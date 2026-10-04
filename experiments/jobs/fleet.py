@@ -17,7 +17,6 @@ from pathlib import Path, PurePosixPath
 import re
 import shlex
 import subprocess
-import sys
 import tarfile
 import tempfile
 import uuid
@@ -147,6 +146,8 @@ def probe_host(host: str, *, remote_python: str = "/usr/bin/python3", timeout: f
         return {"alias": host, "available": False, "error": "server is not in the configured GPU fleet", "gpus": []}
     try:
         result = _ssh(host, ["bash", "-lc", _probe_script(remote_python)], timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return {"alias": host, "available": False, "error": f"SSH/environment probe timed out after {timeout:g} seconds", "gpus": []}
     except (OSError, subprocess.SubprocessError) as exc:
         return {"alias": host, "available": False, "error": str(exc), "gpus": []}
     if result.returncode:
@@ -708,58 +709,10 @@ def _percentage(value: str) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    commands = parser.add_subparsers(dest="action", required=True)
-    inspect = commands.add_parser("inspect", help="inspect all reachable GPU servers")
-    inspect.add_argument("--hosts", nargs="+", default=list(DEFAULT_HOSTS))
-    inspect.add_argument("--probe-python", default="/usr/bin/python3")
-    launch = commands.add_parser("launch", help="select a free GPU and start a detached remote job")
-    launch.add_argument(
-        "--hosts",
-        nargs="+",
-        default=list(DEFAULT_HOSTS),
-        help="compatible candidate server aliases; defaults to the whole fleet",
-    )
-    launch.add_argument("--probe-python", default="/usr/bin/python3")
-    launch.add_argument("--gpu-memory-mib", type=_positive_int, required=True, help="estimated peak memory; dispatch adds a 4 GiB safety margin")
-    launch.add_argument("--idle-memory-mib", type=_positive_int, default=DEFAULT_IDLE_MEMORY_MIB)
-    launch.add_argument("--idle-utilization-pct", type=_percentage, default=DEFAULT_IDLE_UTILIZATION_PCT)
-    launch.add_argument("--cpu-threads", type=_positive_int, required=True)
-    launch.add_argument("--budget-hours", type=_positive_float, required=True)
-    launch.add_argument("--require-path", action="append", default=[], help="absolute remote input path; may be repeated")
-    launch.add_argument("--require-command", action="append", default=[], help="remote PATH command or absolute executable path required before launch; may be repeated")
-    launch.add_argument("--prefer-gpu-name", action="append", default=[], help="GPU name substring; repeat in measured-performance preference order")
-    launch.add_argument("--include-untracked", action="append", default=[], help="local source/config file to add to the snapshot; may be repeated")
-    launch.add_argument("--include-change", action="append", default=[], help="tracked local change to add to the snapshot; may be repeated")
-    launch.add_argument("--state-dir", type=Path, default=DEFAULT_STATE_DIR)
-    launch.add_argument("command", nargs=argparse.REMAINDER)
-    status = commands.add_parser("status", help="retrieve the status of a launched job")
-    status.add_argument("job_id")
-    status.add_argument("--state-dir", type=Path, default=DEFAULT_STATE_DIR)
-    cancel = commands.add_parser("cancel", help="ask the remote supervisor to stop a job")
-    cancel.add_argument("job_id")
-    cancel.add_argument("--state-dir", type=Path, default=DEFAULT_STATE_DIR)
-    args = parser.parse_args(argv)
-    root = Path(__file__).resolve().parents[2]
-    try:
-        if args.action == "inspect":
-            results = inspect_fleet(tuple(args.hosts), remote_python=args.probe_python)
-            print(json.dumps(results, indent=2))
-            return 0 if any(host.get("available") for host in results) else 1
-        if args.action == "launch":
-            command = args.command[1:] if args.command[:1] == ["--"] else args.command
-            if not command:
-                parser.error("launch requires a command after --")
-            args.command = command
-            value = launch_job(args, root)
-            print(json.dumps(value, indent=2))
-            return 0
-        value = status_job(args.job_id, args.state_dir) if args.action == "status" else cancel_job(args.job_id, args.state_dir)
-        print(json.dumps(value, indent=2))
-        return 0
-    except (FleetError, OSError, subprocess.SubprocessError) as exc:
-        print(f"fleet: {exc}", file=sys.stderr)
-        return 2
+    """Compatibility module entry point; all submissions use the smoke gate."""
+    from experiments.jobs.inbox import main as inbox_main
+
+    return inbox_main(argv, public_only=True)
 
 
 if __name__ == "__main__":
