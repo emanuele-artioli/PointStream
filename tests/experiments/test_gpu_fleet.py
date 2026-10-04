@@ -296,3 +296,21 @@ def test_probe_timeout_reports_reason_without_dumping_the_remote_script(monkeypa
     result = fleet.probe_host("gpu2")
     assert not result["available"]
     assert result["error"] == "SSH/environment probe timed out after 20 seconds"
+
+
+def test_selected_snapshot_timeout_bounds_transfer_and_extraction(tmp_path, monkeypatch):
+    source = tmp_path / "source.tar"
+    source.write_bytes(b"archive")
+    calls = []
+    def transfer(*args, **kwargs):
+        calls.append(("transfer", kwargs["timeout"]))
+        return SimpleNamespace(returncode=0, stderr=b"")
+    def remote(host, command, **kwargs):
+        if command[0] == "tar":
+            calls.append(("extract", kwargs["timeout"]))
+        return SimpleNamespace(returncode=0, stdout="a" * 64 + " source.tar", stderr="")
+    monkeypatch.setattr(fleet.subprocess, "run", transfer)
+    monkeypatch.setattr(fleet, "_ssh", remote)
+    fleet._send_snapshot("gpu3", source, "/job/source", "a" * 64, timeout=90)
+    assert calls == [("transfer", 90), ("extract", 90)]
+    assert source.read_bytes() == b"archive"

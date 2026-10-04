@@ -103,8 +103,14 @@ Submission snapshots clean HEAD by default. To dispatch a committed scoped
 checkout through the canonical entry point, add `--source-worktree /absolute/path`.
 It must be the root of a checkout sharing this repository’s Git common directory;
 other repositories and subdirectories are rejected. The selected checkout’s
-HEAD and explicitly selected changes supply the snapshot; the client checkout
-is preserved. Add only intended tracked edits with
+HEAD and explicitly selected changes supply the snapshot. Optional repeated
+`--snapshot-path PATH` arguments select reviewed tracked files/directories
+from that HEAD and record the selection in provenance. Include the complete
+workload and manager dependency set; missing imports must fail local checks
+before submission. Without these arguments the complete HEAD is archived; the client checkout
+is preserved. For a task with tighter file-operation limits, add
+`--snapshot-transfer-seconds 90` (or less) to bound both archive transfer and
+extraction; omitting it retains the existing fleet default. Add only intended tracked edits with
 `--include-change PATH` and new source files with `--include-untracked PATH`;
 never transfer the entire dirty checkout. Submission is published only after its
 snapshot and specification are complete. Source/spec changes after smoke block

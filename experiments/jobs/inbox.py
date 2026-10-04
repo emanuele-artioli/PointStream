@@ -660,6 +660,11 @@ def snapshot_root(root: Path, selected: Path | None) -> Path:
 
 def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     source_root = snapshot_root(root, getattr(args, "source_worktree", None))
+    transfer_seconds = getattr(args, "snapshot_transfer_seconds", None)
+    if transfer_seconds is not None:
+        number(transfer_seconds, "snapshot transfer seconds")
+        if transfer_seconds > 90:
+            raise fleet.FleetError("bounded snapshot transfer seconds must be <=90")
     config = load_config(args.state_dir)
     spec = validate_spec(json.loads(args.spec.read_text()), now=time.time())
     if not set(spec["hosts"]).issubset(config["hosts"]):
@@ -670,12 +675,15 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         if not heartbeat or time.time() - heartbeat["updated"] > 3 * POLL_SECONDS:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
     job_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]
-    snapshot, sha, metadata = fleet._build_snapshot(source_root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked))
+    archive_paths = tuple(getattr(args, "snapshot_path", []))
+    archive_options = {"include_paths": archive_paths} if archive_paths else {}
+    snapshot, sha, metadata = fleet._build_snapshot(source_root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked), **archive_options)
     record = {"job_id": job_id, "status": "preparing", "config": config, "spec_sha256": digest(spec), "snapshot": metadata, "chat_id": args.chat_id}
     monitor.write_json(args.state_dir / f"{job_id}.json", record)
     try:
         prepared = remote_rpc(config, "prepare", {"job_id": job_id})
-        fleet._send_snapshot(config["hosts"][0], snapshot, str(Path(prepared["directory"]) / "source"), sha)
+        transfer_options = {"timeout": transfer_seconds} if transfer_seconds is not None else {}
+        fleet._send_snapshot(config["hosts"][0], snapshot, str(Path(prepared["directory"]) / "source"), sha, **transfer_options)
         response = remote_rpc(config, "publish", {"job_id": job_id, "spec": spec, "snapshot": metadata})
         record.update(response)
         monitor.write_json(args.state_dir / f"{job_id}.json", record)
@@ -766,6 +774,8 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     submission = actions.add_parser("submit")
     submission.add_argument("spec", type=Path)
     submission.add_argument("--source-worktree", type=Path, help="snapshot an explicit checkout of this same repository; default is the canonical checkout")
+    submission.add_argument("--snapshot-transfer-seconds", type=float, help="bound each archive transfer/extraction to at most 90 seconds; default preserves the fleet timeout")
+    submission.add_argument("--snapshot-path", action="append", default=[], help="archive only this reviewed tracked file/directory from HEAD; repeat for a complete workload dependency set")
     submission.add_argument("--chat-id", default=os.environ.get("CODEX_THREAD_ID"), help="submitting Codex chat; register its five-minute heartbeat")
     for command in (workers, submission):
         command.add_argument("--include-change", action="append", default=[])

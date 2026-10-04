@@ -51,3 +51,20 @@ def test_source_worktree_rejects_another_repository_and_subdirectories(tmp_path)
 
 def test_default_snapshot_keeps_canonical_root(tmp_path):
     assert inbox.snapshot_root(tmp_path, None) == tmp_path
+
+
+def test_selected_archive_records_scope_and_omits_unneeded_files(tmp_path):
+    root = repository(tmp_path / "repo")
+    (root / "irrelevant.txt").write_text("large unrelated context\n")
+    git(root, "add", "irrelevant.txt")
+    git(root, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.test", "commit", "-m", "context")
+    archive, _, metadata = fleet._build_snapshot(root, include_paths=("runner.py",))
+    try:
+        with tarfile.open(archive) as stream:
+            assert stream.getnames() == ["runner.py"]
+        assert metadata["tracked_archive_paths_selected"] == ["runner.py"]
+    finally:
+        archive.unlink()
+    for invalid in ("../repo", "/tmp", ":(glob)**", "demo/outputs", "."):
+        with pytest.raises(fleet.FleetError):
+            fleet._build_snapshot(root, include_paths=(invalid,))
