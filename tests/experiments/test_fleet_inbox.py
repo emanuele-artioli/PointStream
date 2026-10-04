@@ -422,3 +422,11 @@ def test_preauthorized_entrypoint_exposes_only_public_actions(internal, capsys):
     with pytest.raises(SystemExit):
         inbox.main([internal], public_only=True)
     assert "invalid choice" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("seconds", [0, float("nan"), 91])
+def test_invalid_bounded_transfer_limit_fails_before_publication(tmp_path, seconds):
+    from argparse import Namespace
+    with pytest.raises(fleet.FleetError, match="positive and finite|<=90"):
+        inbox.submit(Namespace(snapshot_transfer_seconds=seconds), tmp_path)
+    assert not list(tmp_path.iterdir())

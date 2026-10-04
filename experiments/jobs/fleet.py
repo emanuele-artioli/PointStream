@@ -262,15 +262,22 @@ def _build_snapshot(
     *,
     include_changes: tuple[str, ...] = (),
     include_untracked: tuple[str, ...] = (),
+    include_paths: tuple[str, ...] = (),
 ) -> tuple[Path, str, dict[str, Any]]:
     """Create a tar of HEAD plus explicitly selected changes and new files."""
     root = root.resolve()
+    for rel in include_paths:
+        pure = PurePosixPath(rel)
+        if not rel or rel == "." or pure.is_absolute() or ".." in pure.parts or rel.startswith(":"):
+            raise FleetError(f"invalid selected archive path: {rel}")
+        if any(rel == excluded or rel.startswith(excluded + "/") for excluded in SNAPSHOT_EXCLUDED_PATHS):
+            raise FleetError(f"snapshot path is excluded by policy: {rel}")
     temp = tempfile.NamedTemporaryFile(prefix="pointstream-fleet-", suffix=".tar", delete=False)
     snapshot = Path(temp.name)
     try:
         archive = subprocess.Popen(
             [
-                "git", "-C", str(root), "archive", "--format=tar", "HEAD", "--", ".",
+                "git", "-C", str(root), "archive", "--format=tar", "HEAD", "--", *(include_paths or (".",)),
                 ":(exclude)demo/outputs/**",
             ],
             stdout=temp,
@@ -362,6 +369,8 @@ def _build_snapshot(
             "deleted_paths": deleted_paths,
             "snapshot_sha256": digest,
         }
+        if include_paths:
+            metadata["tracked_archive_paths_selected"] = list(include_paths)
         return snapshot, digest, metadata
     except Exception:
         snapshot.unlink(missing_ok=True)
@@ -377,7 +386,10 @@ def _remote_path(host: dict[str, Any], *parts: str) -> str:
     return str(Path(host["data_root"]).joinpath("jobs", "fleet", *parts))
 
 
-def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str) -> None:
+def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str, *, timeout: float | None = None) -> None:
+    timeout = SNAPSHOT_TRANSFER_TIMEOUT_SECONDS if timeout is None else timeout
+    if not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
+        raise FleetError("snapshot transfer timeout must be positive and finite")
     remote_tar = str(Path(target).with_suffix(".tar"))
     receive = f"umask 077; set -o noclobber; cat > {shlex.quote(remote_tar)}"
     with source.open("rb") as stream:
@@ -385,7 +397,7 @@ def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str) -
             ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "-lc", receive])],
             stdin=stream,
             capture_output=True,
-            timeout=SNAPSHOT_TRANSFER_TIMEOUT_SECONDS,
+            timeout=timeout,
             check=False,
         )
     if proc.returncode:
@@ -396,7 +408,7 @@ def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str) -
     extract = _ssh(
         host,
         ["tar", "-xf", remote_tar, "-C", target],
-        timeout=SNAPSHOT_TRANSFER_TIMEOUT_SECONDS,
+        timeout=timeout,
     )
     if extract.returncode:
         raise FleetError(f"{host}: snapshot extraction failed: {extract.stderr.strip()}")

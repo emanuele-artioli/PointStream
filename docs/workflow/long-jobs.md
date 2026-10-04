@@ -99,7 +99,18 @@ paths/versions, GPU UUID, child resource usage and elapsed durations. Workloads
 should additionally publish peak GPU memory and task-specific resource measures.
 Infrastructure smoke results have `citable: false` and never support paper claims.
 
-Submission snapshots clean HEAD by default. Add only intended tracked edits with
+Submission snapshots clean HEAD by default. To dispatch a committed scoped
+checkout through the canonical entry point, add `--source-worktree /absolute/path`.
+It must be the root of a checkout sharing this repository’s Git common directory;
+other repositories and subdirectories are rejected. The selected checkout’s
+HEAD and explicitly selected changes supply the snapshot. Optional repeated
+`--snapshot-path PATH` arguments select reviewed tracked files/directories
+from that HEAD and record the selection in provenance. Include the complete
+workload and manager dependency set; missing imports must fail local checks
+before submission. Without these arguments the complete HEAD is archived; the client checkout
+is preserved. For a task with tighter file-operation limits, add
+`--snapshot-transfer-seconds 90` (or less) to bound both archive transfer and
+extraction; omitting it retains the existing fleet default. Add only intended tracked edits with
 `--include-change PATH` and new source files with `--include-untracked PATH`;
 never transfer the entire dirty checkout. Submission is published only after its
 snapshot and specification are complete. Source/spec changes after smoke block
@@ -141,6 +152,14 @@ status and logs before making a new request. Never replay or migrate automatical
 Completed and interrupted directories remain intact. Cancellation signals only
 owned processes through the supervisor. Existing legacy job IDs remain readable
 and cancellable using their saved local manifests.
+
+Recover selected saved artifacts without a new allocation using
+`scripts/ps-fleet status JOB_ID --artifact smoke/ledger.json --artifact smoke/command.log --output /absolute/new/local/directory`.
+This exports at most twelve job metadata/log/image files, at most 512 KiB each,
+with a twenty-second timeout per read. Paths and symlinks cannot escape the job.
+Exported files are read-only; missing/truncated files are labeled in the receipt,
+and truncated files do not receive a complete content identity. This manager
+operation does not restart workers or replay a stage.
 
 Install the single allow rule in `~/.codex/rules/default.rules` for the absolute
 `/Users/manu/Desktop/PointStream/scripts/ps-fleet` entry point. Remove the former

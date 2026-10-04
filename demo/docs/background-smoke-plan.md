@@ -2,6 +2,27 @@
 
 ## Assignment and limits
 
+**Third approved amendment, 4 October 2026:** the user approved the
+training-readiness continuation: **50 cumulative GPU minutes (3000 seconds)**
+and **60 cumulative CPU preparation minutes (3600 seconds)**. Prior attempts
+remain charged. Submit the environment-first 260-second B1 inventory; promote
+B2/B3/B4 only on actual passing evidence. Per-job, per-file and model-stage
+caps remain unchanged. This authority covers diagnostics, not training.
+
+**Second approved amendment, 4 October 2026:** the user approved raising
+cumulative remote CPU preparation to **40 minutes**, including prior attempts
+and recovery. GPU allocation remains capped at **40 minutes**. Use the tested
+lean snapshot and a 200-second provenance pilot before any model diagnostics.
+All remaining gates and per-job/per-file/model-stage caps remain binding.
+
+**Approved amendment, 4 October 2026:** the user approved the continuation
+proposal in `background-smoke-continuation-20261004.md`: cumulative GPU
+allocation is capped at **40 minutes**, and remote CPU preparation at
+**25 minutes**, including earlier attempts and recovery. The original limits
+below are retained as history; all per-job, per-file and model-stage limits
+remain binding. This amendment does not authorize training or repeated failed
+requests.
+
 Determine whether the background failures come from checkpoint/source
 mismatch, inference state, training degradation, or the tested representation.
 Measure whether temporal packaging improves HNeRV's latent rate. Produce

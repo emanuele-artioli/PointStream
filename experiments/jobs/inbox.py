@@ -646,7 +646,27 @@ def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     return {"config": config, "workers": started, "snapshot": metadata}
 
 
+def snapshot_root(root: Path, selected: Path | None) -> Path:
+    """Permit an explicit checkout of this repository, never another repo."""
+    if selected is None:
+        return root
+    selected = selected.resolve(strict=True)
+    def common(path: Path) -> Path:
+        value = fleet._git(path, "rev-parse", "--git-common-dir").stdout.decode().strip()
+        return (path / value).resolve()
+    top = fleet._git(selected, "rev-parse", "--show-toplevel").stdout.decode().strip()
+    if Path(top).resolve() != selected or common(root) != common(selected):
+        raise fleet.FleetError("source worktree must be a checkout of this same repository")
+    return selected
+
+
 def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
+    source_root = snapshot_root(root, getattr(args, "source_worktree", None))
+    transfer_seconds = getattr(args, "snapshot_transfer_seconds", None)
+    if transfer_seconds is not None:
+        number(transfer_seconds, "snapshot transfer seconds")
+        if transfer_seconds > 90:
+            raise fleet.FleetError("bounded snapshot transfer seconds must be <=90")
     config = load_config(args.state_dir)
     spec = validate_spec(json.loads(args.spec.read_text()), now=time.time())
     if not set(spec["hosts"]).issubset(config["hosts"]):
@@ -657,12 +677,15 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         if not heartbeat or time.time() - heartbeat["updated"] > 3 * POLL_SECONDS:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
     job_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]
-    snapshot, sha, metadata = fleet._build_snapshot(root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked))
+    archive_paths = tuple(getattr(args, "snapshot_path", []))
+    archive_options = {"include_paths": archive_paths} if archive_paths else {}
+    snapshot, sha, metadata = fleet._build_snapshot(source_root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked), **archive_options)
     record = {"job_id": job_id, "status": "preparing", "config": config, "spec_sha256": digest(spec), "snapshot": metadata, "chat_id": args.chat_id}
     monitor.write_json(args.state_dir / f"{job_id}.json", record)
     try:
         prepared = remote_rpc(config, "prepare", {"job_id": job_id})
-        fleet._send_snapshot(config["hosts"][0], snapshot, str(Path(prepared["directory"]) / "source"), sha)
+        transfer_options = {"timeout": transfer_seconds} if transfer_seconds is not None else {}
+        fleet._send_snapshot(config["hosts"][0], snapshot, str(Path(prepared["directory"]) / "source"), sha, **transfer_options)
         response = remote_rpc(config, "publish", {"job_id": job_id, "spec": spec, "snapshot": metadata})
         record.update(response)
         monitor.write_json(args.state_dir / f"{job_id}.json", record)
@@ -752,6 +775,9 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     workers.add_argument("--hosts", nargs="+", choices=fleet.DEFAULT_HOSTS, default=list(fleet.DEFAULT_HOSTS))
     submission = actions.add_parser("submit")
     submission.add_argument("spec", type=Path)
+    submission.add_argument("--source-worktree", type=Path, help="snapshot an explicit checkout of this same repository; default is the canonical checkout")
+    submission.add_argument("--snapshot-transfer-seconds", type=float, help="bound each archive transfer/extraction to at most 90 seconds; default preserves the fleet timeout")
+    submission.add_argument("--snapshot-path", action="append", default=[], help="archive only this reviewed tracked file/directory from HEAD; repeat for a complete workload dependency set")
     submission.add_argument("--chat-id", default=os.environ.get("CODEX_THREAD_ID"), help="submitting Codex chat; register its five-minute heartbeat")
     for command in (workers, submission):
         command.add_argument("--include-change", action="append", default=[])
@@ -763,6 +789,8 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     selftest.add_argument("--include-untracked", action="append", default=[])
     status = actions.add_parser("status")
     status.add_argument("job_id", nargs="?")
+    status.add_argument("--artifact", action="append", default=[], help="bounded read-only export of a selected job artifact")
+    status.add_argument("--output", type=Path, help="new local artifact export directory")
     for name in ("events", "cancel"):
         command = actions.add_parser(name)
         command.add_argument("job_id")
@@ -815,7 +843,18 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
                 monitor.write_json(args.state_dir / "event-acks" / (event_id + ".json"), {"acknowledged": time.time()})
             value = {"acknowledged": args.event_ids}
         else:
-            value = remote_job(args)
+            if getattr(args, "artifact", []):
+                if not args.job_id or args.output is None:
+                    raise fleet.FleetError("artifact export needs a recorded job ID and --output")
+                if not fleet.JOB_ID_RE.fullmatch(args.job_id):
+                    raise fleet.FleetError("invalid job ID")
+                from experiments.jobs.artifacts import export
+                record = monitor.read_json(args.state_dir / f"{args.job_id}.json")
+                if not record:
+                    raise fleet.FleetError("no local job record")
+                value = export(record, args.artifact, args.output)
+            else:
+                value = remote_job(args)
         print(json.dumps(value, indent=2, allow_nan=False))
         return 1 if isinstance(value, dict) and value.get("passed") is False else 0
     except (fleet.FleetError, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
