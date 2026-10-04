@@ -86,3 +86,5 @@ The command snapshots `HEAD`; pass `--include-change PATH` or `--include-untrack
 ```
 
 For overnight runs, use [script-based monitoring and bounded codec pilots](docs/workflow/long-jobs.md).
+
+Storage uses the three roots `pointstream`, `Datasets`, and `Models`; see [storage layout and migration](docs/workflow/storage-layout.md) for path configuration, model repositories/checkpoints, compatibility, and the pending attended cutover.

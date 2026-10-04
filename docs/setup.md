@@ -4,7 +4,7 @@ PointStream has a local coordinator and remote Linux compute hosts. Keep the che
 
 ## Data and environment
 
-Datasets and run outputs live outside the Git tree on the shared data filesystem. The GPU hosts use `/home/itec/emanuele/pointstream-data`; the dispatcher sets `PS_DATA_ROOT` in every remote job. Do not add `assets/` or `outputs/` symlinks to the repository. The Python path resolver accepts `PS_DATA_ROOT`, a checkout-local `.ps-data-root` marker, or the historical repository-root fallback; remote runs always use the explicit shared root.
+Datasets and run outputs live outside the Git tree on the shared data filesystem. The canonical roots are `/home/itec/emanuele/Datasets` and `/home/itec/emanuele/Models`. During migration, the GPU hosts retain the legacy `/home/itec/emanuele/pointstream-data` alias; the dispatcher sets `PS_DATA_ROOT` in every remote job. See [storage layout and migration](workflow/storage-layout.md) for the cutover checks and current deployment status. Do not add `assets/` or `outputs/` symlinks to the repository. The Python path resolver accepts `PS_DATA_ROOT`, a checkout-local `.ps-data-root` marker, an existing `~/Datasets`, or the historical repository-root fallback; remote runs always use the explicit shared root.
 
 The GPU hosts provide `/home/itec/emanuele/.conda/envs/pointstream` and native tools such as FFmpeg and `vvencapp`. Do not mutate that pinned environment with ad-hoc package installs. Inspect and record the exact executable paths and versions needed by an experiment; an FFmpeg build string alone does not prove VVC decoding is available.
 
