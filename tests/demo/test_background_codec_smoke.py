@@ -3,9 +3,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
-import os
 from pathlib import Path
-import sys
 
 import numpy as np
 from PIL import Image
@@ -91,7 +89,9 @@ def test_cut_lengths_order_and_identities(tmp_path: Path) -> None:
         core.validate_cut(rows[:4], start=120, length=4)
     with pytest.raises(ValueError, match="order"):
         core.validate_cut([rows[1], rows[0], *rows[2:]], start=120, length=8)
-    Path(rows[3]["path"]).write_bytes(b"changed")
+    changed_path = rows[3]["path"]
+    assert isinstance(changed_path, str)
+    Path(changed_path).write_bytes(b"changed")
     with pytest.raises(ValueError, match="changed"):
         core.validate_cut(rows, start=120, length=8)
     with pytest.raises(ValueError, match="display index 1"):

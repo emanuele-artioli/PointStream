@@ -155,7 +155,6 @@ def _render_hnerv(root: Path, factory: str, frames: list[Path]) -> tuple[list[Pa
     import torch
     from torchvision.io import read_image
 
-    from demo.experiments.factory_bg_rd import _ensure_target_package
     from demo.experiments.hnerv_holdout_eval import _architecture, _load
 
     stub = hnerv_import_stub(root / "hnerv-stub")
@@ -257,7 +256,6 @@ def _contact_sheet(
     notes_col, notes_row = 3, 1
     x, y = gap + notes_col * (tile_w + gap), title_h + gap + notes_row * (cell_h + gap)
     draw.rounded_rectangle((x, y, x + tile_w, y + cell_h), radius=8, fill="#1d2a37", outline="#3b5164", width=1)
-    note_font = _font(13)
     lines = (
         "Reading the comparison",
         "• Filled source is the inpainted codec input.",

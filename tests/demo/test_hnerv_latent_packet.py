@@ -143,8 +143,9 @@ def test_lossless_packaging_changes_rate_not_codes(tmp_path: Path) -> None:
 def test_decoder_output_ignores_source_tensors() -> None:
     torch = pytest.importorskip("torch")
     from demo.experiments import hnerv_frozen as frozen
+    from torch import nn
 
-    class Decoder(torch.nn.Module):
+    class Decoder(nn.Module):
         def __init__(self):
             super().__init__()
             self.conv = torch.nn.Conv2d(3, 3, 1)
@@ -152,7 +153,7 @@ def test_decoder_output_ignores_source_tensors() -> None:
         def forward(self, embed):
             return torch.sigmoid(self.conv(embed))
 
-    class Model(torch.nn.Module):
+    class Model(nn.Module):
         def __init__(self, decoder):
             super().__init__()
             self.decoder = decoder

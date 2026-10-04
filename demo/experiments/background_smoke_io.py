@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import sys
 import time
+from typing import Any
 
 
 def _stat_identity(path: Path) -> dict[str, int]:

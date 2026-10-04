@@ -927,7 +927,8 @@ def drift_case(stage: Stage, part: str, lpips: Lpips) -> dict[str, Any]:
     if len(reset_frames) != core.DRIFT_LENGTH:
         raise PartFailed("reset segments do not cover the 32 frames")
     reset_psnr = [value for segment in segments for value in segment["frame_psnr_db"]]
-    rows = lambda values: [{"index": core.PRIMARY_START + i, "psnr_db": v} for i, v in enumerate(values)]
+    def rows(values):
+        return [{"index": core.PRIMARY_START + i, "psnr_db": v} for i, v in enumerate(values)]
     return {
         "structure": structure, "arm": arm, "qp": core.QP, "reset_interval": 0, "checkpoints": {"image": image[1], "video": video[1]},
         "frame_ids": frame_ids(stage, cut, core.PRIMARY_START, core.DRIFT_LENGTH),
