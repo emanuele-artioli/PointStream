@@ -69,3 +69,36 @@ def test_read_timeout_publishes_no_partial_export(recorded_job, tmp_path, monkey
     with pytest.raises(subprocess.TimeoutExpired):
         artifacts.export(record, ["smoke/result.json"], target)
     assert not target.exists()
+
+
+def test_admission_inventory_preserves_and_hashes_only_bounded_metadata(recorded_job, tmp_path):
+    record, root = recorded_job
+    attempt = root / "attempts/a"
+    attempt.mkdir(parents=True)
+    content = b'{"admission_rejected":true,"started":100.0}'
+    (attempt / "status.json").write_bytes(content)
+    (attempt / "supervisor.json").write_text('{"pid":123}')
+    target = tmp_path / "audit"
+    artifacts.export(record, ["admission-index.json"], target)
+    result = json.loads((target / "admission-index.json").read_text())
+    row = result["attempts"][0]
+    assert row["directory"] == "attempts/a"
+    assert row["status.json"]["sha256"] == hashlib.sha256(content).hexdigest()
+    assert row["status.json"]["mtime_ns"] == (attempt / "status.json").stat().st_mtime_ns
+    assert (attempt / "status.json").read_bytes() == content
+    receipt = json.loads((target / "export-receipt.json").read_text())
+    assert receipt["files"][0]["synthetic"] is True
+
+
+def test_admission_inventory_rejects_symlink_roots_and_excessive_attempts(recorded_job, tmp_path):
+    record, root = recorded_job
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (root / "attempts").symlink_to(outside)
+    with pytest.raises(fleet.FleetError, match="unsafe admission"):
+        artifacts.export(record, ["admission-index.json"], tmp_path / "audit")
+    (root / "attempts").unlink()
+    for n in range(13):
+        (root / "attempts" / str(n)).mkdir(parents=True)
+    with pytest.raises(fleet.FleetError, match="more than 12"):
+        artifacts.export(record, ["admission-index.json"], tmp_path / "audit")

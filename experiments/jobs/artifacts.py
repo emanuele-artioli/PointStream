@@ -26,7 +26,45 @@ if relative.is_absolute() or '..' in relative.parts:
 path = (root / str(relative)).resolve()
 if root not in path.parents:
     raise ValueError('artifact symlink escapes job directory')
-if not path.exists():
+if str(relative) == 'admission-index.json':
+    attempts_root = root / 'attempts'
+    if attempts_root.is_symlink():
+        raise ValueError('unsafe admission directory root')
+    folders = []
+    if attempts_root.exists():
+        for folder in attempts_root.iterdir():
+            folders.append(folder)
+            if len(folders) > 12:
+                raise ValueError('more than 12 admission directories')
+    folders.sort()
+    folders += [root / 'run'] if (root / 'run').exists() else []
+    if len(folders) > 12:
+        raise ValueError('more than 12 admission directories; select a separate bounded audit')
+    rows = []
+    for folder in folders:
+        if folder.is_symlink() or not folder.is_dir():
+            raise ValueError('admission directory is not a regular directory')
+        row = {'directory': str(folder.relative_to(root))}
+        for name in ('status.json', 'supervisor.json'):
+            item = folder / name
+            if not item.exists():
+                continue
+            if item.is_symlink() or not item.is_file():
+                raise ValueError('unsafe admission metadata')
+            before = item.stat()
+            with item.open('rb') as stream:
+                value = stream.read(32769)
+            after = item.stat()
+            if len(value) > 32768 or (before.st_size, before.st_mtime_ns, before.st_ino) != (after.st_size, after.st_mtime_ns, after.st_ino):
+                raise ValueError('admission metadata too large or changed during read')
+            row[name] = {'content': json.loads(value), 'sha256': hashlib.sha256(value).hexdigest(), 'bytes': len(value), 'mtime_ns': before.st_mtime_ns}
+        rows.append(row)
+    data = json.dumps({'kind': 'read-only admission inventory', 'attempts': rows}, sort_keys=True).encode()
+    if len(data) > limit:
+        raise ValueError('admission inventory exceeds export limit')
+    print(json.dumps({'path': str(relative), 'status': 'read', 'synthetic': True, 'source_bytes': len(data), 'truncated': False,
+        'sha256': hashlib.sha256(data).hexdigest(), 'base64': base64.b64encode(data).decode('ascii'), 'seconds': time.monotonic()-started}))
+elif not path.exists():
     print(json.dumps({'path': str(relative), 'status': 'missing', 'seconds': time.monotonic()-started}))
 else:
     before = path.stat()
@@ -48,7 +86,7 @@ else:
 def validate_paths(paths: list[str]) -> None:
     if not 1 <= len(paths) <= MAX_FILES or len(set(paths)) != len(paths):
         raise fleet.FleetError("select 1-12 distinct job artifacts")
-    metadata = {"ready.json", "spec.json", "environment.json", "state.json", "gate.json", "validation.json", "campaign-error.json", "status.json", "manifest.json"}
+    metadata = {"admission-index.json", "ready.json", "spec.json", "environment.json", "state.json", "gate.json", "validation.json", "campaign-error.json", "status.json", "manifest.json"}
     for value in paths:
         path = Path(value)
         if path.is_absolute() or ".." in path.parts or not path.parts or "\x00" in value:
