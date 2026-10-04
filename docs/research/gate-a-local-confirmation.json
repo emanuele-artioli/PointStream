@@ -462,7 +462,7 @@
     "job": "gpu1:audits/gate-a-retained-score-C2-f12-job-20261003",
     "last_observed": "running"
   },
-  "paper_commit": "ae37810",
+  "paper_commit": "e3d52d3",
   "encoder_access_qualification": {
     "status": "matched_access_comparison_on_hold",
     "finding": "Retained scene000 backgroundpixels use selectedsource000 frames, but canonical canvas geometry uses source000+source028 before firstplate. Nativeone-windowanchorhasnarrowerencoderaccess. Completebytechargingdoesnotfixthis.",
@@ -2260,7 +2260,7 @@
     "scope": "Original4K source38..49, protected packet-only receiver; static initial poses, clipped far arm/racket, retained background ghosts. No matched12 native anchors or qualified96 comparison. All controls retained."
   },
   "fresh_combined_C2_scale48": {
-    "status": "running",
+    "status": "complete_independently_verified_all_four_controls",
     "job": "gpu1:audits/gate-a-fresh-combined-C2-f48-job-20261004",
     "registration_sha256": "62c5f01302e508ea01955455c4da0ed66766788e57cb7e8bfb184c6bf80f72c5",
     "admitted_by": "Actual12 independent byte/pixel/metric/visual qualification; same code/config",
@@ -2268,5 +2268,53 @@
     "memory_gib": 128,
     "cpu_threads": 8,
     "gpu": "none"
+  },
+  "fresh_combined_C2_full96": {
+    "status": "complete_independently_verified_all_four_controls",
+    "artifact": "gpu1:audits/gate-a-fresh-combined-C2-f96-20261004/report.json",
+    "registration_sha256": "878669772e09895dd5be0a73e1f6498a246a5519426e030023fbfbea93bd9a0a",
+    "proof_sha256": "41e95b24b04ce1b226b7e75e5168ffc9a93f4ea7904868fab26d5be1bcdd9611",
+    "controls": {
+      "null": {
+        "complete_bytes": 52831,
+        "vmaf_all96": 62.707727687500004
+      },
+      "unadapted": {
+        "complete_bytes": 51570,
+        "vmaf_all96": 62.73192476041667
+      },
+      "opaque": {
+        "complete_bytes": 55666,
+        "vmaf_all96": 62.285514187500006
+      },
+      "alpha": {
+        "complete_bytes": 58139,
+        "vmaf_all96": 62.695164156249994
+      }
+    },
+    "resources": {
+      "seconds": 3990.559777421993,
+      "affinity": [
+        1,
+        2,
+        3,
+        5,
+        6,
+        8,
+        9,
+        10
+      ],
+      "nice": 19,
+      "self_peak_rss_kib": 9709864,
+      "child_peak_rss_kib": 69272464
+    },
+    "native_source_join": "Existing native96 sourcefile and selectedRGB hashes match exactly. Sparse higher-quality anchors do not establish matched-quality savings.",
+    "scope": "Static initial poses, held far bbox source52, tasktruth/unseen/dense-native gaps. Late96 rasterreview pending. No win claimed."
+  },
+  "pause_20261004": {
+    "status": "paused_at_user_request",
+    "outstanding_owned_jobs": "All3 latest outstanding jobs observed complete exit0/claimsreleased; no new dispatch/promotion authorized during pause",
+    "native_progress": "VVCQP52/QPA0 verified through48frames:27084B/VMAF59.5283195625. AV1CRF63 smokes4K/960/640/1280 complete;1920 and longer AV1 stages pending. No native96QP52 result yet.",
+    "next_minimal": "Collect existing receipts; qualify96QP52 and nearest AV1 quality bracket, then assess complete96 candidate against measured overlapping anchors. Do not replay jobs or broaden search."
   }
 }
