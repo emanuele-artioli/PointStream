@@ -10,9 +10,9 @@ view sits at "scanning folder for git repositories" indefinitely, and so does
 anything waiting on it.
 
 The fix is to let the data live somewhere the code tree does not contain.
-`PS_DATA_ROOT` names that place. It defaults to the repository root, so a
-checkout with its data still in place behaves exactly as before and nothing has
-to be moved for the code to keep working.
+`PS_DATA_ROOT` names that place. A checkout marker takes precedence over an
+existing ~/Datasets root; otherwise the historical repository layout remains
+available. Model sources and checkpoints have a separate Models root.
 
 **Why not a symlink.** A symlink inside the project is what tools follow, and it
 is how one dataset became twelve: each git worktree carried `assets` and
@@ -30,6 +30,8 @@ from typing import Final
 #: Environment variable naming the directory that holds `assets/` and
 #: `outputs/`. Unset means "consult the marker file", then "the repository root".
 ENV_DATA_ROOT: Final = "PS_DATA_ROOT"
+ENV_MODELS_ROOT: Final = "PS_MODELS_ROOT"
+MODELS_ROOT_MARKER: Final = ".ps-models-root"
 
 #: Per-checkout marker naming the data root, one line, no quoting.
 #:
@@ -54,8 +56,8 @@ def data_root() -> Path:
     """Where `assets/` and `outputs/` live.
 
     In order: `PS_DATA_ROOT` if set and non-empty; then a `.ps-data-root` marker
-    file in the repository root; then the repository root itself, which is the
-    historical layout.
+    file in the repository root; then an existing ~/Datasets; then the repository
+    root itself for the historical development layout.
 
     The path is returned whether or not it exists. A caller that needs a
     directory to be present should say so itself, with a message naming what it
@@ -73,17 +75,108 @@ def data_root() -> Path:
     if declared:
         return Path(declared).expanduser().resolve()
 
-    return _REPO_ROOT
+    canonical = Path.home() / "Datasets"
+    return canonical.resolve() if canonical.is_dir() else _REPO_ROOT
 
 
 def assets() -> Path:
-    """The dataset tree: source video, extracted frames, probe sets, weights."""
+    """The dataset tree: source video, extracted frames and probe sets."""
     return data_root() / "assets"
 
 
 def outputs() -> Path:
     """The experiment tree: every run's artifacts and result files."""
     return data_root() / "outputs"
+
+
+def models_root() -> Path:
+    """Model source and checkpoints; explicit configuration never falls back.
+
+    POINTSTREAM_MODELS remains an alias for the demo's existing configuration.
+    The old weights tree is supported until the canonical storage cutover.
+    """
+    override = (
+        os.environ.get(ENV_MODELS_ROOT, "").strip()
+        or os.environ.get("POINTSTREAM_MODELS", "").strip()
+    )
+    if override:
+        return Path(override).expanduser().resolve()
+    try:
+        declared = (_REPO_ROOT / MODELS_ROOT_MARKER).read_text().strip()
+    except OSError:
+        declared = ""
+    if declared:
+        return Path(declared).expanduser().resolve()
+    data = data_root()
+    if data.name == "Datasets":
+        return data.parent / "Models"
+    canonical = Path.home() / "Models"
+    return canonical.resolve() if canonical.is_dir() else assets() / "weights"
+
+
+def model_asset(name: str | Path, *, legacy: str | Path | None = None) -> Path:
+    """Locate a model without downloading it or substituting an explicit root.
+
+    Accept historical assets/weights names, direct model-family paths, and
+    absolute caller-supplied paths. Canonical files take precedence; a retained
+    legacy file is used only when no model root has been explicitly configured.
+    """
+    raw = Path(name)
+    if raw.is_absolute():
+        return raw
+    text = raw.as_posix()
+    for prefix in ("assets/weights/", "weights/"):
+        if text.startswith(prefix):
+            text = text[len(prefix) :]
+            break
+    relative = Path(text)
+    if ".." in relative.parts:
+        raise ValueError("model asset must stay inside its root")
+    root = models_root()
+    candidates = [root / relative]
+    if len(relative.parts) == 1 and root != assets() / "weights":
+        family = model_family(relative.name)
+        if family:
+            candidates.insert(0, root / family / relative.name)
+    for candidate in candidates:
+        if candidate.exists() or candidate.is_symlink():
+            return candidate
+    try:
+        declared = (_REPO_ROOT / MODELS_ROOT_MARKER).read_text().strip()
+    except OSError:
+        declared = ""
+    explicit = bool(
+        os.environ.get(ENV_MODELS_ROOT, "").strip()
+        or os.environ.get("POINTSTREAM_MODELS", "").strip()
+        or declared
+    )
+    if not explicit:
+        historical = [assets() / "weights" / relative, data_root() / "weights" / relative]
+        if legacy is not None:
+            old = Path(legacy)
+            historical.insert(0, old if old.is_absolute() else data_root() / old)
+        for candidate in historical:
+            if candidate.exists() or candidate.is_symlink():
+                return candidate
+    return candidates[0]
+
+
+def model_family(name: str) -> str | None:
+    """Stable family names shared by loaders and the storage migration."""
+    lower = name.lower()
+    for prefix, family in (
+        ("yolo", "YOLO"),
+        ("mobileclip", "YOLO"),
+        ("sam", "SAM"),
+        ("fastsam", "SAM"),
+        ("pix2pix", "pix2pix"),
+        ("spade4tennis", "spade4tennis"),
+        ("vgg", "vgg19"),
+        ("i3d", "i3d"),
+    ):
+        if lower.startswith(prefix):
+            return family
+    return None
 
 
 def _source() -> str:
@@ -96,7 +189,7 @@ def _source() -> str:
             return f"{DATA_ROOT_MARKER} marker file"
     except OSError:
         pass
-    return "repo root (default)"
+    return "~/Datasets" if (Path.home() / "Datasets").is_dir() else "repo root (legacy default)"
 
 
 def describe() -> dict[str, str]:
@@ -112,15 +205,21 @@ def describe() -> dict[str, str]:
         "data_root_source": _source(),
         "assets": str(assets()),
         "outputs": str(outputs()),
+        "models_root": str(models_root()),
     }
 
 
 __all__ = [
     "DATA_ROOT_MARKER",
     "ENV_DATA_ROOT",
+    "ENV_MODELS_ROOT",
+    "MODELS_ROOT_MARKER",
     "assets",
     "data_root",
     "describe",
     "outputs",
+    "models_root",
+    "model_asset",
+    "model_family",
     "repo_root",
 ]

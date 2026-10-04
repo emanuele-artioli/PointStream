@@ -7,10 +7,11 @@ must skip, not auto-download (see src.components.detection.weights).
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
-MODELS_ROOT = Path(os.environ.get("POINTSTREAM_MODELS", "/home/itec/emanuele/Models"))
+from src.contracts import paths
+
+MODELS_ROOT = paths.models_root()
 
 
 def _file(*parts: str) -> Path | None:
