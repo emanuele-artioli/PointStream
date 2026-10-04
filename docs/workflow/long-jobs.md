@@ -99,7 +99,12 @@ paths/versions, GPU UUID, child resource usage and elapsed durations. Workloads
 should additionally publish peak GPU memory and task-specific resource measures.
 Infrastructure smoke results have `citable: false` and never support paper claims.
 
-Submission snapshots clean HEAD by default. Add only intended tracked edits with
+Submission snapshots clean HEAD by default. To dispatch a committed scoped
+checkout through the canonical entry point, add `--source-worktree /absolute/path`.
+It must be the root of a checkout sharing this repository’s Git common directory;
+other repositories and subdirectories are rejected. The selected checkout’s
+HEAD and explicitly selected changes supply the snapshot; the client checkout
+is preserved. Add only intended tracked edits with
 `--include-change PATH` and new source files with `--include-untracked PATH`;
 never transfer the entire dirty checkout. Submission is published only after its
 snapshot and specification are complete. Source/spec changes after smoke block

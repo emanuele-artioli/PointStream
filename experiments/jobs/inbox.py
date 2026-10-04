@@ -644,7 +644,22 @@ def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     return {"config": config, "workers": started, "snapshot": metadata}
 
 
+def snapshot_root(root: Path, selected: Path | None) -> Path:
+    """Permit an explicit checkout of this repository, never another repo."""
+    if selected is None:
+        return root
+    selected = selected.resolve(strict=True)
+    def common(path: Path) -> Path:
+        value = fleet._git(path, "rev-parse", "--git-common-dir").stdout.decode().strip()
+        return (path / value).resolve()
+    top = fleet._git(selected, "rev-parse", "--show-toplevel").stdout.decode().strip()
+    if Path(top).resolve() != selected or common(root) != common(selected):
+        raise fleet.FleetError("source worktree must be a checkout of this same repository")
+    return selected
+
+
 def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
+    source_root = snapshot_root(root, getattr(args, "source_worktree", None))
     config = load_config(args.state_dir)
     spec = validate_spec(json.loads(args.spec.read_text()), now=time.time())
     if not set(spec["hosts"]).issubset(config["hosts"]):
@@ -655,7 +670,7 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         if not heartbeat or time.time() - heartbeat["updated"] > 3 * POLL_SECONDS:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
     job_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]
-    snapshot, sha, metadata = fleet._build_snapshot(root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked))
+    snapshot, sha, metadata = fleet._build_snapshot(source_root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked))
     record = {"job_id": job_id, "status": "preparing", "config": config, "spec_sha256": digest(spec), "snapshot": metadata, "chat_id": args.chat_id}
     monitor.write_json(args.state_dir / f"{job_id}.json", record)
     try:
@@ -750,6 +765,7 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     workers.add_argument("--hosts", nargs="+", choices=fleet.DEFAULT_HOSTS, default=list(fleet.DEFAULT_HOSTS))
     submission = actions.add_parser("submit")
     submission.add_argument("spec", type=Path)
+    submission.add_argument("--source-worktree", type=Path, help="snapshot an explicit checkout of this same repository; default is the canonical checkout")
     submission.add_argument("--chat-id", default=os.environ.get("CODEX_THREAD_ID"), help="submitting Codex chat; register its five-minute heartbeat")
     for command in (workers, submission):
         command.add_argument("--include-change", action="append", default=[])

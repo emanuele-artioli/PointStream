@@ -41,9 +41,9 @@ def test_every_planned_spec_passes_the_dispatcher_schema_and_plan_caps() -> None
 def test_combined_work_above_the_ceiling_is_rejected() -> None:
     planned = all_specs()
     with pytest.raises(ValueError, match="plan ceiling"):
-        specs.check_plan(planned + [max(planned, key=lambda spec: spec["budget_seconds"])])
+        specs.check_plan(planned * 2)
     with pytest.raises(ValueError, match="plan ceiling"):
-        specs.check_plan(planned, spent_seconds=600)
+        specs.check_plan(planned, spent_seconds=1000, spent_inventory_seconds=1000)
     big = dict(planned[0], budget_seconds=600, stall_seconds=600)
     with pytest.raises(ValueError, match="per-job cap"):
         specs.check_plan([big])
@@ -157,9 +157,15 @@ def test_invalid_spend_never_bypasses_the_plan_budget(spent):
 def test_repeated_inventory_reservations_exceed_the_cpu_cap():
     inventory = all_specs()[0]
     with pytest.raises(ValueError, match="inventory budgets"):
-        specs.check_plan([inventory, inventory])
+        specs.check_plan([inventory] * 5)
     with pytest.raises(ValueError, match="inventory budgets"):
-        specs.check_plan([inventory], spent_seconds=340, spent_inventory_seconds=340)
+        specs.check_plan([inventory], spent_seconds=1200, spent_inventory_seconds=1200)
+
+
+def test_approved_continuation_keeps_prior_attempts_charged():
+    caps = specs.check_plan(all_specs(), spent_seconds=680, spent_inventory_seconds=680)
+    assert caps["budget_seconds_total"] == 2190
+    assert caps["remaining_seconds"] == 210
 
 
 def test_drift_spec_requires_hash_pinned_b2_result():

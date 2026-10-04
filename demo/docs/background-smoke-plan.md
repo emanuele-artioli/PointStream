@@ -2,6 +2,14 @@
 
 ## Assignment and limits
 
+**Approved amendment, 4 October 2026:** the user approved the continuation
+proposal in `background-smoke-continuation-20261004.md`: cumulative GPU
+allocation is capped at **40 minutes**, and remote CPU preparation at
+**25 minutes**, including earlier attempts and recovery. The original limits
+below are retained as history; all per-job, per-file and model-stage limits
+remain binding. This amendment does not authorize training or repeated failed
+requests.
+
 Determine whether the background failures come from checkpoint/source
 mismatch, inference state, training degradation, or the tested representation.
 Measure whether temporal packaging improves HNeRV's latent rate. Produce
