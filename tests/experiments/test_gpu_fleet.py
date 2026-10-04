@@ -314,3 +314,37 @@ def test_selected_snapshot_timeout_bounds_transfer_and_extraction(tmp_path, monk
     fleet._send_snapshot("gpu3", source, "/job/source", "a" * 64, timeout=90)
     assert calls == [("transfer", 90), ("extract", 90)]
     assert source.read_bytes() == b"archive"
+
+
+def test_native_probe_records_successful_ffmpeg_version(monkeypatch, tmp_path, capsys):
+    import shutil
+
+    def run(command, **kwargs):
+        if command[0] == "nvidia-smi":
+            output = (
+                "0, GPU-fixture, RTX A6000, 1, 49140, 48675, 0"
+                if command[1].startswith("--query-gpu=")
+                else ""
+            )
+            return subprocess.CompletedProcess(command, 0, output, "")
+        if command[0] == "/fixture/ffmpeg":
+            # FFmpeg's version option differs from the VVC tools' GNU-style flag.
+            success = command[1:] == ["-version"]
+            return subprocess.CompletedProcess(
+                command,
+                0 if success else 8,
+                "ffmpeg version fixture" if success else "",
+                "unsupported option" if not success else "",
+            )
+        return subprocess.CompletedProcess(command, 0, "Python fixture", "")
+
+    monkeypatch.setattr(subprocess, "run", run)
+    monkeypatch.setattr(
+        shutil, "which", lambda name: "/fixture/ffmpeg" if name == "ffmpeg" else None
+    )
+    monkeypatch.setenv("PS_DATA_ROOT", str(tmp_path))
+    exec(compile(fleet._PROBE_PYTHON, "fleet-probe-fixture", "exec"), {})
+    report = json.loads(capsys.readouterr().out)
+    assert report["tool_versions"]["ffmpeg"]["returncode"] == 0
+    assert report["tool_versions"]["ffmpeg"]["version"] == ["ffmpeg version fixture"]
+    assert report["gpus"][0]["compute_processes"] == []
