@@ -2,6 +2,12 @@
 
 ## Decision
 
+The next readiness work is described in
+[the training-readiness record](background-training-readiness.md): isolated
+timed environment probes and local timeout-recovery tests are implemented.
+Its continuation budget is a proposal, not applied authority. No new remote
+job or training ran for that change.
+
 Latest status after the approved 40-minute GPU / 40-minute CPU amendment: see
 [the final bounded attempt](background-smoke-final-attempt-20261004.md).
 The gpu5 inventory started and preserved four passing parts plus a matching

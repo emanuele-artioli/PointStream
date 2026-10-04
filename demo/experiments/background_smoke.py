@@ -361,47 +361,70 @@ def finite_tree(value: Any) -> bool:
 
 # --------------------------------------------------------------- inventory
 
-def _git(root: Path, *args: str) -> str:
-    result = run_command(["git", "-C", str(root), *args], timeout=30)
+def _git(root: Path, *args: str, timeout: float = 30) -> str:
+    result = run_command(["git", "-C", str(root), *args], timeout=timeout)
     if result.returncode != 0:
         raise PartFailed(f"git {' '.join(args)} failed in {root}: {result.stderr[-300:]}")
     return result.stdout
 
 
 def inventory_env(stage: Stage) -> dict[str, Any]:
+    from demo.experiments.background_env_probe import ProbeError, run_recorded_probe
+
     environment: dict[str, Any] = {}
+    stage.environment = environment
+
+    def save(name: str) -> None:
+        core.write_json_new(stage.path("environment-progress", f"{name}.json"), environment)
+
+    def probe(name: str, command: list[str], cap: float = 30, **kwargs):
+        try:
+            return run_recorded_probe(command, name=name, root=stage.path("environment-probes"),
+                                      timeout=stage.clock.bounded(cap), **kwargs)
+        except ProbeError as exc:
+            raise PartFailed(str(exc)) from exc
+
     for name, root, references in (("dcvc", core.DCVC_ROOT, core.DCVC_REFERENCE_SHA256), ("hnerv", core.HNERV_ROOT, core.HNERV_REFERENCE_SHA256)):
-        diff = _git(root, "diff", "--no-color", "HEAD")
+        diff = _git(root, "diff", "--no-color", "HEAD", timeout=stage.clock.bounded(30))
         core.write_json_new(stage.path(f"{name}-source-diff.json"), {"diff": diff})
         files = {}
         for rel in references:
             receipt = core.sha256_file(root / rel, timeout=stage.clock.bounded(30))
             files[rel] = {"sha256": receipt["sha256"], "matches_reference": receipt["sha256"] == references[rel]}
         environment[name] = {
-            "root": str(root), "head": _git(root, "rev-parse", "HEAD").strip(),
-            "status_porcelain": _git(root, "status", "--porcelain").splitlines(),
+            "root": str(root), "head": _git(root, "rev-parse", "HEAD", timeout=stage.clock.bounded(30)).strip(),
+            "status_porcelain": _git(root, "status", "--porcelain", timeout=stage.clock.bounded(30)).splitlines(),
             "tracked_diff_sha256": core.sha256_bytes(diff.encode()), "tracked_diff_bytes": len(diff.encode()),
             "files": files,
         }
+        save(name + "-source")
     report = stage.path("dcvc-check.json")
     expected = stage.path("dcvc-reference.json")
     core.write_json_new(expected, core.DCVC_REFERENCE_SHA256)
-    result = run_command([str(core.DCVC_PYTHON), str(ADAPTER), "check", "--expected", str(expected), "--report", str(report)],
-                         timeout=stage.clock.bounded(90), cwd=core.DCVC_ROOT, env={**os.environ, "PYTHONPATH": str(core.DCVC_ROOT)})
-    if result.returncode != 0:
-        raise PartFailed(f"DCVC adapter check failed: {result.stderr[-800:]}")
+    probe("dcvc-adapter", [str(core.DCVC_PYTHON), str(ADAPTER), "check", "--expected", str(expected), "--report", str(report)],
+          cap=30, cwd=core.DCVC_ROOT, env={**os.environ, "PYTHONPATH": str(core.DCVC_ROOT)})
     environment["dcvc"]["adapter_check"] = core.read_json_bounded(report)
     environment["dcvc"]["revision_matches_mirror"] = environment["dcvc"]["head"] == core.DCVC_REVISION
-    probe = run_command([sys.executable, "-m", "demo.experiments.hnerv_frozen", "probe", "--stub", str(stage.path("hnerv-stub"))],
-                        timeout=stage.clock.bounded(90))
-    environment["hnerv"]["import_probe"] = json.loads(probe.stdout.strip().splitlines()[-1]) if probe.returncode == 0 else {"error": probe.stderr[-800:]}
+    save("dcvc-adapter")
+    result = probe("hnerv-import", [sys.executable, "-m", "demo.experiments.background_env_probe", "hnerv-import"], json_output=True)
+    environment["hnerv"]["import_probe"] = json.loads(result.stdout.strip().splitlines()[-1])
+    save("hnerv-import")
+    imported = environment["hnerv"]["import_probe"]
+    if imported.get("stubbed_modules") != [] or not all(isinstance(imported.get(k), str) and imported[k] for k in ("model_all", "hnerv_utils")):
+        raise PartBlocked("HNeRV import probe did not identify installed modules without stubs")
     ffmpeg_path = core.resolve_ffmpeg()
     if ffmpeg_path is None:
         environment["ffmpeg"] = {"available": False, "path": None}
     else:
-        ffmpeg = run_command([ffmpeg_path, "-hide_banner", "-version"], timeout=20)
+        ffmpeg = probe("ffmpeg", [ffmpeg_path, "-hide_banner", "-version"], cap=10, check=False)
         environment["ffmpeg"] = {"available": ffmpeg.returncode == 0, "path": ffmpeg_path, "version": ffmpeg.stdout.splitlines()[:1]}
-    environment["lpips"] = _lpips_status()
+    save("ffmpeg")
+    result = probe("lpips", [sys.executable, "-m", "demo.experiments.background_env_probe", "lpips"], json_output=True)
+    status = json.loads(result.stdout.strip().splitlines()[-1]).get("status")
+    if not isinstance(status, str):
+        raise PartFailed("LPIPS probe returned no status string")
+    environment["lpips"] = status
+    save("lpips")
     blockers = []
     if not environment["dcvc"]["adapter_check"]["reference"]["matches_reference"]:
         blockers.append("installed DCVC differs from the mirrored inference files")
@@ -411,7 +434,8 @@ def inventory_env(stage: Stage) -> dict[str, Any]:
         blockers.append("HNeRV modules do not import in the worker interpreter")
     if not all(f["matches_reference"] for f in environment["hnerv"]["files"].values()):
         blockers.append("installed HNeRV model/quantizer files differ from the reviewed revision")
-    stage.environment = environment
+    if not environment["lpips"].startswith("lpips "):
+        blockers.append(environment["lpips"])
     if blockers:
         raise PartBlocked("; ".join(blockers))
     return {"dcvc_head": environment["dcvc"]["head"], "dcvc_dirty": environment["dcvc"]["status_porcelain"],
