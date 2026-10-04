@@ -2,6 +2,11 @@
 
 ## Decision
 
+Latest status after the approved budget amendment: see
+[the execution report](background-smoke-approved-execution-20261004.md). The
+new request was canceled after repeated CPU-lock admission failures; corrected
+preparation accounting prevents another submission under the 25-minute cap.
+
 For the later artifact recovery, visual review, passing two-host fleet check
 and explicit budget decision, see [the continuation report](background-smoke-continuation-20261004.md). The observations below remain the record of the first recovery window.
 
