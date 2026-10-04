@@ -44,7 +44,7 @@ def test_an_unregistered_domain_names_the_ones_that_exist():
 
 def test_football_is_not_half_registered():
     """A deferred third profile present in the table would read as supported."""
-    assert set(PROFILES) == {"tennis", "general"}
+    assert set(PROFILES) == {"tennis", "general", "egocentric"}
 
 
 # --------------------------------------------------------------------------

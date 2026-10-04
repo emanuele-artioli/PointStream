@@ -138,6 +138,12 @@ WHOLEBODY_HAND_JOINTS: Final[tuple[str, ...]] = (
     *_indexed("right_hand", 21),
 )
 
+#: One hand, side-agnostic. Index order is the shared COCO-WholeBody/MediaPipe
+#: hand layout: 0 wrist, then thumb 1-4, index 5-8, middle 9-12, ring 13-16,
+#: pinky 17-20, each from base to tip. In an egocentric domain each hand is its
+#: own object, so side travels as an object attribute, not in joint names.
+HAND_21_JOINTS: Final[tuple[str, ...]] = _indexed("hand", 21)
+
 
 # --------------------------------------------------------------------------
 # Skeleton edges, for rendering condition images
@@ -169,6 +175,18 @@ WHOLEBODY_FOOT_EDGES: Final[tuple[tuple[str, str], ...]] = (
     ("right_ankle", "right_heel"),
     ("right_ankle", "right_big_toe"),
     ("right_big_toe", "right_small_toe"),
+)
+
+
+HAND_21_EDGES: Final[tuple[tuple[str, str], ...]] = tuple(
+    (f"hand_{start:02d}", f"hand_{end:02d}")
+    for finger_base in (1, 5, 9, 13, 17)
+    for start, end in (
+        (0, finger_base),
+        (finger_base, finger_base + 1),
+        (finger_base + 1, finger_base + 2),
+        (finger_base + 2, finger_base + 3),
+    )
 )
 
 
@@ -339,11 +357,22 @@ AP10K_17 = KeypointSchema(
     summary="AP-10K animal pose layout.",
 )
 
+HAND_21 = KeypointSchema(
+    name="hand-21",
+    joints=HAND_21_JOINTS,
+    groups={GROUP_HANDS: HAND_21_JOINTS},
+    edges=HAND_21_EDGES,
+    summary="One hand, 21 landmarks; the egocentric per-object schema.",
+)
+
 #: Every schema, by name.
 SCHEMAS: Final[Mapping[str, KeypointSchema]] = {
     schema.name: schema
-    for schema in (COCO_17, OPENPOSE_18, COCO_WHOLEBODY_133, AP10K_17)
+    for schema in (COCO_17, OPENPOSE_18, COCO_WHOLEBODY_133, AP10K_17, HAND_21)
 }
+
+#: Hand sides COCO-WholeBody names its hand banks by.
+HAND_SIDES: Final = ("left", "right")
 
 #: The canonical internal schema for human domains.
 CANONICAL_HUMAN: Final = COCO_WHOLEBODY_133
@@ -433,6 +462,33 @@ def project(source: KeypointSchema, target: KeypointSchema) -> Projection:
         direct=direct,
         derived=derived,
         absent=tuple(absent),
+    )
+
+
+def hand_from_wholebody(side: str) -> Projection:
+    """Project one side's hand bank of COCO-WholeBody-133 onto `HAND_21`.
+
+    Name-based `project` cannot do this on its own: the canonical schema names
+    the banks ``left_hand_NN`` and ``right_hand_NN`` while a hand object carries
+    side-agnostic ``hand_NN`` joints. The mapping is a plain index slice, so it
+    is lossless.
+
+    Raises:
+        ValueError: For a side other than ``left`` or ``right``.
+    """
+    if side not in HAND_SIDES:
+        raise ValueError(f"Hand side must be one of {HAND_SIDES}, got {side!r}.")
+    source_index = COCO_WHOLEBODY_133.index_of
+    direct = {
+        target_idx: source_index[f"{side}_{joint}"]
+        for target_idx, joint in enumerate(HAND_21.joints)
+    }
+    return Projection(
+        source=COCO_WHOLEBODY_133,
+        target=HAND_21,
+        direct=direct,
+        derived={},
+        absent=(),
     )
 
 

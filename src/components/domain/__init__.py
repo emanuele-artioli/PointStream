@@ -32,3 +32,14 @@ REGISTRY.register(
         ),
     )
 )
+REGISTRY.register(
+    BackendSpec(
+        name="egocentric",
+        target="src.components.domain.profiles:build_egocentric",
+        defaults={"selector": "identity"},
+        summary=(
+            "Egocentric manufacturing video: hands as 21-landmark objects; "
+            "free-moving camera, so a panorama background is invalid."
+        ),
+    )
+)

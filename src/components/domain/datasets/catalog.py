@@ -20,7 +20,15 @@ MissingPolicy = Literal["skip", "error"]
 
 _MANIFEST_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = Path(__file__).resolve().parents[4]
-_REGISTERED_DATASETS = ("tennis", "general")
+_REGISTERED_DATASETS = ("tennis", "general", "egocentric")
+
+#: Protocol roles a clip can play. An empty split means the manifest predates
+#: split discipline and the clip is a development sample only.
+SPLIT_FIT = "fit"
+SPLIT_VALIDATION = "validation"
+SPLIT_DEVELOPMENT_HOLDOUT = "development-holdout"
+SPLIT_FINAL_HOLDOUT = "final-holdout"
+SPLITS = ("", SPLIT_FIT, SPLIT_VALIDATION, SPLIT_DEVELOPMENT_HOLDOUT, SPLIT_FINAL_HOLDOUT)
 
 
 class DatasetMissingError(FileNotFoundError):
@@ -52,12 +60,29 @@ class ClipSpec:
     path: str
     pattern: str = ""
     summary: str = ""
+    split: str = ""
+    start_s: float | None = None
+    duration_s: float | None = None
+    size_bytes: int | None = None
 
     def __post_init__(self) -> None:
         if self.kind not in {"video", "frames"}:
             raise ValueError(
                 f"Clip {self.id!r} has kind {self.kind!r}; expected 'video' or 'frames'."
             )
+        if self.split not in SPLITS:
+            raise ValueError(
+                f"Clip {self.id!r} has split {self.split!r}; expected one of "
+                f"{', '.join(repr(item) for item in SPLITS)}."
+            )
+        if (self.start_s is None) != (self.duration_s is None):
+            raise ValueError(
+                f"Clip {self.id!r} must give both start_s and duration_s, or neither."
+            )
+        if self.start_s is not None and (self.start_s < 0 or (self.duration_s or 0) <= 0):
+            raise ValueError(f"Clip {self.id!r} has an empty or negative window.")
+        if self.start_s is not None and self.kind != "video":
+            raise ValueError(f"Clip {self.id!r}: time windows apply to video clips only.")
 
 
 @dataclass(frozen=True)
@@ -81,6 +106,9 @@ class DatasetItem:
     source: Path
     frames: tuple[Path, ...] = ()
     summary: str = ""
+    split: str = ""
+    start_s: float | None = None
+    duration_s: float | None = None
 
     @property
     def sample_path(self) -> Path:
@@ -120,9 +148,16 @@ def parse_manifest(data: Mapping[str, Any]) -> DatasetManifest:
             path=str(item["path"]),
             pattern=str(item.get("pattern") or ""),
             summary=str(item.get("summary") or ""),
+            split=str(item.get("split") or ""),
+            start_s=_optional_float(item.get("start_s")),
+            duration_s=_optional_float(item.get("duration_s")),
+            size_bytes=_optional_int(item.get("size_bytes")),
         )
         for item in clips_raw
     )
+    ids = [clip.id for clip in clips]
+    if len(set(ids)) != len(ids):
+        raise ValueError(f"Dataset manifest for {domain!r} repeats clip ids.")
     roots_raw = data.get("search_roots") or ()
     return DatasetManifest(
         domain=domain,
@@ -131,6 +166,14 @@ def parse_manifest(data: Mapping[str, Any]) -> DatasetManifest:
         clips=clips,
         summary=str(data.get("summary") or ""),
     )
+
+
+def _optional_float(value: Any) -> float | None:
+    return None if value is None else float(value)
+
+
+def _optional_int(value: Any) -> int | None:
+    return None if value is None else int(value)
 
 
 def load_manifest(domain: str, *, path: Path | None = None) -> DatasetManifest:
@@ -224,6 +267,9 @@ def resolve_clip(
         source=source,
         frames=frames,
         summary=spec.summary,
+        split=spec.split,
+        start_s=spec.start_s,
+        duration_s=spec.duration_s,
     )
 
 
@@ -233,15 +279,29 @@ def iter_dataset(
     manifest: DatasetManifest | None = None,
     extra_roots: Sequence[Path] = (),
     missing: MissingPolicy = "skip",
+    splits: Sequence[str] | None = None,
+    include_final_holdout: bool = False,
 ) -> Iterator[DatasetItem]:
     """Yield clips for `domain`, tagged with that domain name.
 
     Default `missing="skip"` lets a runner start on whatever is present.
     `missing="error"` fails on the first absent clip, naming the paths checked.
+    `splits` restricts the protocol roles yielded. Final hold-out clips are
+    never yielded unless `include_final_holdout` is set, so development code
+    cannot open them by iterating a manifest.
     """
     loaded = manifest if manifest is not None else load_manifest(domain)
     roots = resolve_roots(loaded, extra=extra_roots)
+    wanted = None if splits is None else set(splits)
+    if wanted is not None:
+        unknown = sorted(wanted - set(SPLITS))
+        if unknown:
+            raise ValueError(f"Unknown split(s) {unknown}; expected some of {SPLITS}.")
     for spec in loaded.clips:
+        if spec.split == SPLIT_FINAL_HOLDOUT and not include_final_holdout:
+            continue
+        if wanted is not None and spec.split not in wanted:
+            continue
         item = resolve_clip(spec, roots, domain=loaded.domain, missing=missing)
         if item is not None:
             yield item

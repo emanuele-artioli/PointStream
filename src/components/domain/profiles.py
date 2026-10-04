@@ -1,6 +1,6 @@
 """Component wrappers around the contract domain profiles.
 
-The contract already owns `TENNIS` and `GENERAL`. This module does not fork
+The contract already owns `TENNIS`, `GENERAL` and `EGOCENTRIC`. This module does not fork
 those definitions: it names the selector the profile wants and surfaces
 background-method checks so a panorama under parallax fails with the contract's
 message rather than being swallowed.
@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from src.contracts.domain import GENERAL, TENNIS, DomainProfile
+from src.contracts.domain import EGOCENTRIC, GENERAL, TENNIS, DomainProfile
 
 
 @dataclass(frozen=True)
@@ -56,3 +56,8 @@ def build_tennis(*, selector: str = "heuristic") -> DomainBackend:
 def build_general(*, selector: str = "identity") -> DomainBackend:
     """DAVIS-human video. Every detected person is salient; no tennis rules."""
     return DomainBackend(profile=GENERAL, selector=selector)
+
+
+def build_egocentric(*, selector: str = "identity") -> DomainBackend:
+    """Egocentric hands. Every detected hand is salient; no tennis rules."""
+    return DomainBackend(profile=EGOCENTRIC, selector=selector)

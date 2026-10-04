@@ -1,0 +1,103 @@
+# Egocentric set: Egocentric-10K (builddotai) head-mounted manufacturing video,
+# 1920x1080 at 30 fps, HEVC sources. Free-moving camera, so a panorama
+# background is invalid. This stream does not download the dataset.
+#
+# Identity is the raw source video (factory, worker, video index). The demo's
+# `curated/clip_NN_*` names were copies of these files (same byte size on gpu5)
+# and are not identities; `curated/manifest.json` later pointed the same names
+# at other factories, which is why the demo ladder was flagged in 912b0d7.
+#
+# Split protocol (frozen 4 October 2026):
+# - development-holdout: the last 10 s of each development video. These are the
+#   exact windows in pointstream-demo/holdouts/holdouts.json, already used to
+#   score demo generators, so they are exposed and cannot certify a claim.
+# - validation: the 10 s immediately before each development hold-out.
+# - fit: everything before the validation window.
+# - final-holdout: factory_003, referenced by no branch, script or result before
+#   this manifest. Iteration skips it unless a caller opts in explicitly.
+# Checkpoints trained before this manifest sampled seconds across whole videos;
+# they are not governed by these windows and must not be scored as fit-only.
+domain: egocentric
+selector: identity
+summary: Egocentric-10K manufacturing hands, development videos plus one unseen factory.
+search_roots:
+  - /home/itec/emanuele/Datasets/Egocentric-10K/raw
+clips:
+  - id: f001w001v00001-fit
+    kind: video
+    path: extracted/factory001_worker001_00001.mp4
+    size_bytes: 599798044
+    split: fit
+    start_s: 0.0
+    duration_s: 1179.933
+    summary: Factory 1, worker 1, video 1 (demo clip_01).
+  - id: f001w001v00001-validation
+    kind: video
+    path: extracted/factory001_worker001_00001.mp4
+    size_bytes: 599798044
+    split: validation
+    start_s: 1179.933
+    duration_s: 10.0
+    summary: Factory 1, worker 1, video 1, validation window.
+  - id: f001w001v00001-devholdout
+    kind: video
+    path: extracted/factory001_worker001_00001.mp4
+    size_bytes: 599798044
+    split: development-holdout
+    start_s: 1189.933
+    duration_s: 10.0
+    summary: Exposed demo hold-out window (clip_01 last 10 s).
+  - id: f001w001v00000-fit
+    kind: video
+    path: extracted/factory001_worker001_00000.mp4
+    size_bytes: 216756946
+    split: fit
+    start_s: 0.0
+    duration_s: 413.433
+    summary: Factory 1, worker 1, video 0 (demo clip_03).
+  - id: f001w001v00000-validation
+    kind: video
+    path: extracted/factory001_worker001_00000.mp4
+    size_bytes: 216756946
+    split: validation
+    start_s: 413.433
+    duration_s: 10.0
+    summary: Factory 1, worker 1, video 0, validation window.
+  - id: f001w001v00000-devholdout
+    kind: video
+    path: extracted/factory001_worker001_00000.mp4
+    size_bytes: 216756946
+    split: development-holdout
+    start_s: 423.433
+    duration_s: 10.0
+    summary: Exposed demo hold-out window (clip_03 last 10 s).
+  - id: f002w001v00000-fit
+    kind: video
+    path: extracted_f2/factory002_worker001_00000.mp4
+    size_bytes: 599740856
+    split: fit
+    start_s: 0.0
+    duration_s: 1179.767
+    summary: Factory 2, worker 1, video 0.
+  - id: f002w001v00000-validation
+    kind: video
+    path: extracted_f2/factory002_worker001_00000.mp4
+    size_bytes: 599740856
+    split: validation
+    start_s: 1179.767
+    duration_s: 10.0
+    summary: Factory 2, worker 1, video 0, validation window.
+  - id: f002w001v00000-devholdout
+    kind: video
+    path: extracted_f2/factory002_worker001_00000.mp4
+    size_bytes: 599740856
+    split: development-holdout
+    start_s: 1189.767
+    duration_s: 9.967
+    summary: Exposed demo hold-out window (factory002 last 10 s).
+  - id: f003w001v00000-final
+    kind: video
+    path: extracted_new/factory003_worker001_00000.mp4
+    size_bytes: 599741456
+    split: final-holdout
+    summary: Unseen factory reserved for final confirmation; do not inspect during development.

@@ -39,7 +39,7 @@ from src.contracts.capabilities import (
     MOTION_SPARSE_TRAJECTORIES,
 )
 from src.contracts.errors import ConfigValueError, UnknownBackendError
-from src.contracts.keypoints import CANONICAL_HUMAN, KeypointSchema
+from src.contracts.keypoints import CANONICAL_HUMAN, HAND_21, KeypointSchema
 
 # --------------------------------------------------------------------------
 # Camera motion
@@ -387,11 +387,32 @@ GENERAL = DomainProfile(
     ),
 )
 
+EGOCENTRIC = DomainProfile(
+    name="egocentric",
+    salient_classes=(
+        SalientClass(
+            name="hand",
+            keypoint_schema=HAND_21,
+            prompt="hand",
+            summary=(
+                "Each visible hand is its own object; side is an object attribute. "
+                "Tools are not modelled separately yet."
+            ),
+        ),
+    ),
+    camera_motion=CameraMotion.FREE_MOVING,
+    scene_classes=(),
+    summary=(
+        "Head-mounted manufacturing video (Egocentric-10K). The camera translates, "
+        "so the background is a coded stream rather than a panorama; articulated "
+        "hands are the salient foreground."
+    ),
+)
+
 #: Every profile, by config name. Football is deliberately absent — it is a
-#: later decision, and a half-built third profile would be read as a supported
-#: one.
+#: later decision, and a half-built profile would be read as a supported one.
 PROFILES: Final[Mapping[str, DomainProfile]] = {
-    profile.name: profile for profile in (TENNIS, GENERAL)
+    profile.name: profile for profile in (TENNIS, GENERAL, EGOCENTRIC)
 }
 
 

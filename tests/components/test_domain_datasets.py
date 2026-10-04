@@ -51,7 +51,7 @@ def _synthetic_manifest(tmp_path: Path, *, domain: str = "tennis") -> Path:
 
 
 def test_minimal_manifests_exist_for_both_profiles() -> None:
-    for name in ("tennis", "general"):
+    for name in ("tennis", "general", "egocentric"):
         path = manifest_path(name)
         assert path.is_file()
         manifest = load_manifest(name)

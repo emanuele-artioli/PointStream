@@ -27,7 +27,7 @@ def _domain(name: str) -> DomainBackend:
     return built
 
 
-@pytest.mark.parametrize("name", ["tennis", "general"])
+@pytest.mark.parametrize("name", ["tennis", "general", "egocentric"])
 def test_profiles_resolve_by_name_and_round_trip(name: str) -> None:
     spec = DOMAINS.spec(name)
     built = _domain(name)
@@ -41,9 +41,9 @@ def test_profiles_resolve_by_name_and_round_trip(name: str) -> None:
 
 
 def test_football_is_not_registered() -> None:
-    """A half-built third profile would be read as a supported one."""
+    """A half-built profile would be read as a supported one."""
     assert "football" not in DOMAINS
-    assert set(DOMAINS.names()) == {"general", "tennis"}
+    assert set(DOMAINS.names()) == {"general", "tennis", "egocentric"}
     with pytest.raises(UnknownBackendError) as excinfo:
         DOMAINS.spec("football")
     message = str(excinfo.value)
