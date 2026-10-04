@@ -43,6 +43,33 @@ the supervisor stops only its owned process group on contention and marks timing
 contaminated. GPU model filters are compatibility constraints, not performance
 claims. With distributed admission, the first eligible worker wins.
 
+## Partial availability and uncertain jobs
+
+Before a new dispatch, query `scripts/ps-fleet status JOB_ID` for an existing
+request (or the saved legacy job ID) and inspect its preserved supervisor status,
+claims and receipts. Use the canonical fleet status path first; a direct SSH
+failure to the execution node does not establish that the request failed or
+stopped. Shared-inbox state should be inspected through a verified reachable
+management host. If the installed status implementation cannot select or fail
+over to that host, record that as a management-path limitation requiring a
+reviewed fix, not evidence of fleet-wide unavailability. If status remains uncertain,
+retain the request and do not replay or migrate it. Only independent work that
+cannot duplicate the uncertain request may proceed elsewhere.
+
+Audit all eligible hosts with `scripts/ps-fleet inspect`. Record probe failures
+per host and continue with other nodes. Distinguish unreachable, incompatible,
+busy and available hosts; report fleet-wide unavailability only when no eligible
+host has verified capacity. Required fleet doctor/worker gates still apply;
+partial reachability never authorizes bypassing them.
+
+Set the job specification's `hosts` to the complete compatible pool and submit
+with `scripts/ps-fleet submit`; admission selects and claims the available node.
+Do not pin a node merely because a preceding pilot ran there. Validate shared
+input/artifact access and pinned runtime/native binaries on the execution node;
+compatibility is more than free compute capacity. CPU-only requests require a
+supported CPU admission path with equivalent claims, isolation and monitoring;
+do not silently use an old host-pinned SSH helper or reserve an unneeded GPU.
+
 ## Job specification and enforced gate
 
 Schema 1 uses one Python module/script and shared arguments. Only whole-argument
