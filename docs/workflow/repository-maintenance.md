@@ -121,6 +121,26 @@ across unavailable hosts is not verified. Archive and reconcile their remote
 history/process ownership before removing them; cleanliness alone is insufficient.
 No remote worktree, dataset, model, checkpoint, frozen release or source tree was moved.
 
+The bounded follow-up on gpu3 confirmed four old `/tmp` checkouts clean and
+`temporal-mask-wire` dirty. Primary and confirmation status exceeded six seconds;
+the previous observed dirty state remains unresolved. Server-only branch
+retention is explicit:
+
+| Server branch | Reason retained |
+| --- | --- |
+| `main` | Remote primary contains unfinished work; do not fast-forward/reset over it. |
+| `feat/gate-b-confirmation-and-second-domain` | Paused confirmation work and changed second-domain manifest require provenance review. |
+| `codex/foreground-campaign-20260924` | Server head b771b4b differs from the retired Mac/PR143 head; retain until remote history is archived and ownership reconciled. |
+| `codex/journal-experiment-plan` | Clean checkout, but unique remote-only head ef87e1e is absent from the verified Mac archive; preserve research planning until archived/reviewed. |
+| `codex/r01-landmark-metrics` | Clean checkout, but remote-only head4e9bcba has not been imported/reviewed or archived here. |
+| `codex/temporal-mask-wire` | Uncommitted `src/runner/mask_wire.py` remains; preserve until its code and scientific use are reviewed. |
+| `codex/rebuild-semantic-thesis` | Clean checkout, but remote-only head88f17b9 is outside the verified Mac archive; reconcile manuscript/provenance before retirement. |
+
+These seven server worktree registrations share Git metadata. A clean `/tmp`
+checkout does not establish inactivity on every host; gpu2 is unreachable.
+None is silently classified as safe to delete based only on its age.
+
+
 Next: audit the demo source/media identities and selectively integrate qualified
 scientific branches; diagnose DCVC Git collection with a discriminating bounded check;
 finish the96-frame VVC comparison and AV1 overlap; review/integrate qualified
