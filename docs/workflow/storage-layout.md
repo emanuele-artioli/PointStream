@@ -134,5 +134,7 @@ The source and tests implement canonical roots and guarded migration. Physical
 cutover remains pending: gpu1 refused SSH, gpu4 was locked for measurements,
 and fleet workers were present on gpu3, gpu5, and gpu6. Cursor also had active
 code sessions. No live datasets, weights, checkpoints, or source checkout were
-relocated. The generated host check and immutable plan identify these blockers
-and destination collisions. Infrastructure migration smokes are not paper evidence.
+relocated. Generating the immutable remote plan and running the NFS migration
+smoke also await explicit approval to transfer the standalone checker to gpu3.
+A fresh host check and plan must identify remaining blockers and destination
+collisions before application. Infrastructure migration smokes are not paper evidence.
