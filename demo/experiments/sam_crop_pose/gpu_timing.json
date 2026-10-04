@@ -1,0 +1,45 @@
+{
+  "schema": "pointstream.sam_crop_pose_gpu_timing.v1",
+  "providers": [
+    "CUDAExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "crops": 8,
+  "warmup": 3,
+  "order_fastest_first": [
+    "rtmpose-m",
+    "dwpose-l",
+    "rtmpose-l",
+    "rtmw-l",
+    "vitpose-l"
+  ],
+  "timing_ms_per_crop": {
+    "rtmpose-m": {
+      "ms_per_crop": 4.4064946414437145,
+      "crops": 8
+    },
+    "rtmpose-l": {
+      "ms_per_crop": 6.444679631385952,
+      "crops": 8
+    },
+    "dwpose-l": {
+      "ms_per_crop": 6.240836111828685,
+      "crops": 8
+    },
+    "rtmw-l": {
+      "ms_per_crop": 7.276229385752231,
+      "crops": 8
+    },
+    "vitpose-l": {
+      "ms_per_crop": 7.600301498314366,
+      "crops": 8
+    }
+  },
+  "cpu_ms_per_crop": {
+    "rtmpose-m": 31.7,
+    "dwpose-l": 62.1,
+    "rtmpose-l": 62.8,
+    "rtmw-l": 94.8,
+    "vitpose-l": 224.2
+  }
+}

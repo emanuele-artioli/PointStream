@@ -1,0 +1,39 @@
+{
+  "schema": "pointstream.sam_crop_pose_summary.v1",
+  "decision": "Train with RTMW-l. The GPU gap to RTMPose-m is small enough that RTMW-l can also be the runtime pose model.",
+  "judgment": "DWPose-l and RTMPose-l fail on the gallery. RTMPose-m often draws nothing and sometimes hallucinates an implausible span. ViTPose-L is strong and still wrong on clip 1 at 451 s. RTMW-l is the best visual pose, including a hidden thumb.",
+  "score": "Fraction of 21 joints inside the SAM hand/arm mask. Not labeled joint error.",
+  "press_crops": 4681,
+  "excluded": "clip 3 source seconds 210 and 240",
+  "inside_half_rate": {
+    "vitpose-l": 0.892,
+    "rtmw-l": 0.829,
+    "dwpose-l": 0.676,
+    "rtmpose-l": 0.676,
+    "rtmpose-m": 0.525
+  },
+  "mean_inside": {
+    "vitpose-l": 0.854,
+    "rtmw-l": 0.803,
+    "dwpose-l": 0.649,
+    "rtmpose-l": 0.649,
+    "rtmpose-m": 0.485
+  },
+  "cpu_ms_per_crop": {
+    "rtmpose-m": 31.7,
+    "dwpose-l": 62.1,
+    "rtmpose-l": 62.8,
+    "rtmw-l": 94.8,
+    "vitpose-l": 224.2
+  },
+  "gpu_ms_per_crop": {
+    "rtmpose-m": 4.41,
+    "dwpose-l": 6.24,
+    "rtmpose-l": 6.44,
+    "rtmw-l": 7.28,
+    "vitpose-l": 7.6
+  },
+  "gpu": "gpu6 RTX 6000 Ada, CUDAExecutionProvider, 8 crops",
+  "full_report": "/home/itec/emanuele/pointstream-data/jobs/sam-crop-pose/report.json",
+  "gallery": "demo/experiments/sam_crop_pose/gallery.jpg"
+}

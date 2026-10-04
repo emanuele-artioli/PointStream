@@ -1,0 +1,190 @@
+{
+  "schema": "pointstream.demo_smoke_plan_source_inventory.v1",
+  "captured_date": "2026-10-03",
+  "source_checkout": "/Users/manu/Desktop/PointStream",
+  "source_head": "4c5ead904a362b338b90e77b60286bbd6c5b234e",
+  "note": "Baseline source identity only. Includes existing user-owned untracked files. Do not edit/dispatch infrastructure changes implicitly. Verify fresh identity before copying or executing. Foreground/background seed files have ordinary repo imports: retain the rest of the tracked repository too. No weights, datasets, or evidence are bundled.",
+  "files": [
+    {
+      "path": "demo/experiments/compare_pose_on_sam_crops.py",
+      "sha256": "668d2ead7076ad0a4eb8178aa23263d7cd5d5bb9312425e43e454c6fbd9c3b26",
+      "bytes": 11257,
+      "git_tracked": true,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/experiments/factory_bg_rd.py",
+      "sha256": "3c0c98c83ea0cace72c2c08c5a49c99302869ce56f7ea3305f3e7c147d7e9a2d",
+      "bytes": 34531,
+      "git_tracked": false,
+      "scope": [
+        "background"
+      ]
+    },
+    {
+      "path": "demo/experiments/fair_crop_av1.py",
+      "sha256": "a59a873d97278ba1f80ac026b26fc01dff9c07c8e1039154a412af66f8fdf9d0",
+      "bytes": 14534,
+      "git_tracked": false,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/experiments/hand_packet_rate.py",
+      "sha256": "871b1c420d56a7450e82e5a5ab2f4fe097e247c8ba075ce99dc48dda954c8b92",
+      "bytes": 14833,
+      "git_tracked": false,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/experiments/hnerv_holdout_eval.py",
+      "sha256": "8929e1f1d35b45c7b213433f2e3c68744e7267eb6d84a252665bbf59c4731626",
+      "bytes": 7626,
+      "git_tracked": false,
+      "scope": [
+        "background"
+      ]
+    },
+    {
+      "path": "demo/experiments/holdout_hand_rd.py",
+      "sha256": "79c66b31c41e0c4631130637d277aa50a2945ce3159f680ab31002b6084a80b6",
+      "bytes": 19830,
+      "git_tracked": false,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/experiments/render_bg_visual_snapshot.py",
+      "sha256": "e19ec9999d0b6cc23554d4e234bd16d840ce13a6cf6b5f59bfb5a2328621c41a",
+      "bytes": 14011,
+      "git_tracked": false,
+      "scope": [
+        "background"
+      ]
+    },
+    {
+      "path": "demo/experiments/score_holdout_generators.py",
+      "sha256": "8b398d9cc62ec2438d74e68f84bf48eeb20be8662ac8fdb3b6159f307014d454",
+      "bytes": 10644,
+      "git_tracked": false,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/experiments/train_rtmw_hands.py",
+      "sha256": "f73f8ec7862a25f80f1ece0aa8d2f16a79f1eb1ff89d402919aa110b5f29d2b7",
+      "bytes": 12001,
+      "git_tracked": true,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/models/hand_objective.py",
+      "sha256": "f5487a73dd535e292407a2a98381656a96ded3698ca487cdcffbc70a12a870f2",
+      "bytes": 4184,
+      "git_tracked": true,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/models/unet_generator.py",
+      "sha256": "93720f74d44bca1282458fcf714ed3574ea3eebafd72196a671468c8400c521e",
+      "bytes": 9579,
+      "git_tracked": true,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/pipeline/foreground_segmenter.py",
+      "sha256": "dfeaad8b933b1077e5489933cde0fe5143b2c380f7fcf5c50d175217a1314a12",
+      "bytes": 4328,
+      "git_tracked": true,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/pipeline/hand_keypoints.py",
+      "sha256": "7bcea9cc9f259908d21a7aea11bd1c064a359ec270346f3481e65e827fde3cf0",
+      "bytes": 10214,
+      "git_tracked": true,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "demo/pipeline/maps/av1_crf.py",
+      "sha256": "dc6190654d44fe3b4505d69984db0a3985dd423310b13848890b99d8c3a498da",
+      "bytes": 3346,
+      "git_tracked": true,
+      "scope": [
+        "foreground",
+        "background"
+      ]
+    },
+    {
+      "path": "experiments/jobs/fleet.py",
+      "sha256": "8a4a66c596ed7bbb50daef5a30c21cb41b8df23661d9c2172c58c8250cd995a3",
+      "bytes": 40225,
+      "git_tracked": true,
+      "scope": [
+        "read_only_infrastructure"
+      ]
+    },
+    {
+      "path": "tests/demo/test_factory_bg_rd.py",
+      "sha256": "6dd9cd959fa217f532d0cc146569076c7a780fa0161980f9ede43d1c17455a7b",
+      "bytes": 3711,
+      "git_tracked": false,
+      "scope": [
+        "background"
+      ]
+    },
+    {
+      "path": "tests/demo/test_hand_packet_rate.py",
+      "sha256": "4f48fbeaabbac67f70faf1486d03ae345bc59d838c309559af0ec33d78b60477",
+      "bytes": 1826,
+      "git_tracked": false,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "tests/demo/test_holdout_hand_rd.py",
+      "sha256": "fe10df15009762d18375475a239bd4b5d59d9c3e757ece420c56ef4476b46715",
+      "bytes": 896,
+      "git_tracked": false,
+      "scope": [
+        "foreground"
+      ]
+    },
+    {
+      "path": "tests/demo/test_neural_bg.py",
+      "sha256": "cbc3f0710eaf9961e3cbc6c5088c30a51e9c79b384fd3e053d9fcf73a1db89b3",
+      "bytes": 1679,
+      "git_tracked": true,
+      "scope": [
+        "background"
+      ]
+    },
+    {
+      "path": "tests/demo/test_sam_crop_pose.py",
+      "sha256": "9f34558ec5ff2c9e5a5b2db94e6d35d94efb68adedee0025c1af160ada2a1c2c",
+      "bytes": 1484,
+      "git_tracked": true,
+      "scope": [
+        "foreground"
+      ]
+    }
+  ]
+}

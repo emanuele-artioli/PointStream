@@ -6,6 +6,8 @@ PointStream is an object-centric semantic video codec. The target is an ACM TOMM
 
 Run remote GPU work through `scripts/ps-fleet`, which enforces availability checks, resource claims, smoke validation, budgets, and durable monitoring. See [docs/workflow/long-jobs.md](docs/workflow/long-jobs.md) for job specifications and recovery.
 
+Codex subagents default to `gpt-6-luna` at `max` reasoning effort unless the task explicitly specifies otherwise.
+
 ## Branches and review
 
 Do this work on a scoped branch, not directly on `main`. Commit a coherent change when it is in a state worth keeping, and push that branch. Do not leave finished work only in the local checkout. When focused tests cover the behavior, suggest a pull request and wait for the user to ask before opening it.
