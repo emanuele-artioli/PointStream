@@ -2,6 +2,9 @@
 
 ## Decision
 
+For the later artifact recovery, visual review, passing two-host fleet check
+and explicit budget decision, see [the continuation report](background-smoke-continuation-20261004.md). The observations below remain the record of the first recovery window.
+
 B1 has no passing provenance gate, so B2/B3/B4 remain **blocked**. Do not
 rank DCVC-UF or HNeRV, retrain either model, or start a longer experiment
 from these results. No new GPU job was submitted during this recovery.
