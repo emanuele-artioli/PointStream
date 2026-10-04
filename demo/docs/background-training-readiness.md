@@ -2,7 +2,8 @@
 
 Status: **not ready for a training pilot or final training**. This document
 defines the next diagnostic request and the evidence needed to choose a pilot.
-It is not compute authorization. Prior failed/canceled attempts and immutable
+The diagnostic continuation caps below were approved on 4 October 2026;
+training remains unauthorized. Prior failed/canceled attempts and immutable
 receipts remain charged and preserved.
 
 ## Environment audit correction
@@ -54,11 +55,11 @@ sheets before B5's decision. An unfavorable result can justify parking a path;
 it does not justify training it anyway.
 
 The last ledger charged **1220 GPU reservation seconds** and **2205.854
-conservative preparation seconds**. Current caps remain 2400 each. A new
+conservative preparation seconds**. Before the latest approval, caps were 2400 each. A new
 260-second inventory cannot fit the remaining 194.146 preparation seconds
 even before publication. No new remote check or job was run for this change.
 
-Proposed continuation authority, **not yet applied**:
+Continuation authority **approved on 4 October 2026**:
 
 - **50 cumulative GPU minutes (3000 seconds)**, preserving prior 1220. The
   four proposed jobs reserve another 1430, totaling 2650, leaving 350.

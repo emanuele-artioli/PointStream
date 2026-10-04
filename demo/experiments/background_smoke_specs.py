@@ -2,7 +2,7 @@
 
 Specs are written outside the code tree. ``check_plan`` enforces this plan's
 limits on top of ``experiments.jobs.inbox.validate_spec``: at most 480 s per
-job, at most 2400 s of submitted budget in total, stalls inside the budget,
+job, at most 3000 s of submitted budget in total, stalls inside the budget,
 and a substantive validator for every request.
 """
 
@@ -20,8 +20,8 @@ from demo.experiments.background_smoke_core import DATA_ROOT, is_sha256
 JOB_BUDGET_SECONDS = 480
 # User approved the continuation amendment on 4 October 2026. Prior attempts
 # remain charged; model-stage and per-job caps are unchanged.
-PLAN_BUDGET_SECONDS = 2400
-PREPARATION_BUDGET_SECONDS = 2400
+PLAN_BUDGET_SECONDS = 3000
+PREPARATION_BUDGET_SECONDS = 3600
 HOSTS = ["gpu3", "gpu5"]
 GPU_MODELS = ["RTX A6000", "RTX 6000 Ada"]
 MODEL_MEMORY_MIB = 24000

@@ -2,6 +2,13 @@
 
 ## Assignment and limits
 
+**Third approved amendment, 4 October 2026:** the user approved the
+training-readiness continuation: **50 cumulative GPU minutes (3000 seconds)**
+and **60 cumulative CPU preparation minutes (3600 seconds)**. Prior attempts
+remain charged. Submit the environment-first 260-second B1 inventory; promote
+B2/B3/B4 only on actual passing evidence. Per-job, per-file and model-stage
+caps remain unchanged. This authority covers diagnostics, not training.
+
 **Second approved amendment, 4 October 2026:** the user approved raising
 cumulative remote CPU preparation to **40 minutes**, including prior attempts
 and recovery. GPU allocation remains capped at **40 minutes**. Use the tested

@@ -43,7 +43,7 @@ def test_combined_work_above_the_ceiling_is_rejected() -> None:
     with pytest.raises(ValueError, match="plan ceiling"):
         specs.check_plan(planned * 2)
     with pytest.raises(ValueError, match="plan ceiling"):
-        specs.check_plan(planned, spent_seconds=1000, spent_inventory_seconds=1000)
+        specs.check_plan(planned, spent_seconds=1600, spent_inventory_seconds=1600)
     big = dict(planned[0], budget_seconds=600, stall_seconds=600)
     with pytest.raises(ValueError, match="per-job cap"):
         specs.check_plan([big])
@@ -167,7 +167,7 @@ def test_repeated_inventory_reservations_exceed_the_cpu_cap(monkeypatch):
 def test_approved_continuation_keeps_prior_attempts_charged():
     caps = specs.check_plan(all_specs(), spent_seconds=680, spent_inventory_seconds=680)
     assert caps["budget_seconds_total"] == 2190
-    assert caps["remaining_seconds"] == 210
+    assert caps["remaining_seconds"] == 810
 
 
 def test_drift_spec_requires_hash_pinned_b2_result():
