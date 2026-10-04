@@ -73,7 +73,9 @@ def _as_bbox(bbox: Sequence[float], width: int, height: int) -> tuple[float, flo
     return values
 
 
-def _as_joints(joints: Iterable[Sequence[float]], width: int, height: int) -> tuple[tuple[float, float], ...]:
+def _as_joints(
+    joints: Iterable[Sequence[float]], width: int, height: int
+) -> tuple[tuple[float, float], ...]:
     values = tuple(tuple(float(value) for value in point[:2]) for point in joints)
     if len(values) != 21 or any(len(point) != 2 for point in values):
         raise ValueError("a hand must contain exactly 21 x/y joints")
@@ -94,12 +96,16 @@ def _quantize(value: float, limit: int) -> int:
 def _codes(hand: TrackedHand, width: int, height: int) -> tuple[int, ...]:
     box = _as_bbox(hand.bbox, width, height)
     joints = _as_joints(hand.joints, width, height)
-    return tuple(_quantize(v, max(width, height)) for v in (*box, *(v for point in joints for v in point)))
+    return tuple(
+        _quantize(v, max(width, height)) for v in (*box, *(v for point in joints for v in point))
+    )
 
 
 def _iou(a: Sequence[float], b: Sequence[float]) -> float:
-    x1 = max(a[0], b[0]); y1 = max(a[1], b[1])
-    x2 = min(a[2], b[2]); y2 = min(a[3], b[3])
+    x1 = max(a[0], b[0])
+    y1 = max(a[1], b[1])
+    x2 = min(a[2], b[2])
+    y2 = min(a[3], b[3])
     inter = max(0.0, x2 - x1) * max(0.0, y2 - y1)
     area_a = max(0.0, a[2] - a[0]) * max(0.0, a[3] - a[1])
     area_b = max(0.0, b[2] - b[0]) * max(0.0, b[3] - b[1])
@@ -120,7 +126,9 @@ def _joint_center(joints: Sequence[Sequence[float]]) -> tuple[float, float]:
     )
 
 
-def _joint_distance(a: Sequence[Sequence[float]], b: Sequence[Sequence[float]], width: int, height: int) -> float:
+def _joint_distance(
+    a: Sequence[Sequence[float]], b: Sequence[Sequence[float]], width: int, height: int
+) -> float:
     ax, ay = _joint_center(a)
     bx, by = _joint_center(b)
     return math.hypot(ax - bx, ay - by) / math.hypot(width, height)
@@ -150,12 +158,17 @@ class CausalTrackAssociator:
         for detection in detections:
             bbox = _as_bbox(detection.bbox, self.width, self.height)
             joints = _as_joints(detection.joints, self.width, self.height)
-            if detection.handedness is not None and detection.handedness.lower() not in ("left", "right"):
+            if detection.handedness is not None and detection.handedness.lower() not in (
+                "left",
+                "right",
+            ):
                 raise ValueError("handedness must be left, right, or None")
             score = detection.score
             if score is not None and not math.isfinite(float(score)):
                 raise ValueError("candidate score must be finite")
-            checked.append(HandDetection(bbox, joints, detection.handedness, score, detection.candidate_id))
+            checked.append(
+                HandDetection(bbox, joints, detection.handedness, score, detection.candidate_id)
+            )
 
         # Suppress near-identical boxes before tracking. Score is only a stable
         # duplicate tie-breaker; it is not treated as a probability or label.
@@ -189,11 +202,18 @@ class CausalTrackAssociator:
                 if distance <= 0.35 and joints <= 0.35 and (overlap >= 0.02 or distance <= 0.10):
                     cost = 1.0 - overlap + 0.5 * distance + 0.5 * joints
                     possible.append((cost, track_id, index))
-                    self.events.append({
-                        "frame_index": self.frame_index, "kind": "association_cost",
-                        "track_id": track_id, "candidate_id": detection.candidate_id,
-                        "cost": cost, "iou": overlap, "bbox_distance": distance, "joint_distance": joints,
-                    })
+                    self.events.append(
+                        {
+                            "frame_index": self.frame_index,
+                            "kind": "association_cost",
+                            "track_id": track_id,
+                            "candidate_id": detection.candidate_id,
+                            "cost": cost,
+                            "iou": overlap,
+                            "bbox_distance": distance,
+                            "joint_distance": joints,
+                        }
+                    )
         possible.sort()
         assigned_tracks: dict[int, int] = {}
         used_tracks: set[int] = set()
@@ -210,21 +230,28 @@ class CausalTrackAssociator:
             if track_id is None:
                 track_id = self.next_id
                 self.next_id += 1
-                self.events.append({
-                    "frame_index": self.frame_index, "kind": "reset",
-                    "track_id": track_id, "candidate_id": detection.candidate_id,
-                })
+                self.events.append(
+                    {
+                        "frame_index": self.frame_index,
+                        "kind": "reset",
+                        "track_id": track_id,
+                        "candidate_id": detection.candidate_id,
+                    }
+                )
             self._tracks[track_id] = (detection.bbox, detection.joints, self.frame_index)
             handedness = detection.handedness
             if handedness is not None:
                 handedness = "left" if handedness.lower() == "left" else "right"
             result.append(TrackedHand(track_id, handedness, detection.bbox, detection.joints))
         self._expire_tracks()
-        return FrameAssignment(tuple(sorted(result, key=lambda hand: hand.track_id)), True, None, duplicate_count)
+        return FrameAssignment(
+            tuple(sorted(result, key=lambda hand: hand.track_id)), True, None, duplicate_count
+        )
 
     def _expire_tracks(self) -> None:
         self._tracks = {
-            track_id: state for track_id, state in self._tracks.items()
+            track_id: state
+            for track_id, state in self._tracks.items()
             if self.frame_index - state[2] <= self.max_gap + 1
         }
 
@@ -234,11 +261,15 @@ def _validate_dimensions(width: int, height: int) -> None:
         raise ValueError(f"frame dimensions must be between 1 and {MAX_DIMENSION}")
 
 
-def _hand_record(hand: TrackedHand, width: int, height: int, previous: dict[int, tuple[int, ...]], delta: bool) -> tuple[bytes, tuple[int, ...]]:
+def _hand_record(
+    hand: TrackedHand, width: int, height: int, previous: dict[int, tuple[int, ...]], delta: bool
+) -> tuple[bytes, tuple[int, ...]]:
     if not 0 <= hand.track_id <= 65535:
         raise ValueError("track_id must fit uint16")
     codes = _codes(hand, width, height)
-    side = {None: 0, "left": 1, "right": 2}.get(hand.handedness.lower() if hand.handedness else None)
+    side = {None: 0, "left": 1, "right": 2}.get(
+        hand.handedness.lower() if hand.handedness else None
+    )
     if side is None:
         raise ValueError("handedness must be left, right, or None")
     prior = previous.get(hand.track_id)
@@ -283,18 +314,35 @@ def encode_segment(
         plain.append(len(ordered))
         seen: set[int] = set()
         for hand in ordered:
-            record, _ = _hand_record(hand, width, height, previous, method_code == _METHOD_DELTA_ZLIB)
+            record, _ = _hand_record(
+                hand, width, height, previous, method_code == _METHOD_DELTA_ZLIB
+            )
             plain.extend(record)
             total_records += 1
             seen.add(hand.track_id)
         # Keep prior coordinates over short absences. They are encoder state
         # inside this segment only; packet decoding remains self-contained.
-        previous = {key: value for key, value in previous.items() if key in seen or method_code == _METHOD_DELTA_ZLIB}
+        previous = {
+            key: value
+            for key, value in previous.items()
+            if key in seen or method_code == _METHOD_DELTA_ZLIB
+        }
     raw = bytes(plain)
     payload = raw if method_code == _METHOD_RAW else zlib.compress(raw, level=9)
     header = _HEADER.pack(
-        MAGIC, VERSION, method_code, width, height, fps_num, fps_den, COORD_SCALE,
-        start_frame, len(frames), total_records, len(payload), zlib.crc32(raw) & 0xFFFFFFFF,
+        MAGIC,
+        VERSION,
+        method_code,
+        width,
+        height,
+        fps_num,
+        fps_den,
+        COORD_SCALE,
+        start_frame,
+        len(frames),
+        total_records,
+        len(payload),
+        zlib.crc32(raw) & 0xFFFFFFFF,
     )
     return header + payload
 
@@ -303,8 +351,21 @@ def decode_segment(packet: bytes) -> dict:
     """Validate and independently decode one experimental segment."""
     if len(packet) < _HEADER.size:
         raise ValueError("truncated packet header")
-    (magic, version, method, width, height, fps_num, fps_den, units,
-     start_frame, frame_count, expected_records, payload_length, expected_crc) = _HEADER.unpack_from(packet)
+    (
+        magic,
+        version,
+        method,
+        width,
+        height,
+        fps_num,
+        fps_den,
+        units,
+        start_frame,
+        frame_count,
+        expected_records,
+        payload_length,
+        expected_crc,
+    ) = _HEADER.unpack_from(packet)
     if magic != MAGIC or version != VERSION:
         raise ValueError("invalid packet magic or version")
     if method not in (_METHOD_RAW, _METHOD_ZLIB, _METHOD_DELTA_ZLIB):
@@ -316,7 +377,7 @@ def decode_segment(packet: bytes) -> dict:
         raise ValueError("invalid segment frame range")
     if payload_length != len(packet) - _HEADER.size:
         raise ValueError("payload length mismatch or trailing bytes")
-    payload = packet[_HEADER.size:]
+    payload = packet[_HEADER.size :]
     max_plain = frame_count * (1 + 2 * (_RECORD.size + 92))
     try:
         if method == _METHOD_RAW:
@@ -357,7 +418,9 @@ def decode_segment(packet: bytes) -> dict:
             if flags:
                 if method != _METHOD_DELTA_ZLIB or track_id not in previous:
                     raise ValueError("delta record has no segment-local prior")
-                codes = tuple((value + prior) & 0xFFFF for value, prior in zip(encoded, previous[track_id]))
+                codes = tuple(
+                    (value + prior) & 0xFFFF for value, prior in zip(encoded, previous[track_id])
+                )
             else:
                 codes = tuple(encoded)
             previous[track_id] = codes
@@ -372,8 +435,12 @@ def decode_segment(packet: bytes) -> dict:
     if offset != len(plain) or actual_records != expected_records:
         raise ValueError("record count or trailing payload mismatch")
     return {
-        "width": width, "height": height, "fps_num": fps_num, "fps_den": fps_den,
-        "start_frame": start_frame, "method": ("raw", "zlib", "delta_zlib")[method],
+        "width": width,
+        "height": height,
+        "fps_num": fps_num,
+        "fps_den": fps_den,
+        "start_frame": start_frame,
+        "method": ("raw", "zlib", "delta_zlib")[method],
         "frames": frames,
     }
 
@@ -406,18 +473,25 @@ def decoded_bbox_int(hand: TrackedHand, width: int, height: int) -> tuple[int, i
     """Apply one explicit nearest-integer rule before using the source crop."""
     x1, y1, x2, y2 = hand.bbox
     values = tuple(int(math.floor(value + 0.5)) for value in (x1, y1, x2, y2))
-    bx1 = min(width - 1, max(0, values[0])); by1 = min(height - 1, max(0, values[1]))
-    bx2 = min(width, max(bx1 + 1, values[2])); by2 = min(height, max(by1 + 1, values[3]))
+    bx1 = min(width - 1, max(0, values[0]))
+    by1 = min(height - 1, max(0, values[1]))
+    bx2 = min(width, max(bx1 + 1, values[2]))
+    by2 = min(height, max(by1 + 1, values[3]))
     return bx1, by1, bx2, by2
 
 
-def map_points_to_letterbox(points: Sequence[Sequence[float]], meta: dict[str, float]) -> np.ndarray:
+def map_points_to_letterbox(
+    points: Sequence[Sequence[float]], meta: dict[str, float]
+) -> np.ndarray:
     """Map full-frame points with the realized integer resize dimensions."""
     x1, y1 = meta["orig_x1"], meta["orig_y1"]
     orig_w, orig_h = meta["orig_w"], meta["orig_h"]
     sx = meta["new_w"] / orig_w
     sy = meta["new_h"] / orig_h
     return np.asarray(
-        [[(float(x) - x1) * sx + meta["pad_x"], (float(y) - y1) * sy + meta["pad_y"]] for x, y in points],
+        [
+            [(float(x) - x1) * sx + meta["pad_x"], (float(y) - y1) * sy + meta["pad_y"]]
+            for x, y in points
+        ],
         dtype=np.float64,
     )

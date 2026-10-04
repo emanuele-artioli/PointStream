@@ -496,7 +496,7 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
         location = base / "workers" / alias
         location.mkdir(parents=True, exist_ok=True)
         previous = monitor.read_json(location / "active" / "identity.json", {})
-        if previous.get("pid") and previous.get("host") == socket.getfqdn().lower() and is_pid_alive(previous["pid"], previous.get("proc_start_time")):
+        if isinstance(previous, dict) and previous.get("pid") and previous.get("host") == socket.getfqdn().lower() and is_pid_alive(previous["pid"], previous.get("proc_start_time")):
             return {"alias": alias, "pid": previous["pid"], "status": "already_running"}
         # Worker itself arbitrates singleton startup. This acknowledgement is
         # provisional until its heartbeat and ownership match the new PID.
@@ -507,7 +507,7 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
             if process.poll() is not None:
                 raise fleet.FleetError(f"worker {alias} exited during startup; inspect its log")
             identity = monitor.read_json(location / "active" / "identity.json", {})
-            if identity.get("pid") == process.pid:
+            if isinstance(identity, dict) and identity.get("pid") == process.pid:
                 return {"alias": alias, "pid": process.pid, "status": "running", "release": str(Path(__file__).resolve().parents[2])}
             time.sleep(0.1)
         raise fleet.FleetError("worker startup acknowledgement missing; inspect before retrying")
@@ -580,8 +580,10 @@ def worker_bundle(snapshot: Path) -> tuple[Path, dict[str, str]]:
                     if data is not None:
                         data.close()
                         content = original.extractfile(member)
-                        identities[member.name] = hashlib.sha256(content.read()).hexdigest()
-                        content.close()
+                        if content is None:
+                            raise OSError(f"could not read snapshot member {member.name}")
+                        with content:
+                            identities[member.name] = hashlib.sha256(content.read()).hexdigest()
         return bundle, identities
     except Exception:
         bundle.unlink(missing_ok=True)

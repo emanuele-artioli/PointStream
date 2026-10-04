@@ -35,30 +35,31 @@ def repo_root() -> Path:
 def weights_dir(root: Path | None = None) -> Path:
     """Where checkpoints live.
 
-    Since the data move this is under the *data* root, not the checkout —
-    ``src/contracts/paths.py`` is the only place that resolves ``assets/``.
+    Canonical storage is under Models; the path contract retains the legacy
+    external weights root while old checkouts are being migrated.
     An explicit `root` still means "the directory that contains ``assets/``",
     which is what the tests plant into.
     """
     if root is not None:
         return root / "assets" / "weights"
-    return paths.assets() / "weights"
+    return paths.models_root()
 
 
 def intended_weight_path(name: str, *, root: Path | None = None) -> Path:
     """Where `name` would live, without requiring that it does.
 
-    Bare names plant under ``assets/weights/``. A name that already starts with
-    that prefix is treated as repo-relative so the resolver cannot produce
-    ``assets/weights/assets/weights/...``.
+    Bare names resolve under Models, with legacy lookup during migration.
+    Historical ``assets/weights/`` prefixes are normalized once. Explicit test
+    roots retain their historical assets/weights layout.
     """
     raw = Path(name)
     if raw.is_absolute():
         return raw
     posix = name.replace("\\", "/").lstrip("./")
+    if root is None:
+        return paths.model_asset(posix)
     if posix.startswith(_WEIGHTS_POSIX_PREFIX):
-        base = root if root is not None else paths.data_root()
-        return base / posix
+        return root / posix
     return weights_dir(root) / name
 
 
@@ -99,7 +100,7 @@ def resolve_weight(name: str, *, root: Path | None = None) -> Path:
         planted = intended_weight_path(name, root=root)
         if _is_present(planted) or planted.is_symlink():
             candidate = planted
-        elif candidate.exists() or candidate.is_symlink():
+        elif root is not None and (candidate.exists() or candidate.is_symlink()):
             candidate = candidate
         else:
             candidate = planted

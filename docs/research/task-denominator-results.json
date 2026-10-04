@@ -1,0 +1,1022 @@
+{
+  "kind": "retained model-reference cache interventions, synthetic scorer conformance and saved arithmetic audit",
+  "independent_task_accuracy": false,
+  "source_frame_alignment_verified": false,
+  "training_exposure_verified": false,
+  "code_revision": "7228db3c493bdef13fdd098cfbdaea4624c48ea2",
+  "legacy_revision": "3f7c1210a7284a330b3e931c56d5a78d3eb1f29d",
+  "legacy_scorer_sha256": "1261010fd4a0dc1d5708d53efbc3454e384b6a33332661e41ee0f0121ea36d0f",
+  "corrected_scorer_sha256": "25eab6c4bf739b08cee6ecd281e588c6cfbc9270a7b1fc04216e5d50ac6ac0cb",
+  "audit_worker_sha256": "f7f4a53c4f874150e7768bdbf731148122bc65902b0120d3e0c50d8db58c7bab",
+  "command": [
+    "/private/tmp/pointstream-task-evidence/experiments/task_audit/denominator_audit.py",
+    "--track-root",
+    "/private/tmp/task-evidence-inputs",
+    "--out",
+    "/private/tmp/task-evidence-7228db3/report.json",
+    "--report",
+    "/Users/manu/.codex/worktrees/research-evidence-recovery/PointStream/docs/research-recovery/records/demo/egocentric-reports/outputs__results__offline_gt_report_rtm.json",
+    "--report",
+    "/Users/manu/.codex/worktrees/research-evidence-recovery/PointStream/docs/research-recovery/records/demo/egocentric-reports/outputs__results__rtm_encoder_report.json"
+  ],
+  "python": "3.12.7 | packaged by conda-forge | (main, Oct  4 2024, 15:57:01) [Clang 17.0.6 ]",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "gpu_uuid": null,
+  "native_encoder_decoder": "not used",
+  "inputs": [
+    {
+      "path": "/Users/manu/.codex/worktrees/research-evidence-recovery/PointStream/docs/research-recovery/records/demo/egocentric-reports/outputs__results__offline_gt_report_rtm.json",
+      "sha256": "76b3011183769b5aa5fc53a862c436df3e828966b44cdf080bbcf9d41d538359",
+      "bytes": 26032
+    },
+    {
+      "path": "/Users/manu/.codex/worktrees/research-evidence-recovery/PointStream/docs/research-recovery/records/demo/egocentric-reports/outputs__results__rtm_encoder_report.json",
+      "sha256": "ab0732cdbc8085129bed33b29f0e9344b558ca4003494b812b42cf90a1900bf2",
+      "bytes": 14492
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_01_factory001_worker001_00001/ref_gt_rtm_hand.json",
+      "sha256": "728e118ad82b73b19d73b7483776607fe810618f16519d7886c8964212a69a7c",
+      "bytes": 385989
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_01_factory001_worker001_00001/ref_encoder_mp_live.json",
+      "sha256": "2d68c4f4e8a00dfc2f460102c8a5aed7e3c52af57389ea3881bbd3eb5c4cf62b",
+      "bytes": 484037
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_01_factory001_worker001_00001/ps_rec_ps_standard_rtm_hand.json",
+      "sha256": "83166cfc8154e4caa01eec26fa2d97bb0bf74a14afb4ad10e2a491c1474467af",
+      "bytes": 438048
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_01_factory001_worker001_00001/av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "sha256": "3d543dbddda405df8d230b94d792fb53b163b8d5f7f4a81c329bcbd9d90b2531",
+      "bytes": 446168
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_02_factory001_worker001_00002/ref_gt_rtm_hand.json",
+      "sha256": "a8569e5b399e35d1b8e2d6f0f7076c2e4e61cc479e1b747cd82ee08a94dbdf7f",
+      "bytes": 433001
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_02_factory001_worker001_00002/ref_encoder_mp_live.json",
+      "sha256": "dfd75b0f7400181160ca484ddf76970cb06d00daef207ccee5492471918072d1",
+      "bytes": 590296
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_02_factory001_worker001_00002/ps_rec_ps_standard_rtm_hand.json",
+      "sha256": "f5d0f2d419432fac5db2781463113abbdb4fb03c6c588401520c2550eb33b58c",
+      "bytes": 421125
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_02_factory001_worker001_00002/av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "sha256": "c92ef74367c7a506339db6877adf3c35dd2e5b2d61edc09585ea7a551a018f05",
+      "bytes": 453386
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_03_factory001_worker001_00000/ref_gt_rtm_hand.json",
+      "sha256": "eb0dd124b27790efa630fe0b8f14087e214dfd6f20f071515202906be0b10347",
+      "bytes": 417316
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_03_factory001_worker001_00000/ref_encoder_mp_live.json",
+      "sha256": "00f875bb3d20fc75c4f17341f89568f0e67f521d7d6fe0086684318e008b0fcd",
+      "bytes": 404713
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_03_factory001_worker001_00000/ps_rec_ps_standard_rtm_hand.json",
+      "sha256": "3fed270de30d8c306014249847f451ebbb7a39f650573d86112a9157e26e8954",
+      "bytes": 428149
+    },
+    {
+      "path": "/private/tmp/task-evidence-inputs/clip_03_factory001_worker001_00000/av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "sha256": "4f94aa0491550ac76f0f272712850a3d04decdb1b1afeaa393dda5c3d55795bb",
+      "bytes": 430248
+    }
+  ],
+  "external_report": {
+    "path": "/private/tmp/task-evidence-7228db3/report.json",
+    "sha256": "fd0b8699e5e988f1365f6889ee4eace6f0863fe9afec14c59bfb42b5f1b14f76"
+  },
+  "smoke": {
+    "path": "/private/tmp/task-evidence-7228db3/smoke.json",
+    "sha256": "5430798d5f3cee3fc5661231a4f2e8324b1350f6d74853f1ecf61a5558695afb",
+    "started_at_utc": "2026-10-01T09:22:00.511048+00:00",
+    "finished_at_utc": "2026-10-01T09:22:00.730450+00:00",
+    "command": [
+      "/private/tmp/pointstream-task-evidence/experiments/task_audit/denominator_audit.py",
+      "--track-root",
+      "/private/tmp/task-evidence-inputs",
+      "--smoke",
+      "--out",
+      "/private/tmp/task-evidence-7228db3/smoke.json"
+    ]
+  },
+  "full_comparisons": 9,
+  "controlled_conditions": 45,
+  "saved_rows": 75,
+  "all_saved_rows_missing_registered_frame_counters": true,
+  "max_saved_pck_identity_error": 5.551115123125783e-17,
+  "selected_results": [
+    {
+      "clip_cache_identity": "clip_01_factory001_worker001_00001",
+      "prediction": "ref_encoder_mp_live.json",
+      "condition": "full",
+      "legacy": {
+        "detection_rate": 0.12890625,
+        "oracle_capture_ratio": 0.12890625,
+        "mpjpe_pixels": 202.72367705744722,
+        "mean_confidence": 0.8393454425262682,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.39105339105339104,
+        "pck50_all_gt": 0.05040922619047619,
+        "gt_hands": 256.0,
+        "pred_hands": 203.0,
+        "matched_hands": 33.0
+      },
+      "corrected": {
+        "detection_rate": 0.12890625,
+        "oracle_capture_ratio": 0.12890625,
+        "mpjpe_pixels": 202.72367705744722,
+        "mean_confidence": 0.8393454425262682,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.39105339105339104,
+        "pck50_all_gt": 0.05040922619047619,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 223.0,
+        "gt_hands": 256.0,
+        "pred_hands": 203.0,
+        "matched_hands": 33.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_01_factory001_worker001_00001",
+      "prediction": "ref_encoder_mp_live.json",
+      "condition": "reversed",
+      "legacy": {
+        "detection_rate": 0.12890625,
+        "oracle_capture_ratio": 0.12890625,
+        "mpjpe_pixels": 291.13054252971165,
+        "mean_confidence": 0.7701763474580013,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.03318903318903319,
+        "pck50_all_gt": 0.00427827380952381,
+        "gt_hands": 256.0,
+        "pred_hands": 203.0,
+        "matched_hands": 33.0
+      },
+      "corrected": {
+        "detection_rate": 0.12890625,
+        "oracle_capture_ratio": 0.12890625,
+        "mpjpe_pixels": 202.72367705744722,
+        "mean_confidence": 0.8393454425262682,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.39105339105339104,
+        "pck50_all_gt": 0.05040922619047619,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 223.0,
+        "gt_hands": 256.0,
+        "pred_hands": 203.0,
+        "matched_hands": 33.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_01_factory001_worker001_00001",
+      "prediction": "ref_encoder_mp_live.json",
+      "condition": "drop_suffix_0.5",
+      "legacy": {
+        "detection_rate": 0.16,
+        "oracle_capture_ratio": 0.16,
+        "mpjpe_pixels": 174.51709651538977,
+        "mean_confidence": 0.8594186067581177,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.4119047619047619,
+        "pck50_all_gt": 0.06590476190476191,
+        "gt_hands": 125.0,
+        "pred_hands": 104.0,
+        "matched_hands": 20.0
+      },
+      "corrected": {
+        "detection_rate": 0.078125,
+        "oracle_capture_ratio": 0.078125,
+        "mpjpe_pixels": 174.51709651538977,
+        "mean_confidence": 0.8594186067581177,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.4119047619047619,
+        "pck50_all_gt": 0.03218005952380952,
+        "registered_frames": 300.0,
+        "prediction_frames": 150.0,
+        "missing_prediction_frames": 150.0,
+        "missing_reference_hands": 236.0,
+        "gt_hands": 256.0,
+        "pred_hands": 104.0,
+        "matched_hands": 20.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_01_factory001_worker001_00001",
+      "prediction": "ps_rec_ps_standard_rtm_hand.json",
+      "condition": "full",
+      "legacy": {
+        "detection_rate": 0.6640625,
+        "oracle_capture_ratio": 0.6640625,
+        "mpjpe_pixels": 92.2556388835068,
+        "mean_confidence": 0.4334781788727816,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7675070028011205,
+        "pck50_all_gt": 0.5096726190476191,
+        "gt_hands": 256.0,
+        "pred_hands": 291.0,
+        "matched_hands": 170.0
+      },
+      "corrected": {
+        "detection_rate": 0.6640625,
+        "oracle_capture_ratio": 0.6640625,
+        "mpjpe_pixels": 92.2556388835068,
+        "mean_confidence": 0.4334781788727816,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7675070028011205,
+        "pck50_all_gt": 0.5096726190476191,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 86.0,
+        "gt_hands": 256.0,
+        "pred_hands": 291.0,
+        "matched_hands": 170.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_01_factory001_worker001_00001",
+      "prediction": "ps_rec_ps_standard_rtm_hand.json",
+      "condition": "reversed",
+      "legacy": {
+        "detection_rate": 0.484375,
+        "oracle_capture_ratio": 0.484375,
+        "mpjpe_pixels": 126.11447043853502,
+        "mean_confidence": 0.4194880572538222,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.6386328725038403,
+        "pck50_all_gt": 0.3093377976190476,
+        "gt_hands": 256.0,
+        "pred_hands": 291.0,
+        "matched_hands": 124.0
+      },
+      "corrected": {
+        "detection_rate": 0.6640625,
+        "oracle_capture_ratio": 0.6640625,
+        "mpjpe_pixels": 92.2556388835068,
+        "mean_confidence": 0.4334781788727816,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7675070028011205,
+        "pck50_all_gt": 0.5096726190476191,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 86.0,
+        "gt_hands": 256.0,
+        "pred_hands": 291.0,
+        "matched_hands": 170.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_01_factory001_worker001_00001",
+      "prediction": "ps_rec_ps_standard_rtm_hand.json",
+      "condition": "drop_suffix_0.5",
+      "legacy": {
+        "detection_rate": 0.664,
+        "oracle_capture_ratio": 0.664,
+        "mpjpe_pixels": 62.35970232148863,
+        "mean_confidence": 0.4328927878873894,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7814113597246127,
+        "pck50_all_gt": 0.5188571428571429,
+        "gt_hands": 125.0,
+        "pred_hands": 143.0,
+        "matched_hands": 83.0
+      },
+      "corrected": {
+        "detection_rate": 0.32421875,
+        "oracle_capture_ratio": 0.32421875,
+        "mpjpe_pixels": 62.35970232148863,
+        "mean_confidence": 0.4328927878873894,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7814113597246127,
+        "pck50_all_gt": 0.2533482142857143,
+        "registered_frames": 300.0,
+        "prediction_frames": 150.0,
+        "missing_prediction_frames": 150.0,
+        "missing_reference_hands": 173.0,
+        "gt_hands": 256.0,
+        "pred_hands": 143.0,
+        "matched_hands": 83.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_01_factory001_worker001_00001",
+      "prediction": "av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "condition": "full",
+      "legacy": {
+        "detection_rate": 0.671875,
+        "oracle_capture_ratio": 0.671875,
+        "mpjpe_pixels": 103.80204177984676,
+        "mean_confidence": 0.42732554847417875,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.6719269102990033,
+        "pck50_all_gt": 0.45145089285714285,
+        "gt_hands": 256.0,
+        "pred_hands": 292.0,
+        "matched_hands": 172.0
+      },
+      "corrected": {
+        "detection_rate": 0.671875,
+        "oracle_capture_ratio": 0.671875,
+        "mpjpe_pixels": 103.80204177984676,
+        "mean_confidence": 0.42732554847417875,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.6719269102990033,
+        "pck50_all_gt": 0.45145089285714285,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 84.0,
+        "gt_hands": 256.0,
+        "pred_hands": 292.0,
+        "matched_hands": 172.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_01_factory001_worker001_00001",
+      "prediction": "av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "condition": "reversed",
+      "legacy": {
+        "detection_rate": 0.53515625,
+        "oracle_capture_ratio": 0.53515625,
+        "mpjpe_pixels": 142.49906587705271,
+        "mean_confidence": 0.39779069301855824,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5655196385123392,
+        "pck50_all_gt": 0.30264136904761907,
+        "gt_hands": 256.0,
+        "pred_hands": 292.0,
+        "matched_hands": 137.0
+      },
+      "corrected": {
+        "detection_rate": 0.671875,
+        "oracle_capture_ratio": 0.671875,
+        "mpjpe_pixels": 103.80204177984676,
+        "mean_confidence": 0.42732554847417875,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.6719269102990033,
+        "pck50_all_gt": 0.45145089285714285,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 84.0,
+        "gt_hands": 256.0,
+        "pred_hands": 292.0,
+        "matched_hands": 172.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_01_factory001_worker001_00001",
+      "prediction": "av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "condition": "drop_suffix_0.5",
+      "legacy": {
+        "detection_rate": 0.76,
+        "oracle_capture_ratio": 0.76,
+        "mpjpe_pixels": 100.59195375633455,
+        "mean_confidence": 0.4188906525310717,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7022556390977444,
+        "pck50_all_gt": 0.5337142857142857,
+        "gt_hands": 125.0,
+        "pred_hands": 144.0,
+        "matched_hands": 95.0
+      },
+      "corrected": {
+        "detection_rate": 0.37109375,
+        "oracle_capture_ratio": 0.37109375,
+        "mpjpe_pixels": 100.59195375633455,
+        "mean_confidence": 0.4188906525310717,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7022556390977444,
+        "pck50_all_gt": 0.26060267857142855,
+        "registered_frames": 300.0,
+        "prediction_frames": 150.0,
+        "missing_prediction_frames": 150.0,
+        "missing_reference_hands": 161.0,
+        "gt_hands": 256.0,
+        "pred_hands": 144.0,
+        "matched_hands": 95.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_02_factory001_worker001_00002",
+      "prediction": "ref_encoder_mp_live.json",
+      "condition": "full",
+      "legacy": {
+        "detection_rate": 0.3713235294117647,
+        "oracle_capture_ratio": 0.3713235294117647,
+        "mpjpe_pixels": 160.71062081912712,
+        "mean_confidence": 0.8902238878873315,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.4545025931164545,
+        "pck50_all_gt": 0.16876750700280113,
+        "gt_hands": 272.0,
+        "pred_hands": 248.0,
+        "matched_hands": 101.0
+      },
+      "corrected": {
+        "detection_rate": 0.3713235294117647,
+        "oracle_capture_ratio": 0.3713235294117647,
+        "mpjpe_pixels": 160.71062081912712,
+        "mean_confidence": 0.8902238878873315,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.4545025931164545,
+        "pck50_all_gt": 0.16876750700280113,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 171.0,
+        "gt_hands": 272.0,
+        "pred_hands": 248.0,
+        "matched_hands": 101.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_02_factory001_worker001_00002",
+      "prediction": "ref_encoder_mp_live.json",
+      "condition": "reversed",
+      "legacy": {
+        "detection_rate": 0.26838235294117646,
+        "oracle_capture_ratio": 0.26838235294117646,
+        "mpjpe_pixels": 344.29244970918234,
+        "mean_confidence": 0.8737152618904637,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.03261578604044357,
+        "pck50_all_gt": 0.008753501400560224,
+        "gt_hands": 272.0,
+        "pred_hands": 248.0,
+        "matched_hands": 73.0
+      },
+      "corrected": {
+        "detection_rate": 0.3713235294117647,
+        "oracle_capture_ratio": 0.3713235294117647,
+        "mpjpe_pixels": 160.71062081912712,
+        "mean_confidence": 0.8902238878873315,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.4545025931164545,
+        "pck50_all_gt": 0.16876750700280113,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 171.0,
+        "gt_hands": 272.0,
+        "pred_hands": 248.0,
+        "matched_hands": 101.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_02_factory001_worker001_00002",
+      "prediction": "ref_encoder_mp_live.json",
+      "condition": "drop_suffix_0.5",
+      "legacy": {
+        "detection_rate": 0.4076923076923077,
+        "oracle_capture_ratio": 0.4076923076923077,
+        "mpjpe_pixels": 148.43526378274981,
+        "mean_confidence": 0.9025629432696216,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.5561545372866128,
+        "pck50_all_gt": 0.22673992673992674,
+        "gt_hands": 130.0,
+        "pred_hands": 151.0,
+        "matched_hands": 53.0
+      },
+      "corrected": {
+        "detection_rate": 0.1948529411764706,
+        "oracle_capture_ratio": 0.1948529411764706,
+        "mpjpe_pixels": 148.43526378274981,
+        "mean_confidence": 0.9025629432696216,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.5561545372866128,
+        "pck50_all_gt": 0.10836834733893558,
+        "registered_frames": 300.0,
+        "prediction_frames": 150.0,
+        "missing_prediction_frames": 150.0,
+        "missing_reference_hands": 219.0,
+        "gt_hands": 272.0,
+        "pred_hands": 151.0,
+        "matched_hands": 53.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_02_factory001_worker001_00002",
+      "prediction": "ps_rec_ps_standard_rtm_hand.json",
+      "condition": "full",
+      "legacy": {
+        "detection_rate": 0.6066176470588235,
+        "oracle_capture_ratio": 0.6066176470588235,
+        "mpjpe_pixels": 68.00658355456696,
+        "mean_confidence": 0.44942182519219137,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7950937950937951,
+        "pck50_all_gt": 0.48231792717086835,
+        "gt_hands": 272.0,
+        "pred_hands": 276.0,
+        "matched_hands": 165.0
+      },
+      "corrected": {
+        "detection_rate": 0.6066176470588235,
+        "oracle_capture_ratio": 0.6066176470588235,
+        "mpjpe_pixels": 68.00658355456696,
+        "mean_confidence": 0.44942182519219137,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7950937950937951,
+        "pck50_all_gt": 0.48231792717086835,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 107.0,
+        "gt_hands": 272.0,
+        "pred_hands": 276.0,
+        "matched_hands": 165.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_02_factory001_worker001_00002",
+      "prediction": "ps_rec_ps_standard_rtm_hand.json",
+      "condition": "reversed",
+      "legacy": {
+        "detection_rate": 0.5110294117647058,
+        "oracle_capture_ratio": 0.5110294117647058,
+        "mpjpe_pixels": 117.90031827901758,
+        "mean_confidence": 0.453320902242935,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5676601575882152,
+        "pck50_all_gt": 0.29009103641456585,
+        "gt_hands": 272.0,
+        "pred_hands": 276.0,
+        "matched_hands": 139.0
+      },
+      "corrected": {
+        "detection_rate": 0.6066176470588235,
+        "oracle_capture_ratio": 0.6066176470588235,
+        "mpjpe_pixels": 68.00658355456696,
+        "mean_confidence": 0.44942182519219137,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7950937950937951,
+        "pck50_all_gt": 0.48231792717086835,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 107.0,
+        "gt_hands": 272.0,
+        "pred_hands": 276.0,
+        "matched_hands": 165.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_02_factory001_worker001_00002",
+      "prediction": "ps_rec_ps_standard_rtm_hand.json",
+      "condition": "drop_suffix_0.5",
+      "legacy": {
+        "detection_rate": 0.5307692307692308,
+        "oracle_capture_ratio": 0.5307692307692308,
+        "mpjpe_pixels": 73.81701757355287,
+        "mean_confidence": 0.45695823171864386,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.810904071773637,
+        "pck50_all_gt": 0.43040293040293043,
+        "gt_hands": 130.0,
+        "pred_hands": 137.0,
+        "matched_hands": 69.0
+      },
+      "corrected": {
+        "detection_rate": 0.2536764705882353,
+        "oracle_capture_ratio": 0.2536764705882353,
+        "mpjpe_pixels": 73.81701757355287,
+        "mean_confidence": 0.45695823171864386,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.810904071773637,
+        "pck50_all_gt": 0.20570728291316526,
+        "registered_frames": 300.0,
+        "prediction_frames": 150.0,
+        "missing_prediction_frames": 150.0,
+        "missing_reference_hands": 203.0,
+        "gt_hands": 272.0,
+        "pred_hands": 137.0,
+        "matched_hands": 69.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_02_factory001_worker001_00002",
+      "prediction": "av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "condition": "full",
+      "legacy": {
+        "detection_rate": 0.6801470588235294,
+        "oracle_capture_ratio": 0.6801470588235294,
+        "mpjpe_pixels": 89.19449668654573,
+        "mean_confidence": 0.44201060469086106,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.697039897039897,
+        "pck50_all_gt": 0.4740896358543417,
+        "gt_hands": 272.0,
+        "pred_hands": 292.0,
+        "matched_hands": 185.0
+      },
+      "corrected": {
+        "detection_rate": 0.6801470588235294,
+        "oracle_capture_ratio": 0.6801470588235294,
+        "mpjpe_pixels": 89.19449668654573,
+        "mean_confidence": 0.44201060469086106,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.697039897039897,
+        "pck50_all_gt": 0.4740896358543417,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 87.0,
+        "gt_hands": 272.0,
+        "pred_hands": 292.0,
+        "matched_hands": 185.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_02_factory001_worker001_00002",
+      "prediction": "av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "condition": "reversed",
+      "legacy": {
+        "detection_rate": 0.5,
+        "oracle_capture_ratio": 0.5,
+        "mpjpe_pixels": 139.07010871549198,
+        "mean_confidence": 0.4409911301644409,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.49369747899159666,
+        "pck50_all_gt": 0.24684873949579833,
+        "gt_hands": 272.0,
+        "pred_hands": 292.0,
+        "matched_hands": 136.0
+      },
+      "corrected": {
+        "detection_rate": 0.6801470588235294,
+        "oracle_capture_ratio": 0.6801470588235294,
+        "mpjpe_pixels": 89.19449668654573,
+        "mean_confidence": 0.44201060469086106,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.697039897039897,
+        "pck50_all_gt": 0.4740896358543417,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 87.0,
+        "gt_hands": 272.0,
+        "pred_hands": 292.0,
+        "matched_hands": 185.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_02_factory001_worker001_00002",
+      "prediction": "av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "condition": "drop_suffix_0.5",
+      "legacy": {
+        "detection_rate": 0.5846153846153846,
+        "oracle_capture_ratio": 0.5846153846153846,
+        "mpjpe_pixels": 79.44964390656558,
+        "mean_confidence": 0.457292377948761,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7387218045112782,
+        "pck50_all_gt": 0.4318681318681319,
+        "gt_hands": 130.0,
+        "pred_hands": 142.0,
+        "matched_hands": 76.0
+      },
+      "corrected": {
+        "detection_rate": 0.27941176470588236,
+        "oracle_capture_ratio": 0.27941176470588236,
+        "mpjpe_pixels": 79.44964390656558,
+        "mean_confidence": 0.457292377948761,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.7387218045112782,
+        "pck50_all_gt": 0.20640756302521007,
+        "registered_frames": 300.0,
+        "prediction_frames": 150.0,
+        "missing_prediction_frames": 150.0,
+        "missing_reference_hands": 196.0,
+        "gt_hands": 272.0,
+        "pred_hands": 142.0,
+        "matched_hands": 76.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_03_factory001_worker001_00000",
+      "prediction": "ref_encoder_mp_live.json",
+      "condition": "full",
+      "legacy": {
+        "detection_rate": 0.1596958174904943,
+        "oracle_capture_ratio": 0.1596958174904943,
+        "mpjpe_pixels": 66.23067617349606,
+        "mean_confidence": 0.9421440235206059,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.5873015873015873,
+        "pck50_all_gt": 0.09378960709759189,
+        "gt_hands": 263.0,
+        "pred_hands": 169.0,
+        "matched_hands": 42.0
+      },
+      "corrected": {
+        "detection_rate": 0.1596958174904943,
+        "oracle_capture_ratio": 0.1596958174904943,
+        "mpjpe_pixels": 66.23067617349606,
+        "mean_confidence": 0.9421440235206059,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.5873015873015873,
+        "pck50_all_gt": 0.09378960709759189,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 221.0,
+        "gt_hands": 263.0,
+        "pred_hands": 169.0,
+        "matched_hands": 42.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_03_factory001_worker001_00000",
+      "prediction": "ref_encoder_mp_live.json",
+      "condition": "reversed",
+      "legacy": {
+        "detection_rate": 0.09885931558935361,
+        "oracle_capture_ratio": 0.09885931558935361,
+        "mpjpe_pixels": 186.85870213323182,
+        "mean_confidence": 0.9413490983156058,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.11904761904761904,
+        "pck50_all_gt": 0.011768966141589716,
+        "gt_hands": 263.0,
+        "pred_hands": 169.0,
+        "matched_hands": 26.0
+      },
+      "corrected": {
+        "detection_rate": 0.1596958174904943,
+        "oracle_capture_ratio": 0.1596958174904943,
+        "mpjpe_pixels": 66.23067617349606,
+        "mean_confidence": 0.9421440235206059,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.5873015873015873,
+        "pck50_all_gt": 0.09378960709759189,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 221.0,
+        "gt_hands": 263.0,
+        "pred_hands": 169.0,
+        "matched_hands": 42.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_03_factory001_worker001_00000",
+      "prediction": "ref_encoder_mp_live.json",
+      "condition": "drop_suffix_0.5",
+      "legacy": {
+        "detection_rate": 0.13953488372093023,
+        "oracle_capture_ratio": 0.13953488372093023,
+        "mpjpe_pixels": 65.03229282456299,
+        "mean_confidence": 0.9487894740369585,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.5052910052910053,
+        "pck50_all_gt": 0.07050572166851236,
+        "gt_hands": 129.0,
+        "pred_hands": 92.0,
+        "matched_hands": 18.0
+      },
+      "corrected": {
+        "detection_rate": 0.06844106463878327,
+        "oracle_capture_ratio": 0.06844106463878327,
+        "mpjpe_pixels": 65.03229282456299,
+        "mean_confidence": 0.9487894740369585,
+        "handedness_agreement": 0.0,
+        "pck50_matched": 0.5052910052910053,
+        "pck50_all_gt": 0.034582654354517475,
+        "registered_frames": 300.0,
+        "prediction_frames": 150.0,
+        "missing_prediction_frames": 150.0,
+        "missing_reference_hands": 245.0,
+        "gt_hands": 263.0,
+        "pred_hands": 92.0,
+        "matched_hands": 18.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_03_factory001_worker001_00000",
+      "prediction": "ps_rec_ps_standard_rtm_hand.json",
+      "condition": "full",
+      "legacy": {
+        "detection_rate": 0.6577946768060836,
+        "oracle_capture_ratio": 0.6577946768060836,
+        "mpjpe_pixels": 71.30484080740251,
+        "mean_confidence": 0.4288055560836902,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5934489402697495,
+        "pck50_all_gt": 0.39036755386565275,
+        "gt_hands": 263.0,
+        "pred_hands": 266.0,
+        "matched_hands": 173.0
+      },
+      "corrected": {
+        "detection_rate": 0.6577946768060836,
+        "oracle_capture_ratio": 0.6577946768060836,
+        "mpjpe_pixels": 71.30484080740251,
+        "mean_confidence": 0.4288055560836902,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5934489402697495,
+        "pck50_all_gt": 0.39036755386565275,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 90.0,
+        "gt_hands": 263.0,
+        "pred_hands": 266.0,
+        "matched_hands": 173.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_03_factory001_worker001_00000",
+      "prediction": "ps_rec_ps_standard_rtm_hand.json",
+      "condition": "reversed",
+      "legacy": {
+        "detection_rate": 0.311787072243346,
+        "oracle_capture_ratio": 0.311787072243346,
+        "mpjpe_pixels": 116.69518341696063,
+        "mean_confidence": 0.4359270098005853,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.3896631823461092,
+        "pck50_all_gt": 0.12149194278471845,
+        "gt_hands": 263.0,
+        "pred_hands": 266.0,
+        "matched_hands": 82.0
+      },
+      "corrected": {
+        "detection_rate": 0.6577946768060836,
+        "oracle_capture_ratio": 0.6577946768060836,
+        "mpjpe_pixels": 71.30484080740251,
+        "mean_confidence": 0.4288055560836902,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5934489402697495,
+        "pck50_all_gt": 0.39036755386565275,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 90.0,
+        "gt_hands": 263.0,
+        "pred_hands": 266.0,
+        "matched_hands": 173.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_03_factory001_worker001_00000",
+      "prediction": "ps_rec_ps_standard_rtm_hand.json",
+      "condition": "drop_suffix_0.5",
+      "legacy": {
+        "detection_rate": 0.6434108527131783,
+        "oracle_capture_ratio": 0.6434108527131783,
+        "mpjpe_pixels": 60.514593910548484,
+        "mean_confidence": 0.4319328249218952,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5077452667814114,
+        "pck50_all_gt": 0.3266888150609081,
+        "gt_hands": 129.0,
+        "pred_hands": 132.0,
+        "matched_hands": 83.0
+      },
+      "corrected": {
+        "detection_rate": 0.3155893536121673,
+        "oracle_capture_ratio": 0.3155893536121673,
+        "mpjpe_pixels": 60.514593910548484,
+        "mean_confidence": 0.4319328249218952,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5077452667814114,
+        "pck50_all_gt": 0.16023900054318305,
+        "registered_frames": 300.0,
+        "prediction_frames": 150.0,
+        "missing_prediction_frames": 150.0,
+        "missing_reference_hands": 180.0,
+        "gt_hands": 263.0,
+        "pred_hands": 132.0,
+        "matched_hands": 83.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_03_factory001_worker001_00000",
+      "prediction": "av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "condition": "full",
+      "legacy": {
+        "detection_rate": 0.6387832699619772,
+        "oracle_capture_ratio": 0.6387832699619772,
+        "mpjpe_pixels": 73.16916985458701,
+        "mean_confidence": 0.4126845218596004,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.6570294784580499,
+        "pck50_all_gt": 0.41969943871084553,
+        "gt_hands": 263.0,
+        "pred_hands": 258.0,
+        "matched_hands": 168.0
+      },
+      "corrected": {
+        "detection_rate": 0.6387832699619772,
+        "oracle_capture_ratio": 0.6387832699619772,
+        "mpjpe_pixels": 73.16916985458701,
+        "mean_confidence": 0.4126845218596004,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.6570294784580499,
+        "pck50_all_gt": 0.41969943871084553,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 95.0,
+        "gt_hands": 263.0,
+        "pred_hands": 258.0,
+        "matched_hands": 168.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_03_factory001_worker001_00000",
+      "prediction": "av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "condition": "reversed",
+      "legacy": {
+        "detection_rate": 0.34220532319391633,
+        "oracle_capture_ratio": 0.34220532319391633,
+        "mpjpe_pixels": 115.53520031084611,
+        "mean_confidence": 0.4183612154589759,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.38412698412698415,
+        "pck50_all_gt": 0.13145029875067898,
+        "gt_hands": 263.0,
+        "pred_hands": 258.0,
+        "matched_hands": 90.0
+      },
+      "corrected": {
+        "detection_rate": 0.6387832699619772,
+        "oracle_capture_ratio": 0.6387832699619772,
+        "mpjpe_pixels": 73.16916985458701,
+        "mean_confidence": 0.4126845218596004,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.6570294784580499,
+        "pck50_all_gt": 0.41969943871084553,
+        "registered_frames": 300.0,
+        "prediction_frames": 300.0,
+        "missing_prediction_frames": 0.0,
+        "missing_reference_hands": 95.0,
+        "gt_hands": 263.0,
+        "pred_hands": 258.0,
+        "matched_hands": 168.0
+      }
+    },
+    {
+      "clip_cache_identity": "clip_03_factory001_worker001_00000",
+      "prediction": "av1_960x540_p7_250k_reference_trimmed_rtm_hand.json",
+      "condition": "drop_suffix_0.5",
+      "legacy": {
+        "detection_rate": 0.6434108527131783,
+        "oracle_capture_ratio": 0.6434108527131783,
+        "mpjpe_pixels": 68.59853806905433,
+        "mean_confidence": 0.40418589617832595,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5817555938037866,
+        "pck50_all_gt": 0.3743078626799557,
+        "gt_hands": 129.0,
+        "pred_hands": 122.0,
+        "matched_hands": 83.0
+      },
+      "corrected": {
+        "detection_rate": 0.3155893536121673,
+        "oracle_capture_ratio": 0.3155893536121673,
+        "mpjpe_pixels": 68.59853806905433,
+        "mean_confidence": 0.40418589617832595,
+        "handedness_agreement": 1.0,
+        "pck50_matched": 0.5817555938037866,
+        "pck50_all_gt": 0.18359587180879958,
+        "registered_frames": 300.0,
+        "prediction_frames": 150.0,
+        "missing_prediction_frames": 150.0,
+        "missing_reference_hands": 180.0,
+        "gt_hands": 263.0,
+        "pred_hands": 122.0,
+        "matched_hands": 83.0
+      }
+    }
+  ],
+  "started_at_utc": "2026-10-01T09:22:27.624702+00:00",
+  "finished_at_utc": "2026-10-01T09:22:28.149178+00:00",
+  "elapsed_seconds": 0.5243691250216216,
+  "thread_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "preregistration_sha256": "e95d1f92c66497fad4c42ccaf9a93bbcdd15a321ef5391097e773c3e54ae327c"
+}

@@ -145,3 +145,6 @@ tennis_processed/*
 
 # Where assets/ and outputs/ live on this machine (see DATA.md).
 .ps-data-root
+
+# Machine-local model root, alongside the existing external data-root marker.
+.ps-models-root

@@ -4,8 +4,8 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from demo.models.foreground_objective import bgr_uint8_to_rgb_tensor, compose, smoke_hand_objective
-from demo.models.foreground_smoke_net import checkpoint_kind
+from demo.models.foreground_objective import bgr_uint8_to_rgb_tensor, compose, smoke_hand_objective  # noqa: E402 - optional torch dependency
+from demo.models.foreground_smoke_net import checkpoint_kind  # noqa: E402 - optional torch dependency
 
 
 def _tensor(rgb, alpha):
@@ -90,8 +90,11 @@ def test_masked_rgb_mae_uses_alpha_area_and_channel_normalization():
 
 
 def test_batch_reduction_is_not_the_mean_of_unequal_masks():
-    small_rgb = torch.ones(1, 3, 1, 1)
-    small_alpha = torch.ones(1, 1, 1, 1)
+    # Equal spatial dimensions permit batching; alpha areas still differ 1:4.
+    small_rgb = torch.zeros(1, 3, 2, 2)
+    small_rgb[:, :, 0, 0] = 1
+    small_alpha = torch.zeros(1, 1, 2, 2)
+    small_alpha[:, :, 0, 0] = 1
     small_pred = torch.zeros_like(small_rgb)
     large_rgb = torch.ones(1, 3, 2, 2)
     large_alpha = torch.ones(1, 1, 2, 2)

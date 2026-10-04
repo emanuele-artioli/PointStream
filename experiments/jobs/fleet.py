@@ -17,7 +17,6 @@ from pathlib import Path, PurePosixPath
 import re
 import shlex
 import subprocess
-import sys
 import tarfile
 import tempfile
 import uuid
