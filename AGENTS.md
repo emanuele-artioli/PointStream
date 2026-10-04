@@ -1,6 +1,6 @@
 # PointStream
 
-PointStream is an object-centric semantic video codec. The target is an ACM TOMM submission on **30 September 2026**. Report searches transparently, including negative results, and scope claims to evidence that supports them.
+PointStream is an object-centric semantic video codec, evaluated on two co-equal domains (broadcast tennis and egocentric hands). The target is an ACM TOMM submission; the 30 September 2026 date is superseded and the internal date is set at the Phase 3 gate of [docs/unification.md](docs/unification.md). Report searches transparently, including negative results, and scope claims to evidence that supports them.
 
 ## Work and execution
 

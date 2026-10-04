@@ -1,6 +1,6 @@
 # PointStream Roadmap and Submission Gates
 
-**Target Submission**: ACM TOMM — **30 September 2026** (hard deadline).
+**Target Submission**: ACM TOMM. The 30 September 2026 deadline below is superseded (4 October 2026): see [the unification plan](unification.md). The gates remain useful history.
 **Evidence Freeze**: 29 September 2026. Moved from 20 September by decision on
 23 September. Development measurements through 29 September are authorized.
 Held-out confirmation is skipped. A second domain runs only after a claimable

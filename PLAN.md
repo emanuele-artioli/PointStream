@@ -1,5 +1,9 @@
 # PointStream Area Index & Active Plan
 
+> **Superseded 4 October 2026.** The schedule below is historical. Current plan and
+> decisions: [docs/unification.md](docs/unification.md) (no fixed date; tennis and
+> egocentric are co-equal domains under one pipeline).
+
 Research thesis, evidence boundaries, and proposed next tests:
 [semantic codec thesis](docs/strategy/semantic-codec-thesis.md). This working
 note does not change the active evaluation gate below.
