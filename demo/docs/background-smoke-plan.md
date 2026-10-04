@@ -2,6 +2,12 @@
 
 ## Assignment and limits
 
+**Second approved amendment, 4 October 2026:** the user approved raising
+cumulative remote CPU preparation to **40 minutes**, including prior attempts
+and recovery. GPU allocation remains capped at **40 minutes**. Use the tested
+lean snapshot and a 200-second provenance pilot before any model diagnostics.
+All remaining gates and per-job/per-file/model-stage caps remain binding.
+
 **Approved amendment, 4 October 2026:** the user approved the continuation
 proposal in `background-smoke-continuation-20261004.md`: cumulative GPU
 allocation is capped at **40 minutes**, and remote CPU preparation at

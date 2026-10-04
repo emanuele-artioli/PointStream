@@ -21,7 +21,7 @@ JOB_BUDGET_SECONDS = 480
 # User approved the continuation amendment on 4 October 2026. Prior attempts
 # remain charged; model-stage and per-job caps are unchanged.
 PLAN_BUDGET_SECONDS = 2400
-PREPARATION_BUDGET_SECONDS = 1500
+PREPARATION_BUDGET_SECONDS = 2400
 HOSTS = ["gpu3", "gpu5"]
 GPU_MODELS = ["RTX A6000", "RTX 6000 Ada"]
 MODEL_MEMORY_MIB = 24000

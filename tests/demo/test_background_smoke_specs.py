@@ -154,7 +154,9 @@ def test_invalid_spend_never_bypasses_the_plan_budget(spent):
         specs.check_plan(all_specs(), spent_seconds=spent)
 
 
-def test_repeated_inventory_reservations_exceed_the_cpu_cap():
+def test_repeated_inventory_reservations_exceed_the_cpu_cap(monkeypatch):
+    # A tighter preparation ceiling remains enforceable independently of GPU.
+    monkeypatch.setattr(specs, "PREPARATION_BUDGET_SECONDS", 1500)
     inventory = all_specs()[0]
     with pytest.raises(ValueError, match="inventory budgets"):
         specs.check_plan([inventory] * 5)
