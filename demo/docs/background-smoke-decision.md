@@ -2,10 +2,14 @@
 
 ## Decision
 
-Latest status after the approved budget amendment: see
-[the execution report](background-smoke-approved-execution-20261004.md). The
-new request was canceled after repeated CPU-lock admission failures; corrected
-preparation accounting prevents another submission under the 25-minute cap.
+Latest status after the approved 40-minute GPU / 40-minute CPU amendment: see
+[the final bounded attempt](background-smoke-final-attempt-20261004.md).
+The gpu5 inventory started and preserved four passing parts plus a matching
+DCVC source/extension check, but exceeded its 90-second smoke allowance during
+the environment part. No substantive gate passed; B2/B3/B4 remain unrun.
+The background plan is experimentally incomplete. No further request was
+submitted after this failure. The earlier 25-minute execution is retained in
+[the historical report](background-smoke-approved-execution-20261004.md).
 
 For the later artifact recovery, visual review, passing two-host fleet check
 and explicit budget decision, see [the continuation report](background-smoke-continuation-20261004.md). The observations below remain the record of the first recovery window.
