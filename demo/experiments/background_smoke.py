@@ -361,13 +361,6 @@ def finite_tree(value: Any) -> bool:
 
 # --------------------------------------------------------------- inventory
 
-def _git(root: Path, *args: str, timeout: float = 30) -> str:
-    result = run_command(["git", "-C", str(root), *args], timeout=timeout)
-    if result.returncode != 0:
-        raise PartFailed(f"git {' '.join(args)} failed in {root}: {result.stderr[-300:]}")
-    return result.stdout
-
-
 def inventory_env(stage: Stage) -> dict[str, Any]:
     from demo.experiments.background_env_probe import ProbeError, run_recorded_probe
 
@@ -385,15 +378,18 @@ def inventory_env(stage: Stage) -> dict[str, Any]:
             raise PartFailed(str(exc)) from exc
 
     for name, root, references in (("dcvc", core.DCVC_ROOT, core.DCVC_REFERENCE_SHA256), ("hnerv", core.HNERV_ROOT, core.HNERV_REFERENCE_SHA256)):
-        diff = _git(root, "diff", "--no-color", "HEAD", timeout=stage.clock.bounded(30))
+        def git(operation: str, *args: str) -> str:
+            return probe(name + "-git-" + operation, ["git", "-C", str(root), *args]).stdout
+
+        diff = git("diff", "diff", "--no-color", "HEAD")
         core.write_json_new(stage.path(f"{name}-source-diff.json"), {"diff": diff})
         files = {}
         for rel in references:
             receipt = core.sha256_file(root / rel, timeout=stage.clock.bounded(30))
             files[rel] = {"sha256": receipt["sha256"], "matches_reference": receipt["sha256"] == references[rel]}
         environment[name] = {
-            "root": str(root), "head": _git(root, "rev-parse", "HEAD", timeout=stage.clock.bounded(30)).strip(),
-            "status_porcelain": _git(root, "status", "--porcelain", timeout=stage.clock.bounded(30)).splitlines(),
+            "root": str(root), "head": git("head", "rev-parse", "HEAD").strip(),
+            "status_porcelain": git("status", "status", "--porcelain").splitlines(),
             "tracked_diff_sha256": core.sha256_bytes(diff.encode()), "tracked_diff_bytes": len(diff.encode()),
             "files": files,
         }

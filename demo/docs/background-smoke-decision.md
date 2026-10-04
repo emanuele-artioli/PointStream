@@ -2,11 +2,13 @@
 
 ## Decision
 
-The next readiness work is described in
-[the training-readiness record](background-training-readiness.md): isolated
-timed environment probes and local timeout-recovery tests are implemented.
-Its continuation budget is a proposal, not applied authority. No new remote
-job or training ran for that change.
+The approved 50-minute GPU / 60-minute preparation continuation is recorded in
+[the latest execution report](background-smoke-continuation-v3-20261004.md).
+Its environment-first inventory failed on the first DCVC Git provenance
+command's 30-second timeout. Failed validation and complete result receipts
+were preserved; no remainder or model diagnostic ran. Training readiness
+remains blocked. The [readiness record](background-training-readiness.md)
+sets the remaining evidence gates.
 
 Latest status after the approved 40-minute GPU / 40-minute CPU amendment: see
 [the final bounded attempt](background-smoke-final-attempt-20261004.md).

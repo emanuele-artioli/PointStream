@@ -6,6 +6,12 @@ The diagnostic continuation caps below were approved on 4 October 2026;
 training remains unauthorized. Prior failed/canceled attempts and immutable
 receipts remain charged and preserved.
 
+Latest outcome: the approved environment-first inventory failed on the initial
+DCVC Git diff timeout, before dependency or checkpoint checks. See
+[the continuation report](background-smoke-continuation-v3-20261004.md).
+The proposed remainder and model stages below were not run; no repeated
+request is authorized by their listing.
+
 ## Environment audit correction
 
 The previous gpu5 inventory completed its DCVC source/extension check but

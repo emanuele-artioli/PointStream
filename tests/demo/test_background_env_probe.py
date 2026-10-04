@@ -56,7 +56,6 @@ def _environment_stage(tmp_path, monkeypatch, *, failure=None, lpips="lpips cach
     stage_root.mkdir()
     monkeypatch.setenv("PS_STAGE_DIR", str(stage_root))
     stage = smoke.Stage("inventory", 120, [])
-    monkeypatch.setattr(smoke, "_git", lambda *args, **kwargs: "head")
     references = {**smoke.core.DCVC_REFERENCE_SHA256, **smoke.core.HNERV_REFERENCE_SHA256}
     monkeypatch.setattr(smoke.core, "sha256_file", lambda path, **kwargs: {"sha256": next(v for k, v in references.items() if str(path).endswith(k))})
     monkeypatch.setattr(smoke.core, "resolve_ffmpeg", lambda: None)
@@ -66,7 +65,9 @@ def _environment_stage(tmp_path, monkeypatch, *, failure=None, lpips="lpips cach
         if name == failure:
             _write_new(root / (name + '.json'), {"status": "timeout", "complete": False})
             raise ProbeError(name + " exceeded allowance")
-        if name == "dcvc-adapter":
+        if "-git-" in name:
+            output = 'head'
+        elif name == "dcvc-adapter":
             report = Path(command[command.index("--report") + 1])
             report.write_text(json.dumps({"reference": {"matches_reference": True}, "environment": {"extension": {"module": "installed"}}}))
             output = '{}'
@@ -105,3 +106,12 @@ def test_complete_environment_passes_and_preserves_each_probe(tmp_path, monkeypa
     progress = stage.root / "environment-progress"
     assert {p.stem for p in progress.iterdir()} == {"dcvc-source", "hnerv-source", "dcvc-adapter", "hnerv-import", "ffmpeg", "lpips"}
     assert json.loads((progress / "lpips.json").read_text())["lpips"] == "lpips cached"
+
+
+def test_git_timeout_records_repository_and_stops_later_probes(tmp_path, monkeypatch):
+    stage = _environment_stage(tmp_path, monkeypatch, failure="dcvc-git-diff")
+    result = stage.run_part("env", lambda: smoke.inventory_env(stage))
+    assert result["status"] == "failed" and "dcvc-git-diff" in result["reason"]
+    assert json.loads((stage.root / "environment-probes/dcvc-git-diff.json").read_text())["status"] == "timeout"
+    assert not (stage.root / "environment-progress").exists()
+    assert not stage.environment
