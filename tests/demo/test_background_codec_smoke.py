@@ -1,96 +1,284 @@
 from __future__ import annotations
 
-import hashlib
-import math
+import argparse
+import io
+import json
+import os
 from pathlib import Path
+import sys
 
 import numpy as np
 from PIL import Image
 import pytest
 
 from demo.experiments import background_smoke as smoke
+from demo.experiments import background_smoke_core as core
+from demo.experiments import dcvc_uf_adapter as adapter
 
 
-def _save(path: Path, pixels: np.ndarray) -> None:
-    Image.fromarray(pixels.astype(np.uint8), mode="RGB").save(path)
+# ----------------------------------------------------------- pure checks
+
+def test_container_round_trip_and_rejections() -> None:
+    packed = adapter.pack_container(b"native", structure="htl", frame_count=8, force_intra=False)
+    header, native = adapter.unpack_container(packed)
+    assert native == b"native" and header == {"structure": "htl", "frame_count": 8, "force_intra": False, "header_bytes": 9}
+    with pytest.raises(ValueError, match="not a version-1"):
+        adapter.unpack_container(b"XXXX" + packed[4:])
+    with pytest.raises(ValueError, match="truncated"):
+        adapter.unpack_container(packed[:5])
 
 
-def test_known_rgb_errors_report_mean_frame_and_pooled_psnr_separately(tmp_path: Path) -> None:
-    reference, reconstruction = [], []
-    for index, error in enumerate((1, 10)):
-        ref = tmp_path / f"ref{index}.png"
-        rec = tmp_path / f"rec{index}.png"
-        _save(ref, np.zeros((3, 4, 3), dtype=np.uint8))
-        _save(rec, np.full((3, 4, 3), error, dtype=np.uint8))
-        reference.append(ref)
-        reconstruction.append(rec)
-    result = smoke.rgb_sequence_metrics(reference, reconstruction)
-    expected_frame = [10 * math.log10(255**2), 10 * math.log10(255**2 / 100)]
-    assert result["frame_count"] == 2
-    assert result["frame_mse"] == [1.0, 100.0]
-    assert result["mean_frame_psnr_db"] == pytest.approx(sum(expected_frame) / 2)
-    assert result["pooled_mse_psnr_db"] == pytest.approx(10 * math.log10(255**2 / 50.5))
-    assert result["mean_frame_psnr_db"] != pytest.approx(result["pooled_mse_psnr_db"])
+def test_hierarchical_display_order_and_padding_are_explicit() -> None:
+    assert adapter.display_schedule(8, 1, force_intra=False) == [[i] for i in range(8)]
+    assert adapter.display_schedule(8, 8, force_intra=False) == [[0], list(range(1, 8))]
+    ht32 = adapter.display_schedule(32, 8, force_intra=False)
+    assert ht32 == [[0], list(range(1, 9)), list(range(9, 17)), list(range(17, 25)), list(range(25, 32))]
+    assert [i for nal in ht32 for i in nal] == list(range(32))
+    assert adapter.display_schedule(3, 8, force_intra=True) == [[0], [1], [2]]
+    assert all(adapter.reset_flag(i, 8, adapter.RESET_INTERVAL) == 0 for i in range(64))
+    assert adapter.reset_flag(25, 8, 32) == 1
 
 
-def test_temporal_error_uses_rgb_difference_changes(tmp_path: Path) -> None:
-    ref0, ref1, rec0, rec1 = [tmp_path / f"{name}.png" for name in ("r0", "r1", "d0", "d1")]
-    zeros = np.zeros((2, 2, 3), dtype=np.uint8)
-    shifted = np.full((2, 2, 3), 3, dtype=np.uint8)
-    for path, image in ((ref0, zeros), (ref1, zeros), (rec0, zeros), (rec1, shifted)):
-        _save(path, image)
-    result = smoke.rgb_sequence_metrics([ref0, ref1], [rec0, rec1])
-    assert result["temporal_reconstruction_error"] == pytest.approx(3 / 255)
+def frame(value: int, shape=(36, 64, 3)) -> np.ndarray:
+    rng = np.random.default_rng(value)
+    return rng.integers(0, 256, size=shape, dtype=np.uint8)
 
 
-def test_rate_uses_actual_bytes_and_common_frame_duration() -> None:
-    assert smoke.rate_kbps(1200, frames=8, fps=30) == pytest.approx(36.0)
+def test_rgb_metrics_definitions() -> None:
+    ref = [frame(1), frame(2)]
+    same = core.sequence_metrics(ref, ref, expected_shape=(36, 64, 3))
+    assert same["mean_frame_psnr_db"] == 99.0 and same["temporal_reconstruction_error"] == 0.0
+    shifted = [np.clip(f.astype(int) + 4, 0, 255).astype(np.uint8) for f in ref]
+    masks = [np.zeros((36, 64), bool) for _ in ref]
+    masks[0][:10] = True
+    result = core.sequence_metrics(ref, shifted, expected_shape=(36, 64, 3), masks=masks)
+    assert result["pooled_mse_psnr_db"] == pytest.approx(core.psnr_from_mse(float(np.mean(result["frame_mse"]))))
+    assert result["mask_region"]["inside_mask_pooled_psnr_db"] is not None
+    expected_temporal = np.abs((shifted[1].astype(float) - shifted[0]) - (ref[1].astype(float) - ref[0])).mean() / 255
+    assert result["temporal_reconstruction_error"] == pytest.approx(expected_temporal)
+
+
+def test_frame_conventions_are_never_guessed() -> None:
+    with pytest.raises(ValueError, match="declared RGB"):
+        core.require_rgb_frame(frame(1), channel_order="BGR")
+    with pytest.raises(ValueError, match="uint8"):
+        core.require_rgb_frame(frame(1).astype(np.float32))
+    with pytest.raises(ValueError, match="differs from expected"):
+        core.require_rgb_frame(frame(1), expected_shape=(1080, 1920, 3))
+    with pytest.raises(ValueError, match="unit-range"):
+        core.unit_float_to_uint8(np.full((3, 2, 2), 1.5), layout="CHW", value_range="unit")
+    assert core.lpips_input(np.zeros((2, 2, 3), np.uint8)).min() == -1.0
+
+
+def test_rate_counts_actual_file_bytes(tmp_path: Path) -> None:
+    assert core.rate_kbps(1000, frames=8) == pytest.approx(8 * 1000 * 30 / (1000 * 8))
+    a, b = tmp_path / "a.bin", tmp_path / "b.bin"
+    a.write_bytes(b"12345")
+    b.write_bytes(b"123")
+    assert core.stream_file_bytes([a, b]) == 8
+    with pytest.raises(ValueError, match="more than once"):
+        core.stream_file_bytes([a, a])
+
+
+def test_cut_lengths_order_and_identities(tmp_path: Path) -> None:
+    rows = []
+    for index in range(8):
+        path = tmp_path / f"{index}.jpg"
+        path.write_bytes(bytes([index]))
+        rows.append({"index": 120 + index, "path": str(path), "sha256": core.sha256_bytes(bytes([index]))})
+    core.validate_cut(rows, start=120, length=8)
+    with pytest.raises(ValueError, match="only 8- or 32"):
+        core.validate_cut(rows[:4], start=120, length=4)
+    with pytest.raises(ValueError, match="order"):
+        core.validate_cut([rows[1], rows[0], *rows[2:]], start=120, length=8)
+    Path(rows[3]["path"]).write_bytes(b"changed")
+    with pytest.raises(ValueError, match="changed"):
+        core.validate_cut(rows, start=120, length=8)
+    with pytest.raises(ValueError, match="display index 1"):
+        core.compare_frame_identities(["a", "b"], ["a", "c"])
+
+
+def test_part_names_stay_inside_the_plan() -> None:
+    assert smoke.parse_parts("codec", "f001c3-htl-pre,f001c3-av1,f002-htl-ft") == ["f001c3-htl-pre", "f001c3-av1", "f002-htl-ft"]
+    for kind, value in (("codec", "f001c3-htl-mid"), ("codec", "f003-ld-pre"), ("drift", "f001c3-htl-pre"),
+                        ("drift", "f002-ld-pre"), ("latent", "f001c3-b4"), ("latent", "f001c3-b8"), ("codec", "")):
+        with pytest.raises(ValueError):
+            smoke.parse_parts(kind, value)
+
+
+def test_degradation_flags_use_both_thresholds() -> None:
+    parts = {
+        "f001c3-ld-pre": {"status": "passed", "mean_frame_psnr_db": 36.0, "container_bytes": 1000},
+        "f001c3-ld-ft": {"status": "passed", "mean_frame_psnr_db": 33.5, "container_bytes": 900},
+        "f001c3-hts-pre": {"status": "passed", "mean_frame_psnr_db": 34.0, "container_bytes": 1000},
+        "f001c3-hts-ft": {"status": "passed", "mean_frame_psnr_db": 34.0, "container_bytes": 2500},
+        "f001c3-htl-ft": {"status": "passed", "mean_frame_psnr_db": 34.0, "container_bytes": 1000},
+    }
+    flags = smoke.degradation_flags(parts)
+    assert flags["f001c3-ld-ft"]["degraded"] and flags["f001c3-hts-ft"]["degraded"]
+    assert flags["f001c3-htl-ft"].startswith("untested")
+
+
+def test_drift_summary_requires_exact_frames() -> None:
+    rows = [{"index": 120 + i, "psnr_db": 40 - i * 0.1} for i in range(32)]
+    summary = core.summarize_drift(rows)
+    assert summary["last8_minus_first8_db"] == pytest.approx(-2.4)
     with pytest.raises(ValueError):
-        smoke.rate_kbps(1200, frames=0)
+        core.summarize_drift(rows[:31])
 
 
-def test_stream_rate_input_is_summed_from_actual_files(tmp_path: Path) -> None:
-    first, second = tmp_path / "part-a.bin", tmp_path / "part-b.bin"
-    first.write_bytes(b"header")
-    second.write_bytes(b"payload")
-    assert smoke.stream_file_bytes([first, second]) == 13
-    with pytest.raises(OSError):
-        smoke.stream_file_bytes([tmp_path / "missing.bin"])
+def test_adapter_environment_requires_claimed_gpu(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0")
+    with pytest.raises(smoke.PartBlocked, match="claimed GPU"):
+        smoke.adapter_env()
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "GPU-1234")
+    monkeypatch.setenv("PS_STAGE_DIR", "/tmp/stage")
+    env = smoke.adapter_env()
+    assert env["PYTHONPATH"] == str(core.DCVC_ROOT) and env["PS_STAGE_DIR"] == "/tmp/stage"
+    assert env["CUDA_VISIBLE_DEVICES"] == "GPU-1234"
 
 
-def test_order_drop_pad_and_changed_source_hash_are_rejected(tmp_path: Path) -> None:
-    records = []
-    for index in range(120, 128):
-        path = tmp_path / f"{index}.png"
-        _save(path, np.zeros((2, 2, 3), dtype=np.uint8))
-        records.append({
-            "index": index, "path": str(path),
-            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-        })
-    smoke.validate_cut(records, start=120, length=8)
-    with pytest.raises(ValueError, match="index mismatch"):
-        smoke.validate_cut([records[1], records[0], *records[2:]], start=120, length=8)
-    with pytest.raises(ValueError, match="has 7 records"):
-        smoke.validate_cut(records[:-1], start=120, length=8)
-    _save(Path(records[0]["path"]), np.ones((2, 2, 3), dtype=np.uint8))
-    with pytest.raises(ValueError, match="content changed"):
-        smoke.validate_cut(records, start=120, length=8)
+def test_bounded_commands_time_out() -> None:
+    with pytest.raises(TimeoutError):
+        smoke.run_command(["sleep", "5"], timeout=0.2)
 
 
-def test_drift_report_requires_exact_32_ordered_frames() -> None:
-    rows = [{"index": i, "psnr_db": 30.0 - (i - 120) / 10} for i in range(120, 152)]
-    result = smoke.summarize_drift(rows)
-    assert result["frame_count"] == 32
-    assert result["last8_minus_first8_db"] < 0
-    with pytest.raises(ValueError, match="ordered 32 frames"):
-        smoke.summarize_drift(rows[:-1])
-    rows[5]["psnr_db"] = float("nan")
-    with pytest.raises(ValueError, match="nonfinite"):
-        smoke.summarize_drift(rows)
+# ------------------------------------------------- runner on fixtures
+
+SHAPE = (36, 64, 3)
 
 
-def test_outputs_are_append_only(tmp_path: Path) -> None:
-    target = tmp_path / "record.json"
-    smoke._write_json_new(target, {"status": "passed"})
-    with pytest.raises(FileExistsError, match="overwrite"):
-        smoke._write_json_new(target, {"status": "failed"})
+@pytest.fixture
+def fixture_stage(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(core, "FRAME_SHAPE", SHAPE)
+    monkeypatch.setattr(core, "HEIGHT", SHAPE[0])
+    monkeypatch.setattr(core, "WIDTH", SHAPE[1])
+    monkeypatch.setattr(smoke, "SCRATCH_ROOT", tmp_path / "scratch")
+    data = tmp_path / "data"
+    data.mkdir()
+    rows = []
+    for index in range(32):
+        path = data / f"{index:05d}.png"
+        pixels = frame(index)
+        Image.fromarray(pixels).save(path)
+        rows.append({"index": 120 + index, "path": str(path), "sha256": core.sha256_file(path, timeout=30)["sha256"],
+                     "chunk": f"chunk_{120 + 30 * (index // 30):05d}", "chunk_position": index % 30, "rgb_sha256": core.rgb_identity(pixels)})
+    mask = data / "union.npy"
+    np.save(mask, np.zeros(SHAPE[:2], bool))
+    checkpoints = {}
+    for key in ("uf_image", "uf_video:htl:pretrained", "uf_video:ld:pretrained"):
+        path = data / (key.replace(":", "_") + ".pth.tar")
+        path.write_bytes(key.encode())
+        checkpoints[key] = {"path": str(path), "sha256": core.sha256_bytes(key.encode()), "bytes": len(key)}
+    manifest = {
+        "schema": "pointstream.background-smoke.inputs.v1", "provenance": {},
+        "frames": {"f001c3": rows},
+        "masks": {"f001c3": {row["chunk"]: {"path": str(mask), "sha256": core.sha256_file(mask, timeout=30)["sha256"], "shape": list(SHAPE[:2])} for row in rows}},
+        "checkpoints": checkpoints,
+    }
+    manifest_path = data / "selected-inputs.json"
+    manifest_path.write_text(json.dumps(manifest))
+    job = tmp_path / "inbox" / "20261004T000000Z-abcdef12"
+    stage = job / "smoke"
+    stage.mkdir(parents=True)
+    (job / "ready.json").write_text(json.dumps({"git_head": "f" * 40, "source_sha256": "e" * 64}))
+    (job / "environment.json").write_text(json.dumps({"host": "gpu5", "gpu": {"uuid": "GPU-test", "name": "fixture"}}))
+    monkeypatch.setenv("PS_STAGE_DIR", str(stage))
+    monkeypatch.delenv("PS_JOB_DIR", raising=False)
+    return manifest_path
+
+
+def fake_adapter(*, corrupt_repeat: bool = False):
+    """Lossless stand-in for the DCVC process: containers carry raw pixels."""
+
+    def run(stage, action, arguments, *, timeout, report):
+        plan = json.loads(Path(arguments[arguments.index("--plan") + 1]).read_text())
+        if action == "encode":
+            streams = []
+            for stream in plan["streams"]:
+                frames = np.stack([np.asarray(Image.open(Path(stream["frames_dir"]) / f"im{i + 1:05d}.png")) for i in range(stream["frame_count"])])
+                buffer = io.BytesIO()
+                np.save(buffer, frames)
+                container = adapter.pack_container(buffer.getvalue(), structure="htl", frame_count=len(frames), force_intra=plan["force_intra"])
+                Path(stream["container"]).write_bytes(container)
+                if stream.get("i_recon_png"):
+                    Image.fromarray(frames[0]).save(stream["i_recon_png"])
+                nals = [{"type": "I"}] + [{"type": "P"}] * (len(frames) - 1)
+                streams.append({"name": stream["name"], "container": stream["container"], "container_bytes": len(container),
+                                "container_header_bytes": 9, "native_stream_bytes": len(container) - 9, "nals": nals})
+            payload = {"streams": streams, "peak_memory": {"torch_max_reserved_mib": 10.0}, "load_seconds": 0.1}
+        else:
+            for stream in json.loads((report.parent / "encode-plan.json").read_text())["streams"]:
+                assert not Path(stream["frames_dir"]).exists(), "source frames must be sealed during decode"
+            names = [s["name"] for s in plan["streams"]] + plan["repeat"]
+            streams = []
+            for position, name in enumerate(names):
+                stream = next(s for s in plan["streams"] if s["name"] == name)
+                repeat = position >= len(plan["streams"])
+                out = Path(stream["out_dir"] + ("_repeat" if repeat else ""))
+                out.mkdir()
+                _header, native = adapter.unpack_container(Path(stream["container"]).read_bytes())
+                frames = np.load(io.BytesIO(native))
+                hashes = []
+                for index, pixels in enumerate(frames):
+                    if repeat and corrupt_repeat:
+                        pixels = 255 - pixels
+                    Image.fromarray(pixels).save(out / f"im{index + 1:05d}.png")
+                    hashes.append(core.rgb_identity(pixels))
+                streams.append({"name": name, "repeat": repeat, "out_dir": str(out), "decoded_png_sha256": hashes,
+                                "nal_types": ["I"] + ["P"] * (len(frames) - 1)})
+            payload = {"streams": streams, "inputs": "container bytes only", "peak_memory": {"torch_max_reserved_mib": 12.0}, "load_seconds": 0.1}
+        report.write_text(json.dumps(payload))
+        return payload
+
+    return run
+
+
+def test_codec_runner_end_to_end_on_fixtures(fixture_stage: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(smoke, "run_adapter", fake_adapter())
+    args = argparse.Namespace(parts="f001c3-htl-pre", stage_seconds=120, manifest=[fixture_stage])
+    assert smoke.run("codec", args) == 0
+    stage = core.stage_dir()
+    result = json.loads((stage / "result.json").read_text())
+    case = result["parts"]["f001c3-htl-pre"]
+    assert case["status"] == "passed", case
+    assert case["mean_frame_psnr_db"] == 99.0 and case["encoder_i_recon_equals_decoder"] is True
+    assert case["kbps"] == pytest.approx(core.rate_kbps(case["container_bytes"], frames=8))
+    assert case["checkpoints"]["image"]["sha256"] == core.sha256_bytes(b"uf_image")
+    assert Path(case["sheet"]).is_file() and case["lpips"]["status"].startswith("blocked")
+    assert (stage / "f001c3-htl-pre" / "src").is_dir(), "sealed sources are restored after decode"
+    assert not (stage.parent.parent.parent / "scratch").exists() or not any((stage.parent.parent.parent / "scratch").iterdir())
+    assert result["citable"] is False and result["provenance"]["gpu_uuid"] == "GPU-test"
+    passed, checks = smoke.validate("codec")
+    assert passed, checks
+
+
+def test_decoder_state_dependence_fails_the_case_and_the_gate(fixture_stage: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(smoke, "run_adapter", fake_adapter(corrupt_repeat=True))
+    smoke.run("codec", argparse.Namespace(parts="f001c3-htl-pre", stage_seconds=120, manifest=[fixture_stage]))
+    result = json.loads((core.stage_dir() / "result.json").read_text())
+    assert result["parts"]["f001c3-htl-pre"]["status"] == "failed"
+    target = core.stage_dir().parent / "validation.json"
+    monkeypatch.setenv("PS_VALIDATION_PATH", str(target))
+    assert smoke.run_validator("codec") == 1
+    assert json.loads(target.read_text())["passed"] is False
+
+
+def test_drift_runner_compares_one_stream_with_four_reset_streams(fixture_stage: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(smoke, "run_adapter", fake_adapter())
+    assert smoke.run("drift", argparse.Namespace(parts="f001c3-ld-pre", stage_seconds=120, manifest=[fixture_stage])) == 0
+    case = json.loads((core.stage_dir() / "result.json").read_text())["parts"]["f001c3-ld-pre"]
+    assert case["status"] == "passed", case
+    assert case["segment_decode_order"][:4] == ["seg3", "seg0", "seg1", "seg2"]
+    assert case["one_stream"]["drift"]["frame_count"] == 32
+    assert case["four_reset_streams"]["kbps"] == pytest.approx(core.rate_kbps(case["four_reset_streams"]["container_bytes_sum"], frames=32))
+    assert len(case["frame_ids"]) == 32
+    assert smoke.validate("drift")[0]
+
+
+def test_missing_checkpoint_identity_blocks_the_case(fixture_stage: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(smoke, "run_adapter", fake_adapter())
+    smoke.run("codec", argparse.Namespace(parts="f001c3-hts-pre", stage_seconds=120, manifest=[fixture_stage]))
+    case = json.loads((core.stage_dir() / "result.json").read_text())["parts"]["f001c3-hts-pre"]
+    assert case["status"] == "blocked" and "uf_video:hts:pretrained" in case["reason"]
+    assert not smoke.validate("codec")[0]

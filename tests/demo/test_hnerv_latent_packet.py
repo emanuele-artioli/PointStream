@@ -12,65 +12,67 @@ from demo.experiments.hnerv_latent_packet import (
     MAGIC,
     METHODS,
     decode_packet,
+    dequantize,
     encode_packet,
+    summarize_packets,
     write_segment_packets,
 )
 
 
-def _metadata(length: int, *, frame_start: int = 120) -> dict:
+def _metadata(length: int, *, frame_start: int = 120, quantizer: dict | None = None) -> dict:
     return {
         "checkpoint_sha256": "a" * 64,
         "frame_start": frame_start,
         "fps": {"numerator": 30, "denominator": 1},
         "frame_ids": [f"frame-{frame_start + i}" for i in range(length)],
-        "quantizer": {
-            "min": np.asarray([0.0, -1.5, 3.25], dtype="<f4").reshape(1, 1, 1, 3),
-            "scale": np.asarray([1.0, 0.5, 2.0], dtype="<f4").reshape(1, 1, 1, 3),
-        },
+        "quantizer": quantizer or {"min": np.asarray(-1.25, dtype="<f4"), "scale": np.asarray(0.03125, dtype="<f4")},
         "decoder_setup_bytes": 123456,
     }
 
 
 @pytest.mark.parametrize("channels", [3, 4])
+@pytest.mark.parametrize("bits", [4, 6])
 @pytest.mark.parametrize("method", METHODS)
-def test_random_and_constant_codes_round_trip_exactly(channels: int, method: str) -> None:
-    rng = np.random.default_rng(17 + channels)
-    random_codes = rng.integers(0, 64, size=(8, 9, 16, channels), dtype=np.uint8)
-    random_codes[0, 0, 0, 0] = 0
-    random_codes[-1, -1, -1, -1] = 63
-    packet = encode_packet(random_codes, _metadata(8), method=method)
-    decoded, header = decode_packet(packet, expected_checkpoint_sha256="a" * 64)
-    assert np.array_equal(decoded, random_codes)
-    assert header["shape"] == list(random_codes.shape)
-    assert header["frame_start"] == 120
-    constant = np.full((1, 9, 16, channels), 63, dtype=np.uint8)
-    single, _ = decode_packet(encode_packet(constant, _metadata(1), method=method))
-    assert np.array_equal(single, constant)
+def test_random_constant_and_extreme_codes_round_trip(channels: int, bits: int, method: str) -> None:
+    top = (1 << bits) - 1
+    rng = np.random.default_rng(17 + channels + bits)
+    codes = rng.integers(0, top + 1, size=(8, channels, 9, 16), dtype=np.uint8)
+    codes[0, 0, 0, 0], codes[-1, -1, -1, -1] = 0, top
+    decoded, header = decode_packet(encode_packet(codes, _metadata(8), method=method, bit_depth=bits), expected_checkpoint_sha256="a" * 64)
+    assert np.array_equal(decoded, codes) and header["layout"] == "NCHW" and header["bit_depth"] == bits
+    constant = np.full((1, channels, 9, 16), top, dtype=np.uint8)
+    assert np.array_equal(decode_packet(encode_packet(constant, _metadata(1), method=method, bit_depth=bits))[0], constant)
 
 
-def test_modular_temporal_wraparound_has_exact_independent_decode() -> None:
-    codes = np.zeros((8, 9, 16, 3), dtype=np.uint8)
-    codes[:, 0, 0, 0] = np.asarray([63, 0, 1, 1, 63, 0, 63, 1], dtype=np.uint8)
-    packet = encode_packet(codes, _metadata(8), method="delta-zlib6")
-    decoded, _ = decode_packet(packet)
+@pytest.mark.parametrize("bits", [4, 6])
+def test_modular_temporal_wraparound(bits: int) -> None:
+    top = (1 << bits) - 1
+    codes = np.zeros((8, 3, 9, 16), dtype=np.uint8)
+    codes[:, 0, 0, 0] = np.asarray([top, 0, 1, 1, top, 0, top, 1], dtype=np.uint8)
+    decoded, _ = decode_packet(encode_packet(codes, _metadata(8), method="delta-zlib", bit_depth=bits))
     assert np.array_equal(decoded, codes)
 
 
-def test_quantizer_metadata_preserves_dtype_shape_byte_order_and_bytes() -> None:
-    metadata = _metadata(1)
-    metadata["quantizer"]["min"] = np.asarray([0x01020304], dtype=">u4")
-    codes = np.zeros((1, 9, 16, 3), dtype=np.uint8)
-    decoded, header = decode_packet(encode_packet(codes, metadata, method="packed6"))
-    assert decoded[0, 0, 0, 0] == 0
+def test_quantizer_arrays_keep_dtype_shape_endianness_and_invert_exactly() -> None:
+    quantizer = {"min": np.asarray([[[[-2.0]], [[0.5]], [[1.0]]]], dtype=">f2"), "scale": np.asarray(0.25, dtype="<f4")}
+    codes = np.arange(3 * 9 * 16, dtype=np.uint8).reshape(1, 3, 9, 16) % 64
+    decoded, header = decode_packet(encode_packet(codes, _metadata(1, quantizer=quantizer), method="packed", bit_depth=6))
     record = header["quantizer"]["min"]
-    assert record["dtype"] == ">u4"
-    assert record["shape"] == [1]
-    assert np.frombuffer(base64.b64decode(record["data_b64"]), dtype=">u4").tolist() == [0x01020304]
+    assert record["dtype"] == ">f2" and record["shape"] == [1, 3, 1, 1]
+    assert np.frombuffer(base64.b64decode(record["data_b64"]), dtype=">f2").tolist() == [-2.0, 0.5, 1.0]
+    expected = np.asarray([-2.0, 0.5, 1.0], np.float32)[None, :, None, None] + np.float32(0.25) * codes.astype(np.float32)
+    assert np.array_equal(dequantize(decoded, header["quantizer"]), expected)
+    zero_range = {"min": np.asarray(3.0, np.float32), "scale": np.asarray(0.0, np.float32)}
+    assert np.isfinite(dequantize(np.zeros((1, 3, 9, 16), np.uint8), zero_range)).all()
+    with pytest.raises(ValueError, match="floating-point"):
+        encode_packet(codes, _metadata(1, quantizer={"min": np.asarray(1, ">u4"), "scale": np.asarray(1.0)}), method="packed", bit_depth=6)
+    with pytest.raises(ValueError, match="broadcast"):
+        encode_packet(codes, _metadata(1, quantizer={"min": np.zeros(5, np.float32), "scale": np.asarray(1.0)}), method="packed", bit_depth=6)
 
 
-def test_corruption_truncation_and_checkpoint_mismatch_fail_closed() -> None:
-    codes = np.zeros((1, 9, 16, 3), dtype=np.uint8)
-    packet = encode_packet(codes, _metadata(1), method="zlib6")
+def test_corrupt_truncated_wrong_checkpoint_and_wrong_shape_fail() -> None:
+    codes = np.zeros((1, 3, 9, 16), dtype=np.uint8)
+    packet = encode_packet(codes, _metadata(1), method="zlib", bit_depth=6)
     with pytest.raises(ValueError, match="truncated"):
         decode_packet(packet[:8])
     with pytest.raises(ValueError, match="checkpoint identity"):
@@ -79,58 +81,87 @@ def test_corruption_truncation_and_checkpoint_mismatch_fail_closed() -> None:
     damaged[-1] ^= 0x20
     with pytest.raises(ValueError, match="CRC"):
         decode_packet(bytes(damaged))
-    header_start = len(MAGIC) + 4
-    header_length = struct.unpack(">I", packet[len(MAGIC):header_start])[0]
-    header = json.loads(packet[header_start:header_start + header_length])
+    start = len(MAGIC) + 4
+    length = struct.unpack(">I", packet[len(MAGIC):start])[0]
+    header = json.loads(packet[start:start + length])
     header["frame_start"] += 1
-    changed_header = json.dumps(header, sort_keys=True, separators=(",", ":")).encode()
-    bad_header = MAGIC + struct.pack(">I", len(changed_header)) + changed_header + packet[header_start + header_length:]
+    changed = json.dumps(header, sort_keys=True, separators=(",", ":")).encode()
     with pytest.raises(ValueError, match="header CRC"):
-        decode_packet(bad_header)
-
-
-def test_invalid_shapes_codes_precision_and_metadata_are_rejected() -> None:
-    metadata = _metadata(2)
-    with pytest.raises(ValueError, match="shape"):
-        encode_packet(np.zeros((2, 2, 3), dtype=np.uint8), metadata, method="packed6")
-    with pytest.raises(ValueError, match="six-bit"):
-        encode_packet(np.full((1, 9, 16, 3), 64, dtype=np.uint8), _metadata(1), method="packed6")
-    metadata["fps"] = {"numerator": 60, "denominator": 1}
-    with pytest.raises(ValueError, match="30/1"):
-        encode_packet(np.zeros((1, 9, 16, 3), dtype=np.uint8), metadata, method="packed6")
-
-
-def test_packaging_counts_full_files_and_resets_each_segment(tmp_path: Path) -> None:
-    codes = np.zeros((32, 9, 16, 3), dtype=np.uint8)
-    codes[:, :, :, :] = np.arange(32, dtype=np.uint8)[:, None, None, None] % 64
-    metadata = _metadata(32)
-    result = write_segment_packets(codes, metadata, tmp_path)
-    assert result["record_count"] == 111  # (32 one-frame + 4 eight-frame + 1 32-frame) * 3 methods
-    paths = [Path(row["path"]) for row in result["packets"]]
-    assert sum(path.stat().st_size for path in paths) == sum(row["stream_bytes"] for row in result["packets"])
-    first8 = next(Path(row["path"]) for row in result["packets"] if row["segment_length"] == 8 and row["frame_start"] == 120 and row["method"] == "delta-zlib6")
-    codes8, header8 = decode_packet(first8.read_bytes())
-    assert header8["frame_ids"] == [f"frame-{i}" for i in range(120, 128)]
-    assert np.array_equal(codes8, codes[:8])
-    # Decoder setup is an explicit separate field, never silently folded into
-    # latent packet bytes or mistaken for the encoded packet length.
-    assert header8["decoder_setup_bytes"] == 123456
-    assert first8.stat().st_size != header8["decoder_setup_bytes"]
-    with pytest.raises(FileExistsError, match="nonempty"):
-        write_segment_packets(codes, metadata, tmp_path)
-
-
-def test_future_codes_cannot_change_an_earlier_reset_packet() -> None:
-    first = np.zeros((8, 9, 16, 3), dtype=np.uint8)
-    second = first.copy()
-    second[4:] = 42
-    meta = _metadata(8)
-    packet_meta = meta | {"frame_ids": ["frame-120"]}
-    before = encode_packet(first[:1].copy(), packet_meta, method="delta-zlib6")
-    after = encode_packet(second[:1].copy(), packet_meta, method="delta-zlib6")
-    assert before == after
-
-
-def test_decoder_does_not_accept_wrong_packet_magic() -> None:
+        decode_packet(MAGIC + struct.pack(">I", len(changed)) + changed + packet[start + length:])
+    with pytest.raises(ValueError, match="NCHW"):
+        encode_packet(np.zeros((1, 9, 16, 3), np.uint8), _metadata(1), method="packed", bit_depth=6)
+    with pytest.raises(ValueError, match="6-bit"):
+        encode_packet(np.full((1, 3, 9, 16), 64, np.uint8), _metadata(1), method="packed", bit_depth=6)
+    with pytest.raises(ValueError, match="4-bit"):
+        encode_packet(np.full((1, 3, 9, 16), 16, np.uint8), _metadata(1), method="packed", bit_depth=4)
     with pytest.raises(ValueError, match="magic"):
         decode_packet(b"not a packet")
+
+
+def _segments(codes: np.ndarray, length: int) -> list[dict]:
+    return [{"codes": codes[s:s + length], "metadata": _metadata(length, frame_start=120 + s)} for s in range(0, 32, length)]
+
+
+def test_independent_segments_count_whole_files_and_exclude_setup(tmp_path: Path) -> None:
+    codes = (np.arange(32, dtype=np.uint8)[:, None, None, None] * np.ones((1, 3, 9, 16), np.uint8)) % 64
+    records = []
+    for length in (1, 8, 32):
+        records += write_segment_packets(_segments(codes, length), tmp_path / f"L{length}", bit_depth=6)["packets"]
+    assert len(records) == (32 + 4 + 1) * 3
+    assert all(Path(r["path"]).stat().st_size == r["file_bytes"] == r["payload_bytes"] + r["header_bytes"] for r in records)
+    rows = summarize_packets(records, frames=32, setup_bytes=123456)
+    for row in rows:
+        assert row["setup_inclusive_bytes"] == row["latent_only_bytes"] + 123456
+        assert row["latent_only_kbps"] == pytest.approx(8 * row["latent_only_bytes"] * 30 / (1000 * 32))
+    second = next(r for r in records if r["segment_length"] == 8 and r["frame_start"] == 128 and r["method"] == "delta-zlib")
+    decoded, header = decode_packet(Path(second["path"]).read_bytes())
+    assert np.array_equal(decoded, codes[8:16]) and header["frame_ids"][0] == "frame-128"
+    with pytest.raises(FileExistsError, match="nonempty"):
+        write_segment_packets(_segments(codes, 8), tmp_path / "L8", bit_depth=6)
+    with pytest.raises(ValueError, match="cover"):
+        summarize_packets([r for r in records if r["frame_start"] != 120], frames=32, setup_bytes=0)
+
+
+def test_future_codes_cannot_change_an_earlier_packet() -> None:
+    first = np.zeros((32, 3, 9, 16), dtype=np.uint8)
+    second = first.copy()
+    second[8:] = 42
+    meta = _metadata(8)
+    assert encode_packet(first[:8], meta, method="delta-zlib", bit_depth=6) == encode_packet(second[:8], meta, method="delta-zlib", bit_depth=6)
+
+
+def test_lossless_packaging_changes_rate_not_codes(tmp_path: Path) -> None:
+    rng = np.random.default_rng(3)
+    codes = np.repeat(rng.integers(0, 64, size=(1, 4, 9, 16), dtype=np.uint8), 32, axis=0)
+    records = write_segment_packets(_segments(codes, 32), tmp_path, bit_depth=6)["packets"]
+    hashes = {r["codes_sha256"] for r in records}
+    assert len(hashes) == 1
+    sizes = {r["method"]: r["file_bytes"] for r in records}
+    assert sizes["delta-zlib"] < sizes["zlib"] <= sizes["packed"] + 64
+
+
+def test_decoder_output_ignores_source_tensors() -> None:
+    torch = pytest.importorskip("torch")
+    from demo.experiments import hnerv_frozen as frozen
+
+    class Decoder(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.conv = torch.nn.Conv2d(3, 3, 1)
+
+        def forward(self, embed):
+            return torch.sigmoid(self.conv(embed))
+
+    class Model(torch.nn.Module):
+        def __init__(self, decoder):
+            super().__init__()
+            self.decoder = decoder
+
+        def forward(self, source, input_embed=None):
+            return self.decoder(input_embed), [input_embed], 0.0
+
+    decoder = Decoder()
+    embed = torch.rand(2, 3, 9, 16)
+    sources = [np.zeros((9, 16, 3), np.uint8)] * 2
+    report = frozen.source_independence(Model(decoder), decoder, embed, sources, device="cpu")
+    assert report["independent"] and report["repeat_max_abs_diff"] == 0.0
