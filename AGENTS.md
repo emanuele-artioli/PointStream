@@ -6,18 +6,7 @@ PointStream is an object-centric semantic video codec. The target is an ACM TOMM
 
 Run remote GPU work through `scripts/ps-fleet`, which enforces availability checks, resource claims, smoke validation, budgets, and durable monitoring. See [docs/workflow/long-jobs.md](docs/workflow/long-jobs.md) for job specifications and recovery.
 
-Before dispatch, inspect any existing job through `scripts/ps-fleet status JOB_ID`
-and its preserved supervisor receipts, then audit all eligible hosts with
-`scripts/ps-fleet inspect`. A failed connection makes that host unverified, not
-the whole fleet unavailable. Report each unreachable host separately and continue
-checking the others. Submit the full compatible host pool; let fleet admission
-claim an available node rather than pinning one in advance. Compatibility includes
-input/artifact access, pinned binaries, CPU/memory requirements and GPU models.
-An uncertain prior job must not be replayed or migrated: first resolve its
-fleet-wide status and receipts. Independent work may use other verified hosts
-only if it cannot duplicate that uncertain job. CPU-only work must use a supported
-CPU admission path with equivalent claims and monitoring; do not reserve an
-unneeded GPU or bypass admission to obtain portability.
+Before dispatch, check existing jobs and receipts through `scripts/ps-fleet status`, inspect all eligible hosts, and submit to the compatible host pool rather than pinning a node. Treat connection failures per host, continue with other verified nodes, and never replay or migrate a job whose state is uncertain; details are in [the workflow](docs/workflow/long-jobs.md).
 
 Codex subagents default to `gpt-6-luna` at `max` reasoning effort unless the task explicitly specifies otherwise.
 
