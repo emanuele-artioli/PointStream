@@ -660,6 +660,34 @@ def snapshot_root(root: Path, selected: Path | None) -> Path:
     return selected
 
 
+def reconcile_prepared(args: argparse.Namespace) -> dict[str, Any]:
+    """Finish publication only after proving an interrupted transfer is complete."""
+    import inspect
+    from experiments.jobs.prepared_source import verify_prepared_source
+    if not fleet.JOB_ID_RE.fullmatch(args.job_id):
+        raise fleet.FleetError("invalid job ID")
+    record = monitor.read_json(args.state_dir / f"{args.job_id}.json")
+    if not record or record.get("status") not in {"preparing", "submission_unknown"}:
+        raise fleet.FleetError("only a saved unpublished preparation can be reconciled")
+    spec = validate_spec(json.loads(args.spec.read_text()), now=time.time())
+    if digest(spec) != record["spec_sha256"]:
+        raise fleet.FleetError("reconciliation must use the original immutable specification")
+    config = record["config"]
+    directory = str(Path(config["base"]) / "inbox" / args.job_id)
+    code = "import hashlib,os,json,tarfile\nfrom pathlib import Path\n" + inspect.getsource(verify_prepared_source)
+    code += "\nprint(json.dumps(verify_prepared_source(Path(" + repr(directory) + "), " + repr(record["snapshot"]["snapshot_sha256"]) + ")))"
+    checked = fleet._ssh(config["hosts"][0], ["python3", "-c", code], timeout=120)
+    if checked.returncode:
+        raise fleet.FleetError("prepared source proof failed: " + checked.stderr[-1000:])
+    proof = json.loads(checked.stdout.strip().splitlines()[-1])
+    if not args.publish:
+        return {"job_id": args.job_id, "proof": proof, "published": False}
+    result = remote_rpc(config, "publish", {"job_id": args.job_id, "spec": spec, "snapshot": record["snapshot"]})
+    record.update(result, preparation_reconciliation=proof)
+    monitor.write_json(args.state_dir / f"{args.job_id}.json", record)
+    return {**result, "proof": proof}
+
+
 def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     source_root = snapshot_root(root, getattr(args, "source_worktree", None))
     transfer_seconds = getattr(args, "snapshot_transfer_seconds", None)
@@ -779,6 +807,10 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     submission.add_argument("--snapshot-transfer-seconds", type=float, help="bound each archive transfer/extraction to at most 90 seconds; default preserves the fleet timeout")
     submission.add_argument("--snapshot-path", action="append", default=[], help="archive only this reviewed tracked file/directory from HEAD; repeat for a complete workload dependency set")
     submission.add_argument("--chat-id", default=os.environ.get("CODEX_THREAD_ID"), help="submitting Codex chat; register its five-minute heartbeat")
+    reconciliation = actions.add_parser("reconcile", help="verify a saved unpublished transfer; never replay an execution")
+    reconciliation.add_argument("job_id")
+    reconciliation.add_argument("spec", type=Path)
+    reconciliation.add_argument("--publish", action="store_true", help="publish the original request only after complete identity/ownership proof")
     for command in (workers, submission):
         command.add_argument("--include-change", action="append", default=[])
         command.add_argument("--include-untracked", action="append", default=[])
@@ -832,6 +864,8 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
                 value = workers_start(args, root)
         elif args.action == "submit":
             value = submit(args, root)
+        elif args.action == "reconcile":
+            value = reconcile_prepared(args)
         elif args.action == "selftest":
             value = selftest_submit(args, root)
         elif args.action == "watch":
