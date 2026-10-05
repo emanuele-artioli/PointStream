@@ -123,8 +123,9 @@ The NFS home costs ~200 ms per small-file create and 11–17 ms per open; host-l
 disk costs ~0.02 ms (measurements in [infrastructure](../areas/infrastructure.md)).
 Do per-file work locally and move bytes over NFS in a few large files.
 
-- `PS_SCRATCH_DIR` is a fresh per-stage workspace. On a host with a local root it
-  is local disk; otherwise it is `scratch/` beside the stage outputs. Write
+- `PS_SCRATCH_DIR` is a fresh per-stage workspace. It is under the local root when
+  that root is disk, or when it is RAM and the job declares `local_storage_gib`;
+  otherwise it is `scratch/` beside the stage outputs. Write
   intermediates there. Anything placed in `$PS_SCRATCH_DIR/publish/` returns to
   the stage directory as one `published.tar`, recorded with its SHA256. Local
   scratch is deleted after a successful stage and kept on the host after a failure
@@ -135,34 +136,43 @@ Do per-file work locally and move bytes over NFS in a few large files.
   SHA256, and re-hashes it on every use, so a stage never reads unverified bytes.
   `extract: true` unpacks a tar archive once into a read-only tree. Pack datasets of
   many small files as archives; staging them file by file would pay the NFS cost.
-- Optional `local_storage_gib` makes admission require a local root with that much
-  space free beyond a 50 GiB reserve. Extracted inputs require it. Without it, a
-  host lacking local storage, or with too little free space, uses verified shared
-  paths instead and records `mode: shared`.
+- Optional `local_storage_gib` makes admission require a local root that can add
+  that much while keeping its safety margin. Extracted inputs, a staged environment
+  and RAM-backed scratch require it. Without enough space, a stage uses verified
+  shared paths instead and records `mode: shared`. Extraction checks the archive's
+  unpacked size first.
 - Optional `environment`, `{"path", "sha256"}`, names a packed Python environment
   and requires `local_storage_gib`. Each stage extracts it locally (once per host),
   confirms that its interpreter reports the local prefix, and runs the workload and
   `{python}` validator with it, with its `bin` first on `PATH`. A cold `import torch`
   from the NFS environment took 70 s on gpu6 and 669 s on gpu5. Editable installs
   still resolve to their source trees, and console-script shebangs name the original
-  prefix, so call modules through the interpreter. Pack an environment on a host
-  with a local root:
+  prefix, so call modules through the interpreter. Pack an environment with its
+  temporary archive on fast local storage:
 
   ```bash
   python3 -m experiments.jobs.environment pack --prefix ~/.conda/envs/pointstream \
-    --output-dir ~/pointstream-data/environments --work-dir /local/users/$USER/pack-work
+    --output-dir ~/pointstream-data/environments --work-dir /dev/shm/$USER-pack-work
   ```
 
-  The packer refuses to publish if conda or pip metadata changed during packing.
-  Repack after installing packages; the new archive has a new identity.
+  Packing reads every environment file over NFS. Packing a 14 GB environment of
+  85,000 files ran at ~0.3 MB/s on small files, so create a new environment on local
+  storage and pack it from there. The packer refuses to publish if conda or pip
+  metadata changed during packing. Repack after installing packages; the new
+  archive has a new identity, which jobs must declare.
 
-The local root is `PS_LOCAL_ROOT` or `/local/users/$USER/pointstream`. Only an
-administrator can create `/local/users/$USER`; on 2026-10-05 it existed only on
-gpu6. NFS remains the sole source of truth: cache entries are disposable and never
-synchronized between hosts. The first use on a host pays the NFS read (16–93 MB/s
-measured), and staging time counts against the stage budget. Nothing evicts cache
-entries automatically; delete `cache/<sha256>` directories (restore write
-permission on extracted trees first) when the shared disk needs space.
+The local root is `PS_LOCAL_ROOT`, else `/local/users/$USER/pointstream` (disk;
+created by an administrator, only on gpu6 on 2026-10-05), else
+`/dev/shm/$USER-pointstream` (RAM, 188–504 GB free on every host). A disk root
+keeps 50 GiB free. A RAM root always leaves at least 25% of RAM, and never less than
+64 GiB, available to everyone. systemd's default `RemoveIPC=yes` deletes a user's
+/dev/shm files once none of their processes remain on the host. A running job
+always has processes there, so the cache disappears only between jobs and is then
+staged again. NFS remains the sole source of truth: cache entries are disposable
+and never synchronized between hosts. The first use on a host pays the NFS read
+(16–93 MB/s measured), and staging time counts against the stage budget. Nothing
+evicts cache entries automatically; delete `cache/<sha256>` directories (restore
+write permission on extracted trees first) to release space.
 
 The validator sees the smoke directory and must exit zero and write
 `{"passed": true, "checks": ...}` to `PS_VALIDATION_PATH`, with nonempty substantive

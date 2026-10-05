@@ -23,7 +23,7 @@ def local(tmp_path, monkeypatch):
     root.parent.mkdir()
     monkeypatch.setenv(staging.LOCAL_ROOT_ENV, str(root))
     # Hosts' real free space varies; only the reserve tests constrain it.
-    monkeypatch.setattr(staging, "free_bytes", lambda path: 2**50)
+    monkeypatch.setattr(staging, "available_bytes", lambda path: 2**50)
     return root
 
 
@@ -81,7 +81,7 @@ def test_hosts_without_local_storage_use_verified_shared_paths(tmp_path, monkeyp
 def test_reserve_protects_the_shared_local_disk(tmp_path, local, monkeypatch):
     source = tmp_path / "clip.bin"
     source.write_bytes(b"x")
-    monkeypatch.setattr(staging, "free_bytes", lambda path: staging.RESERVE_BYTES)
+    monkeypatch.setattr(staging, "available_bytes", lambda path: 0)
     assert staging.stage_input(item(source), staging.local_root())["mode"] == "shared"
 
 
@@ -106,8 +106,8 @@ def test_archive_members_cannot_escape_the_cache(tmp_path, local):
 def test_storage_requirement_controls_admission(tmp_path, local, monkeypatch):
     assert staging.admission_error({}) is None
     assert staging.admission_error({"local_storage_gib": 1}) is None
-    monkeypatch.setattr(staging, "free_bytes", lambda path: staging.RESERVE_BYTES)
-    assert "less than" in staging.admission_error({"local_storage_gib": 1})
+    monkeypatch.setattr(staging, "available_bytes", lambda path: 0)
+    assert "safety margin" in staging.admission_error({"local_storage_gib": 1})
     monkeypatch.setenv(staging.LOCAL_ROOT_ENV, str(tmp_path / "missing" / "pointstream"))
     assert "no writable" in staging.admission_error({"local_storage_gib": 1})
 
@@ -241,3 +241,47 @@ def test_bad_environment_declarations_are_rejected(tmp_path, mutation):
     mutation(spec)
     with pytest.raises(fleet.FleetError):
         inbox.validate_spec(spec)
+
+
+def test_ram_backed_root_always_leaves_the_memory_margin(tmp_path, monkeypatch):
+    monkeypatch.setattr(staging, "ram_backed", lambda path: True)
+    gib = staging.GIB
+    monkeypatch.setattr(staging.shutil, "disk_usage", lambda path: staging.shutil._ntuple_diskusage(500 * gib, 0, 500 * gib))
+    monkeypatch.setattr(staging, "_memory", lambda: (400 * gib, 300 * gib))
+    assert staging.available_bytes(tmp_path) == 200 * gib  # margin is 25% of RAM
+    monkeypatch.setattr(staging, "_memory", lambda: (100 * gib, 90 * gib))
+    assert staging.available_bytes(tmp_path) == 26 * gib  # margin never below 64 GiB
+    monkeypatch.setattr(staging, "_memory", lambda: (400 * gib, 50 * gib))
+    assert staging.available_bytes(tmp_path) < 0
+
+
+def test_root_falls_back_to_ram_and_never_adopts_a_foreign_directory(tmp_path, monkeypatch):
+    shm = tmp_path / "shm"
+    shm.mkdir()
+    monkeypatch.setattr(staging, "_candidates", lambda: [tmp_path / "no-admin-dir" / "pointstream", shm / "me-pointstream"])
+    assert staging.local_root() == shm / "me-pointstream"
+    monkeypatch.setattr(staging.os, "getuid", lambda: -1)
+    assert staging.local_root() is None
+
+
+@pytest.mark.parametrize("declared", [False, True])
+def test_unbounded_scratch_stays_out_of_ram_unless_declared(tmp_path, monkeypatch, declared):
+    monkeypatch.setattr(staging, "ram_backed", lambda path: True)
+    root, output = tmp_path / "shm", tmp_path / "out"
+    root.mkdir()
+    output.mkdir()
+    scratch = staging.scratch_directory(root, "job", "smoke", output, declared=declared)
+    assert scratch == (root / "scratch" / "job-smoke" if declared else output / "scratch")
+
+
+def test_extraction_is_refused_when_the_unpacked_size_breaks_the_margin(tmp_path, local, monkeypatch):
+    bundle = tmp_path / "frames.tar.gz"
+    with tarfile.open(bundle, "w:gz") as handle:
+        info = tarfile.TarInfo("big.bin")
+        info.size = 1_000_000
+        handle.addfile(info, io.BytesIO(bytes(info.size)))
+    monkeypatch.setattr(staging, "available_bytes", lambda path: bundle.stat().st_size + 10)
+    with pytest.raises(staging.StagingError, match="safety margin"):
+        staging.stage_input(item(bundle, extract=True), staging.local_root())
+    assert not list((local / "cache").rglob(".partial-tree-*"))
+    assert not list((local / "cache").rglob("tree"))

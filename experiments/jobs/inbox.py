@@ -403,7 +403,7 @@ def campaign(directory: Path) -> int:
             output.mkdir()
             # Re-verified per stage, so promotion also requires unchanged staged bytes.
             staged = staging.stage_inputs(spec.get("staged_inputs", []), local_root)
-            scratch = staging.scratch_directory(local_root, directory.name, stage, output)
+            scratch = staging.scratch_directory(local_root, directory.name, stage, output, declared=bool(spec.get("local_storage_gib")))
             packed = staging.stage_environment(spec["environment"], local_root) if spec.get("environment") else None
             python = packed["python"] if packed else sys.executable
             staging_record: dict[str, Any] = {"local_root": str(local_root) if local_root else None, "inputs": staged, "environment": packed, "scratch": str(scratch)}

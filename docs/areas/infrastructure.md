@@ -169,8 +169,8 @@ NFSv4 state. That count is a lead for the server's administrators, not a diagnos
 
 Workaround: [host-local staging](../workflow/long-jobs.md#host-local-staging). A 6 GB
 archive took 313 s to read cold on gpu6, and 4.2 s to verify from the local cache on
-reuse. `/local/users/emanuele` (the local root) exists only on gpu6; other hosts
-fall back to shared paths.
+reuse. The local root is `/local/users/emanuele` on gpu6 and RAM-backed `/dev/shm`
+on the other hosts, with a memory safety margin.
 
 ### Worktree Cleanup Audit
 PR #68 introduced `scripts/cleanup_merged_worktrees.sh`. The documentation audit in PR #73 flagged critical safety hazards in this helper:

@@ -25,33 +25,82 @@ from typing import Any
 import uuid
 
 LOCAL_ROOT_ENV = "PS_LOCAL_ROOT"
-# Never fill a shared local disk: other users' jobs live on the same volume.
-RESERVE_BYTES = 50 * 2**30
-CHUNK_BYTES = 8 * 2**20
 GIB = 2**30
+# Never fill a shared local disk: other users' jobs live on the same volume.
+RESERVE_BYTES = 50 * GIB
+# A RAM-backed root must always leave this much memory available to everyone.
+RAM_MARGIN_MIN_BYTES = 64 * GIB
+RAM_MARGIN_FRACTION = 0.25
+CHUNK_BYTES = 8 * 2**20
 
 
 class StagingError(RuntimeError):
     pass
 
 
+def _candidates() -> list[Path]:
+    configured = os.environ.get(LOCAL_ROOT_ENV)
+    if configured:
+        return [Path(configured)]
+    user = getpass.getuser()
+    # /local/users/<user> exists only where an administrator created it (gpu6 on
+    # 2026-10-05); every host has a large RAM-backed /dev/shm.
+    return [Path("/local/users") / user / "pointstream", Path("/dev/shm") / f"{user}-pointstream"]
+
+
 def local_root() -> Path | None:
     """The host's writable PointStream cache root, or None on hosts without one.
 
-    ``PS_LOCAL_ROOT`` overrides; otherwise ``/local/users/<user>/pointstream``,
-    whose parent only an administrator can create.
+    ``PS_LOCAL_ROOT`` overrides. Otherwise prefer ``/local/users/<user>/pointstream``
+    and fall back to ``/dev/shm/<user>-pointstream``. systemd removes a user's
+    /dev/shm files once none of their processes remain on the host, so that cache
+    lives exactly as long as our workers and jobs do.
     """
-    configured = os.environ.get(LOCAL_ROOT_ENV)
-    root = Path(configured) if configured else Path("/local/users") / getpass.getuser() / "pointstream"
-    parent = root if root.is_dir() else root.parent
-    if not parent.is_dir() or not os.access(parent, os.W_OK | os.X_OK):
-        return None
-    root.mkdir(exist_ok=True)
-    return root
+    for root in _candidates():
+        parent = root if root.is_dir() else root.parent
+        if not parent.is_dir() or not os.access(parent, os.W_OK | os.X_OK):
+            continue
+        root.mkdir(mode=0o700, exist_ok=True)
+        # /dev/shm is world-writable: never use a directory someone else created.
+        if root.stat().st_uid == os.getuid():
+            return root
+    return None
 
 
-def free_bytes(path: Path) -> int:
-    return shutil.disk_usage(path).free
+def ram_backed(path: Path) -> bool:
+    """Whether ``path`` lives on tmpfs/ramfs, by the longest matching mount point."""
+    try:
+        mounts = Path("/proc/mounts").read_text().splitlines()
+    except OSError:
+        return False
+    target, best, kind = str(path.resolve()), -1, ""
+    for line in mounts:
+        fields = line.split()
+        if len(fields) < 3:
+            continue
+        point = fields[1].replace("\\040", " ")
+        if (target == point or target.startswith(point.rstrip("/") + "/")) and len(point) > best:
+            best, kind = len(point), fields[2]
+    return kind in {"tmpfs", "ramfs"}
+
+
+def _memory() -> tuple[int, int]:
+    """(MemTotal, MemAvailable) in bytes."""
+    values = {}
+    for line in Path("/proc/meminfo").read_text().splitlines():
+        name, _, rest = line.partition(":")
+        values[name] = int(rest.split()[0]) * 1024
+    return values["MemTotal"], values["MemAvailable"]
+
+
+def available_bytes(root: Path) -> int:
+    """Bytes we may still add under ``root`` while keeping the safety margin free."""
+    free = shutil.disk_usage(root).free
+    if not ram_backed(root):
+        return free - RESERVE_BYTES
+    total, available = _memory()
+    margin = max(RAM_MARGIN_MIN_BYTES, int(total * RAM_MARGIN_FRACTION))
+    return min(free, available - margin)
 
 
 def admission_error(spec: dict[str, Any]) -> str | None:
@@ -62,8 +111,8 @@ def admission_error(spec: dict[str, Any]) -> str | None:
     root = local_root()
     if root is None:
         return "host has no writable local storage root"
-    if free_bytes(root) < required * GIB + RESERVE_BYTES:
-        return f"host local storage has less than {required} GiB plus reserve free"
+    if available_bytes(root) < required * GIB:
+        return f"host local storage cannot add {required} GiB and keep its safety margin"
     return None
 
 
@@ -117,13 +166,17 @@ def _copy_verified(source: Path, entry: Path, expected: str) -> Path:
     return target
 
 
-def _extract(archive: Path, entry: Path) -> Path:
+def _extract(archive: Path, entry: Path, root: Path) -> Path:
     tree = entry / "tree"
     if tree.is_dir():
         return tree
     partial = entry / f".partial-tree-{uuid.uuid4().hex}"
     try:
         with tarfile.open(archive) as bundle:
+            # Compressed archives expand several-fold; check the real size first.
+            needed = sum(member.size for member in bundle.getmembers())
+            if available_bytes(root) < needed:
+                raise StagingError(f"extracting {archive.name} needs {needed / GIB:.1f} GiB beyond the local safety margin")
             bundle.extractall(partial, filter="data")
         _make_read_only(partial)
         try:
@@ -156,13 +209,12 @@ def stage_input(item: dict[str, Any], root: Path | None) -> dict[str, Any]:
             else:
                 record["mode"] = "local-hit"
         if "mode" not in record:
-            reserve = size * (2 if record["extract"] else 1) + RESERVE_BYTES
-            if free_bytes(root) >= reserve:
+            if available_bytes(root) >= size:
                 entry.mkdir(parents=True, exist_ok=True)
                 cached = _copy_verified(source, entry, item["sha256"])
                 record["mode"] = "local-copy"
         if "mode" in record:
-            record["path"] = str(_extract(cached, entry) if record["extract"] else cached)
+            record["path"] = str(_extract(cached, entry, root) if record["extract"] else cached)
             record["seconds"] = time.time() - started
             return record
     if record["extract"]:
@@ -189,9 +241,14 @@ def stage_inputs(items: list[dict[str, Any]], root: Path | None) -> list[dict[st
     return [stage_input(item, root) for item in items]
 
 
-def scratch_directory(root: Path | None, job_id: str, stage: str, output: Path) -> Path:
-    """Per-stage workspace: local when the host has a root, else beside the outputs."""
-    directory = (root / "scratch" / f"{job_id}-{stage}") if root is not None else (output / "scratch")
+def scratch_directory(root: Path | None, job_id: str, stage: str, output: Path, *, declared: bool) -> Path:
+    """Per-stage workspace: local when the host has a root, else beside the outputs.
+
+    Scratch writes are unbounded, so RAM-backed scratch is used only by jobs whose
+    declared ``local_storage_gib`` admission confirmed fits within the margin.
+    """
+    local = root is not None and (declared or not ram_backed(root))
+    directory = (root / "scratch" / f"{job_id}-{stage}") if local and root is not None else (output / "scratch")
     directory.mkdir(parents=True)
     return directory
 
