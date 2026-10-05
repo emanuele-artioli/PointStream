@@ -107,6 +107,12 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
     local_storage = spec.get("local_storage_gib", 0)
     if not isinstance(local_storage, int) or isinstance(local_storage, bool) or local_storage < 0:
         raise fleet.FleetError("local_storage_gib must be a nonnegative integer")
+    packed = spec.get("environment")
+    if packed is not None:
+        if not isinstance(packed, dict) or set(packed) != {"path", "sha256"}:
+            raise fleet.FleetError("environment declares exactly path and sha256")
+        if not local_storage:
+            raise fleet.FleetError("a staged environment requires local_storage_gib")
     placeholders = {"{" + k + "}" for k in scale} | {"{staged:" + n + "}" for n in names}
     for arg in spec["arguments"]:
         if "{" in arg or "}" in arg:
@@ -115,7 +121,7 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
     inputs = spec["inputs"]
     if not isinstance(inputs, list) or not inputs:
         raise fleet.FleetError("inputs must include immutable manifest/file identities")
-    for item in [*inputs, *spec.get("staged_inputs", [])]:
+    for item in [*inputs, *spec.get("staged_inputs", []), *([packed] if packed is not None else [])]:
         if not isinstance(item, dict) or not Path(item.get("path", "")).is_absolute():
             raise fleet.FleetError("input identities require absolute paths")
         sha = item.get("sha256", "")
@@ -352,10 +358,10 @@ def worker_loop(base: Path, alias: str) -> int:
         lock.rmdir()
 
 
-def phase_command(spec: dict[str, Any], stage: str, staged: list[dict[str, Any]] | None = None) -> list[str]:
+def phase_command(spec: dict[str, Any], stage: str, staged: list[dict[str, Any]] | None = None, python: str = sys.executable) -> list[str]:
     replacements = {"{" + name + "}": str(values[stage]) for name, values in spec["scale"].items()}
     replacements.update({"{staged:" + item["name"] + "}": item["path"] for item in staged or []})
-    return [sys.executable, *spec["entrypoint"], *[replacements.get(arg, arg) for arg in spec["arguments"]]]
+    return [python, *spec["entrypoint"], *[replacements.get(arg, arg) for arg in spec["arguments"]]]
 
 
 def campaign(directory: Path) -> int:
@@ -379,7 +385,7 @@ def campaign(directory: Path) -> int:
         if code_identity != manifest["source_sha256"]:
             raise fleet.FleetError("frozen code identity changed")
         verify_inputs(spec, directory.parents[3])
-        for item in spec.get("staged_inputs", []):
+        for item in [*spec.get("staged_inputs", []), *([spec["environment"]] if spec.get("environment") else [])]:
             path = Path(item["path"]).resolve()
             if not path.is_relative_to(directory.parents[3].resolve()) or not path.is_file():
                 raise fleet.FleetError(f"staged input must be a file under the external data root: {path}")
@@ -398,11 +404,15 @@ def campaign(directory: Path) -> int:
             # Re-verified per stage, so promotion also requires unchanged staged bytes.
             staged = staging.stage_inputs(spec.get("staged_inputs", []), local_root)
             scratch = staging.scratch_directory(local_root, directory.name, stage, output)
-            staging_record: dict[str, Any] = {"local_root": str(local_root) if local_root else None, "inputs": staged, "scratch": str(scratch)}
+            packed = staging.stage_environment(spec["environment"], local_root) if spec.get("environment") else None
+            python = packed["python"] if packed else sys.executable
+            staging_record: dict[str, Any] = {"local_root": str(local_root) if local_root else None, "inputs": staged, "environment": packed, "scratch": str(scratch)}
             monitor.write_json(output / "staging.json", staging_record)
-            command = phase_command(spec, stage, staged)
+            command = phase_command(spec, stage, staged, python)
             env = {**os.environ, "PS_STAGE": stage, "PS_STAGE_DIR": str(output), "PS_SCRATCH_DIR": str(scratch), "PS_VALIDATION_PATH": str(directory / "validation.json")}
-            monitor.write_json(output / "dispatch.json", {"command": command, "input_identity": spec["inputs"], "staged_inputs": staged, "code": manifest, "environment": monitor.read_json(directory / "environment.json", {}), "started": time.time(), "citable": False if stage == "smoke" else None})
+            if packed:
+                env.update(PATH=os.pathsep.join([packed["bin"], env.get("PATH", "")]), CONDA_PREFIX=packed["prefix"])
+            monitor.write_json(output / "dispatch.json", {"command": command, "input_identity": spec["inputs"], "staged_inputs": staged, "staged_environment": packed, "code": manifest, "environment": monitor.read_json(directory / "environment.json", {}), "started": time.time(), "citable": False if stage == "smoke" else None})
             monitor.publish_progress(stage, 0)
             phase_started = time.time()
             with (output / "command.log").open("w") as log:
@@ -417,7 +427,7 @@ def campaign(directory: Path) -> int:
             monitor.write_json(output / "staging.json", staging_record)
             monitor.publish_progress(stage, 1)
             if stage == "smoke":
-                validation_command = [sys.executable if a == "{python}" else a for a in spec["validator"]]
+                validation_command = [python if a == "{python}" else a for a in spec["validator"]]
                 validator_started = time.time()
                 with (output / "validator.log").open("w") as log:
                     checked = subprocess.run(validation_command, cwd=source, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=min(spec["validator_seconds"], max(0.001, budget_end - time.time())), check=False)

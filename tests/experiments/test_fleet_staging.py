@@ -184,3 +184,60 @@ pathlib.Path(os.environ['PS_STAGE_DIR']).joinpath('result.json').write_text(json
     assert record["local_root"] is None and record["inputs"][0]["mode"] == "shared"
     assert (campaign / "smoke" / "scratch" / "kept.bin").exists()
     assert json.loads((campaign / "full" / "result.json").read_text())["frames"] == 8
+
+
+def packed_environment(data: Path, prefix_line: str) -> dict:
+    """A tar'd prefix whose bin/python reports its prefix and forwards real work."""
+    import sys
+    prefix = data / "env-src"
+    (prefix / "bin").mkdir(parents=True)
+    script = prefix / "bin" / "python"
+    script.write_text(f'''#!/bin/sh
+here="$(cd "$(dirname "$0")/.." && pwd -P)"
+if [ "$1" = "-c" ] && [ "$2" = "import sys; print(sys.prefix)" ]; then echo {prefix_line}; exit 0; fi
+echo "$0" >> "$PS_STAGE_DIR/interpreters.log"
+exec {sys.executable} "$@"
+''')
+    script.chmod(0o755)
+    bundle = data / "env.tar.gz"
+    with tarfile.open(bundle, "w:gz") as handle:
+        handle.add(prefix, arcname=".")
+    return {"path": str(bundle), "sha256": inbox.file_digest(bundle)}
+
+
+def environment_job(directory: Path, data: Path, prefix_line: str) -> None:
+    spec = specification(data)
+    spec.update(environment=packed_environment(data, prefix_line), local_storage_gib=1)
+    spec = inbox.validate_spec(spec)
+    monitor.write_json(directory / "spec.json", spec)
+    monitor.write_json(directory / "ready.json", {"spec_sha256": inbox.digest(spec), "source_sha256": inbox.source_identity(directory / "source")})
+
+
+def test_stages_and_validator_run_from_the_staged_environment(campaign, local):
+    environment_job(campaign, campaign.parents[3], '"$here"')
+    assert inbox.campaign(campaign) == 0
+    for stage in ("smoke", "full"):
+        record = monitor.read_json(campaign / stage / "staging.json")["environment"]
+        assert Path(record["prefix"]).is_relative_to(local)
+        assert monitor.read_json(campaign / stage / "dispatch.json")["command"][0] == record["python"]
+    smoke_runs = (campaign / "smoke" / "interpreters.log").read_text().split()
+    assert smoke_runs == [record["python"]] * 2  # workload, then validator
+    assert json.loads((campaign / "full" / "result.json").read_text())["frames"] == 8
+
+
+def test_environment_that_runs_from_elsewhere_is_refused(campaign, local):
+    environment_job(campaign, campaign.parents[3], "/home/itec/emanuele/.conda/envs/pointstream")
+    assert inbox.campaign(campaign) == 1
+    assert "local prefix" in monitor.read_json(campaign / "campaign-error.json")["error"]
+    assert not (campaign / "smoke" / "result.json").exists()
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda s: s.update(environment={"path": s["inputs"][0]["path"], "sha256": s["inputs"][0]["sha256"]}),
+    lambda s: s.update(local_storage_gib=1, environment={**s["inputs"][0], "extract": True}),
+])
+def test_bad_environment_declarations_are_rejected(tmp_path, mutation):
+    spec = specification(tmp_path)
+    mutation(spec)
+    with pytest.raises(fleet.FleetError):
+        inbox.validate_spec(spec)

@@ -18,6 +18,7 @@ import os
 from pathlib import Path
 import shutil
 import stat
+import subprocess
 import tarfile
 import time
 from typing import Any
@@ -170,6 +171,18 @@ def stage_input(item: dict[str, Any], root: Path | None) -> dict[str, Any]:
         raise StagingError(f"input identity changed: {source}")
     record.update(mode="shared", path=str(source), seconds=time.time() - started)
     return record
+
+
+def stage_environment(item: dict[str, Any], root: Path | None) -> dict[str, Any]:
+    """Extract a packed environment locally and prove its interpreter runs from there."""
+    record = stage_input({"name": "environment", **item, "extract": True}, root)
+    prefix = Path(record["path"])
+    python = prefix / "bin" / "python"
+    probe = subprocess.run([str(python), "-c", "import sys; print(sys.prefix)"], capture_output=True, text=True, timeout=120, check=False)
+    reported = probe.stdout.strip()
+    if probe.returncode or not reported or Path(reported).resolve() != prefix.resolve():
+        raise StagingError(f"staged interpreter does not run from its local prefix: {reported or probe.stderr.strip()[-300:]}")
+    return {**record, "prefix": str(prefix), "python": str(python), "bin": str(prefix / "bin")}
 
 
 def stage_inputs(items: list[dict[str, Any]], root: Path | None) -> list[dict[str, Any]]:

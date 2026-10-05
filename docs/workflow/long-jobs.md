@@ -139,6 +139,22 @@ Do per-file work locally and move bytes over NFS in a few large files.
   space free beyond a 50 GiB reserve. Extracted inputs require it. Without it, a
   host lacking local storage, or with too little free space, uses verified shared
   paths instead and records `mode: shared`.
+- Optional `environment`, `{"path", "sha256"}`, names a packed Python environment
+  and requires `local_storage_gib`. Each stage extracts it locally (once per host),
+  confirms that its interpreter reports the local prefix, and runs the workload and
+  `{python}` validator with it, with its `bin` first on `PATH`. A cold `import torch`
+  from the NFS environment took 70 s on gpu6 and 669 s on gpu5. Editable installs
+  still resolve to their source trees, and console-script shebangs name the original
+  prefix, so call modules through the interpreter. Pack an environment on a host
+  with a local root:
+
+  ```bash
+  python3 -m experiments.jobs.environment pack --prefix ~/.conda/envs/pointstream \
+    --output-dir ~/pointstream-data/environments --work-dir /local/users/$USER/pack-work
+  ```
+
+  The packer refuses to publish if conda or pip metadata changed during packing.
+  Repack after installing packages; the new archive has a new identity.
 
 The local root is `PS_LOCAL_ROOT` or `/local/users/$USER/pointstream`. Only an
 administrator can create `/local/users/$USER`; on 2026-10-05 it existed only on
