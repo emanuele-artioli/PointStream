@@ -1019,6 +1019,10 @@
 
         videoC.addEventListener('timeupdate', onClockTick);
         videoA.addEventListener('timeupdate', onClockTick);
+        [videoA, videoB, videoC].forEach(video => {
+            video.addEventListener('seeked', redrawCanvas);
+            video.addEventListener('loadeddata', redrawCanvas);
+        });
 
         videoC.addEventListener('ended', () => {
             btnPlay.textContent = '▶ Play';
