@@ -242,7 +242,7 @@ def test_segment_frames_runtime_policy_propagates_forward_and_shares_identical_p
 
 def test_front_end_runs_the_worker_under_the_sam_interpreter(tmp_path: Path) -> None:
     front = Sam31Segmenter(python=tmp_path / "py", checkpoint=tmp_path / "ckpt.pt")
-    command = front.worker_command(tmp_path / "f", tmp_path / "r.json", tmp_path / "o")
+    command = front.worker_command(tmp_path / "r.json", tmp_path / "o")
     assert command[:3] == [str(tmp_path / "py"), "-m", "src.segmentation.sam31"]
     assert front.source_revision == "2345a4ad109ac29c569da749c91d84f10dc08c40"
     with pytest.raises(FileNotFoundError, match="SAM31_CHECKPOINT"):
@@ -330,3 +330,32 @@ def test_ampere_or_newer_keeps_native_flash_sdpa() -> None:
 
     assert _configure_sdpa_backend(torch_module) == "native_flash"
     assert attention.sdpa_kernel is original
+
+
+@pytest.mark.parametrize(("max_frames", "frames", "windows"), [(None, 5, 3), (3, 3, 2), (4, 4, 2)])
+def test_long_clips_run_in_windows_with_unique_track_ids(
+    tmp_path: Path, max_frames: int | None, frames: int, windows: int
+) -> None:
+    from src.segmentation.sam31 import TRACK_ID_STRIDE, segment_chunks
+
+    source = tmp_path / "clip"
+    source.mkdir()
+    for index in range(5):
+        Image.new("RGB", (6, 4)).save(source / f"{index:03d}.png")
+    request = {
+        "source": str(source),
+        "max_frames": max_frames,
+        "chunk_frames": 2,
+        "fps": 25.0,
+        "concepts": {"hand": "hand"},
+        "policy": "offline_bidirectional",
+    }
+    segmenter = Sam31SequenceSegmenter(predictor=_FakePredictor())
+    masks, segment_s, extract_s = segment_chunks(segmenter, request)
+    assert len(masks) == frames and masks.meta["windows"] == windows
+    # The fake predictor reports tracker 8 on the first frame of every window.
+    starts = [index for index, frame in enumerate(masks.frames) if frame]
+    assert starts == list(range(0, frames, 2))
+    expected = [w * TRACK_ID_STRIDE + 8 for w in range(windows)]
+    assert [masks.frames[i][0].track_id for i in starts] == expected
+    assert segment_s >= 0 and extract_s >= 0

@@ -733,7 +733,11 @@ class Sam31Segmenter:
         checkpoint_sha256: str | None = None,
         prob_threshold: float = 0.35,
         policy: Policy = "offline_bidirectional",
+        chunk_frames: int = 300,
     ) -> None:
+        if chunk_frames <= 0:
+            raise ValueError("chunk_frames must be positive")
+        self.chunk_frames = int(chunk_frames)
         self.python = Path(python or os.environ.get("SAM31_PYTHON") or DEFAULT_PYTHON).expanduser()
         self.checkpoint = Path(checkpoint).expanduser() if checkpoint else default_checkpoint()
         self.source_root = Path(
@@ -750,13 +754,11 @@ class Sam31Segmenter:
         self.prob_threshold = prob_threshold
         self.policy = policy
 
-    def worker_command(self, frames: Path, request: Path, out: Path) -> list[str]:
+    def worker_command(self, request: Path, out: Path) -> list[str]:
         return [
             str(self.python),
             "-m",
             "src.segmentation.sam31",
-            "--frames",
-            str(frames),
             "--request",
             str(request),
             "--out",
@@ -766,7 +768,9 @@ class Sam31Segmenter:
     def segment(
         self, source: Path | str, domain: Any, *, max_frames: int | None = None
     ) -> ClipMasks:
-        from src.segmentation.sources import REPO_ROOT, extract_jpegs, video_fps
+        import shutil
+
+        from src.segmentation.sources import REPO_ROOT, video_fps
 
         if self.checkpoint is None or not self.checkpoint.is_file():
             raise FileNotFoundError(
@@ -778,13 +782,14 @@ class Sam31Segmenter:
             )
         with tempfile.TemporaryDirectory(prefix="ps-sam31-") as tmp:
             work = Path(tmp)
-            extract_t0 = time.perf_counter()
-            count = extract_jpegs(source, work / "frames", max_frames)
-            extract_s = time.perf_counter() - extract_t0
             request = work / "request.json"
             request.write_text(
                 json.dumps(
                     {
+                        "source": str(Path(source).resolve()),
+                        "max_frames": max_frames,
+                        "chunk_frames": self.chunk_frames,
+                        "ffmpeg": shutil.which("ffmpeg"),
                         "concepts": domain.prompts_for("sam"),
                         "policy": self.policy,
                         "prob_threshold": self.prob_threshold,
@@ -801,7 +806,7 @@ class Sam31Segmenter:
                 filter(None, [str(REPO_ROOT), env.get("PYTHONPATH")])
             )
             result = subprocess.run(
-                self.worker_command(work / "frames", request, work / "out"),
+                self.worker_command(request, work / "out"),
                 capture_output=True,
                 text=True,
                 env=env,
@@ -811,11 +816,65 @@ class Sam31Segmenter:
                 raise RuntimeError(
                     f"SAM 3.1 worker failed ({result.returncode}):\n{result.stderr[-4000:]}"
                 )
-            masks = ClipMasks.load(work / "out")
-        masks.meta.setdefault("timing", {})["frame_extract_s"] = round(extract_s, 3)
-        if len(masks) != count:
-            raise RuntimeError(f"SAM 3.1 returned {len(masks)} frames for {count} inputs")
-        return masks
+            return ClipMasks.load(work / "out")
+
+
+TRACK_ID_STRIDE = 100_000
+
+
+def segment_chunks(segmenter: Any, request: dict[str, Any]) -> tuple[ClipMasks, float, float]:
+    """Segment a clip in windows of ``chunk_frames`` with one loaded model.
+
+    A long clip does not fit one SAM 3.1 session, so each window is its own
+    prompt-and-propagate pass. Track ids restart per window; they are offset by
+    ``TRACK_ID_STRIDE`` per window so they stay unique within the clip. Returns
+    the masks, segmentation seconds and frame-extraction seconds.
+    """
+    from dataclasses import replace
+
+    from src.segmentation.sources import extract_jpegs
+
+    limit = request.get("max_frames")
+    chunk = int(request["chunk_frames"])
+    fps = float(request["fps"])
+    clip: ClipMasks | None = None
+    start, window, segment_s, extract_s = 0, 0, 0.0, 0.0
+    while limit is None or start < limit:
+        want = chunk if limit is None else min(chunk, limit - start)
+        with tempfile.TemporaryDirectory(prefix="ps-sam31-chunk-") as tmp:
+            t0 = time.perf_counter()
+            count = extract_jpegs(
+                request["source"],
+                Path(tmp),
+                want,
+                start=start,
+                fps=fps,
+                ffmpeg=request.get("ffmpeg"),
+            )
+            extract_s += time.perf_counter() - t0
+            if count == 0:
+                break
+            t0 = time.perf_counter()
+            part = segmenter.segment_frames(
+                Path(tmp), dict(request["concepts"]), policy=request["policy"], fps=fps
+            )
+            segment_s += time.perf_counter() - t0
+        if clip is None:
+            clip = ClipMasks(part.classes, part.height, part.width, fps)
+        for instances in part.frames:
+            clip.frames.append(
+                [replace(i, track_id=window * TRACK_ID_STRIDE + i.track_id) for i in instances]
+            )
+        for name in part.meta.get("empty_classes", []):
+            clip.meta.setdefault("empty_windows", []).append({"start": start, "class": name})
+        start += count
+        window += 1
+        if count < want:
+            break
+    if clip is None:
+        raise RuntimeError(f"no frames in {request['source']}")
+    clip.meta["windows"] = window
+    return clip, segment_s, extract_s
 
 
 def _worker(argv: list[str] | None = None) -> int:
@@ -824,7 +883,6 @@ def _worker(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="SAM 3.1 worker (runs in the pointstream-sam31 env)"
     )
-    parser.add_argument("--frames", type=Path, required=True)
     parser.add_argument("--request", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
@@ -844,12 +902,7 @@ def _worker(argv: list[str] | None = None) -> int:
     )
     model_load_s = time.perf_counter() - load_t0
     torch.cuda.reset_peak_memory_stats()
-    run_t0 = time.perf_counter()
-    masks = segmenter.segment_frames(
-        args.frames, dict(request["concepts"]), policy=request["policy"], fps=float(request["fps"])
-    )
-    torch.cuda.synchronize()
-    total_s = time.perf_counter() - run_t0
+    masks, total_s, extract_s = segment_chunks(segmenter, request)
     estimator = segmenter.provenance(request["policy"])
     masks.meta.update(
         {
@@ -871,6 +924,8 @@ def _worker(argv: list[str] | None = None) -> int:
             # throughput over the whole clip is.
             "timing": {
                 **timing_summary([], model_load_s=model_load_s, total_s=total_s, frames=len(masks)),
+                "frame_extract_s": round(extract_s, 3),
+                "chunk_frames": int(request["chunk_frames"]),
                 "peak_gpu_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
             },
         }

@@ -65,12 +65,23 @@ def video_fps(source: Path | str, default: float = 30.0) -> float:
     return fps if fps > 1e-3 else default
 
 
-def extract_jpegs(source: Path | str, dest: Path, max_frames: int | None = None) -> int:
-    """``dest/00000.jpg …``, the layout SAM 3.1's video loader reads."""
+def extract_jpegs(
+    source: Path | str,
+    dest: Path,
+    max_frames: int | None = None,
+    *,
+    start: int = 0,
+    fps: float | None = None,
+    ffmpeg: str | None = None,
+) -> int:
+    """``dest/00000.jpg …`` from frame ``start`` on, the layout SAM 3.1's loader reads.
+
+    Returns the number of frames written; past the end of the clip that is 0.
+    """
     dest.mkdir(parents=True, exist_ok=True)
     path = Path(source)
     if path.is_dir():
-        images = image_files(path)[:max_frames]
+        images = image_files(path)[start : None if max_frames is None else start + max_frames]
         from PIL import Image
 
         for index, image in enumerate(images):
@@ -81,7 +92,13 @@ def extract_jpegs(source: Path | str, dest: Path, max_frames: int | None = None)
                 Image.open(image).convert("RGB").save(target, quality=95)
         count = len(images)
     else:
-        command = [shutil.which("ffmpeg") or "ffmpeg", "-y", "-loglevel", "error", "-i", str(path)]
+        command = [ffmpeg or shutil.which("ffmpeg") or "ffmpeg", "-y", "-loglevel", "error"]
+        if start:
+            if not fps:
+                raise ValueError("seeking into a video needs its fps")
+            # Half a frame early, so the first decoded frame is exactly `start`.
+            command += ["-ss", f"{(start - 0.5) / fps:.6f}"]
+        command += ["-i", str(path)]
         if max_frames is not None:
             command += ["-frames:v", str(int(max_frames))]
         command += ["-q:v", "2", "-start_number", "0", str(dest / "%05d.jpg")]
@@ -89,7 +106,7 @@ def extract_jpegs(source: Path | str, dest: Path, max_frames: int | None = None)
         if result.returncode != 0:
             raise RuntimeError(f"frame extraction failed for {path}: {result.stderr[-1500:]}")
         count = len(list(dest.glob("*.jpg")))
-    if count == 0:
+    if count == 0 and start == 0:
         raise RuntimeError(f"no frames extracted from {path}")
     return count
 
