@@ -81,7 +81,7 @@ def assemble(export: Path, masks: dict[str, Path], out: Path, *, ffprobe: str) -
         "schema": "pointstream.demo.release.v1",
         "clips": {},
         "files": {},
-        "maps": {"schema": "pointstream.maps.index.v1", "entries": []},
+        "maps": {"schema": "pointstream.demo.previews.v1", "entries": []},
         "measurements": "Pose-model agreement; not human task truth. Latency and perceptual metrics are not measured for this release.",
         "native_ffmpeg": report.get("native_ffmpeg"),
         "source_manifest_sha256": report["source_manifest"]["sha256"],
@@ -198,7 +198,7 @@ def assemble(export: Path, masks: dict[str, Path], out: Path, *, ffprobe: str) -
                         "fps": clip["fps"],
                         "kind": "av1_preview",
                         "payload_format": "AV1-encoded visual preview; not native feature/keypoint payload",
-                        "payload_kbps": round(
+                        "preview_kbps": round(
                             identity["bytes"] * 8 / (row["n_frames"] / clip["fps"]) / 1000, 1
                         ),
                         "weights_sha256": [weight["sha256"] for weight in mask["weights"]],

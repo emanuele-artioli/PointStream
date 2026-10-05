@@ -317,7 +317,7 @@ def test_inspector_stays_default_tab() -> None:
     assert 'id="tab-inspector" class="tab-content active"' in html
     assert 'data-tab="maps"' not in html
     assert "lpips" not in html[html.index("tab-inspector") : html.index("tab-benchmark")].lower()
-    assert "payload_kbps" in html
+    assert "preview_kbps" in html
     inspector = html[html.index("tab-inspector") : html.index("tab-benchmark")]
     assert "av1_240" in inspector or "AV1 240p" in inspector
     assert "compare-board" not in html

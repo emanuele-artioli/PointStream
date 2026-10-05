@@ -553,7 +553,7 @@
             <div class="target-badge">Three trained recordings</div>
         </header>
 
-        <p class="subtitle" style="margin-bottom: 24px; color: var(--accent-orange);">Same training recordings, held-out final ten-second intervals. Model agreement is a diagnostic, not human ground truth. New latency and perceptual measurements remain pending.</p>
+        <p class="subtitle" style="margin-bottom: 24px; color: var(--accent-orange);">Same training recordings, held-out final ten-second intervals. Model agreement is a diagnostic, not human ground truth. Foreground quality remains limited, including visible box-shaped artifacts. New latency and perceptual measurements remain pending.</p>
 
         <!-- Navigation Tabs -->
         <div class="tab-bar">
@@ -896,7 +896,7 @@
                 const name = (MASK_LABEL[halfMask(side)] || halfMask(side)) + ' ' + res;
                 if (!entry) return name + ' · not in gallery';
                 let text = name;
-                if (Number.isFinite(Number(entry.payload_kbps))) text += ' · ' + fmtKbps(entry.payload_kbps) + ' AV1 preview';
+                if (Number.isFinite(Number(entry.preview_kbps))) text += ' · ' + fmtKbps(entry.preview_kbps) + ' AV1 preview';
                 if (Number.isFinite(Number(entry.extract_ms_p50))) text += ', ' + fmtMs(entry.extract_ms_p50);
                 return text;
             }
@@ -1515,7 +1515,7 @@
                     document.getElementById('maps-empty').innerHTML =
                         'No map gallery yet. From the PointStream repo run ' +
                         '<code>PYTHONPATH=. python demo/experiments/run_maps.py --clips demo/outputs/pitch --maps depth,yoloe,dino,sam31</code>' +
-                        ' then <code>python demo/pitch/publish_site.py</code>. HUD numbers come from sidecar payload_kbps, never the preview files.';
+                        ' then <code>python demo/pitch/publish_site.py</code>. Preview rates are measured from the selected AV1 preview files. Native feature/coordinate payloads are separate.';
                 });
             return mapsIndexPromise;
         }
@@ -1561,7 +1561,7 @@
                 input.checked = keep.has(entry.map);
                 input.onchange = () => onOverlayToggle();
                 const span = document.createElement('span');
-                const kbps = Number(entry.payload_kbps);
+                const kbps = Number(entry.preview_kbps);
                 const ms = Number(entry.extract_ms_p50);
                 let name = entry.label || entry.map;
                 if (Number.isFinite(kbps)) name += ' · ' + fmtKbps(kbps);

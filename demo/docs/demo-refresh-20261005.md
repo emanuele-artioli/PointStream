@@ -60,3 +60,21 @@ mask, playback and crop controls while deriving current rates and model
 agreement from the release. Historical latency, LPIPS, IoU and task-truth
 claims are not carried over. DINOv3's PCA visualization and AV1 mask-preview
 rates are explicitly distinguished from native feature/coordinate payloads.
+
+The first DINO smoke stopped before extraction because the default Torch lacks
+`torch.amp.custom_fwd`. Its full stage did not run. The revised configuration
+uses the already installed `pointstream-neural` interpreter (Torch2.5.1+cu121,
+OpenCV4.11.0), records the actual inference versions and retains strict loading.
+The original failed request remains intact. Its 200-second conservative charge
+is deducted from the original3900-second allowance:3700seconds remain, with a
+2400-second full-stage estimate and the original absolute deadline retained.
+No shared runtime was upgraded and no old execution was replayed.
+
+Visual inspection of the refreshed camera previews shows black rectangular
+foreground regions, especially on Factory002. The RGB-only pix2pix model uses
+box feathering rather than a learned alpha; the current reconstruction also has
+crop/aspect qualification work remaining. This release is an honest prototype
+comparison, not a claim that only throughput remains. At240p, Factory002's
+PointStream model-agreement hand recall is19.6% vs AV1's73.7%, and MPJPE is65.3px
+vs22.9px. Preserve these negative results. Quality, alpha/crop behavior and
+receiver qualification should lead the next discussion before timing optimization.
