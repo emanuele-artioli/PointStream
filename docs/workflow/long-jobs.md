@@ -117,6 +117,37 @@ Children inherit `PS_STAGE` (smoke/full), `PS_STAGE_DIR` (separate output direct
 `experiments.jobs.monitor.publish_progress(stage, completed)` only on actual work
 completion. Log traffic and heartbeat timestamps do not count as progress.
 
+### Host-local staging
+
+The NFS home costs ~200 ms per small-file create and 11–17 ms per open; host-local
+disk costs ~0.02 ms (measurements in [infrastructure](../areas/infrastructure.md)).
+Do per-file work locally and move bytes over NFS in a few large files.
+
+- `PS_SCRATCH_DIR` is a fresh per-stage workspace. On a host with a local root it
+  is local disk; otherwise it is `scratch/` beside the stage outputs. Write
+  intermediates there. Anything placed in `$PS_SCRATCH_DIR/publish/` returns to
+  the stage directory as one `published.tar`, recorded with its SHA256. Local
+  scratch is deleted after a successful stage and kept on the host after a failure
+  (`staging.json` names it).
+- Optional `staged_inputs` entries, `{"name", "path", "sha256", "extract"}`, name
+  files under the data root. Pass them as whole-argument `{staged:NAME}`
+  placeholders. Each stage copies a file once into the host's cache, keyed by
+  SHA256, and re-hashes it on every use, so a stage never reads unverified bytes.
+  `extract: true` unpacks a tar archive once into a read-only tree. Pack datasets of
+  many small files as archives; staging them file by file would pay the NFS cost.
+- Optional `local_storage_gib` makes admission require a local root with that much
+  space free beyond a 50 GiB reserve. Extracted inputs require it. Without it, a
+  host lacking local storage, or with too little free space, uses verified shared
+  paths instead and records `mode: shared`.
+
+The local root is `PS_LOCAL_ROOT` or `/local/users/$USER/pointstream`. Only an
+administrator can create `/local/users/$USER`; on 2026-10-05 it existed only on
+gpu6. NFS remains the sole source of truth: cache entries are disposable and never
+synchronized between hosts. The first use on a host pays the NFS read (16–93 MB/s
+measured), and staging time counts against the stage budget. Nothing evicts cache
+entries automatically; delete `cache/<sha256>` directories (restore write
+permission on extracted trees first) when the shared disk needs space.
+
 The validator sees the smoke directory and must exit zero and write
 `{"passed": true, "checks": ...}` to `PS_VALIDATION_PATH`, with nonempty substantive
 checks. Promotion requires that result, unchanged specification/code/input
