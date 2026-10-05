@@ -174,6 +174,21 @@ class ClipMasks:
             out |= inst.mask()
         return out
 
+    def match(self, index: int, bbox: tuple[float, float, float, float], class_name: str | None = None) -> np.ndarray | None:
+        """The instance mask (of ``class_name``, if given) whose box best overlaps ``bbox``."""
+        x0, y0, x1, y1 = (float(v) for v in bbox)
+        best, best_iou = None, 0.0
+        for inst in self.frames[index] if index < len(self.frames) else ():
+            if class_name is not None and inst.class_name != class_name:
+                continue
+            ix0, iy0, ix1, iy1 = inst.bbox
+            inter = max(0.0, min(x1, ix1) - max(x0, ix0)) * max(0.0, min(y1, iy1) - max(y0, iy0))
+            union = (x1 - x0) * (y1 - y0) + (ix1 - ix0) * (iy1 - iy0) - inter
+            iou = inter / union if union > 0 else 0.0
+            if iou > best_iou:
+                best, best_iou = inst, iou
+        return best.mask() if best is not None else None
+
     def labels(self, index: int) -> np.ndarray:
         """uint8 map: 0 background, ``i + 1`` for ``classes[i]``."""
         out = np.zeros((self.height, self.width), dtype=np.uint8)

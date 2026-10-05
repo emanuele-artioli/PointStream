@@ -3,7 +3,7 @@
 # hear; `backends.<family>.prompts` overrides that text for one model family,
 # and the remaining keys under `backends.<family>` are that backend's options.
 # Order matters: later classes paint over earlier ones in label maps.
-# `clips` are the default benchmark/dataset inputs, relative to PS_DATA_ROOT
+# `clips` are the default benchmark/dataset inputs, relative to PS_DATASETS_ROOT
 # (/home/itec/emanuele/Datasets on the fleet). The tennis dataset catalog lists
 # player crops, which cannot be split into foreground and background, so the
 # full broadcast scenes are listed here instead.
@@ -18,6 +18,11 @@ tennis:
     - tennis_games/alcaraz_hurkacz/011.mp4
     - tennis_games/medvedev_struff/005.mp4
     - tennis_games/djokovic_zverev/004.mp4
+
+general:
+  summary: People in free-moving footage (DAVIS); every person is foreground.
+  classes:
+    person: person
 
 egocentric:
   summary: Egocentric factory work (Egocentric-10K). The worker's arms and hands are foreground.

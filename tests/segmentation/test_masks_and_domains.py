@@ -95,7 +95,7 @@ def test_domains_define_foreground_classes_and_backend_overrides(tmp_path: Path)
 
 
 def test_missing_domain_clips_fail_loudly(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    monkeypatch.setenv("PS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("PS_DATASETS_ROOT", str(tmp_path))
     with pytest.raises(FileNotFoundError, match="not on disk"):
         load_domain("tennis").clip_paths()
 

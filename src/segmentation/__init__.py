@@ -46,14 +46,24 @@ class Domain:
         return {k: v for k, v in self.backends.get(family, {}).items() if k != "prompts"}
 
     def clip_paths(self) -> list[Path]:
-        """Default clips under the data root; a missing one is an error, never a skip."""
-        from src.contracts.paths import data_root
-
-        paths = [data_root() / clip for clip in self.clips]
+        """Default clips under the datasets root; a missing one is an error, never a skip."""
+        paths = [datasets_root() / clip for clip in self.clips]
         missing = [str(path) for path in paths if not path.exists()]
         if missing:
             raise FileNotFoundError(f"domain {self.name!r} clips are not on disk: {missing}")
         return paths
+
+
+def datasets_root() -> Path:
+    """Raw source datasets: ``PS_DATASETS_ROOT``, else ``~/Datasets``.
+
+    Not `paths.data_root()`, which names PointStream's own assets/outputs tree
+    (``Datasets/pointstream-data`` on the fleet).
+    """
+    import os
+
+    override = os.environ.get("PS_DATASETS_ROOT", "").strip()
+    return Path(override).expanduser() if override else Path.home() / "Datasets"
 
 
 def domain_names(path: Path = DOMAINS_YAML) -> tuple[str, ...]:
@@ -89,6 +99,29 @@ class Segmenter(Protocol):
         """Masks for every frame of a video file or a directory of images."""
 
 
+def segment_array(backend: Segmenter, frames: Any, domain: Domain, *, rgb: bool = True) -> ClipMasks:
+    """Segment an in-memory ``(T, H, W, 3)`` clip (the runner's frames are RGB)."""
+    import numpy as np
+
+    clip = np.asarray(frames)
+    bgr = clip[..., ::-1] if rgb else clip
+    if hasattr(backend, "stream"):
+        masks = ClipMasks(domain.classes, int(clip.shape[1]), int(clip.shape[2]), 30.0)
+        for index, tracked in enumerate(backend.stream(iter(bgr), domain)):
+            masks.ensure_frames(index + 1)
+            for class_name, track_id, mask, score in tracked:
+                masks.add(index, class_name, track_id, mask, score)
+        return masks
+    import tempfile
+
+    import cv2
+
+    with tempfile.TemporaryDirectory(prefix="ps-seg-") as tmp:
+        for index, frame in enumerate(bgr):
+            cv2.imwrite(str(Path(tmp) / f"{index:05d}.png"), np.ascontiguousarray(frame))
+        return backend.segment(tmp, domain)
+
+
 def build(name: str, **options: Any) -> Segmenter:
     """Construct a backend by name: ``sam31`` or ``yoloe-26{n,s,m,l,x}``."""
     if name == "sam31":
@@ -112,4 +145,5 @@ __all__ = [
     "build",
     "domain_names",
     "load_domain",
+    "segment_array",
 ]
