@@ -7,16 +7,18 @@ from src.contracts import paths
 
 DEFAULT_REQUIRED_WEIGHTS = [
     "yolo26n.pt",
-    "yolo26n-seg.pt",
+    "yoloe-26n-seg.pt",
+    "mobileclip2_b.ts",
     "yolo26n-pose.pt",
 ]
 
-# Optional weights for open-vocabulary and high-precision segmentation ablations.
+# Larger YOLOE-26 segmenters benchmarked against the SAM 3.1 reference
+# (src.segmentation). SAM 3.1 itself lives in the pointstream-sam31 env.
 OPTIONAL_ABLATION_WEIGHTS = [
-    "yoloe-26n-seg.pt",
-    "mobileclip2_b.ts",
-    "sam3.pt",
-    "sam2_b.pt",
+    "yoloe-26s-seg.pt",
+    "yoloe-26m-seg.pt",
+    "yoloe-26l-seg.pt",
+    "yoloe-26x-seg.pt",
 ]
 
 # Optional weight for the FVD perceptual-quality metric (src/shared/fvd.py):

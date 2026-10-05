@@ -18,11 +18,16 @@ from src.runner.stages import (
 
 
 class _FrameSegmenter:
-    def segment(self, frame, detection):
-        height, width = frame.shape[:2]
-        mask = np.zeros((height, width), dtype=np.uint8)
-        mask[int(frame[0, 0, 0]), 2:4] = 1
-        return mask
+    """Streams one player instance per frame, on the row named by the frame's value."""
+
+    def stream(self, frames, domain):
+        for frame in frames:
+            height, width = frame.shape[:2]
+            player = np.zeros((height, width), dtype=bool)
+            player[int(frame[0, 0, 0]), 2:4] = True
+            far = np.zeros((height, width), dtype=bool)
+            far[5, 6:8] = True  # a second player outside the subject's box
+            yield [("player", 1, player, 0.9), ("player", 2, far, 0.8)]
 
 
 def _objects(frame_count: int) -> tuple[ObjectRequest, ...]:
@@ -43,6 +48,21 @@ def test_full_frame_mask_is_preserved_without_resizing_into_the_detection_box() 
     mask[1:3, 5:7] = 1
     restored = _frame_mask(mask, (0, 0, 2, 2), height=6, width=8)
     np.testing.assert_array_equal(restored, mask.astype(bool))
+
+
+def test_segmentation_skips_subjects_outside_the_domain_classes() -> None:
+    frames = np.zeros((1, 6, 8, 3), dtype=np.uint8)
+    ball = ObjectRequest(
+        object_id="ball",
+        appearance=np.zeros((2, 2, 3), dtype=np.uint8),
+        bbox=(0, 0, 5, 4),
+        frame_index=0,
+        object_class="sports ball",
+    )
+    result = make_segmentation(cast(StageContext, SimpleNamespace(segmenter=_FrameSegmenter())))(
+        {SOURCE: frames, "detection": (ball,)}
+    )
+    assert result == {}
 
 
 def test_segmenter_keeps_each_frame_mask_in_a_track_aligned_stack() -> None:

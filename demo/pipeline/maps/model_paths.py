@@ -27,14 +27,9 @@ def _first(*candidates: Path | None) -> Path | None:
 
 
 MODELS: dict[str, Path | None] = {
-    # YOLOE-26: s-scale not on disk; n is the fast default, x is quality.
-    "yoloe26_seg": _first(
-        _file("YOLO", "yoloe-26s-seg.pt"),
-        _file("YOLO", "yoloe-26n-seg.pt"),
-        _file("YOLO", "yoloe-26x-seg.pt"),
-    ),
+    # Segmentation weights resolve through src.segmentation; this key only lets
+    # run_maps skip the gallery's YOLOE map cleanly when the file is absent.
     "yoloe26_seg_x": _file("YOLO", "yoloe-26x-seg.pt"),
-    "mobileclip2": _file("YOLO", "mobileclip2_b.ts"),
     # YOLO26-depth weights were not in Models/ as of this inventory.
     "yolo26s_depth": _first(
         _file("YOLO", "yolo26s-depth.pt"),
@@ -42,11 +37,6 @@ MODELS: dict[str, Path | None] = {
         _file("YOLO", "yolo26x-depth.pt"),
     ),
     "yolo26n_pose": _file("YOLO", "yolo26n-pose.pt"),
-    "yolo26n_seg": _file("YOLO", "yolo26n-seg.pt"),
-    # SAM 3.1 multiplex not on disk; SAM 3 is the quality mask backend.
-    "sam31": _file("SAM", "sam3.1_multiplex.pt"),
-    "sam3": _file("SAM", "sam3.pt"),
-    "fastsam": _file("SAM", "FastSAM-x.pt"),
     "dinov3_vits": _file("dinov3_vits16_pretrain_lvd1689m-08c60483.pth"),
     "dwpose_pose": _file("DWPose", "dw-ll_ucoco_384.onnx"),
     "dwpose_det": _file("DWPose", "yolox_l.onnx"),

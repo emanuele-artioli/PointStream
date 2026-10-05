@@ -134,21 +134,9 @@ def _injected_objects(bag: Mapping[str, Any]) -> tuple[ObjectRequest, ...]:
 
 
 def _as_detection(item: ObjectRequest) -> Any:
-    from src.components.detection.geometry import Box
-    from src.components.detection.types import Detection
+    from src.runner.perception import as_detection
 
-    x1, y1, x2, y2 = item.bbox
-    class_name = item.object_class
-    if not class_name:
-        lowered = item.object_id.casefold()
-        class_name = "tennis racket" if "racket" in lowered else (
-            "sports ball" if "ball" in lowered else "person"
-        )
-    return Detection(
-        class_name=class_name,
-        bbox=Box(float(x1), float(y1), float(x2), float(y2)),
-        track_id=item.object_id,
-    )
+    return as_detection(item)
 
 
 def _object_from_detection(
@@ -330,33 +318,51 @@ def make_pose(ctx: StageContext) -> StageCallable:
     return pose
 
 
+def _segmentation_class(item: ObjectRequest, classes: tuple[str, ...]) -> str | None:
+    """The domain class a detected subject belongs to, or None if it has none."""
+    from src.components.detection.types import is_person, is_racket
+
+    name = _as_detection(item).class_name
+    if name in classes:
+        return name
+    if is_racket(name) and "racket" in classes:
+        return "racket"
+    if is_person(name):
+        return next((c for c in ("player", "person") if c in classes), None)
+    return None
+
+
 def make_segmentation(ctx: StageContext) -> StageCallable:
-    """Named segmenter. Returns object_id → (T, H, W) full-frame masks."""
+    """Named segmenter. Returns object_id → (T, H, W) full-frame masks.
+
+    The clip is segmented once with the domain's foreground classes; each
+    selected subject takes the instance of its class whose box best overlaps its
+    own in that frame.
+    """
 
     def segmentation(bag: Mapping[str, Any]) -> dict[str, np.ndarray]:
         from src.runner.routing import ensure_segmenter
+        from src.segmentation import load_domain, segment_array
 
         segmenter = ensure_segmenter(ctx)
         subjects = _subjects(bag)
         if segmenter is None or not subjects:
             return {}
         source = as_clip(bag[SOURCE], path=SOURCE)
-        height, width = int(source.shape[1]), int(source.shape[2])
+        frames, height, width = (int(v) for v in source.shape[:3])
+        domain = load_domain(getattr(getattr(ctx, "config", None), "domain", None) or "tennis")
+        clip = segment_array(segmenter, source, domain)
         masks: dict[str, np.ndarray] = {}
         for item in subjects:
             if not _perception_on(bag, item.object_id, item.frame_index):
                 continue
-            frame = source[min(item.frame_index, int(source.shape[0]) - 1)]
-            mask = segmenter.segment(frame, _as_detection(item))
+            class_name = _segmentation_class(item, domain.classes)
+            if class_name is None:  # e.g. the ball: not a foreground class of this domain
+                continue
+            mask = clip.match(min(item.frame_index, frames - 1), item.bbox, class_name)
             if mask is not None:
-                candidate = np.asarray(mask)
-                stack = masks.setdefault(
-                    item.object_id,
-                    np.zeros((int(source.shape[0]), height, width), dtype=bool),
-                )
-                stack[item.frame_index] = _frame_mask(
-                    candidate, item.bbox, height=height, width=width
-                )
+                stack = masks.setdefault(item.object_id, np.zeros((frames, height, width), dtype=bool))
+                stack[item.frame_index] = mask
         return masks
 
     return segmentation

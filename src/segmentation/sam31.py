@@ -1,38 +1,57 @@
-"""SAM 3.1 multiplex video segmentation with auditable causal/offline policies.
+"""SAM 3.1 Object Multiplex: the reference segmenter.
 
-The implementation imports the pinned Meta predictor only after validating a
-local source checkout and checkpoint. It never downloads either artifact.
-Offline callers may propagate in both directions; runtime callers are restricted
-to forward-only propagation.
+Two halves share this file:
+
+* `Sam31SequenceSegmenter` runs inside the ``pointstream-sam31`` env (Python
+  3.12, torch 2.10, Meta's ``sam3`` source checkout). It verifies the pinned
+  checkout and checkpoint, never downloads either, and exposes Meta's session
+  API (start / prompt / propagate / close) with explicit MISSING records.
+* `Sam31Segmenter` runs in the main env. It extracts frames, launches this
+  module as a worker under the SAM interpreter and reads back `ClipMasks`.
+
+Each text prompt resets the multiplex tracker, so every class gets its own
+session and propagate pass. Offline callers may propagate both ways; runtime
+callers are forward-only. This module imports only numpy and PIL at the top so
+the worker starts in the SAM env.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from functools import wraps
+import argparse
 import hashlib
 import inspect
 import json
 import os
-from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import time
 import types
 import uuid
+from collections.abc import Iterator
+from dataclasses import dataclass, field
+from functools import wraps
+from pathlib import Path
 from typing import Any, Literal
 
 import numpy as np
 from PIL import Image
 
-from src.components.detection.types import Detection, is_person
 from src.contracts.observation import EstimatorProvenance, ObservationStatus
+from src.segmentation.masks import ClipMasks
 
-Role = Literal["player", "racket"]
+Role = str
 Propagation = Literal["forward", "backward", "both"]
 Policy = Literal["offline_bidirectional", "offline_causal", "runtime_causal"]
 
-DEFAULT_TEXT = {"player": "tennis player", "racket": "tennis racket"}
+DEFAULT_PYTHON = "~/.conda/envs/pointstream-sam31/bin/python"
+DEFAULT_SOURCE_ROOT = "~/.cache/sam3-meta"
+DEFAULT_SOURCE_REVISION = "2345a4ad109ac29c569da749c91d84f10dc08c40"
+DEFAULT_CHECKPOINT_SHA256 = "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6"
+HF_CHECKPOINT = (
+    "~/.cache/huggingface/hub/models--facebook--sam3.1/snapshots/"
+    "daa63191845a41281374e725f4c9e51c7a824460/sam3.1_multiplex.pt"
+)
 DEFAULT_CONFIG = {
     "model": "sam3.1-multiplex",
     "max_num_objects": 16,
@@ -46,14 +65,27 @@ DEFAULT_CONFIG = {
 }
 
 
+def default_checkpoint() -> Path | None:
+    """SAM31_CHECKPOINT, then Models/SAM, then the Hugging Face cache snapshot."""
+    env = os.environ.get("SAM31_CHECKPOINT", "").strip()
+    if env:
+        return Path(env).expanduser().resolve()
+    candidates = [Path(HF_CHECKPOINT).expanduser()]
+    try:
+        from src.contracts.paths import models_root
+
+        candidates.insert(0, models_root() / "SAM" / "sam3.1_multiplex.pt")
+    except Exception:  # pragma: no cover - paths contract unavailable in a bare env
+        pass
+    return next((path.resolve() for path in candidates if path.is_file()), None)
+
+
 def _configure_sdpa_backend(torch_module: Any) -> str:
     """Allow PyTorch's efficient/math SDPA kernels when Flash Attention is unsupported."""
     if not torch_module.cuda.is_available():
         return "native_sdpa"
-    capability = torch_module.cuda.get_device_capability()
-    if capability[0] >= 8:
+    if torch_module.cuda.get_device_capability()[0] >= 8:
         return "native_flash"
-
     attention = torch_module.nn.attention
     original = attention.sdpa_kernel
     if getattr(original, "_pointstream_sdpa_fallback", False):
@@ -62,12 +94,9 @@ def _configure_sdpa_backend(torch_module: Any) -> str:
 
     @wraps(original)
     def compatible_sdpa_kernel(selected: Any, set_priority: bool = False) -> Any:
-        selected_items = list(selected) if isinstance(selected, (list, tuple)) else [selected]
-        if selected_items == [backends.FLASH_ATTENTION]:
-            return original(
-                [backends.EFFICIENT_ATTENTION, backends.MATH],
-                set_priority=True,
-            )
+        items = list(selected) if isinstance(selected, (list, tuple)) else [selected]
+        if items == [backends.FLASH_ATTENTION]:
+            return original([backends.EFFICIENT_ATTENTION, backends.MATH], set_priority=True)
         return original(selected, set_priority=set_priority)
 
     compatible_sdpa_kernel._pointstream_sdpa_fallback = True  # type: ignore[attr-defined]
@@ -114,11 +143,10 @@ class _Session:
 
 
 class Sam31SequenceSegmenter:
-    """Shared SAM 3.1 predictor for offline preparation and runtime use."""
+    """Pinned SAM 3.1 multiplex predictor with per-role sessions (SAM env only)."""
 
     def __init__(
         self,
-        model_name: str = "sam3.1_multiplex.pt",
         *,
         checkpoint_path: str | Path | None = None,
         source_root: str | Path | None = None,
@@ -135,13 +163,14 @@ class Sam31SequenceSegmenter:
             raise ValueError("prob_threshold must be in [0, 1]")
         if max_num_objects <= 0 or multiplex_count <= 0:
             raise ValueError("SAM3.1 object capacities must be positive")
-        self.model_name = model_name
         self.checkpoint_path = _path_from(checkpoint_path, "SAM31_CHECKPOINT")
         self.source_root = _path_from(source_root, "SAM31_SOURCE_ROOT")
-        self.source_revision = source_revision or os.environ.get("SAM31_SOURCE_REVISION", "").strip()
-        self.expected_checkpoint_sha256 = checkpoint_sha256 or os.environ.get(
-            "SAM31_CHECKPOINT_SHA256", ""
-        ).strip()
+        self.source_revision = (
+            source_revision or os.environ.get("SAM31_SOURCE_REVISION", "").strip()
+        )
+        self.expected_checkpoint_sha256 = (
+            checkpoint_sha256 or os.environ.get("SAM31_CHECKPOINT_SHA256", "").strip()
+        )
         self.prob_threshold = float(prob_threshold)
         self.max_num_objects = int(max_num_objects)
         self.multiplex_count = int(multiplex_count)
@@ -156,10 +185,9 @@ class Sam31SequenceSegmenter:
             self.predictor = self._load_predictor(builder)
 
     def _require_predictor(self) -> Any:
-        predictor = self.predictor
-        if predictor is None:
+        if self.predictor is None:
             raise RuntimeError("SAM3.1 predictor is not loaded")
-        return predictor
+        return self.predictor
 
     def _verify_artifacts(self) -> None:
         if self.checkpoint_path is None or not self.checkpoint_path.is_file():
@@ -174,27 +202,25 @@ class Sam31SequenceSegmenter:
             )
         if not self.source_revision:
             raise ValueError("SAM31_SOURCE_REVISION must pin the SAM 3.1 source checkout")
+        git = ["git", "-C", str(self.source_root)]
         try:
             actual_revision = subprocess.run(
-                ["git", "-C", str(self.source_root), "rev-parse", "HEAD"],
-                check=True,
-                capture_output=True,
-                text=True,
-                timeout=10,
+                [*git, "rev-parse", "HEAD"], check=True, capture_output=True, text=True, timeout=300
             ).stdout.strip()
         except (OSError, subprocess.SubprocessError) as exc:
-            raise RuntimeError(f"Cannot read the SAM 3.1 source revision at {self.source_root}") from exc
+            raise RuntimeError(
+                f"Cannot read the SAM 3.1 source revision at {self.source_root}"
+            ) from exc
         if actual_revision != self.source_revision:
             raise RuntimeError(
-                f"SAM31_SOURCE_REVISION={self.source_revision!r} does not match "
-                f"checkout HEAD {actual_revision!r}"
+                f"SAM31_SOURCE_REVISION={self.source_revision!r} does not match checkout HEAD {actual_revision!r}"
             )
         status = subprocess.run(
-            ["git", "-C", str(self.source_root), "status", "--porcelain", "--untracked-files=all"],
+            [*git, "status", "--porcelain", "--untracked-files=normal"],
             check=True,
             capture_output=True,
             text=True,
-            timeout=10,
+            timeout=300,
         ).stdout.strip()
         if status:
             raise RuntimeError(
@@ -204,19 +230,14 @@ class Sam31SequenceSegmenter:
         actual_hash = _sha256(self.checkpoint_path)
         if self.expected_checkpoint_sha256 and actual_hash != self.expected_checkpoint_sha256:
             raise RuntimeError(
-                "SAM 3.1 checkpoint hash mismatch: expected "
-                f"{self.expected_checkpoint_sha256}, found {actual_hash}"
+                f"SAM 3.1 checkpoint hash mismatch: expected {self.expected_checkpoint_sha256}, found {actual_hash}"
             )
         self.model_revision = actual_revision
         self.checkpoint_hash = actual_hash
 
     def _load_predictor(self, builder: Any | None) -> Any:
-        if self.source_root is not None:
-            source = str(self.source_root)
-            import sys
-
-            if source not in sys.path:
-                sys.path.insert(0, source)
+        if self.source_root is not None and str(self.source_root) not in sys.path:
+            sys.path.insert(0, str(self.source_root))
         if builder is None:
             import torch
 
@@ -249,9 +270,11 @@ class Sam31SequenceSegmenter:
 
     def provenance(self, policy: Policy) -> EstimatorProvenance:
         revision = self.model_revision or self.source_revision or "injected-test-predictor"
-        checkpoint_hash = self.checkpoint_hash or self.expected_checkpoint_sha256 or hashlib.sha256(
-            b"injected-test-predictor"
-        ).hexdigest()
+        checkpoint_hash = (
+            self.checkpoint_hash
+            or self.expected_checkpoint_sha256
+            or hashlib.sha256(b"injected-test-predictor").hexdigest()
+        )
         config = {
             **DEFAULT_CONFIG,
             "prob_threshold": self.prob_threshold,
@@ -259,12 +282,11 @@ class Sam31SequenceSegmenter:
             "multiplex_count": self.multiplex_count,
             **self.model_options,
         }
-        # Preserve the existing native-kernel identity on supported GPUs. The
-        # fallback is provenance-relevant only where it changes execution.
+        # The fallback is provenance-relevant only where it changes execution.
         if self.sdpa_backend_policy == "efficient_then_math_fallback":
             config["sdpa_backend_policy"] = self.sdpa_backend_policy
         config_hash = hashlib.sha256(
-            json.dumps(config, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest()
         return EstimatorProvenance(
             name="sam3.1_multiplex",
@@ -286,8 +308,7 @@ class Sam31SequenceSegmenter:
     ) -> str:
         _validate_role(role)
         key = _session_key(session_key)
-        session_index = (role, key)
-        if session_index in self.sessions:
+        if (role, key) in self.sessions:
             raise RuntimeError(f"SAM3.1 already has an active {role!r}/{key!r} session")
         if frame_width <= 0 or frame_height <= 0:
             raise ValueError("SAM3.1 session dimensions must be positive")
@@ -296,7 +317,7 @@ class Sam31SequenceSegmenter:
             {"type": "start_session", "resource_path": str(resource_path)}
         )
         session_id = str(response["session_id"])
-        self.sessions[session_index] = _Session(
+        self.sessions[(role, key)] = _Session(
             role=role,
             session_id=session_id,
             resource_path=str(resource_path),
@@ -345,38 +366,38 @@ class Sam31SequenceSegmenter:
             x0, y0, x1, y1 = map(float, bbox)
             if x1 <= x0 or y1 <= y0:
                 raise ValueError("SAM3.1 box prompt must have positive width and height")
-            request["bounding_boxes"] = [[
-                (x0 + x1) / (2 * session.frame_width),
-                (y0 + y1) / (2 * session.frame_height),
-                (x1 - x0) / session.frame_width,
-                (y1 - y0) / session.frame_height,
-            ]]
+            request["bounding_boxes"] = [
+                [
+                    (x0 + x1) / (2 * session.frame_width),
+                    (y0 + y1) / (2 * session.frame_height),
+                    (x1 - x0) / session.frame_width,
+                    (y1 - y0) / session.frame_height,
+                ]
+            ]
             request["bounding_box_labels"] = [1]
         if points:
             request["points"] = [
-                [float(x) / session.frame_width, float(y) / session.frame_height]
-                for x, y in points
+                [float(x) / session.frame_width, float(y) / session.frame_height] for x, y in points
             ]
             request["point_labels"] = list(point_labels or [1] * len(points))
             request["obj_id"] = tracker_id
         response = self._require_predictor().handle_request(request)
-        masks = _unpack_outputs(response.get("outputs", {}), session.frame_height, session.frame_width)
-        observations: list[MaskObservation] = []
+        masks = _unpack_outputs(
+            response.get("outputs", {}), session.frame_height, session.frame_width
+        )
         if not masks:
             session.expected_objects.add(object_id)
         target_index = _prompt_target_index(
-            masks,
-            bbox=bbox,
-            points=points,
-            point_labels=point_labels,
+            masks, bbox=bbox, points=points, point_labels=point_labels
         )
-        for index, (tracker_id, mask, score) in enumerate(masks):
-            assigned_id = object_id if index == target_index else f"{role}:{tracker_id}"
+        observations: list[MaskObservation] = []
+        for index, (tracker, mask, score) in enumerate(masks):
+            assigned_id = object_id if index == target_index else f"{role}:{tracker}"
             session.expected_objects.add(assigned_id)
-            session.tracker_to_object[tracker_id] = assigned_id
-            session.object_to_tracker[assigned_id] = tracker_id
+            session.tracker_to_object[tracker] = assigned_id
+            session.object_to_tracker[assigned_id] = tracker
             observations.append(
-                MaskObservation(role, assigned_id, tracker_id, frame_index, mask, score)
+                MaskObservation(role, assigned_id, tracker, frame_index, mask, score)
             )
         if not observations:
             observations.append(
@@ -392,20 +413,18 @@ class Sam31SequenceSegmenter:
             )
         return tuple(observations)
 
-    def propagate(
+    def iter_propagate(
         self,
         role: Role,
         *,
         policy: Policy,
         direction: Propagation,
-        frame_count: int,
         start_frame_index: int | None = None,
         session_key: str = "default",
-    ) -> tuple[MaskObservation, ...]:
+    ) -> Iterator[tuple[int, int, np.ndarray, float | None]]:
+        """Stream ``(frame, tracker_id, mask, score)`` without holding the clip in memory."""
         session = self._session(role, session_key)
         self.provenance(policy)
-        if frame_count <= 0:
-            raise ValueError("frame_count must be positive to account for missing frames")
         if policy == "runtime_causal" and direction != "forward":
             raise ValueError("runtime_causal SAM3.1 propagation must be forward-only")
         if direction not in {"forward", "backward", "both"}:
@@ -418,91 +437,122 @@ class Sam31SequenceSegmenter:
         }
         if start_frame_index is not None:
             request["start_frame_index"] = int(start_frame_index)
-        responses: dict[tuple[int, int], tuple[np.ndarray, float | None]] = {}
         for response in self._require_predictor().handle_stream_request(request):
             frame_index = int(response["frame_index"])
-            for tracker_id, mask, score in _unpack_outputs(
+            for tracker, mask, score in _unpack_outputs(
                 response.get("outputs", {}), session.frame_height, session.frame_width
             ):
-                if tracker_id not in session.tracker_to_object:
-                    session.tracker_to_object[tracker_id] = f"{role}:{tracker_id}"
-                    session.object_to_tracker[session.tracker_to_object[tracker_id]] = tracker_id
-                    session.expected_objects.add(session.tracker_to_object[tracker_id])
-                responses[(frame_index, tracker_id)] = (mask, score)
-        frame_indices = range(frame_count)
+                if tracker not in session.tracker_to_object:
+                    object_id = f"{role}:{tracker}"
+                    session.tracker_to_object[tracker] = object_id
+                    session.object_to_tracker[object_id] = tracker
+                    session.expected_objects.add(object_id)
+                yield frame_index, tracker, mask, score
+
+    def propagate(
+        self,
+        role: Role,
+        *,
+        policy: Policy,
+        direction: Propagation,
+        frame_count: int,
+        start_frame_index: int | None = None,
+        session_key: str = "default",
+    ) -> tuple[MaskObservation, ...]:
+        """Dense (frame x expected object) records; absent pairs are MISSING."""
+        if frame_count <= 0:
+            raise ValueError("frame_count must be positive to account for missing frames")
+        responses = {
+            (frame, tracker): (mask, score)
+            for frame, tracker, mask, score in self.iter_propagate(
+                role,
+                policy=policy,
+                direction=direction,
+                start_frame_index=start_frame_index,
+                session_key=session_key,
+            )
+        }
+        session = self._session(role, session_key)
         records: list[MaskObservation] = []
-        for frame_index in frame_indices:
+        for frame_index in range(frame_count):
             for object_id in sorted(session.expected_objects):
-                object_tracker = session.object_to_tracker.get(object_id)
-                result = (
-                    responses.get((frame_index, object_tracker))
-                    if object_tracker is not None
-                    else None
-                )
+                tracker = session.object_to_tracker.get(object_id)
+                result = responses.get((frame_index, tracker)) if tracker is not None else None
                 records.append(
                     MaskObservation(
                         role,
                         object_id,
-                        object_tracker,
-                        int(frame_index),
+                        tracker,
+                        frame_index,
                         result[0] if result is not None else None,
                         result[1] if result is not None else None,
-                        status=(
-                            ObservationStatus.OBSERVED
-                            if result is not None
-                            else ObservationStatus.MISSING
-                        ),
+                        status=ObservationStatus.OBSERVED
+                        if result is not None
+                        else ObservationStatus.MISSING,
                         reason=None if result is not None else "propagation_missing_frame_object",
                     )
                 )
         return tuple(records)
 
     def close_session(self, role: Role, *, session_key: str = "default") -> None:
-        key = _session_key(session_key)
-        session = self.sessions.pop((role, key), None)
-        if session is None:
-            return
-        self._require_predictor().handle_request({"type": "close_session", "session_id": session.session_id})
+        session = self.sessions.pop((role, _session_key(session_key)), None)
+        if session is not None:
+            self._require_predictor().handle_request(
+                {"type": "close_session", "session_id": session.session_id}
+            )
 
-    def segment(self, frame: np.ndarray, detection: Detection) -> np.ndarray | None:
-        """Causal single-frame adapter for PointStream's registry segmenter API."""
-        if is_person(detection.class_name):
-            role: Role = "player"
-        elif "racket" in detection.class_name.casefold():
-            role = "racket"
-        else:
-            return None
-        image = np.asarray(frame)
-        if image.ndim != 3 or image.shape[2] < 3:
-            raise ValueError("SAM3.1 runtime input must be an HWC color image")
-        height, width = image.shape[:2]
-        with tempfile.TemporaryDirectory(prefix="pointstream-sam31-") as tmp:
-            path = Path(tmp) / "00000.jpg"
-            Image.fromarray(np.asarray(image[..., :3], dtype=np.uint8)).save(path, format="JPEG", quality=95)
+    def segment_frames(
+        self,
+        frames_dir: Path,
+        concepts: dict[str, str],
+        *,
+        policy: Policy = "offline_bidirectional",
+        fps: float = 30.0,
+        on_frame: Any = None,
+    ) -> ClipMasks:
+        """Text-prompt every class on frame 0 and propagate through ``frames_dir``.
+
+        ``concepts`` maps class name to prompt text, in paint order. Classes with
+        identical text share one pass.
+        """
+        frames = sorted(Path(frames_dir).glob("*.jpg"))
+        if not frames:
+            raise RuntimeError(f"no frames in {frames_dir}")
+        width, height = Image.open(frames[0]).size
+        clip = ClipMasks(tuple(concepts), height, width, fps)
+        clip.ensure_frames(len(frames))
+        direction: Propagation = "both" if policy == "offline_bidirectional" else "forward"
+        done: dict[str, str] = {}
+        for class_name, text in concepts.items():
+            if text in done:
+                for index in range(len(frames)):
+                    for inst in [i for i in clip.frames[index] if i.class_name == done[text]]:
+                        clip.add(index, class_name, inst.track_id, inst.mask(), inst.score)
+                continue
+            done[text] = class_name
             self.start_session(
-                role,
-                tmp,
-                frame_width=width,
-                frame_height=height,
-                policy="runtime_causal",
+                class_name, frames_dir, frame_width=width, frame_height=height, policy=policy
             )
             try:
-                observations = self.add_prompt(
-                    role,
-                    frame_index=0,
-                    object_id=detection.track_id or f"{role}:frame0",
-                    text=DEFAULT_TEXT[role],
-                    bbox=(
-                        detection.bbox.x1,
-                        detection.bbox.y1,
-                        detection.bbox.x2,
-                        detection.bbox.y2,
-                    ),
+                self.add_prompt(
+                    class_name, frame_index=0, object_id=f"{class_name}:prompt", text=text
                 )
-                chosen = next((item.mask for item in observations if item.mask is not None), None)
-                return chosen
+                for frame, tracker, mask, score in self.iter_propagate(
+                    class_name, policy=policy, direction=direction
+                ):
+                    if 0 <= frame < len(frames):
+                        clip.add(frame, class_name, tracker, mask, 1.0 if score is None else score)
+                    if on_frame is not None:
+                        on_frame(class_name, frame)
+            except Exception as exc:
+                # The pinned predictor refuses to propagate a prompt that found
+                # nothing; that class is simply absent from this clip.
+                if "No points are provided" not in str(exc):
+                    raise
+                clip.meta.setdefault("empty_classes", []).append(class_name)
             finally:
-                self.close_session(role)
+                self.close_session(class_name)
+        return clip
 
     def _session(self, role: Role, session_key: str = "default") -> _Session:
         _validate_role(role)
@@ -515,9 +565,7 @@ class Sam31SequenceSegmenter:
 
 
 def _unpack_outputs(
-    outputs: Any,
-    height: int,
-    width: int,
+    outputs: Any, height: int, width: int
 ) -> list[tuple[int, np.ndarray, float | None]]:
     if not isinstance(outputs, dict):
         return []
@@ -538,24 +586,25 @@ def _unpack_outputs(
     if not ids:
         ids = list(range(len(masks_array)))
     if len(ids) != len(masks_array):
-        raise ValueError(
-            f"SAM3.1 returned {len(ids)} tracker IDs for {len(masks_array)} masks"
-        )
+        raise ValueError(f"SAM3.1 returned {len(ids)} tracker IDs for {len(masks_array)} masks")
     scores = outputs.get("out_probs")
     if scores is not None and hasattr(scores, "detach"):
         scores = scores.detach().cpu().numpy()
     scores_array = np.asarray(scores).reshape(-1) if scores is not None else np.array([])
     result: list[tuple[int, np.ndarray, float | None]] = []
-    for index, (tracker_id, mask) in enumerate(zip(ids, masks_array)):
+    for index, (tracker, mask) in enumerate(zip(ids, masks_array)):
         binary = np.asarray(mask) > 0
         if binary.shape != (height, width):
-            binary = np.asarray(
-                Image.fromarray(binary.astype(np.uint8) * 255).resize(
-                    (width, height), Image.Resampling.NEAREST
+            binary = (
+                np.asarray(
+                    Image.fromarray(binary.astype(np.uint8) * 255).resize(
+                        (width, height), Image.Resampling.NEAREST
+                    )
                 )
-            ) > 0
+                > 0
+            )
         score = float(scores_array[index]) if index < len(scores_array) else None
-        result.append((tracker_id, binary.astype(np.uint8), score))
+        result.append((tracker, binary.astype(np.uint8), score))
     return result
 
 
@@ -578,7 +627,7 @@ def _prompt_target_index(
     ]
     x0, y0, x1, y1 = bbox if bbox is not None else (0.0, 0.0, 0.0, 0.0)
     scored: list[tuple[float, int, int]] = []
-    for index, (tracker_id, raw_mask, _score) in enumerate(masks):
+    for index, (tracker, raw_mask, _score) in enumerate(masks):
         mask = np.asarray(raw_mask) != 0
         height, width = mask.shape
         score = 0.0
@@ -595,7 +644,7 @@ def _prompt_target_index(
             ix = min(width - 1, max(0, int(round(x))))
             iy = min(height - 1, max(0, int(round(y))))
             score += 1000.0 if mask[iy, ix] else 0.0
-        scored.append((score, -int(tracker_id), index))
+        scored.append((score, -int(tracker), index))
     best_score, _negative_id, best_index = max(scored)
     return best_index if best_score > 0 else None
 
@@ -614,24 +663,19 @@ def _sha256(path: Path) -> str:
 
 
 def _validate_role(role: str) -> None:
-    if role not in {"player", "racket"}:
-        raise ValueError(f"SAM3.1 role must be player or racket, got {role!r}")
+    if not isinstance(role, str) or not role.strip() or "/" in role:
+        raise ValueError(f"SAM3.1 role must be a non-empty class name, got {role!r}")
 
 
 def _install_compatible_session_start(predictor: Any) -> None:
-    """Adapt the verified multiplex predictor's current session initializer.
+    """Adapt the pinned predictor's obsolete ``start_session`` → ``init_state`` call.
 
-    The pinned SAM3.1 checkout used by the existing smoke exposes a
-    ``start_session`` implementation with an obsolete ``model.init_state``
-    signature. Its request dispatcher still routes through that method. Keep
-    the compatibility bridge narrowly scoped to predictors that expose the
-    concrete state store and initializer; test doubles and future compatible
-    APIs are left alone.
+    Only predictors that expose the concrete state store and initializer are
+    patched; test doubles and future compatible APIs are left alone.
     """
     model = getattr(predictor, "model", None)
     state_store = getattr(predictor, "_all_inference_states", None)
-    initializer = getattr(model, "init_state", None)
-    if not callable(initializer) or not isinstance(state_store, dict):
+    if not callable(getattr(model, "init_state", None)) or not isinstance(state_store, dict):
         return
 
     def compatible_start_session(
@@ -674,4 +718,224 @@ def _session_key(value: str) -> str:
     return key
 
 
-__all__ = ["MaskObservation", "Sam31SequenceSegmenter"]
+class Sam31Segmenter:
+    """Main-env front end: frames out, SAM 3.1 worker, `ClipMasks` back."""
+
+    name = "sam31"
+
+    def __init__(
+        self,
+        *,
+        python: str | Path | None = None,
+        checkpoint: str | Path | None = None,
+        source_root: str | Path | None = None,
+        source_revision: str | None = None,
+        checkpoint_sha256: str | None = None,
+        prob_threshold: float = 0.35,
+        policy: Policy = "offline_bidirectional",
+        chunk_frames: int = 300,
+    ) -> None:
+        if chunk_frames <= 0:
+            raise ValueError("chunk_frames must be positive")
+        self.chunk_frames = int(chunk_frames)
+        self.python = Path(python or os.environ.get("SAM31_PYTHON") or DEFAULT_PYTHON).expanduser()
+        self.checkpoint = Path(checkpoint).expanduser() if checkpoint else default_checkpoint()
+        self.source_root = Path(
+            source_root or os.environ.get("SAM31_SOURCE_ROOT") or DEFAULT_SOURCE_ROOT
+        ).expanduser()
+        self.source_revision = (
+            source_revision or os.environ.get("SAM31_SOURCE_REVISION") or DEFAULT_SOURCE_REVISION
+        )
+        self.checkpoint_sha256 = (
+            checkpoint_sha256
+            or os.environ.get("SAM31_CHECKPOINT_SHA256")
+            or DEFAULT_CHECKPOINT_SHA256
+        )
+        self.prob_threshold = prob_threshold
+        self.policy = policy
+
+    def worker_command(self, request: Path, out: Path) -> list[str]:
+        return [
+            str(self.python),
+            "-m",
+            "src.segmentation.sam31",
+            "--request",
+            str(request),
+            "--out",
+            str(out),
+        ]
+
+    def segment(
+        self, source: Path | str, domain: Any, *, max_frames: int | None = None
+    ) -> ClipMasks:
+        import shutil
+
+        from src.segmentation.sources import REPO_ROOT, video_fps
+
+        if self.checkpoint is None or not self.checkpoint.is_file():
+            raise FileNotFoundError(
+                "sam3.1_multiplex.pt is not on disk; set SAM31_CHECKPOINT (no auto-download)"
+            )
+        if not self.python.is_file():
+            raise FileNotFoundError(
+                f"SAM 3.1 interpreter not found: {self.python}; set SAM31_PYTHON"
+            )
+        with tempfile.TemporaryDirectory(prefix="ps-sam31-") as tmp:
+            work = Path(tmp)
+            request = work / "request.json"
+            request.write_text(
+                json.dumps(
+                    {
+                        "source": str(Path(source).resolve()),
+                        "max_frames": max_frames,
+                        "chunk_frames": self.chunk_frames,
+                        "ffmpeg": shutil.which("ffmpeg"),
+                        "concepts": domain.prompts_for("sam"),
+                        "policy": self.policy,
+                        "prob_threshold": self.prob_threshold,
+                        "fps": video_fps(source),
+                        "checkpoint": str(self.checkpoint),
+                        "source_root": str(self.source_root),
+                        "source_revision": self.source_revision,
+                        "checkpoint_sha256": self.checkpoint_sha256,
+                    }
+                )
+            )
+            env = dict(os.environ)
+            env["PYTHONPATH"] = os.pathsep.join(
+                filter(None, [str(REPO_ROOT), env.get("PYTHONPATH")])
+            )
+            result = subprocess.run(
+                self.worker_command(request, work / "out"),
+                capture_output=True,
+                text=True,
+                env=env,
+                cwd=REPO_ROOT,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(
+                    f"SAM 3.1 worker failed ({result.returncode}):\n{result.stderr[-4000:]}"
+                )
+            return ClipMasks.load(work / "out")
+
+
+TRACK_ID_STRIDE = 100_000
+
+
+def segment_chunks(segmenter: Any, request: dict[str, Any]) -> tuple[ClipMasks, float, float]:
+    """Segment a clip in windows of ``chunk_frames`` with one loaded model.
+
+    A long clip does not fit one SAM 3.1 session, so each window is its own
+    prompt-and-propagate pass. Track ids restart per window; they are offset by
+    ``TRACK_ID_STRIDE`` per window so they stay unique within the clip. Returns
+    the masks, segmentation seconds and frame-extraction seconds.
+    """
+    from dataclasses import replace
+
+    from src.segmentation.sources import extract_jpegs
+
+    limit = request.get("max_frames")
+    chunk = int(request["chunk_frames"])
+    fps = float(request["fps"])
+    clip: ClipMasks | None = None
+    start, window, segment_s, extract_s = 0, 0, 0.0, 0.0
+    while limit is None or start < limit:
+        want = chunk if limit is None else min(chunk, limit - start)
+        with tempfile.TemporaryDirectory(prefix="ps-sam31-chunk-") as tmp:
+            t0 = time.perf_counter()
+            count = extract_jpegs(
+                request["source"],
+                Path(tmp),
+                want,
+                start=start,
+                fps=fps,
+                ffmpeg=request.get("ffmpeg"),
+            )
+            extract_s += time.perf_counter() - t0
+            if count == 0:
+                break
+            t0 = time.perf_counter()
+            part = segmenter.segment_frames(
+                Path(tmp), dict(request["concepts"]), policy=request["policy"], fps=fps
+            )
+            segment_s += time.perf_counter() - t0
+        if clip is None:
+            clip = ClipMasks(part.classes, part.height, part.width, fps)
+        for instances in part.frames:
+            clip.frames.append(
+                [replace(i, track_id=window * TRACK_ID_STRIDE + i.track_id) for i in instances]
+            )
+        for name in part.meta.get("empty_classes", []):
+            clip.meta.setdefault("empty_windows", []).append({"start": start, "class": name})
+        start += count
+        window += 1
+        if count < want:
+            break
+    if clip is None:
+        raise RuntimeError(f"no frames in {request['source']}")
+    clip.meta["windows"] = window
+    return clip, segment_s, extract_s
+
+
+def _worker(argv: list[str] | None = None) -> int:
+    from src.segmentation.sources import runtime_identity, timing_summary
+
+    parser = argparse.ArgumentParser(
+        description="SAM 3.1 worker (runs in the pointstream-sam31 env)"
+    )
+    parser.add_argument("--request", type=Path, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    args = parser.parse_args(argv)
+    request = json.loads(args.request.read_text())
+
+    import torch
+
+    if not torch.cuda.is_available():
+        raise RuntimeError("CUDA is unavailable in the SAM 3.1 env")
+    load_t0 = time.perf_counter()
+    segmenter = Sam31SequenceSegmenter(
+        checkpoint_path=request["checkpoint"],
+        source_root=request["source_root"],
+        source_revision=request["source_revision"],
+        checkpoint_sha256=request["checkpoint_sha256"],
+        prob_threshold=float(request["prob_threshold"]),
+    )
+    model_load_s = time.perf_counter() - load_t0
+    torch.cuda.reset_peak_memory_stats()
+    masks, total_s, extract_s = segment_chunks(segmenter, request)
+    estimator = segmenter.provenance(request["policy"])
+    masks.meta.update(
+        {
+            "backend": "sam31",
+            "prompts": request["concepts"],
+            "policy": request["policy"],
+            "prob_threshold": request["prob_threshold"],
+            "model": {
+                "name": estimator.name,
+                "checkpoint": str(segmenter.checkpoint_path),
+                "checkpoint_sha256": estimator.checkpoint_sha256,
+                "source_root": str(segmenter.source_root),
+                "source_revision": estimator.model_revision,
+                "config_sha256": estimator.config_sha256,
+                "sdpa_backend_policy": segmenter.sdpa_backend_policy,
+            },
+            "worker_runtime": runtime_identity(),
+            # One propagate pass per class, so per-step latency is not meaningful;
+            # throughput over the whole clip is.
+            "timing": {
+                **timing_summary([], model_load_s=model_load_s, total_s=total_s, frames=len(masks)),
+                "frame_extract_s": round(extract_s, 3),
+                "chunk_frames": int(request["chunk_frames"]),
+                "peak_gpu_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
+            },
+        }
+    )
+    masks.save(args.out)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(_worker())
+
+
+__all__ = ["MaskObservation", "Policy", "Role", "Sam31SequenceSegmenter", "Sam31Segmenter"]

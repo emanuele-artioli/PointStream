@@ -202,7 +202,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=run_root / "report.json")
     parser.add_argument("--frames", type=int, default=300)
     parser.add_argument("--device", default="cuda:0")
-    parser.add_argument("--mask-video", type=Path, default=None, help="SAM mask for clip 1")
+    parser.add_argument("--mask-video", type=Path, default=None, help="segmentation run (masks.rle) for clip 1")
     parser.add_argument("--pose-backend", default="rtm_hand")
     parser.add_argument("--skip-av1", action="store_true")
     parser.add_argument(

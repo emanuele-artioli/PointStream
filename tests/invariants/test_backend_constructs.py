@@ -70,7 +70,6 @@ def test_every_registered_backend_constructs_or_states_why() -> None:
     assert ("generator", "mofa-video") in names
     assert ("detector", "rf-detr") in names
     assert ("detector", "sam3") in names
-    assert ("segmenter", "sam3") in names
     for item in refused:
         assert item.reason, item
         assert item.reason.strip()

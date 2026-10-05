@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 import time
@@ -24,11 +23,6 @@ CLIPS = (
     "clip_01_factory001_worker001_00001_last10s.mp4",
     "clip_03_factory001_worker001_00000_last10s.mp4",
     "factory002_worker001_00000_last10s.mp4",
-)
-SAM_PYTHON = "/home/itec/emanuele/.conda/envs/pointstream-sam31/bin/python"
-SAM_CHECKPOINT = (
-    "/home/itec/emanuele/.cache/huggingface/hub/models--facebook--sam3.1/"
-    "snapshots/daa63191845a41281374e725f4c9e51c7a824460/sam3.1_multiplex.pt"
 )
 FPS = 30.0
 REALTIME_FPS = 24.0
@@ -65,121 +59,30 @@ def _extract_frames(clip: Path, frames_dir: Path, ffmpeg: str, max_frames: int |
     return len(frames)
 
 
-def _sam_worker(frames: Path, masks: Path, timing: Path, checkpoint: Path) -> int:
-    """Union of a `hand` pass and an `arm` pass. Runs in the SAM 3.1 env."""
-    import inspect
-    import uuid
-
-    import torch
+def _sam_masks(frames: Path, masks: Path, dest: Path) -> dict:
+    """SAM 3.1 egocentric foreground (arm + hand) as 0/255 PNGs, plus its timing."""
     from PIL import Image
-    from torch import nn
 
-    sys.path.insert(0, "/home/itec/emanuele/.cache/sam3-meta")
-    from sam3.model_builder import build_sam3_multiplex_video_predictor
+    from src.segmentation import build, load_domain
 
-    if not torch.cuda.is_available():
-        raise RuntimeError("CUDA is unavailable in the SAM 3.1 env")
-    paths = sorted(frames.glob("*.jpg"))
-    sample = np.asarray(Image.open(paths[0]).convert("RGB"))
-    height, width = int(sample.shape[0]), int(sample.shape[1])
-    n_frames = len(paths)
-    original_load = nn.Module.load_state_dict
-
-    def audited_load(self, state_dict, *a, **k):
-        return original_load(self, state_dict, *a, **k)
-
-    nn.Module.load_state_dict = audited_load
-    t0 = time.perf_counter()
-    try:
-        predictor = build_sam3_multiplex_video_predictor(
-            checkpoint_path=str(checkpoint),
-            max_num_objects=16,
-            multiplex_count=16,
-            use_fa3=False,
-            use_rope_real=False,
-            compile=False,
-            warm_up=False,
-            async_loading_frames=False,
-            default_output_prob_thresh=0.35,
-        )
-    finally:
-        nn.Module.load_state_dict = original_load
-    load_s = time.perf_counter() - t0
-
-    def compatible_start_session(self, resource_path, session_id=None, offload_video_to_cpu=False, offload_state_to_cpu=False):
-        init_kwargs = {
-            "resource_path": resource_path,
-            "offload_video_to_cpu": offload_video_to_cpu,
-            "offload_state_to_cpu": offload_state_to_cpu,
-        }
-        valid = inspect.signature(self.model.init_state).parameters
-        state = self.model.init_state(**{key: value for key, value in init_kwargs.items() if key in valid})
-        session = session_id or str(uuid.uuid4())
-        self._all_inference_states[session] = {"state": state, "session_id": session, "start_time": time.time(), "last_use_time": time.time()}
-        return {"session_id": session}
-
-    predictor.start_session = compatible_start_session.__get__(predictor, type(predictor))
-    session_id = predictor.handle_request({"type": "start_session", "resource_path": str(frames)})["session_id"]
-    union = np.zeros((n_frames, height, width), dtype=bool)
-    frame_ms = [0.0] * n_frames
-    prompt_s = 0.0
-    for text in ("hand", "arm"):
-        torch.cuda.synchronize()
-        prompt_t0 = time.perf_counter()
-        predictor.handle_request({
-            "type": "add_prompt",
-            "session_id": session_id,
-            "frame_index": 0,
-            "text": text,
-            "output_prob_thresh": 0.35,
-        })
-        torch.cuda.synchronize()
-        prompt_s += time.perf_counter() - prompt_t0
-        step_t0 = time.perf_counter()
-        for response in predictor.handle_stream_request({
-            "type": "propagate_in_video",
-            "session_id": session_id,
-            "output_prob_thresh": 0.35,
-        }):
-            torch.cuda.synchronize()
-            dt_ms = (time.perf_counter() - step_t0) * 1000.0
-            step_t0 = time.perf_counter()
-            index = int(response["frame_index"])
-            if index < 0 or index >= n_frames:
-                continue
-            frame_ms[index] += dt_ms
-            masks_out = response["outputs"].get("out_binary_masks", [])
-            if torch.is_tensor(masks_out):
-                masks_out = masks_out.detach().cpu().numpy()
-            masks_out = np.asarray(masks_out)
-            if masks_out.ndim == 4 and masks_out.shape[1] == 1:
-                masks_out = masks_out[:, 0]
-            if masks_out.ndim == 2:
-                masks_out = masks_out[None, ...]
-            for mask in masks_out:
-                if mask.shape != (height, width):
-                    resized = Image.fromarray(mask.astype(np.uint8) * 255).resize((width, height), Image.Resampling.NEAREST)
-                    mask = np.asarray(resized) > 0
-                union[index] |= mask.astype(bool)
+    clip = build("sam31").segment(frames, load_domain("egocentric"))
+    clip.save(dest / "sam")
     masks.mkdir(parents=True, exist_ok=True)
     nonempty = 0
-    for index in range(n_frames):
-        plane = (union[index].astype(np.uint8) * 255)
-        if int(plane.max()) > 0:
-            nonempty += 1
+    for index in range(len(clip)):
+        plane = clip.foreground(index).astype(np.uint8) * 255
+        nonempty += bool(plane.any())
         Image.fromarray(plane).save(masks / f"{index:05d}.png")
-    propagate_s = sum(frame_ms) / 1000.0
-    timing.write_text(json.dumps({
-        "n_frames": n_frames,
-        "model_load_s": round(load_s, 3),
-        "prompt_s": round(prompt_s, 3),
-        "propagate_s": round(propagate_s, 3),
-        "fps_excluding_load": round(steady_fps(n_frames, propagate_s), 3),
+    timing = clip.meta["timing"]
+    return {
+        "n_frames": len(clip),
+        "model_load_s": timing["model_load_s"],
+        "propagate_s": timing["total_s"],
+        "fps_excluding_load": timing["fps"],
         "n_nonempty": nonempty,
-        "gpu": torch.cuda.get_device_name(0),
-        "prompts": ["hand", "arm"],
-    }) + "\n")
-    return 0
+        "gpu": ((clip.meta.get("worker_runtime") or {}).get("gpu") or {}).get("name"),
+        "prompts": clip.meta.get("prompts"),
+    }
 
 
 def _pose_clip(frames_dir: Path, masks_dir: Path) -> tuple[list[list[dict]], dict]:
@@ -378,25 +281,12 @@ def _collapse(rows: list[dict]) -> list[dict]:
     return out
 
 
-def run_clip(clip: Path, dest: Path, ffmpeg: str, max_frames: int | None, lengths: tuple[int, ...], checkpoint: Path) -> dict:
+def run_clip(clip: Path, dest: Path, ffmpeg: str, max_frames: int | None, lengths: tuple[int, ...]) -> dict:
     dest.mkdir(parents=True, exist_ok=True)
     frames = dest / "frames"
     n_frames = _extract_frames(clip, frames, ffmpeg, max_frames)
     masks = dest / "masks"
-    timing_path = dest / "sam_timing.json"
-    env = os.environ.copy()
-    root = str(Path(__file__).resolve().parents[2])
-    env["PYTHONPATH"] = root + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
-    cmd = [
-        SAM_PYTHON, "-m", "demo.experiments.holdout_hand_rd", "--sam-worker",
-        "--frames", str(frames), "--masks", str(masks), "--timing", str(timing_path),
-        "--checkpoint", str(checkpoint),
-    ]
-    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-    (dest / "sam_worker.log").write_text(res.stderr.decode("utf-8", errors="replace")[-20000:])
-    if res.returncode != 0 or not timing_path.is_file():
-        raise RuntimeError(f"SAM worker failed ({res.returncode}). See {dest / 'sam_worker.log'}")
-    sam = json.loads(timing_path.read_text())
+    sam = _sam_masks(frames, masks, dest)
     poses, pose_pack = _pose_clip(frames, masks)
     (dest / "poses.json").write_text(json.dumps(poses) + "\n")
     from demo.experiments.hand_packet_rate import score_tracks
@@ -420,21 +310,11 @@ def run_clip(clip: Path, dest: Path, ffmpeg: str, max_frames: int | None, length
 
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
-    if "--sam-worker" in args:
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--sam-worker", action="store_true")
-        parser.add_argument("--frames", type=Path, required=True)
-        parser.add_argument("--masks", type=Path, required=True)
-        parser.add_argument("--timing", type=Path, required=True)
-        parser.add_argument("--checkpoint", type=Path, required=True)
-        ns = parser.parse_args(args)
-        return _sam_worker(ns.frames, ns.masks, ns.timing, ns.checkpoint)
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--ffmpeg", default="/opt/local/bin/ffmpeg")
     parser.add_argument("--max-frames", type=int, default=None)
     parser.add_argument("--segments", default="30,300")
-    parser.add_argument("--checkpoint", type=Path, default=Path(SAM_CHECKPOINT))
     parser.add_argument("--clips", nargs="*", default=list(CLIPS))
     parser.add_argument("--smoke-first", action="store_true")
     ns = parser.parse_args(args)
@@ -443,7 +323,7 @@ def main(argv: list[str] | None = None) -> int:
     if ns.smoke_first:
         smoke_clip = Path(ns.clips[0]) if Path(ns.clips[0]).is_file() else HOLDOUTS / ns.clips[0]
         print("SMOKE", smoke_clip, flush=True)
-        smoke = run_clip(smoke_clip, ns.out / "smoke", ns.ffmpeg, 8, (8,), ns.checkpoint)
+        smoke = run_clip(smoke_clip, ns.out / "smoke", ns.ffmpeg, 8, (8,))
         (ns.out / "smoke_report.json").write_text(json.dumps(smoke, indent=2) + "\n")
         if smoke["frames"] < 1 or "fps_excluding_load" not in smoke["sam"]:
             raise SystemExit("hold-out smoke did not time a SAM pass")
@@ -452,7 +332,7 @@ def main(argv: list[str] | None = None) -> int:
     for name in ns.clips:
         path = Path(name) if Path(name).is_file() else HOLDOUTS / name
         print("CLIP", path, flush=True)
-        clips.append(run_clip(path, ns.out / path.stem, ns.ffmpeg, ns.max_frames, lengths, ns.checkpoint))
+        clips.append(run_clip(path, ns.out / path.stem, ns.ffmpeg, ns.max_frames, lengths))
         print("DONE", path.name, "fps", clips[-1]["combined_fps_excluding_load"], flush=True)
     report = {"schema": "pointstream.holdout_hand_rd.v1", "realtime_fps": REALTIME_FPS, "clips": clips}
     (ns.out / "report.json").write_text(json.dumps(report, indent=2) + "\n")

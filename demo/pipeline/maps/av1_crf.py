@@ -24,13 +24,13 @@ AV1_PRESET = "7"
 AV1_CRF = "63"
 AV1_PIX_FMT = "yuv420p"
 
-# BGR, painted workbench then tool then hand so the hand stays on top.
+# BGR per segmentation class; the hand stays red for older matte readers.
 CLASS_COLORS_BGR = {
     "workbench": (255, 140, 40),
     "tool": (40, 210, 70),
+    "arm": (40, 180, 255),
     "hand": (40, 40, 255),
 }
-PAINT_ORDER = ("workbench", "tool", "hand")
 
 
 def av1_output_args(scale: str | None = AV1_SCALE) -> list[str]:

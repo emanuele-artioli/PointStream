@@ -179,7 +179,7 @@ def ensure_segmenter(ctx: StageContext) -> Any:
         return None
     kwargs: dict[str, Any] = {}
     if config.segmenter.model:
-        kwargs["model_name"] = config.segmenter.model
+        kwargs["checkpoint" if name.startswith("sam") else "weights"] = config.segmenter.model
     ctx.segmenter = _build(ctx, "segmenter", name, **kwargs)
     return ctx.segmenter
 

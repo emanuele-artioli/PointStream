@@ -44,7 +44,7 @@ ALIAS_TO_FOLDER = {
 
 REQUIRED_KEYS: dict[str, tuple[str, ...]] = {
     "depth": ("yolo26s_depth",),
-    "yoloe": ("yoloe26_seg",),
+    "yoloe": ("yoloe26_seg_x",),
     "sam31": (),
     "dino": ("dinov3_vits",),
     "pose": ("dwpose_pose", "dwpose_det"),
@@ -114,20 +114,22 @@ def _run_depth(clip: Path, out: Path, max_frames: int | None, ctx: dict[str, Any
 
 
 def _run_yoloe(clip: Path, out: Path, max_frames: int | None, ctx: dict[str, Any]) -> None:
-    from demo.pipeline.maps.yoloe_masks import run_yoloe_clip
+    from demo.pipeline.maps.masks import run_mask_map
 
-    run_yoloe_clip(clip, out, max_frames=max_frames)
+    run_mask_map("yoloe-26x", clip, out, max_frames=max_frames)
 
 
 def _run_sam31(clip: Path, out: Path, max_frames: int | None, ctx: dict[str, Any]) -> None:
-    from demo.pipeline.maps.sam31_video import launch, resolve_checkpoint, resolve_python
+    from demo.pipeline.maps.masks import run_mask_map
+    from src.segmentation.sam31 import Sam31Segmenter
 
-    if resolve_checkpoint() is None or not Path(resolve_python()).is_file():
+    front = Sam31Segmenter()
+    if front.checkpoint is None or not front.python.is_file():
         raise MapSkip(
             "map 'sam31' skipped: sam3.1_multiplex.pt or the pointstream-sam31 "
             "python is missing. Do not auto-download."
         )
-    launch(clip, out, max_frames=max_frames)
+    run_mask_map("sam31", clip, out, max_frames=max_frames)
 
 
 def _run_dino(clip: Path, out: Path, max_frames: int | None, ctx: dict[str, Any]) -> None:

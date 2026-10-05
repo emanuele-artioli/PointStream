@@ -1,9 +1,8 @@
-"""Segmenters.
+"""Segmenter registry for the runner's ``segmenter`` config axis.
 
-Implementations live in sibling modules; this module holds the registry.
-Construction targets are import strings, so importing this module does not load
-torch, cv2, or encoder binaries. Do not change ``REGISTRY`` or its axis string
-— the parent package and the shared smoke test key on both.
+The implementations live in `src.segmentation`; this module only names them so
+config validation and `build_backend` keep one registry per axis. Construction
+targets are import strings, so importing this module loads no model code.
 """
 
 from src.contracts.capabilities import CAP_INSTANCE_MASKS
@@ -13,30 +12,20 @@ REGISTRY: Registry[object] = Registry("segmenter")
 
 REGISTRY.register(
     BackendSpec(
-        name="yolo",
-        target="src.components.segmentation.yolo:YoloSegmenter",
-        aliases=("yolo-seg",),
-        capabilities=frozenset({CAP_INSTANCE_MASKS}),
-        defaults={"model_name": "yolo26n-seg.pt"},
-        summary="YOLO26 instance segmenter; the default.",
-    )
-)
-REGISTRY.register(
-    BackendSpec(
         name="sam31",
-        target="src.components.segmentation.sam31:Sam31SequenceSegmenter",
+        target="src.segmentation.sam31:Sam31Segmenter",
         aliases=("sam3.1", "sam3.1-multiplex"),
         capabilities=frozenset({CAP_INSTANCE_MASKS}),
-        defaults={"model_name": "sam3.1_multiplex.pt"},
-        summary="SAM3.1 multiplex video segmentation with causal runtime policy.",
+        summary="SAM 3.1 multiplex video segmentation; the offline reference.",
     )
 )
-REGISTRY.register(
-    BackendSpec(
-        name="sam3",
-        target="src.components.segmentation.sam3:Sam3Segmenter",
-        capabilities=frozenset({CAP_INSTANCE_MASKS}),
-        defaults={"model_name": "sam3.pt"},
-        summary="SAM3 box-prompted segmenter (supersedes SAM2).",
+for _size in ("n", "s", "m", "l", "x"):
+    REGISTRY.register(
+        BackendSpec(
+            name=f"yoloe-26{_size}",
+            target="src.segmentation.yoloe:YoloeSegmenter",
+            capabilities=frozenset({CAP_INSTANCE_MASKS}),
+            defaults={"size": _size, "weights": f"yoloe-26{_size}-seg.pt"},
+            summary=f"YOLOE-26{_size} open-vocabulary instance segmenter.",
+        )
     )
-)

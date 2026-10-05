@@ -340,7 +340,7 @@ def main() -> None:
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--smoke", action="store_true", help="Run 1-epoch smoke test")
     parser.add_argument("--pose-backend", default="rtm_hand", choices=list(BACKENDS))
-    parser.add_argument("--mask-video", type=Path, default=None, help="SAM hand-color video for clip 1")
+    parser.add_argument("--mask-video", type=Path, default=None, help="segmentation run (masks.rle) for clip 1")
     parser.add_argument("--dwb2", action="store_true", default=True)
     parser.add_argument("--no-dwb2", action="store_true")
     parser.add_argument("--max-minutes", type=float, default=60.0)

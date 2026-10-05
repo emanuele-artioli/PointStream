@@ -71,7 +71,7 @@ def test_default_config_backends_are_registered_by_exact_name() -> None:
     assert SELECTION.spec("heuristic").name == "heuristic"
     assert TRACKING.spec("tracker").name == "tracker"
     assert POSE.spec("yolo").name == "yolo"
-    assert SEGMENTERS.spec("yolo").name == "yolo"
+    assert SEGMENTERS.spec("yoloe-26n").name == "yoloe-26n"
 
 
 def test_unknown_detector_name_lists_the_registered_set_and_suggests_a_close_match() -> None:
@@ -85,7 +85,7 @@ def test_unknown_detector_name_lists_the_registered_set_and_suggests_a_close_mat
 def test_sam3_and_rf_detr_are_registered_under_their_exact_names() -> None:
     assert DETECTORS.spec("sam3").name == "sam3"
     assert DETECTORS.spec("rf-detr").name == "rf-detr"
-    assert SEGMENTERS.spec("sam3").name == "sam3"
+    assert SEGMENTERS.spec("sam3.1").name == "sam31"
 
 
 def test_yolo_detector_parses_mocked_boxes_and_drops_unrelated_classes() -> None:
@@ -151,7 +151,7 @@ def test_shipped_default_weight_names_resolve_in_a_planted_tree(tmp_path: Path) 
     assert names == {
         "detector": "yolo26n.pt",
         "pose": "yolo26n-pose.pt",
-        "segmenter": "yolo26n-seg.pt",
+        "segmenter": "yoloe-26n-seg.pt",
     }
     planted = tmp_path / "assets" / "weights"
     planted.mkdir(parents=True)
@@ -166,7 +166,7 @@ def test_shipped_default_weight_names_fail_when_any_link_is_dangling(tmp_path: P
     planted.mkdir(parents=True)
     (planted / "yolo26n.pt").write_bytes(b"ok")
     (planted / "yolo26n-pose.pt").write_bytes(b"ok")
-    (planted / "yolo26n-seg.pt").symlink_to(tmp_path / "missing-seg.pt")
+    (planted / "yoloe-26n-seg.pt").symlink_to(tmp_path / "missing-seg.pt")
     with pytest.raises(ConfigValueError, match="dangling"):
         assert_named_weights_resolve(config, root=tmp_path)
 

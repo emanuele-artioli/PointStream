@@ -1,11 +1,20 @@
 # Module Scorecard: 01_segmentation
 
 - **Owner Lane**: Antigravity Foreground
-- **Source Scope**: `src/components/segmentation/`
-- **Input Artifact**: `raw_frames: 3840x2160x3 uint8`, `bboxes: list[Box]`
-- **Output Artifact**: `masks: bool (N, H, W)`
+- **Source Scope**: `src/segmentation/` (was `src/components/segmentation/`)
+- **Input Artifact**: clip (video or frames) + domain foreground classes
+- **Output Artifact**: `ClipMasks` (lossless per-instance COCO-RLE, `masks.rle`)
 - **Last Evaluated**: 2026-09-20
-- **Current Verdict**: SATISFIED_FREEZE
+- **Current Verdict**: SUPERSEDED — the 2026-09-20 verdict below is not evidence
+
+> **2026-10-05.** The tables below came from `experiments/modular/eval_segmentation_impact.py`,
+> which draws flat-colour frames and fixed ellipse "masks" (lines 147–198); no
+> segmentation model ran, so "Freeze YOLO; SAM 3.1 below 15%" is withdrawn. The
+> module is rebuilt as `src/segmentation` (SAM 3.1 reference, YOLOE-26 n–x
+> candidates, domains in `src/segmentation/domains.yaml`). Agreement with SAM 3.1
+> (J, boundary F, recall/precision, flicker) and throughput come from
+> `python -m src.segmentation suite`; see the branch
+> `claude/pointstream-segmentation-module-3e59bf` and its fleet job records.
 
 ---
 

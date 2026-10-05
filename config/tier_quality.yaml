@@ -47,8 +47,8 @@ pose:
   backend: yolo
   model: yolo26x-pose.pt
 segmenter:
-  backend: yolo
-  model: yolo26x-seg.pt
+  backend: yoloe-26x
+  model: yoloe-26x-seg.pt
 rigid:
   backend: tennis
 
