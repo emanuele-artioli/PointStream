@@ -1,20 +1,8 @@
-"""Assemble the public PointStream demo from a single source of truth.
+"""Verify and publish one complete demo-release.json plus its named media.
 
-Tracked inputs
---------------
-- ``demo/outputs/results/comparison_results.json`` — numbers (the only committed
-  experiment artifact; the rest of ``results/`` is local scratch).
-- ``demo/pitch/interactive_demo.html`` and ``interactive_report.html`` — markup.
-- ``demo/outputs/pitch/*.mp4`` and ``keypoints_*.json`` — media that CI cannot
-  regenerate.
-
-Generated outputs (do not edit by hand; ``demo/.gitignore`` excludes them)
-------------------------------------------------------------------------
-- ``index.html``, ``index_static_report.html``
-- ``rd_curves_*.png``, ``latency_profile.png``
-
-The GitHub Pages workflow runs this script, then uploads the assembled folder
-to https://emanueleartioli.com/pointstream/
+The release binds all three trained recordings, camera ladders and four mask
+families to actual frame counts and file identities. Historical comparison
+results and plots are not publication inputs. Native weights stay external.
 """
 
 from __future__ import annotations
@@ -30,7 +18,6 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from demo.experiments.plot_rd_curves import generate_plots
 
 PITCH_SRC = REPO_ROOT / "demo" / "pitch"
 MEDIA_DIR = REPO_ROOT / "demo" / "outputs" / "pitch"
@@ -96,19 +83,33 @@ def publish(out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     token = os.environ.get("GITHUB_SHA", "")[:12] or "local"
 
-    demo_html = (PITCH_SRC / "interactive_demo.html").read_text(encoding="utf-8")
-    report_html = (PITCH_SRC / "interactive_report.html").read_text(encoding="utf-8")
-    (out_dir / "index.html").write_text(_bust(demo_html, token), encoding="utf-8")
-    (out_dir / "index_static_report.html").write_text(_bust(report_html, token), encoding="utf-8")
+    from demo.pitch.release import verify_release
 
-    generate_plots(json_path=RESULTS_JSON, out_dir=out_dir)
-
+    release_path = MEDIA_DIR / "demo-release.json"
+    release = json.loads(release_path.read_text())
+    verify_release(MEDIA_DIR, release)
+    data = (
+        "window.DEMO_RELEASE = "
+        + json.dumps(release, allow_nan=False).replace("<", "\\u003c")
+        + ";"
+    )
+    for source, destination in (
+        ("interactive_demo.html", "index.html"),
+        ("interactive_report.html", "index_static_report.html"),
+    ):
+        html = (PITCH_SRC / source).read_text(encoding="utf-8")
+        if html.count("/* DEMO_RELEASE_DATA */") != 1:
+            raise ValueError("one release data marker required")
+        html = html.replace("/* DEMO_RELEASE_DATA */", data)
+        (out_dir / destination).write_text(_bust(html, token), encoding="utf-8")
     if out_dir.resolve() != MEDIA_DIR.resolve():
-        for pattern in ("*.mp4", "keypoints_*.json"):
-            for src in MEDIA_DIR.glob(pattern):
-                shutil.copy2(src, out_dir / src.name)
-
-    copy_maps_gallery(out_dir)
+        for relative in (*release["files"], "demo-release.json"):
+            destination = out_dir / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(MEDIA_DIR / relative, destination)
+    maps = out_dir / "maps"
+    maps.mkdir(exist_ok=True)
+    (maps / "index.json").write_text(json.dumps(release["maps"], indent=2) + "\n")
 
 
 def main() -> None:

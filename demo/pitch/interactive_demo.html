@@ -548,12 +548,12 @@
             <div>
                 <h1><span class="pulse-dot"></span> PointStream Interactive Inspector</h1>
                 <div class="subtitle">Semantic compression for egocentric teleoperation</div>
-                <div class="meta-bar">Dataset: <strong>Egocentric-10K</strong> &bull; Hardware: <strong>NVIDIA RTX 6000 Ada</strong> &bull; Parallel E2E <strong>18.4 ms</strong></div>
+                <div class="meta-bar">Egocentric-10K · Factory 1 clips 1 and 3 · Factory 2 clip 1</div>
             </div>
-            <div class="target-badge">18.4 ms teleop path</div>
+            <div class="target-badge">Three trained recordings</div>
         </header>
 
-        <p class="subtitle" style="margin-bottom: 24px; color: var(--accent-orange);">Historical demo: source clip identities and rate/quality measurements require revalidation before scientific use.</p>
+        <p class="subtitle" style="margin-bottom: 24px; color: var(--accent-orange);">Same training recordings, held-out final ten-second intervals. Model agreement is a diagnostic, not human ground truth. New latency and perceptual measurements remain pending.</p>
 
         <!-- Navigation Tabs -->
         <div class="tab-bar">
@@ -568,9 +568,9 @@
             <div class="control-panel">
                 <div class="control-group">
                     <span class="control-label">Sequence:</span>
-                    <button class="btn active" id="btn-clip3" onclick="selectClip('clip_03')">Clip 3 (Table Work)</button>
-                    <button class="btn" id="btn-clip2" onclick="selectClip('clip_02')">Clip 2 (Slow Assembly)</button>
-                    <button class="btn" id="btn-clip1" onclick="selectClip('clip_01')">Clip 1 (Close Hands)</button>
+                    <button class="btn active" id="btn-clip3" onclick="selectClip('clip_03')">Factory 1 · Clip 3</button>
+                    <button class="btn" id="btn-clip2" onclick="selectClip('clip_02')">Factory 2 · Clip 1</button>
+                    <button class="btn" id="btn-clip1" onclick="selectClip('clip_01')">Factory 1 · Clip 1</button>
                 </div>
 
                 <div class="control-group">
@@ -582,7 +582,7 @@
                     </select>
                     <select id="mask-left" class="dropdown" onchange="onHalfChange('left')">
                         <option value="" selected>No mask</option>
-                        <option value="dino">DINOv3</option>
+                        <option value="dino">DINOv3 PCA preview</option>
                         <option value="rtmpose">RTMPose-m</option>
                         <option value="sam31">SAM 3.1</option>
                         <option value="yoloe">YOLOE</option>
@@ -603,7 +603,7 @@
                     </select>
                     <select id="mask-right" class="dropdown" onchange="onHalfChange('right')">
                         <option value="" selected>No mask</option>
-                        <option value="dino">DINOv3</option>
+                        <option value="dino">DINOv3 PCA preview</option>
                         <option value="rtmpose">RTMPose-m</option>
                         <option value="sam31">SAM 3.1</option>
                         <option value="yoloe">YOLOE</option>
@@ -651,232 +651,20 @@
             <div class="skipped-list" id="maps-skipped"></div>
         </div>
 
-        <!-- TAB 2: MULTI-RESOLUTION BENCHMARK -->
+        <!-- TAB 2: CURRENT RELEASE MEASUREMENTS -->
         <div id="tab-benchmark" class="tab-content">
-            <h2 class="section-title">Teleoperation tracking (mean of all three demo clips)</h2>
-            <p style="color:var(--text-muted);margin:-12px 0 16px;font-size:0.9rem;">RTMPose-L on the 1080p reference is GT. The same model is run on each reconstruction. Detection is GT-hand recall; unmatched GT hands count as PCK misses. MediaPipe-on-pixels is no longer the judge.</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Metric</th>
-                        <th>PS 240p</th>
-                        <th>AV1 240p</th>
-                        <th>PS 360p</th>
-                        <th>AV1 360p</th>
-                        <th>PS 540p</th>
-                        <th>AV1 540p</th>
-                        <th>PS 1080p</th>
-                        <th>AV1 1080p</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="highlight-row">
-                        <td>Joint error MPJPE (px, ↓)</td>
-                        <td><strong>77.5</strong></td>
-                        <td>81.1</td>
-                        <td><strong>65.8</strong></td>
-                        <td>74.2</td>
-                        <td>64.6</td>
-                        <td><strong>62.8</strong></td>
-                        <td>74.3</td>
-                        <td><strong>48.8</strong></td>
-                    </tr>
-                    <tr>
-                        <td>Hands recovered vs GT (%, ↑)</td>
-                        <td>50.3</td>
-                        <td>51.8</td>
-                        <td>53.3</td>
-                        <td>57.0</td>
-                        <td>53.1</td>
-                        <td>66.1</td>
-                        <td>56.8</td>
-                        <td>72.7</td>
-                    </tr>
-                    <tr>
-                        <td>Bitrate (kbps)</td>
-                        <td>70.8</td>
-                        <td>59.7</td>
-                        <td>113.4</td>
-                        <td>104.6</td>
-                        <td>275.6</td>
-                        <td>258.9</td>
-                        <td>500.1</td>
-                        <td>570.1</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2 class="section-title">Rate–quality ladder (same three-clip mean)</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Codec</th>
-                        <th>Resolution</th>
-                        <th>Bitrate (kbps)</th>
-                        <th>Encode path (ms)</th>
-                        <th>LPIPS (↓)</th>
-                        <th>PSNR (dB)</th>
-                        <th>MPJPE (px, ↓)</th>
-                        <th>Hands vs GT (%, ↑)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Reference HEVC</td>
-                        <td>1080p</td>
-                        <td>4,200</td>
-                        <td>—</td>
-                        <td>0.000</td>
-                        <td>∞</td>
-                        <td>0.0</td>
-                        <td>100</td>
-                    </tr>
-                    <tr class="highlight-row">
-                        <td><strong>PointStream</strong></td>
-                        <td>240p bg</td>
-                        <td>70.8</td>
-                        <td>18.4</td>
-                        <td>0.320</td>
-                        <td>20.96</td>
-                        <td><strong>77.5</strong></td>
-                        <td>50.3</td>
-                    </tr>
-                    <tr>
-                        <td>AV1 p7</td>
-                        <td>180p</td>
-                        <td>48.3</td>
-                        <td>18.4</td>
-                        <td>0.400</td>
-                        <td>20.78</td>
-                        <td>—</td>
-                        <td>—</td>
-                    </tr>
-                    <tr>
-                        <td>AV1 p7</td>
-                        <td>240p</td>
-                        <td>59.7</td>
-                        <td>10.3</td>
-                        <td>0.300</td>
-                        <td>21.69</td>
-                        <td>81.1</td>
-                        <td>51.8</td>
-                    </tr>
-                    <tr class="highlight-row">
-                        <td><strong>PointStream</strong></td>
-                        <td>360p bg</td>
-                        <td>113.4</td>
-                        <td>18.4</td>
-                        <td>0.210</td>
-                        <td>22.11</td>
-                        <td><strong>65.8</strong></td>
-                        <td>53.3</td>
-                    </tr>
-                    <tr>
-                        <td>AV1 p7</td>
-                        <td>360p</td>
-                        <td>104.6</td>
-                        <td>11.7</td>
-                        <td>0.197</td>
-                        <td>23.04</td>
-                        <td>74.2</td>
-                        <td>57.0</td>
-                    </tr>
-                    <tr class="highlight-row">
-                        <td><strong>PointStream</strong></td>
-                        <td>540p bg</td>
-                        <td>275.6</td>
-                        <td>18.4</td>
-                        <td>0.127</td>
-                        <td>23.69</td>
-                        <td>64.6</td>
-                        <td>53.1</td>
-                    </tr>
-                    <tr>
-                        <td>AV1 p7</td>
-                        <td>540p</td>
-                        <td>263.5</td>
-                        <td>3.3</td>
-                        <td>0.118</td>
-                        <td>24.95</td>
-                        <td>62.8</td>
-                        <td>66.1</td>
-                    </tr>
-                    <tr>
-                        <td>PointStream</td>
-                        <td>1080p bg</td>
-                        <td>500.1</td>
-                        <td>18.4</td>
-                        <td>0.076</td>
-                        <td>25.04</td>
-                        <td>74.3</td>
-                        <td>56.8</td>
-                    </tr>
-                    <tr>
-                        <td>AV1 p6</td>
-                        <td>1080p</td>
-                        <td>570.1</td>
-                        <td>3.3</td>
-                        <td>0.061</td>
-                        <td>27.46</td>
-                        <td>48.8</td>
-                        <td>72.7</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2 class="section-title">Rate-Distortion Pareto Curves & Latency Profile</h2>
-            <div class="chart-box">
-                <img id="rd-curve-img" src="rd_curves_clip_03_factory001_worker001_00000.png" alt="Rate-Distortion Curves">
-                <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                    Pareto curves for the clip on screen. New windows: close hands (factory 35), slow assembly, table work. Three-clip starve mean: PS 89.1 px / 49.5% vs AV1 81.1 px / 51.8%.
-                </p>
-            </div>
-            <div class="chart-box">
-                <img src="latency_profile.png" alt="Latency Profile">
-                <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.9rem;">
-                    PointStream latency on NVIDIA RTX 6000 Ada. Pose extraction 15.4 ms overlaps SVT-AV1 13.6 ms; parallel E2E 18.4 ms, serial 32.0 ms.
-                </p>
-            </div>
+            <h2 class="section-title">Current clip · measured streaming rates and model agreement</h2>
+            <p>Joint error and hand recall compare the same RTMPose model on reconstructed and reference pictures. They do not establish task accuracy. PointStream rates include background and coordinate packets; model and anchor setup bytes are separate. H.264 composite preview sizes are not PointStream network rates.</p>
+            <table><thead><tr><th>Stream</th><th>Resolution</th><th>Rate (kbps)</th><th>Joint error (px)</th><th>Reference hands recovered (%)</th></tr></thead><tbody id="release-measurements"></tbody></table>
+            <p>Latency, LPIPS, segmentation IoU and human task accuracy have not been measured for this release. Mask rates shown in the inspector describe AV1 visual previews, not native feature or coordinate payloads. DINOv3 displays a PCA feature visualization.</p>
+            <p id="release-identity"></p>
+            <p><a href="demo-release.json">Release identities and file checksums</a></p>
         </div>
-
-        <!-- TAB 3: ARCHITECTURE & ROADMAP -->
         <div id="tab-roadmap" class="tab-content">
-            <h2 class="section-title">System Architecture: Asynchronous Semantic Decomposition</h2>
-            <div class="doc-prose">
-                <pre>
-[Robot Camera / Head Node]
-  ├── MediaPipe Hand Pose (GPU: 15.4 ms) ──> 1-Euro Smoothing ──> Quantizer (47 B/hand) ──> [Keypoint Stream: 7-10 kbps]
-  └── Scale + SVT-AV1 (240p–1080p bg)    ──> Lanczos up to 1080p (CPU: 13.6 ms)        ──> [Background Stream: 59-264 kbps]
-                                                                                                │
-                                                                                  Total Stream: 70-276 kbps (15x-60x) + shared WebP anchors 3.77 kbps
-                                                                                                │
-[Teleop Station / Policy Ingestion Node]                                                        ▼
-  ├── Unpack Keypoints (&lt;0.01 ms) ──> Render Wireframe Skeleton Canvas
-  ├── Appearance Anchor Crop       ──> Lightweight Generator (GPU: 2.95 ms) ──> Synthesized Hands
-  └── Decode Background Stream     ──────────────────────────────────────────┴─> Composited Frame (0.01 ms)
-                </pre>
-
-                <h3>Decoupled Interaction Architecture (Modes 2 & 3)</h3>
-                <p>To ensure active performance optimization sessions (TensorRT, CUDA fusion, batching) do not break the interactive application, the system exposes a stable <code>StreamingCodecAdapter</code> contract:</p>
-                <pre>
-class StreamingCodecAdapter(Protocol):
-    def configure(self, width: int, height: int, target_kbps: int) -> None: ...
-    def process_frame(self, frame_bgr: np.ndarray) -> FrameResult: ...
-                </pre>
-
-                <h3>Mode 2: Dynamic Video Selection & Server Processing</h3>
-                <p>Allows users to select or drag-and-drop arbitrary egocentric videos. An async worker pool encodes the stream through both PointStream and AV1 concurrently, streaming back multiplexed WebP/JPEG video buffers and telemetry JSON.</p>
-
-                <h3>Mode 3: Live Camera Teleoperation (Hand Motion via Webcam)</h3>
-                <p>Captures real-time camera frames via <code>navigator.mediaDevices.getUserMedia()</code>. Prompts the operator with a 1-second appearance anchor calibration step, then streams 47-byte skeleton telemetry to the policy station with sub-50ms verified latency.</p>
-
-                <h3>Production Deployment Path to <code>emanueleartioli.com</code></h3>
-                <ul>
-                    <li><strong>Stage 1 (Current)</strong>: Static zero-dependency deployment on <code>emanueleartioli.com</code> / GitHub Pages with 60fps canvas slicing.</li>
-                    <li><strong>Stage 2</strong>: Hosted GPU worker backend on an on-demand VPS / serverless container for dynamic uploads.</li>
-                    <li><strong>Stage 3</strong>: Client-side edge inference via ONNX Runtime Web / WebGPU, running neural synthesis directly on the visitor's local GPU without server costs.</li>
-                </ul>
-            </div>
+            <h2 class="section-title">Current reconstruction path</h2>
+            <div class="doc-prose"><p>RTMPose hand coordinates are packed and decoded through DWB2. A generator trained for the selected factory uses saved training anchors to reconstruct hand appearance. Native AV1 carries the background at six resolutions. The browser displays the decoded composite beside a native AV1 baseline.</p>
+            <p>YOLOE and SAM 3.1 display predicted masks; RTMPose displays skeletons; DINOv3 displays PCA features. Each has six AV1 preview rungs on the same source interval.</p>
+            <p>Next: improve and qualify PointStream reconstruction quality and performance, validate alpha/crop behavior, and measure the intended receiver path. Trained DCVC/HNeRV backgrounds remain outside this release until their separate qualification passes.</p></div>
         </div>
     </div>
 
@@ -887,68 +675,8 @@ class StreamingCodecAdapter(Protocol):
 
     <script>
         // Configuration and State
-        const CLIPS = {
-            'clip_01': {
-                name: 'Clip 1 (Close Hands)',
-                keypoints: 'keypoints_clip_01.json?v=sides1',
-                rd_img: 'rd_curves_clip_01_factory001_worker001_00001.png?v=sides1',
-                streams: {
-                    ps_180:    { kind: 'ps', res: '180p', kbps: 46.5, mpjpe: 93.0, det: 28.9, kp: 12.8 },
-                    ps_starve: { kind: 'ps', res: '240p', kbps: 56.1, mpjpe: 65.6, det: 55.4, kp: 11.6 },
-                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 91.3, mpjpe: 66.0, det: 58.8, kp: 11.6 },
-                    ps_low:    { kind: 'ps', res: '540p', kbps: 163.1, mpjpe: 65.7, det: 61.1, kp: 11.6 },
-                    ps_720:    { kind: 'ps', res: '720p', kbps: 216.1, mpjpe: 93.3, det: 33.1, kp: 12.8 },
-                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 368.8, mpjpe: 72.3, det: 55.4, kp: 11.6 },
-                    av1_180:   { kind: 'av1', res: '180p', kbps: 34.3, mpjpe: 59.0, det: 41.6, kp: 0 },
-                    av1_240:   { kind: 'av1', res: '240p', kbps: 49.1, mpjpe: 49.5, det: 61.2, kp: 0 },
-                    av1_360:   { kind: 'av1', res: '360p', kbps: 83.1, mpjpe: 43.4, det: 75.7, kp: 0 },
-                    av1_540:   { kind: 'av1', res: '540p', kbps: 141.4, mpjpe: 29.9, det: 89.4, kp: 0 },
-                    av1_720:   { kind: 'av1', res: '720p', kbps: 204.3, mpjpe: 29.7, det: 92.0, kp: 0 },
-                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 358.1, mpjpe: 25.8, det: 92.0, kp: 0 },
-                    ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
-                }
-            },
-            'clip_02': {
-                name: 'Clip 2 (Slow Assembly)',
-                keypoints: 'keypoints_clip_02.json?v=sides1',
-                rd_img: 'rd_curves_clip_02_factory001_worker001_00002.png?v=sides1',
-                streams: {
-                    ps_180:    { kind: 'ps', res: '180p', kbps: 50.1, mpjpe: 100.5, det: 32.2, kp: 6.1 },
-                    ps_starve: { kind: 'ps', res: '240p', kbps: 66.2, mpjpe: 110.0, det: 35.3, kp: 5.9 },
-                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 109.3, mpjpe: 77.8, det: 46.5, kp: 5.9 },
-                    ps_low:    { kind: 'ps', res: '540p', kbps: 203.8, mpjpe: 93.2, det: 47.7, kp: 5.9 },
-                    ps_720:    { kind: 'ps', res: '720p', kbps: 305.0, mpjpe: 100.9, det: 54.3, kp: 6.1 },
-                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 518.7, mpjpe: 71.7, det: 58.1, kp: 5.9 },
-                    av1_180:   { kind: 'av1', res: '180p', kbps: 45.6, mpjpe: 92.6, det: 36.6, kp: 0 },
-                    av1_240:   { kind: 'av1', res: '240p', kbps: 66.3, mpjpe: 91.8, det: 35.4, kp: 0 },
-                    av1_360:   { kind: 'av1', res: '360p', kbps: 112.7, mpjpe: 103.8, det: 35.4, kp: 0 },
-                    av1_540:   { kind: 'av1', res: '540p', kbps: 199.2, mpjpe: 93.3, det: 48.2, kp: 0 },
-                    av1_720:   { kind: 'av1', res: '720p', kbps: 293.0, mpjpe: 88.0, det: 45.9, kp: 0 },
-                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 516.3, mpjpe: 76.3, det: 56.4, kp: 0 },
-                    ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
-                }
-            },
-            'clip_03': {
-                name: 'Clip 3 (Table Work)',
-                keypoints: 'keypoints_clip_03.json?v=sides1',
-                rd_img: 'rd_curves_clip_03_factory001_worker001_00000.png?v=sides1',
-                streams: {
-                    ps_180:    { kind: 'ps', res: '180p', kbps: 60.5, mpjpe: 90.1, det: 54.3, kp: 11.4 },
-                    ps_starve: { kind: 'ps', res: '240p', kbps: 75.2, mpjpe: 91.6, det: 57.8, kp: 10.8 },
-                    ps_heavy:  { kind: 'ps', res: '360p', kbps: 124.6, mpjpe: 84.7, det: 54.3, kp: 10.8 },
-                    ps_low:    { kind: 'ps', res: '540p', kbps: 230.7, mpjpe: 64.7, det: 53.9, kp: 10.8 },
-                    ps_720:    { kind: 'ps', res: '720p', kbps: 354.8, mpjpe: 83.2, det: 56.2, kp: 11.4 },
-                    ps_1080:   { kind: 'ps', res: '1080p', kbps: 597.9, mpjpe: 54.1, det: 52.3, kp: 10.8 },
-                    av1_180:   { kind: 'av1', res: '180p', kbps: 51.4, mpjpe: 92.6, det: 59.1, kp: 0 },
-                    av1_240:   { kind: 'av1', res: '240p', kbps: 76.6, mpjpe: 102.0, det: 58.8, kp: 0 },
-                    av1_360:   { kind: 'av1', res: '360p', kbps: 135.1, mpjpe: 75.3, det: 59.9, kp: 0 },
-                    av1_540:   { kind: 'av1', res: '540p', kbps: 239.2, mpjpe: 65.1, det: 60.7, kp: 0 },
-                    av1_720:   { kind: 'av1', res: '720p', kbps: 351.2, mpjpe: 62.1, det: 66.5, kp: 0 },
-                    av1_1080:  { kind: 'av1', res: '1080p', kbps: 609.9, mpjpe: 44.2, det: 69.6, kp: 0 },
-                    ref:       { kind: 'ref', res: '1080p', kbps: 4200, mpjpe: null, det: 100, kp: 0 }
-                }
-            }
-        };
+        /* DEMO_RELEASE_DATA */
+        const CLIPS = window.DEMO_RELEASE.clips;
 
         const MATCH_AV1 = {
             ps_180: 'av1_180',
@@ -998,7 +726,7 @@ class StreamingCodecAdapter(Protocol):
         const CLIP_BTN = { clip_01: 'clip1', clip_02: 'clip2', clip_03: 'clip3' };
 
         function streamFile(clipId, key) {
-            const token = String(key).indexOf('ps_') === 0 ? 'matte1' : 'crf63';
+            const token = window.DEMO_RELEASE.release_id;
             return 'web_' + clipId + '_' + key + '.mp4?v=' + token;
         }
 
@@ -1018,13 +746,11 @@ class StreamingCodecAdapter(Protocol):
             return who + ' ' + s.res + ' · ' + Math.round(s.kbps).toLocaleString() + ' kbps';
         }
 
-        // Published teleop path, not a per-rung remeasure.
-        const STREAM_LATENCY_MS = { ps: 18.4, av1: 13.6 };
-        // 48-frame screen of the shipped videos. Pose is RTMPose-m on pictures encoded before that switch.
-        window.STREAM_ALIGN = {"clip_01": {"av1_180": {"lpips": 0.7435, "seg_iou": 0.1062, "pose_pck": 0.0}, "av1_240": {"lpips": 0.7313, "seg_iou": 0.2739, "pose_pck": 0.0}, "av1_360": {"lpips": 0.733, "seg_iou": 0.1793, "pose_pck": 0.0}, "av1_540": {"lpips": 0.7352, "seg_iou": 0.0961, "pose_pck": 0.0}, "av1_720": {"lpips": 0.7372, "seg_iou": 0.0763, "pose_pck": 0.0}, "av1_1080": {"lpips": 0.7359, "seg_iou": 0.0358, "pose_pck": 0.0}, "ps_starve": {"lpips": 0.7274, "seg_iou": 0.3456, "pose_pck": 0.0079}, "ps_heavy": {"lpips": 0.7284, "seg_iou": 0.3589, "pose_pck": 0.0129}, "ps_low": {"lpips": 0.7278, "seg_iou": 0.3585, "pose_pck": 0.0}, "ps_1080": {"lpips": 0.729, "seg_iou": 0.2408, "pose_pck": 0.0}, "ps_180": {"lpips": 0.7431, "seg_iou": 0.4834, "pose_pck": 0.0099}, "ps_720": {"lpips": 0.7267, "seg_iou": 0.4334, "pose_pck": 0.0159}}, "clip_02": {"av1_180": {"lpips": 0.7861, "seg_iou": 0.4794, "pose_pck": 0.1416}, "av1_240": {"lpips": 0.7553, "seg_iou": 0.3756, "pose_pck": 0.1197}, "av1_360": {"lpips": 0.7053, "seg_iou": 0.3555, "pose_pck": 0.0708}, "av1_540": {"lpips": 0.6712, "seg_iou": 0.5018, "pose_pck": 0.1634}, "av1_720": {"lpips": 0.6584, "seg_iou": 0.3958, "pose_pck": 0.1197}, "av1_1080": {"lpips": 0.6378, "seg_iou": 0.3388, "pose_pck": 0.1506}, "ps_starve": {"lpips": 0.7507, "seg_iou": 0.4207, "pose_pck": 0.1236}, "ps_heavy": {"lpips": 0.7072, "seg_iou": 0.3333, "pose_pck": 0.1763}, "ps_low": {"lpips": 0.6626, "seg_iou": 0.5, "pose_pck": 0.1506}, "ps_1080": {"lpips": 0.6378, "seg_iou": 0.3778, "pose_pck": 0.2329}, "ps_180": {"lpips": 0.7763, "seg_iou": 0.4233, "pose_pck": 0.13}, "ps_720": {"lpips": 0.6499, "seg_iou": 0.4391, "pose_pck": 0.1506}}, "clip_03": {"av1_180": {"lpips": 0.7585, "seg_iou": 0.4795, "pose_pck": 0.1171}, "av1_240": {"lpips": 0.7302, "seg_iou": 0.4167, "pose_pck": 0.2609}, "av1_360": {"lpips": 0.6996, "seg_iou": 0.7083, "pose_pck": 0.2044}, "av1_540": {"lpips": 0.6729, "seg_iou": 0.6678, "pose_pck": 0.2331}, "av1_720": {"lpips": 0.6707, "seg_iou": 0.7083, "pose_pck": 0.248}, "av1_1080": {"lpips": 0.6604, "seg_iou": 0.8542, "pose_pck": 0.2907}, "ps_starve": {"lpips": 0.7375, "seg_iou": 0.7708, "pose_pck": 0.3621}, "ps_heavy": {"lpips": 0.7057, "seg_iou": 0.7917, "pose_pck": 0.3819}, "ps_low": {"lpips": 0.6764, "seg_iou": 0.8125, "pose_pck": 0.3294}, "ps_1080": {"lpips": 0.6613, "seg_iou": 0.8333, "pose_pck": 0.3611}, "ps_180": {"lpips": 0.7514, "seg_iou": 0.6462, "pose_pck": 0.2222}, "ps_720": {"lpips": 0.6692, "seg_iou": 0.7102, "pose_pck": 0.3085}}};
+        const STREAM_LATENCY_MS = {};
+        window.STREAM_ALIGN = {};
         const PS_BY_RES = { '180': 'ps_180', '240': 'ps_starve', '360': 'ps_heavy', '540': 'ps_low', '720': 'ps_720', '1080': 'ps_1080' };
         const AV1_BY_RES = { '180': 'av1_180', '240': 'av1_240', '360': 'av1_360', '540': 'av1_540', '720': 'av1_720', '1080': 'av1_1080' };
-        const MASK_LABEL = { dino: 'DINOv3', rtmpose: 'RTMPose-m', sam31: 'SAM 3.1', yoloe: 'YOLOE' };
+        const MASK_LABEL = { dino: 'DINOv3 PCA preview', rtmpose: 'RTMPose-m', sam31: 'SAM 3.1', yoloe: 'YOLOE' };
         const MASK_IDS = {
             dino: ['dino', 'dinov3'],
             rtmpose: ['rtmpose', 'rtm_hand'],
@@ -1044,8 +770,8 @@ class StreamingCodecAdapter(Protocol):
         }
 
         const BARE_MASK_HEIGHT = {};
-        // One keypoint payload. The preview is not a per-rung encode.
-        const RESOLUTION_FREE = { rtmpose: 'rtmpose' };
+        // All visual previews have independently encoded resolution rungs.
+        const RESOLUTION_FREE = {};
 
         function mapMatches(entry, family, res) {
             const id = String(entry.map || '');
@@ -1058,28 +784,12 @@ class StreamingCodecAdapter(Protocol):
             return bare && height === (BARE_MASK_HEIGHT[family] || '1080');
         }
 
-        // 48-frame RTMPose-m hand packet from the mask screen. One payload, every rung.
-        const RTM_PACKET_KBPS = { clip_01: 12.0, clip_02: 9.4, clip_03: 12.0 };
-        // Published Ada pose-extraction p50 from the latency caption. One payload, every rung.
-        const RTM_EXTRACT_MS = 15.4;
-
         function selectedMapEntry(side) {
             const family = halfMask(side);
             if (!family) return null;
             const entries = mapsEntriesForClip(mapsClipId || currentClipId);
             const found = entries.find(e => mapMatches(e, family, halfRes(side))) || null;
             if (found) return found;
-            if (family === 'rtmpose') {
-                return {
-                    map: 'rtmpose',
-                    clip: currentClipId,
-                    label: 'RTMPose-m',
-                    payload_kbps: RTM_PACKET_KBPS[currentClipId],
-                    extract_ms_p50: RTM_EXTRACT_MS,
-                    status: 'ok',
-                    overlay_key: 'skeleton'
-                };
-            }
             return null;
         }
 
@@ -1161,7 +871,12 @@ class StreamingCodecAdapter(Protocol):
                 btn.className = (id === CLIP_BTN[clipId]) ? 'btn active' : 'btn';
             });
             const info = CLIPS[clipId];
-            document.getElementById('rd-curve-img').src = info.rd_img;
+            document.getElementById('release-measurements').innerHTML = Object.values(info.streams).map(s =>
+                '<tr><td>' + ({ps:'PointStream', av1:'Native AV1', ref:'Reference preview'}[s.kind] || s.kind) +
+                '</td><td>' + s.res + '</td><td>' + s.kbps.toFixed(1) + '</td><td>' +
+                (s.mpjpe == null ? '—' : s.mpjpe.toFixed(1)) + '</td><td>' + s.det.toFixed(1) + '</td></tr>').join('');
+            document.getElementById('release-identity').textContent = info.name + ' · ' + info.n_frames +
+                ' frames at ' + info.fps + ' fps · shared checkpoint + anchors: ' + (info.setup_bytes / 1048576).toFixed(2) + ' MiB.';
             relabelDropdowns();
             updateBundleHud();
             updateStreamSelection();
@@ -1181,7 +896,7 @@ class StreamingCodecAdapter(Protocol):
                 const name = (MASK_LABEL[halfMask(side)] || halfMask(side)) + ' ' + res;
                 if (!entry) return name + ' · not in gallery';
                 let text = name;
-                if (Number.isFinite(Number(entry.payload_kbps))) text += ' · ' + fmtKbps(entry.payload_kbps);
+                if (Number.isFinite(Number(entry.payload_kbps))) text += ' · ' + fmtKbps(entry.payload_kbps) + ' AV1 preview';
                 if (Number.isFinite(Number(entry.extract_ms_p50))) text += ', ' + fmtMs(entry.extract_ms_p50);
                 return text;
             }
@@ -1880,7 +1595,8 @@ class StreamingCodecAdapter(Protocol):
                 ? ('Skipped: ' + skipped.map(s => s.map).join(', ') + ' (missing local weights, not counted).')
                 : '';
             updateBundleHud();
-            preloadOverlayFrames(entries);
+            preloadOverlayFrames(entries.filter(e => ['left', 'right'].some(side =>
+                selectedMapEntry(side) && selectedMapEntry(side).map === e.map)));
         }
 
         function onOverlayToggle() {
@@ -1897,6 +1613,7 @@ class StreamingCodecAdapter(Protocol):
         }
 
         function preloadOverlayFrames(entries) {
+            overlayVideoEls().forEach(v => { v.pause(); v.removeAttribute('src'); v.load(); });
             overlayFrames = {};
             const t = clock().currentTime || 0;
             entries.forEach(entry => {

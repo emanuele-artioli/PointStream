@@ -33,3 +33,30 @@ unchanged until the complete export and mask set pass identity, real-decode,
 frame-count, ladder-completeness and browser checks. Failed or partial runs stay
 external for diagnosis; they never trigger publication. No paused Gate-A job is
 resumed, and no Claude work is changed.
+
+## Campaign and publication gate
+
+Camera job `20261005T131343Z-9013609e` completed its same-path smoke,
+validator and full export on gpu5. Mask requests are independently gated:
+YOLOE `20261005T133458Z-93087ca1`, SAM3.1 `20261005T133519Z-f3bb6020`,
+RTMPose `20261005T133741Z-1b916224`, DINOv3 `20261005T134656Z-b219552a`.
+Source-transfer acknowledgement timeouts require exact read-only preparation
+reconciliation before publishing the original request; they never permit a
+replacement launch. GPU3's pre-existing empty CPU mutex has no ownership
+metadata and is not removed. Admission can use gpu5 normally.
+
+DINOv3 architecture code is pinned under `/home/itec/emanuele/Models/DINOv3`
+at `6876159a11b4df116f30f667f8c9888617df0751`, with the existing local weights.
+Strict loading rejects partial state dictionaries and unrelated weight fallbacks.
+RTMPose mask generation uses explicit existing local detector/pose ONNX paths.
+
+`demo.pitch.release` assembles a new external release from completed camera
+and mask stages, checks all 111 videos with native ffprobe, checks keypoint
+lengths, binds sources and weight hashes, and records every public file hash.
+`demo.pitch.publish_site` refuses partial or changed releases. GitHub Pages
+assembles into a clean temporary directory from that inventory, excluding old
+unreferenced clips and plots. The inspector retains comparison, resolution,
+mask, playback and crop controls while deriving current rates and model
+agreement from the release. Historical latency, LPIPS, IoU and task-truth
+claims are not carried over. DINOv3's PCA visualization and AV1 mask-preview
+rates are explicitly distinguished from native feature/coordinate payloads.

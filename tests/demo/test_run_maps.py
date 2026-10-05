@@ -322,7 +322,8 @@ def test_inspector_stays_default_tab() -> None:
     assert "av1_240" in inspector or "AV1 240p" in inspector
     assert "compare-board" not in html
     assert "STREAM_LATENCY_MS" in html
-    assert "18.4" in html
+    assert "window.DEMO_RELEASE" in html
+    assert "18.4" not in html
     assert "value=\"empty\"" in inspector
     assert "Stacked 3-Panel" not in inspector
     assert "47-Byte Skeleton Telemetry" not in inspector
