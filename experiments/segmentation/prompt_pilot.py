@@ -45,6 +45,16 @@ VARIANTS: dict[str, dict[str, tuple[str, list[str], list[str]]]] = {
 }
 
 
+def selected(domain: str, names: str) -> dict[str, tuple[str, list[str], list[str]]]:
+    if names == "all":
+        return VARIANTS[domain]
+    wanted = [name.strip() for name in names.split(",") if name.strip()]
+    unknown = sorted(set(wanted) - set(VARIANTS[domain]))
+    if unknown:
+        raise SystemExit(f"unknown {domain} variants: {unknown}")
+    return {name: VARIANTS[domain][name] for name in wanted}
+
+
 def coverage(run: Path) -> dict[str, object]:
     masks = ClipMasks.load(run)
     area = masks.height * masks.width
@@ -67,11 +77,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--frames", type=int, required=True)
     parser.add_argument("--clips", type=int, required=True)
     parser.add_argument("--out", type=Path)
+    parser.add_argument("--variants", default="all", help="comma-separated variant names, or all")
     args = parser.parse_args(argv)
     out = args.out or Path(os.environ["PS_STAGE_DIR"])
+    variants = selected(args.domain, args.variants)
     clips = cli.resolve_sources(args.domain, None)[: args.clips]
     summary: dict[str, object] = {"domain": args.domain, "frames": args.frames, "variants": {}}
-    for name, (backend, prompts, options) in VARIANTS[args.domain].items():
+    for name, (backend, prompts, options) in variants.items():
         flags = [f for p in prompts for f in ("--prompt", p)]
         flags += [f for o in options for f in ("--option", o)]
         code = cli.main(
@@ -101,13 +113,13 @@ def main(argv: list[str] | None = None) -> int:
             "options": options,
             "coverage": {clip: coverage(run) for clip, run in runs.items()},
         }
-    sams = [n for n, v in VARIANTS[args.domain].items() if v[0] == REFERENCE_BACKEND]
-    others = [n for n, v in VARIANTS[args.domain].items() if v[0] != REFERENCE_BACKEND]
+    sams = [n for n, v in variants.items() if v[0] == REFERENCE_BACKEND]
+    others = [n for n, v in variants.items() if v[0] != REFERENCE_BACKEND]
     agreement = {}
     for ref in sams:
         report = cli.bench(
             out / ref / args.domain / REFERENCE_BACKEND,
-            [out / n / args.domain / VARIANTS[args.domain][n][0] for n in others],
+            [out / n / args.domain / variants[n][0] for n in others],
         )
         # bench rows run clip-major, candidate-minor.
         agreement[ref] = [
@@ -122,7 +134,7 @@ def main(argv: list[str] | None = None) -> int:
     for clip, source in clips:
         step = max(1, args.frames // 4)
         frames = ",".join(str(i) for i in range(0, args.frames, step))
-        names = list(VARIANTS[args.domain])
+        names = list(variants)
         cli.main(
             [
                 "sheet",
@@ -137,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
                 "--labels",
                 ",".join(names),
                 "--runs",
-                *[str(out / n / args.domain / VARIANTS[args.domain][n][0] / clip) for n in names],
+                *[str(out / n / args.domain / variants[n][0] / clip) for n in names],
             ]
         )
     (out / "pilot.json").write_text(json.dumps(summary, indent=2) + "\n")
@@ -154,7 +166,7 @@ def validate(argv: list[str] | None = None) -> int:
     checks = []
     pilot = json.loads((out / "pilot.json").read_text()) if (out / "pilot.json").is_file() else {}
     checks.append({"name": "pilot summary written", "passed": bool(pilot)})
-    for name in VARIANTS[args.domain]:
+    for name in pilot.get("variants") or VARIANTS[args.domain]:
         cov = (pilot.get("variants") or {}).get(name, {}).get("coverage") or {}
         ok = bool(cov) and all(c["frames"] == pilot["frames"] for c in cov.values())
         checks.append({"name": f"{name}: every clip segmented", "passed": ok, "detail": cov})
