@@ -201,7 +201,7 @@ class Sam31SequenceSegmenter:
         git = ["git", "-C", str(self.source_root)]
         try:
             actual_revision = subprocess.run(
-                [*git, "rev-parse", "HEAD"], check=True, capture_output=True, text=True, timeout=10
+                [*git, "rev-parse", "HEAD"], check=True, capture_output=True, text=True, timeout=300
             ).stdout.strip()
         except (OSError, subprocess.SubprocessError) as exc:
             raise RuntimeError(f"Cannot read the SAM 3.1 source revision at {self.source_root}") from exc
@@ -210,11 +210,11 @@ class Sam31SequenceSegmenter:
                 f"SAM31_SOURCE_REVISION={self.source_revision!r} does not match checkout HEAD {actual_revision!r}"
             )
         status = subprocess.run(
-            [*git, "status", "--porcelain", "--untracked-files=all"],
+            [*git, "status", "--porcelain", "--untracked-files=normal"],
             check=True,
             capture_output=True,
             text=True,
-            timeout=10,
+            timeout=300,
         ).stdout.strip()
         if status:
             raise RuntimeError(
