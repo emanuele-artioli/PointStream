@@ -14,6 +14,7 @@ import shutil
 import sqlite3  # noqa: F401
 import uuid
 import sys
+import subprocess
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -21,11 +22,13 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 import cv2
+import numpy as np
 import torch
 
 from demo.evaluation.evaluate_robotics_teleop import score_pose_tracks
 from demo.evaluation.pose_backends import BACKENDS
-from demo.experiments.clip_identity import CLIP_IDS, check_output_paths, load_clip_manifest
+from demo.experiments.clip_identity import CLIP_IDS, check_output_paths, file_sha256, load_clip_manifest
+from demo.experiments.checkpoint_contract import hand_checkpoint_contract
 from demo.experiments.run_comparison import POINTSTREAM_TIERS, reconstruct_pointstream_video
 from demo.models.dataset import build_curated_samples
 from demo.models.hand_objective import composite_hand_metrics, selection_min
@@ -52,11 +55,10 @@ AV1_KEYS = {
 PS_KEYS = ["ps_180", "ps_starve", "ps_heavy", "ps_low", "ps_720", "ps_1080"]
 
 
-def _load_model(ckpt_path: Path, device: torch.device):
+def _load_model(ckpt_path: Path, device: torch.device, *, expected_factory: str | None = None):
     ckpt = torch.load(ckpt_path, map_location=device)
-    state = ckpt["model_state_dict"]
-    out_channels = int(ckpt.get("out_channels") or 3)
-    if ckpt.get("model_type") == "spade" or "enc1.0.weight" in state:
+    architecture, out_channels, state = hand_checkpoint_contract(ckpt, expected_factory=expected_factory)
+    if architecture == "spade":
         model = HandSPADEUNet(in_channels=6, out_channels=out_channels).to(device)
     else:
         model = HandPix2PixUNet(in_channels=6, out_channels=out_channels).to(device)
@@ -84,14 +86,21 @@ def process_clip(
     only: list[str] | None = None,
     background_mp4s: dict[str, Path] | None = None,
     baseline_hand: dict[str, float] | None = None,
+    saved_anchors: dict[str, np.ndarray] | None = None,
 ) -> dict:
     work.mkdir(parents=True, exist_ok=True)
     pitch.mkdir(parents=True, exist_ok=True)
     judge = BACKENDS["rtm_hand"]
     driver = BACKENDS[pose_backend]
     ref_frames = read_video_frames_robust(clip_path, max_frames=frames)
+    if not ref_frames:
+        raise ValueError("source has no readable frames")
     h, w = ref_frames[0].shape[:2]
-    fps = 30.0
+    cap = cv2.VideoCapture(str(clip_path))
+    fps = float(cap.get(cv2.CAP_PROP_FPS))
+    cap.release()
+    if not np.isfinite(fps) or fps <= 0 or not ref_frames:
+        raise ValueError("source must have readable frames and a finite positive frame rate")
     duration = len(ref_frames) / fps
     ref_mp4 = work / "reference_trimmed.mp4"
     writer = cv2.VideoWriter(str(ref_mp4), cv2.VideoWriter_fourcc(*"mp4v"), fps, (w, h))
@@ -107,9 +116,12 @@ def process_clip(
     frame_alphas = None
     if mask_video is not None:
         frame_alphas = interpolate_hand_alphas(read_hand_alphas(mask_video, w, h, frames))
-    _, anchors, _ = build_curated_samples(
-        ref_mp4, poses, image_size=256, max_frames=frames, clip_id=0, frame_alphas=frame_alphas
-    )
+    if saved_anchors is None:
+        _, anchors, _ = build_curated_samples(
+            ref_mp4, poses, image_size=256, max_frames=frames, clip_id=0, frame_alphas=frame_alphas
+        )
+    else:
+        anchors = saved_anchors
     gt = judge(ref_mp4, frames)
     only_keys: set[str] | None = None
     if only is not None:
@@ -183,8 +195,8 @@ def process_clip(
     # Reference: keep a playable H.264 for the inspector.
     web_transcode(ref_mp4, pitch / f"web_{short}_ref.mp4", _ffmpeg())
     serialize_poses_to_json(poses, pitch / f"keypoints_{short}.json")
-    streams["ref"] = {"kind": "ref", "res": "1080p", "kbps": 4200, "mpjpe": None, "det": 100, "kp": 0}
-    return {"name": short, "clip_path": str(clip_path), "streams": streams}
+    streams["ref"] = {"kind": "ref", "res": "1080p", "kbps": round(ref_mp4.stat().st_size * 8 / duration / 1000, 1), "mpjpe": None, "det": 100, "kp": 0}
+    return {"name": short, "clip_path": str(clip_path), "streams": streams, "n_frames": len(ref_frames), "fps": fps, "duration_s": duration}
 
 
 def main() -> None:
@@ -196,6 +208,7 @@ def main() -> None:
                 data_root() / "jobs" / "demo-rebuild" / uuid.uuid4().hex)
     parser.add_argument("--curated-dir", type=Path, required=True)
     parser.add_argument("--source-manifest", type=Path, help="Reviewed rows with explicit clip_id, path and source sha256; defaults to curated-dir/manifest.json")
+    parser.add_argument("--assets-manifest", type=Path, help="Hash-pinned checkpoints and saved training anchors; source rows select checkpoint, anchors, factory and training_scene")
     parser.add_argument("--checkpoint", type=Path, default=model_asset("demo/overfit_generator.pt", legacy=REPO_ROOT / "demo/outputs/models/overfit_generator.pt"))
     parser.add_argument("--work", type=Path, default=run_root / "work")
     parser.add_argument("--pitch", type=Path, default=run_root / "pitch")
@@ -221,6 +234,15 @@ def main() -> None:
     args = parser.parse_args()
     check_output_paths((args.work, args.pitch, args.out), source_root=REPO_ROOT)
     manifest = load_clip_manifest(args.source_manifest or args.curated_dir / "manifest.json")
+    selections = {row["clip_id"]: row for row in json.loads(manifest.path.read_text())}
+    assets = json.loads(args.assets_manifest.read_text()) if args.assets_manifest else {}
+    for path, identity in assets.items():
+        if identity.get("path") != path or file_sha256(Path(path), timeout=90) != identity.get("sha256"):
+            raise ValueError(f"model/anchor identity mismatch: {path}")
+    if assets:
+        for row in selections.values():
+            if row.get("checkpoint") not in assets or row.get("anchors") not in assets:
+                raise ValueError("each selected clip requires a pinned checkpoint and training anchor")
     if args.clip_only is not None and args.clip_only not in CLIP_IDS:
         raise SystemExit(f"unknown clip ID: {args.clip_only}")
     only = [k for k in args.only_keys.split(",") if k] or None
@@ -237,7 +259,8 @@ def main() -> None:
     with args.out.open("x") as handle:
         json.dump(report, handle, indent=2)
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
-    model, _ = _load_model(args.checkpoint, device)
+    model = None
+    loaded_path = None
     background_mp4s = None
     if args.bg_dir is not None:
         background_mp4s = {k: args.bg_dir / f"{k}.mp4" for k in PS_KEYS if (args.bg_dir / f"{k}.mp4").is_file()}
@@ -247,6 +270,21 @@ def main() -> None:
             continue
         mask = args.mask_video if short == "clip_01" else None
         clip.verify()
+        row = selections[short]
+        checkpoint = Path(row["checkpoint"]) if assets else args.checkpoint
+        if loaded_path != checkpoint:
+            del model
+            if device.type == "cuda":
+                torch.cuda.empty_cache()
+            model, _ = _load_model(checkpoint, device, expected_factory=row.get("factory") if assets else None)
+            loaded_path = checkpoint
+        saved_anchors = None
+        if assets:
+            with np.load(row["anchors"], allow_pickle=False) as archive:
+                prefix = row["training_scene"] + "|"
+                saved_anchors = {key[len(prefix):]: archive[key] for key in archive.files if key.startswith(prefix)}
+            if not saved_anchors or any(value.shape != (256, 256, 3) or value.dtype != np.uint8 for value in saved_anchors.values()):
+                raise ValueError(f"missing or invalid saved training anchors for {short}")
         logger.info("demo rebuild %s from %s", short, clip.path)
         report["clips"][short] = process_clip(
             clip.path,
@@ -262,9 +300,21 @@ def main() -> None:
             only=only,
             background_mp4s=background_mp4s,
             baseline_hand=baseline_hand,
+            saved_anchors=saved_anchors,
         )
         clip.verify()
         report["clips"][short]["source_identity"] = clip.receipt()
+        if assets:
+            report["clips"][short]["factory"] = row["factory"]
+            report["clips"][short]["training_scene"] = row["training_scene"]
+            report["clips"][short]["checkpoint_identity"] = assets[row["checkpoint"]]
+            report["clips"][short]["anchor_identity"] = assets[row["anchors"]]
+        from experiments.jobs.monitor import publish_progress
+        publish_progress(os.environ.get("PS_STAGE", "local"), len(report["clips"]))
+    for path, identity in assets.items():
+        if file_sha256(Path(path), timeout=90) != identity["sha256"]:
+            raise ValueError(f"model/anchor identity changed during export: {path}")
+    report["native_ffmpeg"] = {"path": _ffmpeg(), "version": subprocess.check_output([_ffmpeg(), "-version"], text=True, timeout=15).splitlines()[0]}
     report["status"] = "complete"
     args.out.write_text(json.dumps(report, indent=2))
     logger.info("wrote %s", args.out)
