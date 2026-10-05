@@ -458,9 +458,13 @@ def sha256(path: Path) -> str:
 
 
 def load_known(paths: list[str]) -> dict[str, tuple[str, str]]:
-    """Read ``relpath<TAB>sha256<TAB>how`` lines recorded while downloading."""
+    """Read ``relpath<TAB>sha256<TAB>how`` lines recorded while downloading, or a previous manifest."""
     known: dict[str, tuple[str, str]] = {}
     for p in paths:
+        if p.endswith(".json"):
+            for e in json.load(open(p))["files"]:
+                known[e["path"]] = (e["sha256"], e["sha256_source"])
+            continue
         for line in open(p):
             rel, digest, how = line.rstrip("\n").split("\t")
             known[rel] = (digest, how)
@@ -468,7 +472,7 @@ def load_known(paths: list[str]) -> dict[str, tuple[str, str]]:
 
 
 def build_manifest(name: str, root: Path, facts: dict[str, Any], known: dict[str, tuple[str, str]],
-                   exclude: list[str], workers: int) -> dict[str, Any]:
+                   exclude: list[str], workers: int, smoke_dir: Path) -> dict[str, Any]:
     files = sorted(p for p in root.rglob("*") if p.is_file() and not any(p.match(e) for e in exclude))
 
     def entry(p: Path) -> dict[str, Any]:
@@ -482,6 +486,15 @@ def build_manifest(name: str, root: Path, facts: dict[str, Any], known: dict[str
 
     with ThreadPoolExecutor(workers) as ex:
         entries = list(ex.map(entry, files))
+    # Keep the smoke overlay next to the manifests; scratch is ephemeral.
+    smoke = facts.get("smoke_read", {})
+    if smoke.get("overlay") and Path(smoke["overlay"]).exists():
+        dst = smoke_dir / Path(smoke["overlay"]).name
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not dst.exists():
+            shutil.copyfile(smoke["overlay"], dst)
+            os.chmod(dst, 0o444)
+        smoke["overlay"] = str(dst)
     revision = os.environ.get("PS_TOOL_REVISION", "unknown")
     return {
         "dataset": SOURCES[name]["name"],
@@ -529,7 +542,8 @@ def main(argv: list[str] | None = None) -> None:
         print(json.dumps(facts.get("smoke_read"), indent=1, default=str))
     else:
         facts = json.loads(args.facts.read_text())
-        manifest = build_manifest(args.dataset, args.root, facts, load_known(args.known_hashes), args.exclude, args.workers)
+        manifest = build_manifest(args.dataset, args.root, facts, load_known(args.known_hashes), args.exclude,
+                                  args.workers, args.out.parent / "smoke")
         write_readonly(args.out, manifest)
         print(f"wrote {args.out}: {len(manifest['files'])} files, {manifest['total_bytes'] / 1e9:.2f} GB")
 
