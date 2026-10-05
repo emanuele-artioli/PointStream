@@ -1,0 +1,17 @@
+{
+  "files.watcherExclude": {
+    "**/Models/**": true,
+    "**/Datasets/**": true
+  },
+  "search.exclude": {
+    "Models": true,
+    "Datasets": true
+  },
+  "search.followSymlinks": false,
+  "files.exclude": {
+    "Models": true,
+    "Datasets": true
+  },
+  "python.analysis.exclude": ["Models", "Datasets"],
+  "python.testing.pytestArgs": ["tests"]
+}

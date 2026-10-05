@@ -236,10 +236,13 @@ class YoloeSegmenter:
         if self.model is None:
             from ultralytics import YOLOE
 
-            from src.components.detection.weights import resolve_weight
+            from src.segmentation.storage import model_path
 
-            self.weights_path = resolve_weight(self.weights_name)
-            self.text_encoder_path = resolve_weight("mobileclip2_b.ts")
+            weights = Path(self.weights_name)
+            self.weights_path = (
+                weights if weights.is_absolute() else model_path("YOLO", self.weights_name)
+            )
+            self.text_encoder_path = model_path("YOLO", "mobileclip2_b.ts")
             bind_local_text_encoder(self.text_encoder_path)
             self.model = YOLOE(str(self.weights_path))
         if prompts != self._prompts:

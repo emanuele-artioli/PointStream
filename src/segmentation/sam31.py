@@ -30,6 +30,7 @@ import types
 import uuid
 from collections.abc import Iterator
 from dataclasses import dataclass, field
+from enum import Enum
 from functools import wraps
 from pathlib import Path
 from typing import Any, Literal
@@ -37,12 +38,38 @@ from typing import Any, Literal
 import numpy as np
 from PIL import Image
 
-from src.contracts.observation import EstimatorProvenance, ObservationStatus
 from src.segmentation.masks import ClipMasks
 
 Role = str
 Propagation = Literal["forward", "backward", "both"]
 Policy = Literal["offline_bidirectional", "offline_causal", "runtime_causal"]
+
+
+class ObservationStatus(str, Enum):
+    OBSERVED = "observed"
+    MISSING = "missing"
+    INVALID = "invalid"
+    QUARANTINED = "quarantined"
+
+
+@dataclass(frozen=True)
+class EstimatorProvenance:
+    """Which model, revision, checkpoint, config and policy produced the masks."""
+
+    name: str
+    model_revision: str
+    checkpoint_sha256: str
+    config_sha256: str
+    policy: str
+
+    def __post_init__(self) -> None:
+        if not all((self.name, self.model_revision, self.checkpoint_sha256, self.config_sha256)):
+            raise ValueError(
+                "estimator provenance requires model, revision, checkpoint, and config hashes"
+            )
+        if self.policy not in {"offline_bidirectional", "offline_causal", "runtime_causal"}:
+            raise ValueError(f"unsupported perception policy {self.policy!r}")
+
 
 DEFAULT_PYTHON = "~/.conda/envs/pointstream-sam31/bin/python"
 DEFAULT_SOURCE_ROOT = "~/.cache/sam3-meta"
@@ -71,12 +98,9 @@ def default_checkpoint() -> Path | None:
     if env:
         return Path(env).expanduser().resolve()
     candidates = [Path(HF_CHECKPOINT).expanduser()]
-    try:
-        from src.contracts.paths import models_root
+    from src.segmentation.storage import models_root
 
-        candidates.insert(0, models_root() / "SAM" / "sam3.1_multiplex.pt")
-    except Exception:  # pragma: no cover - paths contract unavailable in a bare env
-        pass
+    candidates.insert(0, models_root() / "SAM" / "sam3.1_multiplex.pt")
     return next((path.resolve() for path in candidates if path.is_file()), None)
 
 

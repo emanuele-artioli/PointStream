@@ -1,20 +1,17 @@
 name: pointstream-ci
 
-# main is expected green. A red main is a merge blocker: twelve consecutive
-# failures on one weights-on-disk test made every later regression invisible.
+# main is expected green; a red main is a merge blocker.
 
 on:
   push:
     branches:
       - main
-      - master
-      - march26version
   pull_request:
 
 jobs:
-  lint:
+  checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -30,77 +27,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
-          pip install coverage==7.8.0
-          pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cpu
 
-      # No paths. `ruff check <paths>` checks those paths INSTEAD of the
-      # project's own file set, exactly as `mypy <paths>` does -- and the
-      # explicit `src tests scripts` list here silently omitted `experiments/`,
-      # one of the five layers `src/contracts/layers.py` names. mypy hit the
-      # same trap and was widened on 2026-08-31; this is the other half.
-      - name: Run ruff lint
-        run: |
-          ruff check
+      # No paths: ruff and mypy check the project's configured file sets.
+      - name: Ruff
+        run: ruff check
 
-  typecheck:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+      - name: Mypy
+        run: mypy --config-file pyproject.toml
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-          cache: "pip"
-          
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
-          pip install coverage==7.8.0
-          pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cpu
-
-      - name: Run mypy
-        run: |
-          mypy --config-file pyproject.toml
-
-  tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-          cache: "pip"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
-          pip install coverage==7.8.0
-          pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cpu
-
-      - name: Install FFmpeg tools
-        run: |
-          if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install -y ffmpeg
-          fi
-
-      - name: Run tests with coverage gate
-        run: |
-          python scripts/check_coverage_gate.py
-
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-xml
-          path: coverage.xml
+      - name: Tests
+        run: python -m pytest

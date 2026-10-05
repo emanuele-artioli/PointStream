@@ -21,6 +21,7 @@ from typing import Any, Protocol
 from collections.abc import Sequence
 
 from src.segmentation.masks import ClipMasks, Instance
+from src.segmentation.storage import datasets_root
 
 DOMAINS_YAML = Path(__file__).with_name("domains.yaml")
 YOLOE_SIZES = ("n", "s", "m", "l", "x")
@@ -84,18 +85,6 @@ class Domain:
         if missing:
             raise FileNotFoundError(f"domain {self.name!r} clips are not on disk: {missing}")
         return paths
-
-
-def datasets_root() -> Path:
-    """Raw source datasets: ``PS_DATASETS_ROOT``, else ``~/Datasets``.
-
-    Not `paths.data_root()`, which names PointStream's own assets/outputs tree
-    (``Datasets/pointstream-data`` on the fleet).
-    """
-    import os
-
-    override = os.environ.get("PS_DATASETS_ROOT", "").strip()
-    return Path(override).expanduser() if override else Path.home() / "Datasets"
 
 
 def domain_names(path: Path = DOMAINS_YAML) -> tuple[str, ...]:
