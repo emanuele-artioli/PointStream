@@ -348,6 +348,7 @@ def cmd_sheet(args: argparse.Namespace) -> int:
     from src.segmentation.sources import iter_frames
 
     runs = [ClipMasks.load(path) for path in args.runs]
+    labels = dict(zip(args.runs, args.labels.split(","))) if args.labels else {}
     wanted = sorted(int(v) for v in args.frames.split(","))
     rows = []
     for index, frame in enumerate(iter_frames(args.source, wanted[-1] + 1)):
@@ -358,7 +359,7 @@ def cmd_sheet(args: argparse.Namespace) -> int:
             tile = overlay(frame, masks, index) if index < len(masks) else frame.copy()
             scale = args.width / tile.shape[1]
             tile = cv2.resize(tile, (args.width, round(tile.shape[0] * scale)))
-            label = f"{masks.meta.get('backend') or path.name}  f{index}"
+            label = f"{labels.get(path) or masks.meta.get('backend') or path.name}  f{index}"
             cv2.putText(tile, label, (8, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
             tiles.append(tile)
         rows.append(np.hstack(tiles))
@@ -451,6 +452,7 @@ def parser() -> argparse.ArgumentParser:
     sheet.add_argument("--runs", type=Path, nargs="+", required=True, help="run directories")
     sheet.add_argument("--frames", default="0,50,100", help="comma-separated frame indices")
     sheet.add_argument("--width", type=int, default=480, help="tile width in pixels")
+    sheet.add_argument("--labels", help="comma-separated tile labels, one per run")
     sheet.add_argument("--out", type=Path, required=True)
     sheet.set_defaults(func=cmd_sheet)
     return root
