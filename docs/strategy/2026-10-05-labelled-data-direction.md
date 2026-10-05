@@ -170,5 +170,10 @@ the players on `djokovic_zverev_004`, the slowest and largest clip). Not
 inspected visually, because this basis is superseded; do not cite.
 
 Egocentric: in the 16-frame smoke, YOLOE with "arm"/"hand" prompts produced no
-masks and SAM 3.1 found hands but no arms. The full egocentric report is in the
-job directory at `full/egocentric/report.json`.
+masks and SAM 3.1 found hands but no arms. Full run (1,200 frames; SAM 3.1 at
+345–364 ms/frame, ~28 GiB peak; no backend failures):
+
+| Backend | J | F | recall | precision | flicker | ms/frame |
+|---|---|---|---|---|---|---|
+| YOLOE-26n | 0.15 | 0.18 | 0.17 | 0.28 | 0.20 | 35 |
+| YOLOE-26x | 0.18 | 0.23 | 0.22 | 0.31 | 0.17 | 90 |
