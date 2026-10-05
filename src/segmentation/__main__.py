@@ -6,6 +6,7 @@
     python -m src.segmentation suite   --domain tennis --backends sam31,yoloe-26n,... --out ROOT
     python -m src.segmentation export  --masks DIR --out PNG_DIR [--kind foreground|labels]
     python -m src.segmentation preview --source clip.mp4 --masks DIR --out overlay.mp4
+    python -m src.segmentation sheet   --source clip.mp4 --runs ROOT/sam31/CLIP ROOT/yoloe-26x/CLIP --out sheet.png
 
 A run directory holds ``masks.rle`` (lossless instance masks) and
 ``provenance.json``. A dataset root holds one run directory per clip. Without
@@ -311,6 +312,17 @@ def cmd_export(args: argparse.Namespace) -> int:
 PALETTE_BGR = ((0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 0, 255), (255, 255, 0))
 
 
+def overlay(frame: Any, masks: ClipMasks, index: int) -> Any:
+    """The frame with each class tinted in its palette colour (BGR)."""
+    import cv2
+
+    labels = masks.labels(index)
+    tinted = frame.copy()
+    for code, _name in enumerate(masks.classes, start=1):
+        tinted[labels == code] = PALETTE_BGR[(code - 1) % len(PALETTE_BGR)]
+    return cv2.addWeighted(frame, 0.5, tinted, 0.5, 0)
+
+
 def cmd_preview(args: argparse.Namespace) -> int:
     import cv2
 
@@ -322,13 +334,36 @@ def cmd_preview(args: argparse.Namespace) -> int:
     )
     try:
         for index, frame in enumerate(iter_frames(args.source, len(masks))):
-            labels = masks.labels(index)
-            overlay = frame.copy()
-            for code, _name in enumerate(masks.classes, start=1):
-                overlay[labels == code] = PALETTE_BGR[(code - 1) % len(PALETTE_BGR)]
-            writer.write(cv2.addWeighted(frame, 0.5, overlay, 0.5, 0))
+            writer.write(overlay(frame, masks, index))
     finally:
         writer.release()
+    return 0
+
+
+def cmd_sheet(args: argparse.Namespace) -> int:
+    """One row per frame, one column per run: a visual check of backends against SAM 3.1."""
+    import cv2
+    import numpy as np
+
+    from src.segmentation.sources import iter_frames
+
+    runs = [ClipMasks.load(path) for path in args.runs]
+    wanted = sorted(int(v) for v in args.frames.split(","))
+    rows = []
+    for index, frame in enumerate(iter_frames(args.source, wanted[-1] + 1)):
+        if index not in wanted:
+            continue
+        tiles = []
+        for path, masks in zip(args.runs, runs):
+            tile = overlay(frame, masks, index) if index < len(masks) else frame.copy()
+            scale = args.width / tile.shape[1]
+            tile = cv2.resize(tile, (args.width, round(tile.shape[0] * scale)))
+            label = f"{masks.meta.get('backend') or path.name}  f{index}"
+            cv2.putText(tile, label, (8, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+            tiles.append(tile)
+        rows.append(np.hstack(tiles))
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(args.out), np.vstack(rows))
     return 0
 
 
@@ -410,6 +445,14 @@ def parser() -> argparse.ArgumentParser:
     preview.add_argument("--masks", type=Path, required=True)
     preview.add_argument("--out", type=Path, required=True)
     preview.set_defaults(func=cmd_preview)
+
+    sheet = sub.add_parser("sheet", help="contact sheet comparing runs on chosen frames")
+    sheet.add_argument("--source", type=Path, required=True)
+    sheet.add_argument("--runs", type=Path, nargs="+", required=True, help="run directories")
+    sheet.add_argument("--frames", default="0,50,100", help="comma-separated frame indices")
+    sheet.add_argument("--width", type=int, default=480, help="tile width in pixels")
+    sheet.add_argument("--out", type=Path, required=True)
+    sheet.set_defaults(func=cmd_sheet)
     return root
 
 

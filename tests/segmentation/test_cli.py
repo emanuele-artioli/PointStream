@@ -80,3 +80,38 @@ def test_suite_runs_every_backend_then_benchmarks_and_validates(
 def test_scene_numbered_clips_keep_their_match_name() -> None:
     assert cli.clip_id(Path("tennis_games/alcaraz_hurkacz/000.mp4")) == "alcaraz_hurkacz_000"
     assert cli.clip_id(Path("curated/clip_01_factory001.mp4")) == "clip_01_factory001"
+
+
+def test_sheet_tiles_runs_side_by_side(tmp_path: Path) -> None:
+    import cv2
+
+    frames = tmp_path / "frames"
+    frames.mkdir()
+    for index in range(3):
+        cv2.imwrite(str(frames / f"{index:03d}.png"), np.full((20, 40, 3), 30 * index, np.uint8))
+    runs = []
+    for name in ("sam31", "yoloe-26n"):
+        masks = _FakeBackend(name).segment(frames, cli.load_domain("tennis"), max_frames=3)
+        masks.width = 40  # the fake backend draws 20x20; the frames are 20x40
+        masks.frames = [[] for _ in range(3)]
+        runs.append(masks.save(tmp_path / name).parent)
+    out = tmp_path / "sheet.png"
+    assert (
+        cli.main(
+            [
+                "sheet",
+                "--source",
+                str(frames),
+                "--runs",
+                *map(str, runs),
+                "--frames",
+                "0,2",
+                "--width",
+                "80",
+                "--out",
+                str(out),
+            ]
+        )
+        == 0
+    )
+    assert cv2.imread(str(out)).shape == (2 * 40, 2 * 80, 3)
