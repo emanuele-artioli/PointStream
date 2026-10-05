@@ -647,6 +647,7 @@
                 </div>
             </div>
 
+            <p id="media-error" role="alert" hidden>Unable to load the selected videos. Reload, or try a browser with native AV1 playback support.</p>
             <div class="maps-empty" id="maps-empty" hidden></div>
             <div class="skipped-list" id="maps-skipped"></div>
         </div>
@@ -858,14 +859,16 @@
                 isEmptyStream(rightKey) ? loadVideo(videoB, '') : loadVideo(videoB, streamFile(currentClipId, rightKey)),
                 loadVideo(videoC, streamFile(currentClipId, 'ref')),
             ]).then(() => {
+                document.getElementById('media-error').hidden = true;
                 syncFromMaster();
                 updateBundleHud();
                 redrawCanvas();
-            }).catch(err => console.error(err));
+            }).catch(err => { document.getElementById('media-error').hidden = false; console.error(err); });
         }
 
         function selectClip(clipId) {
             currentClipId = clipId;
+            keypointsData = null;
             ['clip1', 'clip2', 'clip3'].forEach(id => {
                 const btn = document.getElementById('btn-' + id);
                 btn.className = (id === CLIP_BTN[clipId]) ? 'btn active' : 'btn';
@@ -883,7 +886,7 @@
             loadCurrentStreams();
             fetch(info.keypoints)
                 .then(r => r.json())
-                .then(data => { keypointsData = data; redrawCanvas(); })
+                .then(data => { if (currentClipId === clipId) { keypointsData = data; redrawCanvas(); } })
                 .catch(e => { console.warn("Keypoints JSON load warning:", e); keypointsData = null; });
             mapsClipId = clipId;
             if (mapsIndex) renderMapsOverlays();
@@ -1159,6 +1162,15 @@
             const rightKey = codecKey('right');
             const leftEmpty = isEmptyStream(leftKey);
             const rightEmpty = isEmptyStream(rightKey);
+
+            if ((!leftEmpty && videoA.readyState < 2) || (!rightEmpty && videoB.readyState < 2)) {
+                ctx.fillStyle = '#05070d';
+                ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '24px sans-serif';
+                ctx.fillText('Loading selected videos…', 32, 48);
+                return;
+            }
 
             if (currentMode === 'split') {
                 const splitX = Math.round(w * splitFraction);
