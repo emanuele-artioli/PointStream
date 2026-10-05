@@ -22,6 +22,7 @@ def main() -> None:
     parser.add_argument("--family", choices=FAMILIES, required=True)
     parser.add_argument("--frames", type=int, required=True)
     parser.add_argument("--validate", action="store_true")
+    parser.add_argument("--dinov3-repo", type=Path)
     args = parser.parse_args()
     manifest = load_clip_manifest(args.source_manifest)
     stage = Path(os.environ["PS_STAGE_DIR"])
@@ -70,6 +71,9 @@ def main() -> None:
     elif args.family == "yoloe":
         weights = [require("yoloe26_seg"), require("mobileclip2")]
     elif args.family == "dino":
+        if args.dinov3_repo is None or not (args.dinov3_repo / "hubconf.py").is_file():
+            raise RuntimeError("explicit local DINOv3 repository required")
+        os.environ["DINOV3_REPO"] = str(args.dinov3_repo)
         weights = [require("dinov3_vits")]
     elif args.family == "rtmpose":
         cache = Path("/home/itec/emanuele/.cache/rtmlib/hub/checkpoints")
@@ -98,6 +102,8 @@ def main() -> None:
         },
         "clips": {},
     }
+    if args.family == "dino":
+        report["model_code"] = model_code_identity(args.dinov3_repo)
     (stage / "mask-report.json").write_text(json.dumps(report, indent=2))
     for clip in manifest.clips:
         start = time.monotonic()
@@ -181,6 +187,18 @@ def main() -> None:
     validate(report, stage, manifest=manifest, family=args.family)
 
 
+def model_code_identity(path: Path) -> dict:
+    revision = subprocess.check_output(
+        ["git", "-C", str(path), "rev-parse", "HEAD"], text=True, timeout=30
+    ).strip()
+    dirty = subprocess.check_output(
+        ["git", "-C", str(path), "status", "--porcelain"], text=True, timeout=90
+    )
+    if dirty:
+        raise ValueError("DINOv3 model repository must be clean")
+    return {"path": str(path), "revision": revision}
+
+
 def validate(report: dict, stage: Path, *, manifest=None, family: str | None = None) -> None:
     if report.get("status") != "complete" or set(report.get("clips", {})) != {
         "clip_01",
@@ -199,6 +217,10 @@ def validate(report: dict, stage: Path, *, manifest=None, family: str | None = N
             identity = report["clips"][clip.clip_id]["source_identity"]
             if identity["path"] != str(clip.path) or identity["sha256"] != clip.sha256:
                 raise ValueError("wrong selected mask source")
+    if report["family"] == "dino":
+        identity = report["model_code"]
+        if model_code_identity(Path(identity["path"])) != identity:
+            raise ValueError("DINOv3 model code identity changed")
     for identity in report["weights"]:
         if file_sha256(Path(identity["path"]), timeout=90) != identity["sha256"]:
             raise ValueError("mask checkpoint identity changed")
