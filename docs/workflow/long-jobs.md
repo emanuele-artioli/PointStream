@@ -143,6 +143,14 @@ never transfer the entire dirty checkout. Submission is published only after its
 snapshot and specification are complete. Source/spec changes after smoke block
 promotion. Full runs are not accessible through the old unrestricted `fleet launch`.
 
+If submission reports `submission_unknown` during source transfer, retain the
+original job ID and specification. `scripts/ps-fleet reconcile JOB SPEC` proves
+that the received archive and extracted tree match exactly, extraction processes
+have ended, and no request has been published or owned. Only after that proof,
+`reconcile JOB SPEC --publish` finishes publication of the same request. It never
+extracts again, starts a replacement, takes a claim, or replays child execution.
+Published/owned requests require ordinary durable-status reconciliation instead.
+
 ## Monitoring from the submitting chat
 
 When an agent submits work, pass `--chat-id CHAT_ID` (defaults to CODEX_THREAD_ID

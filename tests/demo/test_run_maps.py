@@ -317,12 +317,13 @@ def test_inspector_stays_default_tab() -> None:
     assert 'id="tab-inspector" class="tab-content active"' in html
     assert 'data-tab="maps"' not in html
     assert "lpips" not in html[html.index("tab-inspector") : html.index("tab-benchmark")].lower()
-    assert "payload_kbps" in html
+    assert "preview_kbps" in html
     inspector = html[html.index("tab-inspector") : html.index("tab-benchmark")]
     assert "av1_240" in inspector or "AV1 240p" in inspector
     assert "compare-board" not in html
     assert "STREAM_LATENCY_MS" in html
-    assert "18.4" in html
+    assert "window.DEMO_RELEASE" in html
+    assert "18.4" not in html
     assert "value=\"empty\"" in inspector
     assert "Stacked 3-Panel" not in inspector
     assert "47-Byte Skeleton Telemetry" not in inspector

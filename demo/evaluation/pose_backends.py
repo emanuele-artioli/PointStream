@@ -7,6 +7,7 @@ whole-body stay registered so ablations can still call them.
 from __future__ import annotations
 
 import logging
+import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -81,7 +82,9 @@ def extract_mediapipe_live(video_path: Path, max_frames: int | None = None) -> l
     return extract_video_hand_poses(video_path, max_frames=max_frames, smooth=True)
 
 
-def extract_mediapipe_offline_gt(video_path: Path, max_frames: int | None = None) -> list[FrameHandPose]:
+def extract_mediapipe_offline_gt(
+    video_path: Path, max_frames: int | None = None
+) -> list[FrameHandPose]:
     """Denser MediaPipe pass: video mode, lower det threshold, no 1-Euro smoothing.
 
     ``static_image_mode=True`` and ``model_complexity=2`` abort this Mediapipe
@@ -130,7 +133,17 @@ def extract_rtm_hand(video_path: Path, max_frames: int | None = None) -> list[Fr
         device = "cpu"
         if _cuda_onnx_ok():
             device = "cuda"
-        _RTM_HAND = Hand(mode="lightweight", to_openpose=False, backend="onnxruntime", device=device)
+        local_weights = {name: os.environ.get("PS_RTM_" + name.upper()) for name in ("det", "pose")}
+        if any(local_weights.values()):
+            if not all(value and Path(value).is_file() for value in local_weights.values()):
+                raise FileNotFoundError("both explicit RTM detector and pose weights are required")
+        _RTM_HAND = Hand(
+            mode="lightweight",
+            to_openpose=False,
+            backend="onnxruntime",
+            device=device,
+            **{key: value for key, value in local_weights.items() if value},
+        )
     model = _RTM_HAND
     frames = read_video_frames_robust(video_path, max_frames=max_frames)
     poses: list[FrameHandPose] = []
@@ -150,7 +163,9 @@ def extract_rtm_hand(video_path: Path, max_frames: int | None = None) -> list[Fr
         for hand_i, pts in enumerate(kpts):
             if pts.shape[0] < 21:
                 continue
-            conf = float(np.mean(scores[hand_i][:21])) if scores.ndim >= 2 else float(np.mean(scores))
+            conf = (
+                float(np.mean(scores[hand_i][:21])) if scores.ndim >= 2 else float(np.mean(scores))
+            )
             if conf < 0.25:
                 continue
             xs = pts[:21, 0]
@@ -176,12 +191,21 @@ def extract_rtm_hand(video_path: Path, max_frames: int | None = None) -> list[Fr
             )
         poses.append(FrameHandPose(frame_idx=idx, hands=hands))
         if idx % 50 == 0:
-            logger.info("%s rtm frame %s/%s hands=%s", video_path.name, idx, len(frames), len(hands))
-    logger.info("%s: %s rtm hands over %s frames", video_path.name, sum(len(p.hands) for p in poses), len(poses))
+            logger.info(
+                "%s rtm frame %s/%s hands=%s", video_path.name, idx, len(frames), len(hands)
+            )
+    logger.info(
+        "%s: %s rtm hands over %s frames",
+        video_path.name,
+        sum(len(p.hands) for p in poses),
+        len(poses),
+    )
     return poses
 
 
-def extract_rtm_wholebody_hands(video_path: Path, max_frames: int | None = None) -> list[FrameHandPose]:
+def extract_rtm_wholebody_hands(
+    video_path: Path, max_frames: int | None = None
+) -> list[FrameHandPose]:
     """Second independent judge: RTMPose whole-body, last 42 COCO-WholeBody hand joints."""
     global _RTM_WB
     try:
@@ -193,7 +217,9 @@ def extract_rtm_wholebody_hands(video_path: Path, max_frames: int | None = None)
 
     if "_RTM_WB" not in globals() or globals().get("_RTM_WB") is None:
         device = "cuda" if _cuda_onnx_ok() else "cpu"
-        globals()["_RTM_WB"] = Wholebody(mode="lightweight", to_openpose=False, backend="onnxruntime", device=device)
+        globals()["_RTM_WB"] = Wholebody(
+            mode="lightweight", to_openpose=False, backend="onnxruntime", device=device
+        )
     model = globals()["_RTM_WB"]
     frames = read_video_frames_robust(video_path, max_frames=max_frames)
     poses: list[FrameHandPose] = []
@@ -234,7 +260,9 @@ def extract_rtm_wholebody_hands(video_path: Path, max_frames: int | None = None)
             hands.append(SingleHand(side, conf, [x1, y1, x2, y2], lms_nm, lms_px))
         poses.append(FrameHandPose(frame_idx=idx, hands=hands))
         if idx % 50 == 0:
-            logger.info("%s wholebody frame %s/%s hands=%s", video_path.name, idx, len(frames), len(hands))
+            logger.info(
+                "%s wholebody frame %s/%s hands=%s", video_path.name, idx, len(frames), len(hands)
+            )
     return poses
 
 
@@ -340,10 +368,15 @@ def _get_dwpose_wholebody():
 
 def extract_dwpose_hands(video_path: Path, max_frames: int | None = None) -> list[FrameHandPose]:
     """DW-Pose hands in the same FrameHandPose the generator and the compressor use."""
-    return [wholebody_to_frame_hands(frame) for frame in extract_dwpose_wholebody(video_path, max_frames)]
+    return [
+        wholebody_to_frame_hands(frame)
+        for frame in extract_dwpose_wholebody(video_path, max_frames)
+    ]
 
 
-def extract_dwpose_wholebody(video_path: Path, max_frames: int | None = None) -> list[FrameWholeBody]:
+def extract_dwpose_wholebody(
+    video_path: Path, max_frames: int | None = None
+) -> list[FrameWholeBody]:
     """DWPose via rtmlib Wholebody; returns body 0:17, feet 17:23, face 23:91, hands 91:133.
 
     Keypoints are One-Euro smoothed across frames. The pose network stays at
@@ -374,7 +407,9 @@ def extract_dwpose_wholebody(video_path: Path, max_frames: int | None = None) ->
         people = smoother.smooth(people_from_rtm(kpts, scores), idx, fps)
         poses.append(FrameWholeBody(frame_idx=idx, people=people, width=w, height=h))
         if idx % 50 == 0:
-            logger.info("%s dwpose frame %s/%s people=%s", video_path.name, idx, len(frames), len(people))
+            logger.info(
+                "%s dwpose frame %s/%s people=%s", video_path.name, idx, len(frames), len(people)
+            )
     return poses
 
 
@@ -490,7 +525,9 @@ class WholeBodyEuroSmoother:
         frame_idx: int,
         fps: float = 30.0,
     ) -> list[WholeBodyPerson]:
-        self._tracks = [track for track in self._tracks if frame_idx - int(track["last"]) <= self.gap]
+        self._tracks = [
+            track for track in self._tracks if frame_idx - int(track["last"]) <= self.gap
+        ]
         used: set[int] = set()
         smoothed: list[WholeBodyPerson] = []
         for person in people:
@@ -521,7 +558,9 @@ class WholeBodyEuroSmoother:
             smoothed.append(WholeBodyPerson(keypoints=keypoints))
         return smoothed
 
-    def _apply(self, track: dict[str, Any], keypoints: np.ndarray, frame_idx: int, fps: float) -> np.ndarray:
+    def _apply(
+        self, track: dict[str, Any], keypoints: np.ndarray, frame_idx: int, fps: float
+    ) -> np.ndarray:
         out = np.array(keypoints, dtype=np.float32, copy=True)
         t = frame_idx / max(fps, 1e-3)
         for joint in range(min(133, out.shape[0])):
@@ -559,9 +598,14 @@ def _run_mediapipe_video(
         if trajectory_filter is not None and pose.hands:
             pose = FrameHandPose(
                 frame_idx=frame_idx,
-                hands=[trajectory_filter.filter_hand(h, frame_idx=frame_idx, fps=30.0) for h in pose.hands],
+                hands=[
+                    trajectory_filter.filter_hand(h, frame_idx=frame_idx, fps=30.0)
+                    for h in pose.hands
+                ],
             )
         poses.append(pose)
     estimator.close()
-    logger.info("%s: %s hands over %s frames", video_path.name, sum(len(p.hands) for p in poses), len(poses))
+    logger.info(
+        "%s: %s hands over %s frames", video_path.name, sum(len(p.hands) for p in poses), len(poses)
+    )
     return poses

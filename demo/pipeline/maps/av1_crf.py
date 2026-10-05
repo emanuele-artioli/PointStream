@@ -50,6 +50,14 @@ def av1_output_args(scale: str | None = AV1_SCALE) -> list[str]:
             AV1_PIX_FMT,
         ]
     )
+    import os
+
+    threads = os.environ.get("PS_NATIVE_THREADS")
+    if threads is not None:
+        count = int(threads)
+        if count < 1 or count > 64:
+            raise ValueError("PS_NATIVE_THREADS must be between 1 and 64")
+        args.extend(["-threads", str(count), "-svtav1-params", f"lp={count}"])
     return args
 
 
@@ -119,4 +127,6 @@ def pipe_bgr_av1(
         *av1_output_args(scale),
         str(dest),
     ]
-    return subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return subprocess.Popen(
+        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )

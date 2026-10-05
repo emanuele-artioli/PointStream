@@ -43,11 +43,11 @@ jobs:
       - name: Install plot dependencies
         run: pip install matplotlib
 
-      - name: Assemble public demo from comparison_results.json
-        run: PYTHONPATH=. python demo/pitch/publish_site.py
+      - name: Verify and assemble the complete demo release
+        run: PYTHONPATH=. python demo/pitch/publish_site.py --out "$RUNNER_TEMP/pointstream-pages"
 
       - name: Disable Jekyll
-        run: touch demo/outputs/pitch/.nojekyll
+        run: touch "$RUNNER_TEMP/pointstream-pages/.nojekyll"
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -55,7 +55,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: demo/outputs/pitch
+          path: ${{ runner.temp }}/pointstream-pages
 
       - name: Deploy to GitHub Pages
         id: deployment
