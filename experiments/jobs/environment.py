@@ -78,7 +78,7 @@ def pack(prefix: Path, output_dir: Path, work_dir: Path) -> dict[str, Any]:
         if package_state(prefix) != before:
             raise PackError("environment packages changed while packing; archive discarded")
         sha256 = _hash(partial)
-        manifest = {
+        manifest: dict[str, Any] = {
             "archive": f"{name}.tar.gz", "sha256": sha256, "bytes": partial.stat().st_size,
             "source_prefix": str(prefix), "host": socket.getfqdn(), "started": started.isoformat(),
             "finished": datetime.now(timezone.utc).isoformat(), "packages": before,
