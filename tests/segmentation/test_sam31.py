@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
+from PIL import Image
 
-from src.components.detection.geometry import Box
-from src.components.detection.types import Detection
-from src.components.segmentation.sam31 import (
+from src.segmentation.sam31 import (
+    Sam31Segmenter,
     Sam31SequenceSegmenter,
     _install_compatible_session_start,
 )
@@ -163,19 +165,54 @@ def test_sam31_propagation_preserves_the_tracker_id_for_each_object() -> None:
     assert propagated[0].tracker_id == 8
 
 
-def test_runtime_segment_adapter_uses_a_causal_prompt_and_skips_other_classes() -> None:
+def _jpeg_frames(folder: Path, count: int, size: tuple[int, int] = (6, 4)) -> Path:
+    folder.mkdir()
+    for index in range(count):
+        Image.new("RGB", size).save(folder / f"{index:05d}.jpg")
+    return folder
+
+
+def test_segment_frames_runs_one_text_session_per_class(tmp_path: Path) -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)
-    frame = np.zeros((4, 6, 3), dtype=np.uint8)
-    player = Detection("person", Box(0, 0, 6, 4), track_id="player-1")
-    mask = segmenter.segment(frame, player)
-    assert mask is not None and mask.shape == (4, 6)
-    request = next(item for item in predictor.requests if item["type"] == "add_prompt")
-    assert request["text"] == "tennis player"
-    assert predictor.requests[0]["type"] == "start_session"
-    ball = Detection("sports ball", Box(1, 1, 3, 3), track_id="ball-1")
-    assert segmenter.segment(frame, ball) is None
-    assert len([item for item in predictor.requests if item["type"] == "start_session"]) == 1
+    frames = _jpeg_frames(tmp_path / "frames", 2)
+
+    masks = segmenter.segment_frames(frames, {"arm": "arm", "hand": "hand"}, fps=25.0)
+
+    assert masks.classes == ("arm", "hand") and len(masks) == 2
+    assert (masks.height, masks.width, masks.fps) == (4, 6, 25.0)
+    assert [inst.class_name for inst in masks.frames[0]] == ["arm", "hand"]
+    assert masks.frames[1] == []  # nothing propagated there: empty, not a whole-frame fill
+    assert masks.frames[0][0].track_id == 8
+    prompts = [item["text"] for item in predictor.requests if item["type"] == "add_prompt"]
+    assert prompts == ["arm", "hand"]
+    starts = [item for item in predictor.requests if item["type"] == "start_session"]
+    closes = [item for item in predictor.requests if item["type"] == "close_session"]
+    assert len(starts) == len(closes) == 2
+    directions = [item["propagation_direction"] for item in predictor.requests if item["type"] == "propagate_in_video"]
+    assert directions == ["both", "both"]
+    assert segmenter.sessions == {}
+
+
+def test_segment_frames_runtime_policy_propagates_forward_and_shares_identical_prompts(tmp_path: Path) -> None:
+    predictor = _FakePredictor()
+    segmenter = Sam31SequenceSegmenter(predictor=predictor)
+    frames = _jpeg_frames(tmp_path / "frames", 1)
+
+    masks = segmenter.segment_frames(frames, {"player": "person", "body": "person"}, policy="runtime_causal")
+
+    assert [inst.class_name for inst in masks.frames[0]] == ["player", "body"]
+    assert len([item for item in predictor.requests if item["type"] == "add_prompt"]) == 1
+    assert [item["propagation_direction"] for item in predictor.requests if item["type"] == "propagate_in_video"] == ["forward"]
+
+
+def test_front_end_runs_the_worker_under_the_sam_interpreter(tmp_path: Path) -> None:
+    front = Sam31Segmenter(python=tmp_path / "py", checkpoint=tmp_path / "ckpt.pt")
+    command = front.worker_command(tmp_path / "f", tmp_path / "r.json", tmp_path / "o")
+    assert command[:3] == [str(tmp_path / "py"), "-m", "src.segmentation.sam31"]
+    assert front.source_revision == "2345a4ad109ac29c569da749c91d84f10dc08c40"
+    with pytest.raises(FileNotFoundError, match="SAM31_CHECKPOINT"):
+        front.segment(tmp_path / "clip.mp4", None)
 
 
 def test_verified_predictor_session_initializer_signature_is_compatible() -> None:
@@ -215,7 +252,7 @@ def test_verified_predictor_session_initializer_signature_is_compatible() -> Non
 def test_older_cuda_uses_efficient_then_math_sdpa_fallback() -> None:
     from types import SimpleNamespace
 
-    from src.components.segmentation.sam31 import _configure_sdpa_backend
+    from src.segmentation.sam31 import _configure_sdpa_backend
 
     calls: list[tuple[object, bool]] = []
 
@@ -246,7 +283,7 @@ def test_older_cuda_uses_efficient_then_math_sdpa_fallback() -> None:
 def test_ampere_or_newer_keeps_native_flash_sdpa() -> None:
     from types import SimpleNamespace
 
-    from src.components.segmentation.sam31 import _configure_sdpa_backend
+    from src.segmentation.sam31 import _configure_sdpa_backend
 
     def original(selected: object, set_priority: bool = False) -> tuple[object, bool]:
         return selected, set_priority
