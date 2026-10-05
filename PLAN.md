@@ -4,6 +4,8 @@ Research thesis, evidence boundaries, and proposed next tests:
 [semantic codec thesis](docs/strategy/semantic-codec-thesis.md). This working
 note does not change the active evaluation gate below.
 
+**Direction since 5 October 2026:** [labelled-data direction](docs/strategy/2026-10-05-labelled-data-direction.md) — racket sports + egocentric hand-object video on labelled datasets; it supersedes the unlabelled evaluation basis below.
+
 Current coordination: **24 September 2026**.
 Start with the [24 September foreground campaign](docs/workflow/session/evaluation-campaign/20260924-foreground-campaign.md).
 The September 17 roadblock, the 20 September evidence freeze, and the older
