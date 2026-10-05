@@ -652,6 +652,14 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     extra = extra_from_features(patch_maps)
+    import torch
+
+    extra["environment"] = {
+        "python": sys.executable,
+        "torch": torch.__version__,
+        "torch_cuda": torch.version.cuda,
+        "opencv": cv2.__version__,
+    }
     extra["load_source"] = load_source
     extra["image_size"] = image_size
     extra["n_register_tokens"] = _n_register_tokens(model)

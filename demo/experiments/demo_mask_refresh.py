@@ -23,6 +23,11 @@ def main() -> None:
     parser.add_argument("--frames", type=int, required=True)
     parser.add_argument("--validate", action="store_true")
     parser.add_argument("--dinov3-repo", type=Path)
+    parser.add_argument(
+        "--inference-python",
+        type=Path,
+        help="Explicit compatible DINO runtime; never an automatic fallback",
+    )
     args = parser.parse_args()
     manifest = load_clip_manifest(args.source_manifest)
     stage = Path(os.environ["PS_STAGE_DIR"])
@@ -142,15 +147,22 @@ def main() -> None:
                 prompts_override={"hand": "hand", "tool": "tool", "workbench": "workbench"},
             )
         elif args.family == "dino":
-            from demo.pipeline.maps import dinov3_features
-
-            if (
-                dinov3_features.main(
-                    ["--clip", str(source), "--out", str(work / "dino"), "--max-frames", str(count)]
-                )
-                != 0
-            ):
-                raise RuntimeError("DINOv3 extraction failed")
+            if args.inference_python is None or not args.inference_python.is_file():
+                raise RuntimeError("explicit compatible DINO inference interpreter required")
+            subprocess.run(
+                [
+                    str(args.inference_python),
+                    "-m",
+                    "demo.pipeline.maps.dinov3_features",
+                    "--clip",
+                    str(source),
+                    "--out",
+                    str(work / "dino"),
+                    "--max-frames",
+                    str(count),
+                ],
+                check=True,
+            )
             png = work / "dino/preview_pca"
         else:
             from demo.evaluation.pose_backends import BACKENDS
