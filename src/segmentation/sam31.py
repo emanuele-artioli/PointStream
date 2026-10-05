@@ -165,8 +165,12 @@ class Sam31SequenceSegmenter:
             raise ValueError("SAM3.1 object capacities must be positive")
         self.checkpoint_path = _path_from(checkpoint_path, "SAM31_CHECKPOINT")
         self.source_root = _path_from(source_root, "SAM31_SOURCE_ROOT")
-        self.source_revision = source_revision or os.environ.get("SAM31_SOURCE_REVISION", "").strip()
-        self.expected_checkpoint_sha256 = checkpoint_sha256 or os.environ.get("SAM31_CHECKPOINT_SHA256", "").strip()
+        self.source_revision = (
+            source_revision or os.environ.get("SAM31_SOURCE_REVISION", "").strip()
+        )
+        self.expected_checkpoint_sha256 = (
+            checkpoint_sha256 or os.environ.get("SAM31_CHECKPOINT_SHA256", "").strip()
+        )
         self.prob_threshold = float(prob_threshold)
         self.max_num_objects = int(max_num_objects)
         self.multiplex_count = int(multiplex_count)
@@ -204,7 +208,9 @@ class Sam31SequenceSegmenter:
                 [*git, "rev-parse", "HEAD"], check=True, capture_output=True, text=True, timeout=300
             ).stdout.strip()
         except (OSError, subprocess.SubprocessError) as exc:
-            raise RuntimeError(f"Cannot read the SAM 3.1 source revision at {self.source_root}") from exc
+            raise RuntimeError(
+                f"Cannot read the SAM 3.1 source revision at {self.source_root}"
+            ) from exc
         if actual_revision != self.source_revision:
             raise RuntimeError(
                 f"SAM31_SOURCE_REVISION={self.source_revision!r} does not match checkout HEAD {actual_revision!r}"
@@ -239,7 +245,9 @@ class Sam31SequenceSegmenter:
             try:
                 from sam3.model_builder import build_sam3_multiplex_video_predictor
             except ImportError as exc:
-                raise RuntimeError("Pinned SAM 3.1 checkout lacks build_sam3_multiplex_video_predictor") from exc
+                raise RuntimeError(
+                    "Pinned SAM 3.1 checkout lacks build_sam3_multiplex_video_predictor"
+                ) from exc
             builder = build_sam3_multiplex_video_predictor
         assert self.checkpoint_path is not None
         options: dict[str, Any] = {
@@ -277,7 +285,9 @@ class Sam31SequenceSegmenter:
         # The fallback is provenance-relevant only where it changes execution.
         if self.sdpa_backend_policy == "efficient_then_math_fallback":
             config["sdpa_backend_policy"] = self.sdpa_backend_policy
-        config_hash = hashlib.sha256(json.dumps(config, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        config_hash = hashlib.sha256(
+            json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
         return EstimatorProvenance(
             name="sam3.1_multiplex",
             model_revision=revision,
@@ -356,29 +366,39 @@ class Sam31SequenceSegmenter:
             x0, y0, x1, y1 = map(float, bbox)
             if x1 <= x0 or y1 <= y0:
                 raise ValueError("SAM3.1 box prompt must have positive width and height")
-            request["bounding_boxes"] = [[
-                (x0 + x1) / (2 * session.frame_width),
-                (y0 + y1) / (2 * session.frame_height),
-                (x1 - x0) / session.frame_width,
-                (y1 - y0) / session.frame_height,
-            ]]
+            request["bounding_boxes"] = [
+                [
+                    (x0 + x1) / (2 * session.frame_width),
+                    (y0 + y1) / (2 * session.frame_height),
+                    (x1 - x0) / session.frame_width,
+                    (y1 - y0) / session.frame_height,
+                ]
+            ]
             request["bounding_box_labels"] = [1]
         if points:
-            request["points"] = [[float(x) / session.frame_width, float(y) / session.frame_height] for x, y in points]
+            request["points"] = [
+                [float(x) / session.frame_width, float(y) / session.frame_height] for x, y in points
+            ]
             request["point_labels"] = list(point_labels or [1] * len(points))
             request["obj_id"] = tracker_id
         response = self._require_predictor().handle_request(request)
-        masks = _unpack_outputs(response.get("outputs", {}), session.frame_height, session.frame_width)
+        masks = _unpack_outputs(
+            response.get("outputs", {}), session.frame_height, session.frame_width
+        )
         if not masks:
             session.expected_objects.add(object_id)
-        target_index = _prompt_target_index(masks, bbox=bbox, points=points, point_labels=point_labels)
+        target_index = _prompt_target_index(
+            masks, bbox=bbox, points=points, point_labels=point_labels
+        )
         observations: list[MaskObservation] = []
         for index, (tracker, mask, score) in enumerate(masks):
             assigned_id = object_id if index == target_index else f"{role}:{tracker}"
             session.expected_objects.add(assigned_id)
             session.tracker_to_object[tracker] = assigned_id
             session.object_to_tracker[assigned_id] = tracker
-            observations.append(MaskObservation(role, assigned_id, tracker, frame_index, mask, score))
+            observations.append(
+                MaskObservation(role, assigned_id, tracker, frame_index, mask, score)
+            )
         if not observations:
             observations.append(
                 MaskObservation(
@@ -466,7 +486,9 @@ class Sam31SequenceSegmenter:
                         frame_index,
                         result[0] if result is not None else None,
                         result[1] if result is not None else None,
-                        status=ObservationStatus.OBSERVED if result is not None else ObservationStatus.MISSING,
+                        status=ObservationStatus.OBSERVED
+                        if result is not None
+                        else ObservationStatus.MISSING,
                         reason=None if result is not None else "propagation_missing_frame_object",
                     )
                 )
@@ -475,7 +497,9 @@ class Sam31SequenceSegmenter:
     def close_session(self, role: Role, *, session_key: str = "default") -> None:
         session = self.sessions.pop((role, _session_key(session_key)), None)
         if session is not None:
-            self._require_predictor().handle_request({"type": "close_session", "session_id": session.session_id})
+            self._require_predictor().handle_request(
+                {"type": "close_session", "session_id": session.session_id}
+            )
 
     def segment_frames(
         self,
@@ -506,9 +530,13 @@ class Sam31SequenceSegmenter:
                         clip.add(index, class_name, inst.track_id, inst.mask(), inst.score)
                 continue
             done[text] = class_name
-            self.start_session(class_name, frames_dir, frame_width=width, frame_height=height, policy=policy)
+            self.start_session(
+                class_name, frames_dir, frame_width=width, frame_height=height, policy=policy
+            )
             try:
-                self.add_prompt(class_name, frame_index=0, object_id=f"{class_name}:prompt", text=text)
+                self.add_prompt(
+                    class_name, frame_index=0, object_id=f"{class_name}:prompt", text=text
+                )
                 for frame, tracker, mask, score in self.iter_propagate(
                     class_name, policy=policy, direction=direction
                 ):
@@ -516,6 +544,12 @@ class Sam31SequenceSegmenter:
                         clip.add(frame, class_name, tracker, mask, 1.0 if score is None else score)
                     if on_frame is not None:
                         on_frame(class_name, frame)
+            except Exception as exc:
+                # The pinned predictor refuses to propagate a prompt that found
+                # nothing; that class is simply absent from this clip.
+                if "No points are provided" not in str(exc):
+                    raise
+                clip.meta.setdefault("empty_classes", []).append(class_name)
             finally:
                 self.close_session(class_name)
         return clip
@@ -525,10 +559,14 @@ class Sam31SequenceSegmenter:
         try:
             return self.sessions[(role, _session_key(session_key))]
         except KeyError as exc:
-            raise RuntimeError(f"SAM3.1 {role!r}/{session_key!r} session has not been started") from exc
+            raise RuntimeError(
+                f"SAM3.1 {role!r}/{session_key!r} session has not been started"
+            ) from exc
 
 
-def _unpack_outputs(outputs: Any, height: int, width: int) -> list[tuple[int, np.ndarray, float | None]]:
+def _unpack_outputs(
+    outputs: Any, height: int, width: int
+) -> list[tuple[int, np.ndarray, float | None]]:
     if not isinstance(outputs, dict):
         return []
     object_ids = outputs.get("out_obj_ids", [])
@@ -557,9 +595,14 @@ def _unpack_outputs(outputs: Any, height: int, width: int) -> list[tuple[int, np
     for index, (tracker, mask) in enumerate(zip(ids, masks_array)):
         binary = np.asarray(mask) > 0
         if binary.shape != (height, width):
-            binary = np.asarray(
-                Image.fromarray(binary.astype(np.uint8) * 255).resize((width, height), Image.Resampling.NEAREST)
-            ) > 0
+            binary = (
+                np.asarray(
+                    Image.fromarray(binary.astype(np.uint8) * 255).resize(
+                        (width, height), Image.Resampling.NEAREST
+                    )
+                )
+                > 0
+            )
         score = float(scores_array[index]) if index < len(scores_array) else None
         result.append((tracker, binary.astype(np.uint8), score))
     return result
@@ -652,7 +695,9 @@ def _install_compatible_session_start(predictor: Any) -> None:
         if hasattr(self, "video_loader_type"):
             init_kwargs["video_loader_type"] = self.video_loader_type
         valid = inspect.signature(self.model.init_state).parameters
-        state = self.model.init_state(**{key: value for key, value in init_kwargs.items() if key in valid})
+        state = self.model.init_state(
+            **{key: value for key, value in init_kwargs.items() if key in valid}
+        )
         identifier = session_id or uuid.uuid4().hex
         now = time.time()
         self._all_inference_states[identifier] = {
@@ -694,48 +739,78 @@ class Sam31Segmenter:
         self.source_root = Path(
             source_root or os.environ.get("SAM31_SOURCE_ROOT") or DEFAULT_SOURCE_ROOT
         ).expanduser()
-        self.source_revision = source_revision or os.environ.get("SAM31_SOURCE_REVISION") or DEFAULT_SOURCE_REVISION
+        self.source_revision = (
+            source_revision or os.environ.get("SAM31_SOURCE_REVISION") or DEFAULT_SOURCE_REVISION
+        )
         self.checkpoint_sha256 = (
-            checkpoint_sha256 or os.environ.get("SAM31_CHECKPOINT_SHA256") or DEFAULT_CHECKPOINT_SHA256
+            checkpoint_sha256
+            or os.environ.get("SAM31_CHECKPOINT_SHA256")
+            or DEFAULT_CHECKPOINT_SHA256
         )
         self.prob_threshold = prob_threshold
         self.policy = policy
 
     def worker_command(self, frames: Path, request: Path, out: Path) -> list[str]:
-        return [str(self.python), "-m", "src.segmentation.sam31", "--frames", str(frames),
-                "--request", str(request), "--out", str(out)]
+        return [
+            str(self.python),
+            "-m",
+            "src.segmentation.sam31",
+            "--frames",
+            str(frames),
+            "--request",
+            str(request),
+            "--out",
+            str(out),
+        ]
 
-    def segment(self, source: Path | str, domain: Any, *, max_frames: int | None = None) -> ClipMasks:
+    def segment(
+        self, source: Path | str, domain: Any, *, max_frames: int | None = None
+    ) -> ClipMasks:
         from src.segmentation.sources import REPO_ROOT, extract_jpegs, video_fps
 
         if self.checkpoint is None or not self.checkpoint.is_file():
-            raise FileNotFoundError("sam3.1_multiplex.pt is not on disk; set SAM31_CHECKPOINT (no auto-download)")
+            raise FileNotFoundError(
+                "sam3.1_multiplex.pt is not on disk; set SAM31_CHECKPOINT (no auto-download)"
+            )
         if not self.python.is_file():
-            raise FileNotFoundError(f"SAM 3.1 interpreter not found: {self.python}; set SAM31_PYTHON")
+            raise FileNotFoundError(
+                f"SAM 3.1 interpreter not found: {self.python}; set SAM31_PYTHON"
+            )
         with tempfile.TemporaryDirectory(prefix="ps-sam31-") as tmp:
             work = Path(tmp)
             extract_t0 = time.perf_counter()
             count = extract_jpegs(source, work / "frames", max_frames)
             extract_s = time.perf_counter() - extract_t0
             request = work / "request.json"
-            request.write_text(json.dumps({
-                "concepts": domain.prompts_for("sam"),
-                "policy": self.policy,
-                "prob_threshold": self.prob_threshold,
-                "fps": video_fps(source),
-                "checkpoint": str(self.checkpoint),
-                "source_root": str(self.source_root),
-                "source_revision": self.source_revision,
-                "checkpoint_sha256": self.checkpoint_sha256,
-            }))
+            request.write_text(
+                json.dumps(
+                    {
+                        "concepts": domain.prompts_for("sam"),
+                        "policy": self.policy,
+                        "prob_threshold": self.prob_threshold,
+                        "fps": video_fps(source),
+                        "checkpoint": str(self.checkpoint),
+                        "source_root": str(self.source_root),
+                        "source_revision": self.source_revision,
+                        "checkpoint_sha256": self.checkpoint_sha256,
+                    }
+                )
+            )
             env = dict(os.environ)
-            env["PYTHONPATH"] = os.pathsep.join(filter(None, [str(REPO_ROOT), env.get("PYTHONPATH")]))
+            env["PYTHONPATH"] = os.pathsep.join(
+                filter(None, [str(REPO_ROOT), env.get("PYTHONPATH")])
+            )
             result = subprocess.run(
                 self.worker_command(work / "frames", request, work / "out"),
-                capture_output=True, text=True, env=env, cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                env=env,
+                cwd=REPO_ROOT,
             )
             if result.returncode != 0:
-                raise RuntimeError(f"SAM 3.1 worker failed ({result.returncode}):\n{result.stderr[-4000:]}")
+                raise RuntimeError(
+                    f"SAM 3.1 worker failed ({result.returncode}):\n{result.stderr[-4000:]}"
+                )
             masks = ClipMasks.load(work / "out")
         masks.meta.setdefault("timing", {})["frame_extract_s"] = round(extract_s, 3)
         if len(masks) != count:
@@ -746,7 +821,9 @@ class Sam31Segmenter:
 def _worker(argv: list[str] | None = None) -> int:
     from src.segmentation.sources import runtime_identity, timing_summary
 
-    parser = argparse.ArgumentParser(description="SAM 3.1 worker (runs in the pointstream-sam31 env)")
+    parser = argparse.ArgumentParser(
+        description="SAM 3.1 worker (runs in the pointstream-sam31 env)"
+    )
     parser.add_argument("--frames", type=Path, required=True)
     parser.add_argument("--request", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
@@ -774,28 +851,30 @@ def _worker(argv: list[str] | None = None) -> int:
     torch.cuda.synchronize()
     total_s = time.perf_counter() - run_t0
     estimator = segmenter.provenance(request["policy"])
-    masks.meta.update({
-        "backend": "sam31",
-        "prompts": request["concepts"],
-        "policy": request["policy"],
-        "prob_threshold": request["prob_threshold"],
-        "model": {
-            "name": estimator.name,
-            "checkpoint": str(segmenter.checkpoint_path),
-            "checkpoint_sha256": estimator.checkpoint_sha256,
-            "source_root": str(segmenter.source_root),
-            "source_revision": estimator.model_revision,
-            "config_sha256": estimator.config_sha256,
-            "sdpa_backend_policy": segmenter.sdpa_backend_policy,
-        },
-        "worker_runtime": runtime_identity(),
-        # One propagate pass per class, so per-step latency is not meaningful;
-        # throughput over the whole clip is.
-        "timing": {
-            **timing_summary([], model_load_s=model_load_s, total_s=total_s, frames=len(masks)),
-            "peak_gpu_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
-        },
-    })
+    masks.meta.update(
+        {
+            "backend": "sam31",
+            "prompts": request["concepts"],
+            "policy": request["policy"],
+            "prob_threshold": request["prob_threshold"],
+            "model": {
+                "name": estimator.name,
+                "checkpoint": str(segmenter.checkpoint_path),
+                "checkpoint_sha256": estimator.checkpoint_sha256,
+                "source_root": str(segmenter.source_root),
+                "source_revision": estimator.model_revision,
+                "config_sha256": estimator.config_sha256,
+                "sdpa_backend_policy": segmenter.sdpa_backend_policy,
+            },
+            "worker_runtime": runtime_identity(),
+            # One propagate pass per class, so per-step latency is not meaningful;
+            # throughput over the whole clip is.
+            "timing": {
+                **timing_summary([], model_load_s=model_load_s, total_s=total_s, frames=len(masks)),
+                "peak_gpu_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
+            },
+        }
+    )
     masks.save(args.out)
     return 0
 

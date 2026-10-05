@@ -44,7 +44,9 @@ def largest_component(binary: np.ndarray) -> np.ndarray:
     """Keep the largest 8-connected region of one detection's mask."""
     import cv2
 
-    count, labels, stats, _ = cv2.connectedComponentsWithStats(binary.astype(np.uint8), connectivity=8)
+    count, labels, stats, _ = cv2.connectedComponentsWithStats(
+        binary.astype(np.uint8), connectivity=8
+    )
     if count <= 2:
         return binary
     return labels == 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
@@ -58,9 +60,15 @@ def _numpy(value: Any) -> np.ndarray:
     return np.asarray(value)
 
 
-def detections_from_result(result: Any, classes: tuple[str, ...], *, keep_largest: bool = True) -> list[Detection]:
+def detections_from_result(
+    result: Any, classes: tuple[str, ...], *, keep_largest: bool = True
+) -> list[Detection]:
     """Full-frame boolean masks with class names and confidences."""
-    if result is None or getattr(result, "masks", None) is None or getattr(result, "boxes", None) is None:
+    if (
+        result is None
+        or getattr(result, "masks", None) is None
+        or getattr(result, "boxes", None) is None
+    ):
         return []
     data = _numpy(result.masks.data)
     if data.size == 0:
@@ -78,11 +86,18 @@ def detections_from_result(result: Any, classes: tuple[str, ...], *, keep_larges
         if binary.shape != (height, width):
             import cv2
 
-            binary = cv2.resize(binary.astype(np.uint8), (width, height), interpolation=cv2.INTER_NEAREST) > 0
+            binary = (
+                cv2.resize(
+                    binary.astype(np.uint8), (width, height), interpolation=cv2.INTER_NEAREST
+                )
+                > 0
+            )
         if keep_largest:
             binary = largest_component(binary)
         if binary.any():
-            found.append((classes[cls[index]], binary, float(conf[index]) if index < conf.size else 1.0))
+            found.append(
+                (classes[cls[index]], binary, float(conf[index]) if index < conf.size else 1.0)
+            )
     return found
 
 
@@ -174,14 +189,21 @@ def bind_local_text_encoder(path: Path) -> None:
         original(self, device, weight)
 
     init._pointstream_local = True  # type: ignore[attr-defined]
-    text_model.MobileCLIPTS.__init__ = init  # type: ignore[method-assign]
+    text_model.MobileCLIPTS.__init__ = init
 
 
 class YoloeSegmenter:
     name: str
 
-    def __init__(self, size: str = "s", *, weights: str | Path | None = None, model: Any = None,
-                 device: Any = None, **options: Any) -> None:
+    def __init__(
+        self,
+        size: str = "s",
+        *,
+        weights: str | Path | None = None,
+        model: Any = None,
+        device: Any = None,
+        **options: Any,
+    ) -> None:
         unknown = set(options) - set(DEFAULTS)
         if unknown:
             raise TypeError(f"unknown YOLOE options: {sorted(unknown)}")
@@ -228,7 +250,9 @@ class YoloeSegmenter:
             self.device = 0 if self._cuda() else "cpu"
         return self.model
 
-    def stream(self, frames: Iterable[np.ndarray], domain: Any, *, timings: list[float] | None = None) -> Iterator[list[Tracked]]:
+    def stream(
+        self, frames: Iterable[np.ndarray], domain: Any, *, timings: list[float] | None = None
+    ) -> Iterator[list[Tracked]]:
         """Per BGR frame, the tracked instances. Appends per-frame ms to ``timings``."""
         model = self.load(domain)
         opts = self.options(domain)
@@ -253,8 +277,11 @@ class YoloeSegmenter:
                 verbose=False,
             )
             tracked = tracker.update(
-                detections_from_result(results[0] if results else None, domain.classes,
-                                       keep_largest=opts["largest_component"])
+                detections_from_result(
+                    results[0] if results else None,
+                    domain.classes,
+                    keep_largest=opts["largest_component"],
+                )
             )
             if cuda:
                 import torch
@@ -264,7 +291,9 @@ class YoloeSegmenter:
                 timings.append((time.perf_counter() - t0) * 1000.0)
             yield tracked
 
-    def segment(self, source: Path | str, domain: Any, *, max_frames: int | None = None) -> ClipMasks:
+    def segment(
+        self, source: Path | str, domain: Any, *, max_frames: int | None = None
+    ) -> ClipMasks:
         from src.segmentation.sources import iter_frames, timing_summary, video_fps
 
         load_t0 = time.perf_counter()
@@ -294,20 +323,27 @@ class YoloeSegmenter:
             peak = round(torch.cuda.max_memory_allocated() / 2**20, 1)
         # The first frame includes CUDA warm-up; throughput excludes it.
         steady = timings[1:] or timings
-        masks.meta.update({
-            "backend": self.name,
-            "prompts": domain.prompts_for("yoloe"),
-            "options": self.options(domain),
-            "model": {
-                "weights": str(self.weights_path) if self.weights_path else self.weights_name,
-                "text_encoder": str(self.text_encoder_path) if self.text_encoder_path else None,
-            },
-            "timing": {
-                **timing_summary(steady, model_load_s=model_load_s, total_s=sum(steady) / 1000.0, frames=len(steady)),
-                "first_frame_ms": round(timings[0], 3) if timings else None,
-                "peak_gpu_mib": peak,
-            },
-        })
+        masks.meta.update(
+            {
+                "backend": self.name,
+                "prompts": domain.prompts_for("yoloe"),
+                "options": self.options(domain),
+                "model": {
+                    "weights": str(self.weights_path) if self.weights_path else self.weights_name,
+                    "text_encoder": str(self.text_encoder_path) if self.text_encoder_path else None,
+                },
+                "timing": {
+                    **timing_summary(
+                        steady,
+                        model_load_s=model_load_s,
+                        total_s=sum(steady) / 1000.0,
+                        frames=len(steady),
+                    ),
+                    "first_frame_ms": round(timings[0], 3) if timings else None,
+                    "peak_gpu_mib": peak,
+                },
+            }
+        )
         return masks
 
 

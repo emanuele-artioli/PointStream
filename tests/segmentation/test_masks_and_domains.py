@@ -27,7 +27,9 @@ def test_rle_round_trips_exactly(mask: np.ndarray) -> None:
 
 def test_compressed_coco_counts_decode_without_pycocotools() -> None:
     runs = [3, 4, 2]
-    text = "".join(chr(r + 48) for r in runs)  # runs below 16 (and the first three) are one character each
+    text = "".join(
+        chr(r + 48) for r in runs
+    )  # runs below 16 (and the first three) are one character each
     assert _string_to_runs(text) == runs
     mask = decode_rle({"size": [3, 3], "counts": text})
     assert mask.ravel(order="F").tolist() == [False] * 3 + [True] * 4 + [False] * 2
@@ -44,7 +46,9 @@ def test_clip_masks_label_and_foreground_maps(tmp_path: Path) -> None:
     assert len(clip) == 3 and clip.frames[1] == [] and clip.frames[2] == []
     assert np.array_equal(clip.foreground(0), player | racket)
     labels = clip.labels(0)
-    assert labels[racket].tolist() == [2] * int(racket.sum())  # later classes paint over earlier ones
+    assert labels[racket].tolist() == [2] * int(
+        racket.sum()
+    )  # later classes paint over earlier ones
     assert set(np.unique(labels[player & ~racket])) == {1}
     assert not clip.foreground(1).any()
     with pytest.raises(ValueError, match="not one of"):
@@ -56,7 +60,9 @@ def test_clip_masks_label_and_foreground_maps(tmp_path: Path) -> None:
     path = clip.save(tmp_path / "run")
     assert path.name == "masks.rle"
     loaded = ClipMasks.load(tmp_path / "run")
-    assert loaded.classes == clip.classes and len(loaded) == 3 and loaded.meta == {"backend": "test"}
+    assert (
+        loaded.classes == clip.classes and len(loaded) == 3 and loaded.meta == {"backend": "test"}
+    )
     assert loaded.frames[0][1].track_id == 2 and loaded.frames[0][1].bbox == (7.0, 4.0, 10.0, 8.0)
     assert np.array_equal(loaded.labels(0), labels)
 
@@ -64,9 +70,25 @@ def test_clip_masks_label_and_foreground_maps(tmp_path: Path) -> None:
 def test_legacy_maps_gallery_payload_loads(tmp_path: Path) -> None:
     mask = _blob()
     doc = {
-        "schema": SCHEMA, "height": 9, "width": 11, "fps": 30.0, "classes": ["hand"],
-        "frames": [{"index": 1, "instances": [{"class_id": 0, "class_name": "hand", "score": 0.5,
-                                                "bbox": [3, 2, 9, 8], "rle": encode_rle(mask)}]}],
+        "schema": SCHEMA,
+        "height": 9,
+        "width": 11,
+        "fps": 30.0,
+        "classes": ["hand"],
+        "frames": [
+            {
+                "index": 1,
+                "instances": [
+                    {
+                        "class_id": 0,
+                        "class_name": "hand",
+                        "score": 0.5,
+                        "bbox": [3, 2, 9, 8],
+                        "rle": encode_rle(mask),
+                    }
+                ],
+            }
+        ],
     }
     (tmp_path / "payload.bin").write_bytes(zlib.compress(json.dumps(doc).encode()))
     clip = ClipMasks.load(tmp_path)
@@ -85,7 +107,9 @@ def test_domains_define_foreground_classes_and_backend_overrides(tmp_path: Path)
     assert ego.options_for("sam") == {}
 
     custom = tmp_path / "domains.yaml"
-    custom.write_text("d:\n  classes: {hand: hand}\n  backends:\n    yoloe: {prompts: {hand: person}, conf: 0.1}\n")
+    custom.write_text(
+        "d:\n  classes: {hand: hand}\n  backends:\n    yoloe: {prompts: {hand: person}, conf: 0.1}\n"
+    )
     domain = load_domain("d", custom)
     assert domain.prompts_for("yoloe") == {"hand": "person"}
     assert domain.prompts_for("sam") == {"hand": "hand"}

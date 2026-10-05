@@ -21,7 +21,7 @@ import numpy as np
 try:
     import zstandard as zstd
 except ImportError:  # pragma: no cover - the SAM env may lack zstandard
-    zstd = None
+    zstd = None  # type: ignore[assignment]
 
 SCHEMA = "pointstream.maps.coco_rle.v1"
 MASKS_NAME = "masks.rle"
@@ -117,7 +117,9 @@ class Instance:
     bbox: tuple[float, float, float, float]
 
     @classmethod
-    def from_mask(cls, class_name: str, track_id: int, mask: np.ndarray, score: float = 1.0) -> Instance | None:
+    def from_mask(
+        cls, class_name: str, track_id: int, mask: np.ndarray, score: float = 1.0
+    ) -> Instance | None:
         binary = np.asarray(mask) > 0
         if not binary.any():
             return None
@@ -151,7 +153,9 @@ class ClipMasks:
         while len(self.frames) < count:
             self.frames.append([])
 
-    def add(self, index: int, class_name: str, track_id: int, mask: np.ndarray, score: float = 1.0) -> None:
+    def add(
+        self, index: int, class_name: str, track_id: int, mask: np.ndarray, score: float = 1.0
+    ) -> None:
         if class_name not in self.classes:
             raise ValueError(f"class {class_name!r} is not one of {self.classes}")
         if np.asarray(mask).shape != (self.height, self.width):
@@ -174,7 +178,9 @@ class ClipMasks:
             out |= inst.mask()
         return out
 
-    def match(self, index: int, bbox: tuple[float, float, float, float], class_name: str | None = None) -> np.ndarray | None:
+    def match(
+        self, index: int, bbox: tuple[float, float, float, float], class_name: str | None = None
+    ) -> np.ndarray | None:
         """The instance mask (of ``class_name``, if given) whose box best overlaps ``bbox``."""
         x0, y0, x1, y1 = (float(v) for v in bbox)
         best, best_iou = None, 0.0
@@ -229,7 +235,13 @@ class ClipMasks:
         if doc.get("schema") != SCHEMA:
             raise ValueError(f"unknown mask schema {doc.get('schema')!r}")
         classes = tuple(str(name) for name in doc["classes"])
-        clip = cls(classes, int(doc["height"]), int(doc["width"]), float(doc["fps"]), meta=dict(doc.get("meta") or {}))
+        clip = cls(
+            classes,
+            int(doc["height"]),
+            int(doc["width"]),
+            float(doc["fps"]),
+            meta=dict(doc.get("meta") or {}),
+        )
         for record in doc.get("frames") or []:
             index = int(record["index"])
             clip.ensure_frames(index + 1)
@@ -252,7 +264,9 @@ class ClipMasks:
         if target.suffix == "" or target.is_dir():
             target = target / MASKS_NAME
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(compress(json.dumps(self.to_doc(), separators=(",", ":")).encode("utf-8")))
+        target.write_bytes(
+            compress(json.dumps(self.to_doc(), separators=(",", ":")).encode("utf-8"))
+        )
         return target
 
     @classmethod

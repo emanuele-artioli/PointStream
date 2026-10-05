@@ -46,7 +46,9 @@ class _FakePredictor:
 def test_sam31_scales_box_prompt_to_relative_coordinates() -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)
-    segmenter.start_session("racket", "/frames", frame_width=60, frame_height=40, policy="offline_causal")
+    segmenter.start_session(
+        "racket", "/frames", frame_width=60, frame_height=40, policy="offline_causal"
+    )
     masks = segmenter.add_prompt(
         "racket",
         frame_index=0,
@@ -67,7 +69,9 @@ def test_sam31_scales_box_prompt_to_relative_coordinates() -> None:
 def test_sam31_scales_point_only_prompts_and_rejects_mixed_prompt_forms() -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)
-    segmenter.start_session("racket", "/frames", frame_width=60, frame_height=40, policy="offline_causal")
+    segmenter.start_session(
+        "racket", "/frames", frame_width=60, frame_height=40, policy="offline_causal"
+    )
     segmenter.add_prompt(
         "racket",
         frame_index=0,
@@ -97,7 +101,9 @@ def test_sam31_scales_point_only_prompts_and_rejects_mixed_prompt_forms() -> Non
 def test_sam31_runtime_policy_rejects_bidirectional_propagation() -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)
-    segmenter.start_session("player", "/frames", frame_width=6, frame_height=4, policy="runtime_causal")
+    segmenter.start_session(
+        "player", "/frames", frame_width=6, frame_height=4, policy="runtime_causal"
+    )
     segmenter.add_prompt("player", frame_index=0, object_id="player-1", text="player")
     with pytest.raises(ValueError, match="forward-only"):
         segmenter.propagate("player", policy="runtime_causal", direction="both", frame_count=1)
@@ -106,9 +112,21 @@ def test_sam31_runtime_policy_rejects_bidirectional_propagation() -> None:
 def test_sam31_sessions_are_separate_by_object_class() -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)
-    segmenter.start_session("player", "/frames", frame_width=6, frame_height=4, policy="offline_causal")
-    segmenter.start_session("racket", "/frames", frame_width=6, frame_height=4, policy="offline_causal")
-    assert len({segmenter.sessions[("player", "default")].session_id, segmenter.sessions[("racket", "default")].session_id}) == 2
+    segmenter.start_session(
+        "player", "/frames", frame_width=6, frame_height=4, policy="offline_causal"
+    )
+    segmenter.start_session(
+        "racket", "/frames", frame_width=6, frame_height=4, policy="offline_causal"
+    )
+    assert (
+        len(
+            {
+                segmenter.sessions[("player", "default")].session_id,
+                segmenter.sessions[("racket", "default")].session_id,
+            }
+        )
+        == 2
+    )
 
 
 def test_sam31_prompt_and_propagation_preserve_missing_objects_and_frames() -> None:
@@ -133,7 +151,9 @@ def test_sam31_prompt_and_propagation_preserve_missing_objects_and_frames() -> N
             }
 
     segmenter = Sam31SequenceSegmenter(predictor=MissingPredictor())
-    segmenter.start_session("racket", "/frames", frame_width=60, frame_height=40, policy="offline_causal")
+    segmenter.start_session(
+        "racket", "/frames", frame_width=60, frame_height=40, policy="offline_causal"
+    )
     first = segmenter.add_prompt(
         "racket", frame_index=0, object_id="racket-1", text="tennis racket"
     )
@@ -153,7 +173,9 @@ def test_sam31_prompt_and_propagation_preserve_missing_objects_and_frames() -> N
 def test_sam31_propagation_preserves_the_tracker_id_for_each_object() -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)
-    segmenter.start_session("racket", "/frames", frame_width=60, frame_height=40, policy="offline_causal")
+    segmenter.start_session(
+        "racket", "/frames", frame_width=60, frame_height=40, policy="offline_causal"
+    )
     segmenter.add_prompt("racket", frame_index=0, object_id="racket-1", text="tennis racket")
 
     propagated = segmenter.propagate(
@@ -189,21 +211,33 @@ def test_segment_frames_runs_one_text_session_per_class(tmp_path: Path) -> None:
     starts = [item for item in predictor.requests if item["type"] == "start_session"]
     closes = [item for item in predictor.requests if item["type"] == "close_session"]
     assert len(starts) == len(closes) == 2
-    directions = [item["propagation_direction"] for item in predictor.requests if item["type"] == "propagate_in_video"]
+    directions = [
+        item["propagation_direction"]
+        for item in predictor.requests
+        if item["type"] == "propagate_in_video"
+    ]
     assert directions == ["both", "both"]
     assert segmenter.sessions == {}
 
 
-def test_segment_frames_runtime_policy_propagates_forward_and_shares_identical_prompts(tmp_path: Path) -> None:
+def test_segment_frames_runtime_policy_propagates_forward_and_shares_identical_prompts(
+    tmp_path: Path,
+) -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)
     frames = _jpeg_frames(tmp_path / "frames", 1)
 
-    masks = segmenter.segment_frames(frames, {"player": "person", "body": "person"}, policy="runtime_causal")
+    masks = segmenter.segment_frames(
+        frames, {"player": "person", "body": "person"}, policy="runtime_causal"
+    )
 
     assert [inst.class_name for inst in masks.frames[0]] == ["player", "body"]
     assert len([item for item in predictor.requests if item["type"] == "add_prompt"]) == 1
-    assert [item["propagation_direction"] for item in predictor.requests if item["type"] == "propagate_in_video"] == ["forward"]
+    assert [
+        item["propagation_direction"]
+        for item in predictor.requests
+        if item["type"] == "propagate_in_video"
+    ] == ["forward"]
 
 
 def test_front_end_runs_the_worker_under_the_sam_interpreter(tmp_path: Path) -> None:

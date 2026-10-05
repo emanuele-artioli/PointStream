@@ -14,7 +14,7 @@ from src.segmentation.yoloe import TrackFilter, YoloeSegmenter, detections_from_
 
 def _square(size: int = 40, x: int = 10, y: int = 10, side: int = 12) -> np.ndarray:
     mask = np.zeros((size, size), dtype=bool)
-    mask[y:y + side, x:x + side] = True
+    mask[y : y + side, x : x + side] = True
     return mask
 
 
@@ -41,7 +41,7 @@ def test_boundary_f_tolerates_small_shifts_only() -> None:
 
 
 def _clip(masks: list[np.ndarray], classes: tuple[str, ...] = ("player",)) -> ClipMasks:
-    clip = ClipMasks(classes, *masks[0].shape, 25.0)
+    clip = ClipMasks(classes, masks[0].shape[0], masks[0].shape[1], 25.0)
     clip.ensure_frames(len(masks))
     for index, mask in enumerate(masks):
         clip.add(index, classes[0], 1, mask)
@@ -60,10 +60,22 @@ def test_compare_scores_identity_as_perfect_and_reports_flicker() -> None:
     assert noisy["recall"] == 0.5
     assert noisy["flicker"] > noisy["reference_flicker"]
 
-    rows = [{"backend": "b", "frames": 4, "scopes": {"foreground": fg}, "ms_per_frame": 10.0, "fps": 100.0,
-             "peak_gpu_mib": None}]
+    rows = [
+        {
+            "backend": "b",
+            "frames": 4,
+            "scopes": {"foreground": fg},
+            "ms_per_frame": 10.0,
+            "fps": 100.0,
+            "peak_gpu_mib": None,
+        }
+    ]
     table = summarize(rows)
-    assert table[0]["J"] == 1.0 and table[0]["ms_per_frame"] == 10.0 and table[0]["peak_gpu_mib"] is None
+    assert (
+        table[0]["J"] == 1.0
+        and table[0]["ms_per_frame"] == 10.0
+        and table[0]["peak_gpu_mib"] is None
+    )
 
 
 def test_track_filter_needs_hits_holds_misses_and_gates_new_tracks() -> None:
@@ -82,7 +94,10 @@ def test_track_filter_drops_small_masks_relative_to_the_largest_of_a_class() -> 
     tracker = TrackFilter(min_area_ratio=0.5)
     big, small = _square(side=20), _square(x=0, y=0, side=4)
     out = tracker.update([("hand", big, 0.9), ("hand", small, 0.9), ("arm", small, 0.9)])
-    assert sorted((name, int(mask.sum())) for name, _t, mask, _s in out) == [("arm", 16), ("hand", 400)]
+    assert sorted((name, int(mask.sum())) for name, _t, mask, _s in out) == [
+        ("arm", 16),
+        ("hand", 400),
+    ]
 
 
 def _result(masks: np.ndarray, cls: list[int], conf: list[float]) -> SimpleNamespace:
@@ -96,7 +111,9 @@ def _result(masks: np.ndarray, cls: list[int], conf: list[float]) -> SimpleNames
 def test_detections_keep_the_largest_component_and_drop_unknown_classes() -> None:
     mask = _square()
     mask[0, 0] = True  # a stray pixel
-    found = detections_from_result(_result(np.stack([mask, mask]), [1, 7], [0.4, 0.9]), ("arm", "hand"))
+    found = detections_from_result(
+        _result(np.stack([mask, mask]), [1, 7], [0.4, 0.9]), ("arm", "hand")
+    )
     assert [(name, score) for name, _m, score in found] == [("hand", pytest.approx(0.4))]
     assert not found[0][1][0, 0]
 

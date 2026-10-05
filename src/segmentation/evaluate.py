@@ -46,8 +46,9 @@ def region_scores(pred: np.ndarray, ref: np.ndarray) -> dict[str, float]:
 def _boundary(mask: np.ndarray) -> np.ndarray:
     import cv2
 
-    binary = mask.astype(np.uint8)
-    eroded = cv2.erode(binary, np.ones((3, 3), np.uint8), borderType=cv2.BORDER_CONSTANT, borderValue=0)
+    binary = np.pad(mask.astype(np.uint8), 1)  # the image edge counts as boundary
+    eroded = cv2.erode(binary, np.ones((3, 3), np.uint8))[1:-1, 1:-1]
+    binary = binary[1:-1, 1:-1]
     return (binary - eroded) > 0
 
 
@@ -89,8 +90,13 @@ def compare(candidate: ClipMasks, reference: ClipMasks) -> dict[str, Any]:
     frames = min(len(candidate), len(reference))
     if frames == 0:
         raise ValueError("no frames to compare")
-    scopes = {"foreground": None, **{name: name for name in reference.classes if name in candidate.classes}}
-    rows: dict[str, dict[str, list[float]]] = {s: {"iou": [], "boundary_f": [], "precision": [], "recall": []} for s in scopes}
+    scopes = {
+        "foreground": None,
+        **{name: name for name in reference.classes if name in candidate.classes},
+    }
+    rows: dict[str, dict[str, list[float]]] = {
+        s: {"iou": [], "boundary_f": [], "precision": [], "recall": []} for s in scopes
+    }
     series: dict[str, tuple[list[np.ndarray], list[np.ndarray]]] = {s: ([], []) for s in scopes}
     empty_agree = 0
     for index in range(frames):
@@ -98,7 +104,10 @@ def compare(candidate: ClipMasks, reference: ClipMasks) -> dict[str, Any]:
             if class_name is None:
                 pred, ref = candidate.foreground(index), reference.foreground(index)
             else:
-                pred, ref = candidate.class_mask(index, class_name), reference.class_mask(index, class_name)
+                pred, ref = (
+                    candidate.class_mask(index, class_name),
+                    reference.class_mask(index, class_name),
+                )
             scores = region_scores(pred, ref)
             row = rows[scope]
             row["iou"].append(scores["iou"])
@@ -127,7 +136,9 @@ def compare(candidate: ClipMasks, reference: ClipMasks) -> dict[str, Any]:
     return summary
 
 
-def report_row(clip: str, backend: str, candidate: ClipMasks, reference: ClipMasks) -> dict[str, Any]:
+def report_row(
+    clip: str, backend: str, candidate: ClipMasks, reference: ClipMasks
+) -> dict[str, Any]:
     scores = compare(candidate, reference)
     timing = candidate.meta.get("timing") or {}
     return {
@@ -137,7 +148,10 @@ def report_row(clip: str, backend: str, candidate: ClipMasks, reference: ClipMas
         "ms_per_frame": timing.get("ms_per_frame"),
         "fps": timing.get("fps"),
         "peak_gpu_mib": timing.get("peak_gpu_mib"),
-        "gpu": ((candidate.meta.get("worker_runtime") or candidate.meta.get("runtime") or {}).get("gpu") or {}).get("name"),
+        "gpu": (
+            (candidate.meta.get("worker_runtime") or candidate.meta.get("runtime") or {}).get("gpu")
+            or {}
+        ).get("name"),
     }
 
 
@@ -154,15 +168,20 @@ def summarize(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             kept = [v for v in values if v is not None]
             return round(float(np.mean(kept)), 4) if kept else None
 
-        table.append({
-            "backend": backend,
-            "clips": len(items),
-            "frames": sum(item["frames"] for item in items),
-            **{key: avg([s[key] for s in fg]) for key in ("J", "F", "J&F", "precision", "recall", "flicker")},
-            "ms_per_frame": avg([item["ms_per_frame"] for item in items]),
-            "fps": avg([item["fps"] for item in items]),
-            "peak_gpu_mib": avg([item["peak_gpu_mib"] for item in items]),
-        })
+        table.append(
+            {
+                "backend": backend,
+                "clips": len(items),
+                "frames": sum(item["frames"] for item in items),
+                **{
+                    key: avg([s[key] for s in fg])
+                    for key in ("J", "F", "J&F", "precision", "recall", "flicker")
+                },
+                "ms_per_frame": avg([item["ms_per_frame"] for item in items]),
+                "fps": avg([item["fps"] for item in items]),
+                "peak_gpu_mib": avg([item["peak_gpu_mib"] for item in items]),
+            }
+        )
     return table
 
 

@@ -110,7 +110,9 @@ def source_identity(source: Path | str, max_frames: int | None = None) -> dict[s
 
 
 @lru_cache(maxsize=64)
-def _source_identity(path: Path, max_frames: int | None, _size: int, _mtime: int) -> tuple[tuple[str, Any], ...]:
+def _source_identity(
+    path: Path, max_frames: int | None, _size: int, _mtime: int
+) -> tuple[tuple[str, Any], ...]:
     """Cached per file version: every backend in a suite reads the same clip."""
     return tuple(_hash_source(path, max_frames).items())
 
@@ -121,13 +123,25 @@ def _hash_source(path: Path, max_frames: int | None) -> dict[str, Any]:
         images = image_files(path)[:max_frames]
         for image in images:
             digest.update(image.name.encode() + b"\0" + sha256_file(image).encode())
-        return {"path": str(path), "kind": "frames", "frames": len(images), "sha256": digest.hexdigest()}
-    return {"path": str(path), "kind": "video", "sha256": sha256_file(path), "max_frames": max_frames}
+        return {
+            "path": str(path),
+            "kind": "frames",
+            "frames": len(images),
+            "sha256": digest.hexdigest(),
+        }
+    return {
+        "path": str(path),
+        "kind": "video",
+        "sha256": sha256_file(path),
+        "max_frames": max_frames,
+    }
 
 
 def _run(command: list[str]) -> str | None:
     try:
-        return subprocess.run(command, capture_output=True, text=True, timeout=20, check=True).stdout.strip()
+        return subprocess.run(
+            command, capture_output=True, text=True, timeout=20, check=True
+        ).stdout.strip()
     except (OSError, subprocess.SubprocessError):
         return None
 
@@ -187,7 +201,9 @@ def write_provenance(out_dir: Path, record: dict[str, Any]) -> Path:
     return target
 
 
-def timing_summary(frame_ms: list[float], *, model_load_s: float, total_s: float, frames: int) -> dict[str, Any]:
+def timing_summary(
+    frame_ms: list[float], *, model_load_s: float, total_s: float, frames: int
+) -> dict[str, Any]:
     """Throughput is the comparable number across backends; percentiles describe streaming."""
     values = np.asarray(frame_ms, dtype=float)
     return {

@@ -22,22 +22,39 @@ class _FakeBackend:
         shift = 0 if self.name == "sam31" else 2
         for index in range(max_frames or 3):
             mask = np.zeros((20, 20), dtype=bool)
-            mask[5:12, 5 + shift:12 + shift] = True
+            mask[5:12, 5 + shift : 12 + shift] = True
             masks.add(index, domain.classes[0], 1, mask, 0.9)
         masks.meta.update({"backend": self.name, "timing": {"ms_per_frame": 4.0, "fps": 250.0}})
         return masks
 
 
-def test_suite_runs_every_backend_then_benchmarks_and_validates(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_suite_runs_every_backend_then_benchmarks_and_validates(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(cli, "build", _FakeBackend)
-    monkeypatch.setattr("src.segmentation.sources.gpu_identity", lambda: {"uuid": "GPU-test", "name": "Fake"})
+    monkeypatch.setattr(
+        "src.segmentation.sources.gpu_identity", lambda: {"uuid": "GPU-test", "name": "Fake"}
+    )
     clip = tmp_path / "match" / "000.mp4"
     clip.parent.mkdir()
     clip.write_bytes(b"not really a video")
     out = tmp_path / "suite"
 
-    code = cli.main(["suite", "--domain", "tennis", "--backends", "sam31,yoloe-26n", "--source", str(clip),
-                     "--out", str(out), "--max-frames", "3"])
+    code = cli.main(
+        [
+            "suite",
+            "--domain",
+            "tennis",
+            "--backends",
+            "sam31,yoloe-26n",
+            "--source",
+            str(clip),
+            "--out",
+            str(out),
+            "--max-frames",
+            "3",
+        ]
+    )
 
     assert code == 0
     run = out / "tennis" / "yoloe-26n" / "match_000"

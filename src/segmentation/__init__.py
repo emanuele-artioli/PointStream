@@ -95,11 +95,15 @@ def load_domain(name: str, path: Path = DOMAINS_YAML) -> Domain:
 class Segmenter(Protocol):
     name: str
 
-    def segment(self, source: Path | str, domain: Domain, *, max_frames: int | None = None) -> ClipMasks:
+    def segment(
+        self, source: Path | str, domain: Domain, *, max_frames: int | None = None
+    ) -> ClipMasks:
         """Masks for every frame of a video file or a directory of images."""
 
 
-def segment_array(backend: Segmenter, frames: Any, domain: Domain, *, rgb: bool = True) -> ClipMasks:
+def segment_array(
+    backend: Segmenter, frames: Any, domain: Domain, *, rgb: bool = True
+) -> ClipMasks:
     """Segment an in-memory ``(T, H, W, 3)`` clip (the runner's frames are RGB)."""
     import numpy as np
 
@@ -128,10 +132,10 @@ def build(name: str, **options: Any) -> Segmenter:
         from src.segmentation.sam31 import Sam31Segmenter
 
         return Sam31Segmenter(**options)
-    if name.startswith("yoloe-26") and name[len("yoloe-26"):] in YOLOE_SIZES:
+    if name.startswith("yoloe-26") and name[len("yoloe-26") :] in YOLOE_SIZES:
         from src.segmentation.yoloe import YoloeSegmenter
 
-        return YoloeSegmenter(size=name[len("yoloe-26"):], **options)
+        return YoloeSegmenter(size=name[len("yoloe-26") :], **options)
     raise KeyError(f"unknown segmentation backend {name!r}; known: {', '.join(BACKENDS)}")
 
 
