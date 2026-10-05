@@ -140,6 +140,38 @@ PointStream runs on a shared remote Linux GPU server with an NFS-backed home dir
 | `import sqlite3` then `torch` | 3 | 2.101 ± 0.620 | 1.350–3.331 | PyTorch import tax |
 | `import sqlite3` then `src.runner` | 3 | 0.529 ± 0.117 | 0.406–0.764 | Runner does **not** load Torch |
 
+These timings are warm-cache metadata walks and imports. File creation and data
+movement on the same home are far slower.
+
+### NFS home file I/O (2026-10-05)
+
+Every host mounts the home as `data3:/x/home/itec/emanuele` (NFSv4.2, `soft`, 10 Gb
+link, 0.2–0.3 ms ping). Single runs of `n = 200` small-file operations per host
+(fsync `n = 20`), on gpu3, gpu5 and gpu6:
+
+| Operation | NFS home | Host-local disk |
+|---|---:|---:|
+| Create and write 4 KB | 174–221 ms | 0.03–0.07 ms |
+| Open and read (warm) | 11–17 ms | 0.01–0.02 ms |
+| Write and fsync | 138–231 ms | 0.3–1.8 ms |
+| Unlink | 73–95 ms | ≈0 ms |
+| Sequential write | 26–49 MB/s | 258–1,644 MB/s |
+| Sequential read, direct I/O (one file each) | gpu6 93, gpu5 42, gpu3 16 MB/s | — |
+
+Network round trip is not the limit; the delay is server-side.
+`/proc/self/mountstats` showed per-operation server time of 5–25 ms for
+`GETATTR`/`OPEN` and queueing of 240–410 ms on `WRITE`. Ten-second samples
+showed 20–570 ms per operation, and one 18 s `DELEGRETURN`, while our clients
+issued only tens to a few hundred operations per second. data3 is a shared
+institute server (12–23 mounts per host). gpu3 and gpu6 had issued 1.95 and
+1.76 billion `TEST_STATEID` calls since boot, which suggests repeated revocation of
+NFSv4 state. That count is a lead for the server's administrators, not a diagnosis.
+
+Workaround: [host-local staging](../workflow/long-jobs.md#host-local-staging). A 6 GB
+archive took 313 s to read cold on gpu6, and 4.2 s to verify from the local cache on
+reuse. The local root is `/local/users/emanuele` on gpu6 and RAM-backed `/dev/shm`
+on the other hosts, with a memory safety margin.
+
 ### Worktree Cleanup Audit
 PR #68 introduced `scripts/cleanup_merged_worktrees.sh`. The documentation audit in PR #73 flagged critical safety hazards in this helper:
 - Suppresses error codes from `git fetch`, `status`, and `log`.

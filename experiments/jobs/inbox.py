@@ -24,7 +24,7 @@ import tempfile
 from typing import Any
 import uuid
 
-from experiments.jobs import fleet, monitor
+from experiments.jobs import fleet, monitor, staging
 from experiments.jobs.claims import get_process_start_time, is_pid_alive
 
 TERMINAL = {"complete", "failed", "cancelled", "contended", "interrupted", "budget_exhausted", "expired", "attention"}
@@ -89,14 +89,39 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
             raise fleet.FleetError("scale values must be finite")
         if "{" + name + "}" not in spec["arguments"]:
             raise fleet.FleetError(f"scale parameter {name} must occupy a whole argument")
+    staged = spec.get("staged_inputs", [])
+    if not isinstance(staged, list):
+        raise fleet.FleetError("staged_inputs must be an array")
+    for item in staged:
+        if not isinstance(item, dict) or set(item) - {"name", "path", "sha256", "extract"}:
+            raise fleet.FleetError("staged inputs declare only name, path, sha256 and extract")
+        if not isinstance(item.get("name"), str) or not item["name"].isidentifier():
+            raise fleet.FleetError("staged input names must be identifiers")
+        if not isinstance(item.get("extract", False), bool):
+            raise fleet.FleetError("staged input extract must be a boolean")
+        if item.get("extract") and not spec.get("local_storage_gib"):
+            raise fleet.FleetError("extracted staged inputs require local_storage_gib")
+    names = [item["name"] for item in staged]
+    if len(names) != len(set(names)):
+        raise fleet.FleetError("staged input names must be unique")
+    local_storage = spec.get("local_storage_gib", 0)
+    if not isinstance(local_storage, int) or isinstance(local_storage, bool) or local_storage < 0:
+        raise fleet.FleetError("local_storage_gib must be a nonnegative integer")
+    packed = spec.get("environment")
+    if packed is not None:
+        if not isinstance(packed, dict) or set(packed) != {"path", "sha256"}:
+            raise fleet.FleetError("environment declares exactly path and sha256")
+        if not local_storage:
+            raise fleet.FleetError("a staged environment requires local_storage_gib")
+    placeholders = {"{" + k + "}" for k in scale} | {"{staged:" + n + "}" for n in names}
     for arg in spec["arguments"]:
         if "{" in arg or "}" in arg:
-            if arg not in {"{" + k + "}" for k in scale}:
-                raise fleet.FleetError("only whole-argument scale placeholders are supported")
+            if arg not in placeholders:
+                raise fleet.FleetError("only whole-argument scale and staged-input placeholders are supported")
     inputs = spec["inputs"]
     if not isinstance(inputs, list) or not inputs:
         raise fleet.FleetError("inputs must include immutable manifest/file identities")
-    for item in inputs:
+    for item in [*inputs, *spec.get("staged_inputs", []), *([packed] if packed is not None else [])]:
         if not isinstance(item, dict) or not Path(item.get("path", "")).is_absolute():
             raise fleet.FleetError("input identities require absolute paths")
         sha = item.get("sha256", "")
@@ -178,6 +203,9 @@ def eligible(spec: dict[str, Any], host: dict[str, Any]) -> dict[str, Any]:
         import shutil
         if not shutil.which(command):
             raise fleet.FleetError("required executable unavailable: " + command)
+    storage = staging.admission_error(spec)
+    if storage:
+        raise fleet.FleetError(storage)
     _, gpu = fleet.select_gpu([host], required_memory_mib=spec["gpu_memory_mib"], cpu_threads=spec["cpu_threads"])
     return gpu
 
@@ -330,9 +358,10 @@ def worker_loop(base: Path, alias: str) -> int:
         lock.rmdir()
 
 
-def phase_command(spec: dict[str, Any], stage: str) -> list[str]:
+def phase_command(spec: dict[str, Any], stage: str, staged: list[dict[str, Any]] | None = None, python: str = sys.executable) -> list[str]:
     replacements = {"{" + name + "}": str(values[stage]) for name, values in spec["scale"].items()}
-    return [sys.executable, *spec["entrypoint"], *[replacements.get(arg, arg) for arg in spec["arguments"]]]
+    replacements.update({"{staged:" + item["name"] + "}": item["path"] for item in staged or []})
+    return [python, *spec["entrypoint"], *[replacements.get(arg, arg) for arg in spec["arguments"]]]
 
 
 def campaign(directory: Path) -> int:
@@ -356,6 +385,11 @@ def campaign(directory: Path) -> int:
         if code_identity != manifest["source_sha256"]:
             raise fleet.FleetError("frozen code identity changed")
         verify_inputs(spec, directory.parents[3])
+        for item in [*spec.get("staged_inputs", []), *([spec["environment"]] if spec.get("environment") else [])]:
+            path = Path(item["path"]).resolve()
+            if not path.is_relative_to(directory.parents[3].resolve()) or not path.is_file():
+                raise fleet.FleetError(f"staged input must be a file under the external data root: {path}")
+        local_root = staging.local_root()
         validation = None
         for stage in ("smoke", "full"):
             verify_inputs(spec, directory.parents[3])
@@ -367,19 +401,33 @@ def campaign(directory: Path) -> int:
                 raise fleet.FleetError("Remaining budget cannot support the saved stage estimate")
             output = directory / stage
             output.mkdir()
-            command = phase_command(spec, stage)
-            env = {**os.environ, "PS_STAGE": stage, "PS_STAGE_DIR": str(output), "PS_VALIDATION_PATH": str(directory / "validation.json")}
-            monitor.write_json(output / "dispatch.json", {"command": command, "input_identity": spec["inputs"], "code": manifest, "environment": monitor.read_json(directory / "environment.json", {}), "started": time.time(), "citable": False if stage == "smoke" else None})
+            # Re-verified per stage, so promotion also requires unchanged staged bytes.
+            staged = staging.stage_inputs(spec.get("staged_inputs", []), local_root)
+            scratch = staging.scratch_directory(local_root, directory.name, stage, output, declared=bool(spec.get("local_storage_gib")))
+            packed = staging.stage_environment(spec["environment"], local_root) if spec.get("environment") else None
+            python = packed["python"] if packed else sys.executable
+            staging_record: dict[str, Any] = {"local_root": str(local_root) if local_root else None, "inputs": staged, "environment": packed, "scratch": str(scratch)}
+            monitor.write_json(output / "staging.json", staging_record)
+            command = phase_command(spec, stage, staged, python)
+            env = {**os.environ, "PS_STAGE": stage, "PS_STAGE_DIR": str(output), "PS_SCRATCH_DIR": str(scratch), "PS_VALIDATION_PATH": str(directory / "validation.json")}
+            if packed:
+                env.update(PATH=os.pathsep.join([packed["bin"], env.get("PATH", "")]), CONDA_PREFIX=packed["prefix"])
+            monitor.write_json(output / "dispatch.json", {"command": command, "input_identity": spec["inputs"], "staged_inputs": staged, "staged_environment": packed, "code": manifest, "environment": monitor.read_json(directory / "environment.json", {}), "started": time.time(), "citable": False if stage == "smoke" else None})
             monitor.publish_progress(stage, 0)
             phase_started = time.time()
             with (output / "command.log").open("w") as log:
                 result = subprocess.run(command, cwd=source, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=min(spec[stage]["seconds"], budget_end - time.time()), check=False)
             monitor.write_json(output / "execution.json", {"exit_code": result.returncode, "seconds": time.time() - phase_started, "children_resource_usage": list(resource.getrusage(resource.RUSAGE_CHILDREN))})
             if result.returncode:
+                # Failed scratch stays on the host for inspection; staging.json names it.
                 raise fleet.FleetError(f"{stage} failed with exit code {result.returncode}")
+            staging_record["published"] = staging.publish_scratch(scratch, output)
+            staging.release_scratch(scratch, output)
+            staging_record["released"] = time.time()
+            monitor.write_json(output / "staging.json", staging_record)
             monitor.publish_progress(stage, 1)
             if stage == "smoke":
-                validation_command = [sys.executable if a == "{python}" else a for a in spec["validator"]]
+                validation_command = [python if a == "{python}" else a for a in spec["validator"]]
                 validator_started = time.time()
                 with (output / "validator.log").open("w") as log:
                     checked = subprocess.run(validation_command, cwd=source, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=min(spec["validator_seconds"], max(0.001, budget_end - time.time())), check=False)
