@@ -236,8 +236,10 @@ def _strip_state_dict(state: Any) -> dict[str, Any]:
         raise TypeError(f"checkpoint is not a dict, got {type(state)!r}")
     for nested in ("state_dict", "model", "teacher"):
         inner = state.get(nested)
-        if isinstance(inner, dict) and inner and not any(
-            k in inner for k in ("state_dict", "epoch", "optimizer")
+        if (
+            isinstance(inner, dict)
+            and inner
+            and not any(k in inner for k in ("state_dict", "epoch", "optimizer"))
         ):
             if any(hasattr(v, "shape") for v in inner.values()):
                 state = inner
@@ -335,7 +337,7 @@ def _load_with_facebook_code(pth: Path, device: str) -> tuple[Any, str]:
         raise Dinov3CodeMissing(missing_code_message(pth))
     model, source = built
     state = _strip_state_dict(_torch_load(pth))
-    model.load_state_dict(state, strict=False)
+    model.load_state_dict(state, strict=True)
     import torch
 
     model.to(device)
@@ -351,12 +353,8 @@ def _load_with_transformers(pth: Path, device: str) -> tuple[Any, str]:
 
     config = AutoConfig.from_pretrained(str(cfg_dir), local_files_only=True)
     model = AutoModel.from_config(config)
-    try:
-        state = _strip_state_dict(_torch_load(pth))
-        model.load_state_dict(state, strict=False)
-    except Exception:
-        # Folder may already hold converted HF weights.
-        model = AutoModel.from_pretrained(str(cfg_dir), local_files_only=True)
+    state = _strip_state_dict(_torch_load(pth))
+    model.load_state_dict(state, strict=True)
     import torch
 
     model.to(device)
@@ -453,7 +451,9 @@ def tokens_to_patch_map(
     return np.ascontiguousarray(patches.reshape(hp, wp, -1), dtype=np.float32)
 
 
-def forward_patch_map(model: Any, rgb: np.ndarray, image_size: int = DEFAULT_IMAGE_SIZE) -> np.ndarray:
+def forward_patch_map(
+    model: Any, rgb: np.ndarray, image_size: int = DEFAULT_IMAGE_SIZE
+) -> np.ndarray:
     """RGB uint8 → (Hp, Wp, C) float32 patch tokens. Not a depth map."""
     import torch
 
@@ -583,7 +583,9 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Output directory, typically demo/outputs/maps/<stem>/dino_feat/",
     )
-    parser.add_argument("--max-frames", type=int, default=None, help="Optional cap on decoded frames.")
+    parser.add_argument(
+        "--max-frames", type=int, default=None, help="Optional cap on decoded frames."
+    )
     parser.add_argument(
         "--image-size",
         type=int,

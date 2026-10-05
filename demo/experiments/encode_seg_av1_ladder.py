@@ -50,14 +50,21 @@ def _percentile(values: list[float], pct: float) -> float:
     return ordered[lo] * (1.0 - frac) + ordered[hi] * frac
 
 
-def encode_sequence(seq_dir: Path, dest: Path, scale: str | None, ffmpeg: str, n_frames: int) -> None:
+def encode_sequence(
+    seq_dir: Path, dest: Path, scale: str | None, ffmpeg: str, n_frames: int
+) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     cmd = [
-        ffmpeg, "-y",
-        "-framerate", f"{FPS:.6f}",
-        "-start_number", "0",
-        "-i", str(seq_dir / "%06d.png"),
-        "-frames:v", str(n_frames),
+        ffmpeg,
+        "-y",
+        "-framerate",
+        f"{FPS:.6f}",
+        "-start_number",
+        "0",
+        "-i",
+        str(seq_dir / "%06d.png"),
+        "-frames:v",
+        str(n_frames),
         *av1_output_args(scale),
         str(dest),
     ]
@@ -83,7 +90,7 @@ def ladder(seq_dir: Path, dest_dir: Path, stem: str, ffmpeg: str, n_frames: int)
     return out
 
 
-def render_yoloe_hands(clip: Path, png_dir: Path) -> float:
+def render_yoloe_hands(clip: Path, png_dir: Path, *, max_frames: int = N_FRAMES) -> float:
     import torch
 
     png_dir.mkdir(parents=True, exist_ok=True)
@@ -111,7 +118,7 @@ def render_yoloe_hands(clip: Path, png_dir: Path) -> float:
         dt_ms = (time.perf_counter() - t0) * 1000.0
         if n_frames > 0:
             step_ms.append(dt_ms)
-        if n_frames >= N_FRAMES:
+        if n_frames >= max_frames:
             break
         orig = getattr(result, "orig_shape", None)
         frame_h = int(orig[0]) if orig is not None else 1080
@@ -130,7 +137,14 @@ def render_yoloe_hands(clip: Path, png_dir: Path) -> float:
     return _percentile(step_ms, 50)
 
 
-def render_sam(clip: Path, png_dir: Path, work: Path) -> float:
+def render_sam(
+    clip: Path,
+    png_dir: Path,
+    work: Path,
+    *,
+    max_frames: int = N_FRAMES,
+    prompts_override: dict[str, str] | None = None,
+) -> float:
     python = resolve_python()
     checkpoint = resolve_checkpoint()
     if checkpoint is None or not Path(python).is_file():
@@ -138,22 +152,33 @@ def render_sam(clip: Path, png_dir: Path, work: Path) -> float:
     frames = work / "frames"
     extract_frames(clip, frames, ffmpeg=os.environ.get("FFMPEG", "/opt/local/bin/ffmpeg"))
     # Keep the demo length.
-    for extra in sorted(frames.glob("*.jpg"))[N_FRAMES:]:
+    for extra in sorted(frames.glob("*.jpg"))[max_frames:]:
         extra.unlink()
     prompts = work / "prompts.json"
-    prompts.write_text(json.dumps(load_prompt_map("sam", clip.stem)))
+    prompts.write_text(json.dumps(prompts_override or load_prompt_map("sam", clip.stem)))
     timing = work / "sam31_timing.json"
     cmd = [
-        python, "-m", "demo.pipeline.maps.sam31_video", "--worker",
-        "--frames", str(frames),
-        "--out", str(work / "unused.mp4"),
-        "--timing", str(timing),
-        "--checkpoint", str(checkpoint),
-        "--prompts", str(prompts),
-        "--png-dir", str(png_dir),
+        python,
+        "-m",
+        "demo.pipeline.maps.sam31_video",
+        "--worker",
+        "--frames",
+        str(frames),
+        "--out",
+        str(work / "unused.mp4"),
+        "--timing",
+        str(timing),
+        "--checkpoint",
+        str(checkpoint),
+        "--prompts",
+        str(prompts),
+        "--png-dir",
+        str(png_dir),
     ]
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(REPO_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env["PYTHONPATH"] = str(REPO_ROOT) + (
+        os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else ""
+    )
     env["CUDA_VISIBLE_DEVICES"] = os.environ.get("CUDA_VISIBLE_DEVICES", "0")
     res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     if res.returncode != 0 or not timing.is_file():
