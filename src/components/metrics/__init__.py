@@ -20,7 +20,6 @@ from src.contracts.metrics import (
     POSE_OKS,
     PSNR,
     REID,
-    SAM_IOU,
     SSIM,
     VMAF,
 )
@@ -90,14 +89,6 @@ REGISTRY.register(
         target="src.components.metrics.pose:PoseMetric",
         capabilities=frozenset({"frame", "reference", "pose"}),
         summary=POSE_OKS.summary,
-    )
-)
-REGISTRY.register(
-    BackendSpec(
-        name=SAM_IOU.name,
-        target="src.components.metrics.semantic_mask:SamIouMetric",
-        capabilities=frozenset({"frame", "reference", "mask"}),
-        summary=SAM_IOU.summary,
     )
 )
 

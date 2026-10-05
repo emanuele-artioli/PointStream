@@ -422,52 +422,14 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def sam_union_allowing_empty(builder, frames: Path, work: Path):
-    """Hand/arm union. A chunk with no detection is an empty mask."""
+    """Arm/hand union. A chunk where SAM 3.1 finds nothing is an empty mask."""
     work.mkdir(parents=True, exist_ok=True)
     cached = work / "union.npy"
     if cached.is_file():
         return list(builder.np.load(cached))
-    paths = sorted(frames.glob("*.jpg"))
-    collected = {}
-    for text in builder.PROMPTS:
-        prompts = work / f"prompts_{text}.json"
-        prompts.write_text(json.dumps({"hand": text}))
-        png = work / f"png_{text}"
-        png.mkdir(parents=True, exist_ok=True)
-        existing = sorted(png.glob("*.png"))
-        frame_size = builder.Image.open(paths[0]).size
-        wrong_size = False
-        if existing:
-            wrong_size = builder.Image.open(existing[0]).size != frame_size
-        if len(existing) < len(paths) or wrong_size:
-            if wrong_size:
-                for old in existing:
-                    old.unlink()
-            cmd = [
-                builder.resolve_python(), "-m", "demo.pipeline.maps.sam31_video", "--worker",
-                "--frames", str(frames), "--out", str(work / f"sam_{text}.mp4"),
-                "--timing", str(work / f"timing_{text}.json"),
-                "--checkpoint", str(builder.resolve_checkpoint()),
-                "--prompts", str(prompts), "--png-dir", str(png), "--concepts", "hand",
-            ]
-            print("RUN", " ".join(cmd), flush=True)
-            proc = subprocess.run(cmd, capture_output=True, text=True)
-            if proc.returncode != 0:
-                detail = (proc.stdout + proc.stderr)[-2000:]
-                print(detail, flush=True)
-                if "No points are provided" not in detail:
-                    raise subprocess.CalledProcessError(proc.returncode, cmd)
-                for old in png.glob("*.png"):
-                    old.unlink()
-                blank = builder.Image.new("RGB", frame_size)
-                for index in range(len(paths)):
-                    blank.save(png / f"{index:05d}.png")
-        masks = []
-        for path in sorted(png.glob("*.png"))[: len(paths)]:
-            arr = builder.np.asarray(builder.Image.open(path).convert("RGB"))
-            masks.append(arr.max(axis=2) > 0)
-        collected[text] = builder.np.stack(masks)
-    union = builder.np.logical_or(collected["hand"], collected["arm"])
+    masks = builder.build("sam31").segment(frames, builder.load_domain("egocentric"))
+    masks.save(work)
+    union = builder.np.stack([masks.foreground(index) for index in range(len(masks))])
     builder.np.save(cached, union)
     return list(union)
 

@@ -9,7 +9,7 @@ def test_sam_adapter_import_does_not_load_unrelated_metric_backends() -> None:
 import sys
 import src.components
 assert 'src.components.metrics' not in sys.modules
-from src.components.segmentation.sam31 import Sam31SequenceSegmenter
+from src.segmentation.sam31 import Sam31SequenceSegmenter
 assert Sam31SequenceSegmenter.__name__ == 'Sam31SequenceSegmenter'
 assert 'src.components.metrics' not in sys.modules
 """

@@ -1,4 +1,4 @@
-"""One-second inpaint smoke: SAM 3.1 mask, feathered edge, DiffuEraser fill.
+"""One-second inpaint smoke: SAM 3.1 arm/hand mask, feathered edge, DiffuEraser fill.
 
 DiffuEraser is the kept filler: it is a video model, so it keeps temporal
 coherence. SDXL, FLUX, and Qwen stay in demo.experiments.archive.neural_bg_still_fills.
@@ -16,7 +16,8 @@ import cv2
 import numpy as np
 
 from demo.experiments.neural_bg import cut_segment, feather_mask
-from demo.pipeline.maps.sam31_video import extract_frames, resolve_checkpoint, resolve_python
+from src.segmentation import build, load_domain
+from src.segmentation.sources import extract_jpegs
 
 logger = logging.getLogger(__name__)
 
@@ -31,18 +32,6 @@ def _load_frames(folder: Path) -> list[np.ndarray]:
         if image is not None:
             frames.append(image)
     return frames
-
-
-def _masks_from_sam_png(folder: Path) -> list[np.ndarray]:
-    """Hand and tool are painted; workbench is not in this smoke."""
-    masks = []
-    for path in sorted(folder.glob("*.png")):
-        image = cv2.imread(str(path), cv2.IMREAD_COLOR)
-        if image is None:
-            continue
-        # Non-black pixels are the foreground the worker painted.
-        masks.append((image.max(axis=2) > 0).astype(np.uint8))
-    return masks
 
 
 def _composite(original: np.ndarray, filled: np.ndarray, soft: np.ndarray) -> np.ndarray:
@@ -146,29 +135,18 @@ def main(argv: list[str] | None = None) -> int:
     if not Path(ffmpeg).is_file():
         ffmpeg = "ffmpeg"
     cut_segment(args.clip, snippet, start_s=1.0, duration_s=args.seconds, ffmpeg=ffmpeg)
+    if args.scale:
+        scaled = args.work / "snippet_scaled.mp4"
+        subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-i", str(snippet), "-vf", f"scale={args.scale}",
+                        "-c:v", "libx264", "-crf", "12", str(scaled)], check=True)
+        snippet = scaled
     frames_dir = args.work / "frames"
-    extract_frames(snippet, frames_dir, scale=args.scale or None, ffmpeg=ffmpeg)
-    frames = _load_frames(frames_dir)[: max(1, int(round(args.seconds * 30)))]
-    checkpoint = resolve_checkpoint()
-    if checkpoint is None:
-        raise SystemExit("SAM 3.1 checkpoint is not on disk")
-    png_dir = args.work / "sam_png"
-    prompts = args.work / "prompts.json"
-    prompts.write_text(json.dumps({"hand": "person wearing gloves", "tool": "handheld tool"}))
-    cmd = [
-        resolve_python(), "-m", "demo.pipeline.maps.sam31_video", "--worker",
-        "--frames", str(frames_dir),
-        "--out", str(args.work / "sam_unused.mp4"),
-        "--timing", str(args.work / "sam_timing.json"),
-        "--checkpoint", str(checkpoint),
-        "--prompts", str(prompts),
-        "--png-dir", str(png_dir),
-        "--concepts", "hand,tool",
-    ]
-    res = subprocess.run(cmd)
-    if res.returncode != 0:
-        raise SystemExit(f"SAM worker failed: {res.returncode}")
-    masks = _masks_from_sam_png(png_dir)
+    count = max(1, int(round(args.seconds * 30)))
+    extract_jpegs(snippet, frames_dir, count)
+    frames = _load_frames(frames_dir)[:count]
+    sam = build("sam31").segment(frames_dir, load_domain("egocentric"))
+    sam.save(args.work / "sam")
+    masks = [sam.foreground(index).astype(np.uint8) for index in range(len(sam))]
     n = min(len(frames), len(masks), 8)
     frames, masks = frames[:n], masks[:n]
     fills: dict[str, list[np.ndarray]] = {}

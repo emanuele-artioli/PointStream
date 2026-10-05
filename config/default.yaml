@@ -42,8 +42,8 @@ pose:
   prompt: null
   schema: coco-wholebody-133
 segmenter:
-  backend: yolo
-  model: yolo26n-seg.pt
+  backend: yoloe-26n
+  model: yoloe-26n-seg.pt
   prompt: null
 appearance:
   representation: compressed-image

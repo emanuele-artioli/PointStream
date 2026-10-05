@@ -28,7 +28,7 @@ import tempfile
 import time
 from typing import Any, cast
 
-from src.components.segmentation.sam31 import Policy, Role
+from src.segmentation.sam31 import Policy, Role
 from src.shared.dataset_quality import (
     QualityDecision,
     filter_player_candidates,
@@ -201,13 +201,13 @@ def _sam_runtime_inventory(sam_python: Path, sam_source: Path) -> dict[str, Any]
         "import importlib.metadata as metadata,json,sys,torch; "
         f"sys.path.insert(0,{str(sam_source)!r}); "
         "from sam3.model_builder import build_sam3_multiplex_video_predictor; "
-        "from src.components.segmentation.sam31 import Sam31SequenceSegmenter; "
+        "from src.segmentation.sam31 import Sam31SequenceSegmenter; "
         "import PIL; "
         "import inspect; "
         "print(json.dumps({'python':sys.executable,'python_version':sys.version,'torch':torch.__version__,"
         "'cuda_available':bool(torch.cuda.is_available()),'cuda_version':torch.version.cuda,"
         "'predictor_signature':str(inspect.signature(build_sam3_multiplex_video_predictor)),"
-        "'sam_adapter':'src.components.segmentation.sam31:Sam31SequenceSegmenter',"
+        "'sam_adapter':'src.segmentation.sam31:Sam31SequenceSegmenter',"
         "'packages':{name:metadata.version(name) for name in ('timm','iopath','Pillow','torchvision')},"
         "'pillow_version':PIL.__version__}))"
     )
@@ -657,7 +657,7 @@ def _jsonable_provenance(value: Any) -> dict[str, Any]:
 
 def _sam_worker(config_path: Path) -> int:
     """Run SAM3.1 only, so its supported CUDA runtime never overlaps DWPose."""
-    from src.components.segmentation.sam31 import Sam31SequenceSegmenter
+    from src.segmentation.sam31 import Sam31SequenceSegmenter
 
     config = _read_json(config_path)
     scene = config["scene"]
@@ -729,7 +729,7 @@ def _sam_worker(config_path: Path) -> int:
             )
 
         for role_name, records in outputs.items():
-            role = cast(Role, role_name)
+            role = role_name
             by_object: dict[str, list[Any]] = defaultdict(list)
             for item in records.values():
                 by_object[item.object_id].append(item)
@@ -2494,7 +2494,7 @@ def _sam_quality_dataset_worker(config_path: Path, *, resume: bool = False) -> i
     """Generate framewise box-guided SAM3.1 masks for one balanced shard."""
     from PIL import Image
     import torch
-    from src.components.segmentation.sam31 import Sam31SequenceSegmenter
+    from src.segmentation.sam31 import Sam31SequenceSegmenter
 
     config = _read_json(config_path)
     if not torch.cuda.is_available():
@@ -2734,7 +2734,7 @@ def _sam_quality_dataset_worker(config_path: Path, *, resume: bool = False) -> i
 
 def _load_quality_chunk(chunk: dict[str, Any]) -> tuple[dict[str, Any], dict[str, dict[tuple[int, str], Any]]]:
     from PIL import Image
-    from src.components.segmentation.sam31 import MaskObservation
+    from src.segmentation.sam31 import MaskObservation
     from src.contracts.observation import EstimatorProvenance, ObservationStatus
 
     payload = _read_json(Path(chunk["metadata_path"]))

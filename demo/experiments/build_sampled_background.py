@@ -22,11 +22,8 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-from PIL import Image
 
-CODE = Path("/home/itec/emanuele/pointstream-data/jobs/neural-bg/code")
-sys.path.insert(0, str(CODE))
-from demo.pipeline.maps.sam31_video import resolve_checkpoint, resolve_python  # noqa: E402
+from src.segmentation import build, load_domain
 
 CURATED = Path("/home/itec/emanuele/Datasets/Egocentric-10K/curated")
 DEST_ROOT = Path("/home/itec/emanuele/Datasets/pointstream-demo")
@@ -37,7 +34,6 @@ DIFF_DIR = Path("/home/itec/emanuele/pointstream-data/jobs/neural-bg/src/DiffuEr
 FPS = 30
 EVERY_S = 30.0
 BATCH_S = 1.0
-PROMPTS = ("hand", "arm")
 # Visually checked: 970s is the press, 990s is the aisle, 1100s is the press again.
 WALK = (976.0, 1104.0)
 PRESS_TRAIN = (916.0, 976.0)
@@ -103,24 +99,10 @@ def sam_union(frames: Path, work: Path) -> list[np.ndarray]:
     paths = sorted(frames.glob("*.jpg"))
     if len(paths) < 23:
         raise SystemExit(f"{frames} has {len(paths)} frames; DiffuEraser needs more than 22")
-    collected: dict[str, list[np.ndarray]] = {text: [] for text in PROMPTS}
-    for text in PROMPTS:
-        prompts = work / f"prompts_{text}.json"
-        prompts.write_text(json.dumps({"hand": text}))
-        png = work / f"png_{text}"
-        png.mkdir(parents=True, exist_ok=True)
-        if len(list(png.glob("*.png"))) < len(paths):
-            run([
-                resolve_python(), "-m", "demo.pipeline.maps.sam31_video", "--worker",
-                "--frames", str(frames), "--out", str(work / f"sam_{text}.mp4"),
-                "--timing", str(work / f"timing_{text}.json"),
-                "--checkpoint", str(resolve_checkpoint()),
-                "--prompts", str(prompts), "--png-dir", str(png), "--concepts", "hand",
-            ])
-        for path in sorted(png.glob("*.png"))[: len(paths)]:
-            arr = np.asarray(Image.open(path).convert("RGB"))
-            collected[text].append(arr.max(axis=2) > 0)
-    union = np.logical_or(np.stack(collected["hand"]), np.stack(collected["arm"]))
+    # SAM 3.1 with the egocentric foreground classes (arm, hand); keep the lossless run.
+    masks = build("sam31").segment(frames, load_domain("egocentric"))
+    masks.save(work)
+    union = np.stack([masks.foreground(index) for index in range(len(masks))])
     np.save(cached, union)
     return list(union)
 
@@ -285,7 +267,7 @@ def process(stem: str, role: str, max_batches: int | None, stage: str, shard: in
         "source": str(src),
         "role": role,
         "recipe": "1s at 30fps every 30s",
-        "mask": "sam3.1 hand union arm",
+        "mask": "src.segmentation sam31, egocentric foreground (arm + hand)",
         "filler": "diffueraser",
         "workstation_holdout": "clip_03_factory001_worker001_00000",
         "rejected_holdout": {

@@ -409,7 +409,7 @@ class PointstreamConfig:
     selection: BackendConfig = field(default_factory=lambda: BackendConfig(backend="heuristic"))
     tracking: BackendConfig = field(default_factory=lambda: BackendConfig(backend="tracker"))
     pose: PoseConfig = field(default_factory=lambda: PoseConfig(backend="yolo", model="yolo26n-pose.pt"))
-    segmenter: BackendConfig = field(default_factory=lambda: BackendConfig(backend="yolo", model="yolo26n-seg.pt"))
+    segmenter: BackendConfig = field(default_factory=lambda: BackendConfig(backend="yoloe-26n", model="yoloe-26n-seg.pt"))
     appearance: AppearanceConfig = field(default_factory=AppearanceConfig)
     motion: MotionConfig = field(default_factory=MotionConfig)
     temporal: TemporalConfig = field(default_factory=TemporalConfig)

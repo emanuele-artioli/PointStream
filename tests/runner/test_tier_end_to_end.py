@@ -93,9 +93,10 @@ def _light_perception() -> dict[str, object]:
             return None
 
     class _SkipSeg:
-        def segment(self, frame, detection):  # noqa: ANN001
-            _ = (frame, detection)
-            return None
+        def stream(self, frames, domain):  # noqa: ANN001
+            _ = domain
+            for _frame in frames:
+                yield []
 
     return {"pose": _SkipPose(), "segmenter": _SkipSeg()}
 

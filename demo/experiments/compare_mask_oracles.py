@@ -22,7 +22,7 @@ from typing import Any
 import cv2
 import numpy as np
 
-from demo.pipeline.maps.encode import union_mask_from_frame, unpack_rle_stream
+from src.segmentation.masks import SCHEMA, ClipMasks
 
 logger = logging.getLogger(__name__)
 
@@ -101,9 +101,12 @@ def dino_support(features: np.ndarray, height: int, width: int, percentile: floa
 
 
 def rle_supports(payload: bytes) -> list[np.ndarray]:
-    doc = unpack_rle_stream(payload)
-    height, width = int(doc["height"]), int(doc["width"])
-    return [union_mask_from_frame(frame, height, width) for frame in doc.get("frames") or []]
+    from src.segmentation.masks import decompress
+
+    doc = json.loads(decompress(payload))
+    assert doc.get("schema") == SCHEMA, doc.get("schema")
+    masks = ClipMasks.from_doc(doc)
+    return [masks.foreground(index).astype(np.uint8) for index in range(len(masks))]
 
 
 def build_report(rows: list[dict[str, Any]]) -> dict[str, Any]:

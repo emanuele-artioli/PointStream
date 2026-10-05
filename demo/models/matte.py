@@ -138,28 +138,24 @@ def matte_bgr(crop: np.ndarray, alpha: np.ndarray) -> np.ndarray:
 
 
 def read_hand_alphas(path: Path, width: int, height: int, max_frames: int) -> list[np.ndarray]:
-    """Decode a colored mask video into full-frame hand alphas."""
-    frames = _read_bgr(path, width, height, max_frames)
-    return [hand_alpha_bgr(frame) for frame in frames]
+    """Full-frame foreground alphas (uint8 0/255) from a segmentation run.
 
+    ``path`` is a `src.segmentation` run (``masks.rle`` or its directory), whose
+    foreground is the arm and hand; a legacy colour mask video still decodes.
+    """
+    path = Path(path)
+    if path.suffix.lower() in {".mp4", ".mkv", ".webm"}:
+        return [hand_alpha_bgr(frame) for frame in _read_bgr(path, width, height, max_frames)]
+    from src.segmentation import ClipMasks
 
-def union_hand_alphas(primary: list[np.ndarray], fallback: list[np.ndarray]) -> list[np.ndarray]:
-    """A pixel is hand if either segmentation says so. Covers frames one model missed."""
-    count = max(len(primary), len(fallback))
-    out: list[np.ndarray] = []
-    for index in range(count):
-        left = primary[index] if index < len(primary) else None
-        right = fallback[index] if index < len(fallback) else None
-        if left is None or right is None:
-            chosen = left if left is not None else right
-            if chosen is None:
-                continue
-            out.append(chosen)
-            continue
-        if right.shape[:2] != left.shape[:2]:
-            right = cv2.resize(right, (left.shape[1], left.shape[0]), interpolation=cv2.INTER_NEAREST)
-        out.append(np.maximum(left, right))
-    return out
+    masks = ClipMasks.load(path)
+    alphas = []
+    for index in range(min(max_frames, len(masks))):
+        alpha = masks.foreground(index).astype(np.uint8) * 255
+        if alpha.shape != (height, width):
+            alpha = cv2.resize(alpha, (width, height), interpolation=cv2.INTER_NEAREST)
+        alphas.append(alpha)
+    return alphas
 
 
 def _clamp_box(x1: int, y1: int, x2: int, y2: int, frame_w: int, frame_h: int) -> list[int]:

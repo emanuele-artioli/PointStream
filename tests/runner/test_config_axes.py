@@ -122,14 +122,11 @@ class _PatternSeg:
     def __init__(self, every: int) -> None:
         self.every = every
 
-    def segment(self, frame, detection):  # noqa: ANN001
-        _ = frame
-        box = detection.bbox
-        height = max(1, int(np.ceil(box.y2) - np.floor(box.y1)))
-        width = max(1, int(np.ceil(box.x2) - np.floor(box.x1)))
-        mask = np.zeros((height, width), dtype=bool)
-        mask[:: self.every, :: self.every] = True
-        return mask
+    def stream(self, frames, domain):  # noqa: ANN001
+        for frame in frames:
+            mask = np.zeros(frame.shape[:2], dtype=bool)
+            mask[:32:self.every, :32:self.every] = True
+            yield [(domain.classes[0], 1, mask, 1.0)]
 
 
 def _art(result: Any, key: str) -> Any:
@@ -211,7 +208,7 @@ def test_segmenter_backend_name_changes_the_result(monkeypatch: pytest.MonkeyPat
 
     def build(name: str, **kwargs: object) -> _PatternSeg:
         _ = kwargs
-        return _PatternSeg(1 if name == "yolo" else 2)
+        return _PatternSeg(1 if name == "yoloe-26n" else 2)
 
     monkeypatch.setattr("src.components.segmentation.REGISTRY.build", build)
     monkeypatch.setattr(
@@ -222,14 +219,14 @@ def test_segmenter_backend_name_changes_the_result(monkeypatch: pytest.MonkeyPat
     left = run(
         _config(
             lattice=_lattice(detection=True, segmentation=True),
-            segmenter=BackendConfig(backend="yolo", model="yolo26n-seg.pt"),
+            segmenter=BackendConfig(backend="yoloe-26n", model="yoloe-26n-seg.pt"),
         ),
         [clip],
     )
     right = run(
         _config(
             lattice=_lattice(detection=True, segmentation=True),
-            segmenter=BackendConfig(backend="sam3", model="sam3.pt"),
+            segmenter=BackendConfig(backend="sam31"),
         ),
         [clip],
     )

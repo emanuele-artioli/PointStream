@@ -35,7 +35,7 @@ from src.contracts.metrics import ALWAYS_ON, DEFAULT_METRICS, MetricSelection, r
 #: with a person-shaped hole in it is not something a ReID backbone has ever
 #: seen, and it would return a number anyway.
 _RECTANGULAR = frozenset(
-    {"vmaf", "lpips", "fvmd", "reid", "palette", "pose_oks", "sam_iou"}
+    {"vmaf", "lpips", "fvmd", "reid", "palette", "pose_oks"}
 )
 
 
