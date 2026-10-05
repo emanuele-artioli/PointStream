@@ -134,14 +134,11 @@ def cmd_suite(args: argparse.Namespace) -> int:
         raise SystemExit("--out is required outside a fleet stage")
     backends = [name.strip() for name in args.backends.split(",") if name.strip()]
     failures: list[dict[str, str]] = []
+    completed = 0
     for domain in args.domain:
-        sources = resolve_sources(domain, args.source)
+        sources = resolve_sources(domain, args.source)[: args.limit]
         for name in backends:
-            try:
-                backend = build(name)
-            except Exception as exc:  # a missing weight is reported, not fatal
-                failures.append({"domain": domain, "backend": name, "error": repr(exc)})
-                continue
+            backend = build(name)
             for clip_id, source in sources:
                 target = out / domain / name / clip_id
                 if (target / "provenance.json").is_file():
@@ -150,14 +147,18 @@ def cmd_suite(args: argparse.Namespace) -> int:
                 try:
                     run_one(backend, domain, clip_id, source, target, args.max_frames)
                 except Exception as exc:
+                    import traceback
+
+                    traceback.print_exc()
                     failures.append({"domain": domain, "backend": name, "clip": clip_id, "error": repr(exc)})
                     if name == REFERENCE_BACKEND and not args.keep_going:
                         raise
+                completed += 1
                 try:
                     from experiments.jobs.monitor import publish_progress
 
-                    publish_progress(os.environ.get("PS_STAGE", "local"), 1)
-                except Exception:
+                    publish_progress(os.environ.get("PS_STAGE", "local"), completed)
+                except ImportError:
                     pass
             del backend
         reference = out / domain / REFERENCE_BACKEND
@@ -169,6 +170,56 @@ def cmd_suite(args: argparse.Namespace) -> int:
             print_table(report["summary"])
     (out / "failures.json").write_text(json.dumps(failures, indent=2) + "\n")
     return 1 if failures and not args.keep_going else 0
+
+
+def validate_suite(root: Path, manifest: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Checks a suite directory must pass before its numbers are looked at."""
+    import math
+
+    checks: list[dict[str, Any]] = []
+
+    def check(name: str, ok: bool, detail: Any = None) -> None:
+        checks.append({"name": name, "passed": bool(ok), "detail": detail})
+
+    failures = json.loads((root / "failures.json").read_text()) if (root / "failures.json").is_file() else None
+    check("no backend failures", failures == [], failures)
+    expected = {Path(item["path"]).resolve(): item["sha256"] for item in (manifest or {}).get("clips", [])}
+    for domain_dir in sorted(p for p in root.iterdir() if p.is_dir() and (p / REFERENCE_BACKEND).is_dir()):
+        domain = domain_dir.name
+        for run in sorted(p for p in domain_dir.glob("*/*") if (p / "provenance.json").is_file()):
+            record = json.loads((run / "provenance.json").read_text())
+            masks = ClipMasks.load(run)
+            label = f"{domain}/{run.parent.name}/{run.name}"
+            check(f"{label}: frames written", len(masks) == record["frames"] > 0, len(masks))
+            check(f"{label}: GPU identity recorded", bool((record.get("runtime") or {}).get("gpu")))
+            source = record.get("source") or {}
+            if expected:
+                check(f"{label}: input matches manifest",
+                      expected.get(Path(source.get("path", "")).resolve()) == source.get("sha256"), source)
+            if run.parent.name == REFERENCE_BACKEND:
+                nonempty = sum(1 for frame in masks.frames if frame)
+                check(f"{label}: reference finds foreground", nonempty > 0, f"{nonempty}/{len(masks)} frames")
+        report_path = domain_dir / "report.json"
+        rows = json.loads(report_path.read_text())["rows"] if report_path.is_file() else []
+        check(f"{domain}: benchmark rows", bool(rows), len(rows))
+        for row in rows:
+            j = row["scopes"]["foreground"]["J"]
+            check(f"{domain}/{row['backend']}/{row['clip']}: finite J", j is not None and math.isfinite(j), j)
+            check(f"{domain}/{row['backend']}/{row['clip']}: throughput recorded", bool(row.get("ms_per_frame")))
+    return {"passed": bool(checks) and all(c["passed"] for c in checks), "checks": checks}
+
+
+def cmd_validate(args: argparse.Namespace) -> int:
+    root = args.root or Path(os.environ.get("PS_STAGE_DIR", ""))
+    manifest = json.loads(args.manifest.read_text()) if args.manifest else None
+    result = validate_suite(root, manifest)
+    target = Path(os.environ.get("PS_VALIDATION_PATH") or root / "validation.json")
+    target.write_text(json.dumps(result, indent=2) + "\n")
+    for item in result["checks"]:
+        if not item["passed"]:
+            print("FAIL", item["name"], item["detail"])
+    print("passed" if result["passed"] else "failed", f"({len(result['checks'])} checks)")
+    return 0 if result["passed"] else 1
 
 
 def cmd_export(args: argparse.Namespace) -> int:
@@ -243,8 +294,14 @@ def parser() -> argparse.ArgumentParser:
     suite.add_argument("--source", type=Path, nargs="*")
     suite.add_argument("--out", type=Path)
     suite.add_argument("--max-frames", type=int)
+    suite.add_argument("--limit", type=int, help="first N clips per domain")
     suite.add_argument("--keep-going", action="store_true")
     suite.set_defaults(func=cmd_suite)
+
+    validate = sub.add_parser("validate", help="check a suite directory (fleet smoke gate)")
+    validate.add_argument("--root", type=Path, help="default: $PS_STAGE_DIR")
+    validate.add_argument("--manifest", type=Path, help="input manifest with clip sha256s")
+    validate.set_defaults(func=cmd_validate)
 
     export = sub.add_parser("export", help="write per-frame PNG masks")
     export.add_argument("--masks", type=Path, required=True)

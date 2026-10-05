@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 from collections.abc import Iterator
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -104,6 +105,17 @@ def sha256_file(path: Path | str) -> str:
 def source_identity(source: Path | str, max_frames: int | None = None) -> dict[str, Any]:
     """sha256 of the video file, or of the ordered frame files a run read."""
     path = Path(source).resolve()
+    stat = path.stat()
+    return dict(_source_identity(path, max_frames, stat.st_size, stat.st_mtime_ns))
+
+
+@lru_cache(maxsize=64)
+def _source_identity(path: Path, max_frames: int | None, _size: int, _mtime: int) -> tuple[tuple[str, Any], ...]:
+    """Cached per file version: every backend in a suite reads the same clip."""
+    return tuple(_hash_source(path, max_frames).items())
+
+
+def _hash_source(path: Path, max_frames: int | None) -> dict[str, Any]:
     if path.is_dir():
         digest = hashlib.sha256()
         images = image_files(path)[:max_frames]
