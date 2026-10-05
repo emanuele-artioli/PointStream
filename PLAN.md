@@ -74,7 +74,7 @@ are reviewed below; only the evidence reuse tasks in the current brief are relea
 
 | Module | Owner Lane | Verdict | Short Headroom (48f) | Long Headroom (192f) | Next Action |
 |---|---|---|---|---|---|
-| [01 Segmentation](docs/scorecards/01_segmentation.md) | Antigravity FG | SATISFIED_FREEZE | $\Delta F = -1.1\text{ kB}$ (10%) | $\Delta F \approx -4\text{ kB}$ | Freeze YOLO; SAM 3.1 below 15% threshold |
+| [01 Segmentation](docs/scorecards/01_segmentation.md) | `src/segmentation` | SUPERSEDED (old numbers were synthetic) | — | — | SAM 3.1 reference vs YOLOE-26 n–x benchmark via `python -m src.segmentation suite` |
 | [02 Background](docs/scorecards/02_background.md) | PointStream codec | ACTIVE_SEARCH | Registered VVC QP 40 plate 58,814 B; warp residual QP 46 is 107 kB at BG 29.56 dB | not remeasured | Matched-QP residual fell only ~29 kB; foreground still blocks a weighted win |
 | [03 Appearance Crops](docs/scorecards/03_appearance_crops.md) | PointStream foreground | ACTIVE_SEARCH | 12 kB budget, 6 crops, FG 17.70 dB | not remeasured | Budget raised FG +3.4 dB and left 42 frames suppressed |
 | [04 Motion & Metadata](docs/scorecards/04_motion_metadata.md) | Cursor / Antigravity | SATISFIED_FREEZE | $T=17.6\text{ kB} < \text{VVC}$; pred $\le +0.12\text{ dB}$ | -29.8 kB | Freeze E06 per-frame RLE wire packing |
