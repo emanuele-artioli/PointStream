@@ -26,6 +26,7 @@ from src.segmentation import (
     BACKENDS,
     REFERENCE_BACKEND,
     ClipMasks,
+    Domain,
     build,
     domain_names,
     load_domain,
@@ -43,8 +44,13 @@ def resolve_sources(domain: str, sources: list[Path] | None) -> list[tuple[str, 
     return [(clip_id(path), path) for path in paths]
 
 
+def domain_for(args: argparse.Namespace, name: str) -> Domain:
+    """The named domain with this command's ``--prompt`` / ``--option`` overrides."""
+    return load_domain(name).with_overrides(args.prompt or (), args.option or ())
+
+
 def run_one(
-    backend: Any, domain_name: str, clip_id: str, source: Path, out: Path, max_frames: int | None
+    backend: Any, domain: Domain, clip_id: str, source: Path, out: Path, max_frames: int | None
 ) -> ClipMasks:
     from src.segmentation.sources import (
         code_identity,
@@ -53,13 +59,12 @@ def run_one(
         write_provenance,
     )
 
-    domain = load_domain(domain_name)
     started = time.time()
     masks = backend.segment(source, domain, max_frames=max_frames)
     masks.meta.update(
         {
             "clip": clip_id,
-            "domain": domain_name,
+            "domain": domain.name,
             "source": source_identity(source, max_frames if source.is_dir() else None),
             "runtime": runtime_identity(),
         }
@@ -84,7 +89,7 @@ def run_one(
 def cmd_run(args: argparse.Namespace) -> int:
     run_one(
         build(args.backend),
-        args.domain,
+        domain_for(args, args.domain),
         clip_id(args.source),
         args.source,
         args.out,
@@ -95,13 +100,14 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 def cmd_dataset(args: argparse.Namespace) -> int:
     backend = build(args.backend)
+    domain = domain_for(args, args.domain)
     for clip_id, source in resolve_sources(args.domain, args.source):
         target = args.out / clip_id
         if (target / "provenance.json").is_file() and not args.force:
             print(f"skip {clip_id}: {target} exists", flush=True)
             continue
         print(f"{args.backend} {clip_id} <- {source}", flush=True)
-        run_one(backend, args.domain, clip_id, source, target, args.max_frames)
+        run_one(backend, domain, clip_id, source, target, args.max_frames)
     return 0
 
 
@@ -184,7 +190,9 @@ def cmd_suite(args: argparse.Namespace) -> int:
                     continue
                 print(f"[{domain}] {name} {clip_id}", flush=True)
                 try:
-                    run_one(backend, domain, clip_id, source, target, args.max_frames)
+                    run_one(
+                        backend, domain_for(args, domain), clip_id, source, target, args.max_frames
+                    )
                 except Exception as exc:
                     import traceback
 
@@ -324,6 +332,21 @@ def cmd_preview(args: argparse.Namespace) -> int:
     return 0
 
 
+def add_overrides(command: argparse.ArgumentParser) -> None:
+    command.add_argument(
+        "--prompt",
+        action="append",
+        metavar="[FAMILY:]CLASS=TEXT",
+        help="override a class prompt (FAMILY: sam or yoloe); repeatable",
+    )
+    command.add_argument(
+        "--option",
+        action="append",
+        metavar="FAMILY:KEY=VALUE",
+        help="override a backend option from domains.yaml, e.g. yoloe:conf=0.05",
+    )
+
+
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(
         prog="python -m src.segmentation",
@@ -339,6 +362,7 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--source", type=Path, required=True, help="video file or image directory")
     run.add_argument("--out", type=Path, required=True)
     run.add_argument("--max-frames", type=int)
+    add_overrides(run)
     run.set_defaults(func=cmd_run)
 
     dataset = sub.add_parser("dataset", help="segment a set of clips into ROOT/<clip>/")
@@ -350,6 +374,7 @@ def parser() -> argparse.ArgumentParser:
     dataset.add_argument("--out", type=Path, required=True)
     dataset.add_argument("--max-frames", type=int)
     dataset.add_argument("--force", action="store_true")
+    add_overrides(dataset)
     dataset.set_defaults(func=cmd_dataset)
 
     bench_p = sub.add_parser("bench", help="score candidate roots against the reference root")
@@ -366,6 +391,7 @@ def parser() -> argparse.ArgumentParser:
     suite.add_argument("--max-frames", type=int)
     suite.add_argument("--limit", type=int, help="first N clips per domain")
     suite.add_argument("--keep-going", action="store_true")
+    add_overrides(suite)
     suite.set_defaults(func=cmd_suite)
 
     validate = sub.add_parser("validate", help="check a suite directory (fleet smoke gate)")

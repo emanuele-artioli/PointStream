@@ -15,9 +15,10 @@ Backends load lazily: importing this package needs only numpy and PyYAML, and
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Protocol
+from collections.abc import Sequence
 
 from src.segmentation.masks import ClipMasks, Instance
 
@@ -44,6 +45,37 @@ class Domain:
 
     def options_for(self, family: str) -> dict[str, Any]:
         return {k: v for k, v in self.backends.get(family, {}).items() if k != "prompts"}
+
+    def with_overrides(self, prompts: Sequence[str] = (), options: Sequence[str] = ()) -> Domain:
+        """Apply ``[FAMILY:]CLASS=TEXT`` prompts and ``FAMILY:KEY=VALUE`` options.
+
+        Prompts for classes this domain does not have are skipped, so one
+        command line can carry overrides for several domains.
+        """
+        import copy
+
+        import yaml
+
+        base = dict(self.prompts)
+        backends = copy.deepcopy(self.backends)
+        for item in prompts:
+            target, _, text = item.partition("=")
+            family, _, name = target.rpartition(":")
+            if not text:
+                raise ValueError(f"prompt override {item!r} is not [FAMILY:]CLASS=TEXT")
+            if name not in self.classes:
+                continue
+            if family:
+                backends.setdefault(family, {}).setdefault("prompts", {})[name] = text
+            else:
+                base[name] = text
+        for item in options:
+            target, _, value = item.partition("=")
+            family, _, key = target.partition(":")
+            if not family or not key or not value:
+                raise ValueError(f"option override {item!r} is not FAMILY:KEY=VALUE")
+            backends.setdefault(family, {})[key] = yaml.safe_load(value)
+        return replace(self, prompts=base, backends=backends)
 
     def clip_paths(self) -> list[Path]:
         """Default clips under the datasets root; a missing one is an error, never a skip."""

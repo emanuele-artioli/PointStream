@@ -129,3 +129,15 @@ def test_backend_registry_names() -> None:
     assert build("yoloe-26m", model=object()).name == "yoloe-26m"
     with pytest.raises(KeyError, match="unknown segmentation backend"):
         build("yolo-seg")
+
+
+def test_command_line_overrides_prompts_and_backend_options() -> None:
+    ego = load_domain("egocentric").with_overrides(
+        ["yoloe:hand=person", "arm=forearm", "player=ignored elsewhere"], ["yoloe:conf=0.05"]
+    )
+    assert ego.prompts_for("yoloe") == {"arm": "forearm", "hand": "person"}
+    assert ego.prompts_for("sam") == {"arm": "forearm", "hand": "hand"}
+    assert ego.options_for("yoloe")["conf"] == 0.05 and ego.options_for("yoloe")["min_hits"] == 5
+    assert load_domain("egocentric").prompts_for("yoloe")["hand"] == "hand"  # the original is untouched
+    with pytest.raises(ValueError, match="FAMILY:KEY=VALUE"):
+        ego.with_overrides(options=["conf=0.1"])
