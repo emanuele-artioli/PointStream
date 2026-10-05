@@ -398,7 +398,7 @@ def campaign(directory: Path) -> int:
             # Re-verified per stage, so promotion also requires unchanged staged bytes.
             staged = staging.stage_inputs(spec.get("staged_inputs", []), local_root)
             scratch = staging.scratch_directory(local_root, directory.name, stage, output)
-            staging_record = {"local_root": str(local_root) if local_root else None, "inputs": staged, "scratch": str(scratch)}
+            staging_record: dict[str, Any] = {"local_root": str(local_root) if local_root else None, "inputs": staged, "scratch": str(scratch)}
             monitor.write_json(output / "staging.json", staging_record)
             command = phase_command(spec, stage, staged)
             env = {**os.environ, "PS_STAGE": stage, "PS_STAGE_DIR": str(output), "PS_SCRATCH_DIR": str(scratch), "PS_VALIDATION_PATH": str(directory / "validation.json")}

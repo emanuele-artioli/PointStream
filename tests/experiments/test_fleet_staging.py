@@ -7,7 +7,10 @@ import tarfile
 import pytest
 
 from experiments.jobs import fleet, inbox, monitor, staging
-from tests.experiments.test_fleet_inbox import campaign, specification  # noqa: F401
+from tests.experiments import test_fleet_inbox
+from tests.experiments.test_fleet_inbox import specification
+
+campaign = test_fleet_inbox.campaign
 
 
 def item(path: Path, name="clips", **extra):
@@ -19,6 +22,8 @@ def local(tmp_path, monkeypatch):
     root = tmp_path / "local" / "pointstream"
     root.parent.mkdir()
     monkeypatch.setenv(staging.LOCAL_ROOT_ENV, str(root))
+    # Hosts' real free space varies; only the reserve tests constrain it.
+    monkeypatch.setattr(staging, "free_bytes", lambda path: 2**50)
     return root
 
 
