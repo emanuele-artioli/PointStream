@@ -64,9 +64,7 @@ Part D is the order of work.
   entrypoint, whole-argument scale placeholders, a smoke of at most 600 s, a
   validator with substantive checks, sha256-identified inputs, a deadline and
   a budget. Uncertain submissions are inspected, never replayed; cancel only
-  your own jobs. GPU hosts are gpu1–gpu6. Verified workers are on gpu3 (RTX
-  A6000) and gpu5 (RTX 6000 Ada); others need `ps-fleet doctor` and
-  `workers start`.
+  your own jobs. GPU hosts are gpu1–gpu6.
 - *Experiments:* GPU time and training are the constraint; code is cheap.
   Before a run, write its decision rule, hypothesis, competing explanation and
   budget. Then run a correctness smoke in minutes, a bounded pilot on the one
@@ -83,43 +81,26 @@ Part D is the order of work.
   `sam3.1_multiplex.pt`, sha256
   `0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6` (move
   it into `Models/SAM`).
-  - Each text prompt resets the tracker, so use one session per class.
-  - A prompt that finds nothing makes propagation raise "No points are
-    provided"; treat that as an empty result.
-  - The pinned build needs a `start_session` compatibility patch and an SDPA
-    fallback on pre-Ampere GPUs.
-  - Measured: 0.35–0.83 s/frame (1080p–4K, two classes), 16–37 GiB peak,
-    25–100 s load. Long clips need windows of ~300 frames.
-- `sam3.pt` (SAM 3, image) is a different model; check which model actually
-  runs before trusting a label.
 - YOLOE-26:
   - Only the `n` and `x` segmentation weights are in `Models/YOLO`, with the
     `mobileclip2_b.ts` text encoder, which must be bound locally.
-  - "hand"/"arm" text prompts find nothing on egocentric footage.
-  - Agreement with SAM 3.1 was J 0.15–0.31 with text prompts, so it is not a
-    SAM substitute without proposers.
   - ByteTrack loses fast hands; mask-IoU association works.
 - ONNX Runtime GPU (DWPose) has silently fallen back to CPU when cuDNN 9 was
   missing; assert the execution provider.
-- Masks are stored losslessly (COCO-RLE), never round-tripped through lossy
-  video.
 
 ## C. Components (high level below segmentation)
 
 1. **Data:** labelled datasets (OpenTTGames, RacketVision, TrackNet, VISOR,
    EgoHOS, HOT3D) behind one adapter interface with native classes,
-   labelled-frame flags and a provenance field per mask. One domain per dataset.
+   labelled-frame flags and a provenance field per mask.
 2. **Segmentation** (carried over): SAM 3.1, YOLOE candidates, label-prompted
-   SAM for classes a dataset lacks, the ball from point prompts, and proposers
-   for the handled object. Output: lossless per-instance masks.
-3. **Background:** remove the foreground (video inpainting), then encode
-   cheaply. A near-static broadcast camera allows a plate plus warps; an
-   egocentric camera moves, so expect a conventional low-rate stream.
+   SAM for classes a dataset lacks, the ball segmented with SAM 3.1 from point prompts, 
+   and proposers for the handled object. Output: lossless per-instance masks.
+3. **Background:** remove the foreground (video inpainting if necessary), then encode
+   (more details will be provided in dedicated session).
 4. **Foreground:** per-object representation (appearance reference, pose or
-   keypoints, mask), decoded generatively or as coded crops. The ball is
-   parametric (trajectory + blur). Rackets and handled objects are part of the
-   problem.
-5. **Reconstruction:** composite foreground over background at the decoder.
+   keypoints, mask), decoded generatively or as coded crops (more details will be provided in dedicated session).
+5. **Reconstruction:** composite foreground (with transparency) over background at the decoder.
 6. **Bitstream and rate accounting.**
 7. **Evaluation:** AV1 and neural-codec baselines, region-weighted and
    perceptual metrics, timing, and later the ablations a TOMM paper needs.
