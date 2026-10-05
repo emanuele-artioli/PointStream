@@ -19,8 +19,11 @@ Part D is the order of work.
    - `src/segmentation/` and `tests/segmentation/`. Cut its three imports into
      the old tree (`src.contracts.paths`, `src.contracts.observation`,
      `src.components.detection.weights`) by inlining the few functions it uses.
-   - Fleet tooling: `scripts/ps-fleet`, `experiments/jobs/` (moved to a
-     `tools/` or `fleet/` package) and their tests.
+   - Fleet tooling: `scripts/ps-fleet`, `experiments/jobs/` including host-local
+     staging (`staging.py`) and packed environments (`environment.py`), moved to a
+     `tools/` or `fleet/` package, with their tests. Keep
+     `docs/workflow/long-jobs.md` (with its host-local staging section) and the
+     NFS measurements from `docs/areas/infrastructure.md` as `docs/fleet.md`.
    - `pyproject.toml`, `pytest.ini`, `.pre-commit-config.yaml`, trimmed.
      `environment.yaml` is replaced by the output of the environment audit
      (Part D, step 4).
@@ -39,7 +42,6 @@ Part D is the order of work.
    - `AGENTS.md`: the rules in Part B;
    - `docs/components.md`: Part C;
    - `docs/resources.md`: datasets, models, links;
-   - `docs/pitfalls.md`: model and tool behaviour in Part B;
    - `docs/experiments.md`: protocol plus a running registry of decisions.
 
    Use the dataset and workstream content of
@@ -65,6 +67,20 @@ Part D is the order of work.
   validator with substantive checks, sha256-identified inputs, a deadline and
   a budget. Uncertain submissions are inspected, never replayed; cancel only
   your own jobs. GPU hosts are gpu1–gpu6.
+- *Shared home is slow NFS:* ~200 ms per small-file create, 11–17 ms per open,
+  minutes for a cold `import torch`. Never do per-file work on it. In fleet
+  jobs, write intermediates to `PS_SCRATCH_DIR`, pass large or many-file inputs
+  as SHA256-identified archives in `staged_inputs`, and run from a packed
+  `environment` (see `docs/fleet.md`). Outside the fleet, keep caches and
+  scratch in `/tmp` or `/dev/shm`. Plan work around this: datasets of many small
+  files are stored and moved as archives.
+- *First run of a model on a GPU class:* GPUs differ in compute capability
+  (Ada 8.9, A6000 8.6, RTX 8000 7.5, GV100 7.0) and libraries fall back silently
+  (ONNX Runtime to CPU without cuDNN 9; attention kernels without flash support
+  before 8.0). The first time a model runs on a GPU class, a smoke asserts the
+  intended device, execution provider and kernels, and the result is recorded in
+  the model–GPU table in `docs/fleet.md`. Later runs read the table instead of
+  re-checking, and pick `gpu_models` from it.
 - *Experiments:* GPU time and training are the constraint; code is cheap.
   Before a run, write its decision rule, hypothesis, competing explanation and
   budget. Then run a correctness smoke in minutes, a bounded pilot on the one
@@ -75,7 +91,7 @@ Part D is the order of work.
 - *Baselines:* SVT-AV1 as the conventional codec and a state-of-the-art neural
   video codec. VVC only if a correct invocation turns out to be needed.
 
-**docs/pitfalls.md (model and tool behaviour)**
+**docs/resources.md (models; facts, not warnings)**
 - SAM 3.1 Object Multiplex: Meta's source pinned to
   `2345a4ad109ac29c569da749c91d84f10dc08c40`; checkpoint
   `sam3.1_multiplex.pt`, sha256
@@ -85,8 +101,6 @@ Part D is the order of work.
   - Only the `n` and `x` segmentation weights are in `Models/YOLO`, with the
     `mobileclip2_b.ts` text encoder, which must be bound locally.
   - ByteTrack loses fast hands; mask-IoU association works.
-- ONNX Runtime GPU (DWPose) has silently fallen back to CPU when cuDNN 9 was
-  missing; assert the execution provider.
 
 ## C. Components (high level below segmentation)
 
@@ -126,5 +140,5 @@ Part D is the order of work.
 8. Training-data export, then background and foreground encoding sessions.
 9. Paper rescoping alongside, with a fresh paper repository state.
 
-Storage performance guidance will be added from the separate session
-evaluating it.
+The NFS guidance and host-local staging come from PR #161 (merged into this
+branch).
