@@ -74,7 +74,7 @@ provenance.
 ### G. Background encoding
 
 Design session ([components](docs/components.md#3-background)). Candidates are
-the neural codec, a panorama/mosaic, and SVT-AV1. Egocentric video is the hard
+DCVC-UF, a panorama/mosaic, and SVT-AV1. Egocentric video is the hard
 case for a panorama: the head moves constantly and the scene is close, so there
 is parallax.
 
@@ -83,7 +83,7 @@ is parallax.
 Design session ([components](docs/components.md#4-foreground)): an appearance
 vector plus keypoints per object. Hands are evaluated twice. On HOT3D the
 keypoints come from motion capture (an oracle upper bound). On VISOR they come
-from a hand-pose estimator (what deployment sees). The gap between the two
+from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). The gap between the two
 measures the cost of pose estimation.
 
 ## Phase 2: racket sports

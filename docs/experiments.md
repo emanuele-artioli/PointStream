@@ -82,6 +82,10 @@ invocation turns out to be needed.
 ### 2026-10-05: Baselines
 - Decision: SVT-AV1 plus one state-of-the-art neural video codec. VVC only if a
   correct invocation is needed.
+- 2026-10-06: the neural codec is DCVC-UF (CVPR 2026, microsoft/DCVC `cbdae87`),
+  the newest DCVC, with a real entropy-coded bitstream. HNeRV is dropped: it has
+  no temporal model, and its latents cost as much as AV1 at 240p in the pre-reset
+  project ([resources](resources.md#models)).
 
 ## Runs
 
