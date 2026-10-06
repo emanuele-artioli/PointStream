@@ -51,6 +51,25 @@ def publish_progress(stage: str, completed: int, *, decision: str | None = None)
         )
 
 
+def save_checkpoint(name: str, data: bytes) -> Path:
+    """Atomically write one finished checkpoint file into ``PS_CHECKPOINT_DIR``.
+
+    The fleet archives only names that do not start with "." when a stage stops,
+    so a checkpoint interrupted mid-write is never published.
+    """
+    if not name or name.startswith(".") or Path(name).name != name:
+        raise ValueError("checkpoint names are plain file names that do not start with '.'")
+    directory = Path(os.environ["PS_CHECKPOINT_DIR"])
+    temporary = directory / f".{name}.{os.getpid()}.tmp"
+    with temporary.open("wb") as handle:
+        handle.write(data)
+        handle.flush()
+        os.fsync(handle.fileno())
+    target = directory / name
+    temporary.replace(target)
+    return target
+
+
 def foreign_gpu_processes(device_uuid: str, own_process_group: int) -> list[int] | None:
     """Return processes using a claimed GPU outside this job's process group.
 
@@ -100,6 +119,10 @@ def due_events(state: dict[str, Any], policy: dict[str, Any], now: float) -> lis
     allow_event = not quiet or policy.get("urgent_during_quiet", False)
     if status in {"failed", "complete", "budget_exhausted", "interrupted", "cancelled", "contended", "expired"}:
         key = f"terminal:{status}"
+        if key not in state["emitted"] and allow_event:
+            events.append(key)
+    for episode in state.get("contention", []):
+        key = f"contention:{episode['detected']}"
         if key not in state["emitted"] and allow_event:
             events.append(key)
     progress = state.get("progress") or {}
@@ -209,6 +232,93 @@ def stop_child(child: subprocess.Popen[Any]) -> bool:
     from experiments.jobs.claims import terminate_and_reap_process_group
 
     return terminate_and_reap_process_group(child)
+
+
+CONTENTION_POLICIES = ("stop", "continue", "pause")
+SALVAGE_SECONDS = 900
+
+
+def open_episode(state: dict[str, Any]) -> dict[str, Any] | None:
+    episodes = state.get("contention") or []
+    if episodes and "cleared" not in episodes[-1] and "ended" not in episodes[-1]:
+        return episodes[-1]
+    return None
+
+
+def signal_group(child: Any, signum: int) -> None:
+    try:
+        os.killpg(child.pid, signum)
+    except ProcessLookupError:
+        pass  # the group already exited; the next poll records its exit code
+
+
+def contention_step(
+    child: Any, state: dict[str, Any], policy: dict[str, Any], foreign: list[int], now: float
+) -> bool | None:
+    """Apply the job's declared contention policy to one occupancy observation.
+
+    Returns whether the owned process group was stopped, or None when it was not
+    asked to stop. External processes are only observed, never signalled.
+    """
+    episode = open_episode(state)
+    if not foreign:
+        if episode is not None:
+            if "paused_at" in episode and "resumed_at" not in episode:
+                signal_group(child, signal.SIGCONT)
+                episode["resumed_at"] = now
+            episode["cleared"] = now
+        return None
+    action = policy.get("policy", "stop")
+    if episode is None:
+        episode = {"detected": now, "action": action, "foreign_gpu_pids": []}
+        state.setdefault("contention", []).append(episode)
+    episode["foreign_gpu_pids"] = sorted(set(episode["foreign_gpu_pids"]) | set(foreign))
+    state.update(timing_contaminated=True, foreign_gpu_pids=foreign)
+    if action == "continue":
+        return None
+    if action == "pause":
+        if "paused_at" not in episode:
+            signal_group(child, signal.SIGSTOP)
+            episode["paused_at"] = now
+            return None
+        if now - episode["paused_at"] < policy["pause_seconds"]:
+            return None
+        error = f"Its claimed GPU stayed in use by another process for {policy['pause_seconds']} s of pause"
+    else:
+        error = "A process outside this job began using its claimed GPU"
+    stopped = stop_child(child)
+    episode["ended"] = now
+    state.update(status="contended" if stopped else "failed", error=error)
+    return stopped
+
+
+def paused_seconds(status: dict[str, Any], since: float, now: float) -> float:
+    """Seconds after ``since`` during which a declared pause held the job stopped."""
+    total = 0.0
+    for episode in status.get("contention") or []:
+        if "paused_at" in episode:
+            end = episode.get("resumed_at", episode.get("ended", now))
+            total += max(0.0, min(end, now) - max(episode["paused_at"], since))
+    return total
+
+
+def salvage(directory: Path, request: dict[str, Any], reason: str) -> dict[str, Any]:
+    """Run the request's salvage command once the owned process group is gone."""
+    started = time.time()
+    try:
+        with (directory / "salvage.log").open("a") as log:
+            result = subprocess.run(
+                [*request["salvage"], reason],
+                cwd=request["cwd"],
+                stdin=subprocess.DEVNULL,
+                stdout=log,
+                stderr=subprocess.STDOUT,
+                timeout=request.get("salvage_seconds", SALVAGE_SECONDS),
+                check=False,
+            )
+        return {"exit_code": result.returncode, "reason": reason, "started": started, "seconds": time.time() - started}
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {"error": str(exc), "reason": reason, "started": started, "seconds": time.time() - started}
 
 
 def supervise(directory: Path) -> int:
@@ -373,6 +483,8 @@ def supervise(directory: Path) -> int:
                     claim_session = None
                 state.update(status="failed", error=str(exc))
         last_log = 0.0
+        contention = request.get("contention") or {"policy": "stop"}
+        stopped = False
         try:
             while True:
                 now = time.time()
@@ -394,14 +506,10 @@ def supervise(directory: Path) -> int:
                                 error="GPU process occupancy could not be verified during the run",
                                 timing_contaminated=True,
                             )
-                        elif foreign:
-                            stopped = stop_child(child)
-                            state.update(
-                                status="contended" if stopped else "failed",
-                                error="A process outside this job began using its claimed GPU",
-                                foreign_gpu_pids=foreign,
-                                timing_contaminated=True,
-                            )
+                        else:
+                            result = contention_step(child, state, contention, foreign, now)
+                            if result is not None:
+                                stopped = result
                     if state["status"] == "running":
                         code = child.poll()
                         if code is not None:
@@ -410,6 +518,21 @@ def supervise(directory: Path) -> int:
                         elif now - state["started"] >= request["budget_seconds"] or now >= request.get("deadline_epoch", float("inf")):
                             stopped = stop_child(child)
                             state["status"] = "budget_exhausted" if stopped else "failed"
+                    if state["status"] != "running":
+                        state["ended"] = now
+                        episode = open_episode(state)
+                        if episode is not None:
+                            episode["ended"] = now
+                        if state["status"] != "complete" and stopped and request.get("salvage"):
+                            # Nothing in the owned group can still write; free the
+                            # GPU for others before copying partial outputs back.
+                            if claim_session is not None:
+                                from experiments.jobs.claims import release_session_claims
+
+                                release_session_claims(claim_session)
+                                claim_session = None
+                            write_json(directory / "status.json", state)
+                            state["salvage"] = salvage(directory, request, state["status"])
                 tick(directory, state, now)
                 if now - last_log >= 600:
                     with (directory / "progress.log").open("a") as log:

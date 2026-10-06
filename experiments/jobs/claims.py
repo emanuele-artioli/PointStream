@@ -926,6 +926,8 @@ def terminate_and_reap_process_group(
         return True
     try:
         os.killpg(pgid, signal.SIGTERM)
+        # A group paused for GPU contention only receives SIGTERM once continued.
+        os.killpg(pgid, signal.SIGCONT)
     except ProcessLookupError:
         process.poll()
         return not group_has_live_members()
