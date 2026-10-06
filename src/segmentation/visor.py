@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import io
 import json
+import math
 import re
 import zipfile
 from collections.abc import Iterable, Iterator, Sequence
@@ -88,10 +89,22 @@ def extraction_rate(fps: float) -> float:
 def epic_frame_to_video_index(epic_frame: int, fps: float) -> int:
     """Decoded-frame index of EPIC-KITCHENS rgb frame ``epic_frame`` (1-indexed).
 
-    Rgb frame k shows video time (k - 1) / `extraction_rate`: on a 59.94 fps
-    video (k - 1) / 60 s, on a 50 fps video decoded frame k - 1.
+    Verified against the released sparse JPEGs per video rate (fleet job
+    ``20261006T193326Z-64057023``, docs/resources.md#datasets):
+
+    * 50 fps (EK-100): decoded frame k - 1 (139/139);
+    * 59.94 fps: the frame nearest time (k - 1) / 60 s (86/86);
+    * 29.97 fps: (k - 1) / 60 s rounded *up* to a decoded frame (72/72).
+
+    No rule held on every checked frame of the one 47.95 fps video (P17_01,
+    train split), so that rate, like any other, is an error.
     """
-    return int(round((epic_frame - 1) * fps / extraction_rate(fps)))
+    position = (epic_frame - 1) * fps / extraction_rate(fps)
+    if abs(fps - 50.0) < 0.01 or abs(fps - 60000 / 1001) < 0.01:
+        return int(round(position))
+    if abs(fps - 30000 / 1001) < 0.01:
+        return int(math.ceil(position - 1e-9))
+    raise ValueError(f"no verified EPIC frame rule for {fps:.3f} fps videos")
 
 
 def keyframe_anchors(doc: dict[str, Any], mapping: dict[str, str], fps: float) -> dict[int, int]:

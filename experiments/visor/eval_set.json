@@ -1,0 +1,1187 @@
+{
+ "name": "visor-val-b1",
+ "created_utc": "2026-10-06T19:45:46.882933+00:00",
+ "rule": {
+  "split": "val",
+  "length": 240,
+  "seed": "pointstream-b1",
+  "verified_classes": [
+   "hevc 1920x1080 50.000"
+  ],
+  "mapping_result": {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261006T193326Z-64057023/full/mapping.json",
+   "sha256": "b960afb53e9fba9cd660c49793ba53c710c0be8c1fbfb5a8800287165eedf55a"
+  },
+  "summary": "one exactly aligned run per validation video of a verified class, its first frames from a keyframe; tools/datasets/visor_b1_inputs.py"
+ },
+ "source_zip": {
+  "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/2v6cgv1x04ol22qp9rm9x2j6a7.zip",
+  "sha256": "58621abab7fe225b1b2e20d1cbf691dcdf725a8d4f212e00497960fb5ff0f66d"
+ },
+ "dataset_manifest": {
+  "path": "/home/itec/emanuele/Datasets/manifests/EPIC-KITCHENS-VISOR.json",
+  "sha256": "caca34cc6d92c522c256e4a8ff4f8f70e517181fccfaf3cdfc676adb34eb3ef2"
+ },
+ "archive": {
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b1-2026-10-06/evalset/visor-val-dense.tar",
+  "sha256": "cca6169a76d5be96549db6fde03429906955105a8e3bcf5e7d867691c619020f",
+  "sources": {
+   "frame_mapping.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/frame_mapping.json",
+    "crc32": 3810323428,
+    "sha256": "dfab2f90e33db26aec6a6991012ba3e4700fe71ce1a761704e3a129f01a718dc"
+   },
+   "dense/P01_107_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P01_107_interpolations.zip",
+    "crc32": 366673603,
+    "sha256": "616adb21121a3197cf745293e66933c2645e0cc216de7bd7e54588dd602fb3dd"
+   },
+   "annotations/P01_107.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P01_107.json",
+    "crc32": 4205961367,
+    "sha256": "03bef9119f7343db282349f69e98e625a304c68c4a83342989984275b3d3ee9d"
+   },
+   "dense/P03_120_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P03_120_interpolations.zip",
+    "crc32": 2944311445,
+    "sha256": "006bfe9f0885275b6d85be61254dff5f372b2580cc1aeda1bd19753bedcb843b"
+   },
+   "annotations/P03_120.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P03_120.json",
+    "crc32": 2841212275,
+    "sha256": "dfbf1f16eddc951ad287c77dcb2c40ada43756d4015a0dce830f1b01b30924ea"
+   },
+   "dense/P06_106_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P06_106_interpolations.zip",
+    "crc32": 2595138567,
+    "sha256": "b3330dc0c3024a9dbbd906e42c2c1c4584b21a609bfdafd022f1ef2ab607d2a6"
+   },
+   "annotations/P06_106.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P06_106.json",
+    "crc32": 255775811,
+    "sha256": "8fc8c867a0f9fda16fb709ea6f024dfd1981c225cdff1e729c8b7d01c53b9c24"
+   },
+   "dense/P06_108_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P06_108_interpolations.zip",
+    "crc32": 3395510278,
+    "sha256": "0f1aaf19c276f64a0fdda1071be0d978a75c78440368905a124a10c0512e9591"
+   },
+   "annotations/P06_108.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P06_108.json",
+    "crc32": 250868835,
+    "sha256": "4c4efca289e57727f6719a35c992aa940037d3715c873b5b59ca1846334a471a"
+   },
+   "dense/P07_101_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P07_101_interpolations.zip",
+    "crc32": 4030131496,
+    "sha256": "8b0ebfdf1f53c966d3040ec4a35ba9b0ef6d0006ef24e6a6247c245fa260d15c"
+   },
+   "annotations/P07_101.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P07_101.json",
+    "crc32": 3154966247,
+    "sha256": "c1551499185010a2d3e021958dbf077a1b6c750e0016334a22488542ba6a7373"
+   },
+   "dense/P07_103_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P07_103_interpolations.zip",
+    "crc32": 1559330169,
+    "sha256": "a20e8b7accd369295500d7d15fec25bd56afbe53e9d1a5622b2ff47ce1d23a5e"
+   },
+   "annotations/P07_103.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P07_103.json",
+    "crc32": 3718450710,
+    "sha256": "041ee331b87c9fc91d428b6a8dae837886dba0e479a42b5b2dc2da1f272373cc"
+   },
+   "dense/P07_110_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P07_110_interpolations.zip",
+    "crc32": 1015429891,
+    "sha256": "cfac79da46fd6d030765defb2ca330c4142b7b9abdcbd46525801977e8649954"
+   },
+   "annotations/P07_110.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P07_110.json",
+    "crc32": 2024049378,
+    "sha256": "c86af11dfcb5597c634f77a246630f050a8ff7346bdc479199e75124b29ef4a7"
+   },
+   "dense/P09_103_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P09_103_interpolations.zip",
+    "crc32": 1369308425,
+    "sha256": "e12921c9bde6740cb6a771a37bf2cd14d2e1df97c5988fd8e217a1c1eb4e35de"
+   },
+   "annotations/P09_103.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P09_103.json",
+    "crc32": 488906979,
+    "sha256": "6e4cbd87c4760d7885dae376ba1b2e25113fc040ad90e9b567cbed98be130849"
+   },
+   "dense/P09_104_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P09_104_interpolations.zip",
+    "crc32": 2955362398,
+    "sha256": "0bd5929ae08060bf7b88864d1fd537562ba3fd2f6b2e941569775662b86cf921"
+   },
+   "annotations/P09_104.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P09_104.json",
+    "crc32": 4156043546,
+    "sha256": "6ba29fc8e3f06cf8838be0df16dc9ae572ed503944cf24ba0d928fcc9482783d"
+   },
+   "dense/P09_106_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P09_106_interpolations.zip",
+    "crc32": 2191139069,
+    "sha256": "bbd99dbc7f42e9c52cf611dbc4a4ae38acec1ded777007e2ccb43952a9abf9ba"
+   },
+   "annotations/P09_106.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P09_106.json",
+    "crc32": 305393564,
+    "sha256": "ffa52ed40fba2a1d98d26e001a63ce717d05d9f3ce3024269ad6fa1f095c53b1"
+   },
+   "dense/P22_107_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P22_107_interpolations.zip",
+    "crc32": 901554822,
+    "sha256": "766ba3ad992f67489368c2ebebb76d9b973448b28965908dedd9714d4cf0b225"
+   },
+   "annotations/P22_107.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P22_107.json",
+    "crc32": 4003452676,
+    "sha256": "ffb9b6021de7afc4cafe5be456093abf15c4b651dc7c5d8c899e628f8cf580ea"
+   },
+   "dense/P25_101_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P25_101_interpolations.zip",
+    "crc32": 614411297,
+    "sha256": "09c972ebb4e115f87a74b8b605d305e78f2451836792da06252a33d77f75c2c8"
+   },
+   "annotations/P25_101.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P25_101.json",
+    "crc32": 44753194,
+    "sha256": "5d47258fc7fd4ec0bd72064c65a7a43acee34164531f45e9c1a84df8e7a68353"
+   },
+   "dense/P26_108_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P26_108_interpolations.zip",
+    "crc32": 3499841249,
+    "sha256": "ebf04a94d5ffb39749fc910fc632779f28bb09466d055c3dc320a8774295a393"
+   },
+   "annotations/P26_108.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P26_108.json",
+    "crc32": 1442169338,
+    "sha256": "b4821db20b4b3da0053b878ffe43e8663272da0447d89701542563a8cb9dc8a8"
+   },
+   "dense/P27_105_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P27_105_interpolations.zip",
+    "crc32": 784016381,
+    "sha256": "6ceb9748d93d3a9ecd27beb9318cea0dab5e252c0c019972e874bdf90eb40d08"
+   },
+   "annotations/P27_105.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P27_105.json",
+    "crc32": 751312811,
+    "sha256": "13adc4702e7e4ce1d69ccb0a2a4e084317be12b2ddd50a4cb4018581e8a5337b"
+   },
+   "dense/P30_110_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P30_110_interpolations.zip",
+    "crc32": 3466581623,
+    "sha256": "72fe5ed18bf24c2f52db6734453db0bb9a69aa4309eb92648f92cb76c4f18024"
+   },
+   "annotations/P30_110.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P30_110.json",
+    "crc32": 3316591366,
+    "sha256": "0b80b561bb95f41735013fd0efb9026628013515900761d92bb3b12585d94c02"
+   },
+   "dense/P37_102_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P37_102_interpolations.zip",
+    "crc32": 3624650792,
+    "sha256": "fe8688408fc2dc47c0d8a2cddc2c8d44ad696c76f65bd080ef9b2646a0d12540"
+   },
+   "annotations/P37_102.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P37_102.json",
+    "crc32": 3483707052,
+    "sha256": "fa29cb0c8cfcb474c64c271306c1a9fac16bc74b9dd9675fda6370f68960f0f8"
+   }
+  }
+ },
+ "items": [
+  {
+   "id": "P01_107_0000000900",
+   "video": "P01_107",
+   "split": "val",
+   "first_visor_frame": 900,
+   "last_visor_frame": 1139,
+   "frames": 240,
+   "first_video_index": 899,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 900,
+    "last": 1201,
+    "eligible_runs": 3,
+    "runs": 8
+   },
+   "keyframes": [
+    0,
+    27,
+    54,
+    92,
+    171,
+    201,
+    228
+   ],
+   "labels": [
+    "cereal box",
+    "cupboard",
+    "food container",
+    "fridge",
+    "left hand",
+    "right hand",
+    "soy milk"
+   ],
+   "start_jpeg": "rgb_frames/P01_107_frame_0000000900.jpg",
+   "dense_member": "dense/P01_107_interpolations.zip",
+   "dense_sha256": "616adb21121a3197cf745293e66933c2645e0cc216de7bd7e54588dd602fb3dd",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P01_107.MP4",
+    "bytes": 362078738,
+    "sha256": "4f899b1b0180039ff7d913fa31a1ceec79889bdeb82ec27a0c7dfac9f71f297e"
+   }
+  },
+  {
+   "id": "P03_120_0000005422",
+   "video": "P03_120",
+   "split": "val",
+   "first_visor_frame": 5422,
+   "last_visor_frame": 5661,
+   "frames": 240,
+   "first_video_index": 5421,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 5422,
+    "last": 5822,
+    "eligible_runs": 14,
+    "runs": 34
+   },
+   "keyframes": [
+    0,
+    25,
+    50,
+    75,
+    100,
+    125,
+    150,
+    175,
+    200,
+    225
+   ],
+   "labels": [
+    "bowl",
+    "left hand",
+    "right hand",
+    "sugar",
+    "weight tray"
+   ],
+   "start_jpeg": "rgb_frames/P03_120_frame_0000005422.jpg",
+   "dense_member": "dense/P03_120_interpolations.zip",
+   "dense_sha256": "006bfe9f0885275b6d85be61254dff5f372b2580cc1aeda1bd19753bedcb843b",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P03_120.MP4",
+    "bytes": 2468031848,
+    "sha256": "8523e198daeafff3a408ca5ef9e83318c4126ec39db4a8dc44fec7a4fc70644c"
+   }
+  },
+  {
+   "id": "P06_106_0000005571",
+   "video": "P06_106",
+   "split": "val",
+   "first_visor_frame": 5571,
+   "last_visor_frame": 5810,
+   "frames": 240,
+   "first_video_index": 5570,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 5571,
+    "last": 6151,
+    "eligible_runs": 7,
+    "runs": 8
+   },
+   "keyframes": [
+    0
+   ],
+   "labels": [
+    "chilli",
+    "hob",
+    "left hand",
+    "plate",
+    "rice",
+    "right hand",
+    "tortilla"
+   ],
+   "start_jpeg": "rgb_frames/P06_106_frame_0000005571.jpg",
+   "dense_member": "dense/P06_106_interpolations.zip",
+   "dense_sha256": "b3330dc0c3024a9dbbd906e42c2c1c4584b21a609bfdafd022f1ef2ab607d2a6",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_106.MP4",
+    "bytes": 522595016,
+    "sha256": "a2d99b3607fb42cada0a69ee8e91a7bdabb88cd571510cd1e94b13cbd89d455e"
+   }
+  },
+  {
+   "id": "P06_108_0000026317",
+   "video": "P06_108",
+   "split": "val",
+   "first_visor_frame": 26317,
+   "last_visor_frame": 26556,
+   "frames": 240,
+   "first_video_index": 26316,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 26317,
+    "last": 26667,
+    "eligible_runs": 17,
+    "runs": 35
+   },
+   "keyframes": [
+    0,
+    81
+   ],
+   "labels": [
+    "hob",
+    "left hand",
+    "pan",
+    "phone",
+    "right hand",
+    "silver foil"
+   ],
+   "start_jpeg": "rgb_frames/P06_108_frame_0000026317.jpg",
+   "dense_member": "dense/P06_108_interpolations.zip",
+   "dense_sha256": "0f1aaf19c276f64a0fdda1071be0d978a75c78440368905a124a10c0512e9591",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_108.MP4",
+    "bytes": 2207554456,
+    "sha256": "041dcbadf1826301038f5c36dc976ae831dd7c6683f2931e0c31e0216bdbf036"
+   }
+  },
+  {
+   "id": "P07_101_0000019693",
+   "video": "P07_101",
+   "split": "val",
+   "first_visor_frame": 19693,
+   "last_visor_frame": 19932,
+   "frames": 240,
+   "first_video_index": 19692,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 19693,
+    "last": 19995,
+    "eligible_runs": 16,
+    "runs": 28
+   },
+   "keyframes": [
+    0,
+    133
+   ],
+   "labels": [
+    "bread",
+    "left hand",
+    "right hand",
+    "tray"
+   ],
+   "start_jpeg": "rgb_frames/P07_101_frame_0000019693.jpg",
+   "dense_member": "dense/P07_101_interpolations.zip",
+   "dense_sha256": "8b0ebfdf1f53c966d3040ec4a35ba9b0ef6d0006ef24e6a6247c245fa260d15c",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P07_101.MP4",
+    "bytes": 1457475229,
+    "sha256": "be919e74386c9ae4e7de30da9c83a69aaa3adbe52924601acbbd1ec0d803c36b"
+   }
+  },
+  {
+   "id": "P07_103_0000000178",
+   "video": "P07_103",
+   "split": "val",
+   "first_visor_frame": 178,
+   "last_visor_frame": 417,
+   "frames": 240,
+   "first_video_index": 177,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 178,
+    "last": 728,
+    "eligible_runs": 2,
+    "runs": 2
+   },
+   "keyframes": [
+    0,
+    67,
+    106,
+    189,
+    231
+   ],
+   "labels": [
+    "cupboard",
+    "left hand",
+    "plate",
+    "right hand",
+    "towel"
+   ],
+   "start_jpeg": "rgb_frames/P07_103_frame_0000000178.jpg",
+   "dense_member": "dense/P07_103_interpolations.zip",
+   "dense_sha256": "a20e8b7accd369295500d7d15fec25bd56afbe53e9d1a5622b2ff47ce1d23a5e",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P07_103.MP4",
+    "bytes": 149027986,
+    "sha256": "5fee857dbea6f22f244a6718cbd36a94af20ff3159317cf3b68fa4e1cfa508bf"
+   }
+  },
+  {
+   "id": "P07_110_0000007178",
+   "video": "P07_110",
+   "split": "val",
+   "first_visor_frame": 7178,
+   "last_visor_frame": 7417,
+   "frames": 240,
+   "first_video_index": 7177,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 7178,
+    "last": 9146,
+    "eligible_runs": 11,
+    "runs": 15
+   },
+   "keyframes": [
+    0,
+    34,
+    131
+   ],
+   "labels": [
+    "fridge",
+    "glass",
+    "left hand",
+    "milk bottle",
+    "milk bottle lid",
+    "mixture",
+    "right hand"
+   ],
+   "start_jpeg": "rgb_frames/P07_110_frame_0000007178.jpg",
+   "dense_member": "dense/P07_110_interpolations.zip",
+   "dense_sha256": "cfac79da46fd6d030765defb2ca330c4142b7b9abdcbd46525801977e8649954",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P07_110.MP4",
+    "bytes": 788471965,
+    "sha256": "28688ccfd50ca92f1418a6797f4e3444efd2b7fa577e74596e8113ce72f7ae04"
+   }
+  },
+  {
+   "id": "P09_103_0000011744",
+   "video": "P09_103",
+   "split": "val",
+   "first_visor_frame": 11744,
+   "last_visor_frame": 11983,
+   "frames": 240,
+   "first_video_index": 11743,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 11744,
+    "last": 12094,
+    "eligible_runs": 9,
+    "runs": 18
+   },
+   "keyframes": [
+    0,
+    163
+   ],
+   "labels": [
+    "chicken",
+    "pan",
+    "sink",
+    "tap"
+   ],
+   "start_jpeg": "rgb_frames/P09_103_frame_0000011744.jpg",
+   "dense_member": "dense/P09_103_interpolations.zip",
+   "dense_sha256": "e12921c9bde6740cb6a771a37bf2cd14d2e1df97c5988fd8e217a1c1eb4e35de",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P09_103.MP4",
+    "bytes": 2252549936,
+    "sha256": "c94c6cf88542ef08057224f5834b911737fb5e25515af3a705bd8b92a7bb4338"
+   }
+  },
+  {
+   "id": "P09_104_0000019201",
+   "video": "P09_104",
+   "split": "val",
+   "first_visor_frame": 19201,
+   "last_visor_frame": 19440,
+   "frames": 240,
+   "first_video_index": 19200,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 19201,
+    "last": 20301,
+    "eligible_runs": 14,
+    "runs": 25
+   },
+   "keyframes": [
+    0,
+    25,
+    129,
+    195
+   ],
+   "labels": [
+    "blender jug",
+    "left hand",
+    "right hand",
+    "socket"
+   ],
+   "start_jpeg": "rgb_frames/P09_104_frame_0000019201.jpg",
+   "dense_member": "dense/P09_104_interpolations.zip",
+   "dense_sha256": "0bd5929ae08060bf7b88864d1fd537562ba3fd2f6b2e941569775662b86cf921",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P09_104.MP4",
+    "bytes": 1677895581,
+    "sha256": "39d515e3b193f3eb9384a7e7f2fe971a6abdf0fe583b20143a28774c525c6906"
+   }
+  },
+  {
+   "id": "P09_106_0000002521",
+   "video": "P09_106",
+   "split": "val",
+   "first_visor_frame": 2521,
+   "last_visor_frame": 2760,
+   "frames": 240,
+   "first_video_index": 2520,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 2521,
+    "last": 3392,
+    "eligible_runs": 4,
+    "runs": 7
+   },
+   "keyframes": [
+    0,
+    67,
+    113
+   ],
+   "labels": [
+    "food",
+    "hob",
+    "left hand",
+    "lid",
+    "plate",
+    "right hand"
+   ],
+   "start_jpeg": "rgb_frames/P09_106_frame_0000002521.jpg",
+   "dense_member": "dense/P09_106_interpolations.zip",
+   "dense_sha256": "bbd99dbc7f42e9c52cf611dbc4a4ae38acec1ded777007e2ccb43952a9abf9ba",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P09_106.MP4",
+    "bytes": 452500886,
+    "sha256": "0a0b741bd243c1187816e9180e8f3a9ed0e5a6d290d76e3621142628145fefb3"
+   }
+  },
+  {
+   "id": "P22_107_0000009538",
+   "video": "P22_107",
+   "split": "val",
+   "first_visor_frame": 9538,
+   "last_visor_frame": 9777,
+   "frames": 240,
+   "first_video_index": 9537,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 9538,
+    "last": 10476,
+    "eligible_runs": 18,
+    "runs": 39
+   },
+   "keyframes": [
+    0,
+    33,
+    67,
+    138,
+    208
+   ],
+   "labels": [
+    "bag",
+    "cupboard",
+    "left hand",
+    "right hand"
+   ],
+   "start_jpeg": "rgb_frames/P22_107_frame_0000009538.jpg",
+   "dense_member": "dense/P22_107_interpolations.zip",
+   "dense_sha256": "766ba3ad992f67489368c2ebebb76d9b973448b28965908dedd9714d4cf0b225",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P22_107.MP4",
+    "bytes": 1760208565,
+    "sha256": "244edaa0fd60f6c51f8fbb345884a2ff455548b0d2532712bdadcc5a038f1c0d"
+   }
+  },
+  {
+   "id": "P25_101_0000007392",
+   "video": "P25_101",
+   "split": "val",
+   "first_visor_frame": 7392,
+   "last_visor_frame": 7631,
+   "frames": 240,
+   "first_video_index": 7391,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 7392,
+    "last": 9357,
+    "eligible_runs": 12,
+    "runs": 18
+   },
+   "keyframes": [
+    0,
+    51,
+    203
+   ],
+   "labels": [
+    "left hand",
+    "oil bottle",
+    "right hand"
+   ],
+   "start_jpeg": "rgb_frames/P25_101_frame_0000007392.jpg",
+   "dense_member": "dense/P25_101_interpolations.zip",
+   "dense_sha256": "09c972ebb4e115f87a74b8b605d305e78f2451836792da06252a33d77f75c2c8",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P25_101.MP4",
+    "bytes": 1320309145,
+    "sha256": "d5def7dee9aaba457b56a8dc425094a97ddbefb85a19bc43980dc79b57f4587a"
+   }
+  },
+  {
+   "id": "P26_108_0000002602",
+   "video": "P26_108",
+   "split": "val",
+   "first_visor_frame": 2602,
+   "last_visor_frame": 2841,
+   "frames": 240,
+   "first_video_index": 2601,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 2602,
+    "last": 3394,
+    "eligible_runs": 6,
+    "runs": 13
+   },
+   "keyframes": [
+    0,
+    211
+   ],
+   "labels": [
+    "food",
+    "hob/cooktop/stovetop",
+    "left hand",
+    "lid",
+    "pan",
+    "right hand"
+   ],
+   "start_jpeg": "rgb_frames/P26_108_frame_0000002602.jpg",
+   "dense_member": "dense/P26_108_interpolations.zip",
+   "dense_sha256": "ebf04a94d5ffb39749fc910fc632779f28bb09466d055c3dc320a8774295a393",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P26_108.MP4",
+    "bytes": 592992067,
+    "sha256": "aebceecf841e5705278211cd2e83c5d7e05089792be402bb378f61da060d4cd3"
+   }
+  },
+  {
+   "id": "P27_105_0000040726",
+   "video": "P27_105",
+   "split": "val",
+   "first_visor_frame": 40726,
+   "last_visor_frame": 40965,
+   "frames": 240,
+   "first_video_index": 40725,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 40726,
+    "last": 41817,
+    "eligible_runs": 20,
+    "runs": 57
+   },
+   "keyframes": [
+    0,
+    37,
+    70,
+    122,
+    148,
+    175,
+    225
+   ],
+   "labels": [
+    "left hand",
+    "paper piece",
+    "right hand",
+    "sandwich",
+    "small sandwich",
+    "table"
+   ],
+   "start_jpeg": "rgb_frames/P27_105_frame_0000040726.jpg",
+   "dense_member": "dense/P27_105_interpolations.zip",
+   "dense_sha256": "6ceb9748d93d3a9ecd27beb9318cea0dab5e252c0c019972e874bdf90eb40d08",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P27_105.MP4",
+    "bytes": 2961751786,
+    "sha256": "e7c5e63116ee206fed17ffc1e1298dfaa4a704301583826a616163d3da100f1c"
+   }
+  },
+  {
+   "id": "P30_110_0000011211",
+   "video": "P30_110",
+   "split": "val",
+   "first_visor_frame": 11211,
+   "last_visor_frame": 11450,
+   "frames": 240,
+   "first_video_index": 11210,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 11211,
+    "last": 12509,
+    "eligible_runs": 11,
+    "runs": 18
+   },
+   "keyframes": [
+    0,
+    165,
+    194
+   ],
+   "labels": [
+    "coffee",
+    "filter paper",
+    "jug",
+    "left hand",
+    "mug",
+    "right hand"
+   ],
+   "start_jpeg": "rgb_frames/P30_110_frame_0000011211.jpg",
+   "dense_member": "dense/P30_110_interpolations.zip",
+   "dense_sha256": "72fe5ed18bf24c2f52db6734453db0bb9a69aa4309eb92648f92cb76c4f18024",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P30_110.MP4",
+    "bytes": 788072730,
+    "sha256": "b5818627cd8e44b2c222137ed11615316b3a1587af3143e49fb34287f1470283"
+   }
+  },
+  {
+   "id": "P37_102_0000001271",
+   "video": "P37_102",
+   "split": "val",
+   "first_visor_frame": 1271,
+   "last_visor_frame": 1510,
+   "frames": 240,
+   "first_video_index": 1270,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 1271,
+    "last": 3413,
+    "eligible_runs": 22,
+    "runs": 27
+   },
+   "keyframes": [
+    0,
+    121
+   ],
+   "labels": [
+    "chicken thigh soup",
+    "hob",
+    "pot",
+    "right hand"
+   ],
+   "start_jpeg": "rgb_frames/P37_102_frame_0000001271.jpg",
+   "dense_member": "dense/P37_102_interpolations.zip",
+   "dense_sha256": "fe8688408fc2dc47c0d8a2cddc2c8d44ad696c76f65bd080ef9b2646a0d12540",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P37_102.MP4",
+    "bytes": 2067855822,
+    "sha256": "b519f73e66d721e1f85571e18c7adf73b48ad47c4ad0251e2a6d23f2ecd434ac"
+   }
+  }
+ ],
+ "excluded": [
+  {
+   "video": "P02_02",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 12410
+   }
+  },
+  {
+   "video": "P02_09",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "2132803497/35582579",
+    "constant_rate": true,
+    "frames": 131858
+   }
+  },
+  {
+   "video": "P02_12",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "78840000/1315333",
+    "constant_rate": true,
+    "frames": 78840
+   }
+  },
+  {
+   "video": "P03_10",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 6160
+   }
+  },
+  {
+   "video": "P03_14",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 15589
+   }
+  },
+  {
+   "video": "P03_22",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 3677
+   }
+  },
+  {
+   "video": "P04_06",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 47248
+   }
+  },
+  {
+   "video": "P04_13",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 18837
+   }
+  },
+  {
+   "video": "P04_24",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 30093
+   }
+  },
+  {
+   "video": "P06_03",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 41123
+   }
+  },
+  {
+   "video": "P06_05",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "1665954567/27794041",
+    "constant_rate": true,
+    "frames": 86569
+   }
+  },
+  {
+   "video": "P06_10",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 14564
+   }
+  },
+  {
+   "video": "P08_17",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 35131
+   }
+  },
+  {
+   "video": "P09_02",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 22159
+   }
+  },
+  {
+   "video": "P09_07",
+   "reason": "class h264 1920x1080 29.970 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 29.970",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "30000/1001",
+    "avg_frame_rate": "30000/1001",
+    "constant_rate": true,
+    "frames": 1655
+   }
+  },
+  {
+   "video": "P12_04",
+   "reason": "class h264 1280x720 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1280x720 59.940",
+    "codec": "h264",
+    "width": 1280,
+    "height": 720,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "529020000/8825897",
+    "constant_rate": true,
+    "frames": 114621
+   }
+  },
+  {
+   "video": "P18_01",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 9976
+   }
+  },
+  {
+   "video": "P18_02",
+   "reason": "class h264 1920x1080 29.970 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 29.970",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "30000/1001",
+    "avg_frame_rate": "30000/1001",
+    "constant_rate": true,
+    "frames": 5706
+   }
+  },
+  {
+   "video": "P21_01",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 41535
+   }
+  },
+  {
+   "video": "P24_09",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "1654451027/27602001",
+    "constant_rate": true,
+    "frames": 117997
+   }
+  },
+  {
+   "video": "P25_09",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 52525
+   }
+  },
+  {
+   "video": "P26_01",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 4778
+   }
+  },
+  {
+   "video": "P26_02",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 27854
+   }
+  },
+  {
+   "video": "P28_05",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 31394
+   }
+  },
+  {
+   "video": "P29_04",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 10766
+   }
+  },
+  {
+   "video": "P30_07",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 18308
+   }
+  },
+  {
+   "video": "P32_07",
+   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
+   "class": {
+    "key": "h264 1920x1080 59.940",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "60000/1001",
+    "avg_frame_rate": "60000/1001",
+    "constant_rate": true,
+    "frames": 1737
+   }
+  }
+ ]
+}

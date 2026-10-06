@@ -56,7 +56,11 @@ def test_frame_numbering_rules() -> None:
     # EPIC rgb frames were extracted at 60 per second (EK-55, any rate) or 50 (EK-100).
     assert visor.epic_frame_to_video_index(1503, 60000 / 1001) == 1500
     assert visor.epic_frame_to_video_index(1503, 50.0) == 1502
-    assert visor.epic_frame_to_video_index(3025, 30000 / 1001) == 1510
+    # 29.97 fps: rounded up (P09_07, rgb frame 80 shows decoded frame 40).
+    assert visor.epic_frame_to_video_index(80, 30000 / 1001) == 40
+    assert visor.epic_frame_to_video_index(3025, 30000 / 1001) == 1511
+    with pytest.raises(ValueError, match="no verified"):
+        visor.epic_frame_to_video_index(100, 48000 / 1001)
 
 
 def test_alignment_is_exact_without_drift_and_interpolated_with_it() -> None:
