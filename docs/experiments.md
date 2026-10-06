@@ -82,3 +82,29 @@ invocation turns out to be needed.
 ### 2026-10-05: Baselines
 - Decision: SVT-AV1 plus one state-of-the-art neural video codec. VVC only if a
   correct invocation is needed.
+
+## Runs
+
+### 2026-10-06 — Environment audit smokes, phase 1 first wave
+- Decision rule: the single `pointstream` environment is adopted for a
+  component on a GPU class when that component's smoke passes every check on
+  that class (claimed device of the class, model on it, CUDA kernels launched,
+  the expected attention family, and an output check against the dataset's own
+  labels). A component that fails only on a class records that class as
+  unsupported in the model–GPU table. A component that fails on every class
+  because of a dependency conflict reopens the audit with a second environment
+  for it.
+- Hypothesis: SAM 3.1, YOLOE-26, HaMeR, WiLoR, hand_tracking_toolkit,
+  DCVC-UF and SVT-AV1 run from one Python 3.12 / torch 2.10.0+cu128 prefix on
+  the 535 driver, on Ada and A6000; on Turing and Volta the SAM 3.1 and DCVC
+  kernels may fall back or fail.
+- Competing explanation: a passing import hides a silent fallback (CPU, math
+  attention, a DCVC extension built for another GPU); the kernel and device
+  records exist to catch that, not the pass/fail bit.
+- Budget: four groups (SAM 3.1; YOLOE + SVT-AV1 + DCVC-UF; HaMeR + HOT3D;
+  WiLoR) on four GPU classes, 16 jobs, each at most 600 s smoke + 600 s full.
+  Ceiling 5.5 GPU-hours wall, expected under 2.
+- Not evidence: infrastructure smokes (`citable: false`). B1 starts in its own
+  session.
+- Jobs:
+- Outcome:

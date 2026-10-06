@@ -1,0 +1,27 @@
+{
+  "DCVC": {
+    "url": "https://github.com/microsoft/DCVC",
+    "revision": "cbdae87a5445114cdc7f48816da63ea80bdeac40",
+    "path": "opt/DCVC"
+  },
+  "cutlass": {
+    "url": "https://github.com/NVIDIA/cutlass",
+    "tag": "v4.4.1",
+    "revision": "4370102f9dacab813282e1d67722fceb0b90a019"
+  },
+  "dcvc_build_patch_sha256": "949b90a02f11e2864e0bdd2e602964d641e643a369704d18bd76279e4e839ebb",
+  "dcvc_extension_gencode": {
+    "sm80": "-gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_75,code=sm_75 -gencode=arch=compute_80,code=sm_80 -gencode=arch=compute_86,code=sm_86",
+    "sm89": "-gencode=arch=compute_89,code=sm_89"
+  },
+  "wheels_sha256": {
+    "wheels/cpu/mlcodec_extensions_cpp-0.0.0-cp312-cp312-linux_x86_64.whl": "846503cddef648185723073183e0aba5ec265e87a28469d026d6659710661eb9",
+    "wheels/sm80/inference_extensions_cuda-0.0.0-cp312-cp312-linux_x86_64.whl": "b1cac7fd5efd03e66d8067406a13326c874d11a6bb3dccabc4a47d27db23d735",
+    "wheels/sm89/inference_extensions_cuda-0.0.0-cp312-cp312-linux_x86_64.whl": "4f369787163769efaf9a6aec0170f1cf5f9d69f6b62c8e1e46009c49d177d1c2"
+  },
+  "WiLoR": {
+    "url": "https://github.com/rolpotamias/WiLoR",
+    "revision": "fcb911312a38fa8badd30d9656a167485d61b8f9",
+    "path": "opt/WiLoR"
+  }
+}

@@ -1,0 +1,27 @@
+# Build-only prefix for the DCVC-UF C++/CUDA extensions. Nothing runs from it:
+# env/build.sh builds wheels here and installs them into the runtime prefix,
+# which therefore carries no CUDA toolkit or compiler.
+name: pointstream-build
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  - pip
+  # Toolkit 12.8 matches torch 2.10.0+cu128. Every target is compiled to SASS:
+  # the hosts' 535 driver cannot JIT PTX newer than CUDA 12.2.
+  - cuda-nvcc=12.8
+  - cuda-cudart-dev=12.8
+  - cuda-libraries-dev=12.8
+  - cuda-nvtx-dev=12.8
+  - cuda-profiler-api=12.8
+  - gxx_linux-64=13
+  - ninja
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu128
+      - torch==2.10.0+cu128
+      - numpy==1.26.4
+      - pybind11
+      - psutil
+      - setuptools
+      - wheel
