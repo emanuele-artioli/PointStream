@@ -74,7 +74,8 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
         # A cpu job claims no GPU, so it must not describe one, nor react to its use.
         if spec["gpu_models"] or spec["gpu_memory_mib"] != 0 or isinstance(spec["gpu_memory_mib"], bool):
             raise fleet.FleetError("a cpu job declares gpu_models: [] and gpu_memory_mib: 0")
-        if spec.get("contention") is not None:
+        # Validation is re-run on the normalized spec, which carries the default policy.
+        if contention_policy(spec.get("contention")) != {"policy": "stop", "resume_attempts": 0}:
             raise fleet.FleetError("contention applies to a claimed GPU; a cpu job declares none")
     for key in ("gpu_memory_mib", "cpu_threads") if device == "gpu" else ("cpu_threads",):
         number(spec[key], key)

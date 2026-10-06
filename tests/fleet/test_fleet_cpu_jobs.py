@@ -26,11 +26,19 @@ def test_cpu_spec_is_valid_and_gpu_spec_keeps_its_default(tmp_path):
     assert inbox.validate_spec(specification(tmp_path))["device"] == "gpu"
 
 
+@pytest.mark.parametrize("make", [cpu_specification, specification])
+def test_normalized_spec_validates_again(tmp_path, make):
+    # The dispatcher validates, then the host re-validates the normalized spec at publication.
+    once = inbox.validate_spec(make(tmp_path))
+    assert inbox.validate_spec(once) == once
+
+
 @pytest.mark.parametrize("mutation", [
     lambda s: s.update(gpu_models=["RTX A6000"]),
     lambda s: s.update(gpu_memory_mib=1024),
     lambda s: s.update(gpu_memory_mib=False),
-    lambda s: s.update(contention={"policy": "stop"}),
+    lambda s: s.update(contention={"policy": "pause", "pause_seconds": 10}),
+    lambda s: s.update(contention={"policy": "stop", "resume_attempts": 1}),
     lambda s: s.update(device="tpu"),
     lambda s: s.update(cpu_threads=0),
 ])
