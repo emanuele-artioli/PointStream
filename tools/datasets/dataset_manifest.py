@@ -92,6 +92,14 @@ SOURCES: dict[str, dict[str, Any]] = {
         "access": "public Hugging Face dataset, not gated; licence binds on access",
         "citation": "Banerjee et al., HOT3D, CVPR 2025",
     },
+    "hint": {
+        "name": "HInt (Hand Interactions)",
+        "homepage": "https://github.com/ddshan/hint",
+        "urls": ["https://fouheylab.eecs.umich.edu/~dandans/projects/hamer/HInt_annotation_partial.zip"],
+        "licence": "MIT (repository); frames from EPIC-KITCHENS VISOR (CC BY-NC 4.0) and Hands23/New Days",
+        "access": "public direct download. The host's TLS certificate expired 2025-05-08 and no checksum is published; downloaded on 2026-10-06 with verification off at the user's request, sha256 recorded while streaming, size equal to the server's Content-Length",
+        "citation": "Pavlakos et al., Reconstructing Hands in 3D with Transformers (HaMeR), CVPR 2024",
+    },
 }
 
 
@@ -570,6 +578,71 @@ def inspect_visor(root: Path, scratch: Path) -> dict[str, Any]:
     }
 
 
+HINT_ZIP = "HInt_annotation_partial.zip"
+HINT_EDGES = [(0, 1), (1, 2), (2, 3), (3, 4), (0, 5), (5, 6), (6, 7), (7, 8), (0, 9), (9, 10), (10, 11), (11, 12),
+              (0, 13), (13, 14), (14, 15), (15, 16), (0, 17), (17, 18), (18, 19), (19, 20)]
+
+
+def inspect_hint(root: Path, scratch: Path) -> dict[str, Any]:
+    """HInt: 21 2D hand keypoints with occlusion flags; EPIC frames are VISOR videos."""
+    import io
+
+    visor = json.load(open(root.parent / "manifests" / "EPIC-KITCHENS-VISOR.json"))
+    visor_videos = {Path(f["path"]).stem for f in visor["files"] if f["path"].startswith("epic_kitchens_videos/")}
+    with zipfile.ZipFile(root / HINT_ZIP) as z:
+        names = z.namelist()
+        folders: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
+        for n in names:
+            parts = n.split("/")
+            if len(parts) == 3 and parts[2]:
+                folders[parts[1]][n.rsplit(".", 1)[-1]] += 1
+        epick: dict[str, Any] = {}
+        out_of_frame = existing = occluded = 0
+        for split in ("TRAIN", "VAL", "TEST"):
+            js = sorted(n for n in names if f"/{split}_epick_img/" in n and n.endswith(".json"))
+            videos = {m.group(1) for n in js if (m := re.search(r"EK_\d+_(P\d+_\d+)_frame", n))}
+            hands = 0
+            for n in js:
+                for a in json.loads(z.read(n)):
+                    hands += 1
+                    for (x, y), e, o in zip(a["keypoints"], a["existence"], a["occlusion"]):
+                        if e:
+                            existing += 1
+                            occluded += int(o > 0)
+                            out_of_frame += int(not (0 <= x < 1920 and 0 <= y < 1080))
+            epick[split] = {"hands": hands, "videos": len(videos), "videos_in_downloaded_visor": len(videos & visor_videos),
+                            "unparsed_names": sum(1 for n in js if not re.search(r"EK_\d+_(P\d+_\d+)_frame", n))}
+        sample = sorted(n for n in names if "/TEST_epick_img/" in n and n.endswith(".json"))[0]
+        image = np.array(Image.open(io.BytesIO(z.read(sample[:-5] + ".jpg"))).convert("RGB"))
+        annotation = json.loads(z.read(sample))[0]
+    draw_img = Image.fromarray(image)
+    draw = ImageDraw.Draw(draw_img)
+    points = annotation["keypoints"]
+    for i, j in HINT_EDGES:
+        if annotation["existence"][i] and annotation["existence"][j]:
+            draw.line([tuple(points[i]), tuple(points[j])], fill=(0, 255, 0), width=4)
+    for (x, y), e, o in zip(points, annotation["existence"], annotation["occlusion"]):
+        if e:
+            colour = (255, 160, 0) if o else (255, 0, 0)
+            draw.ellipse([x - 7, y - 7, x + 7, y + 7], fill=colour)
+    overlay = save_overlay(np.array(draw_img), scratch / "smoke" / "HInt.jpg")
+    return {
+        "label_format": {
+            "<SPLIT>_<source>_img/<name>.json": "list of hands: keypoints [21][x,y] in image pixels (OpenPose hand order), "
+            "existence [21] (0 = outside the frame), occlusion [21] (1 = occluded), keypoint_scores [21], bbox [[x0,y0,x1,y1]], sample",
+            "<name>": "EPIC: EK_<id>_<video>_frame_<10-digit frame>_<l|r>; the suffix is handedness",
+            "<SPLIT>_ego4d_*": "annotations only; Ego4D frames need an Ego4D licence and are not included",
+        },
+        "classes": {"keypoints": 21, "hands": ["left", "right"]},
+        "clips": {"folders": {k: dict(v) for k, v in sorted(folders.items())}, "epick": epick,
+                  "note": "HInt defines its own train/val/test splits; check them against VISOR's video splits before mixing the two"},
+        "resolution": {"epick": "1920x1080"},
+        "keypoint_checks": {"existing": existing, "occluded": occluded, "existing_outside_frame": out_of_frame},
+        "smoke_read": {"sample": sample, "hands": 1, "existing_keypoints": int(sum(annotation["existence"])),
+                       "image_shape": list(image.shape), "overlay": overlay},
+    }
+
+
 INSPECTORS: dict[str, Callable[[Path, Path], dict[str, Any]]] = {
     "visor": inspect_visor,
     "hot3d": inspect_hot3d,
@@ -577,6 +650,7 @@ INSPECTORS: dict[str, Callable[[Path, Path], dict[str, Any]]] = {
     "racketvision": inspect_racketvision,
     "tracknet": inspect_tracknet,
     "egohos": inspect_egohos,
+    "hint": inspect_hint,
 }
 
 
