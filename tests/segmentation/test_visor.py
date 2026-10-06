@@ -53,9 +53,10 @@ def test_frame_numbering_rules() -> None:
     assert visor.visor_frame_to_video_index(1) == 0
     with pytest.raises(ValueError):
         visor.visor_frame_to_video_index(0)
-    # EPIC rgb frames were extracted at the nominal integer rate: 60 for 59.94 fps.
+    # EPIC rgb frames were extracted at 60 per second (EK-55, any rate) or 50 (EK-100).
     assert visor.epic_frame_to_video_index(1503, 60000 / 1001) == 1500
     assert visor.epic_frame_to_video_index(1503, 50.0) == 1502
+    assert visor.epic_frame_to_video_index(3025, 30000 / 1001) == 1510
 
 
 def test_alignment_is_exact_without_drift_and_interpolated_with_it() -> None:
@@ -167,20 +168,24 @@ def test_hold_first_is_perfect_on_a_static_clip_and_imperfect_on_motion() -> Non
 
 def test_rule_summary_counts_holds_and_offsets() -> None:
     rows: list[dict[str, Any]] = [
-        {"rule_holds": {"visor_minus_one": True, "epic_time": True, "epic_minus_one": False},
-         "rule_offset": {"visor_minus_one": 0, "epic_time": 0, "epic_minus_one": 2},
-         "rule_mae": {"visor_minus_one": 1.0, "epic_time": 1.1, "epic_minus_one": 7.0}, "best_mae": 1.0},
-        {"rule_holds": {"visor_minus_one": True, "epic_time": False, "epic_minus_one": False},
-         "rule_offset": {"visor_minus_one": 1, "epic_time": -1, "epic_minus_one": 3},
-         "rule_mae": {"visor_minus_one": 1.2, "epic_time": 6.0, "epic_minus_one": None}, "best_mae": 1.0},
+        {"rule_holds": {"visor_minus_one": True, "epic_time_60": True, "epic_minus_one": False},
+         "rule_offset": {"visor_minus_one": 0, "epic_time_60": 0, "epic_minus_one": 2},
+         "rule_mae": {"visor_minus_one": 1.0, "epic_time_60": 1.1, "epic_minus_one": 7.0}, "best_mae": 1.0},
+        {"rule_holds": {"visor_minus_one": True, "epic_time_60": False, "epic_minus_one": False},
+         "rule_offset": {"visor_minus_one": 1, "epic_time_60": -1, "epic_minus_one": 3},
+         "rule_mae": {"visor_minus_one": 1.2, "epic_time_60": 6.0, "epic_minus_one": None}, "best_mae": 1.0},
     ]
-    for row in rows:  # visor_time agrees with visor_minus_one at 50 fps
+    for row in rows:  # the other rules agree with visor_minus_one here
         for key in ("rule_holds", "rule_offset", "rule_mae"):
-            row[key]["visor_time"] = row[key]["visor_minus_one"]
+            for rule in b1.RULES:
+                row[key].setdefault(rule, row[key]["visor_minus_one"])
+    rows.append({"rule_holds": {rule: False for rule in b1.RULES}, "rule_offset": {rule: None for rule in b1.RULES},
+                 "rule_mae": {rule: None for rule in b1.RULES}, "best_mae": None})  # a frame no rule reached
     summary = b1.summarize_rules(rows)
     assert set(summary) == set(b1.RULES)
-    assert summary["visor_minus_one"]["all_hold"] and summary["visor_minus_one"]["offset_to_best"] == {"0": 1, "1": 1}
-    assert not summary["epic_time"]["all_hold"] and summary["epic_time"]["max_mae_excess"] == 5.0
+    assert summary["visor_minus_one"]["holds"] == 2 and not summary["visor_minus_one"]["all_hold"]
+    assert summary["visor_minus_one"]["offset_to_best"] == {"0": 1, "1": 1}
+    assert not summary["epic_time_60"]["all_hold"] and summary["epic_time_60"]["max_mae_excess"] == 5.0
     assert summary["epic_minus_one"]["holds"] == 0
     assert b1.spaced(list("abcdefghij"), 3) == ["a", "e", "j"]
     assert b1.spaced(list("abc"), 1) == ["c"]

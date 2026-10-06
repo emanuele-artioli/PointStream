@@ -17,7 +17,7 @@ JSONs and the released JPEG of each item's first frame, plus
 
 1. every validation video with a dense file in a video class (codec, size,
    rate) where the frame-mapping check (``--mapping``) found both VISOR frame
-   n = decoded frame n - 1 and the EPIC time rule to hold on every checked frame;
+   n = decoded frame n - 1 and the reader's EPIC rule to hold on every checked frame;
 2. its runs: maximal stretches of consecutive labelled frames;
 3. eligible runs: at least ``--length`` frames, and the first ``--length`` lie
    exactly on the video (`visor.frame_alignment`: no drift between keyframes);
@@ -196,7 +196,7 @@ def pick_run(video: str, eligible: list[tuple[int, int]]) -> tuple[int, int]:
 def command_evalset(args: argparse.Namespace) -> int:
     release = Release()
     holds = json.loads(args.mapping.read_text())["rule_holds_for_classes"]
-    verified = set(holds["visor_minus_one"]) & set(holds["epic_time"])
+    verified = set(holds["visor_minus_one"]) & set(holds["epic_reader"])
     mapping = json.loads(release.zip.read(release.mapping_name))
     mapping_bytes, mapping_record = release.member(release.mapping_name)
     members: dict[str, bytes] = {"frame_mapping.json": mapping_bytes}
@@ -212,7 +212,9 @@ def command_evalset(args: argparse.Namespace) -> int:
         labelled = visor.frames(doc)
         all_runs = visor.runs(labelled)
         fps = float(Fraction(info["r_frame_rate"]))
-        alignment = visor.frame_alignment(doc, visor.keyframe_anchors(doc, mapping[video], fps))
+        alignment = visor.frame_alignment(
+            doc, visor.keyframe_anchors(doc, mapping[video], fps), fps / visor.extraction_rate(fps)
+        )
 
         def exact(first: int) -> bool:
             placed = [alignment.get(n) for n in range(first, first + args.length)]

@@ -173,11 +173,13 @@ invocation turns out to be needed.
   rate), a candidate rule holds when, on every checked sparse frame of every
   video in the class, its decoded frame is within 0.5 grey levels (mean
   absolute RGB difference) of the best match to the released JPEG, and that
-  best match is below 3. Rules: VISOR n − 1, the time rule on VISOR n, the EPIC
-  time rule (extraction at the nominal integer rate) through
-  `frame_mapping.json`, and EPIC k − 1. (2) *evaluation set*. Items come only
-  from validation videos whose class satisfies both VISOR n − 1 and the EPIC
-  time rule, from runs whose first 240 frames lie exactly on the video (no drift
+  best match is below 3. Rules (`experiments/visor/b1.py` `RULES`): VISOR
+  n − 1; VISOR n by time at 60 per second; through `frame_mapping.json`, EPIC
+  k − 1, EPIC k by time at 60 per second, at the nominal integer rate, rounded
+  up at 60 per second, and the reader's rule (60 per second for EK-55, 50 for
+  EK-100). (2) *evaluation set*. Items come only from validation videos whose
+  class satisfies both VISOR n − 1 and the reader's EPIC rule, from runs whose
+  first 240 frames lie exactly on the video (no drift
   between keyframes); one run per video, picked by
   sha256("pointstream-b1:<video>") among the eligible runs, its first 240
   frames starting on a keyframe (`tools/datasets/visor_b1_inputs.py`). If no
@@ -208,3 +210,12 @@ invocation turns out to be needed.
   (`visor-mapping-check.tar` sha256 `4e32ce13…e0c0`, record
   `visor-mapping-check.json` `6ecee54e…c289`, videos hard-linked under
   `inputs/video_<id>/`); environment `pointstream-20261006T113321Z`.
+- Jobs: `20261006T191914Z-10673c3a` (gpu3, `8cb7dfb`) failed its smoke: P09_07
+  (29.97 fps, 1,655 decoded frames) has sparse frames up to VISOR and EPIC
+  3025, so its frames were extracted at 60 per second, not at its own rate.
+  Every rule then pointed past the end of the video and the check crashed
+  instead of recording a miss. Locally on P09_07 the 60-per-second EPIC rule
+  matched 28/32 JPEGs with ordinary rounding and 32/32 rounded up; the rules
+  above add the rounded-up variant, and a miss is now recorded. The metadata
+  drift survey assumed 30 per second for the two 29.97 fps val videos (52 of
+  3,358 EK-55 stretches); drift is now measured against the extraction rate.

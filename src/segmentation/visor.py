@@ -74,13 +74,24 @@ def visor_frame_to_video_index(number: int) -> int:
     return number - 1
 
 
+def extraction_rate(fps: float) -> float:
+    """Frames per second at which EPIC-KITCHENS (and VISOR) extracted a video's frames.
+
+    60 for the EPIC-KITCHENS-55 videos whatever their own rate (59.94, 29.97 or
+    47.95 fps): a 29.97 fps video has about two rgb frames per decoded frame.
+    50 for the EPIC-KITCHENS-100 (50 fps) videos. docs/resources.md records the
+    check against the released sparse JPEGs.
+    """
+    return 50.0 if abs(fps - 50.0) < 0.01 else 60.0
+
+
 def epic_frame_to_video_index(epic_frame: int, fps: float) -> int:
     """Decoded-frame index of EPIC-KITCHENS rgb frame ``epic_frame`` (1-indexed).
 
-    The rgb frames were extracted at the nominal integer rate, so on a 59.94 fps
-    video rgb frame k shows video time (k - 1) / 60 s; at 50 fps it is frame k - 1.
+    Rgb frame k shows video time (k - 1) / `extraction_rate`: on a 59.94 fps
+    video (k - 1) / 60 s, on a 50 fps video decoded frame k - 1.
     """
-    return int(round((epic_frame - 1) * fps / round(fps)))
+    return int(round((epic_frame - 1) * fps / extraction_rate(fps)))
 
 
 def keyframe_anchors(doc: dict[str, Any], mapping: dict[str, str], fps: float) -> dict[int, int]:
@@ -94,21 +105,26 @@ def keyframe_anchors(doc: dict[str, Any], mapping: dict[str, str], fps: float) -
     }
 
 
-def frame_alignment(doc: dict[str, Any], anchors: dict[int, int]) -> dict[int, dict[str, int]]:
+def frame_alignment(
+    doc: dict[str, Any], anchors: dict[int, int], ratio: float = 1.0
+) -> dict[int, dict[str, int]]:
     """Decoded-frame index of each labelled frame, placed between its run's anchors.
 
-    Within a run, a frame between anchors ``a < b`` (VISOR numbers) gets
+    ``ratio`` is decoded frames per VISOR frame: the video's rate over its
+    `extraction_rate` (1 at 50 fps, 0.999 at 59.94, 0.4995 at 29.97). Within a
+    run, a frame between anchors ``a < b`` (VISOR numbers) gets
     ``anchors[a] + round((n - a) * span_video / span_visor)``; ``drift`` is
-    ``span_video - span_visor``, the frames VISOR's numbering gained or lost on
-    the video there. A frame is exact when it is an anchor or its drift is 0.
-    Frames of a run outside its first and last anchor are left out.
+    ``span_video - round(span_visor * ratio)``, the decoded frames VISOR's
+    numbering gained or lost there against its own extraction rate. A frame is
+    exact when it is an anchor or its drift is 0. Frames of a run outside its
+    first and last anchor are left out.
     """
     out: dict[int, dict[str, int]] = {}
     for first, last in runs(frames(doc)):
         keys = sorted(n for n in anchors if first <= n <= last)
         for a, b in zip(keys, keys[1:]):
             video_span, visor_span = anchors[b] - anchors[a], b - a
-            drift = video_span - visor_span
+            drift = video_span - int(round(visor_span * ratio))
             for number in range(a, b + 1):
                 index = anchors[a] + int(round((number - a) * video_span / visor_span))
                 exact = drift == 0 or number in (a, b)
@@ -392,6 +408,7 @@ __all__ = [
     "clip_masks",
     "decode_frames",
     "epic_frame_to_video_index",
+    "extraction_rate",
     "frame_alignment",
     "frame_instances",
     "frame_number",

@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import time
 from collections import Counter, defaultdict
@@ -47,11 +48,15 @@ MATCH = 3.0
 MARGIN = 4
 #: Candidate decoded-frame index of a sparse frame from its VISOR number n,
 #: its EPIC rgb number k (frame_mapping.json) and the video's rate.
+#: ``epic_reader`` is the reader's own rule (`visor.epic_frame_to_video_index`).
 RULES = {
     "visor_minus_one": lambda n, k, fps: n - 1,
-    "visor_time": lambda n, k, fps: int(round((n - 1) * fps / round(fps))),
-    "epic_time": lambda n, k, fps: visor.epic_frame_to_video_index(k, fps),
+    "visor_time_60": lambda n, k, fps: int(round((n - 1) * fps / 60.0)),
     "epic_minus_one": lambda n, k, fps: k - 1,
+    "epic_time_60": lambda n, k, fps: int(round((k - 1) * fps / 60.0)),
+    "epic_time_nominal": lambda n, k, fps: int(round((k - 1) * fps / round(fps))),
+    "epic_ceil_60": lambda n, k, fps: int(math.ceil((k - 1) * fps / 60.0)),
+    "epic_reader": lambda n, k, fps: visor.epic_frame_to_video_index(k, fps),
 }
 
 
@@ -108,7 +113,9 @@ def check_video(video: Path, names: list[str], jpegs: Path, epic: dict[str, str]
         candidates = {rule: f(number, epic_number, info["fps"]) for rule, f in RULES.items()}
         started = time.time()
         decoded = dict(visor.decode_frames(video, candidates.values(), margin=MARGIN, threads=threads))
-        wanted = {i + d for i in candidates.values() for d in range(-MARGIN, MARGIN + 1) if i + d >= 0}
+        # A rule may point past the end of the video; that is a miss, not a decoding gap.
+        last = int(info["frames_declared"] or 0) - 1
+        wanted = {i + d for i in candidates.values() for d in range(-MARGIN, MARGIN + 1) if 0 <= i + d and (last < 0 or i + d <= last)}
         released = np.asarray(Image.open(jpegs / name).convert("RGB"))
         resized = False
         mae: dict[int, float] = {}
@@ -117,6 +124,17 @@ def check_video(video: Path, names: list[str], jpegs: Path, epic: dict[str, str]
                 frame = cv2.resize(frame, (released.shape[1], released.shape[0]), interpolation=cv2.INTER_AREA)
                 resized = True
             mae[index] = float(np.abs(frame.astype(np.int16) - released.astype(np.int16)).mean())
+        if not mae:
+            # No candidate lies inside the video: every rule misses this frame.
+            rows.append({
+                "name": name, "visor_frame": number, "epic_frame": epic_number, "candidates": candidates,
+                "decoded_complete": False, "missing": sorted(wanted), "best_index": None, "best_mae": None,
+                "rule_mae": {rule: None for rule in candidates}, "rule_offset": {rule: None for rule in candidates},
+                "rule_holds": {rule: False for rule in candidates}, "ties": [], "repeated_with_previous": [],
+                "jpeg_shape": list(released.shape), "resized_decoded": False, "window_mae": {},
+                "error": "no candidate frame decoded", "seconds": round(time.time() - started, 2),
+            })
+            continue
         best = min(mae, key=lambda i: mae[i])
         ordered = sorted(decoded)
         repeats = [
@@ -141,7 +159,7 @@ def summarize_rules(rows: list[dict[str, Any]]) -> dict[str, Any]:
     out = {}
     for rule in RULES:
         holds = [row["rule_holds"][rule] for row in rows]
-        offsets = Counter(row["rule_offset"][rule] for row in rows)
+        offsets = Counter(row["rule_offset"][rule] for row in rows if row["rule_offset"][rule] is not None)
         excess = [row["rule_mae"][rule] - row["best_mae"] for row in rows if row["rule_mae"][rule] is not None]
         out[rule] = {
             "frames": len(rows), "holds": int(sum(holds)), "all_hold": bool(rows) and all(holds),
@@ -246,7 +264,8 @@ def convert_item(item: dict[str, Any], archive: str, frames: int, publish: str) 
     dense_sha = file_sha256(member)
     doc = visor.load_annotations(member)
     mapping = json.loads((Path(archive) / "frame_mapping.json").read_text())[item["video"]]
-    alignment = visor.frame_alignment(doc, visor.keyframe_anchors(doc, mapping, item["fps"]))
+    ratio = item["fps"] / visor.extraction_rate(item["fps"])
+    alignment = visor.frame_alignment(doc, visor.keyframe_anchors(doc, mapping, item["fps"]), ratio)
     clip = visor.clip_masks(doc, item["first_visor_frame"], frames, fps=item["fps"], alignment=alignment, meta={
         "item": item["id"], "dense_sha256": dense_sha, "video_sha256": item["video_file"]["sha256"],
     })
@@ -309,7 +328,9 @@ def validate_mapping(stage: Path) -> dict[str, bool]:
     return {
         "every_video_checked": bool(result["videos"]) and all(video["frames"] for video in result["videos"]),
         "every_window_decoded_completely": bool(rows) and all(row["decoded_complete"] for row in rows),
-        "every_jpeg_matches_a_decoded_frame_mae_below_3": bool(rows) and all(row["best_mae"] < MATCH for row in rows),
+        "every_jpeg_matches_a_decoded_frame_mae_below_3": bool(rows) and all(
+            row["best_mae"] is not None and row["best_mae"] < MATCH for row in rows
+        ),
         "jpegs_are_1080p": all(row["jpeg_shape"] == [1080, 1920, 3] for row in rows),
         "every_class_has_a_decision": set(result["classes"]) == {video["class"] for video in result["videos"]},
     }
