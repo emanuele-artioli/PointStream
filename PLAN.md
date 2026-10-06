@@ -1,74 +1,121 @@
 # Plan
 
-Each workstream is scoped to one session. Dependencies: A → B → (C, D, F);
-E after A, in parallel with C and D; G and H after F; I throughout. The
-environment audit (step 0) comes before the first component that needs a new
-dependency.
+Each workstream is scoped to one session. Work runs in two phases
+([decision](docs/experiments.md#2026-10-06-egocentric-first-racket-sports-second)):
 
-## 0. Environment audit, first wave
+- **Phase 1, egocentric hand-object video.** VISOR is the only adopted dataset
+  with native video and dense human masks of the whole foreground: hands with
+  forearms, and active objects. It carries the end-to-end codec evaluation.
+- **Phase 2, racket sports**, once phase 1 has a result. No racket dataset has
+  dense foreground masks, ball positions and video together. Players and the
+  ball are evaluated in separate stages, each on the dataset that labels it.
+  Together the stages estimate the performance on a fully labelled dataset.
+  If phase 2 is not finished by submission, the paper presents it as future
+  work.
 
-Audit SAM 3.1, YOLOE/Ultralytics, the dataset tools (for example the VISOR and
-HOT3D loaders), SVT-AV1 and the chosen neural codec, with their pinned
-dependency versions. The audit decides the environment set and replaces
-`environment.yaml` ([AGENTS.md](AGENTS.md#environments)). Each later component
-starts with its own audit increment.
+Every dataset is used for what it labels ([resources](docs/resources.md#what-each-dataset-is-used-for)).
+The environment audit (step 0) comes before the first component that needs a
+new dependency.
 
-## A. Data acquisition and archive
+## Done
 
-Download OpenTTGames, RacketVision, TrackNet, VISOR, EgoHOS and HOT3D under
-`Datasets`, with immutable manifests ([resources](docs/resources.md#datasets)).
-Archive `tennis_games`, `Egocentric-10K` and `pointstream-demo` (move,
-read-only, no deletion, with a manifest).
-**Done when** every dataset has a manifest and a smoke read of one clip.
+- **A. Data acquisition and archive** (2026-10-06). All six datasets are under
+  `Datasets`, with immutable manifests and smoke reads in `Datasets/manifests/`.
+  The pre-reset data is in `Datasets/archive/pre-reset-2026-10-05/` with its
+  own manifest. Tooling: `tools/datasets/`.
 
-## B. Ground-truth adapters and label-based evaluation
+## Phase 1: egocentric
 
-In `src/segmentation`: a reader per dataset producing `ClipMasks` with native
-classes, per-frame labelled flags, provenance tiers and ball point labels; one
-domain per dataset in `domains.yaml`. Extend `evaluate.py` with point metrics
-for the ball and per-tier reporting; `bench --reference` accepts a ground-truth
-set.
-**Done when** each dataset converts and a trivial candidate scores against it.
+### 0. Environment audit, first wave
 
-## C. SAM 3.1 from label prompts (pseudo-ground truth)
+Audit SAM 3.1, YOLOE/Ultralytics, the VISOR and HOT3D loaders (HOT3D hand
+rendering needs MANO and the fisheye camera model), a hand-pose estimator,
+SVT-AV1 and the chosen neural codec, with their pinned dependency versions. The
+audit decides the environment set and replaces `environment.yaml`
+([AGENTS.md](AGENTS.md#environments)).
 
-Ball masks from point prompts; players and rackets from RacketVision keypoints
-and boxes; arms where egocentric labels stop at the hand. Validate on
-OpenTTGames, which has both masks and ball coordinates.
-**Done when** the gap between prompted SAM and the labels is measured and the
-pseudo-labels are written with provenance.
+### B1. VISOR adapter and evaluation set
 
-## D. Segmentation benchmark on labels (paper table)
+A VISOR reader in `src/segmentation` producing `ClipMasks` from the dense
+interpolations. It records native classes (left hand, right hand, active
+objects), per-frame labelled flags, and a provenance tier per mask: `human` for
+the sparse ground truth, `interpolated` for the dense frames. Frames are decoded
+from the EPIC-KITCHENS videos through `frame_mapping.json`. The evaluation set
+is a fixed list of dense runs from the validation split, recorded with its
+sha256s.
+**Done when** the set converts and a trivial candidate scores against it.
 
-SAM 3.1 (text and prompted), YOLOE-26 n–x (obtain the s, m and l weights), ball
-tracker, hand-object proposer: accuracy against speed per dataset and per class,
-on the fleet.
+### B2. Baseline rate-distortion on VISOR
+
+SVT-AV1 and the neural codec on the evaluation set: rate against weighted PSNR
+(0.7 foreground + 0.3 background on VISOR masks) and the perceptual metrics.
+This is the target PointStream must beat, and it needs no PointStream
+component.
+**Done when** the curves come from a recorded job.
+
+### D1. Segmentation benchmark on VISOR and EgoHOS
+
+SAM 3.1 (text and prompted) and YOLOE-26 against the labels, per class, accuracy
+against speed. EgoHOS is scored on single images only.
 **Done when** the table is reproducible from a recorded job.
 
-## E. Proposers
+### E1. Handled-object proposer
 
-A ball tracker trained or fine-tuned on RacketVision, cross-tested on
-OpenTTGames and TrackNet; a hand-object proposer from VISOR/EgoHOS, cross-tested
-on HOT3D; the vision-language auto-prompt fallback.
-**Done when** cross-dataset numbers decide which to commit to.
+A hand-object proposer trained on VISOR (contact relations) or EgoHOS (object
+orders) prompts SAM 3.1. Cross-tested on the other dataset and on HOT3D object
+masks.
+**Done when** cross-dataset numbers decide whether to commit to it.
 
-## F. Training-data export
+### F1. Training-data export
 
-Per dataset: foreground crops and masks per instance, and background frames with
-the foreground removed, written by `python -m src.segmentation dataset` with
-provenance. Feeds G and H.
+VISOR foreground crops and masks per instance, plus background frames with the
+foreground removed, written by `python -m src.segmentation dataset` with
+provenance.
 
-## G. Background encoding
+### G. Background encoding
 
-Design session ([components](docs/components.md#3-background)).
+Design session ([components](docs/components.md#3-background)). Candidates are
+the neural codec, a panorama/mosaic, and SVT-AV1. Egocentric video is the hard
+case for a panorama: the head moves constantly and the scene is close, so there
+is parallax.
 
-## H. Foreground encoding
+### H. Foreground encoding
 
-Players, handled objects and the ball (a parametric ball trajectory is a
-candidate) ([components](docs/components.md#4-foreground)).
+Design session ([components](docs/components.md#4-foreground)): an appearance
+vector plus keypoints per object. Hands are evaluated twice. On HOT3D the
+keypoints come from motion capture (an oracle upper bound). On VISOR they come
+from a hand-pose estimator (what deployment sees). The gap between the two
+measures the cost of pose estimation.
 
-## I. Paper
+## Phase 2: racket sports
 
-Rescope to racket sports and egocentric hand-object video, with a fresh paper
-repository state: dataset and evaluation-protocol sections (weighted PSNR on
-dataset masks, provenance tiers). Set the venue and submission date.
+### C. SAM 3.1 from label prompts
+
+Players and rackets from RacketVision boxes and keypoints; the ball from point
+prompts. OpenTTGames masks check the objects: whether SAM finds the right
+players, table and scoreboard. Their 320×128 resolution cannot grade borders.
+
+### Players stage
+
+Foreground and background encoding with players as the foreground, scored on
+OpenTTGames. Its camera is fixed, so this is the favourable case for a
+panorama background.
+
+### Ball stage
+
+Ball tracker trained or fine-tuned on RacketVision, cross-tested on OpenTTGames
+and TrackNet (the only dense ball labels). A parametric ball trajectory is the
+candidate encoding.
+
+### D2. Segmentation benchmark on racket sports
+
+As D1, per dataset and class, with the ball scored by point metrics.
+
+## Throughout
+
+### I. Paper
+
+Rescope with a fresh paper repository state: egocentric first, racket sports as
+the second domain or as future work. Write the dataset and evaluation-protocol
+sections (weighted PSNR on dataset masks, provenance tiers). Set the venue and
+submission date.
