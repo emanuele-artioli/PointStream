@@ -1,0 +1,46 @@
+# Foreground classes per domain. Everything a segmenter does not label is
+# background. Each class maps to the text prompt the open-vocabulary models
+# hear; `backends.<family>.prompts` overrides that text for one model family,
+# and the remaining keys under `backends.<family>` are that backend's options.
+# Order matters: later classes paint over earlier ones in label maps.
+# `clips` are the default benchmark/dataset inputs, relative to PS_DATASETS_ROOT
+# (/home/itec/emanuele/Datasets on the fleet). The tennis dataset catalog lists
+# player crops, which cannot be split into foreground and background, so the
+# full broadcast scenes are listed here instead.
+
+tennis:
+  summary: Broadcast tennis. The players and their rackets are foreground.
+  classes:
+    player: tennis player
+    racket: tennis racket
+  clips:
+    - tennis_games/alcaraz_hurkacz/000.mp4
+    - tennis_games/alcaraz_hurkacz/011.mp4
+    - tennis_games/medvedev_struff/005.mp4
+    - tennis_games/djokovic_zverev/004.mp4
+
+general:
+  summary: People in free-moving footage (DAVIS); every person is foreground.
+  classes:
+    person: person
+
+egocentric:
+  summary: Egocentric factory work (Egocentric-10K). The worker's arms and hands are foreground.
+  classes:
+    arm: arm
+    hand: hand
+  clips:
+    - Egocentric-10K/curated/clip_01_factory001_worker001_00001.mp4
+    - Egocentric-10K/curated/clip_02_factory001_worker001_00002.mp4
+    - Egocentric-10K/curated/clip_03_factory001_worker001_00000.mp4
+    - Egocentric-10K/curated/clip_03_factory002_worker001_00000_largehands.mp4
+  backends:
+    yoloe:
+      # Clothing folds flash up for a frame next to the real hand; require a
+      # track to persist before it counts and hold it through brief misses.
+      # Weak boxes (>= conf) may extend a track; only >= new_track_conf start one.
+      conf: 0.03
+      new_track_conf: 0.10
+      min_hits: 5
+      hold_frames: 8
+      min_area_ratio: 0.333

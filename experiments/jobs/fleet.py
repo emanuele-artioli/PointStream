@@ -1,7 +1,7 @@
 """Inspect the GPU fleet and dispatch isolated, supervised PointStream jobs.
 
 Run from the local PointStream checkout. Other users may still allocate a GPU
-after launch-time checks; see ``docs/workflow/long-jobs.md`` for limits.
+after launch-time checks; see ``docs/fleet.md`` for limits.
 """
 
 from __future__ import annotations
