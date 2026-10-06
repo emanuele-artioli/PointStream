@@ -437,7 +437,140 @@ def inspect_hot3d(root: Path, scratch: Path) -> dict[str, Any]:
     }
 
 
+VISOR_ZIP = "2v6cgv1x04ol22qp9rm9x2j6a7.zip"
+
+
+def visor_mask(annotations: list[dict[str, Any]], names: set[str], shape: tuple[int, int]) -> np.ndarray:
+    img = Image.new("1", (shape[1], shape[0]))
+    dr = ImageDraw.Draw(img)
+    for a in annotations:
+        if a["name"] in names:
+            for poly in a["segments"]:
+                if len(poly) >= 3:
+                    dr.polygon([tuple(p) for p in poly], fill=1)
+    return np.array(img)
+
+
+def inspect_visor(root: Path, scratch: Path) -> dict[str, Any]:
+    work = scratch / "visor"
+    zpath = stage(str(root / VISOR_ZIP), work / "zips")
+    base = work / "x" / VISOR_ZIP[:-4]
+    with zipfile.ZipFile(zpath) as z:
+        names = z.namelist()
+        wanted = [n for n in names if "/GroundTruth-SparseAnnotations/annotations/" in n and n.endswith(".json")]
+        wanted += [n for n in names if n.endswith(("frame_mapping.json", "EPIC_100_noun_classes_v2.csv"))]
+        z.extractall(work / "x", members=wanted)
+        dense = [n for n in names if "/Interpolations-DenseAnnotations/" in n and n.endswith(".zip")]
+        rgb = [n for n in names if "/GroundTruth-SparseAnnotations/rgb_frames/" in n and n.endswith(".zip")]
+        dense_bytes = sum(z.getinfo(n).file_size for n in dense)
+    mapping = json.load(open(base / "frame_mapping.json"))
+
+    splits, classes, hands_per_image = {}, collections.Counter(), collections.Counter()
+    gaps: list[int] = []
+    for sp in ["train", "val"]:
+        files = sorted((base / "GroundTruth-SparseAnnotations" / "annotations" / sp).glob("*.json"))
+        n_img = n_mask = 0
+        for f in files:
+            va = json.load(open(f))["video_annotations"]
+            n_img += len(va)
+            frames = sorted(int(re.search(r"frame_(\d+)", e["image"]["name"]).group(1)) for e in va)
+            gaps += [b - a for a, b in zip(frames, frames[1:])]
+            for e in va:
+                n_mask += len(e["annotations"])
+                names_here = [a["name"] for a in e["annotations"]]
+                classes.update(names_here)
+                hands_per_image[sum(n in ("left hand", "right hand") for n in names_here)] += 1
+        splits[sp] = {"videos": len(files), "annotated_images": n_img, "masks": n_mask}
+    test_videos = sorted({n.rsplit("/", 1)[1][:-4] for n in rgb if "/rgb_frames/test/" in n})
+    splits["test"] = {"videos": len(test_videos), "annotations": "not released (images only)"}
+
+    # Smoke: P01_01, first sparse frame with both hands; rasterise on the released frame and
+    # on the same frame decoded from the downloaded EPIC-KITCHENS video via frame_mapping.json.
+    video_id = "P01_01"
+    va = json.load(open(base / "GroundTruth-SparseAnnotations" / "annotations" / "train" / f"{video_id}.json"))["video_annotations"]
+    entry = next(e for e in va if {"left hand", "right hand"} <= {a["name"] for a in e["annotations"]})
+    with zipfile.ZipFile(zpath) as z:
+        inner = next(n for n in rgb if n.endswith(f"/{video_id}.zip"))
+        with z.open(inner) as fz, zipfile.ZipFile(fz) as frames_zip:
+            sparse_rgb = np.array(Image.open(frames_zip.open(entry["image"]["name"])).convert("RGB"))
+    ek_name = mapping[video_id][entry["image"]["name"]]
+    ek_index = int(re.search(r"frame_(\d+)", ek_name).group(1)) - 1  # EPIC rgb_frames are 1-indexed
+    video = root / "epic_kitchens_videos" / f"{video_id}.MP4"
+    probe = ffprobe(str(video))
+    vid_rgb = decode_frame(str(video), ek_index, 0)
+
+    def overlay(img: np.ndarray) -> np.ndarray:
+        h, w = img.shape[:2]
+        scale = np.array([w / 1920, h / 1080])
+        anns = [{**a, "segments": [[[x * scale[0], y * scale[1]] for x, y in p] for p in a["segments"]]} for a in entry["annotations"]]
+        out = blend(img, visor_mask(anns, {"left hand"}, (h, w)), (255, 0, 0))
+        out = blend(out, visor_mask(anns, {"right hand"}, (h, w)), (0, 0, 255))
+        others = {a["name"] for a in anns} - {"left hand", "right hand"}
+        return blend(out, visor_mask(anns, others, (h, w)), (255, 255, 0))
+
+    side = [np.array(Image.fromarray(overlay(x)).resize((960, 540))) for x in (sparse_rgb, vid_rgb)]
+    smoke_path = save_overlay(np.concatenate(side, 1), scratch / "smoke" / "VISOR.jpg")
+    vid_small = np.array(Image.fromarray(vid_rgb).resize((sparse_rgb.shape[1], sparse_rgb.shape[0]))).astype(float)
+    frame_mae = float(np.abs(vid_small - sparse_rgb.astype(float)).mean())
+
+    # Dense interpolations of the same video.
+    with zipfile.ZipFile(zpath) as z:
+        inner = next(n for n in dense if n.endswith(f"/{video_id}_interpolations.zip"))
+        with z.open(inner) as fz, zipfile.ZipFile(fz) as dz:
+            dj = json.load(dz.open(dz.namelist()[0]))["video_annotations"]
+    dense_frames = sorted({int(re.search(r"frame_(\d+)", e["image"]["name"]).group(1)) for e in dj})
+    dense_types = collections.Counter(a.get("type") for e in dj[:2000] for a in e["annotations"])
+
+    # Hand extent: grid of 12 sparse frames with hands from different videos.
+    tiles = []
+    with zipfile.ZipFile(zpath) as z:
+        for f in sorted((base / "GroundTruth-SparseAnnotations" / "annotations" / "train").glob("*.json"))[::14][:12]:
+            vid = f.stem
+            va2 = json.load(open(f))["video_annotations"]
+            e2 = next((e for e in va2 if {"left hand", "right hand"} & {a["name"] for a in e["annotations"]}), None)
+            if e2 is None:
+                continue
+            inner = next(n for n in rgb if n.endswith(f"/{vid}.zip"))
+            with z.open(inner) as fz, zipfile.ZipFile(fz) as frames_zip:
+                im = np.array(Image.open(frames_zip.open(e2["image"]["name"])).convert("RGB"))
+            h, w = im.shape[:2]
+            sc = (w / 1920, h / 1080)
+            anns = [{**a, "segments": [[[x * sc[0], y * sc[1]] for x, y in p] for p in a["segments"]]} for a in e2["annotations"]]
+            t = blend(blend(im, visor_mask(anns, {"left hand"}, (h, w)), (255, 0, 0)), visor_mask(anns, {"right hand"}, (h, w)), (0, 0, 255))
+            tiles.append(np.array(Image.fromarray(t).resize((480, 270))))
+    while len(tiles) % 4:
+        tiles.append(np.zeros_like(tiles[0]))
+    grid = np.concatenate([np.concatenate(tiles[i:i + 4], 1) for i in range(0, len(tiles), 4)], 0)
+    grid_path = save_overlay(grid, scratch / "smoke" / "VISOR_hands_grid.jpg")
+
+    hand_like = {k: v for k, v in classes.items() if "hand" in k or "glove" in k or "arm" in k}
+    return {
+        "label_format": {
+            "GroundTruth-SparseAnnotations/annotations/<split>/<video>.json": "video_annotations[]: image{image_path,name,subsequence,video}, annotations[]{id,name (open vocabulary),class_id (EPIC_100_noun_classes_v2.csv),exhaustive,in_contact_object (hands),on_which_hand (gloves),segments: polygons in 1920x1080 coordinates}",
+            "GroundTruth-SparseAnnotations/rgb_frames/<split>/<P>/<video>.zip": "the annotated sparse frames as JPEG",
+            "Interpolations-DenseAnnotations/<split>/<video>_interpolations.zip": "one JSON per video, same schema plus type (1=start/end GT, 0=interpolated) and interpolation id",
+            "frame_mapping.json": "VISOR frame name -> EPIC-KITCHENS rgb_frames name (1-indexed); used to index the downloaded videos",
+            "epic_kitchens_videos/<video>.MP4": "original EPIC-KITCHENS videos for all 179 VISOR videos (md5-verified against epic-kitchens-download-scripts data/md5.csv)",
+        },
+        "classes": {"hands": ["left hand", "right hand"], "hand_related": hand_like, "objects": f"{len(classes)} open-vocabulary entity names mapped to EPIC-100 noun classes; top 25: {dict(classes.most_common(25))}"},
+        "clips": {"videos": len(mapping), "per_split": splits, "hands_per_annotated_image": dict(hands_per_image),
+                  "sparse_gap_frames": summary(gaps),
+                  "dense_interpolation_zips": len(dense), "dense_bytes_uncompressed_zips": dense_bytes,
+                  "dense_sample": {"video": video_id, "frames_with_masks": len(dense_frames), "video_frames": int(probe.get("nb_frames", 0)),
+                                   "coverage": round(len(dense_frames) / max(1, int(probe.get("nb_frames", 1))), 4),
+                                   "dense_runs": summary(runs_of(dense_frames)), "type_counts_first_2000": dict(dense_types)}},
+        "resolution": {"sparse_frames": f"{sparse_rgb.shape[1]}x{sparse_rgb.shape[0]}", "videos_P01_01": f"{probe['width']}x{probe['height']}"},
+        "fps": {"P01_01": probe["avg_frame_rate"], "note": "EPIC-KITCHENS: mostly 59.94 (EK-55) and 50 (EK-100 extension); see per-video probe at use time"},
+        "smoke_read": {"sample": f"{video_id} {entry['image']['name']} -> video frame index {ek_index} ({ek_name})",
+                       "objects": [a["name"] for a in entry["annotations"]],
+                       "sparse_frame_shape": list(sparse_rgb.shape), "video_frame_shape": list(vid_rgb.shape),
+                       "mean_abs_diff_video_vs_sparse_frame": round(frame_mae, 2),
+                       "overlay": smoke_path, "hands_grid": grid_path},
+    }
+
+
 INSPECTORS: dict[str, Callable[[Path, Path], dict[str, Any]]] = {
+    "visor": inspect_visor,
     "hot3d": inspect_hot3d,
     "openttgames": inspect_openttgames,
     "racketvision": inspect_racketvision,
