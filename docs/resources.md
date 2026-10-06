@@ -35,6 +35,7 @@ labelled classes, and a smoke read of one labelled sample (overlays in
 | **OpenTTGames** (`OpenTTGames`, 35 GB, CC BY-NC-SA) | 12 videos, 1920×1080, 120 fps | Events; ball coordinates and masks (channels R=table, G=human, B=scoreboard) on 4 frames before and 12 after each event, about 9% of frames | Masks are 320×128 and model-aided: good for checking that the right objects were found, not for grading borders. Rackets are not in the human mask; the umpire is. |
 | **RacketVision** (`RacketVision`, 7.6 GB, MIT) | 1,672 clips, 435k frames, 1920×1080, 24–60 fps (badminton, table tennis, tennis) | Ball points on 20.1 / 11.5 / 14.3% of frames; racket box plus 5 keypoints on 9.2 / 3.9 / 4.9%, usually one racket per labelled frame | No masks. The interpolated ball tracks and merged racket predictions are not ground truth. |
 | **TrackNet** (`TrackNet`, 2.6 GB, no licence stated) | 95 tennis clips, 19,835 frames, 1280×720, 30 fps | Ball position and visibility on every frame | JPEG frames only, no video. Only a third-party mirror is reachable. |
+| **HInt** (`HInt`, 3.8 GB, MIT) | `HInt_annotation_partial.zip`: hand keypoints on EPIC-KITCHENS VISOR frames (1920×1080; 2,780 / 625 / 1,906 hands in train / val / test, from 109 / 90 / 40 of our VISOR videos) and New Days; Ego4D annotations without frames | 21 2D keypoints per hand with existence and occlusion flags, handedness in the file name | Keypoints only, no 3D. Its splits are its own; HaMeR trains on HInt train. 377 EPIC files (`EK_frame_…`) name no video. Downloaded with TLS verification off (the host's certificate expired 2025-05-08; no published checksum): sha256 `ac42d9f8…c7fe` recorded while streaming, size equal to the server's Content-Length. Ego4D frames need an Ego4D licence. |
 
 Candidate if needed: SA-Co/VEval SmartGlasses. Not used: DeepSportradar
 (images, not video), ENIGMA-51 (no arms; SAM-HQ masks), DAVIS (too small for the
@@ -47,7 +48,7 @@ domains).
 | End-to-end codec evaluation (video plus dense foreground masks) | VISOR (phase 1); OpenTTGames players stage (phase 2) |
 | Segmentation training and evaluation | VISOR, EgoHOS; OpenTTGames as an object-level check |
 | Handled-object proposer | VISOR (contact), EgoHOS (object orders); HOT3D as cross-test |
-| Hand keypoints and foreground encoding | HOT3D (motion-capture oracle); VISOR with an estimated hand pose; HInt (VISOR frames, 2D keypoints) to choose the estimator, once downloaded |
+| Hand keypoints and foreground encoding | HOT3D (motion-capture oracle); VISOR with an estimated hand pose; HInt (VISOR frames, 2D keypoints) to compare the estimators |
 | Racket pose and player prompts | RacketVision |
 | Ball tracking and ball encoding | TrackNet (dense), RacketVision, OpenTTGames |
 
@@ -83,10 +84,8 @@ codec does not need them: it is scored on pixels inside the dataset masks. They
 matter only for choosing the estimator. For that, HInt ([ddshan/hint](https://github.com/ddshan/hint),
 MIT) labels 21 2D hand keypoints with occlusion flags on EPIC-KITCHENS VISOR
 frames (5.3K hands; train, val and test), New Days and Ego4D. HaMeR trains on
-HInt train, so only HInt test is fair to it. Adopted for H; not downloaded yet:
-its only source (`fouheylab.eecs.umich.edu`, `HInt_annotation_partial.zip`, no
-published checksum) serves a TLS certificate that expired in May 2025, so the
-download needs the user's decision. Ego4D frames need a separate Ego4D licence.
+HInt train, so only HInt test is fair to it. Adopted for H and downloaded to `Datasets/HInt` (manifest
+`Datasets/manifests/HInt.json`, table above).
 
 **VISOR frame mapping.** `frame_mapping.json` names EPIC-KITCHENS rgb frames
 (1-indexed), not decoded video frames. On P32_07 (59.94 fps) rgb frame k matches
@@ -167,7 +166,8 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   only on lab benchmarks, by small margins (FreiHAND PA-MPJPE 5.5 vs 6.0 mm,
   HO3Dv2 7.5 vs 7.7 mm); it does not evaluate on HInt, and no paper found
   compares the two on egocentric data. HaMeR trains on HInt train (VISOR
-  frames), WiLoR does not. So H compares them, and the comparison is a paper
+  frames), WiLoR does not. Establishing which is better on egocentric video is
+  a small contribution of its own: H compares them and the result is a paper
   table ([PLAN](../PLAN.md#h-foreground-encoding)).
 
 **MANO**
@@ -243,8 +243,10 @@ sha256 `44835688156ec6dd5a96ae068e636bb65174597a8ca5f34a6efc33b12bd751b9`
 `experiments/jobs` must keep running on it. Workloads run from the packed
 environment. `pointstream-sam31`, `pointstream-dcvc` and `pointstream-neural`
 were deleted on 2026-10-06; their exact specs are in
-`Datasets/archive/conda-envs-2026-10-06/`. `pointstream-diffueraser` is unrelated
-to phase 1 and was left alone.
+`Datasets/archive/conda-envs-2026-10-06/`, as are those of
+`pointstream-diffueraser` (DiffuEraser video inpainting from the pre-reset demo),
+deleted the same day because nothing in phase 1 used it. If inpainting becomes a
+background candidate, it is audited into the environment like any component.
 
 ## Archive
 
