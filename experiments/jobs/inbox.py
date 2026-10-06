@@ -148,7 +148,150 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
     deadline = date.timestamp()
     if now is not None and deadline <= now:
         raise fleet.FleetError("deadline has already expired")
-    return {**spec, "deadline_epoch": deadline, "validator_seconds": spec.get("validator_seconds", 60), "stall_seconds": number(spec.get("stall_seconds", 1800), "stall_seconds")}
+    contention = contention_policy(spec.get("contention"))
+    if contention.get("pause_seconds", 0) > spec["budget_seconds"]:
+        raise fleet.FleetError("contention.pause_seconds cannot exceed the budget")
+    return {**spec, "contention": contention, "deadline_epoch": deadline, "validator_seconds": spec.get("validator_seconds", 60), "stall_seconds": number(spec.get("stall_seconds", 1800), "stall_seconds")}
+
+
+def contention_policy(value: Any) -> dict[str, Any]:
+    """What the supervisor does when another process starts using the claimed GPU.
+
+    ``stop`` ends the attempt (the default). ``continue`` keeps running and marks
+    timing contaminated; ``basis`` must say why the results do not depend on
+    timing. ``pause`` suspends the owned process group for up to ``pause_seconds``
+    and continues if the GPU clears, otherwise stops. ``resume_attempts`` declares
+    how many numbered attempts may restart a contended stage from its checkpoint.
+    """
+    if value is None:
+        return {"policy": "stop", "resume_attempts": 0}
+    if not isinstance(value, dict) or set(value) - {"policy", "pause_seconds", "basis", "resume_attempts"}:
+        raise fleet.FleetError("contention declares only policy, pause_seconds, basis and resume_attempts")
+    policy = value.get("policy")
+    if policy not in monitor.CONTENTION_POLICIES:
+        raise fleet.FleetError("contention.policy must be stop, continue or pause")
+    result: dict[str, Any] = {"policy": policy}
+    if policy == "pause":
+        result["pause_seconds"] = number(value.get("pause_seconds"), "contention.pause_seconds")
+    elif "pause_seconds" in value:
+        raise fleet.FleetError("contention.pause_seconds applies only to the pause policy")
+    if policy == "continue":
+        if not isinstance(value.get("basis"), str) or not value["basis"].strip():
+            raise fleet.FleetError("contention policy continue requires a basis explaining why results do not depend on timing")
+        result["basis"] = value["basis"]
+    resume = value.get("resume_attempts", 0)
+    if not isinstance(resume, int) or isinstance(resume, bool) or resume < 0:
+        raise fleet.FleetError("contention.resume_attempts must be a nonnegative integer")
+    if resume and policy == "continue":
+        raise fleet.FleetError("the continue policy never stops for contention, so it has nothing to resume")
+    result["resume_attempts"] = resume
+    return result
+
+
+STAGES = ("smoke", "full")
+
+
+def resume_record(directory: Path) -> dict[str, Any]:
+    """The current attempt's resume declaration; attempt 1 has none."""
+    return monitor.read_json(directory / "resume.json", {}) or {}
+
+
+def pending_stages(directory: Path) -> list[str]:
+    completed = resume_record(directory).get("completed_stages", [])
+    return [stage for stage in STAGES if stage not in completed]
+
+
+def stopped_stage(directory: Path) -> str | None:
+    """The stage a stopped attempt was in: the last one started and not released."""
+    for stage in reversed(pending_stages(directory)):
+        record = monitor.read_json(directory / stage / "staging.json")
+        if (directory / stage).is_dir():
+            return None if record and record.get("released") else stage
+    return None
+
+
+def resume_decision(directory: Path, spec: dict[str, Any], state: dict[str, Any], status: dict[str, Any], now: float) -> tuple[dict[str, Any] | None, str]:
+    """Whether a contended attempt may continue as a numbered new attempt, and why."""
+    attempt = state.get("attempt", 1)
+    allowed = spec.get("contention", {}).get("resume_attempts", 0)
+    if attempt > allowed:
+        return None, f"no declared resume attempts remain ({allowed} declared)"
+    stage = stopped_stage(directory)
+    if stage is None:
+        return None, "the stopped stage is unknown"
+    staged = monitor.read_json(directory / stage / "staging.json", {}) or {}
+    checkpoint = staged.get("checkpoint")
+    if not checkpoint or not checkpoint.get("sha256"):
+        return None, f"{stage} published no checkpoint"
+    consumed = state.get("consumed_seconds", 0.0) + max(0.0, status.get("ended", now) - status.get("started", now))
+    stages = pending_stages(directory)
+    needed = sum(spec[name]["seconds"] for name in stages[stages.index(stage):])
+    remaining = min(spec["budget_seconds"] - consumed, spec["deadline_epoch"] - now)
+    if remaining < needed:
+        return None, f"remaining budget {remaining:.0f} s cannot support {needed:.0f} s of stages"
+    return {"attempt": attempt, "stage": stage, "checkpoint": checkpoint, "consumed_seconds": consumed}, "declared resume"
+
+
+def resume_attempt(directory: Path, decision: dict[str, Any], status: dict[str, Any]) -> None:
+    """Archive the contended attempt and queue the next numbered attempt.
+
+    This is not a replay: the specification declared it, it starts from the
+    stopped stage's published checkpoint, and the budget and deadline span every
+    attempt. Ownership is released only after the archive and record exist.
+    """
+    attempt, stage = decision["attempt"], decision["stage"]
+    archive = directory / "resumes" / str(attempt)
+    archive.mkdir(parents=True)
+    for name in ("run", stage, "campaign-error.json", "environment.json"):
+        if (directory / name).exists():
+            (directory / name).rename(archive / name)
+    if stage == "smoke":
+        for name in ("validation.json", "gate.json"):
+            if (directory / name).exists():
+                (directory / name).rename(archive / name)
+    checkpoint = {**decision["checkpoint"], "path": str(archive / stage / "checkpoint.tar")}
+    previous = resume_record(directory)
+    record = {
+        "attempt": attempt + 1,
+        "completed_stages": [s for s in STAGES if s not in pending_stages(directory) or (stage == "full" and s == "smoke")],
+        "previous": {"attempt": attempt, "archive": str(archive), "stage": stage, "checkpoint": checkpoint,
+                     "status": status.get("status"), "error": status.get("error"), "contention": status.get("contention")},
+        "consumed_seconds": decision["consumed_seconds"],
+        "declared": "contention.resume_attempts",
+        "created": time.time(),
+    }
+    if previous:
+        monitor.write_json(archive / "resume.json", previous)
+    monitor.write_json(directory / "resume.json", record)
+    history = [*monitor.read_json(directory / "state.json", {}).get("attempts", []), record["previous"]]
+    transition(directory, "pending", attempt=attempt + 1, consumed_seconds=decision["consumed_seconds"], attempts=history)
+    event(directory, f"resume:attempt-{attempt + 1}", record["previous"])
+    (directory / "owner").rename(archive / "owner")
+
+
+def salvage(directory: Path, reason: str) -> int:
+    """Publish what a stopped stage finished, labelled partial, with its checkpoint."""
+    failed = 0
+    for stage in STAGES:
+        output = directory / stage
+        record = monitor.read_json(output / "staging.json")
+        if not record or record.get("released") or record.get("salvaged"):
+            continue
+        scratch = Path(record["scratch"])
+        salvaged: dict[str, Any] = {"reason": reason, "time": time.time()}
+        if scratch.is_dir():
+            try:
+                record["partial"] = staging.publish_scratch(scratch, output, partial=True)
+                record["checkpoint"] = staging.publish_checkpoint(scratch / "checkpoint", output)
+            except (OSError, tarfile.TarError) as exc:
+                salvaged["error"] = str(exc)
+                failed = 1
+        else:
+            salvaged["error"] = "scratch is not present on this host"
+            failed = 1
+        record["salvaged"] = salvaged
+        monitor.write_json(output / "staging.json", record)
+    return failed
 
 
 def verify_inputs(spec: dict[str, Any], data_root: Path) -> None:
@@ -230,7 +373,17 @@ def reconcile(directory: Path, alias: str) -> None:
             (directory / "owner").rename(attempt / "owner")
         return
     if status.get("status") in TERMINAL:
-        transition(directory, status["status"], remote_status=status)
+        if supervisor.get("pid") and is_pid_alive(supervisor["pid"], supervisor.get("proc_start_time")):
+            return  # still salvaging or delivering; decide once it has exited
+        fields: dict[str, Any] = {"remote_status": status}
+        if status["status"] == "contended":
+            spec = monitor.read_json(directory / "spec.json")
+            decision, reason = resume_decision(directory, spec, state, status, time.time())
+            if decision is not None:
+                resume_attempt(directory, decision, status)
+                return
+            fields["resume_declined"] = reason
+        transition(directory, status["status"], **fields)
         return
     identity = supervisor or owner
     if identity.get("pid") and is_pid_alive(identity["pid"], identity.get("proc_start_time")):
@@ -247,8 +400,9 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any], ho
     if (directory / "cancel.json").exists():
         transition(directory, "cancelled")
         return
-    remaining = min(spec["budget_seconds"], spec["deadline_epoch"] - time.time())
-    if remaining < spec["smoke"]["seconds"] + spec["full"]["seconds"]:
+    # Budget spans every declared attempt; waiting between attempts is bounded by the deadline.
+    remaining = min(spec["budget_seconds"] - state.get("consumed_seconds", 0.0), spec["deadline_epoch"] - time.time())
+    if remaining < sum(spec[stage]["seconds"] for stage in pending_stages(directory)):
         transition(directory, "expired", error="Insufficient time remains before the deadline")
         return
     if digest(spec) != monitor.read_json(directory / "ready.json")["spec_sha256"]:
@@ -263,6 +417,8 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any], ho
         "command": [sys.executable, "-m", "experiments.jobs.inbox", "campaign", str(directory)],
         "cwd": str(source), "budget_seconds": remaining, "deadline_epoch": spec["deadline_epoch"],
         "thread": None, "codex": "codex", "cancel_path": str(directory / "cancel.json"),
+        "contention": spec.get("contention") or {"policy": "stop"}, "attempt": state.get("attempt", 1),
+        "salvage": [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)],
         "claims": {"gpu": gpu["uuid"], "cpu_threads": spec["cpu_threads"], "claims_dir": str(base.parent / "claims"), "min_free_memory_mb": spec["gpu_memory_mib"] + fleet.DEFAULT_MEMORY_MARGIN_MIB},
     })
     monitor.write_json(run / "policy.json", {"stall_seconds": spec["stall_seconds"], "report_at": None, "quiet_until": 0})
@@ -364,10 +520,50 @@ def phase_command(spec: dict[str, Any], stage: str, staged: list[dict[str, Any]]
     return [python, *spec["entrypoint"], *[replacements.get(arg, arg) for arg in spec["arguments"]]]
 
 
+def run_bounded(command: list[str], *, cwd: Path, env: dict[str, str], log: Any, seconds: float, budget_end: float, run: Path) -> int:
+    """Run one stage or validator command under its allowance.
+
+    Time that a declared contention pause held the job stopped extends only the
+    command's own allowance; the budget and deadline still bound it.
+    """
+    started = time.time()
+    child = subprocess.Popen(command, cwd=cwd, env=env, stdout=log, stderr=subprocess.STDOUT)
+    while True:
+        try:
+            return child.wait(timeout=1)
+        except subprocess.TimeoutExpired:
+            now = time.time()
+            if now < budget_end and now - started < seconds:
+                continue
+            if now < budget_end and now - started < seconds + monitor.paused_seconds(monitor.read_json(run / "status.json", {}) or {}, started, now):
+                continue
+            # Let the workload finish a checkpoint before it is killed.
+            child.terminate()
+            try:
+                child.wait(timeout=15)
+            except subprocess.TimeoutExpired:
+                child.kill()
+                child.wait()
+            raise fleet.FleetError(f"command exceeded its {seconds:.0f} s allowance or the budget")
+
+
+def contention_during(run: Path, started: float, ended: float) -> dict[str, Any]:
+    """The supervisor's contention episodes that overlapped one command."""
+    status = monitor.read_json(run / "status.json", {}) or {}
+    episodes = [e for e in status.get("contention") or [] if e["detected"] <= ended and e.get("ended", e.get("cleared", ended)) >= started]
+    return {"timing_contaminated": bool(episodes), "contention": episodes, "paused_seconds": monitor.paused_seconds(status, started, ended)}
+
+
 def campaign(directory: Path) -> int:
     """The monitor owns this process group across smoke, validation, and full."""
     previous = monitor.read_json(directory / "run" / "status.json", {})
-    if previous.get("status") in TERMINAL or any((directory / name).exists() for name in ("smoke", "full", "gate.json", "campaign-error.json")):
+    resume = resume_record(directory)
+    attempt = resume.get("attempt", 1)
+    completed = resume.get("completed_stages", [])
+    leftovers = [name for name in (*pending_stages(directory), "campaign-error.json") if (directory / name).exists()]
+    if "smoke" not in completed and (directory / "gate.json").exists():
+        leftovers.append("gate.json")
+    if previous.get("status") in TERMINAL or leftovers or (monitor.read_json(directory / "run" / "request.json", {}) or {}).get("attempt", 1) != attempt:
         print("campaign: existing attempt is preserved; create a new request instead of replaying", file=sys.stderr)
         return 1
     spec = monitor.read_json(directory / "spec.json")
@@ -389,9 +585,13 @@ def campaign(directory: Path) -> int:
             path = Path(item["path"]).resolve()
             if not path.is_relative_to(directory.parents[3].resolve()) or not path.is_file():
                 raise fleet.FleetError(f"staged input must be a file under the external data root: {path}")
+        if "smoke" in completed:
+            # A resumed attempt keeps an earlier attempt's gate only under identical identities.
+            gate = monitor.read_json(directory / "gate.json", {}) or {}
+            if gate.get("passed") is not True or gate.get("spec_sha256") != digest(spec) or gate.get("source_sha256") != code_identity or gate.get("inputs") != spec["inputs"]:
+                raise fleet.FleetError("a resumed attempt requires the earlier smoke gate under unchanged identities")
         local_root = staging.local_root()
-        validation = None
-        for stage in ("smoke", "full"):
+        for stage in pending_stages(directory):
             verify_inputs(spec, directory.parents[3])
             if digest(monitor.read_json(directory / "spec.json")) != manifest["spec_sha256"]:
                 raise fleet.FleetError("specification changed after smoke")
@@ -403,24 +603,46 @@ def campaign(directory: Path) -> int:
             output.mkdir()
             # Re-verified per stage, so promotion also requires unchanged staged bytes.
             staged = staging.stage_inputs(spec.get("staged_inputs", []), local_root)
-            scratch = staging.scratch_directory(local_root, directory.name, stage, output, declared=bool(spec.get("local_storage_gib")))
+            scratch_name = directory.name if attempt == 1 else f"{directory.name}-attempt{attempt}"
+            scratch = staging.scratch_directory(local_root, scratch_name, stage, output, declared=bool(spec.get("local_storage_gib")))
+            resumed_from = resume["previous"] if resume.get("previous", {}).get("stage") == stage else None
+            if resumed_from:
+                staging.restore_checkpoint(resumed_from["checkpoint"], scratch / "checkpoint")
             packed = staging.stage_environment(spec["environment"], local_root) if spec.get("environment") else None
             python = packed["python"] if packed else sys.executable
-            staging_record: dict[str, Any] = {"local_root": str(local_root) if local_root else None, "inputs": staged, "environment": packed, "scratch": str(scratch)}
+            staging_record: dict[str, Any] = {
+                "local_root": str(local_root) if local_root else None, "inputs": staged, "environment": packed,
+                "scratch": str(scratch), "attempt": attempt,
+                "restored_checkpoint": resumed_from["checkpoint"] if resumed_from else None,
+            }
             monitor.write_json(output / "staging.json", staging_record)
             command = phase_command(spec, stage, staged, python)
-            env = {**os.environ, "PS_STAGE": stage, "PS_STAGE_DIR": str(output), "PS_SCRATCH_DIR": str(scratch), "PS_VALIDATION_PATH": str(directory / "validation.json")}
+            env = {
+                **os.environ, "PS_STAGE": stage, "PS_STAGE_DIR": str(output), "PS_SCRATCH_DIR": str(scratch),
+                "PS_CHECKPOINT_DIR": str(scratch / "checkpoint"), "PS_ATTEMPT": str(attempt),
+                "PS_VALIDATION_PATH": str(directory / "validation.json"),
+            }
             if packed:
                 env.update(PATH=os.pathsep.join([packed["bin"], env.get("PATH", "")]), CONDA_PREFIX=packed["prefix"])
-            monitor.write_json(output / "dispatch.json", {"command": command, "input_identity": spec["inputs"], "staged_inputs": staged, "staged_environment": packed, "code": manifest, "environment": monitor.read_json(directory / "environment.json", {}), "started": time.time(), "citable": False if stage == "smoke" else None})
+            monitor.write_json(output / "dispatch.json", {
+                "command": command, "input_identity": spec["inputs"], "staged_inputs": staged, "staged_environment": packed,
+                "code": manifest, "environment": monitor.read_json(directory / "environment.json", {}), "started": time.time(),
+                "citable": False if stage == "smoke" else None, "attempt": attempt, "resumed_from": resumed_from,
+                "contention_policy": spec.get("contention"),
+            })
             monitor.publish_progress(stage, 0)
             phase_started = time.time()
             with (output / "command.log").open("w") as log:
-                result = subprocess.run(command, cwd=source, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=min(spec[stage]["seconds"], budget_end - time.time()), check=False)
-            monitor.write_json(output / "execution.json", {"exit_code": result.returncode, "seconds": time.time() - phase_started, "children_resource_usage": list(resource.getrusage(resource.RUSAGE_CHILDREN))})
-            if result.returncode:
+                returncode = run_bounded(command, cwd=source, env=env, log=log, seconds=spec[stage]["seconds"], budget_end=budget_end, run=run)
+            phase_ended = time.time()
+            monitor.write_json(output / "execution.json", {
+                "exit_code": returncode, "seconds": phase_ended - phase_started,
+                "children_resource_usage": list(resource.getrusage(resource.RUSAGE_CHILDREN)),
+                **contention_during(run, phase_started, phase_ended),
+            })
+            if returncode:
                 # Failed scratch stays on the host for inspection; staging.json names it.
-                raise fleet.FleetError(f"{stage} failed with exit code {result.returncode}")
+                raise fleet.FleetError(f"{stage} failed with exit code {returncode}")
             staging_record["published"] = staging.publish_scratch(scratch, output)
             staging.release_scratch(scratch, output)
             staging_record["released"] = time.time()
@@ -430,11 +652,11 @@ def campaign(directory: Path) -> int:
                 validation_command = [python if a == "{python}" else a for a in spec["validator"]]
                 validator_started = time.time()
                 with (output / "validator.log").open("w") as log:
-                    checked = subprocess.run(validation_command, cwd=source, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=min(spec["validator_seconds"], max(0.001, budget_end - time.time())), check=False)
+                    checked = run_bounded(validation_command, cwd=source, env=env, log=log, seconds=spec["validator_seconds"], budget_end=budget_end, run=run)
                 validation = monitor.read_json(directory / "validation.json", {})
-                if checked.returncode or validation.get("passed") is not True or not validation.get("checks"):
+                if checked or validation.get("passed") is not True or not validation.get("checks"):
                     raise fleet.FleetError("smoke validator must exit zero and publish passed:true with substantive checks")
-                monitor.write_json(directory / "gate.json", {"passed": True, "spec_sha256": digest(spec), "source_sha256": code_identity, "inputs": spec["inputs"], "validation": validation, "validator_seconds": time.time() - validator_started, "smoke_seconds": time.time() - started, "remaining_seconds": budget_end - time.time()})
+                monitor.write_json(directory / "gate.json", {"passed": True, "spec_sha256": digest(spec), "source_sha256": code_identity, "inputs": spec["inputs"], "validation": validation, "validator_seconds": time.time() - validator_started, "smoke_seconds": time.time() - started, "remaining_seconds": budget_end - time.time(), "attempt": attempt})
         return 0
     except Exception as exc:
         monitor.write_json(directory / "campaign-error.json", {"error": str(exc), "updated": time.time()})
@@ -517,6 +739,11 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
                 state = {**state, "status": remote["status"], "remote_status": remote}
                 if remote.get("admission_rejected") and not remote.get("pid"):
                     state.update(status="pending", admission_reason=remote.get("error"))
+                spec = monitor.read_json(directory / "spec.json", {}) or {}
+                declared = (spec.get("contention") or {}).get("resume_attempts", 0)
+                if remote["status"] == "contended" and state.get("attempt", 1) <= declared and monitor.read_json(directory / "state.json", {}).get("status") not in TERMINAL:
+                    # The owning worker has not yet decided on the declared resume.
+                    state.update(status="resuming")
             if state.get("status") == "pending" and (directory / "owner").exists() and not remote:
                 state.update(status="preparing", execution_owner=monitor.read_json(directory / "owner" / "identity.json", {}))
             if action == "cancel":
@@ -846,9 +1073,11 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     watch.add_argument("chat_id")
     ack = actions.add_parser("ack")
     ack.add_argument("event_ids", nargs="+")
-    for name in (() if public_only else ("worker", "campaign", "rpc")):
+    for name in (() if public_only else ("worker", "campaign", "salvage", "rpc")):
         command = actions.add_parser(name, help=argparse.SUPPRESS)
         command.add_argument("directory", type=Path)
+        if name == "salvage":
+            command.add_argument("reason")
         if name == "worker":
             command.add_argument("alias", choices=fleet.DEFAULT_HOSTS)
         if name == "rpc":
@@ -862,6 +1091,8 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
             return worker(args.directory.resolve(), args.alias)
         if args.action == "campaign":
             return campaign(args.directory.resolve())
+        if args.action == "salvage":
+            return salvage(args.directory.resolve(), args.reason)
         if args.action == "rpc":
             value = rpc(args.directory.resolve(), args.operation, json.loads(args.payload))
         elif args.action == "inspect":

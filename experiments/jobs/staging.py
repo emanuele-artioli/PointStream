@@ -250,20 +250,58 @@ def scratch_directory(root: Path | None, job_id: str, stage: str, output: Path, 
     local = root is not None and (declared or not ram_backed(root))
     directory = (root / "scratch" / f"{job_id}-{stage}") if local and root is not None else (output / "scratch")
     directory.mkdir(parents=True)
+    (directory / "checkpoint").mkdir()
     return directory
 
 
-def publish_scratch(scratch: Path, output: Path) -> dict[str, Any] | None:
-    """Send ``scratch/publish`` back to the shared stage directory as one archive."""
-    selected = scratch / "publish"
-    if not selected.is_dir():
-        return None
-    archive = output / "published.tar"
+def _archive(selected: Path, archive: Path, arcname: str, *, complete_only: bool = False) -> dict[str, Any]:
+    def keep(member: tarfile.TarInfo) -> tarfile.TarInfo | None:
+        # Checkpoint writers rename finished files into place; dot-names are unfinished.
+        return None if complete_only and Path(member.name).name.startswith(".") else member
+
     with tarfile.open(archive, "w") as bundle:
-        bundle.add(selected, arcname="publish")
+        bundle.add(selected, arcname=arcname, filter=keep)
     with tarfile.open(archive) as bundle:
         members = len(bundle.getmembers())
     return {"path": str(archive), "sha256": _hash_file(archive), "bytes": archive.stat().st_size, "members": members}
+
+
+def publish_scratch(scratch: Path, output: Path, *, partial: bool = False) -> dict[str, Any] | None:
+    """Send ``scratch/publish`` back to the shared stage directory as one archive.
+
+    A stage that stopped before finishing publishes ``partial.tar`` instead of
+    ``published.tar``, so a partial result is never mistaken for a finished one.
+    """
+    selected = scratch / "publish"
+    if not selected.is_dir():
+        return None
+    record = _archive(selected, output / ("partial.tar" if partial else "published.tar"), "publish")
+    return {**record, "partial": partial}
+
+
+def publish_checkpoint(checkpoint: Path, output: Path) -> dict[str, Any] | None:
+    """Archive the finished files of a workload checkpoint, or None if there are none."""
+    if not checkpoint.is_dir() or not any(not p.name.startswith(".") for p in checkpoint.iterdir()):
+        return None
+    return _archive(checkpoint, output / "checkpoint.tar", "checkpoint", complete_only=True)
+
+
+def restore_checkpoint(record: dict[str, Any], checkpoint: Path) -> None:
+    """Unpack a published checkpoint into an empty directory after verifying its identity."""
+    archive = Path(record["path"])
+    if _hash_file(archive) != record["sha256"]:
+        raise StagingError(f"checkpoint identity changed: {archive}")
+    if checkpoint.exists() and any(checkpoint.iterdir()):
+        raise StagingError(f"checkpoint directory is not empty: {checkpoint}")
+    partial = checkpoint.parent / f".partial-checkpoint-{uuid.uuid4().hex}"
+    try:
+        with tarfile.open(archive) as bundle:
+            bundle.extractall(partial, filter="data")
+        if checkpoint.exists():
+            checkpoint.rmdir()
+        (partial / "checkpoint").rename(checkpoint)
+    finally:
+        _remove(partial)
 
 
 def release_scratch(scratch: Path, output: Path) -> None:
