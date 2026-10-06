@@ -188,6 +188,61 @@ def _device_rank(name: str, preferred_names: tuple[str, ...] = ()) -> tuple[int,
     return (len(order), name.casefold())
 
 
+def host_rejection(
+    host: dict[str, Any],
+    *,
+    cpu_threads: int,
+    required_paths: tuple[str, ...] = (),
+    required_commands: tuple[str, ...] = (),
+) -> str | None:
+    """Why a probed host cannot take a job, apart from its GPUs; None when it can."""
+    if not host.get("available"):
+        return f"{host.get('alias')}: {host.get('error', 'unavailable')}"
+    if not host.get("python_available") or not host.get("data_root_available"):
+        return f"{host['alias']}: PointStream Python or writable data root is unavailable"
+    headroom = host.get("cpu_headroom")
+    if not isinstance(headroom, int) or cpu_threads > math.floor(0.90 * headroom):
+        return f"{host['alias']}: CPU allowance exceeds 90% of current headroom"
+    missing_paths = [p for p in required_paths if not os.path.isabs(p)]
+    if missing_paths:
+        raise FleetError(f"--require-path values must be absolute remote paths: {missing_paths}")
+    command_status = host.get("required_commands_available")
+    missing_commands = [
+        name
+        for name in required_commands
+        if not (
+            command_status.get(name)
+            if isinstance(command_status, dict)
+            else host.get("tools", {}).get(name)
+        )
+    ]
+    if missing_commands:
+        return f"{host['alias']}: missing commands {', '.join(missing_commands)}"
+    return None
+
+
+def select_cpu(hosts: list[dict[str, Any]], *, cpu_threads: int) -> dict[str, Any]:
+    """Pick a host for a CPU-only job: the one with the most CPU headroom.
+
+    No GPU is claimed or made visible. The supervisor's CPU claim still guards
+    against oversubscription by concurrent PointStream jobs.
+    """
+    if cpu_threads <= 0:
+        raise FleetError("CPU thread allowance must be positive")
+    reasons: list[str] = []
+    candidates: list[tuple[int, str, dict[str, Any]]] = []
+    for host in hosts:
+        reason = host_rejection(host, cpu_threads=cpu_threads)
+        if reason:
+            reasons.append(reason)
+            continue
+        candidates.append((-int(host["cpu_headroom"]), str(host["alias"]), host))
+    if not candidates:
+        detail = "; ".join(reasons) or "no hosts were inspected"
+        raise FleetError(f"No eligible CPU host is available: {detail}")
+    return min(candidates, key=lambda item: item[:2])[2]
+
+
 def select_gpu(
     hosts: list[dict[str, Any]],
     *,
@@ -207,31 +262,11 @@ def select_gpu(
     candidates: list[tuple[tuple[int, int, int, str], dict[str, Any], dict[str, Any]]] = []
     reasons: list[str] = []
     for host in hosts:
-        if not host.get("available"):
-            reasons.append(f"{host.get('alias')}: {host.get('error', 'unavailable')}")
-            continue
-        if not host.get("python_available") or not host.get("data_root_available"):
-            reasons.append(f"{host['alias']}: PointStream Python or writable data root is unavailable")
-            continue
-        headroom = host.get("cpu_headroom")
-        if not isinstance(headroom, int) or cpu_threads > math.floor(0.90 * headroom):
-            reasons.append(f"{host['alias']}: CPU allowance exceeds 90% of current headroom")
-            continue
-        missing_paths = [p for p in required_paths if not os.path.isabs(p)]
-        if missing_paths:
-            raise FleetError(f"--require-path values must be absolute remote paths: {missing_paths}")
-        command_status = host.get("required_commands_available")
-        missing_commands = [
-            name
-            for name in required_commands
-            if not (
-                command_status.get(name)
-                if isinstance(command_status, dict)
-                else host.get("tools", {}).get(name)
-            )
-        ]
-        if missing_commands:
-            reasons.append(f"{host['alias']}: missing commands {', '.join(missing_commands)}")
+        reason = host_rejection(
+            host, cpu_threads=cpu_threads, required_paths=required_paths, required_commands=required_commands
+        )
+        if reason:
+            reasons.append(reason)
             continue
         for gpu in host["gpus"]:
             if gpu.get("pointstream_claimed"):

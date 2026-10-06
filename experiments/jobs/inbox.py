@@ -29,6 +29,7 @@ from experiments.jobs.claims import get_process_start_time, is_pid_alive
 
 TERMINAL = {"complete", "failed", "cancelled", "contended", "interrupted", "budget_exhausted", "expired", "attention"}
 SCHEMA = 1
+DEVICES = ("gpu", "cpu")
 POLL_SECONDS = 60
 
 
@@ -66,7 +67,16 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
         raise fleet.FleetError("hosts must name configured GPU servers")
     if not isinstance(spec["gpu_models"], list) or any(not isinstance(n, str) or not n.strip() for n in spec["gpu_models"]):
         raise fleet.FleetError("gpu_models must be GPU-name substrings (empty means any model)")
-    for key in ("gpu_memory_mib", "cpu_threads"):
+    device = spec.get("device", "gpu")
+    if device not in DEVICES:
+        raise fleet.FleetError("device must be gpu or cpu")
+    if device == "cpu":
+        # A cpu job claims no GPU, so it must not describe one, nor react to its use.
+        if spec["gpu_models"] or spec["gpu_memory_mib"] != 0 or isinstance(spec["gpu_memory_mib"], bool):
+            raise fleet.FleetError("a cpu job declares gpu_models: [] and gpu_memory_mib: 0")
+        if spec.get("contention") is not None:
+            raise fleet.FleetError("contention applies to a claimed GPU; a cpu job declares none")
+    for key in ("gpu_memory_mib", "cpu_threads") if device == "gpu" else ("cpu_threads",):
         number(spec[key], key)
         if not isinstance(spec[key], int):
             raise fleet.FleetError(f"{key} must be an integer")
@@ -151,7 +161,7 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
     contention = contention_policy(spec.get("contention"))
     if contention.get("pause_seconds", 0) > spec["budget_seconds"]:
         raise fleet.FleetError("contention.pause_seconds cannot exceed the budget")
-    return {**spec, "contention": contention, "deadline_epoch": deadline, "validator_seconds": spec.get("validator_seconds", 60), "stall_seconds": number(spec.get("stall_seconds", 1800), "stall_seconds")}
+    return {**spec, "device": device, "contention": contention, "deadline_epoch": deadline, "validator_seconds": spec.get("validator_seconds", 60), "stall_seconds": number(spec.get("stall_seconds", 1800), "stall_seconds")}
 
 
 def contention_policy(value: Any) -> dict[str, Any]:
@@ -338,7 +348,8 @@ def local_probe(alias: str) -> dict[str, Any]:
     return value
 
 
-def eligible(spec: dict[str, Any], host: dict[str, Any]) -> dict[str, Any]:
+def eligible(spec: dict[str, Any], host: dict[str, Any]) -> dict[str, Any] | None:
+    """The GPU this job claims on this host; None for an admitted cpu job."""
     if host["alias"] not in spec["hosts"]:
         raise fleet.FleetError("host is not compatible")
     host = {**host, "gpus": [g for g in host.get("gpus", []) if not spec["gpu_models"] or any(m in g["name"] for m in spec["gpu_models"])]}
@@ -349,6 +360,9 @@ def eligible(spec: dict[str, Any], host: dict[str, Any]) -> dict[str, Any]:
     storage = staging.admission_error(spec)
     if storage:
         raise fleet.FleetError(storage)
+    if spec.get("device", "gpu") == "cpu":
+        fleet.select_cpu([host], cpu_threads=spec["cpu_threads"])
+        return None
     _, gpu = fleet.select_gpu([host], required_memory_mib=spec["gpu_memory_mib"], cpu_threads=spec["cpu_threads"])
     return gpu
 
@@ -391,7 +405,7 @@ def reconcile(directory: Path, alias: str) -> None:
     transition(directory, "attention", error="Execution owner disappeared; inspect supervisor and owned processes. No replay is permitted.")
 
 
-def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any], host: dict[str, Any], base: Path) -> None:
+def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | None, host: dict[str, Any], base: Path) -> None:
     if not acquire_request(directory, host["alias"]):
         return
     state = monitor.read_json(directory / "state.json", {})
@@ -419,7 +433,8 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any], ho
         "thread": None, "codex": "codex", "cancel_path": str(directory / "cancel.json"),
         "contention": spec.get("contention") or {"policy": "stop"}, "attempt": state.get("attempt", 1),
         "salvage": [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)],
-        "claims": {"gpu": gpu["uuid"], "cpu_threads": spec["cpu_threads"], "claims_dir": str(base.parent / "claims"), "min_free_memory_mb": spec["gpu_memory_mib"] + fleet.DEFAULT_MEMORY_MARGIN_MIB},
+        # Without a GPU claim the supervisor claims only CPU threads and hides every GPU.
+        "claims": {"gpu": gpu["uuid"] if gpu else None, "cpu_threads": spec["cpu_threads"], "claims_dir": str(base.parent / "claims"), "min_free_memory_mb": spec["gpu_memory_mib"] + fleet.DEFAULT_MEMORY_MARGIN_MIB},
     })
     monitor.write_json(run / "policy.json", {"stall_seconds": spec["stall_seconds"], "report_at": None, "quiet_until": 0})
     monitor.write_json(directory / "environment.json", {"host": host["host"], "alias": host["alias"], "gpu": gpu, "python": host.get("python_version"), "tools": host.get("tool_versions"), "started": time.time()})
