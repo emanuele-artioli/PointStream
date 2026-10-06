@@ -8,10 +8,12 @@ braceexpand==0.1.7
 certifi==2026.7.22
 charset-normalizer==3.5.2
 click==8.5.0
+clip @ git+https://github.com/ultralytics/CLIP.git@a13192f8cb767260d7dfd98c843b0716593169e7
 contourpy==1.3.3
 cuda-bindings==12.9.4
 cuda-pathfinder==1.8.3
 cycler==0.12.1
+dill==0.4.1
 einops==0.8.2
 filelock==4.0.12
 fonttools==4.66.1
@@ -35,7 +37,7 @@ lazy-loader==0.6
 lightning-utilities==0.15.3
 MarkupSafe==3.0.4
 matplotlib==3.11.2
-MLCodec_extensions_cpp @ file:///local/users/emanuele/envs/20261006/root/work/wheels/cpu/mlcodec_extensions_cpp-0.0.0-cp312-cp312-linux_x86_64.whl#sha256=846503cddef648185723073183e0aba5ec265e87a28469d026d6659710661eb9
+MLCodec_extensions_cpp @ file:///local/users/emanuele/envs/20261006b/root/work/wheels/cpu/mlcodec_extensions_cpp-0.0.0-cp312-cp312-linux_x86_64.whl#sha256=8e8ebfeb5696cb51bd105aaf3cb92df12d8d8acce899f8c1e3b29b23c389c275
 mpmath==1.3.0
 multidict==6.9.1
 networkx==3.7

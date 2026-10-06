@@ -149,6 +149,12 @@ Do per-file work locally and move bytes over NFS in a few large files.
   SHA256, and re-hashes it on every use, so a stage never reads unverified bytes.
   `extract: true` unpacks a tar archive once into a read-only tree. Pack datasets of
   many small files as archives; staging them file by file would pay the NFS cost.
+- `inputs` and `staged_inputs` must resolve to files under the data root
+  (`Datasets/pointstream-data`); `Models` and the datasets are outside it. Stage
+  such a file through a hard link under the data root: the same NFS filesystem,
+  so no bytes are copied and the weight still lives in `Models`. A symbolic link
+  resolves outside and is refused. The environment audit's links are in
+  `pointstream-data/audit/env-2026-10-06/inputs/<name>/<file>`.
 - Optional `local_storage_gib` makes admission require a local root that can add
   that much while keeping its safety margin. Extracted inputs, a staged environment
   and RAM-backed scratch require it. Without enough space, a stage uses verified

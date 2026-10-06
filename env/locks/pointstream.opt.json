@@ -15,9 +15,9 @@
     "sm89": "-gencode=arch=compute_89,code=sm_89"
   },
   "wheels_sha256": {
-    "wheels/cpu/mlcodec_extensions_cpp-0.0.0-cp312-cp312-linux_x86_64.whl": "846503cddef648185723073183e0aba5ec265e87a28469d026d6659710661eb9",
-    "wheels/sm80/inference_extensions_cuda-0.0.0-cp312-cp312-linux_x86_64.whl": "b1cac7fd5efd03e66d8067406a13326c874d11a6bb3dccabc4a47d27db23d735",
-    "wheels/sm89/inference_extensions_cuda-0.0.0-cp312-cp312-linux_x86_64.whl": "4f369787163769efaf9a6aec0170f1cf5f9d69f6b62c8e1e46009c49d177d1c2"
+    "wheels/cpu/mlcodec_extensions_cpp-0.0.0-cp312-cp312-linux_x86_64.whl": "8e8ebfeb5696cb51bd105aaf3cb92df12d8d8acce899f8c1e3b29b23c389c275",
+    "wheels/sm80/inference_extensions_cuda-0.0.0-cp312-cp312-linux_x86_64.whl": "b0fbbfadba3bdbe51a462a837ebd3149bb2aba39d14fedba1b8e9110fc0e21c3",
+    "wheels/sm89/inference_extensions_cuda-0.0.0-cp312-cp312-linux_x86_64.whl": "73b01eb4b9ac53cf8751059ee33850894ebf55e076228af9045b973bb63446a3"
   },
   "WiLoR": {
     "url": "https://github.com/rolpotamias/WiLoR",

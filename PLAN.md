@@ -23,16 +23,15 @@ new dependency.
   `Datasets`, with immutable manifests and smoke reads in `Datasets/manifests/`.
   The pre-reset data is in `Datasets/archive/pre-reset-2026-10-05/` with its
   own manifest. Tooling: `tools/datasets/`.
+- **0. Environment audit, first wave** (2026-10-06). One environment for
+  SAM 3.1, YOLOE-26, the VISOR and HOT3D-Clips readers, HaMeR and WiLoR,
+  SVT-AV1 and DCVC-UF (the chosen neural codec), with the conflicts, locks and
+  packed archive in [resources](docs/resources.md#environments) and per-GPU
+  results in the [model–GPU table](docs/fleet.md#modelgpu-table). Open for B1:
+  the VISOR frame mapping ([resources](docs/resources.md#datasets)). Open for H:
+  HaMeR or WiLoR, decided on HInt test and HOT3D.
 
 ## Phase 1: egocentric
-
-### 0. Environment audit, first wave
-
-Audit SAM 3.1, YOLOE/Ultralytics, the VISOR and HOT3D loaders (HOT3D hand
-rendering needs MANO and the fisheye camera model), a hand-pose estimator,
-SVT-AV1 and the chosen neural codec, with their pinned dependency versions. The
-audit decides the environment set and replaces `environment.yaml`
-([AGENTS.md](AGENTS.md#environments)).
 
 ### B1. VISOR adapter and evaluation set
 
@@ -47,7 +46,7 @@ sha256s.
 
 ### B2. Baseline rate-distortion on VISOR
 
-SVT-AV1 and the neural codec on the evaluation set: rate against weighted PSNR
+SVT-AV1 and DCVC-UF on the evaluation set: rate against weighted PSNR
 (0.7 foreground + 0.3 background on VISOR masks) and the perceptual metrics.
 This is the target PointStream must beat, and it needs no PointStream
 component.

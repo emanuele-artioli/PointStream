@@ -47,7 +47,7 @@ domains).
 | End-to-end codec evaluation (video plus dense foreground masks) | VISOR (phase 1); OpenTTGames players stage (phase 2) |
 | Segmentation training and evaluation | VISOR, EgoHOS; OpenTTGames as an object-level check |
 | Handled-object proposer | VISOR (contact), EgoHOS (object orders); HOT3D as cross-test |
-| Hand keypoints and foreground encoding | HOT3D (motion-capture oracle); VISOR with an estimated hand pose |
+| Hand keypoints and foreground encoding | HOT3D (motion-capture oracle); VISOR with an estimated hand pose; HInt (VISOR frames, 2D keypoints) to choose the estimator, once downloaded |
 | Racket pose and player prompts | RacketVision |
 | Ball tracking and ball encoding | TrackNet (dense), RacketVision, OpenTTGames |
 
@@ -76,7 +76,22 @@ Results are reported per tier. No data is labelled by hand.
 
 **Open questions.**
 - Is the demo rebuilt on VISOR, or kept on the archived copy of its data?
-- Which hand-pose estimator gives VISOR keypoints (HaMeR is in `Datasets/HaMeR`)?
+
+**Hand pose for VISOR** (decided 2026-10-06, [Models](#models)): a
+MANO regressor, HaMeR or WiLoR, not DWPose. VISOR has no hand keypoints, and the
+codec does not need them: it is scored on pixels inside the dataset masks. They
+matter only for choosing the estimator. For that, HInt ([HaMeR](https://github.com/ddshan/hint),
+MIT) labels 21 2D hand keypoints with occlusion flags on EPIC-KITCHENS VISOR
+frames (train, val and test splits). It is not downloaded yet. HaMeR trains on
+HInt's train split, so only HInt test is fair to it.
+
+**VISOR frame mapping.** `frame_mapping.json` names EPIC-KITCHENS rgb frames
+(1-indexed), not decoded video frames. On P32_07 (59.94 fps) rgb frame k matches
+the decoded frame at time (k − 1)/60 s: the frames were extracted at 60 fps.
+`index = k − 1` drifts by one frame per ~1,000 (2 frames off at frame 1,503,
+mean absolute difference 7.1 against the released JPEG, versus 1.3 for the time
+rule). The video also repeats frames in pairs. The B1 reader must use the time
+rule and verify it on more videos, including the 50 fps EK-100 ones.
 
 **Archived.** `tennis_games`, `Egocentric-10K` and the derived
 `pointstream-demo` are in `Datasets/archive/pre-reset-2026-10-05/`: moved,
@@ -86,13 +101,17 @@ until the per-dataset domains replace it.
 
 ## Models
 
+Each family directory in `Models` has a `MANIFEST.json` (sha256, size, source
+path and URL) written by `tools/models/place.py`, which never overwrites.
+
 **SAM 3.1 Object Multiplex**
-- Meta's source pinned to `2345a4ad109ac29c569da749c91d84f10dc08c40`, checked
-  out at `~/.cache/sam3-meta`, run by `~/.conda/envs/pointstream-sam31`.
-- Checkpoint `sam3.1_multiplex.pt`, sha256
-  `0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6`. It
-  belongs in `Models/SAM`. Until it is moved there, the code falls back to the
-  Hugging Face cache snapshot (`SAM31_CHECKPOINT` overrides both).
+- Meta's `sam3` pinned to `2345a4ad109ac29c569da749c91d84f10dc08c40`, installed
+  from git into the environment. `Sam31SequenceSegmenter` checks the installed
+  commit (`direct_url.json`) and every file against its `RECORD` hash;
+  `SAM31_SOURCE_ROOT` selects a git checkout instead.
+- `Models/SAM/sam3.1_multiplex.pt`, sha256
+  `0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6` (copied
+  from the Hugging Face snapshot `daa63191`, with its `sam3.1_config.json`).
 
 **YOLOE-26**
 - Only the `n` and `x` segmentation weights are in `Models/YOLO`
@@ -100,20 +119,116 @@ until the per-dataset domains replace it.
   encoder, which must be bound locally (`bind_local_text_encoder`).
 - ByteTrack loses fast hands; mask-IoU association works.
 
+**Neural video codec: DCVC-UF** (decided 2026-10-06)
+- Microsoft's [DCVC](https://github.com/microsoft/DCVC) at
+  `cbdae87a5445114cdc7f48816da63ea80bdeac40`: DCVC-UF (CVPR 2026), the newest
+  model there, after DCVC-RT (CVPR 2025) and DCVC-FM (CVPR 2024). It writes a
+  real bitstream (rANS entropy coder), so rate is counted from bytes. Three
+  structures: LD (low delay), HT-S and HT-L (chunks of 8 frames).
+- Weights in `Models/DCVC`: `cvpr2026_image.pth.tar`, `cvpr2026_video_{ld,hts,htl}.pth.tar`,
+  copied from the pre-reset download (2026-09-29; DCVC publishes no checksum,
+  hashes in the manifest).
+- `src/codecs/dcvc_uf_worker.py` encodes and decodes one stream. It is ported
+  from the pre-reset adapter, which was correct but never passed its provenance
+  gate. It runs as its own process because DCVC's package is also called `src`.
+  The decoder sees only the container bytes and the checkpoints.
+- Not chosen. HNeRV fits one network per video with no temporal model: the
+  pre-reset latents cost 76–79 kbps at 18–21 dB at 240p, no better than AV1.
+  GLC-video reports estimated rather than coded rates. GVC-RT and MTTF were
+  never installed.
+
+**Hand pose estimators**
+- HaMeR ([geopavlakos/hamer](https://github.com/geopavlakos/hamer) at
+  `3a01849f4148352e9260b69bf28b65d1671a4905`), CVPR 2024, ViT-H. Weights in
+  `Models/HaMeR` (`hamer.ckpt`, `model_config.yaml`, `dataset_config.yaml`,
+  `mano_mean_params.npz`), copied from the official demo archive already in
+  `Datasets/HaMeR/Hand-Texture-Module/`.
+- WiLoR ([rolpotamias/WiLoR](https://github.com/rolpotamias/WiLoR) at
+  `fcb911312a38fa8badd30d9656a167485d61b8f9`), CVPR 2025, newer and faster, with
+  its own YOLO hand detector. Weights in `Models/WiLoR` (`wilor_final.ckpt`,
+  `detector.pt`) from the authors' Hugging Face space, LFS sha256 verified.
+- Both regress MANO pose and shape, the representation HOT3D's motion-capture
+  oracle uses, so the two hand evaluations in H compare like with like. Both
+  take a hand box and handedness, which VISOR masks (and later PointStream's
+  segmenter) supply, so their demo detectors (ViTDet, ViTPose) are not needed.
+- DWPose is not used: it is 2D only, its person detector needs a visible body,
+  and egocentric frames show hands and forearms.
+- Which of the two: a bounded pilot in H on HInt test (2D) and HOT3D (3D against
+  motion capture). On a tie, the faster one.
+
+**MANO**
+- `Models/MANO/MANO_{LEFT,RIGHT}.pkl`: chumpy-free copies of the official v1.2
+  models (`Datasets/MANO/mano_v1_2/models`), written by
+  `tools/models/mano_dechumpy.py`. chumpy does not import on Python 3.12;
+  `shapedirs` was a chumpy `Select` and is evaluated exactly. `MANIFEST.json`
+  holds the source and output sha256 and each array's hash. The HOT3D smoke
+  validates the copies: rendered MANO hands match the labelled amodal boxes.
+
 ## Environments
 
-The environment audit ([PLAN.md](../PLAN.md)) decides the environment set and
-replaces `environment.yaml`. Each environment gets a lock file and the reason it
-exists here.
+**One environment, `pointstream`**, for every phase-1 component: Python 3.12,
+torch 2.10.0+cu128. The audit found conflicts, but none that needed a second
+environment; each is resolved below.
 
-| Environment | Purpose |
+| File | Holds |
 |---|---|
-| `~/.conda/envs/pointstream` | Fleet hosts' main environment |
-| `~/.conda/envs/pointstream-sam31` | SAM 3.1 worker |
+| `environment.yaml` | conda-forge packages (Python, ffmpeg 8.1 with libsvtav1 and libdav1d, SVT-AV1, dav1d) and `env/requirements.txt` |
+| `env/requirements.txt`, `env/no-deps.txt` | Top-level pins; the packages installed without their declared dependencies, and why |
+| `env/build-environment.yaml` | Build-only prefix (CUDA 12.8 toolkit, gcc 13) for the DCVC-UF extensions; nothing runs from it |
+| `env/build.sh` | Builds both prefixes, the extensions and the vendored trees on host-local disk, then writes the locks (resumable by step) |
+| `env/patches/dcvc-build-targets.patch` | DCVC's extension build takes its GPU targets from the build instead of probing the build host |
+| `env/locks/` | `conda list --explicit --md5` and `pip freeze` of both prefixes, `pip check`, and `pointstream.opt.json` (DCVC, CUTLASS and WiLoR revisions, wheel hashes) |
 
-Packed environments for fleet staging go under
-`/home/itec/emanuele/pointstream-data/environments`, which does not exist until
-the first one is packed ([fleet](fleet.md#host-local-staging)).
+Packed for fleet staging: `pointstream-data/environments/pointstream-20261006T113321Z.tar.gz`,
+sha256 `44835688156ec6dd5a96ae068e636bb65174597a8ca5f34a6efc33b12bd751b9`
+(4.9 GB; 8.5 GB unpacked). Built from the recipe alone on gpu6, 2026-10-06, at commit `fa68777`.
+
+**Components and what they pin**
+
+| Component | Source | Stated requirements | In the environment |
+|---|---|---|---|
+| SAM 3.1 | `sam3` @ `2345a4a` | Python 3.12, torch 2.10.0 cu128 (README), numpy<2, timm>=1.0.17 | as stated |
+| YOLOE-26 | `ultralytics==8.4.6` | torch>=1.8, opencv-python | `--no-deps` |
+| VISOR reader | PyAV 19.0.1 | — | decodes the EPIC-KITCHENS videos frame-accurately |
+| HOT3D-Clips | `hand_tracking_toolkit` @ `bc628e9` | numpy, scipy, torch, opencv-python, webdataset | `--no-deps`; FISHEYE624 cameras, MANO via smplx, numpy rasterizer. The hot3d repo (`146b34a`) documents the clip format; its pixi environment (Python 3.10, torch 2.1, projectaria_tools) serves the VRS release, not the clips |
+| HaMeR | `hamer` @ `3a01849` | smplx==0.1.28, chumpy, mmcv==1.3.9, detectron2, pyrender | `--no-deps` |
+| WiLoR | `opt/WiLoR` @ `fcb9113` | Python 3.10, torch cu117, ultralytics==8.1.34, chumpy | vendored tree on `sys.path` (no packaging) |
+| DCVC-UF | `opt/DCVC` @ `cbdae87`, CUTLASS v4.4.1 | Python>=3.12, torch 2.9.1 and CUDA 13.0 tested, extensions built for the build host's GPU | two extension builds in `opt/dcvc-extensions/` |
+| SVT-AV1 | conda-forge `svt-av1` 4.2.0, `ffmpeg` 8.1, `dav1d` 1.5 | — | `SvtAv1EncApp`, `dav1d`, `ffmpeg` on the prefix's `bin` |
+
+**Conflicts and their resolution**
+1. *CUDA.* DCVC-UF is tested on CUDA 13.0; every host runs driver 535 (CUDA
+   12.2). torch 2.10.0+cu128 runs on it through CUDA minor-version
+   compatibility and carries SASS for sm_70 to sm_120. The extensions are
+   compiled with CUDA 12.8 to SASS only, because the driver cannot JIT newer PTX.
+2. *DCVC extension targets.* Its build uses `-arch=native` and a compile-time
+   SM, so it fits only the GPU it was built on. The patch names the targets.
+   Two variants are built: `sm80` (SASS for sm_70, 75, 80 and 86, sm_80 hint
+   tables) and `sm89` (Ada hint tables). The worker loads the one for the
+   device. DCVC then dispatches at run time: plain PyTorch below sm_75, CUTLASS
+   Sm75 kernels on Turing, Sm80 above.
+3. *Two cv2 builds.* ultralytics, hand_tracking_toolkit and hamer declare
+   `opencv-python`; PointStream uses `opencv-python-headless`. Both install
+   `cv2/` over each other, so those three are installed `--no-deps` with their
+   other dependencies listed explicitly. `pip check` reports exactly these
+   omissions (`env/locks/pointstream.pip-check.txt`).
+4. *chumpy.* MANO pickles need chumpy, which fails on Python 3.12. They are
+   converted once (Models above); nothing imports chumpy.
+5. *HaMeR's demo stack.* mmcv==1.3.9 (ViTPose) and detectron2 (ViTDet) are demo
+   detectors. They are left out: hand boxes and handedness come from masks.
+6. *WiLoR's ultralytics==8.1.34.* Its detector checkpoint must load under
+   8.4.6; the WiLoR smoke checks it.
+7. *pkg_resources.* sam3 imports it, and setuptools removed it after 80.x:
+   `setuptools==80.9.0`.
+8. *Two packages named `src`.* DCVC's top-level package collides with
+   PointStream's. The worker interface (one process per encode or decode,
+   JSON plan in, JSON report out) keeps them apart in the same environment.
+
+**Earlier environments.** `~/.conda/envs/pointstream` (Python 3.10, torch
+2.2.2) stays as the interpreter of the fleet workers and the dispatcher only;
+`experiments/jobs` must keep running on it. Workloads run from the packed
+environment. `pointstream-sam31`, `pointstream-dcvc`, `pointstream-neural` and
+`pointstream-diffueraser` are superseded and kept, not deleted.
 
 ## Archive
 
