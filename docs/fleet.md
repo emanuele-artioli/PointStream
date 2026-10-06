@@ -84,9 +84,9 @@ Set the job specification's `hosts` to the complete compatible pool and submit
 with `scripts/ps-fleet submit`; admission selects and claims the available node.
 Do not pin a node merely because a preceding pilot ran there. Validate shared
 input/artifact access and pinned runtime/native binaries on the execution node;
-compatibility is more than free compute capacity. CPU-only requests require a
-supported CPU admission path with equivalent claims, isolation and monitoring;
-do not silently use an old host-pinned SSH helper or reserve an unneeded GPU.
+compatibility is more than free compute capacity. A job that needs no GPU
+declares `"device": "cpu"` ([below](#cpu-jobs)); never use an old host-pinned SSH
+helper or reserve an unneeded GPU for it.
 
 ## Job specification and enforced gate
 
@@ -128,6 +128,18 @@ any model; entrypoint can also be `["relative/script.py"]`. No shell or inline
 Python entrypoint is supported. Smoke is capped at 600 seconds. Stage `seconds`
 is both the saved duration allowance and timeout; reserve validation and overhead
 in the total budget. The deadline includes waiting and bounds execution too.
+
+### CPU jobs
+
+`"device": "cpu"` (the default is `"gpu"`) admits a job on CPU headroom alone:
+it declares `"gpu_models": []`, `"gpu_memory_mib": 0` and no `contention`. A worker
+admits it when its host passes the same checks as for a GPU job (probe, Python,
+writable data root, required commands, `cpu_threads` within 90% of the current
+headroom), whatever its GPUs are doing. The supervisor claims only the CPU threads,
+which still guards against oversubscription by other PointStream jobs, and starts
+the workload with `CUDA_VISIBLE_DEVICES=""`. Staging, the smoke gate, the
+validator, budgets and deadlines are unchanged. Workers admit cpu jobs only from
+a release that includes this path (`workers restart`).
 
 Children inherit `PS_STAGE` (smoke/full), `PS_STAGE_DIR` (separate output directory),
 `PS_JOB_DIR` (supervisor directory), `PS_VALIDATION_PATH`, `PS_SCRATCH_DIR`,
