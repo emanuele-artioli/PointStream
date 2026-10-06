@@ -438,6 +438,7 @@ def inspect_hot3d(root: Path, scratch: Path) -> dict[str, Any]:
 
 
 VISOR_ZIP = "2v6cgv1x04ol22qp9rm9x2j6a7.zip"
+HAND_WORDS = re.compile(r"\b(hand|glove|arm|forearm|wrist)\b")
 
 
 def visor_mask(annotations: list[dict[str, Any]], names: set[str], shape: tuple[int, int]) -> np.ndarray:
@@ -543,7 +544,7 @@ def inspect_visor(root: Path, scratch: Path) -> dict[str, Any]:
     grid = np.concatenate([np.concatenate(tiles[i:i + 4], 1) for i in range(0, len(tiles), 4)], 0)
     grid_path = save_overlay(grid, scratch / "smoke" / "VISOR_hands_grid.jpg")
 
-    hand_like = {k: v for k, v in classes.items() if "hand" in k or "glove" in k or "arm" in k}
+    hand_like = {k: v for k, v in classes.items() if HAND_WORDS.search(k)}
     return {
         "label_format": {
             "GroundTruth-SparseAnnotations/annotations/<split>/<video>.json": "video_annotations[]: image{image_path,name,subsequence,video}, annotations[]{id,name (open vocabulary),class_id (EPIC_100_noun_classes_v2.csv),exhaustive,in_contact_object (hands),on_which_hand (gloves),segments: polygons in 1920x1080 coordinates}",
