@@ -27,8 +27,7 @@ new dependency.
   SAM 3.1, YOLOE-26, the VISOR and HOT3D-Clips readers, HaMeR and WiLoR,
   SVT-AV1 and DCVC-UF (the chosen neural codec), with the conflicts, locks and
   packed archive in [resources](docs/resources.md#environments) and per-GPU
-  results in the [model–GPU table](docs/fleet.md#modelgpu-table). Open for B1:
-  the VISOR frame mapping ([resources](docs/resources.md#datasets)). Open for H:
+  results in the [model–GPU table](docs/fleet.md#modelgpu-table). Open for H:
   HaMeR or WiLoR, decided on HInt test and HOT3D.
 
 ## Phase 1: egocentric

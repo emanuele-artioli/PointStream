@@ -87,13 +87,43 @@ frames (5.3K hands; train, val and test), New Days and Ego4D. HaMeR trains on
 HInt train, so only HInt test is fair to it. Adopted for H and downloaded to `Datasets/HInt` (manifest
 `Datasets/manifests/HInt.json`, table above).
 
-**VISOR frame mapping.** `frame_mapping.json` names EPIC-KITCHENS rgb frames
-(1-indexed), not decoded video frames. On P32_07 (59.94 fps) rgb frame k matches
-the decoded frame at time (k − 1)/60 s: the frames were extracted at 60 fps.
-`index = k − 1` drifts by one frame per ~1,000 (2 frames off at frame 1,503,
-mean absolute difference 7.1 against the released JPEG, versus 1.3 for the time
-rule). The video also repeats frames in pairs. The B1 reader must use the time
-rule and verify it on more videos, including the 50 fps EK-100 ones.
+**VISOR frame mapping** (B1, fleet job `20261006T193326Z-64057023`, gpu3,
+commit `efc516a`, environment `pointstream-20261006T113321Z`; 325 released
+sparse JPEGs from 10 videos, inputs `pointstream-data/visor/b1-2026-10-06/mapping-v2/`).
+VISOR uses three numberings of one video: decoded frames (0-based, what
+PointStream encodes), EPIC-KITCHENS rgb frames, and VISOR's own frames (VISOR
+re-extracted with a newer ffmpeg and names every mask by them).
+`frame_mapping.json` links VISOR to EPIC frames only on *sparse* frames.
+
+| Video type (videos checked) | EPIC rgb frame k is decoded frame | VISOR frame n is decoded frame n − 1 |
+|---|---|---|
+| HEVC 1080p 50 fps, EK-100 (4) | k − 1 (139/139) | yes (139/139) |
+| H.264 1080p 59.94 fps (3) | nearest to (k − 1)/60 s (86/86) | no (18/86; off by up to 13 on P02_02) |
+| H.264 1080p 29.97 fps (2) | (k − 1)/60 s rounded up (72/72) | no (0/72; about two VISOR frames per decoded frame) |
+| H.264 1080p 47.95 fps (1, train) | unresolved (26/28 nearest, 23/28 rounded up) | no |
+
+A rule holds on a frame when its decoded frame is within 0.5 grey levels (mean
+absolute RGB difference) of the best match to the JPEG; best matches were
+0.8–2.6. The EK-55 videos repeat frames in pairs (ties). `visor.epic_frame_to_video_index`
+implements the verified rules and raises for any other rate.
+
+Dense masks have no mapping between keyframes: `visor.frame_alignment` places
+them by counting from their run's keyframes and records the *drift* (decoded
+frames gained or lost against the extraction rate between keyframes). EK-100
+has drift 0 on all 2,383 keyframe stretches of the 16 val videos; EK-55
+drifts by 1–3 frames on about a quarter. Evaluation scores only exactly placed
+frames; training admits drift ≤ 1 ([decision](experiments.md#2026-10-06-visor-frame-drift-exact-frames-for-evaluation-small-drift-for-training)).
+Dense polygons are drawn on an 854×480 canvas and scaled to 1080p; on P32_07's
+keyframes they match the human 1080p masks at IoU 0.97–0.995.
+
+**VISOR evaluation set** (`experiments/visor/eval_set.json`; source
+`pointstream-data/visor/b1-2026-10-06/evalset/eval_set.json`, sha256
+`b994c531…d9cb`; dense archive `visor-val-dense.tar`, `cca6169a…020f`). 16
+items, one per EK-100 validation video (11 participants), 240 frames each
+(4.8 s at 50 fps), every frame labelled and exactly aligned, each starting on a
+keyframe; the run is picked content-blind by sha256("pointstream-b1:<video>").
+The 27 EK-55 validation videos are excluded because their dense frames cannot be
+placed exactly. Masks carry provenance `interpolated`.
 
 **Archived.** `tennis_games`, `Egocentric-10K` and the derived
 `pointstream-demo` are in `Datasets/archive/pre-reset-2026-10-05/`: moved,
@@ -203,7 +233,7 @@ sha256 `44835688156ec6dd5a96ae068e636bb65174597a8ca5f34a6efc33b12bd751b9`
 |---|---|---|---|
 | SAM 3.1 | `sam3` @ `2345a4a` | Python 3.12, torch 2.10.0 cu128 (README), numpy<2, timm>=1.0.17 | as stated |
 | YOLOE-26 | `ultralytics==8.4.6` | torch>=1.8, opencv-python | `--no-deps` |
-| VISOR reader | PyAV 19.0.1 | — | decodes the EPIC-KITCHENS videos frame-accurately |
+| VISOR reader | PyAV 19.0.1 | — | decodes the EPIC-KITCHENS videos frame-accurately; `src/segmentation/visor.py` |
 | HOT3D-Clips | `hand_tracking_toolkit` @ `bc628e9` | numpy, scipy, torch, opencv-python, webdataset | `--no-deps`; FISHEYE624 cameras, MANO via smplx, numpy rasterizer. The hot3d repo (`146b34a`) documents the clip format; its pixi environment (Python 3.10, torch 2.1, projectaria_tools) serves the VRS release, not the clips |
 | HaMeR | `hamer` @ `3a01849` | smplx==0.1.28, chumpy, mmcv==1.3.9, detectron2, pyrender | `--no-deps` |
 | WiLoR | `opt/WiLoR` @ `fcb9113` | Python 3.10, torch cu117, ultralytics==8.1.34, chumpy | vendored tree on `sys.path` (no packaging) |

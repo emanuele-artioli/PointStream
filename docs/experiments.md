@@ -219,3 +219,31 @@ invocation turns out to be needed.
   above add the rounded-up variant, and a miss is now recorded. The metadata
   drift survey assumed 30 per second for the two 29.97 fps val videos (52 of
   3,358 EK-55 stretches); drift is now measured against the extraction rate.
+- Job `20261006T193326Z-64057023` (gpu3, CPU only, `efc516a`, 88 s full
+  stage): validator passed. EK-100 (HEVC 50 fps, 4 videos): VISOR n − 1 and
+  EPIC k − 1 hold on 139/139 JPEGs. 59.94 fps (3): EPIC nearest to
+  (k − 1)/60 s holds on 86/86, VISOR n − 1 on 18/86 (off by up to 13). 29.97 fps
+  (2): EPIC (k − 1)/60 s rounded up holds on 72/72, VISOR n − 1 on 0/72. 47.95
+  fps (P17_01, train): no rule on every frame (26/28 nearest, 23/28 rounded
+  up); the reader raises for that rate. Rule table in
+  [resources](resources.md#datasets).
+- Evaluation set: 16 items, one per EK-100 validation video, 240 frames, from
+  `tools/datasets/visor_b1_inputs.py evalset` on that job's `mapping.json`
+  (`eval_set.json` sha256 `b994c531…d9cb`, archive `cca6169a…020f`). The 27
+  EK-55 validation videos are excluded.
+- Job `20261006T194624Z-8b0d5b7e` (gpu3, CPU only, `2985306`, 160 s full
+  stage, published masks `afd7370a…5799`): validator passed (every frame
+  labelled and exactly aligned, sources match their sha256, dense keyframe vs
+  human masks median IoU 0.973 for hands over 25 instances, 0.979 for objects
+  over 35). Trivial candidate "hold the first frame", mean over items:
+  foreground J 0.337, F 0.264; left hand J 0.349; right hand J 0.285; active
+  object J 0.326. B1's done-when holds.
+- Finding: the dense masks are incomplete. VISOR keeps in a dense run only the
+  entities present at both of its keyframes, so an entity that enters or
+  leaves during the run is missing from every frame of it. On the first frames
+  of the 16 items, 12 lose at least one entity that the human masks label, and
+  5 lose a hand (P01_107, P07_110, P09_104, P30_110 one each; P09_103 both).
+  Where both have the hand, IoU is 0.84–0.99. The minimum hand IoU of 0.0 in
+  the validator summary is this omission, not misalignment. For B2 a missing
+  hand is scored as background; for D1 a segmenter that finds it is penalised.
+  Decision pending (see the B1 report).
