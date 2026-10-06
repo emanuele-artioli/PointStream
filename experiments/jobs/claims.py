@@ -24,7 +24,26 @@ import subprocess
 import time
 from typing import Any, Callable, Iterator
 
-from src.contracts.paths import data_root
+
+def data_root() -> Path:
+    """The fleet data root holding ``jobs/``.
+
+    ``PS_DATA_ROOT`` (set by the fleet in every remote job), then a one-line
+    ``.ps-data-root`` marker in the repository root, then an existing
+    ``~/Datasets``, then the repository root.
+    """
+    override = os.environ.get("PS_DATA_ROOT", "").strip()
+    if override:
+        return Path(override).expanduser().resolve()
+    repo = Path(__file__).resolve().parents[2]
+    try:
+        declared = (repo / ".ps-data-root").read_text(encoding="utf-8").strip()
+    except OSError:
+        declared = ""
+    if declared:
+        return Path(declared).expanduser().resolve()
+    canonical = Path.home() / "Datasets"
+    return canonical.resolve() if canonical.is_dir() else repo
 
 
 class ResourceClaimError(Exception):

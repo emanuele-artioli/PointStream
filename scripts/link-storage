@@ -1,0 +1,19 @@
+#!/bin/sh
+# Create the gitignored Models and Datasets links in this checkout's root.
+# Idempotent; refuses to replace anything that is not already the right link.
+set -eu
+root=$(cd "$(dirname "$0")/.." && pwd -P)
+for name in Models Datasets; do
+    target="/home/itec/emanuele/$name"
+    link="$root/$name"
+    if [ -L "$link" ] && [ "$(readlink "$link")" = "$target" ]; then
+        echo "$name -> $target (present)"
+    elif [ -e "$link" ] || [ -L "$link" ]; then
+        echo "error: $link exists and is not a link to $target; not replacing it" >&2
+        exit 1
+    else
+        [ -d "$target" ] || echo "warning: $target is not reachable from this machine" >&2
+        ln -s "$target" "$link"
+        echo "$name -> $target (created)"
+    fi
+done

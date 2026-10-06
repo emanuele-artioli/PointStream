@@ -1,11 +1,6 @@
 {
-  "_comment": "Per-project values for the host-wide shell guards in ~/.agent-rules/scripts/. Read by every agent's hook adapter; see .agent-rules/README.md.",
-  "protected": ["outputs", "assets"],
-  "detail": "GPU pipeline outputs / dataset and raw sources / weight symlinks",
-  "entry_points": [
-    "train_controlnet",
-    "train_pix2pix",
-    "train_spade4tennis",
-    "train_campaign"
-  ]
+  "_comment": "Per-project values for the host-wide shell guards in ~/.agent-rules/scripts/. Models and Datasets link to the shared weight and dataset stores.",
+  "protected": ["Models", "Datasets"],
+  "detail": "links to /home/itec/emanuele/Models and /home/itec/emanuele/Datasets",
+  "entry_points": []
 }

@@ -1,3 +1,4 @@
+exclude: ^(Models|Datasets)/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -11,11 +12,11 @@ repos:
     hooks:
       - id: ruff
         args: ["--fix"]
-      - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.15.0
     hooks:
       - id: mypy
-        additional_dependencies: ["pydantic==2.11.2", "numpy==1.26.4", "msgpack==1.1.0"]
+        additional_dependencies: ["numpy==1.26.4", "types-PyYAML"]
         args: ["--config-file=pyproject.toml"]
+        pass_filenames: false

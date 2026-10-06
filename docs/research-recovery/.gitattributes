@@ -1,2 +1,0 @@
-# Preserve CRLF in recovered server TSV indexes while checking other whitespace.
-records/server/*.tsv whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
