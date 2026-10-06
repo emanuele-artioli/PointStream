@@ -1,8 +1,9 @@
 """Score a candidate segmentation against the SAM 3.1 reference.
 
-There is no human ground truth for these domains, so SAM 3.1 (offline,
-bidirectional) is treated as correct and every number here is agreement with
-it, not accuracy in an absolute sense.
+Where a domain has no dataset labels, SAM 3.1 (offline, bidirectional) is the
+reference and every number here is agreement with it, not accuracy. Where the
+reference is a dataset's labels (``ClipMasks.labelled`` set), only its labelled
+frames are scored.
 
 Per frame, on the foreground (union of classes) and per class:
 
@@ -84,10 +85,11 @@ def _mean(values: list[float]) -> float | None:
 
 
 def compare(candidate: ClipMasks, reference: ClipMasks) -> dict[str, Any]:
-    """Aggregate agreement of ``candidate`` with ``reference`` over shared frames."""
+    """Aggregate agreement of ``candidate`` with ``reference`` over the shared labelled frames."""
     if (candidate.height, candidate.width) != (reference.height, reference.width):
         raise ValueError("candidate and reference were made at different resolutions")
-    frames = min(len(candidate), len(reference))
+    indices = [index for index in reference.labelled_frames() if index < len(candidate)]
+    frames = len(indices)
     if frames == 0:
         raise ValueError("no frames to compare")
     scopes = {
@@ -99,7 +101,7 @@ def compare(candidate: ClipMasks, reference: ClipMasks) -> dict[str, Any]:
     }
     series: dict[str, tuple[list[np.ndarray], list[np.ndarray]]] = {s: ([], []) for s in scopes}
     empty_agree = 0
-    for index in range(frames):
+    for index in indices:
         for scope, class_name in scopes.items():
             if class_name is None:
                 pred, ref = candidate.foreground(index), reference.foreground(index)
