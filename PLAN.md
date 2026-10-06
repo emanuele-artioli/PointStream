@@ -88,7 +88,8 @@ is parallax.
 Design session ([components](docs/components.md#4-foreground)): an appearance
 vector plus keypoints per object. Hands are evaluated twice. On HOT3D the
 keypoints come from motion capture (an oracle upper bound). On VISOR they come
-from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). HaMeR and WiLoR are compared first, as a paper table: 2D PCK on HInt
+from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). HaMeR and WiLoR are compared first; no published work compares them on
+egocentric video, so the result is a contribution and a paper table: 2D PCK on HInt
 VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
 the foreground reconstruction quality each gives. The literature does not
 settle it for egocentric video ([resources](docs/resources.md#models)). The gap between the two
@@ -124,5 +125,6 @@ As D1, per dataset and class, with the ball scored by point metrics.
 
 Rescope with a fresh paper repository state: egocentric first, racket sports as
 the second domain or as future work. Write the dataset and evaluation-protocol
-sections (weighted PSNR on dataset masks, provenance tiers). Set the venue and
+sections (weighted PSNR on dataset masks, provenance tiers) and the hand-pose
+estimator comparison from H. Set the venue and
 submission date.

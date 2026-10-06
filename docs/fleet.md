@@ -13,6 +13,10 @@ module path, so it is not renamed without restarting every worker.
 | gpu5 | 2 × RTX 6000 Ada | 8.9 |
 | gpu6 | 2 × RTX 6000 Ada | 8.9 |
 
+The home directory is shared, so tools installed there serve every host: Claude Code
+2.1.291 is at `~/.local/bin/claude` (installed 2026-10-06 with the official native
+installer; it updates itself).
+
 ## One entry point
 
 Run `scripts/ps-fleet` from the Mac. For preauthorized operation, invoke
