@@ -43,8 +43,17 @@ invocation turns out to be needed.
 - Hypothesis:
 - Competing explanation:
 - Budget:
-- Jobs:
-- Outcome:
+- Jobs: the 16 listed in the [model–GPU table](fleet.md#modelgpu-table)
+  (environment `pointstream-20261006T113321Z`), plus pre-checks on an earlier
+  build (`20261006T105407Z-800aeeb2` contended, `20261006T105506Z-13aa98b2`,
+  `20261006T112304Z-ea395e8f`) that found the missing `clip` and `dill`.
+- Outcome: one environment adopted. Every component passes on Ada and A6000.
+  The hand models and YOLOE pass on all four classes. DCVC-UF passes on the RTX
+  8000, not on the GV100 (upstream assertion). SAM 3.1 falls back to math
+  attention on the RTX 8000 (39.5 GiB, 2.2× slower) and runs out of memory on
+  the GV100, so SAM jobs use Ada and A6000. No component needed a second
+  environment. Wall time about 1.5 h of queue and run, mostly staging and
+  waiting for GPUs other users held.
 ```
 
 ## Decisions
@@ -110,5 +119,14 @@ invocation turns out to be needed.
   Ceiling 5.5 GPU-hours wall, expected under 2.
 - Not evidence: infrastructure smokes (`citable: false`). B1 starts in its own
   session.
-- Jobs:
-- Outcome:
+- Jobs: the 16 listed in the [model–GPU table](fleet.md#modelgpu-table)
+  (environment `pointstream-20261006T113321Z`), plus pre-checks on an earlier
+  build (`20261006T105407Z-800aeeb2` contended, `20261006T105506Z-13aa98b2`,
+  `20261006T112304Z-ea395e8f`) that found the missing `clip` and `dill`.
+- Outcome: one environment adopted. Every component passes on Ada and A6000.
+  The hand models and YOLOE pass on all four classes. DCVC-UF passes on the RTX
+  8000, not on the GV100 (upstream assertion). SAM 3.1 falls back to math
+  attention on the RTX 8000 (39.5 GiB, 2.2× slower) and runs out of memory on
+  the GV100, so SAM jobs use Ada and A6000. No component needed a second
+  environment. Wall time about 1.5 h of queue and run, mostly staging and
+  waiting for GPUs other users held.
