@@ -697,10 +697,13 @@ def run_group(args: argparse.Namespace, argv: list[str]) -> int:
     }
     write_json(stage_dir / "environment.json", environment)
     status: dict[str, int | str] = {}
+    # Ultralytics pip-installs missing packages at run time unless told not to;
+    # the environment must already hold everything.
+    child_env = {**os.environ, "YOLO_AUTOINSTALL": "false", "YOLO_OFFLINE": "true"}
     for done, component in enumerate(GROUPS[args.group], start=1):
         command = [sys.executable, "-m", "experiments.audit.env_smoke", "component", component, *argv]
         try:
-            result = subprocess.run(command, timeout=COMPONENT_SECONDS, capture_output=True, text=True)
+            result = subprocess.run(command, timeout=COMPONENT_SECONDS, capture_output=True, text=True, env=child_env)
             status[component] = result.returncode
             (stage_dir / "components").mkdir(exist_ok=True)
             (stage_dir / "components" / f"{component}.log").write_text(result.stdout[-20000:] + "\n--- stderr\n" + result.stderr[-20000:])

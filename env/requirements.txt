@@ -26,6 +26,13 @@ zstandard
 # VISOR reader: frame-accurate decoding of the EPIC-KITCHENS videos.
 av
 
+# YOLOE's text encoder imports Ultralytics' CLIP fork; Ultralytics would
+# otherwise try to pip-install it at run time.
+clip @ git+https://github.com/ultralytics/CLIP.git@a13192f8cb767260d7dfd98c843b0716593169e7
+
+# WiLoR's detector checkpoint (saved by ultralytics 8.1) unpickles with dill.
+dill==0.4.1
+
 # Ultralytics' own dependencies except opencv-python; ultralytics itself is in
 # no-deps.txt so the headless OpenCV stays the only cv2.
 matplotlib
