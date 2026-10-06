@@ -7,8 +7,9 @@ name = "pointstream"
 version = "0.2.0"
 description = "Object-centric semantic video codec"
 readme = "README.md"
-requires-python = ">=3.10"
-# The environment audit (PLAN.md) replaces these pins and environment.yaml.
+requires-python = ">=3.12"
+# Pins match the environment lock (env/locks/pointstream.pip.txt); environment.yaml
+# and env/build.sh build the full environment (docs/resources.md#environments).
 dependencies = [
   "numpy==1.26.4",
   "opencv-python-headless==4.10.0.84",
@@ -24,8 +25,6 @@ dev = [
   "pre-commit==4.1.0",
   "pytest==9.0.2",
   "ruff==0.11.2",
-  # pytest and mypy read this file; Python 3.10 has no tomllib.
-  "tomli==2.4.1; python_version < '3.11'",
   "types-PyYAML==6.0.12.20260518",
 ]
 
@@ -34,7 +33,7 @@ include = ["src*", "experiments*"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py312"
 # Models and Datasets are links to half a million files on NFS.
 extend-exclude = ["Models", "Datasets"]
 
@@ -43,7 +42,7 @@ select = ["E", "F"]
 ignore = ["E501"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.12"
 # `files` is the gate: CI runs mypy with no path arguments, and paths on the
 # command line replace this list instead of adding to it.
 files = ["src", "tests", "experiments"]

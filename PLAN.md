@@ -23,21 +23,25 @@ new dependency.
   `Datasets`, with immutable manifests and smoke reads in `Datasets/manifests/`.
   The pre-reset data is in `Datasets/archive/pre-reset-2026-10-05/` with its
   own manifest. Tooling: `tools/datasets/`.
+- **0. Environment audit, first wave** (2026-10-06). One environment for
+  SAM 3.1, YOLOE-26, the VISOR and HOT3D-Clips readers, HaMeR and WiLoR,
+  SVT-AV1 and DCVC-UF (the chosen neural codec), with the conflicts, locks and
+  packed archive in [resources](docs/resources.md#environments) and per-GPU
+  results in the [model–GPU table](docs/fleet.md#modelgpu-table). Open for B1:
+  the VISOR frame mapping ([resources](docs/resources.md#datasets)). Open for H:
+  HaMeR or WiLoR, decided on HInt test and HOT3D.
 
 ## Phase 1: egocentric
-
-### 0. Environment audit, first wave
-
-Audit SAM 3.1, YOLOE/Ultralytics, the VISOR and HOT3D loaders (HOT3D hand
-rendering needs MANO and the fisheye camera model), a hand-pose estimator,
-SVT-AV1 and the chosen neural codec, with their pinned dependency versions. The
-audit decides the environment set and replaces `environment.yaml`
-([AGENTS.md](AGENTS.md#environments)).
 
 ### B1. VISOR adapter and evaluation set
 
 A VISOR reader in `src/segmentation` producing `ClipMasks` from the dense
-interpolations. It records native classes (left hand, right hand, active
+interpolations. Frames come from the video through `frame_mapping.json`, which
+names EPIC rgb frames, not decoded frames: on P32_07 rgb frame k is the frame at
+(k − 1)/60 s, and `k − 1` as an index is up to 2 frames wrong
+([resources](docs/resources.md#datasets), `experiments/audit/env_smoke.py`
+`epic_frame_to_video_index`). B1 verifies the rule on more videos, including
+the 50 fps EK-100 ones, against the released sparse JPEGs, and records it. It records native classes (left hand, right hand, active
 objects), per-frame labelled flags, and a provenance tier per mask: `human` for
 the sparse ground truth, `interpolated` for the dense frames. Frames are decoded
 from the EPIC-KITCHENS videos through `frame_mapping.json`. The evaluation set
@@ -47,7 +51,7 @@ sha256s.
 
 ### B2. Baseline rate-distortion on VISOR
 
-SVT-AV1 and the neural codec on the evaluation set: rate against weighted PSNR
+SVT-AV1 and DCVC-UF on the evaluation set: rate against weighted PSNR
 (0.7 foreground + 0.3 background on VISOR masks) and the perceptual metrics.
 This is the target PointStream must beat, and it needs no PointStream
 component.
@@ -75,7 +79,7 @@ provenance.
 ### G. Background encoding
 
 Design session ([components](docs/components.md#3-background)). Candidates are
-the neural codec, a panorama/mosaic, and SVT-AV1. Egocentric video is the hard
+DCVC-UF, a panorama/mosaic, and SVT-AV1. Egocentric video is the hard
 case for a panorama: the head moves constantly and the scene is close, so there
 is parallax.
 
@@ -84,7 +88,10 @@ is parallax.
 Design session ([components](docs/components.md#4-foreground)): an appearance
 vector plus keypoints per object. Hands are evaluated twice. On HOT3D the
 keypoints come from motion capture (an oracle upper bound). On VISOR they come
-from a hand-pose estimator (what deployment sees). The gap between the two
+from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). HaMeR and WiLoR are compared first, as a paper table: 2D PCK on HInt
+VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
+the foreground reconstruction quality each gives. The literature does not
+settle it for egocentric video ([resources](docs/resources.md#models)). The gap between the two
 measures the cost of pose estimation.
 
 ## Phase 2: racket sports

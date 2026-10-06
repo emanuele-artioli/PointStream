@@ -10,6 +10,10 @@ hand-object video.
 | Path | Contents |
 |---|---|
 | `src/segmentation/` | Foreground/background segmentation: SAM 3.1 and YOLOE backends, lossless masks, evaluation, CLI |
+| `src/codecs/` | Codec workers (DCVC-UF) |
+| `env/`, `environment.yaml` | The environment recipe, patches and locks |
+| `experiments/audit/` | Environment-audit smokes |
+| `tools/` | Dataset acquisition and samples (`datasets/`), weight placement and MANO conversion (`models/`) |
 | `experiments/jobs/` | Fleet dispatcher, workers, resource claims, host-local staging, packed environments |
 | `scripts/ps-fleet` | The fleet's one entry point |
 | `scripts/link-storage` | Creates the `Models` and `Datasets` links |
@@ -26,8 +30,10 @@ scripts/link-storage
 pip install -e ".[dev]"
 ```
 
-Add `.[yoloe]` for the YOLOE backend. SAM 3.1 runs in its own environment
-([resources](docs/resources.md#models)).
+That is enough for the checks. The full environment (SAM 3.1, YOLOE, HaMeR,
+WiLoR, HOT3D tooling, DCVC-UF, SVT-AV1) is one prefix built on host-local disk
+by `env/build.sh` from `environment.yaml`, with locks in `env/locks/`; fleet
+jobs run its packed copy ([resources](docs/resources.md#environments)).
 
 ## Checks
 

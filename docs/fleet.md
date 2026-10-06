@@ -149,6 +149,12 @@ Do per-file work locally and move bytes over NFS in a few large files.
   SHA256, and re-hashes it on every use, so a stage never reads unverified bytes.
   `extract: true` unpacks a tar archive once into a read-only tree. Pack datasets of
   many small files as archives; staging them file by file would pay the NFS cost.
+- `inputs` and `staged_inputs` must resolve to files under the data root
+  (`Datasets/pointstream-data`); `Models` and the datasets are outside it. Stage
+  such a file through a hard link under the data root: the same NFS filesystem,
+  so no bytes are copied and the weight still lives in `Models`. A symbolic link
+  resolves outside and is refused. The environment audit's links are in
+  `pointstream-data/audit/env-2026-10-06/inputs/<name>/<file>`.
 - Optional `local_storage_gib` makes admission require a local root that can add
   that much while keeping its safety margin. Extracted inputs, a staged environment
   and RAM-backed scratch require it. Without enough space, a stage uses verified
@@ -296,3 +302,26 @@ and choose `gpu_models` from it.
 
 | Model | GPU class | Device / provider / kernels verified | Job |
 |---|---|---|---|
+| SAM 3.1 multiplex | RTX 6000 Ada (8.9) | passes: CUDA, torch 2.10.0+cu128, cuDNN 9.10; bf16 flash attention (+ mem-efficient), policy `native_flash`; hand IoU 0.65; peak 11.3 GiB | `20261006T113911Z-fb135803` |
+| SAM 3.1 multiplex | RTX A6000 (8.6) | passes: as Ada; flash attention; hand IoU 0.65; peak 11.3 GiB | `20261006T114724Z-5b302ae5` |
+| SAM 3.1 multiplex | Quadro RTX 8000 (7.5) | **fails the kernel check**: runs on CUDA, but no fused attention exists for its bf16 path, so it falls back to math attention (policy `efficient_then_math_fallback`); same IoU, peak 39.5 GiB, 2.2× slower. Do not use | `20261006T114256Z-e7362cf2` |
+| SAM 3.1 multiplex | Quadro GV100 (7.0) | **fails**: math attention needs more than its 32 GB (CUDA out of memory) | `20261006T114639Z-88223b68` |
+| YOLOE-26x-seg | Ada / A6000 / RTX 8000 / GV100 | passes on all four: CUDA, fp16 tensor-core GEMMs (CUTLASS/xmma for sm_80, sm_75, sm_70); identical hand IoU 0.43; peak 0.5 GiB | Ada `20261006T114026Z-b0696ced`, A6000 `20261006T114738Z-37e174c2`, RTX 8000 `20261006T114401Z-faf2630c`, GV100 `20261006T114644Z-0fd97c54` |
+| DCVC-UF HT-S | RTX 6000 Ada (8.9) | passes: extension `sm89`, 36 CUTLASS kernels; decode from bytes alone deterministic and bit-identical to the encoder's I frame; peak 1.7 GiB | `20261006T114026Z-b0696ced` |
+| DCVC-UF HT-S | RTX A6000 (8.6) | passes: extension `sm80`, 9 CUTLASS kernels; same decode checks | `20261006T114738Z-37e174c2` |
+| DCVC-UF HT-S | Quadro RTX 8000 (7.5) | passes: extension `sm80` (Sm75 CUTLASS path); same decode checks | `20261006T114401Z-faf2630c` |
+| DCVC-UF HT-S | Quadro GV100 (7.0) | **fails upstream**: DCVC's depthwise 3×3 launcher asserts `sm == 75` (`d3x3_kernel.h:571`); no Volta path | `20261006T114644Z-0fd97c54` |
+| HaMeR | Ada / A6000 / RTX 8000 / GV100 | passes on all four: CUDA fp32; attention is plain matmul in its ViT (no fused kernel by design); all checkpoint keys load; projected keypoints inside the VISOR hand boxes; peak 2.6 GiB | Ada `20261006T114125Z-e7d6020a`, A6000 `20261006T114819Z-3bd7c154`, RTX 8000 `20261006T114458Z-366341fe`, GV100 `20261006T120915Z-da4f170e` |
+| WiLoR + detector | Ada / A6000 / RTX 8000 / GV100 | passes on all four: CUDA; mem-efficient attention; all keys load; detector loads under ultralytics 8.4.6 and finds hands; peak 2.6 GiB | Ada `20261006T114150Z-82443769`, A6000 `20261006T114908Z-9eab247b`, RTX 8000 `20261006T114621Z-1e58fc3f`, GV100 `20261006T121039Z-92d1f7c4` |
+
+CPU components, checked in every job above: the VISOR reader (PyAV, time-rule
+frame mapping), SVT-AV1 4.2.0 encode with dav1d decode, and the HOT3D-Clips MANO
+render through the fisheye camera all pass on every host. Environment:
+`pointstream-20261006T113321Z.tar.gz` (sha256 `44835688…51b9`); jobs ran snapshots of
+commit `99ddfbb` (GV100 reruns: `d053f7e`, which changes only documentation). Smoke runs, not
+evidence. Ada `yoloe-codecs` and `hamer` and the first GV100 hand jobs were
+stopped as `contended` by another user's process on the claimed GPU; their
+smoke gates had passed (Ada) or they were rerun (GV100).
+
+**Choosing `gpu_models`:** SAM 3.1 and DCVC-UF on Ada and A6000 only (DCVC-UF
+also runs on the RTX 8000). The hand models and YOLOE run on all four classes.

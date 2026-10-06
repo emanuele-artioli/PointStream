@@ -1,0 +1,57 @@
+# Top-level pip requirements, installed with their dependencies.
+# env/locks/pointstream.pip.txt records every resolved version.
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+# torch 2.10.0+cu128 is SAM 3.1's documented pin. Its wheels carry SASS for
+# sm_70 to sm_120, so one build serves GV100, RTX 8000, A6000 and RTX 6000 Ada,
+# and CUDA 12.8 runs on the hosts' 535 driver through minor-version compatibility.
+torch==2.10.0+cu128
+torchvision==0.25.0+cu128
+
+# SAM 3.1 Object Multiplex, at the pinned revision (docs/resources.md#models).
+sam3 @ git+https://github.com/facebookresearch/sam3@2345a4ad109ac29c569da749c91d84f10dc08c40
+# sam3 requires numpy<2.
+numpy==1.26.4
+pycocotools
+einops
+# sam3 imports pkg_resources, which setuptools removed after 80.x.
+setuptools==80.9.0
+
+# PointStream itself (pyproject.toml).
+opencv-python-headless==4.10.0.84
+Pillow
+PyYAML==6.0.2
+zstandard
+
+# VISOR reader: frame-accurate decoding of the EPIC-KITCHENS videos.
+av
+
+# YOLOE's text encoder imports Ultralytics' CLIP fork; Ultralytics would
+# otherwise try to pip-install it at run time.
+clip @ git+https://github.com/ultralytics/CLIP.git@a13192f8cb767260d7dfd98c843b0716593169e7
+
+# WiLoR's detector checkpoint (saved by ultralytics 8.1) unpickles with dill.
+dill==0.4.1
+
+# Ultralytics' own dependencies except opencv-python; ultralytics itself is in
+# no-deps.txt so the headless OpenCV stays the only cv2.
+matplotlib
+requests
+scipy
+psutil
+polars
+ultralytics-thop
+
+# hand_tracking_toolkit (HOT3D-Clips: fisheye cameras, MANO, rasterizer).
+webdataset
+
+# HaMeR and WiLoR model code (demo-only detectron2, mmcv and ViTPose excluded).
+smplx==0.1.28
+pytorch-lightning
+yacs
+scikit-image
+pyrender
+trimesh
+
+# DCVC-UF test path.
+tqdm

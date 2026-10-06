@@ -2,17 +2,18 @@
 
 Two halves share this file:
 
-* `Sam31SequenceSegmenter` runs inside the ``pointstream-sam31`` env (Python
-  3.12, torch 2.10, Meta's ``sam3`` source checkout). It verifies the pinned
-  checkout and checkpoint, never downloads either, and exposes Meta's session
-  API (start / prompt / propagate / close) with explicit MISSING records.
-* `Sam31Segmenter` runs in the main env. It extracts frames, launches this
-  module as a worker under the SAM interpreter and reads back `ClipMasks`.
+* `Sam31SequenceSegmenter` loads the model. It verifies the pinned ``sam3``
+  code (the installed distribution, or a git checkout named by
+  ``SAM31_SOURCE_ROOT``) and the checkpoint, never downloads either, and
+  exposes Meta's session API (start / prompt / propagate / close) with explicit
+  MISSING records.
+* `Sam31Segmenter` extracts frames, launches this module as a worker process
+  (the same interpreter by default) and reads back `ClipMasks`.
 
 Each text prompt resets the multiplex tracker, so every class gets its own
 session and propagate pass. Offline callers may propagate both ways; runtime
 callers are forward-only. This module imports only numpy and PIL at the top so
-the worker starts in the SAM env.
+the worker starts quickly.
 """
 
 from __future__ import annotations
@@ -71,8 +72,6 @@ class EstimatorProvenance:
             raise ValueError(f"unsupported perception policy {self.policy!r}")
 
 
-DEFAULT_PYTHON = "~/.conda/envs/pointstream-sam31/bin/python"
-DEFAULT_SOURCE_ROOT = "~/.cache/sam3-meta"
 DEFAULT_SOURCE_REVISION = "2345a4ad109ac29c569da749c91d84f10dc08c40"
 DEFAULT_CHECKPOINT_SHA256 = "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6"
 HF_CHECKPOINT = (
@@ -190,7 +189,9 @@ class Sam31SequenceSegmenter:
         self.checkpoint_path = _path_from(checkpoint_path, "SAM31_CHECKPOINT")
         self.source_root = _path_from(source_root, "SAM31_SOURCE_ROOT")
         self.source_revision = (
-            source_revision or os.environ.get("SAM31_SOURCE_REVISION", "").strip()
+            source_revision
+            or os.environ.get("SAM31_SOURCE_REVISION", "").strip()
+            or DEFAULT_SOURCE_REVISION
         )
         self.expected_checkpoint_sha256 = (
             checkpoint_sha256 or os.environ.get("SAM31_CHECKPOINT_SHA256", "").strip()
@@ -219,13 +220,20 @@ class Sam31SequenceSegmenter:
                 "SAM 3.1 checkpoint is missing. Set SAM31_CHECKPOINT to the local "
                 "sam3.1_multiplex.pt file; automatic downloads are disabled."
             )
-        if self.source_root is None or not self.source_root.is_dir():
-            raise FileNotFoundError(
-                "SAM 3.1 source checkout is missing. Set SAM31_SOURCE_ROOT to the "
-                "verified source tree; automatic cloning is disabled."
-            )
         if not self.source_revision:
-            raise ValueError("SAM31_SOURCE_REVISION must pin the SAM 3.1 source checkout")
+            raise ValueError("SAM31_SOURCE_REVISION must pin the SAM 3.1 source")
+        if self.source_root is None:
+            installed = installed_sam3_revision()
+            if installed != self.source_revision:
+                raise RuntimeError(
+                    f"installed sam3 is at {installed!r}, not the pinned {self.source_revision!r}"
+                )
+            self._verify_checkpoint(installed)
+            return
+        if not self.source_root.is_dir():
+            raise FileNotFoundError(
+                f"SAM 3.1 source checkout {self.source_root} is missing; automatic cloning is disabled."
+            )
         git = ["git", "-C", str(self.source_root)]
         try:
             actual_revision = subprocess.run(
@@ -251,12 +259,16 @@ class Sam31SequenceSegmenter:
                 f"SAM 3.1 source checkout at {self.source_root} is dirty; "
                 "the pinned revision alone does not identify its code"
             )
+        self._verify_checkpoint(actual_revision)
+
+    def _verify_checkpoint(self, revision: str) -> None:
+        assert self.checkpoint_path is not None
         actual_hash = _sha256(self.checkpoint_path)
         if self.expected_checkpoint_sha256 and actual_hash != self.expected_checkpoint_sha256:
             raise RuntimeError(
                 f"SAM 3.1 checkpoint hash mismatch: expected {self.expected_checkpoint_sha256}, found {actual_hash}"
             )
-        self.model_revision = actual_revision
+        self.model_revision = revision
         self.checkpoint_hash = actual_hash
 
     def _load_predictor(self, builder: Any | None) -> Any:
@@ -686,6 +698,34 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def installed_sam3_revision() -> str | None:
+    """Commit of the installed ``sam3`` distribution, if it is intact.
+
+    pip records the commit of a ``git+https://...@<sha>`` install in
+    ``direct_url.json``; every installed file must still match its ``RECORD``
+    hash. Editable or path installs have no commit and return ``None``.
+    """
+    import base64
+    from importlib import metadata
+
+    try:
+        dist = metadata.distribution("sam3")
+    except metadata.PackageNotFoundError:
+        return None
+    direct = json.loads(dist.read_text("direct_url.json") or "{}")
+    commit = direct.get("vcs_info", {}).get("commit_id")
+    if not commit or direct.get("dir_info", {}).get("editable"):
+        return None
+    for entry in dist.files or ():
+        if entry.hash is None:
+            continue
+        data = Path(str(dist.locate_file(entry))).read_bytes()
+        digest = base64.urlsafe_b64encode(hashlib.new(entry.hash.mode, data).digest()).rstrip(b"=")
+        if digest.decode() != entry.hash.value:
+            raise RuntimeError(f"installed sam3 file {entry} differs from its RECORD hash")
+    return str(commit)
+
+
 def _validate_role(role: str) -> None:
     if not isinstance(role, str) or not role.strip() or "/" in role:
         raise ValueError(f"SAM3.1 role must be a non-empty class name, got {role!r}")
@@ -762,11 +802,10 @@ class Sam31Segmenter:
         if chunk_frames <= 0:
             raise ValueError("chunk_frames must be positive")
         self.chunk_frames = int(chunk_frames)
-        self.python = Path(python or os.environ.get("SAM31_PYTHON") or DEFAULT_PYTHON).expanduser()
+        self.python = Path(python or os.environ.get("SAM31_PYTHON") or sys.executable).expanduser()
         self.checkpoint = Path(checkpoint).expanduser() if checkpoint else default_checkpoint()
-        self.source_root = Path(
-            source_root or os.environ.get("SAM31_SOURCE_ROOT") or DEFAULT_SOURCE_ROOT
-        ).expanduser()
+        root = source_root or os.environ.get("SAM31_SOURCE_ROOT")
+        self.source_root = Path(root).expanduser() if root else None
         self.source_revision = (
             source_revision or os.environ.get("SAM31_SOURCE_REVISION") or DEFAULT_SOURCE_REVISION
         )
@@ -819,7 +858,7 @@ class Sam31Segmenter:
                         "prob_threshold": self.prob_threshold,
                         "fps": video_fps(source),
                         "checkpoint": str(self.checkpoint),
-                        "source_root": str(self.source_root),
+                        "source_root": str(self.source_root) if self.source_root else None,
                         "source_revision": self.source_revision,
                         "checkpoint_sha256": self.checkpoint_sha256,
                     }
@@ -905,7 +944,7 @@ def _worker(argv: list[str] | None = None) -> int:
     from src.segmentation.sources import runtime_identity, timing_summary
 
     parser = argparse.ArgumentParser(
-        description="SAM 3.1 worker (runs in the pointstream-sam31 env)"
+        description="SAM 3.1 worker"
     )
     parser.add_argument("--request", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
@@ -938,7 +977,7 @@ def _worker(argv: list[str] | None = None) -> int:
                 "name": estimator.name,
                 "checkpoint": str(segmenter.checkpoint_path),
                 "checkpoint_sha256": estimator.checkpoint_sha256,
-                "source_root": str(segmenter.source_root),
+                "source_root": str(segmenter.source_root) if segmenter.source_root else "installed",
                 "source_revision": estimator.model_revision,
                 "config_sha256": estimator.config_sha256,
                 "sdpa_backend_policy": segmenter.sdpa_backend_policy,

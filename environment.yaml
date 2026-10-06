@@ -1,17 +1,18 @@
+# The PointStream environment: one prefix for every phase-1 component.
+# Build it with env/build.sh, which also installs the pinned no-deps packages,
+# the DCVC-UF and WiLoR sources and the DCVC extensions, then writes the locks
+# in env/locks/. The audit and its reasons: docs/resources.md#environments.
 name: pointstream
 channels:
-  - pytorch
-  - nvidia
   - conda-forge
-  - defaults
+  - nodefaults
 dependencies:
-  - python=3.10
+  - python=3.12
   - pip
-  # 1. Conda handles the massive system-level GPU/ML binaries
-  - pytorch=2.5.1=py3.10_cuda12.1_cudnn9.1.0_0
-  - torchvision=0.20.1=py310_cu121
-  - torchaudio=2.5.1=py310_cu121
-  - pytorch-cuda=12.1
+  # Native codec tools. ffmpeg links libsvtav1 and libdav1d; the SvtAv1EncApp
+  # and dav1d command-line tools come from their own packages.
+  - ffmpeg=8.1
+  - svt-av1
+  - dav1d
   - pip:
-      # 2. Pip reads pyproject.toml and installs everything else!
-      - -e .[dev]
+      - -r env/requirements.txt

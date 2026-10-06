@@ -1,0 +1,32 @@
+diff --git a/src/layers/extensions/inference/setup.py b/src/layers/extensions/inference/setup.py
+index 3df5319..238af09 100644
+--- a/src/layers/extensions/inference/setup.py
++++ b/src/layers/extensions/inference/setup.py
+@@ -12,14 +12,10 @@ from torch.utils.cpp_extension import BuildExtension, CUDAExtension
+ 
+ 
+ # Note: assume inference kernel is only built upon NVIDIA platforms.
+-major, minor = torch.cuda.get_device_capability(0)
+-sm = major * 10 + minor
+-if sm == 90:
+-    arch_str = '--generate-code=arch=compute_90a,code=[sm_90a]'
+-elif sm == 100:
+-    arch_str = '--generate-code=arch=compute_100a,code=[sm_100a]'
+-else:
+-    arch_str = '-arch=native'
++# PointStream: the build names its targets instead of probing the build host's GPU.
++# DCVC_SM selects the tuned hint tables; DCVC_GENCODE lists the SASS targets.
++sm = int(os.environ['DCVC_SM'])
++arch_flags = os.environ['DCVC_GENCODE'].split()
+ 
+ cxx_flags = ['-O3', '-Wno-deprecated-declarations']
+ # Per-nvcc internal parallelism via --split-compile=N. The inference
+@@ -35,7 +31,7 @@ elif cpu_count < 32:
+ else:
+     nvcc_split_compile = 4
+ nvcc_flags = [f'-DCURRENT_DEVICE_SM={sm}', '-O3', '--use_fast_math',
+-              '--extra-device-vectorization', arch_str, '-Wno-deprecated-declarations',
++              '--extra-device-vectorization', *arch_flags, '-Wno-deprecated-declarations',
+               f'--split-compile={nvcc_split_compile}']
+ if sm == 90:
+     nvcc_flags.append('-DCUTLASS_ENABLE_GDC_FOR_SM90=1')

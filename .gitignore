@@ -42,6 +42,8 @@ env/
 env.bak/
 venv.bak/
 .venv/*
+# env/ at the root is the environment recipe (env/build.sh), not a virtualenv.
+!/env/
 
 # Unit test / coverage reports
 htmlcov/
