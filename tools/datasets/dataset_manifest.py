@@ -622,13 +622,14 @@ def build_manifest(name: str, root: Path, facts: dict[str, Any], known: dict[str
         entries = list(ex.map(entry, files))
     # Keep the smoke overlay next to the manifests; scratch is ephemeral.
     smoke = facts.get("smoke_read", {})
-    if smoke.get("overlay") and Path(smoke["overlay"]).exists():
-        dst = smoke_dir / Path(smoke["overlay"]).name
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        if not dst.exists():
-            shutil.copyfile(smoke["overlay"], dst)
-            os.chmod(dst, 0o444)
-        smoke["overlay"] = str(dst)
+    for key in ("overlay", "hands_grid"):
+        if smoke.get(key) and Path(smoke[key]).exists() and Path(smoke[key]).parent != smoke_dir:
+            dst = smoke_dir / Path(smoke[key]).name
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if not dst.exists():
+                shutil.copyfile(smoke[key], dst)
+                os.chmod(dst, 0o444)
+            smoke[key] = str(dst)
     revision = os.environ.get("PS_TOOL_REVISION", "unknown")
     return {
         "dataset": SOURCES[name]["name"],
