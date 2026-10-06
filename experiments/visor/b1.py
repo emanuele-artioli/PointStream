@@ -96,7 +96,7 @@ def spaced(items: list[str], count: int) -> list[str]:
 
 # ----------------------------------------------------------------- mapping
 
-def check_video(video: Path, names: list[str], jpegs: Path, epic: dict[str, str]) -> dict[str, Any]:
+def check_video(video: Path, names: list[str], jpegs: Path, epic: dict[str, str], threads: int = 0) -> dict[str, Any]:
     import cv2
     from PIL import Image
 
@@ -107,7 +107,7 @@ def check_video(video: Path, names: list[str], jpegs: Path, epic: dict[str, str]
         epic_number = visor.frame_number(epic[name])
         candidates = {rule: f(number, epic_number, info["fps"]) for rule, f in RULES.items()}
         started = time.time()
-        decoded = dict(visor.decode_frames(video, candidates.values(), margin=MARGIN))
+        decoded = dict(visor.decode_frames(video, candidates.values(), margin=MARGIN, threads=threads))
         wanted = {i + d for i in candidates.values() for d in range(-MARGIN, MARGIN + 1) if i + d >= 0}
         released = np.asarray(Image.open(jpegs / name).convert("RGB"))
         resized = False
@@ -155,20 +155,31 @@ def command_mapping(args: argparse.Namespace) -> int:
     archive = Path(args.archive)
     selection = json.loads((archive / "selection.json").read_text())
     mapping = json.loads((archive / "frame_mapping.json").read_text())
+    videos = [Path(v) for v in args.video]
+    # One process per video; the decoders share the claimed CPU allowance.
+    allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
+    workers = min(allowance, len(videos))
+    threads = max(1, allowance // workers)
     results = []
-    for done, path in enumerate(Path(v) for v in args.video):
-        names = spaced(selection[path.stem]["checked"], args.frames)
-        result = check_video(path, names, archive / "rgb_frames", mapping[path.stem])
-        result["sha256_expected"] = selection[path.stem]["video"]["sha256"]
-        result["rules"] = summarize_rules(result["frames"])
-        results.append(result)
-        progress(done + 1)
+    with ProcessPoolExecutor(max_workers=workers) as pool:
+        futures = {
+            path.stem: pool.submit(check_video, path, spaced(selection[path.stem]["checked"], args.frames),
+                                   archive / "rgb_frames", mapping[path.stem], threads)
+            for path in videos
+        }
+        for stem, future in futures.items():
+            result = future.result()
+            result["sha256_expected"] = selection[stem]["video"]["sha256"]
+            result["rules"] = summarize_rules(result["frames"])
+            results.append(result)
+            progress(len(results))
     by_class: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for result in results:
         by_class[result["class"]].extend(result["frames"])
     classes = {key: summarize_rules(rows) for key, rows in sorted(by_class.items())}
     write_json(stage_dir() / "mapping.json", {
         "tie": TIE, "match": MATCH, "margin": MARGIN, "frames_per_video": args.frames,
+        "processes": workers, "decoder_threads": threads,
         "videos": results, "classes": classes,
         "rule_holds_for_classes": {rule: sorted(k for k, v in classes.items() if v[rule]["all_hold"]) for rule in RULES},
     })

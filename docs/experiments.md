@@ -88,6 +88,31 @@ invocation turns out to be needed.
   1 background results may therefore understate that method; phase 2 tests it
   where it should work.
 
+### 2026-10-06: VISOR frame drift: exact frames for evaluation, small drift for training
+- Context: VISOR's dense masks are numbered by VISOR's own frame extraction;
+  only sparse keyframes are linked to the video (`frame_mapping.json`). Dense
+  frames are placed by counting from their run's keyframes, and the *drift* of
+  a keyframe-to-keyframe stretch (decoded frames minus VISOR frames) bounds how
+  far a placement can be off. Metadata of the 43 val videos with dense files:
+  EK-100 (16 videos, 50 fps) has drift 0 on all 2,383 stretches; EK-55 (27
+  videos, 59.94/29.97 fps) has 0 on 72.9%, ±1 on 22.6%, ±2 on 4.2%, ≥3 on 0.4%
+  of 3,358. On P32_07 a 1-, 2- and 4-frame error mislabels a median 2.3%, 6.7%
+  and 12% of the hand area.
+- Decision: evaluation scores only exactly placed frames, because drift moves
+  mask edges off the hand and so tends to penalise PointStream, which spends
+  its bits where the hand really is. B1's set uses the EK-100 videos, exact
+  everywhere. B2 may add EK-55 clips: encoded whole, scored only on frames
+  proven exact (keyframes, and stretches whose keyframes match the released
+  JPEGs with no drift), via `visor.clip_masks(..., exact_only=True)`. Training
+  (E1, F1) admits stretches with drift ≤ 1 (about 96% of EK-55 by the val
+  survey; F1 measures it on train); every exported mask records its drift so
+  the cutoff can change without re-exporting.
+- Not scheduled: registering each dense frame to the video (nothing to
+  validate it against between keyframes) and reproducing VISOR's frame
+  extraction (exact for all of EK-55 if found, verifiable on the released
+  JPEGs). Revisit the second if reviewers need full EK-55 clips or the exact
+  frames are too sparse for stable B2/D1 numbers.
+
 ### 2026-10-05: Baselines
 - Decision: SVT-AV1 plus one state-of-the-art neural video codec. VVC only if a
   correct invocation is needed.
@@ -174,7 +199,8 @@ invocation turns out to be needed.
 - Budget: CPU only (`"device": "cpu"`, [fleet](fleet.md#cpu-jobs)), no GPU.
   Job 1 (mapping): 10 videos, 325 sparse JPEGs (P32_07, P02_02, P03_22, P09_07,
   P18_02, P17_01 for EK-55; P07_103, P09_106, P01_107, P26_108 for EK-100);
-  smoke 2 frames per video ≤ 300 s, full 40 per video ≤ 1,200 s, 8 threads.
+  smoke 2 frames per video ≤ 300 s, full 40 per video ≤ 1,200 s, 16 threads
+  (one process per video). Budget 1.5 h, deadline 3 h after submission.
   Job 2 (evaluation set): smoke 2 items × 24 frames ≤ 300 s, full all items ×
   240 frames ≤ 1,800 s, 16 threads. Each budget ≤ 1.5 h including staging the
   4.9 GB environment and 2–4 GB of inputs. Ceiling 3 h wall, no GPU hours.

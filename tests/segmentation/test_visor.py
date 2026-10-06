@@ -73,6 +73,11 @@ def test_alignment_is_exact_without_drift_and_interpolated_with_it() -> None:
     assert drifting[12]["exact"] and 20 not in drifting  # the second run has no anchors
     clip = visor.clip_masks(doc, 10, 4, fps=50.0, alignment=drifting, shape=SHAPE)
     assert not clip.meta["aligned_exactly"] and clip.meta["max_abs_drift"] == 2
+    assert clip.meta["drift"] == [0, 2, 0, 0] and clip.labelled_frames() == [0, 1, 2, 3]
+    # For evaluation, the inexact frame keeps its masks but is never scored.
+    scored = visor.clip_masks(doc, 10, 4, fps=50.0, alignment=drifting, exact_only=True, shape=SHAPE)
+    assert scored.labelled_frames() == [0, 2, 3] and scored.frames[1]
+    assert compare(scored, scored)["frames"] == 3
 
     mapping = {"P99_01_frame_0000000010.jpg": "frame_0000000010.jpg",
                "P99_01_frame_0000000012.jpg": "frame_0000000013.jpg"}

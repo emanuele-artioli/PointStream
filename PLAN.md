@@ -54,7 +54,10 @@ sha256s.
 SVT-AV1 and DCVC-UF on the evaluation set: rate against weighted PSNR
 (0.7 foreground + 0.3 background on VISOR masks) and the perceptual metrics.
 This is the target PointStream must beat, and it needs no PointStream
-component.
+component. Only exactly placed frames are scored
+([drift decision](docs/experiments.md#2026-10-06-visor-frame-drift-exact-frames-for-evaluation-small-drift-for-training)):
+the B1 set, optionally EK-55 clips scored on frames whose keyframes match the
+released JPEGs.
 **Done when** the curves come from a recorded job.
 
 ### D1. Segmentation benchmark on VISOR and EgoHOS
@@ -74,7 +77,7 @@ masks.
 
 VISOR foreground crops and masks per instance, plus background frames with the
 foreground removed, written by `python -m src.segmentation dataset` with
-provenance.
+provenance and each mask's drift; training admits drift of at most 1 frame.
 
 ### G. Background encoding
 

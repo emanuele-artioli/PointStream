@@ -256,6 +256,7 @@ def clip_masks(
     *,
     fps: float,
     alignment: dict[int, dict[str, int]] | None = None,
+    exact_only: bool = False,
     shape: tuple[int, int] = FRAME_SIZE,
     meta: dict[str, Any] | None = None,
 ) -> ClipMasks:
@@ -264,8 +265,12 @@ def clip_masks(
     Clip frame ``i`` is VISOR frame ``first + i``. With ``alignment``
     (`frame_alignment`), ``meta["video_indices"]`` names the decoded frame each
     clip frame labels (None where unknown) and ``meta["aligned_exactly"]`` says
-    whether every frame is exact and the indices are consecutive. Frames the
-    file does not label are flagged unlabelled and hold no instances.
+    whether every frame is exact and the indices are consecutive;
+    ``meta["drift"]`` is each frame's anchor drift, the most frames its
+    placement can be off (training may admit small drift). With
+    ``exact_only``, frames that are not placed exactly are flagged unlabelled,
+    so evaluation never scores them; their masks are kept. Frames the file
+    does not label are flagged unlabelled and hold no instances.
     """
     if count <= 0:
         raise ValueError("a clip needs at least one frame")
@@ -307,6 +312,13 @@ def clip_masks(
         placed = [alignment.get(first + index) for index in range(count)]
         indices = [None if p is None else p["index"] for p in placed]
         clip.meta["video_indices"] = indices
+        clip.meta["drift"] = [None if p is None else p["drift"] for p in placed]
+        clip.meta["exact_only"] = exact_only
+        if exact_only:
+            assert clip.labelled is not None
+            for index, p in enumerate(placed):
+                if p is None or not p["exact"]:
+                    clip.labelled[index] = False
         clip.meta["max_abs_drift"] = max((abs(p["drift"]) for p in placed if p), default=None)
         clip.meta["aligned_exactly"] = all(p is not None and p["exact"] for p in placed) and all(
             b == a + 1 for a, b in zip(indices, indices[1:])  # type: ignore[operator]
@@ -315,9 +327,12 @@ def clip_masks(
 
 
 def decode_frames(
-    video: Path | str, indices: Iterable[int], *, margin: int = 0
+    video: Path | str, indices: Iterable[int], *, margin: int = 0, threads: int = 0
 ) -> Iterator[tuple[int, np.ndarray]]:
     """``(index, RGB frame)`` for the decoded frames at ``indices`` (± ``margin``).
+
+    ``threads`` caps the decoder's threads (0: the decoder's own choice), so
+    several decoding processes can share a CPU allowance.
 
     The index of a decoded frame is its presentation time times the stream's
     nominal rate (``r_frame_rate``), so it counts frames from the first one on a
@@ -331,6 +346,7 @@ def decode_frames(
     with av.open(str(video)) as container:
         stream = container.streams.video[0]
         stream.thread_type = "AUTO"
+        stream.codec_context.thread_count = threads
         rate = stream.base_rate or stream.average_rate
         if rate is None or stream.time_base is None:
             raise RuntimeError(f"{video}: stream has no frame rate or time base")
@@ -354,7 +370,7 @@ def video_info(video: Path | str) -> dict[str, Any]:
 
     with av.open(str(video)) as container:
         stream = container.streams.video[0]
-        return {
+        info = {
             "codec": stream.codec_context.name,
             "width": stream.width,
             "height": stream.height,
@@ -363,6 +379,7 @@ def video_info(video: Path | str) -> dict[str, Any]:
             "fps": float(stream.base_rate or stream.average_rate or 0.0),
             "frames_declared": stream.frames,
         }
+    return info
 
 
 __all__ = [
