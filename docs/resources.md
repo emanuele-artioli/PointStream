@@ -80,10 +80,13 @@ Results are reported per tier. No data is labelled by hand.
 **Hand pose for VISOR** (decided 2026-10-06, [Models](#models)): a
 MANO regressor, HaMeR or WiLoR, not DWPose. VISOR has no hand keypoints, and the
 codec does not need them: it is scored on pixels inside the dataset masks. They
-matter only for choosing the estimator. For that, HInt ([HaMeR](https://github.com/ddshan/hint),
+matter only for choosing the estimator. For that, HInt ([ddshan/hint](https://github.com/ddshan/hint),
 MIT) labels 21 2D hand keypoints with occlusion flags on EPIC-KITCHENS VISOR
-frames (train, val and test splits). It is not downloaded yet. HaMeR trains on
-HInt's train split, so only HInt test is fair to it.
+frames (5.3K hands; train, val and test), New Days and Ego4D. HaMeR trains on
+HInt train, so only HInt test is fair to it. Adopted for H; not downloaded yet:
+its only source (`fouheylab.eecs.umich.edu`, `HInt_annotation_partial.zip`, no
+published checksum) serves a TLS certificate that expired in May 2025, so the
+download needs the user's decision. Ego4D frames need a separate Ego4D licence.
 
 **VISOR frame mapping.** `frame_mapping.json` names EPIC-KITCHENS rgb frames
 (1-indexed), not decoded video frames. On P32_07 (59.94 fps) rgb frame k matches
@@ -112,6 +115,9 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
 - `Models/SAM/sam3.1_multiplex.pt`, sha256
   `0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6` (copied
   from the Hugging Face snapshot `daa63191`, with its `sam3.1_config.json`).
+- **GPUs: Ada and A6000 only** (`gpu_models: ["RTX 6000 Ada", "RTX A6000"]`).
+  On the RTX 8000 it falls back to math attention (39.5 GiB, 2.2× slower); on
+  the GV100 it runs out of memory ([model–GPU table](fleet.md#modelgpu-table)).
 
 **YOLOE-26**
 - Only the `n` and `x` segmentation weights are in `Models/YOLO`
@@ -128,6 +134,9 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
 - Weights in `Models/DCVC`: `cvpr2026_image.pth.tar`, `cvpr2026_video_{ld,hts,htl}.pth.tar`,
   copied from the pre-reset download (2026-09-29; DCVC publishes no checksum,
   hashes in the manifest).
+- **GPUs: Ada, A6000 or RTX 8000, never GV100** (upstream has no Volta path).
+  Decode on the same GPU class as the encode: the two extension variants use
+  different kernels, and bit-exactness across classes is not established.
 - `src/codecs/dcvc_uf_worker.py` encodes and decodes one stream. It is ported
   from the pre-reset adapter, which was correct but never passed its provenance
   gate. It runs as its own process because DCVC's package is also called `src`.
@@ -153,8 +162,13 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   segmenter) supply, so their demo detectors (ViTDet, ViTPose) are not needed.
 - DWPose is not used: it is 2D only, its person detector needs a visible body,
   and egocentric frames show hands and forearms.
-- Which of the two: a bounded pilot in H on HInt test (2D) and HOT3D (3D against
-  motion capture). On a tie, the faster one.
+- Both run on all four GPU classes.
+- Which of the two is not settled by the literature. WiLoR's paper beats HaMeR
+  only on lab benchmarks, by small margins (FreiHAND PA-MPJPE 5.5 vs 6.0 mm,
+  HO3Dv2 7.5 vs 7.7 mm); it does not evaluate on HInt, and no paper found
+  compares the two on egocentric data. HaMeR trains on HInt train (VISOR
+  frames), WiLoR does not. So H compares them, and the comparison is a paper
+  table ([PLAN](../PLAN.md#h-foreground-encoding)).
 
 **MANO**
 - `Models/MANO/MANO_{LEFT,RIGHT}.pkl`: chumpy-free copies of the official v1.2
@@ -227,8 +241,10 @@ sha256 `44835688156ec6dd5a96ae068e636bb65174597a8ca5f34a6efc33b12bd751b9`
 **Earlier environments.** `~/.conda/envs/pointstream` (Python 3.10, torch
 2.2.2) stays as the interpreter of the fleet workers and the dispatcher only;
 `experiments/jobs` must keep running on it. Workloads run from the packed
-environment. `pointstream-sam31`, `pointstream-dcvc`, `pointstream-neural` and
-`pointstream-diffueraser` are superseded and kept, not deleted.
+environment. `pointstream-sam31`, `pointstream-dcvc` and `pointstream-neural`
+were deleted on 2026-10-06; their exact specs are in
+`Datasets/archive/conda-envs-2026-10-06/`. `pointstream-diffueraser` is unrelated
+to phase 1 and was left alone.
 
 ## Archive
 

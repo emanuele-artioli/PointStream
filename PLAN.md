@@ -36,7 +36,12 @@ new dependency.
 ### B1. VISOR adapter and evaluation set
 
 A VISOR reader in `src/segmentation` producing `ClipMasks` from the dense
-interpolations. It records native classes (left hand, right hand, active
+interpolations. Frames come from the video through `frame_mapping.json`, which
+names EPIC rgb frames, not decoded frames: on P32_07 rgb frame k is the frame at
+(k − 1)/60 s, and `k − 1` as an index is up to 2 frames wrong
+([resources](docs/resources.md#datasets), `experiments/audit/env_smoke.py`
+`epic_frame_to_video_index`). B1 verifies the rule on more videos, including
+the 50 fps EK-100 ones, against the released sparse JPEGs, and records it. It records native classes (left hand, right hand, active
 objects), per-frame labelled flags, and a provenance tier per mask: `human` for
 the sparse ground truth, `interpolated` for the dense frames. Frames are decoded
 from the EPIC-KITCHENS videos through `frame_mapping.json`. The evaluation set
@@ -83,7 +88,10 @@ is parallax.
 Design session ([components](docs/components.md#4-foreground)): an appearance
 vector plus keypoints per object. Hands are evaluated twice. On HOT3D the
 keypoints come from motion capture (an oracle upper bound). On VISOR they come
-from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). The gap between the two
+from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). HaMeR and WiLoR are compared first, as a paper table: 2D PCK on HInt
+VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
+the foreground reconstruction quality each gives. The literature does not
+settle it for egocentric video ([resources](docs/resources.md#models)). The gap between the two
 measures the cost of pose estimation.
 
 ## Phase 2: racket sports
