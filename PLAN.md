@@ -53,6 +53,38 @@ is a fixed list of dense runs from the validation split, recorded with its
 sha256s.
 **Done when** the set converts and a trivial candidate scores against it.
 
+### B2b. Baseline follow-ups (agreed 2026-10-07, after B2)
+
+B2's baselines made fair and stronger before anything is compared with them.
+Each item gets an experiments.md entry before its fleet run.
+1. **Scoring on the GPU for every codec.** SVT-AV1 jobs encode on the host's
+   CPU but claim a GPU for scoring (B2 scored them on CPU: 227 s per point
+   against 6.5 s). B2's CPU scores stay valid; they are not redone.
+2. **Clean timing, then an equal time budget.** Time DCVC-UF's encode and
+   decode as upstream does (CUDA events around the model calls), apart from
+   the worker's verification (second decode, per-frame hashes) and its CPU
+   4:2:0 conversion, which move out of the timed region. Time SVT-AV1 per
+   preset on the same host class, isolated, with a fixed thread count. Then
+   SVT-AV1 gets the slowest preset whose encode time per window fits DCVC-UF's
+   on the same host, and that preset replaces preset 4 if it differs. CRF only
+   sets the rate. SVT-AV1 has no GPU path; NVENC AV1 (Ada only) is a separate
+   hardware encoder, at most an extra reference point.
+3. **Lower rates by resolution.** CRF stops at 70, so SVT-AV1 also encodes
+   720p, 540p and 360p versions, upscaled to 1080p by a fixed filter before
+   scoring; each item's curve is the convex hull over resolutions. DCVC-UF
+   gets the same ladder if its QP 0 floor is not low enough.
+4. **ROI SVT-AV1.** `--roi-map-file` lowers the quantizer inside the VISOR
+   foreground (an oracle: the dataset's masks, not a segmenter's). A pilot
+   picks the offset. A segmenter-mask variant follows D1.
+5. **DCVC-UF full-range check.** One pilot item coded with limited-range
+   input, scored against the same reference.
+6. **Secondary studies (CPU).** Spatial and temporal complexity per frame and
+   inside the foreground (VCA v2, `/opt/local/bin/vca`; ffmpeg's `siti` as a
+   cross-check) against each item's DCVC-UF advantage; SVT-AV1 with temporal
+   filtering off (`--enable-tf 0`) on a few items.
+**Done when** the B2 curves are redrawn with the fair SVT-AV1 preset, the
+low-rate ladder and the ROI variant, from recorded jobs.
+
 ### B1b. Filling VISOR's missing hands and objects
 
 VISOR's dense masks drop an object's track when its interpolation scored poorly,
