@@ -406,7 +406,11 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
     archive = Path(args.archive)
     frames = min(args.frames, int(item["frames"]))
     log(f"{item['id']}: decoding {frames} frames")
-    source = decode_window(videos[item["video"]], item, frames, archive, work / "source.yuv", args.threads)
+    # PyAV decodes in a fresh process: in one that has loaded torchvision the
+    # decode stalled (jobs 20261007T091602Z-72ae5f5b, 20261007T093027Z-71cc5ec2).
+    with ProcessPoolExecutor(max_workers=1, mp_context=multiprocessing.get_context("spawn")) as pool:
+        source = pool.submit(decode_window, videos[item["video"]], item, frames, archive, work / "source.yuv",
+                             args.threads).result()
     log(f"{item['id']}: loading masks")
     clips, mask_info = load_mask_sets(item, frames, named(args.masks), named(args.mask_record), archive)
     regions = frame_regions(clips, frames)
