@@ -302,41 +302,108 @@ def flat_summary(summary: dict[str, Any], mask_set: str) -> dict[str, float | No
     }
 
 
+# ----------------------------------------------------------------- variants
+
+#: SVT-AV1's ROI map gives one quantizer offset per 64x64 block per frame.
+ROI_BLOCK = 64
+
+
+def variants(args: argparse.Namespace) -> list[dict[str, Any]]:
+    """The codec configurations one job runs; the label is empty for B2's own configuration."""
+    if args.codec == "dcvc":
+        return [{"label": "" if r == "full" else f"range-{r}", "range": r} for r in args.dcvc_range.split(",")]
+    presets = [int(p) for p in str(args.preset).split(",")]
+    offsets = [int(r) for r in str(args.roi_offset).split(",")]
+    out = []
+    for preset in presets:
+        for offset in offsets:
+            parts = [f"p{preset}"] if len(presets) > 1 or preset != 4 else []
+            parts += [f"roi{offset}"] if offset else []
+            parts += [f"tf{args.enable_tf}"] if args.enable_tf is not None else []
+            out.append({"label": "-".join(parts), "preset": preset, "roi_offset": offset, "enable_tf": args.enable_tf})
+    return out
+
+
+def write_roi_map(regions: list[dict[str, np.ndarray]], mask_set: str, frames: int, width: int, height: int,
+                  offset: int, path: Path) -> dict[str, Any]:
+    """SVT-AV1 ROI map: per frame, its number, then one quantizer offset per 64x64 block in
+    raster order, ``offset`` where the block holds any foreground pixel and 0 elsewhere."""
+    rows, cols = -(-height // ROI_BLOCK), -(-width // ROI_BLOCK)
+    lines, shares = [], []
+    for index in range(frames):
+        padded = np.zeros((rows * ROI_BLOCK, cols * ROI_BLOCK), bool)
+        padded[:height, :width] = regions[index][f"{mask_set}/fg"]
+        blocks = padded.reshape(rows, ROI_BLOCK, cols, ROI_BLOCK).any(axis=(1, 3))
+        lines.append(f"{index} " + " ".join(str(offset if b else 0) for b in blocks.ravel()))
+        shares.append(float(blocks.mean()))
+    path.write_text("\n".join(lines) + "\n")
+    return {"path": str(path), "sha256": file_sha256(path), "block": ROI_BLOCK, "grid": [rows, cols],
+            "offset": offset, "mask_set": mask_set, "block_share_mean": round(float(np.mean(shares)), 4)}
+
+
+def convert_range(src: Path, dst: Path, frames: int, width: int, height: int, *, to_limited: bool) -> None:
+    """Full-range 8-bit 4:2:0 to limited range (Y 16-235, C 16-240) or back, rounded."""
+    with dst.open("xb") as handle:
+        for first in range(0, frames, 16):
+            count = min(16, frames - first)
+            data = quality.read_frames(src, width, height, first, count).astype(np.float32)
+            luma, chroma = data[:, :height], data[:, height:]
+            if to_limited:
+                luma, chroma = 16.0 + luma * 219.0 / 255.0, 128.0 + (chroma - 128.0) * 224.0 / 255.0
+            else:
+                luma, chroma = (luma - 16.0) * 255.0 / 219.0, 128.0 + (chroma - 128.0) * 255.0 / 224.0
+            out = np.concatenate([luma, chroma], axis=1)
+            handle.write(np.clip(np.round(out), 0, 255).astype(np.uint8).tobytes())
+
+
 # ----------------------------------------------------------------- codecs
 
 def code_svtav1(args: argparse.Namespace, source: dict[str, Any], fps: Fraction, point: float, work: Path,
-                stream: Path | None) -> dict[str, Any]:
+                stream: Path | None, variant: dict[str, Any], cpus: list[int] | None,
+                roi: dict[str, Any] | None) -> dict[str, Any]:
     width, height, frames = source["width"], source["height"], source["frames"]
     if stream is None:
+        extra = ["--roi-map-file", roi["path"]] if roi else []
+        extra += ["--enable-tf", str(variant["enable_tf"])] if variant["enable_tf"] is not None else []
         record = svtav1.code(Path(source["path"]), work, width=width, height=height, fps=fps, frames=frames, crf=point,
-                             preset=args.preset, threads=args.threads, full_range=source["full_range"],
-                             encoder=args.encoder, decoder=args.decoder)
+                             preset=variant["preset"], threads=args.threads, full_range=source["full_range"],
+                             encoder=args.encoder, decoder=args.decoder, cpus=cpus, extra=extra)
     else:
         decoded = work / "decoded.yuv"
         command = svtav1.decode_command(args.decoder, stream, decoded, threads=args.threads)
-        seconds = svtav1.run(command, 3600)
+        timing = svtav1.run(command, 3600, cpus)
         data = stream.read_bytes()
         sizes = svtav1.ivf_frames(data)
         record = {"stream": str(stream), "decoded": str(decoded), "stream_sha256": hashlib.sha256(data).hexdigest(),
                   "file_bytes": len(data), "payload_bytes": sum(sizes), "temporal_units": len(sizes),
                   "decoded_frames": decoded.stat().st_size / quality.frame_bytes(width, height),
-                  "decode_command": command, "decode_seconds": round(seconds, 3), "reused_stream": True}
+                  "decode_command": command, "decode_seconds": round(timing["wall"], 3), "reused_stream": True}
     record["rate_bytes"] = record["payload_bytes"]
     record["stream_frames"] = record["temporal_units"]
+    record["roi"] = roi
     return record
 
 
 def code_dcvc(args: argparse.Namespace, source: dict[str, Any], point: float, work: Path, stream: Path | None,
-              profile: bool) -> dict[str, Any]:
+              profile: bool, variant: dict[str, Any]) -> dict[str, Any]:
     from src.codecs.dcvc_uf_worker import dcvc_command
 
     if int(point) != point:
         raise SystemExit(f"DCVC-UF QP must be an integer, got {point}")
     container = stream or work / "stream.psdc"
+    width, height, frames = source["width"], source["height"], source["frames"]
+    limited = variant["range"] == "limited"
+    if limited and not source["full_range"]:
+        raise SystemExit("the limited-range variant needs a full-range source")
+    frames_file, out_file = Path(source["path"]), work / "decoded.yuv"
+    if limited:
+        # The codec sees limited range; scoring sees its output mapped back to the source's full range.
+        frames_file, out_file = work / "source-limited.yuv", work / "decoded-limited.yuv"
+        convert_range(Path(source["path"]), frames_file, frames, width, height, to_limited=True)
     plan = {
-        "structure": args.structure, "qp": int(point), "frame_count": source["frames"], "height": source["height"],
-        "width": source["width"], "src_type": "yuv420", "frames_file": source["path"], "container": str(container),
-        "out_file": str(work / "decoded.yuv"), "image_ckpt": args.image_ckpt, "image_sha256": args.image_sha256,
+        "structure": args.structure, "qp": int(point), "frame_count": frames, "height": height,
+        "width": width, "src_type": "yuv420", "frames_file": str(frames_file), "container": str(container),
+        "out_file": str(out_file), "image_ckpt": args.image_ckpt, "image_sha256": args.image_sha256,
         "video_ckpt": args.video_ckpt, "video_sha256": args.video_sha256, "profile": profile,
     }
     plan_path = work / "plan.json"
@@ -353,6 +420,10 @@ def code_dcvc(args: argparse.Namespace, source: dict[str, Any], point: float, wo
         reports[action] = json.loads(report.read_text())
         reports[action]["wall_seconds"] = round(time.time() - started, 3)
         commands[action] = command
+    if limited:
+        convert_range(out_file, work / "decoded.yuv", frames, width, height, to_limited=False)
+        os.remove(out_file)
+        os.remove(frames_file)
     data = container.read_bytes()
     decode = reports["decode"]
     record = {
@@ -362,6 +433,7 @@ def code_dcvc(args: argparse.Namespace, source: dict[str, Any], point: float, wo
         "commands": commands, "plan": plan,
         "decode": {k: v for k, v in decode.items() if k != "passes"},
         "decode_seconds": [p["decode_seconds"] for p in decode["passes"]],
+        "model_decode_seconds": [p.get("model_decode_seconds") for p in decode["passes"]], "range": variant["range"],
         "deterministic": decode["deterministic"], "reused_stream": stream is not None,
     }
     if "encode" in reports:
@@ -371,6 +443,7 @@ def code_dcvc(args: argparse.Namespace, source: dict[str, Any], point: float, wo
         record["decoder_matches_encoder_intra"] = decode["passes"][0]["frame_sha256"][0] == encode["i_recon_sha256"]
         record["same_gpu"] = encode["environment"]["cuda_visible_devices"] == decode["environment"]["cuda_visible_devices"]
         record["encode_seconds"] = encode["encode_seconds"]
+        record["model_encode_seconds"] = encode.get("model_encode_seconds")
     return record
 
 
@@ -391,10 +464,23 @@ def log(message: str) -> None:
     print(f"{time.strftime('%H:%M:%S')} [{os.getpid()}] {message}", file=sys.stderr, flush=True)
 
 
+_SLOT: dict[str, list[int] | None] = {"cpus": None}
+
+
+def _take_slot(slots: Any) -> None:
+    """Pool initializer: this worker's own cores for its encoders, decoders and torch."""
+    _SLOT["cpus"] = slots.get()
+
+
+def metric_device(args: argparse.Namespace) -> str:
+    return args.metric_device or ("cuda" if args.codec == "dcvc" else "cpu")
+
+
 def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -> dict[str, Any]:
     import torch
 
     torch.set_num_threads(max(1, args.threads))
+    cpus = _SLOT["cpus"]
     started = time.time()
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
     work = scratch / "work" / item["id"]
@@ -416,24 +502,31 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
     regions = frame_regions(clips, frames)
     log(f"{item['id']}: masks ready")
     fps = Fraction(item["fps"]).limit_denominator(1001)
-    device = "cuda" if args.codec == "dcvc" else "cpu"
+    device = metric_device(args)
     net = lpips_net(args.lpips_backbone, device)
-    log(f"{item['id']}: LPIPS on {device}")
+    log(f"{item['id']}: LPIPS on {device}, cores {cpus}")
     rows = []
     cross_device = None
-    for number, point in enumerate(parse_points(args.points)):
+    jobs = [(variant, point) for variant in variants(args) for point in parse_points(args.points)]
+    for number, (variant, point) in enumerate(jobs):
         name = point_name(point)
-        point_work = work / f"p{name}"
+        label = variant["label"]
+        point_work = work / f"{label or 'base'}-p{name}"
         point_work.mkdir()
         stream = None
         if args.streams:
-            stream = Path(args.streams) / args.codec / item["id"] / name / STREAM_NAMES[args.codec]
+            stream = Path(args.streams) / args.codec / item["id"] / label / name / STREAM_NAMES[args.codec]
+        roi = None
+        if args.codec == "svtav1" and variant["roi_offset"]:
+            roi = write_roi_map(regions, args.roi_mask_set, frames, source["width"], source["height"],
+                                variant["roi_offset"], point_work / "roi.txt")
         t0 = time.time()
-        log(f"{item['id']}: point {name}: coding")
+        log(f"{item['id']}: {label or 'base'} point {name}: coding")
         if args.codec == "svtav1":
-            coded = code_svtav1(args, source, fps, point, point_work, stream)
+            coded = code_svtav1(args, source, fps, point, point_work, stream, variant, cpus, roi)
         else:
-            coded = code_dcvc(args, source, point, point_work, stream, profile=first_item and number == 0)
+            coded = code_dcvc(args, source, point, point_work, stream, profile=first_item and number == 0,
+                              variant=variant)
         decoded = Path(coded["decoded"])
         log(f"{item['id']}: point {name}: scoring")
         t1 = time.time()
@@ -447,15 +540,18 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
             cross_device = cross_device_check(Path(source["path"]), decoded, regions, source, args.lpips_backbone)
         summary = summarize(per_frame, vmaf["per_frame"], list(clips))
         seconds = frames / float(fps)
-        kept = publish / "streams" / args.codec / item["id"] / name
+        kept = publish / "streams" / args.codec / item["id"] / label / name
         kept.mkdir(parents=True, exist_ok=True)
         if stream is None:
             shutil.copy2(coded["stream"], kept / STREAM_NAMES[args.codec])
-        write_json(publish / "frames" / item["id"] / f"{args.codec}-{name}.json", {
-            "item": item["id"], "codec": args.codec, "point": point, "frames": per_frame, "vmaf": vmaf["per_frame"],
+            if roi:
+                shutil.copy2(roi["path"], kept / "roi.txt")
+        write_json(publish / "frames" / item["id"] / f"{args.codec}-{label or 'base'}-{name}.json", {
+            "item": item["id"], "codec": args.codec, "variant": variant, "point": point, "frames": per_frame,
+            "vmaf": vmaf["per_frame"],
         })
         rows.append({
-            "point": point, "rate_bytes": coded["rate_bytes"], "file_bytes": coded["file_bytes"],
+            "variant": label, "variant_config": variant, "point": point, "rate_bytes": coded["rate_bytes"], "file_bytes": coded["file_bytes"],
             "kbps": coded["rate_bytes"] * 8 / seconds / 1000.0,
             "bpp": coded["rate_bytes"] * 8 / (frames * source["width"] * source["height"]),
             "stream_sha256": coded["stream_sha256"], "stream_frames": coded["stream_frames"],
@@ -509,11 +605,11 @@ def curves(items: list[dict[str, Any]], mask_sets: list[str]) -> dict[str, Any]:
         out[group] = {}
         for mask_set in mask_sets:
             rows = []
-            points = sorted({p["point"] for i in members for p in i["points"]})
-            for point in points:
-                matched = [(i, p) for i in members for p in i["points"] if p["point"] == point]
+            keys = sorted({(p.get("variant", ""), p["point"]) for i in members for p in i["points"]})
+            for label, point in keys:
+                matched = [(i, p) for i in members for p in i["points"] if (p.get("variant", ""), p["point"]) == (label, point)]
                 values = [flat_summary(p["summary"], mask_set) for _, p in matched]
-                row: dict[str, Any] = {"point": point, "items": len(matched)}
+                row: dict[str, Any] = {"variant": label, "point": point, "items": len(matched)}
                 for key in ("kbps", "bpp"):
                     data = [p[key] for _, p in matched]
                     row[key] = float(np.mean(data))
@@ -561,12 +657,23 @@ def command_run(args: argparse.Namespace) -> int:
     rows: list[dict[str, Any]] = []
     if args.codec == "svtav1":
         allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
-        workers = max(1, min(len(items), allowance // max(1, args.threads)))
+        workers = args.workers or max(1, min(len(items), allowance // max(1, args.threads)))
+        context = multiprocessing.get_context("spawn")
+        manager = context.Manager()
+        slots = manager.Queue()
+        # Each worker confines its tools to its own cores (Linux), so encodes do not
+        # spread over the host and timings mean "args.threads cores".
+        allowed = sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else []
+        for k in range(workers):
+            share = allowed[k * args.threads:(k + 1) * args.threads]
+            slots.put(share if len(share) == args.threads else None)
         # Spawned, not forked: the parent has already started torch's thread pools.
-        with ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context("spawn")) as pool:
+        with ProcessPoolExecutor(max_workers=workers, mp_context=context, initializer=_take_slot,
+                                 initargs=(slots,)) as pool:
             for row in pool.map(_run_item_job, [(args, item, n == 0) for n, item in enumerate(items)]):
                 rows.append(row)
                 progress(len(rows))
+        manager.shutdown()
     else:
         workers = 1
         for n, item in enumerate(items):
@@ -577,10 +684,11 @@ def command_run(args: argparse.Namespace) -> int:
         "codec": args.codec, "codec_name": CODECS[args.codec],
         "config": {
             "points": parse_points(args.points), "frames": args.frames, "items": args.items,
-            "preset": args.preset if args.codec == "svtav1" else None,
+            "preset": args.preset if args.codec == "svtav1" else None, "variants": variants(args),
+            "roi_mask_set": args.roi_mask_set if args.codec == "svtav1" else None,
             "structure": args.structure if args.codec == "dcvc" else None,
             "threads": args.threads, "workers": workers, "streams": args.streams,
-            "foreground_weight": FOREGROUND_WEIGHT, "metric_device": "cuda" if args.codec == "dcvc" else "cpu",
+            "foreground_weight": FOREGROUND_WEIGHT, "metric_device": metric_device(args),
             "rgb_view": "bilinear chroma upsampling, BT.709, range as the source declares, rounded to 8 bits",
         },
         "eval_set": {"path": args.eval_set, "sha256": file_sha256(Path(args.eval_set)), "name": eval_set["name"]},
@@ -607,7 +715,8 @@ def validate(stage: Path) -> dict[str, bool]:
     mask_sets = [(r, name, m) for r in rows for name, m in r["mask_sets"].items()]
     checks = {
         "items_processed": bool(rows) and all(r["points"] for r in rows),
-        "every_point_per_item": all(len(r["points"]) == len(result["config"]["points"]) for r in rows),
+        "every_point_per_item": all(
+            len(r["points"]) == len(result["config"]["points"]) * len(result["config"].get("variants") or [None]) for r in rows),
         "windows_start_at_first_video_index": all(r["source"]["first_video_index"] == eval_items[r["id"]]["first_video_index"] for r in rows),
         "windows_are_1080p_420": all((r["source"]["width"], r["source"]["height"]) == (1920, 1080) for r in rows),
         "staged_videos_match_eval_set_sha256": all(staged.get(r["video"]) in (None, r["video_sha256_expected"]) for r in rows)
@@ -630,11 +739,16 @@ def validate(stage: Path) -> dict[str, bool]:
     rises = QUALITY_RISES_WITH_POINT[codec]
     monotone = []
     for r in rows:
-        ordered = sorted(r["points"], key=lambda p: p["point"], reverse=not rises)
-        rates = [p["rate_bytes"] for p in ordered]
-        quality_values = [p["summary"]["frame"]["psnr"] for p in ordered]
-        monotone.append(all(a < b for a, b in zip(rates, rates[1:])) and all(a < b for a, b in zip(quality_values, quality_values[1:])))
+        for label in sorted({p.get("variant", "") for p in r["points"]}):
+            ordered = sorted((p for p in r["points"] if p.get("variant", "") == label), key=lambda p: p["point"], reverse=not rises)
+            rates = [p["rate_bytes"] for p in ordered]
+            quality_values = [p["summary"]["frame"]["psnr"] for p in ordered]
+            monotone.append(all(a < b for a, b in zip(rates, rates[1:])) and all(a < b for a, b in zip(quality_values, quality_values[1:])))
     checks["rate_and_quality_rise_together"] = all(monotone)
+    if result["config"]["metric_device"] == "cuda":
+        cross = [r["cross_device"] for r in rows if r.get("cross_device")]
+        checks["metrics_agree_between_cpu_and_gpu"] = bool(cross) and all(
+            c["max_abs_diff"]["psnr"] < 1e-3 and c["max_abs_diff"]["lpips"] < 1e-3 and c["max_abs_diff"]["ms_ssim"] < 1e-4 for c in cross)
     if codec == "dcvc":
         dcvc = [p["codec_record"] for p in points]
         encoded = [d for d in dcvc if "encode" in d]
@@ -647,18 +761,43 @@ def validate(stage: Path) -> dict[str, bool]:
             or ("A6000" in e["device_name"] and e["extension"]["variant"] == "sm80") for e in envs)
         kernels = [d["encode"].get("kernels") for d in encoded if d["encode"].get("kernels")]
         checks["dcvc_cuda_kernels_ran"] = bool(kernels) and all(k["kernel_launches"] > 0 for k in kernels)
-        cross = [r["cross_device"] for r in rows if r.get("cross_device")]
-        checks["metrics_agree_between_cpu_and_gpu"] = bool(cross) and all(
-            c["max_abs_diff"]["psnr"] < 1e-3 and c["max_abs_diff"]["lpips"] < 1e-3 and c["max_abs_diff"]["ms_ssim"] < 1e-4 for c in cross)
+        checks["dcvc_codec_time_recorded"] = bool(encoded) and all(
+            d.get("model_encode_seconds") and all(d.get("model_decode_seconds") or [None]) for d in encoded)
     else:
+        coded = [p["codec_record"] for p in points if "encode_command" in p["codec_record"]]
+        threads = result["config"]["threads"]
         checks["svtav1_single_keyframe_crf_commands"] = all(
-            "--keyint" in p["codec_record"]["encode_command"] and "--crf" in p["codec_record"]["encode_command"]
-            for p in points if "encode_command" in p["codec_record"])
+            "--keyint" in c["encode_command"] and "--crf" in c["encode_command"] for c in coded)
+        checks["svtav1_confined_to_its_cores"] = bool(coded) and all(
+            c.get("cpus") and len(c["cpus"]) == threads and c.get("encode_cpu_seconds") is not None for c in coded)
+        checks.update(roi_checks(rows))
     return checks
 
 
+def roi_checks(rows: list[dict[str, Any]]) -> dict[str, bool]:
+    """With ROI variants, every map covers the frame grid and each nonzero offset widens the
+    foreground-over-background PSNR margin of the same item and CRF without ROI, on average."""
+    roi_points = [p for r in rows for p in r["points"] if (p.get("variant_config") or {}).get("roi_offset")]
+    if not roi_points:
+        return {}
+    gains = []
+    for r in rows:
+        base = {p["point"]: p for p in r["points"] if not (p.get("variant_config") or {}).get("roi_offset")}
+        for p in r["points"]:
+            offset = (p.get("variant_config") or {}).get("roi_offset")
+            if offset and p["point"] in base:
+                def margin(q: dict[str, Any]) -> float:
+                    m = q["summary"]["mask_sets"]["visor_dense"]
+                    return float(m["psnr_fg"] - m["psnr_bg"])
+                gains.append(margin(p) - margin(base[p["point"]]))
+    return {
+        "roi_maps_cover_the_block_grid": all(p["codec_record"]["roi"]["grid"] == [17, 30] for p in roi_points),
+        "roi_raises_foreground_relative_to_background": bool(gains) and float(np.mean(gains)) > 0.0,
+    }
+
+
 def command_validate(args: argparse.Namespace) -> int:
-    checks = validate(stage_dir())
+    checks = validate_complexity(stage_dir()) if args.kind == "complexity" else validate(stage_dir())
     report = {"passed": all(checks.values()), "checks": checks}
     target = os.environ.get("PS_VALIDATION_PATH")
     if target:
@@ -681,9 +820,13 @@ def bd_rate(rate_a: list[float], quality_a: list[float], rate_b: list[float], qu
     return float((math.exp((integrals[1] - integrals[0]) / (high - low)) - 1.0) * 100.0)
 
 
-def merge_results(paths: list[str]) -> dict[str, Any]:
-    """One codec's jobs as one result: items concatenated, configuration identical, curves recomputed."""
+def merge_results(paths: list[str], variant: str = "") -> dict[str, Any]:
+    """One codec's jobs as one result: items concatenated, configuration identical, only the points
+    of ``variant`` (B2's own configuration when empty), curves recomputed."""
     parts = [json.loads(Path(p).read_text()) for p in paths]
+    for part in parts:
+        for item in part["items"]:
+            item["points"] = [q for q in item["points"] if q.get("variant", "") == variant]
     first = parts[0]
     for part in parts[1:]:
         if part["codec"] != first["codec"] or part["config"]["points"] != first["config"]["points"] or \
@@ -733,14 +876,52 @@ def plot_report(report: dict[str, Any], target: Path, mask_set: str = "visor_den
     plt.close(fig)
 
 
+def spearman(x: list[float], y: list[float]) -> float | None:
+    if len(x) < 3:
+        return None
+
+    def ranks(values: list[float]) -> np.ndarray:
+        order = np.argsort(values, kind="stable")
+        out = np.empty(len(values))
+        out[order] = np.arange(len(values))
+        return out
+
+    a, b = ranks(x), ranks(y)
+    if a.std() == 0 or b.std() == 0:
+        return None
+    return float(np.corrcoef(a, b)[0, 1])
+
+
+def complexity_correlation(bd: dict[str, Any], paths: list[str]) -> dict[str, Any]:
+    """Spearman correlation, over items, between each BD-rate and each complexity measure."""
+    measures: dict[str, dict[str, float]] = {}
+    for path in paths:
+        for item in json.loads(Path(path).read_text())["items"]:
+            measures[item["id"]] = {k: v for k, v in item["means"].items() if v is not None}
+    out: dict[str, Any] = {}
+    for mask_set, metrics in bd.items():
+        for metric, record in metrics.items():
+            ids = [i for i, v in record["per_item"].items() if v is not None and i in measures]
+            keys = sorted({k for i in ids for k in measures[i]})
+            out[f"{mask_set}/{metric}"] = {
+                "items": len(ids),
+                "spearman": {k: spearman([record["per_item"][i] for i in ids if k in measures[i]],
+                                         [measures[i][k] for i in ids if k in measures[i]]) for k in keys},
+            }
+    return out
+
+
 def command_report(args: argparse.Namespace) -> int:
     sources = parse_named(args.result)
-    results = {name: merge_results(path.split(",")) for name, path in sources.items()}
+    results = {}
+    for name, spec in sources.items():
+        paths, _, variant = spec.partition("@")
+        results[name] = merge_results(paths.split(","), variant)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     names = list(results)
     mask_sets = sorted({m for r in results.values() for m in r["masks"]})
-    report: dict[str, Any] = {"inputs": {n: sources[n].split(",") for n in names}, "curves": {}, "bd_rate": {},
+    report: dict[str, Any] = {"inputs": {n: sources[n] for n in names}, "curves": {}, "bd_rate": {},
                               "items": {n: len(r["items"]) for n, r in results.items()}}
     for name, result in results.items():
         report["curves"][name] = result["curves"]
@@ -768,11 +949,149 @@ def command_report(args: argparse.Namespace) -> int:
                     "of": b, "against": a, "per_item": per_item, "summary": summary,
                     "note": "positive: more rate than the anchor at equal quality; cubic fit over each item's common range",
                 }
+    if args.complexity:
+        report["complexity_correlation"] = complexity_correlation(report["bd_rate"], args.complexity.split(","))
     write_json(out / "b2-report.json", report)
     if args.plot:
         plot_report(report, out / "b2-rd.png")
     print(json.dumps({k: v for k, v in report.items() if k != "curves"}, indent=1)[:4000])
     return 0
+
+
+# ----------------------------------------------------------------- complexity (secondary study)
+
+def vca_record(vca: str) -> dict[str, Any]:
+    done = subprocess.run([vca, "--help"], capture_output=True, text=True, timeout=30, env=quality.host_tool_env(vca))
+    lines = (done.stdout or done.stderr).strip().splitlines()
+    real = os.path.realpath(vca)
+    return {"path": vca, "real_path": real, "sha256": file_sha256(Path(real)), "version": lines[0] if lines else None}
+
+
+def vca_command(vca: str, source: Path, out: Path, *, width: int, height: int, fps: float, threads: int) -> list[str]:
+    return [vca, "--input", str(source), "--input-res", f"{width}x{height}", "--input-fps", f"{fps:.6f}",
+            "--input-depth", "8", "--input-csp", "420", "--complexity-csv", str(out), "--threads", str(threads)]
+
+
+def read_csv_columns(path: Path) -> dict[str, list[float]]:
+    import csv
+
+    with path.open() as handle:
+        rows = list(csv.DictReader(handle))
+    columns: dict[str, list[float]] = {}
+    for row in rows:
+        for key, value in row.items():
+            try:
+                columns.setdefault(key.strip(), []).append(float(value))
+            except (TypeError, ValueError):
+                continue
+    return columns
+
+
+def siti(ffmpeg: str, source: Path, log_path: Path, *, width: int, height: int, fps: Fraction) -> dict[str, list[float]]:
+    """ITU-T P.910 spatial and temporal information per frame (ffmpeg's ``siti`` filter)."""
+    command = [ffmpeg, "-hide_banner", "-nostats", "-v", "error", "-f", "rawvideo", "-pix_fmt", "yuv420p",
+               "-s", f"{width}x{height}", "-r", f"{fps.numerator}/{fps.denominator}", "-i", str(source),
+               "-vf", f"siti,metadata=mode=print:file={log_path}", "-f", "null", "-"]
+    done = subprocess.run(command, capture_output=True, text=True, timeout=1800)
+    if done.returncode:
+        raise RuntimeError(f"siti failed ({done.returncode}):\n{done.stderr[-2000:]}")
+    out: dict[str, list[float]] = {"si": [], "ti": []}
+    for line in log_path.read_text().splitlines():
+        for key in out:
+            if line.startswith(f"lavfi.siti.{key}="):
+                out[key].append(float(line.split("=", 1)[1]))
+    return out
+
+
+def region_complexity(source: Path, clip: ClipMasks, frames: int, width: int, height: int) -> dict[str, list[float | None]]:
+    """Per frame on luma: mean gradient magnitude (Sobel) and mean absolute change from the
+    previous frame, inside the foreground and in the background."""
+    import cv2
+
+    out: dict[str, list[float | None]] = {k: [] for k in ("spatial_fg", "spatial_bg", "temporal_fg", "temporal_bg")}
+    previous = None
+    for index in range(frames):
+        luma = quality.read_frames(source, width, height, index, 1)[0, :height].astype(np.float32)
+        fg = clip.foreground(index)
+        gradient = np.hypot(cv2.Sobel(luma, cv2.CV_32F, 1, 0), cv2.Sobel(luma, cv2.CV_32F, 0, 1))
+        change = np.abs(luma - previous) if previous is not None else None
+        for region, mask in (("fg", fg), ("bg", ~fg)):
+            out[f"spatial_{region}"].append(float(gradient[mask].mean()) if mask.any() else None)
+            out[f"temporal_{region}"].append(float(change[mask].mean()) if change is not None and mask.any() else None)
+        previous = luma
+    return out
+
+
+def complexity_item(args: argparse.Namespace, item: dict[str, Any]) -> dict[str, Any]:
+    started = time.time()
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    work = scratch / "complexity" / item["id"]
+    if work.exists():
+        shutil.rmtree(work)
+    work.mkdir(parents=True)
+    videos = {Path(v).stem: Path(v) for v in args.video}
+    frames = min(args.frames, int(item["frames"]))
+    archive = Path(args.archive)
+    source = decode_window(videos[item["video"]], item, frames, archive, work / "source.yuv", args.threads)
+    path = Path(source["path"])
+    width, height = source["width"], source["height"]
+    fps = Fraction(item["fps"]).limit_denominator(1001)
+    vca_csv = work / "vca.csv"
+    command = vca_command(args.vca, path, vca_csv, width=width, height=height, fps=item["fps"], threads=args.threads)
+    done = subprocess.run(command, capture_output=True, text=True, timeout=1800, env=quality.host_tool_env(args.vca))
+    if done.returncode:
+        raise RuntimeError(f"VCA failed ({done.returncode}):\n{done.stderr[-2000:]}")
+    clip = ClipMasks.load(mask_root(Path(dict(args.masks)[args.mask_set]), item["id"]))
+    record = {
+        "id": item["id"], "video_type": video_type(item), "frames": frames, "source": source,
+        "vca": {"command": command, "per_frame": read_csv_columns(vca_csv)},
+        "siti": siti(args.ffmpeg, path, work / "siti.txt", width=width, height=height, fps=fps),
+        "regions": region_complexity(path, clip, frames, width, height), "mask_set": args.mask_set,
+    }
+    record["means"] = {
+        **{f"vca_{k}": mean(list(v)) for k, v in record["vca"]["per_frame"].items() if k.lower() not in ("poc", "frame")},
+        **{f"siti_{k}": mean(list(v)) for k, v in record["siti"].items()},
+        **{k: mean(v) for k, v in record["regions"].items()},
+    }
+    record["seconds"] = round(time.time() - started, 2)
+    shutil.rmtree(work)
+    return record
+
+
+def _complexity_job(payload: tuple[argparse.Namespace, dict[str, Any]]) -> dict[str, Any]:
+    return complexity_item(*payload)
+
+
+def command_complexity(args: argparse.Namespace) -> int:
+    eval_set = json.loads(Path(args.eval_set).read_text())
+    items = select_items(eval_set, args.items)
+    allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
+    workers = max(1, min(len(items), allowance // max(1, args.threads)))
+    rows = []
+    with ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context("spawn")) as pool:
+        for row in pool.map(_complexity_job, [(args, item) for item in items]):
+            rows.append(row)
+            progress(len(rows))
+    write_json(stage_dir() / "complexity.json", {
+        "eval_set": {"path": args.eval_set, "sha256": file_sha256(Path(args.eval_set))},
+        "tools": {"vca": vca_record(args.vca), "ffmpeg": svtav1.tool(args.ffmpeg)},
+        "frames": args.frames, "items": rows,
+    })
+    return 0
+
+
+def validate_complexity(stage: Path) -> dict[str, bool]:
+    result = json.loads((stage / "complexity.json").read_text())
+    rows = result["items"]
+    return {
+        "items_processed": bool(rows),
+        "every_sparse_jpeg_matches_its_decoded_frame": all(g["holds"] for r in rows for g in r["source"]["jpeg_gate"]),
+        "vca_has_a_value_per_frame": all(
+            any(len(v) == r["frames"] for v in r["vca"]["per_frame"].values()) for r in rows),
+        "siti_has_a_value_per_frame": all(len(r["siti"]["si"]) == r["frames"] for r in rows),
+        "regions_have_a_value_per_frame": all(len(v) == r["frames"] for r in rows for v in r["regions"].values()),
+        "measures_finite": all(v is None or math.isfinite(v) for r in rows for v in r["means"].values()),
+    }
 
 
 # ----------------------------------------------------------------- choose (pilot decision rule)
@@ -785,9 +1104,9 @@ MIN_POINTS = 4
 STRUCTURE_GAIN = -3.0
 
 
-def mean_curve(result: dict[str, Any], mask_set: str = "visor_dense") -> list[tuple[float, float, float]]:
+def mean_curve(result: dict[str, Any], mask_set: str = "visor_dense", variant: str = "") -> list[tuple[float, float, float]]:
     """(point, mean kbps, mean weighted PSNR) over all items, by rate."""
-    rows = result["curves"]["all"][mask_set]
+    rows = [r for r in result["curves"]["all"][mask_set] if r.get("variant", "") == variant]
     return sorted(((r["point"], r["kbps"], r["wpsnr"]) for r in rows), key=lambda r: r[1])
 
 
@@ -869,17 +1188,36 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--lpips-backbone", required=True)
     run.add_argument("--vmaf-ffmpeg", default="/opt/local/bin/ffmpeg")
     run.add_argument("--streams", help="score published streams under DIR/<codec>/<item>/<point>/ instead of encoding")
-    run.add_argument("--preset", type=int, default=4)
+    run.add_argument("--preset", default="4", help="SVT-AV1 preset, or a comma-separated list")
+    run.add_argument("--roi-offset", default="0", help="SVT-AV1 quantizer offset inside the foreground, or a list (0: no ROI)")
+    run.add_argument("--roi-mask-set", default="visor_dense")
+    run.add_argument("--enable-tf", type=int, choices=(0, 1, 2), help="SVT-AV1 temporal filtering (default: the encoder's)")
+    run.add_argument("--dcvc-range", default="full", help="DCVC-UF input range: full, limited, or both")
+    run.add_argument("--metric-device", choices=("cpu", "cuda"), help="default: cuda for DCVC-UF, cpu for SVT-AV1")
+    run.add_argument("--workers", type=int, default=0, help="SVT-AV1 items in parallel (0: allowance / threads)")
     run.add_argument("--encoder", default="SvtAv1EncApp")
     run.add_argument("--decoder", default="dav1d")
     run.add_argument("--structure", choices=("ld", "hts", "htl"), default="hts")
     run.add_argument("--image-ckpt")
     run.add_argument("--video-ckpt")
     validate_parser = sub.add_parser("validate")
-    validate_parser.add_argument("--codec", choices=sorted(CODECS), required=True)
+    validate_parser.add_argument("--codec", choices=sorted(CODECS), help="informational; the result names its codec")
+    validate_parser.add_argument("--kind", choices=("b2", "complexity"), default="b2")
+    complexity = sub.add_parser("complexity", help="spatial and temporal complexity per frame and region (CPU)")
+    complexity.add_argument("--eval-set", required=True)
+    complexity.add_argument("--archive", required=True)
+    complexity.add_argument("--masks", action="append", nargs=2, metavar=("NAME", "DIR"), required=True)
+    complexity.add_argument("--mask-set", default="visor_dense")
+    complexity.add_argument("--video", action="append", required=True)
+    complexity.add_argument("--items", required=True)
+    complexity.add_argument("--frames", type=int, required=True)
+    complexity.add_argument("--threads", type=int, default=4)
+    complexity.add_argument("--vca", default="/opt/local/bin/vca")
+    complexity.add_argument("--ffmpeg", default="ffmpeg")
     report = sub.add_parser("report")
-    report.add_argument("--result", action="append", required=True, help="NAME=b2.json[,b2.json...] (one codec, merged); with two names, the second is compared against the first")
+    report.add_argument("--result", action="append", required=True, help="NAME=b2.json[,b2.json...][@VARIANT] (one codec, merged; one variant, B2's own if omitted); with two names, the second is compared against the first")
     report.add_argument("--out", required=True)
+    report.add_argument("--complexity", help="complexity.json files (comma-separated) to correlate with the BD-rates")
     report.add_argument("--plot", action="store_true", help="also draw b2-rd.png (needs matplotlib)")
     choose = sub.add_parser("choose", help="apply the pilot rule: DCVC-UF structure and rate points")
     choose.add_argument("--result", action="append", required=True, help="NAME=pilot b2.json (SVT-AV1, DCVC-UF HT-S, HT-L)")
@@ -887,7 +1225,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "run" and args.codec == "dcvc" and not (args.image_ckpt and args.video_ckpt):
         parser.error("dcvc needs --image-ckpt and --video-ckpt")
-    return {"run": command_run, "validate": command_validate, "report": command_report, "choose": command_choose}[args.command](args)
+    return {"run": command_run, "validate": command_validate, "report": command_report, "choose": command_choose,
+            "complexity": command_complexity}[args.command](args)
 
 
 if __name__ == "__main__":
