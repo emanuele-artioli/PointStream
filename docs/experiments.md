@@ -586,7 +586,18 @@ invocation turns out to be needed.
   B2's configuration, stands; no re-run (the rule's change exceeds 3% but in
   favour of what B2 used). The hypothesis is refuted, and not in the
   competing explanation's direction.
-- J4 outcome (`20261007T174948Z-f66eb774`, gpu5, RTX 6000 Ada for scoring,
+- J2 outcome (`20261007T174747Z-8a4e6d3f`, gpu3, 32 cores, one window at a
+  time after J1 had finished, RTX A6000 for scoring, `aac0cb4`, 2,477 s full
+  stage; validator passed; host load average 7–9 before each encode). Median
+  SVT-AV1 encode time per 240-frame window (wall, CPU) and BD-rate against
+  preset 4 on weighted PSNR, mean over the 2 items: preset 1 80.5 s (750 s
+  CPU), −15.6%; 2 46.2 s, −12.0%; 3 30.3 s, −6.2%; 4 18.7 s (149 s CPU);
+  5 12.8 s, +3.2%; 6 9.1 s, +12.3%; 8 4.6 s, +49.7%; 10 2.7 s, +110%;
+  12 1.94 s (14.6 s CPU), +133%. DCVC-UF HT-L's codec encode on the same host
+  takes 1.90 s, so no tested preset fits the equal-time rule; preset 12 is
+  2% over. The rule did not say what happens when none fits, and the choice
+  changes the baseline's strength by more than a factor of two in rate, so it
+  is put to the user before the full runs (decision below). gpu5, RTX 6000 Ada for scoring,
   `aac0cb4`, 149 s full stage; validator passed): without temporal filtering
   SVT-AV1 is clearly worse. BD-rate against B2's pilot (same items and CRFs),
   mean over the 4 items: weighted PSNR +21.5%, whole-frame PSNR +27.6%, VMAF
