@@ -1,18 +1,19 @@
 {
- "name": "visor-val-b1",
- "created_utc": "2026-10-06T19:45:46.882933+00:00",
+ "name": "visor-val-b1-v2",
+ "created_utc": "2026-10-07T08:07:16.901430+00:00",
  "rule": {
   "split": "val",
   "length": 240,
   "seed": "pointstream-b1",
   "verified_classes": [
+   "h264 1920x1080 59.940",
    "hevc 1920x1080 50.000"
   ],
   "mapping_result": {
    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261006T193326Z-64057023/full/mapping.json",
    "sha256": "b960afb53e9fba9cd660c49793ba53c710c0be8c1fbfb5a8800287165eedf55a"
   },
-  "summary": "one exactly aligned run per validation video of a verified class, its first frames from a keyframe; tools/datasets/visor_b1_inputs.py"
+  "summary": "one exactly aligned, hand-complete window per validation video of a verified 1080p one-to-one class, picked content-blind; tools/datasets/visor_b1_inputs.py"
  },
  "source_zip": {
   "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/2v6cgv1x04ol22qp9rm9x2j6a7.zip",
@@ -23,8 +24,8 @@
   "sha256": "caca34cc6d92c522c256e4a8ff4f8f70e517181fccfaf3cdfc676adb34eb3ef2"
  },
  "archive": {
-  "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b1-2026-10-06/evalset/visor-val-dense.tar",
-  "sha256": "cca6169a76d5be96549db6fde03429906955105a8e3bcf5e7d867691c619020f",
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b1-2026-10-06/evalset-v2/visor-val-dense.tar",
+  "sha256": "a2d9e0cb0373fbf89d1c1e257acc2ffa63602b680cfae03a6fdcc804894b4c3c",
   "sources": {
    "frame_mapping.json": {
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/frame_mapping.json",
@@ -41,6 +42,46 @@
     "crc32": 4205961367,
     "sha256": "03bef9119f7343db282349f69e98e625a304c68c4a83342989984275b3d3ee9d"
    },
+   "dense/P02_02_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P02_02_interpolations.zip",
+    "crc32": 4154555171,
+    "sha256": "41b2ec33b4324b83c0054f78fc92922a10d0f13e22d7f5d116e937f0330c9063"
+   },
+   "annotations/P02_02.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P02_02.json",
+    "crc32": 3546773397,
+    "sha256": "53921a7e92f150c77b6472ceed8fb54fa3d9c98f57a5b64cd4ca359414d68817"
+   },
+   "dense/P02_09_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P02_09_interpolations.zip",
+    "crc32": 287462637,
+    "sha256": "c1cf6b0ffd6b0994e99873d13c77583039e9c5fd2f18dda7fd4e5e8c4c83ea4e"
+   },
+   "annotations/P02_09.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P02_09.json",
+    "crc32": 1534894381,
+    "sha256": "26a2c28a2c2e505f991928fb183bffe33029d3bbeee627906fd5ce1e2de0f17f"
+   },
+   "dense/P02_12_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P02_12_interpolations.zip",
+    "crc32": 2111200612,
+    "sha256": "a0ea8b89b336d4fb6bd2c9dc47e885b43bd64ca3b390c259365d2d943f2ea86f"
+   },
+   "annotations/P02_12.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P02_12.json",
+    "crc32": 968449796,
+    "sha256": "6bcae9a526bed37793f4a1976ca960a668c45a5c79ee255e2235e2bb15931666"
+   },
+   "dense/P03_10_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P03_10_interpolations.zip",
+    "crc32": 1466295672,
+    "sha256": "d194aa35a5c088ded3b72ae1fbcbb2b3404aa81ef63f3a445060e36f11ff0328"
+   },
+   "annotations/P03_10.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P03_10.json",
+    "crc32": 2745772304,
+    "sha256": "d4e41d4d90f60dbdd2899d97ec2c8576bafd8149d7a10745d12ce58a1bae10de"
+   },
    "dense/P03_120_interpolations.zip": {
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P03_120_interpolations.zip",
     "crc32": 2944311445,
@@ -50,6 +91,66 @@
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P03_120.json",
     "crc32": 2841212275,
     "sha256": "dfbf1f16eddc951ad287c77dcb2c40ada43756d4015a0dce830f1b01b30924ea"
+   },
+   "dense/P04_06_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P04_06_interpolations.zip",
+    "crc32": 3571837349,
+    "sha256": "eaee9dc765e2c427687e5f14ea4f5bbe3582b6d5bd7a8a6a9bae6085a1799e2a"
+   },
+   "annotations/P04_06.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P04_06.json",
+    "crc32": 2667000484,
+    "sha256": "5db360b1454cf55c379e213302118667cb53696a554d5df822ba05035bb7fab9"
+   },
+   "dense/P04_13_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P04_13_interpolations.zip",
+    "crc32": 1449642052,
+    "sha256": "161765a661ded1bc70ec701eee6dd7b6fba7a78d0942e9878ee0aa81ceae34df"
+   },
+   "annotations/P04_13.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P04_13.json",
+    "crc32": 162577494,
+    "sha256": "1c211a1ad0ac967def51e9ca5ee77de3072adc37dfc78d9df07cd9757c298f0c"
+   },
+   "dense/P04_24_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P04_24_interpolations.zip",
+    "crc32": 914862036,
+    "sha256": "207b02279bb05c35c42145462edbabd0d48723bb4dd54ee78c7280158f64703f"
+   },
+   "annotations/P04_24.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P04_24.json",
+    "crc32": 2139472496,
+    "sha256": "68009f5c9c0f9ad829fb25af1df5e9c2834d8c9b2d63676b016ee55a68413205"
+   },
+   "dense/P06_03_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P06_03_interpolations.zip",
+    "crc32": 2931953943,
+    "sha256": "fa3cb64235a836ecddd523601a41915a4a827bb14345a2a5e9b140a4d1b6e5a4"
+   },
+   "annotations/P06_03.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P06_03.json",
+    "crc32": 3991444765,
+    "sha256": "f56bb0e1697c80c3fbb22ef4aab4716c300a39de840378c494682f652302ae49"
+   },
+   "dense/P06_05_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P06_05_interpolations.zip",
+    "crc32": 3496815434,
+    "sha256": "543cd57790b6fbc1958ae1ca22874eb48f41fed70700f00a4865451c712a2b71"
+   },
+   "annotations/P06_05.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P06_05.json",
+    "crc32": 3805225511,
+    "sha256": "a967b920652e362255b8bcef3eb8f0b55120e6b23cfdf7c18f85d41f9bf77019"
+   },
+   "dense/P06_10_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P06_10_interpolations.zip",
+    "crc32": 3290993998,
+    "sha256": "16717ff9874898a2c5afd9b922960a9809a5b7c584f86e813339c4f972536dc2"
+   },
+   "annotations/P06_10.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P06_10.json",
+    "crc32": 3430867978,
+    "sha256": "25669083d299efd9daad26ac5a7cb0e637b66401fa10afe9177d434ca286b905"
    },
    "dense/P06_106_interpolations.zip": {
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P06_106_interpolations.zip",
@@ -81,16 +182,6 @@
     "crc32": 3154966247,
     "sha256": "c1551499185010a2d3e021958dbf077a1b6c750e0016334a22488542ba6a7373"
    },
-   "dense/P07_103_interpolations.zip": {
-    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P07_103_interpolations.zip",
-    "crc32": 1559330169,
-    "sha256": "a20e8b7accd369295500d7d15fec25bd56afbe53e9d1a5622b2ff47ce1d23a5e"
-   },
-   "annotations/P07_103.json": {
-    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P07_103.json",
-    "crc32": 3718450710,
-    "sha256": "041ee331b87c9fc91d428b6a8dae837886dba0e479a42b5b2dc2da1f272373cc"
-   },
    "dense/P07_110_interpolations.zip": {
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P07_110_interpolations.zip",
     "crc32": 1015429891,
@@ -100,6 +191,26 @@
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P07_110.json",
     "crc32": 2024049378,
     "sha256": "c86af11dfcb5597c634f77a246630f050a8ff7346bdc479199e75124b29ef4a7"
+   },
+   "dense/P08_17_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P08_17_interpolations.zip",
+    "crc32": 3308378597,
+    "sha256": "da32ffd4f1359d1679cbc76e61d3950b994c9fa7735ceb27fb87140cc3ad07ef"
+   },
+   "annotations/P08_17.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P08_17.json",
+    "crc32": 1381053117,
+    "sha256": "5099f0c5eab95e4762bd545ee96b1d7e64bed5634c94eb002aee2227c0cfe277"
+   },
+   "dense/P09_02_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P09_02_interpolations.zip",
+    "crc32": 418900597,
+    "sha256": "6c33ca2fe914932db0077a52e5b71fca6d0a728c6b49b2b63ed2cb57222fc568"
+   },
+   "annotations/P09_02.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P09_02.json",
+    "crc32": 707666429,
+    "sha256": "7494994a672cc73eaf97ba200cefe97b1a29f60c2d663f20e4cbd159c3b3caf1"
    },
    "dense/P09_103_interpolations.zip": {
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P09_103_interpolations.zip",
@@ -131,6 +242,26 @@
     "crc32": 305393564,
     "sha256": "ffa52ed40fba2a1d98d26e001a63ce717d05d9f3ce3024269ad6fa1f095c53b1"
    },
+   "dense/P18_01_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P18_01_interpolations.zip",
+    "crc32": 117699838,
+    "sha256": "f0ae0f1e02f5ec2b1e42456910dc621a3f5058ae657401b1d3fe9a9069135c8c"
+   },
+   "annotations/P18_01.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P18_01.json",
+    "crc32": 3100565636,
+    "sha256": "bd5d1d359985db9d7b9a9e6164b43889904e2ae2759f9998d828bb5850997364"
+   },
+   "dense/P21_01_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P21_01_interpolations.zip",
+    "crc32": 4104527437,
+    "sha256": "dc14345c3559631cc2f55b35cbd968f6d5be6d21adb782b45103daa35e0edf08"
+   },
+   "annotations/P21_01.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P21_01.json",
+    "crc32": 3872160048,
+    "sha256": "d51f4194d4beba3af73a0527856c6ed789f09a662469365bd550273654256320"
+   },
    "dense/P22_107_interpolations.zip": {
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P22_107_interpolations.zip",
     "crc32": 901554822,
@@ -141,6 +272,26 @@
     "crc32": 4003452676,
     "sha256": "ffb9b6021de7afc4cafe5be456093abf15c4b651dc7c5d8c899e628f8cf580ea"
    },
+   "dense/P24_09_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P24_09_interpolations.zip",
+    "crc32": 2742083785,
+    "sha256": "dde4c5fd23dfd70e830b98bd010835b2d4c41cc06667af68c4995eb3883bdae9"
+   },
+   "annotations/P24_09.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P24_09.json",
+    "crc32": 2131831604,
+    "sha256": "a7996da4fc8013506e84bfa29412a80bc91f38ae43953847911ab7b837effbcb"
+   },
+   "dense/P25_09_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P25_09_interpolations.zip",
+    "crc32": 2188907530,
+    "sha256": "4c53fd7b396d522dabe06e33763c38bd11fa80d6d1f1e3f03c658f2de833b563"
+   },
+   "annotations/P25_09.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P25_09.json",
+    "crc32": 2289619978,
+    "sha256": "b7cd4e3fb389a9901694d621db2c9ebec955733760d2c87f4c27d8682c23d347"
+   },
    "dense/P25_101_interpolations.zip": {
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P25_101_interpolations.zip",
     "crc32": 614411297,
@@ -150,6 +301,16 @@
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P25_101.json",
     "crc32": 44753194,
     "sha256": "5d47258fc7fd4ec0bd72064c65a7a43acee34164531f45e9c1a84df8e7a68353"
+   },
+   "dense/P26_02_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P26_02_interpolations.zip",
+    "crc32": 1992233026,
+    "sha256": "39f205a068b4d23dfcac8c7754ff34c9bf6a3e279357229b595be3195c1c8e6d"
+   },
+   "annotations/P26_02.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P26_02.json",
+    "crc32": 2234614650,
+    "sha256": "cc690c327688d2dd840cc77c2f929a8e9f927d76e82e0e93185abd21fd6c6879"
    },
    "dense/P26_108_interpolations.zip": {
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P26_108_interpolations.zip",
@@ -170,6 +331,26 @@
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P27_105.json",
     "crc32": 751312811,
     "sha256": "13adc4702e7e4ce1d69ccb0a2a4e084317be12b2ddd50a4cb4018581e8a5337b"
+   },
+   "dense/P28_05_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P28_05_interpolations.zip",
+    "crc32": 793351356,
+    "sha256": "15a27df78d7258337f319c13e1262467436cd7c3fd1570ba97d3de9a6b1dc666"
+   },
+   "annotations/P28_05.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P28_05.json",
+    "crc32": 956622464,
+    "sha256": "16a3d679618648b4de037f17aeebe1a89bc9bede6cb03647d0907c9f755920ea"
+   },
+   "dense/P30_07_interpolations.zip": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P30_07_interpolations.zip",
+    "crc32": 1063094500,
+    "sha256": "6d7c211a5ab08ca4a6e847ea4d42942efc54ddbd9a1e3dcee859c4d4392c84d6"
+   },
+   "annotations/P30_07.json": {
+    "member": "2v6cgv1x04ol22qp9rm9x2j6a7/GroundTruth-SparseAnnotations/annotations/val/P30_07.json",
+    "crc32": 936879015,
+    "sha256": "af9dcba1ed2e5a732b2f06b1d25824f89f42b037f66a1b6a3c1e0a9551575da2"
    },
    "dense/P30_110_interpolations.zip": {
     "member": "2v6cgv1x04ol22qp9rm9x2j6a7/Interpolations-DenseAnnotations/val/P30_110_interpolations.zip",
@@ -195,40 +376,38 @@
  },
  "items": [
   {
-   "id": "P01_107_0000000900",
+   "id": "P01_107_0000003049",
    "video": "P01_107",
    "split": "val",
-   "first_visor_frame": 900,
-   "last_visor_frame": 1139,
+   "first_visor_frame": 3049,
+   "last_visor_frame": 3288,
    "frames": 240,
-   "first_video_index": 899,
+   "first_video_index": 3048,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 900,
-    "last": 1201,
-    "eligible_runs": 3,
+    "first": 1369,
+    "last": 4882,
+    "windows": 18,
+    "eligible_windows": 7,
     "runs": 8
    },
    "keyframes": [
-    0,
-    27,
-    54,
-    92,
-    171,
-    201,
-    228
+    24,
+    172
    ],
    "labels": [
-    "cereal box",
-    "cupboard",
+    "cereal",
+    "cup",
     "food container",
-    "fridge",
     "left hand",
     "right hand",
     "soy milk"
    ],
-   "start_jpeg": "rgb_frames/P01_107_frame_0000000900.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P01_107_frame_0000003073.jpg",
+    "rgb_frames/P01_107_frame_0000003221.jpg"
+   ],
    "dense_member": "dense/P01_107_interpolations.zip",
    "dense_sha256": "616adb21121a3197cf745293e66933c2645e0cc216de7bd7e54588dd602fb3dd",
    "video_file": {
@@ -238,41 +417,216 @@
    }
   },
   {
-   "id": "P03_120_0000005422",
-   "video": "P03_120",
+   "id": "P02_02_0000006080",
+   "video": "P02_02",
    "split": "val",
-   "first_visor_frame": 5422,
-   "last_visor_frame": 5661,
+   "first_visor_frame": 6080,
+   "last_visor_frame": 6319,
    "frames": 240,
-   "first_video_index": 5421,
-   "fps": 50.0,
-   "video_class": "hevc 1920x1080 50.000",
+   "first_video_index": 6072,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
    "run": {
-    "first": 5422,
-    "last": 5822,
-    "eligible_runs": 14,
-    "runs": 34
+    "first": 1760,
+    "last": 10543,
+    "windows": 43,
+    "eligible_windows": 4,
+    "runs": 6
+   },
+   "keyframes": [
+    10,
+    148
+   ],
+   "labels": [
+    "glass",
+    "left glove",
+    "left hand",
+    "right glove",
+    "right hand",
+    "sink",
+    "tap"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P02_02_frame_0000006090.jpg",
+    "rgb_frames/P02_02_frame_0000006228.jpg"
+   ],
+   "dense_member": "dense/P02_02_interpolations.zip",
+   "dense_sha256": "41b2ec33b4324b83c0054f78fc92922a10d0f13e22d7f5d116e937f0330c9063",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P02_02.MP4",
+    "bytes": 252242277,
+    "sha256": "580b89c9549c5ff3afe0ab7e111646f135c92871b3408a3e96d24e0dee78a580"
+   }
+  },
+  {
+   "id": "P02_09_0000084627",
+   "video": "P02_09",
+   "split": "val",
+   "first_visor_frame": 84627,
+   "last_visor_frame": 84866,
+   "frames": 240,
+   "first_video_index": 84542,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 84627,
+    "last": 85377,
+    "windows": 199,
+    "eligible_windows": 28,
+    "runs": 124
    },
    "keyframes": [
     0,
-    25,
-    50,
-    75,
-    100,
-    125,
-    150,
-    175,
-    200,
-    225
+    60,
+    170
+   ],
+   "labels": [
+    "hob/cooktop/stovetop",
+    "left hand",
+    "meat",
+    "meat packaging",
+    "pan",
+    "right hand",
+    "wooden spoon"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P02_09_frame_0000084627.jpg",
+    "rgb_frames/P02_09_frame_0000084797.jpg",
+    "rgb_frames/P02_09_frame_0000084687.jpg"
+   ],
+   "dense_member": "dense/P02_09_interpolations.zip",
+   "dense_sha256": "c1cf6b0ffd6b0994e99873d13c77583039e9c5fd2f18dda7fd4e5e8c4c83ea4e",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P02_09.MP4",
+    "bytes": 8279346534,
+    "sha256": "c91d229954cf13066f0e17c67cec7b3bf5d4a1e0f3a96e0744d6aae88c03934e"
+   }
+  },
+  {
+   "id": "P02_12_0000022073",
+   "video": "P02_12",
+   "split": "val",
+   "first_visor_frame": 22073,
+   "last_visor_frame": 22312,
+   "frames": 240,
+   "first_video_index": 22050,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 21833,
+    "last": 24674,
+    "windows": 180,
+    "eligible_windows": 33,
+    "runs": 61
+   },
+   "keyframes": [
+    129,
+    194
+   ],
+   "labels": [
+    "left hand",
+    "meat mix",
+    "oil bottle",
+    "pan",
+    "tray"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P02_12_frame_0000022202.jpg",
+    "rgb_frames/P02_12_frame_0000022267.jpg"
+   ],
+   "dense_member": "dense/P02_12_interpolations.zip",
+   "dense_sha256": "a0ea8b89b336d4fb6bd2c9dc47e885b43bd64ca3b390c259365d2d943f2ea86f",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P02_12.MP4",
+    "bytes": 4950296832,
+    "sha256": "fdbff19c5b4a742075e2636a1dc93dfdf438efa8a49454ff200f5126a4e19f93"
+   }
+  },
+  {
+   "id": "P03_10_0000000616",
+   "video": "P03_10",
+   "split": "val",
+   "first_visor_frame": 616,
+   "last_visor_frame": 855,
+   "frames": 240,
+   "first_video_index": 615,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 616,
+    "last": 1040,
+    "windows": 4,
+    "eligible_windows": 1,
+    "runs": 14
+   },
+   "keyframes": [
+    0,
+    136
+   ],
+   "labels": [
+    "left hand",
+    "pancake",
+    "right hand",
+    "toaster"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P03_10_frame_0000000616.jpg",
+    "rgb_frames/P03_10_frame_0000000752.jpg"
+   ],
+   "dense_member": "dense/P03_10_interpolations.zip",
+   "dense_sha256": "d194aa35a5c088ded3b72ae1fbcbb2b3404aa81ef63f3a445060e36f11ff0328",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P03_10.MP4",
+    "bytes": 387531883,
+    "sha256": "962b37b472e84847078301544982b4da0a9e2e44d15d61ac045ab3fb6878a0f9"
+   }
+  },
+  {
+   "id": "P03_120_0000018627",
+   "video": "P03_120",
+   "split": "val",
+   "first_visor_frame": 18627,
+   "last_visor_frame": 18866,
+   "frames": 240,
+   "first_video_index": 18626,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 17667,
+    "last": 19942,
+    "windows": 38,
+    "eligible_windows": 20,
+    "runs": 34
+   },
+   "keyframes": [
+    15,
+    40,
+    65,
+    90,
+    115,
+    140,
+    165,
+    190,
+    215
    ],
    "labels": [
     "bowl",
+    "grater",
     "left hand",
-    "right hand",
-    "sugar",
-    "weight tray"
+    "lemon",
+    "right hand"
    ],
-   "start_jpeg": "rgb_frames/P03_120_frame_0000005422.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P03_120_frame_0000018842.jpg",
+    "rgb_frames/P03_120_frame_0000018692.jpg",
+    "rgb_frames/P03_120_frame_0000018792.jpg",
+    "rgb_frames/P03_120_frame_0000018817.jpg",
+    "rgb_frames/P03_120_frame_0000018717.jpg",
+    "rgb_frames/P03_120_frame_0000018642.jpg",
+    "rgb_frames/P03_120_frame_0000018742.jpg",
+    "rgb_frames/P03_120_frame_0000018767.jpg",
+    "rgb_frames/P03_120_frame_0000018667.jpg"
+   ],
    "dense_member": "dense/P03_120_interpolations.zip",
    "dense_sha256": "006bfe9f0885275b6d85be61254dff5f372b2580cc1aeda1bd19753bedcb843b",
    "video_file": {
@@ -282,34 +636,279 @@
    }
   },
   {
-   "id": "P06_106_0000005571",
+   "id": "P04_06_0000038498",
+   "video": "P04_06",
+   "split": "val",
+   "first_visor_frame": 38498,
+   "last_visor_frame": 38737,
+   "frames": 240,
+   "first_video_index": 38459,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 37538,
+    "last": 38924,
+    "windows": 37,
+    "eligible_windows": 10,
+    "runs": 41
+   },
+   "keyframes": [
+    209
+   ],
+   "labels": [
+    "bread",
+    "hob/cooktop/stovetop",
+    "pan",
+    "plate",
+    "right hand"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P04_06_frame_0000038707.jpg"
+   ],
+   "dense_member": "dense/P04_06_interpolations.zip",
+   "dense_sha256": "eaee9dc765e2c427687e5f14ea4f5bbe3582b6d5bd7a8a6a9bae6085a1799e2a",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P04_06.MP4",
+    "bytes": 2971129857,
+    "sha256": "0cd6b4b1c77977f83dfb69fef138db207fed70caea531d6539c739615107443a"
+   }
+  },
+  {
+   "id": "P04_13_0000004265",
+   "video": "P04_13",
+   "split": "val",
+   "first_visor_frame": 4265,
+   "last_visor_frame": 4504,
+   "frames": 240,
+   "first_video_index": 4260,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 3785,
+    "last": 5332,
+    "windows": 26,
+    "eligible_windows": 5,
+    "runs": 7
+   },
+   "keyframes": [
+    112
+   ],
+   "labels": [
+    "food",
+    "hob",
+    "left hand",
+    "pan",
+    "right hand",
+    "spatula",
+    "spoon",
+    "thyme"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P04_13_frame_0000004377.jpg"
+   ],
+   "dense_member": "dense/P04_13_interpolations.zip",
+   "dense_sha256": "161765a661ded1bc70ec701eee6dd7b6fba7a78d0942e9878ee0aa81ceae34df",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P04_13.MP4",
+    "bytes": 1184637899,
+    "sha256": "df27e76d7a5510c223274e45f0097da872c95153fc9318dc39a17592371ae59f"
+   }
+  },
+  {
+   "id": "P04_24_0000013497",
+   "video": "P04_24",
+   "split": "val",
+   "first_visor_frame": 13497,
+   "last_visor_frame": 13736,
+   "frames": 240,
+   "first_video_index": 13483,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 13257,
+    "last": 14468,
+    "windows": 31,
+    "eligible_windows": 1,
+    "runs": 18
+   },
+   "keyframes": [],
+   "labels": [
+    "bowl",
+    "left hand",
+    "tap"
+   ],
+   "sparse_jpegs": [],
+   "dense_member": "dense/P04_24_interpolations.zip",
+   "dense_sha256": "207b02279bb05c35c42145462edbabd0d48723bb4dd54ee78c7280158f64703f",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P04_24.MP4",
+    "bytes": 1892929616,
+    "sha256": "de76103a54bcdaad2d2650e987d75089a988bf819437294207f5cd166d977b8d"
+   }
+  },
+  {
+   "id": "P06_03_0000005110",
+   "video": "P06_03",
+   "split": "val",
+   "first_visor_frame": 5110,
+   "last_visor_frame": 5349,
+   "frames": 240,
+   "first_video_index": 5104,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 4870,
+    "last": 7071,
+    "windows": 67,
+    "eligible_windows": 23,
+    "runs": 21
+   },
+   "keyframes": [
+    87
+   ],
+   "labels": [
+    "flour",
+    "left hand",
+    "pepper",
+    "pot",
+    "right hand",
+    "salt bottle",
+    "spoon"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P06_03_frame_0000005197.jpg"
+   ],
+   "dense_member": "dense/P06_03_interpolations.zip",
+   "dense_sha256": "fa3cb64235a836ecddd523601a41915a4a827bb14345a2a5e9b140a4d1b6e5a4",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_03.MP4",
+    "bytes": 2586057986,
+    "sha256": "85dc6503764a6b7cd344e6b03f3cb7616d77a58901cc0aa0a5c21c344779298f"
+   }
+  },
+  {
+   "id": "P06_05_0000047134",
+   "video": "P06_05",
+   "split": "val",
+   "first_visor_frame": 47134,
+   "last_visor_frame": 47373,
+   "frames": 240,
+   "first_video_index": 47086,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 47134,
+    "last": 48259,
+    "windows": 86,
+    "eligible_windows": 21,
+    "runs": 67
+   },
+   "keyframes": [
+    0,
+    104,
+    194
+   ],
+   "labels": [
+    "chopping board",
+    "knife",
+    "left hand",
+    "onion",
+    "right hand",
+    "spoon",
+    "sun dried tomato package"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P06_05_frame_0000047134.jpg",
+    "rgb_frames/P06_05_frame_0000047328.jpg",
+    "rgb_frames/P06_05_frame_0000047238.jpg"
+   ],
+   "dense_member": "dense/P06_05_interpolations.zip",
+   "dense_sha256": "543cd57790b6fbc1958ae1ca22874eb48f41fed70700f00a4865451c712a2b71",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_05.MP4",
+    "bytes": 5435564036,
+    "sha256": "f1155f78badc95e7e1b43432ad44057818c05d670e5d0ddb4edbfd3e4469db38"
+   }
+  },
+  {
+   "id": "P06_10_0000010361",
+   "video": "P06_10",
+   "split": "val",
+   "first_visor_frame": 10361,
+   "last_visor_frame": 10600,
+   "frames": 240,
+   "first_video_index": 10350,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 10361,
+    "last": 10851,
+    "windows": 24,
+    "eligible_windows": 3,
+    "runs": 12
+   },
+   "keyframes": [
+    0,
+    211
+   ],
+   "labels": [
+    "carrot",
+    "chopping board",
+    "hob",
+    "knife",
+    "left hand",
+    "pot",
+    "right hand"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P06_10_frame_0000010361.jpg",
+    "rgb_frames/P06_10_frame_0000010572.jpg"
+   ],
+   "dense_member": "dense/P06_10_interpolations.zip",
+   "dense_sha256": "16717ff9874898a2c5afd9b922960a9809a5b7c584f86e813339c4f972536dc2",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P06_10.MP4",
+    "bytes": 915778773,
+    "sha256": "2abad7c27ca8491dc59e8144e8ff93aa40f2a41d0716f4f0b957535e46e6fda5"
+   }
+  },
+  {
+   "id": "P06_106_0000007118",
    "video": "P06_106",
    "split": "val",
-   "first_visor_frame": 5571,
-   "last_visor_frame": 5810,
+   "first_visor_frame": 7118,
+   "last_visor_frame": 7357,
    "frames": 240,
-   "first_video_index": 5570,
+   "first_video_index": 7117,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 5571,
-    "last": 6151,
-    "eligible_runs": 7,
+    "first": 7118,
+    "last": 8175,
+    "windows": 25,
+    "eligible_windows": 14,
     "runs": 8
    },
    "keyframes": [
-    0
+    0,
+    47,
+    208
    ],
    "labels": [
+    "cheese grater",
+    "cheese packet",
     "chilli",
-    "hob",
     "left hand",
     "plate",
     "rice",
     "right hand",
     "tortilla"
    ],
-   "start_jpeg": "rgb_frames/P06_106_frame_0000005571.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P06_106_frame_0000007165.jpg",
+    "rgb_frames/P06_106_frame_0000007326.jpg",
+    "rgb_frames/P06_106_frame_0000007118.jpg"
+   ],
    "dense_member": "dense/P06_106_interpolations.zip",
    "dense_sha256": "b3330dc0c3024a9dbbd906e42c2c1c4584b21a609bfdafd022f1ef2ab607d2a6",
    "video_file": {
@@ -319,34 +918,47 @@
    }
   },
   {
-   "id": "P06_108_0000026317",
+   "id": "P06_108_0000016366",
    "video": "P06_108",
    "split": "val",
-   "first_visor_frame": 26317,
-   "last_visor_frame": 26556,
+   "first_visor_frame": 16366,
+   "last_visor_frame": 16605,
    "frames": 240,
-   "first_video_index": 26316,
+   "first_video_index": 16365,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 26317,
-    "last": 26667,
-    "eligible_runs": 17,
+    "first": 16126,
+    "last": 17676,
+    "windows": 56,
+    "eligible_windows": 33,
     "runs": 35
    },
    "keyframes": [
-    0,
-    81
+    10,
+    55,
+    122,
+    157,
+    222
    ],
    "labels": [
-    "hob",
+    "chopping board",
+    "knife",
     "left hand",
+    "lid",
     "pan",
-    "phone",
+    "pizza",
     "right hand",
-    "silver foil"
+    "sink",
+    "tap"
    ],
-   "start_jpeg": "rgb_frames/P06_108_frame_0000026317.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P06_108_frame_0000016376.jpg",
+    "rgb_frames/P06_108_frame_0000016421.jpg",
+    "rgb_frames/P06_108_frame_0000016488.jpg",
+    "rgb_frames/P06_108_frame_0000016523.jpg",
+    "rgb_frames/P06_108_frame_0000016588.jpg"
+   ],
    "dense_member": "dense/P06_108_interpolations.zip",
    "dense_sha256": "0f1aaf19c276f64a0fdda1071be0d978a75c78440368905a124a10c0512e9591",
    "video_file": {
@@ -356,32 +968,39 @@
    }
   },
   {
-   "id": "P07_101_0000019693",
+   "id": "P07_101_0000021842",
    "video": "P07_101",
    "split": "val",
-   "first_visor_frame": 19693,
-   "last_visor_frame": 19932,
+   "first_visor_frame": 21842,
+   "last_visor_frame": 22081,
    "frames": 240,
-   "first_video_index": 19692,
+   "first_video_index": 21841,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 19693,
-    "last": 19995,
-    "eligible_runs": 16,
+    "first": 21842,
+    "last": 22826,
+    "windows": 29,
+    "eligible_windows": 8,
     "runs": 28
    },
    "keyframes": [
     0,
-    133
+    34
    ],
    "labels": [
     "bread",
+    "cheese",
+    "chopping board",
+    "chorizo",
     "left hand",
     "right hand",
     "tray"
    ],
-   "start_jpeg": "rgb_frames/P07_101_frame_0000019693.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P07_101_frame_0000021842.jpg",
+    "rgb_frames/P07_101_frame_0000021876.jpg"
+   ],
    "dense_member": "dense/P07_101_interpolations.zip",
    "dense_sha256": "8b0ebfdf1f53c966d3040ec4a35ba9b0ef6d0006ef24e6a6247c245fa260d15c",
    "video_file": {
@@ -391,75 +1010,42 @@
    }
   },
   {
-   "id": "P07_103_0000000178",
-   "video": "P07_103",
-   "split": "val",
-   "first_visor_frame": 178,
-   "last_visor_frame": 417,
-   "frames": 240,
-   "first_video_index": 177,
-   "fps": 50.0,
-   "video_class": "hevc 1920x1080 50.000",
-   "run": {
-    "first": 178,
-    "last": 728,
-    "eligible_runs": 2,
-    "runs": 2
-   },
-   "keyframes": [
-    0,
-    67,
-    106,
-    189,
-    231
-   ],
-   "labels": [
-    "cupboard",
-    "left hand",
-    "plate",
-    "right hand",
-    "towel"
-   ],
-   "start_jpeg": "rgb_frames/P07_103_frame_0000000178.jpg",
-   "dense_member": "dense/P07_103_interpolations.zip",
-   "dense_sha256": "a20e8b7accd369295500d7d15fec25bd56afbe53e9d1a5622b2ff47ce1d23a5e",
-   "video_file": {
-    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P07_103.MP4",
-    "bytes": 149027986,
-    "sha256": "5fee857dbea6f22f244a6718cbd36a94af20ff3159317cf3b68fa4e1cfa508bf"
-   }
-  },
-  {
-   "id": "P07_110_0000007178",
+   "id": "P07_110_0000006712",
    "video": "P07_110",
    "split": "val",
-   "first_visor_frame": 7178,
-   "last_visor_frame": 7417,
+   "first_visor_frame": 6712,
+   "last_visor_frame": 6951,
    "frames": 240,
-   "first_video_index": 7177,
+   "first_video_index": 6711,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 7178,
-    "last": 9146,
-    "eligible_runs": 11,
+    "first": 6712,
+    "last": 7076,
+    "windows": 28,
+    "eligible_windows": 11,
     "runs": 15
    },
    "keyframes": [
     0,
-    34,
-    131
+    80,
+    159,
+    214
    ],
    "labels": [
-    "fridge",
     "glass",
     "left hand",
-    "milk bottle",
-    "milk bottle lid",
-    "mixture",
-    "right hand"
+    "right hand",
+    "sink",
+    "syrup bottle",
+    "tap"
    ],
-   "start_jpeg": "rgb_frames/P07_110_frame_0000007178.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P07_110_frame_0000006712.jpg",
+    "rgb_frames/P07_110_frame_0000006792.jpg",
+    "rgb_frames/P07_110_frame_0000006871.jpg",
+    "rgb_frames/P07_110_frame_0000006926.jpg"
+   ],
    "dense_member": "dense/P07_110_interpolations.zip",
    "dense_sha256": "cfac79da46fd6d030765defb2ca330c4142b7b9abdcbd46525801977e8649954",
    "video_file": {
@@ -469,32 +1055,110 @@
    }
   },
   {
-   "id": "P09_103_0000011744",
-   "video": "P09_103",
+   "id": "P08_17_0000004194",
+   "video": "P08_17",
    "split": "val",
-   "first_visor_frame": 11744,
-   "last_visor_frame": 11983,
+   "first_visor_frame": 4194,
+   "last_visor_frame": 4433,
    "frames": 240,
-   "first_video_index": 11743,
-   "fps": 50.0,
-   "video_class": "hevc 1920x1080 50.000",
+   "first_video_index": 4189,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
    "run": {
-    "first": 11744,
-    "last": 12094,
-    "eligible_runs": 9,
-    "runs": 18
+    "first": 4194,
+    "last": 4459,
+    "windows": 58,
+    "eligible_windows": 13,
+    "runs": 33
+   },
+   "keyframes": [
+    0
+   ],
+   "labels": [
+    "left hand",
+    "right hand"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P08_17_frame_0000004194.jpg"
+   ],
+   "dense_member": "dense/P08_17_interpolations.zip",
+   "dense_sha256": "da32ffd4f1359d1679cbc76e61d3950b994c9fa7735ceb27fb87140cc3ad07ef",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P08_17.MP4",
+    "bytes": 2209620555,
+    "sha256": "5a61491356e4c3ede9933c4f38e200b8490ebb3725d1c1d0a829546e806d85fb"
+   }
+  },
+  {
+   "id": "P09_02_0000009646",
+   "video": "P09_02",
+   "split": "val",
+   "first_visor_frame": 9646,
+   "last_visor_frame": 9885,
+   "frames": 240,
+   "first_video_index": 9636,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 9646,
+    "last": 10026,
+    "windows": 35,
+    "eligible_windows": 6,
+    "runs": 26
    },
    "keyframes": [
     0,
-    163
+    102
    ],
    "labels": [
-    "chicken",
-    "pan",
+    "left hand",
+    "right hand",
     "sink",
     "tap"
    ],
-   "start_jpeg": "rgb_frames/P09_103_frame_0000011744.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P09_02_frame_0000009646.jpg",
+    "rgb_frames/P09_02_frame_0000009748.jpg"
+   ],
+   "dense_member": "dense/P09_02_interpolations.zip",
+   "dense_sha256": "6c33ca2fe914932db0077a52e5b71fca6d0a728c6b49b2b63ed2cb57222fc568",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P09_02.MP4",
+    "bytes": 1394381323,
+    "sha256": "25df6d30f32e04878457b567704356b68840d279f06df10999dac5f0b8477864"
+   }
+  },
+  {
+   "id": "P09_103_0000017124",
+   "video": "P09_103",
+   "split": "val",
+   "first_visor_frame": 17124,
+   "last_visor_frame": 17363,
+   "frames": 240,
+   "first_video_index": 17123,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 16884,
+    "last": 17601,
+    "windows": 16,
+    "eligible_windows": 11,
+    "runs": 18
+   },
+   "keyframes": [
+    133
+   ],
+   "labels": [
+    "chicken",
+    "hob/cooktop/stovetop",
+    "left hand",
+    "pan",
+    "right hand",
+    "spoon"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P09_103_frame_0000017257.jpg"
+   ],
    "dense_member": "dense/P09_103_interpolations.zip",
    "dense_sha256": "e12921c9bde6740cb6a771a37bf2cd14d2e1df97c5988fd8e217a1c1eb4e35de",
    "video_file": {
@@ -504,34 +1168,40 @@
    }
   },
   {
-   "id": "P09_104_0000019201",
+   "id": "P09_104_0000017863",
    "video": "P09_104",
    "split": "val",
-   "first_visor_frame": 19201,
-   "last_visor_frame": 19440,
+   "first_visor_frame": 17863,
+   "last_visor_frame": 18102,
    "frames": 240,
-   "first_video_index": 19200,
+   "first_video_index": 17862,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 19201,
-    "last": 20301,
-    "eligible_runs": 14,
+    "first": 17623,
+    "last": 18298,
+    "windows": 33,
+    "eligible_windows": 15,
     "runs": 25
    },
    "keyframes": [
-    0,
-    25,
-    129,
-    195
+    38,
+    144
    ],
    "labels": [
-    "blender jug",
+    "chorizo",
+    "hob/cooktop/stovetop",
     "left hand",
+    "lid",
+    "oil bottle",
+    "pan",
     "right hand",
-    "socket"
+    "spoon"
    ],
-   "start_jpeg": "rgb_frames/P09_104_frame_0000019201.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P09_104_frame_0000017901.jpg",
+    "rgb_frames/P09_104_frame_0000018007.jpg"
+   ],
    "dense_member": "dense/P09_104_interpolations.zip",
    "dense_sha256": "0bd5929ae08060bf7b88864d1fd537562ba3fd2f6b2e941569775662b86cf921",
    "video_file": {
@@ -541,35 +1211,33 @@
    }
   },
   {
-   "id": "P09_106_0000002521",
+   "id": "P09_106_0000006303",
    "video": "P09_106",
    "split": "val",
-   "first_visor_frame": 2521,
-   "last_visor_frame": 2760,
+   "first_visor_frame": 6303,
+   "last_visor_frame": 6542,
    "frames": 240,
-   "first_video_index": 2520,
+   "first_video_index": 6302,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 2521,
-    "last": 3392,
-    "eligible_runs": 4,
+    "first": 6063,
+    "last": 6563,
+    "windows": 7,
+    "eligible_windows": 1,
     "runs": 7
    },
    "keyframes": [
-    0,
-    67,
-    113
+    227
    ],
    "labels": [
-    "food",
-    "hob",
+    "fork",
     "left hand",
-    "lid",
-    "plate",
     "right hand"
    ],
-   "start_jpeg": "rgb_frames/P09_106_frame_0000002521.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P09_106_frame_0000006530.jpg"
+   ],
    "dense_member": "dense/P09_106_interpolations.zip",
    "dense_sha256": "bbd99dbc7f42e9c52cf611dbc4a4ae38acec1ded777007e2ccb43952a9abf9ba",
    "video_file": {
@@ -579,35 +1247,127 @@
    }
   },
   {
-   "id": "P22_107_0000009538",
-   "video": "P22_107",
+   "id": "P18_01_0000008154",
+   "video": "P18_01",
    "split": "val",
-   "first_visor_frame": 9538,
-   "last_visor_frame": 9777,
+   "first_visor_frame": 8154,
+   "last_visor_frame": 8393,
    "frames": 240,
-   "first_video_index": 9537,
-   "fps": 50.0,
-   "video_class": "hevc 1920x1080 50.000",
+   "first_video_index": 8144,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
    "run": {
-    "first": 9538,
-    "last": 10476,
-    "eligible_runs": 18,
-    "runs": 39
+    "first": 7674,
+    "last": 8791,
+    "windows": 14,
+    "eligible_windows": 1,
+    "runs": 14
+   },
+   "keyframes": [
+    36,
+    210
+   ],
+   "labels": [
+    "bread package",
+    "left hand",
+    "plate",
+    "right hand",
+    "spreading knife"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P18_01_frame_0000008190.jpg",
+    "rgb_frames/P18_01_frame_0000008364.jpg"
+   ],
+   "dense_member": "dense/P18_01_interpolations.zip",
+   "dense_sha256": "f0ae0f1e02f5ec2b1e42456910dc621a3f5058ae657401b1d3fe9a9069135c8c",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P18_01.MP4",
+    "bytes": 627477250,
+    "sha256": "77df357c858b462a1e3a7abc7a52cf6c3068e60f0602d88823dc413490f24c2e"
+   }
+  },
+  {
+   "id": "P21_01_0000031087",
+   "video": "P21_01",
+   "split": "val",
+   "first_visor_frame": 31087,
+   "last_visor_frame": 31326,
+   "frames": 240,
+   "first_video_index": 31054,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 31087,
+    "last": 32010,
+    "windows": 32,
+    "eligible_windows": 2,
+    "runs": 38
    },
    "keyframes": [
     0,
-    33,
-    67,
-    138,
-    208
+    76,
+    160,
+    196
    ],
    "labels": [
-    "bag",
-    "cupboard",
+    "glass",
+    "grape bag",
     "left hand",
     "right hand"
    ],
-   "start_jpeg": "rgb_frames/P22_107_frame_0000009538.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P21_01_frame_0000031283.jpg",
+    "rgb_frames/P21_01_frame_0000031247.jpg",
+    "rgb_frames/P21_01_frame_0000031087.jpg",
+    "rgb_frames/P21_01_frame_0000031163.jpg"
+   ],
+   "dense_member": "dense/P21_01_interpolations.zip",
+   "dense_sha256": "dc14345c3559631cc2f55b35cbd968f6d5be6d21adb782b45103daa35e0edf08",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P21_01.MP4",
+    "bytes": 2612987022,
+    "sha256": "3868df8d409ba639151ac2610f0008f7a716646f3a2fc084db17bb4b16b6d773"
+   }
+  },
+  {
+   "id": "P22_107_0000012402",
+   "video": "P22_107",
+   "split": "val",
+   "first_visor_frame": 12402,
+   "last_visor_frame": 12641,
+   "frames": 240,
+   "first_video_index": 12401,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 10722,
+    "last": 13222,
+    "windows": 65,
+    "eligible_windows": 28,
+    "runs": 39
+   },
+   "keyframes": [
+    24,
+    57,
+    124,
+    174,
+    211
+   ],
+   "labels": [
+    "bowl",
+    "glass",
+    "left hand",
+    "powder",
+    "right hand",
+    "teaspoon"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P22_107_frame_0000012426.jpg",
+    "rgb_frames/P22_107_frame_0000012459.jpg",
+    "rgb_frames/P22_107_frame_0000012526.jpg",
+    "rgb_frames/P22_107_frame_0000012576.jpg",
+    "rgb_frames/P22_107_frame_0000012613.jpg"
+   ],
    "dense_member": "dense/P22_107_interpolations.zip",
    "dense_sha256": "766ba3ad992f67489368c2ebebb76d9b973448b28965908dedd9714d4cf0b225",
    "video_file": {
@@ -617,32 +1377,116 @@
    }
   },
   {
-   "id": "P25_101_0000007392",
+   "id": "P24_09_0000108111",
+   "video": "P24_09",
+   "split": "val",
+   "first_visor_frame": 108111,
+   "last_visor_frame": 108350,
+   "frames": 240,
+   "first_video_index": 108001,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 108111,
+    "last": 108397,
+    "windows": 160,
+    "eligible_windows": 14,
+    "runs": 82
+   },
+   "keyframes": [
+    0
+   ],
+   "labels": [
+    "bowl",
+    "left hand",
+    "right hand"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P24_09_frame_0000108111.jpg"
+   ],
+   "dense_member": "dense/P24_09_interpolations.zip",
+   "dense_sha256": "dde4c5fd23dfd70e830b98bd010835b2d4c41cc06667af68c4995eb3883bdae9",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P24_09.MP4",
+    "bytes": 7409563733,
+    "sha256": "4af7a6343db819e308d1c253e71d97836365303ea667e612c9d4d2490a5a99dd"
+   }
+  },
+  {
+   "id": "P25_09_0000021701",
+   "video": "P25_09",
+   "split": "val",
+   "first_visor_frame": 21701,
+   "last_visor_frame": 21940,
+   "frames": 240,
+   "first_video_index": 21679,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 20261,
+    "last": 23013,
+    "windows": 50,
+    "eligible_windows": 9,
+    "runs": 34
+   },
+   "keyframes": [
+    72
+   ],
+   "labels": [
+    "bowl",
+    "left hand",
+    "pan",
+    "right hand",
+    "vinegar"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P25_09_frame_0000021773.jpg"
+   ],
+   "dense_member": "dense/P25_09_interpolations.zip",
+   "dense_sha256": "4c53fd7b396d522dabe06e33763c38bd11fa80d6d1f1e3f03c658f2de833b563",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P25_09.MP4",
+    "bytes": 3299755901,
+    "sha256": "342a3374723cfaa19e71ced11c91fecdfeb8c816df43d2414cec56ac938610f6"
+   }
+  },
+  {
+   "id": "P25_101_0000012336",
    "video": "P25_101",
    "split": "val",
-   "first_visor_frame": 7392,
-   "last_visor_frame": 7631,
+   "first_visor_frame": 12336,
+   "last_visor_frame": 12575,
    "frames": 240,
-   "first_video_index": 7391,
+   "first_video_index": 12335,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 7392,
-    "last": 9357,
-    "eligible_runs": 12,
+    "first": 12096,
+    "last": 12819,
+    "windows": 47,
+    "eligible_windows": 25,
     "runs": 18
    },
    "keyframes": [
     0,
-    51,
-    203
+    44,
+    123,
+    181
    ],
    "labels": [
+    "hob",
     "left hand",
-    "oil bottle",
+    "meat",
+    "pan",
+    "plate",
     "right hand"
    ],
-   "start_jpeg": "rgb_frames/P25_101_frame_0000007392.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P25_101_frame_0000012459.jpg",
+    "rgb_frames/P25_101_frame_0000012517.jpg",
+    "rgb_frames/P25_101_frame_0000012336.jpg",
+    "rgb_frames/P25_101_frame_0000012380.jpg"
+   ],
    "dense_member": "dense/P25_101_interpolations.zip",
    "dense_sha256": "09c972ebb4e115f87a74b8b605d305e78f2451836792da06252a33d77f75c2c8",
    "video_file": {
@@ -652,34 +1496,72 @@
    }
   },
   {
-   "id": "P26_108_0000002602",
-   "video": "P26_108",
+   "id": "P26_02_0000001071",
+   "video": "P26_02",
    "split": "val",
-   "first_visor_frame": 2602,
-   "last_visor_frame": 2841,
+   "first_visor_frame": 1071,
+   "last_visor_frame": 1310,
    "frames": 240,
-   "first_video_index": 2601,
-   "fps": 50.0,
-   "video_class": "hevc 1920x1080 50.000",
+   "first_video_index": 1069,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
    "run": {
-    "first": 2602,
-    "last": 3394,
-    "eligible_runs": 6,
-    "runs": 13
+    "first": 1071,
+    "last": 2855,
+    "windows": 26,
+    "eligible_windows": 2,
+    "runs": 36
    },
    "keyframes": [
     0,
-    211
+    102
    ],
    "labels": [
-    "food",
-    "hob/cooktop/stovetop",
+    "chicken breast package",
+    "hob",
     "left hand",
-    "lid",
-    "pan",
+    "pot",
     "right hand"
    ],
-   "start_jpeg": "rgb_frames/P26_108_frame_0000002602.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P26_02_frame_0000001071.jpg",
+    "rgb_frames/P26_02_frame_0000001173.jpg"
+   ],
+   "dense_member": "dense/P26_02_interpolations.zip",
+   "dense_sha256": "39f205a068b4d23dfcac8c7754ff34c9bf6a3e279357229b595be3195c1c8e6d",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P26_02.MP4",
+    "bytes": 1750462230,
+    "sha256": "3c86ea341923898173d30f398135038d10f4b8957bfa0ef25e9c620f19d4811f"
+   }
+  },
+  {
+   "id": "P26_108_0000000915",
+   "video": "P26_108",
+   "split": "val",
+   "first_visor_frame": 915,
+   "last_visor_frame": 1154,
+   "frames": 240,
+   "first_video_index": 914,
+   "fps": 50.0,
+   "video_class": "hevc 1920x1080 50.000",
+   "run": {
+    "first": 675,
+    "last": 1313,
+    "windows": 9,
+    "eligible_windows": 3,
+    "runs": 13
+   },
+   "keyframes": [
+    161
+   ],
+   "labels": [
+    "left hand",
+    "right hand"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P26_108_frame_0000001076.jpg"
+   ],
    "dense_member": "dense/P26_108_interpolations.zip",
    "dense_sha256": "ebf04a94d5ffb39749fc910fc632779f28bb09466d055c3dc320a8774295a393",
    "video_file": {
@@ -689,39 +1571,33 @@
    }
   },
   {
-   "id": "P27_105_0000040726",
+   "id": "P27_105_0000038676",
    "video": "P27_105",
    "split": "val",
-   "first_visor_frame": 40726,
-   "last_visor_frame": 40965,
+   "first_visor_frame": 38676,
+   "last_visor_frame": 38915,
    "frames": 240,
-   "first_video_index": 40725,
+   "first_video_index": 38675,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 40726,
-    "last": 41817,
-    "eligible_runs": 20,
+    "first": 35076,
+    "last": 39028,
+    "windows": 86,
+    "eligible_windows": 30,
     "runs": 57
    },
    "keyframes": [
-    0,
-    37,
-    70,
-    122,
-    148,
-    175,
-    225
+    37
    ],
    "labels": [
-    "left hand",
-    "paper piece",
-    "right hand",
-    "sandwich",
-    "small sandwich",
-    "table"
+    "package",
+    "right hand"
    ],
-   "start_jpeg": "rgb_frames/P27_105_frame_0000040726.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P27_105_frame_0000038713.jpg",
+    "rgb_frames/P27_105_frame_0000038759.jpg"
+   ],
    "dense_member": "dense/P27_105_interpolations.zip",
    "dense_sha256": "6ceb9748d93d3a9ecd27beb9318cea0dab5e252c0c019972e874bdf90eb40d08",
    "video_file": {
@@ -731,35 +1607,113 @@
    }
   },
   {
-   "id": "P30_110_0000011211",
+   "id": "P28_05_0000030047",
+   "video": "P28_05",
+   "split": "val",
+   "first_visor_frame": 30047,
+   "last_visor_frame": 30286,
+   "frames": 240,
+   "first_video_index": 30015,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 29327,
+    "last": 30963,
+    "windows": 16,
+    "eligible_windows": 2,
+    "runs": 25
+   },
+   "keyframes": [
+    31
+   ],
+   "labels": [
+    "carrot",
+    "chopping board",
+    "left hand",
+    "right hand"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P28_05_frame_0000030078.jpg"
+   ],
+   "dense_member": "dense/P28_05_interpolations.zip",
+   "dense_sha256": "15a27df78d7258337f319c13e1262467436cd7c3fd1570ba97d3de9a6b1dc666",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P28_05.MP4",
+    "bytes": 1974754140,
+    "sha256": "55a1f251fa602e4ebad1c7aae2b9bffa7453799684d556d3d37e6477b7204355"
+   }
+  },
+  {
+   "id": "P30_07_0000005463",
+   "video": "P30_07",
+   "split": "val",
+   "first_visor_frame": 5463,
+   "last_visor_frame": 5702,
+   "frames": 240,
+   "first_video_index": 5457,
+   "fps": 59.94005994005994,
+   "video_class": "h264 1920x1080 59.940",
+   "run": {
+    "first": 4503,
+    "last": 5896,
+    "windows": 36,
+    "eligible_windows": 5,
+    "runs": 24
+   },
+   "keyframes": [
+    92,
+    184
+   ],
+   "labels": [
+    "coffee bag",
+    "coffee grinder",
+    "left hand",
+    "right hand"
+   ],
+   "sparse_jpegs": [
+    "rgb_frames/P30_07_frame_0000005555.jpg",
+    "rgb_frames/P30_07_frame_0000005647.jpg"
+   ],
+   "dense_member": "dense/P30_07_interpolations.zip",
+   "dense_sha256": "6d7c211a5ab08ca4a6e847ea4d42942efc54ddbd9a1e3dcee859c4d4392c84d6",
+   "video_file": {
+    "path": "/home/itec/emanuele/Datasets/EPIC-KITCHENS-VISOR/epic_kitchens_videos/P30_07.MP4",
+    "bytes": 1151625339,
+    "sha256": "3de0d340a8f0546cb3bcd57e07aff989505cc3d7c20ac02ab45f5cd45c6100a6"
+   }
+  },
+  {
+   "id": "P30_110_0000007526",
    "video": "P30_110",
    "split": "val",
-   "first_visor_frame": 11211,
-   "last_visor_frame": 11450,
+   "first_visor_frame": 7526,
+   "last_visor_frame": 7765,
    "frames": 240,
-   "first_video_index": 11210,
+   "first_video_index": 7525,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 11211,
-    "last": 12509,
-    "eligible_runs": 11,
+    "first": 7286,
+    "last": 8521,
+    "windows": 31,
+    "eligible_windows": 15,
     "runs": 18
    },
    "keyframes": [
-    0,
-    165,
-    194
+    0
    ],
    "labels": [
     "coffee",
     "filter paper",
     "jug",
+    "kettle",
     "left hand",
-    "mug",
-    "right hand"
+    "right hand",
+    "v60/pourover coffee maker"
    ],
-   "start_jpeg": "rgb_frames/P30_110_frame_0000011211.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P30_110_frame_0000007526.jpg"
+   ],
    "dense_member": "dense/P30_110_interpolations.zip",
    "dense_sha256": "72fe5ed18bf24c2f52db6734453db0bb9a69aa4309eb92648f92cb76c4f18024",
    "video_file": {
@@ -769,32 +1723,39 @@
    }
   },
   {
-   "id": "P37_102_0000001271",
+   "id": "P37_102_0000018801",
    "video": "P37_102",
    "split": "val",
-   "first_visor_frame": 1271,
-   "last_visor_frame": 1510,
+   "first_visor_frame": 18801,
+   "last_visor_frame": 19040,
    "frames": 240,
-   "first_video_index": 1270,
+   "first_video_index": 18800,
    "fps": 50.0,
    "video_class": "hevc 1920x1080 50.000",
    "run": {
-    "first": 1271,
-    "last": 3413,
-    "eligible_runs": 22,
+    "first": 17601,
+    "last": 19238,
+    "windows": 64,
+    "eligible_windows": 43,
     "runs": 27
    },
    "keyframes": [
-    0,
-    121
+    12,
+    129,
+    172
    ],
    "labels": [
-    "chicken thigh soup",
-    "hob",
-    "pot",
+    "carrot",
+    "chopping board",
+    "left hand",
+    "plate",
     "right hand"
    ],
-   "start_jpeg": "rgb_frames/P37_102_frame_0000001271.jpg",
+   "sparse_jpegs": [
+    "rgb_frames/P37_102_frame_0000018813.jpg",
+    "rgb_frames/P37_102_frame_0000018930.jpg",
+    "rgb_frames/P37_102_frame_0000018973.jpg"
+   ],
    "dense_member": "dense/P37_102_interpolations.zip",
    "dense_sha256": "fe8688408fc2dc47c0d8a2cddc2c8d44ad696c76f65bd080ef9b2646a0d12540",
    "video_file": {
@@ -806,204 +1767,26 @@
  ],
  "excluded": [
   {
-   "video": "P02_02",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 12410
-   }
-  },
-  {
-   "video": "P02_09",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "2132803497/35582579",
-    "constant_rate": true,
-    "frames": 131858
-   }
-  },
-  {
-   "video": "P02_12",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "78840000/1315333",
-    "constant_rate": true,
-    "frames": 78840
-   }
-  },
-  {
-   "video": "P03_10",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 6160
-   }
-  },
-  {
    "video": "P03_14",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 15589
-   }
+   "reason": "no exactly aligned, hand-complete window",
+   "windows": 8,
+   "runs": 28
   },
   {
    "video": "P03_22",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 3677
-   }
+   "reason": "no exactly aligned, hand-complete window",
+   "windows": 1,
+   "runs": 9
   },
   {
-   "video": "P04_06",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 47248
-   }
-  },
-  {
-   "video": "P04_13",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 18837
-   }
-  },
-  {
-   "video": "P04_24",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 30093
-   }
-  },
-  {
-   "video": "P06_03",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 41123
-   }
-  },
-  {
-   "video": "P06_05",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "1665954567/27794041",
-    "constant_rate": true,
-    "frames": 86569
-   }
-  },
-  {
-   "video": "P06_10",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 14564
-   }
-  },
-  {
-   "video": "P08_17",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 35131
-   }
-  },
-  {
-   "video": "P09_02",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 22159
-   }
+   "video": "P07_103",
+   "reason": "no exactly aligned, hand-complete window",
+   "windows": 5,
+   "runs": 2
   },
   {
    "video": "P09_07",
-   "reason": "class h264 1920x1080 29.970 is not exactly aligned",
+   "reason": "class h264 1920x1080 29.970 is not verified 1080p one-to-one",
    "class": {
     "key": "h264 1920x1080 29.970",
     "codec": "h264",
@@ -1017,7 +1800,7 @@
   },
   {
    "video": "P12_04",
-   "reason": "class h264 1280x720 59.940 is not exactly aligned",
+   "reason": "class h264 1280x720 59.940 is not verified 1080p one-to-one",
    "class": {
     "key": "h264 1280x720 59.940",
     "codec": "h264",
@@ -1030,22 +1813,8 @@
    }
   },
   {
-   "video": "P18_01",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 9976
-   }
-  },
-  {
    "video": "P18_02",
-   "reason": "class h264 1920x1080 29.970 is not exactly aligned",
+   "reason": "class h264 1920x1080 29.970 is not verified 1080p one-to-one",
    "class": {
     "key": "h264 1920x1080 29.970",
     "codec": "h264",
@@ -1058,130 +1827,22 @@
    }
   },
   {
-   "video": "P21_01",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 41535
-   }
-  },
-  {
-   "video": "P24_09",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "1654451027/27602001",
-    "constant_rate": true,
-    "frames": 117997
-   }
-  },
-  {
-   "video": "P25_09",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 52525
-   }
-  },
-  {
    "video": "P26_01",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 4778
-   }
-  },
-  {
-   "video": "P26_02",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 27854
-   }
-  },
-  {
-   "video": "P28_05",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 31394
-   }
+   "reason": "no exactly aligned, hand-complete window",
+   "windows": 5,
+   "runs": 8
   },
   {
    "video": "P29_04",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 10766
-   }
-  },
-  {
-   "video": "P30_07",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 18308
-   }
+   "reason": "no exactly aligned, hand-complete window",
+   "windows": 17,
+   "runs": 22
   },
   {
    "video": "P32_07",
-   "reason": "class h264 1920x1080 59.940 is not exactly aligned",
-   "class": {
-    "key": "h264 1920x1080 59.940",
-    "codec": "h264",
-    "width": 1920,
-    "height": 1080,
-    "r_frame_rate": "60000/1001",
-    "avg_frame_rate": "60000/1001",
-    "constant_rate": true,
-    "frames": 1737
-   }
+   "reason": "no exactly aligned, hand-complete window",
+   "windows": 1,
+   "runs": 1
   }
  ]
 }
