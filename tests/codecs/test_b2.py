@@ -183,3 +183,15 @@ def test_curves_average_items_per_video_type() -> None:
     out = b2.curves([item("a", "EK-100", 100), item("b", "EK-55", 300)], ["v"])
     assert out["all"]["v"][0]["kbps"] == 200 and out["all"]["v"][0]["items"] == 2
     assert out["EK-55"]["v"][0]["kbps"] == 300 and out["EK-100"]["v"][0]["missing_object_share"] == 0.5
+
+
+def test_rate_points_cover_the_common_range_below_the_cap() -> None:
+    av1 = [(62, 400, 34.0), (55, 900, 36.5), (48, 1400, 37.5), (41, 2200, 38.5), (34, 4200, 39.8), (27, 8600, 41.2)]
+    dcvc = [(9, 200, 31.0), (18, 350, 33.0), (27, 600, 35.0), (36, 1000, 36.8), (45, 1700, 38.0), (54, 3000, 39.6), (63, 6000, 41.0)]
+    out = b2.choose_points({"svtav1": [(float(a), float(b), c) for a, b, c in av1],
+                            "dcvc": [(float(a), float(b), c) for a, b, c in dcvc]})
+    assert out["range_db"] == [34.0, 38.5]
+    # SVT-AV1 has nothing below the range; DCVC-UF adds its point just below it (QP 18).
+    assert out["points"]["svtav1"] == [41.0, 48.0, 55.0, 62.0]
+    assert 18.0 in out["points"]["dcvc"] and 54.0 not in out["points"]["dcvc"]
+    assert out["refine_first"] is False

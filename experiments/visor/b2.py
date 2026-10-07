@@ -719,6 +719,79 @@ def command_report(args: argparse.Namespace) -> int:
     return 0
 
 
+# ----------------------------------------------------------------- choose (pilot decision rule)
+
+#: Rate cap of the pilot rule: a third of the lowest pilot source bitrate (9.7 Mbps).
+CAP_KBPS = 3200.0
+TARGETS = 6
+MIN_RANGE_DB = 3.0
+MIN_POINTS = 4
+STRUCTURE_GAIN = -3.0
+
+
+def mean_curve(result: dict[str, Any], mask_set: str = "visor_dense") -> list[tuple[float, float, float]]:
+    """(point, mean kbps, mean weighted PSNR) over all items, by rate."""
+    rows = result["curves"]["all"][mask_set]
+    return sorted(((r["point"], r["kbps"], r["wpsnr"]) for r in rows), key=lambda r: r[1])
+
+
+def choose_points(curves: dict[str, list[tuple[float, float, float]]]) -> dict[str, Any]:
+    """The pilot rule of docs/experiments.md (B2): rate points per codec over the common quality range."""
+    def capped_high(curve: list[tuple[float, float, float]]) -> float:
+        under = [q for _, kbps, q in curve if kbps < CAP_KBPS]
+        return max(under) if under else min(q for _, _, q in curve)
+
+    low = max(min(q for _, _, q in c) for c in curves.values())
+    high = min(capped_high(c) for c in curves.values())
+    targets = [low + (high - low) * i / (TARGETS - 1) for i in range(TARGETS)]
+    chosen: dict[str, Any] = {}
+    for codec, curve in curves.items():
+        picks: list[float] = []
+        for target in targets:
+            point = min(curve, key=lambda r: abs(r[2] - target))[0]
+            if point not in picks:
+                picks.append(point)
+        below = [r for r in curve if r[2] < low]
+        extra = max(below, key=lambda r: r[2])[0] if below else None
+        if extra is not None and extra not in picks:
+            picks.append(extra)
+        chosen[codec] = sorted(picks)
+    return {
+        "range_db": [round(low, 3), round(high, 3)], "targets_db": [round(t, 3) for t in targets],
+        "points": chosen,
+        "refine_first": high - low < MIN_RANGE_DB or any(len(p) < MIN_POINTS for p in chosen.values()),
+    }
+
+
+def command_choose(args: argparse.Namespace) -> int:
+    results = {name: json.loads(Path(path).read_text()) for name, path in parse_named(args.result).items()}
+    structures = {n: r for n, r in results.items() if r["codec"] == "dcvc"}
+    anchor = next(r for r in results.values() if r["codec"] == "svtav1")
+    decision: dict[str, Any] = {"inputs": parse_named(args.result)}
+    chosen_structure = "hts"
+    if {"hts", "htl"} <= {r["config"]["structure"] for r in structures.values()}:
+        by = {r["config"]["structure"]: {i["id"]: i for i in r["items"]} for r in structures.values()}
+        per_item = {}
+        for item_id in sorted(set(by["hts"]) & set(by["htl"])):
+            pairs = []
+            for structure in ("hts", "htl"):
+                pts = sorted(by[structure][item_id]["points"], key=lambda p: p["kbps"])
+                pairs.append(([p["kbps"] for p in pts], [p["summary"]["mask_sets"]["visor_dense"]["wpsnr"] for p in pts]))
+            per_item[item_id] = bd_rate(pairs[0][0], pairs[0][1], pairs[1][0], pairs[1][1])
+        values = [v for v in per_item.values() if v is not None]
+        gain = float(np.mean(values)) if values else None
+        chosen_structure = "htl" if gain is not None and gain < STRUCTURE_GAIN else "hts"
+        decision["structure"] = {"htl_vs_hts_bd_rate_wpsnr_per_item": per_item, "mean": gain,
+                                 "threshold": STRUCTURE_GAIN, "chosen": chosen_structure}
+    dcvc = next(r for r in structures.values() if r["config"]["structure"] == chosen_structure)
+    decision["rate_points"] = choose_points({"svtav1": mean_curve(anchor), "dcvc": mean_curve(dcvc)})
+    decision["curves"] = {"svtav1": mean_curve(anchor), "dcvc": mean_curve(dcvc)}
+    print(json.dumps(decision, indent=1))
+    if args.out:
+        write_json(Path(args.out), decision)
+    return 0
+
+
 # ----------------------------------------------------------------- main
 
 def main(argv: list[str] | None = None) -> int:
@@ -751,10 +824,13 @@ def main(argv: list[str] | None = None) -> int:
     report = sub.add_parser("report")
     report.add_argument("--result", action="append", required=True, help="NAME=b2.json; with two, the second is compared against the first")
     report.add_argument("--out", required=True)
+    choose = sub.add_parser("choose", help="apply the pilot rule: DCVC-UF structure and rate points")
+    choose.add_argument("--result", action="append", required=True, help="NAME=pilot b2.json (SVT-AV1, DCVC-UF HT-S, HT-L)")
+    choose.add_argument("--out")
     args = parser.parse_args(argv)
     if args.command == "run" and args.codec == "dcvc" and not (args.image_ckpt and args.video_ckpt):
         parser.error("dcvc needs --image-ckpt and --video-ckpt")
-    return {"run": command_run, "validate": command_validate, "report": command_report}[args.command](args)
+    return {"run": command_run, "validate": command_validate, "report": command_report, "choose": command_choose}[args.command](args)
 
 
 if __name__ == "__main__":
