@@ -1,7 +1,7 @@
 """PLAN step B1b: fill VISOR's missing hands and objects with SAM 3.1, and validate the fill.
 
     python -m experiments.visor.b1b fill --eval-set JSON --archive DIR --masks DIR --mask-record JSON \\
-        --hand-objects DIR --checkpoint PT --video V.MP4 ... --items all|ID,ID --pairs N --review K
+        --hand-objects DIR --checkpoint PT --video V.MP4 ... --items all|ID,ID --review K
     python -m experiments.visor.b1b validate
     python -m experiments.visor.b1b report --result b1b.json ... --out DIR
 
@@ -23,9 +23,12 @@
    labelled at ``a`` but not at ``b`` score whether SAM also lets them go.
    Objects that VISOR's dense masks drop between ``a`` and ``b`` are flagged:
    they are the ones the fill is for, and the hard cases.
-4. *Fill.* SAM 3.1 is prompted with the human masks at every keyframe of the
-   span (an empty mask where an object is not labelled) and tracks forward
-   through it. On each window frame, every object the dense masks lack
+4. *Fill.* Per gap, SAM 3.1 is also prompted with the human masks at ``b``
+   and tracks backward to the gap's midpoint; each frame takes the prediction
+   from its nearer keyframe (the forward run of step 3 for the first half).
+   Multiplex SAM 3.1 takes mask prompts only on the first frame of a fresh
+   state, so each direction is its own session. On each window frame, every
+   object the dense masks lack
    (`visor.object_key`) and SAM finds (at least ``MIN_AREA`` pixels) is added
    with provenance ``sam_from_label_prompt``; the dense masks are unchanged.
    The mask set is written in B1's ``masks.rle`` format
@@ -121,13 +124,6 @@ class Plan:
         """Span indices of the window's first and last frame."""
         first = int(self.item["first_video_index"]) - self.span_start
         return first, first + int(self.item["frames"]) - 1
-
-    def prompts(self, indices: list[int]) -> dict[int, dict[int, np.ndarray]]:
-        """Every object on every given keyframe: the human mask, or empty where it is not labelled."""
-        return {
-            index: {o.object_id: self.human[index].get(o.object_id, np.zeros(self.shape, bool)) for o in self.objects}
-            for index in indices
-        }
 
     def pairs(self) -> list[tuple[int, int]]:
         ordered = sorted(self.keyframes.values())
@@ -418,7 +414,7 @@ def load_inputs(item: dict[str, Any], archive: Path) -> tuple[dict[str, Any], di
 
 def process_item(tracker: Any, plan: Plan, frames_dir: Path, dense_doc: dict[str, Any], sparse: dict[str, Any],
                  dense_clip: ClipMasks, detections: list[hand_objects.FrameDetections], publish: Path,
-                 max_pairs: int, review: int, profile: bool) -> dict[str, Any]:
+                 review: int, profile: bool) -> dict[str, Any]:
     item = plan.item
     timing: dict[str, float] = {}
     began = time.time()
@@ -430,72 +426,78 @@ def process_item(tracker: Any, plan: Plan, frames_dir: Path, dense_doc: dict[str
     inverse = {index: number for number, index in plan.keyframes.items()}
     kernels: dict[str, Any] = {}
 
-    # Held-out validation: prompt at a, score at b.
+    # Per keyframe gap a < b: SAM prompted at a tracks forward to b (the held-out run, scored at b,
+    # which it never saw), and prompted at b tracks backward to the midpoint. Each frame of the
+    # fill takes the prediction from its nearer keyframe.
     began = time.time()
     rows: list[dict[str, Any]] = []
     hand_check: dict[str, Counter[str]] = defaultdict(Counter)
-    pairs = plan.pairs()[: max_pairs] if max_pairs > 0 else plan.pairs()
     fps = float(item["fps"])
-    for number, (a, b) in enumerate(pairs):
-        labelled = sorted(plan.human[a])
-        if not labelled:
-            continue
-        prompt = {0: {o: plan.human[a][o] for o in labelled}}
-        segment = images[a:b + 1]
+    window_first, window_last = plan.window
+    sam: dict[int, dict[int, tuple[dict[str, Any], float]]] = {}
+    sam_masks_review: dict[int, dict[int, np.ndarray]] = {}
+    review_at = set(review_frames(plan, review))
+    prompt_agreement: list[float] = []
+    tracked = {"forward": 0, "backward": 0}
 
-        def run(segment: Any = segment, prompt: dict[int, dict[int, np.ndarray]] = prompt) -> list[tuple[int, dict[int, tuple[np.ndarray, float]]]]:
-            return list(tracker.track(segment, height, width, prompt))
+    def keep(index: int, objects: dict[int, tuple[np.ndarray, float]]) -> None:
+        if index in plan.human:
+            for obj_id, mask in plan.human[index].items():
+                if obj_id in objects:
+                    prompt_agreement.append(region_scores(objects[obj_id][0], mask)["iou"])
+        if window_first <= index <= window_last:
+            sam[index] = {o: (encode_rle(m), p) for o, (m, p) in objects.items() if m.sum() >= MIN_AREA}
+        if index in review_at:
+            sam_masks_review[index] = {o: m for o, (m, _) in objects.items() if m.sum() >= MIN_AREA}
 
-        if profile and number == 0:
-            # Kernels and attention family from a short separate run; the profiler would bloat on a whole pair.
-            from experiments.audit.env_smoke import profile_cuda
+    for number, (a, b) in enumerate(plan.pairs()):
+        middle = a + (b - a) // 2
+        forward: dict[int, dict[int, tuple[np.ndarray, float]]] = {}
+        if plan.human[a]:
+            prompt = {0: dict(plan.human[a])}
+            if profile and number == 0:
+                # Kernels and attention family from a short separate run; the profiler would bloat on a whole gap.
+                from experiments.audit.env_smoke import profile_cuda
 
-            _, kernels = profile_cuda(lambda: list(tracker.track(images[a:a + 4], height, width, prompt)))
-        outputs = run()
-        by_frame = dict(outputs)
-        dropped = {o.key for o in plan.objects
-                   if any(o.key not in keys_by_frame.get(n, set()) for n in range(inverse[a] + 1, inverse[b]))}
-        rows.extend(score_pair(plan, a, b, by_frame[b - a], dropped))
-        # SAM's hands on the in-between window frames against the detector; the dense hands on
-        # the same frames are the calibration.
+                _, kernels = profile_cuda(lambda: list(tracker.track(images[a:a + 4], height, width, prompt)))
+            forward = dict(tracker.track(images[a:b + 1], height, width, prompt))
+            tracked["forward"] += b - a + 1
+            dropped = {o.key for o in plan.objects
+                       if any(o.key not in keys_by_frame.get(n, set()) for n in range(inverse[a] + 1, inverse[b]))}
+            rows.extend(score_pair(plan, a, b, forward[b - a], dropped))
+        backward: dict[int, dict[int, tuple[np.ndarray, float]]] = {}
+        if plan.human[b]:
+            last = b - (middle + 1)
+            backward = dict(tracker.track(images[middle + 1:b + 1], height, width, {last: dict(plan.human[b])},
+                                          start=last, reverse=True))
+            tracked["backward"] += last + 1
+        for index in range(a, b + 1):
+            if index <= middle:
+                keep(index, forward.get(index - a, {}))
+            else:
+                keep(index, backward.get(index - middle - 1, {}))
+        # SAM's held-out hands on the in-between window frames against the detector; the dense
+        # hands on the same frames are the calibration.
         for offset in range(1, b - a):
-            i = a + offset - plan.window[0]
-            if not 0 <= i < len(dense_clip):
+            i = a + offset - window_first
+            if not 0 <= i < len(dense_clip) or offset not in forward:
                 continue
             epic = video_to_epic_frame(plan.span_start + a + offset, fps)
             if epic is None:
                 continue
             hands = hand_objects.hands_at(detections, epic, min_score=HAND_SCORE)
             for obj in plan.objects:
-                if obj.class_name not in visor.HANDS or obj.object_id not in by_frame[offset]:
+                if obj.class_name not in visor.HANDS or obj.object_id not in forward[offset]:
                     continue
-                mask = by_frame[offset][obj.object_id][0]
+                mask = forward[offset][obj.object_id][0]
                 if mask.sum() >= MIN_AREA:
                     hand_check["sam_heldout"][hand_agreement(mask, obj.class_name, hands)] += 1
                 dense_hand = dense_clip.class_mask(i, obj.class_name)
                 if dense_hand.sum() >= MIN_AREA:
                     hand_check["dense_same_frames"][hand_agreement(dense_hand, obj.class_name, hands)] += 1
-    timing["validation"] = round(time.time() - began, 2)
-
-    # Production fill: prompts at every keyframe of the span.
-    began = time.time()
-    window_first, window_last = plan.window
-    sam: dict[int, dict[int, tuple[dict[str, Any], float]]] = {}
-    sam_masks_review: dict[int, dict[int, np.ndarray]] = {}
-    review_at = set(review_frames(plan, review))
-    prompt_agreement = []
-    keyframe_indices = sorted(plan.keyframes.values())
-    for index, objects in tracker.track(images, height, width, plan.prompts(keyframe_indices)):
-        if index in plan.human:
-            for obj_id, mask in plan.human[index].items():
-                prompt_agreement.append(region_scores(objects[obj_id][0], mask)["iou"])
-        if window_first <= index <= window_last:
-            sam[index] = {o: (encode_rle(m), p) for o, (m, p) in objects.items() if m.sum() >= MIN_AREA}
-        if index in review_at:
-            sam_masks_review[index] = {o: m for o, (m, _) in objects.items() if m.sum() >= MIN_AREA}
-    timing["fill_tracking"] = round(time.time() - began, 2)
+    timing["tracking"] = round(time.time() - began, 2)
     if set(sam) != set(range(window_first, window_last + 1)):
-        raise RuntimeError(f"{item['id']}: SAM returned {len(sam)} of {window_last - window_first + 1} window frames")
+        raise RuntimeError(f"{item['id']}: SAM covered {len(sam)} of {window_last - window_first + 1} window frames")
 
     began = time.time()
     filled, fill_info = fill_clip(dense_clip, plan, sam)
@@ -555,7 +557,7 @@ def process_item(tracker: Any, plan: Plan, frames_dir: Path, dense_doc: dict[str
         "window_span_indices": [window_first, window_last],
         "keyframes": {str(k): v for k, v in sorted(plan.keyframes.items())},
         "objects": [{"object_id": o.object_id, "class": o.class_name, "label": o.label, "repeat": o.repeat} for o in plan.objects],
-        "pairs_scored": len(pairs), "validation": rows,
+        "pairs_scored": len(plan.pairs()), "frames_tracked": tracked, "validation": rows,
         "prompt_reproduced_iou": {"n": len(prompt_agreement), "min": round(min(prompt_agreement), 4) if prompt_agreement else None,
                                   "median": round(float(np.median(prompt_agreement)), 4) if prompt_agreement else None},
         "fill": fill_info, "masks_rle": str(target), "masks_rle_sha256": file_sha256(target),
@@ -613,7 +615,7 @@ def command_fill(args: argparse.Namespace) -> int:
         detections_sha256 = file_sha256(Path(args.hand_objects) / relative)
         detections = hand_objects.load_detections(Path(args.hand_objects) / relative)
         row = process_item(tracker, plan, scratch / "frames" / item["id"], dense_doc, sparse, dense_clip, detections,
-                           publish, args.pairs, args.review, profile=number == 0)
+                           publish, args.review, profile=number == 0)
         row["decode"] = decoded
         row["dense_record_mask_sha256"] = records[item["id"]]["mask_sha256"]
         row["hand_objects"] = {"path": relative, "sha256": detections_sha256, "manifest_sha256": manifest.get(relative)}
@@ -630,8 +632,8 @@ def command_fill(args: argparse.Namespace) -> int:
                    "masks": args.masks, "mask_record": args.mask_record,
                    "mask_record_sha256": file_sha256(Path(args.mask_record))},
         "sam": {**tracker.load_report, "load_seconds": load_seconds, "runtime": runtime(),
-                "min_area": MIN_AREA, "policy": "forward from the span's first keyframe; every keyframe of the span prompts every object (empty where not labelled)"},
-        "settings": {"pairs": args.pairs, "review": args.review, "box_inside": BOX_INSIDE, "hand_score": HAND_SCORE,
+                "min_area": MIN_AREA, "policy": "per keyframe gap a < b: prompted at a, forward to b (held-out score at b); prompted at b, backward to the midpoint; each frame from its nearer keyframe"},
+        "settings": {"review": args.review, "box_inside": BOX_INSIDE, "hand_score": HAND_SCORE,
                      "decision": DECISION},
         "items": rows,
         "validation_summary": summarize_validation(validation),
@@ -793,7 +795,6 @@ def main(argv: list[str] | None = None) -> int:
     fill.add_argument("--checkpoint", required=True)
     fill.add_argument("--video", action="append", required=True)
     fill.add_argument("--items", required=True, help="all, or comma-separated item ids")
-    fill.add_argument("--pairs", type=int, default=0, help="held-out keyframe pairs per item (0: all)")
     fill.add_argument("--review", type=int, default=2, help="review overlays per item")
     merge = sub.add_parser("merge")
     merge.add_argument("--result", action="append", required=True, help="a fill job's b1b.json; pairs with --masks")

@@ -654,11 +654,15 @@ invocation turns out to be needed.
   floor "hold the mask of a"; objects labelled at a but not at b score whether
   SAM lets them go (`released`: under 64 pixels). Objects the dense masks drop
   between a and b form the *hard subset*: the ones the fill is for.
-  *Fill*: SAM is prompted at every keyframe of the span (human masks; an empty
-  mask where an object is not labelled) and tracks forward; on each window
-  frame, an object the dense masks lack (`visor.object_key`) and SAM finds (at
-  least 64 pixels) is added as tier `sam_from_label_prompt`; dense masks are
-  unchanged. Output: `masks.rle` per item in B1's format.
+  *Fill*: per gap, SAM is also prompted with the human masks at b and tracks
+  backward to the gap's midpoint; each frame takes the prediction from its
+  nearer keyframe (the held-out forward run for the first half). On each
+  window frame, an object the dense masks lack (`visor.object_key`) and SAM
+  finds (at least 64 pixels) is added as tier `sam_from_label_prompt`; dense
+  masks are unchanged. Output: `masks.rle` per item in B1's format. (Changed
+  after the first two smokes, before any evidence: the plan was one session
+  prompted at every keyframe, but multiplex SAM 3.1 takes mask prompts only on
+  the first frame of a fresh state, `20261007T204154Z-9531c0f7`.)
   *Hand boxes*: EPIC-KITCHENS-100 hand-object detections (Shan et al. 2020;
   `Datasets/manifests/EPIC-KITCHENS-hand-objects.json`, detector output, not
   labels). A hand mask agrees when a detected hand of its side (score ≥ 0.5)
@@ -692,7 +696,7 @@ invocation turns out to be needed.
   interpolation found hard (fast motion, occlusion, small objects), so SAM's
   accuracy on all objects overstates it on the filled ones; the hard subset
   tests this. (2) One-sided tracking over a whole keyframe gap is harder than
-  the fill (prompts on both sides, at most half a gap away), so held-out scores
+  the fill (each frame at most half a gap from its prompt), so held-out scores
   understate the fill; the rule accepts that bias as conservative. (3)
   Detector agreement may track the detector's own failures on blurred frames;
   the dense hands on the same frames calibrate it. Pairs within an item are

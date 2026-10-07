@@ -80,9 +80,10 @@ class HoldTracker:
         return list(range(len(list(Path(frames_dir).glob("*.png"))))), *SHAPE
 
     def track(self, images: Any, height: int, width: int, prompts: dict[int, dict[int, np.ndarray]],
-              start: int = 0, frames: int | None = None) -> Any:
-        for index in range(start, len(images)):
-            source = max(p for p in prompts if p <= index)
+              start: int = 0, frames: int | None = None, reverse: bool = False) -> Any:
+        order = range(start, -1, -1) if reverse else range(start, len(images))
+        for index in order:
+            source = min(p for p in prompts if p >= index) if reverse else max(p for p in prompts if p <= index)
             yield index, {o: (m.copy(), 0.9) for o, m in prompts[source].items()}
 
     def peak_gpu_mib(self) -> float:
@@ -102,8 +103,7 @@ def test_plan_bounds_the_window_with_keyframes() -> None:
     assert plan.window == (3, 12)
     assert [(o.class_name, o.label) for o in plan.objects] == [("left hand", "left hand"), ("active object", "cup"),
                                                               ("active object", "knife")]
-    prompts = plan.prompts([0, 10])
-    assert prompts[10][2].sum() == 0 and prompts[10][3].any()  # the cup is absent at 20, the knife present
+    assert sorted(plan.human[10]) == [1, 3]  # at keyframe 20: the hand and the knife, not the cup
     assert plan.pairs() == [(0, 10), (10, 20)]
 
 
@@ -145,20 +145,21 @@ def test_item_end_to_end(tmp_path: Path) -> None:
     anchors = {10: 9, 20: 19, 30: 29}
     clip = visor.clip_masks(dense, 13, 10, fps=50.0, alignment=visor.frame_alignment(dense, anchors), shape=SHAPE)
     row = b1b.process_item(HoldTracker(), plan, frames_dir, dense, sparse_doc(), clip, detections(),
-                           tmp_path / "publish", max_pairs=0, review=2, profile=False)
+                           tmp_path / "publish", review=2, profile=False)
     # Held out: the hand holds still, so SAM (holding) and the floor both score 1 at b.
     hands = [r for r in row["validation"] if r["group"] == "hands"]
     assert [r["J"] for r in hands] == [1.0, 1.0] and all(r["hold_J"] == 1.0 for r in hands)
     cup_a = next(r for r in row["validation"] if r["label"] == "cup" and r["a"] == 0)
     assert cup_a["labelled_b"] is False and cup_a["released"] is False  # holding never lets the cup go
-    # Fill: the cup where the dense masks drop it (VISOR 13-17), and the knife labelled at keyframe 20
-    # that the dense masks never have (VISOR 20-22); nothing else.
+    # Fill: each frame from its nearer keyframe. VISOR 13-15 are nearer keyframe 10 (hand, cup): the
+    # cup the dense masks drop there is added. VISOR 16-22 are nearer keyframe 20 (hand, knife): the
+    # knife the dense masks never have is added, and the cup is not (unlabelled at 20).
     filled = ClipMasks.load(tmp_path / "publish" / "masks" / ITEM["id"] / "masks.rle")
     added = {i: [inst.label for inst in f if inst.provenance == b1b.SAM_TIER] for i, f in enumerate(filled.frames)}
-    assert added == {**{i: ["cup"] for i in range(5)}, 5: [], 6: [], **{i: ["knife"] for i in (7, 8, 9)}}
-    assert row["fill"]["instances_added"] == {"active object": 8}
+    assert added == {**{i: ["cup"] for i in range(3)}, **{i: ["knife"] for i in range(3, 10)}}
+    assert row["fill"]["instances_added"] == {"active object": 10}
     assert all(inst.track_id > b1b.FILL_TRACK_BASE for f in filled.frames for inst in f if inst.provenance == b1b.SAM_TIER)
-    assert [len(f) for f in filled.frames[5:7]] == [len(f) for f in clip.frames[5:7]]
+    assert row["frames_tracked"] == {"forward": 22, "backward": 10}  # gaps share their keyframe
     before, after = row["missing_objects"]["visor_dense"], row["missing_objects"]["visor_dense_sam_fill"]
     assert after["mean_share"] < before["mean_share"]
     assert row["prompt_reproduced_iou"]["median"] == 1.0
@@ -197,7 +198,7 @@ def test_validator_on_a_written_result(tmp_path: Path, monkeypatch: pytest.Monke
     clip = visor.clip_masks(dense, 13, 10, fps=50.0, alignment=visor.frame_alignment(dense, {10: 9, 20: 19, 30: 29}),
                             shape=SHAPE)
     row = b1b.process_item(HoldTracker(), plan, frames_dir, dense, sparse_doc(), clip, detections(),
-                           tmp_path / "publish", max_pairs=0, review=2, profile=False)
+                           tmp_path / "publish", review=2, profile=False)
     row.update({"decode": {"jpeg_gate": [{"holds": True}]}, "dense_record_mask_sha256": row["dense_mask_sha256"],
                 "hand_objects": {"sha256": "x" * 64, "manifest_sha256": "x" * 64},
                 "kernels": {"kernel_launches": 10, "attention_family": ["flash"]}})
@@ -238,11 +239,11 @@ def test_merge_keeps_only_adopted_groups(tmp_path: Path, monkeypatch: pytest.Mon
                             shape=SHAPE)
     job = tmp_path / "job"
     row = b1b.process_item(HoldTracker(), plan, frames_dir, dense, sparse_doc(), clip, detections(),
-                           job / "publish", max_pairs=0, review=0, profile=False)
+                           job / "publish", review=0, profile=False)
     (job / "b1b.json").write_text(json.dumps({"items": [row]}, default=str))
     monkeypatch.setenv("PS_STAGE_DIR", str(tmp_path / "stage"))
     monkeypatch.setenv("PS_SCRATCH_DIR", str(tmp_path / "scratch"))
-    for groups, sam_left in (("hands,objects", 8), ("hands", 0)):
+    for groups, sam_left in (("hands,objects", 10), ("hands", 0)):
         assert b1b.main(["merge", "--result", str(job / "b1b.json"), "--masks", str(job), "--groups", groups]) == 0
         merged = ClipMasks.load(tmp_path / "scratch" / "publish" / "masks" / ITEM["id"] / "masks.rle")
         assert sum(inst.provenance == b1b.SAM_TIER for f in merged.frames for inst in f) == sam_left

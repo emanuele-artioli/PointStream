@@ -159,8 +159,9 @@ class Sam31MaskTracker:
         *,
         start: int = 0,
         frames: int | None = None,
+        reverse: bool = False,
     ) -> Iterator[tuple[int, dict[int, tuple[np.ndarray, float]]]]:
-        """Track forward from ``start`` through ``frames`` frames of ``images`` (all by default).
+        """Track from ``start`` through ``frames`` frames of ``images`` (to the end by default), backward with ``reverse``.
 
         ``prompts`` maps a frame to ``{object id: HxW bool mask}``; every object
         must be given on every prompted frame (an empty mask: absent). Yields
@@ -188,7 +189,7 @@ class Sam31MaskTracker:
             model.propagate_in_video_preflight(state, run_mem_encoder=True)
             limit = count if frames is None else frames - 1
             for out in model.propagate_in_video(state, start_frame_idx=start, max_frame_num_to_track=limit,
-                                                reverse=False, tqdm_disable=True):
+                                                reverse=reverse, tqdm_disable=True):
                 frame, obj_ids, _low, video_res = out[:4]
                 scores = out[4] if len(out) > 4 else None
                 binary = (video_res[:, 0] > 0.0).cpu().numpy()
