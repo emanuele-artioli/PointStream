@@ -694,8 +694,27 @@ def validate_result(stage: Path) -> dict[str, bool]:
     }
 
 
+def validate_merge(stage: Path) -> dict[str, bool]:
+    result = json.loads((stage / "merge.json").read_text())
+    rows = result["items"]
+    allowed = {visor.INTERPOLATED, SAM_TIER}
+    groups = set(result["groups"])
+    publish = Path(os.environ.get("PS_SCRATCH_DIR") or stage / "scratch") / "publish" / "masks"
+    sam_hands = 0
+    for row in rows:
+        clip = ClipMasks.load(publish / row["id"] / "masks.rle")
+        sam_hands += sum(1 for f in clip.frames for inst in f if inst.provenance == SAM_TIER and inst.class_name in visor.HANDS)
+    return {
+        "items_merged": bool(rows),
+        "every_item_once": len({r["id"] for r in rows}) == len(rows),
+        "only_dense_and_fill_tiers": all(set(r["provenance"]) <= allowed for r in rows),
+        "dropped_groups_absent": "hands" in groups or sam_hands == 0,
+        "masks_hashed": all(len(r["masks_rle_sha256"]) == 64 and len(r["mask_sha256"]) == 64 for r in rows),
+    }
+
+
 def command_validate(args: argparse.Namespace) -> int:
-    checks = validate_result(stage_dir())
+    checks = validate_merge(stage_dir()) if args.kind == "merge" else validate_result(stage_dir())
     report = {"passed": all(checks.values()), "checks": checks}
     target = os.environ.get("PS_VALIDATION_PATH")
     if target:
@@ -813,7 +832,8 @@ def main(argv: list[str] | None = None) -> int:
     merge.add_argument("--result", action="append", required=True, help="a fill job's b1b.json; pairs with --masks")
     merge.add_argument("--masks", action="append", required=True, help="that job's extracted published.tar")
     merge.add_argument("--groups", required=True, help="hands, objects, or hands,objects")
-    sub.add_parser("validate")
+    validate = sub.add_parser("validate")
+    validate.add_argument("--kind", choices=("fill", "merge"), default="fill")
     report = sub.add_parser("report")
     report.add_argument("--result", action="append", required=True)
     report.add_argument("--out", required=True)
