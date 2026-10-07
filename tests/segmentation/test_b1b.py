@@ -223,3 +223,27 @@ def test_checkpoint_remap_keeps_tracker_and_vision_backbone() -> None:
     })
     assert renamed == {"sam_mask_decoder.w": 1, "backbone.vision_backbone.trunk.w": 2}
     assert sorted(skipped) == ["detector.backbone.language_backbone.w", "detector.transformer.w"]
+
+
+def test_merge_keeps_only_adopted_groups(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import cv2
+
+    plan = b1b.plan_item(ITEM, sparse_doc(), mapping(), shape=SHAPE)
+    frames_dir = tmp_path / "frames"
+    frames_dir.mkdir()
+    for i in range(plan.length):
+        cv2.imwrite(str(frames_dir / f"{i}.png"), np.zeros((*SHAPE, 3), np.uint8))
+    dense = dense_doc()
+    clip = visor.clip_masks(dense, 13, 10, fps=50.0, alignment=visor.frame_alignment(dense, {10: 9, 20: 19, 30: 29}),
+                            shape=SHAPE)
+    job = tmp_path / "job"
+    row = b1b.process_item(HoldTracker(), plan, frames_dir, dense, sparse_doc(), clip, detections(),
+                           job / "publish", max_pairs=0, review=0, profile=False)
+    (job / "b1b.json").write_text(json.dumps({"items": [row]}, default=str))
+    monkeypatch.setenv("PS_STAGE_DIR", str(tmp_path / "stage"))
+    monkeypatch.setenv("PS_SCRATCH_DIR", str(tmp_path / "scratch"))
+    for groups, sam_left in (("hands,objects", 8), ("hands", 0)):
+        assert b1b.main(["merge", "--result", str(job / "b1b.json"), "--masks", str(job), "--groups", groups]) == 0
+        merged = ClipMasks.load(tmp_path / "scratch" / "publish" / "masks" / ITEM["id"] / "masks.rle")
+        assert sum(inst.provenance == b1b.SAM_TIER for f in merged.frames for inst in f) == sam_left
+        assert sum(len(f) for f in merged.frames) == sum(len(f) for f in clip.frames) + sam_left

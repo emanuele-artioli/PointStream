@@ -749,6 +749,37 @@ def command_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_merge(args: argparse.Namespace) -> int:
+    """One mask set from the fill jobs' published masks, keeping SAM instances of the adopted groups only."""
+    keep = set(args.groups.split(","))
+    if not keep <= {"hands", "objects"}:
+        raise SystemExit(f"unknown groups {args.groups}")
+    publish = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch") / "publish"
+    rows = []
+    for result_path, masks_dir in zip(args.result, args.masks):
+        for row in json.loads(Path(result_path).read_text())["items"]:
+            source = mask_root(Path(masks_dir), row["id"])
+            if file_sha256(source) != row["masks_rle_sha256"]:
+                raise RuntimeError(f"{row['id']}: masks.rle differs from its fill record")
+            clip = ClipMasks.load(source)
+            dropped = 0
+            for i, instances in enumerate(clip.frames):
+                kept = [inst for inst in instances if inst.provenance != SAM_TIER
+                        or ("hands" if inst.class_name in visor.HANDS else "objects") in keep]
+                dropped += len(instances) - len(kept)
+                clip.frames[i] = kept
+            clip.meta.setdefault("fill", {})["groups_kept"] = sorted(keep)
+            target = clip.save(publish / "masks" / row["id"])
+            rows.append({"id": row["id"], "source_masks_rle_sha256": row["masks_rle_sha256"], "dropped_sam_instances": dropped,
+                         "masks_rle_sha256": file_sha256(target), "mask_sha256": mask_digest(clip),
+                         "provenance": dict(Counter(inst.provenance for f in clip.frames for inst in f))})
+    if len({r["id"] for r in rows}) != len(rows):
+        raise RuntimeError("an item appears in more than one fill result")
+    write_json(stage_dir() / "merge.json", {"groups": sorted(keep), "results": [
+        {"path": p, "sha256": file_sha256(Path(p))} for p in args.result], "items": rows})
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -764,12 +795,17 @@ def main(argv: list[str] | None = None) -> int:
     fill.add_argument("--items", required=True, help="all, or comma-separated item ids")
     fill.add_argument("--pairs", type=int, default=0, help="held-out keyframe pairs per item (0: all)")
     fill.add_argument("--review", type=int, default=2, help="review overlays per item")
+    merge = sub.add_parser("merge")
+    merge.add_argument("--result", action="append", required=True, help="a fill job's b1b.json; pairs with --masks")
+    merge.add_argument("--masks", action="append", required=True, help="that job's extracted published.tar")
+    merge.add_argument("--groups", required=True, help="hands, objects, or hands,objects")
     sub.add_parser("validate")
     report = sub.add_parser("report")
     report.add_argument("--result", action="append", required=True)
     report.add_argument("--out", required=True)
     args = parser.parse_args(argv)
-    return {"fill": command_fill, "validate": command_validate, "report": command_report}[args.command](args)
+    commands = {"fill": command_fill, "merge": command_merge, "validate": command_validate, "report": command_report}
+    return commands[args.command](args)
 
 
 if __name__ == "__main__":

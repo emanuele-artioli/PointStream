@@ -117,6 +117,12 @@ def mask_root(directory: Path, item_id: str) -> Path:
     raise FileNotFoundError(f"no masks.rle for {item_id} under {directory}")
 
 
+def stream_root(directory: Path) -> Path:
+    """Published streams: ``DIR/<codec>/...``, or an extracted job ``published.tar`` (``DIR/publish/streams``)."""
+    nested = directory / "publish" / "streams"
+    return nested if nested.is_dir() else directory
+
+
 # ----------------------------------------------------------------- source window
 
 def jpeg_targets(item: dict[str, Any], archive: Path) -> list[dict[str, Any]]:
@@ -519,7 +525,7 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
         point_work.mkdir()
         stream = None
         if args.streams:
-            stream = Path(args.streams) / args.codec / item["id"] / label / name / STREAM_NAMES[args.codec]
+            stream = stream_root(Path(args.streams)) / args.codec / item["id"] / label / name / STREAM_NAMES[args.codec]
         roi = None
         if args.codec == "svtav1" and variant["roi_offset"]:
             roi = write_roi_map(regions, args.roi_mask_set, frames, source["width"], source["height"],

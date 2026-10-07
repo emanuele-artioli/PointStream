@@ -64,6 +64,27 @@ def remap_checkpoint(state: Mapping[str, Any]) -> tuple[dict[str, Any], list[str
     return out, skipped
 
 
+def _drop_detector_head(model: Any) -> None:
+    """Compute only the tracker's backbone heads.
+
+    The demo tracker's ``_get_image_feature`` asks the backbone for all three
+    heads. The vision-only backbone returns the detector's (SAM 3) head
+    flattened into the top level of its output, which the tracker's
+    ``forward_image`` then iterates as if it were a head, and fails (job
+    ``20261007T203825Z-0e10810c``, smoke). The tracker reads only the
+    interactive and propagation heads (``_prepare_backbone_features``), as
+    upstream's own ``_prepare_backbone_features_per_frame`` asks for.
+    """
+    original = model.forward_image
+
+    def forward_image(img_batch: Any, *, need_sam3_out: bool = False, need_interactive_out: bool = False,
+                      need_propagation_out: bool = False) -> Any:
+        return original(img_batch, need_sam3_out=False, need_interactive_out=need_interactive_out,
+                        need_propagation_out=need_propagation_out)
+
+    model.forward_image = forward_image
+
+
 class Sam31MaskTracker:
     """The pinned SAM 3.1 tracker on CUDA, prompted with binary masks."""
 
@@ -117,6 +138,7 @@ class Sam31MaskTracker:
                 f"SAM 3.1 tracker weights do not match: {len(result.missing_keys)} missing "
                 f"({result.missing_keys[:5]}), {len(result.unexpected_keys)} unexpected ({result.unexpected_keys[:5]})"
             )
+        _drop_detector_head(model)
         self.model = model.cuda().eval()
 
     def load_frames(self, frames_dir: Path | str) -> tuple[Any, int, int]:
