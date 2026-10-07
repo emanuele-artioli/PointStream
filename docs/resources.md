@@ -135,6 +135,76 @@ read-only, not deleted, with `MANIFEST.json` (104,884 files, 72.5 GB, sha256
 each). `src/segmentation/domains.yaml` still lists clips from them as defaults
 until the per-dataset domains replace it.
 
+### Using VISOR
+
+The rules every session that reads, scores on, or trains from VISOR follows.
+Decided in B1 (2026-10-06/07); evidence and reasons in
+[experiments](experiments.md#2026-10-06--b1-visor-frame-mapping-and-evaluation-set),
+[drift decision](experiments.md#2026-10-06-visor-frame-drift-exact-frames-for-evaluation-small-drift-for-training)
+and [set v2 decision](experiments.md#2026-10-07-visor-evaluation-set-v2-and-a-sam-fill-for-missing-hands);
+illustrated in the B1 report ("VISOR frame drift" artifact).
+
+**Reading.** Use `src/segmentation/visor.py`; never index frames by hand.
+- `load_annotations` reads a sparse JSON or a dense `_interpolations.zip`;
+  `clip_masks` returns `ClipMasks` with VISOR's classes (`left hand`,
+  `right hand`, `active object`; the open-vocabulary name is each instance's
+  `label`; a glove on a hand is that hand), per-frame `labelled` flags and a
+  provenance per mask: `human` (sparse file) or `interpolated` (everything in
+  the dense file, its keyframes too).
+- Dense polygons are drawn at 854×480 and scaled to 1080p: their edges are
+  about two pixels coarse (IoU 0.97–0.995 against the human 1080p masks).
+- An unlabelled frame is unknown, not empty; `evaluate.compare` scores only
+  labelled frames.
+
+**Frames.** VISOR names masks by its own frame extraction. Only sparse frames
+link to the video (`frame_mapping.json` → EPIC rgb frame →
+`epic_frame_to_video_index`, verified per rate in the table above). Dense
+frames are placed between their run's keyframes by `frame_alignment`, which
+records each frame's *drift*: how far VISOR's numbering slipped against the
+video between the two keyframes, which bounds the placement error.
+- EK-100 (50 fps): drift 0 everywhere; VISOR n is decoded frame n − 1.
+- EK-55 59.94 fps: exact on about three quarters of stretches; elsewhere off
+  by 1–3 frames.
+- EK-55 29.97 fps: two VISOR frames per decoded frame; 47.95 fps (P17_01) has
+  no verified rule and the reader raises; P12_04 is 720p video with 1080p masks.
+
+**Missing hands and objects.** VISOR drops or cuts short each object's dense
+track when its interpolation scored poorly, so 22–30% of dense val frames lack
+a hand a human labelled at an end of the run, and most frames lack some
+labelled object. `hand_gaps(dense, sparse)` lists the frames where a labelled
+hand is missing. A hand that comes and goes between keyframes is invisible to
+every label. HInt's VISOR frames are all sparse keyframes, so HInt cannot fill
+these gaps.
+
+**Evaluation (B2, D1, any codec or segmenter score).**
+- Use evaluation set v2 (`experiments/visor/eval_set.json`, below) and nothing
+  else: 34 windows of 240 frames, one per validation video, every frame exactly
+  placed and hand-complete. B2 decodes each window from
+  `first_video_index` and may check its sparse JPEGs (in the archive) against
+  the decoded frames.
+- Score only exactly placed frames. Adding other footage (more EK-55
+  stretches) requires `clip_masks(..., exact_only=True)` and a recorded
+  decision.
+- Objects other than hands can still be missing: report it with every result.
+- Report per provenance tier. When B1b's SAM fill (`sam_from_label_prompt`) is
+  adopted, report every number with and without it; the "without" number is
+  the fair one for D1, where SAM 3.1 is a contestant.
+- Floor for segmenters: "hold the first frame" (the item's first-frame masks
+  copied to every frame) scores, mean over the 34 items, foreground J 0.459,
+  F 0.370 (EK-100 0.403, EK-55 0.504; per item 0.03–0.85; left hand J 0.374,
+  right hand 0.346, active object 0.467; job `20261007T081136Z-71468647`).
+  A segmenter must clearly beat it per scope to count; report it as the first
+  row of the D1 table.
+
+**Training (E1, F1, generators).**
+- Train on the train split; keep the evaluation videos out.
+- Admit dense frames with drift ≤ 1; every exported mask records its drift so
+  the cutoff can change without re-exporting.
+- Instance crops of labelled objects are safe. Background frames ("foreground
+  removed") and segmenter targets are not, where `hand_gaps` reports a missing
+  hand: exclude those frames until B1b fills them, or a model learns hands as
+  background.
+
 ## Models
 
 Each family directory in `Models` has a `MANIFEST.json` (sha256, size, source
