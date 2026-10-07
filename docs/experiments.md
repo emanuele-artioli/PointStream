@@ -708,3 +708,21 @@ invocation turns out to be needed.
   adopted): B2's five full jobs' streams, SVT-AV1 scored on any Ada/A6000,
   DCVC-UF decoded on RTX A6000 (its encode class), ≤ 1.5 h per job. Ceiling 9
   GPU-hours and 12 h wall including staging.
+- Smokes that failed (not evidence): `20261007T203825Z-0e10810c` (gpu6, Ada,
+  `b64332b`): the standalone tracker asked its backbone for the detector's
+  head, whose output the tracker cannot read; it now asks only for its own two
+  heads. `20261007T204154Z-9531c0f7` (gpu3, A6000, `25db974`): a second mask
+  prompt on a fresh multiplex state is refused (above). Every checkpoint key
+  loaded in both (931 of 931).
+- Pilot `20261007T205637Z-0ba26d70` (gpu3, RTX A6000, `4d7f28b`; smoke on
+  P30_110 and validator passed, 18 checks; full stage 573 s, about 5 frames/s
+  tracked including the backbone, peak 5.9 GiB): held out, hands mean J 0.90,
+  median 0.96 (n = 22; hold floor 0.28); objects 0.88, 0.91 (n = 30; floor
+  0.31), hard subset 0.83 (n = 10). Detector agreement: SAM's held-out hands
+  0.73 (1,387 of 1,908), dense hands on the same frames 0.83 (1,592 of 1,929).
+  Finding: on P09_106 57 of the 66 filled hands lay more than half on the
+  other hand, which the dense masks already had (a track that lost its hand
+  and latched onto the other; the detector called 32 of them the other side).
+  Fill rule added before the full run (adoption rule unchanged): a SAM
+  instance more than half on an instance already in the frame is not added
+  (`MAX_OVERLAP`). The full run repeats the four pilot items with it.

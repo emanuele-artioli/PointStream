@@ -248,3 +248,18 @@ def test_merge_keeps_only_adopted_groups(tmp_path: Path, monkeypatch: pytest.Mon
         merged = ClipMasks.load(tmp_path / "scratch" / "publish" / "masks" / ITEM["id"] / "masks.rle")
         assert sum(inst.provenance == b1b.SAM_TIER for f in merged.frames for inst in f) == sam_left
         assert sum(len(f) for f in merged.frames) == sum(len(f) for f in clip.frames) + sam_left
+
+
+def test_fill_rejects_a_track_that_latched_onto_another_object() -> None:
+    from src.segmentation.masks import encode_rle
+
+    plan = b1b.plan_item(ITEM, sparse_doc(), mapping(), shape=SHAPE)
+    dense = dense_doc()
+    clip = visor.clip_masks(dense, 13, 10, fps=50.0, alignment=visor.frame_alignment(dense, {10: 9, 20: 19, 30: 29}),
+                            shape=SHAPE)
+    hand = plan.human[0][1]
+    # The cup track lies on the hand on every window frame; the knife track is elsewhere.
+    sam = {index: {2: (encode_rle(hand), 0.9), 3: (encode_rle(plan.human[10][3]), 0.9)} for index in range(3, 13)}
+    _, info = b1b.fill_clip(clip, plan, sam)
+    assert info["rejected_overlapping"] == {"active object": 8}  # the cup, on the 8 frames the dense masks lack it
+    assert info["instances_added"] == {"active object": 10}  # the knife, everywhere

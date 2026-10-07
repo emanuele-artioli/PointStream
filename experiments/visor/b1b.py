@@ -71,6 +71,10 @@ from src.segmentation.masks import ClipMasks, Instance, decode_rle, encode_rle
 SAM_TIER = "sam_from_label_prompt"
 #: SAM masks smaller than this (pixels at 1080p) count as absent.
 MIN_AREA = 64
+#: A SAM instance is not added when more than this share of it lies on an instance already in the
+#: frame: a track that lost its object and latched onto another (pilot 20261007T205637Z-0ba26d70:
+#: 57 of 66 filled hands on P09_106 lay on the other hand).
+MAX_OVERLAP = 0.5
 #: Fill instances get track ids above the dense masks' own.
 FILL_TRACK_BASE = 1000
 #: A detected hand agrees with a hand mask when this share of its box lies inside the mask's box.
@@ -269,9 +273,11 @@ def fill_clip(dense: ClipMasks, plan: Plan, sam: dict[int, dict[int, tuple[dict[
                     labelled=list(dense.labelled) if dense.labelled is not None else None, meta=dict(dense.meta))
     out.frames = [list(instances) for instances in dense.frames]
     added: Counter[str] = Counter()
+    rejected: Counter[str] = Counter()
     frames_with_fill = 0
     for i in range(len(dense)):
         present = {visor.object_key(inst.class_name, inst.label) for inst in dense.frames[i]}
+        occupied = [inst.mask() for inst in dense.frames[i]]
         new = False
         for obj in plan.objects:
             if obj.key in present:
@@ -280,8 +286,13 @@ def fill_clip(dense: ClipMasks, plan: Plan, sam: dict[int, dict[int, tuple[dict[
             if rle is None:
                 continue
             mask = decode_rle(rle)
-            if mask.sum() < MIN_AREA:
+            area = int(mask.sum())
+            if area < MIN_AREA:
                 continue
+            if any((mask & other).sum() > MAX_OVERLAP * area for other in occupied):
+                rejected[obj.class_name] += 1
+                continue
+            occupied.append(mask)
             box = box_of(mask)
             assert box is not None
             out.frames[i].append(Instance(obj.class_name, FILL_TRACK_BASE + obj.object_id, round(prob, 4), rle, box,
@@ -290,14 +301,15 @@ def fill_clip(dense: ClipMasks, plan: Plan, sam: dict[int, dict[int, tuple[dict[
             new = True
         frames_with_fill += new
     out.meta["fill"] = {
-        "tier": SAM_TIER, "rule": "objects a human labelled at a keyframe of the span that the dense masks lack on a frame, where SAM 3.1 finds at least MIN_AREA pixels",
-        "min_area": MIN_AREA, "track_id_base": FILL_TRACK_BASE,
+        "tier": SAM_TIER, "rule": "objects a human labelled at a keyframe of the span that the dense masks lack on a frame, where SAM 3.1 finds at least MIN_AREA pixels, at most MAX_OVERLAP of them on an instance already in the frame",
+        "min_area": MIN_AREA, "max_overlap": MAX_OVERLAP, "track_id_base": FILL_TRACK_BASE,
         "objects": [{"object_id": o.object_id, "class_name": o.class_name, "label": o.label, "repeat": o.repeat,
                      "track_id": FILL_TRACK_BASE + o.object_id} for o in plan.objects],
         "span_video_indices": [plan.span_start, plan.span_end],
         "keyframes": {str(k): v for k, v in sorted(plan.keyframes.items())},
     }
-    return out, {"instances_added": dict(sorted(added.items())), "frames_with_fill": frames_with_fill}
+    return out, {"instances_added": dict(sorted(added.items())), "rejected_overlapping": dict(sorted(rejected.items())),
+                 "frames_with_fill": frames_with_fill}
 
 
 def missing_share(clip: ClipMasks, item: dict[str, Any], expected: dict[int, set[str]]) -> dict[str, Any]:
@@ -740,6 +752,7 @@ def command_report(args: argparse.Namespace) -> int:
         "hand_check": {k: dict(v) for k, v in sorted(hand.items())}, "hand_agreement_rates": rates,
         "missing_objects_mean_share": {k: round(v, 4) for k, v in missing.items()},
         "fill": {"instances_added": dict(sum((Counter(row["fill"]["instances_added"]) for row in rows), Counter())),
+                 "rejected_overlapping": dict(sum((Counter(row["fill"].get("rejected_overlapping", {})) for row in rows), Counter())),
                  "frames_with_fill": sum(row["fill"]["frames_with_fill"] for row in rows),
                  "items_with_fill": sum(1 for row in rows if row["fill"]["frames_with_fill"])},
         "decision": decide(summary, rates),
