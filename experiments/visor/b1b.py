@@ -447,11 +447,11 @@ def process_item(tracker: Any, plan: Plan, frames_dir: Path, dense_doc: dict[str
             return list(tracker.track(segment, height, width, prompt))
 
         if profile and number == 0:
+            # Kernels and attention family from a short separate run; the profiler would bloat on a whole pair.
             from experiments.audit.env_smoke import profile_cuda
 
-            outputs, kernels = profile_cuda(run)
-        else:
-            outputs = run()
+            _, kernels = profile_cuda(lambda: list(tracker.track(images[a:a + 4], height, width, prompt)))
+        outputs = run()
         by_frame = dict(outputs)
         dropped = {o.key for o in plan.objects
                    if any(o.key not in keys_by_frame.get(n, set()) for n in range(inverse[a] + 1, inverse[b]))}
@@ -577,6 +577,7 @@ def command_fill(args: argparse.Namespace) -> int:
     archive = Path(args.archive)
     videos = {Path(v).stem: v for v in args.video}
     records = {row["id"]: row for row in json.loads(Path(args.mask_record).read_text())["items"]}
+    manifest = {f["path"]: f["sha256"] for f in json.loads(Path(args.hand_objects_manifest).read_text())["files"]}
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
     publish = scratch / "publish"
     plans = []
@@ -608,11 +609,14 @@ def command_fill(args: argparse.Namespace) -> int:
         item = plan.item
         dense_doc, sparse, _ = load_inputs(item, archive)
         dense_clip = ClipMasks.load(mask_root(Path(args.masks), item["id"]))
-        detections = hand_objects.load_detections(Path(args.hand_objects) / "hand-objects" / item["video"][:3] / f"{item['video']}.pkl")
+        relative = f"hand-objects/{item['video'][:3]}/{item['video']}.pkl"
+        detections_sha256 = file_sha256(Path(args.hand_objects) / relative)
+        detections = hand_objects.load_detections(Path(args.hand_objects) / relative)
         row = process_item(tracker, plan, scratch / "frames" / item["id"], dense_doc, sparse, dense_clip, detections,
                            publish, args.pairs, args.review, profile=number == 0)
         row["decode"] = decoded
         row["dense_record_mask_sha256"] = records[item["id"]]["mask_sha256"]
+        row["hand_objects"] = {"path": relative, "sha256": detections_sha256, "manifest_sha256": manifest.get(relative)}
         rows.append(row)
         shutil.rmtree(scratch / "frames" / item["id"], ignore_errors=True)
         write_json(publish / "items" / f"{item['id']}.json", row)
@@ -622,7 +626,8 @@ def command_fill(args: argparse.Namespace) -> int:
     write_json(stage_dir() / "b1b.json", {
         "eval_set": {"path": args.eval_set, "sha256": file_sha256(Path(args.eval_set)), "name": eval_set["name"]},
         "inputs": {"checkpoint": args.checkpoint, "checkpoint_sha256": tracker.load_report.get("checkpoint_sha256"),
-                   "hand_objects": args.hand_objects, "masks": args.masks, "mask_record": args.mask_record,
+                   "hand_objects": args.hand_objects, "hand_objects_manifest_sha256": file_sha256(Path(args.hand_objects_manifest)),
+                   "masks": args.masks, "mask_record": args.mask_record,
                    "mask_record_sha256": file_sha256(Path(args.mask_record))},
         "sam": {**tracker.load_report, "load_seconds": load_seconds, "runtime": runtime(),
                 "min_area": MIN_AREA, "policy": "forward from the span's first keyframe; every keyframe of the span prompts every object (empty where not labelled)"},
@@ -660,6 +665,7 @@ def validate_result(stage: Path) -> dict[str, bool]:
         "flash_attention_on_sm80_plus": capability[0] < 8 or "flash" in first_kernels.get("attention_family", []),
         "sparse_jpegs_match_decoded_frames": all(g["holds"] for row in rows for g in row["decode"]["jpeg_gate"]),
         "dense_masks_are_b1s": all(row["dense_mask_sha256"] == row["dense_record_mask_sha256"] for row in rows),
+        "hand_objects_match_manifest": all(row["hand_objects"]["sha256"] == row["hand_objects"]["manifest_sha256"] for row in rows),
         "window_inside_span": all(0 <= row["window_span_indices"][0] <= row["window_span_indices"][1] < row["span_frames"] for row in rows),
         "mask_prompts_reproduced": all(row["prompt_reproduced_iou"]["n"] > 0 and row["prompt_reproduced_iou"]["median"] >= 0.9 for row in rows),
         "held_out_keyframes_scored": summary["hands"]["n"] > 0,
@@ -752,6 +758,7 @@ def main(argv: list[str] | None = None) -> int:
     fill.add_argument("--masks", required=True, help="B1's published masks (one masks.rle per item)")
     fill.add_argument("--mask-record", required=True, help="B1's evalset.json, with each item's mask_sha256")
     fill.add_argument("--hand-objects", required=True, help="extracted hand-object detections: hand-objects/<P>/<video>.pkl")
+    fill.add_argument("--hand-objects-manifest", required=True, help="Datasets/manifests/EPIC-KITCHENS-hand-objects.json")
     fill.add_argument("--checkpoint", required=True)
     fill.add_argument("--video", action="append", required=True)
     fill.add_argument("--items", required=True, help="all, or comma-separated item ids")

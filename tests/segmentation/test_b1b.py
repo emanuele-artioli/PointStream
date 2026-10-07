@@ -199,6 +199,7 @@ def test_validator_on_a_written_result(tmp_path: Path, monkeypatch: pytest.Monke
     row = b1b.process_item(HoldTracker(), plan, frames_dir, dense, sparse_doc(), clip, detections(),
                            tmp_path / "publish", max_pairs=0, review=2, profile=False)
     row.update({"decode": {"jpeg_gate": [{"holds": True}]}, "dense_record_mask_sha256": row["dense_mask_sha256"],
+                "hand_objects": {"sha256": "x" * 64, "manifest_sha256": "x" * 64},
                 "kernels": {"kernel_launches": 10, "attention_family": ["flash"]}})
     result: dict[str, Any] = {"items": [row], "settings": {"review": 2},
               "validation_summary": b1b.summarize_validation(row["validation"]),

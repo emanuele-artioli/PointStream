@@ -630,3 +630,77 @@ invocation turns out to be needed.
 - Budget: J1 ≤ 1.5 h on one A6000; J2 ≤ 2.5 h (32 threads, GPU for scoring
   only); J3 ≤ 1 h and J4 ≤ 0.5 h on any Ada, A6000 or RTX 8000 (scoring
   only); J5 ≤ 1 h CPU. Ceiling 6 GPU-hours and 8 h wall; smokes ≤ 600 s.
+
+### 2026-10-07 — B1b: SAM 3.1 fill of VISOR's missing hands and objects
+- Question: can SAM 3.1, prompted with the human masks at a run's keyframes,
+  supply the hands and objects VISOR's dense masks lack, accurately enough to
+  score B2 and D1 with a second mask set? On evaluation set v2 the dense masks
+  lack 33% of each frame's labelled objects (B2) and no labelled hand (by
+  construction); elsewhere 22–30% of dense val frames lack a labelled hand.
+- Method (`experiments/visor/b1b.py`, `src/segmentation/sam31_tracker.py`).
+  SAM 3.1's public multiplex API takes no mask prompts at the pinned commit,
+  so its own tracker is used directly (sam3's `build_sam3_multiplex_video_model`,
+  the checkpoint's `tracker.model.*` and `detector.backbone.vision_backbone.*`
+  weights; every key must load). Per item, the *span* runs from the last
+  human-labelled frame at or before the window to the first at or after it
+  (251–516 frames, 2–11 keyframes; 98 keyframe pairs over the 34 items; a CPU
+  survey, not evidence), decoded as consecutive video frames from keyframes
+  placed by B1's verified rules; the sparse JPEGs inside the span are checked
+  as in B1. Every object a human labelled at a keyframe of the span is a SAM
+  object (at most 14 per item).
+  *Held out*: for each consecutive keyframe pair a < b, SAM is prompted with
+  the human masks at a only, tracks forward, and is scored at b against the
+  human masks it never saw (J, boundary F at 0.8% of the diagonal), beside the
+  floor "hold the mask of a"; objects labelled at a but not at b score whether
+  SAM lets them go (`released`: under 64 pixels). Objects the dense masks drop
+  between a and b form the *hard subset*: the ones the fill is for.
+  *Fill*: SAM is prompted at every keyframe of the span (human masks; an empty
+  mask where an object is not labelled) and tracks forward; on each window
+  frame, an object the dense masks lack (`visor.object_key`) and SAM finds (at
+  least 64 pixels) is added as tier `sam_from_label_prompt`; dense masks are
+  unchanged. Output: `masks.rle` per item in B1's format.
+  *Hand boxes*: EPIC-KITCHENS-100 hand-object detections (Shan et al. 2020;
+  `Datasets/manifests/EPIC-KITCHENS-hand-objects.json`, detector output, not
+  labels). A hand mask agrees when a detected hand of its side (score ≥ 0.5)
+  lies at least half inside the mask's bounding box (VISOR hands include the
+  forearm, the detector's do not). Rates are read against the human hands at
+  keyframes and the dense hands on the same frames.
+  *Review*: two window frames per item that are not keyframes, picked by
+  sha256("pointstream-b1b-review:<item>:<n>"), drawn with the dense masks, the
+  fill and SAM's own masks, published as an artifact for review by eye.
+- Decision rule (fixed before any run; `b1b.DECISION`, applied by
+  `b1b report` over all 34 items). Hands are adopted when, over all held-out
+  pairs: mean J ≥ 0.70, median J ≥ 0.80, mean J at least 0.15 above the hold
+  floor; on the hard subset (if n ≥ 10) mean J ≥ 0.60; hands labelled at a and
+  not at b released in ≥ 70% of cases (if n ≥ 5); and SAM's held-out hands
+  agree with the detector at ≥ 0.9 times the rate of the dense hands on the
+  same frames. Objects are adopted when mean J ≥ 0.60, median J ≥ 0.65, mean J
+  at least 0.10 above the floor, and on the hard subset (if n ≥ 10) mean J ≥
+  0.50. If only one group passes, the fill keeps only that group (SAM
+  instances of the other class dropped from the published masks on CPU). The
+  review by eye can veto adoption for a systematic failure; it is recorded
+  here. Only if a group is adopted are B2's published streams rescored with
+  both mask sets (`b2 run --streams`, GPU scoring), and every B2 number is
+  reported with and without the fill, with the share of labelled objects still
+  missing.
+- Hypothesis: across keyframe gaps of 1.3–1.7 s, SAM 3.1 from human masks
+  reaches hand J ≥ 0.8, far above the hold floor; objects score lower (small,
+  occluded, handled) but pass; the fill cuts the missing-object share from
+  33% to under 10%, and moves B2's weighted PSNR by under 1 dB and its BD-rates
+  by a few percent.
+- Competing explanations: (1) VISOR dropped exactly the tracks its
+  interpolation found hard (fast motion, occlusion, small objects), so SAM's
+  accuracy on all objects overstates it on the filled ones; the hard subset
+  tests this. (2) One-sided tracking over a whole keyframe gap is harder than
+  the fill (prompts on both sides, at most half a gap away), so held-out scores
+  understate the fill; the rule accepts that bias as conservative. (3)
+  Detector agreement may track the detector's own failures on blurred frames;
+  the dense hands on the same frames calibrate it. Pairs within an item are
+  correlated; results are also given per video type and per item.
+- Budget: GPUs Ada and A6000 only (model–GPU table). Smoke: one item
+  (P30_110, span 251, one pair), ≤ 600 s. Pilot: the four B2 pilot items
+  (P01_107, P09_106, P02_02, P03_10; 1,272 span frames, 11 pairs), ≤ 1 h.
+  Full: the other 30 items as two jobs of 15, ≤ 2 h each. Rescoring (if
+  adopted): B2's five full jobs' streams, SVT-AV1 scored on any Ada/A6000,
+  DCVC-UF decoded on RTX A6000 (its encode class), ≤ 1.5 h per job. Ceiling 9
+  GPU-hours and 12 h wall including staging.
