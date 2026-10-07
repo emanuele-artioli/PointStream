@@ -30,10 +30,10 @@ def test_ivf_payload_excludes_framing_and_rejects_truncation() -> None:
 
 def test_encode_command_is_single_keyframe_crf_on_raw_planes(tmp_path: Path) -> None:
     command = svtav1.encode_command("SvtAv1EncApp", tmp_path / "s.yuv", tmp_path / "o.ivf", width=1920, height=1080,
-                                    fps=Fraction(60000, 1001), frames=240, crf=35, preset=4, threads=8, full_range=True)
+                                    fps=Fraction(60000, 1001), frames=240, crf=35, preset=4, full_range=True)
     joined = " ".join(command)
     for part in ("--keyint -1", "--crf 35", "--preset 4", "--fps-num 60000", "--fps-denom 1001", "-n 240",
-                 "--color-range 1", "--input-depth 8", "--rc 0"):
+                 "--color-range 1", "--input-depth 8", "--rc 0", "--lp 6"):
         assert part in joined
 
 
@@ -195,3 +195,51 @@ def test_rate_points_cover_the_common_range_below_the_cap() -> None:
     assert out["points"]["svtav1"] == [41.0, 48.0, 55.0, 62.0]
     assert 18.0 in out["points"]["dcvc"] and 54.0 not in out["points"]["dcvc"]
     assert out["refine_first"] is False
+
+
+def test_variants_label_only_what_differs_from_b2() -> None:
+    import argparse
+
+    args = argparse.Namespace(codec="svtav1", preset="4", roi_offset="0,-16", enable_tf=None)
+    assert [v["label"] for v in b2.variants(args)] == ["", "roi-16"]
+    args = argparse.Namespace(codec="svtav1", preset="2,4", roi_offset="0", enable_tf=0)
+    assert [v["label"] for v in b2.variants(args)] == ["p2-tf0", "p4-tf0"]
+    args = argparse.Namespace(codec="dcvc", dcvc_range="full,limited")
+    assert [v["label"] for v in b2.variants(args)] == ["", "range-limited"]
+
+
+def test_roi_map_marks_blocks_touching_the_foreground(tmp_path: Path) -> None:
+    width, height = 130, 70  # 3 x 2 blocks of 64, the last ones partial
+    fg = np.zeros((height, width), bool)
+    fg[65, 129] = True  # bottom-right block only
+    record = b2.write_roi_map([{"m/fg": fg}, {"m/fg": np.zeros_like(fg)}], "m", 2, width, height, -16, tmp_path / "roi.txt")
+    lines = (tmp_path / "roi.txt").read_text().splitlines()
+    assert lines == ["0 0 0 0 0 0 -16", "1 0 0 0 0 0 0"]
+    assert record["grid"] == [2, 3] and record["block_share_mean"] == pytest.approx(1 / 12, abs=1e-4)
+
+
+def test_range_conversion_round_trips_within_one_level(tmp_path: Path) -> None:
+    width, height, frames = 16, 8, 3
+    data = np.random.default_rng(1).integers(0, 256, size=(frames, height * 3 // 2, width), dtype=np.uint8)
+    full, limited, back = tmp_path / "f.yuv", tmp_path / "l.yuv", tmp_path / "b.yuv"
+    data.tofile(full)
+    b2.convert_range(full, limited, frames, width, height, to_limited=True)
+    narrow = np.fromfile(limited, np.uint8).reshape(data.shape)
+    assert narrow[:, :height].min() >= 16 and narrow[:, :height].max() <= 235
+    assert narrow[:, height:].min() >= 16 and narrow[:, height:].max() <= 240
+    b2.convert_range(limited, back, frames, width, height, to_limited=False)
+    assert np.abs(np.fromfile(back, np.uint8).reshape(data.shape).astype(int) - data).max() <= 1
+
+
+def test_spearman_ranks() -> None:
+    assert b2.spearman([1, 2, 3, 4], [10, 20, 30, 40]) == pytest.approx(1.0)
+    assert b2.spearman([1, 2, 3, 4], [4, 3, 2, 1]) == pytest.approx(-1.0)
+    assert b2.spearman([1, 2], [1, 2]) is None
+
+
+def test_positive_roi_offset_raises_the_background_blocks(tmp_path: Path) -> None:
+    width, height = 130, 70
+    fg = np.zeros((height, width), bool)
+    fg[65, 129] = True
+    b2.write_roi_map([{"m/fg": fg}], "m", 1, width, height, 32, tmp_path / "roi.txt")
+    assert (tmp_path / "roi.txt").read_text().splitlines() == ["0 32 32 32 32 32 0"]

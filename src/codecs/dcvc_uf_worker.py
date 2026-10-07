@@ -223,6 +223,26 @@ def _read_source(reader: Any, maximum_read: int, frame_delay: int, is_intra: boo
     return x.to(memory_format=torch.channels_last), padding
 
 
+class ModelTimer:
+    """Wall seconds inside the codec's own calls (network and entropy coding), synchronized
+    with the GPU on both sides; reading, colour conversion, hashing and writing are outside."""
+
+    def __init__(self) -> None:
+        self.seconds = 0.0
+        self.calls = 0
+
+    def __call__(self, fn: Any, *args: Any) -> Any:
+        import torch
+
+        torch.cuda.synchronize()
+        started = time.perf_counter()
+        out = fn(*args)
+        torch.cuda.synchronize()
+        self.seconds += time.perf_counter() - started
+        self.calls += 1
+        return out
+
+
 def _profile(fn: Any) -> dict[str, Any]:
     """CUDA kernels launched by ``fn`` (torch profiler), summed by name."""
     import torch
@@ -278,6 +298,7 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
     padding_r, padding_b = DMCI.get_padding_size(height, width, 16)
     output, sps_helper, nals = io.BytesIO(), SPSHelper(), []
     state: dict[str, Any] = {"i_recon_sha256": None}
+    timer = ModelTimer()
     torch.cuda.reset_peak_memory_stats()
     encode_started = time.time()
 
@@ -288,9 +309,9 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
             maximum_read = 1 if is_intra else min(frame_delay, count - index)
             x, padding = _read_source(reader, maximum_read, frame_delay, is_intra, src_type)
             if is_intra:
-                encoded = i_net.compress(x, qp, padding_b, padding_r)
+                encoded = timer(i_net.compress, x, qp, padding_b, padding_r)
                 p_net.clear_dpb()
-                p_net.add_ref_feature_from_frame(encoded["x_hat"])
+                timer(p_net.add_ref_feature_from_frame, encoded["x_hat"])
                 if src_type == "yuv420":
                     state["i_recon_sha256"] = _sha256(_to_yuv420_bytes(encoded["x_hat"], height, width))
                 else:
@@ -299,7 +320,7 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
                 reset = 0
             else:
                 reset = int(RESET_INTERVAL > 0 and (index + frame_delay) % RESET_INTERVAL == 1)
-                encoded = p_net.compress(x, qp, reset, padding_b, padding_r)
+                encoded = timer(p_net.compress, x, qp, reset, padding_b, padding_r)
             sps = {"sps_id": -1, "height": height, "width": width}
             sps_id, sps_new = sps_helper.get_sps_id(sps)
             sps["sps_id"] = sps_id
@@ -324,6 +345,8 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
         "operation": "encode", "structure": plan["structure"], "src_type": src_type, "qp": qp, "frame_count": count,
         "frame_delay": frame_delay, "checkpoints": loaded, "load_seconds": round(load_seconds, 3),
         "encode_seconds": round(time.time() - encode_started, 3), "nals": nals,
+        "model_encode_seconds": round(timer.seconds, 4), "model_calls": timer.calls,
+        "timing": "model_encode_seconds: codec calls only (profiled runs are not timing evidence)",
         "container_bytes": len(container), "container_sha256": _sha256(container),
         "i_recon_sha256": state["i_recon_sha256"], recon_key: state["i_recon_sha256"], "kernels": kernels,
         "peak_allocated_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
@@ -356,6 +379,7 @@ def decode(plan: dict[str, Any]) -> dict[str, Any]:
     with torch.inference_mode():
         for repeat in (0, 1):
             buffer, sps_helper, hashes = io.BytesIO(native), SPSHelper(), []
+            timer = ModelTimer()
             decode_started = time.time()
             for nal_frames in display_schedule(header["frame_count"], frame_delay):
                 nal = read_header(buffer)
@@ -365,11 +389,11 @@ def decode(plan: dict[str, Any]) -> dict[str, Any]:
                 sps = sps_helper.get_sps_by_id(nal["sps_id"])
                 qp, ec_part, reset, bit_stream = read_ip_remaining(buffer)
                 if nal["nal_type"] == NalType.NAL_I:
-                    recon = i_net.decompress(bit_stream, sps, qp, ec_part)["x_hat"]
+                    recon = timer(i_net.decompress, bit_stream, sps, qp, ec_part)["x_hat"]
                     p_net.clear_dpb()
-                    p_net.add_ref_feature_from_frame(recon, apply_feature_adaptor=False)
+                    timer(lambda r: p_net.add_ref_feature_from_frame(r, apply_feature_adaptor=False), recon)
                 else:
-                    recon = p_net.decompress(bit_stream, sps, qp, ec_part, reset)["x_hat"]
+                    recon = timer(p_net.decompress, bit_stream, sps, qp, ec_part, reset)["x_hat"]
                 for offset, display_index in enumerate(nal_frames):
                     frame = recon[offset] if isinstance(recon, list) else recon
                     if out_file is not None:
@@ -386,7 +410,8 @@ def decode(plan: dict[str, Any]) -> dict[str, Any]:
                 raise ValueError("trailing bytes after the declared frame count")
             torch.cuda.synchronize()
             key = "rgb_sha256" if src_type == "png" else "yuv420_sha256"
-            passes.append({key: hashes, "frame_sha256": hashes, "decode_seconds": round(time.time() - decode_started, 3)})
+            passes.append({key: hashes, "frame_sha256": hashes, "decode_seconds": round(time.time() - decode_started, 3),
+                           "model_decode_seconds": round(timer.seconds, 4)})
     if out_file is not None:
         out_file.close()
     return {

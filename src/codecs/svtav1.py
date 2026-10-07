@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import resource
 import shutil
 import struct
 import subprocess
@@ -54,9 +55,15 @@ def ivf_frames(data: bytes) -> list[int]:
     return sizes
 
 
+#: ``--lp`` is a level of parallelism (0-6), not a thread count; level 6 lets the
+#: encoder size its pools freely. The threads it may use are fixed by CPU
+#: affinity instead (`run` with ``cpus``).
+PARALLELISM_LEVEL = 6
+
+
 def encode_command(
     encoder: str, source: Path, stream: Path, *, width: int, height: int, fps: Fraction, frames: int,
-    crf: float, preset: int, threads: int, full_range: bool,
+    crf: float, preset: int, full_range: bool, extra: list[str] | None = None,
 ) -> list[str]:
     """One-pass CRF, random access, one keyframe for the whole clip (``--keyint -1``)."""
     return [
@@ -65,7 +72,7 @@ def encode_command(
         "--fps-num", str(fps.numerator), "--fps-denom", str(fps.denominator), "-n", str(frames),
         "--color-range", "1" if full_range else "0",
         "--rc", "0", "--crf", f"{crf:g}", "--preset", str(preset), "--keyint", "-1",
-        "--lp", str(threads), "--progress", "0",
+        "--lp", str(PARALLELISM_LEVEL), "--progress", "0", *(extra or []),
     ]
 
 
@@ -73,25 +80,36 @@ def decode_command(decoder: str, stream: Path, output: Path, *, threads: int) ->
     return [decoder, "-i", str(stream), "-o", str(output), "--threads", str(threads), "--quiet"]
 
 
-def run(command: list[str], timeout: float) -> float:
-    started = time.time()
-    done = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
+def run(command: list[str], timeout: float, cpus: list[int] | None = None) -> dict[str, float]:
+    """Run a tool, optionally confined to ``cpus``; wall seconds and the CPU seconds it used."""
+    def confine() -> None:
+        if cpus:
+            os.sched_setaffinity(0, cpus)  # type: ignore[attr-defined,unused-ignore]
+
+    before = resource.getrusage(resource.RUSAGE_CHILDREN)
+    started = time.perf_counter()
+    done = subprocess.run(command, capture_output=True, text=True, timeout=timeout, preexec_fn=confine if cpus else None)
+    wall = time.perf_counter() - started
+    after = resource.getrusage(resource.RUSAGE_CHILDREN)
     if done.returncode:
         raise RuntimeError(f"{command[0]} failed ({done.returncode}):\n{done.stderr[-4000:]}")
-    return time.time() - started
+    cpu = (after.ru_utime - before.ru_utime) + (after.ru_stime - before.ru_stime)
+    return {"wall": wall, "cpu": cpu}
 
 
 def code(
     source: Path, work: Path, *, width: int, height: int, fps: Fraction, frames: int, crf: float,
-    preset: int, threads: int, full_range: bool, encoder: str, decoder: str, timeout: float = 3600,
+    preset: int, threads: int, full_range: bool, encoder: str, decoder: str, timeout: float = 7200,
+    cpus: list[int] | None = None, extra: list[str] | None = None,
 ) -> dict[str, Any]:
     """Encode ``source`` and decode it again; returns the stream record and the decoded file."""
     stream, decoded = work / "stream.ivf", work / "decoded.yuv"
     encode = encode_command(encoder, source, stream, width=width, height=height, fps=fps, frames=frames,
-                            crf=crf, preset=preset, threads=threads, full_range=full_range)
-    encode_seconds = run(encode, timeout)
+                            crf=crf, preset=preset, full_range=full_range, extra=extra)
+    load = os.getloadavg()
+    encoded = run(encode, timeout, cpus)
     decode = decode_command(decoder, stream, decoded, threads=threads)
-    decode_seconds = run(decode, timeout)
+    decoded_time = run(decode, timeout, cpus)
     data = stream.read_bytes()
     sizes = ivf_frames(data)
     frame_bytes = width * height * 3 // 2
@@ -101,5 +119,7 @@ def code(
         "payload_bytes": sum(sizes), "temporal_units": len(sizes),
         "decoded_frames": decoded.stat().st_size / frame_bytes,
         "encode_command": encode, "decode_command": decode,
-        "encode_seconds": round(encode_seconds, 3), "decode_seconds": round(decode_seconds, 3),
+        "encode_seconds": round(encoded["wall"], 3), "encode_cpu_seconds": round(encoded["cpu"], 3),
+        "decode_seconds": round(decoded_time["wall"], 3), "decode_cpu_seconds": round(decoded_time["cpu"], 3),
+        "cpus": cpus, "host_load_before": [round(v, 2) for v in load],
     }
