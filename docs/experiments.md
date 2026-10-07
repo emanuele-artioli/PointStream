@@ -374,3 +374,36 @@ invocation turns out to be needed.
   DCVC-UF as three GPU jobs of 11–12 items on one GPU class (≤ 2.5 h each).
   Ceiling 10 GPU-hours and 12 h wall, including staging (73 GB of videos in
   all; each job stages only its items' videos).
+- Pilot jobs (environment `pointstream-20261006T113321Z`; all validators
+  passed, every sparse JPEG of the 4 items matched): SVT-AV1
+  `20261007T091445Z-cb576ca3` (gpu6, CPU only, `49b72af`, 1,581 s full stage);
+  DCVC-UF HT-S `20261007T094441Z-ba27412b` (gpu6, RTX 6000 Ada, `361067a`,
+  991 s); HT-L `20261007T094711Z-0e696539` (gpu3, RTX A6000, `361067a`,
+  1,709 s). Failed or stopped first attempts, none evidence: `…091007Z-91bbfae2`
+  (the hosts' ffmpeg could not load libvmaf without its library path),
+  `…091602Z-72ae5f5b`, `…091717Z-9b051cd0`, `…093027Z-71cc5ec2` (PyAV
+  stalled decoding in a process that had loaded torchvision; windows are now
+  decoded in a fresh process), `…093726Z-4e7676dc` (CPU and GPU PSNR differed
+  by 5.6e-5 dB, from rounding in the float RGB view, against a check of
+  exact equality; now < 1e-3 dB), and the cancelled `…091012Z-fb21885b`,
+  `…091018Z-7bae2104`, `…093958Z-a67af345`.
+- Pilot outcome (means over the 4 items, `visor_dense`). SVT-AV1 CRF 62 to 13:
+  378 kbps 34.3 dB to 29.5 Mbps 44.5 dB weighted PSNR. DCVC-UF HT-S QP 0 to
+  63: 78 kbps 27.2 dB to 3.2 Mbps 38.6 dB; HT-L: 60 kbps 28.5 dB to 3.0 Mbps
+  39.1 dB. HT-L against HT-S: BD-rate −42.9% (per item −33 to −51%), so
+  HT-L. GPU class does not explain it: the audit coded one clip with HT-S on
+  Ada and A6000 at 0.00634 and 0.00633 bpp, PSNR within 0.08 dB. SVT-AV1
+  beats HT-S at every rate (e.g. 1,403 kbps 37.7 dB against 1,823 kbps
+  37.4 dB), also in luma PSNR on the raw planes on every item, so it is not an
+  artefact of the RGB view or the masks; HT-L is close to SVT-AV1 (953 kbps
+  37.0 dB against SVT-AV1 894 kbps 36.7 dB). DCVC-UF reaches at most 3.0–3.2
+  Mbps at QP 63, so the common range ends at 38.6 dB. The rule gives the range
+  34.3–38.6 dB (4.3 dB), SVT-AV1 CRF 41, 48, 55, 62 and DCVC-UF HT-L QP 27,
+  36, 45, 54, 63; no refinement (`b2 choose`). SVT-AV1 has no point below the
+  range, which its own lowest point sets. Missing labelled objects: 6% of
+  each frame's on the EK-100 pilot items, 32% on EK-55. Caveat: DCVC-UF codes
+  the sources' full-range YUV, while its training video is most likely
+  limited range.
+- Full run: SVT-AV1 two CPU jobs of 17 items; DCVC-UF HT-L three jobs of
+  11–12 items, all on RTX A6000 (the pilot's class, so the 4 pilot items must
+  reproduce bit for bit).
