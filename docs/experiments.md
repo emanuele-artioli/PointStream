@@ -479,3 +479,68 @@ invocation turns out to be needed.
   SVT-AV1 (−0.42 with SVT-AV1's background PSNR). Neither codec is told
   where the foreground is: both encode the whole frame, and masks enter only
   the scoring.
+- Correction (found in B2b): B2 passed `--lp 8` meaning 8 threads, but
+  SVT-AV1 4.2.0's `--lp` is a parallelism level (0–6); 8 was clamped to 6, so
+  every encode could use the whole host. Rate and quality are unaffected (the
+  output is deterministic: pilot items reproduced bit for bit across hosts);
+  the SVT-AV1 timings above are not "8 threads".
+
+### 2026-10-07 — B2b: fair baselines (timing, equal time, ROI, range, complexity)
+- Question: are B2's baselines as strong and as fairly configured as they
+  should be before PointStream is compared with them? Code: `cdab5fc` and
+  later (`experiments/visor/b2.py` variants, `src/codecs/svtav1.py` CPU
+  confinement, DCVC-UF codec-call timing). Every SVT-AV1 encode now runs on
+  its worker's own cores (CPU affinity), with wall and CPU seconds; every
+  codec is scored on the GPU (B2's CPU scores stay valid). The low-rate
+  resolution ladder (PLAN B2b item 3) waits for PointStream's operating
+  rates; its points will be chosen by PointStream's rate range alone, never by
+  how PointStream scores against them.
+- J1, DCVC-UF codec timing and range check. HT-L on the 4 pilot items, 240
+  frames, QP 27, 36, 45, 54, 63, each with full-range input (B2's
+  configuration, also a reproduction check against B2's streams) and with
+  limited-range input (source mapped to 16–235/16–240, output mapped back,
+  scored against the same full-range reference); RTX A6000 on gpu3, 8 threads.
+  Timing: wall seconds inside the codec calls (network and entropy coding,
+  GPU-synchronized), apart from reading, 4:2:0 conversion, hashing and the
+  second, verifying decode. Decision rule (range): if limited-range input
+  changes DCVC-UF's BD-rate against its full-range self (weighted PSNR, mean
+  over the 4 items) by more than 3%, B2's DCVC-UF curves are re-run with the
+  better input and the paper reports both; otherwise full range stands.
+  Hypothesis: limited range costs DCVC-UF little (within 3%). Competing
+  explanation: its training on limited-range YUV makes full range out of
+  distribution, so limited range is clearly better.
+- J2, SVT-AV1 time per preset. Presets 1, 2, 3, 4, 5, 6, 8, 10, 12 on two
+  pilot items (P01_107 EK-100, P02_02 EK-55), CRF 41, 48, 55, 62, one window
+  at a time on 32 cores of gpu3 (half its 64; DCVC-UF had one GPU and 8
+  cores there), after J1 finishes so the host is not shared with it; scored on
+  its A6000. Decision rule (equal time): SVT-AV1's B2 preset becomes the
+  slowest preset whose median encode wall time per window is at most
+  DCVC-UF HT-L's median codec encode time per window from J1 (same host);
+  if that is not preset 4, the B2 SVT-AV1 curves and the ROI run use it, and
+  preset 4 stays as a reference. Hypothesis: DCVC-UF's codec time is far
+  below B2's 12.5 s, so the fair SVT-AV1 preset is faster than 4 (and worse).
+  Competing explanation: DCVC-UF's entropy coding on the CPU dominates and its
+  time is near B2's, so preset 4 or slower fits.
+- J3, ROI SVT-AV1 pilot. `--roi-map-file` with quantizer offsets 0 (control),
+  −16, −32, −64 inside every 64×64 block that touches the VISOR foreground,
+  per frame; preset 4, CRF 41, 48, 55, 62, the 4 pilot items, scored on the
+  GPU. Decision rule: the offset with the most negative mean BD-rate on
+  weighted PSNR against offset 0 is adopted for the full ROI run (all 34
+  items, at the equal-time preset); if none is below −3%, ROI is reported as
+  not helping. Whole-frame PSNR and VMAF BD-rates are reported beside it,
+  since ROI trades background for foreground. Hypothesis: a moderate offset
+  (−16 or −32) gains more than 5% on weighted PSNR. Competing explanation:
+  64×64 blocks cover so much more than the hands (median foreground 20% of
+  the frame) that the shift barely changes the weighting.
+- J4, SVT-AV1 without temporal filtering (secondary): `--enable-tf 0`, preset
+  4, CRF 41–62, the 4 pilot items, against B2's pilot streams. Reported, no
+  decision attached.
+- J5, complexity (secondary, CPU): per frame, VCA v2 (`/opt/local/bin/vca`,
+  E and h), ffmpeg `siti`, and Sobel gradient and frame-difference means
+  inside and outside the foreground, for all 34 items; correlated (Spearman,
+  over items) with B2's per-item BD-rates in `b2 report --complexity`. Run as
+  two jobs on gpu6 and gpu1, where B2's SVT-AV1 jobs left those items' videos
+  cached. Reported, no decision attached.
+- Budget: J1 ≤ 1.5 h on one A6000; J2 ≤ 2.5 h (32 threads, GPU for scoring
+  only); J3 ≤ 1 h and J4 ≤ 0.5 h on any Ada, A6000 or RTX 8000 (scoring
+  only); J5 ≤ 1 h CPU. Ceiling 6 GPU-hours and 8 h wall; smokes ≤ 600 s.
