@@ -696,6 +696,43 @@ def merge_results(paths: list[str]) -> dict[str, Any]:
     return {**first, "items": items, "curves": curves(items, sorted(first["masks"])), "merged_from": paths}
 
 
+PLOT_LABELS = {"svtav1": "SVT-AV1 preset 4", "dcvc": "DCVC-UF"}
+PLOT_METRICS = (("wpsnr", "Weighted PSNR (dB), 0.7 fg + 0.3 bg"), ("psnr_fg", "Foreground PSNR (dB)"),
+                ("vmaf", "VMAF"), ("wlpips", "Weighted LPIPS (lower is better)"))
+
+
+def plot_report(report: dict[str, Any], target: Path, mask_set: str = "visor_dense") -> None:
+    """Rate against quality per video type: means over items at each rate point."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import FixedLocator, NullFormatter, ScalarFormatter
+
+    groups = ("EK-100", "EK-55")
+    fig, axes = plt.subplots(len(groups), len(PLOT_METRICS), figsize=(16, 7.5), constrained_layout=True)
+    for r, group in enumerate(groups):
+        for c, (key, label) in enumerate(PLOT_METRICS):
+            ax = axes[r][c]
+            for codec, codec_curves in report["curves"].items():
+                rows = codec_curves[group][mask_set]
+                ax.plot([row["kbps"] for row in rows], [row[key] for row in rows], "o-", ms=4,
+                        label=f"{PLOT_LABELS.get(codec, codec)} (n={rows[0]['items']})")
+            ax.set_xscale("log")
+            ax.xaxis.set_major_locator(FixedLocator([300, 500, 1000, 2000, 3000]))
+            ax.xaxis.set_major_formatter(ScalarFormatter())
+            ax.xaxis.set_minor_formatter(NullFormatter())
+            ax.grid(True, which="both", alpha=0.3)
+            ax.set_ylabel(f"{group}\n{label}" if c == 0 else label)
+            if r == len(groups) - 1:
+                ax.set_xlabel("Rate (kbps, mean over items)")
+            if r == 0 and c == 0:
+                ax.legend(fontsize=8)
+    fig.suptitle(f"B2 on VISOR evaluation set v2 (240-frame windows), masks: {mask_set}")
+    fig.savefig(target, dpi=130)
+    plt.close(fig)
+
+
 def command_report(args: argparse.Namespace) -> int:
     sources = parse_named(args.result)
     results = {name: merge_results(path.split(",")) for name, path in sources.items()}
@@ -732,6 +769,8 @@ def command_report(args: argparse.Namespace) -> int:
                     "note": "positive: more rate than the anchor at equal quality; cubic fit over each item's common range",
                 }
     write_json(out / "b2-report.json", report)
+    if args.plot:
+        plot_report(report, out / "b2-rd.png")
     print(json.dumps({k: v for k, v in report.items() if k != "curves"}, indent=1)[:4000])
     return 0
 
@@ -841,6 +880,7 @@ def main(argv: list[str] | None = None) -> int:
     report = sub.add_parser("report")
     report.add_argument("--result", action="append", required=True, help="NAME=b2.json[,b2.json...] (one codec, merged); with two names, the second is compared against the first")
     report.add_argument("--out", required=True)
+    report.add_argument("--plot", action="store_true", help="also draw b2-rd.png (needs matplotlib)")
     choose = sub.add_parser("choose", help="apply the pilot rule: DCVC-UF structure and rate points")
     choose.add_argument("--result", action="append", required=True, help="NAME=pilot b2.json (SVT-AV1, DCVC-UF HT-S, HT-L)")
     choose.add_argument("--out")
