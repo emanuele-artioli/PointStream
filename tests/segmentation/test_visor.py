@@ -100,6 +100,41 @@ def test_native_classes(annotation: dict[str, Any], expected: str) -> None:
     assert visor.native_class(annotation) == expected
 
 
+def test_hand_gaps_find_dropped_and_cut_short_hands() -> None:
+    hand = square(100, 100, 200)
+    dense = {"video_annotations": [
+        # Run r1 (10-12): right hand labelled at both ends, kept only on frame 10.
+        {"image": {"name": f"P99_01_frame_{n:010d}.png", "video": "P99_01", "interpolation": "r1",
+                   "interpolation_start_frame": "P99_01_frame_0000000010.png",
+                   "interpolation_end_frame": "P99_01_frame_0000000012.png"},
+         "annotations": [mask("right hand", hand, int(n != 11))] if n == 10 else [mask("cup", hand)]}
+        for n in (10, 11, 12)
+    ] + [
+        # Run r2 (12-14): left hand labelled at the start only, dropped from the run.
+        {"image": {"name": f"P99_01_frame_{n:010d}.png", "video": "P99_01", "interpolation": "r2",
+                   "interpolation_start_frame": "P99_01_frame_0000000012.png",
+                   "interpolation_end_frame": "P99_01_frame_0000000014.png"},
+         "annotations": [mask("cup", hand)]}
+        for n in (12, 13, 14)
+    ]}
+
+    def human(n: int, names: list[str]) -> dict[str, Any]:
+        return {"image": {"name": f"P99_01_frame_{n:010d}.jpg", "video": "P99_01"},
+                "annotations": [{"name": name, "segments": hand} for name in names]}
+
+    sparse = {"video_annotations": [human(10, ["right hand", "cup"]), human(12, ["right hand", "left hand", "cup"]),
+                                    human(14, ["cup"])]}
+    gaps = visor.hand_gaps(dense, sparse)
+    # r1: the right hand (both ends) is cut short after frame 10; the left hand,
+    # labelled at the end of r1 only, is absent there, so r1 lacks it throughout.
+    assert gaps[10] == {"left hand"} and gaps[11] == gaps[12] == {"left hand", "right hand"}
+    # r2: both hands are labelled at its start only and absent there.
+    assert gaps[13] == gaps[14] == {"left hand", "right hand"}
+    complete = {"video_annotations": [human(10, ["right hand", "cup"]), human(12, ["cup"]), human(14, ["cup"])]}
+    # Labelled at frame 10 only and present there: it may leave the frame, so no gap.
+    assert visor.hand_gaps(dense, complete) == {}
+
+
 def test_shared_boundary_frames_merge_and_runs_split_at_gaps() -> None:
     frames = visor.frames(dense_doc())
     assert sorted(frames) == [10, 11, 12, 13, 20, 21]
@@ -212,16 +247,16 @@ def test_convert_item_and_validator(tmp_path: Path) -> None:
             "dense_member": "dense/P99_01_interpolations.json", "video_file": {"sha256": "0" * 64},
             "dense_sha256": b1.file_sha256(archive / "dense" / "P99_01_interpolations.json")}
     row = b1.convert_item(item, str(archive), 4, str(tmp_path / "publish"))
-    assert row["dense_sha256_matches"] and row["first_is_keyframe"] and row["labelled"] == 4
+    assert row["dense_sha256_matches"] and row["first_is_keyframe"] and row["labelled"] == 4 and row["hand_gap_frames"] == 0
     assert row["aligned_exactly"] and row["video_indices"] == [9, 12]
-    agreement = row["human_agreement_first_frame"]
+    agreement = row["human_agreement"]["10"]
     assert agreement["left hand"] > 0.95 and agreement["objects"]["cup"] > 0.95
     assert (tmp_path / "publish" / "masks" / item["id"] / "masks.rle").is_file()
 
     stage = tmp_path / "stage"
     b1.write_json(stage / "evalset.json", {
         "frames_per_item": 4, "items": [row],
-        "dense_vs_human_first_frame_iou": {"hands": {"n": 1, "median": agreement["left hand"]}},
+        "dense_vs_human_keyframe_iou": {"hands": {"n": 1, "median": agreement["left hand"]}},
     })
     checks = b1.validate_evalset(stage)
     assert all(checks.values()), checks

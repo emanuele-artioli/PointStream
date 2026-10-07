@@ -218,25 +218,31 @@ def mask_digest(clip: ClipMasks) -> str:
 
 
 def human_agreement(clip: ClipMasks, sparse: dict[str, Any], first: int) -> dict[str, Any]:
-    """IoU of the dense keyframe (480p redraw) with the human 1080p masks of the same frame."""
-    frame = visor.frames(sparse).get(first)
-    if frame is None:
-        return {"present": False}
+    """IoU of the dense masks with the human 1080p masks on every sparse frame inside the clip."""
+    human_frames = visor.frames(sparse)
+    return {
+        str(first + index): frame_agreement(clip, index, human_frames[first + index])
+        for index in range(len(clip)) if first + index in human_frames
+    }
+
+
+def frame_agreement(clip: ClipMasks, index: int, frame: visor.Frame) -> dict[str, Any]:
+    """Per hand and per shared object label, IoU of dense masks (480p redraw) with human masks."""
     human = visor.frame_instances(frame, dense=False, tracks={})
     out: dict[str, Any] = {"present": True}
     for scope in ("left hand", "right hand"):
-        a, b = clip.class_mask(0, scope), np.zeros((clip.height, clip.width), bool)
+        a, b = clip.class_mask(index, scope), np.zeros((clip.height, clip.width), bool)
         for inst in human:
             if inst.class_name == scope:
                 b |= inst.mask()
         if a.any() or b.any():
             out[scope] = round(float((a & b).sum() / (a | b).sum()), 4)
-    labels = {inst.label for inst in clip.frames[0] if inst.class_name == "active object" and inst.label}
+    labels = {inst.label for inst in clip.frames[index] if inst.class_name == "active object" and inst.label}
     objects = {}
     for label in sorted(labels & {inst.label for inst in human if inst.label}):
         a = np.zeros((clip.height, clip.width), bool)
         b = np.zeros_like(a)
-        for inst in clip.frames[0]:
+        for inst in clip.frames[index]:
             if inst.label == label:
                 a |= inst.mask()
         for inst in human:
@@ -244,7 +250,9 @@ def human_agreement(clip: ClipMasks, sparse: dict[str, Any], first: int) -> dict
                 b |= inst.mask()
         objects[label] = round(float((a & b).sum() / max((a | b).sum(), 1)), 4)
     out["objects"] = objects
-    out["human_only_labels"] = sorted({inst.label for inst in human} - {inst.label for inst in clip.frames[0]})
+    out["human_only_labels"] = sorted(
+        {inst.label for inst in human if inst.label} - {inst.label for inst in clip.frames[index] if inst.label}
+    )
     return out
 
 
@@ -272,6 +280,7 @@ def convert_item(item: dict[str, Any], archive: str, frames: int, publish: str) 
     converted = time.time() - started
     target = clip.save(Path(publish) / "masks" / item["id"])
     sparse = visor.load_annotations(Path(archive) / f"annotations/{item['video']}.json")
+    gaps = visor.hand_gaps(doc, sparse)
     scored = compare(hold_first(clip), clip)
     counts = Counter(inst.class_name for instances in clip.frames for inst in instances)
     return {
@@ -284,7 +293,8 @@ def convert_item(item: dict[str, Any], archive: str, frames: int, publish: str) 
         "instances_per_class": dict(sorted(counts.items())),
         "provenance": dict(Counter(inst.provenance for f in clip.frames for inst in f)),
         "mask_sha256": mask_digest(clip), "masks_rle_sha256": file_sha256(target),
-        "human_agreement_first_frame": human_agreement(clip, sparse, item["first_visor_frame"]),
+        "human_agreement": human_agreement(clip, sparse, item["first_visor_frame"]),
+        "hand_gap_frames": sum(1 for n in range(item["first_visor_frame"], item["first_visor_frame"] + frames) if n in gaps),
         "hold_first": scored, "convert_seconds": round(converted, 2),
         "total_seconds": round(time.time() - started, 2),
     }
@@ -306,13 +316,13 @@ def command_evalset(args: argparse.Namespace) -> int:
     for scope in scopes:
         values = [row["hold_first"]["scopes"][scope] for row in rows if scope in row["hold_first"]["scopes"]]
         summary[scope] = {key: round(float(np.mean([v[key] for v in values])), 4) for key in ("J", "F", "J&F")}
-    hands = [v for row in rows for k, v in row["human_agreement_first_frame"].items() if k in visor.HANDS]
-    objects = [v for row in rows for v in row["human_agreement_first_frame"].get("objects", {}).values()]
+    hands = [v for row in rows for frame in row["human_agreement"].values() for k, v in frame.items() if k in visor.HANDS]
+    objects = [v for row in rows for frame in row["human_agreement"].values() for v in frame.get("objects", {}).values()]
     write_json(stage_dir() / "evalset.json", {
         "eval_set": {"path": args.eval_set, "sha256": file_sha256(Path(args.eval_set)), "name": eval_set["name"]},
         "frames_per_item": args.frames, "items": rows,
         "hold_first_mean_over_items": summary,
-        "dense_vs_human_first_frame_iou": {
+        "dense_vs_human_keyframe_iou": {
             "hands": {"n": len(hands), "median": round(float(np.median(hands)), 4) if hands else None, "min": min(hands, default=None)},
             "objects": {"n": len(objects), "median": round(float(np.median(objects)), 4) if objects else None, "min": min(objects, default=None)},
         },
@@ -339,13 +349,14 @@ def validate_mapping(stage: Path) -> dict[str, bool]:
 def validate_evalset(stage: Path) -> dict[str, bool]:
     result = json.loads((stage / "evalset.json").read_text())
     rows = result["items"]
-    hands = result["dense_vs_human_first_frame_iou"]["hands"]
+    hands = result["dense_vs_human_keyframe_iou"]["hands"]
     scores = [s[k] for row in rows for s in row["hold_first"]["scopes"].values() for k in ("J", "F") if s[k] is not None]
     return {
         "items_converted": bool(rows),
         "every_frame_labelled": all(row["labelled"] == row["frames"] == result["frames_per_item"] for row in rows),
         "dense_sources_match_their_sha256": all(row["dense_sha256_matches"] for row in rows),
-        "items_start_on_a_keyframe": all(row["first_is_keyframe"] for row in rows),
+        "items_have_no_hand_gap": all(row["hand_gap_frames"] == 0 for row in rows),
+        "items_contain_a_human_keyframe": all(row["human_agreement"] for row in rows),
         "items_aligned_exactly_on_the_video": all(row["aligned_exactly"] and row["video_indices_match_eval_set"] for row in rows),
         "only_interpolated_provenance": all(set(row["provenance"]) == {visor.INTERPOLATED} for row in rows),
         "hands_present": all(row["instances_per_class"].get("left hand", 0) + row["instances_per_class"].get("right hand", 0) > 0 for row in rows),

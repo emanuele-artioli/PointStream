@@ -113,6 +113,27 @@ invocation turns out to be needed.
   JPEGs). Revisit the second if reviewers need full EK-55 clips or the exact
   frames are too sparse for stable B2/D1 numbers.
 
+### 2026-10-07: VISOR evaluation set v2 and a SAM fill for missing hands
+- Context: B1's first set (16 EK-100 items) was exact but excluded EK-55
+  wholesale, and VISOR's dense masks leave out hands a human labelled
+  (22–30% of dense val frames; [B1 run](#2026-10-06--b1-visor-frame-mapping-and-evaluation-set)).
+- Decision (set v2, fixed before any item is scored): one item per validation
+  video of a verified 1080p video class with one VISOR frame per decoded frame
+  (EK-100 50 fps and EK-55 59.94 fps); the item is a 240-frame window, from
+  the non-overlapping windows of each dense run, picked by
+  sha256("pointstream-b1:<video>") among those that lie exactly on the video
+  and have no hand gap (`visor.hand_gaps`: a hand labelled by a human at both
+  ends of a run is in every dense frame of it, and one labelled at one end is
+  in the dense masks at that end). Expected from the metadata survey: about 15
+  EK-100 and 20 EK-55 items. Objects other than hands may still be missing;
+  that is reported, not filtered.
+- Decision (later step, PLAN B1b): fill the missing hands and objects with SAM
+  3.1 tracking from the human keyframe masks, as tier `sam_from_label_prompt`.
+  Adopt it if it passes validation on keyframes it never saw and on a random
+  sample of in-between frames, checked by eye and against EPIC-KITCHENS
+  hand-object boxes (a detector's output, independent of SAM). Every result is
+  reported with and without the fill.
+
 ### 2026-10-05: Baselines
 - Decision: SVT-AV1 plus one state-of-the-art neural video codec. VVC only if a
   correct invocation is needed.

@@ -12,18 +12,22 @@ root without copying it.
 
 ``evalset`` fixes the evaluation set from the validation split and writes
 ``visor-val-dense.tar`` with the dense interpolation zips, sparse annotation
-JSONs and the released JPEG of each item's first frame, plus
-``eval_set.json``. The rule, decided before any item was scored:
+JSONs and the released JPEGs of the sparse frames inside each item, plus
+``eval_set.json``. The rule (docs/experiments.md, B1), decided before any
+item was scored:
 
-1. every validation video with a dense file in a video class (codec, size,
-   rate) where the frame-mapping check (``--mapping``) found both VISOR frame
-   n = decoded frame n - 1 and the reader's EPIC rule to hold on every checked frame;
-2. its runs: maximal stretches of consecutive labelled frames;
-3. eligible runs: at least ``--length`` frames, and the first ``--length`` lie
-   exactly on the video (`visor.frame_alignment`: no drift between keyframes);
-4. among them, the one indexed by sha256("pointstream-b1:<video>") modulo their
-   count, content-blind;
-5. the item is that run's first ``--length`` frames, starting on a keyframe.
+1. every validation video with a dense file whose video class (codec, size,
+   rate) is 1080p, has one VISOR frame per decoded frame (50 or 59.94 fps),
+   and passed the reader's EPIC rule on every frame the mapping check
+   (``--mapping``) checked;
+2. its windows: non-overlapping ``--length``-frame stretches of each run of
+   consecutive labelled frames, from the run's start;
+3. eligible windows: every frame placed exactly on the video
+   (`visor.frame_alignment`: no drift between keyframes, consecutive decoded
+   frames) and no hand gap (`visor.hand_gaps`: no hand a human labelled at an
+   end of a run is missing from its dense masks);
+4. the item is the eligible window indexed by sha256("pointstream-b1:<video>")
+   modulo their count, content-blind: one per video.
 
 Both commands read the VISOR zip in place and never extract it; they write a
 few large files, never many small ones. Run them on a fleet host with the
@@ -188,7 +192,7 @@ def command_mapping(args: argparse.Namespace) -> int:
     return 0
 
 
-def pick_run(video: str, eligible: list[tuple[int, int]]) -> tuple[int, int]:
+def pick_run(video: str, eligible: list[Any]) -> Any:
     index = int(sha256(f"{SEED}:{video}".encode()), 16) % len(eligible)
     return eligible[index]
 
@@ -196,7 +200,10 @@ def pick_run(video: str, eligible: list[tuple[int, int]]) -> tuple[int, int]:
 def command_evalset(args: argparse.Namespace) -> int:
     release = Release()
     holds = json.loads(args.mapping.read_text())["rule_holds_for_classes"]
-    verified = set(holds["visor_minus_one"]) & set(holds["epic_reader"])
+    verified = {
+        key for key in holds["epic_reader"]
+        if " 1920x1080 " in key and abs(float(key.split()[-1]) / visor.extraction_rate(float(key.split()[-1])) - 1) < 0.01
+    }
     mapping = json.loads(release.zip.read(release.mapping_name))
     mapping_bytes, mapping_record = release.member(release.mapping_name)
     members: dict[str, bytes] = {"frame_mapping.json": mapping_bytes}
@@ -205,7 +212,7 @@ def command_evalset(args: argparse.Namespace) -> int:
     for video in sorted(v for v, (split, _) in release.dense.items() if split == "val"):
         info = video_class(Path(release.video(video)["path"]))
         if info["key"] not in verified or not info["constant_rate"]:
-            excluded.append({"video": video, "reason": f"class {info['key']} is not exactly aligned", "class": info})
+            excluded.append({"video": video, "reason": f"class {info['key']} is not verified 1080p one-to-one", "class": info})
             continue
         dense_bytes, dense_record = release.member(release.dense[video][1])
         doc = visor.load_annotations(dense_bytes)
@@ -216,51 +223,58 @@ def command_evalset(args: argparse.Namespace) -> int:
             doc, visor.keyframe_anchors(doc, mapping[video], fps), fps / visor.extraction_rate(fps)
         )
 
-        def exact(first: int) -> bool:
+        sparse_bytes, sparse_record = release.member(release.sparse[video][1])
+        sparse_doc = json.loads(sparse_bytes)
+        gaps = visor.hand_gaps(doc, sparse_doc)
+
+        def eligible_window(first: int) -> bool:
             placed = [alignment.get(n) for n in range(first, first + args.length)]
-            return all(p is not None and p["exact"] for p in placed) and all(
-                b["index"] == a["index"] + 1 for a, b in zip(placed, placed[1:])  # type: ignore[index]
+            return (
+                all(p is not None and p["exact"] for p in placed)
+                and all(b["index"] == a["index"] + 1 for a, b in zip(placed, placed[1:]))  # type: ignore[index]
+                and placed[-1]["index"] < info["frames"]  # type: ignore[index]
+                and not any(n in gaps for n in range(first, first + args.length))
             )
 
-        eligible = [r for r in all_runs if r[1] - r[0] + 1 >= args.length and exact(r[0])]
+        windows = [
+            (start, run) for run in all_runs for start in range(run[0], run[1] - args.length + 2, args.length)
+        ]
+        eligible = [(start, run) for start, run in windows if eligible_window(start)]
         if not eligible:
-            excluded.append({"video": video, "reason": f"no run of {args.length} frames", "runs": len(all_runs)})
+            excluded.append({"video": video, "reason": "no exactly aligned, hand-complete window",
+                             "windows": len(windows), "runs": len(all_runs)})
             continue
-        run = pick_run(video, eligible)
-        first, last = run[0], run[0] + args.length - 1
-        if visor.visor_frame_to_video_index(last) >= info["frames"]:
-            excluded.append({"video": video, "reason": "window ends after the video", "class": info})
-            continue
-        sparse_bytes, sparse_record = release.member(release.sparse[video][1])
-        start_jpeg = next(
-            e["image"]["name"] for e in json.loads(sparse_bytes)["video_annotations"]
-            if visor.frame_number(e["image"]["name"]) == first
-        )
+        first, run = pick_run(video, eligible)  # type: ignore[arg-type]
+        last = first + args.length - 1
+        sparse_names = [e["image"]["name"] for e in sparse_doc["video_annotations"]
+                        if first <= visor.frame_number(e["image"]["name"]) <= last]
         members[f"dense/{video}_interpolations.zip"] = dense_bytes
         sources[f"dense/{video}_interpolations.zip"] = dense_record
         members[f"annotations/{video}.json"] = sparse_bytes
         sources[f"annotations/{video}.json"] = sparse_record
-        members[f"rgb_frames/{start_jpeg}"] = release.jpegs(video, [start_jpeg])[start_jpeg]
+        for name, data in release.jpegs(video, sparse_names).items():
+            members[f"rgb_frames/{name}"] = data
         window = [labelled[n] for n in range(first, last + 1)]
         items.append({
             "id": f"{video}_{first:010d}", "video": video, "split": "val",
             "first_visor_frame": first, "last_visor_frame": last, "frames": args.length,
             "first_video_index": alignment[first]["index"],
             "fps": fps, "video_class": info["key"],
-            "run": {"first": run[0], "last": run[1], "eligible_runs": len(eligible), "runs": len(all_runs)},
+            "run": {"first": run[0], "last": run[1], "windows": len(windows), "eligible_windows": len(eligible),
+                    "runs": len(all_runs)},
             "keyframes": [i for i, frame in enumerate(window) if frame.keyframe],
             "labels": sorted({a["name"] for frame in window for a in frame.annotations}),
-            "start_jpeg": f"rgb_frames/{start_jpeg}",
+            "sparse_jpegs": [f"rgb_frames/{name}" for name in sparse_names],
             "dense_member": f"dense/{video}_interpolations.zip", "dense_sha256": dense_record["sha256"],
             "video_file": release.video(video),
         })
     args.out_dir.mkdir(parents=True, exist_ok=True)
     tar_sha = write_tar(args.out_dir / "visor-val-dense.tar", members)
     eval_set = {
-        "name": "visor-val-b1", "created_utc": datetime.now(timezone.utc).isoformat(),
+        "name": "visor-val-b1-v2", "created_utc": datetime.now(timezone.utc).isoformat(),
         "rule": {"split": "val", "length": args.length, "seed": SEED, "verified_classes": sorted(verified),
                  "mapping_result": {"path": str(args.mapping), "sha256": file_sha256(args.mapping)},
-                 "summary": "one exactly aligned run per validation video of a verified class, its first frames from a keyframe; tools/datasets/visor_b1_inputs.py"},
+                 "summary": "one exactly aligned, hand-complete window per validation video of a verified 1080p one-to-one class, picked content-blind; tools/datasets/visor_b1_inputs.py"},
         "source_zip": {"path": str(ROOT / ZIP_NAME), "sha256": release.files[ZIP_NAME]["sha256"]},
         "dataset_manifest": {"path": str(MANIFEST), "sha256": release.manifest_sha256},
         "archive": {"path": str(args.out_dir / "visor-val-dense.tar"), "sha256": tar_sha, "sources": sources},

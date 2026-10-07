@@ -227,6 +227,47 @@ def runs(numbers: Iterable[int]) -> list[tuple[int, int]]:
     return out
 
 
+def hand_gaps(dense: dict[str, Any], sparse: dict[str, Any]) -> dict[int, set[str]]:
+    """Hands the human labels expect in each dense frame but the dense masks lack.
+
+    VISOR filters each object's track between two keyframes by its
+    interpolation score, so a dense run can drop or cut short a hand the human
+    labelled. Within a run from keyframe ``a`` to ``b``: a hand labelled at both
+    ``a`` and ``b`` must be in every dense frame of the run; a hand labelled at
+    only one end must be in the dense masks at that end (it may leave or enter
+    in between). Returns VISOR frame -> missing hand classes, only for frames
+    with a gap. Hands that come and go between keyframes are invisible to
+    every label and are not counted.
+    """
+    human = frames(sparse)
+
+    def hands(annotations: Iterable[dict[str, Any]]) -> set[str]:
+        return {native_class(a) for a in annotations} & set(HANDS)
+
+    runs_by_id: dict[str, dict[int, set[str]]] = {}
+    bounds: dict[str, tuple[int, int]] = {}
+    for entry in dense["video_annotations"]:
+        image = entry["image"]
+        run = image["interpolation"]
+        if "interpolation_start_frame" not in image or "interpolation_end_frame" not in image:
+            continue  # a run without named keyframes cannot be checked
+        bounds[run] = (frame_number(image["interpolation_start_frame"]), frame_number(image["interpolation_end_frame"]))
+        runs_by_id.setdefault(run, {}).setdefault(frame_number(image["name"]), set()).update(hands(entry["annotations"]))
+    gaps: dict[int, set[str]] = {}
+    for run, (a, b) in bounds.items():
+        dense_hands = runs_by_id[run]
+        at_a = hands(human[a].annotations) if a in human else set()
+        at_b = hands(human[b].annotations) if b in human else set()
+        both = at_a & at_b
+        for number in range(a, b + 1):
+            missing = both - dense_hands.get(number, set())
+            missing |= {h for h in at_a - at_b if h not in dense_hands.get(a, set())}
+            missing |= {h for h in at_b - at_a if h not in dense_hands.get(b, set())}
+            if missing:
+                gaps.setdefault(number, set()).update(missing)
+    return gaps
+
+
 def polygon_mask(
     segments: Sequence[Sequence[Sequence[float]]],
     *,
@@ -426,6 +467,7 @@ __all__ = [
     "frame_instances",
     "frame_number",
     "frames",
+    "hand_gaps",
     "is_dense",
     "keyframe_anchors",
     "load_annotations",

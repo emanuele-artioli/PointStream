@@ -48,6 +48,21 @@ is a fixed list of dense runs from the validation split, recorded with its
 sha256s.
 **Done when** the set converts and a trivial candidate scores against it.
 
+### B1b. Filling VISOR's missing hands and objects
+
+VISOR's dense masks drop an object's track when its interpolation scored poorly,
+so 22–30% of dense validation frames lack a hand a human labelled
+([decision](docs/experiments.md#2026-10-07-visor-evaluation-set-v2-and-a-sam-fill-for-missing-hands)).
+SAM 3.1, prompted with the human masks at a run's keyframes, tracks each
+missing object through the run; the result is tier `sam_from_label_prompt`.
+Validation: prompt at one keyframe and score at the next, which SAM never saw;
+review a random sample of in-between frames by eye; check hands against the
+EPIC-KITCHENS hand-object boxes (detector output, to be acquired and
+manifested like the other datasets). Every B2 and D1 result is reported with
+and without the fill. It also removes unlabelled hands from F1's background
+frames and E1's training targets.
+**Done when** the validation numbers from a recorded job decide adoption.
+
 ### B2. Baseline rate-distortion on VISOR
 
 SVT-AV1 and DCVC-UF on the evaluation set: rate against weighted PSNR
