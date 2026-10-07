@@ -248,7 +248,12 @@ def test_merge_keeps_only_adopted_groups(tmp_path: Path, monkeypatch: pytest.Mon
         merged = ClipMasks.load(tmp_path / "scratch" / "publish" / "masks" / ITEM["id"] / "masks.rle")
         assert sum(inst.provenance == b1b.SAM_TIER for f in merged.frames for inst in f) == sam_left
         assert sum(len(f) for f in merged.frames) == sum(len(f) for f in clip.frames) + sam_left
+        import tarfile
+
+        with tarfile.open(tmp_path / "stage" / "published.tar", "w") as tar:
+            tar.add(tmp_path / "scratch" / "publish", arcname="publish")
         assert all(b1b.validate_merge(tmp_path / "stage").values())
+        (tmp_path / "stage" / "published.tar").unlink()
 
 
 def test_fill_rejects_a_track_that_latched_onto_another_object() -> None:

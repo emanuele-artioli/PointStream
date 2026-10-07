@@ -695,18 +695,33 @@ def validate_result(stage: Path) -> dict[str, bool]:
 
 
 def validate_merge(stage: Path) -> dict[str, bool]:
+    """Checks on the merged set as published: the stage's ``published.tar`` (scratch is gone by then)."""
+    import tarfile
+
+    from src.segmentation.masks import decompress
+
     result = json.loads((stage / "merge.json").read_text())
     rows = result["items"]
     allowed = {visor.INTERPOLATED, SAM_TIER}
     groups = set(result["groups"])
-    publish = Path(os.environ.get("PS_SCRATCH_DIR") or stage / "scratch") / "publish" / "masks"
     sam_hands = 0
-    for row in rows:
-        clip = ClipMasks.load(publish / row["id"] / "masks.rle")
-        sam_hands += sum(1 for f in clip.frames for inst in f if inst.provenance == SAM_TIER and inst.class_name in visor.HANDS)
+    matches = []
+    with tarfile.open(stage / "published.tar") as tar:
+        members = {m.name: m for m in tar.getmembers()}
+        for row in rows:
+            member = members.get(f"publish/masks/{row['id']}/masks.rle")
+            handle = tar.extractfile(member) if member is not None else None
+            if handle is None:
+                matches.append(False)
+                continue
+            data = handle.read()
+            matches.append(hashlib.sha256(data).hexdigest() == row["masks_rle_sha256"])
+            clip = ClipMasks.from_doc(json.loads(decompress(data).decode("utf-8")))
+            sam_hands += sum(1 for f in clip.frames for inst in f if inst.provenance == SAM_TIER and inst.class_name in visor.HANDS)
     return {
         "items_merged": bool(rows),
         "every_item_once": len({r["id"] for r in rows}) == len(rows),
+        "published_masks_match_their_hashes": bool(matches) and all(matches),
         "only_dense_and_fill_tiers": all(set(r["provenance"]) <= allowed for r in rows),
         "dropped_groups_absent": "hands" in groups or sam_hands == 0,
         "masks_hashed": all(len(r["masks_rle_sha256"]) == 64 and len(r["mask_sha256"]) == 64 for r in rows),
