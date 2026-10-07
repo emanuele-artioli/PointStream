@@ -268,6 +268,48 @@ def hand_gaps(dense: dict[str, Any], sparse: dict[str, Any]) -> dict[int, set[st
     return gaps
 
 
+def object_key(class_name: str, label: str | None) -> str:
+    """How an object is matched across annotations and masks: its hand class, else its label."""
+    return class_name if class_name in HANDS else str(label)
+
+
+def expected_objects(dense: dict[str, Any], sparse: dict[str, Any]) -> dict[int, set[str]]:
+    """Objects (`object_key`) the human labels say each dense frame should contain.
+
+    Within a run from keyframe ``a`` to ``b``: an object labelled at both ends
+    is expected in every frame of the run; one labelled at only one end is
+    expected at that end only (it may enter or leave in between). Frames shared
+    by two runs take the union. Objects with the same label count once; objects
+    that come and go between keyframes are invisible to every label. Compare
+    with a mask set's keys on the same frame to find what it is missing.
+    """
+    human = frames(sparse)
+
+    def keys(annotations: Iterable[dict[str, Any]]) -> set[str]:
+        return {object_key(native_class(a), a["name"]) for a in annotations}
+
+    expected: dict[int, set[str]] = {}
+    seen: set[tuple[int, int]] = set()
+    for entry in dense["video_annotations"]:
+        image = entry["image"]
+        if "interpolation_start_frame" not in image or "interpolation_end_frame" not in image:
+            continue
+        a, b = frame_number(image["interpolation_start_frame"]), frame_number(image["interpolation_end_frame"])
+        if (a, b) in seen:
+            continue
+        seen.add((a, b))
+        at_a = keys(human[a].annotations) if a in human else set()
+        at_b = keys(human[b].annotations) if b in human else set()
+        for number in range(a, b + 1):
+            wanted = expected.setdefault(number, set())
+            wanted |= at_a & at_b
+            if number == a:
+                wanted |= at_a
+            if number == b:
+                wanted |= at_b
+    return expected
+
+
 def polygon_mask(
     segments: Sequence[Sequence[Sequence[float]]],
     *,
@@ -402,7 +444,17 @@ def decode_frames(
     """``(index, RGB frame)`` for the decoded frames at ``indices`` (± ``margin``).
 
     ``threads`` caps the decoder's threads (0: the decoder's own choice), so
-    several decoding processes can share a CPU allowance.
+    several decoding processes can share a CPU allowance. Frames are found as in
+    `decoded_frames`.
+    """
+    for index, frame in decoded_frames(video, indices, margin=margin, threads=threads):
+        yield index, frame.to_ndarray(format="rgb24")
+
+
+def decoded_frames(
+    video: Path | str, indices: Iterable[int], *, margin: int = 0, threads: int = 0
+) -> Iterator[tuple[int, Any]]:
+    """``(index, av.VideoFrame)`` for the decoded frames at ``indices`` (± ``margin``), unconverted.
 
     The index of a decoded frame is its presentation time times the stream's
     nominal rate (``r_frame_rate``), so it counts frames from the first one on a
@@ -431,7 +483,7 @@ def decode_frames(
                 if at > last:
                     break
                 if at >= first:
-                    yield at, frame.to_ndarray(format="rgb24")
+                    yield at, frame
 
 
 def video_info(video: Path | str) -> dict[str, Any]:
@@ -461,7 +513,9 @@ __all__ = [
     "Frame",
     "clip_masks",
     "decode_frames",
+    "decoded_frames",
     "epic_frame_to_video_index",
+    "expected_objects",
     "extraction_rate",
     "frame_alignment",
     "frame_instances",
@@ -472,6 +526,7 @@ __all__ = [
     "keyframe_anchors",
     "load_annotations",
     "native_class",
+    "object_key",
     "polygon_mask",
     "runs",
     "video_info",

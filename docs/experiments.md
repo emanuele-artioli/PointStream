@@ -296,3 +296,81 @@ invocation turns out to be needed.
   videos (557 windows), EK-55 59.94 fps 1080p 21/24 (444); hand-complete among
   them: 15 (291) and 20 (205); all objects complete: 4 (13) and 3 (13).
   Decision pending with the user (options in the VISOR frame drift report).
+
+### 2026-10-07 — B2: baseline rate-distortion on VISOR
+- Question: what rate and quality do SVT-AV1 and DCVC-UF reach on evaluation
+  set v2 (34 windows of 240 frames, 15 EK-100, 19 EK-55), scored on the VISOR
+  masks? These curves are the target PointStream must beat.
+- Method (`experiments/visor/b2.py`, `src/codecs/svtav1.py`,
+  `src/codecs/quality.py`). Each window is decoded from the source video at
+  `first_video_index` and kept as the decoder's own 8-bit 4:2:0 planes (the
+  sources are full-range `yuvj420p`; EK-100 tags BT.709, EK-55 is untagged).
+  Both codecs take those planes: SVT-AV1 4.2.0 (`SvtAv1EncApp`, preset 4,
+  one-pass CRF, random access, one keyframe: `--keyint -1`), decoded by dav1d;
+  DCVC-UF through its YUV420 path (the input `test_video.py` uses for UVG, one
+  intra frame), decoded from the container bytes in its own process on the
+  same GPU. Rate is the AV1 payload of the IVF stream or the whole DCVC
+  container, in kbps at the source rate. Every metric sees one RGB view of
+  source and decoded frames (bilinear chroma, BT.709, the source's range,
+  rounded to 8 bits): PSNR over the frame and inside the B1 dense masks'
+  foreground (union of hands and active objects) and background, from exact
+  integer error sums; weighted PSNR = 0.7 PSNR_fg + 0.3 PSNR_bg per frame (dB),
+  then the mean over frames (pooled-error variant recorded too); LPIPS (AlexNet,
+  torchmetrics 1.9.0 heads, backbone `Models/LPIPS/alexnet-owt-7be5be79.pth`)
+  as a full-resolution map, so it splits by region the same way; MS-SSIM (RGB);
+  VMAF `vmaf_v0.6.1` through the hosts' `/opt/local/bin/ffmpeg` (libvmaf 3;
+  the environment's ffmpeg has no libvmaf); Y/U/V PSNR. Items are the samples:
+  curves are means over items per rate point, per video type and overall.
+  With every score, the share of each frame's labelled objects missing from
+  the masks: objects a human labelled at both keyframes of the frame's run (or
+  at the frame itself, if it is a keyframe) that the mask set lacks. Results
+  are keyed by mask set (`visor_dense` now); streams are published, so B1b's
+  fill is added later by scoring the same streams with a second mask set
+  (`run --streams`), without re-encoding.
+- Correctness gate (smoke and full): every released sparse JPEG of each item
+  (B1 archive) matches the decoded frame the reader's rule names (best within
+  ±2 frames, within 0.5 of the best, below 3 grey levels, as B1); each item's
+  masks equal B1's published masks (`masks.rle` sha256 and decoded-mask hash
+  from job `20261007T081136Z-71468647`); staged videos match the set's
+  sha256; every frame decoded; no labelled hand missing; rate and quality rise
+  together across points; for DCVC-UF, deterministic decode, decoder intra
+  frame equal to the encoder's, encode and decode on one GPU, extension variant
+  for the class, CUDA kernels launched, and CPU and GPU metrics agreeing (PSNR
+  exactly, LPIPS < 1e-3, MS-SSIM < 1e-4), because SVT-AV1 is scored on CPU.
+- Pilot (rate points, and DCVC-UF structure): 4 items, the two smallest
+  videos of each type (staging cost; content-blind): `P01_107_0000003049`,
+  `P09_106_0000006303` (EK-100), `P02_02_0000006080`, `P03_10_0000000616`
+  (EK-55); 240 frames. SVT-AV1 CRF 13, 20, 27, 34, 41, 48, 55, 62; DCVC-UF
+  QP 0, 9, 18, 27, 36, 45, 54, 63, for HT-S and HT-L.
+- Decision rule (rate points, fixed before the pilot): on the pilot means of
+  weighted PSNR (`visor_dense`) against rate, take the common quality range of
+  SVT-AV1 and the chosen DCVC-UF structure, capped above by each codec's
+  quality at its highest point below 3.2 Mbps (a third of the lowest pilot
+  source bitrate, 9.7 Mbps: re-encoding near the source's own rate measures
+  its artefacts, not the codec). Place 6 targets evenly across that range; per
+  codec take the swept point whose pilot mean is nearest to each target,
+  without duplicates, plus its next lower-rate swept point below the range
+  (PointStream is expected to work at low rate). If the range is under 3 dB or
+  a codec gets fewer than 4 points, refine the sweep on the pilot items first.
+  DCVC-UF structure: HT-L if its pilot BD-rate against HT-S (weighted PSNR,
+  mean over the 4 items) is below −3%, else HT-S (faster, and the structure
+  the environment audit verified). LD is not run: SVT-AV1 runs random access.
+- Decision rule (B2): done when both codecs' curves for all 34 items come from
+  recorded jobs whose validators passed. A failed JPEG check stops the run: the
+  item's frame placement, not the codec, is then in question.
+- Hypothesis: DCVC-UF needs less rate than SVT-AV1 preset 4 for equal
+  weighted PSNR on both video types (negative BD-rate), as it does against
+  VTM on UVG; the two codecs differ less on the foreground than on the
+  background, because hands move fast and blur.
+- Competing explanation: egocentric kitchen video (head motion, motion blur,
+  re-encoded H.264/HEVC sources with their own artefacts, full-range YUV) is
+  far from DCVC-UF's training data, so SVT-AV1 may match or beat it; and any
+  gap at high rate may reflect how each codec reproduces source artefacts. The
+  per-type split and the rate cap separate these.
+- Budget: pilot, SVT-AV1 one CPU job (32 threads; smoke 2 items × 24 frames ×
+  2 points ≤ 600 s; full ≤ 5,400 s) and DCVC-UF two GPU jobs on Ada or A6000
+  (8 threads; smoke ≤ 600 s, full ≤ 3,600 s each), together ≤ 2.5 GPU-hours.
+  Full run, SVT-AV1 as two CPU jobs of 17 items (48 threads, ≤ 3 h each);
+  DCVC-UF as three GPU jobs of 11–12 items on one GPU class (≤ 2.5 h each).
+  Ceiling 10 GPU-hours and 12 h wall, including staging (73 GB of videos in
+  all; each job stages only its items' videos).

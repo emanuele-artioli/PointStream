@@ -135,6 +135,31 @@ def test_hand_gaps_find_dropped_and_cut_short_hands() -> None:
     assert visor.hand_gaps(dense, complete) == {}
 
 
+def test_expected_objects_follow_the_keyframe_labels() -> None:
+    def run(name: str, a: int, b: int) -> list[dict[str, Any]]:
+        return [{"image": {"name": f"P99_01_frame_{n:010d}.png", "video": "P99_01", "interpolation": name,
+                           "interpolation_start_frame": f"P99_01_frame_{a:010d}.png",
+                           "interpolation_end_frame": f"P99_01_frame_{b:010d}.png"}, "annotations": []}
+                for n in range(a, b + 1)]
+
+    def human(n: int, names: list[str]) -> dict[str, Any]:
+        return {"image": {"name": f"P99_01_frame_{n:010d}.jpg", "video": "P99_01"},
+                "annotations": [{"name": name, "segments": square(0, 0, 10)} for name in names]}
+
+    dense = {"video_annotations": run("r1", 10, 12) + run("r2", 12, 14)}
+    sparse = {"video_annotations": [human(10, ["left hand", "cup", "right glove"]),
+                                    human(12, ["left hand", "cup", "knife"]), human(14, ["cup"])]}
+    expected = visor.expected_objects(dense, sparse)
+    # Labelled at both ends of r1: everywhere in it; at one end only: at that end.
+    assert expected[10] == {"left hand", "cup", "right hand"}
+    assert expected[11] == {"left hand", "cup"}
+    # Frame 12 ends r1 and starts r2: the union of both runs' expectations.
+    assert expected[12] == {"left hand", "cup", "knife"}
+    assert expected[13] == {"cup"} and expected[14] == {"cup"}
+    assert visor.object_key("left hand", "left glove") == "left hand"
+    assert visor.object_key("active object", "cup") == "cup"
+
+
 def test_shared_boundary_frames_merge_and_runs_split_at_gaps() -> None:
     frames = visor.frames(dense_doc())
     assert sorted(frames) == [10, 11, 12, 13, 20, 21]

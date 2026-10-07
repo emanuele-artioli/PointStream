@@ -249,6 +249,16 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   GLC-video reports estimated rather than coded rates. GVC-RT and MTTF were
   never installed.
 
+**Quality metrics** (B2, `src/codecs/quality.py`)
+- LPIPS uses torchmetrics' AlexNet heads (in the environment) and the
+  torchvision AlexNet backbone `Models/LPIPS/alexnet-owt-7be5be79.pth`
+  (sha256 `7be5be79…ee02`, its prefix matches the published file name; copied
+  from the shared torch hub cache on 2026-10-07), loaded from that path, never
+  downloaded.
+- VMAF: the environment's ffmpeg has no libvmaf; the hosts' `/opt/local/bin/ffmpeg`
+  (7.1.1, libvmaf 3, built-in `vmaf_v0.6.1`) has it on gpu1–gpu6. Results
+  record its path, sha256 and the libvmaf it links.
+
 **Hand pose estimators**
 - HaMeR ([geopavlakos/hamer](https://github.com/geopavlakos/hamer) at
   `3a01849f4148352e9260b69bf28b65d1671a4905`), CVPR 2024, ViT-H. Weights in

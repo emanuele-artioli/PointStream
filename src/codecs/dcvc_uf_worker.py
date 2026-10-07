@@ -15,6 +15,11 @@ differences (ported from the pre-reset adapter, ``archive/pre-reset-2026-10-05``
 * The CUDA inference extension is chosen per GPU: ``sm89`` on Ada, ``sm80``
   (SASS for sm_70 to sm_86) elsewhere. DCVC then picks its kernel path at run
   time: plain PyTorch below sm_75, CUTLASS Sm75 kernels on Turing, Sm80 above.
+* ``src_type`` selects the input path of ``test_video.py``: ``png`` (RGB frames
+  ``im00001.png``..., output RGB ``.npy`` per frame) or ``yuv420`` (one raw 8-bit
+  planar file, chroma upsampled by nearest neighbour as upstream; output the
+  same raw format in ``out_file``). Upstream truncates the reconstructed chroma
+  when it writes YUV; here both planes are rounded.
 
 Container: b"PSDC", version, flags, structure, frame count (big-endian uint16),
 then the native DCVC stream. Rate counts the whole file.
@@ -171,6 +176,16 @@ def _ensure_image_proxy(i_net: Any) -> None:
         i_net.proxy.set_param(state, i_net.gaussian_encoder.skip_thres)
 
 
+def _to_yuv420_bytes(x_hat: Any, height: int, width: int) -> bytes:
+    """test_video.py YUV path: 4:4:4 to 4:2:0 by 2x2 average, clamp*255, round."""
+    import torch
+    from src.utils.transforms import yuv_444_to_420
+
+    y, uv = yuv_444_to_420(x_hat[:, :, :height, :width] + 0.5)
+    planes = [torch.clamp(p * 255, 0, 255).round().byte().squeeze(0).cpu().numpy() for p in (y, uv)]
+    return b"".join(plane.tobytes() for plane in planes)
+
+
 def _to_rgb_uint8(x_hat: Any, height: int, width: int) -> Any:
     """test_video.py PNG path: ycbcr2rgb(x_hat + 0.5), clamp*255, round."""
     import torch
@@ -181,13 +196,20 @@ def _to_rgb_uint8(x_hat: Any, height: int, width: int) -> Any:
     return rgb.squeeze(0).cpu().numpy().transpose(1, 2, 0)
 
 
-def _read_source(reader: Any, maximum_read: int, frame_delay: int, is_intra: bool) -> tuple[Any, int]:
-    """test_video.get_src_frame for src_type png."""
+def _read_source(reader: Any, maximum_read: int, frame_delay: int, is_intra: bool, src_type: str = "png") -> tuple[Any, int]:
+    """test_video.get_src_frame for src_type png or yuv420."""
     import torch
-    from src.utils.transforms import rgb2ycbcr
+    from src.utils.transforms import rgb2ycbcr, ycbcr420_to_444_np
 
     frames = []
     for _ in range(maximum_read):
+        if src_type == "yuv420":
+            y, uv = reader.read_one_frame()
+            if y is None:
+                raise ValueError("source ended before the declared frame count")
+            yuv = torch.from_numpy(ycbcr420_to_444_np(y, uv)).unsqueeze(0).to("cuda:0")
+            frames.append(yuv.float() / 255.0)
+            continue
         rgb = reader.read_one_frame()
         if rgb is None:
             raise ValueError("source ended before the declared frame count")
@@ -237,7 +259,7 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
     import torch
     from src.models.image_model import DMCI
     from src.utils.stream_helper import SPSHelper, write_ip, write_sps
-    from src.utils.video_reader import PNGReader
+    from src.utils.video_reader import PNGReader, YUV420Reader
 
     _require_claimed_device()
     extension = _import_extension()
@@ -246,7 +268,13 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
     load_seconds = time.time() - started
     qp, count = int(plan["qp"]), int(plan["frame_count"])
     height, width = int(plan["height"]), int(plan["width"])
-    reader = PNGReader(plan["frames_dir"], width, height)
+    src_type = plan.get("src_type", "png")
+    if src_type == "yuv420":
+        reader = YUV420Reader(plan["frames_file"], width, height)
+    elif src_type == "png":
+        reader = PNGReader(plan["frames_dir"], width, height)
+    else:
+        raise ValueError(f"unknown src_type {src_type!r}")
     padding_r, padding_b = DMCI.get_padding_size(height, width, 16)
     output, sps_helper, nals = io.BytesIO(), SPSHelper(), []
     state: dict[str, Any] = {"i_recon_sha256": None}
@@ -258,13 +286,16 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
         while index < count:
             is_intra = index == 0
             maximum_read = 1 if is_intra else min(frame_delay, count - index)
-            x, padding = _read_source(reader, maximum_read, frame_delay, is_intra)
+            x, padding = _read_source(reader, maximum_read, frame_delay, is_intra, src_type)
             if is_intra:
                 encoded = i_net.compress(x, qp, padding_b, padding_r)
                 p_net.clear_dpb()
                 p_net.add_ref_feature_from_frame(encoded["x_hat"])
-                pixels = np.ascontiguousarray(_to_rgb_uint8(encoded["x_hat"], height, width))
-                state["i_recon_sha256"] = _sha256(pixels.tobytes())
+                if src_type == "yuv420":
+                    state["i_recon_sha256"] = _sha256(_to_yuv420_bytes(encoded["x_hat"], height, width))
+                else:
+                    pixels = np.ascontiguousarray(_to_rgb_uint8(encoded["x_hat"], height, width))
+                    state["i_recon_sha256"] = _sha256(pixels.tobytes())
                 reset = 0
             else:
                 reset = int(RESET_INTERVAL > 0 and (index + frame_delay) % RESET_INTERVAL == 1)
@@ -288,12 +319,13 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
     container = pack_container(output.getvalue(), structure=plan["structure"], frame_count=count)
     with Path(plan["container"]).open("xb") as handle:
         handle.write(container)
+    recon_key = "i_recon_rgb_sha256" if src_type == "png" else "i_recon_yuv420_sha256"
     return {
-        "operation": "encode", "structure": plan["structure"], "qp": qp, "frame_count": count,
+        "operation": "encode", "structure": plan["structure"], "src_type": src_type, "qp": qp, "frame_count": count,
         "frame_delay": frame_delay, "checkpoints": loaded, "load_seconds": round(load_seconds, 3),
         "encode_seconds": round(time.time() - encode_started, 3), "nals": nals,
         "container_bytes": len(container), "container_sha256": _sha256(container),
-        "i_recon_rgb_sha256": state["i_recon_sha256"], "kernels": kernels,
+        "i_recon_sha256": state["i_recon_sha256"], recon_key: state["i_recon_sha256"], "kernels": kernels,
         "peak_allocated_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
         "environment": _environment(extension),
     }
@@ -315,7 +347,11 @@ def decode(plan: dict[str, Any]) -> dict[str, Any]:
     i_net, p_net, frame_delay, loaded = _build(plan)
     _ensure_image_proxy(i_net)
     load_seconds = time.time() - started
-    out_dir = Path(plan["out_dir"])
+    src_type = plan.get("src_type", "png")
+    if src_type not in ("png", "yuv420"):
+        raise ValueError(f"unknown src_type {src_type!r}")
+    out_dir = Path(plan["out_dir"]) if src_type == "png" else None
+    out_file = Path(plan["out_file"]).open("xb") if src_type == "yuv420" else None
     passes = []
     with torch.inference_mode():
         for repeat in (0, 1):
@@ -336,19 +372,28 @@ def decode(plan: dict[str, Any]) -> dict[str, Any]:
                     recon = p_net.decompress(bit_stream, sps, qp, ec_part, reset)["x_hat"]
                 for offset, display_index in enumerate(nal_frames):
                     frame = recon[offset] if isinstance(recon, list) else recon
+                    if out_file is not None:
+                        data = _to_yuv420_bytes(frame, sps["height"], sps["width"])
+                        hashes.append(_sha256(data))
+                        if repeat == 0:
+                            out_file.write(data)
+                        continue
                     pixels = np.ascontiguousarray(_to_rgb_uint8(frame, sps["height"], sps["width"]))
                     hashes.append(_sha256(pixels.tobytes()))
-                    if repeat == 0:
+                    if repeat == 0 and out_dir is not None:
                         np.save(out_dir / f"{display_index:05d}.npy", pixels)
             if buffer.read(1):
                 raise ValueError("trailing bytes after the declared frame count")
             torch.cuda.synchronize()
-            passes.append({"rgb_sha256": hashes, "decode_seconds": round(time.time() - decode_started, 3)})
+            key = "rgb_sha256" if src_type == "png" else "yuv420_sha256"
+            passes.append({key: hashes, "frame_sha256": hashes, "decode_seconds": round(time.time() - decode_started, 3)})
+    if out_file is not None:
+        out_file.close()
     return {
-        "operation": "decode", "structure": plan["structure"], "frame_count": header["frame_count"],
+        "operation": "decode", "structure": plan["structure"], "src_type": src_type, "frame_count": header["frame_count"],
         "inputs": "container bytes and checkpoints only", "container_sha256": _sha256(data),
         "checkpoints": loaded, "load_seconds": round(load_seconds, 3), "passes": passes,
-        "deterministic": passes[0]["rgb_sha256"] == passes[1]["rgb_sha256"],
+        "deterministic": passes[0]["frame_sha256"] == passes[1]["frame_sha256"],
         "environment": _environment(extension),
     }
 
