@@ -187,9 +187,12 @@ these gaps.
   stretches) requires `clip_masks(..., exact_only=True)` and a recorded
   decision.
 - Objects other than hands can still be missing: report it with every result.
-- Report per provenance tier. When B1b's SAM fill (`sam_from_label_prompt`) is
-  adopted, report every number with and without it; the "without" number is
-  the fair one for D1, where SAM 3.1 is a contestant.
+- Report per provenance tier, and every number with and without B1b's fill:
+  mask set `visor_dense_sam_fill` (tier `sam_from_label_prompt`, objects only;
+  hands were not adopted), `pointstream-data/jobs/fleet/inbox/20261007T222646Z-3a7ac6ef/full/published.tar`
+  (sha256 `049977f0…799a`, record `merge.json` `1c705e4a…4bea`). It cuts the
+  labelled objects missing from 33% to 1.6% of each frame's. The "without"
+  number is the fair one for D1, where SAM 3.1 is a contestant.
 - Codec baseline (B2, `experiments/visor/b2.py`): SVT-AV1 preset 4 and
   DCVC-UF HT-L curves on all 34 items, keyed by mask set; the streams are
   published in the full jobs' `published.tar`, so a new mask set (B1b's
@@ -209,8 +212,10 @@ these gaps.
   the cutoff can change without re-exporting.
 - Instance crops of labelled objects are safe. Background frames ("foreground
   removed") and segmenter targets are not, where `hand_gaps` reports a missing
-  hand: exclude those frames until B1b fills them, or a model learns hands as
-  background.
+  hand: exclude those frames, or a model learns hands as background. B1b's
+  hand fill was not adopted (it let departed hands go in 4 of 6 cases and
+  some hand tracks moved onto the other hand), so these frames stay excluded
+  until a hand fill passes.
 
 ## Models
 
