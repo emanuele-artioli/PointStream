@@ -681,13 +681,30 @@ def bd_rate(rate_a: list[float], quality_a: list[float], rate_b: list[float], qu
     return float((math.exp((integrals[1] - integrals[0]) / (high - low)) - 1.0) * 100.0)
 
 
+def merge_results(paths: list[str]) -> dict[str, Any]:
+    """One codec's jobs as one result: items concatenated, configuration identical, curves recomputed."""
+    parts = [json.loads(Path(p).read_text()) for p in paths]
+    first = parts[0]
+    for part in parts[1:]:
+        if part["codec"] != first["codec"] or part["config"]["points"] != first["config"]["points"] or \
+                part["config"]["structure"] != first["config"]["structure"] or part["config"]["preset"] != first["config"]["preset"]:
+            raise SystemExit(f"cannot merge results with different codec configurations: {paths}")
+    items = [item for part in parts for item in part["items"]]
+    ids = [item["id"] for item in items]
+    if len(ids) != len(set(ids)):
+        raise SystemExit("an item appears in more than one result")
+    return {**first, "items": items, "curves": curves(items, sorted(first["masks"])), "merged_from": paths}
+
+
 def command_report(args: argparse.Namespace) -> int:
-    results = {name: json.loads(Path(path).read_text()) for name, path in parse_named(args.result).items()}
+    sources = parse_named(args.result)
+    results = {name: merge_results(path.split(",")) for name, path in sources.items()}
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     names = list(results)
     mask_sets = sorted({m for r in results.values() for m in r["masks"]})
-    report: dict[str, Any] = {"inputs": {n: parse_named(args.result)[n] for n in names}, "curves": {}, "bd_rate": {}}
+    report: dict[str, Any] = {"inputs": {n: sources[n].split(",") for n in names}, "curves": {}, "bd_rate": {},
+                              "items": {n: len(r["items"]) for n, r in results.items()}}
     for name, result in results.items():
         report["curves"][name] = result["curves"]
     if len(names) == 2:
@@ -822,7 +839,7 @@ def main(argv: list[str] | None = None) -> int:
     validate_parser = sub.add_parser("validate")
     validate_parser.add_argument("--codec", choices=sorted(CODECS), required=True)
     report = sub.add_parser("report")
-    report.add_argument("--result", action="append", required=True, help="NAME=b2.json; with two, the second is compared against the first")
+    report.add_argument("--result", action="append", required=True, help="NAME=b2.json[,b2.json...] (one codec, merged); with two names, the second is compared against the first")
     report.add_argument("--out", required=True)
     choose = sub.add_parser("choose", help="apply the pilot rule: DCVC-UF structure and rate points")
     choose.add_argument("--result", action="append", required=True, help="NAME=pilot b2.json (SVT-AV1, DCVC-UF HT-S, HT-L)")
