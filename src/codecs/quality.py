@@ -178,6 +178,20 @@ def score(
     return out
 
 
+def host_tool_env(tool_path: str) -> dict[str, str]:
+    """Environment for a tool installed outside the packed environment (the hosts' ``/opt/local``).
+
+    Its shared libraries (libvmaf among them) are found through the host's own
+    library directories, which the hosts' login shells put on
+    ``LD_LIBRARY_PATH``; fleet workloads do not inherit that.
+    """
+    prefix = Path(os.path.realpath(tool_path)).parent.parent
+    paths = ["/usr/lib/x86_64-linux-gnu", str(prefix / "lib" / "x86_64-linux-gnu"), str(prefix / "lib")]
+    env = {k: v for k, v in os.environ.items() if k != "LD_PRELOAD"}
+    env["LD_LIBRARY_PATH"] = os.pathsep.join(paths)
+    return env
+
+
 def vmaf_command(ffmpeg: str, decoded: Path, reference: Path, log: Path, *, width: int, height: int,
                  fps: Fraction, threads: int) -> list[str]:
     raw = ["-f", "rawvideo", "-pix_fmt", "yuv420p", "-s", f"{width}x{height}", "-r", f"{fps.numerator}/{fps.denominator}"]
@@ -190,8 +204,7 @@ def vmaf(ffmpeg: str, decoded: Path, reference: Path, log: Path, *, width: int, 
          threads: int, timeout: float = 1800) -> dict[str, Any]:
     """Per-frame VMAF of ``decoded`` against ``reference`` (libvmaf through ``ffmpeg``)."""
     command = vmaf_command(ffmpeg, decoded, reference, log, width=width, height=height, fps=fps, threads=threads)
-    env = {k: v for k, v in os.environ.items() if k not in ("LD_LIBRARY_PATH", "LD_PRELOAD")}
-    done = subprocess.run(command, capture_output=True, text=True, timeout=timeout, env=env)
+    done = subprocess.run(command, capture_output=True, text=True, timeout=timeout, env=host_tool_env(ffmpeg))
     if done.returncode:
         raise RuntimeError(f"VMAF failed ({done.returncode}):\n{done.stderr[-4000:]}")
     doc = json.loads(log.read_text())
@@ -207,9 +220,11 @@ def vmaf_record(ffmpeg: str) -> dict[str, Any]:
     from src.codecs.svtav1 import tool
 
     record = tool(ffmpeg)
-    linked = subprocess.run(["ldd", record["real_path"]], capture_output=True, text=True, timeout=30).stdout
+    record["ld_library_path"] = host_tool_env(ffmpeg)["LD_LIBRARY_PATH"]
+    linked = subprocess.run(["ldd", record["real_path"]], capture_output=True, text=True, timeout=30,
+                            env=host_tool_env(ffmpeg)).stdout
     for line in linked.splitlines():
-        if "libvmaf" in line and "=>" in line:
+        if "libvmaf" in line and "=>" in line and "not found" not in line:
             path = os.path.realpath(line.split("=>")[1].split("(")[0].strip())
             record["libvmaf"] = {"path": path, "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest()}
     record["model"] = "vmaf_v0.6.1 (built in)"
