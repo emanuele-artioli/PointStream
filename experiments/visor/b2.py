@@ -1,7 +1,7 @@
 """PLAN step B2: SVT-AV1 and DCVC-UF rate-distortion on VISOR evaluation set v2.
 
     python -m experiments.visor.b2 run --codec svtav1|dcvc --eval-set JSON --archive DIR \\
-        --masks NAME=DIR --mask-record NAME=JSON --video V.MP4 ... --items all|ID,ID \\
+        --masks NAME DIR --mask-record NAME JSON --video V.MP4 ... --items all|ID,ID \\
         --frames N --points P,P,... [codec options]
     python -m experiments.visor.b2 validate --codec svtav1|dcvc
     python -m experiments.visor.b2 report --result CODEC=b2.json ... --out DIR
@@ -13,7 +13,7 @@
    released sparse JPEG of the item against the decoded frames, as B1 did
    (the frame the reader's rule names must be the best match within ±2 frames,
    below 3 grey levels);
-2. loads each mask set (``--masks NAME=DIR``: one ``masks.rle`` per item, B1's
+2. loads each mask set (``--masks NAME DIR``: one ``masks.rle`` per item, B1's
    ``visor_dense`` now, B1b's fill later), checks it against its record, and
    counts per frame the objects a human labelled at the run's keyframes that
    the set lacks (`visor.expected_objects`);
@@ -70,6 +70,11 @@ SUMMARY_KEYS = ("wpsnr", "wpsnr_pooled", "psnr_fg", "psnr_bg", "psnr_frame", "wl
 
 
 # ----------------------------------------------------------------- inputs
+
+def named(pairs: list[list[str]] | None) -> dict[str, str]:
+    """``--option NAME PATH`` pairs; each is a whole argument, as fleet placeholders require."""
+    return {name: path for name, path in pairs or []}
+
 
 def parse_named(values: list[str] | None) -> dict[str, str]:
     out = {}
@@ -396,7 +401,7 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
     archive = Path(args.archive)
     frames = min(args.frames, int(item["frames"]))
     source = decode_window(videos[item["video"]], item, frames, archive, work / "source.yuv", args.threads)
-    clips, mask_info = load_mask_sets(item, frames, parse_named(args.masks), parse_named(args.mask_record), archive)
+    clips, mask_info = load_mask_sets(item, frames, named(args.masks), named(args.mask_record), archive)
     regions = frame_regions(clips, frames)
     fps = Fraction(item["fps"]).limit_denominator(1001)
     device = "cuda" if args.codec == "dcvc" else "cpu"
@@ -548,7 +553,7 @@ def command_run(args: argparse.Namespace) -> int:
         for n, item in enumerate(items):
             rows.append(run_item(args, item, n == 0))
             progress(len(rows))
-    mask_sets = list(parse_named(args.masks))
+    mask_sets = list(named(args.masks))
     write_json(stage_dir() / "b2.json", {
         "codec": args.codec, "codec_name": CODECS[args.codec],
         "config": {
@@ -560,7 +565,7 @@ def command_run(args: argparse.Namespace) -> int:
             "rgb_view": "bilinear chroma upsampling, BT.709, range as the source declares, rounded to 8 bits",
         },
         "eval_set": {"path": args.eval_set, "sha256": file_sha256(Path(args.eval_set)), "name": eval_set["name"]},
-        "masks": {name: {"path": path, "record": parse_named(args.mask_record).get(name)} for name, path in parse_named(args.masks).items()},
+        "masks": {name: {"path": path, "record": named(args.mask_record).get(name)} for name, path in named(args.masks).items()},
         "tools": tools, "items": rows, "curves": curves(rows, mask_sets),
     })
     return 0
@@ -704,8 +709,10 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--codec", choices=sorted(CODECS), required=True)
     run.add_argument("--eval-set", required=True)
     run.add_argument("--archive", required=True, help="extracted B1 archive: frame_mapping.json, annotations/, dense/, rgb_frames/")
-    run.add_argument("--masks", action="append", required=True, help="NAME=DIR with <item>/masks.rle")
-    run.add_argument("--mask-record", action="append", help="NAME=JSON listing each item's mask_sha256 and masks_rle_sha256")
+    run.add_argument("--masks", action="append", nargs=2, metavar=("NAME", "DIR"), required=True,
+                     help="a mask set: DIR holds <item>/masks.rle")
+    run.add_argument("--mask-record", action="append", nargs=2, metavar=("NAME", "JSON"),
+                     help="JSON listing each item's mask_sha256 and masks_rle_sha256")
     run.add_argument("--video", action="append", required=True)
     run.add_argument("--items", required=True, help="all, or comma-separated item ids")
     run.add_argument("--frames", type=int, required=True)
