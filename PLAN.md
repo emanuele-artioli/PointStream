@@ -82,6 +82,17 @@ Each item gets an experiments.md entry before its fleet run.
    inside the foreground (VCA v2, `/opt/local/bin/vca`; ffmpeg's `siti` as a
    cross-check) against each item's DCVC-UF advantage; SVT-AV1 with temporal
    filtering off (`--enable-tf 0`) on a few items.
+7. **Why SVT-AV1's ROI cannot raise a region's quality** (deferred; a
+   possible secondary contribution, after the main path). In 4.2.0's CRF
+   mode a negative quantizer offset adds bytes without raising the region's
+   PSNR, while a positive one lowers it as expected (B2b J3, J3b, probe).
+   Hypothesis: the encoder derives its rate-distortion trade-off (lambda)
+   from the frame's quantizer, not the segment's, so a finer segment
+   quantizer buys coefficients that rate-distortion optimization does not
+   turn into quality. First read SVT-AV1's ROI/segmentation and lambda code
+   (minutes); then one bounded probe that tests what the code suggests (e.g.
+   offsets with a matched lambda, or another encoder's ROI); write it up only
+   if the mechanism is confirmed.
 **Done when** the B2 curves are redrawn with the fair SVT-AV1 preset, the
 low-rate ladder and the ROI variant, from recorded jobs.
 
