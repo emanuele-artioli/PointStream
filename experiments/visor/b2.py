@@ -386,6 +386,11 @@ def lpips_net(backbone: str, device: str) -> Any:
     return _LPIPS[key]
 
 
+def log(message: str) -> None:
+    """One timestamped line on stderr, which the fleet keeps in command.log."""
+    print(f"{time.strftime('%H:%M:%S')} [{os.getpid()}] {message}", file=sys.stderr, flush=True)
+
+
 def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -> dict[str, Any]:
     import torch
 
@@ -400,12 +405,16 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
     videos = {Path(v).stem: Path(v) for v in args.video}
     archive = Path(args.archive)
     frames = min(args.frames, int(item["frames"]))
+    log(f"{item['id']}: decoding {frames} frames")
     source = decode_window(videos[item["video"]], item, frames, archive, work / "source.yuv", args.threads)
+    log(f"{item['id']}: loading masks")
     clips, mask_info = load_mask_sets(item, frames, named(args.masks), named(args.mask_record), archive)
     regions = frame_regions(clips, frames)
+    log(f"{item['id']}: masks ready")
     fps = Fraction(item["fps"]).limit_denominator(1001)
     device = "cuda" if args.codec == "dcvc" else "cpu"
     net = lpips_net(args.lpips_backbone, device)
+    log(f"{item['id']}: LPIPS on {device}")
     rows = []
     cross_device = None
     for number, point in enumerate(parse_points(args.points)):
@@ -416,11 +425,13 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
         if args.streams:
             stream = Path(args.streams) / args.codec / item["id"] / name / STREAM_NAMES[args.codec]
         t0 = time.time()
+        log(f"{item['id']}: point {name}: coding")
         if args.codec == "svtav1":
             coded = code_svtav1(args, source, fps, point, point_work, stream)
         else:
             coded = code_dcvc(args, source, point, point_work, stream, profile=first_item and number == 0)
         decoded = Path(coded["decoded"])
+        log(f"{item['id']}: point {name}: scoring")
         t1 = time.time()
         per_frame = quality.score(Path(source["path"]), decoded, regions, width=source["width"], height=source["height"],
                                   frames=frames, full_range=source["full_range"], device=device, lpips_net=net)
@@ -515,6 +526,10 @@ def curves(items: list[dict[str, Any]], mask_sets: list[str]) -> dict[str, Any]:
 
 
 def command_run(args: argparse.Namespace) -> int:
+    import faulthandler
+
+    # A stalled stage leaves every thread's stack in command.log.
+    faulthandler.dump_traceback_later(240, repeat=True, file=sys.stderr)
     eval_set = json.loads(Path(args.eval_set).read_text())
     items = select_items(eval_set, args.items)
     videos = {Path(v).stem for v in args.video}
