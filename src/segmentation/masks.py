@@ -108,24 +108,40 @@ def decompress(blob: bytes) -> bytes:
 
 @dataclass(frozen=True)
 class Instance:
-    """One object in one frame. ``track_id`` is stable within a clip and class."""
+    """One object in one frame. ``track_id`` is stable within a clip and class.
+
+    Dataset labels also carry ``provenance``, the tier the mask comes from
+    (``human``, ``interpolated``, …; docs/resources.md), and ``label``, the
+    dataset's own name for the object when it is finer than ``class_name``.
+    """
 
     class_name: str
     track_id: int
     score: float
     rle: dict[str, Any]
     bbox: tuple[float, float, float, float]
+    provenance: str | None = None
+    label: str | None = None
 
     @classmethod
     def from_mask(
-        cls, class_name: str, track_id: int, mask: np.ndarray, score: float = 1.0
+        cls,
+        class_name: str,
+        track_id: int,
+        mask: np.ndarray,
+        score: float = 1.0,
+        *,
+        provenance: str | None = None,
+        label: str | None = None,
     ) -> Instance | None:
         binary = np.asarray(mask) > 0
         if not binary.any():
             return None
         ys, xs = np.nonzero(binary)
         bbox = (float(xs.min()), float(ys.min()), float(xs.max() + 1), float(ys.max() + 1))
-        return cls(str(class_name), int(track_id), float(score), encode_rle(binary), bbox)
+        return cls(
+            str(class_name), int(track_id), float(score), encode_rle(binary), bbox, provenance, label
+        )
 
     def mask(self) -> np.ndarray:
         return decode_rle(self.rle)
@@ -137,6 +153,10 @@ class ClipMasks:
 
     Empty frames hold no instances; nothing ever becomes a whole-frame fill.
     Later classes in ``classes`` paint over earlier ones in ``labels``.
+
+    ``labelled`` is None for a segmenter's output, where every frame was
+    segmented. For dataset labels it flags the frames that carry labels: an
+    unlabelled frame is unknown, not empty, and is never scored.
     """
 
     classes: tuple[str, ...]
@@ -145,6 +165,7 @@ class ClipMasks:
     fps: float
     frames: list[list[Instance]] = field(default_factory=list)
     meta: dict[str, Any] = field(default_factory=dict)
+    labelled: list[bool] | None = None
 
     def __len__(self) -> int:
         return len(self.frames)
@@ -152,18 +173,36 @@ class ClipMasks:
     def ensure_frames(self, count: int) -> None:
         while len(self.frames) < count:
             self.frames.append([])
+        if self.labelled is not None and len(self.labelled) < count:
+            self.labelled.extend([False] * (count - len(self.labelled)))
 
     def add(
-        self, index: int, class_name: str, track_id: int, mask: np.ndarray, score: float = 1.0
+        self,
+        index: int,
+        class_name: str,
+        track_id: int,
+        mask: np.ndarray,
+        score: float = 1.0,
+        *,
+        provenance: str | None = None,
+        label: str | None = None,
     ) -> None:
         if class_name not in self.classes:
             raise ValueError(f"class {class_name!r} is not one of {self.classes}")
         if np.asarray(mask).shape != (self.height, self.width):
             raise ValueError(f"mask shape {np.asarray(mask).shape} != {(self.height, self.width)}")
         self.ensure_frames(index + 1)
-        instance = Instance.from_mask(class_name, track_id, mask, score)
+        instance = Instance.from_mask(
+            class_name, track_id, mask, score, provenance=provenance, label=label
+        )
         if instance is not None:
             self.frames[index].append(instance)
+
+    def labelled_frames(self) -> list[int]:
+        """Indices of the frames that carry labels (all of them for a segmenter)."""
+        if self.labelled is None:
+            return list(range(len(self.frames)))
+        return [index for index, flag in enumerate(self.labelled) if flag]
 
     def class_mask(self, index: int, class_name: str) -> np.ndarray:
         out = np.zeros((self.height, self.width), dtype=bool)
@@ -214,17 +253,12 @@ class ClipMasks:
             "frames": [
                 {
                     "index": index,
-                    "instances": [
-                        {
-                            "class_id": self.classes.index(inst.class_name),
-                            "class_name": inst.class_name,
-                            "track_id": inst.track_id,
-                            "score": inst.score,
-                            "bbox": list(inst.bbox),
-                            "rle": inst.rle,
-                        }
-                        for inst in instances
-                    ],
+                    **(
+                        {"labelled": bool(self.labelled[index])}
+                        if self.labelled is not None
+                        else {}
+                    ),
+                    "instances": [_instance_doc(self.classes, inst) for inst in instances],
                 }
                 for index, instances in enumerate(self.frames)
             ],
@@ -242,9 +276,14 @@ class ClipMasks:
             float(doc["fps"]),
             meta=dict(doc.get("meta") or {}),
         )
-        for record in doc.get("frames") or []:
+        records = doc.get("frames") or []
+        if any("labelled" in record for record in records):
+            clip.labelled = [False] * (max(int(r["index"]) for r in records) + 1)
+        for record in records:
             index = int(record["index"])
             clip.ensure_frames(index + 1)
+            if clip.labelled is not None:
+                clip.labelled[index] = bool(record.get("labelled", False))
             for order, raw in enumerate(record.get("instances") or []):
                 name = str(raw.get("class_name") or classes[int(raw["class_id"])])
                 clip.frames[index].append(
@@ -254,6 +293,8 @@ class ClipMasks:
                         float(raw.get("score", 1.0)),
                         raw["rle"],
                         tuple(float(v) for v in raw["bbox"][:4]),  # type: ignore[arg-type]
+                        raw.get("provenance"),
+                        raw.get("label"),
                     )
                 )
         return clip
@@ -272,6 +313,22 @@ class ClipMasks:
     @classmethod
     def load(cls, path: Path | str) -> ClipMasks:
         return cls.from_doc(json.loads(decompress(mask_file(path).read_bytes()).decode("utf-8")))
+
+
+def _instance_doc(classes: tuple[str, ...], inst: Instance) -> dict[str, Any]:
+    record: dict[str, Any] = {
+        "class_id": classes.index(inst.class_name),
+        "class_name": inst.class_name,
+        "track_id": inst.track_id,
+        "score": inst.score,
+        "bbox": list(inst.bbox),
+        "rle": inst.rle,
+    }
+    if inst.provenance is not None:
+        record["provenance"] = inst.provenance
+    if inst.label is not None:
+        record["label"] = inst.label
+    return record
 
 
 def mask_file(path: Path | str) -> Path:

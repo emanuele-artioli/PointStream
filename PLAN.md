@@ -27,13 +27,17 @@ new dependency.
   SAM 3.1, YOLOE-26, the VISOR and HOT3D-Clips readers, HaMeR and WiLoR,
   SVT-AV1 and DCVC-UF (the chosen neural codec), with the conflicts, locks and
   packed archive in [resources](docs/resources.md#environments) and per-GPU
-  results in the [model–GPU table](docs/fleet.md#modelgpu-table). Open for B1:
-  the VISOR frame mapping ([resources](docs/resources.md#datasets)). Open for H:
+  results in the [model–GPU table](docs/fleet.md#modelgpu-table). Open for H:
   HaMeR or WiLoR, decided on HInt test and HOT3D.
 
 ## Phase 1: egocentric
 
-### B1. VISOR adapter and evaluation set
+### B1. VISOR adapter and evaluation set (done 2026-10-07)
+
+Result: `src/segmentation/visor.py`, the verified frame rules, and evaluation
+set v2 (34 windows). How every later step uses VISOR:
+[Using VISOR](docs/resources.md#using-visor). The text below is the original
+brief.
 
 A VISOR reader in `src/segmentation` producing `ClipMasks` from the dense
 interpolations. Frames come from the video through `frame_mapping.json`, which
@@ -49,32 +53,57 @@ is a fixed list of dense runs from the validation split, recorded with its
 sha256s.
 **Done when** the set converts and a trivial candidate scores against it.
 
+### B1b. Filling VISOR's missing hands and objects
+
+VISOR's dense masks drop an object's track when its interpolation scored poorly,
+so 22–30% of dense validation frames lack a hand a human labelled
+([decision](docs/experiments.md#2026-10-07-visor-evaluation-set-v2-and-a-sam-fill-for-missing-hands)).
+SAM 3.1, prompted with the human masks at a run's keyframes, tracks each
+missing object through the run; the result is tier `sam_from_label_prompt`.
+Validation: prompt at one keyframe and score at the next, which SAM never saw;
+review a random sample of in-between frames by eye; check hands against the
+EPIC-KITCHENS hand-object boxes (detector output, to be acquired and
+manifested like the other datasets). Every B2 and D1 result is reported with
+and without the fill. It also removes unlabelled hands from F1's background
+frames and E1's training targets.
+**Done when** the validation numbers from a recorded job decide adoption.
+
 ### B2. Baseline rate-distortion on VISOR
 
 SVT-AV1 and DCVC-UF on the evaluation set: rate against weighted PSNR
 (0.7 foreground + 0.3 background on VISOR masks) and the perceptual metrics.
 This is the target PointStream must beat, and it needs no PointStream
-component.
+component. Use evaluation set v2 as [Using VISOR](docs/resources.md#using-visor)
+describes. Only exactly placed frames are scored
+([drift decision](docs/experiments.md#2026-10-06-visor-frame-drift-exact-frames-for-evaluation-small-drift-for-training)):
+the B1 set, optionally EK-55 clips scored on frames whose keyframes match the
+released JPEGs.
 **Done when** the curves come from a recorded job.
 
 ### D1. Segmentation benchmark on VISOR and EgoHOS
 
 SAM 3.1 (text and prompted) and YOLOE-26 against the labels, per class, accuracy
-against speed. EgoHOS is scored on single images only.
+against speed. EgoHOS is scored on single images only. On VISOR: evaluation set
+v2, the "hold the first frame" floor (foreground J 0.459) as the table's first
+row, and every number with and without B1b's fill
+([Using VISOR](docs/resources.md#using-visor)).
 **Done when** the table is reproducible from a recorded job.
 
 ### E1. Handled-object proposer
 
 A hand-object proposer trained on VISOR (contact relations) or EgoHOS (object
 orders) prompts SAM 3.1. Cross-tested on the other dataset and on HOT3D object
-masks.
+masks. VISOR training follows [Using VISOR](docs/resources.md#using-visor):
+train split only, drift ≤ 1, no frames with a hand gap as targets.
 **Done when** cross-dataset numbers decide whether to commit to it.
 
 ### F1. Training-data export
 
 VISOR foreground crops and masks per instance, plus background frames with the
 foreground removed, written by `python -m src.segmentation dataset` with
-provenance.
+provenance and each mask's drift; training admits drift of at most 1 frame.
+Background frames skip frames with a hand gap until B1b fills them
+([Using VISOR](docs/resources.md#using-visor)).
 
 ### G. Background encoding
 

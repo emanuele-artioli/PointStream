@@ -87,19 +87,123 @@ frames (5.3K hands; train, val and test), New Days and Ego4D. HaMeR trains on
 HInt train, so only HInt test is fair to it. Adopted for H and downloaded to `Datasets/HInt` (manifest
 `Datasets/manifests/HInt.json`, table above).
 
-**VISOR frame mapping.** `frame_mapping.json` names EPIC-KITCHENS rgb frames
-(1-indexed), not decoded video frames. On P32_07 (59.94 fps) rgb frame k matches
-the decoded frame at time (k − 1)/60 s: the frames were extracted at 60 fps.
-`index = k − 1` drifts by one frame per ~1,000 (2 frames off at frame 1,503,
-mean absolute difference 7.1 against the released JPEG, versus 1.3 for the time
-rule). The video also repeats frames in pairs. The B1 reader must use the time
-rule and verify it on more videos, including the 50 fps EK-100 ones.
+**VISOR frame mapping** (B1, fleet job `20261006T193326Z-64057023`, gpu3,
+commit `efc516a`, environment `pointstream-20261006T113321Z`; 325 released
+sparse JPEGs from 10 videos, inputs `pointstream-data/visor/b1-2026-10-06/mapping-v2/`).
+VISOR uses three numberings of one video: decoded frames (0-based, what
+PointStream encodes), EPIC-KITCHENS rgb frames, and VISOR's own frames (VISOR
+re-extracted with a newer ffmpeg and names every mask by them).
+`frame_mapping.json` links VISOR to EPIC frames only on *sparse* frames.
+
+| Video type (videos checked) | EPIC rgb frame k is decoded frame | VISOR frame n is decoded frame n − 1 |
+|---|---|---|
+| HEVC 1080p 50 fps, EK-100 (4) | k − 1 (139/139) | yes (139/139) |
+| H.264 1080p 59.94 fps (3) | nearest to (k − 1)/60 s (86/86) | no (18/86; off by up to 13 on P02_02) |
+| H.264 1080p 29.97 fps (2) | (k − 1)/60 s rounded up (72/72) | no (0/72; about two VISOR frames per decoded frame) |
+| H.264 1080p 47.95 fps (1, train) | unresolved (26/28 nearest, 23/28 rounded up) | no |
+
+A rule holds on a frame when its decoded frame is within 0.5 grey levels (mean
+absolute RGB difference) of the best match to the JPEG; best matches were
+0.8–2.6. The EK-55 videos repeat frames in pairs (ties). `visor.epic_frame_to_video_index`
+implements the verified rules and raises for any other rate.
+
+Dense masks have no mapping between keyframes: `visor.frame_alignment` places
+them by counting from their run's keyframes and records the *drift* (decoded
+frames gained or lost against the extraction rate between keyframes). EK-100
+has drift 0 on all 2,383 keyframe stretches of the 16 val videos; EK-55
+drifts by 1–3 frames on about a quarter. Evaluation scores only exactly placed
+frames; training admits drift ≤ 1 ([decision](experiments.md#2026-10-06-visor-frame-drift-exact-frames-for-evaluation-small-drift-for-training)).
+Dense polygons are drawn on an 854×480 canvas and scaled to 1080p; on P32_07's
+keyframes they match the human 1080p masks at IoU 0.97–0.995.
+
+**VISOR evaluation set v2** (`experiments/visor/eval_set.json`; source
+`pointstream-data/visor/b1-2026-10-06/evalset-v2/eval_set.json`, sha256
+`0d25301a…ec2`; dense archive `visor-val-dense.tar`, `a2d9e0cb…c3c`). 34
+items, one per validation video: 15 EK-100 (50 fps) and 19 EK-55 (59.94 fps),
+240 frames each. Every frame is labelled and exactly placed on the video, and
+no hand a human labelled at an end of its dense run is missing
+(`visor.hand_gaps`); the window is picked content-blind by
+sha256("pointstream-b1:<video>"). Masks carry provenance `interpolated`;
+objects other than hands can still be missing (108 at the 78 human-labelled
+frames inside the items). Rule and outcome in
+[experiments](experiments.md#2026-10-07-visor-evaluation-set-v2-and-a-sam-fill-for-missing-hands).
+Set v1 (16 EK-100 items, `b994c531…d9cb`) is superseded.
 
 **Archived.** `tennis_games`, `Egocentric-10K` and the derived
 `pointstream-demo` are in `Datasets/archive/pre-reset-2026-10-05/`: moved,
 read-only, not deleted, with `MANIFEST.json` (104,884 files, 72.5 GB, sha256
 each). `src/segmentation/domains.yaml` still lists clips from them as defaults
 until the per-dataset domains replace it.
+
+### Using VISOR
+
+The rules every session that reads, scores on, or trains from VISOR follows.
+Decided in B1 (2026-10-06/07); evidence and reasons in
+[experiments](experiments.md#2026-10-06--b1-visor-frame-mapping-and-evaluation-set),
+[drift decision](experiments.md#2026-10-06-visor-frame-drift-exact-frames-for-evaluation-small-drift-for-training)
+and [set v2 decision](experiments.md#2026-10-07-visor-evaluation-set-v2-and-a-sam-fill-for-missing-hands);
+illustrated in the B1 report ("VISOR frame drift" artifact).
+
+**Reading.** Use `src/segmentation/visor.py`; never index frames by hand.
+- `load_annotations` reads a sparse JSON or a dense `_interpolations.zip`;
+  `clip_masks` returns `ClipMasks` with VISOR's classes (`left hand`,
+  `right hand`, `active object`; the open-vocabulary name is each instance's
+  `label`; a glove on a hand is that hand), per-frame `labelled` flags and a
+  provenance per mask: `human` (sparse file) or `interpolated` (everything in
+  the dense file, its keyframes too).
+- Dense polygons are drawn at 854×480 and scaled to 1080p: their edges are
+  about two pixels coarse (IoU 0.97–0.995 against the human 1080p masks).
+- An unlabelled frame is unknown, not empty; `evaluate.compare` scores only
+  labelled frames.
+
+**Frames.** VISOR names masks by its own frame extraction. Only sparse frames
+link to the video (`frame_mapping.json` → EPIC rgb frame →
+`epic_frame_to_video_index`, verified per rate in the table above). Dense
+frames are placed between their run's keyframes by `frame_alignment`, which
+records each frame's *drift*: how far VISOR's numbering slipped against the
+video between the two keyframes, which bounds the placement error.
+- EK-100 (50 fps): drift 0 everywhere; VISOR n is decoded frame n − 1.
+- EK-55 59.94 fps: exact on about three quarters of stretches; elsewhere off
+  by 1–3 frames.
+- EK-55 29.97 fps: two VISOR frames per decoded frame; 47.95 fps (P17_01) has
+  no verified rule and the reader raises; P12_04 is 720p video with 1080p masks.
+
+**Missing hands and objects.** VISOR drops or cuts short each object's dense
+track when its interpolation scored poorly, so 22–30% of dense val frames lack
+a hand a human labelled at an end of the run, and most frames lack some
+labelled object. `hand_gaps(dense, sparse)` lists the frames where a labelled
+hand is missing. A hand that comes and goes between keyframes is invisible to
+every label. HInt's VISOR frames are all sparse keyframes, so HInt cannot fill
+these gaps.
+
+**Evaluation (B2, D1, any codec or segmenter score).**
+- Use evaluation set v2 (`experiments/visor/eval_set.json`, below) and nothing
+  else: 34 windows of 240 frames, one per validation video, every frame exactly
+  placed and hand-complete. B2 decodes each window from
+  `first_video_index` and may check its sparse JPEGs (in the archive) against
+  the decoded frames.
+- Score only exactly placed frames. Adding other footage (more EK-55
+  stretches) requires `clip_masks(..., exact_only=True)` and a recorded
+  decision.
+- Objects other than hands can still be missing: report it with every result.
+- Report per provenance tier. When B1b's SAM fill (`sam_from_label_prompt`) is
+  adopted, report every number with and without it; the "without" number is
+  the fair one for D1, where SAM 3.1 is a contestant.
+- Floor for segmenters: "hold the first frame" (the item's first-frame masks
+  copied to every frame) scores, mean over the 34 items, foreground J 0.459,
+  F 0.370 (EK-100 0.403, EK-55 0.504; per item 0.03–0.85; left hand J 0.374,
+  right hand 0.346, active object 0.467; job `20261007T081136Z-71468647`).
+  A segmenter must clearly beat it per scope to count; report it as the first
+  row of the D1 table.
+
+**Training (E1, F1, generators).**
+- Train on the train split; keep the evaluation videos out.
+- Admit dense frames with drift ≤ 1; every exported mask records its drift so
+  the cutoff can change without re-exporting.
+- Instance crops of labelled objects are safe. Background frames ("foreground
+  removed") and segmenter targets are not, where `hand_gaps` reports a missing
+  hand: exclude those frames until B1b fills them, or a model learns hands as
+  background.
 
 ## Models
 
@@ -203,7 +307,7 @@ sha256 `44835688156ec6dd5a96ae068e636bb65174597a8ca5f34a6efc33b12bd751b9`
 |---|---|---|---|
 | SAM 3.1 | `sam3` @ `2345a4a` | Python 3.12, torch 2.10.0 cu128 (README), numpy<2, timm>=1.0.17 | as stated |
 | YOLOE-26 | `ultralytics==8.4.6` | torch>=1.8, opencv-python | `--no-deps` |
-| VISOR reader | PyAV 19.0.1 | — | decodes the EPIC-KITCHENS videos frame-accurately |
+| VISOR reader | PyAV 19.0.1 | — | decodes the EPIC-KITCHENS videos frame-accurately; `src/segmentation/visor.py` |
 | HOT3D-Clips | `hand_tracking_toolkit` @ `bc628e9` | numpy, scipy, torch, opencv-python, webdataset | `--no-deps`; FISHEYE624 cameras, MANO via smplx, numpy rasterizer. The hot3d repo (`146b34a`) documents the clip format; its pixi environment (Python 3.10, torch 2.1, projectaria_tools) serves the VRS release, not the clips |
 | HaMeR | `hamer` @ `3a01849` | smplx==0.1.28, chumpy, mmcv==1.3.9, detectron2, pyrender | `--no-deps` |
 | WiLoR | `opt/WiLoR` @ `fcb9113` | Python 3.10, torch cu117, ultralytics==8.1.34, chumpy | vendored tree on `sys.path` (no packaging) |
