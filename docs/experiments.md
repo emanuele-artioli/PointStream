@@ -554,7 +554,18 @@ invocation turns out to be needed.
   quantizer while the background pays). Competing explanation: blocks are so
   coarse that "background" blocks are a minority of what the weights favour,
   so the shift barely helps.
-- J4, SVT-AV1 without temporal filtering (secondary): `--enable-tf 0`, preset
+- J3b outcome (`20261007T185948Z-f7d9ed2b`, gpu6, RTX 6000 Ada for scoring,
+  `6698a9b`, 466 s full stage; validator passed; a first attempt,
+  `20261007T180417Z-38209348` on gpu1, ended `contended` near its end, since
+  another user's process kept taking the RTX 8000, and published only
+  `partial.tar`): raising the background works as designed: foreground PSNR
+  holds (e.g. 37.58–37.60 dB at CRF 48 for every offset) while the background
+  and the rate fall. BD-rate against no ROI, mean / median over the 4 items,
+  weighted PSNR: +16 → −1.6% / −0.5%, +32 → −3.04% / −1.3%, +64 → −0.8% /
+  +2.2%; whole-frame PSNR +3.0, +8.6, +31.2%; VMAF +2.6, +6.0, +19.4%. By the
+  rule, +32 is adopted for the full ROI run, but only just: one item
+  (P09_106, −10.4%) carries the mean, the others are −1.5 to +0.8%. The full
+  run on 34 items decides whether the gain is real. `--enable-tf 0`, preset
   4, CRF 41–62, the 4 pilot items, against B2's pilot streams. Reported, no
   decision attached.
 - J5, complexity (secondary, CPU): per frame, VCA v2 (`/opt/local/bin/vca`,
@@ -563,6 +574,36 @@ invocation turns out to be needed.
   over items) with B2's per-item BD-rates in `b2 report --complexity`. Run as
   two jobs on gpu6 and gpu1, where B2's SVT-AV1 jobs left those items' videos
   cached. Reported, no decision attached.
+- J1 outcome (`20261007T174610Z-05be667d`, gpu3, RTX A6000, `aac0cb4`,
+  2,402 s full stage; validator passed). DCVC-UF HT-L codec time per
+  240-frame window, median over 20 codings: encode 1.90 s (126 fps), decode
+  2.03 s (118 fps), the same at every QP; the worker's whole encode took
+  13.1 s, so B2's DCVC-UF timings were about 85% pipeline (conversion,
+  reading, hashing). All 20 full-range streams equal B2's pilot streams bit
+  for bit. Limited-range input is worse: BD-rate against full range, mean over
+  the 4 items, weighted PSNR +5.9%, whole-frame PSNR +5.9%, VMAF +1.5%, worse
+  on every item; part of it is the range mapping's own rounding. Full range,
+  B2's configuration, stands; no re-run (the rule's change exceeds 3% but in
+  favour of what B2 used). The hypothesis is refuted, and not in the
+  competing explanation's direction.
+- J4 outcome (`20261007T174948Z-f66eb774`, gpu5, RTX 6000 Ada for scoring,
+  `aac0cb4`, 149 s full stage; validator passed): without temporal filtering
+  SVT-AV1 is clearly worse. BD-rate against B2's pilot (same items and CRFs),
+  mean over the 4 items: weighted PSNR +21.5%, whole-frame PSNR +27.6%, VMAF
+  +27.1%, worse on every item. It costs the background slightly more than the
+  foreground (−0.28 against −0.13 dB at CRF 48), so filtering explains at most
+  a small part of DCVC-UF's foreground advantage.
+- J5 outcome (`20261007T175147Z-16c6f429` gpu6, 104 s;
+  `20261007T175326Z-67c86dcf` gpu1, 150 s; CPU only, `aac0cb4`; validators
+  passed). Spearman correlation over the 34 items between B2's BD-rate of
+  DCVC-UF against SVT-AV1 and each complexity measure (positive: DCVC-UF does
+  relatively worse on more complex content): weighted PSNR, background Sobel
+  gradient 0.56, VCA E 0.47, foreground gradient 0.42, background frame
+  difference 0.32, foreground frame difference 0.28, VCA h 0.23; whole-frame
+  PSNR, background gradient 0.63, VCA E 0.52, background difference 0.46.
+  With 34 items, |ρ| above about 0.34 is significant at 5%. The DCVC-UF
+  advantage is not explained by how much the foreground moves; it is largest
+  on scenes with little spatial detail, especially in the background.
 - Budget: J1 ≤ 1.5 h on one A6000; J2 ≤ 2.5 h (32 threads, GPU for scoring
   only); J3 ≤ 1 h and J4 ≤ 0.5 h on any Ada, A6000 or RTX 8000 (scoring
   only); J5 ≤ 1 h CPU. Ceiling 6 GPU-hours and 8 h wall; smokes ≤ 600 s.
