@@ -649,7 +649,7 @@ def validate(stage: Path) -> dict[str, bool]:
         checks["dcvc_cuda_kernels_ran"] = bool(kernels) and all(k["kernel_launches"] > 0 for k in kernels)
         cross = [r["cross_device"] for r in rows if r.get("cross_device")]
         checks["metrics_agree_between_cpu_and_gpu"] = bool(cross) and all(
-            c["max_abs_diff"]["psnr"] == 0.0 and c["max_abs_diff"]["lpips"] < 1e-3 and c["max_abs_diff"]["ms_ssim"] < 1e-4 for c in cross)
+            c["max_abs_diff"]["psnr"] < 1e-3 and c["max_abs_diff"]["lpips"] < 1e-3 and c["max_abs_diff"]["ms_ssim"] < 1e-4 for c in cross)
     else:
         checks["svtav1_single_keyframe_crf_commands"] = all(
             "--keyint" in p["codec_record"]["encode_command"] and "--crf" in p["codec_record"]["encode_command"]

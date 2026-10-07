@@ -336,7 +336,7 @@ invocation turns out to be needed.
   together across points; for DCVC-UF, deterministic decode, decoder intra
   frame equal to the encoder's, encode and decode on one GPU, extension variant
   for the class, CUDA kernels launched, and CPU and GPU metrics agreeing (PSNR
-  exactly, LPIPS < 1e-3, MS-SSIM < 1e-4), because SVT-AV1 is scored on CPU.
+  < 1e-3 dB, LPIPS < 1e-3, MS-SSIM < 1e-4), because SVT-AV1 is scored on CPU.
 - Pilot (rate points, and DCVC-UF structure): 4 items, the two smallest
   videos of each type (staging cost; content-blind): `P01_107_0000003049`,
   `P09_106_0000006303` (EK-100), `P02_02_0000006080`, `P03_10_0000000616`

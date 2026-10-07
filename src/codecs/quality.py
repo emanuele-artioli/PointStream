@@ -5,7 +5,8 @@ same RGB view of both: chroma upsampled bilinearly, BT.709, full or limited
 range as the source declares, rounded to 8 bits (`yuv420_to_rgb`). Per frame:
 
 * Squared error per RGB pixel, summed exactly in integers, over the whole frame
-  and over each mask region, so PSNR is identical on every device.
+  and over each mask region. (The float RGB view can round a rare pixel
+  differently on CPU and GPU: PSNR then differs by about 1e-5 dB.)
   ``psnr = 10 log10(255^2 / mse)``, capped at ``PSNR_CAP``.
 * Y, U and V PSNR on the planes themselves, and their 6:1:1 mean (the DCVC and
   JVET convention).
