@@ -85,6 +85,16 @@ Each item gets an experiments.md entry before its fleet run.
 **Done when** the B2 curves are redrawn with the fair SVT-AV1 preset, the
 low-rate ladder and the ROI variant, from recorded jobs.
 
+Status (2026-10-07): items 1, 2 (timing), 5 and 6 are done, and item 4's pilot
+chose the ROI offset (+32 on background blocks; lowering the foreground's
+quantizer does nothing in SVT-AV1's CRF mode)
+([outcome](docs/experiments.md#2026-10-07--b2b-fair-baselines-timing-equal-time-roi-range-complexity)).
+DCVC-UF HT-L encodes a window in 1.9 s, faster than any SVT-AV1 preset on 32
+cores. By the user's decision the equal-time preset is matched to
+PointStream's encode time instead, so the equal-time re-encode, the full ROI
+run and the low-rate ladder wait for PointStream's first timing and rates, and
+then run together from J2's time-per-preset table.
+
 ### B1b. Filling VISOR's missing hands and objects
 
 VISOR's dense masks drop an object's track when its interpolation scored poorly,

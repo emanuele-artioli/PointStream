@@ -597,7 +597,15 @@ invocation turns out to be needed.
   takes 1.90 s, so no tested preset fits the equal-time rule; preset 12 is
   2% over. The rule did not say what happens when none fits, and the choice
   changes the baseline's strength by more than a factor of two in rate, so it
-  is put to the user before the full runs (decision below). gpu5, RTX 6000 Ada for scoring,
+  is put to the user before the full runs (decision below).
+- Decision (user, 2026-10-07): equal time stays the rule, but the time to
+  match is PointStream's, not DCVC-UF's: PointStream will likely be slower
+  than DCVC-UF alone. So the equal-time SVT-AV1 preset is chosen once
+  PointStream's encode time per window is measured on the same host class,
+  by J2's table (slowest preset at or under that time), and SVT-AV1 is
+  re-encoded then. The full ROI run (+32, J3b) waits for the same preset, and
+  the low-rate ladder for PointStream's rates, so all three run together.
+  Until then B2's preset-4 curves are the reference. gpu5, RTX 6000 Ada for scoring,
   `aac0cb4`, 149 s full stage; validator passed): without temporal filtering
   SVT-AV1 is clearly worse. BD-rate against B2's pilot (same items and CRFs),
   mean over the 4 items: weighted PSNR +21.5%, whole-frame PSNR +27.6%, VMAF
