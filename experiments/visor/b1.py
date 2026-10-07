@@ -294,6 +294,9 @@ def convert_item(item: dict[str, Any], archive: str, frames: int, publish: str) 
         "provenance": dict(Counter(inst.provenance for f in clip.frames for inst in f)),
         "mask_sha256": mask_digest(clip), "masks_rle_sha256": file_sha256(target),
         "human_agreement": human_agreement(clip, sparse, item["first_visor_frame"]),
+        "human_frames_in_range": sum(
+            1 for n in visor.frames(sparse) if item["first_visor_frame"] <= n < item["first_visor_frame"] + frames
+        ),
         "hand_gap_frames": sum(1 for n in range(item["first_visor_frame"], item["first_visor_frame"] + frames) if n in gaps),
         "hold_first": scored, "convert_seconds": round(converted, 2),
         "total_seconds": round(time.time() - started, 2),
@@ -356,7 +359,9 @@ def validate_evalset(stage: Path) -> dict[str, bool]:
         "every_frame_labelled": all(row["labelled"] == row["frames"] == result["frames_per_item"] for row in rows),
         "dense_sources_match_their_sha256": all(row["dense_sha256_matches"] for row in rows),
         "items_have_no_hand_gap": all(row["hand_gap_frames"] == 0 for row in rows),
-        "items_contain_a_human_keyframe": all(row["human_agreement"] for row in rows),
+        # A window may lie between two human-labelled frames; compare every one it contains.
+        "every_human_frame_in_range_compared": all(len(row["human_agreement"]) == row["human_frames_in_range"] for row in rows),
+        "some_human_frame_compared": any(row["human_agreement"] for row in rows),
         "items_aligned_exactly_on_the_video": all(row["aligned_exactly"] and row["video_indices_match_eval_set"] for row in rows),
         "only_interpolated_provenance": all(set(row["provenance"]) == {visor.INTERPOLATED} for row in rows),
         "hands_present": all(row["instances_per_class"].get("left hand", 0) + row["instances_per_class"].get("right hand", 0) > 0 for row in rows),
