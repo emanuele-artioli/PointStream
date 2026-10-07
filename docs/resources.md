@@ -116,14 +116,18 @@ frames; training admits drift ≤ 1 ([decision](experiments.md#2026-10-06-visor-
 Dense polygons are drawn on an 854×480 canvas and scaled to 1080p; on P32_07's
 keyframes they match the human 1080p masks at IoU 0.97–0.995.
 
-**VISOR evaluation set** (`experiments/visor/eval_set.json`; source
-`pointstream-data/visor/b1-2026-10-06/evalset/eval_set.json`, sha256
-`b994c531…d9cb`; dense archive `visor-val-dense.tar`, `cca6169a…020f`). 16
-items, one per EK-100 validation video (11 participants), 240 frames each
-(4.8 s at 50 fps), every frame labelled and exactly aligned, each starting on a
-keyframe; the run is picked content-blind by sha256("pointstream-b1:<video>").
-The 27 EK-55 validation videos are excluded because their dense frames cannot be
-placed exactly. Masks carry provenance `interpolated`.
+**VISOR evaluation set v2** (`experiments/visor/eval_set.json`; source
+`pointstream-data/visor/b1-2026-10-06/evalset-v2/eval_set.json`, sha256
+`0d25301a…ec2`; dense archive `visor-val-dense.tar`, `a2d9e0cb…c3c`). 34
+items, one per validation video: 15 EK-100 (50 fps) and 19 EK-55 (59.94 fps),
+240 frames each. Every frame is labelled and exactly placed on the video, and
+no hand a human labelled at an end of its dense run is missing
+(`visor.hand_gaps`); the window is picked content-blind by
+sha256("pointstream-b1:<video>"). Masks carry provenance `interpolated`;
+objects other than hands can still be missing (108 at the 78 human-labelled
+frames inside the items). Rule and outcome in
+[experiments](experiments.md#2026-10-07-visor-evaluation-set-v2-and-a-sam-fill-for-missing-hands).
+Set v1 (16 EK-100 items, `b994c531…d9cb`) is superseded.
 
 **Archived.** `tennis_games`, `Egocentric-10K` and the derived
 `pointstream-demo` are in `Datasets/archive/pre-reset-2026-10-05/`: moved,

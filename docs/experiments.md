@@ -133,6 +133,21 @@ invocation turns out to be needed.
   sample of in-between frames, checked by eye and against EPIC-KITCHENS
   hand-object boxes (a detector's output, independent of SAM). Every result is
   reported with and without the fill.
+- Outcome: set v2 has 34 items (15 EK-100, 19 EK-55 59.94 fps; `eval_set.json`
+  sha256 `0d25301a…ec2`, archive `a2d9e0cb…c3c`). Excluded: the two 29.97
+  fps videos and the 720p P12_04 by class; P03_14, P03_22, P07_103, P26_01,
+  P29_04 and P32_07 have no exactly aligned, hand-complete window. Conversion
+  job `20261007T080749Z-8c75e456` failed its smoke: the check that each item
+  contains a human-labelled frame is wrong for 24-frame ranges and for one
+  window that lies between two labelled frames; it now requires every human
+  frame in range to be compared. Job `20261007T081136Z-71468647` (gpu1, CPU
+  only, `7adefe3`, 382 s full stage, published masks `0cf83b8c…37b5`):
+  validator passed. At all 78 human-labelled frames inside the items, every
+  hand is in the dense masks, IoU 0.902–0.997 (median 0.984, 144 hands);
+  objects median 0.966 (253), and 108 human-labelled objects are absent from
+  the dense masks there (reported, not filtered). Hold the first frame, mean
+  over items: foreground J 0.459, F 0.370 (EK-100 0.403, EK-55 0.504; per item
+  0.03–0.85). B1's done-when holds on set v2.
 
 ### 2026-10-05: Baselines
 - Decision: SVT-AV1 plus one state-of-the-art neural video codec. VVC only if a
