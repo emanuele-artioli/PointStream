@@ -454,3 +454,28 @@ invocation turns out to be needed.
   3.3 Mbps (QP 63); one preset and one structure each; the dense masks lack a
   third of the labelled objects, which B1b's fill is meant to supply (add it
   with `run --streams` on the published streams). B2's done-when holds.
+- Timing (every job records its stage seconds in `execution.json`; every item
+  and rate point in `b2.json` records encode, decode, scoring and VMAF
+  seconds; no stage was contended or paused). SVT-AV1 used no GPU: CPU jobs of
+  32 (pilot) and 48 threads, full stages 1,581 + 2,521 + 3,930 s. All GPU time
+  was DCVC-UF: full stages 991 (HT-S) + 1,709 (HT-L pilot) + 3,394 + 3,072 +
+  3,118 s = 3.4 GPU-hours, plus smokes and staging. Per 240-frame window,
+  median: SVT-AV1 preset 4 encodes in 14.6 s (16 fps; 8 threads, up to 6
+  windows at once on a shared host), dav1d decodes in 0.9 s; DCVC-UF HT-L on
+  an RTX A6000 encodes in 12.5 s (19 fps) and decodes in 5.2 s (46 fps), each
+  after a 5.8 s model load, and its times include the worker's CPU-side 4:2:0
+  conversion and hashing, so they are not DCVC-UF's kernel speed. Scoring
+  dominated SVT-AV1's jobs: 227 s per point on CPU (LPIPS and MS-SSIM at
+  1080p) against 6.5 s on the GPU for DCVC-UF. These are pipeline timings,
+  not codec benchmarks: hosts were shared and SVT-AV1 ran windows in
+  parallel.
+- Foreground analysis (from the recorded per-item results, no new job): at a
+  mid rate (SVT-AV1 CRF 48, DCVC-UF QP 45) foreground PSNR exceeds background
+  PSNR by 0.48 dB for DCVC-UF and 0.16 dB for SVT-AV1, and DCVC-UF's gap is
+  larger on 28 of 34 items; its BD-rate is better on weighted than on
+  whole-frame PSNR on 30 of 34 items. Its weighted advantage is larger where
+  the foreground is a smaller share of the frame (Spearman 0.42 between
+  BD-rate and foreground fraction) and where the background is easy for
+  SVT-AV1 (−0.42 with SVT-AV1's background PSNR). Neither codec is told
+  where the foreground is: both encode the whole frame, and masks enter only
+  the scoring.
