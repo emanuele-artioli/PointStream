@@ -468,7 +468,11 @@ invocation turns out to be needed.
   dominated SVT-AV1's jobs: 227 s per point on CPU (LPIPS and MS-SSIM at
   1080p) against 6.5 s on the GPU for DCVC-UF. These are pipeline timings,
   not codec benchmarks: hosts were shared and SVT-AV1 ran windows in
-  parallel.
+  parallel. Superseded as speed evidence by B2b: SVT-AV1's encodes were not
+  confined to 8 threads (`--lp`, below), and DCVC-UF's include the worker's
+  conversion and hashing. Use B2b J2 (SVT-AV1 per preset, 32 pinned cores,
+  one window at a time) and J1 (DCVC-UF codec calls) instead. B2's rates and
+  scores are unaffected.
 - Foreground analysis (from the recorded per-item results, no new job): at a
   mid rate (SVT-AV1 CRF 48, DCVC-UF QP 45) foreground PSNR exceeds background
   PSNR by 0.48 dB for DCVC-UF and 0.16 dB for SVT-AV1, and DCVC-UF's gap is
