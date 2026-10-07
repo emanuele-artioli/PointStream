@@ -726,3 +726,48 @@ invocation turns out to be needed.
   Fill rule added before the full run (adoption rule unchanged): a SAM
   instance more than half on an instance already in the frame is not added
   (`MAX_OVERLAP`). The full run repeats the four pilot items with it.
+- Full jobs (commit `1d33976`, environment `pointstream-20261006T113321Z`,
+  inputs `pointstream-data/visor/b1b-2026-10-07/inputs/`: detections tar
+  `949ea65d…97c3`, manifest `711870f2…1ee5`, SAM checkpoint `0567debe…1cb6`,
+  B1 masks `0cf83b8c…37b5`; smokes and validators passed, 19 checks each, and
+  the validator passes on both full outputs too): share A
+  `20261007T211731Z-f7a21e9f` (17 items, gpu3, RTX A6000, 2,876 s full stage,
+  `b1b.json` `b6009493…527a`) and share B `20261007T211914Z-9402b935` (17
+  items, gpu6, RTX 6000 Ada, 2,018 s, `39744ab2…c2db`); 17,535 frames
+  tracked, 2,344 s of tracking, peak 6.8 GiB; no contention. Report
+  (`b1b report`, `pointstream-data/visor/b1b-2026-10-07/report-1d33976/`,
+  `b1b-report.json` `b6567477…d2a5`):
+
+  | Held out (prompt at a, score at b) | n | mean J | median J | mean F | hold floor J | hard n | hard mean J |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | Hands | 178 | 0.931 | 0.969 | 0.965 | 0.360 | 1 | 0.974 |
+  | Hands, EK-100 / EK-55 | 99 / 79 | 0.965 / 0.888 | 0.972 / 0.965 | 0.991 / 0.932 | 0.424 / 0.279 | | |
+  | Objects | 407 | 0.828 | 0.911 | 0.905 | 0.252 | 158 | 0.704 |
+  | Objects, EK-100 / EK-55 | 221 / 186 | 0.858 / 0.793 | 0.922 / 0.889 | 0.928 / 0.879 | 0.314 / 0.179 | 75 / 83 | 0.746 / 0.666 |
+
+  Mean gap between keyframes 111–117 frames (about 2 s). Hands labelled at a
+  and gone at b: SAM let 4 of 6 go (0.67); objects 24 of 49. Detector
+  agreement (hand box at least half inside the mask's box): SAM's held-out
+  hands 0.941 (13,471 of 14,317), dense hands on the same frames 0.958
+  (13,705 of 14,313), ratio 0.98; human hands at keyframes 0.943 (232 of
+  246). Frames where the detector sees a hand that the masks lack: 41 of
+  14,544 detected hands (0.3%), the same with and without the fill.
+- Decision (by the rule): **objects adopted, hands not**. Hands pass every
+  accuracy check by a wide margin but fail one: SAM released 4 of 6 departed
+  hands, under 0.70 (n = 6, so the failure rests on two cases). The fill
+  therefore keeps objects only. On this set that costs little: the overlap
+  rule had already left 9 filled hand instances (57 rejected), none of which
+  the detector confirmed, and the review frames show the failure mode (a
+  hand track moving onto the other hand). The hard subset (objects the dense
+  masks drop) is 0.70 against a 0.10 floor. The review by eye
+  ([artifact](https://claude.ai/artifact/GSkm3caejx3bNJYUJnQP8K), 68 frames)
+  is pending with the user and can still veto.
+- Fill (objects only; merge job `20261007T222646Z-3a7ac6ef`, CPU, `339c918`,
+  validator passed; `published.tar` `049977f0…799a`, `merge.json`
+  `1c705e4a…4bea`): 18,267 object instances added on 7,504 of 8,160 window
+  frames in 33 of 34 items; 833 object instances rejected for overlap. The
+  share of each frame's labelled objects missing falls from 33.3% (dense) to
+  1.6% (with the fill), mean over items. Limit: on 8 items a prompt is not
+  reproduced on its own frame (minimum IoU 0.00–0.76, every item's median ≥
+  0.96), most likely thin or tiny masks lost at the tracker's mask-input
+  resolution.
