@@ -189,6 +189,12 @@ these gaps.
 - Report per provenance tier. When B1b's SAM fill (`sam_from_label_prompt`) is
   adopted, report every number with and without it; the "without" number is
   the fair one for D1, where SAM 3.1 is a contestant.
+- Codec baseline (B2, `experiments/visor/b2.py`): SVT-AV1 preset 4 and
+  DCVC-UF HT-L curves on all 34 items, keyed by mask set; the streams are
+  published in the full jobs' `published.tar`, so a new mask set (B1b's
+  fill) is scored with `b2 run --streams` without re-encoding. PointStream is
+  compared at equal rate with the better of the two per metric
+  ([outcome](experiments.md#2026-10-07--b2-baseline-rate-distortion-on-visor)).
 - Floor for segmenters: "hold the first frame" (the item's first-frame masks
   copied to every frame) scores, mean over the 34 items, foreground J 0.459,
   F 0.370 (EK-100 0.403, EK-55 0.504; per item 0.03–0.85; left hand J 0.374,
