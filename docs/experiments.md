@@ -238,12 +238,25 @@ invocation turns out to be needed.
   over 35). Trivial candidate "hold the first frame", mean over items:
   foreground J 0.337, F 0.264; left hand J 0.349; right hand J 0.285; active
   object J 0.326. B1's done-when holds.
-- Finding: the dense masks are incomplete. VISOR keeps in a dense run only the
-  entities present at both of its keyframes, so an entity that enters or
-  leaves during the run is missing from every frame of it. On the first frames
-  of the 16 items, 12 lose at least one entity that the human masks label, and
-  5 lose a hand (P01_107, P07_110, P09_104, P30_110 one each; P09_103 both).
-  Where both have the hand, IoU is 0.84–0.99. The minimum hand IoU of 0.0 in
-  the validator summary is this omission, not misalignment. For B2 a missing
-  hand is scored as background; for D1 a segmenter that finds it is penalised.
-  Decision pending (see the B1 report).
+- Finding: the dense masks are incomplete. VISOR's README says the dense
+  interpolations "are filtered and only high J&F scored interpolations are
+  provided": each object's track between two keyframes is kept, cut short or
+  dropped on its own score, and an object labelled at only one end is never
+  interpolated. On the first frames of the 16 items, 5 lose a hand (P01_107,
+  P07_110, P09_104, P30_110 one each; P09_103 both); where both have the
+  hand, IoU is 0.84–0.99, so this is omission, not misalignment. (An earlier
+  version of this entry gave only the one-end cause; P09_103 and P01_107 lose
+  hands labelled at both ends.) Metadata survey of all val videos with dense
+  files (this session, not a fleet job): 22% of EK-100 dense frames (37,708 of
+  170,683) and 30% of EK-55 59.94 fps frames (105,755 of 354,513) miss a hand
+  that a human labelled at an end of their run; hands dropped despite labels at
+  both ends: 277 (EK-100), 711 (EK-55); labelled at one end: 320, 514. Any
+  labelled object is missing on 87% and 90% of frames. A hand that comes and
+  goes between keyframes is not counted. All 1,786 HInt frames in these videos
+  are sparse keyframes, so HInt has no keypoints on the frames where hands go
+  missing. For B2 a missing hand is scored as background; for D1 a segmenter
+  that finds it is penalised; F1 background frames and E1 would learn
+  unlabelled hands as background. Drift-free 240-frame windows: EK-100 16/16
+  videos (557 windows), EK-55 59.94 fps 1080p 21/24 (444); hand-complete among
+  them: 15 (291) and 20 (205); all objects complete: 4 (13) and 3 (13).
+  Decision pending with the user (options in the VISOR frame drift report).
