@@ -532,6 +532,28 @@ invocation turns out to be needed.
   (−16 or −32) gains more than 5% on weighted PSNR. Competing explanation:
   64×64 blocks cover so much more than the hands (median foreground 20% of
   the frame) that the shift barely changes the weighting.
+- J3 outcome (`20261007T174905Z-c6e9381d`, gpu6, RTX 6000 Ada for scoring,
+  `aac0cb4`, 373 s full stage; validator passed): lowering the quantizer in
+  foreground blocks does not work. BD-rate against no ROI, mean over the 4
+  items, weighted PSNR: −16 → +1.7%, −32 → +5.4%, −64 → +15.1% (whole-frame
+  PSNR +3.2, +6.0, +11.7%); at CRF 48, −64 adds 6% rate while foreground PSNR
+  falls (37.59 → 37.25 dB). A CPU probe on 16 frames of P01_107 (gpu6, 4
+  cores, not a fleet job, not evidence) shows why: the map is honoured
+  spatially, since a +64 offset on the left half costs it 1.15 dB and saves 7%,
+  but a −64 offset adds 8% bytes and leaves the region's PSNR unchanged
+  (41.29 → 41.30 dB), with or without adaptive quantization (`--aq-mode 0`).
+  In SVT-AV1 4.2.0's CRF mode, ROI can make a region cheaper, not better. The
+  validator's ROI check (any positive mean margin) was too weak to catch this.
+- J3b, ROI by raising the background: offsets +16, +32, +64 on every 64×64
+  block with no foreground pixel, against 0; CRF 34, 41, 48, 55, 62 (lower
+  CRFs keep the curves overlapping as the background loses quality); preset 4,
+  the 4 pilot items, GPU scoring. Decision rule as for J3: the offset with the
+  most negative mean BD-rate on weighted PSNR against 0, adopted if below −3%,
+  for the full ROI run; otherwise ROI is reported as not helping SVT-AV1 here.
+  Hypothesis: +16 or +32 gains on weighted PSNR (the foreground keeps its
+  quantizer while the background pays). Competing explanation: blocks are so
+  coarse that "background" blocks are a minority of what the weights favour,
+  so the shift barely helps.
 - J4, SVT-AV1 without temporal filtering (secondary): `--enable-tf 0`, preset
   4, CRF 41–62, the 4 pilot items, against B2's pilot streams. Reported, no
   decision attached.

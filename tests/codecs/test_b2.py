@@ -235,3 +235,11 @@ def test_spearman_ranks() -> None:
     assert b2.spearman([1, 2, 3, 4], [10, 20, 30, 40]) == pytest.approx(1.0)
     assert b2.spearman([1, 2, 3, 4], [4, 3, 2, 1]) == pytest.approx(-1.0)
     assert b2.spearman([1, 2], [1, 2]) is None
+
+
+def test_positive_roi_offset_raises_the_background_blocks(tmp_path: Path) -> None:
+    width, height = 130, 70
+    fg = np.zeros((height, width), bool)
+    fg[65, 129] = True
+    b2.write_roi_map([{"m/fg": fg}], "m", 1, width, height, 32, tmp_path / "roi.txt")
+    assert (tmp_path / "roi.txt").read_text().splitlines() == ["0 32 32 32 32 32 0"]

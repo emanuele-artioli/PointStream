@@ -327,14 +327,18 @@ def variants(args: argparse.Namespace) -> list[dict[str, Any]]:
 def write_roi_map(regions: list[dict[str, np.ndarray]], mask_set: str, frames: int, width: int, height: int,
                   offset: int, path: Path) -> dict[str, Any]:
     """SVT-AV1 ROI map: per frame, its number, then one quantizer offset per 64x64 block in
-    raster order, ``offset`` where the block holds any foreground pixel and 0 elsewhere."""
+    raster order. A negative ``offset`` lowers the quantizer of every block that holds any
+    foreground pixel; a positive one raises it on every other block. In SVT-AV1 4.2.0's CRF
+    mode only the second works: a negative offset adds bytes without raising the region's
+    PSNR, a positive one lowers it (B2b probe, docs/experiments.md)."""
     rows, cols = -(-height // ROI_BLOCK), -(-width // ROI_BLOCK)
     lines, shares = [], []
     for index in range(frames):
         padded = np.zeros((rows * ROI_BLOCK, cols * ROI_BLOCK), bool)
         padded[:height, :width] = regions[index][f"{mask_set}/fg"]
         blocks = padded.reshape(rows, ROI_BLOCK, cols, ROI_BLOCK).any(axis=(1, 3))
-        lines.append(f"{index} " + " ".join(str(offset if b else 0) for b in blocks.ravel()))
+        target = blocks if offset < 0 else ~blocks
+        lines.append(f"{index} " + " ".join(str(offset if b else 0) for b in target.ravel()))
         shares.append(float(blocks.mean()))
     path.write_text("\n".join(lines) + "\n")
     return {"path": str(path), "sha256": file_sha256(path), "block": ROI_BLOCK, "grid": [rows, cols],
@@ -1189,7 +1193,7 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--vmaf-ffmpeg", default="/opt/local/bin/ffmpeg")
     run.add_argument("--streams", help="score published streams under DIR/<codec>/<item>/<point>/ instead of encoding")
     run.add_argument("--preset", default="4", help="SVT-AV1 preset, or a comma-separated list")
-    run.add_argument("--roi-offset", default="0", help="SVT-AV1 quantizer offset inside the foreground, or a list (0: no ROI)")
+    run.add_argument("--roi-offset", default="0", help="SVT-AV1 ROI quantizer offset, or a list: negative lowers foreground blocks, positive raises background blocks (0: no ROI)")
     run.add_argument("--roi-mask-set", default="visor_dense")
     run.add_argument("--enable-tf", type=int, choices=(0, 1, 2), help="SVT-AV1 temporal filtering (default: the encoder's)")
     run.add_argument("--dcvc-range", default="full", help="DCVC-UF input range: full, limited, or both")
