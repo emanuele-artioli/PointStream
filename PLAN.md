@@ -68,7 +68,14 @@ and without the fill. It also removes unlabelled hands from F1's background
 frames and E1's training targets.
 **Done when** the validation numbers from a recorded job decide adoption.
 
-### B2. Baseline rate-distortion on VISOR
+### B2. Baseline rate-distortion on VISOR (done 2026-10-07)
+
+Result: `experiments/visor/b2.py`; SVT-AV1 preset 4 (CRF 41–62) and DCVC-UF
+HT-L (QP 27–63) on all 34 items, from recorded jobs
+([outcome](docs/experiments.md#2026-10-07--b2-baseline-rate-distortion-on-visor)).
+DCVC-UF HT-L needs 13% less rate (mean BD-rate; median 18%) for equal weighted
+PSNR, ties on whole-frame PSNR, and loses on VMAF. B1b's fill is added by
+rescoring the published streams. The text below is the original brief.
 
 SVT-AV1 and DCVC-UF on the evaluation set: rate against weighted PSNR
 (0.7 foreground + 0.3 background on VISOR masks) and the perceptual metrics.

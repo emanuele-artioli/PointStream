@@ -189,6 +189,12 @@ these gaps.
 - Report per provenance tier. When B1b's SAM fill (`sam_from_label_prompt`) is
   adopted, report every number with and without it; the "without" number is
   the fair one for D1, where SAM 3.1 is a contestant.
+- Codec baseline (B2, `experiments/visor/b2.py`): SVT-AV1 preset 4 and
+  DCVC-UF HT-L curves on all 34 items, keyed by mask set; the streams are
+  published in the full jobs' `published.tar`, so a new mask set (B1b's
+  fill) is scored with `b2 run --streams` without re-encoding. PointStream is
+  compared at equal rate with the better of the two per metric
+  ([outcome](experiments.md#2026-10-07--b2-baseline-rate-distortion-on-visor)).
 - Floor for segmenters: "hold the first frame" (the item's first-frame masks
   copied to every frame) scores, mean over the 34 items, foreground J 0.459,
   F 0.370 (EK-100 0.403, EK-55 0.504; per item 0.03–0.85; left hand J 0.374,
@@ -248,6 +254,16 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   pre-reset latents cost 76–79 kbps at 18–21 dB at 240p, no better than AV1.
   GLC-video reports estimated rather than coded rates. GVC-RT and MTTF were
   never installed.
+
+**Quality metrics** (B2, `src/codecs/quality.py`)
+- LPIPS uses torchmetrics' AlexNet heads (in the environment) and the
+  torchvision AlexNet backbone `Models/LPIPS/alexnet-owt-7be5be79.pth`
+  (sha256 `7be5be79…ee02`, its prefix matches the published file name; copied
+  from the shared torch hub cache on 2026-10-07), loaded from that path, never
+  downloaded.
+- VMAF: the environment's ffmpeg has no libvmaf; the hosts' `/opt/local/bin/ffmpeg`
+  (7.1.1, libvmaf 3, built-in `vmaf_v0.6.1`) has it on gpu1–gpu6. Results
+  record its path, sha256 and the libvmaf it links.
 
 **Hand pose estimators**
 - HaMeR ([geopavlakos/hamer](https://github.com/geopavlakos/hamer) at
