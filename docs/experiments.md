@@ -760,8 +760,15 @@ invocation turns out to be needed.
   the detector confirmed, and the review frames show the failure mode (a
   hand track moving onto the other hand). The hard subset (objects the dense
   masks drop) is 0.70 against a 0.10 floor. The review by eye
-  ([artifact](https://claude.ai/artifact/GSkm3caejx3bNJYUJnQP8K), 68 frames)
-  is pending with the user and can still veto.
+  ([artifact](https://claude.ai/artifact/GSkm3caejx3bNJYUJnQP8K), 68 frames;
+  user, 2026-10-08) flagged 5 frames in 4 items (P01_107 w083, P04_24 w055
+  and w096, P08_17 w128, P27_105 w169), all hands in SAM's own tracks: the
+  hand kept but the forearm lost, or hand and forearm lost. None is in the
+  adopted object fill, so there is no veto; they confirm that SAM's hand
+  tracks are not fit to fill hands. Also visible there, not flagged: on
+  P27_105 the filled fridge is fragmented into speckle, and large touched
+  surfaces (sink, fridge, cupboard) enter the foreground as VISOR labels
+  them.
 - Fill (objects only; merge job `20261007T222646Z-3a7ac6ef`, CPU, `339c918`,
   validator passed; `published.tar` `049977f0…799a`, `merge.json`
   `1c705e4a…4bea`): 18,267 object instances added on 7,504 of 8,160 window
