@@ -38,6 +38,7 @@ import json
 import math
 import multiprocessing
 import os
+import shutil
 import subprocess
 import time
 from collections import Counter, defaultdict
@@ -1036,6 +1037,13 @@ def command_run(args: argparse.Namespace) -> int:
         if not (mano / name).exists():
             (mano / name).symlink_to(Path(source).resolve())
     args.mano_dir = str(mano)
+    # The staging cache keeps files read-only and drops the execute bit: run a copy.
+    inspect = scratch / "bin" / Path(args.inspect).name
+    inspect.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(args.inspect, inspect)
+    inspect.chmod(0o755)
+    args.inspect_source = args.inspect
+    args.inspect = str(inspect)
     allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
     # Decode in fresh processes before torch loads (B2: PyAV stalled in a process that had loaded torchvision).
     pool = ProcessPoolExecutor(max_workers=2, mp_context=multiprocessing.get_context("spawn"))
@@ -1078,7 +1086,7 @@ def command_run(args: argparse.Namespace) -> int:
         "eval_set": {"path": args.eval_set, "sha256": file_sha256(Path(args.eval_set)), "name": eval_set["name"]},
         "inputs": {"wilor_checkpoint_sha256": wilor.load["checkpoint_sha256"], "wilor_detector_sha256": wilor.load["detector_sha256"],
                    "mano_left_sha256": file_sha256(Path(args.mano_left)), "mano_right_sha256": file_sha256(Path(args.mano_right)),
-                   "inspect": args.inspect, "inspect_sha256": file_sha256(Path(args.inspect)),
+                   "inspect": args.inspect_source, "inspect_sha256": file_sha256(Path(args.inspect)),
                    "svt_result_sha256": [file_sha256(Path(p)) for p in args.svt_result]},
         "wilor": {**wilor.load, "kernels": wilor.kernels, "on_cuda": model_on_cuda(wilor.model)},
         "device": device, "peak_gpu_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
