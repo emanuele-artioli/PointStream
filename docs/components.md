@@ -43,13 +43,20 @@ classes; everything unlabelled is background.
 
 ## 3. Background
 
-Remove the foreground (video inpainting if necessary), then encode.
+After a warm-up, the client holds one representation of everything the camera
+has seen (a panorama for a camera that rotates in place, or a neural model
+fitted to the warm-up), and each later background frame is rebuilt from it
+with only the camera pose. The foreground is removed first; a panorama fills
+what one frame hides from other frames, a neural model may need generative
+inpainting. Steps G1–G5 in [PLAN](../PLAN.md#g-background-user-2026-10-08).
 
 ## 4. Foreground
 
-Per-object representation (appearance reference, pose or keypoints, mask),
-decoded generatively or as coded crops. A parametric trajectory is a candidate
-for the ball.
+Per object, an appearance reference sent once and compact motion parameters
+per frame (hand pose, an object's rigid motion), rendered at the client and
+composited over the background; what the model cannot explain falls back to
+coded pixels. A parametric trajectory is a candidate for the ball. Steps
+H1–H5 in [PLAN](../PLAN.md#h-foreground-user-2026-10-08).
 
 ## 5. Reconstruction
 

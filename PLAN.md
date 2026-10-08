@@ -151,7 +151,154 @@ the B1 set, optionally EK-55 clips scored on frames whose keyframes match the
 released JPEGs.
 **Done when** the curves come from a recorded job.
 
-### D1. Segmentation benchmark on VISOR and EgoHOS
+### G. Background (user, 2026-10-08)
+
+The thesis: a viewer barely looks at the background, and most of it repeats.
+After a warm-up stretch of video, the client receives one representation of
+everything the camera has seen; from then on each background frame is
+rebuilt from it with only the camera's pose (GenStream did this with a
+hand-made 3D model; PointStream builds the representation from the video
+itself). With a camera that rotates in place there is no parallax, so the
+representation is a panorama (planar, cylindrical or spherical) rather than
+3D Gaussian splatting. A second candidate stores the warm-up background in
+the weights of a neural codec and then sends one latent per view. The
+foreground occludes the background: a panorama merges views and fills what
+one frame hides; a neural model needs clean frames, from the panorama or from
+generative inpainting. PRESLEY's lesson stands: the background only has to be
+good enough not to distract. Each step below is one session; its outcome
+decides the next.
+
+#### G1. Camera motion and coverage audit (next)
+
+Does the camera only rotate, and how fast does the background stop being new?
+Per dataset and clip, with the foreground masked out: fit frame-to-frame and
+frame-to-reference homographies (rotation and zoom about a fixed centre) and
+measure what they leave unexplained (alignment error on background pixels,
+the share of frames a homography explains, residual motion that indicates
+parallax or moving background such as water, screens or other people); and
+the coverage curve, the share of each frame's background already seen after
+t seconds. VISOR (evaluation set v2 and longer dense runs; head-mounted, close
+scene, so translation and parallax are expected) and the racket-sports sets
+(fixed or pan-tilt-zoom cameras). CPU or light GPU.
+**Done when** a recorded job says, per dataset, whether a rotation-only
+background holds, how long a warm-up it needs, and which clips a background
+evaluation can use; and whether phase 1's dataset suits it or the background
+work should start on racket sports.
+
+#### G2. Background evaluation protocol
+
+From G1: the clip set (long enough for a warm-up to pay off), the warm-up
+length, rate accounting (the one-time representation counted once, plus the
+per-frame camera pose and any residual, reported against how long the clip
+plays after the warm-up), quality on visible background only (dataset masks;
+occluded pixels have no truth), and render time per frame at the client.
+Baselines on the same background frames: SVT-AV1 and DCVC-UF, plus
+PRESLEY-style degradation (VVC is an extension, after a working pipeline).
+**Done when** the protocol is fixed in experiments.md and the baselines'
+background curves come from recorded jobs.
+
+#### G3. Panorama background
+
+Build the panorama from the warm-up frames with the foreground masked out
+(views merged so that what one frame hides another fills; G1 picks the
+projection), code it once, send each frame's camera parameters, and render the
+view at the client. Measured by G2's protocol: rate over clip length, quality
+on visible background, render time, and the failure cases (residual motion,
+lighting changes, background not seen during the warm-up).
+**Done when** its curves and render time sit beside G2's baselines.
+
+#### G4. Clean background frames
+
+The neural route needs frames without the foreground: panorama-filled frames
+from G3 against generative video inpainting (to be audited into the
+environment), compared on the visible pixels around the hole and by eye.
+**Done when** one source of clean frames is chosen for G5, with numbers.
+
+#### G5. Neural background model
+
+A neural codec fitted or fine-tuned on the warm-up's clean frames, sent once
+(its bytes counted), then one latent per view; DCVC-UF fine-tuning and an
+implicit per-scene model (HNeRV-style, earlier rejected as a general codec)
+are the starting candidates. Measured by G2's protocol against G3 and the
+baselines, render time included.
+**Done when** G3 and G5 are compared on rate, quality and render speed, and one
+background is chosen for PointStream.
+
+### H. Foreground (user, 2026-10-08)
+
+The thesis: a pixel codec spends most of its bits on what moves, and people
+and the objects they handle move in ways computer vision already models.
+GenStream sent a skater as skeleton keypoints and rendered the person at the
+client. PointStream does the same per object: an appearance reference sent
+once (like the background's warm-up), then compact motion parameters per frame
+(hand pose, an object's rigid motion), rendered and composited over the
+background at the client. Whatever the model cannot explain (an object first
+seen, food being cut, a failed estimate) falls back to coded pixels, so every
+frame decodes. VISOR's hands include the forearm, which MANO does not model,
+and the hands carry most of the viewer's attention. Each step is one session.
+G and H are independent until H5, so their sessions can run side by side.
+
+#### H1. Foreground motion and representation audit (can run beside G1)
+
+What the foreground is and how much of it a parametric model could explain.
+On evaluation set v2: the foreground's share of pixels and of B2's bits
+(hands, forearms, handled objects, other objects); per object, how well a
+rigid 2D or 3D motion explains it frame to frame, and how much is
+deformation, appearance change, occlusion and motion blur; per hand, how
+well a hand-pose estimate re-projects onto the mask, and how much of the
+mask is forearm. An estimate of the parameter rate per object per second.
+**Done when** a recorded job says which foreground parts are worth a
+parametric model, which should stay pixels, and in what order to build them.
+
+#### H2. Hand-pose estimators: HaMeR against WiLoR
+
+The comparison already planned, a paper table on its own: 2D PCK on HInt
+VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
+temporal stability on VISOR video. No published work compares them on
+egocentric video ([resources](docs/resources.md#models)). HOT3D's motion
+capture is the oracle that measures what pose estimation costs.
+**Done when** one estimator is chosen for PointStream, with numbers.
+
+#### H3. Hand and arm rendering
+
+From an appearance reference and the per-frame pose (H2), render the hand and
+forearm at the client: a textured MANO mesh, pose-conditioned generation, or
+a mesh with a learned residual; the forearm from the mask's extent or a
+simple arm model. Scored on VISOR foreground quality against coding the same
+pixels with SVT-AV1 at equal rate, with HOT3D's oracle poses as the upper
+bound, and on render time.
+**Done when** a hand renderer beats coded pixels at some rate, or the session
+shows why not.
+
+#### H4. Handled objects
+
+Per object: an appearance reference plus rigid motion where H1 shows it
+holds, coded pixels where it does not (deformable, transparent, cut or newly
+seen objects). How objects enter (first appearance) and how the reference is
+updated as they turn.
+**Done when** each object class H1 named has a representation chosen by numbers.
+
+#### H5. First working PointStream
+
+G's background and H's foreground in one bitstream with every byte counted:
+references once, then camera pose, hand pose and object motion per frame,
+plus the fallback pixels. Scored with B2's harness on evaluation set v2
+(weighted PSNR on dataset masks, with and without B1b's fill) against B2's
+curves, and timed end to end, which picks B2b's equal-time SVT-AV1 preset.
+**Done when** PointStream's curves and encode and decode times on all 34
+items come from recorded jobs, beside B2's.
+
+### After a working pipeline
+
+Optimisation, training and extensions, ordered by what G and H show they need.
+VVC (VVenC, `/opt/local/bin/vvencapp` on the hosts) joins the baselines here
+(user, 2026-10-08: SVT-AV1 is enough until then).
+
+#### D1. Segmentation benchmark on VISOR and EgoHOS
+
+Moved after a working pipeline (user, 2026-10-08): SAM 3.1 already segments
+well enough to build on, and choosing a faster segmenter is an optimisation that needs the
+pipeline's own timing.
 
 SAM 3.1 (text and prompted) and YOLOE-26 against the labels, per class, accuracy
 against speed. EgoHOS is scored on single images only. On VISOR: evaluation set
@@ -160,7 +307,7 @@ row, and every number with and without B1b's fill
 ([Using VISOR](docs/resources.md#using-visor)).
 **Done when** the table is reproducible from a recorded job.
 
-### E1. Handled-object proposer
+#### E1. Handled-object proposer
 
 A hand-object proposer trained on VISOR (contact relations) or EgoHOS (object
 orders) prompts SAM 3.1. Cross-tested on the other dataset and on HOT3D object
@@ -168,32 +315,14 @@ masks. VISOR training follows [Using VISOR](docs/resources.md#using-visor):
 train split only, drift ≤ 1, no frames with a hand gap as targets.
 **Done when** cross-dataset numbers decide whether to commit to it.
 
-### F1. Training-data export
+#### F1. Training-data export
 
 VISOR foreground crops and masks per instance, plus background frames with the
 foreground removed, written by `python -m src.segmentation dataset` with
 provenance and each mask's drift; training admits drift of at most 1 frame.
-Background frames skip frames with a hand gap until B1b fills them
-([Using VISOR](docs/resources.md#using-visor)).
-
-### G. Background encoding
-
-Design session ([components](docs/components.md#3-background)). Candidates are
-DCVC-UF, a panorama/mosaic, and SVT-AV1. Egocentric video is the hard
-case for a panorama: the head moves constantly and the scene is close, so there
-is parallax.
-
-### H. Foreground encoding
-
-Design session ([components](docs/components.md#4-foreground)): an appearance
-vector plus keypoints per object. Hands are evaluated twice. On HOT3D the
-keypoints come from motion capture (an oracle upper bound). On VISOR they come
-from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). HaMeR and WiLoR are compared first; no published work compares them on
-egocentric video, so the result is a contribution and a paper table: 2D PCK on HInt
-VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
-the foreground reconstruction quality each gives. The literature does not
-settle it for egocentric video ([resources](docs/resources.md#models)). The gap between the two
-measures the cost of pose estimation.
+Background frames and segmenter targets skip frames with a hand gap (B1b
+found no hand fill fit for them; excluding keeps 75% of admitted train
+frames, [Using VISOR](docs/resources.md#using-visor)).
 
 ## Phase 2: racket sports
 
