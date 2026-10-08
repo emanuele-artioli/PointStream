@@ -955,3 +955,81 @@ invocation turns out to be needed.
   including staging. If the pilot shows the full run cannot fit, the
   stretches are shortened before anything else changes, and that is recorded
   here.
+- Inputs: `pointstream-data/background/g1-2026-10-08/` (`inputs.json`
+  `4d2026cd…79f7`, every file's sha256): `clips.json` `a8820a14…1f4c`
+  (34 + 34 VISOR, 7 OpenTTGames, 24 RacketVision, 8 TrackNet; about 49,600
+  SAM frames); VISOR and OpenTTGames videos hard-linked; RacketVision clips
+  packed from the sport tars, each checked against
+  `RacketVision.members.sha256` (`racketvision-g1.tar` `0dbada1c…8392`);
+  TrackNet JPEGs from `Dataset.zip` (`tracknet-g1.tar` `4b4c4b8b…a4f0`);
+  B1b fill `049977f0…799a`, B1 dense archive `a2d9e0cb…4c3c`, detections
+  `949ea65d…97c3`, SAM checkpoint `0567debe…1cb6`; environment
+  `pointstream-20261006T113321Z`.
+- Before any fleet run (dev check on gpu1, CPU, not evidence): registration
+  first used the 1 px MAGSAC threshold of the residual and a 200-inlier
+  keyframe trigger, so on VISOR 20% of frames were lost and nearly every frame
+  became a keyframe. The correspondence thresholds were loosened (MAGSAC 6 px
+  at 1080p, inlier share ≥ 0.15, keyframe below 100 inliers); the residual
+  criterion that judges a frame (p90 ≤ 2 px) is unchanged.
+- Failed attempts (infrastructure, no results): `20261008T151121Z-14aeb6de`
+  (`af1b66b`): staging the TrackNet tar failed on the worker, whose zip
+  directory entries had been packed as empty files (now `.jpg` members
+  only, `14b5a56`). `20261008T154749Z-1e8501a2` (gpu3, `14b5a56`): smoke and
+  validator passed (19 checks), then the full stage failed on one clip, where
+  OpenCV's USAC raised on a degenerate fundamental-matrix sample; such a fit
+  now reads as no fit (`3edfedc`, with a test).
+- Pilot `20261008T162927Z-d9372b99` (gpu3, RTX A6000, `3edfedc`; smoke 373 s
+  and validator passed, 19 checks; full stage 2,592 s, validator run on the
+  full output too, 19 checks; no contention; `g1.json` `b9b9a121…e3d3`,
+  `published.tar` `8240a8ab…8447`). SAM 3.1 text passes (two prompts) run at
+  2.3–3.3 frames/s at 960×540 (a 1,200-frame stretch in about 450 s), peak
+  27.7 GiB (the full jobs declare 32,000 MiB); the CPU analysis takes about
+  0.8 s per frame per process alongside. Self-test: 0.0026° and 0.09 px.
+  Results (11 clips, report by the rule; one-clip groups are not verdicts):
+
+  | Clip | holds | explained | p90 flow px (median) | f2f / f2r homography explained | GRIC prefers F (0.5 s) | parallax p50 / p90 px | w90 / w99 s |
+  |---|---|---:|---:|---|---:|---|---|
+  | VISOR stretch P25_101 | no | 0.006 | 21.2 | 0.26 / 0.02 | 0.87 | 2.06 / 5.5 | (11 segments) |
+  | VISOR stretch P22_107 | no | 0.000 | 38.4 | 0.47 / 0.01 | 0.74 | 1.43 / 4.8 | (6 segments) |
+  | VISOR window P25_101 | no | 0.067 | 9.8 | 0.98 / 0.10 | 0.55 | 1.08 / 2.6 | 0 / 4.0 |
+  | VISOR window P22_107 | no | 0.013 | 10.1 | 1.00 / 0.02 | 0.72 | 1.45 / 3.4 | 0 / 2.0 |
+  | OpenTTGames test_2 | yes | 0.930 | 1.29 | 1.00 / 0.84 | 0.00 | 0.23 / 0.96 | 0 / 9.0 |
+  | OpenTTGames test_4 | yes | 1.000 | 1.15 | 1.00 / 1.00 | 0.00 | 0.19 / 0.77 | 0 / 5.0 |
+  | RacketVision badminton | yes | 1.000 | 0.72 | 1.00 / 1.00 | 0.00 | 0.13 / 0.47 | 0 / 5.5 |
+  | RacketVision table tennis | yes | 1.000 | 0.38 | 1.00 / 1.00 | 0.00 | 0.02 / 0.11 | 0 / 1.0 |
+  | RacketVision tennis | yes | 0.949 | 0.86 | 1.00 / 0.95 | 0.00 | 0.16 / 0.58 | 0 / 1.5 |
+  | TrackNet game5/Clip9 | no | 0.883 | 1.25 | 0.95 / 0.87 | 0.00 | 0.23 / 0.79 | 0 / 1.5 |
+  | TrackNet game4/Clip3 | yes | 1.000 | 0.41 | 1.00 / 1.00 | 0.00 | 0.15 / 0.56 | 0 / 1.5 |
+
+  Read with care. On VISOR the lens-free homography fails as well (frame to
+  reference explained on 1–10% of frames, frame to frame at 50 fps on 98–100%),
+  so the failure does not rest on the fitted lens; the lens itself is unstable
+  (horizontal field of view 31.5° on P25_101, 76.7° on P22_107) and the
+  rotation-and-zoom model takes a 2.5–3.5× focal range on a fixed-focus
+  camera: translation leaks into it. The residual sits where depth changes
+  (floor against counter); the attribution gives parallax 35–48% and
+  independent motion 21–36% of the squared error. By the rule, translation is
+  confirmed on 1 of the 2 stretches: GRIC prefers a fundamental matrix on 74%
+  and 87% of pairs, but the median parallax of P22_107 is 1.4 px against the
+  2 px bar (its p90 is 4.8 px). Stretches lose registration (29–48 frames,
+  6–11 segments), so their coverage curves are not meaningful. Tier check:
+  the `sam_text` masks with detector boxes recall 69–76% of the dense
+  foreground pixels, and the rotation residual on the same frames is the
+  same with either mask (explained 0.04 and 0.04, 0 and 0; p90 11.3 against
+  10.3 px, 9.5 against 10.0 px). On racket sports the camera did not move
+  (median rotation speed under 0.06°/s, lens unobservable, prior used), the first
+  frame already shows 90% of every later frame's background, and the players
+  set the 99% warm-up (1–9 s). TrackNet game5/Clip9 misses by unmasked
+  player shadows; the "person" prompt also masks spectators and ball kids.
+  RacketVision and TrackNet clips are 4–10 s rallies, so none plays 10 s
+  after its warm-up (the G2 rule); a panorama shared across a match's rallies
+  is outside G1.
+- Full run sized from the pilot (same revision `3edfedc`, so the pilot's
+  11 clips stand and are not repeated): the other 32 VISOR videos in three
+  jobs (11, 11, 10 videos; SAM about 450 s per stretch, ≤ 9,000 s full
+  stage each), and the other 32 racket clips in one (≤ 7,200 s). Estimated
+  6.6 GPU-hours, 8.2 with the pilot and the failed attempts, inside the
+  10-hour ceiling. Jobs `20261008T172332Z-8f85d3af`,
+  `20261008T172338Z-c73de835`, `20261008T172343Z-cbfd15b8` (VISOR) and
+  `20261008T172349Z-56d1bb1a` (racket), on gpu3, gpu5 and gpu6 (gpu2's
+  worker had no fresh heartbeat).
