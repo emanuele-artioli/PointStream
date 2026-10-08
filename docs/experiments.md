@@ -1056,6 +1056,14 @@ invocation turns out to be needed.
   subspace could plausibly bring the rate down severalfold, and at CRF 48
   it is already 20% of the codec's bits on hands. That is H2's to measure
   (temporal stability is one of its axes), not something H1 shows.
+- Scope. The rigid test is a 2D warp (similarity, homography) of the
+  object's pixels from a reference: exact for planar surfaces and for a
+  camera rotating in place, an approximation for everything else. Its
+  failure says a 2D warp of one reference view cannot carry these parts; it
+  does not test a 3D object pose (6DoF), an articulated arm, a pose relative
+  to the hand, or a bank of reference views. Rule (c)'s 10% is a screen
+  that leaves room for the appearance reference and the residual; whether
+  hands beat coded pixels at equal rate is H3's measurement.
 - Order for H2–H4 (a judgement, since no part passed): H2 as planned, with
   pose rate after temporal smoothing added to its stability axis; H3 hand
   and forearm together, compared against coded pixels at equal rate, the
