@@ -127,6 +127,7 @@ celerybeat.pid
 /Datasets
 assets/
 outputs/
+pointstream-data/
 
 # Paper repository, nested in the server checkout (its own git history)
 67a9ea6275d3d9785ce57026/

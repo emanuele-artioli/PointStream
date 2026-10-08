@@ -238,7 +238,25 @@ frame decodes. VISOR's hands include the forearm, which MANO does not model,
 and the hands carry most of the viewer's attention. Each step is one session.
 G and H are independent until H5, so their sessions can run side by side.
 
-#### H1. Foreground motion and representation audit (can run beside G1)
+#### H1. Foreground motion and representation audit (done 2026-10-08)
+
+Result: `experiments/visor/h1.py` on all 34 items of evaluation set v2, from
+recorded jobs (pilot `20261008T072619Z-0d09640b`, full `…083835Z-5dafce84`,
+`…103118Z-a358e4ad` (10 items, salvaged `partial.tar`), `…150618Z-fb44e5a3`;
+[outcome](docs/experiments.md#2026-10-08--h1-foreground-motion-and-representation-audit),
+[overlays](https://claude.ai/artifact/7ir8Smh5tyWLFDejPppj6k)). By the rule
+fixed beforehand, no part is worth a parametric model. Hands (20% of the
+foreground's SVT-AV1 bits) pass on bits and fit (WiLoR fits 91.5% of
+hand-frames, hand-side IoU median 0.77) but fail on rate: 15.2 kbps of pose
+parameters against 23.4 kbps that SVT-AV1 spends on hand pixels at CRF 62.
+Forearms (12%), handled objects (27–29%) and other objects (38%) fail on fit:
+a reference carried by homographies dies within 0.02–0.04 s (median). The
+forearm is half of VISOR's hand masks (49.7%), so H3 renders it with the hand.
+Objects, not hands, carry two thirds of the foreground's bits, most of them
+large touched surfaces whose motion is the camera's (G's, not H's). Order:
+H2 with pose rate after smoothing added to its stability axis; H3 hand and
+forearm; H4 as briefed is unsupported and waits for the user's decision.
+The text below is the original brief.
 
 What the foreground is and how much of it a parametric model could explain.
 On evaluation set v2: the foreground's share of pixels and of B2's bits
