@@ -171,3 +171,12 @@ def test_degenerate_matches_yield_no_fit_instead_of_raising() -> None:
     H, _ = camera.homography(same, same)
     assert H is None
     assert camera.translation_pair(LENS, same, same) is None
+
+
+def test_tier_check_applies_only_where_the_stretch_reaches_its_window() -> None:
+    from experiments.background.g1 import overlaps_window
+
+    window = {"first_video_index": 3048, "frames": 240}
+    clip = {"masks": {"window_item": window}, "first_index": 0, "last_index": 299}  # a 6 s smoke cap
+    assert not overlaps_window(clip)
+    assert overlaps_window({**clip, "last_index": 5969})

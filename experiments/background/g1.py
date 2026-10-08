@@ -815,8 +815,17 @@ def validate_stage(stage: Path) -> dict[str, bool]:
     if visor_long:
         checks["visor_detector_boxes_used"] = all(r["masks"]["detector"]["boxes"] > 0 for r in visor_long)
         checks["visor_tier_check_measured"] = all((r["masks"].get("dense_recall") or {}).get("frames", 0) > 0
-                                                  for r in visor_long if r["clip"]["masks"].get("window_item"))
+                                                  for r in visor_long if overlaps_window(r["clip"]))
     return checks
+
+
+def overlaps_window(clip: dict[str, Any]) -> bool:
+    """Whether a stretch's analysed range (capped in a smoke) reaches its evaluation window."""
+    window = clip["masks"].get("window_item")
+    if not window:
+        return False
+    first = window["first_video_index"]
+    return clip["first_index"] <= first + window["frames"] - 1 and first <= clip["last_index"]
 
 
 def command_validate(args: argparse.Namespace) -> int:
