@@ -819,3 +819,25 @@ invocation turns out to be needed.
   rescoring 2.1, smokes and pilot 0.3) of the 9 budgeted; wall time about 5.5 h.
   Not done: train-split filling for E1/F1 (hands need a better release
   rule first).
+- Train split without a hand fill (CPU survey, gpu1, 2026-10-08, code
+  `2eeb7a2`, not a fleet job; script and output in
+  `pointstream-data/visor/b1b-2026-10-07/train-gap-survey-2eeb7a2/`,
+  `train_gaps.json` `79beec63…db92`): of the 2,277,946 dense frames of the
+  115 train videos, F1 admits 2,171,781 (drift ≤ 1; P17_01 at 47.95 fps has
+  no frame rule). Excluding the frames where `hand_gaps` reports a missing
+  hand keeps 1,631,454 (75%; EK-100 77%, EK-55 59.94 fps 73%), with 89% of
+  the hand masks and 82% of the object masks, and 4,425 of 5,000 dense runs
+  keep at least one frame. Per video the loss has median 26%, 90th
+  percentile 40%, maximum 55%. Decision: no hand fill for now. F1 and E1
+  exclude the gap frames; 1.6 million frames at 50–60 fps from 115 videos is
+  far more than either will sample. Revisit only if E1 or F1 turns out data
+  limited, or if their errors concentrate on fast motion and occlusion, the
+  conditions under which VISOR's interpolation, and so the excluded frames,
+  fail.
+- Review by eye, fragmentation (CPU, same day, merged fill
+  `049977f0…799a`, every 4th frame): 20% of fill instances have more than a
+  tenth of their area outside their largest connected piece, against 16% of
+  the dense instances (hands occluding objects split masks legitimately);
+  12% have more than a quarter outside. Most often fragmented: cheese, bread,
+  pot, mozzarella (small or translucent, often held). The speckled fridge on
+  P27_105 is the extreme case, not the norm. No change to the fill.

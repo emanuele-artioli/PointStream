@@ -114,8 +114,10 @@ and not for hands (held out: objects mean J 0.83, hard subset 0.70; hands
 `visor_dense_sam_fill` (objects only) for evaluation set v2: the labelled
 objects missing fall from 33% to 1.6% of each frame's
 ([outcome](docs/experiments.md#2026-10-07--b1b-sam-31-fill-of-visors-missing-hands-and-objects)).
-The review by eye (5 of 68 frames flagged, all SAM hand tracks losing the forearm or the hand) does not veto it. Open: train-split filling for E1/F1 (hands
-need a better release rule first). The text below is the original brief.
+The review by eye (5 of 68 frames flagged, all SAM hand tracks losing the
+forearm or the hand) does not veto it. No train-split hand fill: excluding
+the frames with a hand gap keeps 75% of the admitted train frames (1.6
+million), enough for E1/F1. The text below is the original brief.
 
 VISOR's dense masks drop an object's track when its interpolation scored poorly,
 so 22–30% of dense validation frames lack a hand a human labelled
