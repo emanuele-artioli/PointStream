@@ -191,7 +191,8 @@ these gaps.
   mask set `visor_dense_sam_fill` (tier `sam_from_label_prompt`, objects only;
   hands were not adopted), `pointstream-data/jobs/fleet/inbox/20261007T222646Z-3a7ac6ef/full/published.tar`
   (sha256 `049977f0…799a`, record `merge.json` `1c705e4a…4bea`). It cuts the
-  labelled objects missing from 33% to 1.6% of each frame's. The "without"
+  labelled objects missing from 33% to 1.6% of each frame's; B2 with both sets:
+  `pointstream-data/visor/b1b-2026-10-07/b2-rescore-339c918/`. The "without"
   number is the fair one for D1, where SAM 3.1 is a contestant.
 - Codec baseline (B2, `experiments/visor/b2.py`): SVT-AV1 preset 4 and
   DCVC-UF HT-L curves on all 34 items, keyed by mask set; the streams are

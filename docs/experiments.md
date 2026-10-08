@@ -771,3 +771,44 @@ invocation turns out to be needed.
   reproduced on its own frame (minimum IoU 0.00–0.76, every item's median ≥
   0.96), most likely thin or tiny masks lost at the tracker's mask-input
   resolution.
+- B2 rescored with both mask sets (commit `339c918`; `b2 run --streams` on
+  each B2 full job's published streams, every stream checked against B2's
+  recorded sha256; all validators passed; no contention): SVT-AV1
+  `20261007T223938Z-cc5aa830` and `20261007T224051Z-2891acbc` (gpu6, RTX 6000
+  Ada for scoring; dav1d on CPU; 520 and 554 s), DCVC-UF
+  `20261007T223639Z-74f60a0f`, `20261007T223737Z-ab077fea`,
+  `20261007T223830Z-2139df4c` (gpu3, RTX A6000, B2's encode class; 2,306,
+  2,044 and 2,094 s). Reproduction: `visor_dense` scores equal B2's, within
+  9e-6 dB for SVT-AV1 (GPU now, CPU then) and exactly for DCVC-UF. Report
+  `pointstream-data/visor/b1b-2026-10-07/b2-rescore-339c918/` (`b2-report.json`
+  `ce234b4f…9f29`, `b2-rd.png` `83966155…eb80`), means over the 34 items:
+
+  | Codec, point | kbps | wPSNR dense / fill (dB) | fg PSNR dense / fill | bg PSNR dense / fill | wLPIPS dense / fill |
+  |---|---:|---|---|---|---|
+  | SVT-AV1 CRF 62 | 434 | 34.58 / 34.18 | 34.42 / 33.75 | 34.96 / 35.20 | 0.160 / 0.162 |
+  | SVT-AV1 CRF 55 | 1,022 | 36.87 / 36.47 | 36.85 / 36.19 | 36.94 / 37.11 | 0.120 / 0.121 |
+  | SVT-AV1 CRF 48 | 1,576 | 37.84 / 37.44 | 37.88 / 37.26 | 37.73 / 37.86 | 0.105 / 0.106 |
+  | SVT-AV1 CRF 41 | 2,498 | 38.67 / 38.28 | 38.78 / 38.18 | 38.41 / 38.51 | 0.094 / 0.094 |
+  | DCVC-UF QP 27 | 329 | 34.47 / 33.95 | 34.58 / 33.76 | 34.22 / 34.41 | 0.175 / 0.179 |
+  | DCVC-UF QP 36 | 584 | 35.97 / 35.45 | 36.09 / 35.28 | 35.67 / 35.84 | 0.142 / 0.145 |
+  | DCVC-UF QP 45 | 1,032 | 37.21 / 36.70 | 37.35 / 36.56 | 36.87 / 37.02 | 0.119 / 0.121 |
+  | DCVC-UF QP 54 | 1,846 | 38.26 / 37.76 | 38.42 / 37.64 | 37.88 / 38.02 | 0.102 / 0.104 |
+  | DCVC-UF QP 63 | 3,283 | 39.14 / 38.63 | 39.31 / 38.53 | 38.74 / 38.87 | 0.090 / 0.091 |
+
+  Labelled objects missing, mean over items: 33.2% dense, 1.6% with the fill
+  (EK-100 30.8% / 1.8%, EK-55 35.2% / 1.4%). BD-rate of DCVC-UF HT-L against
+  SVT-AV1 on weighted PSNR, mean / median: dense −13.3% / −18.3%, with the
+  fill −10.2% / −16.0% (EK-100 −18.3 / −29.9 → −14.5 / −25.6; EK-55 −9.4 /
+  −11.3 → −6.8 / −7.6). Whole-frame PSNR (−0.5% / −3.6%) and VMAF (+7.5% /
+  +5.0%) use no masks and do not change.
+- Reading: the hypothesis holds for objects. The fill cuts the missing
+  objects from 33% to 1.6% and moves weighted PSNR by 0.4–0.5 dB (it lowers
+  it: the added objects are handled, moving and harder to code than the
+  background they were counted as). It narrows DCVC-UF's weighted advantage
+  over SVT-AV1 by about 3 points of BD-rate without reversing it. For hands the
+  rule held them back on a small-n release check, and the pilot found the
+  failure the check guards against. B1b's done-when holds: the numbers from
+  recorded jobs decided adoption. GPU use about 4 GPU-hours (fill 1.4,
+  rescoring 2.1, smokes and pilot 0.3) of the 9 budgeted; wall time about 5.5 h.
+  Not done: train-split filling for E1/F1 (hands need a better release
+  rule first).
