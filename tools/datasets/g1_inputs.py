@@ -232,7 +232,8 @@ def command_stage(args: argparse.Namespace) -> int:
         with zipfile.ZipFile(root / "TrackNet" / "Dataset.zip") as archive, tarfile.open(tmp, "w") as out:
             for clip in tn:
                 prefix = clip["source"]["member_dir"] + "/"
-                for name in sorted(n for n in archive.namelist() if n.startswith(prefix) and n.count("/") == 3):
+                for name in sorted(n for n in archive.namelist()
+                                   if n.startswith(prefix) and n.endswith(".jpg") and n.count("/") == 3):
                     data = archive.read(name)  # zipfile checks each member's CRC-32
                     add_bytes(out, name, data)
                 members.append({"member_dir": clip["source"]["member_dir"]})
