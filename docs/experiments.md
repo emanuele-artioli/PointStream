@@ -841,3 +841,115 @@ invocation turns out to be needed.
   12% have more than a quarter outside. Most often fragmented: cheese, bread,
   pot, mozzarella (small or translucent, often held). The speckled fridge on
   P27_105 is the extreme case, not the norm. No change to the fill.
+
+### 2026-10-08 — H1: foreground motion and representation audit
+- Question: what is VISOR's foreground made of, and how much of it could
+  compact per-object motion parameters (hand pose, an object's rigid motion)
+  explain instead of coded pixels? Answers H2–H5's questions: whether hands
+  are worth MANO at all, how much of a VISOR hand is forearm (H3 must render
+  it), which objects a rigid model holds for (H4), and what the parameters
+  cost against B2's bits on the same pixels.
+- Data: evaluation set v2 (34 windows of 240 frames), mask set
+  `visor_dense_sam_fill` (B1b, objects filled), with `visor_dense` reported
+  beside it for composition. Frames decoded as B2 does, sparse-JPEG gate
+  included. Code `experiments/visor/h1.py`.
+- Parts, per frame (each pixel in one part; earlier parts win where masks
+  overlap): *hand* (a VISOR hand mask on the fingers' side of the MANO wrist
+  line: the line through the fitted wrist joint perpendicular to wrist →
+  middle-finger knuckle), *forearm* (the same mask beyond that line),
+  *hand, no fit* (a hand mask without a MANO fit), *handled object* (an active
+  object a human labelled in contact with a hand, `in_contact_object`, at a
+  keyframe bounding or inside the window), *other object* (every other active
+  object), background.
+- Method.
+  1. Composition: each part's share of the frame's and of the foreground's
+     pixels. Bits: B2's published SVT-AV1 streams (all 34 items, CRF 41–62)
+     decoded by libaom 3.12.1's `inspect` built with bit accounting
+     (`CONFIG_ACCOUNTING`, `CONFIG_INSPECTION`; patched to print each frame's
+     order hint, so bits map to display frames; binary `aom-inspect-v3.12.1-ps1`, sha256 `9b2e75a2…3959`,
+     patch `env/patches/aom-inspect-ps1.patch`, `cbc0eb0a…50bf`; upstream
+     prints a block's context in place of its first symbol, dropping its bits,
+     so the patch prints both). Every entropy-coded symbol is attributed to the
+     block being decoded; a block's bits are spread evenly over its pixels and
+     split by the parts' pixel shares in the frame it displays as. Frame
+     headers are outside the accounting; their share is reported. DCVC-UF's
+     rANS stream has no per-position bits, so its per-part split is not
+     measured; only its totals are compared.
+  2. Hands: WiLoR (its own YOLO hand detector, conf 0.3; quicker than HaMeR,
+     with a detector; H2 decides between them). Each VISOR hand takes the
+     detection most of whose box lies on the mask (≥ 0.5 of the box);
+     handedness comes from VISOR. The fitted MANO mesh is projected with
+     WiLoR's camera and rasterized as a silhouette. Per hand and frame: IoU
+     with the whole mask, IoU with the hand-side part, share of the mask
+     beyond the wrist (forearm), share of the silhouette outside the mask.
+     Stability over consecutive fitted frames: root-relative 3D joint
+     acceleration (mm/frame²), 2D keypoint acceleration (share of box size),
+     global-orientation change (degrees per frame, flips over 45°). Failure
+     conditions, flagged per hand-frame: no detection; detector box at the
+     image edge; occlusion (≥ 25% of the box covered by object masks); blur
+     (Laplacian variance in the box under half the hand's median, or box
+     motion over 10% of its size per frame).
+  3. Objects (and, as rigid baselines, the hand-side part and the forearm):
+     backward DIS optical flow per frame pair (OpenCV, half resolution), and
+     per object a similarity and a homography fitted to the flow inside its
+     mask (RANSAC). Frame to frame: PSNR inside the object's mask at t + 1 of
+     the previous frame warped by no motion, the similarity, the homography,
+     and the dense flow (the most any motion model can explain). From a
+     reference (what PointStream would send): the object's first frame,
+     carried by the chained homographies; it *holds* at a frame when PSNR on
+     the covered pixels is ≥ 30 dB and at most 20% of the mask is uncovered;
+     a new reference starts where it fails; reported as the share of frames
+     held and the reference life (s). 33.75 dB (B2's foreground PSNR at
+     SVT-AV1 CRF 62 with the fill) is reported beside 30 dB. The homography's
+     squared error is split by pixel into new appearance (the source falls
+     outside the object's mask at t), occlusion by hands (it falls on a hand),
+     deformation (homography error minus flow error on the remaining pixels),
+     appearance change (the flow's own error there: turning, lighting, source
+     noise), with frames whose object moves more than 10 px per frame counted
+     as motion blur.
+  4. Parameter rate: hands as MANO pose (15 joints, axis-angle), global
+     orientation, and camera (image position of the MANO origin and log
+     depth), shape once per track; objects as the homography (4 bounding-box
+     corner displacements). Quantized (angles 1°, positions 0.25 px, log depth
+     0.002; corners 1/8 px; the coarsest steps keep the projected joints
+     within 1 px on average, checked in the job), coded as first differences;
+     the rate is the empirical entropy of those symbols pooled over items,
+     times the frame rate, with a fixed 16 bits per value as the upper bound.
+     Compared with SVT-AV1's bits on the same part (step 1).
+  5. Review: two content-blind frames per item (sha256 of
+     "pointstream-h1-review:<item>:<n>") drawn with the parts, the rendered
+     MANO hands and the homography-warped objects with their error.
+- Decision rule (fixed before any run; `h1.DECISION`, applied by `h1 report`
+  on the means over the 34 items, fill set). A part is worth a parametric
+  model when all three hold: (a) it carries ≥ 10% of the foreground's
+  SVT-AV1 bits at both CRF 48 and CRF 62; (b) the model explains it: hands
+  fitted on ≥ 90% of hand-frames, median hand-side IoU ≥ 0.70 and ≥ 70% of
+  hand-frames at ≥ 0.60; rigid parts held from a reference on ≥ 70% of their
+  frames with median reference life ≥ 0.5 s; (c) its parameter rate (entropy
+  estimate) is ≤ 10% of SVT-AV1's bits on it at CRF 62. Otherwise it stays
+  pixels; an object class or condition that passes (b) on its own is named
+  for H4 as a candidate. The forearm is H3's to render if it is ≥ 20% of the
+  hand masks' pixels; (b) decides rigid layer or pixels. Order of H2–H4:
+  passing parts by expected saving (bit share × share explained).
+- Hypothesis: hands with forearms are most of the foreground's pixels and
+  bits; forearms are 30–40% of VISOR's hand masks; WiLoR covers the hand side
+  at median IoU ≥ 0.70, failing mostly under occlusion by held objects and
+  blur; handled objects are poorly explained by rigid 2D motion (under half
+  their frames held: they turn, are occluded by hands, deform), while other
+  active objects (touched surfaces, static in the world) are held like the
+  background; parameters cost a few kbps, under 5% of SVT-AV1's bits on the
+  same pixels. Order: hands (H2, H3, forearm included), then handled objects
+  only where rigid (H4).
+- Competing explanations: (1) large touched surfaces (sink, fridge,
+  cupboard) that VISOR labels active objects dominate the foreground's
+  pixels and bits; they are static in the world, so G's background, not H,
+  should carry them. The handled/other split tests this. (2) MANO covers the
+  masks (IoU) but jitters, so its rate and renders are worse than the
+  per-frame numbers suggest; the stability measures test this. (3) Rigid
+  fits fail because the flow fails on textureless objects, not because the
+  objects are non-rigid; the dense-flow bound separates the two.
+- Budget: WiLoR runs on all four GPU classes (model–GPU table); flow and
+  fits on 16 CPU threads. Smoke: one item, 48 frames, ≤ 600 s. Pilot: the four
+  B2 pilot items (P01_107, P09_106, P02_02, P03_10), ≤ 1 h. Full: the other
+  30 items as two jobs of 15, ≤ 2 h each. Ceiling 5 GPU-hours and 10 h wall
+  including staging.
