@@ -43,7 +43,12 @@ classes; everything unlabelled is background.
 
 ## 3. Background
 
-Remove the foreground (video inpainting if necessary), then encode.
+After a warm-up, the client holds one representation of everything the camera
+has seen (a panorama for a camera that rotates in place, or a neural model
+fitted to the warm-up), and each later background frame is rebuilt from it
+with only the camera pose. The foreground is removed first; a panorama fills
+what one frame hides from other frames, a neural model may need generative
+inpainting. Steps G1–G5 in [PLAN](../PLAN.md#g-background-user-2026-10-08).
 
 ## 4. Foreground
 

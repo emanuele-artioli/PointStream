@@ -151,42 +151,83 @@ the B1 set, optionally EK-55 clips scored on frames whose keyframes match the
 released JPEGs.
 **Done when** the curves come from a recorded job.
 
-### P1. First working PointStream on VISOR (next)
+### G. Background (user, 2026-10-08)
 
-The whole codec end to end with the simplest component that works at each
-stage, so every later step improves a pipeline that already runs and is
-scored. Before any optimisation (user, 2026-10-08).
-- Segmentation: SAM 3.1 as the encoder sees it (text prompts, causal), and
-  the dataset masks as an oracle variant that isolates the codec from
-  segmentation errors.
-- Background: the frame with the foreground removed (the simplest fill that
-  codes cheaply), encoded by an existing codec at low rate.
-- Foreground: coded crops of each object with its mask, at higher quality
-  (components 4, "decoded as coded crops"); the appearance-and-keypoint
-  representation comes in H.
-- Reconstruction: composite the decoded foreground over the decoded
-  background.
-- Rate: every byte the decoder needs, masks included; scored with B2's
-  harness on evaluation set v2 (weighted PSNR on dataset masks, with and
-  without B1b's fill), against B2's curves.
-- Timing: PointStream's encode time per window on the host class B2b J2
-  timed, which picks B2b's equal-time SVT-AV1 preset and releases B2b's
-  remaining runs.
-**Done when** PointStream's curves on all 34 items come from recorded jobs,
-beside B2's, with the encode time per window.
+The thesis: a viewer barely looks at the background, and most of it repeats.
+After a warm-up stretch of video, the client receives one representation of
+everything the camera has seen; from then on each background frame is
+rebuilt from it with only the camera's pose (GenStream did this with a
+hand-made 3D model; PointStream builds the representation from the video
+itself). With a camera that rotates in place there is no parallax, so the
+representation is a panorama (planar, cylindrical or spherical) rather than
+3D Gaussian splatting. A second candidate stores the warm-up background in
+the weights of a neural codec and then sends one latent per view. The
+foreground occludes the background: a panorama merges views and fills what
+one frame hides; a neural model needs clean frames, from the panorama or from
+generative inpainting. PRESLEY's lesson stands: the background only has to be
+good enough not to distract. Each step below is one session; its outcome
+decides the next.
 
-### G. Background encoding
+#### G1. Camera motion and coverage audit (next)
 
-Design session ([components](docs/components.md#3-background)), replacing
-P1's background. Candidates are
-DCVC-UF, a panorama/mosaic, and SVT-AV1. Egocentric video is the hard
-case for a panorama: the head moves constantly and the scene is close, so there
-is parallax.
+Does the camera only rotate, and how fast does the background stop being new?
+Per dataset and clip, with the foreground masked out: fit frame-to-frame and
+frame-to-reference homographies (rotation and zoom about a fixed centre) and
+measure what they leave unexplained (alignment error on background pixels,
+the share of frames a homography explains, residual motion that indicates
+parallax or moving background such as water, screens or other people); and
+the coverage curve, the share of each frame's background already seen after
+t seconds. VISOR (evaluation set v2 and longer dense runs; head-mounted, close
+scene, so translation and parallax are expected) and the racket-sports sets
+(fixed or pan-tilt-zoom cameras). CPU or light GPU.
+**Done when** a recorded job says, per dataset, whether a rotation-only
+background holds, how long a warm-up it needs, and which clips a background
+evaluation can use; and whether phase 1's dataset suits it or the background
+work should start on racket sports.
+
+#### G2. Background evaluation protocol
+
+From G1: the clip set (long enough for a warm-up to pay off), the warm-up
+length, rate accounting (the one-time representation counted once, plus the
+per-frame camera pose and any residual, reported against how long the clip
+plays after the warm-up), quality on visible background only (dataset masks;
+occluded pixels have no truth), and render time per frame at the client.
+Baselines on the same background frames: SVT-AV1, DCVC-UF and VVC (VVenC is
+on the hosts as `/opt/local/bin/vvencapp`; the baseline decision is updated if
+VVC is added), plus PRESLEY-style degradation.
+**Done when** the protocol is fixed in experiments.md and the baselines'
+background curves come from recorded jobs.
+
+#### G3. Panorama background
+
+Build the panorama from the warm-up frames with the foreground masked out
+(views merged so that what one frame hides another fills; G1 picks the
+projection), code it once, send each frame's camera parameters, and render the
+view at the client. Measured by G2's protocol: rate over clip length, quality
+on visible background, render time, and the failure cases (residual motion,
+lighting changes, background not seen during the warm-up).
+**Done when** its curves and render time sit beside G2's baselines.
+
+#### G4. Clean background frames
+
+The neural route needs frames without the foreground: panorama-filled frames
+from G3 against generative video inpainting (to be audited into the
+environment), compared on the visible pixels around the hole and by eye.
+**Done when** one source of clean frames is chosen for G5, with numbers.
+
+#### G5. Neural background model
+
+A neural codec fitted or fine-tuned on the warm-up's clean frames, sent once
+(its bytes counted), then one latent per view; DCVC-UF fine-tuning and an
+implicit per-scene model (HNeRV-style, earlier rejected as a general codec)
+are the starting candidates. Measured by G2's protocol against G3 and the
+baselines, render time included.
+**Done when** G3 and G5 are compared on rate, quality and render speed, and one
+background is chosen for PointStream.
 
 ### H. Foreground encoding
 
-Design session ([components](docs/components.md#4-foreground)), replacing
-P1's coded crops: an appearance
+Design session ([components](docs/components.md#4-foreground)): an appearance
 vector plus keypoints per object. Hands are evaluated twice. On HOT3D the
 keypoints come from motion capture (an oracle upper bound). On VISOR they come
 from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). HaMeR and WiLoR are compared first; no published work compares them on
@@ -198,12 +239,12 @@ measures the cost of pose estimation.
 
 ### After a working pipeline
 
-Optimisation and training, ordered by what P1, G and H show they need.
+Optimisation and training, ordered by what G and H show they need.
 
 #### D1. Segmentation benchmark on VISOR and EgoHOS
 
-Moved after P1 (user, 2026-10-08): SAM 3.1 already segments well enough to
-build on, and choosing a faster segmenter is an optimisation that needs the
+Moved after a working pipeline (user, 2026-10-08): SAM 3.1 already segments
+well enough to build on, and choosing a faster segmenter is an optimisation that needs the
 pipeline's own timing.
 
 SAM 3.1 (text and prompted) and YOLOE-26 against the labels, per class, accuracy
