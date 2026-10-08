@@ -100,6 +100,18 @@ SOURCES: dict[str, dict[str, Any]] = {
         "access": "public direct download. The host's TLS certificate expired 2025-05-08 and no checksum is published; downloaded on 2026-10-06 with verification off at the user's request, sha256 recorded while streaming, size equal to the server's Content-Length",
         "citation": "Pavlakos et al., Reconstructing Hands in 3D with Transformers (HaMeR), CVPR 2024",
     },
+    "epic_hand_objects": {
+        "name": "EPIC-KITCHENS-100 hand-object detections",
+        "homepage": "https://github.com/epic-kitchens/epic-kitchens-100-hand-object-bboxes",
+        "urls": [
+            "https://data.bris.ac.uk/datasets/3l8eci2oqgst92n14w2yqi5ytu/hand-objects/<P>/<video>.pkl (doi:10.5523/bris.3l8eci2oqgst92n14w2yqi5ytu, EPIC-KITCHENS-100 Automatic Annotations, 2020-06-17)",
+            "https://raw.githubusercontent.com/epic-kitchens/epic-kitchens-100-hand-object-bboxes/5017f570ce29f97aeae1d6183c3dcbdf0d35251b/EPIC_100_frame_counts.csv (reference/)",
+        ],
+        "licence": "data.bris lists the Non-Commercial Government Licence for public sector information; EPIC-KITCHENS data are CC BY-NC 4.0",
+        "access": "public direct download, no registration; no checksum published, so sha256 recorded while streaming and size checked against Content-Length (tools/datasets/download/hand_objects.sh). Only the 34 videos of VISOR evaluation set v2 (B1b, 2026-10-07)",
+        "citation": "Shan et al., Understanding Human Hands in Contact at Internet Scale, CVPR 2020 (detector); Damen et al., Rescaling Egocentric Vision, IJCV 2022 (release)",
+        "use": "detector output, not ground truth: an independent check of SAM-filled hands (PLAN B1b), never a label",
+    },
 }
 
 
@@ -643,7 +655,91 @@ def inspect_hint(root: Path, scratch: Path) -> dict[str, Any]:
     }
 
 
+#: B1's evaluation-set archive: frame_mapping.json, sparse annotations and the released sparse JPEGs.
+VISOR_EVAL_TAR = Path("/home/itec/emanuele/Datasets/pointstream-data/visor/b1-2026-10-06/evalset-v2/visor-val-dense.tar")
+HAND_OBJECTS_SMOKE = ("P01_107", "P01_107_frame_0000003073.jpg")
+
+
+def inspect_epic_hand_objects(root: Path, scratch: Path) -> dict[str, Any]:
+    """Every downloaded video read with PointStream's reader; one sparse VISOR frame drawn with its boxes."""
+    import io
+    import tarfile
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from src.segmentation import hand_objects
+
+    counts = {row["video_id"]: int(row["rgb_n_frames"]) for row in csv.DictReader(open(root / "reference" / "EPIC_100_frame_counts.csv"))}
+    videos: dict[str, Any] = {}
+    for path in sorted((root / "hand-objects").glob("P*/*.pkl")):
+        frames = hand_objects.load_detections(path)
+        boxes = [h.box for f in frames for h in f.hands] + [o.box for f in frames for o in f.objects]
+        videos[path.stem] = {
+            "frames": len(frames), "rgb_n_frames_reference": counts.get(path.stem),
+            "frame_numbers_are_1_to_n": [f.frame_number for f in frames] == list(range(1, len(frames) + 1)),
+            "video_ids_match": all(f.video_id == path.stem for f in frames),
+            "hands": sum(len(f.hands) for f in frames),
+            "hands_score_ge_0.5": sum(1 for f in frames for h in f.hands if h.score >= 0.5),
+            "frames_with_hand_score_ge_0.5": sum(1 for f in frames if any(h.score >= 0.5 for h in f.hands)),
+            "objects": sum(len(f.objects) for f in frames),
+            "boxes_in_unit_square": all(0 <= b.left <= b.right <= 1 and 0 <= b.top <= b.bottom <= 1 for b in boxes),
+        }
+    # Smoke: a released sparse JPEG of evaluation item P01_107 with the human hand masks and the detector's hands.
+    video, jpeg = HAND_OBJECTS_SMOKE
+    wanted = {"frame_mapping.json", f"annotations/{video}.json", f"rgb_frames/{jpeg}"}
+    found: dict[str, bytes] = {}
+    with tarfile.open(VISOR_EVAL_TAR) as tar:
+        for member in tar:
+            if member.name in wanted:
+                handle = tar.extractfile(member)
+                assert handle is not None
+                found[member.name] = handle.read()
+            if len(found) == len(wanted):
+                break
+    epic_name = json.loads(found["frame_mapping.json"])[video][jpeg]
+    epic_frame = int(re.search(r"frame_(\d+)", epic_name).group(1))
+    image = np.array(Image.open(io.BytesIO(found[f"rgb_frames/{jpeg}"])).convert("RGB"))
+    entry = next(e for e in json.loads(found[f"annotations/{video}.json"])["video_annotations"] if e["image"]["name"] == jpeg)
+    detections = hand_objects.load_detections(root / "hand-objects" / video[:3] / f"{video}.pkl")
+    hands = hand_objects.hands_at(detections, epic_frame, min_score=0.5)
+    out = image
+    agreement = {}
+    for side, colour in (("left hand", (255, 0, 0)), ("right hand", (0, 0, 255))):
+        mask = visor_mask(entry["annotations"], {side}, image.shape[:2])
+        out = blend(out, mask, colour)
+        ys, xs = np.nonzero(mask)
+        human = (xs.min(), ys.min(), xs.max() + 1, ys.max() + 1) if xs.size else None
+        mine = [h for h in hands if h.side == side]
+        if human is not None and mine:
+            x0, y0, x1, y1 = mine[0].box.pixels(image.shape[1], image.shape[0])
+            ix = max(0.0, min(x1, human[2]) - max(x0, human[0])) * max(0.0, min(y1, human[3]) - max(y0, human[1]))
+            union = (x1 - x0) * (y1 - y0) + (human[2] - human[0]) * (human[3] - human[1]) - ix
+            agreement[side] = round(float(ix / union), 3)
+    canvas = Image.fromarray(out)
+    draw = ImageDraw.Draw(canvas)
+    for hand in hands:
+        colour = (255, 120, 120) if hand.side == "left hand" else (120, 160, 255)
+        draw.rectangle(hand.box.pixels(image.shape[1], image.shape[0]), outline=colour, width=5)
+        draw.text((hand.box.left * image.shape[1] + 6, hand.box.top * image.shape[0] + 6), f"{hand.side} {hand.score:.2f} {hand.state}", fill=colour)
+    overlay = save_overlay(np.array(canvas), scratch / "smoke" / "EPIC-KITCHENS-hand-objects.jpg")
+    return {
+        "label_format": {
+            "hand-objects/<P>/<video>.pkl": "pickled list of serialized protobuf `Detections` (types.proto at 5017f57), entry i = EPIC rgb frame i + 1: hands[] {bbox (left, top, right, bottom) normalised to [0, 1], score, state (no/self/another-person/portable/stationary contact), object_offset, side left|right}, objects[] {bbox, score}. Hands kept down to score 0.1, objects to 0.01; the release suggests 0.5",
+            "reader": "src/segmentation/hand_objects.py: unpickles with no globals allowed and decodes the protobuf wire format without the protobuf package (absent from the environment); equal on every field of every frame to the official reader (epic_kitchens.hoa at 5017f57, protobuf 3.20.3) on P01_107 (5,976 frames) and P02_02 (12,426), checked 2026-10-07",
+            "reference/EPIC_100_frame_counts.csv": "rgb frame counts per video from the reader repository, used to check each file is complete",
+        },
+        "classes": {"hands": ["left hand", "right hand"], "objects": "class-agnostic boxes", "contact_states": list(hand_objects.HAND_STATES.values())},
+        "clips": {"videos": len(videos), "per_video": videos,
+                  "all_complete": all(v["frames"] == v["rgb_n_frames_reference"] for v in videos.values()),
+                  "all_frame_numbers_consecutive": all(v["frame_numbers_are_1_to_n"] for v in videos.values())},
+        "resolution": {"boxes": "normalised; detector input 456x256 (the release's raw-detection converter default)"},
+        "smoke_read": {"sample": f"{video} {jpeg} -> EPIC rgb frame {epic_frame} ({epic_name})", "hands_score_ge_0.5": [
+            {"side": h.side, "score": round(h.score, 3), "state": h.state} for h in hands],
+            "box_iou_with_human_hand_mask_bbox": agreement, "image_shape": list(image.shape), "overlay": overlay},
+    }
+
+
 INSPECTORS: dict[str, Callable[[Path, Path], dict[str, Any]]] = {
+    "epic_hand_objects": inspect_epic_hand_objects,
     "visor": inspect_visor,
     "hot3d": inspect_hot3d,
     "openttgames": inspect_openttgames,

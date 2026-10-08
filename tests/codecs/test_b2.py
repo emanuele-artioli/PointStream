@@ -243,3 +243,24 @@ def test_positive_roi_offset_raises_the_background_blocks(tmp_path: Path) -> Non
     fg[65, 129] = True
     b2.write_roi_map([{"m/fg": fg}], "m", 1, width, height, 32, tmp_path / "roi.txt")
     assert (tmp_path / "roi.txt").read_text().splitlines() == ["0 32 32 32 32 32 0"]
+
+
+def test_stream_root_accepts_an_extracted_published_tar(tmp_path: Path) -> None:
+    from experiments.visor.b2 import stream_root
+
+    assert stream_root(tmp_path) == tmp_path
+    (tmp_path / "publish" / "streams" / "dcvc").mkdir(parents=True)
+    assert stream_root(tmp_path) == tmp_path / "publish" / "streams"
+
+
+def test_stream_record_finds_the_encoding_jobs_hash(tmp_path: Path) -> None:
+    import argparse
+
+    record = tmp_path / "b2.json"
+    record.write_text(json.dumps({"items": [{"id": "I", "points": [
+        {"variant": "", "point": 41, "stream_sha256": "aa"}, {"point": 48, "stream_sha256": "bb"}]}]}))
+    args = argparse.Namespace(stream_record=str(record))
+    assert b2.stream_record(args, "I", "", 41.0) == "aa"
+    assert b2.stream_record(args, "I", "", 48) == "bb"
+    assert b2.stream_record(args, "J", "", 41) is None
+    assert b2.stream_record(argparse.Namespace(stream_record=None), "I", "", 41) is None

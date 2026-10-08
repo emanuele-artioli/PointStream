@@ -117,6 +117,24 @@ def mask_root(directory: Path, item_id: str) -> Path:
     raise FileNotFoundError(f"no masks.rle for {item_id} under {directory}")
 
 
+def stream_record(args: argparse.Namespace, item_id: str, label: str, point: float) -> str | None:
+    """The sha256 the encoding job recorded for this item, variant and point (``--stream-record``)."""
+    if not getattr(args, "stream_record", None):
+        return None
+    for item in json.loads(Path(args.stream_record).read_text())["items"]:
+        if item["id"] == item_id:
+            for p in item["points"]:
+                if p.get("variant", "") == label and float(p["point"]) == float(point):
+                    return str(p["stream_sha256"])
+    return None
+
+
+def stream_root(directory: Path) -> Path:
+    """Published streams: ``DIR/<codec>/...``, or an extracted job ``published.tar`` (``DIR/publish/streams``)."""
+    nested = directory / "publish" / "streams"
+    return nested if nested.is_dir() else directory
+
+
 # ----------------------------------------------------------------- source window
 
 def jpeg_targets(item: dict[str, Any], archive: Path) -> list[dict[str, Any]]:
@@ -519,7 +537,7 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
         point_work.mkdir()
         stream = None
         if args.streams:
-            stream = Path(args.streams) / args.codec / item["id"] / label / name / STREAM_NAMES[args.codec]
+            stream = stream_root(Path(args.streams)) / args.codec / item["id"] / label / name / STREAM_NAMES[args.codec]
         roi = None
         if args.codec == "svtav1" and variant["roi_offset"]:
             roi = write_roi_map(regions, args.roi_mask_set, frames, source["width"], source["height"],
@@ -532,6 +550,7 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
             coded = code_dcvc(args, source, point, point_work, stream, profile=first_item and number == 0,
                               variant=variant)
         decoded = Path(coded["decoded"])
+        record_sha = stream_record(args, item["id"], label, point)
         log(f"{item['id']}: point {name}: scoring")
         t1 = time.time()
         per_frame = quality.score(Path(source["path"]), decoded, regions, width=source["width"], height=source["height"],
@@ -558,7 +577,7 @@ def run_item(args: argparse.Namespace, item: dict[str, Any], first_item: bool) -
             "variant": label, "variant_config": variant, "point": point, "rate_bytes": coded["rate_bytes"], "file_bytes": coded["file_bytes"],
             "kbps": coded["rate_bytes"] * 8 / seconds / 1000.0,
             "bpp": coded["rate_bytes"] * 8 / (frames * source["width"] * source["height"]),
-            "stream_sha256": coded["stream_sha256"], "stream_frames": coded["stream_frames"],
+            "stream_sha256": coded["stream_sha256"], "record_stream_sha256": record_sha, "stream_frames": coded["stream_frames"],
             "decoded_frames": coded["decoded_frames"], "codec_record": {k: v for k, v in coded.items() if k not in ("stream", "decoded")},
             "vmaf_command": vmaf["command"], "vmaf_version": vmaf["version"], "vmaf_pooled_mean": vmaf["pooled_mean"],
             "summary": summary, "seconds": {"code": round(t1 - t0, 2), "score": round(t2 - t1, 2), "vmaf": round(t3 - t2, 2)},
@@ -692,6 +711,7 @@ def command_run(args: argparse.Namespace) -> int:
             "roi_mask_set": args.roi_mask_set if args.codec == "svtav1" else None,
             "structure": args.structure if args.codec == "dcvc" else None,
             "threads": args.threads, "workers": workers, "streams": args.streams,
+            "stream_record": {"path": args.stream_record, "sha256": file_sha256(Path(args.stream_record))} if args.stream_record else None,
             "foreground_weight": FOREGROUND_WEIGHT, "metric_device": metric_device(args),
             "rgb_view": "bilinear chroma upsampling, BT.709, range as the source declares, rounded to 8 bits",
         },
@@ -753,6 +773,10 @@ def validate(stage: Path) -> dict[str, bool]:
         cross = [r["cross_device"] for r in rows if r.get("cross_device")]
         checks["metrics_agree_between_cpu_and_gpu"] = bool(cross) and all(
             c["max_abs_diff"]["psnr"] < 1e-3 and c["max_abs_diff"]["lpips"] < 1e-3 and c["max_abs_diff"]["ms_ssim"] < 1e-4 for c in cross)
+    streams = bool(result["config"].get("streams"))
+    if streams:
+        checks["streams_match_their_record"] = bool(points) and all(
+            p.get("record_stream_sha256") == p["stream_sha256"] for p in points)
     if codec == "dcvc":
         dcvc = [p["codec_record"] for p in points]
         encoded = [d for d in dcvc if "encode" in d]
@@ -763,17 +787,19 @@ def validate(stage: Path) -> dict[str, bool]:
         checks["dcvc_on_ada_or_a6000_with_matching_extension"] = bool(envs) and all(
             ("6000 Ada" in e["device_name"] and e["extension"]["variant"] == "sm89")
             or ("A6000" in e["device_name"] and e["extension"]["variant"] == "sm80") for e in envs)
-        kernels = [d["encode"].get("kernels") for d in encoded if d["encode"].get("kernels")]
-        checks["dcvc_cuda_kernels_ran"] = bool(kernels) and all(k["kernel_launches"] > 0 for k in kernels)
-        checks["dcvc_codec_time_recorded"] = bool(encoded) and all(
-            d.get("model_encode_seconds") and all(d.get("model_decode_seconds") or [None]) for d in encoded)
+        if not streams:  # decode-only rescoring has no encode to time or profile
+            kernels = [d["encode"].get("kernels") for d in encoded if d["encode"].get("kernels")]
+            checks["dcvc_cuda_kernels_ran"] = bool(kernels) and all(k["kernel_launches"] > 0 for k in kernels)
+            checks["dcvc_codec_time_recorded"] = bool(encoded) and all(
+                d.get("model_encode_seconds") and all(d.get("model_decode_seconds") or [None]) for d in encoded)
     else:
         coded = [p["codec_record"] for p in points if "encode_command" in p["codec_record"]]
         threads = result["config"]["threads"]
         checks["svtav1_single_keyframe_crf_commands"] = all(
             "--keyint" in c["encode_command"] and "--crf" in c["encode_command"] for c in coded)
-        checks["svtav1_confined_to_its_cores"] = bool(coded) and all(
-            c.get("cpus") and len(c["cpus"]) == threads and c.get("encode_cpu_seconds") is not None for c in coded)
+        if not streams:
+            checks["svtav1_confined_to_its_cores"] = bool(coded) and all(
+                c.get("cpus") and len(c["cpus"]) == threads and c.get("encode_cpu_seconds") is not None for c in coded)
         checks.update(roi_checks(rows))
     return checks
 
@@ -1192,6 +1218,7 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--lpips-backbone", required=True)
     run.add_argument("--vmaf-ffmpeg", default="/opt/local/bin/ffmpeg")
     run.add_argument("--streams", help="score published streams under DIR/<codec>/<item>/<point>/ instead of encoding")
+    run.add_argument("--stream-record", help="with --streams: the b2.json of the job that encoded them; every stream must match its sha256")
     run.add_argument("--preset", default="4", help="SVT-AV1 preset, or a comma-separated list")
     run.add_argument("--roi-offset", default="0", help="SVT-AV1 ROI quantizer offset, or a list: negative lowers foreground blocks, positive raises background blocks (0: no ROI)")
     run.add_argument("--roi-mask-set", default="visor_dense")

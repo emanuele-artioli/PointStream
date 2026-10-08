@@ -36,6 +36,7 @@ labelled classes, and a smoke read of one labelled sample (overlays in
 | **RacketVision** (`RacketVision`, 7.6 GB, MIT) | 1,672 clips, 435k frames, 1920×1080, 24–60 fps (badminton, table tennis, tennis) | Ball points on 20.1 / 11.5 / 14.3% of frames; racket box plus 5 keypoints on 9.2 / 3.9 / 4.9%, usually one racket per labelled frame | No masks. The interpolated ball tracks and merged racket predictions are not ground truth. |
 | **TrackNet** (`TrackNet`, 2.6 GB, no licence stated) | 95 tennis clips, 19,835 frames, 1280×720, 30 fps | Ball position and visibility on every frame | JPEG frames only, no video. Only a third-party mirror is reachable. |
 | **HInt** (`HInt`, 3.8 GB, MIT) | `HInt_annotation_partial.zip`: hand keypoints on EPIC-KITCHENS VISOR frames (1920×1080; 2,780 / 625 / 1,906 hands in train / val / test, from 109 / 90 / 40 of our VISOR videos) and New Days; Ego4D annotations without frames | 21 2D keypoints per hand with existence and occlusion flags, handedness in the file name | Keypoints only, no 3D. Its splits are its own; HaMeR trains on HInt train. 377 EPIC files (`EK_frame_…`) name no video. Downloaded with TLS verification off (the host's certificate expired 2025-05-08; no published checksum): sha256 `ac42d9f8…c7fe` recorded while streaming, size equal to the server's Content-Length. Ego4D frames need an Ego4D licence. |
+| **EPIC-KITCHENS-100 hand-object detections** (`EPIC-KITCHENS-hand-objects`, 0.17 GB, Non-Commercial Government Licence; EPIC-KITCHENS CC BY-NC 4.0) | `hand-objects/<P>/<video>.pkl` for the 34 videos of VISOR evaluation set v2 (doi:10.5523/bris.3l8eci2oqgst92n14w2yqi5ytu), plus the release's `EPIC_100_frame_counts.csv` | Detector output (Shan et al. 2020), not labels: per EPIC rgb frame, hand boxes with side, contact state and score (kept down to 0.1), object boxes (down to 0.01); normalised to [0, 1], detector input 456×256 | Used only as an independent check of filled hands (B1b). Hand boxes exclude the forearm VISOR's hands include. No published checksum: sha256 recorded while streaming, size equal to Content-Length (`tools/datasets/download/hand_objects.sh`); every file has the release's frame count. Read by `src/segmentation/hand_objects.py` (no `protobuf` dependency; equal on every field to the official reader on two videos, 18k frames). Manifest `EPIC-KITCHENS-hand-objects.json` (sha256 `711870f2…1ee5`). |
 
 Candidate if needed: SA-Co/VEval SmartGlasses. Not used: DeepSportradar
 (images, not video), ENIGMA-51 (no arms; SAM-HQ masks), DAVIS (too small for the
@@ -186,9 +187,13 @@ these gaps.
   stretches) requires `clip_masks(..., exact_only=True)` and a recorded
   decision.
 - Objects other than hands can still be missing: report it with every result.
-- Report per provenance tier. When B1b's SAM fill (`sam_from_label_prompt`) is
-  adopted, report every number with and without it; the "without" number is
-  the fair one for D1, where SAM 3.1 is a contestant.
+- Report per provenance tier, and every number with and without B1b's fill:
+  mask set `visor_dense_sam_fill` (tier `sam_from_label_prompt`, objects only;
+  hands were not adopted), `pointstream-data/jobs/fleet/inbox/20261007T222646Z-3a7ac6ef/full/published.tar`
+  (sha256 `049977f0…799a`, record `merge.json` `1c705e4a…4bea`). It cuts the
+  labelled objects missing from 33% to 1.6% of each frame's; B2 with both sets:
+  `pointstream-data/visor/b1b-2026-10-07/b2-rescore-339c918/`. The "without"
+  number is the fair one for D1, where SAM 3.1 is a contestant.
 - Codec baseline (B2, `experiments/visor/b2.py`): SVT-AV1 preset 4 and
   DCVC-UF HT-L curves on all 34 items, keyed by mask set; the streams are
   published in the full jobs' `published.tar`, so a new mask set (B1b's
@@ -208,8 +213,10 @@ these gaps.
   the cutoff can change without re-exporting.
 - Instance crops of labelled objects are safe. Background frames ("foreground
   removed") and segmenter targets are not, where `hand_gaps` reports a missing
-  hand: exclude those frames until B1b fills them, or a model learns hands as
-  background.
+  hand: exclude those frames, or a model learns hands as background. B1b's
+  hand fill was not adopted (it let departed hands go in 4 of 6 cases and
+  some hand tracks moved onto the other hand), so these frames stay excluded
+  until a hand fill passes.
 
 ## Models
 
@@ -227,6 +234,16 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
 - **GPUs: Ada and A6000 only** (`gpu_models: ["RTX 6000 Ada", "RTX A6000"]`).
   On the RTX 8000 it falls back to math attention (39.5 GiB, 2.2× slower); on
   the GV100 it runs out of memory ([model–GPU table](fleet.md#modelgpu-table)).
+- **Mask prompts** (B1b, `src/segmentation/sam31_tracker.py`). The multiplex
+  predictor's public API takes text, boxes and points only (its `add_mask`
+  raises for the multiplex model). `Sam31MaskTracker` builds SAM 3.1's own
+  tracker with sam3's `build_sam3_multiplex_video_model` and loads the same
+  checkpoint's `tracker.model.*` and `detector.backbone.vision_backbone.*`
+  weights (931 of 931 keys). Two limits of the pinned code: the tracker must
+  ask its backbone for its own two heads only (asking for the detector's head
+  as well breaks `forward_image`), and a multiplex state takes mask prompts on
+  its first frame only, so each prompted frame is its own session. About 5
+  frames/s with the backbone at 1080p on an RTX A6000, 5–6 GiB.
 
 **YOLOE-26**
 - Only the `n` and `x` segmentation weights are in `Models/YOLO`
