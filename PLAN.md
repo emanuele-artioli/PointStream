@@ -275,7 +275,20 @@ VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
 temporal stability on VISOR video. No published work compares them on
 egocentric video ([resources](docs/resources.md#models)). HOT3D's motion
 capture is the oracle that measures what pose estimation costs.
-**Done when** one estimator is chosen for PointStream, with numbers.
+
+Pose coding (user, 2026-10-08; a candidate secondary contribution). H1 coded
+WiLoR's MANO parameters as quantized first differences: 165 bits per
+hand-frame, 3.2 bits per value, mostly the estimator's jitter (H1 outcome).
+H2 measures the pose stream's rate against distortion (projected joint error,
+and the rendered silhouette's IoU) and latency (frames of lookahead), as
+curves, for each technique alone and in combination: temporal subsampling
+with interpolation at the client (pose sent at 10–30 Hz), smoothing at the
+encoder (a One-Euro filter or a small temporal model), prediction beyond the
+previous frame (constant velocity), a pose subspace (MANO's PCA, 6–45
+components), and the quantization step per joint. The optimal combination
+per latency budget is the result; it decides H3's pose input.
+**Done when** one estimator is chosen for PointStream, with numbers, and the
+pose stream's rate-distortion-latency curves name the coding H3 uses.
 
 #### H3. Hand and arm rendering
 
@@ -288,13 +301,36 @@ bound, and on render time.
 **Done when** a hand renderer beats coded pixels at some rate, or the session
 shows why not.
 
-#### H4. Handled objects
+#### H4. Handled objects (rescoped after H1, user 2026-10-08)
 
-Per object: an appearance reference plus rigid motion where H1 shows it
-holds, coded pixels where it does not (deformable, transparent, cut or newly
-seen objects). How objects enter (first appearance) and how the reference is
-updated as they turn.
-**Done when** each object class H1 named has a representation chosen by numbers.
+H1 found that no 2D warp of one reference view carries an object for more
+than a few frames (median reference life 0.02–0.04 s): objects turn, show new
+sides, are occluded by hands and deform. The large touched surfaces VISOR
+labels active objects (pan, sink, hob, chopping board: 38% of the
+foreground's bits) move with the camera; they go to G's background, and the
+G section takes them up once G1 has finished. H4 covers the handled objects
+(27–29% of the foreground's bits), cheapest idea first:
+1. *Grip pose.* A held rigid object moves with the hand: in the wrist's frame
+   it is still. While grasped, the object is sent as one fixed transform
+   relative to the hand's 3D pose (already in the stream), resent only when
+   the grip changes or the object is released. First measured on HOT3D,
+   which has motion-capture poses of hands and objects: how constant the
+   transform is during a grasp, and how often it changes.
+2. *A bank of reference views.* Each object keeps a few past views; every
+   frame is predicted from the nearest one (by pose, or by prediction
+   error), and a new view is sent only when none predicts well enough. An
+   object turned back and forth, or reappearing from under a hand, costs no
+   new reference. Measured on VISOR against H1's single refreshed reference.
+3. Whatever neither explains stays coded pixels.
+Scored on VISOR foreground quality against SVT-AV1 on the same pixels at
+equal rate, with LPIPS beside weighted PSNR.
+Later candidates, once 1–3 have numbers: a per-object 3D model built from the
+views seen so far (e.g. Gaussian splats) driven by a 6DoF pose, which
+handles rotation; and generative completion of sides not yet seen, which
+costs nothing to send and may score well on LPIPS while scoring badly on
+PSNR, until the real side appears and must be corrected.
+**Done when** handled objects have a representation chosen by numbers, or the
+session shows they should stay pixels.
 
 #### H5. First working PointStream
 
