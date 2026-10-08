@@ -841,3 +841,117 @@ invocation turns out to be needed.
   12% have more than a quarter outside. Most often fragmented: cheese, bread,
   pot, mozzarella (small or translucent, often held). The speckled fridge on
   P27_105 is the extreme case, not the norm. No change to the fill.
+
+### 2026-10-08 — G1: camera motion and coverage audit
+- Question (PLAN G): does each dataset's camera only rotate (and zoom) about
+  a fixed centre, so that a panorama built from a warm-up can rebuild its
+  background, and how long must the warm-up be? G2–G5 need from it: the clips
+  a background evaluation can use, the warm-up length, the panorama's
+  projection, and whether the background work starts on VISOR (phase 1) or on
+  racket sports.
+- Clips (fixed content-blind before any run; `tools/datasets/g1_inputs.py`
+  `RULE`; `clips.json` from metadata only: frame counts, splits, names).
+  *VISOR windows*: all 34 items of evaluation set v2, every frame (240 at 50
+  or 59.94 fps); foreground = the dense masks with B1b's object fill
+  (`visor_dense_sam_fill`). *VISOR stretches*: per evaluation video, 120 s of
+  decoded frames from the window's first frame (moved earlier to fit the
+  video, or the whole video if shorter), at 10 frames/s. *OpenTTGames*: the 7
+  test videos (staged whole; the 5 train videos are 4–11 GB each), 120 s from
+  sha256("pointstream-g1:ott:<video>") mod the free range, 10 frames/s.
+  *RacketVision*: per sport the 8 test clips with the smallest
+  sha256("pointstream-g1:racketvision:<sport>/<match>_<rally>"), whole, 10
+  frames/s. *TrackNet*: the 8 clips with the smallest
+  sha256("pointstream-g1:tracknet:<game>/<clip>"), whole, 10 frames/s. VISOR
+  frames are decoded frame indices placed by B1's verified rules; each
+  window's released sparse JPEGs are checked against the decoded frames.
+- Foreground out of the measurement: VISOR windows by their dense masks;
+  everything else by SAM 3.1 text prompts, tier `sam_text` ("hand" and "arm"
+  on VISOR, plus the EPIC-KITCHENS hand-object detector's hand and object
+  boxes at score ≥ 0.5, since a held object has no fixed name to prompt;
+  "person" and "racket" on racket sports, so spectators, umpires and ball
+  kids are masked too). All masks dilated by 16 px at 1080p. Tier check: on
+  each stretch's frames inside its window, the dense masks' recall by the
+  `sam_text` masks, and the rotation residual measured with both.
+- Method (`experiments/background/camera.py`, `g1.py`; CPU, OpenCV 4.10 and
+  SciPy from the packed environment; 960×540 analysis frames, errors at
+  1080p). SIFT on background, ratio test, MAGSAC. Homographies frame to frame
+  and frame to reference; the rotation-and-zoom model with the clip's lens
+  (focal length and one division-model distortion term, fitted jointly on
+  pairs 0.5 s apart; a window uses its stretch's lens; when the rotation is
+  too small to identify it, a 60° prior is used and recorded as
+  unobservable). Each frame registers to the keyframe its predicted view
+  overlaps most (a new keyframe below 60% overlap or 200 inliers). Residual
+  of the reference warped into the frame, on the background of both: PSNR
+  raw, after a gain and offset (exposure), and after re-warping by dense
+  optical flow (DIS); the residual flow on textured background is the
+  alignment error. Its squared error splits into exposure, parallax
+  (misaligned pixels, > 1 px, whose correspondence obeys the epipolar
+  geometry where GRIC prefers a fundamental matrix), independent motion (the
+  other misaligned pixels: water, screens, people, mask leaks) and a
+  remainder (lighting, blur, noise, disocclusion); it is also given by image
+  radius (distortion), against rotation speed (rolling shutter) and on
+  blurred frames (Laplacian variance under half the clip median).
+  Translation: for frames 0.5 s apart, GRIC (homography against fundamental
+  matrix, σ = 1 px at 1080p) and the parallax, the homography's transfer
+  error on the fundamental matrix's inliers. Coverage: every frame's
+  background is marked on an azimuth–elevation canvas (cell 4 px at 1080p)
+  through the rotation model, with the frame that first saw it;
+  coverage_t(w) is the share of frame t's background seen within the first w
+  seconds, and C(w) its mean over the frames after w. In-job self-test: a real
+  frame re-rendered by a known 3°/1° rotation and 2% zoom must come back
+  within 0.05° and 0.5 px.
+- Decision rule (`g1.DECISION`, fixed before any run). A frame is
+  *explained* when the 90th percentile of residual flow on textured
+  background, after the rotation-and-zoom warp to its reference, is ≤ 2 px at
+  1080p (shares within 1 and 4 px reported beside it). A clip *holds* when
+  ≥ 90% of its measured frames are explained, ≥ 95% register directly to a
+  keyframe, ≥ 80% are measured (enough visible background) and it has one
+  segment (no cut or loss). A dataset (VISOR judged on its stretches, windows
+  reported beside them; RacketVision per sport as well) *holds* when ≥ 75% of
+  its clips hold, holds *for a subset* at 25–75% (G2 gets the clips that
+  hold), and *does not hold* below 25%. Translation is *confirmed* for a clip
+  when GRIC prefers a fundamental matrix on ≥ 50% of its 0.5 s pairs and
+  their median parallax is ≥ 2 px at 1080p. Warm-up: per clip, the first w on
+  a 0.5 s grid with C(w) ≥ 0.90 (and 0.99), else "not reached"; per dataset,
+  the median and range over the clips that hold. G2 can use a clip that
+  holds and plays at least 10 s after its 90% warm-up. The background work
+  starts on VISOR if VISOR holds, or holds for a subset of at least 10
+  stretches with a median 90% warm-up ≤ 30 s; otherwise on racket sports if a
+  racket dataset holds; otherwise the panorama is not the first candidate and
+  G5 (a neural model of the background) leads, on whichever domain G2 can
+  evaluate.
+- Hypothesis: OpenTTGames' fixed camera holds trivially (no motion, lens
+  unobservable), and its coverage is limited only by the players: 90% within
+  seconds, 99% late or never. RacketVision and TrackNet broadcast cameras
+  mostly hold (fixed, or slow pan and zoom); some clips may break on a cut.
+  VISOR does not hold: the head translates while it turns, and at kitchen
+  distances (0.3–1.5 m) a few centimetres give parallax well above 2 px within
+  0.5 s; GRIC prefers a fundamental matrix on most pairs, and fewer than a
+  quarter of the stretches hold. Coverage under the rotation approximation
+  needs tens of seconds on VISOR. So the background work starts on racket
+  sports.
+- Competing explanations: (1) lens distortion of the wide head-mounted
+  camera, not parallax, makes the residual: the fitted k1 and the residual
+  by radius test it. (2) Rolling shutter under fast head rotation: residual
+  that grows with rotation speed while GRIC still prefers a homography
+  (Spearman of residual against speed). (3) Foreground mask leaks (hands the
+  masks miss, unmasked handled objects, other people) show as independent
+  motion near the foreground; the tier check compares the two mask sources on
+  the same frames. (4) Blur and compression set a floor unrelated to
+  geometry: the flow measure largely ignores photometric noise, blurred
+  frames are reported apart, and OpenTTGames' static camera shows the floor.
+  (5) Flow errors on flat surfaces: only textured pixels count, and the
+  self-test checks the measure on known motion. Frames of a clip are
+  correlated, so conclusions are drawn per clip, not per frame.
+- Budget: the only GPU work is SAM 3.1 (Ada or A6000, model–GPU table): about
+  47,000 analysis frames, two text passes each (VISOR stretches 34 × ≤ 1,200,
+  OpenTTGames 7 × ≤ 1,200, RacketVision 24 and TrackNet 8 clips of about 70);
+  the CPU analysis runs in the same jobs (16 threads). Smoke ≤ 600 s per job
+  (clips capped at 12 s). Pilot: 2 VISOR videos (stretch and window), 2
+  OpenTTGames, 1 RacketVision clip per sport, 2 TrackNet, one job ≤ 1 h; it
+  measures SAM's frames per second and the analysis seconds per frame, and
+  the full run is sized from them. Full: the VISOR videos in three jobs and
+  the racket clips in one, ≤ 2.5 h each. Ceiling 10 GPU-hours and 12 h wall
+  including staging. If the pilot shows the full run cannot fit, the
+  stretches are shortened before anything else changes, and that is recorded
+  here.
