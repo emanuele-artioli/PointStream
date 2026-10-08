@@ -144,3 +144,13 @@ def test_review_frames_are_content_blind_and_stable() -> None:
     a = h1.review_frames("P01_107_0000003049", 240, 2)
     assert a == h1.review_frames("P01_107_0000003049", 240, 2)
     assert len(a) == 2 and all(1 <= t < 240 for t in a)
+
+
+def test_sample_map_handles_more_points_than_remap_allows_per_side() -> None:
+    image = textured((300, 400))
+    ys, xs = np.mgrid[0:300, 0:400]
+    points = np.c_[xs.reshape(-1), ys.reshape(-1)].astype(np.float64)  # 120,000 points
+    assert np.array_equal(h1.sample_map(points, image), image.reshape(-1, 3))
+    mask = np.zeros((300, 400), bool)
+    mask[10:20] = True
+    assert np.array_equal(h1.sample_map(points, mask, nearest=True), mask.reshape(-1))

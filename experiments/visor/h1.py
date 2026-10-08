@@ -186,12 +186,20 @@ def sample_map(points_src: np.ndarray, image: np.ndarray, nearest: bool = False)
     """``image`` sampled at float ``(x, y)`` points (bilinear, or nearest for masks; 0 outside)."""
     import cv2
 
-    mx = points_src[:, 0].astype(np.float32).reshape(-1, 1)
-    my = points_src[:, 1].astype(np.float32).reshape(-1, 1)
+    count = len(points_src)
+    # remap needs maps under 32767 on each side: fold the points into rows of WIDTH.
+    width = 1024
+    rows = max(1, -(-count // width))
+    padded = np.zeros((rows * width, 2), np.float32)
+    padded[:count] = points_src
+    mx = np.ascontiguousarray(padded[:, 0].reshape(rows, width))
+    my = np.ascontiguousarray(padded[:, 1].reshape(rows, width))
     if nearest:
-        return cv2.remap(image.astype(np.uint8), mx, my, cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT,
-                         borderValue=(0,)).reshape(-1) > 0
-    return cv2.remap(image, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE).reshape(len(points_src), -1)
+        out = cv2.remap(image.astype(np.uint8), mx, my, cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT,
+                        borderValue=(0,))
+        return out.reshape(-1)[:count] > 0
+    out = cv2.remap(image, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+    return out.reshape(rows * width, -1)[:count]
 
 
 def apply_h(h: np.ndarray, points: np.ndarray) -> np.ndarray:
@@ -852,7 +860,7 @@ def process_item(args: argparse.Namespace, wilor: WiLoR, item: dict[str, Any], f
         fitted_here = reviewed_fits.get(t) or {k: fit_models(flow, m[t]) for k, m in tracks.items() if t in m and t - 1 in m}
         name = f"{item['id']}_t{t:03d}.jpg"
         draw_review(frames[t - 1], frames[t], split_masks[t], object_masks[t], handled, fits[t], wilor.faces,
-                    {k: v for k, v in fitted_here.items() if not k.startswith("hand")}, tracks, t, why,
+                    {k: v for k, v in fitted_here.items() if not k.startswith(("hand:", "hand_no_fit:"))}, tracks, t, why,
                     publish / "review" / name)
         reviews.append({"file": f"review/{name}", "t": t, "why": why})
     timing["review"] = round(time.time() - began, 2)
@@ -1265,6 +1273,37 @@ def summarize_items(items: list[dict[str, Any]], rates: dict[str, Any]) -> dict[
     return {"items": out}
 
 
+def by_label(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Object tracks grouped by VISOR label over items: frames, kind, share held from a reference."""
+    groups: dict[str, dict[str, Any]] = {}
+    for row in items:
+        handled = set(row["contact"]["handled"])
+        motion: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for m in row["motion"]:
+            motion[m["track"]].append(m)
+        for key, info in row["tracks"].items():
+            if info["kind"] not in ("handled_object", "other_object"):
+                continue
+            g = groups.setdefault(key, {"label": key, "items": 0, "frames": 0, "handled_frames": 0, "held_30": 0,
+                                        "chain_frames": 0, "area": 0.0, "psnr_homography": [], "psnr_flow": []})
+            g["items"] += 1
+            g["frames"] += info["frames"]
+            g["handled_frames"] += info["frames"] if key in handled else 0
+            g["held_30"] += info["chains"]["30"]["held"]
+            g["chain_frames"] += info["chains"]["30"]["frames"]
+            g["area"] += info["mean_area"] * info["frames"]
+            g["psnr_homography"] += [m["psnr_homography"] for m in motion[key] if m.get("psnr_homography") is not None]
+            g["psnr_flow"] += [m["psnr_flow"] for m in motion[key] if m.get("psnr_flow") is not None]
+    out = []
+    for g in groups.values():
+        out.append({"label": g["label"], "items": g["items"], "frames": g["frames"],
+                    "handled_share": g["handled_frames"] / g["frames"], "mean_area_px": g["area"] / g["frames"],
+                    "held_share_30": g["held_30"] / g["chain_frames"] if g["chain_frames"] else None,
+                    "psnr_homography_median": float(np.median(g["psnr_homography"])) if g["psnr_homography"] else None,
+                    "psnr_flow_median": float(np.median(g["psnr_flow"])) if g["psnr_flow"] else None})
+    return sorted(out, key=lambda r: -r["frames"] * r["mean_area_px"])
+
+
 def mean_of(values: list[float | None]) -> float | None:
     kept = [v for v in values if v is not None and not (isinstance(v, float) and math.isnan(v))]
     return float(np.mean(kept)) if kept else None
@@ -1323,6 +1362,7 @@ def command_report(args: argparse.Namespace) -> int:
     rates = parameter_rates(items)
     summary = summarize_items(items, rates)["items"]
     report = {"results": sources, "items": len(items), "parameter_rates": rates, "per_item": summary,
+              "objects_by_label": by_label(items),
               "decision": decide(summary), "rule": DECISION}
     out = Path(args.out)
     write_json(out / "h1-report.json", report)

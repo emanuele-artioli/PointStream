@@ -865,11 +865,12 @@ invocation turns out to be needed.
   1. Composition: each part's share of the frame's and of the foreground's
      pixels. Bits: B2's published SVT-AV1 streams (all 34 items, CRF 41–62)
      decoded by libaom 3.12.1's `inspect` built with bit accounting
-     (`CONFIG_ACCOUNTING`, `CONFIG_INSPECTION`; patched to print each frame's
-     order hint, so bits map to display frames; binary `aom-inspect-v3.12.1-ps1`, sha256 `9b2e75a2…3959`,
-     patch `env/patches/aom-inspect-ps1.patch`, `cbc0eb0a…50bf`; upstream
-     prints a block's context in place of its first symbol, dropping its bits,
-     so the patch prints both). Every entropy-coded symbol is attributed to the
+     (`CONFIG_ACCOUNTING`, `CONFIG_INSPECTION`; `tools/aom/build-inspect.sh`,
+     binary `aom-inspect-v3.12.1-ps1`, sha256 `9b2e75a2…3959`). The patch
+     (`env/patches/aom-inspect-ps1.patch`, `cbc0eb0a…50bf`) prints each
+     frame's order hint, so bits map to display frames, and every symbol:
+     upstream prints a block's context in place of its first symbol, dropping
+     its bits. Every entropy-coded symbol is attributed to the
      block being decoded; a block's bits are spread evenly over its pixels and
      split by the parts' pixel shares in the frame it displays as. Frame
      headers are outside the accounting; their share is reported. DCVC-UF's
