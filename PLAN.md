@@ -240,25 +240,22 @@ G and H are independent until H5, so their sessions can run side by side.
 
 #### H1. Foreground motion and representation audit (done 2026-10-08)
 
-Result: `experiments/visor/h1.py` on evaluation set v2 (all 34 items, 8,160 frames,
-from recorded jobs: pilot `20261008T072619Z-0d09640b`, full `…083835Z-5dafce84`,
-`…103118Z-a358e4ad`, `…150618Z-fb44e5a3`;
-[outcome](docs/experiments.md#2026-10-08--h1-foreground-motion-and-representation-audit)).
-By `h1.DECISION`:
-- Hands carry 19–21% of foreground bits; WiLoR fits 91.2% of hand-frames with
-  median hand-side IoU 0.753 (rules a, b hold), but entropy rate is 15.3 kbps
-  vs SVT-AV1 CRF 62's 23.4 kbps (65% > 10%; rule c fails: hands need residual
-  pixel coding rather than pure parameter replacement).
-- Forearms carry ~12% of foreground bits, and make up 49.7% of hand mask area
-  (≥ 20% threshold) -> forearm must be rendered by H3 along with the hand
-  (`forearm_rendered_by_H3 = True`).
-- Handled objects carry ~28% of foreground bits; 2D homography holds on only
-  49.9% of frames (reference life 0.03 s; rule b fails). They stay pixels.
-- Other active objects: static planar surfaces pass rule b individually
-  (toaster 93.3%, tray 91.4%, pot 87.8%, chopping board 85.0%, cooktop 80–82%,
-  sink 77.0%, plate 76.9%) as candidate rigid models for H4 / G.
-- Order of work: H2 (estimator comparison, HaMeR vs WiLoR) -> H3 (hand + forearm
-  renderer) -> H4 (handled objects, named rigid classes only).
+Result: `experiments/visor/h1.py` on all 34 items of evaluation set v2, from
+recorded jobs (pilot `20261008T072619Z-0d09640b`, full `…083835Z-5dafce84`,
+`…103118Z-a358e4ad` (10 items, salvaged `partial.tar`), `…150618Z-fb44e5a3`;
+[outcome](docs/experiments.md#2026-10-08--h1-foreground-motion-and-representation-audit),
+[overlays](https://claude.ai/artifact/7ir8Smh5tyWLFDejPppj6k)). By the rule
+fixed beforehand, no part is worth a parametric model. Hands (20% of the
+foreground's SVT-AV1 bits) pass on bits and fit (WiLoR fits 91.5% of
+hand-frames, hand-side IoU median 0.77) but fail on rate: 15.2 kbps of pose
+parameters against 23.4 kbps that SVT-AV1 spends on hand pixels at CRF 62.
+Forearms (12%), handled objects (27–29%) and other objects (38%) fail on fit:
+a reference carried by homographies dies within 0.02–0.04 s (median). The
+forearm is half of VISOR's hand masks (49.7%), so H3 renders it with the hand.
+Objects, not hands, carry two thirds of the foreground's bits, most of them
+large touched surfaces whose motion is the camera's (G's, not H's). Order:
+H2 with pose rate after smoothing added to its stability axis; H3 hand and
+forearm; H4 as briefed is unsupported and waits for the user's decision.
 The text below is the original brief.
 
 What the foreground is and how much of it a parametric model could explain.

@@ -954,22 +954,113 @@ invocation turns out to be needed.
   B2 pilot items (P01_107, P09_106, P02_02, P03_10), ≤ 1 h. Full: the other
   30 items as two jobs of 15, ≤ 2 h each. Ceiling 5 GPU-hours and 10 h wall
   including staging.
-- Jobs:
-  - Pilot: `20261008T072619Z-0d09640b`, NVIDIA RTX A6000 (`gpu3`, 4 items: P01_107, P09_106, P02_02, P03_10)
-  - Full B: `20261008T083835Z-5dafce84`, Quadro RTX 8000 (`gpu1`, 15 items: P02_12, P04_06, P04_24, P06_05, P06_106, P07_101, P08_17, P09_103, P18_01, P22_107, P25_09, P26_02, P27_105, P30_07, P37_102)
-  - Full A1: `20261008T103118Z-a358e4ad`, Quadro RTX 8000 (`gpu1`, 10 items: P02_09, P03_120, P04_13, P06_03, P06_108, P06_10, P07_110, P09_02, P09_104, P21_01)
-  - Full A2: `20261008T150618Z-fb44e5a3`, NVIDIA RTX A6000 (`gpu3`, 5 items: P24_09, P25_101, P26_108, P28_05, P30_110)
-  - Infrastructure / contention attempts (not evidence): `20261008T070724Z-fb6fa79e` (OpenCV remap clamp), `20261008T071805Z-646a9841` (cache execute bit), `20261008T083438Z-6040a9d6` (gpu6 foreign process contention), `20261008T101514Z-20d1d0da` (gpu3 contention), `20261008T145714Z-d310293f` (smoke item choice).
-  - Code revision: HEAD `6847a298173435c15ee8e26f70f85fd6b7eed5f9`.
-  - Environment: `pointstream-20261006T113321Z.tar.gz` (`44835688156ec6dd5a96ae068e636bb65174597a8ca5f34a6efc33b12bd751b9`).
-  - Inputs: Evaluation set v2 (34 items, sha256 `0d25301a039dbc801bba01baca4992bf7d05dd471b713ed313a249cc7d6feec2`), dense masks archive (`a2d9e0cb0373fbf89d1c1e257acc2ffa63602b680cfae03a6fdcc804894b4c3c`), fill masks `visor_dense_sam_fill` (`049977f057a367a921255dbf894489b877d85c0f33e1baf2554e0ca1af96799a`), B2 SVT-AV1 streams (`3c2517b500c5bf766775b97126bbe2b885c7aa2257536dc6dd290f322dffecda`, `994aa4b32d44e9f38eeb94534b63c6a527cff062802bf06e2d6a8cd4a82d05eb`), WiLoR weights (`3e97aafc7dd08d883a4cc5a027df61fdb6fda6136dbd1319405413862ada6bb2`, `5ef3df44e42d2db52d4ffe91f83a22ce9925e2acc9abebf453f2c5d22e380033`), MANO (`b61cdb94a33582d626456752515624d7c558b5adcc997d13fb422963b5f791ed`, `9e3fb9ac790637539011258e211415d3bcae8daa2759c86b9046f4b371f0c423`), libaom inspect `aom-inspect-v3.12.1-ps1` (`9b2e75a288309a6d91c9dcd2976f30425923a8f6733e74dd65475f7f4e443959`, patch `cbc0eb0a4e768114f6b3fb495f2a1299955743b00085a81ca520023a1a5450bf`).
-- Outcome: evaluated across all 34 windows (8,160 frames, fill set, `h1-report.json`).
-  - **Hands**: 19.37% (CRF 48) and 20.78% (CRF 62) of foreground bits (rule a holds). WiLoR fits 91.18% of hand-frames with median hand-side IoU 0.7533 and 93.82% of frames ≥ 0.60 IoU (rule b holds). Parameter rate is 165.17 bits/frame (15.25 kbps) vs SVT-AV1 CRF 62's 23.37 kbps on hand pixels (65.2% > 10% threshold; rule c fails). Pure unguided parametric replacement fails rule c; hands stay pixel-coded with parametric guidance.
-  - **Forearms**: 11.69% (CRF 48) and 12.27% (CRF 62) of foreground bits (rule a holds). Homography holds 78.81% of frames at 30 dB, but median reference life is 0.140 s (< 0.5 s; rule b fails). Forearm constitutes 49.71% of hand mask pixels (≥ 20% threshold) -> **forearm must be rendered by H3** (`forearm_rendered_by_H3 = True`).
-  - **Handled objects**: 29.13% (CRF 48) and 26.97% (CRF 62) of foreground bits (rule a holds). Homography holds on only 49.86% of frames at 30 dB (< 70%), median reference life 0.031 s (< 0.5 s; rule b fails). Objects turn, deform, and are occluded by hands. Parameter rate is 12.51 kbps vs 41.32 kbps (30.3% > 10%; rule c fails). Stay pixels.
-  - **Other active objects**: 38.21% (CRF 48) and 38.28% (CRF 62) of foreground bits. Homography holds 70.79% of frames, but median reference life is 0.077 s (< 0.5 s). However, large touched surfaces pass rule (b) individually: toaster (93.3% held), tray (91.4% held), pot (87.8% held), chopping board (85.0% held), cooktop/hob (80–82% held), sink (77.0% held), plate (76.9% held). These are planar/rigid elements suitable for H4 / G.
-  - **Order of H2–H4**:
-    1. **H2: Hand pose estimators (HaMeR vs WiLoR)**: Hands carry ~20% of foreground bits, and WiLoR achieves 91.18% fit with 0.753 IoU on VISOR. Compare on HInt/HOT3D for 3D accuracy, temporal stability and speed.
-    2. **H3: Hand and arm rendering**: Hand + forearm carry ~33% of foreground bits, with forearms making up 49.71% of hand mask area. H3 must render both hand and forearm together (pose-conditioned or mesh residual) to beat coded pixels.
-    3. **H4: Handled objects**: Generic handled objects stay pixels (only 49.9% held, reference life 0.03 s). Candidate models apply only to named rigid classes and surfaces identified in H1 (chopping board, tray, plate, pots, toaster, sink).
-
+- Jobs (code `6847a29`, environment `pointstream-20261006T113321Z`; inputs
+  `pointstream-data/visor/h1-2026-10-08/inputs/`, the B1/B1b/B2 records named
+  in the method, specs `h1-pilot.json`, `h1-full-a.json`, `h1-full-b.json`
+  beside them): pilot `20261008T072619Z-0d09640b` (gpu3, RTX A6000; the four
+  pilot items; 1,106 s full stage); full B `20261008T083835Z-5dafce84` (gpu1,
+  Quadro RTX 8000; 15 items; 5,387 s); full A1 `20261008T103118Z-a358e4ad`
+  (gpu1, Quadro RTX 8000; ended `contended` after its 10th item, so only
+  `partial.tar` was published: P02_09, P03_120, P04_13, P06_03, P06_10,
+  P06_108, P07_110, P09_02, P09_104, P21_01, all finished before the foreign
+  process appeared; its validator was run afterwards on `partial.tar` with
+  the job's own smoke-stage WiLoR and device record, every check passing);
+  full A2 `20261008T150618Z-fb44e5a3` (gpu3, RTX A6000; the other 5 of
+  share A; 1,693 s). Validators passed on all four full outputs (18 checks
+  each), so every item met the JPEG gate, matched both mask records and
+  B2's stream hashes, and had each window frame's bits once. Not evidence:
+  `…070724Z-fb6fa79e` (OpenCV `remap` limit), `…071805Z-646a9841` (staged
+  binary not executable), `…083438Z-6040a9d6` (contended on gpu6),
+  `…101514Z-20d1d0da` (cancelled during contention on gpu3),
+  `…145714Z-d310293f` (smoke item not in the share). About 3.5 GPU-hours
+  in the four full stages, 8.5 h wall. Report (`h1 report`, all 34 items):
+  `pointstream-data/visor/h1-2026-10-08/report-6847a29/h1-report.json`
+  (`7e01635a…3fee`). Review overlays (102 frames, 3 per item):
+  [artifact](https://claude.ai/artifact/7ir8Smh5tyWLFDejPppj6k).
+- Provenance note: another agent wrote a `published.tar` (a copy of
+  `partial.tar`) and an `h1.json` (device record and peak memory copied from
+  full B) into A1's job directory so the report would run. Both were moved
+  to `visor/h1-2026-10-08/a1-reconstructed-outside-the-job/` with a README;
+  the job directory again holds only what the fleet wrote. Its report agreed
+  with the reviewed one on every decision value.
+- Outcome, composition (means over items, fill set). The foreground is 26.5%
+  of the pixels (hand 3.6%, forearm 4.2%, hand without fit 0.4%, handled
+  objects 5.5%, other objects 12.8%) and 35% of SVT-AV1's bits at every CRF
+  (35.1–35.6%; accounting covers 93–99% of each stream's payload, the rest
+  is headers). Of the foreground's bits at CRF 48 / 62: hands 19.4 / 20.8%,
+  forearms 11.7 / 12.3%, hands without fit 1.5 / 1.6%, handled objects
+  29.1 / 27.0%, other objects 38.2 / 38.3%. In kbps at CRF 48 / 62: hands
+  77.4 / 23.4, forearms 56.9 / 16.9, handled objects 176 / 41.3, other
+  objects 232 / 62.5. Without the fill the foreground is 20.5% of the
+  pixels and objects are a smaller share (other 40%, handled 9% of the
+  foreground's pixels). DCVC-UF is not split by part.
+- Outcome, hands (WiLoR, 14,852 hand-frames). Fitted on 91.5% of
+  hand-frames; the unfitted ones are mostly small, partly visible hands
+  (median mask 19k pixels against 76k). Hand-side IoU median 0.767 over
+  fitted frames (mean of per-item medians 0.753), below 0.5 on 2.0%; whole
+  mask IoU median 0.50, because the forearm is half the mask: 49.7% of the
+  hand masks' pixels lie beyond the wrist (43% per fitted hand-frame; 7%
+  when the hand is at the image edge, where the wrist line is least
+  reliable). By condition: no flag 41% of frames, IoU 0.768, under 0.5 on
+  0.2%; occlusion ≥ 25% of the box 35%, 0.741, 4.8%; image edge 24%, 0.803,
+  2.8%; blur 10%, 0.756, 5.0%. Stability: root-relative joint acceleration
+  median 4.7 (left) / 5.0 (right) mm/frame², 2D keypoints 2.1 / 2.6% of the
+  box per frame², orientation change 1.9 / 2.1° per frame, 7 flips over 45°
+  in 13,404 consecutive pairs. Quantization (1°, 0.25 px, 0.002 log depth)
+  moves the projected joints by 1.00 px on average (95th percentile 1.73),
+  at the 1 px bound the method set, not under it. Parameter rate (entropy
+  of first differences): 165 bits per hand-frame, about 3.2 bits per value,
+  so 15.2 kbps per item against SVT-AV1's 23.4 kbps on hand pixels at
+  CRF 62 (65%) and 77.4 kbps at CRF 48 (20%).
+- Outcome, rigid motion (homography from flow; PSNR medians, means over
+  items). Frame to frame: other objects copy 29.1, homography 36.0, dense
+  flow 37.0 dB; handled objects 26.9, 32.7, 34.3; forearm 34.6, 40.0, 41.4;
+  hand 31.8, 37.8, 39.7. From a reference, at 30 dB with ≤ 20% uncovered:
+  held 70.8% (other), 49.9% (handled), 78.8% (forearm), 71.9% (hand) of
+  frames, but the chains are refreshed every few frames: median reference
+  life 0.04 s (other), 0.02 s (handled), 0.04 s (forearm and hand); weighted
+  by frames 0.10, 0.04, 0.24, 0.12 s; only 7.5% (other), 7.4% (handled),
+  32% (forearm) and 17% (hand) of frames lie in references that live 0.5 s.
+  No object label reaches a 0.5 s median life (best: toaster 0.21 s, one
+  item; tray 0.15 s; chopping board 0.08 s, sink 0.07 s), though some are
+  often held (toaster 93%, tray 91%, pot 88%, chopping board 85%). Error of
+  the frame-to-frame homography, as shares of its squared error: other
+  objects appearance 36%, deformation 33%, new pixels 14%, hand occlusion
+  10%, blur 7%; handled objects 28%, 27%, 17%, 10%, 18%. Caveat: EK-55
+  repeats some frames (10.5% of its frame pairs are near-identical, 44% on
+  one item), which flatters its frame-to-frame scores slightly.
+- Decision (by the rule; `h1-report.json`): **no part is worth a parametric
+  model by H1's thresholds.** Hands pass (a) bits and (b) fit but fail (c)
+  rate: their parameters cost 65% of SVT-AV1's bits on the same pixels at
+  CRF 62, against the 10% allowed. Forearms, handled and other objects pass
+  (a) and fail (b): references die within a tenth of a second (median life
+  0.02–0.04 s, rule 0.5 s), and handled objects are held on only half their
+  frames. The forearm is 49.7% of the hand masks, so by the rule H3 renders
+  it with the hand. No object class passes (b) on its own, so none is named
+  for H4.
+- Reading. The hypothesis is refuted on its main point: hands with forearms
+  carry a third of the foreground's bits, not most of them; objects carry
+  two thirds, and other (not handled) objects alone 38%. The competing
+  explanation (1) holds: large touched surfaces (pan, sink, hob, chopping
+  board, plate) that VISOR labels active objects are the largest part of
+  the foreground; their image motion is mostly the camera's, which G's background
+  should carry rather than H. As predicted, the forearm is large (half,
+  above the 30–40% guessed), WiLoR covers the hand side (median 0.77) and
+  fails mostly under occlusion and blur, and handled objects are poorly
+  explained (held 50%, life 0.02 s). Competing explanation (3) does not
+  hold: dense flow explains only 1–2 dB more than the homography, and most
+  of the error is appearance change and new pixels, which no motion model
+  explains. Hands are the only part close to passing, and the gap is rate,
+  not fit: WiLoR's per-frame estimates jitter (5 mm/frame²), so first
+  differences cost 3.2 bits per value; smoothing, coarser angles or a pose
+  subspace could plausibly bring the rate down severalfold, and at CRF 48
+  it is already 20% of the codec's bits on hands. That is H2's to measure
+  (temporal stability is one of its axes), not something H1 shows.
+- Order for H2–H4 (a judgement, since no part passed): H2 as planned, with
+  pose rate after temporal smoothing added to its stability axis; H3 hand
+  and forearm together, compared against coded pixels at equal rate, the
+  forearm rendered from the hand's pose and the mask's extent rather than
+  as a rigid layer (forearm references last 0.24 s frame-weighted); H4 as
+  briefed (rigid objects from a reference) has no support from H1: handled
+  objects stay pixels, and the static surfaces belong to G. H4 should be
+  rescoped or dropped before it runs; the user decides.
