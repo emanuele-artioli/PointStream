@@ -137,7 +137,10 @@ def homography(pa: np.ndarray, pb: np.ndarray) -> tuple[np.ndarray | None, np.nd
     none = np.zeros(len(pa), bool)
     if len(pa) < MIN_INLIERS:
         return None, none
-    H, inliers = cv2.findHomography(pa, pb, cv2.USAC_MAGSAC, RANSAC_PX, maxIters=5000, confidence=0.999)
+    try:
+        H, inliers = cv2.findHomography(pa, pb, cv2.USAC_MAGSAC, RANSAC_PX, maxIters=5000, confidence=0.999)
+    except cv2.error:  # a degenerate sample set: OpenCV's USAC raises instead of returning no model
+        return None, none
     if H is None or inliers is None:
         return None, none
     keep = inliers.ravel().astype(bool)
@@ -361,8 +364,11 @@ def translation_pair(lens: Lens, pa: np.ndarray, pb: np.ndarray) -> dict[str, An
         return None
     ua = lens.undistort(pa).astype(np.float32)
     ub = lens.undistort(pb).astype(np.float32)
-    H, h_in = cv2.findHomography(ua, ub, cv2.USAC_MAGSAC, RANSAC_PX, maxIters=5000, confidence=0.999)
-    F, f_in = cv2.findFundamentalMat(ua, ub, cv2.USAC_MAGSAC, EPIPOLAR_PX, 0.999, 5000)
+    try:
+        H, h_in = cv2.findHomography(ua, ub, cv2.USAC_MAGSAC, RANSAC_PX, maxIters=5000, confidence=0.999)
+        F, f_in = cv2.findFundamentalMat(ua, ub, cv2.USAC_MAGSAC, EPIPOLAR_PX, 0.999, 5000)
+    except cv2.error:  # degenerate matches: no test for this pair
+        return None
     if H is None or F is None or h_in is None or f_in is None:
         return None
     F = F[:3]

@@ -340,7 +340,10 @@ def analyse_clip(task: dict[str, Any]) -> dict[str, Any]:
             pa, pb = camera.match(feats[t], feats[t + delta])
             if len(pa) < camera.MIN_INLIERS:
                 continue
-            H, keep = cv2.findHomography(pa, pb, cv2.USAC_MAGSAC, 4.0, maxIters=5000, confidence=0.999)
+            try:
+                H, keep = cv2.findHomography(pa, pb, cv2.USAC_MAGSAC, 4.0, maxIters=5000, confidence=0.999)
+            except cv2.error:  # degenerate sample set (see camera.homography)
+                continue
             if H is not None and keep is not None and keep.sum() >= camera.MIN_INLIERS:
                 keep = keep.ravel().astype(bool)
                 pairs.append((pa[keep], pb[keep]))

@@ -163,3 +163,11 @@ def test_foreground_occlusion_lowers_coverage() -> None:
     cov = camera.coverage(lens, poses, times, lambda t: left if t < 5 else full, np.array([0.0, 4.0, 5.0]))
     curve = dict(zip(cov["warmups_s"], cov["curve"]))
     assert abs(curve[4.0] - 0.5) < 0.02 and curve[5.0] > 0.99
+
+
+def test_degenerate_matches_yield_no_fit_instead_of_raising() -> None:
+    # Identical points give OpenCV's USAC no model; that must read as "no fit".
+    same = np.full((60, 2), 100.0, np.float32)
+    H, _ = camera.homography(same, same)
+    assert H is None
+    assert camera.translation_pair(LENS, same, same) is None
