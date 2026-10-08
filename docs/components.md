@@ -52,9 +52,11 @@ inpainting. Steps G1–G5 in [PLAN](../PLAN.md#g-background-user-2026-10-08).
 
 ## 4. Foreground
 
-Per-object representation (appearance reference, pose or keypoints, mask),
-decoded generatively or as coded crops. A parametric trajectory is a candidate
-for the ball.
+Per object, an appearance reference sent once and compact motion parameters
+per frame (hand pose, an object's rigid motion), rendered at the client and
+composited over the background; what the model cannot explain falls back to
+coded pixels. A parametric trajectory is a candidate for the ball. Steps
+H1–H5 in [PLAN](../PLAN.md#h-foreground-user-2026-10-08).
 
 ## 5. Reconstruction
 

@@ -192,9 +192,8 @@ length, rate accounting (the one-time representation counted once, plus the
 per-frame camera pose and any residual, reported against how long the clip
 plays after the warm-up), quality on visible background only (dataset masks;
 occluded pixels have no truth), and render time per frame at the client.
-Baselines on the same background frames: SVT-AV1, DCVC-UF and VVC (VVenC is
-on the hosts as `/opt/local/bin/vvencapp`; the baseline decision is updated if
-VVC is added), plus PRESLEY-style degradation.
+Baselines on the same background frames: SVT-AV1 and DCVC-UF, plus
+PRESLEY-style degradation (VVC is an extension, after a working pipeline).
 **Done when** the protocol is fixed in experiments.md and the baselines'
 background curves come from recorded jobs.
 
@@ -225,21 +224,75 @@ baselines, render time included.
 **Done when** G3 and G5 are compared on rate, quality and render speed, and one
 background is chosen for PointStream.
 
-### H. Foreground encoding
+### H. Foreground (user, 2026-10-08)
 
-Design session ([components](docs/components.md#4-foreground)): an appearance
-vector plus keypoints per object. Hands are evaluated twice. On HOT3D the
-keypoints come from motion capture (an oracle upper bound). On VISOR they come
-from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). HaMeR and WiLoR are compared first; no published work compares them on
-egocentric video, so the result is a contribution and a paper table: 2D PCK on HInt
+The thesis: a pixel codec spends most of its bits on what moves, and people
+and the objects they handle move in ways computer vision already models.
+GenStream sent a skater as skeleton keypoints and rendered the person at the
+client. PointStream does the same per object: an appearance reference sent
+once (like the background's warm-up), then compact motion parameters per frame
+(hand pose, an object's rigid motion), rendered and composited over the
+background at the client. Whatever the model cannot explain (an object first
+seen, food being cut, a failed estimate) falls back to coded pixels, so every
+frame decodes. VISOR's hands include the forearm, which MANO does not model,
+and the hands carry most of the viewer's attention. Each step is one session.
+G and H are independent until H5, so their sessions can run side by side.
+
+#### H1. Foreground motion and representation audit (can run beside G1)
+
+What the foreground is and how much of it a parametric model could explain.
+On evaluation set v2: the foreground's share of pixels and of B2's bits
+(hands, forearms, handled objects, other objects); per object, how well a
+rigid 2D or 3D motion explains it frame to frame, and how much is
+deformation, appearance change, occlusion and motion blur; per hand, how
+well a hand-pose estimate re-projects onto the mask, and how much of the
+mask is forearm. An estimate of the parameter rate per object per second.
+**Done when** a recorded job says which foreground parts are worth a
+parametric model, which should stay pixels, and in what order to build them.
+
+#### H2. Hand-pose estimators: HaMeR against WiLoR
+
+The comparison already planned, a paper table on its own: 2D PCK on HInt
 VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
-the foreground reconstruction quality each gives. The literature does not
-settle it for egocentric video ([resources](docs/resources.md#models)). The gap between the two
-measures the cost of pose estimation.
+temporal stability on VISOR video. No published work compares them on
+egocentric video ([resources](docs/resources.md#models)). HOT3D's motion
+capture is the oracle that measures what pose estimation costs.
+**Done when** one estimator is chosen for PointStream, with numbers.
+
+#### H3. Hand and arm rendering
+
+From an appearance reference and the per-frame pose (H2), render the hand and
+forearm at the client: a textured MANO mesh, pose-conditioned generation, or
+a mesh with a learned residual; the forearm from the mask's extent or a
+simple arm model. Scored on VISOR foreground quality against coding the same
+pixels with SVT-AV1 at equal rate, with HOT3D's oracle poses as the upper
+bound, and on render time.
+**Done when** a hand renderer beats coded pixels at some rate, or the session
+shows why not.
+
+#### H4. Handled objects
+
+Per object: an appearance reference plus rigid motion where H1 shows it
+holds, coded pixels where it does not (deformable, transparent, cut or newly
+seen objects). How objects enter (first appearance) and how the reference is
+updated as they turn.
+**Done when** each object class H1 named has a representation chosen by numbers.
+
+#### H5. First working PointStream
+
+G's background and H's foreground in one bitstream with every byte counted:
+references once, then camera pose, hand pose and object motion per frame,
+plus the fallback pixels. Scored with B2's harness on evaluation set v2
+(weighted PSNR on dataset masks, with and without B1b's fill) against B2's
+curves, and timed end to end, which picks B2b's equal-time SVT-AV1 preset.
+**Done when** PointStream's curves and encode and decode times on all 34
+items come from recorded jobs, beside B2's.
 
 ### After a working pipeline
 
-Optimisation and training, ordered by what G and H show they need.
+Optimisation, training and extensions, ordered by what G and H show they need.
+VVC (VVenC, `/opt/local/bin/vvencapp` on the hosts) joins the baselines here
+(user, 2026-10-08: SVT-AV1 is enough until then).
 
 #### D1. Segmentation benchmark on VISOR and EgoHOS
 
