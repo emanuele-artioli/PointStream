@@ -151,41 +151,42 @@ the B1 set, optionally EK-55 clips scored on frames whose keyframes match the
 released JPEGs.
 **Done when** the curves come from a recorded job.
 
-### D1. Segmentation benchmark on VISOR and EgoHOS
+### P1. First working PointStream on VISOR (next)
 
-SAM 3.1 (text and prompted) and YOLOE-26 against the labels, per class, accuracy
-against speed. EgoHOS is scored on single images only. On VISOR: evaluation set
-v2, the "hold the first frame" floor (foreground J 0.459) as the table's first
-row, and every number with and without B1b's fill
-([Using VISOR](docs/resources.md#using-visor)).
-**Done when** the table is reproducible from a recorded job.
-
-### E1. Handled-object proposer
-
-A hand-object proposer trained on VISOR (contact relations) or EgoHOS (object
-orders) prompts SAM 3.1. Cross-tested on the other dataset and on HOT3D object
-masks. VISOR training follows [Using VISOR](docs/resources.md#using-visor):
-train split only, drift ≤ 1, no frames with a hand gap as targets.
-**Done when** cross-dataset numbers decide whether to commit to it.
-
-### F1. Training-data export
-
-VISOR foreground crops and masks per instance, plus background frames with the
-foreground removed, written by `python -m src.segmentation dataset` with
-provenance and each mask's drift; training admits drift of at most 1 frame.
-Background frames skip frames with a hand gap until B1b fills them
-([Using VISOR](docs/resources.md#using-visor)).
+The whole codec end to end with the simplest component that works at each
+stage, so every later step improves a pipeline that already runs and is
+scored. Before any optimisation (user, 2026-10-08).
+- Segmentation: SAM 3.1 as the encoder sees it (text prompts, causal), and
+  the dataset masks as an oracle variant that isolates the codec from
+  segmentation errors.
+- Background: the frame with the foreground removed (the simplest fill that
+  codes cheaply), encoded by an existing codec at low rate.
+- Foreground: coded crops of each object with its mask, at higher quality
+  (components 4, "decoded as coded crops"); the appearance-and-keypoint
+  representation comes in H.
+- Reconstruction: composite the decoded foreground over the decoded
+  background.
+- Rate: every byte the decoder needs, masks included; scored with B2's
+  harness on evaluation set v2 (weighted PSNR on dataset masks, with and
+  without B1b's fill), against B2's curves.
+- Timing: PointStream's encode time per window on the host class B2b J2
+  timed, which picks B2b's equal-time SVT-AV1 preset and releases B2b's
+  remaining runs.
+**Done when** PointStream's curves on all 34 items come from recorded jobs,
+beside B2's, with the encode time per window.
 
 ### G. Background encoding
 
-Design session ([components](docs/components.md#3-background)). Candidates are
+Design session ([components](docs/components.md#3-background)), replacing
+P1's background. Candidates are
 DCVC-UF, a panorama/mosaic, and SVT-AV1. Egocentric video is the hard
 case for a panorama: the head moves constantly and the scene is close, so there
 is parallax.
 
 ### H. Foreground encoding
 
-Design session ([components](docs/components.md#4-foreground)): an appearance
+Design session ([components](docs/components.md#4-foreground)), replacing
+P1's coded crops: an appearance
 vector plus keypoints per object. Hands are evaluated twice. On HOT3D the
 keypoints come from motion capture (an oracle upper bound). On VISOR they come
 from a hand-pose estimator, HaMeR or WiLoR (what deployment sees). HaMeR and WiLoR are compared first; no published work compares them on
@@ -194,6 +195,40 @@ VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
 the foreground reconstruction quality each gives. The literature does not
 settle it for egocentric video ([resources](docs/resources.md#models)). The gap between the two
 measures the cost of pose estimation.
+
+### After a working pipeline
+
+Optimisation and training, ordered by what P1, G and H show they need.
+
+#### D1. Segmentation benchmark on VISOR and EgoHOS
+
+Moved after P1 (user, 2026-10-08): SAM 3.1 already segments well enough to
+build on, and choosing a faster segmenter is an optimisation that needs the
+pipeline's own timing.
+
+SAM 3.1 (text and prompted) and YOLOE-26 against the labels, per class, accuracy
+against speed. EgoHOS is scored on single images only. On VISOR: evaluation set
+v2, the "hold the first frame" floor (foreground J 0.459) as the table's first
+row, and every number with and without B1b's fill
+([Using VISOR](docs/resources.md#using-visor)).
+**Done when** the table is reproducible from a recorded job.
+
+#### E1. Handled-object proposer
+
+A hand-object proposer trained on VISOR (contact relations) or EgoHOS (object
+orders) prompts SAM 3.1. Cross-tested on the other dataset and on HOT3D object
+masks. VISOR training follows [Using VISOR](docs/resources.md#using-visor):
+train split only, drift ≤ 1, no frames with a hand gap as targets.
+**Done when** cross-dataset numbers decide whether to commit to it.
+
+#### F1. Training-data export
+
+VISOR foreground crops and masks per instance, plus background frames with the
+foreground removed, written by `python -m src.segmentation dataset` with
+provenance and each mask's drift; training admits drift of at most 1 frame.
+Background frames and segmenter targets skip frames with a hand gap (B1b
+found no hand fill fit for them; excluding keeps 75% of admitted train
+frames, [Using VISOR](docs/resources.md#using-visor)).
 
 ## Phase 2: racket sports
 
