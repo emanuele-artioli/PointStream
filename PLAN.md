@@ -221,8 +221,11 @@ fixes it. On G1's pairs, where one reference serves for seconds, no
 depth-aware warp brings VISOR's background under 2 px on a meaningful share
 of frames. That holds for a few planes, triangulated keyframe depth, and even
 dense flow on epipolar lines: median clip 34% of window frames and 9% of
-stretch frames. So DA3 and depth-augmented keyframes were not run. A
-background sent once and reused for seconds is ruled out. With a fresh
+stretch frames. So DA3 and depth-augmented keyframes were not run. For
+egocentric video, a background sent once and reused for seconds is ruled out.
+Racket sports are unaffected: G1 found their fixed cameras hold a panorama
+(OpenTTGames 6 of 7 clips, with the first frame already showing 90% of every
+later background). With a fresh
 reference (under 0.1 s), though, the best static warp explains 70% of window
 frames and four planes 49%. So the open question is the refresh rate and its
 cost, not depth ([experiments](docs/experiments.md)).

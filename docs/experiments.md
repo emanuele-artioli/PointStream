@@ -1375,7 +1375,10 @@ invocation turns out to be needed.
 - After review (2026-10-09). (1) *Scope of the verdict.* The rule judged G1's
   pairs, where a frame keeps one reference for up to 4.8 s on the windows
   and seconds on the stretches. It rules out a background sent once and
-  reused for seconds. It says nothing about references kept fresh. Binned by
+  reused for seconds *on VISOR*. Racket sports are outside it: G1 found
+  their fixed cameras hold a panorama sent once (OpenTTGames 6 of 7 clips,
+  first frame already 90% of every later background). It says nothing about
+  references kept fresh. Binned by
   the age of the reference (`g1d ages`, from the two runs' published
   results, no new computation; `ages-fc4ccdf/g1d-ages.json` `ad72bbe5…f6ef`):
 
