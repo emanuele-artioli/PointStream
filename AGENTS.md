@@ -69,8 +69,10 @@ operating point the decision needs. It must dominate the components it gates.
 If it fails the rule, the component is not built. Then run a correctness smoke
 in minutes, a bounded pilot on the one axis that matters, and only then the
 scaled run. Start every sweep with the fewest settings that give a rough answer
-(three, not six), and add points only where the answer is unclear. Smokes,
-oracles and pilots finish within 45 minutes. Stop when the decision is made.
+(three, not six), and add points only where the answer is unclear. Every stage
+the agent waits on ends within 45 minutes: smokes, oracles and pilots by
+scope, and longer runs split into parts that each save every finished item.
+Stop when the decision is made.
 Rank by value to the paper first and the demo second. Details are in the
 [protocol](docs/experiments.md#protocol).
 

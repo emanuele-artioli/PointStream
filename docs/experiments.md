@@ -36,10 +36,15 @@ the paper first and the demo second.
    negative results.
 
 **Waiting time.** The agent's context stays cheap to resume for about an
-hour. A smoke, an oracle or a pilot is therefore sized to finish within 45
-minutes, which smokes already meet (fleet caps them at 600 s). A full run may
-take longer: it checkpoints per item, and the agent reads its results when
-it ends.
+hour. Every stage the agent waits on is therefore sized to end within 45
+minutes. Smokes meet this already (fleet caps them at 600 s), and oracles and
+pilots are scoped to it. A full run that needs longer is split into parts of
+at most 45 minutes: shards of its items, one job each, with the same
+specification apart from the item selection. Each part saves every finished
+item ([fleet](fleet.md#checkpoints)), so a crash or a GPU taken by another user
+loses at most the item in progress. The agent reads each part's results as it
+ends and decides whether the next part is still needed, so a decision reached
+early also stops the run early.
 
 Fleet runs follow [fleet](fleet.md): a smoke of at most 600 s, a validator with
 substantive checks, sha256-identified inputs, a deadline and a budget.
