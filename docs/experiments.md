@@ -2050,3 +2050,21 @@ invocation turns out to be needed.
   better (size ratio 0.98 against 0.89). PA-MPJPE removes the orientation,
   which a renderer needs; the report gives orientation error and
   wrist-aligned MPJPE beside the pre-registered contests.
+- Full HInt `20261009T220226Z-958cda4e` (gpu2, RTX A6000; all 3,660 test
+  hands; 849 s; validator 10/10). PCK@0.05 / 0.10 / 0.15, all joints, as
+  pre-registered (distance over the longer side of HInt's `bbox` grown to
+  3:4): VISOR frames HaMeR 51.3 / 82.3 / 92.5, WiLoR 55.2 / 84.7 / 93.9
+  (difference −3.8, 95% CI −4.5 to −3.2: WiLoR wins); New Days HaMeR 58.1 /
+  84.3 / 92.4, WiLoR 56.6 / 83.9 / 92.6 (+1.6, CI +1.0 to +2.2: HaMeR wins).
+  **The anchor fails**: HaMeR's 51.3 is outside 40–47, so by the rule the
+  estimator decision stops here. Every published HaMeR number is 7–9
+  points lower (all, visible and occluded; both sets), a uniform shift
+  that points at the normalising box, not the model: HInt's `bbox` is
+  padded, 1.24× the extent of the labelled keypoints (median, both axes).
+  Normalised by the keypoints' extent instead (same 3:4 growth), HaMeR
+  scores 39.6 on VISOR frames (paper 43.0) and 48.9 on New Days (paper
+  48.0), WiLoR 43.8 and 47.5; the remaining VISOR gap is plausibly the
+  input crop (HaMeR's evaluation crops around its own box; this run feeds
+  HInt's to both models). Under either normalisation the order is the
+  same: WiLoR ahead on VISOR frames by about 4 points, HaMeR ahead on New
+  Days by about 1.5. How to proceed is the user's decision.
