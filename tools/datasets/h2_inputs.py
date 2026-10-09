@@ -175,8 +175,9 @@ def main() -> int:
     clip_staged = []
     for clip in clips:
         name = f"hot3d_{clip['name'][:-4]}"
-        clip_args += ["--hot3d-clip", f"{{staged:{name}}}"]
-        clip_staged.append(staged[name])
+        entry = dict(staged[name], name=f"hot3d_{clip['name'][5:11]}")  # staged names are identifiers
+        clip_args += ["--hot3d-clip", f"{{staged:{entry['name']}}}"]
+        clip_staged.append(entry)
     participants = len({c["participant"] for c in clips})
     specs["hot3d-pilot"] = spec("hot3d", "pilot", [*clip_args, "--clips", "{clips}", "--frames", "{frames}"], clip_staged,
                                 {"clips": {"smoke": 1, "full": participants}, "frames": {"smoke": 30, "full": 150}},
