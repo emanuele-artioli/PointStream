@@ -128,6 +128,7 @@ record = {
 }
 pathlib.Path(sys.argv[1]).write_text(json.dumps(record, indent=2) + "\n")
 EOF
+"$ENV_DIR/nvrc.sh" "$PREFIX" "$WORK"
 
 fi
 

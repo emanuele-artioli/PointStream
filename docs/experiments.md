@@ -1683,6 +1683,186 @@ invocation turns out to be needed.
   Egocentric background work moves to G5. The parked options and what
   would reopen them are in PLAN (G1e).
 
+### 2026-10-09 — G5 oracle: the best a neural background model could do on VISOR
+- Question (PLAN G5, after G1e): could a neural background model beat
+  SVT-AV1 at equal rate on VISOR's visible background? G5's candidates store
+  the background in a per-scene model's weights and send one latent per
+  frame. G1e adds a second one: a model conditioned on a reference that is
+  refreshed every 0.1 s and warped to the frame, which then only has to
+  code what G1e found left after a fresh reference (photometric change and
+  independent motion). Training a G5 model is gated on this oracle.
+- Clips. G1d's prepared archive (`20261009T075810Z-295529d4`,
+  `published.tar` `5a9c47db…5d62`; 960×540, lossless). *Windows*: all 34,
+  every frame (240 frames, 4.0 s at 59.94 or 4.8 s at 50 frames/s).
+  *Stretches*: the 10 of G1d, each cut to a 24 s excerpt (240 frames at
+  10 frames/s) that starts at the stretch's first evaluation-window frame,
+  moved earlier to fit. This rule is fixed before any run and is blind to
+  content. It keeps the window's frames, which carry VISOR's dense masks,
+  inside the excerpt. A whole 120 s stretch would cost five times the GPU
+  time, and a model has to cover new background as the clip goes on (G1,
+  G1d), so its bytes grow with length too.
+- Operating point: 960×540, as stored. Every method codes the same frames
+  and is scored against the same RGB frames. This is G1's analysis
+  resolution, not VISOR's 1080p. A pass here would be checked at 1080p
+  before anything is built on it.
+- Protocol, from G2's (branch `claude/pointstream-g2-background-protocol`
+  at `c99aaab`; the G2 session could not be reached, so its text is taken as
+  written and adapted to VISOR as G2 anticipates). *Rate* over the clip's
+  length: every byte a method sends for the clip, divided by its duration.
+  Egocentric video has no warm-up that pays off (G1, G1d), so every method
+  codes the clip from its first frame, and the baselines pay for their
+  intra frame. *Quality* on visible background V, the complement of the
+  dilated foreground, as G1d stored it. On the windows that is VISOR's
+  dense masks with B1b's fill. On the stretches it is G1's `sam_text`
+  foreground, plus VISOR's dense masks on the window frames (G1e's
+  `window_dense`, dilated as in G1). PSNR_V comes from exact
+  squared-error sums in RGB. LPIPS (AlexNet) is averaged over V, with F
+  pasted back from the source (G2). A clip's score is the mean over its
+  scored frames. On the windows all 240 frames are scored, against the
+  dataset masks. On the stretches the window frames are scored against
+  the dataset masks, which the gate reads. All 240 frames are also scored
+  against `sam_text`, as a check. Clips are the samples. *Render time* per
+  frame at the client: NVRC's decode from its bitstream (model forward),
+  B's sequential rollout including the warp, and dav1d for SVT-AV1, each
+  on one host class.
+- Baselines (CPU), on the same frames: SVT-AV1 4.2.0 preset 4, random
+  access, one keyframe (`--keyint -1`), CRF 32, 40, 48, 54, 59 and 63, 4:2:0
+  8-bit full range (BT.709), on two inputs. *Frame* is the source as is.
+  *Filled* has the foreground inpainted per frame (OpenCV Telea, radius 5),
+  which is smooth and cheap to code. The gate's baseline at each rate is
+  the better of the two inputs: the upper envelope of both inputs' points.
+  The RGB→4:2:0→RGB round trip of the source is scored as the baselines'
+  ceiling (the oracles output RGB directly). DCVC-UF HT-L (B2's
+  configuration, QP 9, 27, 45 and 63) runs on the pilot clips' filled input
+  for the comparison, not for the gate.
+- **Arm A, per-scene implicit model: NVRC** (Kwan et al., NeurIPS 2024,
+  `hmkx/NVRC` @ `ccc432d`, MIT). It is the strongest public implicit
+  video codec: a HiNeRV-v2 representation trained end to end for rate and
+  distortion, with entropy-coded weights and grids written to a real rANS
+  bitstream. Config: HiNeRV-v2 at the size of NVRC's smallest model,
+  channels 224/112/56/28. Upsampling 5·3·2·2 (540 and 960 divide only by
+  multiples of 60) and a base grid of 80×9×16×6, its value count scaled
+  from the 1080p configuration by pixels times frames. NVRC's own schedule:
+  360 epochs, then 30 with rate fine-tuning (`s1-360e`, `s2-30e`), with
+  180×120 patches in batches of 96 (2.1 Mpx per step, as its 120×120 × 144
+  at 1080p). The loss is mean squared error on V only. A fourth PNG
+  channel marks V, and F takes the output's own value, so it adds no
+  error (`env/patches/nvrc-pointstream.patch`). Rate = the bitstream's
+  bytes. Quality is scored on the frames decoded from that bitstream.
+  Three settings, λ = 50, 200 and 800 (×4 apart). Dev check: SVT-AV1
+  spends about 0.01–0.02 bits per pixel here, and λ in that range targets
+  it.
+- **Arm B, model conditioned on a refreshed warped reference** (written for
+  G5: `experiments/background/g5.py`, PyTorch only). The reference is the
+  model's own output at the last refresh point before the frame. Refresh
+  points are every 0.1 s, so on the windows a frame's reference is 1–6 frames
+  old, and on the stretches (10 frames/s) it is the previous frame. The
+  reference is warped by the dense DIS flow from the source frame to the
+  source reference, and priced as `planes4`, 128 bytes per frame. A
+  sendable warp can only be worse (G1e: `epi`, the dense flow on epipolar
+  lines, matches the oracle on 95–100% of pairs). A decoder upsamples a
+  per-frame latent (45×80×c, c = 4) by 3·2·2, with features of the warped
+  reference concatenated at every scale, and blends a synthesised image
+  with the warped reference through a predicted weight. The first frame
+  has no reference. Latents are fitted directly (an auto-decoder, which
+  bounds any encoder for the same decoder) under uniform-noise
+  quantization and a learned factorized Laplace prior per channel. Rate =
+  latents (their ideal code length under that prior, plus the prior at 32
+  bits per value) + weights (8-bit uniform quantization per tensor, priced
+  at its empirical entropy plus a 32-bit scale per tensor; scored with the
+  quantized weights) + motion. Training runs closed loop, as the decoder
+  runs: refresh groups go in time order every epoch, with the current
+  outputs as references (detached), for 300 epochs. The loss is λ·MSE on V
+  plus rate, with λ = 50, 200 and 800 (rate per pixel, as in NVRC).
+  Evaluation is a fresh sequential rollout with the quantized latents and
+  weights.
+- Why these are bounds, and what each bounds. Both arms are fitted to the
+  very frames they are scored on. A G5 model would be fitted to a warm-up
+  and then render later frames, while G1 and G1d show that egocentric
+  background keeps changing. Both see a loss only on V, so they need no
+  clean frames (G4) and spend nothing on the foreground. Neither pays for
+  a foreground fill, which the filled baseline does. Both output 4:4:4 RGB.
+  - A bounds G5's per-scene model class (HNeRV-style "weights once, one
+    latent per view"): it is that class's strongest published member,
+    with its own rate-distortion training and a real bitstream. It does
+    not bound a future implicit architecture that beats NVRC.
+  - B bounds a reference-conditioned model with a sendable warp and a
+    0.1 s refresh. Its motion is the dense flow of the source frames,
+    priced as the cheapest sendable warp, and it is fitted to the scored
+    frames. It does not bound other conditional architectures. DCVC-UF
+    given a render as its reference is G2's residual arm (b), tested
+    under G3.
+  - DCVC-UF fine-tuning (a PLAN G5 candidate) is not gated here. Its
+    starting point is the DCVC-UF baseline above.
+  - *Convergence check*: NVRC's log of rate and PSNR at every 30-epoch
+    evaluation, and B's every 30 epochs. A run whose last interval still
+    gains more than 0.3 dB at equal rate (or saves more than 10% rate at
+    equal PSNR) is flagged as not converged. A loss from a flagged run does
+    not count toward a verdict of "ruled out".
+- Decision rule (`g5.DECISION`, fixed before any fleet run). Per clip and
+  arm, BD-rate on PSNR_V (Bjøntegaard, piecewise cubic in log rate,
+  over the overlapping quality range) against the baseline envelope. With
+  less than 0.5 dB of overlap, the arm is *dominated* if every arm point
+  lies below the envelope (or below its lowest-rate point, at a higher
+  rate), and dominated counts as +∞. Otherwise the clip is *unclear*, and
+  one more λ is added toward the overlap (protocol step 4).
+  1. *Pilot* (G1d's pilot clips: windows P02_12 and P03_120, stretch
+     P26_02; three λ per arm). Per arm:
+     - *Ruled out*: BD-rate ≥ +100% (or dominated) on all three pilot
+       clips, from converged runs. The arm is not scaled, and its G5
+       component is not trained. Why three clips can decide: two codecs'
+       per-item BD-rates on VISOR spread from −55% to +77% around their
+       median (B2). A median below 0 over 44 clips is implausible when
+       three clips all sit at +100% or worse, against a generous oracle.
+     - *Candidate*: BD-rate < 0 on at least one pilot clip, or between 0
+       and +100% on any. The arm's oracle runs on the other 41 clips
+       ("the rest"). Its cost, about 0.7 GPU-hours per clip and setting
+       for A, is beyond this entry's budget, so it needs the user's
+       authorization first.
+  2. *Gate* (after the rest): per arm and group (windows, stretches), the
+     median clip's BD-rate < 0. Only then is the arm's real G5 component
+     built: fitted on warm-up frames and rendering later frames, with a
+     smoke and a pilot of its own. An arm that passes in one group only
+     scopes G5 to that group.
+  3. LPIPS on V, render time and DCVC-UF are reported beside the gate. They
+     do not change it.
+- Hypothesis. A, NVRC, is ruled out on the windows. A 4 s clip leaves its
+  weights nothing to amortize over, and its published advantage is on
+  600-frame sequences of slower content. Every window will need more than
+  twice SVT-AV1's rate. The stretch excerpt (24 s at 10 frames/s) does
+  better, but still above +50%. B is a candidate on the windows (between
+  0 and +100%), because the reference carries most of each frame. On the
+  stretch it is worse: one frame is 0.1 s there, and G1e explained only
+  51% of stretch pairs at that age.
+- Competing explanation. If the arms lose, the cause could be their
+  training rather than the class: too few iterations for 240 frames (the
+  convergence check tests this), the 540p operating point, or drift in B's
+  closed loop (its rollout is reported against the training loss). If an
+  arm wins, the cause could be its generosity rather than a real model's
+  ability: fitting to the scored frames, the loss on V only, oracle
+  motion, 4:4:4 output. That is why a pass leads to the real component's
+  own smoke and pilot, not to its adoption.
+- Environment: NVRC is audited into the one environment
+  ([resources](resources.md#environments)): `compressai` 1.2.8,
+  `accelerate` 1.3.0, `pytorch-msssim` 1.0.0 and `compressai`'s
+  `torch-geometric` 2.8.0.post1 (with `pandas` 3.0.6 and `xxhash` 4.0.1),
+  installed without dependencies over torch 2.10.0+cu128, plus NVRC
+  vendored in `opt/NVRC` with the patch. Dev checks on gpu6 (RTX 6000 Ada,
+  not evidence): NVRC trains P02_12 at 31 frames/s with a 5.2M-parameter
+  model (fp16, Inductor), which puts its schedule at about 50 min per run.
+  It writes and decodes its bitstream (49.9 Mbit after 6 of 390 epochs,
+  at 22.8 dB), and decodes at about 120 frames/s. On P02_12, SVT-AV1 gives
+  35.2 dB (whole frame) at 317 kbps (CRF 60) and 37.5 dB at 690 kbps
+  (CRF 50).
+- Budget. Baselines: one CPU job of ≤ 45 min (44 clips × 2 inputs × 6 CRF),
+  plus DCVC-UF on the 3 pilot clips (≤ 20 min, one GPU). Smoke ≤ 600 s per
+  arm: one window, 48 frames, 2 epochs, bitstream and scoring. Pilot: 9 A
+  runs and 9 B runs, one GPU each, every run ≤ 45 min (if the smoke times
+  A's schedule above 45 min, stage 1 and stage 2 run as separate jobs,
+  resumed from NVRC's checkpoint). Ceiling 12 GPU-hours and 6 h wall for
+  this entry. The rest is outside this ceiling.
+- Jobs and outcome: below, as they finish.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)

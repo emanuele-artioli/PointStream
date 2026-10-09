@@ -23,5 +23,12 @@
     "url": "https://github.com/rolpotamias/WiLoR",
     "revision": "fcb911312a38fa8badd30d9656a167485d61b8f9",
     "path": "opt/WiLoR"
+  },
+  "NVRC": {
+    "url": "https://github.com/hmkx/NVRC",
+    "revision": "ccc432d21bdb6a04a453de588c12396d16af0d81",
+    "path": "opt/NVRC",
+    "patch": "env/patches/nvrc-pointstream.patch",
+    "patch_sha256": "2d7432474e019fc22a01168fa4443be11ba5a1c32557d9cb71645cbaadaa583b"
   }
 }

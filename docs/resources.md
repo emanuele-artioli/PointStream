@@ -334,6 +334,14 @@ Packed for fleet staging: `pointstream-data/environments/pointstream-20261006T11
 sha256 `44835688156ec6dd5a96ae068e636bb65174597a8ca5f34a6efc33b12bd751b9`
 (4.9 GB; 8.5 GB unpacked). Built from the recipe alone on gpu6, 2026-10-06, at commit `fa68777`.
 
+Current pack, with G5's NVRC: `pointstream-data/environments/pointstream-20261009T214002Z.tar.gz`,
+sha256 `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661` (4.9 GB). It
+is the 2026-10-06 pack extended on gpu6, 2026-10-09: a copy of its prefix, plus the
+six packages at the end of `env/no-deps.txt` installed without dependencies, plus
+`env/nvrc.sh`. The recipe now does both (`env/build.sh`), and the locks differ from
+the 2026-10-06 locks by exactly those six packages and `opt/NVRC`. Earlier jobs keep
+naming the pack they ran with.
+
 **Components and what they pin**
 
 | Component | Source | Stated requirements | In the environment |
@@ -346,6 +354,7 @@ sha256 `44835688156ec6dd5a96ae068e636bb65174597a8ca5f34a6efc33b12bd751b9`
 | WiLoR | `opt/WiLoR` @ `fcb9113` | Python 3.10, torch cu117, ultralytics==8.1.34, chumpy | vendored tree on `sys.path` (no packaging) |
 | DCVC-UF | `opt/DCVC` @ `cbdae87`, CUTLASS v4.4.1 | Python>=3.12, torch 2.9.1 and CUDA 13.0 tested, extensions built for the build host's GPU | two extension builds in `opt/dcvc-extensions/` |
 | SVT-AV1 | conda-forge `svt-av1` 4.2.0, `ffmpeg` 8.1, `dav1d` 1.5 | — | `SvtAv1EncApp`, `dav1d`, `ffmpeg` on the prefix's `bin` |
+| NVRC (G5 oracle) | `opt/NVRC` @ `ccc432d`, `env/patches/nvrc-pointstream.patch` | Python 3.13, torch 2.6.0 cu124, compressai==1.2.6, accelerate==1.3.0, pytorch-msssim==1.0.0, timm==0.9.16, deepspeed==0.16.2 | torch 2.10 and timm 1.0.30 as installed; compressai 1.2.8 (conflict 9); deepspeed left out (patched optional); run as a script from its directory |
 
 **Conflicts and their resolution**
 1. *CUDA.* DCVC-UF is tested on CUDA 13.0; every host runs driver 535 (CUDA
@@ -374,6 +383,17 @@ sha256 `44835688156ec6dd5a96ae068e636bb65174597a8ca5f34a6efc33b12bd751b9`
 8. *Two packages named `src`.* DCVC's top-level package collides with
    PointStream's. The worker interface (one process per encode or decode,
    JSON plan in, JSON report out) keeps them apart in the same environment.
+9. *NVRC's pins* (G5, 2026-10-09). compressai 1.2.6 has only a source archive,
+   whose build fails here; 1.2.8 has a cp312 wheel (manylinux_2_34; the hosts
+   run glibc 2.35) with the same entropy-model, rANS and transform API. Its
+   resolver would replace torch, so compressai and its import-time
+   `torch-geometric` (with `pandas` and `xxhash`) are installed without
+   dependencies; its declared `pybind11` and `tomli` are build-time only and
+   appear in `pip check`. NVRC's torch 2.6 and timm 0.9.16 pins are its
+   authors' setup; it trains and writes and decodes its bitstream under
+   torch 2.10 and timm 1.0.30 (dev check on gpu6, Ada). deepspeed serves only
+   a FLOPs profiler; the patch makes it optional, and makes a fourth PNG
+   channel mask the training loss.
 
 **Earlier environments.** `~/.conda/envs/pointstream` (Python 3.10, torch
 2.2.2) stays as the interpreter of the fleet workers and the dispatcher only;

@@ -1,0 +1,72 @@
+diff --git a/main_utils.py b/main_utils.py
+index facf716..0753c56 100644
+--- a/main_utils.py
++++ b/main_utils.py
+@@ -20,7 +20,8 @@ dynamo.config.verbose = True
+ dynamo.config.cache_size_limit = 24
+ dynamo.config.compiled_autograd = True
+ 
+-deepspeed.utils.logger.setLevel('WARNING')
++if deepspeed is not None:
++    deepspeed.utils.logger.setLevel('WARNING')
+ 
+ 
+ @dataclass
+@@ -329,7 +330,7 @@ def profile_model(logger, model, loader, task, get_macs=True):
+             for k in num_params_detailed:
+                 logger.info(f'    {k}: {num_params_detailed[k] / 10**6:.2f}M')
+ 
+-        if get_macs:
++        if get_macs and deepspeed is not None:
+             # Compute MACs
+             _profile_model = _ProfilingModel(model)
+             _profile_model.eval()
+diff --git a/tasks.py b/tasks.py
+index 98b1b8f..845c076 100644
+--- a/tasks.py
++++ b/tasks.py
+@@ -10,6 +10,8 @@ class OverfitTask:
+         self.logger = logger
+         self.video = video
+         self.channels = self.video.get_num_channels()
++        # PointStream: a 4th (alpha) channel marks the pixels the loss may see (255) and those it ignores (0).
++        self.masked = self.channels == 4
+ 
+         self.loss_cfg = [1.0, loss_cfg[0]] if len(loss_cfg) == 1 else loss_cfg
+         self.metric_cfg = metric_cfg
+@@ -78,7 +80,7 @@ class OverfitTask:
+                 math.prod(self.get_patch_size()[1:]) / math.prod(self.get_video_size()[1:]),
+             'video_size': (self.get_num_frames(),) + self.get_video_size()[1:],
+             'patch_size': self.get_patch_size(),
+-            'channels': self.video.get_num_channels()
++            'channels': 3 if self.masked else self.video.get_num_channels()
+         }
+ 
+         return inputs, x
+@@ -111,6 +113,10 @@ class OverfitTask:
+         inputs, target = self.parse_batch(batch)
+         output = model(inputs, compute_outputs=True, compute_rates=False)
+         output = self.parse_output(output)
++        if self.masked:
++            # Ignored pixels take the output's own (detached) value, so they add no error and no gradient.
++            keep = (target[:, 3:4] > 0.5).to(output.dtype)
++            target = target[:, :3] * keep + output.detach() * (1. - keep)
+         loss = self.compute_d_loss(output, target, inputs['lamb'])
+         metrics = self.compute_metrics(output, target)
+         return inputs, target, output, loss, metrics
+diff --git a/utils.py b/utils.py
+index 03df9a2..0303d5c 100644
+--- a/utils.py
++++ b/utils.py
+@@ -25,7 +25,10 @@ import torch._dynamo as dynamo
+ 
+ import torchvision
+ import compressai
+-import deepspeed
++try:
++    import deepspeed
++except ImportError:  # PointStream: only the optional FLOPs profiler uses it
++    deepspeed = None
+ 
+ import timm
+ from timm.optim import create_optimizer_v2, optimizer_kwargs
