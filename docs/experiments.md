@@ -1764,7 +1764,10 @@ invocation turns out to be needed.
   per-frame latent (45×80×c, c = 4) by 3·2·2, with features of the warped
   reference concatenated at every scale, and blends a synthesised image
   with the warped reference through a predicted weight. The first frame
-  has no reference. Latents are fitted directly (an auto-decoder, which
+  has no reference. Its widths (32, 24, 16, 12 at λ = 200 on 240 frames;
+  about 110k parameters) scale with the square root of the frame count and
+  the fourth root of λ, because its weights are priced over the clip's
+  frames and so belong to the rate point. Latents are fitted directly (an auto-decoder, which
   bounds any encoder for the same decoder) under uniform-noise
   quantization and a learned factorized Laplace prior per channel. Rate =
   latents (their ideal code length under that prior, plus the prior at 32
@@ -1855,12 +1858,32 @@ invocation turns out to be needed.
   35.2 dB (whole frame) at 317 kbps (CRF 60) and 37.5 dB at 690 kbps
   (CRF 50).
 - Budget. Baselines: one CPU job of ≤ 45 min (44 clips × 2 inputs × 6 CRF),
-  plus DCVC-UF on the 3 pilot clips (≤ 20 min, one GPU). Smoke ≤ 600 s per
-  arm: one window, 48 frames, 2 epochs, bitstream and scoring. Pilot: 9 A
-  runs and 9 B runs, one GPU each, every run ≤ 45 min (if the smoke times
-  A's schedule above 45 min, stage 1 and stage 2 run as separate jobs,
-  resumed from NVRC's checkpoint). Ceiling 12 GPU-hours and 6 h wall for
-  this entry. The rest is outside this ceiling.
+  plus DCVC-UF on the 3 pilot clips (≤ 20 min, one GPU). Pilot: 9 A runs
+  and 9 B runs, one GPU each, every job ≤ 45 min. Ceiling 12 GPU-hours and
+  6 h wall for this entry. The rest is outside this ceiling.
+- Before any fleet run (dev checks on gpu6, RTX 6000 Ada, packed
+  environment `pointstream-20261009T214002Z`; not evidence). The three
+  commands run end to end on the pilot clips, and their validators pass.
+  - *Baselines.* On 48 frames, P26_02's excerpt starts at its first frame
+    and holds 40 dense-mask frames. The 4:2:0 round trip of the source
+    scores 49–52 dB on V.
+  - *A's timing.* The 2.26M-parameter model trains at 40 frames/s compiled
+    (Inductor) and 25 frames/s eager. Every compile costs about 5 min per
+    stage. One run (240 frames × 390 epochs) is therefore about 48 min
+    compiled and 62 min eager, beyond the 45-minute limit. So each A run is
+    two jobs. *Part 1* is stage 1 (360 epochs, compiled, about 41 min),
+    on RTX 6000 Ada only: an A6000 is slower and would overrun. It
+    publishes its checkpoint and its training log. *Part 2* is stage 2
+    (30 epochs, eager: they do not repay a compile), the bitstream, its
+    decode and the scores, on Ada or A6000, from part 1's checkpoint.
+    Smokes: part 1 on 48 frames for 2 epochs (about 6 min, mostly
+    compiling); part 2 on the full 240 frames from part 1's checkpoint for
+    1 epoch.
+  - *B's timing.* About 6 s per epoch on a stretch (240 refresh groups of
+    one frame), so 300 epochs take about 30 min. Windows (40–48 groups) are
+    faster. Its first dev size scaled with duration and gave the stretch
+    560k parameters, 160 kbps of weights alone. The size now scales with
+    the frame count (above).
 - Jobs and outcome: below, as they finish.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
