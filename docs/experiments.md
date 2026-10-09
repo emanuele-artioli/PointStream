@@ -2075,3 +2075,18 @@ invocation turns out to be needed.
   wins). Reported beside them: wrist-aligned MPJPE 20.1 and 29.7 mm, MPVPE
   19.2 and 28.2 mm, 2D error 6.8% and 7.0% of the box, median global
   orientation error 7.6° and 14.7°.
+- Coding dev check (not evidence: `h2 code` on the two pilots' outputs, gpu6
+  CPU, code `2611942`; 45 s). It found a crash on tracks shorter than the
+  Gaussian window (fixed, with a test). Values: H1's coding (q1, previous,
+  every frame) costs 12.6 kbps (HaMeR) and 12.4 (WiLoR) on the four VISOR
+  pilot items (H1: 15.2 on all 34). For HaMeR the rule chooses 6.5 kbps at
+  0 ms (q4) and 1.7 kbps at 100 ms (Gaussian 33 ms, 15 Hz linear, q8; VISOR
+  IoU 0.790 uncoded → 0.781). For WiLoR it chooses nothing at any budget:
+  the shape is sent once (the track's median betas) while the uncoded
+  reference keeps each frame's, and WiLoR's betas vary much more than
+  HaMeR's, so even at half H1's step its 2D error against the truth is
+  5.4% above the uncoded one (HaMeR 0.1%), past the 5% limit before any
+  pose coding. One-Euro at these cutoffs lags fast hands (2D error 31 px
+  against 14); centred smoothing lowers the 3D error against the truth
+  (HaMeR 19.16 against 19.34 mm), as hypothesised. The reference for the
+  5% limit is the user's decision.
