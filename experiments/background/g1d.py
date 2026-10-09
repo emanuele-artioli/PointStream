@@ -48,14 +48,15 @@ DECISION: dict[str, Any] = {
     "meaningful_median_clip_share": 0.50,
     "groups": ["visor-window", "visor-long"],
     "step1_measures": ["epi", "tri"],  # (c) and (d) run unless neither reaches a meaningful share anywhere
-    "realizable": ["planes2", "planes3", "planes4", "tri", "tri_raw", "da3", "kf"],
+    "realizable": ["planes2", "planes3", "planes4", "tri", "tri_raw", "da3", "da3_tri", "kf"],
     "hole_share_for_3dgs": 0.05,
     "max_hole_share": 0.10,  # a frame counts as explained only if the method renders 90% of h1's region
 }
 SEED = "pointstream-g1d"
 STRETCHES = 10
 PILOT = {"visor-window": 2, "visor-long": 1}
-METHODS = ("rot", "h1", "planes2", "planes3", "planes4", "epi", "tri", "tri_raw")
+METHODS_AB = ("rot", "h1", "planes2", "planes3", "planes4", "epi", "tri", "tri_raw")  # steps (a) and (b)
+METHODS = METHODS_AB + ("da3", "da3_tri", "kf")  # (c) needs --da3; (d) renders the --kf-depth source
 COMPANION_S = (0.5, 1.0)
 COMPANION_RANGE_S = (0.3, 1.5)
 LENS_PAIR_S = 0.5
@@ -418,10 +419,41 @@ def self_test(gray: np.ndarray, bg: np.ndarray, lens: camera.Lens) -> dict[str, 
 class Products:
     """Per-keyframe products (label maps, depth), computed once per process and chunk."""
 
-    def __init__(self, state: dict[str, Any], gray: Any, bg: np.ndarray) -> None:
-        self.state, self.gray, self.bg = state, gray, bg
+    def __init__(self, state: dict[str, Any], gray: Any, bg: np.ndarray, da3: Path | None = None) -> None:
+        self.state, self.gray, self.bg, self.da3 = state, gray, bg, da3
         self.labels: dict[tuple[int, int], tuple[np.ndarray | None, dict[str, Any]]] = {}
         self.depths: dict[int, tuple[depth.KeyDepth | None, dict[str, Any]]] = {}
+        self.da3_depths: dict[tuple[int, bool], tuple[depth.KeyDepth | None, dict[str, Any]]] = {}
+        self._da3_npz: Any = None
+
+    def da3_depth(self, k: int, aligned: bool) -> tuple[depth.KeyDepth | None, dict[str, Any]]:
+        """DA3's depth of keyframe ``k`` at the analysis size; ``aligned``: its inverse depth fitted to the
+        triangulated pixels of `key_depth` (DA3's shape, triangulation's scale and offset)."""
+        if (k, aligned) not in self.da3_depths:
+            began = time.time()
+            if self._da3_npz is None:
+                assert self.da3 is not None, "da3 methods need --da3"
+                self._da3_npz = dict(np.load(self.da3 / "depth.npz"))
+            info: dict[str, Any] = {}
+            kd = None
+            if f"depth_{k}" in self._da3_npz:
+                width, height = camera.ANALYSIS_SIZE
+                d = depth.resize_depth(self._da3_npz[f"depth_{k}"], width, height)
+                if aligned:
+                    tri, _ = self.key_depth(k)
+                    if tri is not None:
+                        d, info = depth.align_inverse_depth(d, tri.depth, tri.measured & np.isfinite(d))
+                        kd = depth.sent_depth(d, self.bg[k], info)
+                else:
+                    kd = depth.sent_depth(d, self.bg[k], info)
+            info["seconds"] = round(time.time() - began, 3)
+            if kd is not None:
+                info.update(png_bytes=kd.png_bytes, png16_bytes=kd.png16_bytes)
+            self.da3_depths[(k, aligned)] = (kd, info)
+        return self.da3_depths[(k, aligned)]
+
+    def source_depth(self, k: int, source: str) -> tuple[depth.KeyDepth | None, dict[str, Any]]:
+        return self.key_depth(k) if source == "tri" else self.da3_depth(k, source == "da3_tri")
 
     def companions(self, k: int) -> list[dict[str, Any]]:
         return [{**c, "gray": np.asarray(self.gray[c["index"]]), "bg": self.bg[c["index"]]}
@@ -458,7 +490,8 @@ class Products:
 
 def measure(lens: camera.Lens, gray_t: np.ndarray, gray_k: np.ndarray, warp: camera.Warp, bg_t: np.ndarray,
             bg_k: np.ndarray, F: np.ndarray | None, near: np.ndarray) -> tuple[dict[str, Any], dict[str, Any] | None]:
-    res = camera.residual(lens, gray_t, gray_k, depth.complete(warp), bg_t, bg_k, F=F, attribute=True, keep=True)
+    res = camera.residual(lens, gray_t, gray_k, depth.complete(warp, (gray_k.shape[0], gray_k.shape[1])), bg_t, bg_k, F=F, attribute=True,
+                          keep=True)
     images = res.pop("_images", None)
     out = g1.strip(res) or {}
     if images is not None and out.get("measured"):
@@ -480,7 +513,7 @@ def evaluate_chunk(task: dict[str, Any]) -> list[dict[str, Any]]:
     bg = ~np.asarray(fg)
     methods = task["methods"]
     g1_frames = task["g1_frames"]
-    products = Products(state, gray, bg)
+    products = Products(state, gray, bg, Path(task["da3"]) if task.get("da3") else None)
     g1_lens, cal = state["g1_lens"], state["cal_lens"]
     poses, times = state["poses"], state["times"]
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * NEAR_FG_PX + 1, 2 * NEAR_FG_PX + 1))
@@ -568,16 +601,16 @@ def evaluate_chunk(task: dict[str, Any]) -> list[dict[str, Any]]:
             res, images = measure(cal, gt, gk, warp, bg[t], bg[k], F_attr, near)
             out["epi"] = {**res, "render_s": round(seconds, 4)}
             overlay["epi"] = images
-        for name in ("tri", "tri_raw"):
+        for name in ("tri", "tri_raw", "da3", "da3_tri"):
             if name not in methods:
                 continue
-            kd, info = products.key_depth(k)
+            kd, info = products.key_depth(k) if name.startswith("tri") else products.da3_depth(k, name == "da3_tri")
             pose_t = depth.pnp(cal, kd.depth, kd.measured, pa, pb) if kd is not None else None
             if kd is None or pose_t is None:
                 out[name] = {"measured": False, "reason": "no keyframe depth" if kd is None else "no PnP pose"}
                 continue
             # tri renders the filled depth; tri_raw only the triangulated pixels (its holes count against it).
-            source_depth = kd.depth if name == "tri" else np.where(kd.measured, kd.depth, np.nan)
+            source_depth = np.where(kd.measured, kd.depth, np.nan) if name == "tri_raw" else kd.depth
             began = time.perf_counter()
             warp, hit = depth.warp_depth(cal, source_depth, bg[k], pose_t[0], pose_t[1])
             seconds = time.perf_counter() - began
@@ -585,6 +618,8 @@ def evaluate_chunk(task: dict[str, Any]) -> list[dict[str, Any]]:
             out[name] = {**res, "render_s": round(seconds, 4), "frame_bytes": 24, "pnp_inliers": pose_t[2],
                          "keyframe": k, "keyframe_bytes": info.get("png_bytes"), "keyframe_bytes16": info.get("png16_bytes")}
             overlay[name] = images
+        if "kf" in methods:
+            out["kf"], overlay["kf"] = render_kf(task, products, state, t, k, gray, bg, pa, pb, near)
         for name, images in overlay.items():
             entry = out.get(name) or {}
             if images is None or h1_region is None or not entry.get("measured"):
@@ -600,6 +635,48 @@ def evaluate_chunk(task: dict[str, Any]) -> list[dict[str, Any]]:
     keyframes = {"labels": {f"{k}:{c}": info for (k, c), (_, info) in products.labels.items()},
                  "depth": {str(k): info for k, (_, info) in products.depths.items()}}
     return [{"keyframes": keyframes}] + records
+
+
+def render_kf(task: dict[str, Any], products: Products, state: dict[str, Any], t: int, k: int, gray: Any,
+              bg: np.ndarray, pa: np.ndarray, pb: np.ndarray, near: np.ndarray) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    """(d) Depth-augmented keyframes: the reference rendered by its depth, its holes filled from the nearest earlier
+    keyframe with depth (causal: a decoder already holds it). The two are measured as one source image, side by
+    side, so the attribution has no epipolar split (one fundamental matrix cannot describe two sources)."""
+    cal, times, source = state["cal_lens"], state["times"], task["kf_depth"]
+    gt = np.asarray(gray[t])
+    began = time.perf_counter()
+    kd, info = products.source_depth(k, source)
+    pose_t = depth.pnp(cal, kd.depth, kd.measured, pa, pb) if kd is not None else None
+    if kd is None or pose_t is None:
+        return {"measured": False, "reason": "no keyframe depth" if kd is None else "no PnP pose"}, None
+    warp, _ = depth.warp_depth(cal, kd.depth, bg[k], pose_t[0], pose_t[1])
+    earlier = [j for j in state["companions"] if j != k and times[j] <= times[t]]
+    second = max(earlier, key=lambda j: times[j]) if earlier else None
+    used = [k]
+    gk = np.asarray(gray[k])
+    width = gk.shape[1]
+    source_gray, source_bg = gk, bg[k]
+    map_x, map_y, valid = warp.map_x, warp.map_y, warp.valid
+    frame_bytes = 24
+    if second is not None:
+        kd2, _ = products.source_depth(second, source)
+        g2 = np.asarray(gray[second])
+        pa2, pb2 = camera.match(camera.features(g2, bg[second]), camera.features(gt, bg[t]))
+        pose2 = depth.pnp(cal, kd2.depth, kd2.measured, pa2, pb2) if kd2 is not None else None
+        if kd2 is not None and pose2 is not None:
+            warp2, _ = depth.warp_depth(cal, kd2.depth, bg[second], pose2[0], pose2[1])
+            fill = ~valid & warp2.valid
+            map_x = np.where(fill, warp2.map_x + width, map_x).astype(np.float32)
+            map_y = np.where(fill, warp2.map_y, map_y).astype(np.float32)
+            valid = valid | warp2.valid
+            source_gray, source_bg = np.hstack([gk, g2]), np.hstack([bg[k], bg[second]])
+            used.append(second)
+            frame_bytes = 48
+    seconds = time.perf_counter() - began
+    res, images = measure(cal, gt, source_gray, camera.Warp(map_x, map_y, valid), bg[t], source_bg, None, near)
+    colour = (task.get("colour_bytes") or {}).get(str(k))
+    return {**res, "render_s": round(seconds, 4), "frame_bytes": frame_bytes, "keyframes_used": used, "keyframe": k,
+            "keyframe_bytes": info.get("png_bytes"), "colour_bytes": colour, "depth_source": source}, images
 
 
 def write_overlay(publish: Path, t: int, gray: np.ndarray, images: dict[str, Any]) -> None:
@@ -712,6 +789,11 @@ def command_run(args: argparse.Namespace) -> int:
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
     restored = g1.restore_clips(checkpoints, publish) if checkpoints else {}
     todo = [c for c in clips if c not in restored]
+    da3_results: dict[str, Any] = {}
+    for clip_id in todo if args.da3 else []:
+        record = Path(args.da3) / "publish" / "da3" / g1.safe(clip_id) / "result.json"
+        if record.is_file():
+            da3_results[clip_id] = json.loads(record.read_text())
     phase_a = {c: pool.submit(register_clip, {"clip_dir": str(metas[c]), "work": str(scratch / "work" / g1.safe(c)),
                                               "limit_frames": args.limit_frames, "self_test": i == 0})
                for i, c in enumerate(todo)}
@@ -752,10 +834,13 @@ def command_run(args: argparse.Namespace) -> int:
         g1_frames = json.loads((metas[clip_id] / "g1_result.json").read_text())["frames"][:n]
         direct = [r["i"] for r in g1_frames if r["status"] == "direct"]
         overlay = {direct[len(direct) // 2]} if direct else set()
+        da3_dir = Path(args.da3) / "publish" / "da3" / g1.safe(clip_id) if args.da3 else None
+        colour = da3_results.get(clip_id, {}).get("jpeg_q90_bytes")
         chunks[clip_id] = [pool.submit(evaluate_chunk, {
             "work": str(scratch / "work" / g1.safe(clip_id)), "publish": str(publish / "clips" / g1.safe(clip_id)),
             "lo": lo, "hi": min(n, lo + CHUNK_FRAMES), "methods": methods, "overlay_frames": overlay,
-            "g1_frames": g1_frames}) for lo in range(0, n, CHUNK_FRAMES)]
+            "g1_frames": g1_frames, "da3": str(da3_dir) if da3_dir else None, "kf_depth": args.kf_depth,
+            "colour_bytes": colour}) for lo in range(0, n, CHUNK_FRAMES)]
         for ready in [c for c in list(chunks) if c not in finished and all(f.done() for f in chunks[c])]:
             finish(ready)
     for clip_id in todo:
@@ -765,6 +850,7 @@ def command_run(args: argparse.Namespace) -> int:
     test = next((finished[c]["registration"].get("self_test") for c in todo if finished[c]["registration"].get("self_test")), None)
     write_json(stage_dir() / "g1d.json", {
         "prepared": str(prepared), "select": args.select, "limit_frames": args.limit_frames, "methods": methods,
+        "da3": args.da3, "kf_depth": args.kf_depth,
         "decision": DECISION, "settings": {
             "COMPANION_S": COMPANION_S, "COMPANION_RANGE_S": COMPANION_RANGE_S, "NEAR_FG_PX": NEAR_FG_PX,
             "MIN_ANGLE_DEG": depth.MIN_ANGLE_DEG, "TRI_REPROJECTION_PX": depth.TRI_REPROJECTION_PX, "PNP_PX": depth.PNP_PX,
@@ -940,7 +1026,9 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--prepared", required=True, help="extracted published.tar of a prepare job")
     run.add_argument("--select", required=True)
     run.add_argument("--limit-frames", type=int, default=0)
-    run.add_argument("--methods", default=",".join(METHODS))
+    run.add_argument("--methods", default=",".join(METHODS_AB))
+    run.add_argument("--da3", help="extracted published.tar of an experiments.background.da3 job")
+    run.add_argument("--kf-depth", default="tri", choices=("tri", "da3", "da3_tri"), help="depth source of kf")
     sub.add_parser("validate")
     report = sub.add_parser("report")
     report.add_argument("--result", action="append", required=True)

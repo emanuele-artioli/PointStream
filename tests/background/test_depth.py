@@ -162,6 +162,18 @@ def test_complete_extrapolates_the_map_into_holes():
     assert (done.valid == valid).all()
 
 
+def test_alignment_recovers_an_affine_inverse_depth_despite_outliers():
+    rng = np.random.default_rng(1)
+    truth = rng.uniform(0.5, 5.0, (40, 60))
+    mono = 1.0 / (0.5 / truth + 0.3)  # monocular depth: its inverse is an affine map of the true inverse depth
+    usable = np.ones_like(truth, bool)
+    noisy = truth.copy()
+    noisy[:4] *= 3.0  # 10% gross outliers in the triangulated reference
+    aligned, info = depth.align_inverse_depth(mono, noisy, usable)
+    assert np.allclose(aligned[4:], truth[4:], rtol=1e-6)
+    assert info["median_relative_error"] < 1e-6
+
+
 def test_calibration_finds_the_focal_length():
     rng = np.random.default_rng(0)
     truth = depth.lens_for(78.0, -0.15)

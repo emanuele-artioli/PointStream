@@ -187,12 +187,13 @@ def warp_epipolar(lens: camera.Lens, target: np.ndarray, source: np.ndarray, H: 
     return camera.Warp(p[..., 0].astype(np.float32), p[..., 1].astype(np.float32), valid)
 
 
-def complete(warp: camera.Warp) -> camera.Warp:
+def complete(warp: camera.Warp, source_shape: tuple[int, int] | None = None) -> camera.Warp:
     """The same warp with its map extrapolated into invalid pixels (validity unchanged).
 
     `camera.residual` measures dense flow on the whole warped image; black holes
     inside it drag the flow at their edges. Each invalid pixel takes its nearest
-    valid pixel's source position plus its offset from that pixel.
+    valid pixel's source position plus its offset from that pixel, clipped to the
+    source (``source_shape``, height and width; the target's by default).
     """
     invalid = ~warp.valid
     if not invalid.any() or not warp.valid.any():
@@ -202,7 +203,7 @@ def complete(warp: camera.Warp) -> camera.Warp:
     iy, ix = np.nonzero(invalid)
     nearest = labels[iy, ix] - 1
     ny, nx = vy[nearest], vx[nearest]
-    h, w = warp.valid.shape
+    h, w = source_shape or warp.valid.shape
     map_x, map_y = warp.map_x.copy(), warp.map_y.copy()
     map_x[iy, ix] = np.clip(warp.map_x[ny, nx] + (ix - nx), 0, w - 1)
     map_y[iy, ix] = np.clip(warp.map_y[ny, nx] + (iy - ny), 0, h - 1)
@@ -528,6 +529,40 @@ def keyframe_depth(lens: camera.Lens, key_gray: np.ndarray, bg_key: np.ndarray,
     quantized, b8, b16 = quantize_depth(filled, valid)
     info.update(measured_share=round(float(measured[bg_key].mean()), 4), angle_p50_deg=round(float(np.median(angle[measured])), 3))
     return KeyDepth(quantized, measured, info, b8, b16)
+
+
+def sent_depth(depth: np.ndarray, bg: np.ndarray, info: dict[str, Any]) -> KeyDepth | None:
+    """A dense keyframe depth (from DA3) restricted to the background and quantized as it would be sent."""
+    valid = bg & np.isfinite(depth) & (depth > 0)
+    if valid.sum() < 1000:
+        return None
+    quantized, b8, b16 = quantize_depth(np.where(valid, depth, np.nan), valid)
+    return KeyDepth(quantized, valid, info, b8, b16)
+
+
+def resize_depth(depth: np.ndarray, width: int, height: int) -> np.ndarray:
+    """A depth map at another resolution, interpolated in inverse depth."""
+    inv = 1.0 / np.maximum(np.asarray(depth, np.float32), 1e-6)
+    return 1.0 / np.maximum(cv2.resize(inv, (width, height), interpolation=cv2.INTER_LINEAR), 1e-9)
+
+
+def align_inverse_depth(depth: np.ndarray, reference: np.ndarray, usable: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+    """``depth`` with its inverse depth mapped by the affine fit (a * x + b) to ``reference``'s inverse depth
+    on ``usable`` pixels; the fit is repeated on the 80% of pixels it fits best."""
+    x = 1.0 / depth[usable]
+    y = 1.0 / reference[usable]
+    keep = np.ones(len(x), bool)
+    a, b = 1.0, 0.0
+    for _ in range(3):
+        a, b = np.linalg.lstsq(np.stack([x[keep], np.ones(int(keep.sum()))], 1), y[keep], rcond=None)[0]
+        error = np.abs(a * x + b - y)
+        keep = error <= np.percentile(error, 80)
+    inv = a / depth + b
+    ok = inv > 1e-9
+    residual = np.abs(a * x + b - y) / np.maximum(y, 1e-12)
+    info = {"a": float(a), "b": float(b), "median_relative_error": round(float(np.median(residual)), 4),
+            "invalid_share": round(float((~ok).mean()), 4)}
+    return np.where(ok, 1.0 / np.where(ok, inv, 1.0), np.nan), info
 
 
 def pnp(lens: camera.Lens, depth: np.ndarray, usable: np.ndarray, pa: np.ndarray,
