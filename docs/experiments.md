@@ -1294,6 +1294,84 @@ invocation turns out to be needed.
   the other 41 clips is sized from this (about 18,500 frames, about 1 h at
   48 threads): `20261009T082847Z-36c4a84c`, same revision, so the pilot's
   clips stand.
+- Full run `20261009T082847Z-36c4a84c` (gpu6, CPU, `0a5bb1f`; smoke gate
+  passed, 10 checks; full 2,137 s at 48 threads, no contention; validator
+  passed on the full output). G1's references and rotation p90 reproduce on
+  every frame of all 44 clips. Report:
+  `pointstream-data/background/g1d-2026-10-09/report-b009870/`
+  (`g1d-report.json` `3cf1d238…07e7`, from the pilot's and this job's
+  `g1d.json`). Medians over clips (explained: p90 ≤ 2 px and holes ≤ 10%;
+  energy: share of the raw squared error, mean over frames):
+
+  | Group | Method | explained (median clip) | clips ≥ 50% | p90 px | holes | bytes/frame | render s | parallax / independent / remainder / exposure |
+  |---|---|---:|---:|---:|---:|---:|---:|---|
+  | windows (34) | rot | 0.06 | 0 | 13.9 | 0.01 | 16 | 0.11 | 0.42 / 0.28 / 0.24 / 0.06 |
+  | windows | h1 | 0.08 | 1 | 8.2 | 0.01 | 32 | 0.09 | 0.36 / 0.27 / 0.31 / 0.06 |
+  | windows | planes2 / 3 / 4 | 0.14 / 0.14 / 0.16 | 1 / 3 / 3 | 5.7 / 4.8 / 4.4 | 0.02–0.03 | 343 / 451 / 535 | 0.44–0.46 | (K = 4) 0.28 / 0.24 / 0.42 / 0.06 |
+  | windows | epi | 0.34 | 8 | 2.7 | 0.03 | – | 0.40 | 0.12 / 0.29 / 0.51 / 0.07 |
+  | windows | tri | 0.09 | 2 | 5.5 | 0.03 | 4,042 | 0.49 | 0.28 / 0.28 / 0.37 / 0.07 |
+  | windows | tri_raw | 0.00 (holes) | 1 | 2.7 | 0.35 | 4,042 | 0.33 | 0.25 / 0.14 / 0.53 / 0.08 |
+  | stretches (10) | rot | 0.005 | 0 | 28.9 | 0.01 | 16 | 0.11 | 0.43 / 0.31 / 0.17 / 0.09 |
+  | stretches | h1 | 0.016 | 0 | 22.3 | 0.01 | 32 | 0.09 | 0.36 / 0.34 / 0.22 / 0.09 |
+  | stretches | planes2 / 3 / 4 | 0.04 / 0.04 / 0.04 | 0 | 16.9 / 14.4 / 13.2 | 0.02–0.04 | 888 / 1,224 / 1,465 | 0.51–0.53 | (K = 4) 0.28 / 0.33 / 0.30 / 0.09 |
+  | stretches | epi | 0.09 | 0 | 6.6 | 0.02 | – | 0.40 | 0.11 / 0.37 / 0.42 / 0.10 |
+  | stretches | tri | 0.02 | 0 | 14.8 | 0.04 | 12,406 | 0.57 | 0.29 / 0.33 / 0.29 / 0.09 |
+  | stretches | tri_raw | 0.00 (holes) | 0 | 6.1 | 0.42 | 12,389 | 0.35 | 0.31 / 0.20 / 0.38 / 0.10 |
+
+  Per clip, `epi` explains 2–100% of a window's frames (8 of 34 at least
+  half, one all) and 5–27% of a stretch's. `tri` explains at most 68% of a
+  window and 12% of a stretch. Bytes per frame count the per-frame
+  parameters plus each used keyframe's map, spread over the frames that use
+  it; stretches have a keyframe every few frames, hence their larger rates.
+  Render times are one CPU thread in numpy, warp construction only.
+- Outcome by the rule: **step 1**. Neither `epi` (median clip 0.34 on the
+  windows, 0.09 on the stretches) nor `tri` (0.09, 0.02) reaches a
+  meaningful share in either group. No depth-aware warp at hand brings
+  VISOR's background under 2 px on a meaningful share of frames, so (c)
+  (Depth Anything 3) and (d) (depth-augmented keyframes) were not run, and
+  3DGS does not arise. **Egocentric video goes to G5**, the neural
+  background model. Code for (c) and (d) (`experiments/background/da3.py`,
+  methods `da3`, `da3_tri` and `kf`) is in the repository but has never run.
+  DA3 was not audited into the environment and no weight was downloaded.
+  The plan for that audit is a pure-Python overlay (DA3 at `3d835ec`,
+  `addict`, `omegaconf`) with import stubs for `pycolmap` and `evo`, which
+  monocular inference never calls.
+- What depth removes and what remains. Depth does what it should to the
+  geometric part. A warp that follows each pixel's epipolar line (`epi`)
+  cuts parallax from 42% to 12% of the error on the windows (43% to 11% on
+  the stretches), and the median p90 from 13.9 to 2.7 px (28.9 to 6.6 px).
+  Four planes reach 4.4 px (13.2), so planes take a third to half of the way
+  at about 535 bytes per frame. A representation built once from a keyframe
+  does not hold, though. Depth triangulated 0.5–1 s after the keyframe
+  (`tri`) is right where it was measured (`tri_raw`: p90 2.7 px on the
+  windows), but that is 58–65% of the background, and the plane-filled rest
+  pulls it back to 5.5 px. Every residual grows with the time to the
+  reference (Spearman about 0.55–0.69 on the windows, whose reference is
+  their first frame, and 0.36–0.42 on the stretches), and barely with the
+  rotation speed (0.11–0.28), so rolling shutter is not the cause. What
+  remains after `epi`, the most generous static-scene warp, is not geometry
+  a better depth could fix. On the windows (stretches) it is 29% (37%)
+  independent motion, 51% (42%) remainder (lighting, blur, noise,
+  disocclusion), 7% (10%) exposure, and 12% (11%) parallax. Mask leaks are
+  not it: only 4–7% of the misaligned pixels lie within 32 px of the
+  foreground. PSNR after flow stays at 31.9 dB (30.2 on the stretches).
+  Competing explanation (1), a measurement floor at wide time gaps, is not
+  excluded: the residual's growth with the time gap fits both a scene and
+  appearance that change and a flow that degrades. OpenTTGames' static floor
+  (1.15 px p90) shows the measure can reach the bar on a static scene.
+  Calibration (4): the self-calibration ranges 41–96° per clip against EPIC
+  Fields' 86.7°. It is a diagnostic, but `tri`'s focal length is the one
+  untested assumption. `epi` does not depend on it, and the decision rests
+  on `epi` failing too.
+- Hypothesis: partly right. Planes helped little (window median 0.16 at
+  K = 4, inside the ≤ 0.20 predicted). Depth did *not* reach a meaningful
+  share on the windows (predicted it would): the windows' reference is their
+  first frame, up to 4.8 s back. The remainder is larger than predicted, and
+  independent motion near the hands is not where it sits.
+- Budget: CPU only, 0 GPU-hours (ceiling 2). CPU jobs: preparation 312 s,
+  pilot 623 s, full 2,137 s, so about 50 min of CPU-job wall (ceiling 8
+  CPU-job-hours). Wall time from the first submission to the report: about
+  1.5 h (ceiling 14 h).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could

@@ -214,6 +214,17 @@ from G3 against generative video inpainting (to be audited into the
 environment), compared on the visible pixels around the hole and by eye.
 **Done when** one source of clean frames is chosen for G5, with numbers.
 
+#### G1d. Depth-aware warps on VISOR (done 2026-10-09)
+
+Decided which background egocentric video gets after G1 ruled out a
+rotation-only panorama. On G1's pairs, no depth-aware warp brings VISOR's
+background under 2 px on a meaningful share of frames. That holds for a few
+planes, triangulated keyframe depth, and even dense flow on epipolar lines:
+median clip 34% of window frames and 9% of stretch frames. So DA3 and
+depth-augmented keyframes were not run, and **egocentric video goes to G5**.
+What remains is independent motion and a photometric remainder (lighting,
+blur, disocclusion), not parallax ([experiments](docs/experiments.md)).
+
 #### G5. Neural background model
 
 A neural codec fitted or fine-tuned on the warm-up's clean frames, sent once
