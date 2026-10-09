@@ -198,12 +198,14 @@ def prepare_clip(task: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in meta.items() if k not in ("indices", "times", "fg_share")}
 
 
-def command_prepare(args: argparse.Namespace) -> int:
+def command_prepare(args: argparse.Namespace, selector: Any = None) -> int:
+    """``selector(spec, which)`` picks the clips (default `select_clips`)."""
     for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
         os.environ[name] = "1"
     spec_path = Path(args.clips)
     spec = json.loads(spec_path.read_text())
-    clips = [g1.plan(c, args.limit_seconds) for c in select_clips(spec, args.select)]
+    selector = selector or select_clips
+    clips = [g1.plan(c, args.limit_seconds) for c in selector(spec, args.select)]
     sources = {name: path for name, path in args.source}
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
     publish = scratch / "publish"
@@ -240,6 +242,7 @@ def command_prepare(args: argparse.Namespace) -> int:
     write_json(stage_dir() / "prepare.json", {
         "clips_file": {"path": str(spec_path), "sha256": file_sha256(spec_path)}, "select": args.select,
         "limit_seconds": args.limit_seconds, "rule": {"seed": SEED, "stretches": STRETCHES, "pilot": PILOT},
+        "selector": f"{selector.__module__}.{selector.__name__}",
         "g1": args.g1, "restored_clips": sorted(restored), "results": results,
     })
     return 0
@@ -1090,8 +1093,8 @@ def main(argv: list[str] | None = None) -> int:
     ages.add_argument("--methods", default="rot,planes4,epi,tri")
     ages.add_argument("--out", required=True)
     args = parser.parse_args(argv)
-    handlers = {"prepare": command_prepare, "validate-prepare": command_validate, "run": command_run,
-                "validate": command_validate, "report": command_report, "ages": command_ages}
+    handlers: dict[str, Any] = {"prepare": command_prepare, "validate-prepare": command_validate, "run": command_run,
+                                "validate": command_validate, "report": command_report, "ages": command_ages}
     return handlers[args.command](args)
 
 

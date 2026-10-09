@@ -1466,7 +1466,8 @@ invocation turns out to be needed.
   to the reference's companion 0.5 s later, then four homographies per
   frame), `epi` (dense flow projected onto epipolar lines; not sendable) and
   `tri` (depth of the reference triangulated from its companions, PnP per
-  frame). Companions are chosen as in G1d. An encoder that refreshes
+  frame). Companions are chosen as in G1d, without G1's registration (the
+  six nearest candidates to each companion time). An encoder that refreshes
   references can see 0.5–1 s ahead at the cost of that much latency, which
   the rate step (G2) would have to state.
 - The oracle, and why it bounds what it gates. It gates refreshed
@@ -1493,14 +1494,17 @@ invocation turns out to be needed.
     0.1 s and 1 s: `h1` p90 and the explained share. (ii) On every VISOR
     pair, the forward-backward consistency of the DIS flow on textured
     background: the p90 at 1080p of |f(x) + b(x + f(x))|, where f is the
-    flow from the target to the warped reference and b the flow back. A pair
-    whose own flow disagrees with itself by more than 2 px cannot certify
-    2 px.
-  - *Mask confound.* On the stretch targets inside their evaluation window
-    (where VISOR's dense masks exist, read from the B1b fill already staged
-    in G1d), each pair is scored twice: with G1's `sam_text` foreground and
-    with the dense masks (dilated as in G1). The reference also needs a dense
-    mask, so at 1 s only targets at least 1 s into the window count.
+    flow from the target to the warped reference and b the flow back. It is
+    computed for every warp, and the rule reads `epi`'s, the closest
+    alignment. A pair whose own flow disagrees with itself by more than 2 px
+    cannot certify 2 px.
+  - *Mask confound.* The one-per-second targets rarely fall inside a
+    stretch's evaluation window, so this check takes every stretch frame
+    there (10 per second, from 1 s). VISOR's dense masks exist there, read
+    from the B1b fill already staged for G1d. Each pair is scored twice:
+    with G1's `sam_text` foreground and with the dense masks (dilated as in
+    G1). The reference also needs a dense mask, so at 1 s only targets at
+    least 1 s into the window count.
 - Decision rule (`g1e.DECISION`, fixed before any fleet run). As in G1d, a
   method is meaningful in a group at an age when its median clip explains at
   least 50% of targets. A method's *refresh age* in a group is the largest
