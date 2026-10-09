@@ -1940,9 +1940,13 @@ invocation turns out to be needed.
      participant (all 9), chosen content-blind (lowest sha256 of
      "pointstream-h2-hot3d:<clip>"), 150 frames at 30 fps. Each hand with a
      MANO label is warped from the 1408² fisheye stream `214-1` into the
-     dataset's own pinhole crop camera (`hand_crops.json`, 512², the
-     toolkit's `warp_image`), the protocol of HOT3D's hand-tracking
-     challenge; the box is the projected ground-truth mesh's. Metrics:
+     dataset's own pinhole crop camera (`hand_crops.json`, the toolkit's
+     `warp_image`; the protocol of HOT3D's hand-tracking challenge) at half
+     its focal length, 512²: the dataset's crops frame the hand so tightly
+     that its mesh leaves the crop, and the regressors' 2× box would see
+     padding (dev check on gpu6: boxes reached x = −15 and y = 551 in a
+     512² crop; at half focal they sit inside with real context). The box
+     is the projected ground-truth mesh's. Metrics:
      MPJPE after aligning the wrist and PA-MPJPE (mm), MPVPE after aligning
      the wrist, 2D joint error in the crop (share of box), and acceleration
      error against the ground truth (mm/frame², root-relative joints rotated
@@ -1961,16 +1965,20 @@ invocation turns out to be needed.
 - Pose coding (`h2 code`, CPU, on the saved per-frame parameters of both
   estimators). Sent per hand-frame: global orientation (axis-angle),
   articulation (15 joints axis-angle, or k coefficients of MANO's pose
-  PCA), root as image position (px) and log depth; shape once per track,
-  not counted. Encoder: smoothing, then temporal subsampling, then the
+  PCA), root as image position (px) and log depth; shape once per track
+  (the track's median betas), not counted. On HOT3D the parameters are
+  expressed in the fisheye camera's frame and the root's position is that
+  camera's pinhole projection; on VISOR they are H1's (nominal focal). Encoder: smoothing, then temporal subsampling, then the
   subspace, then quantization, then prediction; rate = empirical entropy of
   the prediction residual symbols pooled per parameter group over items
   (H1's estimate), × frames sent per second. Decoder: dequantize, predict,
   and fill skipped frames by linear interpolation (needs the next sent
   frame) or by holding (no lookahead). Axes:
   - smoothing: none; One-Euro (causal; min cutoff 0.5, 1, 2 Hz × beta 0,
-    0.5); centred Gaussian over ±L frames (σ = L/2, L = 1, 2, 4, 8);
-  - send rate: every frame, 15, 10, 7.5 Hz;
+    0.5); centred Gaussian looking ahead L = 33, 67, 133, 267 ms (1, 2, 4,
+    8 frames at HOT3D's 30 fps, 2, 3, 7, 13 at VISOR's 50; σ = L/2);
+  - send rate: every frame, 15, 10, 7.5 Hz (every 2nd, 3rd, 4th frame at
+    30 fps; every 3rd, 5th, 7th at 50);
   - subspace: none (45 values), PCA k = 6, 12, 24;
   - quantization: H1's steps (1°, 0.25 px, 0.002) × 0.5, 1, 2, 4, 8;
   - prediction: previous decoded frame (H1), constant velocity.
@@ -1993,9 +2001,11 @@ invocation turns out to be needed.
     more wins is chosen; on a tie (including no wins) the faster at batch 1.
     If HaMeR's HInt VISOR PCK@0.05 (all) falls outside 40–47, the protocol
     does not reproduce the paper, and the run stops there.
-  - Coding, for the chosen estimator. Per latency budget, H3's pose input is
-    the lowest-rate combination whose HOT3D errors against the truth (both
-    MPJPE and 2D) are at most 5% above the uncoded estimate's; its VISOR rate
+  - Coding, for the chosen estimator. Per latency budget (a combination's
+    latency is the larger of its HOT3D and VISOR values), H3's pose input is
+    the combination with the lowest VISOR rate among those whose HOT3D
+    errors against the truth (both MPJPE and 2D) are at most 5% above the
+    uncoded estimate's; its VISOR rate
     (kbps over the 34 items, as H1) and VISOR IoU change are reported beside
     it, and against H1's screen (≤ 10% of SVT-AV1's bits on hands at CRF 62:
     2.3 kbps against 23.4). The smallest budget whose choice passes the

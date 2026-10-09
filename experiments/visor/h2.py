@@ -15,7 +15,8 @@
   HaMeR's evaluator does (``hamer/utils/pose_utils.py``). With ``--speed``, timings of both
   regressors and of WiLoR's detector.
 * ``hot3d``: HOT3D-Clips hands warped into the dataset's pinhole crop cameras (the hand-tracking
-  challenge protocol); the box is the projected ground-truth mesh's. 3D errors against the
+  challenge protocol) at half their focal length, so the enlarged box sees real context rather than
+  padding; the box is the projected ground-truth mesh's. 3D errors against the
   motion-capture MANO, and every fit expressed in the fisheye camera ``214-1`` for the coding stage.
 * ``visor``: evaluation set v2 windows with H1's recorded hand boxes; rendered silhouettes against
   the mask's hand side (H1's wrist split), and the per-frame parameters for the coding stage.
@@ -59,6 +60,7 @@ HINT_SPLITS = ("TEST_epick_img", "TEST_newdays_img")
 HINT_UNIT = 200
 HOT3D_STREAM = "214-1"
 HOT3D_CROP = 512
+HOT3D_ZOOM = 0.5  # the dataset's crop camera at half its focal length: twice the field of view
 NOMINAL_FOCAL = 5000.0 / 256.0  # × the image's longer side, as H1 and the models' demos
 SEED = "pointstream-h2"
 BATCH = 32
@@ -398,6 +400,7 @@ def hot3d_clip_frames(path: str, frames: int) -> tuple[dict[str, Any], list[dict
 def run_hot3d(args: argparse.Namespace, models: dict[str, Regressor], publish: Path, right_model: mano_np.Mano) -> dict[str, Any]:
     import torch
     from hand_tracking_toolkit import camera
+    from hand_tracking_toolkit.camera import PinholePlaneCameraModel
     from hand_tracking_toolkit.dataset import HandSide, decode_hand_crop_params, decode_hand_pose, warp_image
     from hand_tracking_toolkit.hand_models.mano_hand_model import MANOHandModel
 
@@ -420,7 +423,12 @@ def run_hot3d(args: argparse.Namespace, models: dict[str, Regressor], publish: P
             for side, pose in poses.items():
                 if pose.mano is None or HOT3D_STREAM not in crops.get(side, {}):
                     continue
-                crop_cam = crops[side][HOT3D_STREAM]
+                # HOT3D's crops frame the hand so tightly that its mesh leaves the crop; the regressors'
+                # box × RESCALE would then be mostly padding. Same camera, wider view.
+                base = crops[side][HOT3D_STREAM]
+                crop_cam = PinholePlaneCameraModel(width=HOT3D_CROP, height=HOT3D_CROP,
+                                                   f=(base.f[0] * HOT3D_ZOOM, base.f[1] * HOT3D_ZOOM), c=base.c,
+                                                   distort_coeffs=[], T_world_from_eye=base.T_world_from_eye)
                 hands.append({"t": t, "right": side == HandSide.RIGHT, "pose": pose.mano, "cam214": cam214,
                               "crop_cam": crop_cam, "crop": warp_image(cam214, crop_cam, row["image"])})
         if not hands:
@@ -639,7 +647,7 @@ def command_run(args: argparse.Namespace) -> int:
         "models": {k: {**m.load, "kernels": m.kernels, "on_cuda": model_on_cuda(m.model)} for k, m in models.items()},
         "inputs": inputs,
         "settings": {"rescale": RESCALE, "aspect": ASPECT, "pck_thresholds": PCK_THRESHOLDS, "hint_splits": HINT_SPLITS,
-                     "hot3d_stream": HOT3D_STREAM, "hot3d_crop": HOT3D_CROP, "nominal_focal": NOMINAL_FOCAL,
+                     "hot3d_stream": HOT3D_STREAM, "hot3d_crop": HOT3D_CROP, "hot3d_zoom": HOT3D_ZOOM, "nominal_focal": NOMINAL_FOCAL,
                      "limit": args.limit, "clips": args.clips, "frames": args.frames, "items": args.items,
                      "decision": DECISION},
         **result,
