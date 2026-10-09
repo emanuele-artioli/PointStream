@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Bash(git *)",
+      "Bash(ruff check *)",
+      "Bash(mypy *)",
+      "Bash(python -m pytest *)"
+    ]
+  }
+}
