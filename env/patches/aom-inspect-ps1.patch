@@ -1,0 +1,54 @@
+diff --git a/av1/decoder/inspection.c b/av1/decoder/inspection.c
+index f84ed17..113cb71 100644
+--- a/av1/decoder/inspection.c
++++ b/av1/decoder/inspection.c
+@@ -53,6 +53,7 @@ int ifd_inspect(insp_frame_data *fd, void *decoder, int skip_not_transform) {
+   }
+   fd->show_existing_frame = cm->show_existing_frame;
+   fd->frame_number = cm->current_frame.frame_number;
++  fd->order_hint = (int)cm->current_frame.order_hint;
+   fd->show_frame = cm->show_frame;
+   fd->frame_type = cm->current_frame.frame_type;
+   fd->base_qindex = quant_params->base_qindex;
+diff --git a/av1/decoder/inspection.h b/av1/decoder/inspection.h
+index 7d1c14d..77b7bfb 100644
+--- a/av1/decoder/inspection.h
++++ b/av1/decoder/inspection.h
+@@ -65,6 +65,7 @@ struct insp_frame_data {
+ #endif
+   insp_mi_data *mi_grid;
+   int16_t frame_number;
++  int order_hint;
+   int show_frame;
+   int frame_type;
+   int base_qindex;
+diff --git a/examples/inspect.c b/examples/inspect.c
+index 28d3f74..94526af 100644
+--- a/examples/inspect.c
++++ b/examples/inspect.c
+@@ -598,11 +598,12 @@ static int put_accounting(char *buffer) {
+     if (memcmp(&context, &sym->context, sizeof(AccountingSymbolContext)) != 0) {
+       buf += put_num(buf, '[', sym->context.x, 0);
+       buf += put_num(buf, ',', sym->context.y, ']');
+-    } else {
+-      buf += put_num(buf, '[', sym->id, 0);
+-      buf += put_num(buf, ',', sym->bits, 0);
+-      buf += put_num(buf, ',', sym->samples, ']');
++      *(buf++) = ',';
+     }
++    // Every symbol is printed, the first one of a new context too.
++    buf += put_num(buf, '[', sym->id, 0);
++    buf += put_num(buf, ',', sym->bits, 0);
++    buf += put_num(buf, ',', sym->samples, ']');
+     context = sym->context;
+     if (i < num_syms - 1) *(buf++) = ',';
+   }
+@@ -718,6 +719,8 @@ static void inspect(void *pbi, void *data) {
+ #endif
+   buf +=
+       snprintf(buf, MAX_BUFFER, "  \"frame\": %d,\n", frame_data.frame_number);
++  buf += snprintf(buf, MAX_BUFFER, "  \"orderHint\": %d,\n",
++                  frame_data.order_hint);
+   buf += snprintf(buf, MAX_BUFFER, "  \"showFrame\": %d,\n",
+                   frame_data.show_frame);
+   buf += snprintf(buf, MAX_BUFFER, "  \"frameType\": %d,\n",

@@ -44,6 +44,7 @@ ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.12"
+platform = "linux"
 # `files` is the gate: CI runs mypy with no path arguments, and paths on the
 # command line replace this list instead of adding to it.
 files = ["src", "tests", "experiments"]
