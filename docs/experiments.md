@@ -1571,10 +1571,18 @@ invocation turns out to be needed.
   stretch's 1 s not measurable. `tri` has no reference depth on 7 of the
   stretch's 16 pairs: the relative pose to the companions fails (a near
   rotation), as in G1d. Inputs: `pointstream-data/background/g1e-2026-10-09/`
-  (`inputs.json` `643ee3b1…991f`). It holds the seven OpenTTGames results and
+  (`inputs.json` `3d29aea5…b4e1`). It holds the seven OpenTTGames results and
   masks from G1's jobs `20261008T162927Z-d9372b99` and
-  `20261008T203714Z-fd5d2f5b`, and G1d's prepared archive (`5a9c47db…5d62`,
-  now under `jobs/fleet-archive-20261009/`).
+  `20261008T203714Z-fd5d2f5b`, and G1d's prepared archive (`5a9c47db…5d62`).
+  Another session had moved the fleet directory to
+  `jobs/fleet-archive-20261009/`. It was moved back (doctor passed, workers
+  restarted), and the recorded paths in `inputs.json` were corrected, which
+  is why its sha256 changed from the first build (`643ee3b1…991f`).
+- OpenTTGames preparation `20261009T194103Z-e71866e4` (gpu1, CPU, `9b0f8de`;
+  smoke gate passed; full 211 s at 16 threads; validator passed, 9 checks):
+  7 clips (300–1,200 frames; test_2, test_3, test_5 and test_6 are shorter
+  than 120 s), lossless, foreground equal to G1's on every frame.
+  `published.tar` `52d46d36…bffc`.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
