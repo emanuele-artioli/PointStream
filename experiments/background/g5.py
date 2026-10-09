@@ -341,8 +341,14 @@ def command_baselines(args: argparse.Namespace) -> int:
     cores = sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else list(range(allowance))
     tools = {name: svtav1.tool(name) for name in ("SvtAv1EncApp", "dav1d")}
     pool = ProcessPoolExecutor(max_workers=slots, mp_context=multiprocessing.get_context("spawn"))
+    checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
+    restored = g1.restore_clips(checkpoints, publish) if checkpoints else {}
     rows = []
     for done, clip_id in enumerate(chosen, 1):
+        if clip_id in restored:
+            rows.append({**restored[clip_id]["result"], "restored_from_checkpoint": True})
+            progress(done)
+            continue
         clip = load_clip(dirs[clip_id], by_id[clip_id], Path(args.visor_fill) if args.visor_fill else None,
                          args.limit_frames)
         work = scratch / "work" / g1.safe(clip_id)
@@ -383,11 +389,14 @@ def command_baselines(args: argparse.Namespace) -> int:
             Path(rec["decoded"]).unlink()
         row = {**clip.record, "kind": "baselines", "points": points, "ceiling_420": ceiling}
         write_json(publish / "clips" / g1.safe(clip_id) / "baselines.json", row)
+        if checkpoints is not None:
+            g1.save_clip(checkpoints, publish / "clips" / g1.safe(clip_id), clip_id, row, None)
         rows.append(row)
         shutil.rmtree(work, ignore_errors=True)
         progress(done)
     pool.shutdown()
     write_json(stage_dir() / "g5.json", {"kind": "baselines", "select": args.select, "crfs": crfs,
+                                         "restored_clips": sorted(restored),
                                          "limit_frames": args.limit_frames, "preset": PRESET, "tools": tools,
                                          "decision_rule": DECISION, "clips": [summarize_row(r) for r in rows]})
     return 0
