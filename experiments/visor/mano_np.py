@@ -156,6 +156,46 @@ class Mano:
             verts = verts + t
         return joints, (verts if vertices else None)
 
+    def mesh(self, rotmats: np.ndarray, betas: np.ndarray, transl: np.ndarray | None = None, left: bool = False) -> np.ndarray:
+        """Vertices (N, 778, 3)."""
+        _, verts = self.forward(rotmats, betas, transl, left=left, vertices=True)
+        assert verts is not None
+        return verts
+
+    def joints(self, rotmats: np.ndarray, betas: np.ndarray, transl: np.ndarray, left: np.ndarray) -> np.ndarray:
+        """Joints (N, 21, 3) for frames that each have their own shape, side and translation: the
+        ``forward`` computation restricted to the kinematic joints and the five fingertips."""
+        rotmats = np.asarray(rotmats, float)
+        betas = np.asarray(betas, float)
+        n = rotmats.shape[0]
+        if not hasattr(self, "_j_shape"):
+            tips = list(TIPS)
+            self._j_template = self.j_regressor @ self.v_template
+            self._j_shape = np.einsum("jv,vck->jck", self.j_regressor, self.shapedirs)
+            rows = (np.asarray(tips)[:, None] * 3 + np.arange(3)).reshape(-1)
+            self._tip_posedirs = self.posedirs[rows]
+            self._tip_template = self.v_template[tips]
+            self._tip_shape = self.shapedirs[tips]
+            self._tip_weights = self.weights[tips]
+        rest = self._j_template[None] + np.einsum("jck,nk->njc", self._j_shape, betas)
+        feature = (rotmats[:, 1:] - np.eye(3)).reshape(n, 135)
+        tips = (self._tip_template[None] + np.einsum("vck,nk->nvc", self._tip_shape, betas)
+                + (feature @ self._tip_posedirs.T).reshape(n, len(TIPS), 3))
+        world_r = np.zeros((n, 16, 3, 3))
+        world_t = np.zeros((n, 16, 3))
+        world_r[:, 0], world_t[:, 0] = rotmats[:, 0], rest[:, 0]
+        for j in range(1, 16):
+            p = self.parents[j]
+            world_r[:, j] = world_r[:, p] @ rotmats[:, j]
+            world_t[:, j] = world_t[:, p] + np.einsum("nab,nb->na", world_r[:, p], rest[:, j] - rest[:, p])
+        skin_t = world_t - np.einsum("njab,njb->nja", world_r, rest)
+        blend_r = np.einsum("vj,njab->nvab", self._tip_weights, world_r)
+        blend_t = np.einsum("vj,nja->nva", self._tip_weights, skin_t)
+        tip_pos = np.einsum("nvab,nvb->nva", blend_r, tips) + blend_t
+        out = np.concatenate([world_t, tip_pos], 1)[:, list(MANO_TO_OPENPOSE)]
+        out = np.where(np.asarray(left, bool)[:, None, None], out @ MIRROR, out)
+        return out + np.asarray(transl, float)[:, None, :]
+
 
 def change_frame(rotation: np.ndarray, offset: np.ndarray, global_orient: np.ndarray, transl: np.ndarray,
                  rest_root: np.ndarray, left: bool) -> tuple[np.ndarray, np.ndarray]:

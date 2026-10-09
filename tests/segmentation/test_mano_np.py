@@ -78,3 +78,17 @@ def test_change_frame_matches_transformed_points(left):
     moved, moved_verts = model.forward(new_rot, betas, new_t, left=left, vertices=True)
     assert np.allclose(moved, joints @ rotation.T + offset, atol=1e-10)
     assert np.allclose(moved_verts, verts @ rotation.T + offset, atol=1e-10)
+
+
+def test_batched_joints_match_forward_per_frame():
+    model = mano_np.Mano(synthetic_arrays())
+    rng = np.random.default_rng(4)
+    n = 6
+    rot = mano_np.rodrigues(rng.normal(0, 0.5, (n, 16, 3)))
+    betas = rng.normal(0, 1, (n, 10))
+    transl = rng.normal(0, 0.2, (n, 3))
+    left = np.array([True, False, True, False, False, True])
+    batched = model.joints(rot, betas, transl, left)
+    for i in range(n):
+        one, _ = model.forward(rot[i:i + 1], betas[i], transl[i:i + 1], left=bool(left[i]))
+        assert np.allclose(batched[i], one[0], atol=1e-12)
