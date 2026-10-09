@@ -1129,6 +1129,148 @@ invocation turns out to be needed.
   outputs (vector PDF and PNG: coverage per racket dataset, residual per clip,
   per-frame residual; one hash-picked overlay sheet per dataset).
 
+### 2026-10-09 — G1d: depth-aware warps on VISOR's background
+- Question: G1 found that no VISOR stretch or window holds rotation-only
+  (residual energy about 39% parallax and 32% independent motion on the
+  stretches). How much of that residual does a warp that knows depth remove?
+  Does egocentric video get a 3D background (a G3 variant), or go straight to
+  the neural route (G5)?
+- Clips (fixed content-blind before any run). All 34 windows of evaluation
+  set v2, every frame, with G1's foreground (dense masks with B1b's fill). The
+  10 stretches with the smallest sha256("pointstream-g1d:visor-long:<video>"):
+  P26_02, P03_10, P06_10, P06_03, P37_102, P06_05, P02_09, P04_13, P09_106 and
+  P06_106. Each is G1's 120 s at 10 frames/s with G1's foreground: the
+  published SAM 3.1 `sam_text` masks plus the detector boxes, dilated as in
+  G1. Frames are G1's decoded analysis frames. One CPU job decodes them once
+  into a lossless archive (FFV1) with the masks. The job checks that each
+  frame's foreground share equals the one G1 recorded and that the windows'
+  released JPEGs still match the decoded frames.
+- Pairs. G1's registration is re-run with G1's recorded lens. Every
+  `direct` frame t is warped from its G1 reference keyframe k by every
+  method, so all methods are compared on the same pairs. The job checks that
+  the references and G1's rotation residual (G1's own measure) reproduce.
+  Depth methods use EPIC Fields' published COLMAP calibration of
+  EPIC-KITCHENS (P28_101: fx 239.6, fy 243.1 at 456×256, so 86.7° horizontal
+  field of view with their mean; distortion negligible). A per-clip
+  self-calibration is reported beside it as a diagnostic: the grid of focal
+  length and k1 that minimises the calibrated essential matrix's Sampson
+  error.
+- Methods, in order:
+  `rot` (G1's rotation and zoom, reproduced);
+  (a) `h1` (one homography on undistorted pixels) and `planes2/3/4`. These
+  carry a label map on the keyframe, sent once. K planes come from
+  sequential MAGSAC (1 analysis px, 2 px at 1080p) on dense correspondences
+  from k to its first companion: DIS flow seeded by a homography, sampled
+  every 6 px on textured background. Each pixel takes the plane that best
+  predicts its flow, then a 31 px mode filter. Each frame sends K
+  homographies, which the encoder fits to the dense flow from k to t, per
+  label, falling back to `h1` below 30 samples. The renderer forward-splats
+  keyframe pixels, and the larger displacement wins a collision, because
+  nearer surfaces move more;
+  (b) `epi`: the dense flow from t to k, projected onto the pair's epipolar
+  lines (fundamental matrix from the pair's SIFT matches). It removes the
+  motion a rigid scene can explain, but it inherits every error of the
+  per-pixel flow, so it is *not* a ceiling: the dev check below found `tri`
+  above it. It is not a representation.
+  `tri`, the triangulated upper bound: the keyframe's depth comes from dense
+  flow to two companions. They are the frames nearest 0.5 s and 1.0 s after k
+  (or before, at a clip's end; within 0.3–1.5 s, same segment, at least 30
+  homography inliers). Each companion is posed by the essential matrix, and
+  each pixel is triangulated (angle ≥ 0.5°, reprojection ≤ 1.5 analysis px).
+  The primary is the companion with the most pose inliers. A second joins
+  only if, scale-matched, it agrees on their shared pixels (median |log
+  ratio| ≤ 0.05); where both measure, the larger angle wins. Background holes
+  are filled by local plane fits of inverse depth (windows 31–241 px, at
+  least 15% measured). Inverse depth is coded in 8 bits. Each frame's pose
+  comes from PnP (RANSAC, then LM) on the keyframe's 3D points at the pair's
+  matches. The renderer forward-splats the keyframe's background into t with
+  a z-buffer, fills cracks of at most 3×3, then warps colour backwards.
+  `tri_raw` renders only the triangulated pixels, so its holes show how much
+  of `tri` rests on the fill. A frame t is excluded only when it is a
+  companion of its own reference, the circular case;
+  (c) `da3`, Depth Anything 3 depth of the keyframe, monocular. It uses the
+  same PnP and renderer, runs only if the rule below reaches (c), and is
+  audited into the environment first;
+  (d) `kf`, depth-augmented keyframes as the representation: the better of
+  `tri` and `da3`, rendered from the reference and the nearest other
+  keyframe, merged by z-buffer. 3DGS is tried only if (d) leaves holes (below).
+- Measures, per method and frame, are G1's `camera.residual` on the rendered
+  region of the background: p90 residual flow on textured background at
+  1080p (≤ 2 px), shares within 1/2/4 px, PSNR raw / after gain / after
+  flow, and the attribution (exposure, parallax by the pair's epipolar test,
+  independent motion, remainder). Before the flow is measured, each warp's
+  map is extrapolated into its invalid pixels (`depth.complete`), so that
+  holes inside the warped image do not drag the flow at their edges; the
+  scored region is unchanged. Beside them: the hole share (the background
+  both views see, `h1`'s region, that the method does not render), the share
+  of > 2 px pixels within 32 px (1080p) of the foreground, the rate in bytes
+  (`rot` 4 float32 per frame; `h1` 8; planes 8K per frame plus the PNG label
+  map per keyframe; `tri`/`da3` 6 float32 per frame plus the PNG of the
+  8-bit inverse depth per keyframe, its 16-bit size beside it; `kf` also the
+  keyframe's colour as JPEG q90, which every keyframe representation pays),
+  and the render time per frame (one CPU thread, warp construction only). A
+  frame is *explained* when its p90 is ≤ 2 px **and** its hole share is
+  ≤ 10%. Per clip, shares are over G1's measured frames, and a frame a
+  method cannot render counts as not explained.
+- Decision rule (`g1d.DECISION`, fixed before any fleet run). A method
+  brings a group under 2 px *on a meaningful share* when its median clip
+  explains at least 50% of frames. Windows and stretches are judged
+  separately; clips with ≥ 90% (G1's clip bar) are reported beside. (1) If
+  neither `epi` nor `tri` has a meaningful share in either group, no
+  static-scene warp at hand brings VISOR under 2 px. Then (c) and (d) are
+  not run, and egocentric goes to G5. (2) Otherwise (c) and (d) run. The
+  chosen representation is the realizable method (`planes*`, `tri`,
+  `tri_raw`, `da3`, `kf`) with the fewest bytes that has a meaningful share
+  in both groups: egocentric video then gets that background in G3. If none
+  qualifies, G5 leads, and the gap between the best measure (`epi` or `tri`)
+  and the best realizable method is recorded. (3) 3DGS is tried only if the
+  chosen method's median hole share exceeds 5%. In every case, the
+  composition of the residual left by the best methods answers what the
+  remaining residual is made of.
+- Hypothesis: planes help little (median window explained ≤ 20% at K = 4).
+  Depth reaches a meaningful share on the windows but not on the stretches,
+  where references are older and other people, water and lighting change.
+  So no realizable representation qualifies on both groups, and G5 leads for
+  egocentric video. What remains is mostly independent motion near the
+  hands and a photometric remainder.
+- Competing explanations: (1) a measurement floor: DIS flow between views
+  far apart in time or lighting reports misalignment where the geometry is
+  right. Tested by the residual against the time to the reference, by the
+  PSNR after flow, and against OpenTTGames' static floor (G1: 1.15 px p90).
+  (2) Rolling shutter: no single pose fits, so the residual grows with
+  rotation speed (Spearman). (3) Mask leaks: residual next to the foreground
+  (the near-foreground share). (4) Calibration: `epi` and the planes do not
+  need the focal length; `tri` does, and the self-calibration's error at
+  EPIC Fields' lens shows how well that lens fits each clip.
+- Budget: preparation CPU job (stage the 34 videos, 73 GB, plus the masks;
+  decode 34 windows and 10 stretches) ≤ 2 h at 16 threads. Evaluation CPU
+  jobs: smoke ≤ 600 s (2 windows and 1 stretch, 40 frames each), pilot on
+  the same clips in full ≤ 1 h to measure seconds per frame, full ≤ 3 h at
+  48 threads. DA3, if reached: one GPU job ≤ 1 GPU-hour on Ada or A6000,
+  including its first-run kernel check. Ceiling 2 GPU-hours, 8 CPU-job-hours,
+  14 h wall.
+- Before any fleet run (dev checks on gpu6 with the packed environment, the
+  pilot clips capped at 40 frames; not evidence). The preparation round trip
+  is lossless, and its foreground equals G1's on every frame. Five changes
+  followed. (i) The first lens was the per-clip self-calibration. It drifted
+  to the grid's edge (37° and pincushion k1 on two of three clips), because
+  near-rotational pairs let a long focal length fit the essential matrix
+  too; EPIC Fields' calibration replaced it. (ii) Holes inside a splatted
+  image are black, and DIS flow dragged at their edges: `tri` measured
+  12.5 px on a pair whose own correspondences it reproduced within 1.1 px
+  (p90). Hence `depth.complete`. G1 never met this, because its warps leave
+  holes only at the border. (iii) Telea inpainting of inverse depth put
+  8–15 px (p50) of error into the 16% of textured pixels it filled. Local
+  plane fits brought them to 2.7–4.9 px, and `tri` on that pair from 18 to
+  4.5 px. A second companion with 129 pose inliers had also overridden good
+  pixels, hence the agreement test. (iv) Sparse SIFT (about 500 matches)
+  supports two planes at most, so `planes3/4` equalled `planes2`; dense
+  fitting separates them (P02_12 window: 7.7, 4.4 and 3.6 px p90 for K = 2,
+  3 and 4, against 13.5 for `h1`). (v) `epi` was meant as the ceiling, but
+  `tri` explained all 37 frames of P03_120 where `epi` explained 57%, so the
+  rule's step 1 now asks of both. Reproduction of G1: references and rotation
+  p90 matched on every frame (tolerance 0.05 px).
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
