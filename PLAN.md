@@ -339,6 +339,10 @@ references once, then camera pose, hand pose and object motion per frame,
 plus the fallback pixels. Scored with B2's harness on evaluation set v2
 (weighted PSNR on dataset masks, with and without B1b's fill) against B2's
 curves, and timed end to end, which picks B2b's equal-time SVT-AV1 preset.
+Who renders what between G and H (shadows from H's masks, caption overlays,
+exposure, crowds, persistent motion promoted to foreground) and the
+compositing order are fixed in G2's protocol
+([experiments](docs/experiments.md#2026-10-09-background-evaluation-protocol-g2)).
 **Done when** PointStream's curves and encode and decode times on all 34
 items come from recorded jobs, beside B2's.
 

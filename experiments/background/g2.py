@@ -1095,8 +1095,12 @@ def command_validate(args: argparse.Namespace) -> int:
     else:
         doc = json.loads((stage / "g2.json").read_text())
         checks = validate_run(stage, doc)
-    print(json.dumps(checks, indent=1))
-    return 0 if all(checks.values()) else 1
+    report = {"passed": all(checks.values()), "checks": checks}
+    target = os.environ.get("PS_VALIDATION_PATH")
+    if target:
+        write_json(Path(target), report)
+    print(json.dumps(report, indent=1))
+    return 0 if report["passed"] else 1
 
 
 # ----------------------------------------------------------------- choose and report
