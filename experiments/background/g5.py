@@ -411,6 +411,80 @@ def summarize_row(row: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+DCVC_QPS = (9, 27, 45, 63)
+
+
+def code_dcvc(args: argparse.Namespace, source: Path, frames: int, qp: int, work: Path) -> dict[str, Any]:
+    """One DCVC-UF HT-L encode and decode of a 4:2:0 full-range file (B2's worker, full range as is)."""
+    from src.codecs.dcvc_uf_worker import dcvc_command
+
+    work.mkdir(parents=True, exist_ok=True)
+    plan = {"structure": "htl", "qp": qp, "frame_count": frames, "height": HEIGHT, "width": WIDTH,
+            "src_type": "yuv420", "frames_file": str(source), "container": str(work / "stream.psdc"),
+            "out_file": str(work / "decoded.yuv"), "image_ckpt": args.image_ckpt,
+            "image_sha256": file_sha256(Path(args.image_ckpt)), "video_ckpt": args.video_ckpt,
+            "video_sha256": file_sha256(Path(args.video_ckpt)), "profile": False}
+    plan_path = work / "plan.json"
+    write_json(plan_path, plan)
+    reports = {}
+    for action in ("encode", "decode"):
+        report = work / f"{action}.json"
+        command, env, cwd = dcvc_command(Path(sys.prefix), action, plan_path, report)
+        done = subprocess.run(command, env={**os.environ, **env}, cwd=cwd, capture_output=True, text=True,
+                              timeout=3600)
+        if done.returncode:
+            raise RuntimeError(f"DCVC-UF {action} failed ({done.returncode}):\n{done.stderr[-4000:]}")
+        reports[action] = json.loads(report.read_text())
+    data = (work / "stream.psdc").read_bytes()
+    decode, encode = reports["decode"], reports["encode"]
+    return {"bytes": len(data), "decoded": str(work / "decoded.yuv"), "deterministic": decode["deterministic"],
+            "decoder_matches_encoder_intra": decode["passes"][0]["frame_sha256"][0] == encode["i_recon_sha256"],
+            "decode_seconds": [p["decode_seconds"] for p in decode["passes"]],
+            "model_decode_seconds": [p.get("model_decode_seconds") for p in decode["passes"]]}
+
+
+def command_dcvc(args: argparse.Namespace) -> int:
+    """DCVC-UF HT-L on the ``filled`` input of the selected clips (comparison, not the gate)."""
+    import torch
+
+    spec = json.loads(Path(args.clips).read_text())
+    by_id = {c["id"]: c for c in spec["clips"]}
+    dirs = clip_dirs(Path(args.prepared))
+    qps = [int(x) for x in args.qps.split(",")]
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    publish = scratch / "publish"
+    net = load_lpips(args.lpips_backbone, "cuda")
+    rows = []
+    for done, clip_id in enumerate(c["id"] for c in select_clips(spec, args.select)):
+        clip = load_clip(dirs[clip_id], by_id[clip_id], Path(args.visor_fill) if args.visor_fill else None,
+                         args.limit_frames)
+        work = scratch / "work" / g1.safe(clip_id)
+        shutil.rmtree(work, ignore_errors=True)
+        work.mkdir(parents=True)
+        source = work / "filled.yuv"
+        rgb_to_yuv420(inpaint(clip)).tofile(source)
+        points = []
+        for qp in qps:
+            rec = code_dcvc(args, source, clip.n, qp, work / f"qp{qp}")
+            decoded = np.fromfile(rec.pop("decoded"), np.uint8).reshape(clip.n, HEIGHT * 3 // 2, WIDTH)
+            target = publish / "clips" / g1.safe(clip_id) / "streams"
+            target.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(work / f"qp{qp}" / "stream.psdc", target / f"filled-qp{qp}.psdc")
+            points.append({"codec": "dcvc-uf-htl", "input": "filled", "qp": qp,
+                           "kbps": rec["bytes"] * 8 / clip.duration / 1000, "decoded_frames": len(decoded),
+                           "decode_ms_per_frame": 1000 * min(rec["decode_seconds"]) / clip.n, **rec,
+                           "score": score(clip, yuv420_to_rgb(decoded), net, "cuda")})
+            shutil.rmtree(work / f"qp{qp}")
+        row = {**clip.record, "kind": "dcvc", "points": points, "gpu": torch.cuda.get_device_name(0),
+               "gpu_capability": list(torch.cuda.get_device_capability(0))}
+        write_json(publish / "clips" / g1.safe(clip_id) / "dcvc.json", row)
+        rows.append({**row, "points": [{**p, "score": strip_frames(p["score"])} for p in points]})
+        shutil.rmtree(work, ignore_errors=True)
+        progress(done + 1)
+    write_json(stage_dir() / "g5.json", {"kind": "dcvc", "qps": qps, "decision_rule": DECISION, "clips": rows})
+    return 0
+
+
 # ----------------------------------------------------------------- arm A: NVRC
 
 
@@ -837,6 +911,16 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         checks["checkpoint_published"] = published_has(stage, "publish/nvrc-s1/s1/checkpoints/0000/pytorch_model.bin")
         checks["nvrc_vendored"] = all(r["provenance"].get("revision") for r in rows)
         return checks
+    if result["kind"] == "dcvc":
+        checks["every_point"] = all(len(r["points"]) == len(result["qps"]) for r in rows)
+        checks["decoded_every_frame"] = all(p["decoded_frames"] == r["frames"] for r in rows for p in r["points"])
+        checks["deterministic_decode"] = all(p["deterministic"] for r in rows for p in r["points"])
+        checks["decoder_matches_encoder_intra"] = all(p["decoder_matches_encoder_intra"] for r in rows
+                                                      for p in r["points"])
+        checks["rate_rises_with_qp"] = all(all(a["kbps"] < b["kbps"] for a, b in zip(r["points"], r["points"][1:]))
+                                           for r in rows)
+        checks["scores_finite"] = all(finite(p["score"]["dataset"]["psnr_v"]) for r in rows for p in r["points"])
+        return checks
     if result["kind"] == "baselines":
         crfs = result["crfs"]
         checks["every_point"] = all(len(r["points"]) == 2 * len(crfs) for r in rows)
@@ -913,6 +997,13 @@ def main(argv: list[str] | None = None) -> int:
     cond.add_argument("--epochs", type=int, default=300)
     cond.add_argument("--lpips-backbone", default=None)
     cond.set_defaults(func=command_cond)
+    dc = sub.add_parser("dcvc")
+    common(dc)
+    dc.add_argument("--qps", default=",".join(map(str, DCVC_QPS)))
+    dc.add_argument("--image-ckpt", required=True)
+    dc.add_argument("--video-ckpt", required=True)
+    dc.add_argument("--lpips-backbone", default=None)
+    dc.set_defaults(func=command_dcvc)
     val = sub.add_parser("validate")
     val.add_argument("--stage", default=None)
     val.set_defaults(func=command_validate)
