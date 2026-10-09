@@ -63,10 +63,18 @@ Later runs read the table instead of re-checking, and pick `gpu_models` from it.
 
 GPU time and training are the constraint; code is cheap. Before a run, write its
 decision rule, hypothesis, competing explanation and budget in
-[docs/experiments.md](docs/experiments.md). Then run a correctness smoke in
-minutes, a bounded pilot on the one axis that matters, and only then the scaled
-run. Stop when the decision is made. Rank by value to the paper first and the
-demo second.
+[docs/experiments.md](docs/experiments.md). Before building a component, run an
+oracle: the cheapest upper bound of what the component could achieve, at the
+operating point the decision needs. It must dominate the components it gates.
+If it fails the rule, the component is not built. Then run a correctness smoke
+in minutes, a bounded pilot on the one axis that matters, and only then the
+scaled run. Start every sweep with the fewest settings that give a rough answer
+(three, not six), and add points only where the answer is unclear. Every stage
+the agent waits on ends within 45 minutes: smokes, oracles and pilots by
+scope, and longer runs split into parts that each save every finished item.
+Stop when the decision is made.
+Rank by value to the paper first and the demo second. Details are in the
+[protocol](docs/experiments.md#protocol).
 
 ## Evidence
 
