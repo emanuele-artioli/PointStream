@@ -55,7 +55,7 @@ from typing import Any, Iterator
 import numpy as np
 
 from experiments.background.g1 import restore_clips, safe, save_clip
-from experiments.visor.b1 import file_sha256, stage_dir, write_json
+from experiments.visor.b1 import file_sha256, progress, stage_dir, write_json
 from src.codecs import quality, svtav1
 
 ANNOTATIONS = Path(__file__).with_name("g2_annotations.json")
@@ -748,6 +748,7 @@ def command_regions(args: argparse.Namespace) -> int:
         if clip["id"] in restored:
             log(f"{clip['id']}: restored from the checkpoint")
             results.append(restored[clip["id"]]["result"])
+            progress(len(results))
             continue
         work = scratch / "work" / safe(clip["id"])
         shutil.rmtree(work, ignore_errors=True)
@@ -757,6 +758,7 @@ def command_regions(args: argparse.Namespace) -> int:
         results.append(result)
         if checkpoints:
             save_clip(checkpoints, target, clip["id"], result, None)
+        progress(len(results))
         shutil.rmtree(work)
     record = {
         "command": "regions", "clips_file": {"name": doc["name"], "sha256": file_sha256(Path(args.inputs) / "clips.json")},
@@ -983,11 +985,13 @@ def command_run(args: argparse.Namespace) -> int:
             if clip["id"] in restored:
                 log(f"{clip['id']}: restored from the checkpoint")
                 results.append(restored[clip["id"]]["result"])
+                progress(len(results))
                 continue
             result = run_clip(args, clip, scratch, pool)
             results.append(result)
             if checkpoints:
                 save_clip(checkpoints, Path(args.publish) / "clips" / safe(clip["id"]), clip["id"], result, None)
+            progress(len(results))
     finally:
         if pool:
             pool.shutdown()
@@ -1166,6 +1170,26 @@ def bd_rate(rate_a: list[float], q_a: list[float], rate_b: list[float], q_b: lis
     return b2_bd_rate(rate_a, q_a, rate_b, q_b)
 
 
+def checkpoint_doc(path: Path) -> dict[str, Any]:
+    """The finished clips in a stopped job's ``checkpoint.tar``, shaped like ``g2.json``."""
+    import tarfile
+
+    from experiments.background.g1 import CHECKPOINT_RECORD
+
+    results = []
+    with tarfile.open(path) as tar:
+        for member in tar.getmembers():
+            parts = member.name.split("/")
+            if len(parts) == 4 and parts[1] == "clips" and parts[3] == CHECKPOINT_RECORD and not parts[2].startswith("."):
+                handle = tar.extractfile(member)
+                if handle is not None:
+                    results.append(json.loads(handle.read())["result"])
+    codecs = {r["codec"] for r in results}
+    if len(codecs) != 1:
+        raise SystemExit(f"{path}: expected one codec, found {sorted(codecs)}")
+    return {"codec": codecs.pop(), "results": results, "checkpoint": str(path)}
+
+
 def command_report(args: argparse.Namespace) -> int:
     import matplotlib
 
@@ -1176,6 +1200,7 @@ def command_report(args: argparse.Namespace) -> int:
     out.mkdir(parents=True, exist_ok=True)
     regions_doc = json.loads(Path(args.regions_result).read_text())
     docs = [json.loads(Path(p).read_text()) for p in args.result]
+    docs += [checkpoint_doc(Path(p)) for p in args.checkpoint]
     clips = sorted({r["id"] for d in docs for r in d["results"]})
     table = []
     for d in docs:
@@ -1209,7 +1234,7 @@ def command_report(args: argparse.Namespace) -> int:
                                      "stationary": abs(t["kbps"] / e["kbps"] - 1) <= 0.25})
     report = {"clips": clips, "rows": table, "bd_rate_dcvc_vs_svtav1_background": bd, "stationarity": stationarity,
               "regions": [{k: v for k, v in r.items()} for r in regions_doc["results"]],
-              "inputs": {"regions": args.regions_result, "results": args.result}}
+              "inputs": {"regions": args.regions_result, "results": args.result, "checkpoints": args.checkpoint}}
     write_json(out / "g2-report.json", report)
     # Figure: PSNR_V against rate per clip, background input, both codecs; frame input dashed.
     n = len(clips)
@@ -1278,6 +1303,7 @@ def main(argv: list[str] | None = None) -> int:
     report = sub.add_parser("report")
     report.add_argument("--regions-result", required=True)
     report.add_argument("--result", action="append", required=True)
+    report.add_argument("--checkpoint", action="append", default=[], help="checkpoint.tar of a stopped run job")
     report.add_argument("--out", required=True)
     args = parser.parse_args(argv)
     handlers = {"regions": command_regions, "run": command_run, "validate": command_validate,
