@@ -1583,6 +1583,28 @@ invocation turns out to be needed.
   7 clips (300–1,200 frames; test_2, test_3, test_5 and test_6 are shorter
   than 120 s), lossless, foreground equal to G1's on every frame.
   `published.tar` `52d46d36…bffc`.
+- Pilot `20261009T195037Z-d2a08aa1` (gpu1, CPU, `9b0f8de`; smoke gate
+  passed; full 123 s at 32 threads; validator passed, 10 checks, including
+  the oracle at or above each part on every pair): windows P02_12 and
+  P03_120, stretch P26_02, OpenTTGames test_3. Explained share per clip
+  (one frame / 0.1 s / 1 s):
+
+  | Clip | planes4 | epi | tri | oracle | epi forward-backward p90 |
+  |---|---|---|---|---|---|
+  | window P02_12 | 1.00 / 1.00 / 0.11 | 1.00 / 1.00 / 0.39 | 0.94 / 0.89 / 0.11 | 1.00 / 1.00 / 0.39 | 0.13 / 0.21 / 0.75 px |
+  | window P03_120 | 1.00 / 1.00 / 0.26 | 1.00 / 0.95 / 0.63 | 0.95 / 0.79 / 0.21 | 1.00 / 1.00 / 0.68 | 0.22 / 0.39 / 0.66 px |
+  | stretch P26_02 (0.1 s = one frame) | 0.40 / 0.08 | 0.41 / 0.08 | 0.11 / 0.00 | 0.49 / 0.10 | 1.20 / 2.60 px |
+
+  On the stretch, 31% of the 0.1 s pairs and 42% of the 1 s pairs do not
+  match (fewer than 30 homography inliers), and by the rule they count as
+  not explained. On the pairs that do match, `planes4` explains 58%
+  at 0.1 s. Mask check on its 30 window-frame targets at 0.1 s: `planes4`
+  explains 0.50 with the dense masks and 0.60 with `sam_text`, and the
+  oracle 0.57 and 0.77, so the automatic masks do not hold this stretch
+  down. OpenTTGames test_3: `h1` explains 97% at both ages, with p90 0.94
+  and 1.20 px, so the measure holds on a static camera at 1 s. Nothing in
+  the pilot changes the run's settings, so the other 41 clips run as
+  specified: `20261009T195921Z-a5d08578`.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
