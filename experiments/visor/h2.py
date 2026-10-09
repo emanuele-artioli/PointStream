@@ -1098,6 +1098,13 @@ def hot3d_summary(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], rng
                            "participants": sorted({m["participant"] for m, _ in rows})}
     for metric in ("mpjpe_ra_mm", "pa_mpjpe_mm", "mpvpe_ra_mm", "err2d_box"):
         out[metric] = {k: float(np.mean(np.concatenate([a[f"{k}_{metric}"] for _, a in rows]))) for k in MODELS}
+    # Global orientation (reported, not a contest): the wrist→middle-knuckle direction in world axes.
+    gt_rel = np.concatenate([a["gt_world"] - a["gt_world"][:, :1] for _, a in rows])
+    out["orientation_error_deg_median"] = {}
+    for k in MODELS:
+        pred = np.concatenate([a[f"{k}_rel_world"] for _, a in rows])
+        cos = np.sum(pred[:, 9] * gt_rel[:, 9], -1) / (np.linalg.norm(pred[:, 9], axis=-1) * np.linalg.norm(gt_rel[:, 9], axis=-1))
+        out["orientation_error_deg_median"][k] = float(np.degrees(np.median(np.arccos(np.clip(cos, -1, 1)))))
     accel = [{k: accel_errors(m, a, k) for k in MODELS} for m, a in rows]
     out["accel_error_mm"] = {k: float(np.mean(np.concatenate([c[k] for c in accel]))) for k in MODELS}
     resamples = DECISION["bootstrap"]["resamples"]

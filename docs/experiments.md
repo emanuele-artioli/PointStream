@@ -2030,3 +2030,23 @@ invocation turns out to be needed.
   participant), the 4 B2 pilot items, ≤ 1 h; full: HInt test (3,660 hands)
   with the speed runs, 54 HOT3D clips, 34 VISOR items, ≤ 4 GPU-hours.
   CPU coding: one host, 16 threads, ≤ 2 h. Ceiling 6 GPU-hours, 10 h wall.
+- Pilots (code `5d1ff5e` for HInt and VISOR, `d8e00e4` for HOT3D (the same
+  `h2.py`); environment
+  `pointstream-20261006T113321Z`; inputs and specs in
+  `pointstream-data/visor/h2-2026-10-09/`). HInt `20261009T215317Z-ebff7963`
+  (gpu2, RTX A6000; 50 hands per split; validator 10/10): PCK@0.05 (all)
+  on VISOR frames HaMeR 52.6, WiLoR 56.2; New Days 58.1, 57.6. HaMeR's 52.6
+  is above the anchor range (40–47) on 50 hands; the full HInt run decides
+  it. Speed (A6000, fp32, regressor only): HaMeR 30.2 ms per hand at batch
+  1 and 16.0 at batch 32, WiLoR 30.1 and 16.6 (both ViT-H, 672 M and 641 M
+  parameters), WiLoR's detector 25.5 ms per frame: the speed tie-break does
+  not separate them. HOT3D `20261009T215354Z-00426e36` (gpu2, RTX A6000;
+  9 clips, one per participant, 2,562 hands; validator 10/10; the numpy
+  MANO reproduces both models after the change of frame to < 1 µm):
+  PA-MPJPE HaMeR 9.5 mm, WiLoR 6.4; acceleration error 4.4 and 5.8
+  mm/frame²; but wrist-aligned MPJPE 19.3 and 31.2 mm, because WiLoR's
+  global orientation is worse (median 16.9° against 7.0°, both hands
+  alike, so not a mirroring error), while its articulation and size are
+  better (size ratio 0.98 against 0.89). PA-MPJPE removes the orientation,
+  which a renderer needs; the report gives orientation error and
+  wrist-aligned MPJPE beside the pre-registered contests.
