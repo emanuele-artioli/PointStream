@@ -1628,11 +1628,12 @@ invocation turns out to be needed.
 
   Clips with at least half explained, `planes4` / oracle: windows at 0.1 s
   22 / 27 of 34, stretches at 0.1 s 4 / 6 of 10. Per clip at 0.1 s,
-  `planes4` explains 0–100% of a window's targets (16 windows all of them)
+  `planes4` explains 0–100% of a window's targets (11 windows all of them)
   and 16–88% of a stretch's. The stretches' pairs mostly match (median
   clip 95% at 0.1 s, 75% at 1 s). Their shortfall is residual on matched
   pairs: `planes4` explains 49% of them and the oracle 65%. `epi` alone
-  matches the oracle's verdict on about 90% of pairs. `planes4` costs
+  gives the oracle's verdict on 95–100% of a median clip's pairs, so the
+  best-of construction mattered little here. `planes4` costs
   128 bytes per frame plus a label map per reference.
 - Outcome by the rule: **step 3**.
   - **Refresh ages.** The oracle's are 0.3 s on the windows and 0.1 s on
