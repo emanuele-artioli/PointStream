@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(/**)",
+      "Bash(git *)",
+      "Bash(ruff check *)",
+      "Bash(mypy *)",
+      "Bash(python -m pytest *)"
+    ],
+    "ask": [
+      "Bash(gh pr merge *)",
+      "Bash(git push * main)",
+      "Bash(git clean *)",
+      "Bash(rm -rf *)",
+      "Bash(scripts/ps-fleet *)",
+      "Bash(ssh gpu*)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git reset --hard *)",
+      "Edit(//home/itec/emanuele/Datasets/**)",
+      "Edit(//home/itec/emanuele/Models/**)"
+    ]
+  }
+}
