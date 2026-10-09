@@ -1270,6 +1270,30 @@ invocation turns out to be needed.
   `tri` explained all 37 frames of P03_120 where `epi` explained 57%, so the
   rule's step 1 now asks of both. Reproduction of G1: references and rotation
   p90 matched on every frame (tolerance 0.05 px).
+- Preparation `20261009T075810Z-295529d4` (gpu6, CPU, `499998c`; smoke 70 s,
+  full 312 s; validator passed on smoke and full output, 8 checks): 44
+  clips, 7.0 GB of FFV1 (`published.tar` `5a9c47db…5d62`). The round trip
+  is lossless, the foreground equals G1's on every frame, and the window
+  JPEGs match. Hosts gpu1, gpu3, gpu5 and gpu6: gpu2 refused SSH (no worker
+  heartbeat), and gpu4 is left out because it is locked for measurements.
+- Pilot `20261009T080919Z-2aa14966` (gpu1, CPU, `0a5bb1f`; smoke gate
+  passed, 10 checks; full 623 s at 32 threads, about 950 frames; validator
+  passed on the full output). G1's references and rotation p90 reproduce on
+  every frame. Explained share (p90 ≤ 2 px, holes ≤ 10%):
+
+  | Clip | rot | h1 | planes2 / 3 / 4 | epi | tri | tri_raw (ignoring holes) |
+  |---|---:|---:|---|---:|---:|---:|
+  | window P02_12 | 0.07 | 0.17 | 0.22 / 0.22 / 0.23 | 0.35 | 0.15 | 0.20 |
+  | window P03_120 | 0.11 | 0.14 | 0.19 / 0.20 / 0.20 | 0.70 | 0.20 | 0.70 |
+  | stretch P26_02 | 0.01 | 0.03 | 0.05 / 0.04 / 0.05 | 0.08 | 0.02 | 0.10 |
+
+  Over a whole window, every residual grows with the time to the reference
+  (Spearman 0.76–0.93; the windows' references are their first frame).
+  Depth triangulated 0.5–1 s after the keyframe does not hold seconds
+  later, so `tri` falls far below its 40-frame dev check. The full run of
+  the other 41 clips is sized from this (about 18,500 frames, about 1 h at
+  48 threads): `20261009T082847Z-36c4a84c`, same revision, so the pilot's
+  clips stand.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
