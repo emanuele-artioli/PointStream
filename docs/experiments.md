@@ -149,6 +149,114 @@ invocation turns out to be needed.
   over items: foreground J 0.459, F 0.370 (EK-100 0.403, EK-55 0.504; per item
   0.03–0.85). B1's done-when holds on set v2.
 
+### 2026-10-09: Background evaluation protocol (G2)
+Fixed before any G2 run; G3–G5 are measured by it. It serves the cameras G1
+found to hold (racket sports); VISOR takes it over later with its dataset
+masks in place of SAM's.
+- **Clips and times.** G1's 8 clips: OpenTTGames test_1, 2, 4, 5, 6, 7 (1080p,
+  120 fps, limited-range H.264 at 30–60 Mbps) and TrackNet game8/Clip3,
+  game10/Clip1 (720p JPEG frames, 30 fps). Times count from the clip's first
+  frame (G1's `first_index`). Warm-up W = G1's 99% warm-up: 4.5, 9.0, 5.0,
+  1.0, 2.0, 2.0, 1.0 and 0.5 s in that order. Evaluation span E = [W, W + 10 s]
+  (TrackNet game10/Clip1 ends at 10.5 s, so E is its whole remainder). A
+  second span E2 = [W + 10, W + 20 s] on the OpenTTGames clips checks that a
+  baseline's rate is stationary. Scored frames: G1's analysis frames (10
+  frames/s, which carry its SAM 3.1 masks) inside the span, at full
+  resolution.
+- **Regions** (computed once per clip by `g2 regions` and shipped to every
+  later job as one archive). F, the foreground: SAM 3.1 `person` instances
+  whose centroid lies outside the clip's crowd zone (the players, and anyone
+  else moving on court, such as ball kids), every `racket` instance, and a
+  disc of radius width/160 (12 px at 1080p) at each labelled ball position
+  (OpenTTGames `ball_markup.json`, TrackNet `Label.csv`), the masks dilated
+  by 16 analysis pixels (32 px at 1080p). V = not F is the visible
+  background; every background score is on V. Inside V, reported apart:
+  *crowd* C, the annotated zone of spectators and officials (umpire with the
+  table's score display, line judges, ball kids at their posts) minus F;
+  *caption graphics* G, annotated broadcast overlays (score box, channel
+  logo, banner) with the frames they are on, over C where both apply;
+  *shadows* S, pixels of V outside C and G, within half a player's box
+  height of the player, darker than the clip's plate (0.35 ≤ Y/Y_plate ≤
+  0.92, Cb and Cr within 10 levels; opened 3×3, components under 20
+  analysis pixels dropped); *plain* P, the rest. Zones and captions are hand
+  annotations in `experiments/background/g2_annotations.json`, one still
+  camera per clip; the plate is the per-pixel median of the clip's visible
+  samples at 2 frames/s. OpenTTGames' own masks (320×128, players only)
+  are too coarse to score 1080p but check SAM's players (IoU reported).
+  The image-coordinate zones and plate need a still camera; every analysis
+  frame's phase-correlation shift against the plate is reported and must
+  stay under 1 px.
+- **Metrics.** Per scored frame and region: PSNR from exact squared-error
+  sums on B2's RGB view of source and output (`src/codecs/quality.py`),
+  and LPIPS (AlexNet) averaged over the region of its full-resolution map.
+  A clip's score is the mean over its frames (pooled error recorded too).
+  Clips are the samples: curves per clip, then means over clips, per
+  dataset; frames are never pooled across clips.
+- **Rate accounting.** A method sends, beyond the warm-up, B_once bytes once
+  (its representation, camera intrinsics, overlay graphics, light
+  direction, each after its own entropy coding) and b_t bytes per frame
+  (camera parameters, exposure gain and offset, overlay events, crowd
+  refreshes, residual). Its rate after T seconds of play is
+  R(T) = 8 (B_once + Σ_{t ∈ [W, W+T)} b_t) / T, reported for T from 1 s to the
+  clip's end, with the break-even T* at which it meets a baseline at equal
+  V quality. The warm-up itself is delivered the same way for every method
+  (by the baseline codec) and excluded from all rates. A representation the
+  client builds from warm-up frames it already decoded costs nothing extra,
+  but then inherits their coding loss; each method states which it does.
+  Baselines count the bytes of the frames in E only (SVT-AV1: the IVF
+  temporal unit of each displayed frame; DCVC-UF: each NAL spread evenly
+  over the frames it carries), coded from a 2 s lead-in (from the clip start
+  when W < 2 s) so the intra frame lies outside E.
+- **Acceptable loss for crowd, graphics and shadows.** Weighted PSNR is
+  0.7 PSNR_F + 0.3 PSNR_V, so a loss of x dB on V costs 0.3x dB. For each
+  of crowd with graphics, and shadows: their excess error is measured
+  against the counterfactual in which those pixels have the plain region's
+  per-pixel error in the same frame (SSE_V' = SSE_P · |V| / |P|;
+  ΔPSNR_V = 10 log10(SSE_V / SSE_V'); likewise for LPIPS). A treatment is
+  acceptable if at every compared rate it costs at most 0.33 dB of PSNR_V
+  (0.1 dB weighted PSNR) and at most 0.002 of whole-frame LPIPS. On B2's
+  curves either amount is worth about 4% rate (SVT-AV1 and DCVC-UF gain
+  about 1.8 dB weighted PSNR and 0.03 LPIPS per doubling at low rate), small
+  against the background savings G3 targets. A treatment that fails is
+  refreshed more often or coded until it passes.
+- **Ownership of the in-between content** (agreed with H, which renders F).
+  | Content | Owner | Representation | Rate |
+  |---|---|---|---|
+  | Players, rackets, ball, anyone moving on court | H | H's per-object model | foreground |
+  | Player shadows | G, from H's masks | H's mask projected onto the ground plane along a light direction estimated once per scene, as a darkening factor; fallback a low-resolution darkening map per frame | once; fallback per frame |
+  | Caption graphics | G, overlay layer | each graphic once (RGBA) on first appearance; per-frame on/off and position events; new content (a score change) is a new graphic | once per graphic; events |
+  | Exposure | G | per-frame gain and offset per channel | per frame |
+  | Crowd, officials, LED boards | G | static from the warm-up, refreshed as coded patches of the zone only as often as the acceptable-loss test needs | refreshes |
+  | Persistent independent motion | H | promoted to foreground (by the region rule above when it is a person outside the zone; otherwise flagged by G's residual and handed to H) | foreground |
+  | Anything else the render gets wrong | G | residual (below) | per frame |
+
+  The client composites in this order: background (with exposure), shadows,
+  foreground, overlays (H5).
+- **Residual policy.** Code only where the render is wrong: per 16×16 block
+  (11×11 at 720p) of V outside C and G, a block is selected when the
+  render's mean squared error there exceeds τ; F is never coded by G; τ is
+  swept with the codec's quantizer as the residual's rate knob. Arms, at
+  matched rate on PSNR_V: (a) the masked residual, source − render + 128 in
+  selected blocks and 128 elsewhere, coded as video by SVT-AV1 and DCVC-UF;
+  (b) the render as the codec's prediction: DCVC-UF's conditional coder
+  given the rendered frame as its reference (in place of, then beside, the
+  previous decoded frame); (c) no residual. The arm with the lowest BD-rate
+  on PSNR_V wins; within 3%, the simpler one. G3 runs this; it needs a
+  render.
+- **Baselines** on the same frames, quality on V: SVT-AV1 4.2.0 preset 4
+  and DCVC-UF HT-L with full-range-as-is input (B2's and B2b's
+  configurations; VVC after a working pipeline), each on two inputs:
+  *background*, the source with F filled from the clip's plate (static, so
+  nearly free to code: the strongest baseline a background method faces,
+  and the one G3 and G5 are compared with); and *frame*, the source as is,
+  which shows what a codec that does not separate the foreground spends
+  (SVT-AV1 only; B2 compares both codecs on whole frames). Between analysis
+  frames the fill uses the union of the neighbouring analysis frames' F.
+  PRESLEY-style degradation joins with G3, as an ablation of its renderer.
+- **Client time.** Baselines record decoder wall time per frame (dav1d,
+  DCVC-UF's model decode); G3 and G5 record render time per frame on the
+  same host class.
+
 ### 2026-10-05: Baselines
 - Decision: SVT-AV1 plus one state-of-the-art neural video codec. VVC only if a
   correct invocation is needed.
@@ -1359,3 +1467,53 @@ invocation turns out to be needed.
   briefed (rigid objects from a reference) has no support from H1: handled
   objects stay pixels, and the static surfaces belong to G. H4 should be
   rescoped or dropped before it runs; the user decides.
+
+### 2026-10-09 — G2: background baselines on racket sports
+- Question: what do SVT-AV1 and DCVC-UF spend to deliver the visible
+  background of G1's 8 clips, and at what quality, by the
+  [protocol](#2026-10-09-background-evaluation-protocol-g2)? These curves are
+  what G3's panorama and G5's neural background must beat.
+- Steps. (1) `g2 regions` (CPU job, all 8 clips): plates, regions, the
+  still-camera check and the SAM-against-OpenTTGames check, published as the
+  regions archive, plus each region's share of V and a zero-rate *static
+  ceiling*: the warm-up plate (median of the visible samples in [0, W],
+  unseen pixels inpainted) scored on E as is and with a per-frame gain and
+  offset fitted on P. The ceiling is not G3 (nothing is coded); it shows
+  before G3 how much crowd, graphics, shadows and exposure cost a background
+  that does not move. (2) `g2 run`, pilot: SVT-AV1 (both inputs) and DCVC-UF
+  (background) on 2 clips, wide sweeps. (3) Full: all 8 clips at the chosen
+  points. Each codec job checkpoints each finished clip (its streams and
+  scores) and declares one resume attempt.
+- Pilot clips (content-blind, smallest sha256("pointstream-g2:<clip>") per
+  dataset): ott/test_5 and tracknet/game10/Clip1. Sweeps: SVT-AV1 CRF 13, 20,
+  27, 34, 41, 48, 55, 62, 63; DCVC-UF QP 0, 9, 18, 27, 36, 45, 54, 63.
+- Decision rule (rate points, before the pilot): on the pilot means of
+  PSNR_V over E against rate (background input), take the common quality
+  range of the two codecs, capped above at 45 dB (TrackNet's sources are
+  JPEG frames, and OpenTTGames' 30–60 Mbps sources lie far above any rate
+  here, so the cap guards against measuring source artefacts). Place 6
+  targets evenly across it; per codec take the swept point nearest each
+  target, without duplicates, plus the next lower-rate swept point. The
+  frame input uses SVT-AV1's chosen CRFs. If the range is under 3 dB or a
+  codec gets fewer than 4 points, refine on the pilot clips first.
+- Decision rule (G2): done when the protocol above is fixed and both codecs'
+  background curves (and SVT-AV1's frame curves) for all 8 clips come from
+  recorded jobs whose validators passed. A baseline whose rate on E2 differs
+  from E by more than 25% at a point is reported as not stationary there,
+  and G3's R(T) is then compared over E only.
+- Hypothesis: with a still camera and the foreground filled from the plate,
+  the background costs a codec little: at equal CRF the background input
+  needs under a quarter of the frame input's rate, and SVT-AV1 reaches 38 dB
+  PSNR_V under 150 kbps on OpenTTGames. DCVC-UF beats SVT-AV1 on the
+  background input (negative BD-rate on PSNR_V), as B2b found it strongest
+  on low-detail backgrounds.
+- Competing explanation: DCVC-UF spends a floor of bits on every P frame and
+  has no skip mode, so at 120 fps on near-static content it loses to
+  SVT-AV1, whose skip blocks cost almost nothing; and the background's rate
+  is set less by the static scene than by what still changes in it (crowd,
+  captions, exposure, sensor noise at 120 fps), which the region split and
+  the static ceiling locate.
+- Budget: regions ≤ 1 h CPU; pilot SVT-AV1 ≤ 1 h (CPU coding, GPU scoring)
+  and DCVC-UF ≤ 1 h; full SVT-AV1 ≤ 2 h, DCVC-UF ≤ 2.5 h, on RTX 6000 Ada or
+  RTX A6000 (DCVC-UF HT-L as in B2; scoring on the same GPU). Ceiling 6
+  GPU-hours and 12 h wall; smokes ≤ 600 s.

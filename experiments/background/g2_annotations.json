@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "description": "G2 hand annotations (docs/experiments.md, background evaluation protocol). Boxes are [x0, y0, x1, y1] in source pixels, end-exclusive. crowd: the zone of spectators, officials and in-venue score displays; captions: broadcast overlays, with the source frame range they are on (null: the whole clip). Annotated by eye on frames at 12 s (OpenTTGames) and at the first, middle and last frame (TrackNet); every camera is still (G1).",
+  "clips": {
+    "ott/test_1": {"size": [1920, 1080], "crowd": [[830, 320, 1050, 570]], "captions": []},
+    "ott/test_2": {"size": [1920, 1080], "crowd": [[860, 290, 1060, 530]], "captions": []},
+    "ott/test_4": {"size": [1920, 1080], "crowd": [[840, 390, 1000, 580]], "captions": []},
+    "ott/test_5": {"size": [1920, 1080], "crowd": [[840, 390, 1010, 640]], "captions": []},
+    "ott/test_6": {"size": [1920, 1080], "crowd": [[910, 400, 1090, 640]], "captions": []},
+    "ott/test_7": {"size": [1920, 1080], "crowd": [[820, 160, 1000, 470]], "captions": []},
+    "tracknet/game8/Clip3": {
+      "size": [1280, 720],
+      "crowd": [[0, 0, 1280, 118], [0, 118, 200, 445], [1060, 118, 1280, 455], [440, 112, 500, 182],
+                [785, 110, 830, 182], [255, 105, 300, 185], [1025, 112, 1095, 175], [165, 150, 230, 180]],
+      "captions": [{"box": [58, 40, 304, 126], "frames": null}, {"box": [1055, 40, 1217, 110], "frames": null}]
+    },
+    "tracknet/game10/Clip1": {
+      "size": [1280, 720],
+      "crowd": [[300, 0, 960, 88], [170, 140, 265, 315], [1070, 265, 1135, 335], [1215, 150, 1280, 340],
+                [240, 28, 315, 84]],
+      "captions": [{"box": [148, 82, 332, 157], "frames": null}, {"box": [1058, 35, 1218, 108], "frames": null},
+                   {"box": [1128, 108, 1222, 575], "frames": null}]
+    }
+  }
+}
