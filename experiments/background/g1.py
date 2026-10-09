@@ -295,6 +295,46 @@ def sam_text_masks(segmenter: Any, clip: dict[str, Any], jpeg_dir: Path) -> Any:
     return out
 
 
+def foreground(clip: dict[str, Any], work: Path, base: list[np.ndarray] | None, visor_fill: str | None,
+               hand_objects: str | None) -> dict[str, Any]:
+    """Write foreground.npy (dilated) and, for VISOR stretches, dense.npz on window frames."""
+    record: dict[str, Any] = {"dilate_px_1080": camera.DILATE * camera.TO_1080}
+    n = len(clip["indices"])
+    width, height = camera.ANALYSIS_SIZE
+    fgm = np.lib.format.open_memmap(work / "foreground.npy", mode="w+", dtype=bool, shape=(n, height, width))
+    raw = base if base is not None else [np.zeros((height, width), bool) for _ in range(n)]
+    if clip["masks"]["kind"] == "visor_fill":
+        masks, info = visor_fill_masks(clip, Path(str(visor_fill)))
+        record.update(tier="visor_dense_sam_fill", **info)
+        offset = clip["indices"][0] - clip["item"]["first_video_index"]
+        for i in range(n):
+            raw[i] = to_analysis(union(masks.frames[offset + i], (masks.height, masks.width)))
+    if clip["masks"].get("boxes"):
+        boxes, info = detector_boxes(clip, Path(str(hand_objects)))
+        record["detector"] = info
+        for i in range(n):
+            raw[i] = raw[i] | boxes[i]
+    for i in range(n):
+        fgm[i] = dilate(raw[i])
+    fgm.flush()
+    window = clip["masks"].get("window_item")
+    if window:
+        masks, info = visor_fill_masks({"item": window}, Path(str(visor_fill)))
+        dense, recalls = {}, []
+        for i, index in enumerate(clip["indices"]):
+            at = index - window["first_video_index"]
+            if 0 <= at < len(masks.frames):
+                d = to_analysis(union(masks.frames[at], (masks.height, masks.width)))
+                dense[str(i)] = dilate(d)
+                if d.any():
+                    recalls.append(float((d & np.asarray(fgm[i])).sum() / d.sum()))
+        np.savez(work / "dense.npz", **dense)
+        record["tier_check"] = {"window_item": window["id"], "frames": len(dense), **info}
+        record["dense_recall"] = {"frames": len(recalls), "mean": round(float(np.mean(recalls)), 4) if recalls else None,
+                                  "p10": round(float(np.percentile(recalls, 10)), 4) if recalls else None}
+    return record
+
+
 # ----------------------------------------------------------------- analysis (spawned processes)
 
 
@@ -681,44 +721,6 @@ def command_run(args: argparse.Namespace) -> int:
             task["jpeg_gate"] = jpeg_gate(clip, archive)
         return task
 
-    def foreground(clip: dict[str, Any], work: Path, base: list[np.ndarray] | None) -> dict[str, Any]:
-        """Write foreground.npy (dilated) and, for VISOR stretches, dense.npz on window frames."""
-        record: dict[str, Any] = {"dilate_px_1080": camera.DILATE * camera.TO_1080}
-        n = len(clip["indices"])
-        width, height = camera.ANALYSIS_SIZE
-        fgm = np.lib.format.open_memmap(work / "foreground.npy", mode="w+", dtype=bool, shape=(n, height, width))
-        raw = base if base is not None else [np.zeros((height, width), bool) for _ in range(n)]
-        if clip["masks"]["kind"] == "visor_fill":
-            masks, info = visor_fill_masks(clip, Path(args.visor_fill))
-            record.update(tier="visor_dense_sam_fill", **info)
-            offset = clip["indices"][0] - clip["item"]["first_video_index"]
-            for i in range(n):
-                raw[i] = to_analysis(union(masks.frames[offset + i], (masks.height, masks.width)))
-        if clip["masks"].get("boxes"):
-            boxes, info = detector_boxes(clip, Path(args.hand_objects))
-            record["detector"] = info
-            for i in range(n):
-                raw[i] = raw[i] | boxes[i]
-        for i in range(n):
-            fgm[i] = dilate(raw[i])
-        fgm.flush()
-        window = clip["masks"].get("window_item")
-        if window:
-            masks, info = visor_fill_masks({"item": window}, Path(args.visor_fill))
-            dense, recalls = {}, []
-            for i, index in enumerate(clip["indices"]):
-                at = index - window["first_video_index"]
-                if 0 <= at < len(masks.frames):
-                    d = to_analysis(union(masks.frames[at], (masks.height, masks.width)))
-                    dense[str(i)] = dilate(d)
-                    if d.any():
-                        recalls.append(float((d & np.asarray(fgm[i])).sum() / d.sum()))
-            np.savez(work / "dense.npz", **dense)
-            record["tier_check"] = {"window_item": window["id"], "frames": len(dense), **info}
-            record["dense_recall"] = {"frames": len(recalls), "mean": round(float(np.mean(recalls)), 4) if recalls else None,
-                                      "p10": round(float(np.percentile(recalls, 10)), 4) if recalls else None}
-        return record
-
     def analysis_task(clip: dict[str, Any], decoded: dict[str, Any], masks_record: dict[str, Any],
                       lens: dict[str, Any] | None = None) -> dict[str, Any]:
         task = {"plan": clip, "work": str(scratch / "work" / safe(clip["id"])),
@@ -795,14 +797,14 @@ def command_run(args: argparse.Namespace) -> int:
         }
         shutil.rmtree(work / "jpeg", ignore_errors=True)
         base = [to_analysis(union(f, (masks.height, masks.width))) for f in masks.frames]
-        record = {"tier": SAM_TIER, "prompts": clip["masks"]["prompts"], **foreground(clip, work, base)}
+        record = {"tier": SAM_TIER, "prompts": clip["masks"]["prompts"], **foreground(clip, work, base, args.visor_fill, args.hand_objects)}
         submit_analysis(clip["id"], analysis_task(clip, decoded, record))
         done += 1
         progress(done)
     for clip in other:  # VISOR windows: decode here, foreground from the dense masks, lens from the stretch
         decoded = decoder.submit(decode_clip, decode_task(clip, False)).result()
         work = scratch / "work" / safe(clip["id"])
-        record = foreground(clip, work, None)
+        record = foreground(clip, work, None, args.visor_fill, args.hand_objects)
         lens = None
         if clip.get("lens_from"):
             if clip["lens_from"] not in futures:

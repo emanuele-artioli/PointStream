@@ -214,6 +214,44 @@ from G3 against generative video inpainting (to be audited into the
 environment), compared on the visible pixels around the hole and by eye.
 **Done when** one source of clean frames is chosen for G5, with numbers.
 
+#### G1d. Depth-aware warps on VISOR (done 2026-10-09)
+
+After G1 ruled out a rotation-only panorama, G1d asked whether knowing depth
+fixes it. On G1's pairs, where one reference serves for seconds, no
+depth-aware warp brings VISOR's background under 2 px on a meaningful share
+of frames. That holds for a few planes, triangulated keyframe depth, and even
+dense flow on epipolar lines: median clip 34% of window frames and 9% of
+stretch frames. So DA3 and depth-augmented keyframes were not run. For
+egocentric video, a background sent once and reused for seconds is ruled out.
+Racket sports are unaffected: G1 found their fixed cameras hold a panorama
+(OpenTTGames 6 of 7 clips, with the first frame already showing 90% of every
+later background). With a fresh
+reference (under 0.1 s), though, the best static warp explains 70% of window
+frames and four planes 49%. So the open question is the refresh rate and its
+cost, not depth ([experiments](docs/experiments.md)).
+
+#### G1e. Reference refresh (next)
+
+Can a background memory refreshed often enough reach the 2 px bar, and how
+often must it refresh? Same clips, masks and measure as G1d, with the
+reference forced to a fixed age. Start with three ages, spread on a log
+scale (one frame, 0.1 s, 1 s), and add ages only where the curve is unclear.
+Use the best static warp as the oracle and four planes as the cheap
+realizable warp. Beside it:
+
+- **Measurement floor:** the same measure on OpenTTGames' static camera at
+  the same time gaps, to test whether the residual's growth with the gap is
+  the scene or the measure.
+- **Mask confound:** stretches scored only on the frames with dense masks.
+
+**Done when** a recorded job gives the refresh age at which each warp
+explains a meaningful share of frames on windows and on stretches, and
+whether the growth with age is real. If a refresh rate qualifies, G2 then
+prices it against SVT-AV1 and DCVC-UF on the same background frames. The
+reference refresh scheme then serves both domains (a turning camera
+refreshes rarely), unless G2 shows it costs clearly more than the panorama
+on racket sports. Otherwise egocentric video goes to G5.
+
 #### G5. Neural background model
 
 A neural codec fitted or fine-tuned on the warm-up's clean frames, sent once
