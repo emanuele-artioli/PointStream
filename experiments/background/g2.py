@@ -960,6 +960,8 @@ def command_run(args: argparse.Namespace) -> int:
         if args.workers != 1:
             raise SystemExit("DCVC-UF runs one point at a time on its GPU")
     args.metric_device = args.metric_device or ("cuda" if args.codec == "dcvc" else "cpu")
+    if (Path(args.regions) / "publish" / "clips").is_dir():  # the extracted archive's root
+        args.regions = str(Path(args.regions) / "publish")
     doc = load_clips(Path(args.inputs))
     clips = select(doc, args.select)
     regions_record = json.loads((Path(args.regions) / "g2-regions.json").read_text()) \
