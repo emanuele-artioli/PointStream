@@ -1677,6 +1677,11 @@ invocation turns out to be needed.
   full 903 s, refinement 441 s, so about 28 min of CPU-job wall (ceiling 6
   CPU-job-hours). Wall time from the first submission to the report: about
   50 min (ceiling 6 h).
+- After review (user, 2026-10-09): the rule's step-3 component is *not*
+  built. Its ceiling on the stretches is the oracle's 51% at 0.1 s, a
+  narrow pass at best, for a reference refreshed ten times a second.
+  Egocentric background work moves to G5. The parked options and what
+  would reopen them are in PLAN (G1e).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could

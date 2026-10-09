@@ -238,11 +238,29 @@ of stretch targets. Four planes, the sendable warp, explain 78% and 39%.
 At 1 s, neither group passes. The growth with age is real (the measurement
 floor holds), and the masks are not the cause. What is left after a fresh
 reference is photometric change and independent motion, not geometry. By
-the rule (step 3), no sendable warp qualifies in both groups. The rule's
-next step is a sendable warp between four planes and the oracle (DA3 or
-depth-augmented keyframes) at the oracle's refresh age. Its ceiling on the
-stretches is the oracle's 51%, so it can only just pass. Details in
+the rule (step 3), no sendable warp qualifies in both groups. Details in
 [experiments](docs/experiments.md) (G1e entry).
+
+Decision (user, 2026-10-09): egocentric background work moves to G5. The
+rule's own next step is parked, because its best case is a narrow pass:
+a sendable warp between four planes and the oracle (DA3 or depth-augmented
+keyframes) at the oracle's refresh age, capped on the stretches by the
+oracle's 51% at 0.1 s. A reference refreshed ten times a second is close to
+ordinary video coding anyway. Parked options, with what would reopen them:
+
+- **G1f, a better static warp at 0.1 s** (DA3 or depth-augmented keyframes,
+  code in `experiments/background/{g1d,da3}.py`, never run). Reopen if G5
+  fails, or if a cheaper refresh appears. It can only add parallax, which
+  is 7% of what remains at 0.1 s.
+- **Four planes refreshed at 0.1 s on annotated windows only** (78% of
+  window targets). A G2 candidate only if the paper scopes egocentric
+  results to annotated windows, which G1d's and G1e's content-blind
+  stretches argue against.
+- **Model the residual, not the geometry.** After a fresh reference, 63–70%
+  of what remains is photometric (blur, noise, lighting, disocclusion) and
+  21–27% is independent motion. A G5 model that is conditioned on the
+  warped reference could target exactly this. That is the bridge from G1e
+  to G5.
 
 #### G5. Neural background model
 
