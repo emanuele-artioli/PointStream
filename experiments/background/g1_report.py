@@ -122,48 +122,115 @@ def start_decision(groups: dict[str, Any]) -> dict[str, Any]:
     return {"start": "neither: G5 leads", "reason": "no dataset holds"}
 
 
-def figures(rows: list[dict[str, Any]], frames: dict[str, list[dict[str, Any]]], out: Path) -> list[str]:
+#: Paper style: one colour per verdict, the dataset order of the tables.
+HOLD, FAIL = "#2f7d4f", "#b3362f"
+COVER_TICKS = [0, 1, 2, 5, 10, 30, 120]
+MIN_LATER = 10  # frames after the warm-up for a point of C(w)
+
+
+def _style() -> Any:
     import matplotlib
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    plt.rcParams.update({"font.size": 8, "axes.titlesize": 8, "axes.labelsize": 8, "xtick.labelsize": 7,
+                         "ytick.labelsize": 7, "axes.spines.top": False, "axes.spines.right": False,
+                         "pdf.fonttype": 42, "savefig.bbox": "tight"})
+    return plt
+
+
+def _save(fig: Any, out: Path, stem: str) -> list[str]:
     names = []
-    colours = {"visor-long": "#c2410c", "visor-window": "#f59e0b", "ott": "#0e7490", "racketvision": "#4338ca",
-               "tracknet": "#15803d"}
-    fig, axes = plt.subplots(1, 5, figsize=(20, 3.6), sharey=True)
-    for ax, group in zip(axes, GROUPS):
-        sel = [r for r in rows if r["group"] == group]
-        for r in sel:
-            w = np.array(r["coverage"]["warmups_s"], float)
-            c = np.array([np.nan if v is None else v for v in r["coverage"]["curve"]], float)
-            ax.plot(w, c, color=colours[group], alpha=0.35, lw=1)
-        ax.axhline(0.9, color="grey", lw=0.6, ls="--")
-        ax.axhline(0.99, color="grey", lw=0.6, ls=":")
-        ax.set_title(f"{LABELS[group]} ({len(sel)})")
-        ax.set_xlabel("warm-up w (s)")
-        ax.set_xscale("symlog", linthresh=1)
-    axes[0].set_ylabel("C(w): later background already seen")
-    fig.tight_layout()
-    fig.savefig(out / "g1-coverage.png", dpi=110)
+    for ext in ("pdf", "png"):
+        fig.savefig(out / f"{stem}.{ext}", dpi=200)
+        names.append(f"{stem}.{ext}")
+    return names
+
+
+def figures(rows: list[dict[str, Any]], frames: dict[str, list[dict[str, Any]]], out: Path,
+            published: list[str] | None = None) -> list[str]:
+    """Paper figures from the recorded results: vector PDF and PNG, plus sample overlays.
+
+    ``g1-coverage``: C(w) per clip, one panel per racket dataset (the rotation
+    model never holds on VISOR, so its curves are not drawn), green where the
+    clip holds, grey where it does not. ``g1-residual``: each clip's median per-frame p90 residual flow (log
+    scale) against the 2 px rule. ``g1-residual-frames``: the per-frame
+    distribution per dataset. ``figures/overlay_<dataset>.jpg``: one overlay
+    sheet per dataset, picked by hash, not by look.
+    """
+    import hashlib
+    import shutil
+
+    plt = _style()
+    names: list[str] = []
+    groups = [g for g in GROUPS if any(r["group"] == g for r in rows)]
+    scale = lambda w: np.log10(1 + np.asarray(w, float))  # noqa: E731
+    # Coverage is drawn only where the rotation model can hold (VISOR never does), failing clips in grey,
+    # and each curve stops where fewer than MIN_LATER frames remain after the warm-up.
+    covered = [g for g in groups if not g.startswith("visor")] or groups
+    fig, axes = plt.subplots(1, len(covered), figsize=(7.0 * len(covered) / 5 + 1.4, 1.7), sharey=True)
+    for ax, group in zip(np.atleast_1d(axes), covered):
+        for r in sorted((r for r in rows if r["group"] == group), key=lambda r: r["summary"]["holds"]):
+            later = np.array(r["coverage"]["frames_after"], float)
+            w = np.array(r["coverage"]["warmups_s"], float)[later >= MIN_LATER]
+            c = np.array([np.nan if v is None else v for v in r["coverage"]["curve"]], float)[later >= MIN_LATER]
+            holds = r["summary"]["holds"]
+            ax.plot(scale(w), c, color=HOLD if holds else "0.7", alpha=0.7 if holds else 0.6, lw=0.8)
+        for level in (0.9, 0.99):
+            ax.axhline(level, color="0.5", lw=0.5, ls="--")
+        ax.set_xticks(scale(COVER_TICKS), [str(t) for t in COVER_TICKS])
+        ax.set_ylim(0.85, 1.002)
+        ax.set_title(LABELS[group])
+        ax.set_xlabel("warm-up (s)")
+    np.atleast_1d(axes)[0].set_ylabel("background seen")
+    names += _save(fig, out, "g1-coverage")
     plt.close(fig)
-    names.append("g1-coverage.png")
-    fig, ax = plt.subplots(figsize=(10, 4))
-    for i, group in enumerate(GROUPS):
+
+    fig, ax = plt.subplots(figsize=(7.0, 0.45 * len(groups) + 0.6))
+    for i, group in enumerate(groups):
+        for r in (r for r in rows if r["group"] == group):
+            v = r["summary"]["f2r_rot"]["flow_p90_px_median"]
+            if v is None:
+                continue
+            jitter = (int(hashlib.sha256(r["id"].encode()).hexdigest(), 16) % 1000 / 1000 - 0.5) * 0.5
+            ax.scatter(max(v, 0.1), i + jitter, s=10, color=HOLD if r["summary"]["holds"] else FAIL, lw=0)
+    ax.axvline(DECISION["explained_px"], color="0.3", lw=0.7, ls="--")
+    ax.set_xscale("log")
+    ax.set_yticks(range(len(groups)), [LABELS[g] for g in groups])
+    ax.invert_yaxis()
+    ax.set_xlabel("median per-frame p90 residual flow after the rotation-and-zoom warp (px at 1080p)")
+    names += _save(fig, out, "g1-residual")
+    plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(7.0, 2.2))
+    for i, group in enumerate(groups):
         values = [f["f2r_rot"]["flow_p90_px"] for r in rows if r["group"] == group for f in frames.get(r["id"], [])
                   if f.get("f2r_rot", {}).get("measured")]
         if values:
             parts = ax.violinplot([np.log10(np.maximum(values, 0.05))], positions=[i], showmedians=True, widths=0.8)
             for body in parts["bodies"]:
-                body.set_facecolor(colours[group])
-    ax.axhline(np.log10(DECISION["explained_px"]), color="black", lw=0.8, ls="--")
-    ax.set_xticks(range(len(GROUPS)), [LABELS[g] for g in GROUPS])
-    ax.set_ylabel("log10 p90 residual flow (px @1080p)")
-    ax.set_title("Rotation-and-zoom model, frame to reference: per-frame residual")
-    fig.tight_layout()
-    fig.savefig(out / "g1-residual.png", dpi=110)
+                body.set_facecolor("0.6")
+    ax.axhline(np.log10(DECISION["explained_px"]), color="0.3", lw=0.7, ls="--")
+    ax.set_xticks(range(len(groups)), [LABELS[g] for g in groups])
+    ax.set_ylabel("log10 p90 residual (px)")
+    names += _save(fig, out, "g1-residual-frames")
     plt.close(fig)
-    names.append("g1-residual.png")
+
+    sheets = out / "figures"
+    sheets.mkdir(exist_ok=True)
+    for group in groups:
+        ids = sorted((r["id"] for r in rows if r["group"] == group),
+                     key=lambda i: hashlib.sha256(f"g1-paper:{i}".encode()).hexdigest())
+        for clip_id in ids:
+            images = [i for i in next(r for r in rows if r["id"] == clip_id)["images"] if i.startswith("overlay_")]
+            source = next((Path(root) / "publish" / "clips" / safe(clip_id) / images[len(images) // 2]
+                           for root in (published or []) if images
+                           and (Path(root) / "publish" / "clips" / safe(clip_id) / images[len(images) // 2]).is_file()), None)
+            if source is not None:
+                shutil.copyfile(source, sheets / f"overlay_{group}.jpg")
+                names.append(f"figures/overlay_{group}.jpg ({clip_id})")
+                break
     return names
 
 
@@ -200,7 +267,7 @@ def command_report(args: argparse.Namespace) -> int:
                   "translation_confirmed": translation_confirmed(r["summary"]),
                   "parallax_p50_px": r["summary"]["translation_half_s"]["parallax_p50_px_median"],
                   "images": r["images"]} for r in rows]}
-    report["figures"] = figures(rows, frames, out)
+    report["figures"] = figures(rows, frames, out, args.published)
     write_json(out / "g1-report.json", report)
     lines = ["| Dataset | clips | hold | verdict | explained (median) | p90 flow px | translation confirmed | "
              "warm-up 90% s (holding) | warm-up 99% s (holding) | G2 clips |", "|---|---:|---:|---|---:|---:|---:|---:|---:|---:|"]

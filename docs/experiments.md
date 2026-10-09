@@ -1113,3 +1113,18 @@ invocation turns out to be needed.
   fixed and broadcast cameras, where a planar projection suffices (median
   rotation under 0.04°/s on every holding clip). Not measured: whether one panorama can
   serve all rallies of a broadcast match (outside G1).
+- After review (2026-10-09). (1) P04_24 is not a gap in the data: VISOR
+  releases sparse JPEGs only at its human-labelled keyframes, and P04_24's
+  240-frame window lies between two of them; its frames are placed by B1's
+  drift-free rule like every other window. The validator now accepts a
+  window with no released JPEG inside it instead of failing on an empty list;
+  nothing is removed from the evaluation set. (2) The four RacketVision clips
+  that pan or zoom fail even a full homography to their reference, and two of
+  them (table tennis match10_001 and match11_007: zooms of 1.9× and 3.7× within
+  5 s) fail frame to frame too, so they are not a pure pan-and-zoom the model
+  already covers; likely a moving camera rig, blur and LED boards, not
+  established. (3) G1's job now checkpoints each finished clip and restores it
+  on a declared resume ([fleet](fleet.md#checkpoints)); the analysis is
+  unchanged. (4) `g1 report` writes the paper's figures from the recorded
+  outputs (vector PDF and PNG: coverage per racket dataset, residual per clip,
+  per-frame residual; one hash-picked overlay sheet per dataset).

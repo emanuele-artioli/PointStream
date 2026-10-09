@@ -29,11 +29,17 @@ and per clip its source, frame range, analysis rate and mask tier. Per clip:
 Writes ``g1.json`` (clip summaries) to ``PS_STAGE_DIR`` and per clip
 ``publish/clips/<id>/`` (``result.json`` with per-frame records, overlays, the
 first-seen mosaic, and SAM's masks as ``masks.rle``).
+
+Resume: each finished clip is also saved to ``PS_CHECKPOINT_DIR/clips/<id>/``
+(written under a dot-name and renamed, so a stop never archives half a clip).
+A resumed attempt (the job declares ``contention.resume_attempts``) restores
+those clips into ``publish/`` and runs only the rest.
 """
 
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import math
 import multiprocessing
@@ -603,6 +609,44 @@ def self_test(gray: np.ndarray, lens: camera.Lens) -> dict[str, Any]:
             "flow_p90_px": res.get("flow_p90_px"), "inliers": int(keep.sum()), "settings": SELF_TEST}
 
 
+# ----------------------------------------------------------------- checkpoints
+
+CHECKPOINT_RECORD = "checkpoint.json"
+
+
+def save_clip(root: Path, source: Path, clip_id: str, result: dict[str, Any], sam: dict[str, Any] | None) -> Path:
+    """Copy a finished clip's published files into the checkpoint, atomically."""
+    clips = root / "clips"
+    clips.mkdir(parents=True, exist_ok=True)
+    final = clips / safe(clip_id)
+    temporary = clips / f".{safe(clip_id)}.{os.getpid()}.tmp"
+    shutil.rmtree(temporary, ignore_errors=True)
+    shutil.copytree(source, temporary)
+    write_json(temporary / CHECKPOINT_RECORD, {"id": clip_id, "result": result, "sam": sam})
+    if final.exists():
+        shutil.rmtree(final)
+    os.replace(temporary, final)
+    return final
+
+
+def restore_clips(root: Path, publish: Path) -> dict[str, dict[str, Any]]:
+    """Finished clips of an earlier attempt, copied back into ``publish/clips``."""
+    restored: dict[str, dict[str, Any]] = {}
+    clips = root / "clips"
+    if not clips.is_dir():
+        return restored
+    for directory in sorted(clips.iterdir()):
+        record = directory / CHECKPOINT_RECORD
+        if directory.name.startswith(".") or not record.is_file():
+            continue
+        saved = json.loads(record.read_text())
+        target = publish / "clips" / directory.name
+        shutil.rmtree(target, ignore_errors=True)
+        shutil.copytree(directory, target, ignore=shutil.ignore_patterns(CHECKPOINT_RECORD))
+        restored[saved["id"]] = saved
+    return restored
+
+
 # ----------------------------------------------------------------- run
 
 
@@ -684,10 +728,31 @@ def command_run(args: argparse.Namespace) -> int:
             task.update(lens={"f": lens["f"], "k1": lens["k1"]}, lens_report=lens["report"], lens_from=clip["lens_from"])
         return task
 
-    sam_clips = [c for c in clips if c["masks"]["kind"] == "sam_text"]
-    other = [c for c in clips if c["masks"]["kind"] != "sam_text"]
+    checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
+    restored = restore_clips(checkpoints, publish) if checkpoints else {}
     futures: dict[str, Future[Any]] = {}
-    sam_record: dict[str, Any] = {}
+    sam_record: dict[str, Any] = {"clips": {}}
+    if checkpoints and (checkpoints / "sam.json").is_file():
+        sam_record = json.loads((checkpoints / "sam.json").read_text())
+    for clip_id, saved in restored.items():
+        future: Future[Any] = Future()
+        future.set_result({**saved["result"], "restored_from_checkpoint": True})
+        futures[clip_id] = future
+        if saved.get("sam"):
+            sam_record.setdefault("clips", {})[clip_id] = saved["sam"]
+
+    def keep(clip_id: str, future: Future[Any]) -> None:
+        if checkpoints is None or future.exception() is not None:
+            return
+        save_clip(checkpoints, publish / "clips" / safe(clip_id), clip_id, future.result(),
+                  sam_record.get("clips", {}).get(clip_id))
+
+    def submit_analysis(clip_id: str, task: dict[str, Any]) -> None:
+        futures[clip_id] = analyser.submit(analyse_clip, task)
+        futures[clip_id].add_done_callback(functools.partial(keep, clip_id))
+
+    sam_clips = [c for c in clips if c["masks"]["kind"] == "sam_text" and c["id"] not in restored]
+    other = [c for c in clips if c["masks"]["kind"] != "sam_text" and c["id"] not in restored]
     segmenter = None
     pending = {i: decoder.submit(decode_clip, decode_task(c, True)) for i, c in enumerate(sam_clips[:2])}
     done = 0
@@ -707,7 +772,9 @@ def command_run(args: argparse.Namespace) -> int:
                           "sdpa_backend_policy": segmenter.sdpa_backend_policy,
                           "model_revision": provenance.model_revision,
                           "checkpoint_sha256": provenance.checkpoint_sha256, "config_sha256": provenance.config_sha256,
-                          "prob_threshold": segmenter.prob_threshold, "clips": {}}
+                          "prob_threshold": segmenter.prob_threshold, "clips": sam_record.get("clips", {})}
+            if checkpoints is not None:
+                write_json(checkpoints / "sam.json", {**sam_record, "clips": {}})
         import torch
 
         torch.cuda.reset_peak_memory_stats()
@@ -724,11 +791,12 @@ def command_run(args: argparse.Namespace) -> int:
             "masks_rle_sha256": file_sha256(target / "masks.rle"),
             "frames_with_foreground": int(sum(1 for f in masks.frames if f)),
             "empty_chunks": masks.meta.get("empty_chunks", []),
+            "gpu": sam_record["runtime"]["gpu"],
         }
         shutil.rmtree(work / "jpeg", ignore_errors=True)
         base = [to_analysis(union(f, (masks.height, masks.width))) for f in masks.frames]
         record = {"tier": SAM_TIER, "prompts": clip["masks"]["prompts"], **foreground(clip, work, base)}
-        futures[clip["id"]] = analyser.submit(analyse_clip, analysis_task(clip, decoded, record))
+        submit_analysis(clip["id"], analysis_task(clip, decoded, record))
         done += 1
         progress(done)
     for clip in other:  # VISOR windows: decode here, foreground from the dense masks, lens from the stretch
@@ -740,7 +808,7 @@ def command_run(args: argparse.Namespace) -> int:
             if clip["lens_from"] not in futures:
                 raise SystemExit(f"{clip['id']} needs {clip['lens_from']} in the same run")
             lens = futures[clip["lens_from"]].result()["lens"]
-        futures[clip["id"]] = analyser.submit(analyse_clip, analysis_task(clip, decoded, record, lens))
+        submit_analysis(clip["id"], analysis_task(clip, decoded, record, lens))
     results = []
     for clip in clips:
         results.append(futures[clip["id"]].result())
@@ -758,6 +826,7 @@ def command_run(args: argparse.Namespace) -> int:
             "KEYFRAME_OVERLAP", "KEYFRAME_INLIERS", "TEXTURE", "EXPLAINED_PX", "MOVED_PX", "EPIPOLAR_PX",
             "GRIC_SIGMA", "TRANSLATION_SECONDS", "COVER_CELL", "PRIOR_HFOV_DEG")},
         "decision": DECISION, "sam": sam_record, "self_test": test,
+        "restored_clips": sorted(restored),
         "opencv": cv2.__version__, "results": results,
     })
     return 0
@@ -790,8 +859,9 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         "decoded_every_analysis_frame": all(r["decode"]["frames"] == r["summary"]["frames"] for r in rows),
         "clip_file_matches": not clips or file_sha256(Path(result["clips_file"]["path"])) == result["clips_file"]["sha256"],
         "self_test_recovers_known_rotation": bool(result["self_test"] and result["self_test"]["passed"]),
-        "visor_window_jpegs_match_decoded_frames": all(r["decode"]["jpeg_gate"] and all(g["holds"] for g in r["decode"]["jpeg_gate"])
-                                                       for r in windows),
+        "visor_window_jpegs_match_decoded_frames": all(
+            all(g["holds"] for g in r["decode"]["jpeg_gate"])
+            and (bool(r["decode"]["jpeg_gate"]) or not r["clip"]["item"]["sparse_jpegs"]) for r in windows),
         "visor_windows_use_the_fill": all(r["masks"]["tier"] == "visor_dense_sam_fill" for r in windows),
         "frames_registered": all(r["summary"]["status"].get("direct", 0) + r["summary"]["status"].get("chained", 0) > 0
                                  for r in rows if r["summary"]["frames"] > 1),

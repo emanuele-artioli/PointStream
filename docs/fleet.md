@@ -289,6 +289,14 @@ dot-name and rename it into place, or call
 SIGTERM reaches the workload 15 s before SIGKILL, enough to finish a small
 checkpoint.
 
+Every job whose full stage processes several items (clips, videos, windows)
+checkpoints each item as it finishes and declares `contention.resume_attempts`
+(1–2), so a contended or stopped stage resumes on any compatible host with only
+the unfinished items. A job without both loses its finished work when it stops:
+G1's first racket job (`20261008T172349Z-56d1bb1a`) declared neither and was
+rerun from the start. `experiments/background/g1.py` (`save_clip`,
+`restore_clips`) is a worked example.
+
 ### Declared resume
 
 `contention.resume_attempts: N` (with `stop` or `pause`) lets a contended attempt
