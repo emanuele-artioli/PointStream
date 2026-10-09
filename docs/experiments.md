@@ -842,6 +842,293 @@ invocation turns out to be needed.
   pot, mozzarella (small or translucent, often held). The speckled fridge on
   P27_105 is the extreme case, not the norm. No change to the fill.
 
+### 2026-10-08 — G1: camera motion and coverage audit
+- Question (PLAN G): does each dataset's camera only rotate (and zoom) about
+  a fixed centre, so that a panorama built from a warm-up can rebuild its
+  background, and how long must the warm-up be? G2–G5 need from it: the clips
+  a background evaluation can use, the warm-up length, the panorama's
+  projection, and whether the background work starts on VISOR (phase 1) or on
+  racket sports.
+- Clips (fixed content-blind before any run; `tools/datasets/g1_inputs.py`
+  `RULE`; `clips.json` from metadata only: frame counts, splits, names).
+  *VISOR windows*: all 34 items of evaluation set v2, every frame (240 at 50
+  or 59.94 fps); foreground = the dense masks with B1b's object fill
+  (`visor_dense_sam_fill`). *VISOR stretches*: per evaluation video, 120 s of
+  decoded frames from the window's first frame (moved earlier to fit the
+  video, or the whole video if shorter), at 10 frames/s. *OpenTTGames*: the 7
+  test videos (staged whole; the 5 train videos are 4–11 GB each), 120 s from
+  sha256("pointstream-g1:ott:<video>") mod the free range, 10 frames/s.
+  *RacketVision*: per sport the 8 test clips with the smallest
+  sha256("pointstream-g1:racketvision:<sport>/<match>_<rally>"), whole, 10
+  frames/s. *TrackNet*: the 8 clips with the smallest
+  sha256("pointstream-g1:tracknet:<game>/<clip>"), whole, 10 frames/s. VISOR
+  frames are decoded frame indices placed by B1's verified rules; each
+  window's released sparse JPEGs are checked against the decoded frames.
+- Foreground out of the measurement: VISOR windows by their dense masks;
+  everything else by SAM 3.1 text prompts, tier `sam_text` ("hand" and "arm"
+  on VISOR, plus the EPIC-KITCHENS hand-object detector's hand and object
+  boxes at score ≥ 0.5, since a held object has no fixed name to prompt;
+  "person" and "racket" on racket sports, so spectators, umpires and ball
+  kids are masked too). All masks dilated by 16 px at 1080p. Tier check: on
+  each stretch's frames inside its window, the dense masks' recall by the
+  `sam_text` masks, and the rotation residual measured with both.
+- Method (`experiments/background/camera.py`, `g1.py`; CPU, OpenCV 4.10 and
+  SciPy from the packed environment; 960×540 analysis frames, errors at
+  1080p). SIFT on background, ratio test, MAGSAC. Homographies frame to frame
+  and frame to reference; the rotation-and-zoom model with the clip's lens
+  (focal length and one division-model distortion term, fitted jointly on
+  pairs 0.5 s apart; a window uses its stretch's lens; when the rotation is
+  too small to identify it, a 60° prior is used and recorded as
+  unobservable). Each frame registers to the keyframe its predicted view
+  overlaps most (a new keyframe below 60% overlap or 200 inliers). Residual
+  of the reference warped into the frame, on the background of both: PSNR
+  raw, after a gain and offset (exposure), and after re-warping by dense
+  optical flow (DIS); the residual flow on textured background is the
+  alignment error. Its squared error splits into exposure, parallax
+  (misaligned pixels, > 1 px, whose correspondence obeys the epipolar
+  geometry where GRIC prefers a fundamental matrix), independent motion (the
+  other misaligned pixels: water, screens, people, mask leaks) and a
+  remainder (lighting, blur, noise, disocclusion); it is also given by image
+  radius (distortion), against rotation speed (rolling shutter) and on
+  blurred frames (Laplacian variance under half the clip median).
+  Translation: for frames 0.5 s apart, GRIC (homography against fundamental
+  matrix, σ = 1 px at 1080p) and the parallax, the homography's transfer
+  error on the fundamental matrix's inliers. Coverage: every frame's
+  background is marked on an azimuth–elevation canvas (cell 4 px at 1080p)
+  through the rotation model, with the frame that first saw it;
+  coverage_t(w) is the share of frame t's background seen within the first w
+  seconds, and C(w) its mean over the frames after w. In-job self-test: a real
+  frame re-rendered by a known 3°/1° rotation and 2% zoom must come back
+  within 0.05° and 0.5 px.
+- Decision rule (`g1.DECISION`, fixed before any run). A frame is
+  *explained* when the 90th percentile of residual flow on textured
+  background, after the rotation-and-zoom warp to its reference, is ≤ 2 px at
+  1080p (shares within 1 and 4 px reported beside it). A clip *holds* when
+  ≥ 90% of its measured frames are explained, ≥ 95% register directly to a
+  keyframe, ≥ 80% are measured (enough visible background) and it has one
+  segment (no cut or loss). A dataset (VISOR judged on its stretches, windows
+  reported beside them; RacketVision per sport as well) *holds* when ≥ 75% of
+  its clips hold, holds *for a subset* at 25–75% (G2 gets the clips that
+  hold), and *does not hold* below 25%. Translation is *confirmed* for a clip
+  when GRIC prefers a fundamental matrix on ≥ 50% of its 0.5 s pairs and
+  their median parallax is ≥ 2 px at 1080p. Warm-up: per clip, the first w on
+  a 0.5 s grid with C(w) ≥ 0.90 (and 0.99), else "not reached"; per dataset,
+  the median and range over the clips that hold. G2 can use a clip that
+  holds and plays at least 10 s after its 90% warm-up. The background work
+  starts on VISOR if VISOR holds, or holds for a subset of at least 10
+  stretches with a median 90% warm-up ≤ 30 s; otherwise on racket sports if a
+  racket dataset holds; otherwise the panorama is not the first candidate and
+  G5 (a neural model of the background) leads, on whichever domain G2 can
+  evaluate.
+- Hypothesis: OpenTTGames' fixed camera holds trivially (no motion, lens
+  unobservable), and its coverage is limited only by the players: 90% within
+  seconds, 99% late or never. RacketVision and TrackNet broadcast cameras
+  mostly hold (fixed, or slow pan and zoom); some clips may break on a cut.
+  VISOR does not hold: the head translates while it turns, and at kitchen
+  distances (0.3–1.5 m) a few centimetres give parallax well above 2 px within
+  0.5 s; GRIC prefers a fundamental matrix on most pairs, and fewer than a
+  quarter of the stretches hold. Coverage under the rotation approximation
+  needs tens of seconds on VISOR. So the background work starts on racket
+  sports.
+- Competing explanations: (1) lens distortion of the wide head-mounted
+  camera, not parallax, makes the residual: the fitted k1 and the residual
+  by radius test it. (2) Rolling shutter under fast head rotation: residual
+  that grows with rotation speed while GRIC still prefers a homography
+  (Spearman of residual against speed). (3) Foreground mask leaks (hands the
+  masks miss, unmasked handled objects, other people) show as independent
+  motion near the foreground; the tier check compares the two mask sources on
+  the same frames. (4) Blur and compression set a floor unrelated to
+  geometry: the flow measure largely ignores photometric noise, blurred
+  frames are reported apart, and OpenTTGames' static camera shows the floor.
+  (5) Flow errors on flat surfaces: only textured pixels count, and the
+  self-test checks the measure on known motion. Frames of a clip are
+  correlated, so conclusions are drawn per clip, not per frame.
+- Budget: the only GPU work is SAM 3.1 (Ada or A6000, model–GPU table): about
+  47,000 analysis frames, two text passes each (VISOR stretches 34 × ≤ 1,200,
+  OpenTTGames 7 × ≤ 1,200, RacketVision 24 and TrackNet 8 clips of about 70);
+  the CPU analysis runs in the same jobs (16 threads). Smoke ≤ 600 s per job
+  (clips capped at 12 s). Pilot: 2 VISOR videos (stretch and window), 2
+  OpenTTGames, 1 RacketVision clip per sport, 2 TrackNet, one job ≤ 1 h; it
+  measures SAM's frames per second and the analysis seconds per frame, and
+  the full run is sized from them. Full: the VISOR videos in three jobs and
+  the racket clips in one, ≤ 2.5 h each. Ceiling 10 GPU-hours and 12 h wall
+  including staging. If the pilot shows the full run cannot fit, the
+  stretches are shortened before anything else changes, and that is recorded
+  here.
+- Inputs: `pointstream-data/background/g1-2026-10-08/` (`inputs.json`
+  `4d2026cd…79f7`, every file's sha256): `clips.json` `a8820a14…1f4c`
+  (34 + 34 VISOR, 7 OpenTTGames, 24 RacketVision, 8 TrackNet; about 49,600
+  SAM frames); VISOR and OpenTTGames videos hard-linked; RacketVision clips
+  packed from the sport tars, each checked against
+  `RacketVision.members.sha256` (`racketvision-g1.tar` `0dbada1c…8392`);
+  TrackNet JPEGs from `Dataset.zip` (`tracknet-g1.tar` `4b4c4b8b…a4f0`);
+  B1b fill `049977f0…799a`, B1 dense archive `a2d9e0cb…4c3c`, detections
+  `949ea65d…97c3`, SAM checkpoint `0567debe…1cb6`; environment
+  `pointstream-20261006T113321Z`.
+- Before any fleet run (dev check on gpu1, CPU, not evidence): registration
+  first used the 1 px MAGSAC threshold of the residual and a 200-inlier
+  keyframe trigger, so on VISOR 20% of frames were lost and nearly every frame
+  became a keyframe. The correspondence thresholds were loosened (MAGSAC 6 px
+  at 1080p, inlier share ≥ 0.15, keyframe below 100 inliers); the residual
+  criterion that judges a frame (p90 ≤ 2 px) is unchanged.
+- Failed attempts (infrastructure, no results): `20261008T151121Z-14aeb6de`
+  (`af1b66b`): staging the TrackNet tar failed on the worker, whose zip
+  directory entries had been packed as empty files (now `.jpg` members
+  only, `14b5a56`). `20261008T154749Z-1e8501a2` (gpu3, `14b5a56`): smoke and
+  validator passed (19 checks), then the full stage failed on one clip, where
+  OpenCV's USAC raised on a degenerate fundamental-matrix sample; such a fit
+  now reads as no fit (`3edfedc`, with a test).
+- Pilot `20261008T162927Z-d9372b99` (gpu3, RTX A6000, `3edfedc`; smoke 373 s
+  and validator passed, 19 checks; full stage 2,592 s, validator run on the
+  full output too, 19 checks; no contention; `g1.json` `b9b9a121…e3d3`,
+  `published.tar` `8240a8ab…8447`). SAM 3.1 text passes (two prompts) run at
+  2.3–3.3 frames/s at 960×540 (a 1,200-frame stretch in about 450 s), peak
+  27.7 GiB (the full jobs declare 32,000 MiB); the CPU analysis takes about
+  0.8 s per frame per process alongside. Self-test: 0.0026° and 0.09 px.
+  Results (11 clips, report by the rule; one-clip groups are not verdicts):
+
+  | Clip | holds | explained | p90 flow px (median) | f2f / f2r homography explained | GRIC prefers F (0.5 s) | parallax p50 / p90 px | w90 / w99 s |
+  |---|---|---:|---:|---|---:|---|---|
+  | VISOR stretch P25_101 | no | 0.006 | 21.2 | 0.26 / 0.02 | 0.87 | 2.06 / 5.5 | (11 segments) |
+  | VISOR stretch P22_107 | no | 0.000 | 38.4 | 0.47 / 0.01 | 0.74 | 1.43 / 4.8 | (6 segments) |
+  | VISOR window P25_101 | no | 0.067 | 9.8 | 0.98 / 0.10 | 0.55 | 1.08 / 2.6 | 0 / 4.0 |
+  | VISOR window P22_107 | no | 0.013 | 10.1 | 1.00 / 0.02 | 0.72 | 1.45 / 3.4 | 0 / 2.0 |
+  | OpenTTGames test_2 | yes | 0.930 | 1.29 | 1.00 / 0.84 | 0.00 | 0.23 / 0.96 | 0 / 9.0 |
+  | OpenTTGames test_4 | yes | 1.000 | 1.15 | 1.00 / 1.00 | 0.00 | 0.19 / 0.77 | 0 / 5.0 |
+  | RacketVision badminton | yes | 1.000 | 0.72 | 1.00 / 1.00 | 0.00 | 0.13 / 0.47 | 0 / 5.5 |
+  | RacketVision table tennis | yes | 1.000 | 0.38 | 1.00 / 1.00 | 0.00 | 0.02 / 0.11 | 0 / 1.0 |
+  | RacketVision tennis | yes | 0.949 | 0.86 | 1.00 / 0.95 | 0.00 | 0.16 / 0.58 | 0 / 1.5 |
+  | TrackNet game5/Clip9 | no | 0.883 | 1.25 | 0.95 / 0.87 | 0.00 | 0.23 / 0.79 | 0 / 1.5 |
+  | TrackNet game4/Clip3 | yes | 1.000 | 0.41 | 1.00 / 1.00 | 0.00 | 0.15 / 0.56 | 0 / 1.5 |
+
+  Read with care. On VISOR the lens-free homography fails as well (frame to
+  reference explained on 1–10% of frames, frame to frame at 50 fps on 98–100%),
+  so the failure does not rest on the fitted lens; the lens itself is unstable
+  (horizontal field of view 31.5° on P25_101, 76.7° on P22_107) and the
+  rotation-and-zoom model takes a 2.5–3.5× focal range on a fixed-focus
+  camera: translation leaks into it. The residual sits where depth changes
+  (floor against counter); the attribution gives parallax 35–48% and
+  independent motion 21–36% of the squared error. By the rule, translation is
+  confirmed on 1 of the 2 stretches: GRIC prefers a fundamental matrix on 74%
+  and 87% of pairs, but the median parallax of P22_107 is 1.4 px against the
+  2 px bar (its p90 is 4.8 px). Stretches lose registration (29–48 frames,
+  6–11 segments), so their coverage curves are not meaningful. Tier check:
+  the `sam_text` masks with detector boxes recall 69–76% of the dense
+  foreground pixels, and the rotation residual on the same frames is the
+  same with either mask (explained 0.04 and 0.04, 0 and 0; p90 11.3 against
+  10.3 px, 9.5 against 10.0 px). On racket sports the camera did not move
+  (median rotation speed under 0.06°/s, lens unobservable, prior used), the first
+  frame already shows 90% of every later frame's background, and the players
+  set the 99% warm-up (1–9 s). TrackNet game5/Clip9 misses by unmasked
+  player shadows; the "person" prompt also masks spectators and ball kids.
+  RacketVision and TrackNet clips are 4–10 s rallies, so none plays 10 s
+  after its warm-up (the G2 rule); a panorama shared across a match's rallies
+  is outside G1.
+- Full run sized from the pilot (same revision `3edfedc`, so the pilot's
+  11 clips stand and are not repeated): the other 32 VISOR videos in three
+  jobs (11, 11, 10 videos; SAM about 450 s per stretch, ≤ 9,000 s full
+  stage each), and the other 32 racket clips in one (≤ 7,200 s). Estimated
+  6.6 GPU-hours, 8.2 with the pilot and the failed attempts, inside the
+  10-hour ceiling. Jobs `20261008T172332Z-8f85d3af`,
+  `20261008T172338Z-c73de835`, `20261008T172343Z-cbfd15b8` (VISOR) and
+  `20261008T172349Z-56d1bb1a` (racket), on gpu3, gpu5 and gpu6 (gpu2's
+  worker had no fresh heartbeat).
+- Full run, what happened. VISOR share 3 `20261008T172343Z-cbfd15b8` (gpu3,
+  RTX A6000, `3edfedc`; 5,978 s, no contention; validator passed on the full
+  output). Shares 1 and 2 (`…8f85d3af`, `…c73de835`) stopped at the smoke
+  gate on a validator error, not on data: the 6 s smoke cap left P01_107's
+  and P06_10's stretches before their windows, so the tier check had no
+  frames; it now applies only where the analysed range reaches the window
+  (`6a391dc`, which changes only the validator). The racket job
+  (`…56d1bb1a`) was stopped as contended (another user's process held its GPU
+  past the 900 s pause; no results kept). Reruns at `6a391dc`, smoke gates
+  passed, no contention: VISOR share 1 `20261008T203704Z-c101d42a` (gpu6, RTX
+  6000 Ada, 4,310 s), share 2 `20261008T203709Z-614dcdf0` (gpu6, 4,157 s),
+  racket `20261008T203714Z-fd5d2f5b` (gpu5, RTX 6000 Ada, 2,413 s). The
+  validator passes on every full output except share 1, which fails only
+  `visor_window_jpegs_match_decoded_frames` because P04_24's window holds no
+  released sparse JPEG (the check wants a non-empty list); every JPEG that
+  was checked matched its decoded frame (26 of 26 in that share).
+  About 7 GPU-hours in all, inside the 10-hour ceiling; the wall time (about
+  21 h from staging) exceeded the 12 h ceiling because only one Ada/A6000
+  GPU was free for most of the evening (gpu5 and gpu6 busy with other users,
+  gpu2 unreachable).
+- Report: `pointstream-data/background/g1-2026-10-08/report-8e79d9e/`
+  (`g1-report.json` `aa1c334f…89cc`, figures included), all 107 clips from the pilot and the
+  four full jobs. Review page with overlays and coverage maps:
+  [artifact](https://claude.ai/artifact/LB8yoyyc3ebqb7Bii6X2RF).
+
+  | Dataset | clips | hold | verdict | explained (median) | p90 flow px (median) | homography to ref. explained | translation confirmed | GRIC prefers F (median) | w90 / w99 s (holding) | G2 clips |
+  |---|---:|---:|---|---:|---:|---:|---:|---:|---|---:|
+  | VISOR stretches | 34 | 0 | does not hold | 0.006 | 30.2 | 0.02 | 17/34 | 0.87 | – | 0 |
+  | VISOR windows | 34 | 0 | does not hold | 0.063 | 13.9 | 0.08 | 16/34 | 0.89 | – | 0 |
+  | OpenTTGames | 7 | 6 | holds | 0.998 | 1.15 | 0.99 | 0/7 | 0.00 | 0 / 3.3 | 6 |
+  | RacketVision | 24 | 13 | holds for a subset | 0.944 | 1.22 | 0.89 | 0/24 | 0.00 | 0 / 1.5 | 0 |
+  | TrackNet | 8 | 4 | holds for a subset | 0.942 | 1.02 | 0.93 | 0/8 | 0.00 | 0 / 1.3 | 2 |
+
+  RacketVision per sport: badminton 4/8, table tennis 5/8, tennis 4/8 (each
+  a subset).
+- Outcome by the rule. *VISOR does not hold* (0 of 34 stretches, 0 of 34
+  windows). The failure does not rest on the fitted lens: a full homography
+  to the reference explains 2% (stretches) and 8% (windows) of frames, while
+  frame to frame at 50–60 fps explains 99% of window frames. Residual energy
+  is parallax 39% and independent motion 32% on the stretches (42% and 28% on
+  the windows), already 7.6 px at the image centre and rising to 14.9 px at
+  the border (distortion, fitted, cannot be the main cause; the border also
+  shows the nearest surfaces), and little related to rotation speed
+  (Spearman 0.18), so rolling shutter does not explain it either. GRIC prefers
+  a translating camera on a median 87% of 0.5 s pairs; translation is
+  confirmed by the rule on 17 of 34 stretches (median parallax 2.0 px, at
+  the rule's bar). The tier check holds: on the stretches' window frames the
+  rotation residual is the same with the dense masks and with `sam_text`
+  (p90 18.6 against 17.9 px, explained 0 and 0), although `sam_text` with
+  detector boxes recalls only 53% of the dense foreground pixels. VISOR's
+  fitted lens is unstable (median horizontal field of view 62°, varying
+  widely), as expected when translation leaks into a rotation-only fit.
+  *Racket sports: no camera translates* (0 of 39 clips; parallax medians
+  0.07–0.20 px). OpenTTGames holds (6/7; test_3 misses at 0.72 explained).
+  RacketVision and TrackNet hold for a subset; of their 15 failing clips, 4
+  RacketVision clips pan or zoom (table tennis match10_011, match10_001,
+  match11_007; tennis match132_000), and the rest are still cameras whose
+  background moves: crowds, caption graphics sliding in (badminton
+  match133_000), exposure changes (TrackNet game1/Clip12), unmasked player
+  shadows. TrackNet game3/Clip6 (explained 0.03, still camera) has residual
+  spread over the low-texture court with no visible moving object; its cause
+  is not determined. *Warm-up*: wherever a clip holds, the first frame
+  already shows at least 90% of every later frame's background (w90 = 0 s);
+  the players set the 99% warm-up, median 3.3 s (OpenTTGames, 1–9 s), 1.5 s
+  (RacketVision) and 1.3 s (TrackNet). *G2 can use 8 clips*: OpenTTGames
+  test_1, test_2, test_4, test_5, test_6, test_7 and TrackNet game8/Clip3,
+  game10/Clip1; RacketVision rallies (5–10 s) are too short for 10 s of play
+  after a warm-up. *Start*: by the rule, the background work starts on racket
+  sports, on OpenTTGames, the only racket dataset that holds outright.
+- Reading for G2–G5. The hypothesis holds for VISOR and for OpenTTGames. It
+  was too optimistic for the broadcast sets: their cameras turn at most, but
+  a rotation-only panorama alone is not a background for them, because a
+  quarter to half of their clips have moving background (crowds, graphics,
+  lighting). A panorama is a static background plus a residual, and G2 must
+  measure that residual's rate. For VISOR a rotation-only panorama is ruled
+  out; the neural route (G5) or a 3D representation is the candidate for
+  egocentric video, and the projection question (G3) only arises for the
+  fixed and broadcast cameras, where a planar projection suffices (median
+  rotation under 0.04°/s on every holding clip). Not measured: whether one panorama can
+  serve all rallies of a broadcast match (outside G1).
+- After review (2026-10-09). (1) P04_24 is not a gap in the data: VISOR
+  releases sparse JPEGs only at its human-labelled keyframes, and P04_24's
+  240-frame window lies between two of them; its frames are placed by B1's
+  drift-free rule like every other window. The validator now accepts a
+  window with no released JPEG inside it instead of failing on an empty list;
+  nothing is removed from the evaluation set. (2) The four RacketVision clips
+  that pan or zoom fail even a full homography to their reference, and two of
+  them (table tennis match10_001 and match11_007: zooms of 1.9× and 3.7× within
+  5 s) fail frame to frame too, so they are not a pure pan-and-zoom the model
+  already covers; likely a moving camera rig, blur and LED boards, not
+  established. (3) G1's job now checkpoints each finished clip and restores it
+  on a declared resume ([fleet](fleet.md#checkpoints)); the analysis is
+  unchanged. (4) `g1 report` writes the paper's figures from the recorded
+  outputs (vector PDF and PNG: coverage per racket dataset, residual per clip,
+  per-frame residual; one hash-picked overlay sheet per dataset).
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
