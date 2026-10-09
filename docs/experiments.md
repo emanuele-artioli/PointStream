@@ -2068,3 +2068,10 @@ invocation turns out to be needed.
   HInt's to both models). Under either normalisation the order is the
   same: WiLoR ahead on VISOR frames by about 4 points, HaMeR ahead on New
   Days by about 1.5. How to proceed is the user's decision.
+- Full HOT3D `20261009T220759Z-be2af4a6` (gpu2, RTX A6000; 54 clips, 9
+  participants, 14,585 hands; 1,971 s; validator 10/10). PA-MPJPE HaMeR
+  9.2 mm, WiLoR 6.2 (difference +3.1, 95% CI +2.7 to +3.6: WiLoR wins);
+  acceleration error 5.1 and 6.7 mm/frame² (−1.7, CI −2.0 to −1.3: HaMeR
+  wins). Reported beside them: wrist-aligned MPJPE 20.1 and 29.7 mm, MPVPE
+  19.2 and 28.2 mm, 2D error 6.8% and 7.0% of the box, median global
+  orientation error 7.6° and 14.7°.
