@@ -562,13 +562,14 @@ EVAL_LINE = re.compile(r"Eval - \[(\d+)/(\d+)\]\s+img/s: ([\d.]+)")
 
 
 def train_curve(log: str) -> list[dict[str, float]]:
-    """The last logged step of every training epoch: (epoch, bpp, masked-training PSNR)."""
-    last: dict[int, dict[str, float]] = {}
+    """The last logged step of every training epoch: (epoch, bpp, masked-training PSNR). NVRC logs every few
+    steps, so an epoch's final step is not always among them."""
+    last: dict[int, tuple[int, dict[str, float]]] = {}
     for m in TRAIN_LINE.finditer(log):
-        epoch, step, steps = int(m.group(1)), int(m.group(2)), int(m.group(3))
-        if step == steps:
-            last[epoch] = {"epoch": epoch, "bpp": float(m.group(4)), "psnr": float(m.group(5))}
-    return [last[e] for e in sorted(last)]
+        epoch, step = int(m.group(1)), int(m.group(2))
+        if epoch not in last or step >= last[epoch][0]:
+            last[epoch] = (step, {"epoch": epoch, "bpp": float(m.group(4)), "psnr": float(m.group(5))})
+    return [last[e][1] for e in sorted(last)]
 
 
 def converged(curve: list[dict[str, float]], interval: int) -> dict[str, Any]:

@@ -112,6 +112,9 @@ def test_training_log_curve_and_convergence():
     assert g5.converged(curve, 30)["converged"]
     rising = [{**p, "psnr": 30 + p["epoch"] * 0.05} for p in curve]
     assert not g5.converged(rising, 30)["converged"]
+    # 12 steps per epoch logged every 8: the epoch's last logged step stands for it.
+    short = "\n".join(f"Train - Epoch {e} [8/12]    img/s: 1    bpp: 0.5000    psnr: {15 + e:.4f}" for e in range(2))
+    assert [p["psnr"] for p in g5.train_curve(short)] == [15.0, 16.0]
 
 
 def test_nvrc_configs_scale_the_base_grid_with_the_frames(tmp_path):
