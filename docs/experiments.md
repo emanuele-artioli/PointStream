@@ -1558,6 +1558,23 @@ invocation turns out to be needed.
   keyframes, and here every pair has its own reference). Refinement (0.3 s),
   if reached: one more job of ≤ 45 min. Ceiling 6 CPU-job-hours and 6 h
   wall.
+- Before any fleet run (dev check on gpu6, packed environment, `9ae7334`;
+  window P02_12 and stretch P26_02, three targets each; not evidence). The
+  run works end to end, and the oracle is at or above each of its parts on
+  every pair. A VISOR pair takes about 4.5 CPU-s, so the full run is about
+  5,500 VISOR pairs (25,000 CPU-s), and fits one job of under 45 min at 48
+  threads without shards. On P02_12, at one frame all four warps explain all
+  three targets; at 0.1 s `epi`, `planes4` and `tri` do; at 1 s none does
+  (`planes4` p90 5–18 px). Forward-backward p90 is 0.1–0.2 px at one frame,
+  about 0.3 px at 0.1 s and 1.1–1.9 px at 1 s on the window. It is 0.8–3.5 px
+  at 0.1 s and 3–13 px at 1 s on the stretch, so step 5 may well declare the
+  stretch's 1 s not measurable. `tri` has no reference depth on 7 of the
+  stretch's 16 pairs: the relative pose to the companions fails (a near
+  rotation), as in G1d. Inputs: `pointstream-data/background/g1e-2026-10-09/`
+  (`inputs.json` `643ee3b1…991f`). It holds the seven OpenTTGames results and
+  masks from G1's jobs `20261008T162927Z-d9372b99` and
+  `20261008T203714Z-fd5d2f5b`, and G1d's prepared archive (`5a9c47db…5d62`,
+  now under `jobs/fleet-archive-20261009/`).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
