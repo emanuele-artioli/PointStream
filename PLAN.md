@@ -230,27 +230,37 @@ reference (under 0.1 s), though, the best static warp explains 70% of window
 frames and four planes 49%. So the open question is the refresh rate and its
 cost, not depth ([experiments](docs/experiments.md)).
 
-#### G1e. Reference refresh (next)
+#### G1e. Reference refresh (done)
 
-Can a background memory refreshed often enough reach the 2 px bar, and how
-often must it refresh? Same clips, masks and measure as G1d, with the
-reference forced to a fixed age. Start with three ages, spread on a log
-scale (one frame, 0.1 s, 1 s), and add ages only where the curve is unclear.
-Use the best static warp as the oracle and four planes as the cheap
-realizable warp. Beside it:
+A reference refreshed every 0.1 s brings VISOR's background under 2 px on
+most frames: the best static warp explains 92% of window targets and 51%
+of stretch targets. Four planes, the sendable warp, explain 78% and 39%.
+At 1 s, neither group passes. The growth with age is real (the measurement
+floor holds), and the masks are not the cause. What is left after a fresh
+reference is photometric change and independent motion, not geometry. By
+the rule (step 3), no sendable warp qualifies in both groups. Details in
+[experiments](docs/experiments.md) (G1e entry).
 
-- **Measurement floor:** the same measure on OpenTTGames' static camera at
-  the same time gaps, to test whether the residual's growth with the gap is
-  the scene or the measure.
-- **Mask confound:** stretches scored only on the frames with dense masks.
+Decision (user, 2026-10-09): egocentric background work moves to G5. The
+rule's own next step is parked, because its best case is a narrow pass:
+a sendable warp between four planes and the oracle (DA3 or depth-augmented
+keyframes) at the oracle's refresh age, capped on the stretches by the
+oracle's 51% at 0.1 s. A reference refreshed ten times a second is close to
+ordinary video coding anyway. Parked options, with what would reopen them:
 
-**Done when** a recorded job gives the refresh age at which each warp
-explains a meaningful share of frames on windows and on stretches, and
-whether the growth with age is real. If a refresh rate qualifies, G2 then
-prices it against SVT-AV1 and DCVC-UF on the same background frames. The
-reference refresh scheme then serves both domains (a turning camera
-refreshes rarely), unless G2 shows it costs clearly more than the panorama
-on racket sports. Otherwise egocentric video goes to G5.
+- **G1f, a better static warp at 0.1 s** (DA3 or depth-augmented keyframes,
+  code in `experiments/background/{g1d,da3}.py`, never run). Reopen if G5
+  fails, or if a cheaper refresh appears. It can only add parallax, which
+  is 7% of what remains at 0.1 s.
+- **Four planes refreshed at 0.1 s on annotated windows only** (78% of
+  window targets). A G2 candidate only if the paper scopes egocentric
+  results to annotated windows, which G1d's and G1e's content-blind
+  stretches argue against.
+- **Model the residual, not the geometry.** After a fresh reference, 63–70%
+  of what remains is photometric (blur, noise, lighting, disocclusion) and
+  21–27% is independent motion. A G5 model that is conditioned on the
+  warped reference could target exactly this. That is the bridge from G1e
+  to G5.
 
 #### G5. Neural background model
 

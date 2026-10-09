@@ -295,6 +295,19 @@ def sam_text_masks(segmenter: Any, clip: dict[str, Any], jpeg_dir: Path) -> Any:
     return out
 
 
+def window_dense(clip: dict[str, Any], visor_fill: Path) -> tuple[dict[int, np.ndarray], dict[str, Any]]:
+    """A stretch's analysis frames inside its evaluation window: the window's dense masks with B1b's fill
+    (analysis size, not dilated), by analysis frame number."""
+    window = clip["masks"]["window_item"]
+    masks, info = visor_fill_masks({"item": window}, visor_fill)
+    dense = {}
+    for i, index in enumerate(clip["indices"]):
+        at = index - window["first_video_index"]
+        if 0 <= at < len(masks.frames):
+            dense[i] = to_analysis(union(masks.frames[at], (masks.height, masks.width)))
+    return dense, info
+
+
 def foreground(clip: dict[str, Any], work: Path, base: list[np.ndarray] | None, visor_fill: str | None,
                hand_objects: str | None) -> dict[str, Any]:
     """Write foreground.npy (dilated) and, for VISOR stretches, dense.npz on window frames."""
@@ -319,15 +332,12 @@ def foreground(clip: dict[str, Any], work: Path, base: list[np.ndarray] | None, 
     fgm.flush()
     window = clip["masks"].get("window_item")
     if window:
-        masks, info = visor_fill_masks({"item": window}, Path(str(visor_fill)))
+        raw_dense, info = window_dense(clip, Path(str(visor_fill)))
         dense, recalls = {}, []
-        for i, index in enumerate(clip["indices"]):
-            at = index - window["first_video_index"]
-            if 0 <= at < len(masks.frames):
-                d = to_analysis(union(masks.frames[at], (masks.height, masks.width)))
-                dense[str(i)] = dilate(d)
-                if d.any():
-                    recalls.append(float((d & np.asarray(fgm[i])).sum() / d.sum()))
+        for i, d in raw_dense.items():
+            dense[str(i)] = dilate(d)
+            if d.any():
+                recalls.append(float((d & np.asarray(fgm[i])).sum() / d.sum()))
         np.savez(work / "dense.npz", **dense)
         record["tier_check"] = {"window_item": window["id"], "frames": len(dense), **info}
         record["dense_recall"] = {"frames": len(recalls), "mean": round(float(np.mean(recalls)), 4) if recalls else None,
