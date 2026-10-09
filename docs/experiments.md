@@ -176,9 +176,11 @@ masks in place of SAM's.
   *caption graphics* G, annotated broadcast overlays (score box, channel
   logo, banner) with the frames they are on, over C where both apply;
   *shadows* S, pixels of V outside C and G, within half a player's box
-  height of the player, darker than the clip's plate (0.35 ≤ Y/Y_plate ≤
-  0.92, Cb and Cr within 10 levels; opened 3×3, components under 20
-  analysis pixels dropped); *plain* P, the rest. Zones and captions are hand
+  height of the player, darker than the clip's plate (0.2 ≤ Y/Y_plate ≤
+  0.92 above black level, Cb and Cr within 10 levels; opened 3×3,
+  components under 20 analysis pixels dropped; the lower bound was 0.35
+  until a development frame of game10/Clip1 showed sunlit shadows at 0.28,
+  before any recorded run); *plain* P, the rest. Zones and captions are hand
   annotations in `experiments/background/g2_annotations.json`, one still
   camera per clip; the plate is the per-pixel median of the clip's visible
   samples at 2 frames/s. OpenTTGames' own masks (320×128, players only)
@@ -189,6 +191,10 @@ masks in place of SAM's.
 - **Metrics.** Per scored frame and region: PSNR from exact squared-error
   sums on B2's RGB view of source and output (`src/codecs/quality.py`),
   and LPIPS (AlexNet) averaged over the region of its full-resolution map.
+  Every output is scored with F pasted back from the source (chroma only
+  where a 2×2 block lies wholly in F), so the foreground cannot reach V's
+  LPIPS through the network's receptive field: on a development clip,
+  without it, filling F raised LPIPS on V threefold at equal PSNR.
   A clip's score is the mean over its frames (pooled error recorded too).
   Clips are the samples: curves per clip, then means over clips, per
   dataset; frames are never pooled across clips.
@@ -212,9 +218,13 @@ masks in place of SAM's.
   of crowd with graphics, and shadows: their excess error is measured
   against the counterfactual in which those pixels have the plain region's
   per-pixel error in the same frame (SSE_V' = SSE_P · |V| / |P|;
-  ΔPSNR_V = 10 log10(SSE_V / SSE_V'); likewise for LPIPS). A treatment is
-  acceptable if at every compared rate it costs at most 0.33 dB of PSNR_V
-  (0.1 dB weighted PSNR) and at most 0.002 of whole-frame LPIPS. On B2's
+  ΔPSNR_V = 10 log10(SSE_V / SSE_V'); likewise for LPIPS). Codecs already
+  err more there than on plain background (about 1 dB of PSNR_V for
+  SVT-AV1 on a development clip), so the reference is the baseline's own
+  excess: a treatment is acceptable if its excess exceeds that of SVT-AV1
+  on the background input, interpolated at the treatment's PSNR on P, by
+  at most 0.33 dB of PSNR_V (0.1 dB weighted PSNR) and at most 0.002 of
+  whole-frame LPIPS. On B2's
   curves either amount is worth about 4% rate (SVT-AV1 and DCVC-UF gain
   about 1.8 dB weighted PSNR and 0.03 LPIPS per doubling at low rate), small
   against the background savings G3 targets. A treatment that fails is
