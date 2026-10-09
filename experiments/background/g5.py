@@ -877,6 +877,8 @@ def command_report(args: argparse.Namespace) -> int:
     runs = []
     for path in args.result:
         doc = json.loads(Path(path).read_text())
+        if "clips" not in doc and doc.get("kind") == "baselines":  # one clip's baselines.json (a stopped job's)
+            doc = {"kind": "baselines", "clips": [summarize_row(doc)]}
         runs.append({"path": path, "sha256": file_sha256(Path(path)), "kind": doc["kind"]})
         for row in doc["clips"]:
             if doc["kind"] == "baselines":
@@ -1048,7 +1050,7 @@ def main(argv: list[str] | None = None) -> int:
     val.add_argument("--stage", default=None)
     val.set_defaults(func=command_validate)
     rep = sub.add_parser("report")
-    rep.add_argument("--result", nargs="+", required=True)
+    rep.add_argument("--result", nargs="+", required=True, help="g5.json files, or one clip's baselines.json")
     rep.add_argument("--out", required=True)
     rep.set_defaults(func=command_report)
     args = parser.parse_args(argv)
