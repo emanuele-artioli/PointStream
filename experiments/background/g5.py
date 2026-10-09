@@ -720,6 +720,9 @@ def only_clip(spec: dict[str, Any], which: str) -> str:
 
 
 def command_cond(args: argparse.Namespace) -> int:
+    """Arm B on one clip: refreshes every `REFRESH_S` coded by SVT-AV1 at ``--crf`` as their own stream, and the
+    frames between them rendered from the warped refresh, (a) as is (``warp``) and (b) corrected by the
+    per-clip model at ``--lamb`` (``cond``)."""
     import torch
 
     from experiments.background import g5_cond
@@ -730,29 +733,57 @@ def command_cond(args: argparse.Namespace) -> int:
     clip_id = only_clip(spec, args.select)
     clip = load_clip(clip_dirs(Path(args.prepared))[clip_id], by_id[clip_id],
                      Path(args.visor_fill) if args.visor_fill else None, args.limit_frames)
+    step = max(1, round(REFRESH_S * float(clip.fps)))
+    if step == 1:
+        raise SystemExit(f"{clip_id}: a {REFRESH_S} s refresh is every frame here, so arm B is the baseline itself")
     began = time.time()
-    flows = g5_cond.oracle_flows(clip.frames, refresh_reference(clip.n, clip.fps))
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    work = scratch / "cond"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    refresh = list(range(0, clip.n, step))
+    rgb_to_yuv420(clip.frames[refresh]).tofile(work / "refresh.yuv")
+    rec = code_svtav1({"work": str(work / "refresh"), "source": str(work / "refresh.yuv"),
+                       "fps": str(clip.fps / step), "frames": len(refresh), "crf": args.crf, "threads": 8, "cpus": None})
+    raw = np.fromfile(rec["decoded"], np.uint8).reshape(len(refresh), HEIGHT * 3 // 2, WIDTH)
+    fixed = dict(zip(refresh, yuv420_to_rgb(raw)))
+    refs = refresh_reference(clip.n, clip.fps)
+    between = [t for t in range(clip.n) if t not in fixed]
+    flows = g5_cond.oracle_flows(clip.frames, [refs[t] if t in between else None for t in range(clip.n)])
     flow_seconds = time.time() - began
-    fit = g5_cond.fit(clip.frames, clip.keep, flows, refresh_reference(clip.n, clip.fps), lamb=args.lamb,
-                      epochs=args.epochs, device=device, on_epoch=progress)
     net = load_lpips(args.lpips_backbone, device)
-    motion_bytes = MOTION_BYTES * sum(r is not None for r in refresh_reference(clip.n, clip.fps))
-    total_bits = fit["bits"]["latents"] + fit["bits"]["weights"] + 8 * motion_bytes
-    result = {
-        **clip.record, "kind": "cond", "lamb": args.lamb, "epochs": args.epochs,
-        "bits": {**fit["bits"], "motion": 8 * motion_bytes}, "kbps": total_bits / clip.duration / 1000,
-        "score": score(clip, fit["decoded"], net, device),
-        "score_float_weights": strip_frames(score(clip, fit["decoded_float"])),
-        "render_ms_per_frame": fit["render_ms_per_frame"], "render_basis": "sequential rollout from the quantized "
-        "weights and latents, batch 1, warp included, flows precomputed",
-        "flow_seconds": round(flow_seconds, 1), "seconds": round(time.time() - began, 1), "curve": fit["curve"],
-        "converged": fit["converged"], "model": fit["model"], "gpu": torch.cuda.get_device_name(0) if device == "cuda"
-        else "cpu", "gpu_capability": list(torch.cuda.get_device_capability(0)) if device == "cuda" else None,
-    }
-    publish = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch") / "publish"
+    refresh_bits = 8 * rec["payload_bytes"]
+    motion_bits = 8 * MOTION_BYTES * len(between)
+    common = {**clip.record, "kind": "cond", "crf": args.crf, "refresh_every": step, "refresh_frames": len(refresh),
+              "between_frames": len(between), "refresh_stream_sha256": rec["stream_sha256"],
+              "refresh_encode_command": rec["encode_command"],
+              "gpu": torch.cuda.get_device_name(0) if device == "cuda" else "cpu",
+              "gpu_capability": list(torch.cuda.get_device_capability(0)) if device == "cuda" else None}
+    warped = g5_cond.warp_only(fixed, flows, refs, clip.n, device)
+    rows = [{**common, "arm": "warp", "lamb": None, "bits": {"refresh": refresh_bits, "motion": motion_bits},
+             "kbps": (refresh_bits + motion_bits) / clip.duration / 1000, "score": score(clip, warped, net, device),
+             "render_ms_per_frame": None, "converged": {"checked": False, "reason": "nothing trained"}}]
+    fit = g5_cond.fit(clip.frames, clip.keep, flows, refs, lamb=args.lamb, epochs=args.epochs, device=device,
+                      on_epoch=progress, fixed=fixed)
+    bits = {"refresh": refresh_bits, "motion": motion_bits, **fit["bits"]}
+    rows.append({**common, "arm": "cond", "lamb": args.lamb, "epochs": args.epochs, "bits": bits,
+                 "kbps": sum(bits.values()) / clip.duration / 1000, "score": score(clip, fit["decoded"], net, device),
+                 "score_float_weights": strip_frames(score(clip, fit["decoded_float"])),
+                 "render_ms_per_frame": fit["render_ms_per_frame"], "render_basis": "the frames between refreshes: "
+                 "model forward from 8-bit weights and rounded latents plus the warp, batch 1, flows precomputed; "
+                 "the refreshes decode with dav1d", "dav1d_ms_per_refresh": 1000 * rec["decode_seconds"] / len(refresh),
+                 "curve": fit["curve"], "converged": fit["converged"], "model": fit["model"]})
+    for row in rows:
+        row["seconds"] = round(time.time() - began, 1)
+        row["flow_seconds"] = round(flow_seconds, 1)
+    publish = scratch / "publish"
     shutil.rmtree(publish, ignore_errors=True)
-    write_json(publish / "cond" / "result.json", result)
-    write_json(stage_dir() / "g5.json", {"kind": "cond", "decision_rule": DECISION, "clips": [strip_result(result)]})
+    (publish / "cond").mkdir(parents=True)
+    shutil.copyfile(rec["stream"], publish / "cond" / "refresh.ivf")
+    write_json(publish / "cond" / "result.json", rows)
+    write_json(stage_dir() / "g5.json", {"kind": "cond", "decision_rule": DECISION,
+                                         "clips": [strip_result(r) for r in rows]})
+    shutil.rmtree(work, ignore_errors=True)
     return 0
 
 
@@ -842,7 +873,7 @@ def group_gate(verdicts: dict[str, dict[str, Any]]) -> dict[str, Any]:
 
 def command_report(args: argparse.Namespace) -> int:
     baselines: dict[str, dict[str, Any]] = {}
-    arms: dict[str, dict[str, list[dict[str, Any]]]] = {"nvrc": {}, "cond": {}}
+    arms: dict[str, dict[str, list[dict[str, Any]]]] = {"nvrc": {}, "cond": {}, "warp": {}, "dcvc": {}}
     runs = []
     for path in args.result:
         doc = json.loads(Path(path).read_text())
@@ -850,8 +881,10 @@ def command_report(args: argparse.Namespace) -> int:
         for row in doc["clips"]:
             if doc["kind"] == "baselines":
                 baselines[row["id"]] = row
-            else:
-                arms[doc["kind"]].setdefault(row["id"], []).append(row)
+            elif doc["kind"] == "dcvc":
+                arms["dcvc"].setdefault(row["id"], []).extend(row["points"])
+            elif doc["kind"] in ("nvrc", "cond"):
+                arms[row.get("arm", doc["kind"])].setdefault(row["id"], []).append(row)
     report: dict[str, Any] = {"runs": runs, "decision_rule": DECISION, "arms": {}}
     for arm, by_clip in arms.items():
         verdicts = {}
@@ -865,7 +898,7 @@ def command_report(args: argparse.Namespace) -> int:
             test = [(r["kbps"], r["score"][tier]["psnr_v"]) for r in rows if r["score"][tier]["psnr_v"] is not None]
             verdict = clip_verdict(test, anchor)
             verdict.update(group=group, tier=tier, points=sorted(test), anchor=pareto(anchor),
-                           converged=all(r["converged"].get("converged", True) for r in rows))
+                           converged=all(r.get("converged", {}).get("converged", True) for r in rows))
             verdicts[clip_id] = verdict
         pilot = {k: v for k, v in verdicts.items() if k in DECISION["pilot"]}
         groups = {g: group_gate({k: v for k, v in verdicts.items() if v["group"] == g})
@@ -940,16 +973,21 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         checks["rate_positive"] = all(finite(r["kbps"]) and r["kbps"] > 0 for r in rows)
         checks["scores_finite"] = all(finite(r["score"]["dataset"]["psnr_v"]) for r in rows if r["dense_frames"])
         checks["quality_above_floor"] = all(r["score"]["dataset"]["psnr_v"] > 10 for r in rows if r["dense_frames"])
-        checks["render_timed"] = all(finite(r["render_ms_per_frame"]) for r in rows)
-        checks["training_logged"] = all(r.get("curve_s1") or r.get("curve") for r in rows)
+        trained = [r for r in rows if r.get("arm") != "warp"]
+        checks["render_timed"] = all(finite(r["render_ms_per_frame"]) for r in trained)
+        checks["training_logged"] = all(r.get("curve_s1") or r.get("curve") for r in trained)
         if result["kind"] == "nvrc":
             checks["bitstream_written"] = all(r["bitstream_bytes"] > 0 for r in rows)
             checks["nvrc_vendored"] = all(r["provenance"].get("revision") for r in rows)
         else:
+            model_rows = [r for r in rows if r.get("arm") == "cond"]
+            checks["both_variants"] = {r.get("arm") for r in rows} == {"warp", "cond"}
             checks["bits_counted"] = all(all(finite(v) and v > 0 for v in r["bits"].values()) for r in rows)
+            checks["model_adds_bits"] = all(r["kbps"] > w["kbps"] for r in model_rows for w in rows
+                                            if w.get("arm") == "warp")
             checks["quantized_close_to_float"] = all(
                 abs(r["score"]["dataset"]["psnr_v"] - r["score_float_weights"]["dataset"]["psnr_v"]) < 1.0
-                for r in rows if r["dense_frames"])
+                for r in model_rows if r["dense_frames"])
     return checks
 
 
@@ -995,6 +1033,7 @@ def main(argv: list[str] | None = None) -> int:
     cond = sub.add_parser("cond")
     common(cond)
     cond.add_argument("--lamb", type=float, required=True)
+    cond.add_argument("--crf", type=int, required=True, help="SVT-AV1 CRF of the refresh stream")
     cond.add_argument("--epochs", type=int, default=300)
     cond.add_argument("--lpips-backbone", default=None)
     cond.set_defaults(func=command_cond)

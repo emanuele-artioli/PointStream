@@ -1884,7 +1884,43 @@ invocation turns out to be needed.
     faster. Its first dev size scaled with duration and gave the stretch
     560k parameters, 160 kbps of weights alone. The size now scales with
     the frame count (above).
-- Jobs and outcome: below, as they finish.
+- Jobs. Baselines (CPU, all 44 clips): `20261009T221753Z-64ab816f`. DCVC-UF
+  (pilot clips): `20261009T221918Z-c483803d`. A, part 1:
+  `20261009T221725Z-c979689a` failed its smoke gate, but only in the
+  validator: it kept only the log line of an epoch's last step, which NVRC
+  does not always log. The run itself was sound (406 s, checkpoint
+  published), and the fixed parser reads its curve. Resubmitted with the
+  fix (`6ed4410`) as one job per clip and λ.
+- **Arm B, first version: not a bound** (9 pilot jobs, `3c15191`, all
+  complete, validators passed; for example `20261009T221736Z-7cb43081`).
+  As built, its references were only its own outputs, and nothing ever sent
+  a refreshed reference. The first frame came from the 45×80×4 latent
+  alone, and every later frame inherited it through the warp. It reached
+  15–18 dB PSNR_V on the windows at 185–886 kbps, and 22–25 dB on the
+  stretch at 46–158 kbps, flat over its last 150 epochs. DCVC-UF reaches
+  31 dB at 86 kbps on P02_12. This measures a model that has to code a
+  whole frame from a 1/12-resolution latent and a 60–200k-parameter
+  decoder. It does not measure a reference refreshed every 0.1 s, so these
+  runs do not count toward the gate.
+- **Arm B, as G1e meant it** (before any of its runs). The refreshes are
+  sent. Every 0.1 s a frame (every 5th at 50 frames/s, every 6th at 59.94)
+  is coded by SVT-AV1 (preset 4, its CRF the arm's setting) as its own
+  stream at a tenth of a second per frame, and its bytes count. Each frame
+  between refreshes is its refresh's decoded image, warped by the oracle
+  flow (128 bytes per frame) and corrected by the per-clip model above
+  (latents and weights priced). It is trained on the frames between
+  refreshes only, against fixed references, so no error carries over. Two
+  variants per setting: *warp* (no model: refreshes plus motion only) and
+  *cond* (with the model). Settings, three pairs of refresh CRF and model
+  λ, matched so that each refresh quality gets a correction of similar
+  slope: (59, 200), (50, 800), (40, 3200). It runs on the windows only. On
+  the stretches (10 frames/s) every frame is a refresh, so the arm *is*
+  SVT-AV1 at 10 frames/s, which the baseline already is. It cannot beat
+  the baseline there, by construction. Why it bounds the class: the refresh
+  stream is a real codec's, the motion is oracle motion at the sendable
+  price, and the model is fitted to the scored frames with a loss on V.
+  The bound is for this correction model; a stronger conditional coder is
+  DCVC-UF given the warped refresh (G2's arm (b)), not tested here.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could

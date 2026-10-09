@@ -188,3 +188,23 @@ def test_arm_b_fits_prices_and_rolls_out_on_a_tiny_clip():
     assert out["decoded"].shape == frames.shape and out["decoded"].dtype == np.uint8
     assert out["bits"]["latents"] > 0 and out["bits"]["weights"] > 0
     assert out["curve"][-1]["epoch"] == 2 and out["render_ms_per_frame"] > 0
+
+
+def test_arm_b_with_transmitted_refreshes_codes_only_the_frames_between():
+    pytest.importorskip("torch")
+    from experiments.background import g5_cond
+
+    rng = np.random.default_rng(2)
+    base = rng.integers(0, 256, (48, 112, 3), dtype=np.uint8)
+    frames = np.stack([np.roll(base, k, axis=1) for k in range(7)])[:, :, :96]
+    keep = np.ones(frames.shape[:3], bool)
+    refs = g5.refresh_reference(7, Fraction(30))  # refresh every 3 frames: 0, 3, 6
+    fixed = {t: frames[t] for t in (0, 3, 6)}
+    flows = g5_cond.oracle_flows(frames, [refs[t] if t not in fixed else None for t in range(7)], workers=1)
+    out = g5_cond.fit(frames, keep, flows, refs, lamb=200.0, epochs=2, device="cpu", fixed=fixed)
+    assert all(np.array_equal(out["decoded"][t], frames[t]) for t in fixed)
+    assert out["model"]["coded_frames"] == 4
+    warped = g5_cond.warp_only(fixed, flows, refs, 7, "cpu")
+    assert all(np.array_equal(warped[t], frames[t]) for t in fixed)
+    # A rolled frame warped back from its refresh matches it away from the wrap-around edge.
+    assert np.abs(warped[1, :, 8:-8].astype(int) - frames[1, :, 8:-8].astype(int)).mean() < 20

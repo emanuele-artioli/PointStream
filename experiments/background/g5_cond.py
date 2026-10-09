@@ -8,9 +8,12 @@ blends a synthesised image with the warped reference through a predicted
 weight, so disocclusions and independent motion are synthesised and the rest
 is copied.
 
-`fit` trains it as the decoder runs it, closed loop: every epoch walks the
-refresh groups in time order and takes the references from the current outputs
-(detached). Latents are fitted directly (an auto-decoder) under uniform-noise
+`fit` trains it as the decoder runs it: every epoch walks the refresh groups
+in time order and takes the references from the current outputs (detached).
+With ``fixed`` frames (the refreshes, transmitted by another codec), those are
+the outputs at the refresh points and the model codes only the frames between
+them; without, the references are the model's own outputs (closed loop), which
+leaves the first frame to the latent alone. Latents are fitted directly (an auto-decoder) under uniform-noise
 quantization and a learned factorized Laplace prior per channel. The result is
 scored after a fresh sequential rollout from rounded latents and 8-bit weights,
 and priced as latents (ideal code length under the prior, plus the prior) and
@@ -159,8 +162,8 @@ def entropy_bits(symbols: np.ndarray) -> float:
 
 
 def fit(frames: np.ndarray, keep: np.ndarray, flows: np.ndarray, refs: list[int | None], *, lamb: float,
-        epochs: int, device: str, on_epoch: Callable[[int], None] | None = None,
-        seed: int = 0) -> dict[str, Any]:
+        epochs: int, device: str, on_epoch: Callable[[int], None] | None = None, seed: int = 0,
+        fixed: dict[int, np.ndarray] | None = None) -> dict[str, Any]:
     import torch
 
     torch.manual_seed(seed)
@@ -180,6 +183,16 @@ def fit(frames: np.ndarray, keep: np.ndarray, flows: np.ndarray, refs: list[int 
     sched = [torch.optim.lr_scheduler.CosineAnnealingLR(o, steps, eta_min=lr * 0.01)
              for o, lr in ((opt_model, 1e-3), (opt_latent, 1e-2))]
     buffer = torch.zeros((n, 3, h, w), dtype=torch.float16, device=device)
+    fixed = fixed or {}
+    fixed_t = {t: torch.from_numpy(img).to(device).permute(2, 0, 1).float() / 255.0 for t, img in fixed.items()}
+    for t, img in fixed_t.items():
+        buffer[t] = img.to(torch.float16)
+    coded = [t for t in range(n) if t not in fixed]
+    groups = [[t for t in g if t not in fixed] for g in groups]
+    groups = [g for g in groups if g]
+    steps = epochs * len(groups)
+    for s_ in sched:
+        s_.T_max = steps
     curve = []
 
     def target(idx: list[int]) -> tuple[Any, Any]:
@@ -215,43 +228,50 @@ def fit(frames: np.ndarray, keep: np.ndarray, flows: np.ndarray, refs: list[int 
                 s.step()
             buffer[idx] = out.detach().to(torch.float16)
         if (epoch + 1) % CURVE_EVERY == 0 or epoch + 1 == epochs:
-            roll = rollout(model, latent, list(range(n)), refs, flow, (h, w), device)
-            curve.append({"epoch": epoch + 1, **measure(roll, src, mask, model, latent, n, h, w)})
+            roll = rollout(model, latent, list(range(n)), refs, flow, (h, w), device, fixed_t)
+            curve.append({"epoch": epoch + 1, **measure(roll, src, mask, model, latent, coded, h, w)})
         if on_epoch:
             on_epoch(epoch + 1)
-    float_decoded = to_uint8(rollout(model, latent, list(range(n)), refs, flow, (h, w), device))
+    float_decoded = to_uint8(rollout(model, latent, list(range(n)), refs, flow, (h, w), device, fixed_t))
     weight_bits, tensors = quantize_weights(model)
     with torch.no_grad():
         z_int = torch.round(latents.weight).view(n, LATENT_CHANNELS, gh, gw)
-        latent_bits = float(model.bits(z_int).double().sum()) + LATENT_CHANNELS * PRIOR_BITS
+        latent_bits = float(model.bits(z_int[coded]).double().sum()) + LATENT_CHANNELS * PRIOR_BITS
     if device == "cuda":
         torch.cuda.synchronize()
     began = time.perf_counter()
-    decoded = rollout(model, lambda idx: z_int[idx], list(range(n)), refs, flow, (h, w), device)
+    decoded = rollout(model, lambda idx: z_int[idx], list(range(n)), refs, flow, (h, w), device, fixed_t)
     if device == "cuda":
         torch.cuda.synchronize()
-    render_ms = 1000 * (time.perf_counter() - began) / n
+    render_ms = 1000 * (time.perf_counter() - began) / max(1, len(coded))
     params = sum(p.numel() for name, p in model.named_parameters() if name != "log_scale")
     return {
         "decoded": to_uint8(decoded), "decoded_float": float_decoded,
         "bits": {"latents": latent_bits, "weights": weight_bits},
         "render_ms_per_frame": render_ms, "curve": curve, "converged": curve_converged(curve),
         "model": {"widths": list(widths), "latent": [LATENT_CHANNELS, gh, gw], "scales": list(SCALES),
-                  "ref_channels": REF_CHANNELS, "parameters": params, "weight_bits_per_parameter":
+                  "ref_channels": REF_CHANNELS, "parameters": params, "coded_frames": len(coded), "weight_bits_per_parameter":
                   weight_bits / params, "quantized_tensors": tensors, "groups": len(groups)},
     }
 
 
 def rollout(model: Any, latent: Callable[[list[int]], Any], frames: list[int], refs: list[int | None], flow: Any,
-            size: tuple[int, int], device: str) -> Any:
-    """Decode every frame in time order, each from the decoded output at its reference."""
+            size: tuple[int, int], device: str, fixed: dict[int, Any] | None = None) -> Any:
+    """Decode every frame in time order, each from the decoded output at its reference; ``fixed`` frames
+    (transmitted refreshes) are taken as they are."""
     import torch
 
     h, w = size
     out = torch.zeros((len(frames), 3, h, w), dtype=torch.float32, device=device)
+    fixed = fixed or {}
+    for t, img in fixed.items():
+        out[t] = img
     model.eval()
     with torch.no_grad():
-        for idx in refresh_groups(refs):
+        for group in refresh_groups(refs):
+            idx = [t for t in group if t not in fixed]
+            if not idx:
+                continue
             r = refs[idx[0]]
             if r is None:
                 warped = torch.zeros((len(idx), 3, h, w), device=device)
@@ -269,18 +289,44 @@ def to_uint8(images: Any) -> np.ndarray:
     return torch.clamp(torch.round(images * 255.0), 0, 255).to(torch.uint8).permute(0, 2, 3, 1).cpu().numpy()
 
 
-def measure(images: Any, src: Any, mask: Any, model: Any, latent: Callable[[list[int]], Any], n: int, h: int,
-            w: int) -> dict[str, float]:
-    """PSNR on the fitted pixels (V) and the latents' bits per pixel, for the convergence curve."""
+def measure(images: Any, src: Any, mask: Any, model: Any, latent: Callable[[list[int]], Any], coded: list[int],
+            h: int, w: int) -> dict[str, float]:
+    """PSNR on the fitted pixels (V) of the frames the model codes, and their latents' bits per pixel, for the
+    convergence curve."""
     import torch
 
     with torch.no_grad():
-        decoded = torch.clamp(torch.round(images * 255.0), 0, 255)
-        diff = (decoded - src.permute(0, 3, 1, 2).float()) ** 2
-        m = mask.unsqueeze(1).float()
+        decoded = torch.clamp(torch.round(images[coded] * 255.0), 0, 255)
+        diff = (decoded - src[coded].permute(0, 3, 1, 2).float()) ** 2
+        m = mask[coded].unsqueeze(1).float()
         mse = float((diff * m).sum() / (3 * m.sum()))
-        bits = float(sum(model.bits(torch.round(latent([i]))).sum() for i in range(n)))
-    return {"psnr": 10 * math.log10(255.0 ** 2 / max(mse, 1e-12)), "bpp": bits / (n * h * w)}
+        bits = float(sum(model.bits(torch.round(latent([i]))).sum() for i in coded))
+    return {"psnr": 10 * math.log10(255.0 ** 2 / max(mse, 1e-12)), "bpp": bits / (len(coded) * h * w)}
+
+
+def warp_only(fixed: dict[int, np.ndarray], flows: np.ndarray, refs: list[int | None], n: int,
+              device: str) -> np.ndarray:
+    """Every frame between refreshes as its refresh warped by the oracle flow, nothing coded (border pixels
+    clamped, not zeroed)."""
+    import torch
+    import torch.nn.functional as F
+
+    h, w, _ = next(iter(fixed.values())).shape
+    out = np.empty((n, h, w, 3), np.uint8)
+    ys, xs = torch.meshgrid(torch.arange(h, device=device, dtype=torch.float32),
+                            torch.arange(w, device=device, dtype=torch.float32), indexing="ij")
+    for t in range(n):
+        if t in fixed:
+            out[t] = fixed[t]
+            continue
+        r = refs[t]
+        assert r is not None and r in fixed, f"frame {t} has no transmitted reference"
+        img = torch.from_numpy(fixed[r]).to(device).permute(2, 0, 1)[None].float()
+        f = torch.from_numpy(flows[t].astype(np.float32)).to(device)
+        grid = torch.stack([2 * (xs + f[..., 0]) / (w - 1) - 1, 2 * (ys + f[..., 1]) / (h - 1) - 1], -1)[None]
+        warped = F.grid_sample(img, grid, mode="bilinear", padding_mode="border", align_corners=True)
+        out[t] = torch.clamp(torch.round(warped[0]), 0, 255).to(torch.uint8).permute(1, 2, 0).cpu().numpy()
+    return out
 
 
 def curve_converged(curve: list[dict[str, float]]) -> dict[str, Any]:
