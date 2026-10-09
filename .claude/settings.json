@@ -1,19 +1,13 @@
 {
   "permissions": {
     "allow": [
+      "Bash",
+      "Read",
       "Edit(/**)",
-      "Bash(git *)",
-      "Bash(ruff check *)",
-      "Bash(mypy *)",
-      "Bash(python -m pytest *)",
-      "Bash(scripts/ps-fleet *)",
-      "Bash(ssh gpu*)"
-    ],
-    "ask": [
-      "Bash(gh pr merge *)",
-      "Bash(git push * main)",
-      "Bash(git clean *)",
-      "Bash(rm -rf *)"
+      "Write(/**)",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch"
     ],
     "deny": [
       "Bash(git push --force *)",
