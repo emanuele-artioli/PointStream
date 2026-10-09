@@ -672,7 +672,7 @@ def command_cond(args: argparse.Namespace) -> int:
         "weights and latents, batch 1, warp included, flows precomputed",
         "flow_seconds": round(flow_seconds, 1), "seconds": round(time.time() - began, 1), "curve": fit["curve"],
         "converged": fit["converged"], "model": fit["model"], "gpu": torch.cuda.get_device_name(0) if device == "cuda"
-        else "cpu",
+        else "cpu", "gpu_capability": list(torch.cuda.get_device_capability(0)) if device == "cuda" else None,
     }
     publish = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch") / "publish"
     shutil.rmtree(publish, ignore_errors=True)
@@ -828,6 +828,9 @@ def validate_stage(stage: Path) -> dict[str, bool]:
     result = json.loads((stage / "g5.json").read_text())
     rows = result["clips"]
     checks: dict[str, bool] = {"clips_present": bool(rows)}
+    if result["kind"] != "baselines":
+        # First run of NVRC and of arm B on a GPU class: the intended device (Ada or A6000, sm_86 and up).
+        checks["intended_gpu"] = all(r.get("gpu_capability") and tuple(r["gpu_capability"]) >= (8, 6) for r in rows)
     if result["kind"] == "nvrc-s1":
         checks["every_epoch_logged"] = all(len(r["curve_s1"]) == r["epochs"]["s1"] for r in rows)
         checks["training_improves"] = all(r["curve_s1"][-1]["psnr"] > r["curve_s1"][0]["psnr"] for r in rows)
