@@ -1605,6 +1605,77 @@ invocation turns out to be needed.
   and 1.20 px, so the measure holds on a static camera at 1 s. Nothing in
   the pilot changes the run's settings, so the other 41 clips run as
   specified: `20261009T195921Z-a5d08578`.
+- Full run `20261009T195921Z-a5d08578` (gpu5, CPU, `9b0f8de`; smoke gate
+  passed; full 903 s at 48 threads, no contention; validator passed, 10
+  checks). Refinement at 0.3 s, reached by step 4: `20261009T201916Z-9abe4e90`
+  (gpu5, CPU, `e5099d7`, all 51 clips; 441 s; validator passed). Report:
+  `pointstream-data/background/g1e-2026-10-09/report-1ae0ded/`
+  (`g1e-report.json` `fdd2ede3…8ff1`, from the pilot's, the full run's and
+  the refinement's `g1e.json`: `a5727e3f…bd19`, `5a71bc95…a96b` and
+  `6174d3d2…7e73`). Median clip's explained share (p90 ≤ 2 px and holes
+  ≤ 10%; an unmatched pair counts as not explained):
+
+  | Group | Age | h1 | planes4 | epi | tri | oracle | oracle p90 | epi forward-backward p90 |
+  |---|---|---:|---:|---:|---:|---:|---:|---:|
+  | windows (34) | one frame (0.02 s) | 1.00 | 1.00 | 1.00 | 0.68 | 1.00 | 0.43 px | 0.22 px |
+  | windows | 0.1 s | 0.45 | **0.78** | 0.84 | 0.46 | **0.92** | 0.93 px | 0.41 px |
+  | windows | 0.3 s | 0.11 | 0.36 | 0.44 | 0.11 | **0.54** | 1.80 px | 0.65 px |
+  | windows | 1 s | 0.00 | 0.06 | 0.16 | 0.00 | 0.17 | 3.47 px | 1.30 px |
+  | stretches (10) | 0.1 s (one frame) | 0.31 | 0.39 | 0.49 | 0.27 | **0.51** | 1.53 px | 0.55 px |
+  | stretches | 0.3 s | 0.06 | 0.18 | 0.28 | 0.08 | 0.31 | 2.87 px | 1.08 px |
+  | stretches | 1 s | 0.01 | 0.03 | 0.09 | 0.03 | 0.10 | 4.69 px | 1.99 px |
+  | OpenTTGames (7), `h1` | 0.1 / 0.3 / 1 s | 1.00 / 1.00 / 0.99 | | | | | 0.84 / 0.97 / 1.03 px | 0.51 / 0.58 / 0.66 px (`h1`) |
+
+  Clips with at least half explained, `planes4` / oracle: windows at 0.1 s
+  22 / 27 of 34, stretches at 0.1 s 4 / 6 of 10. Per clip at 0.1 s,
+  `planes4` explains 0–100% of a window's targets (16 windows all of them)
+  and 16–88% of a stretch's. The stretches' pairs mostly match (median
+  clip 95% at 0.1 s, 75% at 1 s). Their shortfall is residual on matched
+  pairs: `planes4` explains 49% of them and the oracle 65%. `epi` alone
+  matches the oracle's verdict on about 90% of pairs. `planes4` costs
+  128 bytes per frame plus a label map per reference.
+- Outcome by the rule: **step 3**.
+  - **Refresh ages.** The oracle's are 0.3 s on the windows and 0.1 s on
+    the stretches. `planes4`'s is 0.1 s on the windows (78%) and none on
+    the stretches (39% at 0.1 s). `tri`'s is one frame on the windows, and
+    none on the stretches.
+  - **No sendable warp qualifies in both groups**, so G2 does not yet
+    price a refresh scheme. The rule's next step is a sendable warp
+    between `planes4` and the oracle, at the oracle's refresh age (DA3 or
+    depth-augmented keyframes), with its own entry. Its ceiling is the
+    oracle's: on the stretches, 51% at 0.1 s, only just above the bar, and
+    31% at 0.3 s.
+  - **Floor (step 5).** It holds at every age: OpenTTGames' `h1` p90 is
+    1.03 px at 1 s, and VISOR's forward-backward p90 is at most 1.99 px.
+    The growth with age is therefore real. The residual grows from 0.93
+    to 3.47 px on the windows between 0.1 s and 1 s, while the flow's
+    self-disagreement grows from 0.41 to 1.30 px.
+  - **Mask check.** It holds: dense and `sam_text` masks give the same
+    shares within 2 points, so the stretches' gap to the windows is
+    content, not masks.
+- What the remaining residual is made of (`epi`, energy share of the raw
+  squared error, mean over pairs). On the windows at 0.1 s: remainder 70%,
+  independent motion 21%, parallax 7%, exposure 2%. At 1 s the shares are
+  46%, 34%, 13% and 7%. On the stretches at 0.1 s: 63%, 27%, 7% and 2%.
+  Misaligned pixels near the foreground: 5–7%. A fresh reference removes the
+  geometric part almost entirely. What stays is photometric (blur, noise,
+  lighting, disocclusion) and things that move by themselves, which no
+  static-scene warp can remove.
+- Hypothesis: partly right. The oracle was meaningful at one frame and at
+  0.1 s on the windows, and not at 1 s, as predicted. It was stronger than
+  predicted (92% at 0.1 s, against 65–75%), and so was `planes4` (78%,
+  against 40–55%). The stretches stayed below the windows, as predicted.
+  The mask check closed none of the gap, where part was predicted. The
+  floor held, as predicted.
+- Competing explanations. (1) Selection by G1's keyframing: rejected. Forced
+  ages give *higher* shares than G1d's age bins (window bin under 0.1 s:
+  `epi` 70%, four planes 49%). (2) A measurement floor: rejected. The flow's
+  self-disagreement stays under 2 px and grows a third as fast as the
+  residual, and OpenTTGames holds at 1 s. (3) Masks: rejected (above).
+- Budget: CPU only, 0 GPU-hours. CPU jobs: preparation 211 s, pilot 123 s,
+  full 903 s, refinement 441 s, so about 28 min of CPU-job wall (ceiling 6
+  CPU-job-hours). Wall time from the first submission to the report: about
+  50 min (ceiling 6 h).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
