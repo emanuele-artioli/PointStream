@@ -8,15 +8,38 @@ the paper first and the demo second.
 1. **Write it down first.** Add an entry below with the decision rule, the
    hypothesis, the competing explanation and the budget (GPU hours and wall
    time).
-2. **Correctness smoke, in minutes.** The real component on a representative
+2. **Oracle first.** Before building a component (a representation, a model,
+   a coder), measure the cheapest upper bound of what it could achieve, at the
+   operating point the decision needs. An oracle may use what the component
+   cannot have, such as the target frame, ground truth or unlimited bits.
+   - *It must dominate the components it gates.* Gating means those
+     components never run, so nothing would reveal a wrong bound later. The
+     entry says why the oracle is a bound. If that cannot be argued from its
+     construction, check it on dev samples against the cheapest gated
+     component, and fix the oracle before it gates anything.
+   - *It answers only its configuration.* The entry names what the oracle
+     bounded. When it fails, the result says what to change next, for example
+     several references instead of one, and that change gets its own oracle.
+   - *Results.* An oracle's result is recorded like any other. The component
+     is built only if the oracle passes the decision rule.
+3. **Correctness smoke, in minutes.** The real component on a representative
    bounded input, through the same entrypoint as the full run. On a model's
    first run on a GPU class, the smoke also asserts device, execution provider
    and kernels ([fleet](fleet.md#modelgpu-table)).
-3. **Bounded pilot on the one axis that matters.**
-4. **Scaled run**, only after the pilot shows it can meet the target within
+4. **Bounded pilot on the one axis that matters.** Start a sweep with the
+   fewest settings that give a rough answer, typically three spread over the
+   range. Add intermediate settings only where the answer is unclear, and
+   record why.
+5. **Scaled run**, only after the pilot shows it can meet the target within
    budget.
-5. **Stop when the decision is made.** Record the outcome below, including
+6. **Stop when the decision is made.** Record the outcome below, including
    negative results.
+
+**Waiting time.** The agent's context stays cheap to resume for about an
+hour. A smoke, an oracle or a pilot is therefore sized to finish within 45
+minutes, which smokes already meet (fleet caps them at 600 s). A full run may
+take longer: it checkpoints per item, and the agent reads its results when
+it ends.
 
 Fleet runs follow [fleet](fleet.md): a smoke of at most 600 s, a validator with
 substantive checks, sha256-identified inputs, a deadline and a budget.
