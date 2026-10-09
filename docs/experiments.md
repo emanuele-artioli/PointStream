@@ -1566,8 +1566,8 @@ invocation turns out to be needed.
   threads without shards. On P02_12, at one frame all four warps explain all
   three targets; at 0.1 s `epi`, `planes4` and `tri` do; at 1 s none does
   (`planes4` p90 5–18 px). Forward-backward p90 is 0.1–0.2 px at one frame,
-  about 0.3 px at 0.1 s and 1.1–1.9 px at 1 s on the window. It is 0.8–3.5 px
-  at 0.1 s and 3–13 px at 1 s on the stretch, so step 5 may well declare the
+  about 0.3 px at 0.1 s and 1.1–1.9 px at 1 s on the window (`epi`). On the
+  stretch it is 0.8–2.5 px at 0.1 s and 3–14 px at 1 s, so step 5 may well declare the
   stretch's 1 s not measurable. `tri` has no reference depth on 7 of the
   stretch's 16 pairs: the relative pose to the companions fails (a near
   rotation), as in G1d. Inputs: `pointstream-data/background/g1e-2026-10-09/`
