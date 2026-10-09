@@ -1372,6 +1372,36 @@ invocation turns out to be needed.
   pilot 623 s, full 2,137 s, so about 50 min of CPU-job wall (ceiling 8
   CPU-job-hours). Wall time from the first submission to the report: about
   1.5 h (ceiling 14 h).
+- After review (2026-10-09). (1) *Scope of the verdict.* The rule judged G1's
+  pairs, where a frame keeps one reference for up to 4.8 s on the windows
+  and seconds on the stretches. It rules out a background sent once and
+  reused for seconds. It says nothing about references kept fresh. Binned by
+  the age of the reference (`g1d ages`, from the two runs' published
+  results, no new computation; `ages-fc4ccdf/g1d-ages.json` `ad72bbe5…f6ef`):
+
+  | Windows: reference age | frames | rot | planes4 | epi | tri |
+  |---|---:|---:|---:|---:|---:|
+  | < 0.1 s | 1,186 | 37% | 49% (p90 1.5 px) | 70% (1.3 px) | 33% |
+  | 0.1–0.25 s | 922 | 10% | 35% | 43% | 19% |
+  | 0.25–0.5 s | 883 | 4% | 29% | 37% | 16% |
+  | 0.5–1 s | 1,203 | 2% | 20% | 33% | 9% |
+  | 1–2 s | 1,601 | 1% | 8% | 24% | 6% |
+  | 2–5 s | 1,742 | 2% | 11% | 25% | 10% |
+
+  On the stretches, the best bin with many frames (0.1–0.25 s, 2,166 frames)
+  reaches 18% (`epi`) and 10% (`planes4`). A bin's share also depends on
+  which clips have frames at that age, so this is indicative. It moves the
+  question to how often a reference must be refreshed and what the refreshes
+  cost, which is G1e. G5 is not decided yet. (2) *The oracle was not a bound.*
+  `epi` was meant to bound every static-scene warp, but `tri` beat it on one
+  pilot clip, because `epi` inherits the per-pixel flow's errors. The
+  protocol now requires an oracle to dominate what it gates (PR #180). The
+  verdict still stands for G1's pairs, since `tri` and the planes failed
+  too. (3) *A mask confound on the stretches.* Their foreground is G1's
+  `sam_text` tier, which recalls about half of the dense masks' hand pixels
+  (G1 tier check). Unmasked hands then count as background motion. That may
+  be why the stretches stay far below the windows even with fresh
+  references, and G1e checks it.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
