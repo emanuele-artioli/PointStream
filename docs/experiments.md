@@ -1434,6 +1434,127 @@ invocation turns out to be needed.
   be why the stretches stay far below the windows even with fresh
   references, and G1e checks it.
 
+### 2026-10-09 — G1e: reference refresh on VISOR
+- Question: G1d ruled out a VISOR background reference that is sent once and
+  reused for seconds. Binned by age, G1d's records explain far more with
+  fresh references (windows under 0.1 s: 70% with `epi`, 49% with four
+  planes). Can a reference refreshed often enough reach the 2 px bar, and
+  how often must it be refreshed? If a sendable warp passes at a useful age,
+  G2 prices the refreshes in bytes. If not, egocentric video goes to G5.
+- Why a new measurement and not G1d's bins. In G1d, a frame's age was G1's
+  choice: G1 started a keyframe where tracking failed, so fresh-reference
+  frames are not a random sample. A bin also mixes clips. G1e fixes the
+  targets and forces the age, so every age is scored on the same frames.
+- Clips: G1d's 34 windows and 10 stretches, from G1d's prepared lossless
+  archive (`20261009T075810Z-295529d4`, `published.tar` `5a9c47db…5d62`),
+  with the same foreground. Measurement floor: the 7 OpenTTGames test clips
+  of G1 (120 s at 10 frames/s, G1's `sam_text` masks of persons and rackets),
+  prepared the same way in one more CPU job.
+- Pairs. Targets are fixed before any run, on a stride, so that correlated
+  neighbours do not count as separate samples. Windows: every 10th frame from
+  1 s (about 20 per window, 0.2 s apart). Stretches and OpenTTGames: one per
+  second from 1 s (119 per clip). Each target t is warped from the reference
+  r = t − g for each age g in {1 frame, 0.1 s, 1 s}. On windows (50 or 59.94
+  frames/s) these are 1, 5 or 6, and 50 or 60 frames. On stretches and
+  OpenTTGames (10 frames/s) one frame is 0.1 s, so they get two ages. Every
+  age uses the same targets. A pair is matched by SIFT and a homography with
+  at least 30 inliers, as in G1. A pair that does not match counts as not
+  explained, and the matched share is reported.
+- Methods, all from G1d (`depth.py`), with the reference r as the keyframe:
+  `h1` (one homography; also its region defines holes, as in G1d), `planes4`
+  (the sendable warp: a label map on the reference, fitted to the dense flow
+  to the reference's companion 0.5 s later, then four homographies per
+  frame), `epi` (dense flow projected onto epipolar lines; not sendable) and
+  `tri` (depth of the reference triangulated from its companions, PnP per
+  frame). Companions are chosen as in G1d. An encoder that refreshes
+  references can see 0.5–1 s ahead at the cost of that much latency, which
+  the rate step (G2) would have to state.
+- The oracle, and why it bounds what it gates. It gates refreshed
+  static-scene warps: `planes4`, `tri`, and the depth representations G1d did
+  not run (Depth Anything 3 depth, depth-augmented keyframes, 3DGS). G1d
+  found that `epi` alone does not dominate (`tri` beat it on P03_120). So
+  the oracle is the per-pair best of `epi`, `planes4` and `tri`: a pair is
+  explained if any of the three explains it. By construction it dominates
+  `planes4` and `tri`. It does not dominate unmeasured depth (DA3, 3DGS)
+  by construction. The argument for them is that after `epi`, 87–89% of
+  G1d's residual energy was independent motion, remainder and exposure, and
+  a static-scene warp of any depth cannot remove those. Per pair, the
+  share where `epi` alone matches the oracle is reported, as a check of
+  that argument at fresh ages.
+- Measures per pair and method: G1d's (`camera.residual` with
+  `depth.complete`): p90 residual flow on textured background at 1080p,
+  hole share against `h1`'s region, shares within 1/2/4 px, PSNR after flow,
+  energy attribution, near-foreground share. A pair is *explained* when
+  p90 ≤ 2 px and holes ≤ 10%. Rate is per frame: `planes4` 128 bytes plus its
+  label map PNG per reference, and `tri` 24 bytes plus its 8-bit
+  inverse-depth PNG per reference. The reference image itself is G2's to
+  price. Render time: one CPU thread, warp construction. Two checks beside it:
+  - *Measurement floor, two ways.* (i) OpenTTGames, a static camera, at
+    0.1 s and 1 s: `h1` p90 and the explained share. (ii) On every VISOR
+    pair, the forward-backward consistency of the DIS flow on textured
+    background: the p90 at 1080p of |f(x) + b(x + f(x))|, where f is the
+    flow from the target to the warped reference and b the flow back. A pair
+    whose own flow disagrees with itself by more than 2 px cannot certify
+    2 px.
+  - *Mask confound.* On the stretch targets inside their evaluation window
+    (where VISOR's dense masks exist, read from the B1b fill already staged
+    in G1d), each pair is scored twice: with G1's `sam_text` foreground and
+    with the dense masks (dilated as in G1). The reference also needs a dense
+    mask, so at 1 s only targets at least 1 s into the window count.
+- Decision rule (`g1e.DECISION`, fixed before any fleet run). As in G1d, a
+  method is meaningful in a group at an age when its median clip explains at
+  least 50% of targets. A method's *refresh age* in a group is the largest
+  tested age at which it is meaningful. Windows and stretches are judged
+  separately.
+  1. *Oracle gate.* If the oracle's refresh age on the windows is below
+     0.1 s (only one frame, or none), a refreshed reference is no cheaper
+     than coding every frame. No refresh scheme is built, and egocentric
+     video goes to G5.
+  2. *Sendable warp.* Otherwise, if `planes4` (or `tri`) has a refresh age of
+     at least 0.1 s on the windows *and* on the stretches, G2 prices that
+     warp refreshed at that age against SVT-AV1 and DCVC-UF on the same
+     background frames. If several qualify, the one with fewer bytes per
+     frame goes forward. The stretch verdict stands only if the mask check
+     agrees: the dense and `sam_text` explained shares on the same pairs
+     differ by at most 10 points. Otherwise the stretch verdict is the
+     dense-mask one, on those pairs only, and is flagged as resting on
+     fewer frames.
+  3. If the oracle qualifies at ≥ 0.1 s but no sendable warp does, the gap
+     is recorded, and the next step is a sendable warp between them, with
+     DA3 or depth-augmented keyframes from G1d's (c) and (d), at the oracle's
+     refresh age. That step gets its own entry.
+  4. *Refinement.* If `planes4` or the oracle is meaningful at 0.1 s but
+     not at 1 s on the windows, one more age, 0.3 s, is run on the same
+     targets. This places the refresh age within a factor of about 3, since
+     G2's rate scales with the refresh rate. No other ages are added.
+  5. *Floor.* The growth with age counts as real only if OpenTTGames'
+     median `h1` p90 stays ≤ 2 px at 1 s and VISOR's forward-backward p90
+     stays ≤ 2 px at the age in question. Where it does not, that age's
+     verdict is reported as *not measurable*, and it is not counted as a
+     failure.
+- Hypothesis: on the windows the oracle is meaningful at one frame and at
+  0.1 s (about 65–75%), but not at 1 s. `planes4` is meaningful at one frame
+  and borderline at 0.1 s (40–55%), so step 4 runs. The stretches stay below
+  the windows at 0.1 s. The mask check closes part of that gap, not all of
+  it. The floor holds at 0.1 s, and OpenTTGames holds at 1 s.
+- Competing explanations: (1) G1d's fresh bins were easy frames chosen by
+  G1's keyframing. Then forced ages give lower shares than G1d's bins at
+  the same age. (2) A measurement floor: DIS between distant views degrades.
+  Then forward-backward error grows with age as fast as the residual does.
+  (3) Masks: the stretches' residual is unmasked hands. Then dense masks
+  raise the stretch share on the same pairs.
+- Budget: CPU only, 0 GPU-hours. OpenTTGames preparation ≤ 20 min. Dev check
+  on gpu6 (packed environment, one window and one stretch, a few targets;
+  not evidence) to time the pairs and check forward-backward consistency on
+  synthetic and real pairs. Smoke ≤ 600 s. Pilot (2 windows, 1 stretch,
+  1 OpenTTGames clip, every target) ≤ 20 min. Full run of the rest sized
+  from the pilot and split into shards of ≤ 45 min each, checkpointed per
+  clip (about 2,100 window pairs, 2,400 stretch pairs and 1,700 OpenTTGames
+  pairs; G1d spent about 5.5 CPU-s per frame for eight methods with shared
+  keyframes, and here every pair has its own reference). Refinement (0.3 s),
+  if reached: one more job of ≤ 45 min. Ceiling 6 CPU-job-hours and 6 h
+  wall.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
