@@ -1053,8 +1053,8 @@ invocation turns out to be needed.
   21 h from staging) exceeded the 12 h ceiling because only one Ada/A6000
   GPU was free for most of the evening (gpu5 and gpu6 busy with other users,
   gpu2 unreachable).
-- Report: `pointstream-data/background/g1-2026-10-08/report-6a391dc/`
-  (`g1-report.json` `d23e571d…6608`), all 107 clips from the pilot and the
+- Report: `pointstream-data/background/g1-2026-10-08/report-8e79d9e/`
+  (`g1-report.json` `aa1c334f…89cc`, figures included), all 107 clips from the pilot and the
   four full jobs. Review page with overlays and coverage maps:
   [artifact](https://claude.ai/artifact/LB8yoyyc3ebqb7Bii6X2RF).
 
