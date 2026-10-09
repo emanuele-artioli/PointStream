@@ -34,6 +34,11 @@ def test_smoothers():
     ramp = np.stack([t, 2 * t], 1)
     g = pc.gaussian(ramp, 4)
     assert np.allclose(g[4:-4], ramp[4:-4])  # a symmetric window keeps a line inside the track
+    for n in (1, 2, 3):
+        x = np.arange(n * 2, dtype=float).reshape(n, 2)
+        g = pc.gaussian(x, 13)  # radius longer than the track
+        assert g.shape == x.shape and np.all(np.isfinite(g))
+        assert np.all((g >= x.min(0)) & (g <= x.max(0)))
     const = np.ones((30, 3))
     assert np.allclose(pc.one_euro(const, 30.0, 1.0, 0.5), const)
     rng = np.random.default_rng(0)

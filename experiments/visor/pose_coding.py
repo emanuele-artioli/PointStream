@@ -102,6 +102,8 @@ def gaussian(x: np.ndarray, radius: int) -> np.ndarray:
     norm = np.zeros(n)
     for offset, weight in zip(k, w):
         lo, hi = max(0, -offset), min(n, n - offset)
+        if hi <= lo:
+            continue  # the window reaches past a short track
         out[lo:hi] += weight * x[lo + offset:hi + offset]
         norm[lo:hi] += weight
     return out / norm[:, None]
