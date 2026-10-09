@@ -970,6 +970,58 @@ def decide(table: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+AGE_BINS_S = (0.0, 0.1, 0.25, 0.5, 1.0, 2.0, 5.0)
+
+
+def reference_ages(paths: list[Path], methods: list[str]) -> dict[str, Any]:
+    """Explained share and median p90 by the age of the reference (seconds), per group, from the per-frame
+    records in runs' ``published.tar`` (the same frames as the report: G1-measured, companions excluded).
+    Bins mix clips, so a bin's share also depends on which clips have frames at that age."""
+    import tarfile
+
+    cells: dict[tuple[str, int], dict[str, list[tuple[bool, float | None]]]] = {}
+    for path in paths:
+        with tarfile.open(path) as tar:
+            for member in tar.getmembers():
+                if not member.name.endswith("/result.json"):
+                    continue
+                handle = tar.extractfile(member)
+                assert handle is not None
+                result = json.load(handle)
+                for f in result["frames"]:
+                    if not f["g1"]["measured"] or f.get("methods") is None or f.get("companion_of_reference"):
+                        continue
+                    b = max(i for i, lo in enumerate(AGE_BINS_S[:-1]) if f["dt_reference_s"] >= lo)
+                    cell = cells.setdefault((result["group"], b), {m: [] for m in methods})
+                    for m in methods:
+                        x = f["methods"].get(m) or {}
+                        cell[m].append((bool(x.get("covered_explained")), x.get("flow_p90_px")))
+    out: dict[str, Any] = {"bins_s": list(AGE_BINS_S), "groups": {}}
+    for (group, b), cell in sorted(cells.items()):
+        row: dict[str, Any] = {"from_s": AGE_BINS_S[b], "to_s": AGE_BINS_S[b + 1], "frames": len(cell[methods[0]])}
+        for m in methods:
+            p90 = [q for _, q in cell[m] if q is not None]
+            row[m] = {"explained_share": round(sum(e for e, _ in cell[m]) / max(1, len(cell[m])), 4),
+                      "flow_p90_px_median": round(float(np.median(p90)), 3) if p90 else None}
+        out["groups"].setdefault(group, []).append(row)
+    return out
+
+
+def command_ages(args: argparse.Namespace) -> int:
+    methods = args.methods.split(",")
+    ages = reference_ages([Path(p) for p in args.published], methods)
+    ages["published"] = [{"path": p, "sha256": file_sha256(Path(p))} for p in args.published]
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    write_json(out / "g1d-ages.json", ages)
+    for group, rows in ages["groups"].items():
+        print(group)
+        for row in rows:
+            cells = " | ".join(f"{m} {100 * row[m]['explained_share']:3.0f}% p90 {row[m]['flow_p90_px_median']}" for m in methods)
+            print(f"  {row['from_s']}-{row['to_s']} s  n={row['frames']}  {cells}")
+    return 0
+
+
 def command_report(args: argparse.Namespace) -> int:
     rows: dict[str, dict[str, Any]] = {}
     methods: list[str] = []
@@ -1033,9 +1085,13 @@ def main(argv: list[str] | None = None) -> int:
     report = sub.add_parser("report")
     report.add_argument("--result", action="append", required=True)
     report.add_argument("--out", required=True)
+    ages = sub.add_parser("ages", help="explained share by the age of the reference, from runs' published.tar")
+    ages.add_argument("--published", action="append", required=True)
+    ages.add_argument("--methods", default="rot,planes4,epi,tri")
+    ages.add_argument("--out", required=True)
     args = parser.parse_args(argv)
     handlers = {"prepare": command_prepare, "validate-prepare": command_validate, "run": command_run,
-                "validate": command_validate, "report": command_report}
+                "validate": command_validate, "report": command_report, "ages": command_ages}
     return handlers[args.command](args)
 
 
