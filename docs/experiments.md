@@ -1527,3 +1527,58 @@ masks in place of SAM's.
   and DCVC-UF ≤ 1 h; full SVT-AV1 ≤ 2 h, DCVC-UF ≤ 2.5 h, on RTX 6000 Ada or
   RTX A6000 (DCVC-UF HT-L as in B2; scoring on the same GPU). Ceiling 6
   GPU-hours and 12 h wall; smokes ≤ 600 s.
+  (Budget as run: SVT-AV1 is CPU-only and scored on CPU, so it holds no GPU.)
+- Regions job (`e9c3146`, environment `pointstream-20261006T113321Z`, inputs
+  `g2-inputs.tar` `0a908d48…2bc`): `20261009T074806Z-f3ad8b15` (gpu1, CPU
+  only, 32 threads, 2,655 s full stage; archive `regions-f3ad8b15.tar`
+  `adcdf90d…2e20`). The fleet validates only the smoke; run on the full
+  output, the validator passes every check except `cameras_are_still`. The
+  first attempt `20261009T074356Z-26280c6f` failed its gate only because the
+  validator printed its checks instead of writing them to
+  `PS_VALIDATION_PATH` (all checks true).
+  Per clip: foreground 2–11% of the frame; crowd 2–3% of V on
+  OpenTTGames (the umpire's desk), 10% and 30% on the TrackNet clips;
+  captions 8% and 3% of V on TrackNet, none on OpenTTGames; shadows under
+  0.1% of V on every clip. SAM's players against OpenTTGames' own masks:
+  IoU median 0.82–0.91. Fitted per-frame gains 0.93–1.01 (median
+  0.98–1.0): exposure barely moves, and the gain and offset change PSNR_V
+  by at most 0.13 dB. Static ceiling (warm-up plate, no bits, on V): 32.3–
+  39.7 dB PSNR, LPIPS 0.022–0.116; plain region 32.7–39.7 dB. The crowd and
+  graphics excess of the static plate costs 0.004–0.65 dB of weighted PSNR
+  (largest on test_5 and test_6, where the umpire moves), shadows up to
+  0.56 dB (test_7).
+- Still-camera check, failed. Phase correlation against the plate (the
+  protocol's measure) gives a maximum shift of 1.55 px on test_1 and 1.63
+  px on test_7 (medians 0.35 and 0.43; every other clip under 0.91 px).
+  Phase correlation turned out unreliable: at full resolution it gives
+  spurious peaks up to 105 px on test_7. A development check with SIFT
+  matches on V and a RANSAC homography to the plate (largest displacement
+  of the corners and centre, E and E2) gives medians 0.29 (test_1), 1.07
+  (test_7), 0.23 (test_6) and 0.19 px (game8/Clip3), and 95th percentiles
+  2.6, 6.2, 0.8 and 0.4 px. So test_7, and test_1 at times, move by a pixel
+  or more; G1 called them holding because a homography explains them, not
+  because they are still. Consequence: the image-coordinate plate is
+  approximate on those two clips, so their static ceiling and shadows are
+  flagged. The baselines are unaffected: the plate only fills F, which is
+  never scored. G3 registers every frame anyway.
+- Pilot jobs (`c68621b`): SVT-AV1 `20261009T083552Z-2d9413d6` (gpu3, CPU only,
+  6 workers × 8 cores, 1,932 s); DCVC-UF HT-L `20261009T083557Z-0ce4a6ad`
+  (gpu6, RTX 6000 Ada, 1,331 s). Both validators pass on the full output
+  (DCVC-UF: deterministic decode, decoder intra equal to the encoder's,
+  encode and decode on one GPU).
+- Pilot outcome (background input, E, mean of the 2 clips): SVT-AV1 CRF 63
+  to 13: 24 kbps 37.5 dB to 9.0 Mbps 51.2 dB PSNR_V; DCVC-UF QP 0 to 63: 14
+  kbps 30.1 dB to 504 kbps 40.6 dB. SVT-AV1 is far ahead: on test_5 it
+  reaches 39.3 dB at 39 kbps (CRF 62), where DCVC-UF needs 820 kbps for 40.0
+  dB (QP 63); on game10/Clip1, 41.9 dB at 56 kbps against 41.2 dB at 187
+  kbps. The rule gives the common range 37.5–40.6 dB (3.0 dB, so no
+  refinement), DCVC-UF QP 9, 18, 27, 36, 45, 54, 63 and SVT-AV1 CRF 34, 41,
+  48, 55, 62, 63. Only CRF 62 and 63 of SVT-AV1's swept points lie inside
+  the range, so CRF 58 and 60 are added (CPU only; a deviation from the rule
+  in favour of resolution where the curves meet). Stationarity (test_5,
+  E2 against E): SVT-AV1's rate ratio is 0.79–0.98 at every point, inside
+  the 25% bar. Background against frame input (SVT-AV1, CRF 48): 123
+  against 442 kbps on test_5 (28%), 102 against 149 kbps on game10/Clip1
+  (68%), at the same PSNR_V within 0.15 dB. OpenTTGames' PSNR_V saturates at
+  about 44.6 dB even at 17 Mbps (the source's own noise and H.264
+  artefacts).
