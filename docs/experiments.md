@@ -1033,3 +1033,83 @@ invocation turns out to be needed.
   `20261008T172338Z-c73de835`, `20261008T172343Z-cbfd15b8` (VISOR) and
   `20261008T172349Z-56d1bb1a` (racket), on gpu3, gpu5 and gpu6 (gpu2's
   worker had no fresh heartbeat).
+- Full run, what happened. VISOR share 3 `20261008T172343Z-cbfd15b8` (gpu3,
+  RTX A6000, `3edfedc`; 5,978 s, no contention; validator passed on the full
+  output). Shares 1 and 2 (`…8f85d3af`, `…c73de835`) stopped at the smoke
+  gate on a validator error, not on data: the 6 s smoke cap left P01_107's
+  and P06_10's stretches before their windows, so the tier check had no
+  frames; it now applies only where the analysed range reaches the window
+  (`6a391dc`, which changes only the validator). The racket job
+  (`…56d1bb1a`) was stopped as contended (another user's process held its GPU
+  past the 900 s pause; no results kept). Reruns at `6a391dc`, smoke gates
+  passed, no contention: VISOR share 1 `20261008T203704Z-c101d42a` (gpu6, RTX
+  6000 Ada, 4,310 s), share 2 `20261008T203709Z-614dcdf0` (gpu6, 4,157 s),
+  racket `20261008T203714Z-fd5d2f5b` (gpu5, RTX 6000 Ada, 2,413 s). The
+  validator passes on every full output except share 1, which fails only
+  `visor_window_jpegs_match_decoded_frames` because P04_24's window holds no
+  released sparse JPEG (the check wants a non-empty list); every JPEG that
+  was checked matched its decoded frame (26 of 26 in that share).
+  About 7 GPU-hours in all, inside the 10-hour ceiling; the wall time (about
+  21 h from staging) exceeded the 12 h ceiling because only one Ada/A6000
+  GPU was free for most of the evening (gpu5 and gpu6 busy with other users,
+  gpu2 unreachable).
+- Report: `pointstream-data/background/g1-2026-10-08/report-6a391dc/`
+  (`g1-report.json` `d23e571d…6608`), all 107 clips from the pilot and the
+  four full jobs. Review page with overlays and coverage maps:
+  [artifact](https://claude.ai/artifact/LB8yoyyc3ebqb7Bii6X2RF).
+
+  | Dataset | clips | hold | verdict | explained (median) | p90 flow px (median) | homography to ref. explained | translation confirmed | GRIC prefers F (median) | w90 / w99 s (holding) | G2 clips |
+  |---|---:|---:|---|---:|---:|---:|---:|---:|---|---:|
+  | VISOR stretches | 34 | 0 | does not hold | 0.006 | 30.2 | 0.02 | 17/34 | 0.87 | – | 0 |
+  | VISOR windows | 34 | 0 | does not hold | 0.063 | 13.9 | 0.08 | 16/34 | 0.89 | – | 0 |
+  | OpenTTGames | 7 | 6 | holds | 0.998 | 1.15 | 0.99 | 0/7 | 0.00 | 0 / 3.3 | 6 |
+  | RacketVision | 24 | 13 | holds for a subset | 0.944 | 1.22 | 0.89 | 0/24 | 0.00 | 0 / 1.5 | 0 |
+  | TrackNet | 8 | 4 | holds for a subset | 0.942 | 1.02 | 0.93 | 0/8 | 0.00 | 0 / 1.3 | 2 |
+
+  RacketVision per sport: badminton 4/8, table tennis 5/8, tennis 4/8 (each
+  a subset).
+- Outcome by the rule. *VISOR does not hold* (0 of 34 stretches, 0 of 34
+  windows). The failure does not rest on the fitted lens: a full homography
+  to the reference explains 2% (stretches) and 8% (windows) of frames, while
+  frame to frame at 50–60 fps explains 99% of window frames. Residual energy
+  is parallax 39% and independent motion 32% on the stretches (42% and 28% on
+  the windows), already 7.6 px at the image centre and rising to 14.9 px at
+  the border (distortion, fitted, cannot be the main cause; the border also
+  shows the nearest surfaces), and little related to rotation speed
+  (Spearman 0.18), so rolling shutter does not explain it either. GRIC prefers
+  a translating camera on a median 87% of 0.5 s pairs; translation is
+  confirmed by the rule on 17 of 34 stretches (median parallax 2.0 px, at
+  the rule's bar). The tier check holds: on the stretches' window frames the
+  rotation residual is the same with the dense masks and with `sam_text`
+  (p90 18.6 against 17.9 px, explained 0 and 0), although `sam_text` with
+  detector boxes recalls only 53% of the dense foreground pixels. VISOR's
+  fitted lens is unstable (median horizontal field of view 62°, varying
+  widely), as expected when translation leaks into a rotation-only fit.
+  *Racket sports: no camera translates* (0 of 39 clips; parallax medians
+  0.07–0.20 px). OpenTTGames holds (6/7; test_3 misses at 0.72 explained).
+  RacketVision and TrackNet hold for a subset; of their 15 failing clips, 4
+  RacketVision clips pan or zoom (table tennis match10_011, match10_001,
+  match11_007; tennis match132_000), and the rest are still cameras whose
+  background moves: crowds, caption graphics sliding in (badminton
+  match133_000), exposure changes (TrackNet game1/Clip12), unmasked player
+  shadows. TrackNet game3/Clip6 (explained 0.03, still camera) has residual
+  spread over the low-texture court with no visible moving object; its cause
+  is not determined. *Warm-up*: wherever a clip holds, the first frame
+  already shows at least 90% of every later frame's background (w90 = 0 s);
+  the players set the 99% warm-up, median 3.3 s (OpenTTGames, 1–9 s), 1.5 s
+  (RacketVision) and 1.3 s (TrackNet). *G2 can use 8 clips*: OpenTTGames
+  test_1, test_2, test_4, test_5, test_6, test_7 and TrackNet game8/Clip3,
+  game10/Clip1; RacketVision rallies (5–10 s) are too short for 10 s of play
+  after a warm-up. *Start*: by the rule, the background work starts on racket
+  sports, on OpenTTGames, the only racket dataset that holds outright.
+- Reading for G2–G5. The hypothesis holds for VISOR and for OpenTTGames. It
+  was too optimistic for the broadcast sets: their cameras turn at most, but
+  a rotation-only panorama alone is not a background for them, because a
+  quarter to half of their clips have moving background (crowds, graphics,
+  lighting). A panorama is a static background plus a residual, and G2 must
+  measure that residual's rate. For VISOR a rotation-only panorama is ruled
+  out; the neural route (G5) or a 3D representation is the candidate for
+  egocentric video, and the projection question (G3) only arises for the
+  fixed and broadcast cameras, where a planar projection suffices (median
+  rotation under 0.04°/s on every holding clip). Not measured: whether one panorama can
+  serve all rallies of a broadcast match (outside G1).
