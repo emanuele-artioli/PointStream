@@ -2682,3 +2682,50 @@ invocation turns out to be needed.
   item, 48 frames, ≤ 600 s, including a CPU-against-GPU LPIPS check. Pilot:
   B2's four pilot items (P01_107, P09_106, P02_02, P03_10), ≤ 45 min. Full:
   the other 30 items in parts of ≤ 45 min. Ceiling 3 GPU-hours, 5 h wall.
+- Jobs (code `ea5add8`, environment `pointstream-20261006T113321Z`; inputs
+  and specs in `pointstream-data/visor/h3-2026-10-10/`; every validator
+  10/10). Pilot `20261010T073916Z-5058a257` (gpu2, RTX A6000; B2's four
+  pilot items; 1,355 s, 5.6 min per item; smoke 65 s, LPIPS CPU against GPU
+  7e-6). Full, the other 30 items in five parts of six:
+  `20261010T082506Z-54ab4623` (A6000, 2,001 s), `…082512Z-366ce9ad` (RTX 6000
+  Ada, 2,099 s), `…082551Z-df6149fa` (A6000, 2,218 s), `…082528Z-70e1e80a`
+  (A6000, 2,479 s), `…082534Z-e748833b` (A6000; it reached the 2,700 s cap
+  after 5 of its 6 items, which were all saved in `partial.tar`; the
+  validator passes on them), and `…100218Z-87604272` (Ada, 212 s; the sixth
+  item, P37_102). `…082517Z-8338cee3` failed its transfer checksum and
+  was never published, so it never ran. About 3.6 GPU-hours. Report
+  (`h3 report`, all 34 items):
+  `pointstream-data/visor/h3-2026-10-10/report-ea5add8/h3a.json`
+  (`95ac0e39…d4c3`).
+- Outcome. **The oracle passes.** SVT-AV1 on the hand pixels, as means over
+  items: CRF 62 42.2 kbps, LPIPS 0.122, PSNR 34.9 dB; CRF 48 140.5 kbps,
+  0.085, 38.8 dB; CRF 41 212.6 kbps, 0.077, 39.8 dB. The best oracle point,
+  CRF 48 references with δ 0.02, sends 26% of hand-frames as references:
+  41.9 kbps (pose stream 1.93 included), LPIPS 0.091.
+  - Against SVT-AV1 at the same rate it is 0.025 better in LPIPS (CI
+    −0.029 to −0.022), on all 34 items, and 0.9 dB better in PSNR (CI
+    +0.6 to +1.2).
+  - 7 of the 12 operating points win with the whole interval below zero:
+    CRF 41, 48 and 55 references at δ 0.02 and 0.05, and CRF 41 at δ 0.10.
+    The others tie or lose: references at CRF 62 are too poor, and at δ 0.10
+    they are kept too long.
+  - At δ 0.05 the oracle runs at 14–35 kbps, below SVT-AV1's lowest point,
+    still better in LPIPS (−0.008 to −0.020) but 1–2 dB worse in PSNR.
+  - Cost sensitivity: at 3× the reference cost the best point barely wins
+    (CRF 55, δ 0.02: −0.005, CI −0.009 to −0.001, 23 of 34 items). At 5× no
+    point wins.
+- Reading. The hypothesis holds: references sent on about a quarter of
+  hand-frames and carried forward by the true motion beat coded pixels at
+  CRF 62's rate, in LPIPS and slightly in PSNR. Against the competing
+  explanation, references need not be sent on most frames: about one
+  frame in four suffices at δ 0.02. H1's 0.04 s reference life was measured
+  at a fixed 30 dB with homographies, not against the codec's own quality
+  with dense motion.
+  - Two limits bound what the pass means. The warps here use the target's
+    own motion, which a pose-driven renderer must approximate from a coded
+    pose (H2: 17 px median 2D joint error on HOT3D). And the margin
+    disappears when a reference costs 3–5× an inter-coded frame, which is
+    the likely range for an image coded on its own.
+  - So the textured-mesh renderer is built next, as the rule says. Its
+    reference cost must be measured, not assumed, and references sent at
+    CRF 48 with a refresh near one hand-frame in four are where to start.

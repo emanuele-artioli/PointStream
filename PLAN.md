@@ -410,6 +410,14 @@ pose stream's rate-distortion-latency curves name the coding H3 uses.
 
 #### H3. Hand and arm rendering
 
+H3a (2026-10-10, [outcome](docs/experiments.md#2026-10-10--h3a-texture-transfer-oracle-for-hand-rendering)):
+the texture-transfer oracle passes. On VISOR's hand pixels, SVT-AV1
+references (CRF 48) sent on 26% of hand-frames and warped by the true motion
+reach LPIPS 0.091 at 41.9 kbps, against SVT-AV1's 0.116 at the same rate,
+on all 34 items. The margin vanishes when a reference costs 3–5× an
+inter-coded frame. Next: the textured-mesh renderer (hand and forearm) on
+WiLoR's and HaMeR's coded poses, with each reference's cost measured.
+
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a
