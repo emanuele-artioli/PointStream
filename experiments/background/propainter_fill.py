@@ -10,7 +10,9 @@ downloaded. The steps and defaults are the repository's `inference_propainter.py
 (mask dilation 4, reference stride 10, neighbor length 10, sub-video length 80,
 RAFT 20 iterations, fp16 after RAFT); the one change is that frames are padded
 (edge) to a multiple of 8 and cropped back instead of resized, so known pixels
-stay exact. Outside the dilated holes the output is the input.
+stay exact. Outside the dilated holes the output is the input. A long clip is
+filled in ``chunks`` (each with context frames on both sides that are filled
+but not kept), the models loaded once.
 """
 
 from __future__ import annotations
@@ -49,14 +51,28 @@ def get_ref_index(mid: int, neighbors: list[int], length: int, stride: int, ref_
     return out
 
 
-def inpaint(frames_rgb: np.ndarray, holes: np.ndarray, plan: dict[str, Any], device: str = "cuda") -> np.ndarray:
-    import scipy.ndimage
-    import torch
+def load_models(plan: dict[str, Any], device: str = "cuda") -> tuple[Any, Any, Any]:
+    """RAFT, the flow completion network and ProPainter, from the plan's checked checkpoints."""
     from model.modules.flow_comp_raft import RAFT_bi
     from model.propainter import InpaintGenerator
     from model.recurrent_flow_completion import RecurrentFlowCompleteNet
 
+    raft = RAFT_bi(checked(plan["raft"], plan["raft_sha256"]), device)
+    complete = RecurrentFlowCompleteNet(checked(plan["flow_completion"], plan["flow_completion_sha256"]))
+    for p in complete.parameters():
+        p.requires_grad = False
+    complete.to(device).eval()
+    model = InpaintGenerator(model_path=checked(plan["propainter"], plan["propainter_sha256"])).to(device).eval()
+    return raft, complete, model
+
+
+def inpaint(frames_rgb: np.ndarray, holes: np.ndarray, plan: dict[str, Any], models: tuple[Any, Any, Any],
+            device: str = "cuda") -> np.ndarray:
+    import scipy.ndimage
+    import torch
+
     o = {**DEFAULTS, **plan.get("options", {})}
+    raft, complete, model = models
     n, h0, w0, _ = frames_rgb.shape
     h, w = h0 + (-h0) % 8, w0 + (-w0) % 8
     pad = ((0, 0), (0, h - h0), (0, w - w0))
@@ -66,13 +82,6 @@ def inpaint(frames_rgb: np.ndarray, holes: np.ndarray, plan: dict[str, Any], dev
     frames = torch.from_numpy(frames_np).permute(0, 3, 1, 2).float().div(255).unsqueeze(0).to(device) * 2 - 1
     flow_masks = torch.from_numpy(dilated).float()[None, :, None].to(device)
     masks_dilated = flow_masks.clone()  # the script dilates both masks by the same mask_dilation
-
-    raft = RAFT_bi(checked(plan["raft"], plan["raft_sha256"]), device)
-    complete = RecurrentFlowCompleteNet(checked(plan["flow_completion"], plan["flow_completion_sha256"]))
-    for p in complete.parameters():
-        p.requires_grad = False
-    complete.to(device).eval()
-    model = InpaintGenerator(model_path=checked(plan["propainter"], plan["propainter_sha256"])).to(device).eval()
 
     with torch.no_grad():
         short = 12 if w <= 640 else 8 if w <= 720 else 4 if w <= 1280 else 2
@@ -90,7 +99,7 @@ def inpaint(frames_rgb: np.ndarray, holes: np.ndarray, plan: dict[str, Any], dev
         if o["fp16"]:
             frames, flow_masks, masks_dilated = frames.half(), flow_masks.half(), masks_dilated.half()
             gt = (gt[0].half(), gt[1].half())
-            complete, model = complete.half(), model.half()
+            complete, model = complete.half(), model.half()  # in place: the models stay fp16 for later chunks
 
         length = gt[0].size(1)
         sub = o["subvideo_length"]
@@ -165,13 +174,20 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report", required=True)
     args = parser.parse_args(argv)
     plan = json.loads(Path(args.plan).read_text())
-    frames, holes = np.load(plan["frames"]), np.load(plan["holes"])
+    frames, holes = np.load(plan["frames"], mmap_mode="r"), np.load(plan["holes"], mmap_mode="r")
     began = time.time()
-    out = inpaint(frames, holes, plan)
+    models = load_models(plan)
+    # ``chunks``: [lo, hi, keep_lo, keep_hi] — fill frames lo..hi together, keep keep_lo..keep_hi of the result.
+    chunks = plan.get("chunks") or [[0, len(frames), 0, len(frames)]]
+    out = np.empty(frames.shape, np.uint8)
+    for lo, hi, keep_lo, keep_hi in chunks:
+        filled = inpaint(np.ascontiguousarray(frames[lo:hi]), np.ascontiguousarray(holes[lo:hi]), plan, models)
+        out[keep_lo:keep_hi] = filled[keep_lo - lo:keep_hi - lo]
     torch.cuda.synchronize()
     np.save(plan["out"], out)
     Path(args.report).write_text(json.dumps({
-        "seconds": round(time.time() - began, 1), "frames": len(out), "options": {**DEFAULTS, **plan.get("options", {})},
+        "seconds": round(time.time() - began, 1), "frames": len(out), "chunks": chunks,
+        "options": {**DEFAULTS, **plan.get("options", {})},
         "peak_memory_gib": round(torch.cuda.max_memory_allocated() / 2**30, 2),
         "gpu": torch.cuda.get_device_name(0), "torch": torch.__version__}, indent=1))
     return 0

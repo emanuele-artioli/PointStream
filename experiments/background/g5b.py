@@ -122,6 +122,18 @@ def inpaint_frames(frames: np.ndarray, keep: np.ndarray, indices: list[int], wor
     return out
 
 
+def load_prefilled(dirs: list[str]) -> dict[str, tuple[dict[str, Any], Path]]:
+    """G5c's prefill archives by clip id: their meta and the 4:2:0 fill of the stretch."""
+    out = {}
+    for d in dirs:
+        root = Path(d) / "publish" / "prefill"
+        meta = json.loads((root / "meta.json").read_text())
+        if file_sha256(root / "filled_yuv420.npy") != meta["yuv420_sha256"]:
+            raise RuntimeError(f"{root}: the fill is not the one its meta recorded")
+        out[meta["id"]] = (meta, root / "filled_yuv420.npy")
+    return out
+
+
 # ----------------------------------------------------------------- rescore (SVT-AV1 streams with LPIPS)
 
 
@@ -255,17 +267,27 @@ def command_finetune(args: argparse.Namespace) -> int:
     fit = fit_indices(len(frames), start, g5.EXCERPT_FRAMES if args.limit_frames <= 0 else clip.n, clip.fps, args.fit)
     if args.limit_frames > 0:  # smoke: a few dozen fitted frames
         fit = fit[:max(args.limit_frames, 24)]
-    workers = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 4))
-    filled = inpaint_frames(frames, keep, fit, workers)
-    np.save(work / "frames.npy", g5.rgb_to_yuv420(filled))
+    prefilled = load_prefilled(args.prefilled)
+    if fit_id in prefilled:  # G5c: ProPainter's fill of the whole stretch, made once (`g5c.py prefill`)
+        meta, path = prefilled[fit_id]
+        if meta["first"] != 0 or meta["frames"] != len(frames):
+            raise SystemExit(f"{fit_id}: the prefill covers {meta['first']}+{meta['frames']}, not the stretch")
+        np.save(work / "frames.npy", np.load(path))
+        fill_name = meta["fill"]
+    else:
+        workers = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 4))
+        np.save(work / "frames.npy", g5.rgb_to_yuv420(inpaint_frames(frames, keep, fit, workers)))
+        fill_name = "telea"
     np.save(work / "keep.npy", keep)
-    del frames, filled
+    del frames
     prepare_seconds = time.time() - began
 
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
     plan = {**TRAIN, "frames": str(work / "frames.npy"), "keep": str(work / "keep.npy"), "fit": fit,
             "steps": args.steps, "monitor_every": max(1, args.steps // 10), "save_every": max(1, args.steps // 10),
             "lpips_weight": args.lpips_weight, "lpips_backbone": args.lpips_backbone,
+            "dists_weight": args.dists_weight, "dists_backbone": args.dists_backbone,
+            "temporal_weight": args.temporal_weight,
             "image_ckpt": args.image_ckpt, "image_sha256": file_sha256(Path(args.image_ckpt)),
             "video_ckpt": args.video_ckpt, "video_sha256": file_sha256(Path(args.video_ckpt)),
             "out": str(work / "model"), "resume_dir": str(checkpoints) if checkpoints else None}
@@ -284,9 +306,18 @@ def command_finetune(args: argparse.Namespace) -> int:
     train_log = [json.loads(line) for line in log_text.splitlines() if line.startswith("{")]
 
     # The held-out excerpt, coded by the fine-tuned model (and nothing else changed).
-    net = g5.load_lpips(args.lpips_backbone, "cuda")
+    from experiments.background import g5c
+
+    nets = g5c.load_nets(args) if args.dists_backbone else None
+    net = nets.lpips if nets else g5.load_lpips(args.lpips_backbone, "cuda")
+    flows = g5c.source_flows(clip) if nets else None
     source = work / "filled.yuv"
-    g5.rgb_to_yuv420(g5.inpaint(clip)).tofile(source)
+    if clip_id in prefilled:
+        meta, path = prefilled[clip_id]
+        offset = clip.start - meta["first"]
+        np.ascontiguousarray(np.load(path, mmap_mode="r")[offset:offset + clip.n]).tofile(source)
+    else:
+        g5.rgb_to_yuv420(g5.inpaint(clip)).tofile(source)
     coder = SimpleNamespace(image_ckpt=args.image_ckpt, video_ckpt=trained["checkpoint"])
     publish = scratch / "publish" / "finetune"
     shutil.rmtree(publish, ignore_errors=True)
@@ -302,15 +333,20 @@ def command_finetune(args: argparse.Namespace) -> int:
         points.append({"codec": "dcvc-uf-htl-ft", "input": "filled", "qp": qp,
                        "kbps": rec["bytes"] * 8 / clip.duration / 1000, "decoded_frames": len(decoded),
                        "decode_ms_per_frame": 1000 * min(rec["decode_seconds"]) / clip.n, **rec,
-                       "score": g5.score(clip, g5.yuv420_to_rgb(decoded), net, "cuda")})
+                       "score": (g5c.full_score(clip, g5.yuv420_to_rgb(decoded), nets, flows)
+                                 if nets and flows is not None else g5.score(clip, g5.yuv420_to_rgb(decoded), net, "cuda"))})
         shutil.rmtree(work / f"qp{qp}")
     shutil.copyfile(trained["checkpoint"], publish / "video_ft.pth.tar")
     shutil.copyfile(log_path, publish / "train.log")
     arm = f"{'upper' if args.fit == 'heldout' else ('scene' if fit_id == clip_id else 'other')}-" \
           f"{'lpips' if args.lpips_weight > 0 else 'mse'}"
+    if prefilled:  # G5c arms: the fill and every loss weight in the name
+        arm += f"-b{args.lpips_weight:g}" + ("-dists" if args.dists_weight else "") + \
+               (f"-t{args.temporal_weight:g}" if args.temporal_weight else "") + f"-{fill_name}"
     row = {**clip.record, "kind": "finetune", "arm": arm, "fit": args.fit, "fit_clip": fit_id,
            "fit_frames": len(fit), "guard_s": GUARD_S if args.fit == "scene" else None,
-           "lpips_weight": args.lpips_weight, "steps": args.steps, "train": {**TRAIN, **{k: plan[k] for k in (
+           "lpips_weight": args.lpips_weight, "dists_weight": trained.get("dists_weight", 0.0),
+           "temporal_weight": args.temporal_weight, "fill": fill_name, "steps": args.steps, "train": {**TRAIN, **{k: plan[k] for k in (
                "groups", "patch", "monitor_batch", "monitor_every")}},
            "model": {k: trained[k] for k in ("checkpoint_sha256", "checkpoint_bytes", "parameters")},
            "model_bytes_fp16": 2 * trained["parameters"], "billed": False,
@@ -582,6 +618,12 @@ def main(argv: list[str] | None = None) -> int:
     ft.add_argument("--video-ckpt", required=True)
     ft.add_argument("--qps", default=",".join(map(str, QPS)))
     ft.add_argument("--timeout", type=float, default=3000)
+    ft.add_argument("--prefilled", nargs="*", default=[], help="G5c's extracted prefill archives (ProPainter fill)")
+    ft.add_argument("--dists-backbone", default=None, help="VGG16 for DISTS (scoring, and the loss if weighted)")
+    ft.add_argument("--dists-weight", type=float, default=0.0,
+                    help="DISTS on V in the loss; -1: set at step 0 so it equals the LPIPS term on the monitor set")
+    ft.add_argument("--temporal-weight", type=float, default=0.0,
+                    help="the change of the coding error between consecutive frames on V, in the loss")
     ft.set_defaults(func=command_finetune)
     wp = sub.add_parser("warp")
     common(wp)

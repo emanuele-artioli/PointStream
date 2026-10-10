@@ -132,3 +132,46 @@ def test_report_applies_the_rules(tmp_path):
     assert size["variants"]["delta-4"]["keeps_quality"] and not size["variants"]["whole-2"]["keeps_quality"]
     assert size["smallest_keeping_quality"] == "delta-4"
     assert math.isclose(size["variants"]["whole-2"]["vs_16bit"], 1.0, abs_tol=1e-6)
+
+
+def test_fill_chunks_cover_the_stretch_and_never_cross_the_excerpt():
+    chunks = g5c.fill_chunks(1200, 500, 240)
+    kept = sorted(i for _, _, a, b in chunks for i in range(a, b))
+    assert kept == list(range(1200))
+    assert [500, 740, 500, 740] in chunks
+    for lo, hi, a, b in chunks:
+        assert lo <= a < b <= hi
+        if (a, b) != (500, 740):
+            assert b - a <= g5c.CHUNK
+            assert hi <= 500 or lo >= 740  # context from the same side only
+    assert g5c.fill_chunks(240, 0, 240) == [[0, 240, 0, 240]]
+
+
+def test_temporal_term_is_the_change_of_the_coding_error():
+    torch = pytest.importorskip("torch")
+    from experiments.background.g5b_train import masked_temporal
+
+    torch.manual_seed(0)
+    x_prev, x = torch.rand(2, 3, 8, 8), torch.rand(2, 3, 8, 8)
+    mask = torch.ones(2, 1, 8, 8)
+    same_error = masked_temporal(x, x + 0.1, x_prev, x_prev + 0.1, mask)  # a constant error does not flicker
+    assert torch.allclose(same_error, torch.zeros(2), atol=1e-7)
+    flips = masked_temporal(x, x + 0.1, x_prev, x_prev - 0.1, mask)
+    assert torch.allclose(flips, torch.full((2,), 0.04), atol=1e-6)
+    half = mask.clone()
+    half[..., :4] = 0
+    assert torch.allclose(masked_temporal(x, x + 0.1, x_prev, x_prev - 0.1, half), torch.full((2,), 0.04), atol=1e-6)
+
+
+def test_training_dists_is_the_scoring_dists():
+    torch = pytest.importorskip("torch")
+    pytest.importorskip("torchvision")
+    pytest.importorskip("torchmetrics")
+    from experiments.background.g5b_train import _dists_stats
+    from src.codecs.quality import dists_network, masked_dists
+
+    torch.manual_seed(0)
+    net = dists_network(None)
+    a, b = torch.rand(2, 3, 64, 96), torch.rand(2, 3, 64, 96)
+    mask = (torch.rand(2, 1, 64, 96) > 0.3).float()
+    assert torch.allclose(_dists_stats(net, a, b, mask), masked_dists(net, a, b, mask), atol=1e-5)

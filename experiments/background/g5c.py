@@ -8,6 +8,9 @@
         --lpips-backbone PATH --dists-backbone PATH --limit-frames N
     python -m experiments.background.g5c fill --prepared DIR --clips CLIPS.JSON --visor-fill DIR --select ID,ID \\
         --propainter-tree DIR --propainter-ckpt P --raft-ckpt P --flow-completion-ckpt P --lpips-backbone PATH --dists-backbone PATH --limit-frames N
+    python -m experiments.background.g5c prefill --prepared DIR --clips CLIPS.JSON --visor-fill DIR --select ID \\
+        --propainter-tree DIR --propainter-ckpt P --raft-ckpt P --flow-completion-ckpt P --image-ckpt PATH \\
+        --video-ckpt PATH --lpips-backbone PATH --dists-backbone PATH --limit-frames N
     python -m experiments.background.g5c validate
     python -m experiments.background.g5c report --result g5c.json ... --out DIR
 
@@ -564,6 +567,124 @@ def command_fill(args: argparse.Namespace) -> int:
     return 0
 
 
+# ----------------------------------------------------------------- prefill (ProPainter over whole stretches) and anchors
+
+CHUNK, CONTEXT = 200, 20
+
+
+def fill_chunks(total: int, start: int, length: int, size: int = CHUNK, context: int = CONTEXT) -> list[list[int]]:
+    """[lo, hi, keep_lo, keep_hi] chunks covering 0..total: the held-out excerpt (start..start+length) alone, as
+    the fill check filled it, and the scene frames before and after it in pieces of at most ``size`` kept frames
+    with up to ``context`` frames of their own side on each side (never the excerpt's)."""
+    out = [[start, start + length, start, start + length]]
+    for a, b in ((0, start), (start + length, total)):
+        for keep_lo in range(a, b, size):
+            keep_hi = min(b, keep_lo + size)
+            out.append([max(a, keep_lo - context), min(b, keep_hi + context), keep_lo, keep_hi])
+    return sorted(out, key=lambda c: c[2])
+
+
+def run_propainter(frames: np.ndarray, holes: np.ndarray, chunks: list[list[int]], args: argparse.Namespace,
+                   work: Path) -> tuple[np.ndarray, dict[str, Any]]:
+    """ProPainter's fill of ``holes`` in ``frames`` by ``chunks``, in its tree; V (not ``holes``) is the source."""
+    work.mkdir(parents=True, exist_ok=True)
+    np.save(work / "frames.npy", frames)
+    np.save(work / "holes.npy", holes)
+    plan: dict[str, Any] = {"frames": str(work / "frames.npy"), "holes": str(work / "holes.npy"),
+                            "out": str(work / "filled.npy"), "chunks": chunks}
+    for key, path in {"propainter": args.propainter_ckpt, "raft": args.raft_ckpt,
+                      "flow_completion": args.flow_completion_ckpt}.items():
+        plan[key] = str(path)
+        plan[f"{key}_sha256"] = file_sha256(Path(path))
+    write_json(work / "plan.json", plan)
+    tree = Path(args.propainter_tree)
+    tree = tree / "ProPainter" if (tree / "ProPainter").is_dir() else tree
+    script = Path(__file__).resolve().parent / "propainter_fill.py"
+    done = subprocess.run([sys.executable, str(script), "--plan", str(work / "plan.json"), "--report",
+                           str(work / "report.json")], cwd=tree,
+                          env={**os.environ, "PYTHONPATH": str(tree), "PYTHONNOUSERSITE": "1"},
+                          capture_output=True, text=True, timeout=3000)
+    if done.returncode:
+        raise RuntimeError(f"ProPainter failed ({done.returncode}):\n{done.stderr[-4000:]}")
+    filled = np.load(work / "filled.npy")
+    if filled.shape != frames.shape:
+        raise RuntimeError(f"ProPainter returned {filled.shape}, not {frames.shape}")
+    filled[~holes] = frames[~holes]
+    return filled, {**json.loads((work / "report.json").read_text()), **{k: v for k, v in plan.items() if "sha256" in k}}
+
+
+def code_anchors(clip: g5.Clip, filled_yuv: np.ndarray, args: argparse.Namespace, nets: SimpleNamespace,
+                 work: Path) -> list[dict[str, Any]]:
+    """SVT-AV1 at G5's CRFs on the frames and on the fill, and DCVC-UF off the shelf on the fill, each scored."""
+    flows = source_flows(clip)
+    sources = {"frame": work / "frame.yuv", "filled": work / "filled.yuv"}
+    g5.rgb_to_yuv420(clip.frames).tofile(sources["frame"])
+    filled_yuv.tofile(sources["filled"])
+    methods = []
+    for name, source in sources.items():
+        points = []
+        for crf in g5.CRFS:
+            rec = g5.code_svtav1({"work": str(work / f"{name}-crf{crf}"), "source": str(source), "fps": str(clip.fps),
+                                  "frames": clip.n, "crf": crf, "threads": 8, "cpus": None})
+            rgb = read_decoded(Path(rec["decoded"]), clip.n, clip.n)
+            points.append({"crf": crf, "kbps": 8 * rec["payload_bytes"] / clip.duration / 1000,
+                           "stream_sha256": rec["stream_sha256"], "score": full_score(clip, rgb, nets, flows)})
+            shutil.rmtree(work / f"{name}-crf{crf}")
+        methods.append({"arm": f"svtav1-{name}", "codec": "svtav1", "fill": "propainter", "points": points})
+    points = []
+    for qp in g5.DCVC_QPS:
+        rec = g5.code_dcvc(args, sources["filled"], clip.n, qp, work / f"qp{qp}")
+        rgb = read_decoded(Path(rec.pop("decoded")), clip.n, clip.n)
+        points.append({"qp": qp, "kbps": rec["bytes"] * 8 / clip.duration / 1000, **rec,
+                       "score": full_score(clip, rgb, nets, flows)})
+        shutil.rmtree(work / f"qp{qp}")
+    methods.append({"arm": "dcvc", "codec": "dcvc", "fill": "propainter", "points": points})
+    return methods
+
+
+def command_prefill(args: argparse.Namespace) -> int:
+    """ProPainter's fill of a whole stretch (published for training and coding) and the new anchors on its
+    held-out excerpt."""
+    from experiments.background.g5b import load_scene
+
+    spec = json.loads(Path(args.clips).read_text())
+    by_id = {c["id"]: c for c in spec["clips"]}
+    clip_id = g5.only_clip(spec, args.select)
+    dirs = g5.clip_dirs(Path(args.prepared))
+    began = time.time()
+    frames, keep, start = load_scene(dirs[clip_id], by_id[clip_id], Path(args.visor_fill))
+    clip = g5.load_clip(dirs[clip_id], by_id[clip_id], Path(args.visor_fill), args.limit_frames)
+    if clip.start != start:
+        raise RuntimeError(f"{clip_id}: scene excerpt {start} != G5's {clip.start}")
+    lo, hi = (max(0, start - clip.n), min(len(frames), start + 2 * clip.n)) if args.limit_frames > 0 else (0, len(frames))
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    work = scratch / "prefill"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    chunks = [[a + lo, b + lo, c + lo, d + lo] for a, b, c, d in fill_chunks(hi - lo, start - lo, clip.n)]
+    local = [[a - lo, b - lo, c - lo, d - lo] for a, b, c, d in chunks]
+    filled, propainter = run_propainter(frames[lo:hi], ~keep[lo:hi], local, args, work / "propainter")
+    if not np.array_equal(filled[start - lo:start - lo + clip.n][clip.keep], clip.frames[clip.keep]):
+        raise RuntimeError("the excerpt's V differs from G5's frames")
+    yuv = g5.rgb_to_yuv420(filled)
+    del frames, filled
+    publish = scratch / "publish" / "prefill"
+    publish.mkdir(parents=True)
+    np.save(publish / "filled_yuv420.npy", yuv)
+    meta = {"id": clip_id, "first": lo, "frames": hi - lo, "excerpt_start": start, "excerpt_frames": clip.n,
+            "chunks": chunks, "fill": "propainter", "yuv420_sha256": file_sha256(publish / "filled_yuv420.npy"),
+            "propainter": propainter}
+    write_json(publish / "meta.json", meta)
+    nets = load_nets(args)
+    methods = code_anchors(clip, yuv[start - lo:start - lo + clip.n], args, nets, work / "anchors")
+    write_json(stage_dir() / "g5c.json", {
+        "kind": "anchors", "clip": clip.record, "limit_frames": args.limit_frames, "decision_rule": DECISION,
+        "prefill": {k: v for k, v in meta.items() if k != "propainter"}, "propainter": propainter,
+        "metrics": nets.record, "seconds": round(time.time() - began, 1), **gpu_record(), "methods": methods})
+    shutil.rmtree(work, ignore_errors=True)
+    return 0
+
+
 # ----------------------------------------------------------------- decision
 
 
@@ -615,7 +736,7 @@ def command_report(args: argparse.Namespace) -> int:
     for path in args.result:
         doc = json.loads(Path(path).read_text())
         runs.append({"path": path, "sha256": file_sha256(Path(path)), "kind": doc["kind"]})
-        if doc["kind"] == "checks":
+        if doc["kind"] in ("checks", "anchors"):
             checks[doc["clip"]["id"]] = doc
         elif doc["kind"] == "compress":
             sizes[doc["clip"]["id"]] = doc
@@ -717,6 +838,15 @@ def validate_stage(stage: Path) -> dict[str, bool]:
             checks["16bit_reproduces_g5b"] = all(  # bit-exact re-encoding is recorded, not required (G5c entry)
                 p["published_bytes"] and abs(p["bytes"] - p["published_bytes"]) <= 1e-3 * p["published_bytes"]
                 for p in rows["whole-16"]["points"])
+    elif result["kind"] == "anchors":
+        methods = result["methods"]
+        checks["every_method"] = {m["arm"] for m in methods} == {"svtav1-frame", "svtav1-filled", "dcvc"}
+        checks["every_point_scored"] = all(m["points"] and all(scored(p) for p in m["points"]) for m in methods)
+        checks["dcvc_decodes"] = all(p["deterministic"] and p["decoder_matches_encoder_intra"]
+                                     for m in methods if m["codec"] == "dcvc" for p in m["points"])
+        checks["whole_stretch_filled"] = full and result["prefill"]["frames"] >= 600 or not full
+        checks["prefill_published"] = g5.published_has(stage, "publish/prefill/filled_yuv420.npy")
+        checks["propainter_on_gpu"] = result["propainter"]["gpu"] == result["gpu"]
     elif result["kind"] == "fill":
         rows = result["clips"]
         checks["clips_present"] = bool(rows)
@@ -777,6 +907,13 @@ def main(argv: list[str] | None = None) -> int:
     fi.add_argument("--raft-ckpt", required=True)
     fi.add_argument("--flow-completion-ckpt", required=True)
     fi.set_defaults(func=command_fill)
+    pf = sub.add_parser("prefill")
+    common(pf)
+    pf.add_argument("--propainter-tree", required=True, help="ProPainter's extracted repository")
+    pf.add_argument("--propainter-ckpt", required=True)
+    pf.add_argument("--raft-ckpt", required=True)
+    pf.add_argument("--flow-completion-ckpt", required=True)
+    pf.set_defaults(func=command_prefill)
     va = sub.add_parser("validate")
     va.add_argument("--stage", default=None)
     va.set_defaults(func=command_validate)
