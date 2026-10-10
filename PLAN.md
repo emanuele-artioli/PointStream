@@ -418,8 +418,13 @@ on all 34 items; at equal quality that is a 65% saving on hand pixels, 32%
 if a reference costs twice an inter-coded frame. The oracle's rate is 95%
 references (texture transfer with refresh); it does not bound a generator
 that renders from one reference and the pose (about 2 kbps), which needs
-its own test. Next step to be decided with the user: the textured mesh
-with an inter-coded reference stream, or a single-reference generator.
+its own test. Next (user, 2026-10-10): H3b, a single-reference generator.
+Audit existing pose-conditioned hand generators that take a reference
+image, run the best on WiLoR's coded poses with one reference per track,
+and score it with full-reference LPIPS against SVT-AV1 and H3a's curve.
+Texture transfer (a MANO texture with references sent as an inter-coded
+stream) stays as the fallback. Generic hands judged without a reference
+were not chosen.
 
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
