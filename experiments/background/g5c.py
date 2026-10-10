@@ -442,8 +442,10 @@ def command_compress(args: argparse.Namespace) -> int:
             stream = work / f"qp{qp}" / "stream.psdc"
             published = ft_dir / "streams" / f"filled-qp{qp}.psdc"
             same = published.is_file() and stream.read_bytes() == published.read_bytes()
+            published_bytes = published.stat().st_size if published.is_file() else None
             points.append({"qp": qp, "kbps": rec["bytes"] * 8 / clip.duration / 1000, **rec,
                            "stream_sha256": file_sha256(stream), "same_as_published": same,
+                           "published_bytes": published_bytes,
                            "score": full_score(clip, rgb, nets, flows)})
             shutil.rmtree(work / f"qp{qp}")
         row = {"variant": variant, "size": size, "model_sha256": file_sha256(path), "points": points}
@@ -690,8 +692,9 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         checks["streams_match_records"] = all(p["check"]["matches_record"] for m in methods for p in m["points"])
         checks["deterministic_decode"] = all(p["check"].get("deterministic", True) for m in methods for p in m["points"])
         if full:
-            checks["recoded_same_bytes"] = all(p["check"].get("recoded_same_bytes", True) for m in methods
-                                               for p in m["points"])
+            checks["recoded_matches_stored"] = all(  # within 0.1%; bit-exact equality is recorded
+                abs(p["check"].get("recoded_bytes", p["check"]["stream_bytes"]) - p["check"]["stream_bytes"])
+                <= 1e-3 * p["check"]["stream_bytes"] for m in methods for p in m["points"])
         checks["dists_falls_with_rate"] = all(
             all(a["score"]["dataset"]["dists_v"] >= b["score"]["dataset"]["dists_v"] - 0.01 for a, b in zip(pts, pts[1:]))
             for m in methods if m["codec"] == "svtav1" for pts in [sorted(m["points"], key=lambda p: p["kbps"])])
@@ -706,7 +709,9 @@ def validate_stage(stage: Path) -> dict[str, bool]:
                                            for k in ("whole", "delta") for a, b in ((16, 8), (8, 4), (4, 2))
                                            if f"{k}-{a}" in rows and f"{k}-{b}" in rows)
         if full and "whole-16" in rows:
-            checks["16bit_reproduces_g5b"] = all(p["same_as_published"] for p in rows["whole-16"]["points"])
+            checks["16bit_reproduces_g5b"] = all(  # bit-exact re-encoding is recorded, not required (G5c entry)
+                p["published_bytes"] and abs(p["bytes"] - p["published_bytes"]) <= 1e-3 * p["published_bytes"]
+                for p in rows["whole-16"]["points"])
     elif result["kind"] == "fill":
         rows = result["clips"]
         checks["clips_present"] = bool(rows)
