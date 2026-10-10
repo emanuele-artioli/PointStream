@@ -2138,6 +2138,39 @@ invocation turns out to be needed.
   and its LPIPS_V 0.2034, so **β = 0.026**; 30 minutes of training is
   **540 steps**. Infrastructure, not evidence. Warp check smokes and runs:
   `20261010T062342Z-5d5103f4` (P02_12), `…062347Z-917cfaaa` (P03_120).
+- Anchors and reference (code `60ad72e`). SVT-AV1 rescored with LPIPS:
+  `20261010T062332Z-92f06774` (exceeded its 2,700 s after 23 windows,
+  kept in its `partial.tar` `4d18c877…a927`), `…071155Z-7cdba7a4` (the
+  10 stretches), `…071200Z-882d6d58` (the other 11 windows). DCVC-UF off
+  the shelf on the 10 stretches: `20261010T062337Z-78a7cdcc`. Against
+  SVT-AV1 it is worse on LPIPS_V than on PSNR_V: median BD +151% on
+  LPIPS_V (range +26% to +545%), against about +100% on PSNR_V. The
+  hypothesis that DCVC-UF ranks better on LPIPS was wrong.
+- Warp check, outcome: **closed**. Against SVT-AV1 on LPIPS_V: 0.3 s
+  +52% (P02_12) and +51% (P03_120); 1 s +42% and +54%. On PSNR_V: 0.3 s
+  +34% and dominated; at 1 s, unclear (the cheapest points lie below
+  SVT-AV1's cheapest rate, and every point in its range lies below it).
+  As predicted.
+- Upper bound, outcome (540 steps, all converged by the rule; Ada).
+  β = 0: P26_02 `20261010T063842Z-29a4262e`, P06_03 `…063853Z-c1d2154d`.
+  β = 0.026: P26_02 `…063847Z-3990302d`, P06_03 `…063858Z-93923e53`.
+  BD-rate on LPIPS_V (PSNR_V) against SVT-AV1 | against DCVC-UF:
+  - β = 0, P26_02: +37% (−1%) | −37% (−33%).
+  - β = 0, P06_03: +11% (+11%) | −36% (−31%).
+  - β = 0.026, P26_02: unclear (+82%) | dominates (+15%). Its three
+    points inside SVT-AV1's rate range all lie far below SVT-AV1's best
+    LPIPS_V (0.063 at 31 kbps against 0.132 at 264 kbps); the cheapest
+    (8.7 kbps) lies below SVT-AV1's range, which G5's verdict calls unclear.
+  - β = 0.026, P06_03: −83% (+72%) | −92% (+7%).
+  By the rule the upper bound **passes** (β = 0.026 on P06_03); β = 0
+  alone would be unclear (it beats the reference on both stretches,
+  SVT-AV1 on neither). Scene adaptation buys a steady third of the rate
+  against the unadapted model on both metrics. β > 0 trades PSNR_V for a
+  large LPIPS_V gain, as the second competing explanation (texture that
+  LPIPS rewards) would also produce; the visual check decides that, from
+  decoded frames that the component's jobs now publish. So the component
+  runs at both β (beyond the rule's "better β", within the pilot budget),
+  and the control at β = 0.026. Pilot GPU time so far: about 2.3 hours.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could

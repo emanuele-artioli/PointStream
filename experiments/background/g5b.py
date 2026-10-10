@@ -214,6 +214,22 @@ def monitor_converged(curve: list[dict[str, Any]]) -> dict[str, Any]:
             "from_step": earlier["step"], "to_step": last["step"]}
 
 
+def visual_frames(clip: g5.Clip) -> list[int]:
+    """The first, middle and last frame of the gate tier, for the visual check."""
+    frames = clip.scored["dataset"][0] or list(range(clip.n))
+    return sorted({frames[0], frames[len(frames) // 2], frames[-1]})
+
+
+def save_frames(directory: Path, label: str, clip: g5.Clip, rgb: np.ndarray, indices: list[int]) -> None:
+    """PNGs of ``rgb`` (frames ``indices`` of the clip) with the foreground pasted back from the source."""
+    import cv2
+
+    directory.mkdir(parents=True, exist_ok=True)
+    for frame, i in zip(rgb, indices):
+        pasted = np.where(clip.keep[i][..., None], frame, clip.frames[i])
+        cv2.imwrite(str(directory / f"{label}-f{i:03d}.png"), cv2.cvtColor(pasted, cv2.COLOR_RGB2BGR))
+
+
 def command_finetune(args: argparse.Namespace) -> int:
     import torch
 
@@ -276,10 +292,13 @@ def command_finetune(args: argparse.Namespace) -> int:
     shutil.rmtree(publish, ignore_errors=True)
     (publish / "streams").mkdir(parents=True)
     points = []
+    look = visual_frames(clip)
+    save_frames(publish / "frames", "source", clip, clip.frames[look], look)
     for qp in [int(q) for q in args.qps.split(",")]:
         rec = g5.code_dcvc(coder, source, clip.n, qp, work / f"qp{qp}")  # type: ignore[arg-type]
         decoded = np.fromfile(rec.pop("decoded"), np.uint8).reshape(clip.n, g5.HEIGHT * 3 // 2, g5.WIDTH)
         shutil.copyfile(work / f"qp{qp}" / "stream.psdc", publish / "streams" / f"filled-qp{qp}.psdc")
+        save_frames(publish / "frames", f"qp{qp}", clip, g5.yuv420_to_rgb(decoded[look]), look)
         points.append({"codec": "dcvc-uf-htl-ft", "input": "filled", "qp": qp,
                        "kbps": rec["bytes"] * 8 / clip.duration / 1000, "decoded_frames": len(decoded),
                        "decode_ms_per_frame": 1000 * min(rec["decode_seconds"]) / clip.n, **rec,

@@ -114,3 +114,10 @@ def test_report_reads_every_kind(tmp_path):
     assert report["arms"]["dcvc"]["clips"][clip]["lpips_v"]["vs_svtav1"]["bd_rate"] == pytest.approx(0.1, abs=1e-6)
     assert upper["payback_vs_svtav1"][1]["seconds"] == pytest.approx(8 * 10**7 / (1000 * 100))
     assert report["arms"]["upper-mse"]["pilot"]["decision"] == "incomplete"
+
+
+def test_visual_frames_come_from_the_gate_tier():
+    clip = SimpleNamespace(n=240, scored={"dataset": (list(range(10, 50)), None)})
+    assert g5b.visual_frames(clip) == [10, 30, 49]
+    clip = SimpleNamespace(n=5, scored={"dataset": ([], None)})
+    assert g5b.visual_frames(clip) == [0, 2, 4]
