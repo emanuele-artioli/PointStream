@@ -111,9 +111,9 @@ def excerpt_start(total: int, dense_frames: list[int], length: int) -> int:
     return max(0, min(first, total - length))
 
 
-def refresh_reference(n: int, fps: Fraction) -> list[int | None]:
-    """Per frame, the last refresh point before it (refresh every `REFRESH_S`); None for the first frame."""
-    step = max(1, round(REFRESH_S * float(fps)))
+def refresh_reference(n: int, fps: Fraction, every: float = REFRESH_S) -> list[int | None]:
+    """Per frame, the last refresh point before it (refresh every ``every`` s); None for the first frame."""
+    step = max(1, round(every * float(fps)))
     return [None if t == 0 else ((t - 1) // step) * step for t in range(n)]
 
 
