@@ -480,6 +480,34 @@ Texture transfer (a MANO texture with references sent as an inter-coded
 stream) stays as the fallback. Generic hands judged without a reference
 were not chosen.
 
+H3a2 (running 2026-10-10): H3a with each run's references sent as their own
+SVT-AV1 stream and measured, and the reference choice tuned; it names the
+fallback's operating point and the saving a generator must beat.
+
+H3b's oracle (to review with the user). A generator from one reference and
+the pose is billed at about the pose stream. The oracle grants it a perfect
+generator, so what remains is what the pose cannot carry:
+- the coded pose's placement error (estimation and coding);
+- what MANO does not describe: forearm and sleeve extent, held objects in
+  front of the fingers, motion blur.
+Built on VISOR as perfect appearance placed by WiLoR's and HaMeR's coded
+poses: the true hand pixels moved by the mesh correspondence from the
+uncoded to the coded pose, against the true frame. This also confirms the
+estimator on renders. The uncoded estimate stands in for the true pose,
+which VISOR lacks; HOT3D's motion capture checks that proxy.
+
+Identity (user, 2026-10-10): a hand that looks different from the source
+(skin tone, a missing watch) is acceptable as long as it stays consistent
+across the video. Full-reference LPIPS charges for such differences, so
+H3b's judge must change. Proposal: LPIPS beside measures that ignore
+identity:
+- pose fidelity (WiLoR re-run on the render against the source's pose);
+- realism (FID/KID of hand crops against real VISOR hands);
+- temporal consistency (flow-warped difference between consecutive
+  rendered frames).
+With these the generator may also use no reference at all, a generic hand
+kept constant per track.
+
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a
