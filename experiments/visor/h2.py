@@ -87,6 +87,14 @@ DECISION: dict[str, Any] = {
                "reference": "uncoded pose with the track's median shape"},
 }
 
+HYBRID_DECISION: dict[str, Any] = {
+    "hybrid": "WiLoR's joint rotations and shape, HaMeR's global orientation and translation (wrist kept)",
+    "hot3d": "wrist-aligned MPJPE below both models (95% paired interval below zero against each; by clip)",
+    "hint_margin_pck": 1.0, "visor_margin_iou": 0.01, "visor_split": "wilor",
+    "bootstrap": {"resamples": 1000, "seed": 20261010},
+    "model_focal": 5000.0, "model_image_size": 256,
+}
+
 
 # ----------------------------------------------------------------- shared helpers
 
@@ -319,6 +327,12 @@ def run_hint(args: argparse.Namespace, models: dict[str, Regressor], publish: Pa
                 items = [model.item(images[e["image"]], np.asarray(e["box"], np.float32), e["right"]) for e in unit_entries]
                 fit = model.forward(items, profile=number == 0)
                 arrays[f"{kind}_kp2d"] = fit["kp2d"]
+                # Parameters, so combinations of the two models can be scored offline (H2b).
+                arrays[f"{kind}_rotvec"] = mano_np.rotvec_of(fit["rotmats"].astype(float))
+                arrays[f"{kind}_betas"] = fit["betas"]
+                arrays[f"{kind}_cam_crop"] = fit["cam_crop"]
+                arrays[f"{kind}_box_size"] = fit["box_size"]
+                arrays[f"{kind}_box_center"] = fit["box_center"]
                 arrays[f"{kind}_dist"] = np.linalg.norm(fit["kp2d"] - arrays["gt"], axis=-1) / arrays["norm"][:, None]
             save_unit(publish, "hint", unit, arrays, {"unit": unit, "hands": len(unit_entries),
                                                        "images": len(images), "seconds": round(time.time() - began, 2)})
@@ -462,6 +476,7 @@ def run_hot3d(args: argparse.Namespace, models: dict[str, Regressor], publish: P
             "t": np.array([h["t"] for h in hands]), "right": np.array([h["right"] for h in hands]), "box_crop": boxes,
             "gt_world": gt_w, "gt_214": np.stack([h["cam214"].world_to_eye(gt_w[i]) for i, h in enumerate(hands)]),
             "crop_focal": np.array([float(h["crop_cam"].f[0]) for h in hands]),
+            "R_world_214": np.stack([h["cam214"].T_world_from_eye[:3, :3] for h in hands]),
         }
         checks: dict[str, float] = {"gt_tips_vs_vertices_m": tip_check}
         for kind, model in models.items():
@@ -715,7 +730,22 @@ def validate_code(stage: Path) -> dict[str, bool]:
     }
 
 
+def validate_hybrid(stage: Path) -> dict[str, bool]:
+    out = json.loads((stage / "hybrid.json").read_text())
+    c = out["checks"]
+    return {
+        "hint_models_reproduced_0.5px": c["hint_reproduction_px"] < 0.5,
+        "hot3d_models_reproduced_1um": c["hot3d_reproduction_m"] < 1e-6,
+        "visor_wilor_iou_reproduced": c["visor_wilor_iou_median_vs_job"] < 0.005,
+        "hybrid_keeps_hamer_wrist": c["hybrid_wrist_vs_hamer_m"] < 1e-6 and c["hint_hybrid_wrist_vs_hamer_m"] < 1e-6,
+        "every_part_scored": all(k in out["summary"] for k in ("hint", "hot3d", "visor")),
+        "decision_made": out["decision"]["adopt_hybrid"] in (True, False),
+    }
+
+
 def validate_result(stage: Path) -> dict[str, bool]:
+    if (stage / "hybrid.json").exists():
+        return validate_hybrid(stage)
     if (stage / "code.json").exists():
         return validate_code(stage)
     result = json.loads((stage / "h2.json").read_text())
@@ -1116,7 +1146,8 @@ def pck(dist: np.ndarray, mask: np.ndarray, threshold: float) -> float:
     return float(per_joint.mean() * 100) if per_joint.size else float("nan")
 
 
-def paired_bootstrap(groups: list[Any], stat: Any, rng: np.random.Generator, resamples: int) -> dict[str, float]:
+def paired_bootstrap(groups: list[Any], stat: Any, rng: np.random.Generator, resamples: int,
+                     names: tuple[str, str] = ("hamer", "wilor")) -> dict[str, float]:
     """``stat(groups) -> (a, b)``; the observed difference a - b and its percentile interval over
     resamples of the groups."""
     a, b = stat(groups)
@@ -1126,7 +1157,7 @@ def paired_bootstrap(groups: list[Any], stat: Any, rng: np.random.Generator, res
         x, y = stat([groups[i] for i in pick])
         diffs.append(x - y)
     lo, hi = np.percentile(diffs, [2.5, 97.5])
-    return {"hamer": a, "wilor": b, "difference": a - b, "low": float(lo), "high": float(hi)}
+    return {names[0]: a, names[1]: b, "difference": a - b, "low": float(lo), "high": float(hi)}
 
 
 def keypoint_norm(gt: np.ndarray, existence: np.ndarray) -> np.ndarray:
@@ -1318,6 +1349,210 @@ def command_report(args: argparse.Namespace) -> int:
     return 0
 
 
+# ----------------------------------------------------------------- hybrid (H2b)
+
+def hybrid_params(mano: mano_np.Mano, a: dict[str, np.ndarray], left: np.ndarray,
+                  transl_key: str = "transl") -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """WiLoR's joint rotations and shape with HaMeR's global orientation, translated so that the wrist
+    stays where HaMeR put it."""
+    rv = a["wilor_rotvec"].astype(float).copy()
+    rv[:, 0] = a["hamer_rotvec"][:, 0]
+    shift = mano.rest_root(a["hamer_betas"]) - mano.rest_root(a["wilor_betas"])
+    shift[left] = shift[left] @ mano_np.MIRROR
+    return rv, a["wilor_betas"].astype(float), a[f"hamer_{transl_key}"].astype(float) + shift
+
+
+def model_keypoints(mano: mano_np.Mano, rv: np.ndarray, betas: np.ndarray, cam_crop: np.ndarray, box_size: np.ndarray,
+                    box_center: np.ndarray, right: np.ndarray, offset: np.ndarray | None = None) -> np.ndarray:
+    """Image keypoints as the regressors project them: joints in the (unmirrored) model space, the crop
+    camera (s, tx, ty) at the models' focal length, then the box (``hamer.models.hamer.forward_step``)."""
+    f = HYBRID_DECISION["model_focal"] / HYBRID_DECISION["model_image_size"]
+    m = 2 * right.astype(float) - 1
+    joints = mano.joints(mano_np.rodrigues(rv), betas, np.zeros((len(rv), 3)), np.zeros(len(rv), bool))
+    t = np.stack([cam_crop[:, 1] * m, cam_crop[:, 2], 2 * f / (cam_crop[:, 0] + 1e-9)], -1)
+    p = joints + t[:, None] + (0.0 if offset is None else offset[:, None])
+    kp = f * p[..., :2] / p[..., 2:3]
+    kp[..., 0] *= m[:, None]
+    return kp * box_size[:, None, None] + box_center[:, None, :]
+
+
+def hybrid_hint(mano: mano_np.Mano, units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], rng: np.random.Generator,
+                checks: dict[str, float]) -> dict[str, Any]:
+    keys = ("member", "split", "existence", "gt", "right", "hamer_kp2d", "wilor_kp2d") + tuple(
+        f"{k}_{f}" for k in MODELS for f in ("rotvec", "betas", "cam_crop", "box_size", "box_center"))
+    a = {k: np.concatenate([u[k] for _, u in units]) for k in keys}
+    right = a["right"].astype(bool)
+    kp = {}
+    for k in MODELS:
+        kp[k] = model_keypoints(mano, a[f"{k}_rotvec"], a[f"{k}_betas"], a[f"{k}_cam_crop"], a[f"{k}_box_size"],
+                                a[f"{k}_box_center"], right)
+    checks["hint_reproduction_px"] = float(max(np.abs(kp[k] - a[f"{k}_kp2d"]).max() for k in MODELS))
+    # In model space every hand is a right hand (no mirror for the wrist shift); the camera is HaMeR's, and
+    # the shift keeps the wrist where HaMeR's own shape put it.
+    rv, betas, shift = hybrid_params(mano, {**a, "hamer_transl": np.zeros((len(right), 3))}, np.zeros(len(right), bool))
+    kp["hybrid"] = model_keypoints(mano, rv, betas, a["hamer_cam_crop"], a["hamer_box_size"], a["hamer_box_center"], right,
+                                   offset=shift)
+    wrist_h = mano.joints(mano_np.rodrigues(a["hamer_rotvec"]), a["hamer_betas"], np.zeros((len(right), 3)), np.zeros(len(right), bool))
+    wrist_x = mano.joints(mano_np.rodrigues(rv), betas, shift, np.zeros(len(right), bool))
+    checks["hint_hybrid_wrist_vs_hamer_m"] = float(np.abs(wrist_x[:, 0] - wrist_h[:, 0]).max())
+    norm = keypoint_norm(a["gt"], a["existence"])
+    usable = np.isfinite(norm)
+    ex = a["existence"] & usable[:, None]
+    dist = {k: np.linalg.norm(v - a["gt"], axis=-1) / np.where(usable, norm, 1.0)[:, None] for k, v in kp.items()}
+    out: dict[str, Any] = {}
+    for split in HINT_SPLITS:
+        sel = a["split"] == split
+        if not sel.any():
+            continue  # a smoke's subset may hold one split only
+        members = a["member"][sel]
+        groups = [np.nonzero(members == m)[0] for m in np.unique(members)]
+        d = {k: v[sel] for k, v in dist.items()}
+        e = ex[sel]
+        out[split] = {"pck05_all": {k: pck(d[k], e, 0.05) for k in d},
+                      "hybrid_minus_wilor": paired_bootstrap(
+                          groups, lambda gs: (pck(d["hybrid"][np.concatenate(gs)], e[np.concatenate(gs)], 0.05),
+                                              pck(d["wilor"][np.concatenate(gs)], e[np.concatenate(gs)], 0.05)),
+                          rng, HYBRID_DECISION["bootstrap"]["resamples"], ("hybrid", "wilor"))}
+    return out
+
+
+def hybrid_hot3d(mano: mano_np.Mano, units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], rng: np.random.Generator,
+                 checks: dict[str, float]) -> dict[str, Any]:
+    from hand_tracking_toolkit import camera
+
+    rows = [(m, a) for m, a in units if m["hands"]]
+    per_clip = []
+    reproduction = 0.0
+    wrist = 0.0
+    for meta, a in rows:
+        left = ~a["right"].astype(bool)
+        cam = camera.from_json(meta["camera_214"])
+        joints = {}
+        for k in MODELS:
+            joints[k] = mano.joints(mano_np.rodrigues(a[f"{k}_rotvec"]), a[f"{k}_betas"], a[f"{k}_transl"], left)
+            rel = np.einsum("nab,njb->nja", a["R_world_214"], joints[k] - joints[k][:, :1])
+            reproduction = max(reproduction, float(np.abs(rel - a[f"{k}_rel_world"]).max()))
+        rv, betas, transl = hybrid_params(mano, a, left)
+        joints["hybrid"] = mano.joints(mano_np.rodrigues(rv), betas, transl, left)
+        wrist = max(wrist, float(np.abs(joints["hybrid"][:, 0] - joints["hamer"][:, 0]).max()))
+        gt = a["gt_214"]
+        gt_2d = cam.eye_to_window(gt.reshape(-1, 3)).reshape(-1, 21, 2)
+        clip: dict[str, Any] = {}
+        for k, p in joints.items():
+            d = p[:, 9] - p[:, 0]
+            g = gt[:, 9] - gt[:, 0]
+            cos = (d * g).sum(1) / (np.linalg.norm(d, axis=1) * np.linalg.norm(g, axis=1))
+            p2d = cam.eye_to_window(p.reshape(-1, 3)).reshape(-1, 21, 2)
+            rel_world = np.einsum("nab,njb->nja", a["R_world_214"], p - p[:, :1])
+            clip[k] = {"mpjpe_ra_mm": np.linalg.norm((p - p[:, :1]) - (gt - gt[:, :1]), axis=-1).mean(1) * 1000,
+                       "pa_mpjpe_mm": np.array([procrustes_error(p[i], gt[i]) for i in range(len(p))]) * 1000,
+                       "orientation_deg": np.degrees(np.arccos(np.clip(cos, -1, 1))),
+                       "wrist_mm": np.linalg.norm(p[:, 0] - gt[:, 0], axis=-1) * 1000,
+                       "err2d_px": np.minimum(np.nan_to_num(np.linalg.norm(p2d - gt_2d, axis=-1), nan=cam.width,
+                                                            posinf=cam.width), cam.width).mean(1),
+                       "accel_mm": accel_errors(meta, {"t": a["t"], "right": a["right"], "gt_world": a["gt_world"],
+                                                       f"{k}_rel_world": rel_world}, k)}
+        per_clip.append(clip)
+    checks["hot3d_reproduction_m"] = reproduction
+    checks["hybrid_wrist_vs_hamer_m"] = wrist
+    variants = ("hamer", "wilor", "hybrid")
+    out: dict[str, Any] = {"clips": len(rows), "hands": int(sum(m["hands"] for m, _ in rows))}
+    for metric in ("mpjpe_ra_mm", "pa_mpjpe_mm", "wrist_mm", "err2d_px", "accel_mm"):
+        out[metric] = {k: float(np.mean(np.concatenate([c[k][metric] for c in per_clip]))) for k in variants}
+    out["orientation_deg_median"] = {k: float(np.median(np.concatenate([c[k]["orientation_deg"] for c in per_clip])))
+                                     for k in variants}
+    for other in MODELS:
+        out[f"hybrid_minus_{other}_mpjpe_ra"] = paired_bootstrap(
+            per_clip, lambda gs, o=other: tuple(float(np.mean(np.concatenate([g[v]["mpjpe_ra_mm"] for g in gs])))
+                                               for v in ("hybrid", o)), rng, HYBRID_DECISION["bootstrap"]["resamples"],
+            ("hybrid", other))
+    return out
+
+
+def _visor_item_ious(task: tuple[dict[str, Any], dict[str, np.ndarray], str]) -> dict[str, np.ndarray]:
+    from experiments.visor.h1 import iou, rasterize
+
+    meta, a, mano_path = task
+    mano = mano_np.Mano.load(mano_path)
+    n = int(meta["hands"])
+    left = ~a["right"].astype(bool)
+    shape = tuple(meta["image_shape"])
+    params = {k: (a[f"{k}_rotvec"], a[f"{k}_betas"], a[f"{k}_transl"]) for k in MODELS}
+    params["hybrid"] = hybrid_params(mano, a, left)
+    splits = {}
+    for k in MODELS:
+        offsets = np.concatenate([[0], np.cumsum(a[f"{k}_hand_bits_len"])])
+        splits[k] = [unpack_window(a[f"{k}_hand_window"][i], a[f"{k}_hand_bits"][offsets[i]:offsets[i + 1]].tobytes())
+                     for i in range(n)]
+    out = {f"{v}_vs_{s}": np.full(n, np.nan) for v in params for s in MODELS}
+    for i in range(n):
+        for v, (rv, betas, transl) in params.items():
+            verts = mano.mesh(mano_np.rodrigues(rv[i:i + 1]), betas[i], transl[i:i + 1], left=bool(left[i]))[0]
+            silhouette = rasterize(pinhole(verts, meta["focal"], tuple(meta["principal"])), mano.faces, shape)
+            for s in MODELS:
+                window = a[f"{s}_hand_window"][i]
+                full = np.zeros(shape, bool)
+                full[window[1]:window[3], window[0]:window[2]] = splits[s][i]
+                value = iou(silhouette, full)
+                out[f"{v}_vs_{s}"][i] = np.nan if value is None else value
+    return out
+
+
+def hybrid_visor(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], mano_path: str, workers: int,
+                 rng: np.random.Generator, checks: dict[str, float]) -> dict[str, Any]:
+    rows = [(m, a) for m, a in units if m["hands"]]
+    with ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context("fork")) as pool:
+        items = list(pool.map(_visor_item_ious, [(m, a, mano_path) for m, a in rows]))
+    split = HYBRID_DECISION["visor_split"]
+    saved = np.concatenate([a["wilor_iou_hand"] for _, a in rows])
+    mine = np.concatenate([it["wilor_vs_wilor"] for it in items])
+    checks["visor_wilor_iou_median_vs_job"] = abs(float(np.nanmedian(mine)) - float(np.nanmedian(saved)))
+    out: dict[str, Any] = {"items": len(rows)}
+    for s in MODELS:
+        out[f"iou_median_vs_{s}_split"] = {v: float(np.nanmedian(np.concatenate([it[f"{v}_vs_{s}"] for it in items])))
+                                           for v in ("hamer", "wilor", "hybrid")}
+    out["hybrid_minus_wilor"] = paired_bootstrap(
+        items, lambda gs: tuple(float(np.nanmedian(np.concatenate([g[f"{v}_vs_{split}"] for g in gs])))
+                                for v in ("hybrid", "wilor")), rng, HYBRID_DECISION["bootstrap"]["resamples"], ("hybrid", "wilor"))
+    return out
+
+
+def command_hybrid(args: argparse.Namespace) -> int:
+    began = time.time()
+    rng = np.random.default_rng(HYBRID_DECISION["bootstrap"]["seed"])
+    mano = mano_np.Mano.load(args.mano_right)
+    limit = int(args.units)
+    units = {part: load_units(getattr(args, part), part) for part in ("hint", "hot3d", "visor")}
+    for part, rows in units.items():
+        if not rows or not all(m["npz_hash_ok"] for m, _ in rows):
+            raise SystemExit(f"{part}: missing or corrupt units")
+        if limit:
+            units[part] = rows[:limit]
+    checks: dict[str, float] = {}
+    workers = max(1, int(args.workers or os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
+    summary = {"hint": hybrid_hint(mano, units["hint"], rng, checks)}
+    progress(1)
+    summary["hot3d"] = hybrid_hot3d(mano, units["hot3d"], rng, checks)
+    progress(2)
+    summary["visor"] = hybrid_visor(units["visor"], args.mano_right, workers, rng, checks)
+    progress(3)
+    rule = HYBRID_DECISION
+    a = all(summary["hot3d"][f"hybrid_minus_{o}_mpjpe_ra"]["high"] < 0 for o in MODELS)
+    b = all(s in summary["hint"] and summary["hint"][s]["hybrid_minus_wilor"]["low"] > -rule["hint_margin_pck"]
+            for s in HINT_SPLITS)
+    c = summary["visor"]["hybrid_minus_wilor"]["low"] > -rule["visor_margin_iou"]
+    out_dir = Path(args.out) if args.out else stage_dir()
+    write_json(out_dir / "hybrid.json", {
+        "inputs": {part: [file_sha256(Path(p)) for p in getattr(args, part)] for part in ("hint", "hot3d", "visor")}
+        | {"mano_right_sha256": file_sha256(Path(args.mano_right))},
+        "units": {part: len(rows) for part, rows in units.items()}, "rule": rule, "checks": checks, "summary": summary,
+        "decision": {"a_hot3d_better_than_both": a, "b_hint_within_margin": b, "c_visor_within_margin": c,
+                     "adopt_hybrid": bool(a and b and c)},
+        "seconds": round(time.time() - began, 1),
+    })
+    return 0
+
+
 # ----------------------------------------------------------------- main
 
 def main(argv: list[str] | None = None) -> int:
@@ -1353,6 +1588,13 @@ def main(argv: list[str] | None = None) -> int:
     code.add_argument("--workers", default="")
     code.add_argument("--units", default="0", help="first N units per dataset (0: all); for a smoke")
     code.add_argument("--out", default="", help="default: the stage directory")
+    hybrid = commands.add_parser("hybrid")
+    for part in ("hint", "hot3d", "visor"):
+        hybrid.add_argument(f"--{part}", action="append", required=True)
+    hybrid.add_argument("--mano-right", required=True)
+    hybrid.add_argument("--workers", default="")
+    hybrid.add_argument("--units", default="0", help="first N units per part (0: all); for a smoke")
+    hybrid.add_argument("--out", default="", help="default: the stage directory")
     report = commands.add_parser("report")
     report.add_argument("--hint", action="append", required=True)
     report.add_argument("--hot3d", action="append", required=True)
@@ -1366,6 +1608,8 @@ def main(argv: list[str] | None = None) -> int:
         return command_validate(args)
     if args.command == "code":
         return command_code(args)
+    if args.command == "hybrid":
+        return command_hybrid(args)
     return command_report(args)
 
 

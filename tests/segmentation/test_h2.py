@@ -135,3 +135,41 @@ def test_joint_errors_cap_infinite_projections():
     ref2d[0, 0] = [np.inf, 0]
     _, px = h2.joint_errors(joints, j2d, joints, ref2d, cap=100.0)
     assert np.isclose(px, 100.0 / 42)
+
+
+def hybrid_arrays(n: int = 6, seed: int = 6) -> dict:
+    rng = np.random.default_rng(seed)
+    a = {"right": np.array([True, False] * (n // 2))}
+    for k in h2.MODELS:
+        a[f"{k}_rotvec"] = rng.normal(0, 0.4, (n, 16, 3))
+        a[f"{k}_betas"] = rng.normal(0, 1.5, (n, 10))
+        a[f"{k}_transl"] = rng.normal(0, 0.05, (n, 3)) + np.array([0, 0, 0.6])
+    return a
+
+
+def test_hybrid_keeps_hamer_orientation_and_wrist():
+    mano = mano_np.Mano(synthetic_arrays())
+    a = hybrid_arrays()
+    left = ~a["right"]
+    rv, betas, transl = h2.hybrid_params(mano, a, left)
+    assert np.array_equal(rv[:, 0], a["hamer_rotvec"][:, 0]) and np.array_equal(rv[:, 1:], a["wilor_rotvec"][:, 1:])
+    hybrid = mano.joints(mano_np.rodrigues(rv), betas, transl, left)
+    hamer = mano.joints(mano_np.rodrigues(a["hamer_rotvec"]), a["hamer_betas"], a["hamer_transl"], left)
+    assert np.allclose(hybrid[:, 0], hamer[:, 0], atol=1e-12)
+
+
+def test_model_keypoints_project_through_the_crop_camera():
+    mano = mano_np.Mano(synthetic_arrays())
+    a = hybrid_arrays()
+    right = a["right"]
+    cam = np.array([[0.9, 0.02, -0.01]] * len(right))
+    size, centre = np.full(len(right), 300.0), np.tile([500.0, 400.0], (len(right), 1))
+    kp = h2.model_keypoints(mano, a["wilor_rotvec"], a["wilor_betas"], cam, size, centre, right)
+    f = 5000.0 / 256
+    for i in range(len(right)):
+        m = 1.0 if right[i] else -1.0
+        joints = mano.joints(mano_np.rodrigues(a["wilor_rotvec"][i:i + 1]), a["wilor_betas"][i:i + 1], np.zeros((1, 3)), np.zeros(1, bool))[0]
+        p = joints + np.array([cam[i, 1] * m, cam[i, 2], 2 * f / cam[i, 0]])
+        want = f * p[:, :2] / p[:, 2:3]
+        want[:, 0] *= m
+        assert np.allclose(kp[i], want * size[i] + centre[i])

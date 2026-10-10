@@ -379,6 +379,14 @@ within 5% of the uncoded estimate's error against HOT3D's motion capture;
 it passes H1's rate screen (10% of SVT-AV1's hand bits at CRF 62). At zero
 latency the best is 7.7 kbps.
 
+H2b (2026-10-10,
+[outcome](docs/experiments.md#2026-10-10--h2b-a-hybrid-of-the-two-estimators)):
+a hybrid of WiLoR's fingers and HaMeR's orientation, chosen on H2's HOT3D
+clips, was tested on new clips, HInt and VISOR under a rule fixed
+beforehand. Its 3D gain replicated, but it is worse than both models in the
+image (HInt PCK 35.6 against 43.7, VISOR IoU 0.739 against 0.768): the
+parts do not compose. WiLoR stays.
+
 
 The comparison already planned, a paper table on its own: 2D PCK on HInt
 VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
@@ -407,9 +415,13 @@ forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a
 simple arm model. Scored on VISOR foreground quality against coding the same
 pixels with SVT-AV1 at equal rate, with HOT3D's oracle poses as the upper
-bound, and on render time.
+bound, and on render time. The pose input is H2's coded stream (1.93 kbps);
+the renderer is also run on HaMeR's poses (both models' parameters are saved
+for all 34 VISOR items): the two are close in the image (HOT3D 2D error 17.3
+against 17.4 px, VISOR IoU 0.761 against 0.767) while HaMeR orients the hand
+better in 3D, so render quality confirms the estimator (user, 2026-10-10).
 **Done when** a hand renderer beats coded pixels at some rate, or the session
-shows why not.
+shows why not, and the estimator is confirmed on renders.
 
 #### H4. Handled objects (rescoped after H1, user 2026-10-08)
 

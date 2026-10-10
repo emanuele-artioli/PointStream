@@ -48,7 +48,7 @@ def link(source: Path, target: Path) -> Path:
     return target
 
 
-def hot3d_clips(root: Path, per_participant: int) -> list[dict[str, Any]]:
+def hot3d_clips(root: Path, per_participant: int, skip: int = 0) -> list[dict[str, Any]]:
     definitions = json.loads((root / "clip_definitions.json").read_text())
     by_participant: dict[str, list[str]] = {}
     for name in sorted(os.listdir(root / "train_aria")):
@@ -57,7 +57,7 @@ def hot3d_clips(root: Path, per_participant: int) -> list[dict[str, Any]]:
         clip_id = str(int(name[5:11]))
         participant = definitions[clip_id]["sequence_id"].split("_")[0]
         by_participant.setdefault(participant, []).append(name)
-    chosen = {p: sorted(names, key=lambda n: hashlib.sha256(f"pointstream-h2:hot3d:{n}".encode()).hexdigest())[:per_participant]
+    chosen = {p: sorted(names, key=lambda n: hashlib.sha256(f"pointstream-h2:hot3d:{n}".encode()).hexdigest())[skip:skip + per_participant]
               for p, names in sorted(by_participant.items())}
     order = [names[0] for names in chosen.values()] + [n for names in chosen.values() for n in names[1:]]
     participant_of = {n: p for p, names in chosen.items() for n in names}
@@ -96,6 +96,7 @@ def main() -> int:
     parser.add_argument("--audit-inputs", required=True, help="pointstream-data/audit/env-2026-10-06/inputs")
     parser.add_argument("--hot3d", required=True)
     parser.add_argument("--per-participant", type=int, default=6)
+    parser.add_argument("--skip", type=int, default=0, help="per participant, clips to pass over in the order (H2b: H2's 6)")
     parser.add_argument("--environment", nargs=2, required=True, metavar=("TAR", "SHA256"))
     parser.add_argument("--deadline", required=True)
     args = parser.parse_args()
@@ -113,7 +114,7 @@ def main() -> int:
         "mano_left": link(h1_dir / "inputs" / "mano" / "MANO_LEFT.pkl", inputs / "mano" / "MANO_LEFT.pkl"),
         "mano_right": link(h1_dir / "inputs" / "mano" / "MANO_RIGHT.pkl", inputs / "mano" / "MANO_RIGHT.pkl"),
     }
-    clips = hot3d_clips(Path(args.hot3d), args.per_participant)
+    clips = hot3d_clips(Path(args.hot3d), args.per_participant, args.skip)
     for clip in clips:
         files[f"hot3d_{clip['name'][:-4]}"] = link(clip["path"], inputs / "hot3d" / clip["name"])
     boxes, sources = h1_boxes([Path(j) for j in args.h1_job])
