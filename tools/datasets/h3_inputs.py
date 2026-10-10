@@ -48,7 +48,7 @@ def main() -> int:
     parser.add_argument("--b2-inputs", required=True, help="pointstream-data/visor/b2-2026-10-07/inputs")
     parser.add_argument("--environment", nargs=2, required=True, metavar=("TAR", "SHA256"))
     parser.add_argument("--deadline", required=True)
-    parser.add_argument("--parts", type=int, default=3)
+    parser.add_argument("--parts", type=int, default=5)
     args = parser.parse_args()
     dest = Path(args.dest)
     lpips = link(Path(args.b2_inputs) / "lpips" / "alexnet-owt-7be5be79.pth", dest / "inputs" / "lpips" / "alexnet-owt-7be5be79.pth")
