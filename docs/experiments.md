@@ -2090,3 +2090,16 @@ invocation turns out to be needed.
   against 14); centred smoothing lowers the 3D error against the truth
   (HaMeR 19.16 against 19.34 mm), as hypothesised. The reference for the
   5% limit is the user's decision.
+- Decisions (user, 2026-10-10, after the HInt full run and the coding dev
+  check; recorded in `h2.DECISION`). (1) HInt is normalised by the
+  labelled keypoints' extent grown to 3:4, and the anchor is HaMeR within
+  4 points of the paper on both sets: 39.6 against 43.0 on VISOR frames
+  (−3.4, the remaining gap read as the input crop), 48.9 against 48.0 on
+  New Days (+0.9); it holds. The pre-registered bbox normalisation is
+  reported beside it. With it, VISOR frames: WiLoR 43.8, HaMeR 39.6
+  (difference −4.2, CI −4.8 to −3.5: WiLoR wins); New Days: HaMeR 48.9,
+  WiLoR 47.5 (+1.4, CI +0.8 to +2.0: HaMeR wins). One hand has fewer than
+  two labelled keypoints and is left out. (2) The coding stage's 5% limit
+  is measured against the uncoded pose with the shape the scheme sends
+  (each track's median betas); the cost of sending the shape once is
+  reported apart for each model.

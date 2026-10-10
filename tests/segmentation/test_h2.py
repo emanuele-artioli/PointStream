@@ -98,3 +98,16 @@ def test_coding_grid_on_synthetic_tracks():
     half = by_key["none|15Hz-hold|full|q1|previous"]
     assert half["sent_share"] < 0.5 and half["kbps"] < base["kbps"]
     assert by_key["none|15Hz-linear|full|q1|previous"]["latency_ms"] == (pc.send_step(15.0, 50.0) - 1) * 20.0
+
+
+def test_keypoint_norm_uses_labelled_joints_only():
+    gt = np.zeros((2, 21, 2))
+    gt[0, :, 0] = np.linspace(0, 30, 21)
+    gt[0, :, 1] = np.linspace(0, 40, 21)
+    gt[0, 20] = [1000, 1000]  # outside the frame: not labelled
+    existence = np.ones((2, 21), bool)
+    existence[0, 20] = False
+    existence[1, 1:] = False  # one labelled joint: no extent
+    norm = h2.keypoint_norm(gt, existence)
+    assert np.isclose(norm[0], h2.expanded_size(np.array([0, 0, 28.5, 38.0])))
+    assert np.isnan(norm[1])

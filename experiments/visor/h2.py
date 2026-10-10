@@ -73,11 +73,18 @@ DECISION: dict[str, Any] = {
     "bootstrap": {"resamples": 1000, "interval": 0.95, "seed": 20261009,
                   "unit": {"hint": "image", "hot3d": "clip", "visor": "item"}},
     "tie_break": "faster regressor at batch 1",
-    "anchor": {"metric": "hamer hint_visor_pck05_all", "range": [40.0, 47.0],
-               "published": {"paper": 43.0, "rerun_2508.09629": 44.4}},
+    # Pre-registered: HaMeR's VISOR PCK@0.05 (all) within 40-47 with HInt's `bbox` as the normaliser. It
+    # failed (51.3): that box is padded 1.24x the keypoints. User, 2026-10-10: normalise by the labelled
+    # keypoints' extent (grown to 3:4) and anchor both sets on the paper within MAX_GAP.
+    "anchor": {"metric": "hamer pck05_all, keypoint-extent normalisation", "published": {"TEST_epick_img": 43.0,
+               "TEST_newdays_img": 48.0}, "max_gap": 4.0, "preregistered": {"range": [40.0, 47.0], "normaliser": "bbox"}},
     "coding": {"max_error_increase": 0.05, "budgets_ms": [0.0, 33.3, 100.0, 266.7],
                "h1_screen": {"max_share": 0.10, "svt_crf62_hand_kbps": 23.4},
-               "choice": "per budget, the lowest VISOR kbps among combinations whose HOT3D MPJPE and 2D error against the truth are at most 5% above the uncoded estimate's"},
+               "choice": "per budget, the lowest VISOR kbps among combinations whose HOT3D MPJPE and 2D error against the truth are at most 5% above the uncoded estimate's",
+               # User, 2026-10-10 (after the coding dev check): the uncoded reference carries the shape the
+               # scheme sends, the track's median betas, so the limit measures pose coding alone; the cost
+               # of sending the shape once is reported apart.
+               "reference": "uncoded pose with the track's median shape"},
 }
 
 
@@ -820,6 +827,12 @@ class CodingSet:
         self.order = np.concatenate([tr["rows"] for tr in self.tracks])
         self.uncoded = mano.joints(self.rot, self.betas, self.transl, self.left)
         self.uncoded_2d = self.project(self.uncoded)
+        # The reference for coding: the same poses with the shape the scheme sends, each track's median.
+        track_betas = np.zeros_like(self.betas)
+        for tr in self.tracks:
+            track_betas[tr["rows"]] = tr["betas"]
+        self.reference = mano.joints(self.rot, track_betas, self.transl, self.left)
+        self.reference_2d = self.project(self.reference)
         self.truth_2d = self.project(self.truth) if self.truth is not None else None
 
     def project(self, joints: np.ndarray) -> np.ndarray:
@@ -892,8 +905,8 @@ def evaluate_smoother(key: tuple[str, str], smoother: tuple[Any, ...], basis_arr
                     decoded = [pc.decode(sym, sent, len(tr["x"]), combo, basis) for tr, (sym, sent) in zip(data.tracks, encoded)]
                     joints = data.decode_joints(decoded)
                     joints_2d = data.project(joints)
-                    mp_unc, px_unc = joint_errors(joints, joints_2d, data.uncoded, data.uncoded_2d)
-                    row_common = {"mpjpe_vs_uncoded_mm": mp_unc, "err2d_vs_uncoded_px": px_unc,
+                    mp_unc, px_unc = joint_errors(joints, joints_2d, data.reference, data.reference_2d)
+                    row_common = {"mpjpe_vs_uncoded_mm": mp_unc, "err2d_vs_uncoded_px": px_unc,  # uncoded = shape-once reference
                                   "sent_share": float(sent_per_unit.sum() / max(frames, 1)),
                                   "latency_ms": max(pc.latency_ms(combo, tr["fps"]) for tr in data.tracks) if data.tracks else 0.0}
                     if data.truth is not None:
@@ -985,10 +998,14 @@ def command_code(args: argparse.Namespace) -> int:
     baselines: dict[str, dict[str, Any]] = {"hot3d": {}, "visor": {}}
     for (name, model), data in _SETS.items():
         entry: dict[str, Any] = {"hand_frames": len(data.rot), "tracks": len(data.tracks), "units": len(data.units)}
+        shape_mm, shape_px = joint_errors(data.reference, data.reference_2d, data.uncoded, data.uncoded_2d)
+        entry["shape_once_vs_per_frame"] = {"mpjpe_mm": shape_mm, "err2d_px": shape_px}
         if data.truth is not None:
             assert data.truth_2d is not None
-            mp, px = joint_errors(data.uncoded, data.uncoded_2d, data.truth, data.truth_2d)
+            mp, px = joint_errors(data.reference, data.reference_2d, data.truth, data.truth_2d)
             entry |= {"mpjpe_vs_truth_mm": mp, "err2d_vs_truth_px": px}
+            mp, px = joint_errors(data.uncoded, data.uncoded_2d, data.truth, data.truth_2d)
+            entry["per_frame_shape"] = {"mpjpe_vs_truth_mm": mp, "err2d_vs_truth_px": px}
         baselines[name][model] = entry
     workers = max(1, int(args.workers or os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
     tasks = [(key, s) for key in _SETS for s in pc.SMOOTHERS]
@@ -1051,10 +1068,26 @@ def paired_bootstrap(groups: list[Any], stat: Any, rng: np.random.Generator, res
     return {"hamer": a, "wilor": b, "difference": a - b, "low": float(lo), "high": float(hi)}
 
 
+def keypoint_norm(gt: np.ndarray, existence: np.ndarray) -> np.ndarray:
+    """Per hand, the longer side of the labelled (in-frame) keypoints' extent grown to 3:4; NaN under two."""
+    out = np.full(len(gt), np.nan)
+    for i in range(len(gt)):
+        p = gt[i][existence[i]]
+        if len(p) >= 2:
+            out[i] = expanded_size(np.concatenate([p.min(0), p.max(0)]))
+    return out
+
+
 def hint_summary(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], rng: np.random.Generator) -> dict[str, Any]:
-    a = {k: np.concatenate([u[k] for _, u in units]) for k in ("member", "split", "existence", "occlusion",
-                                                               "hamer_dist", "wilor_dist")}
-    out: dict[str, Any] = {}
+    a = {k: np.concatenate([u[k] for _, u in units]) for k in ("member", "split", "existence", "occlusion", "gt",
+                                                               "hamer_kp2d", "wilor_kp2d", "hamer_dist", "wilor_dist")}
+    norm = keypoint_norm(a["gt"], a["existence"])
+    usable = np.isfinite(norm)
+    a["existence"] = a["existence"] & usable[:, None]
+    for k in MODELS:
+        a[f"{k}_dist_bbox"] = a[f"{k}_dist"]
+        a[f"{k}_dist"] = np.linalg.norm(a[f"{k}_kp2d"] - a["gt"], axis=-1) / np.where(usable, norm, 1.0)[:, None]
+    out: dict[str, Any] = {"normaliser": "keypoint extent (user, 2026-10-10)", "hands_without_two_keypoints": int((~usable).sum())}
     for split in HINT_SPLITS:
         sel = a["split"] == split
         subsets = {"all": a["existence"][sel], "visible": a["existence"][sel] & ~a["occlusion"][sel],
@@ -1070,7 +1103,8 @@ def hint_summary(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], rng:
             idx = np.concatenate(gs)
             return pck(hd[idx], ex[idx], 0.05), pck(wd[idx], ex[idx], 0.05)
 
-        out[split] = {"hands": int(sel.sum()), "pck": table,
+        table_bbox = {k: {f"{t:g}": pck(a[f"{k}_dist_bbox"][sel], subsets["all"], t) for t in PCK_THRESHOLDS} for k in MODELS}
+        out[split] = {"hands": int(sel.sum()), "pck": table, "pck_all_bbox_normaliser": table_bbox,
                       "pck05_all_bootstrap": paired_bootstrap(groups, stat, rng, DECISION["bootstrap"]["resamples"])}
     return out
 
@@ -1152,8 +1186,10 @@ def visor_summary(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], rng
 
 
 def decide(summary: dict[str, Any], speed: dict[str, Any], code: dict[str, Any] | None) -> dict[str, Any]:
-    anchor = summary["hint"]["TEST_epick_img"]["pck"]["hamer"]["all"]["0.05"]
-    lo, hi = DECISION["anchor"]["range"]
+    rule_anchor = DECISION["anchor"]
+    gaps = {split: summary["hint"][split]["pck"]["hamer"]["all"]["0.05"] - published
+            for split, published in rule_anchor["published"].items()}
+    holds = all(abs(g) <= rule_anchor["max_gap"] for g in gaps.values())
     contests = {
         "hint_visor_pck05_all": summary["hint"]["TEST_epick_img"]["pck05_all_bootstrap"],
         "hint_newdays_pck05_all": summary["hint"]["TEST_newdays_img"]["pck05_all_bootstrap"],
@@ -1176,9 +1212,9 @@ def decide(summary: dict[str, Any], speed: dict[str, Any], code: dict[str, Any] 
         verdicts[name] = {**b, "winner": winner}
     faster = min(MODELS, key=lambda k: speed[k]["batch1_ms_per_hand"])
     chosen = max(MODELS, key=lambda k: wins[k]) if wins["hamer"] != wins["wilor"] else faster
-    out: dict[str, Any] = {"anchor": {"hamer_hint_visor_pck05_all": anchor, "range": [lo, hi], "holds": lo <= anchor <= hi},
+    out: dict[str, Any] = {"anchor": {"gap_to_paper": gaps, "max_gap": rule_anchor["max_gap"], "holds": holds},
                            "contests": verdicts, "wins": wins, "faster_at_batch1": faster,
-                           "estimator": chosen if lo <= anchor <= hi else None,
+                           "estimator": chosen if holds else None,
                            "by": "wins" if wins["hamer"] != wins["wilor"] else "tie, speed"}
     if code is not None and out["estimator"]:
         rule = DECISION["coding"]
