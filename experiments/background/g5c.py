@@ -256,7 +256,9 @@ def command_checks(args: argparse.Namespace) -> int:
     flows = source_flows(clip)
     flow_seconds = time.time() - began
     rows = []
-    for done, method in enumerate(stored_methods(args, clip_id), 1):
+    methods = stored_methods(args, clip_id)
+    methods = methods[:args.max_methods] if args.max_methods > 0 else methods
+    for done, method in enumerate(methods, 1):
         if method["arm"] in restored:
             rows.append({**restored[method["arm"]], "restored_from_checkpoint": True})
             progress(done)
@@ -601,6 +603,7 @@ def main(argv: list[str] | None = None) -> int:
     ch.add_argument("--svt", nargs="+", required=True, help="extracted G5 baselines archives")
     ch.add_argument("--dcvc", required=True, help="G5b's extracted dcvc archive")
     ch.add_argument("--arms", nargs="+", default=[], help="G5b's extracted finetune archives of this clip")
+    ch.add_argument("--max-methods", type=int, default=0, help="smoke: the first N methods (SVT-AV1, DCVC-UF, arms)")
     ch.set_defaults(func=command_checks)
     co = sub.add_parser("compress")
     common(co)

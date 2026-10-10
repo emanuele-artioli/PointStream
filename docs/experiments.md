@@ -2282,8 +2282,10 @@ invocation turns out to be needed.
   curve is not an upper bound, and the variants are compared with
   SVT-AV1 too.
 - Budget. Checks: 2 jobs (one per stretch), each ≤ 45 minutes on Ada or
-  A6000 (36 decodes, LPIPS, DISTS, flicker). Size: 2 jobs, each ≤ 45
-  minutes (10 variants × 4 QPs, encode and decode). Smokes ≤ 10 minutes.
+  A6000 (36 decodes, LPIPS, DISTS, flicker). Size: 4 jobs (per stretch,
+  the whole-model variants and the change variants), each ≤ 45 minutes
+  (4 or 6 variants × 4 QPs, encode, decode and scoring). Smokes ≤ 10
+  minutes.
   Ceiling 3.5 GPU-hours. The fill check (Telea against ProPainter) gets
   its own lines here after ProPainter's audit.
 
