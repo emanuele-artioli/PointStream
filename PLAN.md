@@ -363,7 +363,22 @@ mask is forearm. An estimate of the parameter rate per object per second.
 **Done when** a recorded job says which foreground parts are worth a
 parametric model, which should stay pixels, and in what order to build them.
 
-#### H2. Hand-pose estimators: HaMeR against WiLoR
+#### H2. Hand-pose estimators: HaMeR against WiLoR (done 2026-10-10)
+
+Result: `experiments/visor/h2.py` from recorded jobs (HInt `20261009T220226Z-958cda4e`,
+HOT3D `…220759Z-be2af4a6`, VISOR `…215322Z-188ed69c` + `…220823Z-b309d9a2`,
+coding `20261010T054156Z-d9821c8e`;
+[outcome](docs/experiments.md#2026-10-09--h2-hand-pose-estimators-hamer-against-wilor-and-pose-coding)).
+WiLoR is chosen, 3 contests to 2 (HInt VISOR frames, HOT3D PA-MPJPE, VISOR
+IoU against HInt New Days and HOT3D acceleration); HaMeR orients the whole
+hand better (7.6° against 14.7° on HOT3D), which H3 should check on its
+renders. The pose stream for H3: Gaussian smoothing over 33 ms, 15 Hz with
+linear interpolation, the full 45-value pose at 8° steps, previous-frame
+prediction: 1.93 kbps on VISOR (H1's coding 15.2), 83 ms of lookahead,
+within 5% of the uncoded estimate's error against HOT3D's motion capture;
+it passes H1's rate screen (10% of SVT-AV1's hand bits at CRF 62). At zero
+latency the best is 7.7 kbps.
+
 
 The comparison already planned, a paper table on its own: 2D PCK on HInt
 VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and

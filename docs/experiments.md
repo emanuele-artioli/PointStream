@@ -2266,3 +2266,261 @@ invocation turns out to be needed.
   briefed (rigid objects from a reference) has no support from H1: handled
   objects stay pixels, and the static surfaces belong to G. H4 should be
   rescoped or dropped before it runs; the user decides.
+
+### 2026-10-09 — H2: hand-pose estimators (HaMeR against WiLoR) and pose coding
+- Question. Which MANO regressor PointStream uses on egocentric video, with
+  numbers; and how cheaply its pose stream can be sent, as rate against
+  distortion and latency, for each coding technique and their combinations
+  ([PLAN](../PLAN.md#h2-hand-pose-estimators-hamer-against-wilor)).
+- Estimators. HaMeR (`3a01849`, ViT-H) and WiLoR (`fcb9113`) as the
+  environment audit loads them; MANO v1.2 (the dechumpied copies). Both get
+  the same box per hand, enlarged 2.0× (`ViTDetDataset`, as H1 and HaMeR's
+  own HInt evaluation), and the same handedness. Joints for every metric are
+  computed the same way from each mesh, predicted or ground truth: MANO's
+  joint regressor on the 778 vertices plus the five fingertip vertices
+  (744, 320, 443, 554, 671), in OpenPose order; so no metric depends on a
+  model's own joint convention.
+- Benchmarks.
+  1. *HInt* (2D, egocentric frames, `HInt_annotation_partial.zip`,
+     `ac42d9f8…c7fe`): TEST_epick (VISOR frames, 1,906 hands) and
+     TEST_newdays (1,754), boxes from the labels. HaMeR's protocol
+     (`hamer/utils/pose_utils.py`): PCK at 0.05, 0.10 and 0.15 of the box's
+     longer side, over in-frame joints (*all*), unoccluded (*visible*) and
+     occluded ones. HaMeR trains on HInt train, so it is in domain here and
+     WiLoR is not. Anchor: HaMeR's published PCK@0.05 (all) is 43.0 on VISOR
+     and 48.0 on New Days (a later re-run: 44.4, 49.4).
+  2. *HOT3D-Clips* (3D, motion capture): 54 train_aria clips, 6 per
+     participant (all 9), chosen content-blind (lowest sha256 of
+     "pointstream-h2-hot3d:<clip>"), 150 frames at 30 fps. Each hand with a
+     MANO label is warped from the 1408² fisheye stream `214-1` into the
+     dataset's own pinhole crop camera (`hand_crops.json`, the toolkit's
+     `warp_image`; the protocol of HOT3D's hand-tracking challenge) at half
+     its focal length, 512²: the dataset's crops frame the hand so tightly
+     that its mesh leaves the crop, and the regressors' 2× box would see
+     padding (dev check on gpu6: boxes reached x = −15 and y = 551 in a
+     512² crop; at half focal they sit inside with real context). The box
+     is the projected ground-truth mesh's. Metrics:
+     MPJPE after aligning the wrist and PA-MPJPE (mm), MPVPE after aligning
+     the wrist, 2D joint error in the crop (share of box), and acceleration
+     error against the ground truth (mm/frame², root-relative joints rotated
+     into world axes, so the head's motion cancels). Neither model trains on
+     HOT3D; hands wear motion-capture markers.
+  3. *VISOR* (video, evaluation set v2, 34 windows, 240 frames, fill set):
+     H1's recorded hand boxes (WiLoR's detector, matched to VISOR's masks),
+     so both models fit the same hand-frames as H1. Per hand-frame: IoU of
+     the rendered silhouette with the mask's hand side (H1's wrist split,
+     each model splitting by its own wrist), 2D keypoint acceleration (share
+     of box), and orientation flips over 45° per frame.
+  4. *Speed* on one GPU class (RTX A6000), fp32, after warm-up, CUDA
+     synchronised: ms per hand at batch 1 (the codec's case) and per hand at
+     batch 32, regressor only; WiLoR's detector timed once per frame,
+     since both models need a detector in PointStream.
+- Pose coding (`h2 code`, CPU, on the saved per-frame parameters of both
+  estimators). Sent per hand-frame: global orientation (axis-angle),
+  articulation (15 joints axis-angle, or k coefficients of MANO's pose
+  PCA), root as image position (px) and log depth; shape once per track
+  (the track's median betas), not counted. On HOT3D the parameters are
+  expressed in the fisheye camera's frame and the root's position is that
+  camera's pinhole projection; on VISOR they are H1's (nominal focal). Encoder: smoothing, then temporal subsampling, then the
+  subspace, then quantization, then prediction; rate = empirical entropy of
+  the prediction residual symbols pooled per parameter group over items
+  (H1's estimate), × frames sent per second. Decoder: dequantize, predict,
+  and fill skipped frames by linear interpolation (needs the next sent
+  frame) or by holding (no lookahead). Axes:
+  - smoothing: none; One-Euro (causal; min cutoff 0.5, 1, 2 Hz × beta 0,
+    0.5); centred Gaussian looking ahead L = 33, 67, 133, 267 ms (1, 2, 4,
+    8 frames at HOT3D's 30 fps, 2, 3, 7, 13 at VISOR's 50; σ = L/2);
+  - send rate: every frame, 15, 10, 7.5 Hz (every 2nd, 3rd, 4th frame at
+    30 fps; every 3rd, 5th, 7th at 50);
+  - subspace: none (45 values), PCA k = 6, 12, 24;
+  - quantization: H1's steps (1°, 0.25 px, 0.002) × 0.5, 1, 2, 4, 8;
+  - prediction: previous decoded frame (H1), constant velocity.
+  Latency = frames of lookahead (the smoother's L, plus the gap to the next
+  sent frame when interpolating), reported in ms. Distortion: on HOT3D
+  against the motion-capture truth (wrist-aligned MPJPE, mm; 2D joint error
+  in the fisheye image, px), and against the uncoded estimate; on VISOR
+  against the uncoded estimate (2D px at 1920×1080) and, for the points on
+  each Pareto front, the silhouette's hand-side IoU. Every combination of
+  the axes is evaluated (3,080 per estimator); the curves are the Pareto
+  fronts of rate against distortion per latency budget (0, 33, 100,
+  267 ms) and per technique alone.
+- Decision rule (fixed before any run; `h2.DECISION`, applied by
+  `h2 report`).
+  - Estimator. Five accuracy contests: HInt VISOR PCK@0.05 (all), HInt New
+    Days PCK@0.05 (all), HOT3D PA-MPJPE, HOT3D acceleration error, VISOR
+    median hand-side IoU. A model wins a contest when the 95% bootstrap
+    interval of the paired difference excludes zero (1,000 resamples, by
+    image for HInt, by clip for HOT3D, by item for VISOR). The model with
+    more wins is chosen; on a tie (including no wins) the faster at batch 1.
+    If HaMeR's HInt VISOR PCK@0.05 (all) falls outside 40–47, the protocol
+    does not reproduce the paper, and the run stops there.
+  - Coding, for the chosen estimator. Per latency budget (a combination's
+    latency is the larger of its HOT3D and VISOR values), H3's pose input is
+    the combination with the lowest VISOR rate among those whose HOT3D
+    errors against the truth (both MPJPE and 2D) are at most 5% above the
+    uncoded estimate's; its VISOR rate
+    (kbps over the 34 items, as H1) and VISOR IoU change are reported beside
+    it, and against H1's screen (≤ 10% of SVT-AV1's bits on hands at CRF 62:
+    2.3 kbps against 23.4). The smallest budget whose choice passes the
+    screen is named for H3; if none does, the lowest-rate choice at 100 ms.
+- Hypothesis. HaMeR wins on HInt (in domain) by a few points, WiLoR on
+  HOT3D or neither; no clear winner, so WiLoR is chosen on speed. Most of
+  the pose rate is the estimator's jitter: centred smoothing with ≤ 4 frames
+  of lookahead plus 10–15 Hz cuts the rate at least 4× without moving the
+  error against the truth (smoothing lowers it), and the 100 ms choice
+  passes H1's screen; PCA below 24 components costs accuracy on grasps;
+  constant-velocity prediction does not help once smoothed.
+- Competing explanations. (1) HOT3D's lab scenes and markers favour one
+  model for reasons that do not carry to kitchens; HInt and VISOR test
+  egocentric kitchens directly. (2) Errors against the truth are dominated
+  by the estimator's bias (depth, global rotation), so coding changes are
+  invisible against the truth; the distortion against the uncoded estimate
+  separates the coding error. (3) The PCA subspace, learnt from MANO's scans
+  of free hands, misses grasp poses; its error against the truth at small k
+  tests it.
+- Budget. GPU (A6000 preferred; both models pass on every class): smoke
+  ≤ 600 s each; pilot: 200 HInt hands, 9 HOT3D clips (one per
+  participant), the 4 B2 pilot items, ≤ 1 h; full: HInt test (3,660 hands)
+  with the speed runs, 54 HOT3D clips, 34 VISOR items, ≤ 4 GPU-hours.
+  CPU coding: one host, 16 threads, ≤ 2 h. Ceiling 6 GPU-hours, 10 h wall.
+- Pilots (code `5d1ff5e` for HInt and VISOR, `d8e00e4` for HOT3D (the same
+  `h2.py`); environment
+  `pointstream-20261006T113321Z`; inputs and specs in
+  `pointstream-data/visor/h2-2026-10-09/`). HInt `20261009T215317Z-ebff7963`
+  (gpu2, RTX A6000; 50 hands per split; validator 10/10): PCK@0.05 (all)
+  on VISOR frames HaMeR 52.6, WiLoR 56.2; New Days 58.1, 57.6. HaMeR's 52.6
+  is above the anchor range (40–47) on 50 hands; the full HInt run decides
+  it. Speed (A6000, fp32, regressor only): HaMeR 30.2 ms per hand at batch
+  1 and 16.0 at batch 32, WiLoR 30.1 and 16.6 (both ViT-H, 672 M and 641 M
+  parameters), WiLoR's detector 25.5 ms per frame: the speed tie-break does
+  not separate them. HOT3D `20261009T215354Z-00426e36` (gpu2, RTX A6000;
+  9 clips, one per participant, 2,562 hands; validator 10/10; the numpy
+  MANO reproduces both models after the change of frame to < 1 µm):
+  PA-MPJPE HaMeR 9.5 mm, WiLoR 6.4; acceleration error 4.4 and 5.8
+  mm/frame²; but wrist-aligned MPJPE 19.3 and 31.2 mm, because WiLoR's
+  global orientation is worse (median 16.9° against 7.0°, both hands
+  alike, so not a mirroring error), while its articulation and size are
+  better (size ratio 0.98 against 0.89). PA-MPJPE removes the orientation,
+  which a renderer needs; the report gives orientation error and
+  wrist-aligned MPJPE beside the pre-registered contests.
+- Full HInt `20261009T220226Z-958cda4e` (gpu2, RTX A6000; all 3,660 test
+  hands; 849 s; validator 10/10). PCK@0.05 / 0.10 / 0.15, all joints, as
+  pre-registered (distance over the longer side of HInt's `bbox` grown to
+  3:4): VISOR frames HaMeR 51.3 / 82.3 / 92.5, WiLoR 55.2 / 84.7 / 93.9
+  (difference −3.8, 95% CI −4.5 to −3.2: WiLoR wins); New Days HaMeR 58.1 /
+  84.3 / 92.4, WiLoR 56.6 / 83.9 / 92.6 (+1.6, CI +1.0 to +2.2: HaMeR wins).
+  **The anchor fails**: HaMeR's 51.3 is outside 40–47, so by the rule the
+  estimator decision stops here. Every published HaMeR number is 7–9
+  points lower (all, visible and occluded; both sets), a uniform shift
+  that points at the normalising box, not the model: HInt's `bbox` is
+  padded, 1.24× the extent of the labelled keypoints (median, both axes).
+  Normalised by the keypoints' extent instead (same 3:4 growth), HaMeR
+  scores 39.6 on VISOR frames (paper 43.0) and 48.9 on New Days (paper
+  48.0), WiLoR 43.8 and 47.5; the remaining VISOR gap is plausibly the
+  input crop (HaMeR's evaluation crops around its own box; this run feeds
+  HInt's to both models). Under either normalisation the order is the
+  same: WiLoR ahead on VISOR frames by about 4 points, HaMeR ahead on New
+  Days by about 1.5. How to proceed is the user's decision.
+- Full HOT3D `20261009T220759Z-be2af4a6` (gpu2, RTX A6000; 54 clips, 9
+  participants, 14,585 hands; 1,971 s; validator 10/10). PA-MPJPE HaMeR
+  9.2 mm, WiLoR 6.2 (difference +3.1, 95% CI +2.7 to +3.6: WiLoR wins);
+  acceleration error 5.1 and 6.7 mm/frame² (−1.7, CI −2.0 to −1.3: HaMeR
+  wins). Reported beside them: wrist-aligned MPJPE 20.1 and 29.7 mm, MPVPE
+  19.2 and 28.2 mm, 2D error 6.8% and 7.0% of the box, median global
+  orientation error 7.6° and 14.7°.
+- Coding dev check (not evidence: `h2 code` on the two pilots' outputs, gpu6
+  CPU, code `2611942`; 45 s). It found a crash on tracks shorter than the
+  Gaussian window (fixed, with a test). Values: H1's coding (q1, previous,
+  every frame) costs 12.6 kbps (HaMeR) and 12.4 (WiLoR) on the four VISOR
+  pilot items (H1: 15.2 on all 34). For HaMeR the rule chooses 6.5 kbps at
+  0 ms (q4) and 1.7 kbps at 100 ms (Gaussian 33 ms, 15 Hz linear, q8; VISOR
+  IoU 0.790 uncoded → 0.781). For WiLoR it chooses nothing at any budget:
+  the shape is sent once (the track's median betas) while the uncoded
+  reference keeps each frame's, and WiLoR's betas vary much more than
+  HaMeR's, so even at half H1's step its 2D error against the truth is
+  5.4% above the uncoded one (HaMeR 0.1%), past the 5% limit before any
+  pose coding. One-Euro at these cutoffs lags fast hands (2D error 31 px
+  against 14); centred smoothing lowers the 3D error against the truth
+  (HaMeR 19.16 against 19.34 mm), as hypothesised. The reference for the
+  5% limit is the user's decision.
+- Decisions (user, 2026-10-10, after the HInt full run and the coding dev
+  check; recorded in `h2.DECISION`). (1) HInt is normalised by the
+  labelled keypoints' extent grown to 3:4, and the anchor is HaMeR within
+  4 points of the paper on both sets: 39.6 against 43.0 on VISOR frames
+  (−3.4, the remaining gap read as the input crop), 48.9 against 48.0 on
+  New Days (+0.9); it holds. The pre-registered bbox normalisation is
+  reported beside it. With it, VISOR frames: WiLoR 43.8, HaMeR 39.6
+  (difference −4.2, CI −4.8 to −3.5: WiLoR wins); New Days: HaMeR 48.9,
+  WiLoR 47.5 (+1.4, CI +0.8 to +2.0: HaMeR wins). One hand has fewer than
+  two labelled keypoints and is left out. (2) The coding stage's 5% limit
+  is measured against the uncoded pose with the shape the scheme sends
+  (each track's median betas); the cost of sending the shape once is
+  reported apart for each model.
+- Full VISOR `20261009T220823Z-b309d9a2` (gpu1, Quadro GV100; the other 30
+  items; 3,296 s; validator 8/8) with the pilot `20261009T215322Z-188ed69c`
+  (gpu1, GV100; 4 items): 34 items, 13,592 hand-frames. Hand-side IoU
+  median HaMeR 0.761, WiLoR 0.767 (H1's value exactly; difference −0.006,
+  CI −0.011 to −0.0001: WiLoR wins, narrowly); ≥ 0.6 on 95.0% and 94.7%;
+  2D keypoint acceleration 1.5% of the box for both; orientation flips over
+  45° 0.9 and 0.5 per 1,000 frame pairs.
+- Coding jobs (CPU; inputs the full HOT3D archive and both VISOR archives):
+  `20261010T051916Z-ab13c92e` failed (its smoke ran the whole grid and
+  passed 600 s); `20261010T053138Z-f0470dcf` (gpu2, code `52f6ae5`, smoke on
+  4 clips and 4 items) completed, but its report exposed two defects, so it
+  is not evidence: sending the shape once also moved the wrist (the root
+  was MANO's origin, and the wrist sits at a shape-dependent offset from
+  it), which inflated WiLoR's reference by 8.7 px on HOT3D and let PCA-6 at
+  8° pass the 5% limit with VISOR IoU 0.67; and HaMeR's HOT3D 2D mean was
+  10¹⁶ px from a few joints at the fisheye camera's plane. Fixed (`997432d`:
+  the root sent keeps the wrist where the frame's own shape put it; each
+  joint's 2D error is capped at the image width; both checked by the
+  validator). `20261010T054156Z-d9821c8e` (code `997432d`; 369 s; validator
+  9/9 on smoke and full) is the result. Report (`h2 report`, code
+  `997432d`): `pointstream-data/visor/h2-2026-10-09/report-997432d/`
+  (`h2-report.json` `dfbee96d…10f1`, `code.json` `0c357de5…1b24`).
+- Outcome, estimator. Anchor holds (gaps −3.4 and +0.9). Contests: WiLoR
+  wins HInt VISOR frames, HOT3D PA-MPJPE and VISOR IoU; HaMeR wins HInt New
+  Days and HOT3D acceleration. **WiLoR, 3 to 2.** Speed does not separate
+  them (30 ms per hand each at batch 1).
+- Outcome, coding (WiLoR; rates on VISOR's 34 items as H1, errors on HOT3D
+  against the truth, reference = uncoded pose with the track's shape:
+  29.6 mm, 17.3 px). H1's coding: 15.22 kbps (H1: 15.2). Alone, each
+  technique on H1's: constant-velocity prediction costs more (18.1 kbps);
+  quantization steps ×2 / ×4 / ×8: 11.1 / 7.7 / 5.1 kbps, 2D error against
+  the truth +0.6% / +2% / +7%; PCA 24 / 12 / 6: 14.4 / 8.2 / 5.2 kbps at
+  +3% / +8% / +15% 2D; centred smoothing 33 / 133 ms: 11.4 / 7.7 kbps,
+  2D −0.7% / +3% (MPJPE −0.1% / −0.4%); One-Euro (2 Hz, β 0.5): 9.4 kbps,
+  +10%; 15 Hz held / interpolated: 5.7 kbps, +9% / −0.3% (interpolation
+  costs 50 ms); 7.5 Hz interpolated: 3.2 kbps, +2.5%, 120 ms. Choices (lowest
+  VISOR rate within 5% of the reference on both HOT3D errors): 0 and 33 ms:
+  every frame, steps ×4 (7.7 kbps; VISOR IoU 0.768 → 0.762); 100 ms:
+  Gaussian 33 ms, 15 Hz interpolated, full pose, steps ×8, previous (1.93
+  kbps, 83 ms; HOT3D 29.8 mm, 18.2 px; IoU 0.752); 267 ms: Gaussian 67 ms,
+  7.5 Hz interpolated, ×4 (1.70 kbps, 184 ms; IoU 0.752). H1's screen
+  (2.34 kbps): the 100 ms choice passes and is named for H3; nothing at 0
+  or 33 ms passes. HaMeR's numbers are within 1% of WiLoR's on every rate.
+- Reading. The hypothesis holds on coding and half holds on the estimator.
+  WiLoR is chosen by the rule, but the two trade places by criterion: WiLoR
+  articulates fingers better (PA-MPJPE 6.2 against 9.2 mm) and lands
+  slightly better on VISOR's masks; HaMeR orients the whole hand better on
+  HOT3D (median 7.6° against 14.7°, wrist-aligned MPJPE 20 against 30 mm)
+  and jitters less (acceleration 5.1 against 6.7). PA-MPJPE, the field's
+  standard, removes exactly the orientation a renderer needs, so H3 should
+  measure both on its own renders before committing; swapping estimators
+  is cheap (same boxes, same MANO, same coding). The pose stream is cheap
+  once the estimator's jitter is not coded: interpolating 15 Hz samples of
+  a lightly smoothed pose at 8° steps is 7.9× below H1's rate and 8% of
+  SVT-AV1's bits on hands at CRF 62, at 83 ms of latency; at zero latency
+  quantization alone reaches only 7.7 kbps. Smoothing and interpolation
+  remove jitter rather than motion: against the truth they cost nothing or
+  help, while against the uncoded estimate they look like large errors (8
+  px), which is competing explanation (2): the distortion that matters is
+  against the truth, and the rule measured it there. MANO's PCA subspace
+  hurts accuracy for its rate (competing explanation (3) holds), and
+  constant-velocity prediction amplifies the jitter it predicts.
+- Scope. HOT3D is a lab with markers on the hands; VISOR has no 3D truth,
+  so the coding's effect on kitchens is measured only against the uncoded
+  estimate and by IoU. Rates are entropy estimates pooled over items, not
+  an implemented arithmetic coder; track starts (shape, first pose) are
+  counted apart, as in H1. The latency is lookahead only (no encode or
+  network time).
