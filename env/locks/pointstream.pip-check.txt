@@ -1,9 +1,10 @@
+compressai 1.2.8 requires pybind11, which is not installed.
+compressai 1.2.8 requires tomli, which is not installed.
+hand-tracking-toolkit 0.1 requires opencv-python, which is not installed.
+ultralytics 8.4.6 requires opencv-python, which is not installed.
 hamer 0.0.0 requires chumpy, which is not installed.
 hamer 0.0.0 requires detectron2, which is not installed.
 hamer 0.0.0 requires gdown, which is not installed.
 hamer 0.0.0 requires mmcv, which is not installed.
 hamer 0.0.0 requires opencv-python, which is not installed.
-hamer 0.0.0 requires pandas, which is not installed.
 hamer 0.0.0 requires xtcocotools, which is not installed.
-ultralytics 8.4.6 requires opencv-python, which is not installed.
-hand-tracking-toolkit 0.1 requires opencv-python, which is not installed.
