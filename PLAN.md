@@ -303,7 +303,9 @@ the playback time after which the model's bytes would be repaid.
   code is in the pinned DCVC revision (`train_video.py`, `training.md`) and is
   audited into the environment first.
 - *Clips*: long ones first, since they are the ones the paper will present.
-  The 10 VISOR stretches (120 s at 10 frames/s): fit on 0–96 s, score 96–120 s.
+  The 10 VISOR stretches (120 s at 10 frames/s): score G5's 24 s excerpt,
+  which holds the stretch's dense-mask window (96–120 s has dense masks on
+  one stretch only), and fit on the rest of the stretch less 5 s on each side.
   The 34 windows (4–4.8 s) are too short to split and are secondary.
 - *Metric*: LPIPS on the visible background (foreground pasted back, as in G2)
   is the gate, and training may optimize it directly, as codecs optimize PSNR.
