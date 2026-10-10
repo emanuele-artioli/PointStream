@@ -332,6 +332,14 @@ within 5% of the uncoded estimate's error against HOT3D's motion capture;
 it passes H1's rate screen (10% of SVT-AV1's hand bits at CRF 62). At zero
 latency the best is 7.7 kbps.
 
+H2b (2026-10-10,
+[outcome](docs/experiments.md#2026-10-10--h2b-a-hybrid-of-the-two-estimators)):
+a hybrid of WiLoR's fingers and HaMeR's orientation, chosen on H2's HOT3D
+clips, was tested on new clips, HInt and VISOR under a rule fixed
+beforehand. Its 3D gain replicated, but it is worse than both models in the
+image (HInt PCK 35.6 against 43.7, VISOR IoU 0.739 against 0.768): the
+parts do not compose. WiLoR stays.
+
 
 The comparison already planned, a paper table on its own: 2D PCK on HInt
 VISOR test (and New Days), 3D error against HOT3D motion capture, speed, and
