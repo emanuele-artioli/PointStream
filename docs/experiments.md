@@ -2724,8 +2724,24 @@ invocation turns out to be needed.
   - Two limits bound what the pass means. The warps here use the target's
     own motion, which a pose-driven renderer must approximate from a coded
     pose (H2: 17 px median 2D joint error on HOT3D). And the margin
-    disappears when a reference costs 3–5× an inter-coded frame, which is
-    the likely range for an image coded on its own.
-  - So the textured-mesh renderer is built next, as the rule says. Its
-    reference cost must be measured, not assumed, and references sent at
-    CRF 48 with a refresh near one hand-frame in four are where to start.
+    disappears when a reference costs 3–5× an inter-coded frame. References
+    need not be coded on their own: they can be sent as their own
+    low-frame-rate SVT-AV1 stream, each predicted from the last reference
+    (user, 2026-10-10). Its cost (frames about four apart at 26% refresh)
+    is measurable and has not been measured.
+- Equal-quality view (computed after the rule from `h3a.json`; not part of
+  the decision). The rule compares at equal rate and holds SVT-AV1 at CRF
+  62's quality below CRF 62's rate, which understates the oracle. Measured
+  as the rate SVT-AV1 needs for the oracle's LPIPS (per item, linear in
+  log-rate between CRF points; points worse than CRF 62 have no SVT-AV1
+  match and are counted apart), the median saving on hand pixels is:
+  - CRF 48 references, δ 0.02: 65% at the inter-frame cost, 32% at 2×, −1%
+    at 3×.
+  - CRF 55 references, δ 0.02: 71%, 46%, 21%.
+  - CRF 55 references, δ 0.05: 74%, 54%, 34% (28 items; 6 are worse than
+    CRF 62).
+  The oracle's rate is about 95% references and 5% pose. Between
+  references the frames are warped by the true flow, not generated from the
+  pose. So it bounds texture transfer with refresh, not a generator that
+  renders from one reference and the pose alone. Such a generator would
+  cost about the pose stream (2 kbps) and needs its own test.
