@@ -287,7 +287,7 @@ def command_finetune(args: argparse.Namespace) -> int:
             "steps": args.steps, "monitor_every": max(1, args.steps // 10), "save_every": max(1, args.steps // 10),
             "lpips_weight": args.lpips_weight, "lpips_backbone": args.lpips_backbone,
             "dists_weight": args.dists_weight, "dists_backbone": args.dists_backbone,
-            "temporal_weight": args.temporal_weight,
+            "temporal_weight": args.temporal_weight, "dists_every": args.dists_every,
             "image_ckpt": args.image_ckpt, "image_sha256": file_sha256(Path(args.image_ckpt)),
             "video_ckpt": args.video_ckpt, "video_sha256": file_sha256(Path(args.video_ckpt)),
             "out": str(work / "model"), "resume_dir": str(checkpoints) if checkpoints else None}
@@ -346,7 +346,8 @@ def command_finetune(args: argparse.Namespace) -> int:
     row = {**clip.record, "kind": "finetune", "arm": arm, "fit": args.fit, "fit_clip": fit_id,
            "fit_frames": len(fit), "guard_s": GUARD_S if args.fit == "scene" else None,
            "lpips_weight": args.lpips_weight, "dists_weight": trained.get("dists_weight", 0.0),
-           "temporal_weight": args.temporal_weight, "fill": fill_name, "steps": args.steps, "train": {**TRAIN, **{k: plan[k] for k in (
+           "temporal_weight": args.temporal_weight, "dists_every": args.dists_every, "fill": fill_name,
+           "steps": args.steps, "train": {**TRAIN, **{k: plan[k] for k in (
                "groups", "patch", "monitor_batch", "monitor_every")}},
            "model": {k: trained[k] for k in ("checkpoint_sha256", "checkpoint_bytes", "parameters")},
            "model_bytes_fp16": 2 * trained["parameters"], "billed": False,
@@ -622,6 +623,7 @@ def main(argv: list[str] | None = None) -> int:
     ft.add_argument("--dists-backbone", default=None, help="VGG16 for DISTS (scoring, and the loss if weighted)")
     ft.add_argument("--dists-weight", type=float, default=0.0,
                     help="DISTS on V in the loss; -1: set at step 0 so it equals the LPIPS term on the monitor set")
+    ft.add_argument("--dists-every", type=int, default=1, help="DISTS in the loss on every Nth frame of a group")
     ft.add_argument("--temporal-weight", type=float, default=0.0,
                     help="the change of the coding error between consecutive frames on V, in the loss")
     ft.set_defaults(func=command_finetune)

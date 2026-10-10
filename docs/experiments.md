@@ -2433,6 +2433,22 @@ invocation turns out to be needed.
   VGG16 on every frame, activations recomputed), and E's runs only if
   540 steps fit in 45 minutes; otherwise DISTS on one frame per group,
   recorded. Ceiling 15 GPU-hours.
+- Calibration of E (`20261010T214417Z-5328894d`, P06_03, 40 steps, Ada,
+  code `0adcbd5`): DISTS on every frame costs 7.4 s per step (3.3 without)
+  and peaks at 45.7 GiB, so 540 steps would take 67 minutes. As the budget
+  says, E runs with DISTS on the first frame of each group (4 of 32
+  frames, `--dists-every 8`), its weight 8 times the step-0 match so its
+  share stays equal to the LPIPS term (δ = 0.038 per frame at step 0
+  before the factor). Not evidence.
+- The temporal weight was wrong. The same monitor set at step 0 has the
+  temporal term at 0.00057 against a masked distortion of 0.0052: DCVC-UF's
+  coding errors are strongly correlated between frames, so the term is
+  about a tenth of the distortion, not twice it, and γ = 0.5 gives it about
+  5% of the distortion's weight instead of an equal share. F runs as
+  submitted (its answer: a weak term changes nothing, or does), and **F2**
+  is added before its runs: β = 0.026 with γ = 9, so γ times the term
+  equals the distortion at step 0, as intended. Rule (3) applies to F2
+  as to F; if both qualify, the one with less flicker is adopted.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could

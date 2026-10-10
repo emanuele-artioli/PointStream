@@ -21,7 +21,8 @@ with λ from `get_training_lambdas`), with these differences:
 * Optionally (G5c) DISTS on V (torchmetrics' head on VGG16, every layer's
   statistics weighted by V, foreground pasted back) with weight ``dists_weight``
   (negative: set at step 0 so that it equals the LPIPS term on the monitor
-  set), and a temporal term with weight ``temporal_weight``: the mean square of
+  set; with ``dists_every`` > 1 only every such frame of a group is scored and
+  the weight grows by the same factor), and a temporal term with weight ``temporal_weight``: the mean square of
   the change of the coding error between consecutive frames on V of both,
   ((x̂_t − x̂_{t−1}) − (x_t − x_{t−1}))², so a decoded video that changes
   as the source does costs nothing.
@@ -222,7 +223,8 @@ def masked_lpips(net: Any, x: Any, x_hat: Any, mask: Any) -> Any:
 
 def run_sequence(p_net: Any, i_net: Any, x: Any, mask: Any, qp: Any, lambdas: Any, lpips: Any,
                  lpips_weight: float, delay: int, measure_lpips: bool = False, dists: Any = None,
-                 dists_weight: float = 0.0, temporal_weight: float = 0.0) -> tuple[Any, dict[str, float]]:
+                 dists_weight: float = 0.0, temporal_weight: float = 0.0,
+                 dists_every: int = 1) -> tuple[Any, dict[str, float]]:
     """One cascaded sequence: I frame from the frozen image model, then groups of ``delay`` frames. LPIPS on V,
     DISTS on V and the temporal term enter the distortion with their weights; with ``measure_lpips`` each
     available one is only reported."""
@@ -249,7 +251,7 @@ def run_sequence(p_net: Any, i_net: Any, x: Any, mask: Any, qp: Any, lambdas: An
                 lp_frame.append(lp.detach())
                 if lpips_weight > 0:
                     d = d + lpips_weight * lp
-            if dists is not None and (dists_weight > 0 or measure_lpips):
+            if dists is not None and (dists_weight > 0 or measure_lpips) and (t - frames[0]) % dists_every == 0:
                 ds = masked_dists(dists, x[t], x_hat, mask[t])
                 ds_frame.append(ds.detach())
                 if dists_weight > 0:
@@ -318,6 +320,7 @@ def train(plan: dict[str, Any]) -> dict[str, Any]:
     lpips = load_lpips(plan["lpips_backbone"], device)  # the monitor set always reports LPIPS on V
     dists = load_dists(plan["dists_backbone"], device) if plan.get("dists_backbone") else None
     weights = {"dists": float(plan.get("dists_weight") or 0.0), "temporal": float(plan.get("temporal_weight") or 0.0)}
+    dists_every = int(plan.get("dists_every") or 1)  # DISTS on every dists_every-th frame of a group
 
     # The monitor set: fixed crops and QPs spread over the range, drawn once.
     monitor_rng = np.random.default_rng(plan["seed"] + 7919)
@@ -334,7 +337,8 @@ def train(plan: dict[str, Any]) -> dict[str, Any]:
                 x, m, qp = x.to(device), m.to(device), qp.to(device)
                 _, info = run_sequence(p_net, i_net, x, m, qp, lambda_table.to(device)[qp.long()], lpips,
                                        plan["lpips_weight"], g_frame_delay, measure_lpips=True, dists=dists,
-                                       dists_weight=max(0.0, weights["dists"]), temporal_weight=weights["temporal"])
+                                       dists_weight=max(0.0, weights["dists"]), temporal_weight=weights["temporal"],
+                                       dists_every=dists_every)
                 for k, v in info.items():
                     totals.setdefault(k, []).append(v)
         return {k: float(np.mean(v)) for k, v in totals.items()}
@@ -353,7 +357,8 @@ def train(plan: dict[str, Any]) -> dict[str, Any]:
     if step == 0:
         curve.append({"step": 0, **evaluate()})
         if weights["dists"] < 0:  # equal to the LPIPS term on the monitor set at step 0
-            weights["dists"] = plan["lpips_weight"] * curve[0]["lpips_v"] / curve[0]["dists_v"]
+            # on every dists_every-th frame only, so its weight grows by that factor to keep the same share
+            weights["dists"] = dists_every * plan["lpips_weight"] * curve[0]["lpips_v"] / curve[0]["dists_v"]
             emit({"event": "dists_weight", "value": weights["dists"]})
         emit({"event": "monitor", **curve[-1]})
 
@@ -364,7 +369,7 @@ def train(plan: dict[str, Any]) -> dict[str, Any]:
         x, m, qp = x.to(device, non_blocking=True), m.to(device, non_blocking=True), qp.to(device)
         loss, info = run_sequence(p_net, i_net, x, m, qp, lambda_table.to(device)[qp.long()], lpips,
                                   plan["lpips_weight"], g_frame_delay, dists=dists, dists_weight=weights["dists"],
-                                  temporal_weight=weights["temporal"])
+                                  temporal_weight=weights["temporal"], dists_every=dists_every)
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         norm = torch.nn.utils.clip_grad_norm_(p_net.parameters(), max_norm=0.2, error_if_nonfinite=False).item()
