@@ -2606,3 +2606,79 @@ invocation turns out to be needed.
   route to a better pose; a per-frame choice was already ruled out by H2's
   data (HaMeR closer on 72% of HOT3D hand-frames in every depth quartile).
   What remains of the orientation gap is H3's to measure on renders.
+
+### 2026-10-10 — H3a: texture-transfer oracle for hand rendering
+- Question. Could a renderer that carries a hand's appearance from
+  reference frames sent earlier beat SVT-AV1 on VISOR's hand pixels at equal
+  rate? This covers a textured MANO mesh, a mesh with a learned residual,
+  and a forearm drawn from the mask's extent. LPIPS decides, with PSNR
+  reported beside it (user, 2026-10-10): the render replaces the pixels, as
+  in GenStream. H1 bounds the pixel route: carried by homographies, a hand's
+  reference falls below 30 dB within 0.04 s (median). So a render will not
+  reach SVT-AV1's PSNR without a residual, and the open question is
+  perceptual.
+- Region. Per frame of evaluation set v2's 240-frame windows: the union of
+  VISOR's left- and right-hand masks (mask set `visor_dense_sam_fill`, whose
+  hands are B1's), forearm included, since H3 renders the arm too (H1:
+  49.7% of the hand masks).
+- SVT-AV1. B2's streams at CRF 41, 48, 55 and 62, decoded by dav1d. Each
+  frame is composited: decoded pixels inside the region, source pixels
+  outside, so only the hands differ. Per frame: PSNR and LPIPS inside the
+  region, with B2's RGB view and LPIPS (AlexNet spatial map at full
+  resolution, mean inside the region). Rate: H1's bits on the same pixels at
+  that CRF (hand + forearm + hand without fit, fill set, per item).
+- Oracle, per CRF c and margin δ. Frames are taken in order. The bank holds
+  the frames sent so far as references, each as SVT-AV1 decoded it at c.
+  - For a frame with a hand, each of the 6 most recent references is warped
+    to it by DIS optical flow from the source frame to the reference's
+    source frame. This is the oracle's advantage: the motion comes from the
+    target itself.
+  - The warp with the lowest squared error in the region is kept. If its
+    LPIPS exceeds SVT-AV1's at c on that frame by more than δ, or the bank
+    is empty, the frame is sent as a new reference and shows SVT-AV1's
+    decoded pixels.
+  - Rate: references × b_c + the pose stream. b_c is SVT-AV1's bits on the
+    hand pixels at c per hand-frame: an inter-coded frame's cost, below
+    what a reference sent alone would cost. The pose stream is H2's chosen
+    coding of WiLoR on VISOR (`code.json`, 100 ms budget: 1.93 kbps), though
+    the oracle does not use it.
+  - δ ∈ {0.02, 0.05, 0.10}.
+- Why it bounds the gated renderers. They place reference pixels by a
+  warp driven by the decoded pose. The oracle has every advantage over them:
+  true motion from the target, the target's own mask, references chosen
+  using the target, and an optimistic reference cost. It does not bound
+  renderers that synthesise appearance found in no reference
+  (pose-conditioned generation, learned shading); a learned residual only
+  partly.
+- Decision rule (fixed before any run; `h3.ORACLE_DECISION`, applied by
+  `h3 report`).
+  - Per item and per operating point (c, δ), the oracle's mean region LPIPS
+    is compared with SVT-AV1's at the oracle's rate. SVT-AV1's value is
+    linear in log-rate between CRF points; below CRF 62's rate it is CRF
+    62's value, and above CRF 41's it is CRF 41's.
+  - The difference (oracle − SVT-AV1) is averaged over the 34 items, with a
+    95% paired bootstrap interval (1,000 resamples by item).
+  - **The oracle passes if the mean difference is below zero at some
+    (c, δ).** The point estimate decides, because a bound should err toward
+    building.
+  - Pass: a textured-mesh renderer (hand and forearm) is built next, run on
+    WiLoR's and HaMeR's coded poses (PLAN H3), and scored the same way.
+  - Fail: no texture-transfer renderer is built. The outcome says whether
+    refreshes or warp quality failed. Pose-conditioned generation would need
+    its own oracle, and the user decides whether to pursue it.
+  - Reported beside: PSNR at equal rate, the share of hand-frames sent as
+    references, and the difference with references costing 3× and 5× b_c
+    (closer to an intra frame).
+- Hypothesis. The oracle passes at low rate. With CRF 41 or 48 references
+  sent on 10–30% of hand-frames, the warps stay within δ of the
+  references' LPIPS at a rate near CRF 62's, below CRF 62's LPIPS (B2's
+  frame LPIPS: 0.101 at CRF 41, 0.165 at CRF 62). At 3× reference cost the
+  margin halves.
+- Competing explanation. Hands change appearance faster than references can
+  be refreshed: articulation shows new surfaces, and blur and held objects
+  occlude them. H1's references died in 0.04 s, so refreshes are needed on
+  most frames and the oracle tracks SVT-AV1's curve without beating it.
+- Budget. GPU only for LPIPS; flow and warps on 16 CPU threads. Smoke: one
+  item, 48 frames, ≤ 600 s, including a CPU-against-GPU LPIPS check. Pilot:
+  B2's four pilot items (P01_107, P09_106, P02_02, P03_10), ≤ 45 min. Full:
+  the other 30 items in parts of ≤ 45 min. Ceiling 3 GPU-hours, 5 h wall.
