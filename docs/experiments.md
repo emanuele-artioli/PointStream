@@ -2103,3 +2103,12 @@ invocation turns out to be needed.
   is measured against the uncoded pose with the shape the scheme sends
   (each track's median betas); the cost of sending the shape once is
   reported apart for each model.
+- Full VISOR `20261009T220823Z-b309d9a2` (gpu1, Quadro GV100; the other 30
+  items; 3,296 s; validator 8/8) with the pilot `20261009T215322Z-188ed69c`
+  (gpu1, GV100; 4 items): 34 items, 13,592 hand-frames. Hand-side IoU
+  median HaMeR 0.761, WiLoR 0.767 (H1's value exactly; difference −0.006,
+  CI −0.011 to −0.0001: WiLoR wins, narrowly); ≥ 0.6 on 95.0% and 94.7%;
+  2D keypoint acceleration 1.5% of the box for both; orientation flips over
+  45° 0.9 and 0.5 per 1,000 frame pairs.
+- Coding job `20261010T051916Z-ab13c92e` (CPU, code `6a3895a`+; inputs the
+  full HOT3D and both VISOR archives).
