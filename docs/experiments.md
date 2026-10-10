@@ -1921,6 +1921,49 @@ invocation turns out to be needed.
   price, and the model is fitted to the scored frames with a loss on V.
   The bound is for this correction model; a stronger conditional coder is
   DCVC-UF given the warped refresh (G2's arm (b)), not tested here.
+- Runs so far (`33cd300` and later; environment `pointstream-20261009T214002Z`;
+  every validator passed unless said).
+  - *Baselines.* `20261009T221753Z-64ab816f` (CPU, all 44 clips) ran past its
+    2,700 s allowance after 14 windows (about 3.2 min per clip, mostly
+    inpainting and scoring). Its per-clip checkpoint kept them; they are
+    read from its `partial.tar` (`report` accepts one clip's
+    `baselines.json`). The other 30 clips ran in four CPU shards by explicit
+    clip list: `20261009T230937Z-17f60d9f`, `20261009T230943Z-a6010e7f`,
+    `20261009T230949Z-be5deada` and `20261009T230954Z-4c28fc16`. CPU jobs
+    cannot declare a resume, so the shards replace one.
+  - *DCVC-UF* `20261009T221918Z-c483803d` (gpu6, Ada; deterministic decode,
+    intra matches). This job processes 3 clips without a per-clip
+    checkpoint, against the fleet rule; it ran 10 min.
+  - *Arm B* (`33cd300`; P02_12 and P03_120, three settings each):
+    `20261009T230416Z-0e6c0458`, `…230421Z-60b64028`, `…230427Z-c83b3a52`,
+    `…230433Z-991477d7`, `…230438Z-39ed6c81` and `…230443Z-475686e3` (gpu2
+    A6000 and gpu6 Ada, 4–7 min each). On P02_12, against SVT-AV1 on the
+    filled input (127, 271 and 425 kbps for 31.0, 33.6 and 34.9 dB):
+
+    | Refresh CRF, λ | warp (kbps → PSNR_V) | cond (kbps → PSNR_V) | cond's weights, latents |
+    |---|---|---|---|
+    | 59, 200 | 191 → 31.03 | 369 → 31.02 | 172, 6 kbps |
+    | 50, 800 | 310 → 32.64 | 664 → 32.63 | 301, 53 kbps |
+    | 40, 3200 | 473 → 33.58 | 1,166 → 33.61 | 552, 141 kbps |
+
+    The model never helps: at most 0.03 dB for 180–690 kbps. Its curve is
+    flat from epoch 30, and every run passes the convergence check. What a
+    warped 0.1 s refresh leaves (G1e: photometric change and independent
+    motion) is not low-frequency enough for a 1/12-resolution latent to
+    correct cheaply, and the per-clip weights alone cost more than SVT-AV1's
+    whole stream at that quality.
+  - *Arm A, part 1.* P02_12 at λ = 200: `20261009T222809Z-f3873f4a` (gpu6
+    Ada, 2,322 s, converged: +0.06 dB over its last 30 epochs). Part 2:
+    `20261009T235421Z-d60d9f80` (gpu2 A6000, 571 s): **2,129 kbps for
+    35.45 dB PSNR_V** (LPIPS 0.072), decoded from its 1,065,336-byte
+    bitstream; render 25.8 ms per frame (A6000, PNG writing included).
+    SVT-AV1 needs 594 kbps for 35.65 dB, so NVRC needs about 3.6 times the
+    rate. Only one RTX 6000 Ada was free (the others hold other users'
+    processes), so the 7 pending part-1 jobs were cancelled before they
+    started and resubmitted with the decision's order first (λ = 200 on
+    P03_120 and P26_02, then λ = 50, then λ = 800) and a 12:00 deadline.
+    The wall time thus exceeds this entry's 6 h ceiling. GPU-hours stay
+    within it.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
