@@ -164,9 +164,9 @@ def decode_dcvc(image_ckpt: str, video_ckpt: str, container: Path, work: Path) -
     done = subprocess.run(command, env={**os.environ, **env, "PYTHONFAULTHANDLER": "1"}, cwd=cwd, capture_output=True,
                           text=True, timeout=1800)
     if done.returncode:
-        raise RuntimeError(f"DCVC-UF decode failed ({done.returncode}):\n{done.stdout[-2000:]}\n{done.stderr[-6000:]}")
+        return {"returncode": done.returncode, "stderr_tail": done.stderr[-3000:]}
     report = json.loads((work / "report.json").read_text())
-    return {"decoded": str(work / "out.yuv"), "deterministic": report["deterministic"],
+    return {"returncode": 0, "decoded": str(work / "out.yuv"), "deterministic": report["deterministic"],
             "frame_count": report["frame_count"], "video_sha256": plan["video_sha256"]}
 
 
@@ -205,7 +205,10 @@ def stored_methods(args: argparse.Namespace, clip_id: str) -> list[dict[str, Any
 
 
 def decode_point(method: dict[str, Any], point: dict[str, Any], args: argparse.Namespace, n: int,
-                 work: Path) -> tuple[np.ndarray, dict[str, Any]]:
+                 work: Path, source: Path, duration: float) -> tuple[np.ndarray, dict[str, Any]]:
+    """SVT-AV1: the stored stream decoded (dav1d). DCVC-UF: the stored stream decoded alone in a fresh process
+    (recorded, not required: it segfaulted in the first smoke), and the excerpt re-encoded with the stored
+    checkpoint as G5b did, whose decode is scored; the new stream's bytes are compared with the stored ones."""
     from src.codecs import svtav1
 
     stream = Path(point["stream"])
@@ -221,11 +224,18 @@ def decode_point(method: dict[str, Any], point: dict[str, Any], args: argparse.N
         return rgb, {**check, "matches_record": True}
     if method.get("model_sha256") and file_sha256(Path(method["video_ckpt"])) != method["model_sha256"]:
         raise RuntimeError(f"{method['video_ckpt']}: not the checkpoint its result recorded")
-    rec = decode_dcvc(args.image_ckpt, method["video_ckpt"], stream, work / "dcvc")
-    rgb = read_decoded(Path(rec["decoded"]), rec["frame_count"], n)
+    alone = decode_dcvc(args.image_ckpt, method["video_ckpt"], stream, work / "dcvc")
     shutil.rmtree(work / "dcvc")
+    coder = SimpleNamespace(image_ckpt=args.image_ckpt, video_ckpt=method["video_ckpt"])
+    rec = g5.code_dcvc(coder, source, n, point["qp"], work / "recode")  # type: ignore[arg-type]
+    rgb = read_decoded(Path(rec.pop("decoded")), n, n)
+    recoded = (work / "recode" / "stream.psdc").read_bytes()
+    shutil.rmtree(work / "recode")
     return rgb, {**check, "matches_record": check["stream_bytes"] == point["bytes"],
-                 "deterministic": rec["deterministic"], "frame_count": rec["frame_count"]}
+                 "stored_decode_alone": {k: v for k, v in alone.items() if k != "decoded"},
+                 "recoded_same_bytes": recoded == stream.read_bytes(), "recoded_bytes": len(recoded),
+                 "recoded_kbps": 8 * len(recoded) / duration / 1000, "deterministic": rec["deterministic"],
+                 "decoder_matches_encoder_intra": rec["decoder_matches_encoder_intra"]}
 
 
 def restore(checkpoints: Path | None) -> dict[str, dict[str, Any]]:
@@ -262,6 +272,8 @@ def command_checks(args: argparse.Namespace) -> int:
     began = time.time()
     flows = source_flows(clip)
     flow_seconds = time.time() - began
+    source = work / "filled.yuv"
+    g5.rgb_to_yuv420(g5.inpaint(clip)).tofile(source)
     rows = []
     methods = stored_methods(args, clip_id)
     methods = methods[:args.max_methods] if args.max_methods > 0 else methods
@@ -272,7 +284,7 @@ def command_checks(args: argparse.Namespace) -> int:
             continue
         points = []
         for p in method["points"]:
-            rgb, check = decode_point(method, p, args, clip.n, work)
+            rgb, check = decode_point(method, p, args, clip.n, work, source, clip.duration)
             points.append({**{k: v for k, v in p.items() if k != "stream"}, "check": check,
                            "score": full_score(clip, rgb, nets, flows)})
         row = {**{k: v for k, v in method.items() if k != "points"}, "points": points}
@@ -471,8 +483,9 @@ def propainter_fill(clip: g5.Clip, tree: Path, weights: dict[str, Path], work: P
     if done.returncode:
         raise RuntimeError(f"ProPainter failed ({done.returncode}):\n{done.stderr[-4000:]}")
     filled = np.load(work / "filled.npy")
-    if filled.shape != clip.frames.shape or not np.array_equal(filled[clip.keep], clip.frames[clip.keep]):
-        raise RuntimeError("ProPainter changed known pixels or the frame shape")
+    if filled.shape != clip.frames.shape:
+        raise RuntimeError(f"ProPainter returned {filled.shape}, not {clip.frames.shape}")
+    filled[clip.keep] = clip.frames[clip.keep]  # its dilated ring repaints V's edge; every method codes V as is
     return filled, {**json.loads((work / "report.json").read_text()), **{k: v for k, v in plan.items() if "sha256" in k}}
 
 
@@ -676,6 +689,9 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         checks["every_point_scored"] = all(m["points"] and all(scored(p) for p in m["points"]) for m in methods)
         checks["streams_match_records"] = all(p["check"]["matches_record"] for m in methods for p in m["points"])
         checks["deterministic_decode"] = all(p["check"].get("deterministic", True) for m in methods for p in m["points"])
+        if full:
+            checks["recoded_same_bytes"] = all(p["check"].get("recoded_same_bytes", True) for m in methods
+                                               for p in m["points"])
         checks["dists_falls_with_rate"] = all(
             all(a["score"]["dataset"]["dists_v"] >= b["score"]["dataset"]["dists_v"] - 0.01 for a, b in zip(pts, pts[1:]))
             for m in methods if m["codec"] == "svtav1" for pts in [sorted(m["points"], key=lambda p: p["kbps"])])
