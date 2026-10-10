@@ -113,6 +113,72 @@ def lpips_record(backbone: Path) -> dict[str, Any]:
     }
 
 
+def dists_network(vgg_state: dict[str, Any] | None) -> Any:
+    """torchmetrics' DISTS (its alpha/beta) on a VGG16 with ``vgg_state``, never downloaded (random without one)."""
+    from unittest import mock
+
+    import torchvision
+    from torchmetrics.functional.image import dists as module
+
+    vgg = torchvision.models.vgg16(weights=None)
+    if vgg_state is not None:
+        vgg.load_state_dict(vgg_state, strict=True)
+    with mock.patch.object(module, "vgg16", lambda weights=None: vgg):
+        return module.DISTSNetwork(load_weights=True).eval()
+
+
+def load_dists(backbone: Path, device: str) -> Any:
+    """DISTS with the VGG16 backbone read from ``backbone``."""
+    import torch
+
+    return dists_network(torch.load(backbone, map_location="cpu", weights_only=True)).to(device)
+
+
+def masked_dists(net: Any, x: Any, y: Any, mask: Any) -> Any:
+    """DISTS of (b, 3, h, w) images in [0, 1] with every layer's statistics weighted by ``mask`` (b, 1, h, w),
+    resized to the layer by area average; DISTS exactly when the mask is all ones. One value per image."""
+    import torch
+    import torch.nn.functional as F
+
+    with torch.inference_mode():
+        fx, fy = net.forward_once(x), net.forward_once(y)
+        total = net.alpha.sum() + net.beta.sum()
+        alpha = torch.split(net.alpha / total, net.chns, dim=1)
+        beta = torch.split(net.beta / total, net.chns, dim=1)
+        structure = texture = torch.zeros(x.shape[0], 1, 1, 1, device=x.device)
+        c1 = c2 = 1e-6
+        for k, (a, b) in enumerate(zip(fx, fy)):
+            w = F.adaptive_avg_pool2d(mask.float(), a.shape[-2:])
+            w = w / w.sum((2, 3), keepdim=True).clamp_min(1e-12)
+
+            def mean(t: Any) -> Any:
+                return (t * w).sum((2, 3), keepdim=True)  # noqa: B023 (w of this layer)
+
+            a_mean, b_mean = mean(a), mean(b)
+            s1 = (2 * a_mean * b_mean + c1) / (a_mean**2 + b_mean**2 + c1)
+            a_var, b_var = mean((a - a_mean) ** 2), mean((b - b_mean) ** 2)
+            cov = mean(a * b) - a_mean * b_mean
+            s2 = (2 * cov + c2) / (a_var + b_var + c2)
+            structure = structure + (alpha[k] * s1).sum(1, keepdim=True)
+            texture = texture + (beta[k] * s2).sum(1, keepdim=True)
+        return 1 - (structure + texture).flatten()
+
+
+def dists_record(backbone: Path) -> dict[str, Any]:
+    import hashlib
+
+    import torchmetrics
+    from torchmetrics.functional.image import dists as module
+
+    weights = Path(module.__file__).parent / "dists_models" / "weights.pt"
+    return {
+        "metric": "DISTS", "net": "vgg16", "torchmetrics": torchmetrics.__version__,
+        "weights": str(weights), "weights_sha256": hashlib.sha256(weights.read_bytes()).hexdigest(),
+        "backbone": str(backbone), "backbone_sha256": hashlib.sha256(Path(backbone).read_bytes()).hexdigest(),
+        "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)",
+    }
+
+
 def _region_sum(values: Any, mask: Any) -> tuple[Any, Any]:
     """Per-frame sum and count of ``values`` (n, h, w) inside ``mask`` (n, h, w)."""
     return (values * mask).flatten(1).sum(1), mask.flatten(1).sum(1)

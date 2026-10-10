@@ -2211,6 +2211,82 @@ invocation turns out to be needed.
   stretches) waits for the user: the result changes what the rest should
   measure (per-scene against a pooled egocentric model).
 
+### 2026-10-10 — G5c: scene model at scale, step 1 (checks without training)
+- Question (PLAN G5c 1): before any more training, does G5b's LPIPS gain
+  hold on a metric the model never trained on (DISTS), does the scene
+  model flicker, and how small can the model be sent?
+- Scope. G5b's pilot excerpts (P26_02, P06_03; the gate tier as in G5b)
+  and every coded method there: SVT-AV1 (G5's 12 streams per stretch),
+  DCVC-UF off the shelf (G5b's `dcvc` streams) and G5b's five fine-tuned
+  arms per stretch (upper bound and scene at β = 0 and 0.026, control).
+  The checks decode the published streams with the published checkpoints;
+  nothing is re-encoded or retrained, and every stream's bytes are checked
+  against the size its result recorded (`experiments/background/g5c.py`
+  `checks`).
+- **DISTS on V.** torchmetrics 1.9's DISTS (its alpha/beta, `weights.pt`
+  `f5e65c96…8218`) on the VGG16 backbone `Models/DISTS/vgg16-397923af.pth`
+  (`397923af…5bf0`, copied from the shared torch hub cache like LPIPS's
+  AlexNet; the user approved the download, which turned out unneeded). As
+  for LPIPS, the source foreground is pasted into the decoded frame; DISTS
+  pools whole feature maps, so V enters as weights: every layer's means,
+  variances and covariance are taken over V resized to that layer (area
+  average). With V the whole frame this is DISTS exactly (a test checks
+  it). BD-rate on q = −100 × DISTS_V, as LPIPS.
+- **Flicker on V.** For each pair of consecutive excerpt frames, DIS flow
+  on the source (G5's `oracle_flows`) warps frame t−1 onto t; the
+  method's temporal residual (decoded t − warped decoded t−1) minus the
+  source's (source t − warped source t−1), on luma, mean absolute value
+  over V of both frames inside the image, averaged over pairs (all 240
+  frames, the own tier's masks). Zero means the decoded video changes
+  exactly as the source does; real motion and flow error cancel. Also
+  reported: the decoded and source residual energies, and BD-rate on
+  q = −flicker against SVT-AV1.
+- **Model size** (`g5c.py` `compress`), on the two β = 0.026 scene models.
+  Variants: the whole model at 16 bits (G5b's, re-coded as a check:
+  same bytes) and at 8, 4 and 2 bits; the change from the public HT-L
+  weights (which the client has) at 8, 4 and 2 bits, dense, and with only
+  the largest 10% of changes per tensor kept. Tensors of 1,024 or more
+  values are quantized per output channel (symmetric uniform, fp16
+  scales); smaller ones stay fp16 (whole) or fp16 differences (change).
+  Size is the bytes of an actual coder (LZMA, per tensor), with the
+  zeroth-order entropy beside it; payback as in G5b. Each variant loads
+  strictly into B2's worker and re-codes the excerpt at QP 9/27/45/63.
+- Decision rules, fixed now (`g5c.DECISION`):
+  - DISTS: the LPIPS gain *transfers* if the β = 0.026 scene model beats
+    SVT-AV1 on DISTS_V (BD < 0) on P06_03, where it beat it on LPIPS_V.
+    If not, the paper calls the gain LPIPS-specific and step 2's
+    DISTS-in-the-loss arm runs first.
+  - Flicker: *found* if, on either stretch, the β = 0.026 scene model is
+    worse than SVT-AV1 at equal rate (BD on q = −flicker > 0, or no
+    overlap with all its points worse). Then a temporal term joins the
+    loss in step 2 (PLAN G5c 2).
+  - Size: a variant *keeps quality* if its BD-rate on LPIPS_V against the
+    16-bit model's curve is at most +5%. The smallest such variant sets
+    the model size for steps 2–5 and the paper's payback; all variants
+    are reported by size.
+- Hypotheses. DISTS transfers but less: BD against SVT-AV1 on P06_03
+  between −30% and −60% (DISTS tolerates resampled texture, which is what
+  β > 0 makes). Flicker is found for β = 0.026 and not for β = 0: G5b's
+  visual check saw synthesized lines and stains move or vanish. The 8-bit
+  whole model keeps quality and 4-bit does not; the change from the
+  public weights is small (540 steps at 1e-5), so the 4-bit change keeps
+  quality at a few MB, and the sparse 4-bit change at 1–3 MB, a payback
+  of minutes instead of hours.
+- Competing explanations. DISTS and LPIPS are both deep-feature metrics,
+  so DISTS agreeing is not a human judgement; the paper's side-by-side
+  frames carry that. Flicker could come from the source's flow error,
+  which the residual difference cancels only where the flow is wrong in
+  the same way for both; SVT-AV1 and DCVC-UF off the shelf, measured the
+  same way, give the floor. For size, quantization noise could act as a
+  regularizer and *help* on the held-out excerpt; then the 16-bit model's
+  curve is not an upper bound, and the variants are compared with
+  SVT-AV1 too.
+- Budget. Checks: 2 jobs (one per stretch), each ≤ 45 minutes on Ada or
+  A6000 (36 decodes, LPIPS, DISTS, flicker). Size: 2 jobs, each ≤ 45
+  minutes (10 variants × 4 QPs, encode and decode). Smokes ≤ 10 minutes.
+  Ceiling 3.5 GPU-hours. The fill check (Telea against ProPainter) gets
+  its own lines here after ProPainter's audit.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)

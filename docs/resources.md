@@ -287,6 +287,13 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   (sha256 `7be5be79…ee02`, its prefix matches the published file name; copied
   from the shared torch hub cache on 2026-10-07), loaded from that path, never
   downloaded.
+- DISTS (G5c) uses torchmetrics 1.9's `DISTSNetwork` and its alpha/beta
+  (`dists_models/weights.pt` inside torchmetrics, sha256 `f5e65c96…8218`)
+  on the torchvision VGG16 backbone `Models/DISTS/vgg16-397923af.pth`
+  (sha256 `397923af…5bf0`, copied from the shared torch hub cache on
+  2026-10-10, manifest beside it), loaded from that path, never downloaded.
+  On a region, every layer's statistics are weighted by the region
+  (`src.codecs.quality.masked_dists`). No new dependency.
 - VMAF: the environment's ffmpeg has no libvmaf; the hosts' `/opt/local/bin/ffmpeg`
   (7.1.1, libvmaf 3, built-in `vmaf_v0.6.1`) has it on gpu1–gpu6. Results
   record its path, sha256 and the libvmaf it links.
