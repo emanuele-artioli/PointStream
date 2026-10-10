@@ -359,9 +359,11 @@ before only where noted.
 2. *The distortion–perception trade.* The loss already holds both terms; a
    β sweep (adding 0.005 and 0.01 to 0 and 0.026) gives the curve between the
    PSNR-faithful and the LPIPS-optimal model. If flicker is found, a
-   temporal term joins the loss here. DISTS in the loss is one more arm,
-   scored then by a metric none of the arms trained on (LPIPS on VGG, from
-   the same weights) and by eye, so one score always stays held out.
+   temporal term joins the loss here. DISTS joins the loss as one more arm,
+   so the model learns from every metric it is scored on (user, 2026-10-10):
+   a model good on PSNR, LPIPS and DISTS at once is unlikely to game all
+   three, and the paper shows side-by-side frames so readers can check by
+   eye.
 3. *Scene footage from other days.* EPIC-KITCHENS recorded each kitchen on
    several days (3–19 videos per pilot kitchen, 179 videos on the hosts). The
    scene model is fitted on the kitchen's other videos and scored on the
