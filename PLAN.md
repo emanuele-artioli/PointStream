@@ -368,9 +368,13 @@ forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a
 simple arm model. Scored on VISOR foreground quality against coding the same
 pixels with SVT-AV1 at equal rate, with HOT3D's oracle poses as the upper
-bound, and on render time.
+bound, and on render time. The pose input is H2's coded stream (1.93 kbps);
+the renderer is also run on HaMeR's poses (both models' parameters are saved
+for all 34 VISOR items): the two are close in the image (HOT3D 2D error 17.3
+against 17.4 px, VISOR IoU 0.761 against 0.767) while HaMeR orients the hand
+better in 3D, so render quality confirms the estimator (user, 2026-10-10).
 **Done when** a hand renderer beats coded pixels at some rate, or the session
-shows why not.
+shows why not, and the estimator is confirmed on renders.
 
 #### H4. Handled objects (rescoped after H1, user 2026-10-08)
 
