@@ -617,6 +617,7 @@ def code_anchors(clip: g5.Clip, filled_yuv: np.ndarray, args: argparse.Namespace
                  work: Path) -> list[dict[str, Any]]:
     """SVT-AV1 at G5's CRFs on the frames and on the fill, and DCVC-UF off the shelf on the fill, each scored."""
     flows = source_flows(clip)
+    work.mkdir(parents=True, exist_ok=True)
     sources = {"frame": work / "frame.yuv", "filled": work / "filled.yuv"}
     g5.rgb_to_yuv420(clip.frames).tofile(sources["frame"])
     filled_yuv.tofile(sources["filled"])
