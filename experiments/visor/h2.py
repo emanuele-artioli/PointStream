@@ -1402,6 +1402,8 @@ def hybrid_hint(mano: mano_np.Mano, units: list[tuple[dict[str, Any], dict[str, 
     out: dict[str, Any] = {}
     for split in HINT_SPLITS:
         sel = a["split"] == split
+        if not sel.any():
+            continue  # a smoke's subset may hold one split only
         members = a["member"][sel]
         groups = [np.nonzero(members == m)[0] for m in np.unique(members)]
         d = {k: v[sel] for k, v in dist.items()}
@@ -1536,7 +1538,8 @@ def command_hybrid(args: argparse.Namespace) -> int:
     progress(3)
     rule = HYBRID_DECISION
     a = all(summary["hot3d"][f"hybrid_minus_{o}_mpjpe_ra"]["high"] < 0 for o in MODELS)
-    b = all(summary["hint"][s]["hybrid_minus_wilor"]["low"] > -rule["hint_margin_pck"] for s in HINT_SPLITS)
+    b = all(s in summary["hint"] and summary["hint"][s]["hybrid_minus_wilor"]["low"] > -rule["hint_margin_pck"]
+            for s in HINT_SPLITS)
     c = summary["visor"]["hybrid_minus_wilor"]["low"] > -rule["visor_margin_iou"]
     out_dir = Path(args.out) if args.out else stage_dir()
     write_json(out_dir / "hybrid.json", {
