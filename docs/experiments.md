@@ -2310,6 +2310,18 @@ invocation turns out to be needed.
     holes, where quality is not scored, rather than better prediction of
     V; that is still a real saving for every method coding the fill.
   - Budget: one job (both excerpts), ≤ 45 minutes on Ada.
+  - Outcome (`20261010T193932Z-ccdfebd6`, Ada, code `c271736`):
+    **ProPainter wins.** BD-rate of SVT-AV1 on ProPainter's fill against
+    Telea's, on LPIPS_V: −11.2% (P26_02), −12.7% (P06_03); on DISTS_V
+    −15.6%, −14.6%; PSNR_V −10.9%, −9.8%; flicker on V −15.7%, −13.7%.
+    Fill flicker 2.4 against 6.1 (P26_02) and 2.5 against 4.4 (P06_03).
+    ProPainter takes 81 s per 240-frame excerpt on Ada (18 GiB peak);
+    Telea 42–57 s on one CPU core. As predicted. ProPainter's own output
+    repaints a 4-pixel ring of V around each hole (its mask dilation); the
+    source is pasted back on V, so every method still codes V as it is.
+    Consequence: from here every arm codes and trains on ProPainter's
+    fill; the scene frames (about 1,200 per stretch) are filled once per
+    stretch and staged as an archive.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
