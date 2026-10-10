@@ -690,7 +690,31 @@ def load_units(tars: list[str], part: str) -> list[tuple[dict[str, Any], dict[st
 
 # ----------------------------------------------------------------- validate
 
+def validate_code(stage: Path) -> dict[str, bool]:
+    """The coding stage: every combination for both datasets and models, references, choices, IoUs."""
+    from experiments.visor import pose_coding as pc
+
+    code = json.loads((stage / "code.json").read_text())
+    rows = code["rows"]
+    keys = {pc.combo_key(c) for c in pc.combinations()}
+    numbers = [v for name in rows for m in MODELS for r in rows[name][m] for k, v in r.items()
+               if k.endswith(("_mm", "_px", "kbps")) and isinstance(v, float)]
+    h1 = {m: {r["key"]: r for r in rows["visor"][m]}[H1_BASELINE]["kbps"] for m in MODELS}
+    return {
+        "every_combination_evaluated": all({r["key"] for r in rows[name][m]} == keys for name in ("hot3d", "visor") for m in MODELS),
+        "values_finite_and_non_negative": bool(numbers) and all(math.isfinite(v) and v >= 0 for v in numbers),
+        "truth_references_present": all("mpjpe_vs_truth_mm" in code["baselines"]["hot3d"][m] for m in MODELS),
+        # H1's coding of WiLoR on all 34 items cost 15.2 kbps; the same coding here must land near it.
+        "h1_coding_reproduced_within_25pct": abs(h1["wilor"] - 15.2) / 15.2 <= 0.25,
+        "finer_steps_cost_more": all({r["key"]: r for r in rows["visor"][m]}["none|all|full|q0.5|previous"]["kbps"] > h1[m] for m in MODELS),
+        "choices_for_every_budget": all(set(code["choices"][m]) == {f"{b:g}" for b in DECISION["coding"]["budgets_ms"]} for m in MODELS),
+        "uncoded_iou_rendered": all("uncoded" in code["visor_iou"][m] for m in MODELS),
+    }
+
+
 def validate_result(stage: Path) -> dict[str, bool]:
+    if (stage / "code.json").exists():
+        return validate_code(stage)
     result = json.loads((stage / "h2.json").read_text())
     tar = stage / "published.tar"
     part = result["part"]
@@ -1031,7 +1055,7 @@ def command_code(args: argparse.Namespace) -> int:
         for label, combo in keys.items():
             out = visor_iou(data, units["visor"], combo, basis, faces)
             ious[model][label] = {"median": out["median"], "mean": out["mean"]}
-    out_dir = Path(args.out)
+    out_dir = Path(args.out) if args.out else stage_dir()
     write_json(out_dir / "code.json", {
         "inputs": {"hot3d": [file_sha256(Path(p)) for p in args.hot3d], "visor": [file_sha256(Path(p)) for p in args.visor],
                    "mano_right_sha256": file_sha256(Path(args.mano_right))},
@@ -1290,7 +1314,7 @@ def main(argv: list[str] | None = None) -> int:
     code.add_argument("--visor", action="append", required=True)
     code.add_argument("--mano-right", required=True)
     code.add_argument("--workers", default="")
-    code.add_argument("--out", required=True)
+    code.add_argument("--out", default="", help="default: the stage directory")
     report = commands.add_parser("report")
     report.add_argument("--hint", action="append", required=True)
     report.add_argument("--hot3d", action="append", required=True)
