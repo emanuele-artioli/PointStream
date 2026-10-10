@@ -2204,6 +2204,8 @@ invocation turns out to be needed.
     synthesized, not the source's (lines and stains move or vanish), which
     is the PSNR_V cost. A perception–distortion trade, not an adversarial
     one; the paper has to say the background texture is generated.
+- Report: [G5b Scene Model Pilot](https://claude.ai/artifact/H9yE6iBUGWau6K1HQBLcek)
+  (curves, attribution, frames, payback, review answers).
 - Pilot GPU time: about 5.6 hours (calibration 0.1, upper bound 4 × 0.55,
   component and control 6 × 0.55), within the 6 allowed. The rest (8
   stretches) waits for the user: the result changes what the rest should

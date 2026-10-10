@@ -507,4 +507,6 @@ Rescope with a fresh paper repository state: egocentric first, racket sports as
 the second domain or as future work. Write the dataset and evaluation-protocol
 sections (weighted PSNR on dataset masks, provenance tiers) and the hand-pose
 estimator comparison from H. Set the venue and
-submission date.
+submission date. Wherever a model is delivered beforehand and not billed
+(G5b's scene model), report beside the rate the playback time after which its
+bytes are repaid (user, 2026-10-10; G5b's pilot: 2.8–14 h for 241 MB).
