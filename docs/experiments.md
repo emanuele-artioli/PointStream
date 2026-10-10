@@ -2370,6 +2370,70 @@ invocation turns out to be needed.
     fill; the scene frames (about 1,200 per stretch) are filled once per
     stretch and staged as an archive.
 
+### 2026-10-10 — G5c step 2: the distortion–perception trade on ProPainter's fill
+- Question (PLAN G5c 2): which loss should the scene model train with?
+  The β sweep gives the curve from PSNR-faithful to LPIPS-optimal; a
+  temporal term answers step 1's flicker; DISTS in the loss tests whether
+  training on every scored metric helps (the user's call, 2026-10-10).
+  Run overnight with the user's go-ahead for unblocked GPU work.
+- Fill and anchors (`g5c.py prefill`). Step 1 switched every arm to
+  ProPainter's fill, so each of the 10 stretches is filled once, whole
+  (about 1,200 frames): the held-out excerpt alone, as in the fill check,
+  and the scene frames in chunks of at most 200 frames with 20 context
+  frames from the same side (never from the excerpt, so no held-out
+  pixel reaches a training frame's fill). The 4:2:0 fill is published
+  per stretch (sha256 in its meta) and every later job trains on and
+  codes from it (`g5b.py finetune --prefilled`). The same job codes the
+  new anchors on the excerpt: SVT-AV1 at G5's six CRFs on the frames and
+  on the fill (anchor: the upper envelope, as G5), and DCVC-UF off the
+  shelf on the fill (the reference), all scored with LPIPS, DISTS, PSNR
+  and flicker on V.
+- Arms (scene frames of the same stretch, P26_02 and P06_03, 540 steps,
+  G5b's recipe otherwise): A β = 0.026 (G5b's choice, again, on the new
+  fill), B β = 0.01, C β = 0.005, D β = 0, E β = 0.026 plus DISTS on V
+  with its weight set at step 0 so that it equals the LPIPS term on the
+  monitor set, F β = 0.026 plus the temporal term with γ = 0.5: the mean
+  square over V of the change of the coding error between consecutive
+  frames, ((x̂_t − x̂_{t−1}) − (x_t − x_{t−1}))², which is about twice
+  the distortion when errors are independent between frames, so γ = 0.5
+  gives it the distortion's own weight. Every arm is scored with LPIPS,
+  DISTS, PSNR and flicker on V (flicker flow-compensated, unlike the
+  loss).
+- Decision rule, fixed now. An arm *beats* SVT-AV1 on a metric on a
+  stretch if its BD-rate is below 0, or no BD-rate exists and none of its
+  points inside SVT-AV1's rate range lies below SVT-AV1's envelope and at
+  least one lies above it. (1) Candidates: arms A–D that beat SVT-AV1 on
+  LPIPS_V and DISTS_V on both pilot stretches. (2) The β for steps 3–5 is
+  the candidate's with the lowest mean PSNR_V BD-rate against SVT-AV1
+  (the least distortion paid). (3) The temporal term is adopted if F's
+  flicker on V, averaged over its four QPs, is at least 20% below A's on
+  both stretches and F's LPIPS_V BD-rate against A is at most +10% on
+  both. (4) DISTS in the loss is adopted if E's DISTS_V BD-rate against A
+  is −10% or better and its LPIPS_V BD-rate against A at most +10%, on
+  both stretches. Adopted terms join the chosen β in step 3; their
+  combination is checked there, not assumed. If no arm is a candidate, β
+  stays 0.026 and the gap is reported.
+- Hypotheses. On the new anchor (SVT-AV1 also gains 11–13% from the
+  fill), A still beats SVT-AV1 on both metrics, by a little less than
+  G5b's −74% on P06_03. β = 0.01 keeps most of the LPIPS_V gain at about
+  half the PSNR_V cost and is chosen; β = 0.005 is not a candidate on
+  P26_02; β = 0 is not on either. F cuts flicker by 20–30% at under 10%
+  LPIPS_V cost and is adopted. E gains 10–20% on DISTS_V at equal LPIPS_V
+  and is adopted, but this one is the least certain.
+- Competing explanations. A against G5b's β = 0.026 separates the fill's
+  effect from the loss's. A lower flicker in F could come from blurrier
+  output rather than steadier texture; LPIPS_V and DISTS_V against A
+  tell. DISTS and LPIPS share deep features, so E improving both is not
+  proof of better video; the side-by-side frames are.
+- Budget. Prefill and anchors: 10 jobs, each ≤ 30 minutes on Ada or
+  A6000 (ProPainter about 7 minutes per 1,200 frames at 18 GiB, 12
+  SVT-AV1 and 4 DCVC-UF codings, scoring). Arms A–D and F: 10 jobs, each
+  ≤ 45 minutes on Ada (G5b's 33 minutes plus DISTS and flicker scoring).
+  E: a 40-step calibration at the real settings first (DISTS through
+  VGG16 on every frame, activations recomputed), and E's runs only if
+  540 steps fit in 45 minutes; otherwise DISTS on one frame per group,
+  recorded. Ceiling 15 GPU-hours.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
