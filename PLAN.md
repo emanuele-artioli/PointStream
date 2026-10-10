@@ -414,9 +414,12 @@ H3a (2026-10-10, [outcome](docs/experiments.md#2026-10-10--h3a-texture-transfer-
 the texture-transfer oracle passes. On VISOR's hand pixels, SVT-AV1
 references (CRF 48) sent on 26% of hand-frames and warped by the true motion
 reach LPIPS 0.091 at 41.9 kbps, against SVT-AV1's 0.116 at the same rate,
-on all 34 items. The margin vanishes when a reference costs 3–5× an
-inter-coded frame. Next: the textured-mesh renderer (hand and forearm) on
-WiLoR's and HaMeR's coded poses, with each reference's cost measured.
+on all 34 items; at equal quality that is a 65% saving on hand pixels, 32%
+if a reference costs twice an inter-coded frame. The oracle's rate is 95%
+references (texture transfer with refresh); it does not bound a generator
+that renders from one reference and the pose (about 2 kbps), which needs
+its own test. Next step to be decided with the user: the textured mesh
+with an inter-coded reference stream, or a single-reference generator.
 
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
