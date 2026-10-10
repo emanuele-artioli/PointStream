@@ -281,6 +281,22 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   GLC-video reports estimated rather than coded rates. GVC-RT and MTTF were
   never installed.
 
+**Video inpainting** (G5c fill check)
+- ProPainter ([sczhou/ProPainter](https://github.com/sczhou/ProPainter) at
+  `e870e79321c31b733e2031af5aa2fb1fe3ac7eec`, ICCV 2023, S-Lab License 1.0,
+  non-commercial). Staged as `git archive` of that revision without
+  `assets`, `web-demos` and `inputs` (`pointstream-data/background/
+  g5c-2026-10-10/inputs/propainter/propainter-e870e79.tar`, `d3438fe7…175d`)
+  and run as a script in its tree (`experiments/background/propainter_fill.py`),
+  like DCVC. Weights v0.1.0 in `Models/ProPainter` with a manifest:
+  `ProPainter.pth` (`12c070c4…6591`, identical to the older
+  `Models/ProPainter.pth`), `raft-things.pth` (`fcfa4125…a7e1`),
+  `recurrent_flow_completion.pth` (`22939a1a…d283`). Its inference imports
+  (torch, torchvision, cv2, scipy, PIL, einops, imageio, matplotlib, tqdm,
+  requests) are all in the environment; checked by importing it there. No
+  new dependency. The hosts' user-site `propainter` 0.1.0 (the user's fork
+  at `c25e710`, with two model files edited after install) is not used.
+
 **Quality metrics** (B2, `src/codecs/quality.py`)
 - LPIPS uses torchmetrics' AlexNet heads (in the environment) and the
   torchvision AlexNet backbone `Models/LPIPS/alexnet-owt-7be5be79.pth`

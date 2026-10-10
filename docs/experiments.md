@@ -2286,8 +2286,30 @@ invocation turns out to be needed.
   the whole-model variants and the change variants), each ≤ 45 minutes
   (4 or 6 variants × 4 QPs, encode, decode and scoring). Smokes ≤ 10
   minutes.
-  Ceiling 3.5 GPU-hours. The fill check (Telea against ProPainter) gets
-  its own lines here after ProPainter's audit.
+  Ceiling 3.5 GPU-hours.
+- **Fill check** (`g5c.py` `fill`, added after ProPainter's audit, before
+  its run). The holes every method codes (not V of the training masks) on
+  the two pilot excerpts, filled by OpenCV Telea per frame (G5's
+  `filled`) or by ProPainter (sczhou/ProPainter at `e870e79`, the
+  official code chosen by the user over their fork; weights v0.1.0 from
+  `Models/ProPainter`; the repository's inference steps and defaults, with
+  edge padding to a multiple of 8 instead of resizing, so known pixels
+  stay exact: `experiments/background/propainter_fill.py`). Each fill is
+  coded by SVT-AV1 at G5's six CRFs and scored on V as above (LPIPS,
+  DISTS, PSNR, flicker); the fill itself is never scored. Fill flicker:
+  mean absolute luma change inside the holes of consecutive frames after
+  warping by DIS flow on the filled video itself.
+  - Rule: ProPainter's fill *wins* if SVT-AV1 coding it saves at least
+    2% at equal LPIPS_V (BD-rate against Telea's fill) on both
+    excerpts; then every later arm codes and trains on it. Otherwise
+    Telea stays (cheaper: no GPU at the sender).
+  - Hypothesis: it wins, by 5–15%: a temporally consistent fill is
+    cheaper to predict across frames than a per-frame Telea smear that
+    changes with the hand, and its fill flicker is a fraction of Telea's.
+  - Competing explanation: the saving comes from fewer bits in the
+    holes, where quality is not scored, rather than better prediction of
+    V; that is still a real saving for every method coding the fill.
+  - Budget: one job (both excerpts), ≤ 45 minutes on Ada.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
