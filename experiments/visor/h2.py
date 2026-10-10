@@ -1146,7 +1146,8 @@ def pck(dist: np.ndarray, mask: np.ndarray, threshold: float) -> float:
     return float(per_joint.mean() * 100) if per_joint.size else float("nan")
 
 
-def paired_bootstrap(groups: list[Any], stat: Any, rng: np.random.Generator, resamples: int) -> dict[str, float]:
+def paired_bootstrap(groups: list[Any], stat: Any, rng: np.random.Generator, resamples: int,
+                     names: tuple[str, str] = ("hamer", "wilor")) -> dict[str, float]:
     """``stat(groups) -> (a, b)``; the observed difference a - b and its percentile interval over
     resamples of the groups."""
     a, b = stat(groups)
@@ -1156,7 +1157,7 @@ def paired_bootstrap(groups: list[Any], stat: Any, rng: np.random.Generator, res
         x, y = stat([groups[i] for i in pick])
         diffs.append(x - y)
     lo, hi = np.percentile(diffs, [2.5, 97.5])
-    return {"hamer": a, "wilor": b, "difference": a - b, "low": float(lo), "high": float(hi)}
+    return {names[0]: a, names[1]: b, "difference": a - b, "low": float(lo), "high": float(hi)}
 
 
 def keypoint_norm(gt: np.ndarray, existence: np.ndarray) -> np.ndarray:
@@ -1409,7 +1410,7 @@ def hybrid_hint(mano: mano_np.Mano, units: list[tuple[dict[str, Any], dict[str, 
                       "hybrid_minus_wilor": paired_bootstrap(
                           groups, lambda gs: (pck(d["hybrid"][np.concatenate(gs)], e[np.concatenate(gs)], 0.05),
                                               pck(d["wilor"][np.concatenate(gs)], e[np.concatenate(gs)], 0.05)),
-                          rng, HYBRID_DECISION["bootstrap"]["resamples"])}
+                          rng, HYBRID_DECISION["bootstrap"]["resamples"], ("hybrid", "wilor"))}
     return out
 
 
@@ -1461,7 +1462,8 @@ def hybrid_hot3d(mano: mano_np.Mano, units: list[tuple[dict[str, Any], dict[str,
     for other in MODELS:
         out[f"hybrid_minus_{other}_mpjpe_ra"] = paired_bootstrap(
             per_clip, lambda gs, o=other: tuple(float(np.mean(np.concatenate([g[v]["mpjpe_ra_mm"] for g in gs])))
-                                               for v in ("hybrid", o)), rng, HYBRID_DECISION["bootstrap"]["resamples"])
+                                               for v in ("hybrid", o)), rng, HYBRID_DECISION["bootstrap"]["resamples"],
+            ("hybrid", other))
     return out
 
 
@@ -1509,7 +1511,7 @@ def hybrid_visor(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], mano
                                            for v in ("hamer", "wilor", "hybrid")}
     out["hybrid_minus_wilor"] = paired_bootstrap(
         items, lambda gs: tuple(float(np.nanmedian(np.concatenate([g[f"{v}_vs_{split}"] for g in gs])))
-                                for v in ("hybrid", "wilor")), rng, HYBRID_DECISION["bootstrap"]["resamples"])
+                                for v in ("hybrid", "wilor")), rng, HYBRID_DECISION["bootstrap"]["resamples"], ("hybrid", "wilor"))
     return out
 
 
