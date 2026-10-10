@@ -2129,6 +2129,15 @@ invocation turns out to be needed.
   (`ba0b804f…85b87`). Environment `pointstream-20261009T214002Z`
   (`32e68872…4661`): DCVC-UF's training code needs nothing new
   ([resources](resources.md), DCVC-UF).
+- Calibration (before the pilot). Smoke and a 40-step run at the pilot's
+  settings, upper bound on P26_02, β = 0 (`20261010T062353Z-1ed3e72b`,
+  Ada, code `60ad72e`): HT-L has 120.5 M parameters (241 MB at fp16); the
+  fine-tuned checkpoint loads strictly into B2's worker, decodes
+  deterministically and matches the encoder's intra frame. 3.28 s per step,
+  42.7 GiB peak. At step 0 the monitor set's masked distortion is 0.00264
+  and its LPIPS_V 0.2034, so **β = 0.026**; 30 minutes of training is
+  **540 steps**. Infrastructure, not evidence. Warp check smokes and runs:
+  `20261010T062342Z-5d5103f4` (P02_12), `…062347Z-917cfaaa` (P03_120).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
