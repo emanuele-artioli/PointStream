@@ -356,6 +356,14 @@ before only where noted.
      and flicker of the fill. The fill is never scored, but every method codes
      it, and the scene model trains on it. G4's comparison with panorama fills
      comes later; if the temporal fill wins here, all arms switch to it.
+   *Done (2026-10-10, [experiments](docs/experiments.md), G5c):* the LPIPS
+   gain transfers to DISTS (−53% and −76% against SVT-AV1); DCVC-UF
+   flickers more than SVT-AV1 and β > 0 adds about a third; the model
+   ships as its 4-bit change from the public weights, 51 MB at equal
+   quality (payback 0.6–3.1 h; the change is dense, so smaller needs
+   step 4); ProPainter's fill beats Telea's by 11–13% for SVT-AV1 and
+   replaces it everywhere; DCVC-UF decodes reliably only on the
+   encoder's GPU class.
 2. *The distortion–perception trade.* The loss already holds both terms; a
    β sweep (adding 0.005 and 0.01 to 0 and 0.026) gives the curve between the
    PSNR-faithful and the LPIPS-optimal model. If flicker is found, a
