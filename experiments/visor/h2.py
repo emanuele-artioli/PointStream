@@ -705,7 +705,7 @@ def validate_code(stage: Path) -> dict[str, bool]:
         "values_finite_and_non_negative": bool(numbers) and all(math.isfinite(v) and v >= 0 for v in numbers),
         "truth_references_present": all("mpjpe_vs_truth_mm" in code["baselines"]["hot3d"][m] for m in MODELS),
         # H1's coding of WiLoR on all 34 items cost 15.2 kbps; the same coding here must land near it.
-        "h1_coding_reproduced_within_25pct": abs(h1["wilor"] - 15.2) / 15.2 <= 0.25,
+        "h1_coding_reproduced_within_25pct": code["units"]["visor"] < 34 or abs(h1["wilor"] - 15.2) / 15.2 <= 0.25,
         "finer_steps_cost_more": all({r["key"]: r for r in rows["visor"][m]}["none|all|full|q0.5|previous"]["kbps"] > h1[m] for m in MODELS),
         "choices_for_every_budget": all(set(code["choices"][m]) == {f"{b:g}" for b in DECISION["coding"]["budgets_ms"]} for m in MODELS),
         "uncoded_iou_rendered": all("uncoded" in code["visor_iou"][m] for m in MODELS),
@@ -967,8 +967,9 @@ def coding_choice(rows: dict[str, dict[str, list[dict[str, Any]]]], baselines: d
 
 
 def visor_iou(data: CodingSet, units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], combo: dict[str, Any] | None,
-              basis: Any, faces: np.ndarray) -> dict[str, Any]:
-    """Rendered silhouettes of decoded hands against each mask's hand side (the model's own split)."""
+              basis: Any, faces: np.ndarray, tracks: list[int] | None = None) -> np.ndarray:
+    """Rendered silhouettes of decoded hands against each mask's hand side (the model's own split), per
+    hand-frame (NaN outside ``tracks``)."""
     from experiments.visor import pose_coding as pc
     from experiments.visor.h1 import iou, rasterize
 
@@ -981,7 +982,9 @@ def visor_iou(data: CodingSet, units: list[tuple[dict[str, Any], dict[str, np.nd
             windows.append(a[f"{data.model}_hand_window"][i])
             bits.append(a[f"{data.model}_hand_bits"][offsets[i]:offsets[i + 1]].tobytes())
     ious = np.full(len(data.rot), np.nan)
-    for tr in data.tracks:
+    for t_index, tr in enumerate(data.tracks):
+        if tracks is not None and t_index not in tracks:
+            continue
         info = data.units[tr["unit"]]
         rows = tr["rows"]
         if combo is None:
@@ -1003,7 +1006,17 @@ def visor_iou(data: CodingSet, units: list[tuple[dict[str, Any], dict[str, np.nd
             silhouette = rasterize(pinhole(verts[j], info["focal"], info["centre"]), faces, shape)
             value = iou(silhouette, full)
             ious[r] = np.nan if value is None else value
-    return {"median": float(np.nanmedian(ious)), "mean": float(np.nanmean(ious)), "values": ious}
+    return ious
+
+
+_VISOR_UNITS: list[tuple[dict[str, Any], dict[str, np.ndarray]]] = []
+
+
+def iou_task(model: str, combo: dict[str, Any] | None, basis_arrays: tuple[np.ndarray, np.ndarray], tracks: list[int]) -> np.ndarray:
+    from experiments.visor import pose_coding as pc
+
+    data = _SETS[("visor", model)]
+    return visor_iou(data, _VISOR_UNITS, combo, pc.Basis(*basis_arrays), data.mano.faces, tracks)
 
 
 def command_code(args: argparse.Namespace) -> int:
@@ -1011,10 +1024,13 @@ def command_code(args: argparse.Namespace) -> int:
 
     began = time.time()
     mano = mano_np.Mano.load(args.mano_right)
-    units = {"hot3d": [u for u in load_units(args.hot3d, "hot3d")], "visor": [u for u in load_units(args.visor, "visor")]}
+    units = {"hot3d": load_units(args.hot3d, "hot3d"), "visor": load_units(args.visor, "visor")}
     for name, rows in units.items():
         if not rows or not all(m["npz_hash_ok"] for m, _ in rows):
             raise SystemExit(f"{name}: missing or corrupt units")
+        if int(args.units):
+            units[name] = rows[:int(args.units)]  # a smoke's subset
+    _VISOR_UNITS[:] = units["visor"]
     for name in units:
         for model in MODELS:
             _SETS[(name, model)] = CodingSet(name, model, units[name], mano)
@@ -1041,20 +1057,23 @@ def command_code(args: argparse.Namespace) -> int:
             results[name][model].extend(future.result())
             progress(number + 1)
     choices = {m: coding_choice(results, baselines, m) for m in MODELS}
-    basis = pc.Basis(*basis_arrays)
     by_key = {pc.combo_key(c): c for c in pc.combinations()}
     ious: dict[str, dict[str, Any]] = {}
-    for model in MODELS:
-        data = _SETS[("visor", model)]
-        faces = mano.faces
-        keys = {"uncoded": None, H1_BASELINE: by_key[H1_BASELINE]}
-        for budget, choice in choices[model].items():
-            if choice is not None:
-                keys[choice["key"]] = by_key[choice["key"]]
-        ious[model] = {}
-        for label, combo in keys.items():
-            out = visor_iou(data, units["visor"], combo, basis, faces)
-            ious[model][label] = {"median": out["median"], "mean": out["mean"]}
+    with ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context("fork")) as pool:
+        pending = []
+        for model in MODELS:
+            keys: dict[str, dict[str, Any] | None] = {"uncoded": None, H1_BASELINE: by_key[H1_BASELINE]}
+            for choice in choices[model].values():
+                if choice is not None:
+                    keys[choice["key"]] = by_key[choice["key"]]
+            count = len(_SETS[("visor", model)].tracks)
+            for label, combo in keys.items():
+                shares = [list(range(i, count, workers)) for i in range(min(workers, count))]
+                pending.append((model, label, [pool.submit(iou_task, model, combo, basis_arrays, sh) for sh in shares]))
+        for number, (model, label, futures_iou) in enumerate(pending):
+            values = np.fmax.reduce([f.result() for f in futures_iou])  # each share fills its own tracks
+            ious.setdefault(model, {})[label] = {"median": float(np.nanmedian(values)), "mean": float(np.nanmean(values))}
+            progress(len(tasks) + number + 1)
     out_dir = Path(args.out) if args.out else stage_dir()
     write_json(out_dir / "code.json", {
         "inputs": {"hot3d": [file_sha256(Path(p)) for p in args.hot3d], "visor": [file_sha256(Path(p)) for p in args.visor],
@@ -1063,6 +1082,7 @@ def command_code(args: argparse.Namespace) -> int:
                      "step_scales": pc.STEP_SCALES, "predictions": pc.PREDICTIONS, "angle_step_rad": pc.ANGLE_STEP,
                      "px_step": pc.PX_STEP, "logz_step": pc.LOGZ_STEP, "decision": DECISION["coding"],
                      "shape": "the track's median betas, sent once and not counted"},
+        "units": {name: len(rows) for name, rows in units.items()},
         "baselines": baselines, "rows": results, "choices": choices, "visor_iou": ious,
         "seconds": round(time.time() - began, 1),
     })
@@ -1314,6 +1334,7 @@ def main(argv: list[str] | None = None) -> int:
     code.add_argument("--visor", action="append", required=True)
     code.add_argument("--mano-right", required=True)
     code.add_argument("--workers", default="")
+    code.add_argument("--units", default="0", help="first N units per dataset (0: all); for a smoke")
     code.add_argument("--out", default="", help="default: the stage directory")
     report = commands.add_parser("report")
     report.add_argument("--hint", action="append", required=True)
