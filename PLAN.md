@@ -279,8 +279,45 @@ background: NVRC, the strongest public per-video neural codec, needs +347% and
 0.7–1.5 Mbps. A model conditioned on a warped reference refreshed every 0.1 s is
 ruled out (+184%, +409%; even with no model, the warped refresh costs +34% and
 +103%). DCVC-UF, for comparison: −17%, +27%, +41%. By the rule NVRC is a
-candidate, so its oracle on the other 41 clips (about 70 GPU-hours) waits for
-the user's decision. No G5 component is trained before then.
+candidate, but after review (user, 2026-10-10) G5 moves to a scene model that is
+not billed (G5b), which NVRC cannot be: it renders only the frames it was
+fitted to. So NVRC's run on the other 41 clips is dropped. Its fully billed pilot
+stays in the paper as the intermediate step from a per-clip neural codec to
+PointStream's scene-adapted background.
+
+#### G5b. Scene-adapted neural background (user, 2026-10-10)
+
+The deployment PointStream targets shows one scene for a long time (a kitchen,
+a court). A model of that scene is delivered to the client beforehand, and its
+bytes are not billed: the rate is only what is sent at run time (foreground
+appearance and keypoints, background latents and corrections). This replaces
+G5's "sent once (its bytes counted)" and, for the scene model, G2's one-time
+representation B_once. The paper states the assumption and reports beside it
+the playback time after which the model's bytes would be repaid.
+
+- *Held-out evaluation.* With free weights, a model fitted to the frames it is
+  scored on would simply memorize them. So the model is fitted on a video's
+  earlier part and scored on a held-out final segment.
+- *Candidate*: DCVC-UF, its decoder and entropy model fine-tuned on the scene;
+  the run-time rate is its own bitstream on the held-out segment. Its training
+  code is in the pinned DCVC revision (`train_video.py`, `training.md`) and is
+  audited into the environment first.
+- *Clips*: long ones first, since they are the ones the paper will present.
+  The 10 VISOR stretches (120 s at 10 frames/s): fit on 0–96 s, score 96–120 s.
+  The 34 windows (4–4.8 s) are too short to split and are secondary.
+- *Metric*: LPIPS on the visible background (foreground pasted back, as in G2)
+  is the gate, and training may optimize it directly, as codecs optimize PSNR.
+  PSNR on V is reported beside it.
+- *Order*: LPIPS rescoring of the stored SVT-AV1 streams; DCVC-UF off the
+  shelf on the held-out segments (the floor); the oracle, fine-tuned on the
+  held-out segment itself (the upper bound) and on the first 96 s (the
+  component), as a smoke, a two-stretch pilot (≤ 6 GPU-hours) and then the
+  rest. Beside it, the cheap check of G1e's refresh at 0.3 s and 1 s (warp
+  only, on the windows).
+
+**Done when** the fine-tuned DCVC-UF's held-out curves on the stretches sit
+beside SVT-AV1's and the unadapted DCVC-UF's, on LPIPS and PSNR on V, from
+recorded jobs, and G5 can be compared with G3.
 
 ### H. Foreground (user, 2026-10-08)
 

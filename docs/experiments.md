@@ -2027,6 +2027,14 @@ invocation turns out to be needed.
   B 15 × 0.1 including the first version, DCVC-UF 0.2, failed smoke 0.1)
   and 5 CPU jobs (about 2.6 h of job wall). Wall time from the first
   submission to the report: about 4 h, so within the 6 h ceiling after all.
+- After review (user, 2026-10-10). The scene model is delivered beforehand
+  and not billed: the rate is what is sent at run time. That needs a
+  held-out segment, and NVRC cannot render frames outside its fitted range,
+  so NVRC's oracle on the other 41 clips is dropped. Its pilot stays as the
+  paper's intermediate step (a fully billed per-clip neural codec). The
+  gate metric becomes LPIPS on V, and training may optimize it directly;
+  PSNR on V is reported. Long clips come first. The next step is PLAN G5b,
+  DCVC-UF fine-tuned on the scene, with its own entry.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
