@@ -7,7 +7,7 @@
         --arm DIR --variants whole-16,whole-8,... --image-ckpt PATH --video-ckpt PATH \\
         --lpips-backbone PATH --dists-backbone PATH --limit-frames N
     python -m experiments.background.g5c fill --prepared DIR --clips CLIPS.JSON --visor-fill DIR --select ID,ID \\
-        --propainter-tree DIR --propainter-weights DIR --lpips-backbone PATH --dists-backbone PATH --limit-frames N
+        --propainter-tree DIR --propainter-ckpt P --raft-ckpt P --flow-completion-ckpt P --lpips-backbone PATH --dists-backbone PATH --limit-frames N
     python -m experiments.background.g5c validate
     python -m experiments.background.g5c report --result g5c.json ... --out DIR
 
@@ -450,20 +450,18 @@ def command_compress(args: argparse.Namespace) -> int:
 
 # ----------------------------------------------------------------- the fill (Telea against ProPainter)
 
-PROPAINTER_WEIGHTS = {"propainter": "ProPainter.pth", "raft": "raft-things.pth",
-                      "flow_completion": "recurrent_flow_completion.pth"}
-
-
-def propainter_fill(clip: g5.Clip, tree: Path, weights: Path, work: Path) -> tuple[np.ndarray, dict[str, Any]]:
-    """ProPainter's fill of the clip's holes (not V of the training masks), run in its tree."""
+def propainter_fill(clip: g5.Clip, tree: Path, weights: dict[str, Path], work: Path) -> tuple[np.ndarray, dict[str, Any]]:
+    """ProPainter's fill of the clip's holes (not V of the training masks), run in its tree (the extracted
+    archive's ``ProPainter`` directory); ``weights`` maps propainter, raft and flow_completion to checkpoints."""
     work.mkdir(parents=True, exist_ok=True)
     np.save(work / "frames.npy", clip.frames)
     np.save(work / "holes.npy", ~clip.keep)
     plan: dict[str, Any] = {"frames": str(work / "frames.npy"), "holes": str(work / "holes.npy"),
                             "out": str(work / "filled.npy")}
-    for key, name in PROPAINTER_WEIGHTS.items():
-        plan[key] = str(weights / name)
-        plan[f"{key}_sha256"] = file_sha256(weights / name)
+    for key, path in weights.items():
+        plan[key] = str(path)
+        plan[f"{key}_sha256"] = file_sha256(path)
+    tree = tree / "ProPainter" if (tree / "ProPainter").is_dir() else tree
     write_json(work / "plan.json", plan)
     script = Path(__file__).resolve().parent / "propainter_fill.py"
     done = subprocess.run([sys.executable, str(script), "--plan", str(work / "plan.json"), "--report",
@@ -521,8 +519,9 @@ def command_fill(args: argparse.Namespace) -> int:
         t0 = time.time()
         fills = {"telea": g5.inpaint(clip)}
         telea_seconds = time.time() - t0
-        fills["propainter"], propainter = propainter_fill(clip, Path(args.propainter_tree), Path(args.propainter_weights),
-                                                          work / "propainter")
+        weights = {"propainter": Path(args.propainter_ckpt), "raft": Path(args.raft_ckpt),
+                   "flow_completion": Path(args.flow_completion_ckpt)}
+        fills["propainter"], propainter = propainter_fill(clip, Path(args.propainter_tree), weights, work / "propainter")
         methods = []
         for name, filled in fills.items():
             source = work / f"{name}.yuv"
@@ -748,7 +747,9 @@ def main(argv: list[str] | None = None) -> int:
     fi = sub.add_parser("fill")
     common(fi)
     fi.add_argument("--propainter-tree", required=True, help="ProPainter's extracted repository")
-    fi.add_argument("--propainter-weights", required=True, help="directory with its three checkpoints")
+    fi.add_argument("--propainter-ckpt", required=True)
+    fi.add_argument("--raft-ckpt", required=True)
+    fi.add_argument("--flow-completion-ckpt", required=True)
     fi.set_defaults(func=command_fill)
     va = sub.add_parser("validate")
     va.add_argument("--stage", default=None)
