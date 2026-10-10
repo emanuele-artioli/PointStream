@@ -1,7 +1,7 @@
 """PLAN step G5b: a scene-adapted neural background, DCVC-UF fine-tuned on the scene.
 
     python -m experiments.background.g5b rescore --prepared DIR --clips CLIPS.JSON --visor-fill DIR \\
-        --streams DIR,DIR,... --select all|ID,ID --limit-frames N --lpips-backbone PATH
+        --streams DIR DIR ... --select all|ID,ID --limit-frames N --lpips-backbone PATH
     python -m experiments.background.g5b finetune --prepared DIR --clips CLIPS.JSON --visor-fill DIR \\
         --select ID [--fit-clip ID] --fit heldout|scene --steps N --lpips-weight W \\
         --image-ckpt PATH --video-ckpt PATH --lpips-backbone PATH --limit-frames N
@@ -141,7 +141,7 @@ def command_rescore(args: argparse.Namespace) -> int:
     spec = json.loads(Path(args.clips).read_text())
     by_id = {c["id"]: c for c in spec["clips"]}
     dirs = g5.clip_dirs(Path(args.prepared))
-    roots = [Path(p) for p in args.streams.split(",")]
+    roots = [Path(p) for p in args.streams]
     net = g5.load_lpips(args.lpips_backbone, "cuda")
     dav1d = svtav1.tool("dav1d")
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
@@ -551,7 +551,7 @@ def main(argv: list[str] | None = None) -> int:
 
     rs = sub.add_parser("rescore")
     common(rs)
-    rs.add_argument("--streams", required=True, help="comma-separated extracted G5 baselines archives")
+    rs.add_argument("--streams", nargs="+", required=True, help="extracted G5 baselines archives")
     rs.set_defaults(func=command_rescore)
     ft = sub.add_parser("finetune")
     common(ft)
