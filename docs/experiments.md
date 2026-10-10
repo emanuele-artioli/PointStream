@@ -1964,6 +1964,69 @@ invocation turns out to be needed.
     P03_120 and P26_02, then λ = 50, then λ = 800) and a 12:00 deadline.
     The wall time thus exceeds this entry's 6 h ceiling. GPU-hours stay
     within it.
+  - *Arm A, the rest of the pilot.* Part 1 / part 2: P02_12 λ = 50
+    `20261009T222831Z-c990cab8` / `20261010T004119Z-ea3c26a3`; P03_120
+    λ = 200 `20261010T001154Z-e839e37b` / `20261010T012618Z-240f9af5`;
+    P03_120 λ = 50 `20261010T001209Z-afcabd94` / `20261010T030026Z-2fc38d62`;
+    P26_02 λ = 200 `20261010T001201Z-d7ddb776` / `20261010T021325Z-d383710e`;
+    P26_02 λ = 50 `20261010T001216Z-b695080f` / `20261010T034511Z-482b5d1b`.
+    Part 1 always ran on gpu6 (Ada), 2,320–2,360 s; part 2 on gpu2 (A6000).
+    Every run passes the convergence check (+0.04 to +0.07 dB over its last
+    30 epochs). The three λ = 800 runs were cancelled before they started:
+    their points lie above SVT-AV1's quality range, and they could not
+    change the verdict below.
+- Report `pointstream-data/background/g5-2026-10-09/report-a9d3806/`
+  (`g5-report.json` `4b1ae6b8…047f`, from 31 result files: the 14 clips of
+  the stopped baseline job, copied beside it, the 4 shards, DCVC-UF, the 6
+  arm B runs and the 6 arm A runs). BD-rate on PSNR_V against the
+  baseline envelope (positive: more rate for equal quality):
+
+  | Clip | A, NVRC | B, cond | B, warp only | DCVC-UF (comparison) |
+  |---|---:|---:|---:|---:|
+  | window P02_12 | +347% | +184% | +34% | −17% |
+  | window P03_120 | **+2.7%** | +409% | +103% | +27% |
+  | stretch P26_02 | +133% | — (is SVT-AV1) | — | +41% |
+
+  NVRC's points (kbps → dB PSNR_V): P02_12 941 → 31.93 and 2,129 → 35.45;
+  P03_120 736 → 36.50 and 1,497 → 37.90; P26_02 108 → 37.22 and 240 →
+  39.69. On P03_120 the overlap with SVT-AV1 is only 36.5–37.6 dB, at
+  0.7–1.5 Mbps. Below that NVRC has no points: its lowest λ already costs
+  736 kbps there, where SVT-AV1 gives 32.8 dB for 74 kbps.
+- Outcome by the rule.
+  - **Arm B is ruled out**: +184% and +409% on the windows, from converged
+    runs. On the stretches it is SVT-AV1 by construction. Its correction
+    model never helps, and even with no model (warp only) refreshing every
+    0.1 s with oracle motion costs +34% and +103%. That also answers G1e's
+    parked options: a refreshed reference with any sendable warp loses to
+    SVT-AV1 on these windows.
+  - **Arm A is a candidate** (step 1): P03_120 lies between 0 and +100%.
+    The other two clips are well beyond +100%, and the median pilot clip is
+    +133%. By the rule, the next step is A's oracle on the other 41 clips,
+    at about 0.85 GPU-hours per clip and λ (two λ: about 70 GPU-hours), and
+    that needs the user's authorization. Nothing of G5's component is
+    trained until then.
+  - *Render time* per frame at 960×540: dav1d median 1.05 ms (CPU, loaded
+    host), DCVC-UF 2.5–3.5 ms (Ada), arm B 2.6–3.0 ms (A6000), NVRC 25.8 ms
+    (A6000, PNG writing included).
+  - LPIPS on V was scored for the GPU arms and DCVC-UF but not for SVT-AV1:
+    its job ran on CPU without the LPIPS network. It does not enter the
+    rule.
+- Hypothesis: mostly right. A was not ruled out on every window (P03_120
+  is at parity in its high-quality overlap), but it was far beyond +100%
+  on P02_12 and on the stretch, as predicted. B was predicted to be a
+  candidate on the windows; it was ruled out, because its per-clip
+  correction model buys nothing and its weights cost more than SVT-AV1's
+  whole stream.
+- Competing explanations. *Training*: rejected for both arms. Every run is
+  converged by the rule's check, and arm A used NVRC's own schedule.
+  *Generosity*: A's parity on P03_120 is despite being fitted to the scored
+  frames with a loss on V only. A real G5 model, fitted to a warm-up, can
+  only do worse. *Operating point*: everything is at 960×540, and the clips
+  are short (4–4.8 s windows; 24 s stretch excerpts).
+- Budget as run: about 6.8 GPU-hours (A part 1 6 × 0.65, part 2 6 × 0.16,
+  B 15 × 0.1 including the first version, DCVC-UF 0.2, failed smoke 0.1)
+  and 5 CPU jobs (about 2.6 h of job wall). Wall time from the first
+  submission to the report: about 4 h, so within the 6 h ceiling after all.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could

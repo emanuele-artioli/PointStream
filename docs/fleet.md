@@ -427,6 +427,9 @@ and choose `gpu_models` from it.
 | DCVC-UF HT-S | Quadro GV100 (7.0) | **fails upstream**: DCVC's depthwise 3×3 launcher asserts `sm == 75` (`d3x3_kernel.h:571`); no Volta path | `20261006T114644Z-0fd97c54` |
 | HaMeR | Ada / A6000 / RTX 8000 / GV100 | passes on all four: CUDA fp32; attention is plain matmul in its ViT (no fused kernel by design); all checkpoint keys load; projected keypoints inside the VISOR hand boxes; peak 2.6 GiB | Ada `20261006T114125Z-e7d6020a`, A6000 `20261006T114819Z-3bd7c154`, RTX 8000 `20261006T114458Z-366341fe`, GV100 `20261006T120915Z-da4f170e` |
 | WiLoR + detector | Ada / A6000 / RTX 8000 / GV100 | passes on all four: CUDA; mem-efficient attention; all keys load; detector loads under ultralytics 8.4.6 and finds hands; peak 2.6 GiB | Ada `20261006T114150Z-82443769`, A6000 `20261006T114908Z-9eab247b`, RTX 8000 `20261006T114621Z-1e58fc3f`, GV100 `20261006T121039Z-92d1f7c4` |
+| NVRC (G5, HiNeRV-v2 xs at 960×540), stage 1 training | RTX 6000 Ada (8.9) | passes: CUDA, torch 2.10.0+cu128, fp16 autocast, Inductor compile (about 5 min); 40 frames/s at 2.26M parameters, 360 epochs on 240 frames in 2,320–2,360 s. On A6000 the same stage would not fit 45 min (not run) | `20261009T222809Z-f3873f4a` |
+| NVRC, stage 2, rANS bitstream write and decode | RTX A6000 (8.6) | passes: CUDA, eager fp16; bitstream fully consumed on decode; decoded model scores as encoded; 25.8 ms per frame including PNG writing | `20261009T235421Z-d60d9f80` |
+| G5 arm B (`g5_cond`, bf16 autocast) | RTX A6000 (8.6) and RTX 6000 Ada (8.9) | passes on both: CUDA, bf16 autocast, SparseAdam latents; rollout 1.3–3.0 ms per frame | A6000 `20261009T230416Z-0e6c0458`, Ada `20261009T230427Z-c83b3a52` |
 
 CPU components, checked in every job above: the VISOR reader (PyAV, time-rule
 frame mapping), SVT-AV1 4.2.0 encode with dav1d decode, and the HOT3D-Clips MANO

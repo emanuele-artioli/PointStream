@@ -272,6 +272,16 @@ baselines, render time included.
 **Done when** G3 and G5 are compared on rate, quality and render speed, and one
 background is chosen for PointStream.
 
+Oracle pilot on VISOR (2026-10-10, [experiments](docs/experiments.md), G5 oracle
+entry). At 960×540, fitted to the scored frames, against SVT-AV1 on the visible
+background: NVRC, the strongest public per-video neural codec, needs +347% and
++133% rate on two pilot clips and is at parity (+2.7%) on the third, but only at
+0.7–1.5 Mbps. A model conditioned on a warped reference refreshed every 0.1 s is
+ruled out (+184%, +409%; even with no model, the warped refresh costs +34% and
++103%). DCVC-UF, for comparison: −17%, +27%, +41%. By the rule NVRC is a
+candidate, so its oracle on the other 41 clips (about 70 GPU-hours) waits for
+the user's decision. No G5 component is trained before then.
+
 ### H. Foreground (user, 2026-10-08)
 
 The thesis: a pixel codec spends most of its bits on what moves, and people
