@@ -267,6 +267,15 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   from the pre-reset adapter, which was correct but never passed its provenance
   gate. It runs as its own process because DCVC's package is also called `src`.
   The decoder sees only the container bytes and the checkpoints.
+- Training (audited 2026-10-10 for G5b). `train_video.py`, `train_image.py`
+  and `training.md` at the same revision train in plain PyTorch: in training
+  mode the models never call the CUDA inference extensions (the reference
+  frame enters by `pixel_unshuffle`), and the extra imports are numpy,
+  Pillow and scipy, all in the environment. A fine-tuned state dict loads
+  strictly into the inference models, which rebuild their entropy tables
+  with `update(0)`, so the worker codes with it unchanged. G5b's fine-tuning
+  (`experiments/background/g5b_train.py`) runs, like the worker, as a script
+  in DCVC's tree. No new environment and no new dependency.
 - Not chosen. HNeRV fits one network per video with no temporal model: the
   pre-reset latents cost 76–79 kbps at 18–21 dB at 240p, no better than AV1.
   GLC-video reports estimated rather than coded rates. GVC-RT and MTTF were

@@ -2036,6 +2036,100 @@ invocation turns out to be needed.
   PSNR on V is reported. Long clips come first. The next step is PLAN G5b,
   DCVC-UF fine-tuned on the scene, with its own entry.
 
+### 2026-10-10 — G5b: scene-adapted DCVC-UF on VISOR's stretches
+- Question (PLAN G5b): with the scene model delivered beforehand and not
+  billed, does DCVC-UF fine-tuned on the scene code a held-out stretch of the
+  same scene for fewer bits than SVT-AV1 (and than DCVC-UF unadapted) at
+  equal LPIPS on the visible background?
+- Held-out segment. On each of G1d's 10 stretches (120 s at 10 frames/s;
+  P03_10 103 s) it is G5's 240-frame excerpt (24 s), not 96–120 s as PLAN
+  first said: VISOR's dense masks lie in 96–120 s on only one stretch
+  (P09_106), and the gate needs them. The excerpt holds the stretch's
+  dense-mask window (40–48 frames), and G5's SVT-AV1 streams and DCVC-UF
+  setup already code exactly these frames. *Scene frames*: the rest of the
+  stretch, less 5 s on each side of the excerpt (no near-duplicate of a
+  held-out frame is fitted); 910 frames on most stretches. On 4 stretches
+  they lie on both sides of the excerpt; that is the deployment's
+  assumption (a model of the scene, made from other footage of it), not
+  causal coding.
+- Protocol. As G5 (`experiments/background/g5.py`): 960×540, every method
+  codes the excerpt's *filled* input (foreground inpainted) or, for SVT-AV1,
+  the better of frame and filled; quality on V with the foreground pasted
+  back; rate = every byte sent for the excerpt over its 24 s. The fine-tuned
+  model is not billed; its fp16 size is reported, with the playback after
+  which it would be repaid at each operating point (8 × bytes / rate saved
+  against SVT-AV1 at equal LPIPS_V).
+- **Gate metric**: LPIPS (AlexNet) on V of the dataset tier (the dense
+  frames), mean over frames; BD-rate is G5's (PCHIP, Pareto envelopes) on
+  q = −100 × LPIPS_V, so G5's 0.5 overlap is 0.005 LPIPS. PSNR_V on the
+  same frames, and LPIPS_V on all 240 frames against G1's `sam_text`
+  masks, are reported beside it.
+- Arms. *Anchor*: SVT-AV1 (G5's streams, decoded again and scored with
+  LPIPS). *Reference*: DCVC-UF HT-L off the shelf, QP 9/27/45/63 (G5's
+  `dcvc`). *Upper bound*: HT-L fine-tuned on the excerpt itself. *Component*:
+  fine-tuned on the scene frames. *Control*: fine-tuned on another
+  stretch's scene frames (P26_02 ↔ P06_03), to tell the scene from
+  egocentric footage, the mask or the loss. Fine-tuning
+  (`experiments/background/g5b_train.py`, in DCVC's tree): HT-L stage 2's
+  recipe (cascaded, 33 frames = I + 4 groups of 8, 512×512 patches, batch
+  4, AdamW at 1e-5, a random QP per sample with DCVC's λ from 1 to 768, the
+  image model frozen), distortion on V only with DCVC's YUV/RGB weighting,
+  optionally plus β·LPIPS_V. β is set once from the smoke so that β times
+  the monitor set's mean LPIPS_V equals twice its mean masked distortion
+  at step 0. Steps are set from the smoke so that training takes at most
+  30 minutes on Ada. A fixed monitor set (from the fitted frames only,
+  4 QPs) gives the curve.
+- Decision rule (`g5b.DECISION`), on the pilot stretches P26_02 (G5's pilot
+  stretch) and P06_03 (the best `sam_text` recall, 0.84). An arm *passes*
+  if on some pilot stretch, from a converged run (monitor loss down less than
+  3% over the last fifth of the steps), it beats SVT-AV1 (BD < 0) and the
+  unadapted DCVC-UF (BD < −10%). It *fails* if on both it does neither.
+  Otherwise it is *unclear* (more steps, once). Order: (1) the upper bound,
+  β = 0 and β > 0. If it fails, the component is not built and G5b stops.
+  (2) The component and the control, with the better β. If the component
+  passes and the control reaches at least 2/3 of its gain against the
+  unadapted model, the gain is not the scene's, and G5b reports an
+  egocentric-adapted DCVC-UF instead. (3) The component on the other 8
+  stretches: the gate passes if the median stretch's BD-rate against
+  SVT-AV1 is below 0.
+- Hypothesis: the upper bound passes with large margins (BD −40% or better
+  against the unadapted model), because the decoder and the entropy model
+  absorb the excerpt's textures. The component keeps a third or less of
+  that gain: the excerpt's background is mostly seen elsewhere in the
+  stretch, but lighting, clutter and viewpoint differ. Against SVT-AV1 on
+  LPIPS the component is near parity: DCVC-UF off the shelf was +41% on
+  PSNR_V on P26_02, and DCVC-UF's LPIPS is usually better than its PSNR
+  rank. β > 0 helps LPIPS by 10–30% at a small PSNR cost.
+- Competing explanation: whatever the component gains comes from adapting
+  to egocentric kitchen footage at 960×540, to the filled input or to the
+  loss on V, not from knowing the scene. The control measures that. A
+  second one: LPIPS gains with β > 0 come from texture that LPIPS rewards
+  but that is wrong, which PSNR_V beside it and a visual check expose.
+- Side check (PLAN G5b, cheap): G5's warp-only arm (refreshes coded by
+  SVT-AV1, oracle DIS flow at 128 B per frame between) with refreshes every
+  0.3 s and 1 s on G5's pilot windows (P02_12, P03_120), CRF 40/50/59.
+  If either is below 0 BD on PSNR_V or LPIPS_V against SVT-AV1 on either
+  window, G1e's refreshed reference reopens as conditioning for G5b;
+  otherwise it stays closed. Hypothesis: both stay above +30%, since
+  SVT-AV1's inter coding already uses what a refresh carries, and the warp
+  error grows with the reference's age (G1e).
+- Budget. Rescore ≤ 1 GPU-hour (one job, all 44 clips). Reference ≤ 0.5
+  (one job). Smoke ≤ 10 minutes. Pilot ≤ 6 GPU-hours: the upper bound
+  (2 stretches × 2 β) and the component and control (2 + 2), each run
+  ≤ 45 minutes on Ada. The rest ≤ 6 GPU-hours (8 runs). The warp check ≤
+  0.5 (two jobs). Ceiling 14 GPU-hours, stage by stage; a stage that
+  fails the rule stops what follows.
+- Inputs: as G5 (`pointstream-data/background/g5-2026-10-09/inputs.json`
+  `fe56577d…baecf`), the DCVC-UF checkpoints (image `b3b900de…3302`, HT-L
+  `934bde4a…b1a6b3`, the latter 482 MB at fp32), and
+  G5's SVT-AV1 streams: `20261009T221753Z-64ab816f` `partial.tar`
+  (`e8b27b50…245b`, 14 windows), `20261009T230937Z-17f60d9f`
+  (`825625d6…9598`), `…230943Z-a6010e7f` (`e317bd7c…1244`),
+  `…230949Z-be5deada` (`8523c9b4…6bc82`), `…230954Z-4c28fc16`
+  (`ba0b804f…85b87`). Environment `pointstream-20261009T214002Z`
+  (`32e68872…4661`): DCVC-UF's training code needs nothing new
+  ([resources](resources.md), DCVC-UF).
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
