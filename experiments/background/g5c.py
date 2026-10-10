@@ -6,6 +6,8 @@
     python -m experiments.background.g5c compress --prepared DIR --clips CLIPS.JSON --visor-fill DIR --select ID \\
         --arm DIR --variants whole-16,whole-8,... --image-ckpt PATH --video-ckpt PATH \\
         --lpips-backbone PATH --dists-backbone PATH --limit-frames N
+    python -m experiments.background.g5c fill --prepared DIR --clips CLIPS.JSON --visor-fill DIR --select ID,ID \\
+        --propainter-tree DIR --propainter-weights DIR --lpips-backbone PATH --dists-backbone PATH --limit-frames N
     python -m experiments.background.g5c validate
     python -m experiments.background.g5c report --result g5c.json ... --out DIR
 
@@ -16,7 +18,10 @@ with its published checkpoint), nothing re-encoded, and scores each as G5b
 and flicker on V (`flicker`). ``compress`` sends a fine-tuned model smaller:
 the whole model or its change from the public HT-L weights, quantized per
 output channel and LZMA-coded (`compress_state`), and re-codes the excerpt
-with each variant through B2's worker. Each writes ``g5c.json`` in
+with each variant through B2's worker. ``fill`` compares the foreground
+fill every method codes: OpenCV Telea per frame (G5's ``filled``) against
+ProPainter (`experiments.background.propainter_fill`, in its tree), each
+coded by SVT-AV1 at G5's CRFs and scored on V. Each writes ``g5c.json`` in
 ``PS_STAGE_DIR``; ``report`` applies `DECISION` (docs/experiments.md, G5c).
 """
 
@@ -49,6 +54,7 @@ DECISION: dict[str, Any] = {
     "dists_transfer_clip": "visor-long/P06_03",  # where the component beat SVT-AV1 on LPIPS_V
     "flicker_clips": ["visor-long/P26_02", "visor-long/P06_03"],
     "keeps_quality_bd": 0.05,  # a size variant's BD-rate on LPIPS_V against the 16-bit model's curve
+    "fill_wins_bd": -0.02,  # ProPainter's fill replaces Telea's if SVT-AV1 saves this much on LPIPS_V on every clip
 }
 VARIANTS = ["whole-16", "whole-8", "whole-4", "whole-2", "delta-8", "delta-4", "delta-2",
             "delta-8-s0.1", "delta-4-s0.1", "delta-2-s0.1"]
@@ -155,9 +161,10 @@ def decode_dcvc(image_ckpt: str, video_ckpt: str, container: Path, work: Path) -
             "video_sha256": file_sha256(Path(video_ckpt)), "profile": False}
     write_json(work / "plan.json", plan)
     command, env, cwd = dcvc_command(Path(sys.prefix), "decode", work / "plan.json", work / "report.json")
-    done = subprocess.run(command, env={**os.environ, **env}, cwd=cwd, capture_output=True, text=True, timeout=1800)
+    done = subprocess.run(command, env={**os.environ, **env, "PYTHONFAULTHANDLER": "1"}, cwd=cwd, capture_output=True,
+                          text=True, timeout=1800)
     if done.returncode:
-        raise RuntimeError(f"DCVC-UF decode failed ({done.returncode}):\n{done.stderr[-4000:]}")
+        raise RuntimeError(f"DCVC-UF decode failed ({done.returncode}):\n{done.stdout[-2000:]}\n{done.stderr[-6000:]}")
     report = json.loads((work / "report.json").read_text())
     return {"decoded": str(work / "out.yuv"), "deterministic": report["deterministic"],
             "frame_count": report["frame_count"], "video_sha256": plan["video_sha256"]}
@@ -441,6 +448,108 @@ def command_compress(args: argparse.Namespace) -> int:
     return 0
 
 
+# ----------------------------------------------------------------- the fill (Telea against ProPainter)
+
+PROPAINTER_WEIGHTS = {"propainter": "ProPainter.pth", "raft": "raft-things.pth",
+                      "flow_completion": "recurrent_flow_completion.pth"}
+
+
+def propainter_fill(clip: g5.Clip, tree: Path, weights: Path, work: Path) -> tuple[np.ndarray, dict[str, Any]]:
+    """ProPainter's fill of the clip's holes (not V of the training masks), run in its tree."""
+    work.mkdir(parents=True, exist_ok=True)
+    np.save(work / "frames.npy", clip.frames)
+    np.save(work / "holes.npy", ~clip.keep)
+    plan: dict[str, Any] = {"frames": str(work / "frames.npy"), "holes": str(work / "holes.npy"),
+                            "out": str(work / "filled.npy")}
+    for key, name in PROPAINTER_WEIGHTS.items():
+        plan[key] = str(weights / name)
+        plan[f"{key}_sha256"] = file_sha256(weights / name)
+    write_json(work / "plan.json", plan)
+    script = Path(__file__).resolve().parent / "propainter_fill.py"
+    done = subprocess.run([sys.executable, str(script), "--plan", str(work / "plan.json"), "--report",
+                           str(work / "report.json")], cwd=tree, env={**os.environ, "PYTHONPATH": str(tree),
+                                                                    "PYTHONNOUSERSITE": "1"},
+                          capture_output=True, text=True, timeout=2400)
+    if done.returncode:
+        raise RuntimeError(f"ProPainter failed ({done.returncode}):\n{done.stderr[-4000:]}")
+    filled = np.load(work / "filled.npy")
+    if filled.shape != clip.frames.shape or not np.array_equal(filled[clip.keep], clip.frames[clip.keep]):
+        raise RuntimeError("ProPainter changed known pixels or the frame shape")
+    return filled, {**json.loads((work / "report.json").read_text()), **{k: v for k, v in plan.items() if "sha256" in k}}
+
+
+def fill_flicker(filled: np.ndarray, holes: np.ndarray, device: str) -> float | None:
+    """Mean absolute luma change of the fill inside the holes of both frames, after warping frame t−1 onto t
+    by DIS flow on the filled video itself (the fill's own motion, not the hidden actor's)."""
+    import torch
+
+    flows = g5_cond.oracle_flows(filled, [None] + list(range(len(filled) - 1)))
+    luma = torch.tensor(LUMA, device=device).view(1, 3, 1, 1)
+    values = []
+    for t in range(1, len(filled)):
+        a = torch.from_numpy(filled[[t - 1]]).to(device).permute(0, 3, 1, 2).float()
+        m = torch.from_numpy(holes[[t - 1]]).to(device)[:, None].float()
+        warped, valid = g5_cond.warp(torch.cat([a, m], 1), torch.from_numpy(flows[[t]].astype(np.float32)).to(device))
+        region = torch.from_numpy(holes[[t]]).to(device)[:, None] & (warped[:, 3:4] > 0.999) & (valid > 0)
+        if region.any():
+            b = torch.from_numpy(filled[[t]]).to(device).permute(0, 3, 1, 2).float()
+            values.append(float((((b - warped[:, :3]) * luma).sum(1, keepdim=True).abs() * region).sum() / region.sum()))
+    return float(np.mean(values)) if values else None
+
+
+def command_fill(args: argparse.Namespace) -> int:
+    spec = json.loads(Path(args.clips).read_text())
+    by_id = {c["id"]: c for c in spec["clips"]}
+    dirs = g5.clip_dirs(Path(args.prepared))
+    nets = load_nets(args)
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
+    restored = restore(checkpoints)
+    began = time.time()
+    rows = []
+    for done, clip_id in enumerate((c["id"] for c in g5.select_clips(spec, args.select)), 1):
+        key = g1.safe(clip_id)
+        if key in restored:
+            rows.append({**restored[key], "restored_from_checkpoint": True})
+            progress(done)
+            continue
+        clip = g5.load_clip(dirs[clip_id], by_id[clip_id], Path(args.visor_fill), args.limit_frames)
+        work = scratch / "fill" / key
+        shutil.rmtree(work, ignore_errors=True)
+        work.mkdir(parents=True)
+        flows = source_flows(clip)
+        t0 = time.time()
+        fills = {"telea": g5.inpaint(clip)}
+        telea_seconds = time.time() - t0
+        fills["propainter"], propainter = propainter_fill(clip, Path(args.propainter_tree), Path(args.propainter_weights),
+                                                          work / "propainter")
+        methods = []
+        for name, filled in fills.items():
+            source = work / f"{name}.yuv"
+            g5.rgb_to_yuv420(filled).tofile(source)
+            points = []
+            for crf in g5.CRFS:
+                rec = g5.code_svtav1({"work": str(work / f"{name}-crf{crf}"), "source": str(source), "fps": str(clip.fps),
+                                      "frames": clip.n, "crf": crf, "threads": 8, "cpus": None})
+                rgb = read_decoded(Path(rec["decoded"]), clip.n, clip.n)
+                points.append({"crf": crf, "kbps": 8 * rec["payload_bytes"] / clip.duration / 1000,
+                               "stream_sha256": rec["stream_sha256"], "score": full_score(clip, rgb, nets, flows)})
+                shutil.rmtree(work / f"{name}-crf{crf}")
+            methods.append({"arm": f"svtav1-{name}", "codec": "svtav1", "fill": name, "points": points,
+                            "fill_flicker": fill_flicker(filled, ~clip.keep, "cuda"),
+                            "fill_seconds": round(telea_seconds, 1) if name == "telea" else propainter["seconds"]})
+        row = {"clip": clip.record, "propainter": propainter, "methods": methods}
+        save(checkpoints, key, row)
+        rows.append(row)
+        shutil.rmtree(work, ignore_errors=True)
+        progress(done)
+    write_json(stage_dir() / "g5c.json", {
+        "kind": "fill", "select": args.select, "limit_frames": args.limit_frames, "decision_rule": DECISION,
+        "metrics": nets.record, "restored": sorted(restored), "seconds": round(time.time() - began, 1),
+        **gpu_record(), "clips": rows})
+    return 0
+
+
 # ----------------------------------------------------------------- decision
 
 
@@ -482,6 +591,7 @@ def command_report(args: argparse.Namespace) -> int:
     tier = DECISION["gate_tier"]
     checks: dict[str, dict[str, Any]] = {}
     sizes: dict[str, dict[str, Any]] = {}
+    fills: list[dict[str, Any]] = []
     runs = []
     for path in args.result:
         doc = json.loads(Path(path).read_text())
@@ -490,6 +600,8 @@ def command_report(args: argparse.Namespace) -> int:
             checks[doc["clip"]["id"]] = doc
         elif doc["kind"] == "compress":
             sizes[doc["clip"]["id"]] = doc
+        elif doc["kind"] == "fill":
+            fills.append(doc)
     report: dict[str, Any] = {"runs": runs, "decision_rule": DECISION, "checks": {}, "size": {}}
     for clip_id, doc in sorted(checks.items()):
         svt = [p for m in doc["methods"] if m["codec"] == "svtav1" for p in m["points"]]
@@ -523,10 +635,24 @@ def command_report(args: argparse.Namespace) -> int:
         keepers = [n for n, e in out.items() if e["keeps_quality"]]
         report["size"][clip_id] = {"variants": out,
                                    "smallest_keeping_quality": min(keepers, key=lambda n: out[n]["bytes"]) if keepers else None}
+    fill: dict[str, Any] = {}
+    for doc in fills:
+        for row in doc["clips"]:
+            by = {m["fill"]: m for m in row["methods"]}
+            entry = {name: {"fill_flicker": m["fill_flicker"], "fill_seconds": m["fill_seconds"]}
+                     for name, m in by.items()}
+            for metric in METRICS:
+                entry[f"propainter_vs_telea_{metric}"] = g5.clip_verdict(
+                    curve(by["propainter"]["points"], tier, metric), curve(by["telea"]["points"], tier, metric))["bd_rate"]
+            fill[row["clip"]["id"]] = entry
+    report["fill"] = fill
+    values = [e["propainter_vs_telea_lpips_v"] for e in fill.values()]
+    report["fill_decision"] = {"propainter_wins": None if not values or any(v is None for v in values)
+                               else all(v < DECISION["fill_wins_bd"] for v in values)}
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
     write_json(out_dir / "g5c-report.json", report)
-    print(json.dumps({"checks_decision": report["checks_decision"],
+    print(json.dumps({"checks_decision": report["checks_decision"], "fill_decision": report["fill_decision"],
                       "smallest": {c: s["smallest_keeping_quality"] for c, s in report["size"].items()}}, indent=1))
     return 0
 
@@ -566,6 +692,14 @@ def validate_stage(stage: Path) -> dict[str, bool]:
                                            if f"{k}-{a}" in rows and f"{k}-{b}" in rows)
         if full and "whole-16" in rows:
             checks["16bit_reproduces_g5b"] = all(p["same_as_published"] for p in rows["whole-16"]["points"])
+    elif result["kind"] == "fill":
+        rows = result["clips"]
+        checks["clips_present"] = bool(rows)
+        checks["both_fills"] = all({m["fill"] for m in r["methods"]} == {"telea", "propainter"} for r in rows)
+        checks["every_point_scored"] = all(len(m["points"]) == len(g5.CRFS) and all(scored(p) for p in m["points"])
+                                           for r in rows for m in r["methods"])
+        checks["fill_flicker_finite"] = all(g5.finite(m["fill_flicker"]) for r in rows for m in r["methods"])
+        checks["propainter_on_gpu"] = all(r["propainter"]["gpu"] == result["gpu"] for r in rows)
     return checks
 
 
@@ -595,8 +729,8 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--limit-frames", type=int, default=0)
         p.add_argument("--lpips-backbone", required=True)
         p.add_argument("--dists-backbone", required=True)
-        p.add_argument("--image-ckpt", required=True)
-        p.add_argument("--video-ckpt", required=True, help="the public HT-L checkpoint")
+        p.add_argument("--image-ckpt", default=None)
+        p.add_argument("--video-ckpt", default=None, help="the public HT-L checkpoint")
 
     ch = sub.add_parser("checks")
     common(ch)
@@ -611,6 +745,11 @@ def main(argv: list[str] | None = None) -> int:
     co.add_argument("--variants", default=",".join(VARIANTS))
     co.add_argument("--qps", default=",".join(map(str, g5.DCVC_QPS)))
     co.set_defaults(func=command_compress)
+    fi = sub.add_parser("fill")
+    common(fi)
+    fi.add_argument("--propainter-tree", required=True, help="ProPainter's extracted repository")
+    fi.add_argument("--propainter-weights", required=True, help="directory with its three checkpoints")
+    fi.set_defaults(func=command_fill)
     va = sub.add_parser("validate")
     va.add_argument("--stage", default=None)
     va.set_defaults(func=command_validate)
