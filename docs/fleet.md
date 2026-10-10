@@ -442,3 +442,16 @@ smoke gates had passed (Ada) or they were rerun (GV100).
 
 **Choosing `gpu_models`:** SAM 3.1 and DCVC-UF on Ada and A6000 only (DCVC-UF
 also runs on the RTX 8000). The hand models and YOLOE run on all four classes.
+
+**DCVC-UF streams are bound to the GPU that coded them** (G5c, 2026-10-10).
+The table's decode checks hold within one run: a stream decodes
+deterministically right after its encode on the same GPU. A stored stream
+does not travel: Ada-encoded streams decoded on an A6000 give two different
+passes or segfault (`20261010T194633Z-c888eb58`), and even on another Ada
+host one stored stream's decode segfaulted and re-encoding differed by a
+byte (gpu5), while gpu6 reproduced every stream exactly
+(`20261010T194639Z-b316025e`). So: score a DCVC-UF stream only from the
+decode in the job that encoded it (`g5.code_dcvc` does); never decode a
+stored stream in a later job, on any host; to rescore, re-encode with the
+stored checkpoint and score that pair (`g5c.py checks`). The paper states
+it as a deployment limit of every DCVC-UF arm.

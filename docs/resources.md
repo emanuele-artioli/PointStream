@@ -267,6 +267,9 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   from the pre-reset adapter, which was correct but never passed its provenance
   gate. It runs as its own process because DCVC's package is also called `src`.
   The decoder sees only the container bytes and the checkpoints.
+- Portability (G5c): a coded stream decodes reliably only on the GPU class,
+  and not always the host, that encoded it, although DCVC sets deterministic
+  algorithms ([fleet](fleet.md), "DCVC-UF streams are bound to the GPU").
 - Training (audited 2026-10-10 for G5b). `train_video.py`, `train_image.py`
   and `training.md` at the same revision train in plain PyTorch: in training
   mode the models never call the CUDA inference extensions (the reference
