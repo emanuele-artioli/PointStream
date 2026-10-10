@@ -576,8 +576,13 @@ def quality(point: dict[str, Any], tier: str, metric: str) -> float | None:
     return float(value) if metric == "psnr_v" else (-float(value) if metric == "flicker_v" else -100.0 * float(value))
 
 
+def rate(point: dict[str, Any]) -> float:
+    """The rate of the stream that was decoded and scored: a re-encoded DCVC-UF stream's own (``checks``)."""
+    return float(point.get("check", {}).get("recoded_kbps", point["kbps"]))
+
+
 def curve(points: list[dict[str, Any]], tier: str, metric: str) -> list[tuple[float, float]]:
-    return [(float(p["kbps"]), q) for p in points if (q := quality(p, tier, metric)) is not None]
+    return [(rate(p), q) for p in points if (q := quality(p, tier, metric)) is not None]
 
 
 METRICS = ("lpips_v", "dists_v", "psnr_v", "flicker_v")
@@ -628,7 +633,7 @@ def command_report(args: argparse.Namespace) -> int:
                 test, anchor = curve(m["points"], tier, metric), curve(svt, tier, metric)
                 v = g5.clip_verdict(test, anchor)
                 entry[metric] = {**v, "worse": v["bd_rate"] is None and worse_everywhere(test, anchor)}
-            entry["flicker"] = [{"kbps": p["kbps"], **p["score"]["flicker"]} for p in m["points"]]
+            entry["flicker"] = [{"kbps": rate(p), **p["score"]["flicker"]} for p in m["points"]]
             arms[m["arm"]] = entry
         arms["svtav1"] = {"flicker": [{"kbps": p["kbps"], **p["score"]["flicker"]} for p in svt]}
         report["checks"][clip_id] = arms

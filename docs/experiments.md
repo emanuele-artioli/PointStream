@@ -2287,6 +2287,53 @@ invocation turns out to be needed.
   (4 or 6 variants × 4 QPs, encode, decode and scoring). Smokes ≤ 10
   minutes.
   Ceiling 3.5 GPU-hours.
+- Outcome, checks and size (code `c271736`, `93257e4` for the report;
+  report `g5c-report.json` from `g5c.py report` over the six results).
+  Jobs: checks P26_02 `20261010T194633Z-c888eb58` (A6000), P06_03
+  `…194639Z-b316025e` (Ada); size P26_02 `…193016Z-68f20aa8` (whole,
+  Ada) and `…194645Z-a3f9df45` (change, Ada), P06_03 `…194652Z-8711be56`
+  and `…194658Z-fd240ad0` (Ada). Anchor: SVT-AV1 on Telea's fill, as G5b.
+  - **DISTS: the gain transfers.** BD-rate on DISTS_V against SVT-AV1,
+    β = 0.026 scene model: −53% (P06_03; −74% on LPIPS_V) and −76%
+    (P26_02, where LPIPS_V is unclear by G5's verdict). Upper bound −68%,
+    −76%; control −35%, −68%. The β = 0 arms and the unadapted model stay
+    worse than SVT-AV1 on DISTS_V too (+21% to +162%). As predicted.
+  - **Flicker: found.** Flicker on V never overlaps SVT-AV1's range:
+    SVT-AV1 1.8–2.7 luma levels; DCVC-UF off the shelf 2.2–3.7; β = 0
+    scene 2.2–3.9, as the unadapted model; β = 0.026 scene 2.4–4.8. At
+    about 30–45 kbps: SVT-AV1 2.6–2.7, unadapted 3.05, β = 0.026 scene
+    3.5–4.0. So DCVC-UF flickers more than SVT-AV1 on its own, and
+    synthesized texture adds about a third. A temporal term joins the
+    loss in step 2, as the rule says.
+  - **Size: the 4-bit change keeps quality.** Against the 16-bit model's
+    curve (BD on LPIPS_V): change at 8 bits ≤ +0.7%, at 4 bits +0.2%
+    (P06_03) and +1.1% (P26_02), so the smallest variant that keeps
+    quality is the 4-bit change, **51 MB** (LZMA; zeroth-order entropy
+    about the same). The whole model keeps quality at 8 bits (109 MB, +2%
+    and +4%) and breaks at 4 and 2 bits (LPIPS_V above 0.26 at every
+    rate). The 2-bit change loses (+111%, +316%); keeping only the
+    largest 10% of the change loses at every width (+239% to +1,056%):
+    fine-tuning moved nearly every weight a little (81% of the 4-bit
+    levels nonzero), so the change is not sparse. Hypothesis half right:
+    the 4-bit change keeps quality, but it is 51 MB, not a few MB. A
+    small model has to be trained small (step 4: partial or low-rank
+    adaptation). Payback of the 51 MB change against SVT-AV1 at equal
+    LPIPS_V: 0.6 h (P26_02, 10 kbps), 3.1 h and 1.1 h (P06_03, 12 and
+    44 kbps), from G5b's 2.5, 12.9 and 4.8 h at 16 bits (218 MB LZMA).
+  - Decoding stored streams. Re-encoding with the stored checkpoints
+    reproduced every stored stream byte for byte on gpu6 (P06_03), and
+    every stored stream decoded alone there. On gpu5 (Ada, same class)
+    re-encoding differed by up to 1 byte with identical LPIPS_V, and one
+    stored stream's decode alone segfaulted (P26_02, first smokes); on
+    the A6000 (gpu3), Ada-encoded streams decoded alone gave two
+    different passes or segfaulted (QP 63), and re-encoding there
+    differed by up to 0.6%. DCVC-UF's decoder must therefore run on the
+    encoder's GPU class, and even same-class hosts are not guaranteed
+    bit-exact, though DCVC sets deterministic algorithms. Every score
+    above and in G5b comes from an encode and its own decode that match
+    (deterministic, intra frame equal to the encoder's); P26_02's checks
+    are scored at the A6000 re-encodes' own rates. For the paper: a
+    deployment caveat for every DCVC-UF arm, the scene model included.
 - **Fill check** (`g5c.py` `fill`, added after ProPainter's audit, before
   its run). The holes every method codes (not V of the training masks) on
   the two pilot excerpts, filled by OpenCV Telea per frame (G5's
