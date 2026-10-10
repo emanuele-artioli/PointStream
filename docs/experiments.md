@@ -2171,6 +2171,43 @@ invocation turns out to be needed.
   decoded frames that the component's jobs now publish. So the component
   runs at both β (beyond the rule's "better β", within the pilot budget),
   and the control at β = 0.026. Pilot GPU time so far: about 2.3 hours.
+- Component and control, outcome (540 steps, all converged by the rule;
+  Ada; code `fb39288`). Scene frames, β = 0: P26_02
+  `20261010T080746Z-23963f61`, P06_03 `…080758Z-032b73ee`; β = 0.026:
+  `…080752Z-37856ad4`, `…080803Z-38efc9c3`. Control (β = 0.026, fitted
+  on the other pilot stretch's scene frames): P26_02 from P06_03
+  `…080809Z-e1acbcd8`, P06_03 from P26_02 `…080814Z-72742e68`. BD-rate on
+  LPIPS_V (PSNR_V) against SVT-AV1 | against DCVC-UF:
+  - Component β = 0: P26_02 +82% (+16%) | −20% (−21%); P06_03 +44%
+    (+36%) | −11% (−11%). Unclear by the rule: it beats the reference on
+    both, SVT-AV1 on neither. It keeps about half the upper bound's gain
+    (−37%, −36%), more than the third predicted.
+  - Component β = 0.026: P26_02 unclear (+87%) | dominates (+20%), every
+    point in SVT-AV1's range below SVT-AV1's best LPIPS_V; P06_03 −74%
+    (+111%) | −87% (+32%). **Passes** by the rule. Payback of the 241 MB
+    model against SVT-AV1 at equal LPIPS_V: 2.8 h (P26_02, 10 kbps), 14 h
+    and 5 h (P06_03, 12 and 44 kbps); at higher rates SVT-AV1 never
+    reaches its LPIPS_V.
+  - Control: P26_02 −85% (+117%) | −90%; P06_03 −41% (+81%) | −69%.
+    The scene model against its control: −54% (P26_02) and −65% (P06_03).
+    The control's share of the component's gain against the unadapted
+    model, in log rate: 75% on P26_02 (over the rule's 2/3) and 52% on
+    P06_03 (under it). The rule fixed no aggregation over the pilot
+    stretches, so it does not settle this: most of the LPIPS gain comes
+    from fine-tuning for LPIPS on egocentric footage (the first competing
+    explanation), and knowing the scene halves the rate again on both
+    stretches.
+  - Visual check (P26_02, frame 20, foreground pasted back; frames in the
+    jobs' `published.tar`). At equal or lower rate the β = 0.026 output
+    keeps the countertop's grain and the jar's inner structure where
+    β = 0 shows a smooth wash; no periodic or grid artifact. The grain is
+    synthesized, not the source's (lines and stains move or vanish), which
+    is the PSNR_V cost. A perception–distortion trade, not an adversarial
+    one; the paper has to say the background texture is generated.
+- Pilot GPU time: about 5.6 hours (calibration 0.1, upper bound 4 × 0.55,
+  component and control 6 × 0.55), within the 6 allowed. The rest (8
+  stretches) waits for the user: the result changes what the rest should
+  measure (per-scene against a pooled egocentric model).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
