@@ -709,6 +709,9 @@ def validate_code(stage: Path) -> dict[str, bool]:
         "finer_steps_cost_more": all({r["key"]: r for r in rows["visor"][m]}["none|all|full|q0.5|previous"]["kbps"] > h1[m] for m in MODELS),
         "choices_for_every_budget": all(set(code["choices"][m]) == {f"{b:g}" for b in DECISION["coding"]["budgets_ms"]} for m in MODELS),
         "uncoded_iou_rendered": all("uncoded" in code["visor_iou"][m] for m in MODELS),
+        "shape_once_keeps_the_wrist": all(code["baselines"][name][m]["shape_once_vs_per_frame"]["wrist_offset_m"] < 1e-6
+                                          for name in ("hot3d", "visor") for m in MODELS),
+        "two_d_errors_bounded": all(code["baselines"]["hot3d"][m]["err2d_vs_truth_px"] < 1408 for m in MODELS),
     }
 
 
@@ -798,7 +801,8 @@ class CodingSet:
         from experiments.visor import pose_coding as pc
 
         self.name, self.model, self.mano = name, model, mano
-        rot, betas, transl, left, unit_of, truth, root = [], [], [], [], [], [], []
+        rot, betas, transl, left, unit_of, truth = [], [], [], [], [], []
+        widths = []
         self.units: list[dict[str, Any]] = []
         self.tracks: list[dict[str, Any]] = []
         self.cameras: list[Any] = []
@@ -813,9 +817,11 @@ class CodingSet:
                 cam = camera.from_json(meta["camera_214"])
                 focal, centre = float(cam.f[0]), (float(cam.c[0]), float(cam.c[1]))
                 self.cameras.append(cam)
+                widths.append(int(cam.width))
             else:
                 focal, centre = float(meta["focal"]), tuple(meta["principal"])
                 self.cameras.append(None)
+                widths.append(int(meta["image_shape"][1]))
             self.units.append({"unit": meta["unit"], "fps": fps, "seconds": frames / fps, "hands": n, "focal": focal,
                                "centre": centre, "rows": slice(offset, offset + n)})
             if not n:
@@ -826,7 +832,6 @@ class CodingSet:
             transl.append(a[f"{model}_transl"])
             left.append(~a["right"].astype(bool))
             unit_of.append(np.full(n, u))
-            root.append(pc.root_params(a[f"{model}_transl"], focal, centre))
             if name == "hot3d":
                 truth.append(a["gt_214"])
             t = a["t"]
@@ -837,10 +842,8 @@ class CodingSet:
                     continue
                 cuts = np.nonzero(np.diff(t[idx]) != 1)[0] + 1
                 for run in np.split(idx, cuts):
-                    x = np.concatenate([mano_np.unwrap_rotvecs(rv[run, 0]), mano_np.unwrap_rotvecs(rv[run, 1:]).reshape(len(run), 45),
-                                        pc.root_params(a[f"{model}_transl"][run], focal, centre)], 1)
-                    self.tracks.append({"unit": u, "rows": run + offset, "left": not side, "x": x,
-                                        "betas": np.median(a[f"{model}_betas"][run], 0), "fps": fps})
+                    self.tracks.append({"unit": u, "rows": run + offset, "left": not side, "fps": fps,
+                                        "betas": np.median(a[f"{model}_betas"][run], 0)})
             offset += n
         self.rot = np.concatenate(rot)
         self.betas = np.concatenate(betas)
@@ -849,13 +852,24 @@ class CodingSet:
         self.unit_of = np.concatenate(unit_of)
         self.truth = np.concatenate(truth) if truth else None
         self.order = np.concatenate([tr["rows"] for tr in self.tracks])
+        self.width = max(widths)  # 2D errors are capped here: a joint at the camera's plane projects to infinity
         self.uncoded = mano.joints(self.rot, self.betas, self.transl, self.left)
         self.uncoded_2d = self.project(self.uncoded)
-        # The reference for coding: the same poses with the shape the scheme sends, each track's median.
+        # The scheme sends each track's median shape once, and the root so that the wrist stays where the
+        # frame's own shape put it (MANO turns about a shape-dependent rest wrist, not its origin).
         track_betas = np.zeros_like(self.betas)
         for tr in self.tracks:
             track_betas[tr["rows"]] = tr["betas"]
-        self.reference = mano.joints(self.rot, track_betas, self.transl, self.left)
+        shift = mano.rest_root(self.betas) - mano.rest_root(track_betas)
+        shift[self.left] = shift[self.left] @ mano_np.MIRROR
+        self.transl_sent = self.transl + shift
+        self.reference = mano.joints(self.rot, track_betas, self.transl_sent, self.left)
+        rv_all = mano_np.rotvec_of(self.rot)
+        for tr in self.tracks:
+            info = self.units[tr["unit"]]
+            rows = tr["rows"]
+            tr["x"] = np.concatenate([mano_np.unwrap_rotvecs(rv_all[rows, 0]), mano_np.unwrap_rotvecs(rv_all[rows, 1:]).reshape(len(rows), 45),
+                                      pc.root_params(self.transl_sent[rows], info["focal"], info["centre"])], 1)
         self.reference_2d = self.project(self.reference)
         self.truth_2d = self.project(self.truth) if self.truth is not None else None
 
@@ -892,10 +906,12 @@ class CodingSet:
         return out
 
 
-def joint_errors(joints: np.ndarray, joints_2d: np.ndarray, ref: np.ndarray, ref_2d: np.ndarray) -> tuple[float, float]:
-    """Wrist-aligned 3D error (mm) and 2D error (px), means over joints and frames."""
+def joint_errors(joints: np.ndarray, joints_2d: np.ndarray, ref: np.ndarray, ref_2d: np.ndarray,
+                 cap: float = math.inf) -> tuple[float, float]:
+    """Wrist-aligned 3D error (mm) and 2D error (px, each joint's capped at ``cap``), means over joints and frames."""
     mpjpe = np.linalg.norm((joints - joints[:, :1]) - (ref - ref[:, :1]), axis=-1).mean() * 1000
-    return float(mpjpe), float(np.linalg.norm(joints_2d - ref_2d, axis=-1).mean())
+    px = np.nan_to_num(np.linalg.norm(joints_2d - ref_2d, axis=-1), nan=cap, posinf=cap)
+    return float(mpjpe), float(np.minimum(px, cap).mean())
 
 
 _SETS: dict[tuple[str, str], CodingSet] = {}
@@ -929,13 +945,13 @@ def evaluate_smoother(key: tuple[str, str], smoother: tuple[Any, ...], basis_arr
                     decoded = [pc.decode(sym, sent, len(tr["x"]), combo, basis) for tr, (sym, sent) in zip(data.tracks, encoded)]
                     joints = data.decode_joints(decoded)
                     joints_2d = data.project(joints)
-                    mp_unc, px_unc = joint_errors(joints, joints_2d, data.reference, data.reference_2d)
+                    mp_unc, px_unc = joint_errors(joints, joints_2d, data.reference, data.reference_2d, data.width)
                     row_common = {"mpjpe_vs_uncoded_mm": mp_unc, "err2d_vs_uncoded_px": px_unc,  # uncoded = shape-once reference
                                   "sent_share": float(sent_per_unit.sum() / max(frames, 1)),
                                   "latency_ms": max(pc.latency_ms(combo, tr["fps"]) for tr in data.tracks) if data.tracks else 0.0}
                     if data.truth is not None:
                         assert data.truth_2d is not None
-                        mp_true, px_true = joint_errors(joints, joints_2d, data.truth, data.truth_2d)
+                        mp_true, px_true = joint_errors(joints, joints_2d, data.truth, data.truth_2d, data.width)
                         row_common |= {"mpjpe_vs_truth_mm": mp_true, "err2d_vs_truth_px": px_true}
                     for prediction in pc.PREDICTIONS:
                         combo_p = dict(combo, prediction=prediction)
@@ -1038,13 +1054,14 @@ def command_code(args: argparse.Namespace) -> int:
     baselines: dict[str, dict[str, Any]] = {"hot3d": {}, "visor": {}}
     for (name, model), data in _SETS.items():
         entry: dict[str, Any] = {"hand_frames": len(data.rot), "tracks": len(data.tracks), "units": len(data.units)}
-        shape_mm, shape_px = joint_errors(data.reference, data.reference_2d, data.uncoded, data.uncoded_2d)
-        entry["shape_once_vs_per_frame"] = {"mpjpe_mm": shape_mm, "err2d_px": shape_px}
+        shape_mm, shape_px = joint_errors(data.reference, data.reference_2d, data.uncoded, data.uncoded_2d, data.width)
+        entry["shape_once_vs_per_frame"] = {"mpjpe_mm": shape_mm, "err2d_px": shape_px,
+                                            "wrist_offset_m": float(np.abs(data.reference[:, 0] - data.uncoded[:, 0]).max())}
         if data.truth is not None:
             assert data.truth_2d is not None
-            mp, px = joint_errors(data.reference, data.reference_2d, data.truth, data.truth_2d)
+            mp, px = joint_errors(data.reference, data.reference_2d, data.truth, data.truth_2d, data.width)
             entry |= {"mpjpe_vs_truth_mm": mp, "err2d_vs_truth_px": px}
-            mp, px = joint_errors(data.uncoded, data.uncoded_2d, data.truth, data.truth_2d)
+            mp, px = joint_errors(data.uncoded, data.uncoded_2d, data.truth, data.truth_2d, data.width)
             entry["per_frame_shape"] = {"mpjpe_vs_truth_mm": mp, "err2d_vs_truth_px": px}
         baselines[name][model] = entry
     workers = max(1, int(args.workers or os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))

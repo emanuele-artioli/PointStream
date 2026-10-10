@@ -162,6 +162,10 @@ class Mano:
         assert verts is not None
         return verts
 
+    def rest_root(self, betas: np.ndarray) -> np.ndarray:
+        """The rest wrist joint (N, 3) for shapes (N, 10): what the global rotation turns about."""
+        return (self.j_regressor[0] @ self.v_template) + np.einsum("vck,v,nk->nc", self.shapedirs, self.j_regressor[0], np.asarray(betas, float))
+
     def joints(self, rotmats: np.ndarray, betas: np.ndarray, transl: np.ndarray, left: np.ndarray) -> np.ndarray:
         """Joints (N, 21, 3) for frames that each have their own shape, side and translation: the
         ``forward`` computation restricted to the kinematic joints and the five fingertips."""

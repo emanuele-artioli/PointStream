@@ -111,3 +111,27 @@ def test_keypoint_norm_uses_labelled_joints_only():
     norm = h2.keypoint_norm(gt, existence)
     assert np.isclose(norm[0], h2.expanded_size(np.array([0, 0, 28.5, 38.0])))
     assert np.isnan(norm[1])
+
+
+def test_shape_once_reference_keeps_the_wrist():
+    mano = mano_np.Mano(synthetic_arrays())
+    units = visor_units(mano)
+    a = units[0][1]
+    rng = np.random.default_rng(5)
+    for k in h2.MODELS:
+        a[f"{k}_betas"] = rng.normal(0, 1.5, (len(a["t"]), 10))  # a shape that jitters per frame
+    data = h2.CodingSet("visor", "wilor", units, mano)
+    assert np.allclose(data.reference[:, 0], data.uncoded[:, 0], atol=1e-12)
+    # Without the root correction the wrist would move with the shape.
+    unshifted = mano.joints(data.rot, np.concatenate([np.repeat(tr["betas"][None], len(tr["rows"]), 0) for tr in data.tracks])[np.argsort(data.order)],
+                            data.transl, data.left)
+    assert np.abs(unshifted[:, 0] - data.uncoded[:, 0]).max() > 1e-4
+
+
+def test_joint_errors_cap_infinite_projections():
+    joints = np.zeros((2, 21, 3))
+    j2d = np.zeros((2, 21, 2))
+    ref2d = np.zeros((2, 21, 2))
+    ref2d[0, 0] = [np.inf, 0]
+    _, px = h2.joint_errors(joints, j2d, joints, ref2d, cap=100.0)
+    assert np.isclose(px, 100.0 / 42)
