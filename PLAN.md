@@ -321,6 +321,58 @@ the playback time after which the model's bytes would be repaid.
 beside SVT-AV1's and the unadapted DCVC-UF's, on LPIPS and PSNR on V, from
 recorded jobs, and G5 can be compared with G3.
 
+Pilot (2026-10-10, [experiments](docs/experiments.md), G5b entry;
+[report](https://claude.ai/artifact/H9yE6iBUGWau6K1HQBLcek)). On P26_02 and
+P06_03, fitted on the rest of the stretch: with β·LPIPS added to DCVC's own
+distortion (β = 0.026) the scene model passes the rule, −74% against
+SVT-AV1 on P06_03 and better than any SVT-AV1 point on P26_02 at equal
+LPIPS_V, but +87% and +111% at equal PSNR_V; with distortion alone it never
+beats SVT-AV1 (+82%, +44%). A model fine-tuned the same way on the other
+kitchen gets 52–75% of the gain against the unadapted model (in log rate): the
+loss teaches the decoder to rebuild texture instead of blur, which transfers
+across kitchens. Knowing the scene halves the rate again (−54%, −65%). The
+texture is plausible rather than the source's (visual check), and 241 MB of
+weights repay themselves after 2.8–14 h.
+
+#### G5c. Scene model at scale (agreed with the user, 2026-10-10)
+
+Same code and protocol as G5b, cheapest first; each item is gated by the one
+before only where noted.
+1. *Checks on the pilot's models, no training.* DISTS on V beside LPIPS (a
+   metric the model never trained on; VGG16 weights into `Models/`, approved),
+   on all G5b arms and SVT-AV1. A flicker measure on the visible background
+   (the decoded frame's change between frames, after warping by the source's
+   own flow, against the source's change). The model's size against
+   quality: the fine-tuned weights stored as a difference from the public
+   ones, quantized to 8 and 4 bits and entropy-coded, and the whole model at
+   8 bits, each re-coding the excerpts.
+2. *The distortion–perception trade.* The loss already holds both terms; a
+   β sweep (adding 0.005 and 0.01 to 0 and 0.026) gives the curve between the
+   PSNR-faithful and the LPIPS-optimal model. If flicker is found, a
+   temporal term joins the loss here.
+3. *Scene footage from other days.* EPIC-KITCHENS recorded each kitchen on
+   several days (3–19 videos per pilot kitchen, 179 videos on the hosts). The
+   scene model is fitted on the kitchen's other videos and scored on the
+   stretch's excerpt: hours of footage and a true hold-out across days. A
+   model pooled over many kitchens is the generalized model (and the control);
+   the scene model fine-tunes it per kitchen.
+4. *Recipe.* The image model that codes each stream's first frame adapted
+   too; adapting only part of the network (decoder and entropy model, or
+   low-rank adapters); learning rate, crop size and steps, a bounded sweep.
+   Speed over polish until the baselines are beaten; final results train to
+   convergence.
+5. *The rest.* The chosen recipe on the 8 untouched stretches, against
+   SVT-AV1 also at its visual-quality tune with film-grain synthesis and
+   against the pooled model.
+Deferred to after a working pipeline: why DCVC-UF off the shelf ranks worse on
+LPIPS than on PSNR (grain removed by an MSE decoder, quality swings within
+its 8-frame groups, the 4:2:0 input path; one test each), the 1080p check,
+and a small viewing test. VMAF joins at H5, on whole frames.
+**Done when** the scene model's recipe is fixed from recorded jobs and its
+curves on all 10 stretches (LPIPS, DISTS, PSNR on V, flicker, model size and
+payback) sit beside SVT-AV1's, the pooled model's and the unadapted
+DCVC-UF's.
+
 ### H. Foreground (user, 2026-10-08)
 
 The thesis: a pixel codec spends most of its bits on what moves, and people
