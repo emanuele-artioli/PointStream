@@ -393,7 +393,22 @@ before only where noted.
    and entropy model, or low-rank adapters); learning rate, crop size and
    steps, a bounded sweep. Speed over polish until the baselines are beaten;
    final results train to convergence.
-5. *The rest.* The chosen recipe on the 8 untouched stretches, against
+   Selection (user, 2026-10-11): the recipe is chosen by how many of
+   PSNR_V, LPIPS_V, DISTS_V and flicker it beats SVT-AV1 on (median
+   BD-rate over the stretches), ties broken by the mean BD-rate; visual
+   comparisons are made at matched rate (each model re-coded at the QP
+   nearest the target rate), never at matched QP. The user's blind look
+   at equal QP (2026-10-11) could not tell β = 0.026 with and without
+   DISTS apart, and preferred both over β = 0.005 and β = 0, which also
+   spent fewer bits.
+5. *Scope: calm and moving viewpoints.* The scene model's gain tracks the
+   excerpt's motion and SVT-AV1's rate (step 2). More calm stretches,
+   chosen by G1's camera-motion audit with a threshold fixed before any
+   coding, test that the gain holds on calm scenes; the moving ones stay
+   in the paper. The oracle on the losing stretches (fitted on the
+   excerpt itself) tells whether their loss is the footage's or the
+   method's, and step 3 how much real footage closes it.
+6. *The rest.* The chosen recipe on the 8 untouched stretches, against
    SVT-AV1 also at its visual-quality tune with film-grain synthesis.
 Deferred to after a working pipeline: a general model pooled over many
 kitchens with per-kitchen fine-tuning on top (the generalization claim); why
