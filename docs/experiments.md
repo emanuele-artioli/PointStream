@@ -2580,6 +2580,14 @@ invocation turns out to be needed.
   footage gives; the oracle's margin is an upper bound, not a forecast.
   Step 3's footage arms measure the realistic share.
 - Budget: 2 jobs, each ≤ 45 minutes on Ada.
+- Outcome, P04_13 (`20261011T063021Z-477693dc`, Ada, code `2fc616a`,
+  converged): BD-rate against SVT-AV1 on LPIPS_V −0.3% (DISTS_V +98%,
+  PSNR_V +256%); the step-2 model C was +22% (+123%, +287%). **The method
+  is the limit on P04_13**: even fitted on the excerpt it codes, the
+  recipe only ties SVT-AV1 on LPIPS_V and loses on the rest, so no
+  footage can make it win there. Its excerpt moves most of all ten (source
+  flicker 5.4–7.2 against about 2–4 on the calm ones). The rule is the
+  recipe's (β = 0.005); a higher β is step 4's to try. P06_05: pending.
 
 ### 2026-10-11 — G5c step 3: footage from the kitchen's other recordings
 - Question (PLAN G5c 3): does footage of the same kitchen from other
@@ -2625,6 +2633,14 @@ invocation turns out to be needed.
 - Competing explanation: more frames help through diversity, not the
   kitchen; the cross-kitchen control of G5b (another stretch's footage at
   equal size) answers that and runs if H helps.
+- Scope change (2026-10-11, before any step-3 training result): P04_13's
+  footage job (`20261011T062500Z-011fc5d2`) ran out of its 2,700 s in
+  ProPainter after SAM on a shared GPU, and P04_13's oracle (entry above)
+  only ties SVT-AV1 even fitted on the excerpt itself, which bounds every
+  footage arm there. As the protocol says for a failed oracle, P04_13's
+  footage arms are not run. The rule applies to the 3 other stretches:
+  "helps" needs H at −10% or better against C on 2 of 3, or P06_05 turned
+  into a win; "stands alone" needs G within +10% of C on 2 of 3.
 - Budget. Footage: 4 jobs, each ≤ 45 minutes on Ada or A6000 (SAM 3.1
   about 0.38 s and ProPainter about 0.32 s per frame, 2,400 frames).
   Training: 8 jobs, each ≤ 45 minutes on Ada. About 8 GPU-hours.
