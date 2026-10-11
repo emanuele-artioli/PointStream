@@ -28,6 +28,8 @@ from typing import Any
 import numpy as np
 
 FRAME_DELAY = 8  # HT-L's g_frame_delay
+CELL = 16  # pixels per latent cell of y
+PAD = 64  # the training path's networks halve y twice more (z): frames are padded to a multiple of 64
 
 
 def schedule(frame_count: int) -> list[list[int]]:
@@ -52,18 +54,13 @@ def spread_z(y_cells: np.ndarray, z_cells: np.ndarray) -> np.ndarray:
     return y_cells.astype(np.float64) + shared
 
 
-def region_bits(cells: np.ndarray, region: np.ndarray) -> float:
-    """Bits of ``cells`` (Hy, Wy) on ``region`` (frames, h, w) bool: each cell's bits spread evenly over its pixels in
-    every frame (the padded rows and columns beyond h and w count as outside)."""
+def region_bits(cells: np.ndarray, region: np.ndarray, size: int = CELL) -> float:
+    """Bits of ``cells`` (Hy, Wy) on ``region`` (frames, h, w) bool: each ``size``-pixel cell's bits spread evenly over
+    its pixels in every frame (the padded rows and columns beyond h and w count as outside)."""
     hy, wy = cells.shape
     frames, h, w = region.shape
-    size = None
-    for s in (16, 8, 32, 64):
-        if (h + s - 1) // s == hy and (w + s - 1) // s == wy:
-            size = s
-            break
-    if size is None:
-        raise ValueError(f"latent {hy}×{wy} does not tile a {h}×{w} frame")
+    if not (0 <= hy * size - h < PAD and 0 <= wy * size - w < PAD):
+        raise ValueError(f"latent {hy}×{wy} of {size}-pixel cells does not tile a {h}×{w} frame padded to {PAD}")
     padded = np.zeros((frames, hy * size, wy * size), bool)
     padded[:, :h, :w] = region
     counts = padded.reshape(frames, hy, size, wy, size).sum((0, 2, 4))
@@ -103,7 +100,9 @@ def estimate(plan: dict[str, Any]) -> dict[str, Any]:
     region = np.load(plan["region_file"], mmap_mode="r")
     if region.shape != (count, height, width):
         raise ValueError(f"region {region.shape}, expected {(count, height, width)}")
-    pad_r, pad_b = DMCI.get_padding_size(height, width, 16)
+    # The encoder pads to 16 inside its CUDA proxy; the training path needs 64. The extra rows and columns are
+    # edge copies outside R, so they only move a few bits between "outside" cells.
+    pad_r, pad_b = DMCI.get_padding_size(height, width, PAD)
 
     def frame(t: int) -> Any:
         """(1, 3, H, W) YCbCr in [-0.5, 0.5], chroma upsampled by nearest neighbour (``ycbcr420_to_444_np``)."""

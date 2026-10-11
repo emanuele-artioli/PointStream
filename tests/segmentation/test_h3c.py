@@ -33,6 +33,9 @@ def test_region_bits_spread_each_cell_over_its_pixels_and_frames():
     assert math.isclose(bits.region_bits(cells, region), (67 * 120 + 120 * 8 / 16) / 2)
     with pytest.raises(ValueError):
         bits.region_bits(np.ones((10, 10)), region)
+    # A quarter-scale frame (480×272) padded to 64: 20×32 cells, the last 3 rows of cells outside the frame.
+    small = np.ones((1, 272, 480), bool)
+    assert math.isclose(bits.region_bits(np.ones((20, 32)), small), 17 * 30)
 
 
 def test_nal_bytes_split_by_each_nals_share():
