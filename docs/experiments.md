@@ -2449,7 +2449,7 @@ invocation turns out to be needed.
   is added before its runs: β = 0.026 with γ = 9, so γ times the term
   equals the distortion at step 0, as intended. Rule (3) applies to F2
   as to F; if both qualify, the one with less flicker is adopted.
-- Prefill and anchors, outcome (code `85f3b56`…`0adcbd5`; all 10 stretches,
+- Prefill and anchors, outcome (code `22bc2b2`; all 10 stretches,
   Ada and A6000): `20261010T212240Z-6154e13b` (P26_02),
   `…212247Z-c5d24f8b` (P06_03), `…212640Z-2da36c49` (P02_09),
   `…212648Z-69b17f32` (P03_10), `…212654Z-787a2fbd` (P04_13),
@@ -2459,7 +2459,7 @@ invocation turns out to be needed.
   6.5 minutes at 18.6 GiB; the excerpt's SVT-AV1 points reproduce the
   fill check's exactly. Archives: P26_02 `c2afe03a…df43`, P06_03
   `f6d0863e…60dd`.
-- Outcome so far (code `0adcbd5`, Ada, 540 steps, all converged by G5b's
+- Outcome so far (code `22bc2b2`, Ada, 540 steps, all converged by G5b's
   rule). BD-rate against SVT-AV1 on ProPainter's fill, P06_03 | P26_02:
   | Arm | LPIPS_V | DISTS_V | PSNR_V | Jobs |
   |---|---|---|---|---|
