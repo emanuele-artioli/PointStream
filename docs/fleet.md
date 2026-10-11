@@ -51,10 +51,16 @@ and replace only verified worker processes; detached supervisors continue. Worke
 and claim both the request and its GPU/CPU resources. A request remains pending
 while compatible capacity is busy, until its absolute deadline.
 
-Admission requires a complete probe, no compute processes, memory use <=256 MiB,
-utilization <=5%, free memory >= declared peak +4 GiB, and sufficient aggregate
-CPU headroom. The supervisor repeats occupancy, memory and utilization checks
-under the resource claim immediately before starting. The claimed GPU is held
+A GPU job is admitted in one of two classes, chosen by `gpu_sharing`
+([Shared GPUs](#shared-gpus)). **Exclusive** (the default) requires a complete
+probe, no compute processes, memory use <=256 MiB, utilization <=5%, free memory
+>= declared peak +4 GiB, no other PointStream claim on the GPU, and sufficient
+aggregate CPU headroom. **Shared** requires a complete probe and free memory >=
+declared peak + sharing margin (8 GiB by default) + the peak and margin of every
+other shared PointStream claim on that GPU; other users' processes and utilization
+are ignored, and an idle GPU is preferred when one qualifies. The supervisor
+repeats the same class's check under the resource claim immediately before
+starting. The claimed GPU is held
 through smoke, validation and full execution. Other users can still allocate it;
 the job's declared contention policy then decides what happens
 ([below](#gpu-contention-partial-outputs-and-checkpoints)). The supervisor only
@@ -149,6 +155,54 @@ Children inherit `PS_STAGE` (smoke/full), `PS_STAGE_DIR` (separate output direct
 `experiments.jobs.monitor.publish_progress(stage, completed)` only on actual work
 completion. Log traffic and heartbeat timestamps do not count as progress.
 
+### Shared GPUs
+
+The cluster is shared with other users, and most PointStream work (training,
+rescoring, oracles, quality metrics) produces the same results whatever else runs
+on the GPU. Such a job can opt into the shared class:
+
+```json
+"gpu_sharing": {"mode": "shared", "basis": "Outputs and scores do not depend on wall time", "margin_mib": 8192}
+```
+
+`basis` is required and says why the results do not depend on timing;
+`margin_mib` is optional (default 8192, at least 1024). Specs without the field,
+or with `{"mode": "exclusive"}`, are admitted exactly as before.
+
+| Use | Mode |
+|---|---|
+| Training, rescoring, oracles, encode/decode for rate or quality only | `shared` |
+| Decode/render timing, latency, throughput, profiling, first run of a model on a GPU class | `exclusive` |
+
+A shared job:
+
+- is admitted beside other users' processes when memory suffices (see
+  [admission](#one-entry-point)); two PointStream shared jobs share one GPU only
+  if both declared peaks plus margins fit in its free memory, counted
+  conservatively (memory a running job already holds is counted again in its
+  reservation). An exclusive claim and a shared claim never share a GPU.
+- runs with contention policy `continue` (its `basis` defaults to the sharing
+  basis; declaring `stop` or `pause`, or `resume_attempts`, is rejected). Foreign
+  processes are still recorded as contention episodes.
+- has `timing_contaminated: true` from the start in the supervisor's
+  `status.json` and in every stage's `execution.json`. **Timings from a shared job
+  are never evidence**, whatever its episodes say.
+- records `gpu_sharing` in the request, `state.json`, the supervisor's
+  `status.json`, and each stage's `dispatch.json` and `execution.json` (exclusive
+  GPU jobs record `{"mode": "exclusive"}` there too).
+- receives `PS_GPU_SHARING=shared` and `PS_GPU_MEMORY_LIMIT_MIB` (its declared
+  `gpu_memory_mib`). Cap the allocator there, for example
+  `torch.cuda.set_per_process_memory_fraction(limit / total)`.
+- is stopped as `failed` if its own process group uses more than the declared
+  peak + 1 GiB on the GPU, or if that usage cannot be read; the error names the
+  measured and allowed MiB, `status.json` records `gpu_memory_overrun`, and partial
+  outputs and checkpoints are salvaged as usual. Other users' processes are never
+  signalled.
+
+Declare a peak that covers the workload's real maximum, measured in a smoke.
+Workers admit shared jobs only from a release that includes this path
+(`workers restart`, after review).
+
 ### Host-local staging
 
 The NFS home costs ~200 ms per small-file create and 11–17 ms per open; host-local
@@ -241,8 +295,9 @@ promotion. Full runs are not accessible through the old unrestricted `fleet laun
 
 ## GPU contention, partial outputs and checkpoints
 
-Admission requires an idle GPU, but another user can start a process on the
-claimed GPU at any time. The supervisor checks occupancy every 10 seconds. If the
+Exclusive admission requires an idle GPU, but another user can start a process on
+the claimed GPU at any time. (A [shared](#shared-gpus) job always uses
+`continue`.) The supervisor checks occupancy every 10 seconds. If the
 occupancy query fails, the job stops as `failed`. When a foreign process appears,
 the job's optional `contention` declaration decides what happens:
 
