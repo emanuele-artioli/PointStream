@@ -2969,3 +2969,40 @@ invocation turns out to be needed.
   Smoke: one item, 48 frames, ≤ 600 s. Pilot: B2's four pilot items, one
   job. Full: the other 30 items in parts of at most 45 min. Ceiling 12
   GPU-hours (the GPU only for LPIPS), overnight on hosts G5c leaves free.
+- Jobs (code `4f1c429`, environment `pointstream-20261006T113321Z`; every
+  validator 15/15). Pilot `20261010T213310Z-134c06e8` (RTX A6000; P01_107,
+  P09_106; smoke 190 s; items 14.4 and 11.6 min). Full, the other 32 items
+  in 16 jobs of two, `20261010T222727Z-11fee0de` to `…222849Z-252b6963`, on
+  RTX A6000, RTX 6000 Ada, Quadro RTX 8000 and Quadro GV100 (LPIPS on the
+  GPU matched the CPU within 1e-3 on every class), 1,095–2,309 s each. About
+  8.5 GPU-hours. Report (`h3 report`, all 34 items):
+  `pointstream-data/visor/h3-2026-10-10/report-h3a2-4f1c429/h3a2.json`
+  (`636eced3…2d14`). The same encoder re-encoding the whole window
+  reproduces H1's hand bits on B2's streams (median ratio 1.00 at every
+  CRF).
+- Outcome. **With measured references the oracle fails: no operating point
+  beats SVT-AV1.**
+  - Every one of the 12 points is worse in LPIPS at equal rate (+0.002 to
+    +0.029; every interval above zero) and saves nothing at equal quality
+    (median −0.4% to −19%).
+  - The closest are the finest margins: CRF 48 references with δ 0.01
+    (39% of hand-frames sent, 86.5 kbps, LPIPS 0.100 against SVT-AV1's
+    0.098 at that rate, better on 10 of 34 items) and CRF 55 with δ 0.01
+    (54.1 kbps, +0.004).
+  - Two effects compound. A reference sent in its own stream costs 1.4–2.1×
+    an inter-coded frame (median per point; more as references grow
+    sparser). And it is decoded worse than the same frame in the full-rate
+    stream at the same CRF: CRF 48 references with δ 0.02 go from H3a's
+    41.9 kbps and LPIPS 0.091 to 66.6 kbps and 0.109.
+- Reading. The hypothesis held on cost (1.5–2×) and failed on outcome; the
+  competing explanation held, by a different route than expected. Sparse
+  references are cheap enough, but they look worse than the same frames
+  coded at full rate, because SVT-AV1 spends its quality where frames
+  predict each other. H3a's pass relied on references with the full-rate
+  stream's quality at the inter-frame price.
+  - Texture transfer with refresh does not beat coded pixels on VISOR's
+    hands, even with the target's own motion. The textured-mesh fallback is
+    therefore not built.
+  - What could still win must spend far fewer bits on appearance. A
+    generator from one reference (or none) and the pose stream, at about
+    2 kbps, is H3b. The saving it must beat is zero: SVT-AV1's own curve.

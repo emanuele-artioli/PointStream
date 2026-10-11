@@ -480,9 +480,14 @@ Texture transfer (a MANO texture with references sent as an inter-coded
 stream) stays as the fallback. Generic hands judged without a reference
 were not chosen.
 
-H3a2 (running 2026-10-10): H3a with each run's references sent as their own
-SVT-AV1 stream and measured, and the reference choice tuned; it names the
-fallback's operating point and the saving a generator must beat.
+H3a2 (2026-10-11, [outcome](docs/experiments.md#2026-10-10--h3a2-the-texture-transfer-oracle-with-a-measured-reference-stream)):
+with each operating point's references sent as their own SVT-AV1 stream
+and measured, the oracle fails on all 12 points (LPIPS +0.002 to +0.029 at
+equal rate, no equal-quality saving). Sparse references cost 1.4–2.1× an
+inter-coded frame and decode worse than the same frames at full rate. So
+texture transfer with refresh does not beat coded pixels, and the
+textured-mesh fallback is not built. H3b (the generator at about the pose
+stream's rate) is the remaining route.
 
 H3b's oracle (to review with the user). A generator from one reference and
 the pose is billed at about the pose stream. The oracle grants it a perfect
