@@ -2557,6 +2557,30 @@ invocation turns out to be needed.
     - For step 3: the losing stretches (P04_13, P06_05) and the DISTS gap
       are what more scene footage and the recipe must close.
 
+### 2026-10-11 — G5c: the oracle on the stretches that lose (data or method?)
+- Question (the user, 2026-10-11): P04_13 and P06_05 lose to SVT-AV1 on
+  LPIPS_V with the step-2 recipe, and they are the excerpts that move most
+  (step 2's 10-stretch outcome: the scene model's gain tracks the
+  excerpt's motion, ρ = 0.81, and SVT-AV1's rate, ρ = 0.87). Is the method
+  the limit there, or the footage it was fitted on?
+- Oracle: G5b's upper bound with step 2's recipe (β = 0.005, ProPainter's
+  fill, 540 steps), fitted on the held-out excerpt itself: perfect footage
+  of exactly the views it must code. It bounds what any footage could give
+  the recipe, so it dominates the footage arms of step 3.
+- Rule, fixed now: on each of P04_13 and P06_05, if the oracle beats
+  SVT-AV1 on LPIPS_V (BD < 0) by at least 30%, the loss there is the
+  footage's (the method can win with footage that shows the views), and
+  the paper says so, with step 3 measuring how much real footage closes;
+  if it does not beat SVT-AV1, the method is the limit on fast excerpts
+  and the paper scopes to calm ones on that ground.
+- Hypothesis: the oracle wins on both by 40–70% (G5b's upper bound at
+  β = 0.026 won by 83% on P06_03), so the loss is the footage's.
+- Competing explanation: the oracle sees the excerpt it is scored on, so
+  part of its win is memorization of exactly those frames, which no real
+  footage gives; the oracle's margin is an upper bound, not a forecast.
+  Step 3's footage arms measure the realistic share.
+- Budget: 2 jobs, each ≤ 45 minutes on Ada.
+
 ### 2026-10-11 — G5c step 3: footage from the kitchen's other recordings
 - Question (PLAN G5c 3): does footage of the same kitchen from other
   recordings make a better scene model than the stretch's own 90 s, and
