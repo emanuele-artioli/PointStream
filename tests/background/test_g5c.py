@@ -243,3 +243,38 @@ def test_kid_enters_the_selection_lower_is_better():
     assert g5c.quality(p, "dataset", "kid_v") is None
     p["score"]["kid"] = {"kid_v": 3.0, "patches": 400}
     assert g5c.quality(p, "dataset", "kid_v") == -3.0 and "kid_v" in g5c.SELECTION_METRICS
+
+
+def test_enhancer_starts_as_the_identity_and_learns_a_constant_offset():
+    torch = pytest.importorskip("torch")
+    from experiments.background import g5d
+
+    torch.manual_seed(0)
+    net = g5d.enhancer(2, 8)
+    x = torch.rand(2, 3, 16, 16)
+    assert torch.equal(net(x), x)
+    rng = np.random.default_rng(0)
+    decoded = rng.integers(0, 200, (4, 140, 150, 3), dtype=np.uint8)
+    target = decoded + 20  # a constant offset the network must learn
+    keep = np.ones((4, 140, 150), bool)
+    old = dict(g5d.TRAIN)
+    g5d.TRAIN.update(blocks=1, channels=8, batch=4)
+    try:
+        fitted, record = g5d.fit(decoded, target, keep, "mse", 300, None, "cpu")
+    finally:
+        g5d.TRAIN.clear()
+        g5d.TRAIN.update(old)
+    assert record["curve"][-1]["mse_fixed"] < 0.1 * record["mse_fixed_start"]
+    out = g5d.apply(fitted, decoded, "cpu")
+    assert out.dtype == np.uint8 and np.abs(out.astype(int) - target.astype(int)).mean() < 4
+
+
+def test_patches_prefer_visible_background():
+    from experiments.background import g5d
+
+    keep = np.zeros((3, 200, 300), bool)
+    keep[:, :, 150:] = True
+    patches = g5d.sample_patches(np.random.default_rng(0), keep, 50, 64, 0.9)
+    assert len(patches) == 50
+    share = np.mean([keep[i, y:y + 64, x:x + 64].mean() for i, y, x in patches])
+    assert share > 0.8

@@ -2754,6 +2754,42 @@ invocation turns out to be needed.
 - Budget: 4 rescore jobs (≤ 20 minutes each, Ada or A6000) and 12
   training jobs (≤ 45 minutes each, Ada), about 8.5 GPU-hours.
 
+### 2026-10-11 — G5d oracle: a venue-trained enhancer of SVT-AV1 (user, 2026-10-11)
+- Question: can knowledge of the venue held at the client make plain
+  SVT-AV1's background better at no extra rate, keeping what AV1 does well
+  (PSNR, steady frames), which the scene-adapted DCVC-UF loses? The
+  stream stays standard AV1; a small network, sent once like the scene
+  model, maps each decoded frame to a better one (NAS, Yeo et al., OSDI
+  2018). Asked after step 4's round 1: we must beat AV1 by using what the
+  client already has, not by a stronger conventional codec.
+- Method (`experiments/background/g5d.py`). SVT-AV1 at G5's CRFs and preset
+  on the excerpt's ProPainter fill (the prefill of step 2). An
+  EDSR-style residual CNN (8 blocks, 64 channels, about 0.6 M parameters,
+  starting as the identity), one per CRF, fitted on (decoded, source)
+  patches of 128 px on V for 2,000 steps (Adam 2 × 10⁻⁴, cosine). Fits:
+  *excerpt*, on the scored frames themselves (the oracle); *scene*, on the
+  stretch's other frames coded at the same CRF (G5b's split, the same
+  footage as recipe C). Losses: masked MSE, and MSE plus LPIPS on V at
+  equal weight at step 0. Scored as every method (`g5c.full_score`);
+  the rate is SVT-AV1's.
+- Clips: the pilots P26_02 and P06_03 (calm, where a venue model helps
+  most; the oracle needs the best case).
+- Decision rule, fixed now. An arm passes when its BD-rate against
+  SVT-AV1 (the anchors' envelope of frame and fill, `g5c.py rescore`) is
+  −10% or better on at least 3 of PSNR_V, LPIPS_V, DISTS_V, flicker_V and
+  KID_V, on both pilots. No excerpt arm passing closes the enhancer. A
+  scene arm passing means a venue-footage enhancer (other recordings,
+  as step 3) is built next and compared with the scene model.
+- Hypothesis: the excerpt arms pass with PSNR_V among their metrics
+  (−15% to −30%; an MSE-fitted network removes AV1's blocking and
+  ringing), the scene arms reach about half of that, and flicker does
+  not get worse (the network sees one frame but AV1's frames are
+  steady). Competing explanation for a pass: memorizing the excerpt's
+  frames (0.6 M parameters, 240 frames); the scene arms, which never see
+  them, answer it.
+- Budget: 2 jobs, each ≤ 45 minutes on Ada or A6000 (12 SVT-AV1 encodes,
+  24 fits, 30 scored points), about 1.5 GPU-hours.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
