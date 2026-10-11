@@ -3352,8 +3352,8 @@ invocation turns out to be needed.
   actual bytes, and the whole-frame rates, are reported; a BD-rate sign
   that flips between the region rate and the whole-frame rate is stated.
   (3) The component knows the person or kitchen: excluded by participant.
-- Budget. Smoke ≤ 10 minutes. Training data: two CPU jobs (pilot windows;
-  the 24 items) ≤ 45 minutes each. Anchor and reference: one GPU job per
+- Budget. Smoke ≤ 10 minutes. Training data is built inside each training
+  job (a window decodes in about 2 s; H3b2). Anchor and reference: one GPU job per
   pilot item ≤ 45 minutes. Calibration ≤ 10 minutes. Upper bound: two
   runs ≤ 45 minutes (30 minutes of training each), then their coding,
   split into jobs ≤ 45 minutes. Component: one run and its coding.
