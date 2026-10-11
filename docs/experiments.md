@@ -3370,3 +3370,11 @@ invocation turns out to be needed.
   H3b2's units for the cross-checks, DCVC-UF's image and HT-L checkpoints
   (G5b's). Environment `pointstream-20261009T214002Z` (`32e68872…4661`,
   G5b's; the H3b environment plus NVRC).
+- Calibration (`20261011T215620Z-b6a1294d`, shared, RTX 6000 Ada, code
+  `cac5322` and later; the upper bound's data: 4 windows × 3 scales × 5
+  segments, 2,880 fitted frames, 960 sequence starts; 40 steps, β = 0;
+  validator 8/8). At step 0 the monitor set's masked distortion is
+  0.002376 and its LPIPS on R 0.0564, so **β = 0.084** (G5b's 0.026 came
+  from LPIPS on the whole visible background, 0.203). Peak 42.72 GiB
+  allocated, as G5b. Infrastructure, not evidence. Upper bound, 540 steps:
+  β = 0 `20261011T230242Z-eed20579`, β = 0.084 `20261011T230251Z-97f6ec94`.
