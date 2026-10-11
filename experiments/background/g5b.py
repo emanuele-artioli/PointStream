@@ -316,7 +316,11 @@ def command_finetune(args: argparse.Namespace) -> int:
     prepare_seconds = time.time() - began
 
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
+    frame_weights = [float(w) for w in args.frame_weights.split(",")] if args.frame_weights else None
+    if frame_weights is not None and len(frame_weights) != 3:
+        raise SystemExit("--frame-weights: last, even, odd positions of a group (DCVC-UF's 1.5,0.16,0.4)")
     plan = {**TRAIN, "frames": str(work / "frames.npy"), "keep": str(work / "keep.npy"), "fit": fit,
+            "lr": args.lr if args.lr else TRAIN["lr"], "frame_weights": frame_weights,
             "steps": args.steps, "monitor_every": max(1, args.steps // 10), "save_every": max(1, args.steps // 10),
             "lpips_weight": args.lpips_weight, "lpips_backbone": args.lpips_backbone,
             "dists_weight": args.dists_weight, "dists_backbone": args.dists_backbone,
@@ -377,7 +381,9 @@ def command_finetune(args: argparse.Namespace) -> int:
         arm = arm.replace("scene-", "footage-" if args.fit == "footage" else "scene+footage-", 1)
     if prefilled:  # G5c arms: the fill and every loss weight in the name
         arm += f"-b{args.lpips_weight:g}" + ("-dists" if args.dists_weight else "") + \
-               (f"-t{args.temporal_weight:g}" if args.temporal_weight else "") + f"-{fill_name}"
+               (f"-t{args.temporal_weight:g}" if args.temporal_weight else "") + \
+               (f"-w{args.frame_weights}" if args.frame_weights else "") + \
+               (f"-lr{args.lr:g}" if args.lr and args.lr != TRAIN["lr"] else "") + f"-{fill_name}"
     row = {**clip.record, "kind": "finetune", "arm": arm, "fit": args.fit, "fit_clip": fit_id,
            "fit_frames": len(fit), "guard_s": GUARD_S if args.fit == "scene" else None,
            "lpips_weight": args.lpips_weight, "dists_weight": trained.get("dists_weight", 0.0),
@@ -386,7 +392,7 @@ def command_finetune(args: argparse.Namespace) -> int:
                {k: sg[k] for k in ("video", "first_index", "last_index", "frames")} for sg in m["segments"]]}
                for m, _, _ in footage],
            "steps": args.steps, "train": {**TRAIN, **{k: plan[k] for k in (
-               "groups", "patch", "monitor_batch", "monitor_every")}},
+               "groups", "patch", "monitor_batch", "monitor_every", "lr", "frame_weights")}},
            "model": {k: trained[k] for k in ("checkpoint_sha256", "checkpoint_bytes", "parameters")},
            "model_bytes_fp16": 2 * trained["parameters"], "billed": False,
            "curve": trained["curve"], "converged": monitor_converged(trained["curve"]),
@@ -665,6 +671,10 @@ def main(argv: list[str] | None = None) -> int:
     ft.add_argument("--dists-every", type=int, default=1, help="DISTS in the loss on every Nth frame of a group")
     ft.add_argument("--temporal-weight", type=float, default=0.0,
                     help="the change of the coding error between consecutive frames on V, in the loss")
+    ft.add_argument("--frame-weights", default=None,
+                    help="distortion weights of a group's last, even and odd positions (DCVC-UF: 1.5,0.16,0.4)")
+    ft.add_argument("--lr", type=float, default=0.0, help="learning rate (0: TRAIN's)")
+    ft.add_argument("--inception", default=None, help="Inception-v3 weights: KID on V and the position profile")
     ft.set_defaults(func=command_finetune)
     wp = sub.add_parser("warp")
     common(wp)

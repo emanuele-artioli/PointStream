@@ -192,3 +192,54 @@ def test_segments_are_fixed_disjoint_and_away_from_the_ends():
                 assert x["last_index"] < y["first_index"] or y["last_index"] < x["first_index"]
     with pytest.raises(SystemExit):
         g5c.choose_segments("visor-long/P26_02", {"P26_108": (50.0, 9_786)}, 4)
+
+
+def test_kid_is_zero_in_expectation_for_one_distribution_and_grows_with_a_shift():
+    from src.codecs.quality import kid
+
+    rng = np.random.default_rng(0)
+    a, b = rng.normal(size=(400, 16)), rng.normal(size=(400, 16))
+    same = kid(a, b)
+    assert abs(same) < 0.02 and kid(a, b) == pytest.approx(kid(b, a))
+    assert kid(a, b + 0.5) > 10 * abs(same)
+    with pytest.raises(ValueError):
+        kid(a[:1], b)
+
+
+def test_inception_features_are_2048_per_image():
+    torch = pytest.importorskip("torch")
+    pytest.importorskip("torchvision")
+    from src.codecs.quality import inception_features, inception_network
+
+    torch.manual_seed(0)
+    feats = inception_features(inception_network(None), torch.rand(2, 3, 64, 80))
+    assert tuple(feats.shape) == (2, 2048) and feats.dtype == torch.float64
+
+
+def test_kid_patches_are_fixed_and_mostly_visible():
+    n, h, w = 3, 300, 400
+    keep = np.ones((n, h, w), bool)
+    keep[:, :, :200] = False  # the left half is foreground: patches must lie mostly right
+    clip = clip_of(np.zeros((n, h, w, 3), np.uint8), keep)
+    patches = g5c.kid_patches(clip)
+    assert patches == g5c.kid_patches(clip) and len(patches) == n * g5c.KID_PER_FRAME
+    for i, y, x in patches:
+        assert 0 <= y <= h - g5c.KID_PATCH and 0 <= x <= w - g5c.KID_PATCH
+        assert keep[i, y:y + g5c.KID_PATCH, x:x + g5c.KID_PATCH].mean() >= g5c.KID_MIN_V
+    keep[:] = False
+    assert g5c.kid_patches(clip_of(np.zeros((n, h, w, 3), np.uint8), keep)) == []
+
+
+def test_position_profile_follows_dcvc_groups():
+    n = 17  # the first frame and two groups of 8
+    clip = clip_of(np.zeros((n, 4, 4, 3), np.uint8), np.ones((n, 4, 4), bool))
+    per_frame = [100.0] + [float(p) for _ in range(2) for p in range(8)]
+    assert g5c.by_position(clip, per_frame) == [100.0] + [float(p) for p in range(8)]
+    assert g5c.by_position(clip, per_frame[:-1]) is None  # a frame without a value: no profile
+
+
+def test_kid_enters_the_selection_lower_is_better():
+    p = point(10, 0.2, 0.1, 2.0)
+    assert g5c.quality(p, "dataset", "kid_v") is None
+    p["score"]["kid"] = {"kid_v": 3.0, "patches": 400}
+    assert g5c.quality(p, "dataset", "kid_v") == -3.0 and "kid_v" in g5c.SELECTION_METRICS

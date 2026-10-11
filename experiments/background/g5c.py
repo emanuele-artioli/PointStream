@@ -11,6 +11,9 @@
     python -m experiments.background.g5c prefill --prepared DIR --clips CLIPS.JSON --visor-fill DIR --select ID \\
         --propainter-tree DIR --propainter-ckpt P --raft-ckpt P --flow-completion-ckpt P --image-ckpt PATH \\
         --video-ckpt PATH --lpips-backbone PATH --dists-backbone PATH --limit-frames N
+    python -m experiments.background.g5c rescore --prepared DIR --clips CLIPS.JSON --visor-fill DIR --select ID \\
+        --prefill DIR --image-ckpt PATH --video-ckpt PATH --lpips-backbone PATH --dists-backbone PATH \\
+        --inception PATH --limit-frames N
     python -m experiments.background.g5c validate
     python -m experiments.background.g5c report --result g5c.json ... --out DIR
 
@@ -31,6 +34,7 @@ coded by SVT-AV1 at G5's CRFs and scored on V. Each writes ``g5c.json`` in
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import lzma
 import math
@@ -132,22 +136,99 @@ def flicker(clip: g5.Clip, rgb: np.ndarray, flows: np.ndarray, device: str) -> d
             "residual_source": float(np.mean(src_energy)) if src_energy else None, "pairs": len(per_pair)}
 
 
+KID_PATCH = 256  # HiFiC's patch protocol for FID/KID, on V
+KID_PER_FRAME = 2
+KID_MIN_V = 0.75  # a patch at least this much visible background (the rest pasted back from the source)
+KID_TRIES = 40
+KID_TIER = "own"  # every frame of the excerpt has a scoring mask in this tier
+
+
+def kid_patches(clip: g5.Clip) -> list[tuple[int, int, int]]:
+    """(frame, y, x) of up to ``KID_PER_FRAME`` patches per frame of the tier, each mostly V; drawn once per
+    clip from its id, so every method is judged on the same patches."""
+    frames, masks = clip.scored[KID_TIER]
+    h, w = masks[0].shape
+    rng = np.random.default_rng(int(hashlib.sha256(clip.id.encode()).hexdigest()[:16], 16))
+    out = []
+    for i, mask in zip(frames, masks):
+        kept = 0
+        for _ in range(KID_TRIES):
+            y, x = int(rng.integers(0, h - KID_PATCH + 1)), int(rng.integers(0, w - KID_PATCH + 1))
+            if mask[y:y + KID_PATCH, x:x + KID_PATCH].mean() >= KID_MIN_V:
+                out.append((int(i), y, x))
+                kept += 1
+                if kept == KID_PER_FRAME:
+                    break
+    return out
+
+
+def patch_features(net: Any, rgb: np.ndarray, patches: list[tuple[int, int, int]], device: str) -> np.ndarray:
+    import torch
+
+    from src.codecs.quality import inception_features
+
+    feats = []
+    for first in range(0, len(patches), 32):
+        crops = np.stack([rgb[i, y:y + KID_PATCH, x:x + KID_PATCH] for i, y, x in patches[first:first + 32]])
+        t = torch.from_numpy(crops).to(device).permute(0, 3, 1, 2).float() / 255.0
+        feats.append(inception_features(net, t).cpu().numpy())
+    return np.concatenate(feats)
+
+
+def kid_v(clip: g5.Clip, rgb: np.ndarray, nets: SimpleNamespace, device: str) -> dict[str, Any]:
+    """KID (×1000) between the decoded and the source patches of `kid_patches`, the foreground pasted back
+    from the source as for every other score. The source's features are computed once per clip."""
+    from src.codecs.quality import kid
+
+    if clip.id not in nets.kid_source:
+        patches = kid_patches(clip)
+        nets.kid_source[clip.id] = (patches, patch_features(nets.inception, clip.frames, patches, device))
+    patches, source = nets.kid_source[clip.id]
+    if len(patches) < 2:
+        return {"kid_v": None, "patches": len(patches)}
+    pasted = np.where(clip.keep[..., None], rgb, clip.frames)
+    return {"kid_v": 1000.0 * kid(patch_features(nets.inception, pasted, patches, device), source),
+            "patches": len(patches), "patch": KID_PATCH}
+
+
+def by_position(clip: g5.Clip, per_frame: list[float]) -> list[float | None] | None:
+    """Mean PSNR_V of the first frame and of each position in DCVC-UF's groups of 8 after it ((t − 1) mod 8)."""
+    frames = clip.scored[KID_TIER][0]
+    if len(per_frame) != len(frames):
+        return None
+    slots: list[list[float]] = [[] for _ in range(9)]
+    for i, v in zip(frames, per_frame):
+        slots[0 if i == 0 else 1 + (i - 1) % 8].append(v)
+    return [float(np.mean(s)) if s else None for s in slots]
+
+
 def full_score(clip: g5.Clip, rgb: np.ndarray, nets: SimpleNamespace, flows: np.ndarray) -> dict[str, Any]:
-    """G5's score (PSNR and LPIPS on V per tier) with DISTS on V per tier and flicker on V added."""
-    scored = g5.strip_frames(g5.score(clip, rgb, nets.lpips, "cuda"))
+    """G5's score (PSNR and LPIPS on V per tier) with DISTS on V per tier and flicker on V added; with an
+    Inception network, KID on V and the PSNR_V of each position within DCVC-UF's groups (step 4)."""
+    full = g5.score(clip, rgb, nets.lpips, "cuda")
+    profile = by_position(clip, full[KID_TIER]["psnr_v_per_frame"])
+    scored = g5.strip_frames(full)
     for tier, value in dists_v(clip, rgb, nets.dists, "cuda").items():
         scored[tier]["dists_v"] = value
     scored["flicker"] = flicker(clip, rgb, flows, "cuda")
+    if getattr(nets, "inception", None) is not None:
+        scored["kid"] = kid_v(clip, rgb, nets, "cuda")
+        scored[KID_TIER]["psnr_v_by_position"] = profile
     return scored
 
 
 def load_nets(args: argparse.Namespace) -> SimpleNamespace:
     from src.codecs import quality
 
-    return SimpleNamespace(lpips=g5.load_lpips(args.lpips_backbone, "cuda"),
+    nets = SimpleNamespace(lpips=g5.load_lpips(args.lpips_backbone, "cuda"),
                            dists=quality.load_dists(Path(args.dists_backbone), "cuda"),
                            record={"lpips": quality.lpips_record(Path(args.lpips_backbone)),
-                                   "dists": quality.dists_record(Path(args.dists_backbone))})
+                                   "dists": quality.dists_record(Path(args.dists_backbone))},
+                           inception=None, kid_source={})
+    if getattr(args, "inception", None):
+        nets.inception = quality.load_inception(Path(args.inception), "cuda")
+        nets.record["kid"] = quality.inception_record(Path(args.inception))
+    return nets
 
 
 # ----------------------------------------------------------------- decoding stored streams
@@ -686,6 +767,34 @@ def command_prefill(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_rescore(args: argparse.Namespace) -> int:
+    """Step 4's anchors: SVT-AV1 and DCVC-UF off the shelf re-coded on a published prefill's excerpt (as
+    ``prefill`` coded them) and scored with KID on V and the position profile added."""
+    from experiments.background.g5b import load_prefilled
+
+    spec = json.loads(Path(args.clips).read_text())
+    by_id = {c["id"]: c for c in spec["clips"]}
+    clip_id = g5.only_clip(spec, args.select)
+    clip = g5.load_clip(g5.clip_dirs(Path(args.prepared))[clip_id], by_id[clip_id], Path(args.visor_fill),
+                        args.limit_frames)
+    prefilled = load_prefilled([args.prefill])
+    if clip_id not in prefilled:
+        raise SystemExit(f"{args.prefill}: not a prefill of {clip_id}")
+    meta, path = prefilled[clip_id]
+    offset = clip.start - meta["first"]
+    excerpt = np.ascontiguousarray(np.load(path, mmap_mode="r")[offset:offset + clip.n])
+    began = time.time()
+    nets = load_nets(args)
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    methods = code_anchors(clip, excerpt, args, nets, scratch / "rescore")
+    write_json(stage_dir() / "g5c.json", {
+        "kind": "rescore", "clip": clip.record, "limit_frames": args.limit_frames,
+        "prefill": {k: meta[k] for k in ("id", "first", "frames", "yuv420_sha256", "fill")},
+        "metrics": nets.record, "seconds": round(time.time() - began, 1), **gpu_record(), "methods": methods})
+    shutil.rmtree(scratch / "rescore", ignore_errors=True)
+    return 0
+
+
 # ----------------------------------------------------------------- footage from other recordings (step 3)
 
 SEGMENT_S = 60.0
@@ -826,12 +935,17 @@ def command_footage(args: argparse.Namespace) -> int:
 
 
 def quality(point: dict[str, Any], tier: str, metric: str) -> float | None:
-    """Higher is better: −100 × LPIPS_V or DISTS_V, PSNR_V as is, −flicker."""
+    """Higher is better: −100 × LPIPS_V or DISTS_V, PSNR_V as is, −flicker, −KID_V (already ×1000)."""
     score = point["score"]
-    value = score["flicker"]["flicker_v"] if metric == "flicker_v" else score.get(tier, {}).get(metric)
+    if metric == "flicker_v":
+        value = score["flicker"]["flicker_v"]
+    elif metric == "kid_v":
+        value = score.get("kid", {}).get("kid_v")
+    else:
+        value = score.get(tier, {}).get(metric)
     if value is None:
         return None
-    return float(value) if metric == "psnr_v" else (-float(value) if metric == "flicker_v" else -100.0 * float(value))
+    return float(value) if metric == "psnr_v" else (-float(value) if metric in ("flicker_v", "kid_v") else -100.0 * float(value))
 
 
 def rate(point: dict[str, Any]) -> float:
@@ -844,6 +958,8 @@ def curve(points: list[dict[str, Any]], tier: str, metric: str) -> list[tuple[fl
 
 
 METRICS = ("lpips_v", "dists_v", "psnr_v", "flicker_v")
+#: Step 4's selection (user, 2026-10-11): how many of these beat SVT-AV1 (median BD-rate over the stretches).
+SELECTION_METRICS = (*METRICS, "kid_v")
 
 
 def worse_everywhere(test: list[tuple[float, float]], anchor: list[tuple[float, float]]) -> bool:
@@ -948,6 +1064,11 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         return (g5.finite(s["dataset"]["lpips_v"]) and d is not None and 0 <= d <= 1
                 and g5.finite(s["flicker"]["flicker_v"]) and s["flicker"]["pairs"] > 0)
 
+    def kid_scored(p: dict[str, Any]) -> bool:
+        k = p["score"].get("kid", {})
+        return g5.finite(k.get("kid_v")) and k.get("patches", 0) >= (100 if full else 2) and \
+            len([v for v in p["score"][KID_TIER].get("psnr_v_by_position") or [] if v is not None]) == 9
+
     if result["kind"] == "checks":
         methods = result["methods"]
         checks["every_method"] = {m["arm"] for m in methods} >= {"svtav1-frame", "svtav1-filled", "dcvc"} and len(methods) >= 4
@@ -984,6 +1105,16 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         checks["whole_stretch_filled"] = full and result["prefill"]["frames"] >= 600 or not full
         checks["prefill_published"] = g5.published_has(stage, "publish/prefill/filled_yuv420.npy")
         checks["propainter_on_gpu"] = result["propainter"]["gpu"] == result["gpu"]
+    elif result["kind"] == "rescore":
+        methods = result["methods"]
+        checks["every_method"] = {m["arm"] for m in methods} == {"svtav1-frame", "svtav1-filled", "dcvc"}
+        checks["every_point_scored"] = all(m["points"] and all(scored(p) and kid_scored(p) for p in m["points"])
+                                           for m in methods)
+        checks["dcvc_decodes"] = all(p["deterministic"] and p["decoder_matches_encoder_intra"]
+                                     for m in methods if m["codec"] == "dcvc" for p in m["points"])
+        checks["kid_falls_with_rate"] = not full or all(  # more bits, closer to the source's own patches
+            pts[0]["score"]["kid"]["kid_v"] >= pts[-1]["score"]["kid"]["kid_v"]
+            for m in methods for pts in [sorted(m["points"], key=lambda p: p["kbps"])])
     elif result["kind"] == "footage":
         segs = result["segments"]
         checks["segments"] = bool(segs) and all(s["frames"] > 0 for s in segs)
@@ -1033,6 +1164,7 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--dists-backbone", required=True)
         p.add_argument("--image-ckpt", default=None)
         p.add_argument("--video-ckpt", default=None, help="the public HT-L checkpoint")
+        p.add_argument("--inception", default=None, help="Inception-v3 weights: KID on V and the position profile")
 
     ch = sub.add_parser("checks")
     common(ch)
@@ -1061,6 +1193,10 @@ def main(argv: list[str] | None = None) -> int:
     pf.add_argument("--raft-ckpt", required=True)
     pf.add_argument("--flow-completion-ckpt", required=True)
     pf.set_defaults(func=command_prefill)
+    rs = sub.add_parser("rescore")
+    common(rs)
+    rs.add_argument("--prefill", required=True, help="the stretch's extracted prefill archive")
+    rs.set_defaults(func=command_rescore)
     fo = sub.add_parser("footage")
     fo.add_argument("--target", required=True, help="the stretch whose kitchen the footage shows")
     fo.add_argument("--segments", type=int, default=4)

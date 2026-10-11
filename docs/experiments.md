@@ -2693,6 +2693,67 @@ invocation turns out to be needed.
   - GPU time: about 5 hours (footage 4 jobs and 4 failed attempts,
     arms 4 × 0.6, oracles 2 × 0.6).
 
+### 2026-10-11 — G5c step 4: the recipe, round 1 (frame weights, learning rate)
+- Question (PLAN G5c 4): which training change makes the scene model beat
+  SVT-AV1 on more of the selection's metrics, at matched rate?
+- Measured before any run, from recorded streams (no GPU):
+  - *The first frame is cheap.* In recipe C's streams on the 10 stretches
+    (step 2) the intra frame, which the image model codes, is 1.4–9.6%
+    of the bytes (median about 3%; the most at the lowest QP), parsed from
+    the published containers. Adapting the image model can save at most
+    that share of rate directly (its oracle: an intra frame costing
+    nothing), so it is dropped from step 4.
+  - *Standing under the selection* (median BD-rate against SVT-AV1 over the
+    10 stretches). DCVC-UF off the shelf loses on every metric on every
+    stretch (LPIPS_V +39% to +451%). Recipe C beats it on LPIPS_V only
+    (−41%); DISTS_V +28%, PSNR_V +121%, and flicker is worse at every rate
+    on 7 of 10 stretches (+271% to +471% on the other 3): 1 of 4. On the
+    pilots every β > 0 arm of step 2 scores 2 of 4 and C wins the tie
+    (mean −23% against A's −11%).
+  - *A mechanism for the flicker.* DCVC-UF trains with per-frame weights
+    within each group of 8 (`mse_8frames_sum`): 1.5 on the last frame
+    (the next group's reference), 0.4 on the odd and 0.16 on the even
+    positions, so quality swings within every group by design.
+- New judge, held out of every loss: KID on V, HiFiC's patch protocol
+  (patches of 256 px, two per frame where V covers at least 75%, the
+  foreground pasted back from the source, the same patches for every
+  method; `g5c.kid_patches`), on torchvision's Inception-v3 ImageNet pool
+  features (`Models/Inception/inception_v3_google-0cc3c7bd.pth`, sha256
+  `0cc3c7bd…a5ef`, staged under `background/g5c-2026-10-11/inputs/`),
+  unbiased MMD² with the cubic kernel, ×1000. It is not the TF FID
+  network (torch-fidelity is not in the environment), so its values rank
+  our codecs and are not comparable with published FID or KID. Also
+  recorded: PSNR_V per position within the groups.
+- Development set, fixed now: P26_02 and P06_03 (the pilots), P06_10 and
+  P02_09 (4th and 7th–8th of 10 by C's LPIPS_V gain), so the median is
+  not the pilots'. The fast losers (P04_13, P06_05) are step 5's scope.
+  The chosen recipe then runs on all 10.
+- Anchors: SVT-AV1 at G5's CRFs on frame and fill, and DCVC-UF off the
+  shelf, re-coded on the ProPainter prefills and scored with KID
+  (`g5c.py rescore`).
+- Arms (β = 0.005, ProPainter's fill, 540 steps; `g5b.py finetune`): C
+  again (the replicate, for training noise; GPU training is not
+  bit-reproducible), W flat frame weights (0.4175 on every position, the
+  same total; `--frame-weights`), L learning rate 3 × 10⁻⁵ (3×; `--lr`).
+- Decision rule, fixed now. An arm's score is the number of PSNR_V,
+  LPIPS_V, DISTS_V, flicker_V and KID_V on which its median BD-rate
+  against SVT-AV1 over the 4 stretches is below 0 (worse at every rate
+  counts as not beating), ties broken by the mean of the five medians,
+  each BD-rate capped at +100% (worse everywhere counts +100%). An arm
+  replaces C if it scores more than C's replicate, or the same with a
+  mean lower by more than max(5 points, twice the difference between C
+  and its replicate on the four metrics both have). Two winners combine
+  in round 2.
+- Hypotheses. W: C's PSNR_V spread over the 8 positions is at least
+  1 dB and W's under 0.5 dB, and flicker_V at matched rate falls by 10%
+  or more, with LPIPS_V within ±10% of C. L: LPIPS_V 5–15% better than C
+  (540 steps at 10⁻⁵ under-fit the excerpt), PSNR_V unchanged.
+- Competing explanation for the flicker: generated texture that changes
+  from frame to frame (β > 0 added about a third, step 1), not the
+  groups; then W flattens the profile but leaves flicker as it is.
+- Budget: 4 rescore jobs (≤ 20 minutes each, Ada or A6000) and 12
+  training jobs (≤ 45 minutes each, Ada), about 8.5 GPU-hours.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)

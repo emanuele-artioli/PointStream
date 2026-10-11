@@ -313,6 +313,14 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   2026-10-10, manifest beside it), loaded from that path, never downloaded.
   On a region, every layer's statistics are weighted by the region
   (`src.codecs.quality.masked_dists`). No new dependency.
+- KID (G5c step 4) uses torchvision 0.25's Inception-v3 with its ImageNet
+  weights `Models/Inception/inception_v3_google-0cc3c7bd.pth` (sha256
+  `0cc3c7bd…a5ef`, its prefix matches the published file name; already in
+  `Models/`), the classifier removed, 2048 pooled features, unbiased MMD²
+  with the cubic kernel (`src.codecs.quality.kid`). The TF FID network
+  (`pt_inception-2015-12-05`, in the shared torch hub cache) needs
+  torch-fidelity, which the environment lacks, so KID values rank our
+  codecs and are not comparable with published ones. No new dependency.
 - VMAF: the environment's ffmpeg has no libvmaf; the hosts' `/opt/local/bin/ffmpeg`
   (7.1.1, libvmaf 3, built-in `vmaf_v0.6.1`) has it on gpu1–gpu6. Results
   record its path, sha256 and the libvmaf it links.

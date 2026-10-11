@@ -179,6 +179,68 @@ def dists_record(backbone: Path) -> dict[str, Any]:
     }
 
 
+INCEPTION_SIZE = 299
+IMAGENET_MEAN, IMAGENET_STD = (0.485, 0.456, 0.406), (0.229, 0.224, 0.225)
+
+
+def load_inception(weights: Path, device: str) -> Any:
+    """torchvision's Inception-v3 with its ImageNet weights read from ``weights`` and the classifier removed:
+    2048 pooled features per image. Not the TF FID network (torch-fidelity is not in the environment), so a
+    KID from it compares codecs with each other, not with published FID or KID values."""
+    import torch
+
+    return inception_network(torch.load(weights, map_location="cpu", weights_only=True)).to(device)
+
+
+def inception_network(state: dict[str, Any] | None) -> Any:
+    """The network of `load_inception` from a state dict (``None``: random weights, for tests)."""
+    import torch
+    import torchvision
+
+    net = torchvision.models.inception_v3(weights=None, aux_logits=True, transform_input=True,
+                                          init_weights=state is None)
+    if state is not None:
+        net.load_state_dict(state, strict=True)
+    net.fc = torch.nn.Identity()
+    return net.eval()
+
+
+def inception_features(net: Any, images: Any) -> Any:
+    """(b, 2048) features of (b, 3, h, w) RGB images in [0, 1], resized to 299 (bilinear, antialiased)."""
+    import torch
+    import torch.nn.functional as F
+
+    x = F.interpolate(images, size=(INCEPTION_SIZE, INCEPTION_SIZE), mode="bilinear", align_corners=False,
+                      antialias=True)
+    mean = torch.tensor(IMAGENET_MEAN, device=x.device).view(1, 3, 1, 1)
+    std = torch.tensor(IMAGENET_STD, device=x.device).view(1, 3, 1, 1)
+    with torch.inference_mode():
+        return net((x - mean) / std).double()
+
+
+def kid(x: np.ndarray, y: np.ndarray) -> float:
+    """Kernel Inception Distance (Bińkowski et al. 2018): the unbiased MMD² of two feature sets (m, d), (n, d)
+    under the kernel (a·b / d + 1)³, over the whole sets (no subsets)."""
+    x, y = np.asarray(x, np.float64), np.asarray(y, np.float64)
+    m, n, d = len(x), len(y), x.shape[1]
+    if m < 2 or n < 2:
+        raise ValueError("KID needs at least two samples per set")
+    kxx, kyy, kxy = (x @ x.T / d + 1) ** 3, (y @ y.T / d + 1) ** 3, (x @ y.T / d + 1) ** 3
+    return float((kxx.sum() - np.trace(kxx)) / (m * (m - 1)) + (kyy.sum() - np.trace(kyy)) / (n * (n - 1))
+                 - 2 * kxy.mean())
+
+
+def inception_record(weights: Path) -> dict[str, Any]:
+    import hashlib
+
+    import torchvision
+
+    return {"metric": "KID", "net": "inception_v3 (torchvision, ImageNet)", "torchvision": torchvision.__version__,
+            "weights": str(weights), "weights_sha256": hashlib.sha256(Path(weights).read_bytes()).hexdigest(),
+            "features": "2048 pooled, input resized to 299 bilinear antialiased, ImageNet normalization",
+            "kernel": "cubic polynomial, unbiased MMD² over the whole sets"}
+
+
 def _region_sum(values: Any, mask: Any) -> tuple[Any, Any]:
     """Per-frame sum and count of ``values`` (n, h, w) inside ``mask`` (n, h, w)."""
     return (values * mask).flatten(1).sum(1), mask.flatten(1).sum(1)

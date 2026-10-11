@@ -30,6 +30,9 @@ with λ from `get_training_lambdas`), with these differences:
   evaluated every ``monitor_every`` steps without gradients; its curve decides
   convergence. The held-out frames are never seen unless the plan fits on them
   (the upper bound).
+* Optionally (G5c step 4) the per-frame distortion weights within a group (``frame_weights``: last, even and
+  odd positions; DCVC-UF's are 1.5, 0.16 and 0.4, so the last frame, the next group's reference, is coded
+  best and quality swings within every group).
 * The state is saved every ``save_every`` steps for resumption.
 
 Only the video model is trained; the image model codes the first frame of a
@@ -224,7 +227,7 @@ def masked_lpips(net: Any, x: Any, x_hat: Any, mask: Any) -> Any:
 def run_sequence(p_net: Any, i_net: Any, x: Any, mask: Any, qp: Any, lambdas: Any, lpips: Any,
                  lpips_weight: float, delay: int, measure_lpips: bool = False, dists: Any = None,
                  dists_weight: float = 0.0, temporal_weight: float = 0.0,
-                 dists_every: int = 1) -> tuple[Any, dict[str, float]]:
+                 dists_every: int = 1, frame_weights: list[float] | None = None) -> tuple[Any, dict[str, float]]:
     """One cascaded sequence: I frame from the frozen image model, then groups of ``delay`` frames. LPIPS on V,
     DISTS on V and the temporal term enter the distortion with their weights; with ``measure_lpips`` each
     available one is only reported."""
@@ -235,7 +238,7 @@ def run_sequence(p_net: Any, i_net: Any, x: Any, mask: Any, qp: Any, lambdas: An
         ref = i_net.forward_one_frame(x[0], qp, recon_only=True)
     p_net.clear_dpb()
     p_net.add_ref_feature_from_frame(ref.clone(), apply_feature_adaptor=False)
-    weights = [1.5, 0.16, 0.4]  # DCVC-UF's per-frame weights within a group (`DMC.get_rd_info`)
+    weights = frame_weights or [1.5, 0.16, 0.4]  # last, even, odd positions of a group (`mse_8frames_sum`)
     losses, dists_mse, lps, dss, tms, bpps = [], [], [], [], [], []
     prev_hat, prev_x, prev_mask = ref.clone(), x[0], mask[0]  # a normal tensor, not an inference one
     for g in range((x.shape[0] - 1) // delay):
@@ -338,7 +341,7 @@ def train(plan: dict[str, Any]) -> dict[str, Any]:
                 _, info = run_sequence(p_net, i_net, x, m, qp, lambda_table.to(device)[qp.long()], lpips,
                                        plan["lpips_weight"], g_frame_delay, measure_lpips=True, dists=dists,
                                        dists_weight=max(0.0, weights["dists"]), temporal_weight=weights["temporal"],
-                                       dists_every=dists_every)
+                                       dists_every=dists_every, frame_weights=plan.get("frame_weights"))
                 for k, v in info.items():
                     totals.setdefault(k, []).append(v)
         return {k: float(np.mean(v)) for k, v in totals.items()}
@@ -369,7 +372,8 @@ def train(plan: dict[str, Any]) -> dict[str, Any]:
         x, m, qp = x.to(device, non_blocking=True), m.to(device, non_blocking=True), qp.to(device)
         loss, info = run_sequence(p_net, i_net, x, m, qp, lambda_table.to(device)[qp.long()], lpips,
                                   plan["lpips_weight"], g_frame_delay, dists=dists, dists_weight=weights["dists"],
-                                  temporal_weight=weights["temporal"], dists_every=dists_every)
+                                  temporal_weight=weights["temporal"], dists_every=dists_every,
+                                  frame_weights=plan.get("frame_weights"))
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         norm = torch.nn.utils.clip_grad_norm_(p_net.parameters(), max_norm=0.2, error_if_nonfinite=False).item()
