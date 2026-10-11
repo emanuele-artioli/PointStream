@@ -3208,3 +3208,53 @@ invocation turns out to be needed.
   LPIPS punishes more than DISTS; the two savings may disagree.
 - Budget. B2's 4 pilot items; one GPU job ≤ 45 min (seven encodes per item
   on the CPU, mostly small). Ceiling 1 GPU-hour.
+- Jobs. `20261011T174427Z-19719582` (P01_107, P02_02; RTX A6000; 1,542 s)
+  and `20261011T174436Z-787fa437` (P03_10, P09_106; RTX 6000 Ada;
+  1,063 s); code `85c217e`; validator 11/11 each, including bits falling
+  and LPIPS rising with every halving of the resolution. The region S
+  matches the oracle's frame by frame on all 4 items. Report (`h3b report
+  --low`, code `85c217e`):
+  `pointstream-data/visor/h3b-2026-10-11/report-h3b2-85c217e/h3b2-report.json`
+  (`16d7fec6…a685`).
+- Outcome. SVT-AV1 on the hand pixels, means over the 4 items (LPIPS and
+  DISTS on S):
+
+  | point | kbps | LPIPS | DISTS |
+  |---|---|---|---|
+  | CRF 62 (B2's stream) | 35.1 | 0.102 | 0.127 |
+  | CRF 63 | 26.6 | 0.118 | 0.136 |
+  | CRF 63, ½ | 11.5 | 0.167 | 0.163 |
+  | CRF 55, ¼ | 14.8 | 0.177 | 0.173 |
+  | CRF 63, ¼ | 4.7 | 0.233 | 0.207 |
+  | CRF 55, ⅛ | 5.8 | 0.243 | 0.222 |
+  | CRF 63, ⅛ | 1.9 | 0.293 | 0.253 |
+  | CRF 63, 1⁄16 | 0.6 | 0.342 | 0.301 |
+
+  SVT-AV1 reaches the pose stream's rate at an eighth of the resolution.
+  Equal-quality saving of each oracle variant against SVT-AV1's front:
+  - `wilor:arm`: SVT-AV1 needs 19.4, 4.8, 4.2 and 1.7 kbps for its LPIPS
+    on the four items; saving mean 48% (95% CI 6% to 81%). **Not above
+    50%: the route does not reopen.** On DISTS 54% (CI 13% to 90%).
+  - `wilor:hand` (no forearm granted): 3% (CI −121% to 75%), matched on
+    3 items (on P02_02 it is worse than every SVT-AV1 point). At the
+    same rate it ties SVT-AV1 at an eighth of the resolution (0.298
+    against 0.293).
+  - `wilor:arm_uncoded`: 74% (CI 56% to 93%); `hamer:arm`: −12%.
+- Reading. Measured at equal quality, the oracle's advantage depends on
+  what is granted. With a free, perfect forearm and the pose uncoded, a
+  generator would save about three quarters; with the coded pose about
+  half, uncertainly; drawing only the hand, nothing: SVT-AV1 at an eighth
+  of the resolution matches it at the same 2 kbps. The hypothesis held on
+  the rate (SVT-AV1 needs about 5 kbps at the oracle's quality) and on the
+  reading: at LPIPS 0.21 to 0.29 both are far below usable quality.
+  Competing explanation (blur): DISTS, which tolerates blur better,
+  gives the same verdict.
+- Outline check (user, 2026-10-11: would sending the hand's outline be
+  too costly?). On VISOR's 34 items (fill set, both hands, CPU on gpu6,
+  not a fleet job), sending each hand mask's outline in every frame, with
+  no prediction from the previous frame, costs 170 kbps as a lossless
+  chain code (1.14 bits per boundary pixel), 158 kbps as a polygon within
+  1 px and 72 kbps within 2 px (entropy of the vertex deltas). That is
+  above SVT-AV1's CRF 62 on the same pixels. Prediction across frames
+  would have to cut it more than tenfold to fit the pose stream's budget.
+  The outline is not a cheap fix.
