@@ -529,6 +529,33 @@ into `Models`. DISTS is reported beside LPIPS and PSNR, as in G5c. Order:
    about 2 kbps must beat a perceptually tuned codec, not only SVT-AV1.
    It reuses G5b's trainer without changing the background session's
    files.
+4. H3d, a content-aware super-resolution of the hand pixels (NAS, Yeo et
+   al., OSDI 2018; raised by the user, 2026-10-11): SVT-AV1 at a quarter or
+   an eighth of the resolution (H3b2: 4.7 and 1.9 kbps on the hands) and a
+   small SR network trained on the video's own hands, its bits charged
+   (amortized over the video, as PLAN I's payback time). Oracle first: an
+   SR overfit to the evaluation window itself is its upper bound; it must
+   beat H3c's curve at equal LPIPS to be built.
+
+H3b oracle (2026-10-11, [outcome](docs/experiments.md#2026-10-11--h3b-oracle-perfect-appearance-at-the-coded-pose)):
+fails on the 4 pilot items. Perfect appearance at WiLoR's coded pose, with
+the forearm granted, reaches LPIPS 0.211 at 1.93 kbps against SVT-AV1's
+0.102 at 35 kbps (CRF 62; +0.109, CI +0.062 to +0.156), and is worse on
+DISTS, PSNR, flicker, pose fidelity and KID too; HaMeR is worse still, and
+even the uncoded pose fails (0.168). MANO's silhouette misses or overshoots
+about a tenth of the hand, and that alone costs more than SVT-AV1's
+coarsest pixels. So the generator is not built at the pose stream's rate,
+and H3c is next. H3b2 (user, 2026-10-11: judge at equal quality,
+[outcome](docs/experiments.md#2026-10-11--h3b2-svt-av1-down-to-the-pose-streams-rate-equal-quality)):
+SVT-AV1 downscaled reaches the pose stream's rate (1.9 kbps at an eighth of
+the resolution, LPIPS 0.29) and needs about 5 kbps for the oracle's 0.21.
+The oracle's equal-quality saving is 48% (CI 6% to 81%) with the forearm
+granted, none drawing the hand alone: below the 50% bar, so the route does
+not reopen. Sending the hand's outline instead would cost 72–170 kbps per
+frame without prediction. If a generator is revisited (agreed, user,
+2026-10-11): one appearance reference per hand per video, not per track;
+then bridging pose gaps of ≤ 10 frames (83% of breaks) and boxes from the
+masks rather than the detector.
 
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
