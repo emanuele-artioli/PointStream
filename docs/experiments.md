@@ -2449,6 +2449,41 @@ invocation turns out to be needed.
   is added before its runs: β = 0.026 with γ = 9, so γ times the term
   equals the distortion at step 0, as intended. Rule (3) applies to F2
   as to F; if both qualify, the one with less flicker is adopted.
+- Prefill and anchors, outcome (code `85f3b56`…`0adcbd5`; all 10 stretches,
+  Ada and A6000): `20261010T212240Z-6154e13b` (P26_02),
+  `…212247Z-c5d24f8b` (P06_03), `…212640Z-2da36c49` (P02_09),
+  `…212648Z-69b17f32` (P03_10), `…212654Z-787a2fbd` (P04_13),
+  `…212702Z-104550fc` (P06_05), `…212710Z-2b31ffcd` (P06_10),
+  `…212716Z-fac3a3df` (P06_106), `…212722Z-96267071` (P09_106),
+  `…212727Z-e0c6b3d2` (P37_102). ProPainter fills 1,200 frames in about
+  6.5 minutes at 18.6 GiB; the excerpt's SVT-AV1 points reproduce the
+  fill check's exactly. Archives: P26_02 `c2afe03a…df43`, P06_03
+  `f6d0863e…60dd`.
+- Outcome so far (code `0adcbd5`, Ada, 540 steps, all converged by G5b's
+  rule). BD-rate against SVT-AV1 on ProPainter's fill, P06_03 | P26_02:
+  | Arm | LPIPS_V | DISTS_V | PSNR_V | Jobs |
+  |---|---|---|---|---|
+  | A β = 0.026 | −73% \| −95% | −46% \| −70% | +130% \| +91% | `20261010T214349Z-754aa83e`, `…214555Z-c64ae187` |
+  | B β = 0.01 | −71% \| −93% | −49% \| −73% | +98% \| +56% | `…214355Z-7ac53ed1`, `…214602Z-f727e078` |
+  | C β = 0.005 | −66% \| −90% | −42% \| −67% | +81% \| +46% | `…214400Z-11e27fad`, `…214609Z-1f5596b6` |
+  | D β = 0 | +61% \| +74% | +80% \| +184% | +46% \| +12% | `…214406Z-54cc0daf`, `…214615Z-fa6ff232` |
+  | F γ = 0.5 | −72% \| −95% | −43% \| −68% | +128% \| +85% | `…214411Z-a63f4b78`, `…214622Z-f3dfad74` |
+  - Rule (1)–(2): A, B and C are candidates; D is not. Mean PSNR_V
+    BD-rate: A +110%, B +77%, C +63%, so **β = 0.005** for steps 3–5.
+    The hypothesis picked β = 0.01 and expected C to fail on P26_02; it
+    did not. A perceptual weight of any size flips the model from losing
+    to SVT-AV1 (D) to winning by two thirds or more; past that, β trades
+    PSNR_V for a few points of LPIPS_V. A β between 0 and 0.005 was not
+    tried.
+  - On the new fill, A (−73% on P06_03) keeps G5b's gain against
+    SVT-AV1 (−74% on Telea's fill), and P26_02 now has a BD-rate
+    (−95%): ProPainter's anchor reaches lower rates, so the curves
+    overlap. D against DCVC-UF off the shelf: −3% PSNR_V on P06_03 (G5b
+    on Telea's fill: −11%), −25% on P26_02.
+  - Rule (3), F: flicker 2–4% below A's at every QP on both stretches,
+    LPIPS_V within 2% of A's. Not adopted: at γ = 0.5 the term is about
+    5% of the distortion (the calibration above), too weak to matter.
+    F2 decides the temporal term.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
