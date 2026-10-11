@@ -19,6 +19,7 @@ checkpointed. ``report`` adds rates (H1's SVT-AV1 bits, H2's pose stream) and ap
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import multiprocessing
@@ -66,6 +67,33 @@ def variant_names() -> list[str]:
 
 VARIANTS = variant_names()
 JUDGED = ["source"] + [f"svt@{p:g}" for p in POINTS] + [f"{m}:{k}" for m in MODELS for k in ("hand", "arm")]
+
+#: H3b2: SVT-AV1 below CRF 62's rate, as (CRF, downscale); every encoded side a multiple of 8.
+LOW_POINTS = ((63.0, 1), (63.0, 2), (63.0, 4), (63.0, 8), (63.0, 16), (55.0, 4), (55.0, 8))
+
+
+def low_name(crf: float, scale: int) -> str:
+    return f"svt@{crf:g}" + ("" if scale == 1 else f"/{scale}")
+
+
+LOW_VARIANTS = [low_name(c, k) for c, k in LOW_POINTS]
+LOW_SAVING = 0.5
+
+LOW_DECISION = {
+    "points": "the window downscaled per plane (area, sides rounded to multiples of 8) by s, SVT-AV1 preset 4 at CRF c, "
+              "dav1d, upscaled bicubic, inside the hand region",
+    "low_points": [list(p) for p in LOW_POINTS],
+    "rate": "the stream's bits on the downscaled hand region (area >= 0.5), H1's libaom accounting, over the window",
+    "front": "per item, SVT-AV1's Pareto front over H1's four points and these (lowest LPIPS at each rate)",
+    "saving": "1 - oracle rate / the front's rate at the oracle's LPIPS (linear in log-rate; none beyond the front)",
+    "reopen": f"wilor:arm's mean saving with a 95% bootstrap interval by item above {LOW_SAVING:.0%}: the route goes back "
+              "to the user, H3c still next",
+    "beside": "the same on DISTS",
+}
+
+
+def scaled_size(width: int, height: int, scale: int) -> tuple[int, int]:
+    return max(64, 8 * round(width / scale / 8)), max(64, 8 * round(height / scale / 8))
 
 DECISION = {
     "region": "S: the union of VISOR's hand masks (fill set, forearm included) and every rendered silhouette of "
@@ -388,6 +416,51 @@ def fid(x: np.ndarray, y: np.ndarray) -> float:
 
 # ----------------------------------------------------------------- one window
 
+def encode_low(args: argparse.Namespace, source: Path, frames: int, geometry: tuple[int, int, bool], crf: float, scale: int,
+               regions: list[np.ndarray], fps: Any, work: Path, device: str) -> tuple[np.ndarray, dict[str, Any]]:
+    """The window downscaled by ``scale``, coded at ``crf`` (B2's settings), decoded; its RGB frames at the coded size
+    and its bits on the downscaled hand region (H1's accounting)."""
+    import cv2
+
+    from experiments.visor.h1 import PARTS, mi_counts, stream_bits
+    from src.codecs import svtav1
+    from src.codecs.quality import read_frames
+
+    width, height, full_range = geometry
+    sw, sh = scaled_size(width, height, scale)
+    out = work / f"low-{crf:g}-{scale}"
+    out.mkdir(parents=True, exist_ok=True)
+    raw = out / "frames.yuv"
+    with raw.open("wb") as handle:
+        for t in range(frames):
+            plane = read_frames(source, width, height, t, 1)[0]
+            y = plane[:height]
+            uv = plane[height:].reshape(2, height // 2, width // 2)
+            handle.write(cv2.resize(y, (sw, sh), interpolation=cv2.INTER_AREA).tobytes())
+            for c in uv:
+                handle.write(cv2.resize(np.ascontiguousarray(c), (sw // 2, sh // 2), interpolation=cv2.INTER_AREA).tobytes())
+    stream, decoded = out / "stream.ivf", out / "decoded.yuv"
+    allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
+    encode = svtav1.encode_command(args.encoder, raw, stream, width=sw, height=sh, fps=fps, frames=frames, crf=crf,
+                                   preset=int(args.preset), full_range=full_range)
+    timing = svtav1.run(encode, 3600)
+    svtav1.run(svtav1.decode_command(args.decoder, stream, decoded, threads=allowance), 3600)
+    raw.unlink()
+    labels = np.stack([mi_counts((cv2.resize(r.astype(np.float32), (sw, sh), interpolation=cv2.INTER_AREA) >= 0.5).astype(np.uint8),
+                                 len(PARTS)) for r in regions])
+    bits = stream_bits(args.inspect, stream, {"hand": labels}, frames)
+    data = stream.read_bytes()
+    count = decoded.stat().st_size // (sw * sh * 3 // 2)
+    rgb = rgb_memmap(decoded, out / "rgb.npy", min(count, frames), sw, sh, full_range, device)
+    decoded.unlink()
+    record = {"crf": crf, "scale": scale, "size": [sw, sh], "hand_bits": bits["bits_by_part"]["hand"]["hand"],
+              "accounted_bits": bits["accounted_bits"], "payload_bytes": sum(svtav1.ivf_frames(data)),
+              "sha256": hashlib.sha256(data).hexdigest(), "decoded_frames": int(count), "display_frames": len(bits["display_frames"]),
+              "encode_command": encode, "encode_seconds": round(timing["wall"], 2)}
+    stream.unlink()
+    return rgb, record
+
+
 def process_item(args: argparse.Namespace, item: dict[str, Any], nets: dict[str, Any], device: str, publish: Path,
                  decoded_source: dict[str, Any], scratch: Path, cross_device: bool) -> None:
     import cv2
@@ -409,6 +482,21 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], nets: dict[str,
     names = [f"{p:g}" for p in POINTS]
     allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
     decoded: dict[str, np.ndarray] = {}
+    low: dict[str, np.ndarray] = {}
+    low_records: list[dict[str, Any]] = []
+    variants, judged = (LOW_VARIANTS, ["source", *LOW_VARIANTS]) if args.low_rate else (VARIANTS, JUDGED)
+    if args.low_rate:
+        from fractions import Fraction
+
+        regions_all = [clip.class_mask(t, HANDS[0]) | clip.class_mask(t, HANDS[1]) for t in range(frames)]
+        for crf, scale in LOW_POINTS:
+            rgb, record = encode_low(args, Path(decoded_source["path"]), frames, (width, height, full_range), crf, scale,
+                                     regions_all, Fraction(item["fps"]).limit_denominator(1001), work, device)
+            if record["decoded_frames"] < frames:
+                raise RuntimeError(f"{item['id']}: {low_name(crf, scale)} decoded {record['decoded_frames']} frames")
+            low[low_name(crf, scale)] = rgb
+            low_records.append(record)
+        names = []
     for name in names:
         yuv = work / f"crf{name}.yuv"
         command = svtav1.decode_command(args.decoder, streams[name], yuv, threads=allowance)
@@ -434,12 +522,13 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], nets: dict[str,
                  if n_rows else np.zeros(0) for m in MODELS}
     uncoded_iou = {m: np.full(n_rows, np.nan) for m in MODELS}
 
-    nv = len(VARIANTS)
+    nv = len(variants)
     lp_s = np.full((nv, frames), np.nan)
     sse_s = np.zeros((nv, frames), np.int64)
     dists = np.full((nv, frames), np.nan)
     flick = np.full((nv, frames), np.nan)
-    svt_lp_r = np.full((len(POINTS), frames), np.nan)
+    svt_names = [v for v in variants if v.startswith("svt@")]
+    svt_lp_r = np.full((len(svt_names), frames), np.nan)
     lp_rendered = np.full((len(MODELS), frames), np.nan)
     pixels_s = np.zeros(frames, np.int64)
     pixels_r = np.zeros(frames, np.int64)
@@ -542,7 +631,12 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], nets: dict[str,
                 hyb[coded_px] = svt[coded_px]
                 hyb[cov] = col[cov]
                 crops[f"{m}:hybrid@{name}"] = hyb
-        for m in MODELS:
+        for v, small in low.items():
+            up = cv2.resize(np.asarray(small[t]), (width, height), interpolation=cv2.INTER_CUBIC)[crop]
+            out = src.copy()
+            out[reg] = up[reg]
+            crops[v] = out
+        for m in MODELS if not args.low_rate else ():
             for label, key in ((f"{m}:hand", m), (f"{m}:arm", m), (f"{m}:arm_uncoded", f"{m}_uncoded")):
                 cov, col = renders[key]
                 out = filled.copy()
@@ -556,29 +650,30 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], nets: dict[str,
         full_r = region
         pixels_s[t], pixels_r[t] = int(full_s.sum()), int(full_r.sum())
         fulls = []
-        for v in VARIANTS:
+        for v in variants:
             frame = truth_t.copy()
             frame[crop] = crops[v]
             fulls.append(frame)
-            sse_s[VARIANTS.index(v), t] = int(((crops[v][s_crop].astype(np.int32) - src[s_crop].astype(np.int32)) ** 2).sum())
-        masks = [[full_s] + ([full_r] if v.startswith("svt@") else []) for v in VARIANTS]
+            sse_s[variants.index(v), t] = int(((crops[v][s_crop].astype(np.int32) - src[s_crop].astype(np.int32)) ** 2).sum())
+        masks = [[full_s] + ([full_r] if v.startswith("svt@") else []) for v in variants]
         for j, m in enumerate(MODELS):
-            rendered = np.zeros_like(region)
-            rendered[crop] = renders[m][0]
-            masks[VARIANTS.index(f"{m}:arm")].append(rendered)
+            if f"{m}:arm" in variants:
+                rendered = np.zeros_like(region)
+                rendered[crop] = renders[m][0]
+                masks[variants.index(f"{m}:arm")].append(rendered)
         lp = lpips_reduce(nets["lpips"], fulls, truth_t, masks, device)
         if cross_device and "lpips_cpu_vs_device" not in checks:
             from src.codecs.quality import load_lpips
 
             cpu = lpips_reduce(load_lpips(Path(args.lpips_backbone), "cpu"), fulls[-1:], truth_t, masks[-1:], "cpu")
             checks["lpips_cpu_vs_device"] = abs(cpu[0][0] - lp[-1][0])
-        for i, v in enumerate(VARIANTS):
+        for i, v in enumerate(variants):
             lp_s[i, t] = lp[i][0]
-        for i, name in enumerate(names):
-            svt_lp_r[i, t] = lp[VARIANTS.index(f"svt@{name}")][1]
+        for i, v in enumerate(svt_names):
+            svt_lp_r[i, t] = lp[variants.index(v)][1]
         for j, m in enumerate(MODELS):
-            row = lp[VARIANTS.index(f"{m}:arm")]
-            lp_rendered[j, t] = row[1]
+            if f"{m}:arm" in variants:
+                lp_rendered[j, t] = lp[variants.index(f"{m}:arm")][1]
         # DISTS on the crop around S.
         sb = (max(0, int(np.nonzero(full_s.any(0))[0].min()) - DISTS_PAD), max(0, int(np.nonzero(full_s.any(1))[0].min()) - DISTS_PAD),
               min(width, int(np.nonzero(full_s.any(0))[0].max()) + 1 + DISTS_PAD), min(height, int(np.nonzero(full_s.any(1))[0].max()) + 1 + DISTS_PAD))
@@ -595,23 +690,23 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], nets: dict[str,
             gray_p = cv2.cvtColor(previous["truth"][fcrop], cv2.COLOR_RGB2GRAY)
             flow = dis_flow(gray_t, gray_p)
             truth_warped = warp(np.ascontiguousarray(previous["truth"][fcrop]), flow)
-            for i, v in enumerate(VARIANTS):
+            for i, v in enumerate(variants):
                 flick[i, t] = flicker(fulls[i][fcrop], warp(np.ascontiguousarray(previous["fulls"][i][fcrop]), flow),
                                       truth_t[fcrop], truth_warped, full_s[fcrop])
         previous = {"s": full_s, "truth": truth_t, "fulls": fulls}
         # Judges on every JUDGE_EVERY-th frame: WiLoR re-run and Inception features, per fitted hand.
         if t % JUDGE_EVERY == 0 and rows:
-            sources = {"source": truth_t, **{v: fulls[VARIANTS.index(v)] for v in JUDGED if v != "source"}}
+            sources = {"source": truth_t, **{v: fulls[variants.index(v)] for v in judged if v != "source"}}
             inputs, crops_in = [], []
-            for v in JUDGED:
+            for v in judged:
                 for r in rows:
                     inputs.append(nets["wilor"].item(sources[v], np.asarray(a["box"][r], np.float32), bool(a["right"][r])))
                     crops_in.append(square_crop(sources[v], a["box"][r], CROP_GROW, INCEPTION_SIZE))
             fit = nets["wilor"].forward(inputs)
             feats = inception_features(nets["inception"], crops_in, device)
             count = len(rows)
-            judge_kp.append(fit["kp2d"].reshape(len(JUDGED), count, 21, 2).astype(np.float32))
-            judge_feat.append(feats.reshape(len(JUDGED), count, -1))
+            judge_kp.append(fit["kp2d"].reshape(len(judged), count, 21, 2).astype(np.float32))
+            judge_feat.append(feats.reshape(len(judged), count, -1))
             judge_box.extend(fit["box_size"][:count].tolist())
             judge_t.extend([t] * count)
             judge_right.extend(bool(a["right"][r]) for r in rows)
@@ -623,15 +718,16 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], nets: dict[str,
         "svt_lpips_r": svt_lp_r, "lpips_rendered": lp_rendered,
         "judge_t": np.array(judge_t, int), "judge_right": np.array(judge_right, bool), "judge_row": np.array(judge_rows, int),
         "judge_box_size": np.array(judge_box, float),
-        "judge_kp2d": np.concatenate(judge_kp, 1) if judge_kp else np.zeros((len(JUDGED), 0, 21, 2), np.float32),
-        "judge_features": np.concatenate(judge_feat, 1) if judge_feat else np.zeros((len(JUDGED), 0, 2048), np.float16),
+        "judge_kp2d": np.concatenate(judge_kp, 1) if judge_kp else np.zeros((len(judged), 0, 21, 2), np.float32),
+        "judge_features": np.concatenate(judge_feat, 1) if judge_feat else np.zeros((len(judged), 0, 2048), np.float16),
+        "low_hand_bits": np.array([r["hand_bits"] for r in low_records], float),
         **{f"{m}_{k}": v for m in MODELS for k, v in stats[m].items()},
         **{f"{m}_coded_err_px": coded_err[m] for m in MODELS}, **{f"{m}_uncoded_iou": uncoded_iou[m] for m in MODELS},
         "archived_iou_mask": np.stack([a[f"{m}_iou_mask"] for m in MODELS]) if n_rows else np.zeros((len(MODELS), 0)),
         "archived_wilor_kp2d": a["wilor_kp2d"] if n_rows else np.zeros((0, 21, 2)),
     }
     meta = {"unit": item["id"], "video": item["video"], "fps": float(item["fps"]), "frames": frames,
-            "hand_frames": int((pixels_r > 0).sum()), "variants": VARIANTS, "judged": JUDGED,
+            "hand_frames": int((pixels_r > 0).sum()), "variants": variants, "judged": judged, "low_streams": low_records,
             "tracks": {m: poses[m]["tracks"] for m in MODELS}, "pose_rows": n_rows, "pose_unit_hash_ok": bool(meta_p["npz_hash_ok"]),
             "decode": {k: v for k, v in decoded_source.items() if k != "path"}, "mask_set": mask_info[FILL],
             "streams": stream_info, "checks": checks, "seconds": round(time.time() - began, 2)}
@@ -659,6 +755,15 @@ def command_oracle(args: argparse.Namespace) -> int:
     args.pose_units = {meta["unit"]: (meta, a) for meta, a in load_units(args.poses, "visor")}
     if missing := [it["id"] for it in items if it["id"] not in args.pose_units]:
         raise SystemExit(f"no H2 poses for {missing}")
+    if args.low_rate:
+        if not args.inspect:
+            raise SystemExit("--low-rate needs --inspect")
+        # The staging cache keeps files read-only and drops the execute bit: run a copy (H1).
+        copy = scratch / "bin" / Path(args.inspect).name
+        copy.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(args.inspect, copy)
+        copy.chmod(0o755)
+        args.inspect_source, args.inspect = args.inspect, str(copy)
     # PyAV decodes in fresh processes, before torch loads (B2).
     pool = ProcessPoolExecutor(max_workers=2, mp_context=multiprocessing.get_context("spawn"))
 
@@ -711,7 +816,9 @@ def command_oracle(args: argparse.Namespace) -> int:
                    "svt_result_sha256": [file_sha256(Path(p)) for p in args.svt_result],
                    "poses_sha256": [file_sha256(Path(p)) for p in args.poses], "code_sha256": file_sha256(Path(args.code)),
                    "mano_right_sha256": file_sha256(Path(args.mano_right))},
-        "settings": {"frames": frames, "items": args.items, "decision": DECISION, "combos": {m: pc.combo_key(c) for m, c in args.combos.items()},
+        "low_rate": {"encoder": _tool(args.encoder), "inspect": {"path": args.inspect_source, "sha256": file_sha256(Path(args.inspect))},
+                     "preset": args.preset} if args.low_rate else None,
+        "settings": {"frames": frames, "items": args.items, "decision": LOW_DECISION if args.low_rate else DECISION, "combos": {m: pc.combo_key(c) for m, c in args.combos.items()},
                      "crop_pad": CROP_PAD, "dists_pad": DISTS_PAD, "fill_radius": FILL_RADIUS, "judge_every": JUDGE_EVERY,
                      "crop_grow": CROP_GROW, "occluded_m": OCCLUDED_M},
         "items": [it["id"] for it in items], "restored_units": sorted(restored),
@@ -736,6 +843,8 @@ def validate_result(stage: Path) -> dict[str, bool]:
         return {"items_scored": out["items"] > 0, "decision_made": out["decision"]["gate"]["passes"] in (True, False)}
     result = json.loads((stage / "h3b.json").read_text())
     units = load_units([str(stage / "published.tar")], "oracle")
+    if result.get("low_rate"):
+        return validate_low(result, units)
     first = [m for m, _ in units if "lpips_cpu_vs_device" in m["checks"]]
     hand = [(m, a, a["pixels_r"] > 0) for m, a in units]
     rerun = [np.linalg.norm(a["judge_kp2d"][0] - a["archived_wilor_kp2d"][a["judge_row"]], axis=-1).mean(-1) / a["judge_box_size"]
@@ -763,6 +872,30 @@ def validate_result(stage: Path) -> dict[str, bool]:
         # H2: the 100 ms choice moves WiLoR's joints 8.4 px from the uncoded pose (with the track's shape).
         "coded_pose_error_near_h2": bool(len(err)) and 3.0 < float(np.mean(err)) < 20.0,
         "renders_cover_pixels": all(int(a["wilor_covered"].sum()) > 0 for _, a in units if len(a["wilor_coded_err_px"])),
+    }
+
+
+def validate_low(result: dict[str, Any], units: list[tuple[dict[str, Any], dict[str, np.ndarray]]]) -> dict[str, bool]:
+    first = [m for m, _ in units if "lpips_cpu_vs_device" in m["checks"]]
+    hand = [(m, a, a["pixels_r"] > 0) for m, a in units]
+    ladder = [LOW_VARIANTS.index(low_name(63.0, k)) for k in (1, 2, 4, 8, 16)]
+    mean_lp = [float(np.nanmean(np.concatenate([a["lpips"][i] for _, a in units]))) for i in ladder] if units else []
+    mean_bits = [float(np.mean([a["low_hand_bits"][i] for _, a in units])) for i in ladder] if units else []
+    return {
+        "every_item_present": bool(units) and len(units) == len(result["items"]) and all(m["npz_hash_ok"] for m, _ in units),
+        "every_net_on_cuda": all(result["on_cuda"].values()),
+        "sparse_jpegs_match_decoded_frames": all(g["holds"] for m, _ in units for g in m["decode"]["jpeg_gate"]),
+        "mask_set_matches_record": all(m["mask_set"]["masks_rle_sha256"] == m["mask_set"]["record_masks_rle_sha256"] for m, _ in units),
+        "every_low_stream_decodes_the_window": all(r["decoded_frames"] >= m["frames"] and r["display_frames"] >= m["frames"]
+                                                   for m, _ in units for r in m["low_streams"]),
+        "low_hand_bits_positive": all(bool((a["low_hand_bits"] > 0).all()) for _, a in units),
+        "lpips_cpu_matches_device_1e-3": bool(first) and all(m["checks"]["lpips_cpu_vs_device"] < 1e-3 for m in first),
+        "scores_finite_on_hand_frames": all(np.isfinite(a["lpips"][:, h]).all() and np.isfinite(a["dists"][:, h]).all() for _, a, h in hand),
+        # At CRF 63, each halving of the resolution costs fewer bits and looks worse, on average.
+        "bits_fall_with_scale": bool(mean_bits) and bool(np.all(np.diff(mean_bits) < 0)),
+        "lpips_rises_with_scale": bool(mean_lp) and bool(np.all(np.diff(mean_lp) > 0)),
+        "wilor_rerun_reproduces_h2": all(float(np.median(np.linalg.norm(a["judge_kp2d"][0] - a["archived_wilor_kp2d"][a["judge_row"]], axis=-1).mean(-1)
+                                                         / a["judge_box_size"])) < 0.005 for _, a in units if len(a["judge_row"])),
     }
 
 
@@ -823,6 +956,64 @@ def equal_quality(svt: list[dict[str, Any]], lpips: float, kbps: float) -> dict[
     return {"svt_kbps": rate, "saving": 1.0 - kbps / rate, "where": "inside"}
 
 
+def pareto_front(points: list[dict[str, float]], metric: str) -> list[dict[str, float]]:
+    """Points by rising rate, each kept only if it beats every cheaper point on ``metric`` (lower is better)."""
+    front: list[dict[str, float]] = []
+    for q in sorted(points, key=lambda r: r["kbps"]):
+        if not front or q[metric] < front[-1][metric]:
+            front.append(q)
+    return front
+
+
+def rate_on_front(front: list[dict[str, float]], metric: str, value: float) -> float | None:
+    """The rate the front needs for ``value`` (linear in log-rate between its points); None beyond its ends."""
+    worst, best = front[0][metric], front[-1][metric]
+    if value > worst or value < best:
+        return None
+    values = np.array([q[metric] for q in front])[::-1]
+    rates = np.log(np.array([q["kbps"] for q in front]))[::-1]
+    return float(math.exp(np.interp(value, values, rates)))
+
+
+def low_report(items: list[dict[str, Any]], low_units: list[tuple[dict[str, Any], dict[str, np.ndarray]]],
+               oracle_units: dict[str, tuple[dict[str, Any], dict[str, np.ndarray]]]) -> dict[str, Any]:
+    """H3b2: each oracle variant's equal-quality saving against SVT-AV1's front extended below CRF 62's rate."""
+    by_unit = {m["unit"]: (m, a) for m, a in low_units}
+    region_match = []
+    for it in items:
+        meta, a = by_unit[it["unit"]]
+        _, o = oracle_units[it["unit"]]
+        region_match.append(bool(np.array_equal(a["pixels_s"], o["pixels_s"])))
+        hand = a["pixels_r"] > 0
+        seconds = meta["frames"] / meta["fps"]
+        it["low"] = {v: {"kbps": float(a["low_hand_bits"][i]) / seconds / 1000.0, "lpips": float(np.nanmean(a["lpips"][i, hand])),
+                         "dists": float(np.nanmean(a["dists"][i, hand]))} for i, v in enumerate(meta["variants"])}
+    out: dict[str, Any] = {"region_matches_oracle": region_match, "rule": LOW_DECISION,
+                           "low_means": {v: {k: float(np.mean([it["low"][v][k] for it in items])) for k in ("kbps", "lpips", "dists")}
+                                         for v in items[0]["low"]}}
+    for metric in ("lpips", "dists"):
+        rows: dict[str, Any] = {}
+        for v in ("wilor:arm", "wilor:hand", "wilor:arm_uncoded", "hamer:arm"):
+            savings, where = [], []
+            for it in items:
+                points = [{"kbps": it["variants"][f"svt@{p:g}"]["kbps"], metric: it["variants"][f"svt@{p:g}"][metric]} for p in POINTS]
+                points += [{"kbps": r["kbps"], metric: r[metric]} for r in it["low"].values()]
+                front = pareto_front(points, metric)
+                rate = rate_on_front(front, metric, it["variants"][v][metric])
+                if rate is None:
+                    where.append("worse than the front" if it["variants"][v][metric] > front[0][metric] else "better than the front")
+                    continue
+                savings.append(1.0 - it["variants"][v]["kbps"] / rate)
+                where.append(f"{rate:.1f} kbps")
+            rows[v] = {"per_item": where, "matched": len(savings),
+                       "saving": bootstrap_mean(np.array(savings), np.random.default_rng(seed_of(f"{SEED}:low:{metric}:{v}")))
+                       if savings else None}
+        out[metric] = rows
+    gate = out["lpips"]["wilor:arm"]
+    out["reopen"] = bool(gate["saving"] is not None and gate["matched"] == len(items) and gate["saving"]["low"] > LOW_SAVING)
+    return out
+
+
 def command_report(args: argparse.Namespace) -> int:
     units = load_units(args.oracle, "oracle")
     h1 = {row["id"]: row for row in json.loads(Path(args.h1_report).read_text())["per_item"]}
@@ -836,6 +1027,7 @@ def command_report(args: argparse.Namespace) -> int:
         parts = {p: sum(row["bits"][p][FILL]["kbps"][k] for k in ("forearm", "hand_no_fit")) for p in row["bits"]}
         items.append(item_summary(meta, a, hand_kbps(row), parts, pose_kbps))
     names = units[0][0]["variants"]
+    low = low_report(items, load_units(args.low, "oracle"), {m["unit"]: (m, a) for m, a in units}) if args.low else None
 
     def diff(metric: str, v: str, against: str, tag: str) -> dict[str, float]:
         d = np.array([it["variants"][v][metric] - it["variants"][against][metric] for it in items])
@@ -911,7 +1103,7 @@ def command_report(args: argparse.Namespace) -> int:
     out = {
         "rule": DECISION, "items": len(items), "pose_kbps": pose_kbps, "means": mean_of,
         "svt_lpips_r": {f"{p:g}": float(np.mean([it["svt_lpips_r"][f"{p:g}"] for it in items])) for p in POINTS},
-        "tests": tests, "pose_fidelity": pose, "realism": realism,
+        "tests": tests, "pose_fidelity": pose, "realism": realism, "equal_quality_low": low,
         "render": {m: {k: float(np.nanmean([it[m][k] for it in items])) for k in items[0][m]} for m in MODELS},
         "decision": decision,
         "per_item": items,
@@ -920,7 +1112,9 @@ def command_report(args: argparse.Namespace) -> int:
         "units_hash_ok": all(m["npz_hash_ok"] for m, _ in units),
     }
     target = Path(args.out) if args.out else stage_dir()
-    write_json(target / "h3b-report.json", out)
+    write_json(target / ("h3b2-report.json" if args.low else "h3b-report.json"), out)
+    if low:
+        print(json.dumps({k: low[k] for k in ("low_means", "lpips", "dists", "reopen", "region_matches_oracle")}, indent=1, default=str))
     print(json.dumps({"decision": {k: v for k, v in decision.items() if k != "gate"} | {"gate": w["arm"]["lpips_minus_svt62"]},
                       "means": {v: mean_of[v] for v in names if "hybrid" not in v}}, indent=1, default=str))
     return 0
@@ -948,9 +1142,14 @@ def main(argv: list[str] | None = None) -> int:
     oracle.add_argument("--decoder", default="dav1d")
     oracle.add_argument("--items", default="all")
     oracle.add_argument("--frames", default="240")
+    oracle.add_argument("--low-rate", action="store_true", help="H3b2: only SVT-AV1 below CRF 62's rate, scored on the oracle's region")
+    oracle.add_argument("--inspect", default="", help="libaom inspect (H1's), for --low-rate")
+    oracle.add_argument("--encoder", default="SvtAv1EncApp")
+    oracle.add_argument("--preset", default="4")
     commands.add_parser("validate")
     report = commands.add_parser("report")
     report.add_argument("--oracle", action="append", required=True)
+    report.add_argument("--low", action="append", default=[], help="H3b2's published.tar: equal quality on the extended curve")
     report.add_argument("--h1-report", required=True)
     report.add_argument("--code", required=True)
     report.add_argument("--out", default="", help="default: the stage directory")

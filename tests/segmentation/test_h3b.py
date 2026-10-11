@@ -122,3 +122,20 @@ def test_square_crop_pads_outside_the_frame():
 def test_variants_hold_every_composite_once():
     assert len(h3b.VARIANTS) == len(set(h3b.VARIANTS)) == 4 + 2 * (3 + 4)
     assert set(h3b.JUDGED) - {"source"} <= set(h3b.VARIANTS)
+
+
+def test_low_rate_sizes_are_multiples_of_8_for_h1s_accounting():
+    for crf, scale in h3b.LOW_POINTS:
+        w, h = h3b.scaled_size(1920, 1080, scale)
+        assert w % 8 == 0 and h % 8 == 0 and w >= 64 and h >= 64
+    assert h3b.scaled_size(1920, 1080, 1) == (1920, 1080) and h3b.scaled_size(1920, 1080, 8) == (240, 136)
+    assert h3b.LOW_VARIANTS[0] == "svt@63" and "svt@55/4" in h3b.LOW_VARIANTS
+
+
+def test_pareto_front_drops_dominated_points_and_inverts_in_log_rate():
+    points = [{"kbps": 100.0, "lpips": 0.1}, {"kbps": 10.0, "lpips": 0.3}, {"kbps": 50.0, "lpips": 0.35}, {"kbps": 1.0, "lpips": 0.5}]
+    front = h3b.pareto_front(points, "lpips")
+    assert [q["kbps"] for q in front] == [1.0, 10.0, 100.0]  # 50 kbps is worse than 10 kbps
+    assert math.isclose(h3b.rate_on_front(front, "lpips", 0.2), math.sqrt(1000.0))
+    assert math.isclose(h3b.rate_on_front(front, "lpips", 0.4), math.sqrt(10.0))
+    assert h3b.rate_on_front(front, "lpips", 0.6) is None and h3b.rate_on_front(front, "lpips", 0.05) is None

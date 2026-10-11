@@ -3173,3 +3173,38 @@ invocation turns out to be needed.
   and FID compare methods within PointStream only; the paper must say so.
   The pose stream's rate leaves out one reference per track (163 tracks
   per minute on these items, since fits drop out between frames).
+
+### 2026-10-11 — H3b2: SVT-AV1 down to the pose stream's rate (equal quality)
+- Question. H3b's oracle (LPIPS 0.211 at 1.93 kbps) is worse than
+  SVT-AV1's lowest point (CRF 62, 35 kbps, 0.102), so its equal-quality
+  saving is not measured. The user prefers equal quality to equal rate
+  (2026-10-11): what rate does SVT-AV1 need on the hand pixels to reach
+  the oracle's LPIPS, going down towards the pose stream's rate?
+- Method (`h3b oracle --low-rate`, the oracle's code with only these
+  composites). The window's source is downscaled per plane (OpenCV area;
+  sides rounded to even) by s ∈ {1, 2, 4, 8, 16}, encoded with B2's
+  settings (SVT-AV1 preset 4) at CRF 63 (AV1's coarsest) and, at s = 4 and
+  8, CRF 55; decoded by dav1d, upscaled to 1920×1080 (bicubic) and
+  composited inside R as `svt@crf/s`. Rate: the stream's bits on R
+  downscaled to the encode (area ≥ 0.5), by H1's libaom accounting, over
+  the window. Scored exactly as the oracle (same region S, re-rendered by
+  the same code; checked against the oracle's units frame by frame), with
+  every judge.
+- Decision rule (fixed before the run; `h3b.LOW_DECISION`, applied by
+  `h3b report --low`). Per item, SVT-AV1's Pareto front over H1's four
+  points and these seven (lowest LPIPS at each rate); the rate it needs
+  for each oracle variant's LPIPS (linear in log-rate along the front;
+  none beyond it); saving = 1 − oracle rate / that rate. The generator
+  route reopens (to the user, with H3c still next) if `wilor:arm`'s mean
+  saving has a 95% bootstrap interval (by item) above 50%: even granted
+  perfect appearance, a generator must at least halve SVT-AV1's rate at
+  its own quality to pay for the references and the generator's own
+  error. DISTS's equal-quality saving is reported beside it.
+- Hypothesis. SVT-AV1 reaches LPIPS 0.21 at a quarter or an eighth of the
+  resolution, around 5–10 kbps, so the oracle's saving is 60–80% and the
+  route reopens on rate; but at that quality (about 21 dB on the hands)
+  neither is usable, which is the reading to give.
+- Competing explanation. Upscaled low-resolution video is blurred, which
+  LPIPS punishes more than DISTS; the two savings may disagree.
+- Budget. B2's 4 pilot items; one GPU job ≤ 45 min (seven encodes per item
+  on the CPU, mostly small). Ceiling 1 GPU-hour.
