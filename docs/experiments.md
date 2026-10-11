@@ -3006,3 +3006,111 @@ invocation turns out to be needed.
   - What could still win must spend far fewer bits on appearance. A
     generator from one reference (or none) and the pose stream, at about
     2 kbps, is H3b. The saving it must beat is zero: SVT-AV1's own curve.
+
+### 2026-10-11 — H3b oracle: perfect appearance at the coded pose
+- Question. Could a generator that draws the hand from the pose stream
+  alone (about 2 kbps, 20× below SVT-AV1's lowest rate on the hand pixels)
+  beat SVT-AV1 on VISOR's hand pixels, if its appearance were perfect? The
+  oracle grants a perfect generator (the true hand's own pixels) and charges
+  only what the pose cannot carry (PLAN H3, agreed 2026-10-11):
+  - the coded pose's placement error, from estimation and from coding;
+  - what MANO does not describe: the forearm and sleeve, objects in front
+    of the fingers, blur outside the mesh.
+- Poses. H2's VISOR fits (jobs `20261009T215322Z-188ed69c` and
+  `20261009T220823Z-b309d9a2`: per hand-frame rotation, shape, translation,
+  for WiLoR and HaMeR, on H1's boxes) coded per track with each model's
+  100 ms choice from H2's `code.json` (WiLoR: Gaussian 33 ms, 15 Hz
+  interpolated, full pose, steps ×8, 1.93 kbps; HaMeR: the same with PCA 12
+  and steps ×4, 1.77 kbps), decoded with the track's median shape as H2's
+  scheme sends it. The uncoded fit, each frame with its own shape, stands
+  in for the true pose (VISOR has none).
+- Render. Per frame, each fitted hand's MANO mesh is rasterized at the
+  coded pose (painter's order by depth, both hands together). Each covered
+  pixel takes the source's colour at the same surface point (face and
+  barycentric coordinates) on the uncoded mesh's projection, sampled
+  bilinearly; where that point falls outside the hand's mask, the nearest
+  mask pixel's colour instead, so the render only ever shows hand. Rendered
+  pixels never cover objects (VISOR's non-hand masks: the object stream is
+  in front). The share of samples hidden in the uncoded render (self
+  occlusion) is reported.
+- Composites. Inside the hand region R (union of VISOR's hand masks, fill
+  set, forearm included, as H3a), the source is first replaced by an
+  OpenCV Telea fill of R (radius 5): the background a client would show
+  where nothing is drawn. Then, per model m ∈ {WiLoR, HaMeR}:
+  - `m:hand`: the render on top. Forearm, unfitted hands and every hand
+    pixel the render misses stay filled (charged).
+  - `m:arm`: the forearm's true pixels, then the render. A perfect arm
+    model, granted free: the bound for a generator that also draws the arm.
+  - `m:arm_uncoded`: `m:arm` at the uncoded pose (diagnostic: coding error
+    against estimation error).
+  - `m:hybrid@c`: forearm and unfitted hands as SVT-AV1's pixels at CRF c,
+    then the render; rate = pose + H1's bits on forearm and hand-without-fit
+    at c.
+  The forearm is H1's split of each fitted hand's mask at WiLoR's uncoded
+  wrist line (so H1's bits on each part apply); unfitted hands are masks
+  with no H1 box. SVT-AV1 (`svt@c`): B2's streams at CRF 41, 48, 55, 62
+  inside R, as H3a.
+- Judges. Every method is scored per hand-frame on the same region S: R
+  plus every rendered silhouette of either model, coded or uncoded,
+  objects excluded.
+  - LPIPS: B2's AlexNet spatial map on the full frame, averaged over S.
+    Decides (user, 2026-10-10). SVT-AV1's LPIPS over R alone is kept as a
+    check against H3a's numbers.
+  - PSNR over S, and DISTS over S: G5c's masked DISTS (torchmetrics 1.9's
+    alpha/beta on `Models/DISTS/vgg16-397923af.pth`, every layer's
+    statistics weighted by S) on the crop around S padded by 64 px.
+  - Temporal consistency: G5c's flicker on S over consecutive hand-frames
+    (DIS flow on the source warps t−1 onto t; the method's temporal
+    residual minus the source's, luma, mean absolute value).
+  - On every 5th frame (judge frames), per fitted hand, for the source,
+    `svt@c`, `m:hand` and `m:arm`:
+    - pose fidelity: WiLoR re-run on the composite with H1's box, 2D joint
+      error against WiLoR re-run on the source (share of the box);
+    - realism: Inception-v3 pool features (torchvision's ImageNet weights,
+      `Models/Inception/`; not the TF FID network, so values compare only
+      across these methods) of the box crop grown 1.5× square; KID
+      (polynomial kernel, unbiased) and FID against the source crops,
+      pooled over items.
+- Rates. The oracle's rate is the model's pose stream. Appearance is
+  granted: a generator would add one reference per track, reported as
+  tracks per minute. SVT-AV1's rate per item and CRF is H1's bits on hand +
+  forearm + hand without fit (fill set), as H3a.
+- Decision rule (fixed before any run; `h3b.DECISION`, applied by
+  `h3b report`).
+  - Gate: `wilor:arm` at the pose stream's rate against `svt@62`, LPIPS on
+    S, per item; mean difference over items with a 95% paired bootstrap by
+    item (1,000 resamples). Passes if the interval lies below zero: a
+    perfect generator beats SVT-AV1's lowest point at a twentieth of its
+    rate. Its equal-quality saving (the rate SVT-AV1 needs for the oracle's
+    LPIPS, linear in log-rate between CRF points; "beyond CRF 41" if better
+    than all) is reported beside it.
+  - `wilor:hand`, the same test: whether the generator must draw the arm.
+  - Hybrid: H3a's equal-rate test for each `wilor:hybrid@c` (SVT-AV1's
+    LPIPS at the hybrid's rate, linear in log-rate, held at the end
+    points); passes if below zero at some c.
+  - Then: if the gate passes, H3b's generator is built (audit next); it
+    must draw the arm unless `wilor:hand` also passes. If only the hybrid
+    passes, the generator draws the hand and the forearm is coded. If
+    nothing passes, the generator is not built and H3c is next, unless the
+    gate fails only through placement (`wilor:arm_uncoded` passes) or
+    `wilor:arm` matches `svt@62` on pose fidelity, DISTS and KID; then the
+    outcome goes to the user before the route is dropped.
+  - HaMeR's composites take the same tests, reported beside (swapping the
+    estimator is cheap, H2).
+- Hypothesis. `wilor:arm` passes the gate (true appearance, about 8 px of
+  coding error) but would not beat CRF 55; `wilor:hand` fails, since the
+  forearm is about half of R (H1) and a fill is not an arm; the hybrid
+  passes at CRF 55 and 62. The coding error costs less LPIPS than the
+  estimation error (`arm_uncoded` close to `arm`).
+- Competing explanations. (1) The charged pixels show a Telea fill; a
+  better background fill would charge less. The share of R the render
+  misses and LPIPS on rendered pixels alone are reported. (2) Appearance is
+  sampled at the uncoded pose, so estimation error is charged only through
+  the silhouette; HOT3D's motion capture could test that proxy and is run
+  only if the decision turns on it. (3) LPIPS charges a few pixels of
+  displacement that a viewer would not notice without the source beside
+  it; pose fidelity and DISTS are reported to show that.
+- Budget. GPU (LPIPS, DISTS, WiLoR and Inception on Ada or A6000, all
+  verified there): smoke ≤ 600 s (one item, 48 frames); pilot: B2's 4 pilot
+  items, ≤ 45 min; full: the other 30 items in parts of 5 (about 5 min per
+  item), ≤ 3 GPU-hours. Ceiling 4 GPU-hours.
