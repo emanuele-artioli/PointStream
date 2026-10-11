@@ -790,6 +790,13 @@ def command_footage(args: argparse.Namespace) -> int:
         records.append({**seg, "frames": len(clip["indices"]), "decode": decoded, "sam_seconds": round(sam_seconds, 1),
                         "foreground": fg_record, "fg_share": float(1 - keep_all[-1].mean())})
         progress(n + 1)
+    import gc
+
+    import torch
+
+    del segmenter  # SAM 3.1 holds about 30 GiB that ProPainter, in its own process, needs
+    gc.collect()
+    torch.cuda.empty_cache()
     frames, keep = np.concatenate(frames_all), np.concatenate(keep_all)
     offsets = np.cumsum([0] + [len(f) for f in frames_all])
     chunks = []
