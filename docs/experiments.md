@@ -2287,7 +2287,8 @@ invocation turns out to be needed.
   (4 or 6 variants × 4 QPs, encode, decode and scoring). Smokes ≤ 10
   minutes.
   Ceiling 3.5 GPU-hours.
-- Outcome, checks and size (code `c271736`, `93257e4` for the report;
+- Outcome, checks and size (code `7454618` for the first size job, `93257e4`
+  for the other five; the report at `93257e4`;
   report `g5c-report.json` from `g5c.py report` over the six results).
   Jobs: checks P26_02 `20261010T194633Z-c888eb58` (A6000), P06_03
   `…194639Z-b316025e` (Ada); size P26_02 `…193016Z-68f20aa8` (whole,
@@ -2434,7 +2435,7 @@ invocation turns out to be needed.
   540 steps fit in 45 minutes; otherwise DISTS on one frame per group,
   recorded. Ceiling 15 GPU-hours.
 - Calibration of E (`20261010T214417Z-5328894d`, P06_03, 40 steps, Ada,
-  code `0adcbd5`): DISTS on every frame costs 7.4 s per step (3.3 without)
+  code `22bc2b2`): DISTS on every frame costs 7.4 s per step (3.3 without)
   and peaks at 45.7 GiB, so 540 steps would take 67 minutes. As the budget
   says, E runs with DISTS on the first frame of each group (4 of 32
   frames, `--dists-every 8`), its weight 8 times the step-0 match so its
@@ -2521,7 +2522,7 @@ invocation turns out to be needed.
   - Hypothesis: passes, median between −60% and −85% on LPIPS_V; DISTS_V
     below 0 on at least 8 of 10; PSNR_V above 0 on all.
   - Budget: 8 jobs, each ≤ 45 minutes on Ada, about 5 GPU-hours.
-  - Outcome (code `7f13f6b`, Ada, all converged). Jobs: P02_09
+  - Outcome (code `7b3db40`, Ada, all converged). Jobs: P02_09
     `20261011T012101Z-788838d3`, P03_10 `…012112Z-9685b85a`, P04_13
     `…012123Z-73e9f1c9`, P06_05 `…012134Z-fe2661d2`, P06_10
     `…012145Z-8b14a9c7`, P06_106 `…012155Z-1e3b2ae7`, P09_106
@@ -2580,7 +2581,7 @@ invocation turns out to be needed.
   footage gives; the oracle's margin is an upper bound, not a forecast.
   Step 3's footage arms measure the realistic share.
 - Budget: 2 jobs, each ≤ 45 minutes on Ada.
-- Outcome, P04_13 (`20261011T063021Z-477693dc`, Ada, code `2fc616a`,
+- Outcome, P04_13 (`20261011T063021Z-477693dc`, Ada, code `4a75b6e`,
   converged): BD-rate against SVT-AV1 on LPIPS_V −0.3% (DISTS_V +98%,
   PSNR_V +256%); the step-2 model C was +22% (+123%, +287%). **The method
   is the limit on P04_13**: even fitted on the excerpt it codes, the
@@ -2588,7 +2589,7 @@ invocation turns out to be needed.
   footage can make it win there. Its excerpt moves most of all ten (source
   flicker 5.4–7.2 against about 2–4 on the calm ones). The rule is the
   recipe's (β = 0.005); a higher β is step 4's to try.
-- Outcome, P06_05 (`20261011T063032Z-02c80566`, Ada, converged): LPIPS_V
+- Outcome, P06_05 (`20261011T063032Z-02c80566`, Ada, code `4a75b6e`, converged): LPIPS_V
   −11% against SVT-AV1 (DISTS_V +138%, PSNR_V +315%); C was +4% (+158%,
   +331%). Short of the rule's −30%: **the method is the limit on P06_05
   too.** On both fast stretches, fitting on the very frames to be coded
@@ -2656,6 +2657,41 @@ invocation turns out to be needed.
 - Budget. Footage: 4 jobs, each ≤ 45 minutes on Ada or A6000 (SAM 3.1
   about 0.38 s and ProPainter about 0.32 s per frame, 2,400 frames).
   Training: 8 jobs, each ≤ 45 minutes on Ada. About 8 GPU-hours.
+- Footage, outcome: P26_02 `20261011T062431Z-7d8edeb3` (2 segments of
+  P26_108, 1,200 frames, foreground about 30% per frame, SAM 0.29 s per
+  frame) and P06_03 `…062441Z-421d23d7` (P06_05 and P06_10, 2,400
+  frames). The first attempts ran out of GPU memory: SAM 3.1 held about
+  31 GiB while ProPainter ran, fixed in `ca79ee0` (`g5c.py` frees it; the completed jobs ran it),
+  and declared 40,000 MiB. P04_13 `…062500Z-011fc5d2` and P06_05
+  `…062451Z-417b2ef0` ran out of their 2,700 s in ProPainter on a shared
+  GPU; P04_13's arms were dropped by the scope change above, P06_05's are
+  not rerun (below).
+- Outcome, arms (code `401ddf9`, Ada, β = 0.005, 540 steps, converged).
+  BD-rate against C | against SVT-AV1:
+  | Arm | Stretch | LPIPS_V | DISTS_V | PSNR_V | Job |
+  |---|---|---|---|---|---|
+  | G footage only | P26_02 | +226% \| −74% | +69% \| −45% | +16% \| +55% | `20261011T064151Z-62e85d9d` |
+  | H scene + footage | P26_02 | +14% \| −88% | +4% \| −67% | +10% \| +56% | `…064200Z-7def1338` |
+  | G footage only | P06_03 | +13% \| −60% | +2% \| −40% | −3% \| +77% | `…070725Z-599e0365` |
+  | H scene + footage | P06_03 | +6% \| −64% | 0% \| −43% | −7% \| +73% | `…070738Z-f9747804` |
+  - **Footage does not help** (rule: H at −10% against C on 2 of 3): H is
+    worse than C on both completed stretches, so 2 of 3 cannot be met.
+    The clause "H turns P06_05 into a win" is untested: its footage job
+    ran out of time, and its ceiling is the oracle's −11%; not rerun,
+    since the rule is decided and the clause's ceiling is small. At 540
+    steps more frames dilute the steps spent on the frames nearest the
+    excerpt; a longer schedule (step 4) could change that, or the other
+    recordings may simply differ (lighting, clutter, P26_108 is from the
+    later collection).
+  - **Footage does not stand alone** (rule: G within +10% of C on 2 of
+    3): +226% and +13% (P06_03 a near miss). Hypotheses: H helps by
+    10–25% (wrong), G within 15% of C (right on P06_03, wrong on P26_02).
+  - What holds for the paper: a model made only from other recordings of
+    the kitchen, before the stream exists, still beats SVT-AV1 by 60–74%
+    on LPIPS_V and 40–45% on DISTS_V on both calm stretches; the stream's
+    own scene footage adds more on top.
+  - GPU time: about 5 hours (footage 4 jobs and 4 failed attempts,
+    arms 4 × 0.6, oracles 2 × 0.6).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could

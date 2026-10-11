@@ -388,6 +388,13 @@ before only where noted.
    scene model is fitted on the kitchen's other videos and scored on the
    stretch's excerpt: hours of footage and a true hold-out across days. The
    cross-kitchen control of G5b stays as the attribution check.
+   *Done (2026-10-11, [experiments](docs/experiments.md), G5c step 3):*
+   other recordings of the kitchen do not improve the stretch's own model
+   at 540 steps, and alone they fall short of it, but a model made only
+   from them still beats SVT-AV1 by 60–74% on LPIPS_V on the calm pilots.
+   The oracle on the two fast stretches only ties or barely beats
+   SVT-AV1 (−0.3%, −11%): there the base codec's motion coding is the
+   limit, not the footage.
 4. *Recipe.* The image model that codes each stream's first frame adapted
    too, on the same scene frames; adapting only part of the network (decoder
    and entropy model, or low-rank adapters); learning rate, crop size and
