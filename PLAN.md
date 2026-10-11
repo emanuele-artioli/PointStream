@@ -408,6 +408,16 @@ before only where noted.
    at equal QP (2026-10-11) could not tell β = 0.026 with and without
    DISTS apart, and preferred both over β = 0.005 and β = 0, which also
    spent fewer bits.
+   *Round 1 done (2026-10-11, [experiments](docs/experiments.md), G5c
+   step 4):* the image model is not adapted (the intra frame is 1.4–9.6%
+   of the bytes); KID on V joins the selection as a held-out judge; a 3×
+   learning rate is adopted (beats SVT-AV1 on LPIPS_V −65% and DISTS_V
+   −10% over the 4 development stretches, against C's 1 metric); flat
+   frame weights flatten DCVC-UF's quality swing only partly and cut
+   flicker 5%, not adopted. PSNR_V and flicker stay DCVC-UF's losses.
+   Round 2 tests 10⁻⁴. Next, a venue-trained enhancer of SVT-AV1 (G5d
+   oracle, user 2026-10-11) tests the other route for the stored
+   knowledge: after a standard codec instead of inside a neural one.
 5. *Scope: calm and moving viewpoints.* The scene model's gain tracks the
    excerpt's motion and SVT-AV1's rate (step 2). More calm stretches,
    chosen by G1's camera-motion audit with a threshold fixed before any

@@ -2753,6 +2753,59 @@ invocation turns out to be needed.
   groups; then W flattens the profile but leaves flicker as it is.
 - Budget: 4 rescore jobs (≤ 20 minutes each, Ada or A6000) and 12
   training jobs (≤ 45 minutes each, Ada), about 8.5 GPU-hours.
+- Outcome (code `32d55ab` for every job, from each `ready.json`; training
+  on Ada, 540 steps, all converged by G5b's rule, no non-finite steps).
+  Anchors: P26_02 `20261011T085154Z-a3bb2f13` (Ada), P06_03
+  `…085245Z-a0cd2c6b` (A6000), P06_10 `…085316Z-05ba2a56`, P02_09
+  `…085329Z-34bbf0e8` (Ada). C: `…085350Z-4c056175`, `…085408Z-6602fb50`,
+  `…085426Z-94ba7492`, `…085446Z-8605a9eb`. W: `…085505Z-c5bad6a9`,
+  `…085521Z-32371297`, `…085538Z-e705ae6f`, `…085558Z-423565ea`. L:
+  `…085614Z-ea0b9f98`, `20261011T163301Z-e47ae994` (P06_03; its first
+  submission `…085631Z-ed932c65` never finished transferring, was
+  inspected, never ran, and was submitted anew), `…085712Z-f0960193`,
+  `…085733Z-d794a7ea`. Same order of stretches as the anchors.
+  Median BD-rate against SVT-AV1 over the 4 stretches (each capped at +100%):
+  | Arm | LPIPS_V | DISTS_V | PSNR_V | flicker_V | KID_V | Beats | Mean |
+  |---|---|---|---|---|---|---|---|
+  | DCVC-UF off the shelf | +100% | +100% | +78% | worse | +100% | 0 | +96% |
+  | C (step 2, old anchors) | −55% | +3% | +90% | worse | — | 1 | |
+  | C replicate | −55% | +3% | +91% | worse | +94% | 1 | +47% |
+  | W flat weights | −50% | +9% | +94% | worse | +65% | 1 | +44% |
+  | **L lr 3 × 10⁻⁵** | **−65%** | **−10%** | +84% | worse | +51% | **2** | **+32%** |
+  - Training noise: C and its replicate differ by 0.2 points on the mean
+    of the four shared medians, so the margin is the 5-point floor.
+  - **L is adopted** (2 metrics against 1). Per stretch it improves
+    LPIPS_V most where C was weakest (P06_10 −44% → −59%, P02_09 −29% →
+    −39%) and turns DISTS_V's median below 0 (the calm pilots −73% and
+    −46%; P06_10 and P02_09 still +26% and +37%); flicker at matched rate
+    is unchanged (ratio to C 0.99–1.01). Hypothesis (LPIPS_V 5–15%
+    better, PSNR_V unchanged): right; PSNR_V even improves a little.
+  - **W is not adopted** (1 metric, mean 3 points better than C, under the
+    5-point margin). The mechanism holds but is weak: C's PSNR_V spread
+    over the group's 8 positions is 2.2–3.9 dB (DCVC-UF off the shelf
+    2.9–3.5, SVT-AV1 0.9–1.3), W's 1.6–2.5 dB, not under 0.5; flicker at
+    matched rate falls only 5–6%, at about 5 points of LPIPS_V. Both
+    hypotheses wrong in size. DCVC-UF's hierarchical weights are its
+    rate–distortion design (sharp references for the next group), and
+    fine-tuning keeps much of the swing.
+  - Flicker stays worse than SVT-AV1 at every rate on every stretch for
+    every arm, and PSNR_V stays far behind: both are DCVC-UF's (off the
+    shelf it loses on all five metrics on all four stretches), not the
+    adaptation's, which improves LPIPS_V, DISTS_V and KID_V.
+  - GPU time: about 9 hours (16 jobs).
+
+### 2026-10-11 — G5c step 4, round 2: a higher learning rate
+- Question: L (3 × 10⁻⁵) beat C (10⁻⁵); is the gain still rising?
+- Arm L2: learning rate 10⁻⁴, otherwise L; same 4 stretches and anchors.
+- Decision rule, fixed now: L2 replaces L if it beats SVT-AV1 on more
+  metrics, or on as many with a mean lower by more than 5 points; a run
+  with non-finite steps or not converged by G5b's rule is not adopted.
+  Then the recipe runs on the other 6 stretches (their anchors are
+  rescored with KID now, `g5c.py rescore`, independent of the choice).
+- Hypothesis: L2 is within ±5 points of L (the gain flattens), with a
+  risk of instability at 10⁻⁴ (the gradient is clipped at 0.2).
+- Budget: 4 training jobs (Ada) and 6 rescore jobs (Ada or A6000),
+  about 3.5 GPU-hours.
 
 ### 2026-10-11 — G5d oracle: a venue-trained enhancer of SVT-AV1 (user, 2026-10-11)
 - Question: can knowledge of the venue held at the client make plain
