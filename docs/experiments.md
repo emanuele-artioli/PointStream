@@ -3362,7 +3362,7 @@ invocation turns out to be needed.
   runs ≤ 45 minutes (30 minutes of training each), then their coding,
   split into jobs ≤ 45 minutes. Component: one run and its coding.
   Ceiling 8 GPU-hours on Ada (training: 47,000 MiB declared, as G5b
-  peaked at 42.7 GiB allocated) and Ada or A6000 (coding: 24,000 MiB). Stage by stage; a stage that fails the rule stops what follows.
+  peaked at 42.7 GiB allocated) and Ada or A6000 (coding: 32,000 MiB, after 24,000 was overrun at 26,098). Stage by stage; a stage that fails the rule stops what follows.
 - Inputs: H3b's (`pointstream-data/visor/h3b-2026-10-11/inputs.json`:
   evaluation set, dense archive, fill masks and record, B2's SVT-AV1
   streams and results, LPIPS, DISTS, the videos), H1's report

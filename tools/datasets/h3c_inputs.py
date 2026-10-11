@@ -121,7 +121,8 @@ def main() -> int:
                  f"fill masks checked against their record, {'every SVT-AV1 point (B2 streams checked and decoded by dav1d, H3b2 low points re-encoded and accounted by libaom inspect), ' if anchor else ''}"
                  "DCVC-UF HT-L encode and decode by B2's worker at QP 0 and scales 1 and 4 with the per-NAL bit split by the model's "
                  "own estimate, LPIPS on CPU against the GPU, DISTS); the stage runs 240 frames at QP 0, 21, 42 and scales 1, 2, 4.")
-        body = spec(arguments, common + extra, scale, basis, 24000, CODE_SHARING, GPU_MODELS)
+        # 24000 MiB was overrun (26,098 MiB, job 20261011T220701Z-f13c88e2) before the scorer's cache was released.
+        body = spec(arguments, common + extra, scale, basis, 32000, CODE_SHARING, GPU_MODELS)
         path = dest / f"h3c-{name}-{next(v for v in PILOT if item.startswith(v + '_0'))}.json"
         path.write_text(json.dumps(body, indent=1) + "\n")
         written.append(path.name)

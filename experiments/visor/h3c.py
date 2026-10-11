@@ -316,8 +316,13 @@ def run_tree_script(script: Path, plan: dict[str, Any], work: Path, name: str) -
 def code_dcvc(args: argparse.Namespace, source: Path, region_file: Path, size: tuple[int, int], frames: int, qp: int,
               video_ckpt: str, video_sha: str, work: Path) -> dict[str, Any]:
     """One DCVC-UF HT-L encode and decode (B2's worker) and the per-NAL bit split onto R."""
+    import torch
+
     from src.codecs.dcvc_uf_worker import dcvc_command
 
+    # The worker and the bit estimate run beside this process on the same GPU: return the scorer's cached blocks
+    # first, so the job's footprint is the larger of the two, not their sum (shared GPUs bill the process group).
+    torch.cuda.empty_cache()
     work.mkdir(parents=True, exist_ok=True)
     width, height = size
     plan = {"structure": "htl", "qp": qp, "frame_count": frames, "height": height, "width": width, "src_type": "yuv420",
