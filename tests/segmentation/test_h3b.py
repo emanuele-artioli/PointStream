@@ -53,6 +53,20 @@ def test_render_carries_colours_by_surface_correspondence():
     assert not covered[15:20, 20:25].any() and covered[22, 22]
 
 
+def test_render_samples_more_pixels_than_remap_takes_in_one_column():
+    big = np.array([[5.0, 5.0], [245.0, 5.0], [245.0, 245.0], [5.0, 245.0]])
+    box = (0, 0, 250, 250)
+    rng = np.random.default_rng(3)
+    source = rng.integers(0, 255, (250, 250, 3), dtype=np.uint8)
+    region = np.ones((250, 250), bool)
+    z = np.ones(4)
+    ids = h3b.raster(big, z, SQUARE_FACES, box)
+    zmap = h3b.depth_map(ids, big, z, SQUARE_FACES, box)
+    covered, colours, stats = h3b.render(source, region, np.zeros_like(region), ids, big, big, z, zmap, SQUARE_FACES, box,
+                                         h3b.nearest_lookup(region))
+    assert stats["covered"] > 40000 and (colours[covered] == source[covered]).all()
+
+
 def test_render_takes_the_nearest_region_pixel_outside_the_region():
     box = (0, 0, 60, 60)
     source = np.zeros((60, 60, 3), np.uint8)

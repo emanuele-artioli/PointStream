@@ -54,6 +54,7 @@ KID_SUBSETS = 100
 KID_RESAMPLES = 200
 SEED = "pointstream-h3b"
 FACES = 1538  # MANO's triangles per hand
+REMAP_WIDTH = 1024
 
 
 def variant_names() -> list[str]:
@@ -204,8 +205,14 @@ def render(source: np.ndarray, region: np.ndarray, objects: np.ndarray, target_i
     q = (w[:, :, None] * source_pts[faces[f]]).sum(1) - [box[0], box[1]]
     qx = np.clip(q[:, 0], 0, wd - 1)
     qy = np.clip(q[:, 1], 0, h - 1)
-    sampled = cv2.remap(source, qx.astype(np.float32)[:, None], qy.astype(np.float32)[:, None], cv2.INTER_LINEAR,
-                        borderMode=cv2.BORDER_REPLICATE)[:, 0]
+    # remap wants maps under 32,767 rows and columns: lay the samples out as rows of REMAP_WIDTH.
+    n = len(qx)
+    rows = -(-n // REMAP_WIDTH)
+    map_x = np.zeros(rows * REMAP_WIDTH, np.float32)
+    map_y = np.zeros(rows * REMAP_WIDTH, np.float32)
+    map_x[:n], map_y[:n] = qx, qy
+    sampled = cv2.remap(source, map_x.reshape(rows, REMAP_WIDTH), map_y.reshape(rows, REMAP_WIDTH), cv2.INTER_LINEAR,
+                        borderMode=cv2.BORDER_REPLICATE).reshape(-1, source.shape[2])[:n]
     qi, qj = np.round(qy).astype(int), np.round(qx).astype(int)
     outside = ~region[qi, qj]
     if outside.any() and nearest is not None:
