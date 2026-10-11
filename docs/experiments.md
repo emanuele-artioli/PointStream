@@ -2920,3 +2920,89 @@ invocation turns out to be needed.
   pose. So it bounds texture transfer with refresh, not a generator that
   renders from one reference and the pose alone. Such a generator would
   cost about the pose stream (2 kbps) and needs its own test.
+
+### 2026-10-10 — H3a2: the texture-transfer oracle with a measured reference stream
+- Question. H3a charged each reference at SVT-AV1's cost of an inter-coded
+  frame, and its equal-quality saving falls from 65% to 32% to none as that
+  cost doubles and triples. The references can be sent as their own
+  SVT-AV1 stream, each predicted from the previous reference (user,
+  2026-10-10). What does that stream cost on the hand pixels, and what
+  saving remains? The reference choice is also tuned (user: "worthy
+  efforts"): finer margins, eight references tried per frame instead of
+  four, and CRF 62 references dropped (they lost in H3a).
+- Method. H3a's oracle (`h3 oracle`, same region, flow, warps and SVT-AV1
+  baseline) with CRF {41, 48, 55} references, δ ∈ {0.01, 0.02, 0.03, 0.05}
+  and the 8 most recent references tried. After the window, per run:
+  - The reference frames (source frames, in order) are encoded as one
+    SVT-AV1 stream with B2's settings (preset 4, CRF of the run, one
+    keyframe) and decoded by dav1d.
+  - Its bits on the hand pixels are accounted as H1 did (libaom inspect
+    `aom-inspect-v3.12.1-ps1`; each block's bits spread over its pixels).
+  - Every hand-frame is rescored with these decoded references: a reference
+    frame shows itself, every other frame its reference warped by the same
+    flow.
+  - The refresh decisions stay those made against the full-rate stream's
+    pixels (the decoded references differ only by coding noise at the same
+    CRF).
+  - The whole window is re-encoded by the same encoder at each run CRF and
+    accounted the same way, a check against H1's bits on B2's streams.
+- Rate: the reference stream's hand bits over the window plus H2's pose
+  stream (1.93 kbps). SVT-AV1's curve is H3a's (B2's streams, H1's bits).
+- Decision rule (fixed before any run; `h3.STREAM_DECISION`, applied by
+  `h3 report`).
+  - H3a's rule, at the measured rate: the oracle passes if its mean LPIPS
+    difference from SVT-AV1 at equal rate is below zero at some point.
+  - Beside it, the equal-quality saving per item (the rate SVT-AV1 needs
+    for the oracle's LPIPS, linear in log-rate between CRF points, none
+    beyond them), as a median with a bootstrap interval of the mean.
+  - The point with the largest median saving among those matched on at
+    least 30 items is the texture-transfer fallback's operating point (PLAN
+    H3), and its saving is what a generator must beat at its own rate.
+- Hypothesis. References about four frames apart cost 1.5–2× an inter-coded
+  frame, so the best point keeps a 30–50% equal-quality saving. Finer
+  margins at CRF 55 do best.
+- Competing explanation. Hands change so much between references that the
+  stream costs nearly intra-frame rates (3× or more), and no point saves
+  more than 20%.
+- Budget. H3a measured 5.6 min per item. Encoding and accounting add about
+  1 min per run, and rescoring 30 s per run: about 15–20 min per item.
+  Smoke: one item, 48 frames, ≤ 600 s. Pilot: B2's four pilot items, one
+  job. Full: the other 30 items in parts of at most 45 min. Ceiling 12
+  GPU-hours (the GPU only for LPIPS), overnight on hosts G5c leaves free.
+- Jobs (code `4f1c429`, environment `pointstream-20261006T113321Z`; every
+  validator 15/15). Pilot `20261010T213310Z-134c06e8` (RTX A6000; P01_107,
+  P09_106; smoke 190 s; items 14.4 and 11.6 min). Full, the other 32 items
+  in 16 jobs of two, `20261010T222727Z-11fee0de` to `…222849Z-252b6963`, on
+  RTX A6000, RTX 6000 Ada, Quadro RTX 8000 and Quadro GV100 (LPIPS on the
+  GPU matched the CPU within 1e-3 on every class), 1,095–2,309 s each. About
+  8.5 GPU-hours. Report (`h3 report`, all 34 items):
+  `pointstream-data/visor/h3-2026-10-10/report-h3a2-4f1c429/h3a2.json`
+  (`636eced3…2d14`). The same encoder re-encoding the whole window
+  reproduces H1's hand bits on B2's streams (median ratio 1.00 at every
+  CRF).
+- Outcome. **With measured references the oracle fails: no operating point
+  beats SVT-AV1.**
+  - Every one of the 12 points is worse in LPIPS at equal rate (+0.002 to
+    +0.029; every interval above zero) and saves nothing at equal quality
+    (median −0.4% to −19%).
+  - The closest are the finest margins: CRF 48 references with δ 0.01
+    (39% of hand-frames sent, 86.5 kbps, LPIPS 0.100 against SVT-AV1's
+    0.098 at that rate, better on 10 of 34 items) and CRF 55 with δ 0.01
+    (54.1 kbps, +0.004).
+  - Two effects compound. A reference sent in its own stream costs 1.4–2.1×
+    an inter-coded frame (median per point; more as references grow
+    sparser). And it is decoded worse than the same frame in the full-rate
+    stream at the same CRF: CRF 48 references with δ 0.02 go from H3a's
+    41.9 kbps and LPIPS 0.091 to 66.6 kbps and 0.109.
+- Reading. The hypothesis held on cost (1.5–2×) and failed on outcome; the
+  competing explanation held, by a different route than expected. Sparse
+  references are cheap enough, but they look worse than the same frames
+  coded at full rate, because SVT-AV1 spends its quality where frames
+  predict each other. H3a's pass relied on references with the full-rate
+  stream's quality at the inter-frame price.
+  - Texture transfer with refresh does not beat coded pixels on VISOR's
+    hands, even with the target's own motion. The textured-mesh fallback is
+    therefore not built.
+  - What could still win must spend far fewer bits on appearance. A
+    generator from one reference (or none) and the pose stream, at about
+    2 kbps, is H3b. The saving it must beat is zero: SVT-AV1's own curve.
