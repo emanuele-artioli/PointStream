@@ -83,3 +83,30 @@ def test_composite_replaces_only_the_mask():
     out = h3.composite(truth, inside, mask, (2, 2, 6, 4))
     assert out[2, 3].tolist() == [200] * 3 and out[3, 5].tolist() == [200] * 3 and out.sum() == 2 * 3 * 200
     assert truth.sum() == 0
+
+
+def test_svt_rate_at_quality_inverts_the_curve_and_refuses_extrapolation():
+    svt = [{"kbps": 100.0, "lpips": 0.1}, {"kbps": 10.0, "lpips": 0.3}]
+    assert math.isclose(h3.svt_rate_at_quality(svt, 0.2), math.sqrt(1000.0))
+    assert h3.svt_rate_at_quality(svt, 0.35) is None and h3.svt_rate_at_quality(svt, 0.05) is None
+
+
+def test_stream_curves_use_the_measured_reference_bits():
+    frames = 4
+    a = {
+        "pixels": np.array([0, 10, 10, 10]), "points": np.array([41.0, 62.0]),
+        "svt_lpips": np.array([[np.nan, 0.1, 0.1, 0.1], [np.nan, 0.3, 0.3, 0.3]]), "svt_sse": np.full((2, frames), 30),
+        "oracle_lpips": np.array([[np.nan, 0.1, 0.15, 0.15]]), "oracle_sse": np.full((1, frames), 30),
+        "oracle_reference": np.array([[False, True, False, False]]),
+        "run_point": np.array([41.0]), "run_margin": np.array([0.05]),
+        "stream_hand_bits": np.array([60000.0]), "stream_lpips": np.array([[np.nan, 0.2, 0.2, 0.2]]),
+        "stream_sse": np.full((1, frames), 30), "full_points": np.array([41.0]), "full_hand_bits": np.array([180000.0]),
+    }
+    meta = {"unit": "x", "frames": 4, "fps": 2.0}  # a 2 s window
+    out = h3.stream_curves(meta, a, {"41": 90.0, "62": 10.0}, pose_kbps=0.0)
+    row = out["oracle"][0]
+    assert math.isclose(row["kbps"], 30.0) and math.isclose(row["lpips"], 0.2)
+    assert math.isclose(row["svt_kbps_at_quality"], 30.0) and math.isclose(row["saving"], 0.0, abs_tol=1e-12)
+    assert math.isclose(out["full_rate_check"]["41"], 1.0)  # 180 kbit over 2 s against 90 kbps
+    # One reference in three hand-frames: 30 kbps, against 30 kbps at the inter-frame cost.
+    assert math.isclose(row["reference_cost_ratio"], 1.0)

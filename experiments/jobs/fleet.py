@@ -27,6 +27,9 @@ DEFAULT_HOSTS = tuple(f"gpu{n}" for n in range(1, 7))
 DEFAULT_IDLE_MEMORY_MIB = 256
 DEFAULT_MEMORY_MARGIN_MIB = 4096
 DEFAULT_IDLE_UTILIZATION_PCT = 5
+# A shared job runs beside other users' processes; its margin absorbs their growth.
+DEFAULT_SHARING_MARGIN_MIB = 8192
+GPU_SHARING_MODES = ("exclusive", "shared")
 DEFAULT_STATE_DIR = Path.home() / ".pointstream" / "fleet" / "jobs"
 SNAPSHOT_TRANSFER_TIMEOUT_SECONDS = 300
 DEVICE_RANK = ("RTX 6000 Ada", "RTX A6000", "RTX 8000", "GV100")
@@ -118,7 +121,14 @@ try:
     for gpu in gpus:
         safe_uuid = "".join(ch if ch.isalnum() or ch in "_.-" else "_" for ch in gpu["uuid"])
         gpu["pointstream_claimed"] = (claim_root / (host_key + "_" + safe_uuid)).is_dir()
-except OSError as exc:
+        shared_dir = claim_root / (host_key + "_" + safe_uuid + ".shared")
+        shared = []
+        if shared_dir.is_dir():
+            for entry in sorted(shared_dir.glob("*.json")):
+                claim = json.loads(entry.read_text())
+                shared.append({"token": str(claim["token"]), "memory_mib": int(claim["memory_mib"]), "margin_mib": int(claim["margin_mib"])})
+        gpu["pointstream_shared_claims"] = shared
+except (OSError, ValueError, KeyError, TypeError) as exc:
     print(json.dumps({"probe_error": "resource-claim path could not be checked: " + str(exc)})); raise SystemExit(0)
 env_python = os.path.expanduser("~/.conda/envs/pointstream/bin/python")
 tools = {name: shutil.which(name) for name in ("ffmpeg", "vvencapp", "vvdecapp", "codex")}
@@ -243,6 +253,26 @@ def select_cpu(hosts: list[dict[str, Any]], *, cpu_threads: int) -> dict[str, An
     return min(candidates, key=lambda item: item[:2])[2]
 
 
+def _shared_reservation_mib(gpu: dict[str, Any]) -> int | None:
+    """Declared peak plus margin of the shared PointStream claims on one GPU.
+
+    None when the probe's claim list is malformed, so the GPU is not admitted.
+    """
+    claims = gpu.get("pointstream_shared_claims") or []
+    if not isinstance(claims, list):
+        return None
+    total = 0
+    for claim in claims:
+        if not isinstance(claim, dict):
+            return None
+        for key in ("memory_mib", "margin_mib"):
+            value = claim.get(key)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                return None
+            total += value
+    return total
+
+
 def select_gpu(
     hosts: list[dict[str, Any]],
     *,
@@ -253,13 +283,23 @@ def select_gpu(
     required_paths: tuple[str, ...] = (),
     required_commands: tuple[str, ...] = (),
     prefer_gpu_names: tuple[str, ...] = (),
+    sharing: str = "exclusive",
+    sharing_margin_mib: int = DEFAULT_SHARING_MARGIN_MIB,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Pick a free compatible device; reject hosts with any failed prerequisite."""
+    """Pick a compatible device; reject hosts with any failed prerequisite.
+
+    ``exclusive`` admits only an idle GPU. ``shared`` ignores other users'
+    processes and utilization, and admits when free memory covers the declared
+    peak plus ``sharing_margin_mib`` plus every other shared PointStream claim's
+    peak and margin on that GPU. Idle GPUs are preferred in both modes.
+    """
     if required_memory_mib <= 0 or cpu_threads <= 0:
         raise FleetError("GPU memory estimate and CPU thread allowance must be positive")
+    if sharing not in GPU_SHARING_MODES:
+        raise FleetError(f"GPU sharing mode must be one of {GPU_SHARING_MODES}")
     if any(not name.strip() for name in prefer_gpu_names):
         raise FleetError("preferred GPU name substrings must not be empty")
-    candidates: list[tuple[tuple[int, int, int, str], dict[str, Any], dict[str, Any]]] = []
+    candidates: list[tuple[tuple[int, int, int, int, str], dict[str, Any], dict[str, Any]]] = []
     reasons: list[str] = []
     for host in hosts:
         reason = host_rejection(
@@ -271,18 +311,28 @@ def select_gpu(
         for gpu in host["gpus"]:
             if gpu.get("pointstream_claimed"):
                 continue
-            if gpu["compute_processes"]:
-                continue
-            if gpu["memory_used_mib"] > idle_memory_mib:
-                continue
-            if gpu["utilization_pct"] > idle_utilization_pct:
-                continue
-            if gpu["memory_free_mib"] < required_memory_mib + DEFAULT_MEMORY_MARGIN_MIB:
+            reserved = _shared_reservation_mib(gpu)
+            if reserved is None:
+                continue  # unreadable shared claims: fail closed
+            idle = (
+                not reserved
+                and not gpu["compute_processes"]
+                and gpu["memory_used_mib"] <= idle_memory_mib
+                and gpu["utilization_pct"] <= idle_utilization_pct
+            )
+            if sharing == "exclusive":
+                if not idle or gpu["memory_free_mib"] < required_memory_mib + DEFAULT_MEMORY_MARGIN_MIB:
+                    continue
+            elif gpu["memory_free_mib"] < required_memory_mib + sharing_margin_mib + reserved:
                 continue
             order = _device_rank(gpu["name"], prefer_gpu_names)
-            candidates.append(((order[0], -gpu["memory_free_mib"], gpu["utilization_pct"], host["alias"]), host, gpu))
+            candidates.append(((0 if idle else 1, order[0], -gpu["memory_free_mib"], gpu["utilization_pct"], host["alias"]), host, gpu))
     if not candidates:
-        detail = "; ".join(reasons) if reasons else "all inspected GPUs are busy, non-idle, or below the memory requirement"
+        if sharing == "shared":
+            fallback = "all inspected GPUs lack free memory for the declared peak, the sharing margin and other shared claims"
+        else:
+            fallback = "all inspected GPUs are busy, non-idle, or below the memory requirement"
+        detail = "; ".join(reasons) if reasons else fallback
         raise FleetError(f"No eligible GPU is available: {detail}")
     _, host, gpu = min(candidates, key=lambda item: item[0])
     return host, gpu

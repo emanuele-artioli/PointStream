@@ -51,10 +51,16 @@ and replace only verified worker processes; detached supervisors continue. Worke
 and claim both the request and its GPU/CPU resources. A request remains pending
 while compatible capacity is busy, until its absolute deadline.
 
-Admission requires a complete probe, no compute processes, memory use <=256 MiB,
-utilization <=5%, free memory >= declared peak +4 GiB, and sufficient aggregate
-CPU headroom. The supervisor repeats occupancy, memory and utilization checks
-under the resource claim immediately before starting. The claimed GPU is held
+A GPU job is admitted in one of two classes, chosen by `gpu_sharing`
+([Shared GPUs](#shared-gpus)). **Exclusive** (the default) requires a complete
+probe, no compute processes, memory use <=256 MiB, utilization <=5%, free memory
+>= declared peak +4 GiB, no other PointStream claim on the GPU, and sufficient
+aggregate CPU headroom. **Shared** requires a complete probe and free memory >=
+declared peak + sharing margin (8 GiB by default) + the peak and margin of every
+other shared PointStream claim on that GPU; other users' processes and utilization
+are ignored, and an idle GPU is preferred when one qualifies. The supervisor
+repeats the same class's check under the resource claim immediately before
+starting. The claimed GPU is held
 through smoke, validation and full execution. Other users can still allocate it;
 the job's declared contention policy then decides what happens
 ([below](#gpu-contention-partial-outputs-and-checkpoints)). The supervisor only
@@ -149,6 +155,54 @@ Children inherit `PS_STAGE` (smoke/full), `PS_STAGE_DIR` (separate output direct
 `experiments.jobs.monitor.publish_progress(stage, completed)` only on actual work
 completion. Log traffic and heartbeat timestamps do not count as progress.
 
+### Shared GPUs
+
+The cluster is shared with other users, and most PointStream work (training,
+rescoring, oracles, quality metrics) produces the same results whatever else runs
+on the GPU. Such a job can opt into the shared class:
+
+```json
+"gpu_sharing": {"mode": "shared", "basis": "Outputs and scores do not depend on wall time", "margin_mib": 8192}
+```
+
+`basis` is required and says why the results do not depend on timing;
+`margin_mib` is optional (default 8192, at least 1024). Specs without the field,
+or with `{"mode": "exclusive"}`, are admitted exactly as before.
+
+| Use | Mode |
+|---|---|
+| Training, rescoring, oracles, encode/decode for rate or quality only | `shared` |
+| Decode/render timing, latency, throughput, profiling, first run of a model on a GPU class | `exclusive` |
+
+A shared job:
+
+- is admitted beside other users' processes when memory suffices (see
+  [admission](#one-entry-point)); two PointStream shared jobs share one GPU only
+  if both declared peaks plus margins fit in its free memory, counted
+  conservatively (memory a running job already holds is counted again in its
+  reservation). An exclusive claim and a shared claim never share a GPU.
+- runs with contention policy `continue` (its `basis` defaults to the sharing
+  basis; declaring `stop` or `pause`, or `resume_attempts`, is rejected). Foreign
+  processes are still recorded as contention episodes.
+- has `timing_contaminated: true` from the start in the supervisor's
+  `status.json` and in every stage's `execution.json`. **Timings from a shared job
+  are never evidence**, whatever its episodes say.
+- records `gpu_sharing` in the request, `state.json`, the supervisor's
+  `status.json`, and each stage's `dispatch.json` and `execution.json` (exclusive
+  GPU jobs record `{"mode": "exclusive"}` there too).
+- receives `PS_GPU_SHARING=shared` and `PS_GPU_MEMORY_LIMIT_MIB` (its declared
+  `gpu_memory_mib`). Cap the allocator there, for example
+  `torch.cuda.set_per_process_memory_fraction(limit / total)`.
+- is stopped as `failed` if its own process group uses more than the declared
+  peak + 1 GiB on the GPU, or if that usage cannot be read; the error names the
+  measured and allowed MiB, `status.json` records `gpu_memory_overrun`, and partial
+  outputs and checkpoints are salvaged as usual. Other users' processes are never
+  signalled.
+
+Declare a peak that covers the workload's real maximum, measured in a smoke.
+Workers admit shared jobs only from a release that includes this path
+(`workers restart`, after review).
+
 ### Host-local staging
 
 The NFS home costs ~200 ms per small-file create and 11–17 ms per open; host-local
@@ -241,8 +295,9 @@ promotion. Full runs are not accessible through the old unrestricted `fleet laun
 
 ## GPU contention, partial outputs and checkpoints
 
-Admission requires an idle GPU, but another user can start a process on the
-claimed GPU at any time. The supervisor checks occupancy every 10 seconds. If the
+Exclusive admission requires an idle GPU, but another user can start a process on
+the claimed GPU at any time. (A [shared](#shared-gpus) job always uses
+`continue`.) The supervisor checks occupancy every 10 seconds. If the
 occupancy query fails, the job stops as `failed`. When a foreign process appears,
 the job's optional `contention` declaration decides what happens:
 
@@ -427,6 +482,8 @@ and choose `gpu_models` from it.
 | DCVC-UF HT-S | Quadro GV100 (7.0) | **fails upstream**: DCVC's depthwise 3×3 launcher asserts `sm == 75` (`d3x3_kernel.h:571`); no Volta path | `20261006T114644Z-0fd97c54` |
 | HaMeR | Ada / A6000 / RTX 8000 / GV100 | passes on all four: CUDA fp32; attention is plain matmul in its ViT (no fused kernel by design); all checkpoint keys load; projected keypoints inside the VISOR hand boxes; peak 2.6 GiB | Ada `20261006T114125Z-e7d6020a`, A6000 `20261006T114819Z-3bd7c154`, RTX 8000 `20261006T114458Z-366341fe`, GV100 `20261006T120915Z-da4f170e` |
 | WiLoR + detector | Ada / A6000 / RTX 8000 / GV100 | passes on all four: CUDA; mem-efficient attention; all keys load; detector loads under ultralytics 8.4.6 and finds hands; peak 2.6 GiB | Ada `20261006T114150Z-82443769`, A6000 `20261006T114908Z-9eab247b`, RTX 8000 `20261006T114621Z-1e58fc3f`, GV100 `20261006T121039Z-92d1f7c4` |
+| LPIPS (AlexNet, torchmetrics heads; H3) | Ada / A6000 / RTX 8000 / GV100 | passes on all four: CUDA; region LPIPS on the GPU matches the CPU within 1e-3 (7e-6 on the A6000 smoke); plain convolutions, no fused kernels needed | Ada `20261010T222801Z-48e2fd4b`, A6000 `20261010T213310Z-134c06e8`, RTX 8000 `20261010T222739Z-0b9748f4`, GV100 `20261010T222750Z-7094a356` |
+| DISTS (VGG16, torchmetrics 1.9 heads; masked, H3b) and Inception-v3 (torchvision ImageNet weights, pool features; H3b) | RTX A6000 (8.6), RTX 6000 Ada (8.9) | passes on both: CUDA (asserted per network in `h3b.json` `on_cuda`); DISTS of a crop against itself is 0; plain convolutions; with LPIPS and WiLoR in the same job, peak 14.2 GiB | A6000 `20261011T071143Z-d8e6dc58`, Ada `20261011T174436Z-787fa437` |
 | NVRC (G5, HiNeRV-v2 xs at 960×540), stage 1 training | RTX 6000 Ada (8.9) | passes: CUDA, torch 2.10.0+cu128, fp16 autocast, Inductor compile (about 5 min); 40 frames/s at 2.26M parameters, 360 epochs on 240 frames in 2,320–2,360 s. On A6000 the same stage would not fit 45 min (not run) | `20261009T222809Z-f3873f4a` |
 | NVRC, stage 2, rANS bitstream write and decode | RTX A6000 (8.6) | passes: CUDA, eager fp16; bitstream fully consumed on decode; decoded model scores as encoded; 25.8 ms per frame including PNG writing | `20261009T235421Z-d60d9f80` |
 | G5 arm B (`g5_cond`, bf16 autocast) | RTX A6000 (8.6) and RTX 6000 Ada (8.9) | passes on both: CUDA, bf16 autocast, SparseAdam latents; rollout 1.3–3.0 ms per frame | A6000 `20261009T230416Z-0e6c0458`, Ada `20261009T230427Z-c83b3a52` |

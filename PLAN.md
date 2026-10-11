@@ -544,6 +544,83 @@ Texture transfer (a MANO texture with references sent as an inter-coded
 stream) stays as the fallback. Generic hands judged without a reference
 were not chosen.
 
+H3a2 (2026-10-11, [outcome](docs/experiments.md#2026-10-10--h3a2-the-texture-transfer-oracle-with-a-measured-reference-stream)):
+with each operating point's references sent as their own SVT-AV1 stream
+and measured, the oracle fails on all 12 points (LPIPS +0.002 to +0.029 at
+equal rate, no equal-quality saving). Sparse references cost 1.4–2.1× an
+inter-coded frame and decode worse than the same frames at full rate. So
+texture transfer with refresh does not beat coded pixels, and the
+textured-mesh fallback is not built. H3b (the generator at about the pose
+stream's rate) is the remaining route.
+
+H3b's oracle (to review with the user). A generator from one reference and
+the pose is billed at about the pose stream. The oracle grants it a perfect
+generator, so what remains is what the pose cannot carry:
+- the coded pose's placement error (estimation and coding);
+- what MANO does not describe: forearm and sleeve extent, held objects in
+  front of the fingers, motion blur.
+Built on VISOR as perfect appearance placed by WiLoR's and HaMeR's coded
+poses: the true hand pixels moved by the mesh correspondence from the
+uncoded to the coded pose, against the true frame. This also confirms the
+estimator on renders. The uncoded estimate stands in for the true pose,
+which VISOR lacks; HOT3D's motion capture checks that proxy.
+
+Identity (user, 2026-10-10): a hand that looks different from the source
+(skin tone, a missing watch) is acceptable as long as it stays consistent
+across the video. Full-reference LPIPS charges for such differences, so
+H3b's judge must change. Proposal: LPIPS beside measures that ignore
+identity:
+- pose fidelity (WiLoR re-run on the render against the source's pose);
+- realism (FID/KID of hand crops against real VISOR hands);
+- temporal consistency (flow-warped difference between consecutive
+  rendered frames).
+With these the generator may also use no reference at all, a generic hand
+kept constant per track.
+
+Agreed (user, 2026-10-11): the identity-free judges above, and H3b's audit
+of pose-conditioned hand generators, with downloading the chosen weights
+into `Models`. DISTS is reported beside LPIPS and PSNR, as in G5c. Order:
+1. H3b oracle: perfect appearance at WiLoR's and HaMeR's coded poses on
+   VISOR. Only the pose's placement error and what MANO does not describe
+   are charged; scored on all judges at the pose stream's rate.
+2. H3b generator: audit, smoke, then WiLoR's coded poses with one reference
+   per track (and a generic hand), scored the same way.
+3. H3c, a perceptually tuned coder of the foreground pixels: G5b's method
+   (DCVC-UF with β·LPIPS added to its loss, which taught the background
+   decoder to rebuild texture instead of blur and transferred across
+   kitchens) fine-tuned on hands and forearms. It is a foreground
+   candidate in its own right and the fair baseline: a generator at
+   about 2 kbps must beat a perceptually tuned codec, not only SVT-AV1.
+   It reuses G5b's trainer without changing the background session's
+   files.
+4. H3d, a content-aware super-resolution of the hand pixels (NAS, Yeo et
+   al., OSDI 2018; raised by the user, 2026-10-11): SVT-AV1 at a quarter or
+   an eighth of the resolution (H3b2: 4.7 and 1.9 kbps on the hands) and a
+   small SR network trained on the video's own hands, its bits charged
+   (amortized over the video, as PLAN I's payback time). Oracle first: an
+   SR overfit to the evaluation window itself is its upper bound; it must
+   beat H3c's curve at equal LPIPS to be built.
+
+H3b oracle (2026-10-11, [outcome](docs/experiments.md#2026-10-11--h3b-oracle-perfect-appearance-at-the-coded-pose)):
+fails on the 4 pilot items. Perfect appearance at WiLoR's coded pose, with
+the forearm granted, reaches LPIPS 0.211 at 1.93 kbps against SVT-AV1's
+0.102 at 35 kbps (CRF 62; +0.109, CI +0.062 to +0.156), and is worse on
+DISTS, PSNR, flicker, pose fidelity and KID too; HaMeR is worse still, and
+even the uncoded pose fails (0.168). MANO's silhouette misses or overshoots
+about a tenth of the hand, and that alone costs more than SVT-AV1's
+coarsest pixels. So the generator is not built at the pose stream's rate,
+and H3c is next. H3b2 (user, 2026-10-11: judge at equal quality,
+[outcome](docs/experiments.md#2026-10-11--h3b2-svt-av1-down-to-the-pose-streams-rate-equal-quality)):
+SVT-AV1 downscaled reaches the pose stream's rate (1.9 kbps at an eighth of
+the resolution, LPIPS 0.29) and needs about 5 kbps for the oracle's 0.21.
+The oracle's equal-quality saving is 48% (CI 6% to 81%) with the forearm
+granted, none drawing the hand alone: below the 50% bar, so the route does
+not reopen. Sending the hand's outline instead would cost 72–170 kbps per
+frame without prediction. If a generator is revisited (agreed, user,
+2026-10-11): one appearance reference per hand per video, not per track;
+then bridging pose gaps of ≤ 10 frames (83% of breaks) and boxes from the
+masks rather than the detector.
+
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a
