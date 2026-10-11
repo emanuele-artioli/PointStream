@@ -3114,3 +3114,62 @@ invocation turns out to be needed.
   verified there): smoke ≤ 600 s (one item, 48 frames); pilot: B2's 4 pilot
   items, ≤ 45 min; full: the other 30 items in parts of 5 (about 5 min per
   item), ≤ 3 GPU-hours. Ceiling 4 GPU-hours.
+- Jobs. Smoke `20261011T070541Z-cf8849a9` failed on its first hand frame
+  (OpenCV's `remap` caps map sides at 32,767; fixed in `4bd4f51` with a
+  test). Pilot `20261011T071143Z-d8e6dc58` (code `4bd4f51`; gpu3, RTX
+  A6000; environment `pointstream-20261006T113321Z`; inputs and specs in
+  `pointstream-data/visor/h3b-2026-10-11/`; B2's 4 pilot items, 240
+  frames; 2,619 s, 11 min per item, peak 14.2 GiB; validator 14/14,
+  including WiLoR's re-run reproducing H2's fits and the uncoded
+  silhouette matching H2's IoU). Report (`h3b report`, code `4bd4f51`, on
+  the pilot only): `pointstream-data/visor/h3b-2026-10-11/report-pilot-4bd4f51/h3b-report.json`
+  (`448aecaf…1fec`).
+- Outcome (pilot, 4 items). **The gate fails, by a wide margin, and every
+  judge agrees.**
+
+  | method | kbps | LPIPS | DISTS | PSNR dB | flicker | pose error | KID | FID |
+  |---|---|---|---|---|---|---|---|---|
+  | `svt@62` | 35.1 | 0.102 | 0.127 | 33.9 | 2.1 | 1.0% | −0.002 | 20 |
+  | `svt@41` | 178.9 | 0.052 | 0.085 | 39.3 | 1.3 | 0.5% | −0.003 | 8 |
+  | `wilor:arm` | 1.93 | 0.211 | 0.180 | 20.7 | 9.4 | 1.7% | 0.003 | 48 |
+  | `wilor:hand` | 1.93 | 0.298 | 0.224 | 18.7 | 11.4 | 2.6% | 0.005 | 56 |
+  | `wilor:arm_uncoded` | 1.93 | 0.168 | 0.163 | 22.8 | 6.4 | – | – | – |
+  | `hamer:arm` | 1.77 | 0.248 | 0.192 | 19.8 | 9.4 | 2.3% | 0.005 | 60 |
+
+  (LPIPS, DISTS, PSNR and flicker on S, means over items; pose error is
+  WiLoR's 2D joint error against its fit on the source, as a share of
+  the box, on judge frames; KID and FID on 255 hand crops per method.)
+  - Gate: `wilor:arm` − `svt@62` = +0.109 LPIPS (95% CI +0.062 to
+    +0.156), better on 0 of 4 items. `wilor:hand` +0.196. HaMeR is worse
+    still (+0.146). Even with no coding error, `wilor:arm_uncoded` is
+    +0.066 (CI +0.003 to +0.129), better on 1 item.
+  - Hybrid (forearm coded by SVT-AV1): worse than SVT-AV1 at its own rate
+    at every CRF (+0.059 to +0.072; at CRF 62 the hybrid is 18.1 kbps and
+    LPIPS 0.166, against SVT-AV1's 0.102 at 35 kbps).
+  - Equal quality: the oracle is worse than SVT-AV1's lowest point on
+    every item, so the rate SVT-AV1 would need for its LPIPS lies below
+    35 kbps and is not measured here.
+  - Render: the coded pose moves WiLoR's joints 9.9 px (HaMeR 15.2); the
+    render misses 9.7% of the hand pixels and 9.2% of what it draws falls
+    outside them; 9.5% of samples land outside the region and 2.2% are
+    hidden in the uncoded render. LPIPS on the rendered pixels alone is
+    0.207, so the loss is in the hand itself, not in the fill.
+  - Verdict by the rule: the generator is not built; H3c is next. No
+    escalation applies: `arm_uncoded` fails the gate too, and `wilor:arm`
+    is worse than `svt@62` on pose fidelity, DISTS and KID.
+- Reading. A perfect-appearance generator placed by MANO loses to coded
+  pixels at SVT-AV1's lowest rate on every judge, including those that
+  ignore identity. About half of the gap remains with the uncoded pose
+  (0.168 against 0.211), so it is not mainly the pose coding: MANO's
+  silhouette misses or overshoots about a tenth of the hand, and LPIPS
+  charges the misplaced edges and the displaced texture. The forearm
+  matters as predicted (`hand` 0.298 against `arm` 0.211); the hypothesis
+  that `arm` would pass is refuted. Competing explanation (1), the fill:
+  LPIPS on the rendered pixels alone (0.207) is already twice SVT-AV1's,
+  so a better fill (G5c's ProPainter) cannot close the gap.
+- Scope. Four items; the full run was not needed for the decision (0 of
+  4 items better, every judge agreeing). The realism judge uses
+  torchvision's ImageNet Inception-v3, not the TF FID network, so its KID
+  and FID compare methods within PointStream only; the paper must say so.
+  The pose stream's rate leaves out one reference per track (163 tracks
+  per minute on these items, since fits drop out between frames).

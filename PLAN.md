@@ -530,6 +530,17 @@ into `Models`. DISTS is reported beside LPIPS and PSNR, as in G5c. Order:
    It reuses G5b's trainer without changing the background session's
    files.
 
+H3b oracle (2026-10-11, [outcome](docs/experiments.md#2026-10-11--h3b-oracle-perfect-appearance-at-the-coded-pose)):
+fails on the 4 pilot items. Perfect appearance at WiLoR's coded pose, with
+the forearm granted, reaches LPIPS 0.211 at 1.93 kbps against SVT-AV1's
+0.102 at 35 kbps (CRF 62; +0.109, CI +0.062 to +0.156), and is worse on
+DISTS, PSNR, flicker, pose fidelity and KID too; HaMeR is worse still, and
+even the uncoded pose fails (0.168). MANO's silhouette misses or overshoots
+about a tenth of the hand, and that alone costs more than SVT-AV1's
+coarsest pixels. So the generator is not built at the pose stream's rate,
+and H3c is next. Open (user, 2026-10-11): judge at equal quality instead,
+which needs SVT-AV1 points below CRF 62's rate.
+
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a
