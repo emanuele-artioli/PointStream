@@ -3311,10 +3311,14 @@ invocation turns out to be needed.
   each cropped to a fixed 512×512 box centred on R's union over the
   segment (the ¼ frames, 480×272, padded by edge replication outside the
   loss mask); the upper bound uses every segment of the 4 pilot windows,
-  the component two segments per item and scale. β and the steps come from
-  a 40-step calibration of the upper bound at β = 0, by G5b's rules: β
-  times the monitor set's mean LPIPS on R equals twice its masked
-  distortion at step 0, and training takes at most 30 minutes.
+  the component two segments per item and scale. β comes from a 40-step
+  calibration of the upper bound at β = 0, by G5b's rule: β times the
+  monitor set's mean LPIPS on R equals twice its masked distortion at
+  step 0. The steps are G5b's 540 (30 minutes at its exclusive Ada
+  measurement, 3.28 s per step at the same patch, batch and groups):
+  H3c's GPU jobs run shared (fleet, 2026-10-11), so their own step times
+  are not evidence. Training runs on Ada only (HT-L training has not run
+  on an A6000; a first run there would have to be exclusive).
 - Comparison. Per item, each arm's front over its nine points against
   SVT-AV1's: BD-rate on LPIPS_R, the mean log-rate difference over the
   LPIPS range both fronts cover (linear in log rate, 64 levels); none
@@ -3357,9 +3361,8 @@ invocation turns out to be needed.
   pilot item ≤ 45 minutes. Calibration ≤ 10 minutes. Upper bound: two
   runs ≤ 45 minutes (30 minutes of training each), then their coding,
   split into jobs ≤ 45 minutes. Component: one run and its coding.
-  Ceiling 8 GPU-hours on Ada or A6000 (48 GB; G5b's training peaked at
-  42.7 GiB on Ada; the A6000's first training run is checked by the
-  smoke). Stage by stage; a stage that fails the rule stops what follows.
+  Ceiling 8 GPU-hours on Ada (training: 47,000 MiB declared, as G5b
+  peaked at 42.7 GiB allocated) and Ada or A6000 (coding: 24,000 MiB). Stage by stage; a stage that fails the rule stops what follows.
 - Inputs: H3b's (`pointstream-data/visor/h3b-2026-10-11/inputs.json`:
   evaluation set, dense archive, fill masks and record, B2's SVT-AV1
   streams and results, LPIPS, DISTS, the videos), H1's report

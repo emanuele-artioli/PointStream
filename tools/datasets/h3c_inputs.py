@@ -23,6 +23,12 @@ from typing import Any
 PILOT = ("P01_107", "P02_02", "P03_10", "P09_106")  # B2's pilot videos
 EXCLUDED = ("P01", "P02", "P03", "P09")  # their participants
 GPU_MODELS = ["RTX 6000 Ada", "RTX A6000"]  # DCVC-UF, LPIPS and DISTS verified there (docs/fleet.md)
+TRAIN_GPU_MODELS = ["RTX 6000 Ada"]  # HT-L training ran only on Ada (G5b): an A6000 first run would be exclusive
+CODE_SHARING = {"mode": "shared", "basis": "DCVC-UF and SVT-AV1 streams, decodes and their rate and LPIPS/PSNR/DISTS on the "
+                "hand region are deterministic and do not depend on wall time; recorded encode and decode seconds are not evidence"}
+TRAIN_SHARING = {"mode": "shared", "margin_mib": 1024,
+                 "basis": "the fine-tuned weights and monitor losses depend on the seed and the steps, not on wall time; "
+                          "step times are not evidence (the step count comes from G5b's exclusive Ada measurement)"}
 HOSTS = ["gpu1", "gpu2", "gpu3", "gpu4", "gpu5", "gpu6"]
 
 
@@ -81,7 +87,8 @@ def main() -> int:
     common = [staged[k] for k in ("eval_set", "dense_archive", "fill_masks", "fill_record", "dcvc_image", "lpips")] + \
         [staged[v] for v in videos]
 
-    def spec(arguments: list[str], staged_list: list[dict[str, Any]], scale: dict[str, Any], basis: str, memory: int) -> dict[str, Any]:
+    def spec(arguments: list[str], staged_list: list[dict[str, Any]], scale: dict[str, Any], basis: str, memory: int,
+             sharing: dict[str, Any], gpu_models: list[str]) -> dict[str, Any]:
         return {
             "schema": 1, "entrypoint": ["-m", "experiments.visor.h3c"],
             "environment": {"path": args.environment[0], "sha256": args.environment[1]},
@@ -90,8 +97,8 @@ def main() -> int:
             "smoke": {"seconds": 600, "representative_basis": basis}, "full": {"seconds": 2700},
             "validator": ["{python}", "-m", "experiments.visor.h3c", "validate"], "validator_seconds": 300,
             "required_commands": [], "budget_seconds": 4500, "deadline": args.deadline, "stall_seconds": 1800,
-            "cpu_threads": 16, "device": "gpu", "hosts": HOSTS, "gpu_models": GPU_MODELS, "gpu_memory_mib": memory,
-            "local_storage_gib": 60, "contention": {"policy": "pause", "pause_seconds": 900, "resume_attempts": 2},
+            "cpu_threads": 16, "device": "gpu", "hosts": HOSTS, "gpu_models": gpu_models, "gpu_memory_mib": memory,
+            "local_storage_gib": 60, "gpu_sharing": sharing,
         }
 
     written = []
@@ -110,7 +117,7 @@ def main() -> int:
                  f"fill masks checked against their record, {'every SVT-AV1 point (B2 streams checked and decoded by dav1d, H3b2 low points re-encoded and accounted by libaom inspect), ' if anchor else ''}"
                  "DCVC-UF HT-L encode and decode by B2's worker at QP 0 and scales 1 and 4 with the per-NAL bit split by the model's "
                  "own estimate, LPIPS on CPU against the GPU, DISTS); the stage runs 240 frames at QP 0, 21, 42 and scales 1, 2, 4.")
-        body = spec(arguments, common + extra, scale, basis, 24000)
+        body = spec(arguments, common + extra, scale, basis, 24000, CODE_SHARING, GPU_MODELS)
         path = dest / f"h3c-{name}-{next(v for v in PILOT if item.startswith(v + '_0'))}.json"
         path.write_text(json.dumps(body, indent=1) + "\n")
         written.append(path.name)
@@ -127,7 +134,8 @@ def main() -> int:
                  f"hand-centred 512x512 crops with R as the loss mask, {steps['smoke']} steps of G5b's trainer at the stage's settings "
                  "(512x512, 4 groups, batch 4: the stage's memory), monitor curve, state save, checkpoint published; "
                  f"the stage builds {len(items)} windows and runs {steps['full']} steps.")
-        body = spec(arguments, common + [staged["dcvc_video"]], scale, basis, 44000)
+        # G5b's run peaked at 42.7 GiB allocated: nearly a whole 48 GB card, admitted only when it is near empty.
+        body = spec(arguments, common + [staged["dcvc_video"]], scale, basis, 47000, TRAIN_SHARING, TRAIN_GPU_MODELS)
         path = dest / f"h3c-{name}.json"
         path.write_text(json.dumps(body, indent=1) + "\n")
         written.append(path.name)
