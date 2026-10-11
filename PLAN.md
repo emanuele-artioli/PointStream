@@ -513,6 +513,23 @@ identity:
 With these the generator may also use no reference at all, a generic hand
 kept constant per track.
 
+Agreed (user, 2026-10-11): the identity-free judges above, and H3b's audit
+of pose-conditioned hand generators, with downloading the chosen weights
+into `Models`. DISTS is reported beside LPIPS and PSNR, as in G5c. Order:
+1. H3b oracle: perfect appearance at WiLoR's and HaMeR's coded poses on
+   VISOR. Only the pose's placement error and what MANO does not describe
+   are charged; scored on all judges at the pose stream's rate.
+2. H3b generator: audit, smoke, then WiLoR's coded poses with one reference
+   per track (and a generic hand), scored the same way.
+3. H3c, a perceptually tuned coder of the foreground pixels: G5b's method
+   (DCVC-UF with β·LPIPS added to its loss, which taught the background
+   decoder to rebuild texture instead of blur and transferred across
+   kitchens) fine-tuned on hands and forearms. It is a foreground
+   candidate in its own right and the fair baseline: a generator at
+   about 2 kbps must beat a perceptually tuned codec, not only SVT-AV1.
+   It reuses G5b's trainer without changing the background session's
+   files.
+
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a
