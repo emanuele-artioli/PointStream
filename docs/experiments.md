@@ -2507,6 +2507,20 @@ invocation turns out to be needed.
     predicted), DISTS wrong (adopted predicted, flagged least certain).
   - GPU time for step 2: about 11.5 hours (prefill 10 × 0.25–0.3, arms
     14 × 0.55–0.6, calibration 0.15), within the 15 allowed.
+- **The step-2 recipe on all 10 stretches** (written before its runs,
+  with the user's overnight go-ahead for unblocked GPU work). G5b's
+  deferred stage 3 with step 2's loss: scene frames of the same stretch,
+  β = 0.005, ProPainter's fill, 540 steps, on the 8 stretches not yet
+  fitted (pilots: arm C). It gives the gate on the current recipe and the
+  baseline row that steps 3 (other days) and 4 (recipe) must beat; it
+  does not replace step 5.
+  - Rule (G5b's gate): BD-rate on LPIPS_V against SVT-AV1 on the new
+    anchors, median over the 10 stretches below 0 (a stretch with no
+    BD-rate counts by the verdict's sign, unclear ones are excluded and
+    counted). DISTS_V and PSNR_V are reported the same way.
+  - Hypothesis: passes, median between −60% and −85% on LPIPS_V; DISTS_V
+    below 0 on at least 8 of 10; PSNR_V above 0 on all.
+  - Budget: 8 jobs, each ≤ 45 minutes on Ada, about 5 GPU-hours.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
