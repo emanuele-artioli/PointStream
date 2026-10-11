@@ -3258,3 +3258,112 @@ invocation turns out to be needed.
   above SVT-AV1's CRF 62 on the same pixels. Prediction across frames
   would have to cut it more than tenfold to fit the pose stream's budget.
   The outline is not a cheap fix.
+
+### 2026-10-11 — H3c: a perceptually tuned DCVC-UF for the hand pixels
+- Question (PLAN H3c). G5b's method, DCVC-UF HT-L fine-tuned with β·LPIPS
+  added to its masked distortion, turned the background decoder from blur
+  to texture and transferred across kitchens. Fine-tuned on hands and
+  forearms, does it code VISOR's hand pixels for fewer bits than SVT-AV1 at
+  equal LPIPS? It is a foreground coder in its own right and the bar for
+  H3d (and for any generator): H3b2 showed that SVT-AV1 downscaled already
+  reaches the pose stream's rate on the hands.
+- Region and items. R is the union of both hand classes of the fill set
+  (VISOR's hand masks with B1b's SAM fill; they include the visible
+  forearm), as in H3b's `svt_lpips_r`. Scored on B2's 4 pilot items
+  (P01_107, P02_02, P03_10, P09_106), 240 frames each, on every frame with
+  a hand.
+- Quality, as H3b scored SVT-AV1 on R: the decode inside R, the source
+  outside, full-frame LPIPS (AlexNet) averaged over R, mean over the
+  window's hand frames. PSNR on R and masked DISTS on R's box plus 64 px
+  beside it. Points coded below full resolution are upscaled bicubically to
+  1920×1080 first (H3b2).
+- Anchor: SVT-AV1's per-item front on R (lowest LPIPS at each rate) over
+  B2's CRF 41/48/55/62 streams (rate on R: H1's libaom accounting) and
+  H3b2's seven low points (CRF 63 at 1, ½, ¼, ⅛ and 1⁄16 of the
+  resolution, CRF 55 at ¼ and ⅛; re-encoded with H3b2's code and checked
+  against its stream sha256s).
+- DCVC-UF points. HT-L codes the window's own 4:2:0 planes (full range as
+  B2), at full resolution and downscaled by 2 and 4 (H3b2's per-plane area
+  downscale and sizes), at QP 0, 21 and 42: nine points per arm and item.
+  DCVC-UF's floor at full resolution is above the hands' interesting range
+  (B2: QP 27 is 329 kbps for the whole frame), so the scales are what
+  reaches it, as for SVT-AV1. Rate on R: each NAL's container bytes are
+  split by DCVC-UF's own entropy model, per 16×16 latent cell (bits of y,
+  plus z's spread over its cells), from a forward pass of the same model on
+  the same frames with rounding in place of noise; each cell's bits are
+  spread evenly over its pixels in the NAL's frames and summed over R's
+  pixels (H1's rule for libaom's blocks; R downscaled with area ≥ 0.5 as
+  for SVT-AV1's low points). Reported beside: the estimate's total against
+  the actual bytes per NAL, and every point's whole-frame rate.
+- Arms. *Reference*: HT-L off the shelf. *Upper bound* (the oracle):
+  fine-tuned on the 4 pilot windows themselves. *Component*: fine-tuned on
+  the 24 other items whose participants are not the pilot items'
+  (P01, P02, P03 and P09 excluded): another person's hands in another
+  kitchen. The component is one model for every video, delivered with the
+  decoder and not billed, like any codec's weights; the upper bound is not
+  deployable.
+- Fine-tuning (`experiments/background/g5b_train.py` unchanged, through a
+  new driver): G5b's recipe (HT-L stage 2, cascaded 33-frame sequences,
+  batch 4, AdamW at 1e-5, a random QP per sample with λ from 1 to 768, the
+  image model frozen, gradient norm clipped at 0.2), distortion on R only
+  with DCVC's YUV/RGB weighting, optionally plus β·LPIPS on R. Training
+  data: segments of 48 consecutive window frames at one scale (1, ½, ¼),
+  each cropped to a fixed 512×512 box centred on R's union over the
+  segment (the ¼ frames, 480×272, padded by edge replication outside the
+  loss mask); the upper bound uses every segment of the 4 pilot windows,
+  the component two segments per item and scale. β and the steps come from
+  a 40-step calibration of the upper bound at β = 0, by G5b's rules: β
+  times the monitor set's mean LPIPS on R equals twice its masked
+  distortion at step 0, and training takes at most 30 minutes.
+- Comparison. Per item, each arm's front over its nine points against
+  SVT-AV1's: BD-rate on LPIPS_R, the mean log-rate difference over the
+  LPIPS range both fronts cover (linear in log rate, 64 levels); none
+  where they do not overlap (then "dominates" or "is dominated"). Saving =
+  −BD.
+- Decision rule (`h3c.DECISION`, fixed before the run).
+  1. Upper bound, β = 0 and β > 0. It *passes* if at some β the mean
+     BD-rate over the 4 items against SVT-AV1 is below −10% with at least
+     3 of 4 items below 0. It *fails* if at both β the mean is at or above
+     0 (or SVT-AV1 dominates): even fitted to the test frames, the tuned
+     coder does not beat SVT-AV1, so H3c is not built and H3d's bar is
+     SVT-AV1's front. Otherwise *unclear*: the component still runs (one
+     run), flagged.
+  2. Component, at the β of the better upper bound. *Adopted* (H3c is the
+     foreground pixel coder and, with SVT-AV1, sets H3d's bar as the lower
+     envelope of the two) if its mean BD against SVT-AV1 is below 0 with
+     at least 3 of 4 items below 0, and its mean BD against the reference
+     is below −10% (the tuning, not DCVC-UF itself, earns it). If the
+     reference alone beats SVT-AV1 by the same test, it joins the bar.
+  DISTS's and PSNR's BD-rates are reported beside; a sign disagreement
+  between LPIPS and DISTS is stated with the visual check.
+- Hypothesis. Off the shelf, DCVC-UF is worse than SVT-AV1 on LPIPS_R
+  (G5b: +151% median on the background) and closer on PSNR (B2: −13% on
+  weighted PSNR). β > 0 carries G5b's large LPIPS gain over: the upper
+  bound passes by 50% or more, β = 0 is near parity. The component keeps
+  about half of the upper bound's log-rate gain (G5b's scene model kept
+  half, its cross-scene control most of the LPIPS gain) and beats SVT-AV1
+  by 20–50% on LPIPS_R, at a PSNR cost. At ¼ scale DCVC-UF reaches a few
+  kbps on R.
+- Competing explanations. (1) β > 0 synthesizes texture that LPIPS rewards
+  but that is not the source's (G5b's visual check): DISTS, PSNR and
+  decoded frames of each arm, published by the coding jobs, expose it.
+  (2) The rate split favours one codec: DCVC-UF's estimate and libaom's
+  accounting are different instruments. The estimate's total against the
+  actual bytes, and the whole-frame rates, are reported; a BD-rate sign
+  that flips between the region rate and the whole-frame rate is stated.
+  (3) The component knows the person or kitchen: excluded by participant.
+- Budget. Smoke ≤ 10 minutes. Training data: two CPU jobs (pilot windows;
+  the 24 items) ≤ 45 minutes each. Anchor and reference: one GPU job per
+  pilot item ≤ 45 minutes. Calibration ≤ 10 minutes. Upper bound: two
+  runs ≤ 45 minutes (30 minutes of training each), then their coding,
+  split into jobs ≤ 45 minutes. Component: one run and its coding.
+  Ceiling 8 GPU-hours on Ada or A6000 (48 GB; G5b's training peaked at
+  42.7 GiB on Ada; the A6000's first training run is checked by the
+  smoke). Stage by stage; a stage that fails the rule stops what follows.
+- Inputs: H3b's (`pointstream-data/visor/h3b-2026-10-11/inputs.json`:
+  evaluation set, dense archive, fill masks and record, B2's SVT-AV1
+  streams and results, LPIPS, DISTS, the videos), H1's report
+  (`visor/h1-2026-10-08/report-6847a29`) and inspect binary, H3b's and
+  H3b2's units for the cross-checks, DCVC-UF's image and HT-L checkpoints
+  (G5b's). Environment `pointstream-20261009T214002Z` (`32e68872…4661`,
+  G5b's; the H3b environment plus NVRC).
