@@ -2806,6 +2806,22 @@ invocation turns out to be needed.
   risk of instability at 10⁻⁴ (the gradient is clipped at 0.2).
 - Budget: 4 training jobs (Ada) and 6 rescore jobs (Ada or A6000),
   about 3.5 GPU-hours.
+- Outcome (Ada; P26_02 `20261011T184234Z-31b797df` and P06_03
+  `…184244Z-d33d60f6` at code `2ad8693`, exclusive; P06_10
+  `…213150Z-8f4640c2` and P02_09 `…213201Z-fd642194` at `86e541b`, the
+  first shared-GPU jobs, same training code), against the corrected
+  anchor (entry below): L2 beats SVT-AV1 on 1 metric (LPIPS_V −58%;
+  DISTS_V +6%), L on 2 (LPIPS_V −61%, DISTS_V −2%); L2 also failed to
+  converge on P26_02 (the monitor still fell 5.9% over the last fifth).
+  **L2 is not adopted; the recipe is β = 0.005, learning rate 3 × 10⁻⁵,
+  ProPainter's fill, 540 steps.** Hypothesis (within ±5 points, with a
+  risk of instability): right. Anchors of the other 6 stretches,
+  rescored with KID: P03_10 `…184136Z-395aa792`, P06_05
+  `…184156Z-92a0ebd2`, P09_106 `…184205Z-4838ab3f`, P37_102
+  `…184215Z-cef9da1e`, P06_106 `…184225Z-fc129d92` (code `2ad8693`),
+  P04_13 `…213139Z-48eb8982` (`86e541b`, after `…184146Z-e007b2f1` was
+  contended with nothing to resume and `…201618Z-4cdfa689` was
+  cancelled unstarted to run shared).
 
 ### 2026-10-11 — G5d oracle: a venue-trained enhancer of SVT-AV1 (user, 2026-10-11)
 - Question: can knowledge of the venue held at the client make plain
@@ -2842,6 +2858,72 @@ invocation turns out to be needed.
   them, answer it.
 - Budget: 2 jobs, each ≤ 45 minutes on Ada or A6000 (12 SVT-AV1 encodes,
   24 fits, 30 scored points), about 1.5 GPU-hours.
+- Runs. Each first job ran out of time or was contended after 3–5 of
+  the 6 CRFs (`20261011T182551Z-07be07f1` P26_02, A6000, contended after
+  CRFs 32–48; `…182602Z-5a00c1bc` P06_03, Ada, 2,700 s after CRFs
+  32–59; code `80ac357`). Their salvaged checkpoints were passed back
+  (`--restore`) and the remaining CRFs ran on shared GPUs:
+  `…213128Z-5d649cb7` (P26_02, Ada) and `…213117Z-60964490` (P06_03,
+  A6000), code `86e541b` (the same enhancer code, plus `--restore` and
+  the fleet merge). About 75–160 s per fit; 594,371 parameters (1.2 MB
+  at fp16).
+- Outcome, against the corrected anchor (entry below). BD-rate against
+  SVT-AV1, P26_02 | P06_03 ("dom." = better at every rate, no overlap):
+  | Arm | LPIPS_V | DISTS_V | PSNR_V | flicker_V | KID_V | Beats by 10% |
+  |---|---|---|---|---|---|---|
+  | plain SVT-AV1 (check) | 0% \| 0% | 0% \| 0% | +1% \| 0% | +1% \| +1% | 0% \| 0% | 0 \| 0 |
+  | excerpt, MSE | −3% \| −4% | −1% \| −1% | 0% \| −2% | +1% \| +2% | −5% \| −4% | 0 \| 0 |
+  | scene, MSE | −1% \| −3% | +2% \| 0% | 0% \| 0% | +1% \| +1% | −2% \| −3% | 0 \| 0 |
+  | excerpt, MSE + LPIPS | dom. \| −69% | dom. \| −43% | +22% \| +12% | +123% \| +96% | −65% \| −31% | 3 \| 3 |
+  | **scene, MSE + LPIPS** | **dom. \| −58%** | **dom. \| −20%** | +25% \| +20% | +122% \| +93% | **−58% \| −24%** | **3 \| 3** |
+  - **By the rule a scene arm passes** (3 metrics on both pilots), so a
+    venue-footage enhancer (other recordings only, as step 3) is built
+    next and compared with the scene model.
+  - Hypothesis wrong in kind: the MSE enhancer barely moves SVT-AV1
+    (PSNR_V −2% to 0%, even fitted on the excerpt), so AV1's decoded
+    frames hold little a small network can restore toward the source.
+    The gain is all perceptual, and it costs PSNR_V (+20–25%) and
+    flicker (+93–123% BD, about 12% more at equal CRF): the network
+    synthesizes texture frame by frame. The scene arm keeps most of the
+    oracle's gain (memorization is not the explanation).
+  - Against the scene model (recipe L, step 4, the same pilots and
+    anchors): L is stronger on LPIPS_V (−92% | −66%) and DISTS_V (−73% |
+    −38%); the enhancer on PSNR_V (L +53% | +96%), flicker (L worse at
+    every rate) and KID_V (L +12% | +3%), at 1.2 MB against 51 MB, on a
+    standard AV1 stream. By the selection's count on these two stretches
+    the enhancer beats SVT-AV1 on 3 metrics, L on 2.
+  - GPU time: about 2.5 hours (4 jobs).
+
+### 2026-10-12 — Correction: SVT-AV1's envelope was a staircase
+- Found in G5d: plain SVT-AV1 on the fill, byte-identical to the anchor's
+  own fill streams (same sha256), scored 7–15% *better* than "SVT-AV1's
+  envelope". G5's anchor joins SVT-AV1 on the frame and on the fill, and
+  `g5.bd_rate` kept their Pareto front: the frame encodes, 7–33% worse
+  than the fill's, still put points barely above the fill's at much higher
+  rate, and the PCHIP interpolation through that staircase ran below both
+  of SVT-AV1's own curves. Every BD-rate against SVT-AV1 since G5 was
+  therefore optimistic for the test, by 0–15% of the anchor's rate
+  (median about 7%).
+- Fix (`g5.envelope`): the anchor is the upper concave hull of its points
+  (what switching between the encodes achieves), which here is the fill's
+  curve within 1%; the test curve keeps its Pareto front. Regression test
+  in `tests/background/test_g5c.py`. Every later number uses it.
+- Recomputed G5c numbers (BD-rate against SVT-AV1, was → is); **no
+  decision changes**:
+  - Step 2, recipe C on the 10 stretches: LPIPS_V median −41% → −39% (8
+    of 10 below 0, unchanged), DISTS_V +28% → +30%, PSNR_V +121% →
+    +130%. Pilots (median of two): C LPIPS_V −78% → −75%, DISTS_V −55%
+    → −51%.
+  - Step 3, footage only (G): LPIPS_V −60%/−74% → −53%/−72% (P06_03 /
+    P26_02), DISTS_V −40%/−45% → −32%/−46%; scene plus footage (H)
+    −57%/−88%.
+  - Oracle on the fast stretches (U): P04_13 −0.3% → +9%, P06_05 −11% →
+    −6% (the scope conclusion holds, more strongly).
+  - Step 4, development set: C LPIPS_V −55% → −49%, DISTS_V +3% → +5%;
+    L −65% → −61% and −10% → −2% (L still adopted, 2 metrics against 1;
+    its DISTS_V margin is thin); W −50% → −44%.
+  - G5b's earlier numbers (Telea anchors, 2026-10-10) carry the same bias
+    and are superseded by G5c's; they are not recomputed.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could

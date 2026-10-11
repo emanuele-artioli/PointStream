@@ -799,13 +799,29 @@ def pareto(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
     return front
 
 
+def envelope(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """The anchor's achievable envelope: the upper concave hull of (kbps, quality), which switching between
+    its encodes reaches, quality increasing. A Pareto staircase of two interleaved curves (SVT-AV1 on the frame
+    and on the fill) would put the anchor's interpolation below both of its own curves (G5d, 2026-10-12)."""
+    hull: list[tuple[float, float]] = []
+    for p in sorted(set(points)):
+        while len(hull) >= 2:
+            (x1, y1), (x2, y2) = hull[-2], hull[-1]
+            if (y2 - y1) * (p[0] - x1) <= (p[1] - y1) * (x2 - x1):  # hull[-1] on or below the chord
+                hull.pop()
+            else:
+                break
+        hull.append(p)
+    return pareto(hull)
+
+
 def bd_rate(test: list[tuple[float, float]], anchor: list[tuple[float, float]]) -> float | None:
     """Bjøntegaard rate difference of ``test`` against ``anchor`` (fraction; +1.0 is twice the rate), with
     piecewise-cubic (PCHIP) log-rate over the overlapping quality range; None with fewer than two points
     each or an overlap under `DECISION['min_overlap_db']`."""
     from scipy.interpolate import PchipInterpolator
 
-    t, a = pareto(test), pareto(anchor)
+    t, a = pareto(test), envelope(anchor)
     if len(t) < 2 or len(a) < 2:
         return None
     lo, hi = max(t[0][1], a[0][1]), min(t[-1][1], a[-1][1])
@@ -821,7 +837,7 @@ def bd_rate(test: list[tuple[float, float]], anchor: list[tuple[float, float]]) 
 
 def anchor_quality(anchor: list[tuple[float, float]], rate: float) -> float | None:
     """The envelope's quality at ``rate`` (linear in log rate), its best quality above its range, None below."""
-    front = pareto(anchor)
+    front = envelope(anchor)
     if rate < front[0][0]:
         return None
     if rate >= front[-1][0]:

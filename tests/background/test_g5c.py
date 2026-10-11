@@ -278,3 +278,13 @@ def test_patches_prefer_visible_background():
     assert len(patches) == 50
     share = np.mean([keep[i, y:y + 64, x:x + 64].mean() for i, y, x in patches])
     assert share > 0.8
+
+
+def test_anchor_envelope_is_the_concave_hull_not_a_staircase():
+    pytest.importorskip("scipy")
+    filled = [(20.0, 30.0), (40.0, 33.0), (80.0, 35.0), (160.0, 36.5)]
+    frame = [(26.0, 30.2), (52.0, 33.2), (104.0, 35.2), (208.0, 36.7)]  # barely better, much dearer
+    assert g5.envelope(filled + frame) == [(20.0, 30.0), (40.0, 33.0), (80.0, 35.0), (160.0, 36.5), (208.0, 36.7)]
+    # the fill's own curve is not better than the envelope that contains it
+    assert 0 <= g5.bd_rate(filled, filled + frame) < 0.02
+    assert (26.0, 30.2) in g5.pareto(filled + frame)  # the staircase step the old envelope interpolated through

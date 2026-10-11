@@ -415,9 +415,18 @@ before only where noted.
    −10% over the 4 development stretches, against C's 1 metric); flat
    frame weights flatten DCVC-UF's quality swing only partly and cut
    flicker 5%, not adopted. PSNR_V and flicker stay DCVC-UF's losses.
-   Round 2 tests 10⁻⁴. Next, a venue-trained enhancer of SVT-AV1 (G5d
-   oracle, user 2026-10-11) tests the other route for the stored
-   knowledge: after a standard codec instead of inside a neural one.
+   *Round 2 done (2026-10-12):* 10⁻⁴ is not better; **the recipe is
+   β = 0.005, learning rate 3 × 10⁻⁵, ProPainter's fill, 540 steps**,
+   now run on the other 6 stretches. All BD-rates against SVT-AV1 were
+   corrected on 2026-10-12 (its envelope was a staircase, optimistic by
+   about 7%; no decision changed; [experiments](docs/experiments.md)).
+   *G5d oracle (user 2026-10-11, done 2026-10-12):* a venue-trained
+   enhancer after plain SVT-AV1 (NAS-style, 1.2 MB), fitted on the
+   stretch's other frames with LPIPS in its loss, beats SVT-AV1 by 10%
+   or more on LPIPS_V, DISTS_V and KID_V on both pilots, and loses less
+   PSNR_V and flicker than the scene model; fitted for MSE alone it does
+   nothing. By its rule a venue-footage enhancer is next, compared with
+   the scene model.
 5. *Scope: calm and moving viewpoints.* The scene model's gain tracks the
    excerpt's motion and SVT-AV1's rate (step 2). More calm stretches,
    chosen by G1's camera-motion audit with a threshold fixed before any
