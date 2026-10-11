@@ -3,7 +3,7 @@
     python tools/datasets/h3c_inputs.py --dest DIR --h3b-dir DIR --dcvc-dir DIR --inspect BIN \\
         --environment TAR SHA256 --deadline ISO [--train FIT NAME WEIGHT STEPS] [--code LABEL NAME=CKPT ...]
 
-Every staged input is H3b's (``--h3b-dir``'s ``inputs.json``: evaluation set, dense archive, fill masks and record,
+Every staged input is H3b's (``--h3b-dir``'s pilot spec, checked against its ``inputs.json``: evaluation set, dense archive, fill masks and record,
 B2's SVT-AV1 streams and results, LPIPS, DISTS, the videos), plus DCVC-UF's image and HT-L checkpoints from
 ``--dcvc-dir`` and H1's libaom inspect binary. Always written: ``h3c-anchor-<video>.json`` (SVT-AV1's points and
 the reference DCVC-UF on one pilot item each) and ``h3c-calibrate.json`` (40 steps of the upper bound at β = 0).
@@ -68,9 +68,13 @@ def main() -> int:
     dest = Path(args.dest)
     manifest = json.loads((Path(args.h3b_dir) / "inputs.json").read_text())
     files = manifest["files"]
-    staged = {k: {"name": k, **v} for k, v in files.items()
-              if k in ("eval_set", "dense_archive", "fill_masks", "fill_record", "lpips", "dists", "svt_streams_a",
-                       "svt_result_a", "svt_streams_b", "svt_result_b") or k.startswith("video_")}
+    # H3b's spec entries, not its manifest's: they carry ``extract`` for the archives.
+    pilot_spec = json.loads((Path(args.h3b_dir) / "h3b-oracle-pilot.json").read_text())
+    staged = {e["name"]: e for e in pilot_spec["staged_inputs"]
+              if e["name"] in ("eval_set", "dense_archive", "fill_masks", "fill_record", "lpips", "dists", "svt_streams_a",
+                               "svt_result_a", "svt_streams_b", "svt_result_b") or e["name"].startswith("video_")}
+    if mismatch := [k for k, e in staged.items() if files[k]["sha256"] != e["sha256"]]:
+        raise SystemExit(f"H3b's spec and manifest disagree on {mismatch}")
     staged["dcvc_image"] = entry("dcvc_image", Path(args.dcvc_dir) / "cvpr2026_image.pth.tar")
     staged["dcvc_video"] = entry("dcvc_video", Path(args.dcvc_dir) / "cvpr2026_video_htl.pth.tar")
     staged["inspect"] = entry("inspect", Path(args.inspect))
