@@ -372,6 +372,12 @@ before only where noted.
    a model good on PSNR, LPIPS and DISTS at once is unlikely to game all
    three, and the paper shows side-by-side frames so readers can check by
    eye.
+   *Done (2026-10-11, [experiments](docs/experiments.md), G5c step 2):*
+   β = 0.005 (any perceptual weight flips the model from losing to beating
+   SVT-AV1 by two thirds or more on LPIPS_V and DISTS_V; larger β only
+   costs PSNR_V); DISTS in the loss trades LPIPS_V for DISTS_V and is not
+   adopted; a temporal term buys 13% less flicker at 40% LPIPS_V and is
+   not adopted. ProPainter's fill of all 10 stretches is published.
 3. *Scene footage from other days.* EPIC-KITCHENS recorded each kitchen on
    several days (3–19 videos per pilot kitchen, 179 videos on the hosts). The
    scene model is fitted on the kitchen's other videos and scored on the

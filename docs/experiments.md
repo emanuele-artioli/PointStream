@@ -2484,6 +2484,29 @@ invocation turns out to be needed.
     LPIPS_V within 2% of A's. Not adopted: at γ = 0.5 the term is about
     5% of the distortion (the calibration above), too weak to matter.
     F2 decides the temporal term.
+- Outcome, E and F2 (code `7f13f6b`, Ada, 540 steps, converged). BD-rate
+  against A, P06_03 | P26_02:
+  | Arm | LPIPS_V | DISTS_V | PSNR_V | flicker (mean over QPs) | Jobs |
+  |---|---|---|---|---|---|
+  | E (DISTS, 1 frame in 8) | +10.5% \| +20.5% | −29% \| −18% | +8% \| +5% | 0% \| −1% | `20261010T230108Z-2dca65b9`, `…230132Z-dc29fffb` |
+  | F2 (γ = 9) | +43% \| +40% | +46% \| +64% | −7% \| −13% | −13% \| −13% | `…230122Z-c0840bae`, `…230142Z-91a3f4be` |
+  - Rule (4): E gains on DISTS_V (−29%, −18%) but loses more than 10% on
+    LPIPS_V on both stretches (+10.5%, a near miss, and +20.5%). **Not
+    adopted.** At an equal share the two deep-feature terms trade against
+    each other rather than both improving: the competing explanation
+    held, not the user's hope that training on every scored metric would
+    lift all three. The DISTS weight set at step 0 was 0.30 and 0.19 per
+    scored frame (with the factor 8); 3.7–3.9 s per step, 43.2 GiB.
+  - Rule (3): F2 lowers flicker by 13% on both, short of 20%, and costs
+    40% on LPIPS_V and 46–64% on DISTS_V while gaining 7–13% on PSNR_V:
+    the steadier output is the smoother one (the competing explanation).
+    **Not adopted.** Flicker stays a limitation of the scene model, most
+    of it DCVC-UF's own (step 1).
+  - **Step 2's loss for steps 3–5: β = 0.005, no DISTS term, no temporal
+    term.** Hypotheses: β wrong (0.01 predicted), temporal wrong (adopted
+    predicted), DISTS wrong (adopted predicted, flagged least certain).
+  - GPU time for step 2: about 11.5 hours (prefill 10 × 0.25–0.3, arms
+    14 × 0.55–0.6, calibration 0.15), within the 15 allowed.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
