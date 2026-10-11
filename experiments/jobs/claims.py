@@ -87,6 +87,9 @@ class DeviceClaim:
     child_pid: int | None = None
     child_proc_start_time: float | None = None
     process_group_id: int | None = None
+    sharing: str = "exclusive"
+    memory_mib: int | None = None
+    margin_mib: int | None = None
 
 
 @dataclass(frozen=True)
@@ -501,6 +504,145 @@ def query_gpus(
     return list(devices.values())
 
 
+def shared_claims_dir(claims_path: Path, host: str, device_uuid: str) -> Path:
+    """Directory of one device's shared claims, one ``<token>.json`` each."""
+    return claims_path / "devices" / f"{host}_{sanitize_uuid(device_uuid)}.shared"
+
+
+def device_claim_file(claims_path: Path, claim: DeviceClaim) -> Path:
+    """Where a device claim is recorded, by its sharing mode."""
+    if claim.sharing == "shared":
+        return shared_claims_dir(claims_path, claim.host, claim.device_uuid) / f"{claim.token}.json"
+    return claims_path / "devices" / f"{claim.host}_{sanitize_uuid(claim.device_uuid)}" / "claim.json"
+
+
+def live_shared_claims(
+    claims_path: Path, host: str, device_uuid: str, *, exclude_token: str | None = None
+) -> list[dict[str, Any]]:
+    """Shared claims on one device that are not verified dead.
+
+    Verified-dead claims are removed. An unreadable claim raises, so callers
+    fail closed instead of admitting beside a reservation of unknown size.
+    """
+    directory = shared_claims_dir(claims_path, host, device_uuid)
+    if not directory.is_dir():
+        return []
+    live = []
+    for path in sorted(directory.glob("*.json")):
+        data = read_json_safe(path)
+        if not isinstance(data, dict) or not isinstance(data.get("memory_mib"), int) or not isinstance(data.get("margin_mib"), int):
+            raise DeviceUnavailableError(f"Shared claim {path} is unreadable")
+        if data.get("token") == exclude_token:
+            continue
+        if is_claim_active(data) is False:
+            path.unlink(missing_ok=True)
+            continue
+        live.append(data)
+    return live
+
+
+def shared_reservation_mib(shared_claims: list[dict[str, Any]]) -> int:
+    """Declared peaks plus margins reserved by shared claims."""
+    return sum(int(c["memory_mib"]) + int(c["margin_mib"]) for c in shared_claims)
+
+
+def is_device_shareable(device_info: dict[str, Any], *, min_free_memory_mb: float) -> bool:
+    """Whether a shared job fits on a device: free memory only.
+
+    Other users' processes and utilization are ignored; a malformed reading
+    is never shareable.
+    """
+    value = device_info.get("memory_free_mb")
+    if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value) or value < 0:
+        return False
+    return value >= min_free_memory_mb
+
+
+def is_shared_claim_admissible(
+    claim: DeviceClaim, device_info: dict[str, Any] | None, claims_path: Path
+) -> bool:
+    """The shared admission rule for a held claim (the pre-start recheck)."""
+    if device_info is None or claim.memory_mib is None or claim.margin_mib is None:
+        return False
+    try:
+        others = live_shared_claims(claims_path, claim.host, claim.device_uuid, exclude_token=claim.token)
+    except DeviceUnavailableError:
+        return False
+    if exclusive_claim_present(claims_path, claim.host, claim.device_uuid):
+        return False
+    needed = claim.memory_mib + claim.margin_mib + shared_reservation_mib(others)
+    return is_device_shareable(device_info, min_free_memory_mb=needed)
+
+
+def exclusive_claim_present(claims_path: Path, host: str, device_uuid: str) -> bool:
+    """Whether an exclusive claim holds the device or may still (not verified dead)."""
+    lock_dir = claims_path / "devices" / f"{host}_{sanitize_uuid(device_uuid)}"
+    if not lock_dir.exists():
+        return False
+    data = read_json_safe(lock_dir / "claim.json")
+    # A directory without a readable claim is an acquisition in progress.
+    return not data or is_claim_active(data) is not False
+
+
+def acquire_shared_device_claim(
+    *,
+    device_uuid: str,
+    memory_mib: int,
+    margin_mib: int,
+    claims_dir: Path | str | None = None,
+    job_id: str = "default",
+    job_dir: Path | str | None = None,
+    probe_fn: Callable[[], list[dict[str, Any]]] | None = None,
+) -> DeviceClaim:
+    """Claim a share of a GPU that other users may also be using.
+
+    Admission needs a complete probe and free memory for this job's declared
+    peak plus margin plus every other live shared claim's peak and margin on the
+    device. Shared admissions on one device are serialized by a directory mutex.
+    The claim is written before checking for an exclusive claim, and an exclusive
+    acquisition writes before checking for shared claims, so the two never both
+    proceed on one device.
+    """
+    if memory_mib <= 0 or margin_mib <= 0:
+        raise ValueError("a shared claim declares a positive peak and margin")
+    claims_path = get_claims_dir(claims_dir)
+    host = get_canonical_host()
+    directory = shared_claims_dir(claims_path, host, device_uuid)
+    mutex = directory.with_name(directory.name + ".lock")
+    with atomic_dir_lock(mutex):
+        device = next((d for d in query_gpus(probe_fn) if d["uuid"] == device_uuid), None)
+        if device is None:
+            raise DeviceUnavailableError(f"Requested GPU device {device_uuid} not found or probe failed on {host}")
+        others = live_shared_claims(claims_path, host, device_uuid)
+        needed = memory_mib + margin_mib + shared_reservation_mib(others)
+        if not is_device_shareable(device, min_free_memory_mb=needed):
+            raise DeviceBusyError(
+                f"Device {device_uuid} on {host} has under {needed} MiB free for a shared claim "
+                f"({len(others)} other shared claims)"
+            )
+        token = secrets.token_hex(16)
+        claim = DeviceClaim(
+            token=token,
+            host=host,
+            device_uuid=device_uuid,
+            device_ordinal=device.get("index", 0),
+            child_ordinals={device_uuid: 0},
+            pid=os.getpid(),
+            created_at=time.time(),
+            job_id=job_id,
+            job_dir=str(job_dir) if job_dir else None,
+            proc_start_time=get_process_start_time(os.getpid()),
+            sharing="shared",
+            memory_mib=memory_mib,
+            margin_mib=margin_mib,
+        )
+        write_json_atomic(device_claim_file(claims_path, claim), asdict(claim))
+    if exclusive_claim_present(claims_path, host, device_uuid):
+        release_device_claim(host, device_uuid, token, claims_path)
+        raise DeviceClaimConflictError(f"Device {device_uuid} on {host} is claimed exclusively")
+    return claim
+
+
 def is_device_free(
     device_info: dict[str, Any],
     *,
@@ -625,7 +767,14 @@ def acquire_device_claim(
 
         # RECHECK UNDER CLAIM IMMEDIATELY BEFORE RETURNING FOR LAUNCH
         is_still_free = True
-        if recheck_fn is not None:
+        try:
+            # Written before this check, so a concurrent shared claim sees ours.
+            shared_holders = bool(live_shared_claims(claims_path, canonical_host, cand_uuid))
+        except DeviceUnavailableError:
+            shared_holders = True
+        if shared_holders:
+            is_still_free = False
+        elif recheck_fn is not None:
             is_still_free = recheck_fn(cand_uuid, min_free_memory_mb)
         else:
             fresh_devices = query_gpus(probe_fn)
@@ -660,6 +809,14 @@ def release_device_claim(
 ) -> None:
     """Release a device claim by the owning token. Reject non-owner releases."""
     claims_path = get_claims_dir(claims_dir)
+    # Only a hex token can name a shared claim file; anything else is checked below.
+    shared_file = shared_claims_dir(claims_path, host, device_uuid) / f"{token}.json"
+    if re.fullmatch(r"[0-9a-f]+", token) and shared_file.exists():
+        if read_json_safe(shared_file, {}).get("token") != token:
+            raise InvalidTokenError(f"Release rejected for {device_uuid} on {host}: shared claim token mismatch")
+        # The directory stays: removing it could race a concurrent shared admission.
+        shared_file.unlink(missing_ok=True)
+        return
     sanitized = sanitize_uuid(device_uuid)
     lock_dir = claims_path / "devices" / f"{host}_{sanitized}"
     if not lock_dir.exists():
@@ -876,6 +1033,10 @@ def build_child_env(
         env["CUDA_VISIBLE_DEVICES"] = claimed_uuid
         env["PS_CLAIMED_GPU_UUID"] = claimed_uuid
         env["PS_CHILD_DEVICE_ORDINAL"] = "0"
+        if claim_session.device_claim.sharing == "shared" and claim_session.device_claim.memory_mib:
+            # Other users share this GPU: the workload should cap its allocator here.
+            env["PS_GPU_SHARING"] = "shared"
+            env["PS_GPU_MEMORY_LIMIT_MIB"] = str(claim_session.device_claim.memory_mib)
     else:
         # Hide all GPUs for CPU-only execution
         env["CUDA_VISIBLE_DEVICES"] = ""
@@ -955,12 +1116,7 @@ def record_child_identity(session: ClaimSession, process: subprocess.Popen[Any])
 
     if session.device_claim is not None:
         claim = session.device_claim
-        claim_file = (
-            session.claims_dir
-            / "devices"
-            / f"{claim.host}_{sanitize_uuid(claim.device_uuid)}"
-            / "claim.json"
-        )
+        claim_file = device_claim_file(session.claims_dir, claim)
         data = read_json_safe(claim_file, {})
         if data.get("token") != claim.token:
             raise InvalidTokenError("Cannot attach child identity to a device claim not owned by this session")
@@ -1261,6 +1417,11 @@ def get_claims_status(claims_dir: Path | str | None = None) -> dict[str, Any]:
                 if data:
                     active = is_claim_active(data)
                     device_records.append({**data, "active": active, "lock_dir": str(item)})
+                if item.name.endswith(".shared"):
+                    for shared in sorted(item.glob("*.json")):
+                        data = read_json_safe(shared)
+                        if data:
+                            device_records.append({**data, "active": is_claim_active(data), "lock_dir": str(item)})
 
     cpu_records = {}
     if cpu_dir.exists():

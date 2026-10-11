@@ -111,6 +111,51 @@ def foreign_gpu_processes(device_uuid: str, own_process_group: int) -> list[int]
     return sorted(foreign)
 
 
+def owned_gpu_memory_mib(device_uuid: str, own_process_group: int) -> int | None:
+    """GPU memory used on a claimed device by this job's own process group.
+
+    ``None`` means the query failed or an owned process reported no usable
+    memory figure; a shared job then stops rather than risk other users.
+    """
+    try:
+        result = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-compute-apps=gpu_uuid,pid,used_memory",
+                "--format=csv,noheader,nounits",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10,
+        )
+    except (subprocess.SubprocessError, FileNotFoundError, OSError):
+        return None
+    total = 0
+    for line in result.stdout.splitlines():
+        fields = [part.strip() for part in line.split(",")]
+        if len(fields) < 3 or fields[0] != device_uuid:
+            continue
+        try:
+            pid = int(fields[1])
+            process_group = os.getpgid(pid)
+        except ProcessLookupError:
+            continue
+        except (ValueError, OSError):
+            return None
+        if process_group != own_process_group:
+            continue
+        try:
+            total += int(fields[2])
+        except ValueError:
+            return None
+    return total
+
+
+# How far a shared job's own GPU memory may exceed its declared peak before it is stopped.
+SHARED_MEMORY_TOLERANCE_MIB = 1024
+
+
 def due_events(state: dict[str, Any], policy: dict[str, Any], now: float) -> list[str]:
     """Edge-triggered health/decision events plus explicit report deadlines."""
     events = []
@@ -332,6 +377,7 @@ def supervise(directory: Path) -> int:
     def cancellation_requested() -> bool:
         return (directory / "cancel.json").exists() or bool(request.get("cancel_path") and Path(request["cancel_path"]).exists())
 
+    shared = (request.get("claims") or {}).get("sharing") == "shared"
     with (directory / "supervisor.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         write_json(directory / "supervisor.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid())})
@@ -355,6 +401,11 @@ def supervise(directory: Path) -> int:
                 "last_progress": time.time(),
                 "emitted": [],
             }
+            if request.get("gpu_sharing"):
+                state["gpu_sharing"] = request["gpu_sharing"]
+            if shared:
+                # Other users' processes may run beside it from the start.
+                state["timing_contaminated"] = True
             write_json(directory / "status.json", state)
             child = None
             claims_cfg = request.get("claims")
@@ -381,14 +432,28 @@ def supervise(directory: Path) -> int:
                 if gpu_req:
                     gpu_memory_floor = float(claims_cfg.get("min_free_memory_mb", 4000.0))
                     try:
-                        dev_claim = acquire_device_claim(
-                            device_uuid=None if gpu_req == "auto" else gpu_req,
-                            auto_select=(gpu_req == "auto"),
-                            claims_dir=claims_dir,
-                            job_id=directory.name,
-                            job_dir=directory,
-                            min_free_memory_mb=gpu_memory_floor,
-                        )
+                        if shared:
+                            from experiments.jobs.claims import acquire_shared_device_claim
+
+                            if gpu_req == "auto":
+                                raise ValueError("a shared claim names its GPU")
+                            dev_claim = acquire_shared_device_claim(
+                                device_uuid=gpu_req,
+                                memory_mib=int(claims_cfg["memory_mib"]),
+                                margin_mib=int(claims_cfg["margin_mib"]),
+                                claims_dir=claims_dir,
+                                job_id=directory.name,
+                                job_dir=directory,
+                            )
+                        else:
+                            dev_claim = acquire_device_claim(
+                                device_uuid=None if gpu_req == "auto" else gpu_req,
+                                auto_select=(gpu_req == "auto"),
+                                claims_dir=claims_dir,
+                                job_id=directory.name,
+                                job_dir=directory,
+                                min_free_memory_mb=gpu_memory_floor,
+                            )
                     except Exception as exc:
                         state.update(status="failed", admission_rejected=True, error=f"GPU claim failed: {exc}")
                         write_json(directory / "status.json", state)
@@ -437,14 +502,25 @@ def supervise(directory: Path) -> int:
                     child_env = build_child_env(claim_session, child_env)
 
                 if claim_session and claim_session.device_claim:
-                    from experiments.jobs.claims import DeviceBusyError, is_device_free, query_gpus
+                    from experiments.jobs.claims import (
+                        DeviceBusyError,
+                        is_device_free,
+                        is_shared_claim_admissible,
+                        query_gpus,
+                    )
 
                     claimed_uuid = claim_session.device_claim.device_uuid
                     fresh = query_gpus()
                     cand = next((d for d in fresh if d["uuid"] == claimed_uuid), None)
-                    if cand is None or not is_device_free(
-                        cand, min_free_memory_mb=float(claims_cfg.get("min_free_memory_mb", 4000.0))
-                    ):
+                    if shared:
+                        admissible = is_shared_claim_admissible(
+                            claim_session.device_claim, cand, claim_session.claims_dir
+                        )
+                    else:
+                        admissible = cand is not None and is_device_free(
+                            cand, min_free_memory_mb=float(claims_cfg.get("min_free_memory_mb", 4000.0))
+                        )
+                    if not admissible:
                         from experiments.jobs.claims import release_session_claims
 
                         release_session_claims(claim_session)
@@ -510,6 +586,28 @@ def supervise(directory: Path) -> int:
                             result = contention_step(child, state, contention, foreign, now)
                             if result is not None:
                                 stopped = result
+                        device_claim = claim_session.device_claim
+                        if shared and state["status"] == "running" and device_claim.memory_mib:
+                            # Never touch other users' processes; stop our own overrun.
+                            limit = device_claim.memory_mib + SHARED_MEMORY_TOLERANCE_MIB
+                            used = owned_gpu_memory_mib(device_claim.device_uuid, child.pid)
+                            if used is None:
+                                stopped = stop_child(child)
+                                state.update(
+                                    status="failed",
+                                    error="GPU memory of the job's own processes could not be verified on a shared GPU",
+                                )
+                            elif used > limit:
+                                stopped = stop_child(child)
+                                state.update(
+                                    status="failed",
+                                    error=(
+                                        f"GPU memory overrun on a shared GPU: the job's own processes used {used} MiB, "
+                                        f"above the declared peak {device_claim.memory_mib} MiB + "
+                                        f"{SHARED_MEMORY_TOLERANCE_MIB} MiB"
+                                    ),
+                                    gpu_memory_overrun={"used_mib": used, "limit_mib": limit, "detected": now},
+                                )
                     if state["status"] == "running":
                         code = child.poll()
                         if code is not None:

@@ -162,7 +162,52 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
     contention = contention_policy(spec.get("contention"))
     if contention.get("pause_seconds", 0) > spec["budget_seconds"]:
         raise fleet.FleetError("contention.pause_seconds cannot exceed the budget")
-    return {**spec, "device": device, "contention": contention, "deadline_epoch": deadline, "validator_seconds": spec.get("validator_seconds", 60), "stall_seconds": number(spec.get("stall_seconds", 1800), "stall_seconds")}
+    sharing = sharing_policy(spec.get("gpu_sharing"))
+    if sharing["mode"] == "shared":
+        if device == "cpu":
+            raise fleet.FleetError("gpu_sharing applies to a claimed GPU; a cpu job declares none")
+        if spec.get("contention") is None:
+            contention = {"policy": "continue", "basis": sharing["basis"], "resume_attempts": 0}
+        elif contention["policy"] != "continue":
+            raise fleet.FleetError("a shared job runs beside other users' processes, so its contention policy is continue")
+    normalized = {**spec, "device": device, "contention": contention, "deadline_epoch": deadline, "validator_seconds": spec.get("validator_seconds", 60), "stall_seconds": number(spec.get("stall_seconds", 1800), "stall_seconds")}
+    if "gpu_sharing" in spec:
+        normalized["gpu_sharing"] = sharing
+    return normalized
+
+
+def sharing_policy(value: Any) -> dict[str, Any]:
+    """Whether a GPU job needs an idle GPU (``exclusive``, the default) or may
+    run beside other users' processes when enough memory is free (``shared``).
+
+    ``shared`` requires ``basis``, saying why the results do not depend on
+    timing, and accepts ``margin_mib``, the free memory kept beyond the declared
+    peak (default ``fleet.DEFAULT_SHARING_MARGIN_MIB``).
+    """
+    if value is None:
+        return {"mode": "exclusive"}
+    if not isinstance(value, dict) or set(value) - {"mode", "basis", "margin_mib"}:
+        raise fleet.FleetError("gpu_sharing declares only mode, basis and margin_mib")
+    mode = value.get("mode")
+    if mode not in fleet.GPU_SHARING_MODES:
+        raise fleet.FleetError("gpu_sharing.mode must be exclusive or shared")
+    if mode == "exclusive":
+        if set(value) != {"mode"}:
+            raise fleet.FleetError("gpu_sharing.basis and margin_mib apply only to the shared mode")
+        return {"mode": "exclusive"}
+    if not isinstance(value.get("basis"), str) or not value["basis"].strip():
+        raise fleet.FleetError("gpu_sharing mode shared requires a basis explaining why results do not depend on timing")
+    margin = value.get("margin_mib", fleet.DEFAULT_SHARING_MARGIN_MIB)
+    if not isinstance(margin, int) or isinstance(margin, bool) or margin < monitor.SHARED_MEMORY_TOLERANCE_MIB:
+        raise fleet.FleetError(f"gpu_sharing.margin_mib must be an integer of at least {monitor.SHARED_MEMORY_TOLERANCE_MIB}")
+    return {"mode": "shared", "basis": value["basis"], "margin_mib": margin}
+
+
+def gpu_sharing(spec: dict[str, Any]) -> dict[str, Any] | None:
+    """A normalized spec's GPU sharing mode; None for a cpu job."""
+    if spec.get("device", "gpu") == "cpu":
+        return None
+    return spec.get("gpu_sharing") or {"mode": "exclusive"}
 
 
 def contention_policy(value: Any) -> dict[str, Any]:
@@ -364,7 +409,9 @@ def eligible(spec: dict[str, Any], host: dict[str, Any]) -> dict[str, Any] | Non
     if spec.get("device", "gpu") == "cpu":
         fleet.select_cpu([host], cpu_threads=spec["cpu_threads"])
         return None
-    _, gpu = fleet.select_gpu([host], required_memory_mib=spec["gpu_memory_mib"], cpu_threads=spec["cpu_threads"])
+    sharing = gpu_sharing(spec) or {"mode": "exclusive"}
+    options = {"sharing": "shared", "sharing_margin_mib": sharing["margin_mib"]} if sharing["mode"] == "shared" else {}
+    _, gpu = fleet.select_gpu([host], required_memory_mib=spec["gpu_memory_mib"], cpu_threads=spec["cpu_threads"], **options)
     return gpu
 
 
@@ -428,6 +475,10 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
     run.mkdir()
     (run / "events").mkdir()
     source = directory / "source"
+    claims: dict[str, Any] = {"gpu": gpu["uuid"] if gpu else None, "cpu_threads": spec["cpu_threads"], "claims_dir": str(base.parent / "claims"), "min_free_memory_mb": spec["gpu_memory_mib"] + fleet.DEFAULT_MEMORY_MARGIN_MIB}
+    sharing = gpu_sharing(spec) if gpu else None
+    if sharing and sharing["mode"] == "shared":
+        claims.update(sharing="shared", memory_mib=spec["gpu_memory_mib"], margin_mib=sharing["margin_mib"], min_free_memory_mb=spec["gpu_memory_mib"] + sharing["margin_mib"])
     monitor.write_json(run / "request.json", {
         "command": [sys.executable, "-m", "experiments.jobs.inbox", "campaign", str(directory)],
         "cwd": str(source), "budget_seconds": remaining, "deadline_epoch": spec["deadline_epoch"],
@@ -435,11 +486,11 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
         "contention": spec.get("contention") or {"policy": "stop"}, "attempt": state.get("attempt", 1),
         "salvage": [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)],
         # Without a GPU claim the supervisor claims only CPU threads and hides every GPU.
-        "claims": {"gpu": gpu["uuid"] if gpu else None, "cpu_threads": spec["cpu_threads"], "claims_dir": str(base.parent / "claims"), "min_free_memory_mb": spec["gpu_memory_mib"] + fleet.DEFAULT_MEMORY_MARGIN_MIB},
+        "claims": claims, "gpu_sharing": sharing,
     })
     monitor.write_json(run / "policy.json", {"stall_seconds": spec["stall_seconds"], "report_at": None, "quiet_until": 0})
     monitor.write_json(directory / "environment.json", {"host": host["host"], "alias": host["alias"], "gpu": gpu, "python": host.get("python_version"), "tools": host.get("tool_versions"), "started": time.time()})
-    transition(directory, "launching", host_alias=host["alias"], gpu=gpu)
+    transition(directory, "launching", host_alias=host["alias"], gpu=gpu, gpu_sharing=sharing)
     env = {**os.environ, "PYTHONPATH": str(source), "PS_DATA_ROOT": str(base.parent.parent)}
     with (run / "supervisor.log").open("a") as output:
         child = subprocess.Popen([sys.executable, "-m", "experiments.jobs.monitor", "serve", str(run)], cwd=source, env=env, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
@@ -644,17 +695,22 @@ def campaign(directory: Path) -> int:
                 "command": command, "input_identity": spec["inputs"], "staged_inputs": staged, "staged_environment": packed,
                 "code": manifest, "environment": monitor.read_json(directory / "environment.json", {}), "started": time.time(),
                 "citable": False if stage == "smoke" else None, "attempt": attempt, "resumed_from": resumed_from,
-                "contention_policy": spec.get("contention"),
+                "contention_policy": spec.get("contention"), "gpu_sharing": gpu_sharing(spec),
             })
             monitor.publish_progress(stage, 0)
             phase_started = time.time()
             with (output / "command.log").open("w") as log:
                 returncode = run_bounded(command, cwd=source, env=env, log=log, seconds=spec[stage]["seconds"], budget_end=budget_end, run=run)
             phase_ended = time.time()
+            timing = contention_during(run, phase_started, phase_ended)
+            sharing = gpu_sharing(spec)
+            if sharing and sharing["mode"] == "shared":
+                # Other users may have shared the GPU throughout: timing is never evidence.
+                timing["timing_contaminated"] = True
             monitor.write_json(output / "execution.json", {
                 "exit_code": returncode, "seconds": phase_ended - phase_started,
                 "children_resource_usage": list(resource.getrusage(resource.RUSAGE_CHILDREN)),
-                **contention_during(run, phase_started, phase_ended),
+                **timing, "gpu_sharing": sharing,
             })
             if returncode:
                 # Failed scratch stays on the host for inspection; staging.json names it.
