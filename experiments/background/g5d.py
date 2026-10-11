@@ -19,7 +19,8 @@ Each fit is trained with the masked MSE alone (``mse``) and with LPIPS on V
 added at equal weight at step 0 (``lpips``). The enhanced excerpt is scored
 as every other method (`g5c.full_score`: PSNR, LPIPS, DISTS, flicker, KID on
 V); its rate is SVT-AV1's, the network's size is reported for payback. Writes
-``g5d.json`` in ``PS_STAGE_DIR``; each finished CRF is checkpointed.
+``g5d.json`` in ``PS_STAGE_DIR``; each finished CRF is checkpointed, and a
+timed-out run's salvaged checkpoint can be passed back (``--restore``).
 """
 
 from __future__ import annotations
@@ -217,6 +218,8 @@ def command_enhance(args: argparse.Namespace) -> int:
     flows = g5c.source_flows(clip)
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
     restored = g5c.restore(checkpoints)
+    if args.restore:  # a timed-out job's salvaged checkpoint.tar (extracted): its finished CRFs, as recorded
+        restored = {**g5c.restore(Path(args.restore) / "checkpoint"), **restored}
     allowance = max(4, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 4))
     tasks: list[dict[str, Any]] = [
         {"work": str(work / f"{name}-crf{crf}"), "source": str(src), "fps": str(clip.fps), "frames": counts[name],
@@ -259,7 +262,8 @@ def command_enhance(args: argparse.Namespace) -> int:
         "train": {**TRAIN, "steps": args.steps}, "scene_frames": len(scene), "guard_s": GUARD_S,
         "prefill": {k: meta[k] for k in ("id", "first", "frames", "yuv420_sha256", "fill")},
         "prefill_sha256": file_sha256(path), "metrics": nets.record, "encode_seconds": round(encode_seconds, 1),
-        "seconds": round(time.time() - began, 1), "restored": sorted(restored), **g5c.gpu_record(),
+        "seconds": round(time.time() - began, 1), "restored": sorted(restored),
+        "restored_archive": args.restore, **g5c.gpu_record(),
         "model_bytes_fp16": 2 * rows[0]["arms"]["excerpt-mse"]["train"]["parameters"] if rows else None,
         "points": rows})
     shutil.rmtree(work, ignore_errors=True)
@@ -320,6 +324,7 @@ def main(argv: list[str] | None = None) -> int:
     en.add_argument("--dists-backbone", required=True)
     en.add_argument("--inception", required=True)
     en.add_argument("--steps", type=int, required=True)
+    en.add_argument("--restore", default=None, help="an extracted checkpoint.tar of a timed-out run of this clip")
     en.set_defaults(func=command_enhance)
     va = sub.add_parser("validate")
     va.add_argument("--stage", default=None)
