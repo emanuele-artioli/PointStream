@@ -134,6 +134,19 @@ def load_prefilled(dirs: list[str]) -> dict[str, tuple[dict[str, Any], Path]]:
     return out
 
 
+def load_footage(dirs: list[str]) -> list[tuple[dict[str, Any], Path, Path]]:
+    """G5c's footage archives (`g5c.py footage`): their meta, the 4:2:0 fill and the loss masks, hashes checked."""
+    out = []
+    for d in dirs:
+        root = Path(d) / "publish" / "footage"
+        meta = json.loads((root / "meta.json").read_text())
+        for name, key in (("filled_yuv420.npy", "yuv420_sha256"), ("keep.npy", "keep_sha256")):
+            if file_sha256(root / name) != meta[key]:
+                raise RuntimeError(f"{root / name}: not the file its meta recorded")
+        out.append((meta, root / "filled_yuv420.npy", root / "keep.npy"))
+    return out
+
+
 # ----------------------------------------------------------------- rescore (SVT-AV1 streams with LPIPS)
 
 
@@ -264,7 +277,8 @@ def command_finetune(args: argparse.Namespace) -> int:
     frames, keep, start = load_scene(dirs[fit_id], by_id[fit_id], visor_fill)
     if fit_id == clip_id and start != clip.start:
         raise RuntimeError(f"{clip_id}: scene excerpt {start} != G5's {clip.start}")
-    fit = fit_indices(len(frames), start, g5.EXCERPT_FRAMES if args.limit_frames <= 0 else clip.n, clip.fps, args.fit)
+    fit = fit_indices(len(frames), start, g5.EXCERPT_FRAMES if args.limit_frames <= 0 else clip.n, clip.fps,
+                      "heldout" if args.fit == "heldout" else "scene")
     if args.limit_frames > 0:  # smoke: a few dozen fitted frames
         fit = fit[:max(args.limit_frames, 24)]
     prefilled = load_prefilled(args.prefilled)
@@ -280,6 +294,25 @@ def command_finetune(args: argparse.Namespace) -> int:
         fill_name = "telea"
     np.save(work / "keep.npy", keep)
     del frames
+    footage = load_footage(args.footage)
+    if args.fit == "footage" and not footage:
+        raise SystemExit("--fit footage needs --footage")
+    if footage:  # G5c step 3: other recordings of the kitchen after the stretch, a masked blank frame between pieces
+        yuv, mask = [np.load(work / "frames.npy")], [np.load(work / "keep.npy")]
+        extra, at = [], len(yuv[0])
+        for meta, yuv_path, keep_path in footage:
+            if meta["target"] != fit_id:
+                raise SystemExit(f"footage for {meta['target']}, not {fit_id}")
+            f, k = np.load(yuv_path), np.load(keep_path)
+            for seg in meta["segments"]:
+                yuv += [np.zeros_like(f[:1]), f[seg["offset"]:seg["end"]]]
+                mask += [np.zeros_like(k[:1]), k[seg["offset"]:seg["end"]]]
+                extra += list(range(at + 1, at + 1 + seg["end"] - seg["offset"]))
+                at += 1 + seg["end"] - seg["offset"]
+        np.save(work / "frames.npy", np.concatenate(yuv))
+        np.save(work / "keep.npy", np.concatenate(mask))
+        del yuv, mask
+        fit = extra if args.fit == "footage" else fit + extra
     prepare_seconds = time.time() - began
 
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
@@ -340,6 +373,8 @@ def command_finetune(args: argparse.Namespace) -> int:
     shutil.copyfile(log_path, publish / "train.log")
     arm = f"{'upper' if args.fit == 'heldout' else ('scene' if fit_id == clip_id else 'other')}-" \
           f"{'lpips' if args.lpips_weight > 0 else 'mse'}"
+    if footage:
+        arm = arm.replace("scene-", "footage-" if args.fit == "footage" else "scene+footage-", 1)
     if prefilled:  # G5c arms: the fill and every loss weight in the name
         arm += f"-b{args.lpips_weight:g}" + ("-dists" if args.dists_weight else "") + \
                (f"-t{args.temporal_weight:g}" if args.temporal_weight else "") + f"-{fill_name}"
@@ -347,6 +382,9 @@ def command_finetune(args: argparse.Namespace) -> int:
            "fit_frames": len(fit), "guard_s": GUARD_S if args.fit == "scene" else None,
            "lpips_weight": args.lpips_weight, "dists_weight": trained.get("dists_weight", 0.0),
            "temporal_weight": args.temporal_weight, "dists_every": args.dists_every, "fill": fill_name,
+           "footage": [{k: m[k] for k in ("recordings", "frames", "yuv420_sha256")} | {"segments": [
+               {k: sg[k] for k in ("video", "first_index", "last_index", "frames")} for sg in m["segments"]]}
+               for m, _, _ in footage],
            "steps": args.steps, "train": {**TRAIN, **{k: plan[k] for k in (
                "groups", "patch", "monitor_batch", "monitor_every")}},
            "model": {k: trained[k] for k in ("checkpoint_sha256", "checkpoint_bytes", "parameters")},
@@ -611,7 +649,8 @@ def main(argv: list[str] | None = None) -> int:
     rs.set_defaults(func=command_rescore)
     ft = sub.add_parser("finetune")
     common(ft)
-    ft.add_argument("--fit", choices=("heldout", "scene"), required=True)
+    ft.add_argument("--fit", choices=("heldout", "scene", "footage"), required=True)
+    ft.add_argument("--footage", nargs="*", default=[], help="G5c's extracted footage archives (other recordings)")
     ft.add_argument("--fit-clip", default=None, help="another stretch's scene frames (the cross-scene control)")
     ft.add_argument("--steps", type=int, required=True)
     ft.add_argument("--lpips-weight", type=float, default=0.0)

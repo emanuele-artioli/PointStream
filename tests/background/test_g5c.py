@@ -175,3 +175,20 @@ def test_training_dists_is_the_scoring_dists():
     a, b = torch.rand(2, 3, 64, 96), torch.rand(2, 3, 64, 96)
     mask = (torch.rand(2, 1, 64, 96) > 0.3).float()
     assert torch.allclose(_dists_stats(net, a, b, mask), masked_dists(net, a, b, mask), atol=1e-5)
+
+
+def test_segments_are_fixed_disjoint_and_away_from_the_ends():
+    videos = {"P06_05": (59.94, 86_000), "P06_10": (60.0, 14_580)}
+    a = g5c.choose_segments("visor-long/P06_03", videos, 4)
+    assert a == g5c.choose_segments("visor-long/P06_03", videos, 4)
+    assert len(a) == 4 and {s["video"] for s in a} == set(videos)
+    for s in a:
+        fps, frames = videos[s["video"]]
+        assert s["first_index"] >= round(g5c.EDGE_S * fps) and s["last_index"] < frames - round(g5c.EDGE_S * fps)
+        assert s["last_index"] - s["first_index"] + 1 == round(g5c.SEGMENT_S * fps)
+    for x in a:
+        for y in a:
+            if x is not y and x["video"] == y["video"]:
+                assert x["last_index"] < y["first_index"] or y["last_index"] < x["first_index"]
+    with pytest.raises(SystemExit):
+        g5c.choose_segments("visor-long/P26_02", {"P26_108": (50.0, 9_786)}, 4)

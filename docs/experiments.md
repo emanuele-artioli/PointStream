@@ -2557,6 +2557,54 @@ invocation turns out to be needed.
     - For step 3: the losing stretches (P04_13, P06_05) and the DISTS gap
       are what more scene footage and the recipe must close.
 
+### 2026-10-11 — G5c step 3: footage from the kitchen's other recordings
+- Question (PLAN G5c 3): does footage of the same kitchen from other
+  recordings make a better scene model than the stretch's own 90 s, and
+  can it stand alone (a model made before the stream exists)?
+- Scope, decided before any run. Four stretches: the pilots (P26_02,
+  P06_03) and the two that lose to SVT-AV1 on LPIPS_V (P04_13, P06_05),
+  since closing those is what more footage must do. Footage only from
+  recordings that EPIC-KITCHENS' hand-object detections cover, so the
+  foreground is G1's exactly (SAM 3.1 "hand" and "arm" plus the detector's
+  boxes at score ≥ 0.5, dilated 16 px at 1080p); fetching detections for
+  the rest would be a new download. Same kitchen checked by eye on two
+  frames per recording: P06's `_101`–`_110` recordings are another home
+  (dark counter, double sink) and are excluded for P06_03 and P06_05; P26
+  and P04 are one kitchen each. Never the stretch's own recording. Some
+  recordings may be from the same day, so "other recordings", not "other
+  days". Recordings: P26_02 ← P26_108; P06_03 ← P06_05, P06_10; P06_05 ←
+  P06_03, P06_10; P04_13 ← P04_06, P04_24.
+- Dose (fewest settings first): 4 segments of 60 s per stretch at 10
+  frames/s (2,400 frames, about 2.5 times the stretch's own scene frames),
+  dealt round-robin over its recordings and placed by sha256 of the
+  stretch, recording and number, at least 5 s from either end
+  (`g5c.choose_segments`); P26_108 is 196 s long, so P26_02 gets 2
+  segments (1,200 frames). ProPainter fills each segment by chunks within
+  it (`g5c.py footage`). If footage helps, a larger dose follows for a
+  dose–response curve.
+- Arms (step 2's recipe: β = 0.005, ProPainter's fill, 540 steps; scored
+  on the stretch's held-out excerpt as before): G, footage only (`--fit
+  footage`); H, the stretch's scene frames plus footage. Baseline: arm C
+  of step 2 on the same stretch.
+- Decision rule, fixed now. Footage *helps* if H's BD-rate on LPIPS_V
+  against C is −10% or better on at least 3 of the 4 stretches, or H turns
+  a stretch that loses to SVT-AV1 (P04_13, P06_05) into one that beats it
+  on LPIPS_V. Footage *stands alone* if G's BD-rate on LPIPS_V against C
+  is +10% or better (at most 10% worse) on at least 3 of 4. DISTS_V and
+  PSNR_V are reported beside it. If the user switches step 2's loss to
+  the DISTS arm (open, 2026-10-11), the arms run with that loss instead
+  and the rule is unchanged.
+- Hypotheses. H helps by 10–25% on the calm stretches (P26_02, P06_03)
+  and less on the moving ones, and turns neither loser; the gain grows
+  with the dose. G lands within 15% of C: the kitchen is the same, but the
+  excerpt's exact clutter is not in other recordings.
+- Competing explanation: more frames help through diversity, not the
+  kitchen; the cross-kitchen control of G5b (another stretch's footage at
+  equal size) answers that and runs if H helps.
+- Budget. Footage: 4 jobs, each ≤ 45 minutes on Ada or A6000 (SAM 3.1
+  about 0.38 s and ProPainter about 0.32 s per frame, 2,400 frames).
+  Training: 8 jobs, each ≤ 45 minutes on Ada. About 8 GPU-hours.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)

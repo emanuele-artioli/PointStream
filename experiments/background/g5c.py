@@ -686,6 +686,135 @@ def command_prefill(args: argparse.Namespace) -> int:
     return 0
 
 
+# ----------------------------------------------------------------- footage from other recordings (step 3)
+
+SEGMENT_S = 60.0
+FOOTAGE_FPS = 10.0
+EDGE_S = 5.0  # no segment within this of a video's ends
+
+
+def video_info(path: Path) -> tuple[float, int]:
+    """A video's nominal frame rate and its number of frames (from the stream's duration)."""
+    import av
+
+    with av.open(str(path)) as container:
+        stream = container.streams.video[0]
+        rate = float(stream.base_rate or stream.average_rate)
+        seconds = float(stream.duration * stream.time_base) if stream.duration else float(container.duration) / 1e6
+    return rate, int(seconds * rate)
+
+
+def choose_segments(target: str, videos: dict[str, tuple[float, int]], count: int,
+                    seconds: float = SEGMENT_S) -> list[dict[str, Any]]:
+    """``count`` non-overlapping segments of ``seconds`` from ``videos`` (name -> (fps, frames)), dealt round-robin
+    over the videos in hash order, each placed by sha256 of the target, the video and its number; fixed before
+    any run and blind to content."""
+    import hashlib
+
+    def h(text: str) -> int:
+        return int(hashlib.sha256(text.encode()).hexdigest(), 16)
+
+    order = sorted(videos, key=lambda v: h(f"pointstream-g5c3:{target}:{v}"))
+    taken: dict[str, list[tuple[int, int]]] = {v: [] for v in order}
+    out: list[dict[str, Any]] = []
+    k = 0
+    while len(out) < count and k < 50 * count:
+        video = order[k % len(order)]
+        fps, frames = videos[video]
+        length, edge = int(round(seconds * fps)), int(round(EDGE_S * fps))
+        room = frames - 2 * edge - length
+        k += 1
+        if room <= 0:
+            continue
+        for attempt in range(200):
+            first = edge + h(f"pointstream-g5c3:{target}:{video}:{len(taken[video])}:{attempt}") % room
+            last = first + length - 1
+            if all(last < a or first > b for a, b in taken[video]):
+                taken[video].append((first, last))
+                out.append({"video": video, "fps": fps, "first_index": first, "last_index": last})
+                break
+    if len(out) < count:
+        raise SystemExit(f"{target}: only {len(out)} of {count} segments fit in {sorted(videos)}")
+    return out
+
+
+def command_footage(args: argparse.Namespace) -> int:
+    """Other recordings of the stretch's kitchen: segments decoded at 10 frames/s, G1's foreground (SAM 3.1
+    "hand" and "arm" plus the EPIC detector's boxes, dilated), ProPainter's fill; published for training."""
+    from concurrent.futures import ProcessPoolExecutor
+    import multiprocessing
+
+    from experiments.background import g1
+
+    paths = {Path(v).stem: Path(v) for v in args.videos}
+    hand_objects = Path(args.hand_objects)
+    names = sorted(paths)
+    if args.target.split("/")[-1] in names:
+        raise SystemExit("the stretch's own recording is not other footage")
+    info = {v: video_info(paths[v]) for v in names}
+    segments = choose_segments(args.target, info, args.segments)
+    if args.limit_frames > 0:  # smoke: the first segments, shortened
+        segments = [{**s, "last_index": s["first_index"] + int(round(args.limit_frames / FOOTAGE_FPS * s["fps"])) - 1}
+                    for s in segments[:2]]
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    work = scratch / "footage"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    began = time.time()
+    from src.segmentation.sam31 import Sam31SequenceSegmenter
+
+    segmenter = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint)
+    provenance = segmenter.provenance("offline_bidirectional")
+    frames_all, keep_all, records = [], [], []
+    ctx = multiprocessing.get_context("spawn")
+    for n, seg in enumerate(segments):
+        clip = g1.plan({"id": f"{args.target}/footage/{seg['video']}-{seg['first_index']}", "video": seg["video"],
+                        "dataset": "visor", "source": {"kind": "video"}, "fps": seg["fps"],
+                        "first_index": seg["first_index"], "last_index": seg["last_index"],
+                        "analysis": {"mode": "rate", "fps": FOOTAGE_FPS},
+                        "masks": {"kind": "sam_text", "prompts": {"hand": "hand", "arm": "arm"},
+                                  "boxes": "epic_hand_objects"}}, 0)
+        seg_work = work / f"seg{n}"
+        with ProcessPoolExecutor(max_workers=1, mp_context=ctx) as pool:
+            decoded = pool.submit(g1.decode_clip, {"plan": clip, "out": str(seg_work), "threads": 8,
+                                                   "path": str(paths[seg["video"]]),
+                                                   "jpeg_dir": str(seg_work / "jpeg")}).result()
+        t0 = time.time()
+        masks = g1.sam_text_masks(segmenter, clip, seg_work / "jpeg")
+        sam_seconds = time.time() - t0
+        shutil.rmtree(seg_work / "jpeg", ignore_errors=True)
+        base = [g1.to_analysis(g1.union(f, (masks.height, masks.width))) for f in masks.frames]
+        fg_record = g1.foreground(clip, seg_work, base, None, str(hand_objects))
+        frames_all.append(np.load(seg_work / "frames.npy"))
+        keep_all.append(~np.load(seg_work / "foreground.npy"))
+        records.append({**seg, "frames": len(clip["indices"]), "decode": decoded, "sam_seconds": round(sam_seconds, 1),
+                        "foreground": fg_record, "fg_share": float(1 - keep_all[-1].mean())})
+        progress(n + 1)
+    frames, keep = np.concatenate(frames_all), np.concatenate(keep_all)
+    offsets = np.cumsum([0] + [len(f) for f in frames_all])
+    chunks = []
+    for a, b in zip(offsets[:-1], offsets[1:]):
+        chunks += [[int(lo + a), int(hi + a), int(c + a), int(d + a)] for lo, hi, c, d in fill_chunks(int(b - a), 0, 0)
+                   if c < d]
+    filled, propainter = run_propainter(frames, ~keep, chunks, args, work / "propainter")
+    publish = scratch / "publish" / "footage"
+    publish.mkdir(parents=True)
+    np.save(publish / "filled_yuv420.npy", g5.rgb_to_yuv420(filled))
+    np.save(publish / "keep.npy", keep)
+    for rec, a, b in zip(records, offsets[:-1], offsets[1:]):
+        rec.update(offset=int(a), end=int(b))
+    meta = {"target": args.target, "recordings": names, "videos": {v: {"fps": f, "frames": n} for v, (f, n) in info.items()},
+            "segments": records, "frames": int(len(filled)), "fill": "propainter",
+            "yuv420_sha256": file_sha256(publish / "filled_yuv420.npy"), "keep_sha256": file_sha256(publish / "keep.npy"),
+            "sam": {"checkpoint_sha256": provenance.checkpoint_sha256, "model_revision": provenance.model_revision},
+            "propainter": propainter}
+    write_json(publish / "meta.json", meta)
+    write_json(stage_dir() / "g5c.json", {"kind": "footage", "limit_frames": args.limit_frames, **meta,
+                                          "seconds": round(time.time() - began, 1), **gpu_record()})
+    shutil.rmtree(work, ignore_errors=True)
+    return 0
+
+
 # ----------------------------------------------------------------- decision
 
 
@@ -848,6 +977,16 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         checks["whole_stretch_filled"] = full and result["prefill"]["frames"] >= 600 or not full
         checks["prefill_published"] = g5.published_has(stage, "publish/prefill/filled_yuv420.npy")
         checks["propainter_on_gpu"] = result["propainter"]["gpu"] == result["gpu"]
+    elif result["kind"] == "footage":
+        segs = result["segments"]
+        checks["segments"] = bool(segs) and all(s["frames"] > 0 for s in segs)
+        checks["frames_add_up"] = sum(s["frames"] for s in segs) == result["frames"]
+        checks["masks_plausible"] = all(0.0 < s["fg_share"] < 0.8 for s in segs)
+        checks["detector_used"] = all(s["foreground"].get("detector", {}).get("frames_without_epic_frame", 1) == 0
+                                      for s in segs)
+        checks["own_video_excluded"] = result["target"].split("/")[-1] not in {s["video"] for s in segs}
+        checks["published"] = g5.published_has(stage, "publish/footage/filled_yuv420.npy")
+        checks["propainter_on_gpu"] = result["propainter"]["gpu"] == result["gpu"]
     elif result["kind"] == "fill":
         rows = result["clips"]
         checks["clips_present"] = bool(rows)
@@ -915,6 +1054,18 @@ def main(argv: list[str] | None = None) -> int:
     pf.add_argument("--raft-ckpt", required=True)
     pf.add_argument("--flow-completion-ckpt", required=True)
     pf.set_defaults(func=command_prefill)
+    fo = sub.add_parser("footage")
+    fo.add_argument("--target", required=True, help="the stretch whose kitchen the footage shows")
+    fo.add_argument("--segments", type=int, default=4)
+    fo.add_argument("--videos", nargs="+", required=True, help="the other recordings of that kitchen: <recording>.MP4")
+    fo.add_argument("--hand-objects", required=True, help="directory with hand-objects/<P>/<recording>.pkl")
+    fo.add_argument("--sam-checkpoint", required=True)
+    fo.add_argument("--limit-frames", type=int, default=0)
+    fo.add_argument("--propainter-tree", required=True)
+    fo.add_argument("--propainter-ckpt", required=True)
+    fo.add_argument("--raft-ckpt", required=True)
+    fo.add_argument("--flow-completion-ckpt", required=True)
+    fo.set_defaults(func=command_footage)
     va = sub.add_parser("validate")
     va.add_argument("--stage", default=None)
     va.set_defaults(func=command_validate)
