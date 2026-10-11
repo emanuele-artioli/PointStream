@@ -529,6 +529,13 @@ into `Models`. DISTS is reported beside LPIPS and PSNR, as in G5c. Order:
    about 2 kbps must beat a perceptually tuned codec, not only SVT-AV1.
    It reuses G5b's trainer without changing the background session's
    files.
+4. H3d, a content-aware super-resolution of the hand pixels (NAS, Yeo et
+   al., OSDI 2018; raised by the user, 2026-10-11): SVT-AV1 at a quarter or
+   an eighth of the resolution (H3b2: 4.7 and 1.9 kbps on the hands) and a
+   small SR network trained on the video's own hands, its bits charged
+   (amortized over the video, as PLAN I's payback time). Oracle first: an
+   SR overfit to the evaluation window itself is its upper bound; it must
+   beat H3c's curve at equal LPIPS to be built.
 
 H3b oracle (2026-10-11, [outcome](docs/experiments.md#2026-10-11--h3b-oracle-perfect-appearance-at-the-coded-pose)):
 fails on the 4 pilot items. Perfect appearance at WiLoR's coded pose, with
