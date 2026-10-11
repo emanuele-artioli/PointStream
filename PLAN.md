@@ -377,7 +377,11 @@ before only where noted.
    SVT-AV1 by two thirds or more on LPIPS_V and DISTS_V; larger β only
    costs PSNR_V); DISTS in the loss trades LPIPS_V for DISTS_V and is not
    adopted; a temporal term buys 13% less flicker at 40% LPIPS_V and is
-   not adopted. ProPainter's fill of all 10 stretches is published.
+   not adopted. ProPainter's fill of all 10 stretches is published. The
+   recipe on all 10 stretches passes G5b's gate on LPIPS_V (median −41%
+   against SVT-AV1, 8 of 10 below 0) but not on DISTS_V (median +28%, 4
+   of 10): the pilots were among the best stretches. Step 3 starts from
+   this row.
 3. *Scene footage from other days.* EPIC-KITCHENS recorded each kitchen on
    several days (3–19 videos per pilot kitchen, 179 videos on the hosts). The
    scene model is fitted on the kitchen's other videos and scored on the

@@ -2521,6 +2521,41 @@ invocation turns out to be needed.
   - Hypothesis: passes, median between −60% and −85% on LPIPS_V; DISTS_V
     below 0 on at least 8 of 10; PSNR_V above 0 on all.
   - Budget: 8 jobs, each ≤ 45 minutes on Ada, about 5 GPU-hours.
+  - Outcome (code `7f13f6b`, Ada, all converged). Jobs: P02_09
+    `20261011T012101Z-788838d3`, P03_10 `…012112Z-9685b85a`, P04_13
+    `…012123Z-73e9f1c9`, P06_05 `…012134Z-fe2661d2`, P06_10
+    `…012145Z-8b14a9c7`, P06_106 `…012155Z-1e3b2ae7`, P09_106
+    `…012206Z-36d91d5e`, P37_102 `…012216Z-ff4f09a7`; pilots from arm C.
+    BD-rate against SVT-AV1 (LPIPS_V / DISTS_V / PSNR_V), and LPIPS_V
+    against DCVC-UF off the shelf:
+    | Stretch | LPIPS_V | DISTS_V | PSNR_V | LPIPS_V vs DCVC-UF |
+    |---|---|---|---|---|
+    | P26_02 | −90% | −67% | +45% | −94% |
+    | P37_102 | −72% | −40% | +20% | −84% |
+    | P06_03 | −66% | −42% | +80% | −77% |
+    | P06_10 | −44% | +47% | +162% | −84% |
+    | P06_106 | −43% | −7% | +27% | −62% |
+    | P03_10 | −39% | +29% | +213% | −80% |
+    | P02_09 | −29% | +49% | +173% | −83% |
+    | P09_106 | −29% | +27% | +33% | −52% |
+    | P06_05 | +4% | +158% | +331% | −84% |
+    | P04_13 | +22% | +123% | +287% | −80% |
+    | **median** | **−41%** | **+28%** | **+121%** | |
+    - **The gate passes** on LPIPS_V: median −41%, below 0 on 8 of 10.
+      Hypothesis too optimistic (−60% to −85%): the pilots were the two
+      best stretches but one. Against DCVC-UF off the shelf the scene
+      model saves 52–94% on every stretch.
+    - **DISTS_V does not follow**: median +28%, below 0 on 4 of 10
+      (hypothesis: 8). This revises step 1's "the LPIPS gain transfers to
+      DISTS", which rested on the two pilots: on most stretches the
+      β > 0 model wins on the metric it trained on and loses on the one
+      it did not. The paper reports both, with frames.
+    - PSNR_V is above SVT-AV1's on every stretch, as predicted.
+    - Payback of the 51 MB 4-bit change, where SVT-AV1 reaches equal
+      LPIPS_V: 0.4–8 h on 8 stretches at QP 27–45 (17 h on P06_05; none
+      on P04_13, which SVT-AV1 beats).
+    - For step 3: the losing stretches (P04_13, P06_05) and the DISTS gap
+      are what more scene footage and the recipe must close.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
