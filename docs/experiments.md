@@ -2587,7 +2587,19 @@ invocation turns out to be needed.
   recipe only ties SVT-AV1 on LPIPS_V and loses on the rest, so no
   footage can make it win there. Its excerpt moves most of all ten (source
   flicker 5.4–7.2 against about 2–4 on the calm ones). The rule is the
-  recipe's (β = 0.005); a higher β is step 4's to try. P06_05: pending.
+  recipe's (β = 0.005); a higher β is step 4's to try.
+- Outcome, P06_05 (`20261011T063032Z-02c80566`, Ada, converged): LPIPS_V
+  −11% against SVT-AV1 (DISTS_V +138%, PSNR_V +315%); C was +4% (+158%,
+  +331%). Short of the rule's −30%: **the method is the limit on P06_05
+  too.** On both fast stretches, fitting on the very frames to be coded
+  moves LPIPS_V by only 15–20 points against SVT-AV1 and leaves flicker
+  at 4–7 luma levels (C's 4–7 too): the loss comes from DCVC-UF's coding
+  of fast motion, not from what the model knows of the scene. The
+  hypothesis (the oracle wins by 40–70%, so the footage is to blame) was
+  wrong. For the paper: the scene model's gain is scoped to calm
+  viewpoints on this evidence, and the fast excerpts are reported as the
+  base codec's limit. P06_05's footage arms still run: a win is reachable
+  there (−11%), so whether real footage gets near it is still asked.
 
 ### 2026-10-11 — G5c step 3: footage from the kitchen's other recordings
 - Question (PLAN G5c 3): does footage of the same kitchen from other
