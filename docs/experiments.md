@@ -3327,6 +3327,34 @@ invocation turns out to be needed.
   and the footage protocol is revised (the whole video, as the
   competing explanation says). Mixed results are reported as they are
   and decided with the user.
+- Diagnosis, outcome (code `9e49c5e`; A gpu6, B
+  gpu5, Ada, shared; both 10 of 10 checks). BD-rate on LPIPS_V at 540p
+  against SVT-AV1 at 1080p with the same fill: A, the stretch model with
+  F exact, **+4%** (steps 2–3, F dilated: −45%); B, the window-footage
+  model with F dilated, **+22%** against steps 2–3's own anchor
+  (`…122457Z-a660ab4c`). By the rule this is mixed: A moves 49 points
+  with the fill, and B does not recover with it.
+  - The points explain both. On P06_03 the scene model's 540p curve
+    overlaps SVT-AV1's only in a thin band of quality: its top one or two
+    points (QP 50 and 63, 140–540 kbps) against SVT-AV1's lowest CRF
+    (138–174 kbps). There the BD-rate is a PCHIP integral over a few
+    thousandths of LPIPS and swings with them: steps 2–3's −45% was as
+    fragile as the pilot's +20%. At matched rate (log-rate
+    interpolation) the window-footage model equals the stretch model
+    with the same dilated fill: LPIPS_V 0.225 against 0.219 at 27 kbps,
+    0.163 | 0.164 at 59, 0.129 | 0.128 at 139, 0.108 | 0.106 at 394
+    kbps (within ±3%, through 4:2:0 or not). The footage is not the
+    cause, and the exact fill raises both codecs' cost (SVT-AV1's lowest
+    point moves from 138 to 174 kbps and 0.135 to 0.143 LPIPS_V).
+  - Rule (a) as written measures the overlap, not the model, on a
+    window where the curves barely meet. What holds: the window's own
+    footage makes the same scene model as the stretch (both windows);
+    on P06_03 the scene model at 540p is SVT-AV1's equal at its lowest
+    rates and worse above, the 1080p model wins on LPIPS_V there (−58%
+    to −66%), and the route's hull (540p and 1080p) gives −22% (fill
+    dilated) and +3% (exact). Decision with the user (the rule's
+    clause for mixed results).
+  - GPU time: about 1 hour (2 jobs).
 
 
 ### 2026-10-08 — H1: foreground motion and representation audit
