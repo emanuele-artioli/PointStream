@@ -130,9 +130,15 @@ def code_point(codec: str, size: tuple[int, int], value: int, filled: np.ndarray
     else:
         ckpt = args.video_ckpt if codec == "dcvc" else str(Path(args.arm) / "publish" / "finetune" / "video_ft.pth.tar")
         coder = argparse.Namespace(image_ckpt=args.image_ckpt, video_ckpt=ckpt)
-        rec = g5.code_dcvc(coder, source, n, value, work / "dcvc", width=size[0], height=size[1])
+        try:
+            rec, retried = g5.code_dcvc(coder, source, n, value, work / "dcvc", width=size[0], height=size[1]), None
+        except RuntimeError as error:  # the decoder has segfaulted after its own encode (G5c step 1): once more
+            shutil.rmtree(work / "dcvc", ignore_errors=True)
+            rec, retried = g5.code_dcvc(coder, source, n, value, work / "dcvc", width=size[0], height=size[1]), \
+                str(error)[:300]
         nbytes = int(rec["bytes"])
-        extra = {k: rec[k] for k in ("deterministic", "decoder_matches_encoder_intra", "decode_seconds")}
+        extra = {**{k: rec[k] for k in ("deterministic", "decoder_matches_encoder_intra", "decode_seconds")},
+                 "retried_after": retried}
         decoded_path = Path(rec["decoded"])
     raw = np.fromfile(decoded_path, np.uint8).reshape(n, size[1] * 3 // 2, size[0])
     rgb = g5.yuv420_to_rgb(raw)
@@ -170,6 +176,8 @@ def command_format(args: argparse.Namespace) -> int:
     flows = g5c.source_flows(clip)
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
     restored = g5c.restore(checkpoints)
+    if args.restore:  # a failed run's salvaged checkpoint.tar (extracted): its finished points, as recorded
+        restored = {**g5c.restore(Path(args.restore) / "checkpoint"), **restored}
     rows = []
     done = 0
     for name, (codec, size) in zip(args.methods.split(","), methods):
@@ -191,7 +199,7 @@ def command_format(args: argparse.Namespace) -> int:
         "kind": "format", "item": item["id"], "video": item["video"], "fps": str(fps), "frames": n,
         "limit_frames": args.limit_frames, "mask_set": MASK_SET, "dilate_px_1080": round(DILATE * TO_1080),
         "foreground_share": float(fg.mean()), "hole_share": float(holes.mean()), "source": source_record,
-        "arm": arm_record, "propainter": propainter, "metrics": nets.record, "restored": sorted(restored),
+        "arm": arm_record, "propainter": propainter, "restored_archive": args.restore, "metrics": nets.record, "restored": sorted(restored),
         "seconds": round(time.time() - began, 1), **g5c.gpu_record(), "methods": rows})
     shutil.rmtree(work, ignore_errors=True)
     return 0
@@ -244,6 +252,7 @@ def main(argv: list[str] | None = None) -> int:
     fo.add_argument("--arm", default=None, help="the window's stretch: a G5c finetune archive (scene methods)")
     fo.add_argument("--methods", default=",".join(METHODS))
     fo.add_argument("--limit-frames", type=int, default=0)
+    fo.add_argument("--restore", default=None, help="an extracted checkpoint.tar of a failed run of this window")
     fo.set_defaults(func=command_format)
     va = sub.add_parser("validate")
     va.add_argument("--stage", default=None)
