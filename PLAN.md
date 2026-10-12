@@ -422,6 +422,14 @@ before only where noted.
    KID_V are lost. All BD-rates against SVT-AV1 were
    corrected on 2026-10-12 (its envelope was a staircase, optimistic by
    about 7%; no decision changed; [experiments](docs/experiments.md)).
+   *Round 3 (2026-10-12):* 1,080 steps improve every stretch a little
+   (LPIPS_V 1–11 points) but by less than the rule's margin, so the
+   recipe stays at 540 steps for development and the paper's final runs
+   train to convergence; the fast stretches reach a narrow LPIPS_V win
+   (P06_05 −19%) and a tie (P04_13). G5d step 2: the enhancer from
+   other recordings beats SVT-AV1 on LPIPS_V and DISTS_V on both pilots
+   but misses the 3-metric rule on P26_02; a temporal (decoded-frame)
+   input does not cut its flicker.
    *G5d oracle (user 2026-10-11, done 2026-10-12):* a venue-trained
    enhancer after plain SVT-AV1 (NAS-style, 1.2 MB), fitted on the
    stretch's other frames with LPIPS in its loss, beats SVT-AV1 by 10%

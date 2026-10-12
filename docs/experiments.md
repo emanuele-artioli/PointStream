@@ -3053,6 +3053,41 @@ invocation turns out to be needed.
   reach it.
 - Budget: 6 training jobs (≤ 45 minutes, Ada, shared), about 4
   GPU-hours.
+- Runs (Ada, shared GPUs, all converged; every job continued from L's
+  published checkpoint of the same stretch). P26_02
+  `20261012T073147Z-28138c3c`, P06_03 `…073156Z-778f53cb`, P02_09
+  `…073216Z-cbafaee6`, P06_05 `…073237Z-28b93c3c` (code `f9001ed`).
+  P06_10 and P04_13 ran out of their 2,700 s while another user's
+  process shared the GPU for 29 and 39 minutes (`…073205Z-48d358ad`,
+  `…073226Z-5361a155`); their salvaged trainer state was continued
+  (`g5b.py --resume`, full stage only): P06_10 `…085331Z-fc0602d1`,
+  P04_13 `…085441Z-51ff410f` (code `489dcfa`, gpu6 only while gpu5's
+  worker missed heartbeats under other users' load). A first resume
+  (`…082655Z-fb3e5c39`) failed its smoke, which had loaded the late
+  state and trained no step (fixed in `489dcfa`); `…083344Z-25cad55b`
+  was cancelled before it could fail the same way.
+- Outcome. BD-rate against SVT-AV1, L (540 steps) → X (1,080):
+  | Stretch | LPIPS_V | DISTS_V | PSNR_V | KID_V |
+  |---|---|---|---|---|
+  | P26_02 | −92% → −93% | −73% → −70% | +53% → +58% | +12% → +10% |
+  | P06_03 | −66% → −71% | −38% → −40% | +96% → +90% | +3% → −7% |
+  | P06_10 | −55% → −63% | +39% → +24% | +173% → +161% | +154% → +140% |
+  | P02_09 | −31% → −37% | +34% → +26% | +136% → +137% | +137% → +111% |
+  | P06_05 (fast) | −8% → **−19%** | +154% → +135% | +331% → +325% | +124% → +117% |
+  | P04_13 (fast) | +12% → **+0.3%** | +113% → +101% | +327% → +322% | +193% → +181% |
+  - Development set: X beats SVT-AV1 on 2 metrics like L (LPIPS_V
+    −67%, DISTS_V −8% median), mean 3 points lower than L's. **By the
+    rule X does not replace L** (margin 5 points), although it is better
+    on LPIPS_V on every stretch (1–11 points) and on DISTS_V on 5 of 6:
+    longer training helps steadily but little per step. PLAN's "final
+    results train to convergence" stands for the paper's runs.
+  - Fast stretches: P06_05 now beats SVT-AV1 on LPIPS_V by 19%, a win
+    (narrow, reported as one); P04_13 ties (+0.3%). DISTS_V, PSNR_V and
+    KID_V stay lost there. Hypotheses: right (P06_05 −18% or better,
+    P04_13 +2% or better), and the calm stretches moved 1–5 points.
+    The oracle's −22% and −31% leave little room: on fast scenes the
+    scene model reaches LPIPS_V parity or a small win, no more.
+  - GPU time: about 5 hours (6 jobs, 2 timed out and continued).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
