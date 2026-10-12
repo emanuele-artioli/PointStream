@@ -50,6 +50,9 @@ EXCLUDED = ("P01", "P02", "P03", "P09")  # the pilot items' participants, never 
 BD_LEVELS = 64
 SEED = "pointstream-h3c"
 CONTAINER_HEADER = 9  # `src.codecs.dcvc_uf_worker.HEADER`
+JUDGE_EVERY = 5  # H3b's judge frames
+POSE_BUDGETS = ("0", "100", "266.7")  # H2's latency budgets (ms) with a choice for WiLoR
+POSE_GATE_BUDGET = "100"  # the choice named for H3
 
 #: The decision rule, fixed before any fleet run (docs/experiments.md, H3c entry).
 DECISION: dict[str, Any] = {
@@ -61,6 +64,14 @@ DECISION: dict[str, Any] = {
     "items_below_zero": 3,
     "component_adopted_mean_bd": 0.0,  # against SVT-AV1, with at least 3 of 4 items below 0
     "component_vs_reference_bd": -0.10,  # the tuning, not DCVC-UF itself, earns it
+    # H3c2 (docs/experiments.md, 2026-10-12): pose fidelity at rate, pixels against H2's coded keypoints.
+    "h3c2": {
+        "pose_error": "mean over judged hands of the mean 2D joint distance to WiLoR on the source, over the box size",
+        "pixel_envelope": ["svtav1", "reference"],
+        "keypoints": f"H2's WiLoR choice at {POSE_GATE_BUDGET} ms, its dataset rate on every item",
+        "opens_ci_low_above": 0.5,  # mean saving's 95% CI above 50%: the generative-hand path opens
+        "closes_mean_at_most": 0.0,  # mean saving <= 0: a pixel coder carries the pose at the keypoints' rate
+    },
 }
 
 
@@ -358,12 +369,37 @@ class Scorer:
     """H3b's scoring of SVT-AV1 on R: the decode inside R, the source outside; LPIPS of the full frame averaged over R,
     the squared error on R, masked DISTS on R's box plus `DISTS_PAD`."""
 
-    def __init__(self, nets: dict[str, Any], truth: np.ndarray, regions: list[np.ndarray], device: str):
+    def __init__(self, nets: dict[str, Any], truth: np.ndarray, regions: list[np.ndarray], device: str,
+                 judge: list[tuple[int, np.ndarray, bool]] | None = None):
         self.nets, self.truth, self.regions, self.device = nets, truth, regions, device
         self.hand = [t for t, r in enumerate(regions) if r.any()]
+        self.judge = judge or []  # (frame, H2's box, right) per judged hand
+
+    def composite(self, decoded: Any, t: int, upscale: bool) -> np.ndarray:
+        import cv2
+
+        height, width = self.regions[0].shape
+        frame = np.asarray(decoded[t])
+        if upscale:
+            frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_CUBIC)
+        out = np.asarray(self.truth[t]).copy()
+        out[self.regions[t]] = frame[self.regions[t]]
+        return out
+
+    def poses(self, decoded: Any, upscale: bool) -> dict[str, np.ndarray]:
+        """WiLoR's 2D joints and box size on each judged hand of the composite (``decoded`` None: the source)."""
+        if not self.judge:
+            return {"kp2d": np.zeros((0, 21, 2), np.float32), "box_size": np.zeros(0)}
+        frames: dict[int, np.ndarray] = {}
+        items = []
+        for t, box, right in self.judge:
+            if t not in frames:
+                frames[t] = np.asarray(self.truth[t]) if decoded is None else self.composite(decoded, t, upscale)
+            items.append(self.nets["wilor"].item(frames[t], np.asarray(box, np.float32), right))
+        fit = self.nets["wilor"].forward(items)
+        return {"kp2d": fit["kp2d"].astype(np.float32), "box_size": fit["box_size"].astype(np.float64)}
 
     def __call__(self, decoded: Any, upscale: bool) -> dict[str, np.ndarray]:
-        import cv2
         import torch
 
         frames = len(self.regions)
@@ -374,13 +410,9 @@ class Scorer:
             ts = self.hand[first:first + LPIPS_BATCH]
             outs, truths = [], []
             for t in ts:
-                frame = np.asarray(decoded[t])
-                if upscale:
-                    frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_CUBIC)
                 truth_t = np.asarray(self.truth[t])
-                out = truth_t.copy()
+                out = self.composite(decoded, t, upscale)
                 r = self.regions[t]
-                out[r] = frame[r]
                 outs.append(out)
                 truths.append(truth_t)
                 sse[t] = int(((out[r].astype(np.int32) - truth_t[r].astype(np.int32)) ** 2).sum())
@@ -397,7 +429,40 @@ class Scorer:
             for i, t in enumerate(ts):
                 m = torch.from_numpy(self.regions[t]).to(self.device)
                 lp[t] = float((spatial[i] * m).sum()) / int(self.regions[t].sum())
-        return {"lpips": lp, "sse": sse, "dists": dists}
+        return {"lpips": lp, "sse": sse, "dists": dists, "kp2d": self.poses(decoded, upscale)["kp2d"]}
+
+
+def combo_at(code: dict[str, Any], model: str, budget: str) -> dict[str, Any]:
+    """H2's chosen pose coding for ``model`` at the latency ``budget`` (ms)."""
+    from experiments.visor import pose_coding as pc
+
+    key = code["choices"][model][budget]["key"]
+    found = [c for c in pc.combinations() if pc.combo_key(c) == key]
+    if len(found) != 1:
+        raise SystemExit(f"{model} at {budget} ms: coding {key!r} is not one of H2's combinations")
+    return found[0]
+
+
+def item_judge(args: argparse.Namespace, item_id: str, frames: int) -> tuple[list[int], list[tuple[int, np.ndarray, bool]], dict[str, np.ndarray]]:
+    """H3c2's judged hands (H2's WiLoR rows on every `JUDGE_EVERY`-th window frame) and, per H2 budget, the coded
+    keypoints of those hands (each track coded with its median shape and decoded, projected as H3b)."""
+    from experiments.visor.h2 import pinhole
+    from experiments.visor.h3b import item_poses
+
+    meta_p, a = args.pose_units[item_id]
+    rows_at: dict[int, list[int]] = {}
+    for r, t in enumerate(a["t"]):
+        if t < frames:
+            rows_at.setdefault(int(t), []).append(r)
+    rows = [r for t in range(0, frames, JUDGE_EVERY) for r in rows_at.get(t, [])]
+    judge = [(int(a["t"][r]), np.asarray(a["box"][r], np.float32), bool(a["right"][r])) for r in rows]
+    focal, centre = float(meta_p["focal"]), tuple(meta_p["principal"])
+    keypoints = {}
+    for budget in POSE_BUDGETS:
+        joints = item_poses(meta_p, a, args.mano, args.combos[budget], args.basis)["wilor"]["coded_joints"]
+        keypoints[budget] = (np.stack([pinhole(joints[r], focal, centre) for r in rows]) if rows
+                             else np.zeros((0, 21, 2))).astype(np.float32)
+    return rows, judge, keypoints
 
 
 def parse_arms(specs: list[list[str]]) -> list[tuple[str, str]]:
@@ -424,7 +489,12 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     work.mkdir(parents=True)
     planes, regions, mask_info = load_window(args, item, frames, decoded)
     truth = rgb_memmap(Path(decoded["path"]), work / "truth.npy", frames, width, height, full_range, device)
-    score = Scorer(nets, truth, regions, device)
+    judge_rows: list[int] = []
+    judge_spec: list[tuple[int, np.ndarray, bool]] = []
+    keypoints: dict[str, np.ndarray] = {}
+    if args.judge:
+        judge_rows, judge_spec, keypoints = item_judge(args, item["id"], frames)
+    score = Scorer(nets, truth, regions, device, judge_spec)
     points: list[dict[str, Any]] = []
     scores: list[dict[str, np.ndarray]] = []
     look = score.hand[len(score.hand) // 2] if score.hand else 0
@@ -522,14 +592,24 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
 
         checks["lpips_cpu_vs_device"] = abs(lp(cpu, "cpu") - lp(gpu_net, device))
         checks["dists_identity"] = dists_crops(nets["dists"], [np.asarray(truth[t])], np.asarray(truth[t]), regions[t], device)[0]
+    source_pose = score.poses(None, False)
     os.remove(decoded["path"])
     shutil.rmtree(work)
     arrays = {"pixels_r": np.array([int(r.sum()) for r in regions], np.int64),
               "lpips": np.stack([s["lpips"] for s in scores]), "sse": np.stack([s["sse"] for s in scores]),
               "dists": np.stack([s["dists"] for s in scores])}
+    if args.judge:
+        _, a = args.pose_units[item["id"]]
+        arrays.update({"judge_row": np.array(judge_rows, int), "judge_t": np.array([t for t, _, _ in judge_spec], int),
+                       "judge_kp2d": np.stack([s["kp2d"] for s in scores]), "judge_source_kp2d": source_pose["kp2d"],
+                       "judge_box_size": source_pose["box_size"],
+                       "keypoint_kp2d": np.stack([keypoints[b] for b in POSE_BUDGETS]),
+                       "archived_wilor_kp2d": np.asarray(a["wilor_kp2d"])[judge_rows].astype(np.float32)})
     meta = {"unit": f"{item['id']}@{label}", "item": item["id"], "label": label, "video": item["video"], "fps": float(item["fps"]),
             "frames": frames, "seconds_coded": seconds, "hand_frames": len(score.hand), "points": points, "look_frame": look,
             "decode": {k: v for k, v in decoded.items() if k != "path"}, "mask_set": mask_info, "checks": checks,
+            "pose_budgets": {b: args.pose_kbps[b] for b in POSE_BUDGETS} if args.judge else None,
+            "pose_unit_hash_ok": bool(args.pose_units[item["id"]][0]["npz_hash_ok"]) if args.judge else None,
             "seconds": round(time.time() - began, 2)}
     save_unit(publish, "code", f"{item['id']}@{label}", arrays, meta)
 
@@ -548,7 +628,7 @@ def command_code(args: argparse.Namespace) -> int:
     args.image_sha256 = file_sha256(Path(args.image_ckpt))
     args.qps = [int(q) for q in args.qps.split(",")]
     args.scales = [int(s) for s in args.scales.split(",")]
-    label = "+".join((["anchor"] if args.anchor else []) + [n for n, _ in args.arms])
+    label = "+".join((["anchor"] if args.anchor else []) + [n for n, _ in args.arms] + (["judge"] if args.judge else []))
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
     publish = scratch / "publish"
     publish.mkdir(parents=True, exist_ok=True)
@@ -567,6 +647,25 @@ def command_code(args: argparse.Namespace) -> int:
     if device != "cuda":
         raise SystemExit("h3c code needs a GPU (DCVC-UF)")
     nets = {"lpips": load_lpips(Path(args.lpips_backbone), device), "dists": load_dists(Path(args.dists_backbone), device)}
+    on_cuda = {k: next(v.parameters()).is_cuda for k, v in nets.items()}
+    if args.judge:  # H3c2: WiLoR on the composites, H2's coded keypoints
+        from experiments.audit.env_smoke import model_on_cuda
+        from experiments.visor import mano_np
+        from experiments.visor import pose_coding as pc
+        from experiments.visor.h2 import Regressor, mano_dir
+
+        code = json.loads(Path(args.pose_code).read_text())
+        args.pose_kbps = {b: float(code["choices"]["wilor"][b]["visor_kbps"]) for b in POSE_BUDGETS}
+        # Only WiLoR's coded joints are read; H3b's helper also codes HaMeR's rows, with the same combination.
+        args.combos = {b: {m: combo_at(code, "wilor", b) for m in ("wilor", "hamer")} for b in POSE_BUDGETS}
+        args.mano = mano_np.Mano.load(args.mano_right)
+        args.basis = pc.Basis(args.mano.hands_mean, args.mano.hands_components)
+        args.pose_units = {meta["unit"]: (meta, a) for meta, a in load_units(args.poses, "visor")}
+        if missing := [it["id"] for it in items if it["id"] not in args.pose_units]:
+            raise SystemExit(f"no H2 poses for {missing}")
+        args.mano_dir = mano_dir(args, scratch)
+        nets["wilor"] = Regressor("wilor", args)
+        on_cuda["wilor"] = model_on_cuda(nets["wilor"].model)
     done = len(restored)
     began = time.time()
     for number, (item, decoded) in enumerate(windows):
@@ -580,7 +679,10 @@ def command_code(args: argparse.Namespace) -> int:
 
     write_json(stage_dir() / "h3c.json", {
         "command": "code", "label": label, "device": device_record(torch.cuda.get_device_name(0)),
-        "on_cuda": {k: next(v.parameters()).is_cuda for k, v in nets.items()}, "seconds": round(time.time() - began, 2),
+        "on_cuda": on_cuda, "seconds": round(time.time() - began, 2),
+        "judge": {"wilor": nets["wilor"].load, "every": JUDGE_EVERY, "budgets": list(POSE_BUDGETS),
+                  "pose_code_sha256": file_sha256(Path(args.pose_code)),
+                  "poses_sha256": [file_sha256(Path(x)) for x in args.poses]} if args.judge else None,
         "lpips": lpips_record(Path(args.lpips_backbone)),
         "dists": {"torchmetrics": torchmetrics.__version__,
                   "weights_sha256": file_sha256(Path(dists_module.__file__).parent / "dists_models" / "weights.pt"),
@@ -620,6 +722,21 @@ def validate_code(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
                                   if a["codec"] == b["codec"] == "dcvc-uf-htl" and a["arm"] == b["arm"] and a["scale"] == b["scale"]
                                   and a["qp"] < b["qp"]),
     }
+    if result.get("judge"):
+        judged = [(m, a) for m, a in units if "judge_kp2d" in a]
+        rerun = [pose_errors(a["archived_wilor_kp2d"][None], a["judge_source_kp2d"], a["judge_box_size"])[0] for _, a in judged
+                 if len(a["judge_row"])]
+        coded_px = [float(np.linalg.norm(a["keypoint_kp2d"][POSE_BUDGETS.index(POSE_GATE_BUDGET)] - a["archived_wilor_kp2d"], axis=-1).mean())
+                    for _, a in judged if len(a["judge_row"])]
+        checks.update({
+            "every_unit_judged": len(judged) == len(units) and all(len(a["judge_row"]) > 0 for _, a in judged),
+            "pose_units_intact": all(m["pose_unit_hash_ok"] for m, _ in judged),
+            "judge_finite": all(np.isfinite(a["judge_kp2d"]).all() and a["judge_kp2d"].shape[0] == len(m["points"]) for m, a in judged),
+            # WiLoR re-run on the source with H2's box reproduces H2's fit (H3b's check).
+            "wilor_rerun_reproduces_h2": bool(rerun) and max(rerun) < 0.005,
+            # H2: the 100 ms choice moves WiLoR's joints about 8 px (H3b measured 9.9 on the pilot items).
+            "coded_keypoint_error_near_h3b": bool(coded_px) and 3.0 < float(np.mean(coded_px)) < 20.0,
+        })
     if result["anchor"]:
         checks["streams_match_records"] = all(p["stream"]["sha256"] == p["stream"]["recorded_sha256"] for m, _ in units
                                               for p in m["points"] if p["codec"] == "svtav1" and p["scale"] == 1 and "kbps_r" not in p)
@@ -675,6 +792,62 @@ def bd_rate(test: list[dict[str, float]], anchor: list[dict[str, float]], metric
         assert rt is not None and ra is not None
         diffs.append(math.log(rt) - math.log(ra))
     return {"bd": math.expm1(float(np.mean(diffs))), "where": "overlap", "range": [lo, hi]}
+
+
+def pose_errors(kp2d: np.ndarray, source: np.ndarray, box_size: np.ndarray) -> np.ndarray:
+    """Per row of ``kp2d`` (points, hands, 21, 2): the mean over hands of the mean joint distance to ``source``, over
+    the box size."""
+    return (np.linalg.norm(kp2d - source[None], axis=-1).mean(-1) / box_size[None]).mean(-1)
+
+
+def pose_report(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], h1: dict[str, Any]) -> dict[str, Any]:
+    """H3c2: per item, the pixel envelope's rate for the 100 ms keypoints' pose error, and the saving."""
+    rule = DECISION["h3c2"]
+    items: dict[str, Any] = {}
+    for meta, a in units:
+        if "judge_kp2d" not in a or not len(a["judge_row"]):
+            continue
+        errors = pose_errors(a["judge_kp2d"], a["judge_source_kp2d"], a["judge_box_size"])
+        rates = hand_kbps(h1[meta["item"]])
+        pixels = []
+        for j, p in enumerate(meta["points"]):
+            if p["arm"] in rule["pixel_envelope"]:
+                kbps = p["kbps_r"] if "kbps_r" in p else rates[f"{p['crf']:g}"]
+                pixels.append({"name": p["name"], "kbps": float(kbps), "pose": float(errors[j])})
+        keypoints = {b: {"kbps": meta["pose_budgets"][b],
+                         "pose": float(pose_errors(a["keypoint_kp2d"][k][None], a["judge_source_kp2d"], a["judge_box_size"])[0])}
+                     for k, b in enumerate(POSE_BUDGETS)}
+        front = pareto_front(pixels, "pose")
+        gate = keypoints[POSE_GATE_BUDGET]
+        need = rate_on_front(front, "pose", gate["pose"])
+        if need is not None:
+            saving, where = 1 - gate["kbps"] / need, "on the front"
+        elif gate["pose"] < min(q["pose"] for q in front):  # the pixels never reach it: their top rate is a lower bound
+            saving, where = 1 - gate["kbps"] / max(q["kbps"] for q in front), "keypoints better than every pixel point (bound)"
+        else:  # the pixels' cheapest point is already as good: an upper bound
+            saving, where = 1 - gate["kbps"] / min(q["kbps"] for q in front), "pixels' cheapest point already better (bound)"
+        items[meta["item"]] = {"pixels": pixels, "front": front, "keypoints": keypoints, "need_kbps": need,
+                               "saving": saving, "where": where, "judged_hands": int(len(a["judge_row"])),
+                               "pixel_pose_at_keypoint_rate": pose_at_rate(front, gate["kbps"])}
+    savings = np.array([e["saving"] for e in items.values()])
+    out: dict[str, Any] = {"rule": rule, "items": items}
+    if len(savings):
+        ci = bootstrap_mean(savings, np.random.default_rng(seed_of(f"{SEED}:h3c2")), RESAMPLES)
+        out["mean_saving"] = ci
+        out["decision"] = ("opens" if len(items) == len(PILOT) and ci["low"] > rule["opens_ci_low_above"] else
+                           "closes" if len(items) == len(PILOT) and ci["mean"] <= rule["closes_mean_at_most"] else
+                           "unclear" if len(items) == len(PILOT) else "incomplete")
+    return out
+
+
+def pose_at_rate(front: list[dict[str, float]], kbps: float) -> float | None:
+    """The front's pose error at ``kbps`` (linear in log rate), None outside its rates."""
+    pts = sorted(front, key=lambda q: q["kbps"])
+    for a, b in zip(pts, pts[1:]):
+        if a["kbps"] <= kbps <= b["kbps"]:
+            w = (math.log(kbps) - math.log(a["kbps"])) / (math.log(b["kbps"]) - math.log(a["kbps"]))
+            return a["pose"] + w * (b["pose"] - a["pose"])
+    return None
 
 
 def point_summary(a: dict[str, np.ndarray], j: int, hand: np.ndarray) -> dict[str, float]:
@@ -737,9 +910,13 @@ def command_report(args: argparse.Namespace) -> int:
         summary["mean_bd_vs_reference"] = float(np.mean(ref)) if ref else None
         report["arms"][arm] = summary
     report["decision"] = decide(report["arms"])
+    if any("judge_kp2d" in a for _, a in units):
+        report["h3c2"] = pose_report(units, h1)
     out = Path(args.out or stage_dir())
     out.mkdir(parents=True, exist_ok=True)
     write_json(out / "h3c-report.json", report)
+    if "h3c2" in report:
+        print(json.dumps({k: v for k, v in report["h3c2"].items() if k != "items"}, indent=1, default=str))
     print(json.dumps({"decision": report["decision"], "arms": {a: {k: v for k, v in s.items() if k != "items"}
                                                                for a, s in report["arms"].items()}}, indent=1, default=str))
     return 0
@@ -817,6 +994,12 @@ def main(argv: list[str] | None = None) -> int:
     code.add_argument("--decoder", default="dav1d")
     code.add_argument("--encoder", default="SvtAv1EncApp")
     code.add_argument("--preset", default="4")
+    code.add_argument("--judge", action="store_true", help="H3c2: WiLoR on the composites and H2's coded keypoints")
+    code.add_argument("--poses", action="append", default=[], help="H2's VISOR published.tar (both jobs)")
+    code.add_argument("--pose-code", default="", help="H2's code.json")
+    code.add_argument("--mano-left", default="")
+    code.add_argument("--mano-right", default="")
+    code.add_argument("--wilor-checkpoint", default="")
     commands.add_parser("validate")
     report = commands.add_parser("report")
     report.add_argument("--code", action="append", required=True)
