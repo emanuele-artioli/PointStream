@@ -325,8 +325,9 @@ def run_tree_script(script: Path, plan: dict[str, Any], work: Path, name: str) -
 
 
 def code_dcvc(args: argparse.Namespace, source: Path, region_file: Path, size: tuple[int, int], frames: int, qp: int,
-              video_ckpt: str, video_sha: str, work: Path) -> dict[str, Any]:
-    """One DCVC-UF HT-L encode and decode (B2's worker) and the per-NAL bit split onto R."""
+              video_ckpt: str, video_sha: str, work: Path, extra_regions: dict[str, Path] | None = None) -> dict[str, Any]:
+    """One DCVC-UF HT-L encode and decode (B2's worker) and the per-NAL bit split onto R; with ``extra_regions``
+    (name: mask file, as ``region_file``) also onto each of those, under ``extra``."""
     import torch
 
     from src.codecs.dcvc_uf_worker import dcvc_command
@@ -351,10 +352,13 @@ def code_dcvc(args: argparse.Namespace, source: Path, region_file: Path, size: t
     estimate = run_tree_script(Path(__file__).resolve().parent / "h3c_bits.py",
                                {"frames_file": str(source), "region_file": str(region_file), "width": width, "height": height,
                                 "frame_count": frames, "qp": qp, "image_ckpt": args.image_ckpt, "image_sha256": args.image_sha256,
-                                "video_ckpt": video_ckpt, "video_sha256": video_sha}, work, "bits")
+                                "video_ckpt": video_ckpt, "video_sha256": video_sha,
+                                "extra_region_files": {k: str(v) for k, v in (extra_regions or {}).items()}}, work, "bits")
     data = (work / "stream.psdc").read_bytes()
     encode, decode = reports["encode"], reports["decode"]
     split = nal_region_bits(encode["nals"], estimate["nals"], len(data))
+    extra = {name: nal_region_bits(encode["nals"], [{**e, "estimated_region_bits": e["extra_region_bits"][name]} for e in estimate["nals"]],
+                                   len(data))["region_bits"] for name in (extra_regions or {})}
     first, second = decode["passes"][0]["frame_sha256"], decode["passes"][1]["frame_sha256"]
     differ = [t for t, (a, b) in enumerate(zip(first, second)) if a != b]
     return {"qp": qp, "size": [width, height], "bytes": len(data), "stream_sha256": file_sha256(work / "stream.psdc"),
@@ -362,7 +366,8 @@ def code_dcvc(args: argparse.Namespace, source: Path, region_file: Path, size: t
             "decoded": str(work / "decoded.yuv"), "deterministic": decode["deterministic"],
             "decoder_matches_encoder_intra": decode["passes"][0]["frame_sha256"][0] == encode["i_recon_sha256"],
             "encode_seconds": encode["encode_seconds"], "decode_seconds": [p["decode_seconds"] for p in decode["passes"]],
-            "estimate_seconds": estimate["seconds"], "nals": len(encode["nals"]), **split}
+            "estimate_seconds": estimate["seconds"], "nals": len(encode["nals"]), **split,
+            **({"extra_region_bits": extra} if extra_regions else {})}
 
 
 class Scorer:

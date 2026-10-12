@@ -98,8 +98,11 @@ def estimate(plan: dict[str, Any]) -> dict[str, Any]:
         raise ValueError(f"{plan['frames_file']}: {raw.size} bytes for {count} frames of {width}×{height}")
     planes = raw.reshape(count, height * 3 // 2, width)
     region = np.load(plan["region_file"], mmap_mode="r")
-    if region.shape != (count, height, width):
-        raise ValueError(f"region {region.shape}, expected {(count, height, width)}")
+    # Further regions billed from the same pass (H3e: the hand region outside a pasted mask), by name.
+    extra = {name: np.load(path, mmap_mode="r") for name, path in plan.get("extra_region_files", {}).items()}
+    for r in [region, *extra.values()]:
+        if r.shape != (count, height, width):
+            raise ValueError(f"region {r.shape}, expected {(count, height, width)}")
     # The encoder pads to 16 inside its CUDA proxy; the training path needs 64. The extra rows and columns are
     # edge copies outside R, so they only move a few bits between "outside" cells.
     pad_r, pad_b = DMCI.get_padding_size(height, width, PAD)
@@ -152,8 +155,11 @@ def estimate(plan: dict[str, Any]) -> dict[str, Any]:
                 xs += [xs[-1]] * (FRAME_DELAY - len(xs))
                 p_net.forward_one_frame(torch.cat(xs, dim=1), qp)
             c = cells()
-            nals.append({"frames": frames, "estimated_bits": float(c.sum()),
-                         "estimated_region_bits": region_bits(c, np.asarray(region[frames[0]:frames[-1] + 1]))})
+            span = slice(frames[0], frames[-1] + 1)
+            nal = {"frames": frames, "estimated_bits": float(c.sum()), "estimated_region_bits": region_bits(c, np.asarray(region[span]))}
+            if extra:
+                nal["extra_region_bits"] = {name: region_bits(c, np.asarray(r[span])) for name, r in extra.items()}
+            nals.append(nal)
     return {"qp": int(plan["qp"]), "width": width, "height": height, "frame_count": count, "nals": nals,
             "seconds": round(time.time() - began, 2), "gpu": torch.cuda.get_device_name(0),
             "gpu_capability": list(torch.cuda.get_device_capability(0)), "torch": torch.__version__}
