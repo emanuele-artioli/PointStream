@@ -430,3 +430,116 @@ def test_invalid_bounded_transfer_limit_fails_before_publication(tmp_path, secon
     with pytest.raises(fleet.FleetError, match="positive and finite|<=90"):
         inbox.submit(Namespace(snapshot_transfer_seconds=seconds), tmp_path)
     assert not list(tmp_path.iterdir())
+
+
+WAIT_JOB = "20261003T000000Z-12345678"
+
+
+class FakeClock:
+    def __init__(self):
+        self.now = 0.0
+        self.sleeps = []
+
+    def __call__(self):
+        return self.now
+
+    def sleep(self, seconds):
+        self.sleeps.append(seconds)
+        self.now += seconds
+
+
+def wait_remote(responses):
+    """Serve status and events replies; each events call takes the next reply."""
+    def remote(config, action, payload, **kwargs):
+        if action == "status":
+            started = time.time() - 600
+            return {"status": "running", "host_alias": "gpu2", "job_id": payload["job_id"], "remote_status": {"status": "running", "started": started, "last_progress": started + 300, "progress": {"stage": "full", "completed": 3}}}
+        return {"job_id": payload["job_id"], "status": "running", "events": responses.pop(0) if len(responses) > 1 else responses[0]}
+    return remote
+
+
+def test_wait_returns_early_on_event_with_attention_exit(tmp_path, monkeypatch, capsys):
+    monitor.write_json(tmp_path / (WAIT_JOB + ".json"), {"config": {}})
+    stall = {"id": "a" * 32, "kind": "stall:1"}
+    monkeypatch.setattr(inbox, "remote_rpc", wait_remote([[], [], [stall]]))
+    clock = FakeClock()
+    result = inbox.wait_jobs(tmp_path, [WAIT_JOB], 2700, poll_seconds=60, clock=clock, sleep=clock.sleep)
+    assert result["reason"] == "attention" and clock.sleeps == [60, 60]
+    job = result["jobs"][0]
+    assert job["unacknowledged_event_ids"] == [stall["id"]] and job["host"] == "gpu2" and job["stage"] == "full"
+    assert job["minutes_since_start"] == pytest.approx(10, abs=0.2) and job["minutes_since_progress"] == pytest.approx(5, abs=0.2)
+    monkeypatch.setattr(inbox, "remote_rpc", wait_remote([[stall]]))
+    assert inbox.main(["--state-dir", str(tmp_path), "wait", WAIT_JOB]) == inbox.WAIT_ATTENTION_EXIT
+    assert json.loads(capsys.readouterr().out)["jobs"][0]["unacknowledged_event_ids"] == [stall["id"]]
+
+
+def test_wait_ignores_acknowledged_events_and_times_out_with_summary(tmp_path, monkeypatch, capsys):
+    monitor.write_json(tmp_path / (WAIT_JOB + ".json"), {"config": {}})
+    monitor.write_json(tmp_path / "event-acks" / ("b" * 32 + ".json"), {"acknowledged": time.time()})
+    monkeypatch.setattr(inbox, "remote_rpc", wait_remote([[{"id": "b" * 32, "kind": "report:1"}]]))
+    clock = FakeClock()
+    result = inbox.wait_jobs(tmp_path, [WAIT_JOB], 300, poll_seconds=60, clock=clock, sleep=clock.sleep)
+    assert result["reason"] == "timeout" and not result["attention"] and clock.now <= 300
+    assert result["jobs"][0]["status"] == "running" and result["jobs"][0]["unacknowledged_event_ids"] == []
+    monkeypatch.setattr(inbox, "wait_jobs", lambda *args: {"attention": False, "jobs": []})
+    assert inbox.main(["--state-dir", str(tmp_path), "wait", WAIT_JOB, "--max-seconds", "1"]) == 0
+
+
+def test_wait_reports_unknown_job_without_waiting(tmp_path, monkeypatch, capsys):
+    known = "20261003T000000Z-87654321"
+    monitor.write_json(tmp_path / (known + ".json"), {"config": {}})
+    monkeypatch.setattr(inbox, "remote_rpc", wait_remote([[]]))
+    clock = FakeClock()
+    result = inbox.wait_jobs(tmp_path, [WAIT_JOB, known, "not-a-job"], 2700, clock=clock, sleep=clock.sleep)
+    assert result["reason"] == "attention" and clock.sleeps == []
+    assert [j["status"] for j in result["jobs"]] == ["unknown", "running", "unknown"]
+
+    def unpublished(config, action, payload, **kwargs):
+        raise fleet.FleetError("gpu2: status failed: job is unpublished or unknown; inspect transfer before retrying")
+    monkeypatch.setattr(inbox, "remote_rpc", unpublished)
+    assert inbox.main(["--state-dir", str(tmp_path), "wait", known]) == inbox.WAIT_ATTENTION_EXIT
+    assert json.loads(capsys.readouterr().out)["jobs"][0]["status"] == "unknown"
+
+
+def test_wait_keeps_waiting_through_unreachable_hosts(tmp_path, monkeypatch):
+    monitor.write_json(tmp_path / (WAIT_JOB + ".json"), {"config": {}})
+
+    def unreachable(config, action, payload, **kwargs):
+        raise fleet.FleetError("gpu2: status failed: ssh timed out")
+    monkeypatch.setattr(inbox, "remote_rpc", unreachable)
+    clock = FakeClock()
+    result = inbox.wait_jobs(tmp_path, [WAIT_JOB], 180, poll_seconds=60, clock=clock, sleep=clock.sleep)
+    assert result["reason"] == "timeout" and result["jobs"][0]["status"] == "unreachable"
+
+
+def test_wait_returns_when_every_job_is_terminal_and_acknowledged(tmp_path, monkeypatch):
+    monitor.write_json(tmp_path / (WAIT_JOB + ".json"), {"config": {}})
+
+    def complete(config, action, payload, **kwargs):
+        return {"status": "complete", "job_id": WAIT_JOB} if action == "status" else {"events": []}
+    monkeypatch.setattr(inbox, "remote_rpc", complete)
+    clock = FakeClock()
+    result = inbox.wait_jobs(tmp_path, [WAIT_JOB], 2700, clock=clock, sleep=clock.sleep)
+    assert result["reason"] == "all_terminal" and not result["attention"] and clock.sleeps == []
+
+
+def test_wait_caps_max_seconds_and_rejects_nonpositive(tmp_path, monkeypatch, capsys):
+    monitor.write_json(tmp_path / (WAIT_JOB + ".json"), {"config": {}})
+    monkeypatch.setattr(inbox, "remote_rpc", wait_remote([[]]))
+    clock = FakeClock()
+    result = inbox.wait_jobs(tmp_path, [WAIT_JOB], 10_000, poll_seconds=600, clock=clock, sleep=clock.sleep)
+    assert result["max_seconds"] == inbox.WAIT_MAX_SECONDS == 2700 and clock.now <= 2700
+    seen = {}
+    monkeypatch.setattr(inbox, "wait_jobs", lambda state_dir, jobs, seconds: seen.update(seconds=seconds) or {"attention": False, "jobs": []})
+    assert inbox.main(["--state-dir", str(tmp_path), "wait", WAIT_JOB]) == 0 and seen["seconds"] == 2700
+    assert inbox.main(["--state-dir", str(tmp_path), "wait", WAIT_JOB, "--max-seconds", "0"]) == 2
+
+
+def test_wait_never_mutates_jobs(tmp_path, monkeypatch):
+    monitor.write_json(tmp_path / (WAIT_JOB + ".json"), {"config": {}})
+    actions = []
+    remote = wait_remote([[{"id": "c" * 32, "kind": "terminal:failed"}]])
+    monkeypatch.setattr(inbox, "remote_rpc", lambda config, action, payload, **kw: actions.append(action) or remote(config, action, payload))
+    inbox.wait_jobs(tmp_path, [WAIT_JOB], 60, sleep=lambda s: None)
+    assert set(actions) <= {"status", "events"}
+    assert not (tmp_path / "event-acks").exists()
