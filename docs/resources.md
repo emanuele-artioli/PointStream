@@ -326,8 +326,9 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
 - `Models/JointControlVideo/{dit,hand-controller}.safetensors` from
   `CyrusZhang312/JointControlvideo@5961026`; `Models/Wan/Wan2.1-I2V-14B-480P/`
   from `Wan-AI/Wan2.1-I2V-14B-480P@6b73f84` (77 GB: DiT in seven fp32 shards,
-  T5 umt5-xxl encoder bf16, CLIP, VAE, tokenizers). Each family's
-  `MANIFEST.json` checks the files against the Hugging Face LFS sha256.
+  T5 umt5-xxl encoder bf16, CLIP, VAE, tokenizers). `tools/models/place.py`
+  recorded every weight file in a `MANIFEST.json` beside it (for Wan, in
+  `Wan2.1-I2V-14B-480P/`), each matching the Hugging Face LFS sha256.
 - `Models/Wan/Wan2.1-I2V-14B-480P-dit-bf16.safetensors`: the DiT cast to bf16
   by `tools/models/wan_dit_bf16.py` (the cast the pipeline's loader makes; the
   sidecar `.json` holds the shard and output sha256), so a host stages 28 GB,
