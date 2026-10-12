@@ -456,6 +456,50 @@ whole frames.
 curves on all 10 stretches (LPIPS, DISTS, PSNR on V, flicker, model size per
 variant and payback) sit beside SVT-AV1's and the unadapted DCVC-UF's.
 
+#### G6. The background in the first working PointStream (plan, 2026-10-12)
+
+What H5 needs from G: for each of evaluation set v2's 34 windows (1080p,
+4:2:0, 50 or 59.94 frames/s, 4 s), the background's bitstream, its decoded
+frames and decode time, at several rates, so the foreground session can
+composite and B2's harness can score the whole frame. G5c worked on 10
+stretches at 960×540 and 10 frames/s; three gaps lie between. Two routes
+go in (user, 2026-10-12): the scene model (DCVC-UF adapted, recipe L) and
+the venue enhancer after SVT-AV1 (G5d). Cheapest first:
+1. *Interface, agreed with the foreground session before any run.* Input:
+   the window's 1080p frames and a per-frame foreground mask F (the pixels
+   the foreground stream delivers; the encoder fills F with ProPainter and
+   codes the filled frames). Output per rate point: bytes, decoded 1080p
+   frames, decode milliseconds per frame; once per venue: the model, its
+   shipped size and payback. Composite at the client: foreground pixels
+   over the decoded background on F. Scoring: B2's harness (weighted PSNR
+   and LPIPS on dataset masks) plus every metric as BD-rate against
+   SVT-AV1 and DCVC-UF on the whole frame. Open: the mask source at the
+   encoder (dataset masks for the first run, predicted masks after).
+2. *Resolution.* Does a scene model trained at 960×540 help at 1080p?
+   Two options, one smoke each on the pilots' windows: code the background
+   at 1080p with the model as trained (patches are resolution-free), or
+   code it at 540p and upsample at the client (the viewer barely looks at
+   it; PRESLEY). Rate at equal quality on V decides.
+3. *Frame rate.* The windows are 5–6× denser in time than the stretches'
+   10 frames/s, so motion per frame is smaller and DCVC-UF's temporal
+   prediction does more of the work. Training sequences at the window's
+   native rate (footage extracted at native rate, shorter segments) against
+   the 10 frames/s model, on the pilots' windows.
+4. *Scene footage for every window.* Step 3's pipeline (SAM 3.1 and EPIC
+   detections, which cover exactly the 34 videos, then ProPainter) on the
+   window's own video outside the window and a guard, and the kitchen's
+   other recordings for the venue-only variants. About 34 footage jobs.
+5. *Both routes on all 34 windows,* against SVT-AV1 and DCVC-UF coding
+   the same filled background; published for the foreground session's
+   compositor, with rate allocation between foreground and background
+   taken as the concave hull over their rate combinations, per metric.
+Budget: steps 2–3 about 4 GPU-hours; step 4 about 25; step 5 about 40
+(34 windows × two routes). Steps 2–3 run first and decide the settings
+of 4–5; each stage stays under 45 minutes per job.
+**Done when** both routes' background streams for all 34 windows are
+published with the interface above and the foreground session has
+composited them.
+
 ### H. Foreground (user, 2026-10-08)
 
 The thesis: a pixel codec spends most of its bits on what moves, and people
