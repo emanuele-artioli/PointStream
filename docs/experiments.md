@@ -3107,6 +3107,16 @@ invocation turns out to be needed.
 - Hypothesis: delta-4 still keeps quality (about 50 MB, as step 1) and
   delta-2 does not.
 - Budget: 2 jobs, ≤ 45 minutes each on Ada (shared), about 1.5 GPU-hours.
+- Outcome (code `f57259c`, Ada, shared; P26_02 `20261012T104916Z-b516e685`,
+  P06_03 `…105023Z-6f638c97`). Size (LZMA) and BD-rate on LPIPS_V against
+  whole-16, P26_02 | P06_03: whole-16 218 MB; delta-8 111 MB, +0.9% |
+  +0.8%; **delta-4 50 MB, +2.2% | +0.4% (keeps quality)**; delta-2 11 MB,
+  +338% | +115% (breaks). Re-encoded streams with whole-16 match the
+  arm's published ones within 0.01% of bytes. **The recipe ships as its
+  4-bit change from the public weights, 50 MB**, as step 1's model
+  did (hypothesis right): the higher learning rate does not make the
+  change less compressible. Payback at 50 kbps of SVT-AV1 (recipe L's
+  LPIPS_V saving −92% | −66%): 2.4 | 3.4 hours of stream.
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could

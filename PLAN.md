@@ -430,6 +430,9 @@ before only where noted.
    other recordings beats SVT-AV1 on LPIPS_V and DISTS_V on both pilots
    but misses the 3-metric rule on P26_02; a temporal (decoded-frame)
    input does not cut its flicker.
+   *Model size (2026-10-12):* the recipe ships as its 4-bit change from
+   the public weights, 50 MB at equal quality (2-bit breaks); payback
+   2.4–3.4 hours of stream at 50 kbps on the pilots.
    *G5d oracle (user 2026-10-11, done 2026-10-12):* a venue-trained
    enhancer after plain SVT-AV1 (NAS-style, 1.2 MB), fitted on the
    stretch's other frames with LPIPS in its loss, beats SVT-AV1 by 10%
