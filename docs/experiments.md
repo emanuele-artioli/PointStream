@@ -4845,8 +4845,11 @@ invocation turns out to be needed.
 - Inputs: H3c's (`h3c-anchor-<video>.json` staged inputs, re-hashed),
   manifest `pointstream-data/visor/h3d-2026-10-12/inputs-9b3b06a06e4e.json`;
   environment `pointstream-20261009T214002Z` (`32e68872…4661`).
-- Jobs (code `852357d` for all, from each `ready.json`; shared; validators
-  12/12, including the step-0 network reproducing the base point exactly).
+- Jobs (code `852357d` for all, from each `ready.json`; shared). Validators
+  12/12, including the step-0 network reproducing the base point exactly:
+  on each smoke (the fleet's gate, which validates only the smoke) and,
+  run locally on each full stage's `published.tar` and `h3d.json`, on the
+  full run too (2026-10-13).
   *dcvc*: P01_107 `20261012T180806Z-2a4c0cf4` (RTX 6000 Ada), P02_02
   `…183021Z-d077eba0` (Ada), P03_10 `…183037Z-3ebf898f` (A6000), P09_106
   `…183051Z-3f80dcab` (Ada). *svt*: P01_107 `20261012T180816Z-08afa095`
