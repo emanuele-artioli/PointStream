@@ -3378,3 +3378,51 @@ invocation turns out to be needed.
   from LPIPS on the whole visible background, 0.203). Peak 42.72 GiB
   allocated, as G5b. Infrastructure, not evidence. Upper bound, 540 steps:
   β = 0 `20261011T230242Z-eed20579`, β = 0.084 `20261011T230251Z-97f6ec94`.
+- Upper bound, outcome (stage 1). Training: β = 0 converged (monitor loss
+  −2.4% over the last fifth); β = 0.084 did not by G5b's 3% (−3.5%), which
+  can only understate an upper bound. Coding jobs (shared; validators
+  passed; the anchor and reference jobs at code `cac5322`/`a2e5…`, the arms
+  at `ab86e31` and later): anchor and reference `20261011T220119Z-69f5f6d7`
+  (P01_107), `…223528Z-6ecdc738` (P02_02), `…221908Z-8193ffb7` (P03_10),
+  `…220719Z-19637920` (P09_106); β = 0 `20261011T235449Z-bee05804`,
+  `…235458Z-ac5f6422`, `…235508Z-87306ff1`, `20261012T014347Z-7c545a0e`;
+  β = 0.084 `20261011T235710Z-b7171bd9`, `…235719Z-d0c4b5b3`,
+  `…235728Z-58b72909`, `…235737Z-4bdfd185`. Earlier attempts, failed and
+  not evidence: a missing archive extraction and the estimate's padding
+  (smokes), a CUDA out-of-memory when another user's process grew on gpu6,
+  a memory overrun of the shared claim (26,098 MiB against 24,000 + 1,024;
+  fixed by releasing the scorer's cache and declaring 32,000), and one
+  decode mismatch of the β = 0 model on P09_106 at ½ scale, QP 42, on gpu6
+  (`20261011T235517Z-dc8fe8c1`), which did not recur when the same job ran
+  again on gpu3. Report (`h3c report`, code `a5b8a0a`):
+  `pointstream-data/visor/h3c-2026-10-11/report-stage1/h3c-report.json`
+  (`b78300039d74d31c…`). The anchor reproduces H3b: SVT-AV1's LPIPS on R
+  matches H3b's and H3b2's units within 0.0002 on every frame, and every
+  re-encoded low stream matches H3b2's sha256.
+
+  BD-rate on LPIPS_R against SVT-AV1's front (mean over the 4 items, 95%
+  bootstrap CI; items below 0), and beside it:
+
+  | arm | LPIPS_R | items < 0 | vs reference | DISTS_R | PSNR_R | LPIPS_R, whole-frame rate |
+  |---|---|---|---|---|---|---|
+  | reference (off the shelf) | −63% (−68 to −59) | 4 | — | −55% to +52% | −51% to −73% | −59% to −73% |
+  | upper bound, β = 0 | −43% (−52 to −33) | 4 | +66% | −27% to +66% | −58% to +10% | −73% to −87% |
+  | upper bound, β = 0.084 | −61% (−75 to −48) | 4 | −14% (2 items worse) | −5% to −78% | −48% to +18% | −78% to −94% |
+
+  By the rule the upper bound **passes** (β = 0.084), and the component
+  runs at β = 0.084.
+- Reading (stage 1). The hypothesis was wrong at its first step: DCVC-UF
+  off the shelf already needs about 63% less rate than SVT-AV1 for the same
+  LPIPS on the hand pixels, on every item, and PSNR and the whole-frame
+  rate agree (B2 found −13% on whole frames: the hands at these low rates
+  are where DCVC-UF gains most). So, by the rule's last clause, the
+  reference joins H3d's bar. DISTS disagrees on two items (+52%, +16%):
+  DCVC-UF's smooth hands lose texture statistics that DISTS weighs. Tuning
+  with β = 0.084 removes that disagreement (DISTS −5% to −78% on every
+  item) but adds only 14% against the reference on LPIPS_R, two items
+  worse; tuning without LPIPS is 66% worse than the reference: with the
+  rate charged on the whole patch and the distortion only on R, the model
+  learned to starve the background (whole-frame rate −73% to −87%), not to
+  code the hands for fewer bits. The upper bound's margin over the
+  reference is close to the component's 10% bar, so the component is
+  expected to miss it.
