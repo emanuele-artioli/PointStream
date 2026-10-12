@@ -316,6 +316,25 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   a small contribution of its own: H compares them and the result is a paper
   table ([PLAN](../PLAN.md#h-foreground-encoding)).
 
+**JointControlVideo on Wan2.1-I2V-14B-480P** (H3e's hand generator, 2026-10-12)
+- [ZhangCYG/JointControlVideo](https://github.com/ZhangCYG/JointControlVideo) at
+  `f96b2c377f26a165bf63cd9fcb495bb9fd3d3054` (ECCV 2026, Apache-2.0): a LoRA,
+  an expanded patch embedding and an occlusion-aware module that conditions
+  Wan2.1-I2V-14B-480P on 42 camera-frame 3D hand joints and the intrinsics,
+  from a first frame; trained on Ego4D. The audit and why it was chosen over
+  FoundHand, HandRefiner and HOGAN: [H3e](experiments.md#2026-10-12--h3e-a-pretrained-pose-conditioned-generator-renders-the-hand-from-the-coded-keypoints).
+- `Models/JointControlVideo/{dit,hand-controller}.safetensors` from
+  `CyrusZhang312/JointControlvideo@5961026`; `Models/Wan/Wan2.1-I2V-14B-480P/`
+  from `Wan-AI/Wan2.1-I2V-14B-480P@6b73f84` (77 GB: DiT in seven fp32 shards,
+  T5 umt5-xxl encoder bf16, CLIP, VAE, tokenizers). Each family's
+  `MANIFEST.json` checks the files against the Hugging Face LFS sha256.
+- `Models/Wan/Wan2.1-I2V-14B-480P-dit-bf16.safetensors`: the DiT cast to bf16
+  by `tools/models/wan_dit_bf16.py` (the cast the pipeline's loader makes; the
+  sidecar `.json` holds the shard and output sha256), so a host stages 28 GB,
+  not 62.
+- Runs in its own environment, `pointstream-jcv` (below), through
+  `experiments/visor/h3e_generate.py`.
+
 **MANO**
 - `Models/MANO/MANO_{LEFT,RIGHT}.pkl`: chumpy-free copies of the official v1.2
   models (`Datasets/MANO/mano_v1_2/models`), written by
@@ -403,6 +422,22 @@ naming the pack they ran with.
    torch 2.10 and timm 1.0.30 (dev check on gpu6, Ada). deepspeed serves only
    a FLOPs profiler; the patch makes it optional, and makes a fourth PNG
    channel mask the training loss.
+
+10. *pointstream-jcv, a second environment* (H3e, 2026-10-12). JointControlVideo
+   pins transformers 4.57.2, which requires huggingface_hub < 1.0, against
+   huggingface_hub 2.x in `pointstream`, and accelerate 1.12 against NVRC's
+   1.3.0. It runs only the generator, through one script
+   (`experiments/visor/h3e_generate.py`: npz in, npz out), so a separate
+   prefix is the narrow interface. Python 3.12, torch 2.7.0+cu128 (as the
+   checkpoints were trained), JointControlVideo's other pins except xfuser
+   (multi-GPU only); recipe `env/jcv/`, locks `env/locks/pointstream-jcv.*`
+   (`pip check` clean). The fork omits
+   `diffsynth/models/wan_video_camera_controller.py`, which its DiT module
+   imports (Wan-Fun camera models only); the build adds it from upstream
+   DiffSynth-Studio at `c795e35`, sha256-checked. Packed:
+   `pointstream-data/environments/pointstream-jcv-20261012T085233Z.tar.gz`,
+   sha256 `2bec91d460df5487acd10d5dfe062040db2117238fd0fbb72ecf947cfb7bec74`
+   (4.4 GB; 7.4 GB unpacked), built on gpu6 at commit `68b5631`'s recipe.
 
 **Earlier environments.** `~/.conda/envs/pointstream` (Python 3.10, torch
 2.2.2) stays as the interpreter of the fleet workers and the dispatcher only;
