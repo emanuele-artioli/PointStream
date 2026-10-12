@@ -687,6 +687,60 @@ frame without prediction. If a generator is revisited (agreed, user,
 then bridging pose gaps of ≤ 10 frames (83% of breaks) and boxes from the
 masks rather than the detector.
 
+H3c (2026-10-12, [outcome](docs/experiments.md#2026-10-11--h3c-a-perceptually-tuned-dcvc-uf-for-the-hand-pixels)):
+tuning does not pay, but DCVC-UF itself does. Off the shelf, DCVC-UF HT-L
+(at full, ½ and ¼ resolution, rate split onto the hand region by its own
+entropy model) needs about 63% less rate than SVT-AV1 for the same LPIPS on
+the 4 pilot items' hand pixels (CI −68% to −59%; PSNR agrees, DISTS on 2 of
+4). Fine-tuned on the test windows with β·LPIPS it gains only 14% more; on
+other participants' hands it is 151% worse than the published model, and
+tuning without LPIPS starves the background instead of coding the hands
+better. So H3d's bar, and any generator's, is the lower envelope of
+SVT-AV1 and DCVC-UF off the shelf on R, per item. H3d is next.
+
+H3c2 (2026-10-12, [outcome](docs/experiments.md#2026-10-12--h3c2-pose-fidelity-at-rate-pixels-against-keypoints);
+user, 2026-10-12: judge the hand by the pose it carries, identity free, as
+coding for machines does, while keeping a video people can watch; a
+domain-specific mode beside the pixel route, not instead of it, since tennis
+may not want it). With a perfect generator granted, H2's coded keypoints
+(1.93 kbps) carry WiLoR's pose for 69% less rate than the best pixel coder
+needs for the same pose error (CI 47% to 90%; 39% to 98% per item). Unclear
+by the rule; the user opened the path (2026-10-12). Order now:
+1. H3e, a generative-hand oracle (before H3d): a pretrained pose-conditioned
+   hand generator, delivered with the decoder and not billed, renders each
+   hand from the coded keypoints (no per-video reference; identity free,
+   constant per track). Audit first (methods and weights, downloaded into
+   `Models`), then judged on the pilot items by WiLoR's pose error on the
+   composite, KID and flicker on hand crops, against the pixel envelope
+   (SVT-AV1 and DCVC-UF off the shelf) at equal pose error. Built further
+   only if it keeps a saving above 50% with the forearm, held objects and
+   the boundary with the background charged as they are rendered. As
+   generative face video coding does with facial keypoints. Variants
+   (user, 2026-10-12): the hand alone generated, its forearm and held
+   objects coded as pixels (DCVC-UF off the shelf), the generated hand
+   pasted over them, both streams billed; and the forearm generated too.
+   The generator's own silhouette places the hand, so no outline is sent
+   (outlines cost 72–170 kbps, H3b2).
+2. H3d, as agreed, against H3c's bar.
+3. Candidate after H3e (user, 2026-10-12): DCVC-UF conditioned on a
+   proto-hand. The decoder also receives a render of the coded keypoints
+   (a skeleton or MANO image), so its bitstream carries only what the
+   pose does not explain; billed as keypoints plus that residual. DCVC-UF
+   has no such input, so this is a new input path and training, not a
+   fine-tune. Cheapest oracle: the render as DCVC-UF's reference frame.
+   A latent shaped like the keypoints alone, decoded into a hand, is the
+   generator of H3e, not a different design.
+
+Deferred to the optimization stage (user, 2026-10-12): the keypoints'
+rate. H2 kept the pose essentially uncoded-accurate; coarser quantization
+and a pose prior (PCA 6–12) traded a few percent of error for large
+savings. A BD-rate on pose error over H2's combinations picks the point.
+A cheaper point can only raise H3c2's saving, so deferring it cannot
+change H3e's decision. A reference-based mode (the original hands' look)
+stays out of scope unless an application needs it: H3a2 found texture
+transfer loses once the reference is billed, and pixel codecs then serve
+pixel fidelity.
+
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a
