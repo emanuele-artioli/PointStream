@@ -103,7 +103,8 @@ def sample_on_region(rng: np.random.Generator, regions: list[np.ndarray], boxes:
     return out
 
 
-def fit(upscaled: np.ndarray, truth: Any, regions: list[np.ndarray], steps: int, lpips_net: Any, device: str) -> tuple[Any, dict[str, Any]]:
+def fit(upscaled: np.ndarray, truth: Any, regions: list[np.ndarray], steps: int, lpips_net: Any, device: str,
+        blocks: int = TRAIN["blocks"], channels: int = TRAIN["channels"]) -> tuple[Any, dict[str, Any]]:
     """G5d's enhancer (identity at step 0) fitted on (upscaled decode, source) patches centred on R, MSE plus LPIPS on R
     at equal weight at step 0 (G5d's passing loss)."""
     import torch
@@ -114,7 +115,7 @@ def fit(upscaled: np.ndarray, truth: Any, regions: list[np.ndarray], steps: int,
     rng = np.random.default_rng(TRAIN["seed"])
     boxes = region_boxes(regions)
     hand = [t for t, b in enumerate(boxes) if b is not None]
-    net = enhancer(TRAIN["blocks"], TRAIN["channels"]).to(device).train()
+    net = enhancer(blocks, channels).to(device).train()
     optimizer = torch.optim.Adam(net.parameters(), lr=TRAIN["lr"])
     schedule = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, max(1, steps))
     size = TRAIN["patch"]
@@ -148,7 +149,7 @@ def fit(upscaled: np.ndarray, truth: Any, regions: list[np.ndarray], steps: int,
                 curve.append({"step": step, "mse_fixed": float(masked_mse(out, fixed[1], fixed[2])),
                               "lpips_fixed": float(masked_lpips(lpips_net, out, fixed[1], fixed[2]))})
     parameters = int(sum(p.numel() for p in net.parameters()))
-    return net.eval(), {"steps": steps, "lpips_weight": weight, "mse_fixed_start": mse0, "lpips_fixed_start": lp0,
+    return net.eval(), {"steps": steps, "blocks": blocks, "channels": channels, "lpips_weight": weight, "mse_fixed_start": mse0, "lpips_fixed_start": lp0,
                         "curve": curve, "seconds": round(time.time() - began, 1), "parameters": parameters,
                         "bytes_fp16": 2 * parameters}
 
@@ -507,6 +508,63 @@ def decide(arms: dict[str, dict[str, Any]]) -> dict[str, Any]:
     return {"oracle": oracle, "arms": verdicts}
 
 
+def component_rows(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]], durations: dict[str, float]) -> dict[str, dict[str, list[dict[str, Any]]]]:
+    """Each component row's points per item (arm -> item -> points). V's rate is the rate on R plus its network's fp16
+    bits over the video's duration; ``V-*/free`` is V without them (memorization against payback)."""
+    out: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    for meta, a in units:
+        hand = a["pixels_r"] > 0
+        rate = float(meta["point"]["kbps_r"])
+        for j, row in enumerate(meta["rows"]):
+            q = {"name": meta["name"], **point_summary(a, j, hand), "flicker": float(np.nanmean(a["flicker"][j])),
+                 "flicker_base": float(np.nanmean(a["flicker"][0]))}
+            if row.startswith("V-"):
+                seconds = durations[meta["video"]]
+                bits = 8 * meta["fits"][row]["bytes_fp16"] / seconds / 1000
+                out.setdefault(row, {}).setdefault(meta["item"], []).append({**q, "kbps": rate + bits, "network_kbps": bits})
+                out.setdefault(f"{row}/free", {}).setdefault(meta["item"], []).append({**q, "kbps": rate})
+            else:
+                out.setdefault(row, {}).setdefault(meta["item"], []).append({**q, "kbps": rate})
+    return out
+
+
+def component_decision(arms: dict[str, Any], rows: dict[str, dict[str, list[dict[str, Any]]]]) -> dict[str, Any]:
+    """`h3d_component.COMPONENT`: which arm (V at its best size, K, G) stands, and which is H3d's coder."""
+    from experiments.visor.h3d_component import COMPONENT
+
+    def stands(name: str) -> bool:
+        return arms.get(name, {}).get("verdict", {}).get("verdict") == "passes"
+
+    def mean(name: str) -> float:
+        return arms[name]["verdict"].get("mean_bd", math.inf)
+
+    sizes = [r for r in arms if r.startswith("V-") and not r.endswith("/free")]
+    best_v = min(sizes, key=mean) if sizes else None
+
+    def beats(a: str, b: str) -> dict[str, Any]:
+        values = [compare(rows[a][i], rows[b][i], "lpips")["bd"] for i in rows[a] if i in rows.get(b, {})]
+        known = [v for v in values if v is not None]
+        m = float(np.mean(known)) if known else None
+        return {"mean_bd": m, "items": len(known), "beats": m is not None and m <= COMPONENT["beats_by"]}
+
+    out: dict[str, Any] = {"stands": {r: stands(r) for r in ("G-L", "K-L", *sizes)}, "best_v": best_v}
+    shared = [r for r in ("G-L", "K-L") if stands(r)]
+    choice = None
+    if stands("G-L"):
+        choice = "G-L"
+        if stands("K-L"):
+            out["K_vs_G"] = beats("K-L", "G-L")
+            choice = "K-L" if out["K_vs_G"]["beats"] else "G-L"
+    elif stands("K-L"):
+        choice = "K-L"
+    if best_v and stands(best_v):
+        out["V_vs_shared"] = {r: beats(best_v, r) for r in shared}
+        if not shared or all(v["beats"] for v in out["V_vs_shared"].values()):
+            choice = best_v
+    out["coder"] = choice or "none: H3d is not built"
+    return out
+
+
 def command_report(args: argparse.Namespace) -> int:
     from experiments.visor.h3c import point_summary as h3c_summary
 
@@ -560,12 +618,27 @@ def command_report(args: argparse.Namespace) -> int:
             entry["flicker_ratio"] = float(np.nanmean([q["flicker"] / q["flicker_base"] for q in test]))
             per_item[item] = entry
         arms[base] = {"items": per_item, "verdict": arm_verdict(per_item)}
-    report = {"decision_rule": DECISION, "decision": decide(arms), "arms": arms, "base_cross_check": cross,
+    if args.component:
+        comp_rows = component_rows(load_units(args.component, "component"), durations)
+        comp: dict[str, Any] = {}
+        for arm_row, per_arm in sorted(comp_rows.items()):
+            arm_items: dict[str, Any] = {}
+            for item, test in sorted(per_arm.items()):
+                if item in bar:
+                    arm_items[item] = {**{m: compare(test, bar[item], m) for m in METRICS}, "front": test,
+                                       "flicker_ratio": float(np.nanmean([q["flicker"] / q["flicker_base"] for q in test]))}
+            comp[arm_row] = {"items": arm_items, "verdict": arm_verdict(arm_items)}
+        report_component = {"arms": comp, "decision": component_decision(comp, comp_rows)}
+    report: dict[str, Any] = {"decision_rule": DECISION, "decision": decide(arms), "arms": arms, "base_cross_check": cross,
+              **({"component": report_component} if args.component else {}),
               "bar": {item: [{k: v for k, v in q.items() if k != "lpips_frames"} for q in rows] for item, rows in bar.items()},
-              "runs": [{"path": p, "sha256": file_sha256(Path(p))} for p in [*args.oracle, *args.h3c]]}
+              "runs": [{"path": p, "sha256": file_sha256(Path(p))} for p in [*args.oracle, *args.component, *args.h3c]]}
     out = Path(args.out or stage_dir())
     out.mkdir(parents=True, exist_ok=True)
     write_json(out / "h3d-report.json", report)
+    if args.component:
+        print(json.dumps({"component": {r: s["verdict"] for r, s in report["component"]["arms"].items()},
+                          "decision": report["component"]["decision"]}, indent=1, default=str))
     print(json.dumps({"decision": report["decision"], "verdicts": {b: s["verdict"] for b, s in arms.items()},
                       "cross_check_holds": {i: all(e["holds"] for e in c.values()) for i, c in cross.items()}}, indent=1, default=str))
     return 0
@@ -598,7 +671,8 @@ def main(argv: list[str] | None = None) -> int:
     oracle.add_argument("--preset", default="4")
     commands.add_parser("validate")
     report = commands.add_parser("report")
-    report.add_argument("--oracle", action="append", required=True, help="the oracle jobs' published.tar")
+    report.add_argument("--oracle", action="append", default=[], help="the oracle jobs' published.tar")
+    report.add_argument("--component", action="append", default=[], help="the component's score jobs' published.tar")
     report.add_argument("--h3c", action="append", required=True, help="H3c's anchor-and-reference jobs' published.tar")
     report.add_argument("--h1-report", required=True)
     report.add_argument("--video-seconds", action="append", default=[], metavar="VIDEO=SECONDS",

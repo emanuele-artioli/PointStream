@@ -4924,7 +4924,9 @@ invocation turns out to be needed.
   the item's own video. K: 24 segments over the participant's other
   recordings on disk (P01: 9, P02: 18, P03: 17, P09: 4 videos), never the
   item's video. G: 24 segments over recordings of participants other than
-  P01, P02, P03 and P09, one per video. All arms
+  P01, P02, P03 and P09. K and G draw on at most 6 recordings each (chosen
+  by sha256), 4 segments per recording (P09: 4 recordings, 6 each), so a
+  job stages a few videos, not dozens. All arms
   therefore fit on the same 1,152 frames, about 4.8 windows. R in the
   footage is SAM 3.1's "hand" plus "arm" at G1's analysis size (as G1 and
   G5c step 3), upsampled to 1080p: what a sender's own segmenter would give
@@ -4935,8 +4937,8 @@ invocation turns out to be needed.
   steps, MSE plus LPIPS on R. The footage is coded at each point by the same
   code (its segments concatenated into one sequence per point) and upscaled
   bicubically. Sizes: G5d's network (L, 8 blocks × 64 channels, 594 k
-  parameters, 1.19 MB at fp16) for every arm; for V also M (4 × 48, 166 k,
-  0.33 MB) and S (4 × 24, 41 k, 0.08 MB), since its bits are billed. The
+  parameters, 1.19 MB at fp16) for every arm; for V also M (4 × 48, 169 k,
+  0.34 MB) and S (4 × 24, 43 k, 0.09 MB), since its bits are billed. The
   scored window, its base points and the bar are the oracle's.
 - Rate. K and G: the rate on R, as the bar. V: the rate on R plus the
   network's fp16 bits divided by the video's duration (NAS's amortization;
@@ -4969,9 +4971,10 @@ invocation turns out to be needed.
   shows. SAM's masks differ from VISOR's (forearm extent): they only shape
   the training loss; a K or G fitted on VISOR's train-split masks would be
   the check if they matter.
-- Budget. Footage masks: 4 jobs (V and K per item) and 1 (G), SAM 3.1 at
-  about 0.3 s per frame, each ≤ 45 minutes on Ada or A6000 (exclusive SAM
-  memory, 36,000 MiB shared as G5c). G's networks: 1 job (6 fits). Scoring:
-  8 jobs (per item, the ¼ and the ½ points), each fitting V-L, V-M, V-S
-  and K and applying G. Each ≤ 45 minutes, shared. About 9 GPU-hours;
-  ceiling 12.
+- Budget. Footage masks: 8 jobs (V and K per item) and 1 (G), SAM 3.1 at
+  about 0.3 s per frame (about 6 minutes per arm), each ≤ 45 minutes on Ada
+  or A6000, shared at 40,000 MiB (G5c's footage declaration). G's networks:
+  2 jobs (the ¼ and the ½ points, 3 fits each). Scoring: 24 jobs, one per
+  item and point (coding both footages at the point dominates: 2 × 1,152
+  frames), each fitting V-L, V-M, V-S and K and applying G; each ≤ 45
+  minutes, shared. About 10 GPU-hours; ceiling 14.
