@@ -531,6 +531,11 @@ better at every rate | −83%); the window's own footage makes the same
 scene model as the stretch (±3% LPIPS_V at matched rate). *Deferred
 (user, 2026-10-12):* the other 32 windows run once, with the final
 experiments, after the paper's draft fixes the figures they feed.
+*Item 1 done (2026-10-13, [experiments](docs/experiments.md), G6 item
+1):* with F filled exactly, the scene model is trained on footage masked
+the same way (`footage --mask exact`; LPIPS_V −11% | −12% against G1's
+footage) and codes at 1080p in SVT-AV1's range, 540p below it (LPIPS_V
+against SVT-AV1 −97% | −33%; DISTS_V and KID_V still worse on P06_03).
 
 ### H. Foreground (user, 2026-10-08)
 

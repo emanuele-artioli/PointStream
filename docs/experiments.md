@@ -3427,6 +3427,76 @@ invocation turns out to be needed.
 - Budget: 8 jobs on shared Ada or A6000, each under 45 minutes: 2
   footage, 2 training (Ada), 2 format for E, plus 2 format for D. About
   3 GPU-hours.
+- Runs (code `471f211`, shared GPUs, every job's validator passed).
+  Exact footage: P26_02 `20261012T191458Z-ec41db31` (1,061 frames,
+  foreground 23% | 14% per segment against G1's 28% | 17%), P06_03
+  `…191508Z-059d63ab` (1,060; 23% | 17%). Model E, trained (both
+  converged, monitor within 1% over the last fifth): P06_03
+  `…193354Z-1c40a5f2` (Ada); P26_02 `…193114Z-78bb999e` ran out of its
+  2,700 s on a GPU shared at 100% and saved its state, resumed to step 540
+  by `…211954Z-b60afc24` (A6000; DCVC-UF trains on both classes, peak
+  42 GiB). Format, D: P26_02 `…191518Z-6a62cbbb`, P06_03
+  `…191526Z-32f31a5f`; E: P26_02 `…213720Z-eea1154c`, P06_03
+  `…203355Z-54009c15`. Failed, not citable: E's P26_02 format
+  `…212847Z-8fedd1fc`, whose smoke had one of eleven points (540p QP 38)
+  decode unlike its encoder on gpu5 under contention; the same spec,
+  resubmitted unchanged, passed every check.
+- Outcome. Model against model (each model's concave hull, the same F),
+  P26_02 | P06_03:
+  | E against D | LPIPS_V | DISTS_V | PSNR_V | KID_V |
+  |---|---|---|---|---|
+  | hull (540p and 1080p) | **−11% \| −12%** | +32% \| −9% | −3% \| −5% | +17% \| −8% |
+  | 540p | 0% \| −7% | +31% \| −7% | 0% \| −3% | +17% \| −7% |
+  | 1080p | −28% \| −23% | +15% \| −14% | −15% \| −11% | −27% \| −23% |
+  Against SVT-AV1 at 1080p (concave hull), LPIPS_V BD-rate and LPIPS_V
+  at matched rate at SVT-AV1's three lowest CRFs (P26_02 189, 471, 787
+  kbps: SVT-AV1 0.241, 0.218, 0.206; P06_03 174, 417, 708 kbps: 0.142,
+  0.100, 0.087):
+  | Model, size | P26_02 | P06_03 |
+  |---|---|---|
+  | D 540p | −97%; 0.146, 0.128, 0.126 | +20%; 0.137, 0.119, 0.113 |
+  | D 1080p | −97%; 0.143, 0.109, 0.095 | −18%; 0.143, 0.099, 0.076 |
+  | D hull | −96% | −4% |
+  | E 540p | −97%; 0.149, 0.134, 0.130 | +26%; 0.138, 0.119, 0.113 |
+  | E 1080p | −98%; 0.127, 0.102, 0.097 | **−38%**; 0.128, 0.087, 0.066 |
+  | E hull | −97% | −33% |
+  On the other metrics the E hull against SVT-AV1 is DISTS_V −92% |
+  +87%, KID_V −66% | +218%, PSNR_V +126% | +80%, and flicker_V worse at
+  every rate on both.
+  - **(a) passes: E replaces D** (−11% on P26_02, at most +2% needed;
+    −12% on P06_03, −5% needed). Hypothesis right on P06_03 (−12%,
+    within the predicted 5–15%) and wrong on P26_02, which gains as much
+    instead of staying level. The gain is at 1080p (−23% to −28% on
+    LPIPS_V, and on KID_V and PSNR_V too); at 540p it is 0 to −7%, so the
+    band the model learnt is detail that 540p does not keep. Against it,
+    on P26_02 E loses DISTS_V (+32%) and KID_V (+17%) on the hull, all
+    of it at 540p. The competing explanation (the band costs what it
+    costs) is refuted for LPIPS_V.
+  - **(b) the model codes at 1080p in SVT-AV1's range**: 1080p alone is
+    within 5 points of the hull on both windows (−98% against −97%;
+    −38% against −33%), and at matched rate 1080p is better than 540p at
+    every one of SVT-AV1's three lowest rates on both. Hypothesis right.
+    540p stays for rates below SVT-AV1's lowest (the hull is 540p below
+    about 60 kbps on P26_02 and 70 kbps on P06_03). The pilot's
+    1080p −61% on P06_03 had two points overlapping SVT-AV1 in a thin
+    band; with QP 13–38 it is −18% for D, and the competing explanation
+    (the pilot's 1080p points sat where SVT-AV1 is weakest) held for D.
+    Caveat: on P26_02, 1080p's LPIPS_V overlap with SVT-AV1 is thin (its
+    lowest point, 61 kbps, already beats SVT-AV1's best), so its −98%
+    rests on matched rate, which agrees. On DISTS_V and KID_V, 540p is
+    better than 1080p on both windows (E 1080p against 540p: DISTS_V
+    +178% | +87%, KID_V +180% | +163%): the 1080p decode carries LPIPS
+    detail that the distribution metrics do not credit. The route's size
+    follows the headline metric, LPIPS_V, as G5c's selection did.
+  - GPU time: about 4 hours (10 jobs, 2 of them failed or timed out).
+- Decision: G6's scene model is trained on footage masked like F
+  (`footage --mask exact`) and codes at 1080p in SVT-AV1's range, with
+  540p below it. The final run's `format` grid becomes 540p QP 0, 13, 25,
+  38 and 1080p QP 13, 25, 38, 50, 63 (passed as `--mask exact` and
+  `--values`; the defaults stay the pilot's, so its specs re-run as
+  they were). The pilot's published windows (D at
+  540p and two 1080p points) stay for the foreground session's
+  compositor test, rule (c), whose interface does not change.
 
 
 ### 2026-10-08 — H1: foreground motion and representation audit
