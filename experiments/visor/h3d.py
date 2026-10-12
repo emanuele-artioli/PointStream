@@ -21,7 +21,6 @@ import json
 import math
 import os
 import shutil
-import subprocess
 import sys
 import time
 from fractions import Fraction
@@ -508,15 +507,6 @@ def decide(arms: dict[str, dict[str, Any]]) -> dict[str, Any]:
     return {"oracle": oracle, "arms": verdicts}
 
 
-def video_seconds(path: str) -> float | None:
-    try:
-        done = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
-                              capture_output=True, text=True, timeout=60)
-        return float(done.stdout.strip())
-    except (OSError, ValueError, subprocess.TimeoutExpired):
-        return None
-
-
 def command_report(args: argparse.Namespace) -> int:
     from experiments.visor.h3c import point_summary as h3c_summary
 
@@ -554,9 +544,7 @@ def command_report(args: argparse.Namespace) -> int:
             entry["holds"] = (entry["stream_matches"] and lp_gap <= 2e-4) if p["codec"] == "svtav1" else \
                 (abs(entry["lpips_mean_gap"]) <= 0.005 and abs(entry["rate_ratio"] - 1) <= 0.05)
             cross.setdefault(meta["item"], {})[meta["name"]] = entry
-    durations = {}
-    for path in args.video:
-        durations[Path(path).stem] = video_seconds(path)
+    durations = {name: float(seconds) for name, _, seconds in (v.partition("=") for v in args.video_seconds)}
     arms: dict[str, Any] = {}
     for base, per in sorted(tests.items()):
         per_item = {}
@@ -613,7 +601,8 @@ def main(argv: list[str] | None = None) -> int:
     report.add_argument("--oracle", action="append", required=True, help="the oracle jobs' published.tar")
     report.add_argument("--h3c", action="append", required=True, help="H3c's anchor-and-reference jobs' published.tar")
     report.add_argument("--h1-report", required=True)
-    report.add_argument("--video", action="append", default=[], help="the pilot videos (their durations, for the payback)")
+    report.add_argument("--video-seconds", action="append", default=[], metavar="VIDEO=SECONDS",
+                        help="each pilot video's duration (ffprobe), for the payback")
     report.add_argument("--out", default="")
     args = parser.parse_args(argv)
     return {"oracle": command_oracle, "validate": command_validate, "report": command_report}[args.command](args)
