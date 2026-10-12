@@ -499,6 +499,27 @@ the venue enhancer after SVT-AV1 (G5d). Cheapest first:
 Budget: steps 2–3 about 4 GPU-hours; step 4 about 25; step 5 about 40
 (34 windows × two routes). Steps 2–3 run first and decide the settings
 of 4–5; each stage stays under 45 minutes per job.
+*Steps 2–3 done (2026-10-12, [experiments](docs/experiments.md), G6):*
+SVT-AV1 codes the background at 1080p; the scene model at 960×540,
+upsampled at the client; at the windows' native rate it beats SVT-AV1
+on LPIPS_V, DISTS_V and KID_V on both pilots (−91% and −45% on
+LPIPS_V). The frame-rate rule missed by 1 point and the user treated it
+as passed: native-rate and 1080p training are deferred to the final
+runs as ablations.
+*Interface, agreed with the foreground session (2026-10-12):* the
+background codes the whole 1080p frame with F filled, so its decoded
+frames are valid everywhere. F, first run: B2's dataset foreground (the
+union of B1b's `visor_dense_sam_fill` instances), filled exactly (no
+dilation; the foreground blends linearly over an 8 px ring outside F, so
+true background must survive there). The mask is granted in the first
+run, stated, and reported as its own line (its cost, 72–170 kbps for a
+raw outline per H3b2, is an open H5 item). Rates: about 10 kbps to
+2 Mbps, at least five log-spaced points per route (the allocation is the
+concave hull over foreground and background combinations). Published per
+window: decoded frames (raw 4:2:0 or FFV1; DCVC-UF decodes differ across
+GPU classes) and a manifest (window id and frame range, F's mask-set
+sha256, and per rate point bytes, bitstream sha256, per-frame decoded
+sha256s, decode ms per frame, GPU class, job id, `git_head`).
 **Done when** both routes' background streams for all 34 windows are
 published with the interface above and the foreground session has
 composited them.

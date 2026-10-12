@@ -3191,6 +3191,11 @@ invocation turns out to be needed.
   of 5), and loses far less PSNR_V (+25% against +96% on P06_03); DCVC-UF
   off the shelf at 1080p comes close to SVT-AV1 there (LPIPS_V −5%,
   PSNR_V −7% on P06_03; +48% and +10% on P26_02).
+- Decision (user, 2026-10-12): the frame-rate rule is treated as
+  passed. It missed by 1 point on P06_03 (21 against 20), and the model
+  already beats SVT-AV1 on more metrics at the native rate than on the
+  stretches. Native-rate training is not run now; retraining at 1080p
+  and at the native rate are ablations for the paper's final runs.
 - GPU time: about 5 hours (8 jobs, 2 failed).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
