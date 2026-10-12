@@ -3689,6 +3689,16 @@ invocation turns out to be needed.
   attempts: `20261012T114547Z-8cecd105` (inputs read from the wrong level of
   the prepare archive) and `20261012T122341Z-9a1a31a1` (stopped as contended
   by another user's process). Not evidence.
+- Joint order (development window P22_107, 30 judged hands; generations
+  `20261012T132045Z-f518e2e7` OpenPose and `20261012T132054Z-829ed143` MANO,
+  code `1b1ba9e`; judges `20261012T140150Z-f713de00` and
+  `20261012T135958Z-806a82d3`, code `5204ab3`, validators passed). WiLoR on the
+  generated frames against the coded joints: **OpenPose order 3.67%** of the
+  box, MANO order 5.60%; OpenPose better on 27 of 30 hands (difference −1.9
+  points, 95% CI −2.7 to −1.3). The pilot items use OpenPose order (as
+  `mano_np` emits). For scale, on this window the coded keypoints themselves
+  are 1.78% from WiLoR on the source, so the generator adds about 2 points.
+  Development numbers, not evidence for the rule.
 - Hypothesis. The joint module follows its input closely (the paper reports
   joint adherence), so the composite's pose error is the keypoints' (0.8–2.3%
   of the box) plus about half a percent, and V1 saves 50–70% (frame 0 and
