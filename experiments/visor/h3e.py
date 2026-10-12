@@ -555,6 +555,30 @@ def bd_rate_pose(test: list[dict[str, Any]], anchor: list[dict[str, Any]]) -> fl
     return math.exp((area(t) - area(a)) / (hi - lo)) - 1.0
 
 
+def every_rate(test: list[dict[str, Any]], hull_front: list[dict[str, Any]]) -> str:
+    """Whether every ``test`` point is better (or worse) in pose error than the hull at its own rate (the hull's best
+    beyond its top rate; its worst point's rate below it counts as unreachable by the hull)."""
+    from experiments.visor.h3c import pose_at_rate
+
+    sides = set()
+    for q in test:
+        top = hull_front[-1]
+        at = (top["pose"] if q["kbps"] >= top["kbps"] else pose_at_rate(hull_front, q["kbps"]))
+        if at is None:  # below the hull's cheapest rate: the pixels cannot get there
+            sides.add("better")
+            continue
+        sides.add("better" if q["pose"] < at else "worse")
+    return f"{sides.pop()} at every rate" if len(sides) == 1 else "the curves cross"
+
+
+def curve_gap(test: list[dict[str, Any]], anchor: list[dict[str, Any]]) -> str:
+    """Why `bd_rate_pose` gave none: a flat test curve, or no shared pose range."""
+    own = pareto_front(test, "pose")
+    if len(own) < 2 or own[0]["pose"] - own[-1]["pose"] < MIN_OVERLAP:
+        return "its pose error is flat across its points"
+    return "the pose ranges do not overlap"
+
+
 def saving_against(front: list[dict[str, float]], kbps: float, pose: float) -> tuple[float, str]:
     """H3c2's saving at equal pose error (rate on the anchor's hull, linear in log rate), with its bounds beyond
     the hull's ends."""
@@ -609,12 +633,9 @@ def item_report(meta: dict[str, Any], a: dict[str, np.ndarray], pixel_units: lis
     if bd is not None:
         statistic = {"saving": -bd, "how": "BD-rate over the overlapping pose range", "bd_rate": bd}
     else:
-        own = pareto_front(v1, "pose")
-        relation = ("better at every rate" if own[0]["pose"] < front[-1]["pose"] and best["kbps"] <= front[0]["kbps"] else
-                    "worse at every rate" if own[-1]["pose"] > front[0]["pose"] and own[0]["kbps"] >= front[0]["kbps"] else
-                    "no overlap")
-        statistic = {"saving": best["saving"], "how": f"{relation}; best point's rate at equal quality ({best['where']})",
-                     "bd_rate": None}
+        statistic = {"saving": best["saving"], "bd_rate": None,
+                     "how": f"{every_rate(v1, front)}; no BD-rate ({curve_gap(v1, pixels)}); the best point's rate at "
+                            f"equal pose error ({best['where']})"}
     following = float(pose_errors(a["judge_kp2d"][meta["variants"].index("generated")][None], a["coded_kp2d"], box)[0])
     keypoints = float(pose_errors(a["coded_kp2d"][None], source, box)[0])
     rerun = float(pose_errors(a["judge_kp2d"][meta["variants"].index("source")][None], source, box)[0])
@@ -669,7 +690,7 @@ def decide(items: dict[str, dict[str, Any]]) -> dict[str, Any]:
 def command_report(args: argparse.Namespace) -> int:
     units = load_units(args.judge, "judge")
     pixel_units = load_units(args.h3c2, "code")
-    h1 = {it["id"]: it for it in json.loads(Path(args.h1_report).read_text())["items"]}
+    h1 = {row["id"]: row for row in json.loads(Path(args.h1_report).read_text())["per_item"]}
     items = {meta["item"]: item_report(meta, a, pixel_units, h1) for meta, a in units}
     report = {"items": items, "decision": decide(items), "realism": realism(units) if units else {},
               "inputs": {"judge": [{"path": p, "sha256": file_sha256(Path(p))} for p in args.judge],

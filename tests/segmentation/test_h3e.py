@@ -131,3 +131,11 @@ def test_bd_rate_on_pose_of_half_the_rate_is_minus_half():
     half = [{"kbps": q["kbps"] / 2, "pose": q["pose"]} for q in anchor]
     assert h3e.bd_rate_pose(half, anchor) == pytest.approx(-0.5, abs=1e-9)
     assert h3e.bd_rate_pose([{"kbps": 1.0, "pose": 0.001}, {"kbps": 2.0, "pose": 0.0005}], anchor) is None
+
+
+def test_every_rate_compares_each_point_with_the_hull_at_its_rate():
+    hull = [{"kbps": 1.0, "pose": 0.02}, {"kbps": 4.0, "pose": 0.008}, {"kbps": 16.0, "pose": 0.004}]
+    flat_and_worse = [{"kbps": r, "pose": 0.018} for r in (2.0, 3.0, 20.0)]
+    assert h3e.every_rate(flat_and_worse, hull) == "worse at every rate"
+    assert h3e.curve_gap(flat_and_worse, hull) == "its pose error is flat across its points"
+    assert h3e.every_rate([{"kbps": 0.5, "pose": 0.03}, {"kbps": 2.0, "pose": 0.005}], hull) == "better at every rate"
