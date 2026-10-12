@@ -316,8 +316,9 @@ def command_finetune(args: argparse.Namespace) -> int:
     prepare_seconds = time.time() - began
 
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
-    if args.resume and checkpoints is not None and not (checkpoints / "state.pt").is_file():
-        # a timed-out run's salvaged checkpoint.tar (extracted): the trainer continues from its saved step
+    if args.resume and args.limit_frames <= 0 and checkpoints is not None and not (checkpoints / "state.pt").is_file():
+        # a timed-out run's salvaged checkpoint.tar (extracted): the full stage continues from its saved step
+        # (the smoke trains its own few steps from the start)
         checkpoints.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(Path(args.resume) / "checkpoint" / "state.pt", checkpoints / "state.pt")
     init = None
