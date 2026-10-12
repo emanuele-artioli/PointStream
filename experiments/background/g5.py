@@ -414,12 +414,13 @@ def summarize_row(row: dict[str, Any]) -> dict[str, Any]:
 DCVC_QPS = (9, 27, 45, 63)
 
 
-def code_dcvc(args: argparse.Namespace, source: Path, frames: int, qp: int, work: Path) -> dict[str, Any]:
+def code_dcvc(args: argparse.Namespace, source: Path, frames: int, qp: int, work: Path, width: int = WIDTH,
+              height: int = HEIGHT) -> dict[str, Any]:
     """One DCVC-UF HT-L encode and decode of a 4:2:0 full-range file (B2's worker, full range as is)."""
     from src.codecs.dcvc_uf_worker import dcvc_command
 
     work.mkdir(parents=True, exist_ok=True)
-    plan = {"structure": "htl", "qp": qp, "frame_count": frames, "height": HEIGHT, "width": WIDTH,
+    plan = {"structure": "htl", "qp": qp, "frame_count": frames, "height": height, "width": width,
             "src_type": "yuv420", "frames_file": str(source), "container": str(work / "stream.psdc"),
             "out_file": str(work / "decoded.yuv"), "image_ckpt": args.image_ckpt,
             "image_sha256": file_sha256(Path(args.image_ckpt)), "video_ckpt": args.video_ckpt,
@@ -799,13 +800,29 @@ def pareto(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
     return front
 
 
+def envelope(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """The anchor's achievable envelope: the upper concave hull of (kbps, quality), which switching between
+    its encodes reaches, quality increasing. A Pareto staircase of two interleaved curves (SVT-AV1 on the frame
+    and on the fill) would put the anchor's interpolation below both of its own curves (G5d, 2026-10-12)."""
+    hull: list[tuple[float, float]] = []
+    for p in sorted(set(points)):
+        while len(hull) >= 2:
+            (x1, y1), (x2, y2) = hull[-2], hull[-1]
+            if (y2 - y1) * (p[0] - x1) <= (p[1] - y1) * (x2 - x1):  # hull[-1] on or below the chord
+                hull.pop()
+            else:
+                break
+        hull.append(p)
+    return pareto(hull)
+
+
 def bd_rate(test: list[tuple[float, float]], anchor: list[tuple[float, float]]) -> float | None:
     """Bjøntegaard rate difference of ``test`` against ``anchor`` (fraction; +1.0 is twice the rate), with
     piecewise-cubic (PCHIP) log-rate over the overlapping quality range; None with fewer than two points
     each or an overlap under `DECISION['min_overlap_db']`."""
     from scipy.interpolate import PchipInterpolator
 
-    t, a = pareto(test), pareto(anchor)
+    t, a = pareto(test), envelope(anchor)
     if len(t) < 2 or len(a) < 2:
         return None
     lo, hi = max(t[0][1], a[0][1]), min(t[-1][1], a[-1][1])
@@ -821,7 +838,7 @@ def bd_rate(test: list[tuple[float, float]], anchor: list[tuple[float, float]]) 
 
 def anchor_quality(anchor: list[tuple[float, float]], rate: float) -> float | None:
     """The envelope's quality at ``rate`` (linear in log rate), its best quality above its range, None below."""
-    front = pareto(anchor)
+    front = envelope(anchor)
     if rate < front[0][0]:
         return None
     if rate >= front[-1][0]:

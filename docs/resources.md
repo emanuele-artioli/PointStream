@@ -267,6 +267,9 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   from the pre-reset adapter, which was correct but never passed its provenance
   gate. It runs as its own process because DCVC's package is also called `src`.
   The decoder sees only the container bytes and the checkpoints.
+- Portability (G5c): a coded stream decodes reliably only on the GPU class,
+  and not always the host, that encoded it, although DCVC sets deterministic
+  algorithms ([fleet](fleet.md), "DCVC-UF streams are bound to the GPU").
 - Training (audited 2026-10-10 for G5b). `train_video.py`, `train_image.py`
   and `training.md` at the same revision train in plain PyTorch: in training
   mode the models never call the CUDA inference extensions (the reference
@@ -281,12 +284,43 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   GLC-video reports estimated rather than coded rates. GVC-RT and MTTF were
   never installed.
 
+**Video inpainting** (G5c fill check)
+- ProPainter ([sczhou/ProPainter](https://github.com/sczhou/ProPainter) at
+  `e870e79321c31b733e2031af5aa2fb1fe3ac7eec`, ICCV 2023, S-Lab License 1.0,
+  non-commercial). Staged as `git archive` of that revision without
+  `assets`, `web-demos` and `inputs` (`pointstream-data/background/
+  g5c-2026-10-10/inputs/propainter/propainter-e870e79.tar`, `d3438fe7…175d`)
+  and run as a script in its tree (`experiments/background/propainter_fill.py`),
+  like DCVC. Weights v0.1.0 in `Models/ProPainter` with a manifest:
+  `ProPainter.pth` (`12c070c4…6591`, identical to the older
+  `Models/ProPainter.pth`), `raft-things.pth` (`fcfa4125…a7e1`),
+  `recurrent_flow_completion.pth` (`22939a1a…d283`). Its inference imports
+  (torch, torchvision, cv2, scipy, PIL, einops, imageio, matplotlib, tqdm,
+  requests) are all in the environment; checked by importing it there. No
+  new dependency. The hosts' user-site `propainter` 0.1.0 (the user's fork
+  at `c25e710`, with two model files edited after install) is not used.
+
 **Quality metrics** (B2, `src/codecs/quality.py`)
 - LPIPS uses torchmetrics' AlexNet heads (in the environment) and the
   torchvision AlexNet backbone `Models/LPIPS/alexnet-owt-7be5be79.pth`
   (sha256 `7be5be79…ee02`, its prefix matches the published file name; copied
   from the shared torch hub cache on 2026-10-07), loaded from that path, never
   downloaded.
+- DISTS (G5c) uses torchmetrics 1.9's `DISTSNetwork` and its alpha/beta
+  (`dists_models/weights.pt` inside torchmetrics, sha256 `f5e65c96…8218`)
+  on the torchvision VGG16 backbone `Models/DISTS/vgg16-397923af.pth`
+  (sha256 `397923af…5bf0`, copied from the shared torch hub cache on
+  2026-10-10, manifest beside it), loaded from that path, never downloaded.
+  On a region, every layer's statistics are weighted by the region
+  (`src.codecs.quality.masked_dists`). No new dependency.
+- KID (G5c step 4) uses torchvision 0.25's Inception-v3 with its ImageNet
+  weights `Models/Inception/inception_v3_google-0cc3c7bd.pth` (sha256
+  `0cc3c7bd…a5ef`, its prefix matches the published file name; already in
+  `Models/`), the classifier removed, 2048 pooled features, unbiased MMD²
+  with the cubic kernel (`src.codecs.quality.kid`). The TF FID network
+  (`pt_inception-2015-12-05`, in the shared torch hub cache) needs
+  torch-fidelity, which the environment lacks, so KID values rank our
+  codecs and are not comparable with published ones. No new dependency.
 - VMAF: the environment's ffmpeg has no libvmaf; the hosts' `/opt/local/bin/ffmpeg`
   (7.1.1, libvmaf 3, built-in `vmaf_v0.6.1`) has it on gpu1–gpu6. Results
   record its path, sha256 and the libvmaf it links.

@@ -122,6 +122,31 @@ def inpaint_frames(frames: np.ndarray, keep: np.ndarray, indices: list[int], wor
     return out
 
 
+def load_prefilled(dirs: list[str]) -> dict[str, tuple[dict[str, Any], Path]]:
+    """G5c's prefill archives by clip id: their meta and the 4:2:0 fill of the stretch."""
+    out = {}
+    for d in dirs:
+        root = Path(d) / "publish" / "prefill"
+        meta = json.loads((root / "meta.json").read_text())
+        if file_sha256(root / "filled_yuv420.npy") != meta["yuv420_sha256"]:
+            raise RuntimeError(f"{root}: the fill is not the one its meta recorded")
+        out[meta["id"]] = (meta, root / "filled_yuv420.npy")
+    return out
+
+
+def load_footage(dirs: list[str]) -> list[tuple[dict[str, Any], Path, Path]]:
+    """G5c's footage archives (`g5c.py footage`): their meta, the 4:2:0 fill and the loss masks, hashes checked."""
+    out = []
+    for d in dirs:
+        root = Path(d) / "publish" / "footage"
+        meta = json.loads((root / "meta.json").read_text())
+        for name, key in (("filled_yuv420.npy", "yuv420_sha256"), ("keep.npy", "keep_sha256")):
+            if file_sha256(root / name) != meta[key]:
+                raise RuntimeError(f"{root / name}: not the file its meta recorded")
+        out.append((meta, root / "filled_yuv420.npy", root / "keep.npy"))
+    return out
+
+
 # ----------------------------------------------------------------- rescore (SVT-AV1 streams with LPIPS)
 
 
@@ -252,22 +277,71 @@ def command_finetune(args: argparse.Namespace) -> int:
     frames, keep, start = load_scene(dirs[fit_id], by_id[fit_id], visor_fill)
     if fit_id == clip_id and start != clip.start:
         raise RuntimeError(f"{clip_id}: scene excerpt {start} != G5's {clip.start}")
-    fit = fit_indices(len(frames), start, g5.EXCERPT_FRAMES if args.limit_frames <= 0 else clip.n, clip.fps, args.fit)
+    fit = fit_indices(len(frames), start, g5.EXCERPT_FRAMES if args.limit_frames <= 0 else clip.n, clip.fps,
+                      "heldout" if args.fit == "heldout" else "scene")
     if args.limit_frames > 0:  # smoke: a few dozen fitted frames
         fit = fit[:max(args.limit_frames, 24)]
-    workers = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 4))
-    filled = inpaint_frames(frames, keep, fit, workers)
-    np.save(work / "frames.npy", g5.rgb_to_yuv420(filled))
+    prefilled = load_prefilled(args.prefilled)
+    if fit_id in prefilled:  # G5c: ProPainter's fill of the whole stretch, made once (`g5c.py prefill`)
+        meta, path = prefilled[fit_id]
+        if meta["first"] != 0 or meta["frames"] != len(frames):
+            raise SystemExit(f"{fit_id}: the prefill covers {meta['first']}+{meta['frames']}, not the stretch")
+        np.save(work / "frames.npy", np.load(path))
+        fill_name = meta["fill"]
+    else:
+        workers = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 4))
+        np.save(work / "frames.npy", g5.rgb_to_yuv420(inpaint_frames(frames, keep, fit, workers)))
+        fill_name = "telea"
     np.save(work / "keep.npy", keep)
-    del frames, filled
+    del frames
+    footage = load_footage(args.footage)
+    if args.fit == "footage" and not footage:
+        raise SystemExit("--fit footage needs --footage")
+    if footage:  # G5c step 3: other recordings of the kitchen after the stretch, a masked blank frame between pieces
+        yuv, mask = [np.load(work / "frames.npy")], [np.load(work / "keep.npy")]
+        extra, at = [], len(yuv[0])
+        for meta, yuv_path, keep_path in footage:
+            if meta["target"] != fit_id:
+                raise SystemExit(f"footage for {meta['target']}, not {fit_id}")
+            f, k = np.load(yuv_path), np.load(keep_path)
+            for seg in meta["segments"]:
+                yuv += [np.zeros_like(f[:1]), f[seg["offset"]:seg["end"]]]
+                mask += [np.zeros_like(k[:1]), k[seg["offset"]:seg["end"]]]
+                extra += list(range(at + 1, at + 1 + seg["end"] - seg["offset"]))
+                at += 1 + seg["end"] - seg["offset"]
+        np.save(work / "frames.npy", np.concatenate(yuv))
+        np.save(work / "keep.npy", np.concatenate(mask))
+        del yuv, mask
+        fit = extra if args.fit == "footage" else fit + extra
     prepare_seconds = time.time() - began
 
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
+    if args.resume and args.limit_frames <= 0 and checkpoints is not None and not (checkpoints / "state.pt").is_file():
+        # a timed-out run's salvaged checkpoint.tar (extracted): the full stage continues from its saved step
+        # (the smoke trains its own few steps from the start)
+        checkpoints.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(Path(args.resume) / "checkpoint" / "state.pt", checkpoints / "state.pt")
+    init = None
+    if args.init:  # G5c: continue a published arm (its weights; a fresh optimizer), e.g. a longer schedule
+        ft_dir = Path(args.init) / "publish" / "finetune"
+        init = {**{k: v for k, v in json.loads((ft_dir / "result.json").read_text()).items()
+                   if k in ("arm", "steps", "fit", "fit_clip")}, "checkpoint": str(ft_dir / "video_ft.pth.tar")}
+        init["checkpoint_sha256"] = file_sha256(Path(init["checkpoint"]))
+        recorded = json.loads((ft_dir / "result.json").read_text())["model"]["checkpoint_sha256"]
+        if init["checkpoint_sha256"] != recorded or init["fit_clip"] != fit_id:
+            raise SystemExit(f"{ft_dir}: not a recorded checkpoint of {fit_id}")
+    frame_weights = [float(w) for w in args.frame_weights.split(",")] if args.frame_weights else None
+    if frame_weights is not None and len(frame_weights) != 3:
+        raise SystemExit("--frame-weights: last, even, odd positions of a group (DCVC-UF's 1.5,0.16,0.4)")
     plan = {**TRAIN, "frames": str(work / "frames.npy"), "keep": str(work / "keep.npy"), "fit": fit,
+            "lr": args.lr if args.lr else TRAIN["lr"], "frame_weights": frame_weights,
             "steps": args.steps, "monitor_every": max(1, args.steps // 10), "save_every": max(1, args.steps // 10),
             "lpips_weight": args.lpips_weight, "lpips_backbone": args.lpips_backbone,
+            "dists_weight": args.dists_weight, "dists_backbone": args.dists_backbone,
+            "temporal_weight": args.temporal_weight, "dists_every": args.dists_every,
             "image_ckpt": args.image_ckpt, "image_sha256": file_sha256(Path(args.image_ckpt)),
-            "video_ckpt": args.video_ckpt, "video_sha256": file_sha256(Path(args.video_ckpt)),
+            "video_ckpt": init["checkpoint"] if init else args.video_ckpt,
+            "video_sha256": init["checkpoint_sha256"] if init else file_sha256(Path(args.video_ckpt)),
             "out": str(work / "model"), "resume_dir": str(checkpoints) if checkpoints else None}
     if args.limit_frames > 0:  # smoke: short sequences, small patches
         plan.update(groups=1, patch=[256, 256], monitor_batch=1, log_every=1)
@@ -284,9 +358,18 @@ def command_finetune(args: argparse.Namespace) -> int:
     train_log = [json.loads(line) for line in log_text.splitlines() if line.startswith("{")]
 
     # The held-out excerpt, coded by the fine-tuned model (and nothing else changed).
-    net = g5.load_lpips(args.lpips_backbone, "cuda")
+    from experiments.background import g5c
+
+    nets = g5c.load_nets(args) if args.dists_backbone else None
+    net = nets.lpips if nets else g5.load_lpips(args.lpips_backbone, "cuda")
+    flows = g5c.source_flows(clip) if nets else None
     source = work / "filled.yuv"
-    g5.rgb_to_yuv420(g5.inpaint(clip)).tofile(source)
+    if clip_id in prefilled:
+        meta, path = prefilled[clip_id]
+        offset = clip.start - meta["first"]
+        np.ascontiguousarray(np.load(path, mmap_mode="r")[offset:offset + clip.n]).tofile(source)
+    else:
+        g5.rgb_to_yuv420(g5.inpaint(clip)).tofile(source)
     coder = SimpleNamespace(image_ckpt=args.image_ckpt, video_ckpt=trained["checkpoint"])
     publish = scratch / "publish" / "finetune"
     shutil.rmtree(publish, ignore_errors=True)
@@ -302,16 +385,31 @@ def command_finetune(args: argparse.Namespace) -> int:
         points.append({"codec": "dcvc-uf-htl-ft", "input": "filled", "qp": qp,
                        "kbps": rec["bytes"] * 8 / clip.duration / 1000, "decoded_frames": len(decoded),
                        "decode_ms_per_frame": 1000 * min(rec["decode_seconds"]) / clip.n, **rec,
-                       "score": g5.score(clip, g5.yuv420_to_rgb(decoded), net, "cuda")})
+                       "score": (g5c.full_score(clip, g5.yuv420_to_rgb(decoded), nets, flows)
+                                 if nets and flows is not None else g5.score(clip, g5.yuv420_to_rgb(decoded), net, "cuda"))})
         shutil.rmtree(work / f"qp{qp}")
     shutil.copyfile(trained["checkpoint"], publish / "video_ft.pth.tar")
     shutil.copyfile(log_path, publish / "train.log")
     arm = f"{'upper' if args.fit == 'heldout' else ('scene' if fit_id == clip_id else 'other')}-" \
           f"{'lpips' if args.lpips_weight > 0 else 'mse'}"
+    if footage:
+        arm = arm.replace("scene-", "footage-" if args.fit == "footage" else "scene+footage-", 1)
+    if prefilled:  # G5c arms: the fill and every loss weight in the name
+        arm += f"-b{args.lpips_weight:g}" + ("-dists" if args.dists_weight else "") + \
+               (f"-t{args.temporal_weight:g}" if args.temporal_weight else "") + \
+               (f"-w{args.frame_weights}" if args.frame_weights else "") + \
+               (f"-lr{args.lr:g}" if args.lr and args.lr != TRAIN["lr"] else "") + \
+               (f"-init{init['steps']}" if init else "") + f"-{fill_name}"
     row = {**clip.record, "kind": "finetune", "arm": arm, "fit": args.fit, "fit_clip": fit_id,
            "fit_frames": len(fit), "guard_s": GUARD_S if args.fit == "scene" else None,
-           "lpips_weight": args.lpips_weight, "steps": args.steps, "train": {**TRAIN, **{k: plan[k] for k in (
-               "groups", "patch", "monitor_batch", "monitor_every")}},
+           "lpips_weight": args.lpips_weight, "dists_weight": trained.get("dists_weight", 0.0),
+           "temporal_weight": args.temporal_weight, "dists_every": args.dists_every, "fill": fill_name,
+           "footage": [{k: m[k] for k in ("recordings", "frames", "yuv420_sha256")} | {"segments": [
+               {k: sg[k] for k in ("video", "first_index", "last_index", "frames")} for sg in m["segments"]]}
+               for m, _, _ in footage],
+           "steps": args.steps, "init": init, "resumed_archive": args.resume, "total_steps": args.steps + (init["steps"] if init else 0),
+           "train": {**TRAIN, **{k: plan[k] for k in (
+               "groups", "patch", "monitor_batch", "monitor_every", "lr", "frame_weights")}},
            "model": {k: trained[k] for k in ("checkpoint_sha256", "checkpoint_bytes", "parameters")},
            "model_bytes_fp16": 2 * trained["parameters"], "billed": False,
            "curve": trained["curve"], "converged": monitor_converged(trained["curve"]),
@@ -319,7 +417,8 @@ def command_finetune(args: argparse.Namespace) -> int:
            "peak_memory_gib": trained["peak_memory_gib"], "skipped_nonfinite": trained["skipped_nonfinite"],
            "train_log_tail": train_log[-5:], "prepare_seconds": round(prepare_seconds, 1),
            "seconds": round(time.time() - began, 1), "points": points,
-           "base_checkpoints": {"image_sha256": plan["image_sha256"], "video_sha256": plan["video_sha256"]},
+           "base_checkpoints": {"image_sha256": plan["image_sha256"],  # the public weights, also under --init
+                                "video_sha256": file_sha256(Path(args.video_ckpt))},
            "gpu": torch.cuda.get_device_name(0), "gpu_capability": list(torch.cuda.get_device_capability(0)),
            "trainer_gpu": trained["gpu"], "trainer_torch": trained["torch"]}
     write_json(publish / "result.json", row)
@@ -574,7 +673,8 @@ def main(argv: list[str] | None = None) -> int:
     rs.set_defaults(func=command_rescore)
     ft = sub.add_parser("finetune")
     common(ft)
-    ft.add_argument("--fit", choices=("heldout", "scene"), required=True)
+    ft.add_argument("--fit", choices=("heldout", "scene", "footage"), required=True)
+    ft.add_argument("--footage", nargs="*", default=[], help="G5c's extracted footage archives (other recordings)")
     ft.add_argument("--fit-clip", default=None, help="another stretch's scene frames (the cross-scene control)")
     ft.add_argument("--steps", type=int, required=True)
     ft.add_argument("--lpips-weight", type=float, default=0.0)
@@ -582,6 +682,19 @@ def main(argv: list[str] | None = None) -> int:
     ft.add_argument("--video-ckpt", required=True)
     ft.add_argument("--qps", default=",".join(map(str, QPS)))
     ft.add_argument("--timeout", type=float, default=3000)
+    ft.add_argument("--prefilled", nargs="*", default=[], help="G5c's extracted prefill archives (ProPainter fill)")
+    ft.add_argument("--dists-backbone", default=None, help="VGG16 for DISTS (scoring, and the loss if weighted)")
+    ft.add_argument("--dists-weight", type=float, default=0.0,
+                    help="DISTS on V in the loss; -1: set at step 0 so it equals the LPIPS term on the monitor set")
+    ft.add_argument("--dists-every", type=int, default=1, help="DISTS in the loss on every Nth frame of a group")
+    ft.add_argument("--temporal-weight", type=float, default=0.0,
+                    help="the change of the coding error between consecutive frames on V, in the loss")
+    ft.add_argument("--frame-weights", default=None,
+                    help="distortion weights of a group's last, even and odd positions (DCVC-UF: 1.5,0.16,0.4)")
+    ft.add_argument("--lr", type=float, default=0.0, help="learning rate (0: TRAIN's)")
+    ft.add_argument("--inception", default=None, help="Inception-v3 weights: KID on V and the position profile")
+    ft.add_argument("--init", default=None, help="an extracted finetune archive of this stretch to continue")
+    ft.add_argument("--resume", default=None, help="an extracted checkpoint.tar of a timed-out run of this arm")
     ft.set_defaults(func=command_finetune)
     wp = sub.add_parser("warp")
     common(wp)

@@ -338,40 +338,191 @@ weights repay themselves after 2.8–14 h.
 
 Same code and protocol as G5b, cheapest first; each item is gated by the one
 before only where noted.
-1. *Checks on the pilot's models, no training.* DISTS on V beside LPIPS (a
-   metric the model never trained on; VGG16 weights into `Models/`, approved),
-   on all G5b arms and SVT-AV1. A flicker measure on the visible background
-   (the decoded frame's change between frames, after warping by the source's
-   own flow, against the source's change). The model's size against
-   quality: the fine-tuned weights stored as a difference from the public
-   ones, quantized to 8 and 4 bits and entropy-coded, and the whole model at
-   8 bits, each re-coding the excerpts.
+1. *Checks on the pilot's models, no training.*
+   - DISTS on V beside LPIPS: a metric the model never trained on (VGG16
+     weights into `Models/`, approved), on all G5b arms and SVT-AV1.
+   - Flicker on the visible background: the decoded frame's change between
+     frames, after warping by the source's own flow, against the source's
+     change; SVT-AV1, DCVC-UF and both scene models.
+   - Model size against quality, every variant kept so the paper can offer
+     them by latency budget: the whole model at 16, 8, 4 and 2 bits, and
+     only the changed weights (the difference from the public weights,
+     which the client already has) at 8, 4 and 2 bits, dense and with only
+     the largest changes kept; each entropy-coded, each re-coding the
+     excerpts.
+   - The inpainted fill: OpenCV Telea per frame (now) against a temporal
+     video inpainter (ProPainter, `Models/ProPainter.pth`, audited into the
+     environment first), on the pilot excerpts, as rate at equal quality on V
+     and flicker of the fill. The fill is never scored, but every method codes
+     it, and the scene model trains on it. G4's comparison with panorama fills
+     comes later; if the temporal fill wins here, all arms switch to it.
+   *Done (2026-10-10, [experiments](docs/experiments.md), G5c):* the LPIPS
+   gain transfers to DISTS on the two pilots (−53% and −76% against SVT-AV1;
+   not on most other stretches, see step 2); DCVC-UF
+   flickers more than SVT-AV1 and β > 0 adds about a third; the model
+   ships as its 4-bit change from the public weights, 51 MB at equal
+   quality (payback 0.6–3.1 h; the change is dense, so smaller needs
+   step 4); ProPainter's fill beats Telea's by 11–13% for SVT-AV1 and
+   replaces it everywhere; DCVC-UF decodes reliably only on the
+   encoder's GPU class.
 2. *The distortion–perception trade.* The loss already holds both terms; a
    β sweep (adding 0.005 and 0.01 to 0 and 0.026) gives the curve between the
    PSNR-faithful and the LPIPS-optimal model. If flicker is found, a
-   temporal term joins the loss here.
+   temporal term joins the loss here. DISTS joins the loss as one more arm,
+   so the model learns from every metric it is scored on (user, 2026-10-10):
+   a model good on PSNR, LPIPS and DISTS at once is unlikely to game all
+   three, and the paper shows side-by-side frames so readers can check by
+   eye.
+   *Done (2026-10-11, [experiments](docs/experiments.md), G5c step 2):*
+   β = 0.005 (any perceptual weight flips the model from losing to beating
+   SVT-AV1 by two thirds or more on LPIPS_V and DISTS_V; larger β only
+   costs PSNR_V); DISTS in the loss trades LPIPS_V for DISTS_V and is not
+   adopted; a temporal term buys 13% less flicker at 40% LPIPS_V and is
+   not adopted. ProPainter's fill of all 10 stretches is published. The
+   recipe on all 10 stretches passes G5b's gate on LPIPS_V (median −41%
+   against SVT-AV1, 8 of 10 below 0) but not on DISTS_V (median +28%, 4
+   of 10): the pilots were among the best stretches. Step 3 starts from
+   this row.
 3. *Scene footage from other days.* EPIC-KITCHENS recorded each kitchen on
    several days (3–19 videos per pilot kitchen, 179 videos on the hosts). The
    scene model is fitted on the kitchen's other videos and scored on the
-   stretch's excerpt: hours of footage and a true hold-out across days. A
-   model pooled over many kitchens is the generalized model (and the control);
-   the scene model fine-tunes it per kitchen.
+   stretch's excerpt: hours of footage and a true hold-out across days. The
+   cross-kitchen control of G5b stays as the attribution check.
+   *Done (2026-10-11, [experiments](docs/experiments.md), G5c step 3):*
+   other recordings of the kitchen do not improve the stretch's own model
+   at 540 steps, and alone they fall short of it, but a model made only
+   from them still beats SVT-AV1 by 60–74% on LPIPS_V on the calm pilots.
+   The oracle on the two fast stretches only ties or barely beats
+   SVT-AV1 (−0.3%, −11%): there the base codec's motion coding is the
+   limit, not the footage.
 4. *Recipe.* The image model that codes each stream's first frame adapted
-   too; adapting only part of the network (decoder and entropy model, or
-   low-rank adapters); learning rate, crop size and steps, a bounded sweep.
-   Speed over polish until the baselines are beaten; final results train to
-   convergence.
-5. *The rest.* The chosen recipe on the 8 untouched stretches, against
-   SVT-AV1 also at its visual-quality tune with film-grain synthesis and
-   against the pooled model.
-Deferred to after a working pipeline: why DCVC-UF off the shelf ranks worse on
-LPIPS than on PSNR (grain removed by an MSE decoder, quality swings within
-its 8-frame groups, the 4:2:0 input path; one test each), the 1080p check,
-and a small viewing test. VMAF joins at H5, on whole frames.
+   too, on the same scene frames; adapting only part of the network (decoder
+   and entropy model, or low-rank adapters); learning rate, crop size and
+   steps, a bounded sweep. Speed over polish until the baselines are beaten;
+   final results train to convergence.
+   Selection (user, 2026-10-11): the recipe is chosen by how many of
+   PSNR_V, LPIPS_V, DISTS_V and flicker it beats SVT-AV1 on (median
+   BD-rate over the stretches), ties broken by the mean BD-rate; visual
+   comparisons are made at matched rate (each model re-coded at the QP
+   nearest the target rate), never at matched QP. The user's blind look
+   at equal QP (2026-10-11) could not tell β = 0.026 with and without
+   DISTS apart, and preferred both over β = 0.005 and β = 0, which also
+   spent fewer bits.
+   *Round 1 done (2026-10-11, [experiments](docs/experiments.md), G5c
+   step 4):* the image model is not adapted (the intra frame is 1.4–9.6%
+   of the bytes); KID on V joins the selection as a held-out judge; a 3×
+   learning rate is adopted (beats SVT-AV1 on LPIPS_V −65% and DISTS_V
+   −10% over the 4 development stretches, against C's 1 metric); flat
+   frame weights flatten DCVC-UF's quality swing only partly and cut
+   flicker 5%, not adopted. PSNR_V and flicker stay DCVC-UF's losses.
+   *Round 2 done (2026-10-12):* 10⁻⁴ is not better; **the recipe is
+   β = 0.005, learning rate 3 × 10⁻⁵, ProPainter's fill, 540 steps**,
+   on all 10 stretches it beats SVT-AV1 on LPIPS_V by a median 50%
+   (9 of 10), and on DISTS_V on the four calmest; PSNR_V, flicker and
+   KID_V are lost. All BD-rates against SVT-AV1 were
+   corrected on 2026-10-12 (its envelope was a staircase, optimistic by
+   about 7%; no decision changed; [experiments](docs/experiments.md)).
+   *Round 3 (2026-10-12):* 1,080 steps improve every stretch a little
+   (LPIPS_V 1–11 points) but by less than the rule's margin, so the
+   recipe stays at 540 steps for development and the paper's final runs
+   train to convergence; the fast stretches reach a narrow LPIPS_V win
+   (P06_05 −19%) and a tie (P04_13). G5d step 2: the enhancer from
+   other recordings beats SVT-AV1 on LPIPS_V and DISTS_V on both pilots
+   but misses the 3-metric rule on P26_02; a temporal (decoded-frame)
+   input does not cut its flicker.
+   *Model size (2026-10-12):* the recipe ships as its 4-bit change from
+   the public weights, 50 MB at equal quality (2-bit breaks); payback
+   2.4–3.4 hours of stream at 50 kbps on the pilots.
+   *G5d oracle (user 2026-10-11, done 2026-10-12):* a venue-trained
+   enhancer after plain SVT-AV1 (NAS-style, 1.2 MB), fitted on the
+   stretch's other frames with LPIPS in its loss, beats SVT-AV1 by 10%
+   or more on LPIPS_V, DISTS_V and KID_V on both pilots, and loses less
+   PSNR_V and flicker than the scene model; fitted for MSE alone it does
+   nothing. By its rule a venue-footage enhancer is next, compared with
+   the scene model.
+5. *Scope: calm and moving viewpoints.* The scene model's gain tracks the
+   excerpt's motion and SVT-AV1's rate (step 2). More calm stretches,
+   chosen by G1's camera-motion audit with a threshold fixed before any
+   coding, test that the gain holds on calm scenes; the moving ones stay
+   in the paper. The oracle on the losing stretches (fitted on the
+   excerpt itself) tells whether their loss is the footage's or the
+   method's, and step 3 how much real footage closes it.
+6. *The rest.* The chosen recipe on the 8 untouched stretches, against
+   SVT-AV1 also at its visual-quality tune with film-grain synthesis.
+Deferred to after a working pipeline: a general model pooled over many
+kitchens with per-kitchen fine-tuning on top (the generalization claim); why
+DCVC-UF off the shelf ranks worse on LPIPS than on PSNR (grain removed by an
+MSE decoder, quality swings within its 8-frame groups, the 4:2:0 input path;
+one test each); the 1080p check; a small viewing test. VMAF joins at H5, on
+whole frames.
 **Done when** the scene model's recipe is fixed from recorded jobs and its
-curves on all 10 stretches (LPIPS, DISTS, PSNR on V, flicker, model size and
-payback) sit beside SVT-AV1's, the pooled model's and the unadapted
-DCVC-UF's.
+curves on all 10 stretches (LPIPS, DISTS, PSNR on V, flicker, model size per
+variant and payback) sit beside SVT-AV1's and the unadapted DCVC-UF's.
+
+#### G6. The background in the first working PointStream (plan, 2026-10-12)
+
+What H5 needs from G: for each of evaluation set v2's 34 windows (1080p,
+4:2:0, 50 or 59.94 frames/s, 4 s), the background's bitstream, its decoded
+frames and decode time, at several rates, so the foreground session can
+composite and B2's harness can score the whole frame. G5c worked on 10
+stretches at 960×540 and 10 frames/s; three gaps lie between. Two routes
+go in (user, 2026-10-12): the scene model (DCVC-UF adapted, recipe L) and
+the venue enhancer after SVT-AV1 (G5d). Cheapest first:
+1. *Interface, agreed with the foreground session before any run.* Input:
+   the window's 1080p frames and a per-frame foreground mask F (the pixels
+   the foreground stream delivers; the encoder fills F with ProPainter and
+   codes the filled frames). Output per rate point: bytes, decoded 1080p
+   frames, decode milliseconds per frame; once per venue: the model, its
+   shipped size and payback. Composite at the client: foreground pixels
+   over the decoded background on F. Scoring: B2's harness (weighted PSNR
+   and LPIPS on dataset masks) plus every metric as BD-rate against
+   SVT-AV1 and DCVC-UF on the whole frame. Open: the mask source at the
+   encoder (dataset masks for the first run, predicted masks after).
+2. *Resolution.* Does a scene model trained at 960×540 help at 1080p?
+   Two options, one smoke each on the pilots' windows: code the background
+   at 1080p with the model as trained (patches are resolution-free), or
+   code it at 540p and upsample at the client (the viewer barely looks at
+   it; PRESLEY). Rate at equal quality on V decides.
+3. *Frame rate.* The windows are 5–6× denser in time than the stretches'
+   10 frames/s, so motion per frame is smaller and DCVC-UF's temporal
+   prediction does more of the work. Training sequences at the window's
+   native rate (footage extracted at native rate, shorter segments) against
+   the 10 frames/s model, on the pilots' windows.
+4. *Scene footage for every window.* Step 3's pipeline (SAM 3.1 and EPIC
+   detections, which cover exactly the 34 videos, then ProPainter) on the
+   window's own video outside the window and a guard, and the kitchen's
+   other recordings for the venue-only variants. About 34 footage jobs.
+5. *Both routes on all 34 windows,* against SVT-AV1 and DCVC-UF coding
+   the same filled background; published for the foreground session's
+   compositor, with rate allocation between foreground and background
+   taken as the concave hull over their rate combinations, per metric.
+Budget: steps 2–3 about 4 GPU-hours; step 4 about 25; step 5 about 40
+(34 windows × two routes). Steps 2–3 run first and decide the settings
+of 4–5; each stage stays under 45 minutes per job.
+*Steps 2–3 done (2026-10-12, [experiments](docs/experiments.md), G6):*
+SVT-AV1 codes the background at 1080p; the scene model at 960×540,
+upsampled at the client; at the windows' native rate it beats SVT-AV1
+on LPIPS_V, DISTS_V and KID_V on both pilots (−91% and −45% on
+LPIPS_V). The frame-rate rule missed by 1 point and the user treated it
+as passed: native-rate and 1080p training are deferred to the final
+runs as ablations.
+*Interface, agreed with the foreground session (2026-10-12):* the
+background codes the whole 1080p frame with F filled, so its decoded
+frames are valid everywhere. F, first run: B2's dataset foreground (the
+union of B1b's `visor_dense_sam_fill` instances), filled exactly (no
+dilation; the foreground blends linearly over an 8 px ring outside F, so
+true background must survive there). The mask is granted in the first
+run, stated, and reported as its own line (its cost, 72–170 kbps for a
+raw outline per H3b2, is an open H5 item). Rates: about 10 kbps to
+2 Mbps, at least five log-spaced points per route (the allocation is the
+concave hull over foreground and background combinations). Published per
+window: decoded frames (raw 4:2:0 or FFV1; DCVC-UF decodes differ across
+GPU classes) and a manifest (window id and frame range, F's mask-set
+sha256, and per rate point bytes, bitstream sha256, per-frame decoded
+sha256s, decode ms per frame, GPU class, job id, `git_head`).
+**Done when** both routes' background streams for all 34 windows are
+published with the interface above and the foreground session has
+composited them.
 
 ### H. Foreground (user, 2026-10-08)
 
