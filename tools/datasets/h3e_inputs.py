@@ -111,9 +111,12 @@ def main() -> int:
     pilot = [json.loads((Path(args.h3c_dir) / f"h3c2-{v}.json").read_text())["scale"]["items"]["full"] for v in PILOT]
     videos = sorted(k for k in staged if k.startswith("video_"))
     dest.mkdir(parents=True, exist_ok=True)
-    inputs = dest / "inputs.json"
-    inputs.write_text(json.dumps({"files": {k: {"path": v["path"], "sha256": v["sha256"]} for k, v in sorted(staged.items())},
-                                  "pilot_items": pilot, "dev_candidates": list(DEV_CANDIDATES)}, indent=1, sort_keys=True) + "\n")
+    # Content-addressed, so a later run never changes the manifest an earlier spec (maybe running) names.
+    text = json.dumps({"files": {k: {"path": v["path"], "sha256": v["sha256"]} for k, v in sorted(staged.items())},
+                       "pilot_items": pilot, "dev_candidates": list(DEV_CANDIDATES)}, indent=1, sort_keys=True) + "\n"
+    inputs = dest / f"inputs-{hashlib.sha256(text.encode()).hexdigest()[:12]}.json"
+    if not inputs.exists():
+        inputs.write_text(text)
     poses = ["--poses", "{staged:poses_0}", "--poses", "{staged:poses_1}", "--pose-code", "{staged:code}",
              "--mano-left", "{staged:mano_left}", "--mano-right", "{staged:mano_right}"]
     window = ["--eval-set", "{staged:eval_set}", "--archive", "{staged:dense_archive}",
