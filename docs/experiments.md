@@ -3437,3 +3437,43 @@ invocation turns out to be needed.
   QP 0 at ½, 8.3) is close to it with slightly more fold detail. No
   synthesized or periodic texture in any. The source itself is motion
   blurred here.
+- Component, outcome (stage 2). Training `20261012T021957Z-703553f1`
+  (shared, RTX 6000 Ada, code `17b6dc0`; 24 items of 14 participants, two
+  segments per item and scale, 6,912 fitted frames; β = 0.084, 540 steps;
+  converged; validator 8/8; peak 46.69 GiB allocated, close to the 47,000
+  MiB declared). Coding (code `26643b1`, validators passed): P01_107
+  `20261012T030241Z-1217c42b`, P02_02 `…030324Z-534c7f95`, P03_10
+  `…030418Z-3df2f007`, P09_106 `…030512Z-00191e69`. Report (code
+  `26643b1`): `pointstream-data/visor/h3c-2026-10-11/report-stage2/h3c-report.json`
+  (`a402322a11ff7d2d…`), over all 16 coding jobs.
+
+  | item | LPIPS_R vs SVT-AV1 | vs reference | DISTS_R | PSNR_R | whole-frame rate |
+  |---|---|---|---|---|---|
+  | P01_107 | +19% | +219% | +31% | +169% | −31% |
+  | P02_02 | −59% | +21% | −36% | −48% | −81% |
+  | P03_10 | +55% | +286% | −24% | +236% | −56% |
+  | P09_106 | −39% | +80% | −33% | −30% | −79% |
+  | mean | −6% (95% CI −49% to +37%), 2 of 4 below 0 | +151% | | | |
+
+  **Not adopted**: it does not beat SVT-AV1 on 3 of 4 items, and it is
+  151% worse than DCVC-UF off the shelf.
+- Reading. Fine-tuning DCVC-UF for hands does not pay. Fitted to the test
+  windows themselves it gains only 14% over the published model; fitted to
+  other people's hands it loses, by a factor of 2.5 on average in rate at
+  equal LPIPS on R. As for β = 0 in stage 1, the whole-frame rate falls
+  (−31% to −81% against SVT-AV1) while the rate on the hands rises: with
+  the distortion counted only on R and the rate on the whole patch, the
+  model learns to drop the background, and on unseen hands it has also
+  lost some of what the published model knew. A loss with the rate on R
+  only, or the hands coded without the background, would be a different
+  design; nothing here suggests it would beat the published model by much,
+  since even the upper bound barely did. **H3c's outcome is the reference**:
+  DCVC-UF HT-L off the shelf codes VISOR's hand pixels for about 63% less
+  rate than SVT-AV1 at equal LPIPS (CI −68% to −59%, 4 of 4 items; PSNR
+  and the whole-frame rate agree, DISTS on 2 of 4). H3d's bar (and any
+  generator's) is the lower envelope of SVT-AV1 and DCVC-UF off the shelf
+  on R, per item. Scope: 4 pilot items, 240 frames each; one β; one
+  trainer recipe (G5b's).
+- GPU time: about 7 GPU-hours (calibration 0.1, three training runs 1.6,
+  16 coding jobs about 4.5, failed attempts about 0.5), within the 8
+  allowed. Shared jobs' timings are not evidence.

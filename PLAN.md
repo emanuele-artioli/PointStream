@@ -557,6 +557,17 @@ frame without prediction. If a generator is revisited (agreed, user,
 then bridging pose gaps of ≤ 10 frames (83% of breaks) and boxes from the
 masks rather than the detector.
 
+H3c (2026-10-12, [outcome](docs/experiments.md#2026-10-11--h3c-a-perceptually-tuned-dcvc-uf-for-the-hand-pixels)):
+tuning does not pay, but DCVC-UF itself does. Off the shelf, DCVC-UF HT-L
+(at full, ½ and ¼ resolution, rate split onto the hand region by its own
+entropy model) needs about 63% less rate than SVT-AV1 for the same LPIPS on
+the 4 pilot items' hand pixels (CI −68% to −59%; PSNR agrees, DISTS on 2 of
+4). Fine-tuned on the test windows with β·LPIPS it gains only 14% more; on
+other participants' hands it is 151% worse than the published model, and
+tuning without LPIPS starves the background instead of coding the hands
+better. So H3d's bar, and any generator's, is the lower envelope of
+SVT-AV1 and DCVC-UF off the shelf on R, per item. H3d is next.
+
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a
