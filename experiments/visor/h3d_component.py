@@ -345,8 +345,17 @@ def code_only(args: argparse.Namespace, source: Path, size: tuple[int, int], fra
         if done.returncode:
             raise RuntimeError(f"DCVC-UF {action} failed ({done.returncode}):\n{done.stderr[-4000:]}")
         reports[action] = json.loads((work / f"{action}.json").read_text())
+    decode = reports["decode"]
+    # As H3c's coder: a decode whose two passes differ, or that is not the encoder's, is not data (G's ½ networks,
+    # 2026-10-13: QP 21's footage decoded to noise on a shared gpu5 and was fitted before this check existed).
+    if not decode["deterministic"] or decode["passes"][0]["frame_sha256"][0] != reports["encode"]["i_recon_sha256"]:
+        raise RuntimeError(f"DCVC-UF QP {qp} at {width}x{height}: the decode is not the encoder's (two decodes agree: "
+                           f"{decode['deterministic']})")
+    count = (work / "decoded.yuv").stat().st_size // (width * height * 3 // 2)
+    if count < frames:
+        raise RuntimeError(f"DCVC-UF QP {qp}: decoded {count} of {frames} frames")
     return {"bytes": (work / "stream.psdc").stat().st_size, "stream_sha256": file_sha256(work / "stream.psdc"),
-            "decoded": str(work / "decoded.yuv"), "deterministic": bool(reports["decode"]["deterministic"])}
+            "decoded": str(work / "decoded.yuv"), "deterministic": True}
 
 
 def parse_point(name: str) -> tuple[float, int]:
