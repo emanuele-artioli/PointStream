@@ -670,7 +670,7 @@ def realism(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]]) -> dict[s
 
 def decide(items: dict[str, dict[str, Any]]) -> dict[str, Any]:
     out: dict[str, Any] = {"rule": DECISION}
-    complete = set(items) == set(PILOT)
+    complete = sorted(i.rsplit("_", 1)[0] for i in items) == sorted(PILOT)  # item ids are <video>_<first frame>
     for variant, key in (("v1", "v1_statistic"), ("v2", "v2")):
         savings = np.array([e[key]["saving"] for e in items.values()])
         if len(savings):

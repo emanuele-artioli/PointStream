@@ -88,7 +88,7 @@ def test_saving_beyond_the_front_takes_its_ends_as_bounds():
 
 
 def items_with(v1, v2):
-    return {i: {"v1_statistic": {"saving": a}, "v2": {"saving": b}} for i, a, b in zip(h3c.PILOT, v1, v2)}
+    return {f"{i}_0000000001": {"v1_statistic": {"saving": a}, "v2": {"saving": b}} for i, a, b in zip(h3c.PILOT, v1, v2)}
 
 
 @pytest.mark.parametrize("v1,v2,expected", [
