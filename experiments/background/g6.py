@@ -183,6 +183,14 @@ def decode_planes(video: Path, indices: list[int], threads: int = 8) -> tuple[np
     return np.stack(planes), formats == {"yuvj420p"} or ranges in ({"2"}, {"JPEG"})
 
 
+def decode_planes_task(task: dict[str, Any]) -> bool:
+    """`decode_planes` in a spawned process, its planes saved to ``task["out"]``: PyAV's threaded H.264
+    decoder has deadlocked on close inside the process that holds SAM 3.1 (P26_02, twice)."""
+    planes, full_range = decode_planes(Path(task["video"]), task["indices"])
+    np.save(task["out"], planes)
+    return full_range
+
+
 def command_footage(args: argparse.Namespace) -> int:
     """The window's own footage outside it: ``scene``, at 10 frames/s and 960×540 (the scene model's
     training set); ``native``, short segments at the window's rate and 1080p (the enhancer's pairs)."""
@@ -228,6 +236,10 @@ def command_footage(args: argparse.Namespace) -> int:
         with ProcessPoolExecutor(max_workers=1, mp_context=ctx) as pool:
             decoded = pool.submit(g1.decode_clip, {"plan": clip, "out": str(seg_work), "threads": 8,
                                                    "path": args.video, "jpeg_dir": str(seg_work / "jpeg")}).result()
+            if native:
+                full_ranges.add(pool.submit(decode_planes_task, {"video": args.video, "indices": clip["indices"],
+                                                                 "out": str(seg_work / "planes.npy")}).result(600))
+                big_all.append(np.load(seg_work / "planes.npy"))
         t0 = time.time()
         masks = g1.sam_text_masks(segmenter, clip, seg_work / "jpeg")
         sam_seconds = time.time() - t0
@@ -236,10 +248,6 @@ def command_footage(args: argparse.Namespace) -> int:
         fg_record = g1.foreground(clip, seg_work, base, None, args.hand_objects)
         frames_all.append(np.load(seg_work / "frames.npy"))
         keep_all.append(~np.load(seg_work / "foreground.npy"))
-        if native:
-            planes, full_range = decode_planes(Path(args.video), clip["indices"])
-            big_all.append(planes)
-            full_ranges.add(full_range)
         records.append({"first_index": a, "last_index": b, "frames": len(clip["indices"]), "decode": decoded,
                         "sam_seconds": round(sam_seconds, 1), "foreground": fg_record,
                         "fg_share": float(1 - keep_all[-1].mean())})
