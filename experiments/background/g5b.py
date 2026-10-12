@@ -316,6 +316,10 @@ def command_finetune(args: argparse.Namespace) -> int:
     prepare_seconds = time.time() - began
 
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
+    if args.resume and checkpoints is not None and not (checkpoints / "state.pt").is_file():
+        # a timed-out run's salvaged checkpoint.tar (extracted): the trainer continues from its saved step
+        checkpoints.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(Path(args.resume) / "checkpoint" / "state.pt", checkpoints / "state.pt")
     init = None
     if args.init:  # G5c: continue a published arm (its weights; a fresh optimizer), e.g. a longer schedule
         ft_dir = Path(args.init) / "publish" / "finetune"
@@ -402,7 +406,7 @@ def command_finetune(args: argparse.Namespace) -> int:
            "footage": [{k: m[k] for k in ("recordings", "frames", "yuv420_sha256")} | {"segments": [
                {k: sg[k] for k in ("video", "first_index", "last_index", "frames")} for sg in m["segments"]]}
                for m, _, _ in footage],
-           "steps": args.steps, "init": init, "total_steps": args.steps + (init["steps"] if init else 0),
+           "steps": args.steps, "init": init, "resumed_archive": args.resume, "total_steps": args.steps + (init["steps"] if init else 0),
            "train": {**TRAIN, **{k: plan[k] for k in (
                "groups", "patch", "monitor_batch", "monitor_every", "lr", "frame_weights")}},
            "model": {k: trained[k] for k in ("checkpoint_sha256", "checkpoint_bytes", "parameters")},
@@ -689,6 +693,7 @@ def main(argv: list[str] | None = None) -> int:
     ft.add_argument("--lr", type=float, default=0.0, help="learning rate (0: TRAIN's)")
     ft.add_argument("--inception", default=None, help="Inception-v3 weights: KID on V and the position profile")
     ft.add_argument("--init", default=None, help="an extracted finetune archive of this stretch to continue")
+    ft.add_argument("--resume", default=None, help="an extracted checkpoint.tar of a timed-out run of this arm")
     ft.set_defaults(func=command_finetune)
     wp = sub.add_parser("warp")
     common(wp)
