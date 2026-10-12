@@ -3477,3 +3477,54 @@ invocation turns out to be needed.
 - GPU time: about 7 GPU-hours (calibration 0.1, three training runs 1.6,
   16 coding jobs about 4.5, failed attempts about 0.5), within the 8
   allowed. Shared jobs' timings are not evidence.
+
+### 2026-10-12 — H3c2: pose fidelity at rate (pixels against keypoints)
+- Question (user, 2026-10-12). If the decoded hand only has to carry its
+  pose, with identity allowed to change (as for robot learning, the
+  coding-for-machines view), H2's coded keypoints (1.93 kbps) plus a hand
+  generator delivered with the decoder, and billed nothing, compete with
+  the pixel coders. H3c measured DCVC-UF off the shelf at 0.7–2 kbps on R
+  at ¼ and ½ scale. At equal pose fidelity, which needs fewer bits: the
+  keypoints or the pixels? This decides whether a generative-hand path
+  (keypoints and a client-side generator, as generative face video coding
+  does with facial keypoints) is worth building beside the pixel route.
+- Pose error. On every 5th window frame with a fitted hand (H3b's judge
+  frames), WiLoR is re-run with H2's box on the decode inside R (source
+  outside, as H3c scores) and on the source; per hand, the mean 2D
+  distance over the 21 joints between the two, over the box size (H3b's
+  judge). For the keypoint stream, the coded joints (H2's coding, each
+  track with its median shape, decoded and projected as H3b) against WiLoR
+  on the source, over the same box size. Mean over the item's judged hands.
+- Points, per pilot item (B2's four). Pixels: SVT-AV1's eleven points and
+  DCVC-UF off the shelf at 3 scales × 3 QPs, coded again exactly as H3c
+  (rates and LPIPS must reproduce H3c's units). Keypoints: H2's choices for
+  WiLoR at the 0, 100 and 267 ms budgets (7.70, 1.93 and 1.70 kbps over the
+  34 items; H2's rates are dataset means, so the same rate is used on
+  every item).
+- An oracle for the keypoint route: it grants a perfect generator, which
+  renders exactly the coded pose, the forearm and the occlusions, for
+  free. A real generator only adds error.
+- Decision rule (`h3c2` in `h3c.DECISION`, fixed before the run). Per item,
+  the pixel envelope (SVT-AV1 and DCVC-UF off the shelf together, Pareto
+  front on rate and pose error); the rate it needs for the 100 ms
+  keypoints' pose error (linear in log rate along the front; none beyond
+  it); saving = 1 − 1.93 / that rate. The generative-hand path **opens**
+  (planned beside the pixel route, judged identity-free: pose fidelity,
+  KID and flicker) if the mean saving's 95% bootstrap interval (by item)
+  lies above 50% (H3b2's bar: halving the pixels' rate, to pay for a real
+  generator's own error). It **closes** if the mean saving is at or below
+  0: a pixel coder carries the pose as well as the keypoints at their
+  rate, and also the appearance. Otherwise it is unclear and goes to the
+  user. The rate at which each pixel coder matches the 0 ms keypoints'
+  error, and the keypoints' rate needed to beat the pixel envelope at
+  1.93 kbps, are reported beside.
+- Hypothesis. Below 2 kbps the pixel coders blur the hand (H3c: LPIPS
+  about 0.37 at ¼ scale), so WiLoR misreads the fingers; matching the coded
+  keypoints (about 9 px, H3b) needs 5–10 kbps, a saving of 60–80%: the path
+  opens.
+- Competing explanation. WiLoR's error on a blurred hand may stay small
+  because it leans on its hand prior, which favours the pixels; the
+  keypoints' error includes H2's smoothing and 15 Hz interpolation, which a
+  generator would also inherit, so it is the fair one to compare.
+- Budget. One shared GPU job per pilot item (H3c's anchor jobs plus WiLoR
+  on 48 judge frames) ≤ 45 minutes; about 1.5 GPU-hours.
