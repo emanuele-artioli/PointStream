@@ -2822,6 +2822,20 @@ invocation turns out to be needed.
   P04_13 `…213139Z-48eb8982` (`86e541b`, after `…184146Z-e007b2f1` was
   contended with nothing to resume and `…201618Z-4cdfa689` was
   cancelled unstarted to run shared).
+- Recipe on all 10 stretches (L; the 4 development runs above plus P03_10
+  `20261011T233134Z-71d961b4`, P04_13 `…233143Z-06b131c9`, P06_05
+  `…233152Z-26887ec8`, P09_106 `…233201Z-058c940e`, P37_102
+  `…233211Z-d001e77e`, P06_106 `…233220Z-2f6b67a2`; code `d64d6ba`, Ada,
+  shared GPUs, all converged). BD-rate against SVT-AV1 (corrected anchor),
+  median over the 10 | stretches below 0, with step 2's C beside it:
+  LPIPS_V **−50%** | 9 of 10 (C −39% | 8); DISTS_V +19% | 4 (C +30% | 4);
+  PSNR_V +98% | 0 (C +130%); flicker worse on all 10; KID_V +37% | 1.
+  By stretch, LPIPS_V: P26_02 −92%, P37_102 −68%, P06_03 −66%, P06_10
+  −55%, P06_106 −51%, P03_10 −50%, P02_09 −31%, P09_106 −31%, P06_05 −8%,
+  P04_13 +12%. DISTS_V beats SVT-AV1 on the four calmest (P26_02 −73%,
+  P06_03 −38%, P37_102 −31%, P06_106 −11%). Over all 10 the recipe beats
+  SVT-AV1 on 1 of the 5 metrics; on the calm stretches on 2 (LPIPS_V,
+  DISTS_V).
 
 ### 2026-10-11 — G5d oracle: a venue-trained enhancer of SVT-AV1 (user, 2026-10-11)
 - Question: can knowledge of the venue held at the client make plain
