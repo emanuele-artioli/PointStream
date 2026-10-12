@@ -688,6 +688,7 @@ def command_enhance(args: argparse.Namespace) -> int:
             enh_points.append({**restored[keys[1]], "restored_from_checkpoint": True})
             progress(done)
             continue
+        (work / f"footage-{crf}").mkdir(parents=True, exist_ok=True)
         with ThreadPoolExecutor(max_workers=2) as pool:  # both encoders run as subprocesses
             footage = pool.submit(svtav1.code, f_source, work / f"footage-{crf}", width=FULL[0], height=FULL[1],
                                   fps=clip.fps, frames=len(ids), crf=crf, preset=g5.PRESET, threads=8,
