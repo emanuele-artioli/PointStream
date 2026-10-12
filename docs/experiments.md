@@ -4753,3 +4753,92 @@ invocation turns out to be needed.
   alone (the proto-hand-conditioned DCVC-UF candidate in PLAN, or hand
   inpainting into the coded frames), or one conditioned on camera motion
   (Generated Reality conditions on head pose). Not built now: H3d is next.
+
+### 2026-10-12 — H3d oracle: a content-aware super-resolution of the hand pixels (NAS)
+- Question (PLAN H3d; user, 2026-10-11). NAS (Yeo et al., OSDI 2018) codes
+  the video at a low resolution and ships a small super-resolution network
+  trained on that video, its bits charged once. Coded at ¼ or ⅛ of the
+  resolution, the hand pixels reach the pose stream's rate (H3b2; DCVC-UF at
+  ¼ reaches 0.3–3 kbps on R, H3c). Does a network trained on the video's own
+  hands lift those decodes above H3c's bar: the per-item upper concave hull
+  of SVT-AV1 and DCVC-UF off the shelf on R, at equal LPIPS?
+- Oracle: the network fitted on the scored window itself, its bits free.
+  The component fits it on the video it streams too, but must pay for it
+  (amortized over the video, as PLAN I's payback) and sees more frames than
+  the window, so it fits each scored frame less closely. A fit that starts
+  as the identity on the scored frames' own (decode, source) pairs, without
+  a size charge, is therefore a bound for any NAS-style network of the same
+  size or smaller on these bases. It bounds only this configuration (one
+  network per coded stream, one frame in, its size); what to change after a
+  failure is stated with the outcome.
+- Method (`experiments/visor/h3d.py`, `oracle`). Per pilot item (B2's four,
+  240 frames, R as in H3c: both hand classes of the fill set, the visible
+  forearm included):
+  - Bases, re-coded with H3c's code and settings. *dcvc*: DCVC-UF HT-L off
+    the shelf at ¼ and ½ of the resolution, QP 0, 21 and 42 (six points,
+    rate on R by its own per-cell estimate). *svt*: SVT-AV1 at CRF 55 and 63,
+    ¼ and ⅛ of the resolution (H3b2's four points, rate on R by H1's libaom
+    accounting; streams checked against H3b2's sha256). Each decode is
+    upscaled bicubically to 1920×1080, as H3c scores it.
+  - Network, one per base point: G5d's enhancer (`g5d.enhancer`, EDSR-style,
+    8 blocks of 64 channels, about 0.6 M parameters, 1.2 MB at fp16), which
+    starts as the identity on the bicubic upscale, so step 0 is the base
+    point itself. Fitted on (upscaled decode, source) patches of 128 px
+    centred on R pixels of the window's hand frames, 2,000 steps, batch 16,
+    Adam 2 × 10⁻⁴, cosine (G5d's settings), with G5d's passing loss: MSE on
+    R plus LPIPS on R (the decode pasted into the source), at equal weight
+    at step 0. MSE alone is not run: LPIPS decides, and G5d's MSE fits barely
+    moved SVT-AV1.
+  - Scoring: H3c's `Scorer`, unchanged (the output inside R, the source
+    outside; LPIPS_R, PSNR_R, masked DISTS on R's box). Every base point is
+    scored before and after its fit. The before scores and rates must
+    reproduce H3c's units: within 0.0002 LPIPS for SVT-AV1 (byte-identical
+    streams), and within 0.005 LPIPS and 5% rate for DCVC-UF (its streams
+    differ across GPU classes). Beside, a flow-free flicker measure: on
+    consecutive hand frames, the mean absolute luma of the output's change
+    minus the source's change, on R in both frames.
+- Bar, per item: the upper concave hull (`g5.envelope`) on (kbps on R,
+  −LPIPS_R) of H3c's SVT-AV1 points (B2's CRF 41/48/55/62, H3b2's seven
+  low points) and DCVC-UF off the shelf (nine points), from H3c's anchor and
+  reference units. Each arm's curve is its Pareto front over its six (*dcvc*)
+  or four (*svt*) fitted points, as the convention keeps the test's front.
+- Comparison: BD-rate on LPIPS_R against the bar (PCHIP of log rate over
+  the LPIPS range both span, at least 0.005; otherwise "better" or "worse at
+  every rate"), and beside it on DISTS_R and PSNR_R, against the same
+  points' hull on that metric. Saving = −BD. The weights' payback is
+  reported per item: 1.2 MB over the arm's rate saving on R at the window's
+  median LPIPS, against the item's video duration (ffprobe).
+- Decision rule, fixed now (`h3d.DECISION`). Per arm (*dcvc*, *svt*):
+  - **passes** if its mean BD-rate on LPIPS_R over the 4 items is −10% or
+    better, with at least 3 of 4 items below 0. An item "better at every
+    rate" counts below 0 and is left out of the mean; "worse at every rate"
+    counts as not below 0 and blocks a pass. The mean is over the items with
+    a number (at least two).
+  - **fails** if its mean is at or above 0, or at most 1 item is below 0.
+  - otherwise **unclear**.
+  The oracle passes if either arm passes. Then the component is specified
+  next (an entry of its own): the network fitted on the same video outside
+  the window, its bits charged over the video, with network size as the
+  pilot axis. If both arms fail, H3d is not built. If neither passes and
+  either is unclear, the result goes to the user before anything is built.
+  DISTS and PSNR do not decide. A sign disagreement with LPIPS is stated,
+  with the visual check (crops of the source, the base and the fitted
+  output at about the same rate).
+- Hypothesis. *dcvc* passes narrowly. Fitted with LPIPS on the scored
+  frames, the network restores fold and edge texture that DCVC-UF's ¼ and ½
+  decodes smooth away: about −20% to −35% on LPIPS_R, PSNR_R near 0, and
+  DISTS improving most (DCVC-UF's weak metric in H3c). *svt* improves on
+  SVT-AV1's own points by a similar factor but stays behind the bar: the
+  bar is DCVC-UF's, already 63% cheaper. Flicker rises (G5d: the network
+  re-invents texture each frame).
+- Competing explanations. For a pass: the network memorizes the window
+  (0.6 M parameters, 240 frames of hand pixels). That is allowed in the
+  oracle but not in the component, which is fitted outside the window. For a
+  fail: at ¼ and ⅛ the decodes keep no hand detail a network could restore
+  without inventing it. PSNR_R not moving, and LPIPS gains only at the
+  highest-rate bases, would show it.
+- Budget. Smoke ≤ 10 minutes (one item, one point of each base, 50 steps,
+  asserting the fit's step 0 equals the base's scores). Oracle: one job per
+  item and arm (8 jobs). Each is ≤ 45 minutes, shared Ada or A6000 at
+  32,000 MiB, and checkpoints every finished point. That is about 5
+  GPU-hours; ceiling 6.
