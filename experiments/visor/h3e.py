@@ -320,8 +320,8 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
         feats.append(inception_features(nets["inception"], crops, device) if crops else np.zeros((0, 2048), np.float16))
         values = np.full(len(shown), np.nan)
         for i, t in enumerate(shown):
-            p = t - STRIDE
-            if p < 0 or not regions[t].any() or not regions[p].any():
+            p = ([0] + shown)[i]  # the previous generated frame (the window's last two are 2 apart)
+            if not regions[t].any() or not regions[p].any():
                 continue
             fb = flow_box(regions[t], regions[p])
             crop = (slice(fb[1], fb[3]), slice(fb[0], fb[2]))
