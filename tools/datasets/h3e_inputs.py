@@ -177,13 +177,14 @@ def main() -> int:
         (name, _, tar), order = judge_args[0].partition("="), judge_args[1]
         items = judge_args[2].split(",") if len(judge_args) > 2 else pilot
         development = len(judge_args) > 2
-        staged[f"generated_{name}"] = entry(f"generated_{name}", Path(tar), extract=True)
+        key = f"generated_{name.replace('-', '_')}"  # staged names are identifiers
+        staged[key] = entry(key, Path(tar), extract=True)
         for item in items:
             arguments = ["judge", *window, "--masks", "{staged:fill_masks}", "--mask-record", "{staged:fill_record}",
-                         "--generated", f"{{staged:generated_{name}}}", "--order", order, "--image-ckpt", "{staged:dcvc_image}",
+                         "--generated", f"{{staged:{key}}}", "--order", order, "--image-ckpt", "{staged:dcvc_image}",
                          "--video-ckpt", "{staged:dcvc_video}", "--lpips-backbone", "{staged:lpips}", "--inception", "{staged:inception}",
                          "--wilor-checkpoint", "{staged:wilor_checkpoint}", "--qps", "{qps}", "--scales", "{scales}"]
-            extra = [staged[k] for k in ("fill_masks", "fill_record", f"generated_{name}", "dcvc_image", "dcvc_video", "lpips",
+            extra = [staged[k] for k in ("fill_masks", "fill_record", key, "dcvc_image", "dcvc_video", "lpips",
                                          "inception", "wilor_checkpoint")]
             full_points = ("42", "4") if development else ("0,21,42", "1,2,4")  # the order check needs the generator's frames only
             scale = {"items": {"smoke": item, "full": item}, "frames": {"smoke": 240, "full": 240},
