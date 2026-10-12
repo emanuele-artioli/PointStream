@@ -103,3 +103,18 @@ def test_decision_rule(v1, v2, expected):
 
 def test_decision_waits_for_every_pilot_item():
     assert h3e.decide(dict(list(items_with([0.9] * 4, [0.9] * 4).items())[:3]))["decision"] == "incomplete"
+
+
+def test_generator_joints_keep_the_projection_and_move_the_hand_near():
+    rng = np.random.default_rng(1)
+    focal_w, centre = 37500.0, (960.0, 540.0)
+    hand = np.c_[rng.normal(0, 0.04, (21, 2)) + [0.3, 0.2], 20.0 + rng.normal(0, 0.03, 21)]
+    joints = np.zeros((2, 42, 3))
+    joints[0, 21:] = hand
+    focal = h3e.generator_focal(1920)
+    assert np.isclose(focal, 960.0)
+    out = h3e.generator_joints(joints, focal_w, centre, focal)
+    assert not out[0, :21].any() and not out[1].any()
+    assert np.allclose(pinhole(out[0, 21:], focal, centre), pinhole(hand, focal_w, centre), atol=1e-3)
+    assert np.isclose(out[0, 21, 2], hand[0, 2] * focal / focal_w) and 0.3 < out[0, 21, 2] < 0.8
+    assert np.allclose(out[0, 21:, 2] - out[0, 21, 2], hand[:, 2] - hand[0, 2], atol=1e-6)

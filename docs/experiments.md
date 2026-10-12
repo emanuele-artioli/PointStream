@@ -3657,6 +3657,16 @@ invocation turns out to be needed.
   the released 50 if a window fits in 40 minutes on an RTX 6000 Ada,
   otherwise the most that fit, not below 30, recorded here before the
   oracle.
+- Revision (2026-10-12, after the prepare smoke `20261012T102513Z-caafd73e`
+  failed its depth check, before any generation). H2's joints are in WiLoR's
+  camera (focal 5000/256 of the frame, 37,500 px at 1920: near-orthographic,
+  hands about 20 m away). JointControlVideo's module reads inverse depth
+  (clamped at 0.2 m) and orders occlusions by it, as in its metric Ego4D
+  training data. The generator gets a stated camera instead: a 90° horizontal
+  field of view (960 px at 1920), each hand's root at the depth that camera
+  implies (0.026 × WiLoR's, about 0.5 m), MANO's metric depth offsets between
+  joints, and every joint back-projected through its coded 2D position, so the
+  projection the generator sees is exactly H2's coded keypoints.
 - Hypothesis. The joint module follows its input closely (the paper reports
   joint adherence), so the composite's pose error is the keypoints' (0.8–2.3%
   of the box) plus about half a percent, and V1 saves 50–70% (frame 0 and

@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import shutil
 import time
@@ -57,6 +58,7 @@ JUDGE_EVERY = 15  # generated (3) and judged by H3c2 (5)
 CANVAS = (832, 480)  # JointControlVideo's width, height
 DILATE = 0.10  # V1's paste mask: the coded silhouette dilated by this share of the hand's box
 FEATHER = 0.02  # and feathered inside by a Gaussian of this share of the box
+HFOV_DEG = 90.0  # the generator's camera: H2's WiLoR focal (5000/256 of the frame) is near-orthographic
 SEED = "pointstream-h3e"
 
 
@@ -69,6 +71,31 @@ def canvas_geometry(width: int, height: int) -> dict[str, Any]:
     size = (round(width * scale), round(height * scale))
     offset = ((size[0] - CANVAS[0]) // 2, (size[1] - CANVAS[1]) // 2)
     return {"scale": scale, "size": list(size), "offset": list(offset), "source": [width, height]}
+
+
+def generator_focal(width: int) -> float:
+    """A pinhole of `HFOV_DEG` across the frame's width (960 px at 1920)."""
+    return 0.5 * width / math.tan(math.radians(HFOV_DEG) / 2)
+
+
+def generator_joints(joints: np.ndarray, focal_w: float, centre: tuple[float, float], focal: float) -> np.ndarray:
+    """H2's camera-frame joints (WiLoR's focal ``focal_w``, hands about 20 m away) for a camera of ``focal``: the
+    same 2D projection, each hand's root at the depth that camera implies (``focal / focal_w`` of WiLoR's), and
+    MANO's metric depth offsets between the joints. Zero rows (absent hands) stay zero."""
+    from experiments.visor.h2 import pinhole
+
+    out = np.zeros_like(joints, dtype=np.float32)
+    for k in range(joints.shape[0]):
+        for side in (0, 21):
+            hand = joints[k, side:side + 21].astype(np.float64)
+            if not hand.any():
+                continue
+            uv = pinhole(hand, focal_w, centre)
+            z = hand[0, 2] * focal / focal_w + (hand[:, 2] - hand[0, 2])
+            out[k, side:side + 21, 0] = (uv[:, 0] - centre[0]) * z / focal
+            out[k, side:side + 21, 1] = (uv[:, 1] - centre[1]) * z / focal
+            out[k, side:side + 21, 2] = z
+    return out
 
 
 def canvas_intrinsics(focal: float, centre: tuple[float, float], geometry: dict[str, Any]) -> np.ndarray:
@@ -153,12 +180,16 @@ def command_prepare(args: argparse.Namespace) -> int:
         rgb = rgb_memmap(Path(decoded["path"]), scratch / f"{item['id']}-rgb.npy", 1, width, height, decoded["full_range"], "cpu")
         meta_p, a, wilor = coded_poses(args, item["id"])
         geometry = canvas_geometry(width, height)
-        K = canvas_intrinsics(float(meta_p["focal"]), tuple(meta_p["principal"]), geometry)
-        joints = joints_at(times, wilor["coded_joints"], np.asarray(a["t"]), np.asarray(a["right"], bool))
+        centre = tuple(meta_p["principal"])
+        focal = generator_focal(width)
+        K = canvas_intrinsics(focal, centre, geometry)
+        coded = joints_at(times, wilor["coded_joints"], np.asarray(a["t"]), np.asarray(a["right"], bool))
+        joints = generator_joints(coded, float(meta_p["focal"]), centre, focal)
         np.savez(publish / f"{item['id']}.npz", frame0=to_canvas(np.asarray(rgb[0]), geometry), joints=joints, K=K)
         hands = (np.abs(joints).reshape(len(times), 2, -1).sum(-1) > 0)
         record = {"item": item["id"], "frames": frames, "times": times, "geometry": geometry, "K": K.tolist(),
-                  "focal": float(meta_p["focal"]), "principal": list(meta_p["principal"]), "pose_kbps": args.pose_kbps,
+                  "wilor_focal": float(meta_p["focal"]), "generator_focal": focal, "hfov_deg": HFOV_DEG,
+                  "principal": list(meta_p["principal"]), "pose_kbps": args.pose_kbps,
                   "coding": args.combos["wilor"], "hands_per_generated_frame": hands.sum(1).tolist(),
                   "generated_frames_with_a_hand": int(hands.any(1).sum()), "pose_unit_hash_ok": bool(meta_p["npz_hash_ok"]),
                   "depth_m": [float(np.median(joints[..., 2][joints[..., 2] > 0]))] if (joints[..., 2] > 0).any() else [],
