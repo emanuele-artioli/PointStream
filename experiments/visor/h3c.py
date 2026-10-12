@@ -344,7 +344,10 @@ def code_dcvc(args: argparse.Namespace, source: Path, region_file: Path, size: t
     data = (work / "stream.psdc").read_bytes()
     encode, decode = reports["encode"], reports["decode"]
     split = nal_region_bits(encode["nals"], estimate["nals"], len(data))
+    first, second = decode["passes"][0]["frame_sha256"], decode["passes"][1]["frame_sha256"]
+    differ = [t for t, (a, b) in enumerate(zip(first, second)) if a != b]
     return {"qp": qp, "size": [width, height], "bytes": len(data), "stream_sha256": file_sha256(work / "stream.psdc"),
+            "decode_passes_differ_at": differ[:20], "decode_passes_differ_frames": len(differ),
             "decoded": str(work / "decoded.yuv"), "deterministic": decode["deterministic"],
             "decoder_matches_encoder_intra": decode["passes"][0]["frame_sha256"][0] == encode["i_recon_sha256"],
             "encode_seconds": encode["encode_seconds"], "decode_seconds": [p["decode_seconds"] for p in decode["passes"]],
@@ -478,7 +481,10 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
             for qp in args.qps:
                 rec = code_dcvc(args, source, region_file, (sw, sh), frames, qp, ckpt, args.arm_sha256[arm], work / f"{arm}-{scale}-{qp}")
                 if not rec["deterministic"] or not rec["decoder_matches_encoder_intra"]:
-                    raise RuntimeError(f"{item['id']} {arm} scale {scale} QP {qp}: decode is not the encoder's")
+                    raise RuntimeError(f"{item['id']} {arm} scale {scale} QP {qp}: decode is not the encoder's "
+                                       f"(two decodes agree: {rec['deterministic']}, first differing frames "
+                                       f"{rec['decode_passes_differ_at']} of {rec['decode_passes_differ_frames']}; decoder's intra "
+                                       f"frame is the encoder's: {rec['decoder_matches_encoder_intra']})")
                 count = Path(rec["decoded"]).stat().st_size // (sw * sh * 3 // 2)
                 if count < frames:
                     raise RuntimeError(f"{item['id']} {arm}: decoded {count} of {frames} frames")
