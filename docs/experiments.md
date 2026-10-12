@@ -3536,3 +3536,37 @@ invocation turns out to be needed.
   moves the joints by more than 10% of the box); the pose errors compare
   every coder against the same re-run, so the decision does not depend on
   it.
+- Jobs (shared; validators passed): P01_107 `20261012T063131Z-f8c9c61d`
+  (RTX A6000, code `04e7f60`), P02_02 `20261012T070658Z-4e75fd43` (Ada,
+  `fd36976`), P03_10 `20261012T063150Z-8b5b1a07` (Ada, `04e7f60`), P09_106
+  `20261012T070806Z-8306d837` (Ada, `fd36976`). Earlier attempts failed
+  only at the validator (a numpy boolean it could not serialize; the
+  re-run tolerance above) and are not evidence. Report (code `fd36976`):
+  `pointstream-data/visor/h3c-2026-10-11/report-h3c2/h3c-report.json`
+  (`7ca4965ca9ca15ea…`). Reproduction of H3c: P02_02 and P09_106 (same GPU
+  class as their H3c jobs) are identical in every stream and score; P01_107
+  and P03_10 ran on the other class, where DCVC-UF's CUDA extension differs
+  (`sm80` against `sm89`): its streams differ by up to 0.2 kbps on R and
+  per-frame LPIPS by up to 0.03 on single frames (also SVT-AV1's, so the
+  metric's own numerics), item means equal to 4 decimals.
+- Outcome. Pose error (mean joint distance to WiLoR on the source, over
+  the box), the 100 ms keypoints at 1.93 kbps against the pixel envelope:
+
+  | item | judged hands | keypoints at 1.93 kbps | pixels at 1.93 kbps | pixels' rate for the keypoints' error | saving |
+  |---|---|---|---|---|---|
+  | P01_107 | 95 | 0.76% | 0.81% | 5.6 kbps | 66% |
+  | P02_02 | 49 | 1.61% | 6.6% | 89 kbps | 98% |
+  | P03_10 | 83 | 0.94% | 1.6% | 7.1 kbps | 73% |
+  | P09_106 | 28 | 2.26% | 3.0% | 3.2 kbps | 39% |
+
+  Mean saving 69% (95% CI 47% to 90%): above 50%, but the interval is not,
+  so by the rule it is **unclear** and goes to the user. The 0 ms keypoints
+  (7.7 kbps) have 0.4–0.7% error, which the pixels reach only at 14–120
+  kbps. DCVC-UF off the shelf dominates SVT-AV1 at the low end of every
+  pixel front; at the keypoints' rate both blur the hand.
+- Reading. Granted a perfect generator, the keypoints carry the pose for a
+  third of the pixels' rate or less on every item but P09_106 (39%), and
+  P02_02 (gloved hands moving fast) is where pixels lose most. The
+  hypothesis (60–80%) held on the mean. What the rule leaves open is
+  whether a real generator keeps enough of that margin: its own pose error,
+  the forearm and the occlusions by held objects are not charged here.
