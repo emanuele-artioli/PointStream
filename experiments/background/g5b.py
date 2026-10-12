@@ -316,6 +316,15 @@ def command_finetune(args: argparse.Namespace) -> int:
     prepare_seconds = time.time() - began
 
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
+    init = None
+    if args.init:  # G5c: continue a published arm (its weights; a fresh optimizer), e.g. a longer schedule
+        ft_dir = Path(args.init) / "publish" / "finetune"
+        init = {**{k: v for k, v in json.loads((ft_dir / "result.json").read_text()).items()
+                   if k in ("arm", "steps", "fit", "fit_clip")}, "checkpoint": str(ft_dir / "video_ft.pth.tar")}
+        init["checkpoint_sha256"] = file_sha256(Path(init["checkpoint"]))
+        recorded = json.loads((ft_dir / "result.json").read_text())["model"]["checkpoint_sha256"]
+        if init["checkpoint_sha256"] != recorded or init["fit_clip"] != fit_id:
+            raise SystemExit(f"{ft_dir}: not a recorded checkpoint of {fit_id}")
     frame_weights = [float(w) for w in args.frame_weights.split(",")] if args.frame_weights else None
     if frame_weights is not None and len(frame_weights) != 3:
         raise SystemExit("--frame-weights: last, even, odd positions of a group (DCVC-UF's 1.5,0.16,0.4)")
@@ -326,7 +335,8 @@ def command_finetune(args: argparse.Namespace) -> int:
             "dists_weight": args.dists_weight, "dists_backbone": args.dists_backbone,
             "temporal_weight": args.temporal_weight, "dists_every": args.dists_every,
             "image_ckpt": args.image_ckpt, "image_sha256": file_sha256(Path(args.image_ckpt)),
-            "video_ckpt": args.video_ckpt, "video_sha256": file_sha256(Path(args.video_ckpt)),
+            "video_ckpt": init["checkpoint"] if init else args.video_ckpt,
+            "video_sha256": init["checkpoint_sha256"] if init else file_sha256(Path(args.video_ckpt)),
             "out": str(work / "model"), "resume_dir": str(checkpoints) if checkpoints else None}
     if args.limit_frames > 0:  # smoke: short sequences, small patches
         plan.update(groups=1, patch=[256, 256], monitor_batch=1, log_every=1)
@@ -383,7 +393,8 @@ def command_finetune(args: argparse.Namespace) -> int:
         arm += f"-b{args.lpips_weight:g}" + ("-dists" if args.dists_weight else "") + \
                (f"-t{args.temporal_weight:g}" if args.temporal_weight else "") + \
                (f"-w{args.frame_weights}" if args.frame_weights else "") + \
-               (f"-lr{args.lr:g}" if args.lr and args.lr != TRAIN["lr"] else "") + f"-{fill_name}"
+               (f"-lr{args.lr:g}" if args.lr and args.lr != TRAIN["lr"] else "") + \
+               (f"-init{init['steps']}" if init else "") + f"-{fill_name}"
     row = {**clip.record, "kind": "finetune", "arm": arm, "fit": args.fit, "fit_clip": fit_id,
            "fit_frames": len(fit), "guard_s": GUARD_S if args.fit == "scene" else None,
            "lpips_weight": args.lpips_weight, "dists_weight": trained.get("dists_weight", 0.0),
@@ -391,7 +402,8 @@ def command_finetune(args: argparse.Namespace) -> int:
            "footage": [{k: m[k] for k in ("recordings", "frames", "yuv420_sha256")} | {"segments": [
                {k: sg[k] for k in ("video", "first_index", "last_index", "frames")} for sg in m["segments"]]}
                for m, _, _ in footage],
-           "steps": args.steps, "train": {**TRAIN, **{k: plan[k] for k in (
+           "steps": args.steps, "init": init, "total_steps": args.steps + (init["steps"] if init else 0),
+           "train": {**TRAIN, **{k: plan[k] for k in (
                "groups", "patch", "monitor_batch", "monitor_every", "lr", "frame_weights")}},
            "model": {k: trained[k] for k in ("checkpoint_sha256", "checkpoint_bytes", "parameters")},
            "model_bytes_fp16": 2 * trained["parameters"], "billed": False,
@@ -400,7 +412,8 @@ def command_finetune(args: argparse.Namespace) -> int:
            "peak_memory_gib": trained["peak_memory_gib"], "skipped_nonfinite": trained["skipped_nonfinite"],
            "train_log_tail": train_log[-5:], "prepare_seconds": round(prepare_seconds, 1),
            "seconds": round(time.time() - began, 1), "points": points,
-           "base_checkpoints": {"image_sha256": plan["image_sha256"], "video_sha256": plan["video_sha256"]},
+           "base_checkpoints": {"image_sha256": plan["image_sha256"],  # the public weights, also under --init
+                                "video_sha256": file_sha256(Path(args.video_ckpt))},
            "gpu": torch.cuda.get_device_name(0), "gpu_capability": list(torch.cuda.get_device_capability(0)),
            "trainer_gpu": trained["gpu"], "trainer_torch": trained["torch"]}
     write_json(publish / "result.json", row)
@@ -675,6 +688,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="distortion weights of a group's last, even and odd positions (DCVC-UF: 1.5,0.16,0.4)")
     ft.add_argument("--lr", type=float, default=0.0, help="learning rate (0: TRAIN's)")
     ft.add_argument("--inception", default=None, help="Inception-v3 weights: KID on V and the position profile")
+    ft.add_argument("--init", default=None, help="an extracted finetune archive of this stretch to continue")
     ft.set_defaults(func=command_finetune)
     wp = sub.add_parser("warp")
     common(wp)

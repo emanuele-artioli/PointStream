@@ -2985,6 +2985,48 @@ invocation turns out to be needed.
   previous *enhanced* frame) would then be the next step.
 - Budget: 4 enhancer jobs (≤ 45 minutes, shared Ada or A6000) and 4
   training jobs (≤ 45 minutes, Ada), about 5.5 GPU-hours.
+- Runs (code `6ab4c00` for all, shared GPUs). Enhancer: P26_02
+  `20261012T062332Z-e7ab76cb` (CRFs 32–48, Ada) and `…062342Z-7b7f0358`
+  (54–63, A6000); P06_03 `…062353Z-27439cd6` (32–48, Ada) and
+  `…062402Z-09d868ee` (54–63, Ada); their SVT-AV1 streams are
+  byte-identical to the oracle's. Scene model, footage only, recipe L
+  (Ada): P26_02 `…062412Z-3a369103`, P06_03 `…062422Z-17b767b0`.
+  Oracle with recipe L (Ada): P04_13 `…062435Z-0be6a398`, P06_05
+  `…062459Z-4f8164a9`. The four training jobs were specified without
+  `--inception` (step 3's spec helper predates KID), so they have no
+  KID_V; their flicker verdicts are "unclear" only because their curves
+  reach below SVT-AV1's lowest rate, and they flicker more wherever the
+  two overlap.
+- Outcome. BD-rate against SVT-AV1 (corrected anchor), P26_02 | P06_03:
+  | Model, fitted on the other recordings only | LPIPS_V | DISTS_V | PSNR_V | flicker_V | KID_V | Beats by 10% |
+  |---|---|---|---|---|---|---|
+  | enhancer (footage-lpips) | −36% \| −50% | −47% \| −31% | +69% \| +14% | +54% \| +83% | +10% \| −19% | 2 \| 3 |
+  | enhancer, temporal (footage-lpips-t) | −48% \| −51% | −45% \| −34% | +57% \| +15% | +51% \| +93% | +10% \| −26% | 2 \| 3 |
+  | scene model, recipe L | −74% \| −65% | −55% \| −39% | +92% \| +95% | worse | — | 2 \| 2 (of 4) |
+  - **(a) The venue enhancer does not stand by the rule** (3 metrics on
+    both pilots): on P26_02 it beats 2 (KID_V +10%). It still beats
+    SVT-AV1 on LPIPS_V and DISTS_V by 31–51% on both pilots, made only
+    from other recordings. P26_02's only other recording (P26_108) is
+    from the later collection, where the footage-only scene model was
+    also weakest (step 3). Against the footage-only scene model the
+    pattern of the pilots holds: the scene model is stronger on LPIPS_V
+    and DISTS_V, the enhancer loses less PSNR_V and flicker. The
+    footage-only scene model with recipe L improves on step 3's (LPIPS_V
+    −6% and −24% against it).
+  - **(b) The temporal enhancer is not adopted**: flicker at matched
+    rate ×1.00–1.01 against the per-frame one, for both fits on both
+    pilots (LPIPS_V 3–13% better). The competing explanation holds: the
+    network re-invents texture each frame, and a previous *decoded*
+    frame, as blurry as the current one, cannot pin it; a recurrent
+    input (the previous *enhanced* frame) is the next candidate.
+  - **(c) The fast stretches are not the base codec's limit alone.**
+    The oracle with recipe L beats SVT-AV1 on LPIPS_V by 22% on P04_13
+    and 31% on P06_05 (with step 2's recipe: +9% and −6%); DISTS_V and
+    PSNR_V stay far behind (+71% and +107%; +262% and +281%). By the
+    rule (30% on either) a training-settings round for fast scenes is
+    worth running. Hypothesis (c) wrong: the learning rate moved the
+    ceiling by about 30 points.
+  - GPU time: about 5 hours (8 jobs).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
