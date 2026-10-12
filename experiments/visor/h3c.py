@@ -733,7 +733,7 @@ def validate_code(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
             "pose_units_intact": all(m["pose_unit_hash_ok"] for m, _ in judged),
             "judge_finite": all(np.isfinite(a["judge_kp2d"]).all() and a["judge_kp2d"].shape[0] == len(m["points"]) for m, a in judged),
             # WiLoR re-run on the source with H2's box reproduces H2's fit (H3b's check).
-            "wilor_rerun_reproduces_h2": bool(rerun) and max(rerun) < 0.005,
+            "wilor_rerun_reproduces_h2": bool(rerun) and bool(max(rerun) < 0.005),
             # H2: the 100 ms choice moves WiLoR's joints about 8 px (H3b measured 9.9 on the pilot items).
             "coded_keypoint_error_near_h3b": bool(coded_px) and 3.0 < float(np.mean(coded_px)) < 20.0,
         })
@@ -765,6 +765,7 @@ def command_validate(args: argparse.Namespace) -> int:
     stage = stage_dir()
     result = json.loads((stage / "h3c.json").read_text())
     checks = validate_train(stage, result) if result["command"] == "train" else validate_code(stage, result)
+    checks = {k: bool(v) for k, v in checks.items()}  # numpy booleans do not serialize
     report = {"passed": all(checks.values()), "checks": checks}
     target = os.environ.get("PS_VALIDATION_PATH")
     if target:
