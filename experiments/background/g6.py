@@ -176,7 +176,7 @@ def command_format(args: argparse.Namespace) -> int:
     flows = g5c.source_flows(clip)
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"]) if os.environ.get("PS_CHECKPOINT_DIR") else None
     restored = g5c.restore(checkpoints)
-    if args.restore:  # a failed run's salvaged checkpoint.tar (extracted): its finished points, as recorded
+    if args.restore and args.limit_frames <= 0:  # a failed run's salvaged checkpoint (extracted), full stage only
         restored = {**g5c.restore(Path(args.restore) / "checkpoint"), **restored}
     rows = []
     done = 0
