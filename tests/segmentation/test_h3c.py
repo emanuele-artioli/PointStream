@@ -112,3 +112,21 @@ def test_decision_reads_the_upper_bound_and_the_component():
     assert out["upper_bound"] == "fails"
     out = h3c.decide({"upper-mse": arm(-0.05, 3), "upper-lpips": arm(0.2, 0), "component-mse": arm(-0.2, 3, -0.05)})
     assert out["upper_bound"] == "unclear" and not out["component"]["component-mse"]["adopted"]
+
+
+def test_pose_errors_are_box_relative_means():
+    source = np.zeros((2, 21, 2))
+    kp = np.zeros((1, 2, 21, 2))
+    kp[0, 0, :, 0] = 10.0  # hand 0 off by 10 px, hand 1 exact
+    err = h3c.pose_errors(kp, source, np.array([100.0, 50.0]))
+    assert err.shape == (1,) and math.isclose(err[0], (0.1 + 0.0) / 2)
+
+
+def test_pose_at_rate_interpolates_in_log_rate():
+    front = [{"kbps": 1.0, "pose": 0.2}, {"kbps": 100.0, "pose": 0.0}]
+    assert math.isclose(h3c.pose_at_rate(front, 10.0), 0.1)
+    assert h3c.pose_at_rate(front, 0.5) is None
+
+
+def test_pose_budgets_include_the_choice_named_for_h3():
+    assert h3c.POSE_GATE_BUDGET in h3c.POSE_BUDGETS and h3c.DECISION["h3c2"]["opens_ci_low_above"] == 0.5

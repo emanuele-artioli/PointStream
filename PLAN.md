@@ -568,6 +568,26 @@ tuning without LPIPS starves the background instead of coding the hands
 better. So H3d's bar, and any generator's, is the lower envelope of
 SVT-AV1 and DCVC-UF off the shelf on R, per item. H3d is next.
 
+H3c2 (2026-10-12, [outcome](docs/experiments.md#2026-10-12--h3c2-pose-fidelity-at-rate-pixels-against-keypoints);
+user, 2026-10-12: judge the hand by the pose it carries, identity free, as
+coding for machines does, while keeping a video people can watch; a
+domain-specific mode beside the pixel route, not instead of it, since tennis
+may not want it). With a perfect generator granted, H2's coded keypoints
+(1.93 kbps) carry WiLoR's pose for 69% less rate than the best pixel coder
+needs for the same pose error (CI 47% to 90%; 39% to 98% per item). Unclear
+by the rule; the user opened the path (2026-10-12). Order now:
+1. H3e, a generative-hand oracle (before H3d): a pretrained pose-conditioned
+   hand generator, delivered with the decoder and not billed, renders each
+   hand from the coded keypoints (no per-video reference; identity free,
+   constant per track). Audit first (methods and weights, downloaded into
+   `Models`), then judged on the pilot items by WiLoR's pose error on the
+   composite, KID and flicker on hand crops, against the pixel envelope
+   (SVT-AV1 and DCVC-UF off the shelf) at equal pose error. Built further
+   only if it keeps a saving above 50% with the forearm, held objects and
+   the boundary with the background charged as they are rendered. As
+   generative face video coding does with facial keypoints.
+2. H3d, as agreed, against H3c's bar.
+
 From an appearance reference and the per-frame pose (H2), render the hand and
 forearm at the client: a textured MANO mesh, pose-conditioned generation, or
 a mesh with a learned residual; the forearm from the mask's extent or a

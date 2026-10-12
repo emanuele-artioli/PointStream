@@ -64,6 +64,7 @@ def main() -> int:
     parser.add_argument("--deadline", required=True)
     parser.add_argument("--train", nargs=4, metavar=("FIT", "NAME", "WEIGHT", "STEPS"))
     parser.add_argument("--code", nargs="+", metavar="LABEL NAME=CKPT")
+    parser.add_argument("--h3c2", action="store_true", help="also h3c2-<video>.json: anchor, reference and the pose judge")
     args = parser.parse_args()
     dest = Path(args.dest)
     manifest = json.loads((Path(args.h3b_dir) / "inputs.json").read_text())
@@ -72,7 +73,8 @@ def main() -> int:
     pilot_spec = json.loads((Path(args.h3b_dir) / "h3b-oracle-pilot.json").read_text())
     staged = {e["name"]: e for e in pilot_spec["staged_inputs"]
               if e["name"] in ("eval_set", "dense_archive", "fill_masks", "fill_record", "lpips", "dists", "svt_streams_a",
-                               "svt_result_a", "svt_streams_b", "svt_result_b") or e["name"].startswith("video_")}
+                               "svt_result_a", "svt_streams_b", "svt_result_b", "poses_0", "poses_1", "code", "mano_left",
+                               "mano_right", "wilor_checkpoint") or e["name"].startswith("video_")}
     if mismatch := [k for k, e in staged.items() if files[k]["sha256"] != e["sha256"]]:
         raise SystemExit(f"H3b's spec and manifest disagree on {mismatch}")
     staged["dcvc_image"] = entry("dcvc_image", Path(args.dcvc_dir) / "cvpr2026_image.pth.tar")
@@ -107,7 +109,7 @@ def main() -> int:
 
     written = []
 
-    def code_spec(name: str, item: str, arms: list[tuple[str, dict[str, Any]]], anchor: bool) -> None:
+    def code_spec(name: str, item: str, arms: list[tuple[str, dict[str, Any]]], anchor: bool, judge: bool = False) -> None:
         arguments = ["code", *windows, "--dists-backbone", "{staged:dists}", "--qps", "{qps}", "--scales", "{scales}",
                      *[a for n, e in arms for a in ("--arm", n, f"{{staged:{e['name']}}}")]]
         extra = [staged["dists"]] + [e for _, e in arms]
@@ -115,6 +117,11 @@ def main() -> int:
             arguments += ["--anchor", "--svt-streams", "{staged:svt_streams_a}", "--svt-result", "{staged:svt_result_a}",
                           "--svt-streams", "{staged:svt_streams_b}", "--svt-result", "{staged:svt_result_b}", "--inspect", "{staged:inspect}"]
             extra += [staged[k] for k in ("svt_streams_a", "svt_result_a", "svt_streams_b", "svt_result_b", "inspect")]
+        if judge:  # H3c2: WiLoR on the composites, H2's coded keypoints
+            arguments += ["--judge", "--poses", "{staged:poses_0}", "--poses", "{staged:poses_1}", "--pose-code", "{staged:code}",
+                          "--mano-left", "{staged:mano_left}", "--mano-right", "{staged:mano_right}",
+                          "--wilor-checkpoint", "{staged:wilor_checkpoint}"]
+            extra += [staged[k] for k in ("poses_0", "poses_1", "code", "mano_left", "mano_right", "wilor_checkpoint")]
         scale = {"items": {"smoke": item, "full": item}, "frames": {"smoke": 48, "full": 240},
                  "qps": {"smoke": "0", "full": "0,21,42"}, "scales": {"smoke": "1,4", "full": "1,2,4"}}
         basis = (f"H3c code: {item}, its first 48 window frames through the full path (window decode with the sparse-JPEG gate, "
@@ -122,8 +129,12 @@ def main() -> int:
                  "DCVC-UF HT-L encode and decode by B2's worker at QP 0 and scales 1 and 4 with the per-NAL bit split by the model's "
                  "own estimate, LPIPS on CPU against the GPU, DISTS); the stage runs 240 frames at QP 0, 21, 42 and scales 1, 2, 4.")
         # 24000 MiB was overrun (26,098 MiB, job 20261011T220701Z-f13c88e2) before the scorer's cache was released.
-        body = spec(arguments, common + extra, scale, basis, 32000, CODE_SHARING, GPU_MODELS)
-        path = dest / f"h3c-{name}-{next(v for v in PILOT if item.startswith(v + '_0'))}.json"
+        if judge:
+            basis = basis.replace("DISTS)", "DISTS, WiLoR re-run on the judge frames' composites and H2's coded keypoints at 0, 100 and 267 ms)")
+        # WiLoR stays resident beside the scorer when judging (H3b ran it within 16,000 MiB on its own).
+        body = spec(arguments, common + extra, scale, basis, 36000 if judge else 32000, CODE_SHARING, GPU_MODELS)
+        prefix = name if name == "h3c2" else f"h3c-{name}"
+        path = dest / f"{prefix}-{next(v for v in PILOT if item.startswith(v + '_0'))}.json"
         path.write_text(json.dumps(body, indent=1) + "\n")
         written.append(path.name)
 
@@ -146,6 +157,9 @@ def main() -> int:
         written.append(path.name)
 
     train_spec("calibrate", "upper", "0", {"smoke": 3, "full": 40})
+    if args.h3c2:
+        for item in pilot:
+            code_spec("h3c2", item, [("reference", staged["dcvc_video"])], anchor=True, judge=True)
     if args.train:
         fit, name, weight, steps = args.train
         train_spec(f"train-{fit}-{name}", fit, weight, {"smoke": 3, "full": int(steps)})
