@@ -243,6 +243,9 @@ def validate(args: argparse.Namespace) -> int:
         "shapes": all(r["shape"] == [report["frames"], 480, 832, 3] for r in records),
         "first_frame_kept": all(r["first_frame_mean_abs_diff"] < 20.0 for r in records),
         "bf16": bool(report["device"]["bf16"]),
+        # The step budget and the shared memory declaration were measured with a flash kernel (model-GPU table): a
+        # run that fell back to slower attention must not pass.
+        "flash_attention": any(report["attention"].get(k) for k in ("sdpa_flash_kernel_runs", "flash_attn_3", "flash_attn_2")),
     }
     checks = {k: bool(v) for k, v in checks.items()}
     result = {"passed": all(checks.values()), "checks": checks}

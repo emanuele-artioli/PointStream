@@ -60,13 +60,23 @@ def link(source: Path, target: Path) -> Path:
 
 
 def tar_dir(source: Path, target: Path) -> Path:
-    """The directory's files at the archive's top level (an extracted archive is the directory)."""
-    if not target.exists():
-        target.parent.mkdir(parents=True, exist_ok=True)
-        with tarfile.open(target, "w") as t:
-            for f in sorted(source.rglob("*")):
-                if f.is_file():
-                    t.add(f, arcname=str(f.relative_to(source)))
+    """The directory's files at the archive's top level (an extracted archive is the directory). An existing archive
+    is reused only if it holds exactly the source's files, byte for byte; otherwise this fails, as `link` does."""
+    files = {str(f.relative_to(source)): f for f in sorted(source.rglob("*")) if f.is_file()}
+    if target.exists():
+        with tarfile.open(target) as t:
+            members = {m.name: m for m in t.getmembers() if m.isfile()}
+            if set(members) != set(files):
+                raise SystemExit(f"{target} exists and does not hold {source}'s files")
+            for name, f in files.items():
+                handle = t.extractfile(members[name])
+                if handle is None or hashlib.sha256(handle.read()).hexdigest() != file_sha256(f):
+                    raise SystemExit(f"{target} exists and its {name} differs from {f}")
+        return target
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(target, "w") as t:
+        for name, f in files.items():
+            t.add(f, arcname=name)
     return target
 
 

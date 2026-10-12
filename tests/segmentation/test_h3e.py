@@ -1,3 +1,6 @@
+import importlib.util
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -139,3 +142,28 @@ def test_every_rate_compares_each_point_with_the_hull_at_its_rate():
     assert h3e.every_rate(flat_and_worse, hull) == "worse at every rate"
     assert h3e.curve_gap(flat_and_worse, hull) == "its pose error is flat across its points"
     assert h3e.every_rate([{"kbps": 0.5, "pose": 0.03}, {"kbps": 2.0, "pose": 0.005}], hull) == "better at every rate"
+
+
+def load_inputs_tool():
+    path = Path(__file__).resolve().parents[2] / "tools" / "datasets" / "h3e_inputs.py"
+    spec = importlib.util.spec_from_file_location("h3e_inputs", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_tar_dir_reuses_only_an_archive_of_the_same_files(tmp_path):
+    tool = load_inputs_tool()
+    source = tmp_path / "tok"
+    (source / "sub").mkdir(parents=True)
+    (source / "a.json").write_text("one")
+    (source / "sub" / "b.model").write_bytes(b"two")
+    target = tmp_path / "tok.tar"
+    assert tool.tar_dir(source, target) == target
+    assert tool.tar_dir(source, target) == target  # same files: reused
+    (source / "a.json").write_text("changed")
+    with pytest.raises(SystemExit, match="differs"):
+        tool.tar_dir(source, target)
+    (source / "c.txt").write_text("new")
+    with pytest.raises(SystemExit, match="does not hold"):
+        tool.tar_dir(source, target)
