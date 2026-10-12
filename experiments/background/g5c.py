@@ -503,7 +503,16 @@ def command_compress(args: argparse.Namespace) -> int:
     began = time.time()
     flows = source_flows(clip)
     source = work / "filled.yuv"
-    g5.rgb_to_yuv420(g5.inpaint(clip)).tofile(source)
+    if args.prefill:  # the arm's own fill (G5c step 2 on): ProPainter's, from the stretch's published prefill
+        from experiments.background.g5b import load_prefilled
+
+        meta, fill_path = load_prefilled([args.prefill])[clip_id]
+        if meta["fill"] != arm.get("fill"):
+            raise SystemExit(f"{args.prefill}: a {meta['fill']} fill, the arm was trained on {arm.get('fill')}")
+        offset = clip.start - meta["first"]
+        np.ascontiguousarray(np.load(fill_path, mmap_mode="r")[offset:offset + clip.n]).tofile(source)
+    else:
+        g5.rgb_to_yuv420(g5.inpaint(clip)).tofile(source)
     ft, public = load_plain(ft_dir / "video_ft.pth.tar"), load_plain(Path(args.video_ckpt))
     qps = [int(q) for q in args.qps.split(",")]
     rows = []
@@ -540,6 +549,7 @@ def command_compress(args: argparse.Namespace) -> int:
     write_json(stage_dir() / "g5c.json", {
         "kind": "compress", "clip": clip.record, "arm": arm["arm"], "arm_model_sha256": arm["model"]["checkpoint_sha256"],
         "public_sha256": file_sha256(Path(args.video_ckpt)), "qps": qps, "limit_frames": args.limit_frames,
+        "fill": "propainter" if args.prefill else "telea",
         "decision_rule": DECISION, "metrics": nets.record, "restored": sorted(restored),
         "seconds": round(time.time() - began, 1), **gpu_record(), "variants": rows})
     shutil.rmtree(work, ignore_errors=True)
@@ -1178,6 +1188,7 @@ def main(argv: list[str] | None = None) -> int:
     co.add_argument("--arm", required=True, help="G5b's extracted finetune archive to compress")
     co.add_argument("--variants", default=",".join(VARIANTS))
     co.add_argument("--qps", default=",".join(map(str, g5.DCVC_QPS)))
+    co.add_argument("--prefill", default=None, help="the stretch's extracted prefill archive (code its ProPainter fill)")
     co.set_defaults(func=command_compress)
     fi = sub.add_parser("fill")
     common(fi)

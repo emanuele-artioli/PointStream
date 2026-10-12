@@ -3089,6 +3089,25 @@ invocation turns out to be needed.
     scene model reaches LPIPS_V parity or a small win, no more.
   - GPU time: about 5 hours (6 jobs, 2 timed out and continued).
 
+### 2026-10-12 — G5c: model size of the final recipe
+- Question (PLAN G5c, "done when": model size per variant and payback):
+  how small does recipe L's scene model ship? Step 1 measured β = 0.026's
+  model; the recipe's 3× learning rate may move the weights further from
+  the public ones, so the change may compress worse.
+- Method: `g5c.py compress` as step 1 (per-output-channel quantization,
+  LZMA per tensor, the excerpt re-coded with each variant on the same GPU
+  class), now coding the arm's own ProPainter fill (`--prefill`, new) and
+  scoring KID. Variants: whole-16 (the reference), delta-8, delta-4,
+  delta-2. Arms: L on the pilots (P26_02 `20261011T085614Z-ea0b9f98`,
+  P06_03 `20261011T163301Z-e47ae994`).
+- Decision rule (step 1's, `DECISION["keeps_quality_bd"]`): a variant
+  keeps quality if its BD-rate on LPIPS_V against whole-16 is +5% or
+  better; the smallest such variant is the shipped size, and payback is
+  recomputed from recipe L's rate saving against SVT-AV1.
+- Hypothesis: delta-4 still keeps quality (about 50 MB, as step 1) and
+  delta-2 does not.
+- Budget: 2 jobs, ≤ 45 minutes each on Ada (shared), about 1.5 GPU-hours.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
