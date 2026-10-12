@@ -3365,6 +3365,70 @@ invocation turns out to be needed.
   windows stay as they are for the foreground session's compositor.
 
 
+### 2026-10-12 — G6 item 1: the scene model at the exact fill, and its coded size
+- Question: the pilot (above) put the window's F at the agreed exact fill
+  (no dilation), so V now holds the pixels beside the hands' edges. The
+  scene model was trained on footage whose foreground was G1's (dilated
+  16 px, hand boxes), so it never saw that band. On P06_03 its 540p
+  curve fell to SVT-AV1's level, while the 1080p model won (−58% to −66%
+  on LPIPS_V), the reverse of step 2's choice of 540p (made with the
+  dilated fill). Two questions. (a) Does footage masked like F teach the
+  model the band? (b) Should the model code at 540p, at 1080p, or both
+  by rate?
+- Method (`experiments/background/g6.py`, pilot windows P26_02_0000001071
+  and P06_03_0000005110):
+  1. `footage --set scene --mask exact`: the pilot's footage protocol with
+     the foreground shaped like F: SAM 3.1 "hand" and "arm" masks
+     undilated, plus the EPIC detector's *object* boxes (score ≥ 0.5),
+     undilated. The hand boxes are dropped because a box covers the band
+     beside the hand that exact F leaves in V; the object boxes stand in
+     for VISOR's object masks, which the footage has no annotations for.
+     ProPainter fill as before. Model E: recipe L (β 0.005, learning rate
+     3 × 10⁻⁵, 540 steps) on it, from the public HT-L weights. Model D:
+     the pilot's trained model on G1's footage (`20261012T150907Z-d03a60c9`,
+     `…151248Z-bc31027a`).
+  2. `format` for D and E on each window with F exact, the same grid:
+     540p QP 0, 13, 25, 38, 50, 63 (upsampled through 4:2:0), 1080p QP 13,
+     25, 38, 50, 63 (the pilot had only 50 and 63, at 620 kbps and up,
+     above most of SVT-AV1's range). Not published: this is a test.
+  3. Anchor: the pilot's SVT-AV1 at 1080p with the same exact fill (the
+     enhance jobs, 174–4,470 kbps). Scored at 1080p on V as the pilot.
+- Decision rules, fixed now.
+  (a) *E replaces D* if E's BD-rate against D on LPIPS_V (each model's
+  hull of 540p and 1080p, same window, same F) is −5% or better on
+  P06_03 and no worse than +2% on P26_02. Otherwise D stays (G1's
+  footage, unchanged code path). Model against model: both curves span
+  the same rates, so this BD-rate does not have the thin-overlap
+  fragility that rule (a) of the pilot had.
+  (b) *Coded size*, for the model (a) picks: BD-rate against SVT-AV1 at
+  1080p (concave hull) on LPIPS_V for 540p alone, 1080p alone and their
+  hull. If 1080p alone is within 5 points of the hull on both windows,
+  the model codes at 1080p in SVT-AV1's range. Otherwise, if 540p alone
+  is within 5 points of the hull, it stays at 540p. Otherwise the route
+  ships the hull and switches size at the crossing rate. 540p stays
+  available below SVT-AV1's lowest rate either way, if it is the hull
+  there. Beside each BD-rate: the overlap in quality, and LPIPS_V at
+  matched rate (log-rate interpolation) at SVT-AV1's three lowest CRFs.
+  Every other metric (DISTS_V, KID_V, PSNR_V, flicker_V) is reported.
+- Hypotheses. (a) E gains 5–15% on P06_03 (foreground 27%, so a long edge
+  band) and stays level on P26_02. (b) 1080p is within 5 points of the
+  hull in SVT-AV1's range on both windows: there, 540p's upsampling
+  costs more than 1080p's extra bits. 540p wins only below about
+  150 kbps.
+- Competing explanations. (a) The band's cost is intrinsic: shadows,
+  motion blur and VISOR's mask moving from frame to frame make the seam
+  between fill and frame move, which no training removes (SVT-AV1 paid
+  it too: its lowest point moved from 138 to 174 kbps). Then E ≈ D.
+  SAM's undilated masks may also leave hand pixels in the footage's V,
+  spending the model's capacity on them, so E could lose. (b) The
+  pilot's 1080p win could come from its points sitting at rates where
+  SVT-AV1 is weakest, not from the size; the new low QPs at 1080p test
+  this.
+- Budget: 8 jobs on shared Ada or A6000, each under 45 minutes: 2
+  footage, 2 training (Ada), 2 format for E, plus 2 format for D. About
+  3 GPU-hours.
+
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)

@@ -369,14 +369,32 @@ def test_g6_ffv1_round_trip(tmp_path):
     assert g6.ffv1_digests(tmp_path / "x.mkv", threads=1) == digests and len(set(digests)) == 3
 
 
+def test_g1_dilate_zero_keeps_the_mask_exact():
+    from experiments.background import g1
+
+    mask = np.zeros((40, 40), bool)
+    mask[18:22, 18:22] = True
+    assert (g1.dilate(mask, 0) == mask).all()
+    assert g1.dilate(mask).sum() > g1.dilate(mask, 2).sum() > mask.sum()
+
+
 def test_g6_validators_by_kind(tmp_path):
     from experiments.background import g6
 
     footage = {"kind": "footage", "limit_frames": 0, "set": "scene", "guard_s": 5.0, "source_fps": 60.0,
                "window": [30_000, 30_239], "frames": 900, "gpu": "Ada", "gpu_capability": [8, 9],
                "propainter": {"gpu": "Ada"},
-               "segments": [{"first_index": 26_420, "last_index": 29_699, "fg_share": 0.3, "end": 330},
-                            {"first_index": 30_540, "last_index": 33_619, "fg_share": 0.2, "end": 900}]}
+               "segments": [{"first_index": 26_420, "last_index": 29_699, "fg_share": 0.3, "end": 330,
+                             "foreground": {"dilate_px_1080": 16.0}},
+                            {"first_index": 30_540, "last_index": 33_619, "fg_share": 0.2, "end": 900,
+                             "foreground": {"dilate_px_1080": 16.0, "detector": {"kinds": ["hands", "objects"]}}}]}
+    (tmp_path / "g6.json").write_text(json.dumps(footage))
+    assert all(g6.validate_stage(tmp_path).values())  # the pilot's footage: no "mask" recorded, G1's
+    footage["mask"] = {"name": "exact", **g6.FOOTAGE_MASKS["exact"], "box_kinds": ["objects"]}
+    (tmp_path / "g6.json").write_text(json.dumps(footage))
+    assert not g6.validate_stage(tmp_path)["mask_as_named"]
+    for seg in footage["segments"]:
+        seg["foreground"] = {"dilate_px_1080": 0.0, "detector": {"kinds": ["objects"]}}
     (tmp_path / "g6.json").write_text(json.dumps(footage))
     assert all(g6.validate_stage(tmp_path).values())
     footage["segments"][0]["last_index"] = 29_800  # inside the guard

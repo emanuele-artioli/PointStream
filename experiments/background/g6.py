@@ -69,6 +69,11 @@ GRID: dict[str, tuple[int, ...]] = {"svt-1080": g5.CRFS, "svt-540": g5.CRFS, "dc
 STRETCH_S = 120.0  # G1d's stretches: the window's scene footage lies in the 120 s around it
 NATIVE_SEGMENTS, NATIVE_SEGMENT_S = 4, 2.0  # the enhancer's pairs, at the window's size and rate
 RECIPE = {"lpips_weight": 0.005, "lr": 3e-5, "steps": 540}  # recipe L (G5c step 4)
+# The footage's foreground. g1: G1's (SAM 3.1 hand/arm plus the detector's hand and object boxes, dilated 16 px
+# at 1080p). exact: shaped like the window's F, which is filled undilated: no dilation and no hand boxes (a box
+# covers the band beside the hand that exact F leaves in V); object boxes stay, standing in for VISOR's objects.
+FOOTAGE_MASKS: dict[str, dict[str, Any]] = {"g1": {"dilate_px": 8, "box_kinds": ("hands", "objects")},
+                                            "exact": {"dilate_px": 0, "box_kinds": ("objects",)}}
 YUV = {"pix_fmt": "yuv420p", "matrix": "bt709", "range": "full", "chroma": "2x2 mean", "size": list(FULL)}
 ROUTES = {"svt": "anchor", "dcvc": "dcvc-uf", "scene": "scene-model", "enh": "enhancer"}
 JOB_ID = re.compile(r"\d{8}T\d{6}Z-[0-9a-f]{8}")
@@ -245,7 +250,7 @@ def command_footage(args: argparse.Namespace) -> int:
         sam_seconds = time.time() - t0
         shutil.rmtree(seg_work / "jpeg", ignore_errors=True)
         base = [g1.to_analysis(g1.union(f, (masks.height, masks.width))) for f in masks.frames]
-        fg_record = g1.foreground(clip, seg_work, base, None, args.hand_objects)
+        fg_record = g1.foreground(clip, seg_work, base, None, args.hand_objects, **FOOTAGE_MASKS[args.mask])
         frames_all.append(np.load(seg_work / "frames.npy"))
         keep_all.append(~np.load(seg_work / "foreground.npy"))
         records.append({"first_index": a, "last_index": b, "frames": len(clip["indices"]), "decode": decoded,
@@ -296,7 +301,7 @@ def command_footage(args: argparse.Namespace) -> int:
             "guard_s": GUARD_S, "stretch_s": STRETCH_S, "recordings": [item["video"]],
             "source_full_range": sorted(full_ranges) if native else None,
             "segments": [{"video": item["video"], **r} for r in records], "frames": int(len(keep)),
-            "fill": "propainter", "yuv420_sha256": file_sha256(publish / "filled_yuv420.npy"),
+            "mask": {"name": args.mask, **FOOTAGE_MASKS[args.mask]}, "fill": "propainter", "yuv420_sha256": file_sha256(publish / "filled_yuv420.npy"),
             "keep_sha256": file_sha256(publish / "keep.npy"),
             "sam": {"checkpoint_sha256": sam.checkpoint_sha256, "model_revision": sam.model_revision},
             "propainter": propainter}
@@ -765,6 +770,7 @@ def validate_stage(stage: Path) -> dict[str, bool]:
     full = not result["limit_frames"]
     gpu = tuple(result.get("gpu_capability") or (0, 0)) >= (8, 6)
     if result["kind"] == "footage":
+        mask = result.get("mask") or FOOTAGE_MASKS["g1"]
         guard = round(result["guard_s"] * result["source_fps"])
         lo, hi = result["window"][0] - guard, result["window"][1] + guard
         return {
@@ -774,6 +780,9 @@ def validate_stage(stage: Path) -> dict[str, bool]:
             "outside_window_and_guard": all(s["last_index"] < lo or s["first_index"] > hi for s in result["segments"]),
             "enough_frames": result["frames"] >= (300 if result["set"] == "scene" else 200) if full else result["frames"] > 0,
             "propainter_on_gpu": result["propainter"]["gpu"] == result["gpu"],
+            "mask_as_named": all(s["foreground"]["dilate_px_1080"] == 2 * mask["dilate_px"]
+                                 and s["foreground"].get("detector", {}).get("kinds", ["hands", "objects"])
+                                 == list(mask["box_kinds"]) for s in result["segments"]),
         }
     if result["kind"] == "train":
         return {
@@ -848,6 +857,8 @@ def main(argv: list[str] | None = None) -> int:
     for name in ("eval-set", "video", "item", "hand-objects", "sam-checkpoint", *propainter):
         ft.add_argument(f"--{name}", required=True)
     ft.add_argument("--set", choices=("scene", "native"), required=True)
+    ft.add_argument("--mask", choices=tuple(FOOTAGE_MASKS), default="g1",
+                    help="g1: G1's foreground (dilated, hand and object boxes); exact: shaped like the window's F")
     ft.add_argument("--limit-frames", type=int, default=0)
     ft.set_defaults(func=command_footage)
     tr = sub.add_parser("train")
