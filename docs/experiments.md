@@ -2939,6 +2939,53 @@ invocation turns out to be needed.
   - G5b's earlier numbers (Telea anchors, 2026-10-10) carry the same bias
     and are superseded by G5c's; they are not recomputed.
 
+### 2026-10-12 — G5d step 2: the venue enhancer from other recordings; the fast-scene ceiling
+- Questions (user, 2026-10-12: both routes for the stored knowledge go in
+  the paper). (a) Does an enhancer fitted only on the kitchen's *other
+  recordings*, made before the stream exists, still beat SVT-AV1, and
+  how does it compare with the footage-only scene model? (b) Does
+  feeding the previous decoded frame (a temporal enhancer) remove the
+  flicker its texture synthesis adds? (c) Would better training settings
+  rescue the fast stretches, or is the base codec the limit there?
+- (a, b) Enhancer arms (`g5d.py enhance --arms`, MSE + LPIPS loss as the
+  oracle's passing arm, the same network, steps and CRFs): footage-lpips
+  and footage-lpips-t (step 3's footage archives: P26_02
+  `20261011T062431Z-7d8edeb3`, 1,200 frames of P26_108; P06_03
+  `…062441Z-421d23d7`, 2,400 frames of P06_05 and P06_10; each coded by
+  SVT-AV1 at the CRF; target the fill on V, equal to the source there
+  through 4:2:0), and scene-lpips-t beside the oracle's scene-lpips.
+  Two jobs per pilot (CRFs 32, 40, 48 and 54, 59, 63).
+  Scene model for the head-to-head: footage only (as step 3's G) with
+  the step-4 recipe (learning rate 3 × 10⁻⁵), on both pilots.
+- (c) The oracle of step 3 (fitted on the excerpt itself, U) with the
+  step-4 recipe on the two fast stretches, P04_13 and P06_05.
+- Decision rules, fixed now.
+  (a) The venue enhancer stands if footage-lpips or footage-lpips-t
+  beats SVT-AV1 by 10% or more on at least 3 of the 5 metrics on both
+  pilots. The head-to-head with the footage-only scene model is
+  reported metric by metric; it decides nothing (both go in the paper).
+  (b) The temporal enhancer replaces the per-frame one if, for the same
+  fit, flicker_V at matched rate falls by 10% or more and its LPIPS_V
+  BD-rate against the per-frame one is +10% or better, on both pilots.
+  (c) A training-settings round for fast scenes is worth running only if
+  the oracle with the new recipe beats SVT-AV1 by 30% or more on
+  LPIPS_V on either fast stretch (the gain step 3 needed on P06_05);
+  otherwise the fast stretches are scoped out as the base codec's limit.
+- Hypotheses. (a) The footage enhancer keeps most of the scene
+  enhancer's gain (it learns the kitchen's textures, not the excerpt's
+  frames) and passes; against the footage-only scene model it repeats
+  the pattern of the pilots (weaker on LPIPS_V and DISTS_V, better on
+  PSNR_V, flicker and KID_V). (b) The temporal input cuts the added
+  flicker by a third or more at little LPIPS_V cost. (c) The oracle stays
+  above −30% on both (the old one reached +9% and −6%): fast scenes are
+  the base codec's limit.
+- Competing explanation for (b) failing: the flicker is the network
+  inventing new texture each frame from the same coarse input, which a
+  previous *decoded* frame cannot pin down; a recurrent input (the
+  previous *enhanced* frame) would then be the next step.
+- Budget: 4 enhancer jobs (≤ 45 minutes, shared Ada or A6000) and 4
+  training jobs (≤ 45 minutes, Ada), about 5.5 GPU-hours.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)

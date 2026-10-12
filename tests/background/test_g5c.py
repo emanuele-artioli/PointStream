@@ -288,3 +288,25 @@ def test_anchor_envelope_is_the_concave_hull_not_a_staircase():
     # the fill's own curve is not better than the envelope that contains it
     assert 0 <= g5.bd_rate(filled, filled + frame) < 0.02
     assert (26.0, 30.2) in g5.pareto(filled + frame)  # the staircase step the old envelope interpolated through
+
+
+def test_enhancer_arms_and_predecessors():
+    from experiments.background import g5d
+
+    assert g5d.parse_arm("footage-lpips-t") == ("footage", "lpips", True)
+    assert g5d.parse_arm("scene-mse") == ("scene", "mse", False)
+    for bad in ("scene", "scene-l1", "venue-mse", "scene-mse-x"):
+        with pytest.raises(ValueError):
+            g5d.parse_arm(bad)
+    assert g5d.previous([0, 1, 2, 10, 11]).tolist() == [0, 0, 1, 3, 3]  # no predecessor across a gap
+
+
+def test_temporal_enhancer_starts_as_the_identity_on_the_current_frame():
+    torch = pytest.importorskip("torch")
+    from experiments.background import g5d
+
+    net = g5d.enhancer(1, 8, temporal=True)
+    x = torch.rand(2, 6, 16, 16)
+    assert torch.equal(net(x), x[:, :3])
+    decoded = np.random.default_rng(0).integers(0, 255, (3, 16, 16, 3), dtype=np.uint8)
+    assert np.array_equal(g5d.apply(net, decoded, "cpu", temporal=True), decoded)
