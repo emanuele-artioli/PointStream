@@ -411,6 +411,38 @@ Codex automation tool; the CLI returns metadata but cannot call that MCP tool.
 A terminal request's preserved events remain available if Codex was closed.
 Chat notifications resume when Codex returns; remote execution is independent.
 
+## Waiting from a Claude Code session
+
+A Claude Code session waits on its jobs with one bounded, read-only command:
+
+```bash
+scripts/ps-fleet wait JOB_ID [JOB_ID ...] [--max-seconds 2700]
+```
+
+It polls the same `status` and `events` operations, once a minute, and returns
+as soon as any listed job has an unacknowledged event (terminal, stall, declared
+resume, contention or decision; a declined resume and a failed validator arrive
+as `terminal:contended` and `terminal:failed`), when a listed ID is unknown or
+unpublished, when every listed job is terminal with nothing left to
+acknowledge, or after `--max-seconds` (default and maximum 2700). It always
+prints one JSON summary per job: status, host, stage, minutes since start and
+since last progress, and unacknowledged event IDs. Exit 0 means nothing needs
+attention; exit 10 means at least one job does. An unreachable host is reported
+as `unreachable` and the wait continues. It never acknowledges, cancels,
+replays or resubmits.
+
+1. Run `ps-fleet wait` in the background (`run_in_background`), at most 45
+   minutes per call; the session is re-invoked when it returns.
+2. At every return, summarize progress for all listed jobs to the user, even
+   when nothing happened.
+3. Handle each event (inspect, report, decide within the saved experiment
+   policy or ask the user), then acknowledge it with `scripts/ps-fleet ack
+   EVENT_ID ...`.
+4. Re-arm `ps-fleet wait` while any listed job is still running.
+
+Never wait with ad-hoc polling loops (`sleep`/`watch`/repeated `status` calls,
+scheduled wakeups or cron jobs).
+
 ## Recovery and permissions
 
 Workers survive SSH disconnection and Mac sleep. Host reboot or worker death
