@@ -3570,3 +3570,105 @@ invocation turns out to be needed.
   hypothesis (60–80%) held on the mean. What the rule leaves open is
   whether a real generator keeps enough of that margin: its own pose error,
   the forearm and the occlusions by held objects are not charged here.
+
+### 2026-10-12 — H3e: a pretrained pose-conditioned generator renders the hand from the coded keypoints
+- Question (user, 2026-10-12, after H3c2). H3c2 granted a perfect
+  generator: the keypoints (1.93 kbps) carry WiLoR's pose for 69% less rate
+  than the pixel envelope. Does a real, pretrained generator delivered with
+  the decoder (billed nothing) keep a saving above 50% once its own pose
+  error, the forearm, held objects and the boundary with the background are
+  charged as they are rendered? Identity may change (constant per track);
+  pose error decides (user, 2026-10-12).
+- Audit (2026-10-12; methods, code and weights; no hand image generator was
+  in `Models`). Criteria: conditioned on keypoints or MANO; egocentric
+  hands with objects; temporal consistency; released weights and licence;
+  fits a 48 GB card.
+
+  | method | conditioning | domain | video | weights, licence | verdict |
+  |---|---|---|---|---|---|
+  | [JointControlVideo](https://github.com/ZhangCYG/JointControlVideo) (ECCV 2026) | first frame, 42 camera-frame 3D hand joints and intrinsics, text | egocentric hand–object (Ego4D) | yes: Wan2.1-I2V-14B-480P with LoRA and an occlusion-aware joint module, 81 frames | released, Apache-2.0 (Wan2.1 Apache-2.0) | **chosen** |
+  | [FoundHand](https://github.com/arthurchen0518/FoundHand) (CVPR 2025) | reference image with its keypoints and mask, target 2D keypoints | hands, 10M images incl. Ego4D and **EPIC VISOR** | per frame, autoregressive (no video training) | released (notebooks only), GPL-3.0 code, CC BY-NC data | second: 256² crops, trained on our test source |
+  | [HandRefiner](https://github.com/wenquanlu/HandRefiner) | inpainting with a mesh depth ControlNet (SD 1.5) | generated images | no | released, MIT | per-frame flicker; no temporal model |
+  | HOGAN / [HOIG](https://github.com/play-with-HOI-generation/HOIG) (NeurIPS 2022) | hand and object poses | HO3D, DexYCB | no | code; needs object meshes | no object poses in our stream |
+  | ManiVideo, RHanDS, HanDiffuser, Generated Reality | MANO/mesh or skeleton | various | some | no released weights found | not usable |
+
+  JointControlVideo fits best: its input is what H2 codes (MANO joints in
+  the camera frame, with the camera), it is trained on egocentric hand–object
+  video that does not include EPIC-KITCHENS, and it models time. Its joint
+  order is not documented (its dataset is gated); the order is settled on a
+  development window below, not on the pilot items.
+- Oracle. Per pilot item (B2's four), one generation over the 240-frame
+  window: the source's frame 0 as the first frame (granted uncoded), and
+  H2's coded 100 ms WiLoR joints (each track with its median shape, decoded
+  as H3b) at window frames 0, 3, …, 240 (81 frames, about 17–20 fps; frame
+  240 repeats 239), in camera coordinates with WiLoR's pinhole camera,
+  resized and centre-cropped to 832×480 as the model's loader does; left
+  hand in joints 0–20, right in 21–41, absent hands zero. A fixed prompt
+  ("First-person view of hands handling objects in a kitchen."), sent with
+  the decoder; cfg 5, seed 0, the released sampler. The generated frames are
+  upscaled back to the window's resolution (Lanczos); they stand for window
+  frames 3k, and frames in between are not generated (interpolation granted).
+  Two compositions, inside R only (source outside R, as H3c scores):
+  - **V1, hand generated** (user's variant 1): the generated pixels inside
+    each coded hand's MANO silhouette, dilated by 10% of its box and
+    feathered, over DCVC-UF off the shelf decoded at each of H3c's nine
+    points (scales 1, ½, ¼ × QP 0, 21, 42). Rate on R = 1.93 kbps + frame 0's
+    bits on R at that point + frames 1–239's bits on R outside the pasted
+    masks (H3c's split by DCVC-UF's own entropy model, by area). The
+    decoder has the coded pose, so the mask costs nothing.
+  - **V2, hand and forearm generated** (user's variant 2): the generated
+    pixels in all of R (dilated as V1), over the same decodes. Rate =
+    1.93 kbps + frame 0's bits on R. R is the dataset's outline, which the
+    decoder does not have (H3b2: 72–170 kbps): V2 is a bound, not a design.
+- Why it bounds the generator route at this operating point. It grants the
+  uncoded first frame while billing it at the coarse point, drops the hand's
+  bits while DCVC-UF keeps the hand as context for its other cells, grants
+  frame interpolation, and V2 grants the outline. It does not bound a
+  generator fine-tuned on EPIC-KITCHENS or one at higher resolution: if it
+  fails because the 480p frame loses the fingers (generated hands under
+  about 100 px), FoundHand at 256² crops is the next oracle.
+- Judges, as H3c2, on window frames that are both generated and judged
+  there (t = 15, 30, …, 225): WiLoR re-run with H2's box on the composite;
+  pose error = the mean joint distance to WiLoR on the source over the box,
+  mean over the item's hands. The pixel envelope (SVT-AV1 and DCVC-UF off
+  the shelf, Pareto on rate and pose error) is recomputed on the same
+  frames from H3c2's saved joints (no new pixel coding). Reported beside:
+  the generator's own error against the coded joints (does it follow its
+  input), KID on hand crops and flicker (mean absolute frame difference
+  inside R against the source's, over generated frames), for the composite
+  and for DCVC-UF at the nearest rate; a visual check of every item.
+- Decision rule (`h3e` in `DECISION`, fixed before the run). Per item and
+  variant, the saving at equal pose error = 1 − rate / (the pixel
+  envelope's rate for its pose error, linear in log rate along the front),
+  maximized over V1's nine points (the encoder can choose). A pose error
+  below every pixel point counts at the envelope's highest rate (a lower
+  bound on the saving); one above every pixel point at its lowest rate.
+  V1 decides. **Pass** (build the route: next its real coded first frame
+  and the decoder's own forearm mask) if V1's mean saving's 95% bootstrap
+  interval (by item) lies above 50%. **Fail** (no generator now; H3d next)
+  if V1's mean saving is at or below 50%. Otherwise unclear, to the user.
+  If only V2 clears 50%, that goes to the user too: it would need a
+  decoder-side forearm mask, which is untested.
+- Joint order and settings, before the pilot items (development window: an
+  H2 VISOR item outside B2's four). One generation each with the joints in
+  OpenPose order (as `mano_np` emits) and in MANO order (16 kinematic joints,
+  then the tips); the order whose generated frames give WiLoR the lower
+  error against the coded joints is used. The number of sampling steps is
+  the released 50 if a window fits in 40 minutes on an RTX 6000 Ada,
+  otherwise the most that fit, not below 30, recorded here before the
+  oracle.
+- Hypothesis. The joint module follows its input closely (the paper reports
+  joint adherence), so the composite's pose error is the keypoints' (0.8–2.3%
+  of the box) plus about half a percent, and V1 saves 50–70% (frame 0 and
+  the forearm cost most of its rate).
+- Competing explanations. At 480p the generated hands are 60–150 px tall
+  and WiLoR misreads upscaled fingers, so the error grows past the pixel
+  coders' at a few kbps; or the 81-frame clip drifts from the first frame
+  (identity or objects change), which pose error does not see but KID,
+  flicker and the visual check do; or frame 0's bits alone exceed the
+  savings, since every window pays one.
+- Budget. CPU: the Wan2.1 backbone and JointControlVideo weights (about
+  80 GB) into `Models`, one new environment. GPU, RTX 6000 Ada: smoke ≤ 600 s
+  (few frames and steps; exclusive, the model's first run on the class);
+  joint-order check 2 jobs; oracle 4 jobs, one per item, each ≤ 45 minutes;
+  about 5 GPU-hours.
