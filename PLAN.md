@@ -756,6 +756,15 @@ by the rule; the user opened the path (2026-10-12). Order now:
    below, or hand inpainting into the coded frames), or on camera motion.
 2. H3d, as agreed, against H3c's bar (now the per-item concave hull of
    SVT-AV1 and DCVC-UF off the shelf on R, by BD-rate; project convention).
+   Oracle (2026-10-12, [outcome](docs/experiments.md#2026-10-12--h3d-oracle-a-content-aware-super-resolution-of-the-hand-pixels-nas)):
+   **passes**. G5d's enhancer (0.6 M parameters) fitted on the window
+   itself, its bits free, over DCVC-UF's ¼ and ½ decodes needs 77% less rate
+   than the bar for the same LPIPS_R (CI −89% to −66%, 4 of 4 items; DISTS
+   and mostly PSNR agree; flicker unchanged). Over SVT-AV1 it is unclear
+   (−19%) and synthesizes texture. Next, the component: fitted outside the
+   window (memorization) and paid for. At 1.2 MB it costs more than it
+   saves within each pilot video (1.7–3.5 minutes), so network size, and
+   sharing one network across videos, are its axes.
 3. Candidate after H3e (user, 2026-10-12): DCVC-UF conditioned on a
    proto-hand. The decoder also receives a render of the coded keypoints
    (a skeleton or MANO image), so its bitstream carries only what the

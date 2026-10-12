@@ -4842,3 +4842,61 @@ invocation turns out to be needed.
   item and arm (8 jobs). Each is ≤ 45 minutes, shared Ada or A6000 at
   32,000 MiB, and checkpoints every finished point. That is about 5
   GPU-hours; ceiling 6.
+- Inputs: H3c's (`h3c-anchor-<video>.json` staged inputs, re-hashed),
+  manifest `pointstream-data/visor/h3d-2026-10-12/inputs-9b3b06a06e4e.json`;
+  environment `pointstream-20261009T214002Z` (`32e68872…4661`).
+- Jobs (code `852357d` for all, from each `ready.json`; shared; validators
+  12/12, including the step-0 network reproducing the base point exactly).
+  *dcvc*: P01_107 `20261012T180806Z-2a4c0cf4` (RTX 6000 Ada), P02_02
+  `…183021Z-d077eba0` (Ada), P03_10 `…183037Z-3ebf898f` (A6000), P09_106
+  `…183051Z-3f80dcab` (Ada). *svt*: P01_107 `20261012T180816Z-08afa095`
+  (A6000), P02_02 `…183107Z-daa8790f`, P03_10 `…183127Z-ce697c9e`, P09_106
+  `…183140Z-5e2929db` (Ada). 11–28 minutes each; fits 67–122 s (shared,
+  not evidence). Report (`h3d report`, code `fcf378b`, against H3c's anchor
+  and reference units `20261011T220119Z-69f5f6d7`, `…223528Z-6ecdc738`,
+  `…221908Z-8193ffb7`, `…220719Z-19637920`):
+  `pointstream-data/visor/h3d-2026-10-12/report-oracle/h3d-report.json`
+  (`12e02bc6…a71a9f`), with the crops below. The base points reproduce H3c's
+  on every item: SVT-AV1's streams byte for byte (LPIPS within 7 × 10⁻⁵ per
+  frame), DCVC-UF's with identical LPIPS and rate (6 of 24 streams differ
+  in bytes, as across GPU classes).
+- Outcome. BD-rate against H3c's bar (per-item concave hull of SVT-AV1 and
+  DCVC-UF off the shelf on R):
+
+  | arm | item | LPIPS_R | DISTS_R | PSNR_R | flicker (× base) | payback of 1.2 MB | video |
+  |---|---|---|---|---|---|---|---|
+  | DCVC-UF + SR | P01_107 | −88% | −80% | −28% | 1.04 | 286 s | 119 s |
+  | | P02_02 | −69% | −72% | +3% | 1.08 | 717 s | 207 s |
+  | | P03_10 | −89% | −83% | −3% | 1.06 | 443 s | 103 s |
+  | | P09_106 | −64% | −60% | −19% | 0.94 | 2,340 s | 149 s |
+  | | **mean** | **−77% (CI −89 to −66), 4 of 4** | | | | | |
+  | SVT-AV1 + SR | P01_107 | −72% | −76% | +56% | 0.96 | 640 s | 119 s |
+  | | P02_02 | +30% | −57% | +210% | 1.00 | — | 207 s |
+  | | P03_10 | −52% | −80% | +226% | 1.01 | 3,016 s | 103 s |
+  | | P09_106 | +19% | +4% | +132% | 0.92 | — | 149 s |
+  | | mean | −19% (CI −62 to +24), 2 of 4 | | | | | |
+
+  **The oracle passes** on the *dcvc* arm; *svt* is unclear. Payback: the
+  seconds of the hand stream whose saving (at the test front's median
+  LPIPS) equals 1.2 MB.
+- Visual check (`p02_zoom.png`, `p09_zoom.png` beside the report; frame
+  120 and 98). P02_02: DCVC-UF at ¼, QP 21 (2.75 kbps) with the fitted
+  network is close to DCVC-UF at ½, QP 21 (8.5 kbps): the glove's folds and
+  the glass rim come back, with no texture that the source does not have.
+  P09_106: the network sharpens the sleeve's and the hand's outlines, with a
+  faint contour at the sleeve's edge.
+- Reading. Hypothesis wrong in size: a network fitted to the window lifts
+  DCVC-UF's ¼ and ½ decodes by far more than expected (−77%, not −20% to
+  −35%), and on DCVC-UF PSNR_R improves or holds too (−28% to +3%), so it
+  restores the source rather than inventing texture; flicker is unchanged.
+  On SVT-AV1 it is the other way round: PSNR_R gets much worse (+132% to
+  +226%) and LPIPS_R gains on two items only, so it synthesizes texture over
+  AV1's blocks, as G5d found on the background. Two things remain open
+  for the component, both raised by the rule's competing explanation:
+  - *Memorization.* 0.6 M parameters fitted on 240 frames of the scored
+    hands. A fit outside the window answers it.
+  - *Payback.* At 1.2 MB the network costs more than it saves within each
+    pilot video (286–2,340 s against 103–207 s). It must shrink by about
+    3–20 times, or be shared beyond one video (per person or kitchen, or
+    one generic network sent with the decoder, as DCVC-UF's own weights are).
+- GPU time: about 2.4 GPU-hours (8 jobs), within the 6 allowed.
