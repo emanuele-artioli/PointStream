@@ -168,7 +168,9 @@ def generate(args: argparse.Namespace) -> int:
         raise SystemExit(f"--frames {frames}: Wan needs 4k+1 frames")
     out = Path(args.out or Path(os.environ["PS_SCRATCH_DIR"]) / "publish")
     out.mkdir(parents=True, exist_ok=True)
-    inputs = sorted(Path(args.inputs).glob("*.npz"))
+    root = Path(args.inputs)
+    root = root / "publish" if (root / "publish").is_dir() else root  # an extracted published.tar keeps publish/
+    inputs = sorted(root.glob("*.npz"))
     if args.items:
         wanted = args.items.split(",")
         inputs = [p for p in inputs if p.stem in wanted]

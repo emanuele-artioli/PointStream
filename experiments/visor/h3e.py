@@ -265,9 +265,10 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     truth = rgb_memmap(Path(decoded["path"]), work / "truth.npy", frames, width, height, full_range, device)
     meta_p, a, wilor = coded_poses(args, item["id"])
     focal, centre = float(meta_p["focal"]), tuple(meta_p["principal"])
-    prepared = json.loads((Path(args.generated) / f"{item['id']}.json").read_text()) if (Path(args.generated) / f"{item['id']}.json").exists() else None
-    gen_record = json.loads((Path(args.generated) / f"{item['id']}@{args.order}.json").read_text())
-    gen_canvas = np.load(Path(args.generated) / f"{item['id']}@{args.order}.npz")["frames"]
+    tree = Path(args.generated)
+    tree = tree / "publish" if (tree / "publish").is_dir() else tree  # an extracted published.tar keeps publish/
+    gen_record = json.loads((tree / f"{item['id']}@{args.order}.json").read_text())
+    gen_canvas = np.load(tree / f"{item['id']}@{args.order}.npz")["frames"]
     geometry = canvas_geometry(width, height)
     times = generated_times(frames)
     if gen_canvas.shape[0] != len(times):
@@ -412,7 +413,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
               "shown_t": np.array(shown, int)}
     meta = {"unit": item["id"], "item": item["id"], "video": item["video"], "fps": float(item["fps"]), "frames": frames,
             "seconds_coded": seconds, "order": args.order, "variants": variants, "points": points, "look_frame": look,
-            "generated": gen_record, "prepared": prepared, "geometry": geometry, "pose_kbps": args.pose_kbps,
+            "generated": gen_record, "geometry": geometry, "pose_kbps": args.pose_kbps,
             "decode": {k: v for k, v in decoded.items() if k != "path"}, "mask_set": mask_info, "checks": checks,
             "pose_unit_hash_ok": bool(meta_p["npz_hash_ok"]), "seconds": round(time.time() - began, 2)}
     save_unit(publish, "judge", item["id"], arrays, meta)
