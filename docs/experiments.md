@@ -3371,7 +3371,7 @@ invocation turns out to be needed.
   (G5b's). Environment `pointstream-20261009T214002Z` (`32e68872…4661`,
   G5b's; the H3b environment plus NVRC).
 - Calibration (`20261011T215620Z-b6a1294d`, shared, RTX 6000 Ada, code
-  `cac5322` and later; the upper bound's data: 4 windows × 3 scales × 5
+  `0ccb20d`; the upper bound's data: 4 windows × 3 scales × 5
   segments, 2,880 fitted frames, 960 sequence starts; 40 steps, β = 0;
   validator 8/8). At step 0 the monitor set's masked distortion is
   0.002376 and its LPIPS on R 0.0564, so **β = 0.084** (G5b's 0.026 came
@@ -3380,9 +3380,10 @@ invocation turns out to be needed.
   β = 0 `20261011T230242Z-eed20579`, β = 0.084 `20261011T230251Z-97f6ec94`.
 - Upper bound, outcome (stage 1). Training: β = 0 converged (monitor loss
   −2.4% over the last fifth); β = 0.084 did not by G5b's 3% (−3.5%), which
-  can only understate an upper bound. Coding jobs (shared; validators
-  passed; the anchor and reference jobs at code `cac5322`/`a2e5…`, the arms
-  at `ab86e31` and later): anchor and reference `20261011T220119Z-69f5f6d7`
+  can only understate an upper bound (training jobs at code `5002cf6`).
+  Coding jobs (shared; validators passed; code per job's `ready.json`:
+  anchor and reference `4e6bd8d`, P02_02's `5002cf6`; arms `ab86e31`,
+  P09_106's β = 0 rerun `8c70699`): anchor and reference `20261011T220119Z-69f5f6d7`
   (P01_107), `…223528Z-6ecdc738` (P02_02), `…221908Z-8193ffb7` (P03_10),
   `…220719Z-19637920` (P09_106); β = 0 `20261011T235449Z-bee05804`,
   `…235458Z-ac5f6422`, `…235508Z-87306ff1`, `20261012T014347Z-7c545a0e`;
