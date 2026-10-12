@@ -417,7 +417,9 @@ before only where noted.
    flicker 5%, not adopted. PSNR_V and flicker stay DCVC-UF's losses.
    *Round 2 done (2026-10-12):* 10⁻⁴ is not better; **the recipe is
    β = 0.005, learning rate 3 × 10⁻⁵, ProPainter's fill, 540 steps**,
-   now run on the other 6 stretches. All BD-rates against SVT-AV1 were
+   on all 10 stretches it beats SVT-AV1 on LPIPS_V by a median 50%
+   (9 of 10), and on DISTS_V on the four calmest; PSNR_V, flicker and
+   KID_V are lost. All BD-rates against SVT-AV1 were
    corrected on 2026-10-12 (its envelope was a staircase, optimistic by
    about 7%; no decision changed; [experiments](docs/experiments.md)).
    *G5d oracle (user 2026-10-11, done 2026-10-12):* a venue-trained
