@@ -3155,6 +3155,43 @@ invocation turns out to be needed.
 - Budget: 6 jobs (per window: SVT-AV1 at 1080p; SVT-AV1 and the scene
   model at 960×540; the scene model and DCVC-UF at 1080p), each ≤ 45
   minutes on Ada (shared), about 4 GPU-hours.
+- Runs (Ada, shared GPUs). P26_02: SVT-AV1 1080p `20261012T122424Z-f94ef019`,
+  960×540 methods `…131334Z-d125ea07` (code `43086a7`, gpu6), scene model
+  and DCVC-UF at 1080p `…122446Z-943a1dc5`. P06_03: `…122457Z-a660ab4c`,
+  `…122506Z-f7bc558e`, `…122515Z-439a790f`. Code `915bae2` unless noted.
+  P26_02's first 960×540 job (`…122435Z-307fb4ad`, gpu5, shared with
+  another user's process) failed when DCVC-UF's decoder segfaulted after
+  its own encode, and two of its saved scene-model points had failed the
+  decode check (not deterministic, the decoder's intra frame not the
+  encoder's): not reused; the job ran again from scratch on gpu6, and a
+  restored attempt (`…130446Z-9e73b9bf`) failed its smoke, which had
+  loaded the full run's points (fixed in `43086a7`). Every reported
+  DCVC-UF point decodes deterministically and matches the encoder's
+  intra frame. Foreground (B1b) 35% and 29% of the pixels, filled holes
+  38% and 34%.
+- Rates. SVT-AV1 at 1080p spends 130–3,070 kbps on the background (CRF
+  63–32); the scene model at 960×540 12–400 kbps, mostly below SVT-AV1's
+  lowest rate (CRF 63 is its floor), so BD-rates use the overlap.
+- Outcome (2), resolution. BD-rate on LPIPS_V of 960×540 upsampled
+  against 1080p, P26_02 | P06_03: SVT-AV1 +54% | +100% (DISTS_V +40% |
+  +171%): **SVT-AV1 codes at 1080p**. Scene model −35% | −28% (PSNR_V
+  −60% | −35%, DISTS_V −68% | −53%, KID_V −82% | −66%): **the scene
+  model codes at 960×540 and is upsampled at the client**. Hypothesis
+  half wrong: downscaling helps the model trained at that scale, not
+  SVT-AV1. H5's anchor is SVT-AV1's envelope over both sizes, which is
+  its 1080p curve.
+- Outcome (3), frame rate. The scene model at 960×540 against the SVT-AV1
+  envelope at 1080p, P26_02 | P06_03: LPIPS_V **−91% | −45%**, DISTS_V
+  −93% | −12%, KID_V −77% | −6%, PSNR_V +72% | +25%, flicker unclear
+  (too little rate overlap). Its stretches gave LPIPS_V −92% | −66%: on
+  P26_02 the gain transfers, on P06_03 it is 21 points smaller, 1 point
+  outside the rule's 20. **By the rule, native-rate training (G6 step
+  3) runs before step 4.** Beside the rule: at the native rate the model
+  beats SVT-AV1 on 3 of 5 metrics on both windows (on the stretches, 2
+  of 5), and loses far less PSNR_V (+25% against +96% on P06_03); DCVC-UF
+  off the shelf at 1080p comes close to SVT-AV1 there (LPIPS_V −5%,
+  PSNR_V −7% on P06_03; +48% and +10% on P26_02).
+- GPU time: about 5 hours (8 jobs, 2 failed).
 
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
