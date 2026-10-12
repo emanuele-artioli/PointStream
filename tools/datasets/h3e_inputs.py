@@ -179,7 +179,7 @@ def main() -> int:
     for judge_args in args.judge:
         (name, _, tar), order = judge_args[0].partition("="), judge_args[1]
         items = judge_args[2].split(",") if len(judge_args) > 2 else pilot
-        development = len(judge_args) > 2
+        development = any(i not in pilot for i in items)  # a development window: the generator's frames are all it needs
         key = f"generated_{name.replace('-', '_')}"  # staged names are identifiers
         staged[key] = entry(key, Path(tar), extract=True)
         for item in items:
