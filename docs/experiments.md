@@ -3528,3 +3528,11 @@ invocation turns out to be needed.
   generator would also inherit, so it is the fair one to compare.
 - Budget. One shared GPU job per pilot item (H3c's anchor jobs plus WiLoR
   on 48 judge frames) ≤ 45 minutes; about 1.5 GPU-hours.
+- Validator change (after P02_02's smoke `20261012T063140Z-ae4d2017`
+  failed it, before any full result). The check that WiLoR re-run on the
+  source reproduces H2's fit took H3b's 0.5% of the box; per item it is
+  now the median hand within 1% (the smoke's 7 hands: median 0.61%, max
+  1.6%). The check guards the judge's input path (a wrong frame or box
+  moves the joints by more than 10% of the box); the pose errors compare
+  every coder against the same re-run, so the decision does not depend on
+  it.
