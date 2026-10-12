@@ -83,15 +83,16 @@ def main() -> int:
     parser.add_argument("--deadline", required=True)
     parser.add_argument("--prepared", help="the prepare job's published.tar")
     parser.add_argument("--generate", nargs=4, action="append", default=[], metavar=("LABEL", "ITEMS", "ORDERS", "STEPS"))
+    parser.add_argument("--checked", action="store_true", help="H3c2's inputs were re-hashed by an earlier run (skip it)")
     parser.add_argument("--judge", nargs=2, metavar=("NAME=TAR", "ORDER"))
     args = parser.parse_args()
-    dest = Path(args.dest)
+    dest = Path(args.dest).resolve()
     h3c_spec = json.loads((Path(args.h3c_dir) / "h3c2-P01_107.json").read_text())
     staged = {e["name"]: e for e in h3c_spec["staged_inputs"]}
     inception = next(e for e in json.loads((Path(args.h3b_dir) / "h3b-oracle-pilot.json").read_text())["staged_inputs"]
                      if e["name"] == "inception")
     staged["inception"] = inception
-    for e in staged.values():  # H3c2's inputs are unchanged since its jobs
+    for e in ([] if args.checked else staged.values()):  # H3c2's inputs are unchanged since its jobs
         if file_sha256(Path(e["path"])) != e["sha256"]:
             raise SystemExit(f"{e['name']}: {e['path']} changed since H3c2")
     models = dest / "inputs" / "models"
