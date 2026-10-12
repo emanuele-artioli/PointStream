@@ -3355,6 +3355,14 @@ invocation turns out to be needed.
     dilated) and +3% (exact). Decision with the user (the rule's
     clause for mixed results).
   - GPU time: about 1 hour (2 jobs).
+- Decision (user, 2026-10-12): the other 32 windows do not run now.
+  About 80 GPU-hours is worth spending once, on the final experiments,
+  when the pipeline is settled. First the rest of the pipeline is found,
+  built and optimized with cheap tests; then the paper's first draft
+  fixes the figures and the experiments missing for them; then one
+  heavy run produces every result the paper needs. The pilot's code
+  (`g6.py` footage, train, format, enhance) and its two published
+  windows stay as they are for the foreground session's compositor.
 
 
 ### 2026-10-08 — H1: foreground motion and representation audit
