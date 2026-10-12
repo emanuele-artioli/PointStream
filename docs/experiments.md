@@ -3198,6 +3198,77 @@ invocation turns out to be needed.
   and at the native rate are ablations for the paper's final runs.
 - GPU time: about 5 hours (8 jobs, 2 failed).
 
+### 2026-10-12 — G6 steps 4–5, pilot: every stage per window on the pilots' windows
+- Question (PLAN G6 4–5): the pipeline that makes both routes' background
+  for every window of evaluation set v2, at the interface agreed with the
+  foreground session, run end to end on the pilots' windows
+  (P26_02_0000001071, P06_03_0000005110) before the other 32. Two things
+  change from steps 2–3 and are checked here: the scene model's footage
+  (the window's own video, not G1d's stretch), and the enhancer at H5's
+  format (1080p and the native rate; G5d fitted it at 960×540, 10
+  frames/s).
+- Method, per window (`experiments/background/g6.py`):
+  1. `footage --set scene`: G5b's split of a stretch applied to the
+     window, so no window needs a prepared stretch: the 120 s of its own
+     video around it (shifted to stay 5 s from the video's ends), less the
+     window and 5 s on each side, at 10 frames/s and 960×540 (about 1,060
+     frames). Foreground as G5c's footage (SAM 3.1 "hand" and "arm" plus
+     the EPIC detector's boxes at score ≥ 0.5, dilated 16 px at 1080p;
+     the detections cover all 34 videos, G1's `hand-objects.tar`), filled
+     by ProPainter.
+  2. `footage --set native`: 4 segments of 2 s at the window's rate and
+     1080p from the same parts (starts spread evenly, blind to content),
+     the same foreground, ProPainter at 960×540 upsampled into the holes
+     only (as the window's fill). The enhancer's training pairs.
+  3. `train`: recipe L (β 0.005, learning rate 3 × 10⁻⁵, 540 steps) on
+     step 1's footage, from the public HT-L weights.
+  4. `format --publish`: the window decoded as B2 does, F = B1b's
+     `visor_dense_sam_fill` filled *exactly* (no dilation, as agreed),
+     the whole frame coded: the scene model at 960×540 upsampled, QP 0,
+     13, 25, 38, 50, 63, plus at 1080p QP 50 and 63 for the high end.
+  5. `enhance --publish` (two jobs, CRFs 32–48 and 54–63): SVT-AV1 at
+     1080p (G5's preset and CRFs; the anchor, published too), and G5d's
+     enhancer (8 blocks, 64 channels, MSE + LPIPS on V, 2,000 steps)
+     fitted per CRF on step 2's footage coded by SVT-AV1 at that CRF,
+     applied to the window's SVT-AV1 decode.
+  Scored at 1080p on V (`g5c.full_score`: PSNR, LPIPS, DISTS, flicker,
+  KID). Published per window: each point's decoded 1080p frames (FFV1,
+  4:2:0, BT.709 full range; checked by decoding them again), bitstream,
+  enhancer weights, and a manifest (window, frame range, F's mask-set
+  sha256, per point bytes, bitstream sha256, per-frame decoded sha256s,
+  decode ms per frame, GPU class, job id and code revision). Points that
+  the client upsamples are published after upsampling and scored as
+  published (through 4:2:0, unlike steps 2–3).
+- Decision rules, fixed now. (a) *The window's own footage replaces the
+  stretch* if the scene model's BD-rate on LPIPS_V against SVT-AV1 at
+  1080p is within 20 points of steps 2–3's (−91% | −45%) on both
+  windows; otherwise the footage protocol is revised before scaling.
+  (b) *The enhancer works at H5's format* if it beats SVT-AV1 at 1080p by
+  10% or more on LPIPS_V on both windows; otherwise its fit at 960×540
+  (SVT-AV1 at 540p, enhanced, upsampled) is tried on the pilots before
+  scaling. (c) *The interface holds* if every manifest is complete and
+  the foreground session composites one pilot window from it without a
+  change. All three pass → the other 32 windows run with the same
+  settings. Every metric is reported as BD-rate against SVT-AV1 at
+  1080p (concave-hull envelope), the rate allocation with the
+  foreground is the foreground session's.
+- Hypotheses. (a) Passes: the window's own footage is closer to the
+  window in time than most of a stretch's frames; filling F exactly
+  (smaller holes) helps both codecs alike. (b) Passes with a smaller
+  margin than at 960×540 (G5d's footage enhancer −36% | −50% on
+  LPIPS_V): at 1080p and the native rate SVT-AV1's artifacts are finer
+  and the enhancer's receptive field covers less of the scene.
+- Competing explanations. (a) A failure would mean the stretch's frames
+  far from the window carried the gain (more viewpoints), not the
+  window's neighbourhood; footage from the whole video would test it.
+  (b) A failure at 1080p could be the fit's size (4 segments of 2 s at
+  1080p, 400–480 frames, hold fewer distinct views than G5d's 1,200–2,400).
+- Budget: pilot 12 jobs, each ≤ 45 minutes on Ada or A6000 (shared),
+  about 5 GPU-hours. The other 32 windows at the same per-window cost:
+  about 80 GPU-hours, above PLAN's 65 (steps 4–5); the scale-up waits
+  for the user's approval with the pilot's measured cost.
+
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
