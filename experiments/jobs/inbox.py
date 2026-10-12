@@ -1110,6 +1110,59 @@ def watch_chat(state_dir: Path, chat_id: str) -> dict[str, Any]:
     return {"chat_id": chat_id, "jobs": jobs, "all_terminal": all(j["status"].get("status") in TERMINAL for j in jobs)}
 
 
+WAIT_MAX_SECONDS = 2700
+WAIT_ATTENTION_EXIT = 10
+# A missing or unpublished submission needs inspection, never more waiting.
+UNKNOWN_JOB_ERRORS = ("invalid job ID", "no local job record", "unpublished or unknown")
+
+
+def wait_snapshot(state_dir: Path, job_id: str, now: float) -> dict[str, Any]:
+    """One read-only summary of a job and its unacknowledged events."""
+    from argparse import Namespace
+
+    args = Namespace(state_dir=state_dir, job_id=job_id, action="status")
+    try:
+        state = remote_job(args)
+    except (fleet.FleetError, OSError, ValueError, KeyError) as exc:
+        unknown = any(text in str(exc) for text in UNKNOWN_JOB_ERRORS)
+        return {"job_id": job_id, "status": "unknown" if unknown else "unreachable", "error": str(exc), "attention": unknown, "unacknowledged_event_ids": []}
+    remote = state.get("remote_status") or {}
+    progress = remote.get("progress") or {}
+    started, last_progress = remote.get("started"), remote.get("last_progress")
+    summary = {
+        "job_id": job_id,
+        "status": state.get("status"),
+        "host": state.get("host_alias"),
+        "stage": progress.get("stage"),
+        "minutes_since_start": round((now - started) / 60, 1) if started else None,
+        "minutes_since_progress": round((now - last_progress) / 60, 1) if last_progress else None,
+    }
+    try:
+        args.action = "events"
+        events = remote_job(args)["events"]
+    except (fleet.FleetError, OSError, ValueError, KeyError) as exc:
+        return {**summary, "events_error": str(exc), "attention": False, "unacknowledged_event_ids": []}
+    return {**summary, "attention": bool(events), "unacknowledged_event_ids": [e["id"] for e in events], "events": [{"id": e["id"], "kind": e["kind"]} for e in events]}
+
+
+def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, poll_seconds: float = POLL_SECONDS, clock: Any = time.monotonic, sleep: Any = time.sleep) -> dict[str, Any]:
+    """Block until a listed job needs attention or the bounded wait ends. Read-only."""
+    limit = min(max_seconds, WAIT_MAX_SECONDS)
+    begun = clock()
+    while True:
+        poll_started = clock()
+        jobs = [wait_snapshot(state_dir, job_id, time.time()) for job_id in job_ids]
+        elapsed = clock() - begun
+        attention = any(job["attention"] for job in jobs)
+        settled = all(job["status"] in TERMINAL for job in jobs)
+        # Stop before a further poll would end past the limit.
+        remaining = limit - elapsed - (clock() - poll_started)
+        if attention or settled or remaining <= 0:
+            reason = "attention" if attention else "all_terminal" if settled else "timeout"
+            return {"reason": reason, "attention": attention, "waited_seconds": round(elapsed), "max_seconds": limit, "jobs": jobs}
+        sleep(min(poll_seconds, remaining))
+
+
 def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-dir", type=Path, default=fleet.DEFAULT_STATE_DIR)
@@ -1143,6 +1196,9 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
         command.add_argument("job_id")
     watch = actions.add_parser("watch")
     watch.add_argument("chat_id")
+    waiting = actions.add_parser("wait", help="block until a listed job needs attention, at most 45 minutes; read-only")
+    waiting.add_argument("job_ids", nargs="+")
+    waiting.add_argument("--max-seconds", type=float, default=WAIT_MAX_SECONDS, help=f"stop waiting after this many seconds; capped at {WAIT_MAX_SECONDS}")
     ack = actions.add_parser("ack")
     ack.add_argument("event_ids", nargs="+")
     for name in (() if public_only else ("worker", "campaign", "salvage", "rpc")):
@@ -1187,6 +1243,12 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
             value = selftest_submit(args, root)
         elif args.action == "watch":
             value = watch_chat(args.state_dir, args.chat_id)
+        elif args.action == "wait":
+            if not args.max_seconds > 0:
+                raise fleet.FleetError("--max-seconds must be positive")
+            value = wait_jobs(args.state_dir, args.job_ids, args.max_seconds)
+            print(json.dumps(value, indent=2, allow_nan=False))
+            return WAIT_ATTENTION_EXIT if value["attention"] else 0
         elif args.action == "ack":
             for event_id in args.event_ids:
                 if len(event_id) != 32 or any(c not in "0123456789abcdef" for c in event_id):

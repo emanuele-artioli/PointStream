@@ -39,7 +39,8 @@ placeholders, a smoke of at most 600 s, a validator with substantive checks,
 sha256-identified inputs, a deadline and a budget. Check existing jobs and all
 eligible hosts before submitting to the compatible host pool. Uncertain
 submissions are inspected, never replayed; cancel only your own jobs. GPU hosts
-are gpu1–gpu6.
+are gpu1–gpu6. Wait on fleet jobs only with `scripts/ps-fleet wait` (returns within 45
+minutes); summarize progress to the user at every return.
 
 ## Shared home is slow NFS
 
@@ -82,6 +83,12 @@ A number is evidence only if it names its job, code revision, inputs and GPU,
 and comes from the real component, not a stand-in. Also record the selected
 patch checksums, command, environment, and native encoder/decoder paths and
 versions. Infrastructure smoke runs are not evidence.
+
+Report comparisons as BD-rate (rate at equal quality, PCHIP over the overlapping
+quality range) per metric, against an achievable anchor envelope (the upper
+concave hull of the anchor's encodes). When curves do not overlap, report
+"better/worse at every rate" instead of a number. Quality differences at equal
+rate are secondary.
 
 ## Baselines
 
