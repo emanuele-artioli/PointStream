@@ -3427,3 +3427,13 @@ invocation turns out to be needed.
   code the hands for fewer bits. The upper bound's margin over the
   reference is close to the component's 10% bar, so the component is
   expected to miss it.
+- Visual check (P02_02, where the reference loses on DISTS; frame 120,
+  every coder at about 8 kbps on R, crops from the coding jobs'
+  `published.tar`). SVT-AV1 at ¼ (CRF 63, 8.0 kbps) blurs and blocks the
+  glove's edges and loses the glass's rim. DCVC-UF off the shelf at full
+  resolution (QP 0, 8.2) keeps the outlines but renders the glove waxy and
+  flat, without its folds: the lost texture DISTS charges. At ½ (QP 21,
+  8.5) it keeps more folds and the rim, and the tuned model (β = 0.084,
+  QP 0 at ½, 8.3) is close to it with slightly more fold detail. No
+  synthesized or periodic texture in any. The source itself is motion
+  blurred here.
