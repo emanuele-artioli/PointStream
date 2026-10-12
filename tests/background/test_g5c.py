@@ -310,3 +310,22 @@ def test_temporal_enhancer_starts_as_the_identity_on_the_current_frame():
     assert torch.equal(net(x), x[:, :3])
     decoded = np.random.default_rng(0).integers(0, 255, (3, 16, 16, 3), dtype=np.uint8)
     assert np.array_equal(g5d.apply(net, decoded, "cpu", temporal=True), decoded)
+
+
+def test_g6_methods_and_resizing():
+    pytest.importorskip("cv2")
+    from experiments.background import g6
+
+    assert g6.parse_method("scene-540") == ("scene", (960, 540))
+    assert g6.parse_method("svt-1080") == ("svt", (1920, 1080))
+    with pytest.raises(ValueError):
+        g6.parse_method("svt-720")
+    rgb = np.full((2, 1080, 1920, 3), 100, np.uint8)
+    small = g6.resize(rgb, (960, 540), area=True)
+    assert small.shape == (2, 540, 960, 3) and (small == 100).all()
+    assert (g6.resize(small, (1920, 1080), area=False) == 100).all()
+    hole = np.zeros((1, 1080, 1920), bool)
+    hole[0, 500, 900] = True  # one pixel: the hole survives downscaling and dilation is 16 px
+    assert g6.resize(hole, (960, 540), area=True).sum() >= 1
+    grown = g6.dilate_1080(hole)
+    assert grown[0, 500, 916] and not grown[0, 500, 917]

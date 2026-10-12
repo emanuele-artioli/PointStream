@@ -3118,6 +3118,44 @@ invocation turns out to be needed.
   change less compressible. Payback at 50 kbps of SVT-AV1 (recipe L's
   LPIPS_V saving −92% | −66%): 2.4 | 3.4 hours of stream.
 
+### 2026-10-12 — G6 steps 2–3: the background at H5's format (resolution, frame rate)
+- Question (PLAN G6): G5c's evidence is at 960×540 and 10 frames/s; H5
+  is scored by B2's harness at 1080p and the windows' native 59.94
+  frames/s. (2) Should the background be coded at 1080p, or at 960×540
+  and upsampled at the client? (3) Does the scene model trained on 10
+  frames/s footage keep its gain at the native rate, or does it need
+  native-rate training?
+- Method (`experiments/background/g6.py format`): the pilots' evaluation
+  windows (P26_02_0000001071, P06_03_0000005110; 240 frames, 4 s),
+  decoded as B2 does (its JPEG gate checked). Foreground: B1b's
+  `visor_dense_sam_fill`, dilated 16 px at 1080p as G1; filled by
+  ProPainter at 960×540, upsampled into the holes only. Methods on the
+  filled frames: SVT-AV1 (G5's preset and CRFs) at 1080p and at 960×540
+  upsampled (bicubic); DCVC-UF off the shelf at 1080p; recipe L's scene
+  model of the window's stretch (trained at 960×540, 10 frames/s; the
+  window lies inside its held-out excerpt) at 1080p and at 960×540
+  upsampled. Scored at 1080p on the background (not B1b's foreground),
+  `g5c.full_score`: PSNR, LPIPS, DISTS, flicker and KID on V.
+- Decision rules, fixed now. (2) Per codec, the coded size is 960×540
+  upsampled if its BD-rate on LPIPS_V against the same codec at 1080p is
+  0% or better on both windows, else 1080p; PSNR_V and DISTS_V are
+  reported beside it. The anchor for H5 is then SVT-AV1's envelope over
+  both sizes (concave hull). (3) The 10 frames/s scene model transfers if,
+  at its chosen size, its BD-rate on LPIPS_V against that SVT-AV1 envelope
+  is within 20 points of its stretch's (P26_02 −92%, P06_03 −66%) on both
+  windows; otherwise native-rate training (G6 step 3) runs before step 4.
+- Hypotheses. (2) Downscaled coding wins for both codecs at these rates
+  (the background is out of focus and noisy at 1080p, so its fine detail
+  costs bits that LPIPS does not reward), most at the low end. (3) The
+  gain transfers: at 59.94 frames/s each frame moves 6× less, which
+  favours DCVC-UF's temporal prediction more than SVT-AV1's.
+- Competing explanation for a failure of (3): the model learned the
+  stretch's texture at 960×540 scale, and at 1080p (or after resampling)
+  the textures it synthesizes no longer match.
+- Budget: 6 jobs (per window: SVT-AV1 at 1080p; SVT-AV1 and the scene
+  model at 960×540; the scene model and DCVC-UF at 1080p), each ≤ 45
+  minutes on Ada (shared), about 4 GPU-hours.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)

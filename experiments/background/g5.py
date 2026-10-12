@@ -414,12 +414,13 @@ def summarize_row(row: dict[str, Any]) -> dict[str, Any]:
 DCVC_QPS = (9, 27, 45, 63)
 
 
-def code_dcvc(args: argparse.Namespace, source: Path, frames: int, qp: int, work: Path) -> dict[str, Any]:
+def code_dcvc(args: argparse.Namespace, source: Path, frames: int, qp: int, work: Path, width: int = WIDTH,
+              height: int = HEIGHT) -> dict[str, Any]:
     """One DCVC-UF HT-L encode and decode of a 4:2:0 full-range file (B2's worker, full range as is)."""
     from src.codecs.dcvc_uf_worker import dcvc_command
 
     work.mkdir(parents=True, exist_ok=True)
-    plan = {"structure": "htl", "qp": qp, "frame_count": frames, "height": HEIGHT, "width": WIDTH,
+    plan = {"structure": "htl", "qp": qp, "frame_count": frames, "height": height, "width": width,
             "src_type": "yuv420", "frames_file": str(source), "container": str(work / "stream.psdc"),
             "out_file": str(work / "decoded.yuv"), "image_ckpt": args.image_ckpt,
             "image_sha256": file_sha256(Path(args.image_ckpt)), "video_ckpt": args.video_ckpt,
