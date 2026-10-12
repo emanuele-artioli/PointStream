@@ -3028,6 +3028,32 @@ invocation turns out to be needed.
     ceiling by about 30 points.
   - GPU time: about 5 hours (8 jobs).
 
+### 2026-10-12 — G5c step 4, round 3: a longer schedule (fast scenes first)
+- Question (G5d step 2's rule c): recipe L lifted the fast-scene oracle
+  by about 30 points, so the scene model is under-fitted there; does
+  training longer help the deployable model (fitted on the stretch's
+  other frames) on fast and on calm stretches?
+- Arm X: recipe L continued from its published checkpoint for another
+  540 steps (1,080 in all; a fresh optimizer, `g5b.py finetune --init`),
+  on the 4 development stretches (from L's jobs there) and on the two
+  fast ones, P04_13 and P06_05 (from L's 10-stretch run). Scored with
+  KID and the rest as round 1.
+- Decision rule, fixed now: X becomes the recipe if on the development
+  set it beats SVT-AV1 on more metrics than L, or on as many with a mean
+  lower by more than 5 points. On the fast stretches every metric is
+  reported against SVT-AV1 and a win is any BD-rate below 0, however
+  narrow (user, 2026-10-12: a narrow win is still a win, not hidden).
+- Hypotheses: on the calm development stretches within ±5 points of L
+  (near their ceiling); on the fast ones LPIPS_V improves by 10 points
+  or more (P06_05 −8% → −18% or better, P04_13 +12% → +2% or better);
+  DISTS_V and PSNR_V stay lost there.
+- Competing explanation if the fast stretches do not improve: the
+  oracle's gain came from fitting the excerpt's own motion, which the
+  stretch's other frames do not share, so more steps on them cannot
+  reach it.
+- Budget: 6 training jobs (≤ 45 minutes, Ada, shared), about 4
+  GPU-hours.
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
