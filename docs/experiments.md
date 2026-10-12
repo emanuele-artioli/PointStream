@@ -3679,6 +3679,16 @@ invocation turns out to be needed.
   V2 (one point) keeps the rate at equal pose error on the hull. The
   thresholds are unchanged: V1 passes with the mean saving (−BD-rate) above
   50% across its 95% interval and fails at or below 50% mean.
+- Smoke (exclusive, Ada; `20261012T123958Z-7b531e66`, code `be04b54`, validator
+  passed): 9 frames at 4 steps, then 81 frames at 10 steps on P22_107. 32.8 s
+  per step at 81 frames, so the released 50 steps (≈ 27 min per window) fit
+  the 40 minutes: **50 steps**, one job per generation. Peak 39.7 GB
+  reserved; later generations run shared at 42,000 MiB. The T5 tokenizer's
+  warning about a "Mistral regex" does not apply: the prompt's ids equal
+  sentencepiece's own encoding and decode back to the prompt. Earlier
+  attempts: `20261012T114547Z-8cecd105` (inputs read from the wrong level of
+  the prepare archive) and `20261012T122341Z-9a1a31a1` (stopped as contended
+  by another user's process). Not evidence.
 - Hypothesis. The joint module follows its input closely (the paper reports
   joint adherence), so the composite's pose error is the keypoints' (0.8–2.3%
   of the box) plus about half a percent, and V1 saves 50–70% (frame 0 and

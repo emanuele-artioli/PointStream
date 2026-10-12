@@ -84,7 +84,8 @@ def main() -> int:
     parser.add_argument("--prepared", help="the prepare job's published.tar")
     parser.add_argument("--generate", nargs=4, action="append", default=[], metavar=("LABEL", "ITEMS", "ORDERS", "STEPS"))
     parser.add_argument("--checked", action="store_true", help="H3c2's inputs were re-hashed by an earlier run (skip it)")
-    parser.add_argument("--judge", nargs=2, metavar=("NAME=TAR", "ORDER"))
+    parser.add_argument("--judge", nargs="+", action="append", default=[], metavar="NAME=TAR ORDER [ITEMS]",
+                        help="judge specs for a generate job's published.tar, joint ORDER, ITEMS (comma list; default pilot)")
     args = parser.parse_args()
     dest = Path(args.dest).resolve()
     h3c_spec = json.loads((Path(args.h3c_dir) / "h3c2-P01_107.json").read_text())
@@ -164,32 +165,36 @@ def main() -> int:
                  f"intrinsics, joint orders {orders}) for 9 frames at 4 steps; asserts the device, bf16 and the attention kernel "
                  f"(first run on Ada) and records the peak memory and seconds per step; the stage runs 81 frames at {steps} steps.")
         # The first run on the class is exclusive (AGENTS.md); its peak sets the shared declaration afterwards.
-        exclusive = label.startswith(("smoke", "order"))
+        exclusive = label.startswith("smoke")
         body = spec(["experiments/visor/h3e_generate.py"], ["{python}", "experiments/visor/h3e_generate.py", "validate"],
                     args.jcv_environment, arguments, [staged[k] for k in ["prepared", *weights]], scale, basis, "gpu",
-                    40000 if exclusive else 44000, None if exclusive else GEN_SHARING, GEN_GPU_MODELS, 80)
+                    # The exclusive smoke (20261012T123958Z-7b531e66) peaked at 39,654 MiB reserved on Ada.
+                    40000 if exclusive else 42000, None if exclusive else GEN_SHARING, GEN_GPU_MODELS, 80)
         (dest / f"h3e-generate-{label}.json").write_text(json.dumps(body, indent=1) + "\n")
         written.append(f"h3e-generate-{label}.json")
 
-    if args.judge:
-        (name, _, tar), order = args.judge[0].partition("="), args.judge[1]
-        staged["generated"] = entry("generated", Path(tar), extract=True)
-        for item in pilot:
+    for judge_args in args.judge:
+        (name, _, tar), order = judge_args[0].partition("="), judge_args[1]
+        items = judge_args[2].split(",") if len(judge_args) > 2 else pilot
+        development = len(judge_args) > 2
+        staged[f"generated_{name}"] = entry(f"generated_{name}", Path(tar), extract=True)
+        for item in items:
             arguments = ["judge", *window, "--masks", "{staged:fill_masks}", "--mask-record", "{staged:fill_record}",
-                         "--generated", "{staged:generated}", "--order", order, "--image-ckpt", "{staged:dcvc_image}",
+                         "--generated", f"{{staged:generated_{name}}}", "--order", order, "--image-ckpt", "{staged:dcvc_image}",
                          "--video-ckpt", "{staged:dcvc_video}", "--lpips-backbone", "{staged:lpips}", "--inception", "{staged:inception}",
                          "--wilor-checkpoint", "{staged:wilor_checkpoint}", "--qps", "{qps}", "--scales", "{scales}"]
-            extra = [staged[k] for k in ("fill_masks", "fill_record", "generated", "dcvc_image", "dcvc_video", "lpips", "inception",
-                                         "wilor_checkpoint")]
+            extra = [staged[k] for k in ("fill_masks", "fill_record", f"generated_{name}", "dcvc_image", "dcvc_video", "lpips",
+                                         "inception", "wilor_checkpoint")]
+            full_points = ("42", "4") if development else ("0,21,42", "1,2,4")  # the order check needs the generator's frames only
             scale = {"items": {"smoke": item, "full": item}, "frames": {"smoke": 240, "full": 240},
-                     "qps": {"smoke": "42", "full": "0,21,42"}, "scales": {"smoke": "4", "full": "1,2,4"}}
+                     "qps": {"smoke": "42", "full": full_points[0]}, "scales": {"smoke": "4", "full": full_points[1]}}
             basis = (f"H3e judge: {item} through the full path (window decode with the sparse-JPEG gate, the generated frames "
                      "back to the window's resolution, V1's paste masks from the coded silhouettes, DCVC-UF HT-L at QP 42 and scale 4 "
                      "with the split onto R, V1's and V2's billing regions, WiLoR, Inception and flicker on the source, the "
-                     "generator, V2, the DCVC-UF composite and V1); the stage runs QP 0, 21, 42 at scales 1, 2, 4.")
+                     f"generator, V2, the DCVC-UF composite and V1); the stage runs QP {full_points[0]} at scales {full_points[1]}.")
             body = spec(["-m", "experiments.visor.h3e"], ["{python}", "-m", "experiments.visor.h3e", "validate"], args.environment,
                         arguments, window_staged + extra, scale, basis, "gpu", 36000, JUDGE_SHARING, JUDGE_GPU_MODELS, 60)
-            video = next(v for v in PILOT if item.startswith(v + "_0"))
+            video = item if development else next(v for v in PILOT if item.startswith(v + "_0"))
             (dest / f"h3e-judge-{name}-{video}.json").write_text(json.dumps(body, indent=1) + "\n")
             written.append(f"h3e-judge-{name}-{video}.json")
     print(json.dumps({"inputs": str(inputs), "specs": written, "pilot_items": pilot}, indent=1))
