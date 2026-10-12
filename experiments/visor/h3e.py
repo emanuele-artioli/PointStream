@@ -43,10 +43,13 @@ from experiments.visor.h3c import (PILOT, POSE_GATE_BUDGET, QPS, SCALES, code_dc
 DECISION: dict[str, Any] = {
     "pose_error": "H3c2's: mean over judged hands of the mean 2D joint distance to WiLoR on the source, over the box",
     "judge_frames": "window frames both generated (multiples of 3) and judged by H3c2 (multiples of 5), after frame 0",
-    "pixel_envelope": "SVT-AV1 and DCVC-UF off the shelf (H3c2's points), Pareto on rate and pose error, same frames",
+    "pixel_envelope": "SVT-AV1 and DCVC-UF off the shelf (H3c2's points) on the same frames: their achievable hull "
+                      "(upper concave hull in quality, i.e. lower convex hull in pose error, over rate)",
     "rate": "1.93 kbps keypoints + DCVC-UF's bits on R by its own split: V1 frame 0 on R and later frames on R outside "
             "the pasted masks; V2 frame 0 on R",
-    "saving": "1 - rate / the envelope's rate for the same pose error (linear in log rate); V1 maximized over its points",
+    "saving": "V1: -BD-rate of its nine points against the hull (PCHIP, log rate over the overlapping pose range); "
+              "without overlap, better/worse at every rate and its best point's 1 - rate / the hull's rate at equal "
+              "pose error. V2 (one point): 1 - rate / the hull's rate at equal pose error",
     "decides": "v1",
     "passes_ci_low_above": 0.5,  # V1's mean saving's 95% bootstrap CI by item above 50%: build the route
     "fails_mean_at_most": 0.5,  # V1's mean saving at or below 50%: no generator now, H3d next
@@ -510,8 +513,50 @@ def command_validate(args: argparse.Namespace) -> int:
 # ----------------------------------------------------------------- report (CPU)
 
 
+MIN_OVERLAP = 0.001  # pose error (share of the box) both curves must span for a BD-rate
+
+
+def hull(points: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The anchor's achievable envelope on (kbps, pose error): the lower convex hull in pose (upper concave hull in
+    quality), which switching between its encodes reaches, by rising rate and falling error. The same construction
+    as the background's ``experiments.background.g5.envelope`` (G5d, 2026-10-12): a Pareto staircase over several
+    anchor configurations (here SVT-AV1 and DCVC-UF at three scales) would understate the anchor."""
+    out: list[dict[str, Any]] = []
+    for q in sorted(points, key=lambda r: (r["kbps"], r["pose"])):
+        while len(out) >= 2:
+            a, b = out[-2], out[-1]
+            # b on or above the chord a→q in error (on or below it in quality): drop it
+            if (a["pose"] - b["pose"]) * (q["kbps"] - a["kbps"]) <= (a["pose"] - q["pose"]) * (b["kbps"] - a["kbps"]):
+                out.pop()
+            else:
+                break
+        out.append(q)
+    return pareto_front(out, "pose")
+
+
+def bd_rate_pose(test: list[dict[str, Any]], anchor: list[dict[str, Any]]) -> float | None:
+    """BD-rate of ``test`` (its Pareto front) against ``anchor``'s hull on pose error: PCHIP of log rate over the
+    error range both span; None when that range is under `MIN_OVERLAP` or either has fewer than two points."""
+    from scipy.interpolate import PchipInterpolator
+
+    t, a = pareto_front(test, "pose"), hull(anchor)
+    if len(t) < 2 or len(a) < 2:
+        return None
+    lo, hi = max(t[-1]["pose"], a[-1]["pose"]), min(t[0]["pose"], a[0]["pose"])
+    if hi - lo < MIN_OVERLAP:
+        return None
+
+    def area(front: list[dict[str, Any]]) -> float:
+        pts = sorted(front, key=lambda q: q["pose"])
+        f = PchipInterpolator([q["pose"] for q in pts], [math.log(q["kbps"]) for q in pts])
+        return float(f.integrate(lo, hi))
+
+    return math.exp((area(t) - area(a)) / (hi - lo)) - 1.0
+
+
 def saving_against(front: list[dict[str, float]], kbps: float, pose: float) -> tuple[float, str]:
-    """H3c2's saving at equal pose error, with its bounds beyond the front's ends."""
+    """H3c2's saving at equal pose error (rate on the anchor's hull, linear in log rate), with its bounds beyond
+    the hull's ends."""
     need = rate_on_front(front, "pose", pose)
     if need is not None:
         return 1 - kbps / need, "on the front"
@@ -545,7 +590,7 @@ def item_report(meta: dict[str, Any], a: dict[str, np.ndarray], pixel_units: lis
     source, box = p_a["judge_source_kp2d"][index], p_a["judge_box_size"][index]
     errors = {v: float(pose_errors(a["judge_kp2d"][i][None], source, box)[0]) for i, v in enumerate(meta["variants"])}
     pixels = pixel_envelope(p_meta, p_a, h1, rows)
-    front = pareto_front(pixels, "pose")
+    front = hull(pixels)
     kp = meta["pose_kbps"]
     v1 = []
     for p in meta["points"]:
@@ -557,10 +602,23 @@ def item_report(meta: dict[str, Any], a: dict[str, np.ndarray], pixel_units: lis
     v2_rate = kp + cheapest["kbps_v2_pixels"]
     v2_saving, v2_where = saving_against(front, v2_rate, errors["v2"])
     best = max(v1, key=lambda q: q["saving"])
+    # The item's statistic: V1's BD-rate against the pixel hull where their pose errors overlap; otherwise
+    # "better/worse at every rate" with the single best point's rate at equal quality (a bound beyond the hull).
+    bd = bd_rate_pose(v1, pixels)
+    if bd is not None:
+        statistic = {"saving": -bd, "how": "BD-rate over the overlapping pose range", "bd_rate": bd}
+    else:
+        own = pareto_front(v1, "pose")
+        relation = ("better at every rate" if own[0]["pose"] < front[-1]["pose"] and best["kbps"] <= front[0]["kbps"] else
+                    "worse at every rate" if own[-1]["pose"] > front[0]["pose"] and own[0]["kbps"] >= front[0]["kbps"] else
+                    "no overlap")
+        statistic = {"saving": best["saving"], "how": f"{relation}; best point's rate at equal quality ({best['where']})",
+                     "bd_rate": None}
     following = float(pose_errors(a["judge_kp2d"][meta["variants"].index("generated")][None], a["coded_kp2d"], box)[0])
     keypoints = float(pose_errors(a["coded_kp2d"][None], source, box)[0])
     rerun = float(pose_errors(a["judge_kp2d"][meta["variants"].index("source")][None], source, box)[0])
-    return {"judged_hands": int(len(rows)), "errors": errors, "source_rerun_vs_h3c2": rerun, "pixel_points": pixels, "front": front, "v1": v1, "v1_best": best,
+    return {"judged_hands": int(len(rows)), "errors": errors, "source_rerun_vs_h3c2": rerun, "pixel_points": pixels, "hull": front, "v1": v1, "v1_best": best,
+            "v1_statistic": statistic,
             "v2": {"kbps": v2_rate, "pose": errors["v2"], "saving": v2_saving, "where": v2_where, "frame0_point": cheapest["name"]},
             "keypoints_pose": keypoints, "generator_vs_its_input": following,
             "flicker": {v: float(np.nanmean(a["flicker"][i])) for i, v in enumerate(meta["variants"]) if v != "source"},
@@ -591,7 +649,7 @@ def realism(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]]) -> dict[s
 def decide(items: dict[str, dict[str, Any]]) -> dict[str, Any]:
     out: dict[str, Any] = {"rule": DECISION}
     complete = set(items) == set(PILOT)
-    for variant, key in (("v1", "v1_best"), ("v2", "v2")):
+    for variant, key in (("v1", "v1_statistic"), ("v2", "v2")):
         savings = np.array([e[key]["saving"] for e in items.values()])
         if len(savings):
             out[variant] = bootstrap_mean(savings, np.random.default_rng(seed_of(f"{SEED}:{variant}")), RESAMPLES)

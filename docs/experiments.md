@@ -3667,6 +3667,18 @@ invocation turns out to be needed.
   implies (0.026 × WiLoR's, about 0.5 m), MANO's metric depth offsets between
   joints, and every joint back-projected through its coded 2D position, so the
   projection the generator sees is exactly H2's coded keypoints.
+- Revision (2026-10-12, project convention adopted on main, before any
+  generation). Comparisons are BD-rates against an achievable anchor
+  envelope. The pixel envelope (SVT-AV1 and DCVC-UF at three scales, several
+  configurations) is their upper concave hull in quality (lower convex hull in
+  pose error over rate), not a Pareto staircase, which understates a mixed
+  anchor (G5d). V1's statistic per item is its BD-rate on pose error against
+  that hull (PCHIP of log rate over the pose range both span, at least 0.1% of
+  the box); where they do not overlap, the item is reported as better or worse
+  at every rate, and its best point's rate at equal pose error stands in.
+  V2 (one point) keeps the rate at equal pose error on the hull. The
+  thresholds are unchanged: V1 passes with the mean saving (−BD-rate) above
+  50% across its 95% interval and fails at or below 50% mean.
 - Hypothesis. The joint module follows its input closely (the paper reports
   joint adherence), so the composite's pose error is the keypoints' (0.8–2.3%
   of the box) plus about half a percent, and V1 saves 50–70% (frame 0 and

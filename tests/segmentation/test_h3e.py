@@ -88,7 +88,7 @@ def test_saving_beyond_the_front_takes_its_ends_as_bounds():
 
 
 def items_with(v1, v2):
-    return {i: {"v1_best": {"saving": a}, "v2": {"saving": b}} for i, a, b in zip(h3c.PILOT, v1, v2)}
+    return {i: {"v1_statistic": {"saving": a}, "v2": {"saving": b}} for i, a, b in zip(h3c.PILOT, v1, v2)}
 
 
 @pytest.mark.parametrize("v1,v2,expected", [
@@ -118,3 +118,16 @@ def test_generator_joints_keep_the_projection_and_move_the_hand_near():
     assert np.allclose(pinhole(out[0, 21:], focal, centre), pinhole(hand, focal_w, centre), atol=1e-3)
     assert np.isclose(out[0, 21, 2], hand[0, 2] * focal / focal_w) and 0.3 < out[0, 21, 2] < 0.8
     assert np.allclose(out[0, 21:, 2] - out[0, 21, 2], hand[:, 2] - hand[0, 2], atol=1e-6)
+
+
+def test_hull_drops_points_a_mix_of_two_encodes_beats():
+    # (4, 0.032) lies above the chord between (2, 0.04) and (8, 0.01): time-sharing those two reaches 0.03 at 4.
+    points = [{"kbps": 2.0, "pose": 0.04}, {"kbps": 4.0, "pose": 0.032}, {"kbps": 8.0, "pose": 0.01}, {"kbps": 16.0, "pose": 0.012}]
+    assert [(q["kbps"], q["pose"]) for q in h3e.hull(points)] == [(2.0, 0.04), (8.0, 0.01)]
+
+
+def test_bd_rate_on_pose_of_half_the_rate_is_minus_half():
+    anchor = [{"kbps": r, "pose": e} for r, e in ((2.0, 0.04), (4.0, 0.025), (8.0, 0.015), (16.0, 0.01))]
+    half = [{"kbps": q["kbps"] / 2, "pose": q["pose"]} for q in anchor]
+    assert h3e.bd_rate_pose(half, anchor) == pytest.approx(-0.5, abs=1e-9)
+    assert h3e.bd_rate_pose([{"kbps": 1.0, "pose": 0.001}, {"kbps": 2.0, "pose": 0.0005}], anchor) is None
