@@ -1,0 +1,13 @@
+{
+  "JointControlVideo": {
+    "url": "https://github.com/ZhangCYG/JointControlVideo",
+    "revision": "f96b2c377f26a165bf63cd9fcb495bb9fd3d3054",
+    "path": "opt/JointControlVideo",
+    "added": {
+      "diffsynth/models/wan_video_camera_controller.py": {
+        "url": "https://raw.githubusercontent.com/modelscope/DiffSynth-Studio/c795e35142cc44a8d924e682853066816ebe8468/diffsynth/models/wan_video_camera_controller.py",
+        "sha256": "2bad958eb9893105cc7215a4bb91b2c039bde5eb6af8ddf0f02c09e6f7883d61"
+      }
+    }
+  }
+}
