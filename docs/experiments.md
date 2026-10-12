@@ -4900,3 +4900,78 @@ invocation turns out to be needed.
     3–20 times, or be shared beyond one video (per person or kitchen, or
     one generic network sent with the decoder, as DCVC-UF's own weights are).
 - GPU time: about 2.4 GPU-hours (8 jobs), within the 6 allowed.
+
+### 2026-10-12 — H3d component: per-video, per-person and generic super-resolution of the hand pixels
+- Question (user, 2026-10-12, after the oracle). The oracle's network
+  (fitted on the scored window, bits free) beats H3c's bar by 77% on
+  DCVC-UF's ¼ and ½ decodes, but at 1.2 MB it costs more than it saves
+  within any pilot video. Which way of delivering it keeps the gain once it
+  is fitted without the scored frames and its delivery is accounted for?
+  Three ways (user, 2026-10-12):
+  - **V, per video (NAS).** Fitted on the same video outside the window,
+    sent with it: its bits are billed, over the video's duration.
+  - **K, per person and kitchen (the hybrid).** Fitted on the same
+    participant's other recordings (in EPIC-KITCHENS a participant films one
+    kitchen), sent to the client once, before, and reused for every new
+    video: not billed per video.
+  - **G, generic.** Fitted on other participants' recordings, delivered
+    with the decoder like DCVC-UF's own weights: not billed.
+- Footage (`h3d footage`). Segments of 48 consecutive frames at the native
+  rate, placed content-blind by sha256 (as `g5c.choose_segments`), at least
+  5 s from a video's ends; for V also at least 5 s from the scored window.
+  Only recordings of the evaluation's verified classes (1920×1080 at 50 or
+  59.94 frames/s; 7 of the 179 videos on disk are not). V: 24 segments of
+  the item's own video. K: 24 segments over the participant's other
+  recordings on disk (P01: 9, P02: 18, P03: 17, P09: 4 videos), never the
+  item's video. G: 24 segments over recordings of participants other than
+  P01, P02, P03 and P09, one per video. All arms
+  therefore fit on the same 1,152 frames, about 4.8 windows. R in the
+  footage is SAM 3.1's "hand" plus "arm" at G1's analysis size (as G1 and
+  G5c step 3), upsampled to 1080p: what a sender's own segmenter would give
+  it, since only the evaluation windows have dataset masks. Scoring stays on
+  the dataset masks (H3c's R).
+- Fit and score. As the oracle, on its passing arm only: DCVC-UF HT-L off
+  the shelf at ¼ and ½, QP 0, 21 and 42, one network per point, 2,000
+  steps, MSE plus LPIPS on R. The footage is coded at each point by the same
+  code (its segments concatenated into one sequence per point) and upscaled
+  bicubically. Sizes: G5d's network (L, 8 blocks × 64 channels, 594 k
+  parameters, 1.19 MB at fp16) for every arm; for V also M (4 × 48, 166 k,
+  0.33 MB) and S (4 × 24, 41 k, 0.08 MB), since its bits are billed. The
+  scored window, its base points and the bar are the oracle's.
+- Rate. K and G: the rate on R, as the bar. V: the rate on R plus the
+  network's fp16 bits divided by the video's duration (NAS's amortization;
+  the hand stream carries them). V without its bits is reported beside it,
+  to separate memorization from payback.
+- Decision rule, fixed now (`h3d.COMPONENT`). Each arm (V at its best size,
+  K, G) *stands* by the oracle's rule against the bar: mean BD-rate on
+  LPIPS_R −10% or better, with at least 3 of 4 items below 0. Then:
+  - if G stands, H3d's coder is DCVC-UF with G's network (deployable
+    everywhere, nothing per video); K is adopted instead only if it beats G
+    by 10% or more (mean BD-rate of K against G on LPIPS_R), and V only if
+    it beats both by 10%;
+  - if G does not stand but K does, the coder is DCVC-UF with K's network
+    (needs earlier footage of the person), V again only if 10% better;
+  - if only V stands, V; if no arm stands, H3d is not built, and V without
+    its bits says why (near the oracle: the bits; far: the oracle
+    memorized).
+  DISTS_R, PSNR_R and flicker are reported beside; a sign disagreement with
+  LPIPS is stated with a visual check.
+- Hypothesis. Without the scored frames, V-L keeps about two thirds of the
+  oracle's gain (−50%) before its bits, but its bits (40–90 kbps at L, 3–7
+  kbps at S over 1.7–3.5 minutes) exceed what it saves, so V fails at every
+  size. K stands (−40%): same hands, sleeves and lighting. G stands too
+  (−25%): most of the gain is undoing DCVC-UF's low-resolution blur, which
+  is not specific to a person; so H3d's coder is DCVC-UF with G, unless K
+  is 10% better.
+- Competing explanations. For G failing while K stands: the gain is
+  appearance-specific (skin, gloves, sleeves), which argues for the hybrid.
+  For all failing: the oracle memorized the window, which V without bits
+  shows. SAM's masks differ from VISOR's (forearm extent): they only shape
+  the training loss; a K or G fitted on VISOR's train-split masks would be
+  the check if they matter.
+- Budget. Footage masks: 4 jobs (V and K per item) and 1 (G), SAM 3.1 at
+  about 0.3 s per frame, each ≤ 45 minutes on Ada or A6000 (exclusive SAM
+  memory, 36,000 MiB shared as G5c). G's networks: 1 job (6 fits). Scoring:
+  8 jobs (per item, the ¼ and the ½ points), each fitting V-L, V-M, V-S
+  and K and applying G. Each ≤ 45 minutes, shared. About 9 GPU-hours;
+  ceiling 12.
