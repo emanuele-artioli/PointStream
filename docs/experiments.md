@@ -3267,6 +3267,66 @@ invocation turns out to be needed.
   about 5 GPU-hours. The other 32 windows at the same per-window cost:
   about 80 GPU-hours, above PLAN's 65 (steps 4–5); the scale-up waits
   for the user's approval with the pilot's measured cost.
+- Runs (shared GPUs; code `a103325`, with `f2e4aa9` for the enhancer
+  jobs and `9e49c5e` for P26_02's native footage). Footage, scene:
+  P26_02 `20261012T144606Z-fe5e8ef5` (1,061 frames: 79 before the window,
+  982 after, since it starts 18 s into the video), P06_03
+  `…144634Z-91fdde7f` (1,060). Footage, native: P06_03
+  `…144704Z-1b330ff2`, P26_02 `…153200Z-a9414105` (480 frames each,
+  foreground 9–25%). Training (Ada, both converged, monitor −0.3% and
+  −0.4% over the last fifth): P26_02 `…150907Z-d03a60c9`, P06_03
+  `…151248Z-bc31027a`. Scene route: P26_02 `…161128Z-5999b792`, P06_03
+  `…160501Z-6cd65382`. Enhancer route: P06_03 `…154011Z-5c4135b3`,
+  `…154024Z-a4e8259d`; P26_02 `…155052Z-9ad2482e`, `…155102Z-82b6caf5`.
+  Failures, none citable: two SAM 3.1 and one ProPainter out of memory
+  when another session's process grew on the shared GPU after
+  admission (`…144625Z-c117ffa3`, `…160057Z-2eb07276`); P26_02's native
+  footage hung twice after SAM (`…144950Z-e96dde14` ran out of its
+  smoke time, `…150658Z-eef26194` was cancelled after 20 idle minutes):
+  PyAV's threaded H.264 decoder deadlocked on close inside the process
+  holding SAM 3.1, fixed in `9e49c5e` (the 1080p decode runs in the
+  spawned decoder process); the enhancer's footage encode had no work
+  directory (`…150734Z-796c8fa3`, fixed in `f2e4aa9`); the enhancer's
+  declared 20,000 MiB was too low at full size (21.3 GB,
+  `…152624Z-b5bff301`), now 30,000.
+- Outcome. BD-rate against SVT-AV1 at 1080p (concave hull, 174–4,470
+  kbps), P26_02 | P06_03:
+  | Route | LPIPS_V | DISTS_V | PSNR_V | flicker_V | KID_V |
+  |---|---|---|---|---|---|
+  | enhancer (enh-1080) | better at every rate \| −83% | better at every rate \| −82% | +53% \| +26% | worse at every rate (both) | −72% \| −68% |
+  | scene model, 540p | −97% \| **+20%** | −95% \| +116% | +97% \| +97% | worse at every rate (both) | −82% \| worse at every rate |
+  | scene model, 1080p | better at every rate \| −61% | −79% \| +125% | +176% \| +94% | worse at every rate (both) | +35% \| +435% |
+  - **(b) passes**: the enhancer beats SVT-AV1 on LPIPS_V, DISTS_V and
+    KID_V on both windows, far beyond the 10% needed (at the same rate
+    LPIPS_V falls 42–59%, PSNR_V 0.4–0.7 dB), and loses PSNR_V and
+    flicker as at 960×540 (G5d). Hypothesis (a smaller margin than G5d's
+    −36% | −50%) wrong: fitted on the window's own video at its size and
+    rate, it gains more. Applying it took about 160 ms per frame on a
+    shared A6000: not real time at 59.94 frames/s.
+  - **(a) passes on P26_02 and fails on P06_03** (−97% against −91%;
+    +20% against −45%, 65 points off). Two things changed at once from
+    steps 2–3: the footage (the window's own 120 s, not the stretch) and
+    F (filled exactly, not dilated by 16 px, so V now includes the
+    pixels at the hands' edges, which neither model was trained to
+    reproduce; P06_03's foreground is 27% of the frame). Beside it, on
+    P06_03 the model now codes better at 1080p than at 540p (−61%
+    against +20%), the reverse of step 2.
+  - (c) Every manifest is complete (FFV1 frames re-decoded and checked,
+    bitstreams, enhancer weights); the foreground session has not yet
+    composited one.
+  - GPU time: about 5.2 hours (12 completed jobs, 7 failed or cancelled).
+- Diagnosis of (a) on P06_03, decided before its results (two jobs,
+  about 1 GPU-hour): A, the stretch's recipe-L model of steps 2–3
+  (`20261011T163301Z-e47ae994`) with F filled exactly
+  (`20261012T180309Z-48fb21c5`); B, the window-footage model dilated by
+  16 px as steps 2–3 (`…180332Z-92a1e304`), against steps 2–3's SVT-AV1
+  anchor (`…122457Z-a660ab4c`, the same dilation). If A also loses
+  (LPIPS_V at 540p within 20 points of +20%) and B recovers (within 20
+  points of −45%), the exact fill is the cause and the footage stands;
+  if A keeps −45% ± 20 and B does not recover, the footage is the cause
+  and the footage protocol is revised (the whole video, as the
+  competing explanation says). Mixed results are reported as they are
+  and decided with the user.
 
 
 ### 2026-10-08 — H1: foreground motion and representation audit
