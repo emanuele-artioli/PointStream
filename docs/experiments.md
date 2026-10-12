@@ -3714,3 +3714,55 @@ invocation turns out to be needed.
   (few frames and steps; exclusive, the model's first run on the class);
   joint-order check 2 jobs; oracle 4 jobs, one per item, each ≤ 45 minutes;
   about 5 GPU-hours.
+- Jobs (Ada; validators passed). Generations (OpenPose order, 50 steps, code
+  `9a67692`): P01_107 `20261012T141546Z-18c30e4a`, P02_02
+  `20261012T141556Z-5b185f3a`, P03_10 `20261012T141605Z-ff439104`, P09_106
+  `20261012T141614Z-326ad02f`. Judges (nine DCVC-UF points each): P01_107
+  `20261012T145802Z-69fab945`, P02_02 `20261012T145812Z-5e63a0e4`, P09_106
+  `20261012T145830Z-93a84904` (code `9a67692`), P03_10 `20261012T152219Z-20d57d2d`
+  (code `e5e212c`, which changes only the spec writer). P03_10's first judge
+  `20261012T145821Z-f99e456a` stopped when DCVC-UF's two decodes of one stream
+  disagreed (scale ½, QP 42, on a GPU shared with another user's process); the
+  resubmission decoded deterministically, as in H3c. Not evidence. Report (code
+  `8b17aa5`, from the judges' and H3c2's archives on the server):
+  `pointstream-data/visor/h3e-2026-10-12/report/h3e-report.json`
+  (`49af833b24604d67…`).
+- Outcome: **fails**. V1 against the pixel hull, at equal pose error:
+
+  | item | judged hands | V1 | V1's pose error | keypoints' | generator vs its input | V2 |
+  |---|---|---|---|---|---|---|
+  | P01_107 | 30 | −171% (worse at every rate; flat) | 1.77% from 2.06 kbps | 0.77% | 3.0% | −175% |
+  | P02_02 | 16 | **+29%** (BD-rate) | 5.2–5.5% | 1.67% | 4.9% | +76% |
+  | P03_10 | 26 | −197% (worse at every rate; flat) | 2.0% from 1.95 kbps | 0.97% | 2.7% | −190% |
+  | P09_106 | 9 | −848% (BD-rate) | 5.5–6.5% | 4.5% | 10.7% | −610% |
+
+  V1's mean saving −297% (95% CI −679% to −21%), at or below 50%: **fail**.
+  V2 (granted the outline) −225% (CI −501% to +9%). The pose error of V1 is
+  flat across its nine points: it is the generator's, whatever the forearm
+  and objects cost. The pixel hull reaches it at 0.3–1 kbps on P01_107 and
+  P03_10. Flicker (luma, against the source's own change, between generated
+  frames): V1 5–23, DCVC-UF 3–7 on the same frames. KID on hand crops, pooled:
+  V1 0.008–0.009 (interval to 0.03), DCVC-UF 0.0 at QP 42 full scale to 0.031
+  at QP 0 ¼ scale: realism is not where it loses.
+- Visual check (the judges' crops at one judged frame per item, and the
+  generated videos). The generator follows the joints but not the camera: it
+  receives the first frame and the hand joints, not the head's motion, so the
+  generated scene drifts from the real one (a toaster comes into view on
+  P03_10; on P09_106 the frame shows a towel and a bowl that are not there).
+  Pasted inside the coded silhouette, its hands then sit in a different scene
+  from the coded pixels around them: smeared boundaries (P09_106), a forearm
+  with a tattoo the source does not have (P01_107), which WiLoR misreads.
+  P02_02, the one positive item, has a nearly still camera and fast gloved
+  hands that the pixel coders blur.
+- Reading. H3c2's margin (keypoints 69% cheaper with a perfect generator)
+  does not survive a real one: its hands land 2.7–10.7 points (of the box)
+  from the joints it is given, so the composite's pose error is 1.0–3.7
+  points above the keypoints' own (0.8–4.5), and DCVC-UF reaches that
+  fidelity below 1 kbps on three of four items. The competing explanation that held is the
+  drift, not the 480p resolution (the generated hands are large enough for
+  WiLoR on P01_107 and P03_10, where the error is still 3 points). What would
+  change next, and needs its own oracle: a generator conditioned on the
+  decoded pixels around the hand each frame, rather than on a first frame
+  alone (the proto-hand-conditioned DCVC-UF candidate in PLAN, or hand
+  inpainting into the coded frames), or one conditioned on camera motion
+  (Generated Reality conditions on head pose). Not built now: H3d is next.

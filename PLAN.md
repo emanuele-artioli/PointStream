@@ -591,7 +591,20 @@ by the rule; the user opened the path (2026-10-12). Order now:
    pasted over them, both streams billed; and the forearm generated too.
    The generator's own silhouette places the hand, so no outline is sent
    (outlines cost 72–170 kbps, H3b2).
-2. H3d, as agreed, against H3c's bar.
+   Outcome (2026-10-12, [outcome](docs/experiments.md#2026-10-12--h3e-a-pretrained-pose-conditioned-generator-renders-the-hand-from-the-coded-keypoints)):
+   **fails**. JointControlVideo (Wan2.1-I2V-14B with a hand-joint module,
+   ECCV 2026) renders each pilot window from its first frame and H2's coded
+   joints; pasted over DCVC-UF-coded surroundings, it needs more rate than the
+   pixel coders for the same pose error on three of four items (mean −297%,
+   CI −679% to −21%; +29% on P02_02 only). The keypoints are accurate, but
+   the composite's pose error is 1–4 points above theirs (the generated
+   hands land 3–11 points from their input), and without the camera's
+   motion its scene drifts from the real one. The generative mode is not
+   built now. What would change it, each with its own oracle: conditioning on
+   the decoded pixels around the hand every frame (the proto-hand candidate
+   below, or hand inpainting into the coded frames), or on camera motion.
+2. H3d, as agreed, against H3c's bar (now the per-item concave hull of
+   SVT-AV1 and DCVC-UF off the shelf on R, by BD-rate; project convention).
 3. Candidate after H3e (user, 2026-10-12): DCVC-UF conditioned on a
    proto-hand. The decoder also receives a render of the coded keypoints
    (a skeleton or MANO image), so its bitstream carries only what the
