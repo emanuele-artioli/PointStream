@@ -56,6 +56,7 @@ REVIEW_CROP = 48
 STAGE_ENV = dict(os.environ)
 #: A DCVC-UF decode below this frame PSNR is not a picture of the source (the K5 smoke, 2026-10-13: 8-14 dB).
 SANE_FRAME_PSNR = 20.0
+DCVC_ATTEMPTS = 3
 
 
 def safe(window_id: str) -> str:
@@ -84,10 +85,19 @@ def code_svt(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str, 
             "command": rec["encode_command"], "decode_command": rec["decode_command"]}
 
 
-def code_dcvc(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str, Any], frames: int, qp: int) -> dict[str, Any]:
+def luma_psnr(decoded: Path, source: Path, width: int, height: int, frames: int) -> float:
+    """Luma PSNR of a raw 4:2:0 decode against the source, pooled over the frames."""
+    size = width * height * 3 // 2
+    a = np.memmap(decoded, dtype=np.uint8, mode="r", shape=(frames, size))[:, : width * height].astype(np.float64)
+    b = np.memmap(source, dtype=np.uint8, mode="r", shape=(frames, size))[:, : width * height].astype(np.float64)
+    return mse_to_psnr(float(((a - b) ** 2).mean()))
+
+
+def dcvc_attempt(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str, Any], frames: int, qp: int) -> dict[str, Any]:
     from src.codecs.dcvc_uf_worker import dcvc_command
 
     width, height = window["size"]
+    shutil.rmtree(work, ignore_errors=True)
     work.mkdir(parents=True, exist_ok=True)
     plan = {"structure": "htl", "qp": qp, "frame_count": frames, "height": height, "width": width, "src_type": "yuv420",
             "frames_file": str(yuv), "container": str(work / "stream.psdc"), "out_file": str(work / "decoded.yuv"),
@@ -109,8 +119,24 @@ def code_dcvc(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str,
     return {"codec": "dcvc-uf-htl", "param": qp, "kbps": len(data) * 8 / (frames / float(window["fps"])) / 1000.0, "bytes": len(data),
             "stream_sha256": hashlib.sha256(data).hexdigest(), "decoded": str(work / "decoded.yuv"),
             "deterministic": dec["deterministic"], "decoder_matches_encoder_intra": dec["passes"][0]["frame_sha256"][0] == enc["i_recon_sha256"],
+            "luma_psnr": luma_psnr(work / "decoded.yuv", yuv, width, height, frames),
             "kernels": enc.get("kernels"), "peak_allocated_mib": enc.get("peak_allocated_mib"),
             "extension": (enc.get("environment") or {}).get("extension")}
+
+
+def code_dcvc(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str, Any], frames: int, qp: int) -> dict[str, Any]:
+    """One DCVC-UF HT-L point, re-coded from scratch (up to `DCVC_ATTEMPTS`) until its decode is deterministic,
+    matches the encoder's I frame and is a picture of the source (luma PSNR >= `SANE_FRAME_PSNR`). Every attempt is
+    recorded; the K5 smokes on a contended RTX 6000 Ada broke such checks on some points of some runs."""
+    attempts = []
+    for _ in range(DCVC_ATTEMPTS):
+        rec = dcvc_attempt(args, yuv, work, window, frames, qp)
+        ok = rec["deterministic"] and rec["decoder_matches_encoder_intra"] and rec["luma_psnr"] >= SANE_FRAME_PSNR
+        attempts.append({k: rec[k] for k in ("stream_sha256", "bytes", "deterministic", "decoder_matches_encoder_intra", "luma_psnr")})
+        if ok:
+            break
+    rec["attempts"] = attempts
+    return rec
 
 
 # ----------------------------------------------------------------- scoring

@@ -51,6 +51,9 @@ RULE = {
 }
 HOSTS = ["gpu1", "gpu2", "gpu3", "gpu4", "gpu5", "gpu6"]
 GPU_MODELS = ["RTX 6000 Ada", "RTX A6000"]
+#: K5 on the A6000 only: on a contended RTX 6000 Ada (gpu6) DCVC-UF HT-L decoded some points non-deterministically
+#: and unlike the encoder (smokes 20261013T182455Z-ec6f0505, 20261013T183324Z-70873dcb).
+K5_GPU_MODELS = ["RTX A6000"]
 SHARING = {"mode": "shared", "basis": "SAM 3.1's masks, YOLO's detections, the SVT-AV1 and DCVC-UF streams and their "
            "bit accounting and scores do not depend on wall time; recorded seconds are not evidence"}
 
@@ -185,14 +188,15 @@ def main() -> int:
     if not inputs.exists():
         inputs.write_text(text)
 
-    def spec(module: str, arguments: list[str], names: list[str], scale: dict[str, Any], basis: str, memory: int) -> dict[str, Any]:
+    def spec(module: str, arguments: list[str], names: list[str], scale: dict[str, Any], basis: str, memory: int,
+             gpu_models: list[str] = GPU_MODELS) -> dict[str, Any]:
         return {
             "schema": 1, "entrypoint": ["-m", module], "environment": {"path": args.environment[0], "sha256": args.environment[1]},
             "inputs": [{"path": str(inputs), "sha256": file_sha256(inputs)}], "arguments": arguments,
             "staged_inputs": [staged[k] for k in names], "scale": scale, "smoke": {"seconds": 600, "representative_basis": basis},
             "full": {"seconds": 2700}, "validator": ["{python}", "-m", module, "validate"], "validator_seconds": 300,
             "required_commands": [], "budget_seconds": 4500, "deadline": args.deadline, "stall_seconds": 1800,
-            "cpu_threads": 16, "device": "gpu", "hosts": HOSTS, "gpu_models": GPU_MODELS, "gpu_memory_mib": memory,
+            "cpu_threads": 16, "device": "gpu", "hosts": HOSTS, "gpu_models": gpu_models, "gpu_memory_mib": memory,
             "local_storage_gib": 80, "gpu_sharing": SHARING,
         }
 
@@ -224,7 +228,7 @@ def main() -> int:
                  f"source, decodes and composites, ball-region and frame PSNR); the stage runs {what} at {MAX_FRAMES} frames.")
         return spec("experiments.tennis.k5", arguments, ["windows", "dcvc_image", "dcvc_video", "yolo26x", "yolo11x", *src_names],
                     {"windows": {"smoke": ws[0]["id"], "full": ",".join(w["id"] for w in ws)}, "frames": {"smoke": 48, "full": MAX_FRAMES}},
-                    basis, 16000)
+                    basis, 16000, K5_GPU_MODELS)
 
     specs: dict[str, dict[str, Any]] = {}
     pilot = tn[:2] + broadcast[:2]
