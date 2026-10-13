@@ -809,6 +809,14 @@ shows why not, and the estimator is confirmed on renders.
 
 #### H4. Handled objects (rescoped after H1, user 2026-10-08)
 
+Grip pose (item 1) fails (H4a, 2026-10-13, job `20261013T064014Z-04a44b1c`,
+[outcome](docs/experiments.md#2026-10-13--h4a-grip-pose-on-hot3d-is-a-held-object-still-in-the-hands-frame)):
+on HOT3D's motion capture, a reference carried by the wrist holds 49% of
+an object's moving frames at 2 px with a median life of 0.05 s (rule 70%,
+0.5 s). The grip removes half the motion (13 mm and 10° left within a
+grasp, against 82 mm and 21° in the world), but objects move in the
+fingers continuously. Next: item 2, a bank of reference views on VISOR.
+
 H1 found that no 2D warp of one reference view carries an object for more
 than a few frames (median reference life 0.02–0.04 s): objects turn, show new
 sides, are occluded by hands and deform. The large touched surfaces VISOR

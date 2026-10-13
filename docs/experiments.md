@@ -5136,3 +5136,60 @@ invocation turns out to be needed.
   means streaming its ~100 MB tar from NFS. Smoke: 2 clips, ≤ 600 s. No
   pilot: nothing is fitted, and τ is swept in the same pass. Full: 108
   clips, ≤ 45 min. Ceiling 2 CPU-hours.
+- Jobs: `20261013T064014Z-04a44b1c` (code `b003be8`, environment
+  `pointstream-20261009T214002Z`; CPU only, 16 threads on gpu1; inputs
+  `pointstream-data/hot3d/h4a-2026-10-13/inputs-26fb572756ed.json`, spec
+  `h4a.json` beside it). Smoke 2 clips (3 s), full 108 clips of 9
+  participants (15 s of compute; 8.5 min with staging). Validators passed on
+  the smoke and, locally, on the full stage's `published.tar`
+  (`939b43ef…48bb3`; 8 checks: every clip published, eval meshes within
+  2 mm of `models_info` (the keyboard's decimated mesh is 1.03 mm off, so
+  the bound set before the run at 1 mm was raised to 2 mm after the dev
+  run), true poses projecting inside the image, resting objects within 1 px,
+  every scored frame held or refreshed once). Report (`h4a report`):
+  `pointstream-data/hot3d/h4a-2026-10-13/report-b003be8/h4a-report.json`
+  (`cb3b135a…463d`).
+- Outcome (means over the 108 clips, all with moving frames; 189 moving
+  objects, 15,558 scored object-frames). Noise floor: resting objects hold
+  within 0.08 px (median; 95th percentile 0.55 px), so 2 px is well above
+  the motion capture's noise. On moving frames:
+
+  | coder | τ | held | median life | frame-weighted life | refresh rate |
+  |---|---|---|---|---|---|
+  | world | 2 px | 18.4% | 0.035 s | 0.068 s | 2.3 kbps |
+  | grip | 2 px | 37.8% | 0.040 s | 0.103 s | 1.8 kbps |
+  | hybrid | 2 px | 49.4% | 0.052 s | 0.129 s | 1.4 kbps |
+  | hybrid | 4 px | 69.0% | 0.098 s | 0.246 s | 0.9 kbps |
+
+  The hybrid's held frames come from the grip on 53% (left 22%, right 30%)
+  and from the world on 46%. Grip spread over a segment's moving frames
+  (201 segments, quartiles): G turns by 4.0 / 10.1 / 22.6° and shifts by
+  6.7 / 13.1 / 30.4 mm from its middle frame (median over frames), against
+  the world pose's 4.0 / 21.0 / 53.9° and 19 / 82 / 155 mm. Per-clip held
+  share of the hybrid at 2 px: 28% / 50% / 70% (10th, 50th, 90th
+  percentile).
+- Decision (by the rule; `h4a-report.json`): **grip pose fails.** At 2 px
+  the hybrid holds 49% of moving frames (rule 70%) with a median life of
+  0.05 s (rule 0.5 s), 1.5× *world only*'s (rule 2×); at 4 px it holds
+  69% with 0.10 s. Rate passes (1.4 kbps against 4.1) and does not bind.
+  By the rule, grip pose is dropped and H4 moves to item 2, a bank of
+  reference views on VISOR.
+- Reading. The hypothesis is refuted: a held object is not still in the
+  wrist's frame. The grip removes about half of the object's motion
+  (median shift 13 mm against 82 mm in the world, rotation 10° against
+  21°), so the hand does explain most of where the object goes, but what
+  remains (10° and 13 mm within a typical grasp) is far above what a
+  rendered object can absorb: a reference carried by the wrist dies in a
+  tenth of a second, no longer than H1's 2D warps on VISOR. Competing
+  explanation (1) holds: objects move in the fingers (regrasps, in-hand
+  turning, two-handed handling such as the keyboard in the dev clip) and
+  the grip drifts continuously, not in a few discrete changes. (2) does
+  not hold: the noise floor is 0.08 px. (3) makes this a stronger
+  negative: HOT3D's rigid objects in a lab are the favourable case, and
+  the wrist is the motion-capture truth, not an estimate.
+- Scope. The hand frame is the wrist (UmeTrack's); a frame fitted to the
+  fingertips in contact, or a pose predicted from the whole hand's
+  articulation, was not tested and could hold longer. The test is
+  geometric only (vertex reprojection), so it bounds any renderer that
+  needs the object's pose to within 2–4 px. Clips are 5 s long, which
+  cuts 4% of lives; the decision does not rest on long lives.
