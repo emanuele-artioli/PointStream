@@ -521,6 +521,7 @@ and choose `gpu_models` from it.
 | G5 arm B (`g5_cond`, bf16 autocast) | RTX A6000 (8.6) and RTX 6000 Ada (8.9) | passes on both: CUDA, bf16 autocast, SparseAdam latents; rollout 1.3–3.0 ms per frame | A6000 `20261009T230416Z-0e6c0458`, Ada `20261009T230427Z-c83b3a52` |
 | G5d/G6 8-block, 64-channel enhancer | RTX 6000 Ada (8.9) | CUDA, torch 2.10.0+cu128 / cuDNN 9.10.2; strict shipped-weight load; FP16 NHWC tensor-core kernels (`sm80_xmma`, CUTLASS `s16816`) profiled; native dav1d frame hashes and paired precision smoke pass | `20261013T062703Z-e987301d` (smoke; full grid timed out, completed points retained) |
 | G5d/G6 8-block, 64-channel enhancer | RTX A6000 (8.6) | Same device / provider / FP16 tensor-core checks as Ada; full-resolution latency remains above 60 fps on both classes | `20261013T062704Z-0b0e2c14` (smoke; full grid timed out, completed points retained) |
+| G6 narrower enhancer (eight blocks, c32/c24/c16) | RTX 6000 Ada (8.9) | CUDA, FP16 NHWC cuDNN kernels profiled; native dav1d hashes verified; split/resumed Adam training agrees with continuous fit after CPU step-counter reload fix | `20261013T080906Z-33f5d2e3` |
 
 CPU components, checked in every job above: the VISOR reader (PyAV, time-rule
 frame mapping), SVT-AV1 4.2.0 encode with dav1d decode, and the HOT3D-Clips MANO

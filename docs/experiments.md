@@ -5106,3 +5106,12 @@ invocation turns out to be needed.
   their parameters while preserving step-counter semantics. Repeat the
   substantive continuation check on the corrected revision, not the
   unchanged failed source. No quality/latency conclusions from this job.
+
+- Corrected latency screen `20261013T080906Z-33f5d2e3` (code `aeb2b5f`,
+  gpu5 Ada), smoke and full stage pass; `timing_contaminated: false`.
+  Mean / p95 CPU-RGB enhancement latency: c32 25.5 / 27.7 ms,
+  c24 19.3 / 19.5 ms, c16 13.3 / 14.5 ms. CNN-only means 18.1, 12.3,
+  6.1 ms respectively. Select **16 channels, eight blocks**, the only
+  width within the 16.68 ms native-frame budget. This is architecture
+  cost screening, not a trained quality result. Proceed with its CRF48
+  excerpt oracle on both pilots using 2,000 steps and all five metrics.
