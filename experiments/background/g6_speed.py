@@ -8,7 +8,6 @@ import argparse
 import hashlib
 import json
 import os
-import time
 from fractions import Fraction
 from pathlib import Path
 from typing import Any
@@ -18,82 +17,7 @@ import numpy as np
 from experiments.background import g5, g5c, g5d, g6
 from experiments.visor.b1 import file_sha256, progress, stage_dir, write_json
 from src.codecs import svtav1
-
-CONFIGS = ("fp32", "fp16", "fp16-channels-last")
-SPATIAL_CONFIGS = ("fp16-channels-last-540", "fp16-channels-last-540-residual")
-
-
-def apply(net: Any, decoded: np.ndarray, config: str, *, warmup: int = 5) -> tuple[np.ndarray, dict[str, Any]]:
-    """Batch-one CPU RGB → GPU enhance → CPU RGB; CUDA events measure just the CNN.
-
-    Model setup and warmup excluded; transfers, conversion and rounding included
-    in wall latency. Returned frames use the same rounding as g5d.apply.
-    """
-    import torch
-
-    if config not in (*CONFIGS, *SPATIAL_CONFIGS) or decoded.dtype != np.uint8 or decoded.ndim != 4 or decoded.shape[-1] != 3:
-        raise ValueError("expected a supported config and NHWC uint8 RGB frames")
-    dtype = torch.float32 if config == "fp32" else torch.float16
-    layout = torch.channels_last if "channels-last" in config else torch.contiguous_format
-    net = net.eval().to(device="cuda", dtype=dtype, memory_format=layout)
-
-    def input_frame(frame: np.ndarray) -> Any:
-        return (torch.from_numpy(frame[None]).to("cuda").permute(0, 3, 1, 2)
-                .to(dtype=dtype, memory_format=layout) / 255.0)
-
-    if next(net.parameters()).device.type != "cuda" or next(net.parameters()).dtype != dtype:
-        raise ValueError("enhancer device or precision mismatch")
-    spatial = config in SPATIAL_CONFIGS
-
-    def network_input(x: Any) -> Any:
-        return (torch.nn.functional.interpolate(x, size=(540, 960), mode="area")
-                .contiguous(memory_format=layout) if spatial else x)
-
-    def restore_output(y: Any, small: Any, original: Any) -> Any:
-        if not spatial:
-            return y
-        correction = y - small if config.endswith("residual") else y
-        expanded = torch.nn.functional.interpolate(correction.float(), size=original.shape[-2:],
-                                                   mode="bilinear", align_corners=False)
-        return original.float() + expanded if config.endswith("residual") else expanded
-
-    out = np.empty_like(decoded)
-    wall, gpu = [], []
-    with torch.inference_mode():
-        x = network_input(input_frame(decoded[0]))
-        for _ in range(warmup):
-            net(x)
-        torch.cuda.synchronize()
-        with torch.profiler.profile(activities=[torch.profiler.ProfilerActivity.CPU,
-                                               torch.profiler.ProfilerActivity.CUDA]) as profile:
-            net(x)
-            torch.cuda.synchronize()
-        kernels = sorted({e.name for e in profile.events() if e.device_type == torch.autograd.DeviceType.CUDA})
-        if not kernels:
-            raise ValueError("no CUDA kernels observed")
-        torch.cuda.reset_peak_memory_stats()
-        for i, frame in enumerate(decoded):
-            start, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
-            began = time.perf_counter()
-            original = input_frame(frame)
-            x = network_input(original)
-            start.record()
-            y = net(x)
-            end.record()
-            if not torch.isfinite(y).all():
-                raise ValueError("nonfinite enhancer output")
-            y = restore_output(y, x, original)
-            out[i] = y.clamp(0, 1).mul(255).round().to(torch.uint8).permute(0, 2, 3, 1).cpu().numpy()[0]
-            torch.cuda.synchronize()
-            wall.append(1000 * (time.perf_counter() - began))
-            gpu.append(start.elapsed_time(end))
-    return out, {"config": config, "batch": 1, "warmup": warmup, "cuda_kernels": kernels,
-                 "dtype": str(dtype), "layout": str(layout),
-                 "wall_ms_mean": float(np.mean(wall)), "wall_ms_p95": float(np.percentile(wall, 95)),
-                 "cnn_ms_mean": float(np.mean(gpu)), "cnn_ms_p95": float(np.percentile(gpu, 95)),
-                 "wall_ms_per_frame": wall, "cnn_ms_per_frame": gpu,
-                 "peak_memory_mib": torch.cuda.max_memory_allocated() / 2**20}
-
+from src.codecs.enhancer import CONFIGS, SPATIAL_CONFIGS, apply
 
 def pixel_error(frames: np.ndarray, reference: np.ndarray) -> tuple[float, int]:
     """Paired uint8 RGB error with one frame of temporary storage."""
@@ -171,7 +95,7 @@ def command_run(args: argparse.Namespace) -> int:
         g5c.save(checkpoints, f"crf{crf}", row)
         progress(done)
     write_json(stage_dir() / "g6-speed.json", {"item": args.item, "frames": n, "fps": manifest["fps"],
-        "configs_run": configs_run, "manifest_sha256": file_sha256(root / "manifest.json"), "source": source,
+        "crfs": [int(c) for c in args.crfs.split(",")], "configs_run": configs_run, "manifest_sha256": file_sha256(root / "manifest.json"), "source": source,
         "metrics": nets.record, "dav1d": svtav1.tool("dav1d"), "torch": torch.__version__,
         "cudnn": torch.backends.cudnn.version(), "cudnn_benchmark": True,
         "baseline": "published FP16 weights loaded into FP32; original pilot used unsaved FP32 weights",
@@ -183,12 +107,20 @@ def validate(stage: Path) -> dict[str, bool]:
     r = json.loads((stage / "g6-speed.json").read_text())
     rows = r["points"]
     configs = [c for p in rows for c in p["configs"]]
+    def finite_score(score: dict[str, Any]) -> bool:
+        values = [score["dataset"][m] for m in ("lpips_v", "dists_v", "psnr_v")]
+        values += [score["flicker"]["flicker_v"], score["kid"]["kid_v"]]
+        return all(v is not None and np.isfinite(v) for v in values)
+
     return {"intended_gpu": tuple(r["gpu_capability"]) >= (8, 6),
+            "every_crf": [p["crf"] for p in rows] == r["crfs"],
             "native_decode_hashes": bool(rows) and all(p["decoded_hashes_match"] for p in rows),
             "every_config": all([c["config"] for c in p["configs"]] == r.get("configs_run", list(CONFIGS)) for p in rows),
-            "finite_scores": all(np.isfinite(c["score"]["dataset"]["lpips_v"]) for c in configs),
+            "finite_scores": all(finite_score(c["score"]) for c in configs),
             "timed_every_frame": all(len(c["timing"]["wall_ms_per_frame"]) == r["frames"] for c in configs),
             "positive_timings": all(c["timing"]["cnn_ms_mean"] > 0 for c in configs),
+            "precision_lpips": all(c["score"]["dataset"]["lpips_v"] <= 1.01 * p["configs"][0]["score"]["dataset"]["lpips_v"]
+                                   for p in rows for c in p["configs"] if c["config"] in CONFIGS),
             "precision_close": all(c["rgb_mae_vs_fp32"] < 1 for c in configs if c["config"] in CONFIGS)}
 
 

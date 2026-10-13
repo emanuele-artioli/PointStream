@@ -716,16 +716,24 @@ def command_enhance(args: argparse.Namespace) -> int:
                  "score": g5c.full_score(clip, plain_rgb, w["nets"], w["flows"])}
         net, fit_record = g5d.fit(f_decoded, f_target, f_keep, "lpips", args.steps, w["nets"].lpips, "cuda")
         del f_decoded
-        torch.cuda.synchronize()
-        t0 = time.time()
-        enhanced = g5d.apply(net, plain_rgb, "cuda")
-        apply_ms = 1000 * (time.time() - t0) / clip.n
+        inference = getattr(args, "inference", "legacy")
+        inference_record: dict[str, Any] = {"config": inference, "batch": 4}
+        if inference == "legacy":
+            torch.cuda.synchronize()
+            t0 = time.time()
+            enhanced = g5d.apply(net, plain_rgb, "cuda")
+            apply_ms = 1000 * (time.time() - t0) / clip.n
+        else:
+            from src.codecs.enhancer import apply as apply_enhancer
+
+            enhanced, inference_record = apply_enhancer(net, plain_rgb, inference, profile_kernels=False)
+            apply_ms = inference_record["wall_ms_mean"]
         weights = enhancers / f"crf{crf}.pt"
         torch.save({k: v.half() for k, v in net.state_dict().items()}, weights)
         enh_yuv = g5.rgb_to_yuv420(enhanced)
         enhancer = {"weights": f"enhancers/crf{crf}.pt", "weights_sha256": file_sha256(weights),
                     "weights_bytes": weights.stat().st_size, "parameters": fit_record["parameters"],
-                    "apply_ms_per_frame": apply_ms, "fit": fit_record, "fit_frames": len(ids),
+                    "apply_ms_per_frame": apply_ms, "inference": inference_record, "fit": fit_record, "fit_frames": len(ids),
                     "fit_kbps": 8 * f_rec["payload_bytes"] / (len(ids) / float(clip.fps)) / 1000,
                     "changed_share": float((enhanced != plain_rgb).any(axis=3).mean())}
         enh = {"value": crf, **rec, "decode_ms_per_frame": rec["decode_ms_per_frame"] + apply_ms,
@@ -849,6 +857,8 @@ def main(argv: list[str] | None = None) -> int:
     fo.add_argument("--methods", default=",".join(METHODS))
     fo.add_argument("--values", default=None, help="METHOD=V,V;... over the default grid")
     fo.set_defaults(func=command_format)
+    en.add_argument("--inference", choices=("legacy", "fp16-channels-last"), default="legacy",
+                    help="legacy preserves pilot replay; fp16-channels-last uses measured batch-one inference")
     en.add_argument("--footage", required=True, help="the window's extracted native footage archive")
     en.add_argument("--crfs", default=",".join(map(str, g5.CRFS)))
     en.add_argument("--steps", type=int, required=True)

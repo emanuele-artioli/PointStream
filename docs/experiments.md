@@ -4922,3 +4922,13 @@ invocation turns out to be needed.
   smoke 8 frames, full 48, <= 500 seconds/job. The resolution follow-up
   also uses 48 frames and one CRF, <= 500 seconds/job. This establishes
   a bounded deployment pilot, not all-frame quality or speed guarantees.
+
+- The revised three-CRF full stages also exceeded 300 seconds. Completed
+  CRFs and individual configurations were saved; unfinished configurations
+  are not evidence, and these jobs are not reported as complete. Retain
+  their paired 48-frame results at completed rates, inspect them individually,
+  and reduce the follow-up to one CRF rather than extending a timeout.
+  The 540p target is explicitly on Ada (gpu5/gpu6 compatible pool); the
+  A6000 precision pilot remains a separately labelled hardware measurement.
+  Both one-CRF follow-ups have a 500-second ceiling, within the remaining
+  initial hour after accounting for cancelled and timed-out allocations.
