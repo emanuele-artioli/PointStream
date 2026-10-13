@@ -169,7 +169,8 @@ def fit(decoded: np.ndarray, target: np.ndarray, keep: np.ndarray, loss: str, st
     curve: list[dict[str, Any]] = []
     resumed, elapsed = 0, 0.0
     if checkpoint is not None and checkpoint.is_file():
-        state = torch.load(checkpoint, map_location=device, weights_only=True)
+        # Keep Adam step counters on CPU; load_state_dict moves moment tensors to each parameter.
+        state = torch.load(checkpoint, map_location="cpu", weights_only=True)
         if state["signature"] != signature:
             raise ValueError("training checkpoint does not match this fit")
         net.load_state_dict(state["model"], strict=True)

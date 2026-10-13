@@ -5097,3 +5097,12 @@ invocation turns out to be needed.
   split/resumed training with uninterrupted training. Recompute inference
   timings after a resume; never carry contaminated timing into a result.
   Every stage <=45 minutes and every finished point/model saved separately.
+
+- Initial latency smoke `20261013T080143Z-923b4426` (code `49076e9`,
+  gpu5) stopped before promotion: split/resumed training differed from
+  continuous training. Reload used `map_location="cuda"`, moving Adam's
+  originally CPU step counters to CUDA as well as its moment tensors.
+  Reload from CPU instead; optimizer.load_state_dict places moments on
+  their parameters while preserving step-counter semantics. Repeat the
+  substantive continuation check on the corrected revision, not the
+  unchanged failed source. No quality/latency conclusions from this job.
