@@ -5165,3 +5165,8 @@ invocation turns out to be needed.
   Revised bounded attempt: remaining allocation 1,770 s (deduct 53 s),
   full stage 1,400 s, smoke 300 s and validator 30 s, two declared resumes
   within the same remaining allocation; original training archive unchanged.
+
+- Corrected continuation `20261013T115150Z-d39f7aae`, revision
+  `ec31611`, spec SHA256
+  `c8d10c7547c8ddd81f382815c4acbf8e17f6d38f52c127aebb2ab35338192796`,
+  admitted on gpu5; focused seven tests and static checks passed.
