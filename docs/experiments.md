@@ -5115,3 +5115,16 @@ invocation turns out to be needed.
   width within the 16.68 ms native-frame budget. This is architecture
   cost screening, not a trained quality result. Proceed with its CRF48
   excerpt oracle on both pilots using 2,000 steps and all five metrics.
+
+- P06 oracle `20261013T081738Z-178d843d` (code `4c077ef`, gpu5 Ada)
+  completes with validated smoke and uncontaminated full timing. At CRF48,
+  48 frames: plain/reference/c16 LPIPS_V 0.08537 / 0.04987 / 0.05222;
+  c16 retains 93.4% of the reference gain, mean/p95 13.1/14.3 ms.
+  Its 2,000-step fit took 20.8 seconds. Oracle passes for P06; proceed
+  with that window's held-out-footage fit.
+- P26 oracle `20261013T081739Z-f3a73d48` stops under contention 10.6 s
+  after admission on gpu6, before a fit checkpoint exists. The declared
+  resume is declined (`smoke published no checkpoint`). Canonical status
+  confirms it is terminal; no output/timing promoted. A fresh bounded
+  attempt is permitted after this inspection and another pool audit;
+  retain the original request and artifacts, and keep gpu5/gpu6 eligible.
