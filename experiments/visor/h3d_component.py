@@ -270,12 +270,14 @@ def footage_planes(meta: dict[str, Any], paths: dict[str, Path], out: Path) -> t
 
 
 def first_segments(meta: dict[str, Any], a: dict[str, np.ndarray], count: int) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
-    """The footage limited to its first ``count`` segments (smokes)."""
+    """The footage limited to its first ``count`` segments with R (smokes: P03_10's first two show no hands)."""
     if count >= len(meta["segments"]):
         return meta, a
-    keep = a["segment"] < count
+    chosen = [n for n, s in enumerate(meta["segments"]) if s["frames_with_r"] > 0][:count]
+    keep = np.isin(a["segment"], chosen)
     shape = [int(keep.sum()), *meta["shape"][1:]]
-    return {**meta, "segments": meta["segments"][:count], "shape": shape}, {**a, "masks": a["masks"][keep], "segment": a["segment"][keep]}
+    return ({**meta, "segments": [meta["segments"][n] for n in chosen], "shape": shape},
+            {**a, "masks": a["masks"][keep], "segment": a["segment"][keep]})
 
 
 def full_masks(meta: dict[str, Any], a: dict[str, np.ndarray]) -> np.ndarray:
@@ -311,6 +313,8 @@ def training_pairs(args: argparse.Namespace, meta: dict[str, Any], a: dict[str, 
     small = rgb_memmap(Path(rec["decoded"]), work / "footage-rgb.npy", frames, sw, sh, full_range, device)
     truth = rgb_memmap(work / "footage.yuv", work / "footage-truth.npy", frames, 1920, 1080, full_range, device)
     keep = [t for t in range(frames) if masks[t].any()]
+    if not keep:
+        raise RuntimeError(f"{meta['unit']}: no footage frame shows R, nothing to fit")
     xs, ts, rs = (np.empty((len(keep), CROP, CROP, 3), np.uint8), np.empty((len(keep), CROP, CROP, 3), np.uint8), [])
     for i, t in enumerate(keep):
         y, x = crop_box(masks[t])

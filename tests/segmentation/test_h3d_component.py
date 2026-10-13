@@ -93,3 +93,12 @@ def test_v_only_when_it_beats_every_standing_shared_arm():
     assert h3d.component_decision(arms, fronts({"K-L": 1.0, "V-L": 0.95, "V-S": 0.97}))["coder"] == "K-L"
     none = verdicts(G_L=("fails", 0.1), K_L=("unclear", -0.05), V_L=("fails", 0.3))
     assert h3d.component_decision(none, fronts({}))["coder"].startswith("none")
+
+
+def test_a_smoke_takes_the_first_segments_with_r():
+    meta = {"segments": [{"frames_with_r": 0}, {"frames_with_r": 0}, {"frames_with_r": 5}, {"frames_with_r": 48}],
+            "shape": [8, 2, 16]}
+    a = {"segment": np.repeat(np.arange(4), 2), "masks": np.arange(8)[:, None, None] * np.ones((1, 2, 2), np.uint8)}
+    m, b = comp.first_segments(meta, a, 2)
+    assert m["segments"] == meta["segments"][2:] and m["shape"] == [4, 2, 16]
+    assert list(b["segment"]) == [2, 2, 3, 3] and list(b["masks"][:, 0, 0]) == [4, 5, 6, 7]
