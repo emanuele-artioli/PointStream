@@ -5271,3 +5271,55 @@ invocation turns out to be needed.
   per item. Smoke: one item, 48 frames, ≤ 600 s. Pilot: B2's 4 pilot items,
   ≤ 45 min, which also times an item. Full: the other 30 items, in parts of
   at most 45 min each. Ceiling 8 CPU-hours.
+- Jobs: pilot `20261013T074546Z-821ee185` (code `2880e27`, environment
+  `pointstream-20261006T113321Z` as H1; CPU only, 16 threads on gpu4;
+  inputs `pointstream-data/visor/h4b-2026-10-13/inputs-7f2aebab5a6a.json`,
+  spec `h4b-pilot.json` beside it). Smoke P01_107, 48 frames (98 s); full
+  stage B2's 4 pilot items at 240 frames (1,260 s; per item 188–1,257 s,
+  the bank's candidates dominating). Validators passed on the smoke and,
+  locally, on the full stage's `published.tar` (`e14d7f86…`; 6 checks,
+  including *single* against H1's recorded chains: exact on all 28
+  track-thresholds). Report: `…/h4b-2026-10-13/report-pilot-2880e27/h4b-report.json`
+  (`1e10dfb0…`). Not evidence: `20261013T074250Z-24ac003d` (the run
+  finished its smoke; the validator was given a `{staged:…}` placeholder,
+  which the fleet does not expand for validators).
+- Outcome (pilot, means over the 4 items; 6 handled tracks, 1,342
+  handled-object frames):
+
+  | coder | held at 30 dB | median interval | new views per s | held at 33.75 dB |
+  |---|---|---|---|---|
+  | single (H1) | 54.6% | 0.032 s | 31.8 | 26.2% |
+  | single + direct | 56.2% | 0.032 s | 31.0 | 26.4% |
+  | bank-4 | 56.7% | 0.032 s | 30.6 | 26.4% |
+  | bank (every view) | 55.9% | 0.032 s | 31.1 | 26.3% |
+
+  The unlimited bank sends 1.00× the new views of *single + direct*
+  (rule ≤ 0.5×). Per handled track (frames; new views single / single +
+  direct / bank): soy milk 240; 140 / 125 / 130, glass 240; 77 / 77 / 77,
+  tap 240; 60 / 59 / 56, pancake 240; 63 / 63 / 63, pancake package 240;
+  128 / 128 / 128, fork 142; 78 / 78 / 78. Direct registration reaches 8%
+  of the bank's held frames. Other objects behave the same (held 66.7% →
+  67.3%, ratio 1.02).
+- Decision (by the rule, on the pilot): **the bank fails every check**:
+  held 56% (rule 70%), median interval 0.03 s (rule 0.5 s), and it sends
+  as many new views as one re-registering reference (rule half). The rule's
+  unit is the 34 items; the other 30 were not run, because no mean over
+  them could pass: (c) needs the bank to halve the new views, and on every
+  pilot track it changes them by 0–7%. H4b stops at the pilot; handled
+  objects stay coded pixels (H4 item 3).
+- Reading. The hypothesis held, and more strongly than predicted: the bank
+  adds nothing, not even the ~10 points expected from occlusion and new
+  pixels. A view sent earlier almost never predicts a later frame better
+  than the latest view does: within a 4.8 s window the objects' appearance
+  changes one way (turning, being cut, filled, lit differently, blurred),
+  so the most recent view is always the best one and older views are not
+  revisited. Competing explanation (1) does not hold either: direct
+  registration recovers 1.6 points over H1's chain, so broken chains are
+  not why the reference dies. What fails is appearance: at 30 dB a view
+  predicts the next frame on half the frames and is resent every 0.03 s,
+  which is what a pixel codec's own inter prediction already does.
+- Scope. 4 pilot items, 6 handled tracks. Views are warped by homographies;
+  a richer warp (dense flow, a 3D model) was H1's flow bound (1–2 dB over
+  the homography) and is not a bank question. The screen (4 candidates
+  kept from a 1/16-pixel test) could miss a view; it never applies to
+  *single*, and *single + direct* differs from the bank by under 1 point.
