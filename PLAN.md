@@ -884,6 +884,76 @@ curves, and timed end to end, which picks B2b's equal-time SVT-AV1 preset.
 **Done when** PointStream's curves and encode and decode times on all 34
 items come from recorded jobs, beside B2's.
 
+#### K. Where keypoints win (analysis, user 2026-10-13)
+
+Keypoints are PointStream's premise (after GenStream). On egocentric video
+they have lost every time they were asked to replace pixels: as appearance
+(H3b, perfect appearance at the coded pose: 48% saving at equal LPIPS,
+under the 50% bar), as a real generator (H3e: worse on 3 of 4 items), and
+for objects as motion of any kind (H1, H4a, H4b: references die in 1–4
+frames). They win as information: with a perfect generator, H2's coded
+keypoints carry the hand's pose for 69% less rate than pixels at equal
+pose error (H3c2). The failures have causes the work identified: a pixel
+bar that keeps falling (DCVC-UF −63% against SVT-AV1 on the hands, G −22%
+more), rendering judged by the pixels around the subject (MANO's outline
+misses a tenth of the hand), and egocentric video's worst case (moving
+camera, large hands, objects showing new sides, 2–3 minute videos that no
+per-video model pays back). Keypoints should win where those causes are
+absent: very low rates; judges of what keypoints carry (pose, trajectory);
+small fast structured objects; long videos with constant identity; a still
+camera. Broadcast tennis has all five, so it is measured now, not left to
+phase 2's end (user, 2026-10-13). Cheap first, each with its rule written
+before its run:
+- K1. *Very low rates.* H3b2's low-rate win (perfect appearance at the
+  coded pose: LPIPS 0.21 at 1.93 kbps, against SVT-AV1's 0.29 at the same
+  rate, forearm granted) was against SVT-AV1 only; DCVC-UF at ¼ already
+  reaches 0.3–3 kbps on R. Check first from recorded data (H3b, H3e, H3d's
+  G curves on the same items and region): does any keypoint point lie
+  above DCVC-UF + G's curve at its rate? If so, the paper shows the
+  crossover (RD curves of each mode, with the rate where keypoints stop
+  winning); if not, the low-rate claim is dropped for egocentric hands.
+  The regime itself (where pixel coders collapse) is defined per domain by
+  the judge (e.g. a detector's recall on the decoded ball, K5).
+- K2. *Judges of what keypoints carry (coding for machines).* H3c2 judged
+  hands by the pose re-estimated on the decoded video; the mask or pose
+  computed on the original against on the decoded foreground is the same
+  idea. A short study of MPEG's Video Coding for Machines (VCM) and
+  feature coding (FCM) first: how they judge (task accuracy on the decoded
+  content against rate, BD-rate on the task metric, their anchor codec and
+  test conditions), and what PointStream should adopt, so that a keypoint
+  mode is judged on a recognized axis beside human-viewing metrics.
+  Literature only; no runs.
+- K3. *Keypoint-conditioned pixel coding* (H3's proto-hand candidate). The
+  decoder receives the keypoints and the pixels code only what they do not
+  explain; in principle never worse than pixels alone, but it needs a new
+  input path and training. Cheap oracle, inference only: give DCVC-UF as
+  its reference the previous decoded frame warped by the keypoints' motion
+  (H3b's mesh correspondence from t−1's coded pose to t's) instead of the
+  previous decoded frame, and measure the rate on R at equal quality, with
+  the keypoints billed. DCVC-UF estimates and codes its own motion, so the
+  gain is bounded by its motion bits; if even this oracle saves nothing,
+  the trained version is not pursued.
+- K4. *Tennis audit*, H1's method on broadcast tennis (the archived
+  `tennis_games` matches at 1080p; TrackNet's dense ball labels): per part
+  (players, racket, ball, background), its share of pixels and of
+  SVT-AV1's bits (H1's bit accounting), how often the camera is still, a
+  body-pose estimator's fit (audit first, e.g. ultralytics' pose models)
+  and its parameter rate against the bits on those pixels. Decides whether
+  players pass H1's screen and what the ball costs.
+- K5. *Ball oracle.* The true ball drawn from its coded position over
+  SVT-AV1 and DCVC-UF decodes: ball-region quality and a ball detector's
+  recall on the decoded frames, against the pixel coders at equal rate and
+  equal quality. Decides the ball mode.
+- K6. *Player oracle* (after K4): H3b for bodies, perfect appearance at
+  the coded body pose with what the pose cannot describe charged; whether
+  the outline problem shrinks at broadcast scale. A per-player appearance
+  model is amortized over a match (hours), the condition H3d found
+  decisive. The racket in a fixed grip re-tests H4a's grip pose.
+Order: H5 continues on egocentric (a working pipeline with what is
+chosen: G's background, DCVC-UF + G on hands, H4c on objects), since its
+bitstream, compositor and harness carry over to tennis. K4–K5 and K2 run
+beside it in their own sessions; K1 and K3 are cheap and egocentric.
+
 ### After a working pipeline
 
 Optimisation, training and extensions, ordered by what G and H show they need.
@@ -982,3 +1052,15 @@ it saves at the hands' rates), so networks are better delivered once; and
 the generic network's gain on the hands is perceptual (LPIPS and DISTS
 better, PSNR worse, a slight colour shift, no invented texture), as G5d's
 enhancer on the background.
+Negative results to report (user, 2026-10-13), with their numbers:
+parametric motion fails for egocentric objects (H1's homographies, H4a's
+grip pose on HOT3D motion capture, H4b's bank of views), and keypoints
+lose to pixels on egocentric hands at equal quality (H3b, H3e) while
+carrying the pose for less rate (H3c2). Possibly two papers, in order, if
+the final results hold (user, 2026-10-13): one where keypoints beat the
+standard codecs (tennis), one on the learned pixel coders that beat the
+keypoints on egocentric video. Order of writing (user, 2026-10-13): a
+definitive pipeline; a first draft complete but for final touches and the
+figures' final experiments; the final experiments (run once, after the
+figure list is fixed); final touches before submission. The framing waits
+for the pipeline and K4–K6.
