@@ -5220,3 +5220,13 @@ invocation turns out to be needed.
   pending; P26 rate specification prepared, submission gated by held-out.
   Full configured pytest suite passed (with expected GPU/dependency skips),
   Ruff source checks and mypy all 102 source files passed.
+
+- G6 publication verification `20261013T124341Z-6e1a6500` completes
+  on gpu3 A6000 with both stage validators passed. Actual CRF48 stream
+  and enhanced FFV1 decode published, all checks complete; eight blocks,
+  16 channels, 38,003 parameters, shipped weights 85,987 bytes. Full
+  command 53.4 s (plus staging/scoring/publication overhead). CUDA FP16
+  tensor-core kernels profiled. Recorded in fleet model–GPU table. This
+  is interface correctness evidence, not trained quality or shared timing.
+  Published archive SHA256
+  `fd043f006d0330d92f80fb40f97b100268e0192c2639399f9ff478e656f61a05`.

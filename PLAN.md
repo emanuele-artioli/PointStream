@@ -554,7 +554,8 @@ oracles and P06 held-out (86.9% LPIPS gain retained; 13.6 ms mean,
 15.1 ms p95 on Ada). G6 selects it with `--enhancer-channels 16
 --inference fp16-channels-last`, publishes `enh-1080-b8-c16`, and records
 architecture and distinct weights/checkpoint paths. P26 held-out and the
-production publication smoke are submitted. User requests economical
+production publication smoke were submitted; the publication smoke now
+passes on A6000 (actual weights, manifest and FFV1 decoded hashes). User requests economical
 closure: add CRF32/63 on 48-frame excerpts, reuse CRF48, and defer complete
 windows/all-window RD and whole-client timing to final experiments.
 Host/transfer timing diagnosis is deferred unless it changes the decision.

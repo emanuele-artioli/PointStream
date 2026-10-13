@@ -522,6 +522,7 @@ and choose `gpu_models` from it.
 | G5d/G6 8-block, 64-channel enhancer | RTX 6000 Ada (8.9) | CUDA, torch 2.10.0+cu128 / cuDNN 9.10.2; strict shipped-weight load; FP16 NHWC tensor-core kernels (`sm80_xmma`, CUTLASS `s16816`) profiled; native dav1d frame hashes and paired precision smoke pass | `20261013T062703Z-e987301d` (smoke; full grid timed out, completed points retained) |
 | G5d/G6 8-block, 64-channel enhancer | RTX A6000 (8.6) | Same device / provider / FP16 tensor-core checks as Ada; full-resolution latency remains above 60 fps on both classes | `20261013T062704Z-0b0e2c14` (smoke; full grid timed out, completed points retained) |
 | G6 narrower enhancer (eight blocks, c32/c24/c16) | RTX 6000 Ada (8.9) | CUDA, FP16 NHWC cuDNN kernels profiled; native dav1d hashes verified; split/resumed Adam training agrees with continuous fit after CPU step-counter reload fix | `20261013T080906Z-33f5d2e3` |
+| G6 narrow enhancer (eight blocks, c16), actual G6 publication | RTX A6000 (8.6) | CUDA FP16 NHWC cuDNN tensor-core kernels profiled; 38,003 parameters; blocks/channels and distinct shipped weights verified; FFV1 decoded-frame hashes and manifest publication pass. Shared-GPU smoke only, no timing evidence | `20261013T124341Z-6e1a6500` |
 
 CPU components, checked in every job above: the VISOR reader (PyAV, time-rule
 frame mapping), SVT-AV1 4.2.0 encode with dav1d decode, and the HOT3D-Clips MANO
