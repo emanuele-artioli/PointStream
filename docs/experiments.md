@@ -5156,3 +5156,12 @@ invocation turns out to be needed.
   Focused tests: seven passed. Ruff passed with the pre-existing untracked
   paper checkout excluded; mypy passed all 102 configured source files.
   The user-selected 30-minute monitor is rearmed.
+
+- Continuation `20261013T114223Z-76accf59` confirmed terminal contended
+  during smoke after 51.5 s; no checkpoint yet, declared resume declined.
+  Preserve the actual supplied full-fit state at startup under seed-fits,
+  separate from the smoke fit signature, using atomic publication. This
+  allows declared smoke resumes even before its own short fit finishes.
+  Revised bounded attempt: remaining allocation 1,770 s (deduct 53 s),
+  full stage 1,400 s, smoke 300 s and validator 30 s, two declared resumes
+  within the same remaining allocation; original training archive unchanged.

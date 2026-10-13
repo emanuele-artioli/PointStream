@@ -92,6 +92,17 @@ def command_run(args: argparse.Namespace) -> int:
     publish = Path(os.environ["PS_SCRATCH_DIR"]) / "publish"
     publish.mkdir(parents=True, exist_ok=True)
     checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"])
+    if args.fit_state:
+        # Preserve the real supplied training state even if smoke is interrupted
+        # before its short fit. Keep it separate from smoke's fit signature.
+        seed_directory = checkpoints / "seed-fits"
+        seed_directory.mkdir(parents=True, exist_ok=True)
+        for saved_fit in (Path(args.fit_state) / "checkpoint" / "fits").glob("*.pt"):
+            target = seed_directory / saved_fit.name
+            if not target.exists():
+                temporary = target.with_name(f".{target.name}")
+                shutil.copyfile(saved_fit, temporary)
+                temporary.replace(target)
     available = published_points(args.published, args.item)
     crfs = [int(c) for c in args.crfs.split(",")]
     widths = [int(c) for c in args.channels.split(",")]
@@ -156,7 +167,7 @@ def command_run(args: argparse.Namespace) -> int:
             else:
                 fit_checkpoint = checkpoints / "fits" / f"{key}.pt"
                 if args.fit_state and os.environ.get("PS_STAGE") != "smoke" and not fit_checkpoint.exists():
-                    saved_fit = Path(args.fit_state) / "checkpoint" / "fits" / f"{key}.pt"
+                    saved_fit = checkpoints / "seed-fits" / f"{key}.pt"
                     fit_checkpoint.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copyfile(saved_fit, fit_checkpoint)
                 if os.environ.get("PS_STAGE") == "smoke":
