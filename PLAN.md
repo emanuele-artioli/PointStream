@@ -922,7 +922,18 @@ before its run:
   content against rate, BD-rate on the task metric, their anchor codec and
   test conditions), and what PointStream should adopt, so that a keypoint
   mode is judged on a recognized axis beside human-viewing metrics.
-  Literature only; no runs.
+  Literature only; no runs. **Done 2026-10-13: [docs/vcm.md](docs/vcm.md).**
+  VCM and FCM judge as H3c2 does (fixed task network on decoded content,
+  BD-rate on the task metric) but against human labels, with a judge
+  independent of the codec, only within about 10% of the source's accuracy
+  (FCM's performance points), and against VVC (VTM; HM in FCM since
+  2026-08). Pose left MPEG's conditions in 2022. Proposal: per mode a task
+  metric against labels (HInt PCK for hands, TrackNet F1 for the ball,
+  RacketVision for rackets; independent pseudo-labels only for tennis
+  bodies), BD-rate in that range against the pixel envelope and VTM, beside
+  the human-viewing curves. First use: re-judge H3c2 with HaMeR against HInt
+  (CPU count of HInt hands in the items first). None of MPEG's datasets fits
+  the domains.
 - K3. *Keypoint-conditioned pixel coding* (H3's proto-hand candidate). The
   decoder receives the keypoints and the pixels code only what they do not
   explain; in principle never worse than pixels alone, but it needs a new
