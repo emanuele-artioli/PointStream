@@ -756,6 +756,25 @@ by the rule; the user opened the path (2026-10-12). Order now:
    below, or hand inpainting into the coded frames), or on camera motion.
 2. H3d, as agreed, against H3c's bar (now the per-item concave hull of
    SVT-AV1 and DCVC-UF off the shelf on R, by BD-rate; project convention).
+   Oracle (2026-10-12, [outcome](docs/experiments.md#2026-10-12--h3d-oracle-a-content-aware-super-resolution-of-the-hand-pixels-nas)):
+   **passes**. G5d's enhancer (0.6 M parameters) fitted on the window
+   itself, its bits free, over DCVC-UF's ¼ and ½ decodes needs 77% less rate
+   than the bar for the same LPIPS_R (CI −89% to −66%, 4 of 4 items; DISTS
+   and mostly PSNR agree; flicker unchanged). Over SVT-AV1 it is unclear
+   (−19%) and synthesizes texture. Next, the component: fitted outside the
+   window (memorization) and paid for. At 1.2 MB it costs more than it
+   saves within each pilot video (1.7–3.5 minutes), so network size, and
+   sharing one network across videos, are its axes.
+   Component (2026-10-13, [outcome](docs/experiments.md#2026-10-12--h3d-component-per-video-per-person-and-generic-super-resolution-of-the-hand-pixels)):
+   **G stands: H3d's coder is DCVC-UF off the shelf at ¼ and ½ with a
+   generic super-resolution network** (594 k parameters, fitted on six
+   recordings of five other participants, sent with the decoder): −22% rate at equal
+   LPIPS on the hands against the bar (CI −34% to −10%, 4 of 4 items),
+   DISTS agreeing, PSNR worse (+11% to +35%). Per video (NAS, billed) fails
+   at every size on these short videos; per person (the hybrid) is unclear:
+   better than G where the person looks as usual, but it recolours P02_02's
+   gloves toward skin. Fitting outside the window keeps about half of the
+   oracle's gain.
 3. Candidate after H3e (user, 2026-10-12): DCVC-UF conditioned on a
    proto-hand. The decoder also receives a render of the coded keypoints
    (a skeleton or MANO image), so its bitstream carries only what the
@@ -835,6 +854,26 @@ Optimisation, training and extensions, ordered by what G and H show they need.
 VVC (VVenC, `/opt/local/bin/vvencapp` on the hosts) joins the baselines here
 (user, 2026-10-08: SVT-AV1 is enough until then).
 
+#### H3d follow-ups (deferred, user 2026-10-13)
+
+H3d adopted DCVC-UF with a generic super-resolution network (G) for the
+hand pixels; optimizing it waits for a full pipeline. Deferred, each with
+its own oracle when taken up:
+1. *Person network with a fallback* (best of both). K beat G where the
+   person looked as usual (−43%, −55%) but recoloured P02_02's gloves toward
+   skin. A per-person network that defers to G on content unlike its
+   footage (by a novelty test on the decoded hand, or by sending a one-bit
+   choice per segment, billed) would keep K's gain without its failures.
+2. *Longer videos for the per-video network.* Fitted outside the window,
+   V kept about half of the oracle's gain (−37% free of bits) from 1,152
+   frames of 1.7–3.5-minute videos, and its bits sank it. Longer videos give
+   more of the person's own footage (expected to retain more of the oracle's
+   gain) and more seconds to amortize the network over. Measure both on
+   long recordings, e.g. Egocentric-10K (archived on disk,
+   `Datasets/archive/pre-reset-2026-10-05/`).
+3. *G at scale:* more footage and recordings, a longer schedule, network
+   size; then G on all 34 items.
+
 #### D1. Segmentation benchmark on VISOR and EgoHOS
 
 Moved after a working pipeline (user, 2026-10-08): SAM 3.1 already segments
@@ -900,3 +939,10 @@ estimator comparison from H. Set the venue and
 submission date. Wherever a model is delivered beforehand and not billed
 (G5b's scene model), report beside the rate the playback time after which its
 bytes are repaid (user, 2026-10-10; G5b's pilot: 2.8–14 h for 241 MB).
+Results to state when writing (user, 2026-10-13), if they still hold in
+the final experiments: a per-video network (NAS) does not pay for itself on
+short egocentric videos (H3d: 1.7–3.5 minutes; even 86 KB costs more than
+it saves at the hands' rates), so networks are better delivered once; and
+the generic network's gain on the hands is perceptual (LPIPS and DISTS
+better, PSNR worse, a slight colour shift, no invented texture), as G5d's
+enhancer on the background.
