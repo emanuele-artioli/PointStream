@@ -504,9 +504,27 @@ def command_score(args: argparse.Namespace) -> int:
             rows, scores, flicker, fits = ["base"], [score(upscaled, upscale=False)], [], {}
             flicker.append(h3d.flicker_flow_free(h3d.composites(upscaled, truth, regions), truth, regions))
             data: dict[str, Any] = {}
+            looks = [score.hand[len(score.hand) * k // 4] for k in (1, 2, 3)]  # three hand frames for the visual check
+            crops = publish / "frames" / it["id"] / args.point.replace("@", "-").replace("/", "_")
+
+            def keep_look(row: str, frames_rgb: Any) -> None:
+                import cv2
+
+                crops.mkdir(parents=True, exist_ok=True)
+                for t in looks:
+                    ys, xs = np.nonzero(regions[t])
+                    box = (slice(max(0, ys.min() - 64), ys.max() + 65), slice(max(0, xs.min() - 64), xs.max() + 65))
+                    out = np.asarray(truth[t]).copy()
+                    if frames_rgb is not None:
+                        out[regions[t]] = frames_rgb[t][regions[t]]
+                    cv2.imwrite(str(crops / f"{row.replace('/', '_')}-f{t:03d}.png"), cv2.cvtColor(out[box], cv2.COLOR_RGB2BGR))
+
+            keep_look("source", None)
+            keep_look("base", upscaled)
 
             def add(row: str, net: Any) -> None:  # each output scored and dropped: a window is 1.5 GB
                 out = h3d.apply(net, upscaled, regions, device)
+                keep_look(row, out)
                 rows.append(row)
                 scores.append(score(out, upscale=False))
                 flicker.append(h3d.flicker_flow_free(h3d.composites(out, truth, regions), truth, regions))
