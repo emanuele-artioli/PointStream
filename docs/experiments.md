@@ -5175,10 +5175,11 @@ invocation turns out to be needed.
   By the rule, grip pose is dropped and H4 moves to item 2, a bank of
   reference views on VISOR.
 - Reading. The hypothesis is refuted: a held object is not still in the
-  wrist's frame. The grip removes about half of the object's motion
-  (median shift 13 mm against 82 mm in the world, rotation 10° against
-  21°), so the hand does explain most of where the object goes, but what
-  remains (10° and 13 mm within a typical grasp) is far above what a
+  wrist's frame. The grip explains most of the object's translation
+  (median shift 13 mm against 82 mm in the world) but only half of its
+  rotation (10° against 21°); these are medians of per-segment spreads,
+  not a variance split. What remains, mostly rotation (10° turns a 10 cm
+  object's edge by tens of pixels at arm's length), is far above what a
   rendered object can absorb: a reference carried by the wrist dies in a
   tenth of a second, no longer than H1's 2D warps on VISOR. Competing
   explanation (1) holds: objects move in the fingers (regrasps, in-hand

@@ -813,9 +813,14 @@ Grip pose (item 1) fails (H4a, 2026-10-13, job `20261013T064014Z-04a44b1c`,
 [outcome](docs/experiments.md#2026-10-13--h4a-grip-pose-on-hot3d-is-a-held-object-still-in-the-hands-frame)):
 on HOT3D's motion capture, a reference carried by the wrist holds 49% of
 an object's moving frames at 2 px with a median life of 0.05 s (rule 70%,
-0.5 s). The grip removes half the motion (13 mm and 10° left within a
-grasp, against 82 mm and 21° in the world), but objects move in the
-fingers continuously. Next: item 2, a bank of reference views on VISOR.
+0.5 s). The grip explains most of the translation but half the rotation
+(13 mm and 10° left within a grasp, against 82 mm and 21° in the world):
+objects turn in the fingers continuously. Consequence: handled objects get
+no motion for free from the hand stream; a pose representation would need
+its own per-frame object tracker (no labels on VISOR), so the 3D-model
+candidate loses its cheapest route. Grip pose may still serve as a prior
+(a tracker's start, a codec's motion search). Hands (H3) and the
+background (G) are unaffected. Next: item 2, a bank of reference views on VISOR.
 
 H1 found that no 2D warp of one reference view carries an object for more
 than a few frames (median reference life 0.02–0.04 s): objects turn, show new
