@@ -40,6 +40,8 @@ def apply(net: Any, decoded: np.ndarray, config: str, *, warmup: int = 5) -> tup
         return (torch.from_numpy(frame[None]).to("cuda").permute(0, 3, 1, 2)
                 .to(dtype=dtype, memory_format=layout) / 255.0)
 
+    if next(net.parameters()).device.type != "cuda" or next(net.parameters()).dtype != dtype:
+        raise ValueError("enhancer device or precision mismatch")
     out = np.empty_like(decoded)
     wall, gpu = [], []
     with torch.inference_mode():
@@ -47,6 +49,13 @@ def apply(net: Any, decoded: np.ndarray, config: str, *, warmup: int = 5) -> tup
         for _ in range(warmup):
             net(x)
         torch.cuda.synchronize()
+        with torch.profiler.profile(activities=[torch.profiler.ProfilerActivity.CPU,
+                                               torch.profiler.ProfilerActivity.CUDA]) as profile:
+            net(x)
+            torch.cuda.synchronize()
+        kernels = sorted({e.name for e in profile.events() if e.device_type == torch.autograd.DeviceType.CUDA})
+        if not kernels:
+            raise ValueError("no CUDA kernels observed")
         torch.cuda.reset_peak_memory_stats()
         for i, frame in enumerate(decoded):
             start, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
@@ -61,7 +70,8 @@ def apply(net: Any, decoded: np.ndarray, config: str, *, warmup: int = 5) -> tup
             torch.cuda.synchronize()
             wall.append(1000 * (time.perf_counter() - began))
             gpu.append(start.elapsed_time(end))
-    return out, {"config": config, "batch": 1, "warmup": warmup,
+    return out, {"config": config, "batch": 1, "warmup": warmup, "cuda_kernels": kernels,
+                 "dtype": str(dtype), "layout": str(layout),
                  "wall_ms_mean": float(np.mean(wall)), "wall_ms_p95": float(np.percentile(wall, 95)),
                  "cnn_ms_mean": float(np.mean(gpu)), "cnn_ms_p95": float(np.percentile(gpu, 95)),
                  "wall_ms_per_frame": wall, "cnn_ms_per_frame": gpu,
@@ -122,6 +132,8 @@ def command_run(args: argparse.Namespace) -> int:
                "plain_score": g5c.full_score(clip, decoded, nets, flows), "configs": scores}
         rows.append(row)
         write_json(stage_dir() / f"crf{crf}.json", row)
+        checkpoints = Path(os.environ["PS_CHECKPOINT_DIR"])
+        g5c.save(checkpoints, f"crf{crf}", row)
         progress(done)
     write_json(stage_dir() / "g6-speed.json", {"item": args.item, "frames": n, "fps": manifest["fps"],
         "manifest_sha256": file_sha256(root / "manifest.json"), "source": source,
@@ -152,7 +164,7 @@ def main() -> int:
     for name in ("eval-set", "archive", "masks", "video", "item", "published", "lpips-backbone", "dists-backbone", "inception"):
         run.add_argument(f"--{name}", required=True)
     run.add_argument("--limit-frames", type=int, default=0)
-    run.add_argument("--crfs", default="40,54,63")
+    run.add_argument("--crfs", default="32,40,48")
     val = sub.add_parser("validate")
     val.add_argument("--stage", default=None)
     args = parser.parse_args()
