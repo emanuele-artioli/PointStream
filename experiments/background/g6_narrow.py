@@ -155,6 +155,10 @@ def command_run(args: argparse.Namespace) -> int:
                 fit_record = package["footage"]
             else:
                 fit_checkpoint = checkpoints / "fits" / f"{key}.pt"
+                if args.fit_state and os.environ.get("PS_STAGE") != "smoke" and not fit_checkpoint.exists():
+                    saved_fit = Path(args.fit_state) / "checkpoint" / "fits" / f"{key}.pt"
+                    fit_checkpoint.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(saved_fit, fit_checkpoint)
                 if os.environ.get("PS_STAGE") == "smoke":
                     continuous, _ = g5d.fit(pairs[0], pairs[1], pairs[2], "lpips", args.steps, nets.lpips,
                                             "cuda", blocks=BLOCKS, channels=channels)
@@ -252,6 +256,8 @@ def main() -> int:
     run.add_argument("--crfs", default="48")
     run.add_argument("--footage", default=None)
     run.add_argument("--model", default=None)
+    run.add_argument("--fit-state", default=None,
+                     help="SHA256-staged checkpoint archive to continue an interrupted full-stage fit")
     val = sub.add_parser("validate")
     val.add_argument("--stage", default=None)
     args = parser.parse_args()

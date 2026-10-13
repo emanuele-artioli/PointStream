@@ -5128,3 +5128,24 @@ invocation turns out to be needed.
   confirms it is terminal; no output/timing promoted. A fresh bounded
   attempt is permitted after this inspection and another pool audit;
   retain the original request and artifacts, and keep gpu5/gpu6 eligible.
+
+- P26 oracle retry `20261013T083015Z-daa445c2` (code `593d1fc`,
+  gpu6 Ada) passed uncontaminated: CRF48, 48 frames, retained LPIPS gain
+  96.3%, enhancement mean/p95 11.8/13.3 ms. Both capacity screens pass.
+- P06 held-out job `20261013T083016Z-2a17a0a4` passed its smoke,
+  then stopped under contention in the full stage and again immediately
+  after its declared resume. No full result promoted. Its first-attempt
+  checkpoint retains the actual fit state; SHA256
+  `4af7f8270419e0239baf54e02cbe176ef434ffc29d315f57629c908030420aa1`.
+- User authorizes finishing this job. A new bounded continuation stages
+  that immutable archive and imports its fit only in the full stage,
+  with the existing signature check and a fresh correctness smoke.
+  Recompute all scores and timings. Keep the original inputs, eight blocks,
+  16 channels, CRF48, 2,000 steps, 48 evaluation frames and 480 native
+  training frames. Audit found one idle Ada on gpu5, gpu6 busy; keep both
+  eligible. Subtract the previous 277 s from the 2,100 s job reserve:
+  new total allocation 1,823 s, smoke 300 s, full 1,500 s, validator 30 s,
+  two declared contention resumes subject to that remaining allocation,
+  four-hour admission deadline. No budget increase or contaminated timing
+  carried forward. `--fit-state` names only the SHA256-staged fit archive;
+  existing automatic resumes take precedence over this initial seed.
