@@ -820,7 +820,17 @@ no motion for free from the hand stream; a pose representation would need
 its own per-frame object tracker (no labels on VISOR), so the 3D-model
 candidate loses its cheapest route. Grip pose may still serve as a prior
 (a tracker's start, a codec's motion search). Hands (H3) and the
-background (G) are unaffected. Next: item 2, a bank of reference views on VISOR.
+background (G) are unaffected.
+
+A bank of reference views (item 2) fails too (H4b, 2026-10-13, pilot job
+`20261013T074546Z-821ee185`, [outcome](docs/experiments.md#2026-10-13--h4b-a-bank-of-reference-views-for-handled-objects-oracle-visor)):
+an unlimited bank, choosing views with hindsight, holds 56% of handled-object
+frames at 30 dB and sends as many new views as one re-registering reference
+(1.00×), one every 0.03 s; older views are never better than the latest.
+Outcome of H4: **handled objects stay coded pixels** (item 3), coded with
+the rest of the foreground. The later candidates (a per-object 3D model,
+generative completion) have no support from H4a or H4b and wait for a
+working pipeline.
 
 H1 found that no 2D warp of one reference view carries an object for more
 than a few frames (median reference life 0.02–0.04 s): objects turn, show new
