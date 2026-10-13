@@ -1,6 +1,8 @@
 """The speed gate must reject incomplete measurements and unsafe precision changes."""
 import json
 
+import numpy as np
+
 from experiments.background import g6_speed
 
 
@@ -19,3 +21,10 @@ def test_speed_gate_rejects_precision_and_missing_frames(tmp_path):
     checks = g6_speed.validate(tmp_path)
     assert not checks["precision_close"]
     assert not checks["timed_every_frame"]
+
+
+def test_pixel_error_preserves_unsigned_extremes():
+    a = np.array([[[[0, 255, 3]]], [[[255, 0, 7]]]], dtype=np.uint8)
+    b = np.array([[[[255, 0, 5]]], [[[0, 255, 7]]]], dtype=np.uint8)
+    expected = np.abs(a.astype(np.int64) - b.astype(np.int64))
+    assert g6_speed.pixel_error(a, b) == (float(expected.mean()), int(expected.max()))

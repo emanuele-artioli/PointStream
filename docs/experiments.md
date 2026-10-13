@@ -4893,3 +4893,32 @@ invocation turns out to be needed.
   and overhead reserved). Exclusive GPU admission, contention stop, no
   contaminated timing promoted. Inputs and results stay in separate fleet
   jobs; original pilot artifacts are read-only. No 34-window run.
+
+- Follow-up planned before its results: if full-resolution FP16 misses
+  the frame deadline, test only CRF 48 on both windows at 540p with the
+  same published model, without retraining. Three arms: paired FP32
+  1080p, 540p enhanced output upsampled bilinearly, and the 540p learned
+  correction upsampled and added to the original 1080p decoded frame.
+  This is a deployment-resolution test of the existing component, not
+  a new trained architecture. It keeps the native 1080p AV1 stream,
+  exact mask and output format; CNN-only downsampling is not a rate
+  reduction. Decision: a real-time candidate must meet mean and p95
+  enhancement deadlines on both windows, retain at least 80% of the
+  paired FP32 LPIPS_V gain over SVT-AV1 at this point, and still beat
+  SVT-AV1 by 10% in LPIPS_V. Report all metric costs; one rate point
+  cannot establish a BD-rate curve or adoption at every rate. If it
+  fails, record the failure and keep the full-resolution quality mode;
+  a trained smaller model needs a separately justified oracle/pilot.
+  This follow-up only runs if the measured remaining one-hour budget
+  covers it (two jobs, smoke <= 300, full <= 450, budget <= 800 each).
+
+- Pilot scope revision (before replacement runs): the two first jobs
+  passed their 24-frame smoke but the whole-window CPU replay did not
+  finish a CRF within a useful pilot cost. Stop both, preserve their
+  artifacts, and count the elapsed allocations against the hour. The
+  replay now uses G6's existing chunked YUV conversion and framewise
+  precision-error accumulation, preserving arithmetic. Replacement
+  pilot: first 48 frames (content-blind) of each window, three CRFs;
+  smoke 8 frames, full 48, <= 500 seconds/job. The resolution follow-up
+  also uses 48 frames and one CRF, <= 500 seconds/job. This establishes
+  a bounded deployment pilot, not all-frame quality or speed guarantees.
