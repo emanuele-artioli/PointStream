@@ -5213,3 +5213,10 @@ invocation turns out to be needed.
   <=600 s, <=1,230 s allocation, substantive published decode/hash check.
 - P26 held-out request `20261013T123946Z-44a8ad16`, code `3320633`,
   pending while all eligible Ada devices are busy; 30-minute monitor rearmed.
+
+- Actual production smoke `20261013T124341Z-6e1a6500`, revision
+  `7596685`, admitted on gpu3 A6000; shared policy, timings non-citable.
+  P06 extra-rate job `20261013T124547Z-8fe336c3`, same revision, CRF32/63
+  pending; P26 rate specification prepared, submission gated by held-out.
+  Full configured pytest suite passed (with expected GPU/dependency skips),
+  Ruff source checks and mypy all 102 source files passed.

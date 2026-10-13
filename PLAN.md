@@ -549,9 +549,17 @@ for evaluation with the complete pipeline while writing the paper: multi-rate
 RD, composite quality, and whole-client latency. It still improved LPIPS_V
 against SVT-AV1 by 10.8% | 31.4% on the single-rate pilot. The 80% retention
 rule screened replacements, not all useful speed–quality operating points.
-**Quality-preserving 60 fps remains open:** next a
-narrower/shallower 1080p model, oracle and held-out pilot first. No 34-window
-run or flicker work; 0.76 GPU-hours including stopped attempts.
+**Narrow 1080p candidate:** eight blocks/16 channels passes both capacity
+oracles and P06 held-out (86.9% LPIPS gain retained; 13.6 ms mean,
+15.1 ms p95 on Ada). G6 selects it with `--enhancer-channels 16
+--inference fp16-channels-last`, publishes `enh-1080-b8-c16`, and records
+architecture and distinct weights/checkpoint paths. P26 held-out and the
+production publication smoke are submitted. User requests economical
+closure: add CRF32/63 on 48-frame excerpts, reuse CRF48, and defer complete
+windows/all-window RD and whole-client timing to final experiments.
+Host/transfer timing diagnosis is deferred unless it changes the decision.
+No 34-window run or flicker work; quality-preserving 60 fps remains a
+pilot claim until the queued checks pass.
 
 ### H. Foreground (user, 2026-10-08)
 
