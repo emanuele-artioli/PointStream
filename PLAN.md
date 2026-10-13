@@ -1064,3 +1064,19 @@ definitive pipeline; a first draft complete but for final touches and the
 figures' final experiments; the final experiments (run once, after the
 figure list is fixed); final touches before submission. The framing waits
 for the pipeline and K4–K6.
+A point to argue (user, 2026-10-13), scoped to the evidence when written:
+conventional codecs are one-size-fits-all, rigid in what they code and tuned
+to pixel fidelity rather than to what people see; a learned codec's
+strength is less its margin over AV1 than how much further it goes when
+domain knowledge directs it. Evidence so far: DCVC-UF off the shelf is
+−63% against SVT-AV1 on the hands (H3c), and directed by PointStream
+(region rate split by its own entropy model, coding at ¼ and ½, a generic
+enhancer) a further −22% (H3d); the scene-adapted background model (G5b,
+G5c) is the same pattern. Limits to state with it: retraining DCVC-UF
+itself on the domain gained little and did not transfer (H3c: 14% on the
+test windows, 151% worse on other participants), so the direction works
+through what surrounds the codec (scale, regions, enhancers, scene
+adaptation) more than through retraining it; and SVT-AV1 with the same
+enhancer was unclear (H3d oracle: −19%, synthesized texture), which
+supports, weakly, that the learned codec composes better with learned
+parts.
