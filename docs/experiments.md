@@ -5170,3 +5170,14 @@ invocation turns out to be needed.
   `ec31611`, spec SHA256
   `c8d10c7547c8ddd81f382815c4acbf8e17f6d38f52c127aebb2ab35338192796`,
   admitted on gpu5; focused seven tests and static checks passed.
+- P06 continuation `20261013T115150Z-d39f7aae` (code `ec31611`,
+  gpu5 Ada) completes; smoke and full validators pass, no contention or
+  contaminated timing. Full execution 175.2 s. Fit restored at step 2,000,
+  so completed training was reused rather than restarted. At CRF48 on the
+  48 held-out evaluation frames, LPIPS_V plain/reference/c16 is
+  0.085373 / 0.049875 / 0.054542, retaining 86.9% of the reference gain;
+  enhancement mean/p95 13.64/15.09 ms versus the 16.68 ms limit.
+  The P06 held-out speed and quality rule passes. This is still one rate
+  and an excerpt: P26 held-out and full-window three-rate confirmation
+  remain before item 2 closes. Completion event acknowledged; monitor
+  paused with all submitted jobs terminal.
