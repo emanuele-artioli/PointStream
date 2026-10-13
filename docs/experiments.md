@@ -5230,3 +5230,12 @@ invocation turns out to be needed.
   is interface correctness evidence, not trained quality or shared timing.
   Published archive SHA256
   `fd043f006d0330d92f80fb40f97b100268e0192c2639399f9ff478e656f61a05`.
+
+- All Ada devices remained occupied at the latest audit; P26 held-out
+  and P06 extra-rate jobs remain pending, not failed. The user-selected
+  30-minute follow-up now also continues the explicitly authorized P26
+  extra-rate gate once validated held-out evidence passes; it checks for
+  duplicate submissions and preserves the prepared <=1,500 s allocation.
+  No retry/migration/cancellation or budget expansion is authorized by that
+  monitor. Final scope remains preliminary excerpt evidence and verified
+  pipeline integration, with conclusive coverage deferred.
