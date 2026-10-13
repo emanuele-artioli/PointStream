@@ -56,8 +56,13 @@ DECISION: dict[str, Any] = {
     "c_max_rate_share": 0.10, "c_crf": 62,
     "k6_max_rate_share": 0.50, "k6_dataset": "broadcast",
 }
-PARTS = ("background", "player", "racket", "ball")
-FOREGROUND = PARTS[1:]
+PARTS = ("background", "other_person", "player", "racket", "ball")
+FOREGROUND = ("player", "racket", "ball")
+#: The players among SAM's "tennis player" tracks (amended after the pilot, before the full run: the prompt also
+#: masks ball kids and officials). The `PLAYERS` tracks present on at least `PLAYER_MIN_PRESENCE` of the frames that
+#: travel furthest, in body heights; the other tracks are *other_person*, part of the background.
+PLAYERS = 2
+PLAYER_MIN_PRESENCE = 0.5
 NBHD_PARTS = ("other", "ball_neighbourhood")
 PROMPTS = {"player": "tennis player", "racket": "tennis racket", "ball": "tennis ball"}
 CRFS = (41, 48, 55, 62)
@@ -74,7 +79,7 @@ QUANT_PX = (0.25, 1.0)
 VALUE_BOUND_BITS = 16
 REVIEW_SEED = "pointstream-k4-review"
 REVIEW_FRAMES = 2
-COLOURS = {"player": (60, 120, 250), "racket": (250, 200, 40), "ball": (250, 40, 200)}
+COLOURS = {"other_person": (160, 160, 160), "player": (60, 120, 250), "racket": (250, 200, 40), "ball": (250, 40, 200)}
 SKELETON = ((5, 7), (7, 9), (6, 8), (8, 10), (5, 6), (5, 11), (6, 12), (11, 12), (11, 13), (13, 15), (12, 14), (14, 16),
             (0, 1), (0, 2), (1, 3), (2, 4))
 
@@ -189,6 +194,28 @@ def ball_masks(window: dict[str, Any], found: list[dict[str, Any]], frames: int)
             stats["label_disk"] += 1
         stats["sam_other_balls"] += len(sam) - len(reached)
     return out, dict(stats)
+
+
+def choose_players(found: list[dict[str, list[tuple[int, np.ndarray, float]]]]) -> tuple[set[int], dict[str, Any]]:
+    """The `PLAYERS` "tennis player" tracks present on >= `PLAYER_MIN_PRESENCE` of the frames with the longest path of
+    their mask centroid, in median mask heights (body heights travelled); ball kids and officials mostly stand."""
+    frames = len(found)
+    seen: dict[int, list[tuple[int, float, float, float]]] = {}
+    for t, f in enumerate(found):
+        for track, m, _ in f["player"]:
+            ys, xs = np.nonzero(m)
+            seen.setdefault(track, []).append((t, float(xs.mean()), float(ys.mean()), float(ys.max() - ys.min() + 1)))
+    stats = {}
+    for track, rows in seen.items():
+        height = float(np.median([r[3] for r in rows]))
+        path = sum(math.hypot(b[1] - a[1], b[2] - a[2]) for a, b in zip(rows, rows[1:]) if b[0] == a[0] + 1)
+        stats[str(track)] = {"presence": len(rows) / frames, "median_height_px_sam": height,
+                             "body_heights_travelled": path / max(height, 1.0)}
+    eligible = [int(t) for t, v in stats.items() if v["presence"] >= PLAYER_MIN_PRESENCE]
+    chosen = set(sorted(eligible, key=lambda t: -stats[str(t)]["body_heights_travelled"])[:PLAYERS])
+    for key, v in stats.items():
+        v["player"] = int(key) in chosen
+    return chosen, stats
 
 
 # ----------------------------------------------------------------- pose
@@ -338,15 +365,20 @@ def process_window(args: argparse.Namespace, window: dict[str, Any], sources: di
     if len(found) != frames:
         raise RuntimeError(f"{window['id']}: SAM returned {len(found)} of {frames} frames")
     balls, ball_stats = ball_masks(window, found, frames)
+    players, track_stats = choose_players(found)
     labels_maps = np.zeros((frames, height, width), np.uint8)
     nbhd = np.zeros((frames, height, width), np.uint8)
     for t in range(frames):
         lab = labels_maps[t]
-        for _, m, _ in found[t]["player"]:
-            lab[upsample(m, (width, height))] = 1
+        for track, m, _ in found[t]["player"]:
+            if track not in players:
+                lab[upsample(m, (width, height))] = PARTS.index("other_person")
+        for track, m, _ in found[t]["player"]:
+            if track in players:
+                lab[upsample(m, (width, height))] = PARTS.index("player")
         for _, m, _ in found[t]["racket"]:
-            lab[upsample(m, (width, height))] = 2
-        lab[balls[t]] = 3
+            lab[upsample(m, (width, height))] = PARTS.index("racket")
+        lab[balls[t]] = PARTS.index("ball")
         if balls[t].any():
             nbhd[t][dilate(balls[t], BALL_NBHD_PX)] = 1
     shares = (np.stack([(labels_maps == p).mean((1, 2)) for p in range(len(PARTS))], 1)).mean(0)
@@ -355,7 +387,10 @@ def process_window(args: argparse.Namespace, window: dict[str, Any], sources: di
     t0 = time.time()
     dets = {name: poses.run(name, rgb) for name in poses.models}
     pose_seconds = time.time() - t0
-    pose = {name: pose_analysis(name, d, [f["player"] for f in found], (width, height), float(window["fps"])) for name, d in dets.items()}
+    pose = {name: pose_analysis(name, d, [[i for i in f["player"] if i[0] in players] for f in found], (width, height), float(window["fps"]))
+            for name, d in dets.items()}
+    as_defined = {name: pose_analysis(name, d, [f["player"] for f in found], (width, height), float(window["fps"])) for name, d in dets.items()}
+    pose_all = {name: {k: a[k] for k in ("player_frames", "fitted", "fitted_share", "inside_median")} for name, a in as_defined.items()}
     grey = []
     step = max(1, int(round(tw.CAMERA["step_s"] * float(window["fps"]))))
     for t in range(0, frames, step):
@@ -389,7 +424,8 @@ def process_window(args: argparse.Namespace, window: dict[str, Any], sources: di
         "sam": {"seconds": round(sam_seconds, 2), "frames_per_s": round(frames / max(sam_seconds, 1e-9), 3),
                 "instances_per_frame": {c: {"mean": float(np.mean(v)), "max": int(max(v)), "frames_with": int(sum(x > 0 for x in v))}
                                         for c, v in per_frame_counts.items()},
-                "player_tracks": sorted({tr for f in found for tr, _, _ in f["player"]})},
+                "player_tracks": track_stats, "players": sorted(players)},
+        "pose_all_instances": pose_all,
         "ball": ball_stats, "pose": pose, "pose_seconds": round(pose_seconds, 2),
         "camera": {"pairs": camera_pairs, "summary": tw.camera_summary(camera_pairs, step / float(window["fps"]))},
         "bits": bits, "seconds": round(time.time() - began, 2), "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 2),
@@ -587,6 +623,7 @@ def validate_rows(rows: list[dict[str, Any]], record: dict[str, Any]) -> dict[st
         "accounting_covers_85pct_of_payload": all(b["accounted_bits"] >= 0.85 * b["payload_bytes"] * 8 for r in rows for b in r["bits"].values()),
         "parts_cover_every_pixel": all(abs(sum(r["pixel_share"].values()) - 1.0) < 1e-6 for r in rows),
         "players_found_on_half_the_frames": all(r["sam"]["instances_per_frame"]["player"]["frames_with"] >= 0.5 * r["frames"] for r in rows),
+        "players_chosen": all(1 <= len(r["sam"]["players"]) <= PLAYERS for r in rows),
         "tracknet_ball_on_every_visible_frame": all(r["ball"].get("label_sam", 0) + r["ball"].get("label_disk", 0)
                                                     == sum(r["trajectory_symbols"]["visibility"]) for r in rows if r["dataset"] == "tracknet"),
         "bits_split_sum_to_accounted": all(abs(sum(b["bits_by_part"].values()) - (b["accounted_bits"] - b["outside_window_bits"]))
@@ -671,6 +708,10 @@ def summarize(rows: list[dict[str, Any]], model: str) -> dict[str, Any]:
     all_share = {c: {p: mean([r["bits"][c]["bits_by_part"][p] / max(sum(r["bits"][c]["bits_by_part"].values()), 1e-9) for r in rows])
                      for p in PARTS} for c in crfs}
     kbps = {c: {p: mean([r["bits"][c]["kbps_by_part"][p] for r in rows]) for p in PARTS} for c in crfs}
+    # As first defined (every "tennis player" instance a player), reported beside the amended parts.
+    as_defined = {c: mean([(r["bits"][c]["bits_by_part"]["player"] + r["bits"][c]["bits_by_part"]["other_person"])
+                           / max(sum(r["bits"][c]["bits_by_part"][q] for q in (*FOREGROUND, "other_person")), 1e-9) for r in rows]) for c in crfs}
+    fitted_as_defined = {m: mean([r["pose_all_instances"][m]["fitted_share"] for r in rows]) for m in rows[0]["pose_all_instances"]}
     total = {c: mean([r["bits"][c]["kbps"] for r in rows]) for c in crfs}
     nbhd = {c: mean([r["bits"][c]["ball_neighbourhood_kbps"] for r in rows]) for c in crfs}
     poses: dict[str, Any] = {m: {"fitted_share": mean([r["pose"][m]["fitted_share"] for r in rows]),
@@ -682,6 +723,7 @@ def summarize(rows: list[dict[str, Any]], model: str) -> dict[str, Any]:
     return {"windows": len(rows), "pixel_share": {p: mean([r["pixel_share"][p] for r in rows]) for p in PARTS},
             "foreground_bit_share": fg_share, "bit_share": all_share, "kbps_by_part": kbps, "kbps_total": total,
             "ball_neighbourhood_kbps": nbhd, "pose": poses, "model": model,
+            "as_first_defined": {"player_foreground_bit_share": as_defined, "fitted_share": fitted_as_defined},
             "rate_share_crf62": rate / player_62 if rate is not None and player_62 else None,
             "camera_still": mean([r["camera"]["summary"]["still"] for r in rows]),
             "instances_per_frame": {c: mean([r["sam"]["instances_per_frame"][c]["mean"] for r in rows]) for c in PROMPTS}}

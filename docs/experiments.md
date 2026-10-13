@@ -5439,6 +5439,20 @@ invocation turns out to be needed.
   windows, ≤ 45 min. Full: the other 14 windows in parts of ≤ 45 min.
   Camera: one job on the whole match, ≤ 45 min. Ceiling 4 GPU-hours and
   10 h wall.
+- Amendment after the first pilot, before any full run (2026-10-13).
+  Pilot `20261013T182436Z-d39c5b2c` (gpu3, RTX A6000, `0006071`; its full
+  output passes the validator's 14 checks locally) showed competing
+  explanation (2): "tennis player" returns 3–4 instances per frame, and
+  the review frames show ball kids and line judges among them, which
+  inflates the player part and pulls the fit share down (YOLO is never
+  matched to a kneeling ball kid). *Players* are now the 2 "tennis player"
+  tracks present on ≥ 50% of the frames whose mask centroid travels
+  furthest, in median mask heights (`k4.choose_players`); the other tracks
+  are a part of their own, *other person*, counted with the background,
+  not the foreground. The rule is unchanged otherwise and reads the
+  amended parts; the numbers with every instance a player are reported
+  beside them (`as_first_defined`). The pilot is re-run with the
+  amendment; the first pilot is not used for the decision.
 
 ### 2026-10-13 — K5: ball oracle (the true ball at its coded position)
 - Question (PLAN K5): would a ball mode (the ball sent as its position and

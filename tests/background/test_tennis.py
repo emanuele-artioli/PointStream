@@ -119,3 +119,18 @@ def test_k5_oracle_pastes_the_source_inside_the_disk_only():
         assert comp[0, 10, 10, 0] == 200 and comp[0, 10, 15, 0] == 0 and comp[1].max() == 0
         q = k5.quality(comp, source, rows)
         assert q["ball_psnr"] < 100 and q["ball_psnr"] > k5.quality(decoded, source, rows)["ball_psnr"]
+
+
+def test_choose_players_takes_the_two_present_tracks_that_travel_furthest():
+    def blob(x: int, y: int) -> np.ndarray:
+        m = np.zeros((60, 100), bool)
+        m[y:y + 10, x:x + 4] = True
+        return m
+
+    found = []
+    for t in range(10):
+        found.append({"player": [(1, blob(10 + 3 * t, 10), 0.9), (2, blob(50, 40 - 2 * t), 0.9), (3, blob(90, 5), 0.9)]
+                      + ([(4, blob(5 * t, 45), 0.9)] if t < 3 else []), "racket": [], "ball": []})
+    chosen, stats = k4.choose_players(found)
+    assert chosen == {1, 2}  # track 3 stands still; track 4 moves fastest but is present on 3 of 10 frames
+    assert stats["3"]["body_heights_travelled"] == 0.0 and not stats["4"]["player"] and stats["4"]["presence"] == 0.3
