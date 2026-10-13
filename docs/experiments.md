@@ -5013,3 +5013,13 @@ invocation turns out to be needed.
   requests used no GPU. No contaminated timing used. The remaining initial
   hour does not cover a validated new architecture's oracle and held-out
   pilot on both windows; stop this bounded pass rather than expand it.
+
+- Derived validation report (raw-file hashes, completed precision-point
+  checks, complete resolution results and execution records), saved read-only:
+  `pointstream-data/background/g6-speed-2026-10-13/report-8c365b5.json`.
+  Verification: final committed source passes `ruff check` in a clean
+  source archive and `mypy --config-file pyproject.toml`; full local pytest
+  496 passed, 18 skipped, with focused regression tests and both final
+  result validators also passing after the validation refactor. The initial
+  unfiltered workspace lint found 55 existing errors in the unrelated,
+  untracked `paper/` checkout; no manuscript files were changed.
