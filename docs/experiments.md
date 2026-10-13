@@ -5239,3 +5239,26 @@ invocation turns out to be needed.
   No retry/migration/cancellation or budget expansion is authorized by that
   monitor. Final scope remains preliminary excerpt evidence and verified
   pipeline integration, with conclusive coverage deferred.
+
+- P26 held-out `20261013T123946Z-44a8ad16` (code `3320633`,
+  gpu5 Ada) completes: native 480-frame training excludes the window and
+  five-second guard. At CRF48 on 48 evaluation frames, retained LPIPS gain
+  93.9%, mean/p95 enhancement 12.02/13.42 ms. Full execution 190.7 s;
+  uncontaminated timing. Read-only local full-result validator passes all
+  substantive checks. Correction to earlier wording: fleet itself gates
+  the smoke validator only; full-result validation is an explicit artifact
+  check, not automatically run by the current fleet runner.
+- P06 extra-rate `20261013T124547Z-8fe336c3` (code `7596685`, gpu5 Ada)
+  fails its correctness smoke: checkpoint continuation differs from
+  uninterrupted training. No full-stage rate comparison promoted.
+  Logs and partial checkpoint preserved. P26 extra-rate submission is held
+  despite its CRF48 pass because the same multi-rate resume check must be
+  diagnosed before more compute. Do not replay from the heartbeat.
+- P26 CRF48 plain/reference/small: LPIPS_V
+  0.208558/0.081487/0.089198; DISTS_V 0.154748/0.074089/0.078070;
+  KID_V 9.474187/1.508543/3.247387; PSNR_V
+  40.3128/39.4742/39.4426 dB; flicker_V 1.014910/1.167668/1.179084.
+  The LPIPS rule passes; distribution metrics and flicker lose to the
+  original enhancer, so this is not an all-metric quality-preservation claim.
+  All requests are terminal; no further rate stage eligible until the
+  shared failed correctness smoke is resolved. Pause the monitor.
