@@ -257,17 +257,19 @@ def review_strip(source: np.ndarray, versions: dict[str, np.ndarray], row: tuple
 
 def code_window(args: argparse.Namespace, window: dict[str, Any], sources: dict[str, str], pool: ThreadPoolExecutor,
                 cpu_sets: list[list[int]], scratch: Path) -> dict[str, Any]:
-    """Phase 1, before any detector is loaded: the window converted, DCVC-UF at every QP on the GPU (as H3c ran its
-    worker, from a process without ultralytics) while SVT-AV1 codes every CRF on the CPU. Decodes stay on disk."""
+    """Phase 1, before any detector is loaded: the window converted, DCVC-UF at every QP on the GPU with nothing else
+    running (as H3c ran its worker, from a process without ultralytics), then SVT-AV1 at every CRF. Decodes stay on disk."""
     began = time.time()
     frames = min(int(args.frames), int(window["frames"]))
     work = scratch / "work" / safe(window["id"])
     work.mkdir(parents=True, exist_ok=True)
     yuv = work / "source.yuv"
     converted = tw.convert(args.ffmpeg, window, Path(sources[window["source"]["staged"]]), yuv, frames)
+    # DCVC-UF alone first: the K5 smokes broke some of its points while SVT-AV1 loaded every CPU beside it (H3c
+    # coded the two one after the other); SVT-AV1 runs once DCVC-UF is done.
+    points = [code_dcvc(args, yuv, work / f"dcvc-{qp}", window, frames, qp) for qp in QPS]
     svt: list[Future[dict[str, Any]]] = [pool.submit(code_svt, args, yuv, work / f"svt-{crf}", window, frames, crf, cpu_sets[i % len(cpu_sets)])
                                          for i, crf in enumerate(CRFS)]
-    points = [code_dcvc(args, yuv, work / f"dcvc-{qp}", window, frames, qp) for qp in QPS]
     points += [f.result() for f in svt]
     return {"window": window, "frames": frames, "work": work, "yuv": yuv, "convert": converted, "points": points,
             "coding_seconds": round(time.time() - began, 2)}
