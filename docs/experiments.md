@@ -5001,7 +5001,8 @@ invocation turns out to be needed.
   24 scoring, 9 of 9 footage, 2 of 2 networks). Report (`h3d report
   --component`, code `9e3af03`):
   `pointstream-data/visor/h3d-2026-10-12/report-component/h3d-report.json`
-  (`467be69f…6e00`). About 9 GPU-hours, within the 14 allowed.
+  (`467be69f…6e00`). About 8–9 GPU-hours (from the jobs' execution
+  records), within the 14 allowed.
 - Outcome. BD-rate on LPIPS_R against the bar (V billed its network over
   the video; "free" is V without its bits):
 
@@ -5019,7 +5020,7 @@ invocation turns out to be needed.
   G beside: DISTS_R −53%, −25%, −62%, −21%; PSNR_R +35%, +28%, +11%, +13%;
   flicker × 1.00–1.06. **By the rule, H3d's coder is DCVC-UF off the shelf
   at ¼ and ½ resolution with G's network** (594 k parameters, fitted on six
-  other participants' recordings, delivered with the decoder): about a fifth
+  recordings of five other participants, delivered with the decoder): about a fifth
   less rate than the best of SVT-AV1 and DCVC-UF for the same LPIPS on the
   hands, on every pilot item. K does not stand, so the hybrid is not adopted.
   V fails at every size: on 1.7–3.5-minute videos even 86 KB costs more than
@@ -5045,6 +5046,6 @@ invocation turns out to be needed.
   person network would need to know what it has not seen (falling back to
   G), which is a design for later, not adopted now. G costs PSNR (+11% to
   +35%): it is a perceptual gain, as G5d's enhancer on the background.
-  Scope: 4 pilot items; one generic footage of six recordings and 1,152
-  frames; 2,000 steps (G's training loss was still falling); network size L
-  only for G and K.
+  Scope: 4 pilot items; one generic footage of six recordings (five
+  participants) and 1,152 frames; one schedule of 2,000 steps (cosine, its
+  loss flat at the end); network size L only for G and K.
