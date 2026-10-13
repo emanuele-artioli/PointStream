@@ -5333,3 +5333,169 @@ invocation turns out to be needed.
   the homography) and is not a bank question. The screen (4 candidates
   kept from a 1/16-pixel test) could miss a view; it never applies to
   *single*, and *single + direct* differs from the bank by under 1 point.
+
+### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
+- Question (PLAN K4): what is broadcast tennis made of, part by part, and
+  can a body-pose estimator's keypoints carry the players? Per part
+  (players, racket, ball, background): its share of the pixels and of
+  SVT-AV1's bits, how often the camera is still, and the pose estimator's
+  fit and parameter rate against SVT-AV1's bits on the same pixels. Decides
+  whether players pass H1's screen (and so whether K6 runs) and what the
+  ball costs (K5 decides the ball mode).
+- Windows (fixed content-blind before any run; `tools/datasets/k4_inputs.py`
+  `RULE`, from metadata only). *Broadcast*: the archived `tennis_games`
+  matches with scene clips (`alcaraz_hurkacz` 1080p25, `medvedev_struff`
+  1080p50, `rublev_auger-aliassime` 1080p50, `djokovic_federer` 2160p50,
+  `djokovic_zverev` 2160p60; 2160p downscaled to 1920×1080, area filter);
+  per match the 2 clips of at least 240 frames with the smallest
+  sha256("pointstream-k4:broadcast:<match>/<clip>"), first 240 frames: 10
+  windows. *TrackNet*: the 8 clips of at least 120 frames with the
+  smallest sha256("pointstream-k4:tracknet:<game>/<clip>"), first ≤ 240
+  frames at 1280×720, 30 frames/s, with their ball labels. *Camera*: the
+  one whole broadcast in the archive (`raw_1080p/nadal_kyrgios.mp4`,
+  Wimbledon, 2,310 s at 1080p50, close-ups and replays included), every
+  0.5 s. Every window is converted once by ffmpeg to 8-bit 4:2:0 (limited
+  range), and every analysis reads that file, so masks, poses and codec see
+  the same pixels.
+- Parts, per frame (each pixel in one part; earlier parts win): *ball*,
+  *racket*, *player*, background. SAM 3.1 text prompts ("tennis ball",
+  "tennis racket", "tennis player"; offline bidirectional, G1's segmenter,
+  JPEG chunks at 960×540, masks back to the window's size). On TrackNet the
+  ball is its label instead (visibility 1 or 2): the SAM ball mask that
+  contains the labelled point, else a disk of radius 4 px. The foreground
+  is ball + racket + players; spectators, umpires and ball kids are
+  background (a prompt that catches them is reported from the per-frame
+  instance counts and the review frames).
+- Method.
+  1. Bits: SVT-AV1 4.2.0 preset 4, CRF 41, 48, 55, 62, one keyframe (B2's
+     settings), decoded by H1's libaom `inspect` with bit accounting
+     (`aom-inspect-v3.12.1-ps1`, `9b2e75a2…3959`); each block's bits spread
+     evenly over its pixels and split by the parts' pixel shares in the
+     frame it displays as (H1's `stream_bits`). Also reported: the bits
+     within 16 px of the ball (its neighbourhood, which the block
+     spreading can under-count).
+  2. Pose: ultralytics 8.4.6 YOLO26x-pose and YOLO11x-pose (COCO 17
+     keypoints, image size 1280, confidence 0.25), audited side by side;
+     the estimator with the higher fitted share on the pilot is the one the
+     rule reads (ties: keypoints inside the mask). Each SAM player instance
+     takes the detection with at least 0.5 of its box inside the mask's box
+     (H1's matching); unmatched = not fitted. Per player-frame: fitted;
+     share of confident keypoints (≥ 0.5) inside the mask dilated by 8 px;
+     box height. Stability over consecutive fitted frames of a track: 2D
+     keypoint acceleration as a share of the box height per frame².
+  3. Parameter rate: per fitted player-frame the 17 keypoints quantized at
+     0.25 px (H1's position step) plus one visibility bit each, coded as
+     first differences along the track; the empirical entropy of those
+     symbols pooled over a dataset's windows, times the frame rate and the
+     mean number of players per frame; 1 px reported beside it; 16 bits
+     per value as the upper bound. Compared with SVT-AV1's bits on the
+     player pixels. The ball's trajectory rate (TrackNet labels, 1 px):
+     a visibility symbol per frame and, when visible, the residual of a
+     constant-velocity prediction (absolute position after a gap), empirical
+     entropy pooled.
+  4. Camera: on frames 0.5 s apart (960×540, outer 12% border excluded,
+     where the score and channel graphics sit), SIFT with MAGSAC; a pair is
+     a *cut* below 40 inliers, *still* when the homography moves no
+     corner of the inner frame by more than 2 px at 1080p (G1's bar), else
+     *moving*. Each sampled frame is *wide* when YOLO26x-pose finds no
+     person taller than 30% of the frame, else *close*. Reported: shares of
+     time still, still-and-wide, moving, cut; median duration of still
+     runs. The same measure on every window.
+  5. Review: two content-blind frames per window (sha256
+     "pointstream-k4-review:<window>:<n>") with the parts and both
+     estimators' skeletons.
+- Decision rule (`k4.DECISION`, fixed before any run; per dataset, means
+  over its windows). Players pass H1's screen when (a) they carry ≥ 10% of
+  the foreground's SVT-AV1 bits at CRF 48 and 62; (b) the chosen
+  estimator fits ≥ 90% of player-frames and the median share of confident
+  keypoints inside the mask is ≥ 0.9 (a 2D skeleton has no outline, so
+  H1's IoU has no analogue here; K6 measures the outline); (c) the
+  keypoint rate is ≤ 10% of SVT-AV1's bits on the player pixels at CRF 62.
+  K6 (the player oracle) runs if (a) and (b) pass on broadcast and the
+  keypoint rate is ≤ 50% of those bits (H3b's bar: perfect appearance at
+  the coded pose must still save half); otherwise players stay pixels and
+  K6 is not run. The ball and the camera are measured, not gated: the
+  ball's cost feeds K5, the still share feeds G's per-shot background.
+- Hypothesis: players are 1–3% of the pixels, 60–90% of the foreground's
+  bits and 5–15% of all bits; the racket under 0.3% of the pixels; the
+  ball under 0.02% of the pixels and under 0.5% of the bits (hundreds of
+  bits per second at CRF 62); YOLO pose fits ≥ 95% of player-frames on
+  broadcast, fewer on the far player and on 720p TrackNet; keypoints cost
+  3–8 kbps for two players against 20–60 kbps of SVT-AV1 at CRF 62, so (c)
+  fails at 10% but the K6 gate (50%) passes. The camera is still 60–80% of
+  broadcast time and on ≥ 95% of rally frames.
+- Competing explanations: (1) block spreading moves bits between small
+  parts and the large blocks around them (the ball and far player in 64 px
+  blocks); the ball neighbourhood brackets it. (2) "tennis player" also
+  masks ball kids and umpires, inflating players; instance counts and the
+  review frames check it. (3) Keypoint jitter, not motion, sets the rate
+  (H1's hands); the acceleration measure and the 1 px rate show it. (4)
+  Static graphics make a panning camera look still; the border exclusion
+  and the review of moving runs check it.
+- Budget: SAM 3.1 on Ada or A6000 (model–GPU table), about 13,000
+  frame-prompts at G1's 5–6 per second (≈ 40 min); YOLO pose and SVT-AV1
+  (72 encodes, 16 threads) and `inspect` in the same jobs. Smoke: one
+  TrackNet window, 48 frames, ≤ 600 s. Pilot: 2 TrackNet and 2 broadcast
+  windows, ≤ 45 min. Full: the other 14 windows in parts of ≤ 45 min.
+  Camera: one job on the whole match, ≤ 45 min. Ceiling 4 GPU-hours and
+  10 h wall.
+
+### 2026-10-13 — K5: ball oracle (the true ball at its coded position)
+- Question (PLAN K5): would a ball mode (the ball sent as its position and
+  drawn by the decoder) beat the pixel coders on the ball? Oracle: the
+  true ball's pixels drawn at its coded position over each pixel coder's
+  decode, so the only cost added is the trajectory. It bounds every ball
+  mode that codes the position at that precision, because it renders the
+  ball perfectly (the source's own pixels) and bills nothing for its
+  appearance. If it does not win, no ball mode is built.
+- Windows: K4's 8 TrackNet windows (1280×720, 30 frames/s, ≤ 240 frames,
+  the only dense ball labels), the same 4:2:0 files.
+- Coders: SVT-AV1 4.2.0 preset 4, CRF 35, 41, 48, 55, 62 (B2's four and one
+  higher rate); DCVC-UF HT-L off the shelf (B2's worker and checkpoints),
+  QP 0, 21, 42, 63. Rate: the whole stream in kbps.
+- Oracle: on every labelled frame with visibility 1 or 2, the source's
+  pixels inside a disk of radius 4 px around the labelled position (TrackNet
+  labels are integers, so the coded position is the label at 1 px) replace
+  the decode's; rate = the coder's + K4's trajectory rate (empirical
+  entropy, pooled over the 8 windows; the 21 bits per frame of a raw
+  position as the upper bound, reported beside it).
+- Judges, on visible frames (visibility 1–2): (1) *ball-region PSNR*,
+  RGB, within 8 px of the label (so the decoded ring 4–8 px around the
+  drawn ball counts), squared error pooled per window; (2) *a ball
+  detector's recall*: the COCO "sports ball" class of ultralytics YOLO26x
+  and YOLO11x (image size 1280, confidence ≥ 0.1); a frame is a hit when a
+  detection centre lies within 10 px of the label (5 px reported); false
+  detections per frame reported. The detector with the higher recall on
+  the source frames (pilot) is the judge; it is a decision metric only if
+  that recall is ≥ 0.5, otherwise it is reported and (1) decides alone.
+  (3) Whole-frame PSNR, reported (the oracle should not change it).
+- Comparison per window and judge: the oracle on each coder against that
+  coder's anchor envelope (upper concave hull of its encodes), and against
+  the envelope of both coders' encodes pooled (the best pixel coder);
+  BD-rate with PCHIP over the overlapping range (overlap ≥ 0.5 dB for PSNR,
+  ≥ 0.05 for recall), else "better/worse at every rate" (or unclear).
+  Also: the rate below which each coder's recall falls under 90% of its
+  source recall (where pixel coders collapse, K1's regime).
+- Decision rule (`k5.DECISION`, fixed before any run). A ball mode is built
+  (PLAN K, a trajectory and a rendered ball) when the better of the two
+  oracles (on SVT-AV1 or on DCVC-UF) beats the pooled envelope on ≥ 6 of
+  the 8 windows, each by BD-rate ≤ −25% or better at every rate, on
+  ball-region PSNR and, if the detector is valid, on recall. The margin is
+  25%, not H3b's 50%: the oracle bills no appearance, but a ball is a
+  small sphere with little appearance to render. Otherwise the ball stays
+  pixels.
+- Hypothesis: both coders smear the ball at low rates (SVT-AV1 from about
+  CRF 55, DCVC-UF at QP ≤ 21: learned coders smooth small, fast objects),
+  so their recall falls well below the source's, while the oracle keeps
+  the source's recall for under 1 kbps more; BD-rates under −50% on both
+  judges; a ball mode is built.
+- Competing explanations: (1) the detector misses the ball on the source
+  (small, blurred), so recall is no judge; the validity check covers it.
+  (2) The pixel coders already keep the high-contrast ball at every tested
+  rate, so the oracle gains little. (3) A fast ball is a streak longer
+  than the 4 px disk, so the drawn ball leaves a ghost of the decoded
+  streak; review frames of the oracle on the fastest frames check it.
+- Budget: DCVC-UF and YOLO on Ada or A6000, SVT-AV1 on 16 threads. Smoke:
+  one window, 48 frames, ≤ 600 s. Pilot: 2 windows, ≤ 45 min (fixes the
+  detector). Full: the other 6 windows in 2 parts of ≤ 45 min. Ceiling 3
+  GPU-hours and 8 h wall.
