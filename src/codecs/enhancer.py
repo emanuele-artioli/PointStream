@@ -79,6 +79,7 @@ def apply(net: Any, decoded: np.ndarray, config: str, *, warmup: int = 5, profil
             gpu.append(start.elapsed_time(end))
     return out, {"config": config, "batch": 1, "warmup": warmup, "cuda_kernels": kernels,
                  "dtype": str(dtype), "layout": str(layout), "cudnn_benchmark": True,
+                 "cnn_size": [int(x.shape[-1]), int(x.shape[-2])],
                  "wall_ms_mean": float(np.mean(wall)), "wall_ms_p95": float(np.percentile(wall, 95)),
                  "cnn_ms_mean": float(np.mean(gpu)), "cnn_ms_p95": float(np.percentile(gpu, 95)),
                  "wall_ms_per_frame": wall, "cnn_ms_per_frame": gpu,

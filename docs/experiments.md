@@ -5023,3 +5023,29 @@ invocation turns out to be needed.
   result validators also passing after the validation refactor. The initial
   unfiltered workspace lint found 55 existing errors in the unrelated,
   untracked `paper/` checkout; no manuscript files were changed.
+
+### 2026-10-13 — G6 item 2: retain the fast correction as an alternative (user)
+- Clarification: the preceding 80% gain-retention rule decided whether a
+  fast mode replaced the full-resolution quality mode. Its failure does not
+  remove the 540p correction from consideration as a different operating
+  point. The user requests keeping it for the complete-pipeline/paper stage.
+- Retain `g6 enhance --inference fp16-channels-last-540-residual`, published
+  as `enh-correction-540` with separate checkpoint/point keys and recorded
+  CNN size. The AV1 stream remains coded at 1080p; only enhancement runs
+  at 540p, and its upsampled correction is added to the original 1080p
+  decode. Existing defaults and the original pilot artifacts are preserved.
+- Evidence unchanged: CRF48, first 48 frames of each pilot, Ada;
+  enhancement mean 12.6 | 13.1 ms, LPIPS_V 10.8% | 31.4% better than
+  plain SVT-AV1 at equal rate, retaining 26% | 52% of the full enhancer's
+  gain. No new compute or reinterpretation of the failed replacement rule.
+- Deferred evaluation: all rate points, native full windows, all five
+  metrics on the composite, visual review of seams/detail/flicker, and
+  complete client latency including decode, colour conversion, enhancement
+  and composition. Compare the fast and quality modes as alternatives;
+  do not infer whole-pipeline 60 fps from enhancement timing alone.
+- Process correction: the agent treated Claude's estimated "under one
+  GPU-hour" as a hard stopping budget although the user had not assigned
+  that limit. Overestimated feasible replay scope also spent allocations
+  on cancelled and timed-out runs. Item 2 was therefore only partially
+  completed; its remaining smaller-model work was not blocked by missing
+  user authority. This retained-alternative update adds no training study.

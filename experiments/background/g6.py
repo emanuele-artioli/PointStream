@@ -660,6 +660,11 @@ def command_format(args: argparse.Namespace) -> int:
     return 0
 
 
+def enhance_method(inference: str) -> str:
+    """Keep the fast correction's publication and checkpoint keys distinct."""
+    return "enh-correction-540" if inference == "fp16-channels-last-540-residual" else "enh-1080"
+
+
 def command_enhance(args: argparse.Namespace) -> int:
     """SVT-AV1 at 1080p (the anchor, published as is) and G5d's enhancer after it (the second route), fitted
     at each CRF on the window's own native footage coded by SVT-AV1 at that CRF."""
@@ -693,9 +698,11 @@ def command_enhance(args: argparse.Namespace) -> int:
     checkpoints, points_dir, restored, roots = point_dirs(args)
     enhancers = (checkpoints or work) / "enhancers"
     enhancers.mkdir(parents=True, exist_ok=True)
+    inference = getattr(args, "inference", "legacy")
+    method = enhance_method(inference)
     plain_points, enh_points = [], []
     for done, crf in enumerate(crfs, 1):
-        keys = (f"svt-1080-{crf}", f"enh-1080-{crf}")
+        keys = (f"svt-1080-{crf}", f"{method}-{crf}")
         if all(k in restored for k in keys):
             plain_points.append({**restored[keys[0]], "restored_from_checkpoint": True})
             enh_points.append({**restored[keys[1]], "restored_from_checkpoint": True})
@@ -716,7 +723,6 @@ def command_enhance(args: argparse.Namespace) -> int:
                  "score": g5c.full_score(clip, plain_rgb, w["nets"], w["flows"])}
         net, fit_record = g5d.fit(f_decoded, f_target, f_keep, "lpips", args.steps, w["nets"].lpips, "cuda")
         del f_decoded
-        inference = getattr(args, "inference", "legacy")
         inference_record: dict[str, Any] = {"config": inference, "batch": 4}
         if inference == "legacy":
             torch.cuda.synchronize()
@@ -747,7 +753,7 @@ def command_enhance(args: argparse.Namespace) -> int:
         enh_points.append(enh)
         progress(done)
     rows = [{"method": "svt-1080", "codec": "svt", "coded_size": list(FULL), "points": plain_points},
-            {"method": "enh-1080", "codec": "enh", "coded_size": list(FULL), "points": enh_points}]
+            {"method": method, "codec": "enh", "coded_size": list(FULL), "points": enh_points}]
     extra = {"enhancer": {**g5d.TRAIN, "steps": args.steps, "loss": "lpips", "fit": "own video, native rate",
                           "footage": {k: meta[k] for k in ("parts", "window", "guard_s", "yuv420_sha256", "frames")}}}
     check = publish_window(args, w, rows, [enhancers.parent, *roots], extra)
@@ -857,8 +863,9 @@ def main(argv: list[str] | None = None) -> int:
     fo.add_argument("--methods", default=",".join(METHODS))
     fo.add_argument("--values", default=None, help="METHOD=V,V;... over the default grid")
     fo.set_defaults(func=command_format)
-    en.add_argument("--inference", choices=("legacy", "fp16-channels-last"), default="legacy",
-                    help="legacy preserves pilot replay; fp16-channels-last uses measured batch-one inference")
+    en.add_argument("--inference", choices=("legacy", "fp16-channels-last", "fp16-channels-last-540-residual"), default="legacy",
+                    help="legacy preserves pilot replay; fp16-channels-last uses batch one; "
+                         "fp16-channels-last-540-residual retains the fast correction candidate for later evaluation")
     en.add_argument("--footage", required=True, help="the window's extracted native footage archive")
     en.add_argument("--crfs", default=",".join(map(str, g5.CRFS)))
     en.add_argument("--steps", type=int, required=True)
