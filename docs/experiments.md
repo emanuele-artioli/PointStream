@@ -5558,7 +5558,14 @@ invocation turns out to be needed.
   `djokovic_federer/038`, seen in its review frame; in
   `djokovic_zverev/012` the largest person, 291 px tall at 540p, who
   travels 1.0 body heights), each replaced by a smaller person, with the
-  fit there at 1.0, so the misses do not explain the failure; (3) does not hold (stable, coarse
+  fit there at 1.0, so the misses do not explain the failure (kept as
+  known labelling errors; the definition is not changed again). Without
+  them (same report, those windows excluded too): without
+  `djokovic_federer/038`, 8 broadcast windows, fitted 0.859 (as first
+  defined 0.888), keypoints 20.6% of the player bits at CRF 62; without it
+  and `djokovic_zverev/012`, 7 windows, 0.839 (0.872), 17.7%; (a) passes
+  and (b) and (c) fail in every case, so the decision does not depend on
+  them; (3) does not hold (stable, coarse
   keypoints); (4) does not hold: broadcast cameras pan and zoom during
   rallies (review of the match's moving wide pairs), and the 12% border
   exclusion keeps the score graphics out. The camera is the main surprise:
