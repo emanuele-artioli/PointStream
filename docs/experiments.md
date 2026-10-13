@@ -5309,8 +5309,18 @@ invocation turns out to be needed.
   objects stay coded pixels (H4 item 3).
 - Reading. The hypothesis held, and more strongly than predicted: the bank
   adds nothing, not even the ~10 points expected from occlusion and new
-  pixels. A view sent earlier almost never predicts a later frame better
-  than the latest view does: within a 4.8 s window the objects' appearance
+  pixels. What *held* demands: the warped view alone, with no residual,
+  within 30 dB of the frame; a frame that is not held falls back to its
+  pixels. In frames, the median gap between new views per handled track
+  is 1, 2, 4, 3, 2 and 2 (soy milk, glass, tap, pancake, pancake package,
+  fork); the mean over items of 0.032 s is about two frames at 50–60 fps,
+  so these objects need their pixels on about every other frame, and the
+  held frames are below the codec's own quality (at 33.75 dB, B2's
+  foreground at CRF 62, 26% are held). The coders agree because they share
+  the latest view and differ only in older ones: a view sent earlier
+  almost never predicts a later frame better than the latest view does
+  (the unit tests show the bank does reuse views when an object turns
+  back and forth, and *single* reproduces H1 exactly): within a 4.8 s window the objects' appearance
   changes one way (turning, being cut, filled, lit differently, blurred),
   so the most recent view is always the best one and older views are not
   revisited. Competing explanation (1) does not hold either: direct
