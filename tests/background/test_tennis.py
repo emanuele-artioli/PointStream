@@ -134,3 +134,11 @@ def test_choose_players_takes_the_two_present_tracks_that_travel_furthest():
     chosen, stats = k4.choose_players(found)
     assert chosen == {1, 2}  # track 3 stands still; track 4 moves fastest but is present on 3 of 10 frames
     assert stats["3"]["body_heights_travelled"] == 0.0 and not stats["4"]["player"] and stats["4"]["presence"] == 0.3
+
+
+def test_trajectory_rate_is_the_same_after_a_json_round_trip():
+    import json
+
+    s = tw.trajectory_symbols([(1, 10, 10), (1, 12, 11), (1, 14, 13), (1, 15, 13)])
+    back = json.loads(json.dumps(s))
+    assert tw.trajectory_rate([back], 30.0) == tw.trajectory_rate([s], 30.0)

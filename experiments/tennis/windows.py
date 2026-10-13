@@ -115,10 +115,10 @@ def trajectory_symbols(rows: list[tuple[int, int, int]]) -> dict[str, list[Any]]
 
 
 def entropy(symbols: list[Any]) -> float:
-    """Empirical entropy (bits per symbol)."""
+    """Empirical entropy (bits per symbol); a symbol read back from JSON as a list counts as its tuple."""
     if not symbols:
         return 0.0
-    counts = Counter(symbols)
+    counts = Counter(tuple(s) if isinstance(s, list) else s for s in symbols)
     n = len(symbols)
     return -sum(c / n * math.log2(c / n) for c in counts.values())
 
