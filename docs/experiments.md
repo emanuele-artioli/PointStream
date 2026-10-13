@@ -5470,6 +5470,107 @@ invocation turns out to be needed.
   Ball under 1 kbps of SVT-AV1 at CRF 62 on every window; the broadcast
   windows' camera moved on 100% and 89% of their 0.5 s pairs.
 
+- Jobs (all RTX A6000, gpu3, shared; inputs
+  `pointstream-data/tennis/k4-2026-10-13/` `inputs-233a08b158e2.json`,
+  `windows.json` `d79bb01c…e516`; environment `pointstream-20261009T214002Z`:
+  SAM 3.1 at the pinned checkpoint with flash attention, ultralytics 8.4.6,
+  SVT-AV1 4.2.0, ffmpeg 8.1.2, H1's `inspect`). Camera
+  `20261013T134112Z-f78909bc` (`328bb79`; the whole match, 4,620 frames;
+  1,576 s; `k4-camera.json` `bbbb30cc…44b2`). Amended pilot
+  `20261013T184729Z-d7d08c01` (`0e47f61`; `published.tar` `63abd158…4ffa`);
+  parts `20261013T222144Z-453bb877` (`78e7beb1…`), `20261013T222156Z-efa3c25e`
+  (`fd17c8d5…`), `20261013T222209Z-5ad5967e` (`28bfe59d…`), all at
+  `4fd8e10`, whose `k4.py` is the amended pilot's. Not evidence: the first
+  pilot `20261013T182436Z-d39c5b2c` (the definition the amendment replaced;
+  numbers above) and `20261013T134021Z-c5b03bb1` (smoke: `inspect` without
+  its execute bit). Validators passed on the smokes and, run locally, on
+  every full output (15 checks) except part 2 on one window:
+  `broadcast/medvedev_struff/042` is the channel's "Watch more / Subscribe"
+  outro card, no tennis and no person in any frame, so it fails
+  `players_found_on_half_the_frames`, `players_chosen`, and the accounting
+  check (headers are 22% of its nearly static 41 kbps stream at CRF 62);
+  the other 4 windows of part 2 pass all 15. The card is left out of the
+  report (`--exclude`, reason recorded): 9 broadcast and 8 TrackNet
+  windows. About 2.5 GPU-hours with the smokes and the first pilot, inside
+  the 4-hour ceiling; about 10 h wall from the rules to the last part, at
+  the 10 h ceiling (the two session outages and queueing for gpu3, the
+  one free A6000, took most of it).
+- Report (`k4 report`, 17 windows; `k4-report.json` `a6a76af3…d16d`).
+  Estimator by the rule: YOLO11x-pose (pilot fit 0.773 against YOLO26x's
+  0.765; keypoints inside the mask 1.0 for both). Means over windows:
+
+  | | broadcast (9) | TrackNet (8) |
+  |---|---:|---:|
+  | pixels: player / racket / ball / other people | 3.99 / 0.069 / 0.007 / 0.77% | 0.63 / 0.031 / 0.006 / 0.39% |
+  | SVT-AV1 kbps, CRF 48 / 62 (whole frame) | 958 / 248 | 300 / 76 |
+  | foreground's share of all bits, CRF 48 / 62 | 20.0 / 19.0% | 13.7 / 12.2% |
+  | players' share of the foreground's bits, CRF 48 / 62 | 86.0 / 88.6% | 94.0 / 96.0% |
+  | players, kbps at CRF 48 / 62 | 155 / 41.9 | 34.6 / 7.4 |
+  | racket / ball, kbps at CRF 62 | 2.8 / 0.29 | 0.27 / 0.05 |
+  | within 16 px of the ball, kbps at CRF 48 / 62 | 5.4 / 1.1 | 2.4 / 0.36 |
+  | other people's share of all bits, CRF 62 | 5.8% | 1.9% |
+  | (b) player-frames fitted (YOLO11x-pose) | 0.875 | 0.547 |
+  | keypoint rate, kbps (0.25 px; 1 px) | 9.4; 9.3 | 4.2; 4.0 |
+  | keypoint rate / players' SVT-AV1 bits, CRF 48 / 62 | 6.1 / 22.4% | 12.1 / 56.9% |
+  | camera still (0.5 s pairs of the windows) | 41% | 97% |
+
+  As first defined (every "tennis player" instance a player): players are
+  92–94% of the foreground's bits on broadcast and 95–97% on TrackNet, and
+  YOLO11x-pose fits 0.8999 (broadcast) and 0.28 (TrackNet) of the
+  instance-frames. Fit by the player's height in the frame (YOLO11x-pose;
+  broadcast, TrackNet): 6–10% 0.50, 0.00; 10–15% 0.91, 0.21; 15–25% 0.97,
+  1.00; ≥ 25% 1.00, 1.00; keypoints, once fitted, lie inside the mask
+  (median 1.0). Keypoint stability: acceleration 0.021 (broadcast) and
+  0.029 (TrackNet) box heights per frame²; 3.05–3.14 bits per value. The
+  keypoints come at 1–2 px precision (88–100% of first differences whole
+  pixels, 27–67% zero), so 0.25 and 1 px cost the same. Ball trajectory
+  (TrackNet labels): 7.6 bits per frame, 0.23 kbps. The whole match:
+  still 34.9%, moving 41.0%, cut 24.1% of 0.5 s pairs; wide views 57.5%
+  of pairs, and of those 57.5% still; median still run 1.5 s.
+- Decision (by the rule, `k4-report.json`). **Players do not pass H1's
+  screen, and K6 is not run as gated.** On broadcast they pass (a) (86% and
+  89% of the foreground's bits) and fail (b) (fitted 0.875, rule 0.90) and
+  (c) (keypoints 22% of SVT-AV1's player bits at CRF 62, rule 10%); the K6
+  gate needs (a) and (b). TrackNet fails (b) (0.547) and (c) (57%). The
+  definition does not decide it: as first defined, broadcast fits 0.8999,
+  also under the bar. The ball costs 0.29 kbps of SVT-AV1 at CRF 62 on
+  broadcast (1.1 kbps within 16 px), about its trajectory's 0.23 kbps; K5
+  decides its mode (a ball mode is built). The camera is still on 35% of
+  the broadcast match and 41% of the broadcast windows (TrackNet 97%).
+- Reading. The hypothesis holds for the composition (players 0.6–4% of the
+  pixels and 86–96% of the foreground's bits; racket and ball tiny) and
+  fails on fit and camera. (b) fails on one thing: the far player. Players
+  15% of the frame height or taller are fitted on 97–100% of frames at
+  either resolution; below 10% (the far player at 720p, and often at
+  1080p) YOLO's whole-frame inference finds them on 0–50%. That is the
+  estimator's setting (one image at 1280 px for the whole frame), not a
+  limit of keypoints, so the change to test next is a top-down estimate on
+  each SAM player crop, enlarged; if that clears 0.90, the K6 gate is
+  re-read with it. (c) fails by more than the jitter H1 saw on hands:
+  YOLO's keypoints are already coarse and stable (3.1 bits per value), and
+  the margin comes from how cheap the players' pixels are (42 kbps for
+  both at CRF 62 on broadcast, 7.4 kbps at 720p), not from the keypoints'
+  cost; at CRF 48 the keypoints are 6% of the player bits on broadcast,
+  inside the 10%. Competing explanations: (2) held and was amended
+  (officials and ball kids are 5.8% of the broadcast bits, which the first
+  definition gave the players); the motion rule then misses a player who
+  stands still in 2 of 9 broadcast windows (the server in
+  `djokovic_federer/038`, seen in its review frame; in
+  `djokovic_zverev/012` the largest person, 291 px tall at 540p, who
+  travels 1.0 body heights), each replaced by a smaller person, with the
+  fit there at 1.0, so the misses do not explain the failure; (3) does not hold (stable, coarse
+  keypoints); (4) does not hold: broadcast cameras pan and zoom during
+  rallies (review of the match's moving wide pairs), and the 12% border
+  exclusion keeps the score graphics out. The camera is the main surprise:
+  G1's still broadcast cameras (TrackNet, RacketVision) are not the
+  archived matches', whose main camera follows play.
+- Scope. 9 broadcast windows from 5 matches (scene clips of 4–10 s,
+  close-ups included where the content-blind rule took them) and 8
+  TrackNet windows; the camera from one match. Parts by SAM 3.1 text
+  prompts at 960×540 (the far player and the ball are small there). The
+  keypoint rate is of YOLO's 17 COCO keypoints at its own precision, with
+  no shape or outline; a body model with an outline (K6) costs more.
+
 ### 2026-10-13 — K5: ball oracle (the true ball at its coded position)
 - Question (PLAN K5): would a ball mode (the ball sent as its position and
   drawn by the decoder) beat the pixel coders on the ball? Oracle: the
