@@ -930,7 +930,9 @@ before its run:
   2026-08). Pose left MPEG's conditions in 2022. Proposal: per mode a task
   metric against labels (HInt PCK for hands, TrackNet F1 for the ball,
   RacketVision for rackets; independent pseudo-labels only for tennis
-  bodies), BD-rate in that range against the pixel envelope and VTM, beside
+  bodies), BD-rate in that range against the pixel envelope (with B2b's ROI
+  SVT-AV1) and VTM (through the public CompressAI-Vision harness; no MPEG
+  access needed, VCM-RS not used), beside
   the human-viewing curves. First use: re-judge H3c2 with HaMeR against HInt
   (CPU count of HInt hands in the items first). None of MPEG's datasets fits
   the domains.

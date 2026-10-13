@@ -35,7 +35,8 @@ arXiv). What could not be verified is listed at the end.
      does not count.
   4. *Anchor.* VVC: VTM inside VCM's reference software (VCM), HM-18.0 since
      the August 2026 FCM conditions (FCM, previously VTM-23.3). PointStream's
-     anchors are SVT-AV1 and DCVC-UF.
+     anchors are SVT-AV1 (with and without ROI) and DCVC-UF; VTM can be added
+     without MPEG membership through the public CompressAI-Vision harness.
 - **Pose is not in MPEG's current test conditions.** The January 2021 VCM
   conditions listed pose estimation and action recognition (HiEve); by July
   2022 only detection, instance segmentation and tracking remained, and so it
@@ -235,13 +236,46 @@ metrics).
 **Anchors.**
 - The pixel envelope already used (SVT-AV1 and DCVC-UF, their concave hull):
   the strongest anchor PointStream has and the one its decisions use.
+- **ROI SVT-AV1** (B2b: `--roi-map-file`, +32 on background blocks from the
+  dataset masks) joins that envelope for machine-judge items. It is the open
+  counterpart of VCM-RS's main tool (RoI retargeting with a background
+  filter) and of the RoI coding used by 10 of 17 VCM proposals, so an
+  object-centric claim is tested against an object-aware pixel coder.
 - **VTM**, random access, with VCM's QP spacing (six QPs, 4 apart): the
   recognized anchor for a coding-for-machines claim (VCM's requirement is
-  stated against VVC). Plain VTM, not VCM-RS: VCM-RS is in MPEG's
-  member-only repository (`git.mpeg.expert`), so whether it can be run
-  depends on access through AAU's MPEG participation (the user's call). Run
-  only for the machine-judge items, once a mode reaches the paper. This is
-  the "correct invocation" AGENTS.md asks for before VVC joins.
+  stated against VVC). Run only for the machine-judge items, once a mode
+  reaches the paper. This is the "correct invocation" AGENTS.md asks for
+  before VVC joins.
+- **Not VCM-RS** (user, 2026-10-13: no request for MPEG access unless
+  strictly necessary). See below; it is not.
+
+**Without MPEG membership.** Everything the protocol needs is public:
+- [CompressAI-Vision](https://github.com/InterDigitalInc/CompressAI-Vision)
+  (InterDigital, BSD 3-Clause Clear; commit `6d5abf1`, 2026-08-24, read in
+  this study), the harness FCM's conditions use for both anchors. Its
+  remote-inference path ("VCM-like pipelines", per its NEWS) wraps VTM, HM,
+  JM and VVenC (`compressai_vision/codecs/std_codecs.py`); it ships
+  evaluators for MPEG's datasets (SFU-HW, TVD, HiEve, OpenImages, PandaSet),
+  the same task networks (Detectron2, JDE, YOLOX), an MMPose RTMO
+  evaluator scored by COCO keypoint AP (`MMPOSECOCOEval`), and the
+  monotonic cubic BD-rate fit of Wang et al. (PCS 2024) that VCM's CTC
+  prescribes (`scripts/metrics/`). Using its VTM wrapper and its BD-rate
+  code gives an MPEG-identical anchor and statistic, and RTMO is a ready
+  body-pose judge for K6. It needs an environment audit (mmpose,
+  detectron2) like any component. It also wraps VCM-RS, but VCM-RS itself
+  is not included.
+- VTM ([HHI GitLab](https://vcgit.hhi.fraunhofer.de/jvet/VVCSoftware_VTM)),
+  VCM-RS's inner codec, is public.
+- VCM-RS's reference software becomes public with the standard: ISO/IEC
+  23888-2 is at DIS with FDIS planned for late 2026 (MPEG 153), and MPEG-AI
+  lists a Part 7, conformance and reference software for VCM
+  ([mpeg.org](https://www.mpeg.org/standards/MPEG-AI/)); its publication
+  date was not found. When it is published it can join the anchors at no
+  cost.
+- What VCM-RS would add is one more pixel coder, tuned for detection and
+  tracking networks, not for pose; its published gains are on MPEG's
+  datasets and do not transfer to PointStream's items. The paper's claim
+  (keypoints against pixel coders at equal task accuracy) stands without it.
 
 **Tasks, metrics and labels.**
 
@@ -304,25 +338,34 @@ TrackNet ([arXiv:1907.03698](https://arxiv.org/abs/1907.03698)); the
 Bjøntegaard review by Herglotz et al. ([arXiv:2304.12852](https://arxiv.org/abs/2304.12852)),
 which records JVET's move from polynomial fits to PCHIP.
 
-Not verified:
+Not verified, and why (no GPU access was needed for any of it):
 - **JPEG AI's test conditions for computer-vision tasks** (the CTTC's
-  "Part B", e.g. WG 1 N100421): ds.jpeg.org failed TLS verification through
-  this session's proxy, and WebFetch got HTTP 503. Only JPEG AI's stated scope
+  "Part B", e.g. WG 1 N100421, which is public): ds.jpeg.org fails TLS
+  through this cloud session's egress proxy (jpeg.org itself works), and
+  WebFetch got HTTP 503 twice. A session with ordinary network access (the
+  user's local sessions) can download it. Only JPEG AI's stated scope
   (version 1 is for human viewing; latent-domain tasks are planned) is
   reported.
-- **JVET's GFVC common test conditions** (JVET-AG2035): not retrieved from
-  jvet-experts.org; the conditions are taken from Chen et al.'s review, which
-  describes them. No keypoint metric was found in them.
+- **JVET's GFVC common test conditions** (JVET-AG2035, public): the
+  jvet-experts.org document search did not return it from this session; the
+  conditions are taken from Chen et al.'s review, which describes them. No
+  keypoint metric was found in them.
 - **Why VCM dropped pose and action recognition** between N54 (2021) and
   N231 (2022), and VCM's "Evaluation framework and methodologies" N00277
-  (2022), which is not on the public page.
+  (2022): the reasons would be in meeting reports and input contributions,
+  which are member-only (MPEG's document system), not on the public pages.
 - **VCM-RS and the VCM CTC scripts** (`git.mpeg.expert`): member-only, not
   inspected; the exact VCM-RS version of the current anchor is inconsistent
   in N0870's text (v1.2, v1.3) and its template names (2.2).
-- JVET-H0030's interpolation method (FCM's BD-rate reference) was not read.
-- Licences of PandaSet and FLIR; whether HiEve's test labels are public
-  (MPEG distributes them for its five videos).
+- JVET-H0030's interpolation method (FCM's BD-rate reference): public on the
+  JVET site, not retrieved (same search problem as AG2035).
+- Licences of PandaSet and FLIR (not pursued: neither is recommended);
+  whether HiEve's test labels are public (MPEG distributes them for its five
+  videos).
 - No published study of hand-pose accuracy on compressed video was found;
   searches for pose-under-compression codec evaluations found only PCK on a
   structured bitstream (Jin et al.) and keypoint-detection BD-rates in
   [arXiv:2503.21469](https://arxiv.org/abs/2503.21469) (not read in full).
+
+None of these changes the proposal: they concern JPEG AI's and GFVC's
+details, MPEG's history, and datasets the study recommends against.
