@@ -5452,7 +5452,23 @@ invocation turns out to be needed.
   not the foreground. The rule is unchanged otherwise and reads the
   amended parts; the numbers with every instance a player are reported
   beside them (`as_first_defined`). The pilot is re-run with the
-  amendment; the first pilot is not used for the decision.
+  amendment; the first pilot is not used for the decision. The decision
+  rule (`k4.DECISION`: thresholds, CRFs, the K6 gate) is unchanged; only
+  the parts it reads changed, as above.
+
+  The first pilot's numbers, kept on record (every "tennis player"
+  instance a player; `published.tar` `41c877af…0919`):
+
+  | Window | players' pixels | foreground's share of all bits, CRF 62 | players' share of the foreground's bits, CRF 48 / 62 | fitted, YOLO11x / YOLO26x |
+  |---|---:|---:|---:|---|
+  | broadcast djokovic_zverev/008 | 3.90% | 30.1% | 88% / 92% | 0.991 / 0.990 |
+  | broadcast rublev_auger-aliassime/052 | 3.55% | 19.2% | 95% / 96% | 0.827 / 0.794 |
+  | tracknet game3/Clip3 | 0.84% | 12.0% | 95% / 97% | 0.333 / 0.333 |
+  | tracknet game7/Clip2 | 1.02% | 22.8% | 92% / 94% | 0.578 / 0.590 |
+
+  "Tennis player" instances per frame: 4.0, 2.8, 3.0 and 2.9 (mean).
+  Ball under 1 kbps of SVT-AV1 at CRF 62 on every window; the broadcast
+  windows' camera moved on 100% and 89% of their 0.5 s pairs.
 
 ### 2026-10-13 — K5: ball oracle (the true ball at its coded position)
 - Question (PLAN K5): would a ball mode (the ball sent as its position and
