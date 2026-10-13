@@ -107,7 +107,7 @@ def main() -> int:
             "staged_inputs": [staged[k] for k in VISOR] + [chains_entry] + [staged[f"video_{v}"] for v in videos],
             "scale": {"items": {"smoke": smoke_item, "full": ",".join(items)}, "frames": {"smoke": 48, "full": 240}},
             "smoke": {"seconds": 600, "representative_basis": basis}, "full": {"seconds": full_seconds},
-            "validator": ["{python}", "-m", "experiments.visor.h4b", "validate", "--h1-chains", "{staged:h1_chains}"],
+            "validator": ["{python}", "-m", "experiments.visor.h4b", "validate"],
             "validator_seconds": 300, "required_commands": [], "budget_seconds": full_seconds + 900,
             "deadline": args.deadline, "stall_seconds": 1200, "cpu_threads": 16, "device": "cpu", "hosts": HOSTS,
             "gpu_models": [], "gpu_memory_mib": 0, "local_storage_gib": 60,

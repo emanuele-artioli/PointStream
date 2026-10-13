@@ -313,7 +313,7 @@ def command_run(args: argparse.Namespace) -> int:
     write_json(stage_dir() / "h4b.json", {
         "stage": os.environ.get("PS_STAGE", "local"), "items": [i["id"] for i in items], "restored": restored,
         "eval_set": {"path": args.eval_set, "sha256": file_sha256(Path(args.eval_set)), "name": eval_set["name"]},
-        "h1_chains_sha256": file_sha256(Path(args.h1_chains)),
+        "h1_chains": args.h1_chains, "h1_chains_sha256": file_sha256(Path(args.h1_chains)),
         "settings": {"frames": int(args.frames), "hold_psnr": HOLD_PSNR, "max_uncovered": MAX_UNCOVERED, "coders": CODERS,
                      "direct": {"ratio": DIRECT_RATIO, "ransac_px": DIRECT_RANSAC_PX, "min_inliers": DIRECT_MIN_INLIERS,
                                 "tries": DIRECT_TRIES, "dilate_px": DILATE_PX, "sift_features": SIFT_FEATURES},
@@ -381,6 +381,7 @@ def validate_result(stage: Path, chains_path: str | None = None) -> dict[str, bo
     record = json.loads((stage / "h4b.json").read_text())
     publish = Path(os.environ.get("PS_SCRATCH_DIR") or stage / "scratch") / "publish" / "items"
     rows = load_items(publish) if publish.is_dir() else items_from_tar(stage / "published.tar")
+    chains_path = chains_path or record.get("h1_chains")  # the fleet does not expand a validator's placeholders
     chains = json.loads(Path(chains_path).read_text()) if chains_path else None
     return validate_rows(rows, record, chains)
 
