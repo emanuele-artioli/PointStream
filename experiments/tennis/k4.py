@@ -412,6 +412,12 @@ def command_run(args: argparse.Namespace) -> int:
     os.environ.setdefault("YOLO_CONFIG_DIR", str(scratch / "ultralytics"))
     publish = scratch / "publish" / "windows"
     publish.mkdir(parents=True, exist_ok=True)
+    # The staging cache keeps files read-only and drops the execute bit: run a copy (as H1).
+    inspect = scratch / "bin" / Path(args.inspect).name
+    inspect.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(args.inspect, inspect)
+    inspect.chmod(0o755)
+    args.inspect_source, args.inspect = args.inspect, str(inspect)
     restored = []
     checkpoints = os.environ.get("PS_CHECKPOINT_DIR")
     if checkpoints and Path(checkpoints).is_dir():
@@ -464,7 +470,7 @@ def command_run(args: argparse.Namespace) -> int:
         "windows_json": {"path": args.windows, "sha256": file_sha256(Path(args.windows))},
         "decision": DECISION, "sam": sam, "pose": poses.record(),
         "tools": {"encoder": svtav1.tool(args.encoder), "ffmpeg": svtav1.tool(args.ffmpeg),
-                  "inspect": {"path": args.inspect, "sha256": file_sha256(Path(args.inspect))}},
+                  "inspect": {"path": args.inspect_source, "sha256": file_sha256(Path(args.inspect))}},
         "settings": {"crfs": CRFS, "preset": PRESET, "frames": int(args.frames), "prompts": PROMPTS, "sam_size": SAM_SIZE,
                      "ball_disk_px": BALL_DISK_PX, "ball_reach_px": BALL_REACH_PX, "ball_neighbourhood_px": BALL_NBHD_PX,
                      "pose_imgsz": POSE_IMGSZ, "pose_conf": POSE_CONF, "kp_conf": KP_CONF, "kp_dilate_1080": KP_DILATE_1080,

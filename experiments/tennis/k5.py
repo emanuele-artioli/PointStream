@@ -51,6 +51,8 @@ DET_IMGSZ = 1280
 DET_CONF = 0.1
 SPORTS_BALL = 32
 REVIEW_CROP = 48
+#: The fleet's GPU claim (a UUID), read before ultralytics can rewrite it.
+CLAIMED_DEVICES = os.environ.get("CUDA_VISIBLE_DEVICES")
 
 
 def safe(window_id: str) -> str:
@@ -92,7 +94,9 @@ def code_dcvc(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str,
     reports = {}
     for action in ("encode", "decode"):
         command, env, cwd = dcvc_command(Path(sys.prefix), action, work / "plan.json", work / f"{action}.json")
-        done = subprocess.run(command, env={**os.environ, **env}, cwd=cwd, capture_output=True, text=True, timeout=3600)
+        # ultralytics rewrites CUDA_VISIBLE_DEVICES to a bare index when it selects a device; the worker needs the claim.
+        claimed = {"CUDA_VISIBLE_DEVICES": CLAIMED_DEVICES} if CLAIMED_DEVICES is not None else {}
+        done = subprocess.run(command, env={**os.environ, **claimed, **env}, cwd=cwd, capture_output=True, text=True, timeout=3600)
         if done.returncode:
             raise RuntimeError(f"DCVC-UF {action} failed ({done.returncode}):\n{done.stderr[-4000:]}")
         reports[action] = json.loads((work / f"{action}.json").read_text())
