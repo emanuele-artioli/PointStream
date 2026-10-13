@@ -5049,3 +5049,287 @@ invocation turns out to be needed.
   Scope: 4 pilot items; one generic footage of six recordings (five
   participants) and 1,152 frames; one schedule of 2,000 steps (cosine, its
   loss flat at the end); network size L only for G and K.
+
+### 2026-10-13 — H4a: grip pose on HOT3D (is a held object still in the hand's frame?)
+- Question ([PLAN H4](../PLAN.md#h4-handled-objects-rescoped-after-h1-user-2026-10-08),
+  item 1). H1 found that no 2D warp of one reference view carries a handled
+  object for more than 0.02 s (median), and that handled objects are 27–29%
+  of the foreground's SVT-AV1 bits. Grip pose proposes a 3D motion model
+  instead: while an object is held, its pose is the hand's pose (already in
+  the stream) times one fixed transform G, resent only when the grip
+  changes. This entry measures, on motion capture, whether that model holds
+  and how often G must be resent. Bits are not the question: any 6DoF
+  pose costs at most ~1 kbps however it is sent (6 values per frame), against
+  41.3 kbps of SVT-AV1 on handled objects at CRF 62 (H1). The question is
+  whether an object's motion can be *derived from the hand's*, so that the
+  encoder needs an object pose only at the few frames where G changes
+  rather than a 6DoF tracker on every frame (VISOR has no object models
+  and no object-pose labels).
+- Data: HOT3D-Clips `train_aria` (`Datasets/HOT3D`, 1,516 clips of 150
+  frames at 30 fps; Aria only, as H2), 12 clips per participant (all 9, so
+  108 clips), content-blind (lowest sha256 of
+  "pointstream-h4:hot3d:<clip>"). Per frame: `objects.json`
+  (`T_world_from_object` per object), `hands.json` (UmeTrack
+  `T_world_from_wrist` per hand, motion capture), `cameras.json` (the RGB
+  fisheye `214-1`, 1408²). Object geometry: the decimated meshes in
+  `object_models_eval` (their vertices; no texture is used). Code
+  `experiments/hot3d/h4a.py` (to be written after this entry).
+- Method.
+  1. Error of a predicted pose P̂ against the true pose P of an object at a
+     frame: the mean over the mesh's vertices of their distance in the
+     image `214-1` when projected with P̂ and with P (the toolkit's
+     fisheye camera; px), and the same distance in 3D (mm) beside it.
+  2. Predictors, each starting from a *refresh* (a frame at which the true
+     pose is sent, exactly; the oracle's simplification): *world* (the
+     object stays where it was in the world: P̂(t) = P(r)); *camera* (it
+     stays where it was in the camera, H1's copy in 3D); *grip-left* and
+     *grip-right* (P̂(t) = W(t) · G, G = W(r)⁻¹ · P(r), W the hand's
+     motion-capture wrist pose). A predictor fails at the first frame whose
+     error exceeds τ, or where its hand is missing; a refresh is sent there.
+  3. Coders, replayed over every object of every clip: *world only*,
+     *grip only* (the nearer hand at the refresh), and *hybrid* (at each
+     refresh the predictor that lasts longest; an oracle choice by
+     look-ahead, a 2-bit mode). A frame is *held* when it is not a refresh;
+     a reference's *life* is the time from one refresh to the next.
+  4. Scored frames: an object's *moving* frames, where its mean vertex
+     displacement per frame (central difference over ±2 frames) exceeds
+     0.5 mm, dilated by 5 frames. Objects at rest are carried by *world*
+     anyway; the moving frames are where the hand must explain the motion.
+     Lives are cut at the end of a moving segment and of the clip; cut lives
+     count at their observed length (conservative), and their share is
+     reported.
+  5. Reported beside: the noise floor (*world*'s error on objects that never
+     move, frame to frame), the grip's drift within a life (rotation and
+     translation of W(t)⁻¹ P(t) against G), how often G changes (refreshes
+     per second of moving time, per object), τ ∈ {1, 2, 4} px, and the rate
+     of refreshes (6 values at 16 bits plus the mode) against SVT-AV1 on
+     handled objects.
+- Decision rule (fixed before any run; τ = 2 px, means over clips of
+  per-clip values, pooled over each clip's moving frames). Grip pose is
+  worth building on when the *hybrid* coder, on moving frames, (a) holds
+  ≥ 70% of them and (b) has median reference life ≥ 0.5 s (H1's thresholds
+  for a rigid part), and (c) *grip* is what explains them: the hybrid's
+  median life is at least twice *world only*'s on the same frames. Rate
+  ((refreshes × 98 bits) per second) must be ≤ 10% of SVT-AV1's 41.3 kbps
+  on handled objects (H1's (c)); it is reported but not expected to bind.
+  Pass: grip pose is a viable motion model for held objects, and the next
+  step is an appearance oracle (the object's scanned model rendered at the
+  true pose on HOT3D, against the pixel coders at equal quality), since a
+  pose alone renders nothing. Fail: grip pose is dropped and H4 moves to
+  item 2 (a bank of reference views on VISOR). Unclear (passes at 4 px but
+  not 2 px, or (a)–(b) pass without (c)): reported, and the user decides.
+- Hypothesis: rigid objects in HOT3D are held in a stable grip. Within a
+  grasp G drifts by a few mm and a few degrees; refreshes come at grasp,
+  release and regrasp, about once per second of motion. The hybrid holds
+  ≥ 85% of moving frames with median life ≥ 1 s at 2 px, and *world only*
+  lives a few frames.
+- Competing explanations. (1) Objects move in the fingers, not with the
+  palm (turning a mug, pouring, in-hand rotation), so G drifts past 2 px
+  within a few frames; the drift measure separates a stable grip with
+  finger slip from no grip at all. (2) The hand's and the object's motion
+  capture each have their own noise, so G jitters even in a fixed grip; the
+  noise floor and τ = 4 px test whether 2 px is above it. (3) HOT3D's lab
+  tasks with rigid objects favour grip pose against VISOR's kitchens (food,
+  cloth, deformable packaging); a pass is an upper bound for VISOR, which
+  this entry does not test.
+- Budget: CPU only (`"device": "cpu"`, 16 threads); reading a clip's poses
+  means streaming its ~100 MB tar from NFS. Smoke: 2 clips, ≤ 600 s. No
+  pilot: nothing is fitted, and τ is swept in the same pass. Full: 108
+  clips, ≤ 45 min. Ceiling 2 CPU-hours.
+- Jobs: `20261013T064014Z-04a44b1c` (code `b003be8`, environment
+  `pointstream-20261009T214002Z`; CPU only, 16 threads on gpu1; inputs
+  `pointstream-data/hot3d/h4a-2026-10-13/inputs-26fb572756ed.json`, spec
+  `h4a.json` beside it). Smoke 2 clips (3 s), full 108 clips of 9
+  participants (15 s of compute; 8.5 min with staging). Validators passed on
+  the smoke and, locally, on the full stage's `published.tar`
+  (`939b43ef…48bb3`; 8 checks: every clip published, eval meshes within
+  2 mm of `models_info` (the keyboard's decimated mesh is 1.03 mm off, so
+  the bound set before the run at 1 mm was raised to 2 mm after the dev
+  run), true poses projecting inside the image, resting objects within 1 px,
+  every scored frame held or refreshed once). Report (`h4a report`):
+  `pointstream-data/hot3d/h4a-2026-10-13/report-b003be8/h4a-report.json`
+  (`cb3b135a…463d`).
+- Outcome (means over the 108 clips, all with moving frames; 189 moving
+  objects, 15,558 scored object-frames). Noise floor: resting objects hold
+  within 0.08 px (median; 95th percentile 0.55 px), so 2 px is well above
+  the motion capture's noise. On moving frames:
+
+  | coder | τ | held | median life | frame-weighted life | refresh rate |
+  |---|---|---|---|---|---|
+  | world | 2 px | 18.4% | 0.035 s | 0.068 s | 2.3 kbps |
+  | grip | 2 px | 37.8% | 0.040 s | 0.103 s | 1.8 kbps |
+  | hybrid | 2 px | 49.4% | 0.052 s | 0.129 s | 1.4 kbps |
+  | hybrid | 4 px | 69.0% | 0.098 s | 0.246 s | 0.9 kbps |
+
+  The hybrid's held frames come from the grip on 53% (left 22%, right 30%)
+  and from the world on 46%. Grip spread over a segment's moving frames
+  (201 segments, quartiles): G turns by 4.0 / 10.1 / 22.6° and shifts by
+  6.7 / 13.1 / 30.4 mm from its middle frame (median over frames), against
+  the world pose's 4.0 / 21.0 / 53.9° and 19 / 82 / 155 mm. Per-clip held
+  share of the hybrid at 2 px: 28% / 50% / 70% (10th, 50th, 90th
+  percentile).
+- Decision (by the rule; `h4a-report.json`): **grip pose fails.** At 2 px
+  the hybrid holds 49% of moving frames (rule 70%) with a median life of
+  0.05 s (rule 0.5 s), 1.5× *world only*'s (rule 2×); at 4 px it holds
+  69% with 0.10 s. Rate passes (1.4 kbps against 4.1) and does not bind.
+  By the rule, grip pose is dropped and H4 moves to item 2, a bank of
+  reference views on VISOR.
+- Reading. The hypothesis is refuted: a held object is not still in the
+  wrist's frame. The grip explains most of the object's translation
+  (median shift 13 mm against 82 mm in the world) but only half of its
+  rotation (10° against 21°); these are medians of per-segment spreads,
+  not a variance split. What remains, mostly rotation (10° turns a 10 cm
+  object's edge by tens of pixels at arm's length), is far above what a
+  rendered object can absorb: a reference carried by the wrist dies in a
+  tenth of a second, no longer than H1's 2D warps on VISOR. Competing
+  explanation (1) holds: objects move in the fingers (regrasps, in-hand
+  turning, two-handed handling such as the keyboard in the dev clip) and
+  the grip drifts continuously, not in a few discrete changes. (2) does
+  not hold: the noise floor is 0.08 px. (3) makes this a stronger
+  negative: HOT3D's rigid objects in a lab are the favourable case, and
+  the wrist is the motion-capture truth, not an estimate.
+- Scope. The hand frame is the wrist (UmeTrack's); a frame fitted to the
+  fingertips in contact, or a pose predicted from the whole hand's
+  articulation, was not tested and could hold longer. The test is
+  geometric only (vertex reprojection), so it bounds any renderer that
+  needs the object's pose to within 2–4 px. Clips are 5 s long, which
+  cuts 4% of lives; the decision does not rest on long lives.
+
+### 2026-10-13 — H4b: a bank of reference views for handled objects (oracle, VISOR)
+- Question ([PLAN H4](../PLAN.md#h4-handled-objects-rescoped-after-h1-user-2026-10-08),
+  item 2; H4a dropped grip pose). H1 carried each object from one
+  reference by chained homographies and refreshed it where it stopped
+  holding: handled objects held on 49.9% of frames, median reference life
+  0.02 s. A bank keeps the views already sent: each frame is predicted from
+  whichever view predicts it best, and a new view is sent only when none
+  does. An object turned back, or reappearing from under a hand, then costs
+  no new view. This oracle bounds how much a bank can save before any bank
+  is coded: if even an unlimited bank, choosing views with hindsight,
+  needs a new view about as often as H1's single reference, the component
+  is not built and handled objects stay pixels (item 3).
+- Data: evaluation set v2 (34 windows of 240 frames), fill masks
+  (`visor_dense_sam_fill`, as H1), H1's objects: each object label's union
+  of instances per frame, *handled* when a human labelled it in contact
+  with a hand at a keyframe bounding or inside the window (H1's
+  `contact_objects`). Frames decoded as H1 (sparse-JPEG gate), full
+  resolution. Code `experiments/visor/h4b.py` (to be written after this
+  entry), reusing H1's flow, homography fit and hold test.
+- Method. Per object track, frame by frame, as H1: DIS flow (medium preset,
+  half resolution), a homography fitted to it in the object's mask
+  (RANSAC 2 px). A view r *predicts* frame t through a homography H
+  (r → t) when, warping view r's pixels onto the object's mask at t, at
+  most 20% of the mask is uncovered and PSNR on the covered pixels is
+  ≥ 30 dB (H1's test; 33.75 dB beside). Two ways to reach a view:
+  *chained* (the frame-to-frame homographies since r, broken where a step
+  has no fit or the object is absent, as H1), and *direct* (SIFT features
+  inside each mask, dilated 8 px; ratio test 0.75; homography by RANSAC
+  3 px with ≥ 15 inliers; the 4 views with most inliers are tried). Coders:
+  1. *single*: H1's single reference, chained only (must reproduce H1's
+     recorded counts; the correctness check);
+  2. *single + direct*: one reference, reached by either way;
+  3. *bank-4*: the last 4 views used, either way;
+  4. *bank*: every view sent so far, either way (the oracle).
+  At each frame the coder takes the view and way with the highest PSNR
+  among those that predict t; if none does, t becomes a new view. When a
+  coder has more than 4 candidates (chained views plus direct tries), they
+  are first screened on every 4th mask pixel in each direction and only
+  the 4 best get the full test (added with the code, before any run: an
+  unlimited bank can hold a hundred live chains; *single* always gets the
+  full test, as H1). Environment and inputs are H1's
+  (`pointstream-20261006T113321Z`), so *single* is checked against H1's
+  recorded chains per track (within 2% of frames on ≥ 95% of tracks). Per
+  track: frames *held* (predicted) and the new views, with the interval
+  between consecutive new views (s). Other objects are run and reported
+  beside; the decision is on handled objects.
+- Decision rule (fixed before any run; 30 dB; means over the 34 items of
+  per-item values pooled over the item's handled tracks). The bank is
+  worth building when the *bank* oracle (a) holds ≥ 70% of handled-object
+  frames, (b) has a median interval between new views ≥ 0.5 s (H1's
+  thresholds for a rigid part), and (c) the bank is what helps: it sends at
+  most half the new views of *single + direct* (a single reference that
+  can also re-register). Pass: build the bank component (finite views,
+  coded views and residual) and score it on handled-object pixels against
+  SVT-AV1 and DCVC-UF at equal quality (BD-rate per metric against their
+  envelope). Fail: handled objects stay coded pixels (item 3), and H4 is
+  done. Unclear ((a) and (b) pass without (c), or a pass at 30 dB that
+  fails at 33.75 dB): reported, and the user decides.
+- Hypothesis: the bank helps where H1's error split says it can, with new
+  pixels (17% of the homography's error on handled objects) and occlusion
+  by hands (10%), but not with appearance change (28%), deformation (27%)
+  and motion blur (18%). Held frames rise from 50% to about 60%, the
+  interval between new views stays near 0.1 s, and the bank fails (a) and (b).
+- Competing explanations. (1) H1's single reference fails because its chain
+  breaks (no fit for a frame, the object absent for a frame), not because
+  the appearance changes. Then *single + direct* recovers most of the gain
+  and (c) fails; the bank itself is not what helps. (2) 30 dB on covered
+  pixels is the wrong bar against coded pixels; 33.75 dB (B2's foreground
+  PSNR at SVT-AV1 CRF 62) is reported beside. (3) A pixel codec already
+  predicts from several past frames (SVT-AV1 up to 7 references, DCVC-UF
+  from its decoded past), so a pass bounds the representation, not its
+  gain over the codecs; the BD-rate stage decides that.
+- Budget: CPU only (`"device": "cpu"`, 16 threads); decode, flow and SIFT
+  per item. Smoke: one item, 48 frames, ≤ 600 s. Pilot: B2's 4 pilot items,
+  ≤ 45 min, which also times an item. Full: the other 30 items, in parts of
+  at most 45 min each. Ceiling 8 CPU-hours.
+- Jobs: pilot `20261013T074546Z-821ee185` (code `2880e27`, environment
+  `pointstream-20261006T113321Z` as H1; CPU only, 16 threads on gpu4;
+  inputs `pointstream-data/visor/h4b-2026-10-13/inputs-7f2aebab5a6a.json`,
+  spec `h4b-pilot.json` beside it). Smoke P01_107, 48 frames (98 s); full
+  stage B2's 4 pilot items at 240 frames (1,260 s; per item 188–1,257 s,
+  the bank's candidates dominating). Validators passed on the smoke and,
+  locally, on the full stage's `published.tar` (`e14d7f86…`; 6 checks,
+  including *single* against H1's recorded chains: exact on all 28
+  track-thresholds). Report: `…/h4b-2026-10-13/report-pilot-2880e27/h4b-report.json`
+  (`1e10dfb0…`). Not evidence: `20261013T074250Z-24ac003d` (the run
+  finished its smoke; the validator was given a `{staged:…}` placeholder,
+  which the fleet does not expand for validators).
+- Outcome (pilot, means over the 4 items; 6 handled tracks, 1,342
+  handled-object frames):
+
+  | coder | held at 30 dB | median interval | new views per s | held at 33.75 dB |
+  |---|---|---|---|---|
+  | single (H1) | 54.6% | 0.032 s | 31.8 | 26.2% |
+  | single + direct | 56.2% | 0.032 s | 31.0 | 26.4% |
+  | bank-4 | 56.7% | 0.032 s | 30.6 | 26.4% |
+  | bank (every view) | 55.9% | 0.032 s | 31.1 | 26.3% |
+
+  The unlimited bank sends 1.00× the new views of *single + direct*
+  (rule ≤ 0.5×). Per handled track (frames; new views single / single +
+  direct / bank): soy milk 240; 140 / 125 / 130, glass 240; 77 / 77 / 77,
+  tap 240; 60 / 59 / 56, pancake 240; 63 / 63 / 63, pancake package 240;
+  128 / 128 / 128, fork 142; 78 / 78 / 78. Direct registration reaches 8%
+  of the bank's held frames. Other objects behave the same (held 66.7% →
+  67.3%, ratio 1.02).
+- Decision (by the rule, on the pilot): **the bank fails every check**:
+  held 56% (rule 70%), median interval 0.03 s (rule 0.5 s), and it sends
+  as many new views as one re-registering reference (rule half). The rule's
+  unit is the 34 items; the other 30 were not run, because no mean over
+  them could pass: (c) needs the bank to halve the new views, and on every
+  pilot track it changes them by 0–7%. H4b stops at the pilot; handled
+  objects stay coded pixels (H4 item 3).
+- Reading. The hypothesis held, and more strongly than predicted: the bank
+  adds nothing, not even the ~10 points expected from occlusion and new
+  pixels. What *held* demands: the warped view alone, with no residual,
+  within 30 dB of the frame; a frame that is not held falls back to its
+  pixels. In frames, the median gap between new views per handled track
+  is 1, 2, 4, 3, 2 and 2 (soy milk, glass, tap, pancake, pancake package,
+  fork); the mean over items of 0.032 s is about two frames at 50–60 fps,
+  so these objects need their pixels on about every other frame, and the
+  held frames are below the codec's own quality (at 33.75 dB, B2's
+  foreground at CRF 62, 26% are held). The coders agree because they share
+  the latest view and differ only in older ones: a view sent earlier
+  almost never predicts a later frame better than the latest view does
+  (the unit tests show the bank does reuse views when an object turns
+  back and forth, and *single* reproduces H1 exactly): within a 4.8 s window the objects' appearance
+  changes one way (turning, being cut, filled, lit differently, blurred),
+  so the most recent view is always the best one and older views are not
+  revisited. Competing explanation (1) does not hold either: direct
+  registration recovers 1.6 points over H1's chain, so broken chains are
+  not why the reference dies. What fails is appearance: at 30 dB a view
+  predicts the next frame on half the frames and is resent every 0.03 s,
+  which is what a pixel codec's own inter prediction already does.
+- Scope. 4 pilot items, 6 handled tracks. Views are warped by homographies;
+  a richer warp (dense flow, a 3D model) was H1's flow bound (1–2 dB over
+  the homography) and is not a bank question. The screen (4 candidates
+  kept from a 1/16-pixel test) could miss a view; it never applies to
+  *single*, and *single + direct* differs from the bank by under 1 point.

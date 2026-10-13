@@ -809,6 +809,29 @@ shows why not, and the estimator is confirmed on renders.
 
 #### H4. Handled objects (rescoped after H1, user 2026-10-08)
 
+Grip pose (item 1) fails (H4a, 2026-10-13, job `20261013T064014Z-04a44b1c`,
+[outcome](docs/experiments.md#2026-10-13--h4a-grip-pose-on-hot3d-is-a-held-object-still-in-the-hands-frame)):
+on HOT3D's motion capture, a reference carried by the wrist holds 49% of
+an object's moving frames at 2 px with a median life of 0.05 s (rule 70%,
+0.5 s). The grip explains most of the translation but half the rotation
+(13 mm and 10° left within a grasp, against 82 mm and 21° in the world):
+objects turn in the fingers continuously. Consequence: handled objects get
+no motion for free from the hand stream; a pose representation would need
+its own per-frame object tracker (no labels on VISOR), so the 3D-model
+candidate loses its cheapest route. Grip pose may still serve as a prior
+(a tracker's start, a codec's motion search). Hands (H3) and the
+background (G) are unaffected.
+
+A bank of reference views (item 2) fails too (H4b, 2026-10-13, pilot job
+`20261013T074546Z-821ee185`, [outcome](docs/experiments.md#2026-10-13--h4b-a-bank-of-reference-views-for-handled-objects-oracle-visor)):
+an unlimited bank, choosing views with hindsight, holds 56% of handled-object
+frames at 30 dB and sends as many new views as one re-registering reference
+(1.00×), one every 0.03 s; older views are never better than the latest.
+Outcome of H4: **handled objects stay coded pixels** (item 3), coded with
+the rest of the foreground. The later candidates (a per-object 3D model,
+generative completion) have no support from H4a or H4b and wait for a
+working pipeline.
+
 H1 found that no 2D warp of one reference view carries an object for more
 than a few frames (median reference life 0.02–0.04 s): objects turn, show new
 sides, are occluded by hands and deform. The large touched surfaces VISOR
@@ -838,6 +861,19 @@ PSNR, until the real side appears and must be corrected.
 **Done when** handled objects have a representation chosen by numbers, or the
 session shows they should stay pixels.
 
+H4c (agreed, user 2026-10-13): handled objects as pixels, H3d's recipe.
+DCVC-UF off the shelf codes any pixels; only G is domain-trained (on hand
+crops). Open question (user): hands are alike, objects are not, so one
+enhancer for both may serve neither. An enhancer restores local texture
+from a decoded image rather than generating objects, and G5d's enhancer
+already covers whole kitchens, so variety may cost less than for a
+generator; the pilot measures it. Arms, each scored on hand and on
+handled-object pixels separately against the pixel envelope at equal
+quality: G as it is; G refitted on object crops; G refitted on hands and
+objects (one network, same size). Data as H3d's component (other
+participants' recordings, SAM 3.1 masks). Fallback if all fail:
+generative completion of unseen sides.
+
 #### H5. First working PointStream
 
 G's background and H's foreground in one bitstream with every byte counted:
@@ -847,6 +883,76 @@ plus the fallback pixels. Scored with B2's harness on evaluation set v2
 curves, and timed end to end, which picks B2b's equal-time SVT-AV1 preset.
 **Done when** PointStream's curves and encode and decode times on all 34
 items come from recorded jobs, beside B2's.
+
+#### K. Where keypoints win (analysis, user 2026-10-13)
+
+Keypoints are PointStream's premise (after GenStream). On egocentric video
+they have lost every time they were asked to replace pixels: as appearance
+(H3b, perfect appearance at the coded pose: 48% saving at equal LPIPS,
+under the 50% bar), as a real generator (H3e: worse on 3 of 4 items), and
+for objects as motion of any kind (H1, H4a, H4b: references die in 1–4
+frames). They win as information: with a perfect generator, H2's coded
+keypoints carry the hand's pose for 69% less rate than pixels at equal
+pose error (H3c2). The failures have causes the work identified: a pixel
+bar that keeps falling (DCVC-UF −63% against SVT-AV1 on the hands, G −22%
+more), rendering judged by the pixels around the subject (MANO's outline
+misses a tenth of the hand), and egocentric video's worst case (moving
+camera, large hands, objects showing new sides, 2–3 minute videos that no
+per-video model pays back). Keypoints should win where those causes are
+absent: very low rates; judges of what keypoints carry (pose, trajectory);
+small fast structured objects; long videos with constant identity; a still
+camera. Broadcast tennis has all five, so it is measured now, not left to
+phase 2's end (user, 2026-10-13). Cheap first, each with its rule written
+before its run:
+- K1. *Very low rates.* H3b2's low-rate win (perfect appearance at the
+  coded pose: LPIPS 0.21 at 1.93 kbps, against SVT-AV1's 0.29 at the same
+  rate, forearm granted) was against SVT-AV1 only; DCVC-UF at ¼ already
+  reaches 0.3–3 kbps on R. Check first from recorded data (H3b, H3e, H3d's
+  G curves on the same items and region): does any keypoint point lie
+  above DCVC-UF + G's curve at its rate? If so, the paper shows the
+  crossover (RD curves of each mode, with the rate where keypoints stop
+  winning); if not, the low-rate claim is dropped for egocentric hands.
+  The regime itself (where pixel coders collapse) is defined per domain by
+  the judge (e.g. a detector's recall on the decoded ball, K5).
+- K2. *Judges of what keypoints carry (coding for machines).* H3c2 judged
+  hands by the pose re-estimated on the decoded video; the mask or pose
+  computed on the original against on the decoded foreground is the same
+  idea. A short study of MPEG's Video Coding for Machines (VCM) and
+  feature coding (FCM) first: how they judge (task accuracy on the decoded
+  content against rate, BD-rate on the task metric, their anchor codec and
+  test conditions), and what PointStream should adopt, so that a keypoint
+  mode is judged on a recognized axis beside human-viewing metrics.
+  Literature only; no runs.
+- K3. *Keypoint-conditioned pixel coding* (H3's proto-hand candidate). The
+  decoder receives the keypoints and the pixels code only what they do not
+  explain; in principle never worse than pixels alone, but it needs a new
+  input path and training. Cheap oracle, inference only: give DCVC-UF as
+  its reference the previous decoded frame warped by the keypoints' motion
+  (H3b's mesh correspondence from t−1's coded pose to t's) instead of the
+  previous decoded frame, and measure the rate on R at equal quality, with
+  the keypoints billed. DCVC-UF estimates and codes its own motion, so the
+  gain is bounded by its motion bits; if even this oracle saves nothing,
+  the trained version is not pursued.
+- K4. *Tennis audit*, H1's method on broadcast tennis (the archived
+  `tennis_games` matches at 1080p; TrackNet's dense ball labels): per part
+  (players, racket, ball, background), its share of pixels and of
+  SVT-AV1's bits (H1's bit accounting), how often the camera is still, a
+  body-pose estimator's fit (audit first, e.g. ultralytics' pose models)
+  and its parameter rate against the bits on those pixels. Decides whether
+  players pass H1's screen and what the ball costs.
+- K5. *Ball oracle.* The true ball drawn from its coded position over
+  SVT-AV1 and DCVC-UF decodes: ball-region quality and a ball detector's
+  recall on the decoded frames, against the pixel coders at equal rate and
+  equal quality. Decides the ball mode.
+- K6. *Player oracle* (after K4): H3b for bodies, perfect appearance at
+  the coded body pose with what the pose cannot describe charged; whether
+  the outline problem shrinks at broadcast scale. A per-player appearance
+  model is amortized over a match (hours), the condition H3d found
+  decisive. The racket in a fixed grip re-tests H4a's grip pose.
+Order: H5 continues on egocentric (a working pipeline with what is
+chosen: G's background, DCVC-UF + G on hands, H4c on objects), since its
+bitstream, compositor and harness carry over to tennis. K4–K5 and K2 run
+beside it in their own sessions; K1 and K3 are cheap and egocentric.
 
 ### After a working pipeline
 
@@ -946,3 +1052,31 @@ it saves at the hands' rates), so networks are better delivered once; and
 the generic network's gain on the hands is perceptual (LPIPS and DISTS
 better, PSNR worse, a slight colour shift, no invented texture), as G5d's
 enhancer on the background.
+Negative results to report (user, 2026-10-13), with their numbers:
+parametric motion fails for egocentric objects (H1's homographies, H4a's
+grip pose on HOT3D motion capture, H4b's bank of views), and keypoints
+lose to pixels on egocentric hands at equal quality (H3b, H3e) while
+carrying the pose for less rate (H3c2). Possibly two papers, in order, if
+the final results hold (user, 2026-10-13): one where keypoints beat the
+standard codecs (tennis), one on the learned pixel coders that beat the
+keypoints on egocentric video. Order of writing (user, 2026-10-13): a
+definitive pipeline; a first draft complete but for final touches and the
+figures' final experiments; the final experiments (run once, after the
+figure list is fixed); final touches before submission. The framing waits
+for the pipeline and K4–K6.
+A point to argue (user, 2026-10-13), scoped to the evidence when written:
+conventional codecs are one-size-fits-all, rigid in what they code and tuned
+to pixel fidelity rather than to what people see; a learned codec's
+strength is less its margin over AV1 than how much further it goes when
+domain knowledge directs it. Evidence so far: DCVC-UF off the shelf is
+−63% against SVT-AV1 on the hands (H3c), and directed by PointStream
+(region rate split by its own entropy model, coding at ¼ and ½, a generic
+enhancer) a further −22% (H3d); the scene-adapted background model (G5b,
+G5c) is the same pattern. Limits to state with it: retraining DCVC-UF
+itself on the domain gained little and did not transfer (H3c: 14% on the
+test windows, 151% worse on other participants), so the direction works
+through what surrounds the codec (scale, regions, enhancers, scene
+adaptation) more than through retraining it; and SVT-AV1 with the same
+enhancer was unclear (H3d oracle: −19%, synthesized texture), which
+supports, weakly, that the learned codec composes better with learned
+parts.
