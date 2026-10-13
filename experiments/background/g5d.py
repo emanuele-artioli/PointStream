@@ -129,14 +129,19 @@ def previous(frames: list[int]) -> np.ndarray:
 
 
 def fit(decoded: np.ndarray, target: np.ndarray, keep: np.ndarray, loss: str, steps: int, lpips_net: Any,
-        device: str, prev: np.ndarray | None = None) -> tuple[Any, dict[str, Any]]:
+        device: str, prev: np.ndarray | None = None, *, blocks: int | None = None,
+        channels: int | None = None, checkpoint: Path | None = None, stop_after: int | None = None) -> tuple[Any, dict[str, Any]]:
     """The enhancer fitted on (decoded, target) pairs on V (``keep``); with ``prev`` (each pair's predecessor)
     the temporal enhancer, fed the previous decoded frame too."""
     import torch
 
     torch.manual_seed(TRAIN["seed"])
     rng = np.random.default_rng(TRAIN["seed"])
-    net = enhancer(TRAIN["blocks"], TRAIN["channels"], prev is not None).to(device).train()
+    blocks = TRAIN["blocks"] if blocks is None else blocks
+    channels = TRAIN["channels"] if channels is None else channels
+    if blocks < 1 or channels < 1 or steps < 1:
+        raise ValueError("positive blocks, channels and steps required")
+    net = enhancer(blocks, channels, prev is not None).to(device).train()
     optimizer = torch.optim.Adam(net.parameters(), lr=TRAIN["lr"])
     schedule = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, max(1, steps))
     size = TRAIN["patch"]
@@ -159,22 +164,58 @@ def fit(decoded: np.ndarray, target: np.ndarray, keep: np.ndarray, loss: str, st
         mse0 = float(masked_mse(fixed[0][:, :3], fixed[1], fixed[2]))
         lp0 = float(masked_lpips(lpips_net, fixed[0][:, :3], fixed[1], fixed[2])) if loss == "lpips" else None
     weight = mse0 / lp0 if lp0 else 0.0  # equal to the MSE term at step 0
-    began, curve = time.time(), []
-    for step in range(1, steps + 1):
+    signature = {"blocks": blocks, "channels": channels, "steps": steps, "loss": loss,
+                 "temporal": prev is not None, "shape": list(decoded.shape), "train": TRAIN}
+    curve: list[dict[str, Any]] = []
+    resumed, elapsed = 0, 0.0
+    if checkpoint is not None and checkpoint.is_file():
+        state = torch.load(checkpoint, map_location=device, weights_only=True)
+        if state["signature"] != signature:
+            raise ValueError("training checkpoint does not match this fit")
+        net.load_state_dict(state["model"], strict=True)
+        optimizer.load_state_dict(state["optimizer"])
+        schedule.load_state_dict(state["schedule"])
+        rng.bit_generator.state = state["rng"]
+        torch.set_rng_state(state["torch_rng"].cpu())
+        if device == "cuda":
+            torch.cuda.set_rng_state(state["cuda_rng"].cpu())
+        curve, resumed, elapsed = state["curve"], state["step"], state["elapsed"]
+        mse0, lp0, weight = state["mse0"], state["lp0"], state["weight"]
+    began = time.time()
+    last_step = min(steps, stop_after) if stop_after is not None else steps
+    for step in range(resumed + 1, last_step + 1):
         x, t, m = batch(sample_patches(rng, keep, TRAIN["batch"], size, TRAIN["min_v"]))
         out = net(x)
         value = masked_mse(out, t, m)
         if weight:
             value = value + weight * masked_lpips(lpips_net, out, t, m)
+        if not torch.isfinite(value):
+            raise ValueError(f"nonfinite training loss at step {step}")
         optimizer.zero_grad(set_to_none=True)
         value.backward()
         optimizer.step()
         schedule.step()
-        if step % max(1, steps // 10) == 0 or step == steps:
+        if step % max(1, steps // 10) == 0 or step == last_step:
             with torch.no_grad():
-                curve.append({"step": step, "mse_fixed": float(masked_mse(net(fixed[0]), fixed[1], fixed[2]))})
-    return net.eval(), {"steps": steps, "lpips_weight": weight, "mse_fixed_start": mse0, "curve": curve,
-                        "seconds": round(time.time() - began, 1),
+                curve.append({"step": step, "mse_fixed": float(masked_mse(net(fixed[0]), fixed[1], fixed[2])),
+                              "lpips_fixed": float(masked_lpips(lpips_net, net(fixed[0]), fixed[1], fixed[2]))
+                              if loss == "lpips" else None})
+            if checkpoint is not None:
+                checkpoint.parent.mkdir(parents=True, exist_ok=True)
+                temporary = checkpoint.with_name("." + checkpoint.name)
+                with temporary.open("wb") as f:
+                    torch.save({"signature": signature, "model": net.state_dict(), "optimizer": optimizer.state_dict(),
+                                "schedule": schedule.state_dict(), "rng": rng.bit_generator.state,
+                                "torch_rng": torch.get_rng_state(),
+                                "cuda_rng": torch.cuda.get_rng_state() if device == "cuda" else None,
+                                "step": step, "curve": curve, "elapsed": elapsed + time.time() - began,
+                                "mse0": mse0, "lp0": lp0, "weight": weight}, f)
+                    f.flush()
+                    os.fsync(f.fileno())
+                os.replace(temporary, checkpoint)
+    return net.eval(), {"steps": steps, "blocks": blocks, "channels": channels, "resumed_from_step": resumed,
+                        "lpips_fixed_start": lp0, "lpips_weight": weight, "mse_fixed_start": mse0, "curve": curve,
+                        "seconds": round(elapsed + time.time() - began, 1),
                         "parameters": int(sum(p.numel() for p in net.parameters()))}
 
 

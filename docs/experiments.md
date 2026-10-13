@@ -5049,3 +5049,51 @@ invocation turns out to be needed.
   on cancelled and timed-out runs. Item 2 was therefore only partially
   completed; its remaining smaller-model work was not blocked by missing
   user authority. This retained-alternative update adds no training study.
+
+### 2026-10-13 — G6 item 2 continuation: narrower 1080p enhancer (user)
+- Target: mean and p95 enhancement latency <= 1000/native_fps on Ada,
+  while retaining >=80% of the current 1080p enhancer's LPIPS_V gain over
+  plain SVT-AV1 and still improving SVT-AV1 by >=10%. Report all five
+  quality metrics; the deadline is enhancement-only, not the full client.
+- Candidates: eight residual blocks as before (same receptive field),
+  channels 32, 24, 16 rather than 64. One axis, three settings. Latency
+  screen on P06 at CRF48, 32 native 1080p frames, actual 20-step fits,
+  FP16/channels-last batch-one inference. Select the widest width meeting
+  mean and p95 deadlines; near-boundary widths may need a repeat. These
+  short fits test execution and cost, not quality or paper conclusions.
+- Oracle: selected width fitted on the scored excerpt itself (48 frames,
+  CRF48, same masked MSE+LPIPS objective, 2,000 steps). Both windows. This
+  has privileged access to the targets, unlike the deployable footage fit.
+  It is an optimistic empirical capacity screen, not a certified global
+  optimum at a finite optimization budget. A failed screen cannot gate the
+  entire family: check the cheapest held-out-footage fit before concluding
+  that the oracle dominates it, and revise the bound if it does not.
+- Held-out pilot after an oracle pass: the same archived 480 native footage
+  frames used by G6's original enhancer, with the window and five-second
+  guard excluded and their hashes verified; coded by the same native
+  SVT-AV1 preset/CRF. Same architecture, loss, seed and 2,000 steps;
+  evaluated on the window, not its training footage. Begin at CRF48 on
+  48 frames of each pilot. If both pass, extend the rate grid to three
+  spaced CRFs (32,48,63) and confirm on complete 240-frame pilot windows.
+  Reuse finished fits/streams instead of re-fitting for scoring.
+- Hypothesis: the 64-channel model has redundant filters; 32 channels
+  retains the perceptual correction while meeting the deadline. Competing
+  explanation: narrowing removes texture capacity, or original fit settings
+  are unsuitable for the smaller model. Oracle versus footage separates
+  capacity from training/generalization. Distillation or a depth change is
+  a separately recorded next probe if the first width study needs it.
+- Budget, first round: latency screen <=600 s total; two oracle jobs
+  <=1,800 s each; two initial held-out jobs <=2,100 s each; subsequent
+  multi-rate/complete-window confirmation only after passing evidence,
+  <=1,800 s each, sized from measured runtimes. Expected 1–2 GPU-hours;
+  reserve up to 3 GPU-hours including staging and failures for this round,
+  review actual cost after every stage. This is a declared study budget,
+  not Claude's earlier estimate or a new user-imposed hard limit. No paid
+  APIs/compute, full 34-window run, or flicker training.
+- Execution: `g6_narrow.py`, existing pinned environment and native tools;
+  no new dependencies. Exclusive Ada pool gpu5/gpu6 for timing, contention
+  stop with one declared checkpoint resume. Fits save model, optimizer,
+  schedule and RNG states locally at each monitor interval. Smoke compares
+  split/resumed training with uninterrupted training. Recompute inference
+  timings after a resume; never carry contaminated timing into a result.
+  Every stage <=45 minutes and every finished point/model saved separately.
