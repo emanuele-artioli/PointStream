@@ -537,6 +537,16 @@ the same way (`footage --mask exact`; LPIPS_V −11% | −12% against G1's
 footage) and codes at 1080p in SVT-AV1's range, 540p below it (LPIPS_V
 against SVT-AV1 −97% | −33%; DISTS_V and KID_V still worse on P06_03).
 
+*Item 2, bounded speed pass (2026-10-13, [experiments](docs/experiments.md)):*
+`enhance --inference fp16-channels-last` gives about 2.3× faster 1080p
+inference with <0.08% LPIPS_V change on the completed 48-frame CRF32/40
+pilots: 45–46 ms/frame on Ada, 65–66 on A6000. The legacy default is
+preserved. 540p inference takes 13 ms on Ada but retains only 26% | 52%
+of the LPIPS gain when its correction is added to the 1080p decode, so
+it is not adopted. **Quality-preserving 60 fps remains open:** next a
+narrower/shallower 1080p model, oracle and held-out pilot first. No 34-window
+run or flicker work; 0.76 GPU-hours including stopped attempts.
+
 ### H. Foreground (user, 2026-10-08)
 
 The thesis: a pixel codec spends most of its bits on what moves, and people

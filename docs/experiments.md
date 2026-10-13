@@ -4932,3 +4932,84 @@ invocation turns out to be needed.
   A6000 precision pilot remains a separately labelled hardware measurement.
   Both one-CRF follow-ups have a 500-second ceiling, within the remaining
   initial hour after accounting for cancelled and timed-out allocations.
+
+- Jobs/provenance: code `0525f84` for precision, `3107fa6` for resolution;
+  all source patches empty (SHA256 `e3b0c442…b855`). Environment
+  `pointstream-20261009T214002Z.tar.gz`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`,
+  torch 2.10.0+cu128, cuDNN 9.10.2. Native dav1d paths, versions,
+  binary hashes and exact decode commands are in each result; no encoder
+  was invoked (streams from G6's pinned SVT-AV1 4.2.0 pilot are unchanged).
+  Source specifications and staged input hashes remain in each job directory.
+  - Precision: P06 `20261013T062703Z-e987301d` (gpu5, Ada), P26
+    `20261013T062704Z-0b0e2c14` (gpu3, A6000). Both smoke gates passed;
+    full stages timed out at 300 seconds. `full/crf32.json` and
+    `full/crf40.json` completed on both. Revalidated separately with
+    `g6_speed.point_checks`: 48 frames/config, native decoded-frame hashes,
+    every config, finite five-metric scores, positive timings, RGB closeness
+    and the LPIPS precision threshold; all passed. These are preserved
+    completed measurements, **not successful whole-grid jobs**. CRF48 has
+    incomplete per-config files and is excluded from the precision decision.
+  - Resolution: P06 `20261013T063853Z-a49fcb1d` (gpu5, Ada), P26
+    `20261013T063853Z-b6b16499` (gpu6, Ada). Both jobs complete; smoke and
+    full-result validation pass. Full `execution.json` records
+    `timing_contaminated: false` on both (129.9 and 116.6 seconds).
+  - Earlier attempts: `20261013T060714Z-5277cce9` and
+    `20261013T060857Z-5dd9a554` cancelled while pending: host PATH admission
+    could not see dav1d inside the packed environment. No allocation.
+    `20261013T061135Z-df736992` and `20261013T061135Z-e15671da` passed
+    smoke but were cancelled during the excessively costly whole-window
+    CPU replay; no finished full CRF, no full-stage evidence.
+- Precision outcome, CPU-RGB → CPU-RGB wall latency, warmed batch one,
+  range across completed CRF32/40; 48 frames/point:
+
+  | Window, GPU | FP32 mean | FP16 mean | FP16 channels-last mean / p95 | LPIPS_V change at equal rate |
+  |---|---|---|---|---|
+  | P06, Ada | 104.6–107.4 ms | 64.8 ms | 45.5–45.9 / 45.9–46.5 ms | +0.030% to +0.057% |
+  | P26, A6000 | 152.2–153.2 ms | 88.5–89.0 ms | 65.4–66.2 / 65.8–66.9 ms | −0.073% to −0.006% |
+
+  **Precision rule passes on the completed points:** roughly 2.3× faster,
+  same stream and shipped weights. CNN-only channels-last means are
+  40.3–40.7 ms on Ada and 57.2–57.8 ms on A6000. Native dav1d takes
+  2.9–3.6 and 5.3–5.5 ms/frame respectively. Neither is 60 frames/s.
+  DISTS changes within 0.084%, PSNR by at most −0.0016 dB, flicker within
+  0.037%, KID (×1000) by at most 0.027 absolute.
+  - RD comparisons use only the two completed points and G5's PCHIP /
+    achievable anchor envelope (so they are not dense-curve evidence).
+    FP16 channels-last against paired FP32, P06 | P26: LPIPS_V no
+    admissible overlap, slightly worse at both tested rates | −0.23%;
+    DISTS_V −0.13% | −0.13%; PSNR_V +0.08% | +0.10%; KID_V +0.71% |
+    −0.29%; flicker no admissible overlap, slightly worse at both tested
+    rates on both. Equal-rate deltas above show the small absolute size.
+- Resolution outcome, CRF48, first 48 frames, Ada on both; P06 | P26:
+
+  | Inference | Mean / p95 wall ms | LPIPS_V | Retained FP32 gain over SVT-AV1 |
+  |---|---|---|---|
+  | FP32 1080p | 103.5 / 103.9 \| 103.8 / 104.0 | 0.04984 \| 0.08148 | 100% \| 100% |
+  | 540p output upsampled | 12.5 / 12.9 \| 12.7 / 13.6 | 0.10875 \| 0.16527 | −66% \| 34% |
+  | 540p correction added to 1080p | 12.6 / 12.9 \| 13.1 / 14.8 | 0.07617 \| 0.14304 | 26% \| 52% |
+
+  SVT-AV1 LPIPS_V is 0.08537 | 0.20856. The correction variant still
+  improves it by 10.8% | 31.4% at equal rate, but **fails the 80% retention
+  rule**. Full-output upsampling is 27% worse than SVT-AV1 on P06.
+  Neither spatial variant is adopted. A single CRF cannot establish
+  BD-rate, and none of these numbers describes all 240 window frames.
+  The timed boundary excludes YUV→RGB preparation, final RGB→4:2:0 /
+  FFV1 export and compositing; adding dav1d to enhancement means is not
+  a complete client-latency measurement. The enhancement stage at 540p
+  meets 16.7 ms; full client real time has not been established.
+- Decision: expose `g6 enhance --inference fp16-channels-last` for the
+  quality-preserving speed improvement. `--inference legacy` remains
+  the default so previous pilot specifications reproduce their processing
+  path. The shared implementation is `src/codecs/enhancer.py`; production
+  uses the same autotuning and batch-one arithmetic, without kernel profiling.
+  Spatial modes remain experimental in `g6_speed`, outside G6's publish CLI.
+  **Item 2's 60 fps quality-preserving target remains open.** The cheapest
+  next justified study is a narrower/shallower 1080p model, with a latency
+  smoke, an excerpt-fit oracle and held-out footage pilot before adoption;
+  no new training, TensorRT environment, 34-window run or flicker work here.
+- Cost: six allocated jobs, summed supervisor start-to-end 2,746.1 s
+  (0.76 GPU-hours), including cancelled and timed-out attempts; two pending
+  requests used no GPU. No contaminated timing used. The remaining initial
+  hour does not cover a validated new architecture's oracle and held-out
+  pilot on both windows; stop this bounded pass rather than expand it.

@@ -103,25 +103,35 @@ def command_run(args: argparse.Namespace) -> int:
     return 0
 
 
-def validate(stage: Path) -> dict[str, bool]:
-    r = json.loads((stage / "g6-speed.json").read_text())
-    rows = r["points"]
-    configs = [c for p in rows for c in p["configs"]]
+def point_checks(row: dict[str, Any], frames: int, expected_configs: list[str]) -> dict[str, bool]:
+    """Validate one finished point, including points preserved by a stopped job."""
+    configs = row["configs"]
+
     def finite_score(score: dict[str, Any]) -> bool:
         values = [score["dataset"][m] for m in ("lpips_v", "dists_v", "psnr_v")]
         values += [score["flicker"]["flicker_v"], score["kid"]["kid_v"]]
         return all(v is not None and np.isfinite(v) for v in values)
 
+    return {"native_decode_hashes": bool(row["decoded_hashes_match"]),
+            "every_config": [c["config"] for c in configs] == expected_configs,
+            "finite_scores": bool(configs) and all(finite_score(c["score"]) for c in configs),
+            "timed_every_frame": all(len(c["timing"]["wall_ms_per_frame"]) == frames for c in configs),
+            "positive_timings": all(c["timing"]["cnn_ms_mean"] > 0 for c in configs),
+            "precision_lpips": bool(configs) and all(
+                c["score"]["dataset"]["lpips_v"] <= 1.01 * configs[0]["score"]["dataset"]["lpips_v"]
+                for c in configs if c["config"] in CONFIGS),
+            "precision_close": all(c["rgb_mae_vs_fp32"] < 1 for c in configs if c["config"] in CONFIGS)}
+
+
+def validate(stage: Path) -> dict[str, bool]:
+    r = json.loads((stage / "g6-speed.json").read_text())
+    rows = r["points"]
+    checked = [point_checks(p, r["frames"], r.get("configs_run", list(CONFIGS))) for p in rows]
+    names = ("native_decode_hashes", "every_config", "finite_scores", "timed_every_frame",
+             "positive_timings", "precision_lpips", "precision_close")
     return {"intended_gpu": tuple(r["gpu_capability"]) >= (8, 6),
             "every_crf": [p["crf"] for p in rows] == r["crfs"],
-            "native_decode_hashes": bool(rows) and all(p["decoded_hashes_match"] for p in rows),
-            "every_config": all([c["config"] for c in p["configs"]] == r.get("configs_run", list(CONFIGS)) for p in rows),
-            "finite_scores": all(finite_score(c["score"]) for c in configs),
-            "timed_every_frame": all(len(c["timing"]["wall_ms_per_frame"]) == r["frames"] for c in configs),
-            "positive_timings": all(c["timing"]["cnn_ms_mean"] > 0 for c in configs),
-            "precision_lpips": all(c["score"]["dataset"]["lpips_v"] <= 1.01 * p["configs"][0]["score"]["dataset"]["lpips_v"]
-                                   for p in rows for c in p["configs"] if c["config"] in CONFIGS),
-            "precision_close": all(c["rgb_mae_vs_fp32"] < 1 for c in configs if c["config"] in CONFIGS)}
+            **{name: bool(checked) and all(c[name] for c in checked) for name in names}}
 
 
 def main() -> int:

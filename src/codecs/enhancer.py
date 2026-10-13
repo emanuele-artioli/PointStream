@@ -18,8 +18,9 @@ def apply(net: Any, decoded: np.ndarray, config: str, *, warmup: int = 5, profil
     """
     import torch
 
-    if config not in (*CONFIGS, *SPATIAL_CONFIGS) or decoded.dtype != np.uint8 or decoded.ndim != 4 or decoded.shape[-1] != 3:
+    if config not in (*CONFIGS, *SPATIAL_CONFIGS) or decoded.dtype != np.uint8 or decoded.ndim != 4 or decoded.shape[-1] != 3 or not len(decoded):
         raise ValueError("expected a supported config and NHWC uint8 RGB frames")
+    torch.backends.cudnn.benchmark = True
     dtype = torch.float32 if config == "fp32" else torch.float16
     layout = torch.channels_last if "channels-last" in config else torch.contiguous_format
     net = net.eval().to(device="cuda", dtype=dtype, memory_format=layout)
@@ -77,7 +78,7 @@ def apply(net: Any, decoded: np.ndarray, config: str, *, warmup: int = 5, profil
             wall.append(1000 * (time.perf_counter() - began))
             gpu.append(start.elapsed_time(end))
     return out, {"config": config, "batch": 1, "warmup": warmup, "cuda_kernels": kernels,
-                 "dtype": str(dtype), "layout": str(layout),
+                 "dtype": str(dtype), "layout": str(layout), "cudnn_benchmark": True,
                  "wall_ms_mean": float(np.mean(wall)), "wall_ms_p95": float(np.percentile(wall, 95)),
                  "cnn_ms_mean": float(np.mean(gpu)), "cnn_ms_p95": float(np.percentile(gpu, 95)),
                  "wall_ms_per_frame": wall, "cnn_ms_per_frame": gpu,

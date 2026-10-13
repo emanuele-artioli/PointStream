@@ -519,6 +519,8 @@ and choose `gpu_models` from it.
 | NVRC (G5, HiNeRV-v2 xs at 960×540), stage 1 training | RTX 6000 Ada (8.9) | passes: CUDA, torch 2.10.0+cu128, fp16 autocast, Inductor compile (about 5 min); 40 frames/s at 2.26M parameters, 360 epochs on 240 frames in 2,320–2,360 s. On A6000 the same stage would not fit 45 min (not run) | `20261009T222809Z-f3873f4a` |
 | NVRC, stage 2, rANS bitstream write and decode | RTX A6000 (8.6) | passes: CUDA, eager fp16; bitstream fully consumed on decode; decoded model scores as encoded; 25.8 ms per frame including PNG writing | `20261009T235421Z-d60d9f80` |
 | G5 arm B (`g5_cond`, bf16 autocast) | RTX A6000 (8.6) and RTX 6000 Ada (8.9) | passes on both: CUDA, bf16 autocast, SparseAdam latents; rollout 1.3–3.0 ms per frame | A6000 `20261009T230416Z-0e6c0458`, Ada `20261009T230427Z-c83b3a52` |
+| G5d/G6 8-block, 64-channel enhancer | RTX 6000 Ada (8.9) | CUDA, torch 2.10.0+cu128 / cuDNN 9.10.2; strict shipped-weight load; FP16 NHWC tensor-core kernels (`sm80_xmma`, CUTLASS `s16816`) profiled; native dav1d frame hashes and paired precision smoke pass | `20261013T062703Z-e987301d` (smoke; full grid timed out, completed points retained) |
+| G5d/G6 8-block, 64-channel enhancer | RTX A6000 (8.6) | Same device / provider / FP16 tensor-core checks as Ada; full-resolution latency remains above 60 fps on both classes | `20261013T062704Z-0b0e2c14` (smoke; full grid timed out, completed points retained) |
 
 CPU components, checked in every job above: the VISOR reader (PyAV, time-rule
 frame mapping), SVT-AV1 4.2.0 encode with dav1d decode, and the HOT3D-Clips MANO
