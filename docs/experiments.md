@@ -5181,3 +5181,24 @@ invocation turns out to be needed.
   and an excerpt: P26 held-out and full-window three-rate confirmation
   remain before item 2 closes. Completion event acknowledged; monitor
   paused with all submitted jobs terminal.
+
+### 2026-10-13 — Item 2 economical closure (user)
+- User authorizes P26 held-out, practical G6 integration, and a cheap rate
+  check; defer conclusive full-window coverage to final experiments if costly.
+  P26 retains the existing CRF48/48-frame/2,000-step held-out rule and
+  <=2,100 s allocation. No architecture search or new dependency.
+- After P26 passes, add only CRF32 and CRF63 on the same 48-frame excerpts
+  of both pilots, using the original verified training footage and teacher
+  streams. Existing CRF48 models/results are reused. Three rates permit a
+  preliminary RD curve; complete-window/all-window claims stay deferred.
+  Measured P06 full stage took 175 s; four extra points expected about
+  12 GPU-minutes. Bound each two-point job to 900 s full, 300 s smoke,
+  1,500 s total, 30 s validator. Stop on a decided failure.
+- Integration smoke is bounded to 600 s, one rate and eight frames,
+  verifies actual small weights, decoded publication and architecture metadata.
+  Expected remaining total <0.5 GPU-hours; do not scale to multi-hour runs.
+- Timing diagnosis: existing Ada records show CNN times about 6.1 ms
+  for both windows; wall boundary differs by 1–2 ms. Neither causation by
+  content nor machine is established. Use within-job reference/candidate
+  comparisons now, defer controlled host/transfer profiling to final client
+  latency unless the cheap checks miss the deadline.
