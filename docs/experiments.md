@@ -5049,3 +5049,90 @@ invocation turns out to be needed.
   Scope: 4 pilot items; one generic footage of six recordings (five
   participants) and 1,152 frames; one schedule of 2,000 steps (cosine, its
   loss flat at the end); network size L only for G and K.
+
+### 2026-10-13 — H4a: grip pose on HOT3D (is a held object still in the hand's frame?)
+- Question ([PLAN H4](../PLAN.md#h4-handled-objects-rescoped-after-h1-user-2026-10-08),
+  item 1). H1 found that no 2D warp of one reference view carries a handled
+  object for more than 0.02 s (median), and that handled objects are 27–29%
+  of the foreground's SVT-AV1 bits. Grip pose proposes a 3D motion model
+  instead: while an object is held, its pose is the hand's pose (already in
+  the stream) times one fixed transform G, resent only when the grip
+  changes. This entry measures, on motion capture, whether that model holds
+  and how often G must be resent. Bits are not the question: any 6DoF
+  pose costs at most ~1 kbps however it is sent (6 values per frame), against
+  41.3 kbps of SVT-AV1 on handled objects at CRF 62 (H1). The question is
+  whether an object's motion can be *derived from the hand's*, so that the
+  encoder needs an object pose only at the few frames where G changes
+  rather than a 6DoF tracker on every frame (VISOR has no object models
+  and no object-pose labels).
+- Data: HOT3D-Clips `train_aria` (`Datasets/HOT3D`, 1,516 clips of 150
+  frames at 30 fps; Aria only, as H2), 12 clips per participant (all 9, so
+  108 clips), content-blind (lowest sha256 of
+  "pointstream-h4:hot3d:<clip>"). Per frame: `objects.json`
+  (`T_world_from_object` per object), `hands.json` (UmeTrack
+  `T_world_from_wrist` per hand, motion capture), `cameras.json` (the RGB
+  fisheye `214-1`, 1408²). Object geometry: the decimated meshes in
+  `object_models_eval` (their vertices; no texture is used). Code
+  `experiments/hot3d/h4a.py` (to be written after this entry).
+- Method.
+  1. Error of a predicted pose P̂ against the true pose P of an object at a
+     frame: the mean over the mesh's vertices of their distance in the
+     image `214-1` when projected with P̂ and with P (the toolkit's
+     fisheye camera; px), and the same distance in 3D (mm) beside it.
+  2. Predictors, each starting from a *refresh* (a frame at which the true
+     pose is sent, exactly; the oracle's simplification): *world* (the
+     object stays where it was in the world: P̂(t) = P(r)); *camera* (it
+     stays where it was in the camera, H1's copy in 3D); *grip-left* and
+     *grip-right* (P̂(t) = W(t) · G, G = W(r)⁻¹ · P(r), W the hand's
+     motion-capture wrist pose). A predictor fails at the first frame whose
+     error exceeds τ, or where its hand is missing; a refresh is sent there.
+  3. Coders, replayed over every object of every clip: *world only*,
+     *grip only* (the nearer hand at the refresh), and *hybrid* (at each
+     refresh the predictor that lasts longest; an oracle choice by
+     look-ahead, a 2-bit mode). A frame is *held* when it is not a refresh;
+     a reference's *life* is the time from one refresh to the next.
+  4. Scored frames: an object's *moving* frames, where its mean vertex
+     displacement per frame (central difference over ±2 frames) exceeds
+     0.5 mm, dilated by 5 frames. Objects at rest are carried by *world*
+     anyway; the moving frames are where the hand must explain the motion.
+     Lives are cut at the end of a moving segment and of the clip; cut lives
+     count at their observed length (conservative), and their share is
+     reported.
+  5. Reported beside: the noise floor (*world*'s error on objects that never
+     move, frame to frame), the grip's drift within a life (rotation and
+     translation of W(t)⁻¹ P(t) against G), how often G changes (refreshes
+     per second of moving time, per object), τ ∈ {1, 2, 4} px, and the rate
+     of refreshes (6 values at 16 bits plus the mode) against SVT-AV1 on
+     handled objects.
+- Decision rule (fixed before any run; τ = 2 px, means over clips of
+  per-clip values, pooled over each clip's moving frames). Grip pose is
+  worth building on when the *hybrid* coder, on moving frames, (a) holds
+  ≥ 70% of them and (b) has median reference life ≥ 0.5 s (H1's thresholds
+  for a rigid part), and (c) *grip* is what explains them: the hybrid's
+  median life is at least twice *world only*'s on the same frames. Rate
+  ((refreshes × 98 bits) per second) must be ≤ 10% of SVT-AV1's 41.3 kbps
+  on handled objects (H1's (c)); it is reported but not expected to bind.
+  Pass: grip pose is a viable motion model for held objects, and the next
+  step is an appearance oracle (the object's scanned model rendered at the
+  true pose on HOT3D, against the pixel coders at equal quality), since a
+  pose alone renders nothing. Fail: grip pose is dropped and H4 moves to
+  item 2 (a bank of reference views on VISOR). Unclear (passes at 4 px but
+  not 2 px, or (a)–(b) pass without (c)): reported, and the user decides.
+- Hypothesis: rigid objects in HOT3D are held in a stable grip. Within a
+  grasp G drifts by a few mm and a few degrees; refreshes come at grasp,
+  release and regrasp, about once per second of motion. The hybrid holds
+  ≥ 85% of moving frames with median life ≥ 1 s at 2 px, and *world only*
+  lives a few frames.
+- Competing explanations. (1) Objects move in the fingers, not with the
+  palm (turning a mug, pouring, in-hand rotation), so G drifts past 2 px
+  within a few frames; the drift measure separates a stable grip with
+  finger slip from no grip at all. (2) The hand's and the object's motion
+  capture each have their own noise, so G jitters even in a fixed grip; the
+  noise floor and τ = 4 px test whether 2 px is above it. (3) HOT3D's lab
+  tasks with rigid objects favour grip pose against VISOR's kitchens (food,
+  cloth, deformable packaging); a pass is an upper bound for VISOR, which
+  this entry does not test.
+- Budget: CPU only (`"device": "cpu"`, 16 threads); reading a clip's poses
+  means streaming its ~100 MB tar from NFS. Smoke: 2 clips, ≤ 600 s. No
+  pilot: nothing is fitted, and τ is swept in the same pass. Full: 108
+  clips, ≤ 45 min. Ceiling 2 CPU-hours.
