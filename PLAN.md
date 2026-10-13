@@ -765,6 +765,16 @@ by the rule; the user opened the path (2026-10-12). Order now:
    window (memorization) and paid for. At 1.2 MB it costs more than it
    saves within each pilot video (1.7–3.5 minutes), so network size, and
    sharing one network across videos, are its axes.
+   Component (2026-10-13, [outcome](docs/experiments.md#2026-10-12--h3d-component-per-video-per-person-and-generic-super-resolution-of-the-hand-pixels)):
+   **G stands: H3d's coder is DCVC-UF off the shelf at ¼ and ½ with a
+   generic super-resolution network** (594 k parameters, fitted on six other
+   participants' recordings, sent with the decoder): −22% rate at equal
+   LPIPS on the hands against the bar (CI −34% to −10%, 4 of 4 items),
+   DISTS agreeing, PSNR worse (+11% to +35%). Per video (NAS, billed) fails
+   at every size on these short videos; per person (the hybrid) is unclear:
+   better than G where the person looks as usual, but it recolours P02_02's
+   gloves toward skin. Fitting outside the window keeps about half of the
+   oracle's gain.
 3. Candidate after H3e (user, 2026-10-12): DCVC-UF conditioned on a
    proto-hand. The decoder also receives a render of the coded keypoints
    (a skeleton or MANO image), so its bitstream carries only what the

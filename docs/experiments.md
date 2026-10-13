@@ -4981,3 +4981,70 @@ invocation turns out to be needed.
   item and point (coding both footages at the point dominates: 2 × 1,152
   frames), each fitting V-L, V-M, V-S and K and applying G; each ≤ 45
   minutes, shared. About 10 GPU-hours; ceiling 14.
+- Runs. Footage (code `35b864f`; V-P03_10 `2726bd2` after its smoke's
+  two content-blind segments showed no hands and the old check failed it):
+  G `20261012T213113Z-6ab41492`; K `…213122Z-705f4eeb` (P01_107),
+  `…213132Z-4141a4f7` (P02_02), `…213147Z-e0d64447` (P03_10),
+  `…213239Z-30a4ff37` (P09_106); V `…213300Z-9b9b1944`,
+  `…213310Z-60e3c893`, `…223750Z-84cdb758`, `…213403Z-6fcf5062`. G's
+  networks: ¼ `…221222Z-e514f83b` (`35b864f`), ½ `…225257Z-99094ccb`
+  (`532ef12`). The first ½ job (`…221147Z-9760525e`) passed its smoke but
+  fitted QP 21 on a non-deterministic DCVC-UF decode of the footage (shared
+  gpu5); found by validating the full stage locally, discarded, and the
+  footage coder now stops on such a decode, as H3c's does. Scoring: 24 jobs,
+  one per item and point, P01_107, P02_02 and P09_106 at `5de4fd3` and
+  P03_10 at `0b4bad3` (its first smoke had no footage with hands to fit; the
+  smoke now takes the first segments with R); one P02_02 job was
+  resubmitted after a non-deterministic footage decode stopped it. Job ids
+  are in the report's `runs`. The fleet validates only each job's smoke;
+  every full stage above was validated locally with the same checks (24 of
+  24 scoring, 9 of 9 footage, 2 of 2 networks). Report (`h3d report
+  --component`, code `9e3af03`):
+  `pointstream-data/visor/h3d-2026-10-12/report-component/h3d-report.json`
+  (`467be69f…6e00`). About 9 GPU-hours, within the 14 allowed.
+- Outcome. BD-rate on LPIPS_R against the bar (V billed its network over
+  the video; "free" is V without its bits):
+
+  | arm | P01_107 | P02_02 | P03_10 | P09_106 | mean (95% CI) | items < 0 | verdict |
+  |---|---|---|---|---|---|---|---|
+  | **G, generic (with the decoder)** | −28% | −8% | −40% | −12% | **−22% (−34 to −10)** | 4 | **stands** |
+  | K, per person (sent before) | −43% | +88% | −55% | −1% | −3% (−49 to +56) | 3 | unclear |
+  | V-S, per video, billed | +99% | +113% | +177% | +237% | +156% | 0 | fails |
+  | V-M, billed | +387% | +384% | +763% | +876% | +603% | 0 | fails |
+  | V-L, billed | +1146% | +1201% | +2283% | +2925% | +1889% | 0 | fails |
+  | V-L free | −60% | −11% | −63% | −16% | −37% (−61 to −13) | 4 | — |
+  | V-S free | −38% | −2% | −52% | −10% | −26% (−45 to −6) | 4 | — |
+  | no network (check) | +3% | +2% | −1% | +19% | +6% | 1 | — |
+
+  G beside: DISTS_R −53%, −25%, −62%, −21%; PSNR_R +35%, +28%, +11%, +13%;
+  flicker × 1.00–1.06. **By the rule, H3d's coder is DCVC-UF off the shelf
+  at ¼ and ½ resolution with G's network** (594 k parameters, fitted on six
+  other participants' recordings, delivered with the decoder): about a fifth
+  less rate than the best of SVT-AV1 and DCVC-UF for the same LPIPS on the
+  hands, on every pilot item. K does not stand, so the hybrid is not adopted.
+  V fails at every size: on 1.7–3.5-minute videos even 86 KB costs more than
+  it saves.
+- Visual check (`p02_component_f060.png`, `…f120.png`, `p02_G_zoom.png`
+  beside the report; P02_02, QP 21 at ¼, rerun with crops as
+  `20261013T020929Z-72c81eac`, code `9e3af03`, its scores equal to the
+  first run's for the base and G and within 5 × 10⁻⁴ for V; K's 0.234
+  against 0.248, its fit not bit-identical across GPUs). K recolours the
+  yellow rubber gloves toward skin: fitted on P02's other recordings,
+  mostly bare hands, it learned a skin prior, which explains its +88% and
+  PSNR +177% on P02_02. G sharpens the glove's edges and folds a little and
+  shifts its yellow slightly toward brown, without texture the source lacks;
+  that shift is where its PSNR goes while LPIPS and DISTS improve.
+- Reading. Hypotheses: V failing once billed, right; K standing, wrong
+  (it fails on the one item whose hands look unlike the person's other
+  footage); G standing, right (−22% against −25% predicted). Two lessons
+  for the paper. Most of the oracle's −77% came from fitting the scored
+  frames: a network fitted on the same video outside the window keeps −37%
+  free of bits (memorization explains about half), and a generic one −22%.
+  A per-person network is specific to appearance: better than G where the
+  person looks as usual (−43%, −55%), much worse when they wear gloves; a
+  person network would need to know what it has not seen (falling back to
+  G), which is a design for later, not adopted now. G costs PSNR (+11% to
+  +35%): it is a perceptual gain, as G5d's enhancer on the background.
+  Scope: 4 pilot items; one generic footage of six recordings and 1,152
+  frames; 2,000 steps (G's training loss was still falling); network size L
+  only for G and K.
