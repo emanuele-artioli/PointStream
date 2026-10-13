@@ -939,12 +939,36 @@ before its run:
   SVT-AV1's bits (H1's bit accounting), how often the camera is still, a
   body-pose estimator's fit (audit first, e.g. ultralytics' pose models)
   and its parameter rate against the bits on those pixels. Decides whether
-  players pass H1's screen and what the ball costs.
+  players pass H1's screen and what the ball costs. **Done 2026-10-13**
+  ([experiments](docs/experiments.md#2026-10-13--k4-tennis-audit-h1s-method-on-broadcast-tennis)):
+  players do not pass, and K6 is not run as gated. Players are 0.6–4% of
+  the pixels and 86–96% of the foreground's SVT-AV1 bits (pass (a)), but
+  YOLO11x-pose fits 0.875 of broadcast player-frames (rule 0.90; TrackNet
+  0.55) and its keypoints cost 22% of SVT-AV1's player bits at CRF 62
+  (rule 10%; 6% at CRF 48). The fit fails on the far player only: players
+  ≥ 15% of the frame height are fitted on 97–100% of frames, under 10% on
+  0–50%. Next for players, before K6: a top-down pose estimate on each SAM
+  player crop, enlarged, to re-read (b) and the K6 gate. The ball is
+  0.007% of the pixels and 0.29 kbps of SVT-AV1 at CRF 62 (its trajectory
+  0.23 kbps). The camera is still on 35% of a whole broadcast match and
+  41% of the broadcast windows (TrackNet 97%): broadcast cameras follow
+  play, so a per-shot background needs registration (G).
 - K5. *Ball oracle.* The true ball drawn from its coded position over
   SVT-AV1 and DCVC-UF decodes: ball-region quality and a ball detector's
   recall on the decoded frames, against the pixel coders at equal rate and
-  equal quality. Decides the ball mode.
-- K6. *Player oracle* (after K4): H3b for bodies, perfect appearance at
+  equal quality. Decides the ball mode. **Done 2026-10-13**
+  ([experiments](docs/experiments.md#2026-10-13--k5-ball-oracle-the-true-ball-at-its-coded-position)):
+  **a ball mode is built.** On 8 of 8 TrackNet windows the oracle beats
+  the pooled envelope of both coders on ball-region PSNR (median BD-rate
+  −57% drawn over DCVC-UF, −38% over SVT-AV1) for 0.23 kbps; the coders
+  erase a fast ball at low rate (detector recall 0–8% at DCVC-UF's lowest
+  points against 46% on the source). The off-the-shelf detector is no
+  valid judge (46% recall on the source, rule 50%). Next: the ball mode's
+  own oracle with a rendered ball, a streak along the coded velocity
+  (fast balls are 20–40 px streaks, which K5's 4 px disk does not draw),
+  billed for what it sends, then the component.
+- K6. *Player oracle* (after K4; gated off by K4 until the far player is
+  fitted, see K4): H3b for bodies, perfect appearance at
   the coded body pose with what the pose cannot describe charged; whether
   the outline problem shrinks at broadcast scale. A per-player appearance
   model is amortized over a match (hours), the condition H3d found
