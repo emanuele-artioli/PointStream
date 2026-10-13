@@ -5230,7 +5230,14 @@ invocation turns out to be needed.
   3. *bank-4*: the last 4 views used, either way;
   4. *bank*: every view sent so far, either way (the oracle).
   At each frame the coder takes the view and way with the highest PSNR
-  among those that predict t; if none does, t becomes a new view. Per
+  among those that predict t; if none does, t becomes a new view. When a
+  coder has more than 4 candidates (chained views plus direct tries), they
+  are first screened on every 4th mask pixel in each direction and only
+  the 4 best get the full test (added with the code, before any run: an
+  unlimited bank can hold a hundred live chains; *single* always gets the
+  full test, as H1). Environment and inputs are H1's
+  (`pointstream-20261006T113321Z`), so *single* is checked against H1's
+  recorded chains per track (within 2% of frames on ≥ 95% of tracks). Per
   track: frames *held* (predicted) and the new views, with the interval
   between consecutive new views (s). Other objects are run and reported
   beside; the decision is on handled objects.
