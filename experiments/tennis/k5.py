@@ -51,8 +51,11 @@ DET_IMGSZ = 1280
 DET_CONF = 0.1
 SPORTS_BALL = 32
 REVIEW_CROP = 48
-#: The fleet's GPU claim (a UUID), read before ultralytics can rewrite it.
-CLAIMED_DEVICES = os.environ.get("CUDA_VISIBLE_DEVICES")
+#: The environment as the fleet started the stage (its GPU claim a UUID), before anything this process imports can
+#: change it: ultralytics rewrites CUDA_VISIBLE_DEVICES when it selects a device. DCVC-UF's worker gets this one.
+STAGE_ENV = dict(os.environ)
+#: A DCVC-UF decode below this frame PSNR is not a picture of the source (the K5 smoke, 2026-10-13: 8-14 dB).
+SANE_FRAME_PSNR = 20.0
 
 
 def safe(window_id: str) -> str:
@@ -94,9 +97,7 @@ def code_dcvc(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str,
     reports = {}
     for action in ("encode", "decode"):
         command, env, cwd = dcvc_command(Path(sys.prefix), action, work / "plan.json", work / f"{action}.json")
-        # ultralytics rewrites CUDA_VISIBLE_DEVICES to a bare index when it selects a device; the worker needs the claim.
-        claimed = {"CUDA_VISIBLE_DEVICES": CLAIMED_DEVICES} if CLAIMED_DEVICES is not None else {}
-        done = subprocess.run(command, env={**os.environ, **claimed, **env}, cwd=cwd, capture_output=True, text=True, timeout=3600)
+        done = subprocess.run(command, env={**STAGE_ENV, **env}, cwd=cwd, capture_output=True, text=True, timeout=3600)
         if done.returncode:
             raise RuntimeError(f"DCVC-UF {action} failed ({done.returncode}):\n{done.stderr[-4000:]}")
         reports[action] = json.loads((work / f"{action}.json").read_text())
@@ -228,26 +229,36 @@ def review_strip(source: np.ndarray, versions: dict[str, np.ndarray], row: tuple
 # ----------------------------------------------------------------- per window
 
 
-def process_window(args: argparse.Namespace, window: dict[str, Any], sources: dict[str, str], detectors: Detectors,
-                   trajectory: dict[str, Any], pool: ThreadPoolExecutor, cpu_sets: list[list[int]], scratch: Path,
-                   publish: Path) -> dict[str, Any]:
+def code_window(args: argparse.Namespace, window: dict[str, Any], sources: dict[str, str], pool: ThreadPoolExecutor,
+                cpu_sets: list[list[int]], scratch: Path) -> dict[str, Any]:
+    """Phase 1, before any detector is loaded: the window converted, DCVC-UF at every QP on the GPU (as H3c ran its
+    worker, from a process without ultralytics) while SVT-AV1 codes every CRF on the CPU. Decodes stay on disk."""
     began = time.time()
-    width, height = window["size"]
     frames = min(int(args.frames), int(window["frames"]))
-    rows = tw.labels(window, frames)
     work = scratch / "work" / safe(window["id"])
     work.mkdir(parents=True, exist_ok=True)
     yuv = work / "source.yuv"
     converted = tw.convert(args.ffmpeg, window, Path(sources[window["source"]["staged"]]), yuv, frames)
     svt: list[Future[dict[str, Any]]] = [pool.submit(code_svt, args, yuv, work / f"svt-{crf}", window, frames, crf, cpu_sets[i % len(cpu_sets)])
                                          for i, crf in enumerate(CRFS)]
-    source = tw.rgb_frames(yuv, width, height, frames, work / "source.npy")
+    points = [code_dcvc(args, yuv, work / f"dcvc-{qp}", window, frames, qp) for qp in QPS]
+    points += [f.result() for f in svt]
+    return {"window": window, "frames": frames, "work": work, "yuv": yuv, "convert": converted, "points": points,
+            "coding_seconds": round(time.time() - began, 2)}
+
+
+def score_window(coded: dict[str, Any], detectors: Detectors, trajectory: dict[str, Any], publish: Path) -> dict[str, Any]:
+    """Phase 2: every decode and its oracle composite scored, the review strip drawn, the decodes removed."""
+    began = time.time()
+    window, frames, work = coded["window"], coded["frames"], coded["work"]
+    width, height = window["size"]
+    rows = tw.labels(window, frames)
+    source = tw.rgb_frames(coded["yuv"], width, height, frames, work / "source.npy")
     det_source = {n: recall(detectors.centres(n, source), rows) for n in detectors.models}
     points = []
     low: dict[str, Any] = {}
     at = fastest(rows)
-
-    def score(rec: dict[str, Any]) -> None:
+    for rec in coded["points"]:
         decoded = tw.rgb_frames(Path(rec["decoded"]), width, height, frames, work / "decoded.npy")
         comp = oracle(decoded, source, rows, work / "oracle.npy")
         rec["decode"] = {**quality(decoded, source, rows), "detectors": {n: recall(detectors.centres(n, decoded), rows) for n in detectors.models}}
@@ -260,12 +271,6 @@ def process_window(args: argparse.Namespace, window: dict[str, Any], sources: di
         del decoded, comp
         Path(rec.pop("decoded")).unlink()
         points.append(rec)
-
-    for qp in QPS:
-        rec = code_dcvc(args, yuv, work / f"dcvc-{qp}", window, frames, qp)
-        score(rec)
-    for f in svt:
-        score(f.result())
     versions = {}
     for codec, info in sorted(low.items()):
         versions[f"{info['label']} decode"] = info["decode"]
@@ -274,10 +279,12 @@ def process_window(args: argparse.Namespace, window: dict[str, Any], sources: di
         if at is not None else None
     import torch
 
-    row = {"id": window["id"], "frames": frames, "fps": window["fps"], "size": [width, height], "convert": converted,
+    row = {"id": window["id"], "frames": frames, "fps": window["fps"], "size": [width, height], "convert": coded["convert"],
            "source_detectors": det_source, "points": sorted(points, key=lambda p: (p["codec"], p["kbps"])),
-           "trajectory": trajectory, "review": review, "seconds": round(time.time() - began, 2),
+           "trajectory": trajectory, "review": review, "coding_seconds": coded["coding_seconds"],
+           "seconds": round(coded["coding_seconds"] + time.time() - began, 2),
            "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 2)}
+    del source
     shutil.rmtree(work, ignore_errors=True)
     return row
 
@@ -306,7 +313,6 @@ def command_run(args: argparse.Namespace) -> int:
     todo = [w for w in wanted if safe(w) not in restored]
     import torch
 
-    detectors = Detectors([(n, p) for n, p in args.detector])
     threads = int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 16)
     cpus = sorted(os.sched_getaffinity(0))[:threads]  # type: ignore[attr-defined,unused-ignore]
     per = max(1, len(cpus) // len(CRFS))
@@ -314,24 +320,27 @@ def command_run(args: argparse.Namespace) -> int:
     done = len(wanted) - len(todo)
     progress(done)
     with ThreadPoolExecutor(max_workers=len(CRFS)) as pool:
-        for window_id in todo:
-            torch.cuda.reset_peak_memory_stats()
-            row = process_window(args, by_id[window_id], sources, detectors, trajectory, pool, cpu_sets, scratch, publish)
-            body = json.dumps(row, sort_keys=True, default=str).encode()
-            (publish / f"{safe(window_id)}.json").write_bytes(body)
-            if checkpoints:
-                from experiments.jobs.monitor import save_checkpoint
+        coded = [code_window(args, by_id[w], sources, pool, cpu_sets, scratch) for w in todo]
+    detectors = Detectors([(n, p) for n, p in args.detector])
+    for c in coded:
+        window_id = c["window"]["id"]
+        torch.cuda.reset_peak_memory_stats()
+        row = score_window(c, detectors, trajectory, publish)
+        body = json.dumps(row, sort_keys=True, default=str).encode()
+        (publish / f"{safe(window_id)}.json").write_bytes(body)
+        if checkpoints:
+            from experiments.jobs.monitor import save_checkpoint
 
-                buffer = scratch / f"{safe(window_id)}.tar"
-                with tarfile.open(buffer, "w") as tar:
-                    tar.add(publish / f"{safe(window_id)}.json", arcname=f"{safe(window_id)}.json")
-                    if (publish / safe(window_id)).is_dir():
-                        tar.add(publish / safe(window_id), arcname=safe(window_id))
-                save_checkpoint(f"window--{safe(window_id)}.tar", buffer.read_bytes())
-                buffer.unlink()
-            done += 1
-            progress(done)
-            print(f"{window_id}: {row['seconds']} s", flush=True)
+            buffer = scratch / f"{safe(window_id)}.tar"
+            with tarfile.open(buffer, "w") as tar:
+                tar.add(publish / f"{safe(window_id)}.json", arcname=f"{safe(window_id)}.json")
+                if (publish / safe(window_id)).is_dir():
+                    tar.add(publish / safe(window_id), arcname=safe(window_id))
+            save_checkpoint(f"window--{safe(window_id)}.tar", buffer.read_bytes())
+            buffer.unlink()
+        done += 1
+        progress(done)
+        print(f"{window_id}: {row['seconds']} s", flush=True)
     from src.codecs import svtav1
 
     write_json(stage_dir() / "k5.json", {
@@ -373,6 +382,7 @@ def validate_rows(rows: list[dict[str, Any]], record: dict[str, Any]) -> dict[st
         "every_point_coded": all(sorted((p["codec"], p["param"]) for p in r["points"])
                                  == sorted([("dcvc-uf-htl", q) for q in QPS] + [("svt-av1", c) for c in CRFS]) for r in rows),
         "dcvc_decodes_deterministic": all(p["deterministic"] and p["decoder_matches_encoder_intra"] for p in dcvc),
+        "dcvc_decodes_are_pictures": all(p["decode"]["frame_psnr"] >= SANE_FRAME_PSNR for p in dcvc),
         "detectors_on_cuda": all(v.startswith("cuda") for v in record["detectors"]["on_cuda"].values()),
         "oracle_not_below_decode_on_ball": all((p["oracle"]["ball_psnr"] or 0) >= (p["decode"]["ball_psnr"] or 0) - 1e-6 for r in rows for p in r["points"]),
         "oracle_adds_the_trajectory": all(abs(p["oracle"]["kbps"] - p["kbps"] - record["trajectory"]["kbps"]) < 1e-9 for r in rows for p in r["points"]),
