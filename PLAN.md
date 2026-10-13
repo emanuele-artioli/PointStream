@@ -861,6 +861,19 @@ PSNR, until the real side appears and must be corrected.
 **Done when** handled objects have a representation chosen by numbers, or the
 session shows they should stay pixels.
 
+H4c (agreed, user 2026-10-13): handled objects as pixels, H3d's recipe.
+DCVC-UF off the shelf codes any pixels; only G is domain-trained (on hand
+crops). Open question (user): hands are alike, objects are not, so one
+enhancer for both may serve neither. An enhancer restores local texture
+from a decoded image rather than generating objects, and G5d's enhancer
+already covers whole kitchens, so variety may cost less than for a
+generator; the pilot measures it. Arms, each scored on hand and on
+handled-object pixels separately against the pixel envelope at equal
+quality: G as it is; G refitted on object crops; G refitted on hands and
+objects (one network, same size). Data as H3d's component (other
+participants' recordings, SAM 3.1 masks). Fallback if all fail:
+generative completion of unseen sides.
+
 #### H5. First working PointStream
 
 G's background and H's foreground in one bitstream with every byte counted:
