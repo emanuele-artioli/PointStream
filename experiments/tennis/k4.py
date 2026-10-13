@@ -745,6 +745,11 @@ def command_report(args: argparse.Namespace) -> int:
     ids = [r["id"] for r in rows]
     if len(ids) != len(set(ids)):
         raise SystemExit("a window appears twice")
+    excluded = dict(e.split("=", 1) for e in args.exclude)
+    unknown = sorted(set(excluded) - set(ids))
+    if unknown:
+        raise SystemExit(f"excluded windows not published: {unknown}")
+    rows = [r for r in rows if r["id"] not in excluded]
     pilot = [r for r in rows if r["id"] in set(args.pilot_windows.split(","))] if args.pilot_windows else rows
     fit = {m: float(np.mean([r["pose"][m]["fitted_share"] or 0 for r in pilot])) for m in rows[0]["pose"]}
     inside = {m: float(np.mean([r["pose"][m]["inside_median"] or 0 for r in pilot])) for m in rows[0]["pose"]}
@@ -757,7 +762,7 @@ def command_report(args: argparse.Namespace) -> int:
     camera = json.loads(Path(args.camera).read_text()) if args.camera else None
     k6 = decisions.get(DECISION["k6_dataset"], {}).get("k6_gate")
     out = {"decision_rule": DECISION, "published": {p: file_sha256(Path(p)) for p in args.published},
-           "windows": sorted(ids), "model": model, "model_choice": {"fitted_share": fit, "inside_median": inside},
+           "windows": sorted(r["id"] for r in rows), "excluded": excluded, "model": model, "model_choice": {"fitted_share": fit, "inside_median": inside},
            "summaries": summaries, "decisions": decisions, "ball_trajectory": trajectory,
            "camera_match": camera["summary"] if camera else None, "k6_runs": k6}
     out_dir = Path(args.out)
@@ -791,6 +796,8 @@ def main(argv: list[str] | None = None) -> int:
     rep.add_argument("--published", action="append", required=True)
     rep.add_argument("--camera")
     rep.add_argument("--pilot-windows", default="")
+    rep.add_argument("--exclude", action="append", default=[], metavar="ID=REASON",
+                     help="a published window left out of the summaries, with the reason recorded")
     rep.add_argument("--out", required=True)
     args = parser.parse_args(argv)
     return {"run": command_run, "camera": command_camera, "validate": command_validate, "report": command_report}[args.command](args)
