@@ -47,7 +47,7 @@ def test_g6_inference_option_preserves_legacy_default(monkeypatch):
     selected = []
 
     def capture(args):
-        selected.append((args.inference, g6.enhance_method(args.inference)))
+        selected.append((args.inference, g6.enhance_method(args.inference, args.enhancer_channels)))
         return 0
 
     monkeypatch.setattr(g6, "command_enhance", capture)
@@ -58,5 +58,8 @@ def test_g6_inference_option_preserves_legacy_default(monkeypatch):
     assert g6.main(argv) == 0
     assert g6.main([*argv, "--inference", "fp16-channels-last"]) == 0
     assert g6.main([*argv, "--inference", "fp16-channels-last-540-residual"]) == 0
+    assert g6.main([*argv, "--inference", "fp16-channels-last", "--enhancer-channels", "16"]) == 0
     assert selected == [("legacy", "enh-1080"), ("fp16-channels-last", "enh-1080"),
-                        ("fp16-channels-last-540-residual", "enh-correction-540")]
+                        ("fp16-channels-last-540-residual", "enh-correction-540"),
+                        ("fp16-channels-last", "enh-1080-b8-c16")]
+    assert g6.enhance_method("fp16-channels-last-540-residual", 16) == "enh-correction-540-b8-c16"

@@ -660,9 +660,10 @@ def command_format(args: argparse.Namespace) -> int:
     return 0
 
 
-def enhance_method(inference: str) -> str:
+def enhance_method(inference: str, channels: int = 64) -> str:
     """Keep the fast correction's publication and checkpoint keys distinct."""
-    return "enh-correction-540" if inference == "fp16-channels-last-540-residual" else "enh-1080"
+    base = "enh-correction-540" if inference == "fp16-channels-last-540-residual" else "enh-1080"
+    return base if channels == 64 else f"{base}-b8-c{channels}"
 
 
 def command_enhance(args: argparse.Namespace) -> int:
@@ -696,10 +697,12 @@ def command_enhance(args: argparse.Namespace) -> int:
     f_target = g5.yuv420_to_rgb(f_yuv)  # the fill: on V the source, through 4:2:0
     del f_yuv
     checkpoints, points_dir, restored, roots = point_dirs(args)
-    enhancers = (checkpoints or work) / "enhancers"
-    enhancers.mkdir(parents=True, exist_ok=True)
     inference = getattr(args, "inference", "legacy")
-    method = enhance_method(inference)
+    channels = getattr(args, "enhancer_channels", 64)
+    method = enhance_method(inference, channels)
+    weights_directory = "enhancers" if channels == 64 else f"enhancers/{method}"
+    enhancers = (checkpoints or work) / weights_directory
+    enhancers.mkdir(parents=True, exist_ok=True)
     plain_points, enh_points = [], []
     for done, crf in enumerate(crfs, 1):
         keys = (f"svt-1080-{crf}", f"{method}-{crf}")
@@ -721,7 +724,10 @@ def command_enhance(args: argparse.Namespace) -> int:
         plain_rgb = g5.yuv420_to_rgb(yuv)
         plain = {"value": crf, **rec, **keep_point(points_dir, keys[0], yuv, w["fps"], stream),
                  "score": g5c.full_score(clip, plain_rgb, w["nets"], w["flows"])}
-        net, fit_record = g5d.fit(f_decoded, f_target, f_keep, "lpips", args.steps, w["nets"].lpips, "cuda")
+        net, fit_record = g5d.fit(f_decoded, f_target, f_keep, "lpips", args.steps, w["nets"].lpips, "cuda",
+                                blocks=8, channels=channels,
+                                checkpoint=(checkpoints / "fits" / f"{method}-{crf}.pt")
+                                if checkpoints is not None and channels != 64 else None)
         del f_decoded
         inference_record: dict[str, Any] = {"config": inference, "batch": 4}
         if inference == "legacy":
@@ -732,12 +738,13 @@ def command_enhance(args: argparse.Namespace) -> int:
         else:
             from src.codecs.enhancer import apply as apply_enhancer
 
-            enhanced, inference_record = apply_enhancer(net, plain_rgb, inference, profile_kernels=False)
+            enhanced, inference_record = apply_enhancer(net, plain_rgb, inference, profile_kernels=channels != 64)
             apply_ms = inference_record["wall_ms_mean"]
         weights = enhancers / f"crf{crf}.pt"
         torch.save({k: v.half() for k, v in net.state_dict().items()}, weights)
         enh_yuv = g5.rgb_to_yuv420(enhanced)
-        enhancer = {"weights": f"enhancers/crf{crf}.pt", "weights_sha256": file_sha256(weights),
+        enhancer = {"weights": f"{weights_directory}/crf{crf}.pt", "weights_sha256": file_sha256(weights),
+                    "blocks": 8, "channels": channels,
                     "weights_bytes": weights.stat().st_size, "parameters": fit_record["parameters"],
                     "apply_ms_per_frame": apply_ms, "inference": inference_record, "fit": fit_record, "fit_frames": len(ids),
                     "fit_kbps": 8 * f_rec["payload_bytes"] / (len(ids) / float(clip.fps)) / 1000,
@@ -754,15 +761,16 @@ def command_enhance(args: argparse.Namespace) -> int:
         progress(done)
     rows = [{"method": "svt-1080", "codec": "svt", "coded_size": list(FULL), "points": plain_points},
             {"method": method, "codec": "enh", "coded_size": list(FULL), "points": enh_points}]
-    extra = {"enhancer": {**g5d.TRAIN, "steps": args.steps, "loss": "lpips", "fit": "own video, native rate",
+    extra = {"enhancer": {**g5d.TRAIN, "blocks": 8, "channels": channels,
+                          "steps": args.steps, "loss": "lpips", "fit": "own video, native rate",
                           "footage": {k: meta[k] for k in ("parts", "window", "guard_s", "yuv420_sha256", "frames")}}}
-    check = publish_window(args, w, rows, [enhancers.parent, *roots], extra)
+    check = publish_window(args, w, rows, [checkpoints or work, *roots], extra)
     if args.publish:  # the enhancers ship with the window's points (restored ones from the salvaged checkpoint)
-        target = scratch / "publish" / "enhancers"
+        target = scratch / "publish" / weights_directory
         target.mkdir(parents=True, exist_ok=True)
         for crf in crfs:
-            found = next((r / "enhancers" / f"crf{crf}.pt" for r in [enhancers.parent, *roots]
-                          if (r / "enhancers" / f"crf{crf}.pt").is_file()), None)
+            found = next((r / weights_directory / f"crf{crf}.pt" for r in [checkpoints or work, *roots]
+                          if (r / weights_directory / f"crf{crf}.pt").is_file()), None)
             if found is not None:
                 shutil.copyfile(found, target / f"crf{crf}.pt")
         check["enhancers"] = all((scratch / "publish" / p["enhancer"]["weights"]).is_file()
@@ -830,6 +838,16 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         checks["published"] = bool(result["publish_check"].get("complete"))
     if result["kind"] == "enhance":
         checks["enhancer_changes_frames"] = all(p["enhancer"]["changed_share"] > 0.01 for p in rows[1]["points"])
+        checks["enhancer_architecture"] = all(
+            p["enhancer"].get("blocks", 8) == result["enhancer"]["blocks"]
+            and p["enhancer"].get("channels", 64) == result["enhancer"]["channels"]
+            and p["enhancer"]["fit"].get("channels", 64) == result["enhancer"]["channels"]
+            for p in rows[1]["points"])
+        if result["enhancer"]["channels"] != 64:
+            checks["small_enhancer_on_cuda"] = all(
+                p["enhancer"]["inference"]["config"] == "legacy"
+                or bool(p["enhancer"]["inference"].get("cuda_kernels"))
+                for p in rows[1]["points"])
     return checks
 
 
@@ -867,6 +885,8 @@ def main(argv: list[str] | None = None) -> int:
                     help="legacy preserves pilot replay; fp16-channels-last uses batch one; "
                          "fp16-channels-last-540-residual retains the fast correction candidate for later evaluation")
     en.add_argument("--footage", required=True, help="the window's extracted native footage archive")
+    en.add_argument("--enhancer-channels", type=int, choices=(16, 24, 32, 64), default=64,
+                    help="eight-block enhancer width; 16 is the bounded speed-pilot candidate")
     en.add_argument("--crfs", default=",".join(map(str, g5.CRFS)))
     en.add_argument("--steps", type=int, required=True)
     en.set_defaults(func=command_enhance)

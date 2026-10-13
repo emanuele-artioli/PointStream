@@ -5202,3 +5202,14 @@ invocation turns out to be needed.
   content nor machine is established. Use within-job reference/candidate
   comparisons now, defer controlled host/transfer profiling to final client
   latency unless the cheap checks miss the deadline.
+- G6 integration uses the existing pinned model environment and native
+  tools; no dependencies added. Select with `--enhancer-channels 16
+  --inference fp16-channels-last`. Defaults remain eight blocks/64 channels.
+  Distinct method and weight/checkpoint paths prevent mixing architectures;
+  model metadata records blocks/channels and validators check consistency.
+  Production smoke profiles CUDA kernels on the small model. It may run
+  shared on A6000/Ada for interface correctness only; timing is not cited.
+  Eight frames, 48 training frames, 20 steps at CRF48, smoke/full each
+  <=600 s, <=1,230 s allocation, substantive published decode/hash check.
+- P26 held-out request `20261013T123946Z-44a8ad16`, code `3320633`,
+  pending while all eligible Ada devices are busy; 30-minute monitor rearmed.
