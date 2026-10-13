@@ -4858,3 +4858,38 @@ invocation turns out to be needed.
   hypothesis (60–80%) held on the mean. What the rule leaves open is
   whether a real generator keeps enough of that margin: its own pose error,
   the forearm and the occlusions by held objects are not charged here.
+
+### 2026-10-13 — G6 item 2: enhancer inference speed
+- Question: can the shipped 8-block, 64-channel venue enhancer run at the
+  windows' native rate without losing its perceptual gain? The pilot's
+  approximately 160 ms/frame was on a shared GPU and is not speed evidence.
+- First pilot: replay the existing published SVT-AV1 streams and FP16
+  weights on both G6 windows, CRF 32, 40, 48 (three available points from
+  each pilot archive), without fitting or re-encoding. Compare FP32, FP16
+  contiguous, and FP16 channels-last at batch one. cuDNN autotuning with
+  five warmup frames; CUDA-event CNN time and synchronized CPU-RGB to
+  CPU-RGB wall mean/p95, including conversions, transfers and rounding.
+  Native dav1d decode (8 threads) timed separately; verify every decoded
+  frame against its published hash. Score all 240 frames on exact V after
+  the same RGB → 4:2:0 → RGB conversion as G6, with all five G6 metrics.
+  Saved FP16 weights loaded into FP32 are the paired precision reference;
+  the original pilot scored unsaved FP32 weights, so it is not an exact
+  reproduction of that output. No new model is gated: this is an execution
+  optimization of the existing oracle-tested component.
+- Decision rule, before measurement: adopt a configuration if LPIPS_V
+  increases by at most 1% relative to the paired FP32 reference at every
+  tested point on both windows. Report secondary metric changes. Target:
+  mean and p95 CPU-RGB enhancement latency <= 1000/native_fps, with the
+  stricter total dav1d + enhancement mean also reported; do not claim
+  full client real time from CNN timing alone. If these configurations
+  miss, the measured gap decides a bounded lower-resolution or smaller
+  model pilot; do not launch broad architecture or TensorRT searches.
+- Hypothesis: FP16 and channels-last recover much of the shared-GPU FP32
+  cost while preserving LPIPS_V. Competing explanation: the dense 1080p
+  convolutions exceed the per-frame budget even with tensor cores, so
+  resolution/architecture must change.
+- Budget: <= 1 GPU-hour total for item 2, including failed runs and staging;
+  initial jobs <= 1,700 seconds each (smoke <= 600, full <= 900, validator
+  and overhead reserved). Exclusive GPU admission, contention stop, no
+  contaminated timing promoted. Inputs and results stay in separate fleet
+  jobs; original pilot artifacts are read-only. No 34-window run.
