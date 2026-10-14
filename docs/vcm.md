@@ -50,10 +50,11 @@ arXiv). What could not be verified is listed at the end.
   performance points, against the pixel envelope and a VTM anchor, reported
   beside the human-viewing curves as a scalable (machine base layer + human
   enhancement) bitstream.
-- **Datasets:** none of VCM's or FCM's fits PointStream's domains (no
-  egocentric video, no racket sports, no hand or body keypoints in the
-  current conditions). Use them only if a reviewer asks for comparability with
-  MPEG numbers; the closest is SFU-HW's three basketball sequences.
+- **Datasets:** none of VCM's or FCM's datasets is egocentric or racket
+  sport, but HiEve (crowded events, manual body poses and tracks,
+  public labels on MPEG's five FCM videos) is worth opening as a third
+  domain for the body-keypoint mode, judged on MPEG's own axis (PLAN K7).
+  SFU-HW's basketball sequences only if a reviewer asks for detection.
 
 ## MPEG-AI status
 
@@ -148,8 +149,13 @@ over directly:
   In N0848, PP4 is 90–95% of PP1: OpenImages detection mAP@0.5 79.3 → 75.3;
   TVD MOTA 50.3 → 46.2; HiEve MOTA 34.0 → 31.3 (1080p); SFU-HW class A/B
   mAP@0.5:0.95 62.5 → 56.3; PandaSet mIoU 46.0 → 41.4.
-- **No number without overlap.** BD-rate follows JVET-H0030 with no
-  extrapolation; where curves do not overlap, the template outputs 1e308
+- **No number without overlap.** BD-rate follows JVET-H0030 (Tourapis et
+  al., Apple, October 2017; supplied by the user): the JCT-VC/JVET Excel
+  functions extended to any number of points, piecewise cubic in log rate
+  (its macros carry PCHIP routines), with optional linear extrapolation in
+  log rate whose default ("None") is off, an overlap ("coverage") output,
+  and `bdRateROI`, a BD-rate over a chosen quality interval. Where curves
+  do not overlap, H0030 returns ±100%; FCM's template outputs 1e308
   (shown as `####`) instead of ±100%, and that poisons every average it
   enters. An optional "clipped" BD-rate integrates only up to the unsplit
   performance.
@@ -178,11 +184,11 @@ over directly:
 | Choi & Bajić, *Scalable Image Coding for Humans and Machines*, TIP 2022 ([arXiv:2107.08373](https://arxiv.org/abs/2107.08373)) | Detection (YOLOv3, base layer), segmentation (Mask R-CNN, enhancement), reconstruction | Dataset labels | VVC, HEVC and learned codecs; BD-rate and BD-mAP |
 | Choi & Bajić, *Scalable Video Coding for Humans and Machines*, MMSP 2022 ([arXiv:2208.02512](https://arxiv.org/abs/2208.02512)) | Detection on the base layer of video | Dataset labels | HEVC, VVC; notes mAP–rate curves "are not always concave, or even monotonic", so BD-rate-mAP can be undefined |
 | Siarohin et al., *First Order Motion Model*, NeurIPS 2019 ([arXiv:2003.00196](https://arxiv.org/abs/2003.00196)) | Motion transfer: Average Keypoint Distance (AKD) between keypoints detected on the source and on the generated video; Missing Keypoint Rate (MKR); identity distance (AED). For bodies (Tai-Chi-HD) the detector is OpenPose (Cao et al.) | **Pseudo** (same detector on both) | Not a codec evaluation; AKD later became a generative face video coding metric |
-| Chen, Chen, Wang, Ye, *Generative Face Video Coding Techniques and Standardization Efforts: A Review*, DCC 2024 ([arXiv:2311.02649](https://arxiv.org/abs/2311.02649)) | JVET's GFVC test conditions: 50 VoxCeleb sequences at 256², 250 frames; VTM LDB at QP 45–52 as anchor; quality by DISTS and LPIPS | — (human-viewing metrics) | VTM; rate–DISTS/LPIPS curves |
+| JVET-AG2035, *Test conditions and evaluation procedures for generative face video coding* (McCarthy, Chen; JVET 33rd meeting, January 2024; file v3, supplied by the user) | 15 VoxCeleb and 18 CFVQA sequences at 256², 8-bit, 125–250 frames at 25 fps; VTM low delay at QP 37, 42, 47, 52 as anchor; GFVC base pictures intra at QP 22–52. Reported: bitrate, LPIPS and DISTS (RGB 4:4:4), PSNR and SSIM | — (human-viewing metrics only; no keypoint or machine metric) | VTM; BD-rate by piecewise cubic interpolation in the summary, cubic beside. An earlier setup in Chen, Chen, Wang, Ye's review ([arXiv:2311.02649](https://arxiv.org/abs/2311.02649): 50 VoxCeleb sequences, QP 45–52) predates it |
 | Chen, Yin, Konuko, Valenzise, Zhang, Wang, Ye, *Generative Models at the Frontier of Compression: A Survey on Generative Face Video Coding*, 2025 ([arXiv:2506.07369](https://arxiv.org/abs/2506.07369)) | Correlation of quality metrics with subjective scores on GFVC output; AKD and AED included | — | AKD correlates poorly with viewers (PLCC 0.44 against DISTS 0.86 and LPIPS 0.85, its table 5): it measures motion fidelity, not quality |
 | Jin et al., *Semantically Video Coding* ([arXiv:2201.10162](https://arxiv.org/abs/2201.10162)) | Detection, pose estimation (stacked hourglass, PCK), action recognition on a structured bitstream | Dataset labels | VVC |
 
-GFVC's test conditions use human-viewing metrics only; the keypoint metrics
+GFVC's test conditions (JVET-AG2035) use human-viewing metrics only; the keypoint metrics
 (AKD) come from face reenactment, and are not part of a standard protocol.
 H3c2's judge is FOMM's AKD and Hu et al.'s NME applied to hands.
 
@@ -197,11 +203,41 @@ H3c2's judge is FOMM's AKD and Hu et al.'s NME applied to hands.
    coding does; it cannot be predicted). H3c2's 69% stands as what it is, a
    pseudo-label result, and needs a labelled counterpart before the paper
    calls it a machine-task result.
-2. **The judge must not be the encoder's estimator.** VCM fixes the task
-   networks, independent of the codec. If the stream carries WiLoR's joints,
-   the judge is HaMeR (or the reverse), on the decoded pixels for the pixel
-   coders and on the rendered or projected joints for the keypoint stream.
-   A judge that is the encoder's own estimator measures self-agreement.
+
+   *Why H3c2 used pseudo-labels although PointStream has human labels.*
+   VISOR's human labels are masks, not keypoints. Human hand keypoints on
+   these videos come only from HInt, and HInt labels only VISOR's sparse
+   keyframes (B1: every HInt frame in the surveyed videos is one).
+   Evaluation set v2's 34 windows hold 77 sparse keyframes in all, 0–9 per
+   item (`experiments/visor/eval_set.json`), and B2's four pilot items 2, 2,
+   2 and 1; HInt labels some of those (the count needs the HInt archive on
+   the server). H3c2 judged every fifth frame with a fitted hand, 28–95 hands
+   per item: the pseudo-label bought density and per-item statistics that
+   the human labels cannot give on these windows. The two answer different
+   questions and both are kept: human labels (few frames, pooled over items)
+   for the claim, pseudo-labels (dense, per item) for the decisions. The
+   estimator's error on the uncompressed source against HInt is already
+   measured (H2: PCK@0.05 on HInt's VISOR frames), and it is the
+   performance point PP1 of the machine range below.
+2. **Consistency and accuracy are two judges.** H3c2 (and H3e) asked whether
+   WiLoR sees the same joints before and after coding or generation: a
+   *consistency* judge, as FOMM's AKD and Hu et al.'s NME. It is the right
+   measure of whether a decoder or generator follows the pose, and it stays.
+   It has two blind spots that an *accuracy* judge (VCM's) closes:
+   - *Self-agreement.* A generator conditioned on WiLoR's joints can produce
+     hands that WiLoR reads back easily without being plausible hands;
+     another estimator (HaMeR) does not share WiLoR's biases. VCM fixes its
+     task networks independently of the codec for this reason, and requires
+     the codec to be agnostic to the network.
+   - *Asymmetry in H3c2.* The pixel coders' output went through WiLoR again;
+     the keypoint stream's coded joints were compared to WiLoR on the source
+     directly (the perfect-generator oracle), so only the pixels paid
+     WiLoR's sensitivity to its input. H3e put generated frames through
+     WiLoR and the margin did not survive (for the reason H3e traced: the
+     generated scene drifts). In the protocol every
+     mode is judged from what the decoder outputs, by the same judge.
+   Both are reported: WiLoR consistency (fidelity of the decoded hand to the
+   source), and HaMeR against HInt (accuracy of the hand the user gets).
 3. **Report only the relevant range.** FCM's rule: BD-rate where the task
    metric is within about 10% of the source's. For hands that is where PCK on
    the decoded video is at least 90% of PCK on the source; a keypoint win at
@@ -221,12 +257,18 @@ use still gets its own entry in [experiments](experiments.md) with its rule
 written before its run.
 
 **Statistic.** Per item and task metric: BD-rate (PCHIP of log rate over the
-overlapping metric range, project convention) of the mode against the anchor
+overlapping metric range, project convention; JVET-H0030's piecewise cubic
+`bdRateROI` is the same computation over an interval) of the mode against the anchor
 envelope (upper concave hull of the anchor's encodes), restricted to the
 **machine range**: from the metric on the uncompressed source (as FCM's PP1)
 down to 90% of it (FCM's PP4 is 90–95%). Where curves do not overlap in that
 range: "better/worse at every rate" (as FCM's `####`), never a number. Mean
-over items with a bootstrap interval by item, as H3c2.
+over items with a bootstrap interval by item, as H3c2. This follows Barman,
+Martini and Reznik's review of BD practice
+([arXiv:2401.04039](https://arxiv.org/abs/2401.04039), supplied by the
+user): piecewise cubic interpolation; BD only on well-behaved, overlapping
+curves, shown beside the curves themselves; caution with metrics other than
+PSNR, which saturate; a range that matches the operating range.
 
 **Rate.** Everything the decoder needs for the judged content, billed as in
 H3c2 (keypoints, shapes, side information). For a scalable claim, two rates:
@@ -311,21 +353,35 @@ check that the sign of the BD-rate holds.
 |---|---|---|---|---|
 | **SFU-HW-Objects-v3.2** (VCM, FCM) | Boxes, COCO classes; detection (VCM mAP; FCM mAP@0.5:0.95). v1 labels: YOLOv3 proposals corrected by hand frame by frame in Yolo_mark ([Choi et al., Data in Brief 2021](https://pmc.ncbi.nlm.nih.gov/articles/PMC7797526/)); FCM notes the ground truth was revised between v1 and v3.2 | 14 HEVC test sequences (classes A–D, O), clips of 33–129 frames, 24–60 fps; class sizes from HEVC's CTC | Labels CC BY 4.0 ([Mendeley](https://data.mendeley.com/datasets/367kty6nw7/3)); videos from the JCT-VC FTP, licence per sequence | General only. BasketballDrive, BasketballDrill and BasketballPass are sports with people, but indoor basketball, boxes only |
 | **TVD** (VCM, FCM) | Tracking (MOTA, boxes with IDs) on 3 sequences cut into 7 clips (VCM) or 3 videos (FCM); TVD-I: 166 images with boxes and instance masks | 86 sequences of 65 frames at 3840×2160; tracking clips 1920×1080, 50 fps, 8/10-bit | Tencent / Shenzhen Boyan: personal, non-commercial use incl. research and standards work, no redistribution ([TVD page](https://multimedia.tencent.com/resources/tvd)) | No: street and indoor scenes, tracking boxes |
-| **HiEve** (FCM; VCM 2021) | Tracking (MOTA) on 5 videos in FCM. The dataset also has manual 14-keypoint poses (>1M) and actions ([Lin et al., arXiv:2005.04490](https://arxiv.org/abs/2005.04490)); VCM's 2021 CTC used it for pose and actions | 32 videos, crowded events (airport, mall, stadium, …); FCM's five are 1280×720 and 1920×1080, coded at 30 fps | Signed licence agreement with SJTU required (FCM CTTC) | Only as a general human-pose judge; crowded surveillance, not sport or egocentric |
+| **HiEve** (FCM; VCM 2021) | Tracking (MOTA) on 5 videos in FCM. The dataset also has manual 14-keypoint poses (>1M) and actions ([Lin et al., arXiv:2005.04490](https://arxiv.org/abs/2005.04490)); VCM's 2021 CTC used it for pose and actions | 32 videos (19 training, 13 test), crowded events (airport, mall, stadium, …), 15–30 fps, 352×258 to 1920×1080; FCM's five are 1280×720 and 1920×1080, coded at 30 fps | CC BY-NC-SA 4.0 on the dataset page ([humaninevents.org](http://humaninevents.org/data.html)); MPEG additionally has participants sign an SJTU agreement for standards use (FCM CTTC). Training-set labels (tracks, boxes, poses, actions) are public; test-set results go through the authors' evaluation server ([Lin et al.](https://arxiv.org/abs/2005.04490), sec. 7.3). FCM's five videos all match training-set entries by resolution and frame count (lab1, playground, square2 by name; FCM's "road" and "stair2" are listed as road2 and stair1), so their pose labels are public | **Yes, as a new domain** (below): body pose and tracking with human labels, on MPEG's own test videos |
 | **OpenImages V6** (VCM, FCM) | Detection, instance segmentation (5,000 validation images each; mAP@0.5 in FCM) | Still images, already JPEG-compressed | Annotations CC BY 4.0, images listed CC BY 2.0 | No (images) |
 | **PandaSet** (VCM, FCM, optional) | Semantic segmentation from LiDAR labels projected to the front camera, 10 classes (mIoU) | Driving, 80 frames per sequence, 1920×1080, 10 fps | Not verified (see below) | No |
 | **FLIR** (VCM) | Detection on 300 infrared images, with a fine-tuned detector | Thermal images | From MPEG's content server; FLIR's own licence not verified | No |
 
-**Recommendation.** Do not adopt any of them as a PointStream benchmark. Their
-tasks (boxes, tracks, semantic masks) are not what keypoints carry, their
-content is outside both domains, and their labels for the one relevant task
-(HiEve's poses) sit behind a signed licence and are no longer in MPEG's
-conditions. PointStream's own labelled sets serve the machine judge better:
-HInt and HOT3D (hands), TrackNet, RacketVision and OpenTTGames (ball,
-racket). If a reviewer asks for MPEG comparability, the cheapest step is
-VTM as an extra anchor on PointStream's own items; running PointStream on
-SFU-HW's basketball sequences would need a player-and-ball pipeline on
-indoor basketball and gives detection boxes, not poses.
+**Recommendation** (revised 2026-10-14, after the user: a new domain is
+worth opening if it serves PointStream). Two of them earn a place:
+
+- **HiEve, as a third domain: people in crowded events, on MPEG's test videos.**
+  It is the only one with what keypoints carry (manual 14-joint body poses,
+  over a million) and with tracks, and its five FCM videos have public
+  labels. It may have two of the five conditions PLAN K names for keypoints
+  to win (structured objects that keep their identity; a still camera, which
+  K7 measures), and surveillance is among VCM's use cases (N0190). On it
+  PointStream's body-keypoint mode can be judged on MPEG's own axis: MOTA
+  with JDE (VCM's and FCM's tracker) and pose AP against HiEve's poses,
+  against VTM and HM run through CompressAI-Vision (which ships HiEve's
+  evaluator), on the very videos MPEG reports. That also fills the
+  protocol's gap for bodies (tennis players have no human pose labels).
+  Against it: crowds (dozens of people, heavy occlusion), so the keypoint
+  rate grows with the head count; non-commercial licence (fine for
+  research); and the body mode is phase 2 work. It needs its own audit
+  first, like K4 for tennis (PLAN K7).
+- **SFU-HW's three basketball sequences**, only if a reviewer asks for
+  MPEG's detection axis: public, sport, in both VCM's and FCM's conditions,
+  but boxes only.
+
+TVD, OpenImages, PandaSet and FLIR add nothing a keypoint mode can be judged
+on (street tracking boxes, images, driving segmentation, thermal images).
 
 ## Searches and what could not be verified
 
@@ -340,16 +396,13 @@ which records JVET's move from polynomial fits to PCHIP.
 
 Not verified, and why (no GPU access was needed for any of it):
 - **JPEG AI's test conditions for computer-vision tasks** (the CTTC's
-  "Part B", e.g. WG 1 N100421, which is public): ds.jpeg.org fails TLS
-  through this cloud session's egress proxy (jpeg.org itself works), and
-  WebFetch got HTTP 503 twice. A session with ordinary network access (the
-  user's local sessions) can download it. Only JPEG AI's stated scope
+  "Part B"; the latest listed is WG 1 N100600, v8.0, July 2023): jpeg.org's
+  [documentation page](https://jpeg.org/jpegai/documentation.html) links
+  them on ds.jpeg.org, whose root is a placeholder page (user, 2026-10-14);
+  from this session ds.jpeg.org fails TLS and WebFetch got HTTP 503. Not
+  needed for the proposal (JPEG AI is image coding). Only JPEG AI's stated scope
   (version 1 is for human viewing; latent-domain tasks are planned) is
   reported.
-- **JVET's GFVC common test conditions** (JVET-AG2035, public): the
-  jvet-experts.org document search did not return it from this session; the
-  conditions are taken from Chen et al.'s review, which describes them. No
-  keypoint metric was found in them.
 - **Why VCM dropped pose and action recognition** between N54 (2021) and
   N231 (2022), and VCM's "Evaluation framework and methodologies" N00277
   (2022): the reasons would be in meeting reports and input contributions,
@@ -357,15 +410,16 @@ Not verified, and why (no GPU access was needed for any of it):
 - **VCM-RS and the VCM CTC scripts** (`git.mpeg.expert`): member-only, not
   inspected; the exact VCM-RS version of the current anchor is inconsistent
   in N0870's text (v1.2, v1.3) and its template names (2.2).
-- JVET-H0030's interpolation method (FCM's BD-rate reference): public on the
-  JVET site, not retrieved (same search problem as AG2035).
-- Licences of PandaSet and FLIR (not pursued: neither is recommended);
-  whether HiEve's test labels are public (MPEG distributes them for its five
-  videos).
+- Licences of PandaSet and FLIR (not pursued: neither is recommended).
+- HiEve's download (the page's "Get all data" link) was not tried; it may
+  need registration.
 - No published study of hand-pose accuracy on compressed video was found;
   searches for pose-under-compression codec evaluations found only PCK on a
   structured bitstream (Jin et al.) and keypoint-detection BD-rates in
   [arXiv:2503.21469](https://arxiv.org/abs/2503.21469) (not read in full).
+
+Supplied by the user on 2026-10-14 and read: JVET-AG2035 (v3), JVET-H0030
+(document and template macros), Barman et al. (arXiv:2401.04039).
 
 None of these changes the proposal: they concern JPEG AI's and GFVC's
 details, MPEG's history, and datasets the study recommends against.

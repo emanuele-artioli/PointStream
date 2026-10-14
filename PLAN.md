@@ -934,8 +934,9 @@ before its run:
   SVT-AV1) and VTM (through the public CompressAI-Vision harness; no MPEG
   access needed, VCM-RS not used), beside
   the human-viewing curves. First use: re-judge H3c2 with HaMeR against HInt
-  (CPU count of HInt hands in the items first). None of MPEG's datasets fits
-  the domains.
+  (CPU count of HInt hands in the items first), keeping WiLoR's consistency
+  beside it. HiEve, MPEG's body-pose and tracking set, is worth a third
+  domain (K7).
 - K3. *Keypoint-conditioned pixel coding* (H3's proto-hand candidate). The
   decoder receives the keypoints and the pixels code only what they do not
   explain; in principle never worse than pixels alone, but it needs a new
@@ -962,10 +963,22 @@ before its run:
   the outline problem shrinks at broadcast scale. A per-player appearance
   model is amortized over a match (hours), the condition H3d found
   decisive. The racket in a fixed grip re-tests H4a's grip pose.
+- K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
+  PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
+  HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
+  and actions; CC BY-NC-SA 4.0) holds the five videos MPEG's FCM conditions
+  use for tracking, and their labels are public. K4's audit on them: people
+  per frame, their share of pixels and of SVT-AV1's bits, the camera's
+  stillness, a body-pose estimator's fit against HiEve's poses, and the
+  keypoint rate against the bits on those people. Decides whether the body
+  mode (K6) is also judged there, by MOTA with JDE and pose AP against
+  VTM and HM through CompressAI-Vision, on MPEG's own videos. CPU first;
+  the download (registration may be needed) is the first step.
 Order: H5 continues on egocentric (a working pipeline with what is
 chosen: G's background, DCVC-UF + G on hands, H4c on objects), since its
 bitstream, compositor and harness carry over to tennis. K4–K5 and K2 run
-beside it in their own sessions; K1 and K3 are cheap and egocentric.
+beside it in their own sessions; K1 and K3 are cheap and egocentric; K7
+follows K4's method once K4 has run.
 
 ### After a working pipeline
 
