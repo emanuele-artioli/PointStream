@@ -953,16 +953,44 @@ before its run:
   SVT-AV1's bits (H1's bit accounting), how often the camera is still, a
   body-pose estimator's fit (audit first, e.g. ultralytics' pose models)
   and its parameter rate against the bits on those pixels. Decides whether
-  players pass H1's screen and what the ball costs.
+  players pass H1's screen and what the ball costs. **Done 2026-10-13**
+  ([experiments](docs/experiments.md#2026-10-13--k4-tennis-audit-h1s-method-on-broadcast-tennis)):
+  players do not pass, and K6 is not run as gated. Players are 0.6–4% of
+  the pixels and 86–96% of the foreground's SVT-AV1 bits (pass (a)), but
+  YOLO11x-pose fits 0.875 of broadcast player-frames (rule 0.90; TrackNet
+  0.55) and its keypoints cost 22% of SVT-AV1's player bits at CRF 62
+  (rule 10%; 6% at CRF 48). The fit fails on the far player only: players
+  ≥ 15% of the frame height are fitted on 97–100% of frames, under 10% on
+  0–50%. Next for players, before K6: K4b (identification, pose on the
+  far player, keypoint rate), which re-reads (b) and the K6 gate. The ball is
+  0.007% of the pixels and 0.29 kbps of SVT-AV1 at CRF 62 (its trajectory
+  0.23 kbps). The camera is still on 35% of a whole broadcast match and
+  41% of the broadcast windows (TrackNet 97%): broadcast cameras follow
+  play, so a per-shot background needs registration (G).
 - K5. *Ball oracle.* The true ball drawn from its coded position over
   SVT-AV1 and DCVC-UF decodes: ball-region quality and a ball detector's
   recall on the decoded frames, against the pixel coders at equal rate and
-  equal quality. Decides the ball mode.
-- K6. *Player oracle* (after K4): H3b for bodies, perfect appearance at
+  equal quality. Decides the ball mode. **Done 2026-10-13**
+  ([experiments](docs/experiments.md#2026-10-13--k5-ball-oracle-the-true-ball-at-its-coded-position)):
+  **a ball mode is built.** On 8 of 8 TrackNet windows the oracle beats
+  the pooled envelope of both coders on ball-region PSNR (median BD-rate
+  −57% drawn over DCVC-UF, −38% over SVT-AV1) for 0.23 kbps; the coders
+  erase a fast ball at low rate (detector recall 0–8% at DCVC-UF's lowest
+  points against 46% on the source). The off-the-shelf detector is no
+  valid judge (46% recall on the source, rule 50%). Next (K5b): the ball
+  mode's own oracle with a rendered ball, a streak along the coded velocity
+  (fast balls are 20–40 px streaks, which K5's 4 px disk does not draw),
+  billed for what it sends, then the component.
+- K6. *Player oracle* (after K4; gated off by K4 until the far player is
+  fitted, see K4): H3b for bodies, perfect appearance at
   the coded body pose with what the pose cannot describe charged; whether
   the outline problem shrinks at broadcast scale. A per-player appearance
   model is amortized over a match (hours), the condition H3d found
-  decisive. The racket in a fixed grip re-tests H4a's grip pose.
+  decisive. The racket in a fixed grip re-tests H4a's grip pose. The
+  question it answers is the total: keypoints plus appearance against the
+  pixel coders' envelope (SVT-AV1, DCVC-UF), swept over the rendering
+  resolution, so K4's keypoint share (22% of SVT-AV1's player bits at
+  CRF 62) is judged there, not by H1's 10% screen.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
@@ -974,6 +1002,56 @@ before its run:
   mode (K6) is also judged there, by MOTA with JDE and pose AP against
   VTM and HM through CompressAI-Vision, on MPEG's own videos. CPU first;
   the download (registration may be needed) is the first step.
+
+Follow-ups from K4–K5 (user, 2026-10-14), in the order they gate each
+other. Each has its rule written before its run, as everywhere.
+- K8. *Court-view shots.* Split a match at its cuts (ffmpeg scene score)
+  and send to PointStream only the shots that show the court; close-ups,
+  crowd shots, replays and graphics go to the pixel coder. The old
+  pipeline (`9cf3012`, `scene_classification.py`) called low-motion
+  scenes points, which let a close-up and an outro card into K4's
+  windows. Here a shot is a court view when its court lines register to
+  the court model (the `Tennis_courts` reference) with a homography; the
+  same homography gives the court outline that K4b uses to find the
+  players and the per-frame camera registration a panning broadcast
+  camera needs (K4: still on 35% of a match). Shared by foreground and
+  background: G's per-shot background needs the registration, H/K the
+  court outline and the shot list. Judged on the archived matches' scene
+  clips, reviewed by eye, and on the whole match's shots.
+- K4b. *Players before K6* (re-reads K4's (b) and the K6 gate).
+  1. Identification. Candidate rules, content-blind: motion in body
+     heights (K4's amendment), horizontal motion with the clip's end
+     discounted, a racket mask touching the person on most frames,
+     inside the court outline (K8), keypoint motion, and combinations.
+     Chosen on players marked by hand on windows K4 did not measure (a
+     review page where the user marks the two players on a few dozen
+     frames; RacketVision has no player labels), then applied once to
+     every window as amendment 2, with both earlier definitions' numbers
+     kept.
+  2. Pose on the far player. Top-down on each SAM player crop, enlarged:
+     a cheap sweep of the crop size (three sizes, native to about 4×)
+     measuring fit and latency, then a top-down model (DWPose, weights in
+     `Models/DWPose`) if the sweep falls short, super-resolution of the
+     crop last; fine-tuning only if all fail (no tennis pose labels;
+     SportsPose or pseudo-labels from fitted near players). Players under
+     10% of the frame height are fitted on 0–50% today, 15% and taller on
+     97–100%.
+  3. Keypoint rate against keypoint error: quantization 1, 2, 4, 8 px,
+     constant-velocity prediction, a lower keypoint frame rate with
+     interpolation; raw keypoints saved this time (K4 kept histograms
+     only). Which error is acceptable is K6's to judge on the rendering.
+- K5b. *Ball mode.* (1) The renderer's oracle: from the coded position,
+  velocity and a per-window colour and size sent once, a sharp disk and
+  an elongated blur, composited over the decodes and billed; scored as K5,
+  and shown side by side with the source at equal rate for the user's
+  preference (a sharp ball that does not look like broadcast video may be
+  preferred). (2) An encoder-side ball tracker trained on TrackNet's and
+  RacketVision's ball labels (PLAN's ball stage); it is also the judge,
+  since an off-the-shelf detector finds 46% of the source's balls and
+  SAM 3.1's text prompt 56%.
+Datasets: still-camera sets (TrackNet, RacketVision, OpenTTGames) are
+fine where a decision needs labels, with the scope stated in the paper;
+broadcast matches answer what a real broadcast costs.
 Order: H5 continues on egocentric (a working pipeline with what is
 chosen: G's background, DCVC-UF + G on hands, H4c on objects), since its
 bitstream, compositor and harness carry over to tennis. K4–K5 and K2 run
