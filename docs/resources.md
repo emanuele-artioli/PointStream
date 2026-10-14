@@ -484,6 +484,13 @@ were deleted on 2026-10-06; their exact specs are in
 deleted the same day because nothing in phase 1 used it. If inpainting becomes a
 background candidate, it is audited into the environment like any component.
 
+## Coding for machines
+
+How MPEG's VCM and FCM (and JPEG AI, scalable human+machine coding,
+generative face video coding) judge a codec, which datasets they use, and
+PointStream's machine-judge protocol for its keypoint modes:
+[vcm.md](vcm.md) (PLAN K2, 2026-10-13).
+
 ## Archive
 
 The code and documentation before this layout are tagged

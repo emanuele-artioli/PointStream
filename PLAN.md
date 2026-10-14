@@ -922,7 +922,21 @@ before its run:
   content against rate, BD-rate on the task metric, their anchor codec and
   test conditions), and what PointStream should adopt, so that a keypoint
   mode is judged on a recognized axis beside human-viewing metrics.
-  Literature only; no runs.
+  Literature only; no runs. **Done 2026-10-13: [docs/vcm.md](docs/vcm.md).**
+  VCM and FCM judge as H3c2 does (fixed task network on decoded content,
+  BD-rate on the task metric) but against human labels, with a judge
+  independent of the codec, only within about 10% of the source's accuracy
+  (FCM's performance points), and against VVC (VTM; HM in FCM since
+  2026-08). Pose left MPEG's conditions in 2022. Proposal: per mode a task
+  metric against labels (HInt PCK for hands, TrackNet F1 for the ball,
+  RacketVision for rackets; independent pseudo-labels only for tennis
+  bodies), BD-rate in that range against the pixel envelope (with B2b's ROI
+  SVT-AV1) and VTM (through the public CompressAI-Vision harness; no MPEG
+  access needed, VCM-RS not used), beside
+  the human-viewing curves. First use: re-judge H3c2 with HaMeR against HInt
+  (CPU count of HInt hands in the items first), keeping WiLoR's consistency
+  beside it. HiEve, MPEG's body-pose and tracking set, is worth a third
+  domain (K7).
 - K3. *Keypoint-conditioned pixel coding* (H3's proto-hand candidate). The
   decoder receives the keypoints and the pixels code only what they do not
   explain; in principle never worse than pixels alone, but it needs a new
@@ -949,10 +963,22 @@ before its run:
   the outline problem shrinks at broadcast scale. A per-player appearance
   model is amortized over a match (hours), the condition H3d found
   decisive. The racket in a fixed grip re-tests H4a's grip pose.
+- K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
+  PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
+  HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
+  and actions; CC BY-NC-SA 4.0) holds the five videos MPEG's FCM conditions
+  use for tracking, and their labels are public. K4's audit on them: people
+  per frame, their share of pixels and of SVT-AV1's bits, the camera's
+  stillness, a body-pose estimator's fit against HiEve's poses, and the
+  keypoint rate against the bits on those people. Decides whether the body
+  mode (K6) is also judged there, by MOTA with JDE and pose AP against
+  VTM and HM through CompressAI-Vision, on MPEG's own videos. CPU first;
+  the download (registration may be needed) is the first step.
 Order: H5 continues on egocentric (a working pipeline with what is
 chosen: G's background, DCVC-UF + G on hands, H4c on objects), since its
 bitstream, compositor and harness carry over to tennis. K4–K5 and K2 run
-beside it in their own sessions; K1 and K3 are cheap and egocentric.
+beside it in their own sessions; K1 and K3 are cheap and egocentric; K7
+follows K4's method once K4 has run.
 
 ### After a working pipeline
 
