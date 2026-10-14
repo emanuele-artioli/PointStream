@@ -922,7 +922,21 @@ before its run:
   content against rate, BD-rate on the task metric, their anchor codec and
   test conditions), and what PointStream should adopt, so that a keypoint
   mode is judged on a recognized axis beside human-viewing metrics.
-  Literature only; no runs.
+  Literature only; no runs. **Done 2026-10-13: [docs/vcm.md](docs/vcm.md).**
+  VCM and FCM judge as H3c2 does (fixed task network on decoded content,
+  BD-rate on the task metric) but against human labels, with a judge
+  independent of the codec, only within about 10% of the source's accuracy
+  (FCM's performance points), and against VVC (VTM; HM in FCM since
+  2026-08). Pose left MPEG's conditions in 2022. Proposal: per mode a task
+  metric against labels (HInt PCK for hands, TrackNet F1 for the ball,
+  RacketVision for rackets; independent pseudo-labels only for tennis
+  bodies), BD-rate in that range against the pixel envelope (with B2b's ROI
+  SVT-AV1) and VTM (through the public CompressAI-Vision harness; no MPEG
+  access needed, VCM-RS not used), beside
+  the human-viewing curves. First use: re-judge H3c2 with HaMeR against HInt
+  (CPU count of HInt hands in the items first), keeping WiLoR's consistency
+  beside it. HiEve, MPEG's body-pose and tracking set, is worth a third
+  domain (K7).
 - K3. *Keypoint-conditioned pixel coding* (H3's proto-hand candidate). The
   decoder receives the keypoints and the pixels code only what they do not
   explain; in principle never worse than pixels alone, but it needs a new
@@ -977,10 +991,21 @@ before its run:
   pixel coders' envelope (SVT-AV1, DCVC-UF), swept over the rendering
   resolution, so K4's keypoint share (22% of SVT-AV1's player bits at
   CRF 62) is judged there, not by H1's 10% screen.
+- K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
+  PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
+  HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
+  and actions; CC BY-NC-SA 4.0) holds the five videos MPEG's FCM conditions
+  use for tracking, and their labels are public. K4's audit on them: people
+  per frame, their share of pixels and of SVT-AV1's bits, the camera's
+  stillness, a body-pose estimator's fit against HiEve's poses, and the
+  keypoint rate against the bits on those people. Decides whether the body
+  mode (K6) is also judged there, by MOTA with JDE and pose AP against
+  VTM and HM through CompressAI-Vision, on MPEG's own videos. CPU first;
+  the download (registration may be needed) is the first step.
 
 Follow-ups from K4–K5 (user, 2026-10-14), in the order they gate each
 other. Each has its rule written before its run, as everywhere.
-- K7. *Court-view shots.* Split a match at its cuts (ffmpeg scene score)
+- K8. *Court-view shots.* Split a match at its cuts (ffmpeg scene score)
   and send to PointStream only the shots that show the court; close-ups,
   crowd shots, replays and graphics go to the pixel coder. The old
   pipeline (`9cf3012`, `scene_classification.py`) called low-motion
@@ -997,7 +1022,7 @@ other. Each has its rule written before its run, as everywhere.
   1. Identification. Candidate rules, content-blind: motion in body
      heights (K4's amendment), horizontal motion with the clip's end
      discounted, a racket mask touching the person on most frames,
-     inside the court outline (K7), keypoint motion, and combinations.
+     inside the court outline (K8), keypoint motion, and combinations.
      Chosen on players marked by hand on windows K4 did not measure (a
      review page where the user marks the two players on a few dozen
      frames; RacketVision has no player labels), then applied once to
@@ -1030,7 +1055,8 @@ broadcast matches answer what a real broadcast costs.
 Order: H5 continues on egocentric (a working pipeline with what is
 chosen: G's background, DCVC-UF + G on hands, H4c on objects), since its
 bitstream, compositor and harness carry over to tennis. K4–K5 and K2 run
-beside it in their own sessions; K1 and K3 are cheap and egocentric.
+beside it in their own sessions; K1 and K3 are cheap and egocentric; K7
+follows K4's method once K4 has run.
 
 ### After a working pipeline
 
@@ -1142,3 +1168,19 @@ definitive pipeline; a first draft complete but for final touches and the
 figures' final experiments; the final experiments (run once, after the
 figure list is fixed); final touches before submission. The framing waits
 for the pipeline and K4–K6.
+A point to argue (user, 2026-10-13), scoped to the evidence when written:
+conventional codecs are one-size-fits-all, rigid in what they code and tuned
+to pixel fidelity rather than to what people see; a learned codec's
+strength is less its margin over AV1 than how much further it goes when
+domain knowledge directs it. Evidence so far: DCVC-UF off the shelf is
+−63% against SVT-AV1 on the hands (H3c), and directed by PointStream
+(region rate split by its own entropy model, coding at ¼ and ½, a generic
+enhancer) a further −22% (H3d); the scene-adapted background model (G5b,
+G5c) is the same pattern. Limits to state with it: retraining DCVC-UF
+itself on the domain gained little and did not transfer (H3c: 14% on the
+test windows, 151% worse on other participants), so the direction works
+through what surrounds the codec (scale, regions, enhancers, scene
+adaptation) more than through retraining it; and SVT-AV1 with the same
+enhancer was unclear (H3d oracle: −19%, synthesized texture), which
+supports, weakly, that the learned codec composes better with learned
+parts.
