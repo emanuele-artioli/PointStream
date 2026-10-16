@@ -947,6 +947,18 @@ before its run:
   the keypoints billed. DCVC-UF estimates and codes its own motion, so the
   gain is bounded by its motion bits; if even this oracle saves nothing,
   the trained version is not pursued.
+  **Done 2026-10-16: fails, K3 closed**
+  ([experiments](docs/experiments.md#2026-10-16--k3-keypoint-conditioned-pixel-coding-oracle-a-perfect-hand-in-dcvc-ufs-reference)).
+  DCVC-UF HT-L has no motion stream (8 frames per NAL from a recurrent
+  feature memory), but at a memory reset its reference is one frame, so it
+  can be replaced without retraining. The oracle put the source's true hand
+  into that reference (a bound on any keypoint warp): with H2's keypoints
+  billed (1.93 kbps) it is +9% against the unmodified codec on LPIPS_R
+  (CI −23% to +51%, 2 of 4 items better). The true hand saves 48% against
+  the same reset path, but resetting every 8 frames costs 39%, and the
+  keypoints cost more than DCVC-UF spends on R at its low points
+  (0.3–9 kbps). It would pass at keypoints of about 1 kbps or less (H2's
+  cheapest is 1.70). Neither the warp nor the trained version is built.
 - K4. *Tennis audit*, H1's method on broadcast tennis (the archived
   `tennis_games` matches at 1080p; TrackNet's dense ball labels): per part
   (players, racket, ball, background), its share of pixels and of

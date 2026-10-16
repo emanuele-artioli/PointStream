@@ -5859,3 +5859,84 @@ invocation turns out to be needed.
   4, all arms. Pilot: 4 items, two jobs per item (full resolution; ½ and
   ¼), each ≤ 45 min (H3c scored nine points in 13–18 min; here 45 points
   per item). Ceiling 5 GPU-hours, one day wall.
+- Jobs (shared GPU; environment `pointstream-20261009T214002Z`; inputs
+  `pointstream-data/visor/k3-2026-10-16/inputs.json`, `1e282b74…164e`;
+  code per `ready.json`): P01_107 full resolution
+  `20261016T090616Z-df01caf0` (`39bc160`, RTX 6000 Ada); the other seven at
+  `b330f8f` (the change since `39bc160` is the report's comparison only):
+  P01_107 ½ and ¼ `20261016T090907Z-67e990f8` (Ada), P02_02
+  `…090937Z-37023fb0` (A6000) and `…091001Z-d6d10f62` (Ada), P03_10
+  `…091015Z-f398547c` and `…091030Z-bcdf1371`, P09_106
+  `…091045Z-a87c9f00` and `…091106Z-f64cba4d` (all four A6000). Every
+  smoke passed the fleet's validator; every full stage passed the same
+  validator run locally (15/15 checks each). About 2.4 GPU-hours (smokes
+  0.35, full stages 2.0), within the 5 allowed; shared jobs' timings are
+  not evidence. Report (`k3 report`, code `8855c4e`, run locally):
+  `pointstream-data/visor/k3-2026-10-16/report-pilot-8855c4e/k3-report.json`
+  (`3b78c1a1…8bfb`).
+- Instrument. Arm A through the PyTorch path reproduces H3c's real codec:
+  35 of 36 points within H3d's tolerance (calibrated rate within 1.1%,
+  mean LPIPS_R within 0.004); the exception is P09_106 at ¼, QP 0 (rate
+  +4.4%, LPIPS_R −0.007). 21 of the 36 real streams are byte-identical to
+  H3c's (P03_10 all nine, P09_106 none); the others' sizes differ by 1.1%
+  or less except that point (DCVC-UF's encoder is bound to the GPU; H3c
+  ran on other cards). The estimate's ratio to the real bytes stays within
+  the validator's 0.5–2 at every point (H3c: 0.78–1.27).
+- Outcome (pilot, 4 items). **K3 fails by the rule; it is closed.**
+  BD-rate on LPIPS_R (hull against hull; mean over items, 95% bootstrap
+  CI; items below 0), DISTS and PSNR per item beside:
+
+  | test vs anchor | LPIPS_R | items < 0 | DISTS_R per item | PSNR_R per item |
+  |---|---|---|---|---|
+  | **C billed vs A (gate)** | **+9% (−23 to +51)** | 2 | −60, −49, −38, +42% | 0, +47, +63, +91% |
+  | D billed vs A | +66% (+15 to +144) | 0 | −46, −53, −22, +139% | +66% to +185% |
+  | C unbilled vs A | −34% (−50 to −14) | 4 | −26% to −73% | −23% to +14% |
+  | B vs A (reset every NAL) | +39% (+25 to +53) | 0 | +10% to +37% | +24% to +44% |
+  | C unbilled vs B | −48% (−64 to −30) | 4 | −34% to −78% | −11% to −43% |
+  | D unbilled vs B | −17% (−42 to +22) | 3 | | |
+  | E vs B (perfect reference) | −51% (−68 to −34) | 4 | −41% to −82% | −13% to −48% |
+  | E vs A | −38% (−55 to −19) | 4 | | |
+  | C billed vs the pixel envelope | +7% (−25 to +51) | 2 | | |
+
+  (Items in the order P01_107, P02_02, P03_10, P09_106.)
+  - Gate: the better arm, C, is +9% against the unmodified codec with the
+    keypoints billed: by the rule, *fails* (mean ≥ 0). P01_107 saves 31%,
+    P02_02 and P03_10 are at parity, P09_106 loses 68%. D is worse than C
+    on every item: a reference aimed at the group's middle frame codes the
+    group's first frames worse.
+  - Keypoint rate: C passes unbilled (−34%, 4 of 4) and still passes at a
+    keypoint rate up to 1.02 kbps (−10% at 1.0 kbps, 3 of 4); it is unclear
+    from 1.1 to 1.4 kbps and fails from 1.5 kbps. H2's cheapest WiLoR choice
+    (266.7 ms) costs 1.70 kbps, so no recorded keypoint stream passes. The
+    keypoint rate is deferred to optimization (PLAN H3); per the rule this
+    is reported, not a reopening.
+- Reading. A reference that shows the true hand helps DCVC-UF's present
+  weights a lot: against the same reset path (B) it saves 48% of R's rate
+  at equal LPIPS, nearly as much as the whole true frame (E, −51%), so
+  almost all of a better reference's value is in the hand region (the
+  hypothesis put E at 30–50% and C at 10–25%: both higher). Two things
+  remove that gain. (1) The substitution path resets DCVC-UF's recurrent
+  memory every 8 frames, which costs 39% (B against A, every item): the
+  memory carries more than the previous frame does. (2) The keypoints
+  cost 1.93 kbps, while DCVC-UF codes R at 0.3–9 kbps at its ¼ and ½
+  points (P03_10 and P09_106 never exceed 31 kbps): over the shared LPIPS
+  range, the low end decides, and there the keypoints alone cost more than
+  the pixels. The oracle grants the hand's true pixels at the target
+  frame, so it bounds every keypoint warp (which can only move decoded
+  pixels): the warp is not built. Competing explanation (1), that the
+  model cannot use a sharper reference, is refuted (E and C against B);
+  (2), the one-reference-per-group limit, shows in D against C;
+  (3), the instrument, holds (cross-check above).
+- What would change it, each needing its own oracle: keypoints that are in
+  the stream anyway (a mode that sends them for a machine task makes them
+  free; C unbilled passes, but only as the loose appearance bound, and
+  the warp would then need its own test, e.g. the decoded frame warped by
+  the source's optical flow as a tighter bound); keypoints at or below
+  about 1 kbps; or a conditional coder trained to take the keypoints
+  beside its memory instead of through a reset (C against B bounds what
+  the hand's pixels are worth there, −48%, before billing). The user's rule
+  closes the trained version now, since the oracle saves nothing billed.
+- Scope. Four pilot items (240 frames each, 50–60 frames/s), H3c's nine
+  points, LPIPS deciding; DCVC-UF HT-L's published weights; one reference
+  per 8-frame group. The full run was not needed: the gate fails with the
+  pilot's mean above 0 and only 2 of 4 items below 0.
