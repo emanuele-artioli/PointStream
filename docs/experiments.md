@@ -5665,7 +5665,8 @@ invocation turns out to be needed.
   - *Foreground stream* (new, `src/pointstream/`): one DCVC-UF HT-L stream
     of the window at a quarter, half or full resolution (H3d's coder),
     off the shelf. Its input is the source with everything outside
-    K = F dilated by the 8 px ring plus 2 px per downscale step replaced by
+    K = F dilated by the 8 px ring plus two coded pixels (2 × scale px, a
+    bicubic tap's reach) replaced by
     a smooth push-pull extrapolation of K's own pixels (as MPEG-4's
     arbitrary-shape coding padded outside the shape), so DCVC-UF spends
     little outside F and no edge forms at K's border. H3c's rate on R was
@@ -5687,7 +5688,8 @@ invocation turns out to be needed.
   weighted PSNR (0.7 fg + 0.3 bg, per frame then the mean) with
   `visor_dense` (without the fill) and `visor_dense_sam_fill` (with it),
   weighted LPIPS likewise, and weighted DISTS (masked DISTS per region,
-  `quality.masked_dists`) beside; whole-frame PSNR too. B2's anchors (SVT-AV1
+  `quality.masked_dists`, on every 4th frame for every method, to keep a
+  pair's scoring near 15 s) beside; whole-frame PSNR too. B2's anchors (SVT-AV1
   preset 4, CRF 41–62; DCVC-UF HT-L, QP 27–63) are rescored from B2's
   published streams by the same code, so DISTS exists for them; the
   rescoring must reproduce B2's recorded weighted PSNR within 0.02 dB on
@@ -5728,9 +5730,10 @@ invocation turns out to be needed.
   5 12.8 s, 6 9.1 s, 8 4.6 s, 10 2.7 s, 12 1.94 s). This gives the anchor
   the most time PointStream uses.
   (d) *The bitstream holds*: every combination's container parses back to
-  its segments byte for byte, its rate is its file size, and each
-  composite rebuilt from the container's own streams equals the scored
-  one (checked on one combination per item and route).
+  its segments byte for byte and its rate is its length; on one
+  combination per item and route, the streams unpacked from it are the
+  published ones whose decodes were composited (AV1 rebuilt into IVF with
+  the same temporal units). The timing job decodes from containers.
 - Hypotheses. (a) passes on LPIPS and DISTS by a wide margin (−30% or
   more against the pooled hull): the background models win −33% to −97%
   on LPIPS_V against SVT-AV1 (G6) and G wins −22% on the hands; weighted
