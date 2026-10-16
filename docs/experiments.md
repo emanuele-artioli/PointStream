@@ -5883,3 +5883,42 @@ invocation turns out to be needed.
   removal, mask tampering, and rejection of all-empty model output.
   Replacement budget ≤ 3,000 s (smoke ≤ 600, full ≤ 2,100, validator ≤ 300),
   keeping total GPU execution within the original 3,600 s ceiling.
+- Corrected job `20261016T091155Z-7b19ac9a`: revision
+  **`dc4d4fdd8421cb9dd53178cf39e922e99e7802ef`**, from `ready.json`,
+  no selected patch (empty patch SHA256 `e3b0c442…b855`), snapshot
+  `7b9a32f7…3d38a`, source `836c4a3f…7f40b`, spec `fa2ec81f…8b5a0`.
+  Inputs `inputs-v3/selection.json` SHA256
+  `7d1a22f62ac03c514b5f47dbc8c4c3864d9e6b92d461ab90175d2b520c6c23ef`,
+  context archive `3bf99973505a7fb77c68d7155fd56b584c62e3751489f87a0a161a2b46f269e6`;
+  original frame IDs, ranks and source-video SHA256s checked equal to v2.
+  Exact spec `marking-context-job.json`; preparation source/checksums and
+  command `preparation-v3-source.tar`, `preparation-v3-provenance.json`.
+  Environment, checkpoint, GPU compatibility and original sampling rule
+  unchanged. Page to mark is the corrected `review/index.html`, not the
+  failed attempt's root `index.html`.
+- **Marking page ready; stopped for user marks.** Corrected job completed
+  on gpu5 RTX 6000 Ada (shared). Both the 3-frame smoke and **48-frame
+  full output** pass the module validator locally, all 16 checks. Full
+  `published.tar` SHA256
+  `2dc9acb6541224f9f72af8ceb9c781308c3e62d19fcb819515736e4b7da261ee`;
+  `instances.json` `89b78156e85b62741326a5ff2dc8a020ac58934f5dba0ad33a158c887b40f731`;
+  self-contained page `2a05d0eaf6a0a480e2caddd5d7714df72376c2f1606847506f22bfbfd49f0223`.
+  334 numbered instance-frames across 48 review frames (none empty);
+  all 48 original review JPEGs byte-identical to the frozen one-frame
+  attempt's originals. Peak allocated GPU memory 10.70 GiB, within the
+  16,000 MiB declaration. This is resource/marking validation, not evidence
+  that a player-identification rule reaches 0.95; no timing claim.
+  Durable page:
+  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k4b-2026-10-16/review/index.html`.
+  Companion `instances.json` and `provenance.json` identify the raw masks
+  in the job's full `published.tar`. Local validation receipts are
+  `context-smoke-local-validation.json` and `context-full-local-validation.json`.
+  Browser QA on synthetic frames covered two/one/none, confirmation and
+  persistence; the real complete page was checked at 0/48 confirmations.
+  No real frames were marked by the agent. Ruff, mypy and the full test
+  suite pass (560 passed, 19 skipped). Monitoring paused after completion.
+  Next: freeze exact candidate implementations before reading the returned
+  labels, compute their clip features and score by the unchanged rule.
+  No rule is selected or scored yet; (d) waits for adopted K8 homography.
+  Any winner is reported for review of K4's amendment before applying it
+  to K4's windows, as required by this task.
