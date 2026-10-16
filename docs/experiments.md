@@ -6059,3 +6059,25 @@ invocation turns out to be needed.
   `3df90280f2308b23b8ed305a7f2794f4253cc1d643a5d1efa4a13cd681141c6a`.
   Grounding batch eight, parity IoU ≥ .999, all-frame sampling and all budget
   ceilings remain unchanged. Cancellation consumes no GPU-stage allowance.
+- Corrected short pilot `20261016T154053Z-91a66242`, gpu3 RTX A6000:
+  actual `ready.json` revision `84ec4a3edfa98c0f5778e523e9f0f8b1ef7fe9a3`,
+  snapshot `3a1880ea…367e4`, source `97832f14…6c37e`, spec
+  `3ee88af7…0459b`, empty selected patch. The immutable spec's generic
+  “CPU offload” basis is unchanged from the batch-eight archive; the code
+  and recorded effective configuration explicitly request video only.
+  No full output or score is cited yet. Local checks: ruff and configured
+  mypy pass; pytest 572 passed, 19 skipped (rerun with process-inspection
+  permission after the sandbox denied `ps` in an existing contention test).
+- The corrected smoke failed its parity gate, before production/full:
+  minimum class/frame union IoU **0.9265116431832364**, below .999
+  (123 native reference instances on 12 frames). Both RLE sets and
+  `parity.json` survive in the job's `smoke/partial.tar`; the failure is
+  not a candidate score. Batch eight is rejected. Restore **native batch
+  16**, retain video-only CPU offload and the identical parity gate.
+  Reserve 24,000 MiB allocator memory plus the unchanged 4,096 MiB sharing
+  margin, admitting only GPUs with sufficient headroom; this targets the
+  diagnosed native detector activation peak. Timeouts, deadlines, the
+  8 GPU-hour phase ceiling, formulas and human marks remain unchanged.
+  Specs saved separately as `features-v1/specs-native16.tar`, SHA256
+  `a5d55d0b9e56b3765bce7fee955cb0641981d1a49827a6ebbfa43b3a01631264`.
+  Re-run short alone; no medium/long/full-corpus promotion from failures.

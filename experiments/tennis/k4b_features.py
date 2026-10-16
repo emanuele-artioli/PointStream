@@ -171,9 +171,9 @@ def run(args: argparse.Namespace) -> int:
         torch.clear_autocast_cache()
         torch.cuda.empty_cache()
     sam = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint, offload_video_to_cpu=True, offload_state_to_cpu=False,
-                                grounding_batch_size=8)
+                                grounding_batch_size=16)
     if os.environ.get("PS_STAGE") == "smoke":
-        print("phase=offloaded-parity grounding_batch=8", flush=True)
+        print("phase=offloaded-parity grounding_batch=16", flush=True)
         offloaded_reference = sam.segment_frames(parity_jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"])
         overlaps = []
         for t in range(parity_frames):
@@ -181,7 +181,7 @@ def run(args: argparse.Namespace) -> int:
                 a, b = union_masks(reference, t, name), union_masks(offloaded_reference, t, name)
                 overlaps.append(iou(a, b) if (a | b).any() else 1.)
         parity = {"checked": True, "minimum_union_iou": min(overlaps), "native_config_sha256": native_config,
-                  "frames": parity_frames, "prompts": PROMPTS, "native_grounding_batch": native_batch, "grounding_batch": 8,
+                  "frames": parity_frames, "prompts": PROMPTS, "native_grounding_batch": native_batch, "grounding_batch": 16,
                   "reference_instances": sum(len(f) for f in reference.frames)}
         reference.save(publish / "native-parity.rle")
         offloaded_reference.save(publish / "offloaded-parity.rle")
@@ -194,7 +194,7 @@ def run(args: argparse.Namespace) -> int:
         if (role, t) not in completed_masks:
             completed_masks.add((role, t))
             progress(frames + len(completed_masks))
-    print("phase=production-sam frames=" + str(frames) + " grounding_batch=8", flush=True)
+    print("phase=production-sam frames=" + str(frames) + " grounding_batch=16", flush=True)
     clip = sam.segment_frames(jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"], on_frame=on_frame)
     provenance = sam.provenance("offline_bidirectional")
     sam_record = {"runtime": runtime(), "checkpoint_sha256": provenance.checkpoint_sha256,
@@ -240,7 +240,7 @@ def validate(directory: Path, summary: dict[str, Any]) -> dict[str, Any]:
         "sam_nonempty": any(i.class_name in ("person", "player") for f in clip.frames for i in f),
         "sam_pinned": sam["checkpoint_sha256"] == "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
         "sam_native_cuda": sam["sdpa_backend_policy"] == "native_flash" and sam["runtime"]["capability"][0] >= 8,
-        "effective_grounding_batch": sam["grounding_batch_size"] == 8,
+        "effective_grounding_batch": sam["grounding_batch_size"] == 16,
         "cpu_offload_parity": summary["stage"] != "smoke" or (sam["parity"].get("minimum_union_iou", 0) >= .999
                                                                             and sam["parity"].get("reference_instances", 0) > 0),
         "pose_cuda": all(v.startswith("cuda") for v in summary["pose"]["on_cuda"].values()),
