@@ -1,6 +1,10 @@
 # Plan
 
-Each workstream is scoped to one session. Work runs in two phases
+Each workstream is scoped to one session. Items that do not depend on each
+other run in parallel sessions; each item names what it waits for (user,
+2026-10-16). This file is the source of truth: a session card only starts
+an item already written here, and nothing exists only as a card. Work runs
+in two phases
 ([decision](docs/experiments.md#2026-10-06-egocentric-first-racket-sports-second)):
 
 - **Phase 1, egocentric hand-object video.** VISOR is the only adopted dataset
@@ -1184,3 +1188,8 @@ adaptation) more than through retraining it; and SVT-AV1 with the same
 enhancer was unclear (H3d oracle: −19%, synthesized texture), which
 supports, weakly, that the learned codec composes better with learned
 parts.
+Before the claim is written (user, 2026-10-16): compare each coder's gain
+over its own base, not over the shared bar, from H3d's recorded oracle
+(the same enhancer fitted on the same windows over DCVC-UF and over
+SVT-AV1; no compute). Only if that is unclear, fit G on SVT-AV1 decodes
+of G's footage and score it as G (one fit, about 1–2 GPU-hours).
