@@ -46,8 +46,9 @@ def main() -> int:
                 "smoke": {"seconds": 600, "representative_basis": "First <=48 native frames of this same clip through K4 conversion, YOLO11x-pose, all three SAM prompts, CPU-offload/native-mask parity, full-clip scalar features and target-mask export; full uses all native frames."},
                 "full": {"seconds": full}, "validator": ["{python}", "-m", "experiments.tennis.k4b_features", "validate"],
                 "validator_seconds": 300, "budget_seconds": full + 900, "deadline": args.deadline, "stall_seconds": 1800,
-                "device": "gpu", "hosts": HOSTS, "gpu_models": GPU_MODELS, "gpu_memory_mib": 12500,
-                "cpu_threads": 8, "local_storage_gib": 40, "required_commands": [], "gpu_sharing": SHARING}
+                "device": "gpu", "hosts": HOSTS, "gpu_models": GPU_MODELS, "gpu_memory_mib": 16000,
+                "cpu_threads": 8, "local_storage_gib": 40, "required_commands": [],
+                "gpu_sharing": {**SHARING, "margin_mib": 4096}}
         name = c["id"].replace("/", "__") + ".json"
         (args.dest / name).write_text(json.dumps(spec, indent=1) + "\n")
         specs.append({"clip": c["id"], "spec": str(args.dest / name), "frames": c["frames"], "budget_seconds": spec["budget_seconds"]})

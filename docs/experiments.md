@@ -5993,3 +5993,32 @@ invocation turns out to be needed.
   Complete focused tests cover offload flags/provenance, the five rules,
   strict majority, gaps and tail discount, joint visibility, duplicate
   prompts, target-mask export, injective IoU matching and annotation identity.
+- Feature pilot inputs: `features-v1/manifest.json`, SHA256
+  `4db6651100efc5c450525b154d7f82e9b1b53de47e6699f02aaf2a25739a48b5`;
+  40 immutable original-video identities (3,269,018,181 bytes total),
+  hard-linked under `features-v1/inputs/`. Exact per-clip specs are alongside
+  the manifest. Environment/weights reuse K4's pinned artifacts. Deadline
+  `2026-10-17T01:00:00Z`, inside the 10 h wall ceiling from preparation.
+  Submitted first, before any long-clip promotion:
+  `20261016T151219Z-f30bd26d` (`medvedev_struff/007`, full allowance 300 s,
+  total 1,200 s), and `20261016T151309Z-259d7651` (`djokovic_zverev/004`,
+  full 446 s, total 1,346 s). Both `ready.json` records identify
+  **`ebd0024d79c591fd70bcf868210fe609152ef498`**, snapshot
+  `2d882a9c…257e8`, source `dc7ca0b3…b1235`, empty selected patch
+  `e3b0c442…b855`; specs `342753ea…53840` and `98efd543…157a7`.
+  The then-untracked scorer was explicitly excluded from both snapshots;
+  it is not a dependency of feature extraction. No feature result is cited
+  until its full output passes the module validator locally.
+- Both first pilots failed in the **native comparison** before CPU-offload
+  propagation or full promotion. Same diagnosed cause on gpu3 and gpu2:
+  a 324 MiB activation allocation exceeded the 12,500 MiB per-process cap
+  (11.34 GiB already allocated plus 619 MiB reserved; 12.21 GiB allowed),
+  while physical memory remained available. These are failed configuration
+  smokes, not evidence about any candidate. Saved logs and artifacts remain
+  in the original jobs. Correction: 16,000 MiB allocator cap and 4,096 MiB
+  sharing margin, giving a 20,096 MiB admission reservation versus the old
+  20,692 MiB; more actual allocator headroom with physical sharing headroom
+  still reserved. All input pixels, models, parity threshold, candidate
+  formulas, stage timeouts, deadline and 8 GPU-hour phase ceiling unchanged.
+  Revised specs are preserved separately in `features-v1/specs-16g.tar`.
+  Re-run the short pilot alone first, then promote only from valid evidence.
