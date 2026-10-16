@@ -5774,6 +5774,37 @@ invocation turns out to be needed.
 - Budget: CPU first (cuts and line detection); GPU only for a court-keypoint
   model, on the fleet with the usual smoke, ≤ 45 min per stage.
 
+- Implementation/run preparation (2026-10-16, `codex/k8-court-shots`).
+  The supplied `Tennis_courts/reference/` actually contains 966 PNG court
+  photographs, not a geometric model; adjacent `bounding_boxes/` files are
+  YOLO boxes. The user authorized regulation court geometry instead. The
+  ITF model is 23.77 × 10.97 m, singles width 8.23 m, service lines 6.40 m
+  from the net ([ITF](https://www.itftennis.com/en/about-us/organisation/tennis-glossary/));
+  the elevated net is excluded from the planar painted-line model.
+  No pretrained model, new environment or weights are needed: CPU OpenCV
+  4.10.0, NumPy 1.26.4 and SciPy from the existing packed environment.
+  The rule above is unchanged. White-line Hough hypotheses initialize
+  RANSAC against all nine painted line segments, with the preceding frame
+  as a warm start. Every decoded frame is measured at 1080p after K4's
+  limited-range 8-bit YUV420 conversion. Directed chamfer is the mean
+  distance from model-line samples at ≤1 projected-pixel spacing to
+  detected white-line pixels; a frame registers at ≤2 px with support
+  on at least six segments. Out-of-frame model lines and failed fits
+  are retained as missing, never dropped from the error distribution.
+  Initial ffmpeg scene threshold 0.25 is provisional for the user's
+  review (candidate scores ≥0.10 retained); the decision thresholds are fixed.
+  Mixed shots are false positives if predicted court and their duration
+  counts as missed court time. Registration is summarized across all
+  user-labelled court frames, with missing fits treated as infinite error.
+  CPU smoke: first 1,500 frames (30 s), ≤600 s; substantive validator
+  checks frame coverage, shot partition, real registered frames, finite
+  homographies, 80% classification and review images. Pilot/whole-match
+  stages ≤2,700 s; initial ceiling 3,500 CPU wall seconds per job,
+  16 CPU threads, no GPU allocation. The smoke establishes scale before
+  any whole-match run. Focused synthetic checks recover a known court
+  homography and reject blank frames; these are correctness checks, not
+  match evidence. Outcome is pending the user's shot labels.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
