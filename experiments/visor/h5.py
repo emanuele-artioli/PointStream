@@ -4,6 +4,7 @@
     python -m experiments.visor.h5 score WINDOW --foreground DIR --background DIR ... --routes scene,enh,svt \\
         [--anchors DIR ... --b2-result JSON ...] --dists-backbone P --max-combos N --limit-frames N
     python -m experiments.visor.h5 validate
+    python -m experiments.visor.h5 report --score H5.JSON ... --out DIR
 
 WINDOW is ``--eval-set E.JSON --archive DIR --dense-masks DIR --fill-masks DIR --video P.MP4 --item ID
 --image-ckpt P --video-ckpt P --lpips-backbone P``.
@@ -690,6 +691,188 @@ def command_validate(args: argparse.Namespace) -> int:
     return 0 if passed else 1
 
 
+# ----------------------------------------------------------------- report
+
+#: name: (mask set or "frame", key, sign, minimum overlap). Higher sign·value is better.
+METRICS: dict[str, tuple[str, str, float, float]] = {
+    "wlpips_fill": (FILL, "wlpips", -1.0, 0.005), "wdists_fill": (FILL, "wdists", -1.0, 0.005),
+    "wpsnr_fill": (FILL, "wpsnr", 1.0, 0.5), "wpsnr_dense": (DENSE, "wpsnr", 1.0, 0.5),
+    "wlpips_dense": (DENSE, "wlpips", -1.0, 0.005), "psnr_frame": ("frame", "psnr", 1.0, 0.5),
+    "lpips_frame": ("frame", "lpips", -1.0, 0.005), "dists_frame": ("frame", "dists", -1.0, 0.005),
+}
+HEADLINE = "wlpips_fill"
+#: Rule (a), fixed before any run (docs/experiments.md, H5 entry).
+DECISION = {"metric": HEADLINE, "anchor": "pooled", "mean_bd_at_most": -0.10, "items_below_zero": 3}
+#: PointStream's variants: the background routes its curve may use.
+VARIANTS = {"pointstream": ("scene", "enh"), "scene": ("scene",), "enh": ("enh",), "svt-background": ("svt",)}
+
+
+def curve(points: list[dict[str, Any]], metric: str, extra_kbps: float = 0.0) -> list[tuple[float, float]]:
+    where, key, sign, _ = METRICS[metric]
+    return [(p["kbps"] + extra_kbps, sign * p["scores"][where][key]) for p in points
+            if p["scores"][where].get(key) is not None]
+
+
+def compare(test: list[tuple[float, float]], anchor: list[tuple[float, float]], minimum: float) -> dict[str, Any]:
+    """BD-rate of ``test``'s upper concave hull against ``anchor``'s (PCHIP of log rate over the quality range
+    both cover); otherwise whether test is better or worse at every rate both reach."""
+    import math
+
+    from scipy.interpolate import PchipInterpolator
+
+    from experiments.background.g5 import envelope
+
+    t, a = envelope(test), envelope(anchor)
+    if not t or not a:
+        return {"bd": None, "where": "no points"}
+    lo, hi = max(t[0][1], a[0][1]), min(t[-1][1], a[-1][1])
+    if len(t) >= 2 and len(a) >= 2 and hi - lo >= minimum:
+        def area(points: list[tuple[float, float]]) -> float:
+            f = PchipInterpolator([q for _, q in points], [math.log(r) for r, _ in points])
+            return float(f.integrate(lo, hi))
+
+        return {"bd": math.exp((area(t) - area(a)) / (hi - lo)) - 1.0, "range": [lo, hi], "where": "overlap"}
+    sides = set()
+    for rate, q in t:
+        if a[0][0] <= rate:
+            at = a[-1][1] if rate >= a[-1][0] else float(np.interp(math.log(rate), [math.log(r) for r, _ in a],
+                                                                     [x for _, x in a]))
+            sides.add("better" if q > at else "worse")
+    where = f"{sides.pop()} at every rate" if len(sides) == 1 else (
+        "no shared rate" if not sides else "the curves cross without a shared range")
+    return {"bd": None, "where": where}
+
+
+def below_zero(c: dict[str, Any]) -> bool:
+    return (c["bd"] is not None and c["bd"] < 0) or c["where"] == "better at every rate"
+
+
+def matched_regions(points: list[dict[str, Any]], anchor: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """At each anchor point's rate, PointStream's best pair on the headline metric at or under that rate: its
+    foreground and background scores beside the anchor's (rule (b))."""
+    where, key, sign, _ = METRICS[HEADLINE]
+    out = []
+    for a in sorted(anchor, key=lambda x: x["kbps"]):
+        cheaper = [p for p in points if p["kbps"] <= a["kbps"]]
+        if not cheaper:
+            continue
+        best = max(cheaper, key=lambda p: sign * p["scores"][where][key])
+        out.append({"anchor": f"{a['codec']}-{a['point']:g}", "anchor_kbps": a["kbps"], "pair": best["pair"],
+                    "kbps": best["kbps"], **{f"{side}_{k}": {"pointstream": best["scores"][FILL][f"{k}_{side}"],
+                                                             "anchor": a["scores"][FILL][f"{k}_{side}"]}
+                                             for side in ("fg", "bg") for k in ("lpips", "psnr", "dists")}})
+    return out
+
+
+def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_kbps: float) -> dict[str, Any]:
+    from experiments.background.g5 import envelope
+
+    groups = {"svtav1": [a for a in anchors if a["codec"] == "svtav1"],
+              "dcvc": [a for a in anchors if a["codec"] == "dcvc"], "pooled": anchors}
+    out: dict[str, Any] = {"comparisons": {}, "hull": {}, "mask_kbps": mask_kbps}
+    for variant, routes in VARIANTS.items():
+        points = [r for r in rows if r["route"] in routes]
+        if not points:
+            continue
+        for metric, (_, _, _, minimum) in METRICS.items():
+            for name, group in groups.items():
+                if group:
+                    out["comparisons"][f"{variant}|{name}|{metric}"] = compare(curve(points, metric), curve(group, metric),
+                                                                             minimum)
+            if variant == "pointstream" and groups["pooled"]:  # F and its classes billed too
+                out["comparisons"][f"pointstream+mask|pooled|{metric}"] = compare(
+                    curve(points, metric, mask_kbps), curve(groups["pooled"], metric), minimum)
+        hull = envelope(curve(points, HEADLINE))
+        on = [r for r in points for k, q in hull if r["kbps"] == k and
+              -r["scores"][FILL]["wlpips"] == q]
+        out["hull"][variant] = [{"pair": r["pair"], "kbps": r["kbps"], "wlpips": r["scores"][FILL]["wlpips"],
+                                 "background_share": r["kbps_background"] / r["kbps"]} for r in on]
+    pointstream = [r for r in rows if r["route"] in VARIANTS["pointstream"]]
+    out["matched"] = matched_regions(pointstream, anchors) if pointstream and anchors else []
+    return out
+
+
+def summary(items: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    from experiments.visor.h3 import bootstrap_mean
+
+    rng = np.random.default_rng(5)
+    keys = sorted({k for it in items.values() for k in it["comparisons"]})
+    out: dict[str, Any] = {}
+    for key in keys:
+        cs = {i: it["comparisons"][key] for i, it in items.items() if key in it["comparisons"]}
+        bds = np.array([c["bd"] for c in cs.values() if c["bd"] is not None], float)
+        out[key] = {"per_item": {i: c["bd"] if c["bd"] is not None else c["where"] for i, c in cs.items()},
+                    "items": len(cs), "items_below_zero": sum(below_zero(c) for c in cs.values()),
+                    "bd": bootstrap_mean(bds, rng) if len(bds) else None, "bd_items": len(bds)}
+    head = out.get(f"pointstream|{DECISION['anchor']}|{DECISION['metric']}")
+    verdict = "incomplete"
+    if head and head["items"] >= 4:
+        passes = head["bd"] is not None and head["bd"]["mean"] <= DECISION["mean_bd_at_most"] \
+            and head["items_below_zero"] >= DECISION["items_below_zero"]
+        if head["bd_items"] < head["items"]:  # an item without a number: the rule reads its side
+            passes = head["items_below_zero"] >= DECISION["items_below_zero"] and (
+                head["bd"] is None or head["bd"]["mean"] <= DECISION["mean_bd_at_most"])
+        verdict = "passes" if passes else "fails"
+    return {"comparisons": out, "decision": {**DECISION, "verdict": verdict}}
+
+
+def plot(items: dict[str, dict[str, Any]], data: dict[str, dict[str, Any]], target: Path) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from experiments.background.g5 import envelope
+
+    shown = ("wpsnr_fill", "wlpips_fill", "wdists_fill")
+    fig, axes = plt.subplots(len(items), len(shown), figsize=(4.2 * len(shown), 3.2 * len(items)), squeeze=False)
+    for i, item in enumerate(sorted(items)):
+        rows, anchors = data[item]["rows"], data[item]["anchors"]
+        for j, metric in enumerate(shown):
+            ax = axes[i][j]
+            sign = METRICS[metric][2]
+            for label, pts, style in (("PointStream", [r for r in rows if r["route"] in ("scene", "enh")], "-o"),
+                                      ("SVT-AV1 bg", [r for r in rows if r["route"] == "svt"], ":."),
+                                      ("SVT-AV1", [a for a in anchors if a["codec"] == "svtav1"], "--s"),
+                                      ("DCVC-UF", [a for a in anchors if a["codec"] == "dcvc"], "--^")):
+                hull = envelope(curve(pts, metric))
+                if hull:
+                    ax.plot([r for r, _ in hull], [sign * q for _, q in hull], style, label=label, ms=3)
+            ax.set_xscale("log")
+            ax.set_title(f"{item} {metric}", fontsize=8)
+            ax.set_xlabel("kbps", fontsize=8)
+            if i == 0 and j == 0:
+                ax.legend(fontsize=7)
+    fig.tight_layout()
+    fig.savefig(target, dpi=110)
+
+
+def command_report(args: argparse.Namespace) -> int:
+    data: dict[str, dict[str, Any]] = {}
+    for path in args.score:
+        result = json.loads(Path(path).read_text())
+        if result["kind"] != "score" or result["limit_frames"] > 0:
+            raise SystemExit(f"{path}: not a full score stage")
+        d = data.setdefault(result["item"], {"rows": [], "anchors": [], "mask": None, "sources": []})
+        seen = {r["pair"] for r in d["rows"]}
+        d["rows"] += [r for r in result["rows"] if r["pair"] not in seen]
+        d["anchors"] += result["anchors"]
+        d["mask"] = result["foreground_manifest"]["mask_cost"]
+        d["sources"].append({"path": path, "job_id": result.get("job_id"), "git_head": result.get("git_head"),
+                             "gpu": result.get("gpu")})
+    items = {i: item_report(d["rows"], d["anchors"], d["mask"]["kbps"]) for i, d in data.items()}
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    report = {"items": items, **summary(items), "sources": {i: d["sources"] for i, d in data.items()},
+              "mask": {i: d["mask"] for i, d in data.items()}}
+    write_json(out / "h5-report.json", report)
+    if not args.no_plot:
+        plot(items, data, out / "h5-rd.png")
+    head = report["comparisons"].get(f"pointstream|pooled|{HEADLINE}")
+    print(json.dumps({"decision": report["decision"], "headline": head}, indent=1))
+    return 0
+
+
 # ----------------------------------------------------------------- command line
 
 
@@ -718,11 +901,17 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--max-combos", type=int, default=0)
     p.add_argument("--background-points", help="only these background points (method-value, comma separated)")
     sub.add_parser("validate")
+    p = sub.add_parser("report")
+    p.add_argument("--score", action="append", required=True, help="full score stages' h5.json")
+    p.add_argument("--out", required=True)
+    p.add_argument("--no-plot", action="store_true")
     args = parser.parse_args(argv)
     if args.command == "foreground":
         return command_foreground(args)
     if args.command == "score":
         return command_score(args)
+    if args.command == "report":
+        return command_report(args)
     return command_validate(args)
 
 

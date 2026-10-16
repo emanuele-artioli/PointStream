@@ -78,13 +78,13 @@ def test_foreground_validator() -> None:
 
 
 def scores(wpsnr: float = 32.0) -> dict:
-    m = {"wpsnr": wpsnr, "wlpips": 0.2, "wdists": 0.15, "psnr_fg": 30.0}
+    m: dict = {"wpsnr": wpsnr, "wlpips": 0.2, "wdists": 0.15, "psnr_fg": 30.0}
     return {h5.DENSE: dict(m), h5.FILL: dict(m), "frame": {"psnr": 33.0}}
 
 
 def test_score_validator_checks_anchor_reproduction() -> None:
     row = {"bytes": 30, "breakdown": {"header": 20, "background": 10}, "kbps": 0.06, "scores": scores()}
-    anchor = {"deterministic": True, "stream_sha256": "s", "kbps": 100.0, "scores": scores(32.0),
+    anchor: dict = {"deterministic": True, "stream_sha256": "s", "kbps": 100.0, "scores": scores(32.0),
               "b2": {"stream_sha256": "s", "kbps": 100.0, "wpsnr": 32.01}}
     result = {"rows": [row], "anchors": [anchor], "pairs_planned": 1, "jpeg_gate_holds": True, "limit_frames": 0,
               "routes": ["scene"], "bitstream_checks": {"scene": {"pair": "p", "segments_round_trip": True}},
@@ -92,3 +92,36 @@ def test_score_validator_checks_anchor_reproduction() -> None:
     assert all(h5.validate_score(result).values())
     anchor["b2"]["wpsnr"] = 32.5
     assert not h5.validate_score(result)["anchors_reproduce_b2"]
+
+
+def scored(kbps: float, lpips: float, route: str = "scene", codec: str | None = None) -> dict:
+    s: dict = {m: {"wlpips": lpips, "wdists": lpips / 2, "wpsnr": 40 - 30 * lpips, "lpips_fg": lpips, "lpips_bg": lpips,
+             "psnr_fg": 30.0, "psnr_bg": 30.0, "dists_fg": lpips, "dists_bg": lpips} for m in h5.MASK_SETS}
+    s["frame"] = {"psnr": 40 - 30 * lpips, "lpips": lpips, "dists": lpips / 2}
+    row = {"kbps": kbps, "scores": s}
+    if codec:
+        return {**row, "codec": codec, "point": kbps}
+    return {**row, "route": route, "pair": f"{route}-{kbps}", "kbps_background": kbps / 2}
+
+
+def test_compare_halves_rate_and_sides() -> None:
+    anchor = [(100.0, -0.3), (200.0, -0.2), (400.0, -0.1)]
+    test = [(50.0, -0.3), (100.0, -0.2), (200.0, -0.1)]
+    c = h5.compare(test, anchor, 0.005)
+    assert c["where"] == "overlap" and abs(c["bd"] + 0.5) < 1e-9
+    above = h5.compare([(150.0, -0.05), (300.0, -0.04)], anchor, 0.005)
+    assert above["where"] == "better at every rate" and h5.below_zero(above)
+    assert h5.compare([(10.0, -0.5)], anchor, 0.005)["where"] == "no shared rate"
+
+
+def test_report_decision_reads_the_rule() -> None:
+    anchors = [scored(k, q, codec=c) for c in ("svtav1", "dcvc") for k, q in ((100, 0.3), (200, 0.2), (400, 0.1))]
+    good = [scored(k, q) for k, q in ((50, 0.3), (100, 0.2), (200, 0.1))]
+    items = {f"I{i}": h5.item_report(good, anchors, 1.0) for i in range(4)}
+    out = h5.summary(items)
+    assert out["decision"]["verdict"] == "passes"
+    head = out["comparisons"]["pointstream|pooled|wlpips_fill"]
+    assert abs(head["bd"]["mean"] + 0.5) < 1e-6 and head["items_below_zero"] == 4
+    bad = [scored(k, q) for k, q in ((200, 0.3), (400, 0.2), (800, 0.1))]
+    items = {f"I{i}": h5.item_report(bad, anchors, 1.0) for i in range(4)}
+    assert h5.summary(items)["decision"]["verdict"] == "fails"
