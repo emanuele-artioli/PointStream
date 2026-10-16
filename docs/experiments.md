@@ -6043,3 +6043,19 @@ invocation turns out to be needed.
   Both parity mask sets and the comparison are preserved even if it fails.
   No memory cap, time allowance, deadline, phase budget, decision rule or
   human mark is changed by this revision.
+- Before admission, cancelled `20261016T153440Z-1b94df2e` (terminal
+  cancelled; no stage ran). Snapshot revision `2d2c5fda4203e8dfa499a404fcaa1d000cb4527b`;
+  the queued request was also rejected at gpu5 admission for insufficient
+  shared-memory headroom. Source inspection found that the pinned top-level
+  multiplex `init_state` supports video offload but not tracker-state offload.
+  The compatibility adapter had silently filtered the latter flag. Corrected
+  it to reject unsupported true requests explicitly (regression tested), and
+  request **video offload only**, retaining GPU tracker state. The underlying
+  tracker's separate CPU-state option is not exposed by the top-level API;
+  no adapter is added to change it. Therefore the longest-clip pilot must
+  establish state-memory feasibility before promotion. Earlier references to
+  video/state offload describe the requested, not effective, placement.
+  Corrected specs preserved as `features-v1/specs-video-only.tar`, SHA256
+  `3df90280f2308b23b8ed305a7f2794f4253cc1d643a5d1efa4a13cd681141c6a`.
+  Grounding batch eight, parity IoU ≥ .999, all-frame sampling and all budget
+  ceilings remain unchanged. Cancellation consumes no GPU-stage allowance.

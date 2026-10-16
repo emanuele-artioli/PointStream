@@ -781,6 +781,9 @@ def _install_compatible_session_start(predictor: Any) -> None:
         if hasattr(self, "video_loader_type"):
             init_kwargs["video_loader_type"] = self.video_loader_type
         valid = inspect.signature(self.model.init_state).parameters
+        for name in ("offload_video_to_cpu", "offload_state_to_cpu"):
+            if init_kwargs[name] and name not in valid:
+                raise RuntimeError(f"Pinned SAM init_state does not support requested {name}")
         state = self.model.init_state(
             **{key: value for key, value in init_kwargs.items() if key in valid}
         )

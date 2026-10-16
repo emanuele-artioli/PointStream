@@ -43,7 +43,7 @@ def main() -> int:
                 "arguments": ["run", "--manifest", "{staged:manifest}", "--clip", c["id"], "--source", "{staged:clip}",
                               "--sam-checkpoint", "{staged:sam}", "--pose", "{staged:yolo11x_pose}", "--frames", "{frames}"],
                 "scale": {"frames": {"smoke": min(48, c["frames"]), "full": 0}},
-                "smoke": {"seconds": 600, "representative_basis": "First <=48 native frames of this same clip through K4 conversion, YOLO11x-pose and all three SAM prompts with grounding batch 8 and CPU video/state offload. A separate first-12-frame native batch-16 control is compared to batch 8 with IoU >=.999. Full-clip scalar features and target masks are exported; full uses all native frames."},
+                "smoke": {"seconds": 600, "representative_basis": "First <=48 native frames of this same clip through K4 conversion, YOLO11x-pose and all three SAM prompts with grounding batch 8 and CPU video offload; tracker state stays on GPU. A separate first-12-frame native batch-16 control is compared to batch 8 with IoU >=.999. Full-clip scalar features and target masks are exported; full uses all native frames."},
                 "full": {"seconds": full}, "validator": ["{python}", "-m", "experiments.tennis.k4b_features", "validate"],
                 "validator_seconds": 300, "budget_seconds": full + 900, "deadline": args.deadline, "stall_seconds": 1800,
                 "device": "gpu", "hosts": HOSTS, "gpu_models": GPU_MODELS, "gpu_memory_mib": 16000,

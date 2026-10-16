@@ -2,8 +2,8 @@
 
 One clip per fleet job, same path on the prefix smoke and the complete clip.
 The input manifest contains no human selections. The full-size converted YUV
-is the sole source of JPEGs and pose frames, as in K4. Video and tracker state
-are offloaded to CPU for long clips; smoke compares masks to the native path.
+is the sole source of JPEGs and pose frames, as in K4. Video is offloaded to
+CPU; tracker state stays on GPU. Smoke compares masks to the native path.
 """
 
 from __future__ import annotations
@@ -170,7 +170,7 @@ def run(args: argparse.Namespace) -> int:
         gc.collect()
         torch.clear_autocast_cache()
         torch.cuda.empty_cache()
-    sam = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint, offload_video_to_cpu=True, offload_state_to_cpu=True,
+    sam = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint, offload_video_to_cpu=True, offload_state_to_cpu=False,
                                 grounding_batch_size=8)
     if os.environ.get("PS_STAGE") == "smoke":
         print("phase=offloaded-parity grounding_batch=8", flush=True)
@@ -200,7 +200,7 @@ def run(args: argparse.Namespace) -> int:
     sam_record = {"runtime": runtime(), "checkpoint_sha256": provenance.checkpoint_sha256,
                   "model_revision": provenance.model_revision, "config_sha256": provenance.config_sha256,
                   "sdpa_backend_policy": sam.sdpa_backend_policy, "offload_video_to_cpu": True,
-                  "offload_state_to_cpu": True, "grounding_batch_size": sam._require_predictor().model.batched_grounding_batch_size,
+                  "offload_state_to_cpu": False, "grounding_batch_size": sam._require_predictor().model.batched_grounding_batch_size,
                   "prompts": PROMPTS, "parity": parity}
     del sam
     gc.collect()

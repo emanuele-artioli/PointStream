@@ -292,7 +292,7 @@ def test_verified_predictor_session_initializer_signature_is_compatible() -> Non
             self._all_inference_states = {}
             self.async_loading_frames = False
 
-        def start_session(self, resource_path, session_id=None):
+        def start_session(self, resource_path, session_id=None, offload_video_to_cpu=False):
             raise AssertionError("compatibility initializer did not replace legacy method")
 
     predictor = _LegacyPredictor()
@@ -306,6 +306,9 @@ def test_verified_predictor_session_initializer_signature_is_compatible() -> Non
     assert predictor._all_inference_states["fixed"]["state"] == {
         "resource_path": "/external/frames"
     }
+    with pytest.raises(RuntimeError, match="does not support requested offload_video_to_cpu"):
+        predictor.start_session("/external/frames", offload_video_to_cpu=True)
+    assert list(predictor._all_inference_states) == ["fixed"]
 
 
 def test_older_cuda_uses_efficient_then_math_sdpa_fallback() -> None:
