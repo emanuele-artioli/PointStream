@@ -119,3 +119,79 @@ def test_ffmpeg_scene_scan_bounds_input_before_scene_selection(tmp_path):
                     "-i", "pipe:0", "-an", "-c:v", "ffv1", str(video)], input=frames.tobytes(), check=True)
     rows, _ = k8.cuts(video, 10, 10, ffmpeg, tmp_path)
     assert [r["frame"] for r in rows] == [5]  # cut at 20 must NOT be scanned
+
+
+def test_chamfer_measures_visible_portions_of_a_clipped_court():
+    rgb, hom = synthetic()
+    shifted = np.roll(rgb, -400, axis=1)
+    shifted[:, -400:] = [55, 105, 55]
+    hom = np.array([[1, 0, -400], [0, 1, 0], [0, 0, 1]], dtype=float) @ hom
+    error = court.chamfer(hom, court.white_lines(shifted))
+    assert error["chamfer_px"] < 1
+    assert 0.5 < error["visible_fraction"] < 1
+    assert court.register(shifted, hom)["registered"]
+
+
+def test_validator_reads_published_archive_after_scratch_cleanup(tmp_path, monkeypatch):
+    import io
+    import tarfile
+
+    monkeypatch.setenv("PS_STAGE_DIR", str(tmp_path))
+    monkeypatch.setenv("PS_SCRATCH_DIR", str(tmp_path / "deleted-scratch"))
+    monkeypatch.setenv("PS_VALIDATION_PATH", str(tmp_path / "validation.json"))
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "")
+    report = {"size": [1920, 1080], "frames": 1, "all_spans": [[0, 1]], "part": -1, "parts": 1, "geometry": "ITF regulation; net excluded", "shots": [
+        {"id": "shot-0000", "start": 0, "end": 1, "predicted": "court", "images": ["images/a.jpg"] * 3,
+         "registration": [{"frame": 0, "homography": np.eye(3).tolist(), "registered": True, "chamfer_px": 1.0}]}]}
+    with tarfile.open(tmp_path / "published.tar", "w") as archive:
+        for name, data in (("publish/k8-report.json", json.dumps(report).encode()), ("publish/images/a.jpg", b"image")):
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            archive.addfile(info, io.BytesIO(data))
+    assert k8.validate_job() == 0
+    assert json.loads((tmp_path / "validation.json").read_text())["passed"]
+
+
+def test_whole_shot_partitions_cover_all_frames_once_and_preserve_ids():
+    spans = k8.shot_spans([100, 130, 200, 205, 280, 340], 400)
+    selected = [k8.selected_spans(spans, i, 3) for i in range(3)]
+    assert sorted(row for group in selected for row in group) == k8.selected_spans(spans, -1, 3)
+    assert all(b > a for group in selected for _, a, b in group)
+    loads = [sum(b - a for _, a, b in group) for group in selected]
+    assert max(loads) - min(loads) <= max(b - a for a, b in spans)
+
+
+def test_assembly_requires_complete_nonduplicated_frame_coverage(tmp_path):
+    import hashlib
+    import io
+    import tarfile
+
+    source = tmp_path / "source.mp4"
+    source.write_bytes(b"immutable fixture source")
+    identity = {"video_sha256": hashlib.sha256(source.read_bytes()).hexdigest()}
+    archives = []
+    for part in range(2):
+        ident = f"shot-{part:04d}"
+        row = shot(ident, part * 2, (part + 1) * 2, "court")
+        for frame, reg in enumerate(row["registration"], part * 2):
+            reg["frame"] = frame
+        row.update(images=[f"images/{ident}.jpg"] * 3, registered_share=1.0)
+        report = {"source": identity, "fps": 50, "frames": 4, "source_frames": 4, "scene_threshold": 0.25,
+                  "scene_scores": [], "decision": k8.DECISION, "all_spans": [[0, 2], [2, 4]], "shots": [row]}
+        path = tmp_path / f"part-{part}.tar"
+        with tarfile.open(path, "w") as archive:
+            for name, data in (("publish/k8-report.json", json.dumps(report).encode()),
+                               (f"publish/images/{ident}.jpg", b"image")):
+                info = tarfile.TarInfo(name)
+                info.size = len(data)
+                archive.addfile(info, io.BytesIO(data))
+        archives.append(path)
+    result = k8.assemble(archives, tmp_path / "review", source)
+    assert result["frames"] == 4 and result["shots"] == 2
+    assert (tmp_path / "review/source.mp4").resolve() == source
+    assert (tmp_path / "review/READY.json").exists()
+    with pytest.raises(ValueError, match="cover every"):
+        k8.assemble(archives[:1], tmp_path / "incomplete", source)
+    assert not (tmp_path / "incomplete/READY.json").exists()
+    with pytest.raises(ValueError, match="duplicate"):
+        k8.assemble([archives[0], archives[0]], tmp_path / "duplicate", source)

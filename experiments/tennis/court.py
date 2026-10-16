@@ -36,7 +36,17 @@ def white_lines(rgb: np.ndarray) -> np.ndarray:
     # Local contrast suppresses flat white graphics and large white clothing regions.
     value = hsv[:, :, 2]
     ridge = value.astype(np.int16) - cv2.GaussianBlur(value, (0, 0), 4).astype(np.int16)
-    return ((hsv[:, :, 1] < 110) & (value > 155) & (ridge > 5)).astype(np.uint8)
+    raw = ((hsv[:, :, 1] < 80) & (value > 170) & (ridge > 5)).astype(np.uint8)
+    # Colour alone includes pale worn grass. Keep only pixels supported by a
+    # long straight line, otherwise chamfer becomes distance to grass texture.
+    scale = rgb.shape[0] / 1080
+    lines = cv2.HoughLinesP(raw * 255, 1, np.pi / 720, max(20, round(50 * scale)),
+                            minLineLength=max(20, round(80 * scale)), maxLineGap=max(4, round(12 * scale)))
+    support = np.zeros_like(raw)
+    if lines is not None:
+        for x1, y1, x2, y2 in lines[:, 0]:
+            cv2.line(support, (int(x1), int(y1)), (int(x2), int(y2)), (1,), max(3, round(7 * scale)))
+    return raw & support
 
 
 def samples(hom: np.ndarray, step: float = 1.0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -67,20 +77,23 @@ def chamfer(hom: np.ndarray, mask: np.ndarray, step: float = 1.0) -> dict[str, A
     """Directed chamfer: mean projected-line-point distance to detected line pixels.
 
     Sample every <=1 projected pixel, at native resolution. Out-of-frame painted
-    lines are missing support, not clipped away to make a partial court pass.
+    lines have no image pixels to measure and are excluded; at least half the
+    model samples must remain visible. Failed fits remain missing frame errors.
     Error is scaled to 1080p by image height. Each frame contributes one mean.
     """
     _, points, groups = samples(hom, step)
     h, w = mask.shape
     xy = np.rint(points).astype(int)
     visible = (xy[:, 0] >= 0) & (xy[:, 0] < w) & (xy[:, 1] >= 0) & (xy[:, 1] < h)
-    if not mask.any() or not visible.all():
+    if not mask.any() or visible.mean() < 0.5:
         return {"chamfer_px": None, "support": 0.0, "segments_supported": 0}
     dist = cv2.distanceTransform(1 - mask, cv2.DIST_L2, cv2.DIST_MASK_PRECISE)
+    xy, groups = xy[visible], groups[visible]
     errors = dist[xy[:, 1], xy[:, 0]] * (1080 / h)
-    supports = [float((errors[groups == i] <= 6).mean()) for i in range(len(SEGMENTS))]
+    supports = [float((errors[groups == i] <= 6).mean()) if np.any(groups == i) else 0.0
+                for i in range(len(SEGMENTS))]
     return {"chamfer_px": float(errors.mean()), "support": float((errors <= 6).mean()),
-            "segments_supported": sum(s >= 0.5 for s in supports)}
+            "segments_supported": sum(s >= 0.5 for s in supports), "visible_fraction": float(visible.mean())}
 
 
 def refine(hom: np.ndarray, mask: np.ndarray) -> np.ndarray | None:
@@ -161,8 +174,10 @@ def seed(mask: np.ndarray) -> np.ndarray | None:
                     continue
                 _, pts, _ = samples(hom, step=12)
                 xy = np.rint(pts).astype(int)
-                if np.any(xy < 0) or np.any(xy[:, 0] >= w) or np.any(xy[:, 1] >= h):
+                inside = (xy[:, 0] >= 0) & (xy[:, 0] < w) & (xy[:, 1] >= 0) & (xy[:, 1] < h)
+                if inside.mean() < 0.5:
                     continue
+                xy = xy[inside]
                 cost = float(np.minimum(distance[xy[:, 1], xy[:, 0]], 30).mean())
                 if cost < best_cost:
                     best, best_cost = hom, cost
@@ -179,5 +194,12 @@ def register(rgb: np.ndarray, previous: np.ndarray | None = None) -> dict[str, A
     if hom is None:
         return {"homography": None, "chamfer_px": None, "registered": False}
     error = chamfer(hom, mask)
+    if previous is not None and (error["chamfer_px"] is None or error["chamfer_px"] > 6):
+        independent = seed(mask)
+        alternate = refine(independent, mask) if independent is not None else None
+        if alternate is not None:
+            alternative_error = chamfer(alternate, mask)
+            if alternative_error["chamfer_px"] is not None and (error["chamfer_px"] is None or alternative_error["chamfer_px"] < error["chamfer_px"]):
+                hom, error = alternate, alternative_error
     valid = error["chamfer_px"] is not None and error["chamfer_px"] <= 2.0 and error["segments_supported"] >= 6
     return {"homography": hom.tolist(), **error, "registered": bool(valid)}

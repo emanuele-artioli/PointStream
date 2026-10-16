@@ -5789,8 +5789,9 @@ invocation turns out to be needed.
   limited-range 8-bit YUV420 conversion. Directed chamfer is the mean
   distance from model-line samples at ≤1 projected-pixel spacing to
   detected white-line pixels; a frame registers at ≤2 px with support
-  on at least six segments. Out-of-frame model lines and failed fits
-  are retained as missing, never dropped from the error distribution.
+  on at least six segments. Chamfer measures only in-frame projected line
+  portions (at least half the projected samples visible); failed fits
+  remain missing, never dropped from the error distribution.
   Initial ffmpeg scene threshold 0.25 is provisional for the user's
   review (candidate scores ≥0.10 retained); the decision thresholds are fixed.
   Mixed shots are false positives if predicted court and their duration
@@ -5825,6 +5826,24 @@ invocation turns out to be needed.
   owned job and retained its artifacts; scene scanning now has an input
   `-t` bound. An actual ffmpeg regression fixture checks that a cut beyond
   the selected input interval is excluded. No registration evidence yet.
+
+- Registration diagnostic `20261016T091435Z-0a586c9d` (`84dbe11`,
+  gpu1, CPU) completed all 1,500 frames / 4 shots in 228.2 s, predicted
+  zero court shots. Its validator failed because the fleet archives and
+  removes scratch before validation; the corrected validator reads
+  `published.tar` as K4 does (regression-tested). No full stage ran.
+  Visual QA found clipped doubles lines and grass texture in the initial
+  colour mask. Before the next smoke, the detector now requires coherent
+  long straight support, measures in-frame projected portions (rather
+  than rejecting a clipped court), and retries independent hypotheses
+  when a previous fit is poor. These are implementation corrections;
+  the decision thresholds are unchanged and this diagnostic is not used
+  for adoption. At this throughput the match is split into four balanced
+  groups of whole shots, each saving every finished shot, ≤45 min per
+  stage, then assembled into a new review directory. Assembly checks
+  identical inputs/cuts and every source frame exactly once; completed
+  archives remain unchanged. Initial ceiling remains 3,500 wall seconds
+  per CPU job, 16 CPU threads, no GPU allocation.
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel

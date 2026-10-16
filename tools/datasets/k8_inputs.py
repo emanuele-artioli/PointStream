@@ -22,7 +22,7 @@ def main() -> int:
     parser.add_argument("--dest", type=Path, required=True)
     parser.add_argument("--environment", type=Path, required=True)
     parser.add_argument("--environment-sha256", required=True)
-    parser.add_argument("--full-frames", type=int, default=0)
+    parser.add_argument("--full-frames", type=int, default=6000)
     args = parser.parse_args()
     dest = args.dest.resolve()
     dest.relative_to((args.datasets / "pointstream-data").resolve())
@@ -55,6 +55,12 @@ def main() -> int:
             "hosts": [f"gpu{i}" for i in range(1, 7)], "local_storage_gib": 30,
             "required_commands": ["ffmpeg", "ffprobe"]}
     (dest / "job.json").write_text(json.dumps(spec, indent=2) + "\n")
+    for part in range(4):
+        full = json.loads(json.dumps(spec))
+        full["arguments"].extend(["--part", "{part}", "--parts", "4"])
+        full["scale"] = {"frames": {"smoke": 1500, "full": 0}, "part": {"smoke": -1, "full": part}}
+        full["stall_seconds"] = 1800
+        (dest / f"k8-full-{part}.json").write_text(json.dumps(full, indent=2) + "\n")
     print(json.dumps({"spec": str(dest / "job.json"), "inputs": identity}, indent=2))
     return 0
 
