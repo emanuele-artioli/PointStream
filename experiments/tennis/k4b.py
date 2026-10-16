@@ -1,6 +1,6 @@
 """K4b.1 marking stage: K4 conversion and SAM path, then a self-contained review page.
 
-No player rule is applied here. Independent single-frame SAM sessions supply
+No player rule is applied here. Short real temporal SAM sessions supply
 the review instances; later clip-level candidates are matched to these masks by IoU.
 """
 
@@ -157,12 +157,18 @@ def run(args: argparse.Namespace) -> int:
     rows = []
     for i, row in enumerate(selected):
         source = Path(args.frames) / row["member"]
-        raw = np.memmap(source, dtype=np.uint8, mode="r", offset=row["offset"] * 1920 * 1080 * 3 // 2, shape=(1080 * 3 // 2, 1920))
-        rgb = tw.yuv_to_rgb(raw, 1920, 1080)
+        context = []
+        for offset in row["context_offsets"]:
+            raw = np.memmap(source, dtype=np.uint8, mode="r", offset=offset * 1920 * 1080 * 3 // 2, shape=(1080 * 3 // 2, 1920))
+            context.append(tw.yuv_to_rgb(raw, 1920, 1080))
+        target = row["context_frames"].index(row["frame"])
+        rgb = context[target]
         work = scratch / f"frame-{i}"
-        clip = segmenter.segment_frames(k4.write_jpegs(rgb[None], work), PROMPTS, policy="offline_bidirectional", fps=row["fps"])
-        if len(clip.frames) != 1:
-            raise RuntimeError("SAM must return exactly one frame per review session")
+        sequence = segmenter.segment_frames(k4.write_jpegs(np.stack(context), work), PROMPTS, policy="offline_bidirectional", fps=row["fps"])
+        if len(sequence.frames) != len(context):
+            raise RuntimeError("SAM must return every real context frame")
+        clip = ClipMasks(sequence.classes, sequence.height, sequence.width, sequence.fps,
+                         frames=[sequence.frames[target]], meta={"context_frames": row["context_frames"], "target": target})
         mask_path = publish / f"masks-{i:03d}.json.zst"
         clip.save(mask_path)
         groups = numbered(clip)
@@ -173,7 +179,7 @@ def run(args: argparse.Namespace) -> int:
         progress(i + 1)
     record = {"schema": 1, "sam": sam, "selection_sha256": file_sha256(Path(args.selection)),
               "input_archive_sha256": manifest["archive"]["sha256"], "count": len(rows),
-              "session": "independent one-frame sessions; clip-level rules are not evaluated",
+              "session": "eight real adjacent frames per selected frame; only the selected frame is reviewed; clip-level rules are not evaluated",
               "frames": [{k: v for k, v in r.items() if k not in ("image", "original")} for r in rows],
               "converted_inputs_verified": True,
               "gpu_peak_gib": torch.cuda.max_memory_allocated() / 2**30}
@@ -192,7 +198,7 @@ def validate_directory(directory: Path, summary: Path) -> dict[str, Any]:
     frames = record["frames"]
     sam = record["sam"]
     checks = {
-        "selection_recomputed_from_inventory": selection["frames"] == [{**e, **{k: r[k] for k in ("member", "offset", "fps")}} for e, r in zip(expected, selection["frames"])] and len(expected) == len(selection["frames"]),
+        "selection_recomputed_from_inventory": [{k: r[k] for k in ("match", "clip", "frame", "rank")} for r in selection["frames"]] == expected,
         "no_k4_clip": all(f"broadcast/{r['match']}/{r['clip']}" not in selection["excluded"] for r in frames),
         "global_hashes": all(r["rank"] == frame_hash(r["match"], r["clip"], r["frame"]) for r in frames),
         "expected_frame_count": len(frames) == meta["count"] == record["count"] and len(frames) > 0,
@@ -202,6 +208,9 @@ def validate_directory(directory: Path, summary: Path) -> dict[str, Any]:
         "pinned_checkpoint": sam["checkpoint_sha256"] == "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
         "both_prompts": sam["prompts"] == PROMPTS,
         "record_identity": file_sha256(directory / "instances.json") == meta["record_sha256"],
+        "nonempty_model_output": any(r["instances"] for r in frames),
+        "real_temporal_context": all(len(r["context_frames"]) >= 3 and r["frame"] in r["context_frames"]
+                                     and r["context_frames"] == list(range(r["context_frames"][0], r["context_frames"][-1] + 1)) for r in frames),
         "converted_inputs_verified": record["converted_inputs_verified"] is True,
         "mask_integrity": True, "instance_numbering": True, "page_payload": True,
     }

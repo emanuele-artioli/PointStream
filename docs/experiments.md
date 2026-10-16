@@ -5816,8 +5816,8 @@ invocation turns out to be needed.
   `tools/datasets/k4b_inputs.py` preserves the complete inventory, exclusion
   list, hashes, original clip identities and conversion commands.
   Outputs: `Datasets/pointstream-data/tennis/k4b-2026-10-16/`.
-- This stage obtains review instances only: independent one-frame SAM
-  sessions through K4's `Sam31SequenceSegmenter`, offline bidirectional,
+- This stage obtains review instances only through K4's
+  `Sam31SequenceSegmenter`, offline bidirectional,
   both prompts, K4's limited-range 1080p 4:2:0 conversion and 960×540
   quality-95 JPEG path. It does not estimate clip-level motion from sparse
   review frames. Full temporal clip features for candidates (a), (b), (c),
@@ -5841,3 +5841,45 @@ invocation turns out to be needed.
   was cancelled while pending after review found its validator expected
   local scratch to survive publication. The replacement validator reads
   `published.tar`, like K4's, and is tested after removing scratch.
+  Request `20261016T090018Z-00e9fcb6` (`bd38cad9`) was also cancelled
+  before allocation: its conservative 24,000 MiB reservation plus the
+  sharing margin no longer fitted the available GPUs. The same revision
+  and inputs were submitted at 16,000 MiB (recorded SAM smoke peak 11.3 GiB;
+  this stage has one frame per session), without increasing the budget.
+  Both cancelled requests' revisions were read from their `ready.json`.
+- **Rejected marking attempt** `20261016T090231Z-64b221c7`, gpu5 RTX 6000 Ada, shared;
+  revision **`bd38cad9bfdc4f082a3a39621a88083851dc500e`**, read from
+  `ready.json` (no selected changes; empty patch SHA256 `e3b0c442…b855`),
+  snapshot `87f25e2a…bacb4`, source identity `028dc031…da0`, spec
+  `be5462a7…b5ce4`. Exact spec `marking-job-16g.json`; selection
+  `inputs-v2/selection.json` SHA256 `5e79df8406407fbeeab6ef1ed2a990f39dad6393ecb1109d1fdbe65693fb4088`,
+  selected converted frames archive `3af558001d71fbd06eff3d366aafe853de9b1e84c8775ab96c30d30dd3bcf161`.
+  Environment: K4's `pointstream-20261009T214002Z.tar.gz`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`;
+  SAM checkpoint `0567debe…41cb6`. CPU preparation used ffmpeg
+  `n7.1.1-56-gc2184b65d2` at `/opt/local/bin/ffmpeg`; exact preparation
+  sources, checksums, command and tool versions are retained in
+  `preparation-source.tar` and `preparation-provenance.json`. There are
+  no native video encodes in this marking stage.
+- This attempt's one-frame sessions produced **zero instances on all 48
+  frames** (peak 6.17 GiB). The smoke and local full validators passed
+  integrity checks but failed to detect this functional failure; the
+  subsequent output review caught it. It is not a usable marking page
+  or scientific evidence. The archived output and the read-only root
+  `index.html` are retained as failed artifacts, not offered for marking.
+  SAM's pinned `sam3/model_builder.py:1185` enables masklet confirmation;
+  `sam3_multiplex_base.py:251` requires three consecutive detections.
+  One-frame video sessions cannot satisfy that gate.
+- Correction, with sampling and decision rule unchanged: `inputs-v3/`
+  reuses v2's frozen inventory and selection. Around each selected frame,
+  eight **real consecutive** frames are decoded (start `frame - 4`,
+  clamped to the clip's valid span), through exactly K4's conversion and
+  JPEG path. Both prompts propagate on those short sequences with the
+  original confirmation settings; only the originally selected frame's
+  instances enter the page. All-empty smoke/full outputs now fail
+  `nonempty_model_output`, and real contiguous context is checked. This
+  supplies masks for manual marking, not the later full-clip candidate
+  features. A regression covers published-archive validation after scratch
+  removal, mask tampering, and rejection of all-empty model output.
+  Replacement budget ≤ 3,000 s (smoke ≤ 600, full ≤ 2,100, validator ≤ 300),
+  keeping total GPU execution within the original 3,600 s ceiling.
