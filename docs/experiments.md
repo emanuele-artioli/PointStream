@@ -5954,6 +5954,39 @@ invocation turns out to be needed.
   `tools/datasets/k8_publish_existing.py` refuses any ready/claimed/run
   state. No duplicate job was launched and all normal smoke gates remain.
 
+- Review ready (2026-10-16; assembly revision `edcf474`). All twelve
+  recovery jobs above completed their gates and full stages on CPU.
+  Processing time per group 0–11: 246.7, 322.9, 233.2, 228.4, 203.0,
+  288.1, 269.7, 461.4, 485.8, 468.6, 431.2, 507.5 seconds. Assembly
+  verified the preserved archive hashes, recovery manifest identity,
+  source-video SHA256 and exact non-overlapping coverage of all 115,505
+  frames / 360 original shots. No completed shot was rerun. Each shot
+  has its exact first, middle and last image (1,080 JPEGs); the middle
+  carries the projected court when a homography exists. Predictions:
+  41 court, 319 non-court. These are predictions, not measured accuracy.
+  The browser was opened and verified at 0/360 marks; no labels supplied
+  by the agent. Source video seeking uses a read-only loopback server.
+  Final page, relative to the run root:
+  `review/review.html`; review ID `63f9a0d78069c771`.
+  Absolute run root:
+  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k8-2026-10-16/`.
+  `review/k8-report.json` retains every per-frame homography/error,
+  conversion command, native-tool path/version, input/archive checksum,
+  original and recovery job identity, and selected worker checksums.
+  FFmpeg/ffprobe 8.1.2 from the packed environment supplied the native
+  decode/scene paths; no encoder or GPU was used. The full scene command
+  is explicitly reconstructed from the retained full cut scan, rather
+  than mislabeled with the base smoke's 30-second invocation.
+  Report SHA256:
+  `530696e0c6b70dbbbe0939de295faa4a9c83a07140e7586038784bc2e44ce4cf`;
+  HTML SHA256:
+  `4a16e6f746fc1de6442df76e8334df2b7ac091a3fd082d3096205beee8af8a1e`.
+  Required checks passed: ruff, mypy, pytest (574 passed, 19 skipped).
+  **Outcome by the rule: pending the user's complete marks JSON.**
+  Precision, duration-weighted recall, registration median/p95 and
+  per-class misses will be scored only after those marks return.
+  No adoption decision or threshold change has been made.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
