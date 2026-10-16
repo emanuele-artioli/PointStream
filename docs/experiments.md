@@ -5820,7 +5820,8 @@ invocation turns out to be needed.
   points in the bar (DCVC-UF 9 points, SVT-AV1 11). No compute: `h3d.compare`
   (code `56f1120`) on the recorded points. Output:
   `…/h3d-2026-10-12/analysis-own-base-56f1120/own-base.json` (`e261b6d3…`).
-- Decision rule (set with the question, before computing): the claim
+- Decision rule (written after the numbers were computed, so it is a
+  reading aid, not a pre-registered test): the claim
   "the learned codec composes better" is supported if DCVC-UF's gain over
   its own base exceeds SVT-AV1's by at least 10 points of BD-rate on
   LPIPS, on at least 3 of 4 items; refuted if SVT-AV1's gain is at least
