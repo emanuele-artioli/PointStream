@@ -53,6 +53,21 @@ def test_cpu_offload_session_flags_are_explicit_and_change_provenance():
     assert native.provenance("offline_bidirectional").config_sha256 != offloaded.provenance("offline_bidirectional").config_sha256
 
 
+def test_grounding_batch_control_is_applied_and_identified():
+    from types import SimpleNamespace
+
+    predictor = _FakePredictor()
+    predictor.model = SimpleNamespace(batched_grounding_batch_size=16)
+    native = Sam31SequenceSegmenter(predictor=predictor)
+    smaller = Sam31SequenceSegmenter(predictor=predictor, grounding_batch_size=8)
+    assert predictor.model.batched_grounding_batch_size == 8
+    assert native.provenance("offline_bidirectional").config_sha256 != smaller.provenance("offline_bidirectional").config_sha256
+    with pytest.raises(RuntimeError, match="batch-size control"):
+        Sam31SequenceSegmenter(predictor=_FakePredictor(), grounding_batch_size=8)
+    with pytest.raises(ValueError):
+        Sam31SequenceSegmenter(predictor=predictor, grounding_batch_size=0)
+
+
 def test_sam31_scales_box_prompt_to_relative_coordinates() -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)

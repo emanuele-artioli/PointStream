@@ -183,6 +183,7 @@ class Sam31SequenceSegmenter:
         model_options: dict[str, Any] | None = None,
         offload_video_to_cpu: bool = False,
         offload_state_to_cpu: bool = False,
+        grounding_batch_size: int | None = None,
     ) -> None:
         if not 0.0 <= prob_threshold <= 1.0:
             raise ValueError("prob_threshold must be in [0, 1]")
@@ -204,6 +205,9 @@ class Sam31SequenceSegmenter:
         self.model_options = dict(model_options or {})
         self.offload_video_to_cpu = bool(offload_video_to_cpu)
         self.offload_state_to_cpu = bool(offload_state_to_cpu)
+        if grounding_batch_size is not None and (type(grounding_batch_size) is not int or grounding_batch_size <= 0):
+            raise ValueError("grounding_batch_size must be a positive integer")
+        self.grounding_batch_size = grounding_batch_size
         self.sessions: dict[tuple[Role, str], _Session] = {}
         self.predictor = predictor
         self.model_revision: str | None = None
@@ -212,6 +216,13 @@ class Sam31SequenceSegmenter:
         if self.predictor is None:
             self._verify_artifacts()
             self.predictor = self._load_predictor(builder)
+        if self.grounding_batch_size is not None:
+            model = getattr(self.predictor, "model", None)
+            if model is None or not hasattr(model, "batched_grounding_batch_size"):
+                raise RuntimeError("Pinned SAM predictor lacks its grounding batch-size control")
+            model.batched_grounding_batch_size = self.grounding_batch_size
+            if model.batched_grounding_batch_size != self.grounding_batch_size:
+                raise RuntimeError("SAM did not apply the requested grounding batch size")
 
     def _require_predictor(self) -> Any:
         if self.predictor is None:
@@ -328,6 +339,8 @@ class Sam31SequenceSegmenter:
         if self.offload_video_to_cpu or self.offload_state_to_cpu:
             config["offload_video_to_cpu"] = self.offload_video_to_cpu
             config["offload_state_to_cpu"] = self.offload_state_to_cpu
+        if self.grounding_batch_size is not None:
+            config["batched_grounding_batch_size"] = self.grounding_batch_size
         config_hash = hashlib.sha256(
             json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest()

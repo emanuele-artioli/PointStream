@@ -6022,3 +6022,24 @@ invocation turns out to be needed.
   formulas, stage timeouts, deadline and 8 GPU-hour phase ceiling unchanged.
   Revised specs are preserved separately in `features-v1/specs-16g.tar`.
   Re-run the short pilot alone first, then promote only from valid evidence.
+- The 16,000 MiB short attempt `20261016T152206Z-e078b538` also failed
+  during the native comparison (gpu2, before full promotion). Its
+  `ready.json` revision is `04808b97db8b1137c0490f109a7695d95081af1a`,
+  snapshot `54e80bea…96346`, spec `edd289ea…ba6fc`, empty selected patch.
+  A 1.27 GiB detection-head activation exceeded the allocator cap; physical
+  memory was available. No candidate outcome was produced. Revised-spec
+  archive SHA256 `7773a5949ddbfba8ccbbeb9c4927fa9412840f3da24e1dd434c9307dd88d6701`.
+- Revised memory approach, before another smoke: upstream
+  `model_builder.py:1191` batches **16** frames for grounding; those
+  detector activations caused both cap failures. Explicitly use grounding
+  batches of eight, with video/state offload and the same 16,000 MiB cap.
+  This changes batching, not temporal sampling: every native source frame
+  still runs through the same detector/tracker and fixed candidate formulas.
+  The official attribute is asserted effective and included in config
+  provenance; default callers retain the original batch. The production
+  smoke is still all first 48 frames. Its parity control uses the first 12
+  real frames, default batch 16 (effective 12) versus configured batch 8,
+  comparing every class/frame union at the unchanged IoU ≥ .999 threshold.
+  Both parity mask sets and the comparison are preserved even if it fails.
+  No memory cap, time allowance, deadline, phase budget, decision rule or
+  human mark is changed by this revision.

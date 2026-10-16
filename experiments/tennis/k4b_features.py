@@ -154,37 +154,59 @@ def run(args: argparse.Namespace) -> int:
     torch.cuda.empty_cache()
     parity: dict[str, Any] = {"checked": False}
     if os.environ.get("PS_STAGE") == "smoke":
+        parity_jpeg = scratch / "parity-jpeg"
+        parity_jpeg.mkdir()
+        parity_frames = min(12, frames)
+        for p in sorted(jpeg.glob("*.jpg"))[:parity_frames]:
+            (parity_jpeg / p.name).symlink_to(p)
         native = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint)
-        reference = native.segment_frames(jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"])
+        print("phase=native-parity frames=" + str(parity_frames), flush=True)
+        native_batch = native._require_predictor().model.batched_grounding_batch_size
+        if native_batch != 16:
+            raise RuntimeError("Unexpected native SAM grounding batch; parity control is invalid")
+        reference = native.segment_frames(parity_jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"])
         native_config = native.provenance("offline_bidirectional").config_sha256
         del native
         gc.collect()
+        torch.clear_autocast_cache()
         torch.cuda.empty_cache()
-    sam = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint, offload_video_to_cpu=True, offload_state_to_cpu=True)
+    sam = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint, offload_video_to_cpu=True, offload_state_to_cpu=True,
+                                grounding_batch_size=8)
+    if os.environ.get("PS_STAGE") == "smoke":
+        print("phase=offloaded-parity grounding_batch=8", flush=True)
+        offloaded_reference = sam.segment_frames(parity_jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"])
+        overlaps = []
+        for t in range(parity_frames):
+            for name in PROMPTS:
+                a, b = union_masks(reference, t, name), union_masks(offloaded_reference, t, name)
+                overlaps.append(iou(a, b) if (a | b).any() else 1.)
+        parity = {"checked": True, "minimum_union_iou": min(overlaps), "native_config_sha256": native_config,
+                  "frames": parity_frames, "prompts": PROMPTS, "native_grounding_batch": native_batch, "grounding_batch": 8,
+                  "reference_instances": sum(len(f) for f in reference.frames)}
+        reference.save(publish / "native-parity.rle")
+        offloaded_reference.save(publish / "offloaded-parity.rle")
+        write_json(publish / "parity.json", parity)
+        if min(overlaps) < .999:
+            raise ValueError("CPU offload/batch size changed SAM masks in the representative smoke")
+        del reference, offloaded_reference
     completed_masks: set[tuple[str, int]] = set()
     def on_frame(role: str, t: int) -> None:
         if (role, t) not in completed_masks:
             completed_masks.add((role, t))
             progress(frames + len(completed_masks))
+    print("phase=production-sam frames=" + str(frames) + " grounding_batch=8", flush=True)
     clip = sam.segment_frames(jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"], on_frame=on_frame)
     provenance = sam.provenance("offline_bidirectional")
-    if os.environ.get("PS_STAGE") == "smoke":
-        overlaps = []
-        for t in range(frames):
-            for name in PROMPTS:
-                a, b = union_masks(reference, t, name), union_masks(clip, t, name)
-                overlaps.append(iou(a, b) if (a | b).any() else 1.)
-        parity = {"checked": True, "minimum_union_iou": min(overlaps), "native_config_sha256": native_config,
-                  "frames": frames, "prompts": PROMPTS}
-        if min(overlaps) < .999:
-            raise ValueError("CPU offload changed SAM masks in the representative smoke")
     sam_record = {"runtime": runtime(), "checkpoint_sha256": provenance.checkpoint_sha256,
                   "model_revision": provenance.model_revision, "config_sha256": provenance.config_sha256,
                   "sdpa_backend_policy": sam.sdpa_backend_policy, "offload_video_to_cpu": True,
-                  "offload_state_to_cpu": True, "prompts": PROMPTS, "parity": parity}
+                  "offload_state_to_cpu": True, "grounding_batch_size": sam._require_predictor().model.batched_grounding_batch_size,
+                  "prompts": PROMPTS, "parity": parity}
     del sam
     gc.collect()
+    torch.clear_autocast_cache()
     torch.cuda.empty_cache()
+    print("phase=cpu-features", flush=True)
     targets = sorted(t for t in info["review_frames"] if t < frames)
     feature_record, target_clip = extract_features(clip, detections, targets)
     clip.save(publish / "sam-masks.rle")
@@ -218,7 +240,9 @@ def validate(directory: Path, summary: dict[str, Any]) -> dict[str, Any]:
         "sam_nonempty": any(i.class_name in ("person", "player") for f in clip.frames for i in f),
         "sam_pinned": sam["checkpoint_sha256"] == "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
         "sam_native_cuda": sam["sdpa_backend_policy"] == "native_flash" and sam["runtime"]["capability"][0] >= 8,
-        "cpu_offload_parity": summary["stage"] != "smoke" or sam["parity"].get("minimum_union_iou", 0) >= .999,
+        "effective_grounding_batch": sam["grounding_batch_size"] == 8,
+        "cpu_offload_parity": summary["stage"] != "smoke" or (sam["parity"].get("minimum_union_iou", 0) >= .999
+                                                                            and sam["parity"].get("reference_instances", 0) > 0),
         "pose_cuda": all(v.startswith("cuda") for v in summary["pose"]["on_cuda"].values()),
         "pose_finite": all(np.isfinite(v).all() for d in dets for v in d.values()),
         "frozen_candidates": saved["rules"] == summary["rules"] == rules.RULES,
