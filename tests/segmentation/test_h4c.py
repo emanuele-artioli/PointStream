@@ -124,3 +124,13 @@ def test_contacts_name_the_objects_a_hand_touches():
 def test_stage_two(o, r, versus, expected):
     d = h4c.stage2(o, r, versus)
     assert (d["objects"].split(" (")[0], d["hands"], d["networks"]) == expected
+
+
+def test_stage_two_rows_join_stage_one_units_of_the_same_name():
+    meta1 = {"unit": "i@p", "rows": ["base", "G", "oracle"], "fits": {"G": 1, "oracle": 2}}
+    meta2 = {"unit": "i@p", "rows": ["base", "G", "G_O", "G_HO"], "fits": {"G": 1, "G_O": 3, "G_HO": 4}}
+    a1 = {"pixels_o": np.ones(2), "lpips_o": np.array([[1.0, 1], [2, 2], [3, 3]])}
+    a2 = {"pixels_o": np.ones(2), "lpips_o": np.array([[9.0, 9], [9, 9], [4, 4], [5, 5]])}
+    (meta, a), = h4c.merge_units([[(meta1, a1)], [(meta2, a2)]])
+    assert meta["rows"] == ["base", "G", "oracle", "G_O", "G_HO"]
+    assert a["lpips_o"][:, 0].tolist() == [1, 2, 3, 4, 5] and set(meta["fits"]) == {"G", "oracle", "G_O", "G_HO"}

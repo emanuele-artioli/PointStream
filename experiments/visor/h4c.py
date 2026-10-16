@@ -720,8 +720,29 @@ def stage2(o: dict[str, str], r: dict[str, str], versus: dict[str, float | None]
     return {"objects": "G_O", "hands": "G", "networks": 2}
 
 
+def merge_units(per_archive: list[list[tuple[dict[str, Any], dict[str, np.ndarray]]]]) -> list[tuple[dict[str, Any], dict[str, np.ndarray]]]:
+    """One unit per name: stage 2 re-scores a point under stage 1's name with other rows (G_O, G_HO), so rows a later
+    archive adds are appended; a row already present (``base``, ``G``) is kept from the first archive that has it."""
+    merged: dict[str, tuple[dict[str, Any], dict[str, np.ndarray]]] = {}
+    for units in per_archive:
+        for meta, a in units:
+            if meta["unit"] not in merged:
+                merged[meta["unit"]] = (dict(meta), dict(a))
+                continue
+            first, arrays = merged[meta["unit"]]
+            new = [j for j, row in enumerate(meta["rows"]) if row not in first["rows"]]
+            if not new:
+                continue
+            for key, value in a.items():
+                if key.split("_")[0] in ("lpips", "sse", "dists", "flicker"):
+                    arrays[key] = np.concatenate([arrays[key], value[new]])
+            first["rows"] = [*first["rows"], *(meta["rows"][j] for j in new)]
+            first["fits"] = {**first["fits"], **{k: v for k, v in meta["fits"].items() if k in {meta["rows"][j] for j in new}}}
+    return list(merged.values())
+
+
 def command_report(args: argparse.Namespace) -> int:
-    units = load_units(args.run, "point")
+    units = merge_units([load_units([path], "point") for path in args.run])
     h1 = {row["id"]: row for row in json.loads(Path(args.h1_report).read_text())["per_item"]}
     h3d_report = json.loads(Path(args.h3d_report).read_text())
     by_region = {r: rows_by_arm(units, h1, r) for r in REGIONS}
