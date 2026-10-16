@@ -571,8 +571,10 @@ def score_anchors(args: argparse.Namespace, w: dict[str, Any], judges: Judges, w
                 pw.mkdir(parents=True)
                 if codec == "svtav1":
                     rec = b2.code_svtav1(coder, source, w["fps"], point, pw, stream, {}, None, None)
-                else:
-                    rec = b2.code_dcvc(coder, source, point, pw, stream, False, {"range": "full"})
+                else:  # a stored DCVC-UF stream never decodes in a later job (docs/fleet.md): re-encode B2's point
+                    rec = b2.code_dcvc(coder, source, point, pw, None, False, {"range": "full"})
+                    if not (rec["deterministic"] and rec["decoder_matches_encoder_intra"]):
+                        raise RuntimeError(f"B2's DCVC-UF point {point:g} re-encoded: its decode is not the encoder's")
                 if args.limit_frames > 0:  # the smoke scores the window's first frames of the whole stream
                     head = np.fromfile(rec["decoded"], np.uint8, count=w["frames"] * FULL[0] * FULL[1] * 3 // 2)
                     head.tofile(rec["decoded"])
@@ -581,6 +583,7 @@ def score_anchors(args: argparse.Namespace, w: dict[str, Any], judges: Judges, w
                 seconds = w["frames"] / float(w["fps"])
                 b2_row = recorded.get((item["id"], codec, point))
                 rows.append({"codec": codec, "point": point, "rate_bytes": rec["rate_bytes"],
+                             "reencoded": codec == "dcvc", "b2_stream_sha256": file_sha256(stream),
                              "kbps": rec["rate_bytes"] * 8 / (int(item["frames"]) / float(w["fps"])) / 1000,
                              "kbps_window": rec["rate_bytes"] * 8 / seconds / 1000,
                              "stream_sha256": rec["stream_sha256"], "deterministic": rec.get("deterministic"),
@@ -934,11 +937,13 @@ def validate_score(result: dict[str, Any]) -> dict[str, bool]:
     if anchors:
         full = result["limit_frames"] <= 0
         checks["anchors_deterministic"] = all(a["deterministic"] in (None, True) for a in anchors)
-        checks["anchors_are_b2s_streams"] = all(a["b2"] is not None and a["b2"]["stream_sha256"] == a["stream_sha256"]
-                                                for a in anchors)
+        # SVT-AV1: B2's own stream decoded; DCVC-UF: B2's point re-encoded (its match with B2's bytes reported)
+        checks["anchors_are_b2s_points"] = all(a["b2"] is not None and a["b2"]["stream_sha256"] == a["b2_stream_sha256"]
+                                               and (a["reencoded"] or a["stream_sha256"] == a["b2_stream_sha256"])
+                                               for a in anchors)
         checks["anchors_reproduce_b2"] = all(
             abs(a["scores"][DENSE]["wpsnr"] - a["b2"]["wpsnr"]) <= ANCHOR_WPSNR_TOLERANCE_DB
-            and abs(a["kbps"] - a["b2"]["kbps"]) < 1e-6 * a["kbps"] for a in anchors) if full else True
+            and (a["reencoded"] or abs(a["kbps"] - a["b2"]["kbps"]) < 1e-6 * a["kbps"]) for a in anchors) if full else True
     return checks
 
 

@@ -5691,9 +5691,13 @@ invocation turns out to be needed.
   `quality.masked_dists`, on every 4th frame for every method, to keep a
   pair's scoring near 15 s) beside; whole-frame PSNR too. B2's anchors (SVT-AV1
   preset 4, CRF 41–62; DCVC-UF HT-L, QP 27–63) are rescored from B2's
-  published streams by the same code, so DISTS exists for them; the
+  published streams by the same code, so DISTS exists for them (SVT-AV1:
+  B2's streams decoded; DCVC-UF: B2's points re-encoded on the same GPU
+  class, since a stored DCVC-UF stream never decodes in a later job,
+  docs/fleet.md; byte equality with B2's stream reported); the
   rescoring must reproduce B2's recorded weighted PSNR within 0.02 dB on
-  every point (a check, not a choice).
+  every point (a check, not a choice). Every job that codes or decodes
+  DCVC-UF runs on the RTX A6000 (unreliable on contended Ada, K5).
 - Rate allocation: PointStream's curve per item and metric is the upper
   concave hull (`g5.envelope`) over every (foreground point, background
   point) combination of both routes. Anchors are each codec's upper concave

@@ -84,7 +84,8 @@ def scores(wpsnr: float = 32.0) -> dict:
 
 def test_score_validator_checks_anchor_reproduction() -> None:
     row = {"bytes": 30, "breakdown": {"header": 20, "background": 10}, "kbps": 0.06, "scores": scores()}
-    anchor: dict = {"deterministic": True, "stream_sha256": "s", "kbps": 100.0, "scores": scores(32.0),
+    anchor: dict = {"deterministic": True, "stream_sha256": "s", "b2_stream_sha256": "s", "reencoded": False,
+                    "kbps": 100.0, "scores": scores(32.0),
               "b2": {"stream_sha256": "s", "kbps": 100.0, "wpsnr": 32.01}}
     result = {"rows": [row], "anchors": [anchor], "pairs_planned": 1, "jpeg_gate_holds": True, "limit_frames": 0,
               "routes": ["scene"], "bitstream_checks": {"scene": {"pair": "p", "segments_round_trip": True},
