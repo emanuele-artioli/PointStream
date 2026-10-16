@@ -5673,7 +5673,12 @@ invocation turns out to be needed.
     an attribution inside whole-frame codes; this stream is real and every
     byte of it is billed. Points: ¼ and ½ at QP 0, 21, 42 (each with H3d's
     G network for that point) and full resolution at QP 21, 42 (no
-    network). Decoder: bicubic upsampling to 1080p, then per class an
+    network). *Amended after the first full score stage (P02_02, CRF
+    32–48, `20261016T171116Z-d058a70a`), before any comparison with an
+    anchor:* the foreground capped the hull's quality (LPIPS on F 0.12 at
+    its best point, against 0.04–0.07 on the background), so QP 63 at ½
+    and full resolution (no network: G has none for QP 63) are added, as
+    separate foreground jobs per item. Decoder: bicubic upsampling to 1080p, then per class an
     enhancer slot: hands get G on R's box, objects the identity (the slot
     H4c may fill).
   - *Compositing* (G6): out = α·fg + (1 − α)·bg, α = 1 on F and falling

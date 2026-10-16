@@ -50,9 +50,13 @@ from src.pointstream import composite as cp
 DENSE, FILL = "visor_dense", "visor_dense_sam_fill"
 MASK_SETS = (DENSE, FILL)
 FULL = (1920, 1080)
-#: H3d's coder (¼ and ½ with G's network for the point) and full resolution without a network.
-POINTS = ("dcvc@0/4", "dcvc@21/4", "dcvc@42/4", "dcvc@0/2", "dcvc@21/2", "dcvc@42/2", "dcvc@21/1", "dcvc@42/1")
+#: H3d's coder (¼ and ½ with G's network for the point) and full resolution without a network; QP 63 at ½ and
+#: full added after the first pilot score (the foreground capped the hull's quality, docs/experiments.md H5).
+POINTS = ("dcvc@0/4", "dcvc@21/4", "dcvc@42/4", "dcvc@0/2", "dcvc@21/2", "dcvc@42/2", "dcvc@21/1", "dcvc@42/1",
+          "dcvc@63/2", "dcvc@63/1")
 G_SCALES = (2, 4)
+#: The points H3d fitted G for (one network per point).
+G_POINTS = tuple(f"dcvc@{qp}/{scale}" for scale in G_SCALES for qp in (0, 21, 42))
 ROUTE_OF_METHOD = {"scene-540": "scene", "scene-1080": "scene", "enh-1080": "enh", "svt-1080": "svt"}
 DCVC_ATTEMPTS = 3  # K5: re-code a point whose decode is not the encoder's, every attempt recorded
 DISTS_BATCH = 2
@@ -276,7 +280,7 @@ def command_foreground(args: argparse.Namespace) -> int:
     w = load_window(args, work)
     nearest = np.stack([cp.alpha_and_classes(c)[1] for c in w["classes"]])
     cost = mask_cost(w["classes"], w["fps"], work)
-    nets = {n: generic_network(args.generic, n, "cuda") for n in names if parse_point(n)[1] in G_SCALES}
+    nets = {n: generic_network(args.generic, n, "cuda") for n in names if n in G_POINTS}
     checkpoints = checkpoint_dir()
     restored = g5c.restore(checkpoints)
     points = (checkpoints or scratch) / "points"
@@ -608,12 +612,20 @@ def command_score(args: argparse.Namespace) -> int:
     w = load_window(args, work)
     judges = Judges(args)
     alpha = np.stack([cp.alpha_and_classes(c)[0] for c in w["classes"]])
-    fg_root = Path(args.foreground) / "publish" if (Path(args.foreground) / "publish").is_dir() else Path(args.foreground)
-    fg_manifest = json.loads((fg_root / "manifest.json").read_text())
-    if fg_manifest["window"] != w["item"]["id"] or (args.limit_frames <= 0
-                                                     and fg_manifest["classes_sha256"] != w["classes_sha256"]):
-        raise SystemExit("the foreground was coded for another window or another F")
-    fg_points = fg_manifest["points"]
+    fg_points, manifests = [], []
+    for directory in args.foreground:  # several foreground jobs' points (a grid extended later)
+        root = Path(directory) / "publish" if (Path(directory) / "publish").is_dir() else Path(directory)
+        manifest = json.loads((root / "manifest.json").read_text())
+        if manifest["window"] != w["item"]["id"] or (args.limit_frames <= 0
+                                                     and manifest["classes_sha256"] != w["classes_sha256"]):
+            raise SystemExit("the foreground was coded for another window or another F")
+        manifests.append(manifest)
+        fg_points += [{**p, "root": str(root), "manifest_job": manifest.get("job_id")} for p in manifest["points"]]
+    if args.foreground_points:
+        fg_points = [p for p in fg_points if p["name"] in set(args.foreground_points.split(","))]
+    if len({p["key"] for p in fg_points}) != len(fg_points):
+        raise SystemExit("a foreground point appears in two manifests")
+    fg_manifest = manifests[0]
     backgrounds = load_backgrounds(args.background, routes, w["item"]["id"]) if routes else []
     if args.background_points:
         wanted = set(args.background_points.split(","))
@@ -636,10 +648,10 @@ def command_score(args: argparse.Namespace) -> int:
         bg_rgb = None
         for _, fg in [p for p in pairs if p[0]["key"] == bg_key]:
             key = f"{bg_key}+{fg['key']}"
-            c = container_for(w, bg, fg, fg_root)
+            c = container_for(w, bg, fg, Path(fg["root"]))
             data = c.pack()
             if bg["route"] not in checks:  # rule (d), once per route
-                checks[bg["route"]] = {"pair": key, **bitstream_check(c, data, bg, fg, fg_root)}
+                checks[bg["route"]] = {"pair": key, **bitstream_check(c, data, bg, fg, Path(fg["root"]))}
                 (scratch / "publish" / "containers").mkdir(parents=True, exist_ok=True)
                 (scratch / "publish" / "containers" / f"{key}.pstm").write_bytes(data)
             if key in restored:
@@ -649,7 +661,7 @@ def command_score(args: argparse.Namespace) -> int:
                 if bg_rgb is None:
                     bg_rgb = rgb_gpu(read_ffv1(Path(bg["root"]) / bg["decoded"])[:w["frames"]])
                 if fg["key"] not in fg_cache:
-                    fg_cache[fg["key"]] = rgb_gpu(read_ffv1(fg_root / fg["decoded"])[:w["frames"]])
+                    fg_cache[fg["key"]] = rgb_gpu(read_ffv1(Path(fg["root"]) / fg["decoded"])[:w["frames"]])
                 if "gpu_compositor" not in checks:
                     checks["gpu_compositor"] = gpu_matches_cpu(fg_cache[fg["key"]], bg_rgb, alpha)
                 t1 = time.perf_counter()
@@ -658,6 +670,7 @@ def command_score(args: argparse.Namespace) -> int:
                 t2 = time.perf_counter()
                 parts = c.breakdown()
                 row = {"pair": key, "route": bg["route"], "background": bg_key, "foreground": fg["key"],
+                       "foreground_job": fg["manifest_job"],
                        "bytes": len(data), "kbps": len(data) * 8 / seconds / 1000, "breakdown": parts,
                        "kbps_background": parts.get("background", 0) * 8 / seconds / 1000,
                        "kbps_foreground": parts.get("foreground", 0) * 8 / seconds / 1000,
@@ -856,7 +869,7 @@ def command_time(args: argparse.Namespace) -> int:
         raise RuntimeError("the scene model is not the one its training recorded")
     enhancers = Path(args.enhancers) / "publish" / "enhancers"
     timed = [t for t in TIMED if args.limit_frames <= 0 or t == TIMED[0]]
-    nets = {fg: generic_network(args.generic, fg, "cuda") for _, _, fg in timed if parse_point(fg)[1] in G_SCALES}
+    nets = {fg: generic_network(args.generic, fg, "cuda") for _, _, fg in timed if fg in G_POINTS}
     torch.backends.cudnn.benchmark = False
     rows = []
     for done, (method, value, fg) in enumerate(timed, 1):
@@ -911,7 +924,7 @@ def validate_foreground(result: dict[str, Any]) -> dict[str, bool]:
         "rate_rises_with_qp": all(a["kbps"] < b["kbps"] for s in by_scale.values()  # DCVC-UF: QP up, rate up
                                   for a, b in zip(sorted(s, key=lambda r: r["qp"]), sorted(s, key=lambda r: r["qp"])[1:])),
         "foreground_decodes_to_a_picture": all(r["psnr_f"] is not None and 20 < r["psnr_f"] < 60 for r in rows),
-        "g_on_quarter_and_half_only": all((r["slots"]["hand"] is not None) == (r["scale"] in G_SCALES) for r in rows),
+        "g_on_its_points_only": all((r["slots"]["hand"] is not None) == (r["name"] in G_POINTS) for r in rows),
         "g_changes_hands": all(r["changed_by_slots"] > 0 for r in rows if r["slots"]["hand"]),
         "frames_published": all(len(r["decoded_frame_sha256"]) == result["frames"] for r in rows),
         "mask_cost_measured": result["mask_cost"]["bytes"] > 0 and 0 < result["mask_cost"]["share"] < 0.8,
@@ -1165,7 +1178,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--generic", action="append", required=True, help="H3d's generic-network job archives")
     p = sub.add_parser("score")
     add_window(p)
-    p.add_argument("--foreground", required=True)
+    p.add_argument("--foreground", action="append", required=True, help="foreground jobs' archives (extracted)")
+    p.add_argument("--foreground-points", help="only these foreground points (dcvc@QP/SCALE, comma separated)")
     p.add_argument("--background", action="append", default=[])
     p.add_argument("--routes", default="scene,enh")
     p.add_argument("--anchors", action="append", help="B2's job archives (extracted) with the item's streams")

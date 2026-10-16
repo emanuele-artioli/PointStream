@@ -57,7 +57,7 @@ def foreground_result(**change: object) -> dict:
     rows = []
     for scale in (4, 2, 1):
         for qp, kbps in ((0, 8.0), (21, 20.0), (42, 50.0)):
-            rows.append({"scale": scale, "qp": qp, "kbps": kbps * (5 - scale), "deterministic": True,
+            rows.append({"name": f"dcvc@{qp}/{scale}", "scale": scale, "qp": qp, "kbps": kbps * (5 - scale), "deterministic": True,
                          "decoder_matches_encoder_intra": True, "psnr_f": 30.0 + (42 - qp) / 10,
                          "slots": {"hand": {"sha256": "x"} if scale in (2, 4) else None},
                          "changed_by_slots": 0.05 if scale in (2, 4) else 0.0, "decoded_frame_sha256": ["a"] * 240})
