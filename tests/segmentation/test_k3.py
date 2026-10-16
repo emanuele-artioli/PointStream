@@ -77,3 +77,10 @@ def test_gate_takes_the_better_of_c_and_d_and_waits_for_both():
     assert k3.decide({"C": fails, "D": fails})["k3"] == "fails"
     assert k3.decide({"C": passes})["k3"] == "incomplete"
     assert k3.decide({"C": passes, "D": {"verdict": {"verdict": "incomplete"}}})["k3"] == "incomplete"
+
+
+def test_an_arm_against_itself_is_zero_on_hulls():
+    rows = [_row(1.0, 0.30), _row(2.0, 0.29), _row(4.0, 0.20), _row(8.0, 0.18), _row(16.0, 0.10)]
+    assert [r["kbps"] for r in k3.hull(rows, "lpips")] == [1.0, 4.0, 16.0]
+    same = k3.versus({i: rows for i in h3c.PILOT}, {i: rows for i in h3c.PILOT})
+    assert all(abs(e["lpips"]["bd"]) < 1e-12 for e in same["items"].values())

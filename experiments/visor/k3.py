@@ -48,7 +48,8 @@ DECISION: dict[str, Any] = {
     "quality": "lpips_r (H3c's Scorer: the decode inside R, the source outside; LPIPS averaged over R, mean over hand frames)",
     "rate": "kbps on R: DCVC's per-cell estimate on R, each NAL calibrated by the unmodified codec's real bytes for it",
     "keypoints": f"H2's coded WiLoR stream at {POSE_BUDGET} ms (its VISOR rate in h2-code.json) added to C and D",
-    "gate": "the better of C and D (by mean BD), billed, against A's upper concave hull on LPIPS_R",
+    "gate": "the better of C and D (by mean BD), billed, against A on LPIPS_R; each arm's upper concave hull against the "
+            "anchor's (amended before any result: a front against a hull charged A itself +13% in a dry run)",
     "bd": "experiments.visor.h3d.compare: PCHIP of log rate over the shared LPIPS range (>= 0.005), else better/worse "
           "at every rate",
     "verdict": "experiments.visor.h3d.arm_verdict: passes at mean BD <= -10% with >= 3 of 4 items below 0 and none worse "
@@ -330,11 +331,23 @@ def billed(rows: list[dict[str, Any]], kbps: float) -> list[dict[str, Any]]:
     return [{**r, "kbps": r["kbps"] + kbps} for r in rows]
 
 
+def hull(rows: list[dict[str, Any]], metric: str) -> list[dict[str, Any]]:
+    """The rows on ``rows``' upper concave hull in (kbps, quality) on ``metric`` (`g5.envelope`): the test's achievable
+    envelope, as the anchor's is. A Pareto front against the anchor's hull would charge the test for the hull's
+    interpolation (in a dry run, arm A against its own hull)."""
+    from experiments.background.g5 import envelope
+    from experiments.visor.h3d import quality
+
+    vertices = set(envelope(quality(rows, metric)))
+    return [r for r, q in zip(rows, quality(rows, metric)) if q in vertices]
+
+
 def versus(tests: dict[str, list[dict[str, Any]]], anchors: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
-    """Per item, `h3d.compare` on every metric, and `h3d.arm_verdict` on LPIPS."""
+    """Per item, `h3d.compare` of the test's hull against the anchor's on every metric, and `h3d.arm_verdict` on LPIPS."""
     from experiments.visor.h3d import arm_verdict, compare
 
-    per_item = {item: {m: compare(test, anchors[item], m) for m in METRICS} for item, test in sorted(tests.items()) if item in anchors}
+    per_item = {item: {m: compare(hull(test, m), anchors[item], m) for m in METRICS}
+                for item, test in sorted(tests.items()) if item in anchors}
     return {"items": per_item, "verdict": arm_verdict(per_item)}
 
 

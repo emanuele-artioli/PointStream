@@ -5811,10 +5811,14 @@ invocation turns out to be needed.
   billed H2's coded WiLoR stream, 1.93 kbps (the 100 ms choice, its VISOR
   rate from `h2-code.json`, as H3c2): the keypoints a warp needs. A and B
   bill nothing more; E is never compared billed.
-- Comparison. Per item, each arm's Pareto front against the anchor's
-  upper concave hull, BD-rate on LPIPS_R by PCHIP of log rate over the
-  shared range (at least 0.005; else "better/worse at every rate";
-  `h3d.compare`). Anchors: A (the unmodified codec, same instrument), and
+- Comparison. Per item, each arm's upper concave hull against the
+  anchor's, BD-rate on LPIPS_R by PCHIP of log rate over the shared range
+  (at least 0.005; else "better/worse at every rate"; `h3d.compare`).
+  Amended before any result: H3d's front against hull, dry-run on H3c's
+  recorded points relabelled as K3 arms, charged arm A +13% against its
+  own hull, which would bias every arm against the anchor by more than
+  the rule's margin; both sides' hulls are achievable (switching between
+  encodes). Anchors: A (the unmodified codec, same instrument), and
   the pixel envelope (H3c's bar: SVT-AV1's eleven points and DCVC-UF's
   nine real points, H3c's units). DISTS and PSNR beside.
 - Decision rule (`k3.DECISION`, fixed before any run). Gate: the better
