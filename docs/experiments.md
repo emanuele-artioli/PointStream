@@ -5804,6 +5804,14 @@ invocation turns out to be needed.
   any whole-match run. Focused synthetic checks recover a known court
   homography and reject blank frames; these are correctness checks, not
   match evidence. Outcome is pending the user's shot labels.
+  Initial pilot `20261016T090118Z-23f79a90` (gpu1, CPU, `7349881`)
+  was stopped during its smoke: `ffprobe -count_frames` was decoding the
+  whole 2,310 s match on one CPU before the selected 30 s could run.
+  No registration result or decision evidence was produced; task artifacts
+  are retained. The revision uses K4's `-count_packets` convention instead,
+  and checks each requested decoded frame while processing. Chamfer
+  sampling was also corrected to uniform projected-pixel spacing (covered
+  by a focused regression test) before any decision run.
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel

@@ -40,14 +40,15 @@ def white_lines(rgb: np.ndarray) -> np.ndarray:
 
 
 def samples(hom: np.ndarray, step: float = 1.0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    model, groups = [], []
+    image_points, groups = [], []
     for i, segment in enumerate(SEGMENTS):
         ends = project(segment, hom)
-        n = min(3000, max(2, int(np.linalg.norm(ends[1] - ends[0]) / step) + 1))
-        model.append(np.linspace(segment[0], segment[1], n))
+        n = max(2, int(np.ceil(np.linalg.norm(ends[1] - ends[0]) / step)) + 1)
+        image_points.append(np.linspace(ends[0], ends[1], n))
         groups.extend([i] * n)
-    points = np.concatenate(model).astype(np.float32)
-    return points, project(points, hom), np.array(groups)
+    points = np.concatenate(image_points).astype(np.float32)
+    model = project(points, np.linalg.inv(hom))
+    return model, points, np.array(groups)
 
 
 def plausible(hom: np.ndarray, shape: tuple[int, ...]) -> bool:

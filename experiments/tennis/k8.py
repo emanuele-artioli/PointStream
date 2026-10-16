@@ -221,8 +221,8 @@ def run_job(args: argparse.Namespace) -> int:
     identity = json.loads(args.inputs.read_text())
     if file_sha256(args.video) != identity["video_sha256"]:
         raise ValueError("source identity changed")
-    probe_command = ["ffprobe", "-v", "error", "-select_streams", "v:0", "-count_frames", "-show_entries",
-                     "stream=width,height,r_frame_rate,avg_frame_rate,nb_read_frames,start_time", "-of", "json", str(args.video)]
+    probe_command = ["ffprobe", "-v", "error", "-select_streams", "v:0", "-count_packets", "-show_entries",
+                     "stream=width,height,r_frame_rate,avg_frame_rate,nb_read_packets,start_time", "-of", "json", str(args.video)]
     meta = json.loads(subprocess.check_output(probe_command))["streams"][0]
     from fractions import Fraction
     fps = float(Fraction(meta["r_frame_rate"]))
@@ -230,7 +230,7 @@ def run_job(args: argparse.Namespace) -> int:
         raise ValueError("requires CFR video starting at PTS zero")
     if [meta["width"], meta["height"]] != [1920, 1080]:
         raise ValueError("K8 whole match must be 1080p")
-    total = int(meta["nb_read_frames"])
+    total = int(meta["nb_read_packets"])
     frames = min(total, args.frames) if args.frames else total
     scenes, scene_command = cuts(args.video, fps, frames, args.ffmpeg, scratch)
     boundaries = [r["frame"] for r in scenes if r["score"] >= args.threshold and 0 < r["frame"] < frames]

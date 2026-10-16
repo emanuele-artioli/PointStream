@@ -89,3 +89,13 @@ def test_review_starts_unlabelled_and_downloads_identified_json(tmp_path):
     assert 'value=""' in text and 'selected' not in text
     assert 'new Blob' in text and 'review_id:reviewId' in text
     assert json.dumps(k8.CLASSES) in text
+
+
+def test_chamfer_samples_uniformly_in_projected_pixels():
+    _, hom = synthetic()
+    model, points, groups = court.samples(hom)
+    assert np.max(np.linalg.norm(court.project(model, hom) - points, axis=1)) < 0.001
+    for group in range(len(court.SEGMENTS)):
+        steps = np.linalg.norm(np.diff(points[groups == group], axis=0), axis=1)
+        assert steps.max() <= 1.001
+        assert steps.max() - steps.min() < 0.001
