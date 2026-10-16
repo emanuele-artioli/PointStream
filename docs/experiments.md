@@ -6092,3 +6092,21 @@ invocation turns out to be needed.
   batch, 24,000 MiB cap, input pixels, model, gate and all time ceilings.
   Record actual expandable CUDA segments and require them in validation;
   a successful short full and length pilots remain prerequisites to scaling.
+- Expandable-allocator short pilot `20261016T154944Z-4081668c`, gpu3
+  A6000, actual ready revision `3494a8b1c888c6daeb90c0cabd748fa3fa655754`:
+  smoke and full complete. Full **locally validated**, all 17 checks true:
+  64/64 frames, original source coverage, raw SHA256s, pinned CUDA SAM and
+  pose, effective native batch, actual expandable segments, recomputed
+  features and exact target masks. Full peak allocation 22.1047 GiB.
+  Smoke parity min IoU 1.0. Smoke execution 154.750 s, full 120.802 s;
+  GPU-claim interval 325.555 s. Shared timing is not a performance claim.
+  Local receipt SHA256 `bb3cc62943dd42e6a761920d48b239e46358cc056d86afee0f20b95eca5f1be8`.
+  These are configuration/full-coverage checks, not a candidate table.
+- Length promotion is median only: 407 frames of `djokovic_zverev/004`.
+  The initial 446 s full allowance has inadequate margin given the short
+  stage's fixed loading cost plus per-frame propagation. Use a separately
+  preserved median spec with full 900 s, smoke 600 s, validator 300 s,
+  total 1,800 s; the 8 GPU-hour phase ceiling and deadline do not change.
+  Do not submit the maximum or remaining corpus until median evidence
+  establishes feasible stage and phase bounds. Prior failed smoke stage
+  time is 390.260 s; charge complete GPU-claim intervals in the phase ledger.
