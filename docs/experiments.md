@@ -5731,3 +5731,77 @@ invocation turns out to be needed.
   mode has to render the blur (a streak along the coded velocity) and
   pay for what it sends; its own oracle and rendering come next. TrackNet
   only (720p, 8 windows of ≤ 8 s); positions as labelled (integers).
+
+### 2026-10-16 — K8: court-view shots and camera registration (rule)
+- Question (PLAN K8). A broadcast match mixes court views with close-ups,
+  crowd shots, replays and graphics. PointStream should get only the court
+  views, and within each, a per-frame registration of the panning camera
+  (K4: still on 35% of a match). Both come from one measurement: a frame
+  is a court view when its court lines register to the court model with a
+  homography. The same homography gives the court outline (K4b) and the
+  camera's motion (G's per-shot background).
+- Data: the archived broadcast matches (`tennis_games`; the whole
+  `raw_1080p/nadal_kyrgios.mp4`, 2,310 s, and the scene clips K4 drew
+  from), the court model in `Datasets/Tennis_courts` (`reference/`), and
+  the old pipeline's shot code (`9cf3012`, `scene_classification.py`)
+  for reference only (it called low-motion scenes points, which let a
+  close-up and an outro card into K4's windows).
+- Method. (1) Cuts: ffmpeg's scene score, threshold chosen on the review
+  below; shots are the spans between cuts. (2) Registration per frame:
+  court keypoints or lines to the court model by a homography (RANSAC),
+  either from detected white lines or from a pretrained court-keypoint
+  model (audit first; weights into `Models`, never into the checkout).
+  (3) A shot is a court view when at least 80% of its frames register with
+  a reprojection error under the bar below. (4) Review: a local page
+  showing every shot of the whole match (first, middle and last frame,
+  predicted class, the projected court drawn on the middle frame), where
+  the user marks the true class; these marks are the labels.
+- Decision rule (fixed before any run). Adopted when, on the whole match's
+  shots as the user marks them: court-view precision ≥ 0.95 (a non-court
+  shot sent to PointStream is the costly error), court-view recall ≥ 0.90
+  weighted by shot duration, and registration on court-view frames with
+  median reprojection error ≤ 2 px at 1080p (projected court lines against
+  detected line pixels, as a chamfer distance), 95th percentile ≤ 6 px.
+  Cut errors count through the shots they corrupt (a shot mixing two
+  classes is wrong for both). Otherwise the misses are reported by class
+  and the user decides.
+- Hypothesis: court lines register on nearly every court view; misses are
+  extreme zooms on a player (few lines visible) and fast pans with motion
+  blur; precision is easy, recall loses the zooms.
+- Competing explanation: the homography registers court-like structures in
+  replays and graphics (a picture-in-picture court), which precision
+  catches.
+- Budget: CPU first (cuts and line detection); GPU only for a court-keypoint
+  model, on the fleet with the usual smoke, ≤ 45 min per stage.
+
+### 2026-10-16 — K4b.1: identifying the two players (rule)
+- Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
+  furthest) mislabels a player who stands still (2 of 9 broadcast windows).
+  Which content-blind rule picks the two players, judged against players
+  marked by hand rather than by the rule's own output?
+- Data: frames from broadcast scene clips K4 did not measure, chosen
+  content-blind (lowest sha256 of "pointstream-k4b:<match>/<clip>/<frame>"),
+  at least 48 frames from at least 8 clips across the 5 matches, court
+  views only once K8 is adopted. Person instances from SAM 3.1's "person"
+  and "tennis player" prompts, as K4's segmenter.
+- Marks: a local review page shows each frame with its person instances
+  numbered; the user clicks the two players (or marks one or none visible).
+  These marks are the labels; no other labels exist for broadcast players.
+- Candidates (content-blind, each a fixed function of the clip):
+  (a) motion in body heights (K4's amendment 1); (b) horizontal motion,
+  with the clip's last second discounted; (c) a racket mask touching the
+  person on most frames; (d) inside the court outline (K8's homography;
+  evaluated once K8 is adopted); (e) keypoint motion; (f) the combinations
+  (c)+(d), (a)+(d), (a)+(c).
+- Decision rule (fixed before marking). Per candidate: the share of marked
+  frames where both marked players are its two picks (mask IoU ≥ 0.5 each;
+  frames with one marked player count on that one). The candidate with the
+  highest share is adopted if it reaches 0.95, ties to the simpler rule;
+  it is then applied once to every K4 window as amendment 2, with both
+  earlier definitions' numbers kept. If none reaches 0.95, the table is
+  reported and the user decides.
+- Hypothesis: (d) or (c)+(d) wins: players are the people inside the court
+  and holding rackets, while ball kids and line judges stand outside the
+  lines or hold none.
+- Budget: SAM 3.1 instances on the fleet (smoke ≤ 600 s, ≤ 45 min per
+  stage); candidates on CPU; the user's marking about 15 minutes.
