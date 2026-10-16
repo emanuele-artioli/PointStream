@@ -5903,3 +5903,109 @@ invocation turns out to be needed.
   4 GPU-hours; smokes ≤ 600 s on one item, 48 frames. Stage 2: footage,
   two network jobs and four scoring jobs, about 4 GPU-hours. Ceiling 10
   GPU-hours.
+- Stage 2's footage, as fixed above, before its runs (2026-10-16, after
+  stage 1). The object footage takes recordings of participants other than
+  P01, P02, P03 and P09 that have VISOR dense train interpolations, ordered
+  by sha256 (`pointstream-h4c:objects:<video>`); the first 8 were staged
+  (`h4c-2026-10-16/inputs/visor-train-objects.tar`, `1afb9c61…ac49`) and the
+  first 6 with a placeable segment used: P06_11, P04_110, P35_109, P23_02,
+  P06_103, P26_110 (5 participants). Segments of 48 frames lie inside a
+  dense run in which a human marked an object in contact at a keyframe of
+  the run, placed by sha256, every frame within VISOR's drift of 1 (the
+  training admission of 2026-10-06); O is painted from the dense masks as on
+  the evaluation windows. G_HO's hand crops are G's own footage
+  (`20261012T213113Z-6ab41492`, SAM 3.1 hand and arm) unchanged. Both
+  networks: G's size and settings (8 × 64, 594 k parameters, 2,000 steps,
+  MSE plus LPIPS), one per point.
+- Jobs (shared; validators passed on each smoke, and every full stage was
+  validated locally on its `published.tar`, all checks passing; code
+  `35378a6` from each `ready.json`, except P01_107's first job at `1148735`,
+  whose stage-1 path is the same). Specs and inputs:
+  `pointstream-data/visor/h4c-2026-10-16/` (`inputs-867fac311ae5.json`).
+  - Stage 1, bar and arm 1 and the oracle: P01_107 ¼ and ½
+    `20261016T090326Z-1acfc638`, SVT-AV1 points `…091919Z-4ef71e59`,
+    full-resolution DCVC-UF `…091932Z-9daaf74e`; P02_02 ¼ `…091946Z-fa663164`,
+    ½ `…091959Z-e415c0f4`, SVT-AV1 `…145448Z-0d0266a4`, full `…092206Z-c1a801de`;
+    P03_10 ¼ `…092018Z-adafb13c`, ½ `…092033Z-64e75829` (two points; its
+    `partial.tar`) and `…150851Z-693e0958` (QP 42), SVT-AV1 `…092140Z-7042c665`,
+    full `…145524Z-da2bf9a5`; P09_106 ¼ `…092057Z-a6428a3e`, ½
+    `…092112Z-97be19d1`, SVT-AV1 `…092152Z-ca41eff5`, full `…145545Z-1f898699`.
+  - Stage 2: object footage `20261016T145818Z-74b36eb7` (CPU); networks ¼
+    `…152552Z-c3d9ed14`, ½ `…153801Z-03f2a819`; scoring P01_107
+    `…160611Z-c5a96d1f` (four points, `partial.tar`), `…184512Z-ceb4f695`,
+    `…184525Z-29be19be`; P02_02 `…162052Z-cb586f84`; P03_10
+    `…160637Z-a26a7146` (four points, `partial.tar`), `…203231Z-76b386fa`,
+    `…203256Z-b78da953`; P09_106 `…160653Z-d4c46dfa` (three points,
+    `partial.tar`), `…185017Z-99faa39c`, `…203243Z-ec8fa4db`,
+    `…203218Z-c41d6e67`.
+  - Failed attempts, not evidence: DCVC-UF decodes that disagreed with
+    themselves (the code stops on them) at ½ resolution on shared RTX 6000
+    Ada GPUs, eight times on gpu5 and gpu6 (QP 21 four times, QP 42 twice,
+    QP 0 twice, one of them in the ½ networks job's footage); never on the
+    A6000s, where the last
+    points ran (as K5 recorded); two CUDA out-of-memory errors from another
+    user's processes; one memory overrun (SVT-AV1 points of P02_02, 20,732
+    MiB against 16,000 declared; rerun at 24,000); two smokes over 600 s
+    on contended GPUs (rerun with 120-frame smokes). Jobs declaring 60 GiB
+    of local storage (copied from H3d) were not admitted on the A6000 hosts,
+    whose RAM roots are mostly the fleet's input cache; 20 GiB was admitted.
+  - Report (`h4c report`, code `076ced7`, which only merges stage 2's rows
+    into stage 1's units of the same name):
+    `pointstream-data/visor/h4c-2026-10-16/report-076ced7/h4c-report.json`
+    (`d4f10117…b9d8`), with the visual check `p02_dcvc21_4_f120.png`. On R
+    the base points and G reproduce H3d's bar and G within the rule's
+    tolerance (`cross_check_holds`), and G on R gives H3d's −22% exactly.
+- Outcome. Handled objects in the pilot windows (H1's definition): soy milk
+  (P01_107), glass and tap (P02_02), pancake and its package (P03_10), fork
+  (P09_106, on 142 of 240 frames); 5,700–60,600 pixels per frame. BD-rate
+  on LPIPS against each region's bar (mean over 4 items, 95% bootstrap CI;
+  items below 0), DISTS and PSNR beside:
+
+  | arm | LPIPS_O | items | DISTS_O | PSNR_O | LPIPS_R (hands) | items |
+  |---|---|---|---|---|---|---|
+  | oracle (fitted on the window) | −92% (−96 to −88) | 4 | −78% to −88% | −7% to −61% | — | |
+  | G as it is | +10% (−19 to +45) | 1 | −32% to +38% | +25% to +147% | −22% (−35 to −10) | 4 |
+  | G_O | −45% (−55 to −34) | 4 | −2% to −58% | +16% to +51% | −1% (−27 to +33) | 3 |
+  | **G_HO** | **−39% (−48 to −28)** | **4** | −2% to −56% | +10% to +42% | **−33% (−48 to −18)** | **4** |
+
+  Per item on O, G_HO: −23%, −44%, −36%, −51% (P01_107, P02_02, P03_10,
+  P09_106); G_O −27%, −55%, −46%, −54%; G +5%, +58%, −27%, +6%. Pairwise
+  (mean BD-rate on LPIPS): G_O against G_HO on O −1.9%; G_HO against G on
+  O −28%, on R −8%. Flicker on O within 4% of the base's for every arm.
+- Decision (by the rule): **stage 1** — the oracle passes, G as it is fails
+  on objects, so stage 2 ran. **Stage 2** — the first standing arm on O in
+  the order G, G_HO, G_O is G_HO; G_O does not beat it by 10% (−1.9%). G_HO
+  stands on R and is better than G on the hands (−8%, below the +10%
+  allowance): **one network, G_HO, codes hands and handled objects**, over
+  DCVC-UF HT-L off the shelf at ¼ and ½. It replaces G on the hands too.
+- Visual check (P02_02, frame 120, DCVC-UF ¼ at QP 21, 1.1 kbps on O). G as
+  it is turns the chrome tap pink-brown, a skin prior from its hand-only
+  training: that is its +58% on P02_02 and its PSNR loss. G_O and G_HO keep
+  the tap grey and sharpen the glass's and the tap's edges toward the source,
+  with no texture the source lacks; the oracle is closer still (it has seen
+  this glass).
+- Reading. The hypothesis held in direction and was wrong in size: G as it
+  is does not help objects (+10%, not −5% to −15%) because it recolours them
+  toward skin, and the refitted networks gain more (−39% to −45%, not about
+  −20%). The user's concern (hands are alike, objects are not, so one
+  enhancer may serve neither) does not hold on these items: a network that
+  has seen objects as well as hands is as good on objects as one that has
+  seen only objects (within 2%) and better on hands than G (8%), probably
+  because the object footage adds more varied texture and colour than G's
+  six recordings of hands alone. What does not transfer is a network that
+  has seen only one of the two: G recolours objects, G_O loses the hands on
+  P09_106 (+52%). As for the hands, most of the oracle's gain is fitting the
+  scored window (−92% against −39%); and the gain is perceptual, PSNR on O
+  is worse for every refitted arm (+10% to +51%), as G's was on hands.
+  Competing explanation (2), small and fast objects: P09_106's fork (5,700
+  pixels, 142 frames) is the smallest region and the arms rank there as
+  elsewhere. Generative completion (the fallback) is not needed.
+- Scope. 4 pilot items, 6 handled objects; one object footage (6
+  recordings, 5 participants, 691 frames with O); masks from VISOR's dense
+  interpolations for the footage and the fill set for scoring; one network
+  size and schedule. The order G, G_HO, G_O in the rule preferred one network
+  before two; G_O's 1.9% edge on objects is inside the noise of 4 items.
+- GPU time: about 11 GPU-hours (7.0 in finished full stages, the rest smokes
+  and the failed attempts above), **above the 10 allowed**: the excess is
+  the reruns of non-deterministic decodes on shared Ada GPUs. Shared jobs'
+  timings are not evidence.
