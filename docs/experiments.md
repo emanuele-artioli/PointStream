@@ -5861,6 +5861,32 @@ invocation turns out to be needed.
   reports also record resolved ffmpeg/ffprobe paths and versions plus
   stream colour/codec/timestamp metadata. No model or threshold changes.
 
+- Whole-match run submitted (CPU only, `43d32d9`; pending outputs).
+  Four groups of balanced whole shots, same complete source and scene
+  score scan, each its own ≤600 s smoke, ≤2,700 s full stage and 3,500 s
+  total budget. Native tool/codec/colour metadata are in each report.
+
+  | Part | Job | Host (CPU; GPU none) |
+  |---|---|---|
+  | 0 | `20261016T093935Z-caed3e5a` | gpu1 |
+  | 1 | `20261016T093936Z-9d24b59f` | gpu1 |
+  | 2 | `20261016T093938Z-c7c96b10` | gpu5 |
+  | 3 | `20261016T093938Z-90023e70` | gpu5 |
+
+  Source snapshot SHA256 `1a7e221992ff1d5851c298ede352f7489ec701126fea73b132fb81b58ce645f4`;
+  clean selected patch SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+  Input manifest `inputs-4d99d200bcbc.json`, SHA256
+  `4d99d200bcbcc4279ac74781b6529cfbce1835a8afe47a4e94c92b76616327b1`;
+  video SHA256 `676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66`.
+  Packed environment `pointstream-20261009T214002Z.tar.gz`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`.
+  Commands/specifications are preserved in each job's `dispatch.json`,
+  stage metadata and `tennis/k8-2026-10-16/specs-v2/k8-full-<part>.json`.
+  Review serving uses `tools/datasets/k8_review_server.py` (read-only,
+  loopback only, byte ranges for seeking the source); marks stay in the
+  browser until downloaded. UI layout/server changes after `43d32d9`
+  do not change registration, cuts, predictions or archived evidence.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).

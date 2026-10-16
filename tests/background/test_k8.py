@@ -71,7 +71,7 @@ def test_ransac_recovers_projected_regulation_court_and_rejects_blank():
     assert court.register(np.zeros_like(rgb))["homography"] is None
 
 
-def test_chamfer_scales_to_1080_and_out_of_frame_is_not_ignored():
+def test_chamfer_rejects_an_entirely_out_of_frame_projection():
     rgb, hom = synthetic()
     mask = court.white_lines(rgb)
     assert court.chamfer(hom, mask)["chamfer_px"] < 1
@@ -206,3 +206,39 @@ def test_error_summary_uses_ordinary_median_and_retains_infinite_tail():
     assert k8.score(report, marks)["registration_median_px"] == 2.0
     row["registration"][-1]["chamfer_px"] = None
     assert k8.score(report, marks)["registration_p95_px"] is None
+
+
+def test_review_server_supports_byte_ranges_for_seeking(tmp_path):
+    import http.client
+    import threading
+    from functools import partial
+    from http.server import ThreadingHTTPServer
+    from tools.datasets.k8_review_server import RangeHandler, byte_range
+
+    assert byte_range("bytes=2-4", 10) == (2, 5)
+    assert byte_range("bytes=-3", 10) == (7, 10)
+    assert byte_range("bytes=7-", 10) == (7, 10)
+    for header in ("bytes=10-", "bytes=-0", "bytes=7-2", "bytes=1-2,4-6"):
+        with pytest.raises(ValueError):
+            byte_range(header, 10)
+    (tmp_path / "source.mp4").write_bytes(b"0123456789")
+    try:
+        server = ThreadingHTTPServer(("127.0.0.1", 0), partial(RangeHandler, directory=str(tmp_path)))
+    except PermissionError:
+        pytest.skip("loopback server unavailable in sandbox")
+    thread = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True)
+    thread.start()
+    try:
+        connection = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=2)
+        connection.request("GET", "/source.mp4", headers={"Range": "bytes=2-4"})
+        response = connection.getresponse()
+        assert response.status == 206 and response.getheader("Content-Range") == "bytes 2-4/10"
+        assert response.read() == b"234"
+        connection.request("GET", "/source.mp4", headers={"Range": "bytes=100-"})
+        response = connection.getresponse()
+        assert response.status == 416 and response.read() == b""
+        connection.close()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)

@@ -133,10 +133,10 @@ def review_page(report: dict[str, Any], out: Path) -> None:
                      f'{s["registered_share"]:.1%} registered</p><div class="strip">{images}</div>'
                      f'<label>True class <select data-id="{s["id"]}">{options}</select></label>'
                      '<details><summary>Inspect the shot in the source video</summary>'
-                     f'<video controls preload="none" src="source.mp4#t={s["start"]/report["fps"]:.3f},'
+                     f'<video controls muted preload="none" src="source.mp4#t={s["start"]/report["fps"]:.3f},'
                      f'{s["end"]/report["fps"]:.3f}"></video></details></article>')
-    template = '''<!doctype html><html lang="en"><meta charset="utf-8"><title>K8 court-shot review</title>
-<style>body{font:16px system-ui;margin:24px;background:#eee;color:#18212b}header{position:sticky;top:0;background:#fff;padding:12px;z-index:2}article{background:white;margin:20px 0;padding:16px;border-radius:8px}.strip{display:flex;gap:10px}figure{margin:0;width:33.3%}img{width:100%}video{width:70%}select,button{font:inherit;padding:8px}figcaption{font-size:13px}</style>
+    template = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>K8 court-shot review</title>
+<style>body{font:16px system-ui;margin:24px;background:#eee;color:#18212b}header{position:sticky;top:0;background:#fff;padding:12px;z-index:2}article{background:white;margin:20px 0;padding:16px;border-radius:8px}.strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}figure{margin:0;min-width:0}img{display:block;width:100%}video{width:70%;max-width:100%}select,button{font:inherit;padding:8px}figcaption{font-size:13px}</style>
 <header><b>K8 · every broadcast shot</b> <span id="count"></span> <button id="save">Download marks JSON</button>
 <label>Restore marks <input id="load" type="file" accept="application/json"></label></header>
 <p>Mark the true class of every shot. Court means an ordinary court view intended for PointStream; mark replays as replay even when the court is visible. Use mixed for a shot containing both court and non-court content (bad cut); it counts as wrong for both. Use the source video when three frames are insufficient. Green is the projected model; no overlay means no homography. Predictions are not labels. Labels are saved locally in this browser; also download the JSON.</p>
