@@ -181,7 +181,7 @@ def test_assembly_requires_complete_nonduplicated_frame_coverage(tmp_path):
         for frame, reg in enumerate(row["registration"], part * 2):
             reg["frame"] = frame
         row.update(images=[f"images/{ident}.jpg"] * 3, registered_share=1.0)
-        report = {"source": identity, "fps": 50, "frames": 4, "source_frames": 4, "scene_threshold": 0.25,
+        report = {"source": identity, "fps": 50, "frames": 4, "source_frames": 4, "runtime_seconds": 10 + part, "scene_threshold": 0.25,
                   "scene_scores": [], "decision": k8.DECISION, "all_spans": [[0, 2], [2, 4]], "shots": [row]}
         path = tmp_path / f"part-{part}.tar"
         with tarfile.open(path, "w") as archive:
@@ -193,6 +193,9 @@ def test_assembly_requires_complete_nonduplicated_frame_coverage(tmp_path):
         archives.append(path)
     result = k8.assemble(archives, tmp_path / "review", source)
     assert result["frames"] == 4 and result["shots"] == 2
+    assembled = json.loads((tmp_path / "review/k8-report.json").read_text())
+    assert "runtime_seconds" not in assembled
+    assert [r["runtime_seconds"] for r in assembled["part_runs"]] == [10, 11]
     assert (tmp_path / "review/source.mp4").resolve() == source
     assert (tmp_path / "review/READY.json").exists()
     with pytest.raises(ValueError, match="cover every"):

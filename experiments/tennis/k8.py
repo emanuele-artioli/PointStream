@@ -282,8 +282,11 @@ def assemble(archives: list[Path], out: Path, source: Path) -> dict[str, Any]:
         raise ValueError("parts do not cover every source frame exactly once")
     if file_sha256(source) != first["source"]["video_sha256"]:
         raise ValueError("review video identity changed")
-    result = {k: v for k, v in first.items() if k not in ("shots", "review_id", "part", "parts")}
+    result = {k: v for k, v in first.items() if k not in ("shots", "review_id", "part", "parts", "runtime_seconds")}
     result.update(shots=shots, archives=[{"path": str(p), "sha256": file_sha256(p)} for p in archives])
+    result["part_runs"] = [{"archive": str(path), "part": report.get("part"),
+                            "runtime_seconds": report.get("runtime_seconds"), "native_tools": report.get("native_tools")}
+                           for path, report in zip(archives, reports)]
     result["review_id"] = hashlib.sha256(json.dumps(result, sort_keys=True).encode()).hexdigest()[:16]
     (out / "source.mp4").symlink_to(source)
     write_json(out / "k8-report.json", result)
