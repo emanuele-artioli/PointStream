@@ -322,7 +322,7 @@ def item_rows(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]]) -> dict
         for j, p in enumerate(meta["points"]):
             row = {"name": p["name"], "qp": p["qp"], "scale": p["scale"], "kbps": float(p["kbps_r"]),
                    "kbps_estimated": float(p["kbps_r_estimated"]), **point_summary(a, j, hand),
-                   "lpips_frames": a["lpips"][j][hand]}
+                   "lpips_frames": a["lpips"][j][hand], "real_stream_sha256": p["real_stream_sha256"]}
             out.setdefault(meta["item"], {}).setdefault(p["arm"], []).append(row)
     return out
 
@@ -378,7 +378,7 @@ def command_report(args: argparse.Namespace) -> int:
             if p["arm"] == "reference":
                 real[(meta["item"], f"A@{p['qp']}/{p['scale']}")] = {**row, "stream_sha256": p["stream_sha256"],
                                                                      "lpips_frames": a["lpips"][j][hand]}
-    # The PyTorch path against H3c's real codec, point by point (arm A): the same stream, rate within 5%, LPIPS within 0.005.
+    # The PyTorch path against H3c's real codec, point by point (arm A): rate within 5%, LPIPS within 0.005 (H3d's tolerance).
     cross: dict[str, dict[str, Any]] = {}
     for item, by_arm in items.items():
         for row in by_arm.get("A", []):
@@ -388,6 +388,8 @@ def command_report(args: argparse.Namespace) -> int:
             entry = {"rate_ratio": row["kbps"] / ref["kbps"], "lpips_mean_gap": row["lpips"] - ref["lpips"],
                      "lpips_max_frame_gap": float(np.max(np.abs(row["lpips_frames"] - ref["lpips_frames"]))),
                      "psnr_gap": row["psnr"] - ref["psnr"]}
+            entry["stream_matches"] = row["real_stream_sha256"] == ref["stream_sha256"]
+            # Reported, not required: DCVC-UF's encoder is bound to the GPU (docs/fleet.md), as H3d found for its base points.
             entry["holds"] = abs(entry["rate_ratio"] - 1) <= 0.05 and abs(entry["lpips_mean_gap"]) <= 0.005
             cross.setdefault(item, {})[row["name"]] = entry
 
