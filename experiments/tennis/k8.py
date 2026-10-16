@@ -144,7 +144,7 @@ document.querySelector('#load').onchange=async e=>{try{const r=JSON.parse(await 
 def cuts(video: Path, fps: float, limit: int, ffmpeg: str, scratch: Path) -> tuple[list[dict[str, Any]], list[str]]:
     log = scratch / "scene-metadata.txt"
     command = [ffmpeg, "-v", "error", "-nostdin", "-threads", "2", "-i", str(video), "-frames:v", str(limit),
-               "-vf", f"select='gte(scene,0.10)',metadata=print:file={log}", "-an", "-f", "null", "-"]
+               "-vf", f"setpts=PTS-STARTPTS,select='gte(scene,0.10)',metadata=print:file={log}", "-an", "-f", "null", "-"]
     subprocess.run(command, check=True, capture_output=True, timeout=1800)
     return parse_scenes(log.read_text(), fps), command
 
@@ -226,8 +226,8 @@ def run_job(args: argparse.Namespace) -> int:
     meta = json.loads(subprocess.check_output(probe_command))["streams"][0]
     from fractions import Fraction
     fps = float(Fraction(meta["r_frame_rate"]))
-    if meta["r_frame_rate"] != meta["avg_frame_rate"] or abs(float(meta.get("start_time", 0))) > 1e-6:
-        raise ValueError("requires CFR video starting at PTS zero")
+    if meta["r_frame_rate"] != meta["avg_frame_rate"]:
+        raise ValueError("requires CFR video")
     if [meta["width"], meta["height"]] != [1920, 1080]:
         raise ValueError("K8 whole match must be 1080p")
     total = int(meta["nb_read_packets"])
@@ -245,6 +245,7 @@ def run_job(args: argparse.Namespace) -> int:
     report = {"schema": 1, "fps": fps, "frames": frames, "source_frames": total, "source": identity,
               "scene_threshold": args.threshold, "scene_scores": scenes, "scene_command": scene_command,
               "decision": DECISION, "shots": [rows[i] for i in range(len(spans))],
+              "source_start_time": float(meta.get("start_time", 0)),
               "runtime_seconds": time.monotonic() - began, "device": "cpu", "opencv": cv2.__version__,
               "numpy": np.__version__, "geometry": "ITF regulation; net excluded", "probe_command": probe_command}
     report["review_id"] = hashlib.sha256(json.dumps(report, sort_keys=True).encode()).hexdigest()[:16]

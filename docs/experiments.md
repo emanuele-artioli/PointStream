@@ -5812,6 +5812,13 @@ invocation turns out to be needed.
   and checks each requested decoded frame while processing. Chamfer
   sampling was also corrected to uniform projected-pixel spacing (covered
   by a focused regression test) before any decision run.
+  Corrected pilot `20261016T090621Z-91db7939` (gpu1, CPU, `ddd457c`)
+  failed its timing guard in 3.2 s: the source is CFR 50/1 but starts at
+  PTS 0.020 s. The implementation now explicitly rebases scene-score PTS
+  with `setpts=PTS-STARTPTS`; shot indices remain zero-based presentation
+  order, and ffmpeg seeks are relative to stream start. The source offset
+  is recorded rather than requiring zero PTS. No registration result was
+  produced. Neither diagnostic run supports the decision.
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
