@@ -3,6 +3,8 @@
     python -m experiments.visor.h5 foreground WINDOW --points dcvc@0/4,... --generic TAR ... --limit-frames N
     python -m experiments.visor.h5 score WINDOW --foreground DIR --background DIR ... --routes scene,enh,svt \\
         [--anchors DIR ... --b2-result JSON ...] --dists-backbone P --max-combos N --limit-frames N
+    python -m experiments.visor.h5 time WINDOW --arm DIR --enhancers DIR --generic TAR ... --propainter-tree DIR \\
+        --propainter-ckpt P --raft-ckpt P --flow-completion-ckpt P --threads 32
     python -m experiments.visor.h5 validate
     python -m experiments.visor.h5 report --score H5.JSON ... --out DIR
 
@@ -621,6 +623,209 @@ def command_score(args: argparse.Namespace) -> int:
     return 0
 
 
+# ----------------------------------------------------------------- timing (exclusive GPU)
+
+#: The operating points timed per window: (background method, value, foreground point). One per route.
+TIMED = (("scene-1080", 38, "dcvc@21/2"), ("enh-1080", 48, "dcvc@21/4"))
+REPEATS = 3
+
+
+def synchronized(fn: Any) -> tuple[Any, float]:
+    """``fn()`` and its wall seconds, the GPU synchronized before and after."""
+    import torch
+
+    torch.cuda.synchronize()
+    t0 = time.perf_counter()
+    out = fn()
+    torch.cuda.synchronize()
+    return out, time.perf_counter() - t0
+
+
+def dcvc_worker(action: str, plan: dict[str, Any], work: Path) -> dict[str, Any]:
+    """One DCVC-UF worker run; its report (``model_*_seconds``: the codec calls, GPU-synchronized, B2b's
+    codec time)."""
+    import subprocess
+
+    from src.codecs.dcvc_uf_worker import dcvc_command
+
+    plan_path, report = work / f"plan-{action}.json", work / f"{action}.json"
+    write_json(plan_path, plan)
+    command, env, cwd = dcvc_command(Path(sys.prefix), action, plan_path, report)
+    done = subprocess.run(command, env={**os.environ, **env}, cwd=cwd, capture_output=True, text=True, timeout=3600)
+    if done.returncode:
+        raise RuntimeError(f"DCVC-UF {action} failed ({done.returncode}):\n{done.stderr[-4000:]}")
+    return json.loads(report.read_text())
+
+
+def dcvc_plan(args: argparse.Namespace, video_ckpt: str, qp: int, size: tuple[int, int], frames: int, source: Path,
+              container: Path, out: Path) -> dict[str, Any]:
+    return {"structure": "htl", "qp": qp, "frame_count": frames, "height": size[1], "width": size[0],
+            "src_type": "yuv420", "frames_file": str(source), "container": str(container), "out_file": str(out),
+            "image_ckpt": args.image_ckpt, "image_sha256": file_sha256(Path(args.image_ckpt)), "video_ckpt": video_ckpt,
+            "video_sha256": file_sha256(Path(video_ckpt)), "profile": False}
+
+
+def median(values: list[float]) -> float:
+    return float(np.median(values))
+
+
+def time_window(args: argparse.Namespace, w: dict[str, Any], method: str, value: int, fg_name: str, nets: dict[str, Any],
+                scene_ckpt: str, enhancers: Path, work: Path) -> dict[str, Any]:
+    """PointStream's encoder and decoder at one operating point, each stage timed ``REPEATS`` times."""
+    import torch
+
+    from experiments.background import g5, g5d, g6
+    from experiments.visor import h3d
+    from src.codecs import svtav1
+
+    frames, fps = w["frames"], w["fps"]
+    f = w["classes"] > 0
+    cpus = sorted(os.sched_getaffinity(0))[:args.threads]  # type: ignore[attr-defined,unused-ignore]
+    t: dict[str, list[float]] = {}
+
+    def note(name: str, seconds: float) -> None:
+        t.setdefault(name, []).append(seconds)
+
+    route = ROUTE_OF_METHOD[method]
+    size = FULL if method.endswith("1080") else g6.HALF
+    qp, scale = parse_point(fg_name)
+    fg_size = coded_size(scale)
+    containers = []
+    for repeat in range(REPEATS):
+        rw = work / f"r{repeat}"
+        shutil.rmtree(rw, ignore_errors=True)
+        rw.mkdir(parents=True)
+        # ---- encoder
+        (filled, _), seconds = synchronized(lambda: g6.fill(w["rgb"], f, args, rw / "fill"))
+        note("encode/fill (ProPainter, wall with its model load)", seconds)
+        bg_source = rw / "bg.yuv"
+        g5.rgb_to_yuv420(filled if size == FULL else g6.resize(filled, size, area=True)).tofile(bg_source)
+        if route == "scene":
+            rep = dcvc_worker("encode", dcvc_plan(args, scene_ckpt, value, size, frames, bg_source, rw / "bg.psdc",
+                                                  rw / "bg-dec.yuv"), rw)
+            note("encode/background (scene model, DCVC-UF codec calls)", rep["model_encode_seconds"])
+            bg_stream = (rw / "bg.psdc").read_bytes()
+            codec = "dcvc-uf"
+        else:
+            (rw / "svt").mkdir()
+            rec = svtav1.code(bg_source, rw / "svt", width=FULL[0], height=FULL[1], fps=fps, frames=frames, crf=value,
+                              preset=g5.PRESET, threads=args.threads, full_range=True, encoder="SvtAv1EncApp",
+                              decoder="dav1d", cpus=cpus)
+            note(f"encode/background (SVT-AV1 preset {g5.PRESET}, {args.threads} threads, wall)", rec["encode_seconds"])
+            bg_stream = bs.ivf_to_obus(Path(rec["stream"]).read_bytes())[0]
+            codec = "av1"
+        padded, seconds = synchronized(lambda: cp.foreground_input(w["rgb"], f, scale, fg_size))
+        note("encode/foreground padding (CPU)", seconds)
+        g5.rgb_to_yuv420(padded).tofile(rw / "fg.yuv")
+        rep = dcvc_worker("encode", dcvc_plan(args, args.video_ckpt, qp, fg_size, frames, rw / "fg.yuv", rw / "fg.psdc",
+                                              rw / "fg-dec.yuv"), rw)
+        note("encode/foreground (DCVC-UF codec calls)", rep["model_encode_seconds"])
+        c = bs.Container(FULL[0], FULL[1], fps, frames)
+        c.add_coded(bs.Coded("background", bs.ROUTES[route], codec, size[0], size[1], bg_stream))
+        c.add_coded(bs.Coded("foreground", scale, "dcvc-uf", fg_size[0], fg_size[1], (rw / "fg.psdc").read_bytes(),
+                             ((bs.CLASSES["hand"], 1 if fg_name in nets else 0), (bs.CLASSES["object"], 0))))
+        data = c.pack()
+        containers.append({"bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()})
+        # ---- decoder, from the container's own streams
+        back = bs.Container.unpack(data)
+        [bg], [fg] = back.coded(bs.Tag.BACKGROUND), back.coded(bs.Tag.FOREGROUND)
+        if bg.codec == "dcvc-uf":
+            (rw / "bg-in.psdc").write_bytes(bg.stream)
+            rep = dcvc_worker("decode", dcvc_plan(args, scene_ckpt, value, size, frames, bg_source, rw / "bg-in.psdc",
+                                                  rw / "bg-out.yuv"), rw)
+            note("decode/background (scene model, DCVC-UF codec calls)", rep["passes"][0]["model_decode_seconds"])
+            bg_yuv = np.fromfile(rw / "bg-out.yuv", np.uint8).reshape(frames, size[1] * 3 // 2, size[0])
+            bg_rgb, seconds = synchronized(lambda: g5.yuv420_to_rgb(bg_yuv) if size == FULL else
+                                           g6.resize(g5.yuv420_to_rgb(bg_yuv), FULL, area=False))
+            note("decode/background to RGB (and upsampling)", seconds)
+        else:
+            (rw / "bg-in.ivf").write_bytes(bs.obus_to_ivf(bg.stream, bg.width, bg.height, fps))
+            timing = svtav1.run(svtav1.decode_command("dav1d", rw / "bg-in.ivf", rw / "bg-out.yuv", threads=8), 3600,
+                                cpus)
+            note("decode/background (dav1d, 8 threads, wall)", timing["wall"])
+            plain = g5.yuv420_to_rgb(np.fromfile(rw / "bg-out.yuv", np.uint8).reshape(frames, FULL[1] * 3 // 2, FULL[0]))
+            state = torch.load(enhancers / f"crf{value}.pt", map_location="cuda", weights_only=True)
+            net = g5d.enhancer(g5d.TRAIN["blocks"], g5d.TRAIN["channels"]).cuda()
+            net.load_state_dict({k: v.float() for k, v in state.items()})
+            bg_rgb, seconds = synchronized(lambda: g5d.apply(net.eval(), plain, "cuda"))
+            note("decode/background enhancer (G5d)", seconds)
+        (rw / "fg-in.psdc").write_bytes(fg.stream)
+        rep = dcvc_worker("decode", dcvc_plan(args, args.video_ckpt, qp, fg_size, frames, rw / "fg.yuv", rw / "fg-in.psdc",
+                                              rw / "fg-out.yuv"), rw)
+        note("decode/foreground (DCVC-UF codec calls)", rep["passes"][0]["model_decode_seconds"])
+        fg_yuv = np.fromfile(rw / "fg-out.yuv", np.uint8).reshape(frames, fg_size[1] * 3 // 2, fg_size[0])
+        up, seconds = synchronized(lambda: h3d.upscale_all(g5.yuv420_to_rgb(fg_yuv), frames, FULL[0], FULL[1]))
+        note("decode/foreground to RGB and bicubic upsampling", seconds)
+        (alpha, nearest), seconds = synchronized(lambda: tuple(np.stack(x) for x in zip(
+            *[cp.alpha_and_classes(cl) for cl in w["classes"]])))
+        note("decode/alpha and nearest class (from the granted F)", seconds)
+        slots = {cp.HAND: hand_enhancer(nets[fg_name][0], "cuda")} if fg_name in nets else {}
+        fg_rgb, seconds = synchronized(lambda: cp.apply_slots(up, nearest, slots))
+        note("decode/foreground slots (G on the hands)", seconds)
+        _, seconds = synchronized(lambda: g5.rgb_to_yuv420(np.concatenate(
+            [cp.composite(fg_rgb[i:i + CHUNK], bg_rgb[i:i + CHUNK], alpha[i:i + CHUNK]) for i in range(0, frames, CHUNK)])))
+        note("decode/composite and 4:2:0 output", seconds)
+        shutil.rmtree(rw, ignore_errors=True)
+    stages: dict[str, dict[str, Any]] = {k: {"median_s": median(v), "runs_s": [round(x, 3) for x in v]}
+                                         for k, v in t.items()}
+    encode = sum(s["median_s"] for k, s in stages.items() if k.startswith("encode/"))
+    decode = sum(s["median_s"] for k, s in stages.items() if k.startswith("decode/"))
+    return {"method": method, "value": value, "route": route, "foreground": fg_name, "stages": stages,
+            "encode_s_per_window": encode, "decode_s_per_window": decode,
+            "decode_fps": frames / decode if decode else None, "containers": containers}
+
+
+def command_time(args: argparse.Namespace) -> int:
+    import torch
+
+    from experiments.background import g5c, g6
+    from experiments.visor.h3d_component import generic_network
+
+    if os.environ.get("PS_GPU_SHARING") == "shared":
+        raise SystemExit("timing runs only on an exclusive GPU")
+    scratch = scratch_dir()
+    work = scratch / "time"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    began = time.time()
+    w = load_window(args, work)
+    arm = Path(args.arm) / "publish" / "finetune"
+    scene = json.loads((arm / "result.json").read_text())
+    if file_sha256(arm / "video_ft.pth.tar") != scene["model"]["checkpoint_sha256"]:
+        raise RuntimeError("the scene model is not the one its training recorded")
+    enhancers = Path(args.enhancers) / "publish" / "enhancers"
+    timed = [t for t in TIMED if args.limit_frames <= 0 or t == TIMED[0]]
+    nets = {fg: generic_network(args.generic, fg, "cuda") for _, _, fg in timed if parse_point(fg)[1] in G_SCALES}
+    torch.backends.cudnn.benchmark = False
+    rows = []
+    for done, (method, value, fg) in enumerate(timed, 1):
+        rows.append(time_window(args, w, method, value, fg, nets, str(arm / "video_ft.pth.tar"), enhancers,
+                                work / f"{method}-{value}"))
+        progress(done)
+    write_json(stage_dir() / "h5.json", {
+        "kind": "time", "item": w["item"]["id"], "frames": w["frames"], "limit_frames": args.limit_frames,
+        "jpeg_gate_holds": all(c["holds"] for c in w["source"]["jpeg_gate"]), "threads": args.threads,
+        "scene_model_sha256": scene["model"]["checkpoint_sha256"], "rows": rows, "not_timed": [
+            "F and the class map (granted: dataset masks)", "venue models' training (offline, once per venue)"],
+        "gpu_sharing": os.environ.get("PS_GPU_SHARING", "exclusive"), "seconds": round(time.time() - began, 1),
+        **g5c.gpu_record(), **g6.provenance()})
+    shutil.rmtree(work, ignore_errors=True)
+    return 0
+
+
+def validate_time(result: dict[str, Any]) -> dict[str, bool]:
+    rows = result["rows"]
+    return {
+        "window_is_the_released_one": result["jpeg_gate_holds"],
+        "exclusive_gpu": result["gpu_sharing"] != "shared",
+        "every_point_timed": len(rows) == (len(TIMED) if result["limit_frames"] <= 0 else 1),
+        "repeats": all(len(s["runs_s"]) == REPEATS for r in rows for s in r["stages"].values()),
+        "containers_reproducible": all(len({c["sha256"] for c in r["containers"]}) == 1 for r in rows),
+        "times_positive": all(s["median_s"] > 0 for r in rows for s in r["stages"].values()),
+        "encoder_and_decoder": all(r["encode_s_per_window"] > 0 and r["decode_s_per_window"] > 0 for r in rows),
+    }
+
+
 # ----------------------------------------------------------------- validation
 
 
@@ -678,6 +883,8 @@ def validate_score(result: dict[str, Any]) -> dict[str, bool]:
 
 def validate(stage: Path) -> dict[str, bool]:
     result = json.loads((stage / "h5.json").read_text())
+    if result["kind"] == "time":
+        return validate_time(result)
     return validate_foreground(result) if result["kind"] == "foreground" else validate_score(result)
 
 
@@ -900,6 +1107,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--dists-backbone", required=True)
     p.add_argument("--max-combos", type=int, default=0)
     p.add_argument("--background-points", help="only these background points (method-value, comma separated)")
+    p = sub.add_parser("time")
+    add_window(p)
+    for name in ("--arm", "--enhancers", "--propainter-tree", "--propainter-ckpt", "--raft-ckpt", "--flow-completion-ckpt"):
+        p.add_argument(name, required=True)
+    p.add_argument("--generic", action="append", required=True)
+    p.add_argument("--threads", type=int, default=32)
     sub.add_parser("validate")
     p = sub.add_parser("report")
     p.add_argument("--score", action="append", required=True, help="full score stages' h5.json")
@@ -912,6 +1125,8 @@ def main(argv: list[str] | None = None) -> int:
         return command_score(args)
     if args.command == "report":
         return command_report(args)
+    if args.command == "time":
+        return command_time(args)
     return command_validate(args)
 
 
