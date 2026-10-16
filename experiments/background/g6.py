@@ -776,7 +776,9 @@ def validate_stage(stage: Path) -> dict[str, bool]:
         return {
             "intended_gpu": gpu,
             "segments_present": bool(result["segments"]) and result["frames"] == result["segments"][-1]["end"],
-            "foreground_plausible": all(0.0 < s["fg_share"] < 0.8 for s in result["segments"]),
+            # A content-blind piece may show no hands (P03_10, H5): some foreground overall, none above 0.8.
+            "foreground_plausible": any(s["fg_share"] > 0.0 for s in result["segments"])
+            and all(s["fg_share"] < 0.8 for s in result["segments"]),
             "outside_window_and_guard": all(s["last_index"] < lo or s["first_index"] > hi for s in result["segments"]),
             "enough_frames": result["frames"] >= (300 if result["set"] == "scene" else 200) if full else result["frames"] > 0,
             "propainter_on_gpu": result["propainter"]["gpu"] == result["gpu"],
