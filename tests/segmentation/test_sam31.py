@@ -43,6 +43,16 @@ class _FakePredictor:
         }
 
 
+def test_cpu_offload_session_flags_are_explicit_and_change_provenance():
+    predictor = _FakePredictor()
+    native = Sam31SequenceSegmenter(predictor=predictor)
+    offloaded = Sam31SequenceSegmenter(predictor=predictor, offload_video_to_cpu=True, offload_state_to_cpu=True)
+    offloaded.start_session("person", "/external/frames", frame_width=6, frame_height=4, policy="offline_bidirectional")
+    assert predictor.requests[-1]["offload_video_to_cpu"] is True
+    assert predictor.requests[-1]["offload_state_to_cpu"] is True
+    assert native.provenance("offline_bidirectional").config_sha256 != offloaded.provenance("offline_bidirectional").config_sha256
+
+
 def test_sam31_scales_box_prompt_to_relative_coordinates() -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)

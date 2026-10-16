@@ -5956,3 +5956,40 @@ invocation turns out to be needed.
   return a previously missing instance. Full-clip feature extraction
   covers 30,825 frames across the same 40 clips; it is not approximated
   by the review's eight-frame contexts.
+- Label audit after the freeze (`466860d`): 37 two-player, 10 one-player,
+  one zero-player frame; no missing-instance flags or notes. All 48 pass
+  schema, ID, confirmation and visibility checks. The proposal oracle is
+  48/48, scoped to selecting the review's exact proposals. Audit artifact
+  `label-audit-05f513052625.json` preserves this check and its per-frame rows.
+- Full-clip feature stage preflight (before GPU runs). Hypothesis: contact
+  plus motion improves over centroid travel when a player stands still;
+  competing explanations are SAM racket misses, camera motion, pose misses
+  and track fragmentation. Frozen formulas and human marks are not tuned.
+  Every one of the 30,825 native source frames is converted once by K4's
+  ffmpeg path and used for SAM person/player/racket and YOLO11x-pose.
+  The input manifest excludes human selections. Pose runs before SAM and
+  releases its model; SAM's official CPU video/state offload is enabled
+  for long clips. The smoke compares all class/frame unions to native
+  non-offloaded inference at IoU ≥ .999; offload is part of config provenance.
+  Defaults for existing SAM callers remain unchanged. Full-clip native
+  SAM IDs are retained; cross-prompt aliases and scalar features are CPU
+  operations, with raw SAM masks, raw pose detections and scoring-frame
+  masks saved so the validator can recompute them independently.
+  Pilot axis is clip length, not quality or thresholds: minimum
+  `medvedev_struff/007` (64 frames), median `djokovic_zverev/004` (407),
+  maximum `djokovic_zverev/000` (3,975). Pilot promotion requires valid
+  full artifacts and evidence the longest clip fits one ≤45-minute stage
+  and the remaining clips fit the phase budget. No clip is truncated for
+  the final score. Each job has a ≤600 s prefix smoke, substantive
+  validator, SHA256-identified original video/weights/environment/manifest,
+  ≤2,700 s full stage, 300 s validation reserve, and a deadline.
+  GPU compatibility: the already-verified A6000/Ada pool, all six hosts
+  eligible by model filter, 12,500 MiB allocator limit (recorded SAM peak
+  11.3 GiB; CPU-offload pilot must substantiate long-clip use), shared
+  execution with no timing claims, 40 GiB scratch. Phase ceiling 8 GPU-hours
+  and 10 h wall, including pilots/smokes; record actual usage and reserve
+  remaining job allowances before subsequent submissions. Failures or an
+  unattainable stage/phase bound stop promotion, without enlarging the budget.
+  Complete focused tests cover offload flags/provenance, the five rules,
+  strict majority, gaps and tail discount, joint visibility, duplicate
+  prompts, target-mask export, injective IoU matching and annotation identity.
