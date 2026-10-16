@@ -14,7 +14,7 @@ import re
 import shutil
 import subprocess
 import tarfile
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -73,10 +73,18 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
     shots = report["shots"]
     if set(labels) != {s["id"] for s in shots} or any(v not in CLASSES for v in labels.values()):
         raise ValueError("mark every shot exactly once with an allowed class")
+    frames = report.get("source_frames", 0)
+    if frames <= 0 or report.get("frames") != frames:
+        raise ValueError("the rule requires a complete whole-match report")
+    if [(s["start"], s["end"]) for s in shots] != shot_spans([s["start"] for s in shots[1:]], frames):
+        raise ValueError("shots do not partition the whole match")
+    if any([r["frame"] for r in s["registration"]] != list(range(s["start"], s["end"])) for s in shots):
+        raise ValueError("registration must cover every shot frame, including failed fits")
     tp = fp = 0
     duration_tp = duration_true = 0.0
     errors: list[float] = []
     misses: Counter[str] = Counter()
+    missed_shots: dict[str, list[str]] = defaultdict(list)
     confusion: Counter[str] = Counter()
     for shot in shots:
         truth, predicted = labels[shot["id"]], shot["predicted"] == "court"
@@ -91,6 +99,7 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
                 duration_tp += duration
         if (predicted and truth != "court") or (not predicted and truth in ("court", "mixed")):
             misses[truth] += 1
+            missed_shots[truth].append(shot["id"])
         if truth == "court":
             errors.extend(float(r["chamfer_px"]) if r["chamfer_px"] is not None else float("inf")
                           for r in shot["registration"])
@@ -116,7 +125,7 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
             "registration_median_px": median if np.isfinite(median) else None,
             "registration_p95_px": p95 if np.isfinite(p95) else None,
             "missing_registration_is_infinite": True, "court_frames": len(errors),
-            "misses_by_class": dict(misses), "confusion": dict(confusion),
+            "misses_by_class": dict(misses), "missed_shots_by_class": dict(missed_shots), "confusion": dict(confusion),
             "marks_sha256": hashlib.sha256(json.dumps(marks, sort_keys=True).encode()).hexdigest()}
 
 

@@ -27,12 +27,17 @@ def test_eighty_percent_counts_every_frame():
 
 def shot(ident, start, end, pred, error=1.0):
     return {"id": ident, "start": start, "end": end, "predicted": pred,
-            "registration": [{"chamfer_px": error} for _ in range(end - start)]}
+            "registration": [{"frame": t, "chamfer_px": error} for t in range(start, end)]}
+
+
+def scoring_report(shots):
+    frames = shots[-1]["end"]
+    return {"review_id": "a", "fps": 10, "frames": frames, "source_frames": frames, "shots": shots}
 
 
 def test_scoring_duration_recall_and_mixed_shot_penalizes_both():
-    report = {"review_id": "a", "fps": 10, "shots": [shot("a", 0, 90, "court"),
-              shot("b", 90, 100, "non_court"), shot("c", 100, 110, "court")]}
+    report = scoring_report([shot("a", 0, 90, "court"),
+              shot("b", 90, 100, "non_court"), shot("c", 100, 110, "court")])
     result = k8.score(report, {"review_id": "a", "marks": {"a": "court", "b": "court", "c": "mixed"}})
     assert result["precision"] == 0.5
     assert result["duration_recall"] == 9 / 11
@@ -41,7 +46,7 @@ def test_scoring_duration_recall_and_mixed_shot_penalizes_both():
 
 
 def test_missing_registrations_fail_error_bar_and_marks_must_be_complete():
-    report = {"review_id": "a", "fps": 10, "shots": [shot("a", 0, 100, "court", None)]}
+    report = scoring_report([shot("a", 0, 100, "court", None)])
     result = k8.score(report, {"review_id": "a", "marks": {"a": "court"}})
     assert result["precision"] == result["duration_recall"] == 1
     assert result["registration_median_px"] is None
@@ -201,7 +206,7 @@ def test_error_summary_uses_ordinary_median_and_retains_infinite_tail():
     row = shot("a", 0, 4, "court")
     for reg, error in zip(row["registration"], [1.0, 1.0, 3.0, 3.0]):
         reg["chamfer_px"] = error
-    report = {"review_id": "a", "fps": 10, "shots": [row]}
+    report = scoring_report([row])
     marks = {"review_id": "a", "marks": {"a": "court"}}
     assert k8.score(report, marks)["registration_median_px"] == 2.0
     row["registration"][-1]["chamfer_px"] = None
@@ -242,3 +247,15 @@ def test_review_server_supports_byte_ranges_for_seeking(tmp_path):
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)
+
+
+def test_scoring_rejects_partial_matches_and_dropped_frame_rows():
+    report = scoring_report([shot("a", 0, 10, "court")])
+    marks = {"review_id": "a", "marks": {"a": "court"}}
+    report["source_frames"] = 20
+    with pytest.raises(ValueError, match="whole-match"):
+        k8.score(report, marks)
+    report["source_frames"] = 10
+    report["shots"][0]["registration"].pop()
+    with pytest.raises(ValueError, match="every shot frame"):
+        k8.score(report, marks)
