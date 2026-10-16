@@ -80,3 +80,16 @@ def test_recovery_assembly_reuses_complete_shots_and_requires_all_chunks(tmp_pat
     with pytest.raises(ValueError, match="missing recovery chunks"):
         kr.assemble(args)
     assert not (args.out / "READY.json").exists()
+
+
+def test_publication_repair_rejects_any_published_or_executed_request(tmp_path):
+    from tools.datasets.k8_publish_existing import assert_unpublished
+
+    assert_unpublished(tmp_path)
+    for name in ("ready.json", "owner", "run", "state.json"):
+        path = tmp_path / name
+        path.write_text("preserve")
+        with pytest.raises(ValueError, match="inspect, do not repair"):
+            assert_unpublished(tmp_path)
+        assert path.read_text() == "preserve"
+        path.unlink()  # synthetic fixture only

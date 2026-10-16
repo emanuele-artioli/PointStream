@@ -5922,6 +5922,38 @@ invocation turns out to be needed.
   `pyproject.toml` runtime dependency set, avoiding unnecessary NFS file
   creation; each records that source selection and its snapshot checksums.
 
+- Remaining recovery requests (CPU only; `16b19ab`, same worker/court
+  file contents as the successful pilot; runtime-only source snapshot
+  SHA256 `c1bc200d99b2c1b4155c08cf7081a0382da99f52d991536b60801556182c0580`).
+
+  | Group | Job |
+  |---|---|
+  | 0 (pilot) | `20261016T110218Z-1bd79811` |
+  | 1 | `20261016T112031Z-242208de` |
+  | 2 | `20261016T112031Z-139b7c17` |
+  | 3 | `20261016T112032Z-8cd85120` |
+  | 4 | `20261016T112033Z-cea7591b` |
+  | 5 | `20261016T112050Z-f71ef62e` |
+  | 6 | `20261016T112056Z-8d34945b` |
+  | 7 | `20261016T112057Z-b93576b9` |
+  | 8 | `20261016T112057Z-27c43737` |
+  | 9 | `20261016T112101Z-863308e5` |
+  | 10 | `20261016T112058Z-fed578eb` |
+  | 11 | `20261016T112059Z-5522e2a8` |
+
+  Concurrent source transfers suffered connection failures. Canonical
+  status and shared-inbox inspection confirmed groups 2–11 had no ready
+  record, owner, state or run; no workload had executed. Their original
+  requests were continued, not resubmitted: the surviving complete tar
+  matched every original snapshot checksum, partial source directories
+  were preserved, restored source identities were checked against the
+  already-published group 1, and the frozen fleet publisher completed
+  publication under the original IDs/specifications. Source identity
+  `df2516b1506a553ade44b637c471714c5cd040a261aa75c812d788322fcaba32`.
+  Receipt: `recovery-01/publication-repair-receipt.json`; helper
+  `tools/datasets/k8_publish_existing.py` refuses any ready/claimed/run
+  state. No duplicate job was launched and all normal smoke gates remain.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
