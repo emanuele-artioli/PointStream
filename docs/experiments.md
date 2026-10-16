@@ -5922,3 +5922,37 @@ invocation turns out to be needed.
   No rule is selected or scored yet; (d) waits for adopted K8 homography.
   Any winner is reported for review of K4's amendment before applying it
   to K4's windows, as required by this task.
+- Labels returned (2026-10-16): immutable
+  `marks-05f513052625.json`, SHA256
+  `05f5130526254316c078003a3a66398c97aa33027ac56519e0f267429eba50ba`.
+  Only schema, page identities and completeness were inspected initially:
+  correct review/selection identities, 48 entries, 48 confirmed. Individual
+  selections, visibility, missing flags and notes were not inspected before
+  freezing `experiments/tennis/k4b_rules.py` and its focused tests.
+- Candidate implementation freeze (before opening selections). All use
+  tracks present on ≥ half the clip frames and choose at most two.
+  (a) K4's sum of consecutive centroid distances / median mask height.
+  (b) sum of consecutive absolute horizontal displacements in SAM pixels,
+  zero weight for the last second. (c) one-pixel dilation of the racket
+  mask at 960×540 for contact; require contact on **more than half all clip
+  frames**, rank by contact fraction and abstain for unqualified tracks.
+  (e) sum of mean displacements of jointly confident (≥ .5) YOLO11x-pose
+  joints on consecutive fitted frames / median mask height (K4's native
+  whole-frame pose, image size 1280). (a)+(c) ranks first by contact on
+  most frames, then (a), filling remaining picks with (a). No other
+  combinations without (d) are prescribed. Track ties use canonical
+  prompt/native-ID order; candidate ties follow (a), (b), (c), (e), (a)+(c),
+  putting the simpler alternatives first. Duplicate prompt tracks are
+  matched one-to-one when IoU ≥ .8 on > half their co-visible frames,
+  covering ≥ half the shorter track; prefer the person mask.
+  Scoring uses injective IoU ≥ .5 matches for two marked players, only
+  the marked one for one-player frames, and no visible picked masks on
+  zero-player frames. A visible player without a labelled instance cannot
+  earn an IoU match and is never silently excluded. The 0.95 bar, sample,
+  metric, candidate list and deferral of (d) are unchanged. These functions
+  do not load annotations to select any constants.
+  A cheap proposal oracle is run first; it bounds **only the review's
+  existing masks**, not re-segmentation of the full clips, which could
+  return a previously missing instance. Full-clip feature extraction
+  covers 30,825 frames across the same 40 clips; it is not approximated
+  by the review's eight-frame contexts.
