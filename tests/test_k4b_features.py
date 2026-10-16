@@ -3,10 +3,20 @@ import pytest
 from types import SimpleNamespace
 from typing import Any
 
-from experiments.tennis.k4b_features import cpu_state_compatibility, extract_features, key, mask_parity, offload_tracker_state
+from experiments.tennis.k4b_features import cpu_state_compatibility, estimate_full_seconds, extract_features, key, mask_parity, offload_tracker_state
 from src.segmentation.masks import ClipMasks
 
 torch: Any = None  # Supplied by the isolated compatibility-test module, without CUDA.
+
+
+def test_scale_gate_does_not_multiply_fixed_loading_and_first_batch_warmup():
+    phases = dict(imports=1., preparation=0., sam_load=2., sam_compute=0., export=0.,
+                  pose_load=3., pose_first=100., pose_first_frames=8., pose_rest=0.)
+    assert estimate_full_seconds(phases, 48, 3975) == 166
+    phases["pose_rest"] = 40.
+    assert estimate_full_seconds(phases, 48, 88) == 266
+    with pytest.raises(ValueError, match="beyond the first batch"):
+        estimate_full_seconds(phases, 8, 3975)
 
 
 def _merge(d1, d2, k1, k2, d2_idx):

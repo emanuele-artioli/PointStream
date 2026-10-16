@@ -20,6 +20,7 @@ import os
 import tarfile
 import tempfile
 import textwrap
+import time
 from collections import Counter, defaultdict
 from dataclasses import replace
 from pathlib import Path
@@ -198,7 +199,18 @@ def cpu_state_compatibility(module: Any) -> dict[str, Any]:
             "patch_sha256": hashlib.sha256(json.dumps(patches, sort_keys=True).encode()).hexdigest()}
 
 
+def estimate_full_seconds(phases: dict[str, float], frames: int, source_frames: int) -> float:
+    """Keep first-batch pose warmup fixed; scale measured steady work."""
+    first_frames = phases["pose_first_frames"]
+    if frames <= first_frames:
+        raise ValueError("Scale confirmation needs pose work beyond the first batch")
+    variable = ((phases["preparation"] + phases["sam_compute"] + phases["export"]) * source_frames / frames
+                + phases["pose_rest"] * (source_frames - first_frames) / (frames - first_frames))
+    return 60 + phases["imports"] + phases["sam_load"] + phases["pose_load"] + phases["pose_first"] + 1.25 * variable
+
+
 def run(args: argparse.Namespace) -> int:
+    began = time.perf_counter()
     os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
     import cv2
     import torch
@@ -206,6 +218,10 @@ def run(args: argparse.Namespace) -> int:
     from src.segmentation.sam31 import Sam31SequenceSegmenter
     from src.segmentation.sam31_tracker import runtime
 
+    import_seconds = time.perf_counter() - began
+    preparation_start = time.perf_counter()
+    if not 0 <= args.full_stage_seconds <= 2700:
+        raise ValueError("Full-stage allowance must be between zero and 2700 seconds")
     manifest = json.loads(Path(args.manifest).read_text())
     info = next(c for c in manifest["clips"] if c["id"] == args.clip)
     frames = min(int(args.frames) or info["frames"], info["frames"])
@@ -225,11 +241,20 @@ def run(args: argparse.Namespace) -> int:
     raw = np.memmap(scratch / "source.yuv", mode="r", dtype=np.uint8, shape=(frames, 1620, 1920))
     jpeg = scratch / "jpeg"
     jpeg.mkdir()
+    pose_load_start = time.perf_counter()
     poses = k4.Poses([("yolo11x-pose", args.pose)])
+    pose_load_seconds = time.perf_counter() - pose_load_start
+    pose_first = pose_rest = 0.0
+    pose_first_frames = min(8, frames)
     detections = []
     for start in range(0, frames, 8):
         rgb = rgb_batch(raw, start, min(start + 8, frames))
+        pose_start = time.perf_counter()
         detections.extend(poses.run("yolo11x-pose", rgb, batch=8))
+        if start == 0:
+            pose_first = time.perf_counter() - pose_start
+        else:
+            pose_rest += time.perf_counter() - pose_start
         for offset, frame in enumerate(rgb):
             small = cv2.resize(frame, k4.SAM_SIZE, interpolation=cv2.INTER_AREA)
             cv2.imwrite(str(jpeg / f"{start + offset:05d}.jpg"), small[:, :, ::-1], [cv2.IMWRITE_JPEG_QUALITY, 95])
@@ -240,6 +265,7 @@ def run(args: argparse.Namespace) -> int:
         os.environ["CUDA_VISIBLE_DEVICES"] = visible_devices
     gc.collect()
     torch.cuda.empty_cache()
+    preparation_seconds = time.perf_counter() - preparation_start - pose_load_seconds - pose_first - pose_rest
     parity: dict[str, Any] = {"checked": False}
     if os.environ.get("PS_STAGE") == "smoke":
         parity_jpeg = scratch / "parity-jpeg"
@@ -258,6 +284,7 @@ def run(args: argparse.Namespace) -> int:
         gc.collect()
         torch.clear_autocast_cache()
         torch.cuda.empty_cache()
+    sam_load_start = time.perf_counter()
     sam = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint, offload_video_to_cpu=True, offload_state_to_cpu=False,
                                 grounding_batch_size=16)
     predictor = sam._require_predictor()
@@ -265,6 +292,7 @@ def run(args: argparse.Namespace) -> int:
     write_json(publish / "cpu-state-compatibility.json", cpu_compatibility)
     state_offload = offload_tracker_state(predictor)
     del predictor
+    sam_load_seconds = time.perf_counter() - sam_load_start
     if os.environ.get("PS_STAGE") == "smoke":
         print("phase=offloaded-parity grounding_batch=16", flush=True)
         offloaded_reference = sam.segment_frames(parity_jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"])
@@ -285,7 +313,9 @@ def run(args: argparse.Namespace) -> int:
             completed_masks.add((role, t))
             progress(frames + len(completed_masks))
     print("phase=production-sam frames=" + str(frames) + " grounding_batch=16", flush=True)
+    sam_compute_start = time.perf_counter()
     clip = sam.segment_frames(jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"], on_frame=on_frame)
+    sam_compute_seconds = time.perf_counter() - sam_compute_start
     provenance = sam.provenance("offline_bidirectional")
     effective_config = {"segmenter_config_sha256": provenance.config_sha256,
                         "tracker_state_offload": {"api": "tracker.init_state+cached_frame_outputs", "version": 2, "enabled": True},
@@ -299,6 +329,7 @@ def run(args: argparse.Namespace) -> int:
                   "allocator_config": os.environ["PYTORCH_ALLOC_CONF"],
                   "expandable_segments": sum(bool(s.get("is_expandable")) for s in torch.cuda.memory_snapshot()),
                   "prompts": PROMPTS, "parity": parity}
+    export_start = time.perf_counter()
     del sam
     gc.collect()
     torch.clear_autocast_cache()
@@ -310,10 +341,18 @@ def run(args: argparse.Namespace) -> int:
     target_clip.save(publish / "target-masks.rle")
     (publish / "pose.json.zst").write_bytes(compress(json.dumps([{k: v.tolist() for k, v in d.items()} for d in detections]).encode()))
     write_json(publish / "features.json", feature_record)
+    timing = {"imports": import_seconds, "preparation": preparation_seconds, "sam_load": sam_load_seconds,
+              "sam_compute": sam_compute_seconds, "export": time.perf_counter() - export_start,
+              "pose_load": pose_load_seconds, "pose_first": pose_first, "pose_first_frames": pose_first_frames, "pose_rest": pose_rest}
+    estimate = estimate_full_seconds(timing, frames, info["frames"])
+    scale_gate = {"required": os.environ.get("PS_STAGE") == "smoke" and args.full_stage_seconds > 0,
+                  "full_allowance_seconds": args.full_stage_seconds, "estimated_full_seconds": estimate,
+                  "margin": 1.25, "fixed_reserve_seconds": 60, "phases": timing}
     from src.codecs import svtav1
 
     summary = {"clip": info, "frames": frames, "configured_frames": int(args.frames), "stage": os.environ.get("PS_STAGE"),
                "manifest_sha256": file_sha256(Path(args.manifest)), "conversion": converted, "sam": sam_record, "pose": pose_record,
+               "scale_gate": scale_gate,
                "rules": rules.RULES, "gpu_peak_gib": torch.cuda.max_memory_allocated() / 2**30,
                "ffmpeg": svtav1.tool(args.ffmpeg), "files": {p.name: file_sha256(p) for p in sorted(publish.iterdir())}}
     write_json(stage_dir() / "k4b-features.json", summary)
@@ -363,6 +402,14 @@ def validate(directory: Path, summary: dict[str, Any]) -> dict[str, Any]:
                                     == [[(i.class_name, i.track_id, hashlib.sha256(i.mask().tobytes()).hexdigest()) for i in f] for f in target_again.frames],
         "features_finite": all(all(np.isfinite(v) for v in f.values()) for f in saved["features"].values()),
     }
+    gate = summary.get("scale_gate")
+    if gate is not None:
+        phases = gate["phases"]
+        estimate = estimate_full_seconds(phases, summary["frames"], summary["clip"]["frames"])
+        checks["scale_estimate_identified"] = (all(np.isfinite(v) and v >= 0 for v in phases.values())
+                                               and gate["margin"] == 1.25 and gate["fixed_reserve_seconds"] == 60
+                                               and estimate == gate["estimated_full_seconds"])
+        checks["full_scale_fits"] = not gate["required"] or estimate <= gate["full_allowance_seconds"] <= 2700
     return {"passed": all(checks.values()), "checks": checks, "frames": summary["frames"], "clip": summary["clip"]["id"]}
 
 
@@ -373,6 +420,7 @@ def main() -> int:
     for arg in ("manifest", "clip", "source", "sam-checkpoint", "pose", "frames"):
         r.add_argument("--" + arg, required=True)
     r.add_argument("--ffmpeg", default="ffmpeg")
+    r.add_argument("--full-stage-seconds", type=float, default=0, help="Require the smoke's conservative scale estimate to fit this full-stage allowance")
     v = sub.add_parser("validate")
     v.add_argument("--directory", type=Path)
     v.add_argument("--summary", type=Path)

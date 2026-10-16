@@ -6166,3 +6166,54 @@ invocation turns out to be needed.
   checks repaired values, dtype semantics and destination. The native
   mask/track parity gate remains mandatory, followed by the bounded median
   full stage. No candidate formula, score threshold or phase budget changes.
+- Corrected CPU-state pilot `20261016T161909Z-5e827d31`, gpu3 A6000,
+  actual ready revision `079bf6186f283ca1088817bee0016633481c8a1b`:
+  smoke passes fleet validation and full median processing starts. Native
+  versus CPU-storage parity: both minimum union and per-instance IoU 1.0,
+  identical track-ID sets, 132 native instances. Smoke production records
+  3/3 initialized tracker states and 1,125/1,125 cached masks on CPU.
+  Compatibility-patch set SHA256
+  `1692bdc34ece9f1dc48ec7b6b9354f97c69ba6f282c3648477651a0588f41019`.
+  Native package archive remains immutable. No full result is cited before
+  local validation. Local full suite after this correction: 575 passed,
+  19 skipped; ruff and configured mypy pass.
+- Preparing maximum-length confirmation only after local median validation:
+  the shared A6000's observed propagation pace does not establish a ≤45 min
+  all-prompt bound for 3,975 frames. Prefer the verified Ada class for that
+  pilot, checking all hosts and claims again. Add an operational (not scoring)
+  smoke scale gate: separately time imports, actual production preparation,
+  SAM loading, all-prompt propagation, and CPU export. Exclude the native
+  parity control; scale per-frame work to the full clip with 25% margin,
+  retain measured fixed load/import costs, add 60 s fixed reserve. Save the
+  estimate and its components; validator recomputes it and blocks promotion
+  if it exceeds an explicitly supplied full allowance (at most 2,700 s).
+  This changes neither masks nor the frozen identification rule. A passing
+  estimate only permits the bounded maximum pilot, whose complete output
+  still needs local validation and a feasible remaining-phase budget before
+  any corpus run. All phase ceilings and deadlines remain unchanged.
+- Median full `20261016T161909Z-5e827d31` is now **locally validated**:
+  all 22 checks true, 407/407 native frames, recomputed scalar features and
+  scoring masks, actual CPU states/cache and checksummed compatibility
+  receipts. Full peak 21.5914 GiB; full execution 638.061 s; complete GPU
+  claim 850.956 s. Receipt SHA256
+  `f15fea18e714481826c327208e30bb011a92fbcfa0f9ddfda48cecf6cc597bc4`.
+  Total completed phase claims 2,306.386 s; no other phase job is running.
+  Full corpus and maximum remain unsubmitted at this point.
+- Interruption: after median completion, automatic approval review could
+  not run further read-only inspections because its account usage limit
+  was exhausted. No command rejected by that review executed. After the
+  stated reset time, the authorized fleet watch succeeded, confirmed all
+  jobs terminal, and local validation resumed. The idle monitor was paused
+  and the completion event acknowledged; no job was replayed. Absolute
+  deadline `2026-10-17T01:00:00Z` and 8 GPU-hour ceiling remain unchanged.
+- Maximum pilot specification file `features-v1/maximum-ada.json`, file
+  SHA256 `8089be02891006995b91f314dbdc70df91672028b835c874e0b57b8f5a15fe51`:
+  original 600/2,700/300 s stage/validation limits and 3,600 s reservation,
+  Ada filter only, every host checked. gpu5's two Ada GPUs had 28,521 MiB
+  free each and no PointStream claims; gpu5/gpu6 had 504/439 GiB available
+  CPU RAM. GPU time reservation plus completed usage is 5,906.386 s,
+  below the unchanged 28,800 s ceiling. The smoke forecast separates YOLO
+  loading and the first eight-frame prediction batch from subsequent
+  steady work, so one-time warmup is not multiplied by clip length. A
+  regression checks this distinction and rejects a prefix without any
+  post-warmup pose batch. The 25% margin and 60 s reserve stay fixed.
