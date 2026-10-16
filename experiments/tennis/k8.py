@@ -171,7 +171,8 @@ def cuts(video: Path, fps: float, limit: int, ffmpeg: str, scratch: Path) -> tup
     return parse_scenes(log.read_text(), fps), command
 
 
-def process_shot(video: Path, fps: float, start: int, end: int, ident: str, publish: Path, ffmpeg: str) -> dict[str, Any]:
+def process_shot(video: Path, fps: float, start: int, end: int, ident: str, publish: Path, ffmpeg: str, extra_review: dict[str, int] | None = None,
+                 image_prefix: str | None = None) -> dict[str, Any]:
     import cv2
     from experiments.tennis import court
     from experiments.tennis import windows as tw
@@ -185,6 +186,9 @@ def process_shot(video: Path, fps: float, start: int, end: int, ident: str, publ
     assert proc.stdout is not None
     frame_size = 1920 * 1080 * 3 // 2
     rows, images = [], {}
+    requests = ([(index, role, ident) for index, role in
+                 ((0, "first"), ((end - start) // 2, "middle"), (end - start - 1, "last"))]
+                if extra_review is None else [(frame - start, role, image_prefix or ident) for role, frame in extra_review.items()])
     previous = None
     try:
         for i in range(end - start):
@@ -200,7 +204,7 @@ def process_shot(video: Path, fps: float, start: int, end: int, ident: str, publ
             previous = np.array(row["homography"]) if row["homography"] is not None else None
             rows.append({"frame": start + i, **row})
             # Short shots can have coincident first/middle/last frames; write all roles.
-            for index, role in ((0, "first"), ((end - start) // 2, "middle"), (end - start - 1, "last")):
+            for index, role, prefix in requests:
                 if i != index:
                     continue
                 image = rgb.copy()
@@ -208,7 +212,7 @@ def process_shot(video: Path, fps: float, start: int, end: int, ident: str, publ
                     for segment in court.SEGMENTS:
                         pts = np.rint(court.project(segment, np.array(row["homography"]))).astype(np.int32)
                         cv2.polylines(image, [pts], False, (0, 255, 60), 2, cv2.LINE_AA)
-                name = f"images/{ident}-{role}.jpg"
+                name = f"images/{prefix}-{role}.jpg"
                 if not cv2.imwrite(str(publish / name), image[:, :, ::-1], [cv2.IMWRITE_JPEG_QUALITY, 88]):
                     raise RuntimeError("JPEG write failed")
                 images[role] = name
@@ -222,7 +226,9 @@ def process_shot(video: Path, fps: float, start: int, end: int, ident: str, publ
             proc.terminate()
             proc.wait(timeout=30)
     shot = {"id": ident, "start": start, "end": end, "registration": rows,
-            "images": [images[r] for r in ("first", "middle", "last")], "conversion_command": command,
+            "images": [images[r] for r in ("first", "middle", "last")] if extra_review is None else [],
+            "extra_images": images if extra_review is not None else {}, "parent_shot": image_prefix,
+            "conversion_command": command,
             **shot_prediction(rows)}
     write_json(publish / "shots" / f"{ident}.json", shot)
     return shot

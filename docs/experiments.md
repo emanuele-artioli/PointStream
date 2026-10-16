@@ -5887,6 +5887,29 @@ invocation turns out to be needed.
   browser until downloaded. UI layout/server changes after `43d32d9`
   do not change registration, cuts, predictions or archived evidence.
 
+- Full-run resource failure and bounded recovery (2026-10-16).
+  All four full stages reached their enforced 2,700 s allowance; none
+  produced a complete whole-match report. Preserve their `partial.tar`
+  files unchanged. They contain 232 complete shots / 70,383 frames of
+  the 360 shots / 115,505 frames in the retained cut table. Exactly
+  128 shots / 45,122 frames remain. No adoption result is inferred.
+  The initial pilot underestimated hard line-search frames and Python
+  thread contention. Recovery reuses the SHA256-identified cut table
+  and completed archives, processes only missing frames, uses separate
+  CPU processes, and checkpoints chunks of ≤240 frames. Homographies
+  reinitialize at chunk boundaries; the same line detector, court model,
+  RANSAC, chamfer and decision thresholds are retained. Per-item code
+  and archive provenance distinguish the original and recovery results.
+  Whole-shot classification is recomputed from every frame after merge;
+  review images remain the original shot's exact first/middle/last.
+  Recovery budget: 12 balanced missing-frame groups (~3,760 frames each),
+  16 CPU threads / 8 processes, no GPU; smoke ≤300 s on 120 frames of
+  known court shot 9; pilot one complete missing group, full ≤1,800 s,
+  total ≤2,400 s per job. Only after that pilot passes are the remaining
+  groups submitted. Validator checks frame coverage, bounded chunks,
+  real registration, homographies, review images and unchanged shot rule.
+  Tests verify preservation, exact chunk coverage and fail-closed assembly.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
