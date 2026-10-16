@@ -5910,6 +5910,18 @@ invocation turns out to be needed.
   real registration, homographies, review images and unchanged shot rule.
   Tests verify preservation, exact chunk coverage and fail-closed assembly.
 
+- Recovery pilot `20261016T110218Z-1bd79811` (`5432db0`, gpu4,
+  CPU) passed its smoke (120 frames, 41.3 s processing / 44.5 s command)
+  and completed group 0: 22 chunks / 3,756 frames in 246.7 s processing
+  / 249.4 s command. This establishes the actual chunk/process path at
+  the full group scale, with about 7× margin to the 1,800 s cap. Hardware
+  and source identities are revalidated by each remaining job's own gate.
+  The retained evidence and manifest are read-only. Recovery manifest
+  SHA256 `5af2f0a3c4bf6b1f04b7ed145121f3989c0a9c57a6ff3a7ee303c70af577341f`.
+  Remaining jobs select the committed `experiments/`, `src/` and
+  `pyproject.toml` runtime dependency set, avoiding unnecessary NFS file
+  creation; each records that source selection and its snapshot checksums.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
