@@ -5731,3 +5731,127 @@ invocation turns out to be needed.
   mode has to render the blur (a streak along the coded velocity) and
   pay for what it sends; its own oracle and rendering come next. TrackNet
   only (720p, 8 windows of ≤ 8 s); positions as labelled (integers).
+
+### 2026-10-16 — K3: keypoint-conditioned pixel coding (oracle: a perfect hand in DCVC-UF's reference)
+- Question (PLAN K3, H3's proto-hand candidate). Do the hand keypoints save
+  pixel rate on the hand region R when the decoder has them? If DCVC-UF's
+  reference already showed the hand where the keypoints put it, would it
+  code R for fewer bits at equal quality, with the keypoints billed?
+- How DCVC-UF HT-L consumes its reference (microsoft/DCVC `cbdae87`,
+  `src/models/video_model_ht.py` and the CUDA proxy
+  `dmc_htl_proxy.cpp`), checked before anything was built:
+  - *There is no motion stream.* HT-L codes 8 frames per NAL jointly
+    (`g_frame_delay = 8`), conditioned on a context `ctx` extracted from a
+    recurrent memory (`feature_adaptor_m(memory, ref_feature)`), where
+    `ref_feature` is the decoder's 512-channel feature of the previous NAL.
+    Its bits are y (the latent) and z (its hyperprior) only; motion is
+    implicit in y. So the premise "the gain is bounded by its motion bits"
+    has no counterpart: no motion-bit share exists to report. Its
+    replacement here is the share of R's bits that a perfect reference
+    removes (arm E below), the bound on anything reference-side.
+  - *A frame can be the reference without retraining.* At a memory reset
+    the reference is a single frame: after an I frame,
+    `add_ref_feature_from_frame(x̂)` sets the reference to the
+    pixel-unshuffled frame and restarts the memory through
+    `feature_adaptor_i`; the periodic reset (`reset_interval`, upstream
+    default 32) does the same with `recon_head(feature, for_reset=True)`,
+    which is the previous NAL's last decoded frame. So a frame of our
+    choosing (a warped one) can replace the previous decoded frame at
+    every NAL through DCVC's own public path, with no new weights: the
+    model sees exactly the input it sees after every I frame and reset.
+  - *Costs of that substitution.* (1) Resetting every NAL drops the
+    recurrent memory, which the unmodified codec keeps for the whole
+    window (PointStream's worker sets no reset); arm B measures that cost.
+    (2) One reference serves 8 frames (133–160 ms at 50–60 frames/s), so a
+    warp can align the hand at one instant only; arms C and D place it at
+    the group's first and middle frame.
+  - *Instrument.* The CUDA proxy cannot run an encoder and an in-loop
+    decoder in one process (shared global tensor pool), and the encoder
+    needs the decoded previous frame to build the next reference. The
+    oracle therefore runs DCVC's own PyTorch path (`forward_one_frame`,
+    the same weights, fp32, symbols rounded as in H3c's bit estimate), a
+    complete encoder and decoder: rate from the model's own entropy model
+    per 16×16 cell (H3c's split, `h3c_bits`), quality from its x̂. Each
+    NAL's estimated bits are calibrated by the unmodified codec's real
+    bytes for the same NAL (B2's worker, encode only, at every point),
+    the same factor for every arm; raw estimates are reported beside. The
+    unmodified arm through this path is cross-checked against H3c's real
+    decodes (rate and LPIPS_R per point, H3d's tolerance: rate within 5%,
+    mean LPIPS_R within 0.005), and its real stream against H3c's sha256.
+- Oracle, and why it bounds the keypoint warp. The component would warp
+  the previous decoded frame by the hand's MANO mesh motion from t−1's
+  coded pose to t's (H3b's correspondence, H2's coded WiLoR stream). Its
+  best possible output is the hand exactly where it is at the target
+  frame, with the source's appearance, and the background it uncovers
+  shown correctly. The oracle gives the reference exactly that: inside
+  M = R(t₀−1) ∪ R(t), the source's pixels of frame t; elsewhere the
+  previous decoded frame. Nothing a warp of decoded pixels can produce is
+  closer to the frames being coded (it adds coding error and MANO's
+  silhouette error, H3b). The bound holds if the network codes better
+  from a reference closer to its target; arm E (the whole source frame)
+  against B checks that it does. If the oracle fails, the warp is not
+  built and the trained version is not pursued (the user's rule).
+- Arms (DCVC-UF HT-L off the shelf, H3c's checkpoints; per P NAL coding
+  frames t₀…t₀+7; references in 8-bit 4:2:0 converted as the reader does):
+  - A: unmodified (recurrent memory, no reset), as H3c's reference.
+  - B: reset at every NAL to the previous decoded frame x̂(t₀−1) (the
+    control: the substitution path with nothing substituted).
+  - C: B with M's pixels taken from the source at t = t₀.
+  - D: B with M's pixels taken from the source at t = the group's middle
+    frame (t₀+4, or the middle of a shorter last group).
+  - E: the whole source frame t₀ (a perfect reference; diagnostic, not
+    billed for anything, not deployable).
+- Items and points: B2's 4 pilot items (P01_107, P02_02, P03_10,
+  P09_106), 240 frames each; H3c's nine points (QP 0, 21, 42 at full
+  resolution, ½ and ¼; region R and its downscaled mask as H3c).
+- Quality: H3c's `Scorer` (decode inside R, source outside; full-frame
+  LPIPS averaged over R, mean over hand frames; DISTS on R's box plus
+  64 px; PSNR on R).
+- Rates. R's rate per arm and point (calibrated as above). C and D are
+  billed H2's coded WiLoR stream, 1.93 kbps (the 100 ms choice, its VISOR
+  rate from `h2-code.json`, as H3c2): the keypoints a warp needs. A and B
+  bill nothing more; E is never compared billed.
+- Comparison. Per item, each arm's Pareto front against the anchor's
+  upper concave hull, BD-rate on LPIPS_R by PCHIP of log rate over the
+  shared range (at least 0.005; else "better/worse at every rate";
+  `h3d.compare`). Anchors: A (the unmodified codec, same instrument), and
+  the pixel envelope (H3c's bar: SVT-AV1's eleven points and DCVC-UF's
+  nine real points, H3c's units). DISTS and PSNR beside.
+- Decision rule (`k3.DECISION`, fixed before any run). Gate: the better
+  of C and D (by mean BD) against A, billed, on LPIPS_R, scored with
+  H3d's verdict (`h3d.arm_verdict`): *passes* at mean BD ≤ −10% with ≥ 3
+  of 4 items below 0 and none worse at every rate; *fails* at mean ≥ 0 or
+  ≤ 1 item below 0; otherwise *unclear*.
+  - Passes: the keypoint warp itself is built as the next stage (H3b's
+    mesh correspondence, the same arms with the warp in place of the
+    source pixels), with its own rule, before any training.
+  - Fails: K3 is closed; neither the warp nor a trained conditional coder
+    is pursued. If C/D fail billed but pass unbilled, the outcome names
+    the keypoint rate at which they would pass (the keypoint rate is
+    deferred to optimization, PLAN H3); that is not a reopening.
+  - Unclear: to the user with the numbers.
+  - Reported beside, without deciding: B against A (the memory's worth),
+    C and D against B unbilled (the hand pixels' value on a fixed path),
+    E against B (the most any reference could save: the counterpart of
+    the motion-bit share), C/D against the pixel envelope.
+- Hypothesis. A perfect hand in the reference saves rate on R at middle
+  and high rates (hands are the fastest-moving content in egocentric
+  video, so they are where temporal prediction fails), about 10–25% of
+  R's bits against B; resetting every NAL costs 5–15% against A; billed,
+  1.93 kbps erases the gain at DCVC-UF's ¼ points (0.3–9 kbps on R) and
+  part of it at ½. Expected: C/D billed against A near 0, so the gate
+  fails or is unclear; E against B saves 30–50%.
+- Competing explanations. (1) Source pixels are sharper than every
+  reference the model was trained on, so it may not exploit them, or may
+  even pay for the mismatch: E against B shows whether a better reference
+  helps at all, and a failure then speaks for DCVC-UF's present weights,
+  not for a trained conditional coder (stated as the scope). (2) One
+  reference for 8 frames cannot follow the hand within the group: D
+  against C shows the sensitivity to the target time. (3) The PyTorch
+  path differs from the CUDA codec (fp32 against fp16; estimated against
+  real bits): the cross-check on A bounds that.
+- Budget. Ada or A6000, shared GPU (the PyTorch path ran in H3c's coding
+  jobs on both). Smoke ≤ 600 s: P01_107, 48 frames, QP 0 at scales 1 and
+  4, all arms. Pilot: 4 items, two jobs per item (full resolution; ½ and
+  ¼), each ≤ 45 min (H3c scored nine points in 13–18 min; here 45 points
+  per item). Ceiling 5 GPU-hours, one day wall.
