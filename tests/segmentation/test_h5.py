@@ -87,7 +87,8 @@ def test_score_validator_checks_anchor_reproduction() -> None:
     anchor: dict = {"deterministic": True, "stream_sha256": "s", "kbps": 100.0, "scores": scores(32.0),
               "b2": {"stream_sha256": "s", "kbps": 100.0, "wpsnr": 32.01}}
     result = {"rows": [row], "anchors": [anchor], "pairs_planned": 1, "jpeg_gate_holds": True, "limit_frames": 0,
-              "routes": ["scene"], "bitstream_checks": {"scene": {"pair": "p", "segments_round_trip": True}},
+              "routes": ["scene"], "bitstream_checks": {"scene": {"pair": "p", "segments_round_trip": True},
+                                                        "gpu_compositor": {"max_abs": 0}},
               "background_f_is_foreground_f": True}
     assert all(h5.validate_score(result).values())
     anchor["b2"]["wpsnr"] = 32.5

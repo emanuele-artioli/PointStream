@@ -393,20 +393,22 @@ def summarize(per_frame: list[dict[str, Any]], dists: list[dict[str, float | Non
 
 def score_decoded(w: dict[str, Any], judges: Judges, yuv_path: Path) -> dict[str, Any]:
     """Score a whole decoded window (1080p 4:2:0 in the source's full range) as B2 does, plus DISTS."""
-    from experiments.background import g6
     from src.codecs import quality
 
     frames = w["frames"]
+    t0 = time.perf_counter()
     per_frame = quality.score(Path(w["source"]["path"]), yuv_path, w["regions"], width=FULL[0], height=FULL[1],
                               frames=frames, full_range=True, device="cuda", lpips_net=judges.lpips)
+    t1 = time.perf_counter()
     planes = np.memmap(yuv_path, np.uint8, "r", shape=(frames, FULL[1] * 3 // 2, FULL[0]))
     judged = list(range(0, frames, DISTS_EVERY))
     dists = []
     for first in range(0, len(judged), CHUNK):
         idx = judged[first:first + CHUNK]
-        shown = g6.to_rgb(np.asarray(planes[idx]), True)
+        shown = rgb_gpu(np.asarray(planes[idx]))
         dists += dists_frames(judges, shown, w["rgb"][idx], [w["regions"][i] for i in idx], 0)
-    return summarize(per_frame, dists)
+    return {**summarize(per_frame, dists), "seconds": {"b2_harness": round(t1 - t0, 2),
+                                                       "dists": round(time.perf_counter() - t1, 2)}}
 
 
 def load_backgrounds(dirs: list[str], routes: set[str], item_id: str) -> list[dict[str, Any]]:
@@ -474,20 +476,68 @@ def bitstream_check(c: bs.Container, data: bytes, bg: dict[str, Any], fg: dict[s
             "rate_is_length": sum(back.breakdown().values()) == len(data)}
 
 
+def rgb_gpu(planes: np.ndarray) -> np.ndarray:
+    """(n, h·3/2, w) full-range 4:2:0 planes to (n, h, w, 3) uint8 RGB, converted on the GPU (`g6.to_rgb`'s
+    conversion: `quality.yuv420_to_rgb`)."""
+    import torch
+
+    from src.codecs import quality
+
+    out = np.empty((len(planes), planes.shape[1] * 2 // 3, planes.shape[2], 3), np.uint8)
+    for first in range(0, len(planes), CHUNK):
+        x = torch.from_numpy(np.ascontiguousarray(planes[first:first + CHUNK])).cuda()
+        rgb = quality.yuv420_to_rgb(x, planes.shape[2], planes.shape[1] * 2 // 3, full_range=True)
+        out[first:first + CHUNK] = rgb.permute(0, 2, 3, 1).to(torch.uint8).cpu().numpy()
+    return out
+
+
+def composite_gpu(fg: np.ndarray, bg: np.ndarray, alpha: np.ndarray) -> np.ndarray:
+    """`cp.composite` then `g5.rgb_to_yuv420` on the GPU, the same float32 arithmetic: (n, h·3/2, w) uint8."""
+    import torch
+
+    from src.codecs.quality import KB, KR
+
+    a = torch.from_numpy(np.ascontiguousarray(alpha)).cuda()[..., None]
+    mixed = torch.round(a * torch.from_numpy(fg).cuda().float() + (1.0 - a) * torch.from_numpy(bg).cuda().float())
+    rgb = mixed.clamp(0, 255) / 255.0
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    y = KR * r + (1.0 - KR - KB) * g + KB * b
+    cb = (b - y) / (2.0 * (1.0 - KB))
+    cr = (r - y) / (2.0 * (1.0 - KR))
+    n, h, w = y.shape
+
+    def pool(c: Any) -> Any:
+        return c.reshape(n, h // 2, 2, w // 2, 2).mean(dim=(2, 4))
+
+    out = torch.empty((n, h * 3 // 2, w), dtype=torch.uint8, device=y.device)
+    out[:, :h] = torch.round(y * 255.0).clamp(0, 255).to(torch.uint8)
+    chroma = torch.stack([pool(cb), pool(cr)], dim=1) * 255.0 + 128.0
+    out[:, h:] = torch.round(chroma).clamp(0, 255).to(torch.uint8).reshape(n, h // 2, w)
+    return out.cpu().numpy()
+
+
 def composite_window(w: dict[str, Any], fg_rgb: np.ndarray, bg_rgb: np.ndarray, alpha: np.ndarray,
                      out: Path) -> str:
     """The client's output (4:2:0, full range) written to ``out``; its sha256. Both decodes as RGB."""
-    from experiments.background import g5
-
     digest = hashlib.sha256()
     with out.open("wb") as handle:
         for first in range(0, w["frames"], CHUNK):
             sl = slice(first, first + CHUNK)
-            mixed = cp.composite(fg_rgb[sl], bg_rgb[sl], alpha[sl])
-            data = g5.rgb_to_yuv420(mixed).tobytes()
+            data = composite_gpu(fg_rgb[sl], bg_rgb[sl], alpha[sl]).tobytes()
             digest.update(data)
             handle.write(data)
     return digest.hexdigest()
+
+
+def gpu_matches_cpu(fg_rgb: np.ndarray, bg_rgb: np.ndarray, alpha: np.ndarray) -> dict[str, Any]:
+    """The GPU compositor against `cp.composite` and `g5.rgb_to_yuv420` on the first frames: largest difference."""
+    from experiments.background import g5
+
+    sl = slice(0, 4)
+    cpu = g5.rgb_to_yuv420(cp.composite(fg_rgb[sl], bg_rgb[sl], alpha[sl])).astype(np.int16)
+    gpu = composite_gpu(fg_rgb[sl], bg_rgb[sl], alpha[sl]).astype(np.int16)
+    diff = np.abs(cpu - gpu)
+    return {"max_abs": int(diff.max()), "share_differing": float((diff > 0).mean())}
 
 
 def score_anchors(args: argparse.Namespace, w: dict[str, Any], judges: Judges, work: Path) -> list[dict[str, Any]]:
@@ -527,6 +577,7 @@ def score_anchors(args: argparse.Namespace, w: dict[str, Any], judges: Judges, w
                     head = np.fromfile(rec["decoded"], np.uint8, count=w["frames"] * FULL[0] * FULL[1] * 3 // 2)
                     head.tofile(rec["decoded"])
                 scores = score_decoded(w, judges, Path(rec["decoded"]))
+                scores.pop("seconds")
                 seconds = w["frames"] / float(w["fps"])
                 b2_row = recorded.get((item["id"], codec, point))
                 rows.append({"codec": codec, "point": point, "rate_bytes": rec["rate_bytes"],
@@ -591,12 +642,17 @@ def command_score(args: argparse.Namespace) -> int:
             if key in restored:
                 rows.append({**restored[key], "restored_from_checkpoint": True})
             else:
+                t0 = time.perf_counter()
                 if bg_rgb is None:
-                    bg_rgb = g6.to_rgb(read_ffv1(Path(bg["root"]) / bg["decoded"])[:w["frames"]], True)
+                    bg_rgb = rgb_gpu(read_ffv1(Path(bg["root"]) / bg["decoded"])[:w["frames"]])
                 if fg["key"] not in fg_cache:
-                    fg_cache[fg["key"]] = g6.to_rgb(read_ffv1(fg_root / fg["decoded"])[:w["frames"]], True)
+                    fg_cache[fg["key"]] = rgb_gpu(read_ffv1(fg_root / fg["decoded"])[:w["frames"]])
+                if "gpu_compositor" not in checks:
+                    checks["gpu_compositor"] = gpu_matches_cpu(fg_cache[fg["key"]], bg_rgb, alpha)
+                t1 = time.perf_counter()
                 out = work / "composite.yuv"
                 composite_sha = composite_window(w, fg_cache[fg["key"]], bg_rgb, alpha, out)
+                t2 = time.perf_counter()
                 parts = c.breakdown()
                 row = {"pair": key, "route": bg["route"], "background": bg_key, "foreground": fg["key"],
                        "bytes": len(data), "kbps": len(data) * 8 / seconds / 1000, "breakdown": parts,
@@ -604,6 +660,8 @@ def command_score(args: argparse.Namespace) -> int:
                        "kbps_foreground": parts.get("foreground", 0) * 8 / seconds / 1000,
                        "container_sha256": hashlib.sha256(data).hexdigest(), "composite_sha256": composite_sha,
                        "background_job": bg["manifest_job"], "scores": score_decoded(w, judges, out)}
+                row["seconds"] = {"decode_files": round(t1 - t0, 2), "composite": round(t2 - t1, 2),
+                                  **row["scores"].pop("seconds")}
                 g5c.save(checkpoints, key, row)
                 rows.append(row)
             done += 1
@@ -866,7 +924,10 @@ def validate_score(result: dict[str, Any]) -> dict[str, bool]:
         "scores_plausible": all(scores_plausible(r["scores"]) for r in rows + anchors),
         "rate_is_the_container": all(r["bytes"] == sum(r["breakdown"].values()) and r["kbps"] > 0 for r in rows),
         "bitstream_holds": bool(result["bitstream_checks"]) == bool(result["routes"])
-        and all(all(v for k, v in c.items() if k != "pair") for c in result["bitstream_checks"].values()),
+        and all(all(v for k, v in c.items() if k != "pair") for r, c in result["bitstream_checks"].items()
+                if r != "gpu_compositor"),
+        "gpu_compositor_is_the_cpus": not rows or result["bitstream_checks"].get("gpu_compositor", {}).get(
+            "max_abs", 99) <= 1,
         "foreground_decodes_on_f": all(r["scores"][FILL]["psnr_fg"] > 15 for r in rows),
         "background_f_is_foreground_f": result["limit_frames"] > 0 or result["background_f_is_foreground_f"],
     }
