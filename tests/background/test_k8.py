@@ -195,3 +195,14 @@ def test_assembly_requires_complete_nonduplicated_frame_coverage(tmp_path):
     assert not (tmp_path / "incomplete/READY.json").exists()
     with pytest.raises(ValueError, match="duplicate"):
         k8.assemble([archives[0], archives[0]], tmp_path / "duplicate", source)
+
+
+def test_error_summary_uses_ordinary_median_and_retains_infinite_tail():
+    row = shot("a", 0, 4, "court")
+    for reg, error in zip(row["registration"], [1.0, 1.0, 3.0, 3.0]):
+        reg["chamfer_px"] = error
+    report = {"review_id": "a", "fps": 10, "shots": [row]}
+    marks = {"review_id": "a", "marks": {"a": "court"}}
+    assert k8.score(report, marks)["registration_median_px"] == 2.0
+    row["registration"][-1]["chamfer_px"] = None
+    assert k8.score(report, marks)["registration_p95_px"] is None

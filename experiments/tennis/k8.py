@@ -11,6 +11,7 @@ import html
 import json
 import os
 import re
+import shutil
 import subprocess
 import tarfile
 from collections import Counter
@@ -63,7 +64,8 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
     """Mixed shots are wrong for both: a predicted court is FP and their duration is FN.
 
     Registration includes ALL true-court frames, with missing fits represented by
-    infinity, never silently omitted. Quantiles use nearest rank to retain failures.
+    infinity, never silently omitted. Use the ordinary median and linearly
+    interpolated 95th percentile, retaining infinite failures.
     """
     if marks.get("review_id") != report["review_id"]:
         raise ValueError("marks belong to another review")
@@ -94,8 +96,18 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
                           for r in shot["registration"])
     precision = tp / (tp + fp) if tp + fp else 0.0
     recall = duration_tp / duration_true if duration_true else 0.0
-    median, p95 = (np.quantile(errors, [0.5, 0.95], method="inverted_cdf").tolist()
-                   if errors else [float("inf"), float("inf")])
+    ordered = sorted(errors)
+
+    def percentile(q: float) -> float:
+        if not ordered:
+            return float("inf")
+        index = (len(ordered) - 1) * q
+        lo, hi = int(np.floor(index)), int(np.ceil(index))
+        if not np.isfinite(ordered[hi]):
+            return float("inf")
+        return ordered[lo] + (index - lo) * (ordered[hi] - ordered[lo])
+
+    median, p95 = percentile(0.5), percentile(0.95)
     conditions = {"precision": precision >= DECISION["precision"],
                   "duration_recall": recall >= DECISION["duration_recall"],
                   "registration": median <= DECISION["median_px"] and p95 <= DECISION["p95_px"]}
@@ -280,6 +292,13 @@ def run_job(args: argparse.Namespace) -> int:
 
     cv2.setNumThreads(1)
     began = time.monotonic()
+    native: dict[str, Any] = {}
+    for name in ("ffmpeg", "ffprobe"):
+        path = shutil.which(args.ffmpeg if name == "ffmpeg" else name)
+        if path is None:
+            raise FileNotFoundError(name)
+        native[name] = {"path": path, "version": subprocess.check_output([path, "-version"], text=True).splitlines()[:3]}
+    args.ffmpeg = native["ffmpeg"]["path"]
     stage, scratch = Path(os.environ["PS_STAGE_DIR"]), Path(os.environ["PS_SCRATCH_DIR"])
     publish = scratch / "publish"
     (publish / "images").mkdir(parents=True)
@@ -287,8 +306,8 @@ def run_job(args: argparse.Namespace) -> int:
     identity = json.loads(args.inputs.read_text())
     if file_sha256(args.video) != identity["video_sha256"]:
         raise ValueError("source identity changed")
-    probe_command = ["ffprobe", "-v", "error", "-select_streams", "v:0", "-count_packets", "-show_entries",
-                     "stream=width,height,r_frame_rate,avg_frame_rate,nb_read_packets,start_time", "-of", "json", str(args.video)]
+    probe_command = [native["ffprobe"]["path"], "-v", "error", "-select_streams", "v:0", "-count_packets", "-show_entries",
+                     "stream=width,height,r_frame_rate,avg_frame_rate,nb_read_packets,start_time,codec_name,pix_fmt,color_space,color_range", "-of", "json", str(args.video)]
     meta = json.loads(subprocess.check_output(probe_command))["streams"][0]
     from fractions import Fraction
     fps = float(Fraction(meta["r_frame_rate"]))
@@ -313,7 +332,7 @@ def run_job(args: argparse.Namespace) -> int:
               "scene_threshold": args.threshold, "scene_scores": scenes, "scene_command": scene_command,
               "decision": DECISION, "shots": [rows[i] for i in sorted(rows)], "part": args.part, "parts": args.parts,
               "all_spans": spans,
-              "source_start_time": float(meta.get("start_time", 0)),
+              "source_start_time": float(meta.get("start_time", 0)), "stream_metadata": meta, "native_tools": native,
               "runtime_seconds": time.monotonic() - began, "device": "cpu", "opencv": cv2.__version__,
               "numpy": np.__version__, "geometry": "ITF regulation; net excluded", "probe_command": probe_command}
     report["review_id"] = hashlib.sha256(json.dumps(report, sort_keys=True).encode()).hexdigest()[:16]

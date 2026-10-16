@@ -5791,7 +5791,9 @@ invocation turns out to be needed.
   detected white-line pixels; a frame registers at ≤2 px with support
   on at least six segments. Chamfer measures only in-frame projected line
   portions (at least half the projected samples visible); failed fits
-  remain missing, never dropped from the error distribution.
+  remain missing, never dropped from the error distribution. Summary uses
+  the ordinary median and linearly interpolated 95th percentile, with
+  infinite failures retained (fixed before user labels).
   Initial ffmpeg scene threshold 0.25 is provisional for the user's
   review (candidate scores ≥0.10 retained); the decision thresholds are fixed.
   Mixed shots are false positives if predicted court and their duration
@@ -5844,6 +5846,16 @@ invocation turns out to be needed.
   identical inputs/cuts and every source frame exactly once; completed
   archives remain unchanged. Initial ceiling remains 3,500 wall seconds
   per CPU job, 16 CPU threads, no GPU allocation.
+
+- Revised smoke `20261016T092749Z-37f37559` (`b96ad65`, gpu5,
+  CPU, no GPU) passed all ten substantive checks: all 1,500 frames and
+  4 shots covered, images and finite homographies present, actual frames
+  registering under 2 px, classification exactly at the fixed 80% share.
+  Runtime 245.6 s; zero of four shots predicted court. This negative
+  prediction result is retained; it is not accuracy without the user's
+  labels. The 6,000-frame pilot is running. Before the decision run,
+  reports also record resolved ffmpeg/ffprobe paths and versions plus
+  stream colour/codec/timestamp metadata. No model or threshold changes.
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
