@@ -5805,3 +5805,35 @@ invocation turns out to be needed.
   lines or hold none.
 - Budget: SAM 3.1 instances on the fleet (smoke ≤ 600 s, ≤ 45 min per
   stage); candidates on CPU; the user's marking about 15 minutes.
+- Marking-stage implementation (2026-10-16, `codex/k4b-players`; rule
+  above unchanged). Zero-based decimal frame indices and clip stems as in
+  K4. Enumerate all frames in all 159 scene clips in the five `MATCHES`
+  directories; exclude K4's ten broadcast clips in their entirety, including
+  the outro card. Take the smallest **global** hash prefix meeting all
+  three minima, without a content/court filter: 48 frames, 40 clips,
+  all five matches (alcaraz/hurkacz 3, medvedev/struff 7, rublev/auger 20,
+  djokovic/federer 7, djokovic/zverev 11). Selection is metadata-only;
+  `tools/datasets/k4b_inputs.py` preserves the complete inventory, exclusion
+  list, hashes, original clip identities and conversion commands.
+  Outputs: `Datasets/pointstream-data/tennis/k4b-2026-10-16/`.
+- This stage obtains review instances only: independent one-frame SAM
+  sessions through K4's `Sam31SequenceSegmenter`, offline bidirectional,
+  both prompts, K4's limited-range 1080p 4:2:0 conversion and 960×540
+  quality-95 JPEG path. It does not estimate clip-level motion from sparse
+  review frames. Full temporal clip features for candidates (a), (b), (c),
+  (e), (a)+(c) and scoring await the marks; (d) and its combinations await
+  adoption of K8. No candidate or K4 amendment is applied at this stop.
+  Raw masks of both prompts survive; overlapping prompt masks (IoU ≥ .8)
+  share a review number, with the first mask as its scoring mask and all
+  source IDs recorded. Page has an original-image toggle, explicit visible
+  count, missing-instance flag, per-frame confirmation, browser storage and
+  JSON export/import bound to selection and instance-result SHA256s.
+- Marking-stage budget: one fleet job, smoke first 3 hash-ranked frames
+  through the same path ≤ 600 s, full 48 frames ≤ 2,700 s, validator ≤ 300 s,
+  total ceiling 3,600 s, compatible Ada/A6000 pool, shared execution (no
+  timing claim). GPU outputs and frame/mask identities must pass the module
+  validator for **both** smoke and full before the page is cited. The
+  correctness smoke gates production of the page, not scientific adoption.
+  Initial CPU preparation failed before conversion because an assumed
+  ffmpeg path was absent; its empty archive is retained. Preparation v2
+  uses the probed `/opt/local/bin/ffmpeg` and a separate `inputs-v2/`.
