@@ -5837,3 +5837,7 @@ invocation turns out to be needed.
   Initial CPU preparation failed before conversion because an assumed
   ffmpeg path was absent; its empty archive is retained. Preparation v2
   uses the probed `/opt/local/bin/ffmpeg` and a separate `inputs-v2/`.
+  First fleet request `20261016T085803Z-4152bf09` (`32ec13c8`, not evidence)
+  was cancelled while pending after review found its validator expected
+  local scratch to survive publication. The replacement validator reads
+  `published.tar`, like K4's, and is tested after removing scratch.

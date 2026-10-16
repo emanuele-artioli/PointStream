@@ -11,6 +11,8 @@ import base64
 import io
 import json
 import os
+import tarfile
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -235,8 +237,15 @@ def main() -> int:
     args = p.parse_args()
     if args.command == "run":
         return run(args)
-    result = validate_directory(args.directory or Path(os.environ["PS_SCRATCH_DIR"]) / "publish",
-                                args.summary or stage_dir() / "k4b.json")
+    summary = args.summary or stage_dir() / "k4b.json"
+    if args.directory:
+        result = validate_directory(args.directory, summary)
+    else:
+        # The fleet publishes and removes host-local scratch before validation.
+        with tempfile.TemporaryDirectory(prefix="k4b-validate-", dir="/tmp") as temp:
+            with tarfile.open(stage_dir() / "published.tar") as archive:
+                archive.extractall(temp, filter="data")
+            result = validate_directory(Path(temp) / "publish", summary)
     if os.environ.get("PS_VALIDATION_PATH"):
         write_json(Path(os.environ["PS_VALIDATION_PATH"]), result)
     print(json.dumps(result))
