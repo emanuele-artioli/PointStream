@@ -5635,6 +5635,123 @@ invocation turns out to be needed.
   kept from a 1/16-pixel test) could miss a view; it never applies to
   *single*, and *single + direct* differs from the bank by under 1 point.
 
+### 2026-10-16 — H5: the first working PointStream (pilot)
+- Question (PLAN H5): with the components chosen so far, does PointStream,
+  one bitstream with every byte counted, beat B2's anchors on evaluation
+  set v2, and how long do its encoder and decoder take? This entry covers
+  the pipeline and its pilot on B2's 4 pilot items (P01_107_0000003049,
+  P02_02_0000006080, P03_10_0000000616, P09_106_0000006303); the 34-item
+  run is planned from it and waits for a settled pipeline.
+- Components (as chosen; nothing is fitted here).
+  - *F*, the foreground: B2's dataset foreground, the union of B1b's
+    `visor_dense_sam_fill` instances, as agreed with G (PLAN G6). Its
+    classes: hands (VISOR's hand classes, with the forearm; R) and objects
+    (every other instance). F and the class map are **granted** to the
+    decoder in this run: not in the rate, measured as their own line (each
+    window's 3-level map at 1080p coded losslessly with FFV1, and with lzma
+    over the frame-to-frame XOR of the packed bits; the smaller is
+    reported).
+  - *Background*: G6's per-window pipeline (`experiments/background/g6.py`,
+    merged from `claude/g6-background-h5`) with G6 item 1's settings: the
+    whole 1080p frame with F filled exactly by ProPainter, coded by two
+    routes. Scene model: recipe L trained on the window's own-video footage
+    masked like F (`footage --mask exact`), coded at 540p (QP 0, 13, 25, 38,
+    upsampled at the client) and 1080p (QP 13, 25, 38, 50, 63). Enhancer:
+    SVT-AV1 at 1080p (G5's preset 4, CRF 32, 40, 48, 54, 59, 63) and G5d's
+    enhancer fitted per CRF on the window's own native-rate footage. Each
+    venue model is shipped once (G6's interface): not in the rate, its size
+    reported. The plain SVT-AV1 background (the enhance jobs' anchor) is an
+    ablation.
+  - *Foreground stream* (new, `src/pointstream/`): one DCVC-UF HT-L stream
+    of the window at a quarter, half or full resolution (H3d's coder),
+    off the shelf. Its input is the source with everything outside
+    K = F dilated by the 8 px ring plus 2 px per downscale step replaced by
+    a smooth push-pull extrapolation of K's own pixels (as MPEG-4's
+    arbitrary-shape coding padded outside the shape), so DCVC-UF spends
+    little outside F and no edge forms at K's border. H3c's rate on R was
+    an attribution inside whole-frame codes; this stream is real and every
+    byte of it is billed. Points: ¼ and ½ at QP 0, 21, 42 (each with H3d's
+    G network for that point) and full resolution at QP 21, 42 (no
+    network). Decoder: bicubic upsampling to 1080p, then per class an
+    enhancer slot: hands get G on R's box, objects the identity (the slot
+    H4c may fill).
+  - *Compositing* (G6): out = α·fg + (1 − α)·bg, α = 1 on F and falling
+    linearly to 0 over 8 px outside F (Euclidean distance); bg elsewhere.
+  - *Bitstream* (`src/pointstream/bitstream.py`): a header (magic, version,
+    size, frame rate, frame count) and tagged, length-prefixed segments:
+    background (route, coded size, codec, the codec's own stream), each
+    foreground stream (scale, enhancer ids per class), and the venue-model
+    and decoder-network references (sha256 prefixes). The rate is the
+    container's whole size. The mask segment is absent here (granted).
+- Scoring: B2's harness (`src.codecs.quality.score`, B2's regions):
+  weighted PSNR (0.7 fg + 0.3 bg, per frame then the mean) with
+  `visor_dense` (without the fill) and `visor_dense_sam_fill` (with it),
+  weighted LPIPS likewise, and weighted DISTS (masked DISTS per region,
+  `quality.masked_dists`) beside; whole-frame PSNR too. B2's anchors (SVT-AV1
+  preset 4, CRF 41–62; DCVC-UF HT-L, QP 27–63) are rescored from B2's
+  published streams by the same code, so DISTS exists for them; the
+  rescoring must reproduce B2's recorded weighted PSNR within 0.02 dB on
+  every point (a check, not a choice).
+- Rate allocation: PointStream's curve per item and metric is the upper
+  concave hull (`g5.envelope`) over every (foreground point, background
+  point) combination of both routes. Anchors are each codec's upper concave
+  hull. BD-rate: PCHIP of log rate over the overlapping quality range
+  (`g5.bd_rate`'s method), against SVT-AV1, DCVC-UF and their pooled hull;
+  "better/worse at every rate" when the curves do not overlap. Also
+  reported: the hull of each background route alone, the plain-SVT-AV1
+  background, and on the hull's points the split of bytes between
+  foreground and background.
+- Timing (one exclusive job, RTX A6000 on gpu3 with 32 cores, B2b J2's
+  host class): per pilot window, encoder = ProPainter's fill + background
+  encode (scene model's DCVC-UF encode; SVT-AV1 preset 4 on 32 threads) +
+  the foreground's padding and DCVC-UF encode; decoder = background decode
+  (DCVC-UF with the scene model; dav1d plus the enhancer) + foreground
+  decode, upsampling and G + compositing. GPU stages synchronized, median
+  of 3 runs. Not timed: F (granted: dataset masks) and venue-model training
+  (offline, once per venue; G6's training jobs' times reported beside).
+- Decision rules, fixed now.
+  (a) *PointStream beats the anchors* if, against the pooled hull of
+  SVT-AV1 and DCVC-UF, its mean BD-rate on weighted LPIPS
+  (`visor_dense_sam_fill`) is −10% or better with at least 3 of 4 items
+  below 0. Weighted DISTS, both weighted PSNRs and whole-frame PSNR are
+  reported beside with the same rule's numbers, and a sign disagreement
+  with LPIPS is stated. A pass makes the pipeline the candidate for the
+  34-item run (planned, not run here).
+  (b) *Where a failure lies* (or a margin comes from): the same BD-rates
+  with the background replaced by plain SVT-AV1 (the background's share),
+  and the region scores at matched rate (fg and bg separately).
+  (c) *Equal-time SVT-AV1 preset* (B2b's decision, user 2026-10-07):
+  PointStream's encode time per window is the median over the 4 pilot
+  windows, for each background route; the slowest route's median sets the
+  time, and the preset is the slowest in J2's table whose median encode
+  time is at or under it (J2: preset 1 80.5 s, 2 46.2 s, 3 30.3 s, 4 18.7 s,
+  5 12.8 s, 6 9.1 s, 8 4.6 s, 10 2.7 s, 12 1.94 s). This gives the anchor
+  the most time PointStream uses.
+  (d) *The bitstream holds*: every combination's container parses back to
+  its segments byte for byte, its rate is its file size, and each
+  composite rebuilt from the container's own streams equals the scored
+  one (checked on one combination per item and route).
+- Hypotheses. (a) passes on LPIPS and DISTS by a wide margin (−30% or
+  more against the pooled hull): the background models win −33% to −97%
+  on LPIPS_V against SVT-AV1 (G6) and G wins −22% on the hands; weighted
+  PSNR loses (+20% or worse), since both enhancers and the scene model
+  trade PSNR for perceptual quality. (c) ProPainter dominates the encode
+  (tens of seconds per window), so the equal-time preset is 3 or slower,
+  a stronger anchor than B2's preset 4.
+- Competing explanation for a failure of (a): splitting the frame costs
+  more than the parts save. The foreground stream pays for F's boundary
+  and its own intra frame; the background pays for the fill's seams; and
+  the 8 px ring blends two decodes. B2's weighted LPIPS is 70% foreground,
+  where the gain measured so far (G, −22%) is smallest and was measured on
+  hands only, not objects. Measured by (b).
+- Budget. Background for the 4 windows (G6's code, 6 jobs per window:
+  scene footage, training, format; native footage, two enhance jobs): 24
+  jobs, about 12 GPU-hours (G6's pilot: 5.2 for 2 windows with failures).
+  Foreground: 4 jobs, about 2. Scoring and B2's rescoring: 8 jobs, about 5.
+  A smoke on G6's published P06_03 window (its background exists): about 1.
+  Timing: 1 exclusive job, under 45 minutes. About 21 GPU-hours, ceiling
+  28; every job under 45 minutes, shared GPUs except timing.
+
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
   can a body-pose estimator's keypoints carry the players? Per part
