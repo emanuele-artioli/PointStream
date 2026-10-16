@@ -1188,8 +1188,10 @@ adaptation) more than through retraining it; and SVT-AV1 with the same
 enhancer was unclear (H3d oracle: −19%, synthesized texture), which
 supports, weakly, that the learned codec composes better with learned
 parts.
-Before the claim is written (user, 2026-10-16): compare each coder's gain
-over its own base, not over the shared bar, from H3d's recorded oracle
-(the same enhancer fitted on the same windows over DCVC-UF and over
-SVT-AV1; no compute). Only if that is unclear, fit G on SVT-AV1 decodes
-of G's footage and score it as G (one fit, about 1–2 GPU-hours).
+Checked (2026-10-16, [analysis](docs/experiments.md#2026-10-16--does-the-learned-codec-compose-better-with-a-learned-enhancer-analysis-of-h3ds-oracle)):
+over its own base, the same enhancer gains about as much on SVT-AV1 as on
+DCVC-UF (LPIPS −73% against −76%; PSNR −35% against −12%), so "the
+learned codec composes better" is not supported. The argument to make
+instead: DCVC-UF is the better base (−63%, H3c), and learned parts
+directed by domain knowledge add large gains on top of a codec. A G
+fitted on SVT-AV1 decodes would only refine this and is not planned.

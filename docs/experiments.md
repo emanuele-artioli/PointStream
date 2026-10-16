@@ -5805,3 +5805,49 @@ invocation turns out to be needed.
   lines or hold none.
 - Budget: SAM 3.1 instances on the fleet (smoke ≤ 600 s, ≤ 45 min per
   stage); candidates on CPU; the user's marking about 15 minutes.
+
+### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
+- Question (PLAN I, user 2026-10-16): the paper may argue that a learned
+  codec gains more than a conventional one when PointStream adds learned
+  parts. H3d's oracle judged each enhanced coder against the shared bar
+  (the hull of SVT-AV1 and DCVC-UF), which mixes the base's quality with
+  the enhancer's gain. Here each enhanced coder is judged against its own
+  base: the upper concave hull of that coder's points alone.
+- Data: H3d's oracle report `pointstream-data/visor/h3d-2026-10-12/report-oracle/h3d-report.json`
+  (`12e02bc6…`): the same enhancer (G5d's, 594k parameters), fitted on
+  each scored window with its bits free, over DCVC-UF HT-L at ¼ and ½ and
+  over SVT-AV1 at ¼ and ⅛; per item, its Pareto front against its coder's
+  points in the bar (DCVC-UF 9 points, SVT-AV1 11). No compute: `h3d.compare`
+  (code `56f1120`) on the recorded points. Output:
+  `…/h3d-2026-10-12/analysis-own-base-56f1120/own-base.json` (`e261b6d3…`).
+- Decision rule (set with the question, before computing): the claim
+  "the learned codec composes better" is supported if DCVC-UF's gain over
+  its own base exceeds SVT-AV1's by at least 10 points of BD-rate on
+  LPIPS, on at least 3 of 4 items; refuted if SVT-AV1's gain is at least
+  as large on average; unclear otherwise.
+- Outcome (BD-rate against the coder's own envelope; P01_107, P02_02,
+  P03_10, P09_106; mean):
+
+  | enhanced coder | LPIPS | DISTS | PSNR |
+  |---|---|---|---|
+  | DCVC-UF | −88, −66, −87, −64% (−76%) | −83, −92, −88, −60% (−81%) | −28, +1, −3, −19% (−12%) |
+  | SVT-AV1 | −84, −59, −81, −70% (−73%) | −75, −57, −80, −59% (−68%) | −37, −27, −27, −49% (−35%) |
+
+  DCVC-UF's LPIPS gain exceeds SVT-AV1's by 3 points on average (by ≥ 10
+  points on 0 of 4 items; SVT-AV1's is larger on P09_106); on DISTS by 13
+  points; on PSNR SVT-AV1 gains more.
+- Decision (by the rule): **not supported** (unclear on the rule's
+  wording, refuted on LPIPS in substance). The enhancer helps both coders
+  about equally over their own base. H3d's "SVT-AV1 unclear (−19%)" was
+  against the shared bar, which DCVC-UF's base already sets 63% lower; it
+  measured SVT-AV1's weaker base, not a weaker composition.
+- Reading. What the paper can claim from this: DCVC-UF is the better base
+  (−63% at equal LPIPS on the hands, H3c), and a learned enhancer adds a
+  similar large gain to either coder as an oracle. The PLAN I argument
+  should be phrased as "learned parts directed by domain knowledge add
+  large gains on top of a codec, and the learned codec is the better
+  base", not "composes better". Two cautions: SVT-AV1's enhanced output
+  invents texture (H3d's visual check), which LPIPS can reward, so its
+  perceptual gain needs the visual check beside it; and this is the
+  oracle (fitted on the window, bits free), not the generic network G,
+  which was fitted on DCVC-UF decodes only.
