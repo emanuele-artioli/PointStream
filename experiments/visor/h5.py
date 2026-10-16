@@ -225,6 +225,9 @@ def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nea
     g5.rgb_to_yuv420(padded).tofile(source)
     del padded
     t1 = time.time()
+    import torch
+
+    torch.cuda.empty_cache()  # G's cached blocks would otherwise sit beside the DCVC-UF worker (33 GB peak)
     rec = code_dcvc(args, source, frames, qp, size, work / "dcvc")
     t2 = time.time()
     decoded = g5.yuv420_to_rgb(np.fromfile(rec["decoded"], np.uint8).reshape(frames, size[1] * 3 // 2, size[0]))
