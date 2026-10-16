@@ -2,8 +2,9 @@
 
 One clip per fleet job, same path on the prefix smoke and the complete clip.
 The input manifest contains no human selections. The full-size converted YUV
-is the sole source of JPEGs and pose frames, as in K4. Video is offloaded to
-CPU; tracker state stays on GPU. Smoke compares masks to the native path.
+is the sole source of JPEGs and pose frames, as in K4. Video and tracker state
+use native CPU offload options; completed boolean cache masks are copied to
+CPU. Smoke compares masks and track identities to the native path.
 """
 
 from __future__ import annotations
@@ -11,6 +12,7 @@ from __future__ import annotations
 import argparse
 import gc
 import hashlib
+import inspect
 import json
 import os
 import tarfile
@@ -111,6 +113,61 @@ def union_masks(clip: ClipMasks, t: int, name: str) -> np.ndarray:
     return out
 
 
+def mask_parity(reference: ClipMasks, other: ClipMasks) -> dict[str, Any]:
+    if (reference.width, reference.height, len(reference.frames), reference.classes) != (
+            other.width, other.height, len(other.frames), other.classes):
+        raise ValueError("Parity clips have different dimensions/classes/frame counts")
+    unions: list[float] = []
+    instances: list[float] = []
+    same_ids = True
+    for t, frame in enumerate(reference.frames):
+        for name in PROMPTS:
+            a, b = union_masks(reference, t, name), union_masks(other, t, name)
+            unions.append(iou(a, b) if (a | b).any() else 1.)
+        a_masks = {(i.class_name, i.track_id): i.mask() for i in frame}
+        b_masks = {(i.class_name, i.track_id): i.mask() for i in other.frames[t]}
+        same_ids &= a_masks.keys() == b_masks.keys()
+        instances.extend(iou(mask, b_masks[key]) if key in b_masks else 0. for key, mask in a_masks.items())
+    return {"minimum_union_iou": min(unions), "minimum_instance_iou": min(instances, default=0.),
+            "track_ids_match": same_ids, "reference_instances": sum(len(f) for f in reference.frames)}
+
+
+def offload_tracker_state(predictor: Any) -> dict[str, Any]:
+    """Use the pinned tracker's native storage option, absent at top level."""
+    tracker = predictor.model.tracker
+    original = tracker.init_state
+    if "offload_state_to_cpu" not in inspect.signature(original).parameters:
+        raise RuntimeError("Pinned tracker lacks native CPU-state storage")
+    original_cache = predictor.model._cache_frame_outputs
+    record: dict[str, Any] = {"api": "tracker.init_state+cached_frame_outputs", "version": 2,
+                              "initialized": 0, "cpu": 0, "cached_masks": 0, "cached_cpu_masks": 0}
+
+    def initialize(*args: Any, **kwargs: Any) -> Any:
+        kwargs["offload_state_to_cpu"] = True
+        state = original(*args, **kwargs)
+        if not state.get("offload_state_to_cpu") or str(state.get("storage_device")) != "cpu":
+            raise RuntimeError("Tracker CPU-state request was not effective")
+        record["initialized"] += 1
+        record["cpu"] += 1
+        return state
+
+    tracker.init_state = initialize
+
+    def cache(inference_state: Any, frame_idx: int, *args: Any, **kwargs: Any) -> None:
+        original_cache(inference_state, frame_idx, *args, **kwargs)
+        masks = inference_state["cached_frame_outputs"][frame_idx]
+        for object_id, mask in masks.items():
+            stored = mask.cpu()
+            if str(stored.device) != "cpu":
+                raise RuntimeError("Cached SAM mask did not move to CPU")
+            masks[object_id] = stored
+            record["cached_masks"] += 1
+            record["cached_cpu_masks"] += 1
+
+    predictor.model._cache_frame_outputs = cache
+    return record
+
+
 def run(args: argparse.Namespace) -> int:
     os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
     import cv2
@@ -173,23 +230,21 @@ def run(args: argparse.Namespace) -> int:
         torch.cuda.empty_cache()
     sam = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint, offload_video_to_cpu=True, offload_state_to_cpu=False,
                                 grounding_batch_size=16)
+    state_offload = offload_tracker_state(sam._require_predictor())
     if os.environ.get("PS_STAGE") == "smoke":
         print("phase=offloaded-parity grounding_batch=16", flush=True)
         offloaded_reference = sam.segment_frames(parity_jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"])
-        overlaps = []
-        for t in range(parity_frames):
-            for name in PROMPTS:
-                a, b = union_masks(reference, t, name), union_masks(offloaded_reference, t, name)
-                overlaps.append(iou(a, b) if (a | b).any() else 1.)
-        parity = {"checked": True, "minimum_union_iou": min(overlaps), "native_config_sha256": native_config,
+        parity = {"checked": True, **mask_parity(reference, offloaded_reference), "native_config_sha256": native_config,
                   "frames": parity_frames, "prompts": PROMPTS, "native_grounding_batch": native_batch, "grounding_batch": 16,
                   "reference_instances": sum(len(f) for f in reference.frames)}
+        parity["tracker_state_offload"] = dict(state_offload)
         reference.save(publish / "native-parity.rle")
         offloaded_reference.save(publish / "offloaded-parity.rle")
         write_json(publish / "parity.json", parity)
-        if min(overlaps) < .999:
+        if not parity["track_ids_match"] or min(parity["minimum_union_iou"], parity["minimum_instance_iou"]) < .999:
             raise ValueError("CPU offload/batch size changed SAM masks in the representative smoke")
         del reference, offloaded_reference
+    state_offload.update(initialized=0, cpu=0, cached_masks=0, cached_cpu_masks=0)
     completed_masks: set[tuple[str, int]] = set()
     def on_frame(role: str, t: int) -> None:
         if (role, t) not in completed_masks:
@@ -198,10 +253,14 @@ def run(args: argparse.Namespace) -> int:
     print("phase=production-sam frames=" + str(frames) + " grounding_batch=16", flush=True)
     clip = sam.segment_frames(jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"], on_frame=on_frame)
     provenance = sam.provenance("offline_bidirectional")
+    effective_config = {"segmenter_config_sha256": provenance.config_sha256,
+                        "tracker_state_offload": {"api": "tracker.init_state+cached_frame_outputs", "version": 2, "enabled": True}}
     sam_record = {"runtime": runtime(), "checkpoint_sha256": provenance.checkpoint_sha256,
-                  "model_revision": provenance.model_revision, "config_sha256": provenance.config_sha256,
+                  "model_revision": provenance.model_revision, "effective_config": effective_config,
+                  "config_sha256": hashlib.sha256(json.dumps(effective_config, sort_keys=True).encode()).hexdigest(),
                   "sdpa_backend_policy": sam.sdpa_backend_policy, "offload_video_to_cpu": True,
-                  "offload_state_to_cpu": False, "grounding_batch_size": sam._require_predictor().model.batched_grounding_batch_size,
+                  "offload_state_to_cpu": True, "tracker_state_offload": state_offload,
+                  "grounding_batch_size": sam._require_predictor().model.batched_grounding_batch_size,
                   "allocator_config": os.environ["PYTORCH_ALLOC_CONF"],
                   "expandable_segments": sum(bool(s.get("is_expandable")) for s in torch.cuda.memory_snapshot()),
                   "prompts": PROMPTS, "parity": parity}
@@ -235,6 +294,8 @@ def validate(directory: Path, summary: dict[str, Any]) -> dict[str, Any]:
     saved = json.loads((directory / "features.json").read_text())
     recomputed, target_again = extract_features(clip, dets, saved["target_frames"])
     sam = summary["sam"]
+    checked_parity = (mask_parity(ClipMasks.load(directory / "native-parity.rle"), ClipMasks.load(directory / "offloaded-parity.rle"))
+                      if summary["stage"] == "smoke" else None)
     checks = {
         "files_identified": all(file_sha256(directory / n) == h for n, h in summary["files"].items()),
         "every_frame_masked_and_posed": len(clip.frames) == len(dets) == summary["frames"] == summary["conversion"]["frames"],
@@ -244,9 +305,16 @@ def validate(directory: Path, summary: dict[str, Any]) -> dict[str, Any]:
         "sam_pinned": sam["checkpoint_sha256"] == "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
         "sam_native_cuda": sam["sdpa_backend_policy"] == "native_flash" and sam["runtime"]["capability"][0] >= 8,
         "effective_grounding_batch": sam["grounding_batch_size"] == 16,
+        "effective_config_identified": sam["config_sha256"] == hashlib.sha256(
+            json.dumps(sam["effective_config"], sort_keys=True).encode()).hexdigest(),
+        "tracker_cpu_state": sam["offload_state_to_cpu"] and sam["tracker_state_offload"]["initialized"] > 0
+                             and sam["tracker_state_offload"]["initialized"] == sam["tracker_state_offload"]["cpu"],
+        "cached_masks_cpu": sam["tracker_state_offload"]["cached_masks"] > 0
+                            and sam["tracker_state_offload"]["cached_masks"] == sam["tracker_state_offload"]["cached_cpu_masks"],
         "expandable_allocator": sam["allocator_config"] == "expandable_segments:True" and sam["expandable_segments"] > 0,
-        "cpu_offload_parity": summary["stage"] != "smoke" or (sam["parity"].get("minimum_union_iou", 0) >= .999
-                                                                            and sam["parity"].get("reference_instances", 0) > 0),
+        "cpu_offload_parity": checked_parity is None or (all(sam["parity"][k] == v for k, v in checked_parity.items())
+                                  and checked_parity["track_ids_match"] and checked_parity["reference_instances"] > 0
+                                  and min(checked_parity["minimum_union_iou"], checked_parity["minimum_instance_iou"]) >= .999),
         "pose_cuda": all(v.startswith("cuda") for v in summary["pose"]["on_cuda"].values()),
         "pose_finite": all(np.isfinite(v).all() for d in dets for v in d.values()),
         "frozen_candidates": saved["rules"] == summary["rules"] == rules.RULES,

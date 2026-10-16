@@ -6110,3 +6110,43 @@ invocation turns out to be needed.
   Do not submit the maximum or remaining corpus until median evidence
   establishes feasible stage and phase bounds. Prior failed smoke stage
   time is 390.260 s; charge complete GPU-claim intervals in the phase ledger.
+- Median `20261016T155820Z-40b6c9d9`, gpu3 A6000, actual ready revision
+  `f58bb8f1890aba12bffa6a7c2bfb8d079f8195be`: smoke passes, full fails
+  at frame 160/407 of the first prompt, after 164.207 s. A 1.27 GiB
+  request exceeds the 23.44 GiB cap with 21.92 GiB allocated and 344.50 MiB
+  unused reserve. This demonstrates growing state pressure; no full result
+  or candidate score is cited.
+- Next memory-only correction uses the pinned lower-level tracker's
+  **existing** `init_state(offload_state_to_cpu=True)` option. The top-level
+  adapter still rejects unsupported requests; a separate narrow worker
+  adapter forwards the native tracker arguments, verifies each returned
+  state's `storage_device == cpu` and flag, and records counts and API
+  version. No compute kernels, masks, frame sampling or tracking rules are
+  altered. Effective config SHA256 includes this adapter. The existing
+  native-versus-offloaded IoU ≥ .999 smoke now also gates tracker-state
+  placement; native and offloaded mask archives are retained. Reset the
+  initialization counters before production, so parity alone cannot pass
+  the production-placement check. Tests verify forwarding, actual storage,
+  unsupported API rejection and silently ignored requests. Repeat the
+  bounded median pilot directly: its 48-frame correctness smoke precedes
+  the 407-frame full stage, with identical 600/900/300 s limits and phase
+  ceiling. No further corpus promotion until it and the scale bound pass.
+  Source inspection also finds top-level `cached_frame_outputs` retains
+  per-frame **boolean** masks on GPU independently of tracker-state storage.
+  The same placement adapter stores this cache's already-computed masks on
+  CPU after the native cache filter, preserving the original GPU output
+  dictionary used by propagation/postprocessing. It changes storage only;
+  no masks are recomputed. Record and validate every cached mask's CPU
+  placement; adapter version 2 identifies both routes in the effective
+  config. Regression test confirms the native output is unmodified and the
+  cache copy moves to CPU. The native-mask parity gate covers this route too.
+  gpu3 has 384 GiB CPU RAM available at inspection, for long-clip video/state
+  storage; the maximum-length pilot must substantiate actual feasibility.
+  Parity is strengthened before this promotion: require identical native
+  class/track-ID sets and per-instance IoU ≥ .999, as well as class-union
+  IoU ≥ .999. The validator recomputes these from both saved RLE archives;
+  a regression covers an identity swap with identical union masks. This
+  protects motion-based candidates from an offload route that might preserve
+  only aggregate foreground. Decision/scoring thresholds remain unchanged.
+  Median CPU-state spec SHA256
+  `e02b425dfe10a660966f21941b21236b2ddb8955232bdde1eb7053279f3c34cd`.
