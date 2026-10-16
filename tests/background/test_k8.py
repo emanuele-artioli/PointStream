@@ -99,3 +99,23 @@ def test_chamfer_samples_uniformly_in_projected_pixels():
         steps = np.linalg.norm(np.diff(points[groups == group], axis=0), axis=1)
         assert steps.max() <= 1.001
         assert steps.max() - steps.min() < 0.001
+
+
+def test_ffmpeg_scene_scan_bounds_input_before_scene_selection(tmp_path):
+    import os
+    import shutil
+    import subprocess
+
+    ffmpeg = os.environ.get("PS_K8_TEST_FFMPEG") or shutil.which("ffmpeg")
+    if ffmpeg is None:
+        pytest.skip("ffmpeg integration fixture")
+    version = subprocess.run([ffmpeg, "-version"], capture_output=True)
+    if version.returncode:
+        pytest.skip("installed ffmpeg cannot start")
+    video = tmp_path / "three-spans.mkv"
+    frames = np.zeros((30, 48, 64, 3), np.uint8)
+    frames[5:20] = 255
+    subprocess.run([ffmpeg, "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", "64x48", "-r", "10",
+                    "-i", "pipe:0", "-an", "-c:v", "ffv1", str(video)], input=frames.tobytes(), check=True)
+    rows, _ = k8.cuts(video, 10, 10, ffmpeg, tmp_path)
+    assert [r["frame"] for r in rows] == [5]  # cut at 20 must NOT be scanned

@@ -5819,6 +5819,12 @@ invocation turns out to be needed.
   order, and ffmpeg seeks are relative to stream start. The source offset
   is recorded rather than requiring zero PTS. No registration result was
   produced. Neither diagnostic run supports the decision.
+  Third diagnostic `20261016T090920Z-467b9cc2` (`999b899`, gpu1, CPU)
+  exposed an ffmpeg scope bug before registration: `-frames:v` counts
+  selected scene frames, so it did not bound input decoding. Stopped the
+  owned job and retained its artifacts; scene scanning now has an input
+  `-t` bound. An actual ffmpeg regression fixture checks that a cut beyond
+  the selected input interval is excluded. No registration evidence yet.
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel

@@ -143,7 +143,7 @@ document.querySelector('#load').onchange=async e=>{try{const r=JSON.parse(await 
 
 def cuts(video: Path, fps: float, limit: int, ffmpeg: str, scratch: Path) -> tuple[list[dict[str, Any]], list[str]]:
     log = scratch / "scene-metadata.txt"
-    command = [ffmpeg, "-v", "error", "-nostdin", "-threads", "2", "-i", str(video), "-frames:v", str(limit),
+    command = [ffmpeg, "-v", "error", "-nostdin", "-threads", "2", "-t", str(limit / fps), "-i", str(video),
                "-vf", f"setpts=PTS-STARTPTS,select='gte(scene,0.10)',metadata=print:file={log}", "-an", "-f", "null", "-"]
     subprocess.run(command, check=True, capture_output=True, timeout=1800)
     return parse_scenes(log.read_text(), fps), command
