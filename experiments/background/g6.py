@@ -221,7 +221,7 @@ def command_footage(args: argparse.Namespace) -> int:
     if args.limit_frames > 0:  # smoke: the first two pieces, shortened
         step = 1.0 if native else fps / g5c.FOOTAGE_FPS
         ranges = [(a, a + int(round(args.limit_frames * step)) - 1) for a, _ in ranges[:2]]
-    analysis = {"mode": "native"} if native else {"mode": "rate", "fps": g5c.FOOTAGE_FPS}
+    analysis: dict[str, Any] = {"mode": "native"} if native else {"mode": "rate", "fps": g5c.FOOTAGE_FPS}
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
     work = scratch / "footage"
     shutil.rmtree(work, ignore_errors=True)
