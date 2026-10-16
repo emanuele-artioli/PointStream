@@ -5731,3 +5731,175 @@ invocation turns out to be needed.
   mode has to render the blur (a streak along the coded velocity) and
   pay for what it sends; its own oracle and rendering come next. TrackNet
   only (720p, 8 windows of ≤ 8 s); positions as labelled (integers).
+
+### 2026-10-16 — K1: do keypoints win on egocentric hands at very low rates?
+- Question ([PLAN K1](../PLAN.md#k-where-keypoints-win-analysis-user-2026-10-13)).
+  H3b2 found that perfect appearance at the coded pose (`wilor:arm`, LPIPS
+  0.21 at 1.93 kbps, forearm granted) needs 48% less rate than SVT-AV1 at
+  equal LPIPS. Since then the pixel bar fell twice: DCVC-UF off the shelf
+  (H3c, −63% against SVT-AV1) and G on top of it (H3d, −22% more). Does any
+  keypoint point still lie above DCVC-UF + G's curve at its own rate, on the
+  same items and region? From recorded reports only; no new coding.
+- Inputs. H3b2's report (`h3b-2026-10-11/report-h3b2-85c217e/h3b2-report.json`,
+  `16d7fec6…a685`; it carries H3b's oracle units and SVT-AV1's eleven points on
+  S) and H3d's component report (`h3d-2026-10-12/report-component/h3d-report.json`,
+  `467be69f…6e00`; H3c's bar and G's six points on R). Script
+  `experiments/visor/k1.py`.
+- Region and LPIPS variant. Both use B2's AlexNet LPIPS spatial map on the
+  full frame, averaged over a region, mean over the window's hand frames.
+  They differ in the region: H3b scored on S (R plus every rendered MANO
+  silhouette, objects excluded), H3c/H3d on R (the fill set's two hand
+  classes, forearm included). The keypoint judges of H3c2 and H3e (WiLoR's
+  pose error) were never run on G's outputs, so only LPIPS can be compared.
+  The bridge: SVT-AV1's eleven points are the same streams in both (H3c
+  checked their sha256 and reproduced H3b's LPIPS on R within 0.0002), so
+  per item they give a monotone map from LPIPS on S to LPIPS on R (linear
+  between points; R reads 0–9% higher than S at the same point). The
+  oracle's LPIPS on S becomes the LPIPS on R that SVT-AV1 has where it
+  scores the same on S. The comparison: at the oracle's rate, the
+  achievable hull (`g5.envelope`, linear in rate) of G's points alone and
+  of G with H3c's bar (SVT-AV1 and DCVC-UF off the shelf); and the rate
+  that hull needs for the oracle's quality. Reading S as R directly gives
+  the same signs on every item.
+- Decision rule (PLAN K1, fixed before reading the numbers): if any
+  keypoint point lies above DCVC-UF + G's curve at its rate, the paper shows
+  the crossover; if none does, the low-rate claim is dropped for egocentric
+  hands.
+- Outcome (code `k1.py` at this entry's commit; output
+  `pointstream-data/visor/k1-2026-10-16/k1.json`). LPIPS on R at the
+  oracle's rate (1.93 kbps; HaMeR 1.77):
+
+  | item | `wilor:arm` (R≈) | G's hull | G + bar hull | hull's rate for its quality | `arm_uncoded` | `wilor:hand` | `hamer:arm` |
+  |---|---|---|---|---|---|---|---|
+  | P01_107 | **0.172** | 0.258 | 0.258 | 7.9 kbps (saving 76%) | above (0.104) | below (0.274) | above (0.221; saving 55%) |
+  | P02_02 | 0.235 | 0.216 | 0.204 | 1.1 kbps (−71%) | below (0.222) | below (0.44 on S, off the map) | below |
+  | P03_10 | 0.183 | 0.155 | 0.155 | 1.2 kbps (−65%) | above (0.124; saving 48%) | below (0.184) | below (worse than every G point) |
+  | P09_106 | 0.307 | 0.184 | 0.184 | 0.3 kbps (−504%) | below (0.263) | below (0.354) | below |
+
+  Items where the keypoint point lies above DCVC-UF + G: `wilor:arm` 1 of
+  4, `wilor:arm_uncoded` 2, `wilor:hand` 0, `hamer:arm` 1. The hull with the
+  bar changes no sign; on P02_02 the bar (DCVC-UF off the shelf) is above G
+  at 1.9 kbps. A mean saving is not a useful summary here: `wilor:arm`'s
+  per-item savings against the joint hull span +76% to −504%.
+  The real generator (H3e) was judged on pose error, not LPIPS; it lost to
+  the pixel hull without G on 3 of 4 items, and whether G changes pose error
+  was not measured.
+- Reading. A keypoint point lies above DCVC-UF + G on one item, P01_107,
+  and only as an upper bound: appearance perfect and free, the forearm free,
+  no reference billed. Drawing the hand alone (`wilor:hand`, what a
+  generator without an arm model would send) is below the curve on every
+  item, and the real generator is below the pixel coders even without G.
+  By the letter of the rule a crossover exists, but on a single item and
+  only for a bound; P01_107 is where G gains least at low rate (its ¼
+  points are 0.26–0.36). Proposed reading, for the user to confirm:
+  **the low-rate claim is dropped for egocentric hands as a property of the
+  method**; what survives is "with perfect appearance and a free forearm,
+  1 of 4 items", which the paper can state in a sentence, not as a
+  crossover figure.
+  K1's other half (a judge where keypoints carry what matters) stays with
+  K2: re-judging DCVC-UF + G on pose error is a GPU step (WiLoR on G's
+  outputs at the low points), not recorded data.
+- Scope. 4 pilot items; one LPIPS bridge per item through SVT-AV1's
+  points; H3e has no LPIPS, so the generator enters only through its pose
+  result.
+
+### 2026-10-16 — H4c: handled objects as pixels, H3d's recipe
+- Question ([PLAN H4c](../PLAN.md#h4-handled-objects-rescoped-after-h1-user-2026-10-08);
+  user, 2026-10-13). H4a and H4b found no motion representation for handled
+  objects, so they stay coded pixels, but no component codes them yet: in
+  the pipeline the background fills their region. Hands are coded by
+  DCVC-UF HT-L off the shelf at ¼ and ½ plus G, a generic super-resolution
+  network fitted on hand crops (594 k parameters; −22% at equal LPIPS on R,
+  H3d). Does the same recipe code handled objects? Three arms, each scored
+  on hand pixels and on handled-object pixels separately:
+  1. **G as it is** (the hands' network applied to the objects);
+  2. **G_O**, G's network refitted on object crops;
+  3. **G_HO**, refitted on hands and objects together (one network, the same
+     size).
+  The user's concern: hands are alike and objects are not, so one enhancer
+  may serve neither; if hands lose with the shared network, keep two.
+  Fallback if all fail: generative completion of unseen sides, reported,
+  not built.
+- Regions. O is H1's handled-object part on the fill set: per frame, each
+  object label's union of fill-mask instances painted in instance order onto
+  free pixels, *handled* when a human labelled it in contact with a hand at a
+  keyframe bounding or inside the window (H1's `contact_objects`), then the
+  hand masks painted over (hands win). So O excludes R, and H1's per-part
+  bit accounting of B2's SVT-AV1 streams on `handled_object` is the rate on
+  O. R is H3c's (both hand classes of the fill set).
+- Items: B2's 4 pilot items, 240 frames (H3d's). Handled objects there are
+  small (fill set: 0.2–7% of the foreground's pixels per item, H1), so every
+  score reports O's pixels per frame and the frames with O.
+- Bar on O, per item: the upper concave hull (`g5.envelope`) on (kbps on O,
+  −LPIPS_O) of SVT-AV1 (B2's CRF 41/48/55/62 streams, rate from H1's
+  `handled_object` kbps; H3b2's seven low points re-encoded with H3b2's code,
+  rate on O by H1's libaom accounting) and DCVC-UF HT-L off the shelf (full,
+  ½ and ¼ resolution × QP 0, 21, 42; rate on O by its own entropy model, as
+  H3c). Quality as H3c on R, with O for R: the decode inside O, the source
+  outside, full-frame LPIPS averaged over O; PSNR_O; masked DISTS on O's box
+  plus 64 px; flow-free flicker on O.
+- Stage 1, one code path (`experiments/visor/h4c.py run`), every point
+  scored on O and on R:
+  - the bar's twenty points (base decodes);
+  - at DCVC-UF's six ¼ and ½ points: **arm 1**, G's network for that point
+    (H3d's generic jobs `20261012T221222Z-e514f83b`, `…225257Z-99094ccb`)
+    applied on O's box (and on R's, reproducing H3d's G scores on R as the
+    check); and the **oracle**: G5d's enhancer (L, H3d's settings, 2,000
+    steps, MSE plus LPIPS) fitted on the window's own O, its bits free. It
+    bounds arms 2 and 3 on objects: any network of that size fitted outside
+    the window sees the scored frames less.
+- Stage 2 (only if the oracle passes or is unclear; footage specified in
+  this entry before its runs): G_O and G_HO fitted on recordings of
+  participants other than P01, P02, P03 and P09, one network per point.
+  Object masks there come from VISOR's dense train interpolations (objects
+  a human marked in contact, O's definition), not SAM 3.1: SAM has no prompt
+  for "the object in the hand", and the masks only shape the training loss.
+  G_HO adds those object crops to G's own hand footage (SAM 3.1 hand and arm,
+  H3d), same steps and size. Then one scoring job per item applies G, G_O
+  and G_HO at the six points, on O and R.
+- Test curves: each arm's Pareto front over its six points, as H3d. BD-rate
+  per metric against the bar (PCHIP of log rate over the overlap, at least
+  0.005 LPIPS; otherwise better or worse at every rate). Saving = −BD.
+- Decision rule (fixed now; `h4c.DECISION`).
+  - An arm *stands* on a region by H3d's rule (`h3d.DECISION`) against that
+    region's bar: mean BD-rate on LPIPS ≤ −10% with at least 3 of 4 items
+    below 0; *fails* at mean ≥ 0 or at most 1 item below 0; otherwise
+    unclear. The oracle is judged the same way on O.
+  - Stage 1. If the oracle fails on O, arms 2 and 3 are not built: objects
+    are coded by DCVC-UF + G if arm 1 stands on O, otherwise by DCVC-UF off
+    the shelf without an enhancer, and generative completion is reported as
+    the remaining route. If the oracle passes or is unclear, stage 2 runs.
+  - Stage 2. The object network is the first standing arm on O in the order
+    G, G_HO, G_O (one network before two; a shared one before a second),
+    unless a later standing arm beats it by 10% (its mean BD-rate against
+    the earlier arm's points on LPIPS_O ≤ −10%). Hands keep G unless the
+    object network is G_HO and G_HO keeps the hands: it stands on R and its
+    mean BD-rate against G on LPIPS_R is below +10%; then G_HO serves both.
+    If the object network is G_HO but it loses the hands, or is G_O, there
+    are two networks (G on hands). If no arm stands on O, objects are coded
+    by DCVC-UF off the shelf and generative completion is reported.
+  DISTS and PSNR are reported beside and do not decide; a sign disagreement
+  with LPIPS is stated with a visual check.
+- Hypothesis. An enhancer restores local texture lost by DCVC-UF's
+  downscaling (H3d: PSNR held on DCVC-UF, so it restores rather than
+  invents) and G5d's enhancer transferred across kitchens, so: the oracle
+  passes on O (about −50%, less than the hands' −77% since O is small and
+  often blurred); G as it is helps objects a little (−5% to −15%, unclear);
+  G_O stands (about −20%); G_HO matches G on hands within 5% and G_O on
+  objects within 5%, so one network serves both, against the user's concern.
+- Competing explanations. (1) The user's: objects vary (glass, packaging
+  with print, metal, food), so a generic network gains little on them, or
+  learns a hand prior that recolours them (K's gloves in H3d); the visual
+  check of each arm on each item shows it. (2) O is small and fast (H4b:
+  views die in 0.03 s), so LPIPS_O averages few pixels and per-item results
+  swing; pixel counts and per-item BD-rates are reported, and the bar
+  itself may be flat. (3) The rate split onto a small region is coarse
+  (16×16 latent cells, 8×8 libaom blocks): the whole-frame rates are
+  reported beside.
+- Budget. Stage 1: per item two jobs (bar: SVT-AV1's eleven points and
+  DCVC-UF at full resolution; dcvc: the six ¼ and ½ points with G and the
+  oracle), 8 jobs, each ≤ 45 minutes shared on Ada or A6000 at 32,000 MiB
+  (H3c's anchor jobs took 12–18 minutes, H3d's oracle jobs 11–28), about
+  4 GPU-hours; smokes ≤ 600 s on one item, 48 frames. Stage 2: footage,
+  two network jobs and four scoring jobs, about 4 GPU-hours. Ceiling 10
+  GPU-hours.
