@@ -56,7 +56,7 @@ def test_container_carries_the_published_streams(tmp_path: Path, route: str) -> 
 def foreground_result(**change: object) -> dict:
     rows = []
     for scale in (4, 2, 1):
-        for qp, kbps in ((0, 50.0), (21, 20.0), (42, 8.0)):
+        for qp, kbps in ((0, 8.0), (21, 20.0), (42, 50.0)):
             rows.append({"scale": scale, "qp": qp, "kbps": kbps * (5 - scale), "deterministic": True,
                          "decoder_matches_encoder_intra": True, "psnr_f": 30.0 + (42 - qp) / 10,
                          "slots": {"hand": {"sha256": "x"} if scale in (2, 4) else None},
@@ -70,8 +70,8 @@ def foreground_result(**change: object) -> dict:
 def test_foreground_validator() -> None:
     assert all(h5.validate_foreground(foreground_result()).values())
     bad = foreground_result()
-    bad["points"][1]["kbps"] = 999.0  # QP 21 dearer than QP 0
-    assert not h5.validate_foreground(bad)["rate_falls_with_qp"]
+    bad["points"][1]["kbps"] = 999.0  # QP 21 dearer than QP 42
+    assert not h5.validate_foreground(bad)["rate_rises_with_qp"]
     bad = foreground_result()
     bad["points"][0]["deterministic"] = False
     assert not h5.validate_foreground(bad)["every_point_coded"]

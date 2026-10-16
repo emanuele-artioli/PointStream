@@ -847,7 +847,7 @@ def validate_foreground(result: dict[str, Any]) -> dict[str, bool]:
         "window_is_the_released_one": result["jpeg_gate_holds"],
         "every_point_coded": len(rows) > 0 and all(r["deterministic"] and r["decoder_matches_encoder_intra"]
                                                    for r in rows),
-        "rate_falls_with_qp": all(a["kbps"] > b["kbps"] for s in by_scale.values()
+        "rate_rises_with_qp": all(a["kbps"] < b["kbps"] for s in by_scale.values()  # DCVC-UF: QP up, rate up
                                   for a, b in zip(sorted(s, key=lambda r: r["qp"]), sorted(s, key=lambda r: r["qp"])[1:])),
         "foreground_decodes_to_a_picture": all(r["psnr_f"] is not None and 20 < r["psnr_f"] < 60 for r in rows),
         "g_on_quarter_and_half_only": all((r["slots"]["hand"] is not None) == (r["scale"] in G_SCALES) for r in rows),
