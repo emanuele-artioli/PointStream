@@ -112,6 +112,7 @@ def union_masks(clip: ClipMasks, t: int, name: str) -> np.ndarray:
 
 
 def run(args: argparse.Namespace) -> int:
+    os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
     import cv2
     import torch
 
@@ -201,6 +202,8 @@ def run(args: argparse.Namespace) -> int:
                   "model_revision": provenance.model_revision, "config_sha256": provenance.config_sha256,
                   "sdpa_backend_policy": sam.sdpa_backend_policy, "offload_video_to_cpu": True,
                   "offload_state_to_cpu": False, "grounding_batch_size": sam._require_predictor().model.batched_grounding_batch_size,
+                  "allocator_config": os.environ["PYTORCH_ALLOC_CONF"],
+                  "expandable_segments": sum(bool(s.get("is_expandable")) for s in torch.cuda.memory_snapshot()),
                   "prompts": PROMPTS, "parity": parity}
     del sam
     gc.collect()
@@ -241,6 +244,7 @@ def validate(directory: Path, summary: dict[str, Any]) -> dict[str, Any]:
         "sam_pinned": sam["checkpoint_sha256"] == "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
         "sam_native_cuda": sam["sdpa_backend_policy"] == "native_flash" and sam["runtime"]["capability"][0] >= 8,
         "effective_grounding_batch": sam["grounding_batch_size"] == 16,
+        "expandable_allocator": sam["allocator_config"] == "expandable_segments:True" and sam["expandable_segments"] > 0,
         "cpu_offload_parity": summary["stage"] != "smoke" or (sam["parity"].get("minimum_union_iou", 0) >= .999
                                                                             and sam["parity"].get("reference_instances", 0) > 0),
         "pose_cuda": all(v.startswith("cuda") for v in summary["pose"]["on_cuda"].values()),

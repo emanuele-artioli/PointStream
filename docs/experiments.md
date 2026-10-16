@@ -6081,3 +6081,14 @@ invocation turns out to be needed.
   Specs saved separately as `features-v1/specs-native16.tar`, SHA256
   `a5d55d0b9e56b3765bce7fee955cb0641981d1a49827a6ebbfa43b3a01631264`.
   Re-run short alone; no medium/long/full-corpus promotion from failures.
+- Native-batch pilot `20261016T154524Z-9d4d461c` (gpu3 A6000), actual
+  ready revision `796933bb91d3828075eb2cfe9a1e0875ced2606b`, passed the
+  12-frame offload parity comparison exactly (minimum union IoU **1.0**,
+  123 reference instances); failed in the subsequent 48-frame production
+  path, before full. A 1.27 GiB request hit the 23.44 GiB allocator cap
+  with 20.35 GiB allocated and 3.07 GiB reserved but unused. Preserve its
+  partial masks/parity and logs. Test the diagnosed fragmentation remedy
+  `PYTORCH_ALLOC_CONF=expandable_segments:True`, with the same native
+  batch, 24,000 MiB cap, input pixels, model, gate and all time ceilings.
+  Record actual expandable CUDA segments and require them in validation;
+  a successful short full and length pilots remain prerequisites to scaling.
