@@ -48,7 +48,10 @@ def test_recovery_assembly_reuses_complete_shots_and_requires_all_chunks(tmp_pat
                         **{f"publish/{p}": b"old frame" for p in old["images"]}})
     old_hash = file_sha256(partial)
     manifest = {"base_report": {"frames": 10, "source_frames": 10, "fps": 10, "scene_threshold": .25,
-                               "all_spans": [[0, 4], [4, 10]], "source": {"video_sha256": file_sha256(source)}},
+                               "all_spans": [[0, 4], [4, 10]],
+                               "scene_command": ["ffmpeg", "-t", "0.2", "-vf", "metadata=/job-smoke/scene-metadata.txt"],
+                               "source": {"video_sha256": file_sha256(source)}},
+                "scene_metadata_sha256": "cut-table",
                 "completed_archives": [{"path": str(partial), "sha256": old_hash}], "missing": [[1, 4, 10]]}
     manifest_path = tmp_path / "manifest.json"
     manifest_path.write_text(json.dumps(manifest))
@@ -69,6 +72,9 @@ def test_recovery_assembly_reuses_complete_shots_and_requires_all_chunks(tmp_pat
     assert [s["id"] for s in final["shots"]] == ["shot-0000", "shot-0001"]
     assert [r["frame"] for s in final["shots"] for r in s["registration"]] == list(range(10))
     assert final["shots"][1]["predicted"] == "court"
+    assert final["scene_command"] == ["ffmpeg", "-t", "1.0", "-vf", "metadata=/job-full/scene-metadata.txt"]
+    assert final["scene_command_reconstructed"] is True
+    assert final["scene_metadata_sha256"] == "cut-table"
     assert all((args.out / p).exists() for s in final["shots"] for p in s["images"])
     assert file_sha256(partial) == old_hash
     assert source.read_bytes() == b"immutable source fixture"

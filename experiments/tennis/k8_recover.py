@@ -203,6 +203,16 @@ def assemble(args: argparse.Namespace) -> int:
         raise ValueError("whole-match frame coverage failed")
     if file_sha256(args.source) != result["source"]["video_sha256"]:
         raise ValueError("review source changed")
+    # The recovery manifest's base metadata came from the original smoke.
+    # Its cut *data* is the saved full scan; label the reconstructed full
+    # invocation explicitly rather than retaining the smoke's 30 s command.
+    if "scene_command" in result:
+        command = list(result["scene_command"])
+        command[command.index("-t") + 1] = str(result["source_frames"] / result["fps"])
+        result["scene_command"] = [a.replace("-smoke/scene-metadata.txt", "-full/scene-metadata.txt") for a in command]
+        result["scene_command_reconstructed"] = True
+        result["scene_metadata_sha256"] = manifest["scene_metadata_sha256"]
+        result["scene_dispatch"] = str(Path(manifest["completed_archives"][0]["path"]).parent / "dispatch.json")
     result.update(shots=ordered, evidence=evidence, recovery_manifest_sha256=file_sha256(args.manifest))
     result["review_id"] = hashlib.sha256(json.dumps(result, sort_keys=True).encode()).hexdigest()[:16]
     (out / "source.mp4").symlink_to(args.source)
