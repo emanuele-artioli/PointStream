@@ -329,3 +329,79 @@ def test_g6_methods_and_resizing():
     assert g6.resize(hole, (960, 540), area=True).sum() >= 1
     grown = g6.dilate_1080(hole)
     assert grown[0, 500, 916] and not grown[0, 500, 917]
+    assert g6.dilate_1080(hole, 0).sum() == 1  # the agreed interface fills F exactly
+
+
+def test_g6_rate_grid_overrides():
+    from experiments.background import g6
+
+    grid = g6.parse_values("scene-540=0,63;svt-1080=63")
+    assert grid["scene-540"] == (0, 63) and grid["svt-1080"] == (63,) and grid["scene-1080"] == g6.GRID["scene-1080"]
+    assert len(g6.GRID["scene-540"]) + len(g6.GRID["scene-1080"]) >= 5  # the interface's five points per route
+    with pytest.raises(ValueError):
+        g6.parse_values("enh-720=1")
+
+
+def test_g6_scene_footage_is_the_stretch_around_the_window_less_window_and_guard():
+    from experiments.background import g6
+
+    fps = 60.0
+    item = {"first_video_index": 30_000, "frames": 240}
+    parts = g6.scene_parts(item, 100_000, fps)
+    guard = round(g6.GUARD_S * fps)
+    lo = 30_119 - 3600  # 120 s centred on the window
+    assert parts == [(lo, 30_000 - guard - 1), (30_239 + guard + 1, lo + 7199)]
+    edge = round(5.0 * fps)  # near the start: shifted to stay 5 s from the end, one part after the window
+    assert g6.scene_parts({"first_video_index": 600, "frames": 240}, 100_000, fps) == [(839 + guard + 1, edge + 7199)]
+    segments = g6.native_segments(parts, fps)
+    assert len(segments) == g6.NATIVE_SEGMENTS
+    assert all(b - a + 1 == 120 and any(lo <= a and b <= hi for lo, hi in parts) for a, b in segments)
+    assert sorted(segments) == segments and all(s[1] < t[0] for s, t in zip(segments, segments[1:]))
+    assert g6.native_segments([(0, 50)], fps) == []  # shorter than a segment
+
+
+def test_g6_ffv1_round_trip(tmp_path):
+    pytest.importorskip("av")
+    from experiments.background import g6
+
+    yuv = np.random.default_rng(0).integers(0, 255, (3, 24, 32), dtype=np.uint8)
+    digests = g6.write_ffv1(yuv, tmp_path / "x.mkv", Fraction(60000, 1001), threads=1)
+    assert g6.ffv1_digests(tmp_path / "x.mkv", threads=1) == digests and len(set(digests)) == 3
+
+
+def test_g1_dilate_zero_keeps_the_mask_exact():
+    from experiments.background import g1
+
+    mask = np.zeros((40, 40), bool)
+    mask[18:22, 18:22] = True
+    assert (g1.dilate(mask, 0) == mask).all()
+    assert g1.dilate(mask).sum() > g1.dilate(mask, 2).sum() > mask.sum()
+
+
+def test_g6_validators_by_kind(tmp_path):
+    from experiments.background import g6
+
+    footage = {"kind": "footage", "limit_frames": 0, "set": "scene", "guard_s": 5.0, "source_fps": 60.0,
+               "window": [30_000, 30_239], "frames": 900, "gpu": "Ada", "gpu_capability": [8, 9],
+               "propainter": {"gpu": "Ada"},
+               "segments": [{"first_index": 26_420, "last_index": 29_699, "fg_share": 0.3, "end": 330,
+                             "foreground": {"dilate_px_1080": 16.0}},
+                            {"first_index": 30_540, "last_index": 33_619, "fg_share": 0.2, "end": 900,
+                             "foreground": {"dilate_px_1080": 16.0, "detector": {"kinds": ["hands", "objects"]}}}]}
+    (tmp_path / "g6.json").write_text(json.dumps(footage))
+    assert all(g6.validate_stage(tmp_path).values())  # the pilot's footage: no "mask" recorded, G1's
+    footage["mask"] = {"name": "exact", **g6.FOOTAGE_MASKS["exact"], "box_kinds": ["objects"]}
+    (tmp_path / "g6.json").write_text(json.dumps(footage))
+    assert not g6.validate_stage(tmp_path)["mask_as_named"]
+    for seg in footage["segments"]:
+        seg["foreground"] = {"dilate_px_1080": 0.0, "detector": {"kinds": ["objects"]}}
+    (tmp_path / "g6.json").write_text(json.dumps(footage))
+    assert all(g6.validate_stage(tmp_path).values())
+    footage["segments"][0]["last_index"] = 29_800  # inside the guard
+    (tmp_path / "g6.json").write_text(json.dumps(footage))
+    assert not g6.validate_stage(tmp_path)["outside_window_and_guard"]
+    train = {"kind": "train", "limit_frames": 0, "gpu_capability": [8, 9], "steps": 540, "fit_frames": 1000,
+             "skipped_nonfinite": 0, "converged": {"converged": True},
+             "curve": [{"step": 54, "loss": 2.0}, {"step": 540, "loss": 1.0}]}
+    (tmp_path / "g6.json").write_text(json.dumps(train))
+    assert all(g6.validate_stage(tmp_path).values())

@@ -3198,6 +3198,307 @@ invocation turns out to be needed.
   and at the native rate are ablations for the paper's final runs.
 - GPU time: about 5 hours (8 jobs, 2 failed).
 
+### 2026-10-12 — G6 steps 4–5, pilot: every stage per window on the pilots' windows
+- Question (PLAN G6 4–5): the pipeline that makes both routes' background
+  for every window of evaluation set v2, at the interface agreed with the
+  foreground session, run end to end on the pilots' windows
+  (P26_02_0000001071, P06_03_0000005110) before the other 32. Two things
+  change from steps 2–3 and are checked here: the scene model's footage
+  (the window's own video, not G1d's stretch), and the enhancer at H5's
+  format (1080p and the native rate; G5d fitted it at 960×540, 10
+  frames/s).
+- Method, per window (`experiments/background/g6.py`):
+  1. `footage --set scene`: G5b's split of a stretch applied to the
+     window, so no window needs a prepared stretch: the 120 s of its own
+     video around it (shifted to stay 5 s from the video's ends), less the
+     window and 5 s on each side, at 10 frames/s and 960×540 (about 1,060
+     frames). Foreground as G5c's footage (SAM 3.1 "hand" and "arm" plus
+     the EPIC detector's boxes at score ≥ 0.5, dilated 16 px at 1080p;
+     the detections cover all 34 videos, G1's `hand-objects.tar`), filled
+     by ProPainter.
+  2. `footage --set native`: 4 segments of 2 s at the window's rate and
+     1080p from the same parts (starts spread evenly, blind to content),
+     the same foreground, ProPainter at 960×540 upsampled into the holes
+     only (as the window's fill). The enhancer's training pairs.
+  3. `train`: recipe L (β 0.005, learning rate 3 × 10⁻⁵, 540 steps) on
+     step 1's footage, from the public HT-L weights.
+  4. `format --publish`: the window decoded as B2 does, F = B1b's
+     `visor_dense_sam_fill` filled *exactly* (no dilation, as agreed),
+     the whole frame coded: the scene model at 960×540 upsampled, QP 0,
+     13, 25, 38, 50, 63, plus at 1080p QP 50 and 63 for the high end.
+  5. `enhance --publish` (two jobs, CRFs 32–48 and 54–63): SVT-AV1 at
+     1080p (G5's preset and CRFs; the anchor, published too), and G5d's
+     enhancer (8 blocks, 64 channels, MSE + LPIPS on V, 2,000 steps)
+     fitted per CRF on step 2's footage coded by SVT-AV1 at that CRF,
+     applied to the window's SVT-AV1 decode.
+  Scored at 1080p on V (`g5c.full_score`: PSNR, LPIPS, DISTS, flicker,
+  KID). Published per window: each point's decoded 1080p frames (FFV1,
+  4:2:0, BT.709 full range; checked by decoding them again), bitstream,
+  enhancer weights, and a manifest (window, frame range, F's mask-set
+  sha256, per point bytes, bitstream sha256, per-frame decoded sha256s,
+  decode ms per frame, GPU class, job id and code revision). Points that
+  the client upsamples are published after upsampling and scored as
+  published (through 4:2:0, unlike steps 2–3).
+- Decision rules, fixed now. (a) *The window's own footage replaces the
+  stretch* if the scene model's BD-rate on LPIPS_V against SVT-AV1 at
+  1080p is within 20 points of steps 2–3's (−91% | −45%) on both
+  windows; otherwise the footage protocol is revised before scaling.
+  (b) *The enhancer works at H5's format* if it beats SVT-AV1 at 1080p by
+  10% or more on LPIPS_V on both windows; otherwise its fit at 960×540
+  (SVT-AV1 at 540p, enhanced, upsampled) is tried on the pilots before
+  scaling. (c) *The interface holds* if every manifest is complete and
+  the foreground session composites one pilot window from it without a
+  change. All three pass → the other 32 windows run with the same
+  settings. Every metric is reported as BD-rate against SVT-AV1 at
+  1080p (concave-hull envelope), the rate allocation with the
+  foreground is the foreground session's.
+- Hypotheses. (a) Passes: the window's own footage is closer to the
+  window in time than most of a stretch's frames; filling F exactly
+  (smaller holes) helps both codecs alike. (b) Passes with a smaller
+  margin than at 960×540 (G5d's footage enhancer −36% | −50% on
+  LPIPS_V): at 1080p and the native rate SVT-AV1's artifacts are finer
+  and the enhancer's receptive field covers less of the scene.
+- Competing explanations. (a) A failure would mean the stretch's frames
+  far from the window carried the gain (more viewpoints), not the
+  window's neighbourhood; footage from the whole video would test it.
+  (b) A failure at 1080p could be the fit's size (4 segments of 2 s at
+  1080p, 400–480 frames, hold fewer distinct views than G5d's 1,200–2,400).
+- Budget: pilot 12 jobs, each ≤ 45 minutes on Ada or A6000 (shared),
+  about 5 GPU-hours. The other 32 windows at the same per-window cost:
+  about 80 GPU-hours, above PLAN's 65 (steps 4–5); the scale-up waits
+  for the user's approval with the pilot's measured cost.
+- Runs (shared GPUs; code `a103325`, with `f2e4aa9` for the enhancer
+  jobs and `9e49c5e` for P26_02's native footage). Footage, scene:
+  P26_02 `20261012T144606Z-fe5e8ef5` (1,061 frames: 79 before the window,
+  982 after, since it starts 18 s into the video), P06_03
+  `…144634Z-91fdde7f` (1,060). Footage, native: P06_03
+  `…144704Z-1b330ff2`, P26_02 `…153200Z-a9414105` (480 frames each,
+  foreground 9–25%). Training (Ada, both converged, monitor −0.3% and
+  −0.4% over the last fifth): P26_02 `…150907Z-d03a60c9`, P06_03
+  `…151248Z-bc31027a`. Scene route: P26_02 `…161128Z-5999b792`, P06_03
+  `…160501Z-6cd65382`. Enhancer route: P06_03 `…154011Z-5c4135b3`,
+  `…154024Z-a4e8259d`; P26_02 `…155052Z-9ad2482e`, `…155102Z-82b6caf5`.
+  Failures, none citable: two SAM 3.1 and one ProPainter out of memory
+  when another session's process grew on the shared GPU after
+  admission (`…144625Z-c117ffa3`, `…160057Z-2eb07276`); P26_02's native
+  footage hung twice after SAM (`…144950Z-e96dde14` ran out of its
+  smoke time, `…150658Z-eef26194` was cancelled after 20 idle minutes):
+  PyAV's threaded H.264 decoder deadlocked on close inside the process
+  holding SAM 3.1, fixed in `9e49c5e` (the 1080p decode runs in the
+  spawned decoder process); the enhancer's footage encode had no work
+  directory (`…150734Z-796c8fa3`, fixed in `f2e4aa9`); the enhancer's
+  declared 20,000 MiB was too low at full size (21.3 GB,
+  `…152624Z-b5bff301`), now 30,000.
+- Outcome. BD-rate against SVT-AV1 at 1080p (concave hull, 174–4,470
+  kbps), P26_02 | P06_03:
+  | Route | LPIPS_V | DISTS_V | PSNR_V | flicker_V | KID_V |
+  |---|---|---|---|---|---|
+  | enhancer (enh-1080) | better at every rate \| −83% | better at every rate \| −82% | +53% \| +26% | worse at every rate (both) | −72% \| −68% |
+  | scene model, 540p | −97% \| **+20%** | −95% \| +116% | +97% \| +97% | worse at every rate (both) | −82% \| worse at every rate |
+  | scene model, 1080p | better at every rate \| −61% | −79% \| +125% | +176% \| +94% | worse at every rate (both) | +35% \| +435% |
+  - **(b) passes**: the enhancer beats SVT-AV1 on LPIPS_V, DISTS_V and
+    KID_V on both windows, far beyond the 10% needed (at the same rate
+    LPIPS_V falls 42–59%, PSNR_V 0.4–0.7 dB), and loses PSNR_V and
+    flicker as at 960×540 (G5d). Hypothesis (a smaller margin than G5d's
+    −36% | −50%) wrong: fitted on the window's own video at its size and
+    rate, it gains more. Applying it took about 160 ms per frame on a
+    shared A6000: not real time at 59.94 frames/s.
+  - **(a) passes on P26_02 and fails on P06_03** (−97% against −91%;
+    +20% against −45%, 65 points off). Two things changed at once from
+    steps 2–3: the footage (the window's own 120 s, not the stretch) and
+    F (filled exactly, not dilated by 16 px, so V now includes the
+    pixels at the hands' edges, which neither model was trained to
+    reproduce; P06_03's foreground is 27% of the frame). Beside it, on
+    P06_03 the model now codes better at 1080p than at 540p (−61%
+    against +20%), the reverse of step 2.
+  - (c) Every manifest is complete (FFV1 frames re-decoded and checked,
+    bitstreams, enhancer weights); the foreground session has not yet
+    composited one.
+  - GPU time: about 5.2 hours (12 completed jobs, 7 failed or cancelled).
+- Diagnosis of (a) on P06_03, decided before its results (two jobs,
+  about 1 GPU-hour): A, the stretch's recipe-L model of steps 2–3
+  (`20261011T163301Z-e47ae994`) with F filled exactly
+  (`20261012T180309Z-48fb21c5`); B, the window-footage model dilated by
+  16 px as steps 2–3 (`…180332Z-92a1e304`), against steps 2–3's SVT-AV1
+  anchor (`…122457Z-a660ab4c`, the same dilation). If A also loses
+  (LPIPS_V at 540p within 20 points of +20%) and B recovers (within 20
+  points of −45%), the exact fill is the cause and the footage stands;
+  if A keeps −45% ± 20 and B does not recover, the footage is the cause
+  and the footage protocol is revised (the whole video, as the
+  competing explanation says). Mixed results are reported as they are
+  and decided with the user.
+- Diagnosis, outcome (code `9e49c5e`; A gpu6, B
+  gpu5, Ada, shared; both 10 of 10 checks). BD-rate on LPIPS_V at 540p
+  against SVT-AV1 at 1080p with the same fill: A, the stretch model with
+  F exact, **+4%** (steps 2–3, F dilated: −45%); B, the window-footage
+  model with F dilated, **+22%** against steps 2–3's own anchor
+  (`…122457Z-a660ab4c`). By the rule this is mixed: A moves 49 points
+  with the fill, and B does not recover with it.
+  - The points explain both. On P06_03 the scene model's 540p curve
+    overlaps SVT-AV1's only in a thin band of quality: its top one or two
+    points (QP 50 and 63, 140–540 kbps) against SVT-AV1's lowest CRF
+    (138–174 kbps). There the BD-rate is a PCHIP integral over a few
+    thousandths of LPIPS and swings with them: steps 2–3's −45% was as
+    fragile as the pilot's +20%. At matched rate (log-rate
+    interpolation) the window-footage model equals the stretch model
+    with the same dilated fill: LPIPS_V 0.225 against 0.219 at 27 kbps,
+    0.163 | 0.164 at 59, 0.129 | 0.128 at 139, 0.108 | 0.106 at 394
+    kbps (within ±3%, through 4:2:0 or not). The footage is not the
+    cause, and the exact fill raises both codecs' cost (SVT-AV1's lowest
+    point moves from 138 to 174 kbps and 0.135 to 0.143 LPIPS_V).
+  - Rule (a) as written measures the overlap, not the model, on a
+    window where the curves barely meet. What holds: the window's own
+    footage makes the same scene model as the stretch (both windows);
+    on P06_03 the scene model at 540p is SVT-AV1's equal at its lowest
+    rates and worse above, the 1080p model wins on LPIPS_V there (−58%
+    to −66%), and the route's hull (540p and 1080p) gives −22% (fill
+    dilated) and +3% (exact). Decision with the user (the rule's
+    clause for mixed results).
+  - GPU time: about 1 hour (2 jobs).
+- Decision (user, 2026-10-12): the other 32 windows do not run now.
+  About 80 GPU-hours is worth spending once, on the final experiments,
+  when the pipeline is settled. First the rest of the pipeline is found,
+  built and optimized with cheap tests; then the paper's first draft
+  fixes the figures and the experiments missing for them; then one
+  heavy run produces every result the paper needs. The pilot's code
+  (`g6.py` footage, train, format, enhance) and its two published
+  windows stay as they are for the foreground session's compositor.
+
+
+### 2026-10-12 — G6 item 1: the scene model at the exact fill, and its coded size
+- Question: the pilot (above) put the window's F at the agreed exact fill
+  (no dilation), so V now holds the pixels beside the hands' edges. The
+  scene model was trained on footage whose foreground was G1's (dilated
+  16 px, hand boxes), so it never saw that band. On P06_03 its 540p
+  curve fell to SVT-AV1's level, while the 1080p model won (−58% to −66%
+  on LPIPS_V), the reverse of step 2's choice of 540p (made with the
+  dilated fill). Two questions. (a) Does footage masked like F teach the
+  model the band? (b) Should the model code at 540p, at 1080p, or both
+  by rate?
+- Method (`experiments/background/g6.py`, pilot windows P26_02_0000001071
+  and P06_03_0000005110):
+  1. `footage --set scene --mask exact`: the pilot's footage protocol with
+     the foreground shaped like F: SAM 3.1 "hand" and "arm" masks
+     undilated, plus the EPIC detector's *object* boxes (score ≥ 0.5),
+     undilated. The hand boxes are dropped because a box covers the band
+     beside the hand that exact F leaves in V; the object boxes stand in
+     for VISOR's object masks, which the footage has no annotations for.
+     ProPainter fill as before. Model E: recipe L (β 0.005, learning rate
+     3 × 10⁻⁵, 540 steps) on it, from the public HT-L weights. Model D:
+     the pilot's trained model on G1's footage (`20261012T150907Z-d03a60c9`,
+     `…151248Z-bc31027a`).
+  2. `format` for D and E on each window with F exact, the same grid:
+     540p QP 0, 13, 25, 38, 50, 63 (upsampled through 4:2:0), 1080p QP 13,
+     25, 38, 50, 63 (the pilot had only 50 and 63, at 620 kbps and up,
+     above most of SVT-AV1's range). Not published: this is a test.
+  3. Anchor: the pilot's SVT-AV1 at 1080p with the same exact fill (the
+     enhance jobs, 174–4,470 kbps). Scored at 1080p on V as the pilot.
+- Decision rules, fixed now.
+  (a) *E replaces D* if E's BD-rate against D on LPIPS_V (each model's
+  hull of 540p and 1080p, same window, same F) is −5% or better on
+  P06_03 and no worse than +2% on P26_02. Otherwise D stays (G1's
+  footage, unchanged code path). Model against model: both curves span
+  the same rates, so this BD-rate does not have the thin-overlap
+  fragility that rule (a) of the pilot had.
+  (b) *Coded size*, for the model (a) picks: BD-rate against SVT-AV1 at
+  1080p (concave hull) on LPIPS_V for 540p alone, 1080p alone and their
+  hull. If 1080p alone is within 5 points of the hull on both windows,
+  the model codes at 1080p in SVT-AV1's range. Otherwise, if 540p alone
+  is within 5 points of the hull, it stays at 540p. Otherwise the route
+  ships the hull and switches size at the crossing rate. 540p stays
+  available below SVT-AV1's lowest rate either way, if it is the hull
+  there. Beside each BD-rate: the overlap in quality, and LPIPS_V at
+  matched rate (log-rate interpolation) at SVT-AV1's three lowest CRFs.
+  Every other metric (DISTS_V, KID_V, PSNR_V, flicker_V) is reported.
+- Hypotheses. (a) E gains 5–15% on P06_03 (foreground 27%, so a long edge
+  band) and stays level on P26_02. (b) 1080p is within 5 points of the
+  hull in SVT-AV1's range on both windows: there, 540p's upsampling
+  costs more than 1080p's extra bits. 540p wins only below about
+  150 kbps.
+- Competing explanations. (a) The band's cost is intrinsic: shadows,
+  motion blur and VISOR's mask moving from frame to frame make the seam
+  between fill and frame move, which no training removes (SVT-AV1 paid
+  it too: its lowest point moved from 138 to 174 kbps). Then E ≈ D.
+  SAM's undilated masks may also leave hand pixels in the footage's V,
+  spending the model's capacity on them, so E could lose. (b) The
+  pilot's 1080p win could come from its points sitting at rates where
+  SVT-AV1 is weakest, not from the size; the new low QPs at 1080p test
+  this.
+- Budget: 8 jobs on shared Ada or A6000, each under 45 minutes: 2
+  footage, 2 training (Ada), 2 format for E, plus 2 format for D. About
+  3 GPU-hours.
+- Runs (code `471f211`, shared GPUs, every job's validator passed).
+  Exact footage: P26_02 `20261012T191458Z-ec41db31` (1,061 frames,
+  foreground 23% | 14% per segment against G1's 28% | 17%), P06_03
+  `…191508Z-059d63ab` (1,060; 23% | 17%). Model E, trained (both
+  converged, monitor within 1% over the last fifth): P06_03
+  `…193354Z-1c40a5f2` (Ada); P26_02 `…193114Z-78bb999e` ran out of its
+  2,700 s on a GPU shared at 100% and saved its state, resumed to step 540
+  by `…211954Z-b60afc24` (A6000; DCVC-UF trains on both classes, peak
+  42 GiB). Format, D: P26_02 `…191518Z-6a62cbbb`, P06_03
+  `…191526Z-32f31a5f`; E: P26_02 `…213720Z-eea1154c`, P06_03
+  `…203355Z-54009c15`. Failed, not citable: E's P26_02 format
+  `…212847Z-8fedd1fc`, whose smoke had one of eleven points (540p QP 38)
+  decode unlike its encoder on gpu5 under contention; the same spec,
+  resubmitted unchanged, passed every check.
+- Outcome. Model against model (each model's concave hull, the same F),
+  P26_02 | P06_03:
+  | E against D | LPIPS_V | DISTS_V | PSNR_V | KID_V |
+  |---|---|---|---|---|
+  | hull (540p and 1080p) | **−11% \| −12%** | +32% \| −9% | −3% \| −5% | +17% \| −8% |
+  | 540p | 0% \| −7% | +31% \| −7% | 0% \| −3% | +17% \| −7% |
+  | 1080p | −28% \| −23% | +15% \| −14% | −15% \| −11% | −27% \| −23% |
+  Against SVT-AV1 at 1080p (concave hull), LPIPS_V BD-rate and LPIPS_V
+  at matched rate at SVT-AV1's three lowest CRFs (P26_02 189, 471, 787
+  kbps: SVT-AV1 0.241, 0.218, 0.206; P06_03 174, 417, 708 kbps: 0.142,
+  0.100, 0.087):
+  | Model, size | P26_02 | P06_03 |
+  |---|---|---|
+  | D 540p | −97%; 0.146, 0.128, 0.126 | +20%; 0.137, 0.119, 0.113 |
+  | D 1080p | −97%; 0.143, 0.109, 0.095 | −18%; 0.143, 0.099, 0.076 |
+  | D hull | −96% | −4% |
+  | E 540p | −97%; 0.149, 0.134, 0.130 | +26%; 0.138, 0.119, 0.113 |
+  | E 1080p | −98%; 0.127, 0.102, 0.097 | **−38%**; 0.128, 0.087, 0.066 |
+  | E hull | −97% | −33% |
+  On the other metrics the E hull against SVT-AV1 is DISTS_V −92% |
+  +87%, KID_V −66% | +218%, PSNR_V +126% | +80%, and flicker_V worse at
+  every rate on both.
+  - **(a) passes: E replaces D** (−11% on P26_02, at most +2% needed;
+    −12% on P06_03, −5% needed). Hypothesis right on P06_03 (−12%,
+    within the predicted 5–15%) and wrong on P26_02, which gains as much
+    instead of staying level. The gain is at 1080p (−23% to −28% on
+    LPIPS_V, and on KID_V and PSNR_V too); at 540p it is 0 to −7%, so the
+    band the model learnt is detail that 540p does not keep. Against it,
+    on P26_02 E loses DISTS_V (+32%) and KID_V (+17%) on the hull, all
+    of it at 540p. The competing explanation (the band costs what it
+    costs) is refuted for LPIPS_V.
+  - **(b) the model codes at 1080p in SVT-AV1's range**: 1080p alone is
+    within 5 points of the hull on both windows (−98% against −97%;
+    −38% against −33%), and at matched rate 1080p is better than 540p at
+    every one of SVT-AV1's three lowest rates on both. Hypothesis right.
+    540p stays for rates below SVT-AV1's lowest (the hull is 540p below
+    about 60 kbps on P26_02 and 70 kbps on P06_03). The pilot's
+    1080p −61% on P06_03 had two points overlapping SVT-AV1 in a thin
+    band; with QP 13–38 it is −18% for D, and the competing explanation
+    (the pilot's 1080p points sat where SVT-AV1 is weakest) held for D.
+    Caveat: on P26_02, 1080p's LPIPS_V overlap with SVT-AV1 is thin (its
+    lowest point, 61 kbps, already beats SVT-AV1's best), so its −98%
+    rests on matched rate, which agrees. On DISTS_V and KID_V, 540p is
+    better than 1080p on both windows (E 1080p against 540p: DISTS_V
+    +178% | +87%, KID_V +180% | +163%): the 1080p decode carries LPIPS
+    detail that the distribution metrics do not credit. The route's size
+    follows the headline metric, LPIPS_V, as G5c's selection did.
+  - GPU time: about 4 hours (10 jobs, 2 of them failed or timed out).
+- Decision: G6's scene model is trained on footage masked like F
+  (`footage --mask exact`) and codes at 1080p in SVT-AV1's range, with
+  540p below it. The final run's `format` grid becomes 540p QP 0, 13, 25,
+  38 and 1080p QP 13, 25, 38, 50, 63 (passed as `--mask exact` and
+  `--values`; the defaults stay the pilot's, so its specs re-run as
+  they were). The pilot's published windows (D at
+  540p and two 1080p points) stay for the foreground session's
+  compositor test, rule (c), whose interface does not change.
+
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)

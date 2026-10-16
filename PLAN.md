@@ -523,6 +523,19 @@ sha256s, decode ms per frame, GPU class, job id, `git_head`).
 **Done when** both routes' background streams for all 34 windows are
 published with the interface above and the foreground session has
 composited them.
+*Pilot done (2026-10-12, [experiments](docs/experiments.md), G6 steps
+4–5 pilot):* the per-window pipeline runs end to end on the pilots'
+windows and publishes both routes at the agreed interface. The enhancer
+after SVT-AV1 beats it on LPIPS_V, DISTS_V and KID_V on both (LPIPS_V
+better at every rate | −83%); the window's own footage makes the same
+scene model as the stretch (±3% LPIPS_V at matched rate). *Deferred
+(user, 2026-10-12):* the other 32 windows run once, with the final
+experiments, after the paper's draft fixes the figures they feed.
+*Item 1 done (2026-10-13, [experiments](docs/experiments.md), G6 item
+1):* with F filled exactly, the scene model is trained on footage masked
+the same way (`footage --mask exact`; LPIPS_V −11% | −12% against G1's
+footage) and codes at 1080p in SVT-AV1's range, 540p below it (LPIPS_V
+against SVT-AV1 −97% | −33%; DISTS_V and KID_V still worse on P06_03).
 
 ### H. Foreground (user, 2026-10-08)
 
