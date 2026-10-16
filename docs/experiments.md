@@ -5853,7 +5853,11 @@ invocation turns out to be needed.
   registering under 2 px, classification exactly at the fixed 80% share.
   Runtime 245.6 s; zero of four shots predicted court. This negative
   prediction result is retained; it is not accuracy without the user's
-  labels. The 6,000-frame pilot is running. Before the decision run,
+  labels. The 6,000-frame pilot completed in 313.3 s: 15 shots, 2
+  predicted court. All requested frames were processed. A four-part
+  full run is estimated at about 33 min per part including the repeated
+  whole-match cut scan, within the 45 min stage cap (16 CPU threads,
+  no GPU). Before the decision run,
   reports also record resolved ffmpeg/ffprobe paths and versions plus
   stream colour/codec/timestamp metadata. No model or threshold changes.
 
