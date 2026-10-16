@@ -6150,3 +6150,19 @@ invocation turns out to be needed.
   only aggregate foreground. Decision/scoring thresholds remain unchanged.
   Median CPU-state spec SHA256
   `e02b425dfe10a660966f21941b21236b2ddb8955232bdde1eb7053279f3c34cd`.
+- CPU-state attempt `20261016T161135Z-a8b70442`, gpu3 A6000, actual
+  ready revision `58e9b2215203fbacffc1c8d5f59ea8bb04d3f18c`, failed the
+  smoke before parity/full: upstream `video_tracking_multiplex._merge`
+  casts the new CUDA tensor's dtype but omits its CPU destination device.
+  The neighboring `_append` similarly concatenates without a device transfer.
+  Add two guarded, in-memory compatibility replacements: transfer the new
+  tensor to the destination tensor's device before assignment/concatenation.
+  `_merge` retains its original dtype cast; `_append` retains native dtype
+  promotion. No package/environment file is modified. The exact original
+  expressions must occur once or installation fails. Save both unified
+  diffs, original/revised source SHA256s and patch checksums before GPU
+  propagation; include them in effective configuration identity and full
+  validation. CPU-only regression reproduces mixed-device rejection and
+  checks repaired values, dtype semantics and destination. The native
+  mask/track parity gate remains mandatory, followed by the bounded median
+  full stage. No candidate formula, score threshold or phase budget changes.

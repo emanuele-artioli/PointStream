@@ -1,9 +1,55 @@
 import numpy as np
 import pytest
 from types import SimpleNamespace
+from typing import Any
 
-from experiments.tennis.k4b_features import extract_features, key, mask_parity, offload_tracker_state
+from experiments.tennis.k4b_features import cpu_state_compatibility, extract_features, key, mask_parity, offload_tracker_state
 from src.segmentation.masks import ClipMasks
+
+torch: Any = None  # Supplied by the isolated compatibility-test module, without CUDA.
+
+
+def _merge(d1, d2, k1, k2, d2_idx):
+    d1[k1][d2_idx] = d2[k2].to(dtype=d1[k1].dtype)
+
+
+def _append(d1, d2, k1, k2, dim=0):
+    d1[k1] = torch.cat([d1[k1], d2[k2]], dim=dim)
+
+
+def test_cpu_storage_compatibility_preserves_values_dtype_promotion_and_device():
+    class Tensor:
+        def __init__(self, values, device):
+            self.values, self.device = np.asarray(values), device
+            self.dtype = self.values.dtype
+
+        def to(self, *, dtype=None, device=None):
+            return Tensor(self.values.astype(dtype or self.dtype), device or self.device)
+
+        def __setitem__(self, index, value):
+            if self.device != value.device:
+                raise RuntimeError("mixed devices")
+            self.values[index] = value.values
+
+    def cat(values, dim):
+        assert len({v.device for v in values}) == 1
+        return Tensor(np.concatenate([v.values for v in values], axis=dim), values[0].device)
+
+    existing = {"x": Tensor(np.zeros(2, np.float32), "cpu")}
+    added = {"y": Tensor(np.array([1.5], np.float64), "cuda")}
+    with pytest.raises(RuntimeError, match="mixed devices"):
+        _merge(existing, added, "x", "y", [1])
+    module = SimpleNamespace(_merge=_merge, _append=_append, torch=SimpleNamespace(cat=cat))
+    receipt = cpu_state_compatibility(module)
+    module._merge(existing, added, "x", "y", [1])
+    np.testing.assert_array_equal(existing["x"].values, [0, 1.5])
+    assert existing["x"].device == "cpu" and existing["x"].dtype == np.float32
+    module._append(existing, added, "x", "y")
+    np.testing.assert_array_equal(existing["x"].values, [0, 1.5, 1.5])
+    assert existing["x"].device == "cpu" and existing["x"].dtype == np.float64
+    assert len(receipt["patches"]) == 2 and len(receipt["patch_sha256"]) == 64
+    with pytest.raises(RuntimeError, match="patch rejected"):
+        cpu_state_compatibility(SimpleNamespace(_merge=lambda: None))
 
 
 def test_parity_rejects_identity_swaps_even_when_union_is_identical():

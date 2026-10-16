@@ -10,13 +10,16 @@ CPU. Smoke compares masks and track identities to the native path.
 from __future__ import annotations
 
 import argparse
+import difflib
 import gc
 import hashlib
+import importlib
 import inspect
 import json
 import os
 import tarfile
 import tempfile
+import textwrap
 from collections import Counter, defaultdict
 from dataclasses import replace
 from pathlib import Path
@@ -168,6 +171,33 @@ def offload_tracker_state(predictor: Any) -> dict[str, Any]:
     return record
 
 
+def cpu_state_compatibility(module: Any) -> dict[str, Any]:
+    """Repair two pinned storage helpers' missing device transfers, in memory."""
+    replacements = {
+        "_merge": ("d2[k2].to(dtype=d1[k1].dtype)", "d2[k2].to(device=d1[k1].device, dtype=d1[k1].dtype)"),
+        "_append": ("torch.cat([d1[k1], d2[k2]], dim=dim)",
+                    "torch.cat([d1[k1], d2[k2].to(device=d1[k1].device)], dim=dim)"),
+    }
+    patches = []
+    for name, (old, new) in replacements.items():
+        original = getattr(module, name)
+        source = textwrap.dedent(inspect.getsource(original))
+        if source.count(old) != 1:
+            raise RuntimeError(f"Unexpected pinned SAM {name}; CPU-state compatibility patch rejected")
+        revised = source.replace(old, new)
+        patch = "".join(difflib.unified_diff(source.splitlines(keepends=True), revised.splitlines(keepends=True),
+                                           fromfile=name, tofile=name + ".cpu-state"))
+        namespace = dict(original.__globals__)
+        namespace.update(vars(module))
+        exec(compile(revised, f"<pointstream-k4b-cpu-state-{name}>", "exec"), namespace)
+        setattr(module, name, namespace[name])
+        patches.append({"function": name, "source_sha256": hashlib.sha256(source.encode()).hexdigest(),
+                        "revised_sha256": hashlib.sha256(revised.encode()).hexdigest(),
+                        "patch": patch, "patch_sha256": hashlib.sha256(patch.encode()).hexdigest()})
+    return {"version": 1, "patches": patches,
+            "patch_sha256": hashlib.sha256(json.dumps(patches, sort_keys=True).encode()).hexdigest()}
+
+
 def run(args: argparse.Namespace) -> int:
     os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
     import cv2
@@ -230,7 +260,11 @@ def run(args: argparse.Namespace) -> int:
         torch.cuda.empty_cache()
     sam = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint, offload_video_to_cpu=True, offload_state_to_cpu=False,
                                 grounding_batch_size=16)
-    state_offload = offload_tracker_state(sam._require_predictor())
+    predictor = sam._require_predictor()
+    cpu_compatibility = cpu_state_compatibility(importlib.import_module("sam3.model.video_tracking_multiplex"))
+    write_json(publish / "cpu-state-compatibility.json", cpu_compatibility)
+    state_offload = offload_tracker_state(predictor)
+    del predictor
     if os.environ.get("PS_STAGE") == "smoke":
         print("phase=offloaded-parity grounding_batch=16", flush=True)
         offloaded_reference = sam.segment_frames(parity_jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"])
@@ -254,7 +288,8 @@ def run(args: argparse.Namespace) -> int:
     clip = sam.segment_frames(jpeg, PROMPTS, policy="offline_bidirectional", fps=info["fps"], on_frame=on_frame)
     provenance = sam.provenance("offline_bidirectional")
     effective_config = {"segmenter_config_sha256": provenance.config_sha256,
-                        "tracker_state_offload": {"api": "tracker.init_state+cached_frame_outputs", "version": 2, "enabled": True}}
+                        "tracker_state_offload": {"api": "tracker.init_state+cached_frame_outputs", "version": 2, "enabled": True},
+                        "cpu_state_compatibility": cpu_compatibility}
     sam_record = {"runtime": runtime(), "checkpoint_sha256": provenance.checkpoint_sha256,
                   "model_revision": provenance.model_revision, "effective_config": effective_config,
                   "config_sha256": hashlib.sha256(json.dumps(effective_config, sort_keys=True).encode()).hexdigest(),
@@ -307,6 +342,10 @@ def validate(directory: Path, summary: dict[str, Any]) -> dict[str, Any]:
         "effective_grounding_batch": sam["grounding_batch_size"] == 16,
         "effective_config_identified": sam["config_sha256"] == hashlib.sha256(
             json.dumps(sam["effective_config"], sort_keys=True).encode()).hexdigest(),
+        "cpu_state_patch_identified": sam["effective_config"]["cpu_state_compatibility"]["patch_sha256"] == hashlib.sha256(
+            json.dumps(sam["effective_config"]["cpu_state_compatibility"]["patches"], sort_keys=True).encode()).hexdigest(),
+        "cpu_state_patch_receipt": json.loads((directory / "cpu-state-compatibility.json").read_text())
+                                   == sam["effective_config"]["cpu_state_compatibility"],
         "tracker_cpu_state": sam["offload_state_to_cpu"] and sam["tracker_state_offload"]["initialized"] > 0
                              and sam["tracker_state_offload"]["initialized"] == sam["tracker_state_offload"]["cpu"],
         "cached_masks_cpu": sam["tracker_state_offload"]["cached_masks"] > 0
