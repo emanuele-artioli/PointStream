@@ -86,3 +86,41 @@ def test_k1_reads_the_hull_linearly_in_rate():
     assert k1.at_rate(hull, 0.5) is None
     assert k1.rate_for(hull, -0.2) == pytest.approx(2.0)
     assert k1.rate_for(hull, -0.05) is None
+
+
+def test_segments_need_consecutive_frames_within_the_admitted_drift():
+    alignment = {n: {"index": n - 1, "drift": 0} for n in range(1, 11)}
+    alignment[6] = {"index": 5, "drift": 2}  # drifts too far
+    assert h4c.segment_starts(alignment, 1, 10, 3, 1) == [1, 2, 3, 7, 8]
+    alignment[6] = {"index": 6, "drift": 1}  # drift admitted, but frames 5 and 7 then share a decoded frame with it
+    assert h4c.segment_starts(alignment, 1, 10, 3, 1) == [1, 2, 3, 7, 8]
+    alignment[6] = {"index": 5, "drift": 1}
+    assert h4c.segment_starts(alignment, 1, 10, 3, 1) == [1, 2, 3, 4, 5, 6, 7, 8]
+
+
+def test_contacts_name_the_objects_a_hand_touches():
+    def entry(number, annotations):
+        return {"image": {"name": f"P04_01_frame_{number:010d}.jpg"}, "annotations": annotations}
+
+    doc = {"video_annotations": [entry(5, [
+        {"id": "h", "name": "left hand", "class_id": 300, "segments": [], "in_contact_object": "c"},
+        {"id": "c", "name": "cup", "class_id": 7, "segments": []},
+        {"id": "r", "name": "right hand", "class_id": 301, "segments": [], "in_contact_object": "none-of-these"},
+    ])]}
+    assert h4c.contacts(doc) == {5: {"cup"}}
+
+
+@pytest.mark.parametrize("o, r, versus, expected", [
+    ({"G": "passes", "G_HO": "passes", "G_O": "passes"}, {}, {"G_HO>G:o": -0.05, "G_O>G:o": -0.05}, ("G", "G", 1)),
+    ({"G": "passes", "G_HO": "passes", "G_O": "passes"}, {"G_HO": "passes"},
+     {"G_HO>G:o": -0.2, "G_O>G_HO:o": -0.05, "G_HO>G:r": 0.03}, ("G_HO", "G_HO", 1)),
+    ({"G": "unclear", "G_HO": "passes", "G_O": "passes"}, {"G_HO": "passes"},
+     {"G_O>G_HO:o": -0.05, "G_HO>G:r": 0.25}, ("G_HO", "G", 2)),
+    ({"G": "fails", "G_HO": "unclear", "G_O": "passes"}, {}, {}, ("G_O", "G", 2)),
+    ({"G": "passes", "G_HO": "passes", "G_O": "passes"}, {"G_HO": "passes"},
+     {"G_HO>G:o": -0.2, "G_O>G_HO:o": -0.15, "G_HO>G:r": 0.0}, ("G_O", "G", 2)),
+    ({"G": "fails", "G_HO": "fails", "G_O": "unclear"}, {}, {}, ("DCVC-UF off the shelf", "G", 1)),
+])
+def test_stage_two(o, r, versus, expected):
+    d = h4c.stage2(o, r, versus)
+    assert (d["objects"].split(" (")[0], d["hands"], d["networks"]) == expected

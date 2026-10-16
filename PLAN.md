@@ -914,6 +914,16 @@ before its run:
   winning); if not, the low-rate claim is dropped for egocentric hands.
   The regime itself (where pixel coders collapse) is defined per domain by
   the judge (e.g. a detector's recall on the decoded ball, K5).
+  **Done 2026-10-16** ([experiments](docs/experiments.md#2026-10-16--k1-do-keypoints-win-on-egocentric-hands-at-very-low-rates)):
+  from H3b2's and H3d's reports, with H3b's region S mapped to R through
+  SVT-AV1's shared streams. At 1.93 kbps perfect appearance at the coded
+  pose (forearm free) lies above DCVC-UF + G on 1 of 4 items (P01_107,
+  76% saving there; 65–500% worse on the others); the hand alone on none;
+  the uncoded pose on 2. The real generator (H3e) was below the pixel
+  coders even without G. Proposed (to confirm with the user): drop the
+  low-rate claim for egocentric hands; keep only the one-item bound as a
+  sentence. Pose error on G's outputs was never measured, so the
+  information claim (H3c2) is K2's to re-judge.
 - K2. *Judges of what keypoints carry (coding for machines).* H3c2 judged
   hands by the pose re-estimated on the decoded video; the mask or pose
   computed on the original against on the decoded foreground is the same

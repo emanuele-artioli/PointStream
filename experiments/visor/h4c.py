@@ -257,11 +257,17 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
             fits["G"] = {"network_sha256": g_info["sha256"], "fit": g_info["fit"], "data": g_info["data"]}
             add("G", {r: h3d.apply(g_net, upscaled, regions[r], device) for r in REGIONS})
             del g_net
-            net, info = h3d.fit(upscaled, truth, regions["o"], int(args.steps), nets["lpips"], device)
-            fits["oracle"] = info
-            add("oracle", {"o": h3d.apply(net, upscaled, regions["o"], device)})
-            del net
-            if not done and not any(n in FITTED for n in args.points[:args.points.index(name)]):
+            if args.networks:  # stage 2: the refitted networks, on both regions
+                for arm, (r_net, r_info) in load_networks(args.networks, name, device).items():
+                    fits[arm] = {"network_sha256": r_info["sha256"], "fit": r_info["fit"], "data": r_info["data"]}
+                    add(arm, {r: h3d.apply(r_net, upscaled, regions[r], device) for r in REGIONS})
+                    del r_net
+            if args.oracle:
+                net, info = h3d.fit(upscaled, truth, regions["o"], int(args.steps), nets["lpips"], device)
+                fits["oracle"] = info
+                add("oracle", {"o": h3d.apply(net, upscaled, regions["o"], device)})
+                del net
+            if args.oracle and not done and not any(n in FITTED for n in args.points[:args.points.index(name)]):
                 import torch
 
                 from experiments.background.g5d import enhancer
@@ -341,9 +347,216 @@ def command_run(args: argparse.Namespace) -> int:
                 "inspect": {"path": args.inspect_source, "sha256": file_sha256(Path(args.inspect))}},
         "generic": [{"path": p, "sha256": file_sha256(Path(p))} for p in args.generic],
         "settings": {"frames": int(args.frames), "items": args.items, "steps": int(args.steps), "points": args.points,
+                     "oracle": bool(args.oracle), "networks": [{"path": p, "sha256": file_sha256(Path(p))} for p in args.networks],
                      "train": h3d.TRAIN, "decision": DECISION},
         "items": [it["id"] for it in items], "restored_units": sorted(restored)})
     return 0
+
+
+# ----------------------------------------------------------------- stage 2: object footage and the refitted networks
+
+#: Object footage: as H3d's G (24 segments of 48 frames over at most 6 recordings of other participants), inside VISOR's
+#: dense train runs, where a human marked an object in contact at a keyframe of the run, placed by sha256.
+FOOTAGE_O: dict[str, Any] = {"segments": 24, "length": 48, "per_video": 4, "max_videos": 6, "edge_s": 5.0, "max_drift": 1}
+NETWORKS = ("G_O", "G_HO")
+
+
+def segment_starts(alignment: dict[int, dict[str, int]], first: int, last: int, length: int, max_drift: int) -> list[int]:
+    """VISOR numbers ``n`` in the run ``first..last`` whose ``length`` frames from ``n`` are placed on consecutive decoded
+    frames, each within ``max_drift`` (the training admission of 2026-10-06)."""
+    out = []
+    for n in range(first, last - length + 2):
+        placed = [alignment.get(k) for k in range(n, n + length)]
+        if any(p is None or abs(p["drift"]) > max_drift for p in placed):
+            continue
+        indices = [p["index"] for p in placed if p is not None]
+        if all(b == a + 1 for a, b in zip(indices, indices[1:])):
+            out.append(n)
+    return out
+
+
+def contacts(sparse: dict[str, Any]) -> dict[int, set[str]]:
+    """Per sparse (human) frame, the objects a hand is labelled in contact with (H1's `contact_objects`, frame by frame)."""
+    from src.segmentation import visor
+
+    out: dict[int, set[str]] = {}
+    for number, frame in visor.frames(sparse).items():
+        names = {a["id"]: a for a in frame.annotations}
+        for a in frame.annotations:
+            target = names.get(a.get("in_contact_object"))
+            if visor.native_class(a) in visor.HANDS and target is not None and visor.native_class(target) not in visor.HANDS:
+                out.setdefault(number, set()).add(visor.object_key(visor.native_class(target), str(target["name"])))
+    return out
+
+
+def command_footage(args: argparse.Namespace) -> int:
+    """Object footage: segments inside VISOR's dense train runs, O from the dense masks, published as H3d's footage units
+    (masks at G1's analysis size, each segment's decoded-plane sha256), so `h3d_component.training_pairs` reads them."""
+    from experiments.background import g1
+    from experiments.visor.h3d_component import EXCLUDED, VERIFIED, decode_segment, sha_int, spawn_pool, video_class
+    from src.segmentation import visor
+
+    paths = {Path(v).stem: Path(v) for v in args.video}
+    if bad := [v for v in paths if v.split("_")[0] in EXCLUDED]:
+        raise SystemExit(f"object footage excludes {EXCLUDED}: {bad}")
+    root = Path(args.annotations)
+    mapping_all = json.loads((root / "frame_mapping.json").read_text())
+    length = FOOTAGE_O["length"]
+    plans: dict[str, list[tuple[int, set[str], Any]]] = {}
+    classes = {}
+    for video, path in sorted(paths.items()):
+        cls, fps, frames = video_class(path)
+        if cls not in VERIFIED:
+            raise SystemExit(f"{video} is {cls}, not of the evaluation's classes {VERIFIED}")
+        classes[video] = {"class": cls, "fps": fps, "frames": frames}
+        dense = visor.load_annotations(root / "dense" / f"{video}_interpolations.zip")
+        sparse = visor.load_annotations(root / "sparse" / f"{video}.json")
+        anchors = visor.keyframe_anchors(dense, mapping_all[video], fps)
+        alignment = visor.frame_alignment(dense, anchors, fps / visor.extraction_rate(fps))
+        touched = contacts(sparse)
+        edge = int(round(FOOTAGE_O["edge_s"] * fps))
+        options = []
+        for first, last in visor.runs(visor.frames(dense)):
+            handled = set().union(*(touched.get(n, set()) for n in range(first, last + 1)))
+            if not handled:
+                continue
+            for n in segment_starts(alignment, first, last, length, FOOTAGE_O["max_drift"]):
+                index = alignment[n]["index"]
+                if edge <= index and index + length <= frames - edge:
+                    options.append((n, handled, alignment))
+        plans[video] = options
+    order = sorted((v for v in plans if plans[v]), key=lambda v: sha_int(f"{SEED}:objects:{v}"))[:FOOTAGE_O["max_videos"]]
+    segments: list[dict[str, Any]] = []
+    for video in order:
+        taken: list[int] = []
+        for attempt in range(1000):
+            if len(taken) == FOOTAGE_O["per_video"]:
+                break
+            n, handled, alignment = plans[video][sha_int(f"{SEED}:objects:{video}:{attempt}") % len(plans[video])]
+            if all(abs(n - m) >= length for m in taken):
+                taken.append(n)
+                first_index = alignment[n]["index"]
+                segments.append({"video": video, "fps": classes[video]["fps"], "first_index": first_index,
+                                 "last_index": first_index + length - 1, "first_visor": n, "handled": sorted(handled),
+                                 "max_drift": max(abs(alignment[k]["drift"]) for k in range(n, n + length))})
+    segments = segments[:int(args.segments)]
+    if len(segments) < min(int(args.segments), FOOTAGE_O["segments"]):
+        raise SystemExit(f"only {len(segments)} object segments fit in {order}")
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
+    began = time.time()
+    masks, records = [], []
+    docs: dict[str, dict[str, Any]] = {}
+    with spawn_pool() as pool:
+        for k, seg in enumerate(segments):
+            dec = pool.submit(decode_segment, {**seg, "path": str(paths[seg["video"]]), "threads": allowance}).result()
+            if seg["video"] not in docs:
+                docs = {seg["video"]: visor.load_annotations(root / "dense" / f"{seg['video']}_interpolations.zip")}
+            clip = visor.clip_masks(docs[seg["video"]], seg["first_visor"], length, fps=seg["fps"])
+            regions = object_regions(clip, length, set(seg["handled"]))
+            small = np.stack([g1.to_analysis(m) for m in regions])
+            masks.append(small)
+            records.append({**seg, **dec, "frames": length, "share_r": float(small.mean()),
+                            "frames_with_r": int(small.any((1, 2)).sum())})
+            progress(k + 1)
+    stack = np.concatenate(masks)
+    unit = "generic@O"
+    arrays = {"masks": np.packbits(stack, axis=-1), "segment": np.repeat(np.arange(len(masks)), [len(m) for m in masks])}
+    meta = {"unit": unit, "target": "generic", "arm": "O", "videos": classes, "segments": records, "shape": list(stack.shape),
+            "settings": FOOTAGE_O, "source": "VISOR dense train interpolations (objects in contact at a keyframe of the run)",
+            "annotations": {name: file_sha256(root / name) for name in ["frame_mapping.json"]
+                            + [f"dense/{v}_interpolations.zip" for v in order] + [f"sparse/{v}.json" for v in order]}}
+    save_unit(scratch / "publish", "footage", unit, arrays, meta)
+    write_json(stage_dir() / "h4c.json", {"command": "footage", "units": [unit], "segments": len(records),
+                                          "videos": order, "candidates": {v: len(o) for v, o in plans.items()},
+                                          "seconds": round(time.time() - began, 1)})
+    return 0
+
+
+def command_networks(args: argparse.Namespace) -> int:
+    """G_O (object footage) and G_HO (G's hand footage plus the object footage, one network) per point, G's size and
+    steps (H3d's `h3d_component.command_generic`)."""
+    import torch
+
+    from experiments.visor.h3d_component import SIZES, common_setup, first_segments, load_footage, load_lpips_loss, training_pairs
+
+    device = common_setup(args)
+    footage = load_footage(args.footage)
+    objects = [v for u, v in footage.items() if u == "generic@O"]
+    hands = [v for u, v in footage.items() if u == "generic@G"]
+    if len(objects) != 1 or len(hands) != 1:
+        raise SystemExit(f"--footage: the object footage (generic@O) and G's (generic@G), found {sorted(footage)}")
+    sources = {"O": first_segments(*objects[0], int(args.segments)), "G": first_segments(*hands[0], int(args.segments))}
+    paths = {Path(v).stem: Path(v) for v in args.video}
+    lpips_net = load_lpips_loss(args.lpips_backbone, device)
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    publish = scratch / "publish" / "networks"
+    publish.mkdir(parents=True, exist_ok=True)
+    began, rows = time.time(), []
+    for k, name in enumerate(args.point.split(",")):
+        if name not in FITTED:
+            raise SystemExit(f"{name} is not one of G's points {sorted(FITTED)}")
+        _, value, scale = parse_point(name)
+        pairs, data = {}, {}
+        for key, (meta, a) in sources.items():
+            xs, ts, rs, data[key] = training_pairs(args, meta, a, paths, value, scale, scratch / "work" / key, device)
+            pairs[key] = (xs, ts, rs)
+        sets = {"G_O": [pairs["O"]], "G_HO": [pairs["G"], pairs["O"]]}
+        for arm in NETWORKS:
+            xs = np.concatenate([p[0] for p in sets[arm]])
+            ts = np.concatenate([p[1] for p in sets[arm]])
+            rs = [r for p in sets[arm] for r in p[2]]
+            net, info = h3d.fit(xs, ts, rs, int(args.steps), lpips_net, device, *SIZES["L"])
+            target = publish / f"{arm}-{name.replace('@', '-').replace('/', '_')}.pt"
+            torch.save(net.state_dict(), target)
+            rows.append({"arm": arm, "point": name, "network": target.name, "sha256": file_sha256(target), "fit": info,
+                         "pairs": int(len(xs)), "data": {key: data[key] for key in (("O",) if arm == "G_O" else ("G", "O"))}})
+            del net, xs, ts, rs
+        write_json(publish / "networks.json", {"footage": {key: {"unit": m["unit"], "npz_sha256": m["npz_sha256"]}
+                                                           for key, (m, _) in sources.items()}, "rows": rows})
+        del pairs
+        progress(k + 1)
+    from experiments.visor.h3d_component import gpu_record
+
+    write_json(stage_dir() / "h4c.json", {"command": "networks", "rows": rows, "seconds": round(time.time() - began, 1),
+                                          "image_sha256": args.image_sha256, "video_sha256": args.video_sha256, **gpu_record()})
+    return 0
+
+
+def load_networks(tars: list[str], name: str, device: str) -> dict[str, tuple[Any, dict[str, Any]]]:
+    """G_O's and G_HO's networks for the point ``name`` from the networks jobs' archives (sha256 checked)."""
+    import hashlib
+    import io
+    import tarfile
+
+    import torch
+
+    from experiments.background.g5d import enhancer
+    from experiments.visor.h3d_component import SIZES
+
+    out: dict[str, tuple[Any, dict[str, Any]]] = {}
+    for path in tars:
+        with tarfile.open(path) as tar:
+            members = {m.name: m for m in tar.getmembers()}
+            index = members.get("publish/networks/networks.json")
+            if index is None:
+                continue
+            handle = tar.extractfile(index)
+            assert handle is not None
+            for row in json.loads(handle.read())["rows"]:
+                if row["point"] != name:
+                    continue
+                blob = tar.extractfile(members[f"publish/networks/{row['network']}"])
+                assert blob is not None
+                data = blob.read()
+                if hashlib.sha256(data).hexdigest() != row["sha256"]:
+                    raise RuntimeError(f"{row['arm']} for {name}: sha256 differs")
+                net = enhancer(*SIZES["L"]).to(device)
+                net.load_state_dict(torch.load(io.BytesIO(data), map_location=device, weights_only=True))
+                out[row["arm"]] = (net.eval(), {"sha256": row["sha256"], "fit": row["fit"], "data": row["data"]})
+    if set(out) != set(NETWORKS):
+        raise SystemExit(f"networks for {name}: found {sorted(out)} in {tars}")
+    return out
 
 
 # ----------------------------------------------------------------- validation
@@ -369,6 +582,8 @@ def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
         "every_row_scored_on_o": all(np.isfinite(a["lpips_o"][:, o]).all() for _, a, o in present),
         "identity_reproduces_base": not fitted or (bool(first) and all(m["checks"]["identity_reproduces_base"] for m in first)),
         "fit_ran_every_step": all(m["fits"]["oracle"]["curve"][-1]["step"] == m["fits"]["oracle"]["steps"] for m, _, _ in fitted),
+        "networks_applied_at_fitted_points": not result["settings"].get("networks") or all(
+            set(NETWORKS) <= set(m["rows"]) for m, _ in units if m["name"] in FITTED),
         # Fitted on these very frames with LPIPS in the loss, the oracle should not raise LPIPS_O.
         "oracle_lpips_not_worse": all(np.nanmean(a["lpips_o"][j][o]) <= np.nanmean(a["lpips_o"][0][o]) + 1e-3 for j, a, o in oracle),
         "dcvc_decodes_deterministic": all(p["deterministic"] and p["decoder_matches_encoder_intra"] for p in dcvc),
@@ -376,10 +591,37 @@ def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
     }
 
 
+def validate_stage2(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
+    from experiments.visor.h3d_component import SIZES, size_parameters
+
+    if result["command"] == "footage":
+        units = load_units([str(stage / "published.tar")], "footage")
+        return {
+            "unit_present": len(units) == 1 and units[0][0]["npz_hash_ok"],
+            "every_segment_masked": all(s["frames"] == FOOTAGE_O["length"] for m, _ in units for s in m["segments"]),
+            "drift_admitted": all(s["max_drift"] <= FOOTAGE_O["max_drift"] for m, _ in units for s in m["segments"]),
+            # Each segment lies in a run where a human marked a handled object, so most frames should show one.
+            "objects_found": all(sum(s["frames_with_r"] for s in m["segments"]) >= 0.5 * m["shape"][0] for m, _ in units),
+            "other_participants_only": all(v.split("_")[0] not in ("P01", "P02", "P03", "P09") for m, _ in units for v in m["videos"]),
+        }
+    rows = result["rows"]
+    return {
+        "intended_gpu": tuple(result["gpu_capability"]) >= (8, 6),
+        "both_networks_per_point": bool(rows) and all({r["arm"] for r in rows if r["point"] == p} == set(NETWORKS)
+                                                      for p in {r["point"] for r in rows}),
+        "every_fit_ran": all(r["fit"]["curve"][-1]["step"] == r["fit"]["steps"] for r in rows),
+        "losses_finite": all(np.isfinite([c["mse_fixed"] for c in r["fit"]["curve"]]).all() for r in rows),
+        "size_as_g": all(r["fit"]["parameters"] == size_parameters(*SIZES["L"]) for r in rows),
+        "footage_decodes_deterministic": all(d["deterministic"] for r in rows for d in r["data"].values()),
+        "shared_network_sees_both": all(set(r["data"]) == {"G", "O"} for r in rows if r["arm"] == "G_HO"),
+    }
+
+
 def command_validate(args: argparse.Namespace) -> int:
     stage = stage_dir()
     result = json.loads((stage / "h4c.json").read_text())
-    checks = {k: bool(v) for k, v in validate(stage, result).items()}  # numpy booleans do not serialize
+    found = validate(stage, result) if result["command"] == "run" else validate_stage2(stage, result)
+    checks = {k: bool(v) for k, v in found.items()}  # numpy booleans do not serialize
     report = {"passed": all(checks.values()), "checks": checks}
     target = os.environ.get("PS_VALIDATION_PATH")
     if target:
@@ -450,6 +692,34 @@ def stage1(o: dict[str, Any]) -> dict[str, Any]:
     return {"oracle": oracle, "G": g, "next": "stage 2: G_O and G_HO"}
 
 
+def mean_bd_against(test: dict[str, list[dict[str, Any]]], anchor: dict[str, list[dict[str, Any]]]) -> float | None:
+    """Mean over items of ``test``'s BD-rate on LPIPS against ``anchor``'s points (its concave hull)."""
+    values = [h3d.compare(test[i], anchor[i], "lpips")["bd"] for i in test if i in anchor]
+    known = [v for v in values if v is not None]
+    return float(np.mean(known)) if known else None
+
+
+def stage2(o: dict[str, str], r: dict[str, str], versus: dict[str, float | None]) -> dict[str, Any]:
+    """`DECISION['stage2']` from each arm's verdict on O and on R and the pairwise mean BD-rates ``versus``
+    (``"A>B:o"``: A against B on O; ``"G_HO>G:r"``: the shared network against G on the hands)."""
+    standing = [a for a in ("G", "G_HO", "G_O") if o.get(a) == "passes"]
+    if not standing:
+        return {"objects": "DCVC-UF off the shelf (generative completion reported, not built)", "hands": "G", "networks": 1}
+    choice = standing[0]
+    for later in standing[1:]:
+        bd = versus.get(f"{later}>{choice}:o")
+        if bd is not None and bd <= DECISION["beats_by"]:
+            choice = later
+    if choice == "G":
+        return {"objects": "G", "hands": "G", "networks": 1}
+    if choice == "G_HO":
+        cost = versus.get("G_HO>G:r")
+        keeps = r.get("G_HO") == "passes" and cost is not None and cost < DECISION["keeps_hands_below"]
+        return {"objects": "G_HO", "hands": "G_HO" if keeps else "G", "networks": 1 if keeps else 2,
+                "shared_keeps_hands": keeps}
+    return {"objects": "G_O", "hands": "G", "networks": 2}
+
+
 def command_report(args: argparse.Namespace) -> int:
     units = load_units(args.run, "point")
     h1 = {row["id"]: row for row in json.loads(Path(args.h1_report).read_text())["per_item"]}
@@ -460,7 +730,14 @@ def command_report(args: argparse.Namespace) -> int:
     # On R, G and the oracle's base points against H3d's bar on R (its twenty points, H3c's units), and the base points
     # and G checked against H3d's numbers: the same code path reproduces the hands' result.
     bar_r = {item: [{k: q[k] for k in ("name", "kbps", "lpips", "dists", "psnr")} for q in rows] for item, rows in h3d_report["bar"].items()}
-    report_r = verdicts({"G": by_region["r"].get("G", {})}, bar_r)
+    report_r = verdicts({a: by_region["r"][a] for a in ("G", *NETWORKS) if a in by_region["r"]}, bar_r)
+    decision2 = None
+    if all(a in o_arms for a in NETWORKS):
+        pairs = [("G_HO", "G"), ("G_O", "G"), ("G_O", "G_HO")]
+        versus = {f"{a}>{b}:o": mean_bd_against(o_arms[a], o_arms[b]) for a, b in pairs}
+        versus["G_HO>G:r"] = mean_bd_against(by_region["r"]["G_HO"], by_region["r"]["G"])
+        decision2 = {"versus": versus, **stage2({a: v["verdict"]["verdict"] for a, v in report_o.items()},
+                                                 {a: v["verdict"]["verdict"] for a, v in report_r.items()}, versus)}
     cross: dict[str, Any] = {}
     for item, rows in by_region["r"].get("bar", {}).items():
         ref = {q["name"].replace("reference@", "dcvc@"): q for q in bar_r.get(item, [])}
@@ -475,14 +752,14 @@ def command_report(args: argparse.Namespace) -> int:
     holds = all(abs(e["lpips_gap"]) <= 0.005 and abs(e.get("rate_ratio", 1.0) - 1) <= 0.05 for c in cross.values() for e in c.values())
     pixels = {meta["item"]: {"object_frames": meta["object_frames"], "object_pixels_mean": float(np.mean(a["pixels_o"][a["pixels_o"] > 0])),
                              "handled": meta["contact"]["handled"]} for meta, a in units}
-    report = {"decision_rule": DECISION, "stage1": stage1(report_o), "o": report_o, "r": report_r,
+    report = {"decision_rule": DECISION, "stage1": stage1(report_o), "stage2": decision2, "o": report_o, "r": report_r,
               "bar_o": by_region["o"].get("bar", {}), "cross_check_r": cross, "cross_check_holds": holds, "objects": pixels,
               "runs": [{"path": p, "sha256": file_sha256(Path(p))} for p in args.run],
               "h1_report_sha256": file_sha256(Path(args.h1_report)), "h3d_report_sha256": file_sha256(Path(args.h3d_report))}
     out = Path(args.out or stage_dir())
     out.mkdir(parents=True, exist_ok=True)
     write_json(out / "h4c-report.json", report)
-    print(json.dumps({"stage1": report["stage1"], "o": {a: s["verdict"] for a, s in report_o.items()},
+    print(json.dumps({"stage1": report["stage1"], "stage2": decision2, "o": {a: s["verdict"] for a, s in report_o.items()},
                       "r": {a: s["verdict"] for a, s in report_r.items()}, "cross_check_holds": holds}, indent=1, default=str))
     return 0
 
@@ -514,6 +791,21 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--decoder", default="dav1d")
     run.add_argument("--encoder", default="SvtAv1EncApp")
     run.add_argument("--preset", default="4")
+    run.add_argument("--networks", action="append", default=[], help="stage 2: the networks jobs' published.tar (G_O, G_HO)")
+    run.add_argument("--oracle", type=int, default=1, help="0: no oracle fit (stage 2)")
+    footage = commands.add_parser("footage")
+    footage.add_argument("--video", action="append", required=True)
+    footage.add_argument("--annotations", required=True, help="frame_mapping.json, dense/<video>_interpolations.zip, sparse/<video>.json")
+    footage.add_argument("--segments", default=str(FOOTAGE_O["segments"]))
+    networks = commands.add_parser("networks")
+    networks.add_argument("--footage", action="append", required=True, help="the object footage's and G's footage's published.tar")
+    networks.add_argument("--video", action="append", default=[])
+    networks.add_argument("--point", required=True)
+    networks.add_argument("--steps", required=True)
+    networks.add_argument("--segments", default="1000", help="each footage's first N segments (smoke)")
+    networks.add_argument("--image-ckpt", required=True)
+    networks.add_argument("--video-ckpt", required=True)
+    networks.add_argument("--lpips-backbone", required=True)
     commands.add_parser("validate")
     report = commands.add_parser("report")
     report.add_argument("--run", action="append", required=True)
@@ -521,7 +813,8 @@ def main(argv: list[str] | None = None) -> int:
     report.add_argument("--h3d-report", required=True)
     report.add_argument("--out", default="")
     args = parser.parse_args(argv)
-    return {"run": command_run, "validate": command_validate, "report": command_report}[args.command](args)
+    return {"run": command_run, "footage": command_footage, "networks": command_networks, "validate": command_validate,
+            "report": command_report}[args.command](args)
 
 
 if __name__ == "__main__":
