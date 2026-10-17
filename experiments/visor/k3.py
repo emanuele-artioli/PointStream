@@ -41,6 +41,7 @@ BILLED = ("C", "D")  # the arms a keypoint warp would replace: they carry H2's c
 POSE_BUDGET = "100"  # H2's WiLoR choice named for H3 (H3c2's keypoints)
 KEYPOINT_GRID = (0.0, 0.25, 0.5, 1.0)  # kbps, beside H2's rate: where C/D would pass if the keypoints cost less
 PASTED = ("C", "D", "F")  # the arms whose reference changes inside the hand region only
+FLOW_TOLERANCE = 0.25  # luma levels: the validator's allowance for resampling noise where the hand stands still
 FLOW_KEYPOINTS = "gauss:33.3|10Hz-linear|pca12|q8|previous"  # H2's best WiLoR coding at about 1 kbps (+11% 2D on HOT3D)
 METRICS = ("lpips", "dists", "psnr")
 SEED = "pointstream-k3"
@@ -309,9 +310,10 @@ def validate_code(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
                                   for m, _ in units for p in m["points"] if p["arm"] != "A"),
         "hand_arms_paste_hand_pixels": all(p["pasted_share"] and p["pasted_share"] > 0 for m, _ in units for p in m["points"]
                                            if p["arm"] in PASTED and m["hand_frames"] > 0),
-        # The flow warp moves the source's previous frame closer to its next one inside R(t0) than no warp does.
-        "flow_warp_reduces_its_own_error": all(p["flow_error"]["warped"] < p["flow_error"]["unwarped"] for m, _ in units
-                                               for p in m["points"] if p["arm"] == "F" and p.get("flow_error")),
+        # The flow warp brings the source's previous frame no further from its next one inside R(t0) than no warp does,
+        # up to a quarter luma level (a still hand leaves only resampling noise; a broken flow costs many levels).
+        "flow_warp_does_not_add_error": all(p["flow_error"]["warped"] <= p["flow_error"]["unwarped"] + FLOW_TOLERANCE
+                                            for m, _ in units for p in m["points"] if p["arm"] == "F" and p.get("flow_error")),
         "rate_rises_with_qp": all(a["kbps"] < b["kbps"] for m, _ in units for a in m["points"] for b in m["points"]
                                   if a["arm"] == b["arm"] and a["scale"] == b["scale"] and a["qp"] < b["qp"]),
     }
