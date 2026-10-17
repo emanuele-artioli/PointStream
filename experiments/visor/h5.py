@@ -1152,7 +1152,8 @@ def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_
 def summary(items: dict[str, dict[str, Any]]) -> dict[str, Any]:
     from experiments.visor.h3 import bootstrap_mean
 
-    rng = np.random.default_rng(5)
+    import zlib
+
     keys = sorted({k for it in items.values() for k in it["comparisons"]})
     out: dict[str, Any] = {}
     for key in keys:
@@ -1160,7 +1161,8 @@ def summary(items: dict[str, dict[str, Any]]) -> dict[str, Any]:
         bds = np.array([c["bd"] for c in cs.values() if c["bd"] is not None], float)
         out[key] = {"per_item": {i: c["bd"] if c["bd"] is not None else c["where"] for i, c in cs.items()},
                     "items": len(cs), "items_below_zero": sum(below_zero(c) for c in cs.values()),
-                    "bd": bootstrap_mean(bds, rng) if len(bds) else None, "bd_items": len(bds)}
+                    "bd": bootstrap_mean(bds, np.random.default_rng(zlib.crc32(key.encode())))  # per key: reproducible
+                    if len(bds) else None, "bd_items": len(bds)}
     def verdict(variant: str) -> str:
         head = out.get(f"{variant}|{DECISION['anchor']}|{DECISION['metric']}")
         if not head or head["items"] < 4:
@@ -1216,10 +1218,10 @@ def command_report(args: argparse.Namespace) -> int:
         if result["kind"] != "score" or result["limit_frames"] > 0:
             raise SystemExit(f"{path}: not a full score stage")
         d = data.setdefault(result["item"], {"rows": [], "anchors": [], "mask": None, "sources": []})
-        seen = {r["pair"] for r in d["rows"]}
-        d["rows"] += [r for r in result["rows"] if r["pair"] not in seen]
+        seen = {(r["pair"], r.get("mask_scale", 0)) for r in d["rows"]}  # a pair once per mask scale
+        d["rows"] += [r for r in result["rows"] if (r["pair"], r.get("mask_scale", 0)) not in seen]
         d["anchors"] += result["anchors"]
-        d["mask"] = result["foreground_manifest"]["mask_cost"]
+        d["mask"] = d["mask"] or result["foreground_manifest"]["mask_cost"]
         d["sources"].append({"path": path, "job_id": result.get("job_id"), "git_head": result.get("git_head"),
                              "gpu": result.get("gpu")})
     items = {i: item_report(d["rows"], d["anchors"], d["mask"]["kbps"]) for i, d in data.items()}
