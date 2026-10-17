@@ -36,10 +36,12 @@ from experiments.visor.h3b import DISTS_PAD, dists_crops, load_dists, scaled_siz
 from experiments.visor.h3c import (QPS, SCALES, Scorer, decode_windows, downscale_mask, downscale_planes, load_window,
                                    point_summary, run_tree_script)
 
-ARMS = ("A", "B", "C", "D", "E")  # `k3_ref.ARMS`
+ARMS = ("A", "B", "C", "D", "E", "F")  # `k3_ref.ARMS`
 BILLED = ("C", "D")  # the arms a keypoint warp would replace: they carry H2's coded keypoints
 POSE_BUDGET = "100"  # H2's WiLoR choice named for H3 (H3c2's keypoints)
 KEYPOINT_GRID = (0.0, 0.25, 0.5, 1.0)  # kbps, beside H2's rate: where C/D would pass if the keypoints cost less
+PASTED = ("C", "D", "F")  # the arms whose reference changes inside the hand region only
+FLOW_KEYPOINTS = "gauss:33.3|10Hz-linear|pca12|q8|previous"  # H2's best WiLoR coding at about 1 kbps (+11% 2D on HOT3D)
 METRICS = ("lpips", "dists", "psnr")
 SEED = "pointstream-k3"
 
@@ -60,6 +62,19 @@ DECISION: dict[str, Any] = {
     "beside": ["B vs A (the memory's worth)", "C, D vs B unbilled (the hand pixels' value on a fixed path)",
                "E vs B (the most any reference saves: the motion-bit share's counterpart)", "C, D billed vs the pixel envelope",
                "C, D vs A unbilled and at lower keypoint rates"],
+}
+
+
+#: K3b's rule, fixed before its run (docs/experiments.md, 2026-10-17).
+FLOW_DECISION: dict[str, Any] = {
+    "gate": "F (x̂(t0-1) warped to t0 inside R(t0-1) | R(t0) by DIS flow on the source) unbilled against A on LPIPS_R, "
+            "hull against hull, h3d.arm_verdict",
+    "then": {"fails": "hands closed for keypoint conditioning at every keypoint rate; move to tennis players",
+             "passes": f"F billed at H2's {FLOW_KEYPOINTS} by the same verdict: passes -> the MANO warp at that point is next; "
+                       "otherwise hands close with the keypoint rate named",
+             "unclear": "to the user"},
+    "beside": ["F vs B", "F billed at about 1.01 and 1.93 kbps vs A", "K3's C vs F (appearance beyond motion)",
+               "the flow's own warp error inside R(t0)"],
 }
 
 
@@ -171,7 +186,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
                                "kbps": bits["bits"] / seconds / 1000,
                                "kbps_r_estimated": bits["estimated_region_bits"] / seconds / 1000,
                                "estimate_over_actual": bits["estimate_over_actual"], "nals": len(rec["nals"]),
-                               "decoded_sha256": file_sha256(Path(rec["decoded"])), "pasted_share": rec["pasted_share"],
+                               "decoded_sha256": file_sha256(Path(rec["decoded"])), "pasted_share": rec["pasted_share"], "flow_error": rec.get("flow_error"),
                                "real_stream_sha256": real["stream_sha256"], "real_bytes": real["bytes"]})
                 os.remove(point_work / "rgb.npy")
             points[-1]["ref_seconds"] = coded["seconds"]
@@ -292,8 +307,11 @@ def validate_code(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
         # Every substituted reference changes the decode; C and D paste some hand at every point with hands.
         "arms_differ_from_a": all(p["decoded_sha256"] != at(m, "A")[(p["qp"], p["scale"])]["decoded_sha256"]
                                   for m, _ in units for p in m["points"] if p["arm"] != "A"),
-        "c_and_d_paste_hand_pixels": all(p["pasted_share"] and p["pasted_share"] > 0 for m, _ in units for p in m["points"]
-                                         if p["arm"] in BILLED and m["hand_frames"] > 0),
+        "hand_arms_paste_hand_pixels": all(p["pasted_share"] and p["pasted_share"] > 0 for m, _ in units for p in m["points"]
+                                           if p["arm"] in PASTED and m["hand_frames"] > 0),
+        # The flow warp moves the source's previous frame closer to its next one inside R(t0) than no warp does.
+        "flow_warp_reduces_its_own_error": all(p["flow_error"]["warped"] < p["flow_error"]["unwarped"] for m, _ in units
+                                               for p in m["points"] if p["arm"] == "F" and p.get("flow_error")),
         "rate_rises_with_qp": all(a["kbps"] < b["kbps"] for m, _ in units for a in m["points"] for b in m["points"]
                                   if a["arm"] == b["arm"] and a["scale"] == b["scale"] and a["qp"] < b["qp"]),
     }
@@ -322,7 +340,8 @@ def item_rows(units: list[tuple[dict[str, Any], dict[str, np.ndarray]]]) -> dict
         for j, p in enumerate(meta["points"]):
             row = {"name": p["name"], "qp": p["qp"], "scale": p["scale"], "kbps": float(p["kbps_r"]),
                    "kbps_estimated": float(p["kbps_r_estimated"]), **point_summary(a, j, hand),
-                   "lpips_frames": a["lpips"][j][hand], "real_stream_sha256": p["real_stream_sha256"]}
+                   "lpips_frames": a["lpips"][j][hand], "real_stream_sha256": p["real_stream_sha256"],
+                   "flow_error": p.get("flow_error")}
             out.setdefault(meta["item"], {}).setdefault(p["arm"], []).append(row)
     return out
 
@@ -360,8 +379,57 @@ def decide(gate: dict[str, dict[str, Any]]) -> dict[str, Any]:
     return {"k3": verdicts[best]["verdict"], "better_arm": best, "arms": verdicts, "then": DECISION["then"][verdicts[best]["verdict"]]}
 
 
+def decide_flow(unbilled: dict[str, Any], billed_low: dict[str, Any]) -> dict[str, Any]:
+    """K3b: F unbilled against A; if it passes, F billed at H2's ~1 kbps point."""
+    gate = unbilled["verdict"]
+    if gate == "incomplete":
+        return {"k3b": "incomplete"}
+    if gate != "passes":
+        return {"k3b": gate, "then": FLOW_DECISION["then"][gate]}
+    low = billed_low["verdict"]
+    return {"k3b": "passes", "billed_at_low_rate": low,
+            "then": "build the MANO warp at that keypoint rate (its own rule)" if low == "passes"
+            else "hands close; the keypoint rate is the obstacle"}
+
+
+def flow_report(items: dict[str, dict[str, list[dict[str, Any]]]], earlier: dict[str, dict[str, list[dict[str, Any]]]],
+                rates: dict[str, float]) -> dict[str, Any]:
+    """K3b's section: F against A unbilled (the gate), billed at H2's low and chosen points, against B, and K3's C against F."""
+    def arm(name: str, kbps: float = 0.0, source: dict[str, dict[str, list[dict[str, Any]]]] = items) -> dict[str, list[dict[str, Any]]]:
+        return {item: billed(by_arm[name], kbps) for item, by_arm in source.items() if name in by_arm}
+
+    a = arm("A")
+    out: dict[str, Any] = {"decision_rule": FLOW_DECISION, "keypoint_kbps": rates,
+                           "F_unbilled_vs_A": versus(arm("F"), a), "F_vs_B": versus(arm("F"), arm("B")),
+                           **{f"F_billed_{name}_vs_A": versus(arm("F", kbps), a) for name, kbps in rates.items()}}
+    if earlier:
+        out["K3_C_unbilled_vs_F"] = versus(arm("C", source=earlier), arm("F"))
+    errors = [p["flow_error"] for by_arm in items.values() for p in by_arm.get("F", []) if p.get("flow_error")]
+    if errors:
+        out["flow_error"] = {k: float(np.mean([e[k] for e in errors])) for k in ("warped", "unwarped")}
+    out["decision"] = decide_flow(out["F_unbilled_vs_A"]["verdict"], out["F_billed_low_vs_A"]["verdict"])
+    return out
+
+
 def command_report(args: argparse.Namespace) -> int:
     items = item_rows(load_units(args.code, "code"))
+    if any("F" in by_arm for by_arm in items.values()):
+        code = json.loads(Path(args.pose_code).read_text())
+        low = [r for r in code["rows"]["visor"]["wilor"] if r["key"] == FLOW_KEYPOINTS]
+        rates = {"low": float(low[0]["kbps"]), "chosen": float(code["choices"]["wilor"][POSE_BUDGET]["visor_kbps"])}
+        earlier = item_rows(load_units(args.k3, "code")) if args.k3 else {}
+        section = flow_report(items, earlier, rates)
+        for name, entry in section.items():
+            if isinstance(entry, dict) and "verdict" in entry:
+                numbers = [e["lpips"]["bd"] for e in entry["items"].values() if e["lpips"]["bd"] is not None]
+                if numbers:
+                    entry["verdict"]["mean_bd_ci"] = bootstrap_mean(np.array(numbers), np.random.default_rng(seed_of(SEED)), RESAMPLES)
+        out = Path(args.out or stage_dir())
+        out.mkdir(parents=True, exist_ok=True)
+        write_json(out / "k3b-report.json", {**section, "runs": [{"path": p, "sha256": file_sha256(Path(p))} for p in [*args.code, *args.k3]]})
+        print(json.dumps({k: (v["verdict"] if isinstance(v, dict) and "verdict" in v else v) for k, v in section.items()
+                          if k != "decision_rule"}, indent=1, default=str))
+        return 0
     h1 = {row["id"]: row for row in json.loads(Path(args.h1_report).read_text())["per_item"]}
     keypoint_kbps = float(json.loads(Path(args.pose_code).read_text())["choices"]["wilor"][POSE_BUDGET]["visor_kbps"])
     bar: dict[str, list[dict[str, Any]]] = {}
@@ -466,6 +534,7 @@ def main(argv: list[str] | None = None) -> int:
     report.add_argument("--h3c", action="append", required=True, help="H3c's anchor+reference published.tar (the pixel envelope)")
     report.add_argument("--h1-report", required=True)
     report.add_argument("--pose-code", required=True, help="H2's code.json (the keypoints' rate)")
+    report.add_argument("--k3", action="append", default=[], help="K3's published.tar, for K3b's C against F")
     report.add_argument("--out", default="")
     args = parser.parse_args(argv)
     return {"code": command_code, "validate": command_validate, "report": command_report}[args.command](args)

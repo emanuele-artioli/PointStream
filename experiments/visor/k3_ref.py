@@ -15,7 +15,8 @@ Arms (`ARMS`): ``A`` unmodified (recurrent memory); every other arm calls ``clea
 ``add_ref_feature_from_frame(ref)`` before each P NAL coding frames t0..t0+7, with ``ref`` built from the previous
 decoded frame x̂(t0-1) (8-bit 4:2:0, as a decoder holds it) and the source:
 ``B`` x̂(t0-1); ``C`` x̂(t0-1) with the source's frame t0 inside R(t0-1) | R(t0); ``D`` the same at the group's middle
-frame; ``E`` the source's frame t0. Per arm: the decoded window (8-bit 4:2:0, the worker's conversion) and per NAL
+frame; ``E`` the source's frame t0; ``F`` (K3b) x̂(t0-1) warped to t0 inside R(t0-1) | R(t0) by DIS flow between the
+source's frames t0 and t0-1 (the best motion a keypoint warp could give, no appearance). Per arm: the decoded window (8-bit 4:2:0, the worker's conversion) and per NAL
 the model's estimated bits and their share on R (`h3c_bits`' cells).
 """
 
@@ -34,7 +35,9 @@ import numpy as np
 sys.path.append(str(Path(__file__).resolve().parent))
 from h3c_bits import FRAME_DELAY, PAD, load_state, region_bits, schedule, spread_z  # noqa: E402
 
-ARMS = ("A", "B", "C", "D", "E")
+ARMS = ("A", "B", "C", "D", "E", "F")
+FLOW_PAD = 64  # `experiments.visor.h3.FLOW_PAD`
+FLOW_SCALE = 0.5  # `experiments.visor.h3.FLOW_SCALE`, used at full resolution only (smaller frames keep their own)
 
 
 def target_frame(arm: str, frames: list[int]) -> int:
@@ -45,6 +48,81 @@ def target_frame(arm: str, frames: list[int]) -> int:
 def reference_mask(region: np.ndarray, previous: int, target: int) -> np.ndarray:
     """Where the reference shows the source: the hand's pixels at the previous frame and at the target."""
     return np.asarray(region[previous]) | np.asarray(region[target])
+
+
+def planes444(p: np.ndarray, width: int, height: int) -> np.ndarray:
+    """(H, W, 3) uint8 YCbCr of one 4:2:0 frame, chroma upsampled by nearest neighbour (``ycbcr420_to_444_np``)."""
+    chroma = p[height:].reshape(2, height // 2, width // 2).repeat(2, 1).repeat(2, 2)
+    return np.ascontiguousarray(np.concatenate([p[:height][None], chroma]).transpose(1, 2, 0))
+
+
+def flow_box(a: np.ndarray, b: np.ndarray, pad: int = FLOW_PAD) -> tuple[int, int, int, int] | None:
+    """`experiments.visor.h3.flow_box`, None when both masks are empty."""
+    boxes = []
+    for m in (a, b):
+        ys, xs = np.nonzero(m)
+        if len(xs):
+            boxes.append((int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1))
+    if not boxes:
+        return None
+    h, w = a.shape
+    x0, y0 = max(0, min(x[0] for x in boxes) - pad), max(0, min(x[1] for x in boxes) - pad)
+    x1, y1 = min(w, max(x[2] for x in boxes) + pad), min(h, max(x[3] for x in boxes) + pad)
+    if (x1 - x0) % 2:
+        x1 = x1 + 1 if x1 < w else x1 - 1
+    if (y1 - y0) % 2:
+        y1 = y1 + 1 if y1 < h else y1 - 1
+    return x0, y0, x1, y1
+
+
+def dis_flow(target: np.ndarray, source: np.ndarray, scale: float) -> np.ndarray:
+    """`experiments.visor.h3.dis_flow`: backward flow, ``target[y, x] ≈ source[y + f_y, x + f_x]``."""
+    import cv2
+
+    dis = cv2.DISOpticalFlow_create(cv2.DISOPTICAL_FLOW_PRESET_MEDIUM)  # type: ignore[attr-defined]
+    target, source = np.ascontiguousarray(target), np.ascontiguousarray(source)
+    h, w = target.shape
+    if scale != 1.0:
+        size = (int(round(w * scale)), int(round(h * scale)))
+        small = dis.calc(cv2.resize(target, size, interpolation=cv2.INTER_AREA),
+                         cv2.resize(source, size, interpolation=cv2.INTER_AREA), None)
+        return np.asarray(cv2.resize(small, (w, h), interpolation=cv2.INTER_LINEAR) / scale)
+    return np.asarray(dis.calc(target, source, None))
+
+
+def warp(image: np.ndarray, flow: np.ndarray) -> np.ndarray:
+    """`experiments.visor.h3.warp`: ``image`` sampled at each pixel plus its flow (bilinear, edges replicated)."""
+    import cv2
+
+    h, w = flow.shape[:2]
+    gx, gy = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
+    return np.asarray(cv2.remap(image, np.asarray(gx + flow[..., 0], np.float32), np.asarray(gy + flow[..., 1], np.float32),
+                                cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE))
+
+
+def flow_reference(decoded_prev: np.ndarray, source_prev: np.ndarray, source_t0: np.ndarray, region_prev: np.ndarray,
+                   region_t0: np.ndarray, scale: float) -> tuple[np.ndarray, np.ndarray, dict[str, float] | None]:
+    """Arm F's reference (H, W, 3) uint8: ``decoded_prev`` (4:4:4) warped to t0 inside R(t0-1) | R(t0) by the flow between
+    the source's luma planes; the mask; and the flow's own error inside R(t0) (the source t0-1 warped and unwarped,
+    mean absolute luma difference to the source t0), None without a hand at t0."""
+    mask = region_prev | region_t0
+    box = flow_box(region_prev, region_t0)
+    out = decoded_prev.copy()
+    if box is None:
+        return out, mask, None
+    x0, y0, x1, y1 = box
+    crop = (slice(y0, y1), slice(x0, x1))
+    flow = dis_flow(source_t0[crop], source_prev[crop], scale)
+    inside = mask[crop]
+    out[crop][inside] = warp(decoded_prev[crop], flow)[inside]
+    error = None
+    if region_t0.any():
+        r = region_t0[crop]
+        moved = warp(source_prev[crop], flow).astype(np.float32)
+        truth = source_t0[crop].astype(np.float32)
+        error = {"warped": float(np.abs(moved - truth)[r].mean()),
+                 "unwarped": float(np.abs(source_prev[crop].astype(np.float32) - truth)[r].mean())}
+    return out, mask, error
 
 
 def code_arm(arm: str, plan: dict[str, Any], nets: tuple[Any, Any], planes: np.ndarray, region: np.ndarray,
@@ -62,9 +140,13 @@ def code_arm(arm: str, plan: dict[str, Any], nets: tuple[Any, Any], planes: np.n
 
     def to444(p: np.ndarray) -> Any:
         """(3, H, W) YCbCr in [-0.5, 0.5] on the GPU, chroma upsampled by nearest neighbour (``ycbcr420_to_444_np``)."""
-        luma = p[:height].astype(np.float32)
-        chroma = p[height:].reshape(2, height // 2, width // 2).astype(np.float32).repeat(2, 1).repeat(2, 2)
-        return torch.from_numpy(np.concatenate([luma[None], chroma]) / 255.0 - 0.5).to(device)
+        return from444(planes444(p, width, height))
+
+    def from444(x: np.ndarray) -> Any:
+        return torch.from_numpy(x.transpose(2, 0, 1).astype(np.float32) / 255.0 - 0.5).to(device)
+
+    flow_scale = FLOW_SCALE if width >= 1920 else 1.0
+    flow_errors: list[dict[str, float]] = []
 
     def padded(x: Any) -> Any:
         return F.pad(x[None], (0, pad_r, 0, pad_b), mode="replicate")
@@ -110,6 +192,14 @@ def code_arm(arm: str, plan: dict[str, Any], nets: tuple[Any, Any], planes: np.n
                 if arm != "A":
                     if arm == "E":
                         ref = to444(planes[t0])
+                    elif arm == "F":
+                        warped, mask, error = flow_reference(planes444(decoded[previous], width, height), planes[previous][:height],
+                                                             planes[t0][:height], np.asarray(region[previous]),
+                                                             np.asarray(region[t0]), flow_scale)
+                        ref = from444(warped)
+                        pasted.append(float(mask.mean()))
+                        if error is not None:
+                            flow_errors.append(error)
                     else:
                         ref = to444(decoded[previous])
                         if arm in ("C", "D"):
@@ -133,7 +223,8 @@ def code_arm(arm: str, plan: dict[str, Any], nets: tuple[Any, Any], planes: np.n
                          "estimated_region_bits": region_bits(c, np.asarray(region[span]))})
     decoded.tofile(out / f"{arm}.yuv")
     return {"arm": arm, "nals": nals, "decoded": str(out / f"{arm}.yuv"),
-            "pasted_share": float(np.mean(pasted)) if pasted else None}
+            "pasted_share": float(np.mean(pasted)) if pasted else None,
+            "flow_error": {k: float(np.mean([e[k] for e in flow_errors])) for k in ("warped", "unwarped")} if flow_errors else None}
 
 
 def run(plan: dict[str, Any]) -> dict[str, Any]:

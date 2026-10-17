@@ -84,3 +84,58 @@ def test_an_arm_against_itself_is_zero_on_hulls():
     assert [r["kbps"] for r in k3.hull(rows, "lpips")] == [1.0, 4.0, 16.0]
     same = k3.versus({i: rows for i in h3c.PILOT}, {i: rows for i in h3c.PILOT})
     assert all(abs(e["lpips"]["bd"]) < 1e-12 for e in same["items"].values())
+
+
+def test_planes444_upsamples_chroma_by_nearest_neighbour():
+    w, h = 4, 2
+    p = np.zeros((h * 3 // 2, w), np.uint8)
+    p[:h] = 10
+    p[h] = [20, 21, 30, 31]  # U (1×2) then V (1×2), packed in one row of width 4
+    out = ref.planes444(p, w, h)
+    assert out.shape == (h, w, 3) and (out[..., 0] == 10).all()
+    assert out[:, :2, 1].tolist() == [[20, 20], [20, 20]] and out[:, 2:, 1].tolist() == [[21, 21], [21, 21]]
+    assert (out[:, :2, 2] == 30).all() and (out[:, 2:, 2] == 31).all()
+
+
+def _textured(h: int, w: int, shift: int) -> np.ndarray:
+    rng = np.random.default_rng(1)
+    base = rng.integers(0, 255, (h, w + 16), dtype=np.uint8)
+    import cv2
+
+    base = cv2.GaussianBlur(base, (0, 0), 2)
+    return np.ascontiguousarray(base[:, 8 - shift:8 - shift + w])
+
+
+def test_flow_reference_moves_the_previous_hand_and_nothing_else():
+    h, w = 96, 128
+    prev, now = _textured(h, w, 0), _textured(h, w, 3)  # the content moves 3 px right
+    region_prev = np.zeros((h, w), bool)
+    region_prev[30:60, 40:70] = True
+    region_now = np.roll(region_prev, 3, axis=1)
+    decoded = np.repeat(prev[..., None], 3, axis=2)
+    out, mask, error = ref.flow_reference(decoded, prev, now, region_prev, region_now, 1.0)
+    assert (out[~mask] == decoded[~mask]).all()
+    inner = np.zeros((h, w), bool)
+    inner[36:54, 48:68] = True  # away from the region's edges
+    assert np.abs(out[..., 0][inner].astype(int) - now[inner].astype(int)).mean() < 3
+    assert error is not None and error["warped"] < error["unwarped"] / 2
+
+
+def test_flow_reference_without_hands_is_the_previous_frame():
+    h, w = 32, 32
+    empty = np.zeros((h, w), bool)
+    decoded = np.full((h, w, 3), 7, np.uint8)
+    out, mask, error = ref.flow_reference(decoded, decoded[..., 0], decoded[..., 0], empty, empty, 1.0)
+    assert (out == decoded).all() and not mask.any() and error is None
+
+
+def test_flow_decision_reads_the_unbilled_gate_then_the_low_keypoint_rate():
+    def v(verdict: str) -> dict[str, str]:
+        return {"verdict": verdict}
+
+    assert k3.decide_flow(v("fails"), v("passes"))["k3b"] == "fails"
+    assert k3.decide_flow(v("unclear"), v("passes"))["k3b"] == "unclear"
+    passes = k3.decide_flow(v("passes"), v("passes"))
+    assert passes["k3b"] == "passes" and "MANO" in passes["then"]
+    assert "keypoint rate" in k3.decide_flow(v("passes"), v("fails"))["then"]
+    assert k3.decide_flow(v("incomplete"), v("passes"))["k3b"] == "incomplete"

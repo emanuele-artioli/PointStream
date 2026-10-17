@@ -5940,3 +5940,52 @@ invocation turns out to be needed.
   points, LPIPS deciding; DCVC-UF HT-L's published weights; one reference
   per 8-frame group. The full run was not needed: the gate fails with the
   pilot's mean above 0 and only 2 of 4 items below 0.
+
+### 2026-10-17 — K3b: the best motion a keypoint warp could give (flow-warped reference)
+- Question (user, 2026-10-17: are hands conclusively a bad keypoint
+  foreground?). K3's bound gave the reference the hand's *true pixels*,
+  so it granted appearance as well as motion; at a keypoint rate of
+  about 1 kbps (H2 records 1.01 kbps at +11% 2D error on HOT3D: 10 Hz
+  interpolated, PCA 12, steps ×8, 120 ms) it passed only barely (−10%,
+  3 of 4). A keypoint warp can only move the previous decoded hand. This
+  stage measures that motion's value with the keypoints free: if it does
+  not pay unbilled, no keypoint rate makes keypoint-conditioned coding pay
+  on hands.
+- Arm F (`k3_ref`): as B (reset at every NAL to the previous decoded frame
+  x̂(t₀−1)), but inside M = R(t₀−1) ∪ R(t₀) the reference is x̂(t₀−1)
+  warped to t₀ by DIS optical flow computed on the *source* frames t₀ and
+  t₀−1 (H3a's backward flow and bilinear warp, `h3.dis_flow`/`h3.warp`:
+  medium preset, luma, on the two regions' box grown by 64 px; at half
+  resolution for full-resolution points as H1/H3, at the coded resolution
+  otherwise). Why it bounds a keypoint warp: the flow is estimated from the
+  true frames at every pixel (fingers, forearm, the uncovered background),
+  while a MANO warp follows the coded pose's mesh, which misses or
+  overshoots about a tenth of the hand (H3b) and has no forearm or
+  background motion. It is not a strict bound (DIS errs at occlusions and
+  blur), so the reading names that limit; it grants no appearance.
+  Arms A (calibration and anchor) and B (control) are recoded beside it.
+- Items, points, quality, rates, comparison: K3's (4 pilot items, H3c's
+  nine points, LPIPS_R deciding, per-NAL calibration, hull against hull).
+- Decision rule (`k3.FLOW_DECISION`, fixed before the run). Gate: F
+  *unbilled* against A on LPIPS_R, by `h3d.arm_verdict`.
+  - Fails (mean ≥ 0 or ≤ 1 item below 0): hands are closed for keypoint
+    conditioning at every keypoint rate; PointStream moves to tennis
+    players as keypoints (user, 2026-10-17).
+  - Passes (mean ≤ −10%, ≥ 3 of 4 below 0, none worse at every rate): then
+    F billed at H2's 1.01 kbps point is checked by the same verdict; if it
+    also passes, the MANO warp at that point is the next stage (its own
+    rule), else hands close with the keypoint rate named as the obstacle.
+  - Unclear: to the user.
+  - Beside: F against B (the warp's value on a fixed path), F billed at
+    1.01 and 1.93 kbps against A, and K3's C (from K3's jobs) against F
+    (what appearance adds beyond motion).
+- Hypothesis. Motion of decoded pixels is worth much less than true
+  pixels: F against B about −15% (K3's C against B was −48%), and since
+  the reset costs 39%, F unbilled against A about +15 to +25%: fails.
+- Competing explanations. (1) DIS flow is poor on fast, blurred hands, so
+  F understates motion: the flow's warp error is reported (mean absolute
+  luma error inside R(t₀) of the warped source t₀−1 against the source t₀,
+  against the unwarped one). (2) The reset's cost hides a gain a trained
+  coder could keep (K3's reading): F against B shows it.
+- Budget. Ada or A6000, shared. Smoke ≤ 600 s; pilot: 4 items × 2 jobs
+  (arms A, B, F), each ≤ 45 min. Ceiling 2 GPU-hours.
