@@ -5763,6 +5763,96 @@ invocation turns out to be needed.
   A smoke on G6's published P06_03 window (its background exists): about 1.
   Timing: 1 exclusive job, under 45 minutes. About 21 GPU-hours, ceiling
   28; every job under 45 minutes, shared GPUs except timing.
+- Runs (shared RTX 6000 Ada and RTX A6000; code revisions per job from
+  each job's `ready.json`, recorded in its result; every full stage
+  validated locally with the module's own validator: G6 stages 9–10 of
+  9–10 checks, foreground 9/9, scoring 8/8, anchors 11/11).
+  - Background (`experiments/background/g6.py`; per window: scene
+    footage `--mask exact`, recipe-L training, format at 540p QP 0–38 and
+    1080p QP 13–63; native footage, enhance CRF 32–48 and 54–63).
+    P01_107: train `20261016T145531Z-1fe7ccb5`, format
+    `20261017T093325Z-add15e57`, enhance `20261016T090743Z-5ebf7dea`,
+    `…090801Z-18e827b5`. P02_02: train `20261016T092029Z-709f45bd`,
+    format `20261016T145558Z-40cba9fc`, enhance `…090505Z-c04cf958`,
+    `…090523Z-1d2c91cc`. P03_10: train `20261016T145706Z-3c7a9b4c`,
+    format `20261017T093336Z-e59db56b`, enhance
+    `20261016T145616Z-b65e6889`, `…145634Z-99b8bcb9`. P09_106: train
+    `20261016T145724Z-feff65ee`, format `20261017T093347Z-2ba6b75d`,
+    enhance `20261016T091551Z-14a0503c`, `…091616Z-95b1e7e8`. Every
+    scene model converged (last fifth within 1.1%). Scene route
+    10–5,130 kbps, enhancer route 126–7,470 kbps on the background.
+  - Foreground (`h5 foreground`): P01_107 `20261016T185704Z-d332b01b`
+    (10 points); P02_02 `20261016T091421Z-58f2a695` (8) and
+    `…180928Z-ec25bbb9` (QP 63); P03_10 `…091448Z-b1805c33` and
+    `20261017T093212Z-bfc50ee1`; P09_106 `20261016T091510Z-ff6fbf22`
+    and `…181001Z-889ca36a`; P06_03 (smoke window)
+    `20261017T094147Z-5770b26c`. 3.5–2,030 kbps on F.
+  - Scoring (`h5 score`, 150 pairs per item in shards of 12–30, plus
+    P09_106's 48 pairs with the plain SVT-AV1 background): the job ids
+    are in the report's `sources`. Anchors (B2's 4 SVT-AV1 and 5
+    DCVC-UF points per item): P01_107 `20261017T111944Z-c988e876`,
+    P02_02 `…111915Z-66ad2183`, P03_10 `…111957Z-7c2a1eaf`, P09_106
+    `…111928Z-60c2f00c`: every point reproduces B2's weighted PSNR within
+    7 × 10⁻⁶ dB and its rate exactly, and every re-encoded DCVC-UF
+    stream is byte-identical to B2's.
+  - Report (`h5 report`, code `c7e9e91`): `h5-report.json`, `h5-rd.png`,
+    published beside the jobs at
+    `pointstream-data/visor/h5-2026-10-16/report/`.
+  - Failed or replaced, none citable: GPU memory overruns of the
+    foreground (33–35 GB on windows with large F; fixed by releasing the
+    main process's cache before each DCVC-UF call and declaring 40 GB);
+    non-deterministic DCVC-UF decodes on contended Ada (P06_03, QP 0 at
+    ½) and on a contended A6000 (P03_10, QP 63 at ½), stopped by the
+    per-point check and re-run; the scorer's first CPU compositor (2 min
+    per pair; replaced by the same arithmetic on the GPU, checked to
+    within 1 grey level, differing on at most 0.002% of samples); anchor jobs that
+    required `dav1d` on the host's PATH (it ships in the environment); a
+    timing smoke whose two DCVC-UF reports collided.
+- Outcome, rate and quality (BD-rate against the pooled hull of
+  SVT-AV1 preset 4 and DCVC-UF HT-L; negative is less rate; mean and
+  95% bootstrap CI over the 4 items; P01_107 | P02_02 | P03_10 |
+  P09_106):
+
+  | Metric | PointStream | mean (CI) | items < 0 |
+  |---|---|---|---|
+  | **weighted LPIPS (fill)** | −12% \| +0% \| −26% \| −23% | **−15% (−25 to −3)** | 3 |
+  | weighted LPIPS (no fill) | −13% \| +1% \| −26% \| −36% | −18% (−31 to −5) | 3 |
+  | weighted DISTS (fill) | −12% \| +31% \| −1% \| −23% | −1% (−18 to +23) | 3 |
+  | weighted PSNR (fill) | +78% \| +52% \| −4% \| −22% | +26% (−13 to +72) | 2 |
+  | weighted PSNR (no fill) | +79% \| +53% \| −1% \| −47% | +21% (−24 to +66) | 2 |
+  | frame LPIPS | −57% \| −16% \| −43% \| −37% | −38% (−52 to −23) | 4 |
+  | frame DISTS | −61% \| −33% \| −51% \| −48% | −48% (−57 to −37) | 4 |
+  | frame PSNR | +136% \| +83% \| +39% \| +21% | +70% (+30 to +109) | 0 |
+
+  - **(a) passes**: weighted LPIPS −15% (rule −10%) with 3 of 4 items
+    below 0. Weighted DISTS agrees in sign on 3 items but its mean is
+    −1%; weighted PSNR disagrees on P01_107 and P02_02 (+78%, +52%) and
+    agrees on the other two; whole-frame PSNR loses everywhere. The
+    hypothesis was right in sign on LPIPS and wrong in size (−15%, not
+    −30% or more), and half wrong on weighted PSNR (two items gain).
+  - Routes: the enhancer route alone gives −14% on weighted LPIPS
+    (−22 to −4), the scene route alone −4% (−18 to +16); together −15%.
+    The scene route carries PointStream below the anchors' rates
+    (PointStream reaches 15–30 kbps, the anchors start at 160–525
+    kbps), where BD-rate cannot judge: B2b's low-rate ladder (pending)
+    is what can.
+  - **(b)** The plain SVT-AV1 background (P09_106) loses on every metric
+    (weighted LPIPS +20%): the neural background is what wins. At each
+    anchor point's rate (PointStream's best pair on weighted LPIPS at or
+    under it; 9 points per item), PointStream's background has the lower
+    LPIPS on 27 of 36 points (8 of 9 on P01_107, P02_02 and P03_10; 3 of
+    9 on P09_106) and its foreground on 16 of 36 (2, 1, 5 and 8 of 9).
+    On P01_107 and P02_02 (F 50% of the frame on P02_02) the foreground
+    is worse by 0.01–0.04 LPIPS_F and the background carries the gain;
+    on P09_106 (F 2%) it is the reverse. The competing explanation holds
+    for the foreground where F is large: coding F as its own stream (its
+    own intra frame, padding outside K) costs more per bit on F than
+    whole-frame DCVC-UF.
+  - **F billed** (the granted mask at its lossless cost, 0.5–2.9 Mbps
+    per window): every comparison flips (weighted LPIPS +279%, from +26%
+    on P09_106 to +429% on P02_02). The claim stands only with F
+    granted; a mask coder costing a few kbps is a precondition of any
+    deployed PointStream.
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
