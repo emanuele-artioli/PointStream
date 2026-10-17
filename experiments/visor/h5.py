@@ -205,7 +205,11 @@ def hand_enhancer(net: Any, device: str) -> cp.Enhancer:
     from experiments.visor import h3d
 
     def run(frames: np.ndarray, where: np.ndarray) -> np.ndarray:
-        return h3d.apply(net, frames, list(where), device)
+        import torch
+
+        out = h3d.apply(net, frames, list(where), device)
+        torch.cuda.empty_cache()
+        return out
 
     return run
 
@@ -278,6 +282,9 @@ def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nea
 
 
 def command_foreground(args: argparse.Namespace) -> int:
+    # G's crops differ in size every frame; without expandable segments the caching allocator keeps every size and
+    # fills the GPU (48.5 GB with G_HO over F's box). Set before CUDA starts.
+    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
     import torch
 
     from experiments.background import g5c, g6
