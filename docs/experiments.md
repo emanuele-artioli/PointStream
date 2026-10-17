@@ -5796,6 +5796,8 @@ invocation turns out to be needed.
   method**; what survives is "with perfect appearance and a free forearm,
   1 of 4 items", which the paper can state in a sentence, not as a
   crossover figure.
+  **Agreed (user, 2026-10-17): the low-rate claim is dropped for egocentric
+  hands.**
   K1's other half (a judge where keypoints carry what matters) stays with
   K2: re-judging DCVC-UF + G on pose error is a GPU step (WiLoR on G's
   outputs at the low points), not recorded data.

@@ -939,9 +939,8 @@ before its run:
   pose (forearm free) lies above DCVC-UF + G on 1 of 4 items (P01_107,
   76% saving there; 65–500% worse on the others); the hand alone on none;
   the uncoded pose on 2. The real generator (H3e) was below the pixel
-  coders even without G. Proposed (to confirm with the user): drop the
-  low-rate claim for egocentric hands; keep only the one-item bound as a
-  sentence. Pose error on G's outputs was never measured, so the
+  coders even without G. **Agreed (user, 2026-10-17): the low-rate claim is
+  dropped for egocentric hands**; the one-item bound stays a sentence. Pose error on G's outputs was never measured, so the
   information claim (H3c2) is K2's to re-judge.
 - K2. *Judges of what keypoints carry (coding for machines).* H3c2 judged
   hands by the pose re-estimated on the decoded video; the mask or pose
