@@ -723,6 +723,10 @@ def dcvc_worker(action: str, plan: dict[str, Any], work: Path) -> dict[str, Any]
     codec time)."""
     import subprocess
 
+    import torch
+
+    torch.cuda.empty_cache()  # the worker is a separate process; this process's cached blocks would crowd it
+
     from src.codecs.dcvc_uf_worker import dcvc_command
 
     work = work / f"{action}-{Path(plan['container']).stem}"  # one directory per call: the worker never overwrites
@@ -774,7 +778,8 @@ def time_window(args: argparse.Namespace, w: dict[str, Any], method: str, value:
         rw = work / f"r{repeat}"
         shutil.rmtree(rw, ignore_errors=True)
         rw.mkdir(parents=True)
-        # ---- encoder
+        # ---- encoder (the main process's cached GPU blocks are released before each subprocess stage, untimed)
+        torch.cuda.empty_cache()
         (filled, _), seconds = synchronized(lambda: g6.fill(w["rgb"], f, args, rw / "fill"))
         note("encode/fill (ProPainter, wall with its model load)", seconds)
         bg_source = rw / "bg.yuv"
@@ -828,6 +833,7 @@ def time_window(args: argparse.Namespace, w: dict[str, Any], method: str, value:
             net.load_state_dict({k: v.float() for k, v in state.items()})
             bg_rgb, seconds = synchronized(lambda: g5d.apply(net.eval(), plain, "cuda"))
             note("decode/background enhancer (G5d)", seconds)
+            del net, state
         (rw / "fg-in.psdc").write_bytes(fg.stream)
         rep = dcvc_worker("decode", dcvc_plan(args, args.video_ckpt, qp, fg_size, frames, rw / "fg.yuv", rw / "fg-in.psdc",
                                               rw / "fg-out.yuv"), rw)
