@@ -959,6 +959,14 @@ before its run:
   keypoints cost more than DCVC-UF spends on R at its low points
   (0.3–9 kbps). It would pass at keypoints of about 1 kbps or less (H2's
   cheapest is 1.70). Neither the warp nor the trained version is built.
+  **K3b, 2026-10-17 (user: are hands conclusive?): yes, closed**
+  ([experiments](docs/experiments.md#2026-10-17--k3b-the-best-motion-a-keypoint-warp-could-give-flow-warped-reference)).
+  The previous decoded frame warped by optical flow on the source (the best
+  motion a keypoint warp could give, keypoints free) codes R 44% worse than
+  the unmodified codec (0 of 4 items better) and 4% worse than the unwarped
+  reset reference; the flow itself is accurate (7.5 to 1.9 luma levels).
+  K3's gain was all appearance (true pixels −50% against the warp), which
+  keypoints do not carry. Hands stay pixels at every keypoint rate.
 - K4. *Tennis audit*, H1's method on broadcast tennis (the archived
   `tennis_games` matches at 1080p; TrackNet's dense ball labels): per part
   (players, racket, ball, background), its share of pixels and of
