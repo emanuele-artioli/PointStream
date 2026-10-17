@@ -753,7 +753,7 @@ def median(values: list[float]) -> float:
 
 
 def time_window(args: argparse.Namespace, w: dict[str, Any], method: str, value: int, fg_name: str, nets: dict[str, Any],
-                scene_ckpt: str, enhancers: Path, work: Path) -> dict[str, Any]:
+                scene_ckpt: str, enhancers: Path, work: Path, done: int = 0) -> dict[str, Any]:
     """PointStream's encoder and decoder at one operating point, each stage timed ``REPEATS`` times."""
     import torch
 
@@ -851,6 +851,7 @@ def time_window(args: argparse.Namespace, w: dict[str, Any], method: str, value:
             [cp.composite(fg_rgb[i:i + CHUNK], bg_rgb[i:i + CHUNK], alpha[i:i + CHUNK]) for i in range(0, frames, CHUNK)])))
         note("decode/composite and 4:2:0 output", seconds)
         shutil.rmtree(rw, ignore_errors=True)
+        progress(done + repeat + 1)  # one unit per repeat: an operating point takes about 25 minutes
     stages: dict[str, dict[str, Any]] = {k: {"median_s": median(v), "runs_s": [round(x, 3) for x in v]}
                                          for k, v in t.items()}
     encode = sum(s["median_s"] for k, s in stages.items() if k.startswith("encode/"))
@@ -879,16 +880,17 @@ def command_time(args: argparse.Namespace) -> int:
     if file_sha256(arm / "video_ft.pth.tar") != scene["model"]["checkpoint_sha256"]:
         raise RuntimeError("the scene model is not the one its training recorded")
     enhancers = Path(args.enhancers) / "publish" / "enhancers"
-    timed = [t for t in TIMED if args.limit_frames <= 0 or t == TIMED[0]]
+    timed = [t for t in TIMED if ROUTE_OF_METHOD[t[0]] in args.routes.split(",")]
+    timed = timed[:1] if args.limit_frames > 0 else timed
     nets = {fg: generic_network(args.generic, fg, "cuda") for _, _, fg in timed if fg in G_POINTS}
     torch.backends.cudnn.benchmark = False
     rows = []
-    for done, (method, value, fg) in enumerate(timed, 1):
+    for n, (method, value, fg) in enumerate(timed):
         rows.append(time_window(args, w, method, value, fg, nets, str(arm / "video_ft.pth.tar"), enhancers,
-                                work / f"{method}-{value}"))
-        progress(done)
+                                work / f"{method}-{value}", n * REPEATS))
     write_json(stage_dir() / "h5.json", {
         "kind": "time", "item": w["item"]["id"], "frames": w["frames"], "limit_frames": args.limit_frames,
+        "routes": args.routes.split(","), "timed": len(timed),
         "jpeg_gate_holds": all(c["holds"] for c in w["source"]["jpeg_gate"]), "threads": args.threads,
         "scene_model_sha256": scene["model"]["checkpoint_sha256"], "rows": rows, "not_timed": [
             "F and the class map (granted: dataset masks)", "venue models' training (offline, once per venue)"],
@@ -903,7 +905,7 @@ def validate_time(result: dict[str, Any]) -> dict[str, bool]:
     return {
         "window_is_the_released_one": result["jpeg_gate_holds"],
         "exclusive_gpu": result["gpu_sharing"] != "shared",
-        "every_point_timed": len(rows) == (len(TIMED) if result["limit_frames"] <= 0 else 1),
+        "every_point_timed": len(rows) == result["timed"] and len(rows) > 0,
         "repeats": all(len(s["runs_s"]) == REPEATS for r in rows for s in r["stages"].values()),
         "containers_reproducible": all(len({c["sha256"] for c in r["containers"]}) == 1 for r in rows),
         "times_positive": all(s["median_s"] > 0 for r in rows for s in r["stages"].values()),
@@ -1205,6 +1207,7 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument(name, required=True)
     p.add_argument("--generic", action="append", required=True)
     p.add_argument("--threads", type=int, default=32)
+    p.add_argument("--routes", default="scene,enh", help="the background routes to time (one operating point each)")
     sub.add_parser("validate")
     p = sub.add_parser("report")
     p.add_argument("--score", action="append", required=True, help="full score stages' h5.json")
