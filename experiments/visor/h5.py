@@ -726,7 +726,7 @@ def command_score(args: argparse.Namespace) -> int:
                 t2 = time.perf_counter()
                 parts = c.breakdown()
                 row = {"pair": key, "route": bg["route"], "background": bg_key, "foreground": fg["key"],
-                       "foreground_job": fg["manifest_job"], "mask_scale": args.mask_scale,
+                       "foreground_job": fg["manifest_job"], "mask_scale": args.mask_scale, "tag": args.tag,
                        "bytes": len(data), "kbps": len(data) * 8 / seconds / 1000, "breakdown": parts,
                        "kbps_background": parts.get("background", 0) * 8 / seconds / 1000,
                        "kbps_foreground": parts.get("foreground", 0) * 8 / seconds / 1000,
@@ -1125,8 +1125,12 @@ def matched_regions(points: list[dict[str, Any]], anchor: list[dict[str, Any]]) 
 def variant_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     """H5's variants (F granted) by background route, and H5m's: PointStream with F coded at 1/s, and the hull
     over every s."""
-    granted = [r for r in rows if not r.get("mask_scale")]
+    granted = [r for r in rows if not r.get("mask_scale") and not r.get("tag")]
     out = {v: [r for r in granted if r["route"] in routes] for v, routes in VARIANTS.items()}
+    for tag in sorted({r["tag"] for r in rows if r.get("tag")}):  # a foreground swap: its rows, H5's for the rest
+        tagged = [r for r in rows if r.get("tag") == tag and not r.get("mask_scale")]
+        swapped = {r["foreground"] for r in tagged}
+        out[tag] = tagged + [r for r in out["pointstream"] if r["foreground"] not in swapped]
     coded = [r for r in rows if r.get("mask_scale")]
     for s in sorted({r["mask_scale"] for r in coded}):
         out[f"mask{s}"] = [r for r in coded if r["mask_scale"] == s]
@@ -1231,8 +1235,8 @@ def command_report(args: argparse.Namespace) -> int:
         if result["kind"] != "score" or result["limit_frames"] > 0:
             raise SystemExit(f"{path}: not a full score stage")
         d = data.setdefault(result["item"], {"rows": [], "anchors": [], "mask": None, "sources": []})
-        seen = {(r["pair"], r.get("mask_scale", 0)) for r in d["rows"]}  # a pair once per mask scale
-        d["rows"] += [r for r in result["rows"] if (r["pair"], r.get("mask_scale", 0)) not in seen]
+        seen = {(r["pair"], r.get("mask_scale", 0), r.get("tag", "")) for r in d["rows"]}  # once per scale and tag
+        d["rows"] += [r for r in result["rows"] if (r["pair"], r.get("mask_scale", 0), r.get("tag", "")) not in seen]
         d["anchors"] += result["anchors"]
         d["mask"] = d["mask"] or result["foreground_manifest"]["mask_cost"]
         d["sources"].append({"path": path, "job_id": result.get("job_id"), "git_head": result.get("git_head"),
@@ -1282,6 +1286,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--max-combos", type=int, default=0)
     p.add_argument("--background-points", help="only these background points (method-value, comma separated)")
     p.add_argument("--pairs", help="only these pairs (background+foreground keys, comma separated)")
+    p.add_argument("--tag", default="", help="a variant's name for its rows (e.g. gho: G_HO in the foreground slots)")
     p.add_argument("--mask-scale", type=int, default=0, help="H5m: code F's class map at 1/s and composite with it "
                    "(0: F granted, H5)")
     p = sub.add_parser("time")

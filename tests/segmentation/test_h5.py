@@ -155,3 +155,11 @@ def test_variants_split_granted_and_coded_masks() -> None:
     v = h5.variant_rows(rows)
     assert len(v["pointstream"]) == 2 and len(v["scene"]) == 1 and len(v["enh"]) == 1
     assert [r["kbps"] for r in v["mask8"]] == [120] and len(v["mask-hull"]) == 2
+
+
+def test_tagged_variant_replaces_only_its_foregrounds() -> None:
+    base = [{**scored(100, 0.2), "foreground": "dcvc-21_4"}, {**scored(300, 0.1), "foreground": "dcvc-63_1"}]
+    gho = [{**scored(100, 0.18), "foreground": "dcvc-21_4", "tag": "gho"}]
+    v = h5.variant_rows(base + gho)
+    assert len(v["pointstream"]) == 2
+    assert sorted((r["foreground"], r.get("tag", "")) for r in v["gho"]) == [("dcvc-21_4", "gho"), ("dcvc-63_1", "")]
