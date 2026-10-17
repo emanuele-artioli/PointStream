@@ -5853,6 +5853,62 @@ invocation turns out to be needed.
     on P09_106 to +429% on P02_02). The claim stands only with F
     granted; a mask coder costing a few kbps is a precondition of any
     deployed PointStream.
+- Outcome, time (`h5 time`, code `33f4cdb`, exclusive RTX A6000 on gpu2,
+  32 threads, median of 3 runs per stage; one job per window and route:
+  scene `20261017T120926Z-b72736c7` P02_02, `…120948Z-2afd3bc4` P01_107,
+  `…121010Z-8834efe5` P03_10, `…121031Z-27beb50a` P09_106; enhancer
+  `…120937Z-f5b4fa31`, `…120959Z-cef259d9`, `…121020Z-943758c2`,
+  `…121041Z-9cc7af81`; every job 7/7 checks locally, every container
+  reproducible across its 3 runs). Operating points: scene model at
+  1080p QP 38 with the foreground at ½ QP 21; SVT-AV1 CRF 48 plus the
+  enhancer with the foreground at ¼ QP 21. Seconds per 4 s window,
+  median over the 4 windows (range):
+
+  | Stage | scene route | enhancer route |
+  |---|---|---|
+  | ProPainter fill (encoder) | 127 (123–138) | 128 (124–131) |
+  | background encode | 1.9 (DCVC-UF codec calls) | 15–25 (SVT-AV1 preset 4, 32 threads) |
+  | foreground padding (CPU) + DCVC-UF encode | 31–36 | 19–21 |
+  | **encoder** | **163 (156–174)** | **166 (159–173)** |
+  | **decoder** | **95 (80–152)**, 1.6–3.0 frames/s | **133 (124–151)**, 1.6–1.9 frames/s |
+
+  The codecs themselves are fast (DCVC-UF 0.5–2 s per stream per
+  window); the encoder is ProPainter (77%) and the decoder this
+  pipeline's own CPU stages: compositing and 4:2:0 output (47–101 s,
+  the same arithmetic takes about 7 s per window on the GPU in the
+  scorer), G on the hands (7–25 s), the enhancer (37 s) and F's distance
+  transform (11–12 s). Not timed: F (granted) and the venue models'
+  training (G6 training jobs: 1,760–1,784 s per window, once per
+  venue). The SVT-AV1 preset-4 encode inside the enhancer route took
+  15–25 s on gpu2 (17.8 s on P02_02) against J2's median 18.7 s on gpu3
+  (32 cores each), so J2's table applies.
+  - **(c) Equal-time preset: SVT-AV1 preset 1.** The slowest route's
+    median encode (166 s) is above every preset in J2's table; the
+    slowest at or under it is preset 1 (80.5 s; −15.6% against preset 4
+    on weighted PSNR in J2). PointStream's encoder is twice as slow even
+    so, all of it ProPainter; presets 0 and −1 were not in J2.
+    Hypothesis right (ProPainter dominates; 3 or slower).
+- Reading. PointStream as built beats B2's preset-4 SVT-AV1 and DCVC-UF
+  envelope on weighted LPIPS by 15% on the pilot items with F granted,
+  and on frame LPIPS and DISTS by 38–48%; it loses whole-frame PSNR. Its
+  gain is the neural background's; its foreground stream is the weaker
+  part where F is large. Three things stand between this and a
+  paper claim: (1) the anchor at equal time is preset 1 (and B2b's
+  low-rate ladder and ROI variant), not preset 4; (2) F must be coded
+  (lossless costs 0.5–2.9 Mbps, more than the rates where PointStream
+  wins); (3) the foreground stream's per-bit cost on large F.
+- Plan for the 34-item run (not run; final runs wait for a settled
+  pipeline and the paper's figures, memory "final runs once"): per window
+  6 G6 jobs (about 3 GPU-hours with queueing failures, G6's measure), 1–2
+  foreground jobs, 7 scoring shards (12–30 pairs, 10–31 minutes each) and
+  1 anchor job; about 34 × 6 ≈ 200 GPU-hours with today's grid, most of
+  it G6's background (80) and scoring (about 60 at 30–60 s per pair).
+  Before it: B2b's equal-time re-encode at preset 1 with the low-rate
+  ladder and ROI, which the 34 items need anyway; a mask coder; and the
+  foreground's per-bit cost. Scoring could drop the plain SVT-AV1
+  background ablation and DISTS's five-region pass to cut its share.
+- GPU time: 22.5 GPU-hours over 149 smoke and full stages (the jobs'
+  execution records, failures included), within the 28 ceiling.
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
