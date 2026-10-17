@@ -2,6 +2,7 @@ import hashlib
 from fractions import Fraction
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from experiments.visor import h5
@@ -127,3 +128,30 @@ def test_report_decision_reads_the_rule() -> None:
     bad = [scored(k, q) for k, q in ((200, 0.3), (400, 0.2), (800, 0.1))]
     items = {f"I{i}": h5.item_report(bad, anchors, 1.0) for i in range(4)}
     assert h5.summary(items)["decision"]["verdict"] == "fails"
+
+
+def test_container_bills_the_mask(tmp_path: Path) -> None:
+    from src.pointstream import mask as mk
+
+    bg_file, bg_sha = published(tmp_path, "bg.psdc", b"PSDC" + bytes(64))
+    fg_file, fg_sha = published(tmp_path, "fg.psdc", b"PSDC" + bytes(32))
+    bg = {"key": "scene-540-0", "route": "scene", "codec": "scene", "coded_size": [960, 544], "model_sha256": None,
+          "root": str(tmp_path), "bitstream": bg_file, "bitstream_sha256": bg_sha}
+    fg = {"key": "dcvc-0_4", "scale": 4, "coded_size": [480, 272], "bitstream": fg_file, "bitstream_sha256": fg_sha,
+          "slots": {"hand": None, "object": None}}
+    classes = np.zeros((4, 32, 48), np.uint8)
+    classes[:, 8:20, 10:30] = 2
+    payload = mk.encode(mk.reduce(classes, 4), 4)
+    c = h5.container_for({"fps": Fraction(50), "frames": 4}, bg, fg, tmp_path, payload)
+    parts = c.breakdown()
+    assert parts["mask"] == 1 + len(bs.leb128(len(payload))) + len(payload)
+    back = bs.Container.unpack(c.pack())
+    assert [p for t, p in back.segments if t == bs.Tag.MASK] == [payload]
+
+
+def test_variants_split_granted_and_coded_masks() -> None:
+    rows = [{**scored(100, 0.2), "mask_scale": 0}, {**scored(120, 0.2), "mask_scale": 8},
+            {**scored(110, 0.25), "mask_scale": 16}, {**scored(90, 0.3, route="enh"), "mask_scale": 0}]
+    v = h5.variant_rows(rows)
+    assert len(v["pointstream"]) == 2 and len(v["scene"]) == 1 and len(v["enh"]) == 1
+    assert [r["kbps"] for r in v["mask8"]] == [120] and len(v["mask-hull"]) == 2

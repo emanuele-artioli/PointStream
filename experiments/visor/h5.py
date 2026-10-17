@@ -439,7 +439,8 @@ def load_backgrounds(dirs: list[str], routes: set[str], item_id: str) -> list[di
     return sorted(out, key=lambda p: (p["route"], p["key"]))
 
 
-def container_for(w: dict[str, Any], bg: dict[str, Any], fg: dict[str, Any], fg_root: Path) -> bs.Container:
+def container_for(w: dict[str, Any], bg: dict[str, Any], fg: dict[str, Any], fg_root: Path,
+                  mask_payload: bytes | None = None) -> bs.Container:
     """The window's container for one pair: the background stream, the foreground stream with its slots, and
     references to the networks the decoder holds."""
     bg_data = (Path(bg["root"]) / bg["bitstream"]).read_bytes()
@@ -457,6 +458,8 @@ def container_for(w: dict[str, Any], bg: dict[str, Any], fg: dict[str, Any], fg_
     slots = ((bs.CLASSES["hand"], 1 if hand else 0), (bs.CLASSES["object"], 0))
     c.add_coded(bs.Coded("foreground", fg["scale"], "dcvc-uf", fg["coded_size"][0], fg["coded_size"][1], fg_data,
                          slots))
+    if mask_payload is not None:  # H5m: F's class map coded at 1/s (`src.pointstream.mask`)
+        c.add(bs.Tag.MASK, mask_payload)
     if bg["model_sha256"]:
         c.add_model(bs.ModelRef("background", bg["model_sha256"]))
     if hand:
@@ -614,7 +617,25 @@ def command_score(args: argparse.Namespace) -> int:
     began = time.time()
     w = load_window(args, work)
     judges = Judges(args)
-    alpha = np.stack([cp.alpha_and_classes(c)[0] for c in w["classes"]])
+    mask_payload, mask_record = None, None
+    shown_classes = w["classes"]
+    if args.mask_scale > 0:  # H5m: the client's F̂ from the coded class map replaces F
+        from src.pointstream import mask as mk
+
+        reduced = mk.reduce(w["classes"], args.mask_scale)
+        mask_payload = mk.encode(reduced, args.mask_scale)
+        decoded, _ = mk.decode(mask_payload)
+        shown_classes = mk.upsample(decoded, FULL)
+        f, g = w["classes"] > 0, shown_classes > 0
+        mask_record = {"scale": args.mask_scale, "bytes": len(mask_payload),
+                       "kbps": len(mask_payload) * 8 / (w["frames"] / float(w["fps"])) / 1000,
+                       "lossless_on_reduced_grid": bool(np.array_equal(decoded, reduced)),
+                       "iou": float((f & g).sum() / max(int((f | g).sum()), 1)),
+                       "missed_share": float((f & ~g).sum() / max(int(f.sum()), 1)),
+                       "extra_share": float((g & ~f).sum() / max(int(f.sum()), 1)),
+                       "hand_kept": float((shown_classes[w["classes"] == cp.HAND] == cp.HAND).mean())
+                       if (w["classes"] == cp.HAND).any() else None}
+    alpha = np.stack([cp.alpha_and_classes(c)[0] for c in shown_classes])
     fg_points, manifests = [], []
     for directory in args.foreground:  # several foreground jobs' points (a grid extended later)
         root = Path(directory) / "publish" if (Path(directory) / "publish").is_dir() else Path(directory)
@@ -638,6 +659,9 @@ def command_score(args: argparse.Namespace) -> int:
     if args.limit_frames <= 0 and not same_f:
         raise SystemExit("a background was filled for another F than the foreground's")
     pairs = [(b, f) for b in backgrounds for f in fg_points]
+    if args.pairs:
+        wanted = set(args.pairs.split(","))
+        pairs = [(b, f) for b, f in pairs if f"{b['key']}+{f['key']}" in wanted]
     if args.max_combos > 0:  # smoke: a spread of pairs, every route
         pairs = [p for i, p in enumerate(pairs) if i % max(1, len(pairs) // args.max_combos) == 0][:args.max_combos]
     checkpoints = checkpoint_dir()
@@ -651,7 +675,7 @@ def command_score(args: argparse.Namespace) -> int:
         bg_rgb = None
         for _, fg in [p for p in pairs if p[0]["key"] == bg_key]:
             key = f"{bg_key}+{fg['key']}"
-            c = container_for(w, bg, fg, Path(fg["root"]))
+            c = container_for(w, bg, fg, Path(fg["root"]), mask_payload)
             data = c.pack()
             if bg["route"] not in checks:  # rule (d), once per route
                 checks[bg["route"]] = {"pair": key, **bitstream_check(c, data, bg, fg, Path(fg["root"]))}
@@ -673,7 +697,7 @@ def command_score(args: argparse.Namespace) -> int:
                 t2 = time.perf_counter()
                 parts = c.breakdown()
                 row = {"pair": key, "route": bg["route"], "background": bg_key, "foreground": fg["key"],
-                       "foreground_job": fg["manifest_job"],
+                       "foreground_job": fg["manifest_job"], "mask_scale": args.mask_scale,
                        "bytes": len(data), "kbps": len(data) * 8 / seconds / 1000, "breakdown": parts,
                        "kbps_background": parts.get("background", 0) * 8 / seconds / 1000,
                        "kbps_foreground": parts.get("foreground", 0) * 8 / seconds / 1000,
@@ -694,7 +718,8 @@ def command_score(args: argparse.Namespace) -> int:
             "job_id", "git_head", "mask_cost", "classes_sha256")},
         "backgrounds": [{k: b.get(k) for k in ("key", "route", "kbps", "bytes", "bitstream_sha256", "manifest_job",
                                                 "manifest_git_head", "model_sha256")} for b in backgrounds],
-        "pairs_planned": len(pairs), "background_f_is_foreground_f": same_f, "bitstream_checks": checks, "rows": rows, "anchors": anchors,
+        "pairs_planned": len(pairs), "background_f_is_foreground_f": same_f, "bitstream_checks": checks,
+        "mask": mask_record, "rows": rows, "anchors": anchors,
         "judges": judges.record, "seconds": round(time.time() - began, 1), **g5c.gpu_record(), **g6.provenance()})
     shutil.rmtree(work, ignore_errors=True)
     return 0
@@ -959,6 +984,9 @@ def validate_score(result: dict[str, Any]) -> dict[str, bool]:
             "max_abs", 99) <= 1,
         "foreground_decodes_on_f": all(r["scores"][FILL]["psnr_fg"] > 15 for r in rows),
         "background_f_is_foreground_f": result["limit_frames"] > 0 or result["background_f_is_foreground_f"],
+        "mask_billed": not result.get("mask") or (
+            result["mask"]["lossless_on_reduced_grid"] and all(r["breakdown"].get("mask", 0) > result["mask"]["bytes"]
+                                                                for r in rows)),
     }
     if anchors:
         full = result["limit_frames"] <= 0
@@ -1063,14 +1091,26 @@ def matched_regions(points: list[dict[str, Any]], anchor: list[dict[str, Any]]) 
     return out
 
 
+def variant_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    """H5's variants (F granted) by background route, and H5m's: PointStream with F coded at 1/s, and the hull
+    over every s."""
+    granted = [r for r in rows if not r.get("mask_scale")]
+    out = {v: [r for r in granted if r["route"] in routes] for v, routes in VARIANTS.items()}
+    coded = [r for r in rows if r.get("mask_scale")]
+    for s in sorted({r["mask_scale"] for r in coded}):
+        out[f"mask{s}"] = [r for r in coded if r["mask_scale"] == s]
+    if coded:
+        out["mask-hull"] = coded
+    return out
+
+
 def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_kbps: float) -> dict[str, Any]:
     from experiments.background.g5 import envelope
 
     groups = {"svtav1": [a for a in anchors if a["codec"] == "svtav1"],
               "dcvc": [a for a in anchors if a["codec"] == "dcvc"], "pooled": anchors}
     out: dict[str, Any] = {"comparisons": {}, "hull": {}, "mask_kbps": mask_kbps}
-    for variant, routes in VARIANTS.items():
-        points = [r for r in rows if r["route"] in routes]
+    for variant, points in variant_rows(rows).items():
         if not points:
             continue
         for metric, (_, _, _, minimum) in METRICS.items():
@@ -1086,7 +1126,7 @@ def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_
                     key=lambda r: r["kbps"])
         out["hull"][variant] = [{"pair": r["pair"], "kbps": r["kbps"], "wlpips": r["scores"][FILL]["wlpips"],
                                  "background_share": r["kbps_background"] / r["kbps"]} for r in on]
-    pointstream = [r for r in rows if r["route"] in VARIANTS["pointstream"]]
+    pointstream = [r for r in rows if r["route"] in VARIANTS["pointstream"] and not r.get("mask_scale")]
     out["matched"] = matched_regions(pointstream, anchors) if pointstream and anchors else []
     return out
 
@@ -1103,16 +1143,20 @@ def summary(items: dict[str, dict[str, Any]]) -> dict[str, Any]:
         out[key] = {"per_item": {i: c["bd"] if c["bd"] is not None else c["where"] for i, c in cs.items()},
                     "items": len(cs), "items_below_zero": sum(below_zero(c) for c in cs.values()),
                     "bd": bootstrap_mean(bds, rng) if len(bds) else None, "bd_items": len(bds)}
-    head = out.get(f"pointstream|{DECISION['anchor']}|{DECISION['metric']}")
-    verdict = "incomplete"
-    if head and head["items"] >= 4:
+    def verdict(variant: str) -> str:
+        head = out.get(f"{variant}|{DECISION['anchor']}|{DECISION['metric']}")
+        if not head or head["items"] < 4:
+            return "incomplete"
         passes = head["bd"] is not None and head["bd"]["mean"] <= DECISION["mean_bd_at_most"] \
             and head["items_below_zero"] >= DECISION["items_below_zero"]
         if head["bd_items"] < head["items"]:  # an item without a number: the rule reads its side
             passes = head["items_below_zero"] >= DECISION["items_below_zero"] and (
                 head["bd"] is None or head["bd"]["mean"] <= DECISION["mean_bd_at_most"])
-        verdict = "passes" if passes else "fails"
-    return {"comparisons": out, "decision": {**DECISION, "verdict": verdict}}
+        return "passes" if passes else "fails"
+
+    variants = sorted({k.split("|")[0] for k in out})
+    return {"comparisons": out, "decision": {**DECISION, "verdict": verdict("pointstream")},
+            "verdicts": {v: verdict(v) for v in variants}}
 
 
 def plot(items: dict[str, dict[str, Any]], data: dict[str, dict[str, Any]], target: Path) -> None:
@@ -1201,6 +1245,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--dists-backbone", required=True)
     p.add_argument("--max-combos", type=int, default=0)
     p.add_argument("--background-points", help="only these background points (method-value, comma separated)")
+    p.add_argument("--pairs", help="only these pairs (background+foreground keys, comma separated)")
+    p.add_argument("--mask-scale", type=int, default=0, help="H5m: code F's class map at 1/s and composite with it "
+                   "(0: F granted, H5)")
     p = sub.add_parser("time")
     add_window(p)
     for name in ("--arm", "--enhancers", "--propainter-tree", "--propainter-ckpt", "--raft-ckpt", "--flow-completion-ckpt"):
