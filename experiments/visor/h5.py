@@ -1122,18 +1122,19 @@ def plot(items: dict[str, dict[str, Any]], data: dict[str, dict[str, Any]], targ
         for j, metric in enumerate(shown):
             ax = axes[i][j]
             sign = METRICS[metric][2]
-            for label, pts, style in (("PointStream", [r for r in rows if r["route"] in ("scene", "enh")], "-o"),
-                                      ("SVT-AV1 bg", [r for r in rows if r["route"] == "svt"], ":."),
-                                      ("SVT-AV1", [a for a in anchors if a["codec"] == "svtav1"], "--s"),
-                                      ("DCVC-UF", [a for a in anchors if a["codec"] == "dcvc"], "--^")):
+            for label, pts, style, colour in (
+                    ("PointStream", [r for r in rows if r["route"] in ("scene", "enh")], "-o", "tab:blue"),
+                    ("PointStream, SVT-AV1 background", [r for r in rows if r["route"] == "svt"], ":.", "tab:gray"),
+                    ("SVT-AV1 preset 4", [a for a in anchors if a["codec"] == "svtav1"], "--s", "tab:orange"),
+                    ("DCVC-UF HT-L", [a for a in anchors if a["codec"] == "dcvc"], "--^", "tab:green")):
                 hull = envelope(curve(pts, metric))
                 if hull:
-                    ax.plot([r for r, _ in hull], [sign * q for _, q in hull], style, label=label, ms=3)
+                    ax.plot([r for r, _ in hull], [sign * q for _, q in hull], style, color=colour, label=label, ms=3)
             ax.set_xscale("log")
             ax.set_title(f"{item} {metric}", fontsize=8)
             ax.set_xlabel("kbps", fontsize=8)
-            if i == 0 and j == 0:
-                ax.legend(fontsize=7)
+            if j == 0:
+                ax.legend(fontsize=6)
     fig.tight_layout()
     fig.savefig(target, dpi=110)
 
