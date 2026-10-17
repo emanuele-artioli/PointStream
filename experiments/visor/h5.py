@@ -57,6 +57,8 @@ POINTS = ("dcvc@0/4", "dcvc@21/4", "dcvc@42/4", "dcvc@0/2", "dcvc@21/2", "dcvc@4
 G_SCALES = (2, 4)
 #: The points H3d fitted G for (one network per point).
 G_POINTS = tuple(f"dcvc@{qp}/{scale}" for scale in G_SCALES for qp in (0, 21, 42))
+#: Enhancer ids in the container's slot list (0: the identity).
+ENHANCER_IDS = {"G": 1, "G_HO": 2}
 ROUTE_OF_METHOD = {"scene-540": "scene", "scene-1080": "scene", "enh-1080": "enh", "svt-1080": "svt"}
 DCVC_ATTEMPTS = 3  # K5: re-code a point whose decode is not the encoder's, every attempt recorded
 DISTS_BATCH = 2
@@ -209,7 +211,8 @@ def hand_enhancer(net: Any, device: str) -> cp.Enhancer:
 
 
 def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nearest: np.ndarray,
-                     nets: dict[str, Any], work: Path, points: Path) -> dict[str, Any]:
+                     nets: dict[tuple[str, str], tuple[Any, dict[str, Any], str]], work: Path,
+                     points: Path) -> dict[str, Any]:
     """One foreground point: coded, decoded as the client does, kept as FFV1 with its stream."""
     from experiments.background import g5, g6
     from experiments.visor import h3d
@@ -233,11 +236,12 @@ def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nea
     decoded = g5.yuv420_to_rgb(np.fromfile(rec["decoded"], np.uint8).reshape(frames, size[1] * 3 // 2, size[0]))
     upsampled = h3d.upscale_all(decoded, frames, FULL[0], FULL[1]) if size != FULL else decoded
     slots: dict[int, cp.Enhancer] = {}
-    network = None
-    if name in nets:
-        net, info = nets[name]
-        slots[cp.HAND] = hand_enhancer(net, "cuda")
-        network = {"point": name, "sha256": info["sha256"]}
+    networks: dict[str, Any] = {"hand": None, "object": None}
+    for cls, label in ((cp.HAND, "hand"), (cp.OBJECT, "object")):
+        if (name, label) in nets:  # each class's slot: G on the hands (H3d), or G_HO on both (H4c)
+            net, info, arm = nets[(name, label)]
+            slots[cls] = hand_enhancer(net, "cuda")
+            networks[label] = {"point": name, "arm": arm, "sha256": info["sha256"]}
     out = cp.apply_slots(upsampled, nearest, slots)
     t3 = time.time()
     yuv = g5.rgb_to_yuv420(out)
@@ -259,7 +263,7 @@ def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nea
     return {"name": name, "key": key, "qp": qp, "scale": scale, "coded_size": list(size), "bytes": rec["bytes"],
             "kbps": rec["bytes"] * 8 / seconds / 1000, "attempts": rec["attempts"],
             "deterministic": rec["deterministic"], "decoder_matches_encoder_intra": rec["decoder_matches_encoder_intra"],
-            "slots": {"hand": network, "object": None}, "psnr_f": psnr_f,
+            "slots": networks, "psnr_f": psnr_f,
             "changed_by_slots": float((out != upsampled).any(axis=3).mean()),
             "decoded": f"points/{key}/decoded.mkv", "decoded_ffv1_sha256": file_sha256(target / "decoded.mkv"),
             "decoded_frame_sha256": digests, "bitstream": f"points/{key}/stream.psdc",
@@ -283,7 +287,18 @@ def command_foreground(args: argparse.Namespace) -> int:
     w = load_window(args, work)
     nearest = np.stack([cp.alpha_and_classes(c)[1] for c in w["classes"]])
     cost = mask_cost(w["classes"], w["fps"], work)
-    nets = {n: generic_network(args.generic, n, "cuda") for n in names if n in G_POINTS}
+    nets: dict[tuple[str, str], tuple[Any, dict[str, Any], str]] = {}
+    for n in names:
+        if n not in G_POINTS:
+            continue
+        if args.slots == "G":  # H3d: G on the hands, the identity on objects
+            net, info = generic_network(args.generic, n, "cuda")
+            nets[(n, "hand")] = (net, info, "G")
+        else:  # H4c (user, 2026-10-17): G_HO on hands and objects
+            from experiments.visor.h4c import load_networks
+
+            net, info = load_networks(args.object_networks, n, "cuda")["G_HO"]
+            nets[(n, "hand")] = nets[(n, "object")] = (net, info, "G_HO")
     checkpoints = checkpoint_dir()
     restored = g5c.restore(checkpoints)
     points = (checkpoints or scratch) / "points"
@@ -454,16 +469,17 @@ def container_for(w: dict[str, Any], bg: dict[str, Any], fg: dict[str, Any], fg_
     fg_data = (fg_root / fg["bitstream"]).read_bytes()
     if hashlib.sha256(fg_data).hexdigest() != fg["bitstream_sha256"]:
         raise RuntimeError(f"{fg['key']}: foreground stream differs from its manifest")
-    hand = fg["slots"]["hand"]
-    slots = ((bs.CLASSES["hand"], 1 if hand else 0), (bs.CLASSES["object"], 0))
+    hand, obj = fg["slots"]["hand"], fg["slots"].get("object")
+    slots = tuple((bs.CLASSES[k], ENHANCER_IDS[v["arm"] if v.get("arm") else "G"] if v else 0)
+                  for k, v in (("hand", hand), ("object", obj)))
     c.add_coded(bs.Coded("foreground", fg["scale"], "dcvc-uf", fg["coded_size"][0], fg["coded_size"][1], fg_data,
                          slots))
     if mask_payload is not None:  # H5m: F's class map coded at 1/s (`src.pointstream.mask`)
         c.add(bs.Tag.MASK, mask_payload)
     if bg["model_sha256"]:
         c.add_model(bs.ModelRef("background", bg["model_sha256"]))
-    if hand:
-        c.add_model(bs.ModelRef("foreground", hand["sha256"]))
+    for sha in dict.fromkeys(v["sha256"] for v in (hand, obj) if v):
+        c.add_model(bs.ModelRef("foreground", sha))
     return c
 
 
@@ -963,6 +979,8 @@ def validate_foreground(result: dict[str, Any]) -> dict[str, bool]:
                                   for a, b in zip(sorted(s, key=lambda r: r["qp"]), sorted(s, key=lambda r: r["qp"])[1:])),
         "foreground_decodes_to_a_picture": all(r["psnr_f"] is not None and 20 < r["psnr_f"] < 60 for r in rows),
         "g_on_its_points_only": all((r["slots"]["hand"] is not None) == (r["name"] in G_POINTS) for r in rows),
+        "object_slot_as_declared": all(r["slots"].get("object") is None or (
+            r["name"] in G_POINTS and r["slots"]["object"].get("arm") == "G_HO") for r in rows),
         "g_changes_hands": all(r["changed_by_slots"] > 0 for r in rows if r["slots"]["hand"]),
         "frames_published": all(len(r["decoded_frame_sha256"]) == result["frames"] for r in rows),
         "mask_cost_measured": result["mask_cost"]["bytes"] > 0 and 0 < result["mask_cost"]["share"] < 0.8,
@@ -1234,6 +1252,9 @@ def main(argv: list[str] | None = None) -> int:
     add_window(p)
     p.add_argument("--points", default=",".join(POINTS))
     p.add_argument("--generic", action="append", required=True, help="H3d's generic-network job archives")
+    p.add_argument("--slots", choices=("G", "G_HO"), default="G", help="the enhancers in the class slots: H3d's G on "
+                   "the hands, or H4c's G_HO on hands and objects")
+    p.add_argument("--object-networks", action="append", default=[], help="H4c's networks job archives (G_HO)")
     p = sub.add_parser("score")
     add_window(p)
     p.add_argument("--foreground", action="append", required=True, help="foreground jobs' archives (extracted)")

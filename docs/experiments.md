@@ -5910,6 +5910,25 @@ invocation turns out to be needed.
 - GPU time: 22.5 GPU-hours over 149 smoke and full stages (the jobs'
   execution records, failures included), within the 28 ceiling.
 
+### 2026-10-17 — H5 with G_HO in both foreground slots (after H4c)
+- Change (H4c's decision, user 2026-10-17, relayed by the H4c session): H4c's
+  G_HO (G refitted on G's hand footage plus other participants' object
+  crops, 8 × 64; −39% on handled-object pixels and −33% on hands at ¼ and ½,
+  4 of 4 pilot items) replaces G in the hand slot and the identity in the
+  object slot, at H3d's six points (`h5 foreground --slots G_HO`; networks
+  from H4c's jobs `20261016T152552Z-c3d9ed14` and `…153801Z-03f2a819`). QP 63
+  and the full-resolution points keep no network.
+- Scope stated: H4c measured G_HO on H1's handled-object region O; H5's
+  object class is all of F that is not a hand (VISOR's active objects,
+  including large surfaces such as pans and boards), so G_HO on it goes
+  beyond what H4c measured.
+- Method: the foreground jobs of the 4 pilot items rerun at the six points;
+  every pair of the H5 hull rescored as in H5 (F granted), and H5's report
+  run with these rows in place of G's. No new rule: this is a component
+  swap; reported as BD-rate of PointStream with G_HO against PointStream
+  with G on the same pairs, and against the anchors as in H5.
+- Budget: 4 foreground jobs and 4 scoring jobs, about 3 GPU-hours.
+
 ### 2026-10-17 — H5m: coding F (the mask PointStream's decoder needs)
 - Question (after H5's pilot, user 2026-10-17): H5's gain holds only with
   F granted; sent losslessly at 1080p, F and its class map cost 0.5–2.9
