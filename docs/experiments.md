@@ -5910,6 +5910,54 @@ invocation turns out to be needed.
 - GPU time: 22.5 GPU-hours over 149 smoke and full stages (the jobs'
   execution records, failures included), within the 28 ceiling.
 
+### 2026-10-17 — H5m: coding F (the mask PointStream's decoder needs)
+- Question (after H5's pilot, user 2026-10-17): H5's gain holds only with
+  F granted; sent losslessly at 1080p, F and its class map cost 0.5–2.9
+  Mbps per window and flip every comparison. Can F be coded cheaply
+  enough that PointStream still beats B2's anchors with every byte,
+  F's included, counted?
+- Candidate (cheapest first): the class map (0 background, 1 hand, 2
+  object) at 1/s of the frame size (s = 2, 4, 8, 16; F̂ where at least
+  half of a cell's area is F, hand where hand pixels outnumber object
+  pixels there), its two bit planes XOR-ed with the previous frame and
+  compressed with lzma, losslessly; the client upsamples F bilinearly
+  and thresholds at 0.5, and gives each pixel of F̂ the class of the
+  nearest low-resolution F cell (`src/pointstream/mask.py`). F̂ replaces
+  F in the compositor (the ring blend, G's slot); the bytes go into the
+  container's MASK segment, so the rate counts them.
+- Method (`h5 score --mask-scale s`): the published foreground and
+  background decodes of H5's pilot re-composited with F̂ and scored as
+  in H5 (B2's harness on the dataset masks, which stay the reference).
+  Pairs: each item's H5 hull pairs on weighted LPIPS (12–17 per item),
+  at each s. Bias, stated: the streams were coded for the exact F (the
+  background filled F, the foreground kept K = F ⊕ (8 + 2·scale) px), so
+  where F̂ leaves K the foreground shows padding; a pipeline built for
+  F̂ would code K and the fill from F̂. This measures the candidate on
+  today's streams, an estimate of the built component, not a bound.
+  The H5 hull's pairs are chosen with F granted; with F̂ another pair
+  could win, which only helps the candidate (the hull here is a lower
+  bound of the candidate's own hull).
+- Decision rule, fixed now. The candidate is adopted if, at some s (or
+  the hull over s), PointStream with F̂ billed passes H5's rule (a)
+  against the same pooled anchors: weighted LPIPS (fill) BD-rate −10% or
+  better with at least 3 of 4 items below 0. Then the mask coder is
+  built at that grid (encoder codes K and the fill from F̂). Otherwise
+  the next candidate, with its own rule: F derived at the client from
+  what it already decodes (the foreground stream coded with a key
+  outside F), or contours with temporal prediction.
+- Hypotheses. At s = 8 the class map costs 10–60 kbps per window and
+  costs little quality (F̂'s boundary errors of up to 8 px fall in the
+  ring's blend); the rule passes at s = 8 or 16, with a smaller margin
+  than H5's −15% (the mask rate matters most at PointStream's low rates,
+  where most of its hull lies but the anchors do not reach).
+- Competing explanation for a failure: F's boundary is where the
+  composite is judged hardest (hands against the background, the 70%
+  weight on F); missing F pixels show the background's fill (inpainted,
+  wrong content) and extra ones show the foreground's padding, so even
+  small boundary errors cost more than the bits they save.
+- Budget: 4 scoring jobs (one per item, about 60 pairs at 30–40 s), about
+  3 GPU-hours, shared GPUs; each under 45 minutes.
+
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
   can a body-pose estimator's keypoints carry the players? Per part
