@@ -5795,9 +5795,10 @@ invocation turns out to be needed.
     `…111928Z-60c2f00c`: every point reproduces B2's weighted PSNR within
     7 × 10⁻⁶ dB and its rate exactly, and every re-encoded DCVC-UF
     stream is byte-identical to B2's.
-  - Report (`h5 report`, code `c7e9e91`): `h5-report.json`, `h5-rd.png`,
-    published beside the jobs at
-    `pointstream-data/visor/h5-2026-10-16/report/`.
+  - Report (`h5 report`): `h5-report.json`, `h5-rd.png` beside the jobs
+    at `pointstream-data/visor/h5-2026-10-16/report-7ffa414/` (code
+    `7ffa414`, per-key bootstrap; the first, `report/` from `c7e9e91`,
+    is kept as it was).
   - Failed or replaced, none citable: GPU memory overruns of the
     foreground (33–35 GB on windows with large F; fixed by releasing the
     main process's cache before each DCVC-UF call and declaring 40 GB);
@@ -5981,12 +5982,12 @@ invocation turns out to be needed.
   decoding to its reduced grid exactly). P01_107 s = 2, 4, 8, 16:
   `20261017T150931Z-e433c92d`, `…150940Z-83ccfcf4`, `…150949Z-43d7a289`,
   `…150958Z-db776057`; P02_02: `…151010Z-7a75681d`, `…151019Z-494b6010`,
-  `…151028Z-d9ada6bd`, `…151038Z-dd172972`; P03_10: `…151052Z-d0800d65`
-  (s = 2, running when this was written), `…151104Z-c9ed195b`,
+  `…151028Z-d9ada6bd`, `…151038Z-dd172972`; P03_10: `…151052Z-d0800d65`,
+  `…151104Z-c9ed195b`,
   `…151116Z-ddb03427`, `…151127Z-ad0e1bbc`; P09_106: `…151140Z-c5e09039`,
   `…151149Z-33f8ba99`, `…151158Z-6374d0b3`, `…151207Z-d2be1d00`.
 - Mask cost (kbps) and IoU of F̂ with F, P01_107 | P02_02 | P03_10 |
-  P09_106: s = 2: 529 | 971 | – | 219 (IoU 0.98–0.99); s = 4: 166 | 320
+  P09_106: s = 2: 529 | 971 | 662 | 219 (IoU 0.98–0.99); s = 4: 166 | 320
   | 229 | 89 (0.97–0.99); s = 8: 51 | 116 | 75 | 36 (0.96–0.99); s = 16:
   16 | 39 | 23 | 14 (0.83–0.97). F costs about 1/s² of its lossless
   cost; at s = 8 it is still as much as PointStream's whole stream at
@@ -5997,6 +5998,7 @@ invocation turns out to be needed.
   | F | weighted LPIPS | mean (CI) | < 0 | frame LPIPS | frame DISTS |
   |---|---|---|---|---|---|
   | granted (H5) | −12 \| +0 \| −26 \| −23% | −15% (−25 to −5) | 3 | −38% | −48% |
+  | s = 2 | +123 \| +150 \| +122 \| −2% | +98% | 1 | | |
   | s = 4 | +33 \| +52 \| +27 \| −14% | +25% | 1 | +11% | +19% |
   | s = 8 | +3 \| +21 \| −8 \| −18% | −1% (−16 to +13) | 2 | −15% | −16% |
   | s = 16 | +21 \| +13 \| −11 \| +11% | +9% | 1 | −21% | −28% |
@@ -6025,6 +6027,7 @@ invocation turns out to be needed.
 - Code: the report's per-key bootstrap (a comparison's CI no longer
   depends on what else is in the report; H5's headline CI is −25 to −5,
   first printed as −25 to −3), rows keyed by pair and mask scale.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5m-7ffa414/`.
 - GPU time: about 2.5 GPU-hours (16 jobs).
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
