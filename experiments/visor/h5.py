@@ -725,7 +725,9 @@ def dcvc_worker(action: str, plan: dict[str, Any], work: Path) -> dict[str, Any]
 
     from src.codecs.dcvc_uf_worker import dcvc_command
 
-    plan_path, report = work / f"plan-{action}.json", work / f"{action}.json"
+    work = work / f"{action}-{Path(plan['container']).stem}"  # one directory per call: the worker never overwrites
+    work.mkdir(parents=True, exist_ok=False)
+    plan_path, report = work / "plan.json", work / "report.json"
     write_json(plan_path, plan)
     command, env, cwd = dcvc_command(Path(sys.prefix), action, plan_path, report)
     done = subprocess.run(command, env={**os.environ, **env}, cwd=cwd, capture_output=True, text=True, timeout=3600)
