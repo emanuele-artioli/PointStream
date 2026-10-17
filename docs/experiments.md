@@ -5816,13 +5816,13 @@ invocation turns out to be needed.
   | Metric | PointStream | mean (CI) | items < 0 |
   |---|---|---|---|
   | **weighted LPIPS (fill)** | −12% \| +0% \| −26% \| −23% | **−15% (−25 to −5)** | 3 |
-  | weighted LPIPS (no fill) | −13% \| +1% \| −26% \| −36% | −18% (−31 to −5) | 3 |
-  | weighted DISTS (fill) | −12% \| +31% \| −1% \| −23% | −1% (−18 to +23) | 3 |
-  | weighted PSNR (fill) | +78% \| +52% \| −4% \| −22% | +26% (−13 to +72) | 2 |
+  | weighted LPIPS (no fill) | −13% \| +1% \| −26% \| −36% | −18% (−34 to −5) | 3 |
+  | weighted DISTS (fill) | −12% \| +31% \| −1% \| −23% | −1% (−18 to +20) | 3 |
+  | weighted PSNR (fill) | +78% \| +52% \| −4% \| −22% | +26% (−13 to +65) | 2 |
   | weighted PSNR (no fill) | +79% \| +53% \| −1% \| −47% | +21% (−24 to +66) | 2 |
   | frame LPIPS | −57% \| −16% \| −43% \| −37% | −38% (−52 to −23) | 4 |
   | frame DISTS | −61% \| −33% \| −51% \| −48% | −48% (−57 to −37) | 4 |
-  | frame PSNR | +136% \| +83% \| +39% \| +21% | +70% (+30 to +109) | 0 |
+  | frame PSNR | +136% \| +83% \| +39% \| +21% | +70% (+30 to +123) | 0 |
 
   - **(a) passes**: weighted LPIPS −15% (rule −10%) with 3 of 4 items
     below 0. Weighted DISTS agrees in sign on 3 items but its mean is

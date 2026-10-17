@@ -921,7 +921,7 @@ one DCVC-UF foreground stream of F (¼, ½, full; G on the hands), the
 compositor and a container with every byte counted
 (`src/pointstream/`, `experiments/visor/h5.py`). With F granted, rule (a)
 passes: weighted LPIPS −15% against the pooled envelope of B2's preset-4
-SVT-AV1 and DCVC-UF (CI −25 to −3, 3 of 4 items); frame LPIPS −38% and
+SVT-AV1 and DCVC-UF (CI −25 to −5, 3 of 4 items); frame LPIPS −38% and
 DISTS −48% (4 of 4); whole-frame PSNR loses (+70%) and weighted PSNR
 splits. The neural background carries the gain; the foreground stream
 is worse per bit than whole-frame DCVC-UF where F is large. Billing F
@@ -931,6 +931,12 @@ pipeline's CPU stages): **the equal-time SVT-AV1 preset is 1** (B2b's
 re-encode, ladder and ROI run can go). Before the 34-item run (about 200
 GPU-hours, final-runs-once): B2b at preset 1, a mask coder, and the
 foreground's per-bit cost on large F.
+*H5m (2026-10-17):* F's class map coded at 1/s and billed (16–116 kbps at
+s = 8–16) does not keep the weighted-LPIPS margin (hull over s −4%, 2 of 4
+items; rule −10%, 3 of 4); frame LPIPS −21% and DISTS −28% survive on 4 of
+4. Next for F: re-encode the foreground with K and the fill from F̂ (the
+measured streams were coded for exact F), then F carried by the
+foreground stream itself. G_HO (H4c) goes into both foreground slots.
 
 #### K. Where keypoints win (analysis, user 2026-10-13)
 
