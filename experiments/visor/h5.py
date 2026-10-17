@@ -1072,8 +1072,8 @@ def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_
                 out["comparisons"][f"pointstream+mask|pooled|{metric}"] = compare(
                     curve(points, metric, mask_kbps), curve(groups["pooled"], metric), minimum)
         hull = envelope(curve(points, HEADLINE))
-        on = [r for r in points for k, q in hull if r["kbps"] == k and
-              -r["scores"][FILL]["wlpips"] == q]
+        on = sorted((r for r in points for k, q in hull if r["kbps"] == k and -r["scores"][FILL]["wlpips"] == q),
+                    key=lambda r: r["kbps"])
         out["hull"][variant] = [{"pair": r["pair"], "kbps": r["kbps"], "wlpips": r["scores"][FILL]["wlpips"],
                                  "background_share": r["kbps_background"] / r["kbps"]} for r in on]
     pointstream = [r for r in rows if r["route"] in VARIANTS["pointstream"]]
