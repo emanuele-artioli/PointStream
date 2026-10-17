@@ -873,8 +873,27 @@ quality: G as it is; G refitted on object crops; G refitted on hands and
 objects (one network, same size). Data as H3d's component (other
 participants' recordings, SAM 3.1 masks). Fallback if all fail:
 generative completion of unseen sides.
+Outcome (2026-10-16, [experiments](docs/experiments.md#2026-10-16--h4c-handled-objects-as-pixels-h3ds-recipe)):
+**one network, G_HO, codes hands and handled objects.** G refitted on G's
+hand footage plus object crops from other participants' recordings (VISOR
+dense train masks of objects in contact; same 594 k size) over DCVC-UF
+HT-L off the shelf at ¼ and ½: −39% rate at equal LPIPS on handled-object
+pixels against their pixel bar (CI −48% to −28%, 4 of 4 items), and −33%
+on the hands (CI −48% to −18%), 8% better than G there. G as it is fails
+on objects (+10%; it recolours a chrome tap toward skin); G_O (objects
+only) is 2% better than G_HO on objects but loses the hands on one item.
+PSNR is worse for every arm: a perceptual gain, as G's. The window-fitted
+oracle reaches −92%, so most of the gain left is fitting the video itself.
+Generative completion is not needed. The user's concern (one enhancer for
+varied objects and alike hands) does not hold on the pilot items.
 
 #### H5. First working PointStream
+
+Handled objects and hands (decided by H4c, 2026-10-16): DCVC-UF HT-L off
+the shelf at ¼ or ½ resolution plus G_HO, one generic enhancer for both,
+applied on the foreground boxes and sent with the decoder (networks:
+`h4c-2026-10-16` jobs `20261016T152552Z-c3d9ed14` (¼) and
+`20261016T153801Z-03f2a819` (½), one per QP). It replaces G on the hands.
 
 G's background and H's foreground in one bitstream with every byte counted:
 references once, then camera pose, hand pose and object motion per frame,
@@ -914,6 +933,15 @@ before its run:
   winning); if not, the low-rate claim is dropped for egocentric hands.
   The regime itself (where pixel coders collapse) is defined per domain by
   the judge (e.g. a detector's recall on the decoded ball, K5).
+  **Done 2026-10-16** ([experiments](docs/experiments.md#2026-10-16--k1-do-keypoints-win-on-egocentric-hands-at-very-low-rates)):
+  from H3b2's and H3d's reports, with H3b's region S mapped to R through
+  SVT-AV1's shared streams. At 1.93 kbps perfect appearance at the coded
+  pose (forearm free) lies above DCVC-UF + G on 1 of 4 items (P01_107,
+  76% saving there; 65–500% worse on the others); the hand alone on none;
+  the uncoded pose on 2. The real generator (H3e) was below the pixel
+  coders even without G. **Agreed (user, 2026-10-17): the low-rate claim is
+  dropped for egocentric hands**; the one-item bound stays a sentence. Pose error on G's outputs was never measured, so the
+  information claim (H3c2) is K2's to re-judge.
 - K2. *Judges of what keypoints carry (coding for machines).* H3c2 judged
   hands by the pose re-estimated on the decoded video; the mask or pose
   computed on the original against on the decoded foreground is the same
@@ -1053,7 +1081,7 @@ Datasets: still-camera sets (TrackNet, RacketVision, OpenTTGames) are
 fine where a decision needs labels, with the scope stated in the paper;
 broadcast matches answer what a real broadcast costs.
 Order: H5 continues on egocentric (a working pipeline with what is
-chosen: G's background, DCVC-UF + G on hands, H4c on objects), since its
+chosen: G's background, DCVC-UF + G_HO on hands and objects, H4c), since its
 bitstream, compositor and harness carry over to tennis. K4–K5 and K2 run
 beside it in their own sessions; K1 and K3 are cheap and egocentric; K7
 follows K4's method once K4 has run.
