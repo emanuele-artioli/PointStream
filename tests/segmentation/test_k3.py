@@ -102,8 +102,8 @@ def _textured(h: int, w: int, shift: int) -> np.ndarray:
     base = rng.integers(0, 255, (h, w + 16), dtype=np.uint8)
     import cv2
 
-    base = cv2.GaussianBlur(base, (0, 0), 2)
-    return np.ascontiguousarray(base[:, 8 - shift:8 - shift + w])
+    blurred = np.asarray(cv2.GaussianBlur(base, (0, 0), 2), np.uint8)
+    return np.ascontiguousarray(blurred[:, 8 - shift:8 - shift + w])
 
 
 def test_flow_reference_moves_the_previous_hand_and_nothing_else():
