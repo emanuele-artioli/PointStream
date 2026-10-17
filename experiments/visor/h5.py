@@ -242,7 +242,13 @@ def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nea
             net, info, arm = nets[(name, label)]
             slots[cls] = hand_enhancer(net, "cuda")
             networks[label] = {"point": name, "arm": arm, "sha256": info["sha256"]}
-    out = cp.apply_slots(upsampled, nearest, slots)
+    if (name, "hand") in nets and nets.get((name, "object")) is nets[(name, "hand")]:
+        # one network in both slots: one pass over F's box, as the client would run it
+        both = hand_enhancer(nets[(name, "hand")][0], "cuda")
+        enhanced = both(upsampled, nearest > 0)
+        out = np.where((nearest > 0)[..., None], enhanced, upsampled)
+    else:
+        out = cp.apply_slots(upsampled, nearest, slots)
     t3 = time.time()
     yuv = g5.rgb_to_yuv420(out)
     sse, count = 0.0, 0
