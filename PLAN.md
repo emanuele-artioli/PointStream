@@ -896,6 +896,22 @@ plus the fallback pixels. Scored with B2's harness on evaluation set v2
 curves, and timed end to end, which picks B2b's equal-time SVT-AV1 preset.
 **Done when** PointStream's curves and encode and decode times on all 34
 items come from recorded jobs, beside B2's.
+*Pilot done (2026-10-17, [experiments](docs/experiments.md), H5):* the
+pipeline runs end to end on B2's 4 pilot items: G6's two background routes,
+one DCVC-UF foreground stream of F (¼, ½, full; G on the hands), the
+compositor and a container with every byte counted
+(`src/pointstream/`, `experiments/visor/h5.py`). With F granted, rule (a)
+passes: weighted LPIPS −15% against the pooled envelope of B2's preset-4
+SVT-AV1 and DCVC-UF (CI −25 to −3, 3 of 4 items); frame LPIPS −38% and
+DISTS −48% (4 of 4); whole-frame PSNR loses (+70%) and weighted PSNR
+splits. The neural background carries the gain; the foreground stream
+is worse per bit than whole-frame DCVC-UF where F is large. Billing F
+at its lossless cost (0.5–2.9 Mbps) flips every comparison. Encoder
+163–166 s per window (ProPainter 77%), decoder 95–133 s (this
+pipeline's CPU stages): **the equal-time SVT-AV1 preset is 1** (B2b's
+re-encode, ladder and ROI run can go). Before the 34-item run (about 200
+GPU-hours, final-runs-once): B2b at preset 1, a mask coder, and the
+foreground's per-bit cost on large F.
 
 #### K. Where keypoints win (analysis, user 2026-10-13)
 
