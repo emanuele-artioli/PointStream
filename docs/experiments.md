@@ -6218,6 +6218,50 @@ invocation turns out to be needed.
   P01_107 the video coder's rate still falls steeply at CRF 50 (*sdf* at
   1/8: 108 kbps at CRF 35, 44 at 50) while F̂'s accuracy barely moves, so
   CRF 56 and 63 at s = 8 and 16 run as a second job per item (same code).
+- Outcome (CPU; code `028bf81`: P01_107 `20261020T130419Z-552bc357`,
+  P02_02 `…130427Z-b3d147ab`, P03_10 `…130435Z-4fa52c2b`, P09_106
+  `…130456Z-85922e9b`; `6806e31` for CRF 56/63: `…131116Z-19531c72`,
+  `…131124Z-4e72e14f`, `…131132Z-49949d4c`, `…131140Z-cf56c11b`; SVT-AV1
+  v4.2.0; every result validated locally 5/5). Per item, P01_107 | P02_02
+  | P03_10 | P09_106, rate (kbps) and IoU:
+
+  | coder | P01_107 | P02_02 | P03_10 | P09_106 |
+  |---|---|---|---|---|
+  | lzma, s = 8 (H5m) | 51, 0.977 | 116, 0.988 | 75, 0.983 | 36, 0.955 |
+  | lzma, s = 16 | 16, 0.923 | 39, 0.970 | 23, 0.945 | 14, 0.833 |
+  | *sdf*, s = 8, CRF 50 | 44, 0.981 | 133, 0.989 | 60, 0.985 | 31, 0.947 |
+  | *sdf*, s = 8, CRF 63 | 16, 0.971 | 32, 0.983 | 20, 0.976 | 15, 0.889 |
+  | *binary*, s = 8, CRF 63 | 25, 0.977 | 49, 0.987 | 33, 0.982 | 19, 0.942 |
+  | cheapest at lzma s = 8's accuracy | *binary* s8 CRF 50, 73 | *sdf* s4 CRF 50, 282 | *sdf* s4 CRF 50, 126 | *sdf* s4 CRF 50, 57 |
+
+  - **The rule fails.** On no item is a video setting at least as accurate
+    as lzma at s = 8 for less: the cheapest costs 1.4–2.4× more. Re-billed
+    at it, H5m's s = 8 rows give +9, +47, +3, −16% on weighted LPIPS
+    (mean +11%, 1 of 4 below zero; lzma: +3, +21, −8, −18%). Neither
+    clause holds, so **lzma stays the mask coder**, and F carried in the
+    foreground stream becomes the main route for F.
+  - Hypothesis wrong. Frame-to-frame XOR plus lzma is already a strong
+    temporal coder for a mask that mostly stays still. SVT-AV1 at 50
+    frames/s pays per-frame overhead, and a chroma plane of hard steps.
+    *sdf* does buy accuracy: at the same scale it beats lossless lzma on
+    IoU (s = 4, CRF 20: 0.990 against 0.986 on P01_107), but that costs
+    more than the finer grid it would replace.
+  - What video coding does buy: about half the rate for a slightly worse
+    F̂. *binary* at s = 8 and CRF 63 keeps lzma s = 8's IoU within 0.013
+    (boundary +0.2 to +3.7 px) at 0.42–0.52 of its rate. Re-billed there,
+    assuming no loss of quality (optimistic, outside the rule), weighted
+    LPIPS is −4, +10, −18, −20% (mean −8%, 3 of 4): still short of
+    rule (a).
+  - The boundary distance is dominated by small instances that F̂ drops
+    or adds (P02_02: 28–45 px for every coder, lossless lzma included),
+    so it compares coders but is not a size of edge error. The IoU and
+    the share of F wrong carry the comparison.
+  - Caveat for the next step: H5m's rows have G in the foreground slots.
+    G_HO took the granted-F result from −15% to −29%, so coded F with
+    G_HO has not been measured. That, with K taken from F̂, is step 4's
+    rescoring (GPU).
+- Results: `pointstream-data/visor/h5-2026-10-16/mask-video-6806e31/`
+  (each job's `h5.json` and the estimate).
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and

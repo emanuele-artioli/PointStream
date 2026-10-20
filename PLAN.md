@@ -953,10 +953,12 @@ the fair anchors.
    enhancer in 10–324 s. The routes stand as per-kitchen models, pending
    a cross-video check (a model fitted on the kitchen's other recordings,
    scored on the pilot window; GPU).
-2. *F as a video (CPU oracle).* F's clipped signed distance (or its
-   step) in Y and the class in U through SVT-AV1, against H5m's lzma
-   coder by rate and F̂ accuracy; H5m's s = 8 rows re-billed at the
-   cheapest equally accurate setting and judged by rule (a).
+2. *F as a video (CPU oracle).* **Done, fails**: SVT-AV1 (F's signed
+   distance or its step in Y, the class in U) never matches lzma at s = 8
+   for less (1.4–2.4× dearer at equal accuracy). It halves the rate only
+   for a slightly worse F̂, and even then, re-billed optimistically,
+   weighted LPIPS reaches −8% (3 of 4), short of rule (a). lzma stays;
+   F carried in the foreground stream becomes the main route.
 3. *Fair anchors.* (a) SVT-AV1 at the equal-time preset 1, with B2b's
    low-rate ladder (720p, 540p, 360p, upscaled) so the anchors reach
    PointStream's low rates, where the scene route's points now go unread
@@ -964,9 +966,9 @@ the fair anchors.
    to the venue the same way (G6's recipe L on unfilled footage, coded on
    the unfilled window; about 8 jobs). PointStream is re-judged against
    the new pooled envelope, with the venue models billed per kitchen.
-4. *F, GPU.* Re-encode the foreground with K from F̂ (the winning coder of
-   2, or lzma at s = 8 and 16) and rescore; then, if 2 does not pass, an
-   oracle for F carried by the foreground stream itself (no MASK segment).
+4. *F, GPU.* Re-encode the foreground with K from F̂ (lzma at s = 8 and
+   16) with G_HO in the slots (H5m had G), and rescore; then an oracle for
+   F carried by the foreground stream itself (no MASK segment).
 5. *Visual check (CPU).* Side-by-side crops of PointStream and the
    anchors at matched rates, for the user's review.
 Scores stay LPIPS, DISTS and PSNR (a model trained on a metric may be
