@@ -6214,6 +6214,10 @@ invocation turns out to be needed.
   between frames where lzma's are stable. Step 4's rescoring tests that;
   this rule only estimates it.
 - Budget: 4 CPU jobs, under 20 minutes each. No GPU.
+- Points added (before reading the other items; rule unchanged): on
+  P01_107 the video coder's rate still falls steeply at CRF 50 (*sdf* at
+  1/8: 108 kbps at CRF 35, 44 at 50) while F̂'s accuracy barely moves, so
+  CRF 56 and 63 at s = 8 and 16 run as a second job per item (same code).
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
