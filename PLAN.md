@@ -944,23 +944,31 @@ foreground stream itself. *G_HO (H4c) in both foreground slots
 34-item run waits for the paper's figures; plan these instead).* On the
 4 pilot items, each with its rule written before its run, about 10
 GPU-hours in all:
-1. *Venue models' payback (CPU, minutes).* From the recorded model sizes
-   (scene-model checkpoint, enhancer weights per CRF): the rate each saves
-   at matched quality against the same route without it, and the seconds
-   of video it takes to repay its bytes. Decides whether the routes stand
-   as per-venue models or need a model shared across a kitchen's videos.
-2. *Fair anchors.* (a) SVT-AV1 at the equal-time preset 1, with B2b's
+Order agreed with the user (2026-10-20): F's rate test moved up, before
+the fair anchors.
+1. *Venue models' payback (CPU, minutes).* **Done**: the scene model
+   ships as a 50 MB 4-bit change. Billed per video, rule (a) fails (−9%;
+   the curve is the enhancer route alone); billed per kitchen it passes,
+   −25% on 4 of 4. The scene model repays in 0.4–3.3 h of stream, each
+   enhancer in 10–324 s. The routes stand as per-kitchen models, pending
+   a cross-video check (a model fitted on the kitchen's other recordings,
+   scored on the pilot window; GPU).
+2. *F as a video (CPU oracle).* F's clipped signed distance (or its
+   step) in Y and the class in U through SVT-AV1, against H5m's lzma
+   coder by rate and F̂ accuracy; H5m's s = 8 rows re-billed at the
+   cheapest equally accurate setting and judged by rule (a).
+3. *Fair anchors.* (a) SVT-AV1 at the equal-time preset 1, with B2b's
    low-rate ladder (720p, 540p, 360p, upscaled) so the anchors reach
-   PointStream's low rates (CPU; B2b items 2–3 on the pilots). (b) A
-   whole-frame DCVC-UF adapted to the venue the same way (G6's recipe L on
-   unfilled footage, coded on the unfilled window; about 8 jobs). PointStream
-   is re-judged against the new pooled envelope.
-3. *F.* Re-encode the foreground with K from F̂ at s = 8 and 16 (H5m's
-   streams were coded for the exact F) and rescore; then an oracle for F
-   carried by the foreground stream itself (no MASK segment), and a
-   motion-compensated mask (F as an alpha plane through a video codec).
-4. *Visual check (CPU).* Side-by-side crops of PointStream and the anchors
-   at matched rates, for the user's review.
+   PointStream's low rates, where the scene route's points now go unread
+   (CPU; B2b items 2–3 on the pilots). (b) A whole-frame DCVC-UF adapted
+   to the venue the same way (G6's recipe L on unfilled footage, coded on
+   the unfilled window; about 8 jobs). PointStream is re-judged against
+   the new pooled envelope, with the venue models billed per kitchen.
+4. *F, GPU.* Re-encode the foreground with K from F̂ (the winning coder of
+   2, or lzma at s = 8 and 16) and rescore; then, if 2 does not pass, an
+   oracle for F carried by the foreground stream itself (no MASK segment).
+5. *Visual check (CPU).* Side-by-side crops of PointStream and the
+   anchors at matched rates, for the user's review.
 Scores stay LPIPS, DISTS and PSNR (a model trained on a metric may be
 judged on it, user 2026-10-20).
 

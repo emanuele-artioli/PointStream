@@ -6126,6 +6126,42 @@ invocation turns out to be needed.
   rule's cross-video check separates the two.
 - Budget: one CPU job (four 482 MB checkpoints against the public
   weights, under 20 minutes); the report runs locally. No GPU.
+- Outcome. Size job `20261020T130040Z-e3034466` (code `811ae97`, CPU,
+  119 s; validated locally 4/4). Each scene model ships as a 4-bit change
+  of **50.1–50.6 MB** (8-bit: 111 MB; 79–80% of its levels nonzero, as in
+  G5c). Report over H5's and the G_HO swap's 41 score stages with
+  `--billing` (code `028bf81`), BD-rate on weighted LPIPS with fill against
+  the pooled anchors (P01_107 | P02_02 | P03_10 | P09_106):
+
+  | billing | weighted LPIPS | mean (CI) | < 0 | weighted DISTS | frame LPIPS | frame DISTS |
+  |---|---|---|---|---|---|---|
+  | none (H5 with G_HO) | −19 \| −20 \| −42 \| −34% | −29% (−38 to −19) | 4 | −23% | −46% | −53% |
+  | per video | +5 \| −9 \| −10 \| −22% | −9% (−19 to +1) | 3 | +12% (1 of 4) | −31% | −40% |
+  | per kitchen | −17 \| −16 \| −37 \| −29% | −25% (−33 to −16) | 4 | −15% (4 of 4) | −43% | −45% |
+
+  - **Per video the rule fails** (−9%, short of −10%). **Per kitchen it
+    passes** on 4 of 4. By the rule the routes stand as per-kitchen models,
+    and the cross-video check comes before the paper claims them.
+  - Billed per video, PointStream's curve is its enhancer route alone
+    (enhancer route by itself: +5, −9, −10, −22%): 50 MB is 1.9–3.9 Mbps
+    over these videos, so the scene model leaves the hull. Per kitchen,
+    the enhancer route alone gives −17, −17, −31, −28%, so inside the
+    anchors' range the scene model adds little once billed. Its own
+    points lie at 14–140 kbps, below the anchors' lowest rate, where no
+    BD-rate reads them; the low-rate anchors (H5p 3) are the test there.
+  - Payback, seconds of stream at the hull's points inside the anchors'
+    range: scene model 1,310–11,850 s (0.4–3.3 h; P09_106 1.3 k, P03_10
+    3.5 k, P02_02 4.0 k, P01_107 2.3–11.8 k); enhancer 10–324 s, mostly
+    under a minute. So each enhancer repays within one pilot video, and
+    the scene model only within a kitchen (the participants' on-disk
+    footage: 0.65–3.0 h).
+  - Hypothesis half right. Per video fails, but narrowly, because the
+    enhancer route nearly carries it (predicted: clearly). Per kitchen
+    passes on all 4 (predicted: P09 fails): billed over 2,330 s the scene
+    model adds 174 kbps, but the enhancer route covers P09's range.
+  - Weighted PSNR stays worse (+27% unbilled, +31% per kitchen), as in H5.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-pay-028bf81/` (with
+  the billing file, the durations and the size result).
 
 ### 2026-10-20 — H5p 2: F as a video (rate oracle, CPU)
 - Question (user, 2026-10-20; moved ahead of the fair anchors): H5m's
