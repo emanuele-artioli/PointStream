@@ -985,6 +985,29 @@ the fair anchors.
 Scores stay LPIPS, DISTS and PSNR (a model trained on a metric may be
 judged on it, user 2026-10-20).
 
+*H5q, the split's win at equal adaptation (user, 2026-10-20: "as long as
+there's a way to win, we should take it").*
+- The target: PointStream against the venue-adapted whole-frame DCVC-UF,
+  neither model billed. Rule (a) on weighted LPIPS (mean −10% or better, 3
+  of 4 items below zero), and against the pooled fair envelope too. Today
+  it reads +16% (1 of 4). DISTS and PSNR are reported beside it.
+- The levers only the split has, cheapest test first; each one gets its
+  rule written before its run:
+  1. *A venue-adapted foreground coder.* PointStream adapts only its
+     background; the anchor adapts the whole frame, hands included. Use
+     recipe L's fine-tune of DCVC-UF HT-L on the own-video footage's
+     foreground input (F and its ring, the rest push-pull padded, at ¼
+     and ½), with G_HO after it. Oracle first: fit on the scored window
+     itself, the memorization upper bound. If even that does not turn the
+     LPIPS row negative, the lever is dropped.
+  2. *A denser allocation grid.* The hull over (foreground, background)
+     pairs already splits the rate between F and the background. Add
+     points only where the hull is sparse near the anchor's curve.
+  3. *F carried in the foreground stream* (PLAN H5p 4). This removes the
+     MASK segment, which only matters once F is billed.
+- Venue models are sent beforehand and unbilled, on both sides. Payback
+  hours are reported. Smaller models come later (user, 2026-10-20).
+
 #### K. Where keypoints win (analysis, user 2026-10-13)
 
 Keypoints are PointStream's premise (after GenStream). On egocentric video
