@@ -7639,3 +7639,63 @@ invocation turns out to be needed.
   windows (K5's pilot windows first), ≤ 45 min; part 2, the other 4,
   ≤ 45 min, run only if part 1 leaves the rule open. Ceiling 2
   GPU-hours and 6 h wall.
+
+### 2026-10-20 — K5b (2): an encoder-side ball tracker (audit and rule)
+- Question (PLAN K5b 2, ball stage): a tracker that finds the ball on the
+  source for the ball mode's encoder, and that also judges the codecs'
+  outputs (K5: YOLO26x finds 46% of the source's balls, SAM 3.1's text
+  prompt 56%; neither is a valid judge).
+- Audit (2026-10-20). **No TrackNet-family weights are in `Models`**
+  (`YOLO/` holds COCO detectors and trackers' configs only). Candidates:
+  - *WASB* (Tarashima et al., BMVC 2023; `nttcom/WASB-SBDT`, **MIT**):
+    an HRNet heatmap tracker with tennis weights (`wasb_tennis_best.pth.tar`,
+    Google Drive) and the TrackNetV2, ResTrackNetV2, MonoTrack, BallSeg and
+    DeepBall baselines retrained by the same code. Its tennis config
+    trains on TrackNet **games 1–7** and tests on games 8–10, so five of
+    K5's eight windows (games 2, 3, 6, 7) are in its training set; only
+    game8/Clip6 and game10/Clip10 are held out. Plain PyTorch (tested on
+    Python 3.8, CUDA 11.3); no conflict expected with the pointstream
+    environment's torch, checked in the smoke.
+  - *RacketVision's BallTrack* (`OrcustD/RacketVision`, **MIT**):
+    TrackNetV3 with a median background frame, checkpoints on Hugging Face
+    (`linfeng302/RacketVision-Models`; the README names a badminton
+    example, a tennis checkpoint is unconfirmed); torch 2.1.2 and
+    mmengine.
+  - *TrackNetV3* (`qaz812345/TrackNetV3`, **MIT**): shuttlecock only.
+  - TrackNet v1 (the dataset's own model, no licence stated): not used.
+- Labels on disk. TrackNet: 95 clips, 10 games, 1280×720, every frame
+  (no licence stated; already used by K4–K5). RacketVision tennis
+  (**MIT**): 431 rallies at 1920×1080, 21,544 labelled frames (20,066
+  visible; about every 11th frame), split 350 / 38 / 43 with no match in
+  two splits.
+- Held-out labels for the decision: TrackNet's games of K5's windows
+  (2, 3, 6, 7, 8, 10) and RacketVision tennis test. Training uses TrackNet
+  games 1, 4, 5, 9 (44 clips) and RacketVision tennis train.
+- Judge: *detection rate*, the share of visible labelled frames with the
+  tracker's position within 10 px at 720p (15 px at 1080p; 5 px
+  reported), plus false detections per frame without a visible ball.
+- Stage A, the oracle (no training): WASB's tennis weights off the shelf
+  on TrackNet games 8–10 (its own held-out games) and on RacketVision
+  tennis test. It bounds what this architecture reaches when trained on
+  TrackNet's own matches. Rule: if WASB reaches ≥ 0.90 on games 8–10, the
+  architecture is adopted and stage B fine-tunes it with K5's games held
+  out; under 0.90, the other candidates are audited before any training.
+  RacketVision test under 0.70 marks a domain gap that stage B's
+  RacketVision data must close.
+- Stage B (only after A): smoke, a pilot of ≤ 45 min (one setting of the
+  learning rate and schedule, the held-out rate tracked per epoch), then
+  training in parts of ≤ 45 min that each save their checkpoint.
+  Decision rule: the tracker is adopted when its detection rate on the
+  held-out TrackNet games is ≥ 0.90 with ≤ 0.05 false detections per
+  frame without a ball, and ≥ 0.80 on RacketVision tennis test; otherwise
+  the negative is reported and the ball mode keeps labelled positions in
+  its claims (scoped to labelled data).
+- Hypothesis: WASB passes stage A (its paper reports F1 about 0.96 on
+  tennis); RacketVision's broadcast 1080p is harder (smaller ball relative
+  to the frame, different courts), about 0.7–0.85 off the shelf.
+- Competing explanation: TrackNet's games 8–10 share courts and players
+  with games 1–7, so stage A overstates generalization; RacketVision
+  test, from other matches, is the check.
+- Budget: stage A ≤ 0.5 GPU-hour; stage B ≤ 6 GPU-hours. **Waits on the
+  user's permission to download** WASB's code (MIT, GitHub) and its tennis
+  weights (Google Drive) into `Models/WASB`.

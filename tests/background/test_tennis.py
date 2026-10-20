@@ -186,3 +186,12 @@ def test_k5b_decision_needs_both_judges_on_six_of_eight():
     frame_cost = {str(i): window(True, i < 5) for i in range(8)}
     assert k5b.decide(frame_cost)["adopted"]["streak"] is False
     assert k5b.decide({str(i): window(True, True) for i in range(4)})["adopted"]["streak"] is False
+
+
+def test_k5b_labels_read_only_frames_without_touching_them():
+    from experiments.tennis import k5b
+
+    frame = np.full((72, 128, 3), 50, np.uint8)
+    frame.setflags(write=False)
+    out = k5b.label(frame, "source")
+    assert out.max() > 200 and frame.max() == 50

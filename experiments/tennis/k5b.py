@@ -143,7 +143,7 @@ def follow_centres(track: ball.Track, shape: tuple[int, int]) -> np.ndarray:
 def label(panel: np.ndarray, text: str) -> np.ndarray:
     import cv2
 
-    out = np.ascontiguousarray(panel)
+    out = np.array(panel, np.uint8, copy=True)  # frames may be read-only memmaps
     scale = max(0.5, panel.shape[0] / 720)
     (tw_, th), base = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, scale, 1)
     cv2.rectangle(out, (0, 0), (tw_ + 12, th + base + 12), (0, 0, 0), -1)
