@@ -262,3 +262,97 @@ def test_scoring_rejects_partial_matches_and_dropped_frame_rows():
     report["shots"][0]["registration"].pop()
     with pytest.raises(ValueError, match="every shot frame"):
         k8.score(report, marks)
+
+
+def sample_report(count=60):
+    """Two predicted-court shots, then non-court shots of varied length (fps 10)."""
+    shots, start = [], 0
+    for i in range(count):
+        length = 20 + (i * 37) % 300
+        shots.append(shot(f"shot-{i:04d}", start, start + length, "court" if i < 2 else "non_court"))
+        start += length
+    return scoring_report(shots)
+
+
+def test_inclusion_is_proportional_to_duration_capped_and_sums_to_expected():
+    pi, c = k8.inclusion_probabilities({"a": 100, "b": 1, "c": 1, "d": 2}, 2)
+    assert pi == {"a": 1.0, "b": 0.25, "c": 0.25, "d": 0.5} and c == 4
+    assert sum(pi.values()) == pytest.approx(2)
+    pi, c = k8.inclusion_probabilities({"a": 1, "b": 3}, 5)
+    assert pi == {"a": 1.0, "b": 1.0} and c == float("inf")
+
+
+def test_sample_is_content_blind_nested_and_keeps_every_predicted_court_shot():
+    report = sample_report()
+    small, large = k8.stratified_sample(report, 8), k8.stratified_sample(report, 25)
+    assert small["court_shots"] == large["court_shots"] == ["shot-0000", "shot-0001"]
+    assert set(small["sampled_non_court"]) < set(large["sampled_non_court"])
+    assert small["review_id"] != large["review_id"] != report["review_id"]
+    # The draw depends only on the shot ID, never on its registration or pixels.
+    report["shots"][5]["registration"][0]["chamfer_px"] = 99.0
+    assert k8.stratified_sample(report, 8)["sampled_non_court"] == small["sampled_non_court"]
+    assert k8.sample_uniform("shot-0005") == k8.sample_uniform("shot-0005") != k8.sample_uniform("shot-0006")
+
+
+def test_sampled_recall_is_horvitz_thompson_with_a_poisson_interval(monkeypatch):
+    report = sample_report()
+    monkeypatch.setattr(k8, "SAMPLE_STAGES", (8.0, 25.0))
+    design = k8.stratified_sample(report, 8)
+    sampled = design["sampled_non_court"]
+    assert len(sampled) >= 2
+    hidden = sampled[0]
+    marks = {"shot-0000": "court", "shot-0001": "court", **{k: "crowd" for k in sampled}, hidden: "court"}
+    result = k8.score(report, {"review_id": design["review_id"], "marks": marks})
+    durations = {s["id"]: (s["end"] - s["start"]) / 10 for s in report["shots"]}
+    a = durations["shot-0000"] + durations["shot-0001"]
+    pi = design["inclusion"][hidden]
+    assert pi < 1 and durations[hidden] / pi == pytest.approx(design["scale_seconds"])
+    assert result["duration_recall"] == pytest.approx(a / (a + durations[hidden] / pi))
+    lo_k, hi_k = k8.poisson_interval(1)
+    c = design["scale_seconds"]
+    assert result["duration_recall_ci95"] == pytest.approx(
+        [a / (a + c * hi_k), a / (a + max(durations[hidden], c * lo_k))])
+    assert result["precision"] == 1.0 and result["misses_by_class"] == {"court": 1}
+    assert result["misses_by_class_estimated"]["court"] == pytest.approx(1 / pi)
+    # Frames of the hidden court shot weigh 1/pi in the registration percentiles.
+    assert result["court_frames_weighted"] == pytest.approx(a * 10 + durations[hidden] * 10 / pi)
+    with pytest.raises(ValueError):
+        k8.score(report, {"review_id": design["review_id"], "marks": {**marks, "shot-0059": "crowd"}})
+
+
+def test_straddling_stage_one_extends_and_the_last_stage_decides_on_the_point(monkeypatch):
+    report = sample_report()
+    monkeypatch.setattr(k8, "SAMPLE_STAGES", (8.0, 25.0))
+    for expected, status in ((8.0, "extend_sample"), (25.0, "adopted")):
+        design = k8.stratified_sample(report, expected)
+        marks = {"shot-0000": "court", "shot-0001": "court", **{k: "crowd" for k in design["sampled_non_court"]}}
+        result = k8.score(report, {"review_id": design["review_id"], "marks": marks})
+        assert result["duration_recall"] == 1.0 and result["recall_ci_straddles_bar"]
+        assert result["status"] == status
+    assert k8.poisson_interval(0) == pytest.approx((0.0, 3.6888794541139363))
+
+
+def test_weighted_percentile_reduces_to_linear_and_keeps_infinite_tail():
+    values = [3.0, 1.0, 7.5, 2.0, 4.0]
+    for q in (0.0, 0.3, 0.5, 0.95, 1.0):
+        assert k8.weighted_percentile(values, [2.0] * 5, q) == pytest.approx(np.percentile(values, 100 * q))
+    assert k8.weighted_percentile([1.0, 2.0, float("inf")], [1.0, 1.0, 1.0], 0.95) == float("inf")
+    # A heavier small value pulls the median down.
+    assert k8.weighted_percentile([1.0, 2.0, 3.0], [5.0, 1.0, 1.0], 0.5) < 2.0
+
+
+def test_sample_page_shows_only_the_sample_and_keeps_the_full_review(tmp_path):
+    report = sample_report()
+    report["scene_threshold"] = 0.25
+    for s in report["shots"]:
+        s.update(images=[f"images/{s['id']}-{r}.jpg" for r in ("first", "middle", "last")], registered_share=0.5)
+    (tmp_path / "review").mkdir()
+    path = tmp_path / "review" / "k8-report.json"
+    path.write_text(json.dumps(report))
+    summary = k8.write_sample(path, tmp_path / "review-sample-01", 8)
+    page = (tmp_path / "review-sample-01" / "review.html").read_text()
+    design = json.loads((tmp_path / "review-sample-01" / "k8-sample.json").read_text())
+    assert page.count("<article") == summary["shots"] == 2 + len(design["sampled_non_court"]) < 60
+    assert json.dumps(design["review_id"]) in page and 'id="shot-0000"' in page
+    assert (tmp_path / "review-sample-01" / "images").readlink() == k8.Path("../review/images")
+    assert design["base_report_sha256"] == k8.file_sha256(path)

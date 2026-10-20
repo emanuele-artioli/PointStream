@@ -25,6 +25,10 @@ from experiments.visor.b1 import file_sha256, write_json
 DECISION = {"shot_registered_share": 0.80, "precision": 0.95, "duration_recall": 0.90,
             "median_px": 2.0, "p95_px": 6.0}
 CLASSES = ("court", "close_up", "crowd", "replay", "graphics", "other", "mixed")
+SAMPLE_SEED = "pointstream-k8"
+# Amendment 1: expected sampled non-court shots per nested stage; stage 2 runs only
+# when stage 1's recall interval straddles the bar and the other conditions pass.
+SAMPLE_STAGES = (50.0, 150.0)
 
 
 def shot_spans(cuts: list[int], frames: int) -> list[tuple[int, int]]:
@@ -60,19 +64,106 @@ def shot_prediction(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "registered_share": share}
 
 
+def sample_uniform(ident: str) -> float:
+    """Content-blind uniform draw in [0, 1), fixed by the shot ID (amendment 1)."""
+    return int(hashlib.sha256(f"{SAMPLE_SEED}:{ident}".encode()).hexdigest(), 16) / 2 ** 256
+
+
+def inclusion_probabilities(durations: dict[str, float], expected: float) -> tuple[dict[str, float], float]:
+    """Probability proportional to duration, capped at 1 iteratively; returns (pi, c).
+
+    Below the cap pi = d / c, so every sampled positive adds exactly c seconds to the
+    Horvitz-Thompson total. c is infinite when every shot is taken with certainty.
+    """
+    if expected <= 0 or any(d <= 0 for d in durations.values()):
+        raise ValueError("positive durations and expected size required")
+    certain: set[str] = set()
+    while True:
+        rest = {k: d for k, d in durations.items() if k not in certain}
+        slots = expected - len(certain)
+        if not rest or slots <= 0:
+            return {k: 1.0 for k in durations}, float("inf")
+        c = sum(rest.values()) / slots
+        capped = {k for k, d in rest.items() if d >= c}
+        if not capped:
+            return {k: (1.0 if k in certain else d / c) for k, d in durations.items()}, c
+        certain |= capped
+
+
+def stratified_sample(report: dict[str, Any], expected: float) -> dict[str, Any]:
+    """Every predicted-court shot plus a Poisson PPS sample of predicted non-court shots.
+
+    Nested in `expected`: pi grows with it, and the draws u are fixed per shot.
+    """
+    fps = report["fps"]
+    court = [s["id"] for s in report["shots"] if s["predicted"] == "court"]
+    durations = {s["id"]: (s["end"] - s["start"]) / fps for s in report["shots"] if s["predicted"] != "court"}
+    pi, c = inclusion_probabilities(durations, expected)
+    sampled = [k for k in durations if sample_uniform(k) < pi[k]]
+    design = {"schema": 1, "base_review_id": report["review_id"], "seed": f"sha256('{SAMPLE_SEED}:<shot id>')/2^256",
+              "expected_non_court": float(expected), "scale_seconds": c if np.isfinite(c) else None,
+              "court_shots": court, "sampled_non_court": sampled,
+              "inclusion": {k: pi[k] for k in sampled}, "non_court_shots": len(durations),
+              "non_court_seconds": sum(durations.values())}
+    design["review_id"] = hashlib.sha256(json.dumps(design, sort_keys=True).encode()).hexdigest()[:16]
+    return design
+
+
+def poisson_interval(k: int, level: float = 0.95) -> tuple[float, float]:
+    """Exact (Garwood) interval for a Poisson mean from one count."""
+    from scipy.stats import chi2
+
+    alpha = 1 - level
+    lo = 0.0 if k == 0 else float(chi2.ppf(alpha / 2, 2 * k)) / 2
+    return lo, float(chi2.ppf(1 - alpha / 2, 2 * k + 2)) / 2
+
+
+def weighted_percentile(values: list[float], weights: list[float], q: float) -> float:
+    """Linear interpolation at cumulative-weight positions S_{i-1} / (W - w_N).
+
+    Equal weights give positions i/(N-1), the ordinary linear percentile. Infinite
+    (missing) values are retained: a bracket ending at infinity returns infinity.
+    """
+    if not values:
+        return float("inf")
+    order = np.argsort(values, kind="stable")
+    v, w = np.asarray(values, float)[order], np.asarray(weights, float)[order]
+    if len(v) == 1:
+        return float(v[0])
+    pos = np.concatenate([[0.0], np.cumsum(w)[:-1]]) / (w.sum() - w[-1])
+    hi = int(np.searchsorted(pos, q, side="left"))
+    if not np.isfinite(v[hi]):
+        return float("inf")
+    if pos[hi] == q:
+        return float(v[hi])
+    lo = hi - 1
+    return float(v[lo] + (q - pos[lo]) / (pos[hi] - pos[lo]) * (v[hi] - v[lo]))
+
+
 def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
     """Mixed shots are wrong for both: a predicted court is FP and their duration is FN.
 
     Registration includes ALL true-court frames, with missing fits represented by
     infinity, never silently omitted. Use the ordinary median and linearly
     interpolated 95th percentile, retaining infinite failures.
+
+    Marks for the whole review are a census. Marks for a stratified sample
+    (amendment 1) are scored by Horvitz-Thompson: each marked shot weighs 1/pi.
     """
+    design = None
     if marks.get("review_id") != report["review_id"]:
-        raise ValueError("marks belong to another review")
+        design = next((d for d in (stratified_sample(report, n) for n in SAMPLE_STAGES)
+                       if d["review_id"] == marks.get("review_id")), None)
+        if design is None:
+            raise ValueError("marks belong to another review")
     labels = marks["marks"]
-    shots = report["shots"]
-    if set(labels) != {s["id"] for s in shots} or any(v not in CLASSES for v in labels.values()):
+    expected_ids = ({s["id"] for s in report["shots"]} if design is None
+                    else set(design["court_shots"]) | set(design["sampled_non_court"]))
+    if set(labels) != expected_ids or any(v not in CLASSES for v in labels.values()):
         raise ValueError("mark every shot exactly once with an allowed class")
+    weight = {k: 1.0 for k in labels} if design is None else {
+        **{k: 1.0 for k in design["court_shots"]}, **{k: 1 / p for k, p in design["inclusion"].items()}}
+    shots = report["shots"]
     frames = report.get("source_frames", 0)
     if frames <= 0 or report.get("frames") != frames:
         raise ValueError("the rule requires a complete whole-match report")
@@ -81,58 +172,103 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
     if any([r["frame"] for r in s["registration"]] != list(range(s["start"], s["end"])) for s in shots):
         raise ValueError("registration must cover every shot frame, including failed fits")
     tp = fp = 0
-    duration_tp = duration_true = 0.0
+    duration_tp = duration_true_predicted = 0.0
+    sampled_true = estimated_true = capped_true = 0.0
+    positives = 0
     errors: list[float] = []
+    error_weights: list[float] = []
     misses: Counter[str] = Counter()
+    missed_weighted: defaultdict[str, float] = defaultdict(float)
+    missed_seconds: defaultdict[str, float] = defaultdict(float)
     missed_shots: dict[str, list[str]] = defaultdict(list)
     confusion: Counter[str] = Counter()
     for shot in shots:
-        truth, predicted = labels[shot["id"]], shot["predicted"] == "court"
+        if shot["id"] not in labels:
+            continue
+        truth, predicted, w = labels[shot["id"]], shot["predicted"] == "court", weight[shot["id"]]
         duration = (shot["end"] - shot["start"]) / report["fps"]
         confusion[f"{truth}/{shot['predicted']}"] += 1
         if predicted:
             tp += truth == "court"
             fp += truth != "court"
         if truth in ("court", "mixed"):
-            duration_true += duration
-            if truth == "court" and predicted:
-                duration_tp += duration
+            if predicted:
+                duration_true_predicted += duration
+                duration_tp += duration * (truth == "court")
+            else:
+                sampled_true += duration
+                estimated_true += duration * w
+                if w == 1.0:
+                    capped_true += duration
+                else:
+                    positives += 1
         if (predicted and truth != "court") or (not predicted and truth in ("court", "mixed")):
             misses[truth] += 1
+            missed_weighted[truth] += w
+            missed_seconds[truth] += duration * w
             missed_shots[truth].append(shot["id"])
         if truth == "court":
-            errors.extend(float(r["chamfer_px"]) if r["chamfer_px"] is not None else float("inf")
-                          for r in shot["registration"])
+            rows = shot["registration"]
+            errors.extend(float(r["chamfer_px"]) if r["chamfer_px"] is not None else float("inf") for r in rows)
+            error_weights.extend([w] * len(rows))
     precision = tp / (tp + fp) if tp + fp else 0.0
-    recall = duration_tp / duration_true if duration_true else 0.0
-    ordered = sorted(errors)
-
-    def percentile(q: float) -> float:
-        if not ordered:
-            return float("inf")
-        index = (len(ordered) - 1) * q
-        lo, hi = int(np.floor(index)), int(np.ceil(index))
-        if not np.isfinite(ordered[hi]):
-            return float("inf")
-        return ordered[lo] + (index - lo) * (ordered[hi] - ordered[lo])
-
-    median, p95 = percentile(0.5), percentile(0.95)
-    conditions = {"precision": precision >= DECISION["precision"],
-                  "duration_recall": recall >= DECISION["duration_recall"],
-                  "registration": median <= DECISION["median_px"] and p95 <= DECISION["p95_px"]}
-    return {"decision": DECISION, "adopted": all(conditions.values()), "conditions": conditions,
-            "precision": precision, "duration_recall": recall,
+    true_seconds = duration_true_predicted + estimated_true
+    recall = duration_tp / true_seconds if true_seconds else 0.0
+    if design is None:
+        interval = (recall, recall)
+    else:
+        lo_k, hi_k = poisson_interval(positives)
+        c = design["scale_seconds"] or 0.0
+        y_lo = max(sampled_true, capped_true + c * lo_k)
+        y_hi = capped_true + c * hi_k
+        lower, upper = (duration_tp / (duration_true_predicted + y) if duration_true_predicted + y else 0.0
+                        for y in (y_hi, y_lo))
+        interval = (lower, upper)
+    median = weighted_percentile(errors, error_weights, 0.5)
+    p95 = weighted_percentile(errors, error_weights, 0.95)
+    bar = DECISION["duration_recall"]
+    straddles = interval[0] < bar <= interval[1]
+    final_stage = design is None or design["expected_non_court"] == SAMPLE_STAGES[-1]
+    # None: the stage-1 interval straddles the bar, so recall is not yet decided.
+    conditions: dict[str, bool | None] = {
+        "precision": precision >= DECISION["precision"],
+        "duration_recall": recall >= bar if final_stage or not straddles else None,
+        "registration": median <= DECISION["median_px"] and p95 <= DECISION["p95_px"]}
+    extend = conditions["duration_recall"] is None and bool(conditions["precision"] and conditions["registration"])
+    status = "extend_sample" if extend else ("adopted" if all(conditions.values()) else "not_adopted")
+    return {"decision": DECISION, "status": status, "adopted": status == "adopted", "conditions": conditions,
+            "precision": precision, "duration_recall": recall, "duration_recall_ci95": list(interval),
+            "recall_ci_straddles_bar": straddles,
+            "next_stage_expected_non_court": (SAMPLE_STAGES[SAMPLE_STAGES.index(design["expected_non_court"]) + 1]
+                                              if extend and design is not None else None),
+            "sample": None if design is None else {k: design[k] for k in (
+                "review_id", "expected_non_court", "scale_seconds", "non_court_shots", "non_court_seconds")} | {
+                "sampled_non_court": len(design["sampled_non_court"]), "sampled_positives_uncapped": positives,
+                "sampled_positive_seconds": sampled_true, "estimated_hidden_court_seconds": estimated_true},
             "registration_median_px": median if np.isfinite(median) else None,
             "registration_p95_px": p95 if np.isfinite(p95) else None,
             "missing_registration_is_infinite": True, "court_frames": len(errors),
-            "misses_by_class": dict(misses), "missed_shots_by_class": dict(missed_shots), "confusion": dict(confusion),
+            "court_frames_weighted": float(sum(error_weights)),
+            "misses_by_class": dict(misses), "misses_by_class_estimated": dict(missed_weighted),
+            "missed_seconds_by_class_estimated": dict(missed_seconds),
+            "missed_shots_by_class": dict(missed_shots), "confusion": dict(confusion),
             "marks_sha256": hashlib.sha256(json.dumps(marks, sort_keys=True).encode()).hexdigest()}
 
 
-def review_page(report: dict[str, Any], out: Path) -> None:
-    """Self-contained page apart from relative JPEGs; labels start blank, never predictions."""
+def review_page(report: dict[str, Any], out: Path, design: dict[str, Any] | None = None) -> None:
+    """Self-contained page apart from relative JPEGs; labels start blank, never predictions.
+
+    With a stratified-sample design (amendment 1), only its shots are shown, in time
+    order, and the marks file carries the sample's review ID.
+    """
+    chosen = None if design is None else set(design["court_shots"]) | set(design["sampled_non_court"])
+    review_id = report["review_id"] if design is None else design["review_id"]
+    heading = ("K8 · every broadcast shot" if design is None else
+               f"K8 · {len(chosen or ())} shots: every predicted court shot and a duration-weighted sample of the rest")
     cards = []
     for s in report["shots"]:
+        if chosen is not None and s["id"] not in chosen:
+            continue
         images = "".join(f'<figure><img loading="lazy" src="{html.escape(p)}"><figcaption>{label}</figcaption></figure>'
                          for p, label in zip(s["images"], ("First", "Middle + projected court", "Last")))
         options = '<option value="">Choose true class…</option>' + ''.join(
@@ -146,7 +282,7 @@ def review_page(report: dict[str, Any], out: Path) -> None:
                      f'{s["end"]/report["fps"]:.3f}"></video></details></article>')
     template = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>K8 court-shot review</title>
 <style>body{font:16px system-ui;margin:24px;background:#eee;color:#18212b}header{position:sticky;top:0;background:#fff;padding:12px;z-index:2}article{background:white;margin:20px 0;padding:16px;border-radius:8px}.strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}figure{margin:0;min-width:0}img{display:block;width:100%}video{width:70%;max-width:100%}select,button{font:inherit;padding:8px}figcaption{font-size:13px}</style>
-<header><b>K8 · every broadcast shot</b> <span id="count"></span> <button id="save">Download marks JSON</button>
+<header><b>HEADING</b> <span id="count"></span> <button id="save">Download marks JSON</button>
 <label>Restore marks <input id="load" type="file" accept="application/json"></label></header>
 <p>Mark the true class of every shot. Court means an ordinary court view intended for PointStream; mark replays as replay even when the court is visible. Use mixed for a shot containing both court and non-court content (bad cut); it counts as wrong for both. Use the source video when three frames are insufficient. Green is the projected model; no overlay means no homography. Predictions are not labels. Labels are saved locally in this browser; also download the JSON.</p>
 <p>Scene threshold: THRESHOLD. Initial threshold is provisional until this review. All scoring thresholds remain fixed.</p>
@@ -159,8 +295,26 @@ for(const s of selects)s.onchange=()=>{if(s.value)marks[s.dataset.id]=s.value;el
 document.querySelector('#save').onclick=()=>{const blob=new Blob([JSON.stringify({schema:1,review_id:reviewId,marks},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='k8-marks-'+reviewId+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 document.querySelector('#load').onchange=async e=>{try{const r=JSON.parse(await e.target.files[0].text());if(r.review_id!==reviewId)throw Error('Different review');if(Object.entries(r.marks).some(([k,v])=>!selects.some(s=>s.dataset.id===k)||!CLASSES.includes(v)))throw Error('Invalid labels');marks=r.marks;update()}catch(err){alert(err.message)}};
 </script></html>'''
-    out.write_text(template.replace('THRESHOLD', str(report['scene_threshold'])).replace('CARDS', '\n'.join(cards))
-                   .replace('REVIEWID', json.dumps(report['review_id'])).replace('!CLASSES.includes', f'!{json.dumps(CLASSES)}.includes'))
+    out.write_text(template.replace('HEADING', html.escape(heading)).replace('THRESHOLD', str(report['scene_threshold'])).replace('CARDS', '\n'.join(cards))
+                   .replace('REVIEWID', json.dumps(review_id)).replace('!CLASSES.includes', f'!{json.dumps(CLASSES)}.includes'))
+
+
+def write_sample(report_path: Path, out: Path, expected: float) -> dict[str, Any]:
+    """Amendment 1 review: a new directory beside the 360-shot review, which stays unchanged.
+
+    Images and the source link point into the sibling review directory (relative links).
+    """
+    report = json.loads(report_path.read_text())
+    design = stratified_sample(report, expected)
+    design["base_report_sha256"] = file_sha256(report_path)
+    out.mkdir(parents=True, exist_ok=False)
+    for name in ("images", "source.mp4"):
+        (out / name).symlink_to(Path("..") / report_path.parent.name / name)
+    write_json(out / "k8-sample.json", design)
+    review_page(report, out / "review.html", design)
+    return {"review": str(out / "review.html"), "review_id": design["review_id"],
+            "shots": len(design["court_shots"]) + len(design["sampled_non_court"]),
+            "sampled_non_court": len(design["sampled_non_court"])}
 
 
 def cuts(video: Path, fps: float, limit: int, ffmpeg: str, scratch: Path) -> tuple[list[dict[str, Any]], list[str]]:
@@ -413,6 +567,10 @@ def main() -> int:
     run.add_argument("--parts", type=int, default=1)
     run.add_argument("--workers", type=int, default=8)
     run.add_argument("--ffmpeg", default="ffmpeg")
+    sampling = sub.add_parser("sample")
+    sampling.add_argument("--report", type=Path, required=True)
+    sampling.add_argument("--out", type=Path, required=True)
+    sampling.add_argument("--expected", type=float, default=SAMPLE_STAGES[0])
     sub.add_parser("validate")
     assembly = sub.add_parser("assemble")
     assembly.add_argument("--archive", type=Path, action="append", required=True)
@@ -421,6 +579,9 @@ def main() -> int:
     args = parser.parse_args()
     if args.command == "assemble":
         print(json.dumps(assemble(args.archive, args.out, args.source)))
+        return 0
+    if args.command == "sample":
+        print(json.dumps(write_sample(args.report, args.out, args.expected)))
         return 0
     if args.command == "run":
         return run_job(args)

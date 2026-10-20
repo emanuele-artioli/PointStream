@@ -7694,6 +7694,52 @@ invocation turns out to be needed.
   per-class misses will be scored only after those marks return.
   No adoption decision or threshold change has been made.
 
+- Amendment 1: a stratified sample of shots to mark (2026-10-20, written
+  before any mark; Claude takes over from `codex/k8-court-shots` on
+  `claude/k8-court-shots`). The user asked for cheaper marking than all
+  360 shots. **What changes:** the user marks (a) every predicted-court
+  shot (all 41) and (b) a Poisson sample of the 319 predicted non-court
+  shots, drawn with probability proportional to duration:
+  π_i = min(1, n·d_i / D), with D the stratum's duration and the cap
+  applied iteratively. Shot i is in the sample when u_i < π_i. Here
+  u_i = sha256("pointstream-k8:<shot id>") / 2^256 is fixed and blind to
+  content. The expected size is n = 50, about 90 shots in all, at about
+  10 s per shot, or roughly 15 minutes. The sample is nested in n: a
+  larger n keeps every shot already drawn. **Why:** precision needs only
+  the predicted-court shots, and recall needs only an estimate of the
+  court time hidden among the predicted non-court shots. **Estimators.**
+  Precision is exact, from all 41 shots. Duration-weighted recall is
+  R = A / (B + Y). A is the duration of predicted-court shots marked
+  court. B is the duration of predicted-court shots marked court or
+  mixed. Y is the duration of predicted non-court shots that are court or
+  mixed, estimated by Horvitz–Thompson as Ŷ = Σ_sample y_i/π_i. Because
+  π_i = d_i/c below the cap, each sampled positive adds exactly c seconds,
+  so Ŷ = Y_capped + c·k for k sampled positives. The 95% interval on Y
+  takes the exact Poisson (Garwood) interval for E[k], scaled by c. k is
+  a sum of independent Bernoullis, less dispersed than a Poisson, so the
+  interval errs wide. R's interval follows by monotonicity:
+  [A/(B+Y_hi), A/(B+Y_lo)]. Registration error is measured on all true
+  court frames. Frames of sampled shots carry weight 1/π_i, and missing
+  fits stay infinite. The median and 95th percentile use the weighted
+  linear interpolation that reduces to the ordinary median and the
+  linearly interpolated percentile when all weights are equal. Misses
+  are reported by class, both as sampled counts and as weighted estimates
+  of count and duration. **Unchanged:** precision ≥ 0.95, duration
+  recall ≥ 0.90, median ≤ 2 px, 95th percentile ≤ 6 px, the 80%
+  shot rule, the classes, and mixed shots counted wrong for both.
+  **Reading the recall interval.** If the interval lies wholly above or
+  wholly below 0.90, the recall condition is decided. If it straddles
+  0.90 while the other conditions pass, stage 2 extends the same draw to
+  n = 150. Stage-1 marks are kept, and about 85 more shots add about
+  15 minutes. Recall is then decided on the point estimate R̂, with the
+  interval reported, and a still-straddling interval is stated as
+  "within sampling error of the bar". The arithmetic behind this: with
+  A ≈ 449 s and no positive in the sample, n = 50 gives a recall lower
+  bound near 0.77, and n = 150 gives about 0.91. If precision or
+  registration already fails, no second stage runs. The 360-shot review
+  (`review/`, ID `63f9a0d78069c771`) and its report stay unchanged. The
+  sample page is a new directory beside it, `review-sample-01/`.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
