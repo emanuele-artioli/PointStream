@@ -35,6 +35,7 @@ SIZE = (1280, 720)
 HIT_PX = (10.0, 5.0)
 SVT_CRF = 62
 SVT_PRESET = 8
+SANE_FRAME_PSNR = 25.0
 MEDIAN_FRAMES = 100
 BATCH = 16
 #: Each WASB-zoo setting as WASB-SBDT's GET_STARTED evaluates it on tennis.
@@ -161,8 +162,9 @@ def svt_roundtrip(args: argparse.Namespace, frames: np.ndarray, scratch: Path) -
     rec = svtav1.code(yuv, work, width=width, height=height, fps=Fraction(30), frames=len(frames), crf=SVT_CRF, preset=SVT_PRESET,
                       threads=int(os.environ.get("PS_CPU_ALLOWANCE") or 8), full_range=False, encoder=args.encoder, decoder=args.decoder)
     decoded = np.array(tw.rgb_frames(Path(rec["decoded"]), width, height, len(frames), work / "decoded.npy"))
+    mse = float(np.mean([((decoded[t].astype(np.float32) - frames[t].astype(np.float32)) ** 2).mean() for t in range(len(frames))]))
     info = {"crf": SVT_CRF, "preset": SVT_PRESET, "kbps": rec["payload_bytes"] * 8 / (len(frames) / 30.0) / 1000.0,
-            "stream_sha256": rec["stream_sha256"]}
+            "stream_sha256": rec["stream_sha256"], "frame_psnr": 10 * math.log10(255.0**2 / max(mse, 1e-9))}
     import shutil
 
     shutil.rmtree(work)
@@ -522,8 +524,11 @@ def validate_rows(rows: list[dict[str, Any]], record: dict[str, Any]) -> dict[st
         "a_prediction_per_frame": all(len(c["predictions"]) == r["frames"] == len(r["labels"]) for r in rows for c in r["candidates"].values()),
         "labels_present": sum(sum(k == 1 for k, _, _ in r["labels"]) for r in rows) > 0,
         "models_on_cuda": all(v.startswith("cuda") for v in record["on_cuda"].values()),
+        # On the source a working candidate finds the ball; through the codec (the probe) it may not, and the decode
+        # must then be a picture of the source.
         "some_candidate_finds_the_ball": all(any((c["detection_rate"] or 0) > 0.2 for c in r["candidates"].values())
-                                             for r in rows if sum(k == 1 for k, _, _ in r["labels"]) >= 10),
+                                             for r in rows if sum(k == 1 for k, _, _ in r["labels"]) >= 10 and r["set"] != "svt"),
+        "codec_decodes_are_pictures": all(r["frame_psnr"] >= SANE_FRAME_PSNR for r in rows if r["set"] == "svt"),
         "predictions_inside_the_frame": all(not v or (-1 <= x <= SIZE[0] + 1 and -1 <= y <= SIZE[1] + 1)
                                             for r in rows for c in r["candidates"].values() for v, x, y in c["predictions"]),
     }
