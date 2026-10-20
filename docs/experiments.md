@@ -6509,6 +6509,78 @@ invocation turns out to be needed.
   QP 63 at ½), about 12 minutes each on a shared GPU; 4 scoring jobs of
   14–15 pairs, about 15 minutes each. About 3 GPU-hours, ceiling 5; every
   stage under 45 minutes.
+- Runs (shared GPUs; every full stage validated locally; code `ef8870d`
+  for the first job, `53c122a` for the rest, from each job's `ready.json`).
+  - Foreground (`h5 foreground --video-arm`), the six G_HO points and the
+    full-size points per item: P01_107 `20261020T185116Z-f7515340`,
+    `…183312Z-66524402`; P02_02 `…185132Z-0ba747bd`, `…190910Z-92937293`;
+    P03_10 `…185205Z-a530055a`, `…191021Z-85a8bed8`; P09_106
+    `…185227Z-7a3a9678`, `…191028Z-ce3fdc03` (RTX A6000; the rest RTX 6000
+    Ada). Local validation 11/11, except one sanity check on two jobs: F's
+    PSNR at `dcvc@0/4` is 19.07 dB (P01_107, 3.6 kbps) and 19.45 dB
+    (P09_106, 4.6 kbps), under the validator's 20 dB "a picture" floor.
+    A P01_107 frame was inspected: a low-rate picture, not a broken decode.
+    The venue model trades PSNR for LPIPS at every point (QP 21 full size
+    on P01_107: 28.9 dB against the off-the-shelf 30.9). The floor was not
+    changed.
+  - **The venue model fails to decode at QP 63 at ½** on P02_02 (decode
+    unlike its encode, 3 of 3 attempts, `…185151Z-2b315029`) and P03_10
+    (decoder segfault, 3 of 3, `…185221Z-036bb1e3`); P01_107's passed. On
+    no hull pair, the point was dropped and those full-size jobs rerun
+    without it (P09_106's cancelled before reaching it,
+    `…185234Z-5230ec95`). A coder that cannot decode one of its operating
+    points is a defect to state if this route is kept.
+  - Scoring (`h5 score --tag venuefg`, 14–15 pairs): P01_107
+    `20261020T214217Z-bc5cddf0`, P02_02 `…214224Z-5179bf35`, P03_10
+    `…214230Z-2d47185e` (RTX A6000), P09_106 `…214236Z-990c7806`; 9/9
+    each, locally. The report is H5p 3's (its inputs reproduce H5p 3's
+    table exactly) plus these rows.
+- Outcome. BD-rate, P01_107 | P02_02 | P03_10 | P09_106, neither model
+  billed:
+
+  | PointStream against | weighted LPIPS | mean (CI) | < 0 | weighted DISTS | frame LPIPS | frame DISTS | weighted PSNR |
+  |---|---|---|---|---|---|---|---|
+  | `dcvc-venue`, G_HO (H5p 3) | +13 \| +35 \| +27 \| −9% | +16% (0 to +31) | 1 | −4% (2/4) | +15% (0/4) | −17% (4/4) | −11% (3/4) |
+  | **`dcvc-venue`, venue-coded foreground (the rule)** | +22 \| +30 \| +30 \| −8% | **+19% (+2 to +30)** | **1** | −14% (3/4) | +18% (0/4) | −18% (4/4) | +3% (2/4) |
+  | fair pooled, venue-coded foreground | +28 \| +29 \| +31 \| −5% | +21% (+3 to +30) | 1 | −8% (3/4) | +18% (0/4) | −14% (4/4) | +69% (0/4) |
+  | `dcvc-venue`, either foreground per point (post hoc) | +8 \| +19 \| +12 \| −15% | +6% (−9 to +16) | 1 | −15% (4/4) | +12% (0/4) | −22% (4/4) | −11% (3/4) |
+
+  - **The rule fails** (+19%, 1 of 4).
+  - **The high-rate foreground gap is closed** on every item: at the venue
+    anchor's QP 63, PointStream's foreground LPIPS is 0.026 | 0.044 |
+    0.050 | 0.050 against the anchor's 0.024 | 0.044 | 0.048 | 0.050
+    (G_HO's: 0.038 | 0.082 | 0.096 | 0.084).
+  - **The low rates got worse.** At ¼ and ½, G_HO after a venue decode
+    loses to G_HO after an off-the-shelf decode (P01_107 at 45 kbps:
+    foreground 0.226 against 0.171; P09_106 at 128 kbps: 0.253 against
+    0.175). G_HO was fitted on off-the-shelf decodes: the competing
+    explanation, for the low rates only.
+  - Post hoc, not the rule: an encoder choosing per point between the two
+    foreground coders (both sent beforehand; venue-coded on the hull at
+    full size, off the shelf at ¼ and ½) reaches +6% (1 of 4). Weighted
+    DISTS −15% (4 of 4) and frame DISTS −22% (4 of 4).
+  - Hypothesis partly right: the full-size foreground reached the anchor,
+    the weighted-LPIPS margin did not move, because the foreground was not
+    what remained.
+- Where the loss is now (a diagnostic on the post hoc rows, not evidence
+  of a component). Weighted LPIPS is exactly 0.7 × foreground + 0.3 ×
+  background (to 1e-16). Giving PointStream the venue anchor's
+  **background** LPIPS at the same total rate, keeping its own
+  foreground: −12 | −4 | −8 | −30%, mean −13%, 4 of 4 (the rule would
+  pass). Giving it the anchor's **foreground** instead: +1 | −7 | −2 |
+  +3%, mean −1%, 2 of 4. At equal adaptation the split's loss on LPIPS is
+  the background stream.
+- Next, per the rule's branch: the background's coder, not the foreground.
+  Candidates, each with its own rule: what the background stream spends on
+  the filled F (coded, then overwritten by the foreground), and the
+  scene model at 1080p and the native frame rate (G6's deferred
+  ablations). Lever 2 (allocation grid) cannot supply 15 points on its own.
+- GPU time: about 4.5 GPU-hours in all (12 jobs, the 3 failed or cancelled
+  full-size attempts included), within the ceiling of 5.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5q1-53c122a/`
+  (`h5 report` at `53c122a` over H5p 3's sources plus the four scoring
+  stages; the job specs, the scoring stages' `h5.json`, and the post hoc
+  `union.py` and `decompose.py`).
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and

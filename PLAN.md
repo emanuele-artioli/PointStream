@@ -31,7 +31,10 @@ new dependency.
   LPIPS (+16%, 1 of 4) while PointStream wins DISTS (−17%) and PSNR
   (−11%). Billing the mask F costs most of the margin (H5m). **Open, and
   the critical path: H5q (does the split win at equal adaptation?) and
-  H5p 4–5 (F carried by the stream; visual check).**
+  H5p 4–5 (F carried by the stream; visual check).** H5q lever 1 (the
+  venue model codes the foreground) closes the foreground gap but not the
+  LPIPS margin (+19%; +6% choosing per point); the background stream
+  carries what remains.
 - **Background (G):** a scene model adapted to the venue, sent beforehand
   and unbilled (payback hours reported), plus a per-video enhancer route
   (G6).
@@ -399,8 +402,20 @@ there's a way to win, we should take it").*
   at QP 63 it equals off-the-shelf whole-frame DCVC-UF while the venue
   model halves its LPIPS. The high-rate gap is the adaptation alone.
   Lever 1's cheapest form therefore needs no training: the window's venue
-  model (the anchor's own checkpoint) codes the foreground. Running
-  (rule written; 8 foreground and 4 scoring jobs, about 3 GPU-hours).
+  model (the anchor's own checkpoint) codes the foreground.
+- *Lever 1 done, fails (2026-10-21):* +19% (1 of 4). It closes the
+  high-rate foreground gap on every item, but G_HO after a venue decode
+  loses at ¼ and ½; choosing the coder per point (post hoc) reaches +6%
+  (1 of 4), with weighted DISTS −15% and frame DISTS −22% (4 of 4). A
+  region decomposition puts the remaining LPIPS loss in the
+  **background**: PointStream with the anchor's background at the same
+  total rate would pass (−13%, 4 of 4); with the anchor's foreground,
+  −1%. The venue model also fails to decode QP 63 at ½ on 2 of 3 items.
+- *Next: the background stream at equal adaptation* (rule first). What it
+  spends coding the filled F that the foreground then overwrites, and
+  the scene model at 1080p and the native frame rate (G6's deferred
+  ablations). Lever 2 cannot supply the 15 points alone; lever 3 only
+  matters once F is billed.
 
 #### K. Where keypoints win (analysis, user 2026-10-13)
 
@@ -619,6 +634,13 @@ adaptation) more than through retraining it; and SVT-AV1 with the same
 enhancer was unclear (H3d oracle: −19%, synthesized texture), which
 supports, weakly, that the learned codec composes better with learned
 parts.
+Equal adaptation, as it stands (H5p 3, H5q 1; 2026-10-21): against a
+whole-frame DCVC-UF adapted to the venue the same way, neither model
+billed, PointStream loses on LPIPS (+16%; +6% with the best foreground
+per point) and wins on DISTS (weighted −15%, frame −22%, 4 of 4) and
+weighted PSNR (−11%). Not a claim of a win until H5q decides; if it
+stays so, state the metrics' disagreement, and that the loss is the
+background stream's (the foreground matches the anchor at high rates).
 Checked (2026-10-16, [analysis](docs/experiments.md#2026-10-16--does-the-learned-codec-compose-better-with-a-learned-enhancer-analysis-of-h3ds-oracle)):
 over its own base, the same enhancer gains about as much on SVT-AV1 as on
 DCVC-UF (LPIPS −73% against −76%; PSNR −35% against −12%), so "the
