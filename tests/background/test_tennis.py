@@ -195,3 +195,30 @@ def test_k5b_labels_read_only_frames_without_touching_them():
     frame.setflags(write=False)
     out = k5b.label(frame, "source")
     assert out.max() > 200 and frame.max() == 50
+
+
+def test_k5b_trackers_count_hits_misses_and_false_detections():
+    from experiments.tennis import k5b_trackers as kt
+
+    labels = [(1, 100.0, 100.0), (1, 200.0, 200.0), (1, 300.0, 300.0), (0, 0.0, 0.0), (0, 0.0, 0.0), (-1, 5.0, 5.0)]
+    preds = [(True, 103.0, 104.0), (True, 230.0, 200.0), (False, 0.0, 0.0), (True, 50.0, 50.0), (False, 0.0, 0.0), (True, 5.0, 5.0)]
+    c = kt.counts(preds, labels)
+    assert c == {"positives": 3, "negatives": 2, "false_on_negative": 1, "far_on_positive": 1, "hit_10px": 1, "hit_5px": 1}
+    r = kt.rates(c)
+    assert r["detection_rate"] == 1 / 3 and r["false_per_negative"] == 0.5 and abs(r["f1"] - 2 / 6) < 1e-12
+
+
+def test_k5b_trackers_choice_takes_the_probe_within_two_points():
+    from experiments.tennis import k5b_trackers as kt
+
+    def t(rate: float, false: float = 0.0) -> dict:
+        return {"detection_rate": rate, "false_per_negative": false}
+
+    base = {n: t(0.5) for n in kt.CANDIDATES}
+    table = {"tracknet:8,9,10": {**base, "wasb": t(0.95), "balltrack": t(0.90)},
+             "racketvision:test": {**base, "wasb": t(0.80), "balltrack": t(0.84)},
+             "svt:8,9,10": {**base, "wasb": t(0.30), "balltrack": t(0.60)}}
+    choice = kt.choose(table)
+    assert choice["within_0.02"] == ["wasb", "balltrack"] and choice["chosen"] == "balltrack"
+    table["tracknet:8,9,10"]["wasb"] = t(0.99)
+    assert kt.choose(table)["chosen"] == "wasb"

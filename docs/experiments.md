@@ -7674,14 +7674,44 @@ invocation turns out to be needed.
 - Judge: *detection rate*, the share of visible labelled frames with the
   tracker's position within 10 px at 720p (15 px at 1080p; 5 px
   reported), plus false detections per frame without a visible ball.
-- Stage A, the oracle (no training): WASB's tennis weights off the shelf
-  on TrackNet games 8–10 (its own held-out games) and on RacketVision
-  tennis test. It bounds what this architecture reaches when trained on
-  TrackNet's own matches. Rule: if WASB reaches ≥ 0.90 on games 8–10, the
-  architecture is adopted and stage B fine-tunes it with K5's games held
-  out; under 0.90, the other candidates are audited before any training.
-  RacketVision test under 0.70 marks a domain gap that stage B's
-  RacketVision data must close.
+- Downloads (user, 2026-10-20: "yes, all", after asking to download every
+  candidate and pick the best by a cheap test). `Models/WASB`: the seven
+  tennis checkpoints of WASB's model zoo (WASB 6.1 MB, TrackNetV2 45 MB,
+  ResTrackNetV2 5.1 MB, MonoTrack 11.7 MB, BallSeg 50.9 MB, DeepBall
+  0.3 MB, DeepBall-Large 4.1 MB) and the code at `923462c` as a tar;
+  `Models/RacketVision`: `balltrack_best.pth` (46.6 MB; sha256 as
+  published), a tensors-only copy loadable with `weights_only=True`, and
+  the code at `c44af2a`. sha256 in each `MANIFEST.json`. BallTrack's
+  checkpoint holds mmengine log objects that Hugging Face flags as unsafe
+  pickles; it was read once with an unpickler that allows only tensors,
+  numpy arrays and an inert stub for the log objects. It is one model for
+  the three sports, trained on RacketVision only (epoch 47), so all of
+  TrackNet is held out for it.
+- Stage A, the comparison (no training; the user's cheap test). Nine
+  settings, each with its authors' inference: WASB (online tracker,
+  windows of 3 frames at steps 3 and 1), TrackNetV2, ResTrackNetV2,
+  MonoTrack (no heatmap weighting, per-frame peak), BallSeg and the two
+  DeepBalls (step 1), as WASB's README evaluates them; BallTrack with the
+  clip's median frame and its 4 frames ending at the scored frame (its
+  training alignment; its `inference.py` uses the 4 before it). Every
+  frame at 1280×720 (RacketVision's 1080p area-downscaled, labels
+  scaled). Sets: TrackNet games 8–10 (held out for all nine), RacketVision
+  tennis test (held out for all nine), TrackNet games 1–7 (held out for
+  BallTrack only; in-training for the zoo, reported), and TrackNet games
+  8–10 through SVT-AV1 preset 8 at CRF 62 (K5's collapse point; a
+  robustness probe). TrackNet visibility 3 (occluded) is excluded from
+  both positives and negatives.
+- Rule for the choice (fixed before the run): the candidate with the
+  highest mean of its detection rates on the two sets held out for all
+  (TrackNet 8–10, RacketVision test) is chosen; within 0.02 of it, the one
+  with the higher rate on the SVT-AV1 probe, then fewer false detections.
+  Adoption without training: if the chosen candidate holds out K5's games
+  (BallTrack does) and meets stage B's bar on them (≥ 0.90 on TrackNet's
+  K5 games, ≤ 0.05 false detections per ball-less frame, ≥ 0.80 on
+  RacketVision test), it is adopted as tracker and judge with no training.
+  Otherwise stage B trains the chosen architecture with K5's games held
+  out (a WASB-zoo winner is retrained, since its weights saw four of K5's
+  games).
 - Stage B (only after A): smoke, a pilot of ≤ 45 min (one setting of the
   learning rate and schedule, the held-out rate tracked per epoch), then
   training in parts of ≤ 45 min that each save their checkpoint.
@@ -7690,12 +7720,14 @@ invocation turns out to be needed.
   frame without a ball, and ≥ 0.80 on RacketVision tennis test; otherwise
   the negative is reported and the ball mode keeps labelled positions in
   its claims (scoped to labelled data).
-- Hypothesis: WASB passes stage A (its paper reports F1 about 0.96 on
-  tennis); RacketVision's broadcast 1080p is harder (smaller ball relative
-  to the frame, different courts), about 0.7–0.85 off the shelf.
+- Hypothesis: WASB leads the zoo on TrackNet 8–10 (its paper: F1 about
+  0.96) but falls to about 0.6–0.8 on RacketVision's broadcast footage;
+  BallTrack, trained on RacketVision's broadcast tennis, leads there and
+  reaches about 0.85 on TrackNet, so the choice is between these two, and
+  the codec probe separates them (a model with a background frame should
+  hold the ball better on a smoothed court).
 - Competing explanation: TrackNet's games 8–10 share courts and players
   with games 1–7, so stage A overstates generalization; RacketVision
   test, from other matches, is the check.
-- Budget: stage A ≤ 0.5 GPU-hour; stage B ≤ 6 GPU-hours. **Waits on the
-  user's permission to download** WASB's code (MIT, GitHub) and its tennis
-  weights (Google Drive) into `Models/WASB`.
+- Budget: stage A ≤ 1.5 GPU-hours in parts of ≤ 45 min (one per set);
+  stage B ≤ 6 GPU-hours.
