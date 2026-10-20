@@ -31,7 +31,7 @@ DECISION = {"shot_fit_share": 0.80, "fit_px": 6.0, "precision": 0.95, "duration_
 # Clips seen while correcting the method (the pilot smoke's clip): registered for K4b, but
 # neither reviewed nor scored (rule amendment of 2026-10-21).
 DEV_CLIPS = ("djokovic_zverev/000",)
-CHUNK = 400
+CHUNK = 200
 SIZE = (1920, 1080)
 
 

@@ -35,8 +35,8 @@ def test_parts_cover_every_clip_once_and_weigh_4k_more():
     groups = k8b.parts(clips, 2)
     assert sorted(c["id"] for g in groups for c in g) == sorted(c["id"] for c in clips)
     assert [c["id"] for c in groups[0]] == ["m/0", "m/3"]  # 4,800 + 1,000 against 3,000 + 2,000
-    chunks = k8b.chunks([{"id": "m/0", "frames": 900}])
-    assert [(c["start"], c["end"]) for c in chunks] == [(0, 400), (400, 800), (800, 900)]
+    chunks = k8b.chunks([{"id": "m/0", "frames": 500}])
+    assert [(c["start"], c["end"]) for c in chunks] == [(0, 200), (200, 400), (400, 500)]
 
 
 def report():
