@@ -33,8 +33,9 @@ new dependency.
   the critical path: H5q (does the split win at equal adaptation?) and
   H5p 4–5 (F carried by the stream; visual check).** H5q lever 1 (the
   venue model codes the foreground) closes the foreground gap but not the
-  LPIPS margin (+19%; +6% choosing per point); the background stream
-  carries what remains.
+  LPIPS margin (+19%; +6% choosing per point). The remaining loss is
+  structural (F paid twice) and grows with F's area; even a free fill
+  falls short (−5%, 2 of 4). The claim waits on the user.
 - **Background (G):** a scene model adapted to the venue, sent beforehand
   and unbilled (payback hours reported), plus a per-video enhancer route
   (G6).
@@ -411,11 +412,16 @@ there's a way to win, we should take it").*
   **background**: PointStream with the anchor's background at the same
   total rate would pass (−13%, 4 of 4); with the anchor's foreground,
   −1%. The venue model also fails to decode QP 63 at ½ on 2 of 3 items.
-- *Next: the background stream at equal adaptation* (rule first). What it
-  spends coding the filled F that the foreground then overwrites, and
-  the scene model at 1080p and the native frame rate (G6's deferred
-  ablations). Lever 2 cannot supply the 15 points alone; lever 3 only
-  matters once F is billed.
+- *The background stream is not worse per bit* (it beats the anchor's
+  background region below about 300 kbps); the split's loss is
+  structural, paying for F twice, and follows F's share of the frame
+  (P02_02 50%: +19%; P09_106 2%: −15%). Even a free fill in the
+  background stream (CPU estimate) reaches −5% (2 of 4), short of the
+  rule; lever 2 adds a few points, lever 3 matters once F is billed.
+- **Decision for the user:** at equal adaptation the split does not reach
+  rule (a) on LPIPS; it wins on DISTS (weighted −15%, frame −22%, 4 of
+  4) and weighted PSNR (−11%), and where F is small. What the egocentric
+  claim becomes waits on that decision.
 
 #### K. Where keypoints win (analysis, user 2026-10-13)
 

@@ -6570,17 +6570,35 @@ invocation turns out to be needed.
   pass). Giving it the anchor's **foreground** instead: +1 | −7 | −2 |
   +3%, mean −1%, 2 of 4. At equal adaptation the split's loss on LPIPS is
   the background stream.
-- Next, per the rule's branch: the background's coder, not the foreground.
-  Candidates, each with its own rule: what the background stream spends on
-  the filled F (coded, then overwritten by the foreground), and the
-  scene model at 1080p and the native frame rate (G6's deferred
-  ablations). Lever 2 (allocation grid) cannot supply 15 points on its own.
+- The background stream is not worse per bit. Against the venue anchor's
+  whole frame at the same rate, its background LPIPS is lower below
+  about 300 kbps (P01_107 at 93 kbps: 0.164 against 0.196; P02_02 at 215
+  kbps: 0.104 against 0.202) and within about 0.01–0.03 above. What the
+  split loses is structural: it pays for the background stream and for F
+  again in the foreground stream, where the anchor pays once. The per-item
+  loss follows F's share of the frame: P02_02 50% (+19%), P03_10 19%
+  (+12%), P01_107 14% (+8%), P09_106 2% (−15%).
+- The fill lever, estimated before any run (CPU, `fillfree.py`; an
+  estimate, not a bound, not evidence). The background stream codes F's
+  ProPainter fill, which the foreground then overwrites. Cutting the
+  background rate by its bits for F, taken as F's area share times a
+  factor, quality unchanged: factor 0.5, +1% (1 of 4); factor 1 (F free),
+  −5% (2 of 4: +2 | −7 | 0 | −17). Even a free fill leaves the rule
+  unmet, so per the protocol it is not built for this decision. Lever 2
+  (a denser grid) adds a few points at most; lever 3 matters only once F
+  is billed.
+- **Reading for H5q (2026-10-21):** at equal adaptation, with the levers
+  measured or estimated, the split does not reach rule (a) on weighted
+  LPIPS. It wins on DISTS (weighted −15%, frame −22%, 4 of 4, post hoc
+  per-point choice) and on weighted PSNR (−11%, 3 of 4), and it wins
+  where F is small (P09_106). What the egocentric claim becomes is the
+  user's decision.
 - GPU time: about 4.5 GPU-hours in all (12 jobs, the 3 failed or cancelled
   full-size attempts included), within the ceiling of 5.
 - Report: `pointstream-data/visor/h5-2026-10-16/report-h5q1-53c122a/`
   (`h5 report` at `53c122a` over H5p 3's sources plus the four scoring
   stages; the job specs, the scoring stages' `h5.json`, and the post hoc
-  `union.py` and `decompose.py`).
+  `union.py`, `decompose.py` and `fillfree.py`).
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
