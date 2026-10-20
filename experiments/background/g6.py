@@ -634,6 +634,18 @@ def window_record(w: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]
             "metrics": w["nets"].record, "restored_archive": args.restore, "published": bool(args.publish)}
 
 
+def load_arm(arm: str) -> tuple[dict[str, Any], str]:
+    """A ``train`` archive (extracted): its record and its fine-tuned DCVC-UF HT-L checkpoint, checked."""
+    arm_dir = Path(arm) / "publish" / "finetune"
+    result = json.loads((arm_dir / "result.json").read_text())
+    video_ckpt = str(arm_dir / "video_ft.pth.tar")
+    if file_sha256(Path(video_ckpt)) != result["model"]["checkpoint_sha256"]:
+        raise RuntimeError("the published checkpoint is not the one its result recorded")
+    record = {k: result.get(k) for k in ("arm", "id", "item", "fill", "steps", "fit", "footage")} | {
+        "model_sha256": result["model"]["checkpoint_sha256"], "converged": result.get("converged")}
+    return record, video_ckpt
+
+
 def command_format(args: argparse.Namespace) -> int:
     methods = [parse_method(m) for m in args.methods.split(",")]
     grid = parse_values(args.values)
@@ -644,13 +656,7 @@ def command_format(args: argparse.Namespace) -> int:
     began = time.time()
     arm_record, video_ckpt = None, None
     if any(c == "scene" for c, _ in methods):
-        arm_dir = Path(args.arm) / "publish" / "finetune"
-        arm = json.loads((arm_dir / "result.json").read_text())
-        video_ckpt = str(arm_dir / "video_ft.pth.tar")
-        if file_sha256(Path(video_ckpt)) != arm["model"]["checkpoint_sha256"]:
-            raise RuntimeError("the published checkpoint is not the one its result recorded")
-        arm_record = {k: arm.get(k) for k in ("arm", "id", "item", "fill", "steps", "fit", "footage")} | {
-            "model_sha256": arm["model"]["checkpoint_sha256"], "converged": arm.get("converged")}
+        arm_record, video_ckpt = load_arm(args.arm)
     if arm_record and (arm_record["fill"] == "none") != (args.fill == "none"):
         raise SystemExit(f"{args.arm}: trained with fill {arm_record['fill']}, coding with fill {args.fill}")
     w = prepare_window(args, work)

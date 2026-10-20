@@ -6441,6 +6441,75 @@ invocation turns out to be needed.
   format, 4 venue scoring; the failed first batch about 0.5), within the
   ceiling of 14.
 
+### 2026-10-20 — H5q 1: the venue model codes the foreground (equal adaptation)
+- Question (PLAN H5q, lever 1). At equal adaptation, neither model billed,
+  the venue-adapted whole-frame DCVC-UF beats PointStream on weighted
+  LPIPS (+16%, 1 of 4; H5p 3). Where does PointStream lose, and does
+  adapting its foreground coder the way the anchor is adapted close it?
+- Where it loses (H5p 3's report, `matched`: PointStream's best pair at
+  or under each anchor point's rate, per region, LPIPS on the fill masks):
+  - Below about 200 kbps (the scene route) PointStream's foreground is
+    already better than the venue anchor's (P01_107 at 92 kbps: 0.102
+    against 0.154; P09_106 at 128 kbps: 0.175 against 0.263) and its
+    background worse (0.336 against 0.197; 0.397 against 0.234): the
+    hull spends the rate on F, as the 0.7 weight asks.
+  - Above it, the foreground loses (P01_107 at 504 kbps: 0.062 against
+    0.035; P02_02 at 1,145 kbps: 0.125 against 0.063). At QP 63 and full
+    size, PointStream's foreground equals whole-frame DCVC-UF **off the
+    shelf** at the same QP (0.038 | 0.036, 0.082 | 0.082, 0.096 | 0.096)
+    and the venue model halves it (0.024, 0.044, 0.048). So the padding
+    outside F costs nothing, and the high-rate gap is the adaptation alone:
+    the anchor's model was fitted on the video's own frames, hands
+    included, and PointStream's foreground coder was not.
+- Method. The cheapest form of the lever needs no training: each item's
+  venue model (H5p 3 (b): recipe L on the own video's whole frames outside
+  the window, `train --fill none`, the very checkpoint the anchor codes
+  with) replaces DCVC-UF HT-L's video model in PointStream's foreground
+  coder (`h5 foreground --video-arm`, new; the intra model stays the
+  public one, as in the anchor). Everything else is G_HO's PointStream:
+  the ten foreground points, G_HO in both slots at ¼ and ½ (fitted on off-
+  the-shelf decodes, so a mismatch here, stated), the backgrounds as
+  published (scene model, enhancer). Scored by `h5 score --tag venuefg` on
+  each item's pairs of G_HO's hull from H5p 3 (14–15 per item), the
+  foreground swapped for the venue-coded one at the same point; fixed now,
+  before any score. A subset of pairs gives a hull no better than the
+  full grid would, so a pass is not inflated by the choice; neighbours
+  are added only if the answer is unclear (lever 2).
+  - This is the component itself, not an oracle: it costs less than the
+    memorization oracle (no training), which is kept for the fine-tune on
+    foreground input that would follow a partial result.
+  - PointStream now holds two venue models (the scene model on filled
+    footage, the whole-frame model) against the anchor's one. Venue models
+    are sent beforehand and unbilled (user, 2026-10-20); payback hours are
+    reported for both. A one-model PointStream (the whole-frame model also
+    coding the filled background) is a later variant if this passes.
+- Decision rule, fixed now: rule (a) on weighted LPIPS (fill), variant
+  `venuefg` against `dcvc-venue` alone, neither billed: mean BD-rate −10%
+  or better and 3 of 4 items below zero. Also reported, as the H5q target
+  asks: against the fair pooled envelope (SVT-AV1 preset 1 with the
+  ladder, DCVC-UF off the shelf with the ladder, `dcvc-venue`), unbilled;
+  weighted DISTS, frame LPIPS and DISTS, weighted PSNR beside them.
+  - Passes: H5q's target is met on LPIPS; the split wins at equal
+    adaptation (still with F granted; H5p 4 next).
+  - Fails, with the high-rate foreground gap closed (fg LPIPS at QP 63
+    within 10% of the anchor's): what remains is the low-rate background,
+    so lever 2 (allocation grid) or the background's own coder is next.
+  - Fails, with the gap open: the adaptation does not reach the padded
+    foreground input; the fine-tune on foreground input (lever 1 proper,
+    memorization oracle first) decides whether the lever is dropped.
+- Hypothesis: at full size the foreground's LPIPS falls to the anchor's at
+  the same QP (about −40%); at ¼ and ½ less, since G_HO saw off-the-shelf
+  decodes. Weighted LPIPS against `dcvc-venue` moves from +16% to between
+  −5% and −15%: a likely pass on 3 of 4, P02_02 (+35%) the hardest.
+- Competing explanation: the venue model's gain lives in what it memorized
+  outside F (the kitchen), and the padded foreground input, mostly flat
+  push-pull fill, gets little of it; or G_HO after a venue decode loses
+  more at ¼ and ½ than the coder gains.
+- Budget: 8 foreground jobs (per item: the six G_HO points; full size and
+  QP 63 at ½), about 12 minutes each on a shared GPU; 4 scoring jobs of
+  14–15 pairs, about 15 minutes each. About 3 GPU-hours, ceiling 5; every
+  stage under 45 minutes.
+
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
   can a body-pose estimator's keypoints carry the players? Per part

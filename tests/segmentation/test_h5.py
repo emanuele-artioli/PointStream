@@ -165,6 +165,30 @@ def test_tagged_variant_replaces_only_its_foregrounds() -> None:
     assert sorted((r["foreground"], r.get("tag", "")) for r in v["gho"]) == [("dcvc-21_4", "gho"), ("dcvc-63_1", "")]
 
 
+def test_venue_foreground_falls_back_to_gho_and_is_matched() -> None:
+    base = [{**scored(100, 0.2), "foreground": "dcvc-21_4"}, {**scored(300, 0.1), "foreground": "dcvc-63_1"}]
+    gho = [{**scored(100, 0.18), "foreground": "dcvc-21_4", "tag": "gho"}]
+    venue = [{**scored(300, 0.05), "foreground": "dcvc-63_1", "tag": "venuefg"}]
+    v = h5.variant_rows(base + gho + venue)
+    assert sorted((r["foreground"], r.get("tag", "")) for r in v["venuefg"]) == [("dcvc-21_4", "gho"),
+                                                                              ("dcvc-63_1", "venuefg")]
+    anchors = [scored(k, q, codec="dcvc-venue") for k, q in ((100, 0.3), (400, 0.1))]
+    report = h5.item_report(base + gho + venue, anchors, 1.0)
+    assert set(report["matched_by_variant"]) == {"gho", "venuefg"}
+    assert report["matched_by_variant"]["venuefg"][-1]["fg_lpips"]["pointstream"] == 0.05
+
+
+def test_foreground_validator_checks_the_venue_model() -> None:
+    venue = {"fill": "none", "converged": {"converged": True}, "model_sha256": "m", "id": "g6-window/P01_107"}
+    good = foreground_result(item="P01_107_0000003049", video_model={"video_ckpt_sha256": "m", "venue": venue})
+    assert all(h5.validate_foreground(good).values())
+    for change in ({"fill": "exact"}, {"converged": {"converged": False}}, {"model_sha256": "other"},
+                   {"id": "g6-window/P02_02"}):
+        bad = foreground_result(item="P01_107_0000003049",
+                                video_model={"video_ckpt_sha256": "m", "venue": {**venue, **change}})
+        assert not h5.validate_foreground(bad)["venue_model_is_the_windows"]
+
+
 def test_billing_adds_the_routes_model_and_payback_repays_it() -> None:
     anchors = [scored(k, q, codec="dcvc") for k, q in ((100, 0.3), (200, 0.2), (400, 0.1))]
     rows = [scored(50, 0.3), scored(100, 0.2), scored(150, 0.15, route="enh"), scored(200, 0.1)]
