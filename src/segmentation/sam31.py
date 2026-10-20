@@ -181,9 +181,6 @@ class Sam31SequenceSegmenter:
         max_num_objects: int = 16,
         multiplex_count: int = 16,
         model_options: dict[str, Any] | None = None,
-        offload_video_to_cpu: bool = False,
-        offload_state_to_cpu: bool = False,
-        grounding_batch_size: int | None = None,
     ) -> None:
         if not 0.0 <= prob_threshold <= 1.0:
             raise ValueError("prob_threshold must be in [0, 1]")
@@ -203,11 +200,6 @@ class Sam31SequenceSegmenter:
         self.max_num_objects = int(max_num_objects)
         self.multiplex_count = int(multiplex_count)
         self.model_options = dict(model_options or {})
-        self.offload_video_to_cpu = bool(offload_video_to_cpu)
-        self.offload_state_to_cpu = bool(offload_state_to_cpu)
-        if grounding_batch_size is not None and (type(grounding_batch_size) is not int or grounding_batch_size <= 0):
-            raise ValueError("grounding_batch_size must be a positive integer")
-        self.grounding_batch_size = grounding_batch_size
         self.sessions: dict[tuple[Role, str], _Session] = {}
         self.predictor = predictor
         self.model_revision: str | None = None
@@ -216,13 +208,6 @@ class Sam31SequenceSegmenter:
         if self.predictor is None:
             self._verify_artifacts()
             self.predictor = self._load_predictor(builder)
-        if self.grounding_batch_size is not None:
-            model = getattr(self.predictor, "model", None)
-            if model is None or not hasattr(model, "batched_grounding_batch_size"):
-                raise RuntimeError("Pinned SAM predictor lacks its grounding batch-size control")
-            model.batched_grounding_batch_size = self.grounding_batch_size
-            if model.batched_grounding_batch_size != self.grounding_batch_size:
-                raise RuntimeError("SAM did not apply the requested grounding batch size")
 
     def _require_predictor(self) -> Any:
         if self.predictor is None:
@@ -336,11 +321,6 @@ class Sam31SequenceSegmenter:
         # The fallback is provenance-relevant only where it changes execution.
         if self.sdpa_backend_policy == "efficient_then_math_fallback":
             config["sdpa_backend_policy"] = self.sdpa_backend_policy
-        if self.offload_video_to_cpu or self.offload_state_to_cpu:
-            config["offload_video_to_cpu"] = self.offload_video_to_cpu
-            config["offload_state_to_cpu"] = self.offload_state_to_cpu
-        if self.grounding_batch_size is not None:
-            config["batched_grounding_batch_size"] = self.grounding_batch_size
         config_hash = hashlib.sha256(
             json.dumps(config, sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest()
@@ -369,11 +349,9 @@ class Sam31SequenceSegmenter:
         if frame_width <= 0 or frame_height <= 0:
             raise ValueError("SAM3.1 session dimensions must be positive")
         self.provenance(policy)
-        request: dict[str, Any] = {"type": "start_session", "resource_path": str(resource_path)}
-        if self.offload_video_to_cpu or self.offload_state_to_cpu:
-            request.update(offload_video_to_cpu=self.offload_video_to_cpu,
-                           offload_state_to_cpu=self.offload_state_to_cpu)
-        response = self._require_predictor().handle_request(request)
+        response = self._require_predictor().handle_request(
+            {"type": "start_session", "resource_path": str(resource_path)}
+        )
         session_id = str(response["session_id"])
         self.sessions[(role, key)] = _Session(
             role=role,
@@ -781,9 +759,6 @@ def _install_compatible_session_start(predictor: Any) -> None:
         if hasattr(self, "video_loader_type"):
             init_kwargs["video_loader_type"] = self.video_loader_type
         valid = inspect.signature(self.model.init_state).parameters
-        for name in ("offload_video_to_cpu", "offload_state_to_cpu"):
-            if init_kwargs[name] and name not in valid:
-                raise RuntimeError(f"Pinned SAM init_state does not support requested {name}")
         state = self.model.init_state(
             **{key: value for key, value in init_kwargs.items() if key in valid}
         )

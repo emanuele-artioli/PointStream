@@ -43,31 +43,6 @@ class _FakePredictor:
         }
 
 
-def test_cpu_offload_session_flags_are_explicit_and_change_provenance():
-    predictor = _FakePredictor()
-    native = Sam31SequenceSegmenter(predictor=predictor)
-    offloaded = Sam31SequenceSegmenter(predictor=predictor, offload_video_to_cpu=True, offload_state_to_cpu=True)
-    offloaded.start_session("person", "/external/frames", frame_width=6, frame_height=4, policy="offline_bidirectional")
-    assert predictor.requests[-1]["offload_video_to_cpu"] is True
-    assert predictor.requests[-1]["offload_state_to_cpu"] is True
-    assert native.provenance("offline_bidirectional").config_sha256 != offloaded.provenance("offline_bidirectional").config_sha256
-
-
-def test_grounding_batch_control_is_applied_and_identified():
-    from types import SimpleNamespace
-
-    predictor = _FakePredictor()
-    predictor.model = SimpleNamespace(batched_grounding_batch_size=16)
-    native = Sam31SequenceSegmenter(predictor=predictor)
-    smaller = Sam31SequenceSegmenter(predictor=predictor, grounding_batch_size=8)
-    assert predictor.model.batched_grounding_batch_size == 8
-    assert native.provenance("offline_bidirectional").config_sha256 != smaller.provenance("offline_bidirectional").config_sha256
-    with pytest.raises(RuntimeError, match="batch-size control"):
-        Sam31SequenceSegmenter(predictor=_FakePredictor(), grounding_batch_size=8)
-    with pytest.raises(ValueError):
-        Sam31SequenceSegmenter(predictor=predictor, grounding_batch_size=0)
-
-
 def test_sam31_scales_box_prompt_to_relative_coordinates() -> None:
     predictor = _FakePredictor()
     segmenter = Sam31SequenceSegmenter(predictor=predictor)
@@ -292,7 +267,7 @@ def test_verified_predictor_session_initializer_signature_is_compatible() -> Non
             self._all_inference_states = {}
             self.async_loading_frames = False
 
-        def start_session(self, resource_path, session_id=None, offload_video_to_cpu=False):
+        def start_session(self, resource_path, session_id=None):
             raise AssertionError("compatibility initializer did not replace legacy method")
 
     predictor = _LegacyPredictor()
@@ -306,9 +281,6 @@ def test_verified_predictor_session_initializer_signature_is_compatible() -> Non
     assert predictor._all_inference_states["fixed"]["state"] == {
         "resource_path": "/external/frames"
     }
-    with pytest.raises(RuntimeError, match="does not support requested offload_video_to_cpu"):
-        predictor.start_session("/external/frames", offload_video_to_cpu=True)
-    assert list(predictor._all_inference_states) == ["fixed"]
 
 
 def test_older_cuda_uses_efficient_then_math_sdpa_fallback() -> None:

@@ -1,7 +1,8 @@
-"""Score frozen K4b clip rules against the returned hand-selected players.
+"""Score frozen K4b rules against the returned hand-selected players.
 
-Accept only features with a preserved full-stage validation receipt and job
-revision from ready.json. Never applies a rule to K4's original windows.
+Each marked frame is scored on its own window's features (K4b.1 amendment 1).
+Accept only features with a preserved local full-stage validation receipt and
+job revision from ready.json. Never applies a rule to K4's original windows.
 """
 
 from __future__ import annotations
@@ -18,11 +19,9 @@ from experiments.visor.b1 import file_sha256, write_json
 from src.segmentation.masks import ClipMasks
 
 
-def score(marks: dict[str, Any], review: dict[str, Any], review_path: Path,
-          review_dir: Path, inputs: list[dict[str, Any]], partial: bool = False) -> dict[str, Any]:
-    labels = rules.validate_marks(marks, review, review_path)
-    clips = {}
-    provenance = []
+def load_windows(inputs: list[dict[str, Any]]) -> dict[str, tuple[dict[str, Any], ClipMasks]]:
+    """Window features from feature jobs whose full stage passed the validator locally."""
+    windows: dict[str, tuple[dict[str, Any], ClipMasks]] = {}
     for source in inputs:
         root = Path(source["directory"])
         for name, digest in source["files"].items():
@@ -32,33 +31,41 @@ def score(marks: dict[str, Any], review: dict[str, Any], review_path: Path,
         ready = json.loads((root / "ready.json").read_text())
         summary = json.loads((root / "k4b-features.json").read_text())
         if (validation.get("passed") is not True or not validation.get("checks")
-                or not all(validation["checks"].values()) or summary["configured_frames"] != 0
-                or summary["stage"] != "full"):
-            raise ValueError("Only locally validated full-clip outputs may be scored")
-        if ready["git_head"] != source["git_head"] or validation["clip"] != source["clip"] or summary["clip"]["id"] != source["clip"]:
-            raise ValueError("Job revision/clip provenance mismatch")
-        feature = json.loads((root / "features.json").read_text())
-        if feature["frame_count"] != summary["frames"] or summary["frames"] != summary["clip"]["frames"]:
-            raise ValueError("Scoring requires the complete source clip")
-        if feature["rules"] != rules.RULES or feature["picks"] != rules.choose(feature["features"]):
-            raise ValueError("Feature selections do not use the frozen rules")
-        target_masks = ClipMasks.load(root / "target-masks.rle")
-        if source["clip"] in clips or len(target_masks.frames) != len(feature["target_frames"]):
-            raise ValueError("Duplicate clips or incomplete scoring masks")
-        clips[source["clip"]] = (feature, target_masks)
-        provenance.append(source)
+                or not all(validation["checks"].values()) or summary["stage"] != "full"
+                or summary["configured_windows"] != 0):
+            raise ValueError("Only locally validated full-stage window features may be scored")
+        if ready["git_head"] != source["git_head"] or validation["windows"] != [w["id"] for w in summary["windows"]]:
+            raise ValueError("Job revision/window provenance mismatch")
+        for w in summary["windows"]:
+            directory = root / "publish" / k4.safe(w["id"])
+            for name in ("features.json", "target-masks.rle"):
+                if file_sha256(directory / name) != w["files"][name]:
+                    raise ValueError(f"Changed window artifact: {directory / name}")
+            feature = json.loads((directory / "features.json").read_text())
+            if feature["frame_count"] != w["frames"] or feature["target_frames"] != [w["target"]]:
+                raise ValueError("Scoring requires the complete window and its marked frame")
+            if feature["rules"] != rules.RULES or feature["picks"] != rules.choose(feature["features"]):
+                raise ValueError("Feature selections do not use the frozen rules")
+            if w["id"] in windows:
+                raise ValueError(f"Duplicate window: {w['id']}")
+            windows[w["id"]] = (feature, ClipMasks.load(directory / "target-masks.rle"))
+    return windows
+
+
+def score(marks: dict[str, Any], review: dict[str, Any], review_path: Path,
+          review_dir: Path, inputs: list[dict[str, Any]], partial: bool = False) -> dict[str, Any]:
+    labels = rules.validate_marks(marks, review, review_path)
+    windows = load_windows(inputs)
     rows = []
     for frame in review["frames"]:
         clip_id = f"{frame['match']}/{frame['clip']}"
-        if clip_id not in clips:
+        window_id = f"{clip_id}@{frame['frame']}"
+        if window_id not in windows:
             if partial:
                 continue
-            raise ValueError(f"Missing full-clip features: {clip_id}")
-        feature, masks = clips[clip_id]
-        if frame["frame"] not in feature["target_frames"]:
-            raise ValueError("A review frame has no preserved candidate masks")
-        t = feature["target_frames"].index(frame["frame"])
-        by_track = {inst.track_id: k4.upsample(inst.mask(), (1920, 1080)) for inst in masks.frames[t]}
+            raise ValueError(f"Missing window features: {window_id}")
+        feature, masks = windows[window_id]
+        by_track = {inst.track_id: k4.upsample(inst.mask(), (1920, 1080)) for inst in masks.frames[0]}
         path = review_dir / frame["masks"]
         if file_sha256(path) != frame["masks_sha256"]:
             raise ValueError("Hand-marked review mask identity changed")
@@ -72,9 +79,9 @@ def score(marks: dict[str, Any], review: dict[str, Any], review_path: Path,
             present = [track for track in chosen if feature["track_ids"][track] in by_track]
             predicted = [by_track[feature["track_ids"][track]] for track in present]
             comparisons[candidate] = {"correct": rules.correct(predicted, truth, label["visible"], label["missing_instance"]),
-                                      "clip_picks": chosen, "present": present,
+                                      "window_picks": chosen, "present": present,
                                       "iou": [[iou(a, b) for b in truth] for a in predicted]}
-        rows.append({"id": frame["id"], "clip": clip_id, "match": frame["match"], "visible": label["visible"],
+        rows.append({"id": frame["id"], "clip": clip_id, "window": window_id, "match": frame["match"], "visible": label["visible"],
                      "selected": label["selected"], "proposal_oracle": oracle, "candidates": comparisons})
     if not rows:
         raise ValueError("No scored review frames")
@@ -90,10 +97,10 @@ def score(marks: dict[str, Any], review: dict[str, Any], review_path: Path,
     winner = next((r["candidate"] for r in table if r["correct"] == highest and r["reaches_bar"]), None) if complete else None
     return {"rules": rules.RULES, "frames": total, "scored": done, "complete": complete,
             "table": table, "selected_by_frozen_rule": winner, "applied_to_k4": False,
-            "next": ("review K4 amendment before application" if winner else "user decides; court candidate deferred to adopted K8") if complete else "collect remaining full-clip features",
+            "next": ("review K4 amendment before application" if winner else "user decides; court candidate deferred to adopted K8") if complete else "collect remaining window features",
             "visibility": dict(Counter(r["visible"] for r in rows)),
             "proposal_oracle": {"correct": sum(r["proposal_oracle"] for r in rows), "scored": done},
-            "rows": rows, "jobs": provenance}
+            "rows": rows, "jobs": [{k: v for k, v in source.items() if k != "files"} for source in inputs]}
 
 
 def main() -> int:

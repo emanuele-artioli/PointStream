@@ -29,19 +29,26 @@ def fixture(tmp_path):
     marks = dict(schema=1, selection_sha256="sel", result_sha256=file_sha256(rp), marks={
         "m/c/0": dict(selected=[1], visible=1, missing_instance=False, confirmed=True),
         "m/c/1": dict(selected=[], visible=0, missing_instance=False, confirmed=True)})
-    target = ClipMasks(("person",), 540, 960, 25)
-    target.add(0, "person", 0, mask, .9)
-    target.ensure_frames(2)
-    target.save(feature_dir / "target-masks.rle")
-    features = {"person:1": dict(presence=.5, a=1., b=1., c=1., e=1., racket_most=True)}
-    record = dict(rules=RULES, features=features, picks=choose(features), target_frames=[0, 1],
-                  frame_count=2, track_ids={"person:1": 0})
-    (feature_dir / "features.json").write_text(json.dumps(record))
-    (feature_dir / "local-validation.json").write_text(json.dumps(dict(passed=True, checks=dict(real=True), clip="m/c")))
+    rows = []
+    for t in range(2):
+        window = feature_dir / "publish" / f"m__c@{t}"
+        window.mkdir(parents=True)
+        target = ClipMasks(("person",), 540, 960, 25)
+        if t == 0:
+            target.add(0, "person", 0, mask, .9)
+        target.ensure_frames(1)
+        target.save(window / "target-masks.rle")
+        features = {"person:1": dict(presence=.5, a=1., b=1., c=1., e=1., racket_most=True)}
+        record = dict(rules=RULES, features=features, picks=choose(features), target_frames=[t],
+                      frame_count=2, track_ids={"person:1": 0})
+        (window / "features.json").write_text(json.dumps(record))
+        rows.append(dict(id=f"m/c@{t}", frames=2, target=t,
+                         files={p.name: file_sha256(p) for p in window.iterdir()}))
+    (feature_dir / "local-validation.json").write_text(json.dumps(dict(passed=True, checks=dict(real=True), windows=["m/c@0", "m/c@1"])))
     (feature_dir / "ready.json").write_text(json.dumps(dict(git_head="commit")))
-    (feature_dir / "k4b-features.json").write_text(json.dumps(dict(configured_frames=0, stage="full", frames=2, clip=dict(id="m/c", frames=2))))
-    source = dict(directory=str(feature_dir), clip="m/c", job_id="job", git_head="commit",
-                  files={p.name: file_sha256(p) for p in feature_dir.iterdir()})
+    (feature_dir / "k4b-features.json").write_text(json.dumps(dict(configured_windows=0, stage="full", windows=rows)))
+    source = dict(directory=str(feature_dir), job_id="job", git_head="commit",
+                  files={p.name: file_sha256(p) for p in feature_dir.iterdir() if p.is_file()})
     return marks, review, rp, review_dir, source
 
 
@@ -57,8 +64,13 @@ def test_score_counts_absent_track_as_none_and_ties_to_simpler_rule(tmp_path):
 
 def test_score_rejects_changed_artifacts_and_missing_clips(tmp_path):
     marks, review, rp, root, source = fixture(tmp_path)
-    with pytest.raises(ValueError, match="Missing full-clip"):
+    with pytest.raises(ValueError, match="Missing window"):
         score(marks, review, rp, root, [])
     (tmp_path / "features/ready.json").write_text("{}")
     with pytest.raises(ValueError, match="Changed feature"):
+        score(marks, review, rp, root, [source])
+    (tmp_path / "features/ready.json").write_text(json.dumps(dict(git_head="commit")))
+    window = tmp_path / "features/publish/m__c@0/features.json"
+    window.write_text(window.read_text().replace('"a": 1.0', '"a": 2.0'))
+    with pytest.raises(ValueError, match="Changed window"):
         score(marks, review, rp, root, [source])

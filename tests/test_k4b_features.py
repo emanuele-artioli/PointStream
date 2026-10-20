@@ -1,122 +1,43 @@
+import json
+
 import numpy as np
 import pytest
-from types import SimpleNamespace
-from typing import Any
 
-from experiments.tennis.k4b_features import cpu_state_compatibility, estimate_full_seconds, extract_features, key, mask_parity, offload_tracker_state
-from src.segmentation.masks import ClipMasks
-
-torch: Any = None  # Supplied by the isolated compatibility-test module, without CUDA.
-
-
-def test_scale_gate_does_not_multiply_fixed_loading_and_first_batch_warmup():
-    phases = dict(imports=1., preparation=0., sam_load=2., sam_compute=0., export=0.,
-                  pose_load=3., pose_first=100., pose_first_frames=8., pose_rest=0.)
-    assert estimate_full_seconds(phases, 48, 3975) == 166
-    phases["pose_rest"] = 40.
-    assert estimate_full_seconds(phases, 48, 88) == 266
-    with pytest.raises(ValueError, match="beyond the first batch"):
-        estimate_full_seconds(phases, 8, 3975)
+from experiments.tennis import k4
+from experiments.tennis.k4b_features import (convert_command, default_config_sha256, extract_features, key,
+                                             plan_windows, validate, window_span)
+from experiments.tennis.k4b_rules import RULES
+from experiments.visor.b1 import file_sha256
+from src.segmentation.masks import ClipMasks, compress
 
 
-def _merge(d1, d2, k1, k2, d2_idx):
-    d1[k1][d2_idx] = d2[k2].to(dtype=d1[k1].dtype)
+def test_window_is_k4_length_centred_on_the_marked_frame_and_kept_inside_the_clip():
+    assert window_span(1532, 3975) == (1412, 240)
+    assert window_span(14, 3975) == (0, 240)
+    assert window_span(3970, 3975) == (3735, 240)
+    assert window_span(62, 64) == (0, 64)
+    assert window_span(218, 294) == (54, 240)
+    with pytest.raises(ValueError, match="inside the clip"):
+        window_span(64, 64)
 
 
-def _append(d1, d2, k1, k2, dim=0):
-    d1[k1] = torch.cat([d1[k1], d2[k2]], dim=dim)
+def test_plan_has_one_window_per_marked_frame_and_refuses_label_manifests():
+    clips = [dict(id="m/c", frames=400, fps=50., sha256="s", review_frames=[10, 390])]
+    plan = plan_windows(dict(contains_human_marks=False, clips=clips))
+    assert list(plan) == ["m/c@10", "m/c@390"]
+    assert (plan["m/c@390"]["start"], plan["m/c@390"]["frames"], plan["m/c@390"]["target"]) == (160, 240, 230)
+    with pytest.raises(ValueError, match="human selections"):
+        plan_windows(dict(clips=clips))
 
 
-def test_cpu_storage_compatibility_preserves_values_dtype_promotion_and_device():
-    class Tensor:
-        def __init__(self, values, device):
-            self.values, self.device = np.asarray(values), device
-            self.dtype = self.values.dtype
-
-        def to(self, *, dtype=None, device=None):
-            return Tensor(self.values.astype(dtype or self.dtype), device or self.device)
-
-        def __setitem__(self, index, value):
-            if self.device != value.device:
-                raise RuntimeError("mixed devices")
-            self.values[index] = value.values
-
-    def cat(values, dim):
-        assert len({v.device for v in values}) == 1
-        return Tensor(np.concatenate([v.values for v in values], axis=dim), values[0].device)
-
-    existing = {"x": Tensor(np.zeros(2, np.float32), "cpu")}
-    added = {"y": Tensor(np.array([1.5], np.float64), "cuda")}
-    with pytest.raises(RuntimeError, match="mixed devices"):
-        _merge(existing, added, "x", "y", [1])
-    module = SimpleNamespace(_merge=_merge, _append=_append, torch=SimpleNamespace(cat=cat))
-    receipt = cpu_state_compatibility(module)
-    module._merge(existing, added, "x", "y", [1])
-    np.testing.assert_array_equal(existing["x"].values, [0, 1.5])
-    assert existing["x"].device == "cpu" and existing["x"].dtype == np.float32
-    module._append(existing, added, "x", "y")
-    np.testing.assert_array_equal(existing["x"].values, [0, 1.5, 1.5])
-    assert existing["x"].device == "cpu" and existing["x"].dtype == np.float64
-    assert len(receipt["patches"]) == 2 and len(receipt["patch_sha256"]) == 64
-    with pytest.raises(RuntimeError, match="patch rejected"):
-        cpu_state_compatibility(SimpleNamespace(_merge=lambda: None))
+def test_conversion_selects_the_window_before_k4s_scaling():
+    command = convert_command("ffmpeg", "in.mp4", "out.yuv", 160, 240)
+    assert command[command.index("-frames:v") + 1] == "240"
+    assert command[command.index("-vf") + 1].startswith("select=between(n\\,160\\,399),scale=1920:1080:flags=area:out_range=tv")
+    assert "passthrough" in command
 
 
-def test_parity_rejects_identity_swaps_even_when_union_is_identical():
-    a, b = [ClipMasks(("person", "player", "racket"), 4, 6, 1) for _ in range(2)]
-    mask = np.zeros((4, 6), bool)
-    mask[1:3, 1:3] = True
-    a.add(0, "person", 1, mask, .9)
-    b.add(0, "person", 2, mask, .9)
-    result = mask_parity(a, b)
-    assert result["minimum_union_iou"] == 1
-    assert not result["track_ids_match"] and result["minimum_instance_iou"] == 0
-
-
-def test_tracker_cpu_state_adapter_forwards_native_arguments_and_checks_storage():
-    def model(tracker):
-        def cache(state, t, masks):
-            state.setdefault("cached_frame_outputs", {})[t] = dict(masks)
-        return SimpleNamespace(tracker=tracker, _cache_frame_outputs=cache)
-
-    class Tracker:
-        def init_state(self, *, num_frames, offload_state_to_cpu=False):
-            return {"frames": num_frames, "offload_state_to_cpu": offload_state_to_cpu,
-                    "storage_device": "cpu" if offload_state_to_cpu else "cuda"}
-
-    tracker = Tracker()
-    native = model(tracker)
-    record = offload_tracker_state(SimpleNamespace(model=native))
-    state = tracker.init_state(num_frames=407)
-    assert state["frames"] == 407 and state["storage_device"] == "cpu"
-    assert record["initialized"] == record["cpu"] == 1
-
-    class Mask:
-        def __init__(self, device="cuda"):
-            self.device = device
-
-        def cpu(self):
-            return Mask("cpu")
-
-    original = Mask()
-    native._cache_frame_outputs(state, 3, {7: original})
-    assert original.device == "cuda"
-    assert state["cached_frame_outputs"][3][7].device == "cpu"
-    assert record["cached_masks"] == record["cached_cpu_masks"] == 1
-
-    class IgnoringTracker:
-        def init_state(self, *, offload_state_to_cpu=False):
-            return {"offload_state_to_cpu": offload_state_to_cpu, "storage_device": "cuda"}
-
-    bad = IgnoringTracker()
-    offload_tracker_state(SimpleNamespace(model=model(bad)))
-    with pytest.raises(RuntimeError, match="was not effective"):
-        bad.init_state()
-    with pytest.raises(RuntimeError, match="lacks native CPU-state"):
-        offload_tracker_state(SimpleNamespace(model=SimpleNamespace(tracker=SimpleNamespace(init_state=lambda: {}))))
-
-
-def test_full_clip_features_merge_duplicate_prompts_and_preserve_target_masks():
+def test_features_merge_duplicate_prompts_and_preserve_target_masks():
     clip = ClipMasks(("person", "player", "racket"), 540, 960, 2)
     detections = []
     for t in range(8):
@@ -146,3 +67,51 @@ def test_full_clip_features_merge_duplicate_prompts_and_preserve_target_masks():
     assert record["picks"]["c"] == [player_id]
     assert len(targets.frames) == 2 and all(len(f) == 2 for f in targets.frames)
     assert np.array_equal(targets.frames[1][0].mask(), clip.frames[7][0].mask())
+
+
+def _window(tmp_path):
+    clip = ClipMasks(("person", "player", "racket"), 540, 960, 25)
+    detections = []
+    for t in range(8):
+        mask = np.zeros((540, 960), bool)
+        mask[20:50, 30 + t:40 + t] = True
+        clip.add(t, "person", 1, mask, .9)
+        detections.append(dict(boxes=np.zeros((0, 4), np.float32), kps=np.zeros((0, 17, 3), np.float32)))
+    manifest = dict(contains_human_marks=False, clips=[dict(id="m/c", frames=8, fps=25., sha256="s", review_frames=[3])])
+    window = plan_windows(manifest)["m/c@3"]
+    out = tmp_path / "publish" / k4.safe(window["id"])
+    out.mkdir(parents=True)
+    record, targets = extract_features(clip, detections, [window["target"]])
+    clip.save(out / "sam-masks.rle")
+    targets.save(out / "target-masks.rle")
+    (out / "pose.json.zst").write_bytes(compress(json.dumps([{k: v.tolist() for k, v in d.items()} for d in detections]).encode()))
+    (out / "features.json").write_text(json.dumps(record))
+    row = {**window, "conversion": dict(frames=8), "files": {p.name: file_sha256(p) for p in out.iterdir()}}
+    summary = dict(requested=[window["id"]], configured_windows=0, windows=[row], manifest_sha256="",
+                   clips={"m/c": dict(frames=8, fps=25., review_frames=[3], sha256="s")}, rules=RULES,
+                   sam=dict(checkpoint_sha256="0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+                            sdpa_backend_policy="native_flash", runtime=dict(capability=[8, 9]),
+                            config_sha256=default_config_sha256(), grounding_batch_size=16),
+                   pose=dict(on_cuda={"yolo11x-pose": "cuda:0"}), gpu_peak_gib=24., gpu_memory_limit_mib=32000)
+    return tmp_path / "publish", summary, out
+
+
+def test_validator_recomputes_windows_and_catches_tampering(tmp_path):
+    directory, summary, out = _window(tmp_path)
+    report = validate(directory, summary)
+    assert report["passed"], report["checks"]
+    assert report["frames"] == 8
+    moved = json.loads(json.dumps(summary))
+    moved["windows"][0]["start"] = 1
+    assert not validate(directory, moved)["checks"]["windows_placed"]
+    offloaded = json.loads(json.dumps(summary))
+    offloaded["sam"]["config_sha256"] = "0" * 64
+    assert not validate(directory, offloaded)["checks"]["sam_default_config"]
+    over = json.loads(json.dumps(summary))
+    over["gpu_peak_gib"] = 40.
+    assert not validate(directory, over)["checks"]["peak_within_declaration"]
+    features = json.loads((out / "features.json").read_text())
+    features["features"][key("person", 1)]["a"] = 99.
+    (out / "features.json").write_text(json.dumps(features))
+    checks = validate(directory, summary)["checks"]
+    assert not checks["files_identified"] and not checks["features_recomputed"]
