@@ -959,13 +959,23 @@ the fair anchors.
    for a slightly worse F̂, and even then, re-billed optimistically,
    weighted LPIPS reaches −8% (3 of 4), short of rule (a). lzma stays;
    F carried in the foreground stream becomes the main route.
-3. *Fair anchors.* (a) SVT-AV1 at the equal-time preset 1, with B2b's
-   low-rate ladder (720p, 540p, 360p, upscaled) so the anchors reach
-   PointStream's low rates, where the scene route's points now go unread
-   (CPU; B2b items 2–3 on the pilots). (b) A whole-frame DCVC-UF adapted
-   to the venue the same way (G6's recipe L on unfilled footage, coded on
-   the unfilled window; about 8 jobs). PointStream is re-judged against
-   the new pooled envelope, with the venue models billed per kitchen.
+3. *Fair anchors.* **Done, fails** (P01_107's venue anchor pending; it
+   cannot change the verdict). Against SVT-AV1 at preset 1 and DCVC-UF off
+   the shelf, both with a 720/540/360p ladder, plus a whole-frame DCVC-UF
+   adapted to the venue the same way, PointStream with its models billed
+   per kitchen needs 69% more rate on weighted LPIPS (0 of 4).
+   - The ladder reaches 8–80 kbps, where the billed 50 MB scene model
+     loses. Break-even is 10–30 h of stream per scene model, against a
+     kitchen's 0.65–3 h on disk.
+   - At equal adaptation, neither model billed, the venue-adapted
+     whole-frame codec beats PointStream on LPIPS (weighted +17%, frame
+     +16%). PointStream wins on frame DISTS (−20%) and weighted PSNR
+     (−19%).
+   - The background's gain is mostly adaptation, not the split. The
+     paper's claim needs the user's decision: smaller or shared venue
+     models, models sent beforehand (then the adapted anchor is
+     unbilled too), or the split's case made on DISTS, PSNR and the
+     foreground.
 4. *F, GPU.* Re-encode the foreground with K from F̂ (lzma at s = 8 and
    16) with G_HO in the slots (H5m had G), and rescore; then an oracle for
    F carried by the foreground stream itself (no MASK segment).
