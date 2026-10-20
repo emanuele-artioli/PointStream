@@ -110,8 +110,8 @@ python -m pytest
 
 Pass no paths to ruff or mypy: paths replace the configured file sets.
 
-Codex subagents default to `gpt-6-luna` at `max` reasoning effort unless the
-task says otherwise.
+Codex subagents use `gpt-6.1-sol` at `medium` reasoning effort (user,
+2026-10-16; Codex's own default) unless the task says otherwise.
 
 ## Paper repository
 

@@ -348,7 +348,7 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   compares the two on egocentric data. HaMeR trains on HInt train (VISOR
   frames), WiLoR does not. Establishing which is better on egocentric video is
   a small contribution of its own: H compares them and the result is a paper
-  table ([PLAN](../PLAN.md#h-foreground-encoding)).
+  table ([PLAN](../PLAN.md#h-foreground-user-2026-10-08)).
 
 **JointControlVideo on Wan2.1-I2V-14B-480P** (H3e's hand generator, 2026-10-12)
 - [ZhangCYG/JointControlVideo](https://github.com/ZhangCYG/JointControlVideo) at
