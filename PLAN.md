@@ -475,6 +475,21 @@ other. Each has its rule written before its run, as everywhere.
   RacketVision's ball labels (PLAN's ball stage); it is also the judge,
   since an off-the-shelf detector finds 46% of the source's balls and
   SAM 3.1's text prompt 56%.
+  Outcomes (2026-10-21, [entries](docs/experiments.md)): (1) no renderer
+  adopted: a per-window appearance keeps 10–20% of the pixel oracle's
+  gain (BD about 0% against the −25% bar); the diagnostic points to
+  per-frame position and appearance. The user's rendering preference
+  (disk or streak) is pending. (2) RacketVision's BallTrack adopted off
+  the shelf as tracker and judge (0.918 on K5's TrackNet games, never in
+  its training; 0.881 on RacketVision test; 0.022 false detections per
+  frame); no training needed. Through SVT-AV1 at CRF 62 every tracker
+  finds under 3% of the balls.
+- K5b 1b. *Per-frame ball* (next, proposed): K5b 1's oracle with the
+  encoder refining each position by fit (±4 px, billed through the same
+  residual code) and sending the appearance per frame (setting and
+  colour predicted from the previous frame, billed); same decodes, judges
+  and rule; positions from BallTrack as well as the labels, so the ball
+  mode is measured end to end.
 Datasets: still-camera sets (TrackNet, RacketVision, OpenTTGames) are
 fine where a decision needs labels, with the scope stated in the paper;
 broadcast matches answer what a real broadcast costs.

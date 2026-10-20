@@ -7800,3 +7800,78 @@ invocation turns out to be needed.
   test, from other matches, is the check.
 - Budget: stage A ≤ 1.5 GPU-hours in parts of ≤ 45 min (one per set);
   stage B ≤ 6 GPU-hours.
+- Failed attempts (infrastructure, no results): `20261020T191508Z-70549af5`,
+  `…191515Z-e36c7b87`, `…191521Z-b6a436f6` (`c913734`: the packed
+  environment has neither hydra nor omegaconf; WASB's postprocessors are
+  now loaded by path and its configs read as an attribute dict);
+  `20261020T214419Z-17cc0776`, `…214426Z-1d7002a9`, `…214432Z-fb693dbc`
+  (`d5260a7`: `--limit 0` arrived as the string "0", so one full stage
+  scored no clip and its validator passed on an empty list; cancelled or
+  superseded; the validator now rejects an empty stage);
+  `20261020T214842Z-bf85e989`, `…214855Z-a4f4e1df` (gpu2, smokes over
+  600 s beside another user's process at 100%; rerun on Ada);
+  `20261020T220040Z-fe792dc2` (the SVT-AV1 probe's smoke failed the check
+  that some candidate finds the ball, which none does at CRF 62; the
+  probe is now checked by its decode's frame PSNR, ≥ 25 dB).
+- Jobs (all RTX 6000 Ada, gpu5/gpu6, shared; environment
+  `pointstream-20261009T214002Z`; inputs `inputs-k5b2.json`
+  `7cb55480…cd63`): TrackNet games 8–10 `20261020T214833Z-bf224666`
+  (`7590a77`; 30 clips; 1,362 s; `published.tar` `6d2aed8e…2d38`);
+  RacketVision tennis test in three parts `20261020T220058Z-fc8980da`
+  (`cff4f60`, whose `k5b_trackers.py` is `7590a77`'s; 14 rallies; 680 s;
+  `3dbecb66…eadb`), `20261020T214901Z-0d339486` (`7590a77`; 15; 1,240 s;
+  `0c53b65d…33ec`), `20261020T214907Z-eefaac4b` (`7590a77`; 14; 634 s;
+  `3fe00d05…f3cd`); the SVT-AV1 probe `20261020T220308Z-436c3db3`
+  (`09f0cd3`; 30 clips; 986 s; `a4178a34…afe1`); TrackNet games 2, 3, 6, 7
+  `20261020T221615Z-1a87ab2f` (`09f0cd3`; 30 clips; 1,135 s;
+  `5ae5a714…d31f`). Validators passed on each smoke and, run locally, on
+  each full stage. Every model's parameters on `cuda:0` (asserted in each
+  `k5b-trackers.json`; torch 2.10.0+cu128). About 1.7 GPU-hours of full
+  stages, 2 with smokes and failed attempts: over the 1.5-hour budget
+  (the RacketVision rallies are 600 frames at 60 frames/s, longer than
+  estimated, and gpu2's contention cost two smokes).
+- Report (`k5b_trackers report` on the six jobs; `k5b-trackers-report.json`
+  `f2cec565…a42c`). Detection rate within 10 px (5 px), false detections
+  per frame without a ball:
+
+  | Candidate | TrackNet 8–10 | RacketVision test | Mean (rule) | K5's games 2,3,6,7,8,10 | SVT-AV1 CRF 62 (8–10) |
+  |---|---|---|---:|---|---:|
+  | BallTrack | 0.938 (0.851), 0.030 | 0.881, 0.286 | **0.910** | 0.918 (0.771), 0.022 | 0.026 |
+  | WASB, step 1 | 0.923 (0.911), 0.051 | 0.834, 0.379 | 0.879 | 0.966 (0.944)\*, 0.039 | 0.018 |
+  | WASB | 0.922 (0.909), 0.066 | 0.831, 0.350 | 0.876 | 0.965 (0.945)\*, 0.041 | 0.017 |
+  | MonoTrack | 0.898 (0.880), 0.112 | 0.797, 0.404 | 0.847 | 0.953\*, 0.047 | 0.021 |
+  | ResTrackNetV2 | 0.865 (0.844), 0.076 | 0.745, 0.300 | 0.805 | 0.909\*, 0.037 | 0.018 |
+  | TrackNetV2 | 0.842 (0.829), 0.046 | 0.745, 0.291 | 0.794 | 0.928\*, 0.024 | 0.010 |
+  | BallSeg | 0.618 (0.598), 0.005 | 0.637, 0.123 | 0.627 | 0.759\*, 0.002 | 0.011 |
+  | DeepBall-Large | 0.390 (0.357), 0.553 | 0.424, 0.773 | 0.407 | 0.704\*, 0.154 | 0.010 |
+  | DeepBall | 0.396 (0.367), 0.497 | 0.193, 1.000 | 0.294 | 0.670\*, 0.363 | 0.011 |
+
+  \* games 2, 3, 6, 7 are in WASB-zoo training (WASB 0.988 on them
+  alone), so these are not held out. TrackNet 8–10: 5,472 ball frames and
+  197 without; RacketVision test: 1,947 labelled ball frames and 203
+  labelled without (false rates there are high for every candidate;
+  those frames were not inspected);
+  K5's six games: 11,496 and 534. WASB's F1 on 8–10 is 0.954 against
+  0.956 in its paper, so the wrapper reproduces its authors' inference.
+  The SVT-AV1 probe (preset 8, CRF 62, median 84 kbps, frame PSNR
+  32.7–34.3 dB) leaves every candidate under 0.03.
+- Decision (by the rule): **BallTrack is chosen** (0.910 against WASB's
+  0.879; none within 0.02, so the probe did not enter) and **adopted
+  without training**: it never saw TrackNet, and on K5's six games it
+  finds 0.918 of the balls with 0.022 false detections per frame without
+  a ball, and 0.881 on RacketVision test (bars 0.90, 0.05, 0.80). On K5's
+  8 windows it finds 0.916 (0.006 false). Stage B is not needed.
+- Reading. The hypothesis holds on the choice and half on the numbers:
+  WASB leads the zoo on TrackNet (0.92) and falls on RacketVision's
+  broadcast footage (0.83, not as low as predicted), while BallTrack,
+  trained on RacketVision's other matches, leads both. The competing
+  explanation (games 8–10 share courts with 1–7) is visible in the zoo
+  (WASB 0.988 on its training games, 0.922 on 8–10) and does not touch
+  BallTrack. Two limits for its use: (1) it places the ball coarsely (5 px
+  rate 0.771 on K5's games against WASB's 0.944; it takes a blob's box
+  centre at 512×288), so the ball mode's positions want refinement by the
+  encoder (K5b 1's diagnostic: about 1.5 dB from per-frame position);
+  (2) as a judge it is valid (0.92 on the source), and it confirms K5's
+  regime with a valid detector: through SVT-AV1 at CRF 62 every
+  candidate finds under 3% of the balls (YOLO26x's 0.02 in K5 was not a
+  valid judge).
