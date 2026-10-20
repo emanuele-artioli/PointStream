@@ -715,15 +715,24 @@ def command_anchors(args: argparse.Namespace) -> int:
         if codec.startswith("svtav1"):
             rec = b2.code_svtav1(coder, source, w["fps"], value, pw, None, {"preset": args.preset, "enable_tf": None},
                                  None, None)
-        else:
-            rec = b2.code_dcvc(coder, source, value, pw, None, False, {"range": "full"})
-            if not (rec["deterministic"] and rec["decoder_matches_encoder_intra"]):
-                raise RuntimeError(f"DCVC-UF {height}p QP {value}: its decode is not the encoder's")
+        else:  # DCVC-UF decodes non-deterministically on a contended GPU (docs/fleet.md): re-code, as K5
+            attempts = []
+            for _ in range(DCVC_ATTEMPTS):
+                shutil.rmtree(pw, ignore_errors=True)
+                pw.mkdir(parents=True)
+                rec = b2.code_dcvc(coder, source, value, pw, None, False, {"range": "full"})
+                attempts.append({k: rec.get(k) for k in ("stream_sha256", "deterministic", "decoder_matches_encoder_intra")})
+                if rec["deterministic"] and rec["decoder_matches_encoder_intra"]:
+                    break
+            else:
+                raise RuntimeError(f"DCVC-UF {height}p QP {value}: its decode is not the encoder's ({DCVC_ATTEMPTS} attempts)")
+            rec["attempts"] = attempts
         scores = score_decoded(w, judges, to_full(Path(rec["decoded"]), height, w["frames"]))
         rows.append({"codec": codec, "point": value, "height": height, "rate_bytes": rec["rate_bytes"],
                      "kbps": rec["rate_bytes"] * 8 / seconds / 1000, "stream_sha256": rec["stream_sha256"],
                      "decoded_frames": rec["decoded_frames"], "deterministic": rec.get("deterministic"),
-                     "encode_seconds": rec.get("encode_seconds"), "scores": scores, "reencoded": False})
+                     "encode_seconds": rec.get("encode_seconds"), "attempts": rec.get("attempts"), "scores": scores,
+                     "reencoded": False})
         shutil.rmtree(pw, ignore_errors=True)
         progress(len(rows))
         write_json(stage_dir() / "h5.json", {**result, "seconds": round(time.time() - began, 1)})
