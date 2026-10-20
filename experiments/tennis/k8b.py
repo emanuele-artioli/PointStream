@@ -225,7 +225,7 @@ def run(args: argparse.Namespace) -> int:
         native[name] = {"path": path, "version": subprocess.check_output([path, "-version"], text=True).splitlines()[:3]}
     selected = parts(manifest["clips"], args.parts)[args.part]
     if args.frames:
-        selected = selected[:1]  # smoke: the part's first clip, truncated, from the part's own archive
+        selected = [max(selected, key=lambda c: (c["frames"], c["id"]))]  # smoke: the part's longest clip, truncated
     clips = {}
     for clip in selected:
         video = root / clip["path"]
