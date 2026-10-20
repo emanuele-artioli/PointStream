@@ -203,3 +203,93 @@ def register(rgb: np.ndarray, previous: np.ndarray | None = None) -> dict[str, A
                 hom, error = alternate, alternative_error
     valid = error["chamfer_px"] is not None and error["chamfer_px"] <= 2.0 and error["segments_supported"] >= 6
     return {"homography": hom.tolist(), **error, "registered": bool(valid)}
+
+
+# K8b (docs/experiments.md, 2026-10-20 rule). K8's detector above is kept unchanged for
+# reproducing K8's evidence; K8b adds a shade-robust detector, an independent ruler and a
+# spurious-fit guard, and chooses among hypotheses from both detectors.
+FIT_PX = 6.0          # a frame fits at the decision rule's p95 bar
+CLUTTER_MAX = 0.25    # dev: true court fits <= 0.085, spurious fits 0.52-0.66
+
+
+def hough_segments(raw: np.ndarray) -> np.ndarray:
+    """Long straight segments (x1, y1, x2, y2), with K8's Hough parameters scaled to the frame."""
+    scale = raw.shape[0] / 1080
+    lines = cv2.HoughLinesP(raw * 255, 1, np.pi / 720, max(20, round(50 * scale)),
+                            minLineLength=max(20, round(80 * scale)), maxLineGap=max(4, round(12 * scale)))
+    return np.zeros((0, 4), np.int32) if lines is None else lines[:, 0]
+
+
+def relative_lines(rgb: np.ndarray, kernel: int = 31, rel: float = 0.10, absolute: float = 10.0,
+                   saturation: float = 0.75) -> tuple[np.ndarray, np.ndarray]:
+    """(line mask, 1 px centerline ruler), relative to the local background in shade or sun.
+
+    A line pixel is brighter than the morphological opening of the value channel (which
+    removes thin bright lines) by max(absolute, rel * background), and its saturation is
+    at most `saturation` times the closing of the saturation channel.
+    """
+    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    s, v = hsv[:, :, 1].astype(np.float32), hsv[:, :, 2].astype(np.float32)
+    shape = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel, kernel))
+    background = cv2.morphologyEx(v, cv2.MORPH_OPEN, shape)
+    surround = cv2.morphologyEx(s, cv2.MORPH_CLOSE, shape)
+    raw = ((v - background >= np.maximum(absolute, rel * background)) & (s <= saturation * surround)).astype(np.uint8)
+    width = max(3, round(7 * rgb.shape[0] / 1080))
+    support, ruler = np.zeros_like(raw), np.zeros_like(raw)
+    for x1, y1, x2, y2 in hough_segments(raw):
+        cv2.line(support, (int(x1), int(y1)), (int(x2), int(y2)), (1,), width)
+        cv2.line(ruler, (int(x1), int(y1)), (int(x2), int(y2)), (1,), 1)
+    return raw & support, ruler
+
+
+def clutter(hom: np.ndarray, mask: np.ndarray, margin: int = 6) -> float:
+    """Share of the projected court's in-frame interior, beyond `margin` px of every model
+    line, covered by detected pixels; a fit on texture (nets, crowd) is cluttered."""
+    corners = project(OUTLINE, hom)
+    if not np.isfinite(corners).all():
+        return 1.0
+    inside = np.zeros_like(mask)
+    cv2.fillConvexPoly(inside, np.rint(corners).astype(np.int32), (1,))
+    near = np.zeros_like(mask)
+    for segment in SEGMENTS:
+        cv2.polylines(near, [np.rint(project(segment, hom)).astype(np.int32)], False, (1,), 2 * margin + 1)
+    region = (inside > 0) & (near == 0)
+    return float(mask[region].mean()) if region.any() else 1.0
+
+
+def register_v2(rgb: np.ndarray, previous: np.ndarray | None = None) -> dict[str, Any]:
+    """K8b registration: warm start, then both detectors' seeds when it fails or exceeds 2 px.
+
+    Each hypothesis is refined against both masks; the valid fit (>= 6 supported segments on
+    the ruler, clutter <= CLUTTER_MAX) with the lowest ruler chamfer wins. `error_px` is the
+    ruler chamfer at 1080p; `fits` is error <= FIT_PX. Missing fits stay missing.
+    """
+    old = white_lines(rgb)
+    mask, ruler = relative_lines(rgb)
+    best: tuple[np.ndarray, dict[str, Any], float] | None = None
+
+    def consider(candidate: np.ndarray) -> None:
+        nonlocal best
+        for target in (old, mask):
+            fitted = refine(candidate, target)
+            if fitted is None:
+                continue
+            error = chamfer(fitted, ruler)
+            if error["chamfer_px"] is None or error["segments_supported"] < 6:
+                continue
+            mess = clutter(fitted, mask)
+            if mess <= CLUTTER_MAX and (best is None or error["chamfer_px"] < best[1]["chamfer_px"]):
+                best = (fitted, error, mess)
+
+    if previous is not None:
+        consider(previous)
+    if best is None or best[1]["chamfer_px"] > 2.0:
+        for start in (seed(old), seed(mask)):
+            if start is not None:
+                consider(start)
+    if best is None:
+        return {"homography": None, "error_px": None, "fits": False, "registered": False}
+    hom, error, mess = best
+    return {"homography": hom.tolist(), "error_px": error["chamfer_px"], "segments_supported": error["segments_supported"],
+            "visible_fraction": error["visible_fraction"], "clutter": mess,
+            "fits": error["chamfer_px"] <= FIT_PX, "registered": error["chamfer_px"] <= 2.0}
