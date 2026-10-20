@@ -8000,6 +8000,21 @@ invocation turns out to be needed.
     plus JPEGs about 21 s (shared timings, not evidence). Promoted: six
     parts of 7–8 windows (1,564–1,660 frames, about 16 min each at the
     pilot's rate), split longest-first by `tools/datasets/k4b_feature_inputs.py`.
+  - *Parts*, all at `fa7a4fb` (`ready.json`). Part 3
+    `20261020T185418Z-4dfa86ac` (8 windows, 1,612 frames, peak 27.8 GiB)
+    and part 6 `20261020T185438Z-129dc1a3` (7 windows, 1,660 frames, peak
+    27.3 GiB) completed on gpu6 RTX 6000 Ada; both full stages pass all
+    18 checks locally. Parts 1, 2, 4 and 5 (`…185405Z-f78cf558`,
+    `…185411Z-28392fd4`, `…185424Z-4a3e41d9`, `…185430Z-46b3f755`) were
+    admitted one after another on gpu2 (A6000) and each ran out of
+    physical memory in its smoke: another user's process grew to 34.4
+    GiB after admission, leaving about 13 GiB (our allocator cap was 31.25
+    GiB). Contention, not evidence. Resubmitted with the same
+    specification apart from the host pool (gpu2 left out while that
+    process holds 35 GB on both its GPUs): `part{1,2,4,5}-retry.json`,
+    jobs `20261020T214345Z-b3c719eb`, `…214351Z-9fe1e191`,
+    `…214357Z-3cf9965f`, `…214404Z-c4775c13` at `0477bfb` (code as
+    `fa7a4fb`; only this entry changed).
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
