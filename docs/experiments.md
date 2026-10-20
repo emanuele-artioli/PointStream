@@ -6413,8 +6413,16 @@ invocation turns out to be needed.
     ladder exposed the low rates where the billed scene model loses, and
     the venue anchor matches PointStream on LPIPS. Predicted right: the
     venue anchor is the binding one on LPIPS.
-- What this leaves for the paper (for the user to decide, not decided
-  here):
+- Decided (user, 2026-10-20):
+  - Venue models are sent beforehand and not billed; the venue-adapted
+    anchor is then unbilled too (the "neither billed" row).
+  - The hours of stream a venue model needs to repay its bits are reported
+    in the paper as a metric (here 10–30 h against the fair anchors),
+    whatever the dataset's video lengths; runtime use is assumed long
+    enough.
+  - Smaller venue models (partial or low-rank adaptation) are a later,
+    secondary optimization, once there is a win.
+- What this left for the paper (before the user's decision above):
   - The background's venue adaptation is not, by itself, an
     object-centric contribution. A whole-frame codec adapted the same way
     gets it.

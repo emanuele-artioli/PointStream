@@ -971,11 +971,12 @@ the fair anchors.
      whole-frame codec beats PointStream on LPIPS (weighted +16%, frame
      +15%). PointStream wins on frame DISTS (−17%, 4 of 4) and weighted
      PSNR (−11%).
-   - The background's gain is mostly adaptation, not the split. The
-     paper's claim needs the user's decision: smaller or shared venue
-     models, models sent beforehand (then the adapted anchor is
-     unbilled too), or the split's case made on DISTS, PSNR and the
-     foreground.
+   - The background's gain is mostly adaptation, not the split.
+   - Decided (user, 2026-10-20): venue models are sent beforehand and not
+     billed, so the venue-adapted anchor is unbilled too. The paper
+     reports the hours of stream a venue model needs to repay itself
+     (10–30 h here). Smaller venue models are a later optimization, once
+     there is a win.
 4. *F, GPU.* Re-encode the foreground with K from F̂ (lzma at s = 8 and
    16) with G_HO in the slots (H5m had G), and rescore; then an oracle for
    F carried by the foreground stream itself (no MASK segment).
