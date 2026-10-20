@@ -7924,6 +7924,71 @@ invocation turns out to be needed.
   steady work, so one-time warmup is not multiplied by clip length. A
   regression checks this distinction and rejects a prefix without any
   post-warmup pose batch. The 25% margin and 60 s reserve stay fixed.
+- Maximum pilot `20261016T200442Z-17bfb750` (recorded at takeover; the
+  fleet's own record): gpu5 RTX 6000 Ada, shared, revision `6754141`
+  from `ready.json`. Its 48-frame smoke passed every check but its own
+  scale gate: forecast 5,348 s for the 3,975-frame clip against the
+  2,700 s allowance (SAM 43.8 s for 48 frames with three prompts, peak
+  21.46 GiB), so it was not promoted. Not evidence. Phase claims so far
+  about 2,460 s of the 8 GPU-hour ceiling.
+- Takeover (2026-10-20). Codex stopped here; a Claude session continues
+  on `claude/k4b-players` (from `codex/k4b-players`, `origin/main`
+  merged). Everything above stays as recorded.
+- **Amendment 1 (user, 2026-10-20): features over a bounded window per
+  marked frame, not the whole clip.** Written before any windowed run.
+  - *Window.* 240 frames, K4's window length (K4 measured the first 240
+    frames of each clip, and amendment 2 applies the chosen rule to those
+    windows). One window per marked frame `f` of a clip of `n` frames:
+    start `min(max(f − 120, 0), max(n − 240, 0))`, length `min(240, n)`.
+    48 windows, 10,444 frames instead of 30,825; the 10 clips shorter
+    than 240 frames are taken whole. Placement reads only the marked
+    frame's index, chosen by hash before marking, and the clip's length,
+    so it is content-blind and the same for every candidate. Every frame
+    of the window is processed; nothing is subsampled.
+  - *Why the candidates measure the same thing.* Each candidate is a fixed
+    function of the frames it is given: presence on at least half of
+    them, motion and contact summed over them. Amendment 2 will give it
+    K4's 240-frame windows, so scoring it on 240-frame windows measures
+    the rule as it will be applied. The whole-clip features (up to 3,975
+    frames) measured an input the rule never sees in K4. Candidate (b)'s
+    "last second discounted" becomes the window's last second, the only
+    end a rule sees on a K4 window; its frozen formula already zeroes the
+    last second of its input, so `k4b_rules` is unchanged. The frozen
+    formulas (`RULES`, revision `466860d`), the duplicate-prompt merge,
+    the injective IoU ≥ 0.5 scoring, the 0.95 bar, the marks and the
+    deferral of (d) and its combinations to K8 are unchanged.
+  - *SAM runs natively.* 240 frames is what K4 ran with no offload (three
+    prompts, offline bidirectional; peaks 23.9–25.9 GiB under a 32,000
+    MiB declaration on A6000). This path therefore drops video and
+    tracker-state offload, the tracker-state adapter, the two in-memory
+    replacements of upstream SAM functions, the grounding-batch control
+    and the scale forecast (they stay in git history, `6754141`). SAM
+    runs at its defaults (grounding batch 16), as in K4; the
+    expandable-segment allocator setting stays (it changes storage, not
+    results). YOLO11x-pose (1280) runs on every window frame first and is
+    released before SAM loads, as before.
+  - *Jobs.* One run per part; SAM and YOLO load once per part; each
+    window's masks, poses and features are published as soon as it ends,
+    so a stop keeps the finished windows. The smoke is the part's first
+    window whole (240 frames), so it measures the real peak; the full
+    stage runs every window of the part. Pilot: three 240-frame windows,
+    one per source format (`djokovic_zverev/004@381`, 2160p60;
+    `djokovic_federer/069@305`, 2160p50; `alcaraz_hurkacz/006@387`,
+    1080p25). Its windows count in the score (same code and
+    specification apart from the selection, as in K4). Promotion: the
+    pilot's full output validates locally, its peak is within the
+    declaration, and its rate puts each remaining part under 2,700 s.
+    Then the other 45 windows in parts sized from that rate, in parallel
+    on compatible GPUs.
+  - *Validator.* Window placement recomputed from the manifest; every
+    window frame masked and posed; SAM pinned, flash attention, default
+    configuration (no offload, batch 16); person masks found; features and
+    target masks recomputed from the saved masks and poses; frozen rules.
+  - *Budget.* About 10,444 frames at the maximum smoke's 0.9 s per frame:
+    2.6 GPU-hours of SAM, plus loading and pose. Ceiling 4 GPU-hours and
+    6 h wall for this stage, within the 8 GPU-hour phase ceiling with
+    what is spent. Shared mode, Ada and A6000 only, 32,000 MiB declared
+    with a 4,096 MiB margin; every stage ≤ 45 min.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
