@@ -103,6 +103,20 @@ def test_validator_reads_the_published_archive(tmp_path, monkeypatch):
     assert k8b.validate() == 1
 
 
+def test_register_v2_reseats_a_fit_locked_on_the_singles_lines():
+    """Court-level camera: the doubles corners leave the frame; a seed on the singles lines must be swapped."""
+    import cv2
+
+    true = cv2.getPerspectiveTransform(court.OUTLINE, np.array([[440, 214], [1485, 214], [2374, 770], [-472, 770]], np.float32))
+    image = np.zeros((1080, 1920, 3), np.uint8)
+    image[:] = (40, 110, 170)
+    for segment in court.SEGMENTS:
+        cv2.polylines(image, [np.rint(court.project(segment, true)).astype(np.int32)], False, (235, 235, 235), 5)
+    locked = true @ court.SWAPS[1]  # doubles sidelines drawn where the singles lines are
+    result = court.register_v2(image, locked)
+    assert result["fits"] and result["error_px"] < 2.0 and result["segments_supported"] >= 8
+
+
 def test_register_v2_recovers_a_shaded_court_and_rejects_texture():
     """A court whose lines are only slightly brighter than dark grass (K8's absolute bar misses them)."""
     import cv2
@@ -117,3 +131,12 @@ def test_register_v2_recovers_a_shaded_court_and_rejects_texture():
     assert result["fits"] and result["error_px"] < 2.0 and result["clutter"] < 0.05
     noise = np.random.default_rng(0).integers(0, 255, (1080, 1920, 3), dtype=np.uint8)
     assert not court.register_v2(noise)["fits"]
+
+
+def test_dev_clips_are_neither_reviewed_nor_scored(tmp_path, monkeypatch):
+    monkeypatch.setattr(k8b, "DEV_CLIPS", ("b/0",))
+    k8b.review_page(report(), tmp_path / "review.html")
+    assert (tmp_path / "review.html").read_text().count("<article") == 2
+    marks = {"review_id": "r", "marks": {"a/0/shot-00": "court", "a/0/shot-01": "crowd"}}
+    result = k8b.score(report(), marks)
+    assert result["adopted"] and result["excluded_dev_clips"] == ["b/0"]

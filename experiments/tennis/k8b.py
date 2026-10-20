@@ -28,6 +28,9 @@ from experiments.visor.b1 import file_sha256, write_json
 
 DECISION = {"shot_fit_share": 0.80, "fit_px": 6.0, "precision": 0.95, "duration_recall": 0.90,
             "median_px": 2.0, "p95_px": 6.0, "scene_threshold": 0.25, "min_state_seconds": 1.0}
+# Clips seen while correcting the method (the pilot smoke's clip): registered for K4b, but
+# neither reviewed nor scored (rule amendment of 2026-10-21).
+DEV_CLIPS = ("djokovic_zverev/000",)
 CHUNK = 400
 SIZE = (1920, 1080)
 
@@ -336,6 +339,8 @@ def review_page(report: dict[str, Any], out: Path) -> None:
     """K8's review layout over held-out clips; labels start blank and download with the review ID."""
     cards = []
     for clip in report["clips"]:
+        if clip["id"] in DEV_CLIPS:
+            continue
         for s in clip["shots"]:
             images = "".join(f'<figure><img loading="lazy" src="{html.escape(p)}"><figcaption>{label}</figcaption></figure>'
                              for p, label in zip(s["images"], ("First", "Middle + projected court", "Last")))
@@ -348,7 +353,7 @@ def review_page(report: dict[str, Any], out: Path) -> None:
                          f'{options}</select></label><details><summary>Play the shot</summary>'
                          f'<video controls muted preload="none" src="clips/{html.escape(clip["path"])}#t={t0:.3f},{t1:.3f}">'
                          '</video></details></article>')
-    shots = sum(len(c["shots"]) for c in report["clips"])
+    shots = sum(len(c["shots"]) for c in report["clips"] if c["id"] not in DEV_CLIPS)
     page = f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>K8b court-shot review</title>
 <style>body{{font:16px system-ui;margin:24px;background:#eee;color:#18212b}}header{{position:sticky;top:0;background:#fff;padding:12px;z-index:2}}article{{background:white;margin:20px 0;padding:16px;border-radius:8px}}.strip{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}}figure{{margin:0;min-width:0}}img{{display:block;width:100%}}video{{width:70%;max-width:100%}}select,button{{font:inherit;padding:8px}}figcaption{{font-size:13px}}</style>
 <header><b>K8b · {shots} shots of three held-out broadcasts</b> <span id="count"></span> <button id="save">Download marks JSON</button>
@@ -429,7 +434,7 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
     if marks.get("review_id") != report["review_id"]:
         raise ValueError("marks belong to another review")
     labels = marks["marks"]
-    shots = [(c, s) for c in report["clips"] for s in c["shots"]]
+    shots = [(c, s) for c in report["clips"] if c["id"] not in DEV_CLIPS for s in c["shots"]]
     if set(labels) != {s["id"] for _, s in shots} or any(v not in k8.CLASSES for v in labels.values()):
         raise ValueError("mark every shot exactly once with an allowed class")
     tp = fp = 0
@@ -463,6 +468,7 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
     conditions = {"precision": precision >= DECISION["precision"], "duration_recall": recall >= DECISION["duration_recall"],
                   "registration": median <= DECISION["median_px"] and p95 <= DECISION["p95_px"]}
     return {"decision": DECISION, "adopted": all(conditions.values()), "conditions": conditions,
+            "excluded_dev_clips": list(DEV_CLIPS),
             "precision": precision, "predicted_court_shots": tp + fp, "duration_recall": recall,
             "true_court_seconds": seconds_true, "registration_median_px": median if np.isfinite(median) else None,
             "registration_p95_px": p95 if np.isfinite(p95) else None, "court_frames": len(errors),

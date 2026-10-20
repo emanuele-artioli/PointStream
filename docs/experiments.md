@@ -7899,6 +7899,31 @@ invocation turns out to be needed.
   clips, 8 processes, checkpointing every finished clip. Smoke ≤ 600 s
   on one short clip; full stages ≤ 2,700 s; parts sized from the smoke's
   measured rate. No GPU.
+- Pilot smoke `20261020T215039Z-fdd6bf8c` (`78f6fa0`, gpu4, CPU).
+  An earlier submission, `20261020T215018Z-5357cd95`, snapshotted the
+  main checkout (`dabfa5c`, which has no K8b code) and was cancelled
+  before it ran anything. The smoke processed 240 frames of
+  `djokovic_zverev/000` in 524 s and failed its validator: no frame fit.
+  That clip is a court-level practice camera (4K60). Diagnosis: seven
+  model lines fit within 2.4 px, but both singles sidelines were off by
+  39 px. The fit had locked the model's doubles sidelines onto the court's
+  singles lines. The real doubles lines leave the frame, the seed only
+  takes sidelines that cross 60% of the frame height, and K8's geometry
+  guard (corners within ±10% of the width) rejected the correct fit,
+  whose near corners lie 25% beyond each side. Unguarded, the correct fit
+  is 1.22 px on all nine lines. It is not evidence.
+- Amendment 1 (2026-10-21, before any held-out shot is reviewed).
+  (a) K8b's geometry guard allows corners up to 50% of the frame width
+  beyond either side; K8's guard is unchanged. (b) When the best fit
+  exceeds 2 px, it is re-seated on the model's four line-swap pairings:
+  singles↔doubles sidelines and service lines↔baselines, as model-space
+  scalings about the court centre. This is the same one-line-off
+  ambiguity as K8's class-2 misses. (c) Each frame computes the distance
+  transform once per mask, which changes speed only. No threshold
+  changes. Because the fix was found on a held-out clip,
+  `djokovic_zverev/000` (3,975 frames, 66 s) becomes dev: it is still
+  registered (K4b needs it) but is neither reviewed nor scored. The
+  held-out census is the other 69 clips.
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
