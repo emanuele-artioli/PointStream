@@ -8014,7 +8014,50 @@ invocation turns out to be needed.
     process holds 35 GB on both its GPUs): `part{1,2,4,5}-retry.json`,
     jobs `20261020T214345Z-b3c719eb`, `…214351Z-9fe1e191`,
     `…214357Z-3cf9965f`, `…214404Z-c4775c13` at `0477bfb` (code as
-    `fa7a4fb`; only this entry changed).
+    `fa7a4fb`; only this entry changed). All four completed (gpu5 and
+    gpu6, RTX 6000 Ada); each full stage passes all 18 checks locally.
+    Every one of the 48 windows (10,444 frames) is now covered by a
+    locally validated full stage; peaks 27.3–27.8 GiB.
+- **Outcome (2026-10-21), amendment 1, the user's 48 marks** (37
+  two-player, 10 one-player, 1 no-player frames). Jobs: pilot
+  `20261020T184104Z-0af937d9` and parts 3, 6 at `fa7a4fb`; parts 1, 2,
+  4, 5 (retries) at `0477bfb`, all from `ready.json`. Report
+  `features-v2/score-2026-10-20/k4b-report.json` (`2a9a26fd…`), index
+  `index-full.json` (`10e61aa5…`), local validation receipts beside
+  them; marks `05f51305…`, review `instances.json` `89b78156…` and masks
+  `published.tar` `2dc9acb6…` as recorded above.
+
+  | candidate | correct / 48 | share |
+  |---|---:|---:|
+  | (a) motion in body heights | 30 | 0.625 |
+  | (b) horizontal motion, window's last second discounted | 39 | 0.813 |
+  | (c) racket contact on most frames | 32 | 0.667 |
+  | (e) keypoint motion | 26 | 0.542 |
+  | (a)+(c) | 42 | **0.875** |
+  | (d), (c)+(d), (a)+(d) | pending K8 | |
+
+  The window features' proposal oracle is 48/48: on every marked frame
+  the window's SAM masks contain each marked player (IoU ≥ 0.5), so the
+  misses are the rules' choices, not missing masks.
+- Decision (by the rule): **no candidate reaches 0.95**; nothing is
+  adopted and K4 is not amended. The table goes to the user. (d) and its
+  combinations are pending: K8's v0 court list covers `nadal_kyrgios`
+  only, and none of the marked frames come from it, so they wait for
+  K8's homographies on the five marked matches.
+- Reading (not a test; the rules stay frozen). (a)+(c)'s six misses: on
+  five two-player frames it picks one marked player (IoU 0.97–0.98) and
+  another person as the second, or on one frame two other people; the
+  sixth is the one frame with no player visible, which any rule that picks
+  tracks fails. (b) is right on 2 of those 6 and (a)+(c) on 5 of (b)'s
+  9 misses (44 of 48 frames have one of the two right). Misses
+  concentrate on rublev_auger-aliassime and djokovic_federer. The
+  pattern, a second person mistaken for the far player, is what the
+  court outline (d) is meant to remove, and the no-player frame is a
+  shot K8 should drop. Hypothesis "(d) or (c)+(d) wins" stays open.
+- Budget: 7,209 s of stage execution (2.0 GPU-hours: pilot, six parts
+  and the four failed smokes, from each stage's `execution.json`), inside
+  the 4-hour ceiling; about 4.5 h wall, most of it queueing for a GPU
+  with 36 GB free.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
