@@ -7559,3 +7559,83 @@ invocation turns out to be needed.
   perceptual gain needs the visual check beside it; and this is the
   oracle (fitted on the window, bits free), not the generic network G,
   which was fitted on DCVC-UF decodes only.
+
+### 2026-10-20 — K5b (1): the ball renderer's oracle (a drawn ball, billed)
+- Question (PLAN K5b 1): K5's oracle pasted the source's own ball pixels
+  and billed only the trajectory's entropy. Does a ball the decoder
+  *draws* keep the win when every byte of what it needs is sent? Two
+  renderers, both from the coded positions and a per-window appearance
+  sent once: (a) a **sharp disk** (anti-aliased, radius r, colour c);
+  (b) a **streak**, the same disk averaged over the exposure along the
+  coded velocity (alpha = the fraction of the exposure each pixel spends
+  covered, so a fast ball fades as it lengthens, as a camera blurs it).
+  Velocity is the central difference of the coded positions (one-sided
+  at a run's ends, zero for a lone frame), so it costs nothing beyond
+  the positions and one frame of decoder delay. Still an oracle: the
+  positions are TrackNet's labels (a tracker comes in K5b 2).
+- What is sent (`src/pointstream/ball.py`, a `BALL` segment of the
+  PointStream container, its tag and length bytes billed): per window,
+  an on/off bit; when on, colour (3 × 8 bits), radius index (4 bits,
+  1.5–6 px), exposure index (3 bits, 0–1 of a frame interval; 0 is the
+  disk), phase index (3 bits, the streak's centre at −½…+½ of the
+  frame's displacement from the labelled point), the Exp-Golomb order of
+  the residuals; visibility as alternating run lengths (Exp-Golomb);
+  each run's first position absolute (11 + 10 bits at 1280×720), then
+  constant-velocity residuals (signed Exp-Golomb, K5's predictor). Rate
+  = the segment's bytes per window, per window (K5 pooled an entropy; a
+  real code bills more). Decoding the payload returns the positions and
+  parameters exactly (a test).
+- The encoder's fit (analysis by synthesis, as an encoder may: it holds
+  the source and its own decode): per window and coder point, a grid
+  over radius × exposure × phase (the disk: radius only), the colour in
+  closed form (least squares of the composite against the source, then
+  rounded to 8 bits), choosing the combination that most lowers the
+  window's whole-frame squared error; off when none lowers it (then the
+  segment is one byte of payload).
+- Windows, coders, judges and comparison: K5's, unchanged (8 TrackNet
+  windows, SVT-AV1 preset 4 at CRF 35–62, DCVC-UF HT-L at QP 0–63 on the
+  A6000; ball-region PSNR within 8 px of the label, frame PSNR; BD-rate
+  against the pooled envelope and each coder's own). Added: a
+  *streak-region PSNR* (within 8 px of the segment the label's own
+  velocity sweeps in one frame), reported, since K5's region misses most
+  of a 20–40 px streak. Recall is not measured here: YOLO26x was not a
+  valid judge (46% on the source); the tracker of K5b (2) becomes the
+  judge. K5's pixel oracle is recomputed in the same job, so each
+  renderer's distance to the bound is measured on the same decodes.
+- Decision rule (`k5b.DECISION`, fixed before any run). A renderer is
+  adopted when, over a coder underneath (SVT-AV1 or DCVC-UF), it beats
+  the pooled envelope on ball-region PSNR on ≥ 6 of the 8 windows, each
+  by BD-rate ≤ −25% or better at every rate (K5's bar, now with real
+  bytes and a drawn ball), **and** its frame-PSNR BD-rate against its own
+  coder's envelope is ≤ +1% on ≥ 6 of 8 (the ball mode does not hide a
+  cost elsewhere in the frame). If both renderers pass, both stay
+  available and the user's side-by-side preference picks the codec's
+  default; a preferred renderer that fails the rule is not the default.
+  If neither passes, the ball mode needs a richer appearance (a per-window
+  sprite of the source's ball, its own oracle) and the reading says which
+  half failed.
+- Hypothesis: the streak keeps most of K5's gain (pooled BD on DCVC-UF
+  −45% to −55%, K5's oracle −57%) and may beat the pixel oracle on fast
+  windows, where the oracle pastes only 4 px of a long streak; the disk
+  passes on DCVC-UF but by less (about −35%); both pass on SVT-AV1 by less
+  than on DCVC-UF (K5: −38%). Frame PSNR moves by under 0.3%. The
+  billed rate stays under 0.5 kbps per window (K5's entropy: 0.23).
+- Competing explanations: (1) TrackNet's integer labels and their
+  convention (which point of a streak is marked) misplace the drawn ball,
+  costing the disk on fast frames; the fitted phase shows it. (2) The
+  fitted colour mixes ball and court (a 3–5 px ball in 4:2:0), giving a
+  dull ball that scores well and looks wrong; the side by side shows it.
+  (3) At high rates the decode keeps the ball, and a second drawn ball
+  doubles it; the per-point fit can switch the mode off, and the curves
+  show where it does. (4) The streak wins on PSNR only because PSNR
+  rewards blur; the user's preference is the check for display.
+- Side by side (for the user's preference, K5b): per window, at DCVC-UF
+  QP 21 (about 40 kbps, where the decode loses the ball) and QP 42, a
+  2 × 2 clip at equal rate (source, the pixel coder, + disk, + streak;
+  the ball mode adds under 1% of the rate), as a ball-following crop
+  enlarged 3×, and a full-frame 2 × 2 at QP 21.
+- Budget: DCVC-UF on the A6000 (K5's table), SVT-AV1 on 16 threads, no
+  detectors. Smoke: one window, 48 frames, ≤ 600 s. Pilot: part 1, 4
+  windows (K5's pilot windows first), ≤ 45 min; part 2, the other 4,
+  ≤ 45 min, run only if part 1 leaves the rule open. Ceiling 2
+  GPU-hours and 6 h wall.

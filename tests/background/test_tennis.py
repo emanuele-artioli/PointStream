@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import math
+import tempfile
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -142,3 +144,45 @@ def test_trajectory_rate_is_the_same_after_a_json_round_trip():
     s = tw.trajectory_symbols([(1, 10, 10), (1, 12, 11), (1, 14, 13), (1, 15, 13)])
     back = json.loads(json.dumps(s))
     assert tw.trajectory_rate([back], 30.0) == tw.trajectory_rate([s], 30.0)
+
+
+def test_k5b_scores_the_composite_the_decoder_draws():
+    from experiments.tennis import k5b
+    from src.pointstream import ball
+
+    rng = np.random.default_rng(2)
+    h, w, n = 90, 160, 12
+    source = rng.integers(0, 255, (n, h, w, 3), dtype=np.uint8)
+    decoded = np.clip(source.astype(int) + rng.integers(-20, 20, source.shape), 0, 255).astype(np.uint8)
+    track: ball.Track = [(10 + 9 * t, 40 + t) if t != 5 else None for t in range(n)]
+    vel = ball.velocities(track)
+    app = ball.Appearance((250, 240, 30), 4, 6, 2)
+    crops = ball.Crops.build(track, source, vel)
+    masks = k5b.judge_masks(crops)
+    dec = [ball.crops_of(decoded, g["frames"], g["centres"], g["half"]) for g in crops.groups]
+    mse = k5b.frame_mse(decoded, source)
+    q = k5b.score_variant(crops, masks, dec, mse, "streak", app, (h, w))
+    drawn = np.stack([ball.draw(decoded[t], p, vel[t], app) if p else decoded[t] for t, p in enumerate(track)])
+    assert abs(q["frame_psnr"] - k5.mse_to_psnr(float(k5b.frame_mse(drawn, source).mean()))) < 1e-6
+    rows = [(1, p[0], p[1]) if p else (0, 0, 0) for p in track]
+    assert abs(q["ball_psnr"] - k5.quality(drawn, source, rows)["ball_psnr"]) < 1e-6
+    base = k5b.score_variant(crops, masks, dec, mse, "decode", None, (h, w))
+    assert abs(base["ball_psnr"] - k5.quality(decoded, source, rows)["ball_psnr"]) < 1e-6
+    oracle = k5b.score_variant(crops, masks, dec, mse, "oracle", None, (h, w))
+    with tempfile.TemporaryDirectory() as d:
+        ref = k5.quality(k5.oracle(decoded, source, rows, Path(d) / "o.npy"), source, rows)
+    assert abs(oracle["ball_psnr"] - ref["ball_psnr"]) < 1e-6 and abs(oracle["frame_psnr"] - ref["frame_psnr"]) < 1e-6
+
+
+def test_k5b_decision_needs_both_judges_on_six_of_eight():
+    from experiments.tennis import k5b
+
+    def window(ball_ok: bool, frame_ok: bool) -> dict:
+        return {"passes": {"streak-dcvc-uf-htl": {"ball": ball_ok, "frame": frame_ok},
+                           "disk-dcvc-uf-htl": {"ball": False, "frame": True}}}
+
+    six = {str(i): window(i < 6, True) for i in range(8)}
+    assert k5b.decide(six)["adopted"] == {"disk": False, "streak": True}
+    frame_cost = {str(i): window(True, i < 5) for i in range(8)}
+    assert k5b.decide(frame_cost)["adopted"]["streak"] is False
+    assert k5b.decide({str(i): window(True, True) for i in range(4)})["adopted"]["streak"] is False

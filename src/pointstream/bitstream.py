@@ -15,6 +15,7 @@ Segments (`Tag`):
 * ``MASK``: the foreground's per-frame class map (absent while F is granted to the decoder, H5's first run).
 * ``MODEL``: kind u8 (`MODEL_KINDS`), then the first 8 bytes of the model's sha256: a reference to a network
   the decoder already holds (shipped once per venue, or with the decoder), never its weights.
+* ``BALL``: the ball mode's positions and per-window appearance (`src.pointstream.ball`, PLAN K5b).
 
 The rate of a window is the container's length.
 """
@@ -41,6 +42,7 @@ class Tag(IntEnum):
     FOREGROUND = 2
     MASK = 3
     MODEL = 4
+    BALL = 5
 
 
 ROUTES = {"svt": 0, "enh": 1, "scene": 2, "dcvc": 3}
