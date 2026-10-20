@@ -44,3 +44,32 @@ def test_empty_frames() -> None:
     classes = np.zeros((3, 40, 60), np.uint8)
     back, _ = mk.decode(mk.encode(mk.reduce(classes, 4), 4))
     assert not mk.upsample(back, (60, 40)).any()
+
+
+def moving_disc(frames: int = 3) -> np.ndarray:
+    yy, xx = np.mgrid[:1080, :1920]
+    out = np.zeros((frames, 1080, 1920), np.uint8)
+    for t in range(frames):
+        disc = (xx - 700 - 9 * t) ** 2 + (yy - 500) ** 2 < 150 ** 2
+        out[t][disc] = OBJECT
+        out[t][disc & (xx < 700 + 9 * t)] = HAND
+    return out
+
+
+@pytest.mark.parametrize("representation", ["sdf", "binary"])
+def test_video_planes_round_trip_without_the_codec(representation: str) -> None:
+    classes = moving_disc()
+    planes = mk.video_planes(classes, 4, representation)
+    pw, ph = mk.padded_size(1920, 1080, 4)
+    assert planes.shape == (3, pw * ph * 3 // 2) and (pw, ph) == (480, 272)
+    acc = mk.accuracy(classes, mk.video_classes(planes, 4, (1920, 1080)))
+    assert acc["iou"] > 0.98 and acc["class_accuracy"] > 0.97
+    assert acc["boundary_px"] < (1.0 if representation == "sdf" else 3.0)  # the ramp keeps sub-cell precision
+
+
+def test_accuracy_counts_errors() -> None:
+    classes = moving_disc(1)
+    shifted = np.roll(classes, 4, axis=2)
+    acc = mk.accuracy(classes, shifted)
+    assert 0.9 < acc["iou"] < 1 and 1 < acc["boundary_px"] < 4
+    assert mk.accuracy(classes, classes) == {"iou": 1.0, "error_share": 0.0, "boundary_px": 0.0, "class_accuracy": 1.0}

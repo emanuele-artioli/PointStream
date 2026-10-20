@@ -163,3 +163,59 @@ def test_tagged_variant_replaces_only_its_foregrounds() -> None:
     v = h5.variant_rows(base + gho)
     assert len(v["pointstream"]) == 2
     assert sorted((r["foreground"], r.get("tag", "")) for r in v["gho"]) == [("dcvc-21_4", "gho"), ("dcvc-63_1", "")]
+
+
+def test_billing_adds_the_routes_model_and_payback_repays_it() -> None:
+    anchors = [scored(k, q, codec="dcvc") for k, q in ((100, 0.3), (200, 0.2), (400, 0.1))]
+    rows = [scored(50, 0.3), scored(100, 0.2), scored(150, 0.15, route="enh"), scored(200, 0.1)]
+    model = {"scene": 1_000_000.0, "enh": 100_000.0}  # bytes
+    out = h5.billed(rows, model, 100.0)  # 80 kbps for the scene model, 8 kbps for the enhancer
+    assert [round(r["kbps"] - b["kbps"], 6) for r, b in zip(out, rows)] == [80.0, 80.0, 8.0, 80.0]
+    pay = h5.payback(rows, anchors, model)
+    first = next(p for p in pay if p["kbps"] == 50)
+    assert abs(first["anchor_kbps"] - 100) < 1e-6 and abs(first["payback_seconds"] - 8e6 / 50e3) < 1e-6
+    report = h5.item_report(rows, anchors, 0.0, {"bytes": model, "seconds": {"video": 10.0, "kitchen": 1e6}})
+    free = report["comparisons"]["pointstream|pooled|wlpips_fill"]["bd"]
+    assert report["comparisons"]["pointstream@kitchen|pooled|wlpips_fill"]["bd"] == pytest.approx(free, abs=1e-3)
+    assert not h5.below_zero(report["comparisons"]["pointstream@video|pooled|wlpips_fill"])
+
+
+def test_model_size_validator() -> None:
+    def size(b: int) -> dict:
+        return {"bytes": b}
+    row = {"checkpoint_sha256": "a", "checkpoint_bytes": 480, "parameters": 120, "sizes": [size(50), size(110)]}
+    result: dict = {"rows": [row, {**row, "checkpoint_sha256": "b"}], "limit_tensors": 0}
+    assert all(h5.validate_model_size(result).values())
+    result["rows"][1]["sizes"] = [size(300), size(110)]
+    assert not h5.validate_model_size(result)["fewer_bits_smaller"]
+
+
+def test_ladder_parses_heights() -> None:
+    assert h5.parse_ladder("1080=41,48;360=63") == [(1080, 41), (1080, 48), (360, 63)]
+    assert h5.parse_ladder(None) == []
+    with pytest.raises(SystemExit):
+        h5.parse_ladder("480=40")
+
+
+def test_anchors_validator_reads_each_knob_its_way() -> None:
+    def row(codec: str, height: int, point: int, kbps: float) -> dict:
+        return {"codec": codec, "height": height, "point": point, "kbps": kbps, "decoded_frames": 240,
+                "deterministic": True, "scores": scores()}
+    rows = [row("svtav1-p1", 360, 48, 90.0), row("svtav1-p1", 360, 63, 30.0),
+            row("dcvc-ladder", 540, 0, 20.0), row("dcvc-ladder", 540, 21, 60.0)]
+    result: dict = {"rows": rows, "planned": 4, "frames": 240, "jpeg_gate_holds": True}
+    assert all(h5.validate_anchors(result).values())
+    rows[1]["kbps"] = 120.0  # CRF 63 dearer than CRF 48
+    assert not h5.validate_anchors(result)["rate_moves_with_the_knob"]
+
+
+def test_venue_anchor_is_billed_like_pointstream() -> None:
+    anchors = [scored(k, q, codec="dcvc") for k, q in ((100, 0.3), (200, 0.2), (400, 0.1))]
+    venue = [{**scored(k, q, codec="dcvc-venue")} for k, q in ((40, 0.3), (80, 0.2), (160, 0.1))]
+    rows = [scored(50, 0.3), scored(100, 0.2), scored(200, 0.1)]
+    model = {"scene": 1_000_000.0, "venue": 1_000_000.0}
+    report = h5.item_report(rows, anchors + venue, 0.0, {"bytes": model, "seconds": {"kitchen": 1e6}})
+    free = report["comparisons"]["pointstream|venue|wlpips_fill"]
+    paid = report["comparisons"]["pointstream@kitchen|venue|wlpips_fill"]
+    assert free["bd"] > 0 and paid["bd"] == pytest.approx(free["bd"], abs=0.02)  # same bits, same seconds
+    assert "pointstream@kitchen|pooled|wlpips_fill" in report["comparisons"]

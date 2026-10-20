@@ -6,7 +6,9 @@
     python -m experiments.visor.h5 time WINDOW --arm DIR --enhancers DIR --generic TAR ... --propainter-tree DIR \\
         --propainter-ckpt P --raft-ckpt P --flow-completion-ckpt P --threads 32
     python -m experiments.visor.h5 validate
-    python -m experiments.visor.h5 report --score H5.JSON ... --out DIR
+    python -m experiments.visor.h5 report --score H5.JSON ... --out DIR [--billing BILLING.JSON]
+    python -m experiments.visor.h5 model-size --arm DIR ... --video-ckpt P [--limit-tensors N]
+    python -m experiments.visor.h5 mask-video --eval-set E.JSON --fill-masks DIR --item ID [--limit-frames N]
 
 WINDOW is ``--eval-set E.JSON --archive DIR --dense-masks DIR --fill-masks DIR --video P.MP4 --item ID
 --image-ckpt P --video-ckpt P --lpips-backbone P``.
@@ -635,6 +637,142 @@ def score_anchors(args: argparse.Namespace, w: dict[str, Any], judges: Judges, w
     return rows
 
 
+LADDER = {1080: (1920, 1080), 720: (1280, 720), 540: (960, 540), 360: (640, 360)}
+
+
+def parse_ladder(spec: str | None) -> list[tuple[int, int]]:
+    """``1080=41,48;540=0,21`` to [(height, value), ...]."""
+    out = []
+    for part in (spec or "").split(";"):
+        if part.strip():
+            height, _, values = part.partition("=")
+            if int(height) not in LADDER:
+                raise SystemExit(f"{height}: not a ladder height ({sorted(LADDER)})")
+            out += [(int(height), int(v)) for v in values.split(",")]
+    return out
+
+
+def ladder_source(w: dict[str, Any], height: int, work: Path) -> dict[str, Any]:
+    """The window at a ladder size: 1080p as decoded; lower sizes by area average in RGB (as G6's backgrounds),
+    then 4:2:0 in full range."""
+    from experiments.background import g5, g6
+
+    if height == FULL[1]:
+        return {**w["source"], "frames": w["frames"]}
+    size = LADDER[height]
+    path = work / f"source-{height}.yuv"
+    if not path.is_file():
+        g5.rgb_to_yuv420(g6.resize(w["rgb"], size, area=True)).tofile(path)
+    return {"path": str(path), "width": size[0], "height": size[1], "frames": w["frames"], "full_range": True}
+
+
+def to_full(decoded: Path, height: int, frames: int) -> Path:
+    """A ladder decode at 1080p as the client shows it: bicubic in RGB, then 4:2:0 (in place)."""
+    from experiments.background import g5, g6
+
+    if height == FULL[1]:
+        return decoded
+    w, h = LADDER[height]
+    raw = np.fromfile(decoded, np.uint8).reshape(frames, h * 3 // 2, w)
+    out = np.empty((frames, FULL[1] * 3 // 2, FULL[0]), np.uint8)
+    for a in range(0, frames, CHUNK):
+        out[a:a + CHUNK] = g5.rgb_to_yuv420(g6.resize(g5.yuv420_to_rgb(raw[a:a + CHUNK]), FULL, area=False))
+    out.tofile(decoded)
+    return decoded
+
+
+def command_anchors(args: argparse.Namespace) -> int:
+    """H5p 3: fair anchors for the window. SVT-AV1 at the equal-time preset and DCVC-UF off the shelf, each at
+    1080p and lower ladder sizes (upscaled bicubically), and G6's venue-adapted whole-frame DCVC-UF from its
+    published decodes; all scored as H5's anchors. Writes ``h5.json`` after every point."""
+    from experiments.visor import b2
+
+    began = time.time()
+    work = scratch_dir() / "anchors"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    w = load_window(args, work)
+    judges = Judges(args)
+    coder = argparse.Namespace(encoder=args.encoder, decoder=args.decoder, threads=args.threads, structure="htl",
+                               image_ckpt=args.image_ckpt, image_sha256=file_sha256(Path(args.image_ckpt)),
+                               video_ckpt=args.video_ckpt, video_sha256=file_sha256(Path(args.video_ckpt)))
+    seconds = w["frames"] / float(w["fps"])
+    planned = [("svtav1-p%d" % args.preset, h, v) for h, v in parse_ladder(args.svt)] + \
+        [("dcvc-ladder", h, v) for h, v in parse_ladder(args.dcvc)]
+    venue = load_backgrounds(args.venue or [], {"scene"}, w["item"]["id"])
+    rows: list[dict[str, Any]] = []
+    result = {"kind": "anchors", "item": w["item"]["id"], "frames": w["frames"], "limit_frames": args.limit_frames,
+              "jpeg_gate_holds": all(c["holds"] for c in w["source"]["jpeg_gate"]),
+              "preset": args.preset, "planned": len(planned) + len(venue), "rows": rows, "judges": judges.record,
+              "encoder": b2.svtav1.tool(args.encoder) if args.svt else None,
+              "decoder": b2.svtav1.tool(args.decoder) if args.svt else None,
+              "venue_manifests": sorted({v["root"] for v in venue})}
+    for codec, height, value in planned:
+        pw = work / f"{codec}-{height}-{value}"
+        shutil.rmtree(pw, ignore_errors=True)
+        pw.mkdir(parents=True)
+        source = ladder_source(w, height, work)
+        if codec.startswith("svtav1"):
+            rec = b2.code_svtav1(coder, source, w["fps"], value, pw, None, {"preset": args.preset, "enable_tf": None},
+                                 None, None)
+        else:  # DCVC-UF decodes non-deterministically on a contended GPU (docs/fleet.md): re-code, as K5
+            attempts = []
+            for _ in range(DCVC_ATTEMPTS):
+                shutil.rmtree(pw, ignore_errors=True)
+                pw.mkdir(parents=True)
+                rec = b2.code_dcvc(coder, source, value, pw, None, False, {"range": "full"})
+                attempts.append({k: rec.get(k) for k in ("stream_sha256", "deterministic", "decoder_matches_encoder_intra")})
+                if rec["deterministic"] and rec["decoder_matches_encoder_intra"]:
+                    break
+            else:
+                raise RuntimeError(f"DCVC-UF {height}p QP {value}: its decode is not the encoder's ({DCVC_ATTEMPTS} attempts)")
+            rec["attempts"] = attempts
+        scores = score_decoded(w, judges, to_full(Path(rec["decoded"]), height, w["frames"]))
+        rows.append({"codec": codec, "point": value, "height": height, "rate_bytes": rec["rate_bytes"],
+                     "kbps": rec["rate_bytes"] * 8 / seconds / 1000, "stream_sha256": rec["stream_sha256"],
+                     "decoded_frames": rec["decoded_frames"], "deterministic": rec.get("deterministic"),
+                     "encode_seconds": rec.get("encode_seconds"), "attempts": rec.get("attempts"), "scores": scores,
+                     "reencoded": False})
+        shutil.rmtree(pw, ignore_errors=True)
+        progress(len(rows))
+        write_json(stage_dir() / "h5.json", {**result, "seconds": round(time.time() - began, 1)})
+    for v in venue:  # G6's published decode of the unfilled window (FFV1); never its DCVC-UF stream
+        manifest = json.loads((Path(v["root"]) / "manifest.json").read_text())
+        if not str(manifest.get("fill", "")).startswith("none"):
+            raise SystemExit(f"{v['root']}: a filled background, not the venue-adapted whole frame")
+        planes = read_ffv1(Path(v["root"]) / v["decoded"])[:w["frames"]]
+        path = work / "venue.yuv"
+        planes.tofile(path)
+        scores = score_decoded(w, judges, path)
+        rows.append({"codec": "dcvc-venue", "point": v["value"], "height": v["coded_size"][1], "method": v["method"],
+                     "rate_bytes": v["bytes"], "kbps": v["kbps"], "stream_sha256": v["bitstream_sha256"],
+                     "decoded_frames": len(planes), "deterministic": v.get("deterministic"),
+                     "model_sha256": v["model_sha256"], "manifest_job": v["manifest_job"], "scores": scores,
+                     "reencoded": False})
+        progress(len(rows))
+        write_json(stage_dir() / "h5.json", {**result, "seconds": round(time.time() - began, 1)})
+    write_json(stage_dir() / "h5.json", {**result, "seconds": round(time.time() - began, 1)})
+    return 0
+
+
+def validate_anchors(result: dict[str, Any]) -> dict[str, bool]:
+    rows = result["rows"]
+
+    def falls(a: dict[str, Any], b: dict[str, Any]) -> bool:  # SVT-AV1: CRF up, rate down; DCVC-UF: QP up, rate up
+        if (a["codec"], a["height"]) != (b["codec"], b["height"]) or a["point"] >= b["point"]:
+            return True
+        return a["kbps"] >= b["kbps"] if a["codec"].startswith("svtav1") else a["kbps"] <= b["kbps"]
+
+    return {
+        "window_is_the_released_one": result["jpeg_gate_holds"],
+        "every_point_scored": len(rows) == result["planned"] and result["planned"] > 0,
+        "every_frame_decoded": all(r["decoded_frames"] == result["frames"] for r in rows),
+        "dcvc_deterministic": all(r["deterministic"] in (None, True) for r in rows),
+        "scores_plausible": all(scores_plausible(r["scores"]) for r in rows),
+        "rate_moves_with_the_knob": all(falls(a, b) for a in rows for b in rows),
+    }
+
+
 def command_score(args: argparse.Namespace) -> int:
     from experiments.background import g5c, g6
 
@@ -1036,7 +1174,145 @@ def validate(stage: Path) -> dict[str, bool]:
     result = json.loads((stage / "h5.json").read_text())
     if result["kind"] == "time":
         return validate_time(result)
+    if result["kind"] == "model-size":
+        return validate_model_size(result)
+    if result["kind"] == "mask-video":
+        return validate_mask_video(result)
+    if result["kind"] == "anchors":
+        return validate_anchors(result)
     return validate_foreground(result) if result["kind"] == "foreground" else validate_score(result)
+
+
+def load_classes(args: argparse.Namespace) -> tuple[dict[str, Any], np.ndarray]:
+    """The item and its class map from the fill mask set alone (no source decode)."""
+    from experiments.background import g6
+    from experiments.visor.b2 import mask_root
+    from src.segmentation.masks import ClipMasks
+    from src.segmentation.visor import HANDS
+
+    item = g6.load_item(args.eval_set, args.item)
+    frames = args.limit_frames if args.limit_frames > 0 else int(item["frames"])
+    clip = ClipMasks.load(mask_root(Path(args.fill_masks), item["id"]))
+    classes = np.zeros((frames, FULL[1], FULL[0]), np.uint8)
+    for t in range(frames):
+        classes[t][clip.foreground(t)] = cp.OBJECT
+        classes[t][clip.class_mask(t, HANDS[0]) | clip.class_mask(t, HANDS[1])] = cp.HAND
+    return item, classes
+
+
+def command_mask_video(args: argparse.Namespace) -> int:
+    """H5p 2: F coded as a video (SVT-AV1, motion compensated) against H5m's lzma coder, by rate and by how
+    closely the client's F̂ matches F. CPU only."""
+    from src.codecs import svtav1
+    from src.pointstream import mask as mk
+
+    began = time.time()
+    item, classes = load_classes(args)
+    fps = Fraction(item["fps"]).limit_denominator(1001)
+    seconds = len(classes) / float(fps)
+    work = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch") / "mask-video"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    rows: list[dict[str, Any]] = []
+    for scale in (int(x) for x in args.lzma_scales.split(",")):
+        payload = mk.encode(mk.reduce(classes, scale), scale)
+        decoded, _ = mk.decode(payload)
+        rows.append({"coder": "lzma", "scale": scale, "bytes": len(payload), "kbps": len(payload) * 8 / seconds / 1000,
+                     **mk.accuracy(classes, mk.upsample(decoded, FULL))})
+        progress(len(rows))
+    for representation in args.representations.split(","):
+        for scale in (int(x) for x in args.scales.split(",")):
+            pw, ph = mk.padded_size(FULL[0], FULL[1], scale)
+            planes = mk.video_planes(classes, scale, representation)
+            source = work / f"{representation}-{scale}.yuv"
+            planes.tofile(source)
+            for crf in (int(x) for x in args.crfs.split(",")):
+                point = work / f"{representation}-{scale}-{crf}"
+                point.mkdir()
+                coded = svtav1.code(source, point, width=pw, height=ph, fps=fps, frames=len(classes), crf=crf,
+                                    preset=args.preset, threads=args.threads, full_range=True,
+                                    encoder=args.encoder, decoder=args.decoder)
+                back = np.fromfile(coded["decoded"], np.uint8).reshape(len(classes), -1)
+                rows.append({"coder": "svtav1", "representation": representation, "scale": scale, "crf": crf,
+                             "coded_size": [pw, ph], "bytes": coded["payload_bytes"],
+                             "kbps": coded["payload_bytes"] * 8 / seconds / 1000,
+                             "stream_sha256": coded["stream_sha256"], "decoded_frames": coded["decoded_frames"],
+                             "encode_seconds": coded["encode_seconds"],
+                             **mk.accuracy(classes, mk.video_classes(back, scale, FULL))})
+                shutil.rmtree(point)
+                progress(len(rows))
+            source.unlink()
+    write_json(stage_dir() / "h5.json", {
+        "kind": "mask-video", "item": item["id"], "frames": len(classes), "fps": str(fps),
+        "limit_frames": args.limit_frames, "preset": args.preset, "share": float((classes > 0).mean()),
+        "classes_sha256": hashlib.sha256(np.packbits(classes > 0).tobytes()
+                                         + np.packbits(classes == cp.HAND).tobytes()).hexdigest(),
+        "encoder": svtav1.tool(args.encoder), "decoder": svtav1.tool(args.decoder), "rows": rows,
+        "seconds": round(time.time() - began, 1)})
+    return 0
+
+
+def validate_mask_video(result: dict[str, Any]) -> dict[str, bool]:
+    rows = result["rows"]
+    video = [r for r in rows if r["coder"] == "svtav1"]
+    lossless = [r for r in rows if r["coder"] == "lzma"]
+    return {
+        "both_coders": bool(video) and bool(lossless),
+        "every_frame_decoded": all(r["decoded_frames"] == result["frames"] for r in video),
+        "accuracy_plausible": all(0 < r["iou"] <= 1 and 0 <= r["class_accuracy"] <= 1 for r in rows),
+        # at one scale and representation, a higher CRF never costs more
+        "rate_falls_with_crf": all(a["bytes"] >= b["bytes"] for a in video for b in video
+                                   if (a["representation"], a["scale"]) == (b["representation"], b["scale"])
+                                   and a["crf"] < b["crf"]),
+        "lzma_finer_is_closer": all(a["iou"] >= b["iou"] for a in lossless for b in lossless if a["scale"] < b["scale"]),
+    }
+
+
+MODEL_VARIANTS = ("delta-4", "delta-8")  # G5c: delta-4 is recipe L's shipped size (keeps quality within +2.2%)
+
+
+def command_model_size(args: argparse.Namespace) -> int:
+    """H5p 1: what each scene model costs to send (G5c's coder: the change from the public HT-L weights the client
+    has, quantized per output channel, LZMA per tensor). CPU only."""
+    from experiments.background.g5c import compress_state, load_plain
+
+    began = time.time()
+    public_sha = file_sha256(Path(args.video_ckpt))
+    public = load_plain(Path(args.video_ckpt))
+    rows = []
+    for i, arm in enumerate(args.arm):
+        ft_dir = Path(arm) / "publish" / "finetune"
+        trained = json.loads((ft_dir / "result.json").read_text())
+        checkpoint = ft_dir / "video_ft.pth.tar"
+        sha = file_sha256(checkpoint)
+        if sha != trained["model"]["checkpoint_sha256"]:
+            raise RuntimeError(f"{arm}: the published checkpoint is not the one its result recorded")
+        if trained["base_checkpoints"]["video_sha256"] != public_sha:
+            raise SystemExit(f"{arm}: fine-tuned from other public weights than {args.video_ckpt}")
+        ft = load_plain(checkpoint)
+        names = sorted(ft)[:args.limit_tensors] if args.limit_tensors > 0 else sorted(ft)
+        ft, base = {k: ft[k] for k in names}, {k: public[k] for k in names}
+        sizes = [compress_state(ft, base, v, workers=args.threads)[1] for v in args.variants.split(",")]
+        rows.append({"item": trained["item"], "arm": trained["arm"], "train_seconds": trained.get("train_seconds"),
+                     "checkpoint_sha256": sha, "checkpoint_bytes": checkpoint.stat().st_size,
+                     "parameters": trained["model"]["parameters"], "tensors": len(names), "sizes": sizes})
+        progress(i + 1)
+    write_json(stage_dir() / "h5.json", {"kind": "model-size", "limit_tensors": args.limit_tensors,
+                                         "public_sha256": public_sha, "rows": rows,
+                                         "seconds": round(time.time() - began, 1)})
+    return 0
+
+
+def validate_model_size(result: dict[str, Any]) -> dict[str, bool]:
+    rows = result["rows"]
+    return {
+        "every_arm_sized": bool(rows) and all(len(r["sizes"]) == len(MODEL_VARIANTS) for r in rows),
+        "distinct_models": len({r["checkpoint_sha256"] for r in rows}) == len(rows),
+        "fewer_bits_smaller": all(r["sizes"][0]["bytes"] < r["sizes"][1]["bytes"] < r["checkpoint_bytes"] for r in rows),
+        # a change from the public weights, so smaller than the 16-bit whole model (parameters x 2 bytes)
+        "change_below_whole16": all(s["bytes"] < 2 * r["parameters"] for r in rows for s in r["sizes"])
+        if result["limit_tensors"] <= 0 else True,
+    }
 
 
 def command_validate(args: argparse.Namespace) -> int:
@@ -1139,11 +1415,39 @@ def variant_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     return out
 
 
-def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_kbps: float) -> dict[str, Any]:
+def billed(rows: list[dict[str, Any]], model_bytes: dict[str, float], seconds: float) -> list[dict[str, Any]]:
+    """H5p 1: each pair with its background route's model bits spread over ``seconds`` of stream."""
+    return [{**r, "kbps": r["kbps"] + 8 * model_bytes.get(r["route"], 0.0) / seconds / 1000} for r in rows]
+
+
+def payback(points: list[dict[str, Any]], anchors: list[dict[str, Any]], model_bytes: dict[str, float]) -> list[dict[str, Any]]:
+    """At each point of ``points``' hull (headline metric) inside the anchors' quality range: the rate it saves
+    against the anchors' hull at equal quality, and the seconds of stream its route's model takes to repay."""
+    import math
+
     from experiments.background.g5 import envelope
 
-    groups = {"svtav1": [a for a in anchors if a["codec"] == "svtav1"],
-              "dcvc": [a for a in anchors if a["codec"] == "dcvc"], "pooled": anchors}
+    a = envelope(curve(anchors, HEADLINE))
+    out = []
+    for rate, q in envelope(curve(points, HEADLINE)):
+        if not a or not a[0][1] <= q <= a[-1][1]:
+            continue
+        row = next(r for r in points if r["kbps"] == rate and METRICS[HEADLINE][2] * r["scores"][FILL]["wlpips"] == q)
+        anchor_kbps = math.exp(float(np.interp(q, [x for _, x in a], [math.log(r) for r, _ in a])))
+        saving = anchor_kbps - rate
+        bits = 8 * model_bytes.get(row["route"], 0.0)
+        out.append({"pair": row["pair"], "route": row["route"], "kbps": rate, "anchor_kbps": anchor_kbps,
+                    "saving_kbps": saving, "payback_seconds": bits / (saving * 1000) if saving > 0 else None})
+    return out
+
+
+def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_kbps: float,
+                billing: dict[str, Any] | None = None) -> dict[str, Any]:
+    from experiments.background.g5 import envelope
+
+    groups = {"svtav1": [a for a in anchors if a["codec"].startswith("svtav1")],
+              "dcvc": [a for a in anchors if a["codec"] in ("dcvc", "dcvc-ladder")],
+              "venue": [a for a in anchors if a["codec"] == "dcvc-venue"], "pooled": anchors}
     out: dict[str, Any] = {"comparisons": {}, "hull": {}, "mask_kbps": mask_kbps}
     for variant, points in variant_rows(rows).items():
         if not points:
@@ -1161,6 +1465,24 @@ def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_
                     key=lambda r: r["kbps"])
         out["hull"][variant] = [{"pair": r["pair"], "kbps": r["kbps"], "wlpips": r["scores"][FILL]["wlpips"],
                                  "background_share": r["kbps_background"] / r["kbps"]} for r in on]
+    if billing and groups["pooled"]:  # H5p 1: the venue models' bits paid over a video or a kitchen
+        variants = variant_rows(rows)
+        out["payback"] = {}
+        for variant in ("pointstream", "gho"):
+            if not variants.get(variant):
+                continue
+            out["payback"][variant] = payback(variants[variant], groups["pooled"], billing["bytes"])
+            for basis, seconds in billing["seconds"].items():
+                points = billed(variants[variant], billing["bytes"], seconds)
+                # the venue-adapted anchor pays for its model the same way (H5p 3)
+                venue = billed([{**a, "route": "venue"} for a in groups["venue"]], billing["bytes"], seconds)
+                billed_groups = {"pooled": [a for a in anchors if a["codec"] != "dcvc-venue"] + venue,
+                                 "venue": venue}
+                for metric, (_, _, _, minimum) in METRICS.items():
+                    for name, group in billed_groups.items():
+                        if group and (name == "pooled" or groups["venue"]):
+                            out["comparisons"][f"{variant}@{basis}|{name}|{metric}"] = compare(
+                                curve(points, metric), curve(group, metric), minimum)
     pointstream = [r for r in rows if r["route"] in VARIANTS["pointstream"] and not r.get("mask_scale")]
     out["matched"] = matched_regions(pointstream, anchors) if pointstream and anchors else []
     return out
@@ -1214,8 +1536,9 @@ def plot(items: dict[str, dict[str, Any]], data: dict[str, dict[str, Any]], targ
             for label, pts, style, colour in (
                     ("PointStream", [r for r in rows if r["route"] in ("scene", "enh")], "-o", "tab:blue"),
                     ("PointStream, SVT-AV1 background", [r for r in rows if r["route"] == "svt"], ":.", "tab:gray"),
-                    ("SVT-AV1 preset 4", [a for a in anchors if a["codec"] == "svtav1"], "--s", "tab:orange"),
-                    ("DCVC-UF HT-L", [a for a in anchors if a["codec"] == "dcvc"], "--^", "tab:green")):
+                    ("SVT-AV1", [a for a in anchors if a["codec"].startswith("svtav1")], "--s", "tab:orange"),
+                    ("DCVC-UF HT-L", [a for a in anchors if a["codec"] in ("dcvc", "dcvc-ladder")], "--^", "tab:green"),
+                    ("DCVC-UF, venue-adapted", [a for a in anchors if a["codec"] == "dcvc-venue"], "--v", "tab:red")):
                 hull = envelope(curve(pts, metric))
                 if hull:
                     ax.plot([r for r, _ in hull], [sign * q for _, q in hull], style, color=colour, label=label, ms=3)
@@ -1232,20 +1555,29 @@ def command_report(args: argparse.Namespace) -> int:
     data: dict[str, dict[str, Any]] = {}
     for path in args.score:
         result = json.loads(Path(path).read_text())
-        if result["kind"] != "score" or result["limit_frames"] > 0:
-            raise SystemExit(f"{path}: not a full score stage")
+        if result["kind"] not in ("score", "anchors") or result["limit_frames"] > 0:
+            raise SystemExit(f"{path}: not a full score or anchors stage")
         d = data.setdefault(result["item"], {"rows": [], "anchors": [], "mask": None, "sources": []})
+        if result["kind"] == "anchors":  # H5p 3: fair anchors only
+            d["anchors"] += result["rows"]
+            d["sources"].append({"path": path, "job_id": result.get("job_id"), "git_head": result.get("git_head")})
+            continue
         seen = {(r["pair"], r.get("mask_scale", 0), r.get("tag", "")) for r in d["rows"]}  # once per scale and tag
         d["rows"] += [r for r in result["rows"] if (r["pair"], r.get("mask_scale", 0), r.get("tag", "")) not in seen]
         d["anchors"] += result["anchors"]
         d["mask"] = d["mask"] or result["foreground_manifest"]["mask_cost"]
         d["sources"].append({"path": path, "job_id": result.get("job_id"), "git_head": result.get("git_head"),
                              "gpu": result.get("gpu")})
-    items = {i: item_report(d["rows"], d["anchors"], d["mask"]["kbps"]) for i, d in data.items()}
+    billing = json.loads(Path(args.billing).read_text()) if args.billing else {}
+    if args.anchor_codecs:  # H5p 3: the fair set (e.g. without B2's preset-4 SVT-AV1)
+        keep = set(args.anchor_codecs.split(","))
+        for d in data.values():
+            d["anchors"] = [a for a in d["anchors"] if a["codec"] in keep]
+    items = {i: item_report(d["rows"], d["anchors"], d["mask"]["kbps"], billing.get(i)) for i, d in data.items()}
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     report = {"items": items, **summary(items), "sources": {i: d["sources"] for i, d in data.items()},
-              "mask": {i: d["mask"] for i, d in data.items()}}
+              "mask": {i: d["mask"] for i, d in data.items()}, "billing": billing}
     write_json(out / "h5-report.json", report)
     if not args.no_plot:
         plot(items, data, out / "h5-rd.png")
@@ -1301,7 +1633,42 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--score", action="append", required=True, help="full score stages' h5.json")
     p.add_argument("--out", required=True)
     p.add_argument("--no-plot", action="store_true")
+    p.add_argument("--billing", help="H5p 1: JSON {item: {bytes: {route: model bytes}, seconds: {basis: s}}}")
+    p.add_argument("--anchor-codecs", help="only these anchor codecs (svtav1, dcvc, svtav1-p1, dcvc-ladder, "
+                   "dcvc-venue)")
+    p = sub.add_parser("model-size")
+    p.add_argument("--arm", action="append", required=True, help="G6's train jobs' archives (extracted)")
+    p.add_argument("--video-ckpt", required=True, help="the public DCVC-UF HT-L weights they were fine-tuned from")
+    p.add_argument("--variants", default=",".join(MODEL_VARIANTS))
+    p.add_argument("--limit-tensors", type=int, default=0, help="the first N tensors only (smoke)")
+    p.add_argument("--threads", type=int, default=16)
+    p = sub.add_parser("anchors")
+    add_window(p)
+    p.add_argument("--dists-backbone", required=True)
+    p.add_argument("--svt", help="SVT-AV1 ladder: HEIGHT=CRF,...;HEIGHT=...")
+    p.add_argument("--dcvc", help="DCVC-UF HT-L ladder: HEIGHT=QP,...;HEIGHT=...")
+    p.add_argument("--preset", type=int, default=1, help="SVT-AV1 preset (H5's timing: 1 is the equal-time one)")
+    p.add_argument("--venue", action="append", help="G6 format archives of the unfilled window (--fill none)")
+    p.add_argument("--threads", type=int, default=32)
+    p.add_argument("--encoder", default="SvtAv1EncApp")
+    p.add_argument("--decoder", default="dav1d")
+    p = sub.add_parser("mask-video")
+    for name in ("--eval-set", "--fill-masks", "--item"):
+        p.add_argument(name, required=True)
+    p.add_argument("--limit-frames", type=int, default=0)
+    p.add_argument("--representations", default="sdf,binary")
+    p.add_argument("--scales", default="2,4,8")
+    p.add_argument("--crfs", default="20,35,50")
+    p.add_argument("--lzma-scales", default="4,8,16")
+    p.add_argument("--preset", type=int, default=4)
+    p.add_argument("--threads", type=int, default=8)
+    p.add_argument("--encoder", default="SvtAv1EncApp")
+    p.add_argument("--decoder", default="dav1d")
     args = parser.parse_args(argv)
+    if args.command == "mask-video":
+        return command_mask_video(args)
+    if args.command == "anchors":
+        return command_anchors(args)
     if args.command == "foreground":
         return command_foreground(args)
     if args.command == "score":
@@ -1310,6 +1677,8 @@ def main(argv: list[str] | None = None) -> int:
         return command_report(args)
     if args.command == "time":
         return command_time(args)
+    if args.command == "model-size":
+        return command_model_size(args)
     return command_validate(args)
 
 
