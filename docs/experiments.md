@@ -3198,6 +3198,307 @@ invocation turns out to be needed.
   and at the native rate are ablations for the paper's final runs.
 - GPU time: about 5 hours (8 jobs, 2 failed).
 
+### 2026-10-12 — G6 steps 4–5, pilot: every stage per window on the pilots' windows
+- Question (PLAN G6 4–5): the pipeline that makes both routes' background
+  for every window of evaluation set v2, at the interface agreed with the
+  foreground session, run end to end on the pilots' windows
+  (P26_02_0000001071, P06_03_0000005110) before the other 32. Two things
+  change from steps 2–3 and are checked here: the scene model's footage
+  (the window's own video, not G1d's stretch), and the enhancer at H5's
+  format (1080p and the native rate; G5d fitted it at 960×540, 10
+  frames/s).
+- Method, per window (`experiments/background/g6.py`):
+  1. `footage --set scene`: G5b's split of a stretch applied to the
+     window, so no window needs a prepared stretch: the 120 s of its own
+     video around it (shifted to stay 5 s from the video's ends), less the
+     window and 5 s on each side, at 10 frames/s and 960×540 (about 1,060
+     frames). Foreground as G5c's footage (SAM 3.1 "hand" and "arm" plus
+     the EPIC detector's boxes at score ≥ 0.5, dilated 16 px at 1080p;
+     the detections cover all 34 videos, G1's `hand-objects.tar`), filled
+     by ProPainter.
+  2. `footage --set native`: 4 segments of 2 s at the window's rate and
+     1080p from the same parts (starts spread evenly, blind to content),
+     the same foreground, ProPainter at 960×540 upsampled into the holes
+     only (as the window's fill). The enhancer's training pairs.
+  3. `train`: recipe L (β 0.005, learning rate 3 × 10⁻⁵, 540 steps) on
+     step 1's footage, from the public HT-L weights.
+  4. `format --publish`: the window decoded as B2 does, F = B1b's
+     `visor_dense_sam_fill` filled *exactly* (no dilation, as agreed),
+     the whole frame coded: the scene model at 960×540 upsampled, QP 0,
+     13, 25, 38, 50, 63, plus at 1080p QP 50 and 63 for the high end.
+  5. `enhance --publish` (two jobs, CRFs 32–48 and 54–63): SVT-AV1 at
+     1080p (G5's preset and CRFs; the anchor, published too), and G5d's
+     enhancer (8 blocks, 64 channels, MSE + LPIPS on V, 2,000 steps)
+     fitted per CRF on step 2's footage coded by SVT-AV1 at that CRF,
+     applied to the window's SVT-AV1 decode.
+  Scored at 1080p on V (`g5c.full_score`: PSNR, LPIPS, DISTS, flicker,
+  KID). Published per window: each point's decoded 1080p frames (FFV1,
+  4:2:0, BT.709 full range; checked by decoding them again), bitstream,
+  enhancer weights, and a manifest (window, frame range, F's mask-set
+  sha256, per point bytes, bitstream sha256, per-frame decoded sha256s,
+  decode ms per frame, GPU class, job id and code revision). Points that
+  the client upsamples are published after upsampling and scored as
+  published (through 4:2:0, unlike steps 2–3).
+- Decision rules, fixed now. (a) *The window's own footage replaces the
+  stretch* if the scene model's BD-rate on LPIPS_V against SVT-AV1 at
+  1080p is within 20 points of steps 2–3's (−91% | −45%) on both
+  windows; otherwise the footage protocol is revised before scaling.
+  (b) *The enhancer works at H5's format* if it beats SVT-AV1 at 1080p by
+  10% or more on LPIPS_V on both windows; otherwise its fit at 960×540
+  (SVT-AV1 at 540p, enhanced, upsampled) is tried on the pilots before
+  scaling. (c) *The interface holds* if every manifest is complete and
+  the foreground session composites one pilot window from it without a
+  change. All three pass → the other 32 windows run with the same
+  settings. Every metric is reported as BD-rate against SVT-AV1 at
+  1080p (concave-hull envelope), the rate allocation with the
+  foreground is the foreground session's.
+- Hypotheses. (a) Passes: the window's own footage is closer to the
+  window in time than most of a stretch's frames; filling F exactly
+  (smaller holes) helps both codecs alike. (b) Passes with a smaller
+  margin than at 960×540 (G5d's footage enhancer −36% | −50% on
+  LPIPS_V): at 1080p and the native rate SVT-AV1's artifacts are finer
+  and the enhancer's receptive field covers less of the scene.
+- Competing explanations. (a) A failure would mean the stretch's frames
+  far from the window carried the gain (more viewpoints), not the
+  window's neighbourhood; footage from the whole video would test it.
+  (b) A failure at 1080p could be the fit's size (4 segments of 2 s at
+  1080p, 400–480 frames, hold fewer distinct views than G5d's 1,200–2,400).
+- Budget: pilot 12 jobs, each ≤ 45 minutes on Ada or A6000 (shared),
+  about 5 GPU-hours. The other 32 windows at the same per-window cost:
+  about 80 GPU-hours, above PLAN's 65 (steps 4–5); the scale-up waits
+  for the user's approval with the pilot's measured cost.
+- Runs (shared GPUs; code `a103325`, with `f2e4aa9` for the enhancer
+  jobs and `9e49c5e` for P26_02's native footage). Footage, scene:
+  P26_02 `20261012T144606Z-fe5e8ef5` (1,061 frames: 79 before the window,
+  982 after, since it starts 18 s into the video), P06_03
+  `…144634Z-91fdde7f` (1,060). Footage, native: P06_03
+  `…144704Z-1b330ff2`, P26_02 `…153200Z-a9414105` (480 frames each,
+  foreground 9–25%). Training (Ada, both converged, monitor −0.3% and
+  −0.4% over the last fifth): P26_02 `…150907Z-d03a60c9`, P06_03
+  `…151248Z-bc31027a`. Scene route: P26_02 `…161128Z-5999b792`, P06_03
+  `…160501Z-6cd65382`. Enhancer route: P06_03 `…154011Z-5c4135b3`,
+  `…154024Z-a4e8259d`; P26_02 `…155052Z-9ad2482e`, `…155102Z-82b6caf5`.
+  Failures, none citable: two SAM 3.1 and one ProPainter out of memory
+  when another session's process grew on the shared GPU after
+  admission (`…144625Z-c117ffa3`, `…160057Z-2eb07276`); P26_02's native
+  footage hung twice after SAM (`…144950Z-e96dde14` ran out of its
+  smoke time, `…150658Z-eef26194` was cancelled after 20 idle minutes):
+  PyAV's threaded H.264 decoder deadlocked on close inside the process
+  holding SAM 3.1, fixed in `9e49c5e` (the 1080p decode runs in the
+  spawned decoder process); the enhancer's footage encode had no work
+  directory (`…150734Z-796c8fa3`, fixed in `f2e4aa9`); the enhancer's
+  declared 20,000 MiB was too low at full size (21.3 GB,
+  `…152624Z-b5bff301`), now 30,000.
+- Outcome. BD-rate against SVT-AV1 at 1080p (concave hull, 174–4,470
+  kbps), P26_02 | P06_03:
+  | Route | LPIPS_V | DISTS_V | PSNR_V | flicker_V | KID_V |
+  |---|---|---|---|---|---|
+  | enhancer (enh-1080) | better at every rate \| −83% | better at every rate \| −82% | +53% \| +26% | worse at every rate (both) | −72% \| −68% |
+  | scene model, 540p | −97% \| **+20%** | −95% \| +116% | +97% \| +97% | worse at every rate (both) | −82% \| worse at every rate |
+  | scene model, 1080p | better at every rate \| −61% | −79% \| +125% | +176% \| +94% | worse at every rate (both) | +35% \| +435% |
+  - **(b) passes**: the enhancer beats SVT-AV1 on LPIPS_V, DISTS_V and
+    KID_V on both windows, far beyond the 10% needed (at the same rate
+    LPIPS_V falls 42–59%, PSNR_V 0.4–0.7 dB), and loses PSNR_V and
+    flicker as at 960×540 (G5d). Hypothesis (a smaller margin than G5d's
+    −36% | −50%) wrong: fitted on the window's own video at its size and
+    rate, it gains more. Applying it took about 160 ms per frame on a
+    shared A6000: not real time at 59.94 frames/s.
+  - **(a) passes on P26_02 and fails on P06_03** (−97% against −91%;
+    +20% against −45%, 65 points off). Two things changed at once from
+    steps 2–3: the footage (the window's own 120 s, not the stretch) and
+    F (filled exactly, not dilated by 16 px, so V now includes the
+    pixels at the hands' edges, which neither model was trained to
+    reproduce; P06_03's foreground is 27% of the frame). Beside it, on
+    P06_03 the model now codes better at 1080p than at 540p (−61%
+    against +20%), the reverse of step 2.
+  - (c) Every manifest is complete (FFV1 frames re-decoded and checked,
+    bitstreams, enhancer weights); the foreground session has not yet
+    composited one.
+  - GPU time: about 5.2 hours (12 completed jobs, 7 failed or cancelled).
+- Diagnosis of (a) on P06_03, decided before its results (two jobs,
+  about 1 GPU-hour): A, the stretch's recipe-L model of steps 2–3
+  (`20261011T163301Z-e47ae994`) with F filled exactly
+  (`20261012T180309Z-48fb21c5`); B, the window-footage model dilated by
+  16 px as steps 2–3 (`…180332Z-92a1e304`), against steps 2–3's SVT-AV1
+  anchor (`…122457Z-a660ab4c`, the same dilation). If A also loses
+  (LPIPS_V at 540p within 20 points of +20%) and B recovers (within 20
+  points of −45%), the exact fill is the cause and the footage stands;
+  if A keeps −45% ± 20 and B does not recover, the footage is the cause
+  and the footage protocol is revised (the whole video, as the
+  competing explanation says). Mixed results are reported as they are
+  and decided with the user.
+- Diagnosis, outcome (code `9e49c5e`; A gpu6, B
+  gpu5, Ada, shared; both 10 of 10 checks). BD-rate on LPIPS_V at 540p
+  against SVT-AV1 at 1080p with the same fill: A, the stretch model with
+  F exact, **+4%** (steps 2–3, F dilated: −45%); B, the window-footage
+  model with F dilated, **+22%** against steps 2–3's own anchor
+  (`…122457Z-a660ab4c`). By the rule this is mixed: A moves 49 points
+  with the fill, and B does not recover with it.
+  - The points explain both. On P06_03 the scene model's 540p curve
+    overlaps SVT-AV1's only in a thin band of quality: its top one or two
+    points (QP 50 and 63, 140–540 kbps) against SVT-AV1's lowest CRF
+    (138–174 kbps). There the BD-rate is a PCHIP integral over a few
+    thousandths of LPIPS and swings with them: steps 2–3's −45% was as
+    fragile as the pilot's +20%. At matched rate (log-rate
+    interpolation) the window-footage model equals the stretch model
+    with the same dilated fill: LPIPS_V 0.225 against 0.219 at 27 kbps,
+    0.163 | 0.164 at 59, 0.129 | 0.128 at 139, 0.108 | 0.106 at 394
+    kbps (within ±3%, through 4:2:0 or not). The footage is not the
+    cause, and the exact fill raises both codecs' cost (SVT-AV1's lowest
+    point moves from 138 to 174 kbps and 0.135 to 0.143 LPIPS_V).
+  - Rule (a) as written measures the overlap, not the model, on a
+    window where the curves barely meet. What holds: the window's own
+    footage makes the same scene model as the stretch (both windows);
+    on P06_03 the scene model at 540p is SVT-AV1's equal at its lowest
+    rates and worse above, the 1080p model wins on LPIPS_V there (−58%
+    to −66%), and the route's hull (540p and 1080p) gives −22% (fill
+    dilated) and +3% (exact). Decision with the user (the rule's
+    clause for mixed results).
+  - GPU time: about 1 hour (2 jobs).
+- Decision (user, 2026-10-12): the other 32 windows do not run now.
+  About 80 GPU-hours is worth spending once, on the final experiments,
+  when the pipeline is settled. First the rest of the pipeline is found,
+  built and optimized with cheap tests; then the paper's first draft
+  fixes the figures and the experiments missing for them; then one
+  heavy run produces every result the paper needs. The pilot's code
+  (`g6.py` footage, train, format, enhance) and its two published
+  windows stay as they are for the foreground session's compositor.
+
+
+### 2026-10-12 — G6 item 1: the scene model at the exact fill, and its coded size
+- Question: the pilot (above) put the window's F at the agreed exact fill
+  (no dilation), so V now holds the pixels beside the hands' edges. The
+  scene model was trained on footage whose foreground was G1's (dilated
+  16 px, hand boxes), so it never saw that band. On P06_03 its 540p
+  curve fell to SVT-AV1's level, while the 1080p model won (−58% to −66%
+  on LPIPS_V), the reverse of step 2's choice of 540p (made with the
+  dilated fill). Two questions. (a) Does footage masked like F teach the
+  model the band? (b) Should the model code at 540p, at 1080p, or both
+  by rate?
+- Method (`experiments/background/g6.py`, pilot windows P26_02_0000001071
+  and P06_03_0000005110):
+  1. `footage --set scene --mask exact`: the pilot's footage protocol with
+     the foreground shaped like F: SAM 3.1 "hand" and "arm" masks
+     undilated, plus the EPIC detector's *object* boxes (score ≥ 0.5),
+     undilated. The hand boxes are dropped because a box covers the band
+     beside the hand that exact F leaves in V; the object boxes stand in
+     for VISOR's object masks, which the footage has no annotations for.
+     ProPainter fill as before. Model E: recipe L (β 0.005, learning rate
+     3 × 10⁻⁵, 540 steps) on it, from the public HT-L weights. Model D:
+     the pilot's trained model on G1's footage (`20261012T150907Z-d03a60c9`,
+     `…151248Z-bc31027a`).
+  2. `format` for D and E on each window with F exact, the same grid:
+     540p QP 0, 13, 25, 38, 50, 63 (upsampled through 4:2:0), 1080p QP 13,
+     25, 38, 50, 63 (the pilot had only 50 and 63, at 620 kbps and up,
+     above most of SVT-AV1's range). Not published: this is a test.
+  3. Anchor: the pilot's SVT-AV1 at 1080p with the same exact fill (the
+     enhance jobs, 174–4,470 kbps). Scored at 1080p on V as the pilot.
+- Decision rules, fixed now.
+  (a) *E replaces D* if E's BD-rate against D on LPIPS_V (each model's
+  hull of 540p and 1080p, same window, same F) is −5% or better on
+  P06_03 and no worse than +2% on P26_02. Otherwise D stays (G1's
+  footage, unchanged code path). Model against model: both curves span
+  the same rates, so this BD-rate does not have the thin-overlap
+  fragility that rule (a) of the pilot had.
+  (b) *Coded size*, for the model (a) picks: BD-rate against SVT-AV1 at
+  1080p (concave hull) on LPIPS_V for 540p alone, 1080p alone and their
+  hull. If 1080p alone is within 5 points of the hull on both windows,
+  the model codes at 1080p in SVT-AV1's range. Otherwise, if 540p alone
+  is within 5 points of the hull, it stays at 540p. Otherwise the route
+  ships the hull and switches size at the crossing rate. 540p stays
+  available below SVT-AV1's lowest rate either way, if it is the hull
+  there. Beside each BD-rate: the overlap in quality, and LPIPS_V at
+  matched rate (log-rate interpolation) at SVT-AV1's three lowest CRFs.
+  Every other metric (DISTS_V, KID_V, PSNR_V, flicker_V) is reported.
+- Hypotheses. (a) E gains 5–15% on P06_03 (foreground 27%, so a long edge
+  band) and stays level on P26_02. (b) 1080p is within 5 points of the
+  hull in SVT-AV1's range on both windows: there, 540p's upsampling
+  costs more than 1080p's extra bits. 540p wins only below about
+  150 kbps.
+- Competing explanations. (a) The band's cost is intrinsic: shadows,
+  motion blur and VISOR's mask moving from frame to frame make the seam
+  between fill and frame move, which no training removes (SVT-AV1 paid
+  it too: its lowest point moved from 138 to 174 kbps). Then E ≈ D.
+  SAM's undilated masks may also leave hand pixels in the footage's V,
+  spending the model's capacity on them, so E could lose. (b) The
+  pilot's 1080p win could come from its points sitting at rates where
+  SVT-AV1 is weakest, not from the size; the new low QPs at 1080p test
+  this.
+- Budget: 8 jobs on shared Ada or A6000, each under 45 minutes: 2
+  footage, 2 training (Ada), 2 format for E, plus 2 format for D. About
+  3 GPU-hours.
+- Runs (code `471f211`, shared GPUs, every job's validator passed).
+  Exact footage: P26_02 `20261012T191458Z-ec41db31` (1,061 frames,
+  foreground 23% | 14% per segment against G1's 28% | 17%), P06_03
+  `…191508Z-059d63ab` (1,060; 23% | 17%). Model E, trained (both
+  converged, monitor within 1% over the last fifth): P06_03
+  `…193354Z-1c40a5f2` (Ada); P26_02 `…193114Z-78bb999e` ran out of its
+  2,700 s on a GPU shared at 100% and saved its state, resumed to step 540
+  by `…211954Z-b60afc24` (A6000; DCVC-UF trains on both classes, peak
+  42 GiB). Format, D: P26_02 `…191518Z-6a62cbbb`, P06_03
+  `…191526Z-32f31a5f`; E: P26_02 `…213720Z-eea1154c`, P06_03
+  `…203355Z-54009c15`. Failed, not citable: E's P26_02 format
+  `…212847Z-8fedd1fc`, whose smoke had one of eleven points (540p QP 38)
+  decode unlike its encoder on gpu5 under contention; the same spec,
+  resubmitted unchanged, passed every check.
+- Outcome. Model against model (each model's concave hull, the same F),
+  P26_02 | P06_03:
+  | E against D | LPIPS_V | DISTS_V | PSNR_V | KID_V |
+  |---|---|---|---|---|
+  | hull (540p and 1080p) | **−11% \| −12%** | +32% \| −9% | −3% \| −5% | +17% \| −8% |
+  | 540p | 0% \| −7% | +31% \| −7% | 0% \| −3% | +17% \| −7% |
+  | 1080p | −28% \| −23% | +15% \| −14% | −15% \| −11% | −27% \| −23% |
+  Against SVT-AV1 at 1080p (concave hull), LPIPS_V BD-rate and LPIPS_V
+  at matched rate at SVT-AV1's three lowest CRFs (P26_02 189, 471, 787
+  kbps: SVT-AV1 0.241, 0.218, 0.206; P06_03 174, 417, 708 kbps: 0.142,
+  0.100, 0.087):
+  | Model, size | P26_02 | P06_03 |
+  |---|---|---|
+  | D 540p | −97%; 0.146, 0.128, 0.126 | +20%; 0.137, 0.119, 0.113 |
+  | D 1080p | −97%; 0.143, 0.109, 0.095 | −18%; 0.143, 0.099, 0.076 |
+  | D hull | −96% | −4% |
+  | E 540p | −97%; 0.149, 0.134, 0.130 | +26%; 0.138, 0.119, 0.113 |
+  | E 1080p | −98%; 0.127, 0.102, 0.097 | **−38%**; 0.128, 0.087, 0.066 |
+  | E hull | −97% | −33% |
+  On the other metrics the E hull against SVT-AV1 is DISTS_V −92% |
+  +87%, KID_V −66% | +218%, PSNR_V +126% | +80%, and flicker_V worse at
+  every rate on both.
+  - **(a) passes: E replaces D** (−11% on P26_02, at most +2% needed;
+    −12% on P06_03, −5% needed). Hypothesis right on P06_03 (−12%,
+    within the predicted 5–15%) and wrong on P26_02, which gains as much
+    instead of staying level. The gain is at 1080p (−23% to −28% on
+    LPIPS_V, and on KID_V and PSNR_V too); at 540p it is 0 to −7%, so the
+    band the model learnt is detail that 540p does not keep. Against it,
+    on P26_02 E loses DISTS_V (+32%) and KID_V (+17%) on the hull, all
+    of it at 540p. The competing explanation (the band costs what it
+    costs) is refuted for LPIPS_V.
+  - **(b) the model codes at 1080p in SVT-AV1's range**: 1080p alone is
+    within 5 points of the hull on both windows (−98% against −97%;
+    −38% against −33%), and at matched rate 1080p is better than 540p at
+    every one of SVT-AV1's three lowest rates on both. Hypothesis right.
+    540p stays for rates below SVT-AV1's lowest (the hull is 540p below
+    about 60 kbps on P26_02 and 70 kbps on P06_03). The pilot's
+    1080p −61% on P06_03 had two points overlapping SVT-AV1 in a thin
+    band; with QP 13–38 it is −18% for D, and the competing explanation
+    (the pilot's 1080p points sat where SVT-AV1 is weakest) held for D.
+    Caveat: on P26_02, 1080p's LPIPS_V overlap with SVT-AV1 is thin (its
+    lowest point, 61 kbps, already beats SVT-AV1's best), so its −98%
+    rests on matched rate, which agrees. On DISTS_V and KID_V, 540p is
+    better than 1080p on both windows (E 1080p against 540p: DISTS_V
+    +178% | +87%, KID_V +180% | +163%): the 1080p decode carries LPIPS
+    detail that the distribution metrics do not credit. The route's size
+    follows the headline metric, LPIPS_V, as G5c's selection did.
+  - GPU time: about 4 hours (10 jobs, 2 of them failed or timed out).
+- Decision: G6's scene model is trained on footage masked like F
+  (`footage --mask exact`) and codes at 1080p in SVT-AV1's range, with
+  540p below it. The final run's `format` grid becomes 540p QP 0, 13, 25,
+  38 and 1080p QP 13, 25, 38, 50, 63 (passed as `--mask exact` and
+  `--values`; the defaults stay the pilot's, so its specs re-run as
+  they were). The pilot's published windows (D at
+  540p and two 1080p points) stay for the foreground session's
+  compositor test, rule (c), whose interface does not change.
+
+
 ### 2026-10-08 — H1: foreground motion and representation audit
 - Question: what is VISOR's foreground made of, and how much of it could
   compact per-object motion parameters (hand pose, an object's rigid motion)
@@ -5333,6 +5634,445 @@ invocation turns out to be needed.
   the homography) and is not a bank question. The screen (4 candidates
   kept from a 1/16-pixel test) could miss a view; it never applies to
   *single*, and *single + direct* differs from the bank by under 1 point.
+
+### 2026-10-16 — H5: the first working PointStream (pilot)
+- Question (PLAN H5): with the components chosen so far, does PointStream,
+  one bitstream with every byte counted, beat B2's anchors on evaluation
+  set v2, and how long do its encoder and decoder take? This entry covers
+  the pipeline and its pilot on B2's 4 pilot items (P01_107_0000003049,
+  P02_02_0000006080, P03_10_0000000616, P09_106_0000006303); the 34-item
+  run is planned from it and waits for a settled pipeline.
+- Components (as chosen; nothing is fitted here).
+  - *F*, the foreground: B2's dataset foreground, the union of B1b's
+    `visor_dense_sam_fill` instances, as agreed with G (PLAN G6). Its
+    classes: hands (VISOR's hand classes, with the forearm; R) and objects
+    (every other instance). F and the class map are **granted** to the
+    decoder in this run: not in the rate, measured as their own line (each
+    window's 3-level map at 1080p coded losslessly with FFV1, and with lzma
+    over the frame-to-frame XOR of the packed bits; the smaller is
+    reported).
+  - *Background*: G6's per-window pipeline (`experiments/background/g6.py`,
+    merged from `claude/g6-background-h5`) with G6 item 1's settings: the
+    whole 1080p frame with F filled exactly by ProPainter, coded by two
+    routes. Scene model: recipe L trained on the window's own-video footage
+    masked like F (`footage --mask exact`), coded at 540p (QP 0, 13, 25, 38,
+    upsampled at the client) and 1080p (QP 13, 25, 38, 50, 63). Enhancer:
+    SVT-AV1 at 1080p (G5's preset 4, CRF 32, 40, 48, 54, 59, 63) and G5d's
+    enhancer fitted per CRF on the window's own native-rate footage. Each
+    venue model is shipped once (G6's interface): not in the rate, its size
+    reported. The plain SVT-AV1 background (the enhance jobs' anchor) is an
+    ablation.
+  - *Foreground stream* (new, `src/pointstream/`): one DCVC-UF HT-L stream
+    of the window at a quarter, half or full resolution (H3d's coder),
+    off the shelf. Its input is the source with everything outside
+    K = F dilated by the 8 px ring plus two coded pixels (2 × scale px, a
+    bicubic tap's reach) replaced by
+    a smooth push-pull extrapolation of K's own pixels (as MPEG-4's
+    arbitrary-shape coding padded outside the shape), so DCVC-UF spends
+    little outside F and no edge forms at K's border. H3c's rate on R was
+    an attribution inside whole-frame codes; this stream is real and every
+    byte of it is billed. Points: ¼ and ½ at QP 0, 21, 42 (each with H3d's
+    G network for that point) and full resolution at QP 21, 42 (no
+    network). *Amended after the first full score stage (P02_02, CRF
+    32–48, `20261016T171116Z-d058a70a`), before any comparison with an
+    anchor:* the foreground capped the hull's quality (LPIPS on F 0.12 at
+    its best point, against 0.04–0.07 on the background), so QP 63 at ½
+    and full resolution (no network: G has none for QP 63) are added, as
+    separate foreground jobs per item. Decoder: bicubic upsampling to 1080p, then per class an
+    enhancer slot: hands get G on R's box, objects the identity (the slot
+    H4c may fill).
+  - *Compositing* (G6): out = α·fg + (1 − α)·bg, α = 1 on F and falling
+    linearly to 0 over 8 px outside F (Euclidean distance); bg elsewhere.
+  - *Bitstream* (`src/pointstream/bitstream.py`): a header (magic, version,
+    size, frame rate, frame count) and tagged, length-prefixed segments:
+    background (route, coded size, codec, the codec's own stream), each
+    foreground stream (scale, enhancer ids per class), and the venue-model
+    and decoder-network references (sha256 prefixes). The rate is the
+    container's whole size. The mask segment is absent here (granted).
+- Scoring: B2's harness (`src.codecs.quality.score`, B2's regions):
+  weighted PSNR (0.7 fg + 0.3 bg, per frame then the mean) with
+  `visor_dense` (without the fill) and `visor_dense_sam_fill` (with it),
+  weighted LPIPS likewise, and weighted DISTS (masked DISTS per region,
+  `quality.masked_dists`, on every 4th frame for every method, to keep a
+  pair's scoring near 15 s) beside; whole-frame PSNR too. B2's anchors (SVT-AV1
+  preset 4, CRF 41–62; DCVC-UF HT-L, QP 27–63) are rescored from B2's
+  published streams by the same code, so DISTS exists for them (SVT-AV1:
+  B2's streams decoded; DCVC-UF: B2's points re-encoded on the same GPU
+  class, since a stored DCVC-UF stream never decodes in a later job,
+  docs/fleet.md; byte equality with B2's stream reported); the
+  rescoring must reproduce B2's recorded weighted PSNR within 0.02 dB on
+  every point (a check, not a choice). Every job that codes or decodes
+  DCVC-UF runs on the RTX A6000 (unreliable on contended Ada, K5).
+- Rate allocation: PointStream's curve per item and metric is the upper
+  concave hull (`g5.envelope`) over every (foreground point, background
+  point) combination of both routes. Anchors are each codec's upper concave
+  hull. BD-rate: PCHIP of log rate over the overlapping quality range
+  (`g5.bd_rate`'s method), against SVT-AV1, DCVC-UF and their pooled hull;
+  "better/worse at every rate" when the curves do not overlap. Also
+  reported: the hull of each background route alone, the plain-SVT-AV1
+  background, and on the hull's points the split of bytes between
+  foreground and background.
+- Timing (one exclusive job, RTX A6000 on gpu3 with 32 cores, B2b J2's
+  host class): per pilot window, encoder = ProPainter's fill + background
+  encode (scene model's DCVC-UF encode; SVT-AV1 preset 4 on 32 threads) +
+  the foreground's padding and DCVC-UF encode; decoder = background decode
+  (DCVC-UF with the scene model; dav1d plus the enhancer) + foreground
+  decode, upsampling and G + compositing. GPU stages synchronized, median
+  of 3 runs. Not timed: F (granted: dataset masks) and venue-model training
+  (offline, once per venue; G6's training jobs' times reported beside).
+- Decision rules, fixed now.
+  (a) *PointStream beats the anchors* if, against the pooled hull of
+  SVT-AV1 and DCVC-UF, its mean BD-rate on weighted LPIPS
+  (`visor_dense_sam_fill`) is −10% or better with at least 3 of 4 items
+  below 0. Weighted DISTS, both weighted PSNRs and whole-frame PSNR are
+  reported beside with the same rule's numbers, and a sign disagreement
+  with LPIPS is stated. A pass makes the pipeline the candidate for the
+  34-item run (planned, not run here).
+  (b) *Where a failure lies* (or a margin comes from): the same BD-rates
+  with the background replaced by plain SVT-AV1 (the background's share),
+  and the region scores at matched rate (fg and bg separately).
+  (c) *Equal-time SVT-AV1 preset* (B2b's decision, user 2026-10-07):
+  PointStream's encode time per window is the median over the 4 pilot
+  windows, for each background route; the slowest route's median sets the
+  time, and the preset is the slowest in J2's table whose median encode
+  time is at or under it (J2: preset 1 80.5 s, 2 46.2 s, 3 30.3 s, 4 18.7 s,
+  5 12.8 s, 6 9.1 s, 8 4.6 s, 10 2.7 s, 12 1.94 s). This gives the anchor
+  the most time PointStream uses.
+  (d) *The bitstream holds*: every combination's container parses back to
+  its segments byte for byte and its rate is its length; on one
+  combination per item and route, the streams unpacked from it are the
+  published ones whose decodes were composited (AV1 rebuilt into IVF with
+  the same temporal units). The timing job decodes from containers.
+- Hypotheses. (a) passes on LPIPS and DISTS by a wide margin (−30% or
+  more against the pooled hull): the background models win −33% to −97%
+  on LPIPS_V against SVT-AV1 (G6) and G wins −22% on the hands; weighted
+  PSNR loses (+20% or worse), since both enhancers and the scene model
+  trade PSNR for perceptual quality. (c) ProPainter dominates the encode
+  (tens of seconds per window), so the equal-time preset is 3 or slower,
+  a stronger anchor than B2's preset 4.
+- Competing explanation for a failure of (a): splitting the frame costs
+  more than the parts save. The foreground stream pays for F's boundary
+  and its own intra frame; the background pays for the fill's seams; and
+  the 8 px ring blends two decodes. B2's weighted LPIPS is 70% foreground,
+  where the gain measured so far (G, −22%) is smallest and was measured on
+  hands only, not objects. Measured by (b).
+- Budget. Background for the 4 windows (G6's code, 6 jobs per window:
+  scene footage, training, format; native footage, two enhance jobs): 24
+  jobs, about 12 GPU-hours (G6's pilot: 5.2 for 2 windows with failures).
+  Foreground: 4 jobs, about 2. Scoring and B2's rescoring: 8 jobs, about 5.
+  A smoke on G6's published P06_03 window (its background exists): about 1.
+  Timing: 1 exclusive job, under 45 minutes. About 21 GPU-hours, ceiling
+  28; every job under 45 minutes, shared GPUs except timing.
+- Runs (shared RTX 6000 Ada and RTX A6000; code revisions per job from
+  each job's `ready.json`, recorded in its result; every full stage
+  validated locally with the module's own validator: G6 stages 9–10 of
+  9–10 checks, foreground 9/9, scoring 8/8, anchors 11/11).
+  - Background (`experiments/background/g6.py`; per window: scene
+    footage `--mask exact`, recipe-L training, format at 540p QP 0–38 and
+    1080p QP 13–63; native footage, enhance CRF 32–48 and 54–63).
+    P01_107: train `20261016T145531Z-1fe7ccb5`, format
+    `20261017T093325Z-add15e57`, enhance `20261016T090743Z-5ebf7dea`,
+    `…090801Z-18e827b5`. P02_02: train `20261016T092029Z-709f45bd`,
+    format `20261016T145558Z-40cba9fc`, enhance `…090505Z-c04cf958`,
+    `…090523Z-1d2c91cc`. P03_10: train `20261016T145706Z-3c7a9b4c`,
+    format `20261017T093336Z-e59db56b`, enhance
+    `20261016T145616Z-b65e6889`, `…145634Z-99b8bcb9`. P09_106: train
+    `20261016T145724Z-feff65ee`, format `20261017T093347Z-2ba6b75d`,
+    enhance `20261016T091551Z-14a0503c`, `…091616Z-95b1e7e8`. Every
+    scene model converged (last fifth within 1.1%). Scene route
+    10–5,130 kbps, enhancer route 126–7,470 kbps on the background.
+  - Foreground (`h5 foreground`): P01_107 `20261016T185704Z-d332b01b`
+    (10 points); P02_02 `20261016T091421Z-58f2a695` (8) and
+    `…180928Z-ec25bbb9` (QP 63); P03_10 `…091448Z-b1805c33` and
+    `20261017T093212Z-bfc50ee1`; P09_106 `20261016T091510Z-ff6fbf22`
+    and `…181001Z-889ca36a`; P06_03 (smoke window)
+    `20261017T094147Z-5770b26c`. 3.5–2,030 kbps on F.
+  - Scoring (`h5 score`, 150 pairs per item in shards of 12–30, plus
+    P09_106's 48 pairs with the plain SVT-AV1 background): the job ids
+    are in the report's `sources`. Anchors (B2's 4 SVT-AV1 and 5
+    DCVC-UF points per item): P01_107 `20261017T111944Z-c988e876`,
+    P02_02 `…111915Z-66ad2183`, P03_10 `…111957Z-7c2a1eaf`, P09_106
+    `…111928Z-60c2f00c`: every point reproduces B2's weighted PSNR within
+    7 × 10⁻⁶ dB and its rate exactly, and every re-encoded DCVC-UF
+    stream is byte-identical to B2's.
+  - Report (`h5 report`): `h5-report.json`, `h5-rd.png` beside the jobs
+    at `pointstream-data/visor/h5-2026-10-16/report-7ffa414/` (code
+    `7ffa414`, per-key bootstrap; the first, `report/` from `c7e9e91`,
+    is kept as it was).
+  - Failed or replaced, none citable: GPU memory overruns of the
+    foreground (33–35 GB on windows with large F; fixed by releasing the
+    main process's cache before each DCVC-UF call and declaring 40 GB);
+    non-deterministic DCVC-UF decodes on contended Ada (P06_03, QP 0 at
+    ½) and on a contended A6000 (P03_10, QP 63 at ½), stopped by the
+    per-point check and re-run; the scorer's first CPU compositor (2 min
+    per pair; replaced by the same arithmetic on the GPU, checked to
+    within 1 grey level, differing on at most 0.002% of samples); anchor jobs that
+    required `dav1d` on the host's PATH (it ships in the environment); a
+    timing smoke whose two DCVC-UF reports collided.
+- Outcome, rate and quality (BD-rate against the pooled hull of
+  SVT-AV1 preset 4 and DCVC-UF HT-L; negative is less rate; mean and
+  95% bootstrap CI over the 4 items; P01_107 | P02_02 | P03_10 |
+  P09_106):
+
+  | Metric | PointStream | mean (CI) | items < 0 |
+  |---|---|---|---|
+  | **weighted LPIPS (fill)** | −12% \| +0% \| −26% \| −23% | **−15% (−25 to −5)** | 3 |
+  | weighted LPIPS (no fill) | −13% \| +1% \| −26% \| −36% | −18% (−34 to −5) | 3 |
+  | weighted DISTS (fill) | −12% \| +31% \| −1% \| −23% | −1% (−18 to +20) | 3 |
+  | weighted PSNR (fill) | +78% \| +52% \| −4% \| −22% | +26% (−13 to +65) | 2 |
+  | weighted PSNR (no fill) | +79% \| +53% \| −1% \| −47% | +21% (−24 to +66) | 2 |
+  | frame LPIPS | −57% \| −16% \| −43% \| −37% | −38% (−52 to −23) | 4 |
+  | frame DISTS | −61% \| −33% \| −51% \| −48% | −48% (−57 to −37) | 4 |
+  | frame PSNR | +136% \| +83% \| +39% \| +21% | +70% (+30 to +123) | 0 |
+
+  - **(a) passes**: weighted LPIPS −15% (rule −10%) with 3 of 4 items
+    below 0. Weighted DISTS agrees in sign on 3 items but its mean is
+    −1%; weighted PSNR disagrees on P01_107 and P02_02 (+78%, +52%) and
+    agrees on the other two; whole-frame PSNR loses everywhere. The
+    hypothesis was right in sign on LPIPS and wrong in size (−15%, not
+    −30% or more), and half wrong on weighted PSNR (two items gain).
+  - Routes: the enhancer route alone gives −14% on weighted LPIPS
+    (−22 to −4), the scene route alone −4% (−18 to +16); together −15%.
+    The scene route carries PointStream below the anchors' rates
+    (PointStream reaches 15–30 kbps, the anchors start at 160–525
+    kbps), where BD-rate cannot judge: B2b's low-rate ladder (pending)
+    is what can.
+  - **(b)** The plain SVT-AV1 background (P09_106) loses on every metric
+    (weighted LPIPS +20%): the neural background is what wins. At each
+    anchor point's rate (PointStream's best pair on weighted LPIPS at or
+    under it; 9 points per item), PointStream's background has the lower
+    LPIPS on 27 of 36 points (8 of 9 on P01_107, P02_02 and P03_10; 3 of
+    9 on P09_106) and its foreground on 16 of 36 (2, 1, 5 and 8 of 9).
+    On P01_107 and P02_02 (F 50% of the frame on P02_02) the foreground
+    is worse by 0.01–0.04 LPIPS_F and the background carries the gain;
+    on P09_106 (F 2%) it is the reverse. The competing explanation holds
+    for the foreground where F is large: coding F as its own stream (its
+    own intra frame, padding outside K) costs more per bit on F than
+    whole-frame DCVC-UF.
+  - **F billed** (the granted mask at its lossless cost, 0.5–2.9 Mbps
+    per window): every comparison flips (weighted LPIPS +279%, from +26%
+    on P09_106 to +429% on P02_02). The claim stands only with F
+    granted; a mask coder costing a few kbps is a precondition of any
+    deployed PointStream.
+- Outcome, time (`h5 time`, code `33f4cdb`, exclusive RTX A6000 on gpu2,
+  32 threads, median of 3 runs per stage; one job per window and route:
+  scene `20261017T120926Z-b72736c7` P02_02, `…120948Z-2afd3bc4` P01_107,
+  `…121010Z-8834efe5` P03_10, `…121031Z-27beb50a` P09_106; enhancer
+  `…120937Z-f5b4fa31`, `…120959Z-cef259d9`, `…121020Z-943758c2`,
+  `…121041Z-9cc7af81`; every job 7/7 checks locally, every container
+  reproducible across its 3 runs). Operating points: scene model at
+  1080p QP 38 with the foreground at ½ QP 21; SVT-AV1 CRF 48 plus the
+  enhancer with the foreground at ¼ QP 21. Seconds per 4 s window,
+  median over the 4 windows (range):
+
+  | Stage | scene route | enhancer route |
+  |---|---|---|
+  | ProPainter fill (encoder) | 127 (123–138) | 128 (124–131) |
+  | background encode | 1.9 (DCVC-UF codec calls) | 15–25 (SVT-AV1 preset 4, 32 threads) |
+  | foreground padding (CPU) + DCVC-UF encode | 31–36 | 19–21 |
+  | **encoder** | **163 (156–174)** | **166 (159–173)** |
+  | **decoder** | **95 (80–152)**, 1.6–3.0 frames/s | **133 (124–151)**, 1.6–1.9 frames/s |
+
+  The codecs themselves are fast (DCVC-UF 0.5–2 s per stream per
+  window); the encoder is ProPainter (77%) and the decoder this
+  pipeline's own CPU stages: compositing and 4:2:0 output (47–101 s,
+  the same arithmetic takes about 7 s per window on the GPU in the
+  scorer), G on the hands (7–25 s), the enhancer (37 s) and F's distance
+  transform (11–12 s). Not timed: F (granted) and the venue models'
+  training (G6 training jobs: 1,760–1,784 s per window, once per
+  venue). The SVT-AV1 preset-4 encode inside the enhancer route took
+  15–25 s on gpu2 (17.8 s on P02_02) against J2's median 18.7 s on gpu3
+  (32 cores each), so J2's table applies.
+  - **(c) Equal-time preset: SVT-AV1 preset 1.** The slowest route's
+    median encode (166 s) is above every preset in J2's table; the
+    slowest at or under it is preset 1 (80.5 s; −15.6% against preset 4
+    on weighted PSNR in J2). PointStream's encoder is twice as slow even
+    so, all of it ProPainter; presets 0 and −1 were not in J2.
+    Hypothesis right (ProPainter dominates; 3 or slower).
+- Reading. PointStream as built beats B2's preset-4 SVT-AV1 and DCVC-UF
+  envelope on weighted LPIPS by 15% on the pilot items with F granted,
+  and on frame LPIPS and DISTS by 38–48%; it loses whole-frame PSNR. Its
+  gain is the neural background's; its foreground stream is the weaker
+  part where F is large. Three things stand between this and a
+  paper claim: (1) the anchor at equal time is preset 1 (and B2b's
+  low-rate ladder and ROI variant), not preset 4; (2) F must be coded
+  (lossless costs 0.5–2.9 Mbps, more than the rates where PointStream
+  wins); (3) the foreground stream's per-bit cost on large F.
+- Plan for the 34-item run (not run; final runs wait for a settled
+  pipeline and the paper's figures, memory "final runs once"): per window
+  6 G6 jobs (about 3 GPU-hours with queueing failures, G6's measure), 1–2
+  foreground jobs, 7 scoring shards (12–30 pairs, 10–31 minutes each) and
+  1 anchor job; about 34 × 6 ≈ 200 GPU-hours with today's grid, most of
+  it G6's background (80) and scoring (about 60 at 30–60 s per pair).
+  Before it: B2b's equal-time re-encode at preset 1 with the low-rate
+  ladder and ROI, which the 34 items need anyway; a mask coder; and the
+  foreground's per-bit cost. Scoring could drop the plain SVT-AV1
+  background ablation and DISTS's five-region pass to cut its share.
+- GPU time: 22.5 GPU-hours over 149 smoke and full stages (the jobs'
+  execution records, failures included), within the 28 ceiling.
+
+### 2026-10-17 — H5 with G_HO in both foreground slots (after H4c)
+- Change (H4c's decision, user 2026-10-17, relayed by the H4c session): H4c's
+  G_HO (G refitted on G's hand footage plus other participants' object
+  crops, 8 × 64; −39% on handled-object pixels and −33% on hands at ¼ and ½,
+  4 of 4 pilot items) replaces G in the hand slot and the identity in the
+  object slot, at H3d's six points (`h5 foreground --slots G_HO`; networks
+  from H4c's jobs `20261016T152552Z-c3d9ed14` and `…153801Z-03f2a819`). QP 63
+  and the full-resolution points keep no network.
+- Scope stated: H4c measured G_HO on H1's handled-object region O; H5's
+  object class is all of F that is not a hand (VISOR's active objects,
+  including large surfaces such as pans and boards), so G_HO on it goes
+  beyond what H4c measured.
+- Method: the foreground jobs of the 4 pilot items rerun at the six points;
+  every pair of the H5 hull rescored as in H5 (F granted), and H5's report
+  run with these rows in place of G's. No new rule: this is a component
+  swap; reported as BD-rate of PointStream with G_HO against PointStream
+  with G on the same pairs, and against the anchors as in H5.
+- Budget: 4 foreground jobs and 4 scoring jobs, about 3 GPU-hours.
+- Runs (shared Ada; every full stage validated locally: foreground 10/10,
+  scoring 9/9). Foreground (`h5 foreground --slots G_HO`, one job per item
+  and scale, code `470ac5f`): P01_107 `20261017T180513Z-ee4cbe4b`,
+  `…180524Z-81d23687`; P02_02 `…180535Z-1db7d33b`, `…180547Z-2349b02b`;
+  P03_10 `…180559Z-40098c01`, `…180613Z-9bd442dd`; P09_106
+  `…180623Z-911e8a1a`, `…180636Z-0d751fa1`. The DCVC-UF streams are the
+  same bytes as H5's (only the slots differ). Scoring (`--tag gho`, the six
+  G points against every background on H5's hull, 54–60 pairs per item,
+  code `7b54dfd`): P01_107 `20261017T182218Z-84e94d46`,
+  `…182230Z-e960b121`; P02_02 `…183014Z-80e5c530`, `…183028Z-cbb75972`;
+  P03_10 `…182855Z-f458eae1`, `…182908Z-7e362419`; P09_106
+  `…183728Z-f10b2cf0`, `…183742Z-ddea296c`. Pairs whose foreground has no
+  network (QP 63, full size) keep H5's rows. Failed or replaced, none
+  citable: stage timeouts (two network passes per point; then the A6000s
+  saturated by another user) and a 48.5 GB GPU overrun (the caching
+  allocator kept every crop size), fixed in `ff98698` and `470ac5f`.
+- Outcome (F granted; against the pooled anchors as in H5; P01_107 |
+  P02_02 | P03_10 | P09_106):
+
+  | Metric | G_HO | mean (CI) | < 0 | H5 with G |
+  |---|---|---|---|---|
+  | **weighted LPIPS (fill)** | −19 \| −20 \| −42 \| −34% | **−29% (−38 to −19)** | **4** | −15% (3) |
+  | weighted DISTS (fill) | −19 \| −8 \| −39 \| −25% | −23% (−34 to −12) | 4 | −1% (3) |
+  | weighted PSNR (fill) | +78 \| +54 \| −4 \| −22% | +27% (−17 to +66) | 2 | +26% (2) |
+  | frame LPIPS | −61 \| −33 \| −49 \| −40% | −46% (−55 to −37) | 4 | −38% (4) |
+  | frame DISTS | −63 \| −47 \| −53 \| −47% | −53% (−59 to −47) | 4 | −48% (4) |
+  | frame PSNR | +136 \| +85 \| +40 \| +21% | +70% (+31 to +112) | 0 | +70% (0) |
+
+  G_HO against G on the same pairs: weighted LPIPS −16%, −37%, −34%,
+  −33%; weighted DISTS −17%, −47%, −49%, −23%; weighted PSNR +7%, +14%,
+  +9%, +2% (G_HO trades PSNR for perceptual quality, as G did). With G_HO
+  the foreground contributes: rule (a) passes on 4 of 4 items, and
+  weighted DISTS, which disagreed with LPIPS under G, now agrees.
+  Report: `pointstream-data/visor/h5-2026-10-16/report-gho-7b54dfd/`.
+- Not yet a fair claim for the paper (user, 2026-10-20), to settle on the 4
+  pilot items before any 34-item run: (1) the venue models (scene model,
+  enhancer) are fitted on the window's own video and not billed, and their
+  payback was never computed (H3d: per-video networks fail once billed on
+  these short videos); (2) the anchors get no such adaptation: a
+  whole-frame DCVC-UF adapted the same way, and SVT-AV1 at the equal-time
+  preset 1, are the fair anchors; (3) the scene model, the enhancer, G and
+  G_HO were trained with LPIPS in their losses, so LPIPS and DISTS (a
+  related deep-feature metric) need a metric none of them saw and a visual
+  check; (4) F is granted (H5m).
+
+### 2026-10-17 — H5m: coding F (the mask PointStream's decoder needs)
+- Question (after H5's pilot, user 2026-10-17): H5's gain holds only with
+  F granted; sent losslessly at 1080p, F and its class map cost 0.5–2.9
+  Mbps per window and flip every comparison. Can F be coded cheaply
+  enough that PointStream still beats B2's anchors with every byte,
+  F's included, counted?
+- Candidate (cheapest first): the class map (0 background, 1 hand, 2
+  object) at 1/s of the frame size (s = 2, 4, 8, 16; F̂ where at least
+  half of a cell's area is F, hand where hand pixels outnumber object
+  pixels there), its two bit planes XOR-ed with the previous frame and
+  compressed with lzma, losslessly; the client upsamples F bilinearly
+  and thresholds at 0.5, and gives each pixel of F̂ the class of the
+  nearest low-resolution F cell (`src/pointstream/mask.py`). F̂ replaces
+  F in the compositor (the ring blend, G's slot); the bytes go into the
+  container's MASK segment, so the rate counts them.
+- Method (`h5 score --mask-scale s`): the published foreground and
+  background decodes of H5's pilot re-composited with F̂ and scored as
+  in H5 (B2's harness on the dataset masks, which stay the reference).
+  Pairs: each item's H5 hull pairs on weighted LPIPS (12–17 per item),
+  at each s. Bias, stated: the streams were coded for the exact F (the
+  background filled F, the foreground kept K = F ⊕ (8 + 2·scale) px), so
+  where F̂ leaves K the foreground shows padding; a pipeline built for
+  F̂ would code K and the fill from F̂. This measures the candidate on
+  today's streams, an estimate of the built component, not a bound.
+  The H5 hull's pairs are chosen with F granted; with F̂ another pair
+  could win, which only helps the candidate (the hull here is a lower
+  bound of the candidate's own hull).
+- Decision rule, fixed now. The candidate is adopted if, at some s (or
+  the hull over s), PointStream with F̂ billed passes H5's rule (a)
+  against the same pooled anchors: weighted LPIPS (fill) BD-rate −10% or
+  better with at least 3 of 4 items below 0. Then the mask coder is
+  built at that grid (encoder codes K and the fill from F̂). Otherwise
+  the next candidate, with its own rule: F derived at the client from
+  what it already decodes (the foreground stream coded with a key
+  outside F), or contours with temporal prediction.
+- Hypotheses. At s = 8 the class map costs 10–60 kbps per window and
+  costs little quality (F̂'s boundary errors of up to 8 px fall in the
+  ring's blend); the rule passes at s = 8 or 16, with a smaller margin
+  than H5's −15% (the mask rate matters most at PointStream's low rates,
+  where most of its hull lies but the anchors do not reach).
+- Competing explanation for a failure: F's boundary is where the
+  composite is judged hardest (hands against the background, the 70%
+  weight on F); missing F pixels show the background's fill (inpainted,
+  wrong content) and extra ones show the foreground's padding, so even
+  small boundary errors cost more than the bits they save.
+- Budget: 4 scoring jobs (one per item, about 60 pairs at 30–40 s), about
+  3 GPU-hours, shared GPUs; each under 45 minutes.
+- Runs (`h5 score --mask-scale s --pairs <H5 hull>`, code `802be6c`, shared
+  Ada and A6000; every full stage 9/9 checks locally, every MASK payload
+  decoding to its reduced grid exactly). P01_107 s = 2, 4, 8, 16:
+  `20261017T150931Z-e433c92d`, `…150940Z-83ccfcf4`, `…150949Z-43d7a289`,
+  `…150958Z-db776057`; P02_02: `…151010Z-7a75681d`, `…151019Z-494b6010`,
+  `…151028Z-d9ada6bd`, `…151038Z-dd172972`; P03_10: `…151052Z-d0800d65`,
+  `…151104Z-c9ed195b`,
+  `…151116Z-ddb03427`, `…151127Z-ad0e1bbc`; P09_106: `…151140Z-c5e09039`,
+  `…151149Z-33f8ba99`, `…151158Z-6374d0b3`, `…151207Z-d2be1d00`.
+- Mask cost (kbps) and IoU of F̂ with F, P01_107 | P02_02 | P03_10 |
+  P09_106: s = 2: 529 | 971 | 662 | 219 (IoU 0.98–0.99); s = 4: 166 | 320
+  | 229 | 89 (0.97–0.99); s = 8: 51 | 116 | 75 | 36 (0.96–0.99); s = 16:
+  16 | 39 | 23 | 14 (0.83–0.97). F costs about 1/s² of its lossless
+  cost; at s = 8 it is still as much as PointStream's whole stream at
+  its low end on the items where F is large.
+- Outcome (BD-rate against the pooled anchors, as H5; per item P01_107 |
+  P02_02 | P03_10 | P09_106):
+
+  | F | weighted LPIPS | mean (CI) | < 0 | frame LPIPS | frame DISTS |
+  |---|---|---|---|---|---|
+  | granted (H5) | −12 \| +0 \| −26 \| −23% | −15% (−25 to −5) | 3 | −38% | −48% |
+  | s = 2 | +123 \| +150 \| +122 \| −2% | +98% | 1 | | |
+  | s = 4 | +33 \| +52 \| +27 \| −14% | +25% | 1 | +11% | +19% |
+  | s = 8 | +3 \| +21 \| −8 \| −18% | −1% (−16 to +13) | 2 | −15% | −16% |
+  | s = 16 | +21 \| +13 \| −11 \| +11% | +9% | 1 | −21% | −28% |
+  | hull over s | +3 \| +13 \| −14 \| −18% | −4% (−17 to +8) | 2 | −21% (4/4) | −28% (4/4) |
+  | lossless 1080p | | +279% | 0 | +261% | +348% |
+
+  - **The rule fails**: no s, nor the hull over s, reaches −10% with 3 of
+    4 items below 0 on weighted LPIPS; the candidate is not adopted as
+    it is. Hypothesis wrong in cost (s = 8 costs 36–116 kbps, not 10–60)
+    and in quality (the margin vanishes rather than shrinking).
+  - The competing explanation holds on the F-weighted metric: F̂'s
+    boundary errors (the fill showing where F̂ misses F, padding where it
+    overshoots K) cost the 70%-weighted foreground more than the mask's
+    bits save. On the whole frame, where F's boundary is a small part,
+    PointStream with F coded at s = 16 still needs 21% less rate for the
+    same LPIPS and 28% less for DISTS, on 4 of 4 items.
+  - Bias recalled: the streams were coded for the exact F, so this
+    under-states a pipeline built for F̂ (K and the fill from F̂); that
+    component is the obvious next test of this candidate, cheaper than a
+    new coder: re-encode the foreground with K from F̂ at s = 8 and 16.
+  - Next, by the rule: F derived from what the client already decodes
+    (no MASK segment: the foreground stream carries F, e.g. a key outside
+    F or an alpha plane coded with it), or contours with temporal
+    prediction; each with its own rule, after the F̂-consistent re-encode
+    above says how much of the loss was the bias.
+- Code: the report's per-key bootstrap (a comparison's CI no longer
+  depends on what else is in the report; H5's headline CI is −25 to −5,
+  first printed as −25 to −3), rows keyed by pair and mask scale.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5m-7ffa414/`.
+- GPU time: about 2.5 GPU-hours (16 jobs).
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
