@@ -3734,7 +3734,7 @@ invocation turns out to be needed.
 - Question. Which MANO regressor PointStream uses on egocentric video, with
   numbers; and how cheaply its pose stream can be sent, as rate against
   distortion and latency, for each coding technique and their combinations
-  ([PLAN](../PLAN.md#h2-hand-pose-estimators-hamer-against-wilor)).
+  ([PLAN](../PLAN.md#h2-hand-pose-estimators-hamer-against-wilor-done-2026-10-10)).
 - Estimators. HaMeR (`3a01849`, ViT-H) and WiLoR (`fcb9113`) as the
   environment audit loads them; MANO v1.2 (the dechumpied copies). Both get
   the same box per hand, enlarged 2.0× (`ViTDetDataset`, as H1 and HaMeR's
