@@ -7754,6 +7754,62 @@ invocation turns out to be needed.
   read-only on gpu1 loopback (port 17689) and reached through an SSH
   tunnel. It was checked at 0 / 82 marks; the agent supplied no labels.
 
+- **Outcome (2026-10-20): not adopted**, decided at stage 1 with no second
+  stage. Scored with `python -m experiments.tennis.k8 score` (scoring code
+  as in `e43215b`) on the user's marks, `k8-marks-fb6cfe8a81f9a440.json`
+  (SHA256 `eeba025b…cb4a2`, 82/82 marked), against the published report
+  `530696e0…`. Score `review-sample-01/k8-score-sample-01.json`, SHA256
+  `2ac7bebb4a7fbed8e7a6174cc7582cb017ff2df81f245b3861a0256e27b0c405`.
+  The registration jobs are the four original parts and twelve recovery
+  groups listed above (CPU only, no GPU).
+
+  | Condition | Bar | Measured | Passes |
+  |---|---|---|---|
+  | Precision (exact, 41 shots) | ≥ 0.95 | 1.00 (41/41) | yes |
+  | Duration recall (HT, 95% CI) | ≥ 0.90 | 0.34 [0.26, 0.45] | no |
+  | Registration median, true court frames | ≤ 2 px | 1.43 px | yes |
+  | Registration 95th percentile | ≤ 6 px | 24.5 px | no |
+
+  The interval lies wholly below the bar, so no stage 2 runs. On predicted
+  court shots alone the errors are median 0.91 px and p95 2.52 px. The p95
+  fails because of the true court shots the classifier missed. Of the 41
+  sampled non-court shots, 23 are court or mixed. The weighted estimate is
+  about 856 s of court time hidden among the predicted non-court shots
+  (633 s court, 223 s mixed), against 449 s found. **Misses by class**
+  (sampled shots):
+  1. *Near misses, the 80% shot rule* (11 court shots: 0000, 0002, 0012,
+     0017, 0036, 0048, 0088, 0139, 0247, 0290, 0294). A homography exists
+     on almost every frame, with a median chamfer of 0.9–2.0 px, but 20–50%
+     of frames exceed 2 px (p90 3–4.6 px). These are per-frame errors in
+     a shot that does register.
+  2. *Wrong or no fit* (6 court shots: 0100, 0123, 0172, 0201, 0223,
+     0259). The median is 4–20 px, or there is no fit (0201).
+  3. *Missed cuts* (6 mixed shots: 0031, 0062, 0079, 0135, 0181, 0203).
+     The 0.25 scene threshold merged a court and a non-court shot.
+  The user decides how to proceed. Any change of method needs a new rule
+  judged on shots not yet marked; these 82 marks have now been seen.
+  Close-up, crowd and other shots were never predicted as court, so the
+  competing explanation (court-like structures in non-court shots) is not
+  observed.
+- **Decode offset found by the user (2026-10-20).** Each shot's first
+  review image was its predecessor's last frame. The cause: ffmpeg's input
+  `-ss` counts from the container start (0, the audio), while cut indices
+  count from the video's start (0.020 s, `setpts=PTS-STARTPTS`). So
+  `-ss start/fps` decoded from frame start−1. Verified on the broadcast:
+  the first cut is n = 593, and the old seek decoded n = 592. In the
+  published report the registration row labelled f is therefore source
+  frame f−1 for every shot except shot 0. Within each recovery chunk
+  that starts inside a shot, one frame is measured twice and one is never
+  measured. The effect on this outcome is negligible: a corrected shift
+  flips one prediction (shot-0288, a one-frame shot), and recall and p95
+  stay far from their bars. The archived evidence is unchanged.
+  The decode now seeks to (video start − container start) + (start − ½)/fps
+  (`seek_offset`, `seek_seconds`). A regression test with real ffmpeg
+  (an MKV whose audio starts at 0 and video at 0.02 s) passes with the
+  packed ffmpeg 8.1.2 on gpu1. Any later registration run uses the fix.
+  Until then, per-frame homographies from this run must be read at
+  frame f−1.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).

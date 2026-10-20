@@ -325,15 +325,35 @@ def cuts(video: Path, fps: float, limit: int, ffmpeg: str, scratch: Path) -> tup
     return parse_scenes(log.read_text(), fps), command
 
 
+def seek_offset(video: Path, ffprobe: str) -> float:
+    """Video stream start minus container start: ffmpeg's input -ss counts from the container.
+
+    The broadcast's audio starts at 0 and its video at 0.020 s, while the scene scan counts
+    frames from the video's own start (setpts=PTS-STARTPTS). Seeking start/fps alone thus
+    decoded from frame start-1: each shot's first image was its predecessor's last frame
+    (found by the user on the sample review, 2026-10-20).
+    """
+    probe = json.loads(subprocess.check_output(
+        [ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=start_time:format=start_time",
+         "-of", "json", str(video)]))
+    return float(probe["streams"][0].get("start_time", 0)) - float(probe["format"].get("start_time", 0))
+
+
+def seek_seconds(start: int, fps: float, offset: float) -> float:
+    """Input -ss for zero-based frame `start` given `seek_offset`; half a frame early keeps
+    exact seeking off rounding, since the first frame kept has PTS >= -ss."""
+    return max(0.0, offset + (start - 0.5) / fps)
+
+
 def process_shot(video: Path, fps: float, start: int, end: int, ident: str, publish: Path, ffmpeg: str, extra_review: dict[str, int] | None = None,
-                 image_prefix: str | None = None) -> dict[str, Any]:
+                 image_prefix: str | None = None, *, seek_from: float) -> dict[str, Any]:
     import cv2
     from experiments.tennis import court
     from experiments.tennis import windows as tw
 
     window = {"id": ident, "size": [1920, 1080], "fps": fps, "source": {"kind": "video"}}
     command = tw.convert_command(ffmpeg, window, video, Path("pipe:1"), end - start)
-    command[command.index("-i"):command.index("-i")] = ["-ss", str(start / fps)]
+    command[command.index("-i"):command.index("-i")] = ["-ss", f"{seek_seconds(start, fps, seek_from):.6f}"]
     command[command.index("-i"):command.index("-i")] = ["-threads", "1"]
     # Do not use -y pipe:1 as a filesystem path: ffmpeg recognizes the pipe protocol.
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -489,13 +509,15 @@ def run_job(args: argparse.Namespace) -> int:
         raise ValueError("K8 whole match must be 1080p")
     total = int(meta["nb_read_packets"])
     frames = min(total, args.frames) if args.frames else total
+    offset = seek_offset(args.video, native["ffprobe"]["path"])
     scenes, scene_command = cuts(args.video, fps, frames, args.ffmpeg, scratch)
     boundaries = [r["frame"] for r in scenes if r["score"] >= args.threshold and 0 < r["frame"] < frames]
     spans = shot_spans(boundaries, frames)
     selected = selected_spans(spans, args.part, args.parts)
     rows: dict[int, dict[str, Any]] = {}
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        futures = {pool.submit(process_shot, args.video, fps, a, b, f"shot-{i:04d}", publish, args.ffmpeg): i
+        futures = {pool.submit(process_shot, args.video, fps, a, b, f"shot-{i:04d}", publish, args.ffmpeg,
+                               seek_from=offset): i
                    for i, a, b in selected}
         for future in as_completed(futures):
             rows[futures[future]] = future.result()
@@ -504,7 +526,7 @@ def run_job(args: argparse.Namespace) -> int:
               "scene_threshold": args.threshold, "scene_scores": scenes, "scene_command": scene_command,
               "decision": DECISION, "shots": [rows[i] for i in sorted(rows)], "part": args.part, "parts": args.parts,
               "all_spans": spans,
-              "source_start_time": float(meta.get("start_time", 0)), "stream_metadata": meta, "native_tools": native,
+              "source_start_time": float(meta.get("start_time", 0)), "seek_offset_seconds": offset, "stream_metadata": meta, "native_tools": native,
               "runtime_seconds": time.monotonic() - began, "device": "cpu", "opencv": cv2.__version__,
               "numpy": np.__version__, "geometry": "ITF regulation; net excluded", "probe_command": probe_command}
     report["review_id"] = hashlib.sha256(json.dumps(report, sort_keys=True).encode()).hexdigest()[:16]

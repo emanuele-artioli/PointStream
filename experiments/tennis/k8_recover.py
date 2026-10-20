@@ -45,13 +45,13 @@ def groups(items: list[dict[str, Any]], count: int) -> list[list[dict[str, Any]]
     return [sorted(g, key=lambda r: (r["start"], r["id"])) for g in result]
 
 
-def worker(video: Path, fps: float, item: dict[str, Any], publish: Path, ffmpeg: str) -> dict[str, Any]:
+def worker(video: Path, fps: float, item: dict[str, Any], publish: Path, ffmpeg: str, seek_from: float) -> dict[str, Any]:
     import cv2
     cv2.setNumThreads(1)
     a, b = item["shot_start"], item["shot_end"]
     reviews = {"first": a, "middle": a + (b - a) // 2, "last": b - 1}
     return k8.process_shot(video, fps, item["start"], item["end"], item["id"], publish, ffmpeg,
-                           reviews, item["parent"])
+                           reviews, item["parent"], seek_from=seek_from)
 
 
 def load_report(stage: Path) -> tuple[dict[str, Any], set[str]]:
@@ -86,7 +86,8 @@ def run(args: argparse.Namespace) -> int:
     began = time.monotonic()
     rows = {}
     with ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context("spawn")) as pool:
-        futures = {pool.submit(worker, args.video, base["fps"], item, publish, native["ffmpeg"]["path"]): item["id"] for item in selected}
+        futures = {pool.submit(worker, args.video, base["fps"], item, publish, native["ffmpeg"]["path"],
+                               k8.seek_offset(args.video, native["ffprobe"]["path"])): item["id"] for item in selected}
         for future in as_completed(futures):
             rows[futures[future]] = future.result()
             publish_progress(os.environ["PS_STAGE"], len(rows))

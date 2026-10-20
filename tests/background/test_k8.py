@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -356,3 +357,31 @@ def test_sample_page_shows_only_the_sample_and_keeps_the_full_review(tmp_path):
     assert json.dumps(design["review_id"]) in page and 'id="shot-0000"' in page
     assert (tmp_path / "review-sample-01" / "images").readlink() == k8.Path("../review/images")
     assert design["base_report_sha256"] == k8.file_sha256(path)
+
+
+def test_seek_starts_at_the_cut_frame_when_audio_starts_before_video(tmp_path):
+    """Regression (2026-10-20): audio at 0, video at 0.02 s; -ss start/fps decoded frame start-1."""
+    import os
+    import shutil
+    import subprocess
+
+    ffmpeg = os.environ.get("PS_K8_TEST_FFMPEG") or shutil.which("ffmpeg")
+    if ffmpeg is None or subprocess.run([ffmpeg, "-version"], capture_output=True).returncode:
+        pytest.skip("ffmpeg integration fixture")
+    ffprobe = str(Path(ffmpeg).with_name("ffprobe"))
+    video = tmp_path / "offset.mkv"
+    frames = np.repeat(np.arange(0, 250, 10, dtype=np.uint8), 48 * 64).reshape(25, 48, 64)
+    subprocess.run([ffmpeg, "-v", "error", "-f", "rawvideo", "-pix_fmt", "gray", "-s", "64x48", "-r", "50",
+                    "-i", "pipe:0", "-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono", "-t", "0.6",
+                    "-vf", "setpts=PTS+0.02/TB", "-c:v", "ffv1", "-c:a", "pcm_s16le", str(video)],
+                   input=frames.tobytes(), check=True)
+    offset = k8.seek_offset(video, ffprobe)
+    assert offset == pytest.approx(0.02, abs=1e-3)
+
+    def first(ss: float) -> int:
+        out = subprocess.run([ffmpeg, "-v", "error", "-ss", f"{ss:.6f}", "-i", str(video), "-map", "0:v",
+                              "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "gray", "-"], capture_output=True, check=True)
+        return round(float(np.frombuffer(out.stdout, np.uint8).mean()) / 10)
+
+    assert [first(k8.seek_seconds(n, 50, offset)) for n in (0, 1, 7, 24)] == [0, 1, 7, 24]
+    assert first(7 / 50) == 6  # the old seek
