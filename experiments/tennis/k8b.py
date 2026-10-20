@@ -183,7 +183,7 @@ def chunks(clips: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def parts(clips: list[dict[str, Any]], count: int) -> list[list[dict[str, Any]]]:
-    """Whole clips balanced by frame count (4K frames weigh double for decoding)."""
+    """Whole clips balanced by frame count (4K frames weigh more for decoding)."""
     loads = [0.0] * count
     groups: list[list[dict[str, Any]]] = [[] for _ in range(count)]
     for clip in sorted(clips, key=lambda c: (-c["frames"] * c["weight"], c["id"])):
@@ -470,7 +470,7 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
 
 
 def make_manifest(root: Path, matches: list[str], out: Path) -> dict[str, Any]:
-    """Clip identities for the held-out set; 2160p clips weigh double when balancing parts."""
+    """Clip identities for the held-out set; 2160p clips weigh 1.2 when balancing parts (registration runs at 1080p; only decoding costs more)."""
     clips = []
     for match in matches:
         for video in sorted((root / match).glob("*.mp4")):
@@ -478,7 +478,7 @@ def make_manifest(root: Path, matches: list[str], out: Path) -> dict[str, Any]:
                 ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=height,nb_frames", "-of", "json",
                  str(video)]))["streams"][0]
             clips.append({"id": f"{match}/{video.stem}", "path": f"{match}/{video.name}", "sha256": file_sha256(video),
-                          "frames": int(meta["nb_frames"]), "weight": 2.0 if int(meta["height"]) > 1080 else 1.0})
+                          "frames": int(meta["nb_frames"]), "weight": 1.2 if int(meta["height"]) > 1080 else 1.0})
     manifest = {"schema": 1, "root": str(root), "matches": matches, "clips": clips}
     write_json(out, manifest)
     return manifest

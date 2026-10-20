@@ -30,11 +30,11 @@ def test_clip_shots_cut_first_then_split_a_gradual_transition():
     assert k8b.prediction(rows(states)[100:250])["predicted"] == "court"
 
 
-def test_parts_cover_every_clip_once_and_weigh_4k_double():
-    clips = [{"id": f"m/{i}", "frames": f, "weight": w} for i, (f, w) in enumerate([(4000, 2.0), (3000, 1.0), (2000, 1.0), (1000, 1.0)])]
+def test_parts_cover_every_clip_once_and_weigh_4k_more():
+    clips = [{"id": f"m/{i}", "frames": f, "weight": w} for i, (f, w) in enumerate([(4000, 1.2), (3000, 1.0), (2000, 1.0), (1000, 1.0)])]
     groups = k8b.parts(clips, 2)
     assert sorted(c["id"] for g in groups for c in g) == sorted(c["id"] for c in clips)
-    assert [c["id"] for c in groups[0]] == ["m/0"]
+    assert [c["id"] for c in groups[0]] == ["m/0", "m/3"]  # 4,800 + 1,000 against 3,000 + 2,000
     chunks = k8b.chunks([{"id": "m/0", "frames": 900}])
     assert [(c["start"], c["end"]) for c in chunks] == [(0, 400), (400, 800), (800, 900)]
 
