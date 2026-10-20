@@ -6164,7 +6164,7 @@ invocation turns out to be needed.
   the billing file, the durations and the size result).
 - Superseded by H5p 3. The per-kitchen pass holds only against B2's
   anchors, which stop at 162–525 kbps. Against fair anchors that reach the
-  scene route's 8–80 kbps, PointStream billed per kitchen needs 69% more
+  scene route's 8–80 kbps, PointStream billed per kitchen needs 74% more
   rate (0 of 4).
 
 ### 2026-10-20 — H5p 2: F as a video (rate oracle, CPU)
@@ -6359,30 +6359,28 @@ invocation turns out to be needed.
     - P01_107: footage `…144820Z-7d3642df`, after a first attempt
       (`…132849Z-8ca7dab5`) stalled on a loaded host converting the whole
       footage to 4:2:0 at once (now in 64-frame chunks, `f3d9915`,
-      identical output); training `…151642Z-bfeaf628`; format and scoring
-      pending.
+      identical output); training `…151642Z-bfeaf628`, format
+      `…155531Z-154db698`, scoring `…162325Z-9327cf35`.
     - Training converged on every item (LPIPS_V 0.21–0.33 → 0.11–0.17).
-    - Size (`…145053Z-488101d3`): 50.1–50.7 MB per 4-bit change, the same
-      as PointStream's scene models.
+    - Size (`…145053Z-488101d3`; P01_107 `…155550Z-5bd310fb`): 50.1–50.7 MB
+      per 4-bit change, the same as PointStream's scene models.
   - What the fair anchors reach: DCVC-UF off the shelf goes down to 8–9
     kbps at 360p QP 0, and to 38–39 kbps at 1080p QP 0. SVT-AV1 at
     preset 1 reaches 86–95 kbps at 1080p CRF 70. B2's anchors stopped at
     162–525 kbps.
 - Outcome. BD-rate on weighted LPIPS (with fill), P01_107 | P02_02 |
-  P03_10 | P09_106. The venue anchor is not yet in for P01_107; adding an
-  anchor can only strengthen the pooled envelope, so the verdict cannot
-  change.
+  P03_10 | P09_106.
 
   | PointStream (G_HO, F granted) against | weighted LPIPS | mean (CI) | < 0 | weighted DISTS | frame LPIPS | frame DISTS | weighted PSNR |
   |---|---|---|---|---|---|---|---|
   | B2's anchors (H5p 1's reading), models billed per kitchen | −17 \| −16 \| −37 \| −29% | −25% | 4 | −15% | −43% | −45% | |
-  | fair pooled, models not billed | −2 \| +32 \| +27 \| −9% | +12% (−5 to +29) | 2 | −1% | +1% | −20% (4/4) | +43% |
-  | **fair pooled, models billed per kitchen (the rule)** | +95 \| +46 \| +48 \| +89% | **+69% (+47 to +92)** | **0** | +65% | +31% | +32% | +123% |
-  | the venue-adapted DCVC-UF alone, neither billed | — \| +35 \| +27 \| −9% | +17% | 1 of 3 | −6% | +16% | −20% (3/3) | −19% (3/3) |
-  | the venue-adapted DCVC-UF alone, both billed per kitchen | — \| +26 \| +13 \| −6% | +11% | 1 of 3 | −8% (3/3) | +5% | −21% (3/3) | −17% (3/3) |
+  | fair pooled, models not billed | +19 \| +32 \| +27 \| −9% | +17% (0 to +29) | 1 | +2% | +15% | −12% (4/4) | +43% |
+  | **fair pooled, models billed per kitchen (the rule)** | +113 \| +46 \| +48 \| +89% | **+74% (+47 to +101)** | **0** | +66% | +42% | +35% | +123% |
+  | the venue-adapted DCVC-UF alone, neither billed | +13 \| +35 \| +27 \| −9% | +16% (0 to +31) | 1 | −4% (2/4) | +15% (0/4) | −17% (4/4) | −11% (3/4) |
+  | the venue-adapted DCVC-UF alone, both billed per kitchen | +8 \| +26 \| +13 \| −6% | +10% (−1 to +21) | 1 | −7% (4/4) | +5% (1/4) | −19% (4/4) | −12% (3/4) |
 
   - **The rule fails.** Against the fair anchors, with the venue models
-    billed per kitchen as H5p 1 required, PointStream needs 69% more
+    billed per kitchen as H5p 1 required, PointStream needs 74% more
     rate for the same weighted LPIPS (0 of 4 items below zero). The paper
     does not claim that PointStream beats a venue-adapted codec, nor
     fairly configured off-the-shelf ones once its models are paid for.
@@ -6402,13 +6400,13 @@ invocation turns out to be needed.
       at 162–525 kbps, which kept the low rates out of the BD range.
   - The competing explanation holds on LPIPS. At equal adaptation,
     neither model billed, the whole-frame venue-adapted DCVC-UF beats
-    PointStream on weighted LPIPS (+17%, PointStream better on 1 of 3) and
-    on frame LPIPS (+16%, 0 of 3). So most of H5's LPIPS gain was the
+    PointStream on weighted LPIPS (+16%, PointStream better on 1 of 4) and
+    on frame LPIPS (+15%, 0 of 4). So most of H5's LPIPS gain was the
     adaptation, not the object split. The metrics disagree, though:
-    PointStream is better than the venue codec on frame DISTS (−20%, 3 of
-    3), weighted PSNR (−19%, 3 of 3), and slightly on weighted DISTS
-    (−6%). Billing both per kitchen changes little (+11% weighted LPIPS;
-    weighted DISTS −8%, 3 of 3). The split costs LPIPS and buys DISTS and
+    PointStream is better than the venue codec on frame DISTS (−17%, 4 of
+    4), weighted PSNR (−11%, 3 of 4), and slightly on weighted DISTS
+    (−4%). Billing both per kitchen changes little (+10% weighted LPIPS;
+    weighted DISTS −7%, 4 of 4). The split costs LPIPS and buys DISTS and
     PSNR at equal adaptation; it is not a uniform gain.
   - Hypothesis wrong. Preset 1 and the ladder were predicted to change
     little and to leave rule (a) passing at −10 to −20%. Instead the
@@ -6428,8 +6426,12 @@ invocation turns out to be needed.
   - Where the split may still earn its place: DISTS and PSNR at equal
     adaptation, the foreground's own quality (G_HO), rate control by
     region, and F carried in the stream (H5p 4). Each needs its own test.
-- Interim report: `scratchpad report-h5p3-interim`, to publish with P01's
-  venue anchor.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5p3-a06e886/` (code
+  `a06e886`; with the billing files, the hours sweep's billing, every
+  anchor job's `h5.json` and the interim notes).
+- GPU time: about 12 GPU-hours (12 anchor jobs, 4 footage, 4 training, 4
+  format, 4 venue scoring; the failed first batch about 0.5), within the
+  ceiling of 14.
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
