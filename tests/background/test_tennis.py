@@ -222,3 +222,10 @@ def test_k5b_trackers_choice_takes_the_probe_within_two_points():
     assert choice["within_0.02"] == ["wasb", "balltrack"] and choice["chosen"] == "balltrack"
     table["tracknet:8,9,10"]["wasb"] = t(0.99)
     assert kt.choose(table)["chosen"] == "wasb"
+
+
+def test_k5b_trackers_attrdict_reads_nested_keys_both_ways():
+    from experiments.tennis import k5b_trackers as kt
+
+    cfg = kt.AttrDict.of({"MODEL": {"EXTRA": {"STAGE": [{"A": 1}]}}})
+    assert cfg.MODEL.EXTRA["STAGE"][0].A == 1 and cfg["MODEL"]["EXTRA"].STAGE[0]["A"] == 1

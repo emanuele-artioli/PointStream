@@ -178,6 +178,25 @@ def load_yaml(path: Path) -> dict[str, Any]:
     return yaml.safe_load(path.read_text())
 
 
+class AttrDict(dict):
+    """A config read by key or attribute, as WASB's code reads Hydra's (HRNet uses ``cfg.MODEL.EXTRA``); the packed
+    environment has neither hydra nor omegaconf."""
+
+    def __getattr__(self, name: str) -> Any:
+        try:
+            return self[name]
+        except KeyError as e:
+            raise AttributeError(name) from e
+
+    @staticmethod
+    def of(value: Any) -> Any:
+        if isinstance(value, dict):
+            return AttrDict({k: AttrDict.of(v) for k, v in value.items()})
+        if isinstance(value, list):
+            return [AttrDict.of(v) for v in value]
+        return value
+
+
 class Zoo:
     """WASB-SBDT's tennis models, imported from its code tree, with its preprocessing and postprocessors."""
 
@@ -186,11 +205,22 @@ class Zoo:
 
         root = code / "src"
         sys.path.insert(0, str(root))
+        import importlib.util
+
         import models
-        from detectors.deepball_postprocessor import DeepBallPostprocessor
-        from detectors.postprocessor import TracknetV2Postprocessor
         from trackers import build_tracker
         from utils.image import get_affine_transform
+
+        def by_path(name: str) -> Any:
+            # detectors/__init__ imports hydra through the detector class, which this wrapper does not use.
+            spec = importlib.util.spec_from_file_location(f"wasb_{name}", root / "detectors" / f"{name}.py")
+            assert spec is not None and spec.loader is not None
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod
+
+        DeepBallPostprocessor = by_path("deepball_postprocessor").DeepBallPostprocessor
+        TracknetV2Postprocessor = by_path("postprocessor").TracknetV2Postprocessor
 
         if not str(Path(models.__file__).resolve()).startswith(str(root.resolve())):
             raise RuntimeError(f"'models' resolved to {models.__file__}, not WASB's tree")
@@ -206,10 +236,8 @@ class Zoo:
             if "hm_weight" in s:
                 detector_cfg["postprocessor"]["use_hm_weight"] = s["hm_weight"]
             detector_cfg["step"] = s["step"]
-            from omegaconf import OmegaConf
-
-            cfg = OmegaConf.create({"model": model_cfg, "detector": detector_cfg, "dataloader": dataloader,  # as Hydra gives it
-                                    "tracker": load_yaml(root / f"configs/tracker/{s['tracker']}.yaml"), "runner": {"device": "cuda", "gpus": [0]}})
+            cfg = AttrDict.of({"model": model_cfg, "detector": detector_cfg, "dataloader": dataloader,
+                               "tracker": load_yaml(root / f"configs/tracker/{s['tracker']}.yaml"), "runner": {"device": "cuda", "gpus": [0]}})
             key = s["weights"]
             if key not in loaded:
                 net = models.build_model(cfg)
