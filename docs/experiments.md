@@ -7809,6 +7809,14 @@ invocation turns out to be needed.
   packed ffmpeg 8.1.2 on gpu1. Any later registration run uses the fix.
   Until then, per-frame homographies from this run must be read at
   frame f−1.
+- **Partial court-shot list v0 for K4b (d)** (2026-10-20, the user's choice
+  of options B and A). `court-shots-v0/k8-court-shots-v0.json` under the
+  run root (SHA256 `f1efc61dafe6ebd75303a6448ddb5180eaec70dee9e329fde8517674088dad7a`):
+  the 41 predicted-court shots, all marked court, 22,460 frames.
+  Per-frame homographies are re-indexed for the decode offset; the row
+  for a shot's last frame is taken from the next shot. It covers about a
+  third of court time, so absence from the list does not mean non-court.
+  K8b (revised cuts and registration) follows under its own rule.
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
