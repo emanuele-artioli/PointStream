@@ -7924,6 +7924,32 @@ invocation turns out to be needed.
   `djokovic_zverev/000` (3,975 frames, 66 s) becomes dev: it is still
   registered (K4b needs it) but is neither reviewed nor scored. The
   held-out census is the other 69 clips.
+- Runs (CPU only, no GPU; packed environment `32e68872…`; manifest SHA256
+  `82a582e0246f1a3a0fce2fbe1f694097fe7b47dca8cf774cb3f897b3a51ae00a`).
+  The corrected 4-part pilot `20261020T220814Z-c4b9d013` (`0465976`,
+  gpu1) passed its smoke (240 frames, 524 s, about 2.2 s per frame per
+  process) and reached its 2,700 s full-stage cap at 25 of 34 chunks.
+  That code published clips only at the end, so `partial.tar` is empty;
+  its `checkpoint.tar` keeps the finished chunks. The artifacts are
+  retained and nothing was replayed. Resized to 8 parts × 16 processes
+  with 200-frame chunks; each clip is finalized and published as soon as
+  its chunks finish, longest clips first (`913b815`). Pilot part 0,
+  `20261020T225829Z-3cb8b9aa` (gpu6): smoke 160 frames in 183 s; full
+  stage 6 clips, 4,484 frames, in 499 s. Its validator passed on the
+  smoke (fleet) and on the full stage (locally, from `published.tar`).
+  Parts 1–7 were then submitted on the same revision (`git_head` checked
+  in each `ready.json`):
+
+  | Part | Job | Archive SHA256 |
+  |---|---|---|
+  | 0 | `20261020T225829Z-3cb8b9aa` | `3910621c…` |
+  | 1 | `20261020T231141Z-bff7fd07` | `8e61d922…` |
+  | 2 | `20261020T231147Z-a44fc8b0` | `86c30e3e…` |
+  | 3 | `20261020T231153Z-d859538d` | `8e7d98c6…` |
+  | 4 | `20261020T231200Z-23e16ed2` | `d1652905…` |
+  | 5 | `20261020T231206Z-50159441` | `db7ad8b0…` |
+  | 6 | `20261020T231213Z-19ea5d2d` | `c0317166…` |
+  | 7 | `20261020T231220Z-a7110d20` | `0e4df826…` |
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
