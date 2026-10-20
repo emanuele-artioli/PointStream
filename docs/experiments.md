@@ -7639,6 +7639,75 @@ invocation turns out to be needed.
   windows (K5's pilot windows first), ≤ 45 min; part 2, the other 4,
   ≤ 45 min, run only if part 1 leaves the rule open. Ceiling 2
   GPU-hours and 6 h wall.
+- Failed attempt (infrastructure). `20261020T184724Z-58d02fd1`
+  (`14d3892`): the smoke stopped writing the full-frame clip (the label
+  was drawn on a read-only frame); fixed in `523cee1`.
+- Job: part 1 `20261020T185255Z-43bcc85e` (`523cee1`; RTX A6000, gpu3,
+  shared with another user's process; game3/Clip3, game7/Clip2,
+  game10/Clip10, game3/Clip6; full stage 1,213 s; `published.tar`
+  `6520ae01…b095`; inputs, environment, checkpoints and windows as K5;
+  SVT-AV1 4.2.0, dav1d 1.5.4 from the environment). Validator passed on
+  the smoke and, run locally, on the full stage (12 checks). Every DCVC-UF
+  point decoded deterministically on its first attempt. About 0.4
+  GPU-hours with the smoke.
+- Report (`k5b report` on part 1; `k5b-report.json` `a4a556a0…dfc8`). Means
+  over the 4 windows (kbps; ball-region PSNR dB; decode → pixel oracle /
+  disk / streak):
+
+  | Point | kbps | ball PSNR | streak-region PSNR | frame PSNR |
+  |---|---:|---|---|---:|
+  | DCVC-UF QP 0 | 12.95 | 18.73 → 22.94 / 19.32 / 19.70 | 20.98 → 24.10 / 21.48 / 21.88 | 29.42 |
+  | DCVC-UF QP 21 | 36.60 | 19.89 → 24.11 / 20.28 / 20.63 | 22.19 → 25.36 / 22.53 / 22.90 | 33.74 |
+  | DCVC-UF QP 42 | 117.7 | 23.89 → 27.56 / 23.89 / 23.92 | 26.01 → 28.64 / 26.01 / 26.05 | 37.19 |
+  | SVT-AV1 CRF 62 | 73.94 | 20.21 → 24.41 / 20.56 / 20.87 | 22.54 → 25.73 / 22.86 / 23.18 | 35.31 |
+  | SVT-AV1 CRF 55 | 176.0 | 23.62 → 27.74 / 23.67 / 23.77 | 25.91 → 28.97 / 25.95 / 26.04 | 38.35 |
+
+  The ball segment costs 0.22–0.33 kbps when on (one byte of payload,
+  0.003 kbps, when off); the fit turns it off at DCVC-UF QP ≥ 42 and
+  SVT-AV1 CRF ≤ 48 on most windows. BD-rate on ball-region PSNR against
+  the pooled envelope, per window (game10/Clip10, game3/Clip3,
+  game3/Clip6, game7/Clip2): K5's pixel oracle on DCVC-UF −71.9%, −55.8%,
+  −58.3%, −51.0% (K5: −57.3% median, reproduced); the disk on DCVC-UF
+  +7.3%, +6.7%, +4.5%, +0.7%; the streak on DCVC-UF +3.2%, +0.8%, +0.8%,
+  −3.9%; on SVT-AV1 the disk +21% to +30%, the streak +19% to +28%.
+  Frame PSNR against each coder's own envelope: +0.0% to +0.8% (within
+  the +1% bar). Fitted streaks: radius 1.5–4 px, exposure 0.43–1.0 of a
+  frame, phase −1/6, colours dull (e.g. 182/182/172 on a white-ball
+  window).
+- Decision (by the rule): **no renderer is adopted.** Both fail the ball
+  half on all 4 windows with either coder (the rule needs 6 of 8, so 4
+  failures decide it); part 2 was not run. The frame half passes.
+- Reading. The hypothesis fails: a per-window appearance keeps 10–20% of
+  the pixel oracle's gain on the ball region (DCVC-UF QP 21: +0.4 dB for
+  the disk, +0.7 dB for the streak, +4.2 dB for the oracle), not most of
+  it. The review strips show why: fast balls are long, bright streaks;
+  the drawn streak has the right direction but stays faint, and the
+  fitted colour is dull (competing explanation 2: the least-squares fit
+  hedges a ball it cannot place exactly). Competing explanation 3 holds
+  in part: the decode keeps a faint ghost above the ball at QP 21, which
+  the drawn ball does not cover.
+  A diagnostic (`experiments/tennis/k5b_diagnostic.py`; not evidence:
+  source JPEGs read by OpenCV, a temporal
+  median as the true background, TrackNet's camera being still; 8
+  windows, CPU; `k5b-diagnostic.json` `be8237c1…f5d5`) separates the causes. Ball-region PSNR over the median,
+  per window: the per-window renderer recovers 15–60% of what pasting the
+  source within 4 px recovers (+0.4 to +2.4 dB against +2.4 to +6.7 dB);
+  the same streak shifted per frame by its best offset within 4 px (a
+  position oracle; median offset 1.4–3.2 px from the label) adds about
+  1.5 dB; a free setting and colour per frame at the label (an appearance
+  oracle) adds about the same; each alone stays 0.1–2.3 dB under the
+  paste. A sensor-saturation gain (alpha = min(1, g × coverage)) is
+  chosen on one window only. So the drawn ball needs both: positions
+  refined by the encoder to where the ball is (TrackNet's integer labels
+  are 2–3 px off the best fit) and an appearance sent per frame (about
+  35 bits, 1 kbps), each an encoder decision that is billed.
+- Next (K5b 1b, its own oracle, proposed): per-frame position refinement
+  (±4 px by fit, residuals billed through the same Exp-Golomb code) and a
+  per-frame appearance (setting and colour, predicted from the previous
+  frame, billed), on the same decodes and judges, with K5b 1's rule.
+- Rendering preference (side by side sent to the user 2026-10-20: three
+  windows' ball-following clips and one full frame at DCVC-UF QP 21):
+  pending.
 
 ### 2026-10-20 — K5b (2): an encoder-side ball tracker (audit and rule)
 - Question (PLAN K5b 2, ball stage): a tracker that finds the ball on the
