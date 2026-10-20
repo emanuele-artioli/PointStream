@@ -8,6 +8,7 @@
     python -m experiments.visor.h5 validate
     python -m experiments.visor.h5 report --score H5.JSON ... --out DIR [--billing BILLING.JSON]
     python -m experiments.visor.h5 model-size --arm DIR ... --video-ckpt P [--limit-tensors N]
+    python -m experiments.visor.h5 mask-video --eval-set E.JSON --fill-masks DIR --item ID [--limit-frames N]
 
 WINDOW is ``--eval-set E.JSON --archive DIR --dense-masks DIR --fill-masks DIR --video P.MP4 --item ID
 --image-ckpt P --video-ckpt P --lpips-backbone P``.
@@ -1039,7 +1040,94 @@ def validate(stage: Path) -> dict[str, bool]:
         return validate_time(result)
     if result["kind"] == "model-size":
         return validate_model_size(result)
+    if result["kind"] == "mask-video":
+        return validate_mask_video(result)
     return validate_foreground(result) if result["kind"] == "foreground" else validate_score(result)
+
+
+def load_classes(args: argparse.Namespace) -> tuple[dict[str, Any], np.ndarray]:
+    """The item and its class map from the fill mask set alone (no source decode)."""
+    from experiments.background import g6
+    from experiments.visor.b2 import mask_root
+    from src.segmentation.masks import ClipMasks
+    from src.segmentation.visor import HANDS
+
+    item = g6.load_item(args.eval_set, args.item)
+    frames = args.limit_frames if args.limit_frames > 0 else int(item["frames"])
+    clip = ClipMasks.load(mask_root(Path(args.fill_masks), item["id"]))
+    classes = np.zeros((frames, FULL[1], FULL[0]), np.uint8)
+    for t in range(frames):
+        classes[t][clip.foreground(t)] = cp.OBJECT
+        classes[t][clip.class_mask(t, HANDS[0]) | clip.class_mask(t, HANDS[1])] = cp.HAND
+    return item, classes
+
+
+def command_mask_video(args: argparse.Namespace) -> int:
+    """H5p 2: F coded as a video (SVT-AV1, motion compensated) against H5m's lzma coder, by rate and by how
+    closely the client's F̂ matches F. CPU only."""
+    from src.codecs import svtav1
+    from src.pointstream import mask as mk
+
+    began = time.time()
+    item, classes = load_classes(args)
+    fps = Fraction(item["fps"]).limit_denominator(1001)
+    seconds = len(classes) / float(fps)
+    work = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch") / "mask-video"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    rows: list[dict[str, Any]] = []
+    for scale in (int(x) for x in args.lzma_scales.split(",")):
+        payload = mk.encode(mk.reduce(classes, scale), scale)
+        decoded, _ = mk.decode(payload)
+        rows.append({"coder": "lzma", "scale": scale, "bytes": len(payload), "kbps": len(payload) * 8 / seconds / 1000,
+                     **mk.accuracy(classes, mk.upsample(decoded, FULL))})
+        progress(len(rows))
+    for representation in args.representations.split(","):
+        for scale in (int(x) for x in args.scales.split(",")):
+            pw, ph = mk.padded_size(FULL[0], FULL[1], scale)
+            planes = mk.video_planes(classes, scale, representation)
+            source = work / f"{representation}-{scale}.yuv"
+            planes.tofile(source)
+            for crf in (int(x) for x in args.crfs.split(",")):
+                point = work / f"{representation}-{scale}-{crf}"
+                point.mkdir()
+                coded = svtav1.code(source, point, width=pw, height=ph, fps=fps, frames=len(classes), crf=crf,
+                                    preset=args.preset, threads=args.threads, full_range=True,
+                                    encoder=args.encoder, decoder=args.decoder)
+                back = np.fromfile(coded["decoded"], np.uint8).reshape(len(classes), -1)
+                rows.append({"coder": "svtav1", "representation": representation, "scale": scale, "crf": crf,
+                             "coded_size": [pw, ph], "bytes": coded["payload_bytes"],
+                             "kbps": coded["payload_bytes"] * 8 / seconds / 1000,
+                             "stream_sha256": coded["stream_sha256"], "decoded_frames": coded["decoded_frames"],
+                             "encode_seconds": coded["encode_seconds"],
+                             **mk.accuracy(classes, mk.video_classes(back, scale, FULL))})
+                shutil.rmtree(point)
+                progress(len(rows))
+            source.unlink()
+    write_json(stage_dir() / "h5.json", {
+        "kind": "mask-video", "item": item["id"], "frames": len(classes), "fps": str(fps),
+        "limit_frames": args.limit_frames, "preset": args.preset, "share": float((classes > 0).mean()),
+        "classes_sha256": hashlib.sha256(np.packbits(classes > 0).tobytes()
+                                         + np.packbits(classes == cp.HAND).tobytes()).hexdigest(),
+        "encoder": svtav1.tool(args.encoder), "decoder": svtav1.tool(args.decoder), "rows": rows,
+        "seconds": round(time.time() - began, 1)})
+    return 0
+
+
+def validate_mask_video(result: dict[str, Any]) -> dict[str, bool]:
+    rows = result["rows"]
+    video = [r for r in rows if r["coder"] == "svtav1"]
+    lossless = [r for r in rows if r["coder"] == "lzma"]
+    return {
+        "both_coders": bool(video) and bool(lossless),
+        "every_frame_decoded": all(r["decoded_frames"] == result["frames"] for r in video),
+        "accuracy_plausible": all(0 < r["iou"] <= 1 and 0 <= r["class_accuracy"] <= 1 for r in rows),
+        # at one scale and representation, a higher CRF never costs more
+        "rate_falls_with_crf": all(a["bytes"] >= b["bytes"] for a in video for b in video
+                                   if (a["representation"], a["scale"]) == (b["representation"], b["scale"])
+                                   and a["crf"] < b["crf"]),
+        "lzma_finer_is_closer": all(a["iou"] >= b["iou"] for a in lossless for b in lossless if a["scale"] < b["scale"]),
+    }
 
 
 MODEL_VARIANTS = ("delta-4", "delta-8")  # G5c: delta-4 is recipe L's shipped size (keeps quality within +2.2%)
@@ -1398,7 +1486,21 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--variants", default=",".join(MODEL_VARIANTS))
     p.add_argument("--limit-tensors", type=int, default=0, help="the first N tensors only (smoke)")
     p.add_argument("--threads", type=int, default=16)
+    p = sub.add_parser("mask-video")
+    for name in ("--eval-set", "--fill-masks", "--item"):
+        p.add_argument(name, required=True)
+    p.add_argument("--limit-frames", type=int, default=0)
+    p.add_argument("--representations", default="sdf,binary")
+    p.add_argument("--scales", default="2,4,8")
+    p.add_argument("--crfs", default="20,35,50")
+    p.add_argument("--lzma-scales", default="4,8,16")
+    p.add_argument("--preset", type=int, default=4)
+    p.add_argument("--threads", type=int, default=8)
+    p.add_argument("--encoder", default="SvtAv1EncApp")
+    p.add_argument("--decoder", default="dav1d")
     args = parser.parse_args(argv)
+    if args.command == "mask-video":
+        return command_mask_video(args)
     if args.command == "foreground":
         return command_foreground(args)
     if args.command == "score":

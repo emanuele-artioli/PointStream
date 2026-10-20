@@ -6127,6 +6127,58 @@ invocation turns out to be needed.
 - Budget: one CPU job (four 482 MB checkpoints against the public
   weights, under 20 minutes); the report runs locally. No GPU.
 
+### 2026-10-20 — H5p 2: F as a video (rate oracle, CPU)
+- Question (user, 2026-10-20; moved ahead of the fair anchors): H5m's
+  coder XORs each frame's bit planes with the previous frame's and
+  compresses them losslessly, so a hand moving a few pixels pays for its
+  whole edge every frame (36–116 kbps at s = 8). Does a motion-compensated
+  video codec carry F at the same accuracy for a fraction of that?
+- Method (`h5 mask-video`, one CPU job per pilot item). F's class map
+  from the fill mask set, coded as raw 8-bit 4:2:0 at 1/s (s = 2, 4, 8;
+  padded to a multiple of 8) through SVT-AV1 (B2's binary, preset 4, CRF
+  20, 35, 50; rate = the AV1 payload) and decoded by dav1d.
+  - *sdf*: Y is F's signed distance to its boundary, computed at 1080p,
+    reduced by area, clipped to ±8 coded pixels, stored as 128 + 15·d.
+    The client's F̂ is the bilinear upsample of Y at ≥ 128, so the codec
+    sees a ramp instead of a step, and the zero crossing places the
+    boundary below a cell. Ringing below half the ramp's height does not
+    move the threshold.
+  - *binary*: Y is 255 on F's reduced cells, 0 elsewhere (the step).
+  - Classes: U is 255 on hand cells, 0 on object cells, 128 outside F,
+    at chroma's half size; a pixel of F̂ is a hand where U's bilinear
+    upsample is ≥ 128. V is 128.
+  - Beside them, H5m's lzma coder at s = 4, 8, 16, recomputed in the same
+    job.
+  - Accuracy of F̂ against F at 1080p: IoU, the share of F's pixels
+    wrong, the mean symmetric boundary distance (px) and the class
+    accuracy on F ∩ F̂.
+  - (yuva420p: no AV1 encoder here carries alpha; containers that do,
+    such as VP9 in WebM, code it as a second monochrome stream, so a grey
+    plane is the same thing. The foreground stream is DCVC-UF, which has
+    no alpha plane.)
+- Decision rule, fixed now. Per item, the cheapest video setting at least
+  as accurate as lzma at s = 8 (IoU at least as high, boundary distance at
+  most as large) sets the item's mask rate. H5m's s = 8 rows are re-billed
+  at that rate (mask bytes replaced) and judged by H5's rule (a) (weighted
+  LPIPS with fill, pooled anchors, mean −10% or better, 3 of 4 items below
+  zero).
+  - Passes: the video coder is adopted for F. Step 4 (the foreground
+    re-encoded from F̂, GPU) uses it and rescores, which replaces this
+    estimate.
+  - Fails, but the video coder is at least 2× cheaper at equal accuracy:
+    adopted as the mask coder; F carried in the foreground stream (no
+    separate F) is tested next.
+  - Otherwise: lzma stays, and F carried in the foreground stream becomes
+    the main route.
+- Hypothesis. *sdf* at s = 4–8, CRF 35–50, matches lzma s = 8's accuracy
+  at 5–15 kbps (3–10× cheaper); *binary* costs about twice *sdf* at equal
+  accuracy. Re-billed, rule (a) passes narrowly (about −10%).
+- Competing explanation. Equal IoU and boundary distance do not mean an
+  equal composite: the codec's errors may sit elsewhere, or flicker
+  between frames where lzma's are stable. Step 4's rescoring tests that;
+  this rule only estimates it.
+- Budget: 4 CPU jobs, under 20 minutes each. No GPU.
+
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
   can a body-pose estimator's keypoints carry the players? Per part
