@@ -637,6 +637,133 @@ def score_anchors(args: argparse.Namespace, w: dict[str, Any], judges: Judges, w
     return rows
 
 
+LADDER = {1080: (1920, 1080), 720: (1280, 720), 540: (960, 540), 360: (640, 360)}
+
+
+def parse_ladder(spec: str | None) -> list[tuple[int, int]]:
+    """``1080=41,48;540=0,21`` to [(height, value), ...]."""
+    out = []
+    for part in (spec or "").split(";"):
+        if part.strip():
+            height, _, values = part.partition("=")
+            if int(height) not in LADDER:
+                raise SystemExit(f"{height}: not a ladder height ({sorted(LADDER)})")
+            out += [(int(height), int(v)) for v in values.split(",")]
+    return out
+
+
+def ladder_source(w: dict[str, Any], height: int, work: Path) -> dict[str, Any]:
+    """The window at a ladder size: 1080p as decoded; lower sizes by area average in RGB (as G6's backgrounds),
+    then 4:2:0 in full range."""
+    from experiments.background import g5, g6
+
+    if height == FULL[1]:
+        return {**w["source"], "frames": w["frames"]}
+    size = LADDER[height]
+    path = work / f"source-{height}.yuv"
+    if not path.is_file():
+        g5.rgb_to_yuv420(g6.resize(w["rgb"], size, area=True)).tofile(path)
+    return {"path": str(path), "width": size[0], "height": size[1], "frames": w["frames"], "full_range": True}
+
+
+def to_full(decoded: Path, height: int, frames: int) -> Path:
+    """A ladder decode at 1080p as the client shows it: bicubic in RGB, then 4:2:0 (in place)."""
+    from experiments.background import g5, g6
+
+    if height == FULL[1]:
+        return decoded
+    w, h = LADDER[height]
+    raw = np.fromfile(decoded, np.uint8).reshape(frames, h * 3 // 2, w)
+    out = np.empty((frames, FULL[1] * 3 // 2, FULL[0]), np.uint8)
+    for a in range(0, frames, CHUNK):
+        out[a:a + CHUNK] = g5.rgb_to_yuv420(g6.resize(g5.yuv420_to_rgb(raw[a:a + CHUNK]), FULL, area=False))
+    out.tofile(decoded)
+    return decoded
+
+
+def command_anchors(args: argparse.Namespace) -> int:
+    """H5p 3: fair anchors for the window. SVT-AV1 at the equal-time preset and DCVC-UF off the shelf, each at
+    1080p and lower ladder sizes (upscaled bicubically), and G6's venue-adapted whole-frame DCVC-UF from its
+    published decodes; all scored as H5's anchors. Writes ``h5.json`` after every point."""
+    from experiments.visor import b2
+
+    began = time.time()
+    work = scratch_dir() / "anchors"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    w = load_window(args, work)
+    judges = Judges(args)
+    coder = argparse.Namespace(encoder=args.encoder, decoder=args.decoder, threads=args.threads, structure="htl",
+                               image_ckpt=args.image_ckpt, image_sha256=file_sha256(Path(args.image_ckpt)),
+                               video_ckpt=args.video_ckpt, video_sha256=file_sha256(Path(args.video_ckpt)))
+    seconds = w["frames"] / float(w["fps"])
+    planned = [("svtav1-p%d" % args.preset, h, v) for h, v in parse_ladder(args.svt)] + \
+        [("dcvc-ladder", h, v) for h, v in parse_ladder(args.dcvc)]
+    venue = load_backgrounds(args.venue or [], {"scene"}, w["item"]["id"])
+    rows: list[dict[str, Any]] = []
+    result = {"kind": "anchors", "item": w["item"]["id"], "frames": w["frames"], "limit_frames": args.limit_frames,
+              "jpeg_gate_holds": all(c["holds"] for c in w["source"]["jpeg_gate"]),
+              "preset": args.preset, "planned": len(planned) + len(venue), "rows": rows, "judges": judges.record,
+              "encoder": b2.svtav1.tool(args.encoder) if args.svt else None,
+              "decoder": b2.svtav1.tool(args.decoder) if args.svt else None,
+              "venue_manifests": sorted({v["root"] for v in venue})}
+    for codec, height, value in planned:
+        pw = work / f"{codec}-{height}-{value}"
+        shutil.rmtree(pw, ignore_errors=True)
+        pw.mkdir(parents=True)
+        source = ladder_source(w, height, work)
+        if codec.startswith("svtav1"):
+            rec = b2.code_svtav1(coder, source, w["fps"], value, pw, None, {"preset": args.preset, "enable_tf": None},
+                                 None, None)
+        else:
+            rec = b2.code_dcvc(coder, source, value, pw, None, False, {"range": "full"})
+            if not (rec["deterministic"] and rec["decoder_matches_encoder_intra"]):
+                raise RuntimeError(f"DCVC-UF {height}p QP {value}: its decode is not the encoder's")
+        scores = score_decoded(w, judges, to_full(Path(rec["decoded"]), height, w["frames"]))
+        rows.append({"codec": codec, "point": value, "height": height, "rate_bytes": rec["rate_bytes"],
+                     "kbps": rec["rate_bytes"] * 8 / seconds / 1000, "stream_sha256": rec["stream_sha256"],
+                     "decoded_frames": rec["decoded_frames"], "deterministic": rec.get("deterministic"),
+                     "encode_seconds": rec.get("encode_seconds"), "scores": scores, "reencoded": False})
+        shutil.rmtree(pw, ignore_errors=True)
+        progress(len(rows))
+        write_json(stage_dir() / "h5.json", {**result, "seconds": round(time.time() - began, 1)})
+    for v in venue:  # G6's published decode of the unfilled window (FFV1); never its DCVC-UF stream
+        manifest = json.loads((Path(v["root"]) / "manifest.json").read_text())
+        if not str(manifest.get("fill", "")).startswith("none"):
+            raise SystemExit(f"{v['root']}: a filled background, not the venue-adapted whole frame")
+        planes = read_ffv1(Path(v["root"]) / v["decoded"])[:w["frames"]]
+        path = work / "venue.yuv"
+        planes.tofile(path)
+        scores = score_decoded(w, judges, path)
+        rows.append({"codec": "dcvc-venue", "point": v["value"], "height": v["coded_size"][1], "method": v["method"],
+                     "rate_bytes": v["bytes"], "kbps": v["kbps"], "stream_sha256": v["bitstream_sha256"],
+                     "decoded_frames": len(planes), "deterministic": v.get("deterministic"),
+                     "model_sha256": v["model_sha256"], "manifest_job": v["manifest_job"], "scores": scores,
+                     "reencoded": False})
+        progress(len(rows))
+        write_json(stage_dir() / "h5.json", {**result, "seconds": round(time.time() - began, 1)})
+    write_json(stage_dir() / "h5.json", {**result, "seconds": round(time.time() - began, 1)})
+    return 0
+
+
+def validate_anchors(result: dict[str, Any]) -> dict[str, bool]:
+    rows = result["rows"]
+
+    def falls(a: dict[str, Any], b: dict[str, Any]) -> bool:  # SVT-AV1: CRF up, rate down; DCVC-UF: QP up, rate up
+        if (a["codec"], a["height"]) != (b["codec"], b["height"]) or a["point"] >= b["point"]:
+            return True
+        return a["kbps"] >= b["kbps"] if a["codec"].startswith("svtav1") else a["kbps"] <= b["kbps"]
+
+    return {
+        "window_is_the_released_one": result["jpeg_gate_holds"],
+        "every_point_scored": len(rows) == result["planned"] and result["planned"] > 0,
+        "every_frame_decoded": all(r["decoded_frames"] == result["frames"] for r in rows),
+        "dcvc_deterministic": all(r["deterministic"] in (None, True) for r in rows),
+        "scores_plausible": all(scores_plausible(r["scores"]) for r in rows),
+        "rate_moves_with_the_knob": all(falls(a, b) for a in rows for b in rows),
+    }
+
+
 def command_score(args: argparse.Namespace) -> int:
     from experiments.background import g5c, g6
 
@@ -1042,6 +1169,8 @@ def validate(stage: Path) -> dict[str, bool]:
         return validate_model_size(result)
     if result["kind"] == "mask-video":
         return validate_mask_video(result)
+    if result["kind"] == "anchors":
+        return validate_anchors(result)
     return validate_foreground(result) if result["kind"] == "foreground" else validate_score(result)
 
 
@@ -1307,8 +1436,9 @@ def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_
                 billing: dict[str, Any] | None = None) -> dict[str, Any]:
     from experiments.background.g5 import envelope
 
-    groups = {"svtav1": [a for a in anchors if a["codec"] == "svtav1"],
-              "dcvc": [a for a in anchors if a["codec"] == "dcvc"], "pooled": anchors}
+    groups = {"svtav1": [a for a in anchors if a["codec"].startswith("svtav1")],
+              "dcvc": [a for a in anchors if a["codec"] in ("dcvc", "dcvc-ladder")],
+              "venue": [a for a in anchors if a["codec"] == "dcvc-venue"], "pooled": anchors}
     out: dict[str, Any] = {"comparisons": {}, "hull": {}, "mask_kbps": mask_kbps}
     for variant, points in variant_rows(rows).items():
         if not points:
@@ -1335,9 +1465,15 @@ def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_
             out["payback"][variant] = payback(variants[variant], groups["pooled"], billing["bytes"])
             for basis, seconds in billing["seconds"].items():
                 points = billed(variants[variant], billing["bytes"], seconds)
+                # the venue-adapted anchor pays for its model the same way (H5p 3)
+                venue = billed([{**a, "route": "venue"} for a in groups["venue"]], billing["bytes"], seconds)
+                billed_groups = {"pooled": [a for a in anchors if a["codec"] != "dcvc-venue"] + venue,
+                                 "venue": venue}
                 for metric, (_, _, _, minimum) in METRICS.items():
-                    out["comparisons"][f"{variant}@{basis}|pooled|{metric}"] = compare(
-                        curve(points, metric), curve(groups["pooled"], metric), minimum)
+                    for name, group in billed_groups.items():
+                        if group and (name == "pooled" or groups["venue"]):
+                            out["comparisons"][f"{variant}@{basis}|{name}|{metric}"] = compare(
+                                curve(points, metric), curve(group, metric), minimum)
     pointstream = [r for r in rows if r["route"] in VARIANTS["pointstream"] and not r.get("mask_scale")]
     out["matched"] = matched_regions(pointstream, anchors) if pointstream and anchors else []
     return out
@@ -1391,8 +1527,9 @@ def plot(items: dict[str, dict[str, Any]], data: dict[str, dict[str, Any]], targ
             for label, pts, style, colour in (
                     ("PointStream", [r for r in rows if r["route"] in ("scene", "enh")], "-o", "tab:blue"),
                     ("PointStream, SVT-AV1 background", [r for r in rows if r["route"] == "svt"], ":.", "tab:gray"),
-                    ("SVT-AV1 preset 4", [a for a in anchors if a["codec"] == "svtav1"], "--s", "tab:orange"),
-                    ("DCVC-UF HT-L", [a for a in anchors if a["codec"] == "dcvc"], "--^", "tab:green")):
+                    ("SVT-AV1", [a for a in anchors if a["codec"].startswith("svtav1")], "--s", "tab:orange"),
+                    ("DCVC-UF HT-L", [a for a in anchors if a["codec"] in ("dcvc", "dcvc-ladder")], "--^", "tab:green"),
+                    ("DCVC-UF, venue-adapted", [a for a in anchors if a["codec"] == "dcvc-venue"], "--v", "tab:red")):
                 hull = envelope(curve(pts, metric))
                 if hull:
                     ax.plot([r for r, _ in hull], [sign * q for _, q in hull], style, color=colour, label=label, ms=3)
@@ -1409,9 +1546,13 @@ def command_report(args: argparse.Namespace) -> int:
     data: dict[str, dict[str, Any]] = {}
     for path in args.score:
         result = json.loads(Path(path).read_text())
-        if result["kind"] != "score" or result["limit_frames"] > 0:
-            raise SystemExit(f"{path}: not a full score stage")
+        if result["kind"] not in ("score", "anchors") or result["limit_frames"] > 0:
+            raise SystemExit(f"{path}: not a full score or anchors stage")
         d = data.setdefault(result["item"], {"rows": [], "anchors": [], "mask": None, "sources": []})
+        if result["kind"] == "anchors":  # H5p 3: fair anchors only
+            d["anchors"] += result["rows"]
+            d["sources"].append({"path": path, "job_id": result.get("job_id"), "git_head": result.get("git_head")})
+            continue
         seen = {(r["pair"], r.get("mask_scale", 0), r.get("tag", "")) for r in d["rows"]}  # once per scale and tag
         d["rows"] += [r for r in result["rows"] if (r["pair"], r.get("mask_scale", 0), r.get("tag", "")) not in seen]
         d["anchors"] += result["anchors"]
@@ -1419,6 +1560,10 @@ def command_report(args: argparse.Namespace) -> int:
         d["sources"].append({"path": path, "job_id": result.get("job_id"), "git_head": result.get("git_head"),
                              "gpu": result.get("gpu")})
     billing = json.loads(Path(args.billing).read_text()) if args.billing else {}
+    if args.anchor_codecs:  # H5p 3: the fair set (e.g. without B2's preset-4 SVT-AV1)
+        keep = set(args.anchor_codecs.split(","))
+        for d in data.values():
+            d["anchors"] = [a for a in d["anchors"] if a["codec"] in keep]
     items = {i: item_report(d["rows"], d["anchors"], d["mask"]["kbps"], billing.get(i)) for i, d in data.items()}
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -1480,12 +1625,24 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", required=True)
     p.add_argument("--no-plot", action="store_true")
     p.add_argument("--billing", help="H5p 1: JSON {item: {bytes: {route: model bytes}, seconds: {basis: s}}}")
+    p.add_argument("--anchor-codecs", help="only these anchor codecs (svtav1, dcvc, svtav1-p1, dcvc-ladder, "
+                   "dcvc-venue)")
     p = sub.add_parser("model-size")
     p.add_argument("--arm", action="append", required=True, help="G6's train jobs' archives (extracted)")
     p.add_argument("--video-ckpt", required=True, help="the public DCVC-UF HT-L weights they were fine-tuned from")
     p.add_argument("--variants", default=",".join(MODEL_VARIANTS))
     p.add_argument("--limit-tensors", type=int, default=0, help="the first N tensors only (smoke)")
     p.add_argument("--threads", type=int, default=16)
+    p = sub.add_parser("anchors")
+    add_window(p)
+    p.add_argument("--dists-backbone", required=True)
+    p.add_argument("--svt", help="SVT-AV1 ladder: HEIGHT=CRF,...;HEIGHT=...")
+    p.add_argument("--dcvc", help="DCVC-UF HT-L ladder: HEIGHT=QP,...;HEIGHT=...")
+    p.add_argument("--preset", type=int, default=1, help="SVT-AV1 preset (H5's timing: 1 is the equal-time one)")
+    p.add_argument("--venue", action="append", help="G6 format archives of the unfilled window (--fill none)")
+    p.add_argument("--threads", type=int, default=32)
+    p.add_argument("--encoder", default="SvtAv1EncApp")
+    p.add_argument("--decoder", default="dav1d")
     p = sub.add_parser("mask-video")
     for name in ("--eval-set", "--fill-masks", "--item"):
         p.add_argument(name, required=True)
@@ -1501,6 +1658,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "mask-video":
         return command_mask_video(args)
+    if args.command == "anchors":
+        return command_anchors(args)
     if args.command == "foreground":
         return command_foreground(args)
     if args.command == "score":

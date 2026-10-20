@@ -188,3 +188,34 @@ def test_model_size_validator() -> None:
     assert all(h5.validate_model_size(result).values())
     result["rows"][1]["sizes"] = [size(300), size(110)]
     assert not h5.validate_model_size(result)["fewer_bits_smaller"]
+
+
+def test_ladder_parses_heights() -> None:
+    assert h5.parse_ladder("1080=41,48;360=63") == [(1080, 41), (1080, 48), (360, 63)]
+    assert h5.parse_ladder(None) == []
+    with pytest.raises(SystemExit):
+        h5.parse_ladder("480=40")
+
+
+def test_anchors_validator_reads_each_knob_its_way() -> None:
+    def row(codec: str, height: int, point: int, kbps: float) -> dict:
+        return {"codec": codec, "height": height, "point": point, "kbps": kbps, "decoded_frames": 240,
+                "deterministic": True, "scores": scores()}
+    rows = [row("svtav1-p1", 360, 48, 90.0), row("svtav1-p1", 360, 63, 30.0),
+            row("dcvc-ladder", 540, 0, 20.0), row("dcvc-ladder", 540, 21, 60.0)]
+    result: dict = {"rows": rows, "planned": 4, "frames": 240, "jpeg_gate_holds": True}
+    assert all(h5.validate_anchors(result).values())
+    rows[1]["kbps"] = 120.0  # CRF 63 dearer than CRF 48
+    assert not h5.validate_anchors(result)["rate_moves_with_the_knob"]
+
+
+def test_venue_anchor_is_billed_like_pointstream() -> None:
+    anchors = [scored(k, q, codec="dcvc") for k, q in ((100, 0.3), (200, 0.2), (400, 0.1))]
+    venue = [{**scored(k, q, codec="dcvc-venue")} for k, q in ((40, 0.3), (80, 0.2), (160, 0.1))]
+    rows = [scored(50, 0.3), scored(100, 0.2), scored(200, 0.1)]
+    model = {"scene": 1_000_000.0, "venue": 1_000_000.0}
+    report = h5.item_report(rows, anchors + venue, 0.0, {"bytes": model, "seconds": {"kitchen": 1e6}})
+    free = report["comparisons"]["pointstream|venue|wlpips_fill"]
+    paid = report["comparisons"]["pointstream@kitchen|venue|wlpips_fill"]
+    assert free["bd"] > 0 and paid["bd"] == pytest.approx(free["bd"], abs=0.02)  # same bits, same seconds
+    assert "pointstream@kitchen|pooled|wlpips_fill" in report["comparisons"]

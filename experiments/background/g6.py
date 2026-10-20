@@ -215,6 +215,9 @@ def command_footage(args: argparse.Namespace) -> int:
     _, total = g5c.video_info(Path(args.video))
     parts = scene_parts(item, total, fps)
     native = args.set == "native"
+    unfilled = args.fill == "none"  # H5p 3: whole frames for a venue-adapted whole-frame model
+    if unfilled and native:
+        raise SystemExit("--fill none is for scene footage")
     ranges = native_segments(parts, fps) if native else parts
     if not ranges:
         raise SystemExit(f"{item['id']}: no footage outside the window in {total} frames")
@@ -227,8 +230,8 @@ def command_footage(args: argparse.Namespace) -> int:
     shutil.rmtree(work, ignore_errors=True)
     work.mkdir(parents=True)
     began = time.time()
-    segmenter = Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint)
-    sam = segmenter.provenance("offline_bidirectional")
+    segmenter = None if unfilled else Sam31SequenceSegmenter(checkpoint_path=args.sam_checkpoint)
+    sam = segmenter.provenance("offline_bidirectional") if segmenter else None
     frames_all, keep_all, big_all, records = [], [], [], []
     full_ranges = set()
     ctx = multiprocessing.get_context("spawn")
@@ -239,12 +242,19 @@ def command_footage(args: argparse.Namespace) -> int:
                                                         "boxes": "epic_hand_objects"}}, 0)
         seg_work = work / f"seg{n}"
         with ProcessPoolExecutor(max_workers=1, mp_context=ctx) as pool:
-            decoded = pool.submit(g1.decode_clip, {"plan": clip, "out": str(seg_work), "threads": 8,
-                                                   "path": args.video, "jpeg_dir": str(seg_work / "jpeg")}).result()
+            decoded = pool.submit(g1.decode_clip, {"plan": clip, "out": str(seg_work), "threads": 8, "path": args.video,
+                                                   **({} if unfilled else {"jpeg_dir": str(seg_work / "jpeg")})}).result()
             if native:
                 full_ranges.add(pool.submit(decode_planes_task, {"video": args.video, "indices": clip["indices"],
                                                                  "out": str(seg_work / "planes.npy")}).result(600))
                 big_all.append(np.load(seg_work / "planes.npy"))
+        if unfilled:
+            frames_all.append(np.load(seg_work / "frames.npy"))
+            keep_all.append(np.ones(frames_all[-1].shape[:3], bool))
+            records.append({"first_index": a, "last_index": b, "frames": len(clip["indices"]), "decode": decoded,
+                            "sam_seconds": 0.0, "foreground": None, "fg_share": 0.0})
+            progress(n + 1)
+            continue
         t0 = time.time()
         masks = g1.sam_text_masks(segmenter, clip, seg_work / "jpeg")
         sam_seconds = time.time() - t0
@@ -267,7 +277,10 @@ def command_footage(args: argparse.Namespace) -> int:
     for a, b in zip(offsets[:-1], offsets[1:]):
         chunks += [[int(lo + a), int(hi + a), int(c + a), int(d + a)]
                    for lo, hi, c, d in g5c.fill_chunks(int(b - a), 0, 0) if c < d]
-    filled, propainter = g5c.run_propainter(frames, ~keep, chunks, args, work / "propainter")
+    if unfilled:
+        filled, propainter = frames, None
+    else:
+        filled, propainter = g5c.run_propainter(frames, ~keep, chunks, args, work / "propainter")
     del frames
     publish = scratch / "publish" / "footage"
     publish.mkdir(parents=True)
@@ -301,9 +314,9 @@ def command_footage(args: argparse.Namespace) -> int:
             "guard_s": GUARD_S, "stretch_s": STRETCH_S, "recordings": [item["video"]],
             "source_full_range": sorted(full_ranges) if native else None,
             "segments": [{"video": item["video"], **r} for r in records], "frames": int(len(keep)),
-            "mask": {"name": args.mask, **FOOTAGE_MASKS[args.mask]}, "fill": "propainter", "yuv420_sha256": file_sha256(publish / "filled_yuv420.npy"),
-            "keep_sha256": file_sha256(publish / "keep.npy"),
-            "sam": {"checkpoint_sha256": sam.checkpoint_sha256, "model_revision": sam.model_revision},
+            "mask": None if unfilled else {"name": args.mask, **FOOTAGE_MASKS[args.mask]}, "fill": args.fill,
+            "yuv420_sha256": file_sha256(publish / "filled_yuv420.npy"), "keep_sha256": file_sha256(publish / "keep.npy"),
+            "sam": {"checkpoint_sha256": sam.checkpoint_sha256, "model_revision": sam.model_revision} if sam else None,
             "propainter": propainter}
     write_json(publish / "meta.json", meta)
     write_json(stage_dir() / "g6.json", {"kind": "footage", "limit_frames": args.limit_frames, **meta,
@@ -425,8 +438,12 @@ def fill(rgb: np.ndarray, holes: np.ndarray, args: argparse.Namespace, work: Pat
 def prepare_window(args: argparse.Namespace, work: Path) -> dict[str, Any]:
     """The window, F (dilated by ``--dilate-px``), the filled frames, the clip to score and the metrics."""
     item, rgb, fg, source_record = load_window(args, work)
-    holes = dilate_1080(fg, args.dilate_px) if args.dilate_px else fg
-    filled, propainter = fill(rgb, holes, args, work)
+    if getattr(args, "fill", "propainter") == "none":  # H5p 3: the whole window, unfilled
+        holes = np.zeros_like(fg)
+        filled, propainter = rgb, None
+    else:
+        holes = dilate_1080(fg, args.dilate_px) if args.dilate_px else fg
+        filled, propainter = fill(rgb, holes, args, work)
     n = len(rgb)
     fps = Fraction(item["fps"]).limit_denominator(1001)
     clip = g5.Clip(item["id"], "window", fps, 0, rgb, ~holes,
@@ -593,7 +610,9 @@ def publish_window(args: argparse.Namespace, w: dict[str, Any], rows: list[dict[
     item = w["item"]
     manifest = {"window": item["id"], "video": item["video"], "first_video_index": int(item["first_video_index"]),
                 "frames": w["clip"].n, "fps": str(w["fps"]), "yuv": YUV, "foreground": w["foreground"],
-                "fill": "ProPainter at 960x540 (e870e79), upsampled (bicubic) into F only; the whole frame is coded",
+                "fill": "none: the unfilled window (a venue-adapted whole-frame codec, H5p 3)"
+                if getattr(args, "fill", "propainter") == "none" else
+                "ProPainter at 960x540 (e870e79), upsampled (bicubic) into F only; the whole frame is coded",
                 "source": w["source"]["window"], **provenance(), **g5c.gpu_record(),
                 "timings": "decode times on a shared GPU are not citable; the job's state records contention",
                 **extra, "points": entries}
@@ -627,6 +646,8 @@ def command_format(args: argparse.Namespace) -> int:
             raise RuntimeError("the published checkpoint is not the one its result recorded")
         arm_record = {k: arm.get(k) for k in ("arm", "id", "item", "fill", "steps", "fit", "footage")} | {
             "model_sha256": arm["model"]["checkpoint_sha256"], "converged": arm.get("converged")}
+    if arm_record and (arm_record["fill"] == "none") != (args.fill == "none"):
+        raise SystemExit(f"{args.arm}: trained with fill {arm_record['fill']}, coding with fill {args.fill}")
     w = prepare_window(args, work)
     item, clip = w["item"], w["clip"]
     if arm_record and arm_record["id"].split("/")[-1] != item["video"]:
@@ -769,6 +790,16 @@ def validate_stage(stage: Path) -> dict[str, bool]:
     result = json.loads((stage / "g6.json").read_text())
     full = not result["limit_frames"]
     gpu = tuple(result.get("gpu_capability") or (0, 0)) >= (8, 6)
+    if result["kind"] == "footage" and result.get("fill") == "none":  # H5p 3: whole frames, nothing masked
+        guard = round(result["guard_s"] * result["source_fps"])
+        lo, hi = result["window"][0] - guard, result["window"][1] + guard
+        return {
+            "intended_gpu": gpu,
+            "segments_present": bool(result["segments"]) and result["frames"] == result["segments"][-1]["end"],
+            "nothing_masked": all(s["fg_share"] == 0.0 for s in result["segments"]) and result["propainter"] is None,
+            "outside_window_and_guard": all(s["last_index"] < lo or s["first_index"] > hi for s in result["segments"]),
+            "enough_frames": result["frames"] >= 300 if full else result["frames"] > 0,
+        }
     if result["kind"] == "footage":
         mask = result.get("mask") or FOOTAGE_MASKS["g1"]
         guard = round(result["guard_s"] * result["source_fps"])
@@ -812,7 +843,7 @@ def validate_stage(stage: Path) -> dict[str, bool]:
                                   for r in rows for a, b in zip(r["points"], r["points"][1:])),
         "foreground_plausible": 0.0 < result["foreground_share"] < 0.8,
         "window_is_the_released_one": result["source"]["jpeg_gate_holds"],
-        "propainter_on_gpu": result["propainter"]["gpu"] == result["gpu"],
+        "propainter_on_gpu": result["propainter"] is None or result["propainter"]["gpu"] == result["gpu"],
     }
     if result.get("published"):
         checks["published"] = bool(result["publish_check"].get("complete"))
@@ -848,6 +879,8 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--restore", default=None, help="an extracted checkpoint.tar of a failed run of this window")
         p.add_argument("--publish", action="store_true", help="publish decoded frames, bitstreams and a manifest")
     fo.add_argument("--arm", default=None, help="the window's scene model: a train (or G5c finetune) archive")
+    fo.add_argument("--fill", choices=("propainter", "none"), default="propainter",
+                    help="none: code the unfilled window (H5p 3's venue-adapted whole-frame anchor)")
     fo.add_argument("--methods", default=",".join(METHODS))
     fo.add_argument("--values", default=None, help="METHOD=V,V;... over the default grid")
     fo.set_defaults(func=command_format)
@@ -862,6 +895,8 @@ def main(argv: list[str] | None = None) -> int:
     ft.add_argument("--mask", choices=tuple(FOOTAGE_MASKS), default="g1",
                     help="g1: G1's foreground (dilated, hand and object boxes); exact: shaped like the window's F")
     ft.add_argument("--limit-frames", type=int, default=0)
+    ft.add_argument("--fill", choices=("propainter", "none"), default="propainter",
+                    help="none: whole frames, no segmenter or fill (H5p 3's venue-adapted whole-frame anchor)")
     ft.set_defaults(func=command_footage)
     tr = sub.add_parser("train")
     for name in ("eval-set", "item", "footage", "image-ckpt", "video-ckpt", "lpips-backbone"):

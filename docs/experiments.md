@@ -6263,6 +6263,72 @@ invocation turns out to be needed.
 - Results: `pointstream-data/visor/h5-2026-10-16/mask-video-6806e31/`
   (each job's `h5.json` and the estimate).
 
+### 2026-10-20 — H5p 3: fair anchors (equal-time SVT-AV1 with the low-rate ladder; a venue-adapted DCVC-UF)
+- Question (PLAN H5p 3): H5's anchors are B2's SVT-AV1 at preset 4 and
+  DCVC-UF HT-L off the shelf, at 1080p only. PointStream gets an
+  equal-time encoder budget (H5's timing: preset 1), models fitted to the
+  venue, and rates down to 14–29 kbps, where the anchors' floor is
+  162–525 kbps, so its scene-route points go unread. Does PointStream
+  still pass rule (a) when the anchors get the same:
+  (a) preset 1 and lower rates through lower resolutions (PLAN B2b 3);
+  (b) the same adaptation, a whole-frame DCVC-UF fine-tuned on the venue?
+  (b) also separates the paper's two possible claims: the object split,
+  or the adaptation alone.
+- Method.
+  - (a) `h5 anchors`, per item, scored by H5's harness (B2's metrics on
+    both mask sets plus masked DISTS; whole frames).
+    - Downscale: area average in RGB, as G6's backgrounds. Upscale:
+      bicubic to 1080p, as PointStream's client.
+    - SVT-AV1 4.2.0 at preset 1: 1080p CRF 41, 48, 55, 62, 70; 720p, 540p
+      and 360p CRF 48, 55, 62, 70.
+    - DCVC-UF HT-L off the shelf: 1080p QP 0 and 13, below B2's 27–63,
+      which stay in from H5's stages; 540p and 360p QP 0, 21, 42.
+    - Points chosen from PointStream's rate range alone (14 kbps to
+      10 Mbps), before any is scored.
+  - (b) G6's pipeline with the fill switched off (`--fill none`, new):
+    - footage of the item's own video outside the window, whole frames,
+      no segmenter, no ProPainter;
+    - recipe L's training (540 steps, lr 3e-5, LPIPS weight 0.005), the
+      same as PointStream's scene model;
+    - `format` on the unfilled window at PointStream's scene grid (540p QP
+      0, 13, 25, 38; 1080p QP 13, 25, 38, 50, 63);
+    - its published decodes scored by `h5 anchors --venue` as anchor
+      `dcvc-venue`.
+    - Billed as PointStream's scene model: its 4-bit change (sized by
+      `h5 model-size`) over the kitchen's footage. PointStream billed per
+      kitchen too (H5p 1's standing billing).
+- Decision rule, fixed now. PointStream (G_HO in the foreground slots, F
+  granted, venue models billed per kitchen) judged by rule (a) (weighted
+  LPIPS with fill, mean −10% or better, 3 of 4 items below zero) against
+  the fair pooled envelope: the hull of SVT-AV1 at preset 1 with the
+  ladder, DCVC-UF off the shelf (B2's points and the ladder), and
+  `dcvc-venue` billed per kitchen.
+  - Passes: the background result stands against fair anchors (still
+    pending F, H5p 4, and the cross-video check of H5p 1).
+  - Fails: the paper does not claim PointStream beats a venue-adapted
+    codec. The rule is also read against each family alone (which one
+    closes the gap), and against `dcvc-venue` by itself (adaptation
+    without the object split).
+- Hypothesis. Preset 1 helps SVT-AV1 by 10–20%, but DCVC-UF holds the
+  pooled hull at most rates, so (a) changes little above 160 kbps; below
+  it the ladder gives the anchors points, and PointStream's scene route
+  wins there on weighted LPIPS (an upscaled 360p frame is blurred
+  everywhere). `dcvc-venue` is the binding anchor: it gets recipe L's
+  background gain (G5c: −66 to −92% on LPIPS_V against SVT-AV1) on the
+  whole frame. Rule (a) still passes, with a margin of −10 to −20%
+  instead of −25%.
+- Competing explanation. PointStream's gain is the venue adaptation, not
+  the split: `dcvc-venue` matches or beats it, and the object-centric
+  part adds nothing at equal adaptation. If so, the paper's contribution
+  is the adaptation, and the split has to earn its place elsewhere (rate
+  control by region, or the foreground's own coder).
+- Budget. (a) SVT-AV1: 2 jobs per item (1080p; 720p to 360p), 32 CPU
+  threads and a shared GPU for scoring, under 40 minutes each. DCVC-UF
+  ladder: 1 job per item, shared GPU. (b) per item: footage (CPU), train
+  (GPU, about 30 minutes), format (GPU), venue scoring (GPU); one CPU size
+  job. About 11 GPU-hours (scoring-dominated), ceiling 14; every stage
+  under 45 minutes.
+
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
   can a body-pose estimator's keypoints carry the players? Per part
