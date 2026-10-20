@@ -303,7 +303,12 @@ def command_footage(args: argparse.Namespace) -> int:
         big_keep.flush()
         del yuv, big_keep
     else:
-        np.save(publish / "filled_yuv420.npy", g5.rgb_to_yuv420(filled))
+        yuv = np.lib.format.open_memmap(publish / "filled_yuv420.npy", mode="w+", dtype=np.uint8,
+                                        shape=(len(filled), filled.shape[1] * 3 // 2, filled.shape[2]))
+        for i in range(0, len(filled), 64):  # in chunks: the whole set in float32 stalled a loaded host (H5p 3)
+            yuv[i:i + 64] = g5.rgb_to_yuv420(filled[i:i + 64])
+        yuv.flush()
+        del yuv
         np.save(publish / "keep.npy", keep)
     for rec, a, b in zip(records, offsets[:-1], offsets[1:]):
         rec.update(offset=int(a), end=int(b))
