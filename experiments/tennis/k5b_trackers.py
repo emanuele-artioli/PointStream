@@ -430,8 +430,11 @@ def command_run(args: argparse.Namespace) -> int:
         clips = racketvision_clips(Path(args.racketvision), str(which))
     else:
         clips = tracknet_clips(Path(args.tracknet), list(which))  # type: ignore[arg-type]
-    if args.limit:
+    clips = part_of(clips, args.part)
+    if int(args.limit):
         clips = clips[: int(args.limit)]
+    if not clips:
+        raise SystemExit("no clip selected")
     zoo = Zoo(Path(args.wasb_code), Path(args.wasb_weights))
     balltrack = BallTrack(Path(args.balltrack_code), Path(args.balltrack))
     done = len([c for c in clips if safe(args.set, c["id"]) in restored])
@@ -471,7 +474,7 @@ def command_run(args: argparse.Namespace) -> int:
         progress(done)
         print(f"{clip['id']}: {row['seconds']} s " + " ".join(f"{n}={row['candidates'][n]['detection_rate']}" for n in CANDIDATES), flush=True)
     write_json(stage_dir() / "k5b-trackers.json", {
-        "stage": os.environ.get("PS_STAGE", "local"), "set": args.set, "select": args.select, "clips": [c["id"] for c in clips],
+        "stage": os.environ.get("PS_STAGE", "local"), "set": args.set, "select": args.select, "part": args.part, "clips": [c["id"] for c in clips],
         "restored": sorted(restored), "device": torch.cuda.get_device_name(0), "torch": torch.__version__,
         "on_cuda": {n: str(next(s["net"].parameters()).device) for n, s in zoo.settings.items()}
         | {"balltrack": str(next(balltrack.net.parameters()).device)},
@@ -483,6 +486,15 @@ def command_run(args: argparse.Namespace) -> int:
         "seconds_per_candidate": {k: round(v, 1) for k, v in seconds.items()},
     })
     return 0
+
+
+def part_of(clips: list[dict[str, Any]], part: str) -> list[dict[str, Any]]:
+    """Part ``i/n`` (1-based): the i-th of n contiguous, nearly equal chunks of the set's clips."""
+    i, n = (int(v) for v in part.split("/"))
+    if not 1 <= i <= n:
+        raise SystemExit(f"bad part {part}")
+    bounds = np.linspace(0, len(clips), n + 1).round().astype(int)
+    return clips[bounds[i - 1]:bounds[i]]
 
 
 def safe(set_name: str, clip_id: str) -> str:
@@ -504,6 +516,7 @@ def rows_from_tar(path: Path) -> list[dict[str, Any]]:
 
 def validate_rows(rows: list[dict[str, Any]], record: dict[str, Any]) -> dict[str, bool]:
     return {
+        "clips_scored": len(rows) > 0 and len(record["clips"]) > 0,
         "every_clip_published": sorted(r["id"] for r in rows) == sorted(record["clips"]),
         "every_candidate_scored": all(set(r["candidates"]) == set(CANDIDATES) for r in rows),
         "a_prediction_per_frame": all(len(c["predictions"]) == r["frames"] == len(r["labels"]) for r in rows for c in r["candidates"].values()),
@@ -588,6 +601,7 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--set", required=True, choices=["tracknet", "svt", "racketvision"])
     run.add_argument("--select", required=True)
     run.add_argument("--limit", default="0")
+    run.add_argument("--part", default="1/1")
     run.add_argument("--wasb-code", required=True)
     run.add_argument("--wasb-weights", required=True)
     run.add_argument("--balltrack", required=True)

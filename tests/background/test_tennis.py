@@ -229,3 +229,12 @@ def test_k5b_trackers_attrdict_reads_nested_keys_both_ways():
 
     cfg = kt.AttrDict.of({"MODEL": {"EXTRA": {"STAGE": [{"A": 1}]}}})
     assert cfg.MODEL.EXTRA["STAGE"][0].A == 1 and cfg["MODEL"]["EXTRA"].STAGE[0]["A"] == 1
+
+
+def test_k5b_trackers_parts_cover_every_clip_once():
+    from experiments.tennis import k5b_trackers as kt
+
+    clips = [{"id": str(i)} for i in range(43)]
+    parts = [kt.part_of(clips, f"{i}/3") for i in (1, 2, 3)]
+    assert [c["id"] for p in parts for c in p] == [c["id"] for c in clips] and {len(p) for p in parts} <= {14, 15}
+    assert kt.part_of(clips, "1/1") == clips
