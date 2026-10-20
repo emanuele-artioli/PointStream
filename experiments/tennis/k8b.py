@@ -242,18 +242,12 @@ def run(args: argparse.Namespace) -> int:
     for saved_path in checkpoints.glob("chunk-*.json"):
         saved = json.loads(saved_path.read_text())
         done[(saved["clip"], saved["start"])] = saved["rows"]
-    todo = [c for c in work if (c["clip"], c["start"]) not in done]
-    with ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context("spawn")) as pool:
-        futures = {pool.submit(register_chunk, clips[c["clip"]]["video"], c["start"], c["end"], native["ffmpeg"]["path"]): c
-                   for c in todo}
-        for future in as_completed(futures):
-            c = futures[future]
-            done[(c["clip"], c["start"])] = future.result()
-            key = hashlib.sha256(f"{c['clip']}:{c['start']}".encode()).hexdigest()[:16]
-            checkpoint(f"chunk-{key}.json", {"clip": c["clip"], "start": c["start"], "rows": done[(c["clip"], c["start"])]})
-            publish_progress(os.environ.get("PS_STAGE", "local"), len(done))
-    results = []
-    for clip_id, clip in sorted(clips.items()):
+    results: dict[str, dict[str, Any]] = {}
+
+    def finalize(clip_id: str) -> None:
+        """Cuts, shots and review images for a clip whose chunks are all done; published at once,
+        so a stage stopped later still keeps it in partial.tar."""
+        clip = clips[clip_id]
         rows = [r for a in range(0, clip["frames"], CHUNK) for r in done[(clip_id, a)]]
         if [r["frame"] for r in rows] != list(range(clip["frames"])):
             raise ValueError(f"{clip_id}: frames not covered exactly once")
@@ -270,9 +264,30 @@ def run(args: argparse.Namespace) -> int:
                   "source_frames": clip["meta"]["frames"], "stream": clip["meta"], "scene_scores": scenes,
                   "scene_command": scene_command, "cuts": cuts, "shots": shots, "registration": rows}
         write_json(publish / "clips" / f"{prefix}.json", result)
-        results.append({k: result[k] for k in ("id", "frames", "source_frames", "fps", "cuts")} | {"shots": len(shots)})
+        results[clip_id] = {k: result[k] for k in ("id", "frames", "source_frames", "fps", "cuts")} | {"shots": len(shots)}
+
+    def complete(clip_id: str) -> bool:
+        return all((clip_id, a) in done for a in range(0, clips[clip_id]["frames"], CHUNK))
+
+    for clip_id in sorted(clips):
+        if complete(clip_id):
+            finalize(clip_id)
+    # Longest clips first, chunk by chunk, so clips finish progressively and the tail is short.
+    order = sorted(clips, key=lambda k: (-clips[k]["frames"], k))
+    todo = [c for k in order for c in work if c["clip"] == k and (c["clip"], c["start"]) not in done]
+    with ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context("spawn")) as pool:
+        futures = {pool.submit(register_chunk, clips[c["clip"]]["video"], c["start"], c["end"], native["ffmpeg"]["path"]): c
+                   for c in todo}
+        for future in as_completed(futures):
+            c = futures[future]
+            done[(c["clip"], c["start"])] = future.result()
+            key = hashlib.sha256(f"{c['clip']}:{c['start']}".encode()).hexdigest()[:16]
+            checkpoint(f"chunk-{key}.json", {"clip": c["clip"], "start": c["start"], "rows": done[(c["clip"], c["start"])]})
+            publish_progress(os.environ.get("PS_STAGE", "local"), len(done))
+            if complete(c["clip"]) and c["clip"] not in results:
+                finalize(c["clip"])
     report = {"schema": 1, "decision": DECISION, "part": args.part, "parts": args.parts, "chunk": CHUNK,
-              "manifest_sha256": file_sha256(args.manifest), "clips": results, "native_tools": native,
+              "manifest_sha256": file_sha256(args.manifest), "clips": [results[k] for k in sorted(results)], "native_tools": native,
               "frames_limit": args.frames, "runtime_seconds": time.monotonic() - began, "device": "cpu",
               "court_code_sha256": file_sha256(Path(__file__).with_name("court.py")),
               "worker_code_sha256": file_sha256(Path(__file__))}
@@ -280,7 +295,7 @@ def run(args: argparse.Namespace) -> int:
     stage = os.environ.get("PS_STAGE_DIR")
     if stage:
         write_json(Path(stage) / "k8b.json", report)
-    print(json.dumps({"clips": len(results), "frames": sum(r["frames"] for r in results),
+    print(json.dumps({"clips": len(results), "frames": sum(r["frames"] for r in results.values()),
                       "seconds": report["runtime_seconds"]}), flush=True)
     return 0
 
@@ -503,7 +518,7 @@ def main() -> int:
     r.add_argument("--manifest", type=Path, required=True)
     r.add_argument("--archive", type=Path, required=True)
     r.add_argument("--part", type=int, required=True)
-    r.add_argument("--parts", type=int, default=3)
+    r.add_argument("--parts", type=int, default=8)
     r.add_argument("--frames", type=int, default=0)
     r.add_argument("--workers", type=int, default=8)
     sub.add_parser("validate")
