@@ -5969,10 +5969,10 @@ invocation turns out to be needed.
   payback was never computed (H3d: per-video networks fail once billed on
   these short videos); (2) the anchors get no such adaptation: a
   whole-frame DCVC-UF adapted the same way, and SVT-AV1 at the equal-time
-  preset 1, are the fair anchors; (3) the scene model, the enhancer, G and
-  G_HO were trained with LPIPS in their losses, so LPIPS and DISTS (a
-  related deep-feature metric) need a metric none of them saw and a visual
-  check; (4) F is granted (H5m).
+  preset 1, are the fair anchors; (3) F is granted (H5m). Metrics (user,
+  2026-10-20): training a model on LPIPS (or any metric or combination) and
+  scoring on the same metrics is legitimate and is not a gate; the scores
+  stay LPIPS, DISTS and PSNR, with a visual check beside them.
 
 ### 2026-10-17 — H5m: coding F (the mask PointStream's decoder needs)
 - Question (after H5's pilot, user 2026-10-17): H5's gain holds only with

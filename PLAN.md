@@ -938,11 +938,31 @@ items; rule −10%, 3 of 4); frame LPIPS −21% and DISTS −28% survive on 4 of
 measured streams were coded for exact F), then F carried by the
 foreground stream itself. *G_HO (H4c) in both foreground slots
 (2026-10-20):* weighted LPIPS −29% (CI −38 to −19, 4 of 4), DISTS −23%
-(4 of 4), with F granted. Before any 34-item run (user, 2026-10-20: the
-big run waits for the paper's figures), cheap pilot-scale checks of
-fairness: the venue models' payback, a whole-frame venue-adapted DCVC-UF
-anchor and SVT-AV1 at preset 1, a metric none of the models trained on,
-and F (re-encode from F̂, then F at the client).
+(4 of 4), with F granted.
+
+*H5p, pilot-scale checks before any 34-item run (user, 2026-10-20: the
+34-item run waits for the paper's figures; plan these instead).* On the
+4 pilot items, each with its rule written before its run, about 10
+GPU-hours in all:
+1. *Venue models' payback (CPU, minutes).* From the recorded model sizes
+   (scene-model checkpoint, enhancer weights per CRF): the rate each saves
+   at matched quality against the same route without it, and the seconds
+   of video it takes to repay its bytes. Decides whether the routes stand
+   as per-venue models or need a model shared across a kitchen's videos.
+2. *Fair anchors.* (a) SVT-AV1 at the equal-time preset 1, with B2b's
+   low-rate ladder (720p, 540p, 360p, upscaled) so the anchors reach
+   PointStream's low rates (CPU; B2b items 2–3 on the pilots). (b) A
+   whole-frame DCVC-UF adapted to the venue the same way (G6's recipe L on
+   unfilled footage, coded on the unfilled window; about 8 jobs). PointStream
+   is re-judged against the new pooled envelope.
+3. *F.* Re-encode the foreground with K from F̂ at s = 8 and 16 (H5m's
+   streams were coded for the exact F) and rescore; then an oracle for F
+   carried by the foreground stream itself (no MASK segment), and a
+   motion-compensated mask (F as an alpha plane through a video codec).
+4. *Visual check (CPU).* Side-by-side crops of PointStream and the anchors
+   at matched rates, for the user's review.
+Scores stay LPIPS, DISTS and PSNR (a model trained on a metric may be
+judged on it, user 2026-10-20).
 
 #### K. Where keypoints win (analysis, user 2026-10-13)
 
