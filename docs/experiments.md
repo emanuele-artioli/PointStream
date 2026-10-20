@@ -6074,6 +6074,59 @@ invocation turns out to be needed.
 - Report: `pointstream-data/visor/h5-2026-10-16/report-h5m-7ffa414/`.
 - GPU time: about 2.5 GPU-hours (16 jobs).
 
+### 2026-10-20 — H5p 1: the venue models' payback
+- Question (PLAN H5p 1): H5's background routes use models fitted on the
+  window's own video, never billed: the scene model (recipe L, the whole
+  DCVC-UF HT-L fine-tuned) and the enhancer (G5d's network, one per CRF).
+  Once their bits are paid, does PointStream (G_HO in the foreground
+  slots, F granted) still pass H5's rule (a)? Billed over one video, or
+  only over a kitchen's footage?
+- Sizes.
+  - Scene model: what the client needs is the 4-bit change from the public
+    HT-L weights, LZMA-coded (G5c's coder `g5c.compress_state`, variant
+    `delta-4`), measured on each pilot's model in one CPU job
+    (`h5 model-size`). G5c found this variant keeps quality on recipe L's
+    models (+0.4% and +2.2% BD-rate on LPIPS_V against the 16-bit model):
+    assumed here for G6's models, not re-checked.
+  - Enhancer: its fp16 file (1,198,115 bytes), one per operating point
+    (the network of its CRF).
+  - Not billed: DCVC-UF's public weights, G_HO and ProPainter, all
+    generic and shipped with the decoder.
+- Billing (`h5 report --billing`): a pair's rate gains its background
+  model's bits divided by the seconds it serves:
+  - *video*: the item's whole video (ffprobe: P01_107 119 s, P02_02 207
+    s, P03_10 103 s, P09_106 149 s);
+  - *kitchen*: the participant's recordings on disk (EPIC-KITCHENS
+    participants film one kitchen each; P01 10 videos, 10,503 s; P02 19,
+    10,661 s; P03 18, 8,702 s; P09 6, 2,330 s). The dataset holds more
+    footage than is on disk, so this undercounts.
+  Beside it, the payback: at each point of PointStream's hull inside the
+  pooled anchors' range, the model's bits over the rate it saves at equal
+  weighted LPIPS (seconds of stream).
+- Decision rule, fixed now: H5's rule (a) on the billed curves (weighted
+  LPIPS with fill, pooled anchors, mean BD-rate −10% or better, at least
+  3 of 4 items below zero).
+  - Passes billed per *video*: the routes stand as per-video models.
+  - Else passes per *kitchen*: they stand as per-kitchen models. A model
+    fitted on one video then has to serve the kitchen's other videos, so
+    a cross-video check follows (a model fitted on other recordings of
+    the kitchen, scored on the pilot window) before the paper claims it.
+  - Else neither: the background needs a generic model, or one far
+    smaller (G5c step 4's partial or low-rank adaptation), before any
+    background claim.
+- Hypothesis. Per video fails: the change is about 50 MB (G5c), 2–4 Mbps
+  over these videos, above every hull point. Per kitchen it costs about
+  40 kbps (P01–P03) and 170 kbps (P09), comparable to the hull's low end
+  (14–60 kbps, all on the scene route), so the low rates are lost to the
+  enhancer route or the anchors. Rule (a) passes per kitchen on P01–P03
+  with a smaller margin than −29%, and P09 fails.
+- Competing explanation. Rule (a) can pass per kitchen only because the
+  undercounted footage is still long enough; the per-kitchen verdict also
+  rests on the untested assumption that one model serves the kitchen. The
+  rule's cross-video check separates the two.
+- Budget: one CPU job (four 482 MB checkpoints against the public
+  weights, under 20 minutes); the report runs locally. No GPU.
+
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
   can a body-pose estimator's keypoints carry the players? Per part

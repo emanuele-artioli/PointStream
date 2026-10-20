@@ -6,7 +6,8 @@
     python -m experiments.visor.h5 time WINDOW --arm DIR --enhancers DIR --generic TAR ... --propainter-tree DIR \\
         --propainter-ckpt P --raft-ckpt P --flow-completion-ckpt P --threads 32
     python -m experiments.visor.h5 validate
-    python -m experiments.visor.h5 report --score H5.JSON ... --out DIR
+    python -m experiments.visor.h5 report --score H5.JSON ... --out DIR [--billing BILLING.JSON]
+    python -m experiments.visor.h5 model-size --arm DIR ... --video-ckpt P [--limit-tensors N]
 
 WINDOW is ``--eval-set E.JSON --archive DIR --dense-masks DIR --fill-masks DIR --video P.MP4 --item ID
 --image-ckpt P --video-ckpt P --lpips-backbone P``.
@@ -1036,7 +1037,56 @@ def validate(stage: Path) -> dict[str, bool]:
     result = json.loads((stage / "h5.json").read_text())
     if result["kind"] == "time":
         return validate_time(result)
+    if result["kind"] == "model-size":
+        return validate_model_size(result)
     return validate_foreground(result) if result["kind"] == "foreground" else validate_score(result)
+
+
+MODEL_VARIANTS = ("delta-4", "delta-8")  # G5c: delta-4 is recipe L's shipped size (keeps quality within +2.2%)
+
+
+def command_model_size(args: argparse.Namespace) -> int:
+    """H5p 1: what each scene model costs to send (G5c's coder: the change from the public HT-L weights the client
+    has, quantized per output channel, LZMA per tensor). CPU only."""
+    from experiments.background.g5c import compress_state, load_plain
+
+    began = time.time()
+    public_sha = file_sha256(Path(args.video_ckpt))
+    public = load_plain(Path(args.video_ckpt))
+    rows = []
+    for i, arm in enumerate(args.arm):
+        ft_dir = Path(arm) / "publish" / "finetune"
+        trained = json.loads((ft_dir / "result.json").read_text())
+        checkpoint = ft_dir / "video_ft.pth.tar"
+        sha = file_sha256(checkpoint)
+        if sha != trained["model"]["checkpoint_sha256"]:
+            raise RuntimeError(f"{arm}: the published checkpoint is not the one its result recorded")
+        if trained["base_checkpoints"]["video_sha256"] != public_sha:
+            raise SystemExit(f"{arm}: fine-tuned from other public weights than {args.video_ckpt}")
+        ft = load_plain(checkpoint)
+        names = sorted(ft)[:args.limit_tensors] if args.limit_tensors > 0 else sorted(ft)
+        ft, base = {k: ft[k] for k in names}, {k: public[k] for k in names}
+        sizes = [compress_state(ft, base, v, workers=args.threads)[1] for v in args.variants.split(",")]
+        rows.append({"item": trained["item"], "arm": trained["arm"], "train_seconds": trained.get("train_seconds"),
+                     "checkpoint_sha256": sha, "checkpoint_bytes": checkpoint.stat().st_size,
+                     "parameters": trained["model"]["parameters"], "tensors": len(names), "sizes": sizes})
+        progress(i + 1)
+    write_json(stage_dir() / "h5.json", {"kind": "model-size", "limit_tensors": args.limit_tensors,
+                                         "public_sha256": public_sha, "rows": rows,
+                                         "seconds": round(time.time() - began, 1)})
+    return 0
+
+
+def validate_model_size(result: dict[str, Any]) -> dict[str, bool]:
+    rows = result["rows"]
+    return {
+        "every_arm_sized": bool(rows) and all(len(r["sizes"]) == len(MODEL_VARIANTS) for r in rows),
+        "distinct_models": len({r["checkpoint_sha256"] for r in rows}) == len(rows),
+        "fewer_bits_smaller": all(r["sizes"][0]["bytes"] < r["sizes"][1]["bytes"] < r["checkpoint_bytes"] for r in rows),
+        # a change from the public weights, so smaller than the 16-bit whole model (parameters x 2 bytes)
+        "change_below_whole16": all(s["bytes"] < 2 * r["parameters"] for r in rows for s in r["sizes"])
+        if result["limit_tensors"] <= 0 else True,
+    }
 
 
 def command_validate(args: argparse.Namespace) -> int:
@@ -1139,7 +1189,34 @@ def variant_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     return out
 
 
-def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_kbps: float) -> dict[str, Any]:
+def billed(rows: list[dict[str, Any]], model_bytes: dict[str, float], seconds: float) -> list[dict[str, Any]]:
+    """H5p 1: each pair with its background route's model bits spread over ``seconds`` of stream."""
+    return [{**r, "kbps": r["kbps"] + 8 * model_bytes.get(r["route"], 0.0) / seconds / 1000} for r in rows]
+
+
+def payback(points: list[dict[str, Any]], anchors: list[dict[str, Any]], model_bytes: dict[str, float]) -> list[dict[str, Any]]:
+    """At each point of ``points``' hull (headline metric) inside the anchors' quality range: the rate it saves
+    against the anchors' hull at equal quality, and the seconds of stream its route's model takes to repay."""
+    import math
+
+    from experiments.background.g5 import envelope
+
+    a = envelope(curve(anchors, HEADLINE))
+    out = []
+    for rate, q in envelope(curve(points, HEADLINE)):
+        if not a or not a[0][1] <= q <= a[-1][1]:
+            continue
+        row = next(r for r in points if r["kbps"] == rate and METRICS[HEADLINE][2] * r["scores"][FILL]["wlpips"] == q)
+        anchor_kbps = math.exp(float(np.interp(q, [x for _, x in a], [math.log(r) for r, _ in a])))
+        saving = anchor_kbps - rate
+        bits = 8 * model_bytes.get(row["route"], 0.0)
+        out.append({"pair": row["pair"], "route": row["route"], "kbps": rate, "anchor_kbps": anchor_kbps,
+                    "saving_kbps": saving, "payback_seconds": bits / (saving * 1000) if saving > 0 else None})
+    return out
+
+
+def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_kbps: float,
+                billing: dict[str, Any] | None = None) -> dict[str, Any]:
     from experiments.background.g5 import envelope
 
     groups = {"svtav1": [a for a in anchors if a["codec"] == "svtav1"],
@@ -1161,6 +1238,18 @@ def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_
                     key=lambda r: r["kbps"])
         out["hull"][variant] = [{"pair": r["pair"], "kbps": r["kbps"], "wlpips": r["scores"][FILL]["wlpips"],
                                  "background_share": r["kbps_background"] / r["kbps"]} for r in on]
+    if billing and groups["pooled"]:  # H5p 1: the venue models' bits paid over a video or a kitchen
+        variants = variant_rows(rows)
+        out["payback"] = {}
+        for variant in ("pointstream", "gho"):
+            if not variants.get(variant):
+                continue
+            out["payback"][variant] = payback(variants[variant], groups["pooled"], billing["bytes"])
+            for basis, seconds in billing["seconds"].items():
+                points = billed(variants[variant], billing["bytes"], seconds)
+                for metric, (_, _, _, minimum) in METRICS.items():
+                    out["comparisons"][f"{variant}@{basis}|pooled|{metric}"] = compare(
+                        curve(points, metric), curve(groups["pooled"], metric), minimum)
     pointstream = [r for r in rows if r["route"] in VARIANTS["pointstream"] and not r.get("mask_scale")]
     out["matched"] = matched_regions(pointstream, anchors) if pointstream and anchors else []
     return out
@@ -1241,11 +1330,12 @@ def command_report(args: argparse.Namespace) -> int:
         d["mask"] = d["mask"] or result["foreground_manifest"]["mask_cost"]
         d["sources"].append({"path": path, "job_id": result.get("job_id"), "git_head": result.get("git_head"),
                              "gpu": result.get("gpu")})
-    items = {i: item_report(d["rows"], d["anchors"], d["mask"]["kbps"]) for i, d in data.items()}
+    billing = json.loads(Path(args.billing).read_text()) if args.billing else {}
+    items = {i: item_report(d["rows"], d["anchors"], d["mask"]["kbps"], billing.get(i)) for i, d in data.items()}
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     report = {"items": items, **summary(items), "sources": {i: d["sources"] for i, d in data.items()},
-              "mask": {i: d["mask"] for i, d in data.items()}}
+              "mask": {i: d["mask"] for i, d in data.items()}, "billing": billing}
     write_json(out / "h5-report.json", report)
     if not args.no_plot:
         plot(items, data, out / "h5-rd.png")
@@ -1301,6 +1391,13 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--score", action="append", required=True, help="full score stages' h5.json")
     p.add_argument("--out", required=True)
     p.add_argument("--no-plot", action="store_true")
+    p.add_argument("--billing", help="H5p 1: JSON {item: {bytes: {route: model bytes}, seconds: {basis: s}}}")
+    p = sub.add_parser("model-size")
+    p.add_argument("--arm", action="append", required=True, help="G6's train jobs' archives (extracted)")
+    p.add_argument("--video-ckpt", required=True, help="the public DCVC-UF HT-L weights they were fine-tuned from")
+    p.add_argument("--variants", default=",".join(MODEL_VARIANTS))
+    p.add_argument("--limit-tensors", type=int, default=0, help="the first N tensors only (smoke)")
+    p.add_argument("--threads", type=int, default=16)
     args = parser.parse_args(argv)
     if args.command == "foreground":
         return command_foreground(args)
@@ -1310,6 +1407,8 @@ def main(argv: list[str] | None = None) -> int:
         return command_report(args)
     if args.command == "time":
         return command_time(args)
+    if args.command == "model-size":
+        return command_model_size(args)
     return command_validate(args)
 
 

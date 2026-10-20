@@ -163,3 +163,28 @@ def test_tagged_variant_replaces_only_its_foregrounds() -> None:
     v = h5.variant_rows(base + gho)
     assert len(v["pointstream"]) == 2
     assert sorted((r["foreground"], r.get("tag", "")) for r in v["gho"]) == [("dcvc-21_4", "gho"), ("dcvc-63_1", "")]
+
+
+def test_billing_adds_the_routes_model_and_payback_repays_it() -> None:
+    anchors = [scored(k, q, codec="dcvc") for k, q in ((100, 0.3), (200, 0.2), (400, 0.1))]
+    rows = [scored(50, 0.3), scored(100, 0.2), scored(150, 0.15, route="enh"), scored(200, 0.1)]
+    model = {"scene": 1_000_000.0, "enh": 100_000.0}  # bytes
+    out = h5.billed(rows, model, 100.0)  # 80 kbps for the scene model, 8 kbps for the enhancer
+    assert [round(r["kbps"] - b["kbps"], 6) for r, b in zip(out, rows)] == [80.0, 80.0, 8.0, 80.0]
+    pay = h5.payback(rows, anchors, model)
+    first = next(p for p in pay if p["kbps"] == 50)
+    assert abs(first["anchor_kbps"] - 100) < 1e-6 and abs(first["payback_seconds"] - 8e6 / 50e3) < 1e-6
+    report = h5.item_report(rows, anchors, 0.0, {"bytes": model, "seconds": {"video": 10.0, "kitchen": 1e6}})
+    free = report["comparisons"]["pointstream|pooled|wlpips_fill"]["bd"]
+    assert report["comparisons"]["pointstream@kitchen|pooled|wlpips_fill"]["bd"] == pytest.approx(free, abs=1e-3)
+    assert not h5.below_zero(report["comparisons"]["pointstream@video|pooled|wlpips_fill"])
+
+
+def test_model_size_validator() -> None:
+    def size(b: int) -> dict:
+        return {"bytes": b}
+    row = {"checkpoint_sha256": "a", "checkpoint_bytes": 480, "parameters": 120, "sizes": [size(50), size(110)]}
+    result: dict = {"rows": [row, {**row, "checkpoint_sha256": "b"}], "limit_tensors": 0}
+    assert all(h5.validate_model_size(result).values())
+    result["rows"][1]["sizes"] = [size(300), size(110)]
+    assert not h5.validate_model_size(result)["fewer_bits_smaller"]
