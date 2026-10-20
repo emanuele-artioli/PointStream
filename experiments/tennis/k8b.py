@@ -223,7 +223,9 @@ def run(args: argparse.Namespace) -> int:
         if path is None:
             raise FileNotFoundError(name)
         native[name] = {"path": path, "version": subprocess.check_output([path, "-version"], text=True).splitlines()[:3]}
-    selected = parts(manifest["clips"], args.parts)[args.part] if args.part >= 0 else [manifest["clips"][args.smoke_clip]]
+    selected = parts(manifest["clips"], args.parts)[args.part]
+    if args.frames:
+        selected = selected[:1]  # smoke: the part's first clip, truncated, from the part's own archive
     clips = {}
     for clip in selected:
         video = root / clip["path"]
@@ -496,7 +498,6 @@ def main() -> int:
     r.add_argument("--archive", type=Path, required=True)
     r.add_argument("--part", type=int, required=True)
     r.add_argument("--parts", type=int, default=3)
-    r.add_argument("--smoke-clip", type=int, default=0)
     r.add_argument("--frames", type=int, default=0)
     r.add_argument("--workers", type=int, default=8)
     sub.add_parser("validate")
