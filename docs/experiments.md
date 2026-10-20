@@ -7740,6 +7740,20 @@ invocation turns out to be needed.
   (`review/`, ID `63f9a0d78069c771`) and its report stay unchanged. The
   sample page is a new directory beside it, `review-sample-01/`.
 
+- Sample review ready (2026-10-20, `e43215b`, CPU, no re-registration).
+  Command: `python -m experiments.tennis.k8 sample --report review/k8-report.json
+  --out review-sample-01`, run on the published report (SHA256 `530696e0…`,
+  checked). The draw gives 41 + 41 = 82 shots to mark. Of the predicted
+  non-court shots, 41 are sampled (expected 50; Poisson sampling varies the
+  count), covering 548 of their 1,861 s. Scale c = 37.2 s, largest π = 0.94.
+  Sample review ID `fb6cfe8a81f9a440`. `k8-sample.json` SHA256
+  `91738f886955d25c72f2a7c04f9d723bc82a6def5a4cd2afa52bd69e9dbaa3b1`,
+  `review.html` SHA256
+  `92b2ed13234bf4bf78de53a200ce57ebe1db90fd111dfa2d1df64c59b4ef1dd4`.
+  Images and source are relative links into `review/`. The page is served
+  read-only on gpu1 loopback (port 17689) and reached through an SSH
+  tunnel. It was checked at 0 / 82 marks; the agent supplied no labels.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
