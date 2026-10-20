@@ -392,6 +392,15 @@ there's a way to win, we should take it").*
      MASK segment, which only matters once F is billed.
 - Venue models are sent beforehand and unbilled, on both sides. Payback
   hours are reported. Smaller models come later (user, 2026-10-20).
+- *Where it loses (2026-10-20, from H5p 3's per-region scores,
+  [experiments](docs/experiments.md#2026-10-20--h5q-1-the-venue-model-codes-the-foreground-equal-adaptation)):*
+  below about 200 kbps PointStream's foreground already beats the venue
+  anchor's and its background loses; above it the foreground loses, and
+  at QP 63 it equals off-the-shelf whole-frame DCVC-UF while the venue
+  model halves its LPIPS. The high-rate gap is the adaptation alone.
+  Lever 1's cheapest form therefore needs no training: the window's venue
+  model (the anchor's own checkpoint) codes the foreground. Running
+  (rule written; 8 foreground and 4 scoring jobs, about 3 GPU-hours).
 
 #### K. Where keypoints win (analysis, user 2026-10-13)
 
