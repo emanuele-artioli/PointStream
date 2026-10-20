@@ -7989,6 +7989,17 @@ invocation turns out to be needed.
     6 h wall for this stage, within the 8 GPU-hour phase ceiling with
     what is spent. Shared mode, Ada and A6000 only, 32,000 MiB declared
     with a 4,096 MiB margin; every stage ≤ 45 min.
+  - *Pilot* `20261020T184104Z-0af937d9`: gpu6 RTX 6000 Ada, shared
+    (`timing_contaminated`), revision `fa7a4fb` from `ready.json`; specs
+    and plan in `features-v2/` (`pilot.json` `ae7d56e7…`, `windows.json`
+    `dc0e83ed…`), manifest `features-v1/manifest.json` (`4db66511…`). The
+    smoke (one whole window) passed the fleet validator; the full stage
+    (3 windows, 720 frames) passes all 18 checks locally. SAM native
+    (flash attention, batch 16, default configuration); peak 27.3 GiB
+    against the 31.25 GiB declaration; SAM 95–107 s per window and pose
+    plus JPEGs about 21 s (shared timings, not evidence). Promoted: six
+    parts of 7–8 windows (1,564–1,660 frames, about 16 min each at the
+    pilot's rate), split longest-first by `tools/datasets/k4b_feature_inputs.py`.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
