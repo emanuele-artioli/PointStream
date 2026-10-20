@@ -225,10 +225,12 @@ def to_analysis(mask: np.ndarray) -> np.ndarray:
     return cv2.resize(mask.astype(np.uint8) * 255, (width, height), interpolation=cv2.INTER_AREA) > 0
 
 
-def dilate(mask: np.ndarray) -> np.ndarray:
+def dilate(mask: np.ndarray, px: int = camera.DILATE) -> np.ndarray:
     import cv2
 
-    size = 2 * camera.DILATE + 1
+    if px <= 0:
+        return mask.astype(bool)
+    size = 2 * px + 1
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (size, size))
     return cv2.dilate(mask.astype(np.uint8), kernel) > 0
 
@@ -246,8 +248,9 @@ def visor_fill_masks(clip: dict[str, Any], fill_root: Path) -> tuple[Any, dict[s
     return masks, {"masks_rle": str(path), "masks_rle_sha256": file_sha256(path), "instances_by_tier": tiers}
 
 
-def detector_boxes(clip: dict[str, Any], hand_objects_root: Path) -> tuple[list[np.ndarray], dict[str, Any]]:
-    """Hand and object boxes (score >= BOX_SCORE) of the EPIC-KITCHENS detector on each analysis frame."""
+def detector_boxes(clip: dict[str, Any], hand_objects_root: Path,
+                   kinds: tuple[str, ...] = ("hands", "objects")) -> tuple[list[np.ndarray], dict[str, Any]]:
+    """Hand and/or object boxes (score >= BOX_SCORE) of the EPIC-KITCHENS detector on each analysis frame."""
     import cv2
 
     from experiments.visor.b1b import video_to_epic_frame
@@ -265,7 +268,8 @@ def detector_boxes(clip: dict[str, Any], hand_objects_root: Path) -> tuple[list[
             unmapped += 1
         else:
             frame = detections[epic - 1]
-            items: list[Any] = [*frame.hands, *frame.objects]
+            items: list[Any] = [*(frame.hands if "hands" in kinds else ()),
+                                *(frame.objects if "objects" in kinds else ())]
             for item in items:
                 if item.score >= BOX_SCORE:
                     x0, y0, x1, y1 = item.box.pixels(width, height)
@@ -273,7 +277,7 @@ def detector_boxes(clip: dict[str, Any], hand_objects_root: Path) -> tuple[list[
                     boxes += 1
         masks.append(mask > 0)
     return masks, {"path": relative, "sha256": file_sha256(hand_objects_root / relative), "boxes": boxes,
-                   "frames_without_epic_frame": unmapped, "min_score": BOX_SCORE}
+                   "frames_without_epic_frame": unmapped, "min_score": BOX_SCORE, "kinds": list(kinds)}
 
 
 def sam_text_masks(segmenter: Any, clip: dict[str, Any], jpeg_dir: Path) -> Any:
@@ -309,9 +313,11 @@ def window_dense(clip: dict[str, Any], visor_fill: Path) -> tuple[dict[int, np.n
 
 
 def foreground(clip: dict[str, Any], work: Path, base: list[np.ndarray] | None, visor_fill: str | None,
-               hand_objects: str | None) -> dict[str, Any]:
-    """Write foreground.npy (dilated) and, for VISOR stretches, dense.npz on window frames."""
-    record: dict[str, Any] = {"dilate_px_1080": camera.DILATE * camera.TO_1080}
+               hand_objects: str | None, dilate_px: int = camera.DILATE,
+               box_kinds: tuple[str, ...] = ("hands", "objects")) -> dict[str, Any]:
+    """Write foreground.npy (dilated by ``dilate_px`` analysis px) and, for VISOR stretches, dense.npz on window
+    frames."""
+    record: dict[str, Any] = {"dilate_px_1080": dilate_px * camera.TO_1080}
     n = len(clip["indices"])
     width, height = camera.ANALYSIS_SIZE
     fgm = np.lib.format.open_memmap(work / "foreground.npy", mode="w+", dtype=bool, shape=(n, height, width))
@@ -323,19 +329,19 @@ def foreground(clip: dict[str, Any], work: Path, base: list[np.ndarray] | None, 
         for i in range(n):
             raw[i] = to_analysis(union(masks.frames[offset + i], (masks.height, masks.width)))
     if clip["masks"].get("boxes"):
-        boxes, info = detector_boxes(clip, Path(str(hand_objects)))
+        boxes, info = detector_boxes(clip, Path(str(hand_objects)), box_kinds)
         record["detector"] = info
         for i in range(n):
             raw[i] = raw[i] | boxes[i]
     for i in range(n):
-        fgm[i] = dilate(raw[i])
+        fgm[i] = dilate(raw[i], dilate_px)
     fgm.flush()
     window = clip["masks"].get("window_item")
     if window:
         raw_dense, info = window_dense(clip, Path(str(visor_fill)))
         dense, recalls = {}, []
         for i, d in raw_dense.items():
-            dense[str(i)] = dilate(d)
+            dense[str(i)] = dilate(d, dilate_px)
             if d.any():
                 recalls.append(float((d & np.asarray(fgm[i])).sum() / d.sum()))
         np.savez(work / "dense.npz", **dense)
