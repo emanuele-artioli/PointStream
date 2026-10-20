@@ -5929,6 +5929,50 @@ invocation turns out to be needed.
   swap; reported as BD-rate of PointStream with G_HO against PointStream
   with G on the same pairs, and against the anchors as in H5.
 - Budget: 4 foreground jobs and 4 scoring jobs, about 3 GPU-hours.
+- Runs (shared Ada; every full stage validated locally: foreground 10/10,
+  scoring 9/9). Foreground (`h5 foreground --slots G_HO`, one job per item
+  and scale, code `470ac5f`): P01_107 `20261017T180513Z-ee4cbe4b`,
+  `…180524Z-81d23687`; P02_02 `…180535Z-1db7d33b`, `…180547Z-2349b02b`;
+  P03_10 `…180559Z-40098c01`, `…180613Z-9bd442dd`; P09_106
+  `…180623Z-911e8a1a`, `…180636Z-0d751fa1`. The DCVC-UF streams are the
+  same bytes as H5's (only the slots differ). Scoring (`--tag gho`, the six
+  G points against every background on H5's hull, 54–60 pairs per item,
+  code `7b54dfd`): P01_107 `20261017T182218Z-84e94d46`,
+  `…182230Z-e960b121`; P02_02 `…183014Z-80e5c530`, `…183028Z-cbb75972`;
+  P03_10 `…182855Z-f458eae1`, `…182908Z-7e362419`; P09_106
+  `…183728Z-f10b2cf0`, `…183742Z-ddea296c`. Pairs whose foreground has no
+  network (QP 63, full size) keep H5's rows. Failed or replaced, none
+  citable: stage timeouts (two network passes per point; then the A6000s
+  saturated by another user) and a 48.5 GB GPU overrun (the caching
+  allocator kept every crop size), fixed in `ff98698` and `470ac5f`.
+- Outcome (F granted; against the pooled anchors as in H5; P01_107 |
+  P02_02 | P03_10 | P09_106):
+
+  | Metric | G_HO | mean (CI) | < 0 | H5 with G |
+  |---|---|---|---|---|
+  | **weighted LPIPS (fill)** | −19 \| −20 \| −42 \| −34% | **−29% (−38 to −19)** | **4** | −15% (3) |
+  | weighted DISTS (fill) | −19 \| −8 \| −39 \| −25% | −23% (−34 to −12) | 4 | −1% (3) |
+  | weighted PSNR (fill) | +78 \| +54 \| −4 \| −22% | +27% (−17 to +66) | 2 | +26% (2) |
+  | frame LPIPS | −61 \| −33 \| −49 \| −40% | −46% (−55 to −37) | 4 | −38% (4) |
+  | frame DISTS | −63 \| −47 \| −53 \| −47% | −53% (−59 to −47) | 4 | −48% (4) |
+  | frame PSNR | +136 \| +85 \| +40 \| +21% | +70% (+31 to +112) | 0 | +70% (0) |
+
+  G_HO against G on the same pairs: weighted LPIPS −16%, −37%, −34%,
+  −33%; weighted DISTS −17%, −47%, −49%, −23%; weighted PSNR +7%, +14%,
+  +9%, +2% (G_HO trades PSNR for perceptual quality, as G did). With G_HO
+  the foreground contributes: rule (a) passes on 4 of 4 items, and
+  weighted DISTS, which disagreed with LPIPS under G, now agrees.
+  Report: `pointstream-data/visor/h5-2026-10-16/report-gho-7b54dfd/`.
+- Not yet a fair claim for the paper (user, 2026-10-20), to settle on the 4
+  pilot items before any 34-item run: (1) the venue models (scene model,
+  enhancer) are fitted on the window's own video and not billed, and their
+  payback was never computed (H3d: per-video networks fail once billed on
+  these short videos); (2) the anchors get no such adaptation: a
+  whole-frame DCVC-UF adapted the same way, and SVT-AV1 at the equal-time
+  preset 1, are the fair anchors; (3) the scene model, the enhancer, G and
+  G_HO were trained with LPIPS in their losses, so LPIPS and DISTS (a
+  related deep-feature metric) need a metric none of them saw and a visual
+  check; (4) F is granted (H5m).
 
 ### 2026-10-17 — H5m: coding F (the mask PointStream's decoder needs)
 - Question (after H5's pilot, user 2026-10-17): H5's gain holds only with

@@ -936,7 +936,13 @@ s = 8–16) does not keep the weighted-LPIPS margin (hull over s −4%, 2 of 4
 items; rule −10%, 3 of 4); frame LPIPS −21% and DISTS −28% survive on 4 of
 4. Next for F: re-encode the foreground with K and the fill from F̂ (the
 measured streams were coded for exact F), then F carried by the
-foreground stream itself. G_HO (H4c) goes into both foreground slots.
+foreground stream itself. *G_HO (H4c) in both foreground slots
+(2026-10-20):* weighted LPIPS −29% (CI −38 to −19, 4 of 4), DISTS −23%
+(4 of 4), with F granted. Before any 34-item run (user, 2026-10-20: the
+big run waits for the paper's figures), cheap pilot-scale checks of
+fairness: the venue models' payback, a whole-frame venue-adapted DCVC-UF
+anchor and SVT-AV1 at preset 1, a metric none of the models trained on,
+and F (re-encode from F̂, then F at the client).
 
 #### K. Where keypoints win (analysis, user 2026-10-13)
 
