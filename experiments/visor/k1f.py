@@ -43,6 +43,17 @@ DECISION: dict[str, Any] = {
 }
 
 
+def release() -> None:
+    """Return PyTorch's cached GPU memory between points (the fleet charges the job's processes; job
+    20261021T211220Z-3d431acd overran 36,000 MiB at 38,200 with the cache held)."""
+    import gc
+
+    import torch
+
+    gc.collect()
+    torch.cuda.empty_cache()
+
+
 def point_record(name: str, rec: dict[str, Any], scored: dict[str, np.ndarray], hand: np.ndarray) -> dict[str, Any]:
     return {"name": name, "kbps": float(rec["kbps_r"]), "lpips": float(np.nanmean(scored["lpips"][hand])),
             "dists": float(np.nanmean(scored["dists"][hand])), "record": {k: v for k, v in rec.items() if k != "stream"}}
@@ -75,6 +86,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
         lp_rows.append(s["lpips"])
         dists_rows.append(s["dists"])
         del rgb
+        release()
         for f in work.glob("low-*"):
             shutil.rmtree(f) if f.is_dir() else f.unlink()
     for qp, scale in args.dcvc_points:
@@ -94,6 +106,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
             dists_rows.append(s["dists"])
             del out
         del upscaled
+        release()
         (work / "dcvc-rgb.npy").unlink(missing_ok=True)
         shutil.rmtree(work / f"dcvc-{scale}-{qp:g}", ignore_errors=True)
     for f in work.glob("source-*.yuv"):
@@ -106,6 +119,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
             "points": points, "g_overlap": item["video"] in G_VIDEOS, "mask_set": mask_info, "seconds": round(time.time() - began, 2)}
     save_unit(publish, "k1f", item["id"], arrays, meta)
     shutil.rmtree(work, ignore_errors=True)
+    release()
     k1c.process_item(args, item, decoded, nets, device, publish, scratch, first)  # the bound; removes the decoded window
 
 

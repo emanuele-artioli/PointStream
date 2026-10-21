@@ -9819,6 +9819,12 @@ invocation turns out to be needed.
   times an item; a smoke of 48 frames with two DCVC-UF points). Ceiling 8
   GPU-hours (user, 2026-10-21) for all of K1f. If it runs out, the items
   done in the fixed order are reported, and so is the shortfall.
+- Attempts (infrastructure, no score read). Part 0
+  `20261021T211220Z-3d431acd` (`eca0d32`, gpu6): the smoke passed (159 s),
+  then the full stage overran its declared 36,000 MiB at 38,200 (PyTorch's
+  cache held across points, with WiLoR and G resident) and was stopped
+  before finishing an item. Fixed: the cache is released after each point,
+  and 40,000 MiB is declared.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
