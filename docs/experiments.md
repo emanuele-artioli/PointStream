@@ -9060,6 +9060,44 @@ invocation turns out to be needed.
   K4's windows; parts of ≤ 4 windows (≤ 45 min). Shared Ada/A6000,
   memory from the smoke. Ceiling 8 GPU-hours and 16 h wall, smokes
   included.
+- Features for K4's windows: job `20261021T112104Z-ede5db59` (gpu6, RTX
+  6000 Ada, shared; `3d53e9b` from `ready.json`; manifest
+  `k6-2026-10-21/features/manifest.json` `a696d2ba…9726`). Its full
+  stage (9 windows, 2,160 frames) passes all 18 of `k4b_features
+  validate`'s checks locally, the manifest's identity included. Oracle
+  inputs: `k6-2026-10-21/oracle/inputs.tar` `20e595d5…e703`
+  (`tools/datasets/k6_inputs.py oracle`; the seven K4b.1 feature jobs and
+  this one, each identity checked against its index).
+- Pilot attempts (infrastructure, no score read). `20261021T155104Z-1858221f`
+  (`1f8ddc8`): the DCVC-UF worker refused to run, since ultralytics had
+  rewritten CUDA_VISIBLE_DEVICES (K5's known issue; fixed in `d57efa2`).
+  `20261021T155739Z-654cf647` (`d57efa2`): the staged `aom-inspect` had
+  no execute bit (K4's; fixed in `5c83149`). `20261021T160249Z-c714d1f3`
+  (`5c83149`, gpu3 RTX A6000 shared with another user's training): the
+  smoke passed all 18 validator checks; the full stage finished
+  `djokovic_federer/038@120` in 1,479 s, then stopped when DCVC-UF QP 0
+  at ½ on `/072` decoded non-deterministically on 3 of 3 attempts (6–7
+  dB; the fleet's known DCVC-UF failure under contention). Its scores
+  were not opened.
+- **Amendment 1 (2026-10-21, before any score was read).** Three changes,
+  all for cost and robustness; the rule's gates, bars, variants and
+  anchors are unchanged.
+  1. *Judged frames.* A window took 1,479 s, so 45 windows would need
+     about 19 GPU-hours against the 8-hour ceiling. The judges now run on
+     every 3rd scored frame (t mod 3 = 0). Three is coprime with the
+     codes' 2- and 4-frame sending phases, so sent and interpolated frames
+     are judged in their true proportions. Rates still count every scored
+     frame.
+  2. *Warp field.* The skeleton warp's source positions are computed on a
+     4 px grid and the displacement upsampled bilinearly. The field is
+     smooth, and the result is exact for the identity and any translation
+     (tested).
+  3. *A DCVC-UF point that fails K5's guard on all 3 attempts* is
+     recorded (its attempts kept) and left out of that window's envelope,
+     instead of stopping the part. That can only weaken the envelope, in
+     the keypoints' favour; the count of left-out points is reported.
+  Each finished window is now checkpointed (summary and archive), so a
+  stop keeps it.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned

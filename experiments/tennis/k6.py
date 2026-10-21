@@ -52,6 +52,8 @@ CHOSEN = CODES[0]
 PRESET = 4
 WHOLE_FRAME_ABOVE = 0.15  # median mask height share at or above which the whole-frame detections are used
 SIGMA_OF_HEIGHT = 0.08
+MAP_STEP = 4  # px between the warp's computed positions (the field is bilinear between them)
+JUDGE_EVERY = 3  # judged frames: scored frames with t % 3 == 0 (coprime with the codes' 2- and 4-frame phases)
 REF_GAP_S = 1.0
 MIN_JOINT_KEYPOINTS = 4
 TELEA_RADIUS = 5
@@ -312,11 +314,16 @@ def draw(canvas: np.ndarray, drawn: np.ndarray, image: np.ndarray, region: np.nd
     if box is None:
         return mine
     x0, y0, x1, y1 = box
-    py, px = np.mgrid[y0:y1, x0:x1].astype(np.float64)
-    mapped = backward_map(px, py, target_kp, source_kp, sigma)
+    # The displacement field is smooth: computed on a MAP_STEP grid and upsampled (exact for identity and translation).
+    gy, gx = np.mgrid[y0:y1 + MAP_STEP:MAP_STEP, x0:x1 + MAP_STEP:MAP_STEP].astype(np.float64)
+    mapped = backward_map(gx, gy, target_kp, source_kp, sigma)
     if mapped is None:
         return mine
-    mx, my = mapped[0].astype(np.float32), mapped[1].astype(np.float32)
+    py, px = np.mgrid[y0:y1, x0:x1].astype(np.float32)
+    fine = ((px - x0) / MAP_STEP, (py - y0) / MAP_STEP)
+    dx = cv2.remap((mapped[0] - gx).astype(np.float32), *fine, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+    dy = cv2.remap((mapped[1] - gy).astype(np.float32), *fine, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+    mx, my = px + dx, py + dy
     inside = cv2.remap(region.astype(np.uint8), mx, my, cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=(0,)) > 0
     colour = cv2.remap(image, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
     view = canvas[y0:y1, x0:x1]
@@ -461,7 +468,10 @@ def code_dcvc(args: argparse.Namespace, yuv: Path, frames: int, qp: int, scale: 
         if ok:
             break
     else:
-        raise RuntimeError(f"DCVC-UF QP {qp} scale {scale}: no sane decode in {DCVC_ATTEMPTS} attempts: {attempts}")
+        # Amendment 1: a point that fails K5's guard on every attempt is recorded and left out of the window's envelope.
+        source.unlink()
+        return {"codec": "dcvc", "value": qp, "scale": scale, "size": [sw, sh], "failed": True, "attempts": attempts,
+                "payload_bytes": rec["bytes"], "region_bits": None, "decoded": None}
     source.unlink()
     return {"codec": "dcvc", "value": qp, "scale": scale, "size": [sw, sh], "decoded": rec["decoded"],
             "payload_bytes": rec["bytes"], "stream_sha256": rec["stream_sha256"], "region_bits": rec["region_bits"],
@@ -520,6 +530,7 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
     from experiments.visor.h3b import dists_crops, lpips_reduce
 
     began = time.time()
+    timing: dict[str, float] = {}
     w = entry["window"]
     wid = w["id"]
     frames = min(int(args.frames), int(w["frames"]))
@@ -558,14 +569,18 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
     for i, a in enumerate([a for a in ANCHORS if a[0] == "svt"]):
         svt_jobs[anchor_name(a)] = pool.submit(code_svt, args, yuv, frames, fps, a[1], a[2], scored_r,
                                                parts if a[2] == 1 else None, work / anchor_name(a), cpu_sets[i % len(cpu_sets)])
+    timing["pose"] = round(time.time() - began, 1)
     anchors: dict[str, dict[str, Any]] = {}
     for a in [a for a in ANCHORS if a[0] == "dcvc"]:
         anchors[anchor_name(a)] = code_dcvc(args, yuv, frames, a[1], a[2], scored_r, work / anchor_name(a))
     for a in ANCHORS:
         if a[0] == "svt":
             anchors[anchor_name(a)] = svt_jobs[anchor_name(a)].result()
+    timing["anchors"] = round(time.time() - began, 1)
     decodes = {}
     for name, rec in anchors.items():
+        if rec.get("failed"):
+            continue
         sw, sh = rec["size"]
         decodes[name] = rgb_memmap(Path(rec["decoded"]), work / f"{name}-rgb.npy", frames, sw, sh, False, device)
         Path(rec["decoded"]).unlink()
@@ -589,8 +604,10 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
     outline: list[dict[str, Any]] = []
     references: dict[str, dict[str, int | None]] = {v: {} for v in oracle_names if v.startswith("ref")}
     identity_max_diff = None
-    review_at = set(review_frames(wid, scored))
-    for n, t in enumerate(scored):
+    judged = [t for t in scored if t % JUDGE_EVERY == 0]
+    review_at = set(review_frames(wid, judged))
+    timing["prepare"] = round(time.time() - began, 1)
+    for n, t in enumerate(judged):
         truth_t = np.asarray(truth[t])
         r_t = union[t]
         fill = telea_fill(truth_t, r_t)
@@ -640,6 +657,9 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
         racket_t = per_frame[t]["racket"]
         outs = []
         for name in names[:len(ANCHORS)]:
+            if name not in decodes:
+                outs.append(truth_t.copy())  # placeholder, never reported: a failed anchor point is left out
+                continue
             up = cv2.resize(np.asarray(decodes[name][t]), FRAME, interpolation=cv2.INTER_CUBIC)
             out = truth_t.copy()
             out[r_t] = up[r_t]
@@ -658,12 +678,13 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
         if t in review_at:
             pick = {k: outs[names.index(k)] for k in (f"warp@{code_name(CHOSEN)}", f"ref@{code_name(CHOSEN)}", "svt-63-s4", "dcvc-0-s4", "svt-62-s1")}
             save_review(publish / k4.safe(wid) / f"review-t{t:03d}.png", truth_t, pick, regions[t], f"{wid} t={t}")
-        print(f"phase=score window={wid} frame={n + 1}/{len(scored)}", flush=True)
+        print(f"phase=score window={wid} frame={n + 1}/{len(judged)}", flush=True)
 
     out_dir = publish / k4.safe(wid)
     out_dir.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(out_dir / "scores.npz", lpips=lp, lpips_drawn=lp_drawn, lpips_racket=lp_racket, dists=dists, sse=sse,
-                        pixels_s=pixels_s, pixels_r=pixels_r, scored=np.asarray(scored, np.int64))
+                        pixels_s=pixels_s, pixels_r=pixels_r, scored=np.asarray(scored, np.int64),
+                        judged=np.asarray(judged, np.int64))
     pose_rows = {p: [None if r is None else {k: r[k] for k in ("fitted", "setting", "kps", "inside", "confident", "whole_fitted") if k in r}
                      for r in seq] for p, seq in poses.items()}
     keypoints = {name: {f"{p}@{t}": np.round(v, 4).tolist() for (p, t), v in d.items()} for name, d in decoded.items()}
@@ -677,12 +698,13 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
     row = {
         "id": wid, "k4_window": entry.get("k4_window"), "match": wid.split("/")[0], "fps": w["fps"], "frames": frames,
         "start": w["start"], "convert": converted, "players": players, "court": chosen["court"],
-        "median_height": median_height, "scored": scored, "scored_registered": scored_all, "scored_seconds": seconds,
+        "median_height": median_height, "scored": scored, "judged": judged, "scored_registered": scored_all,
+        "scored_seconds": seconds, "timing": timing,
         "variants": names, "identity_max_diff": identity_max_diff,
-        "anchors": {k: {**{x: v for x, v in rec.items() if x != "decoded"}, "kbps_r": rec["region_bits"] / seconds / 1000 if seconds else None,
+        "anchors": {k: {**{x: v for x, v in rec.items() if x != "decoded"}, "kbps_r": rec["region_bits"] / seconds / 1000 if seconds and rec["region_bits"] is not None else None,
                         "kbps": 8 * rec["payload_bytes"] / (frames / float(fps)) / 1000}
                     for k, rec in anchors.items()},
-        "region_pixels_mean": float(pixels_r[scored].mean()) if scored else 0.,
+        "region_pixels_mean": float(pixels_r[judged].mean()) if judged else 0.,
         "parts_pixel_share": {p: float((parts == i).mean()) for i, p in enumerate(PARTS)},
         "seconds": round(time.time() - began, 2),
     }
@@ -724,29 +746,34 @@ def command_run(args: argparse.Namespace) -> int:
     cpus = sorted(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else list(range(allowance))
     half = max(1, len(cpus) // 2)
     cpu_sets = [cpus[:half], cpus[half:] or cpus[:half]]
-    rows = []
+    rows: list[dict[str, Any]] = []
+
+    def checkpoint(complete: bool) -> None:
+        """Every finished window is published at once (the summary and the archive), so a stop keeps them."""
+        summary = {"stage": os.environ.get("PS_STAGE"), "requested": args.windows, "configured_windows": int(args.max_windows),
+                   "frames_argument": int(args.frames), "windows": rows, "decision": DECISION, "codes": [list(c) for c in CODES],
+                   "inputs_sha256": file_sha256(Path(args.inputs) / "inputs.json"), "window_records": {w: args_entry
+                   for w, args_entry in ((w, {k: v for k, v in inputs["windows"][w].items() if k != "fits"}) for w in chosen)},
+                   "tools": {"svt-av1": svtav1.tool(args.encoder), "dav1d": svtav1.tool(args.decoder), "ffmpeg": svtav1.tool(args.ffmpeg),
+                             "inspect_sha256": file_sha256(Path(args.inspect))},
+                   "weights": {"lpips": lpips_record(Path(args.lpips_backbone)), "dists_sha256": file_sha256(Path(args.dists_backbone)),
+                               "dcvc_image_sha256": args.image_sha256, "dcvc_video_sha256": args.video_sha256,
+                               "pose_sha256": file_sha256(Path(args.pose))},
+                   "pose": poses.record(), "on_cuda": {k: next(v.parameters()).is_cuda for k, v in nets.items()},
+                   "gpu": torch.cuda.get_device_name(0), "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3),
+                   "gpu_memory_limit_mib": limit, "seconds": round(time.time() - began, 2)}
+        summary["complete"] = complete
+        with tarfile.open(stage_dir() / "published.tar", "w") as tar:
+            tar.add(publish, arcname="publish")
+        write_json(stage_dir() / "k6.json", summary)
+
     with ThreadPoolExecutor(max_workers=2) as pool:
         for n, wid in enumerate(chosen):
-            torch.cuda.reset_peak_memory_stats()
             rows.append(process_window(args, inputs["windows"][wid], Path(args.sources[args.windows.index(wid)]), nets, crops,
                                        pool, cpu_sets, scratch, publish, device))
             print(f"phase=window window={wid} done={n + 1}/{len(chosen)} seconds={rows[-1]['seconds']}", flush=True)
+            checkpoint(n + 1 == len(chosen))
             progress(n + 1)
-    summary = {"stage": os.environ.get("PS_STAGE"), "requested": args.windows, "configured_windows": int(args.max_windows),
-               "frames_argument": int(args.frames), "windows": rows, "decision": DECISION, "codes": [list(c) for c in CODES],
-               "inputs_sha256": file_sha256(Path(args.inputs) / "inputs.json"), "window_records": {w: args_entry
-               for w, args_entry in ((w, {k: v for k, v in inputs["windows"][w].items() if k != "fits"}) for w in chosen)},
-               "tools": {"svt-av1": svtav1.tool(args.encoder), "dav1d": svtav1.tool(args.decoder), "ffmpeg": svtav1.tool(args.ffmpeg),
-                         "inspect_sha256": file_sha256(Path(args.inspect))},
-               "weights": {"lpips": lpips_record(Path(args.lpips_backbone)), "dists_sha256": file_sha256(Path(args.dists_backbone)),
-                           "dcvc_image_sha256": args.image_sha256, "dcvc_video_sha256": args.video_sha256,
-                           "pose_sha256": file_sha256(Path(args.pose))},
-               "pose": poses.record(), "on_cuda": {k: next(v.parameters()).is_cuda for k, v in nets.items()},
-               "gpu": torch.cuda.get_device_name(0), "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3),
-               "gpu_memory_limit_mib": limit, "seconds": round(time.time() - began, 2)}
-    with tarfile.open(stage_dir() / "published.tar", "w") as tar:
-        tar.add(publish, arcname="publish")
-    write_json(stage_dir() / "k6.json", summary)
     return 0
 
 
@@ -767,27 +794,34 @@ def validate_window(root: Path, row: dict[str, Any]) -> dict[str, bool]:
     again = {name: {f"{p}@{t}": np.round(v, 4).tolist() for (p, t), v in d.items()} for name, d in decoded.items()}
     codes_ok = again == published["decoded"] and json.loads(json.dumps(symbols)) == published["symbols"]
     a = np.load(root / "scores.npz")
-    scored = row["scored"]
+    judged = row["judged"]
     names = row["variants"]
-    finite = all(np.isfinite(a[k][:, scored]).all() for k in ("lpips", "dists", "sse"))
-    unscored = [t for t in range(row["frames"]) if t not in set(scored)]
+    live = [i for i, n in enumerate(names) if not (row["anchors"].get(n) or {}).get("failed")]
+    judged_ok = judged == [t for t in row["scored"] if t % JUDGE_EVERY == 0] and a["judged"].tolist() == judged
+    finite = all(np.isfinite(a[k][np.ix_(live, judged)]).all() for k in ("lpips", "dists", "sse"))
+    unscored = [t for t in range(row["frames"]) if t not in set(judged)]
     nan_elsewhere = all(np.isnan(a["lpips"][:, unscored]).all() for _ in [0])
-    covers = bool((a["pixels_s"][scored] >= a["pixels_r"][scored]).all() and (a["pixels_r"][scored] > 0).all())
+    covers = bool((a["pixels_s"][judged] >= a["pixels_r"][judged]).all() and (a["pixels_r"][judged] > 0).all())
     anchors = row["anchors"]
     svt_ok = all(0 <= r["region_bits"] <= r["accounted_bits"] and r["payload_bytes"] > 0 for r in anchors.values() if r["codec"] == "svt")
     parts_ok = all(anchors[anchor_name(x)]["parts_bits"] is not None for x in ANCHORS if x[0] == "svt" and x[2] == 1)
+    dcvc = [r for r in anchors.values() if r["codec"] == "dcvc"]
     dcvc_ok = all((last := r["attempts"][-1])["deterministic"] and last["decoder_matches_encoder_intra"] and last["luma_psnr"] >= SANE_LUMA_PSNR
-                  and r["region_bits"] >= 0 for r in anchors.values() if r["codec"] == "dcvc")
-    if scored:
-        mean = {n: float(np.mean(a["lpips"][names.index(n), scored])) for n in names}
-        ladder = mean["svt-48-s1"] < mean["svt-62-s1"] < mean["svt-63-s8"] and mean["dcvc-0-s1"] < mean["dcvc-0-s4"]
+                  and r["region_bits"] >= 0 for r in dcvc if not r.get("failed"))
+    failed_recorded = all(len(r["attempts"]) == DCVC_ATTEMPTS and r["region_bits"] is None for r in dcvc if r.get("failed"))
+    if judged:
+        mean = {n: float(np.mean(a["lpips"][names.index(n), judged])) for n in names}
+        ladder = mean["svt-48-s1"] < mean["svt-62-s1"] < mean["svt-63-s8"]
+        if not any(anchors[n].get("failed") for n in ("dcvc-0-s1", "dcvc-0-s4")):
+            ladder &= mean["dcvc-0-s1"] < mean["dcvc-0-s4"]
         identity = row["identity_max_diff"] == 0
-        review = len(list(root.glob("review-t*.png"))) == min(REVIEW_FRAMES, len(scored))
+        review = len(list(root.glob("review-t*.png"))) == min(REVIEW_FRAMES, len(judged))
     else:
         ladder = identity = review = True
     return {"files_identified": files, "players_recomputed": picks, "scored_are_registered_frames": scored_ok,
             "keypoint_codes_recomputed": codes_ok, "scores_finite_on_scored_frames": finite, "no_scores_elsewhere": nan_elsewhere,
             "s_covers_r": covers, "svt_accounting": svt_ok, "parts_accounted_at_full_resolution": parts_ok,
+            "judged_every_third_scored_frame": judged_ok, "failed_dcvc_points_recorded": failed_recorded,
             "dcvc_decodes_sane": dcvc_ok, "lpips_rises_as_the_anchors_coarsen": ladder,
             "identity_warp_reproduces_source": identity, "review_images": review}
 

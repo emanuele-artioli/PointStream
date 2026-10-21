@@ -64,7 +64,7 @@ def pooled_bits(symbol_sets: list[dict[str, Any]]) -> list[float]:
 
 def window_metrics(w: dict[str, Any]) -> dict[str, dict[str, float]]:
     a, row = w["scores"], w["row"]
-    scored = row["scored"]
+    scored = row["judged"]
     out = {}
     for i, name in enumerate(row["variants"]):
         sse = float(a["sse"][i, scored].sum())
@@ -130,7 +130,7 @@ def fast_limbs(windows: list[dict[str, Any]]) -> dict[str, Any]:
     for w in windows:
         row, a = w["row"], w["scores"]
         i4, i1 = row["variants"].index(every4), row["variants"].index(every1)
-        for t in row["scored"]:
+        for t in row["judged"]:
             best = 0.
             for seq in w["poses"].values():
                 cur, prev = seq[t], seq[t - 1] if t > 0 else None
@@ -227,7 +227,7 @@ def command_report(args: argparse.Namespace) -> int:
         for p in sorted(args.k4_rows.glob("broadcast__*.json")):
             r = json.loads(p.read_text())
             k4_rows[r["id"]] = r
-    scored = [w for w in windows if w["row"]["scored"]]
+    scored = [w for w in windows if w["row"]["judged"]]
     sets = {code_name(c): [w["symbols"][code_name(c)] for w in scored] for c in CODES}
     bits = {name: pooled_bits(s) for name, s in sets.items()}
     per_window: dict[str, dict[str, Any]] = {}
@@ -235,7 +235,8 @@ def command_report(args: argparse.Namespace) -> int:
         row = w["row"]
         metrics = window_metrics(w)
         kbps = {name: bits[name][n] / row["scored_seconds"] / 1000 for name in bits}
-        anchors = {a: {"kbps": row["anchors"][a]["kbps_r"], **metrics[a]} for a in ANCHOR_NAMES}
+        anchors = {a: {"kbps": row["anchors"][a]["kbps_r"], **metrics[a]} for a in ANCHOR_NAMES
+                   if not row["anchors"][a].get("failed")}  # amendment 1: failed DCVC-UF points are left out
         savings: dict[str, dict[str, Any]] = {}
         for metric in ("lpips", "dists"):
             hull = envelope([(p["kbps"], -p[metric]) for p in anchors.values()])
@@ -246,6 +247,8 @@ def command_report(args: argparse.Namespace) -> int:
                 savings[metric][v] = {**saving(hull, -metrics[v][metric], rate), "kbps": rate, metric: metrics[v][metric]}
             savings[metric]["hull"] = {"points": hull}
         per_window[row["id"]] = {"match": row["match"], "k4_window": row.get("k4_window"), "scored_frames": len(row["scored"]),
+                                 "judged_frames": len(row["judged"]),
+                                 "failed_anchors": [a for a in ANCHOR_NAMES if row["anchors"][a].get("failed")],
                                  "players": row["players"], "median_height": row["median_height"], "keypoint_kbps": kbps,
                                  "anchors": anchors, "oracle": {v: metrics[v] for v in row["variants"][len(ANCHORS):]},
                                  "savings": savings, "job": w["stage"], "git_head": w["git_head"]}
@@ -253,7 +256,7 @@ def command_report(args: argparse.Namespace) -> int:
         "decision_rule": DECISION, "decision": decide(per_window, {v["match"] for v in per_window.values()}),
         "keypoint_kbps_mean": {name: float(np.mean([v["keypoint_kbps"][name] for v in per_window.values()])) for name in bits},
         "outline": {v: outline_table(scored, v) for v in (f"ref@{code_name(CHOSEN)}", "ref@uncoded", f"warp@{code_name(CHOSEN)}")},
-        "racket_lpips": {v: float(np.nanmean(np.concatenate([w["scores"]["lpips_racket"][w["row"]["variants"].index(v), w["row"]["scored"]]
+        "racket_lpips": {v: float(np.nanmean(np.concatenate([w["scores"]["lpips_racket"][w["row"]["variants"].index(v), w["row"]["judged"]]
                                                              for w in scored])))
                          for v in (f"warp@{code_name(CHOSEN)}", f"ref@{code_name(CHOSEN)}", "svt-62-s1", "dcvc-0-s2")},
         "fast_limbs": fast_limbs(scored), "amendment2": amendment2(windows, k4_rows), "windows": per_window,
