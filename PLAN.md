@@ -38,10 +38,13 @@ new dependency.
 - **Foreground (H):** hands and handled objects are coded pixels, DCVC-UF
   at ¼ or ½ plus the generic enhancer G_HO. Keypoints lose on egocentric
   video (H1, H3, H4, K1, K3).
-- **Tennis (K):** the ball mode wins (K5); K4b done (players found by
-  racket contact plus the court outline, the far player fitted on ×1
-  crops, keypoints 3.3 kbps for two), so K6's gate passes. Next: K6;
-  K7 (HiEve) later.
+- **Tennis (K):** the ball mode wins (K5); court-view shots are adopted
+  as K8b (2026-10-21): on 69 held-out shots from three broadcasts,
+  precision and recall are 1.00, with a registration median of 0.77 px and
+  p95 of 2.71 px; homographies are published for all five of K4b's
+  matches. K4b done (2026-10-21): players found by racket contact plus the
+  court outline, the far player fitted on ×1 crops, keypoints 3.3 kbps for
+  two, so K6's gate passes. Next: K5b, K6; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -447,6 +450,32 @@ other. Each has its rule written before its run, as everywhere.
   background: G's per-shot background needs the registration, H/K the
   court outline and the shot list. Judged on the archived matches' scene
   clips, reviewed by eye, and on the whole match's shots.
+  **Not adopted (2026-10-20)**, scored on a stratified sample of 82
+  shots marked by the user ([entry](docs/experiments.md#2026-10-16--k8-court-view-shots-and-camera-registration-rule)).
+  Precision is 1.00 (all 41 predicted court shots are court), with a
+  registration median of 0.91 px on them. Duration recall is 0.34
+  [0.26, 0.45]: most court time is missed. The misses fall into three
+  classes. 11 of 17 sampled misses fail only the 80% frame rule. 6 have
+  wrong or no fits. 6 shots are mixed (missed cuts). A one-frame decode
+  offset is fixed in code. Open for the user: whether to revise the
+  registration (temporal tracking through a shot, a shot rule on the
+  median error) and the cuts, under a new rule judged on unmarked shots.
+  Or K4b's candidate (d) could use only the 41 precise predicted-court
+  shots.
+  **K8b adopted (2026-10-21)**
+  ([entry](docs/experiments.md#2026-10-20--k8b-court-recall-in-shade-and-across-venues-rule)).
+  The changes: a line detector relative to the local background (works in
+  shade), hypotheses from both detectors, line-swap re-seating, a
+  centerline ruler, a clutter guard, and a 6 px shot rule. On 69 held-out
+  shots of three broadcasts the user's marks and the system agree on
+  every shot. Precision is 1.00 (44/44, lower bound 0.934) and recall
+  1.00; the registration median is 0.77 px and the p95 2.71 px. Per-frame
+  homographies for those 70 clips are published for K4b (d) and G.
+  djokovic_federer and rublev_auger-aliassime are registered too
+  (2026-10-21), so all five of K4b's matches are covered. nadal_kyrgios's
+  whole match (v1 of the court-shot list, with a spot-check of its
+  predicted court shots) waits until the full tennis pipeline needs it
+  (user, 2026-10-21).
 - K4b. *Players before K6* (re-reads K4's (b) and the K6 gate).
   1. Identification. Candidate rules, content-blind: motion in body
      heights (K4's amendment), horizontal motion with the clip's end
@@ -500,6 +529,34 @@ other. Each has its rule written before its run, as everywhere.
   RacketVision's ball labels (PLAN's ball stage); it is also the judge,
   since an off-the-shelf detector finds 46% of the source's balls and
   SAM 3.1's text prompt 56%.
+  Outcomes (2026-10-21, [entries](docs/experiments.md)): (1) no renderer
+  adopted: a per-window appearance keeps 10–20% of the pixel oracle's
+  gain (BD about 0% against the −25% bar); the diagnostic points to
+  per-frame position and appearance. The user's rendering preference
+  (disk or streak) is pending. (2) RacketVision's BallTrack adopted off
+  the shelf as tracker and judge (0.918 on K5's TrackNet games, never in
+  its training; 0.881 on RacketVision test; 0.022 false detections per
+  frame); no training needed. Through SVT-AV1 at CRF 62 every tracker
+  finds under 3% of the balls.
+- K5b 1b. *Per-frame ball*: K5b 1's oracle with the
+  encoder refining each position by fit (±4 px, billed through the same
+  residual code) and sending the appearance per frame (setting and
+  colour predicted from the previous frame, billed); same decodes, judges
+  and rule; positions from BallTrack as well as the labels, so the ball
+  mode is measured end to end. Judges (user, 2026-10-21): BallTrack
+  detection and crop DISTS. Outcome (2026-10-21, [entry](docs/experiments.md)):
+  not adopted, on rate: the drawn ball restores detection (0.01 → 0.90 at
+  DCVC-UF's 13 kbps; 5–20× less rate than the pixel coders for 80% of the
+  source's balls) and passes crop DISTS (streak −27% to −42%), but its
+  ~1 kbps payload fails the frame-PSNR guard (+1.7% to +2.8% against
+  +1%). Decision (user, 2026-10-21): the ball mode is kept as a win
+  despite the guard (about 1 kbps is small; the ball matters in tennis),
+  the guard's failure disclosed; the **streak** is the default renderer
+  (the disk often looks unrealistic; the streak matches DCVC-UF where
+  DCVC-UF keeps the ball and keeps it visible far more often). A cheap
+  check (not evidence) finds colour coded at step 8 saves about 20% of
+  the payload for 0.3% of the fit's gain; a codec default to set before
+  the final runs, not a reason to rerun now.
 Datasets: still-camera sets (TrackNet, RacketVision, OpenTTGames) are
 fine where a decision needs labels, with the scope stated in the paper;
 broadcast matches answer what a real broadcast costs.
@@ -607,6 +664,21 @@ it saves at the hands' rates), so networks are better delivered once; and
 the generic network's gain on the hands is perceptual (LPIPS and DISTS
 better, PSNR worse, a slight colour shift, no invented texture), as G5d's
 enhancer on the background.
+An observation for the tennis paper (user, 2026-10-21; K5b 2): pixel
+coders erase the ball at low rate, measured with a valid ball detector.
+RacketVision's BallTrack finds 0.938 of TrackNet's balls on games 8–10
+(0.918 on K5's games, none in its training); through SVT-AV1 preset 8 at
+CRF 62 (median 84 kbps, frame PSNR 33–34 dB) it finds 0.026, and every
+other tracker of WASB's zoo under 0.03. K5's YOLO26x figure (0.02) came
+from a detector that found only 46% of the source's balls. DCVC-UF,
+measured with BallTrack in K5b 1b: 0.01 of the balls at QP 0 (13 kbps),
+0.15 at QP 21, 0.67 at QP 42 (118 kbps); with the ball mode's streak
+(about 1 kbps) 0.90–0.92 at every point.
+A figure for the tennis paper, if space allows (user, 2026-10-21): the
+ball at equal rate, source | DCVC-UF | + disk | + streak, on two frames
+the user chose from K5b 1b's side-by-side clips (the far player's ball,
+where DCVC-UF loses it and the disk looks unrealistic); regenerated from
+the final experiments' streams, as every figure is.
 Negative results to report (user, 2026-10-13), with their numbers:
 parametric motion fails for egocentric objects (H1's homographies, H4a's
 grip pose on HOT3D motion capture, H4b's bank of views), and keypoints
@@ -663,3 +735,17 @@ learned codec composes better" is not supported. The argument to make
 instead: DCVC-UF is the better base (−63%, H3c), and learned parts
 directed by domain knowledge add large gains on top of a codec. A G
 fitted on SVT-AV1 decodes would only refine this and is not planned.
+A candidate secondary contribution (user, 2026-10-21): the court-view
+classifier and registration (K8b) and the hand-marked shot labels.
+Evidence: 69 held-out shots from three broadcasts, with the user's marks
+and the system agreeing on every shot (registration p95 2.71 px), plus
+K8's 82 marked nadal_kyrgios shots. Before claiming it: (1) a related-work
+check, since broadcast court registration from lines is an established
+topic and the novelty has to be stated against it (shade-robust
+detection, line-swap re-seating, a clutter guard), not assumed; (2) the
+labels are per-shot classes for 151 shots of four broadcasts, not
+per-frame court keypoints, so they are better called a released evaluation
+set than a dataset, and their size is stated; (3) only labels and clip
+identifiers can be released, since the footage is broadcast material. It
+may also be framed as the component that makes the tennis pipeline
+automatic, rather than as a contribution of its own.

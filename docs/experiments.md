@@ -7481,6 +7481,555 @@ invocation turns out to be needed.
 - Budget: CPU first (cuts and line detection); GPU only for a court-keypoint
   model, on the fleet with the usual smoke, ≤ 45 min per stage.
 
+- Implementation/run preparation (2026-10-16, `codex/k8-court-shots`).
+  The supplied `Tennis_courts/reference/` actually contains 966 PNG court
+  photographs, not a geometric model; adjacent `bounding_boxes/` files are
+  YOLO boxes. The user authorized regulation court geometry instead. The
+  ITF model is 23.77 × 10.97 m, singles width 8.23 m, service lines 6.40 m
+  from the net ([ITF](https://www.itftennis.com/en/about-us/organisation/tennis-glossary/));
+  the elevated net is excluded from the planar painted-line model.
+  No pretrained model, new environment or weights are needed: CPU OpenCV
+  4.10.0, NumPy 1.26.4 and SciPy from the existing packed environment.
+  The rule above is unchanged. White-line Hough hypotheses initialize
+  RANSAC against all nine painted line segments, with the preceding frame
+  as a warm start. Every decoded frame is measured at 1080p after K4's
+  limited-range 8-bit YUV420 conversion. Directed chamfer is the mean
+  distance from model-line samples at ≤1 projected-pixel spacing to
+  detected white-line pixels; a frame registers at ≤2 px with support
+  on at least six segments. Chamfer measures only in-frame projected line
+  portions (at least half the projected samples visible); failed fits
+  remain missing, never dropped from the error distribution. Summary uses
+  the ordinary median and linearly interpolated 95th percentile, with
+  infinite failures retained (fixed before user labels).
+  Initial ffmpeg scene threshold 0.25 is provisional for the user's
+  review (candidate scores ≥0.10 retained); the decision thresholds are fixed.
+  Mixed shots are false positives if predicted court and their duration
+  counts as missed court time. Registration is summarized across all
+  user-labelled court frames, with missing fits treated as infinite error.
+  CPU smoke: first 1,500 frames (30 s), ≤600 s; substantive validator
+  checks frame coverage, shot partition, real registered frames, finite
+  homographies, 80% classification and review images. Pilot/whole-match
+  stages ≤2,700 s; initial ceiling 3,500 CPU wall seconds per job,
+  16 CPU threads, no GPU allocation. The smoke establishes scale before
+  any whole-match run. Focused synthetic checks recover a known court
+  homography and reject blank frames; these are correctness checks, not
+  match evidence. Outcome is pending the user's shot labels.
+  Initial pilot `20261016T090118Z-23f79a90` (gpu1, CPU, `7349881`)
+  was stopped during its smoke: `ffprobe -count_frames` was decoding the
+  whole 2,310 s match on one CPU before the selected 30 s could run.
+  No registration result or decision evidence was produced; task artifacts
+  are retained. The revision uses K4's `-count_packets` convention instead,
+  and checks each requested decoded frame while processing. Chamfer
+  sampling was also corrected to uniform projected-pixel spacing (covered
+  by a focused regression test) before any decision run.
+  Corrected pilot `20261016T090621Z-91db7939` (gpu1, CPU, `ddd457c`)
+  failed its timing guard in 3.2 s: the source is CFR 50/1 but starts at
+  PTS 0.020 s. The implementation now explicitly rebases scene-score PTS
+  with `setpts=PTS-STARTPTS`; shot indices remain zero-based presentation
+  order, and ffmpeg seeks are relative to stream start. The source offset
+  is recorded rather than requiring zero PTS. No registration result was
+  produced. Neither diagnostic run supports the decision.
+  Third diagnostic `20261016T090920Z-467b9cc2` (`999b899`, gpu1, CPU)
+  exposed an ffmpeg scope bug before registration: `-frames:v` counts
+  selected scene frames, so it did not bound input decoding. Stopped the
+  owned job and retained its artifacts; scene scanning now has an input
+  `-t` bound. An actual ffmpeg regression fixture checks that a cut beyond
+  the selected input interval is excluded. No registration evidence yet.
+
+- Registration diagnostic `20261016T091435Z-0a586c9d` (`84dbe11`,
+  gpu1, CPU) completed all 1,500 frames / 4 shots in 228.2 s, predicted
+  zero court shots. Its validator failed because the fleet archives and
+  removes scratch before validation; the corrected validator reads
+  `published.tar` as K4 does (regression-tested). No full stage ran.
+  Visual QA found clipped doubles lines and grass texture in the initial
+  colour mask. Before the next smoke, the detector now requires coherent
+  long straight support, measures in-frame projected portions (rather
+  than rejecting a clipped court), and retries independent hypotheses
+  when a previous fit is poor. These are implementation corrections;
+  the decision thresholds are unchanged and this diagnostic is not used
+  for adoption. At this throughput the match is split into four balanced
+  groups of whole shots, each saving every finished shot, ≤45 min per
+  stage, then assembled into a new review directory. Assembly checks
+  identical inputs/cuts and every source frame exactly once; completed
+  archives remain unchanged. Initial ceiling remains 3,500 wall seconds
+  per CPU job, 16 CPU threads, no GPU allocation.
+
+- Revised smoke `20261016T092749Z-37f37559` (`b96ad65`, gpu5,
+  CPU, no GPU) passed all ten substantive checks: all 1,500 frames and
+  4 shots covered, images and finite homographies present, actual frames
+  registering under 2 px, classification exactly at the fixed 80% share.
+  Runtime 245.6 s; zero of four shots predicted court. This negative
+  prediction result is retained; it is not accuracy without the user's
+  labels. The 6,000-frame pilot completed in 313.3 s: 15 shots, 2
+  predicted court. All requested frames were processed. A four-part
+  full run is estimated at about 33 min per part including the repeated
+  whole-match cut scan, within the 45 min stage cap (16 CPU threads,
+  no GPU). Before the decision run,
+  reports also record resolved ffmpeg/ffprobe paths and versions plus
+  stream colour/codec/timestamp metadata. No model or threshold changes.
+
+- Whole-match run submitted (CPU only, `43d32d9`; pending outputs).
+  Four groups of balanced whole shots, same complete source and scene
+  score scan, each its own ≤600 s smoke, ≤2,700 s full stage and 3,500 s
+  total budget. Native tool/codec/colour metadata are in each report.
+
+  | Part | Job | Host (CPU; GPU none) |
+  |---|---|---|
+  | 0 | `20261016T093935Z-caed3e5a` | gpu1 |
+  | 1 | `20261016T093936Z-9d24b59f` | gpu1 |
+  | 2 | `20261016T093938Z-c7c96b10` | gpu5 |
+  | 3 | `20261016T093938Z-90023e70` | gpu5 |
+
+  Source snapshot SHA256 `1a7e221992ff1d5851c298ede352f7489ec701126fea73b132fb81b58ce645f4`;
+  clean selected patch SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+  Input manifest `inputs-4d99d200bcbc.json`, SHA256
+  `4d99d200bcbcc4279ac74781b6529cfbce1835a8afe47a4e94c92b76616327b1`;
+  video SHA256 `676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66`.
+  Packed environment `pointstream-20261009T214002Z.tar.gz`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`.
+  Commands/specifications are preserved in each job's `dispatch.json`,
+  stage metadata and `tennis/k8-2026-10-16/specs-v2/k8-full-<part>.json`.
+  Review serving uses `tools/datasets/k8_review_server.py` (read-only,
+  loopback only, byte ranges for seeking the source); marks stay in the
+  browser until downloaded. UI layout/server changes after `43d32d9`
+  do not change registration, cuts, predictions or archived evidence.
+
+- Full-run resource failure and bounded recovery (2026-10-16).
+  All four full stages reached their enforced 2,700 s allowance; none
+  produced a complete whole-match report. Preserve their `partial.tar`
+  files unchanged. They contain 232 complete shots / 70,383 frames of
+  the 360 shots / 115,505 frames in the retained cut table. Exactly
+  128 shots / 45,122 frames remain. No adoption result is inferred.
+  The initial pilot underestimated hard line-search frames and Python
+  thread contention. Recovery reuses the SHA256-identified cut table
+  and completed archives, processes only missing frames, uses separate
+  CPU processes, and checkpoints chunks of ≤240 frames. Homographies
+  reinitialize at chunk boundaries; the same line detector, court model,
+  RANSAC, chamfer and decision thresholds are retained. Per-item code
+  and archive provenance distinguish the original and recovery results.
+  Whole-shot classification is recomputed from every frame after merge;
+  review images remain the original shot's exact first/middle/last.
+  Recovery budget: 12 balanced missing-frame groups (~3,760 frames each),
+  16 CPU threads / 8 processes, no GPU; smoke ≤300 s on 120 frames of
+  known court shot 9; pilot one complete missing group, full ≤1,800 s,
+  total ≤2,400 s per job. Only after that pilot passes are the remaining
+  groups submitted. Validator checks frame coverage, bounded chunks,
+  real registration, homographies, review images and unchanged shot rule.
+  Tests verify preservation, exact chunk coverage and fail-closed assembly.
+
+- Recovery pilot `20261016T110218Z-1bd79811` (`5432db0`, gpu4,
+  CPU) passed its smoke (120 frames, 41.3 s processing / 44.5 s command)
+  and completed group 0: 22 chunks / 3,756 frames in 246.7 s processing
+  / 249.4 s command. This establishes the actual chunk/process path at
+  the full group scale, with about 7× margin to the 1,800 s cap. Hardware
+  and source identities are revalidated by each remaining job's own gate.
+  The retained evidence and manifest are read-only. Recovery manifest
+  SHA256 `5af2f0a3c4bf6b1f04b7ed145121f3989c0a9c57a6ff3a7ee303c70af577341f`.
+  Remaining jobs select the committed `experiments/`, `src/` and
+  `pyproject.toml` runtime dependency set, avoiding unnecessary NFS file
+  creation; each records that source selection and its snapshot checksums.
+
+- Remaining recovery requests (CPU only; `16b19ab`, same worker/court
+  file contents as the successful pilot; runtime-only source snapshot
+  SHA256 `c1bc200d99b2c1b4155c08cf7081a0382da99f52d991536b60801556182c0580`).
+
+  | Group | Job |
+  |---|---|
+  | 0 (pilot) | `20261016T110218Z-1bd79811` |
+  | 1 | `20261016T112031Z-242208de` |
+  | 2 | `20261016T112031Z-139b7c17` |
+  | 3 | `20261016T112032Z-8cd85120` |
+  | 4 | `20261016T112033Z-cea7591b` |
+  | 5 | `20261016T112050Z-f71ef62e` |
+  | 6 | `20261016T112056Z-8d34945b` |
+  | 7 | `20261016T112057Z-b93576b9` |
+  | 8 | `20261016T112057Z-27c43737` |
+  | 9 | `20261016T112101Z-863308e5` |
+  | 10 | `20261016T112058Z-fed578eb` |
+  | 11 | `20261016T112059Z-5522e2a8` |
+
+  Concurrent source transfers suffered connection failures. Canonical
+  status and shared-inbox inspection confirmed groups 2–11 had no ready
+  record, owner, state or run; no workload had executed. Their original
+  requests were continued, not resubmitted: the surviving complete tar
+  matched every original snapshot checksum, partial source directories
+  were preserved, restored source identities were checked against the
+  already-published group 1, and the frozen fleet publisher completed
+  publication under the original IDs/specifications. Source identity
+  `df2516b1506a553ade44b637c471714c5cd040a261aa75c812d788322fcaba32`.
+  Receipt: `recovery-01/publication-repair-receipt.json`; helper
+  `tools/datasets/k8_publish_existing.py` refuses any ready/claimed/run
+  state. No duplicate job was launched and all normal smoke gates remain.
+
+- Review ready (2026-10-16; assembly revision `edcf474`). All twelve
+  recovery jobs above completed their gates and full stages on CPU.
+  Processing time per group 0–11: 246.7, 322.9, 233.2, 228.4, 203.0,
+  288.1, 269.7, 461.4, 485.8, 468.6, 431.2, 507.5 seconds. Assembly
+  verified the preserved archive hashes, recovery manifest identity,
+  source-video SHA256 and exact non-overlapping coverage of all 115,505
+  frames / 360 original shots. No completed shot was rerun. Each shot
+  has its exact first, middle and last image (1,080 JPEGs); the middle
+  carries the projected court when a homography exists. Predictions:
+  41 court, 319 non-court. These are predictions, not measured accuracy.
+  The browser was opened and verified at 0/360 marks; no labels supplied
+  by the agent. Source video seeking uses a read-only loopback server.
+  Final page, relative to the run root:
+  `review/review.html`; review ID `63f9a0d78069c771`.
+  Absolute run root:
+  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k8-2026-10-16/`.
+  `review/k8-report.json` retains every per-frame homography/error,
+  conversion command, native-tool path/version, input/archive checksum,
+  original and recovery job identity, and selected worker checksums.
+  FFmpeg/ffprobe 8.1.2 from the packed environment supplied the native
+  decode/scene paths; no encoder or GPU was used. The full scene command
+  is explicitly reconstructed from the retained full cut scan, rather
+  than mislabeled with the base smoke's 30-second invocation.
+  Report SHA256:
+  `530696e0c6b70dbbbe0939de295faa4a9c83a07140e7586038784bc2e44ce4cf`;
+  HTML SHA256:
+  `4a16e6f746fc1de6442df76e8334df2b7ac091a3fd082d3096205beee8af8a1e`.
+  Required checks passed: ruff, mypy, pytest (574 passed, 19 skipped).
+  **Outcome by the rule: pending the user's complete marks JSON.**
+  Precision, duration-weighted recall, registration median/p95 and
+  per-class misses will be scored only after those marks return.
+  No adoption decision or threshold change has been made.
+
+- Amendment 1: a stratified sample of shots to mark (2026-10-20, written
+  before any mark; Claude takes over from `codex/k8-court-shots` on
+  `claude/k8-court-shots`). The user asked for cheaper marking than all
+  360 shots. **What changes:** the user marks (a) every predicted-court
+  shot (all 41) and (b) a Poisson sample of the 319 predicted non-court
+  shots, drawn with probability proportional to duration:
+  π_i = min(1, n·d_i / D), with D the stratum's duration and the cap
+  applied iteratively. Shot i is in the sample when u_i < π_i. Here
+  u_i = sha256("pointstream-k8:<shot id>") / 2^256 is fixed and blind to
+  content. The expected size is n = 50, about 90 shots in all, at about
+  10 s per shot, or roughly 15 minutes. The sample is nested in n: a
+  larger n keeps every shot already drawn. **Why:** precision needs only
+  the predicted-court shots, and recall needs only an estimate of the
+  court time hidden among the predicted non-court shots. **Estimators.**
+  Precision is exact, from all 41 shots. Duration-weighted recall is
+  R = A / (B + Y). A is the duration of predicted-court shots marked
+  court. B is the duration of predicted-court shots marked court or
+  mixed. Y is the duration of predicted non-court shots that are court or
+  mixed, estimated by Horvitz–Thompson as Ŷ = Σ_sample y_i/π_i. Because
+  π_i = d_i/c below the cap, each sampled positive adds exactly c seconds,
+  so Ŷ = Y_capped + c·k for k sampled positives. The 95% interval on Y
+  takes the exact Poisson (Garwood) interval for E[k], scaled by c. k is
+  a sum of independent Bernoullis, less dispersed than a Poisson, so the
+  interval errs wide. R's interval follows by monotonicity:
+  [A/(B+Y_hi), A/(B+Y_lo)]. Registration error is measured on all true
+  court frames. Frames of sampled shots carry weight 1/π_i, and missing
+  fits stay infinite. The median and 95th percentile use the weighted
+  linear interpolation that reduces to the ordinary median and the
+  linearly interpolated percentile when all weights are equal. Misses
+  are reported by class, both as sampled counts and as weighted estimates
+  of count and duration. **Unchanged:** precision ≥ 0.95, duration
+  recall ≥ 0.90, median ≤ 2 px, 95th percentile ≤ 6 px, the 80%
+  shot rule, the classes, and mixed shots counted wrong for both.
+  **Reading the recall interval.** If the interval lies wholly above or
+  wholly below 0.90, the recall condition is decided. If it straddles
+  0.90 while the other conditions pass, stage 2 extends the same draw to
+  n = 150. Stage-1 marks are kept, and about 85 more shots add about
+  15 minutes. Recall is then decided on the point estimate R̂, with the
+  interval reported, and a still-straddling interval is stated as
+  "within sampling error of the bar". The arithmetic behind this: with
+  A ≈ 449 s and no positive in the sample, n = 50 gives a recall lower
+  bound near 0.77, and n = 150 gives about 0.91. If precision or
+  registration already fails, no second stage runs. The 360-shot review
+  (`review/`, ID `63f9a0d78069c771`) and its report stay unchanged. The
+  sample page is a new directory beside it, `review-sample-01/`.
+
+- Sample review ready (2026-10-20, `e43215b`, CPU, no re-registration).
+  Command: `python -m experiments.tennis.k8 sample --report review/k8-report.json
+  --out review-sample-01`, run on the published report (SHA256 `530696e0…`,
+  checked). The draw gives 41 + 41 = 82 shots to mark. Of the predicted
+  non-court shots, 41 are sampled (expected 50; Poisson sampling varies the
+  count), covering 548 of their 1,861 s. Scale c = 37.2 s, largest π = 0.94.
+  Sample review ID `fb6cfe8a81f9a440`. `k8-sample.json` SHA256
+  `91738f886955d25c72f2a7c04f9d723bc82a6def5a4cd2afa52bd69e9dbaa3b1`,
+  `review.html` SHA256
+  `92b2ed13234bf4bf78de53a200ce57ebe1db90fd111dfa2d1df64c59b4ef1dd4`.
+  Images and source are relative links into `review/`. The page is served
+  read-only on gpu1 loopback (port 17689) and reached through an SSH
+  tunnel. It was checked at 0 / 82 marks; the agent supplied no labels.
+
+- **Outcome (2026-10-20): not adopted**, decided at stage 1 with no second
+  stage. Scored with `python -m experiments.tennis.k8 score` (scoring code
+  as in `e43215b`) on the user's marks, `k8-marks-fb6cfe8a81f9a440.json`
+  (SHA256 `eeba025b…cb4a2`, 82/82 marked), against the published report
+  `530696e0…`. Score `review-sample-01/k8-score-sample-01.json`, SHA256
+  `2ac7bebb4a7fbed8e7a6174cc7582cb017ff2df81f245b3861a0256e27b0c405`.
+  The registration jobs are the four original parts and twelve recovery
+  groups listed above (CPU only, no GPU).
+
+  | Condition | Bar | Measured | Passes |
+  |---|---|---|---|
+  | Precision (exact, 41 shots) | ≥ 0.95 | 1.00 (41/41) | yes |
+  | Duration recall (HT, 95% CI) | ≥ 0.90 | 0.34 [0.26, 0.45] | no |
+  | Registration median, true court frames | ≤ 2 px | 1.43 px | yes |
+  | Registration 95th percentile | ≤ 6 px | 24.5 px | no |
+
+  The interval lies wholly below the bar, so no stage 2 runs. On predicted
+  court shots alone the errors are median 0.91 px and p95 2.52 px. The p95
+  fails because of the true court shots the classifier missed. Of the 41
+  sampled non-court shots, 23 are court or mixed. The weighted estimate is
+  about 856 s of court time hidden among the predicted non-court shots
+  (633 s court, 223 s mixed), against 449 s found. **Misses by class**
+  (sampled shots):
+  1. *Near misses, the 80% shot rule* (11 court shots: 0000, 0002, 0012,
+     0017, 0036, 0048, 0088, 0139, 0247, 0290, 0294). A homography exists
+     on almost every frame, with a median chamfer of 0.9–2.0 px, but 20–50%
+     of frames exceed 2 px (p90 3–4.6 px). These are per-frame errors in
+     a shot that does register.
+  2. *Wrong or no fit* (6 court shots: 0100, 0123, 0172, 0201, 0223,
+     0259). The median is 4–20 px, or there is no fit (0201).
+  3. *Missed cuts* (6 mixed shots: 0031, 0062, 0079, 0135, 0181, 0203).
+     The 0.25 scene threshold merged a court and a non-court shot.
+  The user decides how to proceed. Any change of method needs a new rule
+  judged on shots not yet marked; these 82 marks have now been seen.
+  Close-up, crowd and other shots were never predicted as court, so the
+  competing explanation (court-like structures in non-court shots) is not
+  observed.
+- **Decode offset found by the user (2026-10-20).** Each shot's first
+  review image was its predecessor's last frame. The cause: ffmpeg's input
+  `-ss` counts from the container start (0, the audio), while cut indices
+  count from the video's start (0.020 s, `setpts=PTS-STARTPTS`). So
+  `-ss start/fps` decoded from frame start−1. Verified on the broadcast:
+  the first cut is n = 593, and the old seek decoded n = 592. In the
+  published report the registration row labelled f is therefore source
+  frame f−1 for every shot except shot 0. Within each recovery chunk
+  that starts inside a shot, one frame is measured twice and one is never
+  measured. The effect on this outcome is negligible: a corrected shift
+  flips one prediction (shot-0288, a one-frame shot), and recall and p95
+  stay far from their bars. The archived evidence is unchanged.
+  The decode now seeks to (video start − container start) + (start − ½)/fps
+  (`seek_offset`, `seek_seconds`). A regression test with real ffmpeg
+  (an MKV whose audio starts at 0 and video at 0.02 s) passes with the
+  packed ffmpeg 8.1.2 on gpu1. Any later registration run uses the fix.
+  Until then, per-frame homographies from this run must be read at
+  frame f−1.
+- **Partial court-shot list v0 for K4b (d)** (2026-10-20, the user's choice
+  of options B and A). `court-shots-v0/k8-court-shots-v0.json` under the
+  run root (SHA256 `f1efc61dafe6ebd75303a6448ddb5180eaec70dee9e329fde8517674088dad7a`):
+  the 41 predicted-court shots, all marked court, 22,460 frames.
+  Per-frame homographies are re-indexed for the decode offset; the row
+  for a shot's last frame is taken from the next shot. It covers about a
+  third of court time, so absence from the list does not mean non-court.
+  K8b (revised cuts and registration) follows under its own rule.
+
+### 2026-10-20 — K8b: court recall in shade and across venues (rule)
+- Question (PLAN K8, after K8 was not adopted). Can a revised registration
+  meet K8's unchanged decision rule on footage the method was not
+  designed on?
+- Diagnosis on dev data: K8's 82 marked shots, which may now be used for
+  design. K8's line detector keeps only pixels with value > 170 and
+  saturation < 80. In shade (court grass at value ≈ 90, a line at ≈ 133)
+  it finds no lines. Late in the match the near half of the court is in
+  shade, so those shots get a wrong fit (one line off) or none (0172,
+  0201, 0223, 0259). The remaining misses fail only the per-frame 2 px
+  bar of the shot rule (2–4 px during pans). Four of the six mixed shots
+  switch from no-fit to fit with no scene-score cut, which looks like a
+  gradual transition.
+- Method (each piece checked on one clean frame from each of the 82 dev
+  shots, decoded without warm start):
+  1. *Relative line detector.* A line pixel is brighter than its local
+     background (morphological opening, 31 px) by at least
+     max(10, 0.10·background), and less saturated than its surroundings
+     (closing, ≤ 0.75 of them). Support from long Hough segments is kept
+     as in K8.
+  2. *Hypotheses.* The previous frame (warm start, reset at cuts), then,
+     when it fails or exceeds 2 px, the seeds from both K8's detector and
+     the relative one. Each is refined against both masks, and the fit
+     with the lowest error is kept. A bank of the match's own good
+     homographies added one frame at twice the cost, so it is not used.
+  3. *Ruler.* The error is the directed chamfer from projected model
+     lines to the 1 px centerlines of the detected Hough segments.
+     Measuring against a mask's full width would let a dense mask
+     flatter the fit; on the dev frames the two agree within 0.7 px.
+  4. *Spurious-fit guard.* Clutter is the share of the projected court's
+     interior, more than 6 px from any model line, that is covered by
+     detected pixels. A fit needs clutter ≤ 0.25, at least 6 supported
+     segments and plausible geometry (as in K8). On the dev frames, court
+     fits had clutter ≤ 0.085, and the two spurious fits (a close-up and
+     a crowd shot) had 0.52–0.66.
+  5. *Shot rule.* A frame *fits* at error ≤ 6 px, the p95 bar. A shot is
+     court when at least 80% of its frames fit. The per-frame 2 px bar
+     no longer gates the shot; registration accuracy is judged only by
+     the decision rule below.
+  6. *Cuts.* Scene score ≥ 0.25 as in K8. In addition, a shot is split
+     where its per-frame fit state changes and the new state lasts at
+     least 1 s. Shorter runs are absorbed into their neighbours.
+  7. *Decoding.* Each clip is decoded sequentially from its start, with
+     no seeks, so the decode-offset bug cannot arise.
+  On the dev frames, 53/58 court frames fit within 2 px and 56/58 within
+  6 px; K8's method got 42 and 52. The 18 non-court frames had 0 fits.
+  These dev numbers are design evidence only.
+- Held-out data: the 70 scene clips of the three other archived
+  broadcasts (`tennis_games/alcaraz_hurkacz`, 21 clips, 6,968 frames at
+  1080p50; `djokovic_zverev`, 8 clips, 20,320 frames at 2160p60, converted
+  to 1080p by K4's conversion; `medvedev_struff`, 41 clips, 10,854 frames
+  at 1080p50). These are different venues, not seen in design, and they
+  are the clips K4b's windows come from.
+  nadal_kyrgios is not re-scored: its marks were used for design.
+- Marks: a review page, as in K8, of every shot the method produces in
+  those clips (a census, so no sampling; about 100 shots, about 15–20
+  minutes). The user marks the true class with K8's classes. The page
+  shows predictions and the projected court as before.
+- Decision rule (K8's thresholds, unchanged): adopted when, on the
+  held-out shots as marked, court-view precision ≥ 0.95, court-view recall
+  ≥ 0.90 weighted by duration, and on all true court frames (missing fits
+  infinite) a median error ≤ 2 px and a 95th percentile ≤ 6 px with the
+  ruler above. Mixed shots count wrong for both. Otherwise the misses are
+  reported by class and the user decides. Limitation, stated beforehand:
+  the clips were cut by the old pipeline around points and are mostly
+  court views, so precision is weakly tested there. The 0/18 dev
+  non-court fits are the only other precision evidence. If K8b is
+  adopted, the nadal_kyrgios whole-match run (v1 of the court-shot list)
+  comes next, and its predicted-court shots are spot-checked.
+- Hypothesis: the shade failure and the 2 px gate cause most of K8's
+  misses. Recall and registration pass on other venues, whose lighting
+  and surfaces differ.
+- Competing explanation: the relative detector is tuned to Wimbledon
+  grass. Hard or clay courts with logos, shadows or different line
+  contrast fail registration, or spurious fits appear on textured
+  surroundings that the clutter guard does not catch.
+- Budget: CPU only, on the fleet. At about 0.5–1.6 s per frame per
+  process, 38k frames take about 20–60k CPU seconds. Parts are whole
+  clips, 8 processes, checkpointing every finished clip. Smoke ≤ 600 s
+  on one short clip; full stages ≤ 2,700 s; parts sized from the smoke's
+  measured rate. No GPU.
+- Pilot smoke `20261020T215039Z-fdd6bf8c` (`78f6fa0`, gpu4, CPU).
+  An earlier submission, `20261020T215018Z-5357cd95`, snapshotted the
+  main checkout (`dabfa5c`, which has no K8b code) and was cancelled
+  before it ran anything. The smoke processed 240 frames of
+  `djokovic_zverev/000` in 524 s and failed its validator: no frame fit.
+  That clip is a court-level practice camera (4K60). Diagnosis: seven
+  model lines fit within 2.4 px, but both singles sidelines were off by
+  39 px. The fit had locked the model's doubles sidelines onto the court's
+  singles lines. The real doubles lines leave the frame, the seed only
+  takes sidelines that cross 60% of the frame height, and K8's geometry
+  guard (corners within ±10% of the width) rejected the correct fit,
+  whose near corners lie 25% beyond each side. Unguarded, the correct fit
+  is 1.22 px on all nine lines. It is not evidence.
+- Amendment 1 (2026-10-21, before any held-out shot is reviewed).
+  (a) K8b's geometry guard allows corners up to 50% of the frame width
+  beyond either side; K8's guard is unchanged. (b) When the best fit
+  exceeds 2 px, it is re-seated on the model's four line-swap pairings:
+  singles↔doubles sidelines and service lines↔baselines, as model-space
+  scalings about the court centre. This is the same one-line-off
+  ambiguity as K8's class-2 misses. (c) Each frame computes the distance
+  transform once per mask, which changes speed only. No threshold
+  changes. Because the fix was found on a held-out clip,
+  `djokovic_zverev/000` (3,975 frames, 66 s) becomes dev: it is still
+  registered (K4b needs it) but is neither reviewed nor scored. The
+  held-out census is the other 69 clips.
+- Runs (CPU only, no GPU; packed environment `32e68872…`; manifest SHA256
+  `82a582e0246f1a3a0fce2fbe1f694097fe7b47dca8cf774cb3f897b3a51ae00a`).
+  The corrected 4-part pilot `20261020T220814Z-c4b9d013` (`0465976`,
+  gpu1) passed its smoke (240 frames, 524 s, about 2.2 s per frame per
+  process) and reached its 2,700 s full-stage cap at 25 of 34 chunks.
+  That code published clips only at the end, so `partial.tar` is empty;
+  its `checkpoint.tar` keeps the finished chunks. The artifacts are
+  retained and nothing was replayed. Resized to 8 parts × 16 processes
+  with 200-frame chunks; each clip is finalized and published as soon as
+  its chunks finish, longest clips first (`913b815`). Pilot part 0,
+  `20261020T225829Z-3cb8b9aa` (gpu6): smoke 160 frames in 183 s; full
+  stage 6 clips, 4,484 frames, in 499 s. Its validator passed on the
+  smoke (fleet) and on the full stage (locally, from `published.tar`).
+  Parts 1–7 were then submitted on the same revision (`git_head` checked
+  in each `ready.json`):
+
+  | Part | Job | Archive SHA256 |
+  |---|---|---|
+  | 0 | `20261020T225829Z-3cb8b9aa` | `3910621c…` |
+  | 1 | `20261020T231141Z-bff7fd07` | `8e61d922…` |
+  | 2 | `20261020T231147Z-a44fc8b0` | `86c30e3e…` |
+  | 3 | `20261020T231153Z-d859538d` | `8e7d98c6…` |
+  | 4 | `20261020T231200Z-23e16ed2` | `d1652905…` |
+  | 5 | `20261020T231206Z-50159441` | `db7ad8b0…` |
+  | 6 | `20261020T231213Z-19ea5d2d` | `c0317166…` |
+  | 7 | `20261020T231220Z-a7110d20` | `0e4df826…` |
+
+  All eight full stages completed (CPU, no GPU). They took 485–564 s on
+  gpu5 and gpu6, and 2,446–2,599 s for parts 5–7, which shared gpu3
+  (64 cores). Each passed its validator on the smoke (fleet) and on the
+  full stage (locally). Assembled with `k8b assemble` (`a87dd2e`): 70
+  clips and 38,142 frames, each clip exactly once, every review image
+  present. Review `review/` under the run root, ID `13f69f53873866a2`,
+  `k8b-report.json` SHA256 `8230bf1a2239978dfb7912bd5f3ed8367f5c85d1ea9e75c42e8ab8fb3fdc3314`,
+  `review.html` SHA256 `a02a45a1a3a064fac69a95693699869650bdc2da3cd029b61d11685988b498f7`.
+  Every clip forms a single shot: no cut at ≥ 0.25 and no persistent
+  change of fit state inside a clip. 69 shots go to the user (the dev
+  clip is excluded). 44 are predicted court (723 s) and 25 non-court
+  (45 s, all medvedev_struff). These are predictions, not accuracy. The
+  page is served read-only on gpu1 loopback (port 17690) through a
+  tunnel, and was checked at 0 / 69 marks; the agent supplied no labels.
+- **Outcome (2026-10-21): adopted.** Scored with `k8b score`
+  (`76a7db2`) on the user's marks `k8b-marks-13f69f53873866a2.json`
+  (SHA256 `8f7f665c…3c0dcd`, 69/69 marked) against `k8b-report.json`
+  (`8230bf1a…`). Score `k8b-score.json` under the run root, SHA256
+  `a914eceed27daf30c46881ee336b4c5505695afa9093830c4db990d2d00b2675`.
+  The jobs, inputs and revision are in the table above (CPU only).
+
+  | Condition | Bar | Measured | Passes |
+  |---|---|---|---|
+  | Precision (44 predicted court shots) | ≥ 0.95 | 1.00 (44/44) | yes |
+  | Duration recall (723 s of true court) | ≥ 0.90 | 1.00 | yes |
+  | Registration median, 31,914 true court frames | ≤ 2 px | 0.77 px | yes |
+  | Registration 95th percentile | ≤ 6 px | 2.71 px | yes |
+
+  Every shot matches the user's class. alcaraz_hurkacz has 21 court
+  shots and djokovic_zverev 7. medvedev_struff has 16 court shots plus
+  21 close-ups, 2 crowd shots and 2 graphics, all predicted non-court.
+  The hypothesis holds: shade and the per-frame 2 px gate caused K8's
+  misses. The competing explanation (failure on other surfaces, or
+  spurious fits on texture) is not observed: the method held on hard
+  courts and a court-level camera. Scope, as stated in the rule: precision
+  rests on 44 shots (one-sided 95% lower bound 0.934, Clopper–Pearson).
+  Only 25 held-out shots are non-court, and no replay or picture-in-picture
+  appears. The clips were pre-cut by the old pipeline, so they test
+  in-clip cuts and fit-state splits only weakly. Registration is measured
+  with the centerline ruler (rule, item 3).
+  **What K4b's candidate (d) can use now:** per-frame court homographies
+  (ITF metres to 1080p pixels; null where there is no fit) and the court
+  outline for every frame of these 70 clips, including the dev clip
+  `djokovic_zverev/000`. They are in `clips/*.json` inside each part's
+  `published.tar` and in the assembled `review/k8b-report.json`
+  (`registration[n].homography`, n = the clip's decoded frame index).
+  Still to run with the same adopted method: the clips of
+  djokovic_federer and rublev_auger-aliassime (the two other matches K4b
+  draws from), and nadal_kyrgios's whole match (v1 of the court-shot
+  list).
+- Application to K4b's other two matches (2026-10-21, the adopted method
+  unchanged; a production run, not new evidence for the rule).
+  djokovic_federer (23 clips, 4K) and rublev_auger-aliassime (66 clips),
+  `<match>/videos/*.mp4`: 89 clips, 31,390 frames. Manifest
+  `k8b-2026-10-20/k4b-matches/manifest.json` (SHA256 `6c2be1a4…`). Eight
+  parts of whole clips (`3aca368`; CPU only, 16 processes each):
+  `20261021T092159Z-9b8ef899`, `…092204Z-1ee9605a`, `…092208Z-804e7d30`,
+  `…092315Z-1a7be77c` (part 3), `…092233Z-e808e648`, `…092238Z-019a88a8`,
+  `…092243Z-41be5f46`, `…092247Z-91b9e709`. The first submission of part 3
+  (`20261021T092213Z-112d5db2`) stopped during source upload: the
+  directory holds only a partial `source.tar`, with no spec, ready
+  record, owner or run. No worker could claim it and nothing executed,
+  so part 3 was submitted once more. The partial directory is left as
+  it is.
+  All eight full stages completed and passed the validator on the smoke
+  (fleet) and on the full stage (locally). Assembled at
+  `k4b-matches/registration/k8b-report.json` (SHA256
+  `eb7b34b9f8117f5926fb9e15d34bde9a209ce43213e19dc9d9641b38b552e3e0`):
+  89 clips, 92 shots, 31,390 frames. Frames that fit: djokovic_federer
+  13,710/13,901, rublev_auger-aliassime 10,264/17,489. The six
+  rublev_auger-aliassime clips K4b needs that do not fit (003, 006, 039,
+  054, 062, 063) were inspected visually. They are close-ups, a tunnel,
+  and a player in front of a wall or by the sideline: not court views,
+  so the absence of a fit is correct. 061 (fits on 34% of frames) is a low
+  courtside view. These shots are not marked (the method is adopted), so
+  this is an inspection, not evidence. Consumers use frames whose `fits`
+  flag is true; a non-null homography above 6 px (e.g. in 003) is kept
+  for inspection only.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
@@ -8404,3 +8953,517 @@ invocation turns out to be needed.
   perceptual gain needs the visual check beside it; and this is the
   oracle (fitted on the window, bits free), not the generic network G,
   which was fitted on DCVC-UF decodes only.
+
+### 2026-10-20 — K5b (1): the ball renderer's oracle (a drawn ball, billed)
+- Question (PLAN K5b 1): K5's oracle pasted the source's own ball pixels
+  and billed only the trajectory's entropy. Does a ball the decoder
+  *draws* keep the win when every byte of what it needs is sent? Two
+  renderers, both from the coded positions and a per-window appearance
+  sent once: (a) a **sharp disk** (anti-aliased, radius r, colour c);
+  (b) a **streak**, the same disk averaged over the exposure along the
+  coded velocity (alpha = the fraction of the exposure each pixel spends
+  covered, so a fast ball fades as it lengthens, as a camera blurs it).
+  Velocity is the central difference of the coded positions (one-sided
+  at a run's ends, zero for a lone frame), so it costs nothing beyond
+  the positions and one frame of decoder delay. Still an oracle: the
+  positions are TrackNet's labels (a tracker comes in K5b 2).
+- What is sent (`src/pointstream/ball.py`, a `BALL` segment of the
+  PointStream container, its tag and length bytes billed): per window,
+  an on/off bit; when on, colour (3 × 8 bits), radius index (4 bits,
+  1.5–6 px), exposure index (3 bits, 0–1 of a frame interval; 0 is the
+  disk), phase index (3 bits, the streak's centre at −½…+½ of the
+  frame's displacement from the labelled point), the Exp-Golomb order of
+  the residuals; visibility as alternating run lengths (Exp-Golomb);
+  each run's first position absolute (11 + 10 bits at 1280×720), then
+  constant-velocity residuals (signed Exp-Golomb, K5's predictor). Rate
+  = the segment's bytes per window, per window (K5 pooled an entropy; a
+  real code bills more). Decoding the payload returns the positions and
+  parameters exactly (a test).
+- The encoder's fit (analysis by synthesis, as an encoder may: it holds
+  the source and its own decode): per window and coder point, a grid
+  over radius × exposure × phase (the disk: radius only), the colour in
+  closed form (least squares of the composite against the source, then
+  rounded to 8 bits), choosing the combination that most lowers the
+  window's whole-frame squared error; off when none lowers it (then the
+  segment is one byte of payload).
+- Windows, coders, judges and comparison: K5's, unchanged (8 TrackNet
+  windows, SVT-AV1 preset 4 at CRF 35–62, DCVC-UF HT-L at QP 0–63 on the
+  A6000; ball-region PSNR within 8 px of the label, frame PSNR; BD-rate
+  against the pooled envelope and each coder's own). Added: a
+  *streak-region PSNR* (within 8 px of the segment the label's own
+  velocity sweeps in one frame), reported, since K5's region misses most
+  of a 20–40 px streak. Recall is not measured here: YOLO26x was not a
+  valid judge (46% on the source); the tracker of K5b (2) becomes the
+  judge. K5's pixel oracle is recomputed in the same job, so each
+  renderer's distance to the bound is measured on the same decodes.
+- Decision rule (`k5b.DECISION`, fixed before any run). A renderer is
+  adopted when, over a coder underneath (SVT-AV1 or DCVC-UF), it beats
+  the pooled envelope on ball-region PSNR on ≥ 6 of the 8 windows, each
+  by BD-rate ≤ −25% or better at every rate (K5's bar, now with real
+  bytes and a drawn ball), **and** its frame-PSNR BD-rate against its own
+  coder's envelope is ≤ +1% on ≥ 6 of 8 (the ball mode does not hide a
+  cost elsewhere in the frame). If both renderers pass, both stay
+  available and the user's side-by-side preference picks the codec's
+  default; a preferred renderer that fails the rule is not the default.
+  If neither passes, the ball mode needs a richer appearance (a per-window
+  sprite of the source's ball, its own oracle) and the reading says which
+  half failed.
+- Hypothesis: the streak keeps most of K5's gain (pooled BD on DCVC-UF
+  −45% to −55%, K5's oracle −57%) and may beat the pixel oracle on fast
+  windows, where the oracle pastes only 4 px of a long streak; the disk
+  passes on DCVC-UF but by less (about −35%); both pass on SVT-AV1 by less
+  than on DCVC-UF (K5: −38%). Frame PSNR moves by under 0.3%. The
+  billed rate stays under 0.5 kbps per window (K5's entropy: 0.23).
+- Competing explanations: (1) TrackNet's integer labels and their
+  convention (which point of a streak is marked) misplace the drawn ball,
+  costing the disk on fast frames; the fitted phase shows it. (2) The
+  fitted colour mixes ball and court (a 3–5 px ball in 4:2:0), giving a
+  dull ball that scores well and looks wrong; the side by side shows it.
+  (3) At high rates the decode keeps the ball, and a second drawn ball
+  doubles it; the per-point fit can switch the mode off, and the curves
+  show where it does. (4) The streak wins on PSNR only because PSNR
+  rewards blur; the user's preference is the check for display.
+- Side by side (for the user's preference, K5b): per window, at DCVC-UF
+  QP 21 (about 40 kbps, where the decode loses the ball) and QP 42, a
+  2 × 2 clip at equal rate (source, the pixel coder, + disk, + streak;
+  the ball mode adds under 1% of the rate), as a ball-following crop
+  enlarged 3×, and a full-frame 2 × 2 at QP 21.
+- Budget: DCVC-UF on the A6000 (K5's table), SVT-AV1 on 16 threads, no
+  detectors. Smoke: one window, 48 frames, ≤ 600 s. Pilot: part 1, 4
+  windows (K5's pilot windows first), ≤ 45 min; part 2, the other 4,
+  ≤ 45 min, run only if part 1 leaves the rule open. Ceiling 2
+  GPU-hours and 6 h wall.
+- Failed attempt (infrastructure). `20261020T184724Z-58d02fd1`
+  (`14d3892`): the smoke stopped writing the full-frame clip (the label
+  was drawn on a read-only frame); fixed in `523cee1`.
+- Job: part 1 `20261020T185255Z-43bcc85e` (`523cee1`; RTX A6000, gpu3,
+  shared with another user's process; game3/Clip3, game7/Clip2,
+  game10/Clip10, game3/Clip6; full stage 1,213 s; `published.tar`
+  `6520ae01…b095`; inputs, environment, checkpoints and windows as K5;
+  SVT-AV1 4.2.0, dav1d 1.5.4 from the environment). Validator passed on
+  the smoke and, run locally, on the full stage (12 checks). Every DCVC-UF
+  point decoded deterministically on its first attempt. About 0.4
+  GPU-hours with the smoke.
+- Report (`k5b report` on part 1; `k5b-report.json` `a4a556a0…dfc8`). Means
+  over the 4 windows (kbps; ball-region PSNR dB; decode → pixel oracle /
+  disk / streak):
+
+  | Point | kbps | ball PSNR | streak-region PSNR | frame PSNR |
+  |---|---:|---|---|---:|
+  | DCVC-UF QP 0 | 12.95 | 18.73 → 22.94 / 19.32 / 19.70 | 20.98 → 24.10 / 21.48 / 21.88 | 29.42 |
+  | DCVC-UF QP 21 | 36.60 | 19.89 → 24.11 / 20.28 / 20.63 | 22.19 → 25.36 / 22.53 / 22.90 | 33.74 |
+  | DCVC-UF QP 42 | 117.7 | 23.89 → 27.56 / 23.89 / 23.92 | 26.01 → 28.64 / 26.01 / 26.05 | 37.19 |
+  | SVT-AV1 CRF 62 | 73.94 | 20.21 → 24.41 / 20.56 / 20.87 | 22.54 → 25.73 / 22.86 / 23.18 | 35.31 |
+  | SVT-AV1 CRF 55 | 176.0 | 23.62 → 27.74 / 23.67 / 23.77 | 25.91 → 28.97 / 25.95 / 26.04 | 38.35 |
+
+  The ball segment costs 0.22–0.33 kbps when on (one byte of payload,
+  0.003 kbps, when off); the fit turns it off at DCVC-UF QP ≥ 42 and
+  SVT-AV1 CRF ≤ 48 on most windows. BD-rate on ball-region PSNR against
+  the pooled envelope, per window (game10/Clip10, game3/Clip3,
+  game3/Clip6, game7/Clip2): K5's pixel oracle on DCVC-UF −71.9%, −55.8%,
+  −58.3%, −51.0% (K5: −57.3% median, reproduced); the disk on DCVC-UF
+  +7.3%, +6.7%, +4.5%, +0.7%; the streak on DCVC-UF +3.2%, +0.8%, +0.8%,
+  −3.9%; on SVT-AV1 the disk +21% to +30%, the streak +19% to +28%.
+  Frame PSNR against each coder's own envelope: +0.0% to +0.8% (within
+  the +1% bar). Fitted streaks: radius 1.5–4 px, exposure 0.43–1.0 of a
+  frame, phase −1/6, colours dull (e.g. 182/182/172 on a white-ball
+  window).
+- Decision (by the rule): **no renderer is adopted.** Both fail the ball
+  half on all 4 windows with either coder (the rule needs 6 of 8, so 4
+  failures decide it); part 2 was not run. The frame half passes.
+- Reading. The hypothesis fails: a per-window appearance keeps 10–20% of
+  the pixel oracle's gain on the ball region (DCVC-UF QP 21: +0.4 dB for
+  the disk, +0.7 dB for the streak, +4.2 dB for the oracle), not most of
+  it. The review strips show why: fast balls are long, bright streaks;
+  the drawn streak has the right direction but stays faint, and the
+  fitted colour is dull (competing explanation 2: the least-squares fit
+  hedges a ball it cannot place exactly). Competing explanation 3 holds
+  in part: the decode keeps a faint ghost above the ball at QP 21, which
+  the drawn ball does not cover.
+  A diagnostic (`experiments/tennis/k5b_diagnostic.py`; not evidence:
+  source JPEGs read by OpenCV, a temporal
+  median as the true background, TrackNet's camera being still; 8
+  windows, CPU; `k5b-diagnostic.json` `be8237c1…f5d5`) separates the causes. Ball-region PSNR over the median,
+  per window: the per-window renderer recovers 15–60% of what pasting the
+  source within 4 px recovers (+0.4 to +2.4 dB against +2.4 to +6.7 dB);
+  the same streak shifted per frame by its best offset within 4 px (a
+  position oracle; median offset 1.4–3.2 px from the label) adds about
+  1.5 dB; a free setting and colour per frame at the label (an appearance
+  oracle) adds about the same; each alone stays 0.1–2.3 dB under the
+  paste. A sensor-saturation gain (alpha = min(1, g × coverage)) is
+  chosen on one window only. So the drawn ball needs both: positions
+  refined by the encoder to where the ball is (TrackNet's integer labels
+  are 2–3 px off the best fit) and an appearance sent per frame (about
+  35 bits, 1 kbps), each an encoder decision that is billed.
+- Next (K5b 1b, its own oracle, proposed): per-frame position refinement
+  (±4 px by fit, residuals billed through the same Exp-Golomb code) and a
+  per-frame appearance (setting and colour, predicted from the previous
+  frame, billed), on the same decodes and judges, with K5b 1's rule.
+- Rendering preference (side by side sent to the user 2026-10-20: three
+  windows' ball-following clips and one full frame at DCVC-UF QP 21):
+  pending.
+
+### 2026-10-20 — K5b (2): an encoder-side ball tracker (audit and rule)
+- Question (PLAN K5b 2, ball stage): a tracker that finds the ball on the
+  source for the ball mode's encoder, and that also judges the codecs'
+  outputs (K5: YOLO26x finds 46% of the source's balls, SAM 3.1's text
+  prompt 56%; neither is a valid judge).
+- Audit (2026-10-20). **No TrackNet-family weights are in `Models`**
+  (`YOLO/` holds COCO detectors and trackers' configs only). Candidates:
+  - *WASB* (Tarashima et al., BMVC 2023; `nttcom/WASB-SBDT`, **MIT**):
+    an HRNet heatmap tracker with tennis weights (`wasb_tennis_best.pth.tar`,
+    Google Drive) and the TrackNetV2, ResTrackNetV2, MonoTrack, BallSeg and
+    DeepBall baselines retrained by the same code. Its tennis config
+    trains on TrackNet **games 1–7** and tests on games 8–10, so five of
+    K5's eight windows (games 2, 3, 6, 7) are in its training set; only
+    game8/Clip6 and game10/Clip10 are held out. Plain PyTorch (tested on
+    Python 3.8, CUDA 11.3); no conflict expected with the pointstream
+    environment's torch, checked in the smoke.
+  - *RacketVision's BallTrack* (`OrcustD/RacketVision`, **MIT**):
+    TrackNetV3 with a median background frame, checkpoints on Hugging Face
+    (`linfeng302/RacketVision-Models`; the README names a badminton
+    example, a tennis checkpoint is unconfirmed); torch 2.1.2 and
+    mmengine.
+  - *TrackNetV3* (`qaz812345/TrackNetV3`, **MIT**): shuttlecock only.
+  - TrackNet v1 (the dataset's own model, no licence stated): not used.
+- Labels on disk. TrackNet: 95 clips, 10 games, 1280×720, every frame
+  (no licence stated; already used by K4–K5). RacketVision tennis
+  (**MIT**): 431 rallies at 1920×1080, 21,544 labelled frames (20,066
+  visible; about every 11th frame), split 350 / 38 / 43 with no match in
+  two splits.
+- Held-out labels for the decision: TrackNet's games of K5's windows
+  (2, 3, 6, 7, 8, 10) and RacketVision tennis test. Training uses TrackNet
+  games 1, 4, 5, 9 (44 clips) and RacketVision tennis train.
+- Judge: *detection rate*, the share of visible labelled frames with the
+  tracker's position within 10 px at 720p (15 px at 1080p; 5 px
+  reported), plus false detections per frame without a visible ball.
+- Downloads (user, 2026-10-20: "yes, all", after asking to download every
+  candidate and pick the best by a cheap test). `Models/WASB`: the seven
+  tennis checkpoints of WASB's model zoo (WASB 6.1 MB, TrackNetV2 45 MB,
+  ResTrackNetV2 5.1 MB, MonoTrack 11.7 MB, BallSeg 50.9 MB, DeepBall
+  0.3 MB, DeepBall-Large 4.1 MB) and the code at `923462c` as a tar;
+  `Models/RacketVision`: `balltrack_best.pth` (46.6 MB; sha256 as
+  published), a tensors-only copy loadable with `weights_only=True`, and
+  the code at `c44af2a`. sha256 in each `MANIFEST.json`. BallTrack's
+  checkpoint holds mmengine log objects that Hugging Face flags as unsafe
+  pickles; it was read once with an unpickler that allows only tensors,
+  numpy arrays and an inert stub for the log objects. It is one model for
+  the three sports, trained on RacketVision only (epoch 47), so all of
+  TrackNet is held out for it.
+- Stage A, the comparison (no training; the user's cheap test). Nine
+  settings, each with its authors' inference: WASB (online tracker,
+  windows of 3 frames at steps 3 and 1), TrackNetV2, ResTrackNetV2,
+  MonoTrack (no heatmap weighting, per-frame peak), BallSeg and the two
+  DeepBalls (step 1), as WASB's README evaluates them; BallTrack with the
+  clip's median frame and its 4 frames ending at the scored frame (its
+  training alignment; its `inference.py` uses the 4 before it). Every
+  frame at 1280×720 (RacketVision's 1080p area-downscaled, labels
+  scaled). Sets: TrackNet games 8–10 (held out for all nine), RacketVision
+  tennis test (held out for all nine), TrackNet games 1–7 (held out for
+  BallTrack only; in-training for the zoo, reported), and TrackNet games
+  8–10 through SVT-AV1 preset 8 at CRF 62 (K5's collapse point; a
+  robustness probe). TrackNet visibility 3 (occluded) is excluded from
+  both positives and negatives.
+- Rule for the choice (fixed before the run): the candidate with the
+  highest mean of its detection rates on the two sets held out for all
+  (TrackNet 8–10, RacketVision test) is chosen; within 0.02 of it, the one
+  with the higher rate on the SVT-AV1 probe, then fewer false detections.
+  Adoption without training: if the chosen candidate holds out K5's games
+  (BallTrack does) and meets stage B's bar on them (≥ 0.90 on TrackNet's
+  K5 games, ≤ 0.05 false detections per ball-less frame, ≥ 0.80 on
+  RacketVision test), it is adopted as tracker and judge with no training.
+  Otherwise stage B trains the chosen architecture with K5's games held
+  out (a WASB-zoo winner is retrained, since its weights saw four of K5's
+  games).
+- Stage B (only after A): smoke, a pilot of ≤ 45 min (one setting of the
+  learning rate and schedule, the held-out rate tracked per epoch), then
+  training in parts of ≤ 45 min that each save their checkpoint.
+  Decision rule: the tracker is adopted when its detection rate on the
+  held-out TrackNet games is ≥ 0.90 with ≤ 0.05 false detections per
+  frame without a ball, and ≥ 0.80 on RacketVision tennis test; otherwise
+  the negative is reported and the ball mode keeps labelled positions in
+  its claims (scoped to labelled data).
+- Hypothesis: WASB leads the zoo on TrackNet 8–10 (its paper: F1 about
+  0.96) but falls to about 0.6–0.8 on RacketVision's broadcast footage;
+  BallTrack, trained on RacketVision's broadcast tennis, leads there and
+  reaches about 0.85 on TrackNet, so the choice is between these two, and
+  the codec probe separates them (a model with a background frame should
+  hold the ball better on a smoothed court).
+- Competing explanation: TrackNet's games 8–10 share courts and players
+  with games 1–7, so stage A overstates generalization; RacketVision
+  test, from other matches, is the check.
+- Budget: stage A ≤ 1.5 GPU-hours in parts of ≤ 45 min (one per set);
+  stage B ≤ 6 GPU-hours.
+- Failed attempts (infrastructure, no results): `20261020T191508Z-70549af5`,
+  `…191515Z-e36c7b87`, `…191521Z-b6a436f6` (`c913734`: the packed
+  environment has neither hydra nor omegaconf; WASB's postprocessors are
+  now loaded by path and its configs read as an attribute dict);
+  `20261020T214419Z-17cc0776`, `…214426Z-1d7002a9`, `…214432Z-fb693dbc`
+  (`d5260a7`: `--limit 0` arrived as the string "0", so one full stage
+  scored no clip and its validator passed on an empty list; cancelled or
+  superseded; the validator now rejects an empty stage);
+  `20261020T214842Z-bf85e989`, `…214855Z-a4f4e1df` (gpu2, smokes over
+  600 s beside another user's process at 100%; rerun on Ada);
+  `20261020T220040Z-fe792dc2` (the SVT-AV1 probe's smoke failed the check
+  that some candidate finds the ball, which none does at CRF 62; the
+  probe is now checked by its decode's frame PSNR, ≥ 25 dB).
+- Jobs (all RTX 6000 Ada, gpu5/gpu6, shared; environment
+  `pointstream-20261009T214002Z`; inputs `inputs-k5b2.json`
+  `7cb55480…cd63`): TrackNet games 8–10 `20261020T214833Z-bf224666`
+  (`7590a77`; 30 clips; 1,362 s; `published.tar` `6d2aed8e…2d38`);
+  RacketVision tennis test in three parts `20261020T220058Z-fc8980da`
+  (`cff4f60`, whose `k5b_trackers.py` is `7590a77`'s; 14 rallies; 680 s;
+  `3dbecb66…eadb`), `20261020T214901Z-0d339486` (`7590a77`; 15; 1,240 s;
+  `0c53b65d…33ec`), `20261020T214907Z-eefaac4b` (`7590a77`; 14; 634 s;
+  `3fe00d05…f3cd`); the SVT-AV1 probe `20261020T220308Z-436c3db3`
+  (`09f0cd3`; 30 clips; 986 s; `a4178a34…afe1`); TrackNet games 2, 3, 6, 7
+  `20261020T221615Z-1a87ab2f` (`09f0cd3`; 30 clips; 1,135 s;
+  `5ae5a714…d31f`). Validators passed on each smoke and, run locally, on
+  each full stage. Every model's parameters on `cuda:0` (asserted in each
+  `k5b-trackers.json`; torch 2.10.0+cu128). About 1.7 GPU-hours of full
+  stages, 2 with smokes and failed attempts: over the 1.5-hour budget
+  (the RacketVision rallies are 600 frames at 60 frames/s, longer than
+  estimated, and gpu2's contention cost two smokes).
+- Report (`k5b_trackers report` on the six jobs; `k5b-trackers-report.json`
+  `f2cec565…a42c`). Detection rate within 10 px (5 px), false detections
+  per frame without a ball:
+
+  | Candidate | TrackNet 8–10 | RacketVision test | Mean (rule) | K5's games 2,3,6,7,8,10 | SVT-AV1 CRF 62 (8–10) |
+  |---|---|---|---:|---|---:|
+  | BallTrack | 0.938 (0.851), 0.030 | 0.881, 0.286 | **0.910** | 0.918 (0.771), 0.022 | 0.026 |
+  | WASB, step 1 | 0.923 (0.911), 0.051 | 0.834, 0.379 | 0.879 | 0.966 (0.944)\*, 0.039 | 0.018 |
+  | WASB | 0.922 (0.909), 0.066 | 0.831, 0.350 | 0.876 | 0.965 (0.945)\*, 0.041 | 0.017 |
+  | MonoTrack | 0.898 (0.880), 0.112 | 0.797, 0.404 | 0.847 | 0.953\*, 0.047 | 0.021 |
+  | ResTrackNetV2 | 0.865 (0.844), 0.076 | 0.745, 0.300 | 0.805 | 0.909\*, 0.037 | 0.018 |
+  | TrackNetV2 | 0.842 (0.829), 0.046 | 0.745, 0.291 | 0.794 | 0.928\*, 0.024 | 0.010 |
+  | BallSeg | 0.618 (0.598), 0.005 | 0.637, 0.123 | 0.627 | 0.759\*, 0.002 | 0.011 |
+  | DeepBall-Large | 0.390 (0.357), 0.553 | 0.424, 0.773 | 0.407 | 0.704\*, 0.154 | 0.010 |
+  | DeepBall | 0.396 (0.367), 0.497 | 0.193, 1.000 | 0.294 | 0.670\*, 0.363 | 0.011 |
+
+  \* games 2, 3, 6, 7 are in WASB-zoo training (WASB 0.988 on them
+  alone), so these are not held out. TrackNet 8–10: 5,472 ball frames and
+  197 without; RacketVision test: 1,947 labelled ball frames and 203
+  labelled without (false rates there are high for every candidate;
+  those frames were not inspected);
+  K5's six games: 11,496 and 534. WASB's F1 on 8–10 is 0.954 against
+  0.956 in its paper, so the wrapper reproduces its authors' inference.
+  The SVT-AV1 probe (preset 8, CRF 62, median 84 kbps, frame PSNR
+  32.7–34.3 dB) leaves every candidate under 0.03.
+- Decision (by the rule): **BallTrack is chosen** (0.910 against WASB's
+  0.879; none within 0.02, so the probe did not enter) and **adopted
+  without training**: it never saw TrackNet, and on K5's six games it
+  finds 0.918 of the balls with 0.022 false detections per frame without
+  a ball, and 0.881 on RacketVision test (bars 0.90, 0.05, 0.80). On K5's
+  8 windows it finds 0.916 (0.006 false). Stage B is not needed.
+- Reading. The hypothesis holds on the choice and half on the numbers:
+  WASB leads the zoo on TrackNet (0.92) and falls on RacketVision's
+  broadcast footage (0.83, not as low as predicted), while BallTrack,
+  trained on RacketVision's other matches, leads both. The competing
+  explanation (games 8–10 share courts with 1–7) is visible in the zoo
+  (WASB 0.988 on its training games, 0.922 on 8–10) and does not touch
+  BallTrack. Two limits for its use: (1) it places the ball coarsely (5 px
+  rate 0.771 on K5's games against WASB's 0.944; it takes a blob's box
+  centre at 512×288), so the ball mode's positions want refinement by the
+  encoder (K5b 1's diagnostic: about 1.5 dB from per-frame position);
+  (2) as a judge it is valid (0.92 on the source), and it confirms K5's
+  regime with a valid detector: through SVT-AV1 at CRF 62 every
+  candidate finds under 3% of the balls (YOLO26x's 0.02 in K5 was not a
+  valid judge).
+
+### 2026-10-21 — K5b (1b): a per-frame ball, judged by detection and DISTS (rule)
+- Question (PLAN K5b 1b): K5b 1 drew the ball from TrackNet's labels with
+  one appearance per window and kept 10–20% of the pixel oracle's
+  ball-region PSNR gain; its diagnostic put the gap on position (labels
+  1.4–3.2 px off the best fit) and on a per-window appearance. Does a
+  ball the encoder places and styles per frame, every byte billed, keep
+  the ball visible and recognisable at the low rates where the pixel
+  coders lose it, end to end from a tracker's positions?
+- Judges (user, 2026-10-21). K5b 1 decided on ball-region PSNR, which
+  punishes a drawn ball twice for a 2 px misplacement and rewards a dull
+  one; the ball mode's claim is that the ball can be seen and followed,
+  not that its pixels are the source's. Deciding: (a) **detection**,
+  BallTrack (K5b 2: never trained on TrackNet, so a clean judge on every
+  K5 window) on the decoded or composited frames, a hit within 10 px of
+  TrackNet's label, over the window's visible frames (5 px reported);
+  (b) **DISTS** (masked DISTS of `src.codecs.quality`, VGG16, all-ones
+  mask) on a 64 × 64 crop centred on the label (clamped to the frame),
+  composite against source, averaged over the visible frames. Reported:
+  ball-region and streak-region PSNR (K5b 1's), LPIPS on the same crop,
+  frame PSNR, and the false detections per ball-less frame.
+- What changes from K5b 1 (`src/pointstream/ball.py`, the same `BALL`
+  segment, versioned): (1) per-frame position refinement: the encoder
+  moves each coded position by the fit's best offset within ±4 px, and
+  the refined positions go through the same constant-velocity
+  Exp-Golomb code, so their cost is billed; (2) a per-frame appearance:
+  radius, exposure and phase indices and the 8-bit colour per visible
+  frame, each coded as the signed Exp-Golomb difference from the
+  previous visible frame (the window's first is absolute), so a steady
+  ball costs a few bits a frame. The fit alternates the two (position
+  with the current appearance, then the appearance at the refined
+  position; two rounds), minimising whole-frame squared error as in
+  K5b 1, with the off switch per window kept. As built (`ball.fit_frames`):
+  each frame's alpha at every setting is tabulated once, the appearance
+  step is one batched product over all settings and decodes, the
+  position step tries every second offset then the 8 neighbours of the
+  best, velocities in the fit are the tracker's (the decoder's, from the
+  refined positions, draw the scored frames), and a frame is sent only
+  where its ball lowers the crop's error (so frames can be hidden, which
+  the visibility runs code). On one window with 9 stand-in decodes the
+  fit takes about 67 s per position source on a laptop CPU, and the
+  payload is 0.9–1.4 kbps.
+- Position sources (the encoder's tracker), each a variant: TrackNet's
+  labels (the bound); **BallTrack** on the source (the encoder the codec
+  would ship; misses become hidden frames, false detections are drawn);
+  **WASB** (step 1) on the source, cheap at inference only and more
+  precise (5 px 0.944 against 0.771), disclosed: it trained on games 2,
+  3, 6, 7, so on six of the eight windows its positions are not held out
+  (game8/Clip6 and game10/Clip10 are). The judge stays BallTrack, scored
+  against the labels, so a WASB-placed ball is judged by a detector that
+  did not place it.
+- Windows, coders and rates: K5b 1's (8 TrackNet windows; SVT-AV1 preset
+  4 at CRF 35–62, DCVC-UF HT-L at QP 0–63 on the A6000); rate = the
+  coder's bytes plus the billed `BALL` segment; K5's pixel oracle
+  recomputed, and judged by the same judges, as the bound.
+- Decision rule (`k5b.DECISION_1B`, fixed before any run). A renderer
+  (disk or streak) with **BallTrack's positions** is adopted when, over a
+  coder underneath, on ≥ 6 of the 8 windows: (i) detection: the rate at
+  which the composite first finds 80% of the balls BallTrack finds on the
+  source (linear in log rate between points) is at most half the rate
+  the pooled pixel envelope (upper hull of detection against rate over
+  both coders) needs for the same, or the envelope never gets there;
+  **and** (ii) DISTS-crop BD-rate ≤ −25% against the pooled envelope, or
+  better at every rate; **and** (iii) frame-PSNR BD-rate ≤ +1% against
+  its own coder's envelope (K5b 1's guard). BD overlap (`k5b1b.DECISION`):
+  0.01 in 1 − DISTS and 1 − LPIPS, 0.5 dB in PSNR. Six of eight needs
+  both parts; part 1 alone (four windows) decides nothing by itself. The
+  judge's GPU path (median and downscale on the GPU) must agree with
+  K5b 2's CPU path on ≥ 97% of the source's frames (a validator check).
+  If the labels' variant passes
+  and BallTrack's does not, the tracker is the gap (WASB's variant says
+  whether its precision closes it, and WASB retraining with K5's games
+  held out becomes the next step). If neither passes, the reading says
+  which judge failed and by how much. If both renderers pass, the user's
+  preference from this run's side by side picks the default.
+- Hypothesis: the drawn ball restores most of the source's detections
+  where the pixel coders lose them (DCVC-UF QP 21–63, SVT-AV1 CRF 55–62:
+  under 10% found) for about 1 kbps, so (i) passes on DCVC-UF and SVT-AV1
+  alike; the streak passes DISTS by more than the disk on fast windows,
+  the disk detection by more (a crisp blob is what BallTrack's heatmap
+  peaks on); BallTrack's positions lose under 0.05 of detection against
+  the labels' after refinement.
+- Competing explanations: (1) BallTrack detects a drawn disk because it
+  is a bright blob, not because it looks like the ball; the false
+  detections on ball-less frames and DISTS check it, and the side by
+  side shows it. (2) With BallTrack's positions, the judge may agree
+  with itself (it drew the ball where it already looked); scoring
+  against the labels and WASB's variant check it. (3) DISTS on a
+  64-pixel crop is dominated by the court around the ball, so the ball
+  barely moves it; the oracle's DISTS gain (pasted pixels) bounds what it
+  can show, and LPIPS is reported beside it.
+- Side by side (for the user's preference): K5b 1's layout (source,
+  pixel coder, + disk, + streak, at equal rate, ball-following 3× crops
+  and one full frame), at DCVC-UF QP 42 and SVT-AV1 CRF 55, BallTrack's
+  positions.
+- Budget: GPU (BallTrack, WASB, DISTS, LPIPS, DCVC-UF) on the A6000;
+  BallTrack, WASB and DISTS are new on that class, so the smoke asserts
+  CUDA for each and the result goes into the model–GPU table. Smoke: one
+  window, 48 frames, ≤ 600 s. Part 1: K5b 1's four windows, ≤ 45 min;
+  part 2: the other four, run only if part 1 leaves the rule open.
+  Ceiling 2 GPU-hours and 6 h wall.
+- Job: `20261021T084417Z-048cc9d4` (`d4bed15`; RTX A6000, gpu3, shared
+  with another user's process; smoke 247 s on game3/Clip3's first 48
+  frames, then part 1: game3/Clip3, game7/Clip2, game10/Clip10,
+  game3/Clip6 at 240 frames, 2,380 s, inside the 45 min stage;
+  `published.tar` `b75adff4…c8d3`; inputs: K4's manifest `233a08b1…`,
+  K5b 2's `7cb55480…cd63`, and `inputs-k5b1b.json` `32fb61ae…40f6` (the
+  DISTS VGG16 `397923af…` and LPIPS AlexNet `7be5be79…` backbones);
+  environment `pointstream-20261009T214002Z`, torch 2.10.0+cu128;
+  SVT-AV1, dav1d and DCVC-UF as K5b 1). Every model on `cuda:0`. Validator
+  passed on the smoke and, run locally, on the full stage (15 checks;
+  BallTrack's GPU path agrees with its CPU path on every source frame).
+  Per window: coding 4–7 min, trackers 15–20 s, the three sources' fits
+  70–134 s (in parallel), judging the rest. About 0.75 GPU-hours.
+- Report (`k5b1b report`; `k5b1b-report.json` `c1f24193…bbe3`). BallTrack
+  finds 0.88–0.99 of the source's balls (target 0.71–0.79). Means over
+  the 4 windows, BallTrack's positions (detection rate; 1 − DISTS shown
+  as DISTS):
+
+  | Point | kbps decode → + streak | detection decode / oracle / disk / streak | DISTS decode / oracle / disk / streak |
+  |---|---|---|---|
+  | DCVC-UF QP 0 | 13.0 → 13.9 | 0.01 / 0.92 / 0.90 / 0.91 | 0.246 / 0.204 / 0.209 / 0.200 |
+  | DCVC-UF QP 21 | 36.6 → 37.6 | 0.15 / 0.91 / 0.90 / 0.92 | 0.199 / 0.165 / 0.171 / 0.164 |
+  | DCVC-UF QP 42 | 117.7 → 118.9 | 0.67 / 0.92 / 0.91 / 0.92 | 0.140 / 0.125 / 0.131 / 0.128 |
+  | SVT-AV1 CRF 62 | 73.9 → 75.0 | 0.19 / 0.90 / 0.89 / 0.91 | 0.175 / 0.142 / 0.148 / 0.140 |
+  | SVT-AV1 CRF 55 | 176.0 → 177.2 | 0.59 / 0.92 / 0.91 / 0.92 | 0.127 / 0.107 / 0.114 / 0.109 |
+
+  Per window (BallTrack's positions): on DCVC-UF, the rate to find 80%
+  of the source's balls is 0.05–0.15 of what the pixel envelope needs
+  (detection passes 4/4, disk and streak); DISTS BD −27% to −42% for the
+  streak (4/4), −22% to −33% for the disk (2/4); **frame-PSNR BD
+  +1.7% to +2.8% against DCVC-UF's own envelope (0/4; bar +1%)**. On
+  SVT-AV1, whose lowest point is already 57–97 kbps, the detection ratio
+  is 0.27–0.72 (2/4), as for K5's pixel oracle (identical ratios: the
+  ball mode reaches the target at SVT's lowest point, so the ratio is
+  bounded by it); frame BD +0.2–0.3% (4/4); streak DISTS 2/4. All three
+  on one window at most. The three position sources score alike (labels,
+  BallTrack, WASB within 0.01 detection and 0.002 DISTS at every point).
+  The ball costs 0.79 kbps (disk) and 1.11 kbps (streak) on average
+  (0.33–1.47), and raises frame PSNR by about 0.01 dB.
+- Decision (by the rule): **no renderer adopted**, and part 1 decides it:
+  on DCVC-UF the frame guard fails on 4/4 (at most 4/8), on SVT-AV1 every
+  variant passes all three on ≤ 1/4 (at most 5/8); 6/8 is out of reach,
+  so part 2 is not run.
+- Reading. The hypothesis holds on what the ball mode is for and fails on
+  its cost. A drawn ball at the encoder's positions restores detection
+  where the pixel coders lose the ball (0.01 → 0.90 at 13 kbps; DCVC-UF
+  alone needs 80–260 kbps for 80% of the source's), and on crop DISTS it
+  closes 75–100% of the gap to the pixel oracle (the streak is within
+  0.004 of the oracle at every DCVC-UF point). What fails is the frame guard, and it
+  fails on rate, not quality: the per-frame payload (about 1 kbps, most
+  of it colour differences) is 7% of DCVC-UF's 13 kbps lowest point,
+  while frame PSNR rises by 0.01 dB, so the frame BD-rate is +2% to +3%.
+  K5b 1's per-window ball cost 0.2 kbps and passed the guard; the guard
+  (≤ +1%) was set for that payload. Competing explanation 1 (BallTrack
+  detects a bright blob) is not excluded by these numbers; DISTS, which
+  also passes, and the clips speak against it. Explanation 2 (the judge
+  agrees with itself) is excluded: labels, BallTrack and WASB positions
+  score the same. Explanation 3 (DISTS on 64 px dominated by the court)
+  does not hold: DISTS moves by 0.04 at QP 0, as much as the oracle's.
+  Positions: BallTrack places the ball within 5 px of the label on 0.78
+  of frames, WASB 0.92 (disclosed overlap); after refinement the fit's
+  positions sit 1.4 (labels), 2.3 (WASB) and 3.0 px (BallTrack) from the
+  labels, which are themselves 1.4–3.2 px off the best fit (K5b 1's
+  diagnostic), so precision is not what limits the ball mode.
+- Side by side (sent to the user 2026-10-21): game3/Clip3 and game7/Clip2
+  at DCVC-UF QP 42, game3/Clip3 at SVT-AV1 CRF 55 (ball-following 3×
+  crops), game10/Clip10 full frame at DCVC-UF QP 42; BallTrack's
+  positions. Rendering preference (user, 2026-10-21): **the streak**.
+  The user's reading of the clips: the source's own ball is low quality
+  and pixelated; DCVC-UF looks good but loses the ball at times,
+  especially near the far player; the disk often looks unrealistic; the
+  streak looks as good as DCVC-UF where DCVC-UF keeps the ball, and keeps
+  it visible far more often.
+- Decision (user, 2026-10-21): the ball mode is **kept**, with the streak
+  as default and BallTrack's positions, although it fails the frame
+  guard by the rule; the failure is on rate (about 1 kbps), it is
+  disclosed wherever the result is reported, and the rule is not
+  restated after the fact.
+- A cheap check of the payload's rate (not evidence: game3/Clip3, three
+  Gaussian-blurred stand-in decodes, the streak fit from the labels,
+  laptop CPU; `rate_check.py` in the session's scratch). Coding each
+  frame's colour at a coarser step: step 8 saves 20–22% of the payload
+  (1,267–1,407 → 989–1,134 bytes) and keeps 99.7–99.9% of the fit's
+  squared-error gain; step 16 saves 29–30% and keeps 98.5–99.7%. One
+  colour per window halves it but leaves the ball worse than none. The
+  rest (about 0.7 kbps) is positions and settings. So step-8 colour is a
+  free default for the final runs (a payload change, set before them);
+  reaching the guard's 0.2–0.4 kbps would need smoother positions and
+  settings too, which the user judged not worth pursuing now.
+- Next (proposed, for the user): the ball mode's rate. Either the encoder
+  spends fewer bits (a rate-aware per-frame fit: colour quantised or held
+  unless the error gain pays its bits; about 0.2–0.4 kbps would pass the
+  guard at 13 kbps), or the guard is restated as what it was meant to
+  check (frame PSNR at the same coder point not lower, which the
+  encoder's last check already ensures), which is a rule change for the
+  user to make, disclosed as such.
+

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import math
+import tempfile
+from pathlib import Path
 
 import cv2
 import numpy as np
+import pytest
 
 from experiments.tennis import k4, k5
 from experiments.tennis import windows as tw
@@ -142,3 +145,140 @@ def test_trajectory_rate_is_the_same_after_a_json_round_trip():
     s = tw.trajectory_symbols([(1, 10, 10), (1, 12, 11), (1, 14, 13), (1, 15, 13)])
     back = json.loads(json.dumps(s))
     assert tw.trajectory_rate([back], 30.0) == tw.trajectory_rate([s], 30.0)
+
+
+def test_k5b_scores_the_composite_the_decoder_draws():
+    from experiments.tennis import k5b
+    from src.pointstream import ball
+
+    rng = np.random.default_rng(2)
+    h, w, n = 90, 160, 12
+    source = rng.integers(0, 255, (n, h, w, 3), dtype=np.uint8)
+    decoded = np.clip(source.astype(int) + rng.integers(-20, 20, source.shape), 0, 255).astype(np.uint8)
+    track: ball.Track = [(10 + 9 * t, 40 + t) if t != 5 else None for t in range(n)]
+    vel = ball.velocities(track)
+    app = ball.Appearance((250, 240, 30), 4, 6, 2)
+    crops = ball.Crops.build(track, source, vel)
+    masks = k5b.judge_masks(crops)
+    dec = [ball.crops_of(decoded, g["frames"], g["centres"], g["half"]) for g in crops.groups]
+    mse = k5b.frame_mse(decoded, source)
+    q = k5b.score_variant(crops, masks, dec, mse, "streak", app, (h, w))
+    drawn = np.stack([ball.draw(decoded[t], p, vel[t], app) if p else decoded[t] for t, p in enumerate(track)])
+    assert abs(q["frame_psnr"] - k5.mse_to_psnr(float(k5b.frame_mse(drawn, source).mean()))) < 1e-6
+    rows = [(1, p[0], p[1]) if p else (0, 0, 0) for p in track]
+    assert abs(q["ball_psnr"] - k5.quality(drawn, source, rows)["ball_psnr"]) < 1e-6
+    base = k5b.score_variant(crops, masks, dec, mse, "decode", None, (h, w))
+    assert abs(base["ball_psnr"] - k5.quality(decoded, source, rows)["ball_psnr"]) < 1e-6
+    oracle = k5b.score_variant(crops, masks, dec, mse, "oracle", None, (h, w))
+    with tempfile.TemporaryDirectory() as d:
+        ref = k5.quality(k5.oracle(decoded, source, rows, Path(d) / "o.npy"), source, rows)
+    assert abs(oracle["ball_psnr"] - ref["ball_psnr"]) < 1e-6 and abs(oracle["frame_psnr"] - ref["frame_psnr"]) < 1e-6
+
+
+def test_k5b_decision_needs_both_judges_on_six_of_eight():
+    from experiments.tennis import k5b
+
+    def window(ball_ok: bool, frame_ok: bool) -> dict:
+        return {"passes": {"streak-dcvc-uf-htl": {"ball": ball_ok, "frame": frame_ok},
+                           "disk-dcvc-uf-htl": {"ball": False, "frame": True}}}
+
+    six = {str(i): window(i < 6, True) for i in range(8)}
+    assert k5b.decide(six)["adopted"] == {"disk": False, "streak": True}
+    frame_cost = {str(i): window(True, i < 5) for i in range(8)}
+    assert k5b.decide(frame_cost)["adopted"]["streak"] is False
+    assert k5b.decide({str(i): window(True, True) for i in range(4)})["adopted"]["streak"] is False
+
+
+def test_k5b_labels_read_only_frames_without_touching_them():
+    from experiments.tennis import k5b
+
+    frame = np.full((72, 128, 3), 50, np.uint8)
+    frame.setflags(write=False)
+    out = k5b.label(frame, "source")
+    assert out.max() > 200 and frame.max() == 50
+
+
+def test_k5b_trackers_count_hits_misses_and_false_detections():
+    from experiments.tennis import k5b_trackers as kt
+
+    labels = [(1, 100.0, 100.0), (1, 200.0, 200.0), (1, 300.0, 300.0), (0, 0.0, 0.0), (0, 0.0, 0.0), (-1, 5.0, 5.0)]
+    preds = [(True, 103.0, 104.0), (True, 230.0, 200.0), (False, 0.0, 0.0), (True, 50.0, 50.0), (False, 0.0, 0.0), (True, 5.0, 5.0)]
+    c = kt.counts(preds, labels)
+    assert c == {"positives": 3, "negatives": 2, "false_on_negative": 1, "far_on_positive": 1, "hit_10px": 1, "hit_5px": 1}
+    r = kt.rates(c)
+    assert r["detection_rate"] == 1 / 3 and r["false_per_negative"] == 0.5 and abs(r["f1"] - 2 / 6) < 1e-12
+
+
+def test_k5b_trackers_choice_takes_the_probe_within_two_points():
+    from experiments.tennis import k5b_trackers as kt
+
+    def t(rate: float, false: float = 0.0) -> dict:
+        return {"detection_rate": rate, "false_per_negative": false}
+
+    base = {n: t(0.5) for n in kt.CANDIDATES}
+    table = {"tracknet:8,9,10": {**base, "wasb": t(0.95), "balltrack": t(0.90)},
+             "racketvision:test": {**base, "wasb": t(0.80), "balltrack": t(0.84)},
+             "svt:8,9,10": {**base, "wasb": t(0.30), "balltrack": t(0.60)}}
+    choice = kt.choose(table)
+    assert choice["within_0.02"] == ["wasb", "balltrack"] and choice["chosen"] == "balltrack"
+    table["tracknet:8,9,10"]["wasb"] = t(0.99)
+    assert kt.choose(table)["chosen"] == "wasb"
+
+
+def test_k5b_trackers_attrdict_reads_nested_keys_both_ways():
+    from experiments.tennis import k5b_trackers as kt
+
+    cfg = kt.AttrDict.of({"MODEL": {"EXTRA": {"STAGE": [{"A": 1}]}}})
+    assert cfg.MODEL.EXTRA["STAGE"][0].A == 1 and cfg["MODEL"]["EXTRA"].STAGE[0]["A"] == 1
+
+
+def test_k5b_trackers_parts_cover_every_clip_once():
+    from experiments.tennis import k5b_trackers as kt
+
+    clips = [{"id": str(i)} for i in range(43)]
+    parts = [kt.part_of(clips, f"{i}/3") for i in (1, 2, 3)]
+    assert [c["id"] for p in parts for c in p] == [c["id"] for c in clips] and {len(p) for p in parts} <= {14, 15}
+    assert kt.part_of(clips, "1/1") == clips
+
+
+def test_k5b1b_detection_rule_reads_the_rate_to_reach_the_target_against_the_pixel_envelope():
+    from experiments.tennis import k5b1b
+
+    pixel = [(10.0, 0.02), (40.0, 0.1), (160.0, 0.9), (640.0, 0.92), (20.0, 0.01)]
+    env = k5b1b.hull(pixel)
+    assert env[0] == (10.0, 0.02) and (20.0, 0.01) not in env and env[-1] == (640.0, 0.92)
+    assert k5b1b.rate_to_reach([(10.0, 0.5), (40.0, 0.8)], 0.8) == pytest.approx(40.0)
+    assert k5b1b.rate_to_reach([(10.0, 0.9)], 0.8) == 10.0
+    assert k5b1b.rate_to_reach([(10.0, 0.1), (40.0, 0.2)], 0.8) is None
+    v = k5b1b.detection_verdict([(12.0, 0.75), (45.0, 0.9)], pixel, 0.8)
+    assert v["passes"] and v["ratio"] < 0.5 and 40.0 < v["anchor_rate"] < 160.0
+    assert not k5b1b.detection_verdict([(150.0, 0.85)], pixel, 0.8)["passes"]
+    assert k5b1b.detection_verdict([(12.0, 0.85)], [(10.0, 0.0), (20.0, 0.1)], 0.8) == {"rate": 12.0, "anchor_rate": None, "ratio": 0.0, "passes": True}
+
+
+def test_k5b1b_decision_needs_all_three_judges_on_six_of_eight_windows_from_balltracks_positions():
+    from experiments.tennis import k5b1b
+
+    def window(ok: bool, labels_ok: bool) -> dict:
+        passes = {f"{k}-dcvc-uf-htl": {"detection": True, "dists": True, "frame": True} for k in ("oracle", *k5b1b.DRAWN)}
+        for r in k5b1b.RENDERERS:
+            passes[f"{r}@balltrack-dcvc-uf-htl"] = {"detection": ok, "dists": True, "frame": True}
+            passes[f"{r}@labels-dcvc-uf-htl"]["detection"] = labels_ok
+        return {"passes": passes}
+
+    d = k5b1b.decide({f"w{i}": window(i < 6, True) for i in range(8)})
+    assert d["adopted"] == {"disk": True, "streak": True} and d["labels_pass"]["disk"]
+    d = k5b1b.decide({f"w{i}": window(i < 5, True) for i in range(8)})
+    assert d["adopted"] == {"disk": False, "streak": False} and d["labels_pass"]["streak"]
+    assert not k5b1b.decide({f"w{i}": window(True, True) for i in range(4)})["adopted"]["disk"]  # part 1 alone decides nothing
+
+
+def test_k5b1b_tracks_and_placement_read_labels_as_the_judge_does():
+    from experiments.tennis import k5b1b
+
+    kinds = k5b1b.label_kinds([(1, 10, 10), (0, 0, 0), (3, 5, 5), (2, 50, 50)])
+    assert [k for k, _, _ in kinds] == [1, 0, -1, 1]
+    track = k5b1b.track_of([(True, 13.6, 10.2), (True, 2.0, 2.0), (False, 0, 0), (True, 1400.0, -3.0)], (720, 1280))
+    assert track == [(14, 10), (2, 2), None, (1279, 0)]
+    p = k5b1b.placement(track, kinds)
+    assert p["within_10px"] == 0.5 and p["within_5px"] == 0.5 and p["sent_without_ball"] == 1 and p["sent"] == 3
