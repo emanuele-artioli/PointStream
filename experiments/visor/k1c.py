@@ -204,7 +204,7 @@ def lpips_over(net: Any, frames: Any, truth: Any, masks: list[np.ndarray], ts: l
 
 
 def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[str, Any], nets: dict[str, Any], device: str,
-                 publish: Path, scratch: Path, first: bool) -> None:
+                 publish: Path, scratch: Path, first: bool, keep_source: bool = False) -> None:
     import cv2
 
     from experiments.visor.b2 import load_mask_sets
@@ -244,6 +244,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     drawn = {v: [np.zeros((height, width), bool) for _ in range(frames)] for v in VARIANTS}
     stats = {k: np.zeros(frames, np.int64) for k in ("r_px", "fitted_r_px", "unfitted_r_px", "missed", "spill", "drawn", "hands")}
     identity_max = 0
+    masked_side_frames = 0
     for t in range(frames):
         truth_t = np.asarray(truth[t])
         if not regions[t].any():
@@ -251,6 +252,10 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
                 outs[v][t] = truth_t
             continue
         sides = {s: clip.class_mask(t, s) for s in HANDS}
+        for m_side in sides.values():  # K1f's predictor: side-frames a hand mask is boxable in (as K1d's cover)
+            if m_side.any():
+                ys_m, xs_m = np.nonzero(m_side)
+                masked_side_frames += int(min(xs_m.max() - xs_m.min() + 1, ys_m.max() - ys_m.min() + 1) >= MIN_BOX)
         objects = clip.foreground(t) & ~regions[t]
         rows = rows_at.get(t, [])
         fitted_sides = {HANDS[1] if kp["right"][i] else HANDS[0] for i in rows}
@@ -313,11 +318,14 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
                    "dists_r": float(np.nanmean(arrays[f"{v.replace('@', '_')}_dists_r"][hand]))} for v in VARIANTS}
     meta = {"unit": item["id"], "item": item["id"], "video": item["video"], "fps": float(item["fps"]), "frames": frames,
             "hand_frames": len(score.hand), "rows": len(kp["rows"]), "look_frame": look, "summary": summary, "cover": cover or None,
+            "masked_side_frames": masked_side_frames, "h2_rows_in_window": int(sum(1 for t in kp["t"] if t < frames)) if not args.cover
+            else int(cover["rows_h2"]),
             "decode": {k: v for k, v in decoded.items() if k != "path"}, "mask_set": mask_info, "checks": checks,
             "pose_unit_hash_ok": bool(args.pose_units[item["id"]][0]["npz_hash_ok"]), "seconds": round(time.time() - began, 2)}
     save_unit(publish, "k1c", item["id"], arrays, meta)
     del outs, truth
-    os.remove(decoded["path"])
+    if not keep_source:
+        os.remove(decoded["path"])
     for f in work.glob("*.npy"):
         f.unlink()
 
