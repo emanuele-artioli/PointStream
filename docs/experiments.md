@@ -7976,3 +7976,79 @@ invocation turns out to be needed.
   window, 48 frames, ≤ 600 s. Part 1: K5b 1's four windows, ≤ 45 min;
   part 2: the other four, run only if part 1 leaves the rule open.
   Ceiling 2 GPU-hours and 6 h wall.
+- Job: `20261021T084417Z-048cc9d4` (`d4bed15`; RTX A6000, gpu3, shared
+  with another user's process; smoke 247 s on game3/Clip3's first 48
+  frames, then part 1: game3/Clip3, game7/Clip2, game10/Clip10,
+  game3/Clip6 at 240 frames, 2,380 s, inside the 45 min stage;
+  `published.tar` `b75adff4…c8d3`; inputs: K4's manifest `233a08b1…`,
+  K5b 2's `7cb55480…cd63`, and `inputs-k5b1b.json` `32fb61ae…40f6` (the
+  DISTS VGG16 `397923af…` and LPIPS AlexNet `7be5be79…` backbones);
+  environment `pointstream-20261009T214002Z`, torch 2.10.0+cu128;
+  SVT-AV1, dav1d and DCVC-UF as K5b 1). Every model on `cuda:0`. Validator
+  passed on the smoke and, run locally, on the full stage (15 checks;
+  BallTrack's GPU path agrees with its CPU path on every source frame).
+  Per window: coding 4–7 min, trackers 15–20 s, the three sources' fits
+  70–134 s (in parallel), judging the rest. About 0.75 GPU-hours.
+- Report (`k5b1b report`; `k5b1b-report.json` `c1f24193…bbe3`). BallTrack
+  finds 0.88–0.99 of the source's balls (target 0.71–0.79). Means over
+  the 4 windows, BallTrack's positions (detection rate; 1 − DISTS shown
+  as DISTS):
+
+  | Point | kbps decode → + streak | detection decode / oracle / disk / streak | DISTS decode / oracle / disk / streak |
+  |---|---|---|---|
+  | DCVC-UF QP 0 | 13.0 → 13.9 | 0.01 / 0.92 / 0.90 / 0.91 | 0.246 / 0.204 / 0.209 / 0.200 |
+  | DCVC-UF QP 21 | 36.6 → 37.6 | 0.15 / 0.91 / 0.90 / 0.92 | 0.199 / 0.165 / 0.171 / 0.164 |
+  | DCVC-UF QP 42 | 117.7 → 118.9 | 0.67 / 0.92 / 0.91 / 0.92 | 0.140 / 0.125 / 0.131 / 0.128 |
+  | SVT-AV1 CRF 62 | 73.9 → 75.0 | 0.19 / 0.90 / 0.89 / 0.91 | 0.175 / 0.142 / 0.148 / 0.140 |
+  | SVT-AV1 CRF 55 | 176.0 → 177.2 | 0.59 / 0.92 / 0.91 / 0.92 | 0.127 / 0.107 / 0.114 / 0.109 |
+
+  Per window (BallTrack's positions): on DCVC-UF, the rate to find 80%
+  of the source's balls is 0.05–0.15 of what the pixel envelope needs
+  (detection passes 4/4, disk and streak); DISTS BD −27% to −42% for the
+  streak (4/4), −22% to −33% for the disk (2/4); **frame-PSNR BD
+  +1.7% to +2.8% against DCVC-UF's own envelope (0/4; bar +1%)**. On
+  SVT-AV1, whose lowest point is already 57–97 kbps, the detection ratio
+  is 0.27–0.72 (2/4), as for K5's pixel oracle (identical ratios: the
+  ball mode reaches the target at SVT's lowest point, so the ratio is
+  bounded by it); frame BD +0.2–0.3% (4/4); streak DISTS 2/4. All three
+  on one window at most. The three position sources score alike (labels,
+  BallTrack, WASB within 0.01 detection and 0.002 DISTS at every point).
+  The ball costs 0.79 kbps (disk) and 1.11 kbps (streak) on average
+  (0.33–1.47), and raises frame PSNR by about 0.01 dB.
+- Decision (by the rule): **no renderer adopted**, and part 1 decides it:
+  on DCVC-UF the frame guard fails on 4/4 (at most 4/8), on SVT-AV1 every
+  variant passes all three on ≤ 1/4 (at most 5/8); 6/8 is out of reach,
+  so part 2 is not run.
+- Reading. The hypothesis holds on what the ball mode is for and fails on
+  its cost. A drawn ball at the encoder's positions restores detection
+  where the pixel coders lose the ball (0.01 → 0.90 at 13 kbps; DCVC-UF
+  alone needs 80–260 kbps for 80% of the source's), and on crop DISTS it
+  closes 75–100% of the gap to the pixel oracle (the streak matches the
+  oracle at every DCVC-UF point). What fails is the frame guard, and it
+  fails on rate, not quality: the per-frame payload (about 1 kbps, most
+  of it colour differences) is 7% of DCVC-UF's 13 kbps lowest point,
+  while frame PSNR rises by 0.01 dB, so the frame BD-rate is +2% to +3%.
+  K5b 1's per-window ball cost 0.2 kbps and passed the guard; the guard
+  (≤ +1%) was set for that payload. Competing explanation 1 (BallTrack
+  detects a bright blob) is not excluded by these numbers; DISTS, which
+  also passes, and the clips speak against it. Explanation 2 (the judge
+  agrees with itself) is excluded: labels, BallTrack and WASB positions
+  score the same. Explanation 3 (DISTS on 64 px dominated by the court)
+  does not hold: DISTS moves by 0.04 at QP 0, as much as the oracle's.
+  Positions: BallTrack places the ball within 5 px of the label on 0.78
+  of frames, WASB 0.92 (disclosed overlap); after refinement the fit's
+  positions sit 1.4 (labels), 2.3 (WASB) and 3.0 px (BallTrack) from the
+  labels, which are themselves 1.4–3.2 px off the best fit (K5b 1's
+  diagnostic), so precision is not what limits the ball mode.
+- Side by side (sent to the user 2026-10-21): game3/Clip3 and game7/Clip2
+  at DCVC-UF QP 42, game3/Clip3 at SVT-AV1 CRF 55 (ball-following 3×
+  crops), game10/Clip10 full frame at DCVC-UF QP 42; BallTrack's
+  positions. Rendering preference: pending.
+- Next (proposed, for the user): the ball mode's rate. Either the encoder
+  spends fewer bits (a rate-aware per-frame fit: colour quantised or held
+  unless the error gain pays its bits; about 0.2–0.4 kbps would pass the
+  guard at 13 kbps), or the guard is restated as what it was meant to
+  check (frame PSNR at the same coder point not lower, which the
+  encoder's last check already ensures), which is a rule change for the
+  user to make, disclosed as such.
+

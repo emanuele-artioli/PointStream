@@ -484,12 +484,19 @@ other. Each has its rule written before its run, as everywhere.
   its training; 0.881 on RacketVision test; 0.022 false detections per
   frame); no training needed. Through SVT-AV1 at CRF 62 every tracker
   finds under 3% of the balls.
-- K5b 1b. *Per-frame ball* (next, proposed): K5b 1's oracle with the
+- K5b 1b. *Per-frame ball*: K5b 1's oracle with the
   encoder refining each position by fit (±4 px, billed through the same
   residual code) and sending the appearance per frame (setting and
   colour predicted from the previous frame, billed); same decodes, judges
   and rule; positions from BallTrack as well as the labels, so the ball
-  mode is measured end to end.
+  mode is measured end to end. Judges (user, 2026-10-21): BallTrack
+  detection and crop DISTS. Outcome (2026-10-21, [entry](docs/experiments.md)):
+  not adopted, on rate: the drawn ball restores detection (0.01 → 0.90 at
+  DCVC-UF's 13 kbps; 5–20× less rate than the pixel coders for 80% of the
+  source's balls) and passes crop DISTS (streak −27% to −42%), but its
+  ~1 kbps payload fails the frame-PSNR guard (+1.7% to +2.8% against
+  +1%). Next: a rate-aware ball payload, or a restated guard (user).
+  Rendering preference (disk or streak): pending.
 Datasets: still-camera sets (TrackNet, RacketVision, OpenTTGames) are
 fine where a decision needs labels, with the scope stated in the paper;
 broadcast matches answer what a real broadcast costs.
