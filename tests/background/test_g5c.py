@@ -405,3 +405,40 @@ def test_g6_validators_by_kind(tmp_path):
              "curve": [{"step": 54, "loss": 2.0}, {"step": 540, "loss": 1.0}]}
     (tmp_path / "g6.json").write_text(json.dumps(train))
     assert all(g6.validate_stage(tmp_path).values())
+
+
+def test_g6_static_fill_is_constant_in_f_and_leaves_v():
+    from experiments.background import g6
+
+    rng = np.random.default_rng(0)
+    filled = rng.integers(0, 256, (5, 8, 6, 3), dtype=np.uint8)
+    holes = np.zeros((5, 8, 6), bool)
+    holes[:, 2:5, 1:4] = True
+    holes[0, 0, 0] = True  # F moves: a pixel in F on one frame only
+    out = g6.static_fill(filled, holes, band=3)
+    assert (out[~holes] == filled[~holes]).all()
+    inside = out[:, 2:5, 1:4]
+    assert (inside == inside[0]).all()  # constant in time
+    assert (inside[0] == np.rint(np.median(filled[:, 2:5, 1:4], axis=0))).all()
+
+
+def test_g6_fill_cost_validator():
+    from experiments.background import g6
+
+    def version(lpips: float) -> dict:
+        return {"bytes": 1000, "deterministic": True, "decoder_matches_encoder_intra": True,
+                "score": {"dataset": {"lpips_v": lpips, "psnr_v": 30.0}}, "enhanced_score": {}}
+
+    result = {"kind": "fill-cost", "limit_frames": 0, "gpu_capability": [8, 9], "foreground_share": 0.3,
+              "source": {"jpeg_gate_holds": True}, "propainter": None, "gpu": "x", "enhancers": "e",
+              "static": {"changed_outside_f": False, "changed_share_of_f": 0.9},
+              "methods": [{"method": "scene-540", "codec": "scene", "points": [
+                  {"propainter": version(0.2), "static": version(0.21)}]},
+                  {"method": "svt-1080", "codec": "svt", "points": [
+                      {"propainter": version(0.2), "static": version(0.2)}]}]}
+    assert all(g6.validate_fill_cost(result, True, True).values())
+    result["static"]["changed_outside_f"] = True
+    assert not g6.validate_fill_cost(result, True, True)["plate_only_inside_f"]
+    result["static"]["changed_outside_f"] = False
+    del result["methods"][1]["points"][0]["static"]["enhanced_score"]
+    assert not g6.validate_fill_cost(result, True, True)["enhancer_route_scored"]
