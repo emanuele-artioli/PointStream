@@ -8001,6 +8001,20 @@ invocation turns out to be needed.
   djokovic_federer and rublev_auger-aliassime (the two other matches K4b
   draws from), and nadal_kyrgios's whole match (v1 of the court-shot
   list).
+- Application to K4b's other two matches (2026-10-21, the adopted method
+  unchanged; a production run, not new evidence for the rule).
+  djokovic_federer (23 clips, 4K) and rublev_auger-aliassime (66 clips),
+  `<match>/videos/*.mp4`: 89 clips, 31,390 frames. Manifest
+  `k8b-2026-10-20/k4b-matches/manifest.json` (SHA256 `6c2be1a4…`). Eight
+  parts of whole clips (`3aca368`; CPU only, 16 processes each):
+  `20261021T092159Z-9b8ef899`, `…092204Z-1ee9605a`, `…092208Z-804e7d30`,
+  `…092315Z-1a7be77c` (part 3), `…092233Z-e808e648`, `…092238Z-019a88a8`,
+  `…092243Z-41be5f46`, `…092247Z-91b9e709`. The first submission of part 3
+  (`20261021T092213Z-112d5db2`) stopped during source upload: the
+  directory holds only a partial `source.tar`, with no spec, ready
+  record, owner or run. No worker could claim it and nothing executed,
+  so part 3 was submitted once more. The partial directory is left as
+  it is.
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
