@@ -8907,6 +8907,160 @@ invocation turns out to be needed.
   players in 48 broadcast windows; the rate is a pooled-entropy bound
   without a real entropy coder.
 
+### 2026-10-21 — K6: player oracle (H3b for bodies, on broadcast tennis)
+- Question (PLAN K6). Would a player sent as keypoints plus an appearance
+  model beat the pixel coders on the players? The total (keypoints, with
+  whatever the pose cannot describe charged) against the achievable
+  envelope of SVT-AV1 and DCVC-UF swept over the coding resolution, and
+  the keypoint frame rate judged on the rendering (K4b.3: every 4th frame
+  has a p95 error of 8 px on fast limbs). Also K4b.1's amendment 2: K4's
+  numbers with the adopted players.
+- Pipeline (the adopted one, nothing re-chosen here).
+  1. Court views: K8b's per-frame homographies
+     (`k8b-2026-10-20/review/k8b-report.json` `8230bf1a…3314`,
+     `k8b-2026-10-20/k4b-matches/registration/k8b-report.json`
+     `eb7b34b9…e3e0`); a frame is *scored* only when its entry has
+     `fits` true.
+  2. Players: K4b.1's (c)+(d) (`k4b_court.choose_d`, `RULES_D` v1) on
+     K4b.1's window features (SAM 3.1 person/player/racket, canonical
+     tracks).
+  3. Pose: YOLO11x-pose as K4b.2. A player whose median mask height is
+     under 15% of the frame takes ×1 crops (K4b.2's path at s = 1); a
+     taller one takes the whole-frame detections K4b.1 published (K4's
+     setting), since enlarged crops give partial detections there
+     (K4b.2's reading). Fitted by K4's matching.
+  4. Keypoints: K4b.3's `code` (closed loop, linear interpolation of
+     skipped frames). Codes: q 4 px constant velocity every frame, every
+     2nd and every 4th (K4b.3's choice), and q 1 px previous every frame
+     (K4's kind). Tracks run over fitted scored frames; a gap starts a
+     track. Rate: each symbol's −log2 of its pooled frequency over all of
+     K6's windows (K4b.3's optimistic adaptive bound), plus the absolute
+     starts, over the window's scored seconds.
+- Windows. K4's 9 broadcast windows (the outro card left out, as K4) and
+  K4b.1's 48. K4's windows get K4b.1's features by K4b.1's code unchanged
+  (`k4b_features run`), through a manifest that lists each K4 clip with
+  frame 120 as its only "review frame", which `window_span` places at
+  frames 0–239, K4's window (no labels involved). The oracle scores the
+  45 windows with ≥ 24 scored frames: 8 of K4's (`rublev_auger-aliassime/038`
+  registers on no frame, `/052` on 32) and 37 of K4b.1's (8,649 scored
+  frames). Overlapping windows of one clip are correlated; the bootstrap
+  is by window and the paper counts matches (5).
+- Region. R(t) at 1080p: the two players' SAM masks (person mask first,
+  as K4b.1) and every racket instance touching one (K4b.1's (c) contact:
+  1 px dilation at 960×540), upsampled. Broadcast footage has no dataset
+  masks, so R comes from SAM 3.1, as in K4 (scoped: the judge and the
+  oracle read the same masks).
+- Oracle variants (1080p composites; per code k). Each is H3b's
+  construction with MANO replaced by a 2D skeleton warp. Bones: K4's
+  `SKELETON` pairs with both ends confident (≥ 0.5) in the keypoints the
+  pixels come from and in the target frame's. Each bone maps the target's
+  coded segment onto the source's segment by a 2D similarity; an output
+  pixel's source position is the blend of the bones' maps with weights
+  exp(−d²/2σ²), d its distance to the coded bone, σ = 0.08 of the
+  player's mask height (fixed, not tuned). No qualifying bone: a
+  translation by the mean displacement of confident keypoints; no
+  confident keypoint: nothing drawn. A pixel is drawn when its source
+  position falls inside the source player's region (nearest); its colour
+  is the source sampled bilinearly. The far player is drawn first. Inside
+  R the source is first replaced by an OpenCV Telea fill (radius 5; H3b's
+  fill); drawn pixels go on top, also outside R (overshoot is charged).
+  - `warp@k` (the bound): the frame's own pixels, moved from the uncoded
+    to the coded keypoints. Perfect appearance at the coded pose, with the
+    outline, cloth and racket granted: only the coding error is charged.
+    It dominates every renderer that places the player at the coded pose,
+    because no renderer can draw more of the true frame.
+  - `ref@k` (what the pose cannot describe charged): the pixels of a
+    reference frame of the same player moved to the coded keypoints. The
+    reference, per player and frame, is the player's fitted scored frame
+    at least 1 s away whose uncoded keypoints are nearest to the coded ones
+    (mean distance over jointly confident keypoints, each set centred on
+    its confident mean and divided by its mask height; ties by the nearer
+    frame). Decoder-side information only (the coded keypoints and a bank
+    sent once); the bank is granted, as a per-player appearance model
+    amortized over a match (H3d's condition). Charged: outline, cloth,
+    hair and the racket, which moves with the forearm as a fixed grip
+    (re-tests H4a's grip pose).
+  - `ref@uncoded`: diagnostic, coding against appearance error.
+- Anchors ("swept over the rendering resolution": the coding resolution,
+  as H3b2). SVT-AV1 4.2.0 preset 4 (K4's settings) at CRF 48 and 62 at
+  1080p, CRF 63 at ½, CRF 55 and 63 at ¼, CRF 63 at ⅛; DCVC-UF HT-L off the
+  shelf (B2's worker and checkpoints) at QP 0 at 1, ½ and ¼ and QP 21 at
+  ½. Downscaled per plane (area), decoded, upscaled bicubically to 1080p
+  and composited inside R (source outside), as H3b2 and H3d. Rate: the
+  bits on R over the scored frames (SVT-AV1: K4's block-spread accounting
+  through `aom inspect`; DCVC-UF: H3c's own-entropy split onto R, R empty
+  on unscored frames) per scored second.
+- Judges, on scored frames with R non-empty, over S(t) = R(t) plus every
+  oracle variant's drawn pixels at t: LPIPS (B2's AlexNet spatial map on
+  the full frame, averaged over S) **decides**; masked DISTS (H3b's, crop
+  of S plus 64 px) and PSNR over S are reported. Mean over the window's
+  scored frames.
+- Decision rule (`k6.DECISION`, fixed before any run). Per window, the
+  anchor envelope is the upper concave hull (`g5.envelope`) of the ten
+  anchor points on (kbps on R, −LPIPS). The rate it needs for a variant's
+  LPIPS is linear along the hull (time-sharing between encodes); better
+  than every anchor point: the best point's rate (the saving is
+  understated); worse than every point: the saving is min(0, 1 − r / r₀)
+  with r₀ the lowest anchor rate (unmeasured counts as no saving).
+  Saving = 1 − r_keypoints / r_envelope. Mean over windows, 95% bootstrap
+  CI by window (1,000 resamples, seed "pointstream-k6").
+  1. Bound: `warp` at K4b.3's code (q 4, velocity, every 4th). It passes
+     if the CI's lower end is above 50% (H3b2's bar: perfect appearance
+     must still save half). If it fails there but passes at every 2nd
+     frame or every frame, the operating point moves to the lowest-rate
+     passing frame rate (the frame rate judged on the rendering). If it
+     fails at every code, no player mode is built: players stay pixels.
+  2. Charged: `ref` at the operating point. It passes if the CI's lower
+     end is above 25% (K5's margin: rendered appearance, unbilled bank).
+     Then a player renderer is built (K6b, its own entry; retrieval and
+     warp first, since that is what `ref` measures). If 1 passes and 2
+     fails, the outcome goes to the user with the diagnosis (coding
+     against appearance from `ref@uncoded`, the outline shares).
+  If DISTS's mean saving disagrees in sign with LPIPS's on a deciding
+  variant, the outcome goes to the user.
+  Stopping (sequential looks): the decision is read after K4's windows
+  and after each later part; it is taken once every gate it reads has its
+  CI wholly above or wholly below its bar on ≥ 8 windows from ≥ 4
+  matches. The looks taken are recorded.
+- Reported beside. The outline: share of R that `ref`'s drawing misses
+  and share of its drawing outside R, by player height (under 10%,
+  10–15%, 15–25%, ≥ 25%), against H3b's 9.7% and 9.2% on hands. The
+  racket: LPIPS on racket pixels for `warp` and `ref`. Fast limbs: `warp`
+  at every 4th against every frame on the scored frames in the top decile
+  of wrist speed. BD-rate of each variant's curve over the codes against
+  the envelope where the LPIPS ranges overlap, else better/worse at every
+  rate.
+- Amendment 2 (K4's 9 windows, all 240 frames, as K4 measured them),
+  with (c)+(d)'s players: (a) the players' share of the foreground's
+  SVT-AV1 bits at CRF 48 and 62 (players and rackets from K6's streams;
+  the ball's bits from K4's record of the window, ≤ 1% of the
+  foreground); (b) the fitted share (step 3's estimator, and whole frame
+  alone as K4); (c) the keypoint rate at K4b.3's code and at q 1 previous
+  against the players' bits at CRF 48 and 62. Beside K4's first
+  definition and amendment 1 (K4's report), and K4's whole-frame kbps
+  against K6's (same settings, same conversion).
+- Hypothesis. `warp` passes the bound at every 4th frame: a 2 px median
+  displacement costs little LPIPS, while the pixel coders reach 3 kbps on
+  the players only at ¼–⅛ resolution. `ref` fails: cloth, racket and
+  outline differ between frames, and LPIPS charges a wrong outline as in
+  H3b. The outline error shrinks with the player's size in pixels but stays
+  above 5%.
+- Competing explanations. (1) LPIPS at 1080p charges misplacements a
+  viewer would not see on a 60–100 px player; DISTS is reported. (2) The
+  Telea fill is a poor background; LPIPS on the drawn pixels alone is
+  reported. (3) Block spreading (64 px blocks, 16 px DCVC-UF cells)
+  misplaces bits around a small far player; whole-frame rates are
+  reported. (4) The bank from the window itself is optimistic (same light,
+  same rally); a bank from elsewhere in the match would do worse, so `ref`
+  is still an upper bound of a retrieval renderer.
+- Budget. Features for K4's 9 windows: one job, smoke ≤ 600 s (one whole
+  window), full ≤ 45 min. Oracle: about 10 min per window (SVT-AV1 on the
+  CPUs beside DCVC-UF and its bit estimate, then rendering and judges);
+  smoke the part's first window, first 48 frames (≤ 600 s); pilot 2 of
+  K4's windows; parts of ≤ 4 windows (≤ 45 min). Shared Ada/A6000,
+  memory from the smoke. Ceiling 8 GPU-hours and 16 h wall, smokes
+  included.
+
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
   codec gains more than a conventional one when PointStream adds learned
