@@ -521,6 +521,30 @@ objects (the tennis ball).
   4. Match fit, only if step 3 passes: fitted on other shots of the same
      match, judged on K6's windows and paid for (amortized, payback hours
      reported, as G5b).
+  Audit, first part (2026-10-21). A tennis fine-tune of
+  Moore-AnimateAnyone (SD 1.5 ReferenceNet, pose guider, motion module;
+  Apache-2.0) is already in `Models/AnimateAnyone/profiles/finetuned_tennis`,
+  beside the original weights. It was trained in two stages in Feb 2026,
+  before the reset, on 20 player tracks from all seven archived tennis
+  videos, so it has seen K6's matches; the overlap is recorded and the
+  clean subset reported (AGENTS.md).
+  Pre-reset diagnostics are not evidence by today's rules, but they bear
+  on the choice:
+  - On 16 Alcaraz frames it lost 4.0 dB foreground PSNR to an articulated
+    paste, with the target's alpha granted too.
+  - It responded to its inputs: shifted poses and swapped references
+    degraded it.
+  - It smears the racket: COCO-17 has no racket.
+  - Off-the-shelf generators lost to a pasted keyframe on player LPIPS
+    (pre-reset BP10).
+  Step 2 runs both profiles, the original and the tennis fine-tune, in
+  K6's harness. That needs Moore-AnimateAnyone's source and an
+  environment with its diffusers pin (the archived runtime pinned
+  diffusers 0.30.3 and imported an external checkout). Neither is on the
+  hosts today, and the current environments have no diffusers. So step 2
+  starts with an environment audit and a packed environment. Its
+  composite grants R as the generator's matte, the analogue of `warp`'s
+  granted outline, so it bounds the generator with its own matte.
   Training discipline for steps 3 and 4: a correctness smoke in minutes;
   then a learning-curve pilot on held-out frames at fixed fractions of the
   step budget; the scaled fit only if that curve, extrapolated, can reach
