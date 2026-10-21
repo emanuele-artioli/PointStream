@@ -457,9 +457,11 @@ other. Each has its rule written before its run, as everywhere.
      features on a 240-frame window per marked frame, user's amendment):
      no candidate reaches 0.95. Best (a)+(c) 0.875 (42/48), then (b)
      0.813, (c) 0.667, (a) 0.625, (e) 0.542. The misses mostly take a
-     second person for the far player. **User decides**; (d) and its
-     combinations wait for K8's court homographies on the five marked
-     matches (K8 v0 covers nadal_kyrgios only).
+     second person for the far player. With K8b's homographies
+     (2026-10-21): **(c)+(d) adopted**, 36/37 (0.973) on the marked frames
+     K8 registers as court views (0.938 on all 48); (d) 0.919, (a)+(d)
+     0.946. Next: amendment 2 on K4's broadcast windows (K4b features and
+     K8b registration there; TrackNet has no registration).
   2. Pose on the far player. Top-down on each SAM player crop, enlarged:
      a cheap sweep of the crop size (three sizes, native to about 4×)
      measuring fit and latency, then a top-down model (DWPose, weights in

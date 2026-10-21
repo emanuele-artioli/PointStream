@@ -8088,6 +8088,49 @@ invocation turns out to be needed.
     (court views, as this entry's data rule asks once K8 is adopted).
     The court-view table decides; the all-frames table is reported beside
     it.
+- Outcome with (d) (`experiments.tennis.k4b_court`, CPU, local; the
+  validated features of the seven jobs above; `features-v2/court-score-2026-10-21/`
+  `k4b-court-report.json` `d593c879…`). K8 registers 37 of the 48 marked frames as
+  court views (36 with two players, 1 with one); the 11 others are the
+  no-player frame, five medvedev_struff one-player close-ups and five
+  rublev_auger-aliassime shots (003, 006, 054, 062 with one player, 063
+  with two).
+
+  | candidate | court views (37) | all frames (48) |
+  |---|---:|---:|
+  | (a) | 23 (0.622) | 30 (0.625) |
+  | (b) | 31 (0.838) | 39 (0.813) |
+  | (c) | 25 (0.676) | 32 (0.667) |
+  | (d) inside the court | 34 (0.919) | 36 (0.750) |
+  | (e) | 19 (0.514) | 26 (0.542) |
+  | (a)+(c) | 33 (0.892) | 42 (0.875) |
+  | **(c)+(d)** | **36 (0.973)** | 45 (0.938) |
+  | (a)+(d) | 35 (0.946) | 42 (0.875) |
+
+  The v1 candidates' all-frames counts reproduce the table above exactly.
+- Decision (by the rule): **(c)+(d) is adopted** (0.973 ≥ 0.95 on court
+  views; no other candidate reaches the bar). The hypothesis held. Its
+  application to K4's windows is amendment 2 (below, not yet run).
+- Reading. (c)+(d)'s one court-view miss, rublev_auger-aliassime/002@422:
+  only one track's foot point falls inside on most registered frames, so
+  the second pick is another person. (d) alone misses it and two windows
+  where a marked player stands inside on 34–42% of frames
+  (rublev_auger-aliassime/040@363, 048@481); the racket rule recovers those
+  two. On all 48 frames (c)+(d) misses three: that frame, the no-player
+  frame and rublev_auger-aliassime/063@337, a two-player shot K8 does not
+  register, so no track is inside and the racket fills the picks. Both
+  are shots K8 sends to the pixel coder, where no identification is
+  needed. Scope: 37 court-view frames from five matches; the margins
+  (1 m, 4 m) were fixed from ITF's run-off before scoring and not tuned.
+- Amendment 2 (to K4, not yet run): K4's broadcast windows need K4b's
+  window features (SAM 3.1 with the person prompt; K4 kept no masks) and
+  K8b's registration, which covers all 10 of K4's broadcast clips
+  (medvedev_struff/042, the outro card, and rublev_auger-aliassime/038
+  register on no frame, rublev_auger-aliassime/052 on 32 of 240); K4's
+  players, bits and fit are then recomputed with (c)+(d)'s players, with
+  amendment 1's and the first definition's numbers kept. TrackNet has no
+  court registration (other courts, K8 not run there), so (d) cannot be
+  applied to it as defined.
 
 ### 2026-10-21 — K4b.2: pose on the far player (crop-size sweep)
 - Question (PLAN K4b, item 2). K4's (b) failed on the far player alone:
