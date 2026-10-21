@@ -38,9 +38,10 @@ new dependency.
 - **Foreground (H):** hands and handled objects are coded pixels, DCVC-UF
   at ¼ or ½ plus the generic enhancer G_HO. Keypoints lose on egocentric
   video (H1, H3, H4, K1, K3).
-- **Tennis (K):** the ball mode wins (K5); players wait on K4b (far-player
-  pose, keypoint rate, identification); court-view shots (K8) wait on
-  labels. Next: K8, K4b, K5b, then K6; K7 (HiEve) later.
+- **Tennis (K):** the ball mode wins (K5); K4b done (players found by
+  racket contact plus the court outline, the far player fitted on ×1
+  crops, keypoints 3.3 kbps for two), so K6's gate passes. Next: K6;
+  K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -408,8 +409,10 @@ objects (the tennis ball).
   0.875, keypoints 22% of SVT-AV1's player bits at CRF 62); K4b next.
 - K5. Done (2026-10-13): **a ball mode is built** (−57% / −38% BD-rate on
   ball-region PSNR over DCVC-UF / SVT-AV1, for 0.23 kbps); K5b next.
-- K6. *Player oracle* (after K4; gated off by K4 until the far player is
-  fitted, see K4): H3b for bodies, perfect appearance at
+- K6. *Player oracle* (after K4; gate passed with K4b, 2026-10-21: the far
+  player fitted by ×1 crops, players found by (c)+(d), keypoints 3.3–15
+  kbps; runs on K4's 9 broadcast windows among its own, which is K4b.1's
+  amendment 2): H3b for bodies, perfect appearance at
   the coded body pose with what the pose cannot describe charged; whether
   the outline problem shrinks at broadcast scale. A per-player appearance
   model is amortized over a match (hours), the condition H3d found
@@ -460,8 +463,15 @@ other. Each has its rule written before its run, as everywhere.
      second person for the far player. With K8b's homographies
      (2026-10-21): **(c)+(d) adopted**, 36/37 (0.973) on the marked frames
      K8 registers as court views (0.938 on all 48); (d) 0.919, (a)+(d)
-     0.946. Next: amendment 2 on K4's broadcast windows (K4b features and
-     K8b registration there; TrackNet has no registration).
+     0.946. Amendment 2 is folded into K6 (2026-10-21, user delegated the
+     call): with K4b.2 and K4b.3, K6's gate passes on every condition
+     whatever K4's two mislabelled windows hold ((a) 86–89% and robust to
+     them in K4; (b) 0.997; keypoints 8–36% of SVT-AV1's player bits), so a
+     standalone re-run of K4's audit (1–2 GPU-hours) decides nothing. K6
+     runs the adopted pipeline (K8 court shots, (c)+(d) players, ×1 crops,
+     K4b.3's codes) and includes K4's 9 broadcast windows, so K4's numbers
+     with the adopted players come from K6's run, beside both earlier
+     definitions'. TrackNet has no court registration.
   2. Pose on the far player. Top-down on each SAM player crop, enlarged:
      a cheap sweep of the crop size (three sizes, native to about 4×)
      measuring fit and latency, then a top-down model (DWPose, weights in

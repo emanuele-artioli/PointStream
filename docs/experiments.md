@@ -8131,6 +8131,11 @@ invocation turns out to be needed.
   amendment 1's and the first definition's numbers kept. TrackNet has no
   court registration (other courts, K8 not run there), so (d) cannot be
   applied to it as defined.
+  Folded into K6 (2026-10-21; the user left the order to the session):
+  after K4b.2 and K4b.3 every K6 gate condition passes whatever K4's two
+  mislabelled windows hold, so a standalone re-run decides nothing; K6
+  includes K4's 9 broadcast windows and reports K4's numbers with the
+  adopted players there (PLAN K4b, K6).
 
 ### 2026-10-21 — K4b.2: pose on the far player (crop-size sweep)
 - Question (PLAN K4b, item 2). K4's (b) failed on the far player alone:
