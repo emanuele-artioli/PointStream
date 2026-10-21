@@ -9561,6 +9561,60 @@ invocation turns out to be needed.
   (the four items; the warp on the CPU, two scorings per item). Ceiling
   1 GPU-hour, smoke included. The comparison (`k1c report`) is local, from
   the validated stage and H3d's report.
+- Job `20261021T184040Z-70821cd0` (gpu5, RTX 6000 Ada, shared; `ab8c205`
+  from `ready.json`; environment `pointstream-20261009T214002Z`; inputs
+  H3c2's, `da49a912…7a10`). Smoke passed the fleet validator. The full
+  stage (4 items, 240 frames) took 1,182 s and passes all 47 of
+  `k1c validate`'s checks locally. Among them: the warp at the uncoded
+  joints reproduces the source on every fitted hand, LPIPS and DISTS of the
+  source against itself are 0, and H2's units hash-check. Rate: 1.927 kbps
+  (WiLoR, `gauss:33.3|15Hz-linear|full|q8|previous`). Report
+  `visor/k1c-2026-10-21/report/k1c-report.json` (`085bb948…ef90`, `k1c
+  report` at `ab8c205` on `full/published.tar` `3207020e…898d`), with the
+  local validation beside it.
+- Outcome. On R, at 1.927 kbps:
+
+  | item | `warp` LPIPS | hull LPIPS | hull's rate for `warp`'s LPIPS (saving) | LPIPS over S | `warp` DISTS / hull | `warp@uncoded` LPIPS | R unfitted | fitted R missed | spill |
+  |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+  | P01_107 | **0.087** | 0.258 | 45.9 kbps (96%) | 0.089 | 0.071 / 0.223 | 0.004 | 0.4% | 3.0% | 2.4% |
+  | P02_02 | 0.272 | 0.204 | 0.96 kbps (−101%) | 0.276 | 0.191 / 0.251 | 0.192 | 39.6% | 8.0% | 3.0% |
+  | P03_10 | **0.093** | 0.155 | 8.6 kbps (78%) | 0.104 | 0.104 / 0.203 | 0.010 | 1.4% | 5.2% | 3.5% |
+  | P09_106 | 0.211 | 0.184 | 1.06 kbps (−82%) | 0.219 | 0.218 / 0.225 | 0.138 | 26.8% | 7.3% | 6.1% |
+
+  (Hull: H3d's bar and DCVC-UF + G, K1's joint hull, read at the
+  keypoint rate. R unfitted: the share of R in a hand that has no H2 fit
+  in that frame, drawn as fill. Missed: the share of a fitted hand's mask
+  the warp does not reach. Spill: the share of the drawing outside R.
+  The coded joints move 7–12 px from the uncoded ones.)
+  - LPIPS on R: the bound is below the hull on **2 of 4** items, so by
+    its own gate this fails the 3-of-4 bar. LPIPS over S gives the same 2.
+  - DISTS on R: the bound is below the DISTS hull on **4 of 4**. That
+    moves the count across 3, so **by the rule the outcome goes to the
+    user.**
+- Diagnosis. The two losing items are the two where H2 left much of R
+  unfitted (40% and 27% of R, against 0.4% and 1.4%). Those pixels are
+  charged as Telea fill. `warp@uncoded` isolates that charge: it is 0.192
+  and 0.138 there, already near the hull (0.204, 0.184), and the coding
+  error (11–12 px) adds the rest. Where the hands are fitted, the outline
+  granted turns H3b's loss into a 78–96% saving. H3b's MANO bound
+  (`wilor:arm`, 0.17–0.31 on R through K1's bridge) lost on 3 of 4. So
+  what decides hands at this rate is the estimator's coverage (a hand
+  with no fit has no keypoints) and the coding error. The renderer's
+  outline does not decide it.
+- Hypothesis: refuted as stated (2 of 4, not ≥ 3), held where the hands
+  are fitted. The competing explanation (finger blending makes the coding
+  error dominate) does not hold on the fitted items: misses are 3–8%.
+- Proposed reading, for the user. (a) By LPIPS's letter, hands are closed
+  for every renderer at the keypoint stream's rate as H2 codes it today.
+  (b) Or hands get K6b's ladder scoped to fitted hands, after a coverage
+  fix: H2b's hybrid estimator, or hands without a fit sent as pixels (a
+  hybrid). That would need its own bound first, charging the pixel
+  coder's rate on unfitted hands.
+- Scope. 4 pilot items, 240 frames. Appearance and outline granted, and
+  no reference billed. The hull is H3d's recorded points. LPIPS decides,
+  DISTS is reported, and they disagree on 2 items.
+- Budget: 1,182 s of stage execution plus the smoke (under 0.5 GPU-hour),
+  inside the 1-hour ceiling.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned

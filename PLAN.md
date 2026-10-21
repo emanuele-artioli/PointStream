@@ -554,6 +554,15 @@ objects (the tennis ball).
   windows, masks and joints are recorded). If even this bound loses,
   hands are closed for every renderer. If it passes, hands get K6b's
   ladder. It does not wait for K6b.
+  **Outcome (2026-10-21, `k1c-report.json` `085bb948…`): to the user.**
+  On R at 1.93 kbps the bound beats the SVT-AV1 + DCVC-UF + G hull on 2 of
+  4 items by LPIPS (P01_107 saves 96%, P03_10 78%), and on 4 of 4 by DISTS.
+  The two LPIPS losses (P02_02, P09_106) are where H2 has no fit for 40%
+  and 27% of R. Those pixels are charged as fill, so the shortfall is the
+  estimator's coverage plus the coding error, not the outline. Options:
+  close hands by LPIPS's letter, or give fitted hands K6b's ladder after
+  a coverage fix (H2b's hybrid, or a pixel coder for unfitted hands, with
+  its own bound first).
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
