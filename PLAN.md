@@ -563,6 +563,12 @@ objects (the tennis ball).
   close hands by LPIPS's letter, or give fitted hands K6b's ladder after
   a coverage fix (H2b's hybrid, or a pixel coder for unfitted hands, with
   its own bound first).
+  **K1d (user, 2026-10-21: "let's try it"):** WiLoR on every masked hand
+  without an H2 fit (`k1d-2026-10-21/report/k1c-report.json` `6427ea8f…`).
+  Coverage is full, but the result is the same: 2 of 4 by LPIPS (P01_107
+  and P03_10 save 96%; P09_106 misses by 0.003, P02_02 by 0.07) and 4 of 4
+  by DISTS, so it goes to the user. The mask-box fits jitter (coded shifts
+  of 24–64 px) and double the rate on the two hard items.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
