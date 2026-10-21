@@ -44,7 +44,10 @@ new dependency.
   p95 of 2.71 px; homographies are published for all five of K4b's
   matches. K4b done (2026-10-21): players found by racket contact plus the
   court outline, the far player fitted on ×1 crops, keypoints 3.3 kbps for
-  two, so K6's gate passes. Next: K5b, K6; K7 (HiEve) later.
+  two, so K6's gate passes. K6 done (2026-10-21): with true appearance
+  at the coded pose the players' keypoints save 95% of the pixel coders'
+  rate, but a reference frame warped to the pose loses to every pixel
+  coder; the renderer is the user's decision. Next: K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -424,6 +427,30 @@ objects (the tennis ball).
   pixel coders' envelope (SVT-AV1, DCVC-UF), swept over the rendering
   resolution, so K4's keypoint share (22% of SVT-AV1's player bits at
   CRF 62) is judged there, not by H1's 10% screen.
+  Done (2026-10-21, [entry](docs/experiments.md#2026-10-21--k6-player-oracle-h3b-for-bodies-on-broadcast-tennis);
+  K4's 9 broadcast windows, 8 scored from 5 matches; the stopping rule
+  met at the first look). **The bound passes and the charged oracle
+  fails, so the decision is the user's.**
+  - The bound: the true appearance moved to the coded keypoints (K4b.3's
+    code, every 4th frame, 3.6 kbps for two players) scores LPIPS 0.075.
+    It saves 95% [91%, 98%] of the envelope's rate (SVT-AV1 and DCVC-UF
+    from 1080p to ⅛; SVT-AV1 at CRF 62 is 42 kbps for 0.130). Every 2nd
+    frame and every frame pass too, so every 4th stays the operating
+    point; fast wrists cost +0.07 LPIPS there.
+  - Charged: a reference frame of the same player warped to the coded
+    pose scores LPIPS 0.46, worse than every pixel point on half of the
+    windows. The coding error plays no part in that (uncoded 0.460). The
+    outline is off by 16–26% missed and 32–46% overshoot at every player
+    size, and the fixed racket grip fails, as H4a's did.
+  - So keypoints carry the pose cheaply, and drawing the appearance is
+    the open problem; retrieval plus a 2D warp is ruled out.
+  - Amendment 2, with the adopted players: players are 91–93% of the
+    foreground's bits and fitted on 0.989 of frames, and keypoints are
+    10.3% of the players' SVT-AV1 bits at CRF 62 (K4: 22%).
+  - Open for the user: whether to give a learned per-player renderer
+    (pose-conditioned, amortized over a match) its own oracle, try
+    keypoints plus a coded residual, or keep players as pixels in the
+    tennis pipeline.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks

@@ -9098,6 +9098,129 @@ invocation turns out to be needed.
      the keypoints' favour; the count of left-out points is reported.
   Each finished window is now checkpointed (summary and archive), so a
   stop keeps it.
+- Jobs (all at `22992f7`, from each `ready.json`; environment
+  `pointstream-20261009T214002Z`; inputs `20e595d5…e703`; shared GPUs,
+  timings not evidence). Pilot `20261021T164820Z-f32fa989` (gpu3, RTX
+  A6000; `djokovic_federer/038`, `/072`); K4 part 1
+  `20261021T171929Z-fcf1e66d` and part 2 `20261021T171936Z-50ce2f74`
+  (gpu6, RTX 6000 Ada); part 3 `20261021T171943Z-b9d3ff04` (gpu3, RTX
+  A6000). Every smoke passed the fleet validator, and every full stage
+  passes all 20 of `k6 validate`'s checks locally (players and keypoint
+  codes recomputed, the warp at the uncoded keypoints reproducing the
+  source exactly, anchors' LPIPS rising as they coarsen). No DCVC-UF
+  point failed, so amendment 1's exclusion was never used. Peak 15.0 GiB.
+  K6's whole-frame SVT-AV1 rates at CRF 48 and 62 equal K4's on all 9
+  windows. Report: `k6-2026-10-21/oracle/report-2026-10-21/k6-report.json`
+  (`22cb71c7…e0ad`, `k6 report` at this entry's commit), with the
+  local validation receipts beside it.
+- Outcome (K4's 9 windows; 8 scored, from all 5 matches; 1,710 scored
+  frames, 565 judged). The stopping rule is met at the first look (8
+  windows, 5 matches, every gate's CI on one side of its bar), so K4b.1's
+  37 windows were not run. Means over the 8 windows; kbps on R (both
+  players and their rackets) over scored seconds; LPIPS, DISTS and PSNR
+  over S:
+
+  | point | kbps | LPIPS | DISTS | PSNR dB |
+  |---|---:|---:|---:|---:|
+  | SVT-AV1 CRF 48 | 174.3 | 0.039 | 0.072 | 32.0 |
+  | SVT-AV1 CRF 62 | 42.0 | 0.130 | 0.141 | 26.0 |
+  | SVT-AV1 CRF 63, ½ | 9.3 | 0.277 | 0.222 | 21.7 |
+  | SVT-AV1 CRF 63, ¼ | 2.5 | 0.384 | 0.282 | 19.3 |
+  | SVT-AV1 CRF 63, ⅛ | 0.6 | 0.456 | 0.339 | 17.6 |
+  | DCVC-UF QP 21, ½ | 5.6 | 0.253 | 0.212 | 23.3 |
+  | DCVC-UF QP 0 | 4.3 | 0.294 | 0.239 | 22.0 |
+  | DCVC-UF QP 0, ½ | 1.4 | 0.379 | 0.293 | 19.7 |
+  | DCVC-UF QP 0, ¼ | 0.3 | 0.452 | 0.351 | 17.5 |
+  | `warp`, q 1 previous, every frame | 13.8 | 0.011 | 0.021 | 34.3 |
+  | `warp`, q 4 velocity, every frame | 8.5 | 0.037 | 0.045 | 24.3 |
+  | `warp`, every 2nd | 5.3 | 0.049 | 0.053 | 22.9 |
+  | **`warp`, every 4th (K4b.3's code)** | **3.6** | **0.075** | 0.068 | 20.8 |
+  | **`ref`, every 4th** | **3.6** | **0.461** | 0.247 | 12.5 |
+  | `ref`, uncoded keypoints | – | 0.460 | 0.247 | 12.6 |
+
+  (SVT-AV1 CRF 55 at ¼, 11.8 kbps, 0.300, is in the report.)
+  - Bound: `warp` at every 4th frame saves 0.950 of the envelope's rate
+    (95% CI 0.914 to 0.975; every window above 0.83). Every 2nd frame
+    0.956 [0.946, 0.970], every frame 0.933 [0.917, 0.953]. **Passes at
+    K4b.3's code, which stays the operating point.** DISTS agrees (0.97).
+  - Charged: `ref` at that code saves −6.58 (CI −9.91 to −3.63). It is
+    worse than every anchor point, SVT-AV1 at ⅛ included, on 4 of 8
+    windows, and worse than the envelope at its own rate on the other 4.
+    **Fails.** DISTS agrees (−1.02 [−2.08, −0.06]).
+- Decision (by the rule): **the bound passes and the charged oracle
+  fails, so the outcome goes to the user.** No player renderer is built
+  on this evidence.
+  - The keypoint rate is not the problem. Perfect appearance at the coded
+    pose costs 3.6 kbps for two players at LPIPS 0.075. SVT-AV1 spends
+    42 kbps for 0.130 at CRF 62, and DCVC-UF at 4.3 kbps reaches 0.294.
+  - What the pose cannot describe is the problem. `ref` is no better at
+    the uncoded keypoints (0.460 against 0.461), so the coding error does
+    not matter there. All of the loss comes from drawing a different
+    frame's appearance at this pose.
+- Reported beside.
+  - Outline. `ref` misses 16–26% of R and draws 32–46% of its pixels
+    outside R in every height bin (under 10%: 16% / 32%; ≥ 25%: 18% /
+    45%). `warp` misses 3–9% and overshoots 3–13%. On hands, H3b's MANO
+    render missed 9.7% and overshot 9.2%. A body warped from another
+    frame's pose has a worse outline than MANO had on hands, and it does
+    not improve with the player's size in pixels.
+  - Racket: LPIPS on racket pixels is 0.474 for `ref` (the fixed grip
+    moving with the forearm), 0.105 for `warp`, and 0.219 for SVT-AV1 at
+    CRF 62. The fixed grip fails, as H4a's grip pose did.
+  - Fast limbs: every 4th frame against every frame adds 0.074 LPIPS on
+    the scored frames in the top decile of wrist speed, against 0.026 on
+    the others. The 8 px p95 of K4b.3 shows on swinging arms. It does not
+    move the bound: every 4th frame still saves 95%.
+  - The fill: LPIPS on `ref`'s drawn pixels alone (0.474) matches its
+    LPIPS over S. The loss is in the drawn player, not in the Telea
+    background (competing explanation 2 does not hold).
+- Amendment 2 (K4's 9 windows, all 240 frames, (c)+(d)'s players; means
+  over windows, as K4):
+
+  | | first definition (K4) | amendment 1 (K4) | (c)+(d) (K6) |
+  |---|---:|---:|---:|
+  | (a) players' share of the foreground's bits, CRF 48 / 62 | 92–94% | 86.0 / 88.6% | 90.8 / 92.7% |
+  | (b) player-frames fitted | 0.8999 (YOLO11x, whole) | 0.875 (whole) | **0.989** (×1 crop under 15%); 0.878 whole frame alone |
+  | (c) keypoints / players' SVT-AV1 bits, CRF 62 | – | 22.4% (9.4 kbps) | **10.3%** (K4b.3's code); 46.1% (q 1 previous) |
+  | the same at CRF 48 | – | 6.1% | 2.4%; 10.7% |
+
+  (a) and (b) pass K4's screen with the adopted players and estimator,
+  and (c) misses H1's 10% bar by 0.3 points at CRF 62. K6's own
+  comparison supersedes that screen. `djokovic_federer/038`, where K4's
+  motion rule missed the standing server, now has both players fitted on
+  every frame, and so does `djokovic_zverev/012`. On the two windows
+  K8b does not register, the rule falls back to racket contact
+  (`rublev_auger-aliassime/038`, a close-up, and most of `/052`). The
+  ball's bits come from K4's record of each window, whose streams K6's
+  reproduce.
+- Reading.
+  - The hypothesis held: `warp` passes and `ref` fails.
+  - "The outline error shrinks with size" is refuted for a reference warp:
+    it stays at 16–26% missed at every height.
+  - K6 answers PLAN's question on rate and opens one on appearance.
+    Keypoints carry the players' pose for a tenth of what pixels spend at
+    a far better quality, if the decoder can draw the true appearance.
+    Drawing it from another frame of the same player through a 2D
+    skeleton warp is worse than any pixel coder, even at an eighth of the
+    resolution.
+  - What to change next (the oracle protocol asks for it): a renderer
+    that is not a single-reference 2D warp. Candidates: a pose-conditioned
+    generator learned per player over a match, or keypoints plus a coded
+    residual (the hybrid H3b had). Each needs its own oracle, and
+    choosing between them is the user's call.
+- Scope.
+  - K4's 9 broadcast windows (8 scored, 5 matches, court views only).
+  - Masks from SAM 3.1, not dataset labels (none exist for broadcast).
+  - LPIPS decides, and DISTS agrees on every gate.
+  - The keypoint rate is K4b.3's pooled-entropy bound.
+  - `ref`'s reference bank is the window's own frames, which is
+    optimistic, so retrieval and a 2D warp are ruled out, not learned
+    generators.
+  - Appearance is granted unbilled in both variants.
+- Budget: 8,625 s of stage execution (2.4 GPU-hours, with the features
+  job, the three failed pilot attempts and the smokes), inside the
+  8-hour ceiling; about 5 h of wall time from the rule, including an
+  outage of the session.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
