@@ -477,7 +477,10 @@ other. Each has its rule written before its run, as everywhere.
   3. Keypoint rate against keypoint error: quantization 1, 2, 4, 8 px,
      constant-velocity prediction, a lower keypoint frame rate with
      interpolation; raw keypoints saved this time (K4 kept histograms
-     only). Which error is acceptable is K6's to judge on the rendering.
+     only). Which error is acceptable is K6's to judge on the rendering. Done (2026-10-21, [entry](docs/experiments.md#2026-10-21--k4b3-keypoint-rate-against-keypoint-error)):
+     q = 4 px, constant velocity, every 4th frame, **3.3 kbps for two
+     players** (median OKS 0.96 far, 0.99 near; p95 8 px on fast limbs);
+     every frame 9.5 kbps (p95 2.4 px). The curve goes to K6.
 - K5b. *Ball mode.* (1) The renderer's oracle: from the coded position,
   velocity and a per-window colour and size sent once, a sharp disk and
   an elongated blur, composited over the decodes and billed; scored as K5,

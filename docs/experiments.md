@@ -8314,6 +8314,44 @@ invocation turns out to be needed.
   every frame against the uncoded keypoints, and the share of zero
   residuals, show it.
 - Budget: CPU minutes, no fleet.
+- Outcome (`experiments.tennis.k4b_rate`, local, 13 s; the three
+  K4b.2 stages above, each locally validated; 24 codes;
+  `pose-v1/rate-2026-10-21/k4b3-report.json` `89276994…`). kbps for two
+  players (1.82 players per frame on average); OKS median and 5th
+  percentile against the uncoded keypoints; displacement in px at 1080p:
+
+  | code | kbps | far OKS (p05) | near OKS (p05) | px median / p95 |
+  |---|---:|---:|---:|---:|
+  | q 1, previous, every frame (K4's kind) | 15.0 | 0.998 (0.995) | 1.000 (0.999) | 0.40 / 0.60 |
+  | q 2, velocity, every frame | 11.7 | 0.991 | 0.999 | 0.80 / 1.20 |
+  | q 4, velocity, every frame | 9.5 | 0.963 (0.925) | 0.994 (0.986) | 1.59 / 2.40 |
+  | q 2, velocity, every 2nd | 6.6 | 0.989 (0.913) | 0.998 (0.940) | 0.90 / 4.39 |
+  | **q 4, velocity, every 4th** | **3.3** | 0.958 (0.813) | 0.988 (0.858) | 1.79 / 8.07 |
+  | q 8, velocity, every 4th | 2.6 | 0.891 | 0.974 | 3.03 / 8.56 |
+
+  18 of the 24 codes pass the bar; every q = 8 code fails on the far
+  player. Constant velocity saves 2–8% over first differences at equal
+  error. Absolute starts are 1–5% of the bits.
+- Decision (by the rule): **q = 4 px, constant velocity, every 4th frame,
+  3.3 kbps for two players** goes to K6 as the cheapest code within the
+  bar, with the whole curve. Against K4's SVT-AV1 player bits on broadcast
+  (other windows, a reference) it is 7.8% at CRF 62 and 2.1% at CRF 48;
+  K4's 22% came from 9.4 kbps.
+- Reading. The bar holds the median, not the tail: skipping frames
+  costs the fast limbs. At every 4th frame the p95 error is 8 px (near
+  player 9.5 px; players in one-player windows, mostly close-ups, 46 px),
+  against 2.4 px for the same quantization every frame (9.5 kbps). So the
+  frame rate is the lever whose error K6 must judge on the rendering:
+  swinging arms are what a viewer watches. Hypothesis: q = 2 is not free
+  but cheap in error (0.8 px median, 22% fewer bits than q = 1); velocity
+  saves little, as expected; every 2nd frame passes; the chosen code is at
+  the low end of 3–6 kbps. Competing explanation: jitter sets the floor
+  at q = 1 (18% zero residuals, 4.2 bits per value; the crops give YOLO
+  finer keypoints than K4's whole frames, 27–67% zeros there), so
+  keypoints at full precision cost more here (15.0 kbps) than K4's 9.4.
+  Scope: YOLO11x-pose's 17 keypoints on ×1 crops of hand-identified
+  players in 48 broadcast windows; the rate is a pooled-entropy bound
+  without a real entropy coder.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
