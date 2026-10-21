@@ -652,8 +652,10 @@ measured with BallTrack in K5b 1b: 0.01 of the balls at QP 0 (13 kbps),
 A figure for the tennis paper, if space allows (user, 2026-10-21): the
 ball at equal rate, source | DCVC-UF | + disk | + streak, on two frames
 the user chose from K5b 1b's side-by-side clips (the far player's ball,
-where DCVC-UF loses it and the disk looks unrealistic); regenerated from
-the final experiments' streams, as every figure is.
+where DCVC-UF loses it and the disk looks unrealistic): tracknet/game3/Clip3
+at DCVC-UF QP 42, frames 35 and 71 of the window (ball-following 3× crop;
+matched to the user's screenshots, job `20261021T084417Z-048cc9d4`);
+regenerated from the final experiments' streams, as every figure is.
 Negative results to report (user, 2026-10-13), with their numbers:
 parametric motion fails for egocentric objects (H1's homographies, H4a's
 grip pose on HOT3D motion capture, H4b's bank of views), and keypoints
