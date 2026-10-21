@@ -8023,8 +8023,8 @@ invocation turns out to be needed.
   its cost. A drawn ball at the encoder's positions restores detection
   where the pixel coders lose the ball (0.01 → 0.90 at 13 kbps; DCVC-UF
   alone needs 80–260 kbps for 80% of the source's), and on crop DISTS it
-  closes 75–100% of the gap to the pixel oracle (the streak matches the
-  oracle at every DCVC-UF point). What fails is the frame guard, and it
+  closes 75–100% of the gap to the pixel oracle (the streak is within
+  0.004 of the oracle at every DCVC-UF point). What fails is the frame guard, and it
   fails on rate, not quality: the per-frame payload (about 1 kbps, most
   of it colour differences) is 7% of DCVC-UF's 13 kbps lowest point,
   while frame PSNR rises by 0.01 dB, so the frame BD-rate is +2% to +3%.
