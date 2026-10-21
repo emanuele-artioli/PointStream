@@ -8058,6 +8058,36 @@ invocation turns out to be needed.
   and the four failed smokes, from each stage's `execution.json`), inside
   the 4-hour ceiling; about 4.5 h wall, most of it queueing for a GPU
   with 36 GB free.
+- (d) and its combinations, defined before any (d) score is computed
+  (2026-10-21; K8b adopted, homographies for the five matches:
+  `k8b-2026-10-20/review/k8b-report.json` `8230bf1a…3314` for
+  alcaraz_hurkacz, djokovic_zverev and medvedev_struff,
+  `k8b-2026-10-20/k4b-matches/registration/k8b-report.json` `eb7b34b9…e3e0`
+  for djokovic_federer and rublev_auger-aliassime; model metres, x across
+  the court 0–10.97, y along it 0–23.77, to 1080p pixels). Frozen as
+  `k4b_court.RULES_D` (version 1), on the same windows, canonical tracks
+  and SAM masks as the other candidates, CPU only:
+  - A track-frame is *registered* when K8's entry for that clip frame
+    (window start + t) has `fits` true (error ≤ 6 px); other frames are
+    not read. The *foot point* is the mask's lowest row at its centroid's
+    x, at 1080p; it maps through the inverse homography to the court
+    plane. *Inside*: x in [−1, 11.97] m and y in [−4, 27.77] m (the doubles
+    court, 1 m beyond each sideline and 4 m behind each baseline; ITF's
+    minimum run-off is 3.66 m at the sides and 6.40 m at the ends, where
+    line judges and ball kids stand). A point behind the camera is outside.
+  - Feature d: the share of the track's registered frames that are
+    inside (0 with no registered frame); *inside on most*: d > 0.5.
+  - (d): eligible tracks (presence ≥ 0.5, as every candidate) inside on
+    most, by d, ties by track key (as v1); fewer than two qualify, fewer
+    picks, as (c). (c)+(d): eligible tracks by inside on most, then racket
+    on most, then d, then the racket share c. (a)+(d): by inside on most,
+    then (a).
+  - Scored as before (injective IoU ≥ 0.5 on the marked frame; bar 0.95;
+    ties to the simpler rule: a, b, c, d, e, then (a)+(c), (c)+(d), (a)+(d)).
+    Two tables: all 48 marked frames, and the marked frames K8 registers
+    (court views, as this entry's data rule asks once K8 is adopted).
+    The court-view table decides; the all-frames table is reported beside
+    it.
 
 ### 2026-10-21 — K4b.2: pose on the far player (crop-size sweep)
 - Question (PLAN K4b, item 2). K4's (b) failed on the far player alone:
