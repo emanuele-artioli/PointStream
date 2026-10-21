@@ -8059,6 +8059,79 @@ invocation turns out to be needed.
   the 4-hour ceiling; about 4.5 h wall, most of it queueing for a GPU
   with 36 GB free.
 
+### 2026-10-21 — K4b.2: pose on the far player (crop-size sweep)
+- Question (PLAN K4b, item 2). K4's (b) failed on the far player alone:
+  YOLO11x-pose on the whole frame at 1280 px fits players under 10% of
+  the frame height on 0–50% of frames and those 15% and taller on
+  97–100%. Does a top-down estimate on each player's crop, enlarged, fit
+  the far player, and at which crop size?
+- Players: identified by hand, not by a rule, so this does not wait for
+  K4b.1's decision or K8. K4b.1's 48 windows (240 frames per marked
+  frame, 10,444 frames, the five broadcast matches) already carry SAM 3.1
+  masks and canonical tracks (`publish/<window>/sam-masks.rle`,
+  `features.json`, from the seven locally validated jobs). On each
+  window's marked frame, each player the user marked takes the canonical
+  track whose mask matches it (IoU ≥ 0.5, injective; 48/48 match, K4b.1's
+  proposal oracle), and that track is the player on every frame of the
+  window (its person mask where both prompts have one, as K4b.1). The
+  no-player frame's window has no players. *Far player*: in a window with
+  two marked players, the one with the smaller median mask height; the
+  other is the *near player*.
+- Settings (YOLO11x-pose, ultralytics 8.4.6, confidence 0.25, as K4).
+  *Whole frame*: K4's setting (1280 px), read from K4b.1's published
+  detections; no GPU. *Crop ×s*, s = 1, 2, 4: the player's mask box at
+  1920×1080, grown by 20% of its height on every side and clipped to the
+  frame, resized by s (bicubic; s = 1 untouched), its long side capped at
+  1280 px (K4's input; only near players reach it), padded to a multiple
+  of 32 and run at that size, so ultralytics does not rescale it.
+  Keypoints map back to the frame.
+- Measures, per setting and player-frame, as K4 (`k4.pose_analysis`'s
+  definitions): *fitted* when a detection has ≥ 0.5 of its box inside the
+  mask's box (H1's matching; for a crop, only that crop's detections);
+  *inside*: share of confident keypoints (≥ 0.5) inside the mask dilated
+  by 8 px. Reported for all player-frames, the far and near players, and
+  K4's height bins (6–10%, 10–15%, 15–25%, ≥ 25% of the frame height;
+  under 6% beside them). *Synthetic far player* (fit says nothing of
+  accuracy): every 8th frame of each near player whose median height is
+  ≥ 15% of the frame and whose ×1 crop is fitted, reduced (area filter)
+  to the same window's far player's median height, then run through each
+  crop setting; OKS (COCO sigmas, the native mask's area) against the
+  near player's own ×1 keypoints confident ≥ 0.5; unfitted counts as
+  OKS 0. *Latency*: GPU milliseconds per crop at each setting (batch 16,
+  synchronized), the whole frame beside it. Raw keypoints are saved (K4b.3
+  reads them).
+- Decision rule (fixed before any run). A crop setting *passes* when, on
+  the 48 windows' hand-identified players: (1) fitted ≥ 0.90 of all
+  player-frames and ≥ 0.90 of far-player frames; (2) median inside ≥ 0.9
+  for both; (3) ≥ 0.90 of synthetic far players at OKS ≥ 0.5. The
+  smallest passing s is chosen (cheapest). If one passes, PLAN K4b.2 is
+  done: K4's (b) is re-read with it (here on hand-identified players; on
+  K4's windows once K4b.1's identification is adopted), and K4b.3 runs on
+  its keypoints. If none passes, stage 2 runs DWPose (`Models/DWPose`,
+  `dw-ll_ucoco_384.onnx`, body 17 of COCO-WholeBody) on the same crops
+  under the same three conditions, after an environment audit and a
+  first-run smoke of its execution provider; then super-resolution of the
+  crop; fine-tuning only if all fail.
+- Hypothesis: whole frame fits about 0.5 of far-player frames and ≥ 0.97
+  of near ones (K4); ×2 lifts the far player to ≥ 0.9 and ×4 adds nothing;
+  near players are unchanged; inside stays 1.0; synthetic OKS ≥ 0.5 on
+  most samples at ×2 and ×4, fewer at ×1.
+- Competing explanations: (1) the far player is missed for occlusion or
+  motion blur, not size: fit would not rise with s, and the height bins
+  show it. (2) Enlarged crops give confident wrong keypoints: inside and
+  the synthetic OKS check it; the reduction does not reproduce broadcast
+  compression of a real far player, so OKS is an upper bound there. (3)
+  A SAM track drifts to another person within the window: review images
+  (the marked frame and one content-blind frame per window, every
+  setting's skeleton on the crop) check it. (4) The crop's margin admits
+  another person: the matching to the player's own mask decides, as K4.
+- Budget: no SAM; one window conversion per window (K4b.1's, 83 s for
+  all), YOLO on about 20,000 player crops per setting and the synthetic
+  samples. Smoke: the part's first window (≤ 600 s). Pilot: K4b.1's three
+  pilot windows, ≤ 45 min. Full: the other 45 windows in two parts of
+  ≤ 45 min. Ada or A6000 (YOLO11x-pose's table rows; Ada asserted in
+  K4b.1's jobs), shared, 12 GB declared. Ceiling 1 GPU-hour and 4 h wall.
+
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
   codec gains more than a conventional one when PointStream adds learned
