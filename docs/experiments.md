@@ -6645,6 +6645,52 @@ invocation turns out to be needed.
 - Budget: 8 jobs (per item: the scene-model points; the SVT-AV1 points),
   each point coded twice, about 25 minutes each on a shared GPU; about 3
   GPU-hours, ceiling 4; every stage under 45 minutes.
+- Runs (`g6 fill-cost`, code `37db6aa` per each job's `ready.json`; RTX
+  6000 Ada; every full stage validated locally, 10/10). P01_107: scene
+  540p `20261021T154938Z-b665eb20`, scene 1080p `…162327Z-c71e1490`,
+  SVT-AV1 `…155730Z-18f6ee72`. P02_02: scene `…155736Z-5d7e5688`, SVT-AV1
+  `…155717Z-f071aac2`. P03_10: scene `…155743Z-d88d653e`, SVT-AV1
+  `…163549Z-e533eed5`. Not citable: a first P02_02 SVT-AV1 job stopped by
+  a GPU-memory overrun (19.9 GB against 16 GB declared;
+  `…154945Z-2eb030d6`, smoke passed), and two smokes over 600 s on the
+  contended A6000 gpu2 (`…155723Z-7ead6dae`, `…155749Z-3a4b785c`), rerun
+  on Ada. P09_106's two jobs were cancelled once the decision was made
+  (below): `…163556Z-79197121`, `…163602Z-be5dbc75`.
+- The fill's measured cost (static plate bytes over ProPainter's, at the
+  same point; LPIPS on V moved by at most 0.007 anywhere):
+
+  | Item (F share) | scene model | SVT-AV1 (enhancer re-applied) |
+  |---|---|---|
+  | P01_107 (14%) | 0.98–1.04 | 1.02–1.03 |
+  | P02_02 (50%) | 0.83–0.87 | 0.61–0.71 |
+  | P03_10 (19%) | 0.99–1.02 (0.90 at 1080p QP 63) | 0.93–1.01 |
+
+  - The static plate is not free where F moves: pixels switching between
+    moving background and a frozen plate cost bits. ProPainter's
+    temporally coherent fill is cheap for the scene model; SVT-AV1 pays
+    for it only where F is large (P02_02).
+- Outcome. Oracle BD-rate on weighted LPIPS against `dcvc-venue`, neither
+  billed (the same rows unchanged reproduce H5q 1's per-point reading
+  exactly, +8 | +19 | +12%): P01_107 **+9%**, P02_02 **+11%**, P03_10
+  **+13%**; P09_106 not measured (−15% unchanged, F 2%).
+  - **The rule fails**: three items stay above zero, so at most 1 of 4
+    can be below zero whatever P09_106 measures. Decided at 3 of 4 items;
+    P09_106's jobs were cancelled.
+  - Hypothesis wrong except on P02_02 (40–60% predicted, 13–39% measured);
+    the competing explanation holds for the scene model everywhere and for
+    SVT-AV1 where F is small. The free fill does not exist in this form,
+    and even the area-proportional bound (H5q 1: −5%, 2 of 4) failed.
+- **H5q closes on LPIPS (2026-10-21).** At equal adaptation the split
+  does not beat the venue-adapted whole-frame DCVC-UF on weighted LPIPS:
+  +16% as built, +6% at best per point, still above zero with the fill's
+  measured cost removed. It wins on weighted DISTS (−15%, 4 of 4), frame
+  DISTS (−22%, 4 of 4) and weighted PSNR (−11%, 3 of 4), and on LPIPS
+  where F is small (P09_106, 2%: −15%). The egocentric claim is the
+  user's to reframe.
+- GPU time: about 2.5 GPU-hours (7 complete jobs, the failed and cancelled
+  ones included), within the ceiling of 4.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5q2-37db6aa/`
+  (the stages' `g6.json`, `oracle.py` and its `oracle.json`, the specs).
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and

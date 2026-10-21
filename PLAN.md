@@ -34,8 +34,9 @@ new dependency.
   H5p 4–5 (F carried by the stream; visual check).** H5q lever 1 (the
   venue model codes the foreground) closes the foreground gap but not the
   LPIPS margin (+19%; +6% choosing per point). The remaining loss is
-  structural (F paid twice) and grows with F's area; even a free fill
-  falls short (−5%, 2 of 4). The claim waits on the user.
+  structural (F paid twice) and grows with F's area; the fill's measured
+  cost does not close it (H5q 2: +9 to +13%). H5q closed on LPIPS; the
+  claim waits on the user.
 - **Background (G):** a scene model adapted to the venue, sent beforehand
   and unbilled (payback hours reported), plus a per-video enhancer route
   (G6).
@@ -418,10 +419,17 @@ there's a way to win, we should take it").*
   (P02_02 50%: +19%; P09_106 2%: −15%). Even a free fill in the
   background stream (CPU estimate) reaches −5% (2 of 4), short of the
   rule; lever 2 adds a few points, lever 3 matters once F is billed.
-- **Decision for the user:** at equal adaptation the split does not reach
-  rule (a) on LPIPS; it wins on DISTS (weighted −15%, frame −22%, 4 of
-  4) and weighted PSNR (−11%), and where F is small. What the egocentric
-  claim becomes waits on that decision.
+- *H5q 2, the fill measured (user, 2026-10-21), fails:* a static plate in
+  F saves 13–39% of the background where F is half the frame (P02_02)
+  and nothing where it is small (moving F makes a frozen plate costly;
+  ProPainter's fill is already cheap for the scene model). With the
+  measured saving, P01_107 +9%, P02_02 +11%, P03_10 +13%: the rule
+  cannot pass.
+- **H5q closed on LPIPS (2026-10-21).** At equal adaptation the split
+  loses on weighted LPIPS (+16% as built, +6% best per point) and wins on
+  weighted DISTS (−15%), frame DISTS (−22%), weighted PSNR (−11%), and
+  on LPIPS where F is small. **The egocentric claim is the user's to
+  reframe**; next on the critical path: H5p 4–5.
 
 #### K. Where keypoints win (analysis, user 2026-10-13)
 
@@ -644,9 +652,11 @@ Equal adaptation, as it stands (H5p 3, H5q 1; 2026-10-21): against a
 whole-frame DCVC-UF adapted to the venue the same way, neither model
 billed, PointStream loses on LPIPS (+16%; +6% with the best foreground
 per point) and wins on DISTS (weighted −15%, frame −22%, 4 of 4) and
-weighted PSNR (−11%). Not a claim of a win until H5q decides; if it
-stays so, state the metrics' disagreement, and that the loss is the
-background stream's (the foreground matches the anchor at high rates).
+weighted PSNR (−11%). H5q decided (2026-10-21): no LPIPS win at
+equal adaptation. State the metrics' disagreement; that the split's
+LPIPS cost is structural (F coded in both streams) and grows with F's
+share of the frame (P09_106, 2%: −15%; P02_02, 50%: +19%); and that the
+foreground alone matches the venue codec at high rates once adapted.
 Checked (2026-10-16, [analysis](docs/experiments.md#2026-10-16--does-the-learned-codec-compose-better-with-a-learned-enhancer-analysis-of-h3ds-oracle)):
 over its own base, the same enhancer gains about as much on SVT-AV1 as on
 DCVC-UF (LPIPS −73% against −76%; PSNR −35% against −12%), so "the
