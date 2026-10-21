@@ -42,8 +42,8 @@ new dependency.
   pose, keypoint rate, identification); court-view shots are adopted
   as K8b (2026-10-21): on 69 held-out shots from three broadcasts,
   precision and recall are 1.00, with a registration median of 0.77 px and
-  p95 of 2.71 px. Next: K8b's homographies for the two remaining K4b
-  matches, then K4b, K5b, K6; K7 (HiEve) later.
+  p95 of 2.71 px; homographies are published for all five of K4b's
+  matches. Next: K4b, K5b, K6; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -468,8 +468,11 @@ other. Each has its rule written before its run, as everywhere.
   every shot. Precision is 1.00 (44/44, lower bound 0.934) and recall
   1.00; the registration median is 0.77 px and the p95 2.71 px. Per-frame
   homographies for those 70 clips are published for K4b (d) and G.
-  Open: the same run on djokovic_federer and rublev_auger-aliassime (the
-  other K4b matches), then nadal_kyrgios's whole match (v1).
+  djokovic_federer and rublev_auger-aliassime are registered too
+  (2026-10-21), so all five of K4b's matches are covered. nadal_kyrgios's
+  whole match (v1 of the court-shot list, with a spot-check of its
+  predicted court shots) waits until the full tennis pipeline needs it
+  (user, 2026-10-21).
 - K4b. *Players before K6* (re-reads K4's (b) and the K6 gate).
   1. Identification. Candidate rules, content-blind: motion in body
      heights (K4's amendment), horizontal motion with the clip's end
