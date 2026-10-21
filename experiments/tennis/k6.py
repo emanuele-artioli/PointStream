@@ -707,6 +707,12 @@ def command_run(args: argparse.Namespace) -> int:
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
     publish = scratch / "publish"
     publish.mkdir(exist_ok=True)
+    # The staging cache keeps files read-only and drops the execute bit: run a copy (as H1 and K4).
+    inspect = scratch / "bin" / Path(args.inspect).name
+    inspect.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(args.inspect, inspect)
+    inspect.chmod(0o755)
+    args.inspect = str(inspect)
     os.environ["YOLO_CONFIG_DIR"] = str(scratch / "ultralytics")
     device = "cuda"
     limit = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "24000"))
