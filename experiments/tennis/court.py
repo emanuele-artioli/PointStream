@@ -61,15 +61,18 @@ def samples(hom: np.ndarray, step: float = 1.0) -> tuple[np.ndarray, np.ndarray,
     return model, points, np.array(groups)
 
 
-def plausible(hom: np.ndarray, shape: tuple[int, ...]) -> bool:
+def plausible(hom: np.ndarray, shape: tuple[int, ...], wide: bool = False) -> bool:
+    """`wide` (K8b) lets the corners lie up to half a frame width beyond either side, as the
+    near corners do from a court-level camera; K8 keeps its +-10% bounds."""
     corners = project(OUTLINE, hom)
     h, w = shape[:2]
+    side = 0.5 if wide else 0.1
     if not np.isfinite(corners).all() or not cv2.isContourConvex(corners.reshape(-1, 1, 2)):
         return False
     area = cv2.contourArea(corners.reshape(-1, 1, 2))
     # Broad geometry guard; rejects tiny court-like graphics and collapsed solutions.
     return bool(0.07 * h * w < area < 0.9 * h * w
-                and np.all(corners[:, 0] > -0.1 * w) and np.all(corners[:, 0] < 1.1 * w)
+                and np.all(corners[:, 0] > -side * w) and np.all(corners[:, 0] < (1 + side) * w)
                 and np.all(corners[:, 1] > 0) and np.all(corners[:, 1] < 1.1 * h))
 
 
@@ -96,7 +99,7 @@ def chamfer(hom: np.ndarray, mask: np.ndarray, step: float = 1.0) -> dict[str, A
             "segments_supported": sum(s >= 0.5 for s in supports), "visible_fraction": float(visible.mean())}
 
 
-def refine(hom: np.ndarray, mask: np.ndarray) -> np.ndarray | None:
+def refine(hom: np.ndarray, mask: np.ndarray, nearest: np.ndarray | None = None, wide: bool = False) -> np.ndarray | None:
     """RANSAC correspondences from projected painted lines to nearby detected pixels.
 
     Initial hypotheses come from independent Hough lines (or the prior frame).
@@ -104,7 +107,8 @@ def refine(hom: np.ndarray, mask: np.ndarray) -> np.ndarray | None:
     """
     if not mask.any():
         return None
-    _, nearest = distance_transform_edt(1 - mask, return_indices=True)
+    if nearest is None:
+        _, nearest = distance_transform_edt(1 - mask, return_indices=True)
     result = hom.copy()
     for _ in range(2):
         model, pts, groups = samples(result, step=10)
@@ -118,7 +122,7 @@ def refine(hom: np.ndarray, mask: np.ndarray) -> np.ndarray | None:
             return None
         fitted, inliers = cv2.findHomography(model[close], target[close], cv2.RANSAC, 3 * h / 1080,
                                             maxIters=300, confidence=0.995)
-        if fitted is None or inliers is None or inliers.sum() < 12 or not plausible(fitted, mask.shape):
+        if fitted is None or inliers is None or inliers.sum() < 12 or not plausible(fitted, mask.shape, wide):
             return None
         result = fitted
     return result
@@ -203,3 +207,110 @@ def register(rgb: np.ndarray, previous: np.ndarray | None = None) -> dict[str, A
                 hom, error = alternate, alternative_error
     valid = error["chamfer_px"] is not None and error["chamfer_px"] <= 2.0 and error["segments_supported"] >= 6
     return {"homography": hom.tolist(), **error, "registered": bool(valid)}
+
+
+# K8b (docs/experiments.md, 2026-10-20 rule). K8's detector above is kept unchanged for
+# reproducing K8's evidence; K8b adds a shade-robust detector, an independent ruler and a
+# spurious-fit guard, and chooses among hypotheses from both detectors.
+FIT_PX = 6.0          # a frame fits at the decision rule's p95 bar
+
+
+def _about_centre(sx: float, sy: float) -> np.ndarray:
+    """Model-space scaling about the court centre (the middle of the net)."""
+    return np.array([[sx, 0, WIDTH / 2 * (1 - sx)], [0, sy, LENGTH / 2 * (1 - sy)], [0, 0, 1]])
+
+
+# H @ swap re-seats a fit whose doubles sidelines sit on the singles lines (and back), or whose
+# baselines sit on the service lines (and back).
+SWAPS = [_about_centre(WIDTH / 8.23, 1), _about_centre(8.23 / WIDTH, 1),
+         _about_centre(1, (LENGTH / 2) / (LENGTH / 2 - SERVICE)), _about_centre(1, (LENGTH / 2 - SERVICE) / (LENGTH / 2))]
+CLUTTER_MAX = 0.25    # dev: true court fits <= 0.085, spurious fits 0.52-0.66
+
+
+def hough_segments(raw: np.ndarray) -> np.ndarray:
+    """Long straight segments (x1, y1, x2, y2), with K8's Hough parameters scaled to the frame."""
+    scale = raw.shape[0] / 1080
+    lines = cv2.HoughLinesP(raw * 255, 1, np.pi / 720, max(20, round(50 * scale)),
+                            minLineLength=max(20, round(80 * scale)), maxLineGap=max(4, round(12 * scale)))
+    return np.zeros((0, 4), np.int32) if lines is None else lines[:, 0]
+
+
+def relative_lines(rgb: np.ndarray, kernel: int = 31, rel: float = 0.10, absolute: float = 10.0,
+                   saturation: float = 0.75) -> tuple[np.ndarray, np.ndarray]:
+    """(line mask, 1 px centerline ruler), relative to the local background in shade or sun.
+
+    A line pixel is brighter than the morphological opening of the value channel (which
+    removes thin bright lines) by max(absolute, rel * background), and its saturation is
+    at most `saturation` times the closing of the saturation channel.
+    """
+    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    s, v = hsv[:, :, 1].astype(np.float32), hsv[:, :, 2].astype(np.float32)
+    shape = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel, kernel))
+    background = cv2.morphologyEx(v, cv2.MORPH_OPEN, shape)
+    surround = cv2.morphologyEx(s, cv2.MORPH_CLOSE, shape)
+    raw = ((v - background >= np.maximum(absolute, rel * background)) & (s <= saturation * surround)).astype(np.uint8)
+    width = max(3, round(7 * rgb.shape[0] / 1080))
+    support, ruler = np.zeros_like(raw), np.zeros_like(raw)
+    for x1, y1, x2, y2 in hough_segments(raw):
+        cv2.line(support, (int(x1), int(y1)), (int(x2), int(y2)), (1,), width)
+        cv2.line(ruler, (int(x1), int(y1)), (int(x2), int(y2)), (1,), 1)
+    return raw & support, ruler
+
+
+def clutter(hom: np.ndarray, mask: np.ndarray, margin: int = 6) -> float:
+    """Share of the projected court's in-frame interior, beyond `margin` px of every model
+    line, covered by detected pixels; a fit on texture (nets, crowd) is cluttered."""
+    corners = project(OUTLINE, hom)
+    if not np.isfinite(corners).all():
+        return 1.0
+    inside = np.zeros_like(mask)
+    cv2.fillConvexPoly(inside, np.rint(corners).astype(np.int32), (1,))
+    near = np.zeros_like(mask)
+    for segment in SEGMENTS:
+        cv2.polylines(near, [np.rint(project(segment, hom)).astype(np.int32)], False, (1,), 2 * margin + 1)
+    region = (inside > 0) & (near == 0)
+    return float(mask[region].mean()) if region.any() else 1.0
+
+
+def register_v2(rgb: np.ndarray, previous: np.ndarray | None = None) -> dict[str, Any]:
+    """K8b registration: warm start, then both detectors' seeds when it fails or exceeds 2 px.
+
+    Each hypothesis is refined against both masks; the valid fit (>= 6 supported segments on
+    the ruler, clutter <= CLUTTER_MAX) with the lowest ruler chamfer wins. `error_px` is the
+    ruler chamfer at 1080p; `fits` is error <= FIT_PX. Missing fits stay missing.
+    """
+    old = white_lines(rgb)
+    mask, ruler = relative_lines(rgb)
+    targets = [(m, distance_transform_edt(1 - m, return_indices=True)[1]) for m in (old, mask) if m.any()]
+    best: tuple[np.ndarray, dict[str, Any], float] | None = None
+
+    def consider(candidate: np.ndarray) -> None:
+        nonlocal best
+        for target, nearest in targets:
+            fitted = refine(candidate, target, nearest, wide=True)
+            if fitted is None:
+                continue
+            error = chamfer(fitted, ruler)
+            if error["chamfer_px"] is None or error["segments_supported"] < 6:
+                continue
+            mess = clutter(fitted, mask)
+            if mess <= CLUTTER_MAX and (best is None or error["chamfer_px"] < best[1]["chamfer_px"]):
+                best = (fitted, error, mess)
+
+    if previous is not None:
+        consider(previous)
+    if best is None or best[1]["chamfer_px"] > 2.0:
+        for start in (seed(old), seed(mask)):
+            if start is not None:
+                consider(start)
+    if best is not None and best[1]["chamfer_px"] > 2.0:
+        # The model's line pairs are ambiguous (singles/doubles sidelines, service lines/
+        # baselines): a fit can lock one line off. Re-seat it on each swapped pairing.
+        for swap in SWAPS:
+            consider(best[0] @ swap)
+    if best is None:
+        return {"homography": None, "error_px": None, "fits": False, "registered": False}
+    hom, error, mess = best
+    return {"homography": hom.tolist(), "error_px": error["chamfer_px"], "segments_supported": error["segments_supported"],
+            "visible_fraction": error["visible_fraction"], "clutter": mess,
+            "fits": error["chamfer_px"] <= FIT_PX, "registered": error["chamfer_px"] <= 2.0}

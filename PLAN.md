@@ -39,10 +39,11 @@ new dependency.
   at ¼ or ½ plus the generic enhancer G_HO. Keypoints lose on egocentric
   video (H1, H3, H4, K1, K3).
 - **Tennis (K):** the ball mode wins (K5); players wait on K4b (far-player
-  pose, keypoint rate, identification); court-view shots (K8) are not
-  adopted (2026-10-20): precision 1.00, but duration recall 0.34 and
-  registration p95 24.5 px; the user decides the next K8 step. Next:
-  K4b, K5b, then K6; K7 (HiEve) later.
+  pose, keypoint rate, identification); court-view shots are adopted
+  as K8b (2026-10-21): on 69 held-out shots from three broadcasts,
+  precision and recall are 1.00, with a registration median of 0.77 px and
+  p95 of 2.71 px; homographies are published for all five of K4b's
+  matches. Next: K4b, K5b, K6; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -458,6 +459,20 @@ other. Each has its rule written before its run, as everywhere.
   median error) and the cuts, under a new rule judged on unmarked shots.
   Or K4b's candidate (d) could use only the 41 precise predicted-court
   shots.
+  **K8b adopted (2026-10-21)**
+  ([entry](docs/experiments.md#2026-10-20--k8b-court-recall-in-shade-and-across-venues-rule)).
+  The changes: a line detector relative to the local background (works in
+  shade), hypotheses from both detectors, line-swap re-seating, a
+  centerline ruler, a clutter guard, and a 6 px shot rule. On 69 held-out
+  shots of three broadcasts the user's marks and the system agree on
+  every shot. Precision is 1.00 (44/44, lower bound 0.934) and recall
+  1.00; the registration median is 0.77 px and the p95 2.71 px. Per-frame
+  homographies for those 70 clips are published for K4b (d) and G.
+  djokovic_federer and rublev_auger-aliassime are registered too
+  (2026-10-21), so all five of K4b's matches are covered. nadal_kyrgios's
+  whole match (v1 of the court-shot list, with a spot-check of its
+  predicted court shots) waits until the full tennis pipeline needs it
+  (user, 2026-10-21).
 - K4b. *Players before K6* (re-reads K4's (b) and the K6 gate).
   1. Identification. Candidate rules, content-blind: motion in body
      heights (K4's amendment), horizontal motion with the clip's end
@@ -631,3 +646,17 @@ learned codec composes better" is not supported. The argument to make
 instead: DCVC-UF is the better base (−63%, H3c), and learned parts
 directed by domain knowledge add large gains on top of a codec. A G
 fitted on SVT-AV1 decodes would only refine this and is not planned.
+A candidate secondary contribution (user, 2026-10-21): the court-view
+classifier and registration (K8b) and the hand-marked shot labels.
+Evidence: 69 held-out shots from three broadcasts, with the user's marks
+and the system agreeing on every shot (registration p95 2.71 px), plus
+K8's 82 marked nadal_kyrgios shots. Before claiming it: (1) a related-work
+check, since broadcast court registration from lines is an established
+topic and the novelty has to be stated against it (shade-robust
+detection, line-swap re-seating, a clutter guard), not assumed; (2) the
+labels are per-shot classes for 151 shots of four broadcasts, not
+per-frame court keypoints, so they are better called a released evaluation
+set than a dataset, and their size is stated; (3) only labels and clip
+identifiers can be released, since the footage is broadcast material. It
+may also be framed as the component that makes the tennis pipeline
+automatic, rather than as a contribution of its own.
