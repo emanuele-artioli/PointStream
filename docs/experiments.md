@@ -7875,3 +7875,90 @@ invocation turns out to be needed.
   regime with a valid detector: through SVT-AV1 at CRF 62 every
   candidate finds under 3% of the balls (YOLO26x's 0.02 in K5 was not a
   valid judge).
+
+### 2026-10-21 — K5b (1b): a per-frame ball, judged by detection and DISTS (rule)
+- Question (PLAN K5b 1b): K5b 1 drew the ball from TrackNet's labels with
+  one appearance per window and kept 10–20% of the pixel oracle's
+  ball-region PSNR gain; its diagnostic put the gap on position (labels
+  1.4–3.2 px off the best fit) and on a per-window appearance. Does a
+  ball the encoder places and styles per frame, every byte billed, keep
+  the ball visible and recognisable at the low rates where the pixel
+  coders lose it, end to end from a tracker's positions?
+- Judges (user, 2026-10-21). K5b 1 decided on ball-region PSNR, which
+  punishes a drawn ball twice for a 2 px misplacement and rewards a dull
+  one; the ball mode's claim is that the ball can be seen and followed,
+  not that its pixels are the source's. Deciding: (a) **detection**,
+  BallTrack (K5b 2: never trained on TrackNet, so a clean judge on every
+  K5 window) on the decoded or composited frames, a hit within 10 px of
+  TrackNet's label, over the window's visible frames (5 px reported);
+  (b) **DISTS** (masked DISTS of `src.codecs.quality`, VGG16, all-ones
+  mask) on a 64 × 64 crop centred on the label (clamped to the frame),
+  composite against source, averaged over the visible frames. Reported:
+  ball-region and streak-region PSNR (K5b 1's), LPIPS on the same crop,
+  frame PSNR, and the false detections per ball-less frame.
+- What changes from K5b 1 (`src/pointstream/ball.py`, the same `BALL`
+  segment, versioned): (1) per-frame position refinement: the encoder
+  moves each coded position by the fit's best offset within ±4 px, and
+  the refined positions go through the same constant-velocity
+  Exp-Golomb code, so their cost is billed; (2) a per-frame appearance:
+  radius, exposure and phase indices and the 8-bit colour per visible
+  frame, each coded as the signed Exp-Golomb difference from the
+  previous visible frame (the window's first is absolute), so a steady
+  ball costs a few bits a frame. The fit alternates the two (position
+  with the current appearance, then the appearance at the refined
+  position; two rounds), minimising whole-frame squared error as in
+  K5b 1, with the off switch per window kept.
+- Position sources (the encoder's tracker), each a variant: TrackNet's
+  labels (the bound); **BallTrack** on the source (the encoder the codec
+  would ship; misses become hidden frames, false detections are drawn);
+  **WASB** (step 1) on the source, cheap at inference only and more
+  precise (5 px 0.944 against 0.771), disclosed: it trained on games 2,
+  3, 6, 7, so on six of the eight windows its positions are not held out
+  (game8/Clip6 and game10/Clip10 are). The judge stays BallTrack, scored
+  against the labels, so a WASB-placed ball is judged by a detector that
+  did not place it.
+- Windows, coders and rates: K5b 1's (8 TrackNet windows; SVT-AV1 preset
+  4 at CRF 35–62, DCVC-UF HT-L at QP 0–63 on the A6000); rate = the
+  coder's bytes plus the billed `BALL` segment; K5's pixel oracle
+  recomputed, and judged by the same judges, as the bound.
+- Decision rule (`k5b.DECISION_1B`, fixed before any run). A renderer
+  (disk or streak) with **BallTrack's positions** is adopted when, over a
+  coder underneath, on ≥ 6 of the 8 windows: (i) detection: the rate at
+  which the composite first finds 80% of the balls BallTrack finds on the
+  source (linear in log rate between points) is at most half the rate
+  the pooled pixel envelope (upper hull of detection against rate over
+  both coders) needs for the same, or the envelope never gets there;
+  **and** (ii) DISTS-crop BD-rate ≤ −25% against the pooled envelope, or
+  better at every rate; **and** (iii) frame-PSNR BD-rate ≤ +1% against
+  its own coder's envelope (K5b 1's guard). If the labels' variant passes
+  and BallTrack's does not, the tracker is the gap (WASB's variant says
+  whether its precision closes it, and WASB retraining with K5's games
+  held out becomes the next step). If neither passes, the reading says
+  which judge failed and by how much. If both renderers pass, the user's
+  preference from this run's side by side picks the default.
+- Hypothesis: the drawn ball restores most of the source's detections
+  where the pixel coders lose them (DCVC-UF QP 21–63, SVT-AV1 CRF 55–62:
+  under 10% found) for about 1 kbps, so (i) passes on DCVC-UF and SVT-AV1
+  alike; the streak passes DISTS by more than the disk on fast windows,
+  the disk detection by more (a crisp blob is what BallTrack's heatmap
+  peaks on); BallTrack's positions lose under 0.05 of detection against
+  the labels' after refinement.
+- Competing explanations: (1) BallTrack detects a drawn disk because it
+  is a bright blob, not because it looks like the ball; the false
+  detections on ball-less frames and DISTS check it, and the side by
+  side shows it. (2) With BallTrack's positions, the judge may agree
+  with itself (it drew the ball where it already looked); scoring
+  against the labels and WASB's variant check it. (3) DISTS on a
+  64-pixel crop is dominated by the court around the ball, so the ball
+  barely moves it; the oracle's DISTS gain (pasted pixels) bounds what it
+  can show, and LPIPS is reported beside it.
+- Side by side (for the user's preference): K5b 1's layout (source,
+  pixel coder, + disk, + streak, at equal rate, ball-following 3× crops
+  and one full frame), at DCVC-UF QP 42 and SVT-AV1 CRF 55, BallTrack's
+  positions.
+- Budget: GPU (BallTrack, WASB, DISTS, LPIPS, DCVC-UF) on the A6000;
+  BallTrack, WASB and DISTS are new on that class, so the smoke asserts
+  CUDA for each and the result goes into the model–GPU table. Smoke: one
+  window, 48 frames, ≤ 600 s. Part 1: K5b 1's four windows, ≤ 45 min;
+  part 2: the other four, run only if part 1 leaves the rule open.
+  Ceiling 2 GPU-hours and 6 h wall.
