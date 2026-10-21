@@ -606,6 +606,20 @@ definitive pipeline; a first draft complete but for final touches and the
 figures' final experiments; the final experiments (run once, after the
 figure list is fixed); final touches before submission. The framing waits
 for the pipeline and K4–K6.
+Ablations to report (user, 2026-10-21), tennis players: (1) how the
+two players are found among everyone on screen. Content-blind candidate
+rules frozen before the user marked players on 48 frames (motion in body
+heights, horizontal motion, racket contact, inside the court outline from
+K8's homography, keypoint motion, and combinations), scored on the marks:
+racket contact plus inside the court wins (0.973 on court views; K4's
+motion rule 0.62), and the shot filter (K8) is
+part of it, since off-court shots carry the misses (K4b.1). (2) How the
+far player's pose is found: whole-frame YOLO fits it on 0.595 of frames,
+a top-down crop at native size on 0.993 (K4b.2; 0.04 → 0.99 for players
+6–10% of the frame height). Method to state with them: frames chosen
+content-blind, rules frozen before the labels were opened, and the marks
+the only labels. [K4b.1](docs/experiments.md#2026-10-16--k4b1-identifying-the-two-players-rule),
+[K4b.2](docs/experiments.md#2026-10-21--k4b2-pose-on-the-far-player-crop-size-sweep).
 A point to argue (user, 2026-10-13), scoped to the evidence when written:
 conventional codecs are one-size-fits-all, rigid in what they code and tuned
 to pixel fidelity rather than to what people see; a learned codec's

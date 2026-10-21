@@ -8268,6 +8268,53 @@ invocation turns out to be needed.
 - Budget: 2,905 s of stage execution (0.81 GPU-hours with the three
   smokes), inside the 1 GPU-hour ceiling; about 2 h wall from the rule.
 
+### 2026-10-21 — K4b.3: keypoint rate against keypoint error
+- Question (PLAN K4b, item 3). What does it cost to send the players'
+  keypoints at each precision, and how far do the decoded keypoints move?
+  K4 measured one point (9.4 kbps for two players, first differences at
+  0.25 px, 22% of SVT-AV1's player bits at CRF 62) and kept no keypoints;
+  K6 needs the curve to choose its operating point.
+- Data: K4b.2's ×1 crop keypoints (the chosen setting), the 48 windows'
+  hand-identified players, from the three locally validated K4b.2 stages
+  (19,062 player-frames; 8,860 far, 8,860 near). CPU only, local.
+- Codes (per player track, YOLO's 17 COCO keypoints, x and y): quantization
+  step q = 1, 2, 4, 8 px at 1080p; prediction *previous* (first
+  differences, K4's) or *constant velocity* (2·previous decoded −
+  the one before; previous on a track's second frame); keypoint rate
+  every frame, every 2nd or every 4th frame, the skipped frames decoded by
+  linear interpolation between sent frames (held after the last). Closed
+  loop: residuals are taken against decoded values. A frame where the
+  player is not fitted ends the track; the next fitted frame starts a new
+  one, its values sent absolutely (log2 of 1920/q and 1080/q bits). Per
+  keypoint and sent frame, one visibility symbol (confidence ≥ 0.5). Rate:
+  empirical entropy of the residual symbols and of the visibility symbols,
+  each pooled over all windows per code (adaptive coding's optimistic
+  bound, as K4), plus the absolute starts, in kbps for two players at each
+  window's frame rate.
+- Error, against the uncoded keypoints, over every fitted frame and the
+  keypoints confident there: displacement in px at 1080p (median, p95) and
+  in shares of the player's box height; OKS against the uncoded keypoints
+  (COCO sigmas, the mask's area), for far and near players.
+- Decision rule (fixed before computing). The code handed to K6 is the
+  lowest-rate code whose median OKS against the uncoded keypoints is
+  ≥ 0.95 for both far and near players (the coding error then sits well
+  inside COCO's tolerance at the player's own scale); its rate is reported
+  against K4's SVT-AV1 player bits on broadcast (41.9 kbps at CRF 62,
+  155 kbps at CRF 48; K4's windows, not these, so a reference, not a
+  test). The whole curve goes to K6, which judges the error on the
+  rendering. K4's gate (c) is not re-read here: its bits come from other
+  windows.
+- Hypothesis: q = 2 px is free in error (YOLO's keypoints come at 1–2 px
+  precision, K4) and costs a third less than 1 px; constant velocity saves
+  little (K4: 27–67% of differences already zero) and loses on jitter;
+  every 2nd frame passes at ≥ 50 fps; the chosen code costs 3–6 kbps for
+  two players.
+- Competing explanation: YOLO's frame-to-frame jitter, not motion, sets
+  both the rate and the error floor of interpolation; the error at q = 1
+  every frame against the uncoded keypoints, and the share of zero
+  residuals, show it.
+- Budget: CPU minutes, no fleet.
+
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
   codec gains more than a conventional one when PointStream adds learned
