@@ -49,8 +49,11 @@ new dependency.
   matches. K4b done (2026-10-21): players found by racket contact plus the
   court outline, the far player fitted on ×1 crops, keypoints 3.3 kbps for
   two, so K6's gate passes. K5b done: BallTrack adopted as tracker and
-  judge; the ball mode kept with the streak renderer (user). Next: K6
-  (running); K7 (HiEve) later.
+  judge; the ball mode kept with the streak renderer (user). K6 done
+  (2026-10-21): with true appearance at the coded pose the players'
+  keypoints save 95% of the pixel coders' rate, but a reference frame
+  warped to the pose loses to every pixel coder. Next: K6b (a learned
+  per-player renderer's oracle), then K6c; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -463,6 +466,118 @@ objects (the tennis ball).
   pixel coders' envelope (SVT-AV1, DCVC-UF), swept over the rendering
   resolution, so K4's keypoint share (22% of SVT-AV1's player bits at
   CRF 62) is judged there, not by H1's 10% screen.
+  Done (2026-10-21, [entry](docs/experiments.md#2026-10-21--k6-player-oracle-h3b-for-bodies-on-broadcast-tennis);
+  K4's 9 broadcast windows, 8 scored from 5 matches; the stopping rule
+  met at the first look). **The bound passes and the charged oracle
+  fails, so the decision is the user's.**
+  - The bound: the true appearance moved to the coded keypoints (K4b.3's
+    code, every 4th frame, 3.6 kbps for two players) scores LPIPS 0.075.
+    It saves 95% [91%, 98%] of the envelope's rate (SVT-AV1 and DCVC-UF
+    from 1080p to ⅛; SVT-AV1 at CRF 62 is 42 kbps for 0.130). Every 2nd
+    frame and every frame pass too, so every 4th stays the operating
+    point; fast wrists cost +0.07 LPIPS there.
+  - Charged: a reference frame of the same player warped to the coded
+    pose scores LPIPS 0.46, worse than every pixel point on half of the
+    windows. The coding error plays no part in that (uncoded 0.460). The
+    outline is off by 16–26% missed and 32–46% overshoot at every player
+    size, and the fixed racket grip fails, as H4a's did.
+  - So keypoints carry the pose cheaply, and drawing the appearance is
+    the open problem; retrieval plus a 2D warp is ruled out.
+  - Amendment 2, with the adopted players: players are 91–93% of the
+    foreground's bits and fitted on 0.989 of frames, and keypoints are
+    10.3% of the players' SVT-AV1 bits at CRF 62 (K4: 22%).
+  - Open for the user: whether to give a learned per-player renderer
+    (pose-conditioned, amortized over a match) its own oracle, try
+    keypoints plus a coded residual, or keep players as pixels in the
+    tennis pipeline. Decided (user, 2026-10-21): K6b, then K6c.
+- K6b. *Learned per-player renderer, oracle* (user, 2026-10-21). No
+  pose-conditioned generator has been trained on PointStream's footage
+  (H3e ran one off the shelf on hands). K6's `ref` was a 2D warp of one
+  reference frame, not a learned model, so K6 rules out retrieval plus
+  warp only. The bar comes from K6, at 3.6 kbps for two players (K4b.3's
+  code, every 4th frame): break-even is about LPIPS 0.29 (DCVC-UF at
+  4.3 kbps, 0.294), and the bound, perfect appearance at the coded pose,
+  is 0.075. Judged by K6's judges against K6's envelope on K4's 8 scored
+  windows.
+  Steps, cheapest first. Each later step is taken only if the one before
+  leaves the decision open, and each has its rule and GPU budget written
+  before it runs (user, 2026-10-21: no training campaign that a cheaper
+  check could have discarded).
+  1. Audit. Reference-conditioned pose-to-person models (an appearance
+     image plus a pose sequence in, video out) and per-subject models,
+     with weights, licences, inputs, size and inference cost per frame.
+     Small models are preferred: H3e's Wan2.1-14B took 27 min for 81
+     frames.
+  2. Zero-shot oracle, inference only. The audited model is given one
+     reference crop of each player (granted, unbilled) and the coded
+     keypoints. Its interface is K6c's, so a pass here decides K6c's
+     route with no training at all.
+  3. Overfit oracle, only if step 2 fails or no zero-shot model exists.
+     A renderer (or a LoRA on step 2's model) is fitted on the window's
+     own frames, H3d's oracle form. It has seen the frames it is judged
+     on, so it bounds every renderer fitted elsewhere in the match. If it
+     misses the bar, the generative route closes for bodies, at the cost
+     of a few short fits.
+  4. Match fit, only if step 3 passes: fitted on other shots of the same
+     match, judged on K6's windows and paid for (amortized, payback hours
+     reported, as G5b).
+  Audit, first part (2026-10-21). A tennis fine-tune of
+  Moore-AnimateAnyone (SD 1.5 ReferenceNet, pose guider, motion module;
+  Apache-2.0) is already in `Models/AnimateAnyone/profiles/finetuned_tennis`,
+  beside the original weights. It was trained in two stages in Feb 2026,
+  before the reset, on 20 player tracks from all seven archived tennis
+  videos, so it has seen K6's matches; the overlap is recorded and the
+  clean subset reported (AGENTS.md).
+  Pre-reset diagnostics are not evidence by today's rules, but they bear
+  on the choice:
+  - On 16 Alcaraz frames it lost 4.0 dB foreground PSNR to an articulated
+    paste, with the target's alpha granted too.
+  - It responded to its inputs: shifted poses and swapped references
+    degraded it.
+  - It smears the racket: COCO-17 has no racket.
+  - Off-the-shelf generators lost to a pasted keyframe on player LPIPS
+    (pre-reset BP10).
+  Step 2 runs both profiles, the original and the tennis fine-tune, in
+  K6's harness. That needs Moore-AnimateAnyone's source and an
+  environment with its diffusers pin (the archived runtime pinned
+  diffusers 0.30.3 and imported an external checkout). Neither is on the
+  hosts today, and the current environments have no diffusers. So step 2
+  starts with an environment audit and a packed environment. Its
+  composite grants R as the generator's matte, the analogue of `warp`'s
+  granted outline, so it bounds the generator with its own matte.
+  Training discipline for steps 3 and 4: a correctness smoke in minutes;
+  then a learning-curve pilot on held-out frames at fixed fractions of the
+  step budget; the scaled fit only if that curve, extrapolated, can reach
+  the bar within budget (compute-preflight); every stage at most 45
+  minutes and checkpointed.
+- K6c. *General player codec* (user, 2026-10-21; after K6b passes). One
+  model shared across players, sent once with the decoder. Per player it
+  receives an appearance image or feature vector, sent once per match or
+  shot and billed, then the coded pose sequence. Scope: court-view shots
+  (K8b). Other shots (close-ups, crowd, replays) go to the pixel coder,
+  which on them is PointStream's own route (the scene-adapted pixel coder
+  with an enhancer, as H5/G6), not the generator. Whether that route beats
+  the baselines there is measured with the full tennis pipeline. The codec
+  may be hybrid, generating only the subsets where it pays, with pixels
+  elsewhere. Subdivisions, each judged by K6's envelope on that subset:
+  1. the far player (under 15% of the frame height), where pixel coders
+     collapse first and a generator's errors are smallest in pixels;
+  2. the body generated, with the racket arm or the racket alone as coded
+     pixels or residual (K6: the fixed grip fails);
+  3. between-point walking against rallies (motion and pose novelty);
+  4. other people (officials and ball kids, 5.8% of SVT-AV1's broadcast
+     bits at CRF 62 in K4) synthesized too, if it pays. Line judges barely
+     move and are cheap as pixels, while ball kids run.
+- K1c. *K6's bound on hands* (user, 2026-10-21: plan the cheap check).
+  H3b's hand bound charged MANO's outline. K6's `warp` grants the outline
+  (the frame's own pixels moved to the coded keypoints, only the coding
+  error charged), and on bodies that is the difference between a 95%
+  saving and a loss. Run K6's `warp` on H3b's 4 pilot items with H2's
+  coded 2D joints, against H3d's envelope (DCVC-UF + G, SVT-AV1) on LPIPS
+  over R. One fleet job of under 45 min (LPIPS and a CPU warp; the
+  windows, masks and joints are recorded). If even this bound loses,
+  hands are closed for every renderer. If it passes, hands get K6b's
+  ladder. It does not wait for K6b.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
