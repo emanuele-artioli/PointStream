@@ -9690,6 +9690,53 @@ invocation turns out to be needed.
 - Budget: 1,019 s plus the smoke. K1c and K1d together used under 1
   GPU-hour.
 
+### 2026-10-21 — K1e: K1d with hand-only boxes (and why two items fit badly)
+- Question (user, 2026-10-21: "if it's cheap, try to box the hand first";
+  "can we figure out why 2 pilots get good fit, and 2 don't?"). K1d's
+  mask-box fits include the forearm and jitter (coded shift 24–64 px on
+  new rows against 7–9 px on H2's). Does fitting on the hand alone remove
+  that, and does the bound then pass?
+- Change against K1d (nothing else changes). Each mask-box row is fitted
+  twice. WiLoR on the mask's box gives a wrist and middle knuckle. H1's
+  `wrist_split` cuts the mask there, and WiLoR runs again on the hand
+  part's box (the first box if the part is under 16 px a side). The
+  second fit is the row.
+- Measured beside, from the run's arrays (CPU, in `k1c report`):
+  - Jitter: the median frame-to-frame acceleration of the uncoded joints
+    (px, mean over 21 joints, consecutive frames of a side), for H2's rows
+    and the new rows, in K1d and K1e. This tests the competing explanation
+    directly: K1d's new rows should jitter more than H2's, and K1e's less
+    than K1d's.
+  - Scene predictors per item, measurable at the encoder: the share of the
+    hand frames H1's detector boxed (H2's rows over all rows), the mean
+    hand-region size, and the median joint speed. They are measured on
+    the pilot and named as candidates only. A scope chosen from 4 items
+    would have to be tested on items it was not chosen from (B2's other
+    30) before any headline uses it.
+- Decision rule (fixed before any run). K1c's: the bound passes when
+  LPIPS on R is below the hull at the item's rate on ≥ 3 of 4 items. Then
+  hands get K6b's ladder with the two-pass fit as the coverage path.
+  Otherwise hands are closed, and the outcome goes to the user if LPIPS
+  over S or DISTS on R crosses 3 differently.
+  - The user's proposed criterion (2026-10-21, made after K1c's and K1d's
+    results): pass when the mean over {LPIPS on R, DISTS on R} of the
+    share of items below the hull is ≥ 75%. K1c and K1d already meet it
+    (2 of 4 and 4 of 4). It is reported beside, and the user decides which
+    governs. The concerns: it was proposed after the results, it would
+    turn both earlier runs into passes, and DISTS compares texture
+    statistics, so it is lenient on the smooth fill and misplaced texture
+    that are this bound's failure modes. The paper reports both metrics
+    either way.
+- Hypothesis. The hand-only fits jitter about as little as H2's rows, so
+  P09_106 (0.003 short in K1d) passes and P02_02 (0.07 short, rubber
+  gloves) still fails: 3 of 4.
+- Competing explanations. (1) The jitter comes from the hands themselves
+  (blur, gloves, occlusion), not the box, so the second fit jitters as
+  much as the first. (2) The rate, not the fit, decides P02_02: doubling
+  the rows reads the hull at 3.8 kbps, where it is 0.162.
+- Budget. One fleet job, K1d's with a second WiLoR pass (≤ 45 min; K1d
+  took 17 min). Ceiling 1 GPU-hour.
+
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
   codec gains more than a conventional one when PointStream adds learned

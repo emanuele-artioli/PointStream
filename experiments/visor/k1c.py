@@ -80,7 +80,8 @@ def item_keypoints(args: argparse.Namespace, item_id: str, frames: int) -> dict[
             "wilor_kp2d": np.asarray(a["wilor_kp2d"])[rows] if rows else np.zeros((0, 21, 2))}
 
 
-def mask_box_rows(wilor: Any, truth: Any, clip: Any, frames: int, meta: dict[str, Any], a: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
+def mask_box_rows(wilor: Any, truth: Any, clip: Any, frames: int, meta: dict[str, Any], a: dict[str, np.ndarray],
+                  hand_box: bool = False) -> dict[str, np.ndarray]:
     """K1d: WiLoR on the fill-set mask's box for every frame and side with a mask and no H2 row, as ``h2.run_visor``
     stores its rows (rotation, shape, full-frame translation at H2's focal, projected joints)."""
     from experiments.visor import mano_np
@@ -102,11 +103,26 @@ def mask_box_rows(wilor: Any, truth: Any, clip: Any, frames: int, meta: dict[str
                 spec.append((t, right, box))
     if not spec:
         return {k: np.asarray(a[k])[:0] for k in ROW_KEYS}
-    fits: list[dict[str, np.ndarray]] = []
-    for first in range(0, len(spec), WILOR_BATCH):
-        chunk = spec[first:first + WILOR_BATCH]
-        fits.append(wilor.forward([wilor.item(np.asarray(truth[t]), box, right) for t, right, box in chunk]))
-    fit = {k: np.concatenate([f[k] for f in fits], 0) for k in fits[0]}
+    def run(boxes: list[tuple[int, bool, np.ndarray]]) -> dict[str, np.ndarray]:
+        fits: list[dict[str, np.ndarray]] = []
+        for first in range(0, len(boxes), WILOR_BATCH):
+            chunk = boxes[first:first + WILOR_BATCH]
+            fits.append(wilor.forward([wilor.item(np.asarray(truth[t]), box, right) for t, right, box in chunk]))
+        return {k: np.concatenate([f[k] for f in fits], 0) for k in fits[0]}
+
+    fit = run(spec)
+    if hand_box:  # K1e: cut the mask at the first fit's wrist line (H1's split) and fit again on the hand part's box
+        from experiments.visor.h1 import wrist_split
+
+        kp = fit["kp2d"]
+        second = []
+        for i, (t, right, box) in enumerate(spec):
+            hand, _ = wrist_split(clip.class_mask(t, HANDS[1] if right else HANDS[0]), kp[i][0], kp[i][9])
+            ys, xs = np.nonzero(hand)
+            cut = (np.array([xs.min(), ys.min(), xs.max() + 1, ys.max() + 1], np.float32) if len(ys) else box)
+            second.append((t, right, cut if min(cut[2] - cut[0], cut[3] - cut[1]) >= MIN_BOX else box))
+        spec = second
+        fit = run(spec)
     height, width = (int(v) for v in meta["image_shape"][:2])
     focal, centre = float(meta["focal"]), tuple(meta["principal"])
     transl = full_translation(fit, np.array([width, height]), focal)
@@ -206,7 +222,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     if args.cover:
         meta_p, a_p = args.pose_units[item["id"]]
         old = {k: np.asarray(a_p[k]) for k in ROW_KEYS}
-        new = mask_box_rows(nets["wilor"], truth, clip, frames, meta_p, old)
+        new = mask_box_rows(nets["wilor"], truth, clip, frames, meta_p, old, hand_box=args.hand_box)
         merged = {k: np.concatenate([old[k], new[k].astype(old[k].dtype)]) for k in ROW_KEYS}
         merged["new"] = np.concatenate([np.zeros(len(old["t"]), bool), np.ones(len(new["t"]), bool)])
         kp = covered_keypoints(args, {**meta_p, "hands": len(merged["t"])}, merged, frames)
@@ -268,6 +284,8 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     arrays["uncoded_vs_wilor_px"] = np.linalg.norm(kp["uncoded"][:, :, :2] - kp["wilor_kp2d"], axis=-1).mean(1)
     if args.cover:
         arrays["new_row"] = kp["new"]
+        arrays["row_t"], arrays["row_right"] = kp["t"], kp["right"]
+        arrays["uncoded_kp2d"], arrays["coded_kp2d"] = kp["uncoded"][:, :, :2].astype(np.float32), kp["coded"][:, :, :2].astype(np.float32)
     look = score.hand[len(score.hand) // 2] if score.hand else 0
     if score.hand:
         ys, xs = np.nonzero(s_masks[look])
@@ -353,7 +371,7 @@ def command_run(args: argparse.Namespace) -> int:
                  "poses_sha256": [file_sha256(Path(x)) for x in args.poses], "mano_sha256": file_sha256(Path(args.mano_right))},
         "settings": {"frames": int(args.frames), "items": [it["id"] for it in items], "skeleton": HAND_SKELETON,
                      "sigma_of_height": SIGMA_OF_HEIGHT,
-                     "cover": bool(args.cover), "decision": DECISION_K1D if args.cover else DECISION,
+                     "cover": bool(args.cover), "hand_box": bool(args.hand_box), "decision": DECISION_K1D if args.cover else DECISION,
                      "wilor": nets["wilor"].load if args.cover else None},
         "restored_units": sorted(restored)})
     return 0
@@ -432,6 +450,23 @@ def item_verdict(warp: dict[str, float], hull: list[tuple[float, float]], kbps: 
     return row
 
 
+def motion(a: dict[str, np.ndarray], rows: np.ndarray) -> dict[str, float | None]:
+    """Median over the given rows of the uncoded joints' frame-to-frame speed and acceleration (px, mean over the 21
+    joints), along each side's consecutive frames; acceleration is the jitter measure (K1e)."""
+    speed: list[float] = []
+    accel: list[float] = []
+    for right in (False, True):
+        idx = np.nonzero(a["row_right"] == right)[0]
+        idx = idx[np.argsort(a["row_t"][idx])]
+        kp, t = a["uncoded_kp2d"][idx], a["row_t"][idx]
+        for i in range(1, len(idx)):
+            if t[i] - t[i - 1] == 1 and rows[idx[i]]:
+                speed.append(float(np.linalg.norm(kp[i] - kp[i - 1], axis=-1).mean()))
+                if i >= 2 and t[i - 1] - t[i - 2] == 1:
+                    accel.append(float(np.linalg.norm(kp[i] - 2 * kp[i - 1] + kp[i - 2], axis=-1).mean()))
+    return {"speed_px": float(np.median(speed)) if speed else None, "accel_px": float(np.median(accel)) if accel else None}
+
+
 def command_report(args: argparse.Namespace) -> int:
     from experiments.background.g5 import envelope
     from experiments.visor.h2 import load_units
@@ -458,6 +493,11 @@ def command_report(args: argparse.Namespace) -> int:
             new = a["new_row"].astype(bool)
             verdict["coded_shift_px_h2_rows"] = float(np.mean(a["coded_shift_px"][~new])) if (~new).any() else None
             verdict["coded_shift_px_new_rows"] = float(np.mean(a["coded_shift_px"][new])) if new.any() else None
+            if "uncoded_kp2d" in a:
+                verdict["motion_h2_rows"], verdict["motion_new_rows"] = motion(a, ~new), motion(a, new)
+                verdict["motion_all_rows"] = motion(a, np.ones_like(new))
+                verdict["h2_share_of_rows"] = float((~new).mean())
+                verdict["hand_px_mean"] = float(a["r_px"][a["pixels_r"] > 0].mean())
         if dists_hull is not None:
             from experiments.visor.k1 import at_rate
             dq = at_rate(dists_hull, item_kbps)
@@ -503,6 +543,7 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--frames", default="240")
     run.add_argument("--allow-cpu", action="store_true")
     run.add_argument("--cover", action="store_true", help="K1d: WiLoR on every masked hand H2 has no row for")
+    run.add_argument("--hand-box", action="store_true", help="K1e: with --cover, refit on the hand part of the mask box")
     run.add_argument("--mano-left", default="")
     run.add_argument("--wilor-checkpoint", default="")
     val = sub.add_parser("validate")

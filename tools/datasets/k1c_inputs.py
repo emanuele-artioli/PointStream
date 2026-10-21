@@ -25,6 +25,7 @@ def main() -> int:
     ap.add_argument("--deadline", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--cover", action="store_true", help="K1d: WiLoR on every masked hand H2 has no row for")
+    ap.add_argument("--hand-box", action="store_true", help="K1e: with --cover, refit on the hand part of the mask box")
     args = ap.parse_args()
     h3c2 = json.loads(Path(args.h3c2_spec).read_text())
     staged = {e["name"]: e for e in h3c2["staged_inputs"]}
@@ -36,6 +37,7 @@ def main() -> int:
                  "--items", "{items}", "--frames", "{frames}"]
     if args.cover:
         arguments += ["--cover", "--mano-left", "{staged:mano_left}", "--wilor-checkpoint", "{staged:wilor_checkpoint}"]
+        arguments += ["--hand-box"] if args.hand_box else []
     basis = ("K1c run: P01_107_0000003049's first 48 window frames through the full path (window decode with the sparse-JPEG "
              "gate, fill masks checked against their record, H2's WiLoR rows coded at the 100 ms choice and projected, the hand "
              "skeleton warp at the coded and uncoded joints, LPIPS and DISTS on R as h3c.Scorer, LPIPS over S); the stage runs the "
