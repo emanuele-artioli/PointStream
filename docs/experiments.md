@@ -9616,6 +9616,47 @@ invocation turns out to be needed.
 - Budget: 1,182 s of stage execution plus the smoke (under 0.5 GPU-hour),
   inside the 1-hour ceiling.
 
+### 2026-10-21 — K1d: K1c's bound with every masked hand fitted (coverage fix)
+- Question (user, 2026-10-21, after K1c: "if we still have a chance to win
+  on hands, let's try it"). K1c lost on P02_02 and P09_106 because H2 has
+  no fit for 40% and 27% of R. On P02_02, 53 hand frames have no fit and
+  131 have one. On P09_106 it is 66 and 114. Whole hands were never boxed
+  by H1's detector, so H2b's hybrid (same boxes) cannot help. The encoder
+  has the hand masks, though. If every masked hand is fitted, does the
+  bound pass?
+- Change against K1c (nothing else changes: items, warp, judges, hull,
+  bars). For every window frame and side whose fill-set class mask is
+  non-empty (box sides ≥ 16 px) and that has no H2 WiLoR row, WiLoR (H2's
+  `Regressor`, same checkpoint) is run on that mask's bounding box, with
+  the side from the mask's class. The fit becomes a row as in `h2.run_visor`
+  (rotation, shape, full-frame translation at H2's focal). It joins H2's
+  rows, and the item's WiLoR tracks are coded again with H2's 100 ms choice
+  (`CodingSet`, so a new row joins its side's track). The mask box includes
+  the forearm, so these fits can be worse than H1-boxed ones. That cost is
+  charged through the coding error of the track.
+- Rate. H2's pooled rate (1.927 kbps for H2's rows) scaled per item by the
+  ratio of coded rows after to before. This assumes the new rows cost what
+  H2's rows cost on average, and leaves out extra track starts. Both new
+  counts are reported, and the hull is read at each item's own rate.
+- Decision rule (`k1c.DECISION_K1D`, fixed before any run). This is K1c's
+  rule on the covered fits. The bound passes on an item when LPIPS on R is
+  below the hull at that item's rate.
+  - ≥ 3 of 4: hands get K6b's ladder (PLAN K6b: audit, zero-shot, overfit,
+    match fit), with the mask-box fit as the coverage path.
+  - < 3: hands are closed for every renderer.
+  - LPIPS over S or DISTS on R crossing 3 differently: to the user.
+- Hypothesis. Passes on 4 of 4. With full coverage, `warp@uncoded` falls
+  to about 0.01 everywhere (as on P01_107 and P03_10). The coding error
+  of the new rows keeps P02_02 and P09_106 below their hulls (0.204,
+  0.184), as it did at 0.087–0.093 on the fitted items.
+- Competing explanation. Mask boxes include the forearm, so WiLoR's fits
+  there jitter. H2's Gaussian smoothing then moves the coded joints far
+  from the uncoded ones, and the coding error eats the gain. The mean coded
+  shift of new rows against H2's rows is reported to show this.
+- Budget. One fleet job, the K1c job with WiLoR added (WiLoR verified on
+  Ada/A6000 by H3b/H3c2): smoke ≤ 600 s (P01_107, 48 frames), full ≤ 45
+  min. Ceiling 1 GPU-hour.
+
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
   codec gains more than a conventional one when PointStream adds learned

@@ -42,6 +42,16 @@ DECISION: dict[str, Any] = {
     "to_user": "LPIPS over S or DISTS on R moves the count of passing items across 3",
     "min_items": 3,
 }
+#: K1d (docs/experiments.md, 2026-10-21): K1c's rule with every masked hand fitted.
+DECISION_K1D: dict[str, Any] = {
+    **DECISION,
+    "change": "WiLoR on the fill-set mask's box for every frame and side with a mask (box sides >= 16 px) and no H2 row; "
+              "the item's WiLoR tracks coded again with H2's 100 ms choice",
+    "rate": "H2's pooled rate x coded rows after / before, per item; the hull is read at each item's rate",
+}
+MIN_BOX = 16  # px, the shorter side of a mask box WiLoR is run on
+WILOR_BATCH = 32
+ROW_KEYS = ("t", "right", "box", "wilor_rotvec", "wilor_betas", "wilor_transl", "wilor_kp2d")
 
 
 # ----------------------------------------------------------------- run (GPU for the judges)
@@ -68,6 +78,70 @@ def item_keypoints(args: argparse.Namespace, item_id: str, frames: int) -> dict[
             "coded": with_conf(coded[rows]) if rows else np.zeros((0, 21, 3)),
             "depth": coded[rows][:, :, 2].mean(1) if rows else np.zeros(0),
             "wilor_kp2d": np.asarray(a["wilor_kp2d"])[rows] if rows else np.zeros((0, 21, 2))}
+
+
+def mask_box_rows(wilor: Any, truth: Any, clip: Any, frames: int, meta: dict[str, Any], a: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
+    """K1d: WiLoR on the fill-set mask's box for every frame and side with a mask and no H2 row, as ``h2.run_visor``
+    stores its rows (rotation, shape, full-frame translation at H2's focal, projected joints)."""
+    from experiments.visor import mano_np
+    from experiments.visor.h2 import full_translation, pinhole
+    from experiments.visor.h3 import HANDS
+
+    have = {(int(t), bool(r)) for t, r in zip(a["t"], a["right"])}
+    spec: list[tuple[int, bool, np.ndarray]] = []
+    for t in range(frames):
+        for right, side in ((False, HANDS[0]), (True, HANDS[1])):
+            if (t, right) in have:
+                continue
+            m = clip.class_mask(t, side)
+            if not m.any():
+                continue
+            ys, xs = np.nonzero(m)
+            box = np.array([xs.min(), ys.min(), xs.max() + 1, ys.max() + 1], np.float32)
+            if min(box[2] - box[0], box[3] - box[1]) >= MIN_BOX:
+                spec.append((t, right, box))
+    if not spec:
+        return {k: np.asarray(a[k])[:0] for k in ROW_KEYS}
+    fits: list[dict[str, np.ndarray]] = []
+    for first in range(0, len(spec), WILOR_BATCH):
+        chunk = spec[first:first + WILOR_BATCH]
+        fits.append(wilor.forward([wilor.item(np.asarray(truth[t]), box, right) for t, right, box in chunk]))
+    fit = {k: np.concatenate([f[k] for f in fits], 0) for k in fits[0]}
+    height, width = (int(v) for v in meta["image_shape"][:2])
+    focal, centre = float(meta["focal"]), tuple(meta["principal"])
+    transl = full_translation(fit, np.array([width, height]), focal)
+    return {"t": np.array([t for t, _, _ in spec], int), "right": np.array([r for _, r, _ in spec], bool),
+            "box": np.stack([b for _, _, b in spec]).astype(float), "wilor_rotvec": mano_np.rotvec_of(fit["rotmats"].astype(float)),
+            "wilor_betas": fit["betas"], "wilor_transl": transl,
+            "wilor_kp2d": np.stack([pinhole(fit["joints"][i] + transl[i], focal, centre) for i in range(len(spec))])}
+
+
+def covered_keypoints(args: argparse.Namespace, meta: dict[str, Any], a: dict[str, np.ndarray], frames: int) -> dict[str, Any]:
+    """K1d: as ``item_keypoints`` on H2's rows plus the mask-box rows, WiLoR's tracks alone coded (H3b's coding)."""
+    from experiments.visor import mano_np
+    from experiments.visor import pose_coding as pc
+    from experiments.visor.h2 import CodingSet, pinhole
+
+    n = int(meta["hands"])
+    focal, centre = float(meta["focal"]), tuple(meta["principal"])
+    data = CodingSet("visor", "wilor", [(meta, a)], args.mano)
+    coded = np.zeros((n, 21, 3))
+    info = data.units[0]
+    for tr in data.tracks:
+        symbols, sent = pc.encode(tr["x"], args.combos["wilor"], tr["fps"], args.basis)
+        x = pc.decode(symbols, sent, len(tr["x"]), args.combos["wilor"], args.basis)
+        rot = mano_np.rodrigues(x[:, :48].reshape(-1, 16, 3))
+        transl = pc.root_transl(x[:, 48:51], info["focal"], info["centre"])
+        coded[tr["rows"]] = args.mano.joints(rot, np.repeat(tr["betas"][None], len(rot), 0), transl, np.full(len(rot), tr["left"]))
+
+    def with_conf(j3: np.ndarray) -> np.ndarray:
+        return np.concatenate([pinhole(j3, focal, centre), np.ones((*j3.shape[:-1], 1))], -1)
+
+    rows = [r for r in range(n) if int(a["t"][r]) < frames]
+    return {"rows": rows, "t": np.asarray(a["t"])[rows].astype(int), "right": np.asarray(a["right"])[rows].astype(bool),
+            "uncoded": with_conf(data.uncoded[rows]), "coded": with_conf(coded[rows]), "depth": coded[rows][:, :, 2].mean(1),
+            "wilor_kp2d": np.asarray(a["wilor_kp2d"])[rows], "new": np.asarray(a["new"])[rows].astype(bool),
+            "tracks": len(data.tracks)}
 
 
 def compose(truth_t: np.ndarray, sides: dict[str, np.ndarray], objects: np.ndarray, hands: list[tuple[bool, np.ndarray, np.ndarray, float]]
@@ -128,7 +202,19 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     clips, mask_info = load_mask_sets(item, frames, {FILL: args.masks}, {FILL: args.mask_record}, Path(args.archive))
     clip = clips[FILL]
     truth = rgb_memmap(Path(decoded["path"]), work / "truth.npy", frames, width, height, full_range, device)
-    kp = item_keypoints(args, item["id"], frames)
+    cover: dict[str, Any] = {}
+    if args.cover:
+        meta_p, a_p = args.pose_units[item["id"]]
+        old = {k: np.asarray(a_p[k]) for k in ROW_KEYS}
+        new = mask_box_rows(nets["wilor"], truth, clip, frames, meta_p, old)
+        merged = {k: np.concatenate([old[k], new[k].astype(old[k].dtype)]) for k in ROW_KEYS}
+        merged["new"] = np.concatenate([np.zeros(len(old["t"]), bool), np.ones(len(new["t"]), bool)])
+        kp = covered_keypoints(args, {**meta_p, "hands": len(merged["t"])}, merged, frames)
+        rows_before = int((old["t"] < frames).sum())
+        cover = {"rows_h2": rows_before, "rows_new": int(len(new["t"])), "tracks": kp["tracks"],
+                 "kbps": POSE_KBPS * (rows_before + len(new["t"])) / max(1, rows_before)}
+    else:
+        kp = item_keypoints(args, item["id"], frames)
     rows_at: dict[int, list[int]] = {}
     for i, t in enumerate(kp["t"]):
         rows_at.setdefault(int(t), []).append(i)
@@ -180,6 +266,8 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     # what the coded joints moved: mean 2D distance to the uncoded and to WiLoR's own 2D joints (px)
     arrays["coded_shift_px"] = np.linalg.norm(kp["coded"][:, :, :2] - kp["uncoded"][:, :, :2], axis=-1).mean(1)
     arrays["uncoded_vs_wilor_px"] = np.linalg.norm(kp["uncoded"][:, :, :2] - kp["wilor_kp2d"], axis=-1).mean(1)
+    if args.cover:
+        arrays["new_row"] = kp["new"]
     look = score.hand[len(score.hand) // 2] if score.hand else 0
     if score.hand:
         ys, xs = np.nonzero(s_masks[look])
@@ -199,7 +287,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
                    "lpips_s": float(np.nanmean(arrays[f"{v.replace('@', '_')}_lpips_s"][hand])),
                    "dists_r": float(np.nanmean(arrays[f"{v.replace('@', '_')}_dists_r"][hand]))} for v in VARIANTS}
     meta = {"unit": item["id"], "item": item["id"], "video": item["video"], "fps": float(item["fps"]), "frames": frames,
-            "hand_frames": len(score.hand), "rows": len(kp["rows"]), "look_frame": look, "summary": summary,
+            "hand_frames": len(score.hand), "rows": len(kp["rows"]), "look_frame": look, "summary": summary, "cover": cover or None,
             "decode": {k: v for k, v in decoded.items() if k != "path"}, "mask_set": mask_info, "checks": checks,
             "pose_unit_hash_ok": bool(args.pose_units[item["id"]][0]["npz_hash_ok"]), "seconds": round(time.time() - began, 2)}
     save_unit(publish, "k1c", item["id"], arrays, meta)
@@ -240,8 +328,15 @@ def command_run(args: argparse.Namespace) -> int:
     args.pose_units = {meta["unit"]: (meta, a) for meta, a in load_units(args.poses, "visor")}
     if missing := [it["id"] for it in items if it["id"] not in args.pose_units]:
         raise SystemExit(f"no H2 poses for {missing}")
-    nets = {"lpips": load_lpips(Path(args.lpips_backbone), device), "dists": load_dists(Path(args.dists_backbone), device)}
+    nets: dict[str, Any] = {"lpips": load_lpips(Path(args.lpips_backbone), device), "dists": load_dists(Path(args.dists_backbone), device)}
     on_cuda = {k: next(v.parameters()).is_cuda for k, v in nets.items()}
+    if args.cover:  # K1d: WiLoR on the mask boxes H2 has no row for
+        from experiments.audit.env_smoke import model_on_cuda
+        from experiments.visor.h2 import Regressor, mano_dir
+
+        args.mano_dir = mano_dir(args, scratch)
+        nets["wilor"] = Regressor("wilor", args)
+        on_cuda["wilor"] = model_on_cuda(nets["wilor"].model)
     began = time.time()
     done = len(restored)
     for number, (item, decoded) in enumerate(windows):
@@ -257,7 +352,9 @@ def command_run(args: argparse.Namespace) -> int:
         "pose": {"budget_ms": BUDGET, "combo": pc.combo_key(combo), "visor_kbps": kbps, "code_sha256": file_sha256(Path(args.pose_code)),
                  "poses_sha256": [file_sha256(Path(x)) for x in args.poses], "mano_sha256": file_sha256(Path(args.mano_right))},
         "settings": {"frames": int(args.frames), "items": [it["id"] for it in items], "skeleton": HAND_SKELETON,
-                     "sigma_of_height": SIGMA_OF_HEIGHT, "decision": DECISION},
+                     "sigma_of_height": SIGMA_OF_HEIGHT,
+                     "cover": bool(args.cover), "decision": DECISION_K1D if args.cover else DECISION,
+                     "wilor": nets["wilor"].load if args.cover else None},
         "restored_units": sorted(restored)})
     return 0
 
@@ -292,6 +389,11 @@ def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
         checks[f"{item}:uncoded_near_wilor"] = float(np.median(a["uncoded_vs_wilor_px"])) < 15.0
         checks[f"{item}:pixel_split"] = bool((a["fitted_r_px"] + a["unfitted_r_px"] == a["r_px"]).all()
                                              and (a["missed"] <= a["fitted_r_px"]).all())
+        if result["settings"].get("cover"):
+            c = m["cover"]
+            checks[f"{item}:cover_rows"] = c["rows_new"] == int(a["new_row"].sum()) and len(a["new_row"]) == m["rows"]
+            checks[f"{item}:cover_kbps"] = abs(c["kbps"] - POSE_KBPS * (c["rows_h2"] + c["rows_new"]) / max(1, c["rows_h2"])) < 1e-9
+            checks[f"{item}:cover_unfitted"] = float(a["unfitted_r_px"][hand].sum() / a["r_px"][hand].sum()) < 0.01
         if "lpips_identity" in m["checks"]:
             checks[f"{item}:lpips_identity"] = m["checks"]["lpips_identity"] < 1e-6
             checks[f"{item}:dists_identity"] = abs(m["checks"]["dists_identity"]) < 1e-4
@@ -348,10 +450,17 @@ def command_report(args: argparse.Namespace) -> int:
         g = h3d["component"]["arms"]["G-L"]["items"][item]["front"]
         hull = envelope([(p["kbps"], -p["lpips"]) for p in g + bar])
         dists_hull = envelope([(p["kbps"], -p["dists"]) for p in g + bar]) if all("dists" in p for p in g + bar) else None
-        verdict = item_verdict(m["summary"]["warp"], hull, kbps)
+        item_kbps = float(m["cover"]["kbps"]) if m.get("cover") else kbps
+        verdict = item_verdict(m["summary"]["warp"], hull, item_kbps)
+        verdict["kbps"] = item_kbps
+        if m.get("cover"):
+            verdict["cover"] = m["cover"]
+            new = a["new_row"].astype(bool)
+            verdict["coded_shift_px_h2_rows"] = float(np.mean(a["coded_shift_px"][~new])) if (~new).any() else None
+            verdict["coded_shift_px_new_rows"] = float(np.mean(a["coded_shift_px"][new])) if new.any() else None
         if dists_hull is not None:
             from experiments.visor.k1 import at_rate
-            dq = at_rate(dists_hull, kbps)
+            dq = at_rate(dists_hull, item_kbps)
             verdict["dists_r"] = m["summary"]["warp"]["dists_r"]
             verdict["dists_hull_at_rate"] = None if dq is None else -dq
             verdict["dists_r_below_hull"] = None if dq is None else bool(m["summary"]["warp"]["dists_r"] < -dq)
@@ -364,12 +473,13 @@ def command_report(args: argparse.Namespace) -> int:
             "spill_share_of_drawn": float(a["spill"][hand].sum() / max(1, a["drawn"][hand].sum())),
             "coded_shift_px": float(np.mean(a["coded_shift_px"])), "hand_frames": m["hand_frames"]}
     count = {k: sum(bool(v.get(k)) for v in items.values()) for k in ("lpips_r_below_hull", "lpips_s_below_hull", "dists_r_below_hull")}
-    passes = count["lpips_r_below_hull"] >= DECISION["min_items"]
-    escalate = any((count[k] >= DECISION["min_items"]) != passes for k in ("lpips_s_below_hull", "dists_r_below_hull")
+    rule = DECISION_K1D if result["settings"].get("cover") else DECISION
+    passes = count["lpips_r_below_hull"] >= rule["min_items"]
+    escalate = any((count[k] >= rule["min_items"]) != passes for k in ("lpips_s_below_hull", "dists_r_below_hull")
                    if any(v.get(k) is not None for v in items.values()))
     out = {"inputs": {"stage": str(stage), "published_sha256": file_sha256(stage / "published.tar"),
                       "h3d": {"path": args.h3d, "sha256": file_sha256(Path(args.h3d))}, "code_sha256": file_sha256(Path(__file__))},
-           "checks": checks, "kbps": kbps, "items": items, "items_below_hull": count, "decision_rule": DECISION,
+           "checks": checks, "kbps": kbps, "items": items, "items_below_hull": count, "decision_rule": rule,
            "decision": {"passes": passes, "to_user": escalate,
                         "reading": ("hands get K6b's ladder" if passes else "hands closed for every renderer")
                         + (" (to the user: S or DISTS crosses the bar differently)" if escalate else "")}}
@@ -392,6 +502,9 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--poses", action="append", required=True, help="H2's VISOR published.tar (both jobs)")
     run.add_argument("--frames", default="240")
     run.add_argument("--allow-cpu", action="store_true")
+    run.add_argument("--cover", action="store_true", help="K1d: WiLoR on every masked hand H2 has no row for")
+    run.add_argument("--mano-left", default="")
+    run.add_argument("--wilor-checkpoint", default="")
     val = sub.add_parser("validate")
     val.add_argument("--stage", default="")
     rep = sub.add_parser("report")

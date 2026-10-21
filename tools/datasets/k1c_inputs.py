@@ -24,19 +24,24 @@ def main() -> int:
     ap.add_argument("--h3c2-spec", required=True)
     ap.add_argument("--deadline", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--cover", action="store_true", help="K1d: WiLoR on every masked hand H2 has no row for")
     args = ap.parse_args()
     h3c2 = json.loads(Path(args.h3c2_spec).read_text())
     staged = {e["name"]: e for e in h3c2["staged_inputs"]}
-    entries = [staged[k] for k in NEEDED + VIDEOS]
+    entries = [staged[k] for k in NEEDED + VIDEOS + (("mano_left", "wilor_checkpoint") if args.cover else ())]
     arguments = ["run", "--eval-set", "{staged:eval_set}", "--archive", "{staged:dense_archive}", "--masks", "{staged:fill_masks}",
                  "--mask-record", "{staged:fill_record}", "--lpips-backbone", "{staged:lpips}", "--dists-backbone", "{staged:dists}",
                  "--poses", "{staged:poses_0}", "--poses", "{staged:poses_1}", "--pose-code", "{staged:code}",
                  "--mano-right", "{staged:mano_right}", *[a for v in VIDEOS for a in ("--video", f"{{staged:{v}}}")],
                  "--items", "{items}", "--frames", "{frames}"]
+    if args.cover:
+        arguments += ["--cover", "--mano-left", "{staged:mano_left}", "--wilor-checkpoint", "{staged:wilor_checkpoint}"]
     basis = ("K1c run: P01_107_0000003049's first 48 window frames through the full path (window decode with the sparse-JPEG "
              "gate, fill masks checked against their record, H2's WiLoR rows coded at the 100 ms choice and projected, the hand "
              "skeleton warp at the coded and uncoded joints, LPIPS and DISTS on R as h3c.Scorer, LPIPS over S); the stage runs the "
              "four pilot items at 240 frames.")
+    if args.cover:
+        basis = basis.replace("the hand skeleton warp", "WiLoR on the mask boxes H2 has no row for and the tracks coded again, the hand skeleton warp")
     spec = {
         "schema": 1, "entrypoint": ["-m", "experiments.visor.k1c"], "environment": h3c2["environment"], "inputs": h3c2["inputs"],
         "arguments": arguments, "staged_inputs": entries,
@@ -45,7 +50,7 @@ def main() -> int:
         "validator": ["{python}", "-m", "experiments.visor.k1c", "validate"], "validator_seconds": 300,
         "required_commands": [], "budget_seconds": 3600, "deadline": args.deadline, "stall_seconds": 1200,
         "cpu_threads": 16, "device": "gpu", "hosts": h3c2["hosts"], "gpu_models": ["RTX 6000 Ada", "RTX A6000"],
-        "gpu_memory_mib": 16000, "local_storage_gib": 30,
+        "gpu_memory_mib": 24000 if args.cover else 16000, "local_storage_gib": 30,
         "gpu_sharing": {"mode": "shared", "basis": "the warp is CPU arithmetic and LPIPS/DISTS on R are deterministic; "
                         "wall time is not evidence"},
     }
