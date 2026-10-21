@@ -569,6 +569,13 @@ objects (the tennis ball).
   and P03_10 save 96%; P09_106 misses by 0.003, P02_02 by 0.07) and 4 of 4
   by DISTS, so it goes to the user. The mask-box fits jitter (coded shifts
   of 24–64 px) and double the rate on the two hard items.
+  **Decision (user, 2026-10-21):** the decision criterion is the mean
+  over LPIPS and DISTS of the share of items won, ≥ 75%. It applies to
+  later runs and, disclosed as post-hoc, to K1c and K1d, which pass under
+  it (75%). Hands go to K6b's ladder. K1e (hand-only boxes) is running.
+  Then K1f: the scope (an encoder-measurable predictor, fixed on the
+  pilot) tested on B2's other 30 items, with the pixel envelope coded
+  there (up to 8 GPU-hours, approved).
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks

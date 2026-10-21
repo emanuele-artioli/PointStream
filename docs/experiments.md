@@ -9728,6 +9728,15 @@ invocation turns out to be needed.
     statistics, so it is lenient on the smooth fill and misplaced texture
     that are this bound's failure modes. The paper reports both metrics
     either way.
+- **Amendment (user, 2026-10-21, before K1e's results; after K1c's and
+  K1d's).** The user's criterion governs K1e and every later run. It
+  passes when the mean over {LPIPS on R, DISTS on R} of the share of items
+  below the hull is ≥ 75%, so LPIPS must win on at least half the items.
+  It also applies **retroactively** to K1c and K1d. That is a post-hoc
+  change and the paper must disclose it: both runs failed the rule written
+  before them (LPIPS 2 of 4) and pass under this one (2/4 and 4/4, mean
+  75%). Consequence: hands go to K6b's ladder. The held-out test (K1f)
+  is judged by this criterion, fixed before it runs.
 - Hypothesis. The hand-only fits jitter about as little as H2's rows, so
   P09_106 (0.003 short in K1d) passes and P02_02 (0.07 short, rubber
   gloves) still fails: 3 of 4.
