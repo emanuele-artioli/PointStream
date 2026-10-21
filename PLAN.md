@@ -597,6 +597,14 @@ it saves at the hands' rates), so networks are better delivered once; and
 the generic network's gain on the hands is perceptual (LPIPS and DISTS
 better, PSNR worse, a slight colour shift, no invented texture), as G5d's
 enhancer on the background.
+An observation for the tennis paper (user, 2026-10-21; K5b 2): pixel
+coders erase the ball at low rate, measured with a valid ball detector.
+RacketVision's BallTrack finds 0.938 of TrackNet's balls on games 8–10
+(0.918 on K5's games, none in its training); through SVT-AV1 preset 8 at
+CRF 62 (median 84 kbps, frame PSNR 33–34 dB) it finds 0.026, and every
+other tracker of WASB's zoo under 0.03. K5's YOLO26x figure (0.02) came
+from a detector that found only 46% of the source's balls. DCVC-UF at
+equal rate is still to be measured with BallTrack (K5b 1b).
 Negative results to report (user, 2026-10-13), with their numbers:
 parametric motion fails for egocentric objects (H1's homographies, H4a's
 grip pose on HOT3D motion capture, H4b's bank of views), and keypoints
