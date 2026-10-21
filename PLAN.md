@@ -39,8 +39,10 @@ new dependency.
   at ¼ or ½ plus the generic enhancer G_HO. Keypoints lose on egocentric
   video (H1, H3, H4, K1, K3).
 - **Tennis (K):** the ball mode wins (K5); players wait on K4b (far-player
-  pose, keypoint rate, identification); court-view shots (K8) wait on
-  labels. Next: K8, K4b, K5b, then K6; K7 (HiEve) later.
+  pose, keypoint rate, identification); court-view shots (K8) are not
+  adopted (2026-10-20): precision 1.00, but duration recall 0.34 and
+  registration p95 24.5 px; the user decides the next K8 step. Next:
+  K4b, K5b, then K6; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -444,6 +446,18 @@ other. Each has its rule written before its run, as everywhere.
   background: G's per-shot background needs the registration, H/K the
   court outline and the shot list. Judged on the archived matches' scene
   clips, reviewed by eye, and on the whole match's shots.
+  **Not adopted (2026-10-20)**, scored on a stratified sample of 82
+  shots marked by the user ([entry](docs/experiments.md#2026-10-16--k8-court-view-shots-and-camera-registration-rule)).
+  Precision is 1.00 (all 41 predicted court shots are court), with a
+  registration median of 0.91 px on them. Duration recall is 0.34
+  [0.26, 0.45]: most court time is missed. The misses fall into three
+  classes. 11 of 17 sampled misses fail only the 80% frame rule. 6 have
+  wrong or no fits. 6 shots are mixed (missed cuts). A one-frame decode
+  offset is fixed in code. Open for the user: whether to revise the
+  registration (temporal tracking through a shot, a shot rule on the
+  median error) and the cuts, under a new rule judged on unmarked shots.
+  Or K4b's candidate (d) could use only the 41 precise predicted-court
+  shots.
 - K4b. *Players before K6* (re-reads K4's (b) and the K6 gate).
   1. Identification. Candidate rules, content-blind: motion in body
      heights (K4's amendment), horizontal motion with the clip's end

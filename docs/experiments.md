@@ -7481,6 +7481,343 @@ invocation turns out to be needed.
 - Budget: CPU first (cuts and line detection); GPU only for a court-keypoint
   model, on the fleet with the usual smoke, ≤ 45 min per stage.
 
+- Implementation/run preparation (2026-10-16, `codex/k8-court-shots`).
+  The supplied `Tennis_courts/reference/` actually contains 966 PNG court
+  photographs, not a geometric model; adjacent `bounding_boxes/` files are
+  YOLO boxes. The user authorized regulation court geometry instead. The
+  ITF model is 23.77 × 10.97 m, singles width 8.23 m, service lines 6.40 m
+  from the net ([ITF](https://www.itftennis.com/en/about-us/organisation/tennis-glossary/));
+  the elevated net is excluded from the planar painted-line model.
+  No pretrained model, new environment or weights are needed: CPU OpenCV
+  4.10.0, NumPy 1.26.4 and SciPy from the existing packed environment.
+  The rule above is unchanged. White-line Hough hypotheses initialize
+  RANSAC against all nine painted line segments, with the preceding frame
+  as a warm start. Every decoded frame is measured at 1080p after K4's
+  limited-range 8-bit YUV420 conversion. Directed chamfer is the mean
+  distance from model-line samples at ≤1 projected-pixel spacing to
+  detected white-line pixels; a frame registers at ≤2 px with support
+  on at least six segments. Chamfer measures only in-frame projected line
+  portions (at least half the projected samples visible); failed fits
+  remain missing, never dropped from the error distribution. Summary uses
+  the ordinary median and linearly interpolated 95th percentile, with
+  infinite failures retained (fixed before user labels).
+  Initial ffmpeg scene threshold 0.25 is provisional for the user's
+  review (candidate scores ≥0.10 retained); the decision thresholds are fixed.
+  Mixed shots are false positives if predicted court and their duration
+  counts as missed court time. Registration is summarized across all
+  user-labelled court frames, with missing fits treated as infinite error.
+  CPU smoke: first 1,500 frames (30 s), ≤600 s; substantive validator
+  checks frame coverage, shot partition, real registered frames, finite
+  homographies, 80% classification and review images. Pilot/whole-match
+  stages ≤2,700 s; initial ceiling 3,500 CPU wall seconds per job,
+  16 CPU threads, no GPU allocation. The smoke establishes scale before
+  any whole-match run. Focused synthetic checks recover a known court
+  homography and reject blank frames; these are correctness checks, not
+  match evidence. Outcome is pending the user's shot labels.
+  Initial pilot `20261016T090118Z-23f79a90` (gpu1, CPU, `7349881`)
+  was stopped during its smoke: `ffprobe -count_frames` was decoding the
+  whole 2,310 s match on one CPU before the selected 30 s could run.
+  No registration result or decision evidence was produced; task artifacts
+  are retained. The revision uses K4's `-count_packets` convention instead,
+  and checks each requested decoded frame while processing. Chamfer
+  sampling was also corrected to uniform projected-pixel spacing (covered
+  by a focused regression test) before any decision run.
+  Corrected pilot `20261016T090621Z-91db7939` (gpu1, CPU, `ddd457c`)
+  failed its timing guard in 3.2 s: the source is CFR 50/1 but starts at
+  PTS 0.020 s. The implementation now explicitly rebases scene-score PTS
+  with `setpts=PTS-STARTPTS`; shot indices remain zero-based presentation
+  order, and ffmpeg seeks are relative to stream start. The source offset
+  is recorded rather than requiring zero PTS. No registration result was
+  produced. Neither diagnostic run supports the decision.
+  Third diagnostic `20261016T090920Z-467b9cc2` (`999b899`, gpu1, CPU)
+  exposed an ffmpeg scope bug before registration: `-frames:v` counts
+  selected scene frames, so it did not bound input decoding. Stopped the
+  owned job and retained its artifacts; scene scanning now has an input
+  `-t` bound. An actual ffmpeg regression fixture checks that a cut beyond
+  the selected input interval is excluded. No registration evidence yet.
+
+- Registration diagnostic `20261016T091435Z-0a586c9d` (`84dbe11`,
+  gpu1, CPU) completed all 1,500 frames / 4 shots in 228.2 s, predicted
+  zero court shots. Its validator failed because the fleet archives and
+  removes scratch before validation; the corrected validator reads
+  `published.tar` as K4 does (regression-tested). No full stage ran.
+  Visual QA found clipped doubles lines and grass texture in the initial
+  colour mask. Before the next smoke, the detector now requires coherent
+  long straight support, measures in-frame projected portions (rather
+  than rejecting a clipped court), and retries independent hypotheses
+  when a previous fit is poor. These are implementation corrections;
+  the decision thresholds are unchanged and this diagnostic is not used
+  for adoption. At this throughput the match is split into four balanced
+  groups of whole shots, each saving every finished shot, ≤45 min per
+  stage, then assembled into a new review directory. Assembly checks
+  identical inputs/cuts and every source frame exactly once; completed
+  archives remain unchanged. Initial ceiling remains 3,500 wall seconds
+  per CPU job, 16 CPU threads, no GPU allocation.
+
+- Revised smoke `20261016T092749Z-37f37559` (`b96ad65`, gpu5,
+  CPU, no GPU) passed all ten substantive checks: all 1,500 frames and
+  4 shots covered, images and finite homographies present, actual frames
+  registering under 2 px, classification exactly at the fixed 80% share.
+  Runtime 245.6 s; zero of four shots predicted court. This negative
+  prediction result is retained; it is not accuracy without the user's
+  labels. The 6,000-frame pilot completed in 313.3 s: 15 shots, 2
+  predicted court. All requested frames were processed. A four-part
+  full run is estimated at about 33 min per part including the repeated
+  whole-match cut scan, within the 45 min stage cap (16 CPU threads,
+  no GPU). Before the decision run,
+  reports also record resolved ffmpeg/ffprobe paths and versions plus
+  stream colour/codec/timestamp metadata. No model or threshold changes.
+
+- Whole-match run submitted (CPU only, `43d32d9`; pending outputs).
+  Four groups of balanced whole shots, same complete source and scene
+  score scan, each its own ≤600 s smoke, ≤2,700 s full stage and 3,500 s
+  total budget. Native tool/codec/colour metadata are in each report.
+
+  | Part | Job | Host (CPU; GPU none) |
+  |---|---|---|
+  | 0 | `20261016T093935Z-caed3e5a` | gpu1 |
+  | 1 | `20261016T093936Z-9d24b59f` | gpu1 |
+  | 2 | `20261016T093938Z-c7c96b10` | gpu5 |
+  | 3 | `20261016T093938Z-90023e70` | gpu5 |
+
+  Source snapshot SHA256 `1a7e221992ff1d5851c298ede352f7489ec701126fea73b132fb81b58ce645f4`;
+  clean selected patch SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+  Input manifest `inputs-4d99d200bcbc.json`, SHA256
+  `4d99d200bcbcc4279ac74781b6529cfbce1835a8afe47a4e94c92b76616327b1`;
+  video SHA256 `676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66`.
+  Packed environment `pointstream-20261009T214002Z.tar.gz`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`.
+  Commands/specifications are preserved in each job's `dispatch.json`,
+  stage metadata and `tennis/k8-2026-10-16/specs-v2/k8-full-<part>.json`.
+  Review serving uses `tools/datasets/k8_review_server.py` (read-only,
+  loopback only, byte ranges for seeking the source); marks stay in the
+  browser until downloaded. UI layout/server changes after `43d32d9`
+  do not change registration, cuts, predictions or archived evidence.
+
+- Full-run resource failure and bounded recovery (2026-10-16).
+  All four full stages reached their enforced 2,700 s allowance; none
+  produced a complete whole-match report. Preserve their `partial.tar`
+  files unchanged. They contain 232 complete shots / 70,383 frames of
+  the 360 shots / 115,505 frames in the retained cut table. Exactly
+  128 shots / 45,122 frames remain. No adoption result is inferred.
+  The initial pilot underestimated hard line-search frames and Python
+  thread contention. Recovery reuses the SHA256-identified cut table
+  and completed archives, processes only missing frames, uses separate
+  CPU processes, and checkpoints chunks of ≤240 frames. Homographies
+  reinitialize at chunk boundaries; the same line detector, court model,
+  RANSAC, chamfer and decision thresholds are retained. Per-item code
+  and archive provenance distinguish the original and recovery results.
+  Whole-shot classification is recomputed from every frame after merge;
+  review images remain the original shot's exact first/middle/last.
+  Recovery budget: 12 balanced missing-frame groups (~3,760 frames each),
+  16 CPU threads / 8 processes, no GPU; smoke ≤300 s on 120 frames of
+  known court shot 9; pilot one complete missing group, full ≤1,800 s,
+  total ≤2,400 s per job. Only after that pilot passes are the remaining
+  groups submitted. Validator checks frame coverage, bounded chunks,
+  real registration, homographies, review images and unchanged shot rule.
+  Tests verify preservation, exact chunk coverage and fail-closed assembly.
+
+- Recovery pilot `20261016T110218Z-1bd79811` (`5432db0`, gpu4,
+  CPU) passed its smoke (120 frames, 41.3 s processing / 44.5 s command)
+  and completed group 0: 22 chunks / 3,756 frames in 246.7 s processing
+  / 249.4 s command. This establishes the actual chunk/process path at
+  the full group scale, with about 7× margin to the 1,800 s cap. Hardware
+  and source identities are revalidated by each remaining job's own gate.
+  The retained evidence and manifest are read-only. Recovery manifest
+  SHA256 `5af2f0a3c4bf6b1f04b7ed145121f3989c0a9c57a6ff3a7ee303c70af577341f`.
+  Remaining jobs select the committed `experiments/`, `src/` and
+  `pyproject.toml` runtime dependency set, avoiding unnecessary NFS file
+  creation; each records that source selection and its snapshot checksums.
+
+- Remaining recovery requests (CPU only; `16b19ab`, same worker/court
+  file contents as the successful pilot; runtime-only source snapshot
+  SHA256 `c1bc200d99b2c1b4155c08cf7081a0382da99f52d991536b60801556182c0580`).
+
+  | Group | Job |
+  |---|---|
+  | 0 (pilot) | `20261016T110218Z-1bd79811` |
+  | 1 | `20261016T112031Z-242208de` |
+  | 2 | `20261016T112031Z-139b7c17` |
+  | 3 | `20261016T112032Z-8cd85120` |
+  | 4 | `20261016T112033Z-cea7591b` |
+  | 5 | `20261016T112050Z-f71ef62e` |
+  | 6 | `20261016T112056Z-8d34945b` |
+  | 7 | `20261016T112057Z-b93576b9` |
+  | 8 | `20261016T112057Z-27c43737` |
+  | 9 | `20261016T112101Z-863308e5` |
+  | 10 | `20261016T112058Z-fed578eb` |
+  | 11 | `20261016T112059Z-5522e2a8` |
+
+  Concurrent source transfers suffered connection failures. Canonical
+  status and shared-inbox inspection confirmed groups 2–11 had no ready
+  record, owner, state or run; no workload had executed. Their original
+  requests were continued, not resubmitted: the surviving complete tar
+  matched every original snapshot checksum, partial source directories
+  were preserved, restored source identities were checked against the
+  already-published group 1, and the frozen fleet publisher completed
+  publication under the original IDs/specifications. Source identity
+  `df2516b1506a553ade44b637c471714c5cd040a261aa75c812d788322fcaba32`.
+  Receipt: `recovery-01/publication-repair-receipt.json`; helper
+  `tools/datasets/k8_publish_existing.py` refuses any ready/claimed/run
+  state. No duplicate job was launched and all normal smoke gates remain.
+
+- Review ready (2026-10-16; assembly revision `edcf474`). All twelve
+  recovery jobs above completed their gates and full stages on CPU.
+  Processing time per group 0–11: 246.7, 322.9, 233.2, 228.4, 203.0,
+  288.1, 269.7, 461.4, 485.8, 468.6, 431.2, 507.5 seconds. Assembly
+  verified the preserved archive hashes, recovery manifest identity,
+  source-video SHA256 and exact non-overlapping coverage of all 115,505
+  frames / 360 original shots. No completed shot was rerun. Each shot
+  has its exact first, middle and last image (1,080 JPEGs); the middle
+  carries the projected court when a homography exists. Predictions:
+  41 court, 319 non-court. These are predictions, not measured accuracy.
+  The browser was opened and verified at 0/360 marks; no labels supplied
+  by the agent. Source video seeking uses a read-only loopback server.
+  Final page, relative to the run root:
+  `review/review.html`; review ID `63f9a0d78069c771`.
+  Absolute run root:
+  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k8-2026-10-16/`.
+  `review/k8-report.json` retains every per-frame homography/error,
+  conversion command, native-tool path/version, input/archive checksum,
+  original and recovery job identity, and selected worker checksums.
+  FFmpeg/ffprobe 8.1.2 from the packed environment supplied the native
+  decode/scene paths; no encoder or GPU was used. The full scene command
+  is explicitly reconstructed from the retained full cut scan, rather
+  than mislabeled with the base smoke's 30-second invocation.
+  Report SHA256:
+  `530696e0c6b70dbbbe0939de295faa4a9c83a07140e7586038784bc2e44ce4cf`;
+  HTML SHA256:
+  `4a16e6f746fc1de6442df76e8334df2b7ac091a3fd082d3096205beee8af8a1e`.
+  Required checks passed: ruff, mypy, pytest (574 passed, 19 skipped).
+  **Outcome by the rule: pending the user's complete marks JSON.**
+  Precision, duration-weighted recall, registration median/p95 and
+  per-class misses will be scored only after those marks return.
+  No adoption decision or threshold change has been made.
+
+- Amendment 1: a stratified sample of shots to mark (2026-10-20, written
+  before any mark; Claude takes over from `codex/k8-court-shots` on
+  `claude/k8-court-shots`). The user asked for cheaper marking than all
+  360 shots. **What changes:** the user marks (a) every predicted-court
+  shot (all 41) and (b) a Poisson sample of the 319 predicted non-court
+  shots, drawn with probability proportional to duration:
+  π_i = min(1, n·d_i / D), with D the stratum's duration and the cap
+  applied iteratively. Shot i is in the sample when u_i < π_i. Here
+  u_i = sha256("pointstream-k8:<shot id>") / 2^256 is fixed and blind to
+  content. The expected size is n = 50, about 90 shots in all, at about
+  10 s per shot, or roughly 15 minutes. The sample is nested in n: a
+  larger n keeps every shot already drawn. **Why:** precision needs only
+  the predicted-court shots, and recall needs only an estimate of the
+  court time hidden among the predicted non-court shots. **Estimators.**
+  Precision is exact, from all 41 shots. Duration-weighted recall is
+  R = A / (B + Y). A is the duration of predicted-court shots marked
+  court. B is the duration of predicted-court shots marked court or
+  mixed. Y is the duration of predicted non-court shots that are court or
+  mixed, estimated by Horvitz–Thompson as Ŷ = Σ_sample y_i/π_i. Because
+  π_i = d_i/c below the cap, each sampled positive adds exactly c seconds,
+  so Ŷ = Y_capped + c·k for k sampled positives. The 95% interval on Y
+  takes the exact Poisson (Garwood) interval for E[k], scaled by c. k is
+  a sum of independent Bernoullis, less dispersed than a Poisson, so the
+  interval errs wide. R's interval follows by monotonicity:
+  [A/(B+Y_hi), A/(B+Y_lo)]. Registration error is measured on all true
+  court frames. Frames of sampled shots carry weight 1/π_i, and missing
+  fits stay infinite. The median and 95th percentile use the weighted
+  linear interpolation that reduces to the ordinary median and the
+  linearly interpolated percentile when all weights are equal. Misses
+  are reported by class, both as sampled counts and as weighted estimates
+  of count and duration. **Unchanged:** precision ≥ 0.95, duration
+  recall ≥ 0.90, median ≤ 2 px, 95th percentile ≤ 6 px, the 80%
+  shot rule, the classes, and mixed shots counted wrong for both.
+  **Reading the recall interval.** If the interval lies wholly above or
+  wholly below 0.90, the recall condition is decided. If it straddles
+  0.90 while the other conditions pass, stage 2 extends the same draw to
+  n = 150. Stage-1 marks are kept, and about 85 more shots add about
+  15 minutes. Recall is then decided on the point estimate R̂, with the
+  interval reported, and a still-straddling interval is stated as
+  "within sampling error of the bar". The arithmetic behind this: with
+  A ≈ 449 s and no positive in the sample, n = 50 gives a recall lower
+  bound near 0.77, and n = 150 gives about 0.91. If precision or
+  registration already fails, no second stage runs. The 360-shot review
+  (`review/`, ID `63f9a0d78069c771`) and its report stay unchanged. The
+  sample page is a new directory beside it, `review-sample-01/`.
+
+- Sample review ready (2026-10-20, `e43215b`, CPU, no re-registration).
+  Command: `python -m experiments.tennis.k8 sample --report review/k8-report.json
+  --out review-sample-01`, run on the published report (SHA256 `530696e0…`,
+  checked). The draw gives 41 + 41 = 82 shots to mark. Of the predicted
+  non-court shots, 41 are sampled (expected 50; Poisson sampling varies the
+  count), covering 548 of their 1,861 s. Scale c = 37.2 s, largest π = 0.94.
+  Sample review ID `fb6cfe8a81f9a440`. `k8-sample.json` SHA256
+  `91738f886955d25c72f2a7c04f9d723bc82a6def5a4cd2afa52bd69e9dbaa3b1`,
+  `review.html` SHA256
+  `92b2ed13234bf4bf78de53a200ce57ebe1db90fd111dfa2d1df64c59b4ef1dd4`.
+  Images and source are relative links into `review/`. The page is served
+  read-only on gpu1 loopback (port 17689) and reached through an SSH
+  tunnel. It was checked at 0 / 82 marks; the agent supplied no labels.
+
+- **Outcome (2026-10-20): not adopted**, decided at stage 1 with no second
+  stage. Scored with `python -m experiments.tennis.k8 score` (scoring code
+  as in `e43215b`) on the user's marks, `k8-marks-fb6cfe8a81f9a440.json`
+  (SHA256 `eeba025b…cb4a2`, 82/82 marked), against the published report
+  `530696e0…`. Score `review-sample-01/k8-score-sample-01.json`, SHA256
+  `2ac7bebb4a7fbed8e7a6174cc7582cb017ff2df81f245b3861a0256e27b0c405`.
+  The registration jobs are the four original parts and twelve recovery
+  groups listed above (CPU only, no GPU).
+
+  | Condition | Bar | Measured | Passes |
+  |---|---|---|---|
+  | Precision (exact, 41 shots) | ≥ 0.95 | 1.00 (41/41) | yes |
+  | Duration recall (HT, 95% CI) | ≥ 0.90 | 0.34 [0.26, 0.45] | no |
+  | Registration median, true court frames | ≤ 2 px | 1.43 px | yes |
+  | Registration 95th percentile | ≤ 6 px | 24.5 px | no |
+
+  The interval lies wholly below the bar, so no stage 2 runs. On predicted
+  court shots alone the errors are median 0.91 px and p95 2.52 px. The p95
+  fails because of the true court shots the classifier missed. Of the 41
+  sampled non-court shots, 23 are court or mixed. The weighted estimate is
+  about 856 s of court time hidden among the predicted non-court shots
+  (633 s court, 223 s mixed), against 449 s found. **Misses by class**
+  (sampled shots):
+  1. *Near misses, the 80% shot rule* (11 court shots: 0000, 0002, 0012,
+     0017, 0036, 0048, 0088, 0139, 0247, 0290, 0294). A homography exists
+     on almost every frame, with a median chamfer of 0.9–2.0 px, but 20–50%
+     of frames exceed 2 px (p90 3–4.6 px). These are per-frame errors in
+     a shot that does register.
+  2. *Wrong or no fit* (6 court shots: 0100, 0123, 0172, 0201, 0223,
+     0259). The median is 4–20 px, or there is no fit (0201).
+  3. *Missed cuts* (6 mixed shots: 0031, 0062, 0079, 0135, 0181, 0203).
+     The 0.25 scene threshold merged a court and a non-court shot.
+  The user decides how to proceed. Any change of method needs a new rule
+  judged on shots not yet marked; these 82 marks have now been seen.
+  Close-up, crowd and other shots were never predicted as court, so the
+  competing explanation (court-like structures in non-court shots) is not
+  observed.
+- **Decode offset found by the user (2026-10-20).** Each shot's first
+  review image was its predecessor's last frame. The cause: ffmpeg's input
+  `-ss` counts from the container start (0, the audio), while cut indices
+  count from the video's start (0.020 s, `setpts=PTS-STARTPTS`). So
+  `-ss start/fps` decoded from frame start−1. Verified on the broadcast:
+  the first cut is n = 593, and the old seek decoded n = 592. In the
+  published report the registration row labelled f is therefore source
+  frame f−1 for every shot except shot 0. Within each recovery chunk
+  that starts inside a shot, one frame is measured twice and one is never
+  measured. The effect on this outcome is negligible: a corrected shift
+  flips one prediction (shot-0288, a one-frame shot), and recall and p95
+  stay far from their bars. The archived evidence is unchanged.
+  The decode now seeks to (video start − container start) + (start − ½)/fps
+  (`seek_offset`, `seek_seconds`). A regression test with real ffmpeg
+  (an MKV whose audio starts at 0 and video at 0.02 s) passes with the
+  packed ffmpeg 8.1.2 on gpu1. Any later registration run uses the fix.
+  Until then, per-frame homographies from this run must be read at
+  frame f−1.
+- **Partial court-shot list v0 for K4b (d)** (2026-10-20, the user's choice
+  of options B and A). `court-shots-v0/k8-court-shots-v0.json` under the
+  run root (SHA256 `f1efc61dafe6ebd75303a6448ddb5180eaec70dee9e329fde8517674088dad7a`):
+  the 41 predicted-court shots, all marked court, 22,460 frames.
+  Per-frame homographies are re-indexed for the decode offset; the row
+  for a shot's last frame is taken from the next shot. It covers about a
+  third of court time, so absence from the list does not mean non-court.
+  K8b (revised cuts and registration) follows under its own rule.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
