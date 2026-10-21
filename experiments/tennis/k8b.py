@@ -492,17 +492,17 @@ def score(report: dict[str, Any], marks: dict[str, Any]) -> dict[str, Any]:
             "marks_sha256": hashlib.sha256(json.dumps(marks, sort_keys=True).encode()).hexdigest()}
 
 
-def make_manifest(root: Path, matches: list[str], out: Path) -> dict[str, Any]:
+def make_manifest(root: Path, matches: list[str], out: Path, pattern: str = "*.mp4") -> dict[str, Any]:
     """Clip identities for the held-out set; 2160p clips weigh 1.2 when balancing parts (registration runs at 1080p; only decoding costs more)."""
     clips = []
     for match in matches:
-        for video in sorted((root / match).glob("*.mp4")):
+        for video in sorted((root / match).glob(pattern)):
             meta = json.loads(subprocess.check_output(
                 ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=height,nb_frames", "-of", "json",
                  str(video)]))["streams"][0]
-            clips.append({"id": f"{match}/{video.stem}", "path": f"{match}/{video.name}", "sha256": file_sha256(video),
+            clips.append({"id": f"{match}/{video.stem}", "path": str(video.relative_to(root)), "sha256": file_sha256(video),
                           "frames": int(meta["nb_frames"]), "weight": 1.2 if int(meta["height"]) > 1080 else 1.0})
-    manifest = {"schema": 1, "root": str(root), "matches": matches, "clips": clips}
+    manifest = {"schema": 1, "root": str(root), "matches": matches, "pattern": pattern, "clips": clips}
     write_json(out, manifest)
     return manifest
 
@@ -514,6 +514,7 @@ def main() -> int:
     m.add_argument("--root", type=Path, required=True)
     m.add_argument("--match", action="append", required=True)
     m.add_argument("--out", type=Path, required=True)
+    m.add_argument("--pattern", default="*.mp4", help="clip glob inside each match directory, e.g. videos/*.mp4")
     r = sub.add_parser("run")
     r.add_argument("--manifest", type=Path, required=True)
     r.add_argument("--archive", type=Path, required=True)
@@ -533,7 +534,7 @@ def main() -> int:
     s.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "manifest":
-        make_manifest(args.root, args.match, args.out)
+        make_manifest(args.root, args.match, args.out, args.pattern)
         return 0
     if args.command == "run":
         return run(args)
