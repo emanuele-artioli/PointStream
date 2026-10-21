@@ -459,9 +459,9 @@ def recompute(root: Path, players: list[str]) -> list[str]:
         ref = rows_by[(s["t"], s["track"])]["settings"]["crop1"]
         for scale in SCALES:
             want = oks(s[f"synthetic{scale}"], ref["kps"], s["area"]) if ref["fitted"] else None
-            got = s["oks"][f"synthetic{scale}"]
+            saved = s["oks"][f"synthetic{scale}"]
             # exp and mean differ by an ulp between platforms' numpy builds (4e-16 seen Linux vs macOS)
-            if (want is None) != (got is None) or (want is not None and abs(want - got) > 1e-9):
+            if (want is None) != (saved is None) or (want is not None and abs(want - saved) > 1e-9):
                 problems.append(f"t={s['t']}: oks{scale}")
     return problems
 
