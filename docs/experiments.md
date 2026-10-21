@@ -9489,6 +9489,79 @@ invocation turns out to be needed.
   8-hour ceiling; about 5 h of wall time from the rule, including an
   outage of the session.
 
+### 2026-10-21 — K1c: K6's bound on egocentric hands (outline granted)
+- Question ([PLAN K1c](../PLAN.md)). H3b's hand bound drew MANO's mesh at
+  the coded pose and charged MANO's outline (it misses 9.7% of the hand and
+  overshoots 9.2%). K6's `warp` grants the outline: the frame's own pixels
+  moved from the uncoded to the coded keypoints by a 2D skeleton warp, so
+  only the coding error is charged. On bodies that was the difference
+  between a loss and a 95% saving. Does the same bound beat the pixel
+  coders on hands, at H2's coded keypoint rate, against H3d's envelope?
+- Items. H3b's pilot: B2's four windows (`P01_107_0000003049`,
+  `P02_02_0000006080`, `P03_10_0000000616`, `P09_106_0000006303`), 240
+  frames each, with H3c2's staged inputs unchanged (window decode, fill
+  masks and record, H2's VISOR poses and `code.json`, MANO, LPIPS and
+  DISTS backbones; `h3c-2026-10-11/inputs.json` `da49a912…7a10`).
+- Keypoints. H2's WiLoR rows, each track coded with H2's 100 ms choice
+  (Gaussian 33 ms, 15 Hz interpolated, full pose, steps ×8; 1.93 kbps
+  pooled, 1.927 in K1) and its median shape, decoded, and the 21 joints
+  projected (`h3b.item_poses`, `h2.pinhole`, as `h3c.item_judge`). Source
+  keypoints: the same row's uncoded fit (its own shape) projected the same
+  way, so the warp at the uncoded keypoints is the identity.
+- Warp. `k6.draw` with a hand skeleton instead of K4's body: the 20 bones
+  of the 21-joint OpenPose/MANO hand (wrist to each finger's base, then
+  along each finger), every joint confident. Per fitted hand (one H2 row
+  per side and frame), the region moved is that side's fill-set class mask
+  (hand and forearm, as R), σ = 0.08 of that mask's height (K6's constant,
+  not tuned), the field on K6's 4 px grid. Hands are drawn farther first
+  (mean coded joint depth). As H3b, drawn pixels never cover objects (the
+  fill set's other foreground), and inside R the source is first replaced
+  by K6's Telea fill (radius 5), so a hand with no fit in that frame, and
+  every pixel of R the warp misses, is charged as fill. Variants:
+  - `warp` (the bound): the uncoded to the coded keypoints.
+  - `warp@uncoded` (diagnostic): the identity on fitted hands; what remains
+    is the charge for unfitted hands.
+- Judges. LPIPS on R exactly as H3c and H3d scored their points (`h3c.Scorer`:
+  the variant inside R, the source outside; B2's AlexNet spatial map on the
+  full frame averaged over R; mean over the window's frames with R
+  non-empty), so the bound and the envelope share region, frames and
+  network. **Decides.** Beside: DISTS on R (H3c's), PSNR on R, LPIPS over
+  S = R ∪ every drawn pixel with the drawing kept outside R (overshoot
+  charged, as K6), the share of R the warp misses and the share of its
+  drawing outside R.
+- Envelope. Per item, the upper concave hull (`g5.envelope`, linear in rate)
+  of SVT-AV1's eleven points and DCVC-UF off the shelf (H3d's bar) together
+  with DCVC-UF + G's six points (H3d's component, arm `G-L`), all on R, from
+  H3d's component report (`h3d-2026-10-12/report-component/h3d-report.json`,
+  `467be69f…6e00`); K1's `joint` hull. At 1.927 kbps it reads LPIPS 0.258
+  (P01_107), 0.204 (P02_02), 0.155 (P03_10) and 0.184 (P09_106).
+- Decision rule (`k1c.DECISION`, fixed before any run). Per item, the bound
+  passes when its LPIPS on R is below the hull's at 1.927 kbps.
+  - If it passes on ≥ 3 of 4 items, hands get K6b's ladder in PLAN
+    (audit, zero-shot, overfit, match fit), as bodies do.
+  - Otherwise hands are closed for every renderer at the keypoint stream's
+    rate: no renderer can draw more of the true frame at the coded pose.
+  - If LPIPS over S (overshoot charged) moves the count of passing items
+    across 3, or DISTS on R disagrees with LPIPS on that count, the outcome
+    goes to the user.
+  - The hull's rate for the bound's quality (and the saving) is reported
+    per item, as K1.
+- Hypothesis. The bound passes on ≥ 3 items. H3b's `wilor:arm_uncoded` (MANO
+  at the uncoded pose) was 0.168 on S and already above the hull on 2
+  items; granting the outline removes MANO's 10% miss and spill, and the
+  coding error (about 10 px on WiLoR's joints) costs less than that.
+- Competing explanation. Hands are not bodies: fingers are thin and close,
+  a 10 px joint error is a large share of a finger, and the warp blends
+  neighbouring fingers' bones, so the coding error alone may cost more
+  LPIPS than a ¼-scale DCVC-UF + G. `warp@uncoded` separates the coding
+  error from the unfitted-hand charge; the missed share separates both
+  from the outline.
+- Budget. One fleet job (`k1c run`), shared Ada or A6000 (LPIPS and DISTS
+  verified there): smoke ≤ 600 s (P01_107, first 48 frames), full ≤ 45 min
+  (the four items; the warp on the CPU, two scorings per item). Ceiling
+  1 GPU-hour, smoke included. The comparison (`k1c report`) is local, from
+  the validated stage and H3d's report.
+
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
   codec gains more than a conventional one when PointStream adds learned
