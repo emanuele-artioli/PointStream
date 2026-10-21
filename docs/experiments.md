@@ -8015,6 +8015,20 @@ invocation turns out to be needed.
   record, owner or run. No worker could claim it and nothing executed,
   so part 3 was submitted once more. The partial directory is left as
   it is.
+  All eight full stages completed and passed the validator on the smoke
+  (fleet) and on the full stage (locally). Assembled at
+  `k4b-matches/registration/k8b-report.json` (SHA256
+  `eb7b34b9f8117f5926fb9e15d34bde9a209ce43213e19dc9d9641b38b552e3e0`):
+  89 clips, 92 shots, 31,390 frames. Frames that fit: djokovic_federer
+  13,710/13,901, rublev_auger-aliassime 10,264/17,489. The six
+  rublev_auger-aliassime clips K4b needs that do not fit (003, 006, 039,
+  054, 062, 063) were inspected visually. They are close-ups, a tunnel,
+  and a player in front of a wall or by the sideline: not court views,
+  so the absence of a fit is correct. 061 (fits on 34% of frames) is a low
+  courtside view. These shots are not marked (the method is adopted), so
+  this is an inspection, not evidence. Consumers use frames whose `fits`
+  flag is true; a non-null homography above 6 px (e.g. in 003) is kept
+  for inspection only.
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
