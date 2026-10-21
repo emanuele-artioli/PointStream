@@ -8131,6 +8131,69 @@ invocation turns out to be needed.
   pilot windows, ≤ 45 min. Full: the other 45 windows in two parts of
   ≤ 45 min. Ada or A6000 (YOLO11x-pose's table rows; Ada asserted in
   K4b.1's jobs), shared, 12 GB declared. Ceiling 1 GPU-hour and 4 h wall.
+- Jobs (all RTX 6000 Ada, gpu6, shared; environment
+  `pointstream-20261009T214002Z`, ultralytics 8.4.6, YOLO11x-pose
+  `013c4354…85f8`; inputs `pointstream-data/tennis/k4b-2026-10-16/pose-v1/`
+  `inputs.tar` `3ae0106e…5e81`, built by `tools/datasets/k4b_pose_inputs.py`
+  from K4b.1's seven validated jobs and the marks `05f51305…`). Pilot
+  `20261021T090639Z-c2c32f37` (`1e9dc6b`; 3 windows, 720 frames; 177 s;
+  `published.tar` `8bba8170…`); part 1 `20261021T091816Z-6a1e0668` (`c5ac3b5`;
+  22 windows, 4,832 frames; 1,326 s; `552f3109…`); part 2
+  `20261021T091821Z-1b022f25` (`c5ac3b5`; 23 windows, 4,892 frames; 1,245 s;
+  `32e79fdd…`). `c5ac3b5` differs from `1e9dc6b` only in the validator's OKS
+  comparison (within 1e-9: an ulp differs between the hosts' and macOS's
+  numpy) and the `report` command. Peak 8.75 GiB of 12 GB. Every full output
+  passes the validator's 9 checks locally (`pose-v1/report-2026-10-21/local-validation/`):
+  each setting's fit and inside, and every synthetic OKS, recomputed from the
+  published masks and keypoints. Both parts saw GPU contention from other
+  users (action continue), so the latencies are indicative only.
+- Outcome (`k4b_pose report`, 48 windows, 19,062 hand-identified
+  player-frames: 8,860 far, 8,860 near, 1,342 in one-player windows;
+  `k4b2-report.json` `bd87835b…91fb`):
+
+  | setting | fitted, all | fitted, far | under 6% (113) | 6–10% (3,257) | 10–15% (3,609) | ≥ 15% (12,083) | synthetic OKS ≥ 0.5 (1,109) | median OKS |
+  |---|---:|---:|---:|---:|---:|---:|---:|---:|
+  | whole frame (K4) | 0.812 | 0.595 | 0.009 | 0.036 | 0.916 | 0.997 | | |
+  | crop ×1 | **0.997** | **0.993** | 0.584 | 0.995 | 1.000 | 1.000 | 0.991 | 0.967 |
+  | crop ×2 | 1.000 | 1.000 | 1.000 | 0.999 | 1.000 | 1.000 | 0.994 | 0.982 |
+  | crop ×4 | 0.996 | 0.999 | 0.991 | 0.997 | 0.997 | 0.995 | 0.994 | 0.974 |
+
+  Median keypoints inside the mask: 1.0 in every setting and group.
+  Latency (shared, contended GPU): 21.6 ms per crop averaged over the three
+  sizes, 39.6 ms per whole frame (median).
+- Decision (by the rule): **crop ×1 passes** (all three sizes pass; the
+  smallest is chosen). The far player is fitted: K4's (b) re-read on
+  hand-identified players goes from 0.812 (whole frame) to 0.997 with
+  median inside 1.0, above the 0.90 bar, so K6's gate condition (b) passes
+  here; on K4's own windows it is re-read once K4b.1's identification is
+  adopted. DWPose, super-resolution and fine-tuning are not needed.
+  K4b.3 (keypoint rate) runs on the ×1 keypoints.
+- Reading. The hypothesis held except that ×1 was already enough: the
+  failure was the whole-frame input (1920 px shown to YOLO at 1280, so a
+  60–100 px far player became 40–70 px), not the player's size in the
+  source. ×2 adds the 113 player-frames under 6% of the height (0.58 →
+  1.0). Competing explanation (1) does not hold (fit rises from 0.04 to
+  0.99 with the crop alone in the 6–10% bin). (2), confident wrong
+  keypoints: the synthetic far player agrees with its own native keypoints
+  (median OKS 0.97–0.98), and on the far player 99.6% of ×1 detections are
+  at least half the mask's height and 96.6% have ≥ 12 confident keypoints
+  (whole frame 95.0%). The fit measure itself is loose on large players:
+  enlarged crops of near players and of close-up players (one-player
+  windows) get partial detections more often (near at ×4: 33% of detections
+  under 0.7 of the mask's height, whole frame 8%; one-player windows at ×1
+  25% against 0.5%), while K4's matching still counts them fitted; a
+  review image (`rublev_auger-aliassime/002@422`, t = 175, ×4) shows a
+  small skeleton inside the player's box. So the estimator to carry
+  forward is ×1 crops for players under 15% of the height and either
+  setting above (whole frame is as good there); K4b.3 and K6 read the
+  keypoints, not this fit count. (3), track drift, and (4), others in the
+  crop: the review images checked (the pilot's 12 and four from
+  rublev_auger-aliassime) show the marked player each time, including with
+  an umpire inside the crop. Scope: 48 broadcast windows from five
+  matches; the synthetic check reduces near players without broadcast
+  compression of a real far player, so its OKS is an upper bound.
+- Budget: 2,905 s of stage execution (0.81 GPU-hours with the three
+  smokes), inside the 1 GPU-hour ceiling; about 2 h wall from the rule.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned

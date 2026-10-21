@@ -467,7 +467,11 @@ other. Each has its rule written before its run, as everywhere.
      crop last; fine-tuning only if all fail (no tennis pose labels;
      SportsPose or pseudo-labels from fitted near players). Players under
      10% of the frame height are fitted on 0–50% today, 15% and taller on
-     97–100%.
+     97–100%. Done (2026-10-21, [entry](docs/experiments.md#2026-10-21--k4b2-pose-on-the-far-player-crop-size-sweep)):
+     **crop ×1 passes**; on 48 windows' hand-identified players, fitted
+     0.997 (far 0.993, whole frame 0.812 / 0.595), synthetic OKS ≥ 0.5 on
+     0.991. K4's (b) passes with it; DWPose not needed. K4b.3 reads its
+     keypoints.
   3. Keypoint rate against keypoint error: quantization 1, 2, 4, 8 px,
      constant-velocity prediction, a lower keypoint frame rate with
      interpolation; raw keypoints saved this time (K4 kept histograms
