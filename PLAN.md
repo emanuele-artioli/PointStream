@@ -450,7 +450,41 @@ objects (the tennis ball).
   - Open for the user: whether to give a learned per-player renderer
     (pose-conditioned, amortized over a match) its own oracle, try
     keypoints plus a coded residual, or keep players as pixels in the
-    tennis pipeline.
+    tennis pipeline. Decided (user, 2026-10-21): K6b, then K6c.
+- K6b. *Learned per-player renderer, oracle* (user, 2026-10-21). No
+  pose-conditioned generator has been trained on PointStream's footage
+  (H3e ran one off the shelf on hands). K6's `ref` was a 2D warp of one
+  reference frame, not a learned model, so K6 rules out retrieval plus
+  warp only.
+  - Audit first, as H3e did: per-subject pose-to-person models and
+    pose-guided video generators, with their weights, licences, inputs
+    and cost.
+  - Then the cheapest oracle, H3d's form: the renderer fitted on the
+    window's own frames, its bits unbilled, drawing each player from
+    K4b.3's coded keypoints (every 4th frame). It is scored by K6's judges
+    against K6's envelope on K4's 8 scored windows.
+  - The bar comes from K6. Break-even is about LPIPS 0.29 at 3.6 kbps
+    (DCVC-UF at 4.3 kbps, 0.294). The bound, perfect appearance at the
+    coded pose, is 0.075. The rule and the GPU budget are written before
+    any training.
+  - If it fails, the generative route closes for bodies. If it passes,
+    the renderer is next fitted on other parts of the match and paid for
+    (amortized, payback hours reported, as G5b).
+- K6c. *General player codec* (user, 2026-10-21; after K6b passes). One
+  model shared across players, sent once with the decoder. Per player it
+  receives an appearance image or feature vector, sent once per match or
+  shot and billed, then the coded pose sequence. It may be hybrid,
+  generating only the subsets where it pays, with pixels elsewhere.
+  Subdivisions to test, each judged by K6's envelope on that subset:
+  1. the far player (under 15% of the frame height), where pixel coders
+     collapse first at low rate and a generator's errors are smallest
+     in pixels;
+  2. court views only (K8b), with close-ups and replays left as pixels;
+  3. the body generated and the racket arm, or the racket alone, as
+     coded pixels or residual (K6: the fixed grip fails);
+  4. between-point walking against rallies (motion and pose novelty);
+  5. the two players only, with umpires, ball kids and crowd staying in
+     the background.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
