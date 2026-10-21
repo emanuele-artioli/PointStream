@@ -7951,6 +7951,21 @@ invocation turns out to be needed.
   | 6 | `20261020T231213Z-19ea5d2d` | `c0317166…` |
   | 7 | `20261020T231220Z-a7110d20` | `0e4df826…` |
 
+  All eight full stages completed (CPU, no GPU). They took 485–564 s on
+  gpu5 and gpu6, and 2,446–2,599 s for parts 5–7, which shared gpu3
+  (64 cores). Each passed its validator on the smoke (fleet) and on the
+  full stage (locally). Assembled with `k8b assemble` (`a87dd2e`): 70
+  clips and 38,142 frames, each clip exactly once, every review image
+  present. Review `review/` under the run root, ID `13f69f53873866a2`,
+  `k8b-report.json` SHA256 `8230bf1a2239978dfb7912bd5f3ed8367f5c85d1ea9e75c42e8ab8fb3fdc3314`,
+  `review.html` SHA256 `a02a45a1a3a064fac69a95693699869650bdc2da3cd029b61d11685988b498f7`.
+  Every clip forms a single shot: no cut at ≥ 0.25 and no persistent
+  change of fit state inside a clip. 69 shots go to the user (the dev
+  clip is excluded). 44 are predicted court (723 s) and 25 non-court
+  (45 s, all medvedev_struff). These are predictions, not accuracy. The
+  page is served read-only on gpu1 loopback (port 17690) through a
+  tunnel, and was checked at 0 / 69 marks; the agent supplied no labels.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
