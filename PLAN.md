@@ -495,8 +495,14 @@ other. Each has its rule written before its run, as everywhere.
   DCVC-UF's 13 kbps; 5–20× less rate than the pixel coders for 80% of the
   source's balls) and passes crop DISTS (streak −27% to −42%), but its
   ~1 kbps payload fails the frame-PSNR guard (+1.7% to +2.8% against
-  +1%). Next: a rate-aware ball payload, or a restated guard (user).
-  Rendering preference (disk or streak): pending.
+  +1%). Decision (user, 2026-10-21): the ball mode is kept as a win
+  despite the guard (about 1 kbps is small; the ball matters in tennis),
+  the guard's failure disclosed; the **streak** is the default renderer
+  (the disk often looks unrealistic; the streak matches DCVC-UF where
+  DCVC-UF keeps the ball and keeps it visible far more often). A cheap
+  check (not evidence) finds colour coded at step 8 saves about 20% of
+  the payload for 0.3% of the fit's gain; a codec default to set before
+  the final runs, not a reason to rerun now.
 Datasets: still-camera sets (TrackNet, RacketVision, OpenTTGames) are
 fine where a decision needs labels, with the scope stated in the paper;
 broadcast matches answer what a real broadcast costs.
@@ -610,8 +616,15 @@ RacketVision's BallTrack finds 0.938 of TrackNet's balls on games 8–10
 (0.918 on K5's games, none in its training); through SVT-AV1 preset 8 at
 CRF 62 (median 84 kbps, frame PSNR 33–34 dB) it finds 0.026, and every
 other tracker of WASB's zoo under 0.03. K5's YOLO26x figure (0.02) came
-from a detector that found only 46% of the source's balls. DCVC-UF at
-equal rate is still to be measured with BallTrack (K5b 1b).
+from a detector that found only 46% of the source's balls. DCVC-UF,
+measured with BallTrack in K5b 1b: 0.01 of the balls at QP 0 (13 kbps),
+0.15 at QP 21, 0.67 at QP 42 (118 kbps); with the ball mode's streak
+(about 1 kbps) 0.90–0.92 at every point.
+A figure for the tennis paper, if space allows (user, 2026-10-21): the
+ball at equal rate, source | DCVC-UF | + disk | + streak, on two frames
+the user chose from K5b 1b's side-by-side clips (the far player's ball,
+where DCVC-UF loses it and the disk looks unrealistic); regenerated from
+the final experiments' streams, as every figure is.
 Negative results to report (user, 2026-10-13), with their numbers:
 parametric motion fails for egocentric objects (H1's homographies, H4a's
 grip pose on HOT3D motion capture, H4b's bank of views), and keypoints

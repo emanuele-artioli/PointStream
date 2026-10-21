@@ -8043,7 +8043,28 @@ invocation turns out to be needed.
 - Side by side (sent to the user 2026-10-21): game3/Clip3 and game7/Clip2
   at DCVC-UF QP 42, game3/Clip3 at SVT-AV1 CRF 55 (ball-following 3×
   crops), game10/Clip10 full frame at DCVC-UF QP 42; BallTrack's
-  positions. Rendering preference: pending.
+  positions. Rendering preference (user, 2026-10-21): **the streak**.
+  The user's reading of the clips: the source's own ball is low quality
+  and pixelated; DCVC-UF looks good but loses the ball at times,
+  especially near the far player; the disk often looks unrealistic; the
+  streak looks as good as DCVC-UF where DCVC-UF keeps the ball, and keeps
+  it visible far more often.
+- Decision (user, 2026-10-21): the ball mode is **kept**, with the streak
+  as default and BallTrack's positions, although it fails the frame
+  guard by the rule; the failure is on rate (about 1 kbps), it is
+  disclosed wherever the result is reported, and the rule is not
+  restated after the fact.
+- A cheap check of the payload's rate (not evidence: game3/Clip3, three
+  Gaussian-blurred stand-in decodes, the streak fit from the labels,
+  laptop CPU; `rate_check.py` in the session's scratch). Coding each
+  frame's colour at a coarser step: step 8 saves 20–22% of the payload
+  (1,267–1,407 → 989–1,134 bytes) and keeps 99.7–99.9% of the fit's
+  squared-error gain; step 16 saves 29–30% and keeps 98.5–99.7%. One
+  colour per window halves it but leaves the ball worse than none. The
+  rest (about 0.7 kbps) is positions and settings. So step-8 colour is a
+  free default for the final runs (a payload change, set before them);
+  reaching the guard's 0.2–0.4 kbps would need smoother positions and
+  settings too, which the user judged not worth pursuing now.
 - Next (proposed, for the user): the ball mode's rate. Either the encoder
   spends fewer bits (a rate-aware per-frame fit: colour quantised or held
   unless the error gain pays its bits; about 0.2–0.4 kbps would pass the
