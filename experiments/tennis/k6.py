@@ -170,15 +170,18 @@ def pose_window(crops: Crops, rgb: Any, frames: int, masks: list[dict[str, np.nd
     out: dict[str, list[dict[str, Any] | None]] = {p: [None] * frames for p in players}
     setting = {p: "whole" if median_height[p] >= WHOLE_FRAME_ABOVE * FRAME[1] else "crop1" for p in players}
     queued = False
+    whole_fitted: dict[tuple[str, int], bool] = {}
     for t in range(frames):
         for p in players:
             m = masks[t].get(p)
             if m is None or not m.any():
                 continue
+            frame = {(t, q): x for q, x in masks[t].items()}
+            whole_fit = fit_whole(m, frame, t, p, *frame_dets(whole[t]))
             if setting[p] == "whole":
-                frame = {(t, q): x for q, x in masks[t].items()}
-                out[p][t] = {**fit_whole(m, frame, t, p, *frame_dets(whole[t])), "setting": "whole"}
+                out[p][t] = {**whole_fit, "setting": "whole", "whole_fitted": whole_fit["fitted"]}
             else:
+                whole_fitted[(p, t)] = whole_fit["fitted"]
                 from experiments.visor.h1 import box_of
 
                 x0, y0, x1, y1 = crop_box(box_of(m))  # type: ignore[arg-type]
@@ -187,7 +190,7 @@ def pose_window(crops: Crops, rgb: Any, frames: int, masks: list[dict[str, np.nd
                 queued = True
     if queued:
         for (p, t), boxes, kps in crops.run("crop1"):
-            out[p][t] = {**fit(masks[t][p], boxes, kps), "setting": "crop1"}
+            out[p][t] = {**fit(masks[t][p], boxes, kps), "setting": "crop1", "whole_fitted": whole_fitted[(p, t)]}
     return out
 
 
@@ -311,7 +314,7 @@ def draw(canvas: np.ndarray, drawn: np.ndarray, image: np.ndarray, region: np.nd
     if mapped is None:
         return mine
     mx, my = mapped[0].astype(np.float32), mapped[1].astype(np.float32)
-    inside = cv2.remap(region.astype(np.uint8), mx, my, cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=0) > 0
+    inside = cv2.remap(region.astype(np.uint8), mx, my, cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=(0,)) > 0
     colour = cv2.remap(image, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
     view = canvas[y0:y1, x0:x1]
     view[inside] = colour[inside]
@@ -564,7 +567,7 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
 
     tracks = code_tracks(poses, scored)
     decoded, symbols = coded_keypoints(tracks)
-    region_height = {(p, t): float(np.nonzero(r[p].any(1))[0].ptp() + 1) if p in r and r[p].any() else 1.
+    region_height = {(p, t): float(np.ptp(np.nonzero(r[p].any(1))[0]) + 1) if p in r and r[p].any() else 1.
                      for t, r in enumerate(regions) for p in players}
     order = sorted(players, key=lambda p: median_height[p])  # far first
     gap = max(1, round(REF_GAP_S * float(fps)))
@@ -594,10 +597,10 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
             canvas = fill.copy()
             mask_v = np.zeros_like(r_t)
             for p in order:
-                rec = poses[p][t]
-                if p not in regions[t] or rec is None or not rec.get("fitted"):
+                pose = poses[p][t]
+                if p not in regions[t] or pose is None or not pose.get("fitted"):
                     continue
-                uncoded = np.asarray(rec["kps"], np.float64)
+                uncoded = np.asarray(pose["kps"], np.float64)
                 target = uncoded if code_key == "uncoded" else decoded[code_key].get((p, t))
                 if target is None:
                     continue
@@ -622,9 +625,9 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
             canvas = fill.copy()
             mask_id = np.zeros_like(r_t)
             for p in order:
-                rec = poses[p][t]
-                if p in regions[t] and rec is not None and rec.get("fitted"):
-                    kp = np.asarray(rec["kps"], np.float64)
+                pose = poses[p][t]
+                if p in regions[t] and pose is not None and pose.get("fitted"):
+                    kp = np.asarray(pose["kps"], np.float64)
                     draw(canvas, mask_id, truth_t, regions[t][p], kp, kp, SIGMA_OF_HEIGHT * region_height[(p, t)])
             if mask_id.any():
                 identity_max_diff = int(np.abs(canvas[mask_id].astype(int) - truth_t[mask_id].astype(int)).max())
@@ -656,9 +659,12 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
     out_dir.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(out_dir / "scores.npz", lpips=lp, lpips_drawn=lp_drawn, lpips_racket=lp_racket, dists=dists, sse=sse,
                         pixels_s=pixels_s, pixels_r=pixels_r, scored=np.asarray(scored, np.int64))
-    pose_rows = {p: [None if r is None else {k: r[k] for k in ("fitted", "setting", "kps", "inside", "confident") if k in r}
+    pose_rows = {p: [None if r is None else {k: r[k] for k in ("fitted", "setting", "kps", "inside", "confident", "whole_fitted") if k in r}
                      for r in seq] for p, seq in poses.items()}
     keypoints = {name: {f"{p}@{t}": np.round(v, 4).tolist() for (p, t), v in d.items()} for name, d in decoded.items()}
+    for name in ("features.json", "sam-masks.rle"):
+        shutil.copyfile(root / name, out_dir / name)
+    write_json(out_dir / "fits.json", entry["fits"])
     (out_dir / "poses.json.zst").write_bytes(compress(json.dumps(pose_rows).encode()))
     (out_dir / "keypoints.json.zst").write_bytes(compress(json.dumps({"decoded": keypoints, "symbols": symbols}).encode()))
     (out_dir / "outline.json.zst").write_bytes(compress(json.dumps({"rows": outline, "references": references}).encode()))
@@ -717,7 +723,8 @@ def command_run(args: argparse.Namespace) -> int:
             progress(n + 1)
     summary = {"stage": os.environ.get("PS_STAGE"), "requested": args.windows, "configured_windows": int(args.max_windows),
                "frames_argument": int(args.frames), "windows": rows, "decision": DECISION, "codes": [list(c) for c in CODES],
-               "inputs_sha256": file_sha256(Path(args.inputs) / "inputs.json"),
+               "inputs_sha256": file_sha256(Path(args.inputs) / "inputs.json"), "window_records": {w: args_entry
+               for w, args_entry in ((w, {k: v for k, v in inputs["windows"][w].items() if k != "fits"}) for w in chosen)},
                "tools": {"svt-av1": svtav1.tool(args.encoder), "dav1d": svtav1.tool(args.decoder), "ffmpeg": svtav1.tool(args.ffmpeg),
                          "inspect_sha256": file_sha256(Path(args.inspect))},
                "weights": {"lpips": lpips_record(Path(args.lpips_backbone)), "dists_sha256": file_sha256(Path(args.dists_backbone)),
@@ -730,3 +737,108 @@ def command_run(args: argparse.Namespace) -> int:
         tar.add(publish, arcname="publish")
     write_json(stage_dir() / "k6.json", summary)
     return 0
+
+
+# ----------------------------------------------------------------- validation (recomputed from the published files)
+
+
+def validate_window(root: Path, row: dict[str, Any]) -> dict[str, bool]:
+    files = all(file_sha256(root / n) == h for n, h in row["files"].items())
+    features = json.loads((root / "features.json").read_text())
+    clip = ClipMasks.load(root / "sam-masks.rle")
+    fits = {int(f): np.asarray(h, np.float64) for f, h in json.loads((root / "fits.json").read_text()).items()}
+    picks = window_players(features, clip, int(row["start"]), fits)["players"] == row["players"]
+    registered = [t for t in range(row["frames"]) if int(row["start"]) + t in fits]
+    scored_ok = row["scored_registered"] == registered and set(row["scored"]) <= set(registered)
+    poses = json.loads(decompress((root / "poses.json.zst").read_bytes()))
+    published = json.loads(decompress((root / "keypoints.json.zst").read_bytes()))
+    decoded, symbols = coded_keypoints(code_tracks(poses, row["scored"]))
+    again = {name: {f"{p}@{t}": np.round(v, 4).tolist() for (p, t), v in d.items()} for name, d in decoded.items()}
+    codes_ok = again == published["decoded"] and json.loads(json.dumps(symbols)) == published["symbols"]
+    a = np.load(root / "scores.npz")
+    scored = row["scored"]
+    names = row["variants"]
+    finite = all(np.isfinite(a[k][:, scored]).all() for k in ("lpips", "dists", "sse"))
+    unscored = [t for t in range(row["frames"]) if t not in set(scored)]
+    nan_elsewhere = all(np.isnan(a["lpips"][:, unscored]).all() for _ in [0])
+    covers = bool((a["pixels_s"][scored] >= a["pixels_r"][scored]).all() and (a["pixels_r"][scored] > 0).all())
+    anchors = row["anchors"]
+    svt_ok = all(0 <= r["region_bits"] <= r["accounted_bits"] and r["payload_bytes"] > 0 for r in anchors.values() if r["codec"] == "svt")
+    parts_ok = all(anchors[anchor_name(x)]["parts_bits"] is not None for x in ANCHORS if x[0] == "svt" and x[2] == 1)
+    dcvc_ok = all((last := r["attempts"][-1])["deterministic"] and last["decoder_matches_encoder_intra"] and last["luma_psnr"] >= SANE_LUMA_PSNR
+                  and r["region_bits"] >= 0 for r in anchors.values() if r["codec"] == "dcvc")
+    if scored:
+        mean = {n: float(np.mean(a["lpips"][names.index(n), scored])) for n in names}
+        ladder = mean["svt-48-s1"] < mean["svt-62-s1"] < mean["svt-63-s8"] and mean["dcvc-0-s1"] < mean["dcvc-0-s4"]
+        identity = row["identity_max_diff"] == 0
+        review = len(list(root.glob("review-t*.png"))) == min(REVIEW_FRAMES, len(scored))
+    else:
+        ladder = identity = review = True
+    return {"files_identified": files, "players_recomputed": picks, "scored_are_registered_frames": scored_ok,
+            "keypoint_codes_recomputed": codes_ok, "scores_finite_on_scored_frames": finite, "no_scores_elsewhere": nan_elsewhere,
+            "s_covers_r": covers, "svt_accounting": svt_ok, "parts_accounted_at_full_resolution": parts_ok,
+            "dcvc_decodes_sane": dcvc_ok, "lpips_rises_as_the_anchors_coarsen": ladder,
+            "identity_warp_reproduces_source": identity, "review_images": review}
+
+
+def validate(directory: Path, summary: dict[str, Any]) -> dict[str, Any]:
+    rows = summary["windows"]
+    requested = summary["requested"][:summary["configured_windows"] or None]
+    per = {r["id"]: validate_window(directory / k4.safe(r["id"]), r) for r in rows}
+    checks = {
+        "windows_requested": bool(rows) and [r["id"] for r in rows] == requested,
+        "frames_as_configured": all(r["frames"] == min(summary["frames_argument"], r["convert"]["frames"]) for r in rows),
+        "decision_frozen": summary["decision"] == DECISION and summary["codes"] == [list(c) for c in CODES],
+        "nets_on_cuda": all(summary["on_cuda"].values()),
+        "peak_within_declaration": summary["gpu_peak_gib"] * 1024 <= summary["gpu_memory_limit_mib"],
+        **{k: all(v[k] for v in per.values()) for k in next(iter(per.values()))},
+    }
+    return {"passed": all(checks.values()), "checks": checks, "windows": {w: [k for k, x in v.items() if not x] for w, v in per.items()}}
+
+
+def command_validate(args: argparse.Namespace) -> int:
+    summary = json.loads((args.summary or stage_dir() / "k6.json").read_text())
+    if args.directory:
+        report = validate(args.directory, summary)
+    else:
+        with tempfile.TemporaryDirectory(prefix="k6-validate-", dir="/tmp") as temp:
+            with tarfile.open(stage_dir() / "published.tar") as archive:
+                archive.extractall(temp, filter="data")
+            report = validate(Path(temp) / "publish", summary)
+    if os.environ.get("PS_VALIDATION_PATH"):
+        write_json(Path(os.environ["PS_VALIDATION_PATH"]), report)
+    print(json.dumps(report))
+    return 0 if report["passed"] else 1
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = parser.add_subparsers(dest="command", required=True)
+    run = sub.add_parser("run")
+    for name in ("inputs", "pose", "inspect", "image-ckpt", "image-sha256", "video-ckpt", "video-sha256", "lpips-backbone",
+                 "dists-backbone"):
+        run.add_argument("--" + name, required=True)
+    run.add_argument("--frames", type=int, required=True)
+    run.add_argument("--max-windows", type=int, required=True, help="0 runs every listed window")
+    run.add_argument("--windows", nargs="+", required=True)
+    run.add_argument("--sources", nargs="+", required=True)
+    run.add_argument("--encoder", default="SvtAv1EncApp")
+    run.add_argument("--decoder", default="dav1d")
+    run.add_argument("--ffmpeg", default="ffmpeg")
+    val = sub.add_parser("validate")
+    val.add_argument("--directory", type=Path)
+    val.add_argument("--summary", type=Path)
+    rep = sub.add_parser("report")
+    rep.add_argument("stages", nargs="+", type=Path, help="locally validated stages: k6.json, local-validation.json, x/publish")
+    rep.add_argument("--k4-rows", type=Path, help="K4's published window rows (broadcast__*.json), for the ball's bits")
+    rep.add_argument("--out", type=Path, required=True)
+    args = parser.parse_args(argv)
+    if args.command == "report":
+        from experiments.tennis.k6_report import command_report
+
+        return command_report(args)
+    return {"run": command_run, "validate": command_validate}[args.command](args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
