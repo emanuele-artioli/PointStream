@@ -66,7 +66,7 @@ def main() -> int:
         "smoke": {"seconds": 600, "representative_basis": basis}, "full": {"seconds": 2700},
         "validator": ["{python}", "-m", "experiments.visor.k1f", "validate"], "validator_seconds": 300, "required_commands": [],
         "budget_seconds": 3600, "deadline": args.deadline, "stall_seconds": 1500, "cpu_threads": 16, "device": "gpu",
-        "hosts": h3c2["hosts"], "gpu_models": ["RTX 6000 Ada", "RTX A6000"], "gpu_memory_mib": 32000, "local_storage_gib": 60,
+        "hosts": h3c2["hosts"], "gpu_models": ["RTX 6000 Ada", "RTX A6000"], "gpu_memory_mib": 36000 if args.cover else 32000, "local_storage_gib": 60,
         "gpu_sharing": h3c2["gpu_sharing"],
     }
     out = Path(args.dest) / f"k1f-part{args.part}.json"

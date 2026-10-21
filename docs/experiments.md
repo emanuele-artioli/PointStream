@@ -9746,6 +9746,79 @@ invocation turns out to be needed.
   the rows reads the hull at 3.8 kbps, where it is 0.162.
 - Budget. One fleet job, K1d's with a second WiLoR pass (≤ 45 min; K1d
   took 17 min). Ceiling 1 GPU-hour.
+- Job `20261021T205023Z-a7bda6e6` (gpu6, RTX 6000 Ada, shared; `be8251e`
+  from `ready.json`). Smoke passed the fleet validator. The full stage
+  (about 17 min) passes all 59 of `k1c validate`'s checks locally. Report
+  `visor/k1e-2026-10-21/report/k1c-report.json` (`7e6f8f69…d769`, on
+  `full/published.tar` `c9287130…1524`).
+- Outcome (on R, each item at its own rate; LPIPS bound / hull):
+
+  | item | kbps | LPIPS | DISTS | K1c → K1d → K1e LPIPS | joint acceleration, px: H2's rows / new rows, mask box / new rows, hand box |
+  |---|---:|---:|---:|---|---:|
+  | P01_107 | 1.95 | **0.086** / 0.257 | **0.069** / 0.222 | 0.087 → 0.087 → 0.086 | 5.1 / 9.0 / 9.1 |
+  | P02_02 | 3.81 | 0.196 / 0.162 | **0.142** / 0.234 | 0.272 → 0.232 → 0.196 | 20.3 / 56.0 / 40.9 |
+  | P03_10 | 2.00 | **0.083** / 0.152 | **0.097** / 0.201 | 0.093 → 0.083 → 0.083 | 6.5 / 28.2 / 28.5 |
+  | P09_106 | 3.55 | 0.139 / 0.138 | **0.175** / 0.197 | 0.211 → 0.141 → 0.139 | 8.0 / 20.9 / 20.1 |
+
+  - LPIPS: 2 of 4 below the hull (P09_106 misses by 0.001). DISTS: 4 of 4.
+    **The amended criterion passes (mean 75%). The rule written before
+    K1e fails (LPIPS 2 of 4).**
+  - Jitter. The new rows jitter 2–9× more than H2's rows on the same item.
+    The hand-only box cuts P02_02's jitter from 56 to 41 px, and P02_02's
+    LPIPS from 0.232 to 0.196. It changes nothing on P01_107, P03_10 or
+    P09_106. So the competing explanation (1) holds in part: the jitter
+    there comes from the hands, not the box. P02_02's own H2 rows jitter
+    20 px, against 5–8 px on the other items (rubber gloves).
+  - The hypothesis (3 of 4 by LPIPS) is refuted by 0.001 on P09_106.
+- Decision. Under the user's criterion, hands go to K6b's ladder with
+  the two-pass fit as the coverage path. K1f, the held-out test, uses the
+  same path.
+
+### 2026-10-21 — K1f: the hand bound's scope on held-out items
+- Question (user, 2026-10-21). On the pilot the bound wins big on two
+  items (96%) and loses narrowly on the two where H1's detector boxed
+  about half of the hand frames. Is "scenes where the detector tracks the
+  hands" a scope where PointStream wins? Does it hold on items the scope
+  was not chosen from?
+- Items. B2's other 30 items, in a content-blind order (sha256 of the id;
+  `tools/datasets/k1f_inputs.py`), 240 frames each. Two come from videos
+  in G's training footage (P07_110, P22_107). They are reported apart,
+  and the clean subset is reported beside the pooled one.
+- Bound. K1e's path, unchanged: H2's WiLoR rows plus the two-pass
+  hand-box fit for every boxable hand without one, coded with H2's 100 ms
+  choice, K1c's warp, judged on R. Rate: K1d's per-item scaling.
+- Envelope, coded per item as the pilot's was (`h3d.code_point`): H3b2's
+  seven SVT-AV1 low points, DCVC-UF HT-L off the shelf at QP 0 at full
+  size and QP 0, 21 and 42 at ½ and ¼, and H3d's G-L network on each ½
+  and ¼ point. Points above about 20 kbps are left out. On the pilot, the
+  hull with and without them is identical at every rate up to 5 kbps
+  (checked on H3d's report). Savings that need a higher rate are capped.
+  B2's CRF 41–62 streams are not used (all ≥ 35 kbps).
+- Scope, fixed now from the pilot. An item is in scope when H1/H2's
+  coverage, H2's rows over the side-frames with a boxable hand mask, is
+  ≥ 0.8. On the pilot the two winners have 0.99 and 0.97, and the two
+  losers 0.51 and 0.54. The encoder can measure it.
+- Decision rule (`k1f.DECISION`, the user's criterion). A group passes
+  when the mean over {LPIPS on R, DISTS on R} of the share of its items
+  whose bound is below the hull at its rate is ≥ 75%.
+  - In scope passes and out of scope fails: the scope is confirmed.
+    Headline: on scenes in scope (their share of items and of hand frames
+    reported), the hand bound saves a median X% of the envelope's rate at
+    about 2 kbps. It is a bound (appearance granted), and K6b's ladder
+    decides what a renderer keeps.
+  - All items pass: no scope is needed, and the claim is over all items.
+  - In scope fails: the scope claim is dropped, and hands' place on K6b's
+    ladder goes back to the user.
+- Hypothesis. In scope passes (both metrics ≥ 75%). Out of scope sits
+  near the bar, as P09_106 does.
+- Competing explanations. (1) The pilot's two winners are atypical
+  (still, close views), and coverage ≥ 0.8 does not predict a win
+  elsewhere. Then in scope fails. (2) Coverage is a proxy for motion. The
+  joint speed per item is reported beside to tell the two apart.
+- Budget. Parts of 2 items, each a fleet job of ≤ 45 min (the first one
+  times an item; a smoke of 48 frames with two DCVC-UF points). Ceiling 8
+  GPU-hours (user, 2026-10-21) for all of K1f. If it runs out, the items
+  done in the fixed order are reported, and so is the shortfall.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
