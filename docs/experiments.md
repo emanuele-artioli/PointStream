@@ -9704,7 +9704,8 @@ invocation turns out to be needed.
 - Measured beside, from the run's arrays (CPU, in `k1c report`):
   - Jitter: the median frame-to-frame acceleration of the uncoded joints
     (px, mean over 21 joints, consecutive frames of a side), for H2's rows
-    and the new rows, in K1d and K1e. This tests the competing explanation
+    and the new rows, for K1d's fits (K1e's first pass, the same box and
+    network, saved beside) and for K1e's second fits. This tests the competing explanation
     directly: K1d's new rows should jitter more than H2's, and K1e's less
     than K1d's.
   - Scene predictors per item, measurable at the encoder: the share of the

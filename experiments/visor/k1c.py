@@ -111,6 +111,7 @@ def mask_box_rows(wilor: Any, truth: Any, clip: Any, frames: int, meta: dict[str
         return {k: np.concatenate([f[k] for f in fits], 0) for k in fits[0]}
 
     fit = run(spec)
+    first_kp2d = fit["kp2d"]
     if hand_box:  # K1e: cut the mask at the first fit's wrist line (H1's split) and fit again on the hand part's box
         from experiments.visor.h1 import wrist_split
 
@@ -129,7 +130,8 @@ def mask_box_rows(wilor: Any, truth: Any, clip: Any, frames: int, meta: dict[str
     return {"t": np.array([t for t, _, _ in spec], int), "right": np.array([r for _, r, _ in spec], bool),
             "box": np.stack([b for _, _, b in spec]).astype(float), "wilor_rotvec": mano_np.rotvec_of(fit["rotmats"].astype(float)),
             "wilor_betas": fit["betas"], "wilor_transl": transl,
-            "wilor_kp2d": np.stack([pinhole(fit["joints"][i] + transl[i], focal, centre) for i in range(len(spec))])}
+            "wilor_kp2d": np.stack([pinhole(fit["joints"][i] + transl[i], focal, centre) for i in range(len(spec))]),
+            "first_kp2d": first_kp2d}
 
 
 def covered_keypoints(args: argparse.Namespace, meta: dict[str, Any], a: dict[str, np.ndarray], frames: int) -> dict[str, Any]:
@@ -219,10 +221,12 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     clip = clips[FILL]
     truth = rgb_memmap(Path(decoded["path"]), work / "truth.npy", frames, width, height, full_range, device)
     cover: dict[str, Any] = {}
+    first_new: np.ndarray | None = None
     if args.cover:
         meta_p, a_p = args.pose_units[item["id"]]
         old = {k: np.asarray(a_p[k]) for k in ROW_KEYS}
         new = mask_box_rows(nets["wilor"], truth, clip, frames, meta_p, old, hand_box=args.hand_box)
+        first_new = new.pop("first_kp2d", None)
         merged = {k: np.concatenate([old[k], new[k].astype(old[k].dtype)]) for k in ROW_KEYS}
         merged["new"] = np.concatenate([np.zeros(len(old["t"]), bool), np.ones(len(new["t"]), bool)])
         kp = covered_keypoints(args, {**meta_p, "hands": len(merged["t"])}, merged, frames)
@@ -286,6 +290,9 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
         arrays["new_row"] = kp["new"]
         arrays["row_t"], arrays["row_right"] = kp["t"], kp["right"]
         arrays["uncoded_kp2d"], arrays["coded_kp2d"] = kp["uncoded"][:, :, :2].astype(np.float32), kp["coded"][:, :, :2].astype(np.float32)
+        if first_new is not None and len(first_new):  # the mask-box fits (K1d's) in place of the new rows' second fits
+            arrays["first_kp2d"] = arrays["uncoded_kp2d"].copy()
+            arrays["first_kp2d"][kp["new"]] = first_new.astype(np.float32)
     look = score.hand[len(score.hand) // 2] if score.hand else 0
     if score.hand:
         ys, xs = np.nonzero(s_masks[look])
@@ -450,7 +457,7 @@ def item_verdict(warp: dict[str, float], hull: list[tuple[float, float]], kbps: 
     return row
 
 
-def motion(a: dict[str, np.ndarray], rows: np.ndarray) -> dict[str, float | None]:
+def motion(a: dict[str, np.ndarray], rows: np.ndarray, key: str = "uncoded_kp2d") -> dict[str, float | None]:
     """Median over the given rows of the uncoded joints' frame-to-frame speed and acceleration (px, mean over the 21
     joints), along each side's consecutive frames; acceleration is the jitter measure (K1e)."""
     speed: list[float] = []
@@ -458,7 +465,7 @@ def motion(a: dict[str, np.ndarray], rows: np.ndarray) -> dict[str, float | None
     for right in (False, True):
         idx = np.nonzero(a["row_right"] == right)[0]
         idx = idx[np.argsort(a["row_t"][idx])]
-        kp, t = a["uncoded_kp2d"][idx], a["row_t"][idx]
+        kp, t = a[key][idx], a["row_t"][idx]
         for i in range(1, len(idx)):
             if t[i] - t[i - 1] == 1 and rows[idx[i]]:
                 speed.append(float(np.linalg.norm(kp[i] - kp[i - 1], axis=-1).mean()))
@@ -496,6 +503,8 @@ def command_report(args: argparse.Namespace) -> int:
             if "uncoded_kp2d" in a:
                 verdict["motion_h2_rows"], verdict["motion_new_rows"] = motion(a, ~new), motion(a, new)
                 verdict["motion_all_rows"] = motion(a, np.ones_like(new))
+                if "first_kp2d" in a:
+                    verdict["motion_new_rows_first_pass"] = motion(a, new, "first_kp2d")
                 verdict["h2_share_of_rows"] = float((~new).mean())
                 verdict["hand_px_mean"] = float(a["r_px"][a["pixels_r"] > 0].mean())
         if dists_hull is not None:
