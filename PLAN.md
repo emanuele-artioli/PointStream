@@ -631,8 +631,15 @@ far player's pose is found: whole-frame YOLO fits it on 0.595 of frames,
 a top-down crop at native size on 0.993 (K4b.2; 0.04 → 0.99 for players
 6–10% of the frame height). Method to state with them: frames chosen
 content-blind, rules frozen before the labels were opened, and the marks
-the only labels. [K4b.1](docs/experiments.md#2026-10-16--k4b1-identifying-the-two-players-rule),
-[K4b.2](docs/experiments.md#2026-10-21--k4b2-pose-on-the-far-player-crop-size-sweep).
+the only labels. (3) What the keypoints cost (K4b.3): quantization
+(1, 2, 4, 8 px), prediction (previous, constant velocity) and keypoint
+frame rate (every frame, 2nd, 4th, interpolated) against the error, from
+15.0 kbps (0.4 px median) to 3.3 kbps (1.8 px median, but 8 px p95 on
+fast limbs); quantization is cheap in error, frame rate is the lever
+whose error shows on swinging arms, which K6 judges on the rendering.
+[K4b.1](docs/experiments.md#2026-10-16--k4b1-identifying-the-two-players-rule),
+[K4b.2](docs/experiments.md#2026-10-21--k4b2-pose-on-the-far-player-crop-size-sweep),
+[K4b.3](docs/experiments.md#2026-10-21--k4b3-keypoint-rate-against-keypoint-error).
 A point to argue (user, 2026-10-13), scoped to the evidence when written:
 conventional codecs are one-size-fits-all, rigid in what they code and tuned
 to pixel fidelity rather than to what people see; a learned codec's
