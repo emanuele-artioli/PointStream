@@ -7732,6 +7732,555 @@ invocation turns out to be needed.
 - Budget: CPU first (cuts and line detection); GPU only for a court-keypoint
   model, on the fleet with the usual smoke, ≤ 45 min per stage.
 
+- Implementation/run preparation (2026-10-16, `codex/k8-court-shots`).
+  The supplied `Tennis_courts/reference/` actually contains 966 PNG court
+  photographs, not a geometric model; adjacent `bounding_boxes/` files are
+  YOLO boxes. The user authorized regulation court geometry instead. The
+  ITF model is 23.77 × 10.97 m, singles width 8.23 m, service lines 6.40 m
+  from the net ([ITF](https://www.itftennis.com/en/about-us/organisation/tennis-glossary/));
+  the elevated net is excluded from the planar painted-line model.
+  No pretrained model, new environment or weights are needed: CPU OpenCV
+  4.10.0, NumPy 1.26.4 and SciPy from the existing packed environment.
+  The rule above is unchanged. White-line Hough hypotheses initialize
+  RANSAC against all nine painted line segments, with the preceding frame
+  as a warm start. Every decoded frame is measured at 1080p after K4's
+  limited-range 8-bit YUV420 conversion. Directed chamfer is the mean
+  distance from model-line samples at ≤1 projected-pixel spacing to
+  detected white-line pixels; a frame registers at ≤2 px with support
+  on at least six segments. Chamfer measures only in-frame projected line
+  portions (at least half the projected samples visible); failed fits
+  remain missing, never dropped from the error distribution. Summary uses
+  the ordinary median and linearly interpolated 95th percentile, with
+  infinite failures retained (fixed before user labels).
+  Initial ffmpeg scene threshold 0.25 is provisional for the user's
+  review (candidate scores ≥0.10 retained); the decision thresholds are fixed.
+  Mixed shots are false positives if predicted court and their duration
+  counts as missed court time. Registration is summarized across all
+  user-labelled court frames, with missing fits treated as infinite error.
+  CPU smoke: first 1,500 frames (30 s), ≤600 s; substantive validator
+  checks frame coverage, shot partition, real registered frames, finite
+  homographies, 80% classification and review images. Pilot/whole-match
+  stages ≤2,700 s; initial ceiling 3,500 CPU wall seconds per job,
+  16 CPU threads, no GPU allocation. The smoke establishes scale before
+  any whole-match run. Focused synthetic checks recover a known court
+  homography and reject blank frames; these are correctness checks, not
+  match evidence. Outcome is pending the user's shot labels.
+  Initial pilot `20261016T090118Z-23f79a90` (gpu1, CPU, `7349881`)
+  was stopped during its smoke: `ffprobe -count_frames` was decoding the
+  whole 2,310 s match on one CPU before the selected 30 s could run.
+  No registration result or decision evidence was produced; task artifacts
+  are retained. The revision uses K4's `-count_packets` convention instead,
+  and checks each requested decoded frame while processing. Chamfer
+  sampling was also corrected to uniform projected-pixel spacing (covered
+  by a focused regression test) before any decision run.
+  Corrected pilot `20261016T090621Z-91db7939` (gpu1, CPU, `ddd457c`)
+  failed its timing guard in 3.2 s: the source is CFR 50/1 but starts at
+  PTS 0.020 s. The implementation now explicitly rebases scene-score PTS
+  with `setpts=PTS-STARTPTS`; shot indices remain zero-based presentation
+  order, and ffmpeg seeks are relative to stream start. The source offset
+  is recorded rather than requiring zero PTS. No registration result was
+  produced. Neither diagnostic run supports the decision.
+  Third diagnostic `20261016T090920Z-467b9cc2` (`999b899`, gpu1, CPU)
+  exposed an ffmpeg scope bug before registration: `-frames:v` counts
+  selected scene frames, so it did not bound input decoding. Stopped the
+  owned job and retained its artifacts; scene scanning now has an input
+  `-t` bound. An actual ffmpeg regression fixture checks that a cut beyond
+  the selected input interval is excluded. No registration evidence yet.
+
+- Registration diagnostic `20261016T091435Z-0a586c9d` (`84dbe11`,
+  gpu1, CPU) completed all 1,500 frames / 4 shots in 228.2 s, predicted
+  zero court shots. Its validator failed because the fleet archives and
+  removes scratch before validation; the corrected validator reads
+  `published.tar` as K4 does (regression-tested). No full stage ran.
+  Visual QA found clipped doubles lines and grass texture in the initial
+  colour mask. Before the next smoke, the detector now requires coherent
+  long straight support, measures in-frame projected portions (rather
+  than rejecting a clipped court), and retries independent hypotheses
+  when a previous fit is poor. These are implementation corrections;
+  the decision thresholds are unchanged and this diagnostic is not used
+  for adoption. At this throughput the match is split into four balanced
+  groups of whole shots, each saving every finished shot, ≤45 min per
+  stage, then assembled into a new review directory. Assembly checks
+  identical inputs/cuts and every source frame exactly once; completed
+  archives remain unchanged. Initial ceiling remains 3,500 wall seconds
+  per CPU job, 16 CPU threads, no GPU allocation.
+
+- Revised smoke `20261016T092749Z-37f37559` (`b96ad65`, gpu5,
+  CPU, no GPU) passed all ten substantive checks: all 1,500 frames and
+  4 shots covered, images and finite homographies present, actual frames
+  registering under 2 px, classification exactly at the fixed 80% share.
+  Runtime 245.6 s; zero of four shots predicted court. This negative
+  prediction result is retained; it is not accuracy without the user's
+  labels. The 6,000-frame pilot completed in 313.3 s: 15 shots, 2
+  predicted court. All requested frames were processed. A four-part
+  full run is estimated at about 33 min per part including the repeated
+  whole-match cut scan, within the 45 min stage cap (16 CPU threads,
+  no GPU). Before the decision run,
+  reports also record resolved ffmpeg/ffprobe paths and versions plus
+  stream colour/codec/timestamp metadata. No model or threshold changes.
+
+- Whole-match run submitted (CPU only, `43d32d9`; pending outputs).
+  Four groups of balanced whole shots, same complete source and scene
+  score scan, each its own ≤600 s smoke, ≤2,700 s full stage and 3,500 s
+  total budget. Native tool/codec/colour metadata are in each report.
+
+  | Part | Job | Host (CPU; GPU none) |
+  |---|---|---|
+  | 0 | `20261016T093935Z-caed3e5a` | gpu1 |
+  | 1 | `20261016T093936Z-9d24b59f` | gpu1 |
+  | 2 | `20261016T093938Z-c7c96b10` | gpu5 |
+  | 3 | `20261016T093938Z-90023e70` | gpu5 |
+
+  Source snapshot SHA256 `1a7e221992ff1d5851c298ede352f7489ec701126fea73b132fb81b58ce645f4`;
+  clean selected patch SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+  Input manifest `inputs-4d99d200bcbc.json`, SHA256
+  `4d99d200bcbcc4279ac74781b6529cfbce1835a8afe47a4e94c92b76616327b1`;
+  video SHA256 `676331e0f4843f81a250b24c8a2f7ac0bb119ead4ffad0f145651ffb91a43e66`.
+  Packed environment `pointstream-20261009T214002Z.tar.gz`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`.
+  Commands/specifications are preserved in each job's `dispatch.json`,
+  stage metadata and `tennis/k8-2026-10-16/specs-v2/k8-full-<part>.json`.
+  Review serving uses `tools/datasets/k8_review_server.py` (read-only,
+  loopback only, byte ranges for seeking the source); marks stay in the
+  browser until downloaded. UI layout/server changes after `43d32d9`
+  do not change registration, cuts, predictions or archived evidence.
+
+- Full-run resource failure and bounded recovery (2026-10-16).
+  All four full stages reached their enforced 2,700 s allowance; none
+  produced a complete whole-match report. Preserve their `partial.tar`
+  files unchanged. They contain 232 complete shots / 70,383 frames of
+  the 360 shots / 115,505 frames in the retained cut table. Exactly
+  128 shots / 45,122 frames remain. No adoption result is inferred.
+  The initial pilot underestimated hard line-search frames and Python
+  thread contention. Recovery reuses the SHA256-identified cut table
+  and completed archives, processes only missing frames, uses separate
+  CPU processes, and checkpoints chunks of ≤240 frames. Homographies
+  reinitialize at chunk boundaries; the same line detector, court model,
+  RANSAC, chamfer and decision thresholds are retained. Per-item code
+  and archive provenance distinguish the original and recovery results.
+  Whole-shot classification is recomputed from every frame after merge;
+  review images remain the original shot's exact first/middle/last.
+  Recovery budget: 12 balanced missing-frame groups (~3,760 frames each),
+  16 CPU threads / 8 processes, no GPU; smoke ≤300 s on 120 frames of
+  known court shot 9; pilot one complete missing group, full ≤1,800 s,
+  total ≤2,400 s per job. Only after that pilot passes are the remaining
+  groups submitted. Validator checks frame coverage, bounded chunks,
+  real registration, homographies, review images and unchanged shot rule.
+  Tests verify preservation, exact chunk coverage and fail-closed assembly.
+
+- Recovery pilot `20261016T110218Z-1bd79811` (`5432db0`, gpu4,
+  CPU) passed its smoke (120 frames, 41.3 s processing / 44.5 s command)
+  and completed group 0: 22 chunks / 3,756 frames in 246.7 s processing
+  / 249.4 s command. This establishes the actual chunk/process path at
+  the full group scale, with about 7× margin to the 1,800 s cap. Hardware
+  and source identities are revalidated by each remaining job's own gate.
+  The retained evidence and manifest are read-only. Recovery manifest
+  SHA256 `5af2f0a3c4bf6b1f04b7ed145121f3989c0a9c57a6ff3a7ee303c70af577341f`.
+  Remaining jobs select the committed `experiments/`, `src/` and
+  `pyproject.toml` runtime dependency set, avoiding unnecessary NFS file
+  creation; each records that source selection and its snapshot checksums.
+
+- Remaining recovery requests (CPU only; `16b19ab`, same worker/court
+  file contents as the successful pilot; runtime-only source snapshot
+  SHA256 `c1bc200d99b2c1b4155c08cf7081a0382da99f52d991536b60801556182c0580`).
+
+  | Group | Job |
+  |---|---|
+  | 0 (pilot) | `20261016T110218Z-1bd79811` |
+  | 1 | `20261016T112031Z-242208de` |
+  | 2 | `20261016T112031Z-139b7c17` |
+  | 3 | `20261016T112032Z-8cd85120` |
+  | 4 | `20261016T112033Z-cea7591b` |
+  | 5 | `20261016T112050Z-f71ef62e` |
+  | 6 | `20261016T112056Z-8d34945b` |
+  | 7 | `20261016T112057Z-b93576b9` |
+  | 8 | `20261016T112057Z-27c43737` |
+  | 9 | `20261016T112101Z-863308e5` |
+  | 10 | `20261016T112058Z-fed578eb` |
+  | 11 | `20261016T112059Z-5522e2a8` |
+
+  Concurrent source transfers suffered connection failures. Canonical
+  status and shared-inbox inspection confirmed groups 2–11 had no ready
+  record, owner, state or run; no workload had executed. Their original
+  requests were continued, not resubmitted: the surviving complete tar
+  matched every original snapshot checksum, partial source directories
+  were preserved, restored source identities were checked against the
+  already-published group 1, and the frozen fleet publisher completed
+  publication under the original IDs/specifications. Source identity
+  `df2516b1506a553ade44b637c471714c5cd040a261aa75c812d788322fcaba32`.
+  Receipt: `recovery-01/publication-repair-receipt.json`; helper
+  `tools/datasets/k8_publish_existing.py` refuses any ready/claimed/run
+  state. No duplicate job was launched and all normal smoke gates remain.
+
+- Review ready (2026-10-16; assembly revision `edcf474`). All twelve
+  recovery jobs above completed their gates and full stages on CPU.
+  Processing time per group 0–11: 246.7, 322.9, 233.2, 228.4, 203.0,
+  288.1, 269.7, 461.4, 485.8, 468.6, 431.2, 507.5 seconds. Assembly
+  verified the preserved archive hashes, recovery manifest identity,
+  source-video SHA256 and exact non-overlapping coverage of all 115,505
+  frames / 360 original shots. No completed shot was rerun. Each shot
+  has its exact first, middle and last image (1,080 JPEGs); the middle
+  carries the projected court when a homography exists. Predictions:
+  41 court, 319 non-court. These are predictions, not measured accuracy.
+  The browser was opened and verified at 0/360 marks; no labels supplied
+  by the agent. Source video seeking uses a read-only loopback server.
+  Final page, relative to the run root:
+  `review/review.html`; review ID `63f9a0d78069c771`.
+  Absolute run root:
+  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k8-2026-10-16/`.
+  `review/k8-report.json` retains every per-frame homography/error,
+  conversion command, native-tool path/version, input/archive checksum,
+  original and recovery job identity, and selected worker checksums.
+  FFmpeg/ffprobe 8.1.2 from the packed environment supplied the native
+  decode/scene paths; no encoder or GPU was used. The full scene command
+  is explicitly reconstructed from the retained full cut scan, rather
+  than mislabeled with the base smoke's 30-second invocation.
+  Report SHA256:
+  `530696e0c6b70dbbbe0939de295faa4a9c83a07140e7586038784bc2e44ce4cf`;
+  HTML SHA256:
+  `4a16e6f746fc1de6442df76e8334df2b7ac091a3fd082d3096205beee8af8a1e`.
+  Required checks passed: ruff, mypy, pytest (574 passed, 19 skipped).
+  **Outcome by the rule: pending the user's complete marks JSON.**
+  Precision, duration-weighted recall, registration median/p95 and
+  per-class misses will be scored only after those marks return.
+  No adoption decision or threshold change has been made.
+
+- Amendment 1: a stratified sample of shots to mark (2026-10-20, written
+  before any mark; Claude takes over from `codex/k8-court-shots` on
+  `claude/k8-court-shots`). The user asked for cheaper marking than all
+  360 shots. **What changes:** the user marks (a) every predicted-court
+  shot (all 41) and (b) a Poisson sample of the 319 predicted non-court
+  shots, drawn with probability proportional to duration:
+  π_i = min(1, n·d_i / D), with D the stratum's duration and the cap
+  applied iteratively. Shot i is in the sample when u_i < π_i. Here
+  u_i = sha256("pointstream-k8:<shot id>") / 2^256 is fixed and blind to
+  content. The expected size is n = 50, about 90 shots in all, at about
+  10 s per shot, or roughly 15 minutes. The sample is nested in n: a
+  larger n keeps every shot already drawn. **Why:** precision needs only
+  the predicted-court shots, and recall needs only an estimate of the
+  court time hidden among the predicted non-court shots. **Estimators.**
+  Precision is exact, from all 41 shots. Duration-weighted recall is
+  R = A / (B + Y). A is the duration of predicted-court shots marked
+  court. B is the duration of predicted-court shots marked court or
+  mixed. Y is the duration of predicted non-court shots that are court or
+  mixed, estimated by Horvitz–Thompson as Ŷ = Σ_sample y_i/π_i. Because
+  π_i = d_i/c below the cap, each sampled positive adds exactly c seconds,
+  so Ŷ = Y_capped + c·k for k sampled positives. The 95% interval on Y
+  takes the exact Poisson (Garwood) interval for E[k], scaled by c. k is
+  a sum of independent Bernoullis, less dispersed than a Poisson, so the
+  interval errs wide. R's interval follows by monotonicity:
+  [A/(B+Y_hi), A/(B+Y_lo)]. Registration error is measured on all true
+  court frames. Frames of sampled shots carry weight 1/π_i, and missing
+  fits stay infinite. The median and 95th percentile use the weighted
+  linear interpolation that reduces to the ordinary median and the
+  linearly interpolated percentile when all weights are equal. Misses
+  are reported by class, both as sampled counts and as weighted estimates
+  of count and duration. **Unchanged:** precision ≥ 0.95, duration
+  recall ≥ 0.90, median ≤ 2 px, 95th percentile ≤ 6 px, the 80%
+  shot rule, the classes, and mixed shots counted wrong for both.
+  **Reading the recall interval.** If the interval lies wholly above or
+  wholly below 0.90, the recall condition is decided. If it straddles
+  0.90 while the other conditions pass, stage 2 extends the same draw to
+  n = 150. Stage-1 marks are kept, and about 85 more shots add about
+  15 minutes. Recall is then decided on the point estimate R̂, with the
+  interval reported, and a still-straddling interval is stated as
+  "within sampling error of the bar". The arithmetic behind this: with
+  A ≈ 449 s and no positive in the sample, n = 50 gives a recall lower
+  bound near 0.77, and n = 150 gives about 0.91. If precision or
+  registration already fails, no second stage runs. The 360-shot review
+  (`review/`, ID `63f9a0d78069c771`) and its report stay unchanged. The
+  sample page is a new directory beside it, `review-sample-01/`.
+
+- Sample review ready (2026-10-20, `e43215b`, CPU, no re-registration).
+  Command: `python -m experiments.tennis.k8 sample --report review/k8-report.json
+  --out review-sample-01`, run on the published report (SHA256 `530696e0…`,
+  checked). The draw gives 41 + 41 = 82 shots to mark. Of the predicted
+  non-court shots, 41 are sampled (expected 50; Poisson sampling varies the
+  count), covering 548 of their 1,861 s. Scale c = 37.2 s, largest π = 0.94.
+  Sample review ID `fb6cfe8a81f9a440`. `k8-sample.json` SHA256
+  `91738f886955d25c72f2a7c04f9d723bc82a6def5a4cd2afa52bd69e9dbaa3b1`,
+  `review.html` SHA256
+  `92b2ed13234bf4bf78de53a200ce57ebe1db90fd111dfa2d1df64c59b4ef1dd4`.
+  Images and source are relative links into `review/`. The page is served
+  read-only on gpu1 loopback (port 17689) and reached through an SSH
+  tunnel. It was checked at 0 / 82 marks; the agent supplied no labels.
+
+- **Outcome (2026-10-20): not adopted**, decided at stage 1 with no second
+  stage. Scored with `python -m experiments.tennis.k8 score` (scoring code
+  as in `e43215b`) on the user's marks, `k8-marks-fb6cfe8a81f9a440.json`
+  (SHA256 `eeba025b…cb4a2`, 82/82 marked), against the published report
+  `530696e0…`. Score `review-sample-01/k8-score-sample-01.json`, SHA256
+  `2ac7bebb4a7fbed8e7a6174cc7582cb017ff2df81f245b3861a0256e27b0c405`.
+  The registration jobs are the four original parts and twelve recovery
+  groups listed above (CPU only, no GPU).
+
+  | Condition | Bar | Measured | Passes |
+  |---|---|---|---|
+  | Precision (exact, 41 shots) | ≥ 0.95 | 1.00 (41/41) | yes |
+  | Duration recall (HT, 95% CI) | ≥ 0.90 | 0.34 [0.26, 0.45] | no |
+  | Registration median, true court frames | ≤ 2 px | 1.43 px | yes |
+  | Registration 95th percentile | ≤ 6 px | 24.5 px | no |
+
+  The interval lies wholly below the bar, so no stage 2 runs. On predicted
+  court shots alone the errors are median 0.91 px and p95 2.52 px. The p95
+  fails because of the true court shots the classifier missed. Of the 41
+  sampled non-court shots, 23 are court or mixed. The weighted estimate is
+  about 856 s of court time hidden among the predicted non-court shots
+  (633 s court, 223 s mixed), against 449 s found. **Misses by class**
+  (sampled shots):
+  1. *Near misses, the 80% shot rule* (11 court shots: 0000, 0002, 0012,
+     0017, 0036, 0048, 0088, 0139, 0247, 0290, 0294). A homography exists
+     on almost every frame, with a median chamfer of 0.9–2.0 px, but 20–50%
+     of frames exceed 2 px (p90 3–4.6 px). These are per-frame errors in
+     a shot that does register.
+  2. *Wrong or no fit* (6 court shots: 0100, 0123, 0172, 0201, 0223,
+     0259). The median is 4–20 px, or there is no fit (0201).
+  3. *Missed cuts* (6 mixed shots: 0031, 0062, 0079, 0135, 0181, 0203).
+     The 0.25 scene threshold merged a court and a non-court shot.
+  The user decides how to proceed. Any change of method needs a new rule
+  judged on shots not yet marked; these 82 marks have now been seen.
+  Close-up, crowd and other shots were never predicted as court, so the
+  competing explanation (court-like structures in non-court shots) is not
+  observed.
+- **Decode offset found by the user (2026-10-20).** Each shot's first
+  review image was its predecessor's last frame. The cause: ffmpeg's input
+  `-ss` counts from the container start (0, the audio), while cut indices
+  count from the video's start (0.020 s, `setpts=PTS-STARTPTS`). So
+  `-ss start/fps` decoded from frame start−1. Verified on the broadcast:
+  the first cut is n = 593, and the old seek decoded n = 592. In the
+  published report the registration row labelled f is therefore source
+  frame f−1 for every shot except shot 0. Within each recovery chunk
+  that starts inside a shot, one frame is measured twice and one is never
+  measured. The effect on this outcome is negligible: a corrected shift
+  flips one prediction (shot-0288, a one-frame shot), and recall and p95
+  stay far from their bars. The archived evidence is unchanged.
+  The decode now seeks to (video start − container start) + (start − ½)/fps
+  (`seek_offset`, `seek_seconds`). A regression test with real ffmpeg
+  (an MKV whose audio starts at 0 and video at 0.02 s) passes with the
+  packed ffmpeg 8.1.2 on gpu1. Any later registration run uses the fix.
+  Until then, per-frame homographies from this run must be read at
+  frame f−1.
+- **Partial court-shot list v0 for K4b (d)** (2026-10-20, the user's choice
+  of options B and A). `court-shots-v0/k8-court-shots-v0.json` under the
+  run root (SHA256 `f1efc61dafe6ebd75303a6448ddb5180eaec70dee9e329fde8517674088dad7a`):
+  the 41 predicted-court shots, all marked court, 22,460 frames.
+  Per-frame homographies are re-indexed for the decode offset; the row
+  for a shot's last frame is taken from the next shot. It covers about a
+  third of court time, so absence from the list does not mean non-court.
+  K8b (revised cuts and registration) follows under its own rule.
+
+### 2026-10-20 — K8b: court recall in shade and across venues (rule)
+- Question (PLAN K8, after K8 was not adopted). Can a revised registration
+  meet K8's unchanged decision rule on footage the method was not
+  designed on?
+- Diagnosis on dev data: K8's 82 marked shots, which may now be used for
+  design. K8's line detector keeps only pixels with value > 170 and
+  saturation < 80. In shade (court grass at value ≈ 90, a line at ≈ 133)
+  it finds no lines. Late in the match the near half of the court is in
+  shade, so those shots get a wrong fit (one line off) or none (0172,
+  0201, 0223, 0259). The remaining misses fail only the per-frame 2 px
+  bar of the shot rule (2–4 px during pans). Four of the six mixed shots
+  switch from no-fit to fit with no scene-score cut, which looks like a
+  gradual transition.
+- Method (each piece checked on one clean frame from each of the 82 dev
+  shots, decoded without warm start):
+  1. *Relative line detector.* A line pixel is brighter than its local
+     background (morphological opening, 31 px) by at least
+     max(10, 0.10·background), and less saturated than its surroundings
+     (closing, ≤ 0.75 of them). Support from long Hough segments is kept
+     as in K8.
+  2. *Hypotheses.* The previous frame (warm start, reset at cuts), then,
+     when it fails or exceeds 2 px, the seeds from both K8's detector and
+     the relative one. Each is refined against both masks, and the fit
+     with the lowest error is kept. A bank of the match's own good
+     homographies added one frame at twice the cost, so it is not used.
+  3. *Ruler.* The error is the directed chamfer from projected model
+     lines to the 1 px centerlines of the detected Hough segments.
+     Measuring against a mask's full width would let a dense mask
+     flatter the fit; on the dev frames the two agree within 0.7 px.
+  4. *Spurious-fit guard.* Clutter is the share of the projected court's
+     interior, more than 6 px from any model line, that is covered by
+     detected pixels. A fit needs clutter ≤ 0.25, at least 6 supported
+     segments and plausible geometry (as in K8). On the dev frames, court
+     fits had clutter ≤ 0.085, and the two spurious fits (a close-up and
+     a crowd shot) had 0.52–0.66.
+  5. *Shot rule.* A frame *fits* at error ≤ 6 px, the p95 bar. A shot is
+     court when at least 80% of its frames fit. The per-frame 2 px bar
+     no longer gates the shot; registration accuracy is judged only by
+     the decision rule below.
+  6. *Cuts.* Scene score ≥ 0.25 as in K8. In addition, a shot is split
+     where its per-frame fit state changes and the new state lasts at
+     least 1 s. Shorter runs are absorbed into their neighbours.
+  7. *Decoding.* Each clip is decoded sequentially from its start, with
+     no seeks, so the decode-offset bug cannot arise.
+  On the dev frames, 53/58 court frames fit within 2 px and 56/58 within
+  6 px; K8's method got 42 and 52. The 18 non-court frames had 0 fits.
+  These dev numbers are design evidence only.
+- Held-out data: the 70 scene clips of the three other archived
+  broadcasts (`tennis_games/alcaraz_hurkacz`, 21 clips, 6,968 frames at
+  1080p50; `djokovic_zverev`, 8 clips, 20,320 frames at 2160p60, converted
+  to 1080p by K4's conversion; `medvedev_struff`, 41 clips, 10,854 frames
+  at 1080p50). These are different venues, not seen in design, and they
+  are the clips K4b's windows come from.
+  nadal_kyrgios is not re-scored: its marks were used for design.
+- Marks: a review page, as in K8, of every shot the method produces in
+  those clips (a census, so no sampling; about 100 shots, about 15–20
+  minutes). The user marks the true class with K8's classes. The page
+  shows predictions and the projected court as before.
+- Decision rule (K8's thresholds, unchanged): adopted when, on the
+  held-out shots as marked, court-view precision ≥ 0.95, court-view recall
+  ≥ 0.90 weighted by duration, and on all true court frames (missing fits
+  infinite) a median error ≤ 2 px and a 95th percentile ≤ 6 px with the
+  ruler above. Mixed shots count wrong for both. Otherwise the misses are
+  reported by class and the user decides. Limitation, stated beforehand:
+  the clips were cut by the old pipeline around points and are mostly
+  court views, so precision is weakly tested there. The 0/18 dev
+  non-court fits are the only other precision evidence. If K8b is
+  adopted, the nadal_kyrgios whole-match run (v1 of the court-shot list)
+  comes next, and its predicted-court shots are spot-checked.
+- Hypothesis: the shade failure and the 2 px gate cause most of K8's
+  misses. Recall and registration pass on other venues, whose lighting
+  and surfaces differ.
+- Competing explanation: the relative detector is tuned to Wimbledon
+  grass. Hard or clay courts with logos, shadows or different line
+  contrast fail registration, or spurious fits appear on textured
+  surroundings that the clutter guard does not catch.
+- Budget: CPU only, on the fleet. At about 0.5–1.6 s per frame per
+  process, 38k frames take about 20–60k CPU seconds. Parts are whole
+  clips, 8 processes, checkpointing every finished clip. Smoke ≤ 600 s
+  on one short clip; full stages ≤ 2,700 s; parts sized from the smoke's
+  measured rate. No GPU.
+- Pilot smoke `20261020T215039Z-fdd6bf8c` (`78f6fa0`, gpu4, CPU).
+  An earlier submission, `20261020T215018Z-5357cd95`, snapshotted the
+  main checkout (`dabfa5c`, which has no K8b code) and was cancelled
+  before it ran anything. The smoke processed 240 frames of
+  `djokovic_zverev/000` in 524 s and failed its validator: no frame fit.
+  That clip is a court-level practice camera (4K60). Diagnosis: seven
+  model lines fit within 2.4 px, but both singles sidelines were off by
+  39 px. The fit had locked the model's doubles sidelines onto the court's
+  singles lines. The real doubles lines leave the frame, the seed only
+  takes sidelines that cross 60% of the frame height, and K8's geometry
+  guard (corners within ±10% of the width) rejected the correct fit,
+  whose near corners lie 25% beyond each side. Unguarded, the correct fit
+  is 1.22 px on all nine lines. It is not evidence.
+- Amendment 1 (2026-10-21, before any held-out shot is reviewed).
+  (a) K8b's geometry guard allows corners up to 50% of the frame width
+  beyond either side; K8's guard is unchanged. (b) When the best fit
+  exceeds 2 px, it is re-seated on the model's four line-swap pairings:
+  singles↔doubles sidelines and service lines↔baselines, as model-space
+  scalings about the court centre. This is the same one-line-off
+  ambiguity as K8's class-2 misses. (c) Each frame computes the distance
+  transform once per mask, which changes speed only. No threshold
+  changes. Because the fix was found on a held-out clip,
+  `djokovic_zverev/000` (3,975 frames, 66 s) becomes dev: it is still
+  registered (K4b needs it) but is neither reviewed nor scored. The
+  held-out census is the other 69 clips.
+- Runs (CPU only, no GPU; packed environment `32e68872…`; manifest SHA256
+  `82a582e0246f1a3a0fce2fbe1f694097fe7b47dca8cf774cb3f897b3a51ae00a`).
+  The corrected 4-part pilot `20261020T220814Z-c4b9d013` (`0465976`,
+  gpu1) passed its smoke (240 frames, 524 s, about 2.2 s per frame per
+  process) and reached its 2,700 s full-stage cap at 25 of 34 chunks.
+  That code published clips only at the end, so `partial.tar` is empty;
+  its `checkpoint.tar` keeps the finished chunks. The artifacts are
+  retained and nothing was replayed. Resized to 8 parts × 16 processes
+  with 200-frame chunks; each clip is finalized and published as soon as
+  its chunks finish, longest clips first (`913b815`). Pilot part 0,
+  `20261020T225829Z-3cb8b9aa` (gpu6): smoke 160 frames in 183 s; full
+  stage 6 clips, 4,484 frames, in 499 s. Its validator passed on the
+  smoke (fleet) and on the full stage (locally, from `published.tar`).
+  Parts 1–7 were then submitted on the same revision (`git_head` checked
+  in each `ready.json`):
+
+  | Part | Job | Archive SHA256 |
+  |---|---|---|
+  | 0 | `20261020T225829Z-3cb8b9aa` | `3910621c…` |
+  | 1 | `20261020T231141Z-bff7fd07` | `8e61d922…` |
+  | 2 | `20261020T231147Z-a44fc8b0` | `86c30e3e…` |
+  | 3 | `20261020T231153Z-d859538d` | `8e7d98c6…` |
+  | 4 | `20261020T231200Z-23e16ed2` | `d1652905…` |
+  | 5 | `20261020T231206Z-50159441` | `db7ad8b0…` |
+  | 6 | `20261020T231213Z-19ea5d2d` | `c0317166…` |
+  | 7 | `20261020T231220Z-a7110d20` | `0e4df826…` |
+
+  All eight full stages completed (CPU, no GPU). They took 485–564 s on
+  gpu5 and gpu6, and 2,446–2,599 s for parts 5–7, which shared gpu3
+  (64 cores). Each passed its validator on the smoke (fleet) and on the
+  full stage (locally). Assembled with `k8b assemble` (`a87dd2e`): 70
+  clips and 38,142 frames, each clip exactly once, every review image
+  present. Review `review/` under the run root, ID `13f69f53873866a2`,
+  `k8b-report.json` SHA256 `8230bf1a2239978dfb7912bd5f3ed8367f5c85d1ea9e75c42e8ab8fb3fdc3314`,
+  `review.html` SHA256 `a02a45a1a3a064fac69a95693699869650bdc2da3cd029b61d11685988b498f7`.
+  Every clip forms a single shot: no cut at ≥ 0.25 and no persistent
+  change of fit state inside a clip. 69 shots go to the user (the dev
+  clip is excluded). 44 are predicted court (723 s) and 25 non-court
+  (45 s, all medvedev_struff). These are predictions, not accuracy. The
+  page is served read-only on gpu1 loopback (port 17690) through a
+  tunnel, and was checked at 0 / 69 marks; the agent supplied no labels.
+- **Outcome (2026-10-21): adopted.** Scored with `k8b score`
+  (`76a7db2`) on the user's marks `k8b-marks-13f69f53873866a2.json`
+  (SHA256 `8f7f665c…3c0dcd`, 69/69 marked) against `k8b-report.json`
+  (`8230bf1a…`). Score `k8b-score.json` under the run root, SHA256
+  `a914eceed27daf30c46881ee336b4c5505695afa9093830c4db990d2d00b2675`.
+  The jobs, inputs and revision are in the table above (CPU only).
+
+  | Condition | Bar | Measured | Passes |
+  |---|---|---|---|
+  | Precision (44 predicted court shots) | ≥ 0.95 | 1.00 (44/44) | yes |
+  | Duration recall (723 s of true court) | ≥ 0.90 | 1.00 | yes |
+  | Registration median, 31,914 true court frames | ≤ 2 px | 0.77 px | yes |
+  | Registration 95th percentile | ≤ 6 px | 2.71 px | yes |
+
+  Every shot matches the user's class. alcaraz_hurkacz has 21 court
+  shots and djokovic_zverev 7. medvedev_struff has 16 court shots plus
+  21 close-ups, 2 crowd shots and 2 graphics, all predicted non-court.
+  The hypothesis holds: shade and the per-frame 2 px gate caused K8's
+  misses. The competing explanation (failure on other surfaces, or
+  spurious fits on texture) is not observed: the method held on hard
+  courts and a court-level camera. Scope, as stated in the rule: precision
+  rests on 44 shots (one-sided 95% lower bound 0.934, Clopper–Pearson).
+  Only 25 held-out shots are non-court, and no replay or picture-in-picture
+  appears. The clips were pre-cut by the old pipeline, so they test
+  in-clip cuts and fit-state splits only weakly. Registration is measured
+  with the centerline ruler (rule, item 3).
+  **What K4b's candidate (d) can use now:** per-frame court homographies
+  (ITF metres to 1080p pixels; null where there is no fit) and the court
+  outline for every frame of these 70 clips, including the dev clip
+  `djokovic_zverev/000`. They are in `clips/*.json` inside each part's
+  `published.tar` and in the assembled `review/k8b-report.json`
+  (`registration[n].homography`, n = the clip's decoded frame index).
+  Still to run with the same adopted method: the clips of
+  djokovic_federer and rublev_auger-aliassime (the two other matches K4b
+  draws from), and nadal_kyrgios's whole match (v1 of the court-shot
+  list).
+- Application to K4b's other two matches (2026-10-21, the adopted method
+  unchanged; a production run, not new evidence for the rule).
+  djokovic_federer (23 clips, 4K) and rublev_auger-aliassime (66 clips),
+  `<match>/videos/*.mp4`: 89 clips, 31,390 frames. Manifest
+  `k8b-2026-10-20/k4b-matches/manifest.json` (SHA256 `6c2be1a4…`). Eight
+  parts of whole clips (`3aca368`; CPU only, 16 processes each):
+  `20261021T092159Z-9b8ef899`, `…092204Z-1ee9605a`, `…092208Z-804e7d30`,
+  `…092315Z-1a7be77c` (part 3), `…092233Z-e808e648`, `…092238Z-019a88a8`,
+  `…092243Z-41be5f46`, `…092247Z-91b9e709`. The first submission of part 3
+  (`20261021T092213Z-112d5db2`) stopped during source upload: the
+  directory holds only a partial `source.tar`, with no spec, ready
+  record, owner or run. No worker could claim it and nothing executed,
+  so part 3 was submitted once more. The partial directory is left as
+  it is.
+  All eight full stages completed and passed the validator on the smoke
+  (fleet) and on the full stage (locally). Assembled at
+  `k4b-matches/registration/k8b-report.json` (SHA256
+  `eb7b34b9f8117f5926fb9e15d34bde9a209ce43213e19dc9d9641b38b552e3e0`):
+  89 clips, 92 shots, 31,390 frames. Frames that fit: djokovic_federer
+  13,710/13,901, rublev_auger-aliassime 10,264/17,489. The six
+  rublev_auger-aliassime clips K4b needs that do not fit (003, 006, 039,
+  054, 062, 063) were inspected visually. They are close-ups, a tunnel,
+  and a player in front of a wall or by the sideline: not court views,
+  so the absence of a fit is correct. 061 (fits on 34% of frames) is a low
+  courtside view. These shots are not marked (the method is adopted), so
+  this is an inspection, not evidence. Consumers use frames whose `fits`
+  flag is true; a non-null homography above 6 px (e.g. in 003) is kept
+  for inspection only.
+
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
   furthest) mislabels a player who stands still (2 of 9 broadcast windows).
@@ -7763,6 +8312,851 @@ invocation turns out to be needed.
   lines or hold none.
 - Budget: SAM 3.1 instances on the fleet (smoke ≤ 600 s, ≤ 45 min per
   stage); candidates on CPU; the user's marking about 15 minutes.
+- Marking-stage implementation (2026-10-16, `codex/k4b-players`; rule
+  above unchanged). Zero-based decimal frame indices and clip stems as in
+  K4. Enumerate all frames in all 159 scene clips in the five `MATCHES`
+  directories; exclude K4's ten broadcast clips in their entirety, including
+  the outro card. Take the smallest **global** hash prefix meeting all
+  three minima, without a content/court filter: 48 frames, 40 clips,
+  all five matches (alcaraz/hurkacz 3, medvedev/struff 7, rublev/auger 20,
+  djokovic/federer 7, djokovic/zverev 11). Selection is metadata-only;
+  `tools/datasets/k4b_inputs.py` preserves the complete inventory, exclusion
+  list, hashes, original clip identities and conversion commands.
+  Outputs: `Datasets/pointstream-data/tennis/k4b-2026-10-16/`.
+- This stage obtains review instances only through K4's
+  `Sam31SequenceSegmenter`, offline bidirectional,
+  both prompts, K4's limited-range 1080p 4:2:0 conversion and 960×540
+  quality-95 JPEG path. It does not estimate clip-level motion from sparse
+  review frames. Full temporal clip features for candidates (a), (b), (c),
+  (e), (a)+(c) and scoring await the marks; (d) and its combinations await
+  adoption of K8. No candidate or K4 amendment is applied at this stop.
+  Raw masks of both prompts survive; overlapping prompt masks (IoU ≥ .8)
+  share a review number, with the first mask as its scoring mask and all
+  source IDs recorded. Page has an original-image toggle, explicit visible
+  count, missing-instance flag, per-frame confirmation, browser storage and
+  JSON export/import bound to selection and instance-result SHA256s.
+- Marking-stage budget: one fleet job, smoke first 3 hash-ranked frames
+  through the same path ≤ 600 s, full 48 frames ≤ 2,700 s, validator ≤ 300 s,
+  total ceiling 3,600 s, compatible Ada/A6000 pool, shared execution (no
+  timing claim). GPU outputs and frame/mask identities must pass the module
+  validator for **both** smoke and full before the page is cited. The
+  correctness smoke gates production of the page, not scientific adoption.
+  Initial CPU preparation failed before conversion because an assumed
+  ffmpeg path was absent; its empty archive is retained. Preparation v2
+  uses the probed `/opt/local/bin/ffmpeg` and a separate `inputs-v2/`.
+  First fleet request `20261016T085803Z-4152bf09` (`32ec13c8`, not evidence)
+  was cancelled while pending after review found its validator expected
+  local scratch to survive publication. The replacement validator reads
+  `published.tar`, like K4's, and is tested after removing scratch.
+  Request `20261016T090018Z-00e9fcb6` (`bd38cad9`) was also cancelled
+  before allocation: its conservative 24,000 MiB reservation plus the
+  sharing margin no longer fitted the available GPUs. The same revision
+  and inputs were submitted at 16,000 MiB (recorded SAM smoke peak 11.3 GiB;
+  this stage has one frame per session), without increasing the budget.
+  Both cancelled requests' revisions were read from their `ready.json`.
+- **Rejected marking attempt** `20261016T090231Z-64b221c7`, gpu5 RTX 6000 Ada, shared;
+  revision **`bd38cad9bfdc4f082a3a39621a88083851dc500e`**, read from
+  `ready.json` (no selected changes; empty patch SHA256 `e3b0c442…b855`),
+  snapshot `87f25e2a…bacb4`, source identity `028dc031…da0`, spec
+  `be5462a7…b5ce4`. Exact spec `marking-job-16g.json`; selection
+  `inputs-v2/selection.json` SHA256 `5e79df8406407fbeeab6ef1ed2a990f39dad6393ecb1109d1fdbe65693fb4088`,
+  selected converted frames archive `3af558001d71fbd06eff3d366aafe853de9b1e84c8775ab96c30d30dd3bcf161`.
+  Environment: K4's `pointstream-20261009T214002Z.tar.gz`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`;
+  SAM checkpoint `0567debe…41cb6`. CPU preparation used ffmpeg
+  `n7.1.1-56-gc2184b65d2` at `/opt/local/bin/ffmpeg`; exact preparation
+  sources, checksums, command and tool versions are retained in
+  `preparation-source.tar` and `preparation-provenance.json`. There are
+  no native video encodes in this marking stage.
+- This attempt's one-frame sessions produced **zero instances on all 48
+  frames** (peak 6.17 GiB). The smoke and local full validators passed
+  integrity checks but failed to detect this functional failure; the
+  subsequent output review caught it. It is not a usable marking page
+  or scientific evidence. The archived output and the read-only root
+  `index.html` are retained as failed artifacts, not offered for marking.
+  SAM's pinned `sam3/model_builder.py:1185` enables masklet confirmation;
+  `sam3_multiplex_base.py:251` requires three consecutive detections.
+  One-frame video sessions cannot satisfy that gate.
+- Correction, with sampling and decision rule unchanged: `inputs-v3/`
+  reuses v2's frozen inventory and selection. Around each selected frame,
+  eight **real consecutive** frames are decoded (start `frame - 4`,
+  clamped to the clip's valid span), through exactly K4's conversion and
+  JPEG path. Both prompts propagate on those short sequences with the
+  original confirmation settings; only the originally selected frame's
+  instances enter the page. All-empty smoke/full outputs now fail
+  `nonempty_model_output`, and real contiguous context is checked. This
+  supplies masks for manual marking, not the later full-clip candidate
+  features. A regression covers published-archive validation after scratch
+  removal, mask tampering, and rejection of all-empty model output.
+  Replacement budget ≤ 3,000 s (smoke ≤ 600, full ≤ 2,100, validator ≤ 300),
+  keeping total GPU execution within the original 3,600 s ceiling.
+- Corrected job `20261016T091155Z-7b19ac9a`: revision
+  **`dc4d4fdd8421cb9dd53178cf39e922e99e7802ef`**, from `ready.json`,
+  no selected patch (empty patch SHA256 `e3b0c442…b855`), snapshot
+  `7b9a32f7…3d38a`, source `836c4a3f…7f40b`, spec `fa2ec81f…8b5a0`.
+  Inputs `inputs-v3/selection.json` SHA256
+  `7d1a22f62ac03c514b5f47dbc8c4c3864d9e6b92d461ab90175d2b520c6c23ef`,
+  context archive `3bf99973505a7fb77c68d7155fd56b584c62e3751489f87a0a161a2b46f269e6`;
+  original frame IDs, ranks and source-video SHA256s checked equal to v2.
+  Exact spec `marking-context-job.json`; preparation source/checksums and
+  command `preparation-v3-source.tar`, `preparation-v3-provenance.json`.
+  Environment, checkpoint, GPU compatibility and original sampling rule
+  unchanged. Page to mark is the corrected `review/index.html`, not the
+  failed attempt's root `index.html`.
+- **Marking page ready; stopped for user marks.** Corrected job completed
+  on gpu5 RTX 6000 Ada (shared). Both the 3-frame smoke and **48-frame
+  full output** pass the module validator locally, all 16 checks. Full
+  `published.tar` SHA256
+  `2dc9acb6541224f9f72af8ceb9c781308c3e62d19fcb819515736e4b7da261ee`;
+  `instances.json` `89b78156e85b62741326a5ff2dc8a020ac58934f5dba0ad33a158c887b40f731`;
+  self-contained page `2a05d0eaf6a0a480e2caddd5d7714df72376c2f1606847506f22bfbfd49f0223`.
+  334 numbered instance-frames across 48 review frames (none empty);
+  all 48 original review JPEGs byte-identical to the frozen one-frame
+  attempt's originals. Peak allocated GPU memory 10.70 GiB, within the
+  16,000 MiB declaration. This is resource/marking validation, not evidence
+  that a player-identification rule reaches 0.95; no timing claim.
+  Durable page:
+  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k4b-2026-10-16/review/index.html`.
+  Companion `instances.json` and `provenance.json` identify the raw masks
+  in the job's full `published.tar`. Local validation receipts are
+  `context-smoke-local-validation.json` and `context-full-local-validation.json`.
+  Browser QA on synthetic frames covered two/one/none, confirmation and
+  persistence; the real complete page was checked at 0/48 confirmations.
+  No real frames were marked by the agent. Ruff, mypy and the full test
+  suite pass (560 passed, 19 skipped). Monitoring paused after completion.
+  Next: freeze exact candidate implementations before reading the returned
+  labels, compute their clip features and score by the unchanged rule.
+  No rule is selected or scored yet; (d) waits for adopted K8 homography.
+  Any winner is reported for review of K4's amendment before applying it
+  to K4's windows, as required by this task.
+- Labels returned (2026-10-16): immutable
+  `marks-05f513052625.json`, SHA256
+  `05f5130526254316c078003a3a66398c97aa33027ac56519e0f267429eba50ba`.
+  Only schema, page identities and completeness were inspected initially:
+  correct review/selection identities, 48 entries, 48 confirmed. Individual
+  selections, visibility, missing flags and notes were not inspected before
+  freezing `experiments/tennis/k4b_rules.py` and its focused tests.
+- Candidate implementation freeze (before opening selections). All use
+  tracks present on ≥ half the clip frames and choose at most two.
+  (a) K4's sum of consecutive centroid distances / median mask height.
+  (b) sum of consecutive absolute horizontal displacements in SAM pixels,
+  zero weight for the last second. (c) one-pixel dilation of the racket
+  mask at 960×540 for contact; require contact on **more than half all clip
+  frames**, rank by contact fraction and abstain for unqualified tracks.
+  (e) sum of mean displacements of jointly confident (≥ .5) YOLO11x-pose
+  joints on consecutive fitted frames / median mask height (K4's native
+  whole-frame pose, image size 1280). (a)+(c) ranks first by contact on
+  most frames, then (a), filling remaining picks with (a). No other
+  combinations without (d) are prescribed. Track ties use canonical
+  prompt/native-ID order; candidate ties follow (a), (b), (c), (e), (a)+(c),
+  putting the simpler alternatives first. Duplicate prompt tracks are
+  matched one-to-one when IoU ≥ .8 on > half their co-visible frames,
+  covering ≥ half the shorter track; prefer the person mask.
+  Scoring uses injective IoU ≥ .5 matches for two marked players, only
+  the marked one for one-player frames, and no visible picked masks on
+  zero-player frames. A visible player without a labelled instance cannot
+  earn an IoU match and is never silently excluded. The 0.95 bar, sample,
+  metric, candidate list and deferral of (d) are unchanged. These functions
+  do not load annotations to select any constants.
+  A cheap proposal oracle is run first; it bounds **only the review's
+  existing masks**, not re-segmentation of the full clips, which could
+  return a previously missing instance. Full-clip feature extraction
+  covers 30,825 frames across the same 40 clips; it is not approximated
+  by the review's eight-frame contexts.
+- Label audit after the freeze (`466860d`): 37 two-player, 10 one-player,
+  one zero-player frame; no missing-instance flags or notes. All 48 pass
+  schema, ID, confirmation and visibility checks. The proposal oracle is
+  48/48, scoped to selecting the review's exact proposals. Audit artifact
+  `label-audit-05f513052625.json` preserves this check and its per-frame rows.
+- Full-clip feature stage preflight (before GPU runs). Hypothesis: contact
+  plus motion improves over centroid travel when a player stands still;
+  competing explanations are SAM racket misses, camera motion, pose misses
+  and track fragmentation. Frozen formulas and human marks are not tuned.
+  Every one of the 30,825 native source frames is converted once by K4's
+  ffmpeg path and used for SAM person/player/racket and YOLO11x-pose.
+  The input manifest excludes human selections. Pose runs before SAM and
+  releases its model; SAM's official CPU video/state offload is enabled
+  for long clips. The smoke compares all class/frame unions to native
+  non-offloaded inference at IoU ≥ .999; offload is part of config provenance.
+  Defaults for existing SAM callers remain unchanged. Full-clip native
+  SAM IDs are retained; cross-prompt aliases and scalar features are CPU
+  operations, with raw SAM masks, raw pose detections and scoring-frame
+  masks saved so the validator can recompute them independently.
+  Pilot axis is clip length, not quality or thresholds: minimum
+  `medvedev_struff/007` (64 frames), median `djokovic_zverev/004` (407),
+  maximum `djokovic_zverev/000` (3,975). Pilot promotion requires valid
+  full artifacts and evidence the longest clip fits one ≤45-minute stage
+  and the remaining clips fit the phase budget. No clip is truncated for
+  the final score. Each job has a ≤600 s prefix smoke, substantive
+  validator, SHA256-identified original video/weights/environment/manifest,
+  ≤2,700 s full stage, 300 s validation reserve, and a deadline.
+  GPU compatibility: the already-verified A6000/Ada pool, all six hosts
+  eligible by model filter, 12,500 MiB allocator limit (recorded SAM peak
+  11.3 GiB; CPU-offload pilot must substantiate long-clip use), shared
+  execution with no timing claims, 40 GiB scratch. Phase ceiling 8 GPU-hours
+  and 10 h wall, including pilots/smokes; record actual usage and reserve
+  remaining job allowances before subsequent submissions. Failures or an
+  unattainable stage/phase bound stop promotion, without enlarging the budget.
+  Complete focused tests cover offload flags/provenance, the five rules,
+  strict majority, gaps and tail discount, joint visibility, duplicate
+  prompts, target-mask export, injective IoU matching and annotation identity.
+- Feature pilot inputs: `features-v1/manifest.json`, SHA256
+  `4db6651100efc5c450525b154d7f82e9b1b53de47e6699f02aaf2a25739a48b5`;
+  40 immutable original-video identities (3,269,018,181 bytes total),
+  hard-linked under `features-v1/inputs/`. Exact per-clip specs are alongside
+  the manifest. Environment/weights reuse K4's pinned artifacts. Deadline
+  `2026-10-17T01:00:00Z`, inside the 10 h wall ceiling from preparation.
+  Submitted first, before any long-clip promotion:
+  `20261016T151219Z-f30bd26d` (`medvedev_struff/007`, full allowance 300 s,
+  total 1,200 s), and `20261016T151309Z-259d7651` (`djokovic_zverev/004`,
+  full 446 s, total 1,346 s). Both `ready.json` records identify
+  **`ebd0024d79c591fd70bcf868210fe609152ef498`**, snapshot
+  `2d882a9c…257e8`, source `dc7ca0b3…b1235`, empty selected patch
+  `e3b0c442…b855`; specs `342753ea…53840` and `98efd543…157a7`.
+  The then-untracked scorer was explicitly excluded from both snapshots;
+  it is not a dependency of feature extraction. No feature result is cited
+  until its full output passes the module validator locally.
+- Both first pilots failed in the **native comparison** before CPU-offload
+  propagation or full promotion. Same diagnosed cause on gpu3 and gpu2:
+  a 324 MiB activation allocation exceeded the 12,500 MiB per-process cap
+  (11.34 GiB already allocated plus 619 MiB reserved; 12.21 GiB allowed),
+  while physical memory remained available. These are failed configuration
+  smokes, not evidence about any candidate. Saved logs and artifacts remain
+  in the original jobs. Correction: 16,000 MiB allocator cap and 4,096 MiB
+  sharing margin, giving a 20,096 MiB admission reservation versus the old
+  20,692 MiB; more actual allocator headroom with physical sharing headroom
+  still reserved. All input pixels, models, parity threshold, candidate
+  formulas, stage timeouts, deadline and 8 GPU-hour phase ceiling unchanged.
+  Revised specs are preserved separately in `features-v1/specs-16g.tar`.
+  Re-run the short pilot alone first, then promote only from valid evidence.
+- The 16,000 MiB short attempt `20261016T152206Z-e078b538` also failed
+  during the native comparison (gpu2, before full promotion). Its
+  `ready.json` revision is `04808b97db8b1137c0490f109a7695d95081af1a`,
+  snapshot `54e80bea…96346`, spec `edd289ea…ba6fc`, empty selected patch.
+  A 1.27 GiB detection-head activation exceeded the allocator cap; physical
+  memory was available. No candidate outcome was produced. Revised-spec
+  archive SHA256 `7773a5949ddbfba8ccbbeb9c4927fa9412840f3da24e1dd434c9307dd88d6701`.
+- Revised memory approach, before another smoke: upstream
+  `model_builder.py:1191` batches **16** frames for grounding; those
+  detector activations caused both cap failures. Explicitly use grounding
+  batches of eight, with video/state offload and the same 16,000 MiB cap.
+  This changes batching, not temporal sampling: every native source frame
+  still runs through the same detector/tracker and fixed candidate formulas.
+  The official attribute is asserted effective and included in config
+  provenance; default callers retain the original batch. The production
+  smoke is still all first 48 frames. Its parity control uses the first 12
+  real frames, default batch 16 (effective 12) versus configured batch 8,
+  comparing every class/frame union at the unchanged IoU ≥ .999 threshold.
+  Both parity mask sets and the comparison are preserved even if it fails.
+  No memory cap, time allowance, deadline, phase budget, decision rule or
+  human mark is changed by this revision.
+- Before admission, cancelled `20261016T153440Z-1b94df2e` (terminal
+  cancelled; no stage ran). Snapshot revision `2d2c5fda4203e8dfa499a404fcaa1d000cb4527b`;
+  the queued request was also rejected at gpu5 admission for insufficient
+  shared-memory headroom. Source inspection found that the pinned top-level
+  multiplex `init_state` supports video offload but not tracker-state offload.
+  The compatibility adapter had silently filtered the latter flag. Corrected
+  it to reject unsupported true requests explicitly (regression tested), and
+  request **video offload only**, retaining GPU tracker state. The underlying
+  tracker's separate CPU-state option is not exposed by the top-level API;
+  no adapter is added to change it. Therefore the longest-clip pilot must
+  establish state-memory feasibility before promotion. Earlier references to
+  video/state offload describe the requested, not effective, placement.
+  Corrected specs preserved as `features-v1/specs-video-only.tar`, SHA256
+  `3df90280f2308b23b8ed305a7f2794f4253cc1d643a5d1efa4a13cd681141c6a`.
+  Grounding batch eight, parity IoU ≥ .999, all-frame sampling and all budget
+  ceilings remain unchanged. Cancellation consumes no GPU-stage allowance.
+- Corrected short pilot `20261016T154053Z-91a66242`, gpu3 RTX A6000:
+  actual `ready.json` revision `84ec4a3edfa98c0f5778e523e9f0f8b1ef7fe9a3`,
+  snapshot `3a1880ea…367e4`, source `97832f14…6c37e`, spec
+  `3ee88af7…0459b`, empty selected patch. The immutable spec's generic
+  “CPU offload” basis is unchanged from the batch-eight archive; the code
+  and recorded effective configuration explicitly request video only.
+  No full output or score is cited yet. Local checks: ruff and configured
+  mypy pass; pytest 572 passed, 19 skipped (rerun with process-inspection
+  permission after the sandbox denied `ps` in an existing contention test).
+- The corrected smoke failed its parity gate, before production/full:
+  minimum class/frame union IoU **0.9265116431832364**, below .999
+  (123 native reference instances on 12 frames). Both RLE sets and
+  `parity.json` survive in the job's `smoke/partial.tar`; the failure is
+  not a candidate score. Batch eight is rejected. Restore **native batch
+  16**, retain video-only CPU offload and the identical parity gate.
+  Reserve 24,000 MiB allocator memory plus the unchanged 4,096 MiB sharing
+  margin, admitting only GPUs with sufficient headroom; this targets the
+  diagnosed native detector activation peak. Timeouts, deadlines, the
+  8 GPU-hour phase ceiling, formulas and human marks remain unchanged.
+  Specs saved separately as `features-v1/specs-native16.tar`, SHA256
+  `a5d55d0b9e56b3765bce7fee955cb0641981d1a49827a6ebbfa43b3a01631264`.
+  Re-run short alone; no medium/long/full-corpus promotion from failures.
+- Native-batch pilot `20261016T154524Z-9d4d461c` (gpu3 A6000), actual
+  ready revision `796933bb91d3828075eb2cfe9a1e0875ced2606b`, passed the
+  12-frame offload parity comparison exactly (minimum union IoU **1.0**,
+  123 reference instances); failed in the subsequent 48-frame production
+  path, before full. A 1.27 GiB request hit the 23.44 GiB allocator cap
+  with 20.35 GiB allocated and 3.07 GiB reserved but unused. Preserve its
+  partial masks/parity and logs. Test the diagnosed fragmentation remedy
+  `PYTORCH_ALLOC_CONF=expandable_segments:True`, with the same native
+  batch, 24,000 MiB cap, input pixels, model, gate and all time ceilings.
+  Record actual expandable CUDA segments and require them in validation;
+  a successful short full and length pilots remain prerequisites to scaling.
+- Expandable-allocator short pilot `20261016T154944Z-4081668c`, gpu3
+  A6000, actual ready revision `3494a8b1c888c6daeb90c0cabd748fa3fa655754`:
+  smoke and full complete. Full **locally validated**, all 17 checks true:
+  64/64 frames, original source coverage, raw SHA256s, pinned CUDA SAM and
+  pose, effective native batch, actual expandable segments, recomputed
+  features and exact target masks. Full peak allocation 22.1047 GiB.
+  Smoke parity min IoU 1.0. Smoke execution 154.750 s, full 120.802 s;
+  GPU-claim interval 325.555 s. Shared timing is not a performance claim.
+  Local receipt SHA256 `bb3cc62943dd42e6a761920d48b239e46358cc056d86afee0f20b95eca5f1be8`.
+  These are configuration/full-coverage checks, not a candidate table.
+- Length promotion is median only: 407 frames of `djokovic_zverev/004`.
+  The initial 446 s full allowance has inadequate margin given the short
+  stage's fixed loading cost plus per-frame propagation. Use a separately
+  preserved median spec with full 900 s, smoke 600 s, validator 300 s,
+  total 1,800 s; the 8 GPU-hour phase ceiling and deadline do not change.
+  Do not submit the maximum or remaining corpus until median evidence
+  establishes feasible stage and phase bounds. Prior failed smoke stage
+  time is 390.260 s; charge complete GPU-claim intervals in the phase ledger.
+- Median `20261016T155820Z-40b6c9d9`, gpu3 A6000, actual ready revision
+  `f58bb8f1890aba12bffa6a7c2bfb8d079f8195be`: smoke passes, full fails
+  at frame 160/407 of the first prompt, after 164.207 s. A 1.27 GiB
+  request exceeds the 23.44 GiB cap with 21.92 GiB allocated and 344.50 MiB
+  unused reserve. This demonstrates growing state pressure; no full result
+  or candidate score is cited.
+- Next memory-only correction uses the pinned lower-level tracker's
+  **existing** `init_state(offload_state_to_cpu=True)` option. The top-level
+  adapter still rejects unsupported requests; a separate narrow worker
+  adapter forwards the native tracker arguments, verifies each returned
+  state's `storage_device == cpu` and flag, and records counts and API
+  version. No compute kernels, masks, frame sampling or tracking rules are
+  altered. Effective config SHA256 includes this adapter. The existing
+  native-versus-offloaded IoU ≥ .999 smoke now also gates tracker-state
+  placement; native and offloaded mask archives are retained. Reset the
+  initialization counters before production, so parity alone cannot pass
+  the production-placement check. Tests verify forwarding, actual storage,
+  unsupported API rejection and silently ignored requests. Repeat the
+  bounded median pilot directly: its 48-frame correctness smoke precedes
+  the 407-frame full stage, with identical 600/900/300 s limits and phase
+  ceiling. No further corpus promotion until it and the scale bound pass.
+  Source inspection also finds top-level `cached_frame_outputs` retains
+  per-frame **boolean** masks on GPU independently of tracker-state storage.
+  The same placement adapter stores this cache's already-computed masks on
+  CPU after the native cache filter, preserving the original GPU output
+  dictionary used by propagation/postprocessing. It changes storage only;
+  no masks are recomputed. Record and validate every cached mask's CPU
+  placement; adapter version 2 identifies both routes in the effective
+  config. Regression test confirms the native output is unmodified and the
+  cache copy moves to CPU. The native-mask parity gate covers this route too.
+  gpu3 has 384 GiB CPU RAM available at inspection, for long-clip video/state
+  storage; the maximum-length pilot must substantiate actual feasibility.
+  Parity is strengthened before this promotion: require identical native
+  class/track-ID sets and per-instance IoU ≥ .999, as well as class-union
+  IoU ≥ .999. The validator recomputes these from both saved RLE archives;
+  a regression covers an identity swap with identical union masks. This
+  protects motion-based candidates from an offload route that might preserve
+  only aggregate foreground. Decision/scoring thresholds remain unchanged.
+  Median CPU-state spec SHA256
+  `e02b425dfe10a660966f21941b21236b2ddb8955232bdde1eb7053279f3c34cd`.
+- CPU-state attempt `20261016T161135Z-a8b70442`, gpu3 A6000, actual
+  ready revision `58e9b2215203fbacffc1c8d5f59ea8bb04d3f18c`, failed the
+  smoke before parity/full: upstream `video_tracking_multiplex._merge`
+  casts the new CUDA tensor's dtype but omits its CPU destination device.
+  The neighboring `_append` similarly concatenates without a device transfer.
+  Add two guarded, in-memory compatibility replacements: transfer the new
+  tensor to the destination tensor's device before assignment/concatenation.
+  `_merge` retains its original dtype cast; `_append` retains native dtype
+  promotion. No package/environment file is modified. The exact original
+  expressions must occur once or installation fails. Save both unified
+  diffs, original/revised source SHA256s and patch checksums before GPU
+  propagation; include them in effective configuration identity and full
+  validation. CPU-only regression reproduces mixed-device rejection and
+  checks repaired values, dtype semantics and destination. The native
+  mask/track parity gate remains mandatory, followed by the bounded median
+  full stage. No candidate formula, score threshold or phase budget changes.
+- Corrected CPU-state pilot `20261016T161909Z-5e827d31`, gpu3 A6000,
+  actual ready revision `079bf6186f283ca1088817bee0016633481c8a1b`:
+  smoke passes fleet validation and full median processing starts. Native
+  versus CPU-storage parity: both minimum union and per-instance IoU 1.0,
+  identical track-ID sets, 132 native instances. Smoke production records
+  3/3 initialized tracker states and 1,125/1,125 cached masks on CPU.
+  Compatibility-patch set SHA256
+  `1692bdc34ece9f1dc48ec7b6b9354f97c69ba6f282c3648477651a0588f41019`.
+  Native package archive remains immutable. No full result is cited before
+  local validation. Local full suite after this correction: 575 passed,
+  19 skipped; ruff and configured mypy pass.
+- Preparing maximum-length confirmation only after local median validation:
+  the shared A6000's observed propagation pace does not establish a ≤45 min
+  all-prompt bound for 3,975 frames. Prefer the verified Ada class for that
+  pilot, checking all hosts and claims again. Add an operational (not scoring)
+  smoke scale gate: separately time imports, actual production preparation,
+  SAM loading, all-prompt propagation, and CPU export. Exclude the native
+  parity control; scale per-frame work to the full clip with 25% margin,
+  retain measured fixed load/import costs, add 60 s fixed reserve. Save the
+  estimate and its components; validator recomputes it and blocks promotion
+  if it exceeds an explicitly supplied full allowance (at most 2,700 s).
+  This changes neither masks nor the frozen identification rule. A passing
+  estimate only permits the bounded maximum pilot, whose complete output
+  still needs local validation and a feasible remaining-phase budget before
+  any corpus run. All phase ceilings and deadlines remain unchanged.
+- Median full `20261016T161909Z-5e827d31` is now **locally validated**:
+  all 22 checks true, 407/407 native frames, recomputed scalar features and
+  scoring masks, actual CPU states/cache and checksummed compatibility
+  receipts. Full peak 21.5914 GiB; full execution 638.061 s; complete GPU
+  claim 850.956 s. Receipt SHA256
+  `f15fea18e714481826c327208e30bb011a92fbcfa0f9ddfda48cecf6cc597bc4`.
+  Total completed phase claims 2,306.386 s; no other phase job is running.
+  Full corpus and maximum remain unsubmitted at this point.
+- Interruption: after median completion, automatic approval review could
+  not run further read-only inspections because its account usage limit
+  was exhausted. No command rejected by that review executed. After the
+  stated reset time, the authorized fleet watch succeeded, confirmed all
+  jobs terminal, and local validation resumed. The idle monitor was paused
+  and the completion event acknowledged; no job was replayed. Absolute
+  deadline `2026-10-17T01:00:00Z` and 8 GPU-hour ceiling remain unchanged.
+- Maximum pilot specification file `features-v1/maximum-ada.json`, file
+  SHA256 `8089be02891006995b91f314dbdc70df91672028b835c874e0b57b8f5a15fe51`:
+  original 600/2,700/300 s stage/validation limits and 3,600 s reservation,
+  Ada filter only, every host checked. gpu5's two Ada GPUs had 28,521 MiB
+  free each and no PointStream claims; gpu5/gpu6 had 504/439 GiB available
+  CPU RAM. GPU time reservation plus completed usage is 5,906.386 s,
+  below the unchanged 28,800 s ceiling. The smoke forecast separates YOLO
+  loading and the first eight-frame prediction batch from subsequent
+  steady work, so one-time warmup is not multiplied by clip length. A
+  regression checks this distinction and rejects a prefix without any
+  post-warmup pose batch. The 25% margin and 60 s reserve stay fixed.
+- Maximum pilot `20261016T200442Z-17bfb750` (recorded at takeover; the
+  fleet's own record): gpu5 RTX 6000 Ada, shared, revision `6754141`
+  from `ready.json`. Its 48-frame smoke passed every check but its own
+  scale gate: forecast 5,348 s for the 3,975-frame clip against the
+  2,700 s allowance (SAM 43.8 s for 48 frames with three prompts, peak
+  21.46 GiB), so it was not promoted. Not evidence. Phase claims so far
+  about 2,460 s of the 8 GPU-hour ceiling.
+- Takeover (2026-10-20). Codex stopped here; a Claude session continues
+  on `claude/k4b-players` (from `codex/k4b-players`, `origin/main`
+  merged). Everything above stays as recorded.
+- **Amendment 1 (user, 2026-10-20): features over a bounded window per
+  marked frame, not the whole clip.** Written before any windowed run.
+  - *Window.* 240 frames, K4's window length (K4 measured the first 240
+    frames of each clip, and amendment 2 applies the chosen rule to those
+    windows). One window per marked frame `f` of a clip of `n` frames:
+    start `min(max(f − 120, 0), max(n − 240, 0))`, length `min(240, n)`.
+    48 windows, 10,444 frames instead of 30,825; the 10 clips shorter
+    than 240 frames are taken whole. Placement reads only the marked
+    frame's index, chosen by hash before marking, and the clip's length,
+    so it is content-blind and the same for every candidate. Every frame
+    of the window is processed; nothing is subsampled.
+  - *Why the candidates measure the same thing.* Each candidate is a fixed
+    function of the frames it is given: presence on at least half of
+    them, motion and contact summed over them. Amendment 2 will give it
+    K4's 240-frame windows, so scoring it on 240-frame windows measures
+    the rule as it will be applied. The whole-clip features (up to 3,975
+    frames) measured an input the rule never sees in K4. Candidate (b)'s
+    "last second discounted" becomes the window's last second, the only
+    end a rule sees on a K4 window; its frozen formula already zeroes the
+    last second of its input, so `k4b_rules` is unchanged. The frozen
+    formulas (`RULES`, revision `466860d`), the duplicate-prompt merge,
+    the injective IoU ≥ 0.5 scoring, the 0.95 bar, the marks and the
+    deferral of (d) and its combinations to K8 are unchanged.
+  - *SAM runs natively.* 240 frames is what K4 ran with no offload (three
+    prompts, offline bidirectional; peaks 23.9–25.9 GiB under a 32,000
+    MiB declaration on A6000). This path therefore drops video and
+    tracker-state offload, the tracker-state adapter, the two in-memory
+    replacements of upstream SAM functions, the grounding-batch control
+    and the scale forecast (they stay in git history, `6754141`). SAM
+    runs at its defaults (grounding batch 16), as in K4; the
+    expandable-segment allocator setting stays (it changes storage, not
+    results). YOLO11x-pose (1280) runs on every window frame first and is
+    released before SAM loads, as before.
+  - *Jobs.* One run per part; SAM and YOLO load once per part; each
+    window's masks, poses and features are published as soon as it ends,
+    so a stop keeps the finished windows. The smoke is the part's first
+    window whole (240 frames), so it measures the real peak; the full
+    stage runs every window of the part. Pilot: three 240-frame windows,
+    one per source format (`djokovic_zverev/004@381`, 2160p60;
+    `djokovic_federer/069@305`, 2160p50; `alcaraz_hurkacz/006@387`,
+    1080p25). Its windows count in the score (same code and
+    specification apart from the selection, as in K4). Promotion: the
+    pilot's full output validates locally, its peak is within the
+    declaration, and its rate puts each remaining part under 2,700 s.
+    Then the other 45 windows in parts sized from that rate, in parallel
+    on compatible GPUs.
+  - *Validator.* Window placement recomputed from the manifest; every
+    window frame masked and posed; SAM pinned, flash attention, default
+    configuration (no offload, batch 16); person masks found; features and
+    target masks recomputed from the saved masks and poses; frozen rules.
+  - *Budget.* About 10,444 frames at the maximum smoke's 0.9 s per frame:
+    2.6 GPU-hours of SAM, plus loading and pose. Ceiling 4 GPU-hours and
+    6 h wall for this stage, within the 8 GPU-hour phase ceiling with
+    what is spent. Shared mode, Ada and A6000 only, 32,000 MiB declared
+    with a 4,096 MiB margin; every stage ≤ 45 min.
+  - *Pilot* `20261020T184104Z-0af937d9`: gpu6 RTX 6000 Ada, shared
+    (`timing_contaminated`), revision `fa7a4fb` from `ready.json`; specs
+    and plan in `features-v2/` (`pilot.json` `ae7d56e7…`, `windows.json`
+    `dc0e83ed…`), manifest `features-v1/manifest.json` (`4db66511…`). The
+    smoke (one whole window) passed the fleet validator; the full stage
+    (3 windows, 720 frames) passes all 18 checks locally. SAM native
+    (flash attention, batch 16, default configuration); peak 27.3 GiB
+    against the 31.25 GiB declaration; SAM 95–107 s per window and pose
+    plus JPEGs about 21 s (shared timings, not evidence). Promoted: six
+    parts of 7–8 windows (1,564–1,660 frames, about 16 min each at the
+    pilot's rate), split longest-first by `tools/datasets/k4b_feature_inputs.py`.
+  - *Parts*, all at `fa7a4fb` (`ready.json`). Part 3
+    `20261020T185418Z-4dfa86ac` (8 windows, 1,612 frames, peak 27.8 GiB)
+    and part 6 `20261020T185438Z-129dc1a3` (7 windows, 1,660 frames, peak
+    27.3 GiB) completed on gpu6 RTX 6000 Ada; both full stages pass all
+    18 checks locally. Parts 1, 2, 4 and 5 (`…185405Z-f78cf558`,
+    `…185411Z-28392fd4`, `…185424Z-4a3e41d9`, `…185430Z-46b3f755`) were
+    admitted one after another on gpu2 (A6000) and each ran out of
+    physical memory in its smoke: another user's process grew to 34.4
+    GiB after admission, leaving about 13 GiB (our allocator cap was 31.25
+    GiB). Contention, not evidence. Resubmitted with the same
+    specification apart from the host pool (gpu2 left out while that
+    process holds 35 GB on both its GPUs): `part{1,2,4,5}-retry.json`,
+    jobs `20261020T214345Z-b3c719eb`, `…214351Z-9fe1e191`,
+    `…214357Z-3cf9965f`, `…214404Z-c4775c13` at `0477bfb` (code as
+    `fa7a4fb`; only this entry changed). All four completed (gpu5 and
+    gpu6, RTX 6000 Ada); each full stage passes all 18 checks locally.
+    Every one of the 48 windows (10,444 frames) is now covered by a
+    locally validated full stage; peaks 27.3–27.8 GiB.
+- **Outcome (2026-10-21), amendment 1, the user's 48 marks** (37
+  two-player, 10 one-player, 1 no-player frames). Jobs: pilot
+  `20261020T184104Z-0af937d9` and parts 3, 6 at `fa7a4fb`; parts 1, 2,
+  4, 5 (retries) at `0477bfb`, all from `ready.json`. Report
+  `features-v2/score-2026-10-20/k4b-report.json` (`2a9a26fd…`), index
+  `index-full.json` (`10e61aa5…`), local validation receipts beside
+  them; marks `05f51305…`, review `instances.json` `89b78156…` and masks
+  `published.tar` `2dc9acb6…` as recorded above.
+
+  | candidate | correct / 48 | share |
+  |---|---:|---:|
+  | (a) motion in body heights | 30 | 0.625 |
+  | (b) horizontal motion, window's last second discounted | 39 | 0.813 |
+  | (c) racket contact on most frames | 32 | 0.667 |
+  | (e) keypoint motion | 26 | 0.542 |
+  | (a)+(c) | 42 | **0.875** |
+  | (d), (c)+(d), (a)+(d) | pending K8 | |
+
+  The window features' proposal oracle is 48/48: on every marked frame
+  the window's SAM masks contain each marked player (IoU ≥ 0.5), so the
+  misses are the rules' choices, not missing masks.
+- Decision (by the rule): **no candidate reaches 0.95**; nothing is
+  adopted and K4 is not amended. The table goes to the user. (d) and its
+  combinations are pending: K8's v0 court list covers `nadal_kyrgios`
+  only, and none of the marked frames come from it, so they wait for
+  K8's homographies on the five marked matches.
+- Reading (not a test; the rules stay frozen). (a)+(c)'s six misses: on
+  five two-player frames it picks one marked player (IoU 0.97–0.98) and
+  another person as the second, or on one frame two other people; the
+  sixth is the one frame with no player visible, which any rule that picks
+  tracks fails. (b) is right on 2 of those 6 and (a)+(c) on 5 of (b)'s
+  9 misses (44 of 48 frames have one of the two right). Misses
+  concentrate on rublev_auger-aliassime and djokovic_federer. The
+  pattern, a second person mistaken for the far player, is what the
+  court outline (d) is meant to remove, and the no-player frame is a
+  shot K8 should drop. Hypothesis "(d) or (c)+(d) wins" stays open.
+- Budget: 7,209 s of stage execution (2.0 GPU-hours: pilot, six parts
+  and the four failed smokes, from each stage's `execution.json`), inside
+  the 4-hour ceiling; about 4.5 h wall, most of it queueing for a GPU
+  with 36 GB free.
+- (d) and its combinations, defined before any (d) score is computed
+  (2026-10-21; K8b adopted, homographies for the five matches:
+  `k8b-2026-10-20/review/k8b-report.json` `8230bf1a…3314` for
+  alcaraz_hurkacz, djokovic_zverev and medvedev_struff,
+  `k8b-2026-10-20/k4b-matches/registration/k8b-report.json` `eb7b34b9…e3e0`
+  for djokovic_federer and rublev_auger-aliassime; model metres, x across
+  the court 0–10.97, y along it 0–23.77, to 1080p pixels). Frozen as
+  `k4b_court.RULES_D` (version 1), on the same windows, canonical tracks
+  and SAM masks as the other candidates, CPU only:
+  - A track-frame is *registered* when K8's entry for that clip frame
+    (window start + t) has `fits` true (error ≤ 6 px); other frames are
+    not read. The *foot point* is the mask's lowest row at its centroid's
+    x, at 1080p; it maps through the inverse homography to the court
+    plane. *Inside*: x in [−1, 11.97] m and y in [−4, 27.77] m (the doubles
+    court, 1 m beyond each sideline and 4 m behind each baseline; ITF's
+    minimum run-off is 3.66 m at the sides and 6.40 m at the ends, where
+    line judges and ball kids stand). A point behind the camera is outside.
+  - Feature d: the share of the track's registered frames that are
+    inside (0 with no registered frame); *inside on most*: d > 0.5.
+  - (d): eligible tracks (presence ≥ 0.5, as every candidate) inside on
+    most, by d, ties by track key (as v1); fewer than two qualify, fewer
+    picks, as (c). (c)+(d): eligible tracks by inside on most, then racket
+    on most, then d, then the racket share c. (a)+(d): by inside on most,
+    then (a).
+  - Scored as before (injective IoU ≥ 0.5 on the marked frame; bar 0.95;
+    ties to the simpler rule: a, b, c, d, e, then (a)+(c), (c)+(d), (a)+(d)).
+    Two tables: all 48 marked frames, and the marked frames K8 registers
+    (court views, as this entry's data rule asks once K8 is adopted).
+    The court-view table decides; the all-frames table is reported beside
+    it.
+- Outcome with (d) (`experiments.tennis.k4b_court`, CPU, local; the
+  validated features of the seven jobs above; `features-v2/court-score-2026-10-21/`
+  `k4b-court-report.json` `d593c879…`). K8 registers 37 of the 48 marked frames as
+  court views (36 with two players, 1 with one); the 11 others are the
+  no-player frame, five medvedev_struff one-player close-ups and five
+  rublev_auger-aliassime shots (003, 006, 054, 062 with one player, 063
+  with two).
+
+  | candidate | court views (37) | all frames (48) |
+  |---|---:|---:|
+  | (a) | 23 (0.622) | 30 (0.625) |
+  | (b) | 31 (0.838) | 39 (0.813) |
+  | (c) | 25 (0.676) | 32 (0.667) |
+  | (d) inside the court | 34 (0.919) | 36 (0.750) |
+  | (e) | 19 (0.514) | 26 (0.542) |
+  | (a)+(c) | 33 (0.892) | 42 (0.875) |
+  | **(c)+(d)** | **36 (0.973)** | 45 (0.938) |
+  | (a)+(d) | 35 (0.946) | 42 (0.875) |
+
+  The v1 candidates' all-frames counts reproduce the table above exactly.
+- Decision (by the rule): **(c)+(d) is adopted** (0.973 ≥ 0.95 on court
+  views; no other candidate reaches the bar). The hypothesis held. Its
+  application to K4's windows is amendment 2 (below, not yet run).
+- Reading. (c)+(d)'s one court-view miss, rublev_auger-aliassime/002@422:
+  only one track's foot point falls inside on most registered frames, so
+  the second pick is another person. (d) alone misses it and two windows
+  where a marked player stands inside on 34–42% of frames
+  (rublev_auger-aliassime/040@363, 048@481); the racket rule recovers those
+  two. On all 48 frames (c)+(d) misses three: that frame, the no-player
+  frame and rublev_auger-aliassime/063@337, a two-player shot K8 does not
+  register, so no track is inside and the racket fills the picks. Both
+  are shots K8 sends to the pixel coder, where no identification is
+  needed. Scope: 37 court-view frames from five matches; the margins
+  (1 m, 4 m) were fixed from ITF's run-off before scoring and not tuned.
+- Amendment 2 (to K4, not yet run): K4's broadcast windows need K4b's
+  window features (SAM 3.1 with the person prompt; K4 kept no masks) and
+  K8b's registration, which covers all 10 of K4's broadcast clips
+  (medvedev_struff/042, the outro card, and rublev_auger-aliassime/038
+  register on no frame, rublev_auger-aliassime/052 on 32 of 240); K4's
+  players, bits and fit are then recomputed with (c)+(d)'s players, with
+  amendment 1's and the first definition's numbers kept. TrackNet has no
+  court registration (other courts, K8 not run there), so (d) cannot be
+  applied to it as defined.
+  Folded into K6 (2026-10-21; the user left the order to the session):
+  after K4b.2 and K4b.3 every K6 gate condition passes whatever K4's two
+  mislabelled windows hold, so a standalone re-run decides nothing; K6
+  includes K4's 9 broadcast windows and reports K4's numbers with the
+  adopted players there (PLAN K4b, K6).
+
+### 2026-10-21 — K4b.2: pose on the far player (crop-size sweep)
+- Question (PLAN K4b, item 2). K4's (b) failed on the far player alone:
+  YOLO11x-pose on the whole frame at 1280 px fits players under 10% of
+  the frame height on 0–50% of frames and those 15% and taller on
+  97–100%. Does a top-down estimate on each player's crop, enlarged, fit
+  the far player, and at which crop size?
+- Players: identified by hand, not by a rule, so this does not wait for
+  K4b.1's decision or K8. K4b.1's 48 windows (240 frames per marked
+  frame, 10,444 frames, the five broadcast matches) already carry SAM 3.1
+  masks and canonical tracks (`publish/<window>/sam-masks.rle`,
+  `features.json`, from the seven locally validated jobs). On each
+  window's marked frame, each player the user marked takes the canonical
+  track whose mask matches it (IoU ≥ 0.5, injective; 48/48 match, K4b.1's
+  proposal oracle), and that track is the player on every frame of the
+  window (its person mask where both prompts have one, as K4b.1). The
+  no-player frame's window has no players. *Far player*: in a window with
+  two marked players, the one with the smaller median mask height; the
+  other is the *near player*.
+- Settings (YOLO11x-pose, ultralytics 8.4.6, confidence 0.25, as K4).
+  *Whole frame*: K4's setting (1280 px), read from K4b.1's published
+  detections; no GPU. *Crop ×s*, s = 1, 2, 4: the player's mask box at
+  1920×1080, grown by 20% of its height on every side and clipped to the
+  frame, resized by s (bicubic; s = 1 untouched), its long side capped at
+  1280 px (K4's input; only near players reach it), padded to a multiple
+  of 32 and run at that size, so ultralytics does not rescale it.
+  Keypoints map back to the frame.
+- Measures, per setting and player-frame, as K4 (`k4.pose_analysis`'s
+  definitions): *fitted* when a detection has ≥ 0.5 of its box inside the
+  mask's box (H1's matching; for a crop, only that crop's detections);
+  *inside*: share of confident keypoints (≥ 0.5) inside the mask dilated
+  by 8 px. Reported for all player-frames, the far and near players, and
+  K4's height bins (6–10%, 10–15%, 15–25%, ≥ 25% of the frame height;
+  under 6% beside them). *Synthetic far player* (fit says nothing of
+  accuracy): every 8th frame of each near player whose median height is
+  ≥ 15% of the frame and whose ×1 crop is fitted, reduced (area filter)
+  to the same window's far player's median height, then run through each
+  crop setting; OKS (COCO sigmas, the native mask's area) against the
+  near player's own ×1 keypoints confident ≥ 0.5; unfitted counts as
+  OKS 0. *Latency*: GPU milliseconds per crop at each setting (batch 16,
+  synchronized), the whole frame beside it. Raw keypoints are saved (K4b.3
+  reads them).
+- Decision rule (fixed before any run). A crop setting *passes* when, on
+  the 48 windows' hand-identified players: (1) fitted ≥ 0.90 of all
+  player-frames and ≥ 0.90 of far-player frames; (2) median inside ≥ 0.9
+  for both; (3) ≥ 0.90 of synthetic far players at OKS ≥ 0.5. The
+  smallest passing s is chosen (cheapest). If one passes, PLAN K4b.2 is
+  done: K4's (b) is re-read with it (here on hand-identified players; on
+  K4's windows once K4b.1's identification is adopted), and K4b.3 runs on
+  its keypoints. If none passes, stage 2 runs DWPose (`Models/DWPose`,
+  `dw-ll_ucoco_384.onnx`, body 17 of COCO-WholeBody) on the same crops
+  under the same three conditions, after an environment audit and a
+  first-run smoke of its execution provider; then super-resolution of the
+  crop; fine-tuning only if all fail.
+- Hypothesis: whole frame fits about 0.5 of far-player frames and ≥ 0.97
+  of near ones (K4); ×2 lifts the far player to ≥ 0.9 and ×4 adds nothing;
+  near players are unchanged; inside stays 1.0; synthetic OKS ≥ 0.5 on
+  most samples at ×2 and ×4, fewer at ×1.
+- Competing explanations: (1) the far player is missed for occlusion or
+  motion blur, not size: fit would not rise with s, and the height bins
+  show it. (2) Enlarged crops give confident wrong keypoints: inside and
+  the synthetic OKS check it; the reduction does not reproduce broadcast
+  compression of a real far player, so OKS is an upper bound there. (3)
+  A SAM track drifts to another person within the window: review images
+  (the marked frame and one content-blind frame per window, every
+  setting's skeleton on the crop) check it. (4) The crop's margin admits
+  another person: the matching to the player's own mask decides, as K4.
+- Budget: no SAM; one window conversion per window (K4b.1's, 83 s for
+  all), YOLO on about 20,000 player crops per setting and the synthetic
+  samples. Smoke: the part's first window (≤ 600 s). Pilot: K4b.1's three
+  pilot windows, ≤ 45 min. Full: the other 45 windows in two parts of
+  ≤ 45 min. Ada or A6000 (YOLO11x-pose's table rows; Ada asserted in
+  K4b.1's jobs), shared, 12 GB declared. Ceiling 1 GPU-hour and 4 h wall.
+- Jobs (all RTX 6000 Ada, gpu6, shared; environment
+  `pointstream-20261009T214002Z`, ultralytics 8.4.6, YOLO11x-pose
+  `013c4354…85f8`; inputs `pointstream-data/tennis/k4b-2026-10-16/pose-v1/`
+  `inputs.tar` `3ae0106e…5e81`, built by `tools/datasets/k4b_pose_inputs.py`
+  from K4b.1's seven validated jobs and the marks `05f51305…`). Pilot
+  `20261021T090639Z-c2c32f37` (`1e9dc6b`; 3 windows, 720 frames; 177 s;
+  `published.tar` `8bba8170…`); part 1 `20261021T091816Z-6a1e0668` (`c5ac3b5`;
+  22 windows, 4,832 frames; 1,326 s; `552f3109…`); part 2
+  `20261021T091821Z-1b022f25` (`c5ac3b5`; 23 windows, 4,892 frames; 1,245 s;
+  `32e79fdd…`). `c5ac3b5` differs from `1e9dc6b` only in the validator's OKS
+  comparison (within 1e-9: an ulp differs between the hosts' and macOS's
+  numpy) and the `report` command. Peak 8.75 GiB of 12 GB. Every full output
+  passes the validator's 9 checks locally (`pose-v1/report-2026-10-21/local-validation/`):
+  each setting's fit and inside, and every synthetic OKS, recomputed from the
+  published masks and keypoints. Both parts saw GPU contention from other
+  users (action continue), so the latencies are indicative only.
+- Outcome (`k4b_pose report`, 48 windows, 19,062 hand-identified
+  player-frames: 8,860 far, 8,860 near, 1,342 in one-player windows;
+  `k4b2-report.json` `bd87835b…91fb`):
+
+  | setting | fitted, all | fitted, far | under 6% (113) | 6–10% (3,257) | 10–15% (3,609) | ≥ 15% (12,083) | synthetic OKS ≥ 0.5 (1,109) | median OKS |
+  |---|---:|---:|---:|---:|---:|---:|---:|---:|
+  | whole frame (K4) | 0.812 | 0.595 | 0.009 | 0.036 | 0.916 | 0.997 | | |
+  | crop ×1 | **0.997** | **0.993** | 0.584 | 0.995 | 1.000 | 1.000 | 0.991 | 0.967 |
+  | crop ×2 | 1.000 | 1.000 | 1.000 | 0.999 | 1.000 | 1.000 | 0.994 | 0.982 |
+  | crop ×4 | 0.996 | 0.999 | 0.991 | 0.997 | 0.997 | 0.995 | 0.994 | 0.974 |
+
+  Median keypoints inside the mask: 1.0 in every setting and group.
+  Latency (shared, contended GPU): 21.6 ms per crop averaged over the three
+  sizes, 39.6 ms per whole frame (median).
+- Decision (by the rule): **crop ×1 passes** (all three sizes pass; the
+  smallest is chosen). The far player is fitted: K4's (b) re-read on
+  hand-identified players goes from 0.812 (whole frame) to 0.997 with
+  median inside 1.0, above the 0.90 bar, so K6's gate condition (b) passes
+  here; on K4's own windows it is re-read once K4b.1's identification is
+  adopted. DWPose, super-resolution and fine-tuning are not needed.
+  K4b.3 (keypoint rate) runs on the ×1 keypoints.
+- Reading. The hypothesis held except that ×1 was already enough: the
+  failure was the whole-frame input (1920 px shown to YOLO at 1280, so a
+  60–100 px far player became 40–70 px), not the player's size in the
+  source. ×2 adds the 113 player-frames under 6% of the height (0.58 →
+  1.0). Competing explanation (1) does not hold (fit rises from 0.04 to
+  0.99 with the crop alone in the 6–10% bin). (2), confident wrong
+  keypoints: the synthetic far player agrees with its own native keypoints
+  (median OKS 0.97–0.98), and on the far player 99.6% of ×1 detections are
+  at least half the mask's height and 96.6% have ≥ 12 confident keypoints
+  (whole frame 95.0%). The fit measure itself is loose on large players:
+  enlarged crops of near players and of close-up players (one-player
+  windows) get partial detections more often (near at ×4: 33% of detections
+  under 0.7 of the mask's height, whole frame 8%; one-player windows at ×1
+  25% against 0.5%), while K4's matching still counts them fitted; a
+  review image (`rublev_auger-aliassime/002@422`, t = 175, ×4) shows a
+  small skeleton inside the player's box. So the estimator to carry
+  forward is ×1 crops for players under 15% of the height and either
+  setting above (whole frame is as good there); K4b.3 and K6 read the
+  keypoints, not this fit count. (3), track drift, and (4), others in the
+  crop: the review images checked (the pilot's 12 and four from
+  rublev_auger-aliassime) show the marked player each time, including with
+  an umpire inside the crop. Scope: 48 broadcast windows from five
+  matches; the synthetic check reduces near players without broadcast
+  compression of a real far player, so its OKS is an upper bound.
+- Budget: 2,905 s of stage execution (0.81 GPU-hours with the three
+  smokes), inside the 1 GPU-hour ceiling; about 2 h wall from the rule.
+
+### 2026-10-21 — K4b.3: keypoint rate against keypoint error
+- Question (PLAN K4b, item 3). What does it cost to send the players'
+  keypoints at each precision, and how far do the decoded keypoints move?
+  K4 measured one point (9.4 kbps for two players, first differences at
+  0.25 px, 22% of SVT-AV1's player bits at CRF 62) and kept no keypoints;
+  K6 needs the curve to choose its operating point.
+- Data: K4b.2's ×1 crop keypoints (the chosen setting), the 48 windows'
+  hand-identified players, from the three locally validated K4b.2 stages
+  (19,062 player-frames; 8,860 far, 8,860 near). CPU only, local.
+- Codes (per player track, YOLO's 17 COCO keypoints, x and y): quantization
+  step q = 1, 2, 4, 8 px at 1080p; prediction *previous* (first
+  differences, K4's) or *constant velocity* (2·previous decoded −
+  the one before; previous on a track's second frame); keypoint rate
+  every frame, every 2nd or every 4th frame, the skipped frames decoded by
+  linear interpolation between sent frames (held after the last). Closed
+  loop: residuals are taken against decoded values. A frame where the
+  player is not fitted ends the track; the next fitted frame starts a new
+  one, its values sent absolutely (log2 of 1920/q and 1080/q bits). Per
+  keypoint and sent frame, one visibility symbol (confidence ≥ 0.5). Rate:
+  empirical entropy of the residual symbols and of the visibility symbols,
+  each pooled over all windows per code (adaptive coding's optimistic
+  bound, as K4), plus the absolute starts, in kbps for two players at each
+  window's frame rate.
+- Error, against the uncoded keypoints, over every fitted frame and the
+  keypoints confident there: displacement in px at 1080p (median, p95) and
+  in shares of the player's box height; OKS against the uncoded keypoints
+  (COCO sigmas, the mask's area), for far and near players.
+- Decision rule (fixed before computing). The code handed to K6 is the
+  lowest-rate code whose median OKS against the uncoded keypoints is
+  ≥ 0.95 for both far and near players (the coding error then sits well
+  inside COCO's tolerance at the player's own scale); its rate is reported
+  against K4's SVT-AV1 player bits on broadcast (41.9 kbps at CRF 62,
+  155 kbps at CRF 48; K4's windows, not these, so a reference, not a
+  test). The whole curve goes to K6, which judges the error on the
+  rendering. K4's gate (c) is not re-read here: its bits come from other
+  windows.
+- Hypothesis: q = 2 px is free in error (YOLO's keypoints come at 1–2 px
+  precision, K4) and costs a third less than 1 px; constant velocity saves
+  little (K4: 27–67% of differences already zero) and loses on jitter;
+  every 2nd frame passes at ≥ 50 fps; the chosen code costs 3–6 kbps for
+  two players.
+- Competing explanation: YOLO's frame-to-frame jitter, not motion, sets
+  both the rate and the error floor of interpolation; the error at q = 1
+  every frame against the uncoded keypoints, and the share of zero
+  residuals, show it.
+- Budget: CPU minutes, no fleet.
+- Outcome (`experiments.tennis.k4b_rate`, local, 13 s; the three
+  K4b.2 stages above, each locally validated; 24 codes;
+  `pose-v1/rate-2026-10-21/k4b3-report.json` `89276994…`). kbps for two
+  players (1.82 players per frame on average); OKS median and 5th
+  percentile against the uncoded keypoints; displacement in px at 1080p:
+
+  | code | kbps | far OKS (p05) | near OKS (p05) | px median / p95 |
+  |---|---:|---:|---:|---:|
+  | q 1, previous, every frame (K4's kind) | 15.0 | 0.998 (0.995) | 1.000 (0.999) | 0.40 / 0.60 |
+  | q 2, velocity, every frame | 11.7 | 0.991 | 0.999 | 0.80 / 1.20 |
+  | q 4, velocity, every frame | 9.5 | 0.963 (0.925) | 0.994 (0.986) | 1.59 / 2.40 |
+  | q 2, velocity, every 2nd | 6.6 | 0.989 (0.913) | 0.998 (0.940) | 0.90 / 4.39 |
+  | **q 4, velocity, every 4th** | **3.3** | 0.958 (0.813) | 0.988 (0.858) | 1.79 / 8.07 |
+  | q 8, velocity, every 4th | 2.6 | 0.891 | 0.974 | 3.03 / 8.56 |
+
+  18 of the 24 codes pass the bar; every q = 8 code fails on the far
+  player. Constant velocity saves 2–8% over first differences at equal
+  error. Absolute starts are 1–5% of the bits.
+- Decision (by the rule): **q = 4 px, constant velocity, every 4th frame,
+  3.3 kbps for two players** goes to K6 as the cheapest code within the
+  bar, with the whole curve. Against K4's SVT-AV1 player bits on broadcast
+  (other windows, a reference) it is 7.8% at CRF 62 and 2.1% at CRF 48;
+  K4's 22% came from 9.4 kbps.
+- Reading. The bar holds the median, not the tail: skipping frames
+  costs the fast limbs. At every 4th frame the p95 error is 8 px (near
+  player 9.5 px; players in one-player windows, mostly close-ups, 46 px),
+  against 2.4 px for the same quantization every frame (9.5 kbps). So the
+  frame rate is the lever whose error K6 must judge on the rendering:
+  swinging arms are what a viewer watches. Hypothesis: q = 2 is not free
+  but cheap in error (0.8 px median, 22% fewer bits than q = 1); velocity
+  saves little, as expected; every 2nd frame passes; the chosen code is at
+  the low end of 3–6 kbps. Competing explanation: jitter sets the floor
+  at q = 1 (18% zero residuals, 4.2 bits per value; the crops give YOLO
+  finer keypoints than K4's whole frames, 27–67% zeros there), so
+  keypoints at full precision cost more here (15.0 kbps) than K4's 9.4.
+  Scope: YOLO11x-pose's 17 keypoints on ×1 crops of hand-identified
+  players in 48 broadcast windows; the rate is a pooled-entropy bound
+  without a real entropy coder.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
@@ -7810,3 +9204,517 @@ invocation turns out to be needed.
   perceptual gain needs the visual check beside it; and this is the
   oracle (fitted on the window, bits free), not the generic network G,
   which was fitted on DCVC-UF decodes only.
+
+### 2026-10-20 — K5b (1): the ball renderer's oracle (a drawn ball, billed)
+- Question (PLAN K5b 1): K5's oracle pasted the source's own ball pixels
+  and billed only the trajectory's entropy. Does a ball the decoder
+  *draws* keep the win when every byte of what it needs is sent? Two
+  renderers, both from the coded positions and a per-window appearance
+  sent once: (a) a **sharp disk** (anti-aliased, radius r, colour c);
+  (b) a **streak**, the same disk averaged over the exposure along the
+  coded velocity (alpha = the fraction of the exposure each pixel spends
+  covered, so a fast ball fades as it lengthens, as a camera blurs it).
+  Velocity is the central difference of the coded positions (one-sided
+  at a run's ends, zero for a lone frame), so it costs nothing beyond
+  the positions and one frame of decoder delay. Still an oracle: the
+  positions are TrackNet's labels (a tracker comes in K5b 2).
+- What is sent (`src/pointstream/ball.py`, a `BALL` segment of the
+  PointStream container, its tag and length bytes billed): per window,
+  an on/off bit; when on, colour (3 × 8 bits), radius index (4 bits,
+  1.5–6 px), exposure index (3 bits, 0–1 of a frame interval; 0 is the
+  disk), phase index (3 bits, the streak's centre at −½…+½ of the
+  frame's displacement from the labelled point), the Exp-Golomb order of
+  the residuals; visibility as alternating run lengths (Exp-Golomb);
+  each run's first position absolute (11 + 10 bits at 1280×720), then
+  constant-velocity residuals (signed Exp-Golomb, K5's predictor). Rate
+  = the segment's bytes per window, per window (K5 pooled an entropy; a
+  real code bills more). Decoding the payload returns the positions and
+  parameters exactly (a test).
+- The encoder's fit (analysis by synthesis, as an encoder may: it holds
+  the source and its own decode): per window and coder point, a grid
+  over radius × exposure × phase (the disk: radius only), the colour in
+  closed form (least squares of the composite against the source, then
+  rounded to 8 bits), choosing the combination that most lowers the
+  window's whole-frame squared error; off when none lowers it (then the
+  segment is one byte of payload).
+- Windows, coders, judges and comparison: K5's, unchanged (8 TrackNet
+  windows, SVT-AV1 preset 4 at CRF 35–62, DCVC-UF HT-L at QP 0–63 on the
+  A6000; ball-region PSNR within 8 px of the label, frame PSNR; BD-rate
+  against the pooled envelope and each coder's own). Added: a
+  *streak-region PSNR* (within 8 px of the segment the label's own
+  velocity sweeps in one frame), reported, since K5's region misses most
+  of a 20–40 px streak. Recall is not measured here: YOLO26x was not a
+  valid judge (46% on the source); the tracker of K5b (2) becomes the
+  judge. K5's pixel oracle is recomputed in the same job, so each
+  renderer's distance to the bound is measured on the same decodes.
+- Decision rule (`k5b.DECISION`, fixed before any run). A renderer is
+  adopted when, over a coder underneath (SVT-AV1 or DCVC-UF), it beats
+  the pooled envelope on ball-region PSNR on ≥ 6 of the 8 windows, each
+  by BD-rate ≤ −25% or better at every rate (K5's bar, now with real
+  bytes and a drawn ball), **and** its frame-PSNR BD-rate against its own
+  coder's envelope is ≤ +1% on ≥ 6 of 8 (the ball mode does not hide a
+  cost elsewhere in the frame). If both renderers pass, both stay
+  available and the user's side-by-side preference picks the codec's
+  default; a preferred renderer that fails the rule is not the default.
+  If neither passes, the ball mode needs a richer appearance (a per-window
+  sprite of the source's ball, its own oracle) and the reading says which
+  half failed.
+- Hypothesis: the streak keeps most of K5's gain (pooled BD on DCVC-UF
+  −45% to −55%, K5's oracle −57%) and may beat the pixel oracle on fast
+  windows, where the oracle pastes only 4 px of a long streak; the disk
+  passes on DCVC-UF but by less (about −35%); both pass on SVT-AV1 by less
+  than on DCVC-UF (K5: −38%). Frame PSNR moves by under 0.3%. The
+  billed rate stays under 0.5 kbps per window (K5's entropy: 0.23).
+- Competing explanations: (1) TrackNet's integer labels and their
+  convention (which point of a streak is marked) misplace the drawn ball,
+  costing the disk on fast frames; the fitted phase shows it. (2) The
+  fitted colour mixes ball and court (a 3–5 px ball in 4:2:0), giving a
+  dull ball that scores well and looks wrong; the side by side shows it.
+  (3) At high rates the decode keeps the ball, and a second drawn ball
+  doubles it; the per-point fit can switch the mode off, and the curves
+  show where it does. (4) The streak wins on PSNR only because PSNR
+  rewards blur; the user's preference is the check for display.
+- Side by side (for the user's preference, K5b): per window, at DCVC-UF
+  QP 21 (about 40 kbps, where the decode loses the ball) and QP 42, a
+  2 × 2 clip at equal rate (source, the pixel coder, + disk, + streak;
+  the ball mode adds under 1% of the rate), as a ball-following crop
+  enlarged 3×, and a full-frame 2 × 2 at QP 21.
+- Budget: DCVC-UF on the A6000 (K5's table), SVT-AV1 on 16 threads, no
+  detectors. Smoke: one window, 48 frames, ≤ 600 s. Pilot: part 1, 4
+  windows (K5's pilot windows first), ≤ 45 min; part 2, the other 4,
+  ≤ 45 min, run only if part 1 leaves the rule open. Ceiling 2
+  GPU-hours and 6 h wall.
+- Failed attempt (infrastructure). `20261020T184724Z-58d02fd1`
+  (`14d3892`): the smoke stopped writing the full-frame clip (the label
+  was drawn on a read-only frame); fixed in `523cee1`.
+- Job: part 1 `20261020T185255Z-43bcc85e` (`523cee1`; RTX A6000, gpu3,
+  shared with another user's process; game3/Clip3, game7/Clip2,
+  game10/Clip10, game3/Clip6; full stage 1,213 s; `published.tar`
+  `6520ae01…b095`; inputs, environment, checkpoints and windows as K5;
+  SVT-AV1 4.2.0, dav1d 1.5.4 from the environment). Validator passed on
+  the smoke and, run locally, on the full stage (12 checks). Every DCVC-UF
+  point decoded deterministically on its first attempt. About 0.4
+  GPU-hours with the smoke.
+- Report (`k5b report` on part 1; `k5b-report.json` `a4a556a0…dfc8`). Means
+  over the 4 windows (kbps; ball-region PSNR dB; decode → pixel oracle /
+  disk / streak):
+
+  | Point | kbps | ball PSNR | streak-region PSNR | frame PSNR |
+  |---|---:|---|---|---:|
+  | DCVC-UF QP 0 | 12.95 | 18.73 → 22.94 / 19.32 / 19.70 | 20.98 → 24.10 / 21.48 / 21.88 | 29.42 |
+  | DCVC-UF QP 21 | 36.60 | 19.89 → 24.11 / 20.28 / 20.63 | 22.19 → 25.36 / 22.53 / 22.90 | 33.74 |
+  | DCVC-UF QP 42 | 117.7 | 23.89 → 27.56 / 23.89 / 23.92 | 26.01 → 28.64 / 26.01 / 26.05 | 37.19 |
+  | SVT-AV1 CRF 62 | 73.94 | 20.21 → 24.41 / 20.56 / 20.87 | 22.54 → 25.73 / 22.86 / 23.18 | 35.31 |
+  | SVT-AV1 CRF 55 | 176.0 | 23.62 → 27.74 / 23.67 / 23.77 | 25.91 → 28.97 / 25.95 / 26.04 | 38.35 |
+
+  The ball segment costs 0.22–0.33 kbps when on (one byte of payload,
+  0.003 kbps, when off); the fit turns it off at DCVC-UF QP ≥ 42 and
+  SVT-AV1 CRF ≤ 48 on most windows. BD-rate on ball-region PSNR against
+  the pooled envelope, per window (game10/Clip10, game3/Clip3,
+  game3/Clip6, game7/Clip2): K5's pixel oracle on DCVC-UF −71.9%, −55.8%,
+  −58.3%, −51.0% (K5: −57.3% median, reproduced); the disk on DCVC-UF
+  +7.3%, +6.7%, +4.5%, +0.7%; the streak on DCVC-UF +3.2%, +0.8%, +0.8%,
+  −3.9%; on SVT-AV1 the disk +21% to +30%, the streak +19% to +28%.
+  Frame PSNR against each coder's own envelope: +0.0% to +0.8% (within
+  the +1% bar). Fitted streaks: radius 1.5–4 px, exposure 0.43–1.0 of a
+  frame, phase −1/6, colours dull (e.g. 182/182/172 on a white-ball
+  window).
+- Decision (by the rule): **no renderer is adopted.** Both fail the ball
+  half on all 4 windows with either coder (the rule needs 6 of 8, so 4
+  failures decide it); part 2 was not run. The frame half passes.
+- Reading. The hypothesis fails: a per-window appearance keeps 10–20% of
+  the pixel oracle's gain on the ball region (DCVC-UF QP 21: +0.4 dB for
+  the disk, +0.7 dB for the streak, +4.2 dB for the oracle), not most of
+  it. The review strips show why: fast balls are long, bright streaks;
+  the drawn streak has the right direction but stays faint, and the
+  fitted colour is dull (competing explanation 2: the least-squares fit
+  hedges a ball it cannot place exactly). Competing explanation 3 holds
+  in part: the decode keeps a faint ghost above the ball at QP 21, which
+  the drawn ball does not cover.
+  A diagnostic (`experiments/tennis/k5b_diagnostic.py`; not evidence:
+  source JPEGs read by OpenCV, a temporal
+  median as the true background, TrackNet's camera being still; 8
+  windows, CPU; `k5b-diagnostic.json` `be8237c1…f5d5`) separates the causes. Ball-region PSNR over the median,
+  per window: the per-window renderer recovers 15–60% of what pasting the
+  source within 4 px recovers (+0.4 to +2.4 dB against +2.4 to +6.7 dB);
+  the same streak shifted per frame by its best offset within 4 px (a
+  position oracle; median offset 1.4–3.2 px from the label) adds about
+  1.5 dB; a free setting and colour per frame at the label (an appearance
+  oracle) adds about the same; each alone stays 0.1–2.3 dB under the
+  paste. A sensor-saturation gain (alpha = min(1, g × coverage)) is
+  chosen on one window only. So the drawn ball needs both: positions
+  refined by the encoder to where the ball is (TrackNet's integer labels
+  are 2–3 px off the best fit) and an appearance sent per frame (about
+  35 bits, 1 kbps), each an encoder decision that is billed.
+- Next (K5b 1b, its own oracle, proposed): per-frame position refinement
+  (±4 px by fit, residuals billed through the same Exp-Golomb code) and a
+  per-frame appearance (setting and colour, predicted from the previous
+  frame, billed), on the same decodes and judges, with K5b 1's rule.
+- Rendering preference (side by side sent to the user 2026-10-20: three
+  windows' ball-following clips and one full frame at DCVC-UF QP 21):
+  pending.
+
+### 2026-10-20 — K5b (2): an encoder-side ball tracker (audit and rule)
+- Question (PLAN K5b 2, ball stage): a tracker that finds the ball on the
+  source for the ball mode's encoder, and that also judges the codecs'
+  outputs (K5: YOLO26x finds 46% of the source's balls, SAM 3.1's text
+  prompt 56%; neither is a valid judge).
+- Audit (2026-10-20). **No TrackNet-family weights are in `Models`**
+  (`YOLO/` holds COCO detectors and trackers' configs only). Candidates:
+  - *WASB* (Tarashima et al., BMVC 2023; `nttcom/WASB-SBDT`, **MIT**):
+    an HRNet heatmap tracker with tennis weights (`wasb_tennis_best.pth.tar`,
+    Google Drive) and the TrackNetV2, ResTrackNetV2, MonoTrack, BallSeg and
+    DeepBall baselines retrained by the same code. Its tennis config
+    trains on TrackNet **games 1–7** and tests on games 8–10, so five of
+    K5's eight windows (games 2, 3, 6, 7) are in its training set; only
+    game8/Clip6 and game10/Clip10 are held out. Plain PyTorch (tested on
+    Python 3.8, CUDA 11.3); no conflict expected with the pointstream
+    environment's torch, checked in the smoke.
+  - *RacketVision's BallTrack* (`OrcustD/RacketVision`, **MIT**):
+    TrackNetV3 with a median background frame, checkpoints on Hugging Face
+    (`linfeng302/RacketVision-Models`; the README names a badminton
+    example, a tennis checkpoint is unconfirmed); torch 2.1.2 and
+    mmengine.
+  - *TrackNetV3* (`qaz812345/TrackNetV3`, **MIT**): shuttlecock only.
+  - TrackNet v1 (the dataset's own model, no licence stated): not used.
+- Labels on disk. TrackNet: 95 clips, 10 games, 1280×720, every frame
+  (no licence stated; already used by K4–K5). RacketVision tennis
+  (**MIT**): 431 rallies at 1920×1080, 21,544 labelled frames (20,066
+  visible; about every 11th frame), split 350 / 38 / 43 with no match in
+  two splits.
+- Held-out labels for the decision: TrackNet's games of K5's windows
+  (2, 3, 6, 7, 8, 10) and RacketVision tennis test. Training uses TrackNet
+  games 1, 4, 5, 9 (44 clips) and RacketVision tennis train.
+- Judge: *detection rate*, the share of visible labelled frames with the
+  tracker's position within 10 px at 720p (15 px at 1080p; 5 px
+  reported), plus false detections per frame without a visible ball.
+- Downloads (user, 2026-10-20: "yes, all", after asking to download every
+  candidate and pick the best by a cheap test). `Models/WASB`: the seven
+  tennis checkpoints of WASB's model zoo (WASB 6.1 MB, TrackNetV2 45 MB,
+  ResTrackNetV2 5.1 MB, MonoTrack 11.7 MB, BallSeg 50.9 MB, DeepBall
+  0.3 MB, DeepBall-Large 4.1 MB) and the code at `923462c` as a tar;
+  `Models/RacketVision`: `balltrack_best.pth` (46.6 MB; sha256 as
+  published), a tensors-only copy loadable with `weights_only=True`, and
+  the code at `c44af2a`. sha256 in each `MANIFEST.json`. BallTrack's
+  checkpoint holds mmengine log objects that Hugging Face flags as unsafe
+  pickles; it was read once with an unpickler that allows only tensors,
+  numpy arrays and an inert stub for the log objects. It is one model for
+  the three sports, trained on RacketVision only (epoch 47), so all of
+  TrackNet is held out for it.
+- Stage A, the comparison (no training; the user's cheap test). Nine
+  settings, each with its authors' inference: WASB (online tracker,
+  windows of 3 frames at steps 3 and 1), TrackNetV2, ResTrackNetV2,
+  MonoTrack (no heatmap weighting, per-frame peak), BallSeg and the two
+  DeepBalls (step 1), as WASB's README evaluates them; BallTrack with the
+  clip's median frame and its 4 frames ending at the scored frame (its
+  training alignment; its `inference.py` uses the 4 before it). Every
+  frame at 1280×720 (RacketVision's 1080p area-downscaled, labels
+  scaled). Sets: TrackNet games 8–10 (held out for all nine), RacketVision
+  tennis test (held out for all nine), TrackNet games 1–7 (held out for
+  BallTrack only; in-training for the zoo, reported), and TrackNet games
+  8–10 through SVT-AV1 preset 8 at CRF 62 (K5's collapse point; a
+  robustness probe). TrackNet visibility 3 (occluded) is excluded from
+  both positives and negatives.
+- Rule for the choice (fixed before the run): the candidate with the
+  highest mean of its detection rates on the two sets held out for all
+  (TrackNet 8–10, RacketVision test) is chosen; within 0.02 of it, the one
+  with the higher rate on the SVT-AV1 probe, then fewer false detections.
+  Adoption without training: if the chosen candidate holds out K5's games
+  (BallTrack does) and meets stage B's bar on them (≥ 0.90 on TrackNet's
+  K5 games, ≤ 0.05 false detections per ball-less frame, ≥ 0.80 on
+  RacketVision test), it is adopted as tracker and judge with no training.
+  Otherwise stage B trains the chosen architecture with K5's games held
+  out (a WASB-zoo winner is retrained, since its weights saw four of K5's
+  games).
+- Stage B (only after A): smoke, a pilot of ≤ 45 min (one setting of the
+  learning rate and schedule, the held-out rate tracked per epoch), then
+  training in parts of ≤ 45 min that each save their checkpoint.
+  Decision rule: the tracker is adopted when its detection rate on the
+  held-out TrackNet games is ≥ 0.90 with ≤ 0.05 false detections per
+  frame without a ball, and ≥ 0.80 on RacketVision tennis test; otherwise
+  the negative is reported and the ball mode keeps labelled positions in
+  its claims (scoped to labelled data).
+- Hypothesis: WASB leads the zoo on TrackNet 8–10 (its paper: F1 about
+  0.96) but falls to about 0.6–0.8 on RacketVision's broadcast footage;
+  BallTrack, trained on RacketVision's broadcast tennis, leads there and
+  reaches about 0.85 on TrackNet, so the choice is between these two, and
+  the codec probe separates them (a model with a background frame should
+  hold the ball better on a smoothed court).
+- Competing explanation: TrackNet's games 8–10 share courts and players
+  with games 1–7, so stage A overstates generalization; RacketVision
+  test, from other matches, is the check.
+- Budget: stage A ≤ 1.5 GPU-hours in parts of ≤ 45 min (one per set);
+  stage B ≤ 6 GPU-hours.
+- Failed attempts (infrastructure, no results): `20261020T191508Z-70549af5`,
+  `…191515Z-e36c7b87`, `…191521Z-b6a436f6` (`c913734`: the packed
+  environment has neither hydra nor omegaconf; WASB's postprocessors are
+  now loaded by path and its configs read as an attribute dict);
+  `20261020T214419Z-17cc0776`, `…214426Z-1d7002a9`, `…214432Z-fb693dbc`
+  (`d5260a7`: `--limit 0` arrived as the string "0", so one full stage
+  scored no clip and its validator passed on an empty list; cancelled or
+  superseded; the validator now rejects an empty stage);
+  `20261020T214842Z-bf85e989`, `…214855Z-a4f4e1df` (gpu2, smokes over
+  600 s beside another user's process at 100%; rerun on Ada);
+  `20261020T220040Z-fe792dc2` (the SVT-AV1 probe's smoke failed the check
+  that some candidate finds the ball, which none does at CRF 62; the
+  probe is now checked by its decode's frame PSNR, ≥ 25 dB).
+- Jobs (all RTX 6000 Ada, gpu5/gpu6, shared; environment
+  `pointstream-20261009T214002Z`; inputs `inputs-k5b2.json`
+  `7cb55480…cd63`): TrackNet games 8–10 `20261020T214833Z-bf224666`
+  (`7590a77`; 30 clips; 1,362 s; `published.tar` `6d2aed8e…2d38`);
+  RacketVision tennis test in three parts `20261020T220058Z-fc8980da`
+  (`cff4f60`, whose `k5b_trackers.py` is `7590a77`'s; 14 rallies; 680 s;
+  `3dbecb66…eadb`), `20261020T214901Z-0d339486` (`7590a77`; 15; 1,240 s;
+  `0c53b65d…33ec`), `20261020T214907Z-eefaac4b` (`7590a77`; 14; 634 s;
+  `3fe00d05…f3cd`); the SVT-AV1 probe `20261020T220308Z-436c3db3`
+  (`09f0cd3`; 30 clips; 986 s; `a4178a34…afe1`); TrackNet games 2, 3, 6, 7
+  `20261020T221615Z-1a87ab2f` (`09f0cd3`; 30 clips; 1,135 s;
+  `5ae5a714…d31f`). Validators passed on each smoke and, run locally, on
+  each full stage. Every model's parameters on `cuda:0` (asserted in each
+  `k5b-trackers.json`; torch 2.10.0+cu128). About 1.7 GPU-hours of full
+  stages, 2 with smokes and failed attempts: over the 1.5-hour budget
+  (the RacketVision rallies are 600 frames at 60 frames/s, longer than
+  estimated, and gpu2's contention cost two smokes).
+- Report (`k5b_trackers report` on the six jobs; `k5b-trackers-report.json`
+  `f2cec565…a42c`). Detection rate within 10 px (5 px), false detections
+  per frame without a ball:
+
+  | Candidate | TrackNet 8–10 | RacketVision test | Mean (rule) | K5's games 2,3,6,7,8,10 | SVT-AV1 CRF 62 (8–10) |
+  |---|---|---|---:|---|---:|
+  | BallTrack | 0.938 (0.851), 0.030 | 0.881, 0.286 | **0.910** | 0.918 (0.771), 0.022 | 0.026 |
+  | WASB, step 1 | 0.923 (0.911), 0.051 | 0.834, 0.379 | 0.879 | 0.966 (0.944)\*, 0.039 | 0.018 |
+  | WASB | 0.922 (0.909), 0.066 | 0.831, 0.350 | 0.876 | 0.965 (0.945)\*, 0.041 | 0.017 |
+  | MonoTrack | 0.898 (0.880), 0.112 | 0.797, 0.404 | 0.847 | 0.953\*, 0.047 | 0.021 |
+  | ResTrackNetV2 | 0.865 (0.844), 0.076 | 0.745, 0.300 | 0.805 | 0.909\*, 0.037 | 0.018 |
+  | TrackNetV2 | 0.842 (0.829), 0.046 | 0.745, 0.291 | 0.794 | 0.928\*, 0.024 | 0.010 |
+  | BallSeg | 0.618 (0.598), 0.005 | 0.637, 0.123 | 0.627 | 0.759\*, 0.002 | 0.011 |
+  | DeepBall-Large | 0.390 (0.357), 0.553 | 0.424, 0.773 | 0.407 | 0.704\*, 0.154 | 0.010 |
+  | DeepBall | 0.396 (0.367), 0.497 | 0.193, 1.000 | 0.294 | 0.670\*, 0.363 | 0.011 |
+
+  \* games 2, 3, 6, 7 are in WASB-zoo training (WASB 0.988 on them
+  alone), so these are not held out. TrackNet 8–10: 5,472 ball frames and
+  197 without; RacketVision test: 1,947 labelled ball frames and 203
+  labelled without (false rates there are high for every candidate;
+  those frames were not inspected);
+  K5's six games: 11,496 and 534. WASB's F1 on 8–10 is 0.954 against
+  0.956 in its paper, so the wrapper reproduces its authors' inference.
+  The SVT-AV1 probe (preset 8, CRF 62, median 84 kbps, frame PSNR
+  32.7–34.3 dB) leaves every candidate under 0.03.
+- Decision (by the rule): **BallTrack is chosen** (0.910 against WASB's
+  0.879; none within 0.02, so the probe did not enter) and **adopted
+  without training**: it never saw TrackNet, and on K5's six games it
+  finds 0.918 of the balls with 0.022 false detections per frame without
+  a ball, and 0.881 on RacketVision test (bars 0.90, 0.05, 0.80). On K5's
+  8 windows it finds 0.916 (0.006 false). Stage B is not needed.
+- Reading. The hypothesis holds on the choice and half on the numbers:
+  WASB leads the zoo on TrackNet (0.92) and falls on RacketVision's
+  broadcast footage (0.83, not as low as predicted), while BallTrack,
+  trained on RacketVision's other matches, leads both. The competing
+  explanation (games 8–10 share courts with 1–7) is visible in the zoo
+  (WASB 0.988 on its training games, 0.922 on 8–10) and does not touch
+  BallTrack. Two limits for its use: (1) it places the ball coarsely (5 px
+  rate 0.771 on K5's games against WASB's 0.944; it takes a blob's box
+  centre at 512×288), so the ball mode's positions want refinement by the
+  encoder (K5b 1's diagnostic: about 1.5 dB from per-frame position);
+  (2) as a judge it is valid (0.92 on the source), and it confirms K5's
+  regime with a valid detector: through SVT-AV1 at CRF 62 every
+  candidate finds under 3% of the balls (YOLO26x's 0.02 in K5 was not a
+  valid judge).
+
+### 2026-10-21 — K5b (1b): a per-frame ball, judged by detection and DISTS (rule)
+- Question (PLAN K5b 1b): K5b 1 drew the ball from TrackNet's labels with
+  one appearance per window and kept 10–20% of the pixel oracle's
+  ball-region PSNR gain; its diagnostic put the gap on position (labels
+  1.4–3.2 px off the best fit) and on a per-window appearance. Does a
+  ball the encoder places and styles per frame, every byte billed, keep
+  the ball visible and recognisable at the low rates where the pixel
+  coders lose it, end to end from a tracker's positions?
+- Judges (user, 2026-10-21). K5b 1 decided on ball-region PSNR, which
+  punishes a drawn ball twice for a 2 px misplacement and rewards a dull
+  one; the ball mode's claim is that the ball can be seen and followed,
+  not that its pixels are the source's. Deciding: (a) **detection**,
+  BallTrack (K5b 2: never trained on TrackNet, so a clean judge on every
+  K5 window) on the decoded or composited frames, a hit within 10 px of
+  TrackNet's label, over the window's visible frames (5 px reported);
+  (b) **DISTS** (masked DISTS of `src.codecs.quality`, VGG16, all-ones
+  mask) on a 64 × 64 crop centred on the label (clamped to the frame),
+  composite against source, averaged over the visible frames. Reported:
+  ball-region and streak-region PSNR (K5b 1's), LPIPS on the same crop,
+  frame PSNR, and the false detections per ball-less frame.
+- What changes from K5b 1 (`src/pointstream/ball.py`, the same `BALL`
+  segment, versioned): (1) per-frame position refinement: the encoder
+  moves each coded position by the fit's best offset within ±4 px, and
+  the refined positions go through the same constant-velocity
+  Exp-Golomb code, so their cost is billed; (2) a per-frame appearance:
+  radius, exposure and phase indices and the 8-bit colour per visible
+  frame, each coded as the signed Exp-Golomb difference from the
+  previous visible frame (the window's first is absolute), so a steady
+  ball costs a few bits a frame. The fit alternates the two (position
+  with the current appearance, then the appearance at the refined
+  position; two rounds), minimising whole-frame squared error as in
+  K5b 1, with the off switch per window kept. As built (`ball.fit_frames`):
+  each frame's alpha at every setting is tabulated once, the appearance
+  step is one batched product over all settings and decodes, the
+  position step tries every second offset then the 8 neighbours of the
+  best, velocities in the fit are the tracker's (the decoder's, from the
+  refined positions, draw the scored frames), and a frame is sent only
+  where its ball lowers the crop's error (so frames can be hidden, which
+  the visibility runs code). On one window with 9 stand-in decodes the
+  fit takes about 67 s per position source on a laptop CPU, and the
+  payload is 0.9–1.4 kbps.
+- Position sources (the encoder's tracker), each a variant: TrackNet's
+  labels (the bound); **BallTrack** on the source (the encoder the codec
+  would ship; misses become hidden frames, false detections are drawn);
+  **WASB** (step 1) on the source, cheap at inference only and more
+  precise (5 px 0.944 against 0.771), disclosed: it trained on games 2,
+  3, 6, 7, so on six of the eight windows its positions are not held out
+  (game8/Clip6 and game10/Clip10 are). The judge stays BallTrack, scored
+  against the labels, so a WASB-placed ball is judged by a detector that
+  did not place it.
+- Windows, coders and rates: K5b 1's (8 TrackNet windows; SVT-AV1 preset
+  4 at CRF 35–62, DCVC-UF HT-L at QP 0–63 on the A6000); rate = the
+  coder's bytes plus the billed `BALL` segment; K5's pixel oracle
+  recomputed, and judged by the same judges, as the bound.
+- Decision rule (`k5b.DECISION_1B`, fixed before any run). A renderer
+  (disk or streak) with **BallTrack's positions** is adopted when, over a
+  coder underneath, on ≥ 6 of the 8 windows: (i) detection: the rate at
+  which the composite first finds 80% of the balls BallTrack finds on the
+  source (linear in log rate between points) is at most half the rate
+  the pooled pixel envelope (upper hull of detection against rate over
+  both coders) needs for the same, or the envelope never gets there;
+  **and** (ii) DISTS-crop BD-rate ≤ −25% against the pooled envelope, or
+  better at every rate; **and** (iii) frame-PSNR BD-rate ≤ +1% against
+  its own coder's envelope (K5b 1's guard). BD overlap (`k5b1b.DECISION`):
+  0.01 in 1 − DISTS and 1 − LPIPS, 0.5 dB in PSNR. Six of eight needs
+  both parts; part 1 alone (four windows) decides nothing by itself. The
+  judge's GPU path (median and downscale on the GPU) must agree with
+  K5b 2's CPU path on ≥ 97% of the source's frames (a validator check).
+  If the labels' variant passes
+  and BallTrack's does not, the tracker is the gap (WASB's variant says
+  whether its precision closes it, and WASB retraining with K5's games
+  held out becomes the next step). If neither passes, the reading says
+  which judge failed and by how much. If both renderers pass, the user's
+  preference from this run's side by side picks the default.
+- Hypothesis: the drawn ball restores most of the source's detections
+  where the pixel coders lose them (DCVC-UF QP 21–63, SVT-AV1 CRF 55–62:
+  under 10% found) for about 1 kbps, so (i) passes on DCVC-UF and SVT-AV1
+  alike; the streak passes DISTS by more than the disk on fast windows,
+  the disk detection by more (a crisp blob is what BallTrack's heatmap
+  peaks on); BallTrack's positions lose under 0.05 of detection against
+  the labels' after refinement.
+- Competing explanations: (1) BallTrack detects a drawn disk because it
+  is a bright blob, not because it looks like the ball; the false
+  detections on ball-less frames and DISTS check it, and the side by
+  side shows it. (2) With BallTrack's positions, the judge may agree
+  with itself (it drew the ball where it already looked); scoring
+  against the labels and WASB's variant check it. (3) DISTS on a
+  64-pixel crop is dominated by the court around the ball, so the ball
+  barely moves it; the oracle's DISTS gain (pasted pixels) bounds what it
+  can show, and LPIPS is reported beside it.
+- Side by side (for the user's preference): K5b 1's layout (source,
+  pixel coder, + disk, + streak, at equal rate, ball-following 3× crops
+  and one full frame), at DCVC-UF QP 42 and SVT-AV1 CRF 55, BallTrack's
+  positions.
+- Budget: GPU (BallTrack, WASB, DISTS, LPIPS, DCVC-UF) on the A6000;
+  BallTrack, WASB and DISTS are new on that class, so the smoke asserts
+  CUDA for each and the result goes into the model–GPU table. Smoke: one
+  window, 48 frames, ≤ 600 s. Part 1: K5b 1's four windows, ≤ 45 min;
+  part 2: the other four, run only if part 1 leaves the rule open.
+  Ceiling 2 GPU-hours and 6 h wall.
+- Job: `20261021T084417Z-048cc9d4` (`d4bed15`; RTX A6000, gpu3, shared
+  with another user's process; smoke 247 s on game3/Clip3's first 48
+  frames, then part 1: game3/Clip3, game7/Clip2, game10/Clip10,
+  game3/Clip6 at 240 frames, 2,380 s, inside the 45 min stage;
+  `published.tar` `b75adff4…c8d3`; inputs: K4's manifest `233a08b1…`,
+  K5b 2's `7cb55480…cd63`, and `inputs-k5b1b.json` `32fb61ae…40f6` (the
+  DISTS VGG16 `397923af…` and LPIPS AlexNet `7be5be79…` backbones);
+  environment `pointstream-20261009T214002Z`, torch 2.10.0+cu128;
+  SVT-AV1, dav1d and DCVC-UF as K5b 1). Every model on `cuda:0`. Validator
+  passed on the smoke and, run locally, on the full stage (15 checks;
+  BallTrack's GPU path agrees with its CPU path on every source frame).
+  Per window: coding 4–7 min, trackers 15–20 s, the three sources' fits
+  70–134 s (in parallel), judging the rest. About 0.75 GPU-hours.
+- Report (`k5b1b report`; `k5b1b-report.json` `c1f24193…bbe3`). BallTrack
+  finds 0.88–0.99 of the source's balls (target 0.71–0.79). Means over
+  the 4 windows, BallTrack's positions (detection rate; 1 − DISTS shown
+  as DISTS):
+
+  | Point | kbps decode → + streak | detection decode / oracle / disk / streak | DISTS decode / oracle / disk / streak |
+  |---|---|---|---|
+  | DCVC-UF QP 0 | 13.0 → 13.9 | 0.01 / 0.92 / 0.90 / 0.91 | 0.246 / 0.204 / 0.209 / 0.200 |
+  | DCVC-UF QP 21 | 36.6 → 37.6 | 0.15 / 0.91 / 0.90 / 0.92 | 0.199 / 0.165 / 0.171 / 0.164 |
+  | DCVC-UF QP 42 | 117.7 → 118.9 | 0.67 / 0.92 / 0.91 / 0.92 | 0.140 / 0.125 / 0.131 / 0.128 |
+  | SVT-AV1 CRF 62 | 73.9 → 75.0 | 0.19 / 0.90 / 0.89 / 0.91 | 0.175 / 0.142 / 0.148 / 0.140 |
+  | SVT-AV1 CRF 55 | 176.0 → 177.2 | 0.59 / 0.92 / 0.91 / 0.92 | 0.127 / 0.107 / 0.114 / 0.109 |
+
+  Per window (BallTrack's positions): on DCVC-UF, the rate to find 80%
+  of the source's balls is 0.05–0.15 of what the pixel envelope needs
+  (detection passes 4/4, disk and streak); DISTS BD −27% to −42% for the
+  streak (4/4), −22% to −33% for the disk (2/4); **frame-PSNR BD
+  +1.7% to +2.8% against DCVC-UF's own envelope (0/4; bar +1%)**. On
+  SVT-AV1, whose lowest point is already 57–97 kbps, the detection ratio
+  is 0.27–0.72 (2/4), as for K5's pixel oracle (identical ratios: the
+  ball mode reaches the target at SVT's lowest point, so the ratio is
+  bounded by it); frame BD +0.2–0.3% (4/4); streak DISTS 2/4. All three
+  on one window at most. The three position sources score alike (labels,
+  BallTrack, WASB within 0.01 detection and 0.002 DISTS at every point).
+  The ball costs 0.79 kbps (disk) and 1.11 kbps (streak) on average
+  (0.33–1.47), and raises frame PSNR by about 0.01 dB.
+- Decision (by the rule): **no renderer adopted**, and part 1 decides it:
+  on DCVC-UF the frame guard fails on 4/4 (at most 4/8), on SVT-AV1 every
+  variant passes all three on ≤ 1/4 (at most 5/8); 6/8 is out of reach,
+  so part 2 is not run.
+- Reading. The hypothesis holds on what the ball mode is for and fails on
+  its cost. A drawn ball at the encoder's positions restores detection
+  where the pixel coders lose the ball (0.01 → 0.90 at 13 kbps; DCVC-UF
+  alone needs 80–260 kbps for 80% of the source's), and on crop DISTS it
+  closes 75–100% of the gap to the pixel oracle (the streak is within
+  0.004 of the oracle at every DCVC-UF point). What fails is the frame guard, and it
+  fails on rate, not quality: the per-frame payload (about 1 kbps, most
+  of it colour differences) is 7% of DCVC-UF's 13 kbps lowest point,
+  while frame PSNR rises by 0.01 dB, so the frame BD-rate is +2% to +3%.
+  K5b 1's per-window ball cost 0.2 kbps and passed the guard; the guard
+  (≤ +1%) was set for that payload. Competing explanation 1 (BallTrack
+  detects a bright blob) is not excluded by these numbers; DISTS, which
+  also passes, and the clips speak against it. Explanation 2 (the judge
+  agrees with itself) is excluded: labels, BallTrack and WASB positions
+  score the same. Explanation 3 (DISTS on 64 px dominated by the court)
+  does not hold: DISTS moves by 0.04 at QP 0, as much as the oracle's.
+  Positions: BallTrack places the ball within 5 px of the label on 0.78
+  of frames, WASB 0.92 (disclosed overlap); after refinement the fit's
+  positions sit 1.4 (labels), 2.3 (WASB) and 3.0 px (BallTrack) from the
+  labels, which are themselves 1.4–3.2 px off the best fit (K5b 1's
+  diagnostic), so precision is not what limits the ball mode.
+- Side by side (sent to the user 2026-10-21): game3/Clip3 and game7/Clip2
+  at DCVC-UF QP 42, game3/Clip3 at SVT-AV1 CRF 55 (ball-following 3×
+  crops), game10/Clip10 full frame at DCVC-UF QP 42; BallTrack's
+  positions. Rendering preference (user, 2026-10-21): **the streak**.
+  The user's reading of the clips: the source's own ball is low quality
+  and pixelated; DCVC-UF looks good but loses the ball at times,
+  especially near the far player; the disk often looks unrealistic; the
+  streak looks as good as DCVC-UF where DCVC-UF keeps the ball, and keeps
+  it visible far more often.
+- Decision (user, 2026-10-21): the ball mode is **kept**, with the streak
+  as default and BallTrack's positions, although it fails the frame
+  guard by the rule; the failure is on rate (about 1 kbps), it is
+  disclosed wherever the result is reported, and the rule is not
+  restated after the fact.
+- A cheap check of the payload's rate (not evidence: game3/Clip3, three
+  Gaussian-blurred stand-in decodes, the streak fit from the labels,
+  laptop CPU; `rate_check.py` in the session's scratch). Coding each
+  frame's colour at a coarser step: step 8 saves 20–22% of the payload
+  (1,267–1,407 → 989–1,134 bytes) and keeps 99.7–99.9% of the fit's
+  squared-error gain; step 16 saves 29–30% and keeps 98.5–99.7%. One
+  colour per window halves it but leaves the ball worse than none. The
+  rest (about 0.7 kbps) is positions and settings. So step-8 colour is a
+  free default for the final runs (a payload change, set before them);
+  reaching the guard's 0.2–0.4 kbps would need smoother positions and
+  settings too, which the user judged not worth pursuing now.
+- Next (proposed, for the user): the ball mode's rate. Either the encoder
+  spends fewer bits (a rate-aware per-frame fit: colour quantised or held
+  unless the error gain pays its bits; about 0.2–0.4 kbps would pass the
+  guard at 13 kbps), or the guard is restated as what it was meant to
+  check (frame PSNR at the same coder point not lower, which the
+  encoder's last check already ensures), which is a rule change for the
+  user to make, disclosed as such.
+

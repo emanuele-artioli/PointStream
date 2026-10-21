@@ -106,7 +106,7 @@ def tracknet(zip_path: Path) -> tuple[list[dict[str, Any]], dict[str, list[str]]
             if name.endswith(".jpg"):
                 jpgs.setdefault(name.rsplit("/", 1)[0], []).append(name)
         keys = sorted((d for d in jpgs if len(jpgs[d]) >= TRACKNET_MIN_FRAMES), key=lambda d: rank(f"tracknet:{d[len('Dataset/'):]}"))
-        windows = []
+        windows: list[dict[str, Any]] = []
         for member_dir in keys[:TRACKNET_CLIPS]:
             key = member_dir[len("Dataset/"):]
             files = sorted(jpgs[member_dir])
@@ -164,9 +164,9 @@ def main() -> int:
             for files in members.values():
                 for name in files:
                     data = archive.read(name)  # zipfile checks each member's CRC-32
-                    info = tarfile.TarInfo(name)
-                    info.size = len(data)
-                    out.addfile(info, io.BytesIO(data))
+                    member_info = tarfile.TarInfo(name)
+                    member_info.size = len(data)
+                    out.addfile(member_info, io.BytesIO(data))
         tmp.rename(tar_path)
     staged["tracknet"] = entry("tracknet", tar_path, extract=True)
     raw = probe(root / ARCHIVE / RAW_MATCH)
