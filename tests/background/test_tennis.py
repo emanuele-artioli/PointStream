@@ -8,6 +8,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+import pytest
 
 from experiments.tennis import k4, k5
 from experiments.tennis import windows as tw
@@ -238,3 +239,46 @@ def test_k5b_trackers_parts_cover_every_clip_once():
     parts = [kt.part_of(clips, f"{i}/3") for i in (1, 2, 3)]
     assert [c["id"] for p in parts for c in p] == [c["id"] for c in clips] and {len(p) for p in parts} <= {14, 15}
     assert kt.part_of(clips, "1/1") == clips
+
+
+def test_k5b1b_detection_rule_reads_the_rate_to_reach_the_target_against_the_pixel_envelope():
+    from experiments.tennis import k5b1b
+
+    pixel = [(10.0, 0.02), (40.0, 0.1), (160.0, 0.9), (640.0, 0.92), (20.0, 0.01)]
+    env = k5b1b.hull(pixel)
+    assert env[0] == (10.0, 0.02) and (20.0, 0.01) not in env and env[-1] == (640.0, 0.92)
+    assert k5b1b.rate_to_reach([(10.0, 0.5), (40.0, 0.8)], 0.8) == pytest.approx(40.0)
+    assert k5b1b.rate_to_reach([(10.0, 0.9)], 0.8) == 10.0
+    assert k5b1b.rate_to_reach([(10.0, 0.1), (40.0, 0.2)], 0.8) is None
+    v = k5b1b.detection_verdict([(12.0, 0.75), (45.0, 0.9)], pixel, 0.8)
+    assert v["passes"] and v["ratio"] < 0.5 and 40.0 < v["anchor_rate"] < 160.0
+    assert not k5b1b.detection_verdict([(150.0, 0.85)], pixel, 0.8)["passes"]
+    assert k5b1b.detection_verdict([(12.0, 0.85)], [(10.0, 0.0), (20.0, 0.1)], 0.8) == {"rate": 12.0, "anchor_rate": None, "ratio": 0.0, "passes": True}
+
+
+def test_k5b1b_decision_needs_all_three_judges_on_six_of_eight_windows_from_balltracks_positions():
+    from experiments.tennis import k5b1b
+
+    def window(ok: bool, labels_ok: bool) -> dict:
+        passes = {f"{k}-dcvc-uf-htl": {"detection": True, "dists": True, "frame": True} for k in ("oracle", *k5b1b.DRAWN)}
+        for r in k5b1b.RENDERERS:
+            passes[f"{r}@balltrack-dcvc-uf-htl"] = {"detection": ok, "dists": True, "frame": True}
+            passes[f"{r}@labels-dcvc-uf-htl"]["detection"] = labels_ok
+        return {"passes": passes}
+
+    d = k5b1b.decide({f"w{i}": window(i < 6, True) for i in range(8)})
+    assert d["adopted"] == {"disk": True, "streak": True} and d["labels_pass"]["disk"]
+    d = k5b1b.decide({f"w{i}": window(i < 5, True) for i in range(8)})
+    assert d["adopted"] == {"disk": False, "streak": False} and d["labels_pass"]["streak"]
+    assert not k5b1b.decide({f"w{i}": window(True, True) for i in range(4)})["adopted"]["disk"]  # part 1 alone decides nothing
+
+
+def test_k5b1b_tracks_and_placement_read_labels_as_the_judge_does():
+    from experiments.tennis import k5b1b
+
+    kinds = k5b1b.label_kinds([(1, 10, 10), (0, 0, 0), (3, 5, 5), (2, 50, 50)])
+    assert [k for k, _, _ in kinds] == [1, 0, -1, 1]
+    track = k5b1b.track_of([(True, 13.6, 10.2), (True, 2.0, 2.0), (False, 0, 0), (True, 1400.0, -3.0)], (720, 1280))
+    assert track == [(14, 10), (2, 2), None, (1279, 0)]
+    p = k5b1b.placement(track, kinds)
+    assert p["within_10px"] == 0.5 and p["within_5px"] == 0.5 and p["sent_without_ball"] == 1 and p["sent"] == 3

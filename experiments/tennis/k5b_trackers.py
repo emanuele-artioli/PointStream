@@ -202,7 +202,7 @@ class AttrDict(dict):
 class Zoo:
     """WASB-SBDT's tennis models, imported from its code tree, with its preprocessing and postprocessors."""
 
-    def __init__(self, code: Path, weights: Path):
+    def __init__(self, code: Path, weights: Path, names: tuple[str, ...] = tuple(ZOO)):
         import torch
 
         root = code / "src"
@@ -231,7 +231,7 @@ class Zoo:
         self.settings: dict[str, dict[str, Any]] = {}
         dataloader = load_yaml(root / "configs/dataloader/default.yaml")
         loaded: dict[str, Any] = {}
-        for name, s in ZOO.items():
+        for name, s in ((n, ZOO[n]) for n in names):
             model_cfg = load_yaml(root / f"configs/model/{s['model']}.yaml")
             detector_cfg = load_yaml(root / f"configs/detector/{s.get('detector', 'tracknetv2')}.yaml")
             detector_cfg["postprocessor"].setdefault("use_hm_weight", s.get("hm_weight", False))
@@ -341,6 +341,58 @@ class BallTrack:
         self.net = net.cuda().eval()
         self.meta = {"epoch": state["meta"]["epoch"], "iter": state["meta"]["iter"]}
 
+    def run_gpu(self, frames: Any) -> list[Prediction]:
+        """`run` on frames already on the GPU, (n, h, w, 3) uint8 RGB at 1280x720: the median frame (the mean of
+        the two middle values, truncated, as numpy's median then uint8) and the bilinear downscale on the GPU, the
+        same model and blob rule. Agreement with `run` is measured, not assumed (K5b 1b's smoke)."""
+        import torch
+        import torch.nn.functional as F
+
+        n = int(frames.shape[0])
+        pick = torch.from_numpy(np.linspace(0, n - 1, min(n, MEDIAN_FRAMES)).astype(int)).to(frames.device)
+        m = len(pick)
+        median = torch.empty(frames.shape[1:], dtype=torch.float32, device=frames.device)
+        for r in range(0, int(frames.shape[1]), 90):  # row bands bound the memory of the selection
+            band = frames[pick, r:r + 90].float()
+            lo = band.kthvalue((m + 1) // 2, dim=0).values
+            median[r:r + 90] = lo if m % 2 else ((lo + band.kthvalue(m // 2 + 1, dim=0).values) / 2).floor()
+
+        def small(x: Any) -> Any:  # (b, h, w, 3) RGB -> (b, 3, 288, 512) BGR in [0, 1], rounded to 8 bits as cv2's
+            y = F.interpolate(x.permute(0, 3, 1, 2).float().flip(1), size=(self.WH[1], self.WH[0]), mode="bilinear",
+                              align_corners=False, antialias=False)
+            return y.round().clamp(0, 255) / 255.0
+
+        med = small(median[None].float())[0]
+        out: list[Prediction] = []
+        sx, sy = SIZE[0] / self.WH[0], SIZE[1] / self.WH[1]
+        with torch.no_grad():
+            for b in range(0, n, BATCH):
+                lo = max(0, b - self.SEQ + 1)
+                chunk = small(frames[lo:min(n, b + BATCH)])
+                batch = []
+                for t in range(b, min(n, b + BATCH)):
+                    seq = [chunk[max(0, j) - lo] for j in range(t - self.SEQ + 1, t + 1)]
+                    batch.append(torch.cat([med, *seq], 0))
+                with torch.autocast("cuda"):
+                    hm, _, _ = self.net(frames=torch.stack(batch))
+                out.extend(self.blobs(hm.float().cpu().numpy()[:, 0], sx, sy))
+        return out
+
+    @staticmethod
+    def blobs(heatmaps: np.ndarray, sx: float, sy: float) -> list[Prediction]:
+        import cv2
+
+        out: list[Prediction] = []
+        for h in heatmaps:
+            mask = (h > 0.5).astype(np.uint8) * 255
+            cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            if not cnts:
+                out.append((False, 0.0, 0.0))
+                continue
+            x, y, w, hh = max((cv2.boundingRect(c) for c in cnts), key=lambda r: r[2] * r[3])
+            out.append((True, (x + w / 2) * sx, (y + hh / 2) * sy))
+        return out
+
     def run(self, frames: np.ndarray) -> list[Prediction]:
         """BGR in [0, 1] at 512x288; per frame t the median frame then frames t-3..t (clamped at 0), as its
         training samples are built; the largest blob over 0.5, its bounding box's centre."""
@@ -362,14 +414,7 @@ class BallTrack:
                     batch.append(np.concatenate([med, *seq], 0))
                 with torch.autocast("cuda"):
                     hm, _, _ = self.net(frames=torch.from_numpy(np.stack(batch)).cuda())
-                for h in hm.float().cpu().numpy()[:, 0]:
-                    mask = (h > 0.5).astype(np.uint8) * 255
-                    cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                    if not cnts:
-                        out.append((False, 0.0, 0.0))
-                        continue
-                    x, y, w, hh = max((cv2.boundingRect(c) for c in cnts), key=lambda r: r[2] * r[3])
-                    out.append((True, (x + w / 2) * sx, (y + hh / 2) * sy))
+                out.extend(self.blobs(hm.float().cpu().numpy()[:, 0], sx, sy))
         return out
 
 

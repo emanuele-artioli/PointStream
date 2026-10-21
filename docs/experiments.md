@@ -7907,7 +7907,16 @@ invocation turns out to be needed.
   ball costs a few bits a frame. The fit alternates the two (position
   with the current appearance, then the appearance at the refined
   position; two rounds), minimising whole-frame squared error as in
-  K5b 1, with the off switch per window kept.
+  K5b 1, with the off switch per window kept. As built (`ball.fit_frames`):
+  each frame's alpha at every setting is tabulated once, the appearance
+  step is one batched product over all settings and decodes, the
+  position step tries every second offset then the 8 neighbours of the
+  best, velocities in the fit are the tracker's (the decoder's, from the
+  refined positions, draw the scored frames), and a frame is sent only
+  where its ball lowers the crop's error (so frames can be hidden, which
+  the visibility runs code). On one window with 9 stand-in decodes the
+  fit takes about 67 s per position source on a laptop CPU, and the
+  payload is 0.9–1.4 kbps.
 - Position sources (the encoder's tracker), each a variant: TrackNet's
   labels (the bound); **BallTrack** on the source (the encoder the codec
   would ship; misses become hidden frames, false detections are drawn);
@@ -7930,7 +7939,12 @@ invocation turns out to be needed.
   both coders) needs for the same, or the envelope never gets there;
   **and** (ii) DISTS-crop BD-rate ≤ −25% against the pooled envelope, or
   better at every rate; **and** (iii) frame-PSNR BD-rate ≤ +1% against
-  its own coder's envelope (K5b 1's guard). If the labels' variant passes
+  its own coder's envelope (K5b 1's guard). BD overlap (`k5b1b.DECISION`):
+  0.01 in 1 − DISTS and 1 − LPIPS, 0.5 dB in PSNR. Six of eight needs
+  both parts; part 1 alone (four windows) decides nothing by itself. The
+  judge's GPU path (median and downscale on the GPU) must agree with
+  K5b 2's CPU path on ≥ 97% of the source's frames (a validator check).
+  If the labels' variant passes
   and BallTrack's does not, the tracker is the gap (WASB's variant says
   whether its precision closes it, and WASB retraining with K5's games
   held out becomes the next step). If neither passes, the reading says
