@@ -7965,6 +7965,42 @@ invocation turns out to be needed.
   (45 s, all medvedev_struff). These are predictions, not accuracy. The
   page is served read-only on gpu1 loopback (port 17690) through a
   tunnel, and was checked at 0 / 69 marks; the agent supplied no labels.
+- **Outcome (2026-10-21): adopted.** Scored with `k8b score`
+  (`76a7db2`) on the user's marks `k8b-marks-13f69f53873866a2.json`
+  (SHA256 `8f7f665c…3c0dcd`, 69/69 marked) against `k8b-report.json`
+  (`8230bf1a…`). Score `k8b-score.json` under the run root, SHA256
+  `a914eceed27daf30c46881ee336b4c5505695afa9093830c4db990d2d00b2675`.
+  The jobs, inputs and revision are in the table above (CPU only).
+
+  | Condition | Bar | Measured | Passes |
+  |---|---|---|---|
+  | Precision (44 predicted court shots) | ≥ 0.95 | 1.00 (44/44) | yes |
+  | Duration recall (723 s of true court) | ≥ 0.90 | 1.00 | yes |
+  | Registration median, 31,914 true court frames | ≤ 2 px | 0.77 px | yes |
+  | Registration 95th percentile | ≤ 6 px | 2.71 px | yes |
+
+  Every shot matches the user's class. alcaraz_hurkacz has 21 court
+  shots and djokovic_zverev 7. medvedev_struff has 16 court shots plus
+  21 close-ups, 2 crowd shots and 2 graphics, all predicted non-court.
+  The hypothesis holds: shade and the per-frame 2 px gate caused K8's
+  misses. The competing explanation (failure on other surfaces, or
+  spurious fits on texture) is not observed: the method held on hard
+  courts and a court-level camera. Scope, as stated in the rule: precision
+  rests on 44 shots (one-sided 95% lower bound 0.934, Clopper–Pearson).
+  Only 25 held-out shots are non-court, and no replay or picture-in-picture
+  appears. The clips were pre-cut by the old pipeline, so they test
+  in-clip cuts and fit-state splits only weakly. Registration is measured
+  with the centerline ruler (rule, item 3).
+  **What K4b's candidate (d) can use now:** per-frame court homographies
+  (ITF metres to 1080p pixels; null where there is no fit) and the court
+  outline for every frame of these 70 clips, including the dev clip
+  `djokovic_zverev/000`. They are in `clips/*.json` inside each part's
+  `published.tar` and in the assembled `review/k8b-report.json`
+  (`registration[n].homography`, n = the clip's decoded frame index).
+  Still to run with the same adopted method: the clips of
+  djokovic_federer and rublev_auger-aliassime (the two other matches K4b
+  draws from), and nadal_kyrgios's whole match (v1 of the court-shot
+  list).
 
 ### 2026-10-16 — K4b.1: identifying the two players (rule)
 - Question (PLAN K4b, item 1). K4's motion rule (the two tracks that travel
