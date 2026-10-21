@@ -6600,6 +6600,52 @@ invocation turns out to be needed.
   stages; the job specs, the scoring stages' `h5.json`, and the post hoc
   `union.py`, `decompose.py` and `fillfree.py`).
 
+### 2026-10-21 — H5q 2: what the background stream spends on the filled F (oracle)
+- Question (user, 2026-10-21: measure the free fill before closing H5q).
+  The background stream codes the whole frame with F filled by ProPainter,
+  and the foreground then overwrites F. H5q 1's estimate took the fill's
+  bits as proportional to F's area: even a free fill reached only −5% (2
+  of 4). ProPainter's fill may flicker, though, and cost more than its
+  area (P02_02: F is 50% of the frame). What does the fill really cost,
+  and would a free one let the split pass at equal adaptation?
+- Method (`g6 fill-cost`, new). Per item, every background point on the
+  union hull of H5q 1 (9–10 per item: scene model at 540p and 1080p,
+  SVT-AV1 with G6's enhancer), coded twice through G6's own coder: with
+  ProPainter's fill (as published) and with a static plate in F (the
+  window's per-pixel temporal median of the filled frames, constant in
+  time, so the codec predicts it almost for free). Both decodes scored on
+  V (`g5.score`, the dataset tier); SVT-AV1's also after the published
+  enhancer of that CRF, re-applied. Then each hull row is recomputed:
+  background rate × (static bytes / ProPainter bytes) of its point,
+  background LPIPS + (static − ProPainter) LPIPS on V, foreground
+  unchanged, weighted LPIPS = 0.7 fg + 0.3 bg (exact, H5q 1).
+  - Why it is an oracle and not the component: it keeps the scored rows'
+    composites and moves only the background's rate and its V quality by
+    measured amounts; the composite's background region is V up to the
+    8 px ring. The real component (the static fill in `format` and
+    `enhance`, every pair rescored, about 7 GPU-hours) runs only if this
+    passes.
+  - The configuration is H5q 1's post hoc per-point choice of foreground
+    coder (off the shelf with G_HO at ¼ and ½, the venue model at full
+    size), the most favourable reading so far. It is fixed now, before
+    this run, as the configuration a real run would be judged on.
+- Decision rule, fixed now: rule (a) on weighted LPIPS (fill) against
+  `dcvc-venue` alone, neither billed: mean −10% or better and 3 of 4 items
+  below zero.
+  - Passes: the static fill is built into G6's routes and every hull pair
+    is rescored, judged by the same rule.
+  - Fails: H5q closes on LPIPS; the egocentric claim is reframed (the
+    user's decision), with the fill's measured cost reported.
+- Hypothesis: the fill costs more than its area where F is large and
+  moving; P02_02's background rate drops 40–60%, the others 10–25%; the
+  oracle reaches −5% to −12%, a borderline pass at best.
+- Competing explanation: the codecs already predict ProPainter's smooth
+  fill cheaply, so it costs less than its area and the oracle stays near
+  or above H5q 1's area estimate (−5%).
+- Budget: 8 jobs (per item: the scene-model points; the SVT-AV1 points),
+  each point coded twice, about 25 minutes each on a shared GPU; about 3
+  GPU-hours, ceiling 4; every stage under 45 minutes.
+
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and
   can a body-pose estimator's keypoints carry the players? Per part
