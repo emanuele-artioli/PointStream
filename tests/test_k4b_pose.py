@@ -154,3 +154,23 @@ def test_local_dilation_matches_k4s_whole_frame_dilation():
     xs = np.clip(np.round(points[:, 0]).astype(int), 0, 1919)
     ys = np.clip(np.round(points[:, 1]).astype(int), 0, 1079)
     assert (kp.within(mask, points) == grown[ys, xs]).all()
+
+
+def test_report_takes_only_locally_validated_full_stages(tmp_path):
+    from experiments.visor.b1 import file_sha256
+
+    out, players, _ = _window(tmp_path)
+    job = tmp_path
+    files = {"pose-crops.json.zst": file_sha256(out / "pose-crops.json.zst")}
+    summary = {"stage": "full", "configured_windows": 0, "pose": {"device": "test"},
+               "windows": [{"id": "m/c@5", "files": files, "crop_seconds": {"crop": 1.}, "crops": {"crop": 78}, "whole_frame_ms": 30.}]}
+    (job / "k4b-pose.json").write_text(json.dumps(summary))
+    (job / "ready.json").write_text(json.dumps({"git_head": "abc"}))
+    (job / "local-validation.json").write_text(json.dumps({"passed": True, "checks": {"x": True}, "windows": ["m/c@5"]}))
+    result = kp.report([job], partial=True)
+    assert result["chosen_scale"] == 1 and result["latency_ms"]["whole_frame_ms_median"] == 30.
+    with pytest.raises(ValueError, match="48"):
+        kp.report([job])
+    (job / "local-validation.json").write_text(json.dumps({"passed": True, "checks": {"x": False}, "windows": ["m/c@5"]}))
+    with pytest.raises(ValueError, match="locally validated"):
+        kp.report([job], partial=True)

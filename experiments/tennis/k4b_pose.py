@@ -494,7 +494,7 @@ def validate(directory: Path, summary: dict[str, Any]) -> dict[str, Any]:
             "windows": [w["id"] for w in windows], "frames": sum(w["frames"] for w in windows)}
 
 
-def summarize(results: list[dict[str, Any]], latency: dict[str, float]) -> dict[str, Any]:
+def summarize(results: list[dict[str, Any]], latency: dict[str, float | None]) -> dict[str, Any]:
     """The rule's measures per setting over every window's rows (hand-identified players)."""
     bins = RULE["height_bins"]
     table: dict[str, Any] = {}
@@ -534,6 +534,44 @@ def summarize(results: list[dict[str, Any]], latency: dict[str, float]) -> dict[
             "next": "re-read K4 (b) with the chosen crop; K4b.3 on its keypoints" if passing else "stage 2: DWPose on the same crops"}
 
 
+def report(jobs: list[Path], partial: bool = False) -> dict[str, Any]:
+    """The rule's table from locally validated full stages (each job directory: ready.json, the stage's
+    k4b-pose.json, local-validation.json and its extracted publish/)."""
+    results, sources, ids = [], [], []
+    seconds: dict[str, float] = defaultdict(float)
+    crops: dict[str, int] = defaultdict(int)
+    whole = []
+    for root in jobs:
+        validation = json.loads((root / "local-validation.json").read_text())
+        summary = json.loads((root / "k4b-pose.json").read_text())
+        ready = json.loads((root / "ready.json").read_text())
+        if (validation.get("passed") is not True or not all(validation["checks"].values()) or summary["stage"] != "full"
+                or summary["configured_windows"] != 0 or validation["windows"] != [w["id"] for w in summary["windows"]]):
+            raise ValueError(f"{root}: only locally validated full stages may be reported")
+        for w in summary["windows"]:
+            if w["id"] in ids:
+                raise ValueError(f"Duplicate window: {w['id']}")
+            ids.append(w["id"])
+            directory = root / "publish" / k4.safe(w["id"])
+            if file_sha256(directory / "pose-crops.json.zst") != w["files"]["pose-crops.json.zst"]:
+                raise ValueError(f"Changed window artifact: {directory}")
+            results.append(json.loads(decompress((directory / "pose-crops.json.zst").read_bytes())))
+            for k, v in w["crop_seconds"].items():
+                seconds[k] += v
+            for k, n in w["crops"].items():
+                crops[k] += n
+            whole.append(w["whole_frame_ms"])
+        sources.append({"job": root.name, "git_head": ready["git_head"], "gpu": summary["pose"]["device"],
+                        "windows": len(summary["windows"]), "k4b_pose_sha256": file_sha256(root / "k4b-pose.json")})
+    if not partial and len(ids) != 48:
+        raise ValueError(f"{len(ids)} of 48 windows")
+    latency = {"crop_ms_mean_all_scales": 1000 * seconds["crop"] / max(crops["crop"], 1),
+               "whole_frame_ms_median": float(np.median(whole)) if whole else None}
+    out = summarize(results, latency)
+    out.update({"windows": sorted(ids), "jobs": sources, "complete": len(ids) == 48})
+    return out
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest="command", required=True)
@@ -544,24 +582,34 @@ def main() -> int:
     r.add_argument("--sources", nargs="+", required=True)
     r.add_argument("--max-windows", type=int, required=True, help="0 runs every listed window")
     r.add_argument("--ffmpeg", default="ffmpeg")
+    rp = sub.add_parser("report")
+    rp.add_argument("jobs", nargs="+", type=Path)
+    rp.add_argument("--out", type=Path, required=True)
+    rp.add_argument("--partial", action="store_true")
     v = sub.add_parser("validate")
     v.add_argument("--directory", type=Path)
     v.add_argument("--summary", type=Path)
     args = p.parse_args()
     if args.command == "run":
         return run(args)
+    if args.command == "report":
+        result = report(args.jobs, args.partial)
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        write_json(args.out, result)
+        print(json.dumps({k: v for k, v in result.items() if k not in ("table", "windows")}, indent=1))
+        return 0
     summary = json.loads((args.summary or stage_dir() / "k4b-pose.json").read_text())
     if args.directory:
-        report = validate(args.directory, summary)
+        checked = validate(args.directory, summary)
     else:
         with tempfile.TemporaryDirectory(prefix="k4b-pose-validate-", dir="/tmp") as temp:
             with tarfile.open(stage_dir() / "published.tar") as archive:
                 archive.extractall(temp, filter="data")
-            report = validate(Path(temp) / "publish", summary)
+            checked = validate(Path(temp) / "publish", summary)
     if os.environ.get("PS_VALIDATION_PATH"):
-        write_json(Path(os.environ["PS_VALIDATION_PATH"]), report)
-    print(json.dumps({k: v for k, v in report.items() if k != "problems"}))
-    return 0 if report["passed"] else 1
+        write_json(Path(os.environ["PS_VALIDATION_PATH"]), checked)
+    print(json.dumps({k: v for k, v in checked.items() if k != "problems"}))
+    return 0 if checked["passed"] else 1
 
 
 if __name__ == "__main__":
