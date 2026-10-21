@@ -7,6 +7,8 @@
         --video-ckpt P --lpips-backbone P --steps N --limit-frames N
     python -m experiments.background.g6 format WINDOW... --methods scene-540,scene-1080 --arm DIR --publish
     python -m experiments.background.g6 enhance WINDOW... --footage DIR --crfs 32,40,48 --steps N --publish
+    python -m experiments.background.g6 fill-cost WINDOW... --methods scene-540,svt-1080 --values ... --arm DIR \
+        --enhancers DIR
     python -m experiments.background.g6 validate
 
 WINDOW is ``--eval-set E.JSON --archive DIR --masks DIR --video P.MP4 --item ID --image-ckpt P --video-ckpt P
@@ -29,6 +31,11 @@ The scene model's footage (``footage --set scene``) is G5b's split of a stretch 
 120 s of its own video around it, less the window and 5 s on each side, at 10 frames/s and 960×540, with
 G1's foreground (SAM 3.1 "hand" and "arm" plus the EPIC detector's boxes, dilated) filled by ProPainter;
 ``train`` fits recipe L on it (β 0.005, learning rate 3e-5, 540 steps; G5c step 4).
+
+``fill-cost`` (H5q, an oracle): each point coded twice, with ProPainter's fill in F and with a static clean plate
+there (`static_fill`: the window's per-pixel temporal median, constant in time, so F costs the codec almost nothing),
+both scored on V (`g5.score`) and, for SVT-AV1, after the published enhancer of that CRF too. The difference is
+what the background stream spends on the fill that the foreground overwrites.
 
 Every point is scored at 1080p on the background (not F), with `g5c.full_score` (PSNR, LPIPS, DISTS, flicker
 and KID on V), and with ``--publish`` published for the foreground session's compositor: the decoded 1080p
@@ -634,6 +641,18 @@ def window_record(w: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]
             "metrics": w["nets"].record, "restored_archive": args.restore, "published": bool(args.publish)}
 
 
+def load_arm(arm: str) -> tuple[dict[str, Any], str]:
+    """A ``train`` archive (extracted): its record and its fine-tuned DCVC-UF HT-L checkpoint, checked."""
+    arm_dir = Path(arm) / "publish" / "finetune"
+    result = json.loads((arm_dir / "result.json").read_text())
+    video_ckpt = str(arm_dir / "video_ft.pth.tar")
+    if file_sha256(Path(video_ckpt)) != result["model"]["checkpoint_sha256"]:
+        raise RuntimeError("the published checkpoint is not the one its result recorded")
+    record = {k: result.get(k) for k in ("arm", "id", "item", "fill", "steps", "fit", "footage")} | {
+        "model_sha256": result["model"]["checkpoint_sha256"], "converged": result.get("converged")}
+    return record, video_ckpt
+
+
 def command_format(args: argparse.Namespace) -> int:
     methods = [parse_method(m) for m in args.methods.split(",")]
     grid = parse_values(args.values)
@@ -644,13 +663,7 @@ def command_format(args: argparse.Namespace) -> int:
     began = time.time()
     arm_record, video_ckpt = None, None
     if any(c == "scene" for c, _ in methods):
-        arm_dir = Path(args.arm) / "publish" / "finetune"
-        arm = json.loads((arm_dir / "result.json").read_text())
-        video_ckpt = str(arm_dir / "video_ft.pth.tar")
-        if file_sha256(Path(video_ckpt)) != arm["model"]["checkpoint_sha256"]:
-            raise RuntimeError("the published checkpoint is not the one its result recorded")
-        arm_record = {k: arm.get(k) for k in ("arm", "id", "item", "fill", "steps", "fit", "footage")} | {
-            "model_sha256": arm["model"]["checkpoint_sha256"], "converged": arm.get("converged")}
+        arm_record, video_ckpt = load_arm(args.arm)
     if arm_record and (arm_record["fill"] == "none") != (args.fill == "none"):
         raise SystemExit(f"{args.arm}: trained with fill {arm_record['fill']}, coding with fill {args.fill}")
     w = prepare_window(args, work)
@@ -788,6 +801,85 @@ def command_enhance(args: argparse.Namespace) -> int:
     return 0
 
 
+def static_fill(filled: np.ndarray, holes: np.ndarray, band: int = 54) -> np.ndarray:
+    """F replaced by the window's per-pixel temporal median of the filled frames, constant in time; V untouched."""
+    plate = np.empty(filled.shape[1:], np.uint8)
+    for y in range(0, filled.shape[1], band):  # a band of rows at a time: the median of the whole window is GBs
+        plate[y:y + band] = np.rint(np.median(filled[:, y:y + band], axis=0)).astype(np.uint8)
+    return np.where(holes[..., None], plate[None], filled)
+
+
+def command_fill_cost(args: argparse.Namespace) -> int:
+    """H5q: the background stream's bytes and quality on V with ProPainter's fill in F and with a static plate."""
+    import torch
+
+    from experiments.background import g5d
+
+    methods = [parse_method(m) for m in args.methods.split(",")]
+    grid = parse_values(args.values)
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    work = scratch / "fill-cost"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    began = time.time()
+    arm_record, video_ckpt = load_arm(args.arm) if any(c == "scene" for c, _ in methods) else (None, None)
+    w = prepare_window(args, work)
+    item, clip = w["item"], w["clip"]
+    if arm_record and arm_record["id"].split("/")[-1] != item["video"]:
+        raise SystemExit(f"{args.arm}: a scene model of {arm_record['id']}, not of {item['video']}")
+    holes = ~clip.keep
+    versions = {"propainter": w["filled"], "static": static_fill(w["filled"], holes)}
+    changed = (versions["static"] != w["filled"]).any(axis=3)
+    enhancer_dirs = [Path(e) / "publish" / "enhancers" for e in args.enhancers or []]
+    checkpoints, _, restored, _ = point_dirs(args)
+    rows = []
+    done = 0
+    for name, (codec, size) in zip(args.methods.split(","), methods):
+        points = []
+        for value in grid[name]:
+            key = f"{name}-{value}"
+            if key in restored:
+                points.append({**restored[key], "restored_from_checkpoint": True})
+                done += 1
+                continue
+            point: dict[str, Any] = {"value": value}
+            for version, frames in versions.items():
+                yuv, rec, _ = code_point(codec, size, value, frames, clip, args, work / key / version,
+                                         video_ckpt if codec == "scene" else None)
+                rgb = g5.yuv420_to_rgb(yuv)
+                out = {**rec, "score": g5.strip_frames(g5.score(clip, rgb, w["nets"].lpips, "cuda"))}
+                if codec == "svt" and enhancer_dirs:  # the enhancer route: G6's published network, re-applied
+                    found = [d / f"crf{value}.pt" for d in enhancer_dirs if (d / f"crf{value}.pt").is_file()]
+                    if not found:
+                        raise SystemExit(f"no published enhancer for CRF {value} in {args.enhancers}")
+                    state = torch.load(found[0], map_location="cuda", weights_only=True)
+                    net = g5d.enhancer(g5d.TRAIN["blocks"], g5d.TRAIN["channels"]).cuda()
+                    net.load_state_dict({k: v.float() for k, v in state.items()})
+                    enhanced = g5d.apply(net.eval(), rgb, "cuda")
+                    out["enhanced_score"] = g5.strip_frames(g5.score(clip, enhanced, w["nets"].lpips, "cuda"))
+                    out["enhancer_sha256"] = file_sha256(found[0])
+                    del net, enhanced
+                    torch.cuda.empty_cache()
+                point[version] = out
+                shutil.rmtree(work / key / version, ignore_errors=True)
+            point["static_over_propainter_bytes"] = point["static"]["bytes"] / point["propainter"]["bytes"]
+            g5c.save(checkpoints, key, point)
+            points.append(point)
+            done += 1
+            progress(done)
+        rows.append({"method": name, "codec": codec, "coded_size": list(size), "points": points})
+    write_json(stage_dir() / "g6.json", {
+        "kind": "fill-cost", **window_record(w, args), "arm": arm_record,
+        "grid": {m: grid[m] for m in args.methods.split(",")}, "restored": sorted(restored),
+        "static": {"rule": "per-pixel temporal median of the filled window, in F only",
+                   "changed_outside_f": bool(changed[~holes].any()), "changed_share_of_f": float(changed[holes].mean())
+                   if holes.any() else 0.0},
+        "enhancers": [str(d) for d in enhancer_dirs] or None,
+        "seconds": round(time.time() - began, 1), **g5c.gpu_record(), **provenance(), "methods": rows})
+    shutil.rmtree(work, ignore_errors=True)
+    return 0
+
+
 # ----------------------------------------------------------------- validation
 
 
@@ -830,6 +922,8 @@ def validate_stage(stage: Path) -> dict[str, bool]:
             "converged": result["converged"]["converged"] if full else True,
             "enough_frames": result["fit_frames"] >= (300 if full else 2),
         }
+    if result["kind"] == "fill-cost":
+        return validate_fill_cost(result, gpu, full)
     rows = result["methods"]
 
     def scored(p: dict[str, Any]) -> bool:
@@ -857,6 +951,29 @@ def validate_stage(stage: Path) -> dict[str, bool]:
     return checks
 
 
+def validate_fill_cost(result: dict[str, Any], gpu: bool, full: bool) -> dict[str, bool]:
+    """H5q's fill-cost oracle: both versions of every point coded and scored, the plate only inside F."""
+    rows = result["methods"]
+    points = [p for r in rows for p in r["points"]]
+    versions = [p[v] for p in points for v in ("propainter", "static")]
+    return {
+        "intended_gpu": gpu,
+        "methods_present": bool(rows) and all(r["points"] for r in rows),
+        "both_versions_scored": all(g5.finite(v["score"]["dataset"]["lpips_v"]) and g5.finite(v["score"]["dataset"]["psnr_v"])
+                                    for v in versions),
+        "dcvc_decodes": all(p[v]["deterministic"] and p[v]["decoder_matches_encoder_intra"]
+                            for r in rows if r["codec"] in ("dcvc", "scene") for p in r["points"]
+                            for v in ("propainter", "static")),
+        "enhancer_route_scored": all("enhanced_score" in p[v] for r in rows if r["codec"] == "svt" for p in r["points"]
+                                     for v in ("propainter", "static")) if result.get("enhancers") else True,
+        "plate_only_inside_f": not result["static"]["changed_outside_f"],
+        "plate_changes_f": result["static"]["changed_share_of_f"] > (0.5 if full else 0.0),
+        "foreground_plausible": 0.0 < result["foreground_share"] < 0.8,
+        "window_is_the_released_one": result["source"]["jpeg_gate_holds"],
+        "propainter_on_gpu": result["propainter"] is None or result["propainter"]["gpu"] == result["gpu"],
+    }
+
+
 def command_validate(args: argparse.Namespace) -> int:
     stage = Path(args.stage or os.environ.get("PS_STAGE_DIR") or ".")
     checks = validate_stage(stage)
@@ -876,7 +993,8 @@ def main(argv: list[str] | None = None) -> int:
               "dists-backbone", "inception", *propainter)
     fo = sub.add_parser("format")
     en = sub.add_parser("enhance")
-    for p in (fo, en):
+    fc = sub.add_parser("fill-cost")
+    for p in (fo, en, fc):
         for name in window:
             p.add_argument(f"--{name}", required=True)
         p.add_argument("--limit-frames", type=int, default=0)
@@ -889,6 +1007,12 @@ def main(argv: list[str] | None = None) -> int:
     fo.add_argument("--methods", default=",".join(METHODS))
     fo.add_argument("--values", default=None, help="METHOD=V,V;... over the default grid")
     fo.set_defaults(func=command_format)
+    fc.add_argument("--arm", default=None, help="the window's scene model: a train archive (scene methods)")
+    fc.add_argument("--enhancers", action="append", help="G6's enhance archives of the window (extracted): their "
+                    "networks, one per CRF")
+    fc.add_argument("--methods", required=True)
+    fc.add_argument("--values", required=True, help="METHOD=V,V;...")
+    fc.set_defaults(func=command_fill_cost, fill="propainter")
     en.add_argument("--footage", required=True, help="the window's extracted native footage archive")
     en.add_argument("--crfs", default=",".join(map(str, g5.CRFS)))
     en.add_argument("--steps", type=int, required=True)

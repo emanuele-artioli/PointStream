@@ -300,6 +300,12 @@ def command_foreground(args: argparse.Namespace) -> int:
     began = time.time()
     torch.backends.cudnn.benchmark = False
     w = load_window(args, work)
+    video_model = None
+    if args.video_arm:  # H5q 1: the window's venue model (G6 `train --fill none`, the anchor's) codes the foreground
+        video_model, args.video_ckpt = g6.load_arm(args.video_arm)
+        if video_model["fill"] != "none" or video_model["id"].split("/")[-1] != w["item"]["video"]:
+            raise SystemExit(f"{args.video_arm}: not the whole-frame venue model of {w['item']['video']}")
+    video_model = {"video_ckpt_sha256": file_sha256(Path(args.video_ckpt)), "venue": video_model}
     nearest = np.stack([cp.alpha_and_classes(c)[1] for c in w["classes"]])
     cost = mask_cost(w["classes"], w["fps"], work)
     nets: dict[tuple[str, str], tuple[Any, dict[str, Any], str]] = {}
@@ -337,13 +343,14 @@ def command_foreground(args: argparse.Namespace) -> int:
     manifest = {"window": item["id"], "video": item["video"], "frames": w["frames"], "fps": str(w["fps"]),
                 "yuv": g6.YUV, "classes_sha256": w["classes_sha256"], "mask_set": FILL, "mask_cost": cost,
                 "ring_px": cp.RING, "keep_radius_px": {str(s): cp.keep_radius(s) for s in (1, 2, 4)},
-                **g6.provenance(), **g5c.gpu_record(), "points": rows}
+                "video_model": video_model, **g6.provenance(), **g5c.gpu_record(), "points": rows}
     write_json(publish / "manifest.json", manifest)
     write_json(stage_dir() / "h5.json", {
         "kind": "foreground", "item": item["id"], "frames": w["frames"], "limit_frames": args.limit_frames,
         "source": {k: v for k, v in w["source"].items() if k != "jpeg_gate"},
         "jpeg_gate_holds": all(c["holds"] for c in w["source"]["jpeg_gate"]), "masks": w["masks"],
-        "mask_cost": cost, "points": rows, "manifest_sha256": file_sha256(publish / "manifest.json"),
+        "mask_cost": cost, "points": rows, "video_model": video_model,
+        "manifest_sha256": file_sha256(publish / "manifest.json"),
         "seconds": round(time.time() - began, 1), **g5c.gpu_record(), **g6.provenance()})
     shutil.rmtree(work, ignore_errors=True)
     return 0
@@ -1136,7 +1143,20 @@ def validate_foreground(result: dict[str, Any]) -> dict[str, bool]:
         "frames_published": all(len(r["decoded_frame_sha256"]) == result["frames"] for r in rows),
         "mask_cost_measured": result["mask_cost"]["bytes"] > 0 and 0 < result["mask_cost"]["share"] < 0.8,
         "full_window": result["limit_frames"] > 0 or result["frames"] == 240,
+        "venue_model_is_the_windows": venue_model_ok(result),
     }
+
+
+def venue_model_ok(result: dict[str, Any]) -> bool:
+    """H5q 1: a foreground coded with a venue model names the whole-frame model of its own video, converged."""
+    venue = (result.get("video_model") or {}).get("venue")
+    if venue is None:
+        return True
+    converged = venue["converged"]  # G6's monitor record, or a flag
+    converged = converged.get("converged") if isinstance(converged, dict) else converged
+    return venue["fill"] == "none" and converged is True and \
+        venue["model_sha256"] == result["video_model"]["video_ckpt_sha256"] and \
+        result["item"].startswith(venue["id"].split("/")[-1] + "_")
 
 
 def validate_score(result: dict[str, Any]) -> dict[str, bool]:
@@ -1398,15 +1418,22 @@ def matched_regions(points: list[dict[str, Any]], anchor: list[dict[str, Any]]) 
     return out
 
 
+#: A tagged foreground swap falls back to this variant's rows on the points it did not recode (H5q 1: the venue
+#: model's foreground, on G_HO's PointStream).
+BASE_OF_TAG = {"venuefg": "gho"}
+
+
 def variant_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     """H5's variants (F granted) by background route, and H5m's: PointStream with F coded at 1/s, and the hull
     over every s."""
     granted = [r for r in rows if not r.get("mask_scale") and not r.get("tag")]
     out = {v: [r for r in granted if r["route"] in routes] for v, routes in VARIANTS.items()}
-    for tag in sorted({r["tag"] for r in rows if r.get("tag")}):  # a foreground swap: its rows, H5's for the rest
+    for tag in sorted({r["tag"] for r in rows if r.get("tag")}, key=lambda t: t in BASE_OF_TAG):
+        # a foreground swap: its rows, and its base variant's (H5's, or G_HO's for H5q) for the other points
         tagged = [r for r in rows if r.get("tag") == tag and not r.get("mask_scale")]
         swapped = {r["foreground"] for r in tagged}
-        out[tag] = tagged + [r for r in out["pointstream"] if r["foreground"] not in swapped]
+        base = out.get(BASE_OF_TAG.get(tag, "pointstream"), out["pointstream"])
+        out[tag] = tagged + [r for r in base if r["foreground"] not in swapped]
     coded = [r for r in rows if r.get("mask_scale")]
     for s in sorted({r["mask_scale"] for r in coded}):
         out[f"mask{s}"] = [r for r in coded if r["mask_scale"] == s]
@@ -1485,6 +1512,8 @@ def item_report(rows: list[dict[str, Any]], anchors: list[dict[str, Any]], mask_
                                 curve(points, metric), curve(group, metric), minimum)
     pointstream = [r for r in rows if r["route"] in VARIANTS["pointstream"] and not r.get("mask_scale")]
     out["matched"] = matched_regions(pointstream, anchors) if pointstream and anchors else []
+    out["matched_by_variant"] = {v: matched_regions(points, anchors) for v, points in variant_rows(rows).items()
+                                 if (v in BASE_OF_TAG or v in BASE_OF_TAG.values()) and points and anchors}
     return out
 
 
@@ -1606,6 +1635,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--slots", choices=("G", "G_HO"), default="G", help="the enhancers in the class slots: H3d's G on "
                    "the hands, or H4c's G_HO on hands and objects")
     p.add_argument("--object-networks", action="append", default=[], help="H4c's networks job archives (G_HO)")
+    p.add_argument("--video-arm", help="H5q 1: G6's `train --fill none` archive of the window's video (extracted); "
+                   "its fine-tuned DCVC-UF HT-L replaces --video-ckpt")
     p = sub.add_parser("score")
     add_window(p)
     p.add_argument("--foreground", action="append", required=True, help="foreground jobs' archives (extracted)")
