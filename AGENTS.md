@@ -77,6 +77,12 @@ Stop when the decision is made.
 Rank by value to the paper first and the demo second. Details are in the
 [protocol](docs/experiments.md#protocol).
 
+Train/test overlap: a component may be trained on data that overlaps the
+evaluation set when that saves real effort; record the overlap and report the
+clean subset beside the pooled number. Judges (detectors, metrics' networks)
+must not have seen the frames they judge. Paper headline numbers state which
+footage was seen in training, and the claim is scoped to it (user, 2026-10-21).
+
 ## Evidence
 
 A number is evidence only if it names its job, code revision, inputs and GPU,

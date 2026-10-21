@@ -504,6 +504,34 @@ other. Each has its rule written before its run, as everywhere.
   RacketVision's ball labels (PLAN's ball stage); it is also the judge,
   since an off-the-shelf detector finds 46% of the source's balls and
   SAM 3.1's text prompt 56%.
+  Outcomes (2026-10-21, [entries](docs/experiments.md)): (1) no renderer
+  adopted: a per-window appearance keeps 10–20% of the pixel oracle's
+  gain (BD about 0% against the −25% bar); the diagnostic points to
+  per-frame position and appearance. The user's rendering preference
+  (disk or streak) is pending. (2) RacketVision's BallTrack adopted off
+  the shelf as tracker and judge (0.918 on K5's TrackNet games, never in
+  its training; 0.881 on RacketVision test; 0.022 false detections per
+  frame); no training needed. Through SVT-AV1 at CRF 62 every tracker
+  finds under 3% of the balls.
+- K5b 1b. *Per-frame ball*: K5b 1's oracle with the
+  encoder refining each position by fit (±4 px, billed through the same
+  residual code) and sending the appearance per frame (setting and
+  colour predicted from the previous frame, billed); same decodes, judges
+  and rule; positions from BallTrack as well as the labels, so the ball
+  mode is measured end to end. Judges (user, 2026-10-21): BallTrack
+  detection and crop DISTS. Outcome (2026-10-21, [entry](docs/experiments.md)):
+  not adopted, on rate: the drawn ball restores detection (0.01 → 0.90 at
+  DCVC-UF's 13 kbps; 5–20× less rate than the pixel coders for 80% of the
+  source's balls) and passes crop DISTS (streak −27% to −42%), but its
+  ~1 kbps payload fails the frame-PSNR guard (+1.7% to +2.8% against
+  +1%). Decision (user, 2026-10-21): the ball mode is kept as a win
+  despite the guard (about 1 kbps is small; the ball matters in tennis),
+  the guard's failure disclosed; the **streak** is the default renderer
+  (the disk often looks unrealistic; the streak matches DCVC-UF where
+  DCVC-UF keeps the ball and keeps it visible far more often). A cheap
+  check (not evidence) finds colour coded at step 8 saves about 20% of
+  the payload for 0.3% of the fit's gain; a codec default to set before
+  the final runs, not a reason to rerun now.
 Datasets: still-camera sets (TrackNet, RacketVision, OpenTTGames) are
 fine where a decision needs labels, with the scope stated in the paper;
 broadcast matches answer what a real broadcast costs.
@@ -611,6 +639,21 @@ it saves at the hands' rates), so networks are better delivered once; and
 the generic network's gain on the hands is perceptual (LPIPS and DISTS
 better, PSNR worse, a slight colour shift, no invented texture), as G5d's
 enhancer on the background.
+An observation for the tennis paper (user, 2026-10-21; K5b 2): pixel
+coders erase the ball at low rate, measured with a valid ball detector.
+RacketVision's BallTrack finds 0.938 of TrackNet's balls on games 8–10
+(0.918 on K5's games, none in its training); through SVT-AV1 preset 8 at
+CRF 62 (median 84 kbps, frame PSNR 33–34 dB) it finds 0.026, and every
+other tracker of WASB's zoo under 0.03. K5's YOLO26x figure (0.02) came
+from a detector that found only 46% of the source's balls. DCVC-UF,
+measured with BallTrack in K5b 1b: 0.01 of the balls at QP 0 (13 kbps),
+0.15 at QP 21, 0.67 at QP 42 (118 kbps); with the ball mode's streak
+(about 1 kbps) 0.90–0.92 at every point.
+A figure for the tennis paper, if space allows (user, 2026-10-21): the
+ball at equal rate, source | DCVC-UF | + disk | + streak, on two frames
+the user chose from K5b 1b's side-by-side clips (the far player's ball,
+where DCVC-UF loses it and the disk looks unrealistic); regenerated from
+the final experiments' streams, as every figure is.
 Negative results to report (user, 2026-10-13), with their numbers:
 parametric motion fails for egocentric objects (H1's homographies, H4a's
 grip pose on HOT3D motion capture, H4b's bank of views), and keypoints
