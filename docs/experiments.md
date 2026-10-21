@@ -6691,6 +6691,22 @@ invocation turns out to be needed.
   ones included), within the ceiling of 4.
 - Report: `pointstream-data/visor/h5-2026-10-16/report-h5q2-37db6aa/`
   (the stages' `g6.json`, `oracle.py` and its `oracle.json`, the specs).
+- Follow-up analyses (CPU, 2026-10-21; not new runs).
+  - Every metric, the per-point configuration against `dcvc-venue` | the
+    fair pooled envelope: weighted LPIPS +6% (1/4) | +8% (1/4); frame
+    LPIPS +12% (0/4) | +11% (0/4); weighted DISTS −15% (4/4) | −9%
+    (3/4); frame DISTS −22% (4/4) | −18% (4/4); weighted PSNR −11% (3/4)
+    | +43% (1/4); frame PSNR +5% (1/4) | +85% (0/4). DISTS wins against
+    every anchor; PSNR wins only against the venue codec (SVT-AV1 at
+    preset 1 holds the pooled PSNR hull); LPIPS loses against every
+    anchor.
+  - F's share of the frame over all 34 windows of evaluation set v2
+    (`visor_dense_sam_fill`, every 8th frame; archive `049977f0…`):
+    median 24%; 1 window under 5% (P09_106, 2.3%), 3 under 10%, 12 over
+    30% (up to 77%). The pilots' LPIPS reading crosses zero between F =
+    2% (−15%) and 14% (+8%). A small-F scope would cover about 3 of 34
+    egocentric windows; broadcast sports, where the players are a few
+    percent of the frame, are the natural small-F domain (K6).
 
 ### 2026-10-13 — K4: tennis audit (H1's method on broadcast tennis)
 - Question (PLAN K4): what is broadcast tennis made of, part by part, and

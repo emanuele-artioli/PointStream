@@ -21,35 +21,36 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-10-20)
+## Where PointStream stands (2026-10-21)
 
 - **Egocentric pipeline (H5):** runs end to end on the 4 pilot items
-  (`src/pointstream/`, `experiments/visor/h5.py`). Against off-the-shelf
-  anchors with F granted: weighted LPIPS −29% (G_HO in both foreground
-  slots). Against fair anchors (H5p 3): fails with venue models billed;
-  at equal adaptation the venue-adapted whole-frame DCVC-UF beats it on
-  LPIPS (+16%, 1 of 4) while PointStream wins DISTS (−17%) and PSNR
-  (−11%). Billing the mask F costs most of the margin (H5m). **Open, and
-  the critical path: H5q (does the split win at equal adaptation?) and
-  H5p 4–5 (F carried by the stream; visual check).** H5q lever 1 (the
-  venue model codes the foreground) closes the foreground gap but not the
-  LPIPS margin (+19%; +6% choosing per point). The remaining loss is
-  structural (F paid twice) and grows with F's area; the fill's measured
-  cost does not close it (H5q 2: +9 to +13%). H5q closed on LPIPS; the
-  claim waits on the user.
+  (`src/pointstream/`, `experiments/visor/h5.py`). Against fairly
+  configured off-the-shelf codecs, venue models unbilled, F granted:
+  weighted LPIPS −22% (4 of 4). At equal adaptation (H5q, closed
+  2026-10-21) against a whole-frame DCVC-UF adapted the same way, neither
+  billed: **DISTS wins** (weighted −15%, frame −22%, 4 of 4; also against
+  the full fair envelope), weighted PSNR wins (−11%), **LPIPS loses** (+6%
+  at best). The LPIPS cost is structural (F coded in both streams) and
+  follows F's share of the frame, median 24% on egocentric video; it
+  wins below about 10% (P09_106, 2%: −15%). Billing the mask F costs
+  most of the margin (H5m). **Next: H5p 4–5** (F carried by the
+  foreground stream; the visual check).
 - **Background (G):** a scene model adapted to the venue, sent beforehand
   and unbilled (payback hours reported), plus a per-video enhancer route
   (G6).
 - **Foreground (H):** hands and handled objects are coded pixels, DCVC-UF
   at ¼ or ½ plus the generic enhancer G_HO. Keypoints lose on egocentric
   video (H1, H3, H4, K1, K3).
-- **Tennis (K):** the ball mode wins (K5); court-view shots are adopted
+- **Tennis (K):** the natural small-foreground domain (players a few
+  percent of the frame). The ball mode wins (K5); court-view shots are adopted
   as K8b (2026-10-21): on 69 held-out shots from three broadcasts,
   precision and recall are 1.00, with a registration median of 0.77 px and
   p95 of 2.71 px; homographies are published for all five of K4b's
   matches. K4b done (2026-10-21): players found by racket contact plus the
   court outline, the far player fitted on ×1 crops, keypoints 3.3 kbps for
-  two, so K6's gate passes. Next: K5b, K6; K7 (HiEve) later.
+  two, so K6's gate passes. K5b done: BallTrack adopted as tracker and
+  judge; the ball mode kept with the streak renderer (user). Next: K6
+  (running); K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -773,7 +774,10 @@ whole-frame DCVC-UF adapted to the venue the same way, neither model
 billed, PointStream loses on LPIPS (+16%; +6% with the best foreground
 per point) and wins on DISTS (weighted −15%, frame −22%, 4 of 4) and
 weighted PSNR (−11%). H5q decided (2026-10-21): no LPIPS win at
-equal adaptation. State the metrics' disagreement; that the split's
+equal adaptation. Reporting (user, 2026-10-21): every metric is reported
+with its result, DISTS (and PSNR where it wins) may lead and LPIPS's loss
+is stated beside it; no account of which metric was planned as the
+headline is needed. State the metrics' disagreement; that the split's
 LPIPS cost is structural (F coded in both streams) and grows with F's
 share of the frame (P09_106, 2%: −15%; P02_02, 50%: +19%); and that the
 foreground alone matches the venue codec at high rates once adapted.
