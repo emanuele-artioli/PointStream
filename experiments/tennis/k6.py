@@ -65,6 +65,9 @@ REVIEW_SEED = "pointstream-k6-review"
 HEIGHT_BINS = (0.0, 0.10, 0.15, 0.25, 1.01)
 #: Parts of the amendment-2 accounting (K4's order, without the ball, whose bits come from K4's record).
 PARTS = ("background", "other_person", "player", "racket")
+#: The stage's claimed device as the supervisor set it; ultralytics rewrites CUDA_VISIBLE_DEVICES to "0" once loaded,
+#: and the DCVC-UF worker refuses to run without the claimed UUID (K5's failed attempt `20261013T134053Z-43fa3fb2`).
+STAGE_CUDA_VISIBLE_DEVICES = os.environ.get("CUDA_VISIBLE_DEVICES")
 
 DECISION: dict[str, Any] = {
     "version": 1,
@@ -447,6 +450,8 @@ def code_dcvc(args: argparse.Namespace, yuv: Path, frames: int, qp: int, scale: 
     region_file = work / "region.npy"
     np.save(region_file, region_labels(scored_r, scale).astype(bool))
     attempts = []
+    if STAGE_CUDA_VISIBLE_DEVICES is not None:
+        os.environ["CUDA_VISIBLE_DEVICES"] = STAGE_CUDA_VISIBLE_DEVICES  # h3c's worker and bit estimate read os.environ
     for attempt in range(DCVC_ATTEMPTS):
         rec = h3c_code(args, source, region_file, (sw, sh), frames, qp, args.video_ckpt, args.video_sha256, work / f"a{attempt}")
         psnr = luma_psnr(Path(rec["decoded"]), source, sw, sh, frames)
