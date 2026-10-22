@@ -606,7 +606,9 @@ objects (the tennis ball).
   + G hull on **22 of 22 by LPIPS and by DISTS**. Median LPIPS on R is
   0.084 against the hull's 0.175, and on 14 items it beats every pixel
   point up to about 45 kbps. No scope is needed. K1f's envelope path
-  reproduces H3d's recorded points on P01_107. Next: K6b's ladder for
+  reproduces H3d's recorded points on P01_107. **Over all 30 held-out
+  items (2026-10-22, `k1f-report-30.json` `d31b1fc2…`): 30 of 30 by
+  LPIPS and by DISTS** (median 0.086 against 0.174). Next: K6b's ladder for
   hands (a renderer that has to earn this appearance).
   **K6b for hands, audit (2026-10-22, experiments.md "K6b (hands) 1"):**
   the renderer is local: it draws a hand crop from a reference crop and
