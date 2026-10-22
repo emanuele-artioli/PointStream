@@ -924,13 +924,14 @@ PANEL_FULL = (640, 360)
 
 
 def parse_match(spec: str) -> dict[str, Any]:
-    """``BG+FG|VENUE_KEY|HEIGHT=CRF``: a PointStream pair, the venue anchor's point and an SVT-AV1 ladder point
-    near its rate."""
+    """``BG+FG[@K]|VENUE_KEY|HEIGHT=CRF``: a PointStream pair (its foreground from the K-th ``--foreground``
+    archive, default 0), the venue anchor's point and an SVT-AV1 ladder point near its rate."""
     pair, venue, svt = spec.split("|")
     height, crf = svt.split("=")
+    pair, _, index = pair.partition("@")
     if "+" not in pair or int(height) not in LADDER:
-        raise SystemExit(f"{spec}: not PAIR|VENUE|HEIGHT=CRF")
-    return {"pair": pair, "venue": venue, "svt": (int(height), int(crf))}
+        raise SystemExit(f"{spec}: not PAIR[@K]|VENUE|HEIGHT=CRF")
+    return {"pair": pair, "foreground": int(index or 0), "venue": venue, "svt": (int(height), int(crf))}
 
 
 def crop_box(f: np.ndarray, size: tuple[int, int] = FULL) -> tuple[int, int, int, int]:
@@ -1007,14 +1008,14 @@ def command_crops(args: argparse.Namespace) -> int:
     if args.mask_scale > 0:
         shown_classes, mask_payload, mask_record = coded_classes(w["classes"], args.mask_scale, w["fps"])
     alpha = np.stack([cp.alpha_and_classes(shown_classes[t])[0] for t in shown_t])
-    fg_points = {}
+    fg_points: list[dict[str, Any]] = []  # per --foreground archive (keys repeat across coders)
     for directory in args.foreground:
         root = Path(directory) / "publish" if (Path(directory) / "publish").is_dir() else Path(directory)
         manifest = json.loads((root / "manifest.json").read_text())
         if manifest["window"] != w["item"]["id"] or manifest.get("mask_scale", 0) not in (0, args.mask_scale):
             raise SystemExit(f"{directory}: another window, or a stream built for another F̂")
-        for p in manifest["points"]:
-            fg_points[p["key"]] = {**p, "root": str(root), "manifest_job": manifest.get("job_id")}
+        fg_points.append({p["key"]: {**p, "root": str(root), "manifest_job": manifest.get("job_id")}
+                          for p in manifest["points"]})
     backgrounds = {b["key"]: b for b in load_backgrounds(args.background, {"scene", "enh", "svt"}, w["item"]["id"])}
     venue = {v["key"]: v for v in load_backgrounds(args.venue, {"scene"}, w["item"]["id"])}
     coder = argparse.Namespace(encoder=args.encoder, decoder=args.decoder, threads=args.threads)
@@ -1022,7 +1023,7 @@ def command_crops(args: argparse.Namespace) -> int:
     for spec in args.match:
         m = parse_match(spec)
         bg_key, fg_key = m["pair"].split("+")
-        bg, fg, ven = backgrounds[bg_key], fg_points[fg_key], venue[m["venue"]]
+        bg, fg, ven = backgrounds[bg_key], fg_points[m["foreground"]][fg_key], venue[m["venue"]]
         c = container_for(w, bg, fg, Path(fg["root"]), mask_payload)
         ps_kbps = len(c.pack()) * 8 / seconds / 1000
 

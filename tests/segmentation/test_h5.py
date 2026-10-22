@@ -276,7 +276,8 @@ def test_coded_rows_with_a_tag_stay_out_of_the_tag_variants() -> None:
 
 def test_match_and_crop_box() -> None:
     m = h5.parse_match("scene-540-0+dcvc-0_4|scene-540-13|540=62")
-    assert m == {"pair": "scene-540-0+dcvc-0_4", "venue": "scene-540-13", "svt": (540, 62)}
+    assert m == {"pair": "scene-540-0+dcvc-0_4", "foreground": 0, "venue": "scene-540-13", "svt": (540, 62)}
+    assert h5.parse_match("enh-1080-63+dcvc-42_1@1|scene-1080-50|1080=55")["foreground"] == 1
     with pytest.raises(SystemExit):
         h5.parse_match("scene-540-0|scene-540-13|500=62")
     f = np.zeros((1080, 1920), bool)
