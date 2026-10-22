@@ -916,6 +916,173 @@ def command_score(args: argparse.Namespace) -> int:
     return 0
 
 
+# ----------------------------------------------------------------- visual check (H5p 5, CPU)
+
+CROP_MIN = 384  # F's box is widened to at least this (px, at 1080p) so a crop shows context
+CROP_PAD = 32
+PANEL_FULL = (640, 360)
+
+
+def parse_match(spec: str) -> dict[str, Any]:
+    """``BG+FG|VENUE_KEY|HEIGHT=CRF``: a PointStream pair, the venue anchor's point and an SVT-AV1 ladder point
+    near its rate."""
+    pair, venue, svt = spec.split("|")
+    height, crf = svt.split("=")
+    if "+" not in pair or int(height) not in LADDER:
+        raise SystemExit(f"{spec}: not PAIR|VENUE|HEIGHT=CRF")
+    return {"pair": pair, "venue": venue, "svt": (int(height), int(crf))}
+
+
+def crop_box(f: np.ndarray, size: tuple[int, int] = FULL) -> tuple[int, int, int, int]:
+    """(x0, y0, x1, y1): F's bounding box padded and widened to `CROP_MIN`, inside the frame; the centre if F is
+    empty."""
+    w, h = size
+    ys, xs = np.nonzero(f)
+    if len(xs):
+        x0, x1, y0, y1 = xs.min() - CROP_PAD, xs.max() + CROP_PAD, ys.min() - CROP_PAD, ys.max() + CROP_PAD
+    else:
+        x0, x1, y0, y1 = w // 2, w // 2, h // 2, h // 2
+    box = []
+    for lo, hi, limit in ((x0, x1, w), (y0, y1, h)):
+        span = max(hi - lo, CROP_MIN)
+        centre = (lo + hi) // 2
+        lo = int(np.clip(centre - span // 2, 0, max(limit - span, 0)))
+        box.append((lo, min(lo + span, limit)))
+    return box[0][0], box[1][0], box[0][1], box[1][1]
+
+
+def labelled(image: np.ndarray, text: str) -> np.ndarray:
+    import cv2
+
+    bar = np.full((28, image.shape[1], 3), 255, np.uint8)
+    cv2.putText(bar, text, (6, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 1, cv2.LINE_AA)
+    return np.concatenate([bar, image], axis=0)
+
+
+def panel_grid(frames: dict[str, np.ndarray], box: tuple[int, int, int, int],
+               crop_width: int = PANEL_FULL[0]) -> np.ndarray:
+    """One row of F's crop and one of the whole frame, a column per named RGB frame (label: name)."""
+    import cv2
+
+    x0, y0, x1, y1 = box
+    crop_height = max(1, round((y1 - y0) * crop_width / (x1 - x0)))
+    top, bottom = [], []
+    for name, rgb in frames.items():
+        top.append(labelled(cv2.resize(np.ascontiguousarray(rgb[y0:y1, x0:x1]), (crop_width, crop_height),
+                                       interpolation=cv2.INTER_AREA), name))
+        whole = cv2.resize(rgb, PANEL_FULL, interpolation=cv2.INTER_AREA)
+        sx, sy = PANEL_FULL[0] / FULL[0], PANEL_FULL[1] / FULL[1]
+        cv2.rectangle(whole, (int(x0 * sx), int(y0 * sy)), (int(x1 * sx) - 1, int(y1 * sy) - 1), (255, 0, 0), 1)
+        bottom.append(whole)
+    def row(panels: list[np.ndarray]) -> np.ndarray:
+        gap = np.full((panels[0].shape[0], 6, 3), 255, np.uint8)
+        return np.concatenate([x for p in panels for x in (p, gap)][:-1], axis=1)
+
+    row1 = row(top)
+    row2 = row([cv2.resize(b, (crop_width, round(PANEL_FULL[1] * crop_width / PANEL_FULL[0]))) for b in bottom])
+    return np.concatenate([row1, np.full((6, row1.shape[1], 3), 255, np.uint8), row2], axis=0)
+
+
+def command_crops(args: argparse.Namespace) -> int:
+    """H5p 5: side-by-side crops of PointStream and the anchors at matched rates, rebuilt on the CPU from the
+    published decodes (the composite as `score` makes it; the venue anchor's FFV1; SVT-AV1 at the equal-time
+    preset re-encoded at the matched ladder point). Writes PNGs to ``publish/crops`` and ``h5.json``."""
+    import cv2
+
+    from experiments.background import g6
+    from experiments.visor import b2
+
+    began = time.time()
+    scratch = scratch_dir()
+    work = scratch / "crops"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    out_dir = scratch / "publish" / "crops"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    w = load_window(args, work)
+    frames = w["frames"]
+    shown_t = [int(t) for t in args.frames.split(",") if int(t) < frames]
+    seconds = frames / float(w["fps"])
+    shown_classes, mask_payload, mask_record = w["classes"], None, None
+    if args.mask_scale > 0:
+        shown_classes, mask_payload, mask_record = coded_classes(w["classes"], args.mask_scale, w["fps"])
+    alpha = np.stack([cp.alpha_and_classes(shown_classes[t])[0] for t in shown_t])
+    fg_points = {}
+    for directory in args.foreground:
+        root = Path(directory) / "publish" if (Path(directory) / "publish").is_dir() else Path(directory)
+        manifest = json.loads((root / "manifest.json").read_text())
+        if manifest["window"] != w["item"]["id"] or manifest.get("mask_scale", 0) not in (0, args.mask_scale):
+            raise SystemExit(f"{directory}: another window, or a stream built for another F̂")
+        for p in manifest["points"]:
+            fg_points[p["key"]] = {**p, "root": str(root), "manifest_job": manifest.get("job_id")}
+    backgrounds = {b["key"]: b for b in load_backgrounds(args.background, {"scene", "enh", "svt"}, w["item"]["id"])}
+    venue = {v["key"]: v for v in load_backgrounds(args.venue, {"scene"}, w["item"]["id"])}
+    coder = argparse.Namespace(encoder=args.encoder, decoder=args.decoder, threads=args.threads)
+    rows = []
+    for spec in args.match:
+        m = parse_match(spec)
+        bg_key, fg_key = m["pair"].split("+")
+        bg, fg, ven = backgrounds[bg_key], fg_points[fg_key], venue[m["venue"]]
+        c = container_for(w, bg, fg, Path(fg["root"]), mask_payload)
+        ps_kbps = len(c.pack()) * 8 / seconds / 1000
+
+        def at(planes: np.ndarray) -> np.ndarray:
+            return g6.to_rgb(np.ascontiguousarray(planes[shown_t]), True)
+
+        fg_rgb = at(read_ffv1(Path(fg["root"]) / fg["decoded"]))
+        bg_rgb = at(read_ffv1(Path(bg["root"]) / bg["decoded"]))
+        ps = cp.composite(fg_rgb, bg_rgb, alpha)
+        venue_rgb = at(read_ffv1(Path(ven["root"]) / ven["decoded"]))
+        height, crf = m["svt"]
+        pw = work / f"svt-{height}-{crf}"
+        shutil.rmtree(pw, ignore_errors=True)
+        pw.mkdir(parents=True)
+        rec = b2.code_svtav1(coder, ladder_source(w, height, work), w["fps"], crf, pw, None,
+                             {"preset": args.preset, "enable_tf": None}, None, None)
+        decoded = to_full(Path(rec["decoded"]), height, frames)
+        svt_planes = np.fromfile(decoded, np.uint8).reshape(frames, FULL[1] * 3 // 2, FULL[0])
+        svt_rgb = at(svt_planes)
+        svt_kbps = rec["rate_bytes"] * 8 / seconds / 1000
+        shutil.rmtree(pw, ignore_errors=True)
+        pngs = []
+        for i, t in enumerate(shown_t):
+            panels = {"source": w["rgb"][t], f"PointStream {ps_kbps:.0f} kbps": ps[i],
+                      f"DCVC-UF venue {ven['kbps']:.0f} kbps": venue_rgb[i],
+                      f"SVT-AV1 p{args.preset} {height}p {svt_kbps:.0f} kbps": svt_rgb[i]}
+            grid = panel_grid(panels, crop_box(w["classes"][t] > 0))
+            name = f"{w['item']['id'].rsplit('_', 1)[0]}_{m['pair']}_f{t:03d}.png"
+            cv2.imwrite(str(out_dir / name), cv2.cvtColor(grid, cv2.COLOR_RGB2BGR))
+            pngs.append({"frame": t, "png": f"crops/{name}", "sha256": file_sha256(out_dir / name),
+                         "shape": list(grid.shape), "std": float(grid.std())})
+        rows.append({"match": spec, "pair": m["pair"], "pointstream_kbps": ps_kbps, "venue_key": m["venue"],
+                     "venue_kbps": ven["kbps"], "svt": {"height": height, "crf": crf, "kbps": svt_kbps,
+                                                        "stream_sha256": rec["stream_sha256"],
+                                                        "decoded_frames": rec["decoded_frames"]},
+                     "foreground_job": fg["manifest_job"], "background_job": bg["manifest_job"],
+                     "venue_job": ven["manifest_job"], "pngs": pngs})
+        progress(len(rows))
+    write_json(stage_dir() / "h5.json", {
+        "kind": "crops", "item": w["item"]["id"], "frames": frames, "limit_frames": args.limit_frames,
+        "jpeg_gate_holds": all(c["holds"] for c in w["source"]["jpeg_gate"]), "shown_frames": shown_t,
+        "mask_scale": args.mask_scale, "mask": mask_record, "planned": len(args.match), "rows": rows,
+        "preset": args.preset, "encoder": b2.svtav1.tool(args.encoder), "decoder": b2.svtav1.tool(args.decoder),
+        "seconds": round(time.time() - began, 1), **g6.provenance()})
+    shutil.rmtree(work, ignore_errors=True)
+    return 0
+
+
+def validate_crops(result: dict[str, Any]) -> dict[str, bool]:
+    rows = result["rows"]
+    return {
+        "window_is_the_released_one": result["jpeg_gate_holds"],
+        "every_match_rendered": len(rows) == result["planned"] > 0,
+        "every_frame_shown": all(len(r["pngs"]) == len(result["shown_frames"]) > 0 for r in rows),
+        "panels_are_pictures": all(p["std"] > 5 and p["shape"][2] == 3 for r in rows for p in r["pngs"]),
+        "rates_recorded": all(r["pointstream_kbps"] > 0 and r["venue_kbps"] > 0 and r["svt"]["kbps"] > 0 for r in rows),
+        "svt_decoded_every_frame": all(r["svt"]["decoded_frames"] == result["frames"] for r in rows),
+    }
+
+
 # ----------------------------------------------------------------- timing (exclusive GPU)
 
 #: The operating points timed per window: (background method, value, foreground point). One per route.
@@ -1221,6 +1388,8 @@ def validate(stage: Path) -> dict[str, bool]:
         return validate_mask_video(result)
     if result["kind"] == "anchors":
         return validate_anchors(result)
+    if result["kind"] == "crops":
+        return validate_crops(result)
     return validate_foreground(result) if result["kind"] == "foreground" else validate_score(result)
 
 
@@ -1707,6 +1876,18 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--threads", type=int, default=32)
     p.add_argument("--encoder", default="SvtAv1EncApp")
     p.add_argument("--decoder", default="dav1d")
+    p = sub.add_parser("crops")
+    add_window(p)
+    p.add_argument("--foreground", action="append", required=True)
+    p.add_argument("--background", action="append", required=True)
+    p.add_argument("--venue", action="append", required=True, help="G6 format archives of the unfilled window")
+    p.add_argument("--match", action="append", required=True, help="PAIR|VENUE_KEY|HEIGHT=CRF (see parse_match)")
+    p.add_argument("--frames", default="60,180", help="frames shown")
+    p.add_argument("--mask-scale", type=int, default=0)
+    p.add_argument("--preset", type=int, default=1)
+    p.add_argument("--threads", type=int, default=32)
+    p.add_argument("--encoder", default="SvtAv1EncApp")
+    p.add_argument("--decoder", default="dav1d")
     p = sub.add_parser("mask-video")
     for name in ("--eval-set", "--fill-masks", "--item"):
         p.add_argument(name, required=True)
@@ -1724,6 +1905,8 @@ def main(argv: list[str] | None = None) -> int:
         return command_mask_video(args)
     if args.command == "anchors":
         return command_anchors(args)
+    if args.command == "crops":
+        return command_crops(args)
     if args.command == "foreground":
         return command_foreground(args)
     if args.command == "score":

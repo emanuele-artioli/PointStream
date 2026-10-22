@@ -272,3 +272,29 @@ def test_coded_rows_with_a_tag_stay_out_of_the_tag_variants() -> None:
     coded = [{**scored(150, 0.2), "foreground": "dcvc-21_4", "tag": "h5p4-venue", "mask_scale": 8}]
     v = h5.variant_rows(base + coded)
     assert "h5p4-venue" not in v and [r["kbps"] for r in v["mask8"]] == [150]
+
+
+def test_match_and_crop_box() -> None:
+    m = h5.parse_match("scene-540-0+dcvc-0_4|scene-540-13|540=62")
+    assert m == {"pair": "scene-540-0+dcvc-0_4", "venue": "scene-540-13", "svt": (540, 62)}
+    with pytest.raises(SystemExit):
+        h5.parse_match("scene-540-0|scene-540-13|500=62")
+    f = np.zeros((1080, 1920), bool)
+    f[100:150, 1880:1910] = True  # small F near the right edge: widened to CROP_MIN, kept inside the frame
+    x0, y0, x1, y1 = h5.crop_box(f)
+    assert x1 == 1920 and x1 - x0 == h5.CROP_MIN and y1 - y0 == h5.CROP_MIN and y0 >= 0
+    assert x0 <= 1880 and y0 <= 100 and y1 >= 150
+    assert h5.crop_box(np.zeros((1080, 1920), bool)) == (768, 348, 1152, 732)
+
+
+def test_panel_grid_and_crops_validator() -> None:
+    rng = np.random.default_rng(0)
+    frames = {n: rng.integers(0, 255, (1080, 1920, 3), dtype=np.uint8) for n in ("source", "a", "b", "c")}
+    grid = h5.panel_grid(frames, (0, 0, 640, 480))
+    assert grid.shape[1] == 4 * h5.PANEL_FULL[0] + 3 * 6 and grid.shape[2] == 3
+    row = {"pointstream_kbps": 100.0, "venue_kbps": 90.0, "svt": {"kbps": 110.0, "decoded_frames": 240},
+           "pngs": [{"std": 40.0, "shape": list(grid.shape)}] * 2}
+    result = {"jpeg_gate_holds": True, "planned": 1, "rows": [row], "shown_frames": [60, 180], "frames": 240}
+    assert all(h5.validate_crops(result).values())
+    result["rows"][0]["pngs"] = [{"std": 0.0, "shape": list(grid.shape)}] * 2
+    assert not h5.validate_crops(result)["panels_are_pictures"]
