@@ -10163,6 +10163,56 @@ invocation turns out to be needed.
   ordering by crop size but was not isolated. (1), having seen VISOR,
   cannot be tested, and the result is a fail despite it.
 
+### 2026-10-22 — K6b (hands) 2b: a bank of free references (rule)
+- Question (user, 2026-10-22, after rung 2). Rung 2's `ref`, one free
+  reference warped to the coded keypoints, beat FoundHand on 2 of 3 items
+  and the hull on 1. Can a few real references, each frame warped from
+  the one nearest in pose, carry the hand's appearance well enough to beat
+  the hull at the keypoint rate? H3a2 already showed that refreshed
+  references coded as their own stream lose to SVT-AV1 at 40–140 kbps.
+  This tests the corner H3a2 left open: very few references, at about
+  2 kbps.
+- Why it bounds. The references are the window's own frames, uncoded and
+  unbilled. A real bank (coded, billed, or sent once per video from
+  outside the window) can only do worse. If this fails, the reference
+  route for hands closes at every rate this side of H3a2. If it passes,
+  the next test is the buildable form: a bank chosen outside the window,
+  coded, and billed once per video.
+- Variants, on rung 2's 3 scored items (P06_108, P22_107, P25_09), with
+  P01_107 for the smoke. K1f's rows, R as the matte, and Telea fill where
+  nothing is drawn, as rung 2.
+  - `bank@K`, K ∈ {1, 4, 16} references per hand side. Chosen at the
+    encoder by farthest-point sampling on the uncoded poses (wrist-centred,
+    scaled by the pose's extent), starting from the side's first fitted
+    frame. Per frame, the decoder picks the reference whose coded pose is
+    nearest, and warps its side mask's pixels from the reference's coded
+    keypoints to the frame's (`k6.draw`). Only what a decoder holding the
+    references would have is used.
+  - `warp`: K1f's bound, the check (within 0.002 of K1f's LPIPS on R).
+- Decision rule (`k6bh.BANK_DECISION`, fixed before any run; the user's
+  criterion). Per K, an item is won on a metric when `bank@K` on R is
+  below K1f's hull at the item's keypoint rate (the references free).
+  Score = mean over {LPIPS, DISTS} of the share of the 3 items won.
+  - **Pass** (some K scores ≥ 75%, i.e. all 3 items on one metric and at
+    least 2 on the other): the next test is the buildable bank (outside
+    the window, coded, billed once per video), with its own rule.
+  - **Fail** (no K reaches 75%): no bank of real references beats the
+    hull at the keypoint rate. With H3a2, the reference route for
+    egocentric hands closes. Rung 3 (a generator fitted per clip) is then
+    the last open rung, and it waits for the user.
+- Hypothesis. `bank@16` passes, and `bank@1` does not (rung 2's `ref`
+  was 1 of 3). Hands show few distinct poses within 4.8 s, so 16
+  references cover most frames.
+- Competing explanation. The coding error of the keypoints (7–12 px)
+  plus the warp's blending of fingers, not the reference's pose, keeps
+  the warp above the hull. Then `bank@16` stays near `ref` and far above
+  `warp`, even with nearer references.
+- Budget. No generation. GPU only for LPIPS and DISTS (four scorings
+  per item). One job per item, ≤ 45 min each, declared at 40,000 MiB (rung
+  2's scoring peaked at 38,926). Each job's smoke (at most 600 s) runs
+  24 frames of its own item, so P01_107 is not needed. Ceiling 0.75
+  GPU-hours.
+
 ### 2026-10-22 — K6b (hands) 3: overfit oracle (rule, not run)
 - Question. Can FoundHand, fitted on the window's own frames, draw that
   hand well enough to beat the hull at about 2 kbps? It has seen the

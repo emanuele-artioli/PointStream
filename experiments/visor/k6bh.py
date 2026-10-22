@@ -54,7 +54,37 @@ DECISION: dict[str, Any] = {
 }
 
 
+BANK_DECISION: dict[str, Any] = {
+    "variants": "bank@K, K in {1, 4, 16}: farthest-point references on uncoded poses (encoder), per frame the reference "
+                "nearest in coded pose (decoder), warped from its coded keypoints to the frame's; references free",
+    "item_won": "bank@K's LPIPS (DISTS) on R below K1f's hull at the item's keypoint rate",
+    "pass": "some K scores >= 0.75 (mean over {LPIPS, DISTS} of the share of items won): next, the buildable bank "
+            "(outside the window, coded, billed once per video)",
+    "fail": "no K reaches 0.75: with H3a2, the reference route for egocentric hands closes",
+}
+
+
 # ----------------------------------------------------------------- geometry (CPU)
+
+
+def pose_vector(points: np.ndarray) -> np.ndarray:
+    """A pose for matching: the 21 joints wrist-centred and scaled by their extent."""
+    p = points[:, :2] - points[0, :2]
+    return (p / max(float(np.ptp(points[:, :2], axis=0).max()), 1.0)).ravel()
+
+
+def farthest_points(poses: np.ndarray, k: int) -> list[int]:
+    """Indices of ``k`` poses by farthest-point sampling, starting from the first."""
+    chosen = [0]
+    dist = np.linalg.norm(poses - poses[0], axis=1)
+    while len(chosen) < min(k, len(poses)):
+        nxt = int(np.argmax(dist))
+        if dist[nxt] <= 0:
+            break
+        chosen.append(nxt)
+        dist = np.minimum(dist, np.linalg.norm(poses - poses[nxt], axis=1))
+    return chosen
+
 
 
 def crop_box(points: np.ndarray, mask: np.ndarray | None) -> tuple[int, int, int]:
@@ -346,7 +376,7 @@ def item_seed(item_id: str) -> int:
     return int(hashlib.sha256(item_id.encode()).hexdigest()[:7], 16)
 
 
-def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[str, Any], nets: dict[str, Any], fh: FoundHand,
+def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[str, Any], nets: dict[str, Any], fh: FoundHand | None,
                  k1f_unit: tuple[dict[str, Any], dict[str, np.ndarray]], device: str, publish: Path, scratch: Path) -> None:
     import cv2
 
@@ -371,7 +401,20 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     # Draw order without K1f's joint depths (not published): smaller hands, assumed farther, first.
     size = np.ptp(rows["coded"][:, :, 1], axis=1) + np.ptp(rows["coded"][:, :, 0], axis=1)
     variants = tuple(args.variants.split(","))
-    rendered = render_item(fh, rows, truth, clip, frames, item_seed(item["id"]), variants)
+    rendered = (render_item(fh, rows, truth, clip, frames, item_seed(item["id"]), variants) if fh is not None
+                else {"refs": {}, "boxes": {}, "gen": {}, "gen@frame": {}, "seconds": {}})
+    banks: dict[str, dict[str, list[int]]] = {}  # variant -> side -> reference rows
+    for v in variants:
+        if not v.startswith("bank@"):
+            continue
+        banks[v] = {}
+        for side, right in ((HANDS[0], False), (HANDS[1], True)):
+            fitted = [i for i in np.argsort(rows["t"], kind="stable") if bool(rows["right"][i]) == right
+                    and int(rows["t"][i]) < frames and clip.class_mask(int(rows["t"][i]), side).any()]
+            if fitted:
+                poses = np.stack([pose_vector(rows["uncoded"][i]) for i in fitted])
+                banks[v][side] = [int(fitted[j]) for j in farthest_points(poses, int(v.split("@")[1]))]
+    bank_masks: dict[int, np.ndarray] = {}
     k1f.release()  # PyTorch's cache between rendering and scoring (job 20261022T084900Z-7e08ab8f overran 16,000 MiB at 24,886)
     rows_at: dict[int, list[int]] = {}
     for i, t in enumerate(rows["t"]):
@@ -402,7 +445,21 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
             for i in here:
                 side = HANDS[1] if rows["right"][i] else HANDS[0]
                 mask = sides[side]
-                if not mask.any() or side not in rendered["refs"]:
+                if not mask.any():
+                    continue
+                if v.startswith("bank@"):
+                    if side not in banks[v]:
+                        continue
+                    target = pose_vector(rows["coded"][i])
+                    j = min(banks[v][side], key=lambda r: float(np.linalg.norm(pose_vector(rows["coded"][r]) - target)))
+                    tj = int(rows["t"][j])
+                    if j not in bank_masks:
+                        bank_masks[j] = clip.class_mask(tj, side)
+                    ys = np.nonzero(bank_masks[j].any(1))[0]
+                    draw(canvas, drawn, np.asarray(truth[tj]), bank_masks[j], rows["coded"][j], rows["coded"][i],
+                         k1c.SIGMA_OF_HEIGHT * float(ys.max() - ys.min() + 1), k1c.HAND_SKELETON)
+                    continue
+                if side not in rendered["refs"]:
                     continue
                 if v == "ref":
                     ref = rendered["refs"][side]
@@ -462,6 +519,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
             "references": {s: {"t": r["t"], "box": list(r["box"])} for s, r in rendered["refs"].items()},
             "crop_side_px": {"min": int(min(sizes)) if sizes else 0, "median": float(np.median(sizes)) if sizes else 0.0,
                              "max": int(max(sizes)) if sizes else 0},
+            "banks": {v: {sd: [int(rows["t"][r]) for r in rs] for sd, rs in b.items()} for v, b in banks.items()},
             "generated_std_min": min(gen_std) if gen_std else None, "render_seconds": rendered["seconds"],
             "mask_set": mask_info, "seconds": round(time.time() - began, 2)}
     save_unit(publish, "k6bh", item["id"], arrays, meta)
@@ -496,10 +554,12 @@ def command_run(args: argparse.Namespace) -> int:
     device = "cuda"
     nets: dict[str, Any] = {"lpips": load_lpips(Path(args.lpips_backbone), device), "dists": load_dists(Path(args.dists_backbone), device)}
     loaded = time.time()
-    fh = FoundHand(Path(args.foundhand_src), Path(args.foundhand_ckpt), Path(args.vae), int(args.steps), device, scratch)
+    generating = any(v.startswith("gen") for v in args.variants.split(","))
+    fh = FoundHand(Path(args.foundhand_src), Path(args.foundhand_ckpt), Path(args.vae), int(args.steps), device, scratch) if generating else None
     load_seconds = time.time() - loaded
     on_cuda = {k: next(v.parameters()).is_cuda for k, v in nets.items()}
-    on_cuda["foundhand"], on_cuda["vae"] = model_on_cuda(fh.model), model_on_cuda(fh.vae)
+    if fh is not None:
+        on_cuda["foundhand"], on_cuda["vae"] = model_on_cuda(fh.model), model_on_cuda(fh.vae)
     began = time.time()
     done = len(restored)
     order = [it["id"] for it in items]
@@ -511,13 +571,14 @@ def command_run(args: argparse.Namespace) -> int:
 
     write_json(stage_dir() / "k6bh.json", {
         "command": "run", "device": device_record(args.gpu_class), "on_cuda": on_cuda,
-        "seconds": round(time.time() - began, 2), "load_seconds": round(load_seconds, 2), "foundhand": fh.record,
-        "inputs": {"foundhand_src": file_sha256(Path(args.foundhand_src)), "foundhand_ckpt": file_sha256(Path(args.foundhand_ckpt)),
-                   "vae": file_sha256(Path(args.vae)), "k1f_stages": [file_sha256(Path(t)) for t in args.k1f_stage]},
+        "seconds": round(time.time() - began, 2), "load_seconds": round(load_seconds, 2), "foundhand": fh.record if fh is not None else None,
+        "inputs": {**({"foundhand_src": file_sha256(Path(args.foundhand_src)), "foundhand_ckpt": file_sha256(Path(args.foundhand_ckpt)),
+                       "vae": file_sha256(Path(args.vae))} if fh is not None else {}),
+                   "k1f_stages": [file_sha256(Path(t)) for t in args.k1f_stage]},
         "lpips": lpips_record(Path(args.lpips_backbone)),
         "dists": {"torchmetrics": torchmetrics.__version__, "backbone_sha256": file_sha256(Path(args.dists_backbone))},
         "settings": {"frames": int(args.frames), "items": order, "variants": args.variants.split(","), "crop_scale": CROP_SCALE,
-                     "size": SIZE, "decision": DECISION}, "restored_units": sorted(restored)})
+                     "size": SIZE, "decision": DECISION if generating else BANK_DECISION}, "restored_units": sorted(restored)})
     return 0
 
 
@@ -530,8 +591,10 @@ def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
     units = {m["item"]: (m, a) for m, a in load_units([str(stage / "published.tar")], "k6bh")}
     settings = result["settings"]
     checks = {"every_item": sorted(units) == sorted(settings["items"]), "on_cuda": all(result["on_cuda"].values()),
-              "foundhand_loaded": result["foundhand"]["params"] > 6e8, "device_class": bool(result["device"]["class_matches"]),
-              "kernels_on_gpu": result["foundhand"]["kernels"]["kernel_launches"] > 0}
+              "device_class": bool(result["device"]["class_matches"])}
+    if result.get("foundhand"):
+        checks["foundhand_loaded"] = result["foundhand"]["params"] > 6e8
+        checks["kernels_on_gpu"] = result["foundhand"]["kernels"]["kernel_launches"] > 0
     for item, (m, a) in units.items():
         hand = a["pixels_r"] > 0
         checks[f"{item}:hash"] = bool(m["npz_hash_ok"]) and bool(m["k1f"]["npz_hash_ok"])
@@ -540,7 +603,10 @@ def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
             checks[f"{item}:{v}:finite"] = bool(np.isfinite(a[f"{key}_lpips_r"][hand]).all() and np.isfinite(a[f"{key}_dists_r"][hand]).all())
             # catches a renderer that draws nothing; a one-reference warp misses much of a moving hand (P25_09's ref
             # covered 49% of R; threshold lowered from 0.5 after that stage was read, docs/experiments.md)
-            checks[f"{item}:{v}:draws"] = m["summary"][v]["covered_share"] > (0.1 if v == "ref" else 0.5)
+            checks[f"{item}:{v}:draws"] = m["summary"][v]["covered_share"] > (0.1 if v == "ref" or v.startswith("bank@") else 0.5)
+        for v, bank in m.get("banks", {}).items():
+            k = int(v.split("@")[1])
+            checks[f"{item}:{v}:bank_size"] = all(1 <= len(ts) <= k for ts in bank.values()) and bool(bank)
         if "gen" in settings["variants"]:
             checks[f"{item}:gen_not_flat"] = (m["generated_std_min"] or 0) > 2.0
             checks[f"{item}:gen_differs_from_frame"] = ("gen@frame" not in settings["variants"]
@@ -622,9 +688,10 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="command", required=True)
     run = sub.add_parser("run")
-    for flag in ("--eval-set", "--archive", "--masks", "--mask-record", "--items", "--lpips-backbone", "--dists-backbone",
-                 "--foundhand-src", "--foundhand-ckpt", "--vae"):
+    for flag in ("--eval-set", "--archive", "--masks", "--mask-record", "--items", "--lpips-backbone", "--dists-backbone"):
         run.add_argument(flag, required=True)
+    for flag in ("--foundhand-src", "--foundhand-ckpt", "--vae"):
+        run.add_argument(flag, default="", help="FoundHand's source, checkpoint and VAE (gen variants only)")
     run.add_argument("--video", action="append", default=[])
     run.add_argument("--k1f-stage", action="append", required=True, help="K1f's published.tar (rows, bound and hull)")
     run.add_argument("--frames", default="240")

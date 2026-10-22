@@ -89,3 +89,14 @@ def test_crop_box_shifts_inside_the_frame() -> None:
     x0, y0, side = k6bh.crop_box(np.array([[185.0, 75.0], [195.0, 95.0]]), mask)
     assert 0 <= x0 and x0 + side <= 200 and 0 <= y0 and y0 + side <= 100
     assert x0 <= 180 and y0 <= 70
+
+
+def test_farthest_points_spreads_and_stops_at_duplicates() -> None:
+    poses = np.array([[0.0, 0.0], [0.1, 0.0], [5.0, 0.0], [5.0, 0.0], [2.5, 3.0]])
+    assert k6bh.farthest_points(poses, 3) == [0, 2, 4]
+    assert len(k6bh.farthest_points(np.zeros((4, 2)), 3)) == 1
+
+
+def test_pose_vector_ignores_position_and_scale() -> None:
+    hand = np.random.default_rng(0).random((21, 2)) * 50
+    assert np.allclose(k6bh.pose_vector(hand), k6bh.pose_vector(hand * 3 + 100))

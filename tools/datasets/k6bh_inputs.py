@@ -33,10 +33,12 @@ def main() -> int:
     items = args.items.split(",")
     videos = sorted({f"video_{i.rsplit('_', 1)[0]}" for i in items})
     stages = sorted(n for n in catalog if n.startswith("k1f_"))
-    entries = [staged[k] for k in COMMON] + [catalog[k] for k in ("foundhand_src", "foundhand_ckpt", "vae", *stages, *videos)]
+    generating = any(v.startswith("gen") for v in args.variants.split(","))
+    models = ("foundhand_src", "foundhand_ckpt", "vae") if generating else ()
+    entries = [staged[k] for k in COMMON] + [catalog[k] for k in (*models, *stages, *videos)]
     arguments = ["run", "--eval-set", "{staged:eval_set}", "--archive", "{staged:dense_archive}", "--masks", "{staged:fill_masks}",
                  "--mask-record", "{staged:fill_record}", "--lpips-backbone", "{staged:lpips}", "--dists-backbone", "{staged:dists}",
-                 "--foundhand-src", "{staged:foundhand_src}", "--foundhand-ckpt", "{staged:foundhand_ckpt}", "--vae", "{staged:vae}",
+                 *([a for k in models for a in (f"--{k.replace('_', '-')}", f"{{staged:{k}}}")]),
                  *[a for s in stages for a in ("--k1f-stage", f"{{staged:{s}}}")],
                  *[a for v in videos for a in ("--video", f"{{staged:{v}}}")],
                  "--items", "{items}", "--frames", "{frames}", "--steps", args.steps, "--variants", args.variants]
@@ -51,8 +53,8 @@ def main() -> int:
         "smoke": {"seconds": 600, "representative_basis": basis}, "full": {"seconds": args.full_seconds},
         "validator": ["{python}", "-m", "experiments.visor.k6bh", "validate"], "validator_seconds": 300, "required_commands": [],
         "budget_seconds": args.full_seconds + 900, "deadline": args.deadline, "stall_seconds": 1500, "cpu_threads": 16, "device": "gpu",
-        "hosts": k1f["hosts"], "gpu_models": ["RTX 6000 Ada"], "gpu_memory_mib": 32000, "local_storage_gib": 60,
-        "gpu_sharing": {"mode": "shared", "margin_mib": 4096,
+        "hosts": k1f["hosts"], "gpu_models": ["RTX 6000 Ada"], "gpu_memory_mib": 40000, "local_storage_gib": 60,
+        "gpu_sharing": {"mode": "shared", "margin_mib": 1024,
                         "basis": "FoundHand's samples depend on the seeds, steps and inputs, and LPIPS and DISTS on R are deterministic; "
                                  "generation seconds are not evidence (the step count comes from the smoke)"},
     }
