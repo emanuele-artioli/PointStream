@@ -36,9 +36,13 @@ sessions update their own items and experiments.md entries
   keypoints' own jitter is addressed (open for the user).
 - **Hands, keypoints (K1f, K6b):** the bound (appearance granted) beats
   the pixel hull on 30 of 30 held-out items by LPIPS and DISTS. No real
-  renderer keeps it yet: FoundHand zero-shot fails (17%), a bank of free
-  references fails by one item-metric (67% at K = 16). Next: the
-  buildable bank; rung 3 (overfit) waits behind it.
+  renderer keeps it: FoundHand zero-shot fails (17%), a bank of in-window
+  references fails by one item-metric (67% at K = 16), and the buildable
+  bank chosen outside the window fails (2c, 12.5% at K = 16–64; free,
+  25%). References from other moments miss the forearm, sleeve and
+  lighting. The reference route closes at a buildable rate. Rung 3
+  (overfit, 4 GPU-hours, rule written) is the last open rung; it waits
+  for the user.
 
 - **Egocentric pipeline (H5):** runs end to end on the 4 pilot items
   (`src/pointstream/`, `experiments/visor/h5.py`). Against fairly
@@ -83,7 +87,7 @@ stops; the root session fills in the outcome and the next step.
 | item | card | branch | suggested model | status |
 |---|---|---|---|---|
 | H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` | Opus | queued 2026-10-22 |
-| K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` | Opus | queued 2026-10-22 |
+| K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` @ `505f5a7` | Opus | reported 2026-10-22: fail (12.5%; free bank 25%); 2.6 GPU-hours of 3.5 |
 | K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` | Opus | queued 2026-10-22 |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 
