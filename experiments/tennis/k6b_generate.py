@@ -76,12 +76,20 @@ def write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=1, sort_keys=True, default=str) + "\n")
 
 
-def load_checked(module: Any, state: dict[str, Any], name: str, allowed_unexpected: tuple[str, ...] = ()) -> dict[str, Any]:
+#: The reference UNet's output head, absent from reference_unet.pth: AnimateAnyone reads the ReferenceNet's attention
+#: features (ReferenceAttentionControl), never its output, so upstream leaves these four at SD 1.5's values and they
+#: cannot change a rendering. They stay at their initialization here and are recorded.
+UNUSED_REFERENCE_HEAD = ("conv_norm_out.weight", "conv_norm_out.bias", "conv_out.weight", "conv_out.bias")
+
+
+def load_checked(module: Any, state: dict[str, Any], name: str, allowed_missing: tuple[str, ...] = ()) -> dict[str, Any]:
     missing, unexpected = module.load_state_dict(state, strict=False)
-    unexpected = [k for k in unexpected if not any(k.endswith(a) for a in allowed_unexpected)]
+    allowed = [k for k in missing if k in allowed_missing]
+    missing = [k for k in missing if k not in allowed_missing]
     if missing:
         raise SystemExit(f"{name}: {len(missing)} missing keys, e.g. {missing[:5]}")
-    return {"keys": len(state), "missing": 0, "unexpected": len(unexpected), "unexpected_examples": unexpected[:5]}
+    return {"keys": len(state), "missing": 0, "missing_allowed": allowed, "unexpected": len(unexpected),
+            "unexpected_examples": unexpected[:5]}
 
 
 def folder(weights: dict[str, Path], prefix: str, scratch: Path) -> Path:
@@ -132,7 +140,7 @@ class Renderer:
                                                                       output_loading_info=True)
         record["image_encoder"] = loading_record(info, "image_encoder")
         reference = UNet2DConditionModel.from_config({**SD15_UNET, "_class_name": "UNet2DConditionModel"})
-        record["reference_unet"] = load_checked(reference, pth("reference_unet"), "reference_unet")
+        record["reference_unet"] = load_checked(reference, pth("reference_unet"), "reference_unet", UNUSED_REFERENCE_HEAD)
         config3d = {**SD15_UNET, "_class_name": "UNet3DConditionModel",
                     "down_block_types": ["CrossAttnDownBlock3D", "CrossAttnDownBlock3D", "CrossAttnDownBlock3D", "DownBlock3D"],
                     "up_block_types": ["UpBlock3D", "CrossAttnUpBlock3D", "CrossAttnUpBlock3D", "CrossAttnUpBlock3D"],
