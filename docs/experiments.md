@@ -11117,3 +11117,32 @@ and each object's representation is judged on both:
   parts of at most 45 minutes, each saving every finished (unit, profile);
   judging in parts of ≤ 4 windows, declared from the smoke's peak. Ceiling
   4 GPU-hours, smokes included (the card's limit: more needs the user).
+- Attempts (infrastructure, no score). `20261022T124048Z-392f179f`: fleet
+  staging refused the first pack (the fork's absolute links; repacked).
+  `20261022T124842Z-6ce5a155` (`b9dbbe5`): the smoke stopped on the VAE's
+  16 missing keys, since sd-vae-ft-mse stores diffusers' deprecated
+  attention names, which only `from_pretrained` renames (a plain
+  `strict=False` load, as upstream does for its UNets, would have left them
+  random). `20261022T125355Z-b34dc124` (`5f8fd07`): stopped on the
+  reference UNet's output head (`conv_norm_out`, `conv_out`), absent from
+  both profiles' `reference_unet.pth`; AnimateAnyone reads the
+  ReferenceNet's attention features, never its output, so the 4 keys are
+  allowed and recorded. A CPU check then matched every other key of both
+  profiles (3D UNet 686 + 588 motion-module keys, pose guider).
+- Prepare: `20261022T123413Z-eba7629b` (CPU, gpu6, `15ed6e9`), 16 units
+  (8 windows × 2 players), 3,400 frames, every judged frame covered; all 82
+  of `k6b validate`'s checks pass locally (`published.tar` `f832b707…8b8c`).
+- Pilot (development, not scored): `20261022T125706Z-924b389b` (gpu6, RTX
+  6000 Ada, shared; `98e3c45` from `ready.json`), one unit
+  (`djokovic_federer/038`, the far player, 240 frames), both profiles at 30
+  steps. First run on Ada passes (fleet model–GPU table). 661 s and 665 s
+  per profile: **2.76 s per frame**. All 16 of `k6b_generate validate`'s
+  checks pass locally. Visual check (3 judged frames): both profiles follow
+  the coded pose (lunge, reach, walking away); `original` keeps the court
+  and the player's look, `finetuned_tennis` draws on black (its training
+  tracks were matted) and turns the player to face away on the first
+  frame; the racket mostly vanishes, as the audit expected.
+- Budget, by the rule. Spent: about 0.55 GPU-hours. The other 3,160 frames
+  × 2 profiles at 2.76 s are 4.85 GPU-hours, and judging 8 windows about 1:
+  **6.4 at 30 steps, about 4.9 at 20**. Neither fits 4 GPU-hours, so **the
+  rung goes back to the user** before the scored run.
