@@ -10988,3 +10988,92 @@ and each object's representation is judged on both:
   GPU-hours (rung 2 took about 0.45 GPU-hours per item at 50 steps on
   Ada, plus its failed attempts), declared at 40,000 MiB, which rung 2's
   scoring needed. Each stage ≤ 45 minutes.
+
+### 2026-10-22 — K6b (hands) 2c: a buildable bank, chosen outside the window and billed (rule)
+- Question ([PLAN K6b](../PLAN.md), hands, after 2b). Rung 2b's free,
+  in-window bank reached the hull on 2 of 3 items with 16 references and
+  improved steeply with K. Does a bank a codec could send keep that: chosen
+  from the video **outside** the scored window, coded, and billed once per
+  video, with the rate amortized over the video?
+- Items. Positions 0–3 of K1f's content-blind order: P09_103, P25_09,
+  P22_107 (G's training footage) and P06_108, 240 frames each, with K1f's
+  rows, R, bound and hull (nothing in the window is re-coded). All four are
+  planned. If P09_103 cannot run for infrastructure reasons, the rule reads
+  the other three, as 2b did.
+- Candidates for the bank (encoder side). VISOR's dense masks (the
+  `visor_dense` interpolations; B1b's fill exists only inside windows) on
+  every frame of the item's video outside the window and outside a 1 s guard
+  on each side, at a stride of 5 frames, exact frames only on P25_09 (59.94
+  fps, `visor.frame_alignment`). Per side with a mask whose box has both
+  sides ≥ 16 px: WiLoR's two-pass hand-box fit (K1e's `mask_box_rows`,
+  unchanged) and its 2D joints. A candidate is kept when at least 15 of its
+  21 joints fall inside its mask dilated by 10% of the mask box's longer
+  side (drops fits off the hand). This is why rung 2c is its own task: H2
+  and K1f fitted the windows only.
+- Selection. Per side, greedy k-medoids on 2b's pose vector
+  (wrist-centred, scaled by extent): each step adds the candidate that most
+  lowers the mean distance from every candidate to its nearest reference. It
+  is nested, so the bank of 16 is the first 16 of the bank of 64, and it
+  weights the poses the video shows often, where 2b's farthest-point
+  sampling (one window, every pose scored) chased the extremes. K ∈ {16, 32,
+  64} per side.
+- What is sent per reference, and billed: the side mask's box (padded by 8
+  px, even sides ≥ 64 px) as one SVT-AV1 still (CRF 40, preset 4, 4:2:0 full
+  range; the box outside the mask filled smoothly first, so the background
+  costs few bits), its mask as polygons (OpenCV contours simplified at
+  1.5 px, coordinates in the box at ⌈log2 side⌉ bits each, plus a count per
+  polygon), its 21 joints in the box at the same precision, the box's
+  position (4 × 11 bits) and side (1 bit). Payload bits only (the AV1 OBUs,
+  as `svtav1` counts them). The decoder uses the decoded pixels and the
+  decoded polygon mask. CRF 40 is fixed now, before any run, from a probe of
+  two sparse-frame hand crops (P06_108: CRF 35 0.18–0.36 bpp, CRF 45
+  0.11–0.22 bpp). A lossless mask (bilevel PNG, about 750 bytes) cost as
+  much as the image, hence polygons.
+- Decoder, per window frame and fitted side (K1f's rows): the reference
+  whose sent joints are nearest the frame's coded joints in pose (2b's
+  matching), warped from its joints to the coded ones with `k6.draw`, inside
+  R (granted, as K1f and 2b), Telea fill where nothing is drawn, objects
+  kept.
+- Rate. Item rate = K1f's keypoint rate for the item + the bank's bits
+  (both sides, K references each) / the video's duration (ffprobe's, the
+  whole video). Reported beside: the rate with the bank amortized over one
+  minute, and the payback per metric, the shortest video for which the
+  bank's quality still sits below the hull (T* = bank bits / (hull's rate
+  at the bank's quality − keypoint rate); an upper bound where the bank
+  beats every hull point; none where it never does).
+- Variants. `bank2c@K` (coded, billed: the decision) and `free2c@K` (the
+  same references uncoded and unbilled: separates the coding and billing
+  from the move outside the window), K ∈ {16, 32, 64}, and `warp` (K1f's
+  bound, the check: within 0.002 of K1f's LPIPS on R, or nothing is read).
+- Decision rule (`k6bh.BANK2C_DECISION`, fixed before any run; the user's
+  criterion). Per K, an item is won on a metric when `bank2c@K` on R is
+  below K1f's hull at the item's rate. A rate above the hull's highest point
+  counts as lost (the hull is not known there). Score = mean over {LPIPS,
+  DISTS} of the share of items won.
+  - **Pass** (some K scores ≥ 75%): hands have a buildable renderer at the
+    keypoint rate plus the bank. Rung 3 is not needed on fidelity. Next: the
+    passing K on K1f's other held-out items, then the component.
+  - **Fail** with `free2c` at some K ≥ 75%: the bank's bits are what fail.
+    Next goes to the user (a cheaper bank: lower resolution, one stream).
+  - **Fail** with `free2c` failing too: references from elsewhere in the
+    video do not carry the hand well enough. With 2b, the reference route
+    closes at a buildable rate, and rung 3 is the last open rung for hands
+    (it waits for the user).
+- Hypothesis. Fails, with the score at 50% or below at every K. The bank's
+  rate (estimated 1–9 kbps at K = 16–64) lifts the bar well above 2b's,
+  and references from other activities in the video differ in lighting and
+  sleeves. `free2c@64` comes near 2b's `bank@16`.
+- Competing explanation. The same person in the same kitchen looks alike
+  across the video, and 64 references from thousands of candidates sit
+  nearer in pose than 2b's 16 from one window. Then `free2c` beats 2b's
+  `bank@16` and `bank2c@16` or `@32` passes, with the bank under 3 kbps.
+  The share of references within 10 s of the window, and of window frames
+  matched to them, are reported, to tell a near-duplicate bank apart.
+- Budget. One job per item, ≤ 45 min each, declared at 44,000 MiB (2b's
+  scoring peaked at 38,926 on P09_103, here with seven scorings). Each job's
+  smoke (≤ 600 s) runs 24 window frames and candidates at a stride of 200 on
+  its own item. Estimate: about 5 min of decoding and WiLoR, then 7 scorings
+  (about 150 s each in 2b) per item, so about 30 min, and about 2.6
+  GPU-hours with the smokes. Ceiling 3.5 GPU-hours, failed attempts
+  included. If it runs out, the items finished in the fixed order are
+  reported, and so is the shortfall.
