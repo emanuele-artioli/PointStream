@@ -11231,3 +11231,31 @@ and each object's representation is judged on both:
     between them.
 - P01_107's bar: K1f's hull at its rate, from the reproduction stage
   `20261022T013208Z-9e048ecf` (K1c recorded 0.258 LPIPS and 0.223 DISTS).
+- Smoke and pilot (development, P01_107; not scored for the rule). Job
+  `20261022T175637Z-b7d48144` (`a3b261b`, gpu6, RTX 6000 Ada, shared). The
+  smoke passed 12 checks: 591 steps in 120 s, the probe loss fell from
+  0.093 to 0.078, the training-pair samples from 0.446 to 0.314 LPIPS.
+  The full stage passes 12 checks locally: 8,428 steps in 1,800 s of
+  fitting (about 4.7 steps per second), peak 21.2 GB reserved. The probe
+  loss fell from 0.093 to 0.050. On the held-out frames 180–209, LPIPS /
+  DISTS on R:
+
+  | fit | steps | LPIPS on R | DISTS on R |
+  |---|---:|---:|---:|
+  | 7.5 min | 2,180 | 0.225 | 0.152 |
+  | 15 min | 4,341 | 0.189 | 0.144 |
+  | 30 min | 8,428 | 0.168 | 0.135 |
+
+  K1f's hull at P01_107's rate (1.95 kbps) reads 0.257 / 0.222. The fit in
+  log time reaches it at 3.3 min (DISTS from the start). Report
+  `visor/k6bh-2026-10-22/report/k6bh3-pilot-report.json` (`ab0b58c7…bb2`).
+  **By the rule, the scaled fits run.** Rung 2's zero-shot `gen` read
+  0.496 / 0.255 on all of P01_107.
+- Revision (before the scored fits). The run notes set the scaled fit's
+  length to the pilot's extrapolated time to the hull, which would be about
+  3 min: a fit sized to reach the bar sits on it by construction, which is
+  not an upper bound. Each scored item is fitted for 20 min instead
+  (between the pilot's 15- and 30-minute points), the longest fit that
+  leaves time to judge its 240 frames and K1f's `warp` in one 45-minute
+  stage. Lockstep rendering took about 1.6 s per frame for both hands in
+  the pilot.
