@@ -55,7 +55,7 @@ def test_polygons_round_trip_and_are_billed() -> None:
     yy, xx = np.mgrid[:120, :160]
     mask[(yy - 60) ** 2 + (xx - 80) ** 2 < 40 ** 2] = True
     polys, bits = k6bh2c.code_polygons(mask)
-    back = k6bh2c.decode_polygons(polys, mask.shape)
+    back = k6bh2c.decode_polygons(polys, (120, 160))
     iou = (back & mask).sum() / (back | mask).sum()
     assert iou > 0.95
     vertices = sum(len(p) for p in polys)
