@@ -27,9 +27,13 @@ The root session keeps this section and the dispatch ledger below; item
 sessions update their own items and experiments.md entries
 ([sessions](docs/sessions.md)).
 
-- **Protocol (2026-10-22):** two tracks, fidelity and experience. Every
-  verdict so far is on fidelity; J re-judges the queued results on
-  experience.
+- **Protocol (2026-10-22):** two tracks, fidelity and experience. J
+  (2026-10-22) re-judged the queued results on experience: H3e, FoundHand
+  and K6 `ref` fail, H3a/H3a2 were not re-judged (outputs not kept). The
+  binding check is time: objects driven by coded keypoints change 1.3–6 ×
+  as much as the source between frames, and K1f's bound (`warp`) fails it
+  too. No keypoint route can pass the experience track until the coded
+  keypoints' own jitter is addressed (open for the user).
 - **Hands, keypoints (K1f, K6b):** the bound (appearance granted) beats
   the pixel hull on 30 of 30 held-out items by LPIPS and DISTS. No real
   renderer keeps it yet: FoundHand zero-shot fails (17%), a bank of free
@@ -81,7 +85,7 @@ stops; the root session fills in the outcome and the next step.
 | H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` | Opus | queued 2026-10-22 |
 | K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` | Opus | queued 2026-10-22 |
 | K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` | Opus | queued 2026-10-22 |
-| J | experience-track re-judging | `claude/j-experience-rejudge` | Sonnet | queued 2026-10-22 |
+| J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 
 ## Done
 
