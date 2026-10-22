@@ -325,9 +325,9 @@ def validate_window(root: Path, row: dict[str, Any], full: bool) -> dict[str, bo
         # the judge's re-run on the source is K6's pose path: the same keypoints (median within 1 px; tall players'
         # K6 poses come from K4b.1's whole-frame detections, made in another job)
         "rerun_is_k6_pose": bool(np.isfinite(a["rerun_vs_k6"]).any() and np.nanmedian(a["rerun_vs_k6"]) <= 1.0),
-        "references_drawn": sum(r is not None for r in row["references"].values()) > 0,
     }
-    if full:  # a full window's SVT-AV1 points reproduce K6's recorded rates on R
+    if full:  # a full window draws references (1 s away) and its SVT-AV1 points reproduce K6's recorded rates on R
+        checks["references_drawn"] = sum(r is not None for r in row["references"].values()) > 0
         checks["rates_reproduce_k6"] = all(row["recorded_kbps"][n] is not None
                                            and abs(row["anchors"][n]["kbps_r"] / row["recorded_kbps"][n] - 1) <= RATE_TOLERANCE
                                            for n in anchor_names())
