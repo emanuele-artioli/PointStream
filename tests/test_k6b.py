@@ -103,9 +103,9 @@ def test_score_and_decision():
     assert s["gen-original"]["score"] == pytest.approx(0.875) and s["gen-original"]["passes"]
     assert k6b.decide({"all": s}, True).startswith("pass")
     assert k6b.decide({"all": s}, False).startswith("not read")
-    rows = [row(False, True, True, True)] * 4
+    rows = [row(False, True, True, True)] * 4  # amendment 1: only gen-original decides
     s = {v: k6b.score(rows, v) for v in k6b.GEN_VARIANTS}
-    assert k6b.decide({"all": s}, True).startswith("to the user")
+    assert k6b.decide({"all": s}, True).startswith("fail")
     rows = [row(False, True, False, True)] * 4
     s = {v: k6b.score(rows, v) for v in k6b.GEN_VARIANTS}
     assert k6b.decide({"all": s}, True).startswith("fail")

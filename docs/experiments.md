@@ -11146,3 +11146,13 @@ and each object's representation is judged on both:
   × 2 profiles at 2.76 s are 4.85 GPU-hours, and judging 8 windows about 1:
   **6.4 at 30 steps, about 4.9 at 20**. Neither fits 4 GPU-hours, so **the
   rung goes back to the user** before the scored run.
+- **Amendment 1 (user, 2026-10-22, before any score was read):
+  `gen-original` only, on all 8 windows, at 30 steps** (about 3.9
+  GPU-hours with what is spent). `k6b.DECISION` version 2: the rung passes
+  if `gen-original` scores ≥ 75%, and fails otherwise; the "to the user"
+  branch for the fine-tune is dropped. `gen-finetuned_tennis` is a
+  diagnostic on the pilot window (`djokovic_federer/038`), where it
+  rendered the far player; its composite takes `gen-original`'s crops for
+  the near player, so the difference between the two is the far player's
+  alone. It is not scored against the envelope. The fine-tune has seen
+  these matches, so it was not a zero-shot test anyway.

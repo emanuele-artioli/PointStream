@@ -53,7 +53,7 @@ CRITERION = 0.75
 FINETUNE_UNLISTED = ("alcaraz_hurkacz", "medvedev_struff", "rublev_auger-aliassime")
 
 DECISION: dict[str, Any] = {
-    "version": 1,
+    "version": 2,
     "items": "K6's scored windows (8, from 5 matches)",
     "quality": "K6's: LPIPS and DISTS over S (R plus every K6 oracle variant's drawn pixels), mean over K6's judged frames",
     "item_won": "gen's value is below K6's envelope (upper concave hull of the anchors on (kbps on R, -metric)) at the "
@@ -61,8 +61,10 @@ DECISION: dict[str, Any] = {
     "score": "mean over {LPIPS, DISTS} of the share of windows won (the user's criterion, 2026-10-21)",
     "pass": "gen-original scores >= 0.75: the zero-shot route holds with the reference granted; next, the reference "
             "billed (K6c's interface)",
-    "to_user": "gen-finetuned_tennis scores >= 0.75 and gen-original does not (the fine-tune has seen K6's matches)",
-    "fail": "both profiles < 0.75: step 3 (overfit oracle) gets its rule and budget and waits for the user",
+    "fail": "gen-original < 0.75: step 3 (overfit oracle) gets its rule and budget and waits for the user",
+    "amendment_1": "(user, 2026-10-22, before any score: both profiles would need ~6.4 GPU-hours against a 4-hour cap) "
+                   "gen-original alone decides, on all 8 windows; gen-finetuned_tennis is a diagnostic on the pilot "
+                   "window, where it rendered the far player only (the near player drawn by gen-original in both)",
     "check": f"warp@{CODE} and ref@{CODE} reproduce K6's LPIPS over S within {REPRO_TOLERANCE} per window, and S's "
              "pixel counts equal K6's on every judged frame, or nothing is read",
     "beside": "K6's saving statistic (1 - keypoint kbps / envelope kbps, bootstrap CI by window), PSNR over S, the share "
@@ -447,7 +449,9 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
         for profile in PROFILES:
             g = generated.get((name, profile))
             if g is None:
-                raise ValueError(f"no generated crops for {name}@{profile}")
+                if profile == "original":
+                    raise ValueError(f"no generated crops for {name}@{profile}")
+                continue  # amendment 1: the fine-tune falls back to gen-original's crops (below)
             for t, crop in zip(g["t"].tolist(), g["crops"]):
                 crops[(profile, player, t)] = (crop, boxes[t])
     k6_scores = np.load(k6dir / "scores.npz")
@@ -475,8 +479,9 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
             canvas = fill.copy()
             written = np.zeros_like(r_t)
             for p in order:
-                if p in regions[t] and (profile, p, t) in crops:
-                    crop, box = crops[(profile, p, t)]
+                key = (profile, p, t) if (profile, p, t) in crops else ("original", p, t)
+                if p in regions[t] and key in crops:
+                    crop, box = crops[key]
                     written |= paste(canvas, crop, box, regions[t][p])
             outs[v], mine[v] = canvas, written
         for v in CHECK_VARIANTS:
@@ -606,7 +611,7 @@ def validate_judge(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
             for v in CHECK_VARIANTS:  # K6's mean over the same judged frames
                 mine = float(np.mean(a["lpips"][VARIANTS.index(v), j]))
                 checks[f"{wid}:{v}_reproduces_k6"] = bool(abs(mine - row["k6_lpips"][v]) <= REPRO_TOLERANCE)
-            for v in GEN_VARIANTS:
+            for v in GEN_VARIANTS[:1]:  # gen-original decides (amendment 1)
                 i = VARIANTS.index(v)
                 share = a["covered"][i, j].sum() / max(1, a["pixels_r"][j].sum())
                 checks[f"{wid}:{v}:draws"] = bool(share > 0.5)
@@ -675,11 +680,8 @@ def score(rows: list[dict[str, Any]], variant: str) -> dict[str, Any]:
 def decide(groups: dict[str, dict[str, Any]], reproduced: bool) -> str:
     if not reproduced:
         return "not read: warp/ref do not reproduce K6"
-    allg = groups["all"]
-    if allg["gen-original"]["passes"]:
+    if groups["all"]["gen-original"]["passes"]:
         return "pass: the zero-shot route holds with the reference granted; next, the reference billed"
-    if allg["gen-finetuned_tennis"]["passes"]:
-        return "to the user: only the fine-tune (which has seen K6's matches) passes"
     return "fail: step 3 (overfit oracle) gets its rule and budget"
 
 
@@ -716,9 +718,14 @@ def command_report(args: argparse.Namespace) -> int:
                     reproduced &= row[v]["reproduces"]
                 rows.append(row)
     groups = {"all": rows, "finetune_unlisted": [r for r in rows if r["finetune_unlisted"]]}
-    scored = {g: {v: score(rs, v) for v in VARIANTS} for g, rs in groups.items()}
+    decided = (GEN_VARIANTS[0], *CHECK_VARIANTS)  # amendment 1: the fine-tune is a diagnostic, not scored
+    scored = {g: {v: score(rs, v) for v in decided} for g, rs in groups.items()}
+    finetune = [{"window": r["window"], "gen-original": {m: r["gen-original"][m]["value"] for m in ("lpips", "dists")},
+                 "gen-finetuned_tennis": {m: r["gen-finetuned_tennis"][m]["value"] for m in ("lpips", "dists")}}
+                for r in rows if r["gen-finetuned_tennis"]["lpips"]["value"] != r["gen-original"]["lpips"]["value"]]
     out = {"decision_rule": DECISION, "decision": decide(scored, reproduced), "reproduced": reproduced, "rows": rows,
-           "groups": scored, "saving_ci": {v: bootstrap([r[v]["saving"] for r in rows]) for v in VARIANTS},
+           "groups": scored, "saving_ci": {v: bootstrap([r[v]["saving"] for r in rows]) for v in decided},
+           "finetune_diagnostic": finetune,
            "inputs": {"stages": sources, "k6_report": file_sha256(Path(args.k6_report)), "code_sha256": file_sha256(Path(__file__))},
            "overlap": "gen-original: off-the-shelf weights (not trained on PointStream's footage); gen-finetuned_tennis: "
                       "counted as having seen every window's match (K6b audit); 'finetune_unlisted' are the windows whose "
