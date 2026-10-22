@@ -91,3 +91,25 @@ def test_residual_energies_of_a_frozen_output_and_of_the_source_itself():
     f, e_out, e_src = j.residual_energies(brighter, prev, cur, prev, region, region)
     assert f == pytest.approx(20.0, abs=1e-3)
     assert j.residual_energies(cur, prev, cur, prev, np.zeros_like(region), region) is None
+
+
+def test_j2_tracks_split_by_side_and_skipped_frames():
+    np = pytest.importorskip("numpy")
+    from experiments.visor import j2
+
+    t = np.array([0, 1, 2, 4, 5, 0, 1])
+    right = np.array([0, 0, 0, 0, 0, 1, 1], bool)
+    assert [list(x) for x in j2.tracks(t, right)] == [[0, 1, 2], [3, 4], [5, 6]]
+
+
+def test_j2_smooth_keeps_constants_and_lines_and_damps_alternation():
+    np = pytest.importorskip("numpy")
+    from experiments.visor import j2
+
+    const = np.full((9, 21, 2), 3.0)
+    assert np.allclose(j2.smooth(const, 2), const)
+    line = np.arange(9, dtype=float)[:, None, None] * np.ones((1, 21, 2))
+    assert np.allclose(j2.smooth(line, 1)[4], line[4], atol=1e-9)  # the centre sees symmetric weights: a line is kept
+    zigzag = ((-1.0) ** np.arange(9))[:, None, None] * np.ones((1, 21, 2))
+    assert np.abs(j2.smooth(zigzag, 2)[4]).max() < 0.1
+    assert np.array_equal(j2.smooth(zigzag, 0), zigzag)
