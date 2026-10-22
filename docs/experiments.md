@@ -100,7 +100,8 @@ and each object's representation is judged on both:
    judge was added. Queue, cheapest first: H3e (its generations are saved,
    no new generation), FoundHand (K6b hands rung 2, re-run keeping the
    crops), H3a/H3a2 if their stages kept the decodes, and K6's `ref` on
-   players.
+   players. Its rule is the entry "J: experience-track re-judging (rule)"
+   (PLAN J).
 
 ## Entry template
 
@@ -10907,3 +10908,83 @@ and each object's representation is judged on both:
   encoder's last check already ensures), which is a rule change for the
   user to make, disclosed as such.
 
+
+### 2026-10-22 — J: experience-track re-judging (rule)
+- Question (user, 2026-10-22; protocol "Two tracks"). Four routes closed on
+  fidelity only. Does any of them give the same experience as the anchors
+  at its own rate: realistic, the same content, as steady over time? A pass
+  reopens that route on the experience track only (its next step goes to
+  the user); a fail closes it on both tracks. Fidelity verdicts stand
+  either way.
+- Results, cheapest first. Each is judged only from outputs that exist,
+  except FoundHand, whose re-run is budgeted below. Nothing else is
+  regenerated under this entry.
+  1. **H3e** V1 (JointControlVideo; 4 pilot items, generations and judge
+     archives saved; `h3e-report.json` `49af833b…`). Its nine V1 points
+     differ only in the DCVC-UF context, so the encoder may choose: the
+     item's operating point is the lowest-rate V1 point that passes all
+     three checks, else its lowest-rate point.
+  2. **FoundHand** `gen` (K6b hands rung 2; positions 0–3 of K1f's order).
+     The crops were not kept, so `gen` is re-run with rung 2's code and
+     settings (50 steps, seed as recorded), keeping the composites and
+     crops, on all 4 items (P09_103 included). Its rate is the item's
+     keypoint rate (reference unbilled, as rung 2). `ref` and `warp` are
+     judged from the same job, beside it.
+  3. **H3a / H3a2** (texture transfer; mesh renders against SVT-AV1). Only
+     if their stages' renders or composites are on the server. If not, the
+     entry records "not re-judged: outputs not kept", and they stay
+     untested on experience.
+  4. **K6 `ref`** on players (K4's 8 scored windows, every 4th frame code,
+     3.6 kbps for two). Its renders are recomputed if not kept: a CPU warp,
+     no generator.
+- Judges, per item at the method's rate, against the anchor hull at that
+  rate. Anchors: DCVC-UF + G and SVT-AV1 for hands (H3c's perceptually
+  tuned DCVC-UF where it exists), K6's envelope for players. Each anchor
+  quantity is read on its own hull (lower convex hull of the quantity over
+  log rate), linear in log rate at the method's rate, clamped to the
+  anchor's range (an item outside the range is flagged).
+  - **Realism.** KID (`h3b`'s Inception crops and `kid_from`, bootstrap
+    95% interval) of the object's crops against a fixed reference set of
+    real crops of the class from footage that neither the method nor the
+    anchor was fitted on. Hands: VISOR videos outside the 34-item
+    evaluation set and outside G's and G_HO's training footage, with the
+    list and its sha256 recorded before any score (FoundHand has seen
+    VISOR, so its overlap is recorded, as rung 2). Players: K4b's matches
+    other than the window's. Pass: the method's KID ≤ the anchor's upper
+    95% bound.
+  - **Same content.** The object's estimator on the output against the
+    same estimator on the source: WiLoR's 2D joints for hands (mean joint
+    distance, % of the box, H3c2's judge), YOLO11x-pose for players (K4b.2's
+    path), as a share of the box. Pass: the method's error ≤ max(the
+    anchor's, 1.5 × the coded keypoints' own error against the source).
+  - **Same over time.** On the region, over consecutive judged frames.
+    The accepted threshold names two quantities, so each is compared in
+    its own form: pass if the method's `h3b.flicker` (its temporal residual
+    minus the source's) ≤ the anchor's, **or** the method's own residual
+    energy (mean absolute motion-compensated luma change, `g5c.flicker`'s
+    energies) ≤ 1.25 × the source's. *This reading is the drafting
+    session's; the user may change it before the first score.* Identity
+    drift along a track is reported beside it and does not decide.
+- Decision rule, per result (fixed before any score). An item passes when
+  all three checks pass. **Pass**: at least 75% of the result's scored
+  items pass (3 of 4 for H3e and FoundHand; 6 of 8 for K6 `ref`). **Fail**
+  otherwise. Items in a judge's or generator's training footage are
+  reported apart beside the pooled share. Each check's per-item pass rate
+  is reported too, so a fail names the check that fails.
+- Hypothesis. All four fail. H3e on same content (V1's pose error 1.8–6.5%
+  of the box, where the pixel hull is at 0.3–1 kbps for that error) and on
+  time (flicker 5–23 against DCVC-UF's 3–7); FoundHand on time (its change
+  19.7 against the source's 14.4 on P06_108) and on content; K6 `ref` on
+  content (it draws 32–46% of R from a fixed reference).
+- Competing explanation. The thresholds are lenient where the anchor is
+  poor: at 2–4 kbps the pixel anchors blur hands and limbs, so their pose
+  error and KID are high and a generator clears them while looking wrong.
+  The visual check of one frame per item is reported beside each pass for
+  that reason. Or the reference set differs in domain (lighting, kitchens)
+  enough that KID ranks every method alike.
+- Budget. CPU: the reference set, the hulls, the reading of saved
+  archives. GPU: Inception and WiLoR or YOLO on saved outputs, ≤ 1 GPU-hour
+  for H3e, H3a/H3a2 and K6 `ref` together; FoundHand's re-run ≤ 3
+  GPU-hours (rung 2 took about 0.45 GPU-hours per item at 50 steps on
+  Ada, plus its failed attempts), declared at 40,000 MiB, which rung 2's
+  scoring needed. Each stage ≤ 45 minutes.

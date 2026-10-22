@@ -21,7 +21,20 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-10-21)
+## Where PointStream stands (2026-10-22)
+
+The root session keeps this section and the dispatch ledger below; item
+sessions update their own items and experiments.md entries
+([sessions](docs/sessions.md)).
+
+- **Protocol (2026-10-22):** two tracks, fidelity and experience. Every
+  verdict so far is on fidelity; J re-judges the queued results on
+  experience.
+- **Hands, keypoints (K1f, K6b):** the bound (appearance granted) beats
+  the pixel hull on 30 of 30 held-out items by LPIPS and DISTS. No real
+  renderer keeps it yet: FoundHand zero-shot fails (17%), a bank of free
+  references fails by one item-metric (67% at K = 16). Next: the
+  buildable bank; rung 3 (overfit) waits behind it.
 
 - **Egocentric pipeline (H5):** runs end to end on the 4 pilot items
   (`src/pointstream/`, `experiments/visor/h5.py`). Against fairly
@@ -56,6 +69,19 @@ new dependency.
   per-player renderer's oracle), then K6c; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
+
+### Dispatch ledger
+
+One row per item session started from the root session. The item
+session reports to the root session when its goal is reached or it
+stops; the root session fills in the outcome and the next step.
+
+| item | card | branch | suggested model | status |
+|---|---|---|---|---|
+| H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` | Opus | queued 2026-10-22 |
+| K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` | Opus | queued 2026-10-22 |
+| K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` | Opus | queued 2026-10-22 |
+| J | experience-track re-judging | `claude/j-experience-rejudge` | Sonnet | queued 2026-10-22 |
 
 ## Done
 
@@ -636,7 +662,7 @@ objects (the tennis ball).
   flicker). The protocol is drafted in
   [experiments](docs/experiments.md#protocol), with the thresholds set
   (user, 2026-10-22). Results closed on fidelity are untested on experience. The
-  re-judging queue is H3e, FoundHand, H3a/H3a2, and K6 `ref`.
+  re-judging queue is H3e, FoundHand, H3a/H3a2, and K6 `ref`: item J.
   **Rung 2b, a bank of free references (2026-10-22): fails by one
   item-metric.** Each frame is warped from the in-window reference nearest
   in coded pose. With 16 references the score is 67% (P22_107 and P25_09
@@ -868,6 +894,29 @@ candidate encoding.
 As D1, per dataset and class, with the ball scored by point metrics.
 
 ## Throughout
+
+### J. Experience-track re-judging (user, 2026-10-22)
+
+Results closed on fidelity are untested on the experience track (realism
+by KID, same content by the object's estimator, same over time by
+flicker; [protocol](docs/experiments.md#protocol)). J judges the four
+queued results on it, cheapest first, each against the anchor hull at its
+own rate. The rule, judges and budget are in experiments.md, "J:
+experience-track re-judging (rule)".
+
+1. H3e V1, from its saved generations and judge archives (CPU, Inception
+   and WiLoR only).
+2. FoundHand `gen` (K6b hands rung 2), re-run on positions 0–3 of K1f's
+   order keeping the crops (≤ 3 GPU-hours).
+3. H3a/H3a2, only if their renders were kept; otherwise recorded as not
+   re-judged.
+4. K6 `ref` on players (CPU warp, YOLO pose).
+
+A result passes when at least 75% of its items pass all three checks.
+A pass reopens that route on the experience track only, and its next
+step goes to the user. A fail closes it on both tracks. First step: the
+held-out reference set of real hand crops and the user's confirmation of
+the flicker reading.
 
 ### I. Paper
 

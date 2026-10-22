@@ -8,8 +8,9 @@ transparently, including negative results, and scope claims to the evidence.
 
 Read [README.md](README.md) for the layout, [PLAN.md](PLAN.md) for the order of
 work, [docs/components.md](docs/components.md),
-[docs/resources.md](docs/resources.md), [docs/experiments.md](docs/experiments.md)
-and [docs/fleet.md](docs/fleet.md).
+[docs/resources.md](docs/resources.md), [docs/experiments.md](docs/experiments.md),
+[docs/fleet.md](docs/fleet.md) and [docs/sessions.md](docs/sessions.md) (root
+and item sessions, cards, reports).
 
 ## Storage
 
