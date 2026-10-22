@@ -116,7 +116,7 @@ def loading_record(info: dict[str, Any], name: str) -> dict[str, Any]:
 class Renderer:
     """One profile's models in fp16 on the GPU, and the released long-video pipeline."""
 
-    def __init__(self, weights: dict[str, Path], profile: str, device: str, scratch: Path):
+    def __init__(self, weights: dict[str, Path], profile: str, device: str, scratch: Path, fit: Path | None = None):
         import torch
         from animate_anyone.models.pose_guider import PoseGuider
         from animate_anyone.models.unet_2d_condition import UNet2DConditionModel
@@ -153,6 +153,10 @@ class Renderer:
         guider = PoseGuider(320, block_out_channels=(16, 32, 96, 256))  # pose2vid.py's construction
         record["pose_guider"] = load_checked(guider, pth("pose_guider"), "pose_guider")
         del state, motion
+        if fit is not None:  # K6b (players) 3: a LoRA fitted on the window's frames, merged into `original`
+            from experiments.tennis.k6b_fit import apply_fit
+
+            record["fit"] = {"checkpoint_sha256": sha256(fit), **apply_fit(reference, denoising, guider, fit)}
         self.pipe = Pose2VideoPipeline(vae=vae, image_encoder=encoder, reference_unet=reference, denoising_unet=denoising,
                                        pose_guider=guider, scheduler=DDIMScheduler(**SCHEDULER)).to(device, dtype=dtype)
         self.modules = {"vae": vae, "image_encoder": encoder, "reference_unet": reference, "denoising_unet": denoising, "pose_guider": guider}
@@ -203,6 +207,8 @@ def command_generate(args: argparse.Namespace) -> int:
         names = [n for n in names if n in args.units.split(",")]
     names = names[:args.max_units or None]
     profiles = args.profiles.split(",")
+    fits = {name: Path(path) for name, path in args.fit}
+    profiles += [name for name in fits if name not in profiles]
     device = "cuda"
     limit = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "24000"))
     torch.cuda.set_per_process_memory_fraction(min(1.0, limit * 2**20 / torch.cuda.get_device_properties(0).total_memory))
@@ -213,7 +219,7 @@ def command_generate(args: argparse.Namespace) -> int:
         if not todo:
             continue
         loaded = time.time()
-        renderer = Renderer(weights, profile, device, scratch)
+        renderer = Renderer(weights, "original" if profile in fits else profile, device, scratch, fits.get(profile))
         record = {**renderer.record, "load_seconds": round(time.time() - loaded, 1),
                   "on_cuda": {k: model_on_cuda(m) for k, m in renderer.modules.items()},
                   "params": {k: int(sum(p.numel() for p in m.parameters())) for k, m in renderer.modules.items()}}
@@ -227,7 +233,9 @@ def command_generate(args: argparse.Namespace) -> int:
             frames = 0
             started = time.time()
             for r in np.unique(run):
-                rows = np.nonzero(run == r)[0][:args.max_frames or None]
+                rows = np.nonzero((run == r) & (t >= args.from_t))[0][:args.max_frames or None]  # step 3: held-out frames
+                if not len(rows):
+                    continue
                 if args.max_frames and frames >= args.max_frames:
                     break
                 video = renderer.render(unit["reference"], unit["pose"][rows], args.steps, seed * 1009 + int(r))
@@ -254,7 +262,8 @@ def command_generate(args: argparse.Namespace) -> int:
         tar.add(publish, arcname="publish")
     write_json(stage_dir() / "k6b_generate.json", {
         "command": "generate", "stage": os.environ.get("PS_STAGE"), "units": names, "profiles": profiles,
-        "steps": args.steps, "max_frames": args.max_frames, "device": device_record(args.gpu_class), "models": records,
+        "steps": args.steps, "max_frames": args.max_frames, "from_t": args.from_t,
+        "fits": {k: {"path": str(v), "sha256": sha256(v)} for k, v in fits.items()}, "device": device_record(args.gpu_class), "models": records,
         "timings": timings, "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3), "gpu_memory_limit_mib": limit,
         "inputs": {"prepared": sha256(Path(args.prepared)), "weights": {k: sha256(v) for k, v in sorted(weights.items())}},
         "settings": {"size": [GEN_W, GEN_H], "cfg": CFG, "context": [CONTEXT_FRAMES, CONTEXT_OVERLAP], "scheduler": SCHEDULER},
@@ -312,6 +321,9 @@ def main(argv: list[str] | None = None) -> int:
     gen.add_argument("--max-units", type=int, default=0)
     gen.add_argument("--max-frames", type=int, default=0, help="the smoke: render only this many frames of a unit")
     gen.add_argument("--steps", type=int, default=30, help="DDIM steps (pose2vid.py's default: 30)")
+    gen.add_argument("--fit", action="append", nargs=2, default=[], metavar=("PROFILE", "CHECKPOINT"),
+                     help="render a profile named PROFILE: `original` with k6b_fit's checkpoint merged")
+    gen.add_argument("--from-t", type=int, default=0, help="render only frames from here (step 3's held-out frames)")
     gen.add_argument("--gpu-class", default="RTX")
     val = sub.add_parser("validate")
     val.add_argument("--stage", default="")

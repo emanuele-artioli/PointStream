@@ -348,6 +348,69 @@ def command_prepare(args: argparse.Namespace) -> int:
     return 0
 
 
+def prepare_fit_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, scratch: Path, publish: Path) -> dict[str, Any]:
+    """Step 3's training pairs (the overfit oracle sees the window's own frames): per player and fitted scored frame,
+    the true crop and the DWPose body map of the *uncoded* keypoints, with step 2's crop rule on runs of fitted frames.
+    Rendering at test still uses step 2's coded maps and granted reference."""
+    w = k6_window(k6dir)
+    row = w["row"]
+    frames = int(row["frames"])
+    truth, _ = window_truth(args, wid, source, frames, scratch / "work" / k4.safe(wid), "cpu")
+    units = []
+    for player in row["players"]:
+        fitted = [t for t in row["scored"] if (rec := w["poses"][player][t]) is not None and rec.get("fitted")]
+        if not fitted:
+            continue
+        ts, images, maps = [], [], []
+        for seq in runs(fitted):
+            kps = [np.asarray(w["poses"][player][t]["kps"], np.float64) for t in seq]
+            for t, kp, box in zip(seq, kps, run_boxes(kps)):
+                ts.append(t)
+                images.append(crop_image(np.asarray(truth[t]), box))
+                maps.append(pose_map(to_crop(kp, box)))
+        name = unit_name(wid, player)
+        np.savez_compressed(publish / "fit" / f"{name}.npz", t=np.asarray(ts, np.int64), image=np.stack(images), pose=np.stack(maps))
+        units.append({"unit": name, "window": wid, "player": player, "frames": len(ts)})
+    shutil.rmtree(scratch / "work" / k4.safe(wid), ignore_errors=True)
+    return {"window": wid, "units": units}
+
+
+def command_prepare_fit(args: argparse.Namespace) -> int:
+    began = time.time()
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    publish = scratch / "publish"
+    (publish / "fit").mkdir(parents=True, exist_ok=True)
+    stages = extract_stages(args.k6_stage, scratch)
+    chosen = args.windows[:args.max_windows or None]
+    rows = []
+    for n, wid in enumerate(chosen):
+        rows.append(prepare_fit_window(args, wid, stages[wid], Path(args.sources[args.windows.index(wid)]), scratch, publish))
+        progress(n + 1)
+    manifest = {"command": "prepare-fit", "windows": rows, "requested": chosen, "gen_size": [GEN_W, GEN_H],
+                "inputs": {"k6_stages": [file_sha256(Path(t)) for t in args.k6_stage]}, "seconds": round(time.time() - began, 2)}
+    write_json(publish / "prepare-fit.json", manifest)
+    with tarfile.open(stage_dir() / "published.tar", "w") as tar:
+        tar.add(publish, arcname="publish")
+    write_json(stage_dir() / "k6b.json", manifest)
+    return 0
+
+
+def validate_prepare_fit(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
+    checks = {"windows_requested": [w["window"] for w in result["windows"]] == result["requested"]}
+    with tempfile_dir() as temp:
+        with tarfile.open(stage / "published.tar") as archive:
+            archive.extractall(temp, filter="data")
+        for w in result["windows"]:
+            for u in w["units"]:
+                a = np.load(temp / "publish" / "fit" / f"{u['unit']}.npz")
+                name = u["unit"]
+                checks[f"{name}:shapes"] = a["image"].shape[1:] == (GEN_H, GEN_W, 3) == a["pose"].shape[1:] and len(a["t"]) == u["frames"] > 0
+                checks[f"{name}:images_not_flat"] = float(a["image"][:: max(1, len(a["t"]) // 8)].std()) > 5.0
+                drawn = a["pose"].max(-1) > 0
+                checks[f"{name}:poses_drawn"] = bool(drawn.reshape(len(drawn), -1).any(1).mean() > 0.95)
+    return checks
+
+
 # ----------------------------------------------------------------- judge (GPU)
 
 
@@ -420,7 +483,10 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
     w = k6_window(k6dir)
     row = w["row"]
     frames = int(row["frames"])  # always the whole window: K6's `ref` searches every scored frame
-    judged = row["judged"][:args.max_judged or None]  # the smoke judges the first few
+    judged = [t for t in row["judged"] if t >= args.from_t][:args.max_judged or None]  # step 3's pilot: held-out frames
+    profiles = tuple(args.profiles.split(","))
+    gen_variants = tuple(f"gen-{p}" for p in profiles)
+    variants = gen_variants + CHECK_VARIANTS
     work = scratch / "work" / k4.safe(wid)
     truth, _ = window_truth(args, wid, source, frames, work, device)
     features = json.loads((k6dir / "features.json").read_text())
@@ -446,17 +512,17 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
         if name not in units:
             continue
         boxes = dict(zip(units[name]["t"].tolist(), units[name]["box"]))
-        for profile in PROFILES:
+        for profile in profiles:
             g = generated.get((name, profile))
             if g is None:
-                if profile == "original":
+                if profile != "finetuned_tennis":
                     raise ValueError(f"no generated crops for {name}@{profile}")
                 continue  # amendment 1: the fine-tune falls back to gen-original's crops (below)
             for t, crop in zip(g["t"].tolist(), g["crops"]):
                 crops[(profile, player, t)] = (crop, boxes[t])
     k6_scores = np.load(k6dir / "scores.npz")
     k6_index = {n: i for i, n in enumerate(row["variants"])}
-    n_v = len(VARIANTS)
+    n_v = len(variants)
     lp = np.full((n_v, frames), np.nan)
     lp_drawn = np.full((n_v, frames), np.nan)
     dists = np.full((n_v, frames), np.nan)
@@ -475,7 +541,7 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
             s_t |= m
         outs: dict[str, np.ndarray] = {}
         mine: dict[str, np.ndarray] = {}
-        for profile, v in zip(PROFILES, GEN_VARIANTS):
+        for profile, v in zip(profiles, gen_variants):
             canvas = fill.copy()
             written = np.zeros_like(r_t)
             for p in order:
@@ -486,19 +552,19 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
             outs[v], mine[v] = canvas, written
         for v in CHECK_VARIANTS:
             outs[v], mine[v] = composites[v], drawn[v]
-        masks = [[s_t, mine[v]] for v in VARIANTS]
-        reduced = lpips_reduce(nets["lpips"], [outs[v] for v in VARIANTS], truth_t, masks, device)
+        masks = [[s_t, mine[v]] for v in variants]
+        reduced = lpips_reduce(nets["lpips"], [outs[v] for v in variants], truth_t, masks, device)
         ys, xs = np.nonzero(s_t)
         s_box = (slice(max(0, ys.min() - DISTS_PAD), min(FRAME[1], ys.max() + 1 + DISTS_PAD)),
                  slice(max(0, xs.min() - DISTS_PAD), min(FRAME[0], xs.max() + 1 + DISTS_PAD)))
-        dists[:, t] = dists_crops(nets["dists"], [outs[v][s_box] for v in VARIANTS], truth_t[s_box], s_t[s_box], device)
-        for i, v in enumerate(VARIANTS):
+        dists[:, t] = dists_crops(nets["dists"], [outs[v][s_box] for v in variants], truth_t[s_box], s_t[s_box], device)
+        for i, v in enumerate(variants):
             lp[i, t], lp_drawn[i, t] = reduced[i]
             sse[i, t] = float(((outs[v][s_t].astype(np.int32) - truth_t[s_t].astype(np.int32)) ** 2).sum())
             covered[i, t] = int((mine[v] & r_t).sum())
         pixels_s[t], pixels_r[t] = int(s_t.sum()), int(r_t.sum())
         if t == review_at:
-            save_review(publish / k4.safe(wid) / f"review-t{t:03d}.png", truth_t, {v: outs[v] for v in VARIANTS}, regions[t], f"{wid} t={t}")
+            save_review(publish / k4.safe(wid) / f"review-t{t:03d}.png", truth_t, {v: outs[v] for v in variants}, regions[t], f"{wid} t={t}")
         print(f"phase=judge window={wid} frame={n + 1}/{len(judged)}", flush=True)
     out_dir = publish / k4.safe(wid)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -506,7 +572,7 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
                         pixels_s=pixels_s, pixels_r=pixels_r, judged=np.asarray(judged, np.int64))
     k6_lp = {v: float(np.mean(k6_scores["lpips"][k6_index[v], judged])) for v in CHECK_VARIANTS} if judged else {}
     result = {
-        "id": wid, "match": wid.split("/")[0], "frames": frames, "judged": judged, "players": players, "variants": list(VARIANTS),
+        "id": wid, "match": wid.split("/")[0], "frames": frames, "judged": judged, "players": players, "variants": list(variants),
         "k6_job_files": row["files"], "k6_lpips": k6_lp,
         "s_pixels_match_k6": bool(np.array_equal(pixels_s[judged], k6_scores["pixels_s"][judged])),
         "seconds": round(time.time() - began, 2),
@@ -548,7 +614,7 @@ def command_judge(args: argparse.Namespace) -> int:
         with tarfile.open(stage_dir() / "published.tar", "w") as tar:
             tar.add(publish, arcname="publish")
         write_json(stage_dir() / "k6b.json", {
-            "command": "judge", "stage": os.environ.get("PS_STAGE"), "requested": chosen, "max_judged": int(args.max_judged),
+            "command": "judge", "stage": os.environ.get("PS_STAGE"), "requested": chosen, "max_judged": int(args.max_judged), "from_t": int(args.from_t), "profiles": args.profiles.split(","),
             "windows": rows, "decision": DECISION, "device": device_record(args.gpu_class),
             "on_cuda": {k: next(v.parameters()).is_cuda for k, v in nets.items()},
             "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3), "gpu_memory_limit_mib": limit,
@@ -608,14 +674,15 @@ def validate_judge(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
             j = row["judged"]
             checks[f"{wid}:finite"] = bool(np.isfinite(a["lpips"][:, j]).all() and np.isfinite(a["dists"][:, j]).all())
             checks[f"{wid}:s_pixels_match_k6"] = bool(row["s_pixels_match_k6"])
+            variants = row.get("variants", list(VARIANTS))
             for v in CHECK_VARIANTS:  # K6's mean over the same judged frames
-                mine = float(np.mean(a["lpips"][VARIANTS.index(v), j]))
+                mine = float(np.mean(a["lpips"][variants.index(v), j]))
                 checks[f"{wid}:{v}_reproduces_k6"] = bool(abs(mine - row["k6_lpips"][v]) <= REPRO_TOLERANCE)
-            for v in GEN_VARIANTS[:1]:  # gen-original decides (amendment 1)
-                i = VARIANTS.index(v)
+            for v in [x for x in variants if x.startswith("gen-") and x != "gen-finetuned_tennis"]:  # the scored renderers
+                i = variants.index(v)
                 share = a["covered"][i, j].sum() / max(1, a["pixels_r"][j].sum())
                 checks[f"{wid}:{v}:draws"] = bool(share > 0.5)
-                checks[f"{wid}:{v}:differs_from_warp"] = bool(np.mean(a["lpips"][i, j]) != np.mean(a["lpips"][VARIANTS.index(CHECK_VARIANTS[0]), j]))
+                checks[f"{wid}:{v}:differs_from_warp"] = bool(np.mean(a["lpips"][i, j]) != np.mean(a["lpips"][variants.index(CHECK_VARIANTS[0]), j]))
             checks[f"{wid}:review"] = len(list(root.glob("review-t*.png"))) == 1
     return checks
 
@@ -636,7 +703,7 @@ class tempfile_dir:
 def command_validate(args: argparse.Namespace) -> int:
     stage = Path(args.stage) if args.stage else stage_dir()
     result = json.loads((stage / "k6b.json").read_text())
-    checks = validate_prepare(stage, result) if result["command"] == "prepare" else validate_judge(stage, result)
+    checks = {"prepare": validate_prepare, "prepare-fit": validate_prepare_fit, "judge": validate_judge}[result["command"]](stage, result)
     report = {"passed": all(checks.values()), "checks": {k: bool(v) for k, v in checks.items()}}
     if target := os.environ.get("PS_VALIDATION_PATH"):
         write_json(Path(target), report)
@@ -647,9 +714,9 @@ def command_validate(args: argparse.Namespace) -> int:
 # ----------------------------------------------------------------- report (CPU)
 
 
-def window_means(a: dict[str, np.ndarray], judged: list[int]) -> dict[str, dict[str, float]]:
+def window_means(a: dict[str, np.ndarray], judged: list[int], variants: tuple[str, ...] | list[str] = VARIANTS) -> dict[str, dict[str, float]]:
     out = {}
-    for i, v in enumerate(VARIANTS):
+    for i, v in enumerate(variants):
         sse = float(a["sse"][i, judged].sum())
         pixels = float(a["pixels_s"][judged].sum()) * 3
         out[v] = {"lpips": float(np.mean(a["lpips"][i, judged])), "dists": float(np.mean(a["dists"][i, judged])),
@@ -703,7 +770,7 @@ def command_report(args: argparse.Namespace) -> int:
                 archive.extractall(temp, filter="data")
             for w in result["windows"]:
                 a = dict(np.load(temp / "publish" / k4.safe(w["id"]) / "scores.npz"))
-                means = window_means(a, w["judged"])
+                means = window_means(a, w["judged"], w["variants"])
                 kw = k6["windows"][w["id"]]
                 kbps = kw["keypoint_kbps"][CODE]
                 row: dict[str, Any] = {"window": w["id"], "match": w["match"], "kbps": kbps,
@@ -739,10 +806,53 @@ def command_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_fit_report(args: argparse.Namespace) -> int:
+    """Step 3's learning curve: each fitted checkpoint (and step 2's zero-shot) on the held-out judged frames, against
+    K6's envelope rebuilt from its anchors' per-frame scores averaged over the same frames (K6's anchor rates)."""
+    from experiments.tennis.k6 import ANCHORS, anchor_name
+
+    k6 = json.loads(Path(args.k6_report).read_text())
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or "/tmp/k6b-fit-report")
+    stages = extract_stages(args.k6_stage, scratch)
+    out: dict[str, Any] = {"windows": {}, "inputs": {"stages": [], "k6_report": file_sha256(Path(args.k6_report)),
+                                                    "code_sha256": file_sha256(Path(__file__))}}
+    for stage in map(Path, args.stage):
+        result = json.loads((stage / "k6b.json").read_text())
+        checks = validate_judge(stage, result)
+        if not all(checks.values()) or result["stage"] != "full":
+            raise SystemExit(f"{stage} fails validation or is not a full stage: {[k for k, v in checks.items() if not v]}")
+        out["inputs"]["stages"].append({"stage": str(stage), "sha256": file_sha256(stage / "published.tar")})
+        with tempfile_dir() as temp:
+            with tarfile.open(stage / "published.tar") as archive:
+                archive.extractall(temp, filter="data")
+            for w in result["windows"]:
+                a = dict(np.load(temp / "publish" / k4.safe(w["id"]) / "scores.npz"))
+                j = w["judged"]
+                means = window_means(a, j, w["variants"])
+                k6row = json.loads((stages[w["id"]] / "window.json").read_text())
+                k6s = np.load(stages[w["id"]] / "scores.npz")
+                kw = k6["windows"][w["id"]]
+                kbps = kw["keypoint_kbps"][CODE]
+                anchors = {}
+                for anchor in map(anchor_name, ANCHORS):
+                    if anchor in kw["anchors"]:
+                        i = k6row["variants"].index(anchor)
+                        anchors[anchor] = {"kbps": kw["anchors"][anchor]["kbps"], "lpips": float(np.mean(k6s["lpips"][i, j])),
+                                           "dists": float(np.mean(k6s["dists"][i, j]))}
+                curve = {v: {m: won(anchors, m, kbps, means[v][m]) for m in ("lpips", "dists")} for v in w["variants"]}
+                reached = [v for v in w["variants"] if v.startswith("gen-fit") and all(curve[v][m]["won"] for m in ("lpips", "dists"))]
+                out["windows"][w["id"]] = {"held_out_frames": j, "kbps": kbps, "anchors_held_out": anchors, "curve": curve,
+                                           "reached": reached}
+                for v in w["variants"]:
+                    print(w["id"], v, " ".join(f"{m} {curve[v][m]['value']:.3f}/{curve[v][m]['envelope']:.3f}" for m in ("lpips", "dists")))
+    write_json(Path(args.out), out)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="command", required=True)
-    for name in ("prepare", "judge"):
+    for name in ("prepare", "prepare-fit", "judge"):
         p = sub.add_parser(name)
         p.add_argument("--inputs", required=True, help="K6's extracted inputs.tar")
         p.add_argument("--k6-stage", action="append", required=True, help="K6's published.tar (pilot and parts)")
@@ -756,17 +866,25 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument("--lpips-backbone", required=True)
             p.add_argument("--dists-backbone", required=True)
             p.add_argument("--max-judged", type=int, default=0, help="0 judges every K6 judged frame (the smoke: a few)")
+            p.add_argument("--from-t", type=int, default=0, help="judge only frames from here (step 3's held-out frames)")
+            p.add_argument("--profiles", default=",".join(PROFILES), help="the generator profiles to composite and score")
             p.add_argument("--gpu-class", default="RTX")
     val = sub.add_parser("validate")
     val.add_argument("--stage", default="")
+    fit = sub.add_parser("fit-report")
+    fit.add_argument("--stage", action="append", required=True, help="validated judge stages of the pilot")
+    fit.add_argument("--k6-stage", action="append", required=True, help="K6's published.tar holding the window")
+    fit.add_argument("--k6-report", required=True)
+    fit.add_argument("--out", required=True)
     rep = sub.add_parser("report")
     rep.add_argument("--stage", action="append", required=True)
     rep.add_argument("--k6-report", required=True)
     rep.add_argument("--out", required=True)
     args = ap.parse_args(argv)
-    if args.command in ("prepare", "judge") and len(args.windows) != len(args.sources):
+    if args.command in ("prepare", "prepare-fit", "judge") and len(args.windows) != len(args.sources):
         raise SystemExit("Give one source per window")
-    return {"prepare": command_prepare, "judge": command_judge, "validate": command_validate, "report": command_report}[args.command](args)
+    return {"prepare": command_prepare, "prepare-fit": command_prepare_fit, "judge": command_judge, "validate": command_validate,
+            "report": command_report, "fit-report": command_fit_report}[args.command](args)
 
 
 if __name__ == "__main__":

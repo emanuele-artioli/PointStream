@@ -11281,3 +11281,36 @@ and each object's representation is judged on both:
   window, 5 GPU-hours for 6, plus the smoke and the pilot (about 1):
   **ceiling 6 GPU-hours, Ada, one job per GPU. Waits for the user's
   approval:** it is training, and step 2 overran its ceiling.
+- Approved (user, 2026-10-22): step 3 as written, ceiling 6 GPU-hours, one
+  job per GPU, starting with the smoke and the pilot on
+  `alcaraz_hurkacz/036`.
+- Revision (before any run; the decision rule unchanged).
+  - *What is fitted.* A full fit of both UNets with AdamW needs about
+    30–40 GB, more than a shared 48 GB card leaves (28–33 GB free on the
+    Ada hosts today), so the rule's LoRA branch: rank 64 (alpha 64) on
+    both UNets' spatial attention projections (attn1/attn2 to_q, to_k,
+    to_v, to_out.0; 104 layers in the ReferenceNet, its last up block
+    excluded as `finetune_stage1.py` freezes it, and 128 in the denoising
+    UNet), plus the whole pose guider. bf16 base weights and autocast,
+    float32 adapters; AdamW, lr 1e-4 (adapters) and 1e-5 (pose guider),
+    50 warm-up steps, batch 1 × 4 accumulated. Otherwise
+    `finetune_stage1.py`'s objective (v-prediction, zero-SNR scheduled
+    linear betas, SNR-γ 5, noise offset 0.05, 10% unconditional). Pairs: a
+    target frame and a random reference frame of the same player in the
+    window, 512×784 crops from the uncoded keypoints (`k6b prepare-fit`).
+    Rendering merges the adapters into `original` (checked on CPU: the
+    adapters saved from the stage-1 UNets load into the rendering UNets and
+    change their weights; the motion module is untouched) and uses step 2's
+    coded maps and granted reference.
+  - *The smoke's "sample moves towards the target".* The decoded x₀
+    prediction at t = 500, with fixed noise, on 4 fixed training frames:
+    its MSE to the true crop must fall from before to after 200 optimizer
+    steps, and so must the loss.
+  - *Pilot.* Fit on frames 0–179 for 30 minutes, checkpoints at 25%, 50%
+    and 100%. Render each, and `original` unfitted (the curve's 0), from
+    frame 180 to 239 for both players, and judge those frames' judged
+    frames (`--from-t 180`) against K6's envelope rebuilt from its
+    anchors' per-frame scores on the same frames (`k6b fit-report`). The
+    scaled fits use the shortest checkpoint fraction that is below that
+    envelope on both metrics; if none is, the curve's trend decides
+    whether 30 minutes can, and if it cannot, the step stops as a fail.

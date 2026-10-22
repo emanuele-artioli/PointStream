@@ -1,0 +1,384 @@
+"""K6b (players) 3's fit: AnimateAnyone (the `original` profile) fitted on a window's own frames, the overfit oracle.
+Run in ``pointstream-jcv`` (as `k6b_generate`), never imported by PointStream:
+
+    python -m experiments.tennis.k6b_fit fit --fit-data TAR --window ID --weight NAME PATH ... --minutes M
+        [--max-t T] [--fractions 0.25,0.5,1] [--max-steps N]
+    python -m experiments.tennis.k6b_fit validate
+
+``--fit-data`` is `experiments.tennis.k6b prepare-fit`'s published.tar: per unit (window, player) the true crops and the
+DWPose maps of the uncoded keypoints. The objective is the fork's ``finetune_stage1.py``: a target frame's latent noised
+and predicted (v-prediction, zero-SNR DDIM schedule, SNR-gamma 5 weighting, noise offset 0.05) by the denoising UNet
+(no motion module) conditioned on its pose map and on a reference frame of the same player through the ReferenceNet
+and its CLIP embedding, which are dropped 10% of the time; the ReferenceNet's last up block is frozen, as there. What is
+fitted is a LoRA on both UNets' attention projections (attn1/attn2 to_q, to_k, to_v, to_out.0) and the whole pose
+guider: a full fit of both UNets with AdamW needs about 30-40 GB, more than a shared 48 GB card leaves (the rule's
+LoRA branch). Pairs come from frames with ``t < --max-t`` (the pilot's held-out split). A checkpoint (the LoRA and the
+pose guider) is written at each fraction of ``--minutes`` of fitting; `k6b_generate --fit` renders with it merged.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import os
+import random
+import tarfile
+import time
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+
+from experiments.tennis.k6b_generate import (GEN_H, GEN_W, SD15_UNET, UNET_ADDITIONAL, folder, load_checked, loading_record,
+                                             sha256, stage_dir, write_json, UNUSED_REFERENCE_HEAD)
+
+LORA_RANK = 64
+LORA_ALPHA = 64
+#: Spatial attention projections; the motion module's are named ``attention_blocks`` and are not matched.
+DENOISING_TARGETS = r".*(attn1|attn2)\.(to_q|to_k|to_v|to_out\.0)$"
+REFERENCE_TARGETS = r"^(?!up_blocks\.3\.).*(attn1|attn2)\.(to_q|to_k|to_v|to_out\.0)$"
+LORA_LR = 1e-4
+GUIDER_LR = 1e-5
+WARMUP = 50
+BATCH = 1
+ACCUMULATE = 4
+UNCOND_RATIO = 0.1
+NOISE_OFFSET = 0.05
+SNR_GAMMA = 5.0
+MAX_GRAD_NORM = 1.0
+#: finetune_stage1.yaml's noise schedule with enable_zero_snr (rescaled, v-prediction, trailing).
+TRAIN_SCHEDULER: dict[str, Any] = {"num_train_timesteps": 1000, "beta_start": 0.00085, "beta_end": 0.012,
+                                   "beta_schedule": "scaled_linear", "steps_offset": 1, "clip_sample": False,
+                                   "rescale_betas_zero_snr": True, "timestep_spacing": "trailing", "prediction_type": "v_prediction"}
+PROBE_T = 500  # the smoke's x0 check: one timestep, fixed noise, the same frames before and after
+
+
+def lora_config(targets: str) -> Any:
+    from peft import LoraConfig
+
+    return LoraConfig(r=LORA_RANK, lora_alpha=LORA_ALPHA, init_lora_weights="gaussian", target_modules=targets)
+
+
+def inject(reference: Any, denoising: Any) -> None:
+    from peft import inject_adapter_in_model
+
+    inject_adapter_in_model(lora_config(REFERENCE_TARGETS), reference)
+    inject_adapter_in_model(lora_config(DENOISING_TARGETS), denoising)
+
+
+def apply_fit(reference: Any, denoising: Any, guider: Any, checkpoint: Path) -> dict[str, Any]:
+    """Load a fitted checkpoint into rendering models and merge the LoRA into their weights (k6b_generate --fit)."""
+    import torch
+    from peft import set_peft_model_state_dict
+    from peft.tuners.lora import LoraLayer
+
+    state = torch.load(checkpoint, map_location="cpu", weights_only=True)
+    inject(reference, denoising)
+    record = {}
+    for name, module in (("reference_unet", reference), ("denoising_unet", denoising)):
+        result = set_peft_model_state_dict(module, state[name])
+        missing = [k for k in getattr(result, "missing_keys", []) if "lora_" in k]
+        if missing:
+            raise SystemExit(f"{name}: {len(missing)} LoRA keys missing from the checkpoint, e.g. {missing[:3]}")
+        layers = [m for m in module.modules() if isinstance(m, LoraLayer)]
+        for layer in layers:
+            layer.merge()
+        record[name] = {"lora_layers": len(layers), "lora_tensors": len(state[name])}
+    record["pose_guider"] = load_checked(guider, state["pose_guider"], "pose_guider")
+    return record
+
+
+class Trainer:
+    def __init__(self, weights: dict[str, Path], device: str, scratch: Path):
+        import torch
+        from animate_anyone.models.mutual_self_attention import ReferenceAttentionControl
+        from animate_anyone.models.pose_guider import PoseGuider
+        from animate_anyone.models.unet_2d_condition import UNet2DConditionModel
+        from animate_anyone.models.unet_3d import UNet3DConditionModel
+        from diffusers import AutoencoderKL, DDIMScheduler
+        from transformers import CLIPVisionModelWithProjection
+
+        self.device = device
+        dtype = torch.bfloat16
+        record: dict[str, Any] = {"dtype": "bfloat16 base weights and autocast; LoRA and pose guider float32"}
+        vae, info = AutoencoderKL.from_pretrained(str(folder(weights, "vae", scratch)), output_loading_info=True)
+        record["vae"] = loading_record(info, "vae")
+        encoder, info = CLIPVisionModelWithProjection.from_pretrained(str(folder(weights, "image_encoder", scratch)), output_loading_info=True)
+        record["image_encoder"] = loading_record(info, "image_encoder")
+        reference = UNet2DConditionModel.from_config({**SD15_UNET, "_class_name": "UNet2DConditionModel"})
+        record["reference_unet"] = load_checked(reference, torch.load(weights["original/reference_unet.pth"], map_location="cpu", weights_only=True),
+                                                "reference_unet", UNUSED_REFERENCE_HEAD)
+        config3d = {**SD15_UNET, "_class_name": "UNet3DConditionModel",
+                    "down_block_types": ["CrossAttnDownBlock3D", "CrossAttnDownBlock3D", "CrossAttnDownBlock3D", "DownBlock3D"],
+                    "up_block_types": ["UpBlock3D", "CrossAttnUpBlock3D", "CrossAttnUpBlock3D", "CrossAttnUpBlock3D"],
+                    "mid_block_type": "UNetMidBlock3DCrossAttn"}
+        stage1 = {**UNET_ADDITIONAL, "use_motion_module": False, "unet_use_temporal_attention": False}  # finetune_stage1.py's
+        denoising = UNet3DConditionModel.from_config(config3d, **stage1)
+        record["denoising_unet"] = load_checked(denoising, torch.load(weights["original/denoising_unet.pth"], map_location="cpu", weights_only=True),
+                                                "denoising_unet")
+        guider = PoseGuider(320, block_out_channels=(16, 32, 96, 256))
+        record["pose_guider"] = load_checked(guider, torch.load(weights["original/pose_guider.pth"], map_location="cpu", weights_only=True), "pose_guider")
+        for m in (vae, encoder, reference, denoising):
+            m.requires_grad_(False)
+        vae.to(device, dtype=torch.float32)  # encoding only, once per frame
+        encoder.to(device, dtype=dtype)
+        reference.to(device, dtype=dtype)
+        denoising.to(device, dtype=dtype)
+        inject(reference, denoising)
+        lora = [p for m in (reference, denoising) for n, p in m.named_parameters() if "lora_" in n]
+        for p in lora:
+            p.data = p.data.float()
+            p.requires_grad_(True)
+        guider.to(device, dtype=torch.float32).requires_grad_(True)
+        record["trainable"] = {"lora_tensors": len(lora), "lora_params": int(sum(p.numel() for p in lora)),
+                               "pose_guider_params": int(sum(p.numel() for p in guider.parameters()))}
+        self.optimizer = torch.optim.AdamW([{"params": lora, "lr": LORA_LR}, {"params": list(guider.parameters()), "lr": GUIDER_LR}],
+                                           betas=(0.9, 0.999), weight_decay=1e-2, eps=1e-8)
+        self.writer = ReferenceAttentionControl(reference, do_classifier_free_guidance=False, mode="write", fusion_blocks="full")
+        self.reader = ReferenceAttentionControl(denoising, do_classifier_free_guidance=False, mode="read", fusion_blocks="full")
+        self.scheduler = DDIMScheduler(**TRAIN_SCHEDULER)
+        self.vae, self.encoder, self.reference, self.denoising, self.guider = vae, encoder, reference, denoising, guider
+        self.lora = lora
+        self.dtype = dtype
+        self.record = record
+
+    def encode(self, images: np.ndarray) -> tuple[Any, Any, Any]:
+        """Latent means and stds (VAE, float32) and CLIP image embeddings of uint8 crops."""
+        import torch
+        from transformers import CLIPImageProcessor
+
+        processor = CLIPImageProcessor()
+        means, stds, embeds = [], [], []
+        with torch.inference_mode():
+            for first in range(0, len(images), 8):
+                x = torch.from_numpy(images[first:first + 8]).to(self.device).permute(0, 3, 1, 2).float() / 127.5 - 1.0
+                dist = self.vae.encode(x).latent_dist
+                means.append(dist.mean)
+                stds.append(dist.std)
+                clip = processor(images=list(images[first:first + 8]), return_tensors="pt").pixel_values
+                embeds.append(self.encoder(clip.to(self.device, dtype=self.dtype)).image_embeds.float())
+        return torch.cat(means), torch.cat(stds), torch.cat(embeds)
+
+    def snr(self, timesteps: Any) -> Any:
+        """finetune_stage1.py's compute_snr."""
+        import torch
+
+        alphas = self.scheduler.alphas_cumprod.to(timesteps.device)[timesteps]
+        return (alphas ** 0.5 / torch.clamp((1 - alphas) ** 0.5, min=1e-8)) ** 2
+
+    def forward(self, target_latents: Any, ref_latents: Any, clip: Any, pose: Any, timesteps: Any, noise: Any, uncond: bool) -> tuple[Any, Any]:
+        """(prediction, target) for a batch; the reference banks are cleared after."""
+        import torch
+
+        noisy = self.scheduler.add_noise(target_latents, noise, timesteps)
+        target = self.scheduler.get_velocity(target_latents, noise, timesteps)
+        with torch.autocast("cuda", dtype=self.dtype):
+            pose_fea = self.guider(pose)
+            embeds = (torch.zeros_like(clip) if uncond else clip).unsqueeze(1).to(self.dtype)
+            if not uncond:
+                self.reference(ref_latents.to(self.dtype), torch.zeros_like(timesteps), encoder_hidden_states=embeds, return_dict=False)
+                self.reader.update(self.writer)
+            pred = self.denoising(noisy.to(self.dtype), timesteps, pose_cond_fea=pose_fea, encoder_hidden_states=embeds).sample
+        self.reader.clear()
+        self.writer.clear()
+        return pred.float(), target
+
+    def loss(self, pred: Any, target: Any, timesteps: Any) -> Any:
+        import torch
+        import torch.nn.functional as F
+
+        snr = self.snr(timesteps) + 1  # v-prediction, as finetune_stage1.py
+        weights = torch.stack([snr, SNR_GAMMA * torch.ones_like(timesteps)], 1).min(1)[0] / snr
+        per = F.mse_loss(pred, target, reduction="none").mean(dim=list(range(1, pred.ndim)))
+        return (per * weights).mean()
+
+    def x0(self, pred: Any, noisy: Any, timesteps: Any) -> Any:
+        """x0 from a v-prediction: sqrt(a) x_t - sqrt(1 - a) v."""
+        a = self.scheduler.alphas_cumprod.to(noisy.device)[timesteps].view(-1, 1, 1, 1, 1)
+        return a ** 0.5 * noisy - (1 - a) ** 0.5 * pred
+
+    def state(self) -> dict[str, Any]:
+        from peft import get_peft_model_state_dict
+
+        return {"reference_unet": {k: v.detach().cpu().half() for k, v in get_peft_model_state_dict(self.reference).items()},
+                "denoising_unet": {k: v.detach().cpu().half() for k, v in get_peft_model_state_dict(self.denoising).items()},
+                "pose_guider": {k: v.detach().cpu() for k, v in self.guider.state_dict().items()}}
+
+
+def command_fit(args: argparse.Namespace) -> int:
+    import torch
+
+    from experiments.audit.env_smoke import device_record, profile_cuda
+    from experiments.jobs.monitor import publish_progress
+
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    began = time.time()
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    publish = scratch / "publish"
+    publish.mkdir(parents=True, exist_ok=True)
+    weights = {name: Path(path) for name, path in args.weight}
+    root = scratch / "fit-data"
+    if not root.is_dir():
+        root.mkdir(parents=True)
+        with tarfile.open(args.fit_data) as archive:
+            archive.extractall(root, filter="data")
+    manifest = json.loads((root / "publish" / "prepare-fit.json").read_text())
+    units = [u["unit"] for w in manifest["windows"] if w["window"] == args.window for u in w["units"]]
+    if not units:
+        raise SystemExit(f"no fit data for {args.window}")
+    device = "cuda"
+    limit = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "24000"))
+    torch.cuda.set_per_process_memory_fraction(min(1.0, limit * 2**20 / torch.cuda.get_device_properties(0).total_memory))
+    seed = int.from_bytes(args.window.encode(), "little") % 2**31
+    random.seed(seed)
+    torch.manual_seed(seed)
+    trainer = Trainer(weights, device, scratch)
+    # Every training frame encoded once: latent mean/std, CLIP embedding, pose map (as the dataset's ToTensor).
+    data = []
+    images_kept: dict[str, np.ndarray] = {}
+    for name in units:
+        a = np.load(root / "publish" / "fit" / f"{name}.npz")
+        keep = a["t"] < args.max_t if args.max_t else np.ones(len(a["t"]), bool)
+        if keep.sum() < 2:
+            continue
+        mean, std, clip = trainer.encode(a["image"][keep])
+        pose = torch.from_numpy(a["pose"][keep]).permute(0, 3, 1, 2).float().div(255)
+        data.append({"unit": name, "t": a["t"][keep], "mean": mean, "std": std, "clip": clip, "pose": pose})
+        images_kept[name] = a["image"][keep]
+    frames = sum(len(d["t"]) for d in data)
+
+    def batch(gen: random.Random) -> tuple[Any, ...]:
+        d = gen.choice(data)
+        i, r = gen.randrange(len(d["t"])), gen.randrange(len(d["t"]))
+        lat = (d["mean"][i:i + 1] + d["std"][i:i + 1] * torch.randn_like(d["mean"][i:i + 1])) * 0.18215
+        ref = (d["mean"][r:r + 1] + d["std"][r:r + 1] * torch.randn_like(d["mean"][r:r + 1])) * 0.18215
+        return lat.unsqueeze(2), ref, d["clip"][r:r + 1], d["pose"][i:i + 1].to(device).unsqueeze(2), d, i
+
+    # The smoke's check, before and after: x0 at PROBE_T with fixed noise on 4 fixed training frames, against the truth.
+    probe_gen = random.Random(1)
+    probe = [batch(probe_gen) for _ in range(4)]
+    probe_noise = [torch.randn_like(p[0]) for p in probe]
+
+    def probe_error() -> float:
+        errs = []
+        with torch.inference_mode():
+            for (lat, ref, clip, pose, d, i), noise in zip(probe, probe_noise):
+                t = torch.full((1,), PROBE_T, device=device, dtype=torch.long)
+                pred, _ = trainer.forward(lat, ref, clip, pose, t, noise, False)
+                noisy = trainer.scheduler.add_noise(lat, noise, t)
+                x0 = trainer.x0(pred, noisy, t)[:, :, 0] / 0.18215
+                image = trainer.vae.decode(x0.float()).sample.clamp(-1, 1)
+                truth = torch.from_numpy(images_kept[d["unit"]][i]).to(device).permute(2, 0, 1)[None].float() / 127.5 - 1.0
+                errs.append(float(((image - truth) ** 2).mean()))
+        return float(np.mean(errs))
+
+    error_before = probe_error()
+    p0 = probe[0]
+    _, kernels = profile_cuda(lambda: trainer.forward(p0[0], p0[1], p0[2], p0[3], torch.full((1,), PROBE_T, device=device, dtype=torch.long),
+                                                      probe_noise[0], False))
+    fractions = sorted(float(f) for f in args.fractions.split(","))
+    budget = args.minutes * 60
+    gen = random.Random(seed)
+    losses: list[float] = []
+    saved: list[dict[str, Any]] = []
+    step = micro = 0
+    fit_began = time.time()
+    trainer.optimizer.zero_grad()
+    while True:
+        elapsed = time.time() - fit_began
+        due = [f for f in fractions if f * budget <= elapsed and not any(s["fraction"] == f for s in saved)]
+        for f in due:
+            path = publish / f"{args.window_name}@fit-{int(round(f * 100))}.pt"
+            torch.save(trainer.state(), path)
+            saved.append({"fraction": f, "minutes": round(elapsed / 60, 2), "optimizer_steps": step, "path": path.name,
+                          "sha256": sha256(path)})
+            print(f"phase=fit checkpoint={path.name} steps={step} minutes={elapsed / 60:.1f}", flush=True)
+            publish_progress(os.environ.get("PS_STAGE", "local"), len(saved))
+        if len(saved) == len(fractions) or (args.max_steps and step >= args.max_steps):
+            break
+        lat, ref, clip, pose, _, _ = batch(gen)
+        noise = torch.randn_like(lat) + NOISE_OFFSET * torch.randn((lat.shape[0], lat.shape[1], 1, 1, 1), device=device)
+        t = torch.randint(0, 1000, (lat.shape[0],), device=device).long()
+        pred, target = trainer.forward(lat, ref, clip, pose, t, noise, random.random() < UNCOND_RATIO)
+        loss = trainer.loss(pred, target, t) / ACCUMULATE
+        loss.backward()
+        losses.append(float(loss) * ACCUMULATE)
+        micro += 1
+        if micro % ACCUMULATE == 0:
+            torch.nn.utils.clip_grad_norm_(trainer.lora + list(trainer.guider.parameters()), MAX_GRAD_NORM)
+            for group, base in zip(trainer.optimizer.param_groups, (LORA_LR, GUIDER_LR)):
+                group["lr"] = base * min(1.0, (step + 1) / WARMUP)
+            trainer.optimizer.step()
+            trainer.optimizer.zero_grad()
+            step += 1
+            if step % 50 == 0:
+                print(f"phase=fit step={step} loss={np.mean(losses[-50 * ACCUMULATE:]):.4f} minutes={(time.time() - fit_began) / 60:.1f}", flush=True)
+    error_after = probe_error()
+    if args.max_steps:  # the smoke: a final checkpoint whatever the time, for the render smoke
+        path = publish / f"{args.window_name}@fit-smoke.pt"
+        torch.save(trainer.state(), path)
+        saved.append({"fraction": None, "optimizer_steps": step, "path": path.name, "sha256": sha256(path)})
+    window = max(1, len(losses) // 10)
+    write_json(stage_dir() / "k6b_fit.json", {
+        "command": "fit", "stage": os.environ.get("PS_STAGE"), "window": args.window, "units": [d["unit"] for d in data],
+        "frames": frames, "max_t": args.max_t, "minutes": args.minutes, "max_steps": args.max_steps, "optimizer_steps": step,
+        "micro_steps": micro, "checkpoints": saved, "loss_first_tenth": float(np.mean(losses[:window])) if losses else None,
+        "loss_last_tenth": float(np.mean(losses[-window:])) if losses else None, "loss_curve": [float(np.mean(losses[i:i + 200])) for i in range(0, len(losses), 200)],
+        "probe_mse_before": error_before, "probe_mse_after": error_after, "model": trainer.record, "kernels": kernels,
+        "device": device_record(args.gpu_class), "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3),
+        "gpu_memory_limit_mib": limit, "settings": {"lora_rank": LORA_RANK, "lora_alpha": LORA_ALPHA, "lora_lr": LORA_LR,
+        "guider_lr": GUIDER_LR, "batch": BATCH, "accumulate": ACCUMULATE, "uncond": UNCOND_RATIO, "noise_offset": NOISE_OFFSET,
+        "snr_gamma": SNR_GAMMA, "scheduler": TRAIN_SCHEDULER, "size": [GEN_W, GEN_H]},
+        "inputs": {"fit_data": sha256(Path(args.fit_data)), "weights": {k: sha256(v) for k, v in sorted(weights.items())}},
+        "seconds": round(time.time() - began, 2)})
+    with tarfile.open(stage_dir() / "published.tar", "w") as tar:
+        tar.add(publish, arcname="publish")
+    return 0
+
+
+def command_validate(args: argparse.Namespace) -> int:
+    stage = Path(args.stage) if args.stage else stage_dir()
+    r = json.loads((stage / "k6b_fit.json").read_text())
+    checks = {
+        "device_class": bool(r["device"]["class_matches"]),
+        "peak_within_declaration": r["gpu_peak_gib"] * 1024 <= r["gpu_memory_limit_mib"],
+        "no_missing_keys": all(r["model"][k]["missing"] == 0 for k in ("vae", "image_encoder", "reference_unet", "denoising_unet", "pose_guider")),
+        "lora_injected": r["model"]["trainable"]["lora_tensors"] > 100,
+        "kernels_on_gpu": r["kernels"]["kernel_launches"] > 0,
+        "loss_falls": r["loss_last_tenth"] is not None and r["loss_last_tenth"] < r["loss_first_tenth"],
+        "sample_moves_to_target": r["probe_mse_after"] < r["probe_mse_before"],
+        "checkpoints": bool(r["checkpoints"]) and all(c["sha256"] for c in r["checkpoints"]),
+        "finite": all(math.isfinite(x) for x in r["loss_curve"]),
+    }
+    report = {"passed": all(checks.values()), "checks": checks}
+    if target := os.environ.get("PS_VALIDATION_PATH"):
+        write_json(Path(target), report)
+    print(json.dumps(report, indent=1))
+    return 0 if report["passed"] else 1
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    sub = ap.add_subparsers(dest="command", required=True)
+    fit = sub.add_parser("fit")
+    fit.add_argument("--fit-data", required=True)
+    fit.add_argument("--window", required=True)
+    fit.add_argument("--weight", action="append", nargs=2, required=True, metavar=("NAME", "PATH"))
+    fit.add_argument("--minutes", type=float, required=True)
+    fit.add_argument("--fractions", default="0.25,0.5,1")
+    fit.add_argument("--max-t", type=int, default=0, help="train on frames t < this (0: all)")
+    fit.add_argument("--max-steps", type=int, default=0, help="the smoke: stop after this many optimizer steps")
+    fit.add_argument("--gpu-class", default="RTX")
+    val = sub.add_parser("validate")
+    val.add_argument("--stage", default="")
+    args = ap.parse_args(argv)
+    if args.command == "fit":
+        args.window_name = args.window.replace("/", "__").replace("@", "_at")
+        return command_fit(args)
+    return command_validate(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
