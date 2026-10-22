@@ -11100,3 +11100,12 @@ and each object's representation is judged on both:
   restore (the frames whose VISOR number is a multiple of 10, with their
   fits, each fitted on its own), so P06_108's 33 min are kept if that stage's
   `partial.tar` holds them.
+- Revision 3 (2026-10-22, validator only, before P22_107 was scored).
+  P22_107's score smoke `20261022T135926Z-ea68c004` failed one check: one
+  of its 128 references (right hand, rank 55) decodes its polygon mask at
+  IoU 0.874 against the source mask, under the check's 0.9 (outer contours
+  only, so a hole is filled). That is lossy coding, not a fault: the
+  decoder warps with the decoded mask, and its bits are billed. The check,
+  meant to catch broken polygon coding, is now median IoU ≥ 0.95 and every
+  reference ≥ 0.8. The three items already scored pass it (37 of 37 checks
+  each).

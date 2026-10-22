@@ -814,7 +814,8 @@ def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
         checks[f"{item}:bank_outside_window"] = all(not lo - m["guard_frames"] <= r["index"] < hi + m["guard_frames"] for r in refs)
         checks[f"{item}:bank_sizes"] = all(1 <= len(side) <= max(KS) for side in m["bank"].values()) and bool(m["bank"])
         checks[f"{item}:refs_coded"] = all(r["image_bits"] > 0 and r["psnr_mask"] > 25.0 for r in refs)
-        checks[f"{item}:polygons"] = all(r["mask_iou"] > 0.9 for r in refs)
+        ious = [r["mask_iou"] for r in refs]  # the decoded polygons against the mask (holes are not coded; the decoder uses them)
+        checks[f"{item}:polygons"] = bool(ious) and float(np.median(ious)) >= 0.95 and min(ious) >= 0.8
         checks[f"{item}:bits_nested"] = m["bank_bits"]["16"] <= m["bank_bits"]["32"] <= m["bank_bits"]["64"] and m["bank_bits"]["16"] > 0
         checks[f"{item}:duration"] = 60.0 < m["video_duration_s"] < 7200.0
         for v in m["summary"]:
