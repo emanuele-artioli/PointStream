@@ -183,6 +183,7 @@ def command_generate(args: argparse.Namespace) -> int:
     import torch
 
     from experiments.audit.env_smoke import device_record, model_on_cuda
+    from experiments.jobs.monitor import publish_progress
 
     os.environ["HF_HUB_OFFLINE"] = "1"  # code never downloads (AGENTS.md); every file is staged
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
@@ -245,6 +246,7 @@ def command_generate(args: argparse.Namespace) -> int:
                                                    "steps": args.steps, "seed": seed, "npz_sha256": sha256(path),
                                                    "crop_std_min": float(min((c.std() for c in crops), default=0.0))})
             timings.append({"unit": name, "profile": profile, "frames": frames, "seconds": round(seconds, 1)})
+            publish_progress(os.environ.get("PS_STAGE", "local"), len(timings))  # one finished (unit, profile)
         records[profile] = record
         del renderer
         torch.cuda.empty_cache()

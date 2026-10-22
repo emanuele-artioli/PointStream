@@ -11156,3 +11156,28 @@ and each object's representation is judged on both:
   the near player, so the difference between the two is the far player's
   alone. It is not scored against the envelope. The fine-tune has seen
   these matches, so it was not a zero-shot test anyway.
+- Generation (`gen-original`, 30 steps; code `edffa84` from each
+  `ready.json`; RTX 6000 Ada, shared). Five parts ran at once on gpu5 and
+  gpu6 beside other sessions' jobs, and ran at about half the pilot's
+  speed. Each saves every finished (unit, profile), so a stop keeps them:
+  `20261022T172711Z-2987835e` complete (`published.tar` `c49c92c7…baf`);
+  `…172657Z-149a024a` finished all 3 units and stopped at its 2,700 s
+  allowance while archiving (`published.tar` `d52af6fb…70f3`);
+  `…172650Z-4708bdf5`, `…172704Z-becacf7e` and `…172719Z-c3f87374`
+  stopped there with 2 of 3 units each (`partial.tar` `2f17caf0…e496`,
+  `6ea7953b…72e`, `f1e97557…612f`). Rendered: 13 of 16 units with the
+  pilot's; **6 of the 8 windows have both players** (both
+  `djokovic_federer` windows, `rublev_auger-aliassime/052`,
+  `djokovic_zverev/012`, both `alcaraz_hurkacz` windows). Missing:
+  `djokovic_zverev/008`'s player 1 and both players of
+  `medvedev_struff/033` (711 frames). No progress was published per unit,
+  so the supervisor raised stall notices; added since (`k6b_generate`
+  publishes one per finished unit).
+- Budget: about 4.4 GPU-hours of stage time are spent (the five parts
+  3.85, the pilot and smokes about 0.55), above the 4-hour ceiling, since
+  the parts contended with each other. **Further spending goes to the
+  user.** What is left: judging (about 1 GPU-hour for 8 windows, 0.75 for
+  6) and the 3 missing units (0.6–1.1). The decision can be read early: at
+  8 windows a pass needs 12 of the 16 window-metrics won, so on the 6
+  complete windows at most 7 won is already a fail and at least 12 already
+  a pass; only 8–11 would need the other two windows.
