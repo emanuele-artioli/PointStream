@@ -11064,6 +11064,76 @@ and each object's representation is judged on both:
   asked before it is submitted. Every stage under 45 minutes; shared GPUs,
   ½-scale DCVC-UF points allowed on Ada and A6000 with the coder's three
   attempts (docs/fleet.md).
+- Runs (s = 8; shared GPUs; code revision from each job's `ready.json`;
+  every full stage validated locally: foreground 12/12, scoring 9/9).
+  - Foreground (`h5 foreground --mask-scale 8`), off the shelf | venue
+    model: P01_107 `20261022T131134Z-62a239a3` | `…131141Z-403dcbca`;
+    P02_02 `…122639Z-cdff24e8` | `…125101Z-71de7c90`; P03_10
+    `…122652Z-f2d94c0f` | `…125106Z-2b385f06`; P09_106
+    `…122705Z-efd8ee14` | `…125110Z-2a8c63f0`. Code `fc0caf8` for the
+    three first off-the-shelf jobs, `1ba09f2` for the others (it adds only
+    `h5 crops`). RTX 6000 Ada.
+  - Two venue-coded jobs pass 11/12: F's PSNR at `dcvc@0/4` (3.6–4.4
+    kbps) is 19.09 dB (P01_107) and 19.33 dB (P09_106), under the
+    validator's 20 dB floor, as H5q 1 found at the same point with F
+    granted (19.07, 19.45). A low-rate picture, not a broken decode
+    (every other point 22–40 dB); the floor was not changed.
+  - Scoring (`h5 score --mask-scale 8`, tags `h5p4-gho` | `h5p4-venue`):
+    P01_107 `20261022T172510Z-1e1e4ff1` | `…172612Z-33e8a123` (`8602763`);
+    P02_02 `…125643Z-1ff8a9ab` | `…134121Z-3e1b0349`; P03_10
+    `…125653Z-63c4d1dd` | `…134531Z-0d44d55c`; P09_106
+    `…130311Z-60d8ed55` | `…133417Z-c7a01f55` (`1ba09f2`). RTX 6000 Ada
+    and RTX A6000. Every planned pair scored: 15 | 13 | 12 | 14.
+  - Not citable: the first P01_107 off-the-shelf job (`…122606Z-a7413b7b`)
+    stopped at its smoke, whose only point was `dcvc@0/4` (F at 19.9999
+    dB, the floor above); the smoke moved to the highest-QP ¼ point, as
+    H5q 1's specs had it, and four not-yet-started venue jobs were
+    cancelled and resubmitted with it (`…122629Z-3f8b7426`,
+    `…122645Z-e4edbf2c`, `…122658Z-51047d6d`, `…122710Z-c94154f6`). Its
+    rerun's smoke ran past 600 s on the contended A6000 gpu2
+    (`…125053Z-fe60a43e`, as in H5q 2); P01_107's two jobs then ran
+    without gpu2 (`…125057Z-79f22900` cancelled).
+- The mask at s = 8, P01_107 | P02_02 | P03_10 | P09_106: 51 | 116 | 75 |
+  36 kbps, F̂'s IoU with F 0.977 | 0.988 | 0.983 | 0.955 (H5m's).
+- Outcome. BD-rate on 4a's pairs, the per-point configuration, neither
+  venue model billed; P01_107 | P02_02 | P03_10 | P09_106, mean, items
+  below zero:
+
+  | against `dcvc-venue` | F granted (4b's oracle) | **F billed, s = 8 (the rule)** | F̂ stream, mask bytes removed | s = 16 bound |
+  |---|---|---|---|---|
+  | **weighted DISTS** | −0 \| −16 \| −22 \| −22: −15%, 4/4 | **+125 \| +146 \| +102 \| −0: +93%, 1/4** | +0 \| −16 \| −21 \| −30: −17%, 3/4 | +44 \| +47 \| +22 \| −18: +24%, 1/4 |
+  | weighted LPIPS | +6 \| +31 \| +42 \| −16: +16%, 1/4 | +127 \| +176 \| +194 \| +12: +127%, 0/4 | +15%, 1/4 | +56%, 1/4 |
+  | frame DISTS | −8 \| −28 \| −21 \| +10: −12%, 3/4 | +115 \| +131 \| +92 \| +41: +95%, 0/4 | −13%, 3/4 | +26%, 0/4 |
+  | frame LPIPS | +26%, 0/4 | +131%, 0/4 | +27%, 0/4 | +65%, 0/4 |
+  | weighted PSNR | +8%, 1/4 | +94%, 0/4 | +10%, 1/4 | +41%, 1/4 |
+
+  Against the fair pooled envelope, F billed: weighted DISTS +117% (0/4),
+  weighted LPIPS +153% (0/4), frame DISTS +107% (0/4), weighted PSNR
+  +199% (0/4); F granted on the same pairs: −9% (3/4), +17%, −7%, +79%.
+  - **The rule fails at s = 8** (+93%, 1 of 4), decided at 3 items (two
+    above zero, whatever P01_107 read).
+  - **s = 16 is not run**: its upper bound (s = 8's composites, a better
+    F̂ than s = 16's, re-billed at s = 16's measured 16 | 39 | 23 | 14
+    kbps from H5m) still fails (+24%, 1 of 4), so the real run cannot
+    pass and the hull over s cannot either.
+  - **F̂ costs nothing; the loss is the MASK segment's rate.** With the
+    mask bytes removed, the stream built for F̂ reads as F granted, or
+    better (weighted DISTS −17% against −15%; P09_106 −30% against
+    −22%): the F̂-built foreground removed H5m's bias entirely. Adding
+    36–116 kbps to every point moves the low end of PointStream's curve,
+    where the venue codec reaches 13–26 kbps, by a factor of 2–10, and the
+    BD-rate integrates in log rate.
+  - Hypothesis right on the verdict, wrong on the size (+93%, not −5 to
+    +10%). The competing explanation fails: the shift dominates the
+    overlap because the venue anchor's curve starts at 13–26 kbps.
+  - **Billing F removes every win of the split at equal adaptation**, on
+    every metric, against both the venue codec and the pooled envelope.
+    What 4b's oracle says about a MASK-free F follows.
+- GPU time: about 2.6 GPU-hours (23 jobs, the failed, timed-out and
+  cancelled ones included), within the ceiling of 3.5.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5p4-8602763/` (the
+  specs, every stage's `h5.json`, `pairs4a.py`, `analyse4a.py` with its
+  `a4.json`, `bound16.py`, `breakeven.py` and their outputs).
 
 ### 2026-10-22 — H5p 4b: oracle for F carried by the foreground stream (no MASK segment)
 - Question (PLAN H5p 4, H5q lever 3). Could F carried by the foreground
@@ -11101,3 +11171,33 @@ and each object's representation is judged on both:
   whether the bound's assumption (no cheaper stream) holds, which matters
   only if a verdict is close.
 - Budget: CPU, minutes.
+- Outcome (CPU; the oracle's rows are H5q 1's scoring stages, 4a's pairs;
+  `analyse4a.py`, `breakeven.py` in 4a's report).
+  - **Weighted LPIPS: the oracle fails** (+16%, 1 of 4 on 4a's pairs; +6%,
+    1 of 4 on the per-point configuration's full grid). F carried by the
+    foreground stream cannot turn H5q's loss; **not built for it.** The
+    same holds for frame LPIPS (+26%, 0/4) and weighted PSNR (+8%, 1/4),
+    which the oracle fails too.
+  - **Weighted DISTS: the oracle passes where 4a fails** (−15%, 4 of 4,
+    against 4a's +93%, 1 of 4), so by the rule a MASK-free F could move
+    that verdict, and a tighter oracle is next. Frame DISTS: the oracle
+    reads −12% (3 of 4), passing too.
+  - A first tighter bound, computed post hoc on the CPU (not a rule
+    written before its run, so a reading, not a decision): the oracle's
+    rows with a constant rate c added for F, the most any carrier could
+    spend and keep the win. Weighted DISTS against `dcvc-venue`: c = 2
+    kbps −11% (3/4, passes), 5 kbps −5% (3/4, fails), 10 kbps +4% (2/4).
+    Frame DISTS fails already at 2 kbps (−8%, 3/4). **A carrier must cost
+    about 2 kbps or less**, about 5 bytes per frame at 50 frames/s.
+  - Every F coder measured so far costs 7–20× that at usable accuracy:
+    lzma at s = 16, 14–39 kbps (IoU 0.83–0.97, H5m); SVT-AV1 at s = 8 CRF
+    63, 15–32 kbps (IoU 0.89–0.98, H5p 2); lzma at s = 8, 36–116 kbps.
+    A carrier inside the foreground stream (a key outside F or an alpha
+    plane) still codes F's boundary every frame as the hands move.
+- Decision by the rule: **not built for LPIPS** (the oracle fails).
+  **Unclear for DISTS**: the oracle passes, and the tighter oracle the
+  rule names (the measured cost of a real carrier, a key or alpha plane in
+  the foreground stream: about 2–3 GPU-hours, as 4a) is not run here. The
+  2 kbps budget makes a pass unlikely, so the session recommends not
+  building it; whether to run that measurement is for the root session
+  and the user.

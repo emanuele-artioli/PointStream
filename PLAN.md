@@ -404,6 +404,21 @@ the fair anchors.
 4. *F, GPU.* Re-encode the foreground with K from F̂ (lzma at s = 8 and
    16) with G_HO in the slots (H5m had G), and rescore; then an oracle for
    F carried by the foreground stream itself (no MASK segment).
+   **Done (2026-10-22, [experiments](docs/experiments.md)), fails.**
+   - 4a: with F billed (lzma at s = 8, the stream built for F̂, the
+     per-point configuration), weighted DISTS against the venue-adapted
+     DCVC-UF reads +93% (1 of 4), where F granted reads −15% (4 of 4).
+     Every metric loses, against the venue codec and the pooled envelope.
+     s = 16 is not run: its upper bound fails too (+24%, 1 of 4).
+   - F̂ costs no quality (mask bytes removed: −17%, as granted). The loss
+     is the mask's 36–116 kbps, at the low rates where the venue codec
+     reaches 13–26 kbps.
+   - 4b: exact F at zero bits fails rule (a) on weighted LPIPS (+16%, 1
+     of 4), so F in the foreground stream is not built for H5q's loss. On
+     DISTS it passes. A post hoc bound puts any carrier's budget at about
+     2 kbps (5 bytes per frame), 7–20× under every F coder measured. The
+     carrier's measured cost (about 2–3 GPU-hours) is the next oracle by
+     the rule; recommended against, decision open.
 5. *Visual check (CPU).* Side-by-side crops of PointStream and the
    anchors at matched rates, for the user's review.
 Scores stay LPIPS, DISTS and PSNR (a model trained on a metric may be
