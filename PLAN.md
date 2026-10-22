@@ -32,8 +32,13 @@ sessions update their own items and experiments.md entries
   and K6 `ref` fail, H3a/H3a2 were not re-judged (outputs not kept). The
   binding check is time: objects driven by coded keypoints change 1.3–6 ×
   as much as the source between frames, and K1f's bound (`warp`) fails it
-  too. No keypoint route can pass the experience track until the coded
-  keypoints' own jitter is addressed (open for the user).
+  too. J's jitter follow-up (2026-10-22, PR #218): smoothing the coded
+  keypoints at the decoder (σ = 1, 2, 4 frames) does not make the bound
+  pass, and neither do smoothed *uncoded* keypoints (2.6–2.9 × the
+  source's change against 1.25). Either the estimator's per-frame noise
+  (1.32% of the box, against the source's own motion of 2.24%) or K1c's
+  compositing (Telea fill, drawn outline) causes it. An identity warp
+  would separate the two (≤ 0.3 GPU-hours; open for the user).
 - **Hands, keypoints (K1f, K6b):** the bound (appearance granted) beats
   the pixel hull on 30 of 30 held-out items by LPIPS and DISTS. No real
   renderer keeps it: FoundHand zero-shot fails (17%), a bank of in-window
@@ -97,6 +102,7 @@ stops; the root session fills in the outcome and the next step.
 | K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` @ `505f5a7` | Opus | reported 2026-10-22: fail (12.5%; free bank 25%); 2.6 GPU-hours of 3.5 |
 | K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` | Opus | queued 2026-10-22 |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
+| J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
 
 ## Done
 
