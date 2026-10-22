@@ -11109,3 +11109,87 @@ and each object's representation is judged on both:
   meant to catch broken polygon coding, is now median IoU ≥ 0.95 and every
   reference ≥ 0.8. The three items already scored pass it (37 of 37 checks
   each).
+- Jobs (RTX 6000 Ada, shared, gpu5 and gpu6; code from each `ready.json`).
+  Extract: P09_103 `20261022T133541Z-972661c4`, P25_09
+  `20261022T133548Z-9c159ae6`, P22_107 `20261022T133554Z-69d44a0b` (all
+  `297927f`); P06_108's stride-5 fits from `20261022T125017Z-174bee4e`
+  (`ec72be4`, its `partial.tar` `6ba9ac36…349b`, cut to stride 10). Score:
+  P06_108 `20261022T134036Z-c2a4a791`, P09_103 `20261022T134327Z-87c2fe46`,
+  P25_09 `20261022T140213Z-6e5dedbc` (all `4f2cb8c`), P22_107
+  `20261022T172554Z-d766d9e1` (`83aa02d`; the validator change only). Every
+  smoke that ran to the end passed the fleet validator. Every full stage
+  passes `k6bh2c validate` locally (11 checks per extract, 37 per score), and
+  `warp` reproduces K1f on every item. Candidates (stride 10): 529–1,723
+  frames per video, 870–2,529 kept fits. References: SVT-AV1 at CRF 40,
+  median PSNR on the mask 37–40 dB, median 10–14 kbit per reference with
+  its polygons and joints, median polygon IoU 0.99. Peak GPU memory
+  reserved 4.9 GB (P06_108). Report
+  `visor/k6bh-2026-10-22/report/k6bh2c-report.json` (`3e46782b…c0b`). GPU
+  time: 9,269 s of stages, failed and timed-out attempts included (P06_108's
+  first full stage counted at its 2,700 s), about 2.6 GPU-hours of the 3.5.
+- Outcome. On R, at each item's rate (keypoints plus the bank amortized over
+  the whole video), against K1f's hull there:
+
+  | item (video s) | kp kbps | `bank2c@16` | `bank2c@32` | `bank2c@64` | `free2c@64` (free) | `warp` |
+  |---|---:|---:|---:|---:|---:|---:|
+  | P09_103 (744) | 2.03 | 0.334 / 0.256 at 2.56 kbps (hull 0.197 / 0.213) | 0.330 / 0.253 at 3.16 (0.186 / 0.204) | 0.331 / 0.251 at 4.43 (0.163 / 0.186) | 0.320 / 0.238 (0.206 / 0.220) | 0.100 / 0.102 |
+  | P25_09 (876) | 2.14 | 0.500 / 0.334 at 2.48 (0.249 / 0.237) | 0.489 / 0.327 at 2.86 (0.237 / 0.234) | 0.483 / 0.325 at 3.60 (0.233 / 0.233) | 0.467 / 0.302 (0.260 / 0.240) | 0.097 / 0.102 |
+  | P22_107 (581, G) | 1.93 | 0.262 / **0.169** at 2.62 (0.221 / 0.197) | 0.237 / **0.156** at 3.31 (0.206 / 0.191) | 0.233 / **0.153** at 4.48 (0.179 / 0.180) | **0.208 / 0.134** (0.236 / 0.204) | 0.059 / 0.049 |
+  | P06_108 (729) | 1.94 | 0.374 / 0.300 at 2.53 (0.161 / 0.199) | 0.358 / 0.289 at 3.09 (0.150 / 0.194) | 0.364 / 0.290 at 4.30 (0.137 / 0.187) | 0.366 / 0.286 (0.172 / 0.206) | 0.091 / 0.123 |
+
+  (LPIPS / DISTS on R; bold: below the hull. G: in G's training footage.)
+  Scores: `bank2c@16`, `@32` and `@64` all 12.5% (LPIPS 0 of 4, DISTS 1 of
+  4); `free2c` 25% at every K. Clean of G (3 items): 0% for every variant
+  but `warp`. The bank costs 0.3–2.5 kbps (0.29–1.78 Mbit), and on P22_107's
+  DISTS it pays back after 109–234 s of video.
+- Decision (by the rule): **fail, and `free2c` fails too.** A bank chosen
+  outside the window, at any K up to 64, does not keep K1f's win: the
+  references from elsewhere in the video do not carry the hand well enough,
+  coded or not. With 2b, the reference route for egocentric hands closes
+  at a buildable rate. Rung 3 (a generator fitted per clip) is the last
+  open rung for hands on fidelity, and it waits for the user.
+- Reading.
+  - Coding and billing are not what fail. `free2c` is within 0.02 LPIPS of
+    `bank2c` at the same K, and the bank adds at most 2.5 kbps.
+  - K barely matters. From 16 to 64 references the mean pose distance falls
+    by 15–27% on every item, but LPIPS on R moves by 0.00–0.03. In 2b, from 1
+    to 16 in-window references, it fell by 45–56%. So the nearest pose is
+    not what is missing. What is missing is the rest of the hand's
+    appearance: the forearm's position and extent, the sleeve, the lighting
+    and the hand's place in the frame.
+  - The warped references cover 46–91% of R (K1f's own pixels: 95–97%),
+    and the order follows the result: P22_107 0.83–0.91, P06_108 0.79,
+    P09_103 0.72–0.76, P25_09 0.46–0.49. Where a reference's mask does not
+    reach R's shape, Telea fills the rest. Against 2b's in-window `bank@16`
+    (free), the gap is 0.10 to 0.23 LPIPS: P22_107 0.100 → 0.208, P25_09
+    0.190 → 0.467, P06_108 0.227 → 0.366.
+  - It is not a near-duplicate effect either way. On P09_103 and P22_107,
+    50–72% of the matches use references within 10 s of the window, and
+    they still lose. On P06_108 and P25_09, 0–19% do.
+- Hypothesis ("fails, score ≤ 50% at every K; the bank's rate lifts the
+  bar"): the fail held, at 12.5%. The stated reason did not: the bar moves
+  little (0.3–2.5 kbps), and the free bank fails as well. The competing
+  explanation (the same person and kitchen look alike across the video)
+  is refuted: `free2c` is far above 2b's in-window bank on every item.
+- Scope and caveats. 4 items (positions 0–3 of K1f's order), one of them in
+  G's footage. One reference quality (CRF 40), but `free2c` bounds every
+  quality. Candidates come only from VISOR's dense spans, at stride 10, with
+  VISOR's dense masks (480p polygons) as the references' mattes, where the
+  window uses B1b's fill. Matching is by the 2D pose shape alone (2b's
+  matcher), not by position or scale in the frame. R is granted, as in K1f.
+- Report (2026-10-22, to the root session).
+  - Stopped because: goal reached.
+  - Decision by the rule: fail, with `free2c` failing too. The reference
+    route for egocentric hands closes at a buildable rate.
+  - Numbers: score 12.5% for `bank2c@16`, `@32` and `@64`, 25% for
+    `free2c` at every K, 0% clean of G. Table above. Jobs above, code
+    `297927f` (extract), `4f2cb8c` and `83aa02d` (score), report
+    `visor/k6bh-2026-10-22/report/k6bh2c-report.json` `3e46782b…c0b`.
+  - Budget: about 2.6 GPU-hours of 3.5.
+  - Deviations: stride 10, not 5, and two stages per item (time); the GPU
+    memory cap; one validator threshold (one lossy mask). All recorded
+    above before the affected scores were read. None changes the rule.
+  - Open for the user: whether to approve rung 3 (overfit oracle, 4
+    GPU-hours), the last open rung for hands on fidelity.
+  - Proposed next step: rung 3 as written, or close hands on fidelity and
+    leave them to the experience track (item J).
