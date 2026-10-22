@@ -60,3 +60,24 @@ def test_heatmaps_peak_at_the_keypoint_and_drop_invalid_ones() -> None:
     assert hm.shape == (42, k6bh.LATENT, k6bh.LATENT)
     assert np.unravel_index(hm[3].argmax(), hm[3].shape) == (16, 8)
     assert not hm[0].any()  # (0, 0) is invalid, as FoundHand's check_keypoints_validity
+
+
+def test_training_pickle_stubs_main_classes() -> None:
+    import pickle
+
+    class HandDiffOpts:  # what FoundHand's training script pickled from __main__
+        pass
+
+    HandDiffOpts.__module__ = "__main__"
+    HandDiffOpts.__qualname__ = "HandDiffOpts"
+    import __main__
+
+    setattr(__main__, "HandDiffOpts", HandDiffOpts)
+    try:
+        data = pickle.dumps({"opts": HandDiffOpts(), "ema_state_dict": {"w": 1}})
+    finally:
+        delattr(__main__, "HandDiffOpts")
+    import io
+
+    loaded = k6bh._TRAINING_PICKLE.Unpickler(io.BytesIO(data)).load()
+    assert loaded["ema_state_dict"] == {"w": 1} and isinstance(loaded["opts"], k6bh._Stub)

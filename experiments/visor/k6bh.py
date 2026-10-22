@@ -20,10 +20,12 @@ import argparse
 import importlib.util
 import json
 import os
+import pickle
 import random
 import sys
 import tarfile
 import time
+import types
 from pathlib import Path
 from typing import Any
 
@@ -139,6 +141,27 @@ def _load_module(name: str, path: Path, package: bool = False) -> Any:
     return module
 
 
+class _Stub:
+    """Stands in for classes the training script pickled from its ``__main__`` (``HandDiffOpts``); inference never reads them."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        pass
+
+    def __setstate__(self, state: Any) -> None:
+        if isinstance(state, dict):
+            self.__dict__.update(state)
+
+
+class _TrainingUnpickler(pickle.Unpickler):
+    def find_class(self, module: str, name: str) -> Any:
+        if module == "__main__":
+            return _Stub
+        return super().find_class(module, name)
+
+
+_TRAINING_PICKLE = types.SimpleNamespace(__name__="pickle", Unpickler=_TrainingUnpickler, load=pickle.load, dump=pickle.dump)
+
+
 class FoundHand:
     """FoundHand's DiT-XL/2 (EMA weights) and SD VAE, loaded from the pinned source tree under private module names."""
 
@@ -158,9 +181,9 @@ class FoundHand:
         self.diffusion = diffusion.create_diffusion(str(steps))
         model = vit.DiT_XL_2(input_size=LATENT, latent_dim=LATENT_DIM, in_channels=LATENT_DIM + 42 + 1, learn_sigma=True)
         try:
-            state = torch.load(ckpt, map_location="cpu", mmap=True, weights_only=False)["ema_state_dict"]
+            state = torch.load(ckpt, map_location="cpu", mmap=True, weights_only=False, pickle_module=_TRAINING_PICKLE)["ema_state_dict"]
         except RuntimeError:  # a legacy (non-zip) checkpoint cannot be memory-mapped
-            state = torch.load(ckpt, map_location="cpu", weights_only=False)["ema_state_dict"]
+            state = torch.load(ckpt, map_location="cpu", weights_only=False, pickle_module=_TRAINING_PICKLE)["ema_state_dict"]
         missing, extra = model.load_state_dict(state, strict=False)
         if missing:
             raise SystemExit(f"FoundHand: missing keys {missing[:5]}")
