@@ -9899,6 +9899,138 @@ invocation turns out to be needed.
   kbps.
 
 
+### 2026-10-22 — K6b (hands) 1: audit of hand renderers
+- Question ([PLAN K6b](../PLAN.md), hands after K1f). K1f's bound moves
+  the hand's own pixels to the 21 coded keypoints. A renderer has to draw
+  them from a reference instead. Which released models can do that, and
+  which one does the zero-shot rung test?
+- Interface, fixed by K1f. Per hand and frame the renderer gets a
+  reference crop of that hand and the 21 coded 2D keypoints (H2's 100 ms
+  code, 1.93–2.72 kbps per item). Its pixels are composited inside R, the
+  granted outline, with the source outside R (`k1c.compose`). So it has to
+  draw a hand crop, not a scene. H3e's failure was that the scene drifted:
+  JointControlVideo generated the whole frame from the first frame and
+  never saw the camera's motion. The local interface removes that failure.
+- Criteria: conditioning on a reference image and 2D (or 3D) hand
+  keypoints; released weights; licence for research; inference cost per
+  frame; whether it has seen VISOR (overlap is allowed, recorded, and the
+  clean subset reported, per AGENTS.md).
+
+  | model | conditioning | weights, licence | cost | verdict |
+  |---|---|---|---|---|
+  | [FoundHand](https://github.com/arthurchen0518/FoundHand) (CVPR 2025) | reference image (mask optional), 2D keypoints as heatmaps (OpenPose 21 per hand); per frame, with a released zero-shot video procedure (first frame plus recent generated frames) | released (Google Drive), GPL-3.0 code, CC BY-NC data | DiT on SD-VAE latents, 256² (32² latent); timing not published | **chosen** |
+  | K6's `ref` (no learning) | the reference crop's pixels warped from its keypoints to the coded ones | in repo | CPU | **floor**: run beside, so the generator has to beat a warp of the same reference |
+  | Moore-AnimateAnyone, original and tennis fine-tune (in `Models`) | reference image, DWPose maps of the full body | in `Models`, Apache-2.0 | SD 1.5, about 1 s per frame | rejected for hands: whole-body model, and FoundHand's paper reports it at LPIPS 0.35 against FoundHand's 0.17 on hand videos (their Table 3b, 12 phone videos). It stays K6b's body candidate |
+  | SD 1.5 + ControlNet OpenPose (in `Models`) | text, OpenPose hand map; a reference only through an adapter | in `Models` | per frame | reserve: no reference conditioning trained for hands |
+  | JointControlVideo (H3e, in `Models`) | first frame, 3D joints, camera intrinsics | Apache-2.0 | 27 min per 81 frames | rejected: H3e failed (−297%), and the cause was the scene drift |
+  | [Generated Reality](https://github.com/LafouCC/generated-reality) (2026) | first frame, 21 3D joints per hand in camera space, head pose | MIT code; trained checkpoint not released (base Wan2.2-Fun-5B-Control) | 5B video DiT | not zero-shot: needs training on HOT3D/GigaHands first |
+  | Re-HOLD (CVPR 2025), iDiT-HOI (2025), ManiVideo, RHanDS | hand–object layouts or meshes | no released weights found | | not usable |
+
+- Overlap. FoundHand's repository lists VISOR among FoundHand-10M's
+  sources, and VISOR's public annotations are its train and val splits,
+  which is where B2's items come from. Before any score is read, the
+  zero-shot rung checks the released data lists for each item's video.
+  Items whose video is listed are reported as seen. If the lists cannot
+  tell, every item counts as seen, and the claim is scoped to "a renderer
+  that may have seen this footage". The judges (LPIPS's AlexNet, DISTS's
+  VGG) have not seen it.
+- Decision: FoundHand is the zero-shot candidate, with `ref` as the floor.
+  Rung 2 needs its source at a pinned commit and its weights in
+  `Models/FoundHand` (with a sha256 manifest), and an environment check.
+  Its pins (Python 3.9, torch 2.3.0, lightning 2.3.0, timm 1.0.7) are older
+  than the main environment's (torch 2.10, timm 1.0.30). It is plain DiT
+  code, so the main environment plus lightning is tried first. A second
+  environment is made only if an import or the smoke's output check fails.
+- Searches (2026-10-22): FoundHand's repository and paper, Generated
+  Reality's project page and repository, Re-HOLD's project page, and web
+  searches for hand reenactment with released weights. Nothing newer than
+  H3e's audit has released weights for a reference-plus-keypoint hand
+  renderer, other than the fact that Generated Reality's code is out.
+
+### 2026-10-22 — K6b (hands) 2: zero-shot oracle (rule)
+- Question. With one unbilled reference crop per hand and the coded
+  keypoints, does FoundHand, off the shelf, keep K1f's win over the pixel
+  hull? K1f's bound (0.084 median LPIPS on R) is the ceiling, and the
+  hull at each item's keypoint rate (median 0.175) is the bar.
+- Items. Positions 0–7 of K1f's content-blind order
+  (`tools/datasets/k1f_inputs.py`), 240 frames each. All 8 have K1f's
+  bound and hull recorded, so nothing is re-coded. Items in G's training
+  footage and items whose video FoundHand has seen are reported apart,
+  beside the pooled numbers. Development (crop rule, keypoint order,
+  sampler settings) is done on K1c's pilot item P01_107 only. It is not
+  among the 8.
+- Keypoints and fits. K1f's, unchanged: H2's WiLoR rows plus the two-pass
+  hand-box fit, coded with H2's 100 ms choice and projected to 21 joints.
+- Reference (granted, unbilled, as K6b's step 2). For each hand side, the
+  window's first frame where that side is fitted. The crop is the same as
+  for the targets.
+- Crop. Per hand and frame, a square around the union of the coded
+  keypoints' box and that side's mask, ×1.25, resized to 256². The
+  keypoints are mapped into the crop, in OpenPose order, with the right
+  hand in joints 0–20 as FoundHand's labels have it. The output is
+  resized back to the box (Lanczos).
+- Variants, each composited by `k1c.compose`: inside that side's R the
+  rendered pixels, Telea fill where no fit exists (K1c's charge), and the
+  source outside R. R is the generator's matte, granted, as `warp`
+  granted the outline.
+  - `gen`: FoundHand with its released video procedure (the reference
+    as first frame, then recent generated frames), at its released
+    sampler settings.
+  - `gen@frame` (diagnostic): FoundHand per frame from the reference
+    alone. It separates the autoregressive drift from the per-frame
+    error.
+  - `ref` (floor): K6's warp of the reference crop's pixels from its
+    uncoded keypoints to the coded ones.
+  - `warp` reproduced (check): K1f's bound. It must match K1f's recorded
+    LPIPS on R within 0.002 per item, or nothing is read.
+- Judges, as K1f: LPIPS on R and DISTS on R (`h3c.Scorer`), mean over the
+  window's frames with R non-empty. Reported beside: PSNR on R, flicker
+  (mean absolute luma change between consecutive frames inside R,
+  against the source's), WiLoR on the rendered crop against the coded
+  keypoints (does it follow its input), and a visual check of one frame
+  per item.
+- Decision rule (`k6bh.DECISION`, fixed before any run; the user's
+  criterion). An item is won on a metric when `gen`'s value on R is below
+  the hull's at that item's keypoint rate (K1f's report). Score = mean
+  over {LPIPS, DISTS} of the share of the 8 items won.
+  - **Pass** (score ≥ 75%): the zero-shot route holds with the reference
+    granted. The overfit rung is skipped. Next is the same oracle with
+    the reference billed (coded once per window and its bits added), the
+    interface K6c would use.
+  - **Fail** (score < 75%): the overfit rung (a fit of FoundHand, or a
+    LoRA on it, to the window's own frames) gets its rule and budget,
+    with the gap from `gen` to the bound reported per item.
+  - If `ref` scores ≥ 75%, a warp of one reference already suffices.
+    That goes to the user, with the better of `ref` and `gen` per item.
+  - If the score is under 75% on the unseen items alone but at or above
+    on the seen ones (or the reverse), the outcome goes to the user.
+- Hypothesis. `gen` lands near the bar, with a score around 50%. FoundHand
+  reports LPIPS 0.17–0.20 on reposing at 256², which is about the hull's
+  median, and DISTS forgives texture more than LPIPS does. `ref` scores
+  lower: it is K6's failure mode (what the pose cannot describe).
+- Competing explanations. (1) Having seen VISOR makes FoundHand better
+  here than on new footage. The seen/unseen split shows it if the lists
+  allow one. (2) The granted matte hides the generator's outline errors,
+  as it did for `warp`, so a pass is still a bound on the matte. (3) The
+  256² crop is the limit, not the generator. Large hands (box > 512 px)
+  are compared with small ones beside the result. (4) Per-frame metrics
+  ignore flicker, so flicker is reported, and a visual check is made of
+  any item that passes with flicker above the source's.
+- Before the run (CPU): the FoundHand source at a pinned commit and its
+  weights into `Models/FoundHand` with a sha256 manifest; its import in
+  the main environment (plus lightning); the overlap check above.
+- Budget. GPU, RTX 6000 Ada (FoundHand's first run on the class). A smoke
+  of at most 600 s on P01_107, 24 frames: it asserts CUDA, the dtype,
+  the attention kernel and the output's range, and times one frame. The
+  timing is recorded here before the pilot. The released step count is
+  kept if one 240-frame item (both hands, `gen` and `gen@frame`) fits in
+  40 minutes; otherwise the most steps that fit, not below half the
+  released number. Then a pilot on P01_107 (development, not scored for
+  the rule), and the 8 items in parts of at most 45 minutes, each saving
+  every finished item. Ceiling 3 GPU-hours for the rung, smoke included.
+  If the budget runs out, the items finished in the fixed order are
+  reported, and so is the shortfall.
+
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
   codec gains more than a conventional one when PointStream adds learned

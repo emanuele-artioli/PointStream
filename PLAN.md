@@ -608,6 +608,15 @@ objects (the tennis ball).
   point up to about 45 kbps. No scope is needed. K1f's envelope path
   reproduces H3d's recorded points on P01_107. Next: K6b's ladder for
   hands (a renderer that has to earn this appearance).
+  **K6b for hands, audit (2026-10-22, experiments.md "K6b (hands) 1"):**
+  the renderer is local: it draws a hand crop from a reference crop and
+  the coded keypoints, inside the granted R. That avoids H3e's scene
+  drift. FoundHand (reference plus 2D keypoints, 256², released; it has
+  seen VISOR, so the overlap is recorded) is the zero-shot candidate, and
+  K6's `ref` warp of the same reference is the floor. AnimateAnyone stays
+  the body candidate. Next: rung 2, the zero-shot oracle on positions 0–7
+  of K1f's order (rule written; ceiling 3 GPU-hours). Before it: the
+  FoundHand source and weights into `Models`, and an environment check.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
