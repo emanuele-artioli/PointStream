@@ -236,6 +236,34 @@ def hand_enhancer(net: Any, device: str) -> cp.Enhancer:
     return run
 
 
+KEY_SEARCH_EVERY = 8  # the encoder's τ search reads every 8th frame
+
+
+def f_agreement(truth: np.ndarray, shown: np.ndarray) -> dict[str, float]:
+    """F̃ (or F̂) against F: IoU, and F's pixels missed and added as shares of F."""
+    inter, union, area = int((truth & shown).sum()), int((truth | shown).sum()), max(int(truth.sum()), 1)
+    return {"iou": inter / union if union else 1.0, "missed_share": int((truth & ~shown).sum()) / area,
+            "extra_share": int((shown & ~truth).sum()) / area}
+
+
+def carried_classes(w: dict[str, Any], decoded: np.ndarray, scale: int) -> tuple[np.ndarray, dict[str, Any],
+                                                                                   np.ndarray]:
+    """H5p 4c: the client's F̃ from the decoded key-padded foreground (``decoded``: RGB at the coded size), with
+    the τ of `cp.KEY_TAUS` that best matches F on every `KEY_SEARCH_EVERY`-th frame; the slots' class map (every
+    F̃ pixel one class: G_HO serves both), the carrier's record, and F̃."""
+    radius = cp.keep_radius(scale)
+    truth = w["classes"] > 0
+    sample = slice(None, None, KEY_SEARCH_EVERY)
+    search = {tau: f_agreement(truth[sample], cp.carried_f(decoded[sample], w["key"], tau, FULL, radius))["iou"]
+              for tau in cp.KEY_TAUS}
+    tau = max(search, key=lambda t: search[t])
+    f_carried = cp.carried_f(decoded, w["key"], tau, FULL, radius)
+    nearest = np.stack([cp.alpha_and_classes(f.astype(np.uint8) * cp.OBJECT)[1] for f in f_carried])
+    record = {"kind": "key", "key": list(w["key"]), "tau": tau, "radius": radius, "iou_by_tau": search,
+              "payload_bytes": len(cp.carrier_payload(w["key"], tau, radius)), **f_agreement(truth, f_carried)}
+    return nearest, record, f_carried
+
+
 def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nearest: np.ndarray,
                      nets: dict[tuple[str, str], tuple[Any, dict[str, Any], str]], work: Path,
                      points: Path) -> dict[str, Any]:
@@ -249,8 +277,12 @@ def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nea
     frames = w["frames"]
     work.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
-    # K from the F the client will composite with: F̂ when F is coded (H5p 4), else F
-    padded = cp.foreground_input(w["rgb"], w.get("shown", w["classes"]) > 0, scale, size)
+    # K from the F the client will composite with: F̂ when F is coded (H5p 4), else F; outside K push-pull, or the
+    # window's key when the stream carries F (H5p 4c)
+    if w.get("key"):
+        padded = cp.key_input(w["rgb"], w["classes"] > 0, scale, size, w["key"])
+    else:
+        padded = cp.foreground_input(w["rgb"], w.get("shown", w["classes"]) > 0, scale, size)
     source = work / "input.yuv"
     g5.rgb_to_yuv420(padded).tofile(source)
     del padded
@@ -261,6 +293,9 @@ def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nea
     rec = code_dcvc(args, source, frames, qp, size, work / "dcvc")
     t2 = time.time()
     decoded = g5.yuv420_to_rgb(np.fromfile(rec["decoded"], np.uint8).reshape(frames, size[1] * 3 // 2, size[0]))
+    carrier = None
+    if w.get("key"):  # H5p 4c: the client's F̃ from the key; the encoder picks τ by F̃'s IoU on every 8th frame
+        nearest, carrier, f_carried = carried_classes(w, decoded, scale)
     upsampled = h3d.upscale_all(decoded, frames, FULL[0], FULL[1]) if size != FULL else decoded
     slots: dict[int, cp.Enhancer] = {}
     networks: dict[str, Any] = {"hand": None, "object": None}
@@ -292,11 +327,15 @@ def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nea
     if g6.ffv1_digests(target / "decoded.mkv") != digests:
         raise RuntimeError(f"{key}: the FFV1 file does not decode to the frames written")
     shutil.copyfile(work / "dcvc" / "stream.psdc", target / "stream.psdc")
+    if carrier is not None:
+        np.savez_compressed(target / "f_carried.npz", f=np.packbits(f_carried, axis=-1))
+        carrier["file"] = f"points/{key}/f_carried.npz"
+        carrier["sha256"] = file_sha256(target / "f_carried.npz")
     seconds = frames / float(w["fps"])
     return {"name": name, "key": key, "qp": qp, "scale": scale, "coded_size": list(size), "bytes": rec["bytes"],
             "kbps": rec["bytes"] * 8 / seconds / 1000, "attempts": rec["attempts"],
             "deterministic": rec["deterministic"], "decoder_matches_encoder_intra": rec["decoder_matches_encoder_intra"],
-            "slots": networks, "psnr_f": psnr_f,
+            "slots": networks, "psnr_f": psnr_f, "carrier": carrier,
             "changed_by_slots": float((out != upsampled).any(axis=3).mean()),
             "decoded": f"points/{key}/decoded.mkv", "decoded_ffv1_sha256": file_sha256(target / "decoded.mkv"),
             "decoded_frame_sha256": digests, "bitstream": f"points/{key}/stream.psdc",
@@ -330,6 +369,10 @@ def command_foreground(args: argparse.Namespace) -> int:
     mask_record = None
     if args.mask_scale > 0:  # H5p 4: the stream built for F̂ (K and the slots), as the client composites it
         w["shown"], _, mask_record = coded_classes(w["classes"], args.mask_scale, w["fps"])
+    if args.carrier == "key":  # H5p 4c: the stream carries F (one key per window); exact F is the encoder's input
+        if args.mask_scale > 0 or args.slots != "G_HO":
+            raise SystemExit("--carrier key needs G_HO in both slots (no classes at the client) and no MASK")
+        w["key"] = cp.choose_key(w["rgb"], cp.dilate(w["classes"] > 0, cp.RING))
     nearest = np.stack([cp.alpha_and_classes(c)[1] for c in w.get("shown", w["classes"])])
     cost = mask_cost(w["classes"], w["fps"], work)
     nets: dict[tuple[str, str], tuple[Any, dict[str, Any], str]] = {}
@@ -368,6 +411,7 @@ def command_foreground(args: argparse.Namespace) -> int:
                 "yuv": g6.YUV, "classes_sha256": w["classes_sha256"], "mask_set": FILL, "mask_cost": cost,
                 "ring_px": cp.RING, "keep_radius_px": {str(s): cp.keep_radius(s) for s in (1, 2, 4)},
                 "mask_scale": args.mask_scale, "mask": mask_record,
+                "carrier": {"kind": "key", "key": list(w["key"])} if w.get("key") else None,
                 "video_model": video_model, **g6.provenance(), **g5c.gpu_record(), "points": rows}
     write_json(publish / "manifest.json", manifest)
     write_json(stage_dir() / "h5.json", {
@@ -375,7 +419,7 @@ def command_foreground(args: argparse.Namespace) -> int:
         "source": {k: v for k, v in w["source"].items() if k != "jpeg_gate"},
         "jpeg_gate_holds": all(c["holds"] for c in w["source"]["jpeg_gate"]), "masks": w["masks"],
         "mask_cost": cost, "points": rows, "video_model": video_model, "mask_scale": args.mask_scale,
-        "mask": mask_record,
+        "mask": mask_record, "carrier": manifest["carrier"],
         "manifest_sha256": file_sha256(publish / "manifest.json"),
         "seconds": round(time.time() - began, 1), **g5c.gpu_record(), **g6.provenance()})
     shutil.rmtree(work, ignore_errors=True)
@@ -503,7 +547,7 @@ def load_backgrounds(dirs: list[str], routes: set[str], item_id: str) -> list[di
 
 
 def container_for(w: dict[str, Any], bg: dict[str, Any], fg: dict[str, Any], fg_root: Path,
-                  mask_payload: bytes | None = None) -> bs.Container:
+                  mask_payload: bytes | None = None, carrier: bool = False) -> bs.Container:
     """The window's container for one pair: the background stream, the foreground stream with its slots, and
     references to the networks the decoder holds."""
     bg_data = (Path(bg["root"]) / bg["bitstream"]).read_bytes()
@@ -524,6 +568,10 @@ def container_for(w: dict[str, Any], bg: dict[str, Any], fg: dict[str, Any], fg_
                          slots))
     if mask_payload is not None:  # H5m: F's class map coded at 1/s (`src.pointstream.mask`)
         c.add(bs.Tag.MASK, mask_payload)
+    if carrier:  # H5p 4c: F carried by the foreground stream; the key and τ it needs
+        k = fg["carrier"]
+        r, g, b = (int(v) for v in k["key"])
+        c.add(bs.Tag.CARRIER, cp.carrier_payload((r, g, b), k["tau"], k["radius"]))
     if bg["model_sha256"]:
         c.add_model(bs.ModelRef("background", bg["model_sha256"]))
     for sha in dict.fromkeys(v["sha256"] for v in (hand, obj) if v):
@@ -590,7 +638,28 @@ def composite_gpu(fg: np.ndarray, bg: np.ndarray, alpha: np.ndarray) -> np.ndarr
     return out.cpu().numpy()
 
 
-def composite_window(w: dict[str, Any], fg_rgb: np.ndarray, bg_rgb: np.ndarray, alpha: np.ndarray,
+class CarriedAlpha:
+    """H5p 4c: the blend weight from a foreground point's F̃ (saved packed by its foreground job), computed for
+    the frames asked (``alpha[slice]``), so a window's float weights never sit in memory whole."""
+
+    def __init__(self, root: Path, carrier: dict[str, Any]) -> None:
+        path = root / carrier["file"]
+        if file_sha256(path) != carrier["sha256"]:
+            raise RuntimeError(f"{path}: F̃ differs from its manifest")
+        self.packed = np.load(path)["f"]
+        self.width = FULL[0]
+
+    def __len__(self) -> int:
+        return len(self.packed)
+
+    def f(self, index: slice) -> np.ndarray:
+        return np.unpackbits(self.packed[index], axis=-1)[..., :self.width].astype(bool)
+
+    def __getitem__(self, index: slice) -> np.ndarray:
+        return np.stack([cp.alpha_and_classes(f.astype(np.uint8) * cp.OBJECT)[0] for f in self.f(index)])
+
+
+def composite_window(w: dict[str, Any], fg_rgb: np.ndarray, bg_rgb: np.ndarray, alpha: Any,
                      out: Path) -> str:
     """The client's output (4:2:0, full range) written to ``out``; its sha256. Both decodes as RGB."""
     digest = hashlib.sha256()
@@ -603,7 +672,7 @@ def composite_window(w: dict[str, Any], fg_rgb: np.ndarray, bg_rgb: np.ndarray, 
     return digest.hexdigest()
 
 
-def gpu_matches_cpu(fg_rgb: np.ndarray, bg_rgb: np.ndarray, alpha: np.ndarray) -> dict[str, Any]:
+def gpu_matches_cpu(fg_rgb: np.ndarray, bg_rgb: np.ndarray, alpha: Any) -> dict[str, Any]:
     """The GPU compositor against `cp.composite` and `g5.rgb_to_yuv420` on the first frames: largest difference."""
     from experiments.background import g5
 
@@ -832,6 +901,8 @@ def command_score(args: argparse.Namespace) -> int:
         if manifest.get("mask_scale", 0) not in (0, args.mask_scale):  # a stream built for F̂ needs that F̂
             raise SystemExit(f"{directory}: foreground built for F at 1/{manifest['mask_scale']}, "
                              f"scored at 1/{args.mask_scale}")
+        if bool(manifest.get("carrier")) != (args.carrier == "key"):  # F̃ from the key only with a key stream
+            raise SystemExit(f"{directory}: carrier {manifest.get('carrier')} scored with --carrier {args.carrier}")
         manifests.append(manifest)
         fg_points += [{**p, "root": str(root), "manifest_job": manifest.get("job_id"),
                        "built_for_mask_scale": manifest.get("mask_scale", 0)} for p in manifest["points"]]
@@ -865,7 +936,7 @@ def command_score(args: argparse.Namespace) -> int:
         bg_rgb = None
         for _, fg in [p for p in pairs if p[0]["key"] == bg_key]:
             key = f"{bg_key}+{fg['key']}"
-            c = container_for(w, bg, fg, Path(fg["root"]), mask_payload)
+            c = container_for(w, bg, fg, Path(fg["root"]), mask_payload, args.carrier == "key")
             data = c.pack()
             if bg["route"] not in checks:  # rule (d), once per route
                 checks[bg["route"]] = {"pair": key, **bitstream_check(c, data, bg, fg, Path(fg["root"]))}
@@ -879,16 +950,19 @@ def command_score(args: argparse.Namespace) -> int:
                     bg_rgb = rgb_gpu(read_ffv1(Path(bg["root"]) / bg["decoded"])[:w["frames"]])
                 if fg["key"] not in fg_cache:
                     fg_cache[fg["key"]] = rgb_gpu(read_ffv1(Path(fg["root"]) / fg["decoded"])[:w["frames"]])
+                # H5p 4c: each foreground point carries its own F̃; otherwise F (or F̂) for every pair
+                pair_alpha = CarriedAlpha(Path(fg["root"]), fg["carrier"]) if args.carrier == "key" else alpha
                 if "gpu_compositor" not in checks:
-                    checks["gpu_compositor"] = gpu_matches_cpu(fg_cache[fg["key"]], bg_rgb, alpha)
+                    checks["gpu_compositor"] = gpu_matches_cpu(fg_cache[fg["key"]], bg_rgb, pair_alpha)
                 t1 = time.perf_counter()
                 out = work / "composite.yuv"
-                composite_sha = composite_window(w, fg_cache[fg["key"]], bg_rgb, alpha, out)
+                composite_sha = composite_window(w, fg_cache[fg["key"]], bg_rgb, pair_alpha, out)
                 t2 = time.perf_counter()
                 parts = c.breakdown()
                 row = {"pair": key, "route": bg["route"], "background": bg_key, "foreground": fg["key"],
                        "foreground_job": fg["manifest_job"], "mask_scale": args.mask_scale, "tag": args.tag,
                        "foreground_built_for_mask_scale": fg["built_for_mask_scale"],
+                       "carrier": fg.get("carrier") if args.carrier == "key" else None,
                        "bytes": len(data), "kbps": len(data) * 8 / seconds / 1000, "breakdown": parts,
                        "kbps_background": parts.get("background", 0) * 8 / seconds / 1000,
                        "kbps_foreground": parts.get("foreground", 0) * 8 / seconds / 1000,
@@ -910,7 +984,8 @@ def command_score(args: argparse.Namespace) -> int:
         "backgrounds": [{k: b.get(k) for k in ("key", "route", "kbps", "bytes", "bitstream_sha256", "manifest_job",
                                                 "manifest_git_head", "model_sha256")} for b in backgrounds],
         "pairs_planned": len(pairs), "background_f_is_foreground_f": same_f, "bitstream_checks": checks,
-        "mask": mask_record, "rows": rows, "anchors": anchors,
+        "mask": mask_record, "carrier": args.carrier if args.carrier != "none" else None, "rows": rows,
+        "anchors": anchors,
         "judges": judges.record, "seconds": round(time.time() - began, 1), **g5c.gpu_record(), **g6.provenance()})
     shutil.rmtree(work, ignore_errors=True)
     return 0
@@ -1333,6 +1408,10 @@ def validate_foreground(result: dict[str, Any]) -> dict[str, bool]:
         "f_hat_as_the_client_decodes": not result.get("mask_scale") or (
             result["mask"]["lossless_on_reduced_grid"] and result["mask"]["scale"] == result["mask_scale"]
             and result["mask"]["iou"] > 0.7),
+        # H5p 4c: every point's F̃ recovered from its key, close to F, and saved for the score stage
+        "f_carried_recovered": not result.get("carrier") or all(
+            r["carrier"] and r["carrier"]["key"] == result["carrier"]["key"] and r["carrier"]["iou"] > 0.7
+            and r["carrier"]["tau"] in cp.KEY_TAUS and r["carrier"].get("sha256") for r in rows),
     }
 
 
@@ -1365,6 +1444,9 @@ def validate_score(result: dict[str, Any]) -> dict[str, bool]:
         "mask_billed": not result.get("mask") or (
             result["mask"]["lossless_on_reduced_grid"] and all(r["breakdown"].get("mask", 0) > result["mask"]["bytes"]
                                                                 for r in rows)),
+        # H5p 4c: the key and τ billed in every container, and no MASK beside them
+        "carrier_billed": not result.get("carrier") or (not result.get("mask") and all(
+            r["breakdown"].get("carrier", 0) == 2 + r["carrier"]["payload_bytes"] for r in rows)),
     }
     if anchors:
         full = result["limit_frames"] <= 0
@@ -1831,6 +1913,8 @@ def main(argv: list[str] | None = None) -> int:
                    "its fine-tuned DCVC-UF HT-L replaces --video-ckpt")
     p.add_argument("--mask-scale", type=int, default=0, help="H5p 4: build the stream for the client's F̂ (F coded "
                    "at 1/s, `src.pointstream.mask`): K and the slots from F̂ (0: from F)")
+    p.add_argument("--carrier", choices=("none", "key"), default="none", help="H5p 4c: the stream carries F: a "
+                   "key colour outside K, F̃ at the client (`src.pointstream.composite.carried_f`)")
     p = sub.add_parser("score")
     add_window(p)
     p.add_argument("--foreground", action="append", required=True, help="foreground jobs' archives (extracted)")
@@ -1846,6 +1930,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--tag", default="", help="a variant's name for its rows (e.g. gho: G_HO in the foreground slots)")
     p.add_argument("--mask-scale", type=int, default=0, help="H5m: code F's class map at 1/s and composite with it "
                    "(0: F granted, H5)")
+    p.add_argument("--carrier", choices=("none", "key"), default="none", help="H5p 4c: composite with each "
+                   "foreground point's F̃ (its key), the CARRIER segment billed, no MASK")
     p = sub.add_parser("time")
     add_window(p)
     for name in ("--arm", "--enhancers", "--propainter-tree", "--propainter-ckpt", "--raft-ckpt", "--flow-completion-ckpt"):

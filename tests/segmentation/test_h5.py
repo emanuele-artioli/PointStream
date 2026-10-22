@@ -299,3 +299,69 @@ def test_panel_grid_and_crops_validator() -> None:
     assert all(h5.validate_crops(result).values())
     result["rows"][0]["pngs"] = [{"std": 0.0, "shape": list(grid.shape)}] * 2
     assert not h5.validate_crops(result)["panels_are_pictures"]
+
+
+def test_key_carrier_recovers_f_from_an_undistorted_stream() -> None:
+    from src.pointstream import composite as cp
+
+    rng = np.random.default_rng(0)
+    frames = rng.integers(60, 200, (3, 1080, 1920, 3), dtype=np.uint8)
+    frames[..., 1] = frames[..., 0]  # greyish content: green and magenta are both far
+    f = np.zeros((3, 1080, 1920), bool)
+    f[:, 300:700, 500:1100] = True
+    f[1, 300:700, 520:1120] = True
+    key = cp.choose_key(frames, cp.dilate(f, cp.RING))
+    assert key in cp.KEYS and key != (0, 0, 0)
+    for scale in (4, 1):
+        size = h5.coded_size(scale)
+        coded = cp.key_input(frames, f, scale, size, key)
+        assert (coded.reshape(-1, 3) == np.array(key)).all(axis=1).any()  # the key is there, outside K
+        shown = cp.carried_f(coded, key, 32, h5.FULL, cp.keep_radius(scale))
+        agreement = h5.f_agreement(f, shown)
+        assert agreement["iou"] > 0.97 and agreement["missed_share"] < 0.03, (scale, agreement)
+    assert cp.parse_carrier(cp.carrier_payload(key, 32, 16)) == (key, 32, 16)
+
+
+def test_container_bills_the_carrier_and_validators_check_it(tmp_path: Path) -> None:
+    bg_file, bg_sha = published(tmp_path, "bg.psdc", b"PSDC" + bytes(64))
+    fg_file, fg_sha = published(tmp_path, "fg.psdc", b"PSDC" + bytes(32))
+    bg = {"key": "scene-540-0", "route": "scene", "codec": "scene", "coded_size": [960, 544], "model_sha256": None,
+          "root": str(tmp_path), "bitstream": bg_file, "bitstream_sha256": bg_sha}
+    carrier = {"kind": "key", "key": [255, 0, 255], "tau": 32, "radius": 16, "payload_bytes": 5, "iou": 0.95,
+               "sha256": "s"}
+    fg = {"key": "dcvc-0_4", "scale": 4, "coded_size": [480, 272], "bitstream": fg_file, "bitstream_sha256": fg_sha,
+          "slots": {"hand": None, "object": None}, "carrier": carrier}
+    c = h5.container_for({"fps": Fraction(50), "frames": 4}, bg, fg, tmp_path, None, True)
+    parts = c.breakdown()
+    assert parts["carrier"] == 2 + 5 and "mask" not in parts
+    back = bs.Container.unpack(c.pack())
+    assert [p for t, p in back.segments if t == bs.Tag.CARRIER] == [bytes([255, 0, 255, 32, 16])]
+    row = {"bytes": sum(parts.values()), "breakdown": parts, "kbps": 1.0, "scores": scores(), "carrier": carrier}
+    result: dict = {"rows": [row], "anchors": [], "pairs_planned": 1, "jpeg_gate_holds": True, "limit_frames": 0,
+                    "routes": ["scene"], "bitstream_checks": {"scene": {"pair": "p"}, "gpu_compositor": {"max_abs": 0}},
+                    "background_f_is_foreground_f": True, "carrier": "key"}
+    assert all(h5.validate_score(result).values())
+    result["mask"] = {"lossless_on_reduced_grid": True, "bytes": 1}
+    assert not h5.validate_score(result)["carrier_billed"]
+    good = foreground_result(carrier={"kind": "key", "key": [255, 0, 255]})
+    for p in good["points"]:
+        p["carrier"] = dict(carrier)
+    assert all(h5.validate_foreground(good).values())
+    good["points"][0]["carrier"]["iou"] = 0.4
+    assert not h5.validate_foreground(good)["f_carried_recovered"]
+
+
+def test_carried_alpha_reads_the_saved_f_hat(tmp_path: Path) -> None:
+    from experiments.visor.b1 import file_sha256
+    from src.pointstream import composite as cp
+
+    f = np.zeros((4, 1080, 1920), bool)
+    f[:, 100:200, 300:500] = True
+    (tmp_path / "points").mkdir()
+    np.savez_compressed(tmp_path / "points" / "f.npz", f=np.packbits(f, axis=-1))
+    carrier = {"file": "points/f.npz", "sha256": file_sha256(tmp_path / "points" / "f.npz")}
+    alpha = h5.CarriedAlpha(tmp_path, carrier)
+    assert len(alpha) == 4 and np.array_equal(alpha.f(slice(1, 3)), f[1:3])
+    assert np.array_equal(alpha[slice(0, 2)][1], cp.alpha_and_classes(f[1].astype(np.uint8) * cp.OBJECT)[0])
+    with pytest.raises(RuntimeError):
+        h5.CarriedAlpha(tmp_path, {**carrier, "sha256": "0" * 64})
