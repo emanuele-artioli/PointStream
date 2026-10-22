@@ -11310,3 +11310,52 @@ and each object's representation is judged on both:
   GPU-hours; the user asked for this run (2026-10-22), knowing the
   estimate (2–3 GPU-hours). Every stage under 45 minutes; gpu2 excluded
   (smokes past 600 s there all day).
+- Runs, stage 1 (`h5 foreground --carrier key`, code `9b4b3ba` per each
+  job's `ready.json`; RTX 6000 Ada; every full stage validated locally,
+  13/13), off the shelf | venue model: P01_107
+  `20261022T181434Z-92f9fe49` | `…181442Z-01f9444d`; P02_02
+  `…181451Z-8e67f9a5` | `…181458Z-05f8e2dd`; P03_10 `…181506Z-d3a74345`
+  | `…181512Z-2cb46248`; P09_106 `…181520Z-d8c8e56f` |
+  `…181527Z-4ad9e659`.
+  - Keys: magenta on P02_02, green on the others.
+  - Two venue jobs miss the 20 dB F-PSNR floor at `dcvc@0/4` only:
+    P01_107 18.96 dB, P09_106 18.58 dB (push-pull at the same point
+    19.09 and 19.33). It is the low-rate point already known from 4a and
+    H5q 1, and F̃ misses 1.8% and 4.9% of F there; every other point is
+    21–40 dB. The gate uses only these streams' rates.
+  - τ: every point chose 96, the top of the set; IoU is already 0.95–0.99
+    above the lowest points, and τ does not change the rate.
+- F̃ is accurate. IoU with F is 0.95–0.99 above the lowest points (0.88 at
+  P09_106's `0/4`, where F is 2% of the frame); F̃ misses 0.1–1% of F and
+  adds 1–6%, as coded source inside K. It is as accurate as lzma at s = 8
+  (0.955–0.988) at no MASK cost.
+- The key's cost, key stream minus the push-pull stream at the same point
+  (granted F):
+  - P02_02 (F 50%): +2.5 to +865 kbps, +33% to +96%.
+  - P03_10 (F 19%): +2.1 to +625 kbps, +74% to +129%.
+  - P01_107 (F 14%): +1.2 to +379 kbps, +30% to +58%.
+  - P09_106 (F 2%): −175 to +9.7 kbps, −21% to +12% (cheaper than
+    push-pull at three of seven points).
+  The flat key's step along K's border costs bits in proportion to K's
+  perimeter, every frame.
+- Outcome: **the gate fails, so stage 2 is not run.** Even with quality as
+  granted (an optimistic bound), weighted DISTS against `dcvc-venue` reads
+  +18 | +5 | +9 | −30%: **+1% (1 of 4)**; against the pooled envelope +7%
+  (1 of 4). Weighted LPIPS +39% (1/4), frame DISTS +1% (1/4), weighted
+  PSNR +35% (1/4).
+  - Hypothesis right on the verdict. The key edge costs far more than the
+    2 kbps budget wherever F is large: 2–25 kbps at the ¼ points, and 30%
+    or more at full size.
+  - The competing explanation holds only where F is small: on P09_106
+    the key costs about what push-pull does, and the bound reads −30%
+    (F granted: −22%).
+  - **H5p 4 closes as a fail.** No F coder tried keeps the split's
+    weighted DISTS win at equal adaptation on egocentric video: neither
+    lzma at s = 8 or 16, nor video coding (H5p 2), nor a key in the
+    foreground stream. Where F is a few percent of the frame (P09_106),
+    the key carrier costs about nothing and the split still wins.
+- GPU time: 1.38 GPU-hours (8 jobs), within the ceiling of 3; stage 2
+  unspent. The item's total is about 4.0 GPU-hours.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5p4c-9b4b3ba.tar`
+  (sha256 `982fe3f7…915ecd`, read-only): the specs, every stage's
+  `h5.json`, `gate4c.py` and its output.

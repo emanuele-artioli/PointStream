@@ -416,9 +416,16 @@ the fair anchors.
    - 4b: exact F at zero bits fails rule (a) on weighted LPIPS (+16%, 1
      of 4), so F in the foreground stream is not built for H5q's loss. On
      DISTS it passes. A post hoc bound puts any carrier's budget at about
-     2 kbps (5 bytes per frame), 7–20× under every F coder measured. The
-     carrier's measured cost (about 2–3 GPU-hours) is the next oracle by
-     the rule; recommended against, decision open.
+     2 kbps (5 bytes per frame), 7–20× under every F coder measured.
+   - 4c (the user asked for the measured carrier, 2026-10-22): a key
+     colour outside K, F̃ recovered at the client (IoU 0.95–0.99). The
+     key's edge costs +30% to +130% of the foreground stream where F is
+     large; its optimistic bound reads weighted DISTS +1% (1 of 4), so
+     the gate fails and it is not scored. Only where F is 2% of the
+     frame (P09_106) is the key free (−30%).
+   - **H5p 4 closes as a fail:** no F coder tried (lzma, video, key)
+     keeps the split's DISTS win at equal adaptation once F is paid
+     for; the split wins only where F is small.
 5. *Visual check (CPU).* Side-by-side crops of PointStream and the
    anchors at matched rates, for the user's review.
    **Done (2026-10-22):** 16 crops (4 items, about 200 kbps and 1 Mbps,
