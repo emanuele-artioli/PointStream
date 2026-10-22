@@ -63,8 +63,8 @@ independent samples.
 encoder and decoder paths and versions recorded. VVC only if a correct
 invocation turns out to be needed.
 
-**Two tracks: fidelity and experience** (user, 2026-10-22; draft, thresholds
-marked *proposed* until the user sets them). PointStream answers two problems,
+**Two tracks: fidelity and experience** (user, 2026-10-22; the thresholds
+marked *proposed* were accepted by the user the same day). PointStream answers two problems,
 and each object's representation is judged on both:
 
 1. *Fidelity: encode the original.* Full-reference judges on the object's

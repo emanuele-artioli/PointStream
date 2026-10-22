@@ -632,8 +632,8 @@ objects (the tennis ball).
   experience (the same experience despite pixel differences: realism by
   KID, same content by the object's estimator, same over time by
   flicker). The protocol is drafted in
-  [experiments](docs/experiments.md#protocol), and its thresholds wait for
-  the user. Results closed on fidelity are untested on experience. The
+  [experiments](docs/experiments.md#protocol), with the thresholds set
+  (user, 2026-10-22). Results closed on fidelity are untested on experience. The
   re-judging queue is H3e, FoundHand, H3a/H3a2, and K6 `ref`.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
