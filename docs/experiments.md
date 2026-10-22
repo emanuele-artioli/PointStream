@@ -11193,3 +11193,41 @@ and each object's representation is judged on both:
     GPU-hours), the last open rung for hands on fidelity.
   - Proposed next step: rung 3 as written, or close hands on fidelity and
     leave them to the experience track (item J).
+
+### 2026-10-22 — K6b (hands) 3: overfit oracle (run)
+- Approved (user, 2026-10-22: "Rung 3 approved: run the overfit oracle as
+  written, within 4 GPU-hours"), after rung 2c failed. The rule is the
+  entry "K6b (hands) 3: overfit oracle (rule, not run)", unchanged: the same
+  3 items, judges, hull and criterion; P01_107 for the smoke and the pilot.
+- Fit (`experiments/visor/k6bh3.py`, written before any run). FoundHand's
+  EMA weights, the full DiT fine-tuned per item: AdamW, learning rate 1e-5
+  (the released checkpoint's), batch 8, bf16 autocast over float32 weights,
+  FoundHand's own `training_losses` (MSE on the noise plus its learned
+  variance term, 1,000 steps). Pairs: a target crop and another crop of the
+  same hand from the fitting frames, both with K1f's uncoded keypoints and
+  rung 2's crop rule. The reference's mask is dropped half the time (the
+  video procedure's later references carry none), and 10% of pairs train
+  the sampler's unconditional branch (zero conditions, `nvs` 2). The
+  sin-cos position embedding stays frozen. The fitted weights are sampled
+  directly (no EMA over a fit this short). Judged as rung 2's `gen` (50
+  steps, guidance 2.5, from the window's first fitted frame, on the coded
+  keypoints).
+- Smoke checks (the rule's): at least 200 steps; the loss on a fixed probe
+  (16 pairs, fixed timesteps and noise) falls; a sample of the probe's
+  training pairs moves towards its target (LPIPS of the crops falls).
+- Deviations, before any run:
+  - The pilot judges the held-out frames 180–209 (30, not 60) at 25%, 50%
+    and 100% of the 30-minute fit (0% keeps only the probes). By rung 2's
+    timing (about 2.5 s per generated hand), four judgements of 60 frames
+    plus the fit would not fit a 45-minute stage.
+  - Both hands' chains are sampled in lockstep (one batch), so the video
+    procedure's per-step random choice of reference is shared by the two
+    hands.
+  - Declared at 30,000 MiB with PyTorch capped at 27 GiB, not ≥ 40,000,
+    as in 2c. Other users hold 15–20 GB on every Ada GPU.
+  - The scaled fits' length is the pilot's extrapolated time to the hull,
+    at most 45 minutes. If that and the judging of 240 frames do not fit one
+    stage, fitting and judging are split, with the weights published
+    between them.
+- P01_107's bar: K1f's hull at its rate, from the reproduction stage
+  `20261022T013208Z-9e048ecf` (K1c recorded 0.258 LPIPS and 0.223 DISTS).
