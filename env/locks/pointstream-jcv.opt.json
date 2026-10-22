@@ -9,5 +9,17 @@
         "sha256": "2bad958eb9893105cc7215a4bb91b2c039bde5eb6af8ddf0f02c09e6f7883d61"
       }
     }
-  }
+  },
+  "Moore-AnimateAnyone": {
+    "url": "https://github.com/emanuele-artioli/Moore-AnimateAnyone",
+    "revision": "67c42297f8024ddb0fd04b69e42ac71fe6bbf3d8",
+    "path": "opt/Moore-AnimateAnyone",
+    "archive_sha256": "bfca6cf1129a0154bf2c3431c0e01b34f5e815eda5ba504f54e001c8ceeb99ee",
+    "upstream": "https://github.com/MooreThreads/Moore-AnimateAnyone@a914ef3"
+  },
+  "diffusers": {
+    "version": "0.30.3",
+    "wheel_sha256": "1b70209e4d2c61223b96a7e13bc4d70869c8b0b68f54a35ce3a67fcf813edeee"
+  },
+  "extended_from_pack_sha256": "2bec91d460df5487acd10d5dfe062040db2117238fd0fbb72ecf947cfb7bec74"
 }

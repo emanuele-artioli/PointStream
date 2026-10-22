@@ -10988,3 +10988,128 @@ and each object's representation is judged on both:
   GPU-hours (rung 2 took about 0.45 GPU-hours per item at 50 steps on
   Ada, plus its failed attempts), declared at 40,000 MiB, which rung 2's
   scoring needed. Each stage ≤ 45 minutes.
+
+### 2026-10-22 — K6b (players) 2: zero-shot oracle, Moore-AnimateAnyone (rule)
+- Question ([PLAN K6b](../PLAN.md), step 2). K6's bound (the frame's own
+  pixels moved to the coded keypoints, LPIPS 0.075 at 3.6 kbps for two
+  players) saves 95% of the pixel envelope's rate, and a warp of another
+  frame (`ref`, 0.461) loses to every pixel point on half the windows. Can
+  a pose-conditioned generator, off the shelf, given one reference crop
+  per player (granted, unbilled) and the coded keypoints, draw the players
+  well enough to beat K6's envelope at the keypoint rate? A pass decides
+  K6c's route with no training.
+- Model. Moore-AnimateAnyone (SD 1.5 ReferenceNet, pose guider, motion
+  module; Apache-2.0), the only reference-plus-pose body model with
+  weights in `Models` (K6b's audit, first part), in two profiles:
+  `original` (the released weights, `patrolli/AnimateAnyone`) and
+  `finetuned_tennis` (the pre-reset fine-tune, Feb 2026). Source: the fork
+  `emanuele-artioli/Moore-AnimateAnyone@67c4229` (upstream `a914ef3`
+  packaged as `animate_anyone`, ported to diffusers 0.30; the fine-tune
+  was trained with it). Its model code differs from upstream only in
+  import paths, a default the inference code overrides, and a load
+  fallback, so the weights' keys are upstream's; every state dict is
+  loaded with its missing keys checked (upstream loads with
+  `strict=False`, which would hide a mismatch).
+- Environment (audit, 2026-10-22). Inference needs torch, diffusers,
+  transformers (the CLIP image encoder), accelerate and einops; not
+  DWPose or ONNX Runtime, since the poses come from the code. `pointstream`
+  has no diffusers or transformers, and transformers 4.x needs
+  huggingface_hub < 1.0 against its 2.1.1 (diffusers 0.30.3 also imports
+  `HfFolder`, removed in huggingface_hub 1.0): conflict 10, which
+  `pointstream-jcv` already resolves. So AnimateAnyone goes into
+  `pointstream-jcv` (torch 2.7.0+cu128, transformers 4.57.2,
+  huggingface_hub 0.36.0) rather than a third environment: the JCV pack
+  plus diffusers 0.30.3 (the archived runtime's pin, wheel
+  `1b70209e…edee`) and the fork, both without dependencies
+  (`env/jcv/extend-animateanyone.sh`; delta in
+  `env/locks/pointstream-jcv.animateanyone-delta.txt`; `pip check` adds
+  only diffusers' `importlib-metadata`, a backport it imports below
+  Python 3.8). The import check covers JointControlVideo too. Packed
+  `pointstream-jcv-20261022T122606Z.tar.gz` (`2c534fb8…23ce2`, 4.5 GB). The
+  generator is called only through `experiments.tennis.k6b_generate`
+  (npz in, npz out); preparing and judging stay in `pointstream`.
+- Items. K6's 8 scored windows (5 matches), with K6's published players,
+  poses, coded keypoints (K4b.3's code, every 4th frame) and judged frames
+  (every 3rd scored frame), from K6's pilot and parts 1–3
+  (`20261021T164820Z-f32fa989`, `…171929Z-fcf1e66d`, `…171936Z-50ce2f74`,
+  `…171943Z-b9d3ff04`). Nothing is re-coded.
+- Interface (`experiments.tennis.k6b prepare`, CPU; decoder-side
+  information only). Per player and run of coded frames, a 512×784 crop
+  (AnimateAnyone's size) that follows the coded keypoints: one height per
+  run (90th percentile over its frames of 1.4 × the larger of the confident
+  keypoints' height and their width at 512:784), centres from the
+  keypoints' boxes smoothed over 9 frames. The coded pose is drawn as
+  AnimateAnyone's DWPose body map (COCO-17 to OpenPose-18 as DWPose maps
+  it, neck from the shoulders, keypoints at K4's 0.5 confidence; body only,
+  since the code carries no hands or face). The reference: the player's
+  first fitted scored frame in the window, its own crop, uncoded.
+- Rendering (`k6b_generate`, `pointstream-jcv`). Each run is one video
+  from the released long-video sampler (24-frame contexts, overlap 4) at
+  the released settings: DDIM with zero-SNR v-prediction, guidance 3.5,
+  fp16, a seed per (window, player). Steps: 30 (pose2vid.py's default),
+  see the budget.
+- Variants, composited by `k6b judge` at 1080p. `gen-original` and
+  `gen-finetuned_tennis`: inside each player's region R (granted, as the
+  generator's matte; the analogue of `warp`'s granted outline) the
+  rendered crop resized back (Lanczos), far player first; Telea fill where
+  R has no rendering (K6's charge); the source outside R.
+  `warp@q4-velocity-e4` and `ref@q4-velocity-e4`: K6's, recomputed as the
+  check.
+- Judges: K6's, unchanged. LPIPS (B2's AlexNet map over the full frame,
+  averaged over S = R plus every K6 oracle variant's drawn pixels) and
+  masked DISTS, on K6's judged frames; PSNR over S beside. Since the
+  generator draws inside R only, S is K6's S.
+- Decision rule (`k6b.DECISION`, fixed before any run; the user's
+  criterion, 2026-10-21). A window is won on a metric when the variant's
+  mean is below K6's envelope (the upper concave hull of K6's ten anchor
+  points on (kbps on R, −metric), from `k6-report.json`) at the window's
+  keypoint rate (K6's pooled rate of q4-velocity-e4). Score = mean over
+  {LPIPS, DISTS} of the share of the 8 windows won.
+  - **Pass**: `gen-original` scores ≥ 75%. The zero-shot route holds with
+    the reference granted; next is the same oracle with the reference
+    billed (K6c's interface).
+  - **To the user**: `gen-finetuned_tennis` scores ≥ 75% and
+    `gen-original` does not. The fine-tune has seen these matches, so it
+    is not zero-shot.
+  - **Fail**: both < 75%. Step 3 (the overfit oracle) gets its rule and
+    budget and waits for the user.
+  - **Check**: `warp` and `ref` reproduce K6's LPIPS over S within 0.002
+    per window, and S's pixel counts equal K6's on every judged frame, or
+    nothing is read.
+  Reported beside: K6's saving statistic with its bootstrap CI, the share
+  of R the generator covers, a review image per window.
+- Overlap. `original` has not seen PointStream's footage. The audit
+  recorded `finetuned_tennis` as trained on all seven archived tennis
+  videos, which include K6's five matches, so every window counts as seen
+  by it. The only surviving track list (`pointstream-data/assets/dataset/
+  pointstream_aa_meta.json`: 114 tracks over 7 videos, written 2026-07-11,
+  after the Feb 2026 weights) names `djokovic_federer` and
+  `djokovic_zverev` but not `alcaraz_hurkacz`, `medvedev_struff` or
+  `rublev_auger-aliassime`. The 4 windows from those three matches are
+  reported apart as "absent from the surviving list", not as clean. The
+  judges have not seen the footage.
+- Hypothesis. Both profiles fail. `gen-original` lands near `ref` (LPIPS
+  over S about 0.35–0.45): it draws a plausible player in the right pose,
+  but not this frame's cloth, outline and racket (COCO-17 has no racket,
+  and the pre-reset fine-tune smeared it). The fine-tune is better, but
+  not by enough: the pre-reset diagnostic had it 4.0 dB below an
+  articulated paste with the alpha granted.
+- Competing explanations. (1) The far player (60–120 px tall) is upscaled
+  about 6× into the crop, outside AnimateAnyone's training distribution;
+  windows are reported by player height. (2) The body-only pose map is
+  out of distribution (DWPose maps carry hands and face); a pass would
+  survive it, a fail could partly be it. (3) The granted matte hides the
+  generator's outline errors, as for `warp`, so a pass is still a bound on
+  the matte.
+- Budget. Weights staged as hard links under
+  `tennis/k6b-2026-10-22/inputs/aa` (recorded in `Models`' manifests).
+  `prepare`: one CPU job. Generation: first-run smokes on each GPU class
+  used (Ada, A6000): one unit, 24 frames, both profiles, asserting CUDA,
+  fp16, the attention kernels and no missing keys, and timing a frame;
+  the timing is recorded here before the scored run. Steps stay at 30 if
+  the projected generation (both profiles, every unit) plus about one
+  GPU-hour for judging and smokes fits 4 GPU-hours; else 20 (the pre-reset
+  class default); else the rung goes back to the user. Generation runs in
+  parts of at most 45 minutes, each saving every finished (unit, profile);
+  judging in parts of ≤ 4 windows, declared from the smoke's peak. Ceiling
+  4 GPU-hours, smokes included (the card's limit: more needs the user).
