@@ -81,3 +81,11 @@ def test_training_pickle_stubs_main_classes() -> None:
 
     loaded = k6bh._TRAINING_PICKLE.Unpickler(io.BytesIO(data)).load()
     assert loaded["ema_state_dict"] == {"w": 1} and isinstance(loaded["opts"], k6bh._Stub)
+
+
+def test_crop_box_shifts_inside_the_frame() -> None:
+    mask = np.zeros((100, 200), bool)
+    mask[70:100, 180:200] = True  # a forearm at the bottom-right corner
+    x0, y0, side = k6bh.crop_box(np.array([[185.0, 75.0], [195.0, 95.0]]), mask)
+    assert 0 <= x0 and x0 + side <= 200 and 0 <= y0 and y0 + side <= 100
+    assert x0 <= 180 and y0 <= 70

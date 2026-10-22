@@ -10068,6 +10068,36 @@ invocation turns out to be needed.
     Flicker and the visual check stay.
   - Handedness. The README and the demos put the true right hand in slots
     0–20, un-mirroring MediaPipe, so no ordering check is needed.
+- Attempts and pilot (development on P01_107, not scored for the rule;
+  timings from a shared GPU, contaminated, not evidence).
+  - `20261022T080212Z-35880d37` (`2344973`, gpu5): the smoke stopped while
+    loading the checkpoint. It pickles the training script's `HandDiffOpts`
+    from `__main__`. Fixed in `796e6e0` by loading with `__main__` classes
+    stubbed (inference reads only `ema_state_dict`). Infrastructure, no
+    score.
+  - `20261022T080535Z-df3082c3` (`796e6e0`, gpu5, RTX 6000 Ada, shared):
+    the smoke and the full stage pass (the full stage locally, 17 checks).
+    First run on Ada: flash attention, bf16 CUTLASS GEMMs on sm80 kernels,
+    35 ms per guided step (two samples), 675.6 M parameters, no missing
+    keys. `warp` reproduces K1f exactly (LPIPS on R 0.08647 against
+    0.08647). The full item took 2,045 s: `gen` 1,008 s, `gen@frame`
+    488 s, and decoding, `ref`, `warp` and scoring about 550 s.
+  - Pilot values on R (P01_107, 1.95 kbps; K1c's hull there reads 0.258
+    LPIPS and 0.223 DISTS): `gen` 0.496 / 0.255, `gen@frame` 0.463 /
+    0.258, `ref` 0.575 / 0.279, `warp` 0.086 / 0.069. Flicker (luma, R):
+    source 6.6, `gen` 10.8, `gen@frame` 31.0. On its first 24 frames
+    (the smoke), `gen` read 0.314 / 0.201. The later frames are much worse
+    than the first ones.
+  - Visual check (frame 120). Where a crop ran past the frame's edge (the
+    forearms at the bottom), the zero padding showed up as a black band in
+    FoundHand's output and was pasted onto R. Fixed in the next commit:
+    the square crop is shifted inside the frame. The generated hands are
+    plausible but not the source's: the fingers and the forearm's position
+    differ.
+  - Budget. Spent so far: about 0.7 GPU-hours of the 3. At 50 steps, `gen`
+    with `ref` and `warp` costs about 26 min per item, so the 8 items need
+    about 3.5 GPU-hours. **`gen` alone does not fit at 50 steps. By the
+    rule, the rung goes back to the user.**
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned

@@ -58,7 +58,9 @@ DECISION: dict[str, Any] = {
 
 
 def crop_box(points: np.ndarray, mask: np.ndarray | None) -> tuple[int, int, int]:
-    """(x0, y0, side): a square around the union of the points' box and the mask's box, x CROP_SCALE."""
+    """(x0, y0, side): a square around the union of the points' box and the mask's box, x CROP_SCALE, shifted to lie
+    inside the frame (the mask's shape) when it fits: FoundHand copies a padded band from the reference into its
+    output (pilot 20261022T080535Z-df3082c3, P01_107's forearms at the frame's bottom edge)."""
     xs, ys = [points[:, 0].min(), points[:, 0].max()], [points[:, 1].min(), points[:, 1].max()]
     if mask is not None and mask.any():
         my, mx = np.nonzero(mask)
@@ -67,7 +69,12 @@ def crop_box(points: np.ndarray, mask: np.ndarray | None) -> tuple[int, int, int
     x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
     side = max(MIN_CROP, int(np.ceil(CROP_SCALE * max(x1 - x0, y1 - y0))))
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-    return int(np.floor(cx - side / 2)), int(np.floor(cy - side / 2)), side
+    bx, by = int(np.floor(cx - side / 2)), int(np.floor(cy - side / 2))
+    if mask is not None:
+        h, w = mask.shape
+        bx = min(max(bx, 0), w - side) if side <= w else bx
+        by = min(max(by, 0), h - side) if side <= h else by
+    return bx, by, side
 
 
 def crop_pixels(image: np.ndarray, box: tuple[int, int, int]) -> np.ndarray:
