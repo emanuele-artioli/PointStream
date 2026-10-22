@@ -9825,6 +9825,13 @@ invocation turns out to be needed.
   cache held across points, with WiLoR and G resident) and was stopped
   before finishing an item. Fixed: the cache is released after each point,
   and 40,000 MiB is declared.
+  Part 6 `20261021T220155Z-2e7fdeb3` ran past the 2,700 s stage limit
+  (two slow items). Its `partial.tar` (`d34d41fd…7619`) keeps P06_03
+  finished and P26_108's envelope. Rerun as part 6b with `--restore`:
+  units of the same items and window length, sha256-checked, are kept, and
+  only P26_108's bound is computed. Parts 8–10 had not started. They were
+  cancelled and resubmitted as one item per job, so no part nears the
+  limit. Items and order are unchanged.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned

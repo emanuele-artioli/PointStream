@@ -60,7 +60,10 @@ def point_record(name: str, rec: dict[str, Any], scored: dict[str, np.ndarray], 
 
 
 def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[str, Any], nets: dict[str, Any], device: str,
-                 publish: Path, scratch: Path, first: bool) -> None:
+                 publish: Path, scratch: Path, first: bool, envelope_done: bool = False) -> None:
+    if envelope_done:  # restored from an earlier attempt: only the bound is left
+        k1c.process_item(args, item, decoded, nets, device, publish, scratch, first)
+        return
     from experiments.visor import h3d
     from experiments.visor.h2 import save_unit
     from experiments.visor.h3 import rgb_memmap
@@ -123,6 +126,37 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     k1c.process_item(args, item, decoded, nets, device, publish, scratch, first)  # the bound; removes the decoded window
 
 
+def restore_from(tar: Path, publish: Path, items: set[str], frames: int) -> dict[str, Any]:
+    """Units of this run's items and frame count that an earlier attempt finished (its ``partial.tar``), copied into
+    ``publish`` after their npz sha256 checks (a smoke's shorter window restores nothing)."""
+    import hashlib
+    import tarfile
+
+    out: dict[str, Any] = {"path": str(tar), "sha256": file_sha256(tar), "k1f": [], "k1c": []}
+    with tarfile.open(tar) as handle:
+        members = {m.name: m for m in handle.getmembers()}
+        for part in ("k1f", "k1c"):
+            for name in sorted(members):
+                if not (name.startswith(f"publish/{part}/") and name.endswith(".json")):
+                    continue
+                npz = name[:-5] + ".npz"
+                if npz not in members:
+                    continue
+                meta_bytes = handle.extractfile(members[name]).read()  # type: ignore[union-attr]
+                meta = json.loads(meta_bytes)
+                if meta["item"] not in items or int(meta["frames"]) != frames:
+                    continue
+                data = handle.extractfile(members[npz]).read()  # type: ignore[union-attr]
+                if hashlib.sha256(data).hexdigest() != meta["npz_sha256"]:
+                    raise SystemExit(f"{tar}: {npz} does not match its record")
+                target = publish / part
+                target.mkdir(parents=True, exist_ok=True)
+                (target / Path(name).name).write_bytes(meta_bytes)
+                (target / Path(npz).name).write_bytes(data)
+                out[part].append(Path(name).stem)
+    return out
+
+
 def command_run(args: argparse.Namespace) -> int:
     import torch
 
@@ -140,7 +174,11 @@ def command_run(args: argparse.Namespace) -> int:
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
     publish = scratch / "publish"
     publish.mkdir(parents=True, exist_ok=True)
+    restored_from = [restore_from(Path(t), publish, {it["id"] for it in items}, int(args.frames)) for t in args.restore]
     done_k1f, done_k1c = restore_units(publish, "k1f"), restore_units(publish, "k1c")
+    for record in restored_from:
+        done_k1f.update(dict.fromkeys(record["k1f"], {}))
+        done_k1c.update(dict.fromkeys(record["k1c"], {}))
     todo = [it for it in items if it["id"] not in done_k1f or it["id"] not in done_k1c]
     copy = scratch / "bin" / Path(args.inspect).name  # the staging cache drops the execute bit (H1)
     copy.parent.mkdir(parents=True, exist_ok=True)
@@ -184,7 +222,8 @@ def command_run(args: argparse.Namespace) -> int:
     began = time.time()
     done = len(items) - len(todo)
     for number, (item, decoded) in enumerate(windows):
-        process_item(args, item, decoded, nets, device, publish, scratch, first=number == 0)
+        process_item(args, item, decoded, nets, device, publish, scratch, first=number == 0,
+                     envelope_done=item["id"] in done_k1f)
         done += 1
         progress(done)
     import torchmetrics
@@ -204,7 +243,7 @@ def command_run(args: argparse.Namespace) -> int:
               "dcvc": {"image_sha256": args.image_sha256, "video_sha256": args.video_sha256}, "g": g_info,
               "svt": {"decoder": _tool(args.decoder), "encoder": _tool(args.encoder), "preset": args.preset,
                       "inspect": {"path": args.inspect_source, "sha256": file_sha256(Path(args.inspect))}},
-              "settings": settings, "restored": sorted(set(done_k1f) & set(done_k1c))}
+              "settings": settings, "restored": sorted(set(done_k1f) & set(done_k1c)), "restored_from": restored_from}
     write_json(stage_dir() / "k1f.json", {"command": "run", **record})
     write_json(stage_dir() / "k1c.json", {"command": "run", **{k: v for k, v in record.items() if k != "g"},
                                           "settings": {**settings, "decision": k1c.DECISION}})
@@ -321,6 +360,7 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--preset", default="4")
     run.add_argument("--cover", action="store_true")
     run.add_argument("--hand-box", action="store_true")
+    run.add_argument("--restore", action="append", default=[], help="an earlier attempt's partial.tar (finished units kept)")
     run.add_argument("--mano-left", default="")
     run.add_argument("--wilor-checkpoint", default="")
     val = sub.add_parser("validate")

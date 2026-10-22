@@ -33,12 +33,20 @@ def main() -> int:
     ap.add_argument("--size", type=int, required=True)
     ap.add_argument("--cover", action="store_true")
     ap.add_argument("--hand-box", action="store_true")
+    ap.add_argument("--restore", nargs=2, metavar=("TAR", "SHA256"), help="an earlier attempt's partial.tar (under the data root)")
+    ap.add_argument("--items", default="", help="these held-out items instead of the part's (comma list)")
+    ap.add_argument("--name", default="", help="the spec's file name suffix")
     args = ap.parse_args()
     h3c2 = json.loads(Path(args.h3c2_spec).read_text())
     score = json.loads(Path(args.h3d_score_spec).read_text())
     staged = {e["name"]: e for e in h3c2["staged_inputs"]}
     generic = [e for e in score["staged_inputs"] if e["name"].startswith("generic_")]
     items = held_out(json.loads(Path(args.eval_set).read_text()))[args.part * args.size:(args.part + 1) * args.size]
+    if args.items:
+        wanted = args.items.split(",")
+        items = [i for i in held_out(json.loads(Path(args.eval_set).read_text())) if i["id"] in wanted]
+        if len(items) != len(wanted):
+            raise SystemExit("--items: not all are held-out items")
     if not items:
         raise SystemExit("no items in that part")
     videos = sorted({f"video_{i['video']}" for i in items})
@@ -53,6 +61,9 @@ def main() -> int:
     if args.cover:
         arguments += ["--cover", "--mano-left", "{staged:mano_left}", "--wilor-checkpoint", "{staged:wilor_checkpoint}"]
         arguments += ["--hand-box"] if args.hand_box else []
+    if args.restore:
+        entries.append({"name": "restore", "path": args.restore[0], "sha256": args.restore[1]})
+        arguments += ["--restore", "{staged:restore}"]
     ids = [i["id"] for i in items]
     basis = (f"K1f part {args.part}: {ids[0]}'s first 48 window frames through the full path (window decode with the sparse-JPEG gate, "
              "fill masks checked, H3b2's SVT-AV1 low points encoded and accounted by libaom inspect, DCVC-UF HT-L at QP 0, full size and 1/4 "
@@ -69,7 +80,7 @@ def main() -> int:
         "hosts": h3c2["hosts"], "gpu_models": ["RTX 6000 Ada", "RTX A6000"], "gpu_memory_mib": 40000 if args.cover else 32000, "local_storage_gib": 60,
         "gpu_sharing": h3c2["gpu_sharing"],
     }
-    out = Path(args.dest) / f"k1f-part{args.part}.json"
+    out = Path(args.dest) / f"k1f-part{args.part}{args.name}.json"
     out.write_text(json.dumps(spec, indent=1) + "\n")
     print(out, ids)
     return 0
