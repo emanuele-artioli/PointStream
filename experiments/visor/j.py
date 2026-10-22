@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -39,10 +40,10 @@ DECISION = {"criterion": CRITERION, "content_factor": CONTENT_FACTOR, "energy_fa
 # ----------------------------------------------------------------- the anchor hull of one quantity
 
 
-def hull(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
-    """Lower convex hull of (kbps, value) in (log kbps, value), by rising rate. Points with a non-finite value or a
-    non-positive rate are left out; at equal rates the lower value is kept."""
-    pts = sorted({(float(r), float(v)) for r, v in points if r > 0 and math.isfinite(v) and math.isfinite(r)})
+def hull(points: Sequence[tuple[float, float | None]]) -> list[tuple[float, float]]:
+    """Lower convex hull of (kbps, value) in (log kbps, value), by rising rate. Points with a missing or non-finite
+    value or a non-positive rate are left out; at equal rates the lower value is kept."""
+    pts = sorted({(float(r), float(v)) for r, v in points if v is not None and r > 0 and math.isfinite(v) and math.isfinite(r)})
     out: list[tuple[float, float]] = []
     for r, v in pts:
         if out and out[-1][0] == r:
@@ -59,7 +60,7 @@ def hull(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
     return out
 
 
-def read(points: list[tuple[float, float]], kbps: float) -> dict[str, Any]:
+def read(points: Sequence[tuple[float, float | None]], kbps: float) -> dict[str, Any]:
     """The hull's value at ``kbps`` (linear in log rate), clamped to its range; ``flag`` says where it was clamped."""
     h = hull(points)
     if not h:

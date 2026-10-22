@@ -59,3 +59,37 @@ def test_h3e_item_fails_when_every_point_fails_content():
     row = j.h3e_item(item)
     assert row["status"] is False
     assert [p["checks"]["content"] for p in row["points"]] == [False, False]
+
+
+def test_player_pose_error_is_over_confident_source_keypoints_and_a_miss_counts_as_one_box():
+    np = pytest.importorskip("numpy")
+    from experiments.tennis import j_players
+
+    ref = np.zeros((17, 3))
+    ref[:, 2] = 0.9
+    ref[0, 2] = 0.1  # not confident: ignored
+    pred = ref.copy()
+    pred[:, 0] += 10.0
+    pred[0, 0] += 1000.0
+    assert j_players.pose_error(pred, ref, 100.0) == pytest.approx(0.1)
+    assert j_players.pose_error(None, ref, 100.0) == j_players.MISSED
+    ref[:, 2] = 0.0
+    assert j_players.pose_error(pred, ref, 100.0) is None
+
+
+def test_residual_energies_of_a_frozen_output_and_of_the_source_itself():
+    np = pytest.importorskip("numpy")
+    from experiments.tennis import j_players
+
+    rng = np.random.default_rng(0)
+    prev = rng.integers(40, 200, (64, 64, 3), dtype=np.uint8)
+    cur = rng.integers(40, 200, (64, 64, 3), dtype=np.uint8)  # no motion a flow can explain: a large residual
+    region = np.zeros((64, 64), bool)
+    region[16:48, 16:48] = True
+    f, e_out, e_src = j_players.residual_energies(cur, prev, cur, prev, region, region)
+    assert f == pytest.approx(0.0)  # the source against itself
+    assert e_out == pytest.approx(e_src) and e_src > 10
+    brighter = cur + np.uint8(20)  # the output jumps by 20 luma levels at t: flicker is that jump
+    f, e_out, e_src = j_players.residual_energies(brighter, prev, cur, prev, region, region)
+    assert f == pytest.approx(20.0, abs=1e-3)
+    assert j_players.residual_energies(cur, prev, cur, prev, np.zeros_like(region), region) is None
