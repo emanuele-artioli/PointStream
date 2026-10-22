@@ -9897,6 +9897,9 @@ invocation turns out to be needed.
   training overlaps one item (P22_107). Judges are LPIPS and DISTS on R;
   pose fidelity was not judged. Savings are censored above about 45
   kbps.
+- Completion (user, 2026-10-22: "yes", about 2.6 more GPU-hours). The 8
+  items not run (positions 22–29 of the fixed order) run as single-item
+  jobs, unchanged. The result is read over all 30.
 
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
