@@ -1,7 +1,7 @@
 """K6b (players) 2's generator: Moore-AnimateAnyone renders each player's runs from one reference crop and the coded
 pose maps. Run in the ``pointstream-jcv`` environment (env/jcv/extend-animateanyone.sh), never imported by PointStream:
 
-    python -m experiments.tennis.k6b_generate generate --prepared TAR --weight NAME=PATH ... [--profiles P,P]
+    python -m experiments.tennis.k6b_generate generate --prepared TAR --weight NAME PATH ... [--profiles P,P]
         [--units U,U] --max-units N --max-frames N --steps N
     python -m experiments.tennis.k6b_generate validate
 
@@ -157,7 +157,7 @@ def command_generate(args: argparse.Namespace) -> int:
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
     publish = scratch / "publish"
     publish.mkdir(parents=True, exist_ok=True)
-    weights = {k: Path(v) for k, v in (w.split("=", 1) for w in args.weight)}
+    weights = {name: Path(path) for name, path in args.weight}
     root = scratch / "prepared"
     if not root.is_dir():
         root.mkdir(parents=True)
@@ -270,7 +270,8 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate")
     gen.add_argument("--prepared", required=True)
-    gen.add_argument("--weight", action="append", required=True, help="NAME=PATH, NAME as in the docstring")
+    gen.add_argument("--weight", action="append", nargs=2, required=True, metavar=("NAME", "PATH"),
+                     help="NAME as in the docstring (two arguments: fleet placeholders must be whole arguments)")
     gen.add_argument("--profiles", default=",".join(PROFILES))
     gen.add_argument("--units", default="", help="comma-separated unit names (default: every prepared unit)")
     gen.add_argument("--max-units", type=int, default=0)
