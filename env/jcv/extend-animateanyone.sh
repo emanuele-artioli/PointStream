@@ -51,7 +51,10 @@ for module in importlib.metadata filelock huggingface_hub numpy regex requests s
 done
 
 mkdir -p "$PREFIX/opt/Moore-AnimateAnyone"
-tar -xf "$AA_ARCHIVE" -C "$PREFIX/opt/Moore-AnimateAnyone"
+# The fork's tree has Models/{original,finetuned_tennis}: links to absolute paths on the NFS home (weight
+# shortcuts for its demo scripts). Nothing here reads them, and fleet staging refuses absolute links.
+tar -xf "$AA_ARCHIVE" -C "$PREFIX/opt/Moore-AnimateAnyone" --exclude=Models
+if find "$PREFIX" -type l -lname "/*" | grep -q .; then echo "absolute links in the prefix" >&2; exit 4; fi
 "$PY" -m pip install --no-deps --no-build-isolation "$PREFIX/opt/Moore-AnimateAnyone"
 "$PY" - "$PREFIX/opt/PROVENANCE.json" "$AA_URL" "$AA_REV" "$AA_ARCHIVE_SHA256" "$PACK_SHA256" "$WHEEL_SHA256" <<'PY'
 import json, pathlib, sys

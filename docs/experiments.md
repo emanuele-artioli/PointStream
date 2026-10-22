@@ -11025,7 +11025,11 @@ and each object's representation is judged on both:
   `env/locks/pointstream-jcv.animateanyone-delta.txt`; `pip check` adds
   only diffusers' `importlib-metadata`, a backport it imports below
   Python 3.8). The import check covers JointControlVideo too. Packed
-  `pointstream-jcv-20261022T122606Z.tar.gz` (`2c534fb8…23ce2`, 4.5 GB). The
+  `pointstream-jcv-20261022T124459Z.tar.gz` (`bf738ce5…8a7e`, 4.5 GB). A
+  first pack (`…122606Z`, `2c534fb8…23ce2`) kept the fork's two links to
+  absolute paths (`Models/{original,finetuned_tennis}`, its demo scripts'
+  weight shortcuts), which fleet staging refuses (pilot
+  `20261022T124048Z-392f179f`, before any stage ran); they are now left out. The
   generator is called only through `experiments.tennis.k6b_generate`
   (npz in, npz out); preparing and judging stay in `pointstream`.
 - Items. K6's 8 scored windows (5 matches), with K6's published players,

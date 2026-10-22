@@ -527,8 +527,8 @@ naming the pack they ran with.
    `pip check` line). The locks differ by exactly those two packages
    (`env/locks/pointstream-jcv.animateanyone-delta.txt`); the import check
    covers JointControlVideo too. Packed:
-   `pointstream-data/environments/pointstream-jcv-20261022T122606Z.tar.gz`,
-   sha256 `2c534fb8ce670659d7dde40270d31882a609140cdb6dff599c23aa6937523ce2`
+   `pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz`,
+   sha256 `bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e`
    (4.5 GB), built on gpu6. H3e's jobs keep naming the 2026-10-12 pack.
 
 **Earlier environments.** `~/.conda/envs/pointstream` (Python 3.10, torch
