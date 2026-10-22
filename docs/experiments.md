@@ -11120,3 +11120,53 @@ and each object's representation is judged on both:
   measure first. Which, if any, to pursue is the user's call.
 - Budget: GPU 0.49 GPU-hours (players) of the 1 shared with H3e and
   H3a/H3a2 (no GPU), and about 0.76 of FoundHand's 3. CPU: the reports.
+
+### 2026-10-22 — J2: the coded keypoints' temporal jitter (rule)
+- Question (user, 2026-10-22, after J). J found that K1f's bound `warp`
+  (the true pixels moved from the uncoded to the coded keypoints) fails
+  "same over time" on both judged hand items: it changes 3.2–3.4 × as
+  much as the source between frames. `warp` moves pixels by
+  d_t = coded_t − uncoded_t, so it flickers wherever d changes between
+  frames. That change has two sources. Coding error (100 ms sends,
+  quantized and interpolated) can be smoothed at the decoder. Estimator
+  noise in the uncoded keypoints cannot, because those are where `warp`
+  takes the pixels from. Which one dominates, and does decoder-side
+  smoothing make the bound pass time?
+- Measure (CPU, from saved keypoints; no GPU). K1f's 30 held-out items
+  (K1c units: `row_t`, `row_right`, `uncoded_kp2d`, `coded_kp2d`). Per
+  hand track (consecutive frames of one side), per joint, over the
+  track's box (the uncoded keypoints' longer side): coding jitter
+  |d_t − d_{t−1}|; source motion |u_t − u_{t−1}|; estimator noise
+  |u_t − S₂(u)_t|, with S_σ a centred Gaussian over the track's frames
+  (σ in frames, edges renormalized). Medians per item, then over items.
+- Oracle (GPU, small): on J's two scored items (P09_103, P22_107), `warp`
+  re-drawn with decoder-side smoothing, everything else as J:
+  - `warp@S_σ`: from the uncoded keypoints to S_σ(coded), σ ∈ {1, 2, 4}
+    frames (non-causal: a decoder delay of about 2σ frames, stated);
+  - `warp@S(u)` (diagnostic, no coding): from u to S₂(u). It isolates the
+    estimator noise: the pixels are moved only by the noise smoothing
+    removes.
+  Judged by J's judges (WiLoR content, `h3b.flicker` and energies),
+  against J's saved SVT-AV1 hulls for the same items (the `j_hands`
+  units of jobs `20261022T123720Z-c74f647b` and `…123731Z-683a932b`).
+- Decision rule (fixed now, before any number is read).
+  - **Smoothing fixes it** if some σ makes `warp@S_σ` pass J's time
+    check on both items, with content still passing J's check. Next (to
+    the user): a decoder-side smoother in the keypoint codec, then
+    renderers re-judged with it.
+  - **The estimator is the cause** if `warp@S(u)` itself fails time on
+    both items: the bound's flicker comes from the source keypoints, and
+    no decoder smoother removes it. To the user: the experience track
+    needs a temporally consistent estimator (or a bound that does not
+    move pixels by estimator noise).
+  - Otherwise unclear, to the user.
+  The measure is reported beside and does not decide.
+- Hypothesis. Mostly estimator noise: WiLoR runs per frame, and K1f's
+  hand-box fits are per frame, so u jitters by a few percent of the box,
+  comparable to the coding's |Δd|. `warp@S(u)` fails time; smoothing the
+  coded keypoints alone helps little.
+- Competing explanation. The 100 ms coding (sends every few frames,
+  interpolated between) puts a kink in d at every send, which dominates;
+  then σ = 2 removes most of it and `warp@S₂` passes.
+- Budget. CPU: the measure and report. GPU: one job per item (warp, CPU,
+  and WiLoR on 5 variants), ≤ 20 min each, ≤ 1 GPU-hour total.
