@@ -11086,3 +11086,17 @@ and each object's representation is judged on both:
   expandable segments: the allocator frees its cache before growing, and a
   real need fails loudly), 30,000 MiB is declared, and the peaks are
   recorded in `k6bh2c.json`. Nothing in the rule changes.
+- Revision 2 (2026-10-22, before any score was read; infrastructure). Job
+  `20261022T125017Z-174bee4e` (P06_108, `ec72be4`) passed its smoke (28
+  checks), but in the full stage the candidates alone took 33 min: 3,121
+  frames at stride 5 and 5,361 fitted hands, with the fits waiting for the
+  whole decode (about 17,000 1080p HEVC frames). Bank, render and seven
+  scorings could not fit the same 45 min. So each item runs as two stages:
+  **extract** (bank frames decoded in chunks of 256 in fresh processes while
+  WiLoR fits the earlier ones; publishes the candidates unit) and **score**
+  (restores it, decodes only the chosen references again, then codes,
+  renders and scores). The stride is 10, not 5: about 1,500 candidates per
+  video, still over 20 times K = 64. A stride-5 unit is cut to stride 10 on
+  restore (the frames whose VISOR number is a multiple of 10, with their
+  fits, each fitted on its own), so P06_108's 33 min are kept if that stage's
+  `partial.tar` holds them.

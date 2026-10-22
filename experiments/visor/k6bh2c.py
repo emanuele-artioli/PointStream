@@ -48,6 +48,7 @@ MIN_SIDE = 64  # px: SVT-AV1's smallest frame
 POLY_EPS = 1.5  # px, OpenCV's approxPolyDP
 COORD_BITS = 11  # a box corner or size in a 1920 x 1080 frame
 WILOR_CHUNK = 32
+DECODE_CHUNK = 256  # candidate frames per decode process
 GPU_CAP_MIB = 27 * 1024  # PyTorch's cap: the allocator frees its cache before growing past it (declared 30,000 MiB)
 WARP_TOLERANCE = 0.002
 CRITERION = 0.75
@@ -273,6 +274,7 @@ def decode_bank_frames(video: str, indices: list[int], out: str, threads: int) -
     written: list[int] = []
     width = height = 0
     formats: set[str] = set()
+    ranges: set[str] = set()
     with open(out, "xb") as handle:
         for at, frame in visor.decoded_frames(video, span, threads=threads):
             if at not in keep or (written and at <= written[-1]):
@@ -281,6 +283,7 @@ def decode_bank_frames(video: str, indices: list[int], out: str, threads: int) -
             if fmt not in ("yuv420p", "yuvj420p"):
                 raise RuntimeError(f"{video}: decoded format {fmt} is not 8-bit 4:2:0")
             formats.add(fmt)
+            ranges.add(str(getattr(frame, "color_range", None)))
             planes = np.ascontiguousarray(frame.to_ndarray())
             height, width = planes.shape[0] * 2 // 3, planes.shape[1]
             handle.write(planes.tobytes())
@@ -292,7 +295,8 @@ def decode_bank_frames(video: str, indices: list[int], out: str, threads: int) -
         rate = float(stream.average_rate) if stream.average_rate else None
     if written != wanted:
         raise RuntimeError(f"{video}: decoded {len(written)} of {len(wanted)} bank frames")
-    return {"path": out, "indices": written, "width": width, "height": height, "formats": sorted(formats),
+    full_range = formats == {"yuvj420p"} or ranges == {"2"} or ranges == {"JPEG"}  # B2's rule
+    return {"path": out, "indices": written, "width": width, "height": height, "formats": sorted(formats), "full_range": full_range,
             "duration_s": duration, "frames_total": frames_total, "fps": rate, "seconds": round(time.time() - began, 2)}
 
 
@@ -318,9 +322,11 @@ def to_rgb(planes: np.ndarray, width: int, height: int, full_range: bool, device
     return rgb.permute(0, 2, 3, 1).to(torch.uint8).cpu().numpy()
 
 
-def fit_candidates(wilor: Any, bank: dict[str, Any], cands: list[tuple[int, int]], frames_doc: dict[int, Any], full_range: bool,
-                   device: str) -> dict[str, np.ndarray]:
-    """K1e's two-pass hand-box fit on every candidate side, and the inside-the-mask test."""
+def fit_candidates(wilor: Any, chunks: list[tuple[Any, int]], cands: list[tuple[int, int]], frames_doc: dict[int, Any],
+                   device: str) -> tuple[dict[str, np.ndarray], dict[str, Any]]:
+    """K1e's two-pass hand-box fit on every candidate side, and the inside-the-mask test. ``chunks``: (a decode future,
+    the index of its first candidate), consumed in order while later ones decode. Returns the fits and the first
+    chunk's record (the video's duration, frame count and colour range)."""
     from experiments.visor.h2 import NOMINAL_FOCAL
     from src.codecs.quality import read_frames
     from src.segmentation import visor
@@ -329,22 +335,33 @@ def fit_candidates(wilor: Any, bank: dict[str, Any], cands: list[tuple[int, int]
     meta = {"image_shape": list(shape), "focal": NOMINAL_FOCAL * max(shape), "principal": (shape[1] / 2.0, shape[0] / 2.0)}
     empty = {"t": np.zeros(0, int), "right": np.zeros(0, bool), "box": np.zeros((0, 4)), "wilor_rotvec": np.zeros((0, 16, 3)),
              "wilor_betas": np.zeros((0, 10)), "wilor_transl": np.zeros((0, 3)), "wilor_kp2d": np.zeros((0, 21, 2))}
-    w, h = bank["width"], bank["height"]
     rows: dict[str, list[Any]] = {"cand": [], "right": [], "kp2d": [], "inside": []}
-    for first in range(0, len(cands), WILOR_CHUNK):
-        chunk = list(range(first, min(len(cands), first + WILOR_CHUNK)))
-        rgb = to_rgb(read_frames(Path(bank["path"]), w, h, first, len(chunk)), w, h, full_range, device)
-        masks = [hand_masks(frames_doc[cands[c][0]]) for c in chunk]
-        new = k1c.mask_box_rows(wilor, rgb, _Masks(masks, shape), len(chunk), meta, empty, hand_box=True)
-        for t, right, kp in zip(new["t"], new["right"], new["wilor_kp2d"]):
-            side = visor.HANDS[1] if right else visor.HANDS[0]
-            rows["cand"].append(chunk[int(t)])
-            rows["right"].append(bool(right))
-            rows["kp2d"].append(np.asarray(kp, np.float32))
-            rows["inside"].append(joints_inside(np.asarray(kp), masks[int(t)][side]))
-    return {"cand": np.array(rows["cand"], int), "right": np.array(rows["right"], bool),
+    record: dict[str, Any] = {}
+    decode_seconds = 0.0
+    for future, offset in chunks:
+        bank = future.result()
+        record = record or bank
+        decode_seconds += bank["seconds"]
+        w, h, count = bank["width"], bank["height"], len(bank["indices"])
+        if [i for _, i in cands[offset:offset + count]] != bank["indices"]:
+            raise RuntimeError(f"decode chunk at {offset}: frames out of order")
+        for first in range(0, count, WILOR_CHUNK):
+            chunk = list(range(first, min(count, first + WILOR_CHUNK)))
+            rgb = to_rgb(read_frames(Path(bank["path"]), w, h, first, len(chunk)), w, h, bank["full_range"], device)
+            masks = [hand_masks(frames_doc[cands[offset + c][0]]) for c in chunk]
+            new = k1c.mask_box_rows(wilor, rgb, _Masks(masks, shape), len(chunk), meta, empty, hand_box=True)
+            for t, right, kp in zip(new["t"], new["right"], new["wilor_kp2d"]):
+                side = visor.HANDS[1] if right else visor.HANDS[0]
+                rows["cand"].append(offset + chunk[int(t)])
+                rows["right"].append(bool(right))
+                rows["kp2d"].append(np.asarray(kp, np.float32))
+                rows["inside"].append(joints_inside(np.asarray(kp), masks[int(t)][side]))
+        os.remove(bank["path"])
+    fits = {"cand": np.array(rows["cand"], int), "right": np.array(rows["right"], bool),
             "kp2d": np.stack(rows["kp2d"]) if rows["kp2d"] else np.zeros((0, 21, 2), np.float32),
             "inside": np.array(rows["inside"], int)}
+    return fits, {**{k: record.get(k) for k in ("duration_s", "frames_total", "fps", "full_range", "formats")},
+                  "decode_seconds": round(decode_seconds, 2)}
 
 
 def code_still(crop: np.ndarray, work: Path, encoder: str, decoder: str) -> tuple[np.ndarray, int, str]:
@@ -369,28 +386,39 @@ def code_still(crop: np.ndarray, work: Path, encoder: str, decoder: str) -> tupl
     return rgb, sum(svtav1.ivf_frames(data)), hashlib.sha256(data).hexdigest()
 
 
-def build_bank(args: argparse.Namespace, bank_frames: dict[str, Any], cands: list[tuple[int, int]], frames_doc: dict[int, Any],
+def build_bank(args: argparse.Namespace, pool: Any, video: str, cands: list[tuple[int, int]], frames_doc: dict[int, Any],
                fits: dict[str, np.ndarray], full_range: bool, device: str, work: Path
                ) -> tuple[dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
-    """Per side, the nested medoid bank (up to max(KS)), each reference coded and billed; and the candidates per side."""
+    """Per side, the nested medoid bank (up to max(KS)), each reference decoded again from the video, coded and billed;
+    and the candidates per side."""
     from src.codecs.quality import read_frames
     from src.segmentation import visor
 
-    w, h = bank_frames["width"], bank_frames["height"]
-    out: dict[str, list[dict[str, Any]]] = {}
+    chosen: dict[str, list[int]] = {}
     record: list[dict[str, Any]] = []
-    jobs = []
     for right, side in ((False, visor.HANDS[0]), (True, visor.HANDS[1])):
         rows = np.nonzero((fits["right"] == right) & (fits["inside"] >= MIN_INSIDE))[0]
         if len(rows) > MAX_CANDIDATES:
             rows = rows[np.linspace(0, len(rows) - 1, MAX_CANDIDATES).round().astype(int)]
         poses = np.stack([pose_vector(fits["kp2d"][r]) for r in rows]) if len(rows) else np.zeros((0, 42))
-        chosen = [int(rows[j]) for j in greedy_medoids(poses, max(KS))]
+        chosen[side] = [int(rows[j]) for j in greedy_medoids(poses, max(KS))]
+        record.append({"side": side, "fitted": int((fits["right"] == right).sum()), "kept": int(len(rows))})
+    indices = sorted({cands[int(fits["cand"][r])][1] for rs in chosen.values() for r in rs})
+    target = work / "refs.yuv"
+    if target.exists():
+        target.unlink()
+    frames = pool.submit(decode_bank_frames, video, indices, str(target), 8).result()
+    if frames["full_range"] != full_range:
+        raise RuntimeError("the references' colour range differs from the window's")
+    w, h = frames["width"], frames["height"]
+    at = {index: j for j, index in enumerate(frames["indices"])}
+    out: dict[str, list[dict[str, Any]]] = {}
+    jobs = []
+    for side, rs in chosen.items():
         refs = []
-        for rank, r in enumerate(chosen):
-            c = int(fits["cand"][r])
-            n, index = cands[c]
-            rgb = to_rgb(read_frames(Path(bank_frames["path"]), w, h, c, 1), w, h, full_range, device)[0]
+        for rank, r in enumerate(rs):
+            n, index = cands[int(fits["cand"][r])]
+            rgb = to_rgb(read_frames(target, w, h, at[index], 1), w, h, full_range, device)[0]
             mask = hand_masks(frames_doc[n])[side]
             box = ref_box(mask)
             x0, y0, bw, bh = box
@@ -402,9 +430,9 @@ def build_bank(args: argparse.Namespace, bank_frames: dict[str, Any], cands: lis
                          "joint_bits": joint_bits(bw, bh), "header_bits": header_bits()})
             jobs.append((refs[-1], smooth_fill(crop, crop_mask), work / f"{side.replace(' ', '-')}-{rank:02d}"))
         out[side] = refs
-        record.append({"side": side, "fitted": int((fits["right"] == right).sum()), "kept": int(len(rows))})
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        coded = list(pool.map(lambda j: code_still(j[1], j[2], args.encoder, args.decoder), jobs))
+    target.unlink()
+    with ThreadPoolExecutor(max_workers=8) as threads:
+        coded = list(threads.map(lambda j: code_still(j[1], j[2], args.encoder, args.decoder), jobs))
     for (ref, _, _), (rgb, payload, digest) in zip(jobs, coded):
         x0, y0, bw, bh = ref["box"]
         decoded_mask = np.zeros(ref["mask"].shape, bool)
@@ -420,9 +448,29 @@ def build_bank(args: argparse.Namespace, bank_frames: dict[str, Any], cands: lis
     return out, record
 
 
-def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[str, Any], bank_frames: dict[str, Any],
-                 cands: list[tuple[int, int]], nets: dict[str, Any], k1f_unit: tuple[dict[str, Any], dict[str, np.ndarray]],
-                 device: str, publish: Path, scratch: Path) -> None:
+def extract_item(args: argparse.Namespace, item: dict[str, Any], chunks: list[tuple[Any, int]], cands: list[tuple[int, int]],
+                 nets: dict[str, Any], device: str, publish: Path) -> None:
+    """Stage 1: WiLoR on every candidate outside the window, published as the item's candidates unit."""
+    from experiments.visor.h2 import save_unit
+    from src.segmentation import visor
+
+    began = time.time()
+    frames_doc = visor.frames(visor.load_annotations(Path(args.archive) / item["dense_member"]))
+    fits, video = fit_candidates(nets["wilor"], chunks, cands, frames_doc, device)
+    save_unit(publish, "k6bh2c-candidates", item["id"],
+              {"visor_frame": np.array([n for n, _ in cands], int), "index": np.array([i for _, i in cands], int),
+               "row_cand": fits["cand"], "row_right": fits["right"], "row_kp2d": fits["kp2d"], "row_inside": fits["inside"]},
+              {"unit": item["id"], "item": item["id"], "video": item["video"], "stride": int(args.stride), "candidates": len(cands),
+               "rows": int(len(fits["cand"])), "kept": int((fits["inside"] >= MIN_INSIDE).sum()), "window": [
+                   int(item["first_video_index"]), int(item["first_video_index"]) + int(item["frames"])],
+               "guard_frames": int(round(GUARD_SECONDS * float(item["fps"]))), "video_record": video,
+               "seconds": round(time.time() - began, 2)})
+
+
+def score_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[str, Any], unit: tuple[dict[str, Any], dict[str, np.ndarray]],
+               pool: Any, video: str, nets: dict[str, Any], k1f_unit: tuple[dict[str, Any], dict[str, np.ndarray]], device: str,
+               publish: Path, scratch: Path) -> None:
+    """Stage 2: the bank from the item's candidates unit, coded and billed; the window rendered and scored."""
     from experiments.tennis.k6 import draw, telea_fill
     from experiments.visor.b2 import load_mask_sets
     from experiments.visor.h2 import save_unit
@@ -436,19 +484,14 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     width, height = decoded["width"], decoded["height"]
     work = scratch / "work" / item["id"]
     work.mkdir(parents=True, exist_ok=True)
-    doc = visor.load_annotations(Path(args.archive) / item["dense_member"])
-    frames_doc = visor.frames(doc)
+    frames_doc = visor.frames(visor.load_annotations(Path(args.archive) / item["dense_member"]))
     full_range = bool(decoded["full_range"])
-    fits = fit_candidates(nets["wilor"], bank_frames, cands, frames_doc, full_range, device)
-    fit_seconds = time.time() - began
-    save_unit(publish, "k6bh2c-candidates", item["id"],
-              {"visor_frame": np.array([n for n, _ in cands], int), "index": np.array([i for _, i in cands], int),
-               "row_cand": fits["cand"], "row_right": fits["right"], "row_kp2d": fits["kp2d"], "row_inside": fits["inside"]},
-              {"unit": item["id"], "item": item["id"], "video": item["video"], "stride": int(args.stride), "candidates": len(cands),
-               "rows": int(len(fits["cand"])), "kept": int((fits["inside"] >= MIN_INSIDE).sum())})
-    release()
-    banks, candidate_record = build_bank(args, bank_frames, cands, frames_doc, fits, full_range, device, work)
-    os.remove(bank_frames["path"])
+    cmeta, ca = unit
+    cands = [(int(n), int(i)) for n, i in zip(ca["visor_frame"], ca["index"])]
+    fits = {"cand": np.asarray(ca["row_cand"]).astype(int), "right": np.asarray(ca["row_right"]).astype(bool),
+            "kp2d": np.asarray(ca["row_kp2d"]), "inside": np.asarray(ca["row_inside"]).astype(int)}
+    banks, candidate_record = build_bank(args, pool, video, cands, frames_doc, fits, full_range, device, work)
+    bank_frames = cmeta["video_record"]
     clips, mask_info = load_mask_sets(item, frames, {FILL: args.masks}, {FILL: args.mask_record}, Path(args.archive))
     clip = clips[FILL]
     truth = rgb_memmap(Path(decoded["path"]), work / "truth.npy", frames, width, height, full_range, device)
@@ -536,7 +579,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     lo, hi = int(item["first_video_index"]), int(item["first_video_index"]) + int(item["frames"])
     meta = {"unit": item["id"], "item": item["id"], "video": item["video"], "frames": frames, "hand_frames": len(hand),
             "summary": summary, "bank_bits": bank_bits, "bank": bank_record, "candidates": candidate_record,
-            "candidate_frames": len(cands), "stride": int(args.stride),
+            "candidate_frames": len(cands), "stride": int(cmeta["stride"]), "candidates_unit_sha256": cmeta["npz_sha256"],
             "nearest_candidate_frames": int(min(min(abs(i - lo), abs(i - (hi - 1))) for _, i in cands)) if cands else None,
             "window": [lo, hi], "guard_frames": int(round(GUARD_SECONDS * fps)),
             "video_duration_s": bank_frames["duration_s"], "video_frames": bank_frames["frames_total"], "video_fps": bank_frames["fps"],
@@ -544,13 +587,76 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
                            for k in KS},
             "k1f": {"kbps": float(meta_k["cover"]["kbps"]) if meta_k.get("cover") else k1c.POSE_KBPS,
                     "warp": meta_k["summary"]["warp"], "frames": int(meta_k["frames"]), "npz_hash_ok": bool(meta_k["npz_hash_ok"])},
-            "mask_set": mask_info, "decode_bank_seconds": bank_frames["seconds"], "fit_seconds": round(fit_seconds, 2),
+            "mask_set": mask_info,
             "seconds": round(time.time() - began, 2)}
     save_unit(publish, "k6bh2c", item["id"], arrays, meta)
     del outs, truth
     os.remove(decoded["path"])
     for f in work.glob("*.npy"):
         f.unlink()
+
+
+def subset_candidates(meta: dict[str, Any], arrays: dict[str, np.ndarray], stride: int) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
+    """A candidates unit at a finer stride cut to ``stride`` (a multiple of it): the frames whose VISOR number is a
+    multiple of ``stride``, and their fits (each frame is fitted on its own, so these are the coarser stride's)."""
+    if stride % int(meta["stride"]):
+        raise ValueError(f"stride {stride} is not a multiple of {meta['stride']}")
+    keep = np.nonzero(arrays["visor_frame"] % stride == 0)[0]
+    new_index = np.full(len(arrays["visor_frame"]), -1)
+    new_index[keep] = np.arange(len(keep))
+    rows = np.nonzero(new_index[arrays["row_cand"]] >= 0)[0]
+    out = {"visor_frame": arrays["visor_frame"][keep], "index": arrays["index"][keep], "row_cand": new_index[arrays["row_cand"][rows]],
+           "row_right": arrays["row_right"][rows], "row_kp2d": arrays["row_kp2d"][rows], "row_inside": arrays["row_inside"][rows]}
+    return ({**{k: v for k, v in meta.items() if k not in ("npz_sha256", "npz_hash_ok")}, "stride": stride, "candidates": int(len(keep)),
+             "rows": int(len(rows)), "kept": int((out["row_inside"] >= MIN_INSIDE).sum()),
+             "cut_from": {"stride": int(meta["stride"]), "npz_sha256": meta["npz_sha256"]}}, out)
+
+
+def restore_candidates(tar: Path, publish: Path, items: set[str], stride: int) -> list[str]:
+    """Candidates units of these items from an earlier stage's ``published.tar`` or ``partial.tar`` (npz sha256
+    checked), at this stride or cut to it from a finer one, published into ``publish``."""
+    import io
+    import tarfile
+
+    from experiments.visor.h2 import save_unit
+
+    done = []
+    with tarfile.open(tar) as handle:
+        members = {m.name: m for m in handle.getmembers()}
+        for name in sorted(members):
+            if not (name.startswith("publish/k6bh2c-candidates/") or name.startswith("k6bh2c-candidates/")) or not name.endswith(".json"):
+                continue
+            npz = name[:-5] + ".npz"
+            if npz not in members:
+                continue
+            meta = json.loads(handle.extractfile(members[name]).read())  # type: ignore[union-attr]
+            if meta["item"] not in items or stride % int(meta["stride"]):
+                continue
+            data = handle.extractfile(members[npz]).read()  # type: ignore[union-attr]
+            if hashlib.sha256(data).hexdigest() != meta["npz_sha256"]:
+                raise SystemExit(f"{tar}: {npz} does not match its record")
+            with np.load(io.BytesIO(data), allow_pickle=False) as z:
+                arrays = {k: z[k] for k in z.files}
+            meta, arrays = subset_candidates(meta, arrays, stride)
+            save_unit(publish, "k6bh2c-candidates", meta["item"], arrays, meta)
+            done.append(meta["item"])
+    return done
+
+
+def published_units(publish: Path, part: str) -> dict[str, tuple[dict[str, Any], dict[str, np.ndarray]]]:
+    """The units in ``publish/<part>`` whose npz matches its record (restored from a checkpoint or an archive)."""
+    out = {}
+    for meta_path in sorted((publish / part).glob("*.json")):
+        data_path = meta_path.with_suffix(".npz")
+        if not data_path.exists():
+            continue
+        meta = json.loads(meta_path.read_text())
+        data = data_path.read_bytes()
+        if hashlib.sha256(data).hexdigest() != meta.get("npz_sha256"):
+            continue
+        with np.load(data_path, allow_pickle=False) as npz:
+            out[meta["item"]] = (meta, {k: npz[k] for k in npz.files})
+    return out
 
 
 def command_run(args: argparse.Namespace) -> int:
@@ -568,23 +674,32 @@ def command_run(args: argparse.Namespace) -> int:
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
     publish = scratch / "publish"
     publish.mkdir(parents=True, exist_ok=True)
-    restored = restore_units(publish, "k6bh2c")
-    todo = [it for it in items if it["id"] not in restored]
+    stride = int(args.stride)
+    restored_from = {str(t): {"sha256": file_sha256(Path(t)), "items": restore_candidates(Path(t), publish, {it["id"] for it in items}, stride)}
+                     for t in args.restore}
+    restore_units(publish, "k6bh2c-candidates")  # a previous attempt's checkpoint
+    scored = restore_units(publish, "k6bh2c")
+    have = {k for k, (m, _) in published_units(publish, "k6bh2c-candidates").items() if int(m["stride"]) == stride}
+    to_extract = [it for it in items if it["id"] not in have]
+    to_score = [] if args.extract_only else [it for it in items if it["id"] not in scored]
     mapping = json.loads((Path(args.archive) / "frame_mapping.json").read_text())
-    cands = {it["id"]: candidate_frames(it, visor.load_annotations(Path(args.archive) / it["dense_member"]), mapping, int(args.stride))
-             for it in todo}
+    cands = {it["id"]: candidate_frames(it, visor.load_annotations(Path(args.archive) / it["dense_member"]), mapping, stride)
+             for it in to_extract}
     videos = {Path(v).stem: v for v in args.video}
     allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
-    pool = ProcessPoolExecutor(max_workers=1, mp_context=multiprocessing.get_context("spawn"))
+    pool = ProcessPoolExecutor(max_workers=2, mp_context=multiprocessing.get_context("spawn"))
     (scratch / "bank").mkdir(parents=True, exist_ok=True)
-    bank_jobs = {}
-    for it in todo:  # PyAV in a fresh process, started before torch
-        target = scratch / "bank" / f"{it['id']}.yuv"
-        if target.exists():
-            target.unlink()
-        bank_jobs[it["id"]] = pool.submit(decode_bank_frames, videos[it["video"]], [i for _, i in cands[it["id"]]], str(target),
-                                          max(1, allowance // 2))
-    windows = decode_windows(args, todo, int(args.frames), scratch)
+    chunks: dict[str, list[tuple[Any, int]]] = {}
+    for it in to_extract:  # PyAV in fresh processes, started before torch; chunks decode while WiLoR fits earlier ones
+        chunks[it["id"]] = []
+        indices = [i for _, i in cands[it["id"]]]
+        for first in range(0, len(indices), DECODE_CHUNK):
+            target = scratch / "bank" / f"{it['id']}-{first:06d}.yuv"
+            if target.exists():
+                target.unlink()
+            chunks[it["id"]].append((pool.submit(decode_bank_frames, videos[it["video"]], indices[first:first + DECODE_CHUNK], str(target),
+                                                 max(1, allowance // 2)), first))
+    windows = decode_windows(args, to_score, int(args.frames), scratch) if to_score else iter(())
     os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")  # one allocator for crops of every size
     import torch
 
@@ -599,18 +714,31 @@ def command_run(args: argparse.Namespace) -> int:
     device = "cuda"
     total_mib = torch.cuda.get_device_properties(0).total_memory / 2 ** 20
     torch.cuda.set_per_process_memory_fraction(min(1.0, GPU_CAP_MIB / total_mib))
-    nets: dict[str, Any] = {"lpips": load_lpips(Path(args.lpips_backbone), device), "dists": load_dists(Path(args.dists_backbone), device)}
-    args.mano_dir = mano_dir(args, scratch)
-    nets["wilor"] = Regressor("wilor", args)
-    on_cuda = {k: next(v.parameters()).is_cuda for k, v in nets.items() if k != "wilor"}
-    on_cuda["wilor"] = model_on_cuda(nets["wilor"].model)
+    nets: dict[str, Any] = {}
+    on_cuda: dict[str, bool] = {}
     began = time.time()
-    done = len(restored)
-    for item, decoded in windows:
-        process_item(args, item, decoded, bank_jobs[item["id"]].result(), cands[item["id"]], nets, units[item["id"]], device,
-                     publish, scratch)
-        done += 1
-        progress(done)
+    done = 0
+    if to_extract:
+        args.mano_dir = mano_dir(args, scratch)
+        nets["wilor"] = Regressor("wilor", args)
+        on_cuda["wilor"] = model_on_cuda(nets["wilor"].model)
+        for it in to_extract:
+            extract_item(args, it, chunks[it["id"]], cands[it["id"]], nets, device, publish)
+            done += 1
+            progress(done)
+        del nets["wilor"]
+        from experiments.visor.k1f import release
+
+        release()
+    if to_score:
+        nets.update({"lpips": load_lpips(Path(args.lpips_backbone), device), "dists": load_dists(Path(args.dists_backbone), device)})
+        on_cuda.update({k: next(nets[k].parameters()).is_cuda for k in ("lpips", "dists")})
+        cand_units = published_units(publish, "k6bh2c-candidates")
+        for item, decoded in windows:
+            score_item(args, item, decoded, cand_units[item["id"]], pool, videos[item["video"]], nets, units[item["id"]], device,
+                       publish, scratch)
+            done += 1
+            progress(done)
     pool.shutdown()
     import torchmetrics
 
@@ -618,14 +746,15 @@ def command_run(args: argparse.Namespace) -> int:
         "command": "run", "device": device_record(args.gpu_class), "on_cuda": on_cuda, "seconds": round(time.time() - began, 2),
         "inputs": {"k1f_stages": [file_sha256(Path(t)) for t in args.k1f_stage],
                    "wilor_checkpoint": file_sha256(Path(args.wilor_checkpoint)), "videos": {Path(v).stem: file_sha256(Path(v)) for v in args.video}},
-        "wilor": nets["wilor"].load, "lpips": lpips_record(Path(args.lpips_backbone)),
+        "restored_from": restored_from, "extracted": [it["id"] for it in to_extract], "scored": [it["id"] for it in to_score],
+        "wilor": nets["wilor"].load if "wilor" in nets else None, "lpips": lpips_record(Path(args.lpips_backbone)),
         "dists": {"torchmetrics": torchmetrics.__version__, "backbone_sha256": file_sha256(Path(args.dists_backbone))},
         "gpu_cap_mib": GPU_CAP_MIB, "peak_allocated_mib": round(torch.cuda.max_memory_allocated() / 2 ** 20, 1),
         "peak_reserved_mib": round(torch.cuda.max_memory_reserved() / 2 ** 20, 1),
         "svt": {"encoder": svtav1.tool(args.encoder), "decoder": svtav1.tool(args.decoder), "crf": CRF, "preset": PRESET},
-        "settings": {"frames": int(args.frames), "stride": int(args.stride), "items": [it["id"] for it in items], "ks": list(KS),
-                     "guard_seconds": GUARD_SECONDS, "min_inside": MIN_INSIDE, "dilate": DILATE, "poly_eps": POLY_EPS,
-                     "decision": BANK2C_DECISION}, "restored_units": sorted(restored)})
+        "settings": {"frames": int(args.frames), "stride": stride, "items": [it["id"] for it in items], "ks": list(KS),
+                     "extract_only": bool(args.extract_only), "guard_seconds": GUARD_SECONDS, "min_inside": MIN_INSIDE, "dilate": DILATE,
+                     "poly_eps": POLY_EPS, "decision": BANK2C_DECISION}, "restored_units": sorted(scored)})
     return 0
 
 
@@ -635,10 +764,26 @@ def command_run(args: argparse.Namespace) -> int:
 def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
     from experiments.visor.h2 import load_units
 
-    units = {m["item"]: (m, a) for m, a in load_units([str(stage / "published.tar")], "k6bh2c")}
     settings = result["settings"]
-    checks = {"every_item": sorted(units) == sorted(settings["items"]), "on_cuda": all(result["on_cuda"].values()),
-              "device_class": bool(result["device"]["class_matches"]), "crf": result["svt"]["crf"] == CRF}
+    checks = {"on_cuda": all(result["on_cuda"].values()), "device_class": bool(result["device"]["class_matches"]),
+              "crf": result["svt"]["crf"] == CRF}
+    cands = {m["item"]: (m, a) for m, a in load_units([str(stage / "published.tar")], "k6bh2c-candidates")}
+    checks["every_item_extracted"] = sorted(cands) == sorted(settings["items"])
+    for item, (m, a) in cands.items():
+        lo, hi = m["window"]
+        g = m["guard_frames"]
+        video = m["video_record"]
+        checks[f"{item}:candidates_hash"] = bool(m["npz_hash_ok"])
+        checks[f"{item}:candidates_stride"] = int(m["stride"]) == int(settings["stride"]) and bool((a["visor_frame"] % m["stride"] == 0).all())
+        checks[f"{item}:candidates_outside"] = bool(((a["index"] < lo - g) | (a["index"] >= hi + g)).all()) and len(a["index"]) > 0
+        checks[f"{item}:fits_both_sides"] = all(int(((a["row_right"] == r) & (a["row_inside"] >= MIN_INSIDE)).sum()) > 0 for r in (False, True))
+        checks[f"{item}:fits_index"] = bool((a["row_cand"] >= 0).all() and (a["row_cand"] < len(a["index"])).all())
+        checks[f"{item}:fits_finite"] = bool(np.isfinite(a["row_kp2d"]).all()) and bool(((a["row_inside"] >= 0) & (a["row_inside"] <= 21)).all())
+        checks[f"{item}:video_record"] = 60.0 < float(video["duration_s"]) < 7200.0 and int(video["frames_total"]) > 0
+    if settings.get("extract_only"):
+        return checks
+    units = {m["item"]: (m, a) for m, a in load_units([str(stage / "published.tar")], "k6bh2c")}
+    checks["every_item"] = sorted(units) == sorted(settings["items"])
     for item, (m, a) in units.items():
         hand = a["pixels_r"] > 0
         lo, hi = m["window"]
@@ -762,7 +907,9 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--video", action="append", default=[])
     run.add_argument("--k1f-stage", action="append", required=True, help="K1f's published.tar (rows, bound and hull)")
     run.add_argument("--frames", default="240")
-    run.add_argument("--stride", default="5", help="every stride-th VISOR frame outside the window is a candidate")
+    run.add_argument("--stride", default="10", help="every stride-th VISOR frame outside the window is a candidate")
+    run.add_argument("--extract-only", action="store_true", help="stage 1: the candidates' fits only")
+    run.add_argument("--restore", action="append", default=[], help="an earlier stage's published.tar or partial.tar (candidates kept)")
     run.add_argument("--encoder", default="SvtAv1EncApp")
     run.add_argument("--decoder", default="dav1d")
     run.add_argument("--gpu-class", default="RTX 6000 Ada", help="the GPU class the smoke asserts (model-GPU table)")

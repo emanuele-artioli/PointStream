@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -96,3 +98,30 @@ def test_candidates_leave_out_the_window_and_guard() -> None:
     assert not any(999 - 50 <= i < 999 + 240 + 50 for i in indices)
     assert 299 not in indices  # VISOR frame 300 has no hand
     assert indices == sorted(indices) and len(indices) > 300
+
+
+def test_candidates_restore_from_an_archive_cut_to_a_coarser_stride(tmp_path: Path) -> None:
+    import tarfile
+
+    from experiments.visor.h2 import save_unit
+
+    frames = np.arange(5, 105, 5)  # stride 5
+    arrays = {"visor_frame": frames, "index": frames - 1, "row_cand": np.array([0, 1, 1, 3, 19]),
+              "row_right": np.array([False, False, True, True, False]), "row_kp2d": np.arange(5 * 42, dtype=np.float32).reshape(5, 21, 2),
+              "row_inside": np.array([21, 20, 3, 21, 21])}
+    meta = {"unit": "X_1", "item": "X_1", "stride": 5, "candidates": 20, "window": [0, 1], "guard_frames": 0,
+            "video_record": {"duration_s": 100.0, "frames_total": 5000}}
+    old = tmp_path / "old"
+    save_unit(old / "publish", "k6bh2c-candidates", "X_1", arrays, meta)
+    tar = tmp_path / "partial.tar"
+    with tarfile.open(tar, "w") as handle:
+        handle.add(old / "publish", arcname="publish")
+    publish = tmp_path / "new"
+    assert k6bh2c.restore_candidates(tar, publish, {"X_1"}, 10) == ["X_1"]
+    (m, a), = k6bh2c.published_units(publish, "k6bh2c-candidates").values()
+    assert m["stride"] == 10 and list(a["visor_frame"]) == list(range(10, 101, 10))
+    # rows on frames 10 (cand 1 -> 0, twice), 20 (cand 3 -> 1) and 100 (cand 19 -> 9) survive; frame 5's goes
+    assert list(a["row_cand"]) == [0, 0, 1, 9] and list(a["row_inside"]) == [20, 3, 21, 21]
+    assert np.array_equal(a["row_kp2d"], arrays["row_kp2d"][1:])
+    assert m["cut_from"]["stride"] == 5
+    assert k6bh2c.restore_candidates(tar, publish, {"other"}, 10) == []
