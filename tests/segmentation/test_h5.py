@@ -295,7 +295,7 @@ def test_panel_grid_and_crops_validator() -> None:
     assert grid.shape[1] == 4 * h5.PANEL_FULL[0] + 3 * 6 and grid.shape[2] == 3
     row = {"pointstream_kbps": 100.0, "venue_kbps": 90.0, "svt": {"kbps": 110.0, "decoded_frames": 240},
            "pngs": [{"std": 40.0, "shape": list(grid.shape)}] * 2}
-    result = {"jpeg_gate_holds": True, "planned": 1, "rows": [row], "shown_frames": [60, 180], "frames": 240}
+    result: dict = {"jpeg_gate_holds": True, "planned": 1, "rows": [row], "shown_frames": [60, 180], "frames": 240}
     assert all(h5.validate_crops(result).values())
     result["rows"][0]["pngs"] = [{"std": 0.0, "shape": list(grid.shape)}] * 2
     assert not h5.validate_crops(result)["panels_are_pictures"]

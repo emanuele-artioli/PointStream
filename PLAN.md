@@ -421,6 +421,10 @@ the fair anchors.
      the rule; recommended against, decision open.
 5. *Visual check (CPU).* Side-by-side crops of PointStream and the
    anchors at matched rates, for the user's review.
+   **Done (2026-10-22):** 16 crops (4 items, about 200 kbps and 1 Mbps,
+   frames 60 and 180), PointStream billed as in 4a against the venue
+   codec and SVT-AV1 preset 1 at their best point at or under its rate;
+   in 4a's report archive, for the user's review.
 Scores stay LPIPS, DISTS and PSNR (a model trained on a metric may be
 judged on it, user 2026-10-20).
 

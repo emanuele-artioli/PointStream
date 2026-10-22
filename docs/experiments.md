@@ -11131,9 +11131,11 @@ and each object's representation is judged on both:
     What 4b's oracle says about a MASK-free F follows.
 - GPU time: about 2.6 GPU-hours (23 jobs, the failed, timed-out and
   cancelled ones included), within the ceiling of 3.5.
-- Report: `pointstream-data/visor/h5-2026-10-16/report-h5p4-8602763/` (the
-  specs, every stage's `h5.json`, `pairs4a.py`, `analyse4a.py` with its
-  `a4.json`, `bound16.py`, `breakeven.py` and their outputs).
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5p4-8602763.tar`
+  (sha256 `1ecb4806…c9c4a2`, read-only; one archive, as the NFS home
+  asks): the specs, every stage's `h5.json`, `pairs4a.py`,
+  `analyse4a.py` with its `a4.json`, `bound16.py`, `breakeven.py` and
+  their outputs in `out/`, and H5p 5's crops.
 
 ### 2026-10-22 — H5p 4b: oracle for F carried by the foreground stream (no MASK segment)
 - Question (PLAN H5p 4, H5q lever 3). Could F carried by the foreground
@@ -11201,3 +11203,50 @@ and each object's representation is judged on both:
   2 kbps budget makes a pass unlikely, so the session recommends not
   building it; whether to run that measurement is for the root session
   and the user.
+
+### 2026-10-22 — H5p 5: visual check, PointStream and the anchors at matched rates (CPU)
+- Question (PLAN H5p 5): what do PointStream and the anchors look like at
+  the same rate, for the user's review beside the BD-rates?
+- Method (`h5 crops`, new; one CPU job per item). The client's output
+  rebuilt on frames 60 and 180 from the published decodes: PointStream as
+  billed in 4a (F coded at 1/8 and the stream built for F̂, the composite
+  as `score` makes it), the venue-adapted DCVC-UF's published FFV1, and
+  SVT-AV1 at preset 1 re-encoded at its ladder point. Each PNG shows F's
+  box (padded, at least 384 px) and the whole frame, labelled with each
+  stream's rate.
+- Matches, fixed by rule before any image: on PointStream's billed
+  weighted-DISTS hull, the pair nearest 200 kbps and the pair nearest
+  1 Mbps (log rate); each anchor at its best weighted DISTS at or under
+  that rate (H5's "matched" convention, which favours the anchors).
+  PointStream | venue | SVT-AV1 (kbps):
+  - P01_107: 164 | 132 (1080p QP 25) | 147 (720p CRF 62); 1027 | 670 |
+    811 (1080p CRF 48).
+  - P02_02: 238 | 202 | 221 (720p CRF 62); 968 | 669 | 886 (720p CRF 48).
+  - P03_10: 179 | 93 | 138 (720p CRF 62); 1343 | 976 | 928 (1080p CRF 48).
+  - P09_106: 182 | 128 | 161 (360p CRF 62); 1230 | 1084 | 1177 (720p CRF
+    48).
+- Runs (CPU, 32 threads; every full stage 6/6 locally; each rebuilt
+  PointStream rate equals its scoring row's container): P01_107
+  `20261022T173554Z-a7980f6d`, P09_106 `…172537Z-588cfb8e` (`8602763`);
+  P02_02 `…173732Z-ef9b37e1`, P03_10 `…173739Z-517bd9ba` (`583a4fb`, the
+  same `h5 crops`). Not citable: the first P02_02 and P03_10 jobs ran past
+  the 600 s smoke on the loaded gpu2 (`…172523Z-0f87919b`,
+  `…172530Z-0aea402f`), rerun without it.
+- Outcome: 16 PNGs in 4a's report archive (`crops/`), for the user's
+  review; no rule, no verdict. First look (the session's, not a judge):
+  at about 200 kbps PointStream draws the hands sharpest, the venue codec
+  keeps a little more texture on handled objects (P09_106's towel) and
+  in the background, and SVT-AV1 at 360–720p blurs the hands; at about
+  1 Mbps the three are close at this size.
+- Item report (H5p 4–5, sent to the root session; docs/sessions.md):
+  - Stopped because: goal reached (4a and 4b decided as far as their
+    rules go, the crops of 5 ready); one decision is open for the root
+    session and the user.
+  - Decision by the rule: 4a fails (F billed at s = 8: weighted DISTS
+    +93%, 1 of 4, against the venue-adapted DCVC-UF; s = 16's upper bound
+    +24%, 1 of 4, so not run). 4b: not built for LPIPS (the oracle, exact
+    F at zero bits, reads +16%, 1 of 4); unclear for DISTS (the oracle
+    passes, −15%, 4 of 4; a post hoc bound puts any F carrier's budget at
+    about 2 kbps).
+  - Numbers, budget, branch and checks: in the three entries above;
+    about 2.6 GPU-hours of the card's 4; CPU for 4b and 5.
