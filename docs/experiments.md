@@ -11077,3 +11077,12 @@ and each object's representation is judged on both:
   GPU-hours with the smokes. Ceiling 3.5 GPU-hours, failed attempts
   included. If it runs out, the items finished in the fixed order are
   reported, and so is the shortfall.
+- Revision (2026-10-22, before any run; infrastructure only). The first job,
+  `20261022T122902Z-6db2cc7e` (P06_108), stayed pending: other users held
+  15–20 GB on every Ada GPU, so none had 44 GB free. It was cancelled before
+  it started. The 38,926 MiB was rung 2's, with FoundHand resident, and the
+  model–GPU table records 14.2 GiB for WiLoR, LPIPS and DISTS together. So
+  PyTorch is capped at 27 GiB (`set_per_process_memory_fraction`, with
+  expandable segments: the allocator frees its cache before growing, and a
+  real need fails loudly), 30,000 MiB is declared, and the peaks are
+  recorded in `k6bh2c.json`. Nothing in the rule changes.
