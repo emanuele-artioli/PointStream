@@ -628,6 +628,13 @@ objects (the tennis ball).
   frames). Its rule is written, with a ceiling of 4 GPU-hours, and it
   waits for the user's approval. If it fails, the generative route
   closes for hands.
+  **Two tracks (user, 2026-10-22):** fidelity (encode the original) and
+  experience (the same experience despite pixel differences: realism by
+  KID, same content by the object's estimator, same over time by
+  flicker). The protocol is drafted in
+  [experiments](docs/experiments.md#protocol), and its thresholds wait for
+  the user. Results closed on fidelity are untested on experience. The
+  re-judging queue is H3e, FoundHand, H3a/H3a2, and K6 `ref`.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks

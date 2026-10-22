@@ -63,6 +63,45 @@ independent samples.
 encoder and decoder paths and versions recorded. VVC only if a correct
 invocation turns out to be needed.
 
+**Two tracks: fidelity and experience** (user, 2026-10-22; draft, thresholds
+marked *proposed* until the user sets them). PointStream answers two problems,
+and each object's representation is judged on both:
+
+1. *Fidelity: encode the original.* Full-reference judges on the object's
+   region (LPIPS, DISTS, PSNR), as BD-rate against the anchor envelope, or at
+   the method's rate against the anchor hull. Every entry so far is on this
+   track, and its verdicts stand.
+2. *Experience: the same experience as the original, despite pixel
+   differences.* At the method's rate, an item passes when all three hold
+   against the anchor hull at that rate:
+   - **Realism.** KID of the object's crops (`h3b`'s Inception crops) against
+     real crops of the same class from footage that neither the method nor
+     the anchor was fitted on: for hands, held-out VISOR videos, and for
+     players, other matches. *Proposed:* the method's KID is at most the
+     anchor's upper 95% bound.
+   - **Same content.** The object's estimator, re-run on the output, agrees
+     with the source: WiLoR's 2D joints for hands, the body pose for
+     players, the detected position for the ball. *Proposed:* the method's
+     error is at most max(the anchor's error, 1.5 × the coded keypoints' own
+     error against the source).
+   - **Same over time.** Flicker (`h3b.flicker`: the method's temporal
+     residual minus the source's, luma, in the region). *Proposed:* at most
+     max(the anchor's, 1.25 × the source's own frame-to-frame change). An
+     identity drift along a track (an appearance embedding's change against
+     the source's) is reported beside it and does not decide.
+   Anchors on this track: the strongest perceptual pixel anchors measured
+   (DCVC-UF + G; H3c's perceptually tuned DCVC-UF where it exists) with the
+   SVT-AV1 envelope. Criterion as on fidelity: the share of items passing,
+   ≥ 75%. A user study (two-alternative forced choice) is optional, and
+   nothing relies on it.
+
+   Results judged only on fidelity are untested on experience, not passed.
+   Re-judging them on this track is allowed, and the entry says when the
+   judge was added. Queue, cheapest first: H3e (its generations are saved,
+   no new generation), FoundHand (K6b hands rung 2, re-run keeping the
+   crops), H3a/H3a2 if their stages kept the decodes, and K6's `ref` on
+   players.
+
 ## Entry template
 
 ```markdown
