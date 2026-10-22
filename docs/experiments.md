@@ -10251,6 +10251,43 @@ and each object's representation is judged on both:
   2's scoring peaked at 38,926). Each job's smoke (at most 600 s) runs
   24 frames of its own item, so P01_107 is not needed. Ceiling 0.75
   GPU-hours.
+- Jobs (RTX 6000 Ada, gpu6, shared; code `e0d4df5` from `ready.json`):
+  P06_108 `20261022T105912Z-875474c1`, P22_107 `20261022T105916Z-287e2bd3`,
+  P25_09 `20261022T105921Z-160d3f85`. Every smoke passed the fleet
+  validator, and every full stage passes `k6bh validate` locally, with
+  `warp` reproducing K1f. Report
+  `visor/k6bh-2026-10-22/report/k6bh-bank-report.json` (`c4c0b472…5b70`),
+  with the validations in `k6bh-bank-validation.tar` (`377b2202…7c39`).
+  GPU time: 2,080 s of stages, about 0.6 GPU-hours with the smokes,
+  within the 0.75.
+- Outcome. On R, at each item's keypoint rate, the references free:
+
+  | item | hull LPIPS / DISTS | `bank@1` | `bank@4` | `bank@16` | `warp` |
+  |---|---:|---:|---:|---:|---:|
+  | P06_108 | 0.172 / 0.206 | 0.416 / 0.322 | 0.344 / 0.276 | 0.227 / 0.209 | 0.091 / 0.123 |
+  | P22_107 (G) | 0.236 / 0.204 | **0.198 / 0.128** | **0.173 / 0.116** | **0.100 / 0.078** | 0.059 / 0.049 |
+  | P25_09 | 0.260 / 0.240 | 0.429 / 0.296 | 0.293 / **0.221** | **0.190 / 0.159** | 0.097 / 0.102 |
+
+  Scores (mean over {LPIPS, DISTS} of the share of items won): `bank@1`
+  33%, `bank@4` 50%, `bank@16` 67%. Clean of G's footage (P06_108,
+  P25_09): 0%, 25%, 50%.
+- Decision (by the rule): **fail.** No K reaches 75%. `bank@16` misses by
+  one item-metric: P06_108's DISTS, 0.209 against 0.206.
+- Reading. The rule expected a flat curve if the reference route were
+  closed. Instead quality improves steeply with K: from K = 1 to 16, LPIPS
+  on R falls by 45–56% on every item, and 16 references reach the hull on
+  2 of 3 items. The competing explanation (the coding error and the warp's
+  blending, not the reference's pose, keep the warp above the hull) is
+  refuted. Nearer references close most of the gap to `warp`, so the
+  pose distance to the reference is what costs. The hypothesis held for
+  `bank@1`, and fell one item-metric short for `bank@16`.
+  So the route does not close as the rule's fail branch states. What is
+  open is a bank larger than 16, which only makes sense if it is
+  affordable: sent once per video (VISOR's videos run for minutes) and
+  chosen outside the window. That is the buildable test, with K up to 64
+  and its billed rate. It needs keypoints for frames outside the windows
+  (H2's poses cover the windows only), so it is a task of its own, not
+  run here. Rung 3 (a generator fitted per clip) waits behind it.
 
 ### 2026-10-22 — K6b (hands) 3: overfit oracle (rule, not run)
 - Question. Can FoundHand, fitted on the window's own frames, draw that

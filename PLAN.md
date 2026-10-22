@@ -635,6 +635,14 @@ objects (the tennis ball).
   [experiments](docs/experiments.md#protocol), with the thresholds set
   (user, 2026-10-22). Results closed on fidelity are untested on experience. The
   re-judging queue is H3e, FoundHand, H3a/H3a2, and K6 `ref`.
+  **Rung 2b, a bank of free references (2026-10-22): fails by one
+  item-metric.** Each frame is warped from the in-window reference nearest
+  in coded pose. With 16 references the score is 67% (P22_107 and P25_09
+  won on both metrics; P06_108 lost DISTS 0.209 against 0.206); K = 1 and
+  4 score 33% and 50%. Quality rises steeply with K. Next for hands, on
+  fidelity: the buildable bank (K up to 64, chosen outside the window,
+  coded and billed once per video). It needs keypoints outside the
+  windows, so it is a task of its own. Rung 3 waits behind it.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
