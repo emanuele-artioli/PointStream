@@ -300,6 +300,17 @@ def decode_bank_frames(video: str, indices: list[int], out: str, threads: int) -
             "duration_s": duration, "frames_total": frames_total, "fps": rate, "seconds": round(time.time() - began, 2)}
 
 
+def probe_video(video: str) -> dict[str, Any]:
+    """The video's duration, frame count and rate (as ``decode_bank_frames`` records them)."""
+    import av
+
+    with av.open(video) as container:
+        stream = container.streams.video[0]
+        duration = float(container.duration) / 1e6 if container.duration else float(stream.duration * stream.time_base)
+        return {"duration_s": duration, "frames_total": int(stream.frames),
+                "fps": float(stream.average_rate) if stream.average_rate else None}
+
+
 # ----------------------------------------------------------------- run (GPU)
 
 
@@ -661,7 +672,7 @@ def published_units(publish: Path, part: str) -> dict[str, tuple[dict[str, Any],
 
 def command_run(args: argparse.Namespace) -> int:
     from experiments.visor.b2 import select_items
-    from experiments.visor.h2 import restore_units
+    from experiments.visor.h2 import restore_units, save_unit
     from experiments.visor.h3c import decode_windows
     from src.segmentation import visor
 
@@ -678,6 +689,17 @@ def command_run(args: argparse.Namespace) -> int:
     restored_from = {str(t): {"sha256": file_sha256(Path(t)), "items": restore_candidates(Path(t), publish, {it["id"] for it in items}, stride)}
                      for t in args.restore}
     restore_units(publish, "k6bh2c-candidates")  # a previous attempt's checkpoint
+    videos = {Path(v).stem: v for v in args.video}
+    pool = ProcessPoolExecutor(max_workers=2, mp_context=multiprocessing.get_context("spawn"))
+    by_id = {it["id"]: it for it in items}
+    for item_id, (meta, arrays) in published_units(publish, "k6bh2c-candidates").items():
+        if item_id in by_id and "video_record" not in meta:  # a unit from before 297927f: window, guard and video added
+            it = by_id[item_id]
+            meta = {k: v for k, v in meta.items() if k not in ("npz_sha256", "npz_hash_ok")}
+            meta.update({"window": [int(it["first_video_index"]), int(it["first_video_index"]) + int(it["frames"])],
+                         "guard_frames": int(round(GUARD_SECONDS * float(it["fps"]))),
+                         "video_record": {**pool.submit(probe_video, videos[it["video"]]).result(), "probed": True}})
+            save_unit(publish, "k6bh2c-candidates", item_id, arrays, meta)
     scored = restore_units(publish, "k6bh2c")
     have = {k for k, (m, _) in published_units(publish, "k6bh2c-candidates").items() if int(m["stride"]) == stride}
     to_extract = [it for it in items if it["id"] not in have]
@@ -685,9 +707,7 @@ def command_run(args: argparse.Namespace) -> int:
     mapping = json.loads((Path(args.archive) / "frame_mapping.json").read_text())
     cands = {it["id"]: candidate_frames(it, visor.load_annotations(Path(args.archive) / it["dense_member"]), mapping, stride)
              for it in to_extract}
-    videos = {Path(v).stem: v for v in args.video}
     allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
-    pool = ProcessPoolExecutor(max_workers=2, mp_context=multiprocessing.get_context("spawn"))
     (scratch / "bank").mkdir(parents=True, exist_ok=True)
     chunks: dict[str, list[tuple[Any, int]]] = {}
     for it in to_extract:  # PyAV in fresh processes, started before torch; chunks decode while WiLoR fits earlier ones
