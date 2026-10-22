@@ -54,8 +54,15 @@ sessions update their own items and experiments.md entries
   at best). The LPIPS cost is structural (F coded in both streams) and
   follows F's share of the frame, median 24% on egocentric video; it
   wins below about 10% (P09_106, 2%: −15%). Billing the mask F costs
-  most of the margin (H5m). **Next: H5p 4–5** (F carried by the
-  foreground stream; the visual check).
+  most of the margin (H5m). **H5p 4–5 done (2026-10-22): billing F
+  removes every win.** With F coded (lzma, 36–116 kbps), weighted DISTS
+  reads +93% (1 of 4) against the venue-adapted DCVC-UF, and every
+  metric loses against every anchor. F̂ itself costs no quality; the
+  mask's rate does, at rates where the venue codec needs 13–26 kbps. A
+  carrier inside the foreground stream would have to cost about 2 kbps,
+  and an exact F at zero bits still loses LPIPS (+16%). The crops for the
+  visual check are ready (user). The egocentric claim is the user's to
+  reframe; small-F domains (tennis) are where F's rate matters least.
 - **Background (G):** a scene model adapted to the venue, sent beforehand
   and unbilled (payback hours reported), plus a per-video enhancer route
   (G6).
@@ -86,7 +93,7 @@ stops; the root session fills in the outcome and the next step.
 
 | item | card | branch | suggested model | status |
 |---|---|---|---|---|
-| H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` | Opus | queued 2026-10-22 |
+| H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` @ `3b11a36` | Opus | reported 2026-10-22: 4a fail (F billed +93% wDISTS), 4b not built (LPIPS), crops ready; 2.6 GPU-hours of 4 |
 | K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` @ `505f5a7` | Opus | reported 2026-10-22: fail (12.5%; free bank 25%); 2.6 GPU-hours of 3.5 |
 | K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` | Opus | queued 2026-10-22 |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
