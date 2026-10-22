@@ -48,6 +48,7 @@ MIN_SIDE = 64  # px: SVT-AV1's smallest frame
 POLY_EPS = 1.5  # px, OpenCV's approxPolyDP
 COORD_BITS = 11  # a box corner or size in a 1920 x 1080 frame
 WILOR_CHUNK = 32
+GPU_CAP_MIB = 27 * 1024  # PyTorch's cap: the allocator frees its cache before growing past it (declared 30,000 MiB)
 WARP_TOLERANCE = 0.002
 CRITERION = 0.75
 BANK2C_DECISION: dict[str, Any] = {
@@ -579,6 +580,7 @@ def command_run(args: argparse.Namespace) -> int:
         bank_jobs[it["id"]] = pool.submit(decode_bank_frames, videos[it["video"]], [i for _, i in cands[it["id"]]], str(target),
                                           max(1, allowance // 2))
     windows = decode_windows(args, todo, int(args.frames), scratch)
+    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")  # one allocator for crops of every size
     import torch
 
     from experiments.audit.env_smoke import device_record, model_on_cuda
@@ -590,6 +592,8 @@ def command_run(args: argparse.Namespace) -> int:
     if not torch.cuda.is_available():
         raise SystemExit("k6bh2c run needs a GPU")
     device = "cuda"
+    total_mib = torch.cuda.get_device_properties(0).total_memory / 2 ** 20
+    torch.cuda.set_per_process_memory_fraction(min(1.0, GPU_CAP_MIB / total_mib))
     nets: dict[str, Any] = {"lpips": load_lpips(Path(args.lpips_backbone), device), "dists": load_dists(Path(args.dists_backbone), device)}
     args.mano_dir = mano_dir(args, scratch)
     nets["wilor"] = Regressor("wilor", args)
@@ -611,6 +615,8 @@ def command_run(args: argparse.Namespace) -> int:
                    "wilor_checkpoint": file_sha256(Path(args.wilor_checkpoint)), "videos": {Path(v).stem: file_sha256(Path(v)) for v in args.video}},
         "wilor": nets["wilor"].load, "lpips": lpips_record(Path(args.lpips_backbone)),
         "dists": {"torchmetrics": torchmetrics.__version__, "backbone_sha256": file_sha256(Path(args.dists_backbone))},
+        "gpu_cap_mib": GPU_CAP_MIB, "peak_allocated_mib": round(torch.cuda.max_memory_allocated() / 2 ** 20, 1),
+        "peak_reserved_mib": round(torch.cuda.max_memory_reserved() / 2 ** 20, 1),
         "svt": {"encoder": svtav1.tool(args.encoder), "decoder": svtav1.tool(args.decoder), "crf": CRF, "preset": PRESET},
         "settings": {"frames": int(args.frames), "stride": int(args.stride), "items": [it["id"] for it in items], "ks": list(KS),
                      "guard_seconds": GUARD_SECONDS, "min_inside": MIN_INSIDE, "dilate": DILATE, "poly_eps": POLY_EPS,

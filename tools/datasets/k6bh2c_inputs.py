@@ -55,7 +55,7 @@ def main() -> int:
         "smoke": {"seconds": 600, "representative_basis": basis}, "full": {"seconds": args.full_seconds},
         "validator": ["{python}", "-m", "experiments.visor.k6bh2c", "validate"], "validator_seconds": 300, "required_commands": [],
         "budget_seconds": args.full_seconds + 900, "deadline": args.deadline, "stall_seconds": args.full_seconds - 300,
-        "cpu_threads": 16, "device": "gpu", "hosts": base["hosts"], "gpu_models": ["RTX 6000 Ada"], "gpu_memory_mib": 44000,
+        "cpu_threads": 16, "device": "gpu", "hosts": base["hosts"], "gpu_models": ["RTX 6000 Ada"], "gpu_memory_mib": 30000,
         "local_storage_gib": 60, "gpu_sharing": {"mode": "shared", "margin_mib": 1024, "basis": determinism},
     }
     out = Path(args.dest) / f"k6bh2c-{args.name}.json"
