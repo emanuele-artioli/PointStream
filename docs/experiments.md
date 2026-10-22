@@ -11118,12 +11118,12 @@ and each object's representation is judged on both:
   judging in parts of ≤ 4 windows, declared from the smoke's peak. Ceiling
   4 GPU-hours, smokes included (the card's limit: more needs the user).
 - Attempts (infrastructure, no score). `20261022T124048Z-392f179f`: fleet
-  staging refused the first pack (the fork's absolute links; repacked).
-  `20261022T124842Z-6ce5a155` (`b9dbbe5`): the smoke stopped on the VAE's
+  staging refused the first pack (`82d57c8`; the fork's absolute links; repacked).
+  `20261022T124842Z-6ce5a155` (`3129a42`): the smoke stopped on the VAE's
   16 missing keys, since sd-vae-ft-mse stores diffusers' deprecated
   attention names, which only `from_pretrained` renames (a plain
   `strict=False` load, as upstream does for its UNets, would have left them
-  random). `20261022T125355Z-b34dc124` (`5f8fd07`): stopped on the
+  random). `20261022T125355Z-b34dc124` (`472bd2c`): stopped on the
   reference UNet's output head (`conv_norm_out`, `conv_out`), absent from
   both profiles' `reference_unet.pth`; AnimateAnyone reads the
   ReferenceNet's attention features, never its output, so the 4 keys are
