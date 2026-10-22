@@ -31,7 +31,7 @@ from typing import Any
 
 import numpy as np
 
-from experiments.visor import k1c
+from experiments.visor import k1c, k1f
 from experiments.visor.b1 import file_sha256, progress, stage_dir, write_json
 
 FOUNDHAND_REV = "ae0e9808ef1300820d499e707ec4d655da158e6d"
@@ -372,6 +372,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     size = np.ptp(rows["coded"][:, :, 1], axis=1) + np.ptp(rows["coded"][:, :, 0], axis=1)
     variants = tuple(args.variants.split(","))
     rendered = render_item(fh, rows, truth, clip, frames, item_seed(item["id"]), variants)
+    k1f.release()  # PyTorch's cache between rendering and scoring (job 20261022T084900Z-7e08ab8f overran 16,000 MiB at 24,886)
     rows_at: dict[int, list[int]] = {}
     for i, t in enumerate(rows["t"]):
         if t < frames:
@@ -423,6 +424,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     luma = np.array([0.299, 0.587, 0.114])
     for v in variants:
         s = score(outs[v], upscale=False)
+        k1f.release()
         key = v.replace("@", "_")
         arrays[f"{key}_lpips_r"], arrays[f"{key}_dists_r"], arrays[f"{key}_sse_r"] = s["lpips"], s["dists"], s["sse"]
         arrays[f"{key}_covered_r"] = covered[v]

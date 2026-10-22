@@ -51,7 +51,7 @@ def main() -> int:
         "smoke": {"seconds": 600, "representative_basis": basis}, "full": {"seconds": args.full_seconds},
         "validator": ["{python}", "-m", "experiments.visor.k6bh", "validate"], "validator_seconds": 300, "required_commands": [],
         "budget_seconds": args.full_seconds + 900, "deadline": args.deadline, "stall_seconds": 1500, "cpu_threads": 16, "device": "gpu",
-        "hosts": k1f["hosts"], "gpu_models": ["RTX 6000 Ada"], "gpu_memory_mib": 16000, "local_storage_gib": 60,
+        "hosts": k1f["hosts"], "gpu_models": ["RTX 6000 Ada"], "gpu_memory_mib": 32000, "local_storage_gib": 60,
         "gpu_sharing": {"mode": "shared", "margin_mib": 4096,
                         "basis": "FoundHand's samples depend on the seeds, steps and inputs, and LPIPS and DISTS on R are deterministic; "
                                  "generation seconds are not evidence (the step count comes from the smoke)"},
