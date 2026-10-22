@@ -11250,3 +11250,63 @@ and each object's representation is judged on both:
     about 2 kbps).
   - Numbers, budget, branch and checks: in the three entries above;
     about 2.6 GPU-hours of the card's 4; CPU for 4b and 5.
+
+### 2026-10-22 — H5p 4c: F carried by the foreground stream, a key outside K (measured carrier)
+- Question (user, 2026-10-22: "measure the MASK-free F carrier ..., with
+  its rule written first"; 4b's next oracle). 4b's zero-bit oracle keeps
+  the weighted DISTS win and a post hoc bound gave any carrier about 2
+  kbps. What does a real carrier inside the foreground stream cost, and
+  does PointStream with it keep the win?
+- Carrier (`--carrier key`, new), chosen so the compositor stays as built:
+  - Encoder: the foreground input keeps the source on K (F dilated by the
+    ring and the guard, `keep_radius`), exactly as today, and puts one
+    flat key colour outside K instead of push-pull padding. The key is
+    chosen per window from six saturated colours, the one farthest (in
+    YCbCr, 1st percentile of distances) from the source pixels on K.
+  - Client: K̃ is where the decoded foreground (at its coded size) lies
+    farther than τ from the key, upsampled to 1080p; F̃ = K̃ eroded by
+    `keep_radius`. The alpha ring and the enhancer slots then run on F̃
+    as on F. Erosion after dilation fills only gaps narrower than the
+    keep radius; those pixels are inside K, so they show coded source,
+    not the fill.
+  - G_HO sits in both slots, so the client needs no hand/object classes.
+  - The encoder picks τ per point from a fixed set (the best IoU of F̃
+    with F on every 8th frame) and sends the key and τ: a 5-byte CARRIER
+    segment, billed.
+  - Exact F stays the encoder's input (no F̂); the backgrounds stay as
+    published (filled for F).
+- Configuration and pairs: 4a's (the per-point configuration; the 54
+  pairs of its weighted-DISTS hull, 30 foreground points), so each row
+  compares like with like against F granted and against 4a.
+- Two stages, the cheaper first.
+  - Stage 1, the foreground jobs: the key-padded streams, their rate
+    against the push-pull streams at the same point, and F̃'s IoU.
+  - Gate (an optimistic bound, CPU): the F-granted rows with each pair's
+    foreground bytes replaced by the key stream's, plus the CARRIER
+    segment, quality unchanged. If this fails the rule below, stage 2 is
+    not run and the carrier fails.
+  - Stage 2, scoring: the composites with F̃ (no MASK), the CARRIER
+    segment in the container.
+- Decision rule, fixed now: weighted DISTS (fill) against `dcvc-venue`,
+  neither venue model billed, rule (a)'s form (mean −10% or better, 3 of
+  4 items below zero).
+  - Passes: the key carrier is PointStream's F; the split keeps its
+    weighted DISTS win at equal adaptation with every byte counted.
+  - Fails (at the gate or in stage 2): no F coder tried keeps the win;
+    H5p 4 closes as a fail.
+  - Reported beside it, on the same pairs: weighted LPIPS, frame LPIPS
+    and DISTS, weighted PSNR, against `dcvc-venue` and the fair pooled
+    envelope; the carrier's rate per point and F̃'s IoU.
+- Hypothesis: the gate fails. The flat key makes a hard edge along K's
+  border every frame, which a smooth push-pull padding avoids; at the ¼
+  points (4–30 kbps) that adds more than the 2 kbps the win allows.
+- Competing explanation: a flat key is as cheap as push-pull (both are
+  predicted almost for free; the edge along K's border is short and moves
+  with the hands, which the codec already pays for), so the rate barely
+  moves, F̃'s IoU is high, and the rule passes near F granted's −15%.
+- Budget: stage 1, 8 foreground jobs (as 4a: about 1.3 GPU-hours);
+  stage 2, 8 scoring jobs (about 0.9 GPU-hours), only if the gate passes.
+  Ceiling 3 GPU-hours. With 4a's 2.6 this takes the item past the card's 4
+  GPU-hours; the user asked for this run (2026-10-22), knowing the
+  estimate (2–3 GPU-hours). Every stage under 45 minutes; gpu2 excluded
+  (smokes past 600 s there all day).
