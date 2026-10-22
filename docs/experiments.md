@@ -11331,9 +11331,9 @@ and each object's representation is judged on both:
   (0.955–0.988) at no MASK cost.
 - The key's cost, key stream minus the push-pull stream at the same point
   (granted F):
-  - P02_02 (F 50%): +2.5 to +865 kbps, +33% to +96%.
-  - P03_10 (F 19%): +2.1 to +625 kbps, +74% to +129%.
-  - P01_107 (F 14%): +1.2 to +379 kbps, +30% to +58%.
+  - P02_02 (F 50%): +2.5 to +865 kbps, +36% to +93%.
+  - P03_10 (F 19%): +2.1 to +625 kbps, +60% to +129%.
+  - P01_107 (F 14%): +1.2 to +379 kbps, +26% to +58%.
   - P09_106 (F 2%): −175 to +9.7 kbps, −21% to +12% (cheaper than
     push-pull at three of seven points).
   The flat key's step along K's border costs bits in proportion to K's
@@ -11344,8 +11344,8 @@ and each object's representation is judged on both:
   (1 of 4). Weighted LPIPS +39% (1/4), frame DISTS +1% (1/4), weighted
   PSNR +35% (1/4).
   - Hypothesis right on the verdict. The key edge costs far more than the
-    2 kbps budget wherever F is large: 2–25 kbps at the ¼ points, and 30%
-    or more at full size.
+    2 kbps budget wherever F is large: 1–25 kbps at the ¼ points, and
+    26% or more at every point.
   - The competing explanation holds only where F is small: on P09_106
     the key costs about what push-pull does, and the bound reads −30%
     (F granted: −22%).

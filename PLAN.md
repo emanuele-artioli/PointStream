@@ -419,7 +419,7 @@ the fair anchors.
      2 kbps (5 bytes per frame), 7–20× under every F coder measured.
    - 4c (the user asked for the measured carrier, 2026-10-22): a key
      colour outside K, F̃ recovered at the client (IoU 0.95–0.99). The
-     key's edge costs +30% to +130% of the foreground stream where F is
+     key's edge costs +26% to +129% of the foreground stream where F is
      large; its optimistic bound reads weighted DISTS +1% (1 of 4), so
      the gate fails and it is not scored. Only where F is 2% of the
      frame (P09_106) is the key free (−30%).
