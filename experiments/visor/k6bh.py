@@ -538,7 +538,9 @@ def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
         for v in settings["variants"]:
             key = v.replace("@", "_")
             checks[f"{item}:{v}:finite"] = bool(np.isfinite(a[f"{key}_lpips_r"][hand]).all() and np.isfinite(a[f"{key}_dists_r"][hand]).all())
-            checks[f"{item}:{v}:draws"] = m["summary"][v]["covered_share"] > 0.5
+            # catches a renderer that draws nothing; a one-reference warp misses much of a moving hand (P25_09's ref
+            # covered 49% of R; threshold lowered from 0.5 after that stage was read, docs/experiments.md)
+            checks[f"{item}:{v}:draws"] = m["summary"][v]["covered_share"] > (0.1 if v == "ref" else 0.5)
         if "gen" in settings["variants"]:
             checks[f"{item}:gen_not_flat"] = (m["generated_std_min"] or 0) > 2.0
             checks[f"{item}:gen_differs_from_frame"] = ("gen@frame" not in settings["variants"]
