@@ -39,50 +39,16 @@ from experiments.tennis import k4, k6
 from experiments.tennis.k4b_features import convert
 from experiments.tennis.k4b_pose import Crops, crop_box, fit, fit_whole, frame_dets, magnify
 from experiments.visor.b1 import file_sha256, progress, stage_dir, write_json
+from experiments.visor.j import MISSED, pose_error, residual_energies
 from src.segmentation.masks import ClipMasks, decompress
 
 ANCHORS: tuple[tuple[str, int, int], ...] = (("svt", 63, 8), ("svt", 63, 4), ("svt", 55, 4), ("svt", 63, 2))
 METHOD = f"ref@{k6.code_name(k6.CHOSEN)}"
-LUMA = np.array([0.299, 0.587, 0.114], np.float32)
-MISSED = 1.0  # content error of a player the output's estimator does not fit (one box)
 RATE_TOLERANCE = 0.001  # relative: the SVT-AV1 points must reproduce K6's recorded kbps on R
 
 
 def anchor_names() -> list[str]:
     return [k6.anchor_name(a) for a in ANCHORS]
-
-
-def pose_error(pred: np.ndarray | None, ref: np.ndarray, height: float) -> float | None:
-    """Mean distance over ``ref``'s confident keypoints, over ``height``; `MISSED` when ``pred`` is None."""
-    visible = ref[:, 2] >= k4.KP_CONF
-    if not visible.any():
-        return None
-    if pred is None:
-        return MISSED
-    return float(np.linalg.norm(pred[visible, :2] - ref[visible, :2], axis=1).mean() / max(height, 1.0))
-
-
-def residual_energies(out_t: np.ndarray, out_p: np.ndarray, truth_t: np.ndarray, truth_p: np.ndarray, region: np.ndarray,
-                      region_p: np.ndarray) -> tuple[float, float, float] | None:
-    """(h3b.flicker, the output's residual energy, the source's), on ``region`` at t, flow from the source (as H3e)."""
-    import cv2
-
-    from experiments.visor.h3 import dis_flow, flow_box, warp
-    from experiments.visor.h3b import flicker
-
-    if not region.any() or not region_p.any():
-        return None
-    fb = flow_box(region, region_p)
-    crop = (slice(fb[1], fb[3]), slice(fb[0], fb[2]))
-    tt, tp = truth_t[crop], truth_p[crop]
-    flow = dis_flow(cv2.cvtColor(tt, cv2.COLOR_RGB2GRAY), cv2.cvtColor(tp, cv2.COLOR_RGB2GRAY))
-    ow = warp(np.ascontiguousarray(out_p[crop]), flow)
-    tw = warp(np.ascontiguousarray(tp), flow)
-    m = region[crop]
-    f = flicker(out_t[crop], ow, tt, tw, m)
-    e_out = float(np.abs((out_t[crop].astype(np.float32) - ow.astype(np.float32)) @ LUMA)[m].mean())
-    e_src = float(np.abs((tt.astype(np.float32) - tw.astype(np.float32)) @ LUMA)[m].mean())
-    return f, e_out, e_src
 
 
 class Judge:
@@ -391,6 +357,8 @@ def command_validate(args: argparse.Namespace) -> int:
         directory = directory / "publish"
     result = validate(Path(directory), summary)
     write_json(stage / "validation.json", result)
+    if target := os.environ.get("PS_VALIDATION_PATH"):  # where the fleet reads the smoke gate
+        write_json(Path(target), result)
     print(json.dumps(result, indent=1))
     return 0 if result["passed"] else 1
 

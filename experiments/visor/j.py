@@ -152,6 +152,49 @@ def check_rates(rows: dict[str, dict[str, bool | None]]) -> dict[str, dict[str, 
                 "none": sum(1 for r in rows.values() if r.get(c) is None)} for c in names}
 
 
+# ----------------------------------------------------------------- judges shared by hands and players
+
+LUMA = (0.299, 0.587, 0.114)
+MISSED = 1.0  # content error of an object the output's estimator does not fit (one box)
+KP_CONF = 0.5  # K4's keypoint confidence (players); hands' WiLoR joints carry 1
+
+
+def pose_error(pred: Any | None, ref: Any, height: float) -> float | None:
+    """Mean distance over ``ref``'s confident keypoints, over ``height``; `MISSED` when ``pred`` is None."""
+    import numpy as np
+
+    visible = ref[:, 2] >= KP_CONF
+    if not visible.any():
+        return None
+    if pred is None:
+        return MISSED
+    return float(np.linalg.norm(pred[visible, :2] - ref[visible, :2], axis=1).mean() / max(height, 1.0))
+
+
+def residual_energies(out_t: Any, out_p: Any, truth_t: Any, truth_p: Any, region: Any,
+                      region_p: Any) -> tuple[float, float, float] | None:
+    """(h3b.flicker, the output's residual energy, the source's), on ``region`` at t, flow from the source (as H3e)."""
+    import cv2
+    import numpy as np
+
+    from experiments.visor.h3 import dis_flow, flow_box, warp
+    from experiments.visor.h3b import flicker
+
+    if not region.any() or not region_p.any():
+        return None
+    fb = flow_box(region, region_p)
+    crop = (slice(fb[1], fb[3]), slice(fb[0], fb[2]))
+    tt, tp = truth_t[crop], truth_p[crop]
+    flow = dis_flow(cv2.cvtColor(tt, cv2.COLOR_RGB2GRAY), cv2.cvtColor(tp, cv2.COLOR_RGB2GRAY))
+    ow = warp(np.ascontiguousarray(out_p[crop]), flow)
+    tw = warp(np.ascontiguousarray(tp), flow)
+    m = region[crop]
+    f = flicker(out_t[crop], ow, tt, tw, m)
+    e_out = float(np.abs((out_t[crop].astype(np.float32) - ow.astype(np.float32)) @ np.asarray(LUMA, np.float32))[m].mean())
+    e_src = float(np.abs((tt.astype(np.float32) - tw.astype(np.float32)) @ np.asarray(LUMA, np.float32))[m].mean())
+    return f, e_out, e_src
+
+
 # ----------------------------------------------------------------- H3e V1 (from its saved report)
 
 
