@@ -10030,6 +10030,44 @@ invocation turns out to be needed.
   every finished item. Ceiling 3 GPU-hours for the rung, smoke included.
   If the budget runs out, the items finished in the fixed order are
   reported, and so is the shortfall.
+- Revision (2026-10-22, after reading FoundHand's source, before any run).
+  - Source and weights. FoundHand at `ae0e980` (archive
+    `visor/k6bh-2026-10-22/inputs/foundhand-src-ae0e980.tar.gz`,
+    `fe8ff8a0…7f35`). The released checkpoint
+    `DINO_EMA_11M_b50_lr1e-5_epoch6_step320k.ckpt` (11.6 GB, `66434caf…62d7`)
+    and SD's `vae-ft-mse-840000-ema-pruned.ckpt` (`c6a580b1…3dab`, as Hugging
+    Face lists it) are in `Models/FoundHand` with a `MANIFEST.json`,
+    hard-linked into the run's `inputs/`. Inference uses the DiT-XL/2's
+    `ema_state_dict` (as the demos do) and needs only torch, numpy and
+    timm. Lightning, SAM and mediapipe serve training and the demos' own
+    keypoints and masks, which K1f supplies. So the main environment
+    (`pointstream-20261009T214002Z`) runs it, and no environment is added.
+    The DiT runs under bf16 autocast, and the VAE in float32.
+  - Steps. The released demos sample with 250 respaced DDPM steps and
+    guidance 2.5. At that count the 8 items cannot fit the 3 GPU-hours. A
+    pilot on P01_107 (development, not scored) runs all four variants at
+    50 steps and records seconds per step. The step count for the 8 items
+    is the largest of {250, 100, 50} whose projected cost (both FoundHand
+    variants) fits the remaining ceiling with a 25% margin. If 50 does not
+    fit, `gen@frame` runs on the first 2 items only. If `gen` alone does not
+    fit at 50, the rung goes back to the user. The count is recorded here
+    before the 8 items run.
+  - Keypoints. Read from K1f's published rows (`row_t`, `row_right`,
+    `uncoded_kp2d`, `coded_kp2d` of each item's K1c unit; P01_107 from the
+    reproduction job `20261022T013208Z-9e048ecf`). They are exactly the
+    keypoints K1f scored, with no second WiLoR run. K1f did not publish
+    joint depths, so overlapping hands are drawn smaller first (smaller
+    taken as farther). The `warp` check against K1f's recorded value
+    tests that too.
+  - Overlap check. FoundHand-10M's file lists are only on Globus, which
+    needs a login, so the lists cannot tell. Every item counts as seen, and
+    the claim is scoped to a renderer that may have seen this footage
+    (VISOR's annotated frames, not necessarily these windows).
+  - Dropped before any run: "WiLoR on the rendered crop" (reported beside).
+    It would add WiLoR to the job for a number that decides nothing.
+    Flicker and the visual check stay.
+  - Handedness. The README and the demos put the true right hand in slots
+    0–20, un-mirroring MediaPipe, so no ordering check is needed.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned

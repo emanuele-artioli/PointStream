@@ -350,6 +350,23 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   a small contribution of its own: H compares them and the result is a paper
   table ([PLAN](../PLAN.md#h-foreground-user-2026-10-08)).
 
+**FoundHand** (K6b's hand renderer, zero-shot rung, 2026-10-22)
+- [arthurchen0518/FoundHand](https://github.com/arthurchen0518/FoundHand) at
+  `ae0e9808ef1300820d499e707ec4d655da158e6d` (CVPR 2025; code GPL-3.0, data
+  CC BY-NC 4.0): a DiT-XL/2 on SD-VAE latents (256², 32² latent) conditioned on
+  a reference crop with its 2D keypoint heatmaps and mask, and on target
+  keypoints. Its training set lists EPIC VISOR. The audit: [K6b (hands) 1](experiments.md#2026-10-22--k6b-hands-1-audit-of-hand-renderers).
+- `Models/FoundHand/DINO_EMA_11M_b50_lr1e-5_epoch6_step320k.ckpt` (Google Drive,
+  linked from the README; 11,618,464,835 B, `66434caf…62d7`; model, EMA and
+  training state) and `vae-ft-mse-840000-ema-pruned.ckpt` (Hugging Face
+  `stabilityai/sd-vae-ft-mse-original`, `c6a580b1…3dab`), with `MANIFEST.json`
+  from `tools/models/place.py`. The source is staged as a `git archive` of the
+  pinned commit (`visor/k6bh-2026-10-22/inputs/foundhand-src-ae0e980.tar.gz`)
+  and imported under private module names by `experiments/visor/k6bh.py`.
+- Environment: the main one. Inference needs torch, numpy and timm (its pins,
+  torch 2.3 and timm 1.0.7, are older; the code is plain DiT). Lightning, SAM
+  and mediapipe are for training and the demos only.
+
 **JointControlVideo on Wan2.1-I2V-14B-480P** (H3e's hand generator, 2026-10-12)
 - [ZhangCYG/JointControlVideo](https://github.com/ZhangCYG/JointControlVideo) at
   `f96b2c377f26a165bf63cd9fcb495bb9fd3d3054` (ECCV 2026, Apache-2.0): a LoRA,
