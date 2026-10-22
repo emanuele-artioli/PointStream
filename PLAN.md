@@ -578,6 +578,73 @@ objects (the tennis ball).
   windows, masks and joints are recorded). If even this bound loses,
   hands are closed for every renderer. If it passes, hands get K6b's
   ladder. It does not wait for K6b.
+  **Outcome (2026-10-21, `k1c-report.json` `085bb948…`): to the user.**
+  On R at 1.93 kbps the bound beats the SVT-AV1 + DCVC-UF + G hull on 2 of
+  4 items by LPIPS (P01_107 saves 96%, P03_10 78%), and on 4 of 4 by DISTS.
+  The two LPIPS losses (P02_02, P09_106) are where H2 has no fit for 40%
+  and 27% of R. Those pixels are charged as fill, so the shortfall is the
+  estimator's coverage plus the coding error, not the outline. Options:
+  close hands by LPIPS's letter, or give fitted hands K6b's ladder after
+  a coverage fix (H2b's hybrid, or a pixel coder for unfitted hands, with
+  its own bound first).
+  **K1d (user, 2026-10-21: "let's try it"):** WiLoR on every masked hand
+  without an H2 fit (`k1d-2026-10-21/report/k1c-report.json` `6427ea8f…`).
+  Coverage is full, but the result is the same: 2 of 4 by LPIPS (P01_107
+  and P03_10 save 96%; P09_106 misses by 0.003, P02_02 by 0.07) and 4 of 4
+  by DISTS, so it goes to the user. The mask-box fits jitter (coded shifts
+  of 24–64 px) and double the rate on the two hard items.
+  **Decision (user, 2026-10-21):** the decision criterion is the mean
+  over LPIPS and DISTS of the share of items won, ≥ 75%. It applies to
+  later runs and, disclosed as post-hoc, to K1c and K1d, which pass under
+  it (75%). Hands go to K6b's ladder. K1e (hand-only boxes) is running.
+  Then K1f: the scope (an encoder-measurable predictor, fixed on the
+  pilot) tested on B2's other 30 items, with the pixel envelope coded
+  there (up to 8 GPU-hours, approved).
+  **K1f outcome (2026-10-22, `k1f-report.json` `2f6e4291…`):** on 22
+  held-out items, the hand bound (appearance granted, 21 coded keypoints
+  at about 2 kbps, every masked hand fitted) is below the SVT-AV1 + DCVC-UF
+  + G hull on **22 of 22 by LPIPS and by DISTS**. Median LPIPS on R is
+  0.084 against the hull's 0.175, and on 14 items it beats every pixel
+  point up to about 45 kbps. No scope is needed. K1f's envelope path
+  reproduces H3d's recorded points on P01_107. **Over all 30 held-out
+  items (2026-10-22, `k1f-report-30.json` `d31b1fc2…`): 30 of 30 by
+  LPIPS and by DISTS** (median 0.086 against 0.174). Next: K6b's ladder for
+  hands (a renderer that has to earn this appearance).
+  **K6b for hands, audit (2026-10-22, experiments.md "K6b (hands) 1"):**
+  the renderer is local: it draws a hand crop from a reference crop and
+  the coded keypoints, inside the granted R. That avoids H3e's scene
+  drift. FoundHand (reference plus 2D keypoints, 256², released; it has
+  seen VISOR, so the overlap is recorded) is the zero-shot candidate, and
+  K6's `ref` warp of the same reference is the floor. AnimateAnyone stays
+  the body candidate. Next: rung 2, the zero-shot oracle on positions 0–7
+  of K1f's order (rule written; ceiling 3 GPU-hours). Before it: the
+  FoundHand source and weights into `Models`, and an environment check.
+  **Rung 2, zero-shot (2026-10-22, experiments.md "K6b (hands) 2"):
+  fails.** FoundHand with one unbilled reference crop and the coded
+  keypoints wins 0 of 3 held-out items by LPIPS and 1 of 3 by DISTS
+  (score 17%; a 4th item, not run, could not have changed it). Its LPIPS
+  on R is 0.28–0.52 against the hull's 0.17–0.26 and the bound's
+  0.06–0.10. A warp of the reference does as well or better. The 4
+  items at 50 steps were the user's decision when 8 did not fit 3 GPU-hours.
+  Next: rung 3, the overfit oracle (FoundHand fitted on the window's own
+  frames). Its rule is written, with a ceiling of 4 GPU-hours, and it
+  waits for the user's approval. If it fails, the generative route
+  closes for hands.
+  **Two tracks (user, 2026-10-22):** fidelity (encode the original) and
+  experience (the same experience despite pixel differences: realism by
+  KID, same content by the object's estimator, same over time by
+  flicker). The protocol is drafted in
+  [experiments](docs/experiments.md#protocol), with the thresholds set
+  (user, 2026-10-22). Results closed on fidelity are untested on experience. The
+  re-judging queue is H3e, FoundHand, H3a/H3a2, and K6 `ref`.
+  **Rung 2b, a bank of free references (2026-10-22): fails by one
+  item-metric.** Each frame is warped from the in-window reference nearest
+  in coded pose. With 16 references the score is 67% (P22_107 and P25_09
+  won on both metrics; P06_108 lost DISTS 0.209 against 0.206); K = 1 and
+  4 score 33% and 50%. Quality rises steeply with K. Next for hands, on
+  fidelity: the buildable bank (K up to 64, chosen outside the window,
+  coded and billed once per video). It needs keypoints outside the
+  windows, so it is a task of its own. Rung 3 waits behind it.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks

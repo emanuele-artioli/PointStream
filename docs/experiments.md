@@ -63,6 +63,45 @@ independent samples.
 encoder and decoder paths and versions recorded. VVC only if a correct
 invocation turns out to be needed.
 
+**Two tracks: fidelity and experience** (user, 2026-10-22; the thresholds
+marked *proposed* were accepted by the user the same day). PointStream answers two problems,
+and each object's representation is judged on both:
+
+1. *Fidelity: encode the original.* Full-reference judges on the object's
+   region (LPIPS, DISTS, PSNR), as BD-rate against the anchor envelope, or at
+   the method's rate against the anchor hull. Every entry so far is on this
+   track, and its verdicts stand.
+2. *Experience: the same experience as the original, despite pixel
+   differences.* At the method's rate, an item passes when all three hold
+   against the anchor hull at that rate:
+   - **Realism.** KID of the object's crops (`h3b`'s Inception crops) against
+     real crops of the same class from footage that neither the method nor
+     the anchor was fitted on: for hands, held-out VISOR videos, and for
+     players, other matches. *Proposed:* the method's KID is at most the
+     anchor's upper 95% bound.
+   - **Same content.** The object's estimator, re-run on the output, agrees
+     with the source: WiLoR's 2D joints for hands, the body pose for
+     players, the detected position for the ball. *Proposed:* the method's
+     error is at most max(the anchor's error, 1.5 × the coded keypoints' own
+     error against the source).
+   - **Same over time.** Flicker (`h3b.flicker`: the method's temporal
+     residual minus the source's, luma, in the region). *Proposed:* at most
+     max(the anchor's, 1.25 × the source's own frame-to-frame change). An
+     identity drift along a track (an appearance embedding's change against
+     the source's) is reported beside it and does not decide.
+   Anchors on this track: the strongest perceptual pixel anchors measured
+   (DCVC-UF + G; H3c's perceptually tuned DCVC-UF where it exists) with the
+   SVT-AV1 envelope. Criterion as on fidelity: the share of items passing,
+   ≥ 75%. A user study (two-alternative forced choice) is optional, and
+   nothing relies on it.
+
+   Results judged only on fidelity are untested on experience, not passed.
+   Re-judging them on this track is allowed, and the entry says when the
+   judge was added. Queue, cheapest first: H3e (its generations are saved,
+   no new generation), FoundHand (K6b hands rung 2, re-run keeping the
+   crops), H3a/H3a2 if their stages kept the decodes, and K6's `ref` on
+   players.
+
 ## Entry template
 
 ```markdown
@@ -9488,6 +9527,825 @@ invocation turns out to be needed.
   job, the three failed pilot attempts and the smokes), inside the
   8-hour ceiling; about 5 h of wall time from the rule, including an
   outage of the session.
+
+### 2026-10-21 — K1c: K6's bound on egocentric hands (outline granted)
+- Question ([PLAN K1c](../PLAN.md)). H3b's hand bound drew MANO's mesh at
+  the coded pose and charged MANO's outline (it misses 9.7% of the hand and
+  overshoots 9.2%). K6's `warp` grants the outline: the frame's own pixels
+  moved from the uncoded to the coded keypoints by a 2D skeleton warp, so
+  only the coding error is charged. On bodies that was the difference
+  between a loss and a 95% saving. Does the same bound beat the pixel
+  coders on hands, at H2's coded keypoint rate, against H3d's envelope?
+- Items. H3b's pilot: B2's four windows (`P01_107_0000003049`,
+  `P02_02_0000006080`, `P03_10_0000000616`, `P09_106_0000006303`), 240
+  frames each, with H3c2's staged inputs unchanged (window decode, fill
+  masks and record, H2's VISOR poses and `code.json`, MANO, LPIPS and
+  DISTS backbones; `h3c-2026-10-11/inputs.json` `da49a912…7a10`).
+- Keypoints. H2's WiLoR rows, each track coded with H2's 100 ms choice
+  (Gaussian 33 ms, 15 Hz interpolated, full pose, steps ×8; 1.93 kbps
+  pooled, 1.927 in K1) and its median shape, decoded, and the 21 joints
+  projected (`h3b.item_poses`, `h2.pinhole`, as `h3c.item_judge`). Source
+  keypoints: the same row's uncoded fit (its own shape) projected the same
+  way, so the warp at the uncoded keypoints is the identity.
+- Warp. `k6.draw` with a hand skeleton instead of K4's body: the 20 bones
+  of the 21-joint OpenPose/MANO hand (wrist to each finger's base, then
+  along each finger), every joint confident. Per fitted hand (one H2 row
+  per side and frame), the region moved is that side's fill-set class mask
+  (hand and forearm, as R), σ = 0.08 of that mask's height (K6's constant,
+  not tuned), the field on K6's 4 px grid. Hands are drawn farther first
+  (mean coded joint depth). As H3b, drawn pixels never cover objects (the
+  fill set's other foreground), and inside R the source is first replaced
+  by K6's Telea fill (radius 5), so a hand with no fit in that frame, and
+  every pixel of R the warp misses, is charged as fill. Variants:
+  - `warp` (the bound): the uncoded to the coded keypoints.
+  - `warp@uncoded` (diagnostic): the identity on fitted hands; what remains
+    is the charge for unfitted hands.
+- Judges. LPIPS on R exactly as H3c and H3d scored their points (`h3c.Scorer`:
+  the variant inside R, the source outside; B2's AlexNet spatial map on the
+  full frame averaged over R; mean over the window's frames with R
+  non-empty), so the bound and the envelope share region, frames and
+  network. **Decides.** Beside: DISTS on R (H3c's), PSNR on R, LPIPS over
+  S = R ∪ every drawn pixel with the drawing kept outside R (overshoot
+  charged, as K6), the share of R the warp misses and the share of its
+  drawing outside R.
+- Envelope. Per item, the upper concave hull (`g5.envelope`, linear in rate)
+  of SVT-AV1's eleven points and DCVC-UF off the shelf (H3d's bar) together
+  with DCVC-UF + G's six points (H3d's component, arm `G-L`), all on R, from
+  H3d's component report (`h3d-2026-10-12/report-component/h3d-report.json`,
+  `467be69f…6e00`); K1's `joint` hull. At 1.927 kbps it reads LPIPS 0.258
+  (P01_107), 0.204 (P02_02), 0.155 (P03_10) and 0.184 (P09_106).
+- Decision rule (`k1c.DECISION`, fixed before any run). Per item, the bound
+  passes when its LPIPS on R is below the hull's at 1.927 kbps.
+  - If it passes on ≥ 3 of 4 items, hands get K6b's ladder in PLAN
+    (audit, zero-shot, overfit, match fit), as bodies do.
+  - Otherwise hands are closed for every renderer at the keypoint stream's
+    rate: no renderer can draw more of the true frame at the coded pose.
+  - If LPIPS over S (overshoot charged) moves the count of passing items
+    across 3, or DISTS on R disagrees with LPIPS on that count, the outcome
+    goes to the user.
+  - The hull's rate for the bound's quality (and the saving) is reported
+    per item, as K1.
+- Hypothesis. The bound passes on ≥ 3 items. H3b's `wilor:arm_uncoded` (MANO
+  at the uncoded pose) was 0.168 on S and already above the hull on 2
+  items; granting the outline removes MANO's 10% miss and spill, and the
+  coding error (about 10 px on WiLoR's joints) costs less than that.
+- Competing explanation. Hands are not bodies: fingers are thin and close,
+  a 10 px joint error is a large share of a finger, and the warp blends
+  neighbouring fingers' bones, so the coding error alone may cost more
+  LPIPS than a ¼-scale DCVC-UF + G. `warp@uncoded` separates the coding
+  error from the unfitted-hand charge; the missed share separates both
+  from the outline.
+- Budget. One fleet job (`k1c run`), shared Ada or A6000 (LPIPS and DISTS
+  verified there): smoke ≤ 600 s (P01_107, first 48 frames), full ≤ 45 min
+  (the four items; the warp on the CPU, two scorings per item). Ceiling
+  1 GPU-hour, smoke included. The comparison (`k1c report`) is local, from
+  the validated stage and H3d's report.
+- Job `20261021T184040Z-70821cd0` (gpu5, RTX 6000 Ada, shared; `ab8c205`
+  from `ready.json`; environment `pointstream-20261009T214002Z`; inputs
+  H3c2's, `da49a912…7a10`). Smoke passed the fleet validator. The full
+  stage (4 items, 240 frames) took 1,182 s and passes all 47 of
+  `k1c validate`'s checks locally. Among them: the warp at the uncoded
+  joints reproduces the source on every fitted hand, LPIPS and DISTS of the
+  source against itself are 0, and H2's units hash-check. Rate: 1.927 kbps
+  (WiLoR, `gauss:33.3|15Hz-linear|full|q8|previous`). Report
+  `visor/k1c-2026-10-21/report/k1c-report.json` (`085bb948…ef90`, `k1c
+  report` at `ab8c205` on `full/published.tar` `3207020e…898d`), with the
+  local validation beside it.
+- Outcome. On R, at 1.927 kbps:
+
+  | item | `warp` LPIPS | hull LPIPS | hull's rate for `warp`'s LPIPS (saving) | LPIPS over S | `warp` DISTS / hull | `warp@uncoded` LPIPS | R unfitted | fitted R missed | spill |
+  |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+  | P01_107 | **0.087** | 0.258 | 45.9 kbps (96%) | 0.089 | 0.071 / 0.223 | 0.004 | 0.4% | 3.0% | 2.4% |
+  | P02_02 | 0.272 | 0.204 | 0.96 kbps (−101%) | 0.276 | 0.191 / 0.251 | 0.192 | 39.6% | 8.0% | 3.0% |
+  | P03_10 | **0.093** | 0.155 | 8.6 kbps (78%) | 0.104 | 0.104 / 0.203 | 0.010 | 1.4% | 5.2% | 3.5% |
+  | P09_106 | 0.211 | 0.184 | 1.06 kbps (−82%) | 0.219 | 0.218 / 0.225 | 0.138 | 26.8% | 7.3% | 6.1% |
+
+  (Hull: H3d's bar and DCVC-UF + G, K1's joint hull, read at the
+  keypoint rate. R unfitted: the share of R in a hand that has no H2 fit
+  in that frame, drawn as fill. Missed: the share of a fitted hand's mask
+  the warp does not reach. Spill: the share of the drawing outside R.
+  The coded joints move 7–12 px from the uncoded ones.)
+  - LPIPS on R: the bound is below the hull on **2 of 4** items, so by
+    its own gate this fails the 3-of-4 bar. LPIPS over S gives the same 2.
+  - DISTS on R: the bound is below the DISTS hull on **4 of 4**. That
+    moves the count across 3, so **by the rule the outcome goes to the
+    user.**
+- Diagnosis. The two losing items are the two where H2 left much of R
+  unfitted (40% and 27% of R, against 0.4% and 1.4%). Those pixels are
+  charged as Telea fill. `warp@uncoded` isolates that charge: it is 0.192
+  and 0.138 there, already near the hull (0.204, 0.184), and the coding
+  error (11–12 px) adds the rest. Where the hands are fitted, the outline
+  granted turns H3b's loss into a 78–96% saving. H3b's MANO bound
+  (`wilor:arm`, 0.17–0.31 on R through K1's bridge) lost on 3 of 4. So
+  what decides hands at this rate is the estimator's coverage (a hand
+  with no fit has no keypoints) and the coding error. The renderer's
+  outline does not decide it.
+- Hypothesis: refuted as stated (2 of 4, not ≥ 3), held where the hands
+  are fitted. The competing explanation (finger blending makes the coding
+  error dominate) does not hold on the fitted items: misses are 3–8%.
+- Proposed reading, for the user. (a) By LPIPS's letter, hands are closed
+  for every renderer at the keypoint stream's rate as H2 codes it today.
+  (b) Or hands get K6b's ladder scoped to fitted hands, after a coverage
+  fix: H2b's hybrid estimator, or hands without a fit sent as pixels (a
+  hybrid). That would need its own bound first, charging the pixel
+  coder's rate on unfitted hands.
+- Scope. 4 pilot items, 240 frames. Appearance and outline granted, and
+  no reference billed. The hull is H3d's recorded points. LPIPS decides,
+  DISTS is reported, and they disagree on 2 items.
+- Budget: 1,182 s of stage execution plus the smoke (under 0.5 GPU-hour),
+  inside the 1-hour ceiling.
+
+### 2026-10-21 — K1d: K1c's bound with every masked hand fitted (coverage fix)
+- Question (user, 2026-10-21, after K1c: "if we still have a chance to win
+  on hands, let's try it"). K1c lost on P02_02 and P09_106 because H2 has
+  no fit for 40% and 27% of R. On P02_02, 53 hand frames have no fit and
+  131 have one. On P09_106 it is 66 and 114. Whole hands were never boxed
+  by H1's detector, so H2b's hybrid (same boxes) cannot help. The encoder
+  has the hand masks, though. If every masked hand is fitted, does the
+  bound pass?
+- Change against K1c (nothing else changes: items, warp, judges, hull,
+  bars). For every window frame and side whose fill-set class mask is
+  non-empty (box sides ≥ 16 px) and that has no H2 WiLoR row, WiLoR (H2's
+  `Regressor`, same checkpoint) is run on that mask's bounding box, with
+  the side from the mask's class. The fit becomes a row as in `h2.run_visor`
+  (rotation, shape, full-frame translation at H2's focal). It joins H2's
+  rows, and the item's WiLoR tracks are coded again with H2's 100 ms choice
+  (`CodingSet`, so a new row joins its side's track). The mask box includes
+  the forearm, so these fits can be worse than H1-boxed ones. That cost is
+  charged through the coding error of the track.
+- Rate. H2's pooled rate (1.927 kbps for H2's rows) scaled per item by the
+  ratio of coded rows after to before. This assumes the new rows cost what
+  H2's rows cost on average, and leaves out extra track starts. Both new
+  counts are reported, and the hull is read at each item's own rate.
+- Decision rule (`k1c.DECISION_K1D`, fixed before any run). This is K1c's
+  rule on the covered fits. The bound passes on an item when LPIPS on R is
+  below the hull at that item's rate.
+  - ≥ 3 of 4: hands get K6b's ladder (PLAN K6b: audit, zero-shot, overfit,
+    match fit), with the mask-box fit as the coverage path.
+  - < 3: hands are closed for every renderer.
+  - LPIPS over S or DISTS on R crossing 3 differently: to the user.
+- Hypothesis. Passes on 4 of 4. With full coverage, `warp@uncoded` falls
+  to about 0.01 everywhere (as on P01_107 and P03_10). The coding error
+  of the new rows keeps P02_02 and P09_106 below their hulls (0.204,
+  0.184), as it did at 0.087–0.093 on the fitted items.
+- Competing explanation. Mask boxes include the forearm, so WiLoR's fits
+  there jitter. H2's Gaussian smoothing then moves the coded joints far
+  from the uncoded ones, and the coding error eats the gain. The mean coded
+  shift of new rows against H2's rows is reported to show this.
+- Budget. One fleet job, the K1c job with WiLoR added (WiLoR verified on
+  Ada/A6000 by H3b/H3c2): smoke ≤ 600 s (P01_107, 48 frames), full ≤ 45
+  min. Ceiling 1 GPU-hour.
+- Job `20261021T200019Z-e6b9c107` (gpu6, RTX 6000 Ada, shared; `1aa1b43`
+  from `ready.json`; inputs H3c2's). Smoke passed the fleet validator. The
+  full stage took 1,019 s and passes all 59 of `k1c validate`'s checks
+  locally, including that under 1% of R is left unfitted on every item
+  (0.0% on all four). Report `visor/k1d-2026-10-21/report/k1c-report.json`
+  (`6427ea8f…7c68`, on `full/published.tar` `a8249947…1f42`).
+- Outcome. On R, each item at its own rate:
+
+  | item | new rows (H2's) | kbps | `warp` LPIPS | hull LPIPS | result | DISTS `warp` / hull | coded shift, H2's rows / new rows |
+  |---|---:|---:|---:|---:|---|---:|---:|
+  | P01_107 | 6 (474) | 1.95 | **0.087** | 0.257 | saves 96% | 0.070 / 0.222 | 7.4 / 9.3 px |
+  | P02_02 | 237 (243) | 3.81 | 0.232 | 0.162 | loses (−214%) | 0.163 / 0.234 | 20.8 / 64.2 px |
+  | P03_10 | 15 (416) | 2.00 | **0.083** | 0.153 | saves 96% | 0.097 / 0.201 | 8.9 / 16.1 px |
+  | P09_106 | 123 (146) | 3.55 | 0.141 | 0.138 | loses (−3%) | 0.177 / 0.197 | 15.6 / 24.2 px |
+
+  - LPIPS on R: below the hull on **2 of 4**. Over S: 2 of 4. DISTS on R:
+    4 of 4. **By the rule, the outcome goes to the user again.**
+  - Coverage worked: `warp@uncoded` is ≤ 0.0001 on every item (it was
+    0.192 and 0.138). P02_02 improved from 0.272 to 0.232 and P09_106
+    from 0.211 to 0.141.
+  - The competing explanation holds. The mask-box fits jitter: their coded
+    joints move 24–64 px from the uncoded ones. They also corrupt the H2
+    rows they join (P02_02's H2 rows moved 10.9 px in K1c and 20.8 px
+    here). Doubling the rows doubles the rate, too, so the hull is read at
+    3.5–3.8 kbps, where it is lower. P09_106 misses by 0.003; P02_02 by
+    0.07.
+- Reading. Hands win where the hand is boxed well (P01_107 and P03_10, 96%
+  each, at H2's rate). They lose where a good fit is missing, now through
+  bad fits instead of no fits. Hypothesis (4 of 4) refuted.
+- Scope. As K1c. The rate scaling assumes a new row costs an average H2
+  row. Mask boxes include the forearm (the stated limitation).
+- Budget: 1,019 s plus the smoke. K1c and K1d together used under 1
+  GPU-hour.
+
+### 2026-10-21 — K1e: K1d with hand-only boxes (and why two items fit badly)
+- Question (user, 2026-10-21: "if it's cheap, try to box the hand first";
+  "can we figure out why 2 pilots get good fit, and 2 don't?"). K1d's
+  mask-box fits include the forearm and jitter (coded shift 24–64 px on
+  new rows against 7–9 px on H2's). Does fitting on the hand alone remove
+  that, and does the bound then pass?
+- Change against K1d (nothing else changes). Each mask-box row is fitted
+  twice. WiLoR on the mask's box gives a wrist and middle knuckle. H1's
+  `wrist_split` cuts the mask there, and WiLoR runs again on the hand
+  part's box (the first box if the part is under 16 px a side). The
+  second fit is the row.
+- Measured beside, from the run's arrays (CPU, in `k1c report`):
+  - Jitter: the median frame-to-frame acceleration of the uncoded joints
+    (px, mean over 21 joints, consecutive frames of a side), for H2's rows
+    and the new rows, for K1d's fits (K1e's first pass, the same box and
+    network, saved beside) and for K1e's second fits. This tests the competing explanation
+    directly: K1d's new rows should jitter more than H2's, and K1e's less
+    than K1d's.
+  - Scene predictors per item, measurable at the encoder: the share of the
+    hand frames H1's detector boxed (H2's rows over all rows), the mean
+    hand-region size, and the median joint speed. They are measured on
+    the pilot and named as candidates only. A scope chosen from 4 items
+    would have to be tested on items it was not chosen from (B2's other
+    30) before any headline uses it.
+- Decision rule (fixed before any run). K1c's: the bound passes when
+  LPIPS on R is below the hull at the item's rate on ≥ 3 of 4 items. Then
+  hands get K6b's ladder with the two-pass fit as the coverage path.
+  Otherwise hands are closed, and the outcome goes to the user if LPIPS
+  over S or DISTS on R crosses 3 differently.
+  - The user's proposed criterion (2026-10-21, made after K1c's and K1d's
+    results): pass when the mean over {LPIPS on R, DISTS on R} of the
+    share of items below the hull is ≥ 75%. K1c and K1d already meet it
+    (2 of 4 and 4 of 4). It is reported beside, and the user decides which
+    governs. The concerns: it was proposed after the results, it would
+    turn both earlier runs into passes, and DISTS compares texture
+    statistics, so it is lenient on the smooth fill and misplaced texture
+    that are this bound's failure modes. The paper reports both metrics
+    either way.
+- **Amendment (user, 2026-10-21, before K1e's results; after K1c's and
+  K1d's).** The user's criterion governs K1e and every later run. It
+  passes when the mean over {LPIPS on R, DISTS on R} of the share of items
+  below the hull is ≥ 75%, so LPIPS must win on at least half the items.
+  It also applies **retroactively** to K1c and K1d. That is a post-hoc
+  change and the paper must disclose it: both runs failed the rule written
+  before them (LPIPS 2 of 4) and pass under this one (2/4 and 4/4, mean
+  75%). Consequence: hands go to K6b's ladder. The held-out test (K1f)
+  is judged by this criterion, fixed before it runs.
+- Hypothesis. The hand-only fits jitter about as little as H2's rows, so
+  P09_106 (0.003 short in K1d) passes and P02_02 (0.07 short, rubber
+  gloves) still fails: 3 of 4.
+- Competing explanations. (1) The jitter comes from the hands themselves
+  (blur, gloves, occlusion), not the box, so the second fit jitters as
+  much as the first. (2) The rate, not the fit, decides P02_02: doubling
+  the rows reads the hull at 3.8 kbps, where it is 0.162.
+- Budget. One fleet job, K1d's with a second WiLoR pass (≤ 45 min; K1d
+  took 17 min). Ceiling 1 GPU-hour.
+- Job `20261021T205023Z-a7bda6e6` (gpu6, RTX 6000 Ada, shared; `be8251e`
+  from `ready.json`). Smoke passed the fleet validator. The full stage
+  (about 17 min) passes all 59 of `k1c validate`'s checks locally. Report
+  `visor/k1e-2026-10-21/report/k1c-report.json` (`7e6f8f69…d769`, on
+  `full/published.tar` `c9287130…1524`).
+- Outcome (on R, each item at its own rate; LPIPS bound / hull):
+
+  | item | kbps | LPIPS | DISTS | K1c → K1d → K1e LPIPS | joint acceleration, px: H2's rows / new rows, mask box / new rows, hand box |
+  |---|---:|---:|---:|---|---:|
+  | P01_107 | 1.95 | **0.086** / 0.257 | **0.069** / 0.222 | 0.087 → 0.087 → 0.086 | 5.1 / 9.0 / 9.1 |
+  | P02_02 | 3.81 | 0.196 / 0.162 | **0.142** / 0.234 | 0.272 → 0.232 → 0.196 | 20.3 / 56.0 / 40.9 |
+  | P03_10 | 2.00 | **0.083** / 0.152 | **0.097** / 0.201 | 0.093 → 0.083 → 0.083 | 6.5 / 28.2 / 28.5 |
+  | P09_106 | 3.55 | 0.139 / 0.138 | **0.175** / 0.197 | 0.211 → 0.141 → 0.139 | 8.0 / 20.9 / 20.1 |
+
+  - LPIPS: 2 of 4 below the hull (P09_106 misses by 0.001). DISTS: 4 of 4.
+    **The amended criterion passes (mean 75%). The rule written before
+    K1e fails (LPIPS 2 of 4).**
+  - Jitter. The new rows jitter 2–9× more than H2's rows on the same item.
+    The hand-only box cuts P02_02's jitter from 56 to 41 px, and P02_02's
+    LPIPS from 0.232 to 0.196. It changes nothing on P01_107, P03_10 or
+    P09_106. So the competing explanation (1) holds in part: the jitter
+    there comes from the hands, not the box. P02_02's own H2 rows jitter
+    20 px, against 5–8 px on the other items (rubber gloves).
+  - The hypothesis (3 of 4 by LPIPS) is refuted by 0.001 on P09_106.
+- Decision. Under the user's criterion, hands go to K6b's ladder with
+  the two-pass fit as the coverage path. K1f, the held-out test, uses the
+  same path.
+
+### 2026-10-21 — K1f: the hand bound's scope on held-out items
+- Question (user, 2026-10-21). On the pilot the bound wins big on two
+  items (96%) and loses narrowly on the two where H1's detector boxed
+  about half of the hand frames. Is "scenes where the detector tracks the
+  hands" a scope where PointStream wins? Does it hold on items the scope
+  was not chosen from?
+- Items. B2's other 30 items, in a content-blind order (sha256 of the id;
+  `tools/datasets/k1f_inputs.py`), 240 frames each. Two come from videos
+  in G's training footage (P07_110, P22_107). They are reported apart,
+  and the clean subset is reported beside the pooled one.
+- Bound. K1e's path, unchanged: H2's WiLoR rows plus the two-pass
+  hand-box fit for every boxable hand without one, coded with H2's 100 ms
+  choice, K1c's warp, judged on R. Rate: K1d's per-item scaling.
+- Envelope, coded per item as the pilot's was (`h3d.code_point`): H3b2's
+  seven SVT-AV1 low points, DCVC-UF HT-L off the shelf at QP 0 at full
+  size and QP 0, 21 and 42 at ½ and ¼, and H3d's G-L network on each ½
+  and ¼ point. Points above about 20 kbps are left out. On the pilot, the
+  hull with and without them is identical at every rate up to 5 kbps
+  (checked on H3d's report). Savings that need a higher rate are capped.
+  B2's CRF 41–62 streams are not used (all ≥ 35 kbps).
+- Scope, fixed now from the pilot. An item is in scope when H1/H2's
+  coverage, H2's rows over the side-frames with a boxable hand mask, is
+  ≥ 0.8. On the pilot the two winners have 0.99 and 0.97, and the two
+  losers 0.51 and 0.54. The encoder can measure it.
+- Decision rule (`k1f.DECISION`, the user's criterion). A group passes
+  when the mean over {LPIPS on R, DISTS on R} of the share of its items
+  whose bound is below the hull at its rate is ≥ 75%.
+  - In scope passes and out of scope fails: the scope is confirmed.
+    Headline: on scenes in scope (their share of items and of hand frames
+    reported), the hand bound saves a median X% of the envelope's rate at
+    about 2 kbps. It is a bound (appearance granted), and K6b's ladder
+    decides what a renderer keeps.
+  - All items pass: no scope is needed, and the claim is over all items.
+  - In scope fails: the scope claim is dropped, and hands' place on K6b's
+    ladder goes back to the user.
+- Hypothesis. In scope passes (both metrics ≥ 75%). Out of scope sits
+  near the bar, as P09_106 does.
+- Competing explanations. (1) The pilot's two winners are atypical
+  (still, close views), and coverage ≥ 0.8 does not predict a win
+  elsewhere. Then in scope fails. (2) Coverage is a proxy for motion. The
+  joint speed per item is reported beside to tell the two apart.
+- Budget. Parts of 2 items, each a fleet job of ≤ 45 min (the first one
+  times an item; a smoke of 48 frames with two DCVC-UF points). Ceiling 8
+  GPU-hours (user, 2026-10-21) for all of K1f. If it runs out, the items
+  done in the fixed order are reported, and so is the shortfall.
+- Attempts (infrastructure, no score read). Part 0
+  `20261021T211220Z-3d431acd` (`eca0d32`, gpu6): the smoke passed (159 s),
+  then the full stage overran its declared 36,000 MiB at 38,200 (PyTorch's
+  cache held across points, with WiLoR and G resident) and was stopped
+  before finishing an item. Fixed: the cache is released after each point,
+  and 40,000 MiB is declared.
+  Part 6 `20261021T220155Z-2e7fdeb3` ran past the 2,700 s stage limit
+  (two slow items). Its `partial.tar` (`d34d41fd…7619`) keeps P06_03
+  finished and P26_108's envelope. Rerun as part 6b with `--restore`:
+  units of the same items and window length, sha256-checked, are kept, and
+  only P26_108's bound is computed. Parts 8–10 had not started. They were
+  cancelled and resubmitted as one item per job, so no part nears the
+  limit. Items and order are unchanged. Part 8 (`20261021T220208Z-fda99e47`)
+  had begun its smoke when it was cancelled, and its two items were
+  resubmitted the same way.
+- Reproduction check (added after the held-out scores were read, before
+  they are recorded as evidence). K1f's envelope path has not been shown
+  to reproduce H3d's recorded points. One job runs `k1f run` on the pilot
+  item P01_107 (same flags, same inputs). Every point it shares with
+  H3d's component report (SVT-AV1's seven low points, DCVC-UF's seven,
+  G-L's six) must match within 2% in rate on R and 0.003 in LPIPS on R.
+  If any point fails, the held-out result is not evidence until the
+  difference is explained.
+  Job `20261022T013208Z-9e048ecf` (gpu6, `3f530f1`): all 20 points pass,
+  18 exactly. G-L at QP 0 ½ differs by 1.05% in rate and 0.0011 in LPIPS,
+  and at QP 42 ½ by 0.34% and 0.0001. The bound reproduces K1e's 0.0865.
+- Jobs (RTX 6000 Ada, shared, gpu6). Parts 0–5 and 7 (`d1a47c3`), 6b and
+  the six single-item parts (`b9e1d58`), each revision from its
+  `ready.json`: `20261021T211923Z-08179c83`, `20261021T220120Z-f7cbc6ed`,
+  `20261021T220127Z-381c7366`, `20261021T220134Z-c0b4a121`,
+  `20261021T220141Z-eff4e8be`, `20261021T220148Z-9e99d6a7`,
+  `20261022T000642Z-3f9256ae`, `20261021T220201Z-9337c526`,
+  `20261022T000649Z-adac9f11`, `20261022T000656Z-1aea7c30`,
+  `20261022T000702Z-d16bf68f`, `20261022T000709Z-f303e32f`,
+  `20261022T000742Z-2efab10c`, `20261022T000749Z-e723338c`. Every smoke
+  passed the fleet validator, and every full stage passes `k1f validate`
+  locally (44 checks for two-item parts, 26 for single, 46 for 6b).
+  Report `visor/k1f-2026-10-21/report/k1f-report.json` (`2f6e4291…888e`),
+  with the validation receipts in `k1f-validation.tar`. GPU time: 22,488 s
+  of stage execution, plus the failed and cancelled attempts and the
+  reproduction check, about 7.6 GPU-hours, within the 8.
+- Outcome. 22 of the 30 held-out items were run (the budget's
+  content-blind order; positions 22–29 were not run). On R, each item at
+  its own keypoint rate (1.93–2.72 kbps):
+  - **The bound is below the hull on 22 of 22 items by LPIPS and 22 of 22
+    by DISTS.** Every group passes the criterion at 100%: all (22), in
+    scope (19), out of scope (3), clean of G's training (21), and in
+    scope and clean (18).
+  - LPIPS on R: the bound's median is 0.084 (0.059–0.194), and the hull's
+    at the same rate is 0.175 (0.076–0.410). On 14 items the bound beats
+    every pixel point coded (up to about 45 kbps, SVT-AV1 CRF 63 at full
+    size), so their saving is censored. On the 8 others the median
+    saving is 84% (9–91%). The narrowest margin is P04_24, at 0.075
+    against 0.076.
+  - Scope. 19 of 22 items (86% of items and of hand frames) have coverage
+    ≥ 0.8. The 3 below (0.71–0.73) also win once the hand-box fit fills
+    them.
+- Decision (by the rule). **All items pass, so no scope is needed. The
+  claim is over all held-out items:** with appearance granted, egocentric
+  hands sent as 21 coded keypoints (about 2 kbps) beat SVT-AV1, DCVC-UF
+  and DCVC-UF + G on the hand region, on every held-out item, on both
+  metrics.
+- Reading. The pilot was harder than the held-out set. With the
+  hand-box path, P02_02 (rubber gloves, jittery fits) and P09_106 lose
+  by LPIPS, and on the held-out set nothing does. Pooled with the pilot,
+  the bound wins 24 of 26 items by LPIPS and 26 of 26 by DISTS. The
+  pilot's coverage predictor was not needed. Coverage is fixed by fitting
+  every masked hand, and what is left on P02_02 is fit quality, not
+  missing fits.
+- Hypothesis. In scope passed as predicted. "Out of scope sits near the
+  bar" is refuted: all 3 win clearly.
+- Scope and caveats. This is a bound: the hand's own pixels are moved,
+  so appearance and outline are granted. K6b's ladder decides what a
+  renderer keeps. 22 of 30 held-out items were run. The rate is K1d's
+  per-row scaling (new rows assumed to cost an average H2 row). G's
+  training overlaps one item (P22_107). Judges are LPIPS and DISTS on R;
+  pose fidelity was not judged. Savings are censored above about 45
+  kbps.
+- Completion (user, 2026-10-22: "yes", about 2.6 more GPU-hours). The 8
+  items not run (positions 22–29 of the fixed order) run as single-item
+  jobs, unchanged. The result is read over all 30.
+  Jobs (`ffd6ccd`, gpu6, RTX 6000 Ada): `20261022T072405Z-ab09c0af`,
+  `20261022T072414Z-a0071b24`, `20261022T072430Z-d94d8b6e`,
+  `20261022T072439Z-e7c8ed8c`, `20261022T072448Z-b850bbac`,
+  `20261022T072458Z-9cc87e86`, `20261022T072508Z-128ba164`,
+  `20261022T072522Z-e7c0f8bc`. Each passes all 26 checks locally (9,378
+  s together). Report over all 30:
+  `visor/k1f-2026-10-21/report/k1f-report-30.json` (`d31b1fc2…0eb8`), with
+  `k1f-validation-30.tar`. K1f's total: about 10.2 GPU-hours (8 approved,
+  then 2.6 more, user, 2026-10-22).
+- **Outcome over all 30 held-out items.** The bound is below the hull on
+  **30 of 30 by LPIPS and 30 of 30 by DISTS**, and every group passes at
+  100%: all (30), in scope (26), out of scope (4), clean of G (28), and
+  in scope and clean (24). LPIPS on R: the bound's median is 0.086, the
+  hull's 0.174. On 17 items the bound beats every pixel point coded (up
+  to about 45 kbps). On the 13 others the median saving is 83% (10–93%).
+  The narrowest margin is still P04_24 (0.075 against 0.076). In scope:
+  87% of items and of hand frames. Pooled with the pilot (K1e's path),
+  the bound wins 32 of 34 items by LPIPS and 34 of 34 by DISTS.
+
+
+### 2026-10-22 — K6b (hands) 1: audit of hand renderers
+- Question ([PLAN K6b](../PLAN.md), hands after K1f). K1f's bound moves
+  the hand's own pixels to the 21 coded keypoints. A renderer has to draw
+  them from a reference instead. Which released models can do that, and
+  which one does the zero-shot rung test?
+- Interface, fixed by K1f. Per hand and frame the renderer gets a
+  reference crop of that hand and the 21 coded 2D keypoints (H2's 100 ms
+  code, 1.93–2.72 kbps per item). Its pixels are composited inside R, the
+  granted outline, with the source outside R (`k1c.compose`). So it has to
+  draw a hand crop, not a scene. H3e's failure was that the scene drifted:
+  JointControlVideo generated the whole frame from the first frame and
+  never saw the camera's motion. The local interface removes that failure.
+- Criteria: conditioning on a reference image and 2D (or 3D) hand
+  keypoints; released weights; licence for research; inference cost per
+  frame; whether it has seen VISOR (overlap is allowed, recorded, and the
+  clean subset reported, per AGENTS.md).
+
+  | model | conditioning | weights, licence | cost | verdict |
+  |---|---|---|---|---|
+  | [FoundHand](https://github.com/arthurchen0518/FoundHand) (CVPR 2025) | reference image (mask optional), 2D keypoints as heatmaps (OpenPose 21 per hand); per frame, with a released zero-shot video procedure (first frame plus recent generated frames) | released (Google Drive), GPL-3.0 code, CC BY-NC data | DiT on SD-VAE latents, 256² (32² latent); timing not published | **chosen** |
+  | K6's `ref` (no learning) | the reference crop's pixels warped from its keypoints to the coded ones | in repo | CPU | **floor**: run beside, so the generator has to beat a warp of the same reference |
+  | Moore-AnimateAnyone, original and tennis fine-tune (in `Models`) | reference image, DWPose maps of the full body | in `Models`, Apache-2.0 | SD 1.5, about 1 s per frame | rejected for hands: whole-body model, and FoundHand's paper reports it at LPIPS 0.35 against FoundHand's 0.17 on hand videos (their Table 3b, 12 phone videos). It stays K6b's body candidate |
+  | SD 1.5 + ControlNet OpenPose (in `Models`) | text, OpenPose hand map; a reference only through an adapter | in `Models` | per frame | reserve: no reference conditioning trained for hands |
+  | JointControlVideo (H3e, in `Models`) | first frame, 3D joints, camera intrinsics | Apache-2.0 | 27 min per 81 frames | rejected: H3e failed (−297%), and the cause was the scene drift |
+  | [Generated Reality](https://github.com/LafouCC/generated-reality) (2026) | first frame, 21 3D joints per hand in camera space, head pose | MIT code; trained checkpoint not released (base Wan2.2-Fun-5B-Control) | 5B video DiT | not zero-shot: needs training on HOT3D/GigaHands first |
+  | Re-HOLD (CVPR 2025), iDiT-HOI (2025), ManiVideo, RHanDS | hand–object layouts or meshes | no released weights found | | not usable |
+
+- Overlap. FoundHand's repository lists VISOR among FoundHand-10M's
+  sources, and VISOR's public annotations are its train and val splits,
+  which is where B2's items come from. Before any score is read, the
+  zero-shot rung checks the released data lists for each item's video.
+  Items whose video is listed are reported as seen. If the lists cannot
+  tell, every item counts as seen, and the claim is scoped to "a renderer
+  that may have seen this footage". The judges (LPIPS's AlexNet, DISTS's
+  VGG) have not seen it.
+- Decision: FoundHand is the zero-shot candidate, with `ref` as the floor.
+  Rung 2 needs its source at a pinned commit and its weights in
+  `Models/FoundHand` (with a sha256 manifest), and an environment check.
+  Its pins (Python 3.9, torch 2.3.0, lightning 2.3.0, timm 1.0.7) are older
+  than the main environment's (torch 2.10, timm 1.0.30). It is plain DiT
+  code, so the main environment plus lightning is tried first. A second
+  environment is made only if an import or the smoke's output check fails.
+- Searches (2026-10-22): FoundHand's repository and paper, Generated
+  Reality's project page and repository, Re-HOLD's project page, and web
+  searches for hand reenactment with released weights. Nothing newer than
+  H3e's audit has released weights for a reference-plus-keypoint hand
+  renderer, other than the fact that Generated Reality's code is out.
+
+### 2026-10-22 — K6b (hands) 2: zero-shot oracle (rule)
+- Question. With one unbilled reference crop per hand and the coded
+  keypoints, does FoundHand, off the shelf, keep K1f's win over the pixel
+  hull? K1f's bound (0.084 median LPIPS on R over its first 22 items;
+  0.086 over all 30) is the ceiling, and the hull at each item's keypoint
+  rate (median 0.175; 0.174 over 30) is the bar.
+- Items. Positions 0–7 of K1f's content-blind order
+  (`tools/datasets/k1f_inputs.py`), 240 frames each. All 8 have K1f's
+  bound and hull recorded, so nothing is re-coded. Items in G's training
+  footage and items whose video FoundHand has seen are reported apart,
+  beside the pooled numbers. Development (crop rule, keypoint order,
+  sampler settings) is done on K1c's pilot item P01_107 only. It is not
+  among the 8.
+- Keypoints and fits. K1f's, unchanged: H2's WiLoR rows plus the two-pass
+  hand-box fit, coded with H2's 100 ms choice and projected to 21 joints.
+- Reference (granted, unbilled, as K6b's step 2). For each hand side, the
+  window's first frame where that side is fitted. The crop is the same as
+  for the targets.
+- Crop. Per hand and frame, a square around the union of the coded
+  keypoints' box and that side's mask, ×1.25, resized to 256². The
+  keypoints are mapped into the crop, in OpenPose order, with the right
+  hand in joints 0–20 as FoundHand's labels have it. The output is
+  resized back to the box (Lanczos).
+- Variants, each composited by `k1c.compose`: inside that side's R the
+  rendered pixels, Telea fill where no fit exists (K1c's charge), and the
+  source outside R. R is the generator's matte, granted, as `warp`
+  granted the outline.
+  - `gen`: FoundHand with its released video procedure (the reference
+    as first frame, then recent generated frames), at its released
+    sampler settings.
+  - `gen@frame` (diagnostic): FoundHand per frame from the reference
+    alone. It separates the autoregressive drift from the per-frame
+    error.
+  - `ref` (floor): K6's warp of the reference crop's pixels from its
+    uncoded keypoints to the coded ones.
+  - `warp` reproduced (check): K1f's bound. It must match K1f's recorded
+    LPIPS on R within 0.002 per item, or nothing is read.
+- Judges, as K1f: LPIPS on R and DISTS on R (`h3c.Scorer`), mean over the
+  window's frames with R non-empty. Reported beside: PSNR on R, flicker
+  (mean absolute luma change between consecutive frames inside R,
+  against the source's), WiLoR on the rendered crop against the coded
+  keypoints (does it follow its input), and a visual check of one frame
+  per item.
+- Decision rule (`k6bh.DECISION`, fixed before any run; the user's
+  criterion). An item is won on a metric when `gen`'s value on R is below
+  the hull's at that item's keypoint rate (K1f's report). Score = mean
+  over {LPIPS, DISTS} of the share of the 8 items won.
+  - **Pass** (score ≥ 75%): the zero-shot route holds with the reference
+    granted. The overfit rung is skipped. Next is the same oracle with
+    the reference billed (coded once per window and its bits added), the
+    interface K6c would use.
+  - **Fail** (score < 75%): the overfit rung (a fit of FoundHand, or a
+    LoRA on it, to the window's own frames) gets its rule and budget,
+    with the gap from `gen` to the bound reported per item.
+  - If `ref` scores ≥ 75%, a warp of one reference already suffices.
+    That goes to the user, with the better of `ref` and `gen` per item.
+  - If the score is under 75% on the unseen items alone but at or above
+    on the seen ones (or the reverse), the outcome goes to the user.
+- Hypothesis. `gen` lands near the bar, with a score around 50%. FoundHand
+  reports LPIPS 0.17–0.20 on reposing at 256², which is about the hull's
+  median, and DISTS forgives texture more than LPIPS does. `ref` scores
+  lower: it is K6's failure mode (what the pose cannot describe).
+- Competing explanations. (1) Having seen VISOR makes FoundHand better
+  here than on new footage. The seen/unseen split shows it if the lists
+  allow one. (2) The granted matte hides the generator's outline errors,
+  as it did for `warp`, so a pass is still a bound on the matte. (3) The
+  256² crop is the limit, not the generator. Large hands (box > 512 px)
+  are compared with small ones beside the result. (4) Per-frame metrics
+  ignore flicker, so flicker is reported, and a visual check is made of
+  any item that passes with flicker above the source's.
+- Before the run (CPU): the FoundHand source at a pinned commit and its
+  weights into `Models/FoundHand` with a sha256 manifest; its import in
+  the main environment (plus lightning); the overlap check above.
+- Budget. GPU, RTX 6000 Ada (FoundHand's first run on the class). A smoke
+  of at most 600 s on P01_107, 24 frames: it asserts CUDA, the dtype,
+  the attention kernel and the output's range, and times one frame. The
+  timing is recorded here before the pilot. The released step count is
+  kept if one 240-frame item (both hands, `gen` and `gen@frame`) fits in
+  40 minutes; otherwise the most steps that fit, not below half the
+  released number. Then a pilot on P01_107 (development, not scored for
+  the rule), and the 8 items in parts of at most 45 minutes, each saving
+  every finished item. Ceiling 3 GPU-hours for the rung, smoke included.
+  If the budget runs out, the items finished in the fixed order are
+  reported, and so is the shortfall.
+- Revision (2026-10-22, after reading FoundHand's source, before any run).
+  - Source and weights. FoundHand at `ae0e980` (archive
+    `visor/k6bh-2026-10-22/inputs/foundhand-src-ae0e980.tar.gz`,
+    `fe8ff8a0…7f35`). The released checkpoint
+    `DINO_EMA_11M_b50_lr1e-5_epoch6_step320k.ckpt` (11.6 GB, `66434caf…62d7`)
+    and SD's `vae-ft-mse-840000-ema-pruned.ckpt` (`c6a580b1…3dab`, as Hugging
+    Face lists it) are in `Models/FoundHand` with a `MANIFEST.json`,
+    hard-linked into the run's `inputs/`. Inference uses the DiT-XL/2's
+    `ema_state_dict` (as the demos do) and needs only torch, numpy and
+    timm. Lightning, SAM and mediapipe serve training and the demos' own
+    keypoints and masks, which K1f supplies. So the main environment
+    (`pointstream-20261009T214002Z`) runs it, and no environment is added.
+    The DiT runs under bf16 autocast, and the VAE in float32.
+  - Steps. The released demos sample with 250 respaced DDPM steps and
+    guidance 2.5. At that count the 8 items cannot fit the 3 GPU-hours. A
+    pilot on P01_107 (development, not scored) runs all four variants at
+    50 steps and records seconds per step. The step count for the 8 items
+    is the largest of {250, 100, 50} whose projected cost (both FoundHand
+    variants) fits the remaining ceiling with a 25% margin. If 50 does not
+    fit, `gen@frame` runs on the first 2 items only. If `gen` alone does not
+    fit at 50, the rung goes back to the user. The count is recorded here
+    before the 8 items run.
+  - Keypoints. Read from K1f's published rows (`row_t`, `row_right`,
+    `uncoded_kp2d`, `coded_kp2d` of each item's K1c unit; P01_107 from the
+    reproduction job `20261022T013208Z-9e048ecf`). They are exactly the
+    keypoints K1f scored, with no second WiLoR run. K1f did not publish
+    joint depths, so overlapping hands are drawn smaller first (smaller
+    taken as farther). The `warp` check against K1f's recorded value
+    tests that too.
+  - Overlap check. FoundHand-10M's file lists are only on Globus, which
+    needs a login, so the lists cannot tell. Every item counts as seen, and
+    the claim is scoped to a renderer that may have seen this footage
+    (VISOR's annotated frames, not necessarily these windows).
+  - Dropped before any run: "WiLoR on the rendered crop" (reported beside).
+    It would add WiLoR to the job for a number that decides nothing.
+    Flicker and the visual check stay.
+  - Handedness. The README and the demos put the true right hand in slots
+    0–20, un-mirroring MediaPipe, so no ordering check is needed.
+- Attempts and pilot (development on P01_107, not scored for the rule;
+  timings from a shared GPU, contaminated, not evidence).
+  - `20261022T080212Z-35880d37` (`2344973`, gpu5): the smoke stopped while
+    loading the checkpoint. It pickles the training script's `HandDiffOpts`
+    from `__main__`. Fixed in `796e6e0` by loading with `__main__` classes
+    stubbed (inference reads only `ema_state_dict`). Infrastructure, no
+    score.
+  - `20261022T080535Z-df3082c3` (`796e6e0`, gpu5, RTX 6000 Ada, shared):
+    the smoke and the full stage pass (the full stage locally, 17 checks).
+    First run on Ada: flash attention, bf16 CUTLASS GEMMs on sm80 kernels,
+    35 ms per guided step (two samples), 675.6 M parameters, no missing
+    keys. `warp` reproduces K1f exactly (LPIPS on R 0.08647 against
+    0.08647). The full item took 2,045 s: `gen` 1,008 s, `gen@frame`
+    488 s, and decoding, `ref`, `warp` and scoring about 550 s.
+  - Pilot values on R (P01_107, 1.95 kbps; K1c's hull there reads 0.258
+    LPIPS and 0.223 DISTS): `gen` 0.496 / 0.255, `gen@frame` 0.463 /
+    0.258, `ref` 0.575 / 0.279, `warp` 0.086 / 0.069. Flicker (luma, R):
+    source 6.6, `gen` 10.8, `gen@frame` 31.0. On its first 24 frames
+    (the smoke), `gen` read 0.314 / 0.201. The later frames are much worse
+    than the first ones.
+  - Visual check (frame 120). Where a crop ran past the frame's edge (the
+    forearms at the bottom), the zero padding showed up as a black band in
+    FoundHand's output and was pasted onto R. Fixed in the next commit:
+    the square crop is shifted inside the frame. The generated hands are
+    plausible but not the source's: the fingers and the forearm's position
+    differ.
+  - Budget. Spent so far: about 0.7 GPU-hours of the 3. At 50 steps, `gen`
+    with `ref` and `warp` costs about 26 min per item, so the 8 items need
+    about 3.5 GPU-hours. **`gen` alone does not fit at 50 steps. By the
+    rule, the rung goes back to the user.**
+- Decision (user, 2026-10-22, before any scored run): **4 items at 50
+  steps**: positions 0–3 of K1f's order (P09_103, P25_09, P22_107 (G's
+  training footage), P06_108), with `gen`, `ref` and `warp`, and without
+  `gen@frame`. One item per job, about 1.7 GPU-hours, within the 3. The
+  rule is unchanged otherwise: the score is the mean over {LPIPS, DISTS}
+  of the share of the 4 items won, and it passes at ≥ 75% (3 of 4 on
+  both, or 4 and 2). Code `466f73f` (crops inside the frame).
+- Jobs (RTX 6000 Ada, shared, so timings are contaminated; code from each
+  job's `ready.json`). P06_108 `20261022T084910Z-abd3eff7` (`1320465`).
+  P22_107 `20261022T084905Z-09c2f882` (`1320465`). P25_09
+  `20261022T090959Z-8ccce208` (`7e75675`: the GPU cache is released
+  between rendering and scoring, and 32,000 MiB is declared). The
+  rendering is the same in both revisions. Every smoke passed the fleet
+  validator, and every full stage passes `k6bh validate` locally. Each
+  stage's `warp` reproduces K1f's recorded LPIPS on R within 0.0001.
+  P25_09's `ref` covers 49% of R, under the validator's first coverage
+  threshold (50%), which was meant to catch an empty drawing. It was
+  lowered to 10% for `ref` after that stage was read (`1f47d1d`). The
+  decision reads `gen` only, which covers 100%.
+  Infrastructure failures (no score): P25_09 `20261022T084900Z-7e08ab8f`
+  overran its declared 16,000 MiB (24,886), and P09_103
+  `20261022T084856Z-539368dd` overran it too (22,058). P09_103's rerun
+  `20261022T092110Z-d37eedfb` overran 32,000 MiB (38,926) while scoring.
+  Report `visor/k6bh-2026-10-22/report/k6bh-report.json` (`e32546d7…2b4f`),
+  with the local validations in `k6bh-validation.tar` (`8c97643f…0a0f`).
+  GPU time: about 2.7 GPU-hours of the 3, failed attempts included.
+- Outcome. 3 of the 4 items were scored. P09_103 was not: by then it
+  could not change the decision, and the budget was nearly spent. On R,
+  at each item's keypoint rate:
+
+  | item | kbps | `gen` LPIPS / hull | `gen` DISTS / hull | `ref` LPIPS / DISTS | `warp` LPIPS / DISTS | crop (median px) | flicker `gen` / source |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | P06_108 | 1.94 | 0.308 / 0.172 | 0.273 / 0.206 | 0.391 / 0.307 | 0.091 / 0.123 | 550 | 19.7 / 14.4 |
+  | P22_107 (G) | 1.93 | 0.281 / 0.236 | **0.200** / 0.204 | **0.191** / **0.125** | 0.059 / 0.049 | 742 | 6.5 / 3.8 |
+  | P25_09 | 2.14 | 0.524 / 0.260 | 0.353 / 0.240 | 0.429 / 0.297 | 0.097 / 0.102 | 1,067 | 11.0 / 3.2 |
+
+  (Bold: below the hull. G: in G's training footage. FoundHand may have
+  seen every item, so the overlap could not be resolved.)
+  - `gen` wins 0 of 3 items by LPIPS and 1 of 3 by DISTS: **score 17%**.
+    With P09_103 won on both, it would be at most 37.5%.
+  - `ref` (a warp of one reference) wins 1 of 3 on both metrics (33%), and
+    beats `gen` on P22_107 and P25_09 by LPIPS. The pilot item
+    P01_107 (development) read `gen` 0.496 / 0.255 against a hull of
+    0.258 / 0.223.
+  - `warp`, the bound, wins 3 of 3 on both (it reproduces K1f).
+- Decision (by the rule): **fail.** FoundHand off the shelf does not keep
+  K1f's win. A zero-shot renderer with one unbilled reference loses to
+  the pixel hull at about 2 kbps on every scored item by LPIPS. The next
+  rung (overfit) gets its rule and budget below. The decision does not
+  depend on the items FoundHand may have seen, since none could be
+  separated.
+- Reading. The gap from `gen` to the bound (0.19–0.43 LPIPS) is much
+  larger than the gap from the bound to the hull. FoundHand's hands are
+  plausible but not the source's: the fingers and the forearm are drawn
+  where its 256² crop puts them, and it flickers more than the source
+  (6.5–19.7 against 3.2–14.4). That `ref` sometimes beats it says that
+  where one reference is close in pose, real pixels beat generated ones.
+  The forearm, which is in R, is a large part of what neither renders
+  (K1c's R includes it). The largest crops (P25_09, about 1,070 px down
+  to 256) lose the most.
+- Hypothesis ("`gen` lands near the bar, score around 50%"): refuted.
+  The score is 17%. Competing explanation (3), the 256² crop, fits the
+  ordering by crop size but was not isolated. (1), having seen VISOR,
+  cannot be tested, and the result is a fail despite it.
+
+### 2026-10-22 — K6b (hands) 2b: a bank of free references (rule)
+- Question (user, 2026-10-22, after rung 2). Rung 2's `ref`, one free
+  reference warped to the coded keypoints, beat FoundHand on 2 of 3 items
+  and the hull on 1. Can a few real references, each frame warped from
+  the one nearest in pose, carry the hand's appearance well enough to beat
+  the hull at the keypoint rate? H3a2 already showed that refreshed
+  references coded as their own stream lose to SVT-AV1 at 40–140 kbps.
+  This tests the corner H3a2 left open: very few references, at about
+  2 kbps.
+- Why it bounds. The references are the window's own frames, uncoded and
+  unbilled. A real bank (coded, billed, or sent once per video from
+  outside the window) can only do worse. If this fails, the reference
+  route for hands closes at every rate this side of H3a2. If it passes,
+  the next test is the buildable form: a bank chosen outside the window,
+  coded, and billed once per video.
+- Variants, on rung 2's 3 scored items (P06_108, P22_107, P25_09), with
+  P01_107 for the smoke. K1f's rows, R as the matte, and Telea fill where
+  nothing is drawn, as rung 2.
+  - `bank@K`, K ∈ {1, 4, 16} references per hand side. Chosen at the
+    encoder by farthest-point sampling on the uncoded poses (wrist-centred,
+    scaled by the pose's extent), starting from the side's first fitted
+    frame. Per frame, the decoder picks the reference whose coded pose is
+    nearest, and warps its side mask's pixels from the reference's coded
+    keypoints to the frame's (`k6.draw`). Only what a decoder holding the
+    references would have is used.
+  - `warp`: K1f's bound, the check (within 0.002 of K1f's LPIPS on R).
+- Decision rule (`k6bh.BANK_DECISION`, fixed before any run; the user's
+  criterion). Per K, an item is won on a metric when `bank@K` on R is
+  below K1f's hull at the item's keypoint rate (the references free).
+  Score = mean over {LPIPS, DISTS} of the share of the 3 items won.
+  - **Pass** (some K scores ≥ 75%, i.e. all 3 items on one metric and at
+    least 2 on the other): the next test is the buildable bank (outside
+    the window, coded, billed once per video), with its own rule.
+  - **Fail** (no K reaches 75%): no bank of real references beats the
+    hull at the keypoint rate. With H3a2, the reference route for
+    egocentric hands closes. Rung 3 (a generator fitted per clip) is then
+    the last open rung, and it waits for the user.
+- Hypothesis. `bank@16` passes, and `bank@1` does not (rung 2's `ref`
+  was 1 of 3). Hands show few distinct poses within 4.8 s, so 16
+  references cover most frames.
+- Competing explanation. The coding error of the keypoints (7–12 px)
+  plus the warp's blending of fingers, not the reference's pose, keeps
+  the warp above the hull. Then `bank@16` stays near `ref` and far above
+  `warp`, even with nearer references.
+- Budget. No generation. GPU only for LPIPS and DISTS (four scorings
+  per item). One job per item, ≤ 45 min each, declared at 40,000 MiB (rung
+  2's scoring peaked at 38,926). Each job's smoke (at most 600 s) runs
+  24 frames of its own item, so P01_107 is not needed. Ceiling 0.75
+  GPU-hours.
+- Jobs (RTX 6000 Ada, gpu6, shared; code `e0d4df5` from `ready.json`):
+  P06_108 `20261022T105912Z-875474c1`, P22_107 `20261022T105916Z-287e2bd3`,
+  P25_09 `20261022T105921Z-160d3f85`. Every smoke passed the fleet
+  validator, and every full stage passes `k6bh validate` locally, with
+  `warp` reproducing K1f. Report
+  `visor/k6bh-2026-10-22/report/k6bh-bank-report.json` (`c4c0b472…5b70`),
+  with the validations in `k6bh-bank-validation.tar` (`377b2202…7c39`).
+  GPU time: 2,080 s of stages, about 0.6 GPU-hours with the smokes,
+  within the 0.75.
+- Outcome. On R, at each item's keypoint rate, the references free:
+
+  | item | hull LPIPS / DISTS | `bank@1` | `bank@4` | `bank@16` | `warp` |
+  |---|---:|---:|---:|---:|---:|
+  | P06_108 | 0.172 / 0.206 | 0.416 / 0.322 | 0.344 / 0.276 | 0.227 / 0.209 | 0.091 / 0.123 |
+  | P22_107 (G) | 0.236 / 0.204 | **0.198 / 0.128** | **0.173 / 0.116** | **0.100 / 0.078** | 0.059 / 0.049 |
+  | P25_09 | 0.260 / 0.240 | 0.429 / 0.296 | 0.293 / **0.221** | **0.190 / 0.159** | 0.097 / 0.102 |
+
+  Scores (mean over {LPIPS, DISTS} of the share of items won): `bank@1`
+  33%, `bank@4` 50%, `bank@16` 67%. Clean of G's footage (P06_108,
+  P25_09): 0%, 25%, 50%.
+- Decision (by the rule): **fail.** No K reaches 75%. `bank@16` misses by
+  one item-metric: P06_108's DISTS, 0.209 against 0.206.
+- Reading. The rule expected a flat curve if the reference route were
+  closed. Instead quality improves steeply with K: from K = 1 to 16, LPIPS
+  on R falls by 45–56% on every item, and 16 references reach the hull on
+  2 of 3 items. The competing explanation (the coding error and the warp's
+  blending, not the reference's pose, keep the warp above the hull) is
+  refuted. Nearer references close most of the gap to `warp`, so the
+  pose distance to the reference is what costs. The hypothesis held for
+  `bank@1`, and fell one item-metric short for `bank@16`.
+  So the route does not close as the rule's fail branch states. What is
+  open is a bank larger than 16, which only makes sense if it is
+  affordable: sent once per video (VISOR's videos run for minutes) and
+  chosen outside the window. That is the buildable test, with K up to 64
+  and its billed rate. It needs keypoints for frames outside the windows
+  (H2's poses cover the windows only), so it is a task of its own, not
+  run here. Rung 3 (a generator fitted per clip) waits behind it.
+
+### 2026-10-22 — K6b (hands) 3: overfit oracle (rule, not run)
+- Question. Can FoundHand, fitted on the window's own frames, draw that
+  hand well enough to beat the hull at about 2 kbps? It has seen the
+  frames it is judged on (H3d's oracle form), so it bounds every renderer
+  fitted elsewhere in the same video. If it fails, the generative route
+  closes for egocentric hands at the keypoint stream's rate: K1f's win
+  needs the hand's own appearance per frame, which only pixels carry.
+- Model. FoundHand's EMA weights, fine-tuned per item (full DiT, or a
+  LoRA if the smoke shows full tuning cannot fit 48 GB) with its own
+  diffusion loss (`training_losses` in its `gaussian_diffusion`; no
+  training script is released, so the loop is written here). Pairs
+  (reference crop, target crop) come from the window's own frames and
+  the same crops as rung 2 (K1f's uncoded keypoints for training, coded
+  ones at test).
+- Items. The 3 items scored in rung 2 (P06_108, P22_107, P25_09), with
+  P01_107 for the smoke and the pilot. The same judges, hull and
+  criterion. Pass (≥ 75%): rung 4 (a fit on other shots of the same
+  video, billed). Fail: the generative route closes for hands, and K1f's
+  bound stays a bound.
+- Training discipline (PLAN K6b). A smoke of at most 10 min: the loss
+  falls over 200 steps, and a sample changes towards the target. Then a
+  learning-curve pilot on P01_107: fit on frames 0–179 at 25%, 50% and
+  100% of a 30-minute step budget, judge `gen` on the held-out frames
+  180–239. The scaled fit runs only if the curve, extrapolated, reaches
+  the hull's LPIPS on R at P01_107's rate within 45 minutes per item.
+  Every stage is at most 45 minutes and checkpointed.
+- Hypothesis. It fails. Rung 2's gap is mostly pose-to-pixel error and
+  the forearm, not identity, and fitting 240 frames of one hand helps
+  identity most.
+- Competing explanation. Most of the gap is appearance (skin, sleeves,
+  lighting), which the fit learns. Then the held-out frames improve
+  steeply in the pilot.
+- Budget. A ceiling of 4 GPU-hours (smoke, pilot, 3 fits), RTX 6000 Ada,
+  declared at ≥ 40,000 MiB. **Waits for the user's approval:** it is
+  training, and rung 2's ceiling was nearly spent.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
