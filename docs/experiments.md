@@ -9831,7 +9831,17 @@ invocation turns out to be needed.
   units of the same items and window length, sha256-checked, are kept, and
   only P26_108's bound is computed. Parts 8–10 had not started. They were
   cancelled and resubmitted as one item per job, so no part nears the
-  limit. Items and order are unchanged.
+  limit. Items and order are unchanged. Part 8 (`20261021T220208Z-fda99e47`)
+  had begun its smoke when it was cancelled, and its two items were
+  resubmitted the same way.
+- Reproduction check (added after the held-out scores were read, before
+  they are recorded as evidence). K1f's envelope path has not been shown
+  to reproduce H3d's recorded points. One job runs `k1f run` on the pilot
+  item P01_107 (same flags, same inputs). Every point it shares with
+  H3d's component report (SVT-AV1's seven low points, DCVC-UF's seven,
+  G-L's six) must match within 2% in rate on R and 0.003 in LPIPS on R.
+  If any point fails, the held-out result is not evidence until the
+  difference is explained.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned

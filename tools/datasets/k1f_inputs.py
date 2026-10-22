@@ -36,6 +36,7 @@ def main() -> int:
     ap.add_argument("--restore", nargs=2, metavar=("TAR", "SHA256"), help="an earlier attempt's partial.tar (under the data root)")
     ap.add_argument("--items", default="", help="these held-out items instead of the part's (comma list)")
     ap.add_argument("--name", default="", help="the spec's file name suffix")
+    ap.add_argument("--reproduce", action="store_true", help="allow pilot items (the check against H3d's recorded points)")
     args = ap.parse_args()
     h3c2 = json.loads(Path(args.h3c2_spec).read_text())
     score = json.loads(Path(args.h3d_score_spec).read_text())
@@ -44,7 +45,8 @@ def main() -> int:
     items = held_out(json.loads(Path(args.eval_set).read_text()))[args.part * args.size:(args.part + 1) * args.size]
     if args.items:
         wanted = args.items.split(",")
-        items = [i for i in held_out(json.loads(Path(args.eval_set).read_text())) if i["id"] in wanted]
+        pool = json.loads(Path(args.eval_set).read_text())["items"] if args.reproduce else held_out(json.loads(Path(args.eval_set).read_text()))
+        items = [i for i in pool if i["id"] in wanted]
         if len(items) != len(wanted):
             raise SystemExit("--items: not all are held-out items")
     if not items:
