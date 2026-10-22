@@ -576,6 +576,14 @@ objects (the tennis ball).
   Then K1f: the scope (an encoder-measurable predictor, fixed on the
   pilot) tested on B2's other 30 items, with the pixel envelope coded
   there (up to 8 GPU-hours, approved).
+  **K1f outcome (2026-10-22, `k1f-report.json` `2f6e4291…`):** on 22
+  held-out items, the hand bound (appearance granted, 21 coded keypoints
+  at about 2 kbps, every masked hand fitted) is below the SVT-AV1 + DCVC-UF
+  + G hull on **22 of 22 by LPIPS and by DISTS**. Median LPIPS on R is
+  0.084 against the hull's 0.175, and on 14 items it beats every pixel
+  point up to about 45 kbps. No scope is needed. K1f's envelope path
+  reproduces H3d's recorded points on P01_107. Next: K6b's ladder for
+  hands (a renderer that has to earn this appearance).
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks

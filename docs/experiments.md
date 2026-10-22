@@ -9842,6 +9842,62 @@ invocation turns out to be needed.
   G-L's six) must match within 2% in rate on R and 0.003 in LPIPS on R.
   If any point fails, the held-out result is not evidence until the
   difference is explained.
+  Job `20261022T013208Z-9e048ecf` (gpu6, `3f530f1`): all 20 points pass,
+  18 exactly. G-L at QP 0 ½ differs by 1.05% in rate and 0.0011 in LPIPS,
+  and at QP 42 ½ by 0.34% and 0.0001. The bound reproduces K1e's 0.0865.
+- Jobs (RTX 6000 Ada, shared, gpu6). Parts 0–5 and 7 (`d1a47c3`), 6b and
+  the six single-item parts (`b9e1d58`), each revision from its
+  `ready.json`: `20261021T211923Z-08179c83`, `20261021T220120Z-f7cbc6ed`,
+  `20261021T220127Z-381c7366`, `20261021T220134Z-c0b4a121`,
+  `20261021T220141Z-eff4e8be`, `20261021T220148Z-9e99d6a7`,
+  `20261022T000642Z-3f9256ae`, `20261021T220201Z-9337c526`,
+  `20261022T000649Z-adac9f11`, `20261022T000656Z-1aea7c30`,
+  `20261022T000702Z-d16bf68f`, `20261022T000709Z-f303e32f`,
+  `20261022T000742Z-2efab10c`, `20261022T000749Z-e723338c`. Every smoke
+  passed the fleet validator, and every full stage passes `k1f validate`
+  locally (44 checks for two-item parts, 26 for single, 46 for 6b).
+  Report `visor/k1f-2026-10-21/report/k1f-report.json` (`2f6e4291…888e`),
+  with the validation receipts in `k1f-validation.tar`. GPU time: 22,488 s
+  of stage execution, plus the failed and cancelled attempts and the
+  reproduction check, about 7.6 GPU-hours, within the 8.
+- Outcome. 22 of the 30 held-out items were run (the budget's
+  content-blind order; positions 22–29 were not run). On R, each item at
+  its own keypoint rate (1.93–2.72 kbps):
+  - **The bound is below the hull on 22 of 22 items by LPIPS and 22 of 22
+    by DISTS.** Every group passes the criterion at 100%: all (22), in
+    scope (19), out of scope (3), clean of G's training (21), and in
+    scope and clean (18).
+  - LPIPS on R: the bound's median is 0.084 (0.059–0.194), and the hull's
+    at the same rate is 0.175 (0.076–0.410). On 14 items the bound beats
+    every pixel point coded (up to about 45 kbps, SVT-AV1 CRF 63 at full
+    size), so their saving is censored. On the 8 others the median
+    saving is 84% (9–91%). The narrowest margin is P04_24, at 0.075
+    against 0.076.
+  - Scope. 19 of 22 items (86% of items and of hand frames) have coverage
+    ≥ 0.8. The 3 below (0.71–0.73) also win once the hand-box fit fills
+    them.
+- Decision (by the rule). **All items pass, so no scope is needed. The
+  claim is over all held-out items:** with appearance granted, egocentric
+  hands sent as 21 coded keypoints (about 2 kbps) beat SVT-AV1, DCVC-UF
+  and DCVC-UF + G on the hand region, on every held-out item, on both
+  metrics.
+- Reading. The pilot was harder than the held-out set. With the
+  hand-box path, P02_02 (rubber gloves, jittery fits) and P09_106 lose
+  by LPIPS, and on the held-out set nothing does. Pooled with the pilot,
+  the bound wins 24 of 26 items by LPIPS and 26 of 26 by DISTS. The
+  pilot's coverage predictor was not needed. Coverage is fixed by fitting
+  every masked hand, and what is left on P02_02 is fit quality, not
+  missing fits.
+- Hypothesis. In scope passed as predicted. "Out of scope sits near the
+  bar" is refuted: all 3 win clearly.
+- Scope and caveats. This is a bound: the hand's own pixels are moved,
+  so appearance and outline are granted. K6b's ladder decides what a
+  renderer keeps. 22 of 30 held-out items were run. The rate is K1d's
+  per-row scaling (new rows assumed to cost an average H2 row). G's
+  training overlaps one item (P22_107). Judges are LPIPS and DISTS on R;
+  pose fidelity was not judged. Savings are censored above about 45
+  kbps.
+
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
