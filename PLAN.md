@@ -404,8 +404,34 @@ the fair anchors.
 4. *F, GPU.* Re-encode the foreground with K from F̂ (lzma at s = 8 and
    16) with G_HO in the slots (H5m had G), and rescore; then an oracle for
    F carried by the foreground stream itself (no MASK segment).
+   **Done (2026-10-22, [experiments](docs/experiments.md)), fails.**
+   - 4a: with F billed (lzma at s = 8, the stream built for F̂, the
+     per-point configuration), weighted DISTS against the venue-adapted
+     DCVC-UF reads +93% (1 of 4), where F granted reads −15% (4 of 4).
+     Every metric loses, against the venue codec and the pooled envelope.
+     s = 16 is not run: its upper bound fails too (+24%, 1 of 4).
+   - F̂ costs no quality (mask bytes removed: −17%, as granted). The loss
+     is the mask's 36–116 kbps, at the low rates where the venue codec
+     reaches 13–26 kbps.
+   - 4b: exact F at zero bits fails rule (a) on weighted LPIPS (+16%, 1
+     of 4), so F in the foreground stream is not built for H5q's loss. On
+     DISTS it passes. A post hoc bound puts any carrier's budget at about
+     2 kbps (5 bytes per frame), 7–20× under every F coder measured.
+   - 4c (the user asked for the measured carrier, 2026-10-22): a key
+     colour outside K, F̃ recovered at the client (IoU 0.95–0.99). The
+     key's edge costs +26% to +129% of the foreground stream where F is
+     large; its optimistic bound reads weighted DISTS +1% (1 of 4), so
+     the gate fails and it is not scored. Only where F is 2% of the
+     frame (P09_106) is the key free (−30%).
+   - **H5p 4 closes as a fail:** no F coder tried (lzma, video, key)
+     keeps the split's DISTS win at equal adaptation once F is paid
+     for; the split wins only where F is small.
 5. *Visual check (CPU).* Side-by-side crops of PointStream and the
    anchors at matched rates, for the user's review.
+   **Done (2026-10-22):** 16 crops (4 items, about 200 kbps and 1 Mbps,
+   frames 60 and 180), PointStream billed as in 4a against the venue
+   codec and SVT-AV1 preset 1 at their best point at or under its rate;
+   in 4a's report archive, for the user's review.
 Scores stay LPIPS, DISTS and PSNR (a model trained on a metric may be
 judged on it, user 2026-10-20).
 
