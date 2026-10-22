@@ -571,6 +571,22 @@ objects (the tennis ball).
   starts with an environment audit and a packed environment. Its
   composite grants R as the generator's matte, the analogue of `warp`'s
   granted outline, so it bounds the generator with its own matte.
+  **Step 2, zero-shot (2026-10-22, experiments.md "K6b (players) 2"):
+  fails.** Moore-AnimateAnyone (the released weights) with one unbilled
+  reference crop per player and the coded keypoints, inside the granted R,
+  wins 3 of 6 windows on LPIPS and 3 of 6 on DISTS (score 50%; the two
+  unjudged windows could not have lifted it to 75%). It is far better than
+  K6's `ref` warp (LPIPS over S 0.21–0.38 against 0.39–0.55) and beats the
+  envelope on both metrics on the three Djokovic windows (saving 2–73%),
+  losing both Alcaraz windows (by 0.004–0.058) and the Rublev close-up.
+  The bound is 0.05–0.12. The environment is `pointstream-jcv` extended
+  (huggingface_hub < 1.0, conflict 10); first run on Ada recorded. Scope
+  (user, before any score): the released profile alone decides; the
+  tennis fine-tune was a diagnostic on one window, and no better there.
+  4.75 GPU-hours, over the 4-hour ceiling because parallel parts slowed
+  each other (reported to the user before judging). Next: step 3, the
+  overfit oracle; its rule is written (ceiling 6 GPU-hours) and it waits
+  for the user's approval.
   Training discipline for steps 3 and 4: a correctness smoke in minutes;
   then a learning-curve pilot on held-out frames at fixed fractions of the
   step budget; the scaled fit only if that curve, extrapolated, can reach

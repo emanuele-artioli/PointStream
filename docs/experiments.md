@@ -11181,3 +11181,103 @@ and each object's representation is judged on both:
   8 windows a pass needs 12 of the 16 window-metrics won, so on the 6
   complete windows at most 7 won is already a fail and at least 12 already
   a pass; only 8–11 would need the other two windows.
+- Decision (user, 2026-10-22, after the budget was spent): judge the 6
+  windows with both players rendered first, and render the last two only
+  if the 6 leave the decision open.
+- Judging: `20261022T182340Z-e773acb4` (`djokovic_federer/038`,
+  `rublev_auger-aliassime/052`, `alcaraz_hurkacz/045`) and
+  `20261022T182347Z-c0aac9cc` (`djokovic_federer/072`, `djokovic_zverev/012`,
+  `alcaraz_hurkacz/036`), both gpu3 (RTX A6000, shared), code `47db732`
+  from `ready.json`, 8.4 and 11.1 minutes. Every smoke passed the fleet
+  validator, and both full stages pass all 29 of `k6b validate`'s checks
+  locally: on every window `warp` and `ref` reproduce K6's LPIPS over S
+  within 0.002, and S's pixel counts equal K6's on every judged frame.
+  Report: `tennis/k6b-2026-10-22/report/k6b-report.json` (`acd27678…ca43`,
+  `k6b report` at `47db732`; judge archives `87c724d6…2113` and
+  `cd470612…6f4c`), with the local validations of the prepare, pilot and
+  judge stages in `k6b-validation.tar` (`e92b16fe…2577`).
+- Outcome (6 windows from 4 matches; means over K6's judged frames; the
+  envelope is K6's at the window's keypoint rate):
+
+  | window | kbps | heights px | `gen-original` LPIPS / envelope | DISTS / envelope | `ref` LPIPS | `warp` LPIPS | saving |
+  |---|---:|---|---:|---:|---:|---:|---:|
+  | djokovic_federer/038 | 2.74 | 138, 282 | **0.211** / 0.244 | **0.189** / 0.223 | 0.535 | 0.045 | 54% |
+  | djokovic_federer/072 | 2.92 | 156, 280 | **0.252** / 0.255 | **0.197** / 0.224 | 0.492 | 0.063 | 2% |
+  | djokovic_zverev/012 | 3.32 | 158, 784 | **0.275** / 0.379 | **0.150** / 0.252 | 0.429 | 0.051 | 73% |
+  | alcaraz_hurkacz/036 | 1.94 | 118, 175 | 0.291 / 0.280 | 0.250 / 0.246 | 0.431 | 0.099 | −35% |
+  | alcaraz_hurkacz/045 | 2.07 | 110, 190 | 0.338 / 0.280 | 0.282 / 0.249 | 0.391 | 0.107 | −135% |
+  | rublev_auger-aliassime/052 | 9.80 | 140, 542 | 0.381 / 0.243 | 0.188 / 0.164 | 0.547 | 0.123 | −826% |
+
+  (Bold: below the envelope. The generator covers 95–99.8% of R. K6's
+  saving statistic for `gen-original`: mean −1.45, 95% CI [−4.30, 0.31];
+  `warp` 0.94 [0.90, 0.97]; `ref` −7.49.)
+  - `gen-original` wins 3 of 6 windows on LPIPS and 3 of 6 on DISTS:
+    **score 50%**. At 8 windows a pass needs 12 of 16 window-metrics; with
+    the two unjudged windows won on both, the score could reach at most
+    10 of 16 (62.5%).
+  - The fine-tune diagnostic (`djokovic_federer/038`, its far player
+    rendered by the fine-tune): LPIPS 0.219 against `original`'s 0.211,
+    DISTS 0.193 against 0.189. The fine-tune is not better there.
+- Decision (by the rule, amendment 1): **fail**. A zero-shot
+  AnimateAnyone, with one unbilled reference per player and R granted as
+  its matte, does not beat K6's envelope on 75% of the windows. The two
+  unjudged windows (`djokovic_zverev/008`, `medvedev_struff/033`) could not
+  change it, so they were not rendered. Step 3 gets its rule below.
+- Reading.
+  - The hypothesis ("`gen-original` near `ref`, LPIPS 0.35–0.45") is
+    refuted in the generator's favour. It is far better than a warp of the
+    same kind of reference on every window (0.21–0.38 against 0.39–0.55),
+    and it beats the envelope on both metrics on 3 windows. The gap to the
+    bound (`warp`, 0.05–0.12) is still 0.16–0.26 LPIPS.
+  - The wins are the three Djokovic windows; the losses are both Alcaraz
+    windows (both players small, 110–190 px, and lost by 0.004–0.058) and
+    the Rublev close-up (7 judged frames, a 542 px player, whose envelope
+    is at 9.8 kbps). Competing explanation (1), the far player upscaled
+    out of distribution, fits the Alcaraz losses but not
+    `djokovic_federer/038`'s win (its far player is 138 px); it was not
+    isolated.
+  - The granted matte (competing explanation 3) remains the condition: the
+    generator draws inside R only, so its outline is granted, as `warp`'s.
+- Budget: about 4.75 GPU-hours of stage time (failed attempts 0.12, pilot
+  0.46, five generation parts 3.85, judging 0.33), above the 4-hour
+  ceiling by the parts' contention with each other; the overrun was
+  reported to the user before the judging, which the user approved.
+
+### 2026-10-22 — K6b (players) 3: overfit oracle (rule, not run)
+- Question. Can AnimateAnyone, fitted on the window's own frames, draw
+  those players well enough to beat K6's envelope at the keypoint rate on
+  75% of the windows? It has seen the frames it is judged on (H3d's oracle
+  form), so it bounds every renderer fitted elsewhere in the same match
+  (step 4). If it fails, the generative route closes for players at the
+  keypoint rate, with the matte granted.
+- Model. `original` (the profile that decided step 2), fitted per window
+  with the fork's `finetune_stage1.py` objective (ReferenceNet, denoising
+  UNet and pose guider; the motion module frozen), on pairs (reference,
+  target) from the window's own frames, drawn from the uncoded keypoints;
+  tested on the coded ones, as step 2. A LoRA instead of the full UNets if
+  the smoke shows full fitting cannot fit 48 GB.
+- Items. The 6 windows step 2 judged, with the same judges, envelope and
+  criterion (score ≥ 75% of window-metrics). Pass: step 4 (a fit on other
+  shots of the same match, billed). Fail: the generative route closes for
+  players; K6's bound stays a bound.
+- Training discipline (PLAN K6b). A smoke of at most 10 minutes: the loss
+  falls over 200 steps, and a sample moves towards the target. Then a
+  learning-curve pilot on `alcaraz_hurkacz/036` (the narrowest step-2
+  loss): fit on frames 0–179 at 25%, 50% and 100% of a 30-minute step
+  budget, render and judge the held-out frames 180–239. The scaled fits
+  run only if that curve, extrapolated, reaches the window's envelope on
+  the held-out frames within 30 minutes of fitting per window.
+- Hypothesis. It passes on the Djokovic windows and on
+  `alcaraz_hurkacz/036`, and the score reaches 75%: step 2's losses are
+  near the bar, and the residual gap is appearance (cloth, racket,
+  lighting), which a fit learns.
+- Competing explanation. The gap is the pose-to-pixel error of the coded
+  keypoints and the missing racket (COCO-17 has none), which a fit on the
+  same keypoints cannot remove; then the held-out frames improve little
+  in the pilot.
+- Budget. Per window a fit of at most 30 minutes, rendering (about 15
+  minutes for two players, run one job per GPU: step 2's parts slowed
+  each other by half), and judging (3 minutes): about 50 minutes per
+  window, 5 GPU-hours for 6, plus the smoke and the pilot (about 1):
+  **ceiling 6 GPU-hours, Ada, one job per GPU. Waits for the user's
+  approval:** it is training, and step 2 overran its ceiling.
