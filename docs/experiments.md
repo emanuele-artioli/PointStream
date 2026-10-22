@@ -10988,3 +10988,116 @@ and each object's representation is judged on both:
   GPU-hours (rung 2 took about 0.45 GPU-hours per item at 50 steps on
   Ada, plus its failed attempts), declared at 40,000 MiB, which rung 2's
   scoring needed. Each stage ≤ 45 minutes.
+
+### 2026-10-22 — H5p 4a: F coded and billed, the foreground re-encoded from F̂ (G_HO in the slots)
+- Question (PLAN H5p 4). Every equal-adaptation reading so far has F
+  granted. H5m coded F (lzma at 1/s) on streams made for the exact F, with
+  G in the slots; the loss it found was partly that bias. With F billed
+  and the foreground built for F̂ (K, the ring and the enhancer slots from
+  F̂), what is left of the split's wins against the venue-adapted
+  whole-frame DCVC-UF, neither venue model billed?
+- Configuration, fixed now: H5q 1's per-point choice of foreground coder
+  (DCVC-UF off the shelf, or the window's venue model, per point; G_HO in
+  both slots at ¼ and ½), the configuration H5q 2 fixed as the one a real
+  run is judged on. Its F-granted reading against `dcvc-venue`: weighted
+  DISTS −15% (4 of 4), frame DISTS −22% (4 of 4), weighted PSNR −11% (3 of
+  4), weighted LPIPS +6% (1 of 4).
+- Method.
+  - `h5 foreground --mask-scale s` (new): the client's F̂ (`mask.reduce`,
+    `encode`, `decode`, `upsample`, as the MASK segment carries it)
+    replaces F in the foreground's input (K = F̂ dilated by the ring and the
+    guard, the rest push-pull padded) and in the enhancer slots (the class
+    of the nearest F̂ pixel on F̂ and its ring). F's PSNR is still taken
+    on the true F.
+  - `h5 score --mask-scale s` (H5m's): F̂ in the compositor's alpha, the
+    MASK payload in the container, so the rate bills it. The score refuses
+    a foreground coded for another s.
+  - The backgrounds stay as published, filled for the exact F. A pipeline
+    built for F̂ would code the true pixels where F̂ misses F, so this
+    reading is conservative where F̂ under-covers F, and unchanged where it
+    over-covers (the foreground covers that fill).
+  - Pairs, fixed now, before any score: per item, the per-point
+    configuration's hull pairs on weighted DISTS (fill) with F granted, 15
+    | 13 | 12 | 14 (P01_107 | P02_02 | P03_10 | P09_106), 30 foreground
+    points in all, each re-encoded with its own coder. A subset's hull is
+    no better than the full grid's, so a pass is not inflated by the
+    choice. The other metrics are read on the same pairs, beside their
+    F-granted reading on those pairs (weighted LPIPS +16%, 1 of 4; frame
+    DISTS −12%, 3 of 4; weighted PSNR +8%, 1 of 4), so each row compares
+    like with like: what billing F costs at fixed pairs.
+  - s = 8 first (H5m's best single scale on weighted LPIPS, 36–116 kbps).
+    s = 16 runs only if s = 8 fails the rule, and is then judged as the
+    hull over s.
+- Decision rule, fixed now. The win to keep is weighted DISTS (fill)
+  against `dcvc-venue` alone, neither billed, in rule (a)'s form: mean
+  BD-rate −10% or better and 3 of 4 items below zero.
+  - Passes: PointStream with every byte of F counted keeps its weighted
+    DISTS win at equal adaptation; lzma at that s with the F̂-built
+    foreground is the billed configuration the paper reports. 4b decides
+    whether F in the foreground stream is worth building for margin.
+  - Fails at s = 8: s = 16, then the hull over s, by the same rule.
+  - Fails at both: billing F removes the split's DISTS win; 4b's oracle
+    says whether a MASK-free F could restore it.
+  - Reported beside it, on the same pairs, against `dcvc-venue` and the
+    fair pooled envelope (SVT-AV1 preset 1 with the ladder, DCVC-UF off
+    the shelf with the ladder, `dcvc-venue`): weighted LPIPS, frame LPIPS,
+    frame DISTS, weighted PSNR, and the mask's kbps and F̂'s IoU.
+- Hypothesis: the rule fails at s = 8. The mask costs 36–116 kbps, as much
+  as PointStream's whole stream at the low end of its hull, where most of
+  the DISTS hull's pairs lie (scene model at 540p); the F̂-built
+  foreground recovers part of H5m's boundary loss but not the rate.
+  Weighted DISTS moves from −15% to between −5% and +10%; P02_02 (F 50%,
+  116 kbps) and P01_107 (−0% granted) go above zero.
+- Competing explanation: the mask adds a near-constant 36–116 kbps, which
+  shifts the curve's low end off the overlap with `dcvc-venue` (13–26
+  kbps up to 2–4.6 Mbps) but is a small share of the rate over most of
+  the overlapping quality range, where the BD-rate is integrated in log
+  rate; DISTS judges texture more than F̂'s boundary, and the F̂-built
+  foreground removes H5m's padding artefacts. Then the win survives with
+  a smaller margin (−10% or better).
+- Budget (s = 8): per item two foreground jobs (the off-the-shelf points;
+  the venue-coded points, `--video-arm`) and two scoring jobs (the score
+  stage takes one coder's manifest per key), 16 jobs. From H5q 1's runs
+  (2.3 min per foreground point, about 50 s per scored pair, ~3 min
+  overhead per job): about 2.7 GPU-hours, ceiling 3.5. s = 16, if needed,
+  the same again: together over the card's 4 GPU-hours, so the user is
+  asked before it is submitted. Every stage under 45 minutes; shared GPUs,
+  ½-scale DCVC-UF points allowed on Ada and A6000 with the coder's three
+  attempts (docs/fleet.md).
+
+### 2026-10-22 — H5p 4b: oracle for F carried by the foreground stream (no MASK segment)
+- Question (PLAN H5p 4, H5q lever 3). Could F carried by the foreground
+  stream itself (a key outside F, an alpha plane, or F derived at the
+  client from what it decodes), with no MASK segment, turn a verdict that
+  H5q or 4a reads as a loss?
+- Oracle: the exact F at zero bits, with today's foreground stream and its
+  slots: the F-granted rows of 4a's pairs, already measured (H5q 1's
+  `venuefg` and G_HO scoring stages). It dominates any such component:
+  - no carried F̃ is more accurate than F, and F costs no bits here;
+  - carrying F in the stream constrains the padding outside F (a key, a
+    hard edge, or a second plane), which push-pull's smooth padding, built
+    to cost the codec as little as possible, does not; so the stream does
+    not get cheaper. Assumed, stated: a carried F that also made the
+    foreground stream cheaper than push-pull padding would break the bound.
+  - No GPU: the oracle's rows exist. A tighter oracle (the real cost of a
+    key or alpha plane) runs only if this one moves a verdict.
+- Operating point: where H5q loses, weighted LPIPS (fill) against
+  `dcvc-venue`, neither billed, rule (a) (mean −10% or better, 3 of 4
+  below zero). Then each metric of 4a's table where 4a's billed reading
+  fails rule (a)'s form.
+- Decision rule, fixed now. For each such verdict: if the oracle also
+  fails it, F in the foreground stream cannot turn it and is not built for
+  it. If the oracle passes where 4a fails, the component could move that
+  verdict: a tighter oracle (the measured cost of the carrier) is next,
+  with its own rule.
+- Hypothesis: on weighted LPIPS the oracle fails (the per-point
+  configuration with F granted reads +6%, 1 of 4, on its full grid and
+  +16% on 4a's pairs), so the component is not built for H5q's loss.
+  Whether it matters for DISTS depends on 4a: if 4a keeps the DISTS win,
+  the oracle can only add margin; if 4a loses it, the oracle (−15%, 4 of
+  4) passes and a tighter oracle follows.
+- Competing explanation: none can rescue weighted LPIPS here, since the
+  bound is the F-granted reading itself; the only open question is
+  whether the bound's assumption (no cheaper stream) holds, which matters
+  only if a verdict is close.
+- Budget: CPU, minutes.

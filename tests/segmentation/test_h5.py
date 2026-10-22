@@ -243,3 +243,32 @@ def test_venue_anchor_is_billed_like_pointstream() -> None:
     paid = report["comparisons"]["pointstream@kitchen|venue|wlpips_fill"]
     assert free["bd"] > 0 and paid["bd"] == pytest.approx(free["bd"], abs=0.02)  # same bits, same seconds
     assert "pointstream@kitchen|pooled|wlpips_fill" in report["comparisons"]
+
+
+def test_coded_classes_is_the_clients_f_hat() -> None:
+    from src.pointstream import mask as mk
+
+    classes = np.zeros((3, 64, 96), np.uint8)
+    classes[:, 10:40, 20:70] = 2
+    classes[:, 12:30, 22:40] = 1
+    classes[1, :, :] = np.roll(classes[1], 3, axis=1)
+    shown, payload, record = h5.coded_classes(classes, 8, Fraction(50))
+    decoded, scale = mk.decode(payload)
+    assert scale == 8 and np.array_equal(shown, mk.upsample(decoded, (96, 64)))
+    assert record["lossless_on_reduced_grid"] and record["bytes"] == len(payload)
+    assert 0.8 < record["iou"] <= 1 and abs(record["kbps"] - len(payload) * 8 / (3 / 50) / 1000) < 1e-9
+
+
+def test_foreground_validator_checks_f_hat() -> None:
+    mask = {"scale": 8, "lossless_on_reduced_grid": True, "iou": 0.97}
+    assert all(h5.validate_foreground(foreground_result(mask_scale=8, mask=mask)).values())
+    for change in ({"scale": 16}, {"lossless_on_reduced_grid": False}, {"iou": 0.5}):
+        bad = foreground_result(mask_scale=8, mask={**mask, **change})
+        assert not h5.validate_foreground(bad)["f_hat_as_the_client_decodes"]
+
+
+def test_coded_rows_with_a_tag_stay_out_of_the_tag_variants() -> None:
+    base = [{**scored(100, 0.2), "foreground": "dcvc-21_4"}]
+    coded = [{**scored(150, 0.2), "foreground": "dcvc-21_4", "tag": "h5p4-venue", "mask_scale": 8}]
+    v = h5.variant_rows(base + coded)
+    assert "h5p4-venue" not in v and [r["kbps"] for r in v["mask8"]] == [150]

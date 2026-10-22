@@ -161,6 +161,26 @@ def mask_cost(classes: np.ndarray, fps: Fraction, work: Path) -> dict[str, Any]:
             "share": float((classes > 0).mean()), "hand_share": float((classes == cp.HAND).mean())}
 
 
+def coded_classes(classes: np.ndarray, scale: int, fps: Fraction) -> tuple[np.ndarray, bytes, dict[str, Any]]:
+    """H5m: the client's F̂ from F's class map coded at 1/``scale`` (`src.pointstream.mask`), the MASK payload, and
+    its record (rate, F̂ against F)."""
+    from src.pointstream import mask as mk
+
+    reduced = mk.reduce(classes, scale)
+    payload = mk.encode(reduced, scale)
+    decoded, _ = mk.decode(payload)
+    shown = mk.upsample(decoded, (classes.shape[2], classes.shape[1]))
+    f, g = classes > 0, shown > 0
+    hands = classes == cp.HAND
+    record = {"scale": scale, "bytes": len(payload), "kbps": len(payload) * 8 / (len(classes) / float(fps)) / 1000,
+              "lossless_on_reduced_grid": bool(np.array_equal(decoded, reduced)),
+              "iou": float((f & g).sum() / max(int((f | g).sum()), 1)),
+              "missed_share": float((f & ~g).sum() / max(int(f.sum()), 1)),
+              "extra_share": float((g & ~f).sum() / max(int(f.sum()), 1)),
+              "hand_kept": float((shown[hands] == cp.HAND).mean()) if hands.any() else None}
+    return shown, payload, record
+
+
 def read_ffv1(path: Path) -> np.ndarray:
     """(n, h·3/2, w) 4:2:0 planes of an FFV1 file."""
     import av
@@ -229,7 +249,8 @@ def foreground_point(args: argparse.Namespace, w: dict[str, Any], name: str, nea
     frames = w["frames"]
     work.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
-    padded = cp.foreground_input(w["rgb"], w["classes"] > 0, scale, size)
+    # K from the F the client will composite with: F̂ when F is coded (H5p 4), else F
+    padded = cp.foreground_input(w["rgb"], w.get("shown", w["classes"]) > 0, scale, size)
     source = work / "input.yuv"
     g5.rgb_to_yuv420(padded).tofile(source)
     del padded
@@ -306,7 +327,10 @@ def command_foreground(args: argparse.Namespace) -> int:
         if video_model["fill"] != "none" or video_model["id"].split("/")[-1] != w["item"]["video"]:
             raise SystemExit(f"{args.video_arm}: not the whole-frame venue model of {w['item']['video']}")
     video_model = {"video_ckpt_sha256": file_sha256(Path(args.video_ckpt)), "venue": video_model}
-    nearest = np.stack([cp.alpha_and_classes(c)[1] for c in w["classes"]])
+    mask_record = None
+    if args.mask_scale > 0:  # H5p 4: the stream built for F̂ (K and the slots), as the client composites it
+        w["shown"], _, mask_record = coded_classes(w["classes"], args.mask_scale, w["fps"])
+    nearest = np.stack([cp.alpha_and_classes(c)[1] for c in w.get("shown", w["classes"])])
     cost = mask_cost(w["classes"], w["fps"], work)
     nets: dict[tuple[str, str], tuple[Any, dict[str, Any], str]] = {}
     for n in names:
@@ -343,13 +367,15 @@ def command_foreground(args: argparse.Namespace) -> int:
     manifest = {"window": item["id"], "video": item["video"], "frames": w["frames"], "fps": str(w["fps"]),
                 "yuv": g6.YUV, "classes_sha256": w["classes_sha256"], "mask_set": FILL, "mask_cost": cost,
                 "ring_px": cp.RING, "keep_radius_px": {str(s): cp.keep_radius(s) for s in (1, 2, 4)},
+                "mask_scale": args.mask_scale, "mask": mask_record,
                 "video_model": video_model, **g6.provenance(), **g5c.gpu_record(), "points": rows}
     write_json(publish / "manifest.json", manifest)
     write_json(stage_dir() / "h5.json", {
         "kind": "foreground", "item": item["id"], "frames": w["frames"], "limit_frames": args.limit_frames,
         "source": {k: v for k, v in w["source"].items() if k != "jpeg_gate"},
         "jpeg_gate_holds": all(c["holds"] for c in w["source"]["jpeg_gate"]), "masks": w["masks"],
-        "mask_cost": cost, "points": rows, "video_model": video_model,
+        "mask_cost": cost, "points": rows, "video_model": video_model, "mask_scale": args.mask_scale,
+        "mask": mask_record,
         "manifest_sha256": file_sha256(publish / "manifest.json"),
         "seconds": round(time.time() - began, 1), **g5c.gpu_record(), **g6.provenance()})
     shutil.rmtree(work, ignore_errors=True)
@@ -794,21 +820,7 @@ def command_score(args: argparse.Namespace) -> int:
     mask_payload, mask_record = None, None
     shown_classes = w["classes"]
     if args.mask_scale > 0:  # H5m: the client's F̂ from the coded class map replaces F
-        from src.pointstream import mask as mk
-
-        reduced = mk.reduce(w["classes"], args.mask_scale)
-        mask_payload = mk.encode(reduced, args.mask_scale)
-        decoded, _ = mk.decode(mask_payload)
-        shown_classes = mk.upsample(decoded, FULL)
-        f, g = w["classes"] > 0, shown_classes > 0
-        mask_record = {"scale": args.mask_scale, "bytes": len(mask_payload),
-                       "kbps": len(mask_payload) * 8 / (w["frames"] / float(w["fps"])) / 1000,
-                       "lossless_on_reduced_grid": bool(np.array_equal(decoded, reduced)),
-                       "iou": float((f & g).sum() / max(int((f | g).sum()), 1)),
-                       "missed_share": float((f & ~g).sum() / max(int(f.sum()), 1)),
-                       "extra_share": float((g & ~f).sum() / max(int(f.sum()), 1)),
-                       "hand_kept": float((shown_classes[w["classes"] == cp.HAND] == cp.HAND).mean())
-                       if (w["classes"] == cp.HAND).any() else None}
+        shown_classes, mask_payload, mask_record = coded_classes(w["classes"], args.mask_scale, w["fps"])
     alpha = np.stack([cp.alpha_and_classes(c)[0] for c in shown_classes])
     fg_points, manifests = [], []
     for directory in args.foreground:  # several foreground jobs' points (a grid extended later)
@@ -817,8 +829,12 @@ def command_score(args: argparse.Namespace) -> int:
         if manifest["window"] != w["item"]["id"] or (args.limit_frames <= 0
                                                      and manifest["classes_sha256"] != w["classes_sha256"]):
             raise SystemExit("the foreground was coded for another window or another F")
+        if manifest.get("mask_scale", 0) not in (0, args.mask_scale):  # a stream built for F̂ needs that F̂
+            raise SystemExit(f"{directory}: foreground built for F at 1/{manifest['mask_scale']}, "
+                             f"scored at 1/{args.mask_scale}")
         manifests.append(manifest)
-        fg_points += [{**p, "root": str(root), "manifest_job": manifest.get("job_id")} for p in manifest["points"]]
+        fg_points += [{**p, "root": str(root), "manifest_job": manifest.get("job_id"),
+                       "built_for_mask_scale": manifest.get("mask_scale", 0)} for p in manifest["points"]]
     if args.foreground_points:
         fg_points = [p for p in fg_points if p["name"] in set(args.foreground_points.split(","))]
     if len({p["key"] for p in fg_points}) != len(fg_points):
@@ -872,6 +888,7 @@ def command_score(args: argparse.Namespace) -> int:
                 parts = c.breakdown()
                 row = {"pair": key, "route": bg["route"], "background": bg_key, "foreground": fg["key"],
                        "foreground_job": fg["manifest_job"], "mask_scale": args.mask_scale, "tag": args.tag,
+                       "foreground_built_for_mask_scale": fg["built_for_mask_scale"],
                        "bytes": len(data), "kbps": len(data) * 8 / seconds / 1000, "breakdown": parts,
                        "kbps_background": parts.get("background", 0) * 8 / seconds / 1000,
                        "kbps_foreground": parts.get("foreground", 0) * 8 / seconds / 1000,
@@ -1144,6 +1161,10 @@ def validate_foreground(result: dict[str, Any]) -> dict[str, bool]:
         "mask_cost_measured": result["mask_cost"]["bytes"] > 0 and 0 < result["mask_cost"]["share"] < 0.8,
         "full_window": result["limit_frames"] > 0 or result["frames"] == 240,
         "venue_model_is_the_windows": venue_model_ok(result),
+        # H5p 4: a stream built for F̂ took F̂ from a MASK payload that decodes exactly, and F̂ is close to F
+        "f_hat_as_the_client_decodes": not result.get("mask_scale") or (
+            result["mask"]["lossless_on_reduced_grid"] and result["mask"]["scale"] == result["mask_scale"]
+            and result["mask"]["iou"] > 0.7),
     }
 
 
@@ -1428,7 +1449,8 @@ def variant_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     over every s."""
     granted = [r for r in rows if not r.get("mask_scale") and not r.get("tag")]
     out = {v: [r for r in granted if r["route"] in routes] for v, routes in VARIANTS.items()}
-    for tag in sorted({r["tag"] for r in rows if r.get("tag")}, key=lambda t: t in BASE_OF_TAG):
+    tags = {r["tag"] for r in rows if r.get("tag") and not r.get("mask_scale")}  # coded-F rows go to mask{s} below
+    for tag in sorted(tags, key=lambda t: t in BASE_OF_TAG):
         # a foreground swap: its rows, and its base variant's (H5's, or G_HO's for H5q) for the other points
         tagged = [r for r in rows if r.get("tag") == tag and not r.get("mask_scale")]
         swapped = {r["foreground"] for r in tagged}
@@ -1637,6 +1659,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--object-networks", action="append", default=[], help="H4c's networks job archives (G_HO)")
     p.add_argument("--video-arm", help="H5q 1: G6's `train --fill none` archive of the window's video (extracted); "
                    "its fine-tuned DCVC-UF HT-L replaces --video-ckpt")
+    p.add_argument("--mask-scale", type=int, default=0, help="H5p 4: build the stream for the client's F̂ (F coded "
+                   "at 1/s, `src.pointstream.mask`): K and the slots from F̂ (0: from F)")
     p = sub.add_parser("score")
     add_window(p)
     p.add_argument("--foreground", action="append", required=True, help="foreground jobs' archives (extracted)")
