@@ -84,18 +84,38 @@ def load_checked(module: Any, state: dict[str, Any], name: str, allowed_unexpect
     return {"keys": len(state), "missing": 0, "unexpected": len(unexpected), "unexpected_examples": unexpected[:5]}
 
 
+def folder(weights: dict[str, Path], prefix: str, scratch: Path) -> Path:
+    """A folder whose files link the staged weights named ``prefix/<file>`` (from_pretrained reads folders)."""
+    out = scratch / "folders" / prefix
+    out.mkdir(parents=True, exist_ok=True)
+    for name, path in weights.items():
+        if name.startswith(prefix + "/"):
+            link = out / name.split("/", 1)[1]
+            if not link.exists():
+                link.symlink_to(path.resolve())
+    return out
+
+
+def loading_record(info: dict[str, Any], name: str) -> dict[str, Any]:
+    missing = list(info.get("missing_keys", []))
+    if missing:
+        raise SystemExit(f"{name}: {len(missing)} missing keys, e.g. {missing[:5]}")
+    unexpected = list(info.get("unexpected_keys", []))
+    return {"missing": 0, "unexpected": len(unexpected), "unexpected_examples": unexpected[:5],
+            "mismatched": len(info.get("mismatched_keys", []))}
+
+
 class Renderer:
     """One profile's models in fp16 on the GPU, and the released long-video pipeline."""
 
-    def __init__(self, weights: dict[str, Path], profile: str, device: str):
+    def __init__(self, weights: dict[str, Path], profile: str, device: str, scratch: Path):
         import torch
         from animate_anyone.models.pose_guider import PoseGuider
         from animate_anyone.models.unet_2d_condition import UNet2DConditionModel
         from animate_anyone.models.unet_3d import UNet3DConditionModel
         from animate_anyone.pipelines.pipeline_pose2vid_long import Pose2VideoPipeline
         from diffusers import AutoencoderKL, DDIMScheduler
-        from safetensors.torch import load_file
-        from transformers import CLIPVisionConfig, CLIPVisionModelWithProjection
+        from transformers import CLIPVisionModelWithProjection
 
         dtype = torch.float16  # animation.yaml's weight_dtype
 
@@ -103,11 +123,14 @@ class Renderer:
             return torch.load(weights[f"{profile}/{key}.pth"], map_location="cpu", weights_only=True)
 
         record: dict[str, Any] = {"profile": profile, "dtype": "float16"}
-        vae = AutoencoderKL.from_config(AutoencoderKL.load_config(str(weights["vae/config.json"])))
-        record["vae"] = load_checked(vae, load_file(str(weights["vae/diffusion_pytorch_model.safetensors"])), "vae")
-        encoder = CLIPVisionModelWithProjection(CLIPVisionConfig.from_json_file(str(weights["image_encoder/config.json"])))
-        record["image_encoder"] = load_checked(encoder, torch.load(weights["image_encoder/pytorch_model.bin"], map_location="cpu", weights_only=True),
-                                               "image_encoder", ("position_ids",))
+        # The VAE and the image encoder load through their libraries' own from_pretrained, as pose2vid.py does:
+        # sd-vae-ft-mse stores diffusers' deprecated attention names (query/key/value/proj_attn), which only
+        # from_pretrained renames. Each sees a folder linking the staged files, and its loading info is checked.
+        vae, info = AutoencoderKL.from_pretrained(str(folder(weights, "vae", scratch)), output_loading_info=True)
+        record["vae"] = loading_record(info, "vae")
+        encoder, info = CLIPVisionModelWithProjection.from_pretrained(str(folder(weights, "image_encoder", scratch)),
+                                                                      output_loading_info=True)
+        record["image_encoder"] = loading_record(info, "image_encoder")
         reference = UNet2DConditionModel.from_config({**SD15_UNET, "_class_name": "UNet2DConditionModel"})
         record["reference_unet"] = load_checked(reference, pth("reference_unet"), "reference_unet")
         config3d = {**SD15_UNET, "_class_name": "UNet3DConditionModel",
@@ -153,6 +176,8 @@ def command_generate(args: argparse.Namespace) -> int:
 
     from experiments.audit.env_smoke import device_record, model_on_cuda
 
+    os.environ["HF_HUB_OFFLINE"] = "1"  # code never downloads (AGENTS.md); every file is staged
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
     began = time.time()
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
     publish = scratch / "publish"
@@ -179,7 +204,7 @@ def command_generate(args: argparse.Namespace) -> int:
         if not todo:
             continue
         loaded = time.time()
-        renderer = Renderer(weights, profile, device)
+        renderer = Renderer(weights, profile, device, scratch)
         record = {**renderer.record, "load_seconds": round(time.time() - loaded, 1),
                   "on_cuda": {k: model_on_cuda(m) for k, m in renderer.modules.items()},
                   "params": {k: int(sum(p.numel() for p in m.parameters())) for k, m in renderer.modules.items()}}
