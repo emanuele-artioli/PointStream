@@ -65,7 +65,13 @@ sessions update their own items and experiments.md entries
   metric loses against every anchor. F̂ itself costs no quality; the
   mask's rate does, at rates where the venue codec needs 13–26 kbps. A
   carrier inside the foreground stream would have to cost about 2 kbps,
-  and an exact F at zero bits still loses LPIPS (+16%). The crops for the
+  and an exact F at zero bits still loses LPIPS (+16%). H5p 4c measured
+  one (a flat key colour outside K, 5-byte segment): F̃ is as accurate as
+  lzma's, but the key's border costs 26–129% more foreground rate where F
+  is large, so weighted DISTS reads +1% (1 of 4) even as an optimistic
+  bound; on P09_106 (F 2%) the key is nearly free and reads −30%. H5p 4
+  closes as a fail: no F coder tried keeps the egocentric win once F is
+  paid for. The key carrier is the candidate for small-F domains. The crops for the
   visual check are ready (user). The egocentric claim is the user's to
   reframe; small-F domains (tennis) are where F's rate matters least.
 - **Background (G):** a scene model adapted to the venue, sent beforehand
@@ -105,6 +111,7 @@ stops; the root session fills in the outcome and the next step.
 | item | card | branch | suggested model | status |
 |---|---|---|---|---|
 | H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` @ `3b11a36` | Opus | reported 2026-10-22: 4a fail (F billed +93% wDISTS), 4b not built (LPIPS), crops ready; 2.6 GPU-hours of 4 |
+| H5p 4c | key carrier for F (user's request) | `claude/h5p-f-stream` @ `41c37c8` | Opus | reported 2026-10-22: fail at the gate (+1%, 1 of 4; P09_106 −30%); 1.38 GPU-hours of 3 |
 | K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` @ `505f5a7` | Opus | reported 2026-10-22: fail (12.5%; free bank 25%); 2.6 GPU-hours of 3.5 |
 | K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` @ `340d8d5` | Opus | reported 2026-10-22: fail (50%, 6 of 8 windows); 4.75 GPU-hours of 4 (overrun approved by the user) |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
