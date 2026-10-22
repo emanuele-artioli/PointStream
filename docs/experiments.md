@@ -10010,8 +10010,9 @@ and each object's representation is judged on both:
 ### 2026-10-22 — K6b (hands) 2: zero-shot oracle (rule)
 - Question. With one unbilled reference crop per hand and the coded
   keypoints, does FoundHand, off the shelf, keep K1f's win over the pixel
-  hull? K1f's bound (0.084 median LPIPS on R) is the ceiling, and the
-  hull at each item's keypoint rate (median 0.175) is the bar.
+  hull? K1f's bound (0.084 median LPIPS on R over its first 22 items;
+  0.086 over all 30) is the ceiling, and the hull at each item's keypoint
+  rate (median 0.175; 0.174 over 30) is the bar.
 - Items. Positions 0–7 of K1f's content-blind order
   (`tools/datasets/k1f_inputs.py`), 240 frames each. All 8 have K1f's
   bound and hull recorded, so nothing is re-coded. Items in G's training
