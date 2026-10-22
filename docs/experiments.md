@@ -10105,6 +10105,99 @@ invocation turns out to be needed.
   rule is unchanged otherwise: the score is the mean over {LPIPS, DISTS}
   of the share of the 4 items won, and it passes at ≥ 75% (3 of 4 on
   both, or 4 and 2). Code `466f73f` (crops inside the frame).
+- Jobs (RTX 6000 Ada, shared, so timings are contaminated; code from each
+  job's `ready.json`). P06_108 `20261022T084910Z-abd3eff7` (`1320465`).
+  P22_107 `20261022T084905Z-09c2f882` (`1320465`). P25_09
+  `20261022T090959Z-8ccce208` (`7e75675`: the GPU cache is released
+  between rendering and scoring, and 32,000 MiB is declared). The
+  rendering is the same in both revisions. Every smoke passed the fleet
+  validator, and every full stage passes `k6bh validate` locally. Each
+  stage's `warp` reproduces K1f's recorded LPIPS on R within 0.0001.
+  P25_09's `ref` covers 49% of R, under the validator's first coverage
+  threshold (50%), which was meant to catch an empty drawing. It was
+  lowered to 10% for `ref` after that stage was read (`1f47d1d`). The
+  decision reads `gen` only, which covers 100%.
+  Infrastructure failures (no score): P25_09 `20261022T084900Z-7e08ab8f`
+  overran its declared 16,000 MiB (24,886), and P09_103
+  `20261022T084856Z-539368dd` overran it too (22,058). P09_103's rerun
+  `20261022T092110Z-d37eedfb` overran 32,000 MiB (38,926) while scoring.
+  Report `visor/k6bh-2026-10-22/report/k6bh-report.json` (`e32546d7…2b4f`),
+  with the local validations in `k6bh-validation.tar` (`8c97643f…0a0f`).
+  GPU time: about 2.7 GPU-hours of the 3, failed attempts included.
+- Outcome. 3 of the 4 items were scored. P09_103 was not: by then it
+  could not change the decision, and the budget was nearly spent. On R,
+  at each item's keypoint rate:
+
+  | item | kbps | `gen` LPIPS / hull | `gen` DISTS / hull | `ref` LPIPS / DISTS | `warp` LPIPS / DISTS | crop (median px) | flicker `gen` / source |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | P06_108 | 1.94 | 0.308 / 0.172 | 0.273 / 0.206 | 0.391 / 0.307 | 0.091 / 0.123 | 550 | 19.7 / 14.4 |
+  | P22_107 (G) | 1.93 | 0.281 / 0.236 | **0.200** / 0.204 | **0.191** / **0.125** | 0.059 / 0.049 | 742 | 6.5 / 3.8 |
+  | P25_09 | 2.14 | 0.524 / 0.260 | 0.353 / 0.240 | 0.429 / 0.297 | 0.097 / 0.102 | 1,067 | 11.0 / 3.2 |
+
+  (Bold: below the hull. G: in G's training footage. FoundHand may have
+  seen every item, so the overlap could not be resolved.)
+  - `gen` wins 0 of 3 items by LPIPS and 1 of 3 by DISTS: **score 17%**.
+    With P09_103 won on both, it would be at most 37.5%.
+  - `ref` (a warp of one reference) wins 1 of 3 on both metrics (33%), and
+    beats `gen` on P22_107 and P25_09 by LPIPS. The pilot item
+    P01_107 (development) read `gen` 0.496 / 0.255 against a hull of
+    0.258 / 0.223.
+  - `warp`, the bound, wins 3 of 3 on both (it reproduces K1f).
+- Decision (by the rule): **fail.** FoundHand off the shelf does not keep
+  K1f's win. A zero-shot renderer with one unbilled reference loses to
+  the pixel hull at about 2 kbps on every scored item by LPIPS. The next
+  rung (overfit) gets its rule and budget below. The decision does not
+  depend on the items FoundHand may have seen, since none could be
+  separated.
+- Reading. The gap from `gen` to the bound (0.19–0.43 LPIPS) is much
+  larger than the gap from the bound to the hull. FoundHand's hands are
+  plausible but not the source's: the fingers and the forearm are drawn
+  where its 256² crop puts them, and it flickers more than the source
+  (6.5–19.7 against 3.2–14.4). That `ref` sometimes beats it says that
+  where one reference is close in pose, real pixels beat generated ones.
+  The forearm, which is in R, is a large part of what neither renders
+  (K1c's R includes it). The largest crops (P25_09, about 1,070 px down
+  to 256) lose the most.
+- Hypothesis ("`gen` lands near the bar, score around 50%"): refuted.
+  The score is 17%. Competing explanation (3), the 256² crop, fits the
+  ordering by crop size but was not isolated. (1), having seen VISOR,
+  cannot be tested, and the result is a fail despite it.
+
+### 2026-10-22 — K6b (hands) 3: overfit oracle (rule, not run)
+- Question. Can FoundHand, fitted on the window's own frames, draw that
+  hand well enough to beat the hull at about 2 kbps? It has seen the
+  frames it is judged on (H3d's oracle form), so it bounds every renderer
+  fitted elsewhere in the same video. If it fails, the generative route
+  closes for egocentric hands at the keypoint stream's rate: K1f's win
+  needs the hand's own appearance per frame, which only pixels carry.
+- Model. FoundHand's EMA weights, fine-tuned per item (full DiT, or a
+  LoRA if the smoke shows full tuning cannot fit 48 GB) with its own
+  diffusion loss (`training_losses` in its `gaussian_diffusion`; no
+  training script is released, so the loop is written here). Pairs
+  (reference crop, target crop) come from the window's own frames and
+  the same crops as rung 2 (K1f's uncoded keypoints for training, coded
+  ones at test).
+- Items. The 3 items scored in rung 2 (P06_108, P22_107, P25_09), with
+  P01_107 for the smoke and the pilot. The same judges, hull and
+  criterion. Pass (≥ 75%): rung 4 (a fit on other shots of the same
+  video, billed). Fail: the generative route closes for hands, and K1f's
+  bound stays a bound.
+- Training discipline (PLAN K6b). A smoke of at most 10 min: the loss
+  falls over 200 steps, and a sample changes towards the target. Then a
+  learning-curve pilot on P01_107: fit on frames 0–179 at 25%, 50% and
+  100% of a 30-minute step budget, judge `gen` on the held-out frames
+  180–239. The scaled fit runs only if the curve, extrapolated, reaches
+  the hull's LPIPS on R at P01_107's rate within 45 minutes per item.
+  Every stage is at most 45 minutes and checkpointed.
+- Hypothesis. It fails. Rung 2's gap is mostly pose-to-pixel error and
+  the forearm, not identity, and fitting 240 frames of one hand helps
+  identity most.
+- Competing explanation. Most of the gap is appearance (skin, sleeves,
+  lighting), which the fit learns. Then the held-out frames improve
+  steeply in the pilot.
+- Budget. A ceiling of 4 GPU-hours (smoke, pilot, 3 fits), RTX 6000 Ada,
+  declared at ≥ 40,000 MiB. **Waits for the user's approval:** it is
+  training, and rung 2's ceiling was nearly spent.
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned

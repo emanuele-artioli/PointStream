@@ -617,6 +617,17 @@ objects (the tennis ball).
   the body candidate. Next: rung 2, the zero-shot oracle on positions 0–7
   of K1f's order (rule written; ceiling 3 GPU-hours). Before it: the
   FoundHand source and weights into `Models`, and an environment check.
+  **Rung 2, zero-shot (2026-10-22, experiments.md "K6b (hands) 2"):
+  fails.** FoundHand with one unbilled reference crop and the coded
+  keypoints wins 0 of 3 held-out items by LPIPS and 1 of 3 by DISTS
+  (score 17%; a 4th item, not run, could not have changed it). Its LPIPS
+  on R is 0.28–0.52 against the hull's 0.17–0.26 and the bound's
+  0.06–0.10. A warp of the reference does as well or better. The 4
+  items at 50 steps were the user's decision when 8 did not fit 3 GPU-hours.
+  Next: rung 3, the overfit oracle (FoundHand fitted on the window's own
+  frames). Its rule is written, with a ceiling of 4 GPU-hours, and it
+  waits for the user's approval. If it fails, the generative route
+  closes for hands.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
