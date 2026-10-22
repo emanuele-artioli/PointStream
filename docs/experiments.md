@@ -9900,6 +9900,24 @@ invocation turns out to be needed.
 - Completion (user, 2026-10-22: "yes", about 2.6 more GPU-hours). The 8
   items not run (positions 22–29 of the fixed order) run as single-item
   jobs, unchanged. The result is read over all 30.
+  Jobs (`ffd6ccd`, gpu6, RTX 6000 Ada): `20261022T072405Z-ab09c0af`,
+  `20261022T072414Z-a0071b24`, `20261022T072430Z-d94d8b6e`,
+  `20261022T072439Z-e7c8ed8c`, `20261022T072448Z-b850bbac`,
+  `20261022T072458Z-9cc87e86`, `20261022T072508Z-128ba164`,
+  `20261022T072522Z-e7c0f8bc`. Each passes all 26 checks locally (9,378
+  s together). Report over all 30:
+  `visor/k1f-2026-10-21/report/k1f-report-30.json` (`d31b1fc2…0eb8`), with
+  `k1f-validation-30.tar`. K1f's total: about 10.2 GPU-hours (8 approved,
+  then 2.6 more, user, 2026-10-22).
+- **Outcome over all 30 held-out items.** The bound is below the hull on
+  **30 of 30 by LPIPS and 30 of 30 by DISTS**, and every group passes at
+  100%: all (30), in scope (26), out of scope (4), clean of G (28), and
+  in scope and clean (24). LPIPS on R: the bound's median is 0.086, the
+  hull's 0.174. On 17 items the bound beats every pixel point coded (up
+  to about 45 kbps). On the 13 others the median saving is 83% (10–93%).
+  The narrowest margin is still P04_24 (0.075 against 0.076). In scope:
+  87% of items and of hand frames. Pooled with the pilot (K1e's path),
+  the bound wins 32 of 34 items by LPIPS and 34 of 34 by DISTS.
 
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
