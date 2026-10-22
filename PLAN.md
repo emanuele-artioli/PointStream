@@ -85,8 +85,14 @@ sessions update their own items and experiments.md entries
   judge; the ball mode kept with the streak renderer (user). K6 done
   (2026-10-21): with true appearance at the coded pose the players'
   keypoints save 95% of the pixel coders' rate, but a reference frame
-  warped to the pose loses to every pixel coder. Next: K6b (a learned
-  per-player renderer's oracle), then K6c; K7 (HiEve) later.
+  warped to the pose loses to every pixel coder. K6b step 2 (2026-10-22):
+  AnimateAnyone zero-shot, one unbilled reference and R granted as its
+  matte, wins 3 of 6 windows by LPIPS and by DISTS (50%, fail). It wins
+  all three Djokovic windows (up to 73% saving) and loses both Alcaraz
+  windows and Rublev's. Step 3 (overfit, ≤ 6 GPU-hours, rule written)
+  waits for the user. Every player result so far grants the matte; the
+  matte's rate is unmeasured on tennis (H5p 4: on egocentric video the
+  billed mask removed every win). K6c after K6b; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -100,7 +106,7 @@ stops; the root session fills in the outcome and the next step.
 |---|---|---|---|---|
 | H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` @ `3b11a36` | Opus | reported 2026-10-22: 4a fail (F billed +93% wDISTS), 4b not built (LPIPS), crops ready; 2.6 GPU-hours of 4 |
 | K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` @ `505f5a7` | Opus | reported 2026-10-22: fail (12.5%; free bank 25%); 2.6 GPU-hours of 3.5 |
-| K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` | Opus | queued 2026-10-22 |
+| K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` @ `340d8d5` | Opus | reported 2026-10-22: fail (50%, 6 of 8 windows); 4.75 GPU-hours of 4 (overrun approved by the user) |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 | J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
 
