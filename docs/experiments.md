@@ -9489,6 +9489,437 @@ invocation turns out to be needed.
   8-hour ceiling; about 5 h of wall time from the rule, including an
   outage of the session.
 
+### 2026-10-21 — K1c: K6's bound on egocentric hands (outline granted)
+- Question ([PLAN K1c](../PLAN.md)). H3b's hand bound drew MANO's mesh at
+  the coded pose and charged MANO's outline (it misses 9.7% of the hand and
+  overshoots 9.2%). K6's `warp` grants the outline: the frame's own pixels
+  moved from the uncoded to the coded keypoints by a 2D skeleton warp, so
+  only the coding error is charged. On bodies that was the difference
+  between a loss and a 95% saving. Does the same bound beat the pixel
+  coders on hands, at H2's coded keypoint rate, against H3d's envelope?
+- Items. H3b's pilot: B2's four windows (`P01_107_0000003049`,
+  `P02_02_0000006080`, `P03_10_0000000616`, `P09_106_0000006303`), 240
+  frames each, with H3c2's staged inputs unchanged (window decode, fill
+  masks and record, H2's VISOR poses and `code.json`, MANO, LPIPS and
+  DISTS backbones; `h3c-2026-10-11/inputs.json` `da49a912…7a10`).
+- Keypoints. H2's WiLoR rows, each track coded with H2's 100 ms choice
+  (Gaussian 33 ms, 15 Hz interpolated, full pose, steps ×8; 1.93 kbps
+  pooled, 1.927 in K1) and its median shape, decoded, and the 21 joints
+  projected (`h3b.item_poses`, `h2.pinhole`, as `h3c.item_judge`). Source
+  keypoints: the same row's uncoded fit (its own shape) projected the same
+  way, so the warp at the uncoded keypoints is the identity.
+- Warp. `k6.draw` with a hand skeleton instead of K4's body: the 20 bones
+  of the 21-joint OpenPose/MANO hand (wrist to each finger's base, then
+  along each finger), every joint confident. Per fitted hand (one H2 row
+  per side and frame), the region moved is that side's fill-set class mask
+  (hand and forearm, as R), σ = 0.08 of that mask's height (K6's constant,
+  not tuned), the field on K6's 4 px grid. Hands are drawn farther first
+  (mean coded joint depth). As H3b, drawn pixels never cover objects (the
+  fill set's other foreground), and inside R the source is first replaced
+  by K6's Telea fill (radius 5), so a hand with no fit in that frame, and
+  every pixel of R the warp misses, is charged as fill. Variants:
+  - `warp` (the bound): the uncoded to the coded keypoints.
+  - `warp@uncoded` (diagnostic): the identity on fitted hands; what remains
+    is the charge for unfitted hands.
+- Judges. LPIPS on R exactly as H3c and H3d scored their points (`h3c.Scorer`:
+  the variant inside R, the source outside; B2's AlexNet spatial map on the
+  full frame averaged over R; mean over the window's frames with R
+  non-empty), so the bound and the envelope share region, frames and
+  network. **Decides.** Beside: DISTS on R (H3c's), PSNR on R, LPIPS over
+  S = R ∪ every drawn pixel with the drawing kept outside R (overshoot
+  charged, as K6), the share of R the warp misses and the share of its
+  drawing outside R.
+- Envelope. Per item, the upper concave hull (`g5.envelope`, linear in rate)
+  of SVT-AV1's eleven points and DCVC-UF off the shelf (H3d's bar) together
+  with DCVC-UF + G's six points (H3d's component, arm `G-L`), all on R, from
+  H3d's component report (`h3d-2026-10-12/report-component/h3d-report.json`,
+  `467be69f…6e00`); K1's `joint` hull. At 1.927 kbps it reads LPIPS 0.258
+  (P01_107), 0.204 (P02_02), 0.155 (P03_10) and 0.184 (P09_106).
+- Decision rule (`k1c.DECISION`, fixed before any run). Per item, the bound
+  passes when its LPIPS on R is below the hull's at 1.927 kbps.
+  - If it passes on ≥ 3 of 4 items, hands get K6b's ladder in PLAN
+    (audit, zero-shot, overfit, match fit), as bodies do.
+  - Otherwise hands are closed for every renderer at the keypoint stream's
+    rate: no renderer can draw more of the true frame at the coded pose.
+  - If LPIPS over S (overshoot charged) moves the count of passing items
+    across 3, or DISTS on R disagrees with LPIPS on that count, the outcome
+    goes to the user.
+  - The hull's rate for the bound's quality (and the saving) is reported
+    per item, as K1.
+- Hypothesis. The bound passes on ≥ 3 items. H3b's `wilor:arm_uncoded` (MANO
+  at the uncoded pose) was 0.168 on S and already above the hull on 2
+  items; granting the outline removes MANO's 10% miss and spill, and the
+  coding error (about 10 px on WiLoR's joints) costs less than that.
+- Competing explanation. Hands are not bodies: fingers are thin and close,
+  a 10 px joint error is a large share of a finger, and the warp blends
+  neighbouring fingers' bones, so the coding error alone may cost more
+  LPIPS than a ¼-scale DCVC-UF + G. `warp@uncoded` separates the coding
+  error from the unfitted-hand charge; the missed share separates both
+  from the outline.
+- Budget. One fleet job (`k1c run`), shared Ada or A6000 (LPIPS and DISTS
+  verified there): smoke ≤ 600 s (P01_107, first 48 frames), full ≤ 45 min
+  (the four items; the warp on the CPU, two scorings per item). Ceiling
+  1 GPU-hour, smoke included. The comparison (`k1c report`) is local, from
+  the validated stage and H3d's report.
+- Job `20261021T184040Z-70821cd0` (gpu5, RTX 6000 Ada, shared; `ab8c205`
+  from `ready.json`; environment `pointstream-20261009T214002Z`; inputs
+  H3c2's, `da49a912…7a10`). Smoke passed the fleet validator. The full
+  stage (4 items, 240 frames) took 1,182 s and passes all 47 of
+  `k1c validate`'s checks locally. Among them: the warp at the uncoded
+  joints reproduces the source on every fitted hand, LPIPS and DISTS of the
+  source against itself are 0, and H2's units hash-check. Rate: 1.927 kbps
+  (WiLoR, `gauss:33.3|15Hz-linear|full|q8|previous`). Report
+  `visor/k1c-2026-10-21/report/k1c-report.json` (`085bb948…ef90`, `k1c
+  report` at `ab8c205` on `full/published.tar` `3207020e…898d`), with the
+  local validation beside it.
+- Outcome. On R, at 1.927 kbps:
+
+  | item | `warp` LPIPS | hull LPIPS | hull's rate for `warp`'s LPIPS (saving) | LPIPS over S | `warp` DISTS / hull | `warp@uncoded` LPIPS | R unfitted | fitted R missed | spill |
+  |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+  | P01_107 | **0.087** | 0.258 | 45.9 kbps (96%) | 0.089 | 0.071 / 0.223 | 0.004 | 0.4% | 3.0% | 2.4% |
+  | P02_02 | 0.272 | 0.204 | 0.96 kbps (−101%) | 0.276 | 0.191 / 0.251 | 0.192 | 39.6% | 8.0% | 3.0% |
+  | P03_10 | **0.093** | 0.155 | 8.6 kbps (78%) | 0.104 | 0.104 / 0.203 | 0.010 | 1.4% | 5.2% | 3.5% |
+  | P09_106 | 0.211 | 0.184 | 1.06 kbps (−82%) | 0.219 | 0.218 / 0.225 | 0.138 | 26.8% | 7.3% | 6.1% |
+
+  (Hull: H3d's bar and DCVC-UF + G, K1's joint hull, read at the
+  keypoint rate. R unfitted: the share of R in a hand that has no H2 fit
+  in that frame, drawn as fill. Missed: the share of a fitted hand's mask
+  the warp does not reach. Spill: the share of the drawing outside R.
+  The coded joints move 7–12 px from the uncoded ones.)
+  - LPIPS on R: the bound is below the hull on **2 of 4** items, so by
+    its own gate this fails the 3-of-4 bar. LPIPS over S gives the same 2.
+  - DISTS on R: the bound is below the DISTS hull on **4 of 4**. That
+    moves the count across 3, so **by the rule the outcome goes to the
+    user.**
+- Diagnosis. The two losing items are the two where H2 left much of R
+  unfitted (40% and 27% of R, against 0.4% and 1.4%). Those pixels are
+  charged as Telea fill. `warp@uncoded` isolates that charge: it is 0.192
+  and 0.138 there, already near the hull (0.204, 0.184), and the coding
+  error (11–12 px) adds the rest. Where the hands are fitted, the outline
+  granted turns H3b's loss into a 78–96% saving. H3b's MANO bound
+  (`wilor:arm`, 0.17–0.31 on R through K1's bridge) lost on 3 of 4. So
+  what decides hands at this rate is the estimator's coverage (a hand
+  with no fit has no keypoints) and the coding error. The renderer's
+  outline does not decide it.
+- Hypothesis: refuted as stated (2 of 4, not ≥ 3), held where the hands
+  are fitted. The competing explanation (finger blending makes the coding
+  error dominate) does not hold on the fitted items: misses are 3–8%.
+- Proposed reading, for the user. (a) By LPIPS's letter, hands are closed
+  for every renderer at the keypoint stream's rate as H2 codes it today.
+  (b) Or hands get K6b's ladder scoped to fitted hands, after a coverage
+  fix: H2b's hybrid estimator, or hands without a fit sent as pixels (a
+  hybrid). That would need its own bound first, charging the pixel
+  coder's rate on unfitted hands.
+- Scope. 4 pilot items, 240 frames. Appearance and outline granted, and
+  no reference billed. The hull is H3d's recorded points. LPIPS decides,
+  DISTS is reported, and they disagree on 2 items.
+- Budget: 1,182 s of stage execution plus the smoke (under 0.5 GPU-hour),
+  inside the 1-hour ceiling.
+
+### 2026-10-21 — K1d: K1c's bound with every masked hand fitted (coverage fix)
+- Question (user, 2026-10-21, after K1c: "if we still have a chance to win
+  on hands, let's try it"). K1c lost on P02_02 and P09_106 because H2 has
+  no fit for 40% and 27% of R. On P02_02, 53 hand frames have no fit and
+  131 have one. On P09_106 it is 66 and 114. Whole hands were never boxed
+  by H1's detector, so H2b's hybrid (same boxes) cannot help. The encoder
+  has the hand masks, though. If every masked hand is fitted, does the
+  bound pass?
+- Change against K1c (nothing else changes: items, warp, judges, hull,
+  bars). For every window frame and side whose fill-set class mask is
+  non-empty (box sides ≥ 16 px) and that has no H2 WiLoR row, WiLoR (H2's
+  `Regressor`, same checkpoint) is run on that mask's bounding box, with
+  the side from the mask's class. The fit becomes a row as in `h2.run_visor`
+  (rotation, shape, full-frame translation at H2's focal). It joins H2's
+  rows, and the item's WiLoR tracks are coded again with H2's 100 ms choice
+  (`CodingSet`, so a new row joins its side's track). The mask box includes
+  the forearm, so these fits can be worse than H1-boxed ones. That cost is
+  charged through the coding error of the track.
+- Rate. H2's pooled rate (1.927 kbps for H2's rows) scaled per item by the
+  ratio of coded rows after to before. This assumes the new rows cost what
+  H2's rows cost on average, and leaves out extra track starts. Both new
+  counts are reported, and the hull is read at each item's own rate.
+- Decision rule (`k1c.DECISION_K1D`, fixed before any run). This is K1c's
+  rule on the covered fits. The bound passes on an item when LPIPS on R is
+  below the hull at that item's rate.
+  - ≥ 3 of 4: hands get K6b's ladder (PLAN K6b: audit, zero-shot, overfit,
+    match fit), with the mask-box fit as the coverage path.
+  - < 3: hands are closed for every renderer.
+  - LPIPS over S or DISTS on R crossing 3 differently: to the user.
+- Hypothesis. Passes on 4 of 4. With full coverage, `warp@uncoded` falls
+  to about 0.01 everywhere (as on P01_107 and P03_10). The coding error
+  of the new rows keeps P02_02 and P09_106 below their hulls (0.204,
+  0.184), as it did at 0.087–0.093 on the fitted items.
+- Competing explanation. Mask boxes include the forearm, so WiLoR's fits
+  there jitter. H2's Gaussian smoothing then moves the coded joints far
+  from the uncoded ones, and the coding error eats the gain. The mean coded
+  shift of new rows against H2's rows is reported to show this.
+- Budget. One fleet job, the K1c job with WiLoR added (WiLoR verified on
+  Ada/A6000 by H3b/H3c2): smoke ≤ 600 s (P01_107, 48 frames), full ≤ 45
+  min. Ceiling 1 GPU-hour.
+- Job `20261021T200019Z-e6b9c107` (gpu6, RTX 6000 Ada, shared; `1aa1b43`
+  from `ready.json`; inputs H3c2's). Smoke passed the fleet validator. The
+  full stage took 1,019 s and passes all 59 of `k1c validate`'s checks
+  locally, including that under 1% of R is left unfitted on every item
+  (0.0% on all four). Report `visor/k1d-2026-10-21/report/k1c-report.json`
+  (`6427ea8f…7c68`, on `full/published.tar` `a8249947…1f42`).
+- Outcome. On R, each item at its own rate:
+
+  | item | new rows (H2's) | kbps | `warp` LPIPS | hull LPIPS | result | DISTS `warp` / hull | coded shift, H2's rows / new rows |
+  |---|---:|---:|---:|---:|---|---:|---:|
+  | P01_107 | 6 (474) | 1.95 | **0.087** | 0.257 | saves 96% | 0.070 / 0.222 | 7.4 / 9.3 px |
+  | P02_02 | 237 (243) | 3.81 | 0.232 | 0.162 | loses (−214%) | 0.163 / 0.234 | 20.8 / 64.2 px |
+  | P03_10 | 15 (416) | 2.00 | **0.083** | 0.153 | saves 96% | 0.097 / 0.201 | 8.9 / 16.1 px |
+  | P09_106 | 123 (146) | 3.55 | 0.141 | 0.138 | loses (−3%) | 0.177 / 0.197 | 15.6 / 24.2 px |
+
+  - LPIPS on R: below the hull on **2 of 4**. Over S: 2 of 4. DISTS on R:
+    4 of 4. **By the rule, the outcome goes to the user again.**
+  - Coverage worked: `warp@uncoded` is ≤ 0.0001 on every item (it was
+    0.192 and 0.138). P02_02 improved from 0.272 to 0.232 and P09_106
+    from 0.211 to 0.141.
+  - The competing explanation holds. The mask-box fits jitter: their coded
+    joints move 24–64 px from the uncoded ones. They also corrupt the H2
+    rows they join (P02_02's H2 rows moved 10.9 px in K1c and 20.8 px
+    here). Doubling the rows doubles the rate, too, so the hull is read at
+    3.5–3.8 kbps, where it is lower. P09_106 misses by 0.003; P02_02 by
+    0.07.
+- Reading. Hands win where the hand is boxed well (P01_107 and P03_10, 96%
+  each, at H2's rate). They lose where a good fit is missing, now through
+  bad fits instead of no fits. Hypothesis (4 of 4) refuted.
+- Scope. As K1c. The rate scaling assumes a new row costs an average H2
+  row. Mask boxes include the forearm (the stated limitation).
+- Budget: 1,019 s plus the smoke. K1c and K1d together used under 1
+  GPU-hour.
+
+### 2026-10-21 — K1e: K1d with hand-only boxes (and why two items fit badly)
+- Question (user, 2026-10-21: "if it's cheap, try to box the hand first";
+  "can we figure out why 2 pilots get good fit, and 2 don't?"). K1d's
+  mask-box fits include the forearm and jitter (coded shift 24–64 px on
+  new rows against 7–9 px on H2's). Does fitting on the hand alone remove
+  that, and does the bound then pass?
+- Change against K1d (nothing else changes). Each mask-box row is fitted
+  twice. WiLoR on the mask's box gives a wrist and middle knuckle. H1's
+  `wrist_split` cuts the mask there, and WiLoR runs again on the hand
+  part's box (the first box if the part is under 16 px a side). The
+  second fit is the row.
+- Measured beside, from the run's arrays (CPU, in `k1c report`):
+  - Jitter: the median frame-to-frame acceleration of the uncoded joints
+    (px, mean over 21 joints, consecutive frames of a side), for H2's rows
+    and the new rows, for K1d's fits (K1e's first pass, the same box and
+    network, saved beside) and for K1e's second fits. This tests the competing explanation
+    directly: K1d's new rows should jitter more than H2's, and K1e's less
+    than K1d's.
+  - Scene predictors per item, measurable at the encoder: the share of the
+    hand frames H1's detector boxed (H2's rows over all rows), the mean
+    hand-region size, and the median joint speed. They are measured on
+    the pilot and named as candidates only. A scope chosen from 4 items
+    would have to be tested on items it was not chosen from (B2's other
+    30) before any headline uses it.
+- Decision rule (fixed before any run). K1c's: the bound passes when
+  LPIPS on R is below the hull at the item's rate on ≥ 3 of 4 items. Then
+  hands get K6b's ladder with the two-pass fit as the coverage path.
+  Otherwise hands are closed, and the outcome goes to the user if LPIPS
+  over S or DISTS on R crosses 3 differently.
+  - The user's proposed criterion (2026-10-21, made after K1c's and K1d's
+    results): pass when the mean over {LPIPS on R, DISTS on R} of the
+    share of items below the hull is ≥ 75%. K1c and K1d already meet it
+    (2 of 4 and 4 of 4). It is reported beside, and the user decides which
+    governs. The concerns: it was proposed after the results, it would
+    turn both earlier runs into passes, and DISTS compares texture
+    statistics, so it is lenient on the smooth fill and misplaced texture
+    that are this bound's failure modes. The paper reports both metrics
+    either way.
+- **Amendment (user, 2026-10-21, before K1e's results; after K1c's and
+  K1d's).** The user's criterion governs K1e and every later run. It
+  passes when the mean over {LPIPS on R, DISTS on R} of the share of items
+  below the hull is ≥ 75%, so LPIPS must win on at least half the items.
+  It also applies **retroactively** to K1c and K1d. That is a post-hoc
+  change and the paper must disclose it: both runs failed the rule written
+  before them (LPIPS 2 of 4) and pass under this one (2/4 and 4/4, mean
+  75%). Consequence: hands go to K6b's ladder. The held-out test (K1f)
+  is judged by this criterion, fixed before it runs.
+- Hypothesis. The hand-only fits jitter about as little as H2's rows, so
+  P09_106 (0.003 short in K1d) passes and P02_02 (0.07 short, rubber
+  gloves) still fails: 3 of 4.
+- Competing explanations. (1) The jitter comes from the hands themselves
+  (blur, gloves, occlusion), not the box, so the second fit jitters as
+  much as the first. (2) The rate, not the fit, decides P02_02: doubling
+  the rows reads the hull at 3.8 kbps, where it is 0.162.
+- Budget. One fleet job, K1d's with a second WiLoR pass (≤ 45 min; K1d
+  took 17 min). Ceiling 1 GPU-hour.
+- Job `20261021T205023Z-a7bda6e6` (gpu6, RTX 6000 Ada, shared; `be8251e`
+  from `ready.json`). Smoke passed the fleet validator. The full stage
+  (about 17 min) passes all 59 of `k1c validate`'s checks locally. Report
+  `visor/k1e-2026-10-21/report/k1c-report.json` (`7e6f8f69…d769`, on
+  `full/published.tar` `c9287130…1524`).
+- Outcome (on R, each item at its own rate; LPIPS bound / hull):
+
+  | item | kbps | LPIPS | DISTS | K1c → K1d → K1e LPIPS | joint acceleration, px: H2's rows / new rows, mask box / new rows, hand box |
+  |---|---:|---:|---:|---|---:|
+  | P01_107 | 1.95 | **0.086** / 0.257 | **0.069** / 0.222 | 0.087 → 0.087 → 0.086 | 5.1 / 9.0 / 9.1 |
+  | P02_02 | 3.81 | 0.196 / 0.162 | **0.142** / 0.234 | 0.272 → 0.232 → 0.196 | 20.3 / 56.0 / 40.9 |
+  | P03_10 | 2.00 | **0.083** / 0.152 | **0.097** / 0.201 | 0.093 → 0.083 → 0.083 | 6.5 / 28.2 / 28.5 |
+  | P09_106 | 3.55 | 0.139 / 0.138 | **0.175** / 0.197 | 0.211 → 0.141 → 0.139 | 8.0 / 20.9 / 20.1 |
+
+  - LPIPS: 2 of 4 below the hull (P09_106 misses by 0.001). DISTS: 4 of 4.
+    **The amended criterion passes (mean 75%). The rule written before
+    K1e fails (LPIPS 2 of 4).**
+  - Jitter. The new rows jitter 2–9× more than H2's rows on the same item.
+    The hand-only box cuts P02_02's jitter from 56 to 41 px, and P02_02's
+    LPIPS from 0.232 to 0.196. It changes nothing on P01_107, P03_10 or
+    P09_106. So the competing explanation (1) holds in part: the jitter
+    there comes from the hands, not the box. P02_02's own H2 rows jitter
+    20 px, against 5–8 px on the other items (rubber gloves).
+  - The hypothesis (3 of 4 by LPIPS) is refuted by 0.001 on P09_106.
+- Decision. Under the user's criterion, hands go to K6b's ladder with
+  the two-pass fit as the coverage path. K1f, the held-out test, uses the
+  same path.
+
+### 2026-10-21 — K1f: the hand bound's scope on held-out items
+- Question (user, 2026-10-21). On the pilot the bound wins big on two
+  items (96%) and loses narrowly on the two where H1's detector boxed
+  about half of the hand frames. Is "scenes where the detector tracks the
+  hands" a scope where PointStream wins? Does it hold on items the scope
+  was not chosen from?
+- Items. B2's other 30 items, in a content-blind order (sha256 of the id;
+  `tools/datasets/k1f_inputs.py`), 240 frames each. Two come from videos
+  in G's training footage (P07_110, P22_107). They are reported apart,
+  and the clean subset is reported beside the pooled one.
+- Bound. K1e's path, unchanged: H2's WiLoR rows plus the two-pass
+  hand-box fit for every boxable hand without one, coded with H2's 100 ms
+  choice, K1c's warp, judged on R. Rate: K1d's per-item scaling.
+- Envelope, coded per item as the pilot's was (`h3d.code_point`): H3b2's
+  seven SVT-AV1 low points, DCVC-UF HT-L off the shelf at QP 0 at full
+  size and QP 0, 21 and 42 at ½ and ¼, and H3d's G-L network on each ½
+  and ¼ point. Points above about 20 kbps are left out. On the pilot, the
+  hull with and without them is identical at every rate up to 5 kbps
+  (checked on H3d's report). Savings that need a higher rate are capped.
+  B2's CRF 41–62 streams are not used (all ≥ 35 kbps).
+- Scope, fixed now from the pilot. An item is in scope when H1/H2's
+  coverage, H2's rows over the side-frames with a boxable hand mask, is
+  ≥ 0.8. On the pilot the two winners have 0.99 and 0.97, and the two
+  losers 0.51 and 0.54. The encoder can measure it.
+- Decision rule (`k1f.DECISION`, the user's criterion). A group passes
+  when the mean over {LPIPS on R, DISTS on R} of the share of its items
+  whose bound is below the hull at its rate is ≥ 75%.
+  - In scope passes and out of scope fails: the scope is confirmed.
+    Headline: on scenes in scope (their share of items and of hand frames
+    reported), the hand bound saves a median X% of the envelope's rate at
+    about 2 kbps. It is a bound (appearance granted), and K6b's ladder
+    decides what a renderer keeps.
+  - All items pass: no scope is needed, and the claim is over all items.
+  - In scope fails: the scope claim is dropped, and hands' place on K6b's
+    ladder goes back to the user.
+- Hypothesis. In scope passes (both metrics ≥ 75%). Out of scope sits
+  near the bar, as P09_106 does.
+- Competing explanations. (1) The pilot's two winners are atypical
+  (still, close views), and coverage ≥ 0.8 does not predict a win
+  elsewhere. Then in scope fails. (2) Coverage is a proxy for motion. The
+  joint speed per item is reported beside to tell the two apart.
+- Budget. Parts of 2 items, each a fleet job of ≤ 45 min (the first one
+  times an item; a smoke of 48 frames with two DCVC-UF points). Ceiling 8
+  GPU-hours (user, 2026-10-21) for all of K1f. If it runs out, the items
+  done in the fixed order are reported, and so is the shortfall.
+- Attempts (infrastructure, no score read). Part 0
+  `20261021T211220Z-3d431acd` (`eca0d32`, gpu6): the smoke passed (159 s),
+  then the full stage overran its declared 36,000 MiB at 38,200 (PyTorch's
+  cache held across points, with WiLoR and G resident) and was stopped
+  before finishing an item. Fixed: the cache is released after each point,
+  and 40,000 MiB is declared.
+  Part 6 `20261021T220155Z-2e7fdeb3` ran past the 2,700 s stage limit
+  (two slow items). Its `partial.tar` (`d34d41fd…7619`) keeps P06_03
+  finished and P26_108's envelope. Rerun as part 6b with `--restore`:
+  units of the same items and window length, sha256-checked, are kept, and
+  only P26_108's bound is computed. Parts 8–10 had not started. They were
+  cancelled and resubmitted as one item per job, so no part nears the
+  limit. Items and order are unchanged. Part 8 (`20261021T220208Z-fda99e47`)
+  had begun its smoke when it was cancelled, and its two items were
+  resubmitted the same way.
+- Reproduction check (added after the held-out scores were read, before
+  they are recorded as evidence). K1f's envelope path has not been shown
+  to reproduce H3d's recorded points. One job runs `k1f run` on the pilot
+  item P01_107 (same flags, same inputs). Every point it shares with
+  H3d's component report (SVT-AV1's seven low points, DCVC-UF's seven,
+  G-L's six) must match within 2% in rate on R and 0.003 in LPIPS on R.
+  If any point fails, the held-out result is not evidence until the
+  difference is explained.
+  Job `20261022T013208Z-9e048ecf` (gpu6, `3f530f1`): all 20 points pass,
+  18 exactly. G-L at QP 0 ½ differs by 1.05% in rate and 0.0011 in LPIPS,
+  and at QP 42 ½ by 0.34% and 0.0001. The bound reproduces K1e's 0.0865.
+- Jobs (RTX 6000 Ada, shared, gpu6). Parts 0–5 and 7 (`d1a47c3`), 6b and
+  the six single-item parts (`b9e1d58`), each revision from its
+  `ready.json`: `20261021T211923Z-08179c83`, `20261021T220120Z-f7cbc6ed`,
+  `20261021T220127Z-381c7366`, `20261021T220134Z-c0b4a121`,
+  `20261021T220141Z-eff4e8be`, `20261021T220148Z-9e99d6a7`,
+  `20261022T000642Z-3f9256ae`, `20261021T220201Z-9337c526`,
+  `20261022T000649Z-adac9f11`, `20261022T000656Z-1aea7c30`,
+  `20261022T000702Z-d16bf68f`, `20261022T000709Z-f303e32f`,
+  `20261022T000742Z-2efab10c`, `20261022T000749Z-e723338c`. Every smoke
+  passed the fleet validator, and every full stage passes `k1f validate`
+  locally (44 checks for two-item parts, 26 for single, 46 for 6b).
+  Report `visor/k1f-2026-10-21/report/k1f-report.json` (`2f6e4291…888e`),
+  with the validation receipts in `k1f-validation.tar`. GPU time: 22,488 s
+  of stage execution, plus the failed and cancelled attempts and the
+  reproduction check, about 7.6 GPU-hours, within the 8.
+- Outcome. 22 of the 30 held-out items were run (the budget's
+  content-blind order; positions 22–29 were not run). On R, each item at
+  its own keypoint rate (1.93–2.72 kbps):
+  - **The bound is below the hull on 22 of 22 items by LPIPS and 22 of 22
+    by DISTS.** Every group passes the criterion at 100%: all (22), in
+    scope (19), out of scope (3), clean of G's training (21), and in
+    scope and clean (18).
+  - LPIPS on R: the bound's median is 0.084 (0.059–0.194), and the hull's
+    at the same rate is 0.175 (0.076–0.410). On 14 items the bound beats
+    every pixel point coded (up to about 45 kbps, SVT-AV1 CRF 63 at full
+    size), so their saving is censored. On the 8 others the median
+    saving is 84% (9–91%). The narrowest margin is P04_24, at 0.075
+    against 0.076.
+  - Scope. 19 of 22 items (86% of items and of hand frames) have coverage
+    ≥ 0.8. The 3 below (0.71–0.73) also win once the hand-box fit fills
+    them.
+- Decision (by the rule). **All items pass, so no scope is needed. The
+  claim is over all held-out items:** with appearance granted, egocentric
+  hands sent as 21 coded keypoints (about 2 kbps) beat SVT-AV1, DCVC-UF
+  and DCVC-UF + G on the hand region, on every held-out item, on both
+  metrics.
+- Reading. The pilot was harder than the held-out set. With the
+  hand-box path, P02_02 (rubber gloves, jittery fits) and P09_106 lose
+  by LPIPS, and on the held-out set nothing does. Pooled with the pilot,
+  the bound wins 24 of 26 items by LPIPS and 26 of 26 by DISTS. The
+  pilot's coverage predictor was not needed. Coverage is fixed by fitting
+  every masked hand, and what is left on P02_02 is fit quality, not
+  missing fits.
+- Hypothesis. In scope passed as predicted. "Out of scope sits near the
+  bar" is refuted: all 3 win clearly.
+- Scope and caveats. This is a bound: the hand's own pixels are moved,
+  so appearance and outline are granted. K6b's ladder decides what a
+  renderer keeps. 22 of 30 held-out items were run. The rate is K1d's
+  per-row scaling (new rows assumed to cost an average H2 row). G's
+  training overlaps one item (P22_107). Judges are LPIPS and DISTS on R;
+  pose fidelity was not judged. Savings are censored above about 45
+  kbps.
+- Completion (user, 2026-10-22: "yes", about 2.6 more GPU-hours). The 8
+  items not run (positions 22–29 of the fixed order) run as single-item
+  jobs, unchanged. The result is read over all 30.
+  Jobs (`ffd6ccd`, gpu6, RTX 6000 Ada): `20261022T072405Z-ab09c0af`,
+  `20261022T072414Z-a0071b24`, `20261022T072430Z-d94d8b6e`,
+  `20261022T072439Z-e7c8ed8c`, `20261022T072448Z-b850bbac`,
+  `20261022T072458Z-9cc87e86`, `20261022T072508Z-128ba164`,
+  `20261022T072522Z-e7c0f8bc`. Each passes all 26 checks locally (9,378
+  s together). Report over all 30:
+  `visor/k1f-2026-10-21/report/k1f-report-30.json` (`d31b1fc2…0eb8`), with
+  `k1f-validation-30.tar`. K1f's total: about 10.2 GPU-hours (8 approved,
+  then 2.6 more, user, 2026-10-22).
+- **Outcome over all 30 held-out items.** The bound is below the hull on
+  **30 of 30 by LPIPS and 30 of 30 by DISTS**, and every group passes at
+  100%: all (30), in scope (26), out of scope (4), clean of G (28), and
+  in scope and clean (24). LPIPS on R: the bound's median is 0.086, the
+  hull's 0.174. On 17 items the bound beats every pixel point coded (up
+  to about 45 kbps). On the 13 others the median saving is 83% (10–93%).
+  The narrowest margin is still P04_24 (0.075 against 0.076). In scope:
+  87% of items and of hand frames. Pooled with the pilot (K1e's path),
+  the bound wins 32 of 34 items by LPIPS and 34 of 34 by DISTS.
+
+
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
   codec gains more than a conventional one when PointStream adds learned

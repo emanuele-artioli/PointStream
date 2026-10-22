@@ -256,12 +256,13 @@ def segment_distance2(px: np.ndarray, py: np.ndarray, a: np.ndarray, b: np.ndarr
     return (px - a[0] - u * d[0]) ** 2 + (py - a[1] - u * d[1]) ** 2
 
 
-def backward_map(px: np.ndarray, py: np.ndarray, target: np.ndarray, source: np.ndarray, sigma: float) -> tuple[np.ndarray, np.ndarray] | None:
+def backward_map(px: np.ndarray, py: np.ndarray, target: np.ndarray, source: np.ndarray, sigma: float,
+                 skeleton: tuple[tuple[int, int], ...] = k4.SKELETON) -> tuple[np.ndarray, np.ndarray] | None:
     """Source position of each target pixel: the blend of each bone's similarity (target segment onto source segment)
     with weights exp(-d^2 / 2 sigma^2), d the distance to the target bone. Bones need both ends confident in both
     keypoint sets; without one, a translation by the mean displacement of jointly confident keypoints; None without."""
     conf = (target[:, 2] >= k4.KP_CONF) & (source[:, 2] >= k4.KP_CONF)
-    bones = [(a, b) for a, b in k4.SKELETON if conf[a] and conf[b]]
+    bones = [(a, b) for a, b in skeleton if conf[a] and conf[b]]
     if not bones:
         if not conf.any():
             return None
@@ -281,6 +282,7 @@ def backward_map(px: np.ndarray, py: np.ndarray, target: np.ndarray, source: np.
 
 
 def target_box(target: np.ndarray, source: np.ndarray, region: np.ndarray, pad: float) -> tuple[int, int, int, int] | None:
+    frame = (region.shape[1], region.shape[0])
     """Where the moved region can land: the source region's box relative to its confident keypoints' box, carried to
     the target's keypoints' box (scaled by their heights), padded by ``pad`` of the target's height."""
     conf_t, conf_s = target[:, 2] >= k4.KP_CONF, source[:, 2] >= k4.KP_CONF
@@ -299,12 +301,12 @@ def target_box(target: np.ndarray, source: np.ndarray, region: np.ndarray, pad: 
     y0 = ty0 - (sy0 - ys.min()) * s - pad * h
     x1 = tx1 + (xs.max() + 1 - sx1) * s + pad * h
     y1 = ty1 + (ys.max() + 1 - sy1) * s + pad * h
-    box = (max(0, int(math.floor(x0))), max(0, int(math.floor(y0))), min(FRAME[0], int(math.ceil(x1))), min(FRAME[1], int(math.ceil(y1))))
+    box = (max(0, int(math.floor(x0))), max(0, int(math.floor(y0))), min(frame[0], int(math.ceil(x1))), min(frame[1], int(math.ceil(y1))))
     return box if box[2] > box[0] and box[3] > box[1] else None
 
 
 def draw(canvas: np.ndarray, drawn: np.ndarray, image: np.ndarray, region: np.ndarray, source_kp: np.ndarray,
-         target_kp: np.ndarray, sigma: float) -> np.ndarray:
+         target_kp: np.ndarray, sigma: float, skeleton: tuple[tuple[int, int], ...] = k4.SKELETON) -> np.ndarray:
     """Draw ``image``'s ``region`` moved from ``source_kp`` to ``target_kp`` onto ``canvas`` (in place); returns this
     player's drawn mask (also OR-ed into ``drawn``)."""
     import cv2
@@ -316,7 +318,7 @@ def draw(canvas: np.ndarray, drawn: np.ndarray, image: np.ndarray, region: np.nd
     x0, y0, x1, y1 = box
     # The displacement field is smooth: computed on a MAP_STEP grid and upsampled (exact for identity and translation).
     gy, gx = np.mgrid[y0:y1 + MAP_STEP:MAP_STEP, x0:x1 + MAP_STEP:MAP_STEP].astype(np.float64)
-    mapped = backward_map(gx, gy, target_kp, source_kp, sigma)
+    mapped = backward_map(gx, gy, target_kp, source_kp, sigma, skeleton)
     if mapped is None:
         return mine
     py, px = np.mgrid[y0:y1, x0:x1].astype(np.float32)
