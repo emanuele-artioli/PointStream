@@ -10098,6 +10098,13 @@ invocation turns out to be needed.
     with `ref` and `warp` costs about 26 min per item, so the 8 items need
     about 3.5 GPU-hours. **`gen` alone does not fit at 50 steps. By the
     rule, the rung goes back to the user.**
+- Decision (user, 2026-10-22, before any scored run): **4 items at 50
+  steps**: positions 0–3 of K1f's order (P09_103, P25_09, P22_107 (G's
+  training footage), P06_108), with `gen`, `ref` and `warp`, and without
+  `gen@frame`. One item per job, about 1.7 GPU-hours, within the 3. The
+  rule is unchanged otherwise: the score is the mean over {LPIPS, DISTS}
+  of the share of the 4 items won, and it passes at ≥ 75% (3 of 4 on
+  both, or 4 and 2). Code `466f73f` (crops inside the frame).
 
 ### 2026-10-16 — Does the learned codec compose better with a learned enhancer? (analysis of H3d's oracle)
 - Question (PLAN I, user 2026-10-16): the paper may argue that a learned
