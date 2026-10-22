@@ -11170,3 +11170,42 @@ and each object's representation is judged on both:
   then σ = 2 removes most of it and `warp@S₂` passes.
 - Budget. CPU: the measure and report. GPU: one job per item (warp, CPU,
   and WiLoR on 5 variants), ≤ 20 min each, ≤ 1 GPU-hour total.
+- Measure (CPU, code `513328c7`; K1f's 22 stages, all 30 items;
+  `visor/j-2026-10-22/report-j2-513328c7/j2-measure.json`, `557c67e0…45ab`).
+  Medians over items of per-item medians, in % of the box per frame:
+  coding jitter |Δd| 1.94, the source's own motion 2.24, estimator noise
+  (u against S₂(u)) 1.32. Smoothing the coded keypoints (σ = 2) leaves
+  1.72 of jitter in d: 11% less. Most of d's change between frames is in
+  u, which `warp` takes the pixels from.
+- Oracle (job `20261022T172749Z-4c9d5594`, gpu3 RTX A6000, shared, code
+  `513328c7` from `ready.json`; full stage passes `j2 validate` locally,
+  10 checks; report `…/report-j2-513328c7/j2-report.json`, `793c8126…f0d48`).
+  The re-drawn `warp` reproduces J's saved pose error and flicker exactly
+  on both items. Per item (pose % of box; flicker; energy / source's):
+
+  | variant | P09_103 | P22_107 |
+  |---|---:|---:|
+  | J's time bar: SVT-AV1 flicker / 1.25 | 3.78 / 1.25 | 2.12 / 1.25 |
+  | `warp` | 2.50%; 5.53; 3.38 | 1.42%; 4.40; 3.21 |
+  | `warp@S1` | 2.19%; 4.87; 2.98 | 1.31%; 4.03; 2.92 |
+  | `warp@S2` | 2.40%; 4.98; 3.01 | 1.28%; 3.91; 2.82 |
+  | `warp@S4` | 3.54%; 5.79; 3.45 | 1.51%; 3.97; 2.84 |
+  | `warp@Su` (no coding) | 1.42%; 4.54; 2.85 | 0.56%; 3.42; 2.62 |
+
+  Content passes everywhere. Time fails everywhere, on both branches.
+- **Decision (by the rule): the estimator is the cause.** No σ makes the
+  smoothed bound pass time; the best (σ = 1–2) cuts its energy by about
+  12%. `warp@S(u)`, with no coding at all, still changes 2.6–2.9 × as
+  much as the source. A decoder-side smoother does not fix the
+  experience track.
+- Hypothesis (mostly estimator noise; `warp@S(u)` fails; smoothing
+  helps little): held. The competing explanation (send kinks dominate;
+  σ = 2 passes) is refuted.
+- Caveat for the reading. `warp@S(u)` moves pixels only by u's smoothed
+  noise, but it is still drawn by K1c's compose (the Telea fill where a
+  masked hand has no fit, and the drawn outline), which may flicker on
+  its own. An identity warp (u → u) separates the estimator from that
+  compositing; it was not run (the rule decided). It is the next check
+  if the user pursues this track (CPU warp and flicker only, under 0.3
+  GPU-hours with WiLoR, or none without content).
+- Budget: about 0.53 GPU-hours (32 min claimed), within the 1.

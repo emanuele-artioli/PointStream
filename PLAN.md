@@ -925,6 +925,12 @@ alone, so the held-out KID reference sets were not built. Beside: K1f's
 bound (`warp`) fails time on both hand items too, so the coded
 keypoints' own jitter is the binding problem on this track. Whether to
 measure and smooth it is open for the user. GPU: 0.49 + 0.76 hours.
+**J2 (2026-10-22, user: "go ahead"): the estimator is the cause.** Decoder-side
+smoothing of the coded keypoints never makes `warp` pass time (energy
+2.8–3.0 × the source's at best), and neither does removing the
+estimator's own noise without coding (2.6–2.9 ×). Next, if pursued: an
+identity warp to separate the estimator from K1c's compositing (fill,
+outline). GPU: 0.53 hours.
 
 ### I. Paper
 
