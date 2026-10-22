@@ -68,6 +68,8 @@ def test_sent_joints_are_whole_pixels_in_the_box() -> None:
     sent = k6bh2c.sent_joints(pts, (8, 16, 64, 64))
     assert np.allclose(sent[0], [10.0, 21.0]) and np.allclose(sent[1], [71.0, 16.0])
     assert k6bh2c.joint_bits(64, 64) == 21 * 12
+    full = k6bh2c.with_conf(sent)
+    assert full.shape == (21, 3) and (full[:, 2] == 1).all() and np.array_equal(full[:, :2], sent)
 
 
 def test_payback_and_hull_reading() -> None:

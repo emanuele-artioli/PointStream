@@ -192,6 +192,11 @@ def sent_joints(points: np.ndarray, box: tuple[int, int, int, int]) -> np.ndarra
     return local + np.array([x0, y0], float)
 
 
+def with_conf(points: np.ndarray) -> np.ndarray:
+    """(21, 3) joints with confidence 1, as ``k6.draw`` reads them (K1f's rows carry the same)."""
+    return np.concatenate([np.asarray(points, float)[:, :2], np.ones((len(points), 1))], -1)
+
+
 def header_bits() -> int:
     return 4 * COORD_BITS + 1  # the box and the side
 
@@ -392,7 +397,7 @@ def build_bank(args: argparse.Namespace, bank_frames: dict[str, Any], cands: lis
             crop, crop_mask = rgb[y0:y0 + bh, x0:x0 + bw], mask[y0:y0 + bh, x0:x0 + bw]
             polys, poly_bits = code_polygons(crop_mask)
             refs.append({"rank": rank, "row": r, "visor_frame": n, "index": index, "side": side, "box": box,
-                         "kp2d": fits["kp2d"][r].astype(float), "sent_kp2d": sent_joints(fits["kp2d"][r], box),
+                         "kp2d": with_conf(fits["kp2d"][r]), "sent_kp2d": with_conf(sent_joints(fits["kp2d"][r], box)),
                          "image": rgb, "mask": mask, "polys": polys, "poly_bits": poly_bits,
                          "joint_bits": joint_bits(bw, bh), "header_bits": header_bits()})
             jobs.append((refs[-1], smooth_fill(crop, crop_mask), work / f"{side.replace(' ', '-')}-{rank:02d}"))
