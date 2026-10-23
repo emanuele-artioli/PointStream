@@ -106,10 +106,13 @@ sessions update their own items and experiments.md entries
   fitted 7.5 min per window on its own frames **passes at 83%** (LPIPS 4
   of 6, DISTS 6 of 6; rate savings 35–84% where it wins), reference,
   matte and LoRA (49 MB) unbilled. Step 4 (a fit per match, billed) is
-  outlined. Root estimate from the reported savings: 49 MB repays in
-  6–69 h of play, against a match's 2–3 h, so a per-match LoRA has to
-  shrink 3–30× (rank, quantization), or be sent once per player and
-  unbilled as the venue models are (user's call). Every player result so far grants the matte; the
+  Step 4 (2026-10-23): a rank-4 LoRA per match (1.55 MB, 8-bit LZMA,
+  1.73 kbps over 2 h), fitted on other shots of the match, **fails**:
+  67% unbilled, 58% billed (losses: alcaraz_hurkacz/045 and
+  rublev_auger-aliassime/052). About 60% of step 3's gain transfers
+  (hands: none), and payback is 0.4–2.1 h where it wins. **The
+  generative route for players closes at the keypoint rate by the
+  rule**, with the matte and reference still granted. Every player result so far grants the matte; the
   matte's rate is unmeasured on tennis (H5p 4: on egocentric video the
   billed mask removed every win). K6c after K6b; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
@@ -130,17 +133,23 @@ stops; the root session fills in the outcome and the next step.
 | K6b hands 4 | the fit moved to other shots (user's rule) | `claude/k6b-hand-bank` @ `fd83eb7` | Opus | reported 2026-10-23: fail (25%; 0% clean of G); 1.3 GPU-hours of 3 |
 | K6b hands 3m | rung 3 with a decoder-side matte | — | Opus | withdrawn 2026-10-23: rung 4 failed with the matte granted |
 | K6b players 3 | overfit oracle (user approved) | `claude/k6b-players-zeroshot` @ `03a3df8` | Opus | reported 2026-10-23: pass (83%), matte and LoRA unbilled; 4.8 GPU-hours of 6 |
-| K6m | the players' matte on tennis (rate and decoder-side) | — | Sonnet | proposed 2026-10-23 |
+| K6b players 4 | match fit, billed | `claude/k6b-players-zeroshot` @ `20eb7c3` | Opus | reported 2026-10-23: fail (67% unbilled, 58% billed); 7.0 GPU-hours of 7 |
+| K6m | the players' matte on tennis | — | Sonnet | moot for renderers (step 4 failed); its measure moves to T1 |
+| T1 | the split on tennis, F billed | — | Opus | proposed 2026-10-23 |
 
 **Proposed next items (root session, 2026-10-23; each writes its rule
 before its run).**
 - *K6b hands 3m:* withdrawn (rung 4 failed even with R granted).
-- *K6m: the players' matte.* K6 and K6b step 2 grant R as the matte
-  too. CPU first: the rate of the players' masks on K6's 8 windows with
-  H5p's coders (lzma at s = 8, the key carrier of H5p 4c), against the
-  keypoints' 2–3.3 kbps and the windows' margins; then the decoder-side
-  alternative (the pose's own silhouette) if the coded mask costs more
-  than the margin. Gates K6b step 3 for players.
+- *T1: the split on tennis, F billed.* With every keypoint renderer
+  closed (hands, players), tennis's open question is H5's: does the
+  split (players and ball as coded pixels plus the ball mode, background
+  by its own coder) beat SVT-AV1 and DCVC-UF on K6's windows once F is
+  paid for? Egocentric F (median 24% of the frame) cost 36–116 kbps and
+  removed every win (H5p 4); tennis F is a few percent, where H5p 4c's
+  key carrier was nearly free (P09_106, 2%: −30%). CPU first: F's rate
+  on K6's windows (lzma at s = 8 and 16, the key carrier's border cost)
+  against the split's margin with F granted, if that margin exists;
+  then the oracle and its rule.
 | K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` @ `340d8d5` | Opus | reported 2026-10-22: fail (50%, 6 of 8 windows); 4.75 GPU-hours of 4 (overrun approved by the user) |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 | J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
