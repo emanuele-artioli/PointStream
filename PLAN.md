@@ -404,8 +404,34 @@ the fair anchors.
 4. *F, GPU.* Re-encode the foreground with K from F̂ (lzma at s = 8 and
    16) with G_HO in the slots (H5m had G), and rescore; then an oracle for
    F carried by the foreground stream itself (no MASK segment).
+   **Done (2026-10-22, [experiments](docs/experiments.md)), fails.**
+   - 4a: with F billed (lzma at s = 8, the stream built for F̂, the
+     per-point configuration), weighted DISTS against the venue-adapted
+     DCVC-UF reads +93% (1 of 4), where F granted reads −15% (4 of 4).
+     Every metric loses, against the venue codec and the pooled envelope.
+     s = 16 is not run: its upper bound fails too (+24%, 1 of 4).
+   - F̂ costs no quality (mask bytes removed: −17%, as granted). The loss
+     is the mask's 36–116 kbps, at the low rates where the venue codec
+     reaches 13–26 kbps.
+   - 4b: exact F at zero bits fails rule (a) on weighted LPIPS (+16%, 1
+     of 4), so F in the foreground stream is not built for H5q's loss. On
+     DISTS it passes. A post hoc bound puts any carrier's budget at about
+     2 kbps (5 bytes per frame), 7–20× under every F coder measured.
+   - 4c (the user asked for the measured carrier, 2026-10-22): a key
+     colour outside K, F̃ recovered at the client (IoU 0.95–0.99). The
+     key's edge costs +26% to +129% of the foreground stream where F is
+     large; its optimistic bound reads weighted DISTS +1% (1 of 4), so
+     the gate fails and it is not scored. Only where F is 2% of the
+     frame (P09_106) is the key free (−30%).
+   - **H5p 4 closes as a fail:** no F coder tried (lzma, video, key)
+     keeps the split's DISTS win at equal adaptation once F is paid
+     for; the split wins only where F is small.
 5. *Visual check (CPU).* Side-by-side crops of PointStream and the
    anchors at matched rates, for the user's review.
+   **Done (2026-10-22):** 16 crops (4 items, about 200 kbps and 1 Mbps,
+   frames 60 and 180), PointStream billed as in 4a against the venue
+   codec and SVT-AV1 preset 1 at their best point at or under its rate;
+   in 4a's report archive, for the user's review.
 Scores stay LPIPS, DISTS and PSNR (a model trained on a metric may be
 judged on it, user 2026-10-20).
 
@@ -944,9 +970,23 @@ experience-track re-judging (rule)".
 
 A result passes when at least 75% of its items pass all three checks.
 A pass reopens that route on the experience track only, and its next
-step goes to the user. A fail closes it on both tracks. First step: the
-held-out reference set of real hand crops and the user's confirmation of
-the flicker reading.
+step goes to the user. A fail closes it on both tracks.
+**Outcome (2026-10-22): all four routes stay closed.** The user kept
+the drafted time reading. H3e V1 fails on content (P01_107 and P03_10
+above SVT-AV1 alone at every point). FoundHand `gen` fails on time (2 of
+2 items scored, which decides; energy 4–6 × the source's). K6 `ref`
+fails on time (8 of 8 windows). H3a/H3a2 were not re-judged (outputs not
+kept). Every decision came from content or time against SVT-AV1's points
+alone, so the held-out KID reference sets were not built. Beside: K1f's
+bound (`warp`) fails time on both hand items too, so the coded
+keypoints' own jitter is the binding problem on this track. Whether to
+measure and smooth it is open for the user. GPU: 0.49 + 0.76 hours.
+**J2 (2026-10-22, user: "go ahead"): the estimator is the cause.** Decoder-side
+smoothing of the coded keypoints never makes `warp` pass time (energy
+2.8–3.0 × the source's at best), and neither does removing the
+estimator's own noise without coding (2.6–2.9 ×). Next, if pursued: an
+identity warp to separate the estimator from K1c's compositing (fill,
+outline). GPU: 0.53 hours.
 
 ### I. Paper
 

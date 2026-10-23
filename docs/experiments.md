@@ -10988,6 +10988,598 @@ and each object's representation is judged on both:
   GPU-hours (rung 2 took about 0.45 GPU-hours per item at 50 steps on
   Ada, plus its failed attempts), declared at 40,000 MiB, which rung 2's
   scoring needed. Each stage ≤ 45 minutes.
+- Time reading (user, 2026-10-22, before any score): the OR reading as
+  drafted. Pass if the method's `h3b.flicker` ≤ the anchor's, or its own
+  residual energy ≤ 1.25 × the source's.
+- Order of checks (session, 2026-10-22; protocol: stop when the decision
+  is made). Each anchor quantity is read on its own hull. Adding anchor
+  points can only lower a hull inside the rate range the smaller set
+  already spans. So a check read against SVT-AV1's points alone (CPU)
+  is conclusive where it *fails* and the method's rate is inside their
+  range: SVT-AV1 + DCVC-UF + G would be at most as high. A subset pass
+  decides nothing. Content and time were scored first. Realism (KID)
+  was to be scored only for items they left undecided, so the held-out
+  reference sets were not built: no result needed them. Code
+  `experiments/visor/j.py` (checks, hull, decision),
+  `experiments/tennis/j_players.py`, `experiments/visor/j_hands.py`.
+- **H3e V1: fail** (content). From `h3e-report.json` (`49af833b…41d4`), CPU,
+  code `b46b81be`: `visor/j-2026-10-22/report-h3e-b46b81be/j-h3e.json`
+  (`6985b3d1…f208`). Against SVT-AV1's points alone (H3c2's judge), every
+  one of V1's nine points fails same content on P01_107 (1.77% of the
+  box against the SVT-AV1 hull's 0.45–1.60% at its rates, and 1.5 × the
+  keypoints' 0.77% = 1.16%) and on P03_10 (2.0% against 1.37–1.63%;
+  floor 1.46%). So at most 2 of 4 items can pass, and 3 are needed.
+  P09_106 passes content through the keypoints' floor (1.5 × 4.49%) at
+  six points. P02_02 is open at its lowest point (5.45% at 2.71 kbps,
+  under SVT-AV1's 5.91%). Realism and time were not scored. H3e's own
+  flicker (V1 5–23 against DCVC-UF's 3–7) is reported beside.
+- **H3a / H3a2: not re-judged: outputs not kept.** Their published units
+  (`h3-2026-10-10`, jobs `20261010T073916Z-5058a257` and the H3a2 parts)
+  hold per-frame scores only (about 55 KB per 240-frame item), and
+  `experiments/visor/h3.py` writes no renders. They stay untested on
+  experience.
+- **K6 `ref` on players: fail** (time, 8 of 8). Jobs (shared GPUs; code
+  from each `ready.json`): part 1 `20261022T123630Z-716f81c3`
+  (`a947277d`, gpu3 RTX A6000), part 2 `20261022T123851Z-898cda0b`
+  (`80133781`, gpu3 RTX A6000), part 3 `20261022T123907Z-d4dd728e`
+  (`80133781`, gpu6 RTX 6000 Ada). K6's pipeline unchanged (players,
+  pose, the chosen code, `ref` drawn as K6 draws it), K6's inputs
+  (`20e595d5…e703`); anchors SVT-AV1's four low points (CRF 63 at ⅛, ¼,
+  ½; CRF 55 at ¼), which span every window's keypoint rate and reproduce
+  K6's recorded rates on R within 0.1% on all 8 windows. Every full stage
+  passes `j_players validate` locally (89 checks). Report
+  `tennis/j-2026-10-22/report-players-80133781/j-players.json`
+  (`6b849d00…6933`), validations `j-players-validation.tar`
+  (`f5120908…f8115`). Per window, at its keypoint rate (1.9–9.8 kbps):
+
+  | window | kbps | `ref` flicker / SVT-AV1 hull | `ref` energy / 1.25 × source | `ref` pose / SVT-AV1 hull (box) | coded keypoints |
+  |---|---:|---:|---:|---:|---:|
+  | alcaraz_hurkacz/036 | 1.94 | 28.6 / 15.0 | 23.4 / 16.3 | 0.191 / 0.113 | 0.027 |
+  | alcaraz_hurkacz/045 | 2.07 | 25.4 / 15.4 | 20.1 / 15.3 | 0.135 / 0.190 | 0.026 |
+  | djokovic_federer/038 | 2.74 | 18.1 / 7.1 | 16.0 / 6.8 | 0.263 / 0.134 | 0.014 |
+  | djokovic_federer/072 | 2.92 | 16.0 / 7.6 | 13.7 / 7.0 | 0.163 / 0.107 | 0.014 |
+  | djokovic_zverev/008 | 3.20 | 15.9 / 6.6 | 13.6 / 6.4 | 0.070 / 0.037 | 0.006 |
+  | djokovic_zverev/012 | 3.32 | 18.4 / 7.5 | 15.6 / 7.4 | 0.137 / 0.027 | 0.007 |
+  | medvedev_struff/033 | 3.04 | 25.6 / 16.0 | 18.6 / 17.4 | 0.324 / 0.316 | 0.022 |
+  | rublev_auger-aliassime/052 | 9.80 | 17.2 / 9.8 | 14.1 / 8.8 | 0.273 / 0.199 | 0.049 |
+
+  Time fails on 8 of 8 windows, on both branches: `ref` changes more
+  between frames than the source does (1.3–3.0 × its residual energy)
+  and more than SVT-AV1 at its rate. Same content fails on 7 of 8 (045
+  is open: `ref` 0.135 under SVT-AV1's 0.190). The content error counts
+  a player that YOLO does not fit on an output as one box (`j.MISSED`,
+  the session's convention): 2–28% of `ref`'s player-frames, and the
+  anchors' too. The decision does not rest on it, since time alone
+  fails every window. Realism was not scored. GPU: 1,769 s of stage
+  execution (0.49 GPU-hours, the three failed smokes included: part
+  1's first attempt `20261022T123215Z-4a8565be` wrote its gate to the
+  wrong path, and parts 2 and 3's first attempts `…123634Z-ec2ceea4`
+  and `…123639Z-6fd8908a` checked for references a 48-frame smoke cannot
+  have; infrastructure, no score).
+- **FoundHand `gen` (K6b hands rung 2): fail** (time, 2 of 2 items
+  scored, which decides 4). Re-run with rung 2's code path and settings
+  (`k6bh.render_item`, 50 steps, item-keyed seeds, its crops and
+  composites; `ref` and `warp` beside), with K1f's seven SVT-AV1 low
+  points coded as K1f codes them (their rates on R reproduce K1f's within
+  0.1%), WiLoR (H3c2's error, box from each row's uncoded keypoints grown
+  ×1.2), and the flicker judges. Jobs (gpu5 RTX 6000 Ada, shared, code
+  `a947277d` from `ready.json`): P09_103 `20261022T123720Z-c74f647b`,
+  P22_107 `20261022T123731Z-683a932b` (G's training footage). Both full
+  stages pass `j_hands validate` locally (10 checks each). Report
+  `visor/j-2026-10-22/report-hands-80133781/j-hands.json`
+  (`8dc07d63…9f70`), validations `j-hands-validation.tar`
+  (`6325f2ce…5fe9`). At each item's keypoint rate:
+
+  | item | kbps | `gen` flicker / SVT-AV1 hull | `gen` energy / 1.25 × source | `gen` pose / SVT-AV1 hull / 1.5 × keypoints | `ref` (pose, flicker) | `warp` (pose, flicker, energy) |
+  |---|---:|---:|---:|---:|---:|---:|
+  | P09_103 | 2.03 | 10.7 / 3.8 | 10.5 / 2.1 | 5.4% / 7.4% / 5.7% (passes) | 8.3%, 5.0 | 2.5%, 5.5, 5.6 |
+  | P22_107 (G) | 1.93 | 6.1 / 2.1 | 5.8 / 1.6 | 3.9% / 4.7% / 3.5% (open) | 4.5%, 3.3 | 1.4%, 4.4, 4.2 |
+
+  `gen` fails time on both items, on both branches: its residual energy
+  is 4–6 × the source's, and its flicker 3 × SVT-AV1's at its rate. Two
+  failed items of four leave at most 2 passing, under the 3 needed, so
+  the remaining items (P06_108, P25_09) were cancelled once the decision
+  was made (`…123735Z-abbc683f` in its full stage, `…123749Z-a8815161` in
+  its smoke; no score read). Same content passes or is open: on P09_103
+  `gen`'s pose error (5.4% of the box) is under the keypoints' floor, and
+  on P22_107 it is under SVT-AV1's hull, which decides nothing. Realism
+  was not scored. FoundHand may have seen this footage (rung 2: the
+  overlap could not be resolved), and P22_107 is in G's footage; the
+  decision does not depend on either, since both items fail.
+  Beside: `ref` and `warp` fail time on both items too. `warp`, K1f's
+  bound (the true pixels moved to the coded keypoints), changes 3.2–3.4 ×
+  as much as the source between frames and 1.5–2.1 × SVT-AV1's flicker at
+  its rate. The coded keypoints themselves (100 ms coding, interpolated
+  between sends) make the hand move unlike the source, before any
+  renderer. GPU: about 0.76 GPU-hours of claimed time (2 items of about
+  19 min, the cancelled jobs 6 and 1 min), within the 3.
+- Visual check: no item passed, so none is shown beside a pass. One frame
+  per scored item is kept (`publish/frames/` in each job's
+  `published.tar`; K6 `ref` in `look-t*.jpg` per window). On P22_107
+  (frame 120) `gen` draws a plausible right hand, softer than the source
+  and in a slightly different grip; `ref` shows the warped reference's
+  doubled fingers; SVT-AV1 at ¼ and ⅛ blurs the hands.
+- **Decision (by the rule): all four routes stay closed.** H3e V1 fails
+  (content), FoundHand `gen` fails (time), K6 `ref` fails (time), and
+  H3a/H3a2 are untested on experience (outputs not kept). By the rule a
+  fail closes the route on both tracks. Fidelity verdicts stand.
+- Hypothesis ("all four fail"): held for the three judged. H3e failed on
+  content as predicted; its time was not needed. FoundHand failed on time
+  as predicted; its content passed or stayed open, not failed as
+  predicted. K6 `ref` was predicted to fail on content; it fails there
+  on 7 of 8 windows, but time decides alone. The competing explanation
+  (lenient thresholds where the anchor is poor) did not arise: no item
+  passed. Not tested: KID's domain sensitivity (no reference set built).
+- Reading. On the experience track the binding check is time, not
+  realism or content. Generated and warped objects driven by coded
+  keypoints change between frames 1.3–6 × as much as the source does,
+  while the pixel coders at the same rate stay near the source's own
+  change. Even K1f's bound fails it on both judged items. So a renderer
+  for this track needs temporally smooth keypoints or a temporally
+  conditioned renderer, and the keypoint code's own jitter needs its own
+  measure first. Which, if any, to pursue is the user's call.
+- Budget: GPU 0.49 GPU-hours (players) of the 1 shared with H3e and
+  H3a/H3a2 (no GPU), and about 0.76 of FoundHand's 3. CPU: the reports.
+
+### 2026-10-22 — J2: the coded keypoints' temporal jitter (rule)
+- Question (user, 2026-10-22, after J). J found that K1f's bound `warp`
+  (the true pixels moved from the uncoded to the coded keypoints) fails
+  "same over time" on both judged hand items: it changes 3.2–3.4 × as
+  much as the source between frames. `warp` moves pixels by
+  d_t = coded_t − uncoded_t, so it flickers wherever d changes between
+  frames. That change has two sources. Coding error (100 ms sends,
+  quantized and interpolated) can be smoothed at the decoder. Estimator
+  noise in the uncoded keypoints cannot, because those are where `warp`
+  takes the pixels from. Which one dominates, and does decoder-side
+  smoothing make the bound pass time?
+- Measure (CPU, from saved keypoints; no GPU). K1f's 30 held-out items
+  (K1c units: `row_t`, `row_right`, `uncoded_kp2d`, `coded_kp2d`). Per
+  hand track (consecutive frames of one side), per joint, over the
+  track's box (the uncoded keypoints' longer side): coding jitter
+  |d_t − d_{t−1}|; source motion |u_t − u_{t−1}|; estimator noise
+  |u_t − S₂(u)_t|, with S_σ a centred Gaussian over the track's frames
+  (σ in frames, edges renormalized). Medians per item, then over items.
+- Oracle (GPU, small): on J's two scored items (P09_103, P22_107), `warp`
+  re-drawn with decoder-side smoothing, everything else as J:
+  - `warp@S_σ`: from the uncoded keypoints to S_σ(coded), σ ∈ {1, 2, 4}
+    frames (non-causal: a decoder delay of about 2σ frames, stated);
+  - `warp@S(u)` (diagnostic, no coding): from u to S₂(u). It isolates the
+    estimator noise: the pixels are moved only by the noise smoothing
+    removes.
+  Judged by J's judges (WiLoR content, `h3b.flicker` and energies),
+  against J's saved SVT-AV1 hulls for the same items (the `j_hands`
+  units of jobs `20261022T123720Z-c74f647b` and `…123731Z-683a932b`).
+- Decision rule (fixed now, before any number is read).
+  - **Smoothing fixes it** if some σ makes `warp@S_σ` pass J's time
+    check on both items, with content still passing J's check. Next (to
+    the user): a decoder-side smoother in the keypoint codec, then
+    renderers re-judged with it.
+  - **The estimator is the cause** if `warp@S(u)` itself fails time on
+    both items: the bound's flicker comes from the source keypoints, and
+    no decoder smoother removes it. To the user: the experience track
+    needs a temporally consistent estimator (or a bound that does not
+    move pixels by estimator noise).
+  - Otherwise unclear, to the user.
+  The measure is reported beside and does not decide.
+- Hypothesis. Mostly estimator noise: WiLoR runs per frame, and K1f's
+  hand-box fits are per frame, so u jitters by a few percent of the box,
+  comparable to the coding's |Δd|. `warp@S(u)` fails time; smoothing the
+  coded keypoints alone helps little.
+- Competing explanation. The 100 ms coding (sends every few frames,
+  interpolated between) puts a kink in d at every send, which dominates;
+  then σ = 2 removes most of it and `warp@S₂` passes.
+- Budget. CPU: the measure and report. GPU: one job per item (warp, CPU,
+  and WiLoR on 5 variants), ≤ 20 min each, ≤ 1 GPU-hour total.
+- Measure (CPU, code `513328c7`; K1f's 22 stages, all 30 items;
+  `visor/j-2026-10-22/report-j2-513328c7/j2-measure.json`, `557c67e0…45ab`).
+  Medians over items of per-item medians, in % of the box per frame:
+  coding jitter |Δd| 1.94, the source's own motion 2.24, estimator noise
+  (u against S₂(u)) 1.32. Smoothing the coded keypoints (σ = 2) leaves
+  1.72 of jitter in d: 11% less. Most of d's change between frames is in
+  u, which `warp` takes the pixels from.
+- Oracle (job `20261022T172749Z-4c9d5594`, gpu3 RTX A6000, shared, code
+  `513328c7` from `ready.json`; full stage passes `j2 validate` locally,
+  10 checks; report `…/report-j2-513328c7/j2-report.json`, `793c8126…f0d48`).
+  The re-drawn `warp` reproduces J's saved pose error and flicker exactly
+  on both items. Per item (pose % of box; flicker; energy / source's):
+
+  | variant | P09_103 | P22_107 |
+  |---|---:|---:|
+  | J's time bar: SVT-AV1 flicker / 1.25 | 3.78 / 1.25 | 2.12 / 1.25 |
+  | `warp` | 2.50%; 5.53; 3.38 | 1.42%; 4.40; 3.21 |
+  | `warp@S1` | 2.19%; 4.87; 2.98 | 1.31%; 4.03; 2.92 |
+  | `warp@S2` | 2.40%; 4.98; 3.01 | 1.28%; 3.91; 2.82 |
+  | `warp@S4` | 3.54%; 5.79; 3.45 | 1.51%; 3.97; 2.84 |
+  | `warp@Su` (no coding) | 1.42%; 4.54; 2.85 | 0.56%; 3.42; 2.62 |
+
+  Content passes everywhere. Time fails everywhere, on both branches.
+- **Decision (by the rule): the estimator is the cause.** No σ makes the
+  smoothed bound pass time; the best (σ = 1–2) cuts its energy by about
+  12%. `warp@S(u)`, with no coding at all, still changes 2.6–2.9 × as
+  much as the source. A decoder-side smoother does not fix the
+  experience track.
+- Hypothesis (mostly estimator noise; `warp@S(u)` fails; smoothing
+  helps little): held. The competing explanation (send kinks dominate;
+  σ = 2 passes) is refuted.
+- Caveat for the reading. `warp@S(u)` moves pixels only by u's smoothed
+  noise, but it is still drawn by K1c's compose (the Telea fill where a
+  masked hand has no fit, and the drawn outline), which may flicker on
+  its own. An identity warp (u → u) separates the estimator from that
+  compositing; it was not run (the rule decided). It is the next check
+  if the user pursues this track (CPU warp and flicker only, under 0.3
+  GPU-hours with WiLoR, or none without content).
+- Budget: about 0.53 GPU-hours (32 min claimed), within the 1.
+
+### 2026-10-22 — H5p 4a: F coded and billed, the foreground re-encoded from F̂ (G_HO in the slots)
+- Question (PLAN H5p 4). Every equal-adaptation reading so far has F
+  granted. H5m coded F (lzma at 1/s) on streams made for the exact F, with
+  G in the slots; the loss it found was partly that bias. With F billed
+  and the foreground built for F̂ (K, the ring and the enhancer slots from
+  F̂), what is left of the split's wins against the venue-adapted
+  whole-frame DCVC-UF, neither venue model billed?
+- Configuration, fixed now: H5q 1's per-point choice of foreground coder
+  (DCVC-UF off the shelf, or the window's venue model, per point; G_HO in
+  both slots at ¼ and ½), the configuration H5q 2 fixed as the one a real
+  run is judged on. Its F-granted reading against `dcvc-venue`: weighted
+  DISTS −15% (4 of 4), frame DISTS −22% (4 of 4), weighted PSNR −11% (3 of
+  4), weighted LPIPS +6% (1 of 4).
+- Method.
+  - `h5 foreground --mask-scale s` (new): the client's F̂ (`mask.reduce`,
+    `encode`, `decode`, `upsample`, as the MASK segment carries it)
+    replaces F in the foreground's input (K = F̂ dilated by the ring and the
+    guard, the rest push-pull padded) and in the enhancer slots (the class
+    of the nearest F̂ pixel on F̂ and its ring). F's PSNR is still taken
+    on the true F.
+  - `h5 score --mask-scale s` (H5m's): F̂ in the compositor's alpha, the
+    MASK payload in the container, so the rate bills it. The score refuses
+    a foreground coded for another s.
+  - The backgrounds stay as published, filled for the exact F. A pipeline
+    built for F̂ would code the true pixels where F̂ misses F, so this
+    reading is conservative where F̂ under-covers F, and unchanged where it
+    over-covers (the foreground covers that fill).
+  - Pairs, fixed now, before any score: per item, the per-point
+    configuration's hull pairs on weighted DISTS (fill) with F granted, 15
+    | 13 | 12 | 14 (P01_107 | P02_02 | P03_10 | P09_106), 30 foreground
+    points in all, each re-encoded with its own coder. A subset's hull is
+    no better than the full grid's, so a pass is not inflated by the
+    choice. The other metrics are read on the same pairs, beside their
+    F-granted reading on those pairs (weighted LPIPS +16%, 1 of 4; frame
+    DISTS −12%, 3 of 4; weighted PSNR +8%, 1 of 4), so each row compares
+    like with like: what billing F costs at fixed pairs.
+  - s = 8 first (H5m's best single scale on weighted LPIPS, 36–116 kbps).
+    s = 16 runs only if s = 8 fails the rule, and is then judged as the
+    hull over s.
+- Decision rule, fixed now. The win to keep is weighted DISTS (fill)
+  against `dcvc-venue` alone, neither billed, in rule (a)'s form: mean
+  BD-rate −10% or better and 3 of 4 items below zero.
+  - Passes: PointStream with every byte of F counted keeps its weighted
+    DISTS win at equal adaptation; lzma at that s with the F̂-built
+    foreground is the billed configuration the paper reports. 4b decides
+    whether F in the foreground stream is worth building for margin.
+  - Fails at s = 8: s = 16, then the hull over s, by the same rule.
+  - Fails at both: billing F removes the split's DISTS win; 4b's oracle
+    says whether a MASK-free F could restore it.
+  - Reported beside it, on the same pairs, against `dcvc-venue` and the
+    fair pooled envelope (SVT-AV1 preset 1 with the ladder, DCVC-UF off
+    the shelf with the ladder, `dcvc-venue`): weighted LPIPS, frame LPIPS,
+    frame DISTS, weighted PSNR, and the mask's kbps and F̂'s IoU.
+- Hypothesis: the rule fails at s = 8. The mask costs 36–116 kbps, as much
+  as PointStream's whole stream at the low end of its hull, where most of
+  the DISTS hull's pairs lie (scene model at 540p); the F̂-built
+  foreground recovers part of H5m's boundary loss but not the rate.
+  Weighted DISTS moves from −15% to between −5% and +10%; P02_02 (F 50%,
+  116 kbps) and P01_107 (−0% granted) go above zero.
+- Competing explanation: the mask adds a near-constant 36–116 kbps, which
+  shifts the curve's low end off the overlap with `dcvc-venue` (13–26
+  kbps up to 2–4.6 Mbps) but is a small share of the rate over most of
+  the overlapping quality range, where the BD-rate is integrated in log
+  rate; DISTS judges texture more than F̂'s boundary, and the F̂-built
+  foreground removes H5m's padding artefacts. Then the win survives with
+  a smaller margin (−10% or better).
+- Budget (s = 8): per item two foreground jobs (the off-the-shelf points;
+  the venue-coded points, `--video-arm`) and two scoring jobs (the score
+  stage takes one coder's manifest per key), 16 jobs. From H5q 1's runs
+  (2.3 min per foreground point, about 50 s per scored pair, ~3 min
+  overhead per job): about 2.7 GPU-hours, ceiling 3.5. s = 16, if needed,
+  the same again: together over the card's 4 GPU-hours, so the user is
+  asked before it is submitted. Every stage under 45 minutes; shared GPUs,
+  ½-scale DCVC-UF points allowed on Ada and A6000 with the coder's three
+  attempts (docs/fleet.md).
+- Runs (s = 8; shared GPUs; code revision from each job's `ready.json`;
+  every full stage validated locally: foreground 12/12, scoring 9/9).
+  - Foreground (`h5 foreground --mask-scale 8`), off the shelf | venue
+    model: P01_107 `20261022T131134Z-62a239a3` | `…131141Z-403dcbca`;
+    P02_02 `…122639Z-cdff24e8` | `…125101Z-71de7c90`; P03_10
+    `…122652Z-f2d94c0f` | `…125106Z-2b385f06`; P09_106
+    `…122705Z-efd8ee14` | `…125110Z-2a8c63f0`. Code `fc0caf8` for the
+    three first off-the-shelf jobs, `1ba09f2` for the others (it adds only
+    `h5 crops`). RTX 6000 Ada.
+  - Two venue-coded jobs pass 11/12: F's PSNR at `dcvc@0/4` (3.6–4.4
+    kbps) is 19.09 dB (P01_107) and 19.33 dB (P09_106), under the
+    validator's 20 dB floor, as H5q 1 found at the same point with F
+    granted (19.07, 19.45). A low-rate picture, not a broken decode
+    (every other point 22–40 dB); the floor was not changed.
+  - Scoring (`h5 score --mask-scale 8`, tags `h5p4-gho` | `h5p4-venue`):
+    P01_107 `20261022T172510Z-1e1e4ff1` | `…172612Z-33e8a123` (`8602763`);
+    P02_02 `…125643Z-1ff8a9ab` | `…134121Z-3e1b0349`; P03_10
+    `…125653Z-63c4d1dd` | `…134531Z-0d44d55c`; P09_106
+    `…130311Z-60d8ed55` | `…133417Z-c7a01f55` (`1ba09f2`). RTX 6000 Ada
+    and RTX A6000. Every planned pair scored: 15 | 13 | 12 | 14.
+  - Not citable: the first P01_107 off-the-shelf job (`…122606Z-a7413b7b`)
+    stopped at its smoke, whose only point was `dcvc@0/4` (F at 19.9999
+    dB, the floor above); the smoke moved to the highest-QP ¼ point, as
+    H5q 1's specs had it, and four not-yet-started venue jobs were
+    cancelled and resubmitted with it (`…122629Z-3f8b7426`,
+    `…122645Z-e4edbf2c`, `…122658Z-51047d6d`, `…122710Z-c94154f6`). Its
+    rerun's smoke ran past 600 s on the contended A6000 gpu2
+    (`…125053Z-fe60a43e`, as in H5q 2); P01_107's two jobs then ran
+    without gpu2 (`…125057Z-79f22900` cancelled).
+- The mask at s = 8, P01_107 | P02_02 | P03_10 | P09_106: 51 | 116 | 75 |
+  36 kbps, F̂'s IoU with F 0.977 | 0.988 | 0.983 | 0.955 (H5m's).
+- Outcome. BD-rate on 4a's pairs, the per-point configuration, neither
+  venue model billed; P01_107 | P02_02 | P03_10 | P09_106, mean, items
+  below zero:
+
+  | against `dcvc-venue` | F granted (4b's oracle) | **F billed, s = 8 (the rule)** | F̂ stream, mask bytes removed | s = 16 bound |
+  |---|---|---|---|---|
+  | **weighted DISTS** | −0 \| −16 \| −22 \| −22: −15%, 4/4 | **+125 \| +146 \| +102 \| −0: +93%, 1/4** | +0 \| −16 \| −21 \| −30: −17%, 3/4 | +44 \| +47 \| +22 \| −18: +24%, 1/4 |
+  | weighted LPIPS | +6 \| +31 \| +42 \| −16: +16%, 1/4 | +127 \| +176 \| +194 \| +12: +127%, 0/4 | +15%, 1/4 | +56%, 1/4 |
+  | frame DISTS | −8 \| −28 \| −21 \| +10: −12%, 3/4 | +115 \| +131 \| +92 \| +41: +95%, 0/4 | −13%, 3/4 | +26%, 0/4 |
+  | frame LPIPS | +26%, 0/4 | +131%, 0/4 | +27%, 0/4 | +65%, 0/4 |
+  | weighted PSNR | +8%, 1/4 | +94%, 0/4 | +10%, 1/4 | +41%, 1/4 |
+
+  Against the fair pooled envelope, F billed: weighted DISTS +117% (0/4),
+  weighted LPIPS +153% (0/4), frame DISTS +107% (0/4), weighted PSNR
+  +199% (0/4); F granted on the same pairs: −9% (3/4), +17%, −7%, +79%.
+  - **The rule fails at s = 8** (+93%, 1 of 4), decided at 3 items (two
+    above zero, whatever P01_107 read).
+  - **s = 16 is not run**: its upper bound (s = 8's composites, a better
+    F̂ than s = 16's, re-billed at s = 16's measured 16 | 39 | 23 | 14
+    kbps from H5m) still fails (+24%, 1 of 4), so the real run cannot
+    pass and the hull over s cannot either.
+  - **F̂ costs nothing; the loss is the MASK segment's rate.** With the
+    mask bytes removed, the stream built for F̂ reads as F granted, or
+    better (weighted DISTS −17% against −15%; P09_106 −30% against
+    −22%): the F̂-built foreground removed H5m's bias entirely. Adding
+    36–116 kbps to every point moves the low end of PointStream's curve,
+    where the venue codec reaches 13–26 kbps, by a factor of 2–10, and the
+    BD-rate integrates in log rate.
+  - Hypothesis right on the verdict, wrong on the size (+93%, not −5 to
+    +10%). The competing explanation fails: the shift dominates the
+    overlap because the venue anchor's curve starts at 13–26 kbps.
+  - **Billing F removes every win of the split at equal adaptation**, on
+    every metric, against both the venue codec and the pooled envelope.
+    What 4b's oracle says about a MASK-free F follows.
+- GPU time: about 2.6 GPU-hours (23 jobs, the failed, timed-out and
+  cancelled ones included), within the ceiling of 3.5.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5p4-8602763.tar`
+  (sha256 `1ecb4806…c9c4a2`, read-only; one archive, as the NFS home
+  asks): the specs, every stage's `h5.json`, `pairs4a.py`,
+  `analyse4a.py` with its `a4.json`, `bound16.py`, `breakeven.py` and
+  their outputs in `out/`, and H5p 5's crops.
+
+### 2026-10-22 — H5p 4b: oracle for F carried by the foreground stream (no MASK segment)
+- Question (PLAN H5p 4, H5q lever 3). Could F carried by the foreground
+  stream itself (a key outside F, an alpha plane, or F derived at the
+  client from what it decodes), with no MASK segment, turn a verdict that
+  H5q or 4a reads as a loss?
+- Oracle: the exact F at zero bits, with today's foreground stream and its
+  slots: the F-granted rows of 4a's pairs, already measured (H5q 1's
+  `venuefg` and G_HO scoring stages). It dominates any such component:
+  - no carried F̃ is more accurate than F, and F costs no bits here;
+  - carrying F in the stream constrains the padding outside F (a key, a
+    hard edge, or a second plane), which push-pull's smooth padding, built
+    to cost the codec as little as possible, does not; so the stream does
+    not get cheaper. Assumed, stated: a carried F that also made the
+    foreground stream cheaper than push-pull padding would break the bound.
+  - No GPU: the oracle's rows exist. A tighter oracle (the real cost of a
+    key or alpha plane) runs only if this one moves a verdict.
+- Operating point: where H5q loses, weighted LPIPS (fill) against
+  `dcvc-venue`, neither billed, rule (a) (mean −10% or better, 3 of 4
+  below zero). Then each metric of 4a's table where 4a's billed reading
+  fails rule (a)'s form.
+- Decision rule, fixed now. For each such verdict: if the oracle also
+  fails it, F in the foreground stream cannot turn it and is not built for
+  it. If the oracle passes where 4a fails, the component could move that
+  verdict: a tighter oracle (the measured cost of the carrier) is next,
+  with its own rule.
+- Hypothesis: on weighted LPIPS the oracle fails (the per-point
+  configuration with F granted reads +6%, 1 of 4, on its full grid and
+  +16% on 4a's pairs), so the component is not built for H5q's loss.
+  Whether it matters for DISTS depends on 4a: if 4a keeps the DISTS win,
+  the oracle can only add margin; if 4a loses it, the oracle (−15%, 4 of
+  4) passes and a tighter oracle follows.
+- Competing explanation: none can rescue weighted LPIPS here, since the
+  bound is the F-granted reading itself; the only open question is
+  whether the bound's assumption (no cheaper stream) holds, which matters
+  only if a verdict is close.
+- Budget: CPU, minutes.
+- Outcome (CPU; the oracle's rows are H5q 1's scoring stages, 4a's pairs;
+  `analyse4a.py`, `breakeven.py` in 4a's report).
+  - **Weighted LPIPS: the oracle fails** (+16%, 1 of 4 on 4a's pairs; +6%,
+    1 of 4 on the per-point configuration's full grid). F carried by the
+    foreground stream cannot turn H5q's loss; **not built for it.** The
+    same holds for frame LPIPS (+26%, 0/4) and weighted PSNR (+8%, 1/4),
+    which the oracle fails too.
+  - **Weighted DISTS: the oracle passes where 4a fails** (−15%, 4 of 4,
+    against 4a's +93%, 1 of 4), so by the rule a MASK-free F could move
+    that verdict, and a tighter oracle is next. Frame DISTS: the oracle
+    reads −12% (3 of 4), passing too.
+  - A first tighter bound, computed post hoc on the CPU (not a rule
+    written before its run, so a reading, not a decision): the oracle's
+    rows with a constant rate c added for F, the most any carrier could
+    spend and keep the win. Weighted DISTS against `dcvc-venue`: c = 2
+    kbps −11% (3/4, passes), 5 kbps −5% (3/4, fails), 10 kbps +4% (2/4).
+    Frame DISTS fails already at 2 kbps (−8%, 3/4). **A carrier must cost
+    about 2 kbps or less**, about 5 bytes per frame at 50 frames/s.
+  - Every F coder measured so far costs 7–20× that at usable accuracy:
+    lzma at s = 16, 14–39 kbps (IoU 0.83–0.97, H5m); SVT-AV1 at s = 8 CRF
+    63, 15–32 kbps (IoU 0.89–0.98, H5p 2); lzma at s = 8, 36–116 kbps.
+    A carrier inside the foreground stream (a key outside F or an alpha
+    plane) still codes F's boundary every frame as the hands move.
+- Decision by the rule: **not built for LPIPS** (the oracle fails).
+  **Unclear for DISTS**: the oracle passes, and the tighter oracle the
+  rule names (the measured cost of a real carrier, a key or alpha plane in
+  the foreground stream: about 2–3 GPU-hours, as 4a) is not run here. The
+  2 kbps budget makes a pass unlikely, so the session recommends not
+  building it; whether to run that measurement is for the root session
+  and the user.
+
+### 2026-10-22 — H5p 5: visual check, PointStream and the anchors at matched rates (CPU)
+- Question (PLAN H5p 5): what do PointStream and the anchors look like at
+  the same rate, for the user's review beside the BD-rates?
+- Method (`h5 crops`, new; one CPU job per item). The client's output
+  rebuilt on frames 60 and 180 from the published decodes: PointStream as
+  billed in 4a (F coded at 1/8 and the stream built for F̂, the composite
+  as `score` makes it), the venue-adapted DCVC-UF's published FFV1, and
+  SVT-AV1 at preset 1 re-encoded at its ladder point. Each PNG shows F's
+  box (padded, at least 384 px) and the whole frame, labelled with each
+  stream's rate.
+- Matches, fixed by rule before any image: on PointStream's billed
+  weighted-DISTS hull, the pair nearest 200 kbps and the pair nearest
+  1 Mbps (log rate); each anchor at its best weighted DISTS at or under
+  that rate (H5's "matched" convention, which favours the anchors).
+  PointStream | venue | SVT-AV1 (kbps):
+  - P01_107: 164 | 132 (1080p QP 25) | 147 (720p CRF 62); 1027 | 670 |
+    811 (1080p CRF 48).
+  - P02_02: 238 | 202 | 221 (720p CRF 62); 968 | 669 | 886 (720p CRF 48).
+  - P03_10: 179 | 93 | 138 (720p CRF 62); 1343 | 976 | 928 (1080p CRF 48).
+  - P09_106: 182 | 128 | 161 (360p CRF 62); 1230 | 1084 | 1177 (720p CRF
+    48).
+- Runs (CPU, 32 threads; every full stage 6/6 locally; each rebuilt
+  PointStream rate equals its scoring row's container): P01_107
+  `20261022T173554Z-a7980f6d`, P09_106 `…172537Z-588cfb8e` (`8602763`);
+  P02_02 `…173732Z-ef9b37e1`, P03_10 `…173739Z-517bd9ba` (`583a4fb`, the
+  same `h5 crops`). Not citable: the first P02_02 and P03_10 jobs ran past
+  the 600 s smoke on the loaded gpu2 (`…172523Z-0f87919b`,
+  `…172530Z-0aea402f`), rerun without it.
+- Outcome: 16 PNGs in 4a's report archive (`crops/`), for the user's
+  review; no rule, no verdict. First look (the session's, not a judge):
+  at about 200 kbps PointStream draws the hands sharpest, the venue codec
+  keeps a little more texture on handled objects (P09_106's towel) and
+  in the background, and SVT-AV1 at 360–720p blurs the hands; at about
+  1 Mbps the three are close at this size.
+- Item report (H5p 4–5, sent to the root session; docs/sessions.md):
+  - Stopped because: goal reached (4a and 4b decided as far as their
+    rules go, the crops of 5 ready); one decision is open for the root
+    session and the user.
+  - Decision by the rule: 4a fails (F billed at s = 8: weighted DISTS
+    +93%, 1 of 4, against the venue-adapted DCVC-UF; s = 16's upper bound
+    +24%, 1 of 4, so not run). 4b: not built for LPIPS (the oracle, exact
+    F at zero bits, reads +16%, 1 of 4); unclear for DISTS (the oracle
+    passes, −15%, 4 of 4; a post hoc bound puts any F carrier's budget at
+    about 2 kbps).
+  - Numbers, budget, branch and checks: in the three entries above;
+    about 2.6 GPU-hours of the card's 4; CPU for 4b and 5.
+
+### 2026-10-22 — H5p 4c: F carried by the foreground stream, a key outside K (measured carrier)
+- Question (user, 2026-10-22: "measure the MASK-free F carrier ..., with
+  its rule written first"; 4b's next oracle). 4b's zero-bit oracle keeps
+  the weighted DISTS win and a post hoc bound gave any carrier about 2
+  kbps. What does a real carrier inside the foreground stream cost, and
+  does PointStream with it keep the win?
+- Carrier (`--carrier key`, new), chosen so the compositor stays as built:
+  - Encoder: the foreground input keeps the source on K (F dilated by the
+    ring and the guard, `keep_radius`), exactly as today, and puts one
+    flat key colour outside K instead of push-pull padding. The key is
+    chosen per window from six saturated colours, the one farthest (in
+    YCbCr, 1st percentile of distances) from the source pixels on K.
+  - Client: K̃ is where the decoded foreground (at its coded size) lies
+    farther than τ from the key, upsampled to 1080p; F̃ = K̃ eroded by
+    `keep_radius`. The alpha ring and the enhancer slots then run on F̃
+    as on F. Erosion after dilation fills only gaps narrower than the
+    keep radius; those pixels are inside K, so they show coded source,
+    not the fill.
+  - G_HO sits in both slots, so the client needs no hand/object classes.
+  - The encoder picks τ per point from a fixed set (the best IoU of F̃
+    with F on every 8th frame) and sends the key and τ: a 5-byte CARRIER
+    segment, billed.
+  - Exact F stays the encoder's input (no F̂); the backgrounds stay as
+    published (filled for F).
+- Configuration and pairs: 4a's (the per-point configuration; the 54
+  pairs of its weighted-DISTS hull, 30 foreground points), so each row
+  compares like with like against F granted and against 4a.
+- Two stages, the cheaper first.
+  - Stage 1, the foreground jobs: the key-padded streams, their rate
+    against the push-pull streams at the same point, and F̃'s IoU.
+  - Gate (an optimistic bound, CPU): the F-granted rows with each pair's
+    foreground bytes replaced by the key stream's, plus the CARRIER
+    segment, quality unchanged. If this fails the rule below, stage 2 is
+    not run and the carrier fails.
+  - Stage 2, scoring: the composites with F̃ (no MASK), the CARRIER
+    segment in the container.
+- Decision rule, fixed now: weighted DISTS (fill) against `dcvc-venue`,
+  neither venue model billed, rule (a)'s form (mean −10% or better, 3 of
+  4 items below zero).
+  - Passes: the key carrier is PointStream's F; the split keeps its
+    weighted DISTS win at equal adaptation with every byte counted.
+  - Fails (at the gate or in stage 2): no F coder tried keeps the win;
+    H5p 4 closes as a fail.
+  - Reported beside it, on the same pairs: weighted LPIPS, frame LPIPS
+    and DISTS, weighted PSNR, against `dcvc-venue` and the fair pooled
+    envelope; the carrier's rate per point and F̃'s IoU.
+- Hypothesis: the gate fails. The flat key makes a hard edge along K's
+  border every frame, which a smooth push-pull padding avoids; at the ¼
+  points (4–30 kbps) that adds more than the 2 kbps the win allows.
+- Competing explanation: a flat key is as cheap as push-pull (both are
+  predicted almost for free; the edge along K's border is short and moves
+  with the hands, which the codec already pays for), so the rate barely
+  moves, F̃'s IoU is high, and the rule passes near F granted's −15%.
+- Budget: stage 1, 8 foreground jobs (as 4a: about 1.3 GPU-hours);
+  stage 2, 8 scoring jobs (about 0.9 GPU-hours), only if the gate passes.
+  Ceiling 3 GPU-hours. With 4a's 2.6 this takes the item past the card's 4
+  GPU-hours; the user asked for this run (2026-10-22), knowing the
+  estimate (2–3 GPU-hours). Every stage under 45 minutes; gpu2 excluded
+  (smokes past 600 s there all day).
+- Runs, stage 1 (`h5 foreground --carrier key`, code `9b4b3ba` per each
+  job's `ready.json`; RTX 6000 Ada; every full stage validated locally,
+  13/13), off the shelf | venue model: P01_107
+  `20261022T181434Z-92f9fe49` | `…181442Z-01f9444d`; P02_02
+  `…181451Z-8e67f9a5` | `…181458Z-05f8e2dd`; P03_10 `…181506Z-d3a74345`
+  | `…181512Z-2cb46248`; P09_106 `…181520Z-d8c8e56f` |
+  `…181527Z-4ad9e659`.
+  - Keys: magenta on P02_02, green on the others.
+  - Two venue jobs miss the 20 dB F-PSNR floor at `dcvc@0/4` only:
+    P01_107 18.96 dB, P09_106 18.58 dB (push-pull at the same point
+    19.09 and 19.33). It is the low-rate point already known from 4a and
+    H5q 1, and F̃ misses 1.8% and 4.9% of F there; every other point is
+    21–40 dB. The gate uses only these streams' rates.
+  - τ: every point chose 96, the top of the set; IoU is already 0.95–0.99
+    above the lowest points, and τ does not change the rate.
+- F̃ is accurate. IoU with F is 0.95–0.99 above the lowest points (0.88 at
+  P09_106's `0/4`, where F is 2% of the frame); F̃ misses 0.1–1% of F and
+  adds 1–6%, as coded source inside K. It is as accurate as lzma at s = 8
+  (0.955–0.988) at no MASK cost.
+- The key's cost, key stream minus the push-pull stream at the same point
+  (granted F):
+  - P02_02 (F 50%): +2.5 to +865 kbps, +36% to +93%.
+  - P03_10 (F 19%): +2.1 to +625 kbps, +60% to +129%.
+  - P01_107 (F 14%): +1.2 to +379 kbps, +26% to +58%.
+  - P09_106 (F 2%): −175 to +9.7 kbps, −21% to +12% (cheaper than
+    push-pull at three of seven points).
+  The flat key's step along K's border costs bits in proportion to K's
+  perimeter, every frame.
+- Outcome: **the gate fails, so stage 2 is not run.** Even with quality as
+  granted (an optimistic bound), weighted DISTS against `dcvc-venue` reads
+  +18 | +5 | +9 | −30%: **+1% (1 of 4)**; against the pooled envelope +7%
+  (1 of 4). Weighted LPIPS +39% (1/4), frame DISTS +1% (1/4), weighted
+  PSNR +35% (1/4).
+  - Hypothesis right on the verdict. The key edge costs far more than the
+    2 kbps budget wherever F is large: 1–25 kbps at the ¼ points, and
+    26% or more at every point.
+  - The competing explanation holds only where F is small: on P09_106
+    the key costs about what push-pull does, and the bound reads −30%
+    (F granted: −22%).
+  - **H5p 4 closes as a fail.** No F coder tried keeps the split's
+    weighted DISTS win at equal adaptation on egocentric video: neither
+    lzma at s = 8 or 16, nor video coding (H5p 2), nor a key in the
+    foreground stream. Where F is a few percent of the frame (P09_106),
+    the key carrier costs about nothing and the split still wins.
+- GPU time: 1.38 GPU-hours (8 jobs), within the ceiling of 3; stage 2
+  unspent. The item's total is about 4.0 GPU-hours.
+- Report: `pointstream-data/visor/h5-2026-10-16/report-h5p4c-9b4b3ba.tar`
+  (sha256 `982fe3f7…915ecd`, read-only): the specs, every stage's
+  `h5.json`, `gate4c.py` and its output.
 
 ### 2026-10-22 — K6b (hands) 2c: a buildable bank, chosen outside the window and billed (rule)
 - Question ([PLAN K6b](../PLAN.md), hands, after 2b). Rung 2b's free,

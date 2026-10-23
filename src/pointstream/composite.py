@@ -131,3 +131,74 @@ def composite(foreground: np.ndarray, background: np.ndarray, alpha: np.ndarray)
     a = alpha[..., None].astype(np.float32)
     out = a * foreground.astype(np.float32) + (1.0 - a) * background.astype(np.float32)
     return np.clip(np.round(out), 0, 255).astype(np.uint8)
+
+
+# ------------------------------------------- F carried by the foreground stream: a key outside K (PLAN H5p 4c)
+
+#: Saturated candidates for the key colour (RGB); the window's key is the one farthest from the source on K.
+KEYS = ((255, 0, 255), (0, 255, 0), (0, 0, 255), (0, 255, 255), (255, 0, 0), (255, 255, 0))
+#: Thresholds the encoder may pick (YCbCr distance from the key, 0–255 units).
+KEY_TAUS = (16, 24, 32, 48, 64, 96)
+
+
+def ycbcr(rgb: np.ndarray) -> np.ndarray:
+    """RGB (…, 3) to BT.709 full-range Y, Cb, Cr as float32 in 0–255 units (chroma centred on 0)."""
+    x = rgb.astype(np.float32)
+    y = 0.2126 * x[..., 0] + 0.7152 * x[..., 1] + 0.0722 * x[..., 2]
+    return np.stack([y, (x[..., 2] - y) / 1.8556, (x[..., 0] - y) / 1.5748], axis=-1)
+
+
+def choose_key(frames: np.ndarray, keep: np.ndarray, every: int = 8) -> tuple[int, int, int]:
+    """The candidate key farthest from the source pixels on K: the largest 1st percentile of YCbCr distances,
+    over every ``every``-th frame."""
+    pixels = np.concatenate([ycbcr(f[k]) for f, k in zip(frames[::every], keep[::every]) if k.any()]
+                            or [np.zeros((1, 3), np.float32)])
+    if len(pixels) > 200_000:
+        pixels = pixels[np.random.default_rng(0).choice(len(pixels), 200_000, replace=False)]
+
+    def margin(key: tuple[int, int, int]) -> float:
+        return float(np.percentile(np.linalg.norm(pixels - ycbcr(np.array(key, np.uint8)), axis=1), 1))
+
+    return max(KEYS, key=margin)
+
+
+def key_input(frames: np.ndarray, foreground: np.ndarray, scale: int, size: tuple[int, int],
+              key: tuple[int, int, int], ring: int = RING) -> np.ndarray:
+    """`foreground_input` with the flat ``key`` outside K instead of push-pull padding."""
+    import cv2
+
+    radius = keep_radius(scale, ring)
+    out = np.empty((len(frames), size[1], size[0], 3), np.uint8)
+    for t, (frame, f) in enumerate(zip(frames, foreground)):
+        small = cv2.resize(frame, size, interpolation=cv2.INTER_AREA) if frame.shape[1::-1] != size else frame
+        known = cv2.resize(dilate(f, radius).astype(np.float32), size, interpolation=cv2.INTER_AREA) > 0
+        out[t] = np.where(known[..., None], small, np.array(key, np.uint8))
+    return out
+
+
+def carried_f(decoded: np.ndarray, key: tuple[int, int, int], tau: float, size: tuple[int, int],
+              radius: int) -> np.ndarray:
+    """The client's F̃ from the decoded foreground at its coded size (n, h, w, 3): K̃ where the colour lies
+    farther than ``tau`` from ``key``, upsampled to ``size`` (w, h) bilinearly at 0.5, then eroded by
+    ``radius`` (the keep radius K was dilated by)."""
+    import cv2
+
+    target = ycbcr(np.array(key, np.uint8))
+    kernel = disk(radius)
+    out = np.empty((len(decoded), size[1], size[0]), bool)
+    for t, frame in enumerate(decoded):  # a frame at a time: full-size float frames would not fit at once
+        k = np.linalg.norm(ycbcr(frame) - target, axis=-1) > tau
+        up = cv2.resize(k.astype(np.float32), size, interpolation=cv2.INTER_LINEAR) >= 0.5 \
+            if k.shape[::-1] != size else k
+        out[t] = cv2.erode(up.astype(np.uint8), kernel).astype(bool) if radius > 0 else up
+    return out
+
+
+def carrier_payload(key: tuple[int, int, int], tau: int, radius: int) -> bytes:
+    """The CARRIER segment's payload (`src.pointstream.bitstream`)."""
+    return bytes([*key, tau, radius])
+
+
+def parse_carrier(payload: bytes) -> tuple[tuple[int, int, int], int, int]:
+    r, g, b, tau, radius = payload
+    return (r, g, b), tau, radius
