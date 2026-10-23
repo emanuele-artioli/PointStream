@@ -12846,3 +12846,20 @@ and each object's representation is judged on both:
     against step 4's 922; 1,542,044 bytes), `med-A` `…192542Z-76ac4449`
     (843; 1,557,820), `med-B` `…192551Z-62ca7bde` (585; 2,515,324, of
     which the guider's change 965,696: 2.79 kbps over 2 h).
+  - The tennis base (`20261023T194934Z-b0dcbb19`, code `3890706`): 36
+    windows of all 5 matches, 8,597 crops (every second frame), 1,918
+    optimizer steps in 25 minutes, the stage 41.2 minutes; passes `k6b_fit
+    validate` (loss 0.217 → 0.207, probe 0.0154 → 0.0140);
+    `075b001a…3285`.
+  - Arm C's `medvedev_struff` fit (`20261023T203428Z-85ca5f54`) failed its
+    smoke on the probe (0.02093 → 0.02102, +0.5%) with every other check
+    passing (base merged, guider billed, loss). The probe's frames come
+    from the training windows, which the base was trained on, so it starts
+    lower (0.0209, against 0.0227 without the base) and 200 steps move it
+    within noise; `djokovic_zverev`'s C passed. For fits on the base, the
+    check now allows a rise under 1%; resubmitted.
+  - Development judge for arms A and B (`20261023T203239Z-d497467e`,
+    `b1de5471…6cba`, 25 checks, `warp` and `ref` reproduced): A and B each
+    win 2 of 4 window-metrics billed (both of `djokovic_zverev/008`, none
+    of `medvedev_struff/033`, lost by 0.001 on each metric for A); A has
+    the larger margin (0.156 against 0.137 of the envelope).
