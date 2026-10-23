@@ -112,7 +112,14 @@ sessions update their own items and experiments.md entries
   rublev_auger-aliassime/052). About 60% of step 3's gain transfers
   (hands: none), and payback is 0.4–2.1 h where it wins. **The
   generative route for players closes at the keypoint rate by the
-  rule**, with the matte and reference still granted. Every player result so far grants the matte; the
+  rule**, with the matte and reference still granted. Step 5
+  (2026-10-24, user approved): a tennis base LoRA (K6's windows
+  excluded, unbilled) plus a 4-bit rank-4 match LoRA with the pose
+  guider (1.65 kbps over 2 h) **fails at 67%, billed and unbilled**.
+  Billing no longer costs a window. The same two windows (045, 052) lose
+  in steps 3–5, so each recipe change moves the margins, not the score.
+  Step 6 (Wan-Animate 14B, zero-shot first) is outlined; it waits for
+  the user. Every player result so far grants the matte; the
   matte's rate is unmeasured on tennis (H5p 4: on egocentric video the
   billed mask removed every win). K6c after K6b; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
@@ -134,6 +141,7 @@ stops; the root session fills in the outcome and the next step.
 | K6b hands 3m | rung 3 with a decoder-side matte | — | Opus | withdrawn 2026-10-23: rung 4 failed with the matte granted |
 | K6b players 3 | overfit oracle (user approved) | `claude/k6b-players-zeroshot` @ `03a3df8` | Opus | reported 2026-10-23: pass (83%), matte and LoRA unbilled; 4.8 GPU-hours of 6 |
 | K6b players 4 | match fit, billed | `claude/k6b-players-zeroshot` @ `20eb7c3` | Opus | reported 2026-10-23: fail (67% unbilled, 58% billed); 7.0 GPU-hours of 7 |
+| K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5`, PR #225 | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11 |
 | K6m | the players' matte on tennis | — | Sonnet | moot for renderers (step 4 failed); its measure moves to T1 |
 | T1 | the split on tennis, F billed | — | Opus | proposed 2026-10-23 |
 
