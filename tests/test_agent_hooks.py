@@ -1,0 +1,148 @@
+"""Claude Code hooks: ledger staleness, after-compaction context, large-read guard."""
+
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+from tools.agent_hooks import guard_large_read as guard
+from tools.agent_hooks import ledger, session_start
+
+ROOT = Path(__file__).resolve().parents[1]
+
+PLAN = """# Plan
+
+### Dispatch ledger
+
+| item | card | branch | suggested model | status |
+|---|---|---|---|---|
+| H5p 4–5 | F stream | `claude/h5p-f-stream` | Opus | queued 2026-10-22 |
+| K6b hands 2c | bank | `claude/k6b-hand-bank` | Opus | done 2026-10-23 |
+| J | rejudge | `claude/j-experience-rejudge` | Sonnet | queued 2026-10-22 |
+
+## Done
+
+| a | b | `claude/not-a-ledger` | c | queued |
+"""
+
+SUBJECTS = [
+    "Merge pull request #221 from emanuele-artioli/claude/k6b-hand-bank",
+    "Merge remote-tracking branch 'origin/main' into claude/h5p-f-stream",
+    "Merge pull request #220 from emanuele-artioli/claude/h5p-f-stream",
+    "Merge pull request #219 from emanuele-artioli/claude/h5p-f-stream-old",
+]
+
+
+def test_ledger_rows_only_from_the_ledger_table() -> None:
+    rows = ledger.ledger_rows(PLAN)
+    assert [r.branch for r in rows] == ["claude/h5p-f-stream", "claude/k6b-hand-bank", "claude/j-experience-rejudge"]
+    assert rows[0].status == "queued 2026-10-22"
+
+
+def test_merged_prs_matches_whole_branch_names() -> None:
+    merged = ledger.merged_prs(SUBJECTS)
+    assert merged["claude/h5p-f-stream"] == [220]
+    assert merged["claude/h5p-f-stream-old"] == [219]
+    assert "claude/j-experience-rejudge" not in merged
+
+
+def test_stale_rows_flags_queued_rows_with_merged_prs_only() -> None:
+    stale = ledger.stale_rows(ledger.ledger_rows(PLAN), ledger.merged_prs(SUBJECTS))
+    assert len(stale) == 1
+    assert "claude/h5p-f-stream" in stale[0] and "#220" in stale[0]
+
+
+def _repo(tmp_path: Path) -> Path:
+    def run(*args: str) -> None:
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True)
+
+    run("init", "-q", "-b", "main")
+    run("config", "user.email", "t@example.com")
+    run("config", "user.name", "t")
+    (tmp_path / "PLAN.md").write_text(PLAN, encoding="utf-8")
+    run("add", "PLAN.md")
+    run("commit", "-qm", "plan")
+    return tmp_path
+
+
+def test_session_start_is_silent_on_startup_without_ledger_problems(tmp_path: Path) -> None:
+    root = _repo(tmp_path)  # no origin/main: no merges known, nothing stale
+    assert session_start.build("startup", root, fetch=False) == ""
+
+
+def test_session_start_after_compaction_reports_git_state(tmp_path: Path) -> None:
+    root = _repo(tmp_path)
+    (root / "new.txt").write_text("x", encoding="utf-8")
+    text = session_start.build("compact", root, fetch=False)
+    assert "Branch: main" in text
+    assert "Uncommitted files (1)" in text and "new.txt" in text
+    assert "plan" in text  # last commit
+    assert "ps-fleet status JOB_ID" in text
+    assert len(text.splitlines()) <= 30
+
+
+def test_session_start_runs_as_a_hook() -> None:
+    done = subprocess.run(
+        [sys.executable, "-m", "tools.agent_hooks.session_start"],
+        cwd=ROOT, input=json.dumps({"source": "clear"}), capture_output=True, text=True, timeout=60,
+    )
+    assert done.returncode == 0
+
+
+def _long(tmp_path: Path, name: str, lines: int) -> Path:
+    path = tmp_path / name
+    path.write_text("".join(f"line {i} with some padding text\n" for i in range(lines)), encoding="utf-8")
+    return path
+
+
+def test_read_of_long_file_without_limit_is_blocked(tmp_path: Path) -> None:
+    path = _long(tmp_path, "big.md", 1500)
+    message = guard.check({"tool_name": "Read", "tool_input": {"file_path": str(path)}})
+    assert message is not None and "1500 lines" in message and "offset" in message
+    assert guard.check({"tool_name": "Read", "tool_input": {"file_path": str(path), "limit": 200}}) is None
+
+
+def test_short_files_pass(tmp_path: Path) -> None:
+    path = _long(tmp_path, "small.md", 900)
+    assert guard.check({"tool_name": "Read", "tool_input": {"file_path": str(path)}}) is None
+    assert guard.check({"tool_name": "Read", "tool_input": {"file_path": str(tmp_path / "missing.md")}}) is None
+
+
+def test_logs_have_a_lower_limit_and_tail_advice(tmp_path: Path) -> None:
+    path = _long(tmp_path, "job.log", 400)
+    message = guard.check({"tool_name": "Bash", "tool_input": {"command": f"cat {path}"}, "cwd": str(tmp_path)})
+    assert message is not None and "tail -n 40" in message
+
+
+def test_bash_printers_only_when_output_reaches_the_session(tmp_path: Path) -> None:
+    _long(tmp_path, "job.log", 400)
+
+    def blocked(command: str) -> bool:
+        return guard.check({"tool_name": "Bash", "tool_input": {"command": command}, "cwd": str(tmp_path)}) is not None
+
+    assert blocked("cat job.log")
+    assert blocked("cd x && cat -n job.log")
+    assert not blocked("cat job.log | grep Error")
+    assert not blocked("cat job.log > copy.log")
+    assert not blocked("tail -n 40 job.log")
+    assert not blocked("cat <<EOF > notes.md\nhi\nEOF")
+
+
+def test_guard_runs_as_a_hook_and_exits_2_when_blocking(tmp_path: Path) -> None:
+    path = _long(tmp_path, "big.md", 1500)
+    payload = json.dumps({"tool_name": "Read", "tool_input": {"file_path": str(path)}})
+    done = subprocess.run(
+        [sys.executable, "-m", "tools.agent_hooks.guard_large_read"],
+        cwd=ROOT, input=payload, capture_output=True, text=True, timeout=60,
+    )
+    assert done.returncode == 2 and "1500 lines" in done.stderr
+
+
+
+def test_settings_wire_both_hooks() -> None:
+    settings = json.loads((ROOT / ".claude" / "settings.json").read_text(encoding="utf-8"))
+    commands = json.dumps(settings["hooks"])
+    assert "tools.agent_hooks.session_start" in commands
+    assert "tools.agent_hooks.guard_large_read" in commands

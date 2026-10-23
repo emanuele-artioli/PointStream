@@ -243,3 +243,125 @@ def test_venue_anchor_is_billed_like_pointstream() -> None:
     paid = report["comparisons"]["pointstream@kitchen|venue|wlpips_fill"]
     assert free["bd"] > 0 and paid["bd"] == pytest.approx(free["bd"], abs=0.02)  # same bits, same seconds
     assert "pointstream@kitchen|pooled|wlpips_fill" in report["comparisons"]
+
+
+def test_coded_classes_is_the_clients_f_hat() -> None:
+    from src.pointstream import mask as mk
+
+    classes = np.zeros((3, 64, 96), np.uint8)
+    classes[:, 10:40, 20:70] = 2
+    classes[:, 12:30, 22:40] = 1
+    classes[1, :, :] = np.roll(classes[1], 3, axis=1)
+    shown, payload, record = h5.coded_classes(classes, 8, Fraction(50))
+    decoded, scale = mk.decode(payload)
+    assert scale == 8 and np.array_equal(shown, mk.upsample(decoded, (96, 64)))
+    assert record["lossless_on_reduced_grid"] and record["bytes"] == len(payload)
+    assert 0.8 < record["iou"] <= 1 and abs(record["kbps"] - len(payload) * 8 / (3 / 50) / 1000) < 1e-9
+
+
+def test_foreground_validator_checks_f_hat() -> None:
+    mask = {"scale": 8, "lossless_on_reduced_grid": True, "iou": 0.97}
+    assert all(h5.validate_foreground(foreground_result(mask_scale=8, mask=mask)).values())
+    for change in ({"scale": 16}, {"lossless_on_reduced_grid": False}, {"iou": 0.5}):
+        bad = foreground_result(mask_scale=8, mask={**mask, **change})
+        assert not h5.validate_foreground(bad)["f_hat_as_the_client_decodes"]
+
+
+def test_coded_rows_with_a_tag_stay_out_of_the_tag_variants() -> None:
+    base = [{**scored(100, 0.2), "foreground": "dcvc-21_4"}]
+    coded = [{**scored(150, 0.2), "foreground": "dcvc-21_4", "tag": "h5p4-venue", "mask_scale": 8}]
+    v = h5.variant_rows(base + coded)
+    assert "h5p4-venue" not in v and [r["kbps"] for r in v["mask8"]] == [150]
+
+
+def test_match_and_crop_box() -> None:
+    m = h5.parse_match("scene-540-0+dcvc-0_4|scene-540-13|540=62")
+    assert m == {"pair": "scene-540-0+dcvc-0_4", "foreground": 0, "venue": "scene-540-13", "svt": (540, 62)}
+    assert h5.parse_match("enh-1080-63+dcvc-42_1@1|scene-1080-50|1080=55")["foreground"] == 1
+    with pytest.raises(SystemExit):
+        h5.parse_match("scene-540-0|scene-540-13|500=62")
+    f = np.zeros((1080, 1920), bool)
+    f[100:150, 1880:1910] = True  # small F near the right edge: widened to CROP_MIN, kept inside the frame
+    x0, y0, x1, y1 = h5.crop_box(f)
+    assert x1 == 1920 and x1 - x0 == h5.CROP_MIN and y1 - y0 == h5.CROP_MIN and y0 >= 0
+    assert x0 <= 1880 and y0 <= 100 and y1 >= 150
+    assert h5.crop_box(np.zeros((1080, 1920), bool)) == (768, 348, 1152, 732)
+
+
+def test_panel_grid_and_crops_validator() -> None:
+    rng = np.random.default_rng(0)
+    frames = {n: rng.integers(0, 255, (1080, 1920, 3), dtype=np.uint8) for n in ("source", "a", "b", "c")}
+    grid = h5.panel_grid(frames, (0, 0, 640, 480))
+    assert grid.shape[1] == 4 * h5.PANEL_FULL[0] + 3 * 6 and grid.shape[2] == 3
+    row = {"pointstream_kbps": 100.0, "venue_kbps": 90.0, "svt": {"kbps": 110.0, "decoded_frames": 240},
+           "pngs": [{"std": 40.0, "shape": list(grid.shape)}] * 2}
+    result: dict = {"jpeg_gate_holds": True, "planned": 1, "rows": [row], "shown_frames": [60, 180], "frames": 240}
+    assert all(h5.validate_crops(result).values())
+    result["rows"][0]["pngs"] = [{"std": 0.0, "shape": list(grid.shape)}] * 2
+    assert not h5.validate_crops(result)["panels_are_pictures"]
+
+
+def test_key_carrier_recovers_f_from_an_undistorted_stream() -> None:
+    from src.pointstream import composite as cp
+
+    rng = np.random.default_rng(0)
+    frames = rng.integers(60, 200, (3, 1080, 1920, 3), dtype=np.uint8)
+    frames[..., 1] = frames[..., 0]  # greyish content: green and magenta are both far
+    f = np.zeros((3, 1080, 1920), bool)
+    f[:, 300:700, 500:1100] = True
+    f[1, 300:700, 520:1120] = True
+    key = cp.choose_key(frames, cp.dilate(f, cp.RING))
+    assert key in cp.KEYS and key != (0, 0, 0)
+    for scale in (4, 1):
+        size = h5.coded_size(scale)
+        coded = cp.key_input(frames, f, scale, size, key)
+        assert (coded.reshape(-1, 3) == np.array(key)).all(axis=1).any()  # the key is there, outside K
+        shown = cp.carried_f(coded, key, 32, h5.FULL, cp.keep_radius(scale))
+        agreement = h5.f_agreement(f, shown)
+        assert agreement["iou"] > 0.97 and agreement["missed_share"] < 0.03, (scale, agreement)
+    assert cp.parse_carrier(cp.carrier_payload(key, 32, 16)) == (key, 32, 16)
+
+
+def test_container_bills_the_carrier_and_validators_check_it(tmp_path: Path) -> None:
+    bg_file, bg_sha = published(tmp_path, "bg.psdc", b"PSDC" + bytes(64))
+    fg_file, fg_sha = published(tmp_path, "fg.psdc", b"PSDC" + bytes(32))
+    bg = {"key": "scene-540-0", "route": "scene", "codec": "scene", "coded_size": [960, 544], "model_sha256": None,
+          "root": str(tmp_path), "bitstream": bg_file, "bitstream_sha256": bg_sha}
+    carrier = {"kind": "key", "key": [255, 0, 255], "tau": 32, "radius": 16, "payload_bytes": 5, "iou": 0.95,
+               "sha256": "s"}
+    fg = {"key": "dcvc-0_4", "scale": 4, "coded_size": [480, 272], "bitstream": fg_file, "bitstream_sha256": fg_sha,
+          "slots": {"hand": None, "object": None}, "carrier": carrier}
+    c = h5.container_for({"fps": Fraction(50), "frames": 4}, bg, fg, tmp_path, None, True)
+    parts = c.breakdown()
+    assert parts["carrier"] == 2 + 5 and "mask" not in parts
+    back = bs.Container.unpack(c.pack())
+    assert [p for t, p in back.segments if t == bs.Tag.CARRIER] == [bytes([255, 0, 255, 32, 16])]
+    row = {"bytes": sum(parts.values()), "breakdown": parts, "kbps": 1.0, "scores": scores(), "carrier": carrier}
+    result: dict = {"rows": [row], "anchors": [], "pairs_planned": 1, "jpeg_gate_holds": True, "limit_frames": 0,
+                    "routes": ["scene"], "bitstream_checks": {"scene": {"pair": "p"}, "gpu_compositor": {"max_abs": 0}},
+                    "background_f_is_foreground_f": True, "carrier": "key"}
+    assert all(h5.validate_score(result).values())
+    result["mask"] = {"lossless_on_reduced_grid": True, "bytes": 1}
+    assert not h5.validate_score(result)["carrier_billed"]
+    good = foreground_result(carrier={"kind": "key", "key": [255, 0, 255]})
+    for p in good["points"]:
+        p["carrier"] = dict(carrier)
+    assert all(h5.validate_foreground(good).values())
+    good["points"][0]["carrier"]["iou"] = 0.4
+    assert not h5.validate_foreground(good)["f_carried_recovered"]
+
+
+def test_carried_alpha_reads_the_saved_f_hat(tmp_path: Path) -> None:
+    from experiments.visor.b1 import file_sha256
+    from src.pointstream import composite as cp
+
+    f = np.zeros((4, 1080, 1920), bool)
+    f[:, 100:200, 300:500] = True
+    (tmp_path / "points").mkdir()
+    np.savez_compressed(tmp_path / "points" / "f.npz", f=np.packbits(f, axis=-1))
+    carrier = {"file": "points/f.npz", "sha256": file_sha256(tmp_path / "points" / "f.npz")}
+    alpha = h5.CarriedAlpha(tmp_path, carrier)
+    assert len(alpha) == 4 and np.array_equal(alpha.f(slice(1, 3)), f[1:3])
+    assert np.array_equal(alpha[slice(0, 2)][1], cp.alpha_and_classes(f[1].astype(np.uint8) * cp.OBJECT)[0])
+    with pytest.raises(RuntimeError):
+        h5.CarriedAlpha(tmp_path, {**carrier, "sha256": "0" * 64})

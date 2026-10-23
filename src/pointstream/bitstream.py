@@ -16,6 +16,8 @@ Segments (`Tag`):
 * ``MODEL``: kind u8 (`MODEL_KINDS`), then the first 8 bytes of the model's sha256: a reference to a network
   the decoder already holds (shipped once per venue, or with the decoder), never its weights.
 * ``BALL``: the ball mode's positions and per-window appearance (`src.pointstream.ball`, PLAN K5b).
+* ``CARRIER``: F carried by the foreground stream itself (no MASK): key R, G, B u8, threshold u8, keep radius u8
+  (`src.pointstream.composite.carrier_payload`, PLAN H5p 4c).
 
 The rate of a window is the container's length.
 """
@@ -43,6 +45,7 @@ class Tag(IntEnum):
     MASK = 3
     MODEL = 4
     BALL = 5
+    CARRIER = 6
 
 
 ROUTES = {"svt": 0, "enh": 1, "scene": 2, "dcvc": 3}

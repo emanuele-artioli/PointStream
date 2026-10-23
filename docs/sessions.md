@@ -36,8 +36,73 @@ A card's prompt stands alone:
    the pool.
 4. Questions the user must answer go to the user in the item session, and
    are mentioned in the report.
-5. When a stop condition holds, commit, push the branch, and send the
-   report.
+5. When a stop condition holds, commit, push the branch, open the pull
+   request with auto-merge (AGENTS.md), and send the report.
+6. Once the pull request has merged and the report is sent, tell the user
+   the session is ready to be archived. Sessions never archive themselves
+   or each other: the user may want to give a finished session a new task.
+
+## The dispatch ledger
+
+The root session updates its ledger row at every event, not in batches:
+card sent, report received, pull request merged, item stopped. A fresh root
+session must be able to carry on from PLAN.md alone, so nothing it needs
+lives only in its conversation. The startup hook flags rows still marked
+queued whose branch already has a merged pull request
+([hooks](#hooks)).
+
+## Asking the user
+
+Rules for when to ask are in AGENTS.md ("Deciding and asking"). The user
+switches between sessions and cannot be expected to remember this one, so a
+question carries its own context. No fixed template; cover what applies:
+
+- what this work is for, in terms of the paper or the demo;
+- what is done and what was found, with the numbers that matter;
+- the options, with what each costs (GPU time, work) and risks;
+- your recommendation and why;
+- exactly what you need from the user.
+
+Explain every internal name (item letters, part numbers, script names) the
+first time it appears. Sessions may reason in their own labels; the user
+should not have to decode them.
+
+## Compaction
+
+A session cannot run `/compact` itself. At a phase boundary (a pilot done, a
+report sent, a decision made), once the state is written to files, tell the
+user it is a good moment to compact and give a one-line focus. The focus
+names where the state is written, the few things that live only in the
+conversation, and what to drop:
+
+> State is in the H5p report and its experiments entry. Keep job 4812
+> (running), 3.1 of 8 GPU-hours spent, and the open question on crop size.
+> Drop logs and the dead ends already recorded.
+
+Automatic compaction (at 80% in cloud sessions) is the safety net. When the
+next phase is a new task, a fresh session from a card is better than
+compacting. Cache note: every step re-reads the whole context, cached at
+about a tenth of the input price for an hour; a compaction rewrites only the
+summary. Keep waits under the hour (`ps-fleet wait` returns within 45
+minutes) so the cache survives them. Local desktop sessions were checked on
+2026-10-23: all cache writes use the 1-hour lifetime.
+
+## Hooks
+
+`.claude/settings.json` runs two hooks from `tools/agent_hooks/` (standard
+library only, tested in `tests/test_agent_hooks.py`):
+
+- **SessionStart** (`session_start.py`): after a compaction, prints the
+  branch, uncommitted files, last commits and a reminder to re-check fleet
+  jobs by ID, so the session works from live state rather than the summary
+  alone. On startup and resume it prints only stale ledger rows, and nothing
+  when there are none. It does not query the fleet: that is slow on the
+  shared drive, and job IDs are in the experiments entries.
+- **PreToolUse** (`guard_large_read.py`): blocks a whole-file Read of a file
+  over 1000 lines, and a `cat`/`less`/`more` whose output reaches the
+  session, on such a file; logs (`.log`, `.out`, `.err`) at 300 lines. The
+  message says what to do instead. Ranged reads and piped or redirected
+  output pass.
 
 ## The report
 
