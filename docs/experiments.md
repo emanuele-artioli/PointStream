@@ -12005,3 +12005,73 @@ and each object's representation is judged on both:
   3's peak: 21.2 GB). Each job's smoke (≤ 600 s) fits 60 frames for 120 s
   and judges 24. Estimate about 2.4 GPU-hours with the smokes. Ceiling 3
   GPU-hours, failed attempts included.
+- Dry run (CPU, gpu6, before any GPU stage): P06_108's candidates restored
+  from 2c's score stage, 240 frames decoded in 46 s, 396 crops, all outside
+  the window and its guard. The masks cover the hands and the joints sit on
+  them. One early frame's fit is loose but passed 2c's inside-the-mask
+  filter.
+- Jobs (RTX 6000 Ada, shared, gpu6; `9bc7003` from each `ready.json`; 20
+  min of fitting each): P06_108 `20261023T082231Z-f2ae58cf`, P22_107
+  `20261023T082238Z-9b03b134`. Both smokes passed the fleet validator, and
+  both full stages pass `k6bh3 validate` locally (16 checks), with `warp`
+  reproducing K1f. Steps reached: 5,759 and 5,659 (rung 3: 5,579–5,708).
+  Crops: 396 and 378 (from 240 of 1,471 and of P22_107's candidate frames
+  with a kept fit), 3% and 7% within 10 s of the window. Report
+  `visor/k6bh-2026-10-22/report/k6bh4-report.json` (`3690a96f…e9a`).
+- Stopped early (2026-10-23): P25_09 (`20261023T082245Z-e3a8572a`) was
+  cancelled while its smoke ran. With P06_108 losing both metrics and
+  P22_107 losing LPIPS, the score could reach at most 50% even if P25_09
+  won both, so the decision was made. P25_09 also lost LPIPS in rung 3.
+- Outcome. On R, at each item's keypoint rate, the fit unbilled:
+
+  | item | transferred fit, LPIPS / DISTS | hull | rung 3 (in-window fit) | rung 2 (zero-shot) | `warp` |
+  |---|---:|---:|---:|---:|---:|
+  | P06_108 | 0.321 / 0.268 | 0.172 / 0.206 | 0.162 / 0.177 | 0.308 / 0.273 | 0.091 / 0.123 |
+  | P22_107 (G) | 0.283 / **0.194** | 0.236 / 0.204 | 0.174 / 0.151 | 0.281 / 0.200 | 0.059 / 0.049 |
+
+  (Bold: below the hull.) LPIPS 0 of 2, DISTS 1 of 2: **score 25%**. Clean
+  of G (P06_108): 0%. Flicker in R: 35.7 against the source's 14.4
+  (P06_108), 15.7 against 3.8 (P22_107). With the weights billed once per
+  video (1.35 GB) the rate is 14.8 and 18.6 Mbps. Payback never comes,
+  except on P22_107's DISTS: about 113 days of video.
+- Decision (by the rule): **fail.** A FoundHand fitted on other shots of the
+  same video does not carry the hand in the window. With 2c, hands on
+  fidelity close at the keypoint rate and go to the experience track (item
+  J). K1f's bound stays a bound.
+- Reading.
+  - None of rung 3's gain transfers. The transferred fit lands on rung 2's
+    zero-shot `gen` (within 0.013 LPIPS and 0.006 DISTS on both items),
+    against rung 3's 0.11–0.15 LPIPS better. The fit learned this window,
+    not the hand.
+  - The strips show the person: skin tone, the watch and forearm hair on
+    P22_107, the sleeve-less arms of P06_108. What breaks is the hand in the
+    window's action: at P06_108's frame 120 (twisting a jar lid) the fingers
+    over the lid are a smear, and on P22_107 the fingers around the spoon
+    are placed differently from the source's. That is the pose-to-pixel
+    error rung 3's hypothesis named, and only the window's own frames fixed
+    it there.
+  - Not a near-duplicate effect: 3–7% of the crops sit within 10 s of the
+    window, so the fit saw almost nothing close to it.
+- Hypothesis ("fails, between rung 2 and rung 3, score ≤ 50%"): the fail
+  held, at 25%. It landed on rung 2, not between. The competing explanation
+  (the fit learns the person and the keypoints place it) is refuted: the
+  person transfers, and it is not enough.
+- Scope and caveats. 2 of the 3 planned items (stopped once decided), one in
+  G's footage. 240 fit frames and 20 min, as rung 3. A longer fit or more
+  frames could move the numbers, but rung 3's comparison shows the gap is
+  the window's own content, not the fit's length. Fit crops use VISOR's
+  480p dense masks, and the window uses B1b's fill. The reference stays
+  granted from the window, as in rungs 2 and 3. FoundHand may have seen the
+  footage.
+- Report (2026-10-23, to the root session).
+  - Stopped because: goal reached (decided after 2 items).
+  - Decision by the rule: fail, 25% (0% clean of G).
+  - Numbers: the table above; jobs above; code `9bc7003`; report
+    `k6bh4-report.json` `3690a96f…e9a`.
+  - Budget: 4,373 s of stages plus P25_09's cancelled smoke, about 1.3
+    GPU-hours of the 3.
+  - Deviations: P25_09 not run (the decision was made without it).
+  - Open for the user: nothing on fidelity for hands. The generative route
+    for hands is closed at the keypoint rate; whether the experience track
+    takes hands up is the root session's call.
+  - Proposed next step: none on this ladder.
