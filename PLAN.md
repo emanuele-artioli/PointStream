@@ -99,8 +99,14 @@ sessions update their own items and experiments.md entries
   AnimateAnyone zero-shot, one unbilled reference and R granted as its
   matte, wins 3 of 6 windows by LPIPS and by DISTS (50%, fail). It wins
   all three Djokovic windows (up to 73% saving) and loses both Alcaraz
-  windows and Rublev's. Step 3 (overfit, ≤ 6 GPU-hours, rule written)
-  waits for the user. Every player result so far grants the matte; the
+  windows and Rublev's. Step 3 (2026-10-23, user approved): a LoRA
+  fitted 7.5 min per window on its own frames **passes at 83%** (LPIPS 4
+  of 6, DISTS 6 of 6; rate savings 35–84% where it wins), reference,
+  matte and LoRA (49 MB) unbilled. Step 4 (a fit per match, billed) is
+  outlined. Root estimate from the reported savings: 49 MB repays in
+  6–69 h of play, against a match's 2–3 h, so a per-match LoRA has to
+  shrink 3–30× (rank, quantization), or be sent once per player and
+  unbilled as the venue models are (user's call). Every player result so far grants the matte; the
   matte's rate is unmeasured on tennis (H5p 4: on egocentric video the
   billed mask removed every win). K6c after K6b; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
@@ -119,6 +125,7 @@ stops; the root session fills in the outcome and the next step.
 | K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` @ `505f5a7` | Opus | reported 2026-10-22: fail (12.5%; free bank 25%); 2.6 GPU-hours of 3.5 |
 | K6b hands 3 | overfit oracle (user approved) | `claude/k6b-hand-bank` @ `3059660` | Opus | reported 2026-10-23: pass (83%; 75% clean of G), R granted; visual check on P06_108 supports it (flicker 18.0 against the source's 14.4); 3.1 GPU-hours of 4 |
 | K6b hands 3m | rung 3 with a decoder-side matte; visual check, flicker | — | Opus | proposed 2026-10-23 |
+| K6b players 3 | overfit oracle (user approved) | `claude/k6b-players-zeroshot` @ `03a3df8` | Opus | reported 2026-10-23: pass (83%), matte and LoRA unbilled; 4.8 GPU-hours of 6 |
 | K6m | the players' matte on tennis (rate and decoder-side) | — | Sonnet | proposed 2026-10-23 |
 
 **Proposed next items (root session, 2026-10-23; each writes its rule
