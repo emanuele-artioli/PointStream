@@ -587,6 +587,19 @@ objects (the tennis ball).
   each other (reported to the user before judging). Next: step 3, the
   overfit oracle; its rule is written (ceiling 6 GPU-hours) and it waits
   for the user's approval.
+  **Step 3, overfit oracle (2026-10-23, experiments.md "K6b (players)
+  3"): passes.** AnimateAnyone fitted on each window's own frames (a LoRA
+  on both UNets' attention and the pose guider, 7.5 minutes: the pilot's
+  learning curve saturated there) wins 4 of 6 windows on LPIPS and 6 of 6
+  on DISTS (score 83%), saving 35–84% of the envelope's rate on four
+  windows. It improves every window over the zero-shot step (LPIPS
+  0.185–0.300 against 0.211–0.381); it loses LPIPS on
+  `alcaraz_hurkacz/045` by 0.003 (its fit got the fewest steps) and on the
+  Rublev close-up. The fit saw the frames it is judged on, and its
+  reference, matte and LoRA are unbilled, so it bounds a match fit. 4.8
+  GPU-hours of the 6 approved. Next: step 4 (a fit on other shots of the
+  same match, billed and amortized); outlined, its rule waits for the
+  user.
   Training discipline for steps 3 and 4: a correctness smoke in minutes;
   then a learning-curve pilot on held-out frames at fixed fractions of the
   step budget; the scaled fit only if that curve, extrapolated, can reach

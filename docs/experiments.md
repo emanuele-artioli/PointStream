@@ -11354,3 +11354,73 @@ and each object's representation is judged on both:
   (fit 11 with loading, rendering both players 20, judging 3) plus each
   job's smoke, about 4 GPU-hours for 6; with the 1.05 spent, about 5 of the
   6 approved.
+- Scaled fits (`gen-fit`: `original` + the window's LoRA, 7.5 minutes on
+  all of the window's fitted frames; code `82f3369`, Ada, shared; one job
+  per GPU): `20261023T072435Z-a39f6718` (`djokovic_federer/038`, 710
+  optimizer steps), `…072444Z-bf4cb8e0` (`/072`, 430), `…072453Z-ce59b93f`
+  (`rublev_auger-aliassime/052`, 671), `…072502Z-fcdde99d`
+  (`djokovic_zverev/012`, 625), `…072511Z-371ff3e9` (`alcaraz_hurkacz/045`,
+  449), `…072519Z-37185050` (`/036`, 415). The budget is wall time, so
+  contention cut the steps on four windows below the pilot's 677 at 7.5
+  minutes. Every smoke passed (loss and x₀ falling) and every full stage
+  passes `k6b_fit validate` locally. Renders (code `1aaa085`, both players,
+  every frame): `20261023T073830Z-3f8140a2`, `…073840Z-65dd93e6`,
+  `…074026Z-6394e968`, `…074108Z-a101a3d1` (42 minutes, contended),
+  `…075035Z-97344dbd`, `…075506Z-bf288877`; all pass `k6b_generate
+  validate`. Judges: `20261023T083816Z-f1649e10` and `…083822Z-30b2b476`
+  (gpu2, RTX A6000; `1aaa085`), all 29 checks each locally, with `warp`
+  and `ref` reproducing K6 on every window. Report:
+  `tennis/k6b-2026-10-22/report/k6b-report-step3.json` (`0224e2d9…0583`,
+  `k6b report --step 3`), receipts in `k6b-step3-validation.tar`
+  (`5e0ec785…447c`).
+- Outcome (6 windows from 4 matches; K6's envelope at each window's
+  keypoint rate):
+
+  | window | `gen-fit` LPIPS / envelope | DISTS / envelope | step 2 LPIPS / DISTS | saving |
+  |---|---:|---:|---:|---:|
+  | djokovic_federer/038 | **0.185** / 0.244 | **0.183** / 0.223 | 0.211 / 0.189 | 75% |
+  | djokovic_federer/072 | **0.230** / 0.255 | **0.191** / 0.224 | 0.252 / 0.197 | 35% |
+  | djokovic_zverev/012 | **0.257** / 0.379 | **0.146** / 0.252 | 0.275 / 0.150 | 84% |
+  | alcaraz_hurkacz/036 | **0.247** / 0.280 | **0.219** / 0.246 | 0.291 / 0.250 | 60% |
+  | alcaraz_hurkacz/045 | 0.283 / 0.280 | **0.241** / 0.249 | 0.338 / 0.282 | −12% |
+  | rublev_auger-aliassime/052 | 0.300 / 0.243 | **0.152** / 0.164 | 0.381 / 0.188 | −122% |
+
+  (K6's saving statistic: mean 0.20, 95% CI [−0.45, 0.69], positive on 4
+  of 6. The bound, `warp`, is 0.045–0.123 LPIPS.)
+  - `gen-fit` wins 4 of 6 windows on LPIPS and 6 of 6 on DISTS: **score
+    83%**.
+  - The fit improves every window over step 2 (LPIPS by 0.018–0.081). The
+    LPIPS losses are `alcaraz_hurkacz/045` by 0.003, the window whose fit
+    got 449 steps, and the Rublev close-up (7 judged frames, a 542 px
+    player, an envelope at 9.8 kbps).
+- Decision (by the rule): **pass.** A renderer fitted on the window's own
+  frames beats the pixel envelope at the keypoint rate on 83% of the
+  window-metrics, so the generative route stays open for players with the
+  matte granted. Next is step 4: a fit on other shots of the same match,
+  judged on K6's windows and billed. Its rule waits for the user.
+- Reading.
+  - The hypothesis (passes on the Djokovic windows and
+    `alcaraz_hurkacz/036`, score ≥ 75%) held. The competing explanation (the
+    gap is pose-to-pixel error the fit cannot remove) is refuted for
+    DISTS, and for LPIPS on 4 windows; it may still describe the Rublev
+    close-up.
+  - Scope. This bounds renderers fitted elsewhere in the match: the fit
+    saw the frames it is judged on, its reference and matte are granted,
+    and its LoRA (24.4 M parameters, about 49 MB in fp16) is unbilled.
+    `original` has not seen PointStream's footage before this fit.
+- Budget: 4.8 GPU-hours of stage time (smokes, pilot fit, render and
+  judge, 6 fits, 6 renders, 2 judges), within the 6 approved.
+
+### 2026-10-23 — K6b (players) 4: match fit (outline, not run)
+- Question. Does a renderer fitted on *other* shots of the same match beat
+  K6's envelope on K6's windows once its cost is paid? Step 3 bounds it;
+  this is the buildable form (PLAN K6b step 4; G5b's payback).
+- Sketch, for the user to approve before a rule is fixed. Per match, one
+  LoRA fitted on K4b.1's other windows of that match (its 48 windows cover
+  K6's 5 matches; K6's own windows held out), with step 3's recipe and a
+  learning-curve pilot on one match first. Judged as steps 2 and 3. Billed:
+  the LoRA's bytes (about 49 MB in fp16, or less if quantized) amortized
+  over the match's hours, with payback hours reported as G5b; the
+  reference stays granted. Needs K4b.1's windows' poses (published) and
+  their frames. Budget: about 1 GPU-hour per match (fit and render), 5–6
+  GPU-hours with judging; to be fixed with the rule.
