@@ -12863,3 +12863,24 @@ and each object's representation is judged on both:
     win 2 of 4 window-metrics billed (both of `djokovic_zverev/008`, none
     of `medvedev_struff/033`, lost by 0.001 on each metric for A); A has
     the larger margin (0.156 against 0.137 of the envelope).
+  - Arm C fits (on the base, guider trained, 8-bit): `dz-C`
+    `20261023T203414Z-38ef7b42` (821 steps, 2,507,660 bytes), `med-C`
+    `…204452Z-d5c90446` (588, 2,519,640; passes the strict probe test too).
+    Development renders (each passing `k6b_generate validate`): A
+    `…194403Z-815f567a`, `…194332Z-0f8fbf72`; B `…195337Z-a9db1ff9`,
+    `…194542Z-72dd61dc`; C `…205611Z-1872b27b`, `…210405Z-bf738c80` (008,
+    033 in that order). Judges `…203239Z-d497467e` (A, B) and
+    `…213006Z-b2642a24` (C, `f3cd5fbd…ee8f`), `warp` and `ref` reproduced.
+
+    | arm | 008 billed kbps | 008 LPIPS / env | 008 DISTS / env | 033 billed kbps | 033 LPIPS / env | 033 DISTS / env |
+    |---|---:|---:|---:|---:|---:|---:|
+    | A | 4.91 | **0.240** / 0.324 | **0.143** / 0.229 | 4.77 | 0.226 / 0.225 | 0.227 / 0.226 |
+    | B | 5.98 | **0.233** / 0.309 | **0.138** / 0.220 | 5.84 | 0.229 / 0.219 | 0.228 / 0.223 |
+    | C | 5.98 | **0.225** / 0.309 | **0.133** / 0.220 | 5.84 | 0.222 / 0.219 | 0.226 / 0.223 |
+
+    Envelopes at the billed rate; bold won. Each arm wins 2 of 4; by the
+    rule the larger margin decides: **C** (0.159 of the envelope, A 0.156,
+    B 0.137). C is best on every cell; B's data and guider alone gain
+    little on 033 (2 training windows) and their 0.97 MB guider raises the
+    bar. Render-time variants of C submitted: 4 bits (from the fp16
+    checkpoint) and guidance 2.0, on both windows.
