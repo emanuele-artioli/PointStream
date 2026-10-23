@@ -12709,3 +12709,108 @@ and each object's representation is judged on both:
   fits 1.51, pilot renders 1.34, pilot judge 0.1, scaled fits 0.95,
   renders 2.21, judges 0.27), at the 7-hour ceiling; smokes add a few
   minutes each. Renders ran on shared GPUs and took 9–33 minutes each.
+
+### 2026-10-23 — K6b (players) 5: more data, a tennis base, the pose guider and fewer bits (rule, not run)
+- Question (user, 2026-10-23, after step 4's 67% / 58%: "try all the
+  things that might improve performance before closing the players").
+  Can the match fit reach the envelope on K6's windows, billed, once it
+  is given what step 4 left out?
+- What step 4 says about where the gain is.
+  - Not training time or capacity: on the pilot, 10 minutes scored as 20
+    and rank 4 as rank 64; the fits' loss is flat after the first minutes.
+    So learning rate, rank or longer fits are not tried.
+  - Billing caps the score: step 3's oracle, billed the same 1.73 kbps,
+    wins 8 of 12 window-metrics (67%). Reaching 9 needs both fewer bits
+    and more quality.
+  - The window-metrics in reach: `djokovic_federer/072` LPIPS (0.001
+    above the billed envelope: fewer bits) and `rublev/052` DISTS (0.014;
+    the oracle wins it at 0.152). `alcaraz_hurkacz/045` (0.022–0.046) and
+    052's LPIPS (0.110) are lost by the oracle too.
+  - 052 is judged on 32 frames: only 32 of its 240 frames are registered
+    court views (K6 scores those). Its other frames are a close-up, which
+    K6's player selection (it needs the court) cannot crop, so close-up
+    training data is out of reach without new code; it is not tried.
+- Data (K6's `inputs.tar`, K4b.1's 57 windows): step 4 capped training at
+  6 windows with ≥ 120 registered frames. Without the cap (the 120-frame
+  floor kept, K6's 8 windows excluded): `rublev` 13 windows (3,095
+  registered frames, about 2.2× step 4's), `djokovic_zverev` 11 (2,640,
+  about 1.8×), `djokovic_federer` 7 (1,680), `alcaraz_hurkacz` 3 (720; no
+  more exist: more needs new K4b windows from the archive's 21 clips, a
+  separate job not run here), `medvedev_struff` 2 (480). Djokovic is the
+  only player in two matches.
+- Development windows (fixed now): `djokovic_zverev/008@120` and
+  `medvedev_struff/033@120`. K6 scored both (envelopes exist) and steps
+  2–4 never judged them, so the recipe is chosen there and the 6 judged
+  windows are not looked at until the scaled run. They are left out of
+  every fit's training data.
+- Arms (cumulative, the fewest that separate the causes):
+  - **A** step 4's recipe (rank 4, 10 minutes, cap 6, guider frozen),
+    the baseline on the development windows.
+  - **B** A + every K4b.1 window of the match (no cap) + the pose guider
+    trained and billed (1.1 M parameters, coded as the adapter).
+  - **C** B on a **tennis base**: one LoRA (rank 64, 30 minutes) trained
+    on every K4b.1 window of all 5 matches except the 8 K6 windows. It is
+    part of the decoder, fitted once for the sport, so it is not billed
+    per match. The match's rank-4 LoRA is fitted on top of the merged
+    base. This is the general model that K6c would ship, and it gives
+    `alcaraz_hurkacz` the other matches' data.
+  - Render-time, on the best arm's checkpoints (no refit): adapter bits
+    {8, 4} (per output channel, G5c's coder) and guidance {3.5, 2.0}.
+- Per-player (user, 2026-10-23): Djokovic, the one player with two
+  matches. One player LoRA over `djokovic_federer` and `djokovic_zverev`
+  (the chosen recipe), billed over **H_player = 20 hours** (10 matches of
+  2 hours, an assumption the user may set). Judged on 038, 072 and 012
+  beside the per-match fit; reported, not deciding (one player).
+- Choice on the development windows (2 windows × 2 metrics = 4,
+  billed at H = 2 h): the arm winning the most; ties go to the larger
+  mean margin below the envelope (in units of the window's envelope),
+  then to the cheaper. Bits: 4 if both metrics stay within 0.005 of 8
+  bits on both windows, else 8. Guidance: 2.0 only if it wins more, or
+  as many with the larger margin.
+- Decision rule (step 4's, unchanged; the user's criterion). On the 6
+  judged windows at the billed rate (H = 2 h), score = mean over
+  {LPIPS, DISTS} of the share won by `gen-match5`.
+  - **Pass** (≥ 75%): per-match player models pay for themselves. K6c's
+    route is open (the tennis base is its first piece).
+  - **To the user**: < 75% billed, ≥ 75% unbilled.
+  - **Fail**: < 75% unbilled. Then the open route left for players is a
+    newer generator (below); the AnimateAnyone line closes.
+  - Reported beside: unbilled score, payback, the per-player Djokovic
+    variant, and each arm's development numbers. The 75% threshold stays
+    for this ladder; paper results will use a significance test or a
+    confidence interval instead (user, 2026-10-23).
+- Hypothesis. B fixes `rublev/052`'s DISTS (2.2× data), C adds
+  `alcaraz_hurkacz/045` on at least one metric (other matches' data), and
+  4 bits flips 072's LPIPS: 9–10 of 12, a pass.
+- Competing explanations. (1) The losing windows are hard for this
+  generator at any data (052's 32 frames sit at a cut; 045's players are
+  small): then B and C do not move them on the development windows
+  either, and the newer generator is the test. (2) A tennis base helps
+  the court views it was trained on but washes out identity: then C wins
+  on DISTS and loses on LPIPS. (3) The pose guider's gain in step 3 was
+  memorized timing, not appearance: then B equals A with all data.
+- Budget (ceiling **11 GPU-hours**, Ada, one job per GPU, every stage
+  ≤ 45 minutes and checkpointed; renders about 0.35 GPU-hours per
+  window as measured in step 4):
+  - Training data, about 0.6: `prepare-match` for the uncapped windows
+    (`rublev` 7 more, `djokovic_zverev` 5, `djokovic_federer` 1,
+    `medvedev_struff` 2).
+  - Development, about 5.2 (`medvedev_struff` trains on 2 windows only, so
+    033 tests transfer from little data): fits A and B for 2 matches (1.2), the tennis
+    base (30 minutes, 0.6) and C for 2 matches (0.6), 6 renders of the
+    two development windows (2.1), 2 render-time variants on the best arm
+    (0.4, 120 frames each), 2 judges (0.3).
+  - Scaled, about 4.4: 4 match fits (1.2), the Djokovic player fit (0.3),
+    6 window renders (2.1), 2 more for the player variant on 038 and 012
+    (0.7; 072 shares 038's fit), 2 judges (0.3) — less if A wins (no new
+    base).
+  - Code (CPU, before any job): `prepare-match` without the cap, fits on
+    a merged base, the guider in the billed adapter, 4-bit coding, the
+    development and per-player reports, tests.
+- Not in this step: a newer generator. Wan-Animate (Wan2.2, 14B, open
+  weights; arXiv 2509.14055) and its successors are the current open
+  state of the art for pose-driven animation; trying one needs an
+  environment audit (a 14B DiT on 48 GB cards), so it is outlined as
+  step 6 (the same zero-shot, overfit and match ladder), its rule written
+  after the audit.
+- **Waits for the user's approval** (and H_player, if not 20 hours).

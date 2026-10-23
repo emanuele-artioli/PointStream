@@ -639,8 +639,17 @@ objects (the tennis ball).
   training crops; its fit failed the coarse `loss_falls` check) and the
   Rublev close-up. By the rule, the generative route for players closes
   at the keypoint rate, and step 3's extra windows came from fitting the
-  judged frames. About 7.0 GPU-hours, at the ceiling. Next: the user's
-  call.
+  judged frames. About 7.0 GPU-hours, at the ceiling. Not closed (user,
+  2026-10-23): **step 5's rule is written (experiments.md "K6b (players)
+  5")**. Three cumulative arms (step 4's recipe; all of the match's
+  K4b.1 windows plus the pose guider trained; the same on a tennis-wide
+  base LoRA that is part of the decoder) are chosen on two development
+  windows that K6 scored and steps 2–4 never judged (`djokovic_zverev/008`,
+  `medvedev_struff/033`). Then 4-bit adapters and guidance 2.0 are tried
+  at render time, and the 6 windows are judged billed by step 4's rule,
+  beside a per-player Djokovic model billed over 20 hours. Ceiling 11
+  GPU-hours. Waits for the user's approval. Step 6 (outlined): a newer
+  generator (Wan-Animate), after an environment audit.
   Training discipline for steps 3 and 4: a correctness smoke in minutes;
   then a learning-curve pilot on held-out frames at fixed fractions of the
   step budget; the scaled fit only if that curve, extrapolated, can reach
