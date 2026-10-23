@@ -12906,3 +12906,8 @@ and each object's representation is judged on both:
     It projects to about 10.6 GPU-hours; the per-player Djokovic variant
     (a fit and 3 renders, about 1.6 more) would pass the ceiling, so it
     waits for the user.
+  - The first submission of the `djokovic_zverev/012` render
+    (`20261023T221727Z-f4e7cb41`) timed out transferring its snapshot to
+    gpu1; inspected, it was never published (no specification or ready
+    record), so no worker can run it. It is left in place, and the render
+    is a new request (`20261023T221822Z-70715001`).
