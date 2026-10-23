@@ -473,8 +473,34 @@ the fair anchors.
 4. *F, GPU.* Re-encode the foreground with K from F̂ (lzma at s = 8 and
    16) with G_HO in the slots (H5m had G), and rescore; then an oracle for
    F carried by the foreground stream itself (no MASK segment).
+   **Done (2026-10-22, [experiments](docs/experiments.md)), fails.**
+   - 4a: with F billed (lzma at s = 8, the stream built for F̂, the
+     per-point configuration), weighted DISTS against the venue-adapted
+     DCVC-UF reads +93% (1 of 4), where F granted reads −15% (4 of 4).
+     Every metric loses, against the venue codec and the pooled envelope.
+     s = 16 is not run: its upper bound fails too (+24%, 1 of 4).
+   - F̂ costs no quality (mask bytes removed: −17%, as granted). The loss
+     is the mask's 36–116 kbps, at the low rates where the venue codec
+     reaches 13–26 kbps.
+   - 4b: exact F at zero bits fails rule (a) on weighted LPIPS (+16%, 1
+     of 4), so F in the foreground stream is not built for H5q's loss. On
+     DISTS it passes. A post hoc bound puts any carrier's budget at about
+     2 kbps (5 bytes per frame), 7–20× under every F coder measured.
+   - 4c (the user asked for the measured carrier, 2026-10-22): a key
+     colour outside K, F̃ recovered at the client (IoU 0.95–0.99). The
+     key's edge costs +26% to +129% of the foreground stream where F is
+     large; its optimistic bound reads weighted DISTS +1% (1 of 4), so
+     the gate fails and it is not scored. Only where F is 2% of the
+     frame (P09_106) is the key free (−30%).
+   - **H5p 4 closes as a fail:** no F coder tried (lzma, video, key)
+     keeps the split's DISTS win at equal adaptation once F is paid
+     for; the split wins only where F is small.
 5. *Visual check (CPU).* Side-by-side crops of PointStream and the
    anchors at matched rates, for the user's review.
+   **Done (2026-10-22):** 16 crops (4 items, about 200 kbps and 1 Mbps,
+   frames 60 and 180), PointStream billed as in 4a against the venue
+   codec and SVT-AV1 preset 1 at their best point at or under its rate;
+   in 4a's report archive, for the user's review.
 Scores stay LPIPS, DISTS and PSNR (a model trained on a metric may be
 judged on it, user 2026-10-20).
 
@@ -740,6 +766,36 @@ objects (the tennis ball).
   fidelity: the buildable bank (K up to 64, chosen outside the window,
   coded and billed once per video). It needs keypoints outside the
   windows, so it is a task of its own. Rung 3 waits behind it.
+  **Rung 2c, the buildable bank (2026-10-22, experiments.md "K6b (hands)
+  2c", `k6bh2c-report.json` `3e46782b…`): fails, and the free bank fails
+  too.** Up to 64 references per hand, chosen from VISOR-masked frames
+  outside the window (WiLoR on 529–1,723 frames per video), coded as
+  SVT-AV1 stills with polygon masks and billed once per video (0.3–2.5
+  kbps), score 12.5% at K = 16, 32 and 64 (LPIPS 0 of 4, DISTS 1 of 4), and
+  25% unbilled. Clean of G's footage: 0%. LPIPS on R is 0.23–0.50 against
+  the hull's 0.14–0.25. The bits are not the problem, and neither is K
+  (16 → 64 moves LPIPS by at most 0.03). References from other moments of
+  the video do not carry the forearm, sleeve and lighting: the warp covers
+  46–91% of R, against 95–97% for the window's own pixels. With 2b, the
+  reference route for egocentric hands closes at a buildable rate. Next on
+  fidelity: rung 3 (the overfit oracle, rule written, 4 GPU-hours), the
+  last open rung for hands, waiting for the user.
+  **Rung 3, the overfit oracle (user approved, 2026-10-22; experiments.md
+  "K6b (hands) 3: overfit oracle (run)", `k6bh3-report.json` `07ac515b…`):
+  passes, 83%.** FoundHand fine-tuned for 20 min on each window's own frames
+  (weights unbilled) draws the hand from the coded keypoints at about 2 kbps
+  below the SVT-AV1 + DCVC-UF + G hull on R: LPIPS 2 of 3 (P06_108 0.162
+  against 0.172, P22_107 0.174 against 0.236; P25_09 loses, 0.291 against
+  0.260), DISTS 3 of 3. Clean of G's footage: 75%, at the bar. The fit
+  roughly halves rung 2's zero-shot gap (LPIPS down 0.11–0.23), and the
+  pilot's held-out curve was still falling at 30 min. The margins on the
+  hard items are thin (0.006–0.010). It is an oracle: fitted on the frames
+  it is judged on, unbilled, and FoundHand may have seen the footage. Next by
+  the rule: rung 4, a fit on other shots of the same video, billed. A visual
+  check (user, 2026-10-23; P06_108 re-fitted, 0.163 / 0.180) shows the
+  source's pose, skin and lighting with softer texture, blur where fingers
+  cross an object, and flicker 25% above the source's. Rung 4 waits for the
+  user.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
@@ -983,9 +1039,23 @@ experience-track re-judging (rule)".
 
 A result passes when at least 75% of its items pass all three checks.
 A pass reopens that route on the experience track only, and its next
-step goes to the user. A fail closes it on both tracks. First step: the
-held-out reference set of real hand crops and the user's confirmation of
-the flicker reading.
+step goes to the user. A fail closes it on both tracks.
+**Outcome (2026-10-22): all four routes stay closed.** The user kept
+the drafted time reading. H3e V1 fails on content (P01_107 and P03_10
+above SVT-AV1 alone at every point). FoundHand `gen` fails on time (2 of
+2 items scored, which decides; energy 4–6 × the source's). K6 `ref`
+fails on time (8 of 8 windows). H3a/H3a2 were not re-judged (outputs not
+kept). Every decision came from content or time against SVT-AV1's points
+alone, so the held-out KID reference sets were not built. Beside: K1f's
+bound (`warp`) fails time on both hand items too, so the coded
+keypoints' own jitter is the binding problem on this track. Whether to
+measure and smooth it is open for the user. GPU: 0.49 + 0.76 hours.
+**J2 (2026-10-22, user: "go ahead"): the estimator is the cause.** Decoder-side
+smoothing of the coded keypoints never makes `warp` pass time (energy
+2.8–3.0 × the source's at best), and neither does removing the
+estimator's own noise without coding (2.6–2.9 ×). Next, if pursued: an
+identity warp to separate the estimator from K1c's compositing (fill,
+outline). GPU: 0.53 hours.
 
 ### I. Paper
 
