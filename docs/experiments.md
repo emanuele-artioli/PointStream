@@ -11508,3 +11508,55 @@ and each object's representation is judged on both:
     rate in `k6b report`. Tests for the quantization round trip and the
     billing.
 - **Waits for the user's approval** (and, if wanted, a different H).
+- Approved (user, 2026-10-23): as written, H = 2 hours, ceiling 7
+  GPU-hours.
+- Training data (`k6b prepare-match`, code `999439c`/`3fbb57a`; K6's
+  players and poses on K4b.1's windows): `20261023T093741Z-1ce1d61b`
+  (`alcaraz_hurkacz`, 3 windows, 1,440 crops, `33e037eb…bb1b`),
+  `20261023T094307Z-a06b224a` (`djokovic_federer`, 6, 2,880,
+  `1b9661d6…6b45`), `20261023T093749Z-1f0371dd` (`djokovic_zverev`, 6,
+  2,880, `79f36734…d27d`), `20261023T094453Z-6f165e95`
+  (`rublev_auger-aliassime`, 6, 2,829, `69f67e70…c47a`); each passes
+  `k6b validate` (19–37 checks). Two first attempts failed on memory
+  (`20261023T093735Z-76072748` overran its 8,000 MiB declaration at
+  12,074; `…093754Z-c9e511bc` ran out on a full shared GPU) and were rerun
+  at 16,000 MiB. Player heights: 90–284 px on court, except one
+  `djokovic_federer` unit at 749 px and `djokovic_zverev`'s near player
+  (530–602 px, as its judged window's 784).
+- Pilot fits (`djokovic_federer`, 2,880 crops, 20 minutes, the pose guider
+  frozen; code `59f0acb`): rank 64 `20261023T095639Z-63da751f` (1,613
+  optimizer steps), rank 16 `…095648Z-3ea11584` (1,607), rank 4
+  `…095700Z-083e27d9` (1,534); every smoke and full stage passes
+  `k6b_fit validate`, peak 12.4 GiB. Billed (8-bit, LZMA): rank 64 20.5
+  MB (22.8 kbps over 2 h), rank 16 5.4 MB (6.0), rank 4 1.6 MB (1.75).
+  An earlier submission of the three (`…095534Z`, `…095550Z`,
+  `…095602Z`) was cancelled at once: its checkpoints would have shared
+  names across ranks.
+- Pilot renders and judge: `20261023T110007Z-2335ecfc` (rank 64, both
+  checkpoints and the unquantized check), `…110013Z-cbcaaa91` (16),
+  `…110020Z-c1725982` (4), all pass `k6b_generate validate`; judge
+  `20261023T115041Z-68286c57` (`59f0acb`; `published.tar` `8ec0bc00…8334`), 45 checks
+  locally, `warp` and `ref` reproducing K6. Curve (`k6b-pilot4.json`;
+  frames 180–239 of 038 and 072, 20 judged frames each; envelope from
+  K6's anchors on those frames at the billed rate):
+
+  | checkpoint | billed kbps (038 / 072) | 038 LPIPS / env | DISTS / env | 072 LPIPS / env | DISTS / env |
+  |---|---:|---:|---:|---:|---:|
+  | rank 4, 10 min | 4.47 / 4.64 | 0.195 / 0.245 | 0.185 / 0.239 | 0.210 / 0.259 | 0.187 / 0.230 |
+  | rank 4, 20 min | 4.49 / 4.67 | 0.201 / 0.245 | 0.197 / 0.239 | 0.223 / 0.259 | 0.193 / 0.229 |
+  | rank 16, 10 min | 8.71 / 8.89 | 0.199 / 0.217 | 0.196 / 0.217 | 0.220 / 0.234 | 0.194 / 0.216 |
+  | rank 16, 20 min | 8.73 / 8.91 | 0.202 / 0.217 | 0.196 / 0.216 | 0.221 / 0.234 | 0.192 / 0.215 |
+  | rank 64, 10 min | 25.48 / 25.65 | 0.197 / 0.123 | 0.193 / 0.141 | 0.224 / 0.139 | 0.197 / 0.162 |
+  | rank 64, 20 min | 25.51 / 25.68 | 0.207 / 0.123 | 0.199 / 0.141 | 0.217 / 0.139 | 0.195 / 0.162 |
+  | rank 64, 20 min, fp16 (unbilled check) | – | 0.207 | 0.199 | 0.217 | 0.195 |
+
+  Every rank-4 and rank-16 checkpoint wins both metrics on both segments
+  billed; rank 64 wins them only unbilled. The 8-bit adapter scores as
+  the fp16 one (0.207 and 0.217 both), so quantization costs nothing here.
+  Rank 4 is as good as rank 64, and 10 minutes as good as 20. By the rule,
+  **the scaled run uses rank 4 with a 10-minute fit**; `djokovic_federer`
+  reuses its pilot checkpoint (`djokovic_federer-r4@fit-50.pt`, 768
+  optimizer steps, 1,553,200 bytes). Budget: about 3.55 GPU-hours spent
+  (training data 0.55, pilot fits 1.51, renders 1.34, judge 0.1); the
+  scaled run projects to about 3.25 (3 fits about 0.95, the 6 windows
+  rendered about 2.0, 2 judges 0.3), 6.8 in all.
