@@ -744,9 +744,13 @@ def score(rows: list[dict[str, Any]], variant: str) -> dict[str, Any]:
     return {"windows": len(rows), "lpips_share": lp, "dists_share": di, "score": (lp + di) / 2, "passes": (lp + di) / 2 >= CRITERION}
 
 
-def decide(groups: dict[str, dict[str, Any]], reproduced: bool) -> str:
+def decide(groups: dict[str, dict[str, Any]], reproduced: bool, step: int = 2) -> str:
     if not reproduced:
         return "not read: warp/ref do not reproduce K6"
+    if step == 3:  # experiments.md "K6b (players) 3": the overfit oracle
+        if groups["all"]["gen-fit"]["passes"]:
+            return "pass: step 4 (a fit on other shots of the same match, billed)"
+        return "fail: the generative route closes for players at the keypoint rate (the matte granted)"
     if groups["all"]["gen-original"]["passes"]:
         return "pass: the zero-shot route holds with the reference granted; next, the reference billed"
     return "fail: step 3 (overfit oracle) gets its rule and budget"
@@ -775,7 +779,7 @@ def command_report(args: argparse.Namespace) -> int:
                 kbps = kw["keypoint_kbps"][CODE]
                 row: dict[str, Any] = {"window": w["id"], "match": w["match"], "kbps": kbps,
                                        "finetune_unlisted": w["match"] in FINETUNE_UNLISTED}
-                for v in VARIANTS:
+                for v in w["variants"]:
                     row[v] = {**means[v], **{m: won(kw["anchors"], m, kbps, means[v][m]) for m in ("lpips", "dists")}}
                     hull = [tuple(p) for p in kw["savings"]["lpips"]["hull"]["points"]]
                     row[v]["saving"] = saving(hull, -means[v]["lpips"], kbps)["saving"]
@@ -785,12 +789,12 @@ def command_report(args: argparse.Namespace) -> int:
                     reproduced &= row[v]["reproduces"]
                 rows.append(row)
     groups = {"all": rows, "finetune_unlisted": [r for r in rows if r["finetune_unlisted"]]}
-    decided = (GEN_VARIANTS[0], *CHECK_VARIANTS)  # amendment 1: the fine-tune is a diagnostic, not scored
+    decided = ("gen-fit" if args.step == 3 else GEN_VARIANTS[0], *CHECK_VARIANTS)  # step 2, amendment 1: the fine-tune is a diagnostic
     scored = {g: {v: score(rs, v) for v in decided} for g, rs in groups.items()}
     finetune = [{"window": r["window"], "gen-original": {m: r["gen-original"][m]["value"] for m in ("lpips", "dists")},
                  "gen-finetuned_tennis": {m: r["gen-finetuned_tennis"][m]["value"] for m in ("lpips", "dists")}}
-                for r in rows if r["gen-finetuned_tennis"]["lpips"]["value"] != r["gen-original"]["lpips"]["value"]]
-    out = {"decision_rule": DECISION, "decision": decide(scored, reproduced), "reproduced": reproduced, "rows": rows,
+                for r in rows if "gen-finetuned_tennis" in r and r["gen-finetuned_tennis"]["lpips"]["value"] != r["gen-original"]["lpips"]["value"]]
+    out = {"decision_rule": DECISION, "step": args.step, "decision": decide(scored, reproduced, args.step), "reproduced": reproduced, "rows": rows,
            "groups": scored, "saving_ci": {v: bootstrap([r[v]["saving"] for r in rows]) for v in decided},
            "finetune_diagnostic": finetune,
            "inputs": {"stages": sources, "k6_report": file_sha256(Path(args.k6_report)), "code_sha256": file_sha256(Path(__file__))},
@@ -801,7 +805,7 @@ def command_report(args: argparse.Namespace) -> int:
     for r in rows:
         print(r["window"], f"{r['kbps']:.2f} kbps", " ".join(
             f"{v}: L {r[v]['lpips']['value']:.3f}/{r[v]['lpips']['envelope']:.3f} D {r[v]['dists']['value']:.3f}/{r[v]['dists']['envelope']:.3f}"
-            for v in VARIANTS))
+            for v in decided))
     print(json.dumps({"decision": out["decision"], "groups": scored}, indent=1))
     return 0
 
@@ -880,6 +884,7 @@ def main(argv: list[str] | None = None) -> int:
     rep.add_argument("--stage", action="append", required=True)
     rep.add_argument("--k6-report", required=True)
     rep.add_argument("--out", required=True)
+    rep.add_argument("--step", type=int, default=2, help="2: gen-original decides; 3: gen-fit (the overfit oracle)")
     args = ap.parse_args(argv)
     if args.command in ("prepare", "prepare-fit", "judge") and len(args.windows) != len(args.sources):
         raise SystemExit("Give one source per window")
