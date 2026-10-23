@@ -893,7 +893,14 @@ def choose_arm(stats: dict[str, dict[str, Any]], arms: list[str]) -> str:
 
 def fewer_bits_hold(rows: list[dict[str, Any]], full: str, fewer: str, tolerance: float = 0.005) -> bool:
     """Step 5: 4 bits if both metrics stay within ``tolerance`` of 8 bits on every development window."""
-    return all(abs(r[fewer][m]["value"] - r[full][m]["value"]) <= tolerance for r in rows for m in ("lpips", "dists"))
+    by: dict[str, dict[Any, dict[str, Any]]] = {full: {}, fewer: {}}  # the two may come from different judges' rows
+    for i, r in enumerate(rows):
+        for v in by:
+            if v in r:
+                by[v][r.get("window", i)] = r[v]
+    if not by[full] or set(by[full]) != set(by[fewer]):
+        raise SystemExit(f"{full} and {fewer} are not judged on the same windows")
+    return all(abs(by[fewer][w][m]["value"] - by[full][w][m]["value"]) <= tolerance for w in by[full] for m in ("lpips", "dists"))
 
 
 def guidance_better(stats: dict[str, dict[str, Any]], default: str, other: str) -> bool:
