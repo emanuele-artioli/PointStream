@@ -359,6 +359,8 @@ def command_fit(args: argparse.Namespace) -> int:
                     raise SystemExit(f"{u['unit']} is in two fit-data archives")
                 unit_path[u["unit"]] = root / "publish" / "fit" / f"{u['unit']}.npz"
     units = sorted(unit_path)
+    if args.max_units:  # the smoke: a few units, spread over the archives' order
+        units = units[:: max(1, len(units) // args.max_units)][:args.max_units]
     if not units:
         raise SystemExit(f"no fit data for {args.window_name}")
     base_state = None
@@ -546,6 +548,7 @@ def main(argv: list[str] | None = None) -> int:
     fit.add_argument("--minutes", type=float, required=True)
     fit.add_argument("--fractions", default="0.25,0.5,1")
     fit.add_argument("--max-t", type=int, default=0, help="train on frames t < this (0: all)")
+    fit.add_argument("--max-units", type=int, default=0, help="the smoke: fit on this many units only (0: all)")
     fit.add_argument("--frame-stride", type=int, default=1, help="step 5's base: train on every n-th frame of each unit")
     fit.add_argument("--max-steps", type=int, default=0, help="the smoke: stop after this many optimizer steps")
     fit.add_argument("--gpu-class", default="RTX")
