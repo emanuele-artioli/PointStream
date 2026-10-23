@@ -54,17 +54,63 @@ TRAIN_SCHEDULER: dict[str, Any] = {"num_train_timesteps": 1000, "beta_start": 0.
 PROBE_T = 500  # the smoke's x0 check: one timestep, fixed noise, the same frames before and after
 
 
-def lora_config(targets: str) -> Any:
+QUANT_MIN_VALUES = 1024  # g5c's: smaller tensors go as fp16
+
+
+def lora_config(targets: str, rank: int = LORA_RANK) -> Any:
     from peft import LoraConfig
 
-    return LoraConfig(r=LORA_RANK, lora_alpha=LORA_ALPHA, init_lora_weights="gaussian", target_modules=targets)
+    return LoraConfig(r=rank, lora_alpha=rank, init_lora_weights="gaussian", target_modules=targets)  # alpha = rank (step 3)
 
 
-def inject(reference: Any, denoising: Any) -> None:
+def inject(reference: Any, denoising: Any, rank: int = LORA_RANK) -> None:
     from peft import inject_adapter_in_model
 
-    inject_adapter_in_model(lora_config(REFERENCE_TARGETS), reference)
-    inject_adapter_in_model(lora_config(DENOISING_TARGETS), denoising)
+    inject_adapter_in_model(lora_config(REFERENCE_TARGETS, rank), reference)
+    inject_adapter_in_model(lora_config(DENOISING_TARGETS, rank), denoising)
+
+
+def quantize_channels(t: Any, bits: int) -> tuple[Any, Any, Any]:
+    """`experiments.background.g5c.quantize_channels`, copied (g5c's module needs the main environment): symmetric
+    uniform quantization per output channel (dim 0), int8 levels, fp16 scales, and the dequantized tensor."""
+    import torch
+
+    levels = 2 ** (bits - 1) - 1
+    flat = t.reshape(t.shape[0], -1).float()
+    scale = (flat.abs().amax(1) / levels).half().float()
+    safe = torch.where(scale > 0, scale, torch.ones_like(scale))
+    q = torch.clamp(torch.round(flat / safe[:, None]), -levels, levels)
+    q[scale == 0] = 0
+    return q.to(torch.int8), scale.half(), (q * scale[:, None]).reshape(t.shape)
+
+
+def quantize_adapters(state: dict[str, Any], bits: int) -> tuple[dict[str, Any], dict[str, Any]]:
+    """K6b (players) 4's billed form of a checkpoint: every adapter tensor of QUANT_MIN_VALUES or more values
+    quantized per output channel to ``bits`` (smaller ones fp16), each payload LZMA-coded on its own (g5c's
+    ``whole`` variant). Returns the state the decoder rebuilds (fp16) and the billed size; the pose guider, when
+    present, is billed as its fp16 change (zero bytes when frozen, so it is left out)."""
+    import lzma
+
+    out: dict[str, Any] = {k: v for k, v in state.items() if k not in ("reference_unet", "denoising_unet")}
+    payloads: list[bytes] = []
+    values = 0
+    for part in ("reference_unet", "denoising_unet"):
+        out[part] = {}
+        for name, t in state[part].items():
+            values += t.numel()
+            if t.numel() < QUANT_MIN_VALUES:
+                sent = t.half()
+                payloads.append(sent.numpy().tobytes())
+                out[part][name] = sent
+                continue
+            q, scale, rebuilt = quantize_channels(t.float(), bits)
+            payloads += [q.numpy().tobytes(), scale.numpy().tobytes()]
+            out[part][name] = rebuilt.half()
+    if "pose_guider" in state:
+        payloads += [v.half().numpy().tobytes() for v in state["pose_guider"].values()]
+    coded = sum(len(lzma.compress(b, preset=6)) for b in payloads)
+    return out, {"bits": bits, "bytes": coded, "adapter_values": values, "raw_fp16_bytes": 2 * values,
+                 "pose_guider_billed": "pose_guider" in state}
 
 
 def apply_fit(reference: Any, denoising: Any, guider: Any, checkpoint: Path) -> dict[str, Any]:
@@ -74,8 +120,9 @@ def apply_fit(reference: Any, denoising: Any, guider: Any, checkpoint: Path) -> 
     from peft.tuners.lora import LoraLayer
 
     state = torch.load(checkpoint, map_location="cpu", weights_only=True)
-    inject(reference, denoising)
-    record = {}
+    rank = int(state.get("rank", LORA_RANK))
+    inject(reference, denoising, rank)
+    record: dict[str, Any] = {"rank": rank}
     for name, module in (("reference_unet", reference), ("denoising_unet", denoising)):
         result = set_peft_model_state_dict(module, state[name])
         missing = [k for k in getattr(result, "missing_keys", []) if "lora_" in k]
@@ -85,12 +132,15 @@ def apply_fit(reference: Any, denoising: Any, guider: Any, checkpoint: Path) -> 
         for layer in layers:
             layer.merge()
         record[name] = {"lora_layers": len(layers), "lora_tensors": len(state[name])}
-    record["pose_guider"] = load_checked(guider, state["pose_guider"], "pose_guider")
+    if "pose_guider" in state:
+        record["pose_guider"] = load_checked(guider, state["pose_guider"], "pose_guider")
+    else:
+        record["pose_guider"] = "frozen (the profile's)"
     return record
 
 
 class Trainer:
-    def __init__(self, weights: dict[str, Path], device: str, scratch: Path):
+    def __init__(self, weights: dict[str, Path], device: str, scratch: Path, rank: int = LORA_RANK, freeze_guider: bool = False):
         import torch
         from animate_anyone.models.mutual_self_attention import ReferenceAttentionControl
         from animate_anyone.models.pose_guider import PoseGuider
@@ -125,16 +175,19 @@ class Trainer:
         encoder.to(device, dtype=dtype)
         reference.to(device, dtype=dtype)
         denoising.to(device, dtype=dtype)
-        inject(reference, denoising)
+        inject(reference, denoising, rank)
+        self.rank, self.freeze_guider = rank, freeze_guider
         lora = [p for m in (reference, denoising) for n, p in m.named_parameters() if "lora_" in n]
         for p in lora:
             p.data = p.data.float()
             p.requires_grad_(True)
-        guider.to(device, dtype=torch.float32).requires_grad_(True)
+        guider.to(device, dtype=torch.float32).requires_grad_(not freeze_guider)
         record["trainable"] = {"lora_tensors": len(lora), "lora_params": int(sum(p.numel() for p in lora)),
-                               "pose_guider_params": int(sum(p.numel() for p in guider.parameters()))}
-        self.optimizer = torch.optim.AdamW([{"params": lora, "lr": LORA_LR}, {"params": list(guider.parameters()), "lr": GUIDER_LR}],
-                                           betas=(0.9, 0.999), weight_decay=1e-2, eps=1e-8)
+                               "pose_guider_params": 0 if freeze_guider else int(sum(p.numel() for p in guider.parameters())),
+                               "rank": rank, "pose_guider_frozen": freeze_guider}
+        groups = [{"params": lora, "lr": LORA_LR}] + ([] if freeze_guider else [{"params": list(guider.parameters()), "lr": GUIDER_LR}])
+        self.optimizer = torch.optim.AdamW(groups, betas=(0.9, 0.999), weight_decay=1e-2, eps=1e-8)
+        self.trainable = lora + ([] if freeze_guider else list(guider.parameters()))
         self.writer = ReferenceAttentionControl(reference, do_classifier_free_guidance=False, mode="write", fusion_blocks="full")
         self.reader = ReferenceAttentionControl(denoising, do_classifier_free_guidance=False, mode="read", fusion_blocks="full")
         self.scheduler = DDIMScheduler(**TRAIN_SCHEDULER)
@@ -201,9 +254,12 @@ class Trainer:
     def state(self) -> dict[str, Any]:
         from peft import get_peft_model_state_dict
 
-        return {"reference_unet": {k: v.detach().cpu().half() for k, v in get_peft_model_state_dict(self.reference).items()},
-                "denoising_unet": {k: v.detach().cpu().half() for k, v in get_peft_model_state_dict(self.denoising).items()},
-                "pose_guider": {k: v.detach().cpu() for k, v in self.guider.state_dict().items()}}
+        out: dict[str, Any] = {"rank": self.rank,
+                               "reference_unet": {k: v.detach().cpu().float() for k, v in get_peft_model_state_dict(self.reference).items()},
+                               "denoising_unet": {k: v.detach().cpu().float() for k, v in get_peft_model_state_dict(self.denoising).items()}}
+        if not self.freeze_guider:
+            out["pose_guider"] = {k: v.detach().cpu() for k, v in self.guider.state_dict().items()}
+        return out
 
 
 def command_fit(args: argparse.Namespace) -> int:
@@ -225,16 +281,19 @@ def command_fit(args: argparse.Namespace) -> int:
         with tarfile.open(args.fit_data) as archive:
             archive.extractall(root, filter="data")
     manifest = json.loads((root / "publish" / "prepare-fit.json").read_text())
-    units = [u["unit"] for w in manifest["windows"] if w["window"] == args.window for u in w["units"]]
+    if args.match:  # K6b (players) 4: every training window of the match
+        units = [u["unit"] for w in manifest["windows"] if w["window"].split("/")[0] == args.match for u in w["units"]]
+    else:
+        units = [u["unit"] for w in manifest["windows"] if w["window"] == args.window for u in w["units"]]
     if not units:
-        raise SystemExit(f"no fit data for {args.window}")
+        raise SystemExit(f"no fit data for {args.match or args.window}")
     device = "cuda"
     limit = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "24000"))
     torch.cuda.set_per_process_memory_fraction(min(1.0, limit * 2**20 / torch.cuda.get_device_properties(0).total_memory))
-    seed = int.from_bytes(args.window.encode(), "little") % 2**31
+    seed = int.from_bytes((args.match or args.window).encode(), "little") % 2**31
     random.seed(seed)
     torch.manual_seed(seed)
-    trainer = Trainer(weights, device, scratch)
+    trainer = Trainer(weights, device, scratch, args.rank, args.freeze_guider)
     # Every training frame encoded once: latent mean/std, CLIP embedding, pose map (as the dataset's ToTensor).
     data = []
     images_kept: dict[str, np.ndarray] = {}
@@ -274,6 +333,21 @@ def command_fit(args: argparse.Namespace) -> int:
                 errs.append(float(((image - truth) ** 2).mean()))
         return float(np.mean(errs))
 
+    def save(state: dict[str, Any], path: Path) -> dict[str, Any]:
+        """The checkpoint rendering reads: quantized as billed (``--quantize``), else fp16; with ``--also-unquantized`` the
+        fp16 adapters beside it (`-fp16`), the quantization check."""
+        rec: dict[str, Any] = {}
+        if args.also_unquantized:
+            raw = path.with_name(path.stem + "-fp16.pt")
+            torch.save({**state, **{k: {n: v.half() for n, v in state[k].items()} for k in ("reference_unet", "denoising_unet")}}, raw)
+            rec["unquantized"] = {"path": raw.name, "sha256": sha256(raw)}
+        if args.quantize:
+            state, rec["billing"] = quantize_adapters(state, args.quantize)
+        else:
+            state = {**state, **{k: {n: v.half() for n, v in state[k].items()} for k in ("reference_unet", "denoising_unet")}}
+        torch.save(state, path)
+        return {"path": path.name, "sha256": sha256(path), **rec}
+
     error_before = probe_error()
     p0 = probe[0]
     _, kernels = profile_cuda(lambda: trainer.forward(p0[0], p0[1], p0[2], p0[3], torch.full((1,), PROBE_T, device=device, dtype=torch.long),
@@ -291,9 +365,7 @@ def command_fit(args: argparse.Namespace) -> int:
         due = [f for f in fractions if f * budget <= elapsed and not any(s["fraction"] == f for s in saved)]
         for f in due:
             path = publish / f"{args.window_name}@fit-{int(round(f * 100))}.pt"
-            torch.save(trainer.state(), path)
-            saved.append({"fraction": f, "minutes": round(elapsed / 60, 2), "optimizer_steps": step, "path": path.name,
-                          "sha256": sha256(path)})
+            saved.append({"fraction": f, "minutes": round(elapsed / 60, 2), "optimizer_steps": step, **save(trainer.state(), path)})
             print(f"phase=fit checkpoint={path.name} steps={step} minutes={elapsed / 60:.1f}", flush=True)
             publish_progress(os.environ.get("PS_STAGE", "local"), len(saved))
         if len(saved) == len(fractions) or (args.max_steps and step >= args.max_steps):
@@ -307,7 +379,7 @@ def command_fit(args: argparse.Namespace) -> int:
         losses.append(float(loss) * ACCUMULATE)
         micro += 1
         if micro % ACCUMULATE == 0:
-            torch.nn.utils.clip_grad_norm_(trainer.lora + list(trainer.guider.parameters()), MAX_GRAD_NORM)
+            torch.nn.utils.clip_grad_norm_(trainer.trainable, MAX_GRAD_NORM)
             for group, base in zip(trainer.optimizer.param_groups, (LORA_LR, GUIDER_LR)):
                 group["lr"] = base * min(1.0, (step + 1) / WARMUP)
             trainer.optimizer.step()
@@ -318,17 +390,17 @@ def command_fit(args: argparse.Namespace) -> int:
     error_after = probe_error()
     if args.max_steps:  # the smoke: a final checkpoint whatever the time, for the render smoke
         path = publish / f"{args.window_name}@fit-smoke.pt"
-        torch.save(trainer.state(), path)
-        saved.append({"fraction": None, "optimizer_steps": step, "path": path.name, "sha256": sha256(path)})
+        saved.append({"fraction": None, "optimizer_steps": step, **save(trainer.state(), path)})
     window = max(1, len(losses) // 10)
     write_json(stage_dir() / "k6b_fit.json", {
-        "command": "fit", "stage": os.environ.get("PS_STAGE"), "window": args.window, "units": [d["unit"] for d in data],
+        "command": "fit", "stage": os.environ.get("PS_STAGE"), "window": args.window, "match": args.match, "units": [d["unit"] for d in data],
         "frames": frames, "max_t": args.max_t, "minutes": args.minutes, "max_steps": args.max_steps, "optimizer_steps": step,
         "micro_steps": micro, "checkpoints": saved, "loss_first_tenth": float(np.mean(losses[:window])) if losses else None,
         "loss_last_tenth": float(np.mean(losses[-window:])) if losses else None, "loss_curve": [float(np.mean(losses[i:i + 200])) for i in range(0, len(losses), 200)],
         "probe_mse_before": error_before, "probe_mse_after": error_after, "model": trainer.record, "kernels": kernels,
         "device": device_record(args.gpu_class), "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3),
-        "gpu_memory_limit_mib": limit, "settings": {"lora_rank": LORA_RANK, "lora_alpha": LORA_ALPHA, "lora_lr": LORA_LR,
+        "gpu_memory_limit_mib": limit, "settings": {"lora_rank": args.rank, "lora_alpha": args.rank, "quantize": args.quantize,
+        "pose_guider_frozen": args.freeze_guider, "lora_lr": LORA_LR,
         "guider_lr": GUIDER_LR, "batch": BATCH, "accumulate": ACCUMULATE, "uncond": UNCOND_RATIO, "noise_offset": NOISE_OFFSET,
         "snr_gamma": SNR_GAMMA, "scheduler": TRAIN_SCHEDULER, "size": [GEN_W, GEN_H]},
         "inputs": {"fit_data": sha256(Path(args.fit_data)), "weights": {k: sha256(v) for k, v in sorted(weights.items())}},
@@ -364,7 +436,12 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="command", required=True)
     fit = sub.add_parser("fit")
     fit.add_argument("--fit-data", required=True)
-    fit.add_argument("--window", required=True)
+    fit.add_argument("--window", default="", help="step 3: fit on this window's frames")
+    fit.add_argument("--match", default="", help="step 4: fit on every training window of this match")
+    fit.add_argument("--rank", type=int, default=LORA_RANK)
+    fit.add_argument("--freeze-guider", action="store_true", help="step 4: the pose guider stays the profile's (not sent)")
+    fit.add_argument("--quantize", type=int, default=0, help="step 4: adapter bits as billed (8); 0 keeps fp16")
+    fit.add_argument("--also-unquantized", action="store_true", help="also save the fp16 adapters (the quantization check)")
     fit.add_argument("--weight", action="append", nargs=2, required=True, metavar=("NAME", "PATH"))
     fit.add_argument("--minutes", type=float, required=True)
     fit.add_argument("--fractions", default="0.25,0.5,1")
@@ -375,7 +452,9 @@ def main(argv: list[str] | None = None) -> int:
     val.add_argument("--stage", default="")
     args = ap.parse_args(argv)
     if args.command == "fit":
-        args.window_name = args.window.replace("/", "__").replace("@", "_at")
+        if bool(args.window) == bool(args.match):
+            raise SystemExit("give exactly one of --window and --match")
+        args.window_name = (args.match or args.window).replace("/", "__").replace("@", "_at")
         return command_fit(args)
     return command_validate(args)
 

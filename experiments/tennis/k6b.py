@@ -395,6 +395,75 @@ def command_prepare_fit(args: argparse.Namespace) -> int:
     return 0
 
 
+def prepare_match_window(args: argparse.Namespace, wid: str, entry: dict[str, Any], source: Path, crops: Any, scratch: Path,
+                         publish: Path, device: str) -> dict[str, Any]:
+    """Step 4's training pairs from one of K4b.1's other windows (K6 never ran them): K6's adopted players, regions and
+    uncoded poses (`window_players`, `frame_regions`, `pose_window`, unchanged), then step 3's crops and DWPose maps on
+    the fitted scored (court-view, registered) frames."""
+    from experiments.tennis.k6 import frame_regions, heights, pose_window, window_players
+    from src.segmentation.masks import ClipMasks, decompress
+
+    w = entry["window"]
+    frames = int(w["frames"])
+    root = Path(args.inputs) / "windows" / k4.safe(wid)
+    for name, digest in entry["files"].items():
+        if file_sha256(root / name) != digest:
+            raise ValueError(f"Changed input: {root / name}")
+    truth, _ = window_truth(args, wid, source, frames, scratch / "work" / k4.safe(wid), device)
+    features = json.loads((root / "features.json").read_text())
+    clip = ClipMasks.load(root / "sam-masks.rle")
+    whole = json.loads(decompress((root / "pose.json.zst").read_bytes()))
+    fits = {int(f): np.asarray(h, np.float64) for f, h in entry["fits"].items()}
+    players = window_players(features, clip, int(w["start"]), fits)["players"]
+    per_frame = [frame_regions(clip.frames[t], features["aliases"], players) for t in range(frames)]
+    median_height = heights([f["bodies"] for f in per_frame], players)
+    poses = pose_window(crops, truth, frames, [f["bodies"] for f in per_frame], whole, players, median_height)
+    scored = [t for t in range(frames) if int(w["start"]) + t in fits and any(r.any() for r in per_frame[t]["regions"].values())]
+    units = []
+    for player in players:
+        fitted = [t for t in scored if (rec := poses[player][t]) is not None and rec.get("fitted")]
+        if not fitted:
+            continue
+        ts, images, maps = [], [], []
+        for seq in runs(fitted):
+            kps = [np.asarray(poses[player][t]["kps"], np.float64) for t in seq]  # type: ignore[index]
+            for t, kp, box in zip(seq, kps, run_boxes(kps)):
+                ts.append(t)
+                images.append(crop_image(np.asarray(truth[t]), box))
+                maps.append(pose_map(to_crop(kp, box)))
+        name = unit_name(wid, player)
+        np.savez_compressed(publish / "fit" / f"{name}.npz", t=np.asarray(ts, np.int64), image=np.stack(images), pose=np.stack(maps))
+        units.append({"unit": name, "window": wid, "player": player, "frames": len(ts), "median_height": median_height[player]})
+    shutil.rmtree(scratch / "work" / k4.safe(wid), ignore_errors=True)
+    return {"window": wid, "units": units, "players": players, "scored_frames": len(scored)}
+
+
+def command_prepare_match(args: argparse.Namespace) -> int:
+    from experiments.tennis.k4b_pose import Crops
+
+    began = time.time()
+    scratch = Path(os.environ.get("PS_SCRATCH_DIR") or stage_dir() / "scratch")
+    publish = scratch / "publish"
+    (publish / "fit").mkdir(parents=True, exist_ok=True)
+    os.environ["YOLO_CONFIG_DIR"] = str(scratch / "ultralytics")
+    inputs = json.loads((Path(args.inputs) / "inputs.json").read_text())
+    crops = Crops(k4.Poses([("yolo11x-pose", args.pose)]))
+    chosen = args.windows[:args.max_windows or None]
+    rows = []
+    for n, wid in enumerate(chosen):
+        rows.append(prepare_match_window(args, wid, inputs["windows"][wid], Path(args.sources[args.windows.index(wid)]), crops,
+                                         scratch, publish, "cuda"))
+        progress(n + 1)
+    manifest = {"command": "prepare-match", "windows": rows, "requested": chosen, "gen_size": [GEN_W, GEN_H],
+                "inputs": {"k6_inputs": file_sha256(Path(args.inputs) / "inputs.json"), "pose_sha256": file_sha256(Path(args.pose))},
+                "seconds": round(time.time() - began, 2)}
+    write_json(publish / "prepare-fit.json", manifest)  # the name k6b_fit reads
+    with tarfile.open(stage_dir() / "published.tar", "w") as tar:
+        tar.add(publish, arcname="publish")
+    write_json(stage_dir() / "k6b.json", manifest)
+    return 0
+
+
 def validate_prepare_fit(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
     checks = {"windows_requested": [w["window"] for w in result["windows"]] == result["requested"]}
     with tempfile_dir() as temp:
@@ -703,7 +772,8 @@ class tempfile_dir:
 def command_validate(args: argparse.Namespace) -> int:
     stage = Path(args.stage) if args.stage else stage_dir()
     result = json.loads((stage / "k6b.json").read_text())
-    checks = {"prepare": validate_prepare, "prepare-fit": validate_prepare_fit, "judge": validate_judge}[result["command"]](stage, result)
+    checks = {"prepare": validate_prepare, "prepare-fit": validate_prepare_fit, "prepare-match": validate_prepare_fit,
+              "judge": validate_judge}[result["command"]](stage, result)
     report = {"passed": all(checks.values()), "checks": {k: bool(v) for k, v in checks.items()}}
     if target := os.environ.get("PS_VALIDATION_PATH"):
         write_json(Path(target), report)
@@ -756,10 +826,46 @@ def decide(groups: dict[str, dict[str, Any]], reproduced: bool, step: int = 2) -
     return "fail: step 3 (overfit oracle) gets its rule and budget"
 
 
+def billed_kbps(nbytes: float, hours: float) -> float:
+    """K6b (players) 4: a model's bytes spread over ``hours`` of the match, in kbps."""
+    return nbytes * 8 / (hours * 3600) / 1000
+
+
+def payback_hours(hull: list[tuple[float, float]], lpips: float, kbps: float, nbytes: float) -> float:
+    """Hours of the match after which the model's bits are repaid by the rate it saves at equal LPIPS (G5b): its
+    bits over (envelope kbps at that LPIPS - keypoint kbps); infinite when it saves nothing."""
+    from experiments.tennis.k6_report import rate_on_envelope
+
+    needed, _ = rate_on_envelope(hull, -lpips)
+    if needed is None or needed <= kbps:
+        return math.inf
+    return nbytes * 8 / ((needed - kbps) * 1000) / 3600
+
+
+def billed_score(rows: list[dict[str, Any]], variant: str) -> dict[str, Any]:
+    if not rows:
+        return {"windows": 0}
+    lp = float(np.mean([r[variant]["billed"]["lpips"]["won"] for r in rows]))
+    di = float(np.mean([r[variant]["billed"]["dists"]["won"] for r in rows]))
+    return {"windows": len(rows), "lpips_share": lp, "dists_share": di, "score": (lp + di) / 2, "passes": (lp + di) / 2 >= CRITERION}
+
+
+def decide_billed(billed: dict[str, Any], unbilled: dict[str, Any], reproduced: bool) -> str:
+    """experiments.md "K6b (players) 4"."""
+    if not reproduced:
+        return "not read: warp/ref do not reproduce K6"
+    if billed["passes"]:
+        return "pass: per-match player models pay for themselves; next, the reference billed too (K6c's route)"
+    if unbilled["passes"]:
+        return "to the user: passes unbilled only (a smaller model, a longer amortization, or another H)"
+    return "fail: a match fit does not reach the envelope even unbilled; step 3's pass was memorization"
+
+
 def command_report(args: argparse.Namespace) -> int:
     from experiments.tennis.k6_report import bootstrap, saving
 
     k6 = json.loads(Path(args.k6_report).read_text())
+    billing = json.loads(Path(args.billing).read_text()) if args.billing else {}  # step 4: {variant: {match: bytes}}
     rows: list[dict[str, Any]] = []
     sources = []
     reproduced = True
@@ -783,18 +889,32 @@ def command_report(args: argparse.Namespace) -> int:
                     row[v] = {**means[v], **{m: won(kw["anchors"], m, kbps, means[v][m]) for m in ("lpips", "dists")}}
                     hull = [tuple(p) for p in kw["savings"]["lpips"]["hull"]["points"]]
                     row[v]["saving"] = saving(hull, -means[v]["lpips"], kbps)["saving"]
+                    if v in billing:
+                        nbytes = billing[v][w["match"]]
+                        rate = kbps + billed_kbps(nbytes, args.hours)
+                        row[v]["billed"] = {"kbps": rate, "bytes": nbytes, "hours": args.hours,
+                                            **{m: won(kw["anchors"], m, rate, means[v][m]) for m in ("lpips", "dists")},
+                                            "saving": saving(hull, -means[v]["lpips"], rate)["saving"],
+                                            "payback_hours": payback_hours(hull, means[v]["lpips"], kbps, nbytes)}
                 for v in CHECK_VARIANTS:
                     row[v]["k6_lpips"] = kw["oracle"][v]["lpips"]
                     row[v]["reproduces"] = abs(means[v]["lpips"] - kw["oracle"][v]["lpips"]) <= REPRO_TOLERANCE
                     reproduced &= row[v]["reproduces"]
                 rows.append(row)
     groups = {"all": rows, "finetune_unlisted": [r for r in rows if r["finetune_unlisted"]]}
-    decided = ("gen-fit" if args.step == 3 else GEN_VARIANTS[0], *CHECK_VARIANTS)  # step 2, amendment 1: the fine-tune is a diagnostic
+    main = {3: "gen-fit", 4: "gen-match"}.get(args.step, GEN_VARIANTS[0])  # step 2, amendment 1: the fine-tune is a diagnostic
+    decided = (main, *CHECK_VARIANTS)
     scored = {g: {v: score(rs, v) for v in decided} for g, rs in groups.items()}
+    if args.step == 4:
+        for g, rs in groups.items():
+            scored[g][f"{main} billed"] = billed_score(rs, main)
     finetune = [{"window": r["window"], "gen-original": {m: r["gen-original"][m]["value"] for m in ("lpips", "dists")},
                  "gen-finetuned_tennis": {m: r["gen-finetuned_tennis"][m]["value"] for m in ("lpips", "dists")}}
                 for r in rows if "gen-finetuned_tennis" in r and r["gen-finetuned_tennis"]["lpips"]["value"] != r["gen-original"]["lpips"]["value"]]
-    out = {"decision_rule": DECISION, "step": args.step, "decision": decide(scored, reproduced, args.step), "reproduced": reproduced, "rows": rows,
+    verdict = (decide_billed(scored["all"][f"{main} billed"], scored["all"][main], reproduced) if args.step == 4
+               else decide(scored, reproduced, args.step))
+    out = {"decision_rule": DECISION, "step": args.step, "decision": verdict, "reproduced": reproduced, "rows": rows,
+           "billing": {"hours": args.hours, "bytes": billing} if billing else None,
            "groups": scored, "saving_ci": {v: bootstrap([r[v]["saving"] for r in rows]) for v in decided},
            "finetune_diagnostic": finetune,
            "inputs": {"stages": sources, "k6_report": file_sha256(Path(args.k6_report)), "code_sha256": file_sha256(Path(__file__))},
@@ -816,6 +936,7 @@ def command_fit_report(args: argparse.Namespace) -> int:
     from experiments.tennis.k6 import ANCHORS, anchor_name
 
     k6 = json.loads(Path(args.k6_report).read_text())
+    billing = json.loads(Path(args.billing).read_text()) if args.billing else {}  # step 4's pilot: {variant: billed bytes}
     scratch = Path(os.environ.get("PS_SCRATCH_DIR") or "/tmp/k6b-fit-report")
     stages = extract_stages(args.k6_stage, scratch)
     out: dict[str, Any] = {"windows": {}, "inputs": {"stages": [], "k6_report": file_sha256(Path(args.k6_report)),
@@ -843,8 +964,14 @@ def command_fit_report(args: argparse.Namespace) -> int:
                         i = k6row["variants"].index(anchor)
                         anchors[anchor] = {"kbps": kw["anchors"][anchor]["kbps"], "lpips": float(np.mean(k6s["lpips"][i, j])),
                                            "dists": float(np.mean(k6s["dists"][i, j]))}
-                curve = {v: {m: won(anchors, m, kbps, means[v][m]) for m in ("lpips", "dists")} for v in w["variants"]}
-                reached = [v for v in w["variants"] if v.startswith("gen-fit") and all(curve[v][m]["won"] for m in ("lpips", "dists"))]
+                rate = {v: kbps + (billed_kbps(billing[v], args.hours) if v in billing else 0.0) for v in w["variants"]}
+                curve = {v: {m: won(anchors, m, rate[v], means[v][m]) for m in ("lpips", "dists")} for v in w["variants"]}
+                for v in w["variants"]:
+                    curve[v]["kbps"] = rate[v]
+                    if v in billing:
+                        curve[v]["unbilled"] = {m: won(anchors, m, kbps, means[v][m]) for m in ("lpips", "dists")}
+                reached = [v for v in w["variants"] if v.startswith("gen-") and v != "gen-original"
+                           and all(curve[v][m]["won"] for m in ("lpips", "dists"))]
                 out["windows"][w["id"]] = {"held_out_frames": j, "kbps": kbps, "anchors_held_out": anchors, "curve": curve,
                                            "reached": reached}
                 for v in w["variants"]:
@@ -873,6 +1000,13 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument("--from-t", type=int, default=0, help="judge only frames from here (step 3's held-out frames)")
             p.add_argument("--profiles", default=",".join(PROFILES), help="the generator profiles to composite and score")
             p.add_argument("--gpu-class", default="RTX")
+    pm = sub.add_parser("prepare-match")
+    pm.add_argument("--inputs", required=True, help="K6's extracted inputs.tar (K4b.1's windows' features, masks, fits)")
+    pm.add_argument("--pose", required=True, help="YOLO11x-pose weights (K6's)")
+    pm.add_argument("--windows", nargs="+", required=True)
+    pm.add_argument("--sources", nargs="+", required=True)
+    pm.add_argument("--max-windows", type=int, required=True)
+    pm.add_argument("--ffmpeg", default="ffmpeg")
     val = sub.add_parser("validate")
     val.add_argument("--stage", default="")
     fit = sub.add_parser("fit-report")
@@ -880,15 +1014,20 @@ def main(argv: list[str] | None = None) -> int:
     fit.add_argument("--k6-stage", action="append", required=True, help="K6's published.tar holding the window")
     fit.add_argument("--k6-report", required=True)
     fit.add_argument("--out", required=True)
+    fit.add_argument("--billing", default="", help="step 4's pilot: JSON {variant: billed bytes}")
+    fit.add_argument("--hours", type=float, default=2.0)
     rep = sub.add_parser("report")
     rep.add_argument("--stage", action="append", required=True)
     rep.add_argument("--k6-report", required=True)
     rep.add_argument("--out", required=True)
-    rep.add_argument("--step", type=int, default=2, help="2: gen-original decides; 3: gen-fit (the overfit oracle)")
+    rep.add_argument("--step", type=int, default=2, help="2: gen-original decides; 3: gen-fit (overfit oracle); 4: gen-match, billed")
+    rep.add_argument("--billing", default="", help="step 4: JSON {variant: {match: billed bytes}}")
+    rep.add_argument("--hours", type=float, default=2.0, help="step 4: H, the hours of the match the bytes are spread over")
     args = ap.parse_args(argv)
-    if args.command in ("prepare", "prepare-fit", "judge") and len(args.windows) != len(args.sources):
+    if args.command in ("prepare", "prepare-fit", "prepare-match", "judge") and len(args.windows) != len(args.sources):
         raise SystemExit("Give one source per window")
-    return {"prepare": command_prepare, "prepare-fit": command_prepare_fit, "judge": command_judge, "validate": command_validate,
+    return {"prepare": command_prepare, "prepare-fit": command_prepare_fit, "prepare-match": command_prepare_match,
+            "judge": command_judge, "validate": command_validate,
             "report": command_report, "fit-report": command_fit_report}[args.command](args)
 
 

@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import pytest
 
@@ -125,3 +127,39 @@ def test_step3_decision_reads_the_fitted_renderer():
     s = {"gen-fit": k6b.score([row(True)] * 4 + [row(False)] * 2, "gen-fit")}
     assert k6b.decide({"all": s}, True, step=3).startswith("fail")
     assert k6b.decide({"all": s}, False, step=3).startswith("not read")
+
+
+def test_billed_rate_and_payback():
+    # 1.5 MB over 2 hours: 12 Mbit / 7200 s = 1.667 kbps
+    assert k6b.billed_kbps(1.5e6, 2.0) == pytest.approx(1.6667, abs=1e-3)
+    hull = [(1.0, -0.40), (10.0, -0.20)]
+    # LPIPS 0.30 needs 5.5 kbps on the hull; at 2.5 kbps of keypoints the saving is 3 kbps; 1.5 MB repays in 4000 s
+    assert k6b.payback_hours(hull, 0.30, 2.5, 1.5e6) == pytest.approx(12e6 / 3000 / 3600)
+    assert k6b.payback_hours(hull, 0.45, 2.5, 1.5e6) == math.inf  # worse than every point: never repaid
+
+
+def test_step4_verdict():
+    passing, failing = {"passes": True}, {"passes": False}
+    assert k6b.decide_billed(passing, passing, True).startswith("pass")
+    assert k6b.decide_billed(failing, passing, True).startswith("to the user")
+    assert k6b.decide_billed(failing, failing, True).startswith("fail")
+    assert k6b.decide_billed(passing, passing, False).startswith("not read")
+
+
+def test_adapter_quantization_matches_g5c_and_is_billed():
+    torch = pytest.importorskip("torch")
+    from experiments.background import g5c
+    from experiments.tennis import k6b_fit
+
+    gen = torch.Generator().manual_seed(0)
+    t = torch.randn(64, 320, generator=gen)
+    for a, b in zip(k6b_fit.quantize_channels(t, 8), g5c.quantize_channels(t, 8)):
+        assert torch.equal(a, b)
+    state = {"rank": 4, "reference_unet": {"x.lora_A.weight": torch.randn(4, 320, generator=gen)},
+             "denoising_unet": {"y.lora_B.weight": torch.randn(320, 4, generator=gen), "tiny": torch.randn(8, generator=gen)}}
+    rebuilt, billing = k6b_fit.quantize_adapters(state, 8)
+    assert billing["adapter_values"] == 4 * 320 + 320 * 4 + 8 and not billing["pose_guider_billed"]
+    assert 0 < billing["bytes"] < billing["raw_fp16_bytes"]  # 8 bits and LZMA beat fp16
+    err = (rebuilt["reference_unet"]["x.lora_A.weight"].float() - state["reference_unet"]["x.lora_A.weight"]).abs().max()
+    assert err < 0.02 * state["reference_unet"]["x.lora_A.weight"].abs().max()
+    assert torch.equal(rebuilt["denoising_unet"]["tiny"], state["denoising_unet"]["tiny"].half())  # small tensors stay fp16
