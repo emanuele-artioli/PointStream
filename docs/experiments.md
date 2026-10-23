@@ -11580,3 +11580,361 @@ and each object's representation is judged on both:
 - Report: `pointstream-data/visor/h5-2026-10-16/report-h5p4c-9b4b3ba.tar`
   (sha256 `982fe3f7…915ecd`, read-only): the specs, every stage's
   `h5.json`, `gate4c.py` and its output.
+
+### 2026-10-22 — K6b (hands) 2c: a buildable bank, chosen outside the window and billed (rule)
+- Question ([PLAN K6b](../PLAN.md), hands, after 2b). Rung 2b's free,
+  in-window bank reached the hull on 2 of 3 items with 16 references and
+  improved steeply with K. Does a bank a codec could send keep that: chosen
+  from the video **outside** the scored window, coded, and billed once per
+  video, with the rate amortized over the video?
+- Items. Positions 0–3 of K1f's content-blind order: P09_103, P25_09,
+  P22_107 (G's training footage) and P06_108, 240 frames each, with K1f's
+  rows, R, bound and hull (nothing in the window is re-coded). All four are
+  planned. If P09_103 cannot run for infrastructure reasons, the rule reads
+  the other three, as 2b did.
+- Candidates for the bank (encoder side). VISOR's dense masks (the
+  `visor_dense` interpolations; B1b's fill exists only inside windows) on
+  every frame of the item's video outside the window and outside a 1 s guard
+  on each side, at a stride of 5 frames, exact frames only on P25_09 (59.94
+  fps, `visor.frame_alignment`). Per side with a mask whose box has both
+  sides ≥ 16 px: WiLoR's two-pass hand-box fit (K1e's `mask_box_rows`,
+  unchanged) and its 2D joints. A candidate is kept when at least 15 of its
+  21 joints fall inside its mask dilated by 10% of the mask box's longer
+  side (drops fits off the hand). This is why rung 2c is its own task: H2
+  and K1f fitted the windows only.
+- Selection. Per side, greedy k-medoids on 2b's pose vector
+  (wrist-centred, scaled by extent): each step adds the candidate that most
+  lowers the mean distance from every candidate to its nearest reference. It
+  is nested, so the bank of 16 is the first 16 of the bank of 64, and it
+  weights the poses the video shows often, where 2b's farthest-point
+  sampling (one window, every pose scored) chased the extremes. K ∈ {16, 32,
+  64} per side.
+- What is sent per reference, and billed: the side mask's box (padded by 8
+  px, even sides ≥ 64 px) as one SVT-AV1 still (CRF 40, preset 4, 4:2:0 full
+  range; the box outside the mask filled smoothly first, so the background
+  costs few bits), its mask as polygons (OpenCV contours simplified at
+  1.5 px, coordinates in the box at ⌈log2 side⌉ bits each, plus a count per
+  polygon), its 21 joints in the box at the same precision, the box's
+  position (4 × 11 bits) and side (1 bit). Payload bits only (the AV1 OBUs,
+  as `svtav1` counts them). The decoder uses the decoded pixels and the
+  decoded polygon mask. CRF 40 is fixed now, before any run, from a probe of
+  two sparse-frame hand crops (P06_108: CRF 35 0.18–0.36 bpp, CRF 45
+  0.11–0.22 bpp). A lossless mask (bilevel PNG, about 750 bytes) cost as
+  much as the image, hence polygons.
+- Decoder, per window frame and fitted side (K1f's rows): the reference
+  whose sent joints are nearest the frame's coded joints in pose (2b's
+  matching), warped from its joints to the coded ones with `k6.draw`, inside
+  R (granted, as K1f and 2b), Telea fill where nothing is drawn, objects
+  kept.
+- Rate. Item rate = K1f's keypoint rate for the item + the bank's bits
+  (both sides, K references each) / the video's duration (ffprobe's, the
+  whole video). Reported beside: the rate with the bank amortized over one
+  minute, and the payback per metric, the shortest video for which the
+  bank's quality still sits below the hull (T* = bank bits / (hull's rate
+  at the bank's quality − keypoint rate); an upper bound where the bank
+  beats every hull point; none where it never does).
+- Variants. `bank2c@K` (coded, billed: the decision) and `free2c@K` (the
+  same references uncoded and unbilled: separates the coding and billing
+  from the move outside the window), K ∈ {16, 32, 64}, and `warp` (K1f's
+  bound, the check: within 0.002 of K1f's LPIPS on R, or nothing is read).
+- Decision rule (`k6bh.BANK2C_DECISION`, fixed before any run; the user's
+  criterion). Per K, an item is won on a metric when `bank2c@K` on R is
+  below K1f's hull at the item's rate. A rate above the hull's highest point
+  counts as lost (the hull is not known there). Score = mean over {LPIPS,
+  DISTS} of the share of items won.
+  - **Pass** (some K scores ≥ 75%): hands have a buildable renderer at the
+    keypoint rate plus the bank. Rung 3 is not needed on fidelity. Next: the
+    passing K on K1f's other held-out items, then the component.
+  - **Fail** with `free2c` at some K ≥ 75%: the bank's bits are what fail.
+    Next goes to the user (a cheaper bank: lower resolution, one stream).
+  - **Fail** with `free2c` failing too: references from elsewhere in the
+    video do not carry the hand well enough. With 2b, the reference route
+    closes at a buildable rate, and rung 3 is the last open rung for hands
+    (it waits for the user).
+- Hypothesis. Fails, with the score at 50% or below at every K. The bank's
+  rate (estimated 1–9 kbps at K = 16–64) lifts the bar well above 2b's,
+  and references from other activities in the video differ in lighting and
+  sleeves. `free2c@64` comes near 2b's `bank@16`.
+- Competing explanation. The same person in the same kitchen looks alike
+  across the video, and 64 references from thousands of candidates sit
+  nearer in pose than 2b's 16 from one window. Then `free2c` beats 2b's
+  `bank@16` and `bank2c@16` or `@32` passes, with the bank under 3 kbps.
+  The share of references within 10 s of the window, and of window frames
+  matched to them, are reported, to tell a near-duplicate bank apart.
+- Budget. One job per item, ≤ 45 min each, declared at 44,000 MiB (2b's
+  scoring peaked at 38,926 on P09_103, here with seven scorings). Each job's
+  smoke (≤ 600 s) runs 24 window frames and candidates at a stride of 200 on
+  its own item. Estimate: about 5 min of decoding and WiLoR, then 7 scorings
+  (about 150 s each in 2b) per item, so about 30 min, and about 2.6
+  GPU-hours with the smokes. Ceiling 3.5 GPU-hours, failed attempts
+  included. If it runs out, the items finished in the fixed order are
+  reported, and so is the shortfall.
+- Revision (2026-10-22, before any run; infrastructure only). The first job,
+  `20261022T122902Z-6db2cc7e` (P06_108), stayed pending: other users held
+  15–20 GB on every Ada GPU, so none had 44 GB free. It was cancelled before
+  it started. The 38,926 MiB was rung 2's, with FoundHand resident, and the
+  model–GPU table records 14.2 GiB for WiLoR, LPIPS and DISTS together. So
+  PyTorch is capped at 27 GiB (`set_per_process_memory_fraction`, with
+  expandable segments: the allocator frees its cache before growing, and a
+  real need fails loudly), 30,000 MiB is declared, and the peaks are
+  recorded in `k6bh2c.json`. Nothing in the rule changes.
+- Revision 2 (2026-10-22, before any score was read; infrastructure). Job
+  `20261022T125017Z-174bee4e` (P06_108, `ec72be4`) passed its smoke (28
+  checks), but in the full stage the candidates alone took 33 min: 3,121
+  frames at stride 5 and 5,361 fitted hands, with the fits waiting for the
+  whole decode (about 17,000 1080p HEVC frames). Bank, render and seven
+  scorings could not fit the same 45 min. So each item runs as two stages:
+  **extract** (bank frames decoded in chunks of 256 in fresh processes while
+  WiLoR fits the earlier ones; publishes the candidates unit) and **score**
+  (restores it, decodes only the chosen references again, then codes,
+  renders and scores). The stride is 10, not 5: about 1,500 candidates per
+  video, still over 20 times K = 64. A stride-5 unit is cut to stride 10 on
+  restore (the frames whose VISOR number is a multiple of 10, with their
+  fits, each fitted on its own), so P06_108's 33 min are kept if that stage's
+  `partial.tar` holds them.
+- Revision 3 (2026-10-22, validator only, before P22_107 was scored).
+  P22_107's score smoke `20261022T135926Z-ea68c004` failed one check: one
+  of its 128 references (right hand, rank 55) decodes its polygon mask at
+  IoU 0.874 against the source mask, under the check's 0.9 (outer contours
+  only, so a hole is filled). That is lossy coding, not a fault: the
+  decoder warps with the decoded mask, and its bits are billed. The check,
+  meant to catch broken polygon coding, is now median IoU ≥ 0.95 and every
+  reference ≥ 0.8. The three items already scored pass it (37 of 37 checks
+  each).
+- Jobs (RTX 6000 Ada, shared, gpu5 and gpu6; code from each `ready.json`).
+  Extract: P09_103 `20261022T133541Z-972661c4`, P25_09
+  `20261022T133548Z-9c159ae6`, P22_107 `20261022T133554Z-69d44a0b` (all
+  `297927f`); P06_108's stride-5 fits from `20261022T125017Z-174bee4e`
+  (`ec72be4`, its `partial.tar` `6ba9ac36…349b`, cut to stride 10). Score:
+  P06_108 `20261022T134036Z-c2a4a791`, P09_103 `20261022T134327Z-87c2fe46`,
+  P25_09 `20261022T140213Z-6e5dedbc` (all `4f2cb8c`), P22_107
+  `20261022T172554Z-d766d9e1` (`83aa02d`; the validator change only). Every
+  smoke that ran to the end passed the fleet validator. Every full stage
+  passes `k6bh2c validate` locally (11 checks per extract, 37 per score), and
+  `warp` reproduces K1f on every item. Candidates (stride 10): 529–1,723
+  frames per video, 870–2,529 kept fits. References: SVT-AV1 at CRF 40,
+  median PSNR on the mask 37–40 dB, median 10–14 kbit per reference with
+  its polygons and joints, median polygon IoU 0.99. Peak GPU memory
+  reserved 4.9 GB (P06_108). Report
+  `visor/k6bh-2026-10-22/report/k6bh2c-report.json` (`3e46782b…c0b`). GPU
+  time: 9,269 s of stages, failed and timed-out attempts included (P06_108's
+  first full stage counted at its 2,700 s), about 2.6 GPU-hours of the 3.5.
+- Outcome. On R, at each item's rate (keypoints plus the bank amortized over
+  the whole video), against K1f's hull there:
+
+  | item (video s) | kp kbps | `bank2c@16` | `bank2c@32` | `bank2c@64` | `free2c@64` (free) | `warp` |
+  |---|---:|---:|---:|---:|---:|---:|
+  | P09_103 (744) | 2.03 | 0.334 / 0.256 at 2.56 kbps (hull 0.197 / 0.213) | 0.330 / 0.253 at 3.16 (0.186 / 0.204) | 0.331 / 0.251 at 4.43 (0.163 / 0.186) | 0.320 / 0.238 (0.206 / 0.220) | 0.100 / 0.102 |
+  | P25_09 (876) | 2.14 | 0.500 / 0.334 at 2.48 (0.249 / 0.237) | 0.489 / 0.327 at 2.86 (0.237 / 0.234) | 0.483 / 0.325 at 3.60 (0.233 / 0.233) | 0.467 / 0.302 (0.260 / 0.240) | 0.097 / 0.102 |
+  | P22_107 (581, G) | 1.93 | 0.262 / **0.169** at 2.62 (0.221 / 0.197) | 0.237 / **0.156** at 3.31 (0.206 / 0.191) | 0.233 / **0.153** at 4.48 (0.179 / 0.180) | **0.208 / 0.134** (0.236 / 0.204) | 0.059 / 0.049 |
+  | P06_108 (729) | 1.94 | 0.374 / 0.300 at 2.53 (0.161 / 0.199) | 0.358 / 0.289 at 3.09 (0.150 / 0.194) | 0.364 / 0.290 at 4.30 (0.137 / 0.187) | 0.366 / 0.286 (0.172 / 0.206) | 0.091 / 0.123 |
+
+  (LPIPS / DISTS on R; bold: below the hull. G: in G's training footage.)
+  Scores: `bank2c@16`, `@32` and `@64` all 12.5% (LPIPS 0 of 4, DISTS 1 of
+  4); `free2c` 25% at every K. Clean of G (3 items): 0% for every variant
+  but `warp`. The bank costs 0.3–2.5 kbps (0.29–1.78 Mbit), and on P22_107's
+  DISTS it pays back after 109–234 s of video.
+- Decision (by the rule): **fail, and `free2c` fails too.** A bank chosen
+  outside the window, at any K up to 64, does not keep K1f's win: the
+  references from elsewhere in the video do not carry the hand well enough,
+  coded or not. With 2b, the reference route for egocentric hands closes
+  at a buildable rate. Rung 3 (a generator fitted per clip) is the last
+  open rung for hands on fidelity, and it waits for the user.
+- Reading.
+  - Coding and billing are not what fail. `free2c` is within 0.02 LPIPS of
+    `bank2c` at the same K, and the bank adds at most 2.5 kbps.
+  - K barely matters. From 16 to 64 references the mean pose distance falls
+    by 15–27% on every item, but LPIPS on R moves by 0.00–0.03. In 2b, from 1
+    to 16 in-window references, it fell by 45–56%. So the nearest pose is
+    not what is missing. What is missing is the rest of the hand's
+    appearance: the forearm's position and extent, the sleeve, the lighting
+    and the hand's place in the frame.
+  - The warped references cover 46–91% of R (K1f's own pixels: 95–97%),
+    and the order follows the result: P22_107 0.83–0.91, P06_108 0.79,
+    P09_103 0.72–0.76, P25_09 0.46–0.49. Where a reference's mask does not
+    reach R's shape, Telea fills the rest. Against 2b's in-window `bank@16`
+    (free), the gap is 0.10 to 0.23 LPIPS: P22_107 0.100 → 0.208, P25_09
+    0.190 → 0.467, P06_108 0.227 → 0.366.
+  - It is not a near-duplicate effect either way. On P09_103 and P22_107,
+    50–72% of the matches use references within 10 s of the window, and
+    they still lose. On P06_108 and P25_09, 0–19% do.
+- Hypothesis ("fails, score ≤ 50% at every K; the bank's rate lifts the
+  bar"): the fail held, at 12.5%. The stated reason did not: the bar moves
+  little (0.3–2.5 kbps), and the free bank fails as well. The competing
+  explanation (the same person and kitchen look alike across the video)
+  is refuted: `free2c` is far above 2b's in-window bank on every item.
+- Scope and caveats. 4 items (positions 0–3 of K1f's order), one of them in
+  G's footage. One reference quality (CRF 40), but `free2c` bounds every
+  quality. Candidates come only from VISOR's dense spans, at stride 10, with
+  VISOR's dense masks (480p polygons) as the references' mattes, where the
+  window uses B1b's fill. Matching is by the 2D pose shape alone (2b's
+  matcher), not by position or scale in the frame. R is granted, as in K1f.
+- Report (2026-10-22, to the root session).
+  - Stopped because: goal reached.
+  - Decision by the rule: fail, with `free2c` failing too. The reference
+    route for egocentric hands closes at a buildable rate.
+  - Numbers: score 12.5% for `bank2c@16`, `@32` and `@64`, 25% for
+    `free2c` at every K, 0% clean of G. Table above. Jobs above, code
+    `297927f` (extract), `4f2cb8c` and `83aa02d` (score), report
+    `visor/k6bh-2026-10-22/report/k6bh2c-report.json` `3e46782b…c0b`.
+  - Budget: about 2.6 GPU-hours of 3.5.
+  - Deviations: stride 10, not 5, and two stages per item (time); the GPU
+    memory cap; one validator threshold (one lossy mask). All recorded
+    above before the affected scores were read. None changes the rule.
+  - Open for the user: whether to approve rung 3 (overfit oracle, 4
+    GPU-hours), the last open rung for hands on fidelity.
+  - Proposed next step: rung 3 as written, or close hands on fidelity and
+    leave them to the experience track (item J).
+
+### 2026-10-22 — K6b (hands) 3: overfit oracle (run)
+- Approved (user, 2026-10-22: "Rung 3 approved: run the overfit oracle as
+  written, within 4 GPU-hours"), after rung 2c failed. The rule is the
+  entry "K6b (hands) 3: overfit oracle (rule, not run)", unchanged: the same
+  3 items, judges, hull and criterion; P01_107 for the smoke and the pilot.
+- Fit (`experiments/visor/k6bh3.py`, written before any run). FoundHand's
+  EMA weights, the full DiT fine-tuned per item: AdamW, learning rate 1e-5
+  (the released checkpoint's), batch 8, bf16 autocast over float32 weights,
+  FoundHand's own `training_losses` (MSE on the noise plus its learned
+  variance term, 1,000 steps). Pairs: a target crop and another crop of the
+  same hand from the fitting frames, both with K1f's uncoded keypoints and
+  rung 2's crop rule. The reference's mask is dropped half the time (the
+  video procedure's later references carry none), and 10% of pairs train
+  the sampler's unconditional branch (zero conditions, `nvs` 2). The
+  sin-cos position embedding stays frozen. The fitted weights are sampled
+  directly (no EMA over a fit this short). Judged as rung 2's `gen` (50
+  steps, guidance 2.5, from the window's first fitted frame, on the coded
+  keypoints).
+- Smoke checks (the rule's): at least 200 steps; the loss on a fixed probe
+  (16 pairs, fixed timesteps and noise) falls; a sample of the probe's
+  training pairs moves towards its target (LPIPS of the crops falls).
+- Deviations, before any run:
+  - The pilot judges the held-out frames 180–209 (30, not 60) at 25%, 50%
+    and 100% of the 30-minute fit (0% keeps only the probes). By rung 2's
+    timing (about 2.5 s per generated hand), four judgements of 60 frames
+    plus the fit would not fit a 45-minute stage.
+  - Both hands' chains are sampled in lockstep (one batch), so the video
+    procedure's per-step random choice of reference is shared by the two
+    hands.
+  - Declared at 30,000 MiB with PyTorch capped at 27 GiB, not ≥ 40,000,
+    as in 2c. Other users hold 15–20 GB on every Ada GPU.
+  - The scaled fits' length is the pilot's extrapolated time to the hull,
+    at most 45 minutes. If that and the judging of 240 frames do not fit one
+    stage, fitting and judging are split, with the weights published
+    between them.
+- P01_107's bar: K1f's hull at its rate, from the reproduction stage
+  `20261022T013208Z-9e048ecf` (K1c recorded 0.258 LPIPS and 0.223 DISTS).
+- Smoke and pilot (development, P01_107; not scored for the rule). Job
+  `20261022T175637Z-b7d48144` (`a3b261b`, gpu6, RTX 6000 Ada, shared). The
+  smoke passed 12 checks: 591 steps in 120 s, the probe loss fell from
+  0.093 to 0.078, the training-pair samples from 0.446 to 0.314 LPIPS.
+  The full stage passes 12 checks locally: 8,428 steps in 1,800 s of
+  fitting (about 4.7 steps per second), peak 21.2 GB reserved. The probe
+  loss fell from 0.093 to 0.050. On the held-out frames 180–209, LPIPS /
+  DISTS on R:
+
+  | fit | steps | LPIPS on R | DISTS on R |
+  |---|---:|---:|---:|
+  | 7.5 min | 2,180 | 0.225 | 0.152 |
+  | 15 min | 4,341 | 0.189 | 0.144 |
+  | 30 min | 8,428 | 0.168 | 0.135 |
+
+  K1f's hull at P01_107's rate (1.95 kbps) reads 0.257 / 0.222. The fit in
+  log time reaches it at 3.3 min (DISTS from the start). Report
+  `visor/k6bh-2026-10-22/report/k6bh3-pilot-report.json` (`ab0b58c7…bb2`).
+  **By the rule, the scaled fits run.** Rung 2's zero-shot `gen` read
+  0.496 / 0.255 on all of P01_107.
+- Revision (before the scored fits). The run notes set the scaled fit's
+  length to the pilot's extrapolated time to the hull, which would be about
+  3 min: a fit sized to reach the bar sits on it by construction, which is
+  not an upper bound. Each scored item is fitted for 20 min instead
+  (between the pilot's 15- and 30-minute points), the longest fit that
+  leaves time to judge its 240 frames and K1f's `warp` in one 45-minute
+  stage. Lockstep rendering took about 1.6 s per frame for both hands in
+  the pilot.
+- Jobs (RTX 6000 Ada, shared, gpu5 and gpu6; `a268c0c` from each
+  `ready.json`; 20 min of fitting each): P25_09 `20261022T183807Z-3795e867`,
+  P22_107 `20261022T183815Z-59e06155`, P06_108 `20261022T183822Z-ef0d3c3c`.
+  Every smoke passed the fleet validator, and every full stage passes `k6bh3
+  validate` locally (11 checks), with `warp` reproducing K1f. Steps reached:
+  5,579–5,708. Report `visor/k6bh-2026-10-22/report/k6bh3-report.json`
+  (`07ac515b…064`). GPU time for rung 3, smokes and pilot included: 8,951 s
+  of stages, about 2.5 GPU-hours of the 4.
+- Outcome. On R, at each item's keypoint rate (1.93–2.14 kbps), the fitted
+  weights free (an oracle: fitted on the frames it is judged on):
+
+  | item | `gen` fitted, LPIPS / hull | `gen` fitted, DISTS / hull | rung 2's `gen` (zero-shot) | `warp` (bound) |
+  |---|---:|---:|---:|---:|
+  | P25_09 | 0.291 / 0.260 | **0.234** / 0.240 | 0.524 / 0.353 | 0.097 / 0.102 |
+  | P22_107 (G) | **0.174** / 0.236 | **0.151** / 0.204 | 0.281 / 0.200 | 0.059 / 0.049 |
+  | P06_108 | **0.162** / 0.172 | **0.177** / 0.206 | 0.308 / 0.273 | 0.091 / 0.123 |
+
+  (Bold: below the hull.) LPIPS 2 of 3, DISTS 3 of 3: **score 83%**. Clean
+  of G's footage (P06_108, P25_09): LPIPS 1 of 2, DISTS 2 of 2, 75%.
+- Decision (by the rule): **pass.** A FoundHand fitted on the window's own
+  frames draws the hand from the coded keypoints (about 2 kbps) well enough
+  to beat the SVT-AV1 + DCVC-UF + G hull on R. Next by the rule: rung 4, a
+  fit on other shots of the same video, billed. The generative route for
+  hands stays open.
+- Reading.
+  - The fit roughly halves rung 2's gap: LPIPS on R falls by 0.11–0.23 on
+    every item against the zero-shot `gen`. It still sits 0.07–0.19 above
+    K1f's bound, the hand's own pixels.
+  - The margins are thin where the item is hard. P06_108 wins LPIPS by 0.010
+    and P25_09 wins DISTS by 0.006, while P22_107 wins both by 0.05–0.06.
+    The pass at 83% rests on these; clean of G it is exactly at the bar.
+  - P25_09, the largest hands (crops of about 1,070 px drawn at 256²), is
+    the one LPIPS loss, as in rung 2. Competing explanation (3), the crop
+    size, still fits and is still not isolated.
+  - The pilot's held-out curve (P01_107, frames 180–209) was still falling
+    at 30 min (0.168 LPIPS), and these fits stopped at 20. Longer fits would
+    likely lower every number. That is an oracle's question, not rung 4's.
+- Hypothesis ("fails: the gap is pose-to-pixel error and the forearm, not
+  identity"): refuted. The competing explanation (most of the gap is
+  appearance, which the fit learns) holds. The pilot's held-out frames fell
+  steeply (0.225 → 0.168 between 7.5 and 30 min).
+- Scope and caveats. An oracle: fitted on the frames it is judged on, and
+  its weights (1.35 GB per item in bf16) are not billed. A real codec has
+  to fit elsewhere and send the fit, which is rung 4. FoundHand may have seen
+  every item's footage (rung 2's overlap note). 3 items. Flicker and a visual
+  check, which rung 2 reported beside, were not computed here, and the
+  rendered frames were not kept. A visual check of a few frames is the
+  cheapest next step before rung 4 is written.
+- Report (2026-10-23, to the root session).
+  - Stopped because: goal reached.
+  - Decision by the rule: pass (83%; 75% clean of G).
+  - Numbers: the table above; jobs above; code `a268c0c`; report
+    `k6bh3-report.json` `07ac515b…064`; pilot report `ab0b58c7…bb2`.
+  - Budget: about 2.5 GPU-hours of 4.
+  - Deviations, all before the scored fits: the pilot judged 30 held-out
+    frames, not 60; both hands sampled in lockstep; 30,000 MiB with a 27 GiB
+    cap; the scored fits ran 20 min, not "the time to the hull" (about 3
+    min, which would sit on the bar by construction).
+  - Open for the user: whether rung 4 (fit elsewhere in the video, billed)
+    gets a rule and budget, and whether a visual check comes first.
+  - Proposed next step: a visual check (the frames were not kept, so one
+    item re-fitted and rendered with its frames saved, about 0.6
+    GPU-hours), then rung 4's rule.
+- Visual check (user, 2026-10-23: "Yes, run the visual check: re-fit one
+  item for 20 min with its rendered frames saved"). P06_108 (clean of G, the
+  thinnest LPIPS win), re-fitted with the same seeds and settings: job
+  `20261023T062736Z-14fa0c21` (`2910f1c`, gpu6), 13 checks pass locally,
+  `published.tar` `9101f00b…89fe4`. It reproduces the scored fit: 5,652
+  steps, LPIPS / DISTS on R 0.163 / 0.180 (scored: 0.162 / 0.177; hull 0.172
+  / 0.206; GPU nondeterminism). Flicker in R (rung 2's measure): fitted
+  `gen` 18.0, source 14.4, `warp` 15.3 (rung 2's zero-shot `gen`: 19.7).
+  Strips of source | fitted `gen` | `warp` at frames 40, 80, 120, 159 and
+  199 (evenly spaced over the hand frames) are in `publish/frames/`.
+  - The fitted hands follow the source's pose, finger placement, skin tone
+    and lighting in every strip. No fingers are broken, added or missing,
+    and the scene outside R is untouched. Rung 2's zero-shot hands were
+    plausible but not the source's. These are the source's.
+  - The texture is softer than the source's: tendons, veins and skin creases
+    are smoothed, as a 256² crop drawn back at about 550 px would be. On the
+    reaching hand at frame 40 the colour is slightly warmer.
+  - At frame 120 (both hands twisting a jar lid), the fingers over the lid
+    are blurred and the lid's outline shifts. `warp` shows doubled edges in
+    the same place.
+  - Flicker is 25% above the source's, which per-frame LPIPS and DISTS do
+    not see. Rung 2's rule asked for a visual check of any pass with flicker
+    above the source's: this is it, and nothing in it contradicts the pass.
+  GPU time: 2,169 s; rung 3 in all, about 3.1 GPU-hours of the 4.

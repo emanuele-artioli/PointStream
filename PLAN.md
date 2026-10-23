@@ -697,6 +697,36 @@ objects (the tennis ball).
   fidelity: the buildable bank (K up to 64, chosen outside the window,
   coded and billed once per video). It needs keypoints outside the
   windows, so it is a task of its own. Rung 3 waits behind it.
+  **Rung 2c, the buildable bank (2026-10-22, experiments.md "K6b (hands)
+  2c", `k6bh2c-report.json` `3e46782b…`): fails, and the free bank fails
+  too.** Up to 64 references per hand, chosen from VISOR-masked frames
+  outside the window (WiLoR on 529–1,723 frames per video), coded as
+  SVT-AV1 stills with polygon masks and billed once per video (0.3–2.5
+  kbps), score 12.5% at K = 16, 32 and 64 (LPIPS 0 of 4, DISTS 1 of 4), and
+  25% unbilled. Clean of G's footage: 0%. LPIPS on R is 0.23–0.50 against
+  the hull's 0.14–0.25. The bits are not the problem, and neither is K
+  (16 → 64 moves LPIPS by at most 0.03). References from other moments of
+  the video do not carry the forearm, sleeve and lighting: the warp covers
+  46–91% of R, against 95–97% for the window's own pixels. With 2b, the
+  reference route for egocentric hands closes at a buildable rate. Next on
+  fidelity: rung 3 (the overfit oracle, rule written, 4 GPU-hours), the
+  last open rung for hands, waiting for the user.
+  **Rung 3, the overfit oracle (user approved, 2026-10-22; experiments.md
+  "K6b (hands) 3: overfit oracle (run)", `k6bh3-report.json` `07ac515b…`):
+  passes, 83%.** FoundHand fine-tuned for 20 min on each window's own frames
+  (weights unbilled) draws the hand from the coded keypoints at about 2 kbps
+  below the SVT-AV1 + DCVC-UF + G hull on R: LPIPS 2 of 3 (P06_108 0.162
+  against 0.172, P22_107 0.174 against 0.236; P25_09 loses, 0.291 against
+  0.260), DISTS 3 of 3. Clean of G's footage: 75%, at the bar. The fit
+  roughly halves rung 2's zero-shot gap (LPIPS down 0.11–0.23), and the
+  pilot's held-out curve was still falling at 30 min. The margins on the
+  hard items are thin (0.006–0.010). It is an oracle: fitted on the frames
+  it is judged on, unbilled, and FoundHand may have seen the footage. Next by
+  the rule: rung 4, a fit on other shots of the same video, billed. A visual
+  check (user, 2026-10-23; P06_108 re-fitted, 0.163 / 0.180) shows the
+  source's pose, skin and lighting with softer texture, blur where fingers
+  cross an object, and flicker 25% above the source's. Rung 4 waits for the
+  user.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
