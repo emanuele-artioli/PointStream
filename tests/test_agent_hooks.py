@@ -139,3 +139,10 @@ def test_guard_runs_as_a_hook_and_exits_2_when_blocking(tmp_path: Path) -> None:
     )
     assert done.returncode == 2 and "1500 lines" in done.stderr
 
+
+
+def test_settings_wire_both_hooks() -> None:
+    settings = json.loads((ROOT / ".claude" / "settings.json").read_text(encoding="utf-8"))
+    commands = json.dumps(settings["hooks"])
+    assert "tools.agent_hooks.session_start" in commands
+    assert "tools.agent_hooks.guard_large_read" in commands

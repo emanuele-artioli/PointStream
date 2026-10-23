@@ -50,12 +50,12 @@ def too_long(path: Path) -> int | None:
 def advice(path: Path, lines: int) -> str:
     if path.suffix.lower() in LOG_SUFFIXES:
         how = (
-            f"show the tail and the error lines instead, e.g. `tail -n 40 {path}` and "
+            f"show the tail and the error lines, e.g. `tail -n 40 {path}` and "
             f"`grep -nE 'Error|Traceback|WARN' {path} | head -n 40`"
         )
     else:
         how = "search it (Grep) or read a line range (Read with offset and limit)"
-    return f"{path} has {lines} lines; reading it whole would fill the context. {how}. (docs/sessions.md#context)"
+    return f"{path} has {lines} lines; reading it whole would fill the context. Instead, {how}. (AGENTS.md, Context and compaction)"
 
 
 def printed_files(command: str) -> list[str]:
