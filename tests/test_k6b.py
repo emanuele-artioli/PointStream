@@ -115,3 +115,13 @@ def test_unit_names_and_seeds_are_stable():
     name = k6b.unit_name("djokovic_federer/038@120", "person:000000000002")
     assert "/" not in name and ":" not in name and "@" not in name
     assert k6b.unit_seed(name) == k6b.unit_seed(name)
+
+
+def test_step3_decision_reads_the_fitted_renderer():
+    def row(won):
+        return {"gen-fit": {"lpips": {"won": won}, "dists": {"won": won}}}
+    s = {"gen-fit": k6b.score([row(True)] * 5 + [row(False)], "gen-fit")}
+    assert k6b.decide({"all": s}, True, step=3).startswith("pass")
+    s = {"gen-fit": k6b.score([row(True)] * 4 + [row(False)] * 2, "gen-fit")}
+    assert k6b.decide({"all": s}, True, step=3).startswith("fail")
+    assert k6b.decide({"all": s}, False, step=3).startswith("not read")

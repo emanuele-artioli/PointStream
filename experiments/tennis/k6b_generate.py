@@ -206,7 +206,7 @@ def command_generate(args: argparse.Namespace) -> int:
     if args.units:
         names = [n for n in names if n in args.units.split(",")]
     names = names[:args.max_units or None]
-    profiles = args.profiles.split(",")
+    profiles = [p for p in args.profiles.split(",") if p]  # empty: only the --fit profiles
     if args.fit_archive:  # k6b_fit's published.tar: --fit names its members (placeholders must be whole arguments)
         fit_root = scratch / "fit-archive"
         if not fit_root.is_dir():
