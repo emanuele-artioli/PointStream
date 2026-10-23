@@ -1,1 +1,1 @@
-No broken requirements found.
+diffusers 0.30.3 requires importlib-metadata, which is not installed.

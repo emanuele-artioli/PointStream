@@ -367,6 +367,31 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   torch 2.3 and timm 1.0.7, are older; the code is plain DiT). Lightning, SAM
   and mediapipe are for training and the demos only.
 
+**Moore-AnimateAnyone** (K6b's player renderer, zero-shot rung, 2026-10-22)
+- Source: [emanuele-artioli/Moore-AnimateAnyone](https://github.com/emanuele-artioli/Moore-AnimateAnyone)
+  at `67c42297f8024ddb0fd04b69e42ac71fe6bbf3d8`, a fork of
+  [MooreThreads/Moore-AnimateAnyone](https://github.com/MooreThreads/Moore-AnimateAnyone)
+  `a914ef3` (Apache-2.0) that packages the code as `animate_anyone` (upstream's
+  top-level `src` collides with PointStream's) and ports it to diffusers 0.30.
+  Its model code differs from upstream only in import paths, one default the
+  inference code overrides, and a load fallback. Staged as `git archive`
+  (`tennis/k6b-2026-10-22/inputs/env/moore-animateanyone-67c4229.tar`,
+  `bfca6cf1…99ee`) and installed into `pointstream-jcv` (conflict 10 below).
+- Weights in `Models/AnimateAnyone/profiles/{original,finetuned_tennis}/`
+  (`denoising_unet.pth`, `reference_unet.pth`, `pose_guider.pth`,
+  `motion_module.pth`), recorded in `Models/AnimateAnyone/MANIFEST.json`.
+  `original` is `patrolli/AnimateAnyone` (the top-level `.pth` files beside
+  `profiles/` are 135-byte git-LFS pointers, not weights). `finetuned_tennis`
+  is the pre-reset fine-tune (Feb 2026, the fork's `finetune_stage{1,2}.py`);
+  its training tracks are not recorded with the weights (K6b (players) 2's
+  overlap note). The VAE is `Models/sd-vae-ft-mse` and the CLIP image encoder
+  `Models/sd-image-variations-diffusers/image_encoder`, each with a manifest.
+  SD 1.5 contributes only its UNet config, which `k6b_generate` embeds: every
+  UNet weight comes from the profile.
+- Inference only, in `pointstream-jcv`, through `experiments.tennis.k6b_generate`
+  (npz in, npz out). DWPose is not run: the pose maps are drawn from the coded
+  keypoints by `experiments.tennis.k6b.pose_map`.
+
 **JointControlVideo on Wan2.1-I2V-14B-480P** (H3e's hand generator, 2026-10-12)
 - [ZhangCYG/JointControlVideo](https://github.com/ZhangCYG/JointControlVideo) at
   `f96b2c377f26a165bf63cd9fcb495bb9fd3d3054` (ECCV 2026, Apache-2.0): a LoRA,
@@ -490,6 +515,21 @@ naming the pack they ran with.
    `pointstream-data/environments/pointstream-jcv-20261012T085233Z.tar.gz`,
    sha256 `2bec91d460df5487acd10d5dfe062040db2117238fd0fbb72ecf947cfb7bec74`
    (4.4 GB; 7.4 GB unpacked), built on gpu6 at commit `68b5631`'s recipe.
+   *Extended for Moore-AnimateAnyone* (K6b, 2026-10-22). AnimateAnyone needs
+   transformers (its CLIP image encoder) and diffusers; transformers 4.x
+   requires huggingface_hub < 1.0, and diffusers 0.30.3 (the archived
+   runtime's pin) imports `HfFolder`, removed in huggingface_hub 1.0. So it
+   meets the same conflict, and goes into this environment instead of a third
+   one. `env/jcv/extend-animateanyone.sh` adds to the 2026-10-12 pack, offline
+   and hash-checked, diffusers 0.30.3 (PyPI wheel `1b70209e…edee`) and the fork,
+   both without dependencies (diffusers' others are already there; its
+   `importlib-metadata` is a backport imported only below Python 3.8, the one
+   `pip check` line). The locks differ by exactly those two packages
+   (`env/locks/pointstream-jcv.animateanyone-delta.txt`); the import check
+   covers JointControlVideo too. Packed:
+   `pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz`,
+   sha256 `bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e`
+   (4.5 GB), built on gpu6. H3e's jobs keep naming the 2026-10-12 pack.
 
 **Earlier environments.** `~/.conda/envs/pointstream` (Python 3.10, torch
 2.2.2) stays as the interpreter of the fleet workers and the dispatcher only;

@@ -597,6 +597,59 @@ objects (the tennis ball).
   starts with an environment audit and a packed environment. Its
   composite grants R as the generator's matte, the analogue of `warp`'s
   granted outline, so it bounds the generator with its own matte.
+  **Step 2, zero-shot (2026-10-22, experiments.md "K6b (players) 2"):
+  fails.** Moore-AnimateAnyone (the released weights) with one unbilled
+  reference crop per player and the coded keypoints, inside the granted R,
+  wins 3 of 6 windows on LPIPS and 3 of 6 on DISTS (score 50%; the two
+  unjudged windows could not have lifted it to 75%). It is far better than
+  K6's `ref` warp (LPIPS over S 0.21–0.38 against 0.39–0.55) and beats the
+  envelope on both metrics on the three Djokovic windows (saving 2–73%),
+  losing both Alcaraz windows (by 0.004–0.058) and the Rublev close-up.
+  The bound is 0.05–0.12. The environment is `pointstream-jcv` extended
+  (huggingface_hub < 1.0, conflict 10); first run on Ada recorded. Scope
+  (user, before any score): the released profile alone decides; the
+  tennis fine-tune was a diagnostic on one window, and no better there.
+  4.75 GPU-hours, over the 4-hour ceiling because parallel parts slowed
+  each other (reported to the user before judging). Next: step 3, the
+  overfit oracle; its rule is written (ceiling 6 GPU-hours) and it waits
+  for the user's approval.
+  **Step 3, overfit oracle (2026-10-23, experiments.md "K6b (players)
+  3"): passes.** AnimateAnyone fitted on each window's own frames (a LoRA
+  on both UNets' attention and the pose guider, 7.5 minutes: the pilot's
+  learning curve saturated there) wins 4 of 6 windows on LPIPS and 6 of 6
+  on DISTS (score 83%), saving 35–84% of the envelope's rate on four
+  windows. It improves every window over the zero-shot step (LPIPS
+  0.185–0.300 against 0.211–0.381); it loses LPIPS on
+  `alcaraz_hurkacz/045` by 0.003 (its fit got the fewest steps) and on the
+  Rublev close-up. The fit saw the frames it is judged on, and its
+  reference, matte and LoRA are unbilled, so it bounds a match fit. 4.8
+  GPU-hours of the 6 approved. Next: step 4 (a fit on other shots of the
+  same match, billed and amortized). **Its rule is written (2026-10-23,
+  experiments.md "K6b (players) 4")**: one LoRA per match on up to 6 of
+  K4b.1's other windows, the pose guider frozen, 8-bit adapter bytes
+  billed over H = 2 hours (an assumption: the archive holds scene clips),
+  a pilot over ranks {64, 16, 4} on `djokovic_federer`, ceiling 7
+  GPU-hours. Size decides: step 3's adapter would cost 54 kbps over 2 h.
+  **Step 4, match fit billed (2026-10-23): fails.** The pilot chose rank
+  4 and a 10-minute fit (1.55 MB at 8 bits, 1.73 kbps over 2 h; it scored
+  as rank 64 and as fp16). On the 6 windows, `gen-match` wins 4 of 6 on
+  LPIPS and 4 of 6 on DISTS unbilled (67%), 3 and 4 billed (58%). It
+  recovers about 60% of step 3's gain over zero-shot and pays back in
+  0.4–2.1 hours where it wins, but loses `alcaraz_hurkacz/045` (fewest
+  training crops; its fit failed the coarse `loss_falls` check) and the
+  Rublev close-up. By the rule, the generative route for players closes
+  at the keypoint rate, and step 3's extra windows came from fitting the
+  judged frames. About 7.0 GPU-hours, at the ceiling. Not closed (user,
+  2026-10-23): **step 5's rule is written (experiments.md "K6b (players)
+  5")**. Three cumulative arms (step 4's recipe; all of the match's
+  K4b.1 windows plus the pose guider trained; the same on a tennis-wide
+  base LoRA that is part of the decoder) are chosen on two development
+  windows that K6 scored and steps 2–4 never judged (`djokovic_zverev/008`,
+  `medvedev_struff/033`). Then 4-bit adapters and guidance 2.0 are tried
+  at render time, and the 6 windows are judged billed by step 4's rule,
+  beside a per-player Djokovic model billed over 20 hours. Ceiling 11
+  GPU-hours. Waits for the user's approval. Step 6 (outlined): a newer
+  generator (Wan-Animate), after an environment audit.
   Training discipline for steps 3 and 4: a correctness smoke in minutes;
   then a learning-curve pilot on held-out frames at fixed fractions of the
   step budget; the scaled fit only if that curve, extrapolated, can reach
