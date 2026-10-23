@@ -11322,3 +11322,27 @@ and each object's representation is judged on both:
   - Proposed next step: a visual check (the frames were not kept, so one
     item re-fitted and rendered with its frames saved, about 0.6
     GPU-hours), then rung 4's rule.
+- Visual check (user, 2026-10-23: "Yes, run the visual check: re-fit one
+  item for 20 min with its rendered frames saved"). P06_108 (clean of G, the
+  thinnest LPIPS win), re-fitted with the same seeds and settings: job
+  `20261023T062736Z-14fa0c21` (`2910f1c`, gpu6), 13 checks pass locally,
+  `published.tar` `9101f00b…89fe4`. It reproduces the scored fit: 5,652
+  steps, LPIPS / DISTS on R 0.163 / 0.180 (scored: 0.162 / 0.177; hull 0.172
+  / 0.206; GPU nondeterminism). Flicker in R (rung 2's measure): fitted
+  `gen` 18.0, source 14.4, `warp` 15.3 (rung 2's zero-shot `gen`: 19.7).
+  Strips of source | fitted `gen` | `warp` at frames 40, 80, 120, 159 and
+  199 (evenly spaced over the hand frames) are in `publish/frames/`.
+  - The fitted hands follow the source's pose, finger placement, skin tone
+    and lighting in every strip. No fingers are broken, added or missing,
+    and the scene outside R is untouched. Rung 2's zero-shot hands were
+    plausible but not the source's. These are the source's.
+  - The texture is softer than the source's: tendons, veins and skin creases
+    are smoothed, as a 256² crop drawn back at about 550 px would be. On the
+    reaching hand at frame 40 the colour is slightly warmer.
+  - At frame 120 (both hands twisting a jar lid), the fingers over the lid
+    are blurred and the lid's outline shifts. `warp` shows doubled edges in
+    the same place.
+  - Flicker is 25% above the source's, which per-frame LPIPS and DISTS do
+    not see. Rung 2's rule asked for a visual check of any pass with flicker
+    above the source's: this is it, and nothing in it contradicts the pass.
+  GPU time: 2,169 s; rung 3 in all, about 3.1 GPU-hours of the 4.

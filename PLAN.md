@@ -696,8 +696,10 @@ objects (the tennis ball).
   pilot's held-out curve was still falling at 30 min. The margins on the
   hard items are thin (0.006–0.010). It is an oracle: fitted on the frames
   it is judged on, unbilled, and FoundHand may have seen the footage. Next by
-  the rule: rung 4, a fit on other shots of the same video, billed, after a
-  visual check of the fitted renders (about 0.6 GPU-hours). Both wait for the
+  the rule: rung 4, a fit on other shots of the same video, billed. A visual
+  check (user, 2026-10-23; P06_108 re-fitted, 0.163 / 0.180) shows the
+  source's pose, skin and lighting with softer texture, blur where fingers
+  cross an object, and flicker 25% above the source's. Rung 4 waits for the
   user.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
