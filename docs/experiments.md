@@ -11314,3 +11314,43 @@ and each object's representation is judged on both:
     scaled fits use the shortest checkpoint fraction that is below that
     envelope on both metrics; if none is, the curve's trend decides
     whether 30 minutes can, and if it cannot, the step stops as a fail.
+- Prepare-fit: `20261022T190503Z-2b3ca9b5` (CPU, `c829076`), the 6 windows'
+  12 units, every fitted frame; all 37 of `k6b validate`'s checks pass
+  locally (`published.tar` `99cb6bc2…40b1`).
+- Smoke and pilot fit: `20261023T061758Z-c0316a7d` (gpu6, RTX 6000 Ada,
+  shared; `c829076`), `alcaraz_hurkacz/036` frames 0–179 (360 crops, both
+  players). The smoke (200 optimizer steps) passes the fleet validator:
+  loss 0.219 → 0.173 and the decoded x₀'s MSE to the truth 0.0140 →
+  0.0112. Full: 2,689 optimizer steps in 30 minutes (checkpoints at 7.5,
+  15 and 30 minutes after 677, 1,256 and 2,689 steps), x₀ MSE 0.0140 →
+  0.0080, peak 12.0 GiB, attention on the flash kernel; 24.4 M adapter and
+  1.1 M pose-guider parameters. All 9 of `k6b_fit validate`'s checks pass
+  locally.
+- Pilot render: `20261023T065337Z-b411c095` (gpu5, Ada; `2400b01`):
+  `original` and the three checkpoints merged (128 adapter layers each),
+  both players, t = 180–239, 2.5 s per frame; all 42 of `k6b_generate
+  validate`'s checks pass locally. Pilot judge: `20261023T072106Z-2043b488`
+  (gpu6, Ada; `2400b01`), 20 held-out judged frames; all 19 checks pass
+  locally (`warp` and `ref` reproduce K6 on them). Curve
+  (`k6b fit-report`, `k6b-fit-pilot.json` `dc07cb15…4a05`; envelope from
+  K6's anchors on the same frames, at 1.94 kbps):
+
+  | on t = 180–239 | LPIPS / envelope | DISTS / envelope |
+  |---|---:|---:|
+  | `original`, unfitted | 0.282 / 0.306 | 0.256 / 0.262 |
+  | fit, 7.5 min (25%) | 0.241 / 0.306 | 0.227 / 0.262 |
+  | fit, 15 min (50%) | 0.237 / 0.306 | 0.223 / 0.262 |
+  | fit, 30 min (100%) | 0.245 / 0.306 | 0.219 / 0.262 |
+  | `warp` (bound) | 0.085 | 0.094 |
+  | `ref` | 0.448 | 0.288 |
+
+  The fit helps (−0.04 LPIPS, −0.03 DISTS against unfitted on held-out
+  frames) and saturates within 7.5 minutes. Every checkpoint is under the
+  held-out envelope, but so is the unfitted model on these frames (the
+  window as a whole was lost in step 2 by 0.011 LPIPS), so the pilot shows
+  the fit's gain, not a margin. By the rule, **the scaled fits run at the
+  shortest reaching fraction: 7.5 minutes per window**, on all of the
+  window's frames (the oracle form). Projected: about 35 minutes per window
+  (fit 11 with loading, rendering both players 20, judging 3) plus each
+  job's smoke, about 4 GPU-hours for 6; with the 1.05 spent, about 5 of the
+  6 approved.
