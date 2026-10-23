@@ -35,3 +35,20 @@ def test_log_time_fit_and_extrapolation() -> None:
 def test_decision_names_the_pilot_horizon() -> None:
     assert k6bh3.HULL_MINUTES == 45.0 and k6bh3.JUDGED == (0.25, 0.5, 1.0)
     assert "45 min" in k6bh3.DECISION["pilot"]
+
+
+def test_look_frames_are_evenly_spaced_and_content_blind() -> None:
+    hand = list(range(10, 250))
+    looks = k6bh3.look_frames(hand)
+    assert len(looks) == k6bh3.LOOKS and looks == sorted(looks)
+    assert looks[0] > hand[0] and looks[-1] < hand[-1]  # the ends are left out
+    assert k6bh3.look_frames([3, 7]) == [3, 7] and k6bh3.look_frames([]) == []
+
+
+def test_flicker_reads_luma_changes_inside_r() -> None:
+    frames = np.zeros((3, 4, 4, 3))
+    frames[1] += 10.0  # a jump of 10 in luma between frames 0 and 1, none between 1 and 2
+    frames[2] += 10.0
+    regions = [np.ones((4, 4), bool)] * 3
+    assert k6bh3.flicker(lambda t: frames[t], regions, [0, 1, 2]) == pytest.approx(5.0)
+    assert np.isnan(k6bh3.flicker(lambda t: frames[t], regions, [0]))

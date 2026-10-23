@@ -99,6 +99,30 @@ def minutes_to_reach(seconds: list[float], values: list[float], target: float) -
     return float(np.exp((target - a) / b) / 60)
 
 
+LUMA = np.array([0.299, 0.587, 0.114])
+LOOKS = 5  # frames saved for the visual check
+
+
+def look_frames(hand: list[int], count: int = LOOKS) -> list[int]:
+    """Evenly spaced hand frames for the visual check (content-blind: by position only)."""
+    if not hand:
+        return []
+    picks = np.linspace(0, len(hand) - 1, min(count, len(hand)) + 2)[1:-1] if len(hand) > count else np.arange(len(hand))
+    return sorted({int(hand[int(round(i))]) for i in picks})
+
+
+def flicker(composite: Any, regions: list[np.ndarray], hand: list[int]) -> float:
+    """Rung 2's flicker: the mean absolute luma change inside R between consecutive frames (``composite(t)`` gives frame
+    t), over the hand frames whose previous frame has R too."""
+    values = []
+    for t in hand:
+        if t == 0 or not regions[t - 1].any():
+            continue
+        r = regions[t]
+        values.append(float(np.abs(composite(t)[r] @ LUMA - composite(t - 1)[r] @ LUMA).mean()))
+    return float(np.mean(values)) if values else float("nan")
+
+
 # ----------------------------------------------------------------- fitting (GPU)
 
 
@@ -328,10 +352,29 @@ def judge(fh: k6bh.FoundHand, nets: dict[str, Any], rows: dict[str, np.ndarray],
     hand = np.array(score.hand, int)
     pixels = np.array([int(r.sum()) for r in regions], np.int64)
     std = [float(np.std(c)) for c in crops.values()]
-    return {"lpips": s["lpips"], "dists": s["dists"], "sse": s["sse"], "covered": covered, "pixels_r": pixels,
+    return {"lpips": s["lpips"], "dists": s["dists"], "sse": s["sse"], "covered": covered, "pixels_r": pixels, "out": out,
+            "score": score, "regions": regions,
             "summary": {"lpips_r": float(np.nanmean(s["lpips"][hand])), "dists_r": float(np.nanmean(s["dists"][hand])),
+                        "flicker": flicker(lambda t: score.composite(out, t, False), regions, score.hand),
+                        "flicker_source": flicker(lambda t: np.asarray(truth[t]), regions, score.hand),
                         "covered_share": float(covered[hand].sum() / max(1, pixels[hand].sum())), "hand_frames": int(len(hand)),
                         "crops": len(crops), "generated_std_min": min(std) if std else None, "render_seconds": round(render_seconds, 2)}}
+
+
+def save_looks(publish: Path, item_id: str, truth: Any, gen: Any, warp: Any, regions: list[np.ndarray], hand: list[int]) -> list[int]:
+    """The visual check: at evenly spaced hand frames, source | fitted gen | K1f's warp around R (+-64 px), as PNGs."""
+    import cv2
+
+    looks = look_frames(hand)
+    folder = publish / "frames"
+    folder.mkdir(parents=True, exist_ok=True)
+    height, width = regions[0].shape
+    for t in looks:
+        ys, xs = np.nonzero(regions[t])
+        box = (slice(max(0, ys.min() - 64), min(height, ys.max() + 65)), slice(max(0, xs.min() - 64), min(width, xs.max() + 65)))
+        strip = np.concatenate([np.asarray(truth[t])[box], np.asarray(gen[t])[box], np.asarray(warp[t])[box]], 1)
+        cv2.imwrite(str(folder / f"{item_id}-f{t:03d}-source-gen-warp.png"), cv2.cvtColor(strip, cv2.COLOR_RGB2BGR))
+    return looks
 
 
 # ----------------------------------------------------------------- run (GPU)
@@ -368,6 +411,7 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     marks = list(FRACTIONS) if pilot else [0.0, 1.0]
     curve: list[dict[str, Any]] = []
     arrays: dict[str, np.ndarray] = {}
+    last: dict[str, Any] = {}  # the latest judgement: its frames, for the visual check
 
     def on_mark(fraction: float, steps: int, trained: float) -> None:
         point: dict[str, Any] = {"fraction": fraction, "steps": steps, "trained_seconds": round(trained, 2),
@@ -375,6 +419,8 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
         if (pilot and fraction in JUDGED) or fraction == 1.0:
             j = judge(fh, nets, rows, truth, clip, fit_frames, eval_frames, seed, work, device)
             point.update(j["summary"])
+            last.clear()
+            last.update(j)
             key = f"gen_{int(round(100 * fraction)):03d}"
             for k in ("lpips", "dists", "sse", "covered"):
                 arrays[f"{key}_{k}_r"] = j[k]
@@ -382,8 +428,10 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
         curve.append(point)
 
     trace = fit(fitter, nets["diffusion"], float(args.fit_seconds), marks, on_mark, probe)
-    summary: dict[str, Any] = {"gen": {k: curve[-1][k] for k in ("lpips_r", "dists_r", "covered_share")}}
-    if not pilot and frames == int(meta_k["frames"]):  # K1f's bound, the check
+    summary: dict[str, Any] = {"gen": {k: curve[-1][k] for k in ("lpips_r", "dists_r", "covered_share", "flicker")},
+                               "source": {"flicker": curve[-1]["flicker_source"]}}
+    looks: list[int] = []
+    if not pilot:  # K1f's bound (the check, at its 240 frames) and the visual check's frames
         warp = np.lib.format.open_memmap(work / "warp.npy", mode="w+", dtype=np.uint8, shape=truth.shape)
         rows_at: dict[int, list[int]] = {}
         for i, t in enumerate(rows["t"]):
@@ -403,10 +451,12 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
         hand = np.array(score.hand, int)
         summary["warp"] = {"lpips_r": float(np.nanmean(s["lpips"][hand])), "dists_r": float(np.nanmean(s["dists"][hand]))}
         arrays["warp_lpips_r"], arrays["warp_dists_r"] = s["lpips"], s["dists"]
+        summary["warp"]["flicker"] = flicker(lambda t: score.composite(warp, t, False), regions, score.hand)
+        looks = save_looks(publish, item["id"], truth, last["out"], warp, last["regions"], last["score"].hand)
     arrays["loss_trace"] = np.array(trace["trace"], float).reshape(-1, 2)
     meta = {"unit": item["id"], "item": item["id"], "video": item["video"], "mode": args.mode, "frames": frames,
             "fit_frames": [fit_frames.start, fit_frames.stop], "eval_frames": [eval_frames.start, eval_frames.stop],
-            "crops": len(crops), "fit_seconds": float(args.fit_seconds), "steps": trace["steps"],
+            "crops": len(crops), "fit_seconds": float(args.fit_seconds), "look_frames": looks, "steps": trace["steps"],
             "trained_seconds": round(trace["trained_seconds"], 2), "fixed_loss": trace["fixed"], "curve": curve, "summary": summary,
             "k1f": {"kbps": float(meta_k["cover"]["kbps"]) if meta_k.get("cover") else k1c.POSE_KBPS, "warp": meta_k["summary"]["warp"],
                     "frames": int(meta_k["frames"]), "npz_hash_ok": bool(meta_k["npz_hash_ok"])},
@@ -499,9 +549,19 @@ def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
         if m["mode"] == "pilot":
             checks[f"{item}:curve_points"] = [p["fraction"] for p in judged] == list(JUDGED)
             checks[f"{item}:held_out"] = m["fit_frames"][1] <= m["eval_frames"][0]
-        elif settings["frames"] == m["k1f"]["frames"]:
+        else:
+            checks[f"{item}:looks_saved"] = len(m.get("look_frames", [])) > 0 and saved_looks(stage, item) == len(m["look_frames"])
+            checks[f"{item}:flicker"] = bool(np.isfinite(m["summary"]["gen"]["flicker"]) and np.isfinite(m["summary"]["source"]["flicker"]))
+        if m["mode"] == "fit" and settings["frames"] == m["k1f"]["frames"]:
             checks[f"{item}:warp_reproduces_k1f"] = abs(m["summary"]["warp"]["lpips_r"] - m["k1f"]["warp"]["lpips_r"]) <= k6bh.WARP_TOLERANCE
     return checks
+
+
+def saved_looks(stage: Path, item: str) -> int:
+    import tarfile
+
+    with tarfile.open(stage / "published.tar") as tar:
+        return sum(1 for n in tar.getnames() if n.startswith(f"publish/frames/{item}-f") and n.endswith(".png"))
 
 
 def command_validate(args: argparse.Namespace) -> int:
