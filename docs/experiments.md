@@ -12884,3 +12884,25 @@ and each object's representation is judged on both:
     little on 033 (2 training windows) and their 0.97 MB guider raises the
     bar. Render-time variants of C submitted: 4 bits (from the fp16
     checkpoint) and guidance 2.0, on both windows.
+  - Render-time variants of C (renders `20261023T213704Z-20255857`,
+    `…213714Z-d0fde23f` at 4 bits; `…213721Z-d2107908`,
+    `…213730Z-5bb220ed` at guidance 2.0; judge `…220810Z-042508fa`,
+    `1bfd7fc3…9157`, 25 checks). 4 bits bills 1,491,392 and 1,495,592
+    bytes (guider change 0.42 MB), 1.66 kbps over 2 h.
+
+    | variant | 008 LPIPS | 008 DISTS | 033 LPIPS / env | 033 DISTS / env | won | margin |
+    |---|---:|---:|---:|---:|---:|---:|
+    | C | **0.2246** | **0.1333** | 0.2223 / 0.219 | 0.2263 / 0.223 | 2 | 0.159 |
+    | C, 4 bits | **0.2246** | **0.1335** | **0.2220** / 0.225 | 0.2262 / 0.226 | 3 | 0.185 |
+    | C, guidance 2.0 | **0.2264** | **0.1372** | **0.2155** / 0.219 | 0.2246 / 0.223 | 3 | 0.163 |
+
+    By the rule, **4 bits** (within 0.0004 of 8 bits on every cell) and
+    **guidance 2.0** (3 won against 2). The two were chosen apart; their
+    combination is first rendered in the scaled run. Development report
+    `k6b-report-step5-dev.json`. Budget so far 6.98 GPU-hours.
+  - Scaled run: `gen-match5` = C, 4 bits, guidance 2.0. `djokovic_zverev`
+    reuses `dz-C` (the same data, recipe and exclusions as a new fit);
+    fits for `djokovic_federer`, `alcaraz_hurkacz` and `rublev` submitted.
+    It projects to about 10.6 GPU-hours; the per-player Djokovic variant
+    (a fit and 3 renders, about 1.6 more) would pass the ceiling, so it
+    waits for the user.
