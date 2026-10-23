@@ -598,8 +598,13 @@ objects (the tennis ball).
   Rublev close-up. The fit saw the frames it is judged on, and its
   reference, matte and LoRA are unbilled, so it bounds a match fit. 4.8
   GPU-hours of the 6 approved. Next: step 4 (a fit on other shots of the
-  same match, billed and amortized); outlined, its rule waits for the
-  user.
+  same match, billed and amortized). **Its rule is written (2026-10-23,
+  experiments.md "K6b (players) 4")**: one LoRA per match on up to 6 of
+  K4b.1's other windows, the pose guider frozen, 8-bit adapter bytes
+  billed over H = 2 hours (an assumption: the archive holds scene clips),
+  a pilot over ranks {64, 16, 4} on `djokovic_federer`, ceiling 7
+  GPU-hours. Size decides: step 3's adapter would cost 54 kbps over 2 h.
+  Waits for the user's approval.
   Training discipline for steps 3 and 4: a correctness smoke in minutes;
   then a learning-curve pilot on held-out frames at fixed fractions of the
   step budget; the scaled fit only if that curve, extrapolated, can reach

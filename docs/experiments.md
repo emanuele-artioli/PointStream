@@ -11411,16 +11411,100 @@ and each object's representation is judged on both:
 - Budget: 4.8 GPU-hours of stage time (smokes, pilot fit, render and
   judge, 6 fits, 6 renders, 2 judges), within the 6 approved.
 
-### 2026-10-23 — K6b (players) 4: match fit (outline, not run)
-- Question. Does a renderer fitted on *other* shots of the same match beat
-  K6's envelope on K6's windows once its cost is paid? Step 3 bounds it;
-  this is the buildable form (PLAN K6b step 4; G5b's payback).
-- Sketch, for the user to approve before a rule is fixed. Per match, one
-  LoRA fitted on K4b.1's other windows of that match (its 48 windows cover
-  K6's 5 matches; K6's own windows held out), with step 3's recipe and a
-  learning-curve pilot on one match first. Judged as steps 2 and 3. Billed:
-  the LoRA's bytes (about 49 MB in fp16, or less if quantized) amortized
-  over the match's hours, with payback hours reported as G5b; the
-  reference stays granted. Needs K4b.1's windows' poses (published) and
-  their frames. Budget: about 1 GPU-hour per match (fit and render), 5–6
-  GPU-hours with judging; to be fixed with the rule.
+### 2026-10-23 — K6b (players) 4: match fit, billed (rule, not run)
+- Question (PLAN K6b step 4, user 2026-10-23). Step 3's renderer saw the
+  frames it is judged on. Does one fitted on *other* shots of the same
+  match beat K6's envelope on K6's windows, once its bytes are paid?
+- Why size decides. Step 3's adapter is 24.4 M parameters: about 49 MB in
+  fp16, 390 Mbit. Over a 2-hour match that is 54 kbps, against a keypoint
+  stream of 2–3 kbps and envelope rates of 3–20 kbps at the qualities step
+  3 reached. Even at 8 bits it is 27 kbps. To pay back within a match the
+  adapter must be a few MB, so rank and quantization are part of the test.
+- Matches and windows. The 4 matches of step 3's 6 windows:
+  `djokovic_federer` (judged 038, 072), `djokovic_zverev` (012),
+  `alcaraz_hurkacz` (036, 045), `rublev_auger-aliassime` (052).
+  `medvedev_struff` has no judged window and is left out.
+  - Training: K4b.1's other windows of the match (K6's `inputs.tar`), every
+    one from a different clip than the judged windows, so other shots. Up
+    to 6 per match, those with at least 120 registered frames, in sorted
+    id order:
+    `alcaraz_hurkacz` 002, 006, 011 (3); `djokovic_federer` 015@85,
+    015@211, 033, 057, 069, 077 (6); `djokovic_zverev` 000@814, 000@1532,
+    000@2006, 002, 004, 006@1257 (6); `rublev_auger-aliassime` 000, 002,
+    004, 021, 024, 027 (6). Only court-view frames (K8b-registered), as K6
+    scores.
+  - Their players and uncoded poses are not published (K6 ran only K4's
+    windows), so a GPU job computes them with K6's code unchanged
+    (`window_players`, `pose_window`: (c)+(d), YOLO11x-pose with ×1 crops
+    under 15% height), then step 3's crops and DWPose maps.
+  - The judged windows' own frames are never used for fitting.
+- Model and billing.
+  - `original` plus one LoRA per match on both UNets' attention (step 3's
+    targets and recipe). The pose guider is frozen: it is a further 1.1 M
+    parameters to send, and step 3 did not isolate what it gave.
+  - Billed bytes: the adapter quantized to 8 bits per output channel (fp16
+    scales; G5c's `quantize_channels`), LZMA-coded (G5c's coder). The
+    rendering uses the dequantized adapter, so what is judged is what is
+    billed. The reference crop stays granted, as in steps 2 and 3.
+  - Amortization: the bits over **H = 2 hours** of the match (a short
+    best-of-three; the archive holds scene clips, not whole matches, so H
+    is an assumption, and the user may set it). A window's billed rate is
+    its keypoint rate plus bits / H. Payback hours are reported per window:
+    the bits over the rate saved at equal LPIPS, as G5b.
+- Pilot (development, not scored): `djokovic_federer`, the match with the
+  most training windows and two judged windows that step 3 won.
+  - Three ranks, the fewest that bracket the answer: 64 (step 3's, about
+    24 MB at 8 bits), 16 (about 6 MB) and 4 (about 1.5 MB; billed 1.7
+    kbps over 2 h).
+  - Each fitted for 20 minutes, with checkpoints at 50% and 100% (more
+    data than step 3's 480 frames: about 2,900 crops).
+  - Rendered on frames 180–239 of 038 and 072 (both players) and judged
+    there against K6's envelope from its anchors' per-frame scores
+    (`k6b fit-report`), at the billed rate.
+  - The scaled run uses the configuration with the best billed result on
+    the pilot (both metrics won on both segments; ties to the smaller
+    rank, then the shorter fit). If none wins both metrics on both
+    segments billed, the pilot's best goes ahead only if it wins them
+    unbilled, and the outcome is read with that caveat.
+- Decision rule (fixed now; the user's criterion). On the 6 judged windows
+  (whole windows, K6's judges and judged frames, `warp` and `ref`
+  reproduced as before), a window is won on a metric when `gen-match`'s
+  value is below K6's envelope at the window's **billed** rate. Score =
+  mean over {LPIPS, DISTS} of the share won.
+  - **Pass** (≥ 75%): per-match player models pay for themselves within
+    a match. K6c's route is open; next is the reference billed too.
+  - **To the user**: < 75% billed but ≥ 75% at the unbilled rate. The
+    models work but cost too much at H = 2 h; the options are a smaller
+    model, a longer amortization (a per-player model across matches), or
+    the H the user sets.
+  - **Fail**: < 75% unbilled. A match fit does not reach the envelope, so
+    the generative route for players closes at the keypoint rate, and
+    step 3's pass was memorization of the judged frames.
+- Hypothesis. Unbilled, the match fit lands between steps 2 and 3 (about
+  half of step 3's gain) and scores about 75%. Billed, rank 4 costs under
+  2 kbps and keeps most of rank 64's quality, so the billed score is about
+  the unbilled one. Payback is under an hour on the Djokovic windows.
+- Competing explanations. (1) Step 3's gain was the judged frames
+  themselves (lighting, the exact shirt in this rally), which other shots
+  do not carry; then the match fit is no better than step 2. (2) The
+  training windows include other people picked as players or close-ups;
+  their crops would add noise. The share of training crops whose player
+  height is outside the judged windows' range is reported. (3) 8-bit
+  quantization costs quality; the pilot's rank-64 arm is also rendered
+  unquantized, as a check.
+- Budget (ceiling **7 GPU-hours**, Ada, one job per GPU, every stage ≤ 45
+  minutes and checkpointed):
+  - Training data, about 0.5: one GPU job per match (YOLO, SAM masks read
+    from K6's inputs), 3–6 windows each.
+  - Pilot, about 2.5: 3 fits of 20 minutes (with loading, about 1.2), 7
+    renders of 240 frames each (6 checkpoints and the unquantized check;
+    1,680 frames at 2.5 s, about 1.2), one judge (0.1).
+  - Scaled, about 3.3: 3 more match fits at the chosen setting (about 1.3
+    with loading and smokes; the pilot match's fit is reused) and the 6
+    judged windows rendered in full (2,449 frames, about 1.7), plus 2
+    judges (0.3).
+  - Code (CPU, before any job): the training-data job, 8-bit adapter
+    coding and its billed size, the frozen pose guider, and the billed
+    rate in `k6b report`. Tests for the quantization round trip and the
+    billing.
+- **Waits for the user's approval** (and, if wanted, a different H).
