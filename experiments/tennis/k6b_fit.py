@@ -379,17 +379,19 @@ def command_fit(args: argparse.Namespace) -> int:
     torch.manual_seed(seed)
     trainer = Trainer(weights, device, scratch, args.rank, args.freeze_guider, base_state)
     # Every training frame encoded once: latent mean/std, CLIP embedding, pose map (as the dataset's ToTensor).
+    # Pose maps stay uint8 in host memory (step 5's base holds about 9,000 crops) and the true images are read back
+    # only for the probe's four frames.
     data = []
-    images_kept: dict[str, np.ndarray] = {}
     for name in units:
         a = np.load(unit_path[name])
         keep = a["t"] < args.max_t if args.max_t else np.ones(len(a["t"]), bool)
+        if args.frame_stride > 1:  # step 5's base: every n-th frame (neighbours are near copies), for the 45-minute stage
+            keep &= np.arange(len(keep)) % args.frame_stride == 0
         if keep.sum() < 2:
             continue
         mean, std, clip = trainer.encode(a["image"][keep])
-        pose = torch.from_numpy(a["pose"][keep]).permute(0, 3, 1, 2).float().div(255)
-        data.append({"unit": name, "t": a["t"][keep], "mean": mean, "std": std, "clip": clip, "pose": pose})
-        images_kept[name] = a["image"][keep]
+        pose = torch.from_numpy(np.ascontiguousarray(a["pose"][keep])).permute(0, 3, 1, 2)
+        data.append({"unit": name, "t": a["t"][keep], "rows": np.nonzero(keep)[0], "mean": mean, "std": std, "clip": clip, "pose": pose})
     frames = sum(len(d["t"]) for d in data)
 
     def batch(gen: random.Random) -> tuple[Any, ...]:
@@ -397,12 +399,13 @@ def command_fit(args: argparse.Namespace) -> int:
         i, r = gen.randrange(len(d["t"])), gen.randrange(len(d["t"]))
         lat = (d["mean"][i:i + 1] + d["std"][i:i + 1] * torch.randn_like(d["mean"][i:i + 1])) * 0.18215
         ref = (d["mean"][r:r + 1] + d["std"][r:r + 1] * torch.randn_like(d["mean"][r:r + 1])) * 0.18215
-        return lat.unsqueeze(2), ref, d["clip"][r:r + 1], d["pose"][i:i + 1].to(device).unsqueeze(2), d, i
+        return lat.unsqueeze(2), ref, d["clip"][r:r + 1], d["pose"][i:i + 1].to(device).float().div(255).unsqueeze(2), d, i
 
     # The smoke's check, before and after: x0 at PROBE_T with fixed noise on 4 fixed training frames, against the truth.
     probe_gen = random.Random(1)
     probe = [batch(probe_gen) for _ in range(4)]
     probe_noise = [torch.randn_like(p[0]) for p in probe]
+    truths = {(p[4]["unit"], p[5]): np.load(unit_path[p[4]["unit"]])["image"][p[4]["rows"][p[5]]] for p in probe}
 
     def probe_error() -> float:
         errs = []
@@ -413,7 +416,7 @@ def command_fit(args: argparse.Namespace) -> int:
                 noisy = trainer.scheduler.add_noise(lat, noise, t)
                 x0 = trainer.x0(pred, noisy, t)[:, :, 0] / 0.18215
                 image = trainer.vae.decode(x0.float()).sample.clamp(-1, 1)
-                truth = torch.from_numpy(images_kept[d["unit"]][i]).to(device).permute(2, 0, 1)[None].float() / 127.5 - 1.0
+                truth = torch.from_numpy(truths[(d["unit"], i)]).to(device).permute(2, 0, 1)[None].float() / 127.5 - 1.0
                 errs.append(float(((image - truth) ** 2).mean()))
         return float(np.mean(errs))
 
@@ -480,7 +483,7 @@ def command_fit(args: argparse.Namespace) -> int:
         "command": "fit", "stage": os.environ.get("PS_STAGE"), "window": args.window, "match": ",".join(args.match),
         "name": args.window_name, "all": args.all, "excluded": args.exclude_window, "windows": windows_used,
         "base": {"member": args.base, "sha256": sha256(base_path)} if args.base else None, "units": [d["unit"] for d in data],
-        "frames": frames, "max_t": args.max_t, "minutes": args.minutes, "max_steps": args.max_steps, "optimizer_steps": step,
+        "frames": frames, "frame_stride": args.frame_stride, "max_t": args.max_t, "minutes": args.minutes, "max_steps": args.max_steps, "optimizer_steps": step,
         "micro_steps": micro, "checkpoints": saved, "loss_first_tenth": float(np.mean(losses[:window])) if losses else None,
         "loss_last_tenth": float(np.mean(losses[-window:])) if losses else None, "loss_curve": [float(np.mean(losses[i:i + 200])) for i in range(0, len(losses), 200)],
         "probe_mse_before": error_before, "probe_mse_after": error_after, "model": trainer.record, "kernels": kernels,
@@ -543,6 +546,7 @@ def main(argv: list[str] | None = None) -> int:
     fit.add_argument("--minutes", type=float, required=True)
     fit.add_argument("--fractions", default="0.25,0.5,1")
     fit.add_argument("--max-t", type=int, default=0, help="train on frames t < this (0: all)")
+    fit.add_argument("--frame-stride", type=int, default=1, help="step 5's base: train on every n-th frame of each unit")
     fit.add_argument("--max-steps", type=int, default=0, help="the smoke: stop after this many optimizer steps")
     fit.add_argument("--gpu-class", default="RTX")
     val = sub.add_parser("validate")
