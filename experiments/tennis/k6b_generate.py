@@ -207,7 +207,15 @@ def command_generate(args: argparse.Namespace) -> int:
         names = [n for n in names if n in args.units.split(",")]
     names = names[:args.max_units or None]
     profiles = args.profiles.split(",")
-    fits = {name: Path(path) for name, path in args.fit}
+    if args.fit_archive:  # k6b_fit's published.tar: --fit names its members (placeholders must be whole arguments)
+        fit_root = scratch / "fit-archive"
+        if not fit_root.is_dir():
+            fit_root.mkdir(parents=True)
+            with tarfile.open(args.fit_archive) as archive:
+                archive.extractall(fit_root, filter="data")
+        fits = {name: fit_root / "publish" / member for name, member in args.fit}
+    else:
+        fits = {name: Path(path) for name, path in args.fit}
     profiles += [name for name in fits if name not in profiles]
     device = "cuda"
     limit = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "24000"))
@@ -323,6 +331,7 @@ def main(argv: list[str] | None = None) -> int:
     gen.add_argument("--steps", type=int, default=30, help="DDIM steps (pose2vid.py's default: 30)")
     gen.add_argument("--fit", action="append", nargs=2, default=[], metavar=("PROFILE", "CHECKPOINT"),
                      help="render a profile named PROFILE: `original` with k6b_fit's checkpoint merged")
+    gen.add_argument("--fit-archive", default="", help="k6b_fit's published.tar; --fit then names a member of its publish/")
     gen.add_argument("--from-t", type=int, default=0, help="render only frames from here (step 3's held-out frames)")
     gen.add_argument("--gpu-class", default="RTX")
     val = sub.add_parser("validate")
