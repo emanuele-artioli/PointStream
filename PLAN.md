@@ -49,9 +49,12 @@ sessions update their own items and experiments.md entries
   (2026-10-23, user approved): FoundHand fitted 20 min on the window's
   own frames, weights unbilled, **passes at 83%** (LPIPS 2 of 3, DISTS
   3 of 3; 75% clean of G, at the bar; margins 0.006–0.010 on the hard
-  items). Like every hand result so far it grants R as the matte, which
-  the decoder does not have (H3b2: 72–170 kbps to send). The next gate is
-  a matte the decoder derives itself (below), before rung 4.
+  items). Rung 4 (2026-10-23, user's rule: the fit moved to other shots
+  of the video, delivered beforehand) **fails, 25%** (0% clean of G):
+  none of rung 3's gain transfers, and it lands on rung 2's zero-shot.
+  **Hands close on fidelity at the keypoint rate**; K1f's bound stays a
+  bound. Every hand result also granted R, which the decoder does not
+  have (H3b2: 72–170 kbps).
 
 - **Egocentric pipeline (H5):** runs end to end on the 4 pilot items
   (`src/pointstream/`, `experiments/visor/h5.py`). Against fairly
@@ -124,24 +127,14 @@ stops; the root session fills in the outcome and the next step.
 | H5p 4c | key carrier for F (user's request) | `claude/h5p-f-stream` @ `41c37c8` | Opus | reported 2026-10-22: fail at the gate (+1%, 1 of 4; P09_106 −30%); 1.38 GPU-hours of 3 |
 | K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` @ `505f5a7` | Opus | reported 2026-10-22: fail (12.5%; free bank 25%); 2.6 GPU-hours of 3.5 |
 | K6b hands 3 | overfit oracle (user approved) | `claude/k6b-hand-bank` @ `3059660` | Opus | reported 2026-10-23: pass (83%; 75% clean of G), R granted; visual check on P06_108 supports it (flicker 18.0 against the source's 14.4); 3.1 GPU-hours of 4 |
-| K6b hands 3m | rung 3 with a decoder-side matte; visual check, flicker | — | Opus | proposed 2026-10-23 |
+| K6b hands 4 | the fit moved to other shots (user's rule) | `claude/k6b-hand-bank` @ `fd83eb7` | Opus | reported 2026-10-23: fail (25%; 0% clean of G); 1.3 GPU-hours of 3 |
+| K6b hands 3m | rung 3 with a decoder-side matte | — | Opus | withdrawn 2026-10-23: rung 4 failed with the matte granted |
 | K6b players 3 | overfit oracle (user approved) | `claude/k6b-players-zeroshot` @ `03a3df8` | Opus | reported 2026-10-23: pass (83%), matte and LoRA unbilled; 4.8 GPU-hours of 6 |
 | K6m | the players' matte on tennis (rate and decoder-side) | — | Sonnet | proposed 2026-10-23 |
 
 **Proposed next items (root session, 2026-10-23; each writes its rule
 before its run).**
-- *K6b hands 3m: the matte gate.* Every hand win (K1f's bound, the
-  banks, rung 3) grants R, the dataset's outline, which the decoder does
-  not have: sending it costs 72–170 kbps (H3b2), against keypoints at
-  about 2 kbps. Re-fit rung 3 on its 3 items with the rendered frames
-  kept, and composite with a matte the decoder derives itself (the coded
-  keypoints' MANO silhouette dilated as H3e V1, or the generator's own
-  drawn hand), the rest of R charged as coded pixels at the item's rate.
-  It bounds rung 4 (fit in-window, matte decoder-side): if it fails,
-  rung 4 is not run. The same frames give J's time check. P06_108's
-  re-fit with frames kept already exists (job `20261023T062736Z-14fa0c21`,
-  `published.tar` `9101f00b…e4`, reproduces the scored fit): reuse it.
-  About 1 GPU-hour.
+- *K6b hands 3m:* withdrawn (rung 4 failed even with R granted).
 - *K6m: the players' matte.* K6 and K6b step 2 grant R as the matte
   too. CPU first: the rate of the players' masks on K6's 8 windows with
   H5p's coders (lzma at s = 8, the key carrier of H5p 4c), against the
