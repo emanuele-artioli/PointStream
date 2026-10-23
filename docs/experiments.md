@@ -11536,7 +11536,7 @@ and each object's representation is judged on both:
   checkpoints and the unquantized check), `…110013Z-cbcaaa91` (16),
   `…110020Z-c1725982` (4), all pass `k6b_generate validate`; judge
   `20261023T115041Z-68286c57` (`59f0acb`; `published.tar` `8ec0bc00…8334`), 45 checks
-  locally, `warp` and `ref` reproducing K6. Curve (`k6b-pilot4.json`;
+  locally, `warp` and `ref` reproducing K6. Curve (`k6b-pilot4.json`, `b572114a…8df3`;
   frames 180–239 of 038 and 072, 20 judged frames each; envelope from
   K6's anchors on those frames at the billed rate):
 
