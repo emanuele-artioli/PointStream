@@ -12911,3 +12911,62 @@ and each object's representation is judged on both:
     gpu1; inspected, it was never published (no specification or ready
     record), so no worker can run it. It is left in place, and the render
     is a new request (`20261023T221822Z-70715001`).
+  - Scaled fits (C; code `45b9b90`): `djokovic_federer`
+    `20261023T221639Z-aec779fe` (7 windows, 3,360 crops, 617 steps),
+    `alcaraz_hurkacz` `…221650Z-3d7cbe2f` (3, 1,440, 716), `rublev`
+    `…221700Z-502a4298` (13, 6,166, 600; probe 0.0132 → 0.0131, the
+    smallest move); `djokovic_zverev` reuses `dz-C`. Each passes `k6b_fit
+    validate`. Renders (`match5`: the fp16 checkpoint quantized to 4 bits
+    as billed, guidance 2.0, the base merged), each passing `k6b_generate
+    validate`: 038 `20261023T223743Z-69111776` (`5a99b977…6515`), 072
+    `…223751Z-7c51a9ee` (`29dc6cb3…05b1`), 012 `…221822Z-70715001`
+    (`ad26e1a2…8a4c`), 036 `…223535Z-e9d7c710` (`9fcf4bab…f7e2`), 045
+    `…223542Z-32a6e7dc` (`3a86468a…05c5`), 052 `…224225Z-3f7d4ed2`
+    (`66636952…cbd4`). Billed: 1,478,828 (`djokovic_federer`), 1,491,392,
+    1,488,252, 1,489,388 bytes, 1.64–1.66 kbps over 2 h. Judges
+    `20261023T231003Z-4fe6e239` (038, 052, 045; `4b57f935…9792`) and
+    `…232338Z-94c7a048` (072, 012, 036; `39277b5b…77ff`), 29 checks each,
+    `warp` and `ref` reproduced. Report `k6b report --step 5 --billing
+    k6b-step5-billing.json --hours 2` (`k6b-report-step5.json`,
+    `73f2929a…8b4f`); development report `k6b-report-step5-dev.json`
+    (`0457b86c…35e6`); receipts `k6b-step5-validation.tar`
+    (`65db4ec2…2c52`); all read-only in
+    `~/pointstream-data/tennis/k6b-2026-10-22/report/`.
+
+    | window | billed kbps | LPIPS / billed env | step 4 | DISTS / billed env | step 4 | payback h |
+    |---|---:|---:|---:|---:|---:|---:|
+    | djokovic_federer/038 | 4.38 | **0.196** / 0.219 | 0.197 | **0.190** / 0.208 | 0.184 | 0.52 |
+    | djokovic_federer/072 | 4.56 | **0.224** / 0.230 | 0.230 | **0.201** / 0.209 | 0.195 | 1.16 |
+    | djokovic_zverev/012 | 4.98 | **0.264** / 0.354 | 0.275 | **0.154** / 0.229 | 0.151 | 0.23 |
+    | alcaraz_hurkacz/036 | 3.59 | **0.234** / 0.261 | 0.245 | **0.216** / 0.235 | 0.219 | 0.82 |
+    | alcaraz_hurkacz/045 | 3.73 | 0.290 / 0.260 | 0.305 | 0.252 / 0.237 | 0.259 | – |
+    | rublev_auger-aliassime/052 | 11.46 | 0.366 / 0.234 | 0.344 | 0.184 / 0.156 | 0.171 | – |
+
+    Bold: won billed. `gen-match5` wins 4 of 6 on LPIPS and 4 of 6 on
+    DISTS, billed and unbilled alike (**score 67%**, both). K6's saving
+    statistic: mean −58%, 95% CI −267% to +69%, positive on 4 windows.
+- **Outcome: fails** by the rule (< 75% unbilled). Billing no longer costs
+  anything (4 bits and the guider at 1.66 kbps; 072's LPIPS, lost to
+  billing in step 4, is won), and LPIPS improves on five windows (by
+  0.001–0.015). But the two windows that step 4 lost stay lost on both
+  metrics: `alcaraz_hurkacz/045` improves (LPIPS 0.305 → 0.290, DISTS
+  0.259 → 0.252) and still misses by 0.015–0.030; `rublev/052` gets worse
+  (0.344 → 0.366, 0.171 → 0.184). DISTS is slightly worse than step 4 on
+  four windows (by 0.001–0.006), as guidance 2.0 was on
+  `djokovic_zverev/008`. Read as the rule says: the AnimateAnyone line
+  closes for players at the keypoint rate; the open route is a newer
+  generator (step 6, after an environment audit).
+- Against the hypothesis: 4 bits flipped 072 (as predicted); the tennis
+  base and more data helped where step 4 already won and on 045's
+  values, but did not win 045 (predicted: one metric) or 052's DISTS
+  (predicted: won with 2.2× data; it got worse). Competing explanation 1
+  (the losing windows are hard for this generator at any data) fits:
+  052 is judged on 32 frames at a cut, and its fit moved least (probe
+  −1%). Not separated: whether guidance 2.0 or the Rublev fit made 052
+  worse (the two were chosen apart on the development windows and first
+  combined here).
+- Per-player Djokovic variant: **not run**. It would have taken the step
+  past the ceiling (about 1.6 GPU-hours more), and it cannot change the
+  verdict: all three Djokovic windows are already won.
+- Budget: **10.02 GPU-hours** of 11 (37 jobs, smokes included, from the
+  jobs' execution records).

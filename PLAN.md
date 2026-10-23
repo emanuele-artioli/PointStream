@@ -648,8 +648,18 @@ objects (the tennis ball).
   `medvedev_struff/033`). Then 4-bit adapters and guidance 2.0 are tried
   at render time, and the 6 windows are judged billed by step 4's rule,
   beside a per-player Djokovic model billed over 20 hours. Ceiling 11
-  GPU-hours. Waits for the user's approval. Step 6 (outlined): a newer
-  generator (Wan-Animate), after an environment audit.
+  GPU-hours. Approved (user, 2026-10-23). **Step 5 (2026-10-24): fails.**
+  The rule chose arm C (the tennis base, all of the match's windows, the
+  guider trained) on the development windows, at 4 bits (no quality cost;
+  1.66 kbps over 2 h with the guider) and guidance 2.0. On the 6 windows
+  it wins 4 of 6 on LPIPS and 4 of 6 on DISTS, billed and unbilled alike
+  (67%): billing no longer costs a window, and LPIPS improves on five,
+  but `alcaraz_hurkacz/045` (closer) and the Rublev window (worse) stay
+  lost on both metrics. The AnimateAnyone line closes for players at the
+  keypoint rate. The per-player Djokovic variant was not run (it would
+  have passed the ceiling and could not change the verdict). 10.0
+  GPU-hours of 11. Next: step 6 (outlined), a newer generator
+  (Wan-Animate), after an environment audit; the user's call.
   Training discipline for steps 3 and 4: a correctness smoke in minutes;
   then a learning-curve pilot on held-out frames at fixed fractions of the
   step budget; the scaled fit only if that curve, extrapolated, can reach
