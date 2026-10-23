@@ -11560,3 +11560,65 @@ and each object's representation is judged on both:
   (training data 0.55, pilot fits 1.51, renders 1.34, judge 0.1); the
   scaled run projects to about 3.25 (3 fits about 0.95, the 6 windows
   rendered about 2.0, 2 judges 0.3), 6.8 in all.
+- Scaled fits (rank 4, 10 minutes, pose guider frozen, 8-bit; code
+  `c457eec`): `djokovic_zverev` `20261023T115551Z-85b5b82a` (922 optimizer
+  steps, 1,556,432 bytes), `alcaraz_hurkacz` `…115607Z-03161c27` (805,
+  1,551,640), `rublev_auger-aliassime` `…115626Z-bba5391b` (919,
+  1,558,868); `djokovic_federer` reuses the pilot's (1,553,200). Billed:
+  1.72–1.73 kbps over 2 h each. The first two and Rublev pass `k6b_fit
+  validate` locally. **`alcaraz_hurkacz` fails one check, `loss_falls`**
+  (first-tenth loss 0.195, last-tenth 0.196): the loss is logged at only
+  17 points, so each tenth is one sample. The curve falls to 0.183 mid-fit,
+  and the fixed-noise probe falls 19% (0.0096 → 0.0078; the others 10–13%).
+  Its renders went ahead without a refit, which would have exceeded the
+  ceiling; it has half the other matches' training crops (1,440).
+- Renders (whole windows, both players, the match's `-r4@fit-100.pt`, or
+  the pilot's `fit-50` for `djokovic_federer`; code `c457eec`), each
+  passing `k6b_generate validate` locally: 038 `20261023T115641Z-915f55b1`
+  (`9c64993b…0dec`), 072 `…115652Z-aac3ec71` (`8625d28f…34dc`), 052
+  `…121820Z-4e808d4e` (`a0e5fa98…d86a`), 012 `…121813Z-52941285`
+  (`14c472a9…3e93`), 045 `…123449Z-c778472c` (`5c73549e…82a8`), 036
+  `…123441Z-932422f6` (`7a759cd8…f113`). Judges (`c457eec`, Ada and A6000,
+  `--profiles match`): `20261023T132947Z-fb8a8581` (038, 052, 045;
+  `fca0ea2b…6c7c`) and `…132954Z-ec202dfb` (072, 012, 036;
+  `4578d620…ec56`), 29 checks each, locally. `warp` and `ref` reproduce
+  K6 (`reproduced: true`; `warp`'s LPIPS within 1e-4 on every window).
+  Report `k6b report --step 4 --billing k6b-step4-billing.json --hours 2`
+  (`k6b-report-step4.json`, `73a00639…405b`), with the pilot's curve and
+  billing and every stage's validation (`k6b-step4-validation.tar`,
+  `a7700f23…ceb8`), read-only in
+  `~/pointstream-data/tennis/k6b-2026-10-22/report/`.
+
+  | window | keypoint kbps | billed kbps | LPIPS env (billed) | match | step 3 | step 2 | DISTS env (billed) | match | step 3 | step 2 | payback h |
+  |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+  | djokovic_federer/038 | 2.74 | 4.47 | 0.244 (0.219) | **0.197** | 0.185 | 0.211 | 0.223 (0.208) | **0.184** | 0.183 | 0.189 | 0.57 |
+  | djokovic_federer/072 | 2.92 | 4.64 | 0.255 (0.229) | 0.230 | 0.230 | 0.252 | 0.224 (0.209) | **0.195** | 0.191 | 0.197 | 2.12 |
+  | djokovic_zverev/012 | 3.32 | 5.05 | 0.379 (0.353) | **0.275** | 0.257 | 0.275 | 0.252 (0.228) | **0.151** | 0.146 | 0.150 | 0.39 |
+  | alcaraz_hurkacz/036 | 1.94 | 3.66 | 0.280 (0.261) | **0.245** | 0.247 | 0.291 | 0.246 (0.235) | **0.219** | 0.219 | 0.250 | 1.13 |
+  | alcaraz_hurkacz/045 | 2.07 | 3.80 | 0.280 (0.259) | 0.305 | 0.283 | 0.338 | 0.249 (0.237) | 0.259 | 0.241 | 0.282 | – |
+  | rublev_auger-aliassime/052 | 9.80 | 11.53 | 0.243 (0.234) | 0.344 | 0.300 | 0.381 | 0.164 (0.156) | 0.171 | 0.152 | 0.188 | – |
+
+  Bold: won billed. Unbilled, `gen-match` wins 4 of 6 on LPIPS and 4 of 6
+  on DISTS (**score 67%**); billed, 3 of 6 and 4 of 6 (**58%**; 072's
+  LPIPS 0.230 sits between the unbilled 0.255 and the billed 0.229).
+  K6's saving statistic for `gen-match`: mean −36%, 95% CI −181% to +64%,
+  positive on 4 windows. The report's `finetune_unlisted` group is step
+  2's subset and does not apply here.
+- **Outcome: fails** by the rule (< 75% unbilled). Read as the rule says:
+  a fit on other shots of the same match does not reach the envelope on
+  K6's windows, and step 3's two extra windows (045 and 052 on DISTS)
+  came from fitting the judged frames. The match fit is not step 2 again,
+  though: it improves on zero-shot on every window but 012 (LPIPS equal,
+  DISTS 0.151 against 0.150), and recovers about 60% of step 3's gain over step 2 (mean
+  LPIPS 0.266 against 0.291 and 0.250; DISTS 0.197 against 0.209 and
+  0.189), as hypothesized. The hypothesis's score (about 75%) and its
+  billed claim hold in part: billing cost one window-metric (072's
+  LPIPS), and payback is 0.4–2.1 hours on the four windows won. It loses
+  on the same two windows the earlier steps found hardest: the Rublev
+  close-up (its training windows are court views; whether the scale gap
+  is the cause was not measured) and `alcaraz_hurkacz/045`, the match
+  with the fewest training crops and the fit that failed `loss_falls`.
+- Budget: about 7.0 GPU-hours of full stages (training data 0.55, pilot
+  fits 1.51, pilot renders 1.34, pilot judge 0.1, scaled fits 0.95,
+  renders 2.21, judges 0.27), at the 7-hour ceiling; smokes add a few
+  minutes each. Renders ran on shared GPUs and took 9–33 minutes each.

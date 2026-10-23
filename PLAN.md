@@ -604,7 +604,17 @@ objects (the tennis ball).
   billed over H = 2 hours (an assumption: the archive holds scene clips),
   a pilot over ranks {64, 16, 4} on `djokovic_federer`, ceiling 7
   GPU-hours. Size decides: step 3's adapter would cost 54 kbps over 2 h.
-  Waits for the user's approval.
+  **Step 4, match fit billed (2026-10-23): fails.** The pilot chose rank
+  4 and a 10-minute fit (1.55 MB at 8 bits, 1.73 kbps over 2 h; it scored
+  as rank 64 and as fp16). On the 6 windows, `gen-match` wins 4 of 6 on
+  LPIPS and 4 of 6 on DISTS unbilled (67%), 3 and 4 billed (58%). It
+  recovers about 60% of step 3's gain over zero-shot and pays back in
+  0.4–2.1 hours where it wins, but loses `alcaraz_hurkacz/045` (fewest
+  training crops; its fit failed the coarse `loss_falls` check) and the
+  Rublev close-up. By the rule, the generative route for players closes
+  at the keypoint rate, and step 3's extra windows came from fitting the
+  judged frames. About 7.0 GPU-hours, at the ceiling. Next: the user's
+  call.
   Training discipline for steps 3 and 4: a correctness smoke in minutes;
   then a learning-curve pilot on held-out frames at fixed fractions of the
   step budget; the scaled fit only if that curve, extrapolated, can reach
