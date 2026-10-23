@@ -725,8 +725,14 @@ objects (the tennis ball).
   the rule: rung 4, a fit on other shots of the same video, billed. A visual
   check (user, 2026-10-23; P06_108 re-fitted, 0.163 / 0.180) shows the
   source's pose, skin and lighting with softer texture, blur where fingers
-  cross an object, and flicker 25% above the source's. Rung 4 waits for the
-  user.
+  cross an object, and flicker 25% above the source's. **Rung 4 (entry "K6b
+  (hands) 4", `k6bh4-report.json` `3690a96f…`): fails, 25%.** The same fit
+  on 240 frames from other shots of the video (outside the window, fit
+  unbilled) lands on rung 2's zero-shot numbers (P06_108 0.321 / 0.268,
+  P22_107 0.283 / 0.194 LPIPS / DISTS on R), and none of rung 3's gain
+  transfers. Stopped after 2 of 3 items, once decided. Hands on fidelity
+  close at the keypoint rate; K1f's bound stays a bound, and hands go to the
+  experience track (item J).
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
