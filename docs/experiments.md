@@ -12654,8 +12654,10 @@ and each object's representation is judged on both:
   1,558,868); `djokovic_federer` reuses the pilot's (1,553,200). Billed:
   1.72–1.73 kbps over 2 h each. The first two and Rublev pass `k6b_fit
   validate` locally. **`alcaraz_hurkacz` fails one check, `loss_falls`**
-  (first-tenth loss 0.195, last-tenth 0.196): the loss is logged at only
-  17 points, so each tenth is one sample. The curve falls to 0.183 mid-fit,
+  (first-tenth loss 0.195, last-tenth 0.196). Each tenth is the mean of
+  about 320 micro-step losses at random timesteps, so it is noisy at this
+  scale (corrected 2026-10-23: first written as "one sample", a misreading
+  of the 17-point logged curve). The logged curve falls to 0.183 mid-fit,
   and the fixed-noise probe falls 19% (0.0096 → 0.0078; the others 10–13%).
   Its renders went ahead without a refit, which would have exceeded the
   ceiling; it has half the other matches' training crops (1,440).
@@ -12814,3 +12816,5 @@ and each object's representation is judged on both:
   step 6 (the same zero-shot, overfit and match ladder), its rule written
   after the audit.
 - **Waits for the user's approval** (and H_player, if not 20 hours).
+- Approved (user, 2026-10-23): as written, ceiling 11 GPU-hours,
+  H_player = 20 hours.

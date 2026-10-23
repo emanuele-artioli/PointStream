@@ -84,45 +84,100 @@ def quantize_channels(t: Any, bits: int) -> tuple[Any, Any, Any]:
     return q.to(torch.int8), scale.half(), (q * scale[:, None]).reshape(t.shape)
 
 
-def quantize_adapters(state: dict[str, Any], bits: int) -> tuple[dict[str, Any], dict[str, Any]]:
+def quantize_tensor(t: Any, bits: int, payloads: list[bytes]) -> Any:
+    """One billed tensor: per output channel at ``bits`` when it has QUANT_MIN_VALUES or more values, else fp16; its
+    payloads appended; the decoder's rebuilt tensor returned (fp32)."""
+    if t.numel() < QUANT_MIN_VALUES or t.dim() == 0:
+        sent = t.half()
+        payloads.append(sent.numpy().tobytes())
+        return sent.float()
+    q, scale, rebuilt = quantize_channels(t.float(), bits)
+    payloads += [q.numpy().tobytes(), scale.numpy().tobytes()]
+    return rebuilt
+
+
+def quantize_adapters(state: dict[str, Any], bits: int, guider_base: dict[str, Any] | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
     """K6b (players) 4's billed form of a checkpoint: every adapter tensor of QUANT_MIN_VALUES or more values
     quantized per output channel to ``bits`` (smaller ones fp16), each payload LZMA-coded on its own (g5c's
-    ``whole`` variant). Returns the state the decoder rebuilds (fp16) and the billed size; the pose guider, when
-    present, is billed as its fp16 change (zero bytes when frozen, so it is left out)."""
+    ``whole`` variant). Returns the state the decoder rebuilds (fp16) and the billed size. A trained pose guider
+    (step 5) is billed the same way as its change from the profile's guider (``guider_base``), which the decoder
+    holds: rebuilt = base + dequantized change. Frozen, it is absent and costs nothing."""
     import lzma
 
-    out: dict[str, Any] = {k: v for k, v in state.items() if k not in ("reference_unet", "denoising_unet")}
+    out: dict[str, Any] = {k: v for k, v in state.items() if k not in ("reference_unet", "denoising_unet", "pose_guider")}
     payloads: list[bytes] = []
     values = 0
     for part in ("reference_unet", "denoising_unet"):
         out[part] = {}
         for name, t in state[part].items():
             values += t.numel()
-            if t.numel() < QUANT_MIN_VALUES:
-                sent = t.half()
-                payloads.append(sent.numpy().tobytes())
-                out[part][name] = sent
-                continue
-            q, scale, rebuilt = quantize_channels(t.float(), bits)
-            payloads += [q.numpy().tobytes(), scale.numpy().tobytes()]
-            out[part][name] = rebuilt.half()
+            out[part][name] = quantize_tensor(t.float(), bits, payloads).half()
+    adapter_payloads = len(payloads)
+    guider_values = 0
     if "pose_guider" in state:
-        payloads += [v.half().numpy().tobytes() for v in state["pose_guider"].values()]
-    coded = sum(len(lzma.compress(b, preset=6)) for b in payloads)
-    return out, {"bits": bits, "bytes": coded, "adapter_values": values, "raw_fp16_bytes": 2 * values,
-                 "pose_guider_billed": "pose_guider" in state}
+        if guider_base is None:
+            raise SystemExit("a trained pose guider is billed as its change: give the profile's guider weights")
+        out["pose_guider"] = {}
+        for name, t in state["pose_guider"].items():
+            base = guider_base[name].float()
+            if not t.is_floating_point():  # integer buffers (none in PoseGuider today) go unchanged and unbilled
+                out["pose_guider"][name] = t
+                continue
+            guider_values += t.numel()
+            out["pose_guider"][name] = base + quantize_tensor(t.float() - base, bits, payloads)
+    sizes = [len(lzma.compress(b, preset=6)) for b in payloads]
+    return out, {"bits": bits, "bytes": sum(sizes), "adapter_values": values, "raw_fp16_bytes": 2 * values,
+                 "pose_guider_billed": "pose_guider" in state, "pose_guider_values": guider_values,
+                 "pose_guider_bytes": sum(sizes[adapter_payloads:])}
 
 
-def apply_fit(reference: Any, denoising: Any, guider: Any, checkpoint: Path) -> dict[str, Any]:
-    """Load a fitted checkpoint into rendering models and merge the LoRA into their weights (k6b_generate --fit)."""
+def merge_base(reference: Any, denoising: Any, base: dict[str, Any]) -> dict[str, Any]:
+    """Step 5's tennis base: its LoRA merged into both UNets' weights and the LoRA layers removed, so a match's
+    LoRA can be injected (fitting) or merged (rendering) on top. Not billed: the base is part of the decoder."""
+    from peft import set_peft_model_state_dict
+    from peft.tuners.lora import LoraLayer
+
+    rank = int(base.get("rank", LORA_RANK))
+    inject(reference, denoising, rank)
+    record: dict[str, Any] = {"rank": rank}
+    for name, module in (("reference_unet", reference), ("denoising_unet", denoising)):
+        result = set_peft_model_state_dict(module, base[name])
+        missing = [k for k in getattr(result, "missing_keys", []) if "lora_" in k]
+        if missing:
+            raise SystemExit(f"base {name}: {len(missing)} LoRA keys missing, e.g. {missing[:3]}")
+        layers = [(n, m) for n, m in module.named_modules() if isinstance(m, LoraLayer)]
+        for n, layer in layers:
+            layer.merge()
+            parent, _, child = n.rpartition(".")
+            setattr(module.get_submodule(parent) if parent else module, child, layer.get_base_layer())
+        if any(isinstance(m, LoraLayer) for m in module.modules()):
+            raise SystemExit(f"base {name}: LoRA layers left after merging")
+        record[name] = {"merged_layers": len(layers)}
+        if hasattr(module, "peft_config"):  # the base's adapter config goes with its layers; the match's is injected fresh
+            del module.peft_config
+    return record
+
+
+def apply_fit(reference: Any, denoising: Any, guider: Any, checkpoint: Path, base: Path | None = None,
+              requantize: int = 0) -> dict[str, Any]:
+    """Load a fitted checkpoint into rendering models and merge the LoRA into their weights (k6b_generate --fit).
+    Step 5: ``base``, a tennis base merged first; ``requantize``, the checkpoint (an fp16 one) quantized to these bits
+    as billed before merging, the billed size recorded."""
     import torch
     from peft import set_peft_model_state_dict
     from peft.tuners.lora import LoraLayer
 
+    record: dict[str, Any] = {}
+    if base is not None:
+        record["base"] = {"sha256": sha256(base), **merge_base(reference, denoising, torch.load(base, map_location="cpu", weights_only=True))}
     state = torch.load(checkpoint, map_location="cpu", weights_only=True)
+    if requantize:
+        guider_base = {k: v.detach().cpu() for k, v in guider.state_dict().items()}
+        state, record["billing"] = quantize_adapters({**state, **{k: {n: v.float() for n, v in state[k].items()}
+                                                                 for k in ("reference_unet", "denoising_unet")}}, requantize, guider_base)
     rank = int(state.get("rank", LORA_RANK))
     inject(reference, denoising, rank)
-    record: dict[str, Any] = {"rank": rank}
+    record["rank"] = rank
     for name, module in (("reference_unet", reference), ("denoising_unet", denoising)):
         result = set_peft_model_state_dict(module, state[name])
         missing = [k for k in getattr(result, "missing_keys", []) if "lora_" in k]
@@ -140,7 +195,8 @@ def apply_fit(reference: Any, denoising: Any, guider: Any, checkpoint: Path) -> 
 
 
 class Trainer:
-    def __init__(self, weights: dict[str, Path], device: str, scratch: Path, rank: int = LORA_RANK, freeze_guider: bool = False):
+    def __init__(self, weights: dict[str, Path], device: str, scratch: Path, rank: int = LORA_RANK, freeze_guider: bool = False,
+                 base: dict[str, Any] | None = None):
         import torch
         from animate_anyone.models.mutual_self_attention import ReferenceAttentionControl
         from animate_anyone.models.pose_guider import PoseGuider
@@ -169,6 +225,9 @@ class Trainer:
                                                 "denoising_unet")
         guider = PoseGuider(320, block_out_channels=(16, 32, 96, 256))
         record["pose_guider"] = load_checked(guider, torch.load(weights["original/pose_guider.pth"], map_location="cpu", weights_only=True), "pose_guider")
+        self.guider_base = {k: v.detach().clone() for k, v in guider.state_dict().items()}  # the decoder's: a trained guider is billed as its change
+        if base is not None:  # step 5's tennis base, merged before the match's LoRA is injected
+            record["base"] = merge_base(reference, denoising, base)
         for m in (vae, encoder, reference, denoising):
             m.requires_grad_(False)
         vae.to(device, dtype=torch.float32)  # encoding only, once per frame
@@ -275,30 +334,55 @@ def command_fit(args: argparse.Namespace) -> int:
     publish = scratch / "publish"
     publish.mkdir(parents=True, exist_ok=True)
     weights = {name: Path(path) for name, path in args.weight}
-    root = scratch / "fit-data"
-    if not root.is_dir():
-        root.mkdir(parents=True)
-        with tarfile.open(args.fit_data) as archive:
-            archive.extractall(root, filter="data")
-    manifest = json.loads((root / "publish" / "prepare-fit.json").read_text())
-    if args.match:  # K6b (players) 4: every training window of the match
-        units = [u["unit"] for w in manifest["windows"] if w["window"].split("/")[0] == args.match for u in w["units"]]
-    else:
-        units = [u["unit"] for w in manifest["windows"] if w["window"] == args.window for u in w["units"]]
+    # Step 5: several prepare tars (step 4's capped windows and the uncapped rest); a unit's npz is found in its own.
+    unit_path: dict[str, Path] = {}
+    windows_used: list[str] = []
+    for n, tar in enumerate(args.fit_data):
+        root = scratch / "fit-data" / str(n)
+        if not root.is_dir():
+            root.mkdir(parents=True)
+            with tarfile.open(tar) as archive:
+                archive.extractall(root, filter="data")
+        manifest = json.loads((root / "publish" / "prepare-fit.json").read_text())
+        for w in manifest["windows"]:
+            if w["window"] in args.exclude_window:
+                continue
+            if args.window:
+                take = w["window"] == args.window
+            else:  # step 4: one match; step 5: a player's matches, or every match (--all, the tennis base)
+                take = args.all or w["window"].split("/")[0] in args.match
+            if not take:
+                continue
+            windows_used.append(w["window"])
+            for u in w["units"]:
+                if u["unit"] in unit_path:
+                    raise SystemExit(f"{u['unit']} is in two fit-data archives")
+                unit_path[u["unit"]] = root / "publish" / "fit" / f"{u['unit']}.npz"
+    units = sorted(unit_path)
     if not units:
-        raise SystemExit(f"no fit data for {args.match or args.window}")
+        raise SystemExit(f"no fit data for {args.window_name}")
+    base_state = None
+    base_path = Path()
+    if args.base:
+        base_root = scratch / "base-archive"
+        if not base_root.is_dir():
+            base_root.mkdir(parents=True)
+            with tarfile.open(args.base_archive) as archive:
+                archive.extractall(base_root, filter="data")
+        base_path = base_root / "publish" / args.base
+        base_state = torch.load(base_path, map_location="cpu", weights_only=True)
     device = "cuda"
     limit = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "24000"))
     torch.cuda.set_per_process_memory_fraction(min(1.0, limit * 2**20 / torch.cuda.get_device_properties(0).total_memory))
-    seed = int.from_bytes((args.match or args.window).encode(), "little") % 2**31
+    seed = int.from_bytes(args.window_name.encode(), "little") % 2**31
     random.seed(seed)
     torch.manual_seed(seed)
-    trainer = Trainer(weights, device, scratch, args.rank, args.freeze_guider)
+    trainer = Trainer(weights, device, scratch, args.rank, args.freeze_guider, base_state)
     # Every training frame encoded once: latent mean/std, CLIP embedding, pose map (as the dataset's ToTensor).
     data = []
     images_kept: dict[str, np.ndarray] = {}
     for name in units:
-        a = np.load(root / "publish" / "fit" / f"{name}.npz")
+        a = np.load(unit_path[name])
         keep = a["t"] < args.max_t if args.max_t else np.ones(len(a["t"]), bool)
         if keep.sum() < 2:
             continue
@@ -342,7 +426,7 @@ def command_fit(args: argparse.Namespace) -> int:
             torch.save({**state, **{k: {n: v.half() for n, v in state[k].items()} for k in ("reference_unet", "denoising_unet")}}, raw)
             rec["unquantized"] = {"path": raw.name, "sha256": sha256(raw)}
         if args.quantize:
-            state, rec["billing"] = quantize_adapters(state, args.quantize)
+            state, rec["billing"] = quantize_adapters(state, args.quantize, {k: v.cpu() for k, v in trainer.guider_base.items()})
         else:
             state = {**state, **{k: {n: v.half() for n, v in state[k].items()} for k in ("reference_unet", "denoising_unet")}}
         torch.save(state, path)
@@ -393,7 +477,9 @@ def command_fit(args: argparse.Namespace) -> int:
         saved.append({"fraction": None, "optimizer_steps": step, **save(trainer.state(), path)})
     window = max(1, len(losses) // 10)
     write_json(stage_dir() / "k6b_fit.json", {
-        "command": "fit", "stage": os.environ.get("PS_STAGE"), "window": args.window, "match": args.match, "units": [d["unit"] for d in data],
+        "command": "fit", "stage": os.environ.get("PS_STAGE"), "window": args.window, "match": ",".join(args.match),
+        "name": args.window_name, "all": args.all, "excluded": args.exclude_window, "windows": windows_used,
+        "base": {"member": args.base, "sha256": sha256(base_path)} if args.base else None, "units": [d["unit"] for d in data],
         "frames": frames, "max_t": args.max_t, "minutes": args.minutes, "max_steps": args.max_steps, "optimizer_steps": step,
         "micro_steps": micro, "checkpoints": saved, "loss_first_tenth": float(np.mean(losses[:window])) if losses else None,
         "loss_last_tenth": float(np.mean(losses[-window:])) if losses else None, "loss_curve": [float(np.mean(losses[i:i + 200])) for i in range(0, len(losses), 200)],
@@ -403,7 +489,7 @@ def command_fit(args: argparse.Namespace) -> int:
         "pose_guider_frozen": args.freeze_guider, "lora_lr": LORA_LR,
         "guider_lr": GUIDER_LR, "batch": BATCH, "accumulate": ACCUMULATE, "uncond": UNCOND_RATIO, "noise_offset": NOISE_OFFSET,
         "snr_gamma": SNR_GAMMA, "scheduler": TRAIN_SCHEDULER, "size": [GEN_W, GEN_H]},
-        "inputs": {"fit_data": sha256(Path(args.fit_data)), "weights": {k: sha256(v) for k, v in sorted(weights.items())}},
+        "inputs": {"fit_data": [sha256(Path(t)) for t in args.fit_data], "weights": {k: sha256(v) for k, v in sorted(weights.items())}},
         "seconds": round(time.time() - began, 2)})
     with tarfile.open(stage_dir() / "published.tar", "w") as tar:
         tar.add(publish, arcname="publish")
@@ -424,6 +510,11 @@ def command_validate(args: argparse.Namespace) -> int:
         "checkpoints": bool(r["checkpoints"]) and all(c["sha256"] for c in r["checkpoints"]),
         "finite": all(math.isfinite(x) for x in r["loss_curve"]),
     }
+    if r.get("base"):  # step 5: the tennis base merged into both UNets before the match's LoRA
+        checks["base_merged"] = all(r["model"]["base"][k]["merged_layers"] > 50 for k in ("reference_unet", "denoising_unet"))
+    if not r["settings"]["pose_guider_frozen"] and r["settings"]["quantize"]:  # step 5: the trained guider billed
+        checks["guider_billed"] = all(c["billing"]["pose_guider_billed"] and c["billing"]["pose_guider_bytes"] > 0
+                                      for c in r["checkpoints"] if "billing" in c)
     report = {"passed": all(checks.values()), "checks": checks}
     if target := os.environ.get("PS_VALIDATION_PATH"):
         write_json(Path(target), report)
@@ -435,9 +526,15 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="command", required=True)
     fit = sub.add_parser("fit")
-    fit.add_argument("--fit-data", required=True)
+    fit.add_argument("--fit-data", action="append", required=True, help="prepare-fit/prepare-match published.tar (repeatable)")
     fit.add_argument("--window", default="", help="step 3: fit on this window's frames")
-    fit.add_argument("--match", default="", help="step 4: fit on every training window of this match")
+    fit.add_argument("--match", action="append", default=[], help="step 4: fit on every training window of this match; "
+                     "step 5: repeat for a player's matches")
+    fit.add_argument("--all", action="store_true", help="step 5's tennis base: every window of every archive")
+    fit.add_argument("--exclude-window", action="append", default=[], help="never fitted on (step 5: K6's windows)")
+    fit.add_argument("--name", default="", help="the checkpoints' stem (default: from --window or --match)")
+    fit.add_argument("--base-archive", default="", help="step 5: the tennis base fit's published.tar")
+    fit.add_argument("--base", default="", help="step 5: the base checkpoint (a member of --base-archive), merged first")
     fit.add_argument("--rank", type=int, default=LORA_RANK)
     fit.add_argument("--freeze-guider", action="store_true", help="step 4: the pose guider stays the profile's (not sent)")
     fit.add_argument("--quantize", type=int, default=0, help="step 4: adapter bits as billed (8); 0 keeps fp16")
@@ -452,11 +549,16 @@ def main(argv: list[str] | None = None) -> int:
     val.add_argument("--stage", default="")
     args = ap.parse_args(argv)
     if args.command == "fit":
-        if bool(args.window) == bool(args.match):
-            raise SystemExit("give exactly one of --window and --match")
-        args.window_name = (args.match or args.window).replace("/", "__").replace("@", "_at")
-        if args.match:  # step 4's pilot fits several ranks of one match: their checkpoints must not share names
-            args.window_name += f"-r{args.rank}"
+        if sum(map(bool, (args.window, args.match, args.all))) != 1:
+            raise SystemExit("give exactly one of --window, --match and --all")
+        if bool(args.base) != bool(args.base_archive):
+            raise SystemExit("--base and --base-archive go together")
+        if args.name:
+            args.window_name = args.name
+        else:
+            args.window_name = (args.window or "+".join(args.match) or "tennis").replace("/", "__").replace("@", "_at")
+            if not args.window:  # step 4's pilot fits several ranks of one match: their checkpoints must not share names
+                args.window_name += f"-r{args.rank}"
         return command_fit(args)
     return command_validate(args)
 

@@ -163,3 +163,50 @@ def test_adapter_quantization_matches_g5c_and_is_billed():
     err = (rebuilt["reference_unet"]["x.lora_A.weight"].float() - state["reference_unet"]["x.lora_A.weight"]).abs().max()
     assert err < 0.02 * state["reference_unet"]["x.lora_A.weight"].abs().max()
     assert torch.equal(rebuilt["denoising_unet"]["tiny"], state["denoising_unet"]["tiny"].half())  # small tensors stay fp16
+
+
+def test_guider_is_billed_as_its_quantized_change_and_fewer_bits_cost_less():
+    torch = pytest.importorskip("torch")
+    from experiments.tennis import k6b_fit
+
+    gen = torch.Generator().manual_seed(1)
+    base = {"conv.weight": torch.randn(16, 3, 3, 3, generator=gen), "conv.bias": torch.randn(16, generator=gen)}
+    trained = {k: v + 0.01 * torch.randn(v.shape, generator=gen) for k, v in base.items()}
+    lora = {"x.lora_A.weight": torch.randn(4, 320, generator=gen)}
+    state = {"rank": 4, "reference_unet": lora, "denoising_unet": {}, "pose_guider": trained}
+    with pytest.raises(SystemExit):
+        k6b_fit.quantize_adapters(state, 8)  # a trained guider needs the decoder's weights
+    rebuilt, billing = k6b_fit.quantize_adapters(state, 8, base)
+    assert billing["pose_guider_billed"] and billing["pose_guider_values"] == 16 * 27 + 16
+    assert 0 < billing["pose_guider_bytes"] < billing["bytes"]
+    for k in base:  # the decoder rebuilds base + change, close to the trained weights
+        assert (rebuilt["pose_guider"][k] - trained[k]).abs().max() < 1e-3
+    _, four = k6b_fit.quantize_adapters(state, 4, base)
+    assert four["bytes"] < billing["bytes"]
+
+
+def test_billing_entry_reads_both_forms():
+    billing = {"gen-match5": {"djokovic_federer": 1000}, "gen-player": {"hours": 20, "bytes": {"djokovic_federer": 3000}}}
+    assert k6b.billing_entry(billing, "gen-match5", "djokovic_federer", 2.0) == (1000.0, 2.0)
+    assert k6b.billing_entry(billing, "gen-player", "djokovic_federer", 2.0) == (3000.0, 20.0)
+    assert k6b.billing_entry(billing, "gen-player", "rublev_auger-aliassime", 2.0) is None
+    assert k6b.billing_entry(billing, "gen-A", "djokovic_federer", 2.0) is None
+
+
+def _dev_row(**variants):
+    return {v.replace("_", "-"): {m: {"value": val[i]} for i, m in enumerate(("lpips", "dists"))} |
+            {"billed": {m: {"value": val[i], "envelope": 0.2, "won": val[i] < 0.2} for i, m in enumerate(("lpips", "dists"))}}
+            for v, val in variants.items()}
+
+
+def test_step5_development_choice():
+    rows = [_dev_row(gen_A=(0.21, 0.19), gen_B=(0.19, 0.19), gen_C=(0.19, 0.18), gen_C4=(0.193, 0.183), gen_Cg=(0.18, 0.21)),
+            _dev_row(gen_A=(0.25, 0.22), gen_B=(0.22, 0.19), gen_C=(0.22, 0.19), gen_C4=(0.22, 0.19), gen_Cg=(0.19, 0.18))]
+    stats = {v: k6b.dev_stats(rows, v) for v in ("gen-A", "gen-B", "gen-C", "gen-C4", "gen-Cg")}
+    assert stats["gen-A"]["won"] == 1 and stats["gen-B"]["won"] == 3 and stats["gen-C"]["won"] == 3
+    assert k6b.choose_arm(stats, ["gen-A", "gen-B", "gen-C"]) == "gen-C"  # a tie on wins goes to the larger margin
+    stats["gen-C"]["margin"] = stats["gen-B"]["margin"]
+    assert k6b.choose_arm(stats, ["gen-A", "gen-B", "gen-C"]) == "gen-B"  # then to the cheaper
+    assert k6b.fewer_bits_hold(rows, "gen-C", "gen-C4")
+    assert not k6b.fewer_bits_hold(rows, "gen-A", "gen-B")
+    assert k6b.guidance_better(stats, "gen-C", "gen-Cg")  # 3 won each, the larger margin

@@ -861,6 +861,47 @@ def decide_billed(billed: dict[str, Any], unbilled: dict[str, Any], reproduced: 
     return "fail: a match fit does not reach the envelope even unbilled; step 3's pass was memorization"
 
 
+def billing_entry(billing: dict[str, Any], variant: str, match: str, hours: float) -> tuple[float, float] | None:
+    """A variant's billed bytes for a match and the hours they are spread over. Step 4's form is {variant: {match:
+    bytes}} at --hours; step 5's may give a variant its own hours: {variant: {"hours": H, "bytes": {match: bytes}}}
+    (the per-player model over H_player)."""
+    entry = billing.get(variant)
+    if entry is None:
+        return None
+    if "bytes" in entry:
+        nbytes = entry["bytes"].get(match)
+        return None if nbytes is None else (float(nbytes), float(entry.get("hours", hours)))
+    nbytes = entry.get(match)
+    return None if nbytes is None else (float(nbytes), hours)
+
+
+def dev_stats(rows: list[dict[str, Any]], variant: str) -> dict[str, Any]:
+    """Step 5's development windows: window-metrics won billed, and the mean margin below the billed envelope in units
+    of that envelope (positive is better)."""
+    cells = [r[variant]["billed"][m] for r in rows if variant in r and "billed" in r[variant] for m in ("lpips", "dists")]
+    if not cells:
+        return {"cells": 0}
+    return {"cells": len(cells), "won": int(sum(c["won"] for c in cells)),
+            "margin": float(np.mean([(c["envelope"] - c["value"]) / c["envelope"] for c in cells]))}
+
+
+def choose_arm(stats: dict[str, dict[str, Any]], arms: list[str]) -> str:
+    """experiments.md "K6b (players) 5": the most won; ties to the larger margin, then to the cheaper (``arms`` is in
+    order of cost)."""
+    return max(arms, key=lambda a: (stats[a]["won"], stats[a]["margin"], -arms.index(a)))
+
+
+def fewer_bits_hold(rows: list[dict[str, Any]], full: str, fewer: str, tolerance: float = 0.005) -> bool:
+    """Step 5: 4 bits if both metrics stay within ``tolerance`` of 8 bits on every development window."""
+    return all(abs(r[fewer][m]["value"] - r[full][m]["value"]) <= tolerance for r in rows for m in ("lpips", "dists"))
+
+
+def guidance_better(stats: dict[str, dict[str, Any]], default: str, other: str) -> bool:
+    """Step 5: the other guidance only if it wins more, or as many with the larger margin."""
+    a, b = stats[default], stats[other]
+    return b["won"] > a["won"] or (b["won"] == a["won"] and b["margin"] > a["margin"])
+
+
 def command_report(args: argparse.Namespace) -> int:
     from experiments.tennis.k6_report import bootstrap, saving
 
@@ -889,10 +930,10 @@ def command_report(args: argparse.Namespace) -> int:
                     row[v] = {**means[v], **{m: won(kw["anchors"], m, kbps, means[v][m]) for m in ("lpips", "dists")}}
                     hull = [tuple(p) for p in kw["savings"]["lpips"]["hull"]["points"]]
                     row[v]["saving"] = saving(hull, -means[v]["lpips"], kbps)["saving"]
-                    if v in billing:
-                        nbytes = billing[v][w["match"]]
-                        rate = kbps + billed_kbps(nbytes, args.hours)
-                        row[v]["billed"] = {"kbps": rate, "bytes": nbytes, "hours": args.hours,
+                    if (entry := billing_entry(billing, v, w["match"], args.hours)) is not None:
+                        nbytes, hours = entry
+                        rate = kbps + billed_kbps(nbytes, hours)
+                        row[v]["billed"] = {"kbps": rate, "bytes": nbytes, "hours": hours,
                                             **{m: won(kw["anchors"], m, rate, means[v][m]) for m in ("lpips", "dists")},
                                             "saving": saving(hull, -means[v]["lpips"], rate)["saving"],
                                             "payback_hours": payback_hours(hull, means[v]["lpips"], kbps, nbytes)}
@@ -902,20 +943,44 @@ def command_report(args: argparse.Namespace) -> int:
                     reproduced &= row[v]["reproduces"]
                 rows.append(row)
     groups = {"all": rows, "finetune_unlisted": [r for r in rows if r["finetune_unlisted"]]}
-    main = {3: "gen-fit", 4: "gen-match"}.get(args.step, GEN_VARIANTS[0])  # step 2, amendment 1: the fine-tune is a diagnostic
-    decided = (main, *CHECK_VARIANTS)
-    scored = {g: {v: score(rs, v) for v in decided} for g, rs in groups.items()}
-    if args.step == 4:
+    main = {3: "gen-fit", 4: "gen-match", 5: "gen-match5"}.get(args.step, GEN_VARIANTS[0])  # step 2, amendment 1: the fine-tune is a diagnostic
+    seen = [v for v in dict.fromkeys(v for r in rows for v in r if v.startswith("gen-"))]
+    if args.step == 5:  # every renderer judged is reported; on the development windows none decides
+        decided = (*seen, *CHECK_VARIANTS)
+    else:
+        decided = (main, *CHECK_VARIANTS)
+    scored = {g: {v: score([r for r in rs if v in r], v) for v in decided} for g, rs in groups.items()}
+    if args.step in (4, 5):
         for g, rs in groups.items():
-            scored[g][f"{main} billed"] = billed_score(rs, main)
+            for v in (main,) if args.step == 4 else seen:
+                billed_rows = [r for r in rs if v in r and "billed" in r[v]]
+                if billed_rows:
+                    scored[g][f"{v} billed"] = billed_score(billed_rows, v)
+    development: dict[str, Any] | None = None
+    if args.step == 5 and args.dev:
+        stats = {v: dev_stats(rows, v) for v in seen}
+        arms = [f"gen-{a}" for a in args.arms.split(",") if a]
+        development = {"stats": stats, "arms": arms, "choice": choose_arm(stats, arms) if arms else None}
+        if args.compare_bits:
+            full, fewer = (f"gen-{x}" for x in args.compare_bits.split(","))
+            development["fewer_bits_hold"] = bool(fewer_bits_hold(rows, full, fewer))
+        if args.compare_cfg:
+            default, other = (f"gen-{x}" for x in args.compare_cfg.split(","))
+            development["guidance_better"] = bool(guidance_better(stats, default, other))
     finetune = [{"window": r["window"], "gen-original": {m: r["gen-original"][m]["value"] for m in ("lpips", "dists")},
                  "gen-finetuned_tennis": {m: r["gen-finetuned_tennis"][m]["value"] for m in ("lpips", "dists")}}
                 for r in rows if "gen-finetuned_tennis" in r and r["gen-finetuned_tennis"]["lpips"]["value"] != r["gen-original"]["lpips"]["value"]]
-    verdict = (decide_billed(scored["all"][f"{main} billed"], scored["all"][main], reproduced) if args.step == 4
-               else decide(scored, reproduced, args.step))
+    if args.step == 5 and args.dev:
+        verdict = "development: no verdict (the recipe is chosen)" if reproduced else "not read: warp/ref do not reproduce K6"
+    elif args.step in (4, 5):
+        verdict = decide_billed(scored["all"][f"{main} billed"], scored["all"][main], reproduced)
+        if args.step == 5 and verdict.startswith("fail"):
+            verdict = "fail: the match fit does not reach the envelope even unbilled; the AnimateAnyone line closes (step 6: a newer generator)"
+    else:
+        verdict = decide(scored, reproduced, args.step)
     out = {"decision_rule": DECISION, "step": args.step, "decision": verdict, "reproduced": reproduced, "rows": rows,
-           "billing": {"hours": args.hours, "bytes": billing} if billing else None,
-           "groups": scored, "saving_ci": {v: bootstrap([r[v]["saving"] for r in rows]) for v in decided},
+           "billing": {"hours": args.hours, "bytes": billing} if billing else None, "development": development,
+           "groups": scored, "saving_ci": {v: bootstrap([r[v]["saving"] for r in rows if v in r]) for v in decided},
            "finetune_diagnostic": finetune,
            "inputs": {"stages": sources, "k6_report": file_sha256(Path(args.k6_report)), "code_sha256": file_sha256(Path(__file__))},
            "overlap": "gen-original: off-the-shelf weights (not trained on PointStream's footage); gen-finetuned_tennis: "
@@ -925,7 +990,7 @@ def command_report(args: argparse.Namespace) -> int:
     for r in rows:
         print(r["window"], f"{r['kbps']:.2f} kbps", " ".join(
             f"{v}: L {r[v]['lpips']['value']:.3f}/{r[v]['lpips']['envelope']:.3f} D {r[v]['dists']['value']:.3f}/{r[v]['dists']['envelope']:.3f}"
-            for v in decided))
+            for v in decided if v in r))
     print(json.dumps({"decision": out["decision"], "groups": scored}, indent=1))
     return 0
 
@@ -1021,7 +1086,12 @@ def main(argv: list[str] | None = None) -> int:
     rep.add_argument("--k6-report", required=True)
     rep.add_argument("--out", required=True)
     rep.add_argument("--step", type=int, default=2, help="2: gen-original decides; 3: gen-fit (overfit oracle); 4: gen-match, billed")
-    rep.add_argument("--billing", default="", help="step 4: JSON {variant: {match: billed bytes}}")
+    rep.add_argument("--billing", default="", help="step 4: JSON {variant: {match: billed bytes}}; step 5 also "
+                     "{variant: {\"hours\": H, \"bytes\": {match: billed bytes}}}")
+    rep.add_argument("--dev", action="store_true", help="step 5: the development windows (the recipe is chosen, no verdict)")
+    rep.add_argument("--arms", default="", help="step 5 --dev: the arms' profiles in order of cost, e.g. A,B,C")
+    rep.add_argument("--compare-bits", default="", help="step 5 --dev: PROFILE8,PROFILE4")
+    rep.add_argument("--compare-cfg", default="", help="step 5 --dev: DEFAULT,OTHER")
     rep.add_argument("--hours", type=float, default=2.0, help="step 4: H, the hours of the match the bytes are spread over")
     args = ap.parse_args(argv)
     if args.command in ("prepare", "prepare-fit", "prepare-match", "judge") and len(args.windows) != len(args.sources):

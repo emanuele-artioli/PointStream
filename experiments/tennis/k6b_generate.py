@@ -116,7 +116,8 @@ def loading_record(info: dict[str, Any], name: str) -> dict[str, Any]:
 class Renderer:
     """One profile's models in fp16 on the GPU, and the released long-video pipeline."""
 
-    def __init__(self, weights: dict[str, Path], profile: str, device: str, scratch: Path, fit: Path | None = None):
+    def __init__(self, weights: dict[str, Path], profile: str, device: str, scratch: Path, fit: Path | None = None,
+                 base: Path | None = None, bits: int = 0, cfg: float = CFG):
         import torch
         from animate_anyone.models.pose_guider import PoseGuider
         from animate_anyone.models.unet_2d_condition import UNet2DConditionModel
@@ -156,7 +157,9 @@ class Renderer:
         if fit is not None:  # K6b (players) 3: a LoRA fitted on the window's frames, merged into `original`
             from experiments.tennis.k6b_fit import apply_fit
 
-            record["fit"] = {"checkpoint_sha256": sha256(fit), **apply_fit(reference, denoising, guider, fit)}
+            record["fit"] = {"checkpoint_sha256": sha256(fit), **apply_fit(reference, denoising, guider, fit, base, bits)}
+        self.cfg = cfg
+        record["cfg"] = cfg
         self.pipe = Pose2VideoPipeline(vae=vae, image_encoder=encoder, reference_unet=reference, denoising_unet=denoising,
                                        pose_guider=guider, scheduler=DDIMScheduler(**SCHEDULER)).to(device, dtype=dtype)
         self.modules = {"vae": vae, "image_encoder": encoder, "reference_unet": reference, "denoising_unet": denoising, "pose_guider": guider}
@@ -170,7 +173,7 @@ class Renderer:
 
         generator = torch.Generator(device="cpu").manual_seed(seed)
         with torch.inference_mode():
-            video = self.pipe(Image.fromarray(reference), [Image.fromarray(p) for p in poses], GEN_W, GEN_H, len(poses), steps, CFG,
+            video = self.pipe(Image.fromarray(reference), [Image.fromarray(p) for p in poses], GEN_W, GEN_H, len(poses), steps, self.cfg,
                               generator=generator, context_frames=CONTEXT_FRAMES, context_overlap=CONTEXT_OVERLAP).videos
         frames = video[0].permute(1, 2, 3, 0).float().clamp(0, 1).cpu().numpy()  # (n, H, W, 3)
         return (frames * 255).round().astype(np.uint8)
@@ -220,8 +223,14 @@ def command_generate(args: argparse.Namespace) -> int:
                     raise SystemExit(f"{path.name} is in two fit archives")
                 members[path.name] = path
         fits = {name: members[member] for name, member in args.fit}
+        bases = {name: members[member] for name, member in args.fit_base}  # step 5: the tennis base, merged first
     else:
         fits = {name: Path(path) for name, path in args.fit}
+        bases = {name: Path(path) for name, path in args.fit_base}
+    bits = {name: int(b) for name, b in args.fit_bits}  # step 5: an fp16 checkpoint quantized as billed at render time
+    cfgs = {name: float(c) for name, c in args.cfg}
+    if unknown := (set(bases) | set(bits)) - set(fits):
+        raise SystemExit(f"--fit-base/--fit-bits name profiles without --fit: {sorted(unknown)}")
     profiles += [name for name in fits if name not in profiles]
     device = "cuda"
     limit = int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "24000"))
@@ -233,7 +242,8 @@ def command_generate(args: argparse.Namespace) -> int:
         if not todo:
             continue
         loaded = time.time()
-        renderer = Renderer(weights, "original" if profile in fits else profile, device, scratch, fits.get(profile))
+        renderer = Renderer(weights, "original" if profile in fits else profile, device, scratch, fits.get(profile),
+                            bases.get(profile), bits.get(profile, 0), cfgs.get(profile, CFG))
         record = {**renderer.record, "load_seconds": round(time.time() - loaded, 1),
                   "on_cuda": {k: model_on_cuda(m) for k, m in renderer.modules.items()},
                   "params": {k: int(sum(p.numel() for p in m.parameters())) for k, m in renderer.modules.items()}}
@@ -277,10 +287,11 @@ def command_generate(args: argparse.Namespace) -> int:
     write_json(stage_dir() / "k6b_generate.json", {
         "command": "generate", "stage": os.environ.get("PS_STAGE"), "units": names, "profiles": profiles,
         "steps": args.steps, "max_frames": args.max_frames, "from_t": args.from_t,
-        "fits": {k: {"path": str(v), "sha256": sha256(v)} for k, v in fits.items()}, "device": device_record(args.gpu_class), "models": records,
+        "fits": {k: {"path": str(v), "sha256": sha256(v), "base": str(bases[k]) if k in bases else None, "bits": bits.get(k, 0)}
+                 for k, v in fits.items()}, "device": device_record(args.gpu_class), "models": records,
         "timings": timings, "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3), "gpu_memory_limit_mib": limit,
         "inputs": {"prepared": sha256(Path(args.prepared)), "weights": {k: sha256(v) for k, v in sorted(weights.items())}},
-        "settings": {"size": [GEN_W, GEN_H], "cfg": CFG, "context": [CONTEXT_FRAMES, CONTEXT_OVERLAP], "scheduler": SCHEDULER},
+        "settings": {"size": [GEN_W, GEN_H], "cfg": {p: cfgs.get(p, CFG) for p in profiles}, "context": [CONTEXT_FRAMES, CONTEXT_OVERLAP], "scheduler": SCHEDULER},
         "versions": versions(), "seconds": round(time.time() - began, 2)})
     return 0
 
@@ -305,6 +316,11 @@ def command_validate(args: argparse.Namespace) -> int:
         checks[f"{profile}:no_missing_keys"] = all(rec[k]["missing"] == 0 for k in ("vae", "image_encoder", "reference_unet", "denoising_unet", "pose_guider"))
         checks[f"{profile}:motion_module_loaded"] = rec["motion_module_keys"] > 100
         checks[f"{profile}:kernels_on_gpu"] = rec["kernels"]["kernel_launches"] > 0
+        fit = (result.get("fits") or {}).get(profile) or {}
+        if fit.get("base"):  # step 5: the tennis base merged before the profile's checkpoint
+            checks[f"{profile}:base_merged"] = all(rec["fit"]["base"][k]["merged_layers"] > 50 for k in ("reference_unet", "denoising_unet"))
+        if fit.get("bits"):  # step 5: quantized at render time, as billed
+            checks[f"{profile}:billed"] = rec["fit"]["billing"]["bits"] == fit["bits"] and rec["fit"]["billing"]["bytes"] > 0
     with tempfile.TemporaryDirectory(prefix="k6bg-validate-", dir="/tmp") as temp:
         with tarfile.open(stage / "published.tar") as archive:
             archive.extractall(temp, filter="data")
@@ -339,6 +355,12 @@ def main(argv: list[str] | None = None) -> int:
                      help="render a profile named PROFILE: `original` with k6b_fit's checkpoint merged")
     gen.add_argument("--fit-archive", action="append", default=[], help="k6b_fit's published.tar (repeatable); --fit names a member")
     gen.add_argument("--from-t", type=int, default=0, help="render only frames from here (step 3's held-out frames)")
+    gen.add_argument("--fit-base", action="append", nargs=2, default=[], metavar=("PROFILE", "CHECKPOINT"),
+                     help="step 5: merge this tennis base into PROFILE before its --fit checkpoint")
+    gen.add_argument("--fit-bits", action="append", nargs=2, default=[], metavar=("PROFILE", "BITS"),
+                     help="step 5: quantize PROFILE's (fp16) checkpoint to BITS as billed before merging")
+    gen.add_argument("--cfg", action="append", nargs=2, default=[], metavar=("PROFILE", "SCALE"),
+                     help=f"step 5: PROFILE's guidance scale (default {CFG})")
     gen.add_argument("--gpu-class", default="RTX")
     val = sub.add_parser("validate")
     val.add_argument("--stage", default="")
