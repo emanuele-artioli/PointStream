@@ -455,6 +455,8 @@ def main(argv: list[str] | None = None) -> int:
         if bool(args.window) == bool(args.match):
             raise SystemExit("give exactly one of --window and --match")
         args.window_name = (args.match or args.window).replace("/", "__").replace("@", "_at")
+        if args.match:  # step 4's pilot fits several ranks of one match: their checkpoints must not share names
+            args.window_name += f"-r{args.rank}"
         return command_fit(args)
     return command_validate(args)
 
