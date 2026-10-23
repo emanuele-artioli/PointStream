@@ -685,6 +685,20 @@ objects (the tennis ball).
   reference route for egocentric hands closes at a buildable rate. Next on
   fidelity: rung 3 (the overfit oracle, rule written, 4 GPU-hours), the
   last open rung for hands, waiting for the user.
+  **Rung 3, the overfit oracle (user approved, 2026-10-22; experiments.md
+  "K6b (hands) 3: overfit oracle (run)", `k6bh3-report.json` `07ac515b…`):
+  passes, 83%.** FoundHand fine-tuned for 20 min on each window's own frames
+  (weights unbilled) draws the hand from the coded keypoints at about 2 kbps
+  below the SVT-AV1 + DCVC-UF + G hull on R: LPIPS 2 of 3 (P06_108 0.162
+  against 0.172, P22_107 0.174 against 0.236; P25_09 loses, 0.291 against
+  0.260), DISTS 3 of 3. Clean of G's footage: 75%, at the bar. The fit
+  roughly halves rung 2's zero-shot gap (LPIPS down 0.11–0.23), and the
+  pilot's held-out curve was still falling at 30 min. The margins on the
+  hard items are thin (0.006–0.010). It is an oracle: fitted on the frames
+  it is judged on, unbilled, and FoundHand may have seen the footage. Next by
+  the rule: rung 4, a fit on other shots of the same video, billed, after a
+  visual check of the fitted renders (about 0.6 GPU-hours). Both wait for the
+  user.
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks

@@ -11259,3 +11259,66 @@ and each object's representation is judged on both:
   leaves time to judge its 240 frames and K1f's `warp` in one 45-minute
   stage. Lockstep rendering took about 1.6 s per frame for both hands in
   the pilot.
+- Jobs (RTX 6000 Ada, shared, gpu5 and gpu6; `a268c0c` from each
+  `ready.json`; 20 min of fitting each): P25_09 `20261022T183807Z-3795e867`,
+  P22_107 `20261022T183815Z-59e06155`, P06_108 `20261022T183822Z-ef0d3c3c`.
+  Every smoke passed the fleet validator, and every full stage passes `k6bh3
+  validate` locally (11 checks), with `warp` reproducing K1f. Steps reached:
+  5,579–5,708. Report `visor/k6bh-2026-10-22/report/k6bh3-report.json`
+  (`07ac515b…064`). GPU time for rung 3, smokes and pilot included: 8,951 s
+  of stages, about 2.5 GPU-hours of the 4.
+- Outcome. On R, at each item's keypoint rate (1.93–2.14 kbps), the fitted
+  weights free (an oracle: fitted on the frames it is judged on):
+
+  | item | `gen` fitted, LPIPS / hull | `gen` fitted, DISTS / hull | rung 2's `gen` (zero-shot) | `warp` (bound) |
+  |---|---:|---:|---:|---:|
+  | P25_09 | 0.291 / 0.260 | **0.234** / 0.240 | 0.524 / 0.353 | 0.097 / 0.102 |
+  | P22_107 (G) | **0.174** / 0.236 | **0.151** / 0.204 | 0.281 / 0.200 | 0.059 / 0.049 |
+  | P06_108 | **0.162** / 0.172 | **0.177** / 0.206 | 0.308 / 0.273 | 0.091 / 0.123 |
+
+  (Bold: below the hull.) LPIPS 2 of 3, DISTS 3 of 3: **score 83%**. Clean
+  of G's footage (P06_108, P25_09): LPIPS 1 of 2, DISTS 2 of 2, 75%.
+- Decision (by the rule): **pass.** A FoundHand fitted on the window's own
+  frames draws the hand from the coded keypoints (about 2 kbps) well enough
+  to beat the SVT-AV1 + DCVC-UF + G hull on R. Next by the rule: rung 4, a
+  fit on other shots of the same video, billed. The generative route for
+  hands stays open.
+- Reading.
+  - The fit roughly halves rung 2's gap: LPIPS on R falls by 0.11–0.23 on
+    every item against the zero-shot `gen`. It still sits 0.07–0.19 above
+    K1f's bound, the hand's own pixels.
+  - The margins are thin where the item is hard. P06_108 wins LPIPS by 0.010
+    and P25_09 wins DISTS by 0.006, while P22_107 wins both by 0.05–0.06.
+    The pass at 83% rests on these; clean of G it is exactly at the bar.
+  - P25_09, the largest hands (crops of about 1,070 px drawn at 256²), is
+    the one LPIPS loss, as in rung 2. Competing explanation (3), the crop
+    size, still fits and is still not isolated.
+  - The pilot's held-out curve (P01_107, frames 180–209) was still falling
+    at 30 min (0.168 LPIPS), and these fits stopped at 20. Longer fits would
+    likely lower every number. That is an oracle's question, not rung 4's.
+- Hypothesis ("fails: the gap is pose-to-pixel error and the forearm, not
+  identity"): refuted. The competing explanation (most of the gap is
+  appearance, which the fit learns) holds. The pilot's held-out frames fell
+  steeply (0.225 → 0.168 between 7.5 and 30 min).
+- Scope and caveats. An oracle: fitted on the frames it is judged on, and
+  its weights (1.35 GB per item in bf16) are not billed. A real codec has
+  to fit elsewhere and send the fit, which is rung 4. FoundHand may have seen
+  every item's footage (rung 2's overlap note). 3 items. Flicker and a visual
+  check, which rung 2 reported beside, were not computed here, and the
+  rendered frames were not kept. A visual check of a few frames is the
+  cheapest next step before rung 4 is written.
+- Report (2026-10-23, to the root session).
+  - Stopped because: goal reached.
+  - Decision by the rule: pass (83%; 75% clean of G).
+  - Numbers: the table above; jobs above; code `a268c0c`; report
+    `k6bh3-report.json` `07ac515b…064`; pilot report `ab0b58c7…bb2`.
+  - Budget: about 2.5 GPU-hours of 4.
+  - Deviations, all before the scored fits: the pilot judged 30 held-out
+    frames, not 60; both hands sampled in lockstep; 30,000 MiB with a 27 GiB
+    cap; the scored fits ran 20 min, not "the time to the hull" (about 3
+    min, which would sit on the bar by construction).
+  - Open for the user: whether rung 4 (fit elsewhere in the video, billed)
+    gets a rule and budget, and whether a visual check comes first.
+  - Proposed next step: a visual check (the frames were not kept, so one
+    item re-fitted and rendered with its frames saved, about 0.6
+    GPU-hours), then rung 4's rule.
