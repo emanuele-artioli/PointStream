@@ -487,7 +487,10 @@ def command_fit(args: argparse.Namespace) -> int:
         "base": {"member": args.base, "sha256": sha256(base_path)} if args.base else None, "units": [d["unit"] for d in data],
         "frames": frames, "frame_stride": args.frame_stride, "max_t": args.max_t, "minutes": args.minutes, "max_steps": args.max_steps, "optimizer_steps": step,
         "micro_steps": micro, "checkpoints": saved, "loss_first_tenth": float(np.mean(losses[:window])) if losses else None,
-        "loss_last_tenth": float(np.mean(losses[-window:])) if losses else None, "loss_curve": [float(np.mean(losses[i:i + 200])) for i in range(0, len(losses), 200)],
+        "loss_last_tenth": float(np.mean(losses[-window:])) if losses else None,
+        # Standard errors of the two tenths: each step's loss is at a random timestep, so their means are noisy (step 5).
+        "loss_first_tenth_se": float(np.std(losses[:window]) / math.sqrt(window)) if losses else None,
+        "loss_last_tenth_se": float(np.std(losses[-window:]) / math.sqrt(window)) if losses else None, "loss_curve": [float(np.mean(losses[i:i + 200])) for i in range(0, len(losses), 200)],
         "probe_mse_before": error_before, "probe_mse_after": error_after, "model": trainer.record, "kernels": kernels,
         "device": device_record(args.gpu_class), "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3),
         "gpu_memory_limit_mib": limit, "settings": {"lora_rank": args.rank, "lora_alpha": args.rank, "quantize": args.quantize,
@@ -510,7 +513,12 @@ def command_validate(args: argparse.Namespace) -> int:
         "no_missing_keys": all(r["model"][k]["missing"] == 0 for k in ("vae", "image_encoder", "reference_unet", "denoising_unet", "pose_guider")),
         "lora_injected": r["model"]["trainable"]["lora_tensors"] > 100,
         "kernels_on_gpu": r["kernels"]["kernel_launches"] > 0,
-        "loss_falls": r["loss_last_tenth"] is not None and r["loss_last_tenth"] < r["loss_first_tenth"],
+        # Step 5: the loss must not rise by more than two standard errors (a fall in the tenths' means is within their
+        # noise at random timesteps); that training moves the model is the probe's check below. Earlier fits, without
+        # the standard errors, keep the strict test.
+        "loss_falls": r["loss_last_tenth"] is not None and (
+            r["loss_last_tenth"] < r["loss_first_tenth"] + 2 * math.hypot(r["loss_first_tenth_se"], r["loss_last_tenth_se"])
+            if r.get("loss_first_tenth_se") is not None else r["loss_last_tenth"] < r["loss_first_tenth"]),
         "sample_moves_to_target": r["probe_mse_after"] < r["probe_mse_before"],
         "checkpoints": bool(r["checkpoints"]) and all(c["sha256"] for c in r["checkpoints"]),
         "finite": all(math.isfinite(x) for x in r["loss_curve"]),

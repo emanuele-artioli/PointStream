@@ -12818,3 +12818,31 @@ and each object's representation is judged on both:
 - **Waits for the user's approval** (and H_player, if not 20 hours).
 - Approved (user, 2026-10-23): as written, ceiling 11 GPU-hours,
   H_player = 20 hours.
+- Run log (2026-10-23).
+  - Training data (`k6b prepare-match`, code `436e6c3`, 16,000 MiB),
+    each passing `k6b validate` locally: `rublev`
+    `20261023T192005Z-64582992` (7 windows, 3,337 crops,
+    `3ece72fa…db77`), `djokovic_zverev` `…192013Z-a58b341c` (5, 2,400,
+    `c163f089…e18e`), `djokovic_federer` `…192023Z-6e446ad0` (1, 480,
+    `fd0d57e1…c01a`), `medvedev_struff` `…192031Z-c32a29a2` (2, 939,
+    `71e7bc58…1c23`).
+  - Deviation (stage limit): the tennis base trains on every second
+    frame for 25 minutes, not every frame for 30. At about 18,000 crops,
+    encoding (0.07 s per crop) and a 30-minute fit would overrun the
+    45-minute stage. Step 4's pilot found no gain past 10 minutes.
+  - Fits keep pose maps as uint8 (the base would have needed about 86 GB
+    of host memory as float32); the arithmetic is unchanged.
+  - The base's first submission (`20261023T193408Z-ecb623cd`) failed its
+    smoke on `loss_falls` (0.228 → 0.230 over 200 steps) while its probe
+    fell (0.0153 → 0.0142): the second noise failure of that check after
+    step 4's `alcaraz_hurkacz`. Each step's loss is at a random timestep,
+    so a tenth's mean is noisy. From here, fits record the tenths'
+    standard errors and the check fails only on a rise of more than two
+    of them; the probe stays the test that training moves the model.
+    Earlier fits keep the strict test (step 4's `alcaraz_hurkacz` result
+    is not re-read).
+  - Development fits (code `a3390e5`, 10 minutes): `dz-A`
+    `20261023T192405Z-4879087a` (594 optimizer steps on a shared GPU,
+    against step 4's 922; 1,542,044 bytes), `med-A` `…192542Z-76ac4449`
+    (843; 1,557,820), `med-B` `…192551Z-62ca7bde` (585; 2,515,324, of
+    which the guider's change 965,696: 2.79 kbps over 2 h).

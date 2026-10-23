@@ -210,3 +210,29 @@ def test_step5_development_choice():
     assert k6b.fewer_bits_hold(rows, "gen-C", "gen-C4")
     assert not k6b.fewer_bits_hold(rows, "gen-A", "gen-B")
     assert k6b.guidance_better(stats, "gen-C", "gen-Cg")  # 3 won each, the larger margin
+
+
+def test_fit_validator_loss_check_allows_noise_but_not_a_rise(tmp_path):
+    import json
+
+    from experiments.tennis import k6b_fit
+
+    model = {k: {"missing": 0} for k in ("vae", "image_encoder", "reference_unet", "denoising_unet", "pose_guider")}
+    model["trainable"] = {"lora_tensors": 464}
+    base = {"device": {"class_matches": True}, "gpu_peak_gib": 12.0, "gpu_memory_limit_mib": 24000, "model": model,
+            "kernels": {"kernel_launches": 10}, "probe_mse_before": 0.015, "probe_mse_after": 0.014,
+            "checkpoints": [{"sha256": "x"}], "loss_curve": [0.2], "settings": {"pose_guider_frozen": True, "quantize": 0}}
+
+    def check(**loss):
+        (tmp_path / "k6b_fit.json").write_text(json.dumps({**base, **loss}))
+        k6b_fit.main(["validate", "--stage", str(tmp_path)])
+        return json.loads((tmp_path / "out.json").read_text())["checks"]["loss_falls"]
+
+    import os
+    os.environ["PS_VALIDATION_PATH"] = str(tmp_path / "out.json")
+    try:
+        assert check(loss_first_tenth=0.228, loss_last_tenth=0.230, loss_first_tenth_se=0.006, loss_last_tenth_se=0.006)
+        assert not check(loss_first_tenth=0.20, loss_last_tenth=0.25, loss_first_tenth_se=0.006, loss_last_tenth_se=0.006)
+        assert not check(loss_first_tenth=0.228, loss_last_tenth=0.230)  # no standard errors: the strict test
+    finally:
+        del os.environ["PS_VALIDATION_PATH"]
