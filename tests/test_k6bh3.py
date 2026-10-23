@@ -52,3 +52,49 @@ def test_flicker_reads_luma_changes_inside_r() -> None:
     regions = [np.ones((4, 4), bool)] * 3
     assert k6bh3.flicker(lambda t: frames[t], regions, [0, 1, 2]) == pytest.approx(5.0)
     assert np.isnan(k6bh3.flicker(lambda t: frames[t], regions, [0]))
+
+
+def _candidates() -> dict[str, np.ndarray]:
+    # 6 candidate frames; frame 2 has no kept fit, frame 4 has only a dropped one
+    return {"visor_frame": np.array([10, 20, 30, 40, 50, 60]), "index": np.array([9, 19, 29, 39, 49, 59]),
+            "row_cand": np.array([0, 0, 1, 3, 4, 5]), "row_right": np.array([False, True, False, True, True, False]),
+            "row_inside": np.array([21, 18, 15, 20, 3, 21]), "row_kp2d": np.tile(np.array([[100.0, 100.0]]), (6, 21, 1))
+            + np.arange(21)[None, :, None]}
+
+
+def test_transfer_picks_are_kept_frames_evenly_spaced() -> None:
+    arrays = _candidates()
+    assert k6bh3.transfer_picks(arrays, 10, 15) == [0, 1, 3, 5]  # every frame with a kept fit, in order
+    assert k6bh3.transfer_picks(arrays, 2, 15) == [0, 5]  # the ends, by position only
+    assert k6bh3.transfer_picks(arrays, 3, 15) == [0, 1, 5] or k6bh3.transfer_picks(arrays, 3, 15) == [0, 3, 5]
+
+
+def test_transfer_crops_take_kept_hands_with_their_masks(monkeypatch: pytest.MonkeyPatch) -> None:
+    from experiments.visor import k6bh2c
+    from src.segmentation import visor
+
+    arrays = _candidates()
+    shape = (300, 400)
+    left = np.zeros(shape, bool)
+    left[90:140, 90:140] = True
+
+    def masks(frame: int) -> dict[str, np.ndarray]:  # frame 10 has both hands, 40 has none, 60 only the left
+        return {10: {visor.HANDS[0]: left, visor.HANDS[1]: left}, 40: {}, 60: {visor.HANDS[0]: left}}[frame]
+
+    monkeypatch.setattr(k6bh2c, "hand_masks", masks)
+    rgb = np.zeros((3, *shape, 3), np.uint8)
+    crops = k6bh3.transfer_crops(arrays, [0, 3, 5], rgb, [0, 3, 5], {10: 10, 40: 40, 60: 60}, 15)
+    assert [(c["t"], c["right"]) for c in crops] == [(0, False), (0, True), (5, False)]  # 40's hand has no mask
+    assert all(c["image"].shape == (256, 256, 3) and c["mask"].shape == (256, 256) and c["kp"].shape == (21, 2) for c in crops)
+    assert [c["index"] for c in crops] == [9, 9, 59]
+
+
+def test_near_share_counts_frames_close_to_the_window() -> None:
+    window = (1000, 1240)
+    assert k6bh3.near_share([400, 499, 500, 1239, 1739, 1740], window, 50.0, 10.0) == pytest.approx(3 / 6)
+    assert np.isnan(k6bh3.near_share([], window, 50.0, 10.0))
+
+
+def test_transfer_decision_is_the_users_criterion() -> None:
+    assert "unbilled" in k6bh3.TRANSFER_DECISION["billing"] and "0.75" in k6bh3.TRANSFER_DECISION["pass"]
+    assert k6bh3.TRANSFER_FRAMES == 240 and k6bh3.WEIGHT_BYTES_PER_PARAM == 2

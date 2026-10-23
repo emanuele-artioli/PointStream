@@ -11938,3 +11938,70 @@ and each object's representation is judged on both:
     not see. Rung 2's rule asked for a visual check of any pass with flicker
     above the source's: this is it, and nothing in it contradicts the pass.
   GPU time: 2,169 s; rung 3 in all, about 3.1 GPU-hours of the 4.
+
+### 2026-10-23 — K6b (hands) 4: the fit moved outside the window (transfer, rule)
+- Approved (user, 2026-10-23: "I agree, go ahead", to running rung 4 as a
+  transfer test with the fit treated as delivered beforehand, the billed
+  rate and payback reported beside it, about 2.5–3 GPU-hours).
+- Question. Rung 3's FoundHand, fitted on the window's own frames, beat the
+  hull (83%). Does a fit on other shots of the same video do the same, with
+  nothing from the window in its training? That is the fit an encoder could
+  make and send before the window plays.
+- Billing. The fit is treated as delivered beforehand and not billed, as
+  venue models are (user, 2026-10-20), so the item's rate is K1f's keypoint
+  rate, as in rungs 2 and 3. Reported beside, not decided on: the rate with
+  the fitted weights billed once per video (675.6M parameters in bf16,
+  1.35 GB, about 15 Mbps over these 10–15-minute videos) and its payback
+  (2c's `payback_seconds`). Per-video billing of full weights fails by
+  arithmetic, so a pass here asks how small a fit can be, not whether this
+  one ships.
+- Items. Rung 3's three (P06_108, P25_09, P22_107; P22_107 in G's
+  footage), 240 frames each, with K1f's rows, R, bound and hull. Same
+  judges and hull as rungs 2 and 3. Nothing in the window is re-coded.
+- Fit data (the only change from rung 3). 2c's candidates (VISOR's dense
+  hand masks outside the window and a 1 s guard, every 10th VISOR frame,
+  WiLoR's two-pass hand-box fit, kept with ≥ 15 of 21 joints inside the
+  mask dilated by 10%), from 2c's published units (P25_09 and P22_107 from
+  their extract stages, P06_108 from its score stage, cut to stride 10). Of
+  the candidate frames with at least one kept fit, 240 evenly spaced by
+  position (content-blind; rung 3 fitted 240 frames), decoded again, and
+  every kept hand on them cropped by rung 2's rule with its VISOR mask and
+  WiLoR joints. The share of crops within 10 s of the window is reported.
+- Everything else is rung 3's, unchanged: the released EMA weights, full
+  fine-tune, AdamW 1e-5, batch 8, bf16 autocast, `training_losses`, the
+  pairing and dropout, 20 min of fitting, the same seeds. Judged as rung 2's
+  `gen` (50 steps, guidance 2.5, both hands in lockstep) on all 240 window
+  frames, from the window's first fitted frame per side as reference
+  (granted and unbilled, as in rungs 2 and 3). `warp` reproduced (check:
+  within 0.002 of K1f's LPIPS on R, or nothing is read). Flicker and the
+  visual-check strips are saved, as in rung 3's check.
+- Decision rule (`k6bh3.TRANSFER_DECISION`, fixed before any run; the
+  user's criterion). An item is won on a metric when the transferred
+  `gen`'s value on R is below K1f's hull at its keypoint rate. Score = mean
+  over {LPIPS, DISTS} of the share of the 3 items won.
+  - **Pass** (≥ 75%): a fit made elsewhere in the same video carries the
+    hand. Generative hands are buildable if the fit can be delivered. Next
+    goes to the user: how small a fit can be (LoRA rank, fewer layers, one
+    fit per person across videos) against the payback.
+  - **Fail** (< 75%): the fit does not transfer across shots. Rung 3's
+    win needs the window's own frames, which only pixels carry, so the
+    generative route for hands closes at the keypoint rate. With 2c, hands
+    on fidelity close, and they go to the experience track (item J).
+  - Reported beside: the gap to rung 3's in-window fit per item (how much
+    of the fit's gain transfers) and to rung 2's zero-shot `gen`.
+- Hypothesis. It fails, landing between rung 2 and rung 3 (score ≤ 50%).
+  2c showed that what other shots lack is the hand's appearance in the
+  window (forearm extent, sleeve, lighting, place in the frame), and a fit
+  learns the shots it sees.
+- Competing explanation. The fit learns the person (skin, hand shape,
+  sleeve) and the generator places it from the keypoints, which a warped
+  bank could not. Then most of rung 3's gain transfers and the margins on
+  P06_108 and P22_107 survive. A transfer that holds only on the items whose
+  crops sit near the window (the 10 s share) would be a near-duplicate
+  effect, as 2c checked.
+- Budget. One job per item, ≤ 45 min each (decoding the 240 fit frames,
+  20 min of fitting, rendering and scoring 240 frames, `warp`), RTX 6000
+  Ada, shared, declared at 30,000 MiB with PyTorch capped at 27 GiB (rung
+  3's peak: 21.2 GB). Each job's smoke (≤ 600 s) fits 60 frames for 120 s
+  and judges 24. Estimate about 2.4 GPU-hours with the smokes. Ceiling 3
+  GPU-hours, failed attempts included.
