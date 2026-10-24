@@ -303,6 +303,35 @@ def test_lost_publication_reply_retains_id_and_does_not_resubmit(tmp_path, monke
     assert calls == ["health", "prepare", "publish"]
 
 
+def test_submit_recommends_bounded_completion_monitoring_without_recurring_heartbeat(tmp_path, monkeypatch):
+    from argparse import Namespace
+    spec_path = tmp_path / "spec.json"
+    spec_path.write_text(json.dumps(specification(tmp_path)))
+    snapshot = tmp_path / "snapshot.tar"
+    snapshot.write_bytes(b"snapshot")
+    monkeypatch.setattr(inbox, "load_config", lambda _: {"hosts": ["gpu1"]})
+    monkeypatch.setattr(fleet, "_build_snapshot", lambda *a, **kw: (snapshot, "hash", {}))
+    monkeypatch.setattr(fleet, "_send_snapshot", lambda *a: None)
+    calls = []
+    def remote(config, action, payload):
+        calls.append(action)
+        if action == "health":
+            return {"workers": {"gpu1": {"updated": time.time()}}}
+        if action == "prepare":
+            return {"directory": "/data/jobs/fleet/inbox/" + payload["job_id"]}
+        return {"status": "pending"}
+    monkeypatch.setattr(inbox, "remote_rpc", remote)
+    args = Namespace(state_dir=tmp_path / "state", spec=spec_path, include_change=[], include_untracked=[], chat_id="chat")
+    result = inbox.submit(args, tmp_path)
+    policy = result["monitoring"]
+    assert calls == ["health", "prepare", "publish"]
+    assert not policy["heartbeat_required"] and not policy["recurring_polling"]
+    assert "interval_minutes" not in policy
+    assert policy["wait_command"] == [str(tmp_path / "scripts" / "ps-fleet"), "wait", result["job_id"], "--max-seconds", "2700"]
+    assert policy["watchdog_seconds"] == 2700
+    assert monitor.read_json(args.state_dir / (result["job_id"] + ".json"))["chat_id"] == "chat"
+
+
 def test_campaign_budget_includes_supervisor_startup(campaign):
     monitor.write_json(campaign / "run" / "status.json", {"started": time.time() - 100})
     monitor.write_json(campaign / "run" / "request.json", {"budget_seconds": 101})

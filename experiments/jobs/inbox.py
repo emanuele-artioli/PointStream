@@ -1036,7 +1036,10 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         response = remote_rpc(config, "publish", {"job_id": job_id, "spec": spec, "snapshot": metadata})
         record.update(response)
         monitor.write_json(args.state_dir / f"{job_id}.json", record)
-        return {**record, "monitoring": {"chat_id": args.chat_id, "interval_minutes": 5, "events_command": str(root / "scripts" / "ps-fleet") + " events " + job_id, "heartbeat_required": bool(args.chat_id)}}
+        return {**record, "monitoring": {"chat_id": args.chat_id, "events_command": str(root / "scripts" / "ps-fleet") + " events " + job_id,
+                                      "wait_command": [str(root / "scripts" / "ps-fleet"), "wait", job_id, "--max-seconds", "2700"],
+                                      "mode": "completion_first", "watchdog_seconds": 2700,
+                                      "heartbeat_required": False, "recurring_polling": False}}
     except Exception as exc:
         # Publication/launch may have succeeded even when the reply was lost.
         monitor.write_json(args.state_dir / f"{job_id}.json", {**record, "status": "submission_unknown", "error": str(exc)})
