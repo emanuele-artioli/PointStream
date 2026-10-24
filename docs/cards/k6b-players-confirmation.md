@@ -1,4 +1,4 @@
-# Card: tennis-player study (clip-local scope approval pending; 8 GPU-hour ceiling)
+# Card: tennis-player study (clip-local scope approved; 8 GPU-hour ceiling)
 
 Effort: high. Report to the requesting chat and append to
 `docs/experiments/k6b-players.md`; do not launch chats or recurring monitors.
@@ -7,8 +7,8 @@ Effort: high. Report to the requesting chat and append to
 Proposed next phase: describe whether frozen step-5 AnimateAnyone player
 rendering reaches the frozen score on 12 unused clip-local 240-frame windows
 of Alcaraz–Hurkacz and Medvedev–Struff under the frozen ≥95% court-registration
-gate. This same-broadcast diagnostic requires explicit scope-change approval;
-it cannot establish independent-source, training-clean or unseen-match
+gate. The user explicitly approved this same-broadcast diagnostic scope on
+2026-10-24; it cannot establish independent-source, training-clean or unseen-match
 confirmation. The stronger confirmation goal remains blocked. Step 5 remains failed.
 
 ## Scope and stop conditions
@@ -17,9 +17,10 @@ work included, contingent on CPU provenance validation. **0 spent**. CPU source
 checks found no original Alcaraz/Medvedev videos or verified extraction receipts
 in the inspected archive/records; source-frame mapping remains unresolved.
 Independent-source confirmation stays blocked at that gate. The current
-phase is CPU-only; any later use requires explicit approval of the narrower
-diagnostic scope below. The earlier contingent budget approval does not waive
-the unresolved provenance gate. No fitting, Wan-Animate or other task is
+preparation phase is CPU-only. The user has now explicitly approved the narrower
+diagnostic scope below within the existing ceiling; remaining CPU validation
+and staged compute gates still apply. This scope approval does not pass
+the unresolved original-source confirmation gate. No fitting, Wan-Animate or other task is
 included. The authorization/outcome continuation is appended to the experiment
 entry. Stop on newly detected overlap, unresolved required validation, validator
 failure, budget exhaustion, mathematical futility or required user judgment. No automatic
@@ -92,7 +93,7 @@ claim, verified original-source PTS mapping and source/replay overlap checks
 remain mandatory and unresolved. The completed clip-only audit does not pass
 that gate. For the proposed diagnostic, reuse its preserved receipts and carry
 original-source/replay uncertainty as an explicit limitation; this substitution
-requires user scope approval before GPU spending. Separate clip hashes alone
+has explicit user scope approval (2026-10-24). Separate clip hashes alone
 do not prove source-frame independence. Known judge training overlap blocks
 judging; unknown upstream pretraining exposure remains disclosed.
 
@@ -103,7 +104,7 @@ validate clip-local frame/PTS/fps and codec alignment. Do not demand unavailable
 original PTS as a diagnostic execution check or label it verified. A mismatch,
 new overlap or known judge exposure stops work for review before quality opens.
 
-## Future execution, only after explicit clip-local scope approval
+## Future execution under approved clip-local scope
 Use existing step-5 C base plus frozen matching adapters/guider, 4-bit,
 guidance 2.0, 512×784 crops, 30 DDIM steps, existing deterministic seeds
 and 4 px velocity keypoints every fourth frame, no fitting. Same first fitted source
@@ -128,7 +129,7 @@ stop resolves provenance, validates gate discrimination, overturns step 5 or
 supports independent-sample inference; report the two match clusters.
 
 Implement and test the substantive validator from the experiment entry before
-GPU dispatch (only after scope approval and CPU prerequisites pass): hashes and
+GPU dispatch (approved scope; only after CPU prerequisites pass): hashes and
 dependency/overlap joins, verified clip-local PTS/frame/fps exactness,
 227/228 gate boundaries and invalid homographies, identical mask/index sets,
 keypoint round trip, generated coverage/nonflatness, reference membership,
@@ -147,17 +148,18 @@ Use compatible Ada gpu5/gpu6 pool, pinned packs/locks and SHA256 inputs. Inspect
 existing jobs/hosts; persist IDs, budget, deadline and output paths before one
 bounded fleet wait. No recurring monitors. Preserve evidence read-only and
 write new outputs under Datasets. Run project checks, commit/push scoped work,
-report here. No GPU execution may begin until explicit scope-change approval
-and the remaining CPU prerequisites pass. The ceiling is already approved;
+report here. Scope and ceiling are approved; GPU execution still requires the
+remaining CPU prerequisites and staged gates to pass;
 0 of 8 GPU-hours spent. No fitting, source download, other chat, recurring
 monitor or auto-merge attempt is authorized by this continuation.
 
-## Decision awaiting the user
-Approve proceeding with the **clip-local same-broadcast diagnostic despite
-unresolved original-source/replay independence**, using the unchanged 12 windows,
-frozen rule/recipe, identical-window anchors and existing 8 GPU-hour ceiling,
-subject to CPU validation and staged smoke/pilot gates; or retain CPU-only
-status at 0 GPU cost. Recommendation: the narrower diagnostic is defensible
-if its descriptive value warrants the estimated 6–8 GPU-hours; it cannot
-deliver the original stronger confirmation claim. No additional budget is
-requested, and approval must not mark the original-source gate passed.
+## Scope approval recorded (2026-10-24)
+The user explicitly approved proceeding with the **clip-local same-broadcast
+diagnostic despite unresolved original-source/replay independence** (“I approve
+it”), using the unchanged 12 windows, frozen rule/recipe, identical-window
+anchors and existing 8 GPU-hour ceiling, subject to CPU validation and staged
+smoke/pilot gates. No further scope or budget approval is pending within these
+limits. Estimated total remains 6–8 GPU-hours; 0 spent. This authorization
+cannot deliver the original stronger confirmation claim or mark its gate passed.
+The preparation-only task ends here; validator implementation and staged
+execution are the next authorized work, with no fitting or Wan-Animate.

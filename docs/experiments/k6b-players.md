@@ -1874,3 +1874,34 @@ a weaker claim automatically.
   appended protocol override and own PLAN text together; `git diff --check`
   passes. No executable files changed, so no audit or test suite rerun. Prior
   code-validation results and the unchanged macOS test limitation remain above.
+
+
+### 2026-10-24 — Explicit approval of narrower diagnostic scope
+
+- User approval in this study chat: “I approve it, I don't understand what the
+  problem is,” attached to the pending clip-local scope decision. This is
+  explicit permission for the narrower **clip-local same-broadcast diagnostic
+  despite unresolved source independence**. It supersedes the preceding
+  scope-approval-pending status; no repeated scope/budget approval is needed
+  within the frozen protocol and 8 GPU-hour ceiling.
+- The unresolved original-source/replay issue now limits the diagnostic's
+  claim; it is not an execution blocker for this approved scope. The stronger
+  independent-source confirmation gate remains **unresolved**, not passed.
+  No claim of certified training-clean frames or unseen-match generalization.
+- Unchanged: 12 frozen windows; ≥228/240 K8b fits gate; frozen step-5 recipe;
+  identical-window SVT-AV1/DCVC-UF anchors; descriptive ≥75% score; exploratory
+  115 px threshold; references and exact matte granted/unbilled; 8 GPU-hour
+  hard ceiling with **0 spent**. Smoke/pilot, scale-feasibility, validator and
+  futility rules still apply. No fitting, Wan-Animate or cohort replacement.
+- Preparation-only work is complete. Next authorized execution work is to
+  implement/test the substantive validator and freeze/verify staged manifests,
+  followed by the staged compute gates. These checks protect correctness;
+  they do not reopen the already approved claim scope or fabricate source PTS.
+- The planning chat was informed directly with the user's explicit permission,
+  identifying this chat as the study owner to avoid duplicate execution.
+  No other chat was launched. No GPU job, fitting, generation, new source
+  download, monitor, wakeup or auto-merge attempt occurred in this approval
+  continuation. GPU quality decision remains not reached.
+- Verification: documentation reviewed against the approved scope and previous
+  frozen protocol; `git diff --check` passes. No executable changes or audit
+  reruns; prior test results remain recorded above.
