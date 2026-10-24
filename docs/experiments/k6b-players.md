@@ -1804,3 +1804,73 @@ resolves recorded fitting lineage, not decoded replay/PTS independence.
   `python -m pytest`: 843 passed, 24 skipped, 1 unchanged macOS protected-path
   symlink-resolution failure. `git diff --check` passes. PR diff is confined
   to this study's PLAN text, card, experiment entry, audit utility and tests.
+
+
+### 2026-10-24 — Documentation reconciliation; clip-local scope decision pending
+
+This continuation reuses the preserved CPU recovery report and receipts above;
+no audit was rerun. It supersedes the original preparation's execution and
+validator prerequisites **only for a proposed clip-local diagnostic**, subject
+to explicit user scope approval. The original-source confirmation gate remains
+**unresolved**, not passed. The earlier 8 GPU-hour approval was contingent on
+provenance checks; it is not permission to waive that gate or dispatch under
+a weaker claim automatically.
+
+- **Concrete approval needed:** proceed with a descriptive same-broadcast,
+  clip-local diagnostic despite unresolved original-source/replay independence,
+  within the existing 8 GPU-hour ceiling, after the remaining CPU prerequisites
+  and staged gates; or keep CPU-only status at no GPU cost. Recommendation:
+  the diagnostic is defensible if the user values that limited result enough
+  for the estimated 6–8 GPU-hours. It cannot deliver independent-source,
+  certified training-clean or unseen-match confirmation. No new budget request.
+- **Unchanged inputs/protocol:** all 12 frozen 240-frame windows and source
+  hashes in the card; ≥228/240 K8b `fits=true` (≤6 px), finite nonsingular
+  homographies, invalid/missing=false; no quality-dependent replacements.
+  All pass, so gate discrimination is untested. The 115 px threshold stays
+  exploratory and cannot rescue failure. Keep frozen step-5 C base/matching
+  adapters/guider, 4-bit, guidance 2.0, 512×784, 30 DDIM, existing deterministic
+  seed and 4 px velocity/every-fourth-frame keypoint rules; no fitting/tuning.
+- **Comparison/limitations:** actual SVT-AV1 and DCVC-UF on identical windows,
+  native fps, masks, indices and duration convention, fair achievable anchor
+  envelopes without extrapolation. References and exact target matte R remain
+  **granted and unbilled**; no end-to-end codec-gain claim. Preserve two-match
+  clustering and unknown original-source/replay and upstream pretraining
+  exposure; the clip screen is not a certificate of source independence.
+- **Descriptive rule:** mean LPIPS/DISTS billed-rate win share ≥75%
+  (≥18/24 with all 12), minimum six valid gated windows/three per match;
+  report every window/metric/match, pooled/gated, billed/unbilled and missingness.
+  Billed below bar but unbilled ≥75% returns to the user; below unbilled bar
+  fails the descriptive criterion. No interim success; stop for mathematical
+  futility only when every remaining win cannot reach the bar. Missing output
+  or unfair/unbracketed anchors are unresolved, never wins. Step-5 fail stands.
+- **Remaining CPU prerequisites:** implement/test the substantive GPU-run
+  validator specified earlier, including corruption rejection; freeze manifest,
+  scoring indices and code; recheck staged bytes and dependency/reference joins
+  against preserved receipts. Verify clip-local frame/PTS/fps and alignment,
+  rather than requiring unavailable original PTS for this narrower execution.
+  Validator records `clip_audit=complete`, `original_source_gate=unresolved`,
+  `claim_scope=clip_local_diagnostic`, and rejects a stronger claim while that
+  gate is unresolved. No nominal cut-time inference becomes verified PTS.
+  Existing substantive checks for geometry boundaries, codec/keypoint round
+  trips, masks/indices, coverage, rates, real devices/kernels and finite,
+  bracketed metrics remain mandatory. GPU-dependent checks run only in an
+  authorized smoke. Known judge overlap, new detected overlap or changed inputs
+  stops execution for review; unknown exposure remains explicitly disclosed.
+- **Staging unchanged:** 0.3 GPU-h smoke (≤600 s each, one window per match),
+  3.4 h first six (three per match in frozen rank order), 3.4 h remaining six,
+  0.9 h reserve; hard total 8 h including failures/retries. Before scaling,
+  pilot must demonstrate total projected cost ≤8 h with valid outputs and fair
+  anchors; otherwise stop, not tune or silently expand budget. Single-window
+  shards/checkpoints and waits ≤45 min. No interim pass or quality-driven recipe
+  changes; budget exhaustion and validator failure stop the study.
+- **Outcome of this continuation:** documentation reconciled; decision by
+  quality rule not reached; **0 of 8 GPU-hours spent**, no jobs submitted.
+  No GPU dispatch, fitting, generation, source download, additional chat,
+  recurring monitor or auto-merge attempt. The separate existing merge approval
+  block remains in force. Card now requires scope approval instead of asking
+  again for the already granted ceiling. Historical entries above are retained
+  as provenance, with this entry controlling the proposed diagnostic route.
+- Verification for this documentation-only continuation: reviewed the card,
+  appended protocol override and own PLAN text together; `git diff --check`
+  passes. No executable files changed, so no audit or test suite rerun. Prior
+  code-validation results and the unchanged macOS test limitation remain above.

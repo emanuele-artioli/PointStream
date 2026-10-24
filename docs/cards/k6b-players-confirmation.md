@@ -1,13 +1,15 @@
-# Card: tennis-player confirmation (8 GPU-hours approved; provenance gate unresolved)
+# Card: tennis-player study (clip-local scope approval pending; 8 GPU-hour ceiling)
 
 Effort: high. Report to the requesting chat and append to
 `docs/experiments/k6b-players.md`; do not launch chats or recurring monitors.
 
 ## Goal
-Decide whether frozen step-5 AnimateAnyone player rendering transfers to unused
-240-frame windows of Alcaraz–Hurkacz and Medvedev–Struff under a frozen ≥95%
-court-registration gate. This tests a same-match conditional hypothesis;
-it does not establish independent-match generalization. Step 5 remains failed.
+Proposed next phase: describe whether frozen step-5 AnimateAnyone player
+rendering reaches the frozen score on 12 unused clip-local 240-frame windows
+of Alcaraz–Hurkacz and Medvedev–Struff under the frozen ≥95% court-registration
+gate. This same-broadcast diagnostic requires explicit scope-change approval;
+it cannot establish independent-source, training-clean or unseen-match
+confirmation. The stronger confirmation goal remains blocked. Step 5 remains failed.
 
 ## Scope and stop conditions
 User approval (2026-10-24): **8 GPU-hours hard ceiling**, all smoke/failed/retry
@@ -15,10 +17,12 @@ work included, contingent on CPU provenance validation. **0 spent**. CPU source
 checks found no original Alcaraz/Medvedev videos or verified extraction receipts
 in the inspected archive/records; source-frame mapping remains unresolved.
 Independent-source confirmation stays blocked at that gate. The current
-phase is CPU-only; any later use must follow the explicitly narrower diagnostic
-route below. No fitting, Wan-Animate or other task is included. The authorization/outcome continuation
-is appended to the experiment entry. Stop on unresolved overlap, validator failure, budget
-exhaustion, mathematical futility or required user judgment. No automatic
+phase is CPU-only; any later use requires explicit approval of the narrower
+diagnostic scope below. The earlier contingent budget approval does not waive
+the unresolved provenance gate. No fitting, Wan-Animate or other task is
+included. The authorization/outcome continuation is appended to the experiment
+entry. Stop on newly detected overlap, unresolved required validation, validator
+failure, budget exhaustion, mathematical futility or required user judgment. No automatic
 replacement, tuning, refit, or expansion of scope.
 
 Branch: `codex/k6b-player-confirmation-plan`, isolated from main.
@@ -83,14 +87,23 @@ from all old manifest clip IDs and their in-clip references. The original-profil
 base and both match-adapter dependency chains are verified in the preserved
 job records and their hashes are recorded in the entry; recheck actual staged
 bytes against those receipts before dispatch. Pre-reset finetuned_tennis
-has unknown track overlap and is forbidden here. Verify original-source PTS
-mapping and exact/near-duplicate replay overlap with every old training,
-development and reference clip on CPU before any GPU spending. Separate clip
-hashes alone do not prove source-frame independence. Known judge training overlap
-blocks judging; unknown upstream pretraining exposure remains disclosed.
-If a check fails, stop and revise the card before opening quality, not after.
+has unknown track overlap and is forbidden here. For the stronger confirmation
+claim, verified original-source PTS mapping and source/replay overlap checks
+remain mandatory and unresolved. The completed clip-only audit does not pass
+that gate. For the proposed diagnostic, reuse its preserved receipts and carry
+original-source/replay uncertainty as an explicit limitation; this substitution
+requires user scope approval before GPU spending. Separate clip hashes alone
+do not prove source-frame independence. Known judge training overlap blocks
+judging; unknown upstream pretraining exposure remains disclosed.
 
-## Future execution, only after approval
+Remaining CPU prerequisites for the diagnostic: implement/test the substantive
+validator below; freeze its manifest, scoring indices and code hashes; recheck
+staged input/checkpoint bytes and dependency/reference joins against receipts;
+validate clip-local frame/PTS/fps and codec alignment. Do not demand unavailable
+original PTS as a diagnostic execution check or label it verified. A mismatch,
+new overlap or known judge exposure stops work for review before quality opens.
+
+## Future execution, only after explicit clip-local scope approval
 Use existing step-5 C base plus frozen matching adapters/guider, 4-bit,
 guidance 2.0, 512×784 crops, 30 DDIM steps, existing deterministic seeds
 and 4 px velocity keypoints every fourth frame, no fitting. Same first fitted source
@@ -104,19 +117,27 @@ stays in one job on one GPU. Start three settings per codec as fixed in the
 entry; complete all potentially hull-improving K6 settings before deciding,
 within budget. No fabricated BD-rate from one method operating point.
 
-Decision: mean of LPIPS/DISTS win shares at billed rate ≥75%, minimum six
-gated windows with three per match. With all 12, ≥18/24 window-metrics passes.
+Descriptive decision: mean of LPIPS/DISTS win shares at billed rate ≥75%,
+minimum six gated windows with three per match. With all 12, ≥18/24
+window-metrics reaches the descriptive bar.
 Below billed bar but ≥75% unbilled goes to user; below unbilled bar fails.
 Report pooled/gated, each metric/window/match, unbilled and missingness. No
 interim pass; futility stop only if all remaining wins cannot reach the bar.
-115 px results cannot rescue failure. No inference that frames are independent.
+115 px results cannot rescue failure. Neither reaching the bar nor a futility
+stop resolves provenance, validates gate discrimination, overturns step 5 or
+supports independent-sample inference; report the two match clusters.
 
 Implement and test the substantive validator from the experiment entry before
-GPU dispatch (only after the unresolved source gate clears): hashes and dependency/overlap joins, PTS/frame/fps exactness,
+GPU dispatch (only after scope approval and CPU prerequisites pass): hashes and
+dependency/overlap joins, verified clip-local PTS/frame/fps exactness,
 227/228 gate boundaries and invalid homographies, identical mask/index sets,
 keypoint round trip, generated coverage/nonflatness, reference membership,
 byte/rate recomputation, real codec round trips, actual device/kernels and
-finite/bracketed metrics; corruption fixtures must be rejected.
+finite/bracketed metrics; corruption fixtures must be rejected. Preserve
+separate provenance fields: `clip_audit=complete`,
+`original_source_gate=unresolved`, `claim_scope=clip_local_diagnostic`.
+Reject a stronger claim with that unresolved gate; never synthesize original PTS
+from nominal cut times or make unresolved provenance a validator success.
 
 Staging ceiling: smoke 0.3 h (≤600 s each), first six 3.4 h (three per match),
 remaining six 3.4 h, reserve 0.9 h; 8 h total. Expected renders 4.2 h plus
@@ -126,4 +147,17 @@ Use compatible Ada gpu5/gpu6 pool, pinned packs/locks and SHA256 inputs. Inspect
 existing jobs/hosts; persist IDs, budget, deadline and output paths before one
 bounded fleet wait. No recurring monitors. Preserve evidence read-only and
 write new outputs under Datasets. Run project checks, commit/push scoped work,
-report here. No GPU execution may begin until the user approves the budget.
+report here. No GPU execution may begin until explicit scope-change approval
+and the remaining CPU prerequisites pass. The ceiling is already approved;
+0 of 8 GPU-hours spent. No fitting, source download, other chat, recurring
+monitor or auto-merge attempt is authorized by this continuation.
+
+## Decision awaiting the user
+Approve proceeding with the **clip-local same-broadcast diagnostic despite
+unresolved original-source/replay independence**, using the unchanged 12 windows,
+frozen rule/recipe, identical-window anchors and existing 8 GPU-hour ceiling,
+subject to CPU validation and staged smoke/pilot gates; or retain CPU-only
+status at 0 GPU cost. Recommendation: the narrower diagnostic is defensible
+if its descriptive value warrants the estimated 6–8 GPU-hours; it cannot
+deliver the original stronger confirmation claim. No additional budget is
+requested, and approval must not mark the original-source gate passed.
