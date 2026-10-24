@@ -40,8 +40,11 @@ placeholders, a smoke of at most 600 s, a validator with substantive checks,
 sha256-identified inputs, a deadline and a budget. Check existing jobs and all
 eligible hosts before submitting to the compatible host pool. Uncertain
 submissions are inspected, never replayed; cancel only your own jobs. GPU hosts
-are gpu1–gpu6. Wait on fleet jobs only with `scripts/ps-fleet wait` (returns within 45
-minutes); summarize progress to the user at every return.
+are gpu1–gpu6. Wait on fleet jobs only with `scripts/ps-fleet wait` (at most 45
+minutes). Prefer verified completion-triggered wakeups. Do not create recurring
+LLM polling or cache keepalives; when completion wakeups are unavailable, use
+one bounded deadline check as described in [docs/fleet.md](docs/fleet.md).
+Notify only meaningful changes; persist state before waiting (user, 2026-10-24).
 
 ## Shared home is slow NFS
 
