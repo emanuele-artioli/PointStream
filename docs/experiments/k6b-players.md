@@ -2243,3 +2243,21 @@ a weaker claim automatically.
 - Final source/anchor shard submitted **`20261024T211935Z-d45d6fbb`**, same fixed ten anchors, Med029@138/Al047@123/Med021@246, 2700 s reservation/fresh44-minute deadline, code e35d3b3c. Receipt `/tmp/k6b-confirm-anchor4-submit.json`. Save ID before bounded wait.
 
 - CPU preparation of Al016/Med017/Al008 submitted **`20261024T212000Z-7d4ddcf5`**,0 GPU-h. Rendering these remains gated on first-six futility and cost. Receipt `/tmp/k6b-confirm-prepare-third3-submit.json`.
+
+- First full renderer `20261024T205730Z-869e62f2` complete; substantive full validation passes every check, exact frozen recipe/coverage/device and adapter+guider billing. Archive SHA256 `8a927ae4b80feaa7cb95f9fb61d5f3bafb1d2ce744a310fe07a1d58745a5ec06`. Claimed wall0.371330 h, completed total **2.12262/8 h** plus final anchor active. At0.3713 h/render, remaining11 renders4.085 h + final anchors about0.37 h + judging0.2–0.4 h projects6.8–7.0 h total, within8. Continue first-six pilot; remaining-six rendering still gated on quality futility.
+
+- Second renderer submitted **`20261024T212140Z-f1459bd9`**, Med014@194 both240-frame player units; same30DDIM/4bit/C recipe with matching Med adapter. Spec SHA256 `592b68c6169884e87d1be4d004676d87d4c82c33ab1c00c5a30ce4f368df6a66`, code6ccc5ec2,2100 s reservation/fresh44-minute deadline. Receipt `/tmp/k6b-confirm-gen2-submit.json`.
+
+- CPU recovery checkpoint: `tennis/k6b-confirm-20261024-execution/execution-state-20261024T2129Z.tar.gz`, SHA256 `f138ad9b5f2136e11313f3fde7ec1dda8ebdc88b1f8ddef2a277a0a372d20505`,1,916,710 bytes,13 members. Contains verified receipts, current ledger and exact spec factory; remote copy hash verified. New path only, no evidence modified. GPU stages continue under one bounded native wait.
+
+- Final anchor/source shard `20261024T211935Z-d45d6fbb` complete; all12 source symbol sets and fixed ten-point anchor curves now validated. Archive SHA256 `8f03bf7aef11443ef03ebb9ddfa369ce1148c5120b07404bf5a7bcdba9990e7f`. Charged wall0.380167 h; completed total **2.50279/8 h**, second renderer active. Pooled rates can now be frozen over all12 before interpreting pilot quality.
+
+- Third renderer submitted **`20261024T214351Z-3f29c4ca`**, Al013@213 both239-frame/two-run player units, fixed C recipe; spec SHA256 `f6f07af6b090f001e3275339a0c9baf7b87db7b33a8e8f1802061c47736d04ef`, code6ccc5ec2,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen3-submit.json`.
+
+- Final CPU preparation submitted **`20261024T214359Z-53bb8f6f`**, Med029/Al047/Med021,0 GPU-h; receipt `/tmp/k6b-confirm-prepare-fourth3-submit.json`.
+
+- Second full renderer `20261024T212140Z-f1459bd9` complete, full scientific validation passes. Archive SHA256 `41d02a6ecb0bb693acdee431b8ebaecfd1075c85f7eb3091410c70679d63ea90`. Charged0.374634 h; completed total **2.87743/8 h**, third renderer active. All12 source-only pooled entropy rates frozen before any judge quality: `tennis/k6b-confirm-20261024-execution/source-rates-frozen-20261024T2145Z.json`, SHA256 `b84eed26aafa7a8298c5be52ba2356e996d4394617bfb9819b3f61b3261fd8cf`.
+
+- Fourth renderer submitted **`20261024T214544Z-7d7c0bb1`**, Med037@349 both240-frame/one-run units, fixed matching C recipe; spec SHA256 `ac44b5b6d5d4bbaecf032ddc77c83cfcae9e147d86718d143fee7d189d5802bc`, code6ccc5ec2,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen4-submit.json`.
+
+- CPU report integration probe succeeded with all12 real anchor sources and both completed generation receipts; zero judged rows/no quality verdict, output `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/report-input-probe-20261024T2147Z.json`, SHA256 `d946015f67695c6367f0614cb78f39ae30f586bcdfef7b83c9e68cfd2386ac0c`. All source artifact checksums and substantive smoke/full receipts accepted by the final report path. No CUDA visible/no GPU use.

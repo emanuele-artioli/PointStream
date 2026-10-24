@@ -14,8 +14,8 @@ confirmation. The stronger confirmation goal remains blocked. Step 5 remains fai
 ## Scope and stop conditions
 User approval (2026-10-24): **8 GPU-hours hard ceiling**, all smoke/failed/retry
 work included. Explicit clip-local scope approval resolves the earlier
-provenance condition for this diagnostic. **1.75129 spent** before the active first renderer and final
-anchor shard; live accounting and job IDs are in the experiment entry. CPU source
+provenance condition for this diagnostic. **2.87743 spent** before the active third and fourth
+renderer shards; live accounting and job IDs are in the experiment entry. CPU source
 checks found no original Alcaraz/Medvedev videos or verified extraction receipts
 in the inspected archive/records; source-frame mapping remains unresolved.
 Independent-source confirmation stays blocked at that gate. The original
