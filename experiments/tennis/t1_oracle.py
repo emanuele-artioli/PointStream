@@ -339,8 +339,18 @@ def report(paths: list[Path], out: Path) -> int:
     windows = [w for p in paths for w in json.loads(p.read_text())['windows']]
     if len({w['id'] for w in windows}) != len(windows):
         raise ValueError('duplicate window in report inputs')
-    result: dict[str, Any] = {'sources': [{'path': str(p), 'sha256': file_sha256(p)} for p in paths], 'windows': {}, 'summary': {}, 'actual_billed': {'windows': {}, 'summary': {}}}
+    result: dict[str, Any] = {'sources': [{'path': str(p), 'sha256': file_sha256(p)} for p in paths], 'windows': {}, 'summary': {}, 'rate_components': {}, 'actual_billed': {'windows': {}, 'summary': {}}}
     for w in windows:
+        split_rows = [r for r in w['rows'] if r['kind'] == 'split']
+        components = {key: [float(min(r[key] for r in split_rows)), float(max(r[key] for r in split_rows))]
+                      for key in ['background_kbps', 'foreground_kbps', 'mask_kbps']}
+        framing = [r['actual_kbps'] - r['background_kbps'] - r['foreground_kbps'] - r['mask_kbps'] for r in split_rows]
+        if min(framing) <= 0:
+            raise ValueError('missing split container framing cost')
+        components['framing_kbps'] = [float(min(framing)), float(max(framing))]
+        anchors = [r['kbps'] for r in w['rows'] if r['kind'] == 'anchor']
+        components['anchor_kbps'] = [float(min(anchors)), float(max(anchors))]
+        result['rate_components'][w['id']] = components
         comparisons: dict[str, Any] = {}
         for metric, sign in METRICS.items():
             test = [(r['kbps'], sign * r['scores'][metric]) for r in w['rows'] if r['kind'] == 'split']
