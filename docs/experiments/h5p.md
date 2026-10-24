@@ -923,3 +923,32 @@ the decisions are in [experiments.md](../experiments.md).
   =3400 s, plus ended jobs <450 s; total <6250 s (<2 GPU-hours). This
   diagnostic is cheaper than changing or re-encoding the codec ladder,
   which is outside this card's mask work.
+- Diagnostic P01_107: `20261024T084521Z-bc72ff4d`, revision `74bd6d57`,
+  ≤600 s; pending at acknowledgement.
+- Final local checks at `9e576c04` implementation: ruff and mypy pass
+  (184 files); full pytest outside sandbox: **830 passed, 24 skipped,
+  1 failed**, the pre-existing macOS protected-symlink test. All 50
+  PointStream tests pass. Linux CI is still required for the platform case.
+- Diagnostics, same code and ≤600 s each: P02_02
+  `20261024T084534Z-c700da3b`; P03_10 `20261024T084607Z-e00640d5`.
+  P03's full-ladder job `20261024T084139Z-eed9df04` and P09's
+  `20261024T084208Z-f947299c` both reached the native validation stop;
+  neither supplies full mask-curve evidence.
+- Diagnostic P09_106: `20261024T084640Z-668afb3e`, code `74bd6d57`,
+  complete and validated, as are the other three diagnostics. P09's first
+  saved **stock** point is actually `dcvc@42/2`, not `dcvc@0/4`; the
+  earlier description assumed an existing point that its stock archive
+  does not contain. Selection was by first saved point, before results.
+  This limits its interpretation to that ½-resolution point.
+- Full diagnostics (240 frames, Ada, exact corrected grid): P01_107
+  27.30 kbps; P02_02 61.33; P03_10 30.00; P09_106 13.29. All exceed
+  2 kbps. Unreduced SAM IoU against the s=8 reference mask is respectively
+  0.827, 0.716, 0.383, 0.654; this is not IoU against original F.
+- Actual GPU use from all eleven supervisors' ended−started times:
+  **1141.39 seconds =0.3171 GPU-hours of 2**, including every failed and
+  cancelled attempt. All jobs are terminal; no GPU work remains running.
+- Final descriptive CPU accuracy audit: compare saved reduced predictions
+  and corrected grids against original B1b F with the existing IoU and
+  symmetric boundary metric. This does not change the decision rule or
+  invent a missing full-curve result. Four items, 8-frame smoke / 240-frame
+  full, no GPU; input NPZ files and original mask archive SHA256-identified.
