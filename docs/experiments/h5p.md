@@ -952,3 +952,71 @@ the decisions are in [experiments.md](../experiments.md).
   symmetric boundary metric. This does not change the decision rule or
   invent a missing full-curve result. Four items, 8-frame smoke / 240-frame
   full, no GPU; input NPZ files and original mask archive SHA256-identified.
+
+### 2026-10-24 — H5p 4d final accuracy and report
+- CPU audit `20261024T095522Z-407e7eda`, code `7ee06ff2`, gpu1 CPU,
+  complete; all four substantive checks pass. Against original B1b F:
+
+  | item | s=8 / corrected IoU | uncorrected client IoU | s=8 boundary px | uncorrected boundary px | billed correction kbps |
+  |---|---|---|---|---|---|
+  | P01_107 | 0.9765 | 0.8239 | 5.86 | 23.11 | 27.30 |
+  | P02_02 | 0.9876 | 0.7164 | 33.33 | 34.52 | 61.33 |
+  | P03_10 | 0.9829 | 0.3809 | 4.39 | 90.43 | 30.00 |
+  | P09_106 | 0.9548 | 0.6521 | 4.27 | 113.83 | 13.29 |
+
+  Corrections recover lzma s=8's binary grid exactly. The uncorrected
+  client mask here is the actual reduced/upsampled SAM prediction, not
+  the unreduced predictor scored in the diagnostic's initial log.
+  The boundary statistic includes dropped small instances (H5p 2 caveat).
+- Limitation: this measures a SAM tracker initialized by a billed union
+  mask and exact residual coding at one saved stock point. It is not a
+  zero-prompt segmenter, not a bound on arbitrary segmentation/correction
+  schemes, and not a complete production decoder: independent receiver
+  repeatability of SAM predictions has not been verified. Even granting
+  that repeatability, this measured correction profile misses 2 kbps.
+  No uncorrected DISTS or full corrected-mask BD-rate is invented.
+- All jobs are terminal. No Wan-Animate or 34-window run was launched.
+  Raw job outputs, failed native attempts, source archives and masks remain
+  preserved in their original external-data locations.
+
+## Report: H5p 4d (2026-10-24)
+- Stopped because: user decision needed. The bounded shape test is decided;
+  continuing the full decoder-mask curve requires reliable raw native
+  decodes after the documented three-attempt gate failed, and a separate
+  choice about repairing/re-encoding that ladder. No more GPU work is queued.
+- Decision by the rule: (a) fail: 0/4 reach 2 kbps, weighted DISTS +16.6%
+  (1/4 below zero) after exact-mask rebilling. (b) full rule not reached:
+  native decoding blocks the curve. The four completed single-point
+  SAM/correction diagnostics all miss 2 kbps; this does not reject every
+  decoder segmentation method. Exact free masks still do not fix the
+  established LPIPS loss (+16% on 4a's pairs).
+- Numbers: best shape rates 14.80 | 24.79 | 21.54 | 10.85 kbps;
+  SAM plus billed initialization/corrections 27.30 | 61.33 | 30.00 | 13.29.
+  Jobs, revisions, model/GPU records, inputs, native paths and hashes are
+  recorded above and in the read-only evidence bundle. CPU shape jobs:
+  `20261024T082551Z-b86db128`, `…082613Z-c3ff4ae0`,
+  `…082655Z-eb51efd6`, `…082741Z-0dec552f`; diagnostic jobs:
+  `…084521Z-bc72ff4d`, `…084534Z-c700da3b`,
+  `…084607Z-e00640d5`, `…084640Z-668afb3e` (all complete).
+- Budget: **0.3171 of 2 GPU-hours**, all eleven ended supervisor durations
+  included; CPU shape coding and final accuracy audit use zero GPU-hours.
+- Branch and commits: `codex/h5p-4d-mask`; shape code `f632732c`,
+  diagnostic code `74bd6d57`, accuracy code `7ee06ff2`. Current main merged
+  to preserve concurrent work. Ruff and mypy pass (189 files after merge).
+  Full pytest: 834 passed, 24 skipped, one existing macOS protected-symlink
+  test failure; all 50 PointStream tests pass. Linux CI must check that case.
+- Deviations: stopped an initially circular enhanced-input smoke (charged,
+  excluded); switched to raw pre-enhancement native decoding. Native
+  mismatches/crashes prevented full curves; added a smaller diagnostic.
+  P09's first stock point is 42/2, others 0/4. No general failure of
+  decoder segmentation is claimed from these restrictions.
+- Open for the user: whether to commission native-decoder repair and then
+  the complete decoder-mask curve; current evidence supports no adoption.
+- Proposed next step: retain lzma as the current codec and the negative
+  shape/correction results. A separate decoder repair pilot needs its own
+  bounded budget; this card authorizes no further runs.
+- Evidence bundle: `pointstream-data/visor/h5-2026-10-16/report-h5p4d-7ee06ff2-20261024.tar.gz`,
+  SHA256 `383b34b10c838b883e21308e22344cdd28dba4c0eb404d3e12734a52719a0565`.
+  Contains the report, complete numerical inputs, per-job records, native
+  attempt metadata, CPU/GPU validations, source input identities and manifest.
+  Uploaded to the external data root and made read-only; original jobs remain.
