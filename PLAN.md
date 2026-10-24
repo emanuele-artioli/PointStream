@@ -27,14 +27,34 @@ The root session keeps this section and the dispatch ledger below; item
 sessions update their own items and their files in `docs/experiments/`
 ([sessions](docs/sessions.md)).
 
-- **Protocol (2026-10-22):** two tracks, fidelity and experience. Every
-  verdict so far is on fidelity; J re-judges the queued results on
-  experience.
+- **Protocol (2026-10-22):** two tracks, fidelity and experience. J
+  (2026-10-22) re-judged the queued results on experience: H3e, FoundHand
+  and K6 `ref` fail, H3a/H3a2 were not re-judged (outputs not kept). The
+  binding check is time: objects driven by coded keypoints change 1.3–6 ×
+  as much as the source between frames, and K1f's bound (`warp`) fails it
+  too. J's jitter follow-up (2026-10-22, PR #218): smoothing the coded
+  keypoints at the decoder (σ = 1, 2, 4 frames) does not make the bound
+  pass, and neither do smoothed *uncoded* keypoints (2.6–2.9 × the
+  source's change against 1.25). Either the estimator's per-frame noise
+  (1.32% of the box, against the source's own motion of 2.24%) or K1c's
+  compositing (Telea fill, drawn outline) causes it. An identity warp
+  would separate the two (≤ 0.3 GPU-hours; open for the user).
 - **Hands, keypoints (K1f, K6b):** the bound (appearance granted) beats
   the pixel hull on 30 of 30 held-out items by LPIPS and DISTS. No real
-  renderer keeps it yet: FoundHand zero-shot fails (17%), a bank of free
-  references fails by one item-metric (67% at K = 16). Next: the
-  buildable bank; rung 3 (overfit) waits behind it.
+  renderer keeps it: FoundHand zero-shot fails (17%), a bank of in-window
+  references fails by one item-metric (67% at K = 16), and the buildable
+  bank chosen outside the window fails (2c, 12.5% at K = 16–64; free,
+  25%). References from other moments miss the forearm, sleeve and
+  lighting. The reference route closes at a buildable rate. Rung 3
+  (2026-10-23, user approved): FoundHand fitted 20 min on the window's
+  own frames, weights unbilled, **passes at 83%** (LPIPS 2 of 3, DISTS
+  3 of 3; 75% clean of G, at the bar; margins 0.006–0.010 on the hard
+  items). Rung 4 (2026-10-23, user's rule: the fit moved to other shots
+  of the video, delivered beforehand) **fails, 25%** (0% clean of G):
+  none of rung 3's gain transfers, and it lands on rung 2's zero-shot.
+  **Hands close on fidelity at the keypoint rate**; K1f's bound stays a
+  bound. Every hand result also granted R, which the decoder does not
+  have (H3b2: 72–170 kbps).
 
 - **Egocentric pipeline (H5):** runs end to end on the 4 pilot items
   (`src/pointstream/`, `experiments/visor/h5.py`). Against fairly
@@ -46,8 +66,21 @@ sessions update their own items and their files in `docs/experiments/`
   at best). The LPIPS cost is structural (F coded in both streams) and
   follows F's share of the frame, median 24% on egocentric video; it
   wins below about 10% (P09_106, 2%: −15%). Billing the mask F costs
-  most of the margin (H5m). **Next: H5p 4–5** (F carried by the
-  foreground stream; the visual check).
+  most of the margin (H5m). **H5p 4–5 done (2026-10-22): billing F
+  removes every win.** With F coded (lzma, 36–116 kbps), weighted DISTS
+  reads +93% (1 of 4) against the venue-adapted DCVC-UF, and every
+  metric loses against every anchor. F̂ itself costs no quality; the
+  mask's rate does, at rates where the venue codec needs 13–26 kbps. A
+  carrier inside the foreground stream would have to cost about 2 kbps,
+  and an exact F at zero bits still loses LPIPS (+16%). H5p 4c measured
+  one (a flat key colour outside K, 5-byte segment): F̃ is as accurate as
+  lzma's, but the key's border costs 26–129% more foreground rate where F
+  is large, so weighted DISTS reads +1% (1 of 4) even as an optimistic
+  bound; on P09_106 (F 2%) the key is nearly free and reads −30%. H5p 4
+  closes as a fail: no F coder tried keeps the egocentric win once F is
+  paid for. The key carrier is the candidate for small-F domains. The crops for the
+  visual check are ready (user). The egocentric claim is the user's to
+  reframe; small-F domains (tennis) are where F's rate matters least.
 - **Background (G):** a scene model adapted to the venue, sent beforehand
   and unbilled (payback hours reported), plus a per-video enhancer route
   (G6).
@@ -65,23 +98,90 @@ sessions update their own items and their files in `docs/experiments/`
   judge; the ball mode kept with the streak renderer (user). K6 done
   (2026-10-21): with true appearance at the coded pose the players'
   keypoints save 95% of the pixel coders' rate, but a reference frame
-  warped to the pose loses to every pixel coder. Next: K6b (a learned
-  per-player renderer's oracle), then K6c; K7 (HiEve) later.
+  warped to the pose loses to every pixel coder. K6b step 2 (2026-10-22):
+  AnimateAnyone zero-shot, one unbilled reference and R granted as its
+  matte, wins 3 of 6 windows by LPIPS and by DISTS (50%, fail). It wins
+  all three Djokovic windows (up to 73% saving) and loses both Alcaraz
+  windows and Rublev's. Step 3 (2026-10-23, user approved): a LoRA
+  fitted 7.5 min per window on its own frames **passes at 83%** (LPIPS 4
+  of 6, DISTS 6 of 6; rate savings 35–84% where it wins), reference,
+  matte and LoRA (49 MB) unbilled. Step 4 (a fit per match, billed) is
+  Step 4 (2026-10-23): a rank-4 LoRA per match (1.55 MB, 8-bit LZMA,
+  1.73 kbps over 2 h), fitted on other shots of the match, **fails**:
+  67% unbilled, 58% billed (losses: alcaraz_hurkacz/045 and
+  rublev_auger-aliassime/052). About 60% of step 3's gain transfers
+  (hands: none), and payback is 0.4–2.1 h where it wins. **The
+  generative route for players closes at the keypoint rate by the
+  rule**, with the matte and reference still granted. Step 5
+  (2026-10-24, user approved): a tennis base LoRA (K6's windows
+  excluded, unbilled) plus a 4-bit rank-4 match LoRA with the pose
+  guider (1.65 kbps over 2 h) **fails at 67%, billed and unbilled**.
+  Billing no longer costs a window. The same two windows (045, 052) lose
+  in steps 3–5, so each recipe change moves the margins, not the score.
+  Step 6 (Wan-Animate 14B, zero-shot first) is outlined; it waits for
+  the user. Every player result so far grants the matte; the
+  matte's rate is unmeasured on tennis (H5p 4: on egocentric video the
+  billed mask removed every win). K6c after K6b; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
 ### Dispatch ledger
 
-One row per item session started from the root session. The item
-session reports to the root session when its goal is reached or it
-stops; the root session fills in the outcome and the next step.
+One row per item session started from the root session, updated at every
+event ([sessions](docs/sessions.md#the-dispatch-ledger)). From 2026-10-24
+sessions run in Codex: cards are files in [docs/cards](docs/cards/README.md)
+that the user pastes into a new Codex session, and reports come back
+through the user or the pushed branch.
 
-| item | card | branch | suggested model | status |
+| item | card | branch | model / effort | status |
 |---|---|---|---|---|
-| H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` | Opus | queued 2026-10-22 |
-| K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` | Opus | queued 2026-10-22 |
-| K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` | Opus | queued 2026-10-22 |
-| J | experience-track re-judging | `claude/j-experience-rejudge` | Sonnet | queued 2026-10-22 |
+| J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
+| J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
+| H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` @ `3b11a36` | Opus | reported 2026-10-22: 4a fail (F billed +93% wDISTS), 4b not built (LPIPS), crops ready; 2.6 GPU-hours of 4 |
+| H5p 4c | key carrier for F (user's request) | `claude/h5p-f-stream` @ `41c37c8`, PR #220 | Opus | reported 2026-10-22: fail at the gate (+1%, 1 of 4; P09_106 −30%); 1.38 GPU-hours of 3 |
+| K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` @ `505f5a7` | Opus | reported 2026-10-22: fail (12.5%; free bank 25%); 2.6 GPU-hours of 3.5 |
+| K6b hands 3 | overfit oracle (user approved) | `claude/k6b-hand-bank` @ `3059660` | Opus | reported 2026-10-23: pass (83%; 75% clean of G), R granted; visual check supports it; 3.1 GPU-hours of 4 |
+| K6b hands 4 | the fit moved to other shots (user's rule) | `claude/k6b-hand-bank` @ `fd83eb7`, PR #221 | Opus | reported 2026-10-23: fail (25%; 0% clean of G); 1.3 GPU-hours of 3. Hands closed on fidelity |
+| K6b hands 3m | rung 3 with a decoder-side matte | — | Opus | withdrawn 2026-10-23: rung 4 failed with the matte granted |
+| K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` @ `340d8d5` | Opus | reported 2026-10-22: fail (50%); 4.75 GPU-hours of 4 (overrun approved) |
+| K6b players 3 | overfit oracle (user approved) | `claude/k6b-players-zeroshot` @ `03a3df8` | Opus | reported 2026-10-23: pass (83%), matte and LoRA unbilled; 4.8 GPU-hours of 6 |
+| K6b players 4 | match fit, billed | `claude/k6b-players-zeroshot` @ `20eb7c3` | Opus | reported 2026-10-23: fail (67% unbilled, 58% billed); 7.0 GPU-hours of 7 |
+| K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5` | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11. PR #225 merged before this outcome commit: not on main yet |
+| K6m | the players' matte on tennis | — | Sonnet | card dismissed 2026-10-24: folded into T1 |
+| K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | card ready 2026-10-24 ([card](docs/cards/k6b-players-5b.md)); user agreed to run it |
+| T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | card ready 2026-10-24 ([card](docs/cards/t1.md)) |
+| K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
+
+**T1: the split on tennis, F billed.** With every keypoint renderer
+closed for hands and stalled at 67% for players, tennis's open question
+is H5's: does the split (players and ball as coded pixels plus the ball
+mode, background by its own coder) beat SVT-AV1 and DCVC-UF on K6's
+windows once F is paid for? Egocentric F (median 24% of the frame) cost
+36–116 kbps and removed every win (H5p 4); tennis F is a few percent,
+where H5p 4c's key carrier was nearly free (P09_106, 2%: −30%). No
+tennis pipeline exists yet (H5 is egocentric): CPU first (F's rate on
+K6's windows), then the oracle and its rule.
+
+**K6b players 5b and 6.** Steps 3–5 lose the same two windows:
+`rublev_auger-aliassime/052` is judged on 32 of its 240 frames (the rest is
+a close-up K8b does not register) and `alcaraz_hurkacz/045` has small
+players. 5b (CPU) explains the losses and looks for a scope rule an
+encoder can compute before coding; a rule found on these windows is a
+hypothesis until fresh windows confirm it, and step 5's verdict stands.
+Step 6 tries Wan-Animate, conditioned on the same unbilled reference as
+step 2 (zero-shot means no fitting, not no appearance); speed is
+secondary while quality is tested (user, 2026-10-24).
+
+**Handover (2026-10-24).** The Claude Code root session
+(`session_01StNQ6dvxYRHhnMbQymNgNf`) stopped when the weekly Claude
+tokens ran out; a Codex root session takes over from
+[its card](docs/cards/root.md). Open for the user: (1) how to reframe the
+egocentric claim (proposal: a negative result with its cause, F's rate,
+and the split's win where F is small, P09_106; tennis carries the
+positive claim); (2) whether to run step 6 after 5b; (3) the identity-warp
+check (J's caveat), only if the experience track stays a goal. Branches
+with work not on main: `claude/k6b-players-zeroshot` (step 5's outcome,
+`d0a00e5`). PR #218 (J) was open at handover.
 
 ## Done
 
@@ -1016,7 +1116,7 @@ Results closed on fidelity are untested on the experience track (realism
 by KID, same content by the object's estimator, same over time by
 flicker; [protocol](docs/experiments.md#protocol)). J judges the four
 queued results on it, cheapest first, each against the anchor hull at its
-own rate. The rule, judges and budget are in experiments.md, "J:
+own rate. The rule, judges and budget are in [docs/experiments/j.md](docs/experiments/j.md), "J:
 experience-track re-judging (rule)".
 
 1. H3e V1, from its saved generations and judge archives (CPU, Inception
