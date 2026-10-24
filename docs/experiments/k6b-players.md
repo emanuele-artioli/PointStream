@@ -1191,3 +1191,44 @@ access the fleet process test passes. No hook or unrelated item was edited.
 Linux CI must pass before auto-merge can complete.
 - Final CPU snapshot SHA256: `f29e32500a53e8978d572ca93559ba632fb51fc147238a9733183da531dfcc81`.
 - Locally derived scoped-score JSON SHA256: `7686b3681607b53882a6dadbc819d79ad9625e43fa581e40cfb0517fdb3c2272`; reproduce from the preserved source reports with the command above.
+
+## Report: K6b players 5b (2026-10-24)
+- Stopped because: goal reached for the CPU diagnosis; individual causal
+  contributions remain unisolated, as the saved-data limit requires.
+- Decision by the rule: step 5 remains **fail**, 8/12 window-metrics (67%).
+  No cuts occur in any of the eight windows. Registration ≥95% gives
+  8/10 (80%); adding minimum height ≥115 px gives 8/8 (100%), both
+  unconfirmed hypotheses discovered on these windows.
+- Explanation: 052 is one continuous oblique court shot, **not a close-up
+  or a cross-cut reference**; registration 32/240, seven judged frames,
+  reference t109 on both players. Net occlusion and appearance/pose errors
+  are visible, but not causally separated. 045 has nearly the same size,
+  rate and anchor strength as winning 036; a front/back appearance error
+  and racket/arm changes are visible, with no uniquely established cause.
+- Numbers: pooled steps 2/3/4/5 are 50/83.3/66.7/66.7% unbilled;
+  registration-scoped 60/90/80/80%; combined-scoped 75/100/100/100%.
+  Billed step 4 is 58.3/70/87.5% and step 5 is 66.7/80/100% in those
+  same three scopes. All scores retain identical method/anchor windows.
+  CPU job `20261024T083117Z-2e644b08`, code `de79482f`, gpu2 host,
+  no GPU, report `full/scope.json` SHA256
+  `ac640ae8f2ee0d807a085555f5504a354de9cba554aaf465cd036673c0d046d2`.
+- Budget: **0 of 0 GPU-hours**; completed workload smoke 4.87 s,
+  full 32.38 s; three failed startup/smoke requests preserved above.
+- Branch and commits: `codex/k6b-players-5b`; measured code `de79482f`,
+  diagnosis/report `3f6db4b3`; [PR #232](https://github.com/emanuele-artioli/PointStream/pull/232).
+  Ruff, mypy and three focused tests pass; full Mac suite 821 passed,
+  24 skipped, one unchanged protection-hook path-resolution failure.
+  All 34 CPU measurement checks pass. Linux CI gates merge.
+- Deviations: corrected the card's cut/close-up premise and step-3 pooled
+  score (83%, not 67%). Eight windows already include development 008/033.
+  Integrated d0a00e5's missing saved step-5 continuation without changing
+  its verdict. No new GPU computation, fitting or confirmation.
+- Open for the user: no execution question; any positive paper claim
+  and a future confirmation budget remain the user's decision.
+- Proposed next step: CPU-freeze 12 unused Alcaraz/Medvedev windows from
+  archive clips not used in training/selection, audit overlaps and gates,
+  then test the frozen adapters and same-window anchors in bounded parts,
+  estimated **6–8 GPU-hours**, subject to preflight and fresh authorization.
+  The 13 unused windows in the current manifest cannot pass the proposed
+  registration scope. Nadal–Kyrgios (2,310 s) exists as a fresh-match
+  alternative but has no step-5 match adapter. No confirmation was run.
