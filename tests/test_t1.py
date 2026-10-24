@@ -32,3 +32,20 @@ def test_measure_bills_whole_window_and_marks_missing_ball(tmp_path, monkeypatch
     (root / 'features.json').write_text('{}')
     with pytest.raises(ValueError, match='Changed input'):
         t1.measure(tmp_path, 'match/clip@120', 240)
+
+
+def test_rate_relaxation_keeps_all_mask_and_container_framing():
+    from fractions import Fraction
+    from experiments.tennis.t1_oracle import container_bytes, relaxed_bytes
+    from src.pointstream import bitstream as bs
+
+    background, foreground, mask = b'b' * 141, b'f' * 1000, b'm' * 51
+    packed = container_bytes(background, foreground, mask, 'dcvc', (960, 544), (480, 272), 4, Fraction(50), 240)
+    decoded = bs.Container.unpack(packed)
+    assert decoded.coded(bs.Tag.BACKGROUND)[0].stream == background
+    assert decoded.coded(bs.Tag.FOREGROUND)[0].stream == foreground
+    assert next(p for t, p in decoded.segments if t == bs.Tag.MASK) == mask
+    relaxed = relaxed_bytes(packed, foreground)
+    assert relaxed < len(packed)
+    assert relaxed > len(background) + len(mask)
+    assert relaxed == sum(decoded.breakdown().values()) - len(foreground)

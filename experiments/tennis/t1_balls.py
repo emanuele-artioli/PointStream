@@ -123,7 +123,24 @@ def main() -> int:
     run.add_argument('--max-windows', type=int, default=8)
     run.add_argument('--ffmpeg', default='ffmpeg')
     sub.add_parser('validate')
+    identify = sub.add_parser('identify')
+    identify.add_argument('--source-stage', type=Path, required=True)
     args = parser.parse_args()
+    if args.command == 'identify':
+        info = {n: {'path': str(args.source_stage / n), 'sha256': file_sha256(args.source_stage / n)} for n in ['balls.tar', 't1-balls.json']}
+        source = json.loads((args.source_stage / 't1-balls.json').read_text())
+        if len(source['windows']) != 8:
+            raise ValueError('ball reference generation is incomplete')
+        with tarfile.open(args.source_stage / 'balls.tar') as archive:
+            for row in source['windows']:
+                import hashlib
+                handle = archive.extractfile(k4.safe(row['id']) + '/ball-masks.rle')
+                assert handle is not None
+                if hashlib.sha256(handle.read()).hexdigest() != row['sha256']:
+                    raise ValueError('ball archive content identity mismatch')
+        write_json(stage_dir() / 'ball-identities.json', info)
+        write_json(Path(os.environ['PS_VALIDATION_PATH']), {'passed': True, 'checks': {'identified': len(info) == 2}})
+        return 0
     if args.command == 'validate':
         result = validate(stage_dir())
         write_json(Path(os.environ['PS_VALIDATION_PATH']), result)

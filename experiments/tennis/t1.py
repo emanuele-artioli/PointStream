@@ -17,7 +17,7 @@ from src.pointstream.composite import HAND, OBJECT
 from src.segmentation.masks import ClipMasks
 
 
-def measure(inputs: Path, wid: str, frames: int) -> dict[str, Any]:
+def measure(inputs: Path, wid: str, frames: int, balls: Path | None = None, ball_report: Path | None = None) -> dict[str, Any]:
     manifest = json.loads((inputs / 'inputs.json').read_text())
     entry = manifest['windows'][wid]
     w = entry['window']
@@ -28,6 +28,17 @@ def measure(inputs: Path, wid: str, frames: int) -> dict[str, Any]:
     features = json.loads((root / 'features.json').read_text())
     clip = ClipMasks.load(root / 'sam-masks.rle')
     fits = {int(t): np.asarray(h, np.float64) for t, h in entry['fits'].items()}
+    ball_clip = None
+    if balls is not None:
+        assert ball_report is not None
+        info = next(row for row in json.loads(ball_report.read_text())['windows'] if row['id'] == wid)
+        ball_path = balls / k4.safe(wid) / 'ball-masks.rle'
+        if info['source_sha256'] != w['sha256'] or file_sha256(ball_path) != info['sha256']:
+            raise ValueError(f'{wid}: ball reference identity mismatch')
+        ball_clip = ClipMasks.load(ball_path)
+        if len(ball_clip.frames) < min(frames, int(w['frames'])) or 'ball' not in ball_clip.classes:
+            raise ValueError(f'{wid}: incomplete ball reference')
+    has_ball = ball_clip is not None or 'ball' in clip.classes
     players = k6.window_players(features, clip, int(w['start']), fits)['players']
     n = min(frames, int(w['frames']))
     reduced: dict[int, list[np.ndarray]] = {8: [], 16: []}
@@ -36,7 +47,7 @@ def measure(inputs: Path, wid: str, frames: int) -> dict[str, Any]:
         regions = k6.frame_regions(instances, features['aliases'], players)['regions']
         p = np.logical_or.reduce([*regions.values(), np.zeros(k6.FRAME[::-1], bool)])
         b = np.zeros_like(p)
-        for inst in instances:
+        for inst in (ball_clip.frames[t] if ball_clip is not None else instances):
             if inst.class_name == 'ball':
                 b |= k4.upsample(inst.mask(), k6.FRAME)
         classes = np.zeros(p.shape, np.uint8)
@@ -45,7 +56,7 @@ def measure(inputs: Path, wid: str, frames: int) -> dict[str, Any]:
         for scale in reduced:
             reduced[scale].append(mask.reduce(classes[None], scale)[0])
         shares.append({'t': t, 'registered': int(w['start']) + t in fits,
-                       'player': float(p.mean()), 'ball': float(b.mean()) if 'ball' in clip.classes else None, 'foreground': float((p | b).mean())})
+                       'player': float(p.mean()), 'ball': float(b.mean()) if has_ball else None, 'foreground': float((p | b).mean())})
     seconds = n / float(Fraction(w['fps']))
     rates = {}
     for scale, sequence in reduced.items():
@@ -59,12 +70,12 @@ def measure(inputs: Path, wid: str, frames: int) -> dict[str, Any]:
     selected = [s for s in shares if s['registered']]
     return {'id': wid, 'frames': n, 'seconds': seconds, 'players': players,
             'scored_frames': len(selected), 'mask': rates,
-            'share_all': {k: float(np.mean([s[k] for s in shares])) if k != 'ball' or 'ball' in clip.classes else None for k in ('player', 'ball', 'foreground')},
-            'share_registered': {k: float(np.mean([s[k] for s in selected])) if k != 'ball' or 'ball' in clip.classes else None for k in ('player', 'ball', 'foreground')},
+            'share_all': {k: float(np.mean([s[k] for s in shares])) if k != 'ball' or has_ball else None for k in ('player', 'ball', 'foreground')},
+            'share_registered': {k: float(np.mean([s[k] for s in selected])) if k != 'ball' or has_ball else None for k in ('player', 'ball', 'foreground')},
             'frame_shares': shares, 'input_files': entry['files'],
-            'available_classes': list(clip.classes),
-            'ball_masks_available': 'ball' in clip.classes,
-            'ball_provenance': 'not measured: K6 features have no ball prompt' if 'ball' not in clip.classes else 'SAM; not native labels'}
+            'available_classes': list(clip.classes) + (['ball'] if ball_clip is not None else []),
+            'ball_masks_available': has_ball,
+            'ball_provenance': 'not measured: K6 features have no ball prompt' if not has_ball else 'SAM; not native labels'}
 
 
 def main() -> int:
@@ -72,6 +83,8 @@ def main() -> int:
     parser.add_argument('command', choices=['masks', 'validate'])
     parser.add_argument('--inputs', type=Path)
     parser.add_argument('--windows', nargs='+')
+    parser.add_argument('--ball-masks', type=Path)
+    parser.add_argument('--ball-report', type=Path)
     parser.add_argument('--frames', type=int, default=240)
     parser.add_argument('--max-windows', type=int, default=8)
     args = parser.parse_args()
@@ -90,7 +103,7 @@ def main() -> int:
     rows = []
     requested = args.windows[:args.max_windows]
     for wid in requested:
-        rows.append(measure(args.inputs, wid, args.frames))
+        rows.append(measure(args.inputs, wid, args.frames, args.ball_masks, args.ball_report))
         write_json(out / 't1-masks.json', {'windows': rows, 'requested_windows': requested, 'input_manifest_sha256': file_sha256(args.inputs / 'inputs.json')})
         from experiments.jobs.monitor import publish_progress
         publish_progress('masks', len(rows))
