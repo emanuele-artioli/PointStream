@@ -2295,3 +2295,13 @@ a weaker claim automatically.
 - CPU scale-layout audit: Al016 has234/223 coded player frames across7/10 runs; Med017240/229 across1/8. Read the exact pinned `animate_anyone/pipelines/context.py` and long pipeline on gpu6: short runs≤24 use their real length (no24-frame padding); long runs use stride1/overlap4. Denoiser context-frame work Al016545 and Med017574 is no greater than the pilot one-run480-frame window576; only modest per-run setup overhead differs. Keep the same1700 s full cap/2100 s reservation and frozen renderer; no tuning/cancellation/replay. Original conservative24-padding count was not a sampler cost estimate. Remaining four windows each two240-frame/one-run units.
 
 - Eighth renderer submitted **`20261024T224543Z-9e1145bb`**, Med017@206, fixed existing C recipe; spec SHA256 `9f0ecf0aa03ed03dad8ac992403b3281492a1370818228ef7fa9bb3b1fa240c2`, code58ecca22,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen8-submit.json`. Completed total4.609387/8 h before remaining-six render work; renderers7–8 active.
+
+- Seventh renderer `20261024T224350Z-0cc91c89` complete; full exact recipe/coverage validation passes despite17 source runs across both players. Archive SHA256 `ff98cf212e6ddd38e0adec696003f8a6a2b19433086a8741fcf173b5f17d43cb`, charged0.34983 h. Completed total **4.95922/8 h**, eighth renderer active; same source-only cost reasoning confirmed, no model/configuration change.
+
+- Ninth renderer submitted **`20261024T230641Z-31aa2383`**, Al008@261, both240-frame/one-run units, fixed C recipe; spec SHA256 `119ca7ddaff1383203e9aeb107461fcd661d1d43e5787559e9a105a41cb4a8c6`, code903e033a,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen9-submit.json`.
+
+- Eighth renderer `20261024T224543Z-9e1145bb` complete; full scientific validation passes, exact coded coverage retained including missing-pose gaps. Archive SHA256 `9c679c0e12c1f69ca1fafad52ed503c14a897df90bc7d766196851d440bad540`, charged0.371886 h. Completed total **5.3311/8 h**, ninth renderer active.
+
+- Tenth renderer submitted **`20261024T230918Z-b01ae9ae`**, Med029@138, two240-frame/one-run units, fixed C recipe; spec SHA256 `6b88c4fa4fbfdf5c93c9f8e4e85c34ac7034d05cb74e93329dfe462424e4353c`, code903e033a,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen10-submit.json`.
+
+- Remaining-six CPU exact-mask preflight passed: all476 judging frames reconstruct identical source R/S hashes, zero mismatches and no quality metrics; **956 frames across all12 windows** now covered. Four CPU threads/no CUDA. Archive `tennis/k6b-confirm-20261024-execution/mask-remaining-20261024T2317Z.tar.gz`, SHA256 `853cf3109711fad844d228f8484759a9380452c957578d7133408d884e5f0bc0`, includes source-run cost audit.
