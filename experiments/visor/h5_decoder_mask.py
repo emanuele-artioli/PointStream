@@ -86,7 +86,10 @@ def main() -> int:
             attempt_dir.mkdir()
             out = attempt_dir / 'raw.yuv'
             plan['out_file'] = str(out)
-            native = dcvc_worker('decode', plan, attempt_dir)
+            try:
+                native = dcvc_worker('decode', plan, attempt_dir)
+            except RuntimeError as error:
+                native = {'deterministic': False, 'error': str(error)}
             (stage / f'raw{index}-attempt{attempt}-decode.json').write_text(json.dumps(native, indent=2))
             if native['deterministic']:
                 break

@@ -876,3 +876,24 @@ the decisions are in [experiments.md](../experiments.md).
   three times as H5's codec path does, and requests exclusive GPUs. Remaining
   three item allocations ≤1700 seconds each; including P02_02's ≤1800 and
   the two ended attempts (~111.4 s), the aggregate upper bound is ~7012 s.
+- Additional CPU reading (same 4a fixed pairs and identical binary masks):
+  replacing MASK with the best shape payload gives weighted DISTS
+  +40.9 | +26.2 | +19.9 | −20.5%, mean **+16.6%, 1/4 below zero**;
+  weighted LPIPS +49.2% (1/4). Existing lzma baseline reproduces +93.35%
+  weighted DISTS (1/4) before replacement. PCHIP and upper concave anchor
+  envelope use `h5.compare`; every container segment overhead is billed.
+  `experiments/visor/h5_mask_report.py` records SHA256 identities of its
+  score, shape and correction inputs. This reading confirms failure under
+  the full DISTS rule, beyond the ≤2 kbps feasibility screen.
+- P01_107 exclusive retry: `20261024T083825Z-d68be64f`, code `e740088b`,
+  cap 1700 seconds. P02_02 remains `20261024T083702Z-14c3862e` with its
+  original 1800-second cap; no result is accepted after a differing decode.
+- P02_02 `20261024T083702Z-14c3862e` stopped after ~103 s: a native
+  decoder subprocess segfaulted in full; no full mask evidence. Native
+  process failures now consume one of the same three attempts, with each
+  error retained. The exclusive P01 retry passed smoke and completed its
+  first full native point; it has not yet produced a full SAM result.
+- Revised remaining allocation after P02 ended: P01's current ≤1700 s
+  plus P02 retry, P03 and P09 each ≤1700 s =6800 s. Ended attempts
+  ~215 s give <7015 s aggregate maximum, still under 7200 s. No further
+  retries beyond these jobs without first re-auditing actual elapsed time.

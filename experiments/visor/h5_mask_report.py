@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from experiments.visor import h5
@@ -20,7 +21,7 @@ def main() -> int:
     data = json.loads(args.scores.read_text())
     shapes = {r['item']: r for path in args.shape for r in [json.loads(path.read_text())]}
     decoders = {r['item']: r for path in args.decoder for r in [json.loads(path.read_text())]}
-    result = {'inputs': {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
+    result: dict[str, Any] = {'inputs': {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
                          for path in [args.scores, *args.shape, *args.decoder]}, 'items': {}, 'summary': {}}
     metrics = ('wdists_fill', 'wlpips_fill', 'dists_frame', 'wpsnr_fill')
     for item, selection in sorted(data['selection'].items()):
@@ -31,7 +32,7 @@ def main() -> int:
                    if r['codec'] == 'dcvc-venue']
         if len(rows) != len(chosen) or not anchors:
             raise ValueError('incomplete fixed pair or anchor set')
-        variants = {'lzma': rows}
+        variants: dict[str, list[dict[str, Any]]] = {'lzma': rows}
         if item in shapes:
             source = shapes[item]
             assert all(r['roundtrip'] and r['accuracy_identical'] for r in source['rows'])
