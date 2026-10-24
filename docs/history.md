@@ -33,7 +33,7 @@ and not for hands (held out: objects mean J 0.83, hard subset 0.70; hands
 0.93 but only 4 of 6 departed hands released). Mask set
 `visor_dense_sam_fill` (objects only) for evaluation set v2: the labelled
 objects missing fall from 33% to 1.6% of each frame's
-([outcome](docs/experiments.md#2026-10-07--b1b-sam-31-fill-of-visors-missing-hands-and-objects)).
+([outcome](experiments/b1b.md#2026-10-07--b1b-sam-31-fill-of-visors-missing-hands-and-objects)).
 The review by eye (5 of 68 frames flagged, all SAM hand tracks losing the
 forearm or the hand) does not veto it. No train-split hand fill: excluding
 the frames with a hand gap keeps 75% of the admitted train frames (1.6
@@ -41,7 +41,7 @@ million), enough for E1/F1. The text below is the original brief.
 
 VISOR's dense masks drop an object's track when its interpolation scored poorly,
 so 22–30% of dense validation frames lack a hand a human labelled
-([decision](docs/experiments.md#2026-10-07-visor-evaluation-set-v2-and-a-sam-fill-for-missing-hands)).
+([decision](experiments.md#2026-10-07-visor-evaluation-set-v2-and-a-sam-fill-for-missing-hands)).
 SAM 3.1, prompted with the human masks at a run's keyframes, tracks each
 missing object through the run; the result is tier `sam_from_label_prompt`.
 Validation: prompt at one keyframe and score at the next, which SAM never saw;
@@ -56,7 +56,7 @@ frames and E1's training targets.
 
 Result: `experiments/visor/b2.py`; SVT-AV1 preset 4 (CRF 41–62) and DCVC-UF
 HT-L (QP 27–63) on all 34 items, from recorded jobs
-([outcome](docs/experiments.md#2026-10-07--b2-baseline-rate-distortion-on-visor)).
+([outcome](experiments/b2.md#2026-10-07--b2-baseline-rate-distortion-on-visor)).
 DCVC-UF HT-L needs 13% less rate (mean BD-rate; median 18%) for equal weighted
 PSNR, ties on whole-frame PSNR, and loses on VMAF. B1b's fill is added by
 rescoring the published streams. The text below is the original brief.
@@ -66,7 +66,7 @@ SVT-AV1 and DCVC-UF on the evaluation set: rate against weighted PSNR
 This is the target PointStream must beat, and it needs no PointStream
 component. Use evaluation set v2 as [Using VISOR](docs/resources.md#using-visor)
 describes. Only exactly placed frames are scored
-([drift decision](docs/experiments.md#2026-10-06-visor-frame-drift-exact-frames-for-evaluation-small-drift-for-training)):
+([drift decision](experiments.md#2026-10-06-visor-frame-drift-exact-frames-for-evaluation-small-drift-for-training)):
 the B1 set, optionally EK-55 clips scored on frames whose keyframes match the
 released JPEGs.
 **Done when** the curves come from a recorded job.
@@ -131,7 +131,7 @@ Racket sports are unaffected: G1 found their fixed cameras hold a panorama
 later background). With a fresh
 reference (under 0.1 s), though, the best static warp explains 70% of window
 frames and four planes 49%. So the open question is the refresh rate and its
-cost, not depth ([experiments](docs/experiments.md)).
+cost, not depth ([experiments](experiments.md)).
 
 ## G1e. Reference refresh (done)
 
@@ -142,7 +142,7 @@ At 1 s, neither group passes. The growth with age is real (the measurement
 floor holds), and the masks are not the cause. What is left after a fresh
 reference is photometric change and independent motion, not geometry. By
 the rule (step 3), no sendable warp qualifies in both groups. Details in
-[experiments](docs/experiments.md) (G1e entry).
+[experiments](experiments.md) (G1e entry).
 
 Decision (user, 2026-10-09): egocentric background work moves to G5. The
 rule's own next step is parked, because its best case is a narrow pass:
@@ -175,7 +175,7 @@ baselines, render time included.
 **Done when** G3 and G5 are compared on rate, quality and render speed, and one
 background is chosen for PointStream.
 
-Oracle pilot on VISOR (2026-10-10, [experiments](docs/experiments.md), G5 oracle
+Oracle pilot on VISOR (2026-10-10, [experiments](experiments.md), G5 oracle
 entry). At 960×540, fitted to the scored frames, against SVT-AV1 on the visible
 background: NVRC, the strongest public per-video neural codec, needs +347% and
 +133% rate on two pilot clips and is at parity (+2.7%) on the third, but only at
@@ -224,7 +224,7 @@ the playback time after which the model's bytes would be repaid.
 beside SVT-AV1's and the unadapted DCVC-UF's, on LPIPS and PSNR on V, from
 recorded jobs, and G5 can be compared with G3.
 
-Pilot (2026-10-10, [experiments](docs/experiments.md), G5b entry;
+Pilot (2026-10-10, [experiments](experiments.md), G5b entry;
 [report](https://claude.ai/artifact/H9yE6iBUGWau6K1HQBLcek)). On P26_02 and
 P06_03, fitted on the rest of the stretch: with β·LPIPS added to DCVC's own
 distortion (β = 0.026) the scene model passes the rule, −74% against
@@ -259,7 +259,7 @@ before only where noted.
      and flicker of the fill. The fill is never scored, but every method codes
      it, and the scene model trains on it. G4's comparison with panorama fills
      comes later; if the temporal fill wins here, all arms switch to it.
-   *Done (2026-10-10, [experiments](docs/experiments.md), G5c):* the LPIPS
+   *Done (2026-10-10, [experiments](experiments.md), G5c):* the LPIPS
    gain transfers to DISTS on the two pilots (−53% and −76% against SVT-AV1;
    not on most other stretches, see step 2); DCVC-UF
    flickers more than SVT-AV1 and β > 0 adds about a third; the model
@@ -276,7 +276,7 @@ before only where noted.
    a model good on PSNR, LPIPS and DISTS at once is unlikely to game all
    three, and the paper shows side-by-side frames so readers can check by
    eye.
-   *Done (2026-10-11, [experiments](docs/experiments.md), G5c step 2):*
+   *Done (2026-10-11, [experiments](experiments.md), G5c step 2):*
    β = 0.005 (any perceptual weight flips the model from losing to beating
    SVT-AV1 by two thirds or more on LPIPS_V and DISTS_V; larger β only
    costs PSNR_V); DISTS in the loss trades LPIPS_V for DISTS_V and is not
@@ -291,7 +291,7 @@ before only where noted.
    scene model is fitted on the kitchen's other videos and scored on the
    stretch's excerpt: hours of footage and a true hold-out across days. The
    cross-kitchen control of G5b stays as the attribution check.
-   *Done (2026-10-11, [experiments](docs/experiments.md), G5c step 3):*
+   *Done (2026-10-11, [experiments](experiments.md), G5c step 3):*
    other recordings of the kitchen do not improve the stretch's own model
    at 540 steps, and alone they fall short of it, but a model made only
    from them still beats SVT-AV1 by 60–74% on LPIPS_V on the calm pilots.
@@ -311,7 +311,7 @@ before only where noted.
    at equal QP (2026-10-11) could not tell β = 0.026 with and without
    DISTS apart, and preferred both over β = 0.005 and β = 0, which also
    spent fewer bits.
-   *Round 1 done (2026-10-11, [experiments](docs/experiments.md), G5c
+   *Round 1 done (2026-10-11, [experiments](experiments.md), G5c
    step 4):* the image model is not adapted (the intra frame is 1.4–9.6%
    of the bytes); KID on V joins the selection as a held-out judge; a 3×
    learning rate is adopted (beats SVT-AV1 on LPIPS_V −65% and DISTS_V
@@ -324,7 +324,7 @@ before only where noted.
    (9 of 10), and on DISTS_V on the four calmest; PSNR_V, flicker and
    KID_V are lost. All BD-rates against SVT-AV1 were
    corrected on 2026-10-12 (its envelope was a staircase, optimistic by
-   about 7%; no decision changed; [experiments](docs/experiments.md)).
+   about 7%; no decision changed; [experiments](experiments.md)).
    *Round 3 (2026-10-12):* 1,080 steps improve every stretch a little
    (LPIPS_V 1–11 points) but by less than the rule's margin, so the
    recipe stays at 540 steps for development and the paper's final runs
@@ -367,7 +367,7 @@ variant and payback) sit beside SVT-AV1's and the unadapted DCVC-UF's.
 Result: `experiments/visor/h1.py` on all 34 items of evaluation set v2, from
 recorded jobs (pilot `20261008T072619Z-0d09640b`, full `…083835Z-5dafce84`,
 `…103118Z-a358e4ad` (10 items, salvaged `partial.tar`), `…150618Z-fb44e5a3`;
-[outcome](docs/experiments.md#2026-10-08--h1-foreground-motion-and-representation-audit),
+[outcome](experiments/h1.md#2026-10-08--h1-foreground-motion-and-representation-audit),
 [overlays](https://claude.ai/artifact/7ir8Smh5tyWLFDejPppj6k)). By the rule
 fixed beforehand, no part is worth a parametric model. Hands (20% of the
 foreground's SVT-AV1 bits) pass on bits and fit (WiLoR fits 91.5% of
@@ -397,7 +397,7 @@ parametric model, which should stay pixels, and in what order to build them.
 Result: `experiments/visor/h2.py` from recorded jobs (HInt `20261009T220226Z-958cda4e`,
 HOT3D `…220759Z-be2af4a6`, VISOR `…215322Z-188ed69c` + `…220823Z-b309d9a2`,
 coding `20261010T054156Z-d9821c8e`;
-[outcome](docs/experiments.md#2026-10-09--h2-hand-pose-estimators-hamer-against-wilor-and-pose-coding)).
+[outcome](experiments/h2.md#2026-10-09--h2-hand-pose-estimators-hamer-against-wilor-and-pose-coding)).
 WiLoR is chosen, 3 contests to 2 (HInt VISOR frames, HOT3D PA-MPJPE, VISOR
 IoU against HInt New Days and HOT3D acceleration); HaMeR orients the whole
 hand better (7.6° against 14.7° on HOT3D), which H3 should check on its
@@ -409,7 +409,7 @@ it passes H1's rate screen (10% of SVT-AV1's hand bits at CRF 62). At zero
 latency the best is 7.7 kbps.
 
 H2b (2026-10-10,
-[outcome](docs/experiments.md#2026-10-10--h2b-a-hybrid-of-the-two-estimators)):
+[outcome](experiments/h2b.md#2026-10-10--h2b-a-hybrid-of-the-two-estimators)):
 a hybrid of WiLoR's fingers and HaMeR's orientation, chosen on H2's HOT3D
 clips, was tested on new clips, HInt and VISOR under a rule fixed
 beforehand. Its 3D gain replicated, but it is worse than both models in the
@@ -439,7 +439,7 @@ pose stream's rate-distortion-latency curves name the coding H3 uses.
 
 ## H3. Hand and arm rendering
 
-H3a (2026-10-10, [outcome](docs/experiments.md#2026-10-10--h3a-texture-transfer-oracle-for-hand-rendering)):
+H3a (2026-10-10, [outcome](experiments/h3a.md#2026-10-10--h3a-texture-transfer-oracle-for-hand-rendering)):
 the texture-transfer oracle passes. On VISOR's hand pixels, SVT-AV1
 references (CRF 48) sent on 26% of hand-frames and warped by the true motion
 reach LPIPS 0.091 at 41.9 kbps, against SVT-AV1's 0.116 at the same rate,
@@ -455,7 +455,7 @@ Texture transfer (a MANO texture with references sent as an inter-coded
 stream) stays as the fallback. Generic hands judged without a reference
 were not chosen.
 
-H3a2 (2026-10-11, [outcome](docs/experiments.md#2026-10-10--h3a2-the-texture-transfer-oracle-with-a-measured-reference-stream)):
+H3a2 (2026-10-11, [outcome](experiments/h3a2.md#2026-10-10--h3a2-the-texture-transfer-oracle-with-a-measured-reference-stream)):
 with each operating point's references sent as their own SVT-AV1 stream
 and measured, the oracle fails on all 12 points (LPIPS +0.002 to +0.029 at
 equal rate, no equal-quality saving). Sparse references cost 1.4–2.1× an
@@ -512,7 +512,7 @@ into `Models`. DISTS is reported beside LPIPS and PSNR, as in G5c. Order:
    SR overfit to the evaluation window itself is its upper bound; it must
    beat H3c's curve at equal LPIPS to be built.
 
-H3b oracle (2026-10-11, [outcome](docs/experiments.md#2026-10-11--h3b-oracle-perfect-appearance-at-the-coded-pose)):
+H3b oracle (2026-10-11, [outcome](experiments/h3b.md#2026-10-11--h3b-oracle-perfect-appearance-at-the-coded-pose)):
 fails on the 4 pilot items. Perfect appearance at WiLoR's coded pose, with
 the forearm granted, reaches LPIPS 0.211 at 1.93 kbps against SVT-AV1's
 0.102 at 35 kbps (CRF 62; +0.109, CI +0.062 to +0.156), and is worse on
@@ -521,7 +521,7 @@ even the uncoded pose fails (0.168). MANO's silhouette misses or overshoots
 about a tenth of the hand, and that alone costs more than SVT-AV1's
 coarsest pixels. So the generator is not built at the pose stream's rate,
 and H3c is next. H3b2 (user, 2026-10-11: judge at equal quality,
-[outcome](docs/experiments.md#2026-10-11--h3b2-svt-av1-down-to-the-pose-streams-rate-equal-quality)):
+[outcome](experiments/h3b2.md#2026-10-11--h3b2-svt-av1-down-to-the-pose-streams-rate-equal-quality)):
 SVT-AV1 downscaled reaches the pose stream's rate (1.9 kbps at an eighth of
 the resolution, LPIPS 0.29) and needs about 5 kbps for the oracle's 0.21.
 The oracle's equal-quality saving is 48% (CI 6% to 81%) with the forearm
@@ -532,7 +532,7 @@ frame without prediction. If a generator is revisited (agreed, user,
 then bridging pose gaps of ≤ 10 frames (83% of breaks) and boxes from the
 masks rather than the detector.
 
-H3c (2026-10-12, [outcome](docs/experiments.md#2026-10-11--h3c-a-perceptually-tuned-dcvc-uf-for-the-hand-pixels)):
+H3c (2026-10-12, [outcome](experiments/h3c.md#2026-10-11--h3c-a-perceptually-tuned-dcvc-uf-for-the-hand-pixels)):
 tuning does not pay, but DCVC-UF itself does. Off the shelf, DCVC-UF HT-L
 (at full, ½ and ¼ resolution, rate split onto the hand region by its own
 entropy model) needs about 63% less rate than SVT-AV1 for the same LPIPS on
@@ -543,7 +543,7 @@ tuning without LPIPS starves the background instead of coding the hands
 better. So H3d's bar, and any generator's, is the lower envelope of
 SVT-AV1 and DCVC-UF off the shelf on R, per item. H3d is next.
 
-H3c2 (2026-10-12, [outcome](docs/experiments.md#2026-10-12--h3c2-pose-fidelity-at-rate-pixels-against-keypoints);
+H3c2 (2026-10-12, [outcome](experiments/h3c2.md#2026-10-12--h3c2-pose-fidelity-at-rate-pixels-against-keypoints);
 user, 2026-10-12: judge the hand by the pose it carries, identity free, as
 coding for machines does, while keeping a video people can watch; a
 domain-specific mode beside the pixel route, not instead of it, since tennis
@@ -566,7 +566,7 @@ by the rule; the user opened the path (2026-10-12). Order now:
    pasted over them, both streams billed; and the forearm generated too.
    The generator's own silhouette places the hand, so no outline is sent
    (outlines cost 72–170 kbps, H3b2).
-   Outcome (2026-10-12, [outcome](docs/experiments.md#2026-10-12--h3e-a-pretrained-pose-conditioned-generator-renders-the-hand-from-the-coded-keypoints)):
+   Outcome (2026-10-12, [outcome](experiments/h3e.md#2026-10-12--h3e-a-pretrained-pose-conditioned-generator-renders-the-hand-from-the-coded-keypoints)):
    **fails**. JointControlVideo (Wan2.1-I2V-14B with a hand-joint module,
    ECCV 2026) renders each pilot window from its first frame and H2's coded
    joints; pasted over DCVC-UF-coded surroundings, it needs more rate than the
@@ -580,7 +580,7 @@ by the rule; the user opened the path (2026-10-12). Order now:
    below, or hand inpainting into the coded frames), or on camera motion.
 2. H3d, as agreed, against H3c's bar (now the per-item concave hull of
    SVT-AV1 and DCVC-UF off the shelf on R, by BD-rate; project convention).
-   Oracle (2026-10-12, [outcome](docs/experiments.md#2026-10-12--h3d-oracle-a-content-aware-super-resolution-of-the-hand-pixels-nas)):
+   Oracle (2026-10-12, [outcome](experiments/h3d.md#2026-10-12--h3d-oracle-a-content-aware-super-resolution-of-the-hand-pixels-nas)):
    **passes**. G5d's enhancer (0.6 M parameters) fitted on the window
    itself, its bits free, over DCVC-UF's ¼ and ½ decodes needs 77% less rate
    than the bar for the same LPIPS_R (CI −89% to −66%, 4 of 4 items; DISTS
@@ -589,7 +589,7 @@ by the rule; the user opened the path (2026-10-12). Order now:
    window (memorization) and paid for. At 1.2 MB it costs more than it
    saves within each pilot video (1.7–3.5 minutes), so network size, and
    sharing one network across videos, are its axes.
-   Component (2026-10-13, [outcome](docs/experiments.md#2026-10-12--h3d-component-per-video-per-person-and-generic-super-resolution-of-the-hand-pixels)):
+   Component (2026-10-13, [outcome](experiments/h3d.md#2026-10-12--h3d-component-per-video-per-person-and-generic-super-resolution-of-the-hand-pixels)):
    **G stands: H3d's coder is DCVC-UF off the shelf at ¼ and ½ with a
    generic super-resolution network** (594 k parameters, fitted on six
    recordings of five other participants, sent with the decoder): −22% rate at equal
@@ -634,7 +634,7 @@ shows why not, and the estimator is confirmed on renders.
 ## H4. Handled objects (rescoped after H1, user 2026-10-08)
 
 Grip pose (item 1) fails (H4a, 2026-10-13, job `20261013T064014Z-04a44b1c`,
-[outcome](docs/experiments.md#2026-10-13--h4a-grip-pose-on-hot3d-is-a-held-object-still-in-the-hands-frame)):
+[outcome](experiments/h4a.md#2026-10-13--h4a-grip-pose-on-hot3d-is-a-held-object-still-in-the-hands-frame)):
 on HOT3D's motion capture, a reference carried by the wrist holds 49% of
 an object's moving frames at 2 px with a median life of 0.05 s (rule 70%,
 0.5 s). The grip explains most of the translation but half the rotation
@@ -647,7 +647,7 @@ candidate loses its cheapest route. Grip pose may still serve as a prior
 background (G) are unaffected.
 
 A bank of reference views (item 2) fails too (H4b, 2026-10-13, pilot job
-`20261013T074546Z-821ee185`, [outcome](docs/experiments.md#2026-10-13--h4b-a-bank-of-reference-views-for-handled-objects-oracle-visor)):
+`20261013T074546Z-821ee185`, [outcome](experiments/h4b.md#2026-10-13--h4b-a-bank-of-reference-views-for-handled-objects-oracle-visor)):
 an unlimited bank, choosing views with hindsight, holds 56% of handled-object
 frames at 30 dB and sends as many new views as one re-registering reference
 (1.00×), one every 0.03 s; older views are never better than the latest.
@@ -697,7 +697,7 @@ quality: G as it is; G refitted on object crops; G refitted on hands and
 objects (one network, same size). Data as H3d's component (other
 participants' recordings, SAM 3.1 masks). Fallback if all fail:
 generative completion of unseen sides.
-Outcome (2026-10-16, [experiments](docs/experiments.md#2026-10-16--h4c-handled-objects-as-pixels-h3ds-recipe)):
+Outcome (2026-10-16, [experiments](experiments/h4c.md#2026-10-16--h4c-handled-objects-as-pixels-h3ds-recipe)):
 **one network, G_HO, codes hands and handled objects.** G refitted on G's
 hand footage plus object crops from other participants' recordings (VISOR
 dense train masks of objects in contact; same 594 k size) over DCVC-UF
@@ -741,7 +741,7 @@ before its run:
   winning); if not, the low-rate claim is dropped for egocentric hands.
   The regime itself (where pixel coders collapse) is defined per domain by
   the judge (e.g. a detector's recall on the decoded ball, K5).
-  **Done 2026-10-16** ([experiments](docs/experiments.md#2026-10-16--k1-do-keypoints-win-on-egocentric-hands-at-very-low-rates)):
+  **Done 2026-10-16** ([experiments](experiments/k1.md#2026-10-16--k1-do-keypoints-win-on-egocentric-hands-at-very-low-rates)):
   from H3b2's and H3d's reports, with H3b's region S mapped to R through
   SVT-AV1's shared streams. At 1.93 kbps perfect appearance at the coded
   pose (forearm free) lies above DCVC-UF + G on 1 of 4 items (P01_107,
@@ -784,7 +784,7 @@ before its run:
   gain is bounded by its motion bits; if even this oracle saves nothing,
   the trained version is not pursued.
   **Done 2026-10-16: fails, K3 closed**
-  ([experiments](docs/experiments.md#2026-10-16--k3-keypoint-conditioned-pixel-coding-oracle-a-perfect-hand-in-dcvc-ufs-reference)).
+  ([experiments](experiments/k3.md#2026-10-16--k3-keypoint-conditioned-pixel-coding-oracle-a-perfect-hand-in-dcvc-ufs-reference)).
   DCVC-UF HT-L has no motion stream (8 frames per NAL from a recurrent
   feature memory), but at a memory reset its reference is one frame, so it
   can be replaced without retraining. The oracle put the source's true hand
@@ -796,7 +796,7 @@ before its run:
   (0.3–9 kbps). It would pass at keypoints of about 1 kbps or less (H2's
   cheapest is 1.70). Neither the warp nor the trained version is built.
   **K3b, 2026-10-17 (user: are hands conclusive?): yes, closed**
-  ([experiments](docs/experiments.md#2026-10-17--k3b-the-best-motion-a-keypoint-warp-could-give-flow-warped-reference)).
+  ([experiments](experiments/k3b.md#2026-10-17--k3b-the-best-motion-a-keypoint-warp-could-give-flow-warped-reference)).
   The previous decoded frame warped by optical flow on the source (the best
   motion a keypoint warp could give, keypoints free) codes R 44% worse than
   the unmodified codec (0 of 4 items better) and 4% worse than the unwarped
@@ -810,7 +810,7 @@ before its run:
   body-pose estimator's fit (audit first, e.g. ultralytics' pose models)
   and its parameter rate against the bits on those pixels. Decides whether
   players pass H1's screen and what the ball costs. **Done 2026-10-13**
-  ([experiments](docs/experiments.md#2026-10-13--k4-tennis-audit-h1s-method-on-broadcast-tennis)):
+  ([experiments](experiments/k4.md#2026-10-13--k4-tennis-audit-h1s-method-on-broadcast-tennis)):
   players do not pass, and K6 is not run as gated. Players are 0.6–4% of
   the pixels and 86–96% of the foreground's SVT-AV1 bits (pass (a)), but
   YOLO11x-pose fits 0.875 of broadcast player-frames (rule 0.90; TrackNet
@@ -827,7 +827,7 @@ before its run:
   SVT-AV1 and DCVC-UF decodes: ball-region quality and a ball detector's
   recall on the decoded frames, against the pixel coders at equal rate and
   equal quality. Decides the ball mode. **Done 2026-10-13**
-  ([experiments](docs/experiments.md#2026-10-13--k5-ball-oracle-the-true-ball-at-its-coded-position)):
+  ([experiments](experiments/k5.md#2026-10-13--k5-ball-oracle-the-true-ball-at-its-coded-position)):
   **a ball mode is built.** On 8 of 8 TrackNet windows the oracle beats
   the pooled envelope of both coders on ball-region PSNR (median BD-rate
   −57% drawn over DCVC-UF, −38% over SVT-AV1) for 0.23 kbps; the coders

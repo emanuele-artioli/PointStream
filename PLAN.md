@@ -24,7 +24,7 @@ new dependency.
 ## Where PointStream stands (2026-10-22)
 
 The root session keeps this section and the dispatch ledger below; item
-sessions update their own items and experiments.md entries
+sessions update their own items and their files in `docs/experiments/`
 ([sessions](docs/sessions.md)).
 
 - **Protocol (2026-10-22):** two tracks, fidelity and experience. J
@@ -184,7 +184,7 @@ Done (2026-10-07). Narrative: [history](docs/history.md#b1-visor-adapter-and-eva
 ### B2b. Baseline follow-ups (agreed 2026-10-07, after B2)
 
 B2's baselines made fair and stronger before anything is compared with them.
-Each item gets an experiments.md entry before its fleet run.
+Each item gets an entry in its `docs/experiments/` file before its fleet run.
 1. **Scoring on the GPU for every codec.** SVT-AV1 jobs encode on the host's
    CPU but claim a GPU for scoring (B2 scored them on CPU: 227 s per point
    against 6.5 s). B2's CPU scores stay valid; they are not redone.
@@ -227,7 +227,7 @@ low-rate ladder and the ROI variant, from recorded jobs.
 Status (2026-10-07): items 1, 2 (timing), 5 and 6 are done, and item 4's pilot
 chose the ROI offset (+32 on background blocks; lowering the foreground's
 quantizer does nothing in SVT-AV1's CRF mode)
-([outcome](docs/experiments.md#2026-10-07--b2b-fair-baselines-timing-equal-time-roi-range-complexity)).
+([outcome](docs/experiments/b2b.md#2026-10-07--b2b-fair-baselines-timing-equal-time-roi-range-complexity)).
 DCVC-UF HT-L encodes a window in 1.9 s, faster than any SVT-AV1 preset on 32
 cores. By the user's decision the equal-time preset is matched to
 PointStream's encode time instead, so the equal-time re-encode, the full ROI
@@ -537,7 +537,7 @@ there's a way to win, we should take it").*
 - Venue models are sent beforehand and unbilled, on both sides. Payback
   hours are reported. Smaller models come later (user, 2026-10-20).
 - *Where it loses (2026-10-20, from H5p 3's per-region scores,
-  [experiments](docs/experiments.md#2026-10-20--h5q-1-the-venue-model-codes-the-foreground-equal-adaptation)):*
+  [experiments](docs/experiments/h5q.md#2026-10-20--h5q-1-the-venue-model-codes-the-foreground-equal-adaptation)):*
   below about 200 kbps PointStream's foreground already beats the venue
   anchor's and its background loses; above it the foreground loses, and
   at QP 63 it equals off-the-shelf whole-frame DCVC-UF while the venue
@@ -597,7 +597,7 @@ objects (the tennis ball).
   pixel coders' envelope (SVT-AV1, DCVC-UF), swept over the rendering
   resolution, so K4's keypoint share (22% of SVT-AV1's player bits at
   CRF 62) is judged there, not by H1's 10% screen.
-  Done (2026-10-21, [entry](docs/experiments.md#2026-10-21--k6-player-oracle-h3b-for-bodies-on-broadcast-tennis);
+  Done (2026-10-21, [entry](docs/experiments/k6.md#2026-10-21--k6-player-oracle-h3b-for-bodies-on-broadcast-tennis);
   K4's 9 broadcast windows, 8 scored from 5 matches; the stopping rule
   met at the first look). **The bound passes and the charged oracle
   fails, so the decision is the user's.**
@@ -676,6 +676,59 @@ objects (the tennis ball).
   starts with an environment audit and a packed environment. Its
   composite grants R as the generator's matte, the analogue of `warp`'s
   granted outline, so it bounds the generator with its own matte.
+  **Step 2, zero-shot (2026-10-22, experiments.md "K6b (players) 2"):
+  fails.** Moore-AnimateAnyone (the released weights) with one unbilled
+  reference crop per player and the coded keypoints, inside the granted R,
+  wins 3 of 6 windows on LPIPS and 3 of 6 on DISTS (score 50%; the two
+  unjudged windows could not have lifted it to 75%). It is far better than
+  K6's `ref` warp (LPIPS over S 0.21–0.38 against 0.39–0.55) and beats the
+  envelope on both metrics on the three Djokovic windows (saving 2–73%),
+  losing both Alcaraz windows (by 0.004–0.058) and the Rublev close-up.
+  The bound is 0.05–0.12. The environment is `pointstream-jcv` extended
+  (huggingface_hub < 1.0, conflict 10); first run on Ada recorded. Scope
+  (user, before any score): the released profile alone decides; the
+  tennis fine-tune was a diagnostic on one window, and no better there.
+  4.75 GPU-hours, over the 4-hour ceiling because parallel parts slowed
+  each other (reported to the user before judging). Next: step 3, the
+  overfit oracle; its rule is written (ceiling 6 GPU-hours) and it waits
+  for the user's approval.
+  **Step 3, overfit oracle (2026-10-23, experiments.md "K6b (players)
+  3"): passes.** AnimateAnyone fitted on each window's own frames (a LoRA
+  on both UNets' attention and the pose guider, 7.5 minutes: the pilot's
+  learning curve saturated there) wins 4 of 6 windows on LPIPS and 6 of 6
+  on DISTS (score 83%), saving 35–84% of the envelope's rate on four
+  windows. It improves every window over the zero-shot step (LPIPS
+  0.185–0.300 against 0.211–0.381); it loses LPIPS on
+  `alcaraz_hurkacz/045` by 0.003 (its fit got the fewest steps) and on the
+  Rublev close-up. The fit saw the frames it is judged on, and its
+  reference, matte and LoRA are unbilled, so it bounds a match fit. 4.8
+  GPU-hours of the 6 approved. Next: step 4 (a fit on other shots of the
+  same match, billed and amortized). **Its rule is written (2026-10-23,
+  experiments.md "K6b (players) 4")**: one LoRA per match on up to 6 of
+  K4b.1's other windows, the pose guider frozen, 8-bit adapter bytes
+  billed over H = 2 hours (an assumption: the archive holds scene clips),
+  a pilot over ranks {64, 16, 4} on `djokovic_federer`, ceiling 7
+  GPU-hours. Size decides: step 3's adapter would cost 54 kbps over 2 h.
+  **Step 4, match fit billed (2026-10-23): fails.** The pilot chose rank
+  4 and a 10-minute fit (1.55 MB at 8 bits, 1.73 kbps over 2 h; it scored
+  as rank 64 and as fp16). On the 6 windows, `gen-match` wins 4 of 6 on
+  LPIPS and 4 of 6 on DISTS unbilled (67%), 3 and 4 billed (58%). It
+  recovers about 60% of step 3's gain over zero-shot and pays back in
+  0.4–2.1 hours where it wins, but loses `alcaraz_hurkacz/045` (fewest
+  training crops; its fit failed the coarse `loss_falls` check) and the
+  Rublev close-up. By the rule, the generative route for players closes
+  at the keypoint rate, and step 3's extra windows came from fitting the
+  judged frames. About 7.0 GPU-hours, at the ceiling. Not closed (user,
+  2026-10-23): **step 5's rule is written (experiments.md "K6b (players)
+  5")**. Three cumulative arms (step 4's recipe; all of the match's
+  K4b.1 windows plus the pose guider trained; the same on a tennis-wide
+  base LoRA that is part of the decoder) are chosen on two development
+  windows that K6 scored and steps 2–4 never judged (`djokovic_zverev/008`,
+  `medvedev_struff/033`). Then 4-bit adapters and guidance 2.0 are tried
+  at render time, and the 6 windows are judged billed by step 4's rule,
+  beside a per-player Djokovic model billed over 20 hours. Ceiling 11
+  GPU-hours. Waits for the user's approval. Step 6 (outlined): a newer
+  generator (Wan-Animate), after an environment audit.
   Training discipline for steps 3 and 4: a correctness smoke in minutes;
   then a learning-curve pilot on held-out frames at fixed fractions of the
   step budget; the scaled fit only if that curve, extrapolated, can reach
@@ -804,8 +857,14 @@ objects (the tennis ball).
   the rule: rung 4, a fit on other shots of the same video, billed. A visual
   check (user, 2026-10-23; P06_108 re-fitted, 0.163 / 0.180) shows the
   source's pose, skin and lighting with softer texture, blur where fingers
-  cross an object, and flicker 25% above the source's. Rung 4 waits for the
-  user.
+  cross an object, and flicker 25% above the source's. **Rung 4 (entry "K6b
+  (hands) 4", `k6bh4-report.json` `3690a96f…`): fails, 25%.** The same fit
+  on 240 frames from other shots of the video (outside the window, fit
+  unbilled) lands on rung 2's zero-shot numbers (P06_108 0.321 / 0.268,
+  P22_107 0.283 / 0.194 LPIPS / DISTS on R), and none of rung 3's gain
+  transfers. Stopped after 2 of 3 items, once decided. Hands on fidelity
+  close at the keypoint rate; K1f's bound stays a bound, and hands go to the
+  experience track (item J).
 - K7. *HiEve audit* (user, 2026-10-14: open a domain if it serves
   PointStream; [docs/vcm.md](docs/vcm.md#datasets-vcm-and-fcm-evaluate-on)).
   HiEve (crowded events, surveillance-style footage; manual 14-joint poses, tracks
@@ -833,7 +892,7 @@ other. Each has its rule written before its run, as everywhere.
   court outline and the shot list. Judged on the archived matches' scene
   clips, reviewed by eye, and on the whole match's shots.
   **Not adopted (2026-10-20)**, scored on a stratified sample of 82
-  shots marked by the user ([entry](docs/experiments.md#2026-10-16--k8-court-view-shots-and-camera-registration-rule)).
+  shots marked by the user ([entry](docs/experiments/k8.md#2026-10-16--k8-court-view-shots-and-camera-registration-rule)).
   Precision is 1.00 (all 41 predicted court shots are court), with a
   registration median of 0.91 px on them. Duration recall is 0.34
   [0.26, 0.45]: most court time is missed. The misses fall into three
@@ -845,7 +904,7 @@ other. Each has its rule written before its run, as everywhere.
   Or K4b's candidate (d) could use only the 41 precise predicted-court
   shots.
   **K8b adopted (2026-10-21)**
-  ([entry](docs/experiments.md#2026-10-20--k8b-court-recall-in-shade-and-across-venues-rule)).
+  ([entry](docs/experiments/k8b.md#2026-10-20--k8b-court-recall-in-shade-and-across-venues-rule)).
   The changes: a line detector relative to the local background (works in
   shade), hypotheses from both detectors, line-swap re-seating, a
   centerline ruler, a clutter guard, and a 6 px shot rule. On 69 held-out
@@ -867,7 +926,7 @@ other. Each has its rule written before its run, as everywhere.
      review page where the user marks the two players on a few dozen
      frames; RacketVision has no player labels), then applied once to
      every window as amendment 2, with both earlier definitions' numbers
-     kept. Scored (2026-10-21, [entry](docs/experiments.md#2026-10-16--k4b1-identifying-the-two-players-rule);
+     kept. Scored (2026-10-21, [entry](docs/experiments/k4b.md#2026-10-16--k4b1-identifying-the-two-players-rule);
      features on a 240-frame window per marked frame, user's amendment):
      no candidate reaches 0.95. Best (a)+(c) 0.875 (42/48), then (b)
      0.813, (c) 0.667, (a) 0.625, (e) 0.542. The misses mostly take a
@@ -890,7 +949,7 @@ other. Each has its rule written before its run, as everywhere.
      crop last; fine-tuning only if all fail (no tennis pose labels;
      SportsPose or pseudo-labels from fitted near players). Players under
      10% of the frame height are fitted on 0–50% today, 15% and taller on
-     97–100%. Done (2026-10-21, [entry](docs/experiments.md#2026-10-21--k4b2-pose-on-the-far-player-crop-size-sweep)):
+     97–100%. Done (2026-10-21, [entry](docs/experiments/k4b.md#2026-10-21--k4b2-pose-on-the-far-player-crop-size-sweep)):
      **crop ×1 passes**; on 48 windows' hand-identified players, fitted
      0.997 (far 0.993, whole frame 0.812 / 0.595), synthetic OKS ≥ 0.5 on
      0.991. K4's (b) passes with it; DWPose not needed. K4b.3 reads its
@@ -898,7 +957,7 @@ other. Each has its rule written before its run, as everywhere.
   3. Keypoint rate against keypoint error: quantization 1, 2, 4, 8 px,
      constant-velocity prediction, a lower keypoint frame rate with
      interpolation; raw keypoints saved this time (K4 kept histograms
-     only). Which error is acceptable is K6's to judge on the rendering. Done (2026-10-21, [entry](docs/experiments.md#2026-10-21--k4b3-keypoint-rate-against-keypoint-error)):
+     only). Which error is acceptable is K6's to judge on the rendering. Done (2026-10-21, [entry](docs/experiments/k4b.md#2026-10-21--k4b3-keypoint-rate-against-keypoint-error)):
      q = 4 px, constant velocity, every 4th frame, **3.3 kbps for two
      players** (median OKS 0.96 far, 0.99 near; p95 8 px on fast limbs);
      every frame 9.5 kbps (p95 2.4 px). The curve goes to K6.
@@ -1130,9 +1189,9 @@ frame rate (every frame, 2nd, 4th, interpolated) against the error, from
 15.0 kbps (0.4 px median) to 3.3 kbps (1.8 px median, but 8 px p95 on
 fast limbs); quantization is cheap in error, frame rate is the lever
 whose error shows on swinging arms, which K6 judges on the rendering.
-[K4b.1](docs/experiments.md#2026-10-16--k4b1-identifying-the-two-players-rule),
-[K4b.2](docs/experiments.md#2026-10-21--k4b2-pose-on-the-far-player-crop-size-sweep),
-[K4b.3](docs/experiments.md#2026-10-21--k4b3-keypoint-rate-against-keypoint-error).
+[K4b.1](docs/experiments/k4b.md#2026-10-16--k4b1-identifying-the-two-players-rule),
+[K4b.2](docs/experiments/k4b.md#2026-10-21--k4b2-pose-on-the-far-player-crop-size-sweep),
+[K4b.3](docs/experiments/k4b.md#2026-10-21--k4b3-keypoint-rate-against-keypoint-error).
 A point to argue (user, 2026-10-13), scoped to the evidence when written:
 conventional codecs are one-size-fits-all, rigid in what they code and tuned
 to pixel fidelity rather than to what people see; a learned codec's
@@ -1161,7 +1220,7 @@ headline is needed. State the metrics' disagreement; that the split's
 LPIPS cost is structural (F coded in both streams) and grows with F's
 share of the frame (P09_106, 2%: −15%; P02_02, 50%: +19%); and that the
 foreground alone matches the venue codec at high rates once adapted.
-Checked (2026-10-16, [analysis](docs/experiments.md#2026-10-16--does-the-learned-codec-compose-better-with-a-learned-enhancer-analysis-of-h3ds-oracle)):
+Checked (2026-10-16, [analysis](docs/experiments/h3d.md#2026-10-16--does-the-learned-codec-compose-better-with-a-learned-enhancer-analysis-of-h3ds-oracle)):
 over its own base, the same enhancer gains about as much on SVT-AV1 as on
 DCVC-UF (LPIPS −73% against −76%; PSNR −35% against −12%), so "the
 learned codec composes better" is not supported. The argument to make

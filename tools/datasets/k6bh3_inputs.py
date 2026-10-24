@@ -1,11 +1,11 @@
 """Fleet specifications for K6b (hands) 3, the overfit oracle (docs/experiments.md, 2026-10-22 K6b (hands) 3).
 
-    python tools/datasets/k6bh3_inputs.py --mode pilot|fit --base-spec K6BH-SPEC.json --staged STAGED.json --items ID \\
-        --k1f-stages NAME,NAME --deadline ISO --dest DIR --name NAME [--fit-seconds S]
+    python tools/datasets/k6bh3_inputs.py --mode pilot|fit|transfer --base-spec K6BH-SPEC.json --staged STAGED.json --items ID \\
+        --k1f-stages NAME,NAME --deadline ISO --dest DIR --name NAME [--fit-seconds S] [--candidates NAME]
 
 The environment, gate inputs and hosts are a rung-2 spec's; ``--staged`` maps names to staged entries (the window,
-masks, LPIPS, DISTS, FoundHand's source, checkpoint and VAE, the named K1f stages and the item's video). One item per
-job. Standard library only.
+masks, LPIPS, DISTS, FoundHand's source, checkpoint and VAE, the named K1f stages and the item's video; in
+``transfer`` mode also 2c's stage archive with the item's candidates). One item per job. Standard library only.
 """
 
 from __future__ import annotations
@@ -23,26 +23,35 @@ def main() -> int:
         ap.add_argument(flag, required=True)
     ap.add_argument("--fit-seconds", type=int, default=1800)
     ap.add_argument("--full-seconds", type=int, default=2700)
+    ap.add_argument("--candidates", default="", help="transfer: the staged name of 2c's archive with the item's candidates")
     args = ap.parse_args()
     base = json.loads(Path(args.base_spec).read_text())
     staged = json.loads(Path(args.staged).read_text())
     item = args.items
     video = f"video_{item.rsplit('_', 1)[0]}"
     stages = args.k1f_stages.split(",")
-    entries = [staged[k] for k in (*COMMON, *stages, video)]
+    transfer = args.mode == "transfer"
+    if transfer and not args.candidates:
+        raise SystemExit("--mode transfer needs --candidates")
+    entries = [staged[k] for k in (*COMMON, *stages, video, *([args.candidates] if transfer else []))]
     pilot = args.mode == "pilot"
     arguments = ["run", "--mode", args.mode, "--eval-set", "{staged:eval_set}", "--archive", "{staged:dense_archive}",
                  "--masks", "{staged:fill_masks}", "--mask-record", "{staged:fill_record}", "--lpips-backbone", "{staged:lpips}",
                  "--dists-backbone", "{staged:dists}", "--foundhand-src", "{staged:foundhand_src}",
                  "--foundhand-ckpt", "{staged:foundhand_ckpt}", "--vae", "{staged:vae}",
                  *[a for s in stages for a in ("--k1f-stage", f"{{staged:{s}}}")], "--video", f"{{staged:{video}}}",
-                 "--items", "{items}", "--frames", "{frames}", "--fit-seconds", "{fit_seconds}", "--eval-frames", "{eval_frames}"]
+                 "--items", "{items}", "--frames", "{frames}", "--fit-seconds", "{fit_seconds}", "--eval-frames", "{eval_frames}",
+                 *(["--candidates", f"{{staged:{args.candidates}}}", "--fit-frames", "{fit_frames}"] if transfer else [])]
     scale = {"items": {"smoke": item, "full": item},
              "frames": {"smoke": 240 if pilot else 24, "full": 240},
              "fit_seconds": {"smoke": 120, "full": args.fit_seconds},
              "eval_frames": {"smoke": 8 if pilot else 24, "full": 30 if pilot else 240}}
-    basis = (f"K6b (hands) 3, {args.mode}: {item} through the full path (FoundHand's EMA weights loaded, the window's crops "
-             "encoded by the VAE, 120 s of fitting with its training_losses, the fixed-probe loss and a training-pair sample "
+    if transfer:
+        scale["fit_frames"] = {"smoke": 60, "full": 240}
+    source = ("60 of 2c's candidate frames outside the window decoded and their kept hands cropped and encoded by the VAE"
+              if transfer else "the window's crops encoded by the VAE")
+    basis = (f"K6b (hands) {'4' if transfer else '3'}, {args.mode}: {item} through the full path (FoundHand's EMA weights loaded, "
+             f"{source}, 120 s of fitting with its training_losses, the fixed-probe loss and a training-pair sample "
              "at each mark, rung 2's gen rendered with both hands in lockstep, composited and scored on R"
              + (", on 8 held-out frames from 180" if pilot else ", on 24 frames, with K1f's warp") + "); the stage fits "
              f"{args.fit_seconds} s and judges {scale['eval_frames']['full']} frames.")

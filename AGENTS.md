@@ -64,8 +64,9 @@ Later runs read the table instead of re-checking, and pick `gpu_models` from it.
 ## Experiments
 
 GPU time and training are the constraint; code is cheap. Before a run, write its
-decision rule, hypothesis, competing explanation and budget in
-[docs/experiments.md](docs/experiments.md). Before building a component, run an
+decision rule, hypothesis, competing explanation and budget in the item's
+file under [docs/experiments/](docs/experiments.md#runs), one file per PLAN
+item. Before building a component, run an
 oracle: the cheapest upper bound of what the component could achieve, at the
 operating point the decision needs. It must dominate the components it gates.
 If it fails the rule, the component is not built. Then run a correctness smoke
@@ -106,8 +107,11 @@ VVC only if a correct invocation turns out to be needed.
 
 Work on a scoped branch, not directly on `main`. Commit a coherent change when
 it is worth keeping, and push the branch. When focused tests cover the
-behaviour, suggest a pull request and wait for the user to ask before opening
-it. The checks are the ones CI runs:
+behaviour and the checks pass locally, open the pull request and enable
+auto-merge with a merge commit; it merges once CI passes (user, 2026-10-23).
+Leave auto-merge off only when the merge has to wait for the user's timing,
+e.g. a change that would break sessions still running, and say so in the
+description. The checks are the ones CI runs:
 
 ```bash
 ruff check
@@ -119,6 +123,57 @@ Pass no paths to ruff or mypy: paths replace the configured file sets.
 
 Codex subagents use `gpt-6.1-sol` at `medium` reasoning effort (user,
 2026-10-16; Codex's own default) unless the task says otherwise.
+
+## Deciding and asking
+
+Decide alone, and record why, whenever a step can be undone: merges, Overleaf
+pushes, paper text, a choice between methods. Ask the user first only when:
+
+- the step cannot be undone: deleting or overwriting anything in `Datasets` or
+  `Models`, rewriting history on a shared branch, spending GPU time beyond the
+  card's budget, submitting the paper;
+- a wrong call, though reversible, would be expensive (much GPU time or work);
+- it needs the user's judgment (taste, what the paper should claim);
+- you are not confident between the options.
+
+The user switches between several sessions, so a question must stand on its
+own: what the work is for, what is done and found, the options with their cost
+and risk, your recommendation, and exactly what you need. Explain every
+internal name the first time ("part 1a, the test of the hand detector on
+blurred frames"). Never make the user scroll back for context
+([sessions](docs/sessions.md#asking-the-user)).
+
+## Context and compaction
+
+Long outputs stay in the context until the next compaction and are re-read on
+every step. Check a file's length before reading it, then search it or read a
+range; send long command output to a file and read its tail and error lines. A
+hook blocks whole reads of long files and logs. Scripts print a short summary
+(status, key numbers, warning and error counts, path to the full log); read
+the full log when the summary shows anything unexpected.
+
+Keep state in files, not only in the conversation: record each fleet job ID in
+the experiments entry when submitting it. When a phase ends, tell the user it is
+a good moment to `/compact` and give a one-line focus
+([sessions](docs/sessions.md#compaction)).
+
+Compact instructions: keep verbatim the card's goal, scope and stop
+conditions; every fleet job ID with its state; GPU-hours spent of the budget;
+the decision rule's result so far; the root session's address; open questions
+for the user. Drop logs, file dumps, wait output and dead ends already
+recorded in files.
+
+## Claude Code and Codex
+
+Both work in this repository under the same rules; this file is the
+instructions for both. The hooks in `tools/agent_hooks/` run under both:
+`.claude/settings.json` wires them for Claude Code, `.codex/hooks.json` for
+Codex (trust them once with `/hooks`). Claude Code's settings also deny edits
+in `Models`/`Datasets`, force pushes and `git reset --hard`; under Codex
+`guard_protected.py` enforces the same. Where a document names a Claude Code
+tool, Codex uses its own equivalent
+([sessions](docs/sessions.md#codex)): sessions reach each other only through
+the user and the repository, and model tiers map to reasoning effort.
 
 ## Paper repository
 

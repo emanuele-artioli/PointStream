@@ -1,6 +1,6 @@
 """K6b (hands) 3: the overfit oracle, FoundHand fitted on the window's own frames (docs/experiments.md, 2026-10-22).
 
-    python -m experiments.visor.k6bh3 run --mode pilot|fit <k6bh run's inputs> --fit-seconds S --eval-frames N
+    python -m experiments.visor.k6bh3 run --mode pilot|fit|transfer <k6bh run's inputs> [--candidates TAR ...] --fit-seconds S --eval-frames N
     python -m experiments.visor.k6bh3 validate
     python -m experiments.visor.k6bh3 report --pilot DIR --stage DIR ... --k1f-stage TAR ... --out JSON
 
@@ -13,6 +13,8 @@ fitted frame, on the coded keypoints, composited inside R and scored on R (``h3c
 * ``pilot`` (P01_107, development): fit on frames 0-179 for ``fit-seconds`` of training, judging ``gen`` on the
   held-out frames from 180 at 0%, 25%, 50% and 100% of it (the learning curve).
 * ``fit`` (the scored items): fit on all 240 frames, then judge ``gen`` and reproduce K1f's ``warp``.
+* ``transfer`` (rung 4, 2026-10-23): as ``fit``, but fitted on 240 of 2c's candidate frames outside the window (and
+  its guard) instead of the window's own, each kept hand cropped with its VISOR mask and WiLoR joints.
 """
 
 from __future__ import annotations
@@ -50,6 +52,21 @@ DECISION: dict[str, Any] = {
     "pass": "score >= 0.75: rung 4 (a fit on other shots of the same video, billed)",
     "fail": "score < 0.75: the generative route closes for hands at the keypoint rate; K1f's bound stays a bound",
 }
+TRANSFER_FRAMES = 240  # rung 4: candidate frames fitted (rung 3 fitted the window's 240)
+TRANSFER_DECODE_CHUNK = 64
+CANDIDATE_STRIDE = 10  # 2c's
+WEIGHT_BYTES_PER_PARAM = 2  # bf16, the fit as it would be sent
+TRANSFER_DECISION: dict[str, Any] = {
+    "fit_data": "2c's candidates outside the window and a 1 s guard (stride 10, kept fits), 240 frames evenly spaced by "
+                "position among those with a kept fit; every kept hand cropped by rung 2's rule with its VISOR mask and "
+                "WiLoR joints; everything else as rung 3 (20 min, the same seeds)",
+    "billing": "the fit delivered beforehand and unbilled (as venue models, user 2026-10-20); the rate with the weights "
+               "billed once per video and its payback reported beside",
+    "item_won": "the transferred gen's LPIPS (DISTS) on R below K1f's hull at the item's keypoint rate",
+    "score": "mean over {LPIPS, DISTS} of the share of the 3 items won (P06_108, P22_107, P25_09)",
+    "pass": "score >= 0.75: a fit made elsewhere in the video carries the hand; next to the user (how small a fit can be)",
+    "fail": "score < 0.75: the fit does not transfer across shots; hands on fidelity close (experience track)",
+}
 
 
 # ----------------------------------------------------------------- data (CPU)
@@ -72,6 +89,49 @@ def hand_crops(rows: dict[str, np.ndarray], truth: Any, clip: Any, frames: range
         out.append({"row": int(i), "t": t, "right": right, "box": box, "image": k6bh.crop_pixels(np.asarray(truth[t]), box),
                     "mask": k6bh.crop_pixels(mask, box), "kp": k6bh.to_crop(rows[key][i], box)})
     return out
+
+
+def transfer_picks(arrays: dict[str, np.ndarray], count: int, min_inside: int) -> list[int]:
+    """Rung 4's fit frames: of the candidate frames with at least one kept fit, ``count`` evenly spaced by position
+    (content-blind), as candidate indices in order."""
+    kept = np.unique(arrays["row_cand"][arrays["row_inside"] >= min_inside])
+    if len(kept) <= count:
+        return [int(c) for c in kept]
+    return [int(kept[int(round(i))]) for i in np.linspace(0, len(kept) - 1, count)]
+
+
+def transfer_crops(arrays: dict[str, np.ndarray], picks: list[int], rgb: np.ndarray, at: list[int], frames_doc: dict[int, Any],
+                   min_inside: int) -> list[dict[str, Any]]:
+    """Rung 2's crop of every kept hand on the decoded candidate frames ``rgb`` (candidate indices ``at``, a slice of
+    ``picks``), with its VISOR dense mask and WiLoR joints."""
+    from experiments.visor.k6bh2c import hand_masks, with_conf
+    from src.segmentation import visor
+
+    out = []
+    for frame, c in zip(rgb, at):
+        n = int(arrays["visor_frame"][c])
+        masks = hand_masks(frames_doc[n])
+        for r in np.nonzero((arrays["row_cand"] == c) & (arrays["row_inside"] >= min_inside))[0]:
+            right = bool(arrays["row_right"][r])
+            mask = masks.get(visor.HANDS[1] if right else visor.HANDS[0])
+            if mask is None or not mask.any():
+                continue
+            if mask.shape != frame.shape[:2]:
+                raise RuntimeError(f"candidate {c}: mask {mask.shape} against frame {frame.shape[:2]}")
+            kp = with_conf(arrays["row_kp2d"][r])
+            box = k6bh.crop_box(kp, mask)
+            out.append({"row": int(r), "t": int(c), "index": int(arrays["index"][c]), "right": right, "box": box,
+                        "image": k6bh.crop_pixels(frame, box), "mask": k6bh.crop_pixels(mask, box), "kp": k6bh.to_crop(kp, box)})
+    return out
+
+
+def near_share(indices: list[int], window: tuple[int, int], fps: float, seconds: float) -> float:
+    """Share of ``indices`` (decoded frame numbers) within ``seconds`` of the window [lo, hi)."""
+    if not indices:
+        return float("nan")
+    lo, hi = window
+    reach = seconds * fps
+    return float(np.mean([(lo - reach <= i < hi + reach) for i in indices]))
 
 
 def reference_pairs(sides: np.ndarray, rng: np.random.Generator, picks: np.ndarray) -> np.ndarray:
@@ -380,8 +440,46 @@ def save_looks(publish: Path, item_id: str, truth: Any, gen: Any, warp: Any, reg
 # ----------------------------------------------------------------- run (GPU)
 
 
+def build_transfer(args: argparse.Namespace, item: dict[str, Any], plan: dict[str, Any], device: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Rung 4's fit crops from the decoded candidate frames (``plan``: the candidates unit, the picks and the decode
+    futures), and their record."""
+    from experiments.visor.k6bh2c import MIN_INSIDE, NEAR_SECONDS, to_rgb
+    from src.codecs.quality import read_frames
+    from src.segmentation import visor
+
+    began = time.time()
+    meta, arrays, picks = plan["meta"], plan["arrays"], plan["picks"]
+    frames_doc = visor.frames(visor.load_annotations(Path(args.archive) / item["dense_member"]))
+    crops: list[dict[str, Any]] = []
+    decode_seconds = 0.0
+    for future, offset in plan["chunks"]:
+        bank = future.result()
+        decode_seconds += bank["seconds"]
+        at = picks[offset:offset + len(bank["indices"])]
+        if [int(arrays["index"][c]) for c in at] != bank["indices"]:
+            raise RuntimeError(f"{item['id']}: decode chunk at {offset} out of order")
+        for first in range(0, len(at), 16):
+            count = min(16, len(at) - first)
+            rgb = to_rgb(read_frames(Path(bank["path"]), bank["width"], bank["height"], first, count), bank["width"], bank["height"],
+                         bank["full_range"], device)
+            crops.extend(transfer_crops(arrays, picks, rgb, at[first:first + count], frames_doc, MIN_INSIDE))
+        os.remove(bank["path"])
+    lo, hi = meta["window"]
+    indices = [c["index"] for c in crops]
+    record = {"candidates_npz_sha256": meta["npz_sha256"], "stride": int(meta["stride"]), "candidate_frames": int(len(arrays["index"])),
+              "frames_with_kept_fit": int(len(np.unique(arrays["row_cand"][arrays["row_inside"] >= MIN_INSIDE]))),
+              "fit_frames": len(picks), "crops": len(crops), "crops_right": int(sum(c["right"] for c in crops)),
+              "window": [int(lo), int(hi)], "guard_frames": int(meta["guard_frames"]),
+              "index_range": [min(indices), max(indices)] if indices else None,
+              "outside_guard": bool(all(i < lo - meta["guard_frames"] or i >= hi + meta["guard_frames"] for i in indices)),
+              "near_share_10s": near_share(indices, (lo, hi), float(item["fps"]), NEAR_SECONDS),
+              "video_record": meta["video_record"], "decode_seconds": round(decode_seconds, 2), "seconds": round(time.time() - began, 2)}
+    return crops, record
+
+
 def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[str, Any], nets: dict[str, Any],
-                 k1f_unit: tuple[dict[str, Any], dict[str, np.ndarray]], device: str, publish: Path, scratch: Path) -> None:
+                 k1f_unit: tuple[dict[str, Any], dict[str, np.ndarray]], device: str, publish: Path, scratch: Path,
+                 plan: dict[str, Any] | None = None) -> None:
     from experiments.visor.b2 import load_mask_sets
     from experiments.visor.h2 import save_unit
     from experiments.visor.h3 import FILL, HANDS, rgb_memmap
@@ -404,7 +502,13 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
     eval_frames = range(EVAL_FROM, min(frames, EVAL_FROM + eval_n)) if pilot else range(0, min(frames, eval_n))
     fh = nets["foundhand"]
     fh.model.load_state_dict(nets["foundhand_state"])  # each item starts from the released EMA weights
-    crops = hand_crops(rows, truth, clip, fit_frames, "uncoded")
+    transfer: dict[str, Any] | None = None
+    if args.mode == "transfer":  # rung 4: nothing from the window is fitted; its first fitted frame stays the reference
+        if plan is None:
+            raise SystemExit(f"{item['id']}: no candidates")
+        crops, transfer = build_transfer(args, item, plan, device)
+    else:
+        crops = hand_crops(rows, truth, clip, fit_frames, "uncoded")
     seed = k6bh.item_seed(item["id"])
     fitter = Fitter(fh, crops, device, TRAIN_SEED + seed)
     probe = make_probe(fitter, seed)
@@ -455,16 +559,54 @@ def process_item(args: argparse.Namespace, item: dict[str, Any], decoded: dict[s
         looks = save_looks(publish, item["id"], truth, last["out"], warp, last["regions"], last["score"].hand)
     arrays["loss_trace"] = np.array(trace["trace"], float).reshape(-1, 2)
     meta = {"unit": item["id"], "item": item["id"], "video": item["video"], "mode": args.mode, "frames": frames,
-            "fit_frames": [fit_frames.start, fit_frames.stop], "eval_frames": [eval_frames.start, eval_frames.stop],
+            "fit_frames": None if transfer else [fit_frames.start, fit_frames.stop], "eval_frames": [eval_frames.start, eval_frames.stop],
             "crops": len(crops), "fit_seconds": float(args.fit_seconds), "look_frames": looks, "steps": trace["steps"],
             "trained_seconds": round(trace["trained_seconds"], 2), "fixed_loss": trace["fixed"], "curve": curve, "summary": summary,
             "k1f": {"kbps": float(meta_k["cover"]["kbps"]) if meta_k.get("cover") else k1c.POSE_KBPS, "warp": meta_k["summary"]["warp"],
                     "frames": int(meta_k["frames"]), "npz_hash_ok": bool(meta_k["npz_hash_ok"])},
             "mask_set": mask_info, "seconds": round(time.time() - began, 2)}
+    if transfer is not None:
+        meta["transfer"] = transfer
+        meta["weights"] = {"params": int(fh.record["params"]), "bytes": int(fh.record["params"]) * WEIGHT_BYTES_PER_PARAM}
     save_unit(publish, "k6bh3", item["id"], arrays, meta)
     os.remove(decoded["path"])
     for f in work.glob("*.npy"):
         f.unlink()
+
+
+def transfer_plans(args: argparse.Namespace, items: list[dict[str, Any]], scratch: Path) -> dict[str, dict[str, Any]]:
+    """Rung 4: each item's candidates unit restored from 2c's archives (cut to stride 10), its fit frames picked, and
+    their decode submitted to fresh processes (PyAV before torch), in chunks."""
+    import multiprocessing
+    from concurrent.futures import ProcessPoolExecutor
+
+    from experiments.visor.k6bh2c import MIN_INSIDE, decode_bank_frames, published_units, restore_candidates
+
+    store = scratch / "candidates"
+    store.mkdir(parents=True, exist_ok=True)
+    wanted = {it["id"] for it in items}
+    for tar in args.candidates:
+        restore_candidates(Path(tar), store, wanted, CANDIDATE_STRIDE)
+    units = published_units(store, "k6bh2c-candidates")
+    if missing := sorted(wanted - set(units)):
+        raise SystemExit(f"no candidates for {missing}")
+    videos = {Path(v).stem: v for v in args.video}
+    allowance = max(1, int(os.environ.get("PS_CPU_ALLOWANCE") or os.cpu_count() or 1))
+    pool = ProcessPoolExecutor(max_workers=2, mp_context=multiprocessing.get_context("spawn"))
+    (scratch / "bank").mkdir(parents=True, exist_ok=True)
+    plans = {}
+    for it in items:
+        meta, arrays = units[it["id"]]
+        picks = transfer_picks(arrays, int(args.fit_frames), MIN_INSIDE)
+        chunks = []
+        for first in range(0, len(picks), TRANSFER_DECODE_CHUNK):
+            target = scratch / "bank" / f"{it['id']}-{first:06d}.yuv"
+            if target.exists():
+                target.unlink()
+            indices = [int(arrays["index"][c]) for c in picks[first:first + TRANSFER_DECODE_CHUNK]]
+            chunks.append((pool.submit(decode_bank_frames, videos[it["video"]], indices, str(target), max(1, allowance // 2)), first))
+        plans[it["id"]] = {"meta": meta, "arrays": arrays, "picks": picks, "chunks": chunks}
+    return plans
 
 
 def command_run(args: argparse.Namespace) -> int:
@@ -481,6 +623,7 @@ def command_run(args: argparse.Namespace) -> int:
     publish.mkdir(parents=True, exist_ok=True)
     restored = restore_units(publish, "k6bh3")
     todo = [it for it in items if it["id"] not in restored]
+    plans = transfer_plans(args, todo, scratch) if args.mode == "transfer" else {}  # PyAV processes, before torch
     windows = decode_windows(args, todo, int(args.frames), scratch)
     os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
     import torch
@@ -506,7 +649,7 @@ def command_run(args: argparse.Namespace) -> int:
     began = time.time()
     done = len(restored)
     for item, decoded in windows:
-        process_item(args, item, decoded, nets, units[item["id"]], device, publish, scratch)
+        process_item(args, item, decoded, nets, units[item["id"]], device, publish, scratch, plans.get(item["id"]))
         done += 1
         progress(done)
     import torchmetrics
@@ -521,7 +664,9 @@ def command_run(args: argparse.Namespace) -> int:
         "dists": {"torchmetrics": torchmetrics.__version__, "backbone_sha256": file_sha256(Path(args.dists_backbone))},
         "settings": {"mode": args.mode, "frames": int(args.frames), "items": [it["id"] for it in items], "fit_seconds": float(args.fit_seconds),
                      "eval_frames": int(args.eval_frames), "steps": int(args.steps), "batch": BATCH, "lr": LR, "p_uncond": P_UNCOND,
-                     "p_no_ref_mask": P_NO_REF_MASK, "fractions": FRACTIONS, "decision": DECISION}, "restored_units": sorted(restored)})
+                     "p_no_ref_mask": P_NO_REF_MASK, "fractions": FRACTIONS, "fit_frames": int(args.fit_frames),
+                     "decision": TRANSFER_DECISION if args.mode == "transfer" else DECISION},
+        "candidates": {str(t): file_sha256(Path(t)) for t in args.candidates}, "restored_units": sorted(restored)})
     return 0
 
 
@@ -552,7 +697,12 @@ def validate(stage: Path, result: dict[str, Any]) -> dict[str, bool]:
         else:
             checks[f"{item}:looks_saved"] = len(m.get("look_frames", [])) > 0 and saved_looks(stage, item) == len(m["look_frames"])
             checks[f"{item}:flicker"] = bool(np.isfinite(m["summary"]["gen"]["flicker"]) and np.isfinite(m["summary"]["source"]["flicker"]))
-        if m["mode"] == "fit" and settings["frames"] == m["k1f"]["frames"]:
+        if m["mode"] == "transfer":
+            tr = m["transfer"]
+            checks[f"{item}:transfer_outside_window"] = bool(tr["outside_guard"]) and tr["crops"] > 0
+            checks[f"{item}:transfer_frames"] = tr["fit_frames"] == min(int(settings["fit_frames"]), tr["frames_with_kept_fit"])
+            checks[f"{item}:transfer_both_sides"] = 0 < tr["crops_right"] < tr["crops"] and m["crops"] == tr["crops"]
+        if m["mode"] in ("fit", "transfer") and settings["frames"] == m["k1f"]["frames"]:
             checks[f"{item}:warp_reproduces_k1f"] = abs(m["summary"]["warp"]["lpips_r"] - m["k1f"]["warp"]["lpips_r"]) <= k6bh.WARP_TOLERANCE
     return checks
 
@@ -582,10 +732,12 @@ def command_report(args: argparse.Namespace) -> int:
     from experiments.background.g5 import envelope
     from experiments.visor.h2 import load_units
     from experiments.visor.k1f import G_VIDEOS
-    from experiments.visor.k6bh2c import won
+    from experiments.visor.k6bh2c import payback_seconds, won
 
     hulls = {m["item"]: m for m, _ in load_units(args.k1f_stage, "k1f")}
-    out: dict[str, Any] = {"decision_rule": DECISION, "inputs": {"k1f_stages": [file_sha256(Path(t)) for t in args.k1f_stage],
+    compare = json.loads(Path(args.compare).read_text()) if args.compare else {}
+    rung3 = {r["item"]: r for r in compare.get("rows", [])}
+    out: dict[str, Any] = {"decision_rule": DECISION, "inputs": {"compare": file_sha256(Path(args.compare)) if args.compare else None, "k1f_stages": [file_sha256(Path(t)) for t in args.k1f_stage],
                                                                  "code_sha256": file_sha256(Path(__file__))}}
     for stage in map(Path, args.pilot):
         result = json.loads((stage / "k6bh3.json").read_text())
@@ -609,26 +761,48 @@ def command_report(args: argparse.Namespace) -> int:
                             "minutes_to_reach_hull": reach,
                             "go": (reach.get("lpips") or float("inf")) <= HULL_MINUTES}
     rows = []
+    modes = set()
     for stage in map(Path, args.stage):
         result = json.loads((stage / "k6bh3.json").read_text())
         checks = validate(stage, result)
-        if not all(checks.values()) or result["settings"]["mode"] != "fit" or result["settings"]["frames"] != 240:
+        mode = result["settings"]["mode"]
+        modes.add(mode)
+        if not all(checks.values()) or mode not in ("fit", "transfer") or result["settings"]["frames"] != 240:
             raise SystemExit(f"{stage} is not a valid full fit: {[k for k, v in checks.items() if not v]}")
         for m, _ in load_units([str(stage / "published.tar")], "k6bh3"):
             kbps = m["k1f"]["kbps"]
             row: dict[str, Any] = {"item": m["item"], "kbps": kbps, "g_overlap": m["video"] in G_VIDEOS, "steps": m["steps"],
-                                   "trained_seconds": m["trained_seconds"], "stage": str(stage), "sha256": file_sha256(stage / "published.tar")}
+                                   "trained_seconds": m["trained_seconds"], "stage": str(stage), "sha256": file_sha256(stage / "published.tar"),
+                                   "flicker": m["summary"]["gen"]["flicker"], "flicker_source": m["summary"]["source"]["flicker"]}
+            if mode == "transfer":
+                tr = m["transfer"]
+                bits = 8.0 * m["weights"]["bytes"]
+                duration = float(tr["video_record"]["duration_s"])
+                row["transfer"] = {k: tr[k] for k in ("crops", "fit_frames", "near_share_10s", "index_range", "window")}
+                row["billed"] = {"weight_bits": bits, "video_duration_s": duration, "kbps": kbps + bits / duration / 1000}
             for mt in ("lpips", "dists"):
                 item_hull = envelope([(p["kbps"], -p[mt]) for p in hulls[m["item"]]["points"]])
                 value = m["summary"]["gen"][f"{mt}_r"]
                 ok, at, _ = won(value, item_hull, kbps)
                 row.update({mt: value, f"{mt}_hull": at, f"{mt}_won": ok, f"warp_{mt}": m["summary"]["warp"][f"{mt}_r"]})
+                if mode == "transfer":
+                    row["billed"][f"{mt}_payback"] = payback_seconds(row["billed"]["weight_bits"], kbps, item_hull, value)
+                    if m["item"] in rung3:
+                        row[f"{mt}_rung3"] = rung3[m["item"]][mt]
             rows.append(row)
+    if len(modes) > 1:
+        raise SystemExit(f"stages mix modes {sorted(modes)}")
+    if "transfer" in modes:
+        out["decision_rule"] = TRANSFER_DECISION
     if rows:
-        lp = float(np.mean([r["lpips_won"] for r in rows]))
-        di = float(np.mean([r["dists_won"] for r in rows]))
+        def score(rs: list[dict[str, Any]]) -> dict[str, Any]:
+            lp = float(np.mean([r["lpips_won"] for r in rs])) if rs else float("nan")
+            di = float(np.mean([r["dists_won"] for r in rs])) if rs else float("nan")
+            return {"items": len(rs), "lpips_share": lp, "dists_share": di, "score": (lp + di) / 2, "passes": (lp + di) / 2 >= CRITERION}
+
         out["rows"] = rows
-        out["score"] = {"items": len(rows), "lpips_share": lp, "dists_share": di, "score": (lp + di) / 2, "passes": (lp + di) / 2 >= CRITERION}
+        out["score"] = score(rows)
+        out["score_clean_of_g"] = score([r for r in rows if not r["g_overlap"]])
     write_json(Path(args.out), out)
     print(json.dumps({k: v for k, v in out.items() if k != "decision_rule"}, indent=1, default=str))
     return 0
@@ -641,7 +815,9 @@ def main(argv: list[str] | None = None) -> int:
     for flag in ("--eval-set", "--archive", "--masks", "--mask-record", "--items", "--lpips-backbone", "--dists-backbone",
                  "--foundhand-src", "--foundhand-ckpt", "--vae"):
         run.add_argument(flag, required=True)
-    run.add_argument("--mode", choices=("pilot", "fit"), required=True)
+    run.add_argument("--mode", choices=("pilot", "fit", "transfer"), required=True)
+    run.add_argument("--candidates", action="append", default=[], help="transfer: 2c's stage archives with the candidates units")
+    run.add_argument("--fit-frames", default=str(TRANSFER_FRAMES), help="transfer: candidate frames fitted")
     run.add_argument("--video", action="append", default=[])
     run.add_argument("--k1f-stage", action="append", required=True)
     run.add_argument("--frames", default="240")
@@ -655,6 +831,7 @@ def main(argv: list[str] | None = None) -> int:
     rep.add_argument("--pilot", action="append", default=[])
     rep.add_argument("--stage", action="append", default=[])
     rep.add_argument("--k1f-stage", action="append", required=True)
+    rep.add_argument("--compare", default="", help="rung 3's report, for the transfer's gap to the in-window fit")
     rep.add_argument("--out", required=True)
     args = ap.parse_args(argv)
     return {"run": command_run, "validate": command_validate, "report": command_report}[args.command](args)

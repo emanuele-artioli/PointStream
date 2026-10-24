@@ -140,7 +140,7 @@ until the per-dataset domains replace it.
 
 The rules every session that reads, scores on, or trains from VISOR follows.
 Decided in B1 (2026-10-06/07); evidence and reasons in
-[experiments](experiments.md#2026-10-06--b1-visor-frame-mapping-and-evaluation-set),
+[experiments](experiments/b1.md#2026-10-06--b1-visor-frame-mapping-and-evaluation-set),
 [drift decision](experiments.md#2026-10-06-visor-frame-drift-exact-frames-for-evaluation-small-drift-for-training)
 and [set v2 decision](experiments.md#2026-10-07-visor-evaluation-set-v2-and-a-sam-fill-for-missing-hands);
 illustrated in the B1 report ("VISOR frame drift" artifact).
@@ -199,7 +199,7 @@ these gaps.
   published in the full jobs' `published.tar`, so a new mask set (B1b's
   fill) is scored with `b2 run --streams` without re-encoding. PointStream is
   compared at equal rate with the better of the two per metric
-  ([outcome](experiments.md#2026-10-07--b2-baseline-rate-distortion-on-visor)).
+  ([outcome](experiments/b2.md#2026-10-07--b2-baseline-rate-distortion-on-visor)).
 - Floor for segmenters: "hold the first frame" (the item's first-frame masks
   copied to every frame) scores, mean over the 34 items, foreground J 0.459,
   F 0.370 (EK-100 0.403, EK-55 0.504; per item 0.03–0.85; left hand J 0.374,
@@ -355,7 +355,7 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   `ae0e9808ef1300820d499e707ec4d655da158e6d` (CVPR 2025; code GPL-3.0, data
   CC BY-NC 4.0): a DiT-XL/2 on SD-VAE latents (256², 32² latent) conditioned on
   a reference crop with its 2D keypoint heatmaps and mask, and on target
-  keypoints. Its training set lists EPIC VISOR. The audit: [K6b (hands) 1](experiments.md#2026-10-22--k6b-hands-1-audit-of-hand-renderers).
+  keypoints. Its training set lists EPIC VISOR. The audit: [K6b (hands) 1](experiments/k6b-hands.md#2026-10-22--k6b-hands-1-audit-of-hand-renderers).
 - `Models/FoundHand/DINO_EMA_11M_b50_lr1e-5_epoch6_step320k.ckpt` (Google Drive,
   linked from the README; 11,618,464,835 B, `66434caf…62d7`; model, EMA and
   training state) and `vae-ft-mse-840000-ema-pruned.ckpt` (Hugging Face
@@ -367,13 +367,38 @@ path and URL) written by `tools/models/place.py`, which never overwrites.
   torch 2.3 and timm 1.0.7, are older; the code is plain DiT). Lightning, SAM
   and mediapipe are for training and the demos only.
 
+**Moore-AnimateAnyone** (K6b's player renderer, zero-shot rung, 2026-10-22)
+- Source: [emanuele-artioli/Moore-AnimateAnyone](https://github.com/emanuele-artioli/Moore-AnimateAnyone)
+  at `67c42297f8024ddb0fd04b69e42ac71fe6bbf3d8`, a fork of
+  [MooreThreads/Moore-AnimateAnyone](https://github.com/MooreThreads/Moore-AnimateAnyone)
+  `a914ef3` (Apache-2.0) that packages the code as `animate_anyone` (upstream's
+  top-level `src` collides with PointStream's) and ports it to diffusers 0.30.
+  Its model code differs from upstream only in import paths, one default the
+  inference code overrides, and a load fallback. Staged as `git archive`
+  (`tennis/k6b-2026-10-22/inputs/env/moore-animateanyone-67c4229.tar`,
+  `bfca6cf1…99ee`) and installed into `pointstream-jcv` (conflict 10 below).
+- Weights in `Models/AnimateAnyone/profiles/{original,finetuned_tennis}/`
+  (`denoising_unet.pth`, `reference_unet.pth`, `pose_guider.pth`,
+  `motion_module.pth`), recorded in `Models/AnimateAnyone/MANIFEST.json`.
+  `original` is `patrolli/AnimateAnyone` (the top-level `.pth` files beside
+  `profiles/` are 135-byte git-LFS pointers, not weights). `finetuned_tennis`
+  is the pre-reset fine-tune (Feb 2026, the fork's `finetune_stage{1,2}.py`);
+  its training tracks are not recorded with the weights (K6b (players) 2's
+  overlap note). The VAE is `Models/sd-vae-ft-mse` and the CLIP image encoder
+  `Models/sd-image-variations-diffusers/image_encoder`, each with a manifest.
+  SD 1.5 contributes only its UNet config, which `k6b_generate` embeds: every
+  UNet weight comes from the profile.
+- Inference only, in `pointstream-jcv`, through `experiments.tennis.k6b_generate`
+  (npz in, npz out). DWPose is not run: the pose maps are drawn from the coded
+  keypoints by `experiments.tennis.k6b.pose_map`.
+
 **JointControlVideo on Wan2.1-I2V-14B-480P** (H3e's hand generator, 2026-10-12)
 - [ZhangCYG/JointControlVideo](https://github.com/ZhangCYG/JointControlVideo) at
   `f96b2c377f26a165bf63cd9fcb495bb9fd3d3054` (ECCV 2026, Apache-2.0): a LoRA,
   an expanded patch embedding and an occlusion-aware module that conditions
   Wan2.1-I2V-14B-480P on 42 camera-frame 3D hand joints and the intrinsics,
   from a first frame; trained on Ego4D. The audit and why it was chosen over
-  FoundHand, HandRefiner and HOGAN: [H3e](experiments.md#2026-10-12--h3e-a-pretrained-pose-conditioned-generator-renders-the-hand-from-the-coded-keypoints).
+  FoundHand, HandRefiner and HOGAN: [H3e](experiments/h3e.md#2026-10-12--h3e-a-pretrained-pose-conditioned-generator-renders-the-hand-from-the-coded-keypoints).
 - `Models/JointControlVideo/{dit,hand-controller}.safetensors` from
   `CyrusZhang312/JointControlvideo@5961026`; `Models/Wan/Wan2.1-I2V-14B-480P/`
   from `Wan-AI/Wan2.1-I2V-14B-480P@6b73f84` (77 GB: DiT in seven fp32 shards,
@@ -490,6 +515,21 @@ naming the pack they ran with.
    `pointstream-data/environments/pointstream-jcv-20261012T085233Z.tar.gz`,
    sha256 `2bec91d460df5487acd10d5dfe062040db2117238fd0fbb72ecf947cfb7bec74`
    (4.4 GB; 7.4 GB unpacked), built on gpu6 at commit `68b5631`'s recipe.
+   *Extended for Moore-AnimateAnyone* (K6b, 2026-10-22). AnimateAnyone needs
+   transformers (its CLIP image encoder) and diffusers; transformers 4.x
+   requires huggingface_hub < 1.0, and diffusers 0.30.3 (the archived
+   runtime's pin) imports `HfFolder`, removed in huggingface_hub 1.0. So it
+   meets the same conflict, and goes into this environment instead of a third
+   one. `env/jcv/extend-animateanyone.sh` adds to the 2026-10-12 pack, offline
+   and hash-checked, diffusers 0.30.3 (PyPI wheel `1b70209e…edee`) and the fork,
+   both without dependencies (diffusers' others are already there; its
+   `importlib-metadata` is a backport imported only below Python 3.8, the one
+   `pip check` line). The locks differ by exactly those two packages
+   (`env/locks/pointstream-jcv.animateanyone-delta.txt`); the import check
+   covers JointControlVideo too. Packed:
+   `pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz`,
+   sha256 `bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e`
+   (4.5 GB), built on gpu6. H3e's jobs keep naming the 2026-10-12 pack.
 
 **Earlier environments.** `~/.conda/envs/pointstream` (Python 3.10, torch
 2.2.2) stays as the interpreter of the fleet workers and the dispatcher only;
