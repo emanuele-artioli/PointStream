@@ -17,8 +17,8 @@ sessions** (user, 2026-10-22).
 A card's prompt stands alone:
 
 - **Goal:** the decision the item has to reach, by a rule in
-  experiments.md (written by the root session, or as the item's first
-  step).
+  the item's file in `docs/experiments/` (written by the root session, or
+  as the item's first step).
 - **Scope:** what is in, what is out, and the GPU budget.
 - **Stop conditions:** the goal is reached; the budget is spent; a
   decision belongs to the user; or the session runs out of ideas.
@@ -27,9 +27,10 @@ A card's prompt stands alone:
 
 ## How an item session works
 
-1. Read AGENTS.md, the PLAN item and its experiments.md entries.
+1. Read AGENTS.md, the PLAN item and its file in `docs/experiments/`.
 2. Work on the item's branch. Edit only the item's own PLAN.md text and
-   its own experiments.md entries (append new entries at the end). Leave
+   its own file in `docs/experiments/` (append new entries at its end;
+   create it for a new item). Leave
    "Where PointStream stands" and the ledger to the root session. This
    keeps parallel branches from conflicting.
 3. Check existing fleet jobs before submitting: other item sessions share
@@ -109,7 +110,7 @@ library only, tested in `tests/test_agent_hooks.py`):
 Sent to the root session with `SendMessage` (the root session appears in
 `ListAgents`; use the ID from the card). If it cannot be reached, end the
 session's last reply with the report so the user can forward it. The same
-text goes into the item's experiments.md entry as its outcome.
+text goes into the item's entry in `docs/experiments/` as its outcome.
 
 ```markdown
 ## Report: <item> (<date>)
