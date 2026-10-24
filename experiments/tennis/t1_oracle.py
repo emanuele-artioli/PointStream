@@ -55,7 +55,10 @@ def reference(args: argparse.Namespace, wid: str, source: Path, work: Path) -> d
 
     entry = json.loads((args.inputs / 'inputs.json').read_text())['windows'][wid]
     w = entry['window']
-    n = min(args.frames, int(w['frames']))
+    offset = args.frame_offset
+    if not 0 <= offset < int(w['frames']):
+        raise ValueError('frame offset outside original window')
+    n = min(args.frames, int(w['frames']) - offset)
     if file_sha256(source) != w['sha256']:
         raise ValueError(f'{wid}: changed source')
     root = args.inputs / 'windows' / k4.safe(wid)
@@ -68,18 +71,18 @@ def reference(args: argparse.Namespace, wid: str, source: Path, work: Path) -> d
         raise ValueError(f'{wid}: ball reference identity mismatch')
     balls = ClipMasks.load(ball_path)
     clip = ClipMasks.load(root / 'sam-masks.rle')
-    if len(balls.frames) < n:
+    if len(balls.frames) < offset + n:
         raise ValueError(f'{wid}: incomplete ball sequence')
     features = json.loads((root / 'features.json').read_text())
     fits = {int(t): np.asarray(h, np.float64) for t, h in entry['fits'].items()}
     players = k6.window_players(features, clip, int(w['start']), fits)['players']
     classes = np.lib.format.open_memmap(work / 'classes.npy', mode='w+', dtype=np.uint8, shape=(n, 1080, 1920))
     for t in range(n):
-        regions = k6.frame_regions(clip.frames[t], features['aliases'], players)['regions']
+        regions = k6.frame_regions(clip.frames[offset + t], features['aliases'], players)['regions']
         c = np.zeros((1080, 1920), np.uint8)
         for m in regions.values():
             c[m] = cp.HAND
-        for inst in balls.frames[t]:
+        for inst in balls.frames[offset + t]:
             c[k4.upsample(inst.mask(), k6.FRAME)] = cp.OBJECT
         classes[t] = c
     reduced = np.stack([mk.reduce(classes[t:t + 1], 8)[0] for t in range(n)])
@@ -91,7 +94,7 @@ def reference(args: argparse.Namespace, wid: str, source: Path, work: Path) -> d
     for t in range(n):
         shown[t] = mk.upsample(decoded[t:t + 1], k6.FRAME)[0]
     raw = work / 'original.yuv'
-    conversion = convert(args.ffmpeg, {**w, 'frames': n}, source, raw)
+    conversion = convert(args.ffmpeg, {**w, 'start': int(w['start']) + offset, 'frames': n}, source, raw)
     original = rgb_memmap(raw, work / 'original.npy', n, 1920, 1080, False, 'cuda')
     full = work / 'reference.yuv'
     # A common full-range 4:2:0 normalization is applied to every arm and to the reference.
@@ -104,13 +107,13 @@ def reference(args: argparse.Namespace, wid: str, source: Path, work: Path) -> d
     for t in range(n):
         filled[t] = cv2.inpaint(np.asarray(truth[t]), (shown[t] > 0).astype(np.uint8) * 255, 3, cv2.INPAINT_TELEA)
         alpha[t] = cp.alpha_and_classes(np.asarray(shown[t]))[0]
-    judged = [t for t in range(n) if (int(w['start']) + t in fits) and (classes[t] > 0).any() and t % 3 == 0]
+    judged = [t for t in range(n) if (int(w['start']) + offset + t in fits) and (classes[t] > 0).any() and (offset + t) % 3 == 0]
     if not judged:
         raise ValueError(f'{wid}: no judged frames')
     return {'id': wid, 'frames': n, 'fps': Fraction(w['fps']), 'truth': truth, 'classes': classes,
             'shown': shown, 'filled': filled, 'alpha': alpha, 'mask': payload, 'judged': judged,
             'source_sha256': w['sha256'], 'ball_sha256': ball_info['sha256'], 'conversion': conversion,
-            'reference_yuv_sha256': file_sha256(full)}
+            'reference_yuv_sha256': file_sha256(full), 'frame_offset': offset}
 
 
 def encode(args: argparse.Namespace, point: tuple[str, int, int], rgb: np.ndarray, w: dict[str, Any],
@@ -304,7 +307,7 @@ def process(args: argparse.Namespace, wid: str, source: Path, scratch: Path) -> 
     for row in rows:
         row['scores'] = {m: float(np.mean([s[m] for s in row['samples']])) for m in METRICS}
     write_json(streams / 'per-frame.json', rows)
-    result = {'id': wid, 'frames': w['frames'], 'judged': w['judged'], 'seconds': seconds,
+    result = {'id': wid, 'frames': w['frames'], 'frame_offset': w['frame_offset'], 'judged': w['judged'], 'seconds': seconds,
               'source_sha256': w['source_sha256'], 'ball_sha256': w['ball_sha256'], 'reference_yuv_sha256': w['reference_yuv_sha256'],
               'mask_bytes': len(w['mask']),
               'ball_pixels_retained': float(((w['classes'] == cp.OBJECT) & (w['shown'] > 0)).sum() / max(int((w['classes'] == cp.OBJECT).sum()), 1)),
@@ -374,6 +377,7 @@ def main() -> int:
     run.add_argument('--sources', type=Path, nargs='+', required=True)
     run.add_argument('--frames', type=int, default=240)
     run.add_argument('--max-windows', type=int, default=1)
+    run.add_argument('--frame-offset', type=int, default=0)
     run.add_argument('--threads', type=int, default=32)
     run.add_argument('--ffmpeg', default='ffmpeg')
     run.add_argument('--encoder', default='SvtAv1EncApp')
