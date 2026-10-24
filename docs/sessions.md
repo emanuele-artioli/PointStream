@@ -83,11 +83,19 @@ conversation, and what to drop:
 
 Automatic compaction (at 80% in cloud sessions) is the safety net. When the
 next phase is a new task, a fresh session from a card is better than
-compacting. Cache note: every step re-reads the whole context, cached at
-about a tenth of the input price for an hour; a compaction rewrites only the
-summary. Keep waits under the hour (`ps-fleet wait` returns within 45
-minutes) so the cache survives them. Local desktop sessions were checked on
-2026-10-23: all cache writes use the 1-hour lifetime.
+compacting. Cache behavior differs by harness. Claude Code's local check on
+2026-10-23 found one-hour cache writes; this is not a Codex guarantee. Retain
+45-minute bounded stages to avoid forgotten work, not to assume a fixed KV TTL.
+
+Codex's desktop cache lifetime is not exposed here. On 2026-10-24 this T1 chat
+(`gpt-6.1-sol`, medium) resumed after about 118 minutes: the first new inference
+reported 137472 cached input tokens out of 139911 (98.3%). This is observed
+cache accounting, not proof of physical KV residency or a guaranteed TTL. The
+public API guide documents a 30-minute default minimum for GPT-5.6 and later,
+with a 12-hour API option; neither identifies this app's actual setting.
+Source: [OpenAI prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching).
+Do not wake a model to keep its cache warm. Save durable continuation state and
+use the [completion-first monitoring policy](fleet.md#monitoring-from-the-submitting-chat).
 
 ## Hooks
 
@@ -153,13 +161,15 @@ Codex sessions follow the same protocol. What differs:
 - **Model per card.** Codex runs `gpt-6.1-sol` (AGENTS.md); the tier
   becomes reasoning effort: Opus work at `high`, Sonnet work at `medium`,
   Haiku work at `low`.
-- **Waiting on the fleet.** Use the native heartbeat in
-  [fleet](fleet.md#monitoring-from-the-submitting-chat), or
-  `scripts/ps-fleet wait` as a Claude Code session does.
+- **Waiting on the fleet.** Use the
+  [completion-first policy](fleet.md#monitoring-from-the-submitting-chat):
+  verified completion wakeups, otherwise one self-expiring deadline check.
+  A Codex background session handle does not establish automatic model wakeup.
+  No recurring LLM heartbeat or cache keepalive.
 - **Compaction.** `/compact` and automatic compaction work as in Claude
-  Code; the SessionStart hook runs after both. Codex's prompt cache is
-  automatic and its lifetime is not set by us (minutes, not guaranteed an
-  hour), so compacting before a long wait pays off more than in Claude Code.
+  Code; the SessionStart hook runs after both. Cache expiry is not loss of
+  saved conversation history. Compact when the context needs it, not on an
+  assumed cache timer.
 - **Hooks and blocks.** `.codex/hooks.json` runs the same SessionStart and
   large-read hooks, plus `guard_protected.py`, which blocks what Claude
   Code's settings deny. Codex loads project hooks only once the project is
