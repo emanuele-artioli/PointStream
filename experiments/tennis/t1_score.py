@@ -64,7 +64,19 @@ def score(args: argparse.Namespace) -> int:
                      'mask_kbps': len(mask) * 8 / seconds / 1000, 'samples': []})
     arrays = {r['name']: np.load(bundle / (r['name'] + '.npy'), mmap_mode='r') for r in records}
     nets = {'lpips': load_lpips(args.lpips_backbone, 'cuda'), 'dists': load_dists(args.dists_backbone, 'cuda')}
-    judged = [t for t in m['judged'] if t < args.max_frames]
+    completed: list[int] = []
+    if args.resume_json is not None:
+        previous = json.loads(args.resume_json.read_text())
+        if previous['id'] != m['id'] or len(previous['rows']) != len(rows):
+            raise ValueError('wrong score checkpoint')
+        completed = [s['t'] for s in previous['rows'][0]['samples']]
+        if completed != m['judged'][:len(completed)]:
+            raise ValueError('score checkpoint is not an exact frame prefix')
+        for row, old in zip(rows, previous['rows']):
+            if row['name'] != old['name'] or row['kbps'] != old['kbps'] or [s['t'] for s in old['samples']] != completed:
+                raise ValueError('score checkpoint configuration mismatch')
+            row['samples'] = old['samples']
+    judged = [t for t in m['judged'] if t < args.max_frames and t not in completed]
     for j, t in enumerate(judged):
         shown = mk.upsample(reduced[t:t + 1], (1920, 1080))[0]
         alpha = cp.alpha_and_classes(shown)[0]
@@ -74,19 +86,22 @@ def score(args: argparse.Namespace) -> int:
         for row, values in zip(rows, scores):
             row['samples'].append({'t': t, **values})
         if (j + 1) % 10 == 0:
-            write_json(stage_dir() / 'score-progress.json', {'id': m['id'], 'complete_frames': j + 1, 'rows': rows})
+            write_json(stage_dir() / 'score-progress.json', {'id': m['id'], 'complete_frames': len(completed) + j + 1, 'rows': rows})
         publish_progress('saved-native-pixel-scores', j + 1)
         print(f'phase=score window={m["id"]} frame={j + 1}/{len(judged)}', flush=True)
     for row in rows:
         row['scores'] = {metric: float(np.mean([s[metric] for s in row['samples']])) for metric in METRICS}
     write_json(stage_dir() / 'per-frame.json', rows)
     window = {k: m[k] for k in ['id', 'frames', 'source_sha256', 'ball_sha256', 'reference_yuv_sha256', 'native_job', 'native_code', 'native_gpu']}
-    window.update(seconds=seconds, judged=judged, rows=[{k: v for k, v in r.items() if k != 'samples'} for r in rows],
+    window.update(seconds=seconds, judged=completed + judged, rows=[{k: v for k, v in r.items() if k != 'samples'} for r in rows],
                   wall_seconds=time.monotonic() - begin, streams=m['streams'],
                   relaxation_check=all(r['kbps'] < r['actual_kbps'] for r in rows if r['kind'] == 'split'))
     report = {'windows': [window], 'requested': [m['id']], 'device': 'cuda', 'gpu': torch.cuda.get_device_name(),
               'torch': torch.__version__, 'tools': m['tools'], 'recovery': True,
-              'pixel_archive_manifest_sha256': file_sha256(bundle / 'manifest.json')}
+              'pixel_archive_manifest_sha256': file_sha256(bundle / 'manifest.json'),
+              'resumed_score_sha256': file_sha256(args.resume_json) if args.resume_json is not None else None,
+              'prior_metric_job': args.resume_job,
+              'dists_cache_smoke_diff': nets.get('cache_verified')}
     write_json(stage_dir() / 't1-oracle.json', report)
     return 0
 
@@ -97,6 +112,8 @@ def main() -> int:
     p.add_argument('--bundle', type=Path)
     p.add_argument('--lpips-backbone', type=Path)
     p.add_argument('--dists-backbone', type=Path)
+    p.add_argument('--resume-json', type=Path)
+    p.add_argument('--resume-job')
     p.add_argument('--max-frames', type=int, default=240)
     args = p.parse_args()
     if args.command == 'validate':

@@ -204,10 +204,19 @@ def score_outputs(nets: dict[str, Any], outputs: list[np.ndarray], truth: np.nda
     lpips = lpips_reduce(nets['lpips'], outputs, truth, [masks for _ in outputs], 'cuda')
     ref = torch.from_numpy(np.ascontiguousarray(truth)).cuda().permute(2, 0, 1)[None].float() / 255
     torch_masks = [torch.from_numpy(m.copy()).cuda()[None, None] for m in masks]
+    with torch.inference_mode():
+        reference_features = nets['dists'].forward_once(ref)
     rows = []
     for image, lp in zip(outputs, lpips):
         x = torch.from_numpy(np.ascontiguousarray(image)).cuda().permute(2, 0, 1)[None].float() / 255
-        ds = [float(v[0]) for v in dists_regions(nets['dists'], x, ref, torch_masks)]
+        ds = [float(v[0]) for v in dists_regions(nets['dists'], x, ref, torch_masks, reference_features)]
+        if os.environ.get('PS_STAGE') == 'smoke' and 'cache_verified' not in nets:
+            legacy = [float(v[0]) for v in dists_regions(nets['dists'], x, ref, torch_masks)]
+            difference = max(abs(a - b) for a, b in zip(ds, legacy))
+            if difference > 1e-7:
+                raise ValueError(f'DISTS reference cache changed values: {difference}')
+            nets['cache_verified'] = difference
+            print(f'dists_reference_cache_max_abs_diff={difference:.9g}', flush=True)
         error = (image.astype(np.float32) - truth.astype(np.float32)) ** 2
         p = [psnr(float(error[m].mean())) for m in masks]
         rows.append({'wlpips': .7 * lp[0] + .3 * lp[1], 'wdists': .7 * ds[0] + .3 * ds[1],
