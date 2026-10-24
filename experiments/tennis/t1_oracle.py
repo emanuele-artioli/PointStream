@@ -337,7 +337,9 @@ def report(paths: list[Path], out: Path) -> int:
     from experiments.visor.h5 import compare
 
     windows = [w for p in paths for w in json.loads(p.read_text())['windows']]
-    result: dict[str, Any] = {'windows': {}, 'summary': {}, 'actual_billed': {'windows': {}, 'summary': {}}}
+    if len({w['id'] for w in windows}) != len(windows):
+        raise ValueError('duplicate window in report inputs')
+    result: dict[str, Any] = {'sources': [{'path': str(p), 'sha256': file_sha256(p)} for p in paths], 'windows': {}, 'summary': {}, 'actual_billed': {'windows': {}, 'summary': {}}}
     for w in windows:
         comparisons: dict[str, Any] = {}
         for metric, sign in METRICS.items():
@@ -383,12 +385,23 @@ def main() -> int:
     run.add_argument('--encoder', default='SvtAv1EncApp')
     run.add_argument('--decoder', default='dav1d')
     sub.add_parser('validate')
+    sub.add_parser('validate-report')
     rep = sub.add_parser('report')
     rep.add_argument('--stage', nargs='+', type=Path, required=True)
-    rep.add_argument('--out', type=Path, required=True)
+    rep.add_argument('--out', type=Path)
     args = parser.parse_args()
     if args.command == 'report':
-        return report(args.stage, args.out)
+        return report(args.stage, args.out or stage_dir() / 't1-comparison.json')
+    if args.command == 'validate-report':
+        data = json.loads((stage_dir() / 't1-comparison.json').read_text())
+        checks = {'eight_windows': len(data['windows']) == 8,
+                  'sources_identified': len(data['sources']) == 8 and all(len(r['sha256']) == 64 for r in data['sources']),
+                  'all_metrics': set(data['summary']) == set(METRICS),
+                  'all_comparisons': all(set(v) == set(METRICS) for v in data['windows'].values()),
+                  'billed_companion': len(data['actual_billed']['windows']) == 8}
+        result = {'passed': all(checks.values()), 'checks': checks}
+        write_json(Path(os.environ['PS_VALIDATION_PATH']), result)
+        return 0 if result['passed'] else 1
     if args.command == 'validate':
         result = validate(stage_dir())
         write_json(Path(os.environ['PS_VALIDATION_PATH']), result)

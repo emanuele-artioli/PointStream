@@ -106,3 +106,13 @@ def test_score_resume_rejects_changed_rates_and_nonprefix_frames():
         restore_score_prefix([changed], previous, [0, 3, 6], 'window')
     with pytest.raises(ValueError, match='exact frame prefix'):
         restore_score_prefix([deepcopy(row)], previous, [0, 6, 9], 'window')
+
+
+def test_report_rejects_duplicate_windows(tmp_path):
+    from experiments.tennis.t1_oracle import report
+
+    source = tmp_path / 'source.json'
+    source.write_text(json.dumps({'windows': [{'id': 'same'}, {'id': 'same'}]}))
+    with pytest.raises(ValueError, match='duplicate window'):
+        report([source], tmp_path / 'comparison.json')
+    assert not (tmp_path / 'comparison.json').exists()
