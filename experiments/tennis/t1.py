@@ -43,6 +43,7 @@ def measure(inputs: Path, wid: str, frames: int, balls: Path | None = None, ball
     n = min(frames, int(w['frames']))
     reduced: dict[int, list[np.ndarray]] = {8: [], 16: []}
     shares: list[dict[str, Any]] = []
+    agreement = {s: {'intersection': 0, 'union': 0, 'ball_retained': 0, 'ball_pixels': 0} for s in reduced}
     for t, instances in enumerate(clip.frames[:n]):
         regions = k6.frame_regions(instances, features['aliases'], players)['regions']
         p = np.logical_or.reduce([*regions.values(), np.zeros(k6.FRAME[::-1], bool)])
@@ -55,6 +56,12 @@ def measure(inputs: Path, wid: str, frames: int, balls: Path | None = None, ball
         classes[b] = OBJECT
         for scale in reduced:
             reduced[scale].append(mask.reduce(classes[None], scale)[0])
+            reconstructed = mask.upsample(reduced[scale][-1][None], k6.FRAME)[0] > 0
+            a = agreement[scale]
+            a['intersection'] += int((reconstructed & (classes > 0)).sum())
+            a['union'] += int((reconstructed | (classes > 0)).sum())
+            a['ball_retained'] += int((reconstructed & b).sum())
+            a['ball_pixels'] += int(b.sum())
         shares.append({'t': t, 'registered': int(w['start']) + t in fits,
                        'player': float(p.mean()), 'ball': float(b.mean()) if has_ball else None, 'foreground': float((p | b).mean())})
     seconds = n / float(Fraction(w['fps']))
@@ -66,7 +73,9 @@ def measure(inputs: Path, wid: str, frames: int, balls: Path | None = None, ball
         if s != scale or not np.array_equal(decoded, r):
             raise ValueError('MASK roundtrip failed')
         rates[str(scale)] = {'bytes': len(payload), 'kbps': 8 * len(payload) / seconds / 1000,
-                             'reduced_foreground_share': float((r > 0).mean())}
+                             'reduced_foreground_share': float((r > 0).mean()),
+                             'foreground_iou': agreement[scale]['intersection'] / max(agreement[scale]['union'], 1),
+                             'ball_retained_fraction': agreement[scale]['ball_retained'] / agreement[scale]['ball_pixels'] if agreement[scale]['ball_pixels'] else None}
     selected = [s for s in shares if s['registered']]
     return {'id': wid, 'frames': n, 'seconds': seconds, 'players': players,
             'scored_frames': len(selected), 'mask': rates,
@@ -75,7 +84,7 @@ def measure(inputs: Path, wid: str, frames: int, balls: Path | None = None, ball
             'frame_shares': shares, 'input_files': entry['files'],
             'available_classes': list(clip.classes) + (['ball'] if ball_clip is not None else []),
             'ball_masks_available': has_ball,
-            'ball_provenance': 'not measured: K6 features have no ball prompt' if not has_ball else 'SAM; not native labels'}
+            'ball_provenance': 'not measured: K6 features have no ball prompt' if not has_ball else 'SAM at BallTrack or disk fallback; model reference, not native labels'}
 
 
 def main() -> int:

@@ -149,6 +149,12 @@ def encode(args: argparse.Namespace, point: tuple[str, int, int], rgb: np.ndarra
         rec = h5.code_dcvc(coder, source, w['frames'], value, (width, height), work / 'dcvc')
         native_stream = work / 'dcvc' / 'stream.psdc'
         stream = native_stream.read_bytes()
+        from experiments.tennis.k5 import luma_psnr
+        rec['native_luma_psnr'] = luma_psnr(Path(rec['decoded']), source, width, height, w['frames'])
+        if rec['native_luma_psnr'] < 12:
+            raise ValueError('DCVC decode failed the native luma sanity floor')
+        for report_name in ['plan.json', 'encode.json', 'decode.json']:
+            shutil.copyfile(work / 'dcvc' / report_name, stream_dir / (name + '-' + report_name))
     decoded = Path(rec['decoded'])
     if decoded.stat().st_size != w['frames'] * width * height * 3 // 2:
         raise ValueError('decoded size mismatch')
@@ -162,7 +168,7 @@ def encode(args: argparse.Namespace, point: tuple[str, int, int], rgb: np.ndarra
     result = {'name': name, 'codec': codec, 'value': value, 'scale': scale, 'size': [width, height],
               'payload_bytes': len(stream), 'stream_sha256': hashlib.sha256(stream).hexdigest(), 'native_stream': dest.name,
               'decoded': str(shown_path), 'stream': stream, 'encode_decode_seconds': time.monotonic() - start,
-              'input_sha256': file_sha256(source), 'checks': {k: rec[k] for k in ('deterministic', 'decoder_matches_encoder_intra', 'attempts', 'encode_command', 'decode_command') if k in rec}}
+              'input_sha256': file_sha256(source), 'checks': {k: rec[k] for k in ('deterministic', 'decoder_matches_encoder_intra', 'attempts', 'native_luma_psnr', 'encode_command', 'decode_command') if k in rec}}
     del native_rgb, shown
     for p in (source, decoded, work / 'native.npy'):
         p.unlink(missing_ok=True)
@@ -246,6 +252,8 @@ def process(args: argparse.Namespace, wid: str, source: Path, scratch: Path) -> 
     write_json(streams / 'per-frame.json', rows)
     result = {'id': wid, 'frames': w['frames'], 'judged': w['judged'], 'seconds': seconds,
               'source_sha256': w['source_sha256'], 'ball_sha256': w['ball_sha256'], 'reference_yuv_sha256': w['reference_yuv_sha256'],
+              'mask_bytes': len(w['mask']),
+              'ball_pixels_retained': float(((w['classes'] == cp.OBJECT) & (w['shown'] > 0)).sum() / max(int((w['classes'] == cp.OBJECT).sum()), 1)),
               'conversion': w['conversion'], 'rows': [{k: v for k, v in r.items() if k != 'samples'} for r in rows],
               'streams': [{k: v for k, v in r.items() if k not in ('stream', 'decoded')} for r in anchors + backgrounds + foreground],
               'gpu_peak_gib': torch.cuda.max_memory_allocated() / 2**30, 'wall_seconds': time.monotonic() - start,
