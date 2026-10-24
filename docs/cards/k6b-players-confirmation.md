@@ -161,5 +161,7 @@ anchors and existing 8 GPU-hour ceiling, subject to CPU validation and staged
 smoke/pilot gates. No further scope or budget approval is pending within these
 limits. Estimated total remains 6–8 GPU-hours; 0 spent. This authorization
 cannot deliver the original stronger confirmation claim or mark its gate passed.
-The preparation-only task ends here; validator implementation and staged
-execution are the next authorized work, with no fitting or Wan-Animate.
+The user subsequently explicitly instructed execution (“If not, do so”).
+Run the CPU validator prerequisites and staged diagnostic within these limits;
+no fitting or Wan-Animate. Current IDs and budget accounting live in the
+experiment entry, which controls continuation after each stage.

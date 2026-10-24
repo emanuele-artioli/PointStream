@@ -1905,3 +1905,43 @@ a weaker claim automatically.
 - Verification: documentation reviewed against the approved scope and previous
   frozen protocol; `git diff --check` passes. No executable changes or audit
   reruns; prior test results remain recorded above.
+
+
+### 2026-10-24 — Approved diagnostic execution begins
+
+- User explicitly instructs “Did you run the task? If not, do so.” This chat
+  owns execution; planning chat notified to avoid duplicate dispatch. Scope
+  and 8 GPU-hour ceiling already approved; no renewed approval requested.
+- CPU manifest gate implemented in `experiments.tennis.k6b_confirm`: checks
+  all 12 immutable source/window/fps identities, centered placement, complete
+  registration rows, finite nonsingular homographies, old-clip intersections
+  and qualified claim scope. Preflight passes all 12 with the original counts
+  (234–240/240). It does not pass the original-source confirmation gate.
+- Frozen execution manifest:
+  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/manifest.json`,
+  SHA256 `7ed2589fdb5e54ac1fbe3dd05a1b3a7f3c01076aa3244efd135ceb5a50ba03c1`.
+  Reuses the completed CPU audit; no new source download or audit rerun.
+- First stage: actual SAM3.1/YOLO11x pose/features; smoke two full 240-frame
+  windows (first per match), then first three per match in frozen rank order,
+  no scores or renders. Frozen centers are actual absolute native frame indices
+  (e.g. Alcaraz031@129 starts9), not the old @target120 shorthand.
+  Native feature validator is wrapped with immutable cohort/span/fps/hash and
+  240-frame coverage checks. Synthetic corruption tests pass for wrong sources,
+  starts, fps, missing output, duplicate IDs, overlap claims, singular/nonfinite
+  homographies and 227/228 boundary. Ruff and mypy pass (197 source files).
+  Full suite running locally; prior macOS hook limitation remains known.
+- Stage caps: smoke600 s, full1800 s, validation120 s, total reservation2700 s;
+  exclusive compatible Ada pool gpu6/gpu5, 32,000 MiB, eight CPU threads,
+  pinned PointStream pack SHA256 `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`.
+  Overall smoke allowance remains0.3 GPU-h, first-six3.4 h, remaining-six3.4 h,
+  reserve0.9 h; all actual smoke/failed/retry use counts against8 h. This
+  reservation is not recorded spending. Stop on invalid output or infeasible
+  projected full-study cost. All subsequent quality-producing stages still
+  require their substantive native and comparison validators.
+- Fleet inspected all six hosts; no active diagnostic jobs found. gpu6 has two
+  idle Ada GPUs; gpu5 occupied by foreign work, so exclusive admission avoids
+  those devices. No foreign processes changed. No `--chat-id` is passed (its
+  legacy recurring-heartbeat path is forbidden). Use attended bounded fleet
+  wait; automatic completion resumption is unverified in this client.
+- No job ID yet at this checkpoint; GPU-hours spent **0/8**. Save the returned
+  ID immediately after submission; uncertain submission is inspected, not replayed.
