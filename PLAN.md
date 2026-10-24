@@ -152,8 +152,8 @@ marked `card ready` is waiting for the user to start it.
 | K6b players 4 | match fit, billed | `claude/k6b-players-zeroshot` @ `20eb7c3` | Opus | reported 2026-10-23: fail (67% unbilled, 58% billed); 7.0 GPU-hours of 7 |
 | K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5` | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11. PR #225 merged before this outcome commit: not on main yet |
 | K6m | the players' matte on tennis | — | Sonnet | card dismissed 2026-10-24: folded into T1 |
-| K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | card ready 2026-10-24 ([card](docs/cards/k6b-players-5b.md)); user agreed to run it |
-| T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | card ready 2026-10-24 ([card](docs/cards/t1.md)) |
+| K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | reported 2026-10-24: no cut in 052; registration gate 80% vs 67% pooled (hypothesis); 0 of 0 GPU-hours |
+| T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | reported 2026-10-24: CPU players/rackets 0.47–3.37%, MASK s=8 12.39–58.66 kbps; ball masks absent, scope choice pending; oracle not run; 0 of 4 GPU-hours |
 | K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
 | H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask` | Codex high | running 2026-10-24 ([card](docs/cards/h5p-4d.md)); CPU shape coding first; decoder segmentation ≤ 2 GPU-hours |
 
@@ -164,15 +164,17 @@ mode, background by its own coder) beat SVT-AV1 and DCVC-UF on K6's
 windows once F is paid for? Egocentric F (median 24% of the frame) cost
 36–116 kbps and removed every win (H5p 4); tennis F is a few percent,
 where H5p 4c's key carrier was nearly free (P09_106, 2%: −30%). No
-tennis pipeline exists yet (H5 is egocentric): CPU first (F's rate on
-K6's windows), then the oracle and its rule.
+tennis pipeline exists yet (H5 is egocentric). T1 CPU accounting
+(2026-10-24): players/rackets cover 0.47–3.37%; MASK s=8 costs
+12.39–58.66 kbps. K6 saved no ball masks; joint oracle not run pending
+the ball-reference scope choice (0 of 4 GPU-hours; [entry](docs/experiments/t1.md)).
 
 **K6b players 5b and 6.** Steps 3–5 lose the same two windows:
-`rublev_auger-aliassime/052` is judged on 32 of its 240 frames (the rest is
-a close-up K8b does not register) and `alcaraz_hurkacz/045` has small
-players. 5b (CPU) explains the losses and looks for a scope rule an
-encoder can compute before coding; a rule found on these windows is a
-hypothesis until fresh windows confirm it, and step 5's verdict stands.
+5b's CPU diagnosis (2026-10-24) finds **no cut** in 052: one oblique court
+view, 32/240 registered frames and seven judged. A ≥95% registration gate
+reads 80% beside 67% pooled; adding ≥115 px reads 100% on four windows,
+but both gates are unconfirmed hypotheses. 045 shows appearance/view and
+racket errors, with no isolated causal explanation; step 5's fail stands.
 Step 6 tries Wan-Animate, conditioned on the same unbilled reference as
 step 2 (zero-shot means no fitting, not no appearance); speed is
 secondary while quality is tested (user, 2026-10-24).

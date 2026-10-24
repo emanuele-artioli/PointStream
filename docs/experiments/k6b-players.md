@@ -773,3 +773,462 @@ the decisions are in [experiments.md](../experiments.md).
     against step 4's 922; 1,542,044 bytes), `med-A` `…192542Z-76ac4449`
     (843; 1,557,820), `med-B` `…192551Z-62ca7bde` (585; 2,515,324, of
     which the guider's change 965,696: 2.79 kbps over 2 h).
+
+  - The tennis base (`20261023T194934Z-b0dcbb19`, code `3890706`): 36
+    windows of all 5 matches, 8,597 crops (every second frame), 1,918
+    optimizer steps in 25 minutes, the stage 41.2 minutes; passes `k6b_fit
+    validate` (loss 0.217 → 0.207, probe 0.0154 → 0.0140);
+    `075b001a…3285`.
+  - Arm C's `medvedev_struff` fit (`20261023T203428Z-85ca5f54`) failed its
+    smoke on the probe (0.02093 → 0.02102, +0.5%) with every other check
+    passing (base merged, guider billed, loss). The probe's frames come
+    from the training windows, which the base was trained on, so it starts
+    lower (0.0209, against 0.0227 without the base) and 200 steps move it
+    within noise; `djokovic_zverev`'s C passed. For fits on the base, the
+    check now allows a rise under 1%; resubmitted.
+  - Development judge for arms A and B (`20261023T203239Z-d497467e`,
+    `b1de5471…6cba`, 25 checks, `warp` and `ref` reproduced): A and B each
+    win 2 of 4 window-metrics billed (both of `djokovic_zverev/008`, none
+    of `medvedev_struff/033`, lost by 0.001 on each metric for A); A has
+    the larger margin (0.156 against 0.137 of the envelope).
+  - Arm C fits (on the base, guider trained, 8-bit): `dz-C`
+    `20261023T203414Z-38ef7b42` (821 steps, 2,507,660 bytes), `med-C`
+    `…204452Z-d5c90446` (588, 2,519,640; passes the strict probe test too).
+    Development renders (each passing `k6b_generate validate`): A
+    `…194403Z-815f567a`, `…194332Z-0f8fbf72`; B `…195337Z-a9db1ff9`,
+    `…194542Z-72dd61dc`; C `…205611Z-1872b27b`, `…210405Z-bf738c80` (008,
+    033 in that order). Judges `…203239Z-d497467e` (A, B) and
+    `…213006Z-b2642a24` (C, `f3cd5fbd…ee8f`), `warp` and `ref` reproduced.
+
+    | arm | 008 billed kbps | 008 LPIPS / env | 008 DISTS / env | 033 billed kbps | 033 LPIPS / env | 033 DISTS / env |
+    |---|---:|---:|---:|---:|---:|---:|
+    | A | 4.91 | **0.240** / 0.324 | **0.143** / 0.229 | 4.77 | 0.226 / 0.225 | 0.227 / 0.226 |
+    | B | 5.98 | **0.233** / 0.309 | **0.138** / 0.220 | 5.84 | 0.229 / 0.219 | 0.228 / 0.223 |
+    | C | 5.98 | **0.225** / 0.309 | **0.133** / 0.220 | 5.84 | 0.222 / 0.219 | 0.226 / 0.223 |
+
+    Envelopes at the billed rate; bold won. Each arm wins 2 of 4; by the
+    rule the larger margin decides: **C** (0.159 of the envelope, A 0.156,
+    B 0.137). C is best on every cell; B's data and guider alone gain
+    little on 033 (2 training windows) and their 0.97 MB guider raises the
+    bar. Render-time variants of C submitted: 4 bits (from the fp16
+    checkpoint) and guidance 2.0, on both windows.
+  - Render-time variants of C (renders `20261023T213704Z-20255857`,
+    `…213714Z-d0fde23f` at 4 bits; `…213721Z-d2107908`,
+    `…213730Z-5bb220ed` at guidance 2.0; judge `…220810Z-042508fa`,
+    `1bfd7fc3…9157`, 25 checks). 4 bits bills 1,491,392 and 1,495,592
+    bytes (guider change 0.42 MB), 1.66 kbps over 2 h.
+
+    | variant | 008 LPIPS | 008 DISTS | 033 LPIPS / env | 033 DISTS / env | won | margin |
+    |---|---:|---:|---:|---:|---:|---:|
+    | C | **0.2246** | **0.1333** | 0.2223 / 0.219 | 0.2263 / 0.223 | 2 | 0.159 |
+    | C, 4 bits | **0.2246** | **0.1335** | **0.2220** / 0.225 | 0.2262 / 0.226 | 3 | 0.185 |
+    | C, guidance 2.0 | **0.2264** | **0.1372** | **0.2155** / 0.219 | 0.2246 / 0.223 | 3 | 0.163 |
+
+    By the rule, **4 bits** (within 0.0004 of 8 bits on every cell) and
+    **guidance 2.0** (3 won against 2). The two were chosen apart; their
+    combination is first rendered in the scaled run. Development report
+    `k6b-report-step5-dev.json`. Budget so far 6.98 GPU-hours.
+  - Scaled run: `gen-match5` = C, 4 bits, guidance 2.0. `djokovic_zverev`
+    reuses `dz-C` (the same data, recipe and exclusions as a new fit);
+    fits for `djokovic_federer`, `alcaraz_hurkacz` and `rublev` submitted.
+    It projects to about 10.6 GPU-hours; the per-player Djokovic variant
+    (a fit and 3 renders, about 1.6 more) would pass the ceiling, so it
+    waits for the user.
+  - The first submission of the `djokovic_zverev/012` render
+    (`20261023T221727Z-f4e7cb41`) timed out transferring its snapshot to
+    gpu1; inspected, it was never published (no specification or ready
+    record), so no worker can run it. It is left in place, and the render
+    is a new request (`20261023T221822Z-70715001`).
+  - Scaled fits (C; code `45b9b90`): `djokovic_federer`
+    `20261023T221639Z-aec779fe` (7 windows, 3,360 crops, 617 steps),
+    `alcaraz_hurkacz` `…221650Z-3d7cbe2f` (3, 1,440, 716), `rublev`
+    `…221700Z-502a4298` (13, 6,166, 600; probe 0.0132 → 0.0131, the
+    smallest move); `djokovic_zverev` reuses `dz-C`. Each passes `k6b_fit
+    validate`. Renders (`match5`: the fp16 checkpoint quantized to 4 bits
+    as billed, guidance 2.0, the base merged), each passing `k6b_generate
+    validate`: 038 `20261023T223743Z-69111776` (`5a99b977…6515`), 072
+    `…223751Z-7c51a9ee` (`29dc6cb3…05b1`), 012 `…221822Z-70715001`
+    (`ad26e1a2…8a4c`), 036 `…223535Z-e9d7c710` (`9fcf4bab…f7e2`), 045
+    `…223542Z-32a6e7dc` (`3a86468a…05c5`), 052 `…224225Z-3f7d4ed2`
+    (`66636952…cbd4`). Billed: 1,478,828 (`djokovic_federer`), 1,491,392,
+    1,488,252, 1,489,388 bytes, 1.64–1.66 kbps over 2 h. Judges
+    `20261023T231003Z-4fe6e239` (038, 052, 045; `4b57f935…9792`) and
+    `…232338Z-94c7a048` (072, 012, 036; `39277b5b…77ff`), 29 checks each,
+    `warp` and `ref` reproduced. Report `k6b report --step 5 --billing
+    k6b-step5-billing.json --hours 2` (`k6b-report-step5.json`,
+    `73f2929a…8b4f`); development report `k6b-report-step5-dev.json`
+    (`0457b86c…35e6`); receipts `k6b-step5-validation.tar`
+    (`65db4ec2…2c52`); all read-only in
+    `~/pointstream-data/tennis/k6b-2026-10-22/report/`.
+
+    | window | billed kbps | LPIPS / billed env | step 4 | DISTS / billed env | step 4 | payback h |
+    |---|---:|---:|---:|---:|---:|---:|
+    | djokovic_federer/038 | 4.38 | **0.196** / 0.219 | 0.197 | **0.190** / 0.208 | 0.184 | 0.52 |
+    | djokovic_federer/072 | 4.56 | **0.224** / 0.230 | 0.230 | **0.201** / 0.209 | 0.195 | 1.16 |
+    | djokovic_zverev/012 | 4.98 | **0.264** / 0.354 | 0.275 | **0.154** / 0.229 | 0.151 | 0.23 |
+    | alcaraz_hurkacz/036 | 3.59 | **0.234** / 0.261 | 0.245 | **0.216** / 0.235 | 0.219 | 0.82 |
+    | alcaraz_hurkacz/045 | 3.73 | 0.290 / 0.260 | 0.305 | 0.252 / 0.237 | 0.259 | – |
+    | rublev_auger-aliassime/052 | 11.46 | 0.366 / 0.234 | 0.344 | 0.184 / 0.156 | 0.171 | – |
+
+    Bold: won billed. `gen-match5` wins 4 of 6 on LPIPS and 4 of 6 on
+    DISTS, billed and unbilled alike (**score 67%**, both). K6's saving
+    statistic: mean −58%, 95% CI −267% to +69%, positive on 4 windows.
+- **Outcome: fails** by the rule (< 75% unbilled). Billing no longer costs
+  anything (4 bits and the guider at 1.66 kbps; 072's LPIPS, lost to
+  billing in step 4, is won), and LPIPS improves on five windows (by
+  0.001–0.015). But the two windows that step 4 lost stay lost on both
+  metrics: `alcaraz_hurkacz/045` improves (LPIPS 0.305 → 0.290, DISTS
+  0.259 → 0.252) and still misses by 0.015–0.030; `rublev/052` gets worse
+  (0.344 → 0.366, 0.171 → 0.184). DISTS is slightly worse than step 4 on
+  four windows (by 0.001–0.006), as guidance 2.0 was on
+  `djokovic_zverev/008`. Read as the rule says: the AnimateAnyone line
+  closes for players at the keypoint rate; the open route is a newer
+  generator (step 6, after an environment audit).
+- Against the hypothesis: 4 bits flipped 072 (as predicted); the tennis
+  base and more data helped where step 4 already won and on 045's
+  values, but did not win 045 (predicted: one metric) or 052's DISTS
+  (predicted: won with 2.2× data; it got worse). Competing explanation 1
+  (the losing windows are hard for this generator at any data) fits:
+  052 is judged on 32 frames at a cut, and its fit moved least (probe
+  −1%). Not separated: whether guidance 2.0 or the Rublev fit made 052
+  worse (the two were chosen apart on the development windows and first
+  combined here).
+- Per-player Djokovic variant: **not run**. It would have taken the step
+  past the ceiling (about 1.6 GPU-hours more), and it cannot change the
+  verdict: all three Djokovic windows are already won.
+- Budget: **10.02 GPU-hours** of 11 (37 jobs, smokes included, from the
+  jobs' execution records).
+
+### 2026-10-24 — K6b (players) 5b: CPU diagnosis and scope hypothesis (rule)
+- Question: why do 045 and 052 lose, and can an encoder-computable rule
+  route difficult windows to pixels? Step 5 remains a fail.
+- Before new measurements: test 052's shot-cut explanation first. Compare
+  court-registration runs, video cut positions, reference frame indices and
+  judged indices; distinguish a cut anywhere from a reference crossing a cut.
+- Measurements on all eight K6 windows (008 and 033 are also development
+  windows, not two extra independent windows): registered share, player
+  heights, pose misses, camera motion/cuts, coded rate, LPIPS/DISTS envelope,
+  reference-to-target time/pose distance, and saved steps 2–5 margins.
+- Hypothesis: mixed shots explain 052, and small or poorly fitted players
+  explain 045. Competing explanation: reference selection stays in court
+  view and equally small successful players refute that explanation; errors
+  may be generator-specific. No causal claim from correlation alone.
+- Scope selection: first test a single-shot window (no detected internal cut);
+  then examine registered share, heights and fit coverage. Report exclusions
+  and pooled/scoped numerators and denominators side by side for every
+  step, billed and unbilled where available. Never infer missing scores.
+  Any discovered threshold is exploratory and requires unused-window
+  confirmation on every method with identical inclusion.
+- Budget: zero GPU-hours; saved data and CPU analysis only, no fitting,
+  Wan-Animate or 34-window final run. Stop with a measured explanation
+  or explicit uncertainty and a bounded, unexecuted confirmation proposal.
+- Provenance integration: step-5 run continuation copied verbatim from
+  d0a00e5b7e5a0fa2ec53a330eff62b4eea93e756, absent from origin/main
+  58f4eba9. Existing entries retained; no earlier verdict changed.
+- CPU job submitted: `20261024T082408Z-3cb3f467` (pending at submission),
+  code `dae3fe78a3ca7faa9a0da8af2eb86dbe68634267`; snapshot
+  `b7458237c73952f47a24040f57fb7978d9bbc1658d907f92f15fb8b52fb0cd86`.
+  Two CPU threads, no GPU claim; smoke 300 s, full 600 s, total ceiling
+  1,200 s. All six hosts inspected; eligible host pool retained. Original
+  clips and K6 bundles staged by the existing prepare specification's
+  SHA256 identities. Outputs go to the new job, never into prior evidence.
+- First CPU request `20261024T082408Z-3cb3f467`: startup failure, no
+  workload or smoke began. Fleet marked attention after owner disappearance;
+  inspected `run/supervisor.log` and `run/supervisor.json`: Python exits on
+  missing `experiments.jobs.monitor` because the selected snapshot included
+  only the analysis module. No run status, smoke or workload log exists.
+  Boot-log SHA256 recorded in the export receipt; original request retained.
+  Corrected request includes the fleet runtime dependencies; this is a
+  diagnosed startup failure, not a replay of uncertain execution.
+- Corrected CPU request `20261024T082728Z-19b9b119`: pending at submission, code
+  `f7fa4cf6`; snapshot `b8a633ee0e96d58ea1b6c9a0124eec172dc2439d02867ffe7da81941c49d7216`. Same
+  inputs and 1,200 s CPU ceiling, zero GPU allocation.
+- Corrected request `20261024T082728Z-19b9b119` failed its smoke
+  before decoding: the reused specification passed `--inputs`, which the
+  analysis parser did not accept. Exit 2 confirmed in `smoke/command.log`;
+  no full stage ran. Added the input-manifest parser and archived-window
+  inventory, retained both failed jobs; still 0 GPU-hours.
+- Third CPU request `20261024T082934Z-3b15531e`: pending at submission, code
+  `02d8b5ae`, same zero-GPU specification and 1,200 s CPU ceiling.
+- Third request `20261024T082934Z-3b15531e` failed substantive smoke
+  validation: ffmpeg filters produced 241 scene metadata rows for 240
+  output frames. No full stage ran. Fixed by trimming the filter input
+  to 240 frames; added six-frame source contact sheets. Preliminary
+  smoke-only diagnostics suggest no cut in 052 (max scene score 0.01282),
+  contrary to the card's premise; final read awaits a passing job.
+- Fourth CPU request `20261024T083117Z-2e644b08`: pending at submission, code
+  `de79482f`, same inputs and limits; no GPU allocation.
+
+#### Outcome: the cut premise is false; scope remains a hypothesis
+- Final CPU job `20261024T083117Z-2e644b08` **complete**, gpu2 host,
+  **no GPU allocated** (`CUDA_VISIBLE_DEVICES=""`). Code `de79482f`,
+  two CPU threads, smoke 4.87 s and full 32.38 s of workload wall time;
+  all 34 full-stage validation checks pass locally (the remote smoke
+  validator passed 10 checks). No model, judge or fit was run.
+- Evidence: `jobs/fleet/inbox/20261024T083117Z-2e644b08/full/scope.json`
+  under `Datasets/pointstream-data/`, SHA256
+  `ac640ae8f2ee0d807a085555f5504a354de9cba554aaf465cd036673c0d046d2`.
+  It includes all clip and K6 archive identities, exact ffmpeg commands,
+  all scene scores, reference indices, registration runs and contact-sheet
+  identities. Packed environment `pointstream-20261009T214002Z`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`;
+  native binary `{staged environment}/bin/ffmpeg`, version 8.1.2.
+  Snapshot selected `experiments/jobs` and `experiments/tennis/k6b_scope.py`;
+  no local patch or untracked file included. `ready.json` preserves the
+  snapshot identity. Input manifest archive `20e595d5…e703` and the four
+  K6 archives are the unchanged step-2 preparation inputs.
+- Reproduce scores: `python -m experiments.tennis.k6b_scope report --scope
+  SCOPE_JSON --reports STEP2_JSON STEP3_JSON STEP4_JSON STEP5_JSON --out
+  NEW_JSON`. The analysis output must be a new external path. Reports are
+  the saved `tennis/k6b-2026-10-22/report/` files. Their complete identities:
+  - `k6-report.json`: `22cb71c741d2870dfd3f646ca55f6ffbed16fdc275f86174f5103cd8635ee0ad`.
+  - `k6b-report.json`: `acd27678226bd3208422b56bbb6ae26bbc60b9828e9152cf36315c37cc42ca43`.
+  - `k6b-report-step3.json`: `0224e2d95e73da1b2fe251dbab0f7bec6b5688d890668c9678e7fea0c00a0583`.
+  - `k6b-report-step4.json`: `73a00639f6624a1f3edadfc121f9b2a481486fc08da1c911f0ce43730827405b`.
+  - `k6b-report-step5.json`: `73f2929adba747446c166a7d118c2e67c6ff36b93968055a4874ace1605f8b4f`.
+
+**First test: a cut in 052.** No cut is detected in **any** of the eight
+240-frame windows at scene thresholds 0.15, 0.30 or 0.45 (320×180 decode,
+ffmpeg scene score). In 052 the maximum is only 0.01282. The six-frame source
+contact sheet (`sheet-rublev_auger-aliassime__052_at120.jpg`, frames 0, 60,
+109, 153, 180, 239) shows one continuous, low oblique court view, with camera
+motion, throughout. It is **not mostly a close-up**. Sparse registration is
+not evidence of non-court footage. The card and earlier interpretation of
+this window were mistaken; their historical text and step-5 verdict stand.
+
+052's registered spans (inclusive): 109–110, 115, 118–119, 130–136,
+139–153, 157, 235–236, 238–239. Both references are frame **109**, the first
+fitted scored frame; both players have all 32 registered poses fitted.
+Only **seven frames are judged**: 132, 135, 141, 144, 147, 150, 153.
+All references and judged frames belong to the same detected shot. Thus
+neither a cross-cut reference nor pose *misses on registered frames* explain
+this loss. The generator has poor pose/appearance reconstruction in an
+oblique, net-occluded view; failed court registration makes its evaluation
+unusually sparse. The saved t144 image shows the far player behind the net,
+a changed racket/arm outline and clothing details. These are observed errors,
+not a causal ablation proving which model limitation creates the margin.
+
+**Measurements on the eight K6 windows.** 008 and 033 are two of the eight,
+not two additional independent windows. Heights are medians of the two
+player masks in native 1080p pixels. `Reg` is frames K8b registers, `J` the
+actual judged frames. Envelope is LPIPS / DISTS at the unbilled keypoint
+rate, reproduced from the saved reports, including development envelopes.
+
+| Window | Reg / 240 | J | Heights px | Keypoint kbps | Envelope LPIPS / DISTS |
+|---|---:|---:|---|---:|---|
+| alcaraz_hurkacz/036 | 240 | 80 | 118, 175 | 1.937 | 0.280 / 0.246 |
+| alcaraz_hurkacz/045 | 239 | 79 | 110, 190 | 2.073 | 0.280 / 0.249 |
+| djokovic_federer/038 | 240 | 80 | 138, 282 | 2.741 | 0.244 / 0.223 |
+| djokovic_federer/072 | 240 | 80 | 156, 280 | 2.916 | 0.255 / 0.224 |
+| djokovic_zverev/008 | 240 | 80 | 160, 618 | 3.196 | 0.348 / 0.244 |
+| djokovic_zverev/012 | 239 | 79 | 158, 784 | 3.323 | 0.379 / 0.252 |
+| medvedev_struff/033 | 240 | 80 | 85, 168 | 3.044 | 0.248 / 0.240 |
+| rublev_auger-aliassime/052 | 32 | 7 | 140, 542 | 9.803 | 0.243 / 0.164 |
+
+Players below are ordered by mask height, smaller first. Misses count failed
+pose fits **conditional on registered frames**; unregistered frames are
+outside the denominator. Camera motion is the median / p95 displacement of
+the projected court centre between adjacent registered frames (1080p px),
+a registration-derived proxy, not optical flow or true camera velocity.
+Reference distance is translation-centred joint displacement divided by
+that player's median mask height (joint confidence ≥ 0.5, ≥ 4 shared joints),
+median over fitted judged targets; this measures pose, not image LPIPS.
+
+| Window | Pose misses % | Both fitted % | Camera med / p95 px | Reference t | Median reference gap s | Pose distance |
+|---|---|---:|---|---|---|---|
+| alcaraz_hurkacz/036 | 0.00, 0.00 | 100.00 | 0.11 / 0.35 | 0, 0 | 4.74, 4.74 | 0.145, 0.147 |
+| alcaraz_hurkacz/045 | 0.00, 4.60 | 95.40 | 0.33 / 8.91 | 0, 0 | 4.80, 4.92 | 0.223, 0.087 |
+| djokovic_federer/038 | 0.00, 0.00 | 100.00 | 0.09 / 0.20 | 0, 0 | 2.37, 2.37 | 0.194, 0.117 |
+| djokovic_federer/072 | 0.00, 0.00 | 100.00 | 0.14 / 0.75 | 0, 0 | 2.37, 2.37 | 0.180, 0.161 |
+| djokovic_zverev/008 | 0.00, 0.00 | 100.00 | 0.56 / 1.83 | 0, 0 | 1.98, 1.98 | 0.033, 0.043 |
+| djokovic_zverev/012 | 0.00, 0.00 | 100.00 | 0.50 / 2.53 | 1, 1 | 1.98, 1.98 | 0.079, 0.050 |
+| medvedev_struff/033 | 3.75, 0.00 | 96.25 | 0.02 / 0.13 | 0, 0 | 2.43, 2.37 | 0.102, 0.306 |
+| rublev_auger-aliassime/052 | 0.00, 0.00 | 100.00 | 0.62 / 6.62 | 109, 109 | 0.70, 0.70 | 0.097, 0.114 |
+
+**045:** no cut, 239/240 registered frames, the far player fitted on all
+239, the near player missing 4.60% of registered frames. Smaller masks
+(110, 190 px) alone do not establish a cause: winning 036 has 118, 175 px,
+almost the same keypoint rate (1.94 vs 2.07 kbps) and the same unbilled
+anchor strength. Its far-player reference pose distance is larger (0.223
+vs 0.145), consistent with more variation from one reference; development
+033 has an even larger distance (0.306 on its larger player), so this is not
+a uniquely separating feature. Camera p95 is high, but 052 does not have
+the largest p95. The saved step-5 t120 image has a front-facing far player
+in the source and a back-facing generated player, with a changed racket
+and arms on the near player. Appearance/view and racket reconstruction
+are visible failure modes; no saved CPU-only comparison isolates their
+individual contribution. A global window failure cannot be attributed
+numerically to the far player from a single review frame.
+
+052's high 9.80 kbps is measured over just 32 registered frames (0.64 s),
+in eight broken runs; short tracks incur repeated absolute starts. Its
+median reference gap is only 0.70 s and pose distances 0.097 / 0.114,
+so a far-away reference is not its distinctive problem. Rates and anchors
+use the same registered-duration convention; changing only its keypoint
+denominator to the full window would be unfair. The perfectly supplied
+appearance bound still wins (052 LPIPS 0.123 vs envelope 0.243; 045 0.107
+vs 0.280), so these windows do not bound all possible renderers as failures.
+
+**Saved per-window margins** (envelope minus method; positive wins).
+Each cell is LPIPS / DISTS, **unbilled**. These are fixed-point margins,
+not new BD-rate claims. Full original reports retain native codec paths,
+versions, GPU identities and source-job provenance. Step-2 judges
+`20261022T182340Z-e773acb4`, `20261022T182347Z-c0aac9cc`; step-3 judges
+`20261023T083816Z-f1649e10`, `20261023T083822Z-30b2b476`; step-4 judges
+`20261023T132947Z-fb8a8581` and its companion in the preserved report;
+step-5 judges `20261023T231003Z-4fe6e239`, `20261023T232338Z-94c7a048`.
+
+| Window | Step 2 | Step 3 | Step 4 | Step 5 |
+|---|---|---|---|---|
+| alcaraz_hurkacz/036 | -0.0104 / -0.0041 | +0.0331 / +0.0268 | +0.0352 / +0.0271 | +0.0465 / +0.0302 |
+| alcaraz_hurkacz/045 | -0.0583 / -0.0322 | -0.0027 / +0.0081 | -0.0245 / -0.0096 | -0.0096 / -0.0024 |
+| djokovic_federer/038 | +0.0329 / +0.0344 | +0.0591 / +0.0400 | +0.0471 / +0.0394 | +0.0487 / +0.0335 |
+| djokovic_federer/072 | +0.0031 / +0.0274 | +0.0251 / +0.0335 | +0.0253 / +0.0295 | +0.0313 / +0.0238 |
+| djokovic_zverev/008 | not scored | not scored | not scored | not scored |
+| djokovic_zverev/012 | +0.1042 / +0.1017 | +0.1224 / +0.1063 | +0.1039 / +0.1004 | +0.1155 / +0.0981 |
+| medvedev_struff/033 | not scored | not scored | not scored | not scored |
+| rublev_auger-aliassime/052 | -0.1385 / -0.0243 | -0.0573 / +0.0112 | -0.1006 / -0.0070 | -0.1226 / -0.0204 |
+
+Billed step-5 losses: 045 −0.0298 / −0.0145; 052 −0.1317 / −0.0275.
+008 and 033 have **no final step-2–5 test scores**; step 5 used them to
+choose the recipe. Their saved development A/B/C and render-time variants
+are not the final combined 4-bit, guidance-2.0 configuration. Their numbers
+remain in the copied step-5 development table; they must not be filled into
+missing test cells. Also correct the card's shorthand: **step 3 scored
+83%, not 67%**; its two LPIPS losses both won DISTS.
+
+**Scope candidates and pooled scores, side by side.** Every score compares
+the method against exactly the same retained windows' own anchor envelopes.
+Unrendered windows never enter a denominator. No anchor is selectively
+removed or changed. The saved warp bound stays 100% and the ref warp scores
+1/12 pooled, 1/10 after the registration gate, 1/8 after the combined gate;
+the score reporter emits all three methods together to enforce that scope.
+
+- Single-shot rule: no scene score > 0.30. It excludes **nothing**, including
+  052, at all three thresholds checked; scores equal pooled throughout.
+- Registration rule: keep windows with **≥ 95% registered frames**, otherwise
+  use the pixel coder. Excludes only 052 on all eight. It does not separate
+  every loss, since 045 remains. This threshold is a discovered hypothesis;
+  these data do not identify 95% uniquely (any threshold above 13.33% and
+  at most 99.58% has the same membership).
+- Size alone (single-shot plus smaller player's median height ≥ 115 px):
+  excludes 045 and development 033 but retains 052. Its scored denominator
+  is five windows and scores happen to equal the registration-only column;
+  the excluded failure is different. It has no established causal basis.
+- Combined registration ≥ 95% **and** minimum height ≥ 115 px: excludes 052,
+  045 and development 033; four scored windows remain. It separates the two
+  selected test losses retrospectively, but 115 px was chosen in the tiny
+  gap between 110 and 118 px. This perfect-looking selection is explicitly
+  exploratory, not a validated decision boundary or a paper result.
+
+| Step | Pooled (= single-shot) | ≥95% registration | ≥95% registration and ≥115 px |
+|---|---|---|---|
+| 2 unbilled | 6/12 = 50% | 6/10 = 60% | 6/8 = 75% |
+| 3 overfit, unbilled | 10/12 = 83.3% | 9/10 = 90% | 8/8 = 100% |
+| 4 unbilled | 8/12 = 66.7% | 8/10 = 80% | 8/8 = 100% |
+| 4 billed | 7/12 = 58.3% | 7/10 = 70% | 7/8 = 87.5% |
+| 5 unbilled | 8/12 = 66.7% | 8/10 = 80% | 8/8 = 100% |
+| 5 billed | 8/12 = 66.7% | 8/10 = 80% | 8/8 = 100% |
+
+These are window-metrics, not independent frames; only four matches in the
+pooled test and three after removing 052. No score changes the written
+step-5 **fail** verdict. Registration-only is the simpler follow-up
+hypothesis; the combined gate should be frozen and tested alongside it,
+not preferred for producing 100% here. A deployed fallback would also need
+whole-stream rate accounting on excluded windows; these object-region
+scores do not establish a hybrid codec's end-to-end gain.
+
+**Fresh-window confirmation (not run).** The saved input inventory contains
+57 windows: 36 used to train step 5's tennis base, eight evaluation/development
+windows, and 13 unused by that fit. The remaining 13 are:
+`medvedev_struff` 007@62, 016@14, 023@69, 028@44, 034@105;
+`rublev_auger-aliassime` 003@53, 006@55, 038@120, 039@222, 054@16,
+061@83, 062@218, 063@337. They failed the 120-registered-frame training
+floor (038 has zero), so **none can satisfy a ≥95% gate**: they cannot
+confirm performance inside the proposed scope. The 34-window final run
+would reuse fitted data and is neither authorized nor an independent test.
+
+Available archive sources outside those 44 train/eval windows include the
+2,310 s `archive/pre-reset-2026-10-05/tennis_games/raw_1080p/nadal_kyrgios.mp4`
+(documented in K8; not used in steps 3–5), plus unused scene clips of the
+five matches. K8b documents 21 Alcaraz–Hurkacz clips and 41 Medvedev–Struff
+clips; only five Alcaraz clips (002, 006, 011, 036, 045) and three Medvedev
+clips (006, 008, 033) enter step-5 fit/evaluation. These leave **16 and 38
+clip IDs**, respectively, outside that fit/evaluation set, before rejecting
+non-court views, too-short clips and overlaps. Their remaining IDs and
+eligibility have not been enumerated here; do not invent a confirmed
+window list. Archive `MANIFEST.json` is the read-only source inventory.
+
+Proposed bounded confirmation: first CPU-freeze 12 new, non-overlapping
+240-frame windows from unused Alcaraz and Medvedev clips (six per match),
+chosen by source metadata and shot boundaries before looking at generation
+or anchor quality. Audit no shared source frames with any step-3–5 fitting,
+recipe selection or this scope analysis; compute and freeze both gates,
+record exclusions and score the identical windows for every method. Include
+boundary cases and retain pooled scores. Use the **existing frozen** step-5
+match adapters, with no new fitting; the published eight windows cannot
+confirm it. A candidate 12-window budget is **about 6–8 GPU-hours** (not an
+authorization): 12 renders × step 4's measured ~0.35 h = 4.2 h, ~0.6–1 h
+judging, and ~1–2 h for new features/poses/anchor curves, contingent on a
+correctness smoke and scale pilot. Fresh archive verification must precede
+that estimate becoming a run card. Start with a six-window first part and
+stop if the decision is already clear. Nadal–Kyrgios is an alternative
+fresh-match zero-shot check, but lacks a fitted step-5 match adapter and
+therefore does not directly confirm the frozen per-match recipe without a
+new training protocol. **No confirmation, fitting or Wan-Animate run was
+started.**
+
+**Verification and provenance.** The final analysis module passes `ruff
+check` and `mypy --config-file pyproject.toml` (181 source files); all three
+focused tests pass. Final full `python -m pytest`: 821 passed, 24 skipped,
+one failure in unchanged `test_patches_into_models_or_datasets_are_blocked`.
+On macOS `/home/itec/emanuele/Datasets` resolves to
+`/System/Volumes/Data/home/itec/emanuele/Datasets`, so that test's symlink
+expectation fails. The hook is byte-identical to origin/main (SHA256
+`82a4e2fe5c882fb1d590e1a7ee031352c74fa901fea8f77fd114f57a3c4b957d`).
+The sandboxed first full suite also blocked `ps`; with process-control
+access the fleet process test passes. No hook or unrelated item was edited.
+Linux CI must pass before auto-merge can complete.
+- Final CPU snapshot SHA256: `f29e32500a53e8978d572ca93559ba632fb51fc147238a9733183da531dfcc81`.
+- Locally derived scoped-score JSON SHA256: `7686b3681607b53882a6dadbc819d79ad9625e43fa581e40cfb0517fdb3c2272`; reproduce from the preserved source reports with the command above.
+
+## Report: K6b players 5b (2026-10-24)
+- Stopped because: goal reached for the CPU diagnosis; individual causal
+  contributions remain unisolated, as the saved-data limit requires.
+- Decision by the rule: step 5 remains **fail**, 8/12 window-metrics (67%).
+  No cuts occur in any of the eight windows. Registration ≥95% gives
+  8/10 (80%); adding minimum height ≥115 px gives 8/8 (100%), both
+  unconfirmed hypotheses discovered on these windows.
+- Explanation: 052 is one continuous oblique court shot, **not a close-up
+  or a cross-cut reference**; registration 32/240, seven judged frames,
+  reference t109 on both players. Net occlusion and appearance/pose errors
+  are visible, but not causally separated. 045 has nearly the same size,
+  rate and anchor strength as winning 036; a front/back appearance error
+  and racket/arm changes are visible, with no uniquely established cause.
+- Numbers: pooled steps 2/3/4/5 are 50/83.3/66.7/66.7% unbilled;
+  registration-scoped 60/90/80/80%; combined-scoped 75/100/100/100%.
+  Billed step 4 is 58.3/70/87.5% and step 5 is 66.7/80/100% in those
+  same three scopes. All scores retain identical method/anchor windows.
+  CPU job `20261024T083117Z-2e644b08`, code `de79482f`, gpu2 host,
+  no GPU, report `full/scope.json` SHA256
+  `ac640ae8f2ee0d807a085555f5504a354de9cba554aaf465cd036673c0d046d2`.
+- Budget: **0 of 0 GPU-hours**; completed workload smoke 4.87 s,
+  full 32.38 s; three failed startup/smoke requests preserved above.
+- Branch and commits: `codex/k6b-players-5b`; measured code `de79482f`,
+  diagnosis/report `3f6db4b3`; [PR #232](https://github.com/emanuele-artioli/PointStream/pull/232).
+  Ruff, mypy and three focused tests pass; full Mac suite 821 passed,
+  24 skipped, one unchanged protection-hook path-resolution failure.
+  All 34 CPU measurement checks pass. Linux CI gates merge.
+- Deviations: corrected the card's cut/close-up premise and step-3 pooled
+  score (83%, not 67%). Eight windows already include development 008/033.
+  Integrated d0a00e5's missing saved step-5 continuation without changing
+  its verdict. No new GPU computation, fitting or confirmation.
+- Open for the user: no execution question; any positive paper claim
+  and a future confirmation budget remain the user's decision.
+- Proposed next step: CPU-freeze 12 unused Alcaraz/Medvedev windows from
+  archive clips not used in training/selection, audit overlaps and gates,
+  then test the frozen adapters and same-window anchors in bounded parts,
+  estimated **6–8 GPU-hours**, subject to preflight and fresh authorization.
+  The 13 unused windows in the current manifest cannot pass the proposed
+  registration scope. Nadal–Kyrgios (2,310 s) exists as a fresh-match
+  alternative but has no step-5 match adapter. No confirmation was run.
