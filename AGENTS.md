@@ -64,8 +64,9 @@ Later runs read the table instead of re-checking, and pick `gpu_models` from it.
 ## Experiments
 
 GPU time and training are the constraint; code is cheap. Before a run, write its
-decision rule, hypothesis, competing explanation and budget in
-[docs/experiments.md](docs/experiments.md). Before building a component, run an
+decision rule, hypothesis, competing explanation and budget in the item's
+file under [docs/experiments/](docs/experiments.md#runs), one file per PLAN
+item. Before building a component, run an
 oracle: the cheapest upper bound of what the component could achieve, at the
 operating point the decision needs. It must dominate the components it gates.
 If it fails the rule, the component is not built. Then run a correctness smoke
