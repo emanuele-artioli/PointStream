@@ -100,7 +100,7 @@ and each object's representation is judged on both:
    judge was added. Queue, cheapest first: H3e (its generations are saved,
    no new generation), FoundHand (K6b hands rung 2, re-run keeping the
    crops), H3a/H3a2 if their stages kept the decodes, and K6's `ref` on
-   players. Its rule is the entry "J: experience-track re-judging (rule)"
+   players. Its rule is the first entry of [j.md](experiments/j.md)
    (PLAN J).
 
 ## Entry template
