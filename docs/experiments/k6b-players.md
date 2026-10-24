@@ -1232,3 +1232,302 @@ Linux CI must pass before auto-merge can complete.
   The 13 unused windows in the current manifest cannot pass the proposed
   registration scope. Nadal–Kyrgios (2,310 s) exists as a fresh-match
   alternative but has no step-5 match adapter. No confirmation was run.
+
+
+### 2026-10-24 — K6b players confirmation: CPU preparation, awaiting approval
+
+**Goal:** decide whether the frozen step-5 player renderer transfers to unused
+windows of the same Alcaraz–Hurkacz and Medvedev–Struff broadcasts under a
+prespecified encoder-computable registration scope. This is conditional,
+within-match confirmation, not an independent-match test or a deployable codec.
+Step 5's historical fail (8/12 window-metrics) remains unchanged.
+
+**Scope:** CPU-only preparation now, 0 GPU-hours authorized or spent. No GPU
+submission, fitting, new generated images/video, Wan-Animate, other chats or
+recurring monitors. Future execution requires explicit budget approval AND the
+CPU provenance gates below. Branch: `codex/k6b-player-confirmation-plan`.
+Report address: this requesting chat and this entry; no other chat is launched.
+
+**Stop conditions:** stop preparation with this card and audit; await budget
+approval. In future execution stop on a failed validator, unresolved provenance,
+insufficient eligible windows, mathematical futility, exhausted budget or a
+question requiring user judgment. Never spend beyond the approved ceiling.
+
+#### Audit: what “unused” does and does not establish
+
+Read-only CPU metadata audit on gpu1 (2026-10-24), no model imports or quality
+reports opened. Read archive MANIFEST, K4b selection, K8b registration, the saved
+5b input inventory and the base job specification. No files in Models or
+Datasets were changed. Temporary local audit extracts are not canonical evidence;
+the source hashes and complete chosen source identities are recorded here.
+
+- The 5b proposal did not enumerate 12 windows. The archive has 21 Alcaraz
+  clips and 41 Medvedev clips. Outside step-5 fit/evaluation there are 16/38
+  clip IDs, as reported. Excluding **all 57 old manifest windows**, including
+  the 13 unused low-registration windows, leaves 16/33 clip IDs. Of these,
+  9/13 respectively contain at least 240 native frames. Thus a six-per-match
+  sample is feasible without recycling an old manifest window.
+- Alcaraz old clips: 002, 006, 011 (base/match training), 036, 045
+  (evaluation). Medvedev: 006, 008 (base/match training), 033 (recipe
+  development); also exclude unused-manifest clips 007, 016, 023, 028, 034.
+  Step 3's own-window fits and steps 4–5's development/reference use are
+  contained in the old clips. Conservatively excluding their entire clips
+  excludes their source reference frames too, rather than relying on different
+  window IDs. K4b selection's reviewed Alcaraz/Medvedev frames also occur in
+  these excluded clips.
+- Base job `20261023T194934Z-b0dcbb19/spec.json` explicitly loads
+  `original/{denoising_unet,reference_unet,pose_guider,motion_module}.pth`,
+  excludes all eight K6 windows and uses every second training frame. Its
+  36-window training set is documented above. `k6b_fit.py` samples training
+  references from those same training units. The pre-reset
+  `finetuned_tennis` profile saw all seven archived matches and lacks a
+  track-level manifest (resources.md); **do not use it or its descendants**
+  for a clean confirmation. Checkpoint names alone are not proof: the exact
+  Alcaraz and Medvedev step-5 adapter/base input hashes and transitive fit-unit
+  lists were subsequently joined to the preserved records below: their units
+  are the same excluded old clips. Before dispatch recheck actual staged bytes
+  against these receipts. Missing or mismatched lineage blocks confirmation.
+- All candidate clips were already processed/reviewed in K8b's court census.
+  This independently tests generator quality conditional on a frozen
+  registration procedure, not the registration algorithm on unseen footage.
+  Both matches, identities, venues and broadcast styles were seen by the
+  tennis base and match adapters. Twelve windows are **two match clusters**,
+  not twelve independent matches; frames and two metrics are not independent
+  replicates. Off-the-shelf pretraining overlap is not exhaustively known.
+- Distinct clip IDs and SHA256 identities prove separate encoded files, not
+  absence of duplicated/replayed source frames. `scenes.txt` provides scene
+  cut times, but original extraction offsets/rounding and replay duplicates
+  were not verified against decoded video here. A clean source-frame claim is
+  therefore **not certified yet**. Before any GPU work, reconstruct source PTS
+  intervals for every candidate and every old fitting/development/reference
+  clip, verify the mappings by sequential CPU decode, and compare decoded
+  frame hashes plus near-duplicate/replay candidates by CPU visual review.
+  Use all old clip frames conservatively. Record exact, temporal and replay
+  overlap separately. Any overlap or unresolvable mapping stops this card;
+  replacements require a new prespecified manifest before quality is opened.
+- Judges must not have been fitted on these frames. Pin LPIPS/DISTS weights
+  and provenance, use the existing off-the-shelf judges without adaptation,
+  and explicitly record unknown pretraining exposure rather than inventing a
+  clean subset. Known judge training overlap blocks scoring.
+
+**Conclusion:** enough source clips exist for a same-match holdout; “12 unused
+windows” alone does not establish independent confirmation. With the remaining
+lineage and decoded-duplicate checks passed, this can confirm a new-window
+within-match hypothesis only. It cannot establish unseen-match generalization.
+Nadal–Kyrgios would require a different zero-shot protocol (no matching step-5
+adapter); it is not silently substituted.
+
+#### Frozen source-only selection and registration rule v1
+
+Selection was written before computing candidate registration counts and before
+opening any new codec/generator quality scores: one centered 240-frame window
+per unused clip, `start=(N-240)//2`, half-open `[start,start+240)`, native fps,
+sequential decoding, no frame-rate conversion. Rank clips by ascending hex
+SHA256 of UTF-8 `pointstream-k6b-confirm-v1:<match>/<clip>`, take the first six
+per match among N≥240 after excluding all old manifest clips. Do not select by
+registration, height, pose success or anticipated quality. Reserves are not
+scored and are not automatic replacements. All 12 stay in the pooled cohort.
+
+**Primary gate:** at least **228 of 240** frames have K8b **`fits=true`** and
+a finite, nonsingular court homography. Missing/invalid rows count as failures.
+Use the adopted frozen K8b algorithm, line ruler, geometry/clutter guards and
+source hashes; no re-estimation/tuning to favor a window. `fits` is the ≤6 px
+flag that K4b/K6 actually consumes (`k4b_court.registrations`), NOT K8's
+older `registered` ≤2 px flag. The initial scratch wording used `registered`;
+code inspection corrected that field mapping before quality was opened. This
+is a prospective test of 5b's discovered ≥95% hypothesis, not independent
+justification of the numerical threshold. Freeze code/manifest hashes before
+running or viewing any new quality result; changes invalidate confirmation v1.
+
+No extra cut or pose-success gate. Record cuts and pose failures as diagnostics;
+a failed model/pose is not grounds to delete a window. Size ≥115 native 1080p
+pixels remains **exploratory**, selected in the 110–118 px gap on old losses.
+No independent evidence justifies it. Report it only as a labeled secondary
+stratum beside primary and pooled results, with the same methods and anchors;
+never use it to rescue a primary failure or replace the deciding denominator.
+Source-mask-derived heights also inherit the supplied-matte assumption.
+
+| Clip | Native inclusive frames | fps | K8b fits | Source SHA256 |
+|---|---|---:|---:|---|
+| alcaraz_hurkacz/031 | 9–248 | 25 | 240/240 | `054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76` |
+| alcaraz_hurkacz/013 | 93–332 | 25 | 239/240 | `1af169200b28659c503499979863b6219b0d331f532962ac69fb505d13c4976c` |
+| alcaraz_hurkacz/023 | 108–347 | 25 | 239/240 | `88345a9deac75a4b6180daa56a2ec7cda2afea25babb5b549b937105bca45d1a` |
+| alcaraz_hurkacz/016 | 153–392 | 25 | 234/240 | `305a369d74882a628ff7efd6b49cf3f75c56a985d78ffd798863542df20551bd` |
+| alcaraz_hurkacz/008 | 141–380 | 25 | 240/240 | `355e4b0a3408e4c8f049baadf749c937e52930f57df5018867e5baa0cdd49e54` |
+| alcaraz_hurkacz/047 | 3–242 | 25 | 240/240 | `7bb3a53e3b416d3b84c0344c99b29d1374f8c49b54f970034f4f29a95609e99b` |
+| medvedev_struff/014 | 74–313 | 50 | 240/240 | `a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be` |
+| medvedev_struff/037 | 229–468 | 50 | 240/240 | `97372d45ba53068078fdc85300a550221b2c4bd31a3074958b52081326e3feeb` |
+| medvedev_struff/002 | 218–457 | 50 | 240/240 | `49cc09d072d740bd4d5ed02fdd24f2b3edbdc5fb16a660f66f1e8148ff8be14a` |
+| medvedev_struff/017 | 86–325 | 50 | 240/240 | `64cc4bc0a0712b5daa6bc00c5ed592b31a0f8333cb36a4caf5b05d24f9e39873` |
+| medvedev_struff/029 | 18–257 | 50 | 240/240 | `013979d403ec9ae3e48ce3dc49bbf261b37fb6a3dd78af71d5b8d81419612e8f` |
+| medvedev_struff/021 | 126–365 | 50 | 240/240 | `fa2da44fdc64d6d95c9a111953dd6d16a088cb534dc7336a98d3cb2557d30b4a` |
+
+All 12 pass the primary gate (Alcaraz/016: 234; all other windows: 239–240).
+This cohort tests performance **inside** the proposed scope. With no excluded
+window it cannot establish that registration discriminates wins from losses,
+or quantify the fallback's benefit; gate and pooled membership coincide here.
+Do not add low-registration clips after seeing scores. Source fps matters:
+Alcaraz is 25 fps (9.6 s/window), Medvedev 50 fps (4.8 s/window), not all 50 fps.
+
+#### Identical comparison, decision and substantive validation
+
+- Primary method: existing frozen step-5 `gen-match5` (C tennis base,
+  appropriate match adapter/guider, 4-bit per-output-channel coding, guidance
+  2.0), 512×784 crops, 30 DDIM steps and deterministic unit seed rule
+  (`int(sha256(unit)[:7],16)`, per-run seed `seed*1009+run_id`).
+  Coded keypoints: 4 px, velocity predictor, every fourth frame as K6.
+  No new training, reference search, recipe sweep or step-3 overfit rerun.
+  Carry K6 `warp` appearance oracle and `ref` warp as diagnostics on the same
+  windows; old steps 2–5 remain historical, not fabricated fresh measurements.
+- Each new reference is the first fitted scored source frame per player,
+  exactly the existing step-2/5 rule, within its own frozen window, granted
+  and unbilled. Record source frame, crop and SHA256; no reference bank or
+  outside-window substitution. This permitted test-time conditioning is not
+  training overlap, but prevents a “no target appearance” claim.
+- Anchors: actual SVT-AV1 (preset 4) and DCVC-UF. Initial three settings
+  per codec, `(quality, downscale)`: SVT `(48,1),(63,4),(63,8)`; DCVC
+  `(0,1),(0,2),(0,4)`. The final comparison must include the remaining K6
+  anchor settings SVT `(62,1),(63,2),(55,4)` and DCVC `(21,2)` wherever
+  they could strengthen the hull; omission requires a quality-independent
+  dominance justification. If budget cannot cover a fair envelope, report
+  incomplete, not pass. Add further points only for bracketing/overlap,
+  with a documented budget check. Same source window, native fps,
+  frame indices, player regions, union masks, crop and scoring stride for
+  every method and every anchor, in both pooled and gated reports. Freeze
+  score indices before rendering: K6's registered frames and every-third-frame
+  judging convention, with pose failures retained/reported. Missing required
+  output invalidates the result; it cannot shrink an anchor's or method's set.
+- Rates use the same registered-duration convention as K6 for all curves;
+  primary billed rate adds adapter and trained-guider bytes over H=2 hours,
+  with the tennis base treated as shipped decoder data as in step 5. Report
+  those base bytes and amortization assumption, unbilled rate, payback and
+  whole-window duration too. References and exact target matte **R remain
+  granted and unbilled**. This is an object-renderer feasibility test with a
+  supplied matte, not an end-to-end codec gain, decoder-side segmentation
+  solution or paid-mask hybrid/fallback demonstration.
+- For each window/metric build the achievable upper-concave anchor envelope
+  (quality orientation made explicit), compare strictly lower LPIPS/DISTS
+  at the method's billed rate without extrapolation. Primary statistic is
+  `(LPIPS wins + DISTS wins)/(2*n_gated)`, bar ≥75%; publish each metric,
+  window and match separately, pooled alongside gated, billed/unbilled,
+  all exclusions and missingness. If all 12 validate, pass needs ≥18/24.
+  Require at least six gated windows, at least three per match, otherwise
+  insufficient confirmation. Below 75% billed but ≥75% unbilled goes to the
+  user; below 75% unbilled fails. Unbracketed rates or invalid outputs are
+  unresolved, never wins. A pass supports this conditional same-match scope
+  only; the earlier step-5 verdict is not rewritten.
+- Report BD-rate per metric using PCHIP on overlapping quality only when a
+  genuine method curve exists; do not invent a curve from one frozen operating
+  point. Otherwise report fixed-point wins and margins, and “better/worse at
+  every rate” only when the measured curves support it. No extrapolated BD-rate.
+  Report match-level variation; a two-cluster confidence interval is not
+  credible evidence of population generalization. No optional-stopping p-value.
+- Validator must recompute input/checkpoint hashes, complete training/reference
+  intersections, source PTS/duplicate audit, exact 240 decoded frames and fps,
+  unique IDs and no cross-window overlap, all 240 registration rows and gate
+  count. Test boundary counts 227/228, null/nonfinite/singular homographies,
+  wrong fps/start/hash, duplicated IDs and missing outputs with deliberate
+  corruption fixtures. Validate coded-keypoint encode/decode round trip,
+  shapes, finite/nonflat generated crops, frame coverage, player identity and
+  reference membership; independently recalculate adapter bits and rates.
+  Assert actual CUDA device/provider/kernel on the approved GPU class in the
+  future smoke; no CPU fallback. Require real bitstreams, native binary paths
+  and versions, encode/decode agreement, identical scoring-index/mask hashes,
+  finite metrics, envelope bracketing and no extrapolation. DCVC-UF is encoded,
+  decoded and judged within the same job/GPU (its saved-stream portability
+  limitation stands). Synthetic corruption tests must fail; a success flag or
+  file existence alone is insufficient. Validator is specified here, **not
+  implemented or executed by this preparation task**.
+
+#### Staged proposal — NOT authorized
+
+Hypothesis: the frozen step-5 renderer achieves ≥75% billed within the
+registration scope on new same-match windows. Competing explanations:
+post-hoc scope overfit, repeated broadcast content, same-match appearance
+memorization, favorable anchor coverage, and supplied reference/matte hide
+costs. The existing appearance oracle is the upper bound; no new renderer
+component is proposed. Include its real measurements diagnostically, never
+claim the bound as a method result.
+
+Proposed hard ceiling **8 GPU-hours total**, not an allocation or dispatch:
+
+| Stage | Ceiling GPU-h | Release condition |
+|---|---:|---|
+| CPU provenance/manifest and validator implementation | 0 | Approval plus all lineage/PTS/duplicate checks pass; otherwise stop |
+| Representative correctness smoke | 0.3 | ≤600 s per smoke; one window per match, all substantive checks pass |
+| First six windows (three per match), all prep/anchors/render/judges | 3.4 | Fixed recipe, no tuning; budget feasibility measured |
+| Remaining six, same pipeline | 3.4 | Pilot predicts total ≤8 h and no validator failure |
+| Contention/bracketing/validation reserve | 0.9 | Only documented work within total ceiling |
+
+Central estimate 6–8 GPU-hours: renders 12×0.35=4.2 h (measured step-4
+per-window cost, not a guarantee for these sources), preparation/poses and
+anchors roughly 1–2 h, judging roughly 0.6–1 h. CPU SVT/registration does not
+consume GPU time. Smoke overhead and retries count toward 8 h. CPU stages
+≤45 min each; GPU shard ≤45 min, checkpoint every finished window. Twelve
+renders may be 0.7 h for a pair, so shard by single window rather than match.
+Pilot first-three-per-match follows the frozen rank order; compute-only scale
+confirmation uses measured seconds/frame, peak memory and projected remaining
+cost, never a new quality-dependent recipe. No interim pass: complete all 12
+unless even winning every remaining window-metric cannot reach 75%, in which
+case stop for futility and report the incomplete cohort honestly. Failure of
+this conditional test does not prove that every possible player renderer fails.
+
+Use only compatible Ada hosts gpu5/gpu6 for the generator, per the recorded
+model–GPU table; do not add A6000 by inference. Use the pinned packed
+`pointstream-jcv` generation environment and main PointStream prep/codec/judge
+environment, their locks and exact SHA256 packs. Before dispatch inspect existing
+jobs and all eligible hosts, pin code revision and selected patch hashes,
+staged archive hashes, exact entrypoint/arguments, versions, per-job caps and
+absolute deadline (set only after approval). Save each job ID here immediately.
+No runnable fleet spec is issued with guessed hashes/deadlines. Verify native
+completion resumption once per client; then one bounded `ps-fleet wait` per
+batch, ≤45 min. If unavailable, preserve continuation and use at most one
+verified self-expiring deadline check, never recurring model polling.
+
+#### Source receipts and report
+
+Frozen checkpoint dependency receipts (read records, did not load tensors):
+
+- `20261023T194934Z-b0dcbb19`: spec SHA256 `99c8a3b83fa28169645e23a75ba2a7da1dba4a294a1827a12259fc7d68f3b1a3`;
+  `full/k6b_fit.json` SHA256 `02e3d1571de608fd87130687cfa1dafb778ae2795303ad8663fa3308b7e22ea2`.
+  Frozen checkpoint `tennis-base@fit-100.pt`, SHA256 `85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4`.
+- `20261023T204452Z-d5c90446`: spec SHA256 `c25f464a0e7775176188c0e8b38dd8d9f6ea41cb330c6bbaa469000558778317`;
+  `full/k6b_fit.json` SHA256 `9ee9c488d1217c71405fa984ccfc435efef4cb8bd5962d69886b41cd6fa3cfa5`.
+  Frozen checkpoint `med-C@fit-100-fp16.pt`, SHA256 `aa7bb8391f0e644c92df447a10d8ff3f76837ec58ad98311db3ecb454a5b98b4`.
+- `20261023T221650Z-3d7cbe2f`: spec SHA256 `2e7ef9c434a151e64289fc443b083efa9a2d6691e3343043b1dd706b21bdbaa1`;
+  `full/k6b_fit.json` SHA256 `e9d2bd731cb2349dbb4af32281d980ed82e66c5bbc97b8a215c1ff9acc74bf77`.
+  Frozen checkpoint `ah-C@fit-100-fp16.pt`, SHA256 `5c6caf090f90a66eac5808abdaadfa50a74114331e610da4ea9a7f61db282d7a`.
+
+Both match jobs point to base archive SHA256
+`075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285`.
+Alcaraz fit-data SHA256
+`33e037eb4a07541310f431c8bad4c78ffb6ffd1ee9ee51f976e75292b0f0bb1b`;
+Medvedev fit-data SHA256
+`71e7bc58a0feaac2323b22d051bf6a64cf1eb605d8d41cb7320a6e8fca341c23`.
+Base and match records use only `original` profile weights. Alcaraz units are
+002/006/011, Medvedev units 006/008 (two players each); the base includes these
+same units plus the other three matches. No selected clip ID intersects any
+recorded base/match training unit or old development/reference clip. This
+resolves recorded fitting lineage, not decoded replay/PTS independence.
+
+- `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261024T083117Z-2e644b08/full/scope.json`: `ac640ae8f2ee0d807a085555f5504a354de9cba554aaf465cd036673c0d046d2`.
+- `/home/itec/emanuele/Datasets/pointstream-data/tennis/k8b-2026-10-20/review/k8b-report.json`: `8230bf1a2239978dfb7912bd5f3ed8367f5c85d1ea9e75c42e8ab8fb3fdc3314`.
+- `/home/itec/emanuele/Datasets/archive/pre-reset-2026-10-05/MANIFEST.json`: `2bd94e9966fc8b09c5ce5eb9bef79f49ad349e1310a1d445fa6a646e86db8dde`.
+- `/home/itec/emanuele/Datasets/pointstream-data/tennis/k4b-2026-10-16/inputs-v3/selection.json`: `7d1a22f62ac03c514b5f47dbc8c4c3864d9e6b92d461ab90175d2b520c6c23ef`.
+
+- Code inspected: preparation checkout `aa95b3b1b5d0049f2cf9757be8b38afdfcdadd0e`; CPU metadata inspection only.
+- Jobs submitted by this task: **none**. GPU-hours: **0 of 0 authorized**.
+- Stopped because: user budget approval needed, as explicitly requested.
+- Decision by rule: **not reached**; no new quality scores opened or produced.
+- Verification: `ruff check` passed; `mypy --config-file pyproject.toml`
+  passed (189 source files); full `python -m pytest`: 833 passed, 25 skipped,
+  2 failed. The process-group test failed because sandboxed `ps` is denied;
+  its isolated rerun with process inspection permitted passed (1/1). The
+  unchanged protected-path hook test still fails on macOS symlink resolution
+  under `/System/Volumes/Data/home`, as already reported in 5b. No test/hook
+  source was changed. `git diff --check` passed. This is a documentation-only
+  change; Linux CI remains the merge gate. Publication: scoped branch/PR.
+- Open for user: approve up to 8 GPU-hours for this conditional same-match
+  study, contingent on the remaining CPU provenance gates, or keep it
+  preparation-only. Recommendation: approve only with that limited claim;
+  do not describe it as independent-match confirmation.
