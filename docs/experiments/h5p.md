@@ -740,3 +740,286 @@ the decisions are in [experiments.md](../experiments.md).
 - Report: `pointstream-data/visor/h5-2026-10-16/report-h5p4c-9b4b3ba.tar`
   (sha256 `982fe3f7…915ecd`, read-only): the specs, every stage's
   `h5.json`, `gate4c.py` and its output.
+
+### 2026-10-24 — H5p 4d rules: binary shape and decoder-derived F
+- Scope: the four H5 pilots only; no final runs or Wan-Animate. Root report
+  address: `01a16cfc-1a88-7013-bd79-8489fe7c1eb2` (delegating Codex chat);
+  prior root: `session_01StNQ6dvxYRHhnMbQymNgNf`.
+- Ceiling: exact free masks preserve weighted DISTS (−15%, 4/4) but
+  **do not fix the established LPIPS loss** (+16% on 4a's pairs).
+- (a) Decision rule, before the run: at exactly lzma s=8's binary accuracy,
+  the cheapest of intra, previous-frame context, and motion-predicted
+  context must cost ≤2 kbps on at least 3/4 items. This is a feasibility
+  screen for the stated rate target, not a measured BD-rate verdict.
+  A pass proceeds to rebilling 4b's fixed pairs and the existing DISTS rule
+  (mean ≤−10%, ≥3/4 below zero); a fail closes only these configurations.
+- Hypothesis: binary contexts and motion reduce lzma's 36–116 kbps but
+  cannot remove enough boundary innovation to reach 2 kbps.
+  Competing explanation: contour coherence leaves almost no unpredictable
+  boundary information after motion, so the target becomes feasible.
+- Bound/permission to build: 4b's exact-free-F oracle passes DISTS, so
+  these coders can move that verdict; they are not built to rescue LPIPS.
+- Component: experimental adaptive binary arithmetic coder, not an MPEG-4
+  CAE or JBIG2 implementation. Five causal spatial neighbours and five
+  predicted temporal neighbours, adaptive counts; three modes (intra,
+  previous frame, ±4-cell integer search in 32-cell blocks). Motion vectors
+  are LZMA-compressed and billed, alongside the header and arithmetic bits.
+  No free encoder-only motion. The current foreground stream's DCVC motion
+  is latent rather than exposed vectors; this tests independent shape motion.
+  Union F only, since both enhancer slots use G_HO; excluding class bits
+  favours the candidate. Reduction uses the same majority cells as lzma,
+  guaranteeing identical binary IoU and boundary distance after upsampling.
+- Correctness smoke: real arithmetic encode/decode on moving shapes, full,
+  empty, random masks, odd dimensions and partial blocks; 12 tests passed.
+  Fleet smoke: 8 real pilot frames, all three modes and exact roundtrips;
+  full stage: all 240 frames, same input and processing path.
+- Budget (a): zero GPU-hours; four CPU jobs, each smoke ≤600 s, full ≤2400 s,
+  total per-job allowance ≤3100 s. No scaled run beyond the four pilots.
+- (b) Decision rule, before any segmentation run: use only already-decoded
+  streams and decoder-available prompts; record any granted prompts as an
+  oracle and bill any actual correction/initialization. Measure F accuracy
+  beside lzma s=8 and score the fixed 4a pairs against `dcvc-venue` at equal
+  adaptation: weighted DISTS mean ≤−10%, ≥3/4 below zero. Exact-free-F is
+  the motivating ceiling; it does not prove every inaccurate mask produces
+  a worse perceptual score. No gate will assume monotonicity without checking.
+- Hypothesis (b): segmentation can find hands but lacks the labelled object
+  identity and outlines that generated B1b's F. Competing explanation:
+  the decoded streams retain enough semantic evidence to recover F without
+  additional information. Audit that interface before allocating a GPU.
+- Budget (b): at most 2 GPU-hours including smokes and failed attempts;
+  every stage ≤45 min. Choose a representative smoke before estimating the
+  number of pairs affordable. A missing decoder interface or oracle that
+  cannot dominate its proposed correction family is a design blocker,
+  not a measured failure of decoder segmentation.
+- CPU submission (revision `f632732c`): P01_107
+  `20261024T082551Z-b86db128` (acknowledged pending). Input mask archive
+  SHA256 `049977f057a367a921255dbf894489b877d85c0f33e1baf2554e0ca1af96799a`;
+  packed environment `pointstream-20261009T214002Z`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`.
+  Command: `python -m experiments.visor.h5_shape --masks {staged:fill_masks}
+  --item ITEM --frames {frames}`; frames 8 smoke / 240 full. No native
+  video encoder or decoder is used by this CPU shape experiment.
+- CPU submission P02_02: `20261024T082613Z-c3ff4ae0` (pending at
+  acknowledgement); same revision and staged inputs as P01_107.
+- CPU submission P03_10: `20261024T082655Z-eb51efd6` (pending at
+  acknowledgement). P01_107's real smoke completed three exact roundtrips;
+  smoke rates are infrastructure checks, not pilot evidence.
+- CPU submission P09_106: `20261024T082741Z-0dec552f` (acknowledged).
+- CPU full-stage results (240 frames, revision `f632732c`): intra |
+  temporal | motion, kbps: P01_107 44.53 | 14.80 | 15.07;
+  P02_02 50.79 | 24.79 | 25.83; P03_10 50.65 | 21.54 | 22.88;
+  P09_106 15.25 | 11.76 | 10.85. All 12 full encode/decode roundtrips
+  are exact on the reduced union. **Rule (a) fails, 0/4 ≤2 kbps.** This
+  rejects these three configurations, not every possible CAE/motion coder.
+- (b) Concrete configuration, fixed before GPU submission: the pinned
+  B1b SAM 3.1 mask tracker on each saved 4a decoded foreground point,
+  initialized with the first s=8 union mask, actually encoded and decoded
+  with the intra shape coder. No future human prompt is granted. The
+  predictor tracks the union as one object; it does not receive source
+  images, object labels, later masks, or corrections as tracking prompts.
+  Its full-size predictions are majority-reduced to s=8. Send the XOR
+  against the target s=8 union through the temporal shape coder; bill seed,
+  correction payload and two configuration bytes. Decoder XOR roundtrips
+  must recover 4a's exact reduced union on every frame. G_HO is the same
+  in both slots, so class identities cannot change the corrected image.
+- This is a **real corrected-mask configuration**, not a bound on all
+  segmentation/correction methods. Its unchanged binary masks allow the
+  measured 4a composites/metrics to be reused point by point with MASK
+  bytes replaced. Each foreground point has its own correction rate: never
+  apply one point's predictor to other points for free. Uncorrected IoU is
+  reported, not substituted for an unmeasured DISTS score. No claim about
+  uncorrected segmentation's BD-rate is made without scoring it.
+- GPU budget allocation: four jobs capped at 1800 seconds each (sum 2 h),
+  each smoke ≤300 s (8 frames, first point), full ≤1320 s (240 frames,
+  all saved foreground points), validator ≤60 s; remaining allowance for
+  overhead. SAM 3.1 on Ada/A6000 is already in the model–GPU table;
+  runtime/device and full checkpoint load are validated again. Per-point
+  results are saved immediately, preserving completed work if time runs out.
+- Local checks: pinned temporary Python 3.12 environment from `.[dev]`;
+  ruff passed. Initial base-Mac checks were unsuitable (numpy 2 / missing
+  stubs), so no result from them is treated as a project regression.
+  Full pinned pytest: 828 passed, 25 skipped, two platform-sensitive failures
+  (`ps` denied by sandbox; protected dangling `/home/.../Datasets` symlink
+  resolution on macOS). Rechecking those outside the sandbox separately.
+- Decoder submission P01_107: `20261024T083129Z-617103d1`, revision
+  `94178029`, pending at acknowledgement; ≤1800 seconds (0.5 GPU-hours).
+  No other decoder jobs submitted until this smoke is inspected.
+- Review correction before promoting decoder work: saved `decoded.mkv`
+  contains mask-placed G_HO enhancement, so using it directly is circular.
+  Cancelled only our job `20261024T083129Z-617103d1` after 50.6 s
+  (0.0141 GPU-hours), retaining its smoke artifacts but **excluding them
+  from scientific evidence**. This is a methodological error, not a SAM
+  failure. The corrected entrypoint independently decodes `stream.psdc`
+  with the matching stock/venue weights before loading SAM. Both native
+  decoder passes must agree. SAM then sees raw pre-enhancement RGB only.
+  Decoder processes finish before SAM is loaded, avoiding simultaneous
+  codec/tracker GPU memory. The saved enhanced frames supply no pixels.
+- Remaining allocation: first corrected job ≤1740 s, other three ≤1800 s;
+  plus the cancelled 50.6 s totals at most 7190.6 s (<2 GPU-hours). Full
+  first job ≤1260 s; no retry may exceed this aggregate allowance.
+- Corrected decoder submission P01_107: `20261024T083446Z-1d84eea5`,
+  revision `cf692902`, pending at acknowledgement. Native stream decoding
+  also requires the image checkpoint and matching stock/venue video weights;
+  these are staged by SHA256 (full identities in the job's spec).
+- Pinned local mypy now passes (183 files). The two platform-sensitive
+  pytest checks were re-run outside the sandbox: process suspension passes;
+  the existing dangling `/home/.../Datasets` symlink guard test still fails
+  on this Mac. It is unrelated to shape coding and remains reported.
+- Corrected raw-input job `20261024T083446Z-1d84eea5` stopped after
+  60.8 seconds: smoke passed (27.7 s), full's first native DCVC double
+  decode differed. No full segmentation numbers are evidence. This is the
+  known native decoder determinism hazard in `docs/fleet.md`, not a mask
+  quality failure. P02_02 `20261024T083702Z-14c3862e` was acknowledged
+  before the full failure was inspected; its own determinism gate remains
+  mandatory and no bad decode is promoted.
+- Next revision saves every native attempt before deciding, retries at most
+  three times as H5's codec path does, and requests exclusive GPUs. Remaining
+  three item allocations ≤1700 seconds each; including P02_02's ≤1800 and
+  the two ended attempts (~111.4 s), the aggregate upper bound is ~7012 s.
+- Additional CPU reading (same 4a fixed pairs and identical binary masks):
+  replacing MASK with the best shape payload gives weighted DISTS
+  +40.9 | +26.2 | +19.9 | −20.5%, mean **+16.6%, 1/4 below zero**;
+  weighted LPIPS +49.2% (1/4). Existing lzma baseline reproduces +93.35%
+  weighted DISTS (1/4) before replacement. PCHIP and upper concave anchor
+  envelope use `h5.compare`; every container segment overhead is billed.
+  `experiments/visor/h5_mask_report.py` records SHA256 identities of its
+  score, shape and correction inputs. This reading confirms failure under
+  the full DISTS rule, beyond the ≤2 kbps feasibility screen.
+- P01_107 exclusive retry: `20261024T083825Z-d68be64f`, code `e740088b`,
+  cap 1700 seconds. P02_02 remains `20261024T083702Z-14c3862e` with its
+  original 1800-second cap; no result is accepted after a differing decode.
+- P02_02 `20261024T083702Z-14c3862e` stopped after ~103 s: a native
+  decoder subprocess segfaulted in full; no full mask evidence. Native
+  process failures now consume one of the same three attempts, with each
+  error retained. The exclusive P01 retry passed smoke and completed its
+  first full native point; it has not yet produced a full SAM result.
+- Revised remaining allocation after P02 ended: P01's current ≤1700 s
+  plus P02 retry, P03 and P09 each ≤1700 s =6800 s. Ended attempts
+  ~215 s give <7015 s aggregate maximum, still under 7200 s. No further
+  retries beyond these jobs without first re-auditing actual elapsed time.
+- P02_02 exclusive retry: `20261024T084111Z-1939a70f`, revision
+  `9e576c04`, ≤1700 s (pending at acknowledgement).
+- P03_10 `20261024T084139Z-eed9df04` and P09_106
+  `20261024T084208Z-f947299c`: code `9e576c04`, each ≤1700 s,
+  acknowledged pending. P01 `20261024T083825Z-d68be64f` stopped after
+  ~80.7 s: a full-stream point failed all three native determinism checks
+  even on an exclusive Ada GPU. Its raw per-attempt reports are retained.
+  This blocks a complete corrected-mask BD-rate curve for P01 at this
+  configuration; **no segmentation verdict follows from it**.
+- P02 exclusive retry `20261024T084111Z-1939a70f` also stopped at the
+  three-attempt native gate in full. P03/P09 continue under their existing
+  caps. **The requested full corrected-mask BD-rate result is blocked by
+  native decoder reliability, not established as a pass or fail.**
+- Revised bounded diagnostic, declared before full SAM results: first
+  stock foreground point `dcvc@0/4`, 240 frames on each item, with the
+  identical seed/tracker/correction pipeline. Four jobs ≤600 s each,
+  smoke ≤180 s (8 tracked frames), full ≤300 s, validator ≤60 s.
+  This tests whether that concrete decoder-mask configuration meets 2 kbps;
+  it cannot rule out other points, segmenters, or correction coders, and
+  cannot replace the missing full BD-rate curve. No extrapolated quality
+  or rate is reported as a measured result. P09's stock point is not on
+  4a's selected hull (its corresponding point used venue weights).
+- Budget reserve: four diagnostic caps =2400 s, remaining P03/P09 caps
+  =3400 s, plus ended jobs <450 s; total <6250 s (<2 GPU-hours). This
+  diagnostic is cheaper than changing or re-encoding the codec ladder,
+  which is outside this card's mask work.
+- Diagnostic P01_107: `20261024T084521Z-bc72ff4d`, revision `74bd6d57`,
+  ≤600 s; pending at acknowledgement.
+- Final local checks at `9e576c04` implementation: ruff and mypy pass
+  (184 files); full pytest outside sandbox: **830 passed, 24 skipped,
+  1 failed**, the pre-existing macOS protected-symlink test. All 50
+  PointStream tests pass. Linux CI is still required for the platform case.
+- Diagnostics, same code and ≤600 s each: P02_02
+  `20261024T084534Z-c700da3b`; P03_10 `20261024T084607Z-e00640d5`.
+  P03's full-ladder job `20261024T084139Z-eed9df04` and P09's
+  `20261024T084208Z-f947299c` both reached the native validation stop;
+  neither supplies full mask-curve evidence.
+- Diagnostic P09_106: `20261024T084640Z-668afb3e`, code `74bd6d57`,
+  complete and validated, as are the other three diagnostics. P09's first
+  saved **stock** point is actually `dcvc@42/2`, not `dcvc@0/4`; the
+  earlier description assumed an existing point that its stock archive
+  does not contain. Selection was by first saved point, before results.
+  This limits its interpretation to that ½-resolution point.
+- Full diagnostics (240 frames, Ada, exact corrected grid): P01_107
+  27.30 kbps; P02_02 61.33; P03_10 30.00; P09_106 13.29. All exceed
+  2 kbps. Unreduced SAM IoU against the s=8 reference mask is respectively
+  0.827, 0.716, 0.383, 0.654; this is not IoU against original F.
+- Actual GPU use from all eleven supervisors' ended−started times:
+  **1141.39 seconds =0.3171 GPU-hours of 2**, including every failed and
+  cancelled attempt. All jobs are terminal; no GPU work remains running.
+- Final descriptive CPU accuracy audit: compare saved reduced predictions
+  and corrected grids against original B1b F with the existing IoU and
+  symmetric boundary metric. This does not change the decision rule or
+  invent a missing full-curve result. Four items, 8-frame smoke / 240-frame
+  full, no GPU; input NPZ files and original mask archive SHA256-identified.
+
+### 2026-10-24 — H5p 4d final accuracy and report
+- CPU audit `20261024T095522Z-407e7eda`, code `7ee06ff2`, gpu1 CPU,
+  complete; all four substantive checks pass. Against original B1b F:
+
+  | item | s=8 / corrected IoU | uncorrected client IoU | s=8 boundary px | uncorrected boundary px | billed correction kbps |
+  |---|---|---|---|---|---|
+  | P01_107 | 0.9765 | 0.8239 | 5.86 | 23.11 | 27.30 |
+  | P02_02 | 0.9876 | 0.7164 | 33.33 | 34.52 | 61.33 |
+  | P03_10 | 0.9829 | 0.3809 | 4.39 | 90.43 | 30.00 |
+  | P09_106 | 0.9548 | 0.6521 | 4.27 | 113.83 | 13.29 |
+
+  Corrections recover lzma s=8's binary grid exactly. The uncorrected
+  client mask here is the actual reduced/upsampled SAM prediction, not
+  the unreduced predictor scored in the diagnostic's initial log.
+  The boundary statistic includes dropped small instances (H5p 2 caveat).
+- Limitation: this measures a SAM tracker initialized by a billed union
+  mask and exact residual coding at one saved stock point. It is not a
+  zero-prompt segmenter, not a bound on arbitrary segmentation/correction
+  schemes, and not a complete production decoder: independent receiver
+  repeatability of SAM predictions has not been verified. Even granting
+  that repeatability, this measured correction profile misses 2 kbps.
+  No uncorrected DISTS or full corrected-mask BD-rate is invented.
+- All jobs are terminal. No Wan-Animate or 34-window run was launched.
+  Raw job outputs, failed native attempts, source archives and masks remain
+  preserved in their original external-data locations.
+
+## Report: H5p 4d (2026-10-24)
+- Stopped because: user decision needed. The bounded shape test is decided;
+  continuing the full decoder-mask curve requires reliable raw native
+  decodes after the documented three-attempt gate failed, and a separate
+  choice about repairing/re-encoding that ladder. No more GPU work is queued.
+- Decision by the rule: (a) fail: 0/4 reach 2 kbps, weighted DISTS +16.6%
+  (1/4 below zero) after exact-mask rebilling. (b) full rule not reached:
+  native decoding blocks the curve. The four completed single-point
+  SAM/correction diagnostics all miss 2 kbps; this does not reject every
+  decoder segmentation method. Exact free masks still do not fix the
+  established LPIPS loss (+16% on 4a's pairs).
+- Numbers: best shape rates 14.80 | 24.79 | 21.54 | 10.85 kbps;
+  SAM plus billed initialization/corrections 27.30 | 61.33 | 30.00 | 13.29.
+  Jobs, revisions, model/GPU records, inputs, native paths and hashes are
+  recorded above and in the read-only evidence bundle. CPU shape jobs:
+  `20261024T082551Z-b86db128`, `…082613Z-c3ff4ae0`,
+  `…082655Z-eb51efd6`, `…082741Z-0dec552f`; diagnostic jobs:
+  `…084521Z-bc72ff4d`, `…084534Z-c700da3b`,
+  `…084607Z-e00640d5`, `…084640Z-668afb3e` (all complete).
+- Budget: **0.3171 of 2 GPU-hours**, all eleven ended supervisor durations
+  included; CPU shape coding and final accuracy audit use zero GPU-hours.
+- Branch and commits: `codex/h5p-4d-mask`; shape code `f632732c`,
+  diagnostic code `74bd6d57`, accuracy code `7ee06ff2`. Current main merged
+  to preserve concurrent work. Ruff and mypy pass (189 files after merge).
+  Full pytest: 834 passed, 24 skipped, one existing macOS protected-symlink
+  test failure; all 50 PointStream tests pass. Linux CI must check that case.
+- Deviations: stopped an initially circular enhanced-input smoke (charged,
+  excluded); switched to raw pre-enhancement native decoding. Native
+  mismatches/crashes prevented full curves; added a smaller diagnostic.
+  P09's first stock point is 42/2, others 0/4. No general failure of
+  decoder segmentation is claimed from these restrictions.
+- Open for the user: whether to commission native-decoder repair and then
+  the complete decoder-mask curve; current evidence supports no adoption.
+- Proposed next step: retain lzma as the current codec and the negative
+  shape/correction results. A separate decoder repair pilot needs its own
+  bounded budget; this card authorizes no further runs.
+- Evidence bundle: `pointstream-data/visor/h5-2026-10-16/report-h5p4d-7ee06ff2-20261024.tar.gz`,
+  SHA256 `383b34b10c838b883e21308e22344cdd28dba4c0eb404d3e12734a52719a0565`.
+  Contains the report, complete numerical inputs, per-job records, native
+  attempt metadata, CPU/GPU validations, source input identities and manifest.
+  Uploaded to the external data root and made read-only; original jobs remain.
+- Publication: [PR #233](https://github.com/emanuele-artioli/PointStream/pull/233),
+  merge-commit auto-merge requested after required checks; evidence/report
+  commit `f1902471`. The PR preserves the unresolved full-curve result.
