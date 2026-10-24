@@ -1,0 +1,39 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$(git rev-parse --show-toplevel)\" && python3 -m tools.agent_hooks.session_start",
+            "timeout": 30,
+            "statusMessage": "Checking branch and dispatch ledger"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$(git rev-parse --show-toplevel)\" && python3 -m tools.agent_hooks.guard_large_read",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$(git rev-parse --show-toplevel)\" && python3 -m tools.agent_hooks.guard_protected",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -163,6 +163,18 @@ the decision rule's result so far; the root session's address; open questions
 for the user. Drop logs, file dumps, wait output and dead ends already
 recorded in files.
 
+## Claude Code and Codex
+
+Both work in this repository under the same rules; this file is the
+instructions for both. The hooks in `tools/agent_hooks/` run under both:
+`.claude/settings.json` wires them for Claude Code, `.codex/hooks.json` for
+Codex (trust them once with `/hooks`). Claude Code's settings also deny edits
+in `Models`/`Datasets`, force pushes and `git reset --hard`; under Codex
+`guard_protected.py` enforces the same. Where a document names a Claude Code
+tool, Codex uses its own equivalent
+([sessions](docs/sessions.md#codex)): sessions reach each other only through
+the user and the repository, and model tiers map to reasoning effort.
+
 ## Paper repository
 
 The manuscript is the Overleaf git project `67a9ea6275d3d9785ce57026`
