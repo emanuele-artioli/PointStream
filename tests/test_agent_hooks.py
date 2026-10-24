@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from tools.agent_hooks import guard_large_read as guard
+from tools.agent_hooks import guard_protected as protected
 from tools.agent_hooks import ledger, session_start
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -146,3 +147,51 @@ def test_settings_wire_both_hooks() -> None:
     commands = json.dumps(settings["hooks"])
     assert "tools.agent_hooks.session_start" in commands
     assert "tools.agent_hooks.guard_large_read" in commands
+
+
+# Codex: same hook scripts, Codex's payloads (tool_name "Bash" / "apply_patch").
+
+
+def test_codex_bash_payload_hits_the_large_read_guard(tmp_path: Path) -> None:
+    _long(tmp_path, "job.log", 400)
+    payload = {"tool_name": "Bash", "tool_input": {"command": "cat job.log"}, "cwd": str(tmp_path), "turn_id": "t"}
+    message = guard.check(payload)
+    assert message is not None and "grep -nE" in message
+
+
+def test_force_push_and_hard_reset_are_blocked() -> None:
+    def blocked(command: str) -> bool:
+        return protected.check({"tool_name": "Bash", "tool_input": {"command": command}}) is not None
+
+    assert blocked("git push --force origin main")
+    assert blocked("git push -f origin x")
+    assert blocked("git -C repo push origin +main")
+    assert blocked("cd x && git reset --hard origin/main")
+    assert not blocked("git push --force-with-lease -u origin claude/x")
+    assert not blocked("git push -u origin claude/x")
+    assert not blocked("git reset --soft HEAD~1")
+    assert not blocked("git commit -m 'reset'")
+
+
+def test_patches_into_models_or_datasets_are_blocked(tmp_path: Path) -> None:
+    def blocked(patch: str) -> bool:
+        payload = {"tool_name": "apply_patch", "tool_input": {"command": patch}, "cwd": str(tmp_path)}
+        return protected.check(payload) is not None
+
+    assert blocked("*** Begin Patch\n*** Update File: Datasets/manifests/x.json\n@@\n-a\n+b\n*** End Patch\n")
+    assert blocked("*** Begin Patch\n*** Add File: /home/itec/emanuele/Models/YOLO/w.pt\n+x\n*** End Patch\n")
+    assert blocked("*** Begin Patch\n*** Update File: src/a.py\n*** Move to: Models/a.py\n*** End Patch\n")
+    assert not blocked("*** Begin Patch\n*** Update File: src/segmentation/storage.py\n@@\n-a\n+b\n*** End Patch\n")
+    link = tmp_path / "data"
+    link.symlink_to("/home/itec/emanuele/Datasets", target_is_directory=True)
+    assert blocked("*** Begin Patch\n*** Add File: data/new.txt\n+x\n*** End Patch\n")
+
+
+def test_codex_hooks_file_runs_the_same_scripts() -> None:
+    config = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
+    hooks = config["hooks"]
+    assert hooks["SessionStart"][0]["matcher"] == "startup|resume|compact"
+    commands = json.dumps(hooks)
+    for module in ("session_start", "guard_large_read", "guard_protected"):
+        assert f"tools.agent_hooks.{module}" in commands
+    assert "git rev-parse --show-toplevel" in commands

@@ -6,6 +6,9 @@ compaction. This hook blocks:
 - Read without `limit` on a file over LIMIT_LINES lines (LOG_LIMIT_LINES for logs);
 - a Bash `cat`/`less`/`more`/`bat` whose output reaches the session, on such a file.
 
+Claude Code (.claude/settings.json) and Codex (.codex/hooks.json) both run it;
+Codex has no Read tool, so there only the Bash check applies.
+
 Blocking exits with code 2; the message on stderr tells the session what to
 do instead (search, a line range, or the tail plus error lines). Reads with
 an explicit range, piped or redirected output, and short files pass.
@@ -54,7 +57,10 @@ def advice(path: Path, lines: int) -> str:
             f"`grep -nE 'Error|Traceback|WARN' {path} | head -n 40`"
         )
     else:
-        how = "search it (Grep) or read a line range (Read with offset and limit)"
+        how = (
+            f"search it (`grep -n PATTERN {path}`) or read a line range "
+            f"(`sed -n '1,200p' {path}`, or Read with offset and limit)"
+        )
     return f"{path} has {lines} lines; reading it whole would fill the context. Instead, {how}. (AGENTS.md, Context and compaction)"
 
 

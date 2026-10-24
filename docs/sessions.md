@@ -90,8 +90,9 @@ minutes) so the cache survives them. Local desktop sessions were checked on
 
 ## Hooks
 
-`.claude/settings.json` runs two hooks from `tools/agent_hooks/` (standard
-library only, tested in `tests/test_agent_hooks.py`):
+`.claude/settings.json` (Claude Code) and `.codex/hooks.json` (Codex) run
+these hooks from `tools/agent_hooks/` (standard library only, tested in
+`tests/test_agent_hooks.py`):
 
 - **SessionStart** (`session_start.py`): after a compaction, prints the
   branch, uncommitted files, last commits and a reminder to re-check fleet
@@ -104,6 +105,9 @@ library only, tested in `tests/test_agent_hooks.py`):
   session, on such a file; logs (`.log`, `.out`, `.err`) at 300 lines. The
   message says what to do instead. Ranged reads and piped or redirected
   output pass.
+- **PreToolUse, Codex only** (`guard_protected.py`): blocks patches into
+  `Models`/`Datasets`, force pushes (`--force-with-lease` passes) and
+  `git reset --hard`, which Claude Code's settings deny natively.
 
 ## The report
 
@@ -135,3 +139,29 @@ Cards say how hard their item is, so cheaper models take the easier ones.
   re-scoring saved outputs), small fleet runs.
 - **Haiku:** mechanical, fully specified work: collecting files, rendering
   crops for a visual check, refreshing a table.
+
+## Codex
+
+Codex sessions follow the same protocol. What differs:
+
+- **Reports and cards.** Codex cannot message other sessions or show cards.
+  An item session ends its last reply with the report and writes the same
+  text into its experiments entry, then pushes; the user forwards it, or
+  the root session reads it from the pushed branch. The root session writes
+  a card as a prompt the user pastes into a new Codex session.
+- **Model per card.** Codex runs `gpt-6.1-sol` (AGENTS.md); the tier
+  becomes reasoning effort: Opus work at `high`, Sonnet work at `medium`,
+  Haiku work at `low`.
+- **Waiting on the fleet.** Use the native heartbeat in
+  [fleet](fleet.md#monitoring-from-the-submitting-chat), or
+  `scripts/ps-fleet wait` as a Claude Code session does.
+- **Compaction.** `/compact` and automatic compaction work as in Claude
+  Code; the SessionStart hook runs after both. Codex's prompt cache is
+  automatic and its lifetime is not set by us (minutes, not guaranteed an
+  hour), so compacting before a long wait pays off more than in Claude Code.
+- **Hooks and blocks.** `.codex/hooks.json` runs the same SessionStart and
+  large-read hooks, plus `guard_protected.py`, which blocks what Claude
+  Code's settings deny. Codex loads project hooks only once the project is
+  trusted and the hooks are reviewed with `/hooks`.
+- **Archiving.** As in Claude Code, a session says it is ready to be
+  archived; the user archives it.
