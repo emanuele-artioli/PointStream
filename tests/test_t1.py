@@ -49,3 +49,38 @@ def test_rate_relaxation_keeps_all_mask_and_container_framing():
     assert relaxed < len(packed)
     assert relaxed > len(background) + len(mask)
     assert relaxed == sum(decoded.breakdown().values()) - len(foreground)
+
+
+def test_cpu_encoder_defers_cuda_and_honors_its_cpu_subset(tmp_path, monkeypatch):
+    import argparse
+    import struct
+    import sys
+    from fractions import Fraction
+    from types import SimpleNamespace
+    from experiments.tennis import t1_oracle
+    from src.codecs import svtav1
+
+    def forbidden_cuda():
+        raise AssertionError('CPU encoder worker touched CUDA')
+
+    monkeypatch.setitem(sys.modules, 'torch', SimpleNamespace(cuda=SimpleNamespace(empty_cache=forbidden_cuda)))
+    monkeypatch.setattr(t1_oracle.k6, 'scaled_size', lambda _: (8, 8))
+    called = {}
+
+    def encode(source, work, **kwargs):
+        called.update(kwargs)
+        stream, decoded = work / 'stream.ivf', work / 'decoded.yuv'
+        stream.write_bytes(b'DKIF' + struct.pack('<HH', 0, 32) + b'\0' * 24 + struct.pack('<IQ', 1, 0) + b'x')
+        decoded.write_bytes(b'\0' * (8 * 8 * 3 // 2))
+        return {'stream': str(stream), 'decoded': str(decoded), 'cpus': kwargs['cpus']}
+
+    monkeypatch.setattr(svtav1, 'code', encode)
+    streams = tmp_path / 'streams'
+    streams.mkdir()
+    result = t1_oracle.encode(argparse.Namespace(encoder='svt', decoder='dav1d', threads=32), ('svt', 62, 1),
+                              np.zeros((1, 8, 8, 3), np.uint8), {'frames': 1, 'fps': Fraction(50)},
+                              tmp_path / 'work', streams, 'anchor', cpus=[2, 3], defer_rgb=True)
+    assert called['cpus'] == [2, 3] and called['threads'] == 2
+    assert result['_native_yuv'].endswith('decoded.yuv')
+    from pathlib import Path
+    assert not Path(result['decoded']).exists()
