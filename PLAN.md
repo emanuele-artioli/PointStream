@@ -157,7 +157,7 @@ marked `card ready` is waiting for the user to start it.
 | K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | reported 2026-10-24: no cut in 052; registration gate 80% vs 67% pooled (hypothesis); 0 of 0 GPU-hours |
 | T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | reported 2026-10-24: CPU players/rackets 0.47–3.37%, MASK s=8 12.39–58.66 kbps; ball masks absent, scope choice pending; oracle not run; 0 of 4 GPU-hours |
 | K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
-| H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask` | Codex high | reported 2026-10-24: shape target fails (+16.6% wDISTS); decoder diagnostic 13.3–61.3 kbps, full curve blocked by native decode; 0.3171 GPU-hours of 2 |
+| H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask`, PR #233 | Codex high | reported 2026-10-24: shape target fails (+16.6% wDISTS); decoder diagnostic 13.3–61.3 kbps, full curve blocked by native decode; 0.3171 GPU-hours of 2 |
 
 **T1: the split on tennis, F billed.** With every keypoint renderer
 closed for hands and stalled at 67% for players, tennis's open question

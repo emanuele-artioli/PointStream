@@ -1020,3 +1020,6 @@ the decisions are in [experiments.md](../experiments.md).
   Contains the report, complete numerical inputs, per-job records, native
   attempt metadata, CPU/GPU validations, source input identities and manifest.
   Uploaded to the external data root and made read-only; original jobs remain.
+- Publication: [PR #233](https://github.com/emanuele-artioli/PointStream/pull/233),
+  merge-commit auto-merge requested after required checks; evidence/report
+  commit `f1902471`. The PR preserves the unresolved full-curve result.
