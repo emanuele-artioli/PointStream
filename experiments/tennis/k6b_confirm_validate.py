@@ -35,7 +35,7 @@ def strict_won(anchors: dict[str, dict[str, float]], metric: str, rate: float, v
     if rate < hull[0][0] or rate > hull[-1][0]:
         return {'resolved': False, 'rate': rate, 'value': value, 'reason': 'unbracketed rate', 'won': None}
     bar = -float(np.interp(rate, [p[0] for p in hull], [p[1] for p in hull]))
-    return {'resolved': True, 'rate': rate, 'value': value, 'envelope': bar, 'won': value < bar}
+    return {'resolved': True, 'rate': rate, 'value': value, 'envelope': bar, 'won': bool(value < bar)}
 
 
 def check_anchor_rows(manifest: dict[str, Any], inputs: dict[str, Any], summary: dict[str, Any]) -> None:
@@ -116,7 +116,7 @@ def reference_index(row: dict[str, Any], poses: dict[str, Any], player: str) -> 
 
 
 def check_prepare_references(root: Path, summary: dict[str, Any], anchors: dict[str, Path]) -> None:
-    from experiments.tennis.k4 import safe
+    from experiments.tennis.k6b import unit_name
     from src.segmentation.masks import decompress
 
     for window in summary['windows']:
@@ -135,7 +135,7 @@ def check_prepare_references(root: Path, summary: dict[str, Any], anchors: dict[
             a = np.load(root / 'publish/units' / (unit['unit'] + '.npz'))
             if a['t'].tolist() != expected or a['judged'].tolist() != [t in row['judged'] for t in expected]:
                 raise ValueError('Prepared target/score coverage differs')
-            if not unit['unit'].startswith(safe(wid) + '__'):
+            if unit['unit'] != unit_name(wid, player):
                 raise ValueError('Cross-window player unit')
 
 

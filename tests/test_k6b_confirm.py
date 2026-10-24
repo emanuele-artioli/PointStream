@@ -12,7 +12,7 @@ def manifest():
             'old_clips': [f'old/{i}' for i in range(49)],
             'clips': [{'id': c, 'frames': 240 + 2*s, 'fps': fps, 'sha256': sha,
                        'review_frames': [s + 120], 'staged': {'sha256': sha},
-                       'registration': [{'fits': True, 'homography': np.eye(3).tolist()} for _ in range(240)]}
+                       'registration': [{'frame': s+t, 'fits': True, 'homography': np.eye(3).tolist()} for t in range(240)]}
                       for c, s, fps, sha in FROZEN]}
 
 
@@ -39,7 +39,7 @@ def test_manifest_rejects_scope_source_overlap_and_placement_corruption():
         m['clips'][0][key] = value
         with pytest.raises(ValueError):
             check_manifest(m)
-    for mutate in ('duplicate', 'overlap', 'scope', 'gate', 'budget'):
+    for mutate in ('duplicate', 'overlap', 'scope', 'gate', 'budget', 'registration_frame'):
         m = deepcopy(source)
         if mutate == 'duplicate':
             m['clips'][1] = m['clips'][0]
@@ -49,8 +49,10 @@ def test_manifest_rejects_scope_source_overlap_and_placement_corruption():
             m['provenance']['claim_scope'] = 'independent_confirmation'
         elif mutate == 'gate':
             m['clips'][0]['registration'][:13] = [None]*13
-        else:
+        elif mutate == 'budget':
             m['budget_gpu_hours'] = 9
+        else:
+            m['clips'][0]['registration'][0]['frame'] += 1
         with pytest.raises(ValueError):
             check_manifest(m)
 
@@ -121,3 +123,20 @@ def test_reference_uses_first_fitted_scored_source_and_retains_missingness():
     assert reference_index(row, poses, 'p') == 2
     with pytest.raises(ValueError):
         reference_index({'scored': [1]}, poses, 'p')
+
+
+def test_descriptive_verdict_keeps_all_cells_and_never_passes_early():
+    from experiments.tennis.k6b_confirm_report import verdict
+
+    def rows(n, billed_wins, unbilled_wins):
+        return [{'match': 'alcaraz_hurkacz' if i < 6 else 'medvedev_struff',
+                 'billed': {m: {'won': 2*i+j < billed_wins} for j,m in enumerate(('lpips','dists'))},
+                 'unbilled': {m: {'won': 2*i+j < unbilled_wins} for j,m in enumerate(('lpips','dists'))}}
+                for i in range(n)]
+    assert verdict(rows(9, 18, 18))['decision'] == 'incomplete; no interim pass'
+    assert verdict(rows(12, 18, 18))['decision'] == 'descriptive billed bar reached'
+    assert verdict(rows(12, 17, 18))['decision'] == 'user judgment: unbilled bar only'
+    assert verdict(rows(12, 17, 17))['decision'] == 'descriptive criterion failed'
+    v = verdict(rows(6, 0, 0))
+    assert v['decision'].startswith('futility:')
+    assert v['scores']['unbilled']['maximum_possible_wins'] == 12

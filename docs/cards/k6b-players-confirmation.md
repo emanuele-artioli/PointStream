@@ -13,12 +13,14 @@ confirmation. The stronger confirmation goal remains blocked. Step 5 remains fai
 
 ## Scope and stop conditions
 User approval (2026-10-24): **8 GPU-hours hard ceiling**, all smoke/failed/retry
-work included, contingent on CPU provenance validation. **0 spent**. CPU source
+work included. Explicit clip-local scope approval resolves the earlier
+provenance condition for this diagnostic. **0.07568 spent** before the current
+feature job; live accounting and job IDs are in the experiment entry. CPU source
 checks found no original Alcaraz/Medvedev videos or verified extraction receipts
 in the inspected archive/records; source-frame mapping remains unresolved.
-Independent-source confirmation stays blocked at that gate. The current
-preparation phase is CPU-only. The user has now explicitly approved the narrower
-diagnostic scope below within the existing ceiling; remaining CPU validation
+Independent-source confirmation stays blocked at that gate. The original
+preparation/recovery phase ended CPU-only; the user has now instructed execution
+under the approved narrower scope and existing ceiling. Remaining CPU validation
 and staged compute gates still apply. This scope approval does not pass
 the unresolved original-source confirmation gate. No fitting, Wan-Animate or other task is
 included. The authorization/outcome continuation is appended to the experiment
@@ -45,10 +47,10 @@ remain uncertain. The original-source gate remains unresolved. No window,
 registration threshold, quality criterion or budget changed. The 115 px gate
 stays exploratory; reference and exact matte remain granted/unbilled.
 
-The latest user-directed phase is CPU-only and is now complete: **0 of 8 GPU-hours
-spent**. No GPU work starts in this phase. Any later GPU diagnostic keeps all
+That recovery phase ended CPU-only at 0 GPU-hours. Current authorized
+execution is recorded in the latest experiment entry. The GPU diagnostic keeps all
 12 windows, reports the source uncertainty and two-match clustering explicitly,
-and must implement/validate the existing GPU validator and pass smoke/pilot
+and must pass the implemented GPU validators and smoke/pilot
 budget gates. The historical step-5 fail is unchanged. Durable report/evidence
 addresses and hashes are in the appended experiment outcome.
 
@@ -97,8 +99,8 @@ has explicit user scope approval (2026-10-24). Separate clip hashes alone
 do not prove source-frame independence. Known judge training overlap blocks
 judging; unknown upstream pretraining exposure remains disclosed.
 
-Remaining CPU prerequisites for the diagnostic: implement/test the substantive
-validator below; freeze its manifest, scoring indices and code hashes; recheck
+Before scaling the diagnostic: pass the implemented substantive validators
+below; freeze the manifest, scoring indices and code hashes; recheck
 staged input/checkpoint bytes and dependency/reference joins against receipts;
 validate clip-local frame/PTS/fps and codec alignment. Do not demand unavailable
 original PTS as a diagnostic execution check or label it verified. A mismatch,
@@ -128,8 +130,8 @@ interim pass; futility stop only if all remaining wins cannot reach the bar.
 stop resolves provenance, validates gate discrimination, overturns step 5 or
 supports independent-sample inference; report the two match clusters.
 
-Implement and test the substantive validator from the experiment entry before
-GPU dispatch (approved scope; only after CPU prerequisites pass): hashes and
+Use the implemented substantive validators from the experiment entry at each
+stage (approved scope; CPU checks before each required promotion): hashes and
 dependency/overlap joins, verified clip-local PTS/frame/fps exactness,
 227/228 gate boundaries and invalid homographies, identical mask/index sets,
 keypoint round trip, generated coverage/nonflatness, reference membership,
@@ -150,7 +152,8 @@ bounded fleet wait. No recurring monitors. Preserve evidence read-only and
 write new outputs under Datasets. Run project checks, commit/push scoped work,
 report here. Scope and ceiling are approved; GPU execution still requires the
 remaining CPU prerequisites and staged gates to pass;
-0 of 8 GPU-hours spent. No fitting, source download, other chat, recurring
+0.07568 of 8 GPU-hours spent before the current feature job. No fitting,
+source download, other chat, recurring
 monitor or auto-merge attempt is authorized by this continuation.
 
 ## Scope approval recorded (2026-10-24)
@@ -159,7 +162,8 @@ diagnostic despite unresolved original-source/replay independence** (“I approv
 it”), using the unchanged 12 windows, frozen rule/recipe, identical-window
 anchors and existing 8 GPU-hour ceiling, subject to CPU validation and staged
 smoke/pilot gates. No further scope or budget approval is pending within these
-limits. Estimated total remains 6–8 GPU-hours; 0 spent. This authorization
+limits. Estimated total remains 6–8 GPU-hours; current accounting is in the
+experiment entry. This authorization
 cannot deliver the original stronger confirmation claim or mark its gate passed.
 The user subsequently explicitly instructed execution (“If not, do so”).
 Run the CPU validator prerequisites and staged diagnostic within these limits;

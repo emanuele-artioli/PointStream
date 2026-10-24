@@ -66,6 +66,8 @@ def check_manifest(manifest: dict[str, Any]) -> dict[str, list[int]]:
             raise ValueError(f"Wrong centered frame placement: {cid}")
         if c["staged"]["sha256"] != digest:
             raise ValueError(f"Staged source mismatch: {cid}")
+        if any(r is not None and r.get("frame") != start+t for t, r in enumerate(c["registration"])):
+            raise ValueError(f"Misaligned native registration frame: {cid}")
         gates[wid] = gate(c["registration"])
         # All 12 frozen windows passed in the original pre-quality audit.
         if len(gates[wid]) < 228:

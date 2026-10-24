@@ -2011,7 +2011,7 @@ a weaker claim automatically.
   confirms literal `{staged:manifest}` FileNotFoundError. No source/model or
   quality failure. Both failed attempts total272.43 s = **0.07568/8 GPU-h**.
 - Read the retained0.91 MB smoke masks/poses and independently ran the repaired
-  validator on CPU before another GPU attempt: **all20 checks pass**,480 frames,
+  validator on CPU before another GPU attempt: **all19 checks pass**,480 frames,
   including actual feature/mask recomputation, source placement/hash, native
   SAM/CUDA policy and peak limits. Local receipt
   `/tmp/k6b-confirm-smoke-v2-validation.json`; raw smoke artifacts remain
@@ -2040,3 +2040,40 @@ a weaker claim automatically.
   No new environment or provider, no model recipe change. Native mask/pose
   validation remains in the pinned main environment. Original-source gate
   stays unresolved; exact matte/reference remain granted.
+
+- Resumed commit/push now succeeds after the usage-limit reset. Third feature
+  job **`20261024T193537Z-12dffb55`**, code `769833b5`, returnedpending; spec SHA256
+  `4a12b3442a59916c5b5677e4f5797c062f1e61f3a31a3a1a5ba7e3752f67d1f0`. Renewed deadline2026-10-24T20:19:25Z,
+  reservation2700 s; GPU spend before this job0.07568/8 h. Receipt
+  `/tmp/k6b-confirm-features-submit-v3.json`. No implicit replay of old jobs.
+
+- CPU geometry-pack smoke/reconstruction passes on the two retained source
+  windows:10 checks, every file byte and geometry-only scoring index/R mask
+  recomputed. Pack SHA256
+  `348a32de99c9e6c43f6f3f67340a478e8b72ea101f93ad9a6fb554041a0f1d42`;
+  this is CPU plumbing evidence, not a new quality result or a full-cohort pack.
+- Reporter fixes the denominator at24 cells, forbids interim success and
+  extrapolation, separates billed/unbilled and base-charged comparisons,
+  records per-window/match metrics/missingness and both duration conventions.
+  Keypoint entropy rates pool **all12 source-code symbol sets** even for a
+  pilot/futility report; compute those before deciding on partial generations.
+  No source-code frequency choice depends on generated quality. No BD-rate is
+  fabricated from the single frozen renderer point.
+- Frozen checkpoint archives freshly hashed without loading tensors: base
+  `075b001a…3285`, Alcaraz `f1a488f2a3ddecf57cff451801f64bc07ae652c2b8b998d4ac844ba8685f5fa2`,
+  Medvedev `5fc200fc50f5af68e561fa10baba54520043e5770555712caf6e89092b175427`.
+  The actual shipped tennis-base checkpoint is48,878,567 bytes; primary treats
+  it as common decoder data, alternative reports that payload charged over2 h.
+  Trained adapter/guider still billed once per match over2 h; reference and
+  exact target matte remain granted/unbilled in every comparison.
+
+- Full local suite with process inspection allowed:850 passed,24 skipped,1
+  unchanged macOS protected-path symlink test failure. Ruff and mypy pass
+  (200 files). Later small validation/report refinements pass focused tests.
+- CPU receipt archive published separately as
+  `tennis/k6b-confirm-20261024-execution/cpu-preflight-20261024T1952Z.tar.gz`,
+  SHA256 `60d90908eb26061969e16a54863d3d0e3b6a47dbbd2d1e046d7517410b2035be`,
+  1,523 bytes. It identifies the native validator and source feature job; it
+  is infrastructure/CPU proof, not a paper quality result. Prior raw jobs and
+  archives retained. Native registration-frame alignment now checked directly;
+  all12 pass the strengthened CPU gate without changing the manifest.
