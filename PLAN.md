@@ -81,8 +81,10 @@ sessions update their own items and their files in `docs/experiments/`
   paid for. The key carrier is the candidate for small-F domains. The crops for the
   visual check are ready (user). The egocentric claim is the user's to
   reframe; small-F domains (tennis) are where F's rate matters least.
-  Next for egocentric: H5p 4d, a mask under about 2 kbps (binary shape
-  coding, or F derived at the client); card ready.
+  H5p 4d (2026-10-24): binary shape coding costs 10.9–24.8 kbps and
+  still fails (+16.6% weighted DISTS); decoder corrections cost 13.3–61.3
+  kbps at one point per item. The full decoder curve is blocked by native
+  decode instability; exact free masks still do not fix LPIPS.
 - **Background (G):** a scene model adapted to the venue, sent beforehand
   and unbilled (payback hours reported), plus a per-video enhancer route
   (G6).
@@ -155,7 +157,7 @@ marked `card ready` is waiting for the user to start it.
 | K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | reported 2026-10-24: no cut in 052; registration gate 80% vs 67% pooled (hypothesis); 0 of 0 GPU-hours |
 | T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | reported 2026-10-24: CPU players/rackets 0.47–3.37%, MASK s=8 12.39–58.66 kbps; ball masks absent, scope choice pending; oracle not run; 0 of 4 GPU-hours |
 | K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
-| H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask` | Codex high | card ready 2026-10-24 ([card](docs/cards/h5p-4d.md)) |
+| H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask`, PR #233 | Codex high | reported 2026-10-24: shape target fails (+16.6% wDISTS); decoder diagnostic 13.3–61.3 kbps, full curve blocked by native decode; 0.3171 GPU-hours of 2 |
 
 **T1: the split on tennis, F billed.** With every keypoint renderer
 closed for hands and stalled at 67% for players, tennis's open question
@@ -185,10 +187,13 @@ previous one, a video codec on the signed distance, a key colour) costs
 36–116 kbps, and billed it removes the split's win. The ceiling is H5p 4b:
 the exact F at zero bits wins weighted DISTS (−15%) and still loses
 weighted LPIPS (+16%), so a mask can at best restore the DISTS win, within
-about 2 kbps. Two routes are untested: binary shape coding with motion
+about 2 kbps. 4d tests two further routes: binary shape coding with motion
 prediction (MPEG-4's context-based arithmetic coding; CPU), and F derived
 at the client from the decoded streams by the same segmenter (no bits, or
-a small correction stream).
+a small correction stream). Measured 2026-10-24: shape coding fails
+the rate target and DISTS rule; SAM plus exact corrections also misses 2 kbps
+on the single-point diagnostic. Full decoder-side BD-rate is unresolved
+after native repeatability failures; [record](docs/experiments/h5p.md).
 
 **Handover (2026-10-24).** The Claude Code root session
 (`session_01StNQ6dvxYRHhnMbQymNgNf`) stopped when the weekly Claude
