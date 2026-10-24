@@ -17,6 +17,23 @@ from experiments.visor.b1 import file_sha256, stage_dir, write_json
 from src.pointstream import bitstream as bs, composite as cp, mask as mk
 
 
+def restore_score_prefix(rows: list[dict[str, Any]], previous: dict[str, Any], expected: list[int], window: str) -> list[int]:
+    """Accept only an exact frame prefix of this same set of coded candidates."""
+    if previous['id'] != window or len(previous['rows']) != len(rows):
+        raise ValueError('wrong score checkpoint')
+    completed = [sample['t'] for sample in previous['rows'][0]['samples']]
+    if completed != expected[:len(completed)] or previous['complete_frames'] != len(completed):
+        raise ValueError('score checkpoint is not an exact frame prefix')
+    for row, old in zip(rows, previous['rows']):
+        fields = ['name', 'kind', 'kbps'] + ([k for k in ['actual_kbps', 'background_kbps', 'foreground_kbps', 'mask_kbps'] if k in row])
+        if any(row[k] != old[k] for k in fields) or [sample['t'] for sample in old['samples']] != completed:
+            raise ValueError('score checkpoint configuration mismatch')
+        if any(not all(np.isfinite(sample[key]) for key in METRICS) for sample in old['samples']):
+            raise ValueError('score checkpoint has nonfinite metrics')
+        row['samples'] = list(old['samples'])
+    return completed
+
+
 def score(args: argparse.Namespace) -> int:
     import torch
     from src.codecs.quality import load_lpips
@@ -34,6 +51,7 @@ def score(args: argparse.Namespace) -> int:
     truth = np.load(bundle / 'truth.npy', mmap_mode='r')
     classes = np.load(bundle / 'classes.npy', mmap_mode='r')
     frames = m['frames']
+    array_index = {frame: index for index, frame in enumerate(m.get('array_frames', list(range(frames))))}
     reduced = np.stack([mk.reduce(classes[t:t + 1], 8)[0] for t in range(frames)])
     mask = mk.encode(reduced, 8)
     records = m['streams']
@@ -67,22 +85,17 @@ def score(args: argparse.Namespace) -> int:
     completed: list[int] = []
     if args.resume_json is not None:
         previous = json.loads(args.resume_json.read_text())
-        if previous['id'] != m['id'] or len(previous['rows']) != len(rows):
-            raise ValueError('wrong score checkpoint')
-        completed = [s['t'] for s in previous['rows'][0]['samples']]
-        if completed != m['judged'][:len(completed)]:
-            raise ValueError('score checkpoint is not an exact frame prefix')
-        for row, old in zip(rows, previous['rows']):
-            if row['name'] != old['name'] or row['kbps'] != old['kbps'] or [s['t'] for s in old['samples']] != completed:
-                raise ValueError('score checkpoint configuration mismatch')
-            row['samples'] = old['samples']
+        completed = restore_score_prefix(rows, previous, m['judged'], m['id'])
     judged = [t for t in m['judged'] if t < args.max_frames and t not in completed]
     for j, t in enumerate(judged):
+        if t not in array_index:
+            raise ValueError(f'missing original frame {t} in pixel archive')
+        pixel_index = array_index[t]
         shown = mk.upsample(reduced[t:t + 1], (1920, 1080))[0]
         alpha = cp.alpha_and_classes(shown)[0]
-        images = [np.asarray(arrays[a['name']][t]) for a in anchors]
-        images += [cp.composite(arrays[f['name']][t:t + 1], arrays[b['name']][t:t + 1], alpha[None])[0] for b, f in pairs]
-        scores = score_outputs(nets, images, np.asarray(truth[t]), np.asarray(classes[t]))
+        images = [np.asarray(arrays[a['name']][pixel_index]) for a in anchors]
+        images += [cp.composite(arrays[f['name']][pixel_index:pixel_index + 1], arrays[b['name']][pixel_index:pixel_index + 1], alpha[None])[0] for b, f in pairs]
+        scores = score_outputs(nets, images, np.asarray(truth[pixel_index]), np.asarray(classes[t]))
         for row, values in zip(rows, scores):
             row['samples'].append({'t': t, **values})
         if (j + 1) % 10 == 0:

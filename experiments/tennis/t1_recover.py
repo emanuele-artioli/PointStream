@@ -36,7 +36,21 @@ def pack(args: argparse.Namespace) -> int:
         raise ValueError('incomplete original reference arrays')
     if classes.dtype != np.uint8 or truth.dtype != np.uint8:
         raise ValueError('wrong original pixel type')
-    paths = {'truth.npy': work / 'truth.npy', 'classes.npy': work / 'classes.npy'}
+    judged = [t for t in range(n) if str(int(w['start']) + t) in original['fits'] and (classes[t] > 0).any() and t % 3 == 0]
+    array_frames = [t for t in judged if t >= args.from_frame] if args.from_frame else list(range(n))
+    compact = Path(os.environ['PS_SCRATCH_DIR']) / 'compact'
+    compact.mkdir(exist_ok=True)
+    def selected_array(name: str, source_path: Path) -> Path:
+        if not args.from_frame:
+            return source_path
+        source_array = np.load(source_path, mmap_mode='r')
+        path = compact / name
+        target = np.lib.format.open_memmap(path, mode='w+', dtype=np.uint8, shape=(len(array_frames), *source_array.shape[1:]))
+        for index, frame in enumerate(array_frames):
+            target[index] = source_array[frame]
+        del target
+        return path
+    paths = {'truth.npy': selected_array('truth.npy', work / 'truth.npy'), 'classes.npy': work / 'classes.npy'}
     records: list[dict[str, Any]] = []
     for kind, points in [('foreground', FG), ('background', GRID), ('anchor', GRID)]:
         for codec, value, scale in points:
@@ -63,7 +77,7 @@ def pack(args: argparse.Namespace) -> int:
                             'payload_bytes': len(payload), 'checks': checks})
     selected = records[:args.max_decodes]
     for record in selected:
-        paths[record['name'] + '.npy'] = work / record['name'] / 'shown.npy'
+        paths[record['name'] + '.npy'] = selected_array(record['name'] + '.npy', work / record['name'] / 'shown.npy')
     ready = json.loads((source.parent / 'ready.json').read_text())
     smoke = json.loads((source.parent / 'smoke' / 't1-oracle.json').read_text())
     manifest = {'id': args.window, 'frames': n, 'fps': w['fps'], 'source_sha256': w['sha256'],
@@ -71,7 +85,7 @@ def pack(args: argparse.Namespace) -> int:
                 'native_code': ready['git_head'], 'native_gpu': state.get('gpu'),
                 'reference_yuv_sha256': file_sha256(work / 'reference.yuv'),
                 'tools': smoke['tools'], 'torch': smoke['torch'], 'streams': records,
-                'judged': [t for t in range(n) if str(int(w['start']) + t) in original['fits'] and (classes[t] > 0).any() and t % 3 == 0],
+                'judged': judged, 'array_frames': array_frames,
                 'arrays': {name: {'sha256': file_sha256(path), 'bytes': path.stat().st_size} for name, path in paths.items()}}
     archive_path = stage_dir() / 'native-decoded.tar'
     with tarfile.open(archive_path, 'w') as archive:
@@ -100,6 +114,7 @@ def main() -> int:
     p.add_argument('--inputs', type=Path)
     p.add_argument('--ball-report', type=Path)
     p.add_argument('--window')
+    p.add_argument('--from-frame', type=int, default=0)
     p.add_argument('--max-decodes', type=int, default=15)
     args = p.parse_args()
     if args.command == 'validate':

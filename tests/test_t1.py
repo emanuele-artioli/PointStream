@@ -84,3 +84,25 @@ def test_cpu_encoder_defers_cuda_and_honors_its_cpu_subset(tmp_path, monkeypatch
     assert result['_native_yuv'].endswith('decoded.yuv')
     from pathlib import Path
     assert not Path(result['decoded']).exists()
+
+
+def test_score_resume_rejects_changed_rates_and_nonprefix_frames():
+    from copy import deepcopy
+    from experiments.tennis.t1_score import restore_score_prefix
+    from experiments.tennis.t1_oracle import METRICS
+
+    row = {'name': 'a+b', 'kind': 'split', 'kbps': 10., 'actual_kbps': 40.,
+           'background_kbps': 8., 'foreground_kbps': 30., 'mask_kbps': 1., 'samples': []}
+    old = deepcopy(row)
+    old['samples'] = [{'t': t, **dict.fromkeys(METRICS, .1)} for t in [0, 3]]
+    previous = {'id': 'window', 'complete_frames': 2, 'rows': [old]}
+    rows = [deepcopy(row)]
+    assert restore_score_prefix(rows, previous, [0, 3, 6], 'window') == [0, 3]
+    rows[0]['samples'].append({'t': 6})
+    assert len(old['samples']) == 2
+    changed = deepcopy(row)
+    changed['actual_kbps'] = 41.
+    with pytest.raises(ValueError, match='configuration mismatch'):
+        restore_score_prefix([changed], previous, [0, 3, 6], 'window')
+    with pytest.raises(ValueError, match='exact frame prefix'):
+        restore_score_prefix([deepcopy(row)], previous, [0, 6, 9], 'window')
