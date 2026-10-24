@@ -330,7 +330,7 @@ def main() -> int:
     torch.set_num_threads(4)
     if len(args.windows) != len(args.sources):
         parser.error('one source per window required')
-    torch.cuda.set_per_process_memory_fraction(min(1., int(os.environ['PS_GPU_MEMORY_LIMIT_MIB']) * 2**20 / torch.cuda.get_device_properties(0).total_memory))
+    torch.cuda.set_per_process_memory_fraction(min(1., int(os.environ.get('PS_GPU_MEMORY_LIMIT_MIB', '40000')) * 2**20 / torch.cuda.get_device_properties(0).total_memory))
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
     result = {'requested': args.windows[:args.max_windows], 'device': 'cuda', 'gpu': torch.cuda.get_device_name(),
               'torch': torch.__version__, 'tools': {t: svtav1.tool(t) for t in [args.encoder, args.decoder, args.ffmpeg]},
