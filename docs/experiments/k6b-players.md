@@ -948,3 +948,11 @@ the decisions are in [experiments.md](../experiments.md).
   analysis parser did not accept. Exit 2 confirmed in `smoke/command.log`;
   no full stage ran. Added the input-manifest parser and archived-window
   inventory, retained both failed jobs; still 0 GPU-hours.
+- Third CPU request `20261024T082934Z-3b15531e`: pending at submission, code
+  `02d8b5ae`, same zero-GPU specification and 1,200 s CPU ceiling.
+- Third request `20261024T082934Z-3b15531e` failed substantive smoke
+  validation: ffmpeg filters produced 241 scene metadata rows for 240
+  output frames. No full stage ran. Fixed by trimming the filter input
+  to 240 frames; added six-frame source contact sheets. Preliminary
+  smoke-only diagnostics suggest no cut in 052 (max scene score 0.01282),
+  contrary to the card's premise; final read awaits a passing job.

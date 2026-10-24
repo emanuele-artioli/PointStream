@@ -129,13 +129,18 @@ def analyze(args: argparse.Namespace) -> None:
     for wid, source_name in chosen:
         source = Path(source_name)
         command = [ffmpeg, '-v', 'info', '-nostdin', '-threads', '2', '-i', str(source), '-frames:v', '240',
-                   '-vf', "scale=320:180,select='gte(scene,0)',metadata=print", '-an', '-f', 'null', '-']
+                   '-vf', "trim=end_frame=240,scale=320:180,select='gte(scene,0)',metadata=print", '-an', '-f', 'null', '-']
         done = subprocess.run(command, capture_output=True, text=True, check=True)
         scenes = parse_scenes(done.stderr)
         row, parts = records[wid]
         value = diagnose(row, parts['poses.json.zst'], parts['fits.json'], scenes)
         value['source'] = {'path': str(source), 'sha256': sha(source)}
         value['command'] = command
+        sheet = stage / ('sheet-' + wid.replace('/', '__').replace('@', '_at') + '.jpg')
+        subprocess.run([ffmpeg, '-v', 'error', '-nostdin', '-threads', '2', '-i', str(source),
+                        '-vf', "trim=end_frame=240,select='eq(n,0)+eq(n,60)+eq(n,109)+eq(n,153)+eq(n,180)+eq(n,239)',scale=480:270,tile=3x2",
+                        '-frames:v', '1', '-q:v', '3', str(sheet)], check=True)
+        value['sheet'] = {'path': sheet.name, 'sha256': sha(sheet), 'frames': [0, 60, 109, 153, 180, 239]}
         rows.append(value)
         print(f'{wid}: {len(scenes)} frames; cuts {value["cuts"]}', flush=True)
     inventory = json.loads((Path(args.inputs) / 'inputs.json').read_text())
