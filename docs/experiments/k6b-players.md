@@ -1592,3 +1592,95 @@ resolves recorded fitting lineage, not decoded replay/PTS independence.
   budget untouched. No new download or source substitution was attempted.
 - Verification: metadata-only/doc-only continuation; `git diff --check` passed.
   Earlier ruff/mypy/pytest results above still describe unchanged runtime code.
+
+### 2026-10-24 — CPU source recovery and clip-local overlap assessment
+
+- User authorizes CPU-only recovery; frozen cohort and approved 8 GPU-hour
+  ceiling unchanged, 0 spent. If full recovery fails, decide the defensible
+  narrower claim from a clip-only overlap audit. No GPU dispatch in this phase.
+- Recovery found `split_scenes.py` at Git commit
+  `db11965efd14f54ea6f29b1f5e5bb28693d50b97` (2025-02-12), file SHA256
+  `734f2d0e88ab7303d1db2eddd16d8b1f2ad55fccc77948ce82ec33a96193fc55`.
+  It parses `scenes.txt` cut times, prepends 0, names scenes by index and
+  re-encodes each using input-before-`-ss`, `-t` and default ffmpeg settings.
+  This recovers extraction logic, NOT a source-byte or invocation receipt.
+- Before duplicate results: compare every frozen candidate frame against all
+  frames in every old 57-window manifest source clip, conservatively including
+  material outside actual fitted/reference windows; also compare distinct
+  candidates. Exact duplicate means SHA256 equality of decoded native yuv420p
+  frames at equal dimensions. Low-resolution hashes do not decide exactness.
+- Replay screen (diagnostic, not an independence certificate): grayscale 64×36
+  frame descriptors, nearest mean squared pixel distance for every candidate
+  frame, and source-frame pairs flagged at RMSE ≤3 luma levels on [0,255].
+  Full-frame background similarity can cause false positives; source-frame
+  crops/temporal neighbors must be inspected before calling a replay. A clean
+  screen cannot rule out cropped, zoomed, altered-speed or alternate-view replay.
+  Threshold not selected from new quality scores; none will be opened here.
+- Runtime bound: CPU-only attended command, ≤600 s, no torch/model loading,
+  two ffmpeg threads, sequential source decoding, one new result directory
+  under Datasets; no source modification. Stop on missing/changed input or
+  decoded frame-count mismatch. Partial outputs remain unpromoted on failure.
+- Provisional interpretation frozen before audit: distinct filenames alone
+  support only new-file diagnostics. No exact/near duplicate flags plus CPU
+  review can support a restricted clip-local holdout diagnostic with unknown
+  original-source overlap; neither proves independent source/match confirmation.
+- CPU overlap collection now uses `tools/datasets/k6b_recovery.py` (stdlib
+  collector, local NumPy screen), with native `/opt/local/bin/ffmpeg`
+  n7.1.1-56-gc2184b65d2. Initial smoke v1 passed; v2 adds deadline cleanup
+  and type fixes without changing decoded pixels. Final v2 smoke: four clips
+  (old/candidate, each match), hash/count checks passed, audit JSON SHA256
+  `c22ce0e95f145d53169ea18f353e771e1dea6f3970c5f0fae16a212eab72ad08`.
+- Bounded attended CPU full command launched with handle `70689`; external
+  output `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-recovery-20261024-v2-full/`.
+  Command `ssh gpu1 /usr/bin/python3 - collect --cohort <base64 of the frozen
+  12 clip/start/source-SHA records> --out <output> --code-sha256 <local file
+  SHA256>`, stdin is the audit utility. Exact ffmpeg arguments and all source
+  hashes/descriptor offsets are saved in each audit record. Entire collection
+  deadline 600 s, child decode deadline 120 s, CPU only; no fleet/GPU job.
+  Raw local console log `/tmp/k6b-recovery-full.log`; preserve partial.json
+  if it fails. Do not replay unknown execution. No monitors/wakeups created.
+- Full v2 command `70689` exited 1 with a confirmed `TimeoutExpired` on
+  `djokovic_zverev/000` (3,975 native 4K frames) at the 120 s child cap.
+  No unknown submission was replayed. Its read-only checkpoint has 19 finished
+  clips / 8,495 frames; the incomplete collection is NOT a clean audit.
+- Revised CPU approach: native hash equality is impossible across dimensions,
+  so 4K old clips receive only the 64×36 replay screen and their hashes are
+  explicitly labeled `screen_only_other_dimensions`, excluded from native
+  equality. All frozen candidates are asserted 1920×1080; every equal-size
+  old clip still gets native yuv420p SHA256. No overlap-test/cohort/quality
+  threshold changes. Child cap 500 s for 4K, 120 s for 1080p; whole command
+  still capped at 600 s. Subsequent parts exclude the 19 finished clips.
+- First revised 4K CPU pilot: handle `53234`, output
+  `.../tennis/k6b-recovery-20261024-v3-part0/`, source index 19 only.
+  Dispatch code SHA256
+  `a65a8afcae9629cbe4b39a7cfdc14e84fb5dfe8690cd893b721c7e1b6428641c`.
+  Prior v2 dispatch code SHA256
+  `4465585440ee84dd9d59b4ead6ca90c4734248c465eca277e71e4b33622c2e4d`.
+  Both code snapshots retained locally for publication with the new receipts.
+  Merger checks complete source coverage, descriptor byte counts and hashes,
+  unique clips and consistent expected inventories before promoting an audit;
+  smoke/partial collections alone are rejected. No GPU jobs or spending.
+- Revised 4K pilot `53234` **complete**: `djokovic_zverev/000`, all
+  3,975 descriptor frames verified; audit SHA256
+  `665f2c05cc7e8249569c2db92e6d864e93e82b2f692e9ab6818a2a96c255573b`.
+  Native hashes deliberately not comparable at 4K; this is not an absence-of-
+  replay result. Remaining CPU batch handle `51413` runs sequential parts
+  `v3-part1` (source indices 20–26), `v3-part2` (27–40), `v3-part3` (41–60).
+  Each part ≤600 s; batch ≤approximately 31 min including SSH overhead,
+  under the 45 min operational bound. First 19 clips and pilot clip excluded
+  from further decoding. All outputs under the same new `tennis/` prefix.
+- Expanded recovery searched the archive manifest, shared home/Datasets and
+  likely old-project roots shallowly, narrowly filtered shell history, tracked
+  pre-reset sources AND older Git history. The older `split_scenes.py` was
+  found by `git log --all -S scenes.txt`, correcting the earlier tip-only
+  negative search. Seven preserved `pointstream-data/assets/raw_4k` aliases
+  were inspected: Alcaraz titles identify other highlights/practice matches;
+  none establishes an original of the two frozen broadcasts. No source bytes,
+  original-source hash or matching execution receipt recovered. Search was
+  bounded; unnamed/offline backups and unindexed locations remain unsearched.
+- Applying the recovered historical splitter to existing scene cut times gives
+  zero nominal candidate/old-clip interval overlaps for the two matches, but
+  those inferred times are NOT verified original PTS. The clip-local audit
+  cannot remove that limitation or upstream pretraining uncertainty.
+
+- CPU remaining-batch start 2026-10-24T16:57:48.058720+00:00; conservative whole-batch deadline 2026-10-24T17:28:48.058720+00:00. Handle `51413`; three ≤600 s stages plus connection overhead.
