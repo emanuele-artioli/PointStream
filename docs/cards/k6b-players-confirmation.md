@@ -14,8 +14,9 @@ User approval (2026-10-24): **8 GPU-hours hard ceiling**, all smoke/failed/retry
 work included, contingent on CPU provenance validation. **0 spent**. CPU source
 checks found no original Alcaraz/Medvedev videos or verified extraction receipts
 in the inspected archive/records; source-frame mapping remains unresolved.
-Stop at that gate: no GPU runs or new generations until it clears. No fitting,
-Wan-Animate or other task is included. The authorization/outcome continuation
+Independent-source confirmation stays blocked at that gate. The current
+phase is CPU-only; any later use must follow the explicitly narrower diagnostic
+route below. No fitting, Wan-Animate or other task is included. The authorization/outcome continuation
 is appended to the experiment entry. Stop on unresolved overlap, validator failure, budget
 exhaustion, mathematical futility or required user judgment. No automatic
 replacement, tuning, refit, or expansion of scope.
@@ -25,6 +26,26 @@ Read AGENTS.md, PLAN.md, docs/sessions.md and the 5b report plus the appended
 “CPU preparation, awaiting approval” entry in docs/experiments/k6b-players.md.
 That entry contains source hashes, complete window identities, validator contract,
 comparison semantics, decision rule, cost basis and remaining provenance gates.
+
+## CPU recovery decision (2026-10-24)
+Recovery found historical splitter logic, not original source bytes/hash or
+verified execution receipts. A complete clip-only audit covered 61 clips /
+39,853 decoded frames, with 0 native equal-size hash matches and 0 pairs at
+64×36 RMSE ≤3. Four closest pairs show different poses/score overlays.
+
+This supports **a clip-local same-broadcast diagnostic with no detected overlap
+under those tests**, not independent-source or certified training-clean
+confirmation. Re-encoded/cropped/altered replays and upstream pretraining overlap
+remain uncertain. The original-source gate remains unresolved. No window,
+registration threshold, quality criterion or budget changed. The 115 px gate
+stays exploratory; reference and exact matte remain granted/unbilled.
+
+The latest user-directed phase is CPU-only and is now complete: **0 of 8 GPU-hours
+spent**. No GPU work starts in this phase. Any later GPU diagnostic keeps all
+12 windows, reports the source uncertainty and two-match clustering explicitly,
+and must implement/validate the existing GPU validator and pass smoke/pilot
+budget gates. The historical step-5 fail is unchanged. Durable report/evidence
+addresses and hashes are in the appended experiment outcome.
 
 ## Frozen cohort and rule
 

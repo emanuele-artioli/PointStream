@@ -1684,3 +1684,104 @@ resolves recorded fitting lineage, not decoded replay/PTS independence.
   cannot remove that limitation or upstream pretraining uncertainty.
 
 - CPU remaining-batch start 2026-10-24T16:57:48.058720+00:00; conservative whole-batch deadline 2026-10-24T17:28:48.058720+00:00. Handle `51413`; three ≤600 s stages plus connection overhead.
+
+
+#### CPU recovery outcome and claim decision
+
+- **Recovery partial:** extraction logic recovered from the historical commit
+  above; original source bytes/hash and matching execution receipts not found
+  in the bounded search. The original-source confirmation gate remains
+  unresolved. No source re-download or substitute was introduced.
+- **CPU collection complete:** failed v2 checkpoint plus v3 parts 0–3 cover
+  61 unique clips / 39,853 decoded frames: 49 old source clips (all 57 old
+  manifest windows) and 12 unchanged candidate windows / 2,880 frames.
+  Equal-size native comparisons cover 16,653 old 1080p frames plus distinct
+  candidate pairs. The 20,320 old 4K frames are descriptor-screened only;
+  native-byte equality across different dimensions is impossible.
+- **Detected overlap:** 0 native yuv420p SHA256 matches; 0 frames meet the
+  prespecified 64×36 grayscale RMSE ≤3 screen. Same decoder for every clip,
+  source file hashes and frame counts checked. New/new pairs are tested once
+  and attached to the later row; table minima are against old plus earlier
+  candidates, not symmetric global per-window minima. The screen does not
+  prove absence of altered replay or original-source overlap.
+
+| Candidate | Exact matches | RMSE≤3 flags | Min RMSE vs old/prior |
+|---|---:|---:|---:|
+| alcaraz_hurkacz/008 | 0 | 0 | 6.6373 |
+| alcaraz_hurkacz/013 | 0 | 0 | 7.3050 |
+| alcaraz_hurkacz/016 | 0 | 0 | 3.9952 |
+| alcaraz_hurkacz/023 | 0 | 0 | 4.3259 |
+| alcaraz_hurkacz/031 | 0 | 0 | 6.6069 |
+| alcaraz_hurkacz/047 | 0 | 0 | 8.9437 |
+| medvedev_struff/002 | 0 | 0 | 4.5905 |
+| medvedev_struff/014 | 0 | 0 | 5.3977 |
+| medvedev_struff/017 | 0 | 0 | 3.1347 |
+| medvedev_struff/021 | 0 | 0 | 4.4663 |
+| medvedev_struff/029 | 0 | 0 | 4.6600 |
+| medvedev_struff/037 | 0 | 0 | 4.2987 |
+
+- Reviewed the four closest source-frame pairs at 640×360: Medvedev 017:280
+  vs 014:111 (3.1347), Alcaraz 016:382 vs 011:14 (3.9952), Medvedev
+  037:302 vs 033:137 (4.2987), Alcaraz 023:304 vs 036:230 (4.3259).
+  Different player poses/locations and score overlays are visible; none is
+  visually the same frame. This limited review is not a certification against
+  cropped/zoomed, altered-speed, overlaid or alternate-view replays. Exact
+  decoded hashes also miss lossy re-encodings of an original frame.
+- **Decision:** the audit supports a **clip-local, same-broadcast diagnostic
+  on the 12 frozen archive windows, with no detected overlap under the stated
+  tests**. It does NOT support “independent source footage,” “training-clean
+  frames” or unseen-match confirmation. Report unknown original-source and
+  upstream pretraining overlap; do not create a certified-clean subset from
+  this screen. The original stronger gate is not silently marked passed.
+- The narrower route keeps every window, the ≥228/240 registration rule,
+  identical method/anchor windows and the 8 GPU-hour ceiling unchanged.
+  The 115 px threshold stays exploratory; the ≥75% statistic can be reported
+  descriptively, not as 12 independent samples or validation of registration
+  discrimination (all 12 pass that gate). Step 5's historical fail stands.
+  Appearance reference and exact target matte remain **granted and unbilled**;
+  no end-to-end codec-gain claim follows.
+- **This phase ends CPU-only.** 0 of 8 approved GPU-hours used; no fitting,
+  generation, quality judge, Wan-Animate, chats, monitors or wakeups started.
+  All task-owned audit commands are terminal; no active batch is left behind.
+  A later diagnostic run still needs the written GPU validator implemented
+  and the original smoke/pilot/scale budget gates. No GPU execution starts here.
+
+#### Durable recovery receipts, verification and continuation
+
+- Canonical report bundle under Datasets:
+  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-recovery-20261024-report.tar.gz`,
+  SHA256 `2bfafa0c0115171d784dd3d79696207917362f85a9653fa7939c3f446b57ff5b`.
+  Includes report, all five collection records, code v2/v3, recovered splitter,
+  inferred intervals, source-pair review and provenance. Raw descriptor files
+  remain read-only in their original output directories.
+- Merged screen JSON SHA256
+  `03b4ddf84c67efd200464a3649b46f22ef80ec8650ba9c4d8c75ba02b930f5e8`.
+  CPU part audit hashes: part0 `665f2c05…5573b` (above),
+  part1 `8c6a16b344a50cbe34353fb1b660166842f52c03eaae3014a89afe7f5b443299`,
+  part2 `f7710a3c89530add88d2872eeca3e69da075ce406602e86fed790e5cc580e467`,
+  part3 `0a055cef3931ccfeaf60a340f5831232e49bf15004c676bf255fc016adff2d48`.
+- All runs used gpu1 **CPU only**, Python `/usr/bin/python3` 3.10.12,
+  software ffmpeg n7.1.1-56-gc2184b65d2. Binary SHA256:
+  `/opt/local/bin/ffmpeg` `0b652966dc4ecf5e45854c58d8149c7a41352b3285e8695ca26501dff4a72656`;
+  `/opt/local/bin/ffprobe` `1e09f52f9bc91ecec6d05f5b33fd4d69064fa9874b9599c55343ab011d37e66c`.
+  Dispatch baseline `921a9a81` plus the selected v2/v3 code checksums above;
+  utility subsequently committed in `728c44ac`. Exact command vectors, source
+  SHA256s and descriptor offsets are in collection records. Local screen uses
+  project NumPy 1.26.4, at most two BLAS threads, no model loading.
+- Reproduce: collect via `tools/datasets/k6b_recovery.py collect` with the
+  frozen clip/start/SHA cohort; use bounded clip-index parts and new output
+  directories. `python -m tools.datasets.k6b_recovery screen V2_CHECKPOINT
+  --extra V3_PART0 --extra V3_PART1 --extra V3_PART2 --extra V3_PART3`.
+  Merger refuses missing coverage, duplicated clips, changed bytes, wrong
+  descriptor counts and standalone partial/smoke promotion. Source archives,
+  older runs and failed checkpoints were not overwritten or deleted.
+- Verification: `ruff check` and `mypy --config-file pyproject.toml` pass
+  (190 source files). Full `python -m pytest`: 838 passed, 24 skipped,
+  1 unchanged macOS protected-path symlink-resolution failure. Seven focused
+  audit/scope tests pass, including the subsequently added multi-part merge
+  coverage/offset fixture. `git diff --check` passes. No unrelated hook fix.
+- Stopped because CPU recovery/claim decision is complete. No new source
+  identity was invented and no narrower numerical quality result was produced.
+  Recommendation for future work: retain this cohort only for the explicitly
+  qualified same-broadcast clip diagnostic; retain the strict original-source
+  limitation until originals/receipts are independently recovered.

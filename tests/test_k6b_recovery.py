@@ -56,3 +56,24 @@ def test_descriptor_screen_detects_candidate_copy_and_checks_bytes(tmp_path: Pat
     p.write_bytes(b'changed')
     with pytest.raises(ValueError, match='changed'):
         screen(tmp_path)
+
+
+def test_merger_requires_complete_inventory_and_preserves_offsets(tmp_path: Path):
+    folders = [tmp_path / 'part0', tmp_path / 'part1']
+    for i, p in enumerate(folders):
+        p.mkdir()
+        binary = p / 'descriptors.bin'
+        binary.write_bytes(bytes(64*36))
+        row = {'clip': 'old' if i == 0 else 'a', 'role': 'old' if i == 0 else 'candidate',
+               'frames': 1, 'start': 0 if i == 0 else 37, 'offset': 0,
+               'size': '1920x1080', 'hashes': ['0'*64]}
+        payload = {'complete': bool(i), 'records': [row]}
+        if i:
+            payload.update(expected_clips=['a', 'old'], descriptors_sha256=hashlib.sha256(binary.read_bytes()).hexdigest())
+        (p / ('audit.json' if i else 'partial.json')).write_text(json.dumps(payload))
+    result = screen(folders[0], [folders[1]])
+    assert result['clips'] == result['decoded_frames'] == 2
+    assert result['exact_pairs'][0]['frame'] == 37
+    assert result['candidates'][0]['nearest'][0]['other_frame'] == 0
+    with pytest.raises(ValueError, match='duplicate collected clip'):
+        screen(folders[0], [folders[1], folders[1]])
