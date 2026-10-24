@@ -37,7 +37,7 @@ def pack(args: argparse.Namespace) -> int:
     if classes.dtype != np.uint8 or truth.dtype != np.uint8:
         raise ValueError('wrong original pixel type')
     paths = {'truth.npy': work / 'truth.npy', 'classes.npy': work / 'classes.npy'}
-    records = []
+    records: list[dict[str, Any]] = []
     for kind, points in [('foreground', FG), ('background', GRID), ('anchor', GRID)]:
         for codec, value, scale in points:
             name = f'{kind}-{codec}-{value}-s{scale}'

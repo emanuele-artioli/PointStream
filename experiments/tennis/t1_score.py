@@ -73,6 +73,8 @@ def score(args: argparse.Namespace) -> int:
         scores = score_outputs(nets, images, np.asarray(truth[t]), np.asarray(classes[t]))
         for row, values in zip(rows, scores):
             row['samples'].append({'t': t, **values})
+        if (j + 1) % 10 == 0:
+            write_json(stage_dir() / 'score-progress.json', {'id': m['id'], 'complete_frames': j + 1, 'rows': rows})
         publish_progress('saved-native-pixel-scores', j + 1)
         print(f'phase=score window={m["id"]} frame={j + 1}/{len(judged)}', flush=True)
     for row in rows:

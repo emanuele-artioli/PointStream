@@ -218,6 +218,10 @@ def process(args: argparse.Namespace, wid: str, source: Path, scratch: Path) -> 
             records.append(encode(args, point, rgb, w, work / name, streams, name, kind == 'foreground'))
             print(f'phase=codec window={wid} point={name} bytes={records[-1]["payload_bytes"]}', flush=True)
             publish_progress('codecs', sum(len(r) for r in (foreground, backgrounds, anchors)))
+    write_json(stage_dir() / (k4.safe(wid) + '-native.json'), {
+        'id': wid, 'frames': w['frames'], 'source_sha256': w['source_sha256'],
+        'ball_sha256': w['ball_sha256'], 'mask_bytes': len(w['mask']),
+        'streams': [{k: v for k, v in r.items() if k != 'stream'} for r in anchors + backgrounds + foreground]})
     nets = {'lpips': load_lpips(args.lpips_backbone, 'cuda'), 'dists': load_dists(args.dists_backbone, 'cuda')}
     rows = []
     seconds = w['frames'] / float(w['fps'])
@@ -245,6 +249,7 @@ def process(args: argparse.Namespace, wid: str, source: Path, scratch: Path) -> 
             strip = np.concatenate([cv2.resize(im, (640, 360)) for im in [w['truth'][t], images[0], images[len(anchors)]]], axis=1)
             cv2.imwrite(str(stage_dir() / f'{k4.safe(wid)}-t{t:03d}.jpg'), cv2.cvtColor(strip, cv2.COLOR_RGB2BGR))
         if (j + 1) % 10 == 0:
+            write_json(stage_dir() / (k4.safe(wid) + '-score-progress.json'), {'id': wid, 'complete_frames': j + 1, 'rows': rows})
             publish_progress('scores', j + 1)
             print(f'phase=score window={wid} frame={j + 1}/{len(w["judged"])}', flush=True)
     for row in rows:
