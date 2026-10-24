@@ -2119,3 +2119,33 @@ a weaker claim automatically.
   full/≤600 s smoke and2700 s job reservation, exclusive compatible Ada pool.
   Native full output is substantively validated before return; same-job DCVC
   encode/decode/judge retained. Save both IDs before the next batch wait.
+
+- First anchor shard submitted **`20261024T201059Z-29586984`**, code `3fb9ef18`, spec
+  SHA256 `f4b16cfead40fc0f2133bdc685e33b6567461ec75a8cbe21792f8340d44f4907`; returnedpending;
+  deadline2026-10-24T20:54:56Z,2700 s reservation. Receipt `/tmp/k6b-confirm-anchors-pilot1-submit.json`.
+  Scope: Alcaraz031@129, Medvedev014@194, Alcaraz013@213, all240 native
+  frames; smoke first48 frames of the first window per match. Real ten-point
+  source encodes and source-code/oracle path, no renderer fitting/generation.
+  Only one anchor job submitted while the remaining-feature job occupies the
+  other Ada GPU; issue the second shard when capacity frees so its full-stage
+  deadline can be met. At submission known spent0.36645/8 h, other active
+  reservation2700 s; combined worst-case reservations remain below8 h.
+
+- Remaining feature job `20261024T200318Z-12faa9a8` **complete**, full native
+  scientific validation passes. All12 frozen windows/2880 unique target frames
+  now have masks/poses; no cohort replacement. Remaining archive SHA256
+  `ba4534f5e0ed0df5c589cd31c4bb7153225589b970357b8272823e1e59cdb523` at
+  `jobs/fleet/inbox/20261024T200318Z-12faa9a8/full/published.tar`.
+  Claimed-job wall1056.15 s; total GPU spent **0.65982/8 h**, excluding
+  currently running first anchor shard. Native full feature pipeline complete.
+- First anchor shard `20261024T201059Z-29586984` was running full after its
+  smoke gate passed; no human quality interpretation yet. Ready next source
+  jobs: all12 CPU comparison pack (0 GPU-h), then the second first-six anchor
+  shard on the now-free Ada GPU. Both planned caps remain2700 s or less, so
+  current spending plus both anchor reservations stays below8 h.
+- Strengthened preparation validator reconstructs every coded pose bitmap,
+  crop box and run ID, checks raw source-decode identity, and first fitted
+  source reference placement. Tested on retained real Alcaraz036 preparation
+  and source-code artifacts (old jobs `20261022T123413Z-eba7629b`,
+  `20261021T171936Z-50ce2f74`): exact reconstruction passes in2.43 CPU seconds.
+  No new source-video download or quality result; this is correctness evidence.

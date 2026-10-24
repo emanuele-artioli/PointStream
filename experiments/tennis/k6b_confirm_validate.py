@@ -116,7 +116,7 @@ def reference_index(row: dict[str, Any], poses: dict[str, Any], player: str) -> 
 
 
 def check_prepare_references(root: Path, summary: dict[str, Any], anchors: dict[str, Path]) -> None:
-    from experiments.tennis.k6b import unit_name
+    from experiments.tennis.k6b import unit_name, runs, run_boxes, pose_map, to_crop, inside_frame
     from src.segmentation.masks import decompress
 
     for window in summary['windows']:
@@ -127,6 +127,8 @@ def check_prepare_references(root: Path, summary: dict[str, Any], anchors: dict[
         decoded = json.loads(decompress((source / 'keypoints.json.zst').read_bytes()))['decoded']['q4-velocity-e4']
         if window['frames'] != row['frames'] or sorted(u['player'] for u in window['units']) != sorted(row['players']):
             raise ValueError('Incomplete player/reference set')
+        if window['convert']['sha256'] != row['convert']['sha256']:
+            raise ValueError('Reference/anchor source decode differs')
         for unit in window['units']:
             player = unit['player']
             if unit['reference_t'] != reference_index(row, poses, player):
@@ -137,6 +139,20 @@ def check_prepare_references(root: Path, summary: dict[str, Any], anchors: dict[
                 raise ValueError('Prepared target/score coverage differs')
             if unit['unit'] != unit_name(wid, player):
                 raise ValueError('Cross-window player unit')
+            boxes, maps, run_ids = a['box'], a['pose'], a['run']
+            cursor = 0
+            for run_id, ts in enumerate(runs(expected)):
+                keypoints = [np.asarray(decoded[f'{player}@{t}'], np.float64) for t in ts]
+                for kp, box in zip(keypoints, run_boxes(keypoints)):
+                    if run_ids[cursor] != run_id or not np.allclose(boxes[cursor], box, rtol=1e-12, atol=1e-10):
+                        raise ValueError('Prepared run/crop differs from decoded keypoints')
+                    if not np.array_equal(maps[cursor], pose_map(to_crop(kp, box))):
+                        raise ValueError('Prepared pose map differs from decoded keypoints')
+                    cursor += 1
+            reference_kp = np.asarray(poses[player][unit['reference_t']]['kps'], np.float64)
+            reference_box = inside_frame(run_boxes([reference_kp])[0])
+            if not np.allclose(a['reference_box'], reference_box, rtol=1e-12, atol=1e-10):
+                raise ValueError('Reference crop placement differs from first fitted source pose')
 
 
 def main(argv: list[str] | None = None) -> int:
