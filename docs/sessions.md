@@ -165,3 +165,7 @@ Codex sessions follow the same protocol. What differs:
   trusted and the hooks are reviewed with `/hooks`.
 - **Archiving.** As in Claude Code, a session says it is ready to be
   archived; the user archives it.
+- **Without a root session** (from 2026-10-24): each item session keeps
+  its own row of PLAN.md's dispatch ledger (`running` when it starts,
+  `reported` with its outcome when it stops) and its item's bullet in
+  "Where PointStream stands", so PLAN.md stays the single record.

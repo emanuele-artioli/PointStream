@@ -8,8 +8,7 @@ Paste everything below the line.
 
 You are an **item session** for PointStream (repo
 `emanuele-artioli/PointStream`), running in Codex on the server checkout, so
-the fleet is reachable. Report through the user: Codex cannot message other
-sessions.
+the fleet is reachable. Report in your item file and your last reply.
 
 ## Read first
 AGENTS.md (Environments, Fleet, First run of a model on a GPU class),
@@ -60,9 +59,16 @@ stands" or the ledger. Stop when the rule decides, the budget is spent, a
 decision belongs to the user, or you run out of ideas (for example the
 model does not fit the cards).
 
+## Ledger
+PLAN.md's dispatch ledger is the single record of open work. When you start,
+set your row's status to `running <date>` and push that commit at once. When
+you stop, set it to `reported <date>: <one-line outcome>; <GPU-hours used> of
+<budget>`, and update your item's bullet in "Where PointStream stands" in one
+or two lines. Edit only your own row and bullet.
+
 ## Report
 Run `ruff check`, `mypy --config-file pyproject.toml`, `python -m pytest`.
 Commit, push, open the pull request with auto-merge. Put the report (format
 in `docs/sessions.md`, "The report") at the end of your entry and at the end
-of your last reply; the user forwards it to the root session. Then tell the
+of your last reply. Then tell the
 user you are ready to be archived once the pull request has merged.

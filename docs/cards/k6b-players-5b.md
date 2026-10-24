@@ -7,8 +7,8 @@ Paste everything below the line.
 
 You are an **item session** for PointStream (repo
 `emanuele-artioli/PointStream`), running in Codex on the server checkout, so
-the fleet and `~/pointstream-data` are reachable. Report through the user:
-Codex cannot message other sessions.
+the fleet and `~/pointstream-data` are reachable. Report in your
+item file and your last reply.
 
 ## Read first
 AGENTS.md, `docs/sessions.md` (including "Codex"), PLAN.md's tennis bullet
@@ -55,6 +55,11 @@ is expected to win from windows that go to the pixel coder.
    envelope's strength at that rate (its LPIPS/DISTS), the reference crop's
    distance to the judged frames, and steps 2–5's per-window margins.
    Read saved reports and inputs only.
+   Check first whether 052 crosses a shot cut (court view to close-up):
+   K4 chose windows by time, not by shot, so a window can straddle a cut.
+   If it does, test the obvious content-blind rule, "a window is one shot"
+   (shot-boundary detection is standard at an encoder), and find which
+   frames the generator's reference and the judged frames come from.
 3. Say which measurement explains the losses, if any. If a rule follows,
    state it with its threshold, and show the score of steps 2–5 under it
    **beside** the pooled score, never instead of it.
@@ -71,15 +76,21 @@ is expected to win from windows that go to the pixel coder.
 
 ## Scope and budget
 In: the analysis above, a small script and a focused test if code is needed.
-Out: new GPU runs, new fits, changing earlier entries, editing PLAN.md's
-"Where PointStream stands" or the ledger. GPU: none. Stop when the goal is
+Out: new GPU runs, new fits, changing earlier entries, editing other items' text in PLAN.md. GPU: none. Stop when the goal is
 reached, a decision belongs to the user, or you run out of ideas.
+
+## Ledger
+PLAN.md's dispatch ledger is the single record of open work. When you start,
+set your row's status to `running <date>` and push that commit at once. When
+you stop, set it to `reported <date>: <one-line outcome>; <GPU-hours used> of
+<budget>`, and update your item's bullet in "Where PointStream stands" in one
+or two lines. Edit only your own row and bullet.
 
 ## Report
 Run `ruff check`, `mypy --config-file pyproject.toml`, `python -m pytest`.
 Commit, push, open the pull request with auto-merge. Put the report (format
 in `docs/sessions.md`, "The report") at the end of your entry and at the end
-of your last reply; the user forwards it to the root session. Include: which
+of your last reply. Include: which
 measurement explains each loss, the proposed scope rule (or none), steps
 2–5's scores under it beside the pooled ones, and the confirmation run's
 windows and cost. Then tell the user you are ready to be archived once the

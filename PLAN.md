@@ -81,6 +81,8 @@ sessions update their own items and their files in `docs/experiments/`
   paid for. The key carrier is the candidate for small-F domains. The crops for the
   visual check are ready (user). The egocentric claim is the user's to
   reframe; small-F domains (tennis) are where F's rate matters least.
+  Next for egocentric: H5p 4d, a mask under about 2 kbps (binary shape
+  coding, or F derived at the client); card ready.
 - **Background (G):** a scene model adapted to the venue, sent beforehand
   and unbilled (payback hours reported), plus a per-video enhancer route
   (G6).
@@ -127,11 +129,13 @@ sessions update their own items and their files in `docs/experiments/`
 
 ### Dispatch ledger
 
-One row per item session started from the root session, updated at every
-event ([sessions](docs/sessions.md#the-dispatch-ledger)). From 2026-10-24
-sessions run in Codex: cards are files in [docs/cards](docs/cards/README.md)
-that the user pastes into a new Codex session, and reports come back
-through the user or the pushed branch.
+The single record of open work: one row per item session, with its card,
+branch and status. Cards are prompts in [docs/cards](docs/cards/README.md)
+that the user pastes into a new session (Claude Code or Codex). From
+2026-10-24 there is no standing root session: each item session sets its
+own row to `running` when it starts and to `reported` with its outcome when
+it stops, and updates its item's bullet in "Where PointStream stands". A row
+marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
@@ -151,6 +155,7 @@ through the user or the pushed branch.
 | K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | card ready 2026-10-24 ([card](docs/cards/k6b-players-5b.md)); user agreed to run it |
 | T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | card ready 2026-10-24 ([card](docs/cards/t1.md)) |
 | K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
+| H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask` | Codex high | card ready 2026-10-24 ([card](docs/cards/h5p-4d.md)) |
 
 **T1: the split on tennis, F billed.** With every keypoint renderer
 closed for hands and stalled at 67% for players, tennis's open question
@@ -172,10 +177,21 @@ Step 6 tries Wan-Animate, conditioned on the same unbilled reference as
 step 2 (zero-shot means no fitting, not no appearance); speed is
 secondary while quality is tested (user, 2026-10-24).
 
+**H5p 4d: a cheaper foreground mask.** Every mask coder tried on the
+egocentric pilot (lossless coding of downscaled frames XORed with the
+previous one, a video codec on the signed distance, a key colour) costs
+36–116 kbps, and billed it removes the split's win. The ceiling is H5p 4b:
+the exact F at zero bits wins weighted DISTS (−15%) and still loses
+weighted LPIPS (+16%), so a mask can at best restore the DISTS win, within
+about 2 kbps. Two routes are untested: binary shape coding with motion
+prediction (MPEG-4's context-based arithmetic coding; CPU), and F derived
+at the client from the decoded streams by the same segmenter (no bits, or
+a small correction stream).
+
 **Handover (2026-10-24).** The Claude Code root session
 (`session_01StNQ6dvxYRHhnMbQymNgNf`) stopped when the weekly Claude
-tokens ran out; a Codex root session takes over from
-[its card](docs/cards/root.md). Open for the user: (1) how to reframe the
+tokens ran out. No root session replaces it: item sessions keep this
+ledger themselves (above). Open for the user: (1) how to reframe the
 egocentric claim (proposal: a negative result with its cause, F's rate,
 and the split's win where F is small, P09_106; tennis carries the
 positive claim); (2) whether to run step 6 after 5b; (3) the identity-warp
@@ -658,8 +674,9 @@ objects (the tennis ball).
   1. Audit. Reference-conditioned pose-to-person models (an appearance
      image plus a pose sequence in, video out) and per-subject models,
      with weights, licences, inputs, size and inference cost per frame.
-     Small models are preferred: H3e's Wan2.1-14B took 27 min for 81
-     frames.
+     Small models were preferred at first (H3e's Wan2.1-14B took 27 min
+     for 81 frames); from 2026-10-24 speed is secondary while quality is
+     what is being tested (user).
   2. Zero-shot oracle, inference only. The audited model is given one
      reference crop of each player (granted, unbilled) and the coded
      keypoints. Its interface is K6c's, so a pass here decides K6c's
