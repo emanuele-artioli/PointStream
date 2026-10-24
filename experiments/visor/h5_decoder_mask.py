@@ -76,16 +76,22 @@ def main() -> int:
         scale = int(path.parent.name.rsplit('_', 1)[1])
         w, h = coded_size(scale)
         video_ckpt = args.video_ckpt if arm == 0 else venue_ckpt
-        out = point_dir / 'raw.yuv'
         plan = {'structure': 'htl', 'container': str(path.parent / 'stream.psdc'),
-                'src_type': 'yuv420', 'out_file': str(out),
+                'src_type': 'yuv420',
                 'image_ckpt': args.image_ckpt, 'video_ckpt': video_ckpt,
                 'image_sha256': hashlib.sha256(Path(args.image_ckpt).read_bytes()).hexdigest(),
                 'video_sha256': hashlib.sha256(Path(video_ckpt).read_bytes()).hexdigest()}
-        native = dcvc_worker('decode', plan, point_dir)
-        if not native['deterministic']:
-            raise RuntimeError('native DCVC decode not deterministic; no segmentation evidence')
-        (stage / f'raw{index}-decode.json').write_text(json.dumps(native, indent=2))
+        for attempt in range(3):
+            attempt_dir = point_dir / str(attempt)
+            attempt_dir.mkdir()
+            out = attempt_dir / 'raw.yuv'
+            plan['out_file'] = str(out)
+            native = dcvc_worker('decode', plan, attempt_dir)
+            (stage / f'raw{index}-attempt{attempt}-decode.json').write_text(json.dumps(native, indent=2))
+            if native['deterministic']:
+                break
+        else:
+            raise RuntimeError('native DCVC decode failed three determinism checks; no segmentation evidence')
         raw_inputs.append((out, w, h))
         publish_progress(os.environ['PS_STAGE'], index + 1)
     tracker = Sam31MaskTracker(args.checkpoint)
@@ -97,7 +103,7 @@ def main() -> int:
         raw, w, h = raw_inputs[index]
         planes = np.memmap(raw, np.uint8, mode='r').reshape(-1, h * 3 // 2, w)
         for t in range(n):
-            image = yuv420_to_rgb(planes[t:t + 1])[0]
+            image = yuv420_to_rgb(np.array(planes[t:t + 1]))[0]
             image = cv2.resize(image, (clip.width, clip.height), interpolation=cv2.INTER_CUBIC)
             cv2.imwrite(str(frames_dir / f'{t}.png'), image[..., ::-1])
         del planes

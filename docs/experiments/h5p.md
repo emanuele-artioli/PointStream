@@ -857,3 +857,22 @@ the decisions are in [experiments.md](../experiments.md).
 - Remaining allocation: first corrected job ≤1740 s, other three ≤1800 s;
   plus the cancelled 50.6 s totals at most 7190.6 s (<2 GPU-hours). Full
   first job ≤1260 s; no retry may exceed this aggregate allowance.
+- Corrected decoder submission P01_107: `20261024T083446Z-1d84eea5`,
+  revision `cf692902`, pending at acknowledgement. Native stream decoding
+  also requires the image checkpoint and matching stock/venue video weights;
+  these are staged by SHA256 (full identities in the job's spec).
+- Pinned local mypy now passes (183 files). The two platform-sensitive
+  pytest checks were re-run outside the sandbox: process suspension passes;
+  the existing dangling `/home/.../Datasets` symlink guard test still fails
+  on this Mac. It is unrelated to shape coding and remains reported.
+- Corrected raw-input job `20261024T083446Z-1d84eea5` stopped after
+  60.8 seconds: smoke passed (27.7 s), full's first native DCVC double
+  decode differed. No full segmentation numbers are evidence. This is the
+  known native decoder determinism hazard in `docs/fleet.md`, not a mask
+  quality failure. P02_02 `20261024T083702Z-14c3862e` was acknowledged
+  before the full failure was inspected; its own determinism gate remains
+  mandatory and no bad decode is promoted.
+- Next revision saves every native attempt before deciding, retries at most
+  three times as H5's codec path does, and requests exclusive GPUs. Remaining
+  three item allocations ≤1700 seconds each; including P02_02's ≤1800 and
+  the two ended attempts (~111.4 s), the aggregate upper bound is ~7012 s.
