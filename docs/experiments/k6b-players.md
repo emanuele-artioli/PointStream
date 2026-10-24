@@ -1945,3 +1945,43 @@ a weaker claim automatically.
   wait; automatic completion resumption is unverified in this client.
 - No job ID yet at this checkpoint; GPU-hours spent **0/8**. Save the returned
   ID immediately after submission; uncertain submission is inspected, not replayed.
+
+- First job submitted **`20261024T174042Z-463f42af`**, returned pending;
+  spec SHA256 `e8913b69cc1f699f8a2132e49be3d8680e775e79d538ca928cd65c3034e44a82`,
+  code `dbc79e4bc974b888e9d61d2a1ad1230d22e2b626`, snapshot SHA256
+  `a4bffe3c4a14734f8f3e611e7359e3a4af448389610817e83d96bf1c1244fb04`.
+  Deadline2026-10-24T18:23:54Z, total reservation2700 s. Inputs/output receipt
+  in `/tmp/k6b-confirm-features-submit.json`, canonical output under
+  `jobs/fleet/inbox/20261024T174042Z-463f42af/`. No unknown replay.
+  Dispatcher inferred chat ID despite no flag and printed legacy heartbeat
+  guidance; no automation tool was called. Inspecting whether this is guidance
+  only before waiting; do not create any recurring model monitor.
+- Full local suite:844 passed,25 skipped,2 failures: known macOS protected-path
+  symlink issue and sandbox-denied process inspection in the contention test.
+  Focused new validator tests3/3 pass; rerun process test with inspection allowed.
+
+- Admission check returned pending (no host assigned yet); one bounded fleet
+  wait started for this recorded ID, ≤2640 s. No resubmission. Source review of
+  dispatcher confirms heartbeat text is guidance only: it writes a chat ID in
+  the receipt but does not create a scheduled model automation. No monitors
+  exist from this task. Process-control test rerun with inspection permitted
+  passes1/1; only the previously recorded macOS protected-path failure remains.
+
+- Job `20261024T174042Z-463f42af` **failed before model loading**: staged
+  source paths were outside the fleet data root and additionally contained an
+  incorrectly inferred `/videos/` segment. Confirmed terminal; no unknown replay.
+  Supervisor elapsed10.29 s counts conservatively as **0.00286/8 GPU-h**.
+  Failure events reported/acknowledged. Original attempt/evidence preserved.
+- Corrected preparation uses exact source paths from saved recovery receipts,
+  copies the 12 clips to the new experiment's `sources/`, and verifies every
+  SHA256 after copying. Original bytes and cohort unchanged. New immutable
+  manifest-v2.json SHA256 `8b81c4b9645a24bb5b613bdda908440735fe932d23ea251b0c567a366bda090b`; 33499247 staged bytes.
+  CPU staging's first attempt failed on the inferred path, before any copy;
+  inspected then corrected from receipts, not a re-download. No prior output
+  overwritten. The successful CPU preparation is terminal.
+- Downstream code adds actual R/S scoring-mask hashes to native anchor and
+  method judge records, exact generated-target coverage/recipe/checkpoint
+  checks, and a bracket-only envelope comparison with no fallback extrapolation.
+  Focused tests27 passed,2 skipped; ruff/mypy pass (198 files). No quality
+  scores opened. First-feature retry uses the same recipe and 2700 s reservation,
+  deadline 2026-10-24T18:29:40.227745+00:00. Next returned job ID must be saved immediately.

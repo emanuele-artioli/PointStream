@@ -606,6 +606,7 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
     outline: list[dict[str, Any]] = []
     references: dict[str, dict[str, int | None]] = {v: {} for v in oracle_names if v.startswith("ref")}
     identity_max_diff = None
+    scoring_masks: dict[str, dict[str, str]] = {}
     judged = [t for t in scored if t % JUDGE_EVERY == 0]
     review_at = set(review_frames(wid, judged))
     timing["prepare"] = round(time.time() - began, 1)
@@ -656,6 +657,8 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
             if mask_id.any():
                 identity_max_diff = int(np.abs(canvas[mask_id].astype(int) - truth_t[mask_id].astype(int)).max())
         s_t = r_t | drawn_all
+        scoring_masks[str(t)] = {"r": hashlib.sha256(np.packbits(r_t).tobytes()).hexdigest(),
+                                 "s": hashlib.sha256(np.packbits(s_t).tobytes()).hexdigest()}
         racket_t = per_frame[t]["racket"]
         outs = []
         for name in names[:len(ANCHORS)]:
@@ -701,7 +704,7 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
         "id": wid, "k4_window": entry.get("k4_window"), "match": wid.split("/")[0], "fps": w["fps"], "frames": frames,
         "start": w["start"], "convert": converted, "players": players, "court": chosen["court"],
         "median_height": median_height, "scored": scored, "judged": judged, "scored_registered": scored_all,
-        "scored_seconds": seconds, "timing": timing,
+        "scored_seconds": seconds, "timing": timing, "scoring_masks": scoring_masks,
         "variants": names, "identity_max_diff": identity_max_diff,
         "anchors": {k: {**{x: v for x, v in rec.items() if x != "decoded"}, "kbps_r": rec["region_bits"] / seconds / 1000 if seconds and rec["region_bits"] is not None else None,
                         "kbps": 8 * rec["payload_bytes"] / (frames / float(fps)) / 1000}

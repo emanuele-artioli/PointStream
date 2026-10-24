@@ -71,3 +71,42 @@ def test_feature_output_requires_exact_window_and_full_decode():
     summary['windows'] = []
     with pytest.raises(ValueError):
         check_feature_rows(m, summary)
+
+
+def test_anchor_envelope_never_extrapolates_or_awards_a_missing_cell():
+    from experiments.tennis.k6b_confirm_validate import strict_won
+
+    anchors = {'a': {'kbps': 1., 'lpips': .4}, 'b': {'kbps': 10., 'lpips': .2},
+               'c': {'kbps': 5., 'lpips': .35}}
+    assert strict_won(anchors, 'lpips', 5.5, .28)['won']
+    assert not strict_won(anchors, 'lpips', 5.5, .31)['won']
+    for rate in (0., 11.):
+        cell = strict_won(anchors, 'lpips', rate, .01)
+        assert cell['won'] is None and not cell['resolved']
+    with pytest.raises(ValueError):
+        strict_won(anchors, 'lpips', float('nan'), .1)
+    with pytest.raises(ValueError):
+        strict_won({}, 'lpips', 1, .1)
+
+
+def test_generated_recipe_and_target_coverage_corruption():
+    from experiments.tennis.k6b_confirm_validate import ADAPTER_SHA, BASE_SHA, check_generated
+
+    prepared = {'windows': [{'units': [{'unit': 'u', 'window': 'alcaraz_hurkacz/031@129'}]}]}
+    result = {'profiles': ['match5'], 'steps': 30, 'from_t': 0,
+              'settings': {'size': [512, 784], 'cfg': {'match5': 2.0}, 'context': [24, 4]},
+              'units': ['u'], 'max_frames': 0,
+              'fits': {'match5': {'sha256': ADAPTER_SHA['alcaraz_hurkacz'], 'bits': 4}},
+              'models': {'match5': {'fit': {'base': {'sha256': BASE_SHA},
+                         'billing': {'pose_guider_billed': True, 'pose_guider_bytes': 4, 'bytes': 8}}}}}
+    a = {'t': np.array([0, 1, 2, 3]), 'run': np.zeros(4), 'judged': np.array([True, False, False, True])}
+    g = {'t': np.array([0, 3]), 'crops': np.zeros((2, 784, 512, 3), dtype=np.uint8)}
+    check_generated(result, prepared, {'u': (a, g)})
+    for key, value in [('steps', 29), ('profiles', ['original']), ('units', ['u', 'u'])]:
+        bad = deepcopy(result)
+        bad[key] = value
+        with pytest.raises(ValueError):
+            check_generated(bad, prepared, {'u': (a, g)})
+    g['t'] = np.array([0, 0])
+    with pytest.raises(ValueError):
+        check_generated(result, prepared, {'u': (a, g)})
