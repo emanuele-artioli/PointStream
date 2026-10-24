@@ -1749,7 +1749,7 @@ resolves recorded fitting lineage, not decoded replay/PTS independence.
 #### Durable recovery receipts, verification and continuation
 
 - Canonical report bundle under Datasets:
-  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-recovery-20261024-report.tar.gz`,
+  `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-recovery-20261024-report-v2.tar.gz`,
   SHA256 `2bfafa0c0115171d784dd3d79696207917362f85a9653fa7939c3f446b57ff5b`.
   Includes report, all five collection records, code v2/v3, recovered splitter,
   inferred intervals, source-pair review and provenance. Raw descriptor files
@@ -1785,3 +1785,22 @@ resolves recorded fitting lineage, not decoded replay/PTS independence.
   Recommendation for future work: retain this cohort only for the explicitly
   qualified same-broadcast clip diagnostic; retain the strict original-source
   limitation until originals/receipts are independently recovered.
+
+- Publication recovery: the first report upload lost its SSH connection.
+  Inspected the existing destination through shared-storage host gpu2 before
+  any retry: old report.tar.gz contains 2,916,352 bytes, SHA256
+  `2996e0a8e51939b093f830b202781b5cd0eb3f3397a0e86b2412168349b3b834`,
+  not the complete local bundle (3,555,736 bytes). Preserved that partial file;
+  publication uses the distinct report-v2.tar.gz path above, never overwrites
+  or promotes the partial upload. No compute job was replayed.
+- Report publication **verified** through gpu2: report-v2.tar.gz is exactly
+  3,555,736 bytes, expected SHA256 `2bfafa0c…ff5b`; every tar member reads
+  successfully. Partial first upload retained. The PR's adjacent PLAN-row
+  conflict was resolved by retaining this study's row and the upstream T1
+  outcome; no T1 work was run or changed by this study. Auto-merge stays off
+  under the separately recorded approval block.
+- Final branch verification after incorporating origin/main `058d8225`:
+  `ruff check` passes; `mypy --config-file pyproject.toml` passes (195 files);
+  `python -m pytest`: 843 passed, 24 skipped, 1 unchanged macOS protected-path
+  symlink-resolution failure. `git diff --check` passes. PR diff is confined
+  to this study's PLAN text, card, experiment entry, audit utility and tests.

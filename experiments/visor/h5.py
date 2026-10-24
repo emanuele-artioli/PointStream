@@ -442,13 +442,14 @@ class Judges:
                        "dists": quality.dists_record(Path(args.dists_backbone))}
 
 
-def dists_regions(net: Any, x: Any, y: Any, masks: list[Any]) -> list[Any]:
+def dists_regions(net: Any, x: Any, y: Any, masks: list[Any], reference_features: Any = None) -> list[Any]:
     """`quality.masked_dists` for several masks from one pass of the network over ``x`` and ``y``."""
     import torch
     import torch.nn.functional as F
 
     with torch.inference_mode():
-        fx, fy = net.forward_once(x), net.forward_once(y)
+        fx = net.forward_once(x)
+        fy = net.forward_once(y) if reference_features is None else reference_features
         total = net.alpha.sum() + net.beta.sum()
         alpha = torch.split(net.alpha / total, net.chns, dim=1)
         beta = torch.split(net.beta / total, net.chns, dim=1)
