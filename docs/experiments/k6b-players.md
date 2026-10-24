@@ -2149,3 +2149,97 @@ a weaker claim automatically.
   and source-code artifacts (old jobs `20261022T123413Z-eba7629b`,
   `20261021T171936Z-50ce2f74`): exact reconstruction passes in2.43 CPU seconds.
   No new source-video download or quality result; this is correctness evidence.
+
+- Submitted inputs-all12: **`20261024T203302Z-332cab62`**, spec SHA256 `7fa35cdae4a5e3953343f11c95a62c89405de0d445742a7655b67c24835ab149`, code `e35d3b3c`, returnedpending. Receipt `/tmp/k6b-confirm-inputs-all12-submit.json`. CPU-only,0 GPU-h.
+
+- Submitted anchors-pilot2: **`20261024T203305Z-855eccf9`**, spec SHA256 `72194f4550a3dad06a66d990cc16fcd96a5484b18b270c126113c27df02e1bbe`, code `e35d3b3c`, returnedpending. Receipt `/tmp/k6b-confirm-anchors-pilot2-submit.json`. 2700 s reservation; all-source GPU spending before running anchor jobs0.65982/8 h.
+
+- First anchor/source-code job `20261024T201059Z-29586984` **complete**,
+  full scientific validator passes. Real same-window codecs/decodes, source
+  q4-velocity-e4 codes and oracle masks on all three240-frame windows;
+  per-window times363.62/329.54/343.78 s, total component1047.21 s. Claimed
+  GPU job1347.10 s =0.37420 h. Known total **1.03402/8 GPU-h**,
+  plus active second anchor `20261024T203305Z-855eccf9`.
+  Archive SHA256 `67444a2a8f56c8700fb073a1184ce207ec3ad38cc003dbafa6710bb33836dff9` under that job's full/
+  published.tar; no quality interpretation before all12 pooled source rates.
+- All12 CPU geometry-pack job `20261024T203302Z-332cab62` **complete**,
+  0 GPU-h; inputs.tar SHA256 `8bf1cc899b4597d1bfa7e7d86d3ce60d7516ebcfd948eb9e22eefccf1be780e4`. Frozen per-window masks,
+  sources, fps and judging indices ready for every comparison. Source pack
+  and first-six pack differ only by included windows, not per-window data.
+- Source timing now predicts four three-window anchor shards about1.50 GPU-h
+  total; features including failures0.65982 h. With old measured same-recipe
+  renderer1252 s/window plus per-job smokes/validation, all12 renders about
+  4.5 h and judging about0.2–0.4 h: still within8 h. New renderer cost measured
+  before scaling; its recipe remains fixed. Initial correctness smoke0.3 h is
+  the one-time campaign; repeated fleet gate work is charged to its associated
+  pilot/scale window allocation, with every second counted once in total8 h.
+- Next: third source-code/anchor shard on the free Ada GPU and CPU preparation
+  of the first three windows using their completed native source-code artifact.
+  Target pose maps/crop boxes/run IDs/reference placement are recomputed by the
+  strengthened validator before any generation. Save returned IDs before wait.
+
+- Anchor/source shard submission assigned **`20261024T204512Z-8a7d6449`**
+  but returned **submission outcome unknown**: snapshot extracted, temporary
+  archive cleanup did not finish. Do not replay or assume a GPU job exists.
+  Inspect this exact ID and presence of signed spec/ready state first. No new
+  code/model/data choice is involved; source snapshot transfer used90 s cap.
+- CPU prepare first-three submitted **`20261024T204514Z-f427e93b`**, spec SHA256
+  `39a4d82d16606aad47c04b7118a7f2bfaad9fdf7fa0013660f1497e386dd76ce`, code `e35d3b3c`, returnedpending;0 GPU-h.
+  Receipt `/tmp/k6b-confirm-prepare-first3-submit.json`. Retain its ID independently of the uncertain anchor request.
+
+- Inspected uncertain request `20261024T204512Z-8a7d6449`: broker reports
+  unpublished/unknown; shared directory has source/,source.tar,events only,
+  **no spec.json, no ready.json, no run/**. Submission process exited2.
+  Therefore it was never runnable and spent0 GPU-h. Preserve that snapshot;
+  no manual cleanup or publication. A new replacement request is justified,
+  not a replay of an unknown running job. Transfer will explicitly select the
+  complete workload trees (experiments/src/env/scripts/tools plus pyproject),
+  excluding unrelated docs/tests; same code revision and all runtime inputs.
+- CPU preparation `20261024T204514Z-f427e93b` **complete**,0 GPU-h; second
+  anchor `20261024T203305Z-855eccf9` running full with two completed windows
+  at this inspection. Next source request uses a fresh44-min deadline.
+
+- Confirmed replacement third anchor submitted **`20261024T205303Z-4928c016`**, spec SHA256 `5ed8b884b56b57e5a871d68542fe059958aea0ce4d6a024cda57c7b2fe8660b0`, code `e35d3b3c`, selected runtime trees recorded in snapshot; returnedpending. Receipt `/tmp/k6b-confirm-anchors-remaining1-v2-submit.json`. The old unpublished `20261024T204512Z-8a7d6449` remains untouched/non-runnable.
+
+- First-three CPU preparation `20261024T204514Z-f427e93b` complete with full
+  scientific validation. Archive SHA256 `674c40981a7d805a2d241b12bf499ca1a6e99351234581edebe30667cb6bfa0c`.
+  First two windows have two240-frame/one-run player units each; Alcaraz013
+  has two239-frame/two-run units (one excluded registration frame). References
+  all first fitted scored frame0. Actual decoded keypoint maps, crop boxes,
+  run IDs, source YUV identity and reference membership/placement verified.
+- First renderer pilot ready: Alcaraz031@129, both actual240-frame players,
+  exact existing C base and matching adapter/guider,4-bit, guidance2.0,
+  512×784,30DDIM, source-deterministic seeds. Smoke8 frames per real unit,
+  fullall coded frames,1700 s full/180 s smoke/2100 s total reservation.
+  No tuning, fitting or alternative profile. Current source-data scope and
+  references/exact matte remain granted; original-source gate unresolved.
+
+- First renderer submitted **`20261024T205730Z-869e62f2`**, spec SHA256 `0532d7e391b3580740f0f1c9799287a4f10223d6941c6f9898462c563230624a`, code `e35d3b3c`, selected runtime trees; returnedpending. Receipt `/tmp/k6b-confirm-generate-pilot1-submit.json`. Alcaraz031@129 both240-frame player units,2100 s reservation, deadline2026-10-24T21:41:26Z. No new fitting.
+
+- Second anchor shard `20261024T203305Z-855eccf9` **complete**, full
+  scientific validation passes; archive SHA256 `d77d38a9fec4b09d2cc733a4181fef83f7c7619f5a68aa98e32e6cf4aa824878`.
+  This finishes all six pilot windows' real anchors and source codes. Claimed
+  GPU wall1315.90 s; known total **1.39955/8 h**, plus active
+  source shard `20261024T205303Z-4928c016` and renderer
+  `20261024T205730Z-869e62f2`. No quality decision until all12 pooled rates.
+- First renderer's initial status/wait confirms it passed the substantive
+  real-model smoke and entered full sampling on gpu6. Expected body units,
+  frozen recipe/checkpoints/guider billing, device/kernels and actual generated
+  target coverage validated before promotion. No fitting or alternative model.
+- Next CPU-only preparation covers the second three pilot windows from their
+  completed source-code artifact. Remaining-six rendering stays unreleased.
+
+- Second-three CPU preparation submitted **`20261024T210930Z-91f893e4`**, spec SHA256 `a2a312639c80150b6f0264316da9c97a3a2017b305d5cd4859f184a5a10f583c`, code `e35d3b3c`, selected runtime trees, returnedpending;0 GPU-h. Receipt `/tmp/k6b-confirm-prepare-second3-submit.json`.
+
+- Second-three CPU preparation `20261024T210930Z-91f893e4` complete (0 GPU-h).
+  At this batch event, replacement source shard `20261024T205303Z-4928c016`
+  and renderer pilot `20261024T205730Z-869e62f2` were both running full on
+  gpu6; renderer completed one real player unit. No resubmission or recipe
+  change. Completed anchor GPU subtotal remains1.39955/8 h before active jobs.
+  Native bounded batch wait result `/tmp/k6b-confirm-pilot-next-wait.json`.
+
+- Third source/anchor shard `20261024T205303Z-4928c016` complete with full scientific validation; archive SHA256 `543d4aa07500a89cfa0a65f9381ebff1d69114f527cce102043645cd6aaae162`. Charged GPU wall 0.351748 h; completed total **1.75129/8 h**, renderer pilot still active. No quality interpretation.
+
+- Final source/anchor shard submitted **`20261024T211935Z-d45d6fbb`**, same fixed ten anchors, Med029@138/Al047@123/Med021@246, 2700 s reservation/fresh44-minute deadline, code e35d3b3c. Receipt `/tmp/k6b-confirm-anchor4-submit.json`. Save ID before bounded wait.
+
+- CPU preparation of Al016/Med017/Al008 submitted **`20261024T212000Z-7d4ddcf5`**,0 GPU-h. Rendering these remains gated on first-six futility and cost. Receipt `/tmp/k6b-confirm-prepare-third3-submit.json`.

@@ -4,7 +4,7 @@ Effort: high. Report to the requesting chat and append to
 `docs/experiments/k6b-players.md`; do not launch chats or recurring monitors.
 
 ## Goal
-Proposed next phase: describe whether frozen step-5 AnimateAnyone player
+Describe whether frozen step-5 AnimateAnyone player
 rendering reaches the frozen score on 12 unused clip-local 240-frame windows
 of Alcaraz–Hurkacz and Medvedev–Struff under the frozen ≥95% court-registration
 gate. The user explicitly approved this same-broadcast diagnostic scope on
@@ -14,8 +14,8 @@ confirmation. The stronger confirmation goal remains blocked. Step 5 remains fai
 ## Scope and stop conditions
 User approval (2026-10-24): **8 GPU-hours hard ceiling**, all smoke/failed/retry
 work included. Explicit clip-local scope approval resolves the earlier
-provenance condition for this diagnostic. **0.07568 spent** before the current
-feature job; live accounting and job IDs are in the experiment entry. CPU source
+provenance condition for this diagnostic. **1.75129 spent** before the active first renderer and final
+anchor shard; live accounting and job IDs are in the experiment entry. CPU source
 checks found no original Alcaraz/Medvedev videos or verified extraction receipts
 in the inspected archive/records; source-frame mapping remains unresolved.
 Independent-source confirmation stays blocked at that gate. The original
@@ -152,7 +152,7 @@ bounded fleet wait. No recurring monitors. Preserve evidence read-only and
 write new outputs under Datasets. Run project checks, commit/push scoped work,
 report here. Scope and ceiling are approved; GPU execution still requires the
 remaining CPU prerequisites and staged gates to pass;
-0.07568 of 8 GPU-hours spent before the current feature job. No fitting,
+0.65982 of 8 GPU-hours spent before the current anchor jobs. No fitting,
 source download, other chat, recurring
 monitor or auto-merge attempt is authorized by this continuation.
 
