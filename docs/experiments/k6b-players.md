@@ -773,3 +773,155 @@ the decisions are in [experiments.md](../experiments.md).
     against step 4's 922; 1,542,044 bytes), `med-A` `…192542Z-76ac4449`
     (843; 1,557,820), `med-B` `…192551Z-62ca7bde` (585; 2,515,324, of
     which the guider's change 965,696: 2.79 kbps over 2 h).
+
+  - The tennis base (`20261023T194934Z-b0dcbb19`, code `3890706`): 36
+    windows of all 5 matches, 8,597 crops (every second frame), 1,918
+    optimizer steps in 25 minutes, the stage 41.2 minutes; passes `k6b_fit
+    validate` (loss 0.217 → 0.207, probe 0.0154 → 0.0140);
+    `075b001a…3285`.
+  - Arm C's `medvedev_struff` fit (`20261023T203428Z-85ca5f54`) failed its
+    smoke on the probe (0.02093 → 0.02102, +0.5%) with every other check
+    passing (base merged, guider billed, loss). The probe's frames come
+    from the training windows, which the base was trained on, so it starts
+    lower (0.0209, against 0.0227 without the base) and 200 steps move it
+    within noise; `djokovic_zverev`'s C passed. For fits on the base, the
+    check now allows a rise under 1%; resubmitted.
+  - Development judge for arms A and B (`20261023T203239Z-d497467e`,
+    `b1de5471…6cba`, 25 checks, `warp` and `ref` reproduced): A and B each
+    win 2 of 4 window-metrics billed (both of `djokovic_zverev/008`, none
+    of `medvedev_struff/033`, lost by 0.001 on each metric for A); A has
+    the larger margin (0.156 against 0.137 of the envelope).
+  - Arm C fits (on the base, guider trained, 8-bit): `dz-C`
+    `20261023T203414Z-38ef7b42` (821 steps, 2,507,660 bytes), `med-C`
+    `…204452Z-d5c90446` (588, 2,519,640; passes the strict probe test too).
+    Development renders (each passing `k6b_generate validate`): A
+    `…194403Z-815f567a`, `…194332Z-0f8fbf72`; B `…195337Z-a9db1ff9`,
+    `…194542Z-72dd61dc`; C `…205611Z-1872b27b`, `…210405Z-bf738c80` (008,
+    033 in that order). Judges `…203239Z-d497467e` (A, B) and
+    `…213006Z-b2642a24` (C, `f3cd5fbd…ee8f`), `warp` and `ref` reproduced.
+
+    | arm | 008 billed kbps | 008 LPIPS / env | 008 DISTS / env | 033 billed kbps | 033 LPIPS / env | 033 DISTS / env |
+    |---|---:|---:|---:|---:|---:|---:|
+    | A | 4.91 | **0.240** / 0.324 | **0.143** / 0.229 | 4.77 | 0.226 / 0.225 | 0.227 / 0.226 |
+    | B | 5.98 | **0.233** / 0.309 | **0.138** / 0.220 | 5.84 | 0.229 / 0.219 | 0.228 / 0.223 |
+    | C | 5.98 | **0.225** / 0.309 | **0.133** / 0.220 | 5.84 | 0.222 / 0.219 | 0.226 / 0.223 |
+
+    Envelopes at the billed rate; bold won. Each arm wins 2 of 4; by the
+    rule the larger margin decides: **C** (0.159 of the envelope, A 0.156,
+    B 0.137). C is best on every cell; B's data and guider alone gain
+    little on 033 (2 training windows) and their 0.97 MB guider raises the
+    bar. Render-time variants of C submitted: 4 bits (from the fp16
+    checkpoint) and guidance 2.0, on both windows.
+  - Render-time variants of C (renders `20261023T213704Z-20255857`,
+    `…213714Z-d0fde23f` at 4 bits; `…213721Z-d2107908`,
+    `…213730Z-5bb220ed` at guidance 2.0; judge `…220810Z-042508fa`,
+    `1bfd7fc3…9157`, 25 checks). 4 bits bills 1,491,392 and 1,495,592
+    bytes (guider change 0.42 MB), 1.66 kbps over 2 h.
+
+    | variant | 008 LPIPS | 008 DISTS | 033 LPIPS / env | 033 DISTS / env | won | margin |
+    |---|---:|---:|---:|---:|---:|---:|
+    | C | **0.2246** | **0.1333** | 0.2223 / 0.219 | 0.2263 / 0.223 | 2 | 0.159 |
+    | C, 4 bits | **0.2246** | **0.1335** | **0.2220** / 0.225 | 0.2262 / 0.226 | 3 | 0.185 |
+    | C, guidance 2.0 | **0.2264** | **0.1372** | **0.2155** / 0.219 | 0.2246 / 0.223 | 3 | 0.163 |
+
+    By the rule, **4 bits** (within 0.0004 of 8 bits on every cell) and
+    **guidance 2.0** (3 won against 2). The two were chosen apart; their
+    combination is first rendered in the scaled run. Development report
+    `k6b-report-step5-dev.json`. Budget so far 6.98 GPU-hours.
+  - Scaled run: `gen-match5` = C, 4 bits, guidance 2.0. `djokovic_zverev`
+    reuses `dz-C` (the same data, recipe and exclusions as a new fit);
+    fits for `djokovic_federer`, `alcaraz_hurkacz` and `rublev` submitted.
+    It projects to about 10.6 GPU-hours; the per-player Djokovic variant
+    (a fit and 3 renders, about 1.6 more) would pass the ceiling, so it
+    waits for the user.
+  - The first submission of the `djokovic_zverev/012` render
+    (`20261023T221727Z-f4e7cb41`) timed out transferring its snapshot to
+    gpu1; inspected, it was never published (no specification or ready
+    record), so no worker can run it. It is left in place, and the render
+    is a new request (`20261023T221822Z-70715001`).
+  - Scaled fits (C; code `45b9b90`): `djokovic_federer`
+    `20261023T221639Z-aec779fe` (7 windows, 3,360 crops, 617 steps),
+    `alcaraz_hurkacz` `…221650Z-3d7cbe2f` (3, 1,440, 716), `rublev`
+    `…221700Z-502a4298` (13, 6,166, 600; probe 0.0132 → 0.0131, the
+    smallest move); `djokovic_zverev` reuses `dz-C`. Each passes `k6b_fit
+    validate`. Renders (`match5`: the fp16 checkpoint quantized to 4 bits
+    as billed, guidance 2.0, the base merged), each passing `k6b_generate
+    validate`: 038 `20261023T223743Z-69111776` (`5a99b977…6515`), 072
+    `…223751Z-7c51a9ee` (`29dc6cb3…05b1`), 012 `…221822Z-70715001`
+    (`ad26e1a2…8a4c`), 036 `…223535Z-e9d7c710` (`9fcf4bab…f7e2`), 045
+    `…223542Z-32a6e7dc` (`3a86468a…05c5`), 052 `…224225Z-3f7d4ed2`
+    (`66636952…cbd4`). Billed: 1,478,828 (`djokovic_federer`), 1,491,392,
+    1,488,252, 1,489,388 bytes, 1.64–1.66 kbps over 2 h. Judges
+    `20261023T231003Z-4fe6e239` (038, 052, 045; `4b57f935…9792`) and
+    `…232338Z-94c7a048` (072, 012, 036; `39277b5b…77ff`), 29 checks each,
+    `warp` and `ref` reproduced. Report `k6b report --step 5 --billing
+    k6b-step5-billing.json --hours 2` (`k6b-report-step5.json`,
+    `73f2929a…8b4f`); development report `k6b-report-step5-dev.json`
+    (`0457b86c…35e6`); receipts `k6b-step5-validation.tar`
+    (`65db4ec2…2c52`); all read-only in
+    `~/pointstream-data/tennis/k6b-2026-10-22/report/`.
+
+    | window | billed kbps | LPIPS / billed env | step 4 | DISTS / billed env | step 4 | payback h |
+    |---|---:|---:|---:|---:|---:|---:|
+    | djokovic_federer/038 | 4.38 | **0.196** / 0.219 | 0.197 | **0.190** / 0.208 | 0.184 | 0.52 |
+    | djokovic_federer/072 | 4.56 | **0.224** / 0.230 | 0.230 | **0.201** / 0.209 | 0.195 | 1.16 |
+    | djokovic_zverev/012 | 4.98 | **0.264** / 0.354 | 0.275 | **0.154** / 0.229 | 0.151 | 0.23 |
+    | alcaraz_hurkacz/036 | 3.59 | **0.234** / 0.261 | 0.245 | **0.216** / 0.235 | 0.219 | 0.82 |
+    | alcaraz_hurkacz/045 | 3.73 | 0.290 / 0.260 | 0.305 | 0.252 / 0.237 | 0.259 | – |
+    | rublev_auger-aliassime/052 | 11.46 | 0.366 / 0.234 | 0.344 | 0.184 / 0.156 | 0.171 | – |
+
+    Bold: won billed. `gen-match5` wins 4 of 6 on LPIPS and 4 of 6 on
+    DISTS, billed and unbilled alike (**score 67%**, both). K6's saving
+    statistic: mean −58%, 95% CI −267% to +69%, positive on 4 windows.
+- **Outcome: fails** by the rule (< 75% unbilled). Billing no longer costs
+  anything (4 bits and the guider at 1.66 kbps; 072's LPIPS, lost to
+  billing in step 4, is won), and LPIPS improves on five windows (by
+  0.001–0.015). But the two windows that step 4 lost stay lost on both
+  metrics: `alcaraz_hurkacz/045` improves (LPIPS 0.305 → 0.290, DISTS
+  0.259 → 0.252) and still misses by 0.015–0.030; `rublev/052` gets worse
+  (0.344 → 0.366, 0.171 → 0.184). DISTS is slightly worse than step 4 on
+  four windows (by 0.001–0.006), as guidance 2.0 was on
+  `djokovic_zverev/008`. Read as the rule says: the AnimateAnyone line
+  closes for players at the keypoint rate; the open route is a newer
+  generator (step 6, after an environment audit).
+- Against the hypothesis: 4 bits flipped 072 (as predicted); the tennis
+  base and more data helped where step 4 already won and on 045's
+  values, but did not win 045 (predicted: one metric) or 052's DISTS
+  (predicted: won with 2.2× data; it got worse). Competing explanation 1
+  (the losing windows are hard for this generator at any data) fits:
+  052 is judged on 32 frames at a cut, and its fit moved least (probe
+  −1%). Not separated: whether guidance 2.0 or the Rublev fit made 052
+  worse (the two were chosen apart on the development windows and first
+  combined here).
+- Per-player Djokovic variant: **not run**. It would have taken the step
+  past the ceiling (about 1.6 GPU-hours more), and it cannot change the
+  verdict: all three Djokovic windows are already won.
+- Budget: **10.02 GPU-hours** of 11 (37 jobs, smokes included, from the
+  jobs' execution records).
+
+### 2026-10-24 — K6b (players) 5b: CPU diagnosis and scope hypothesis (rule)
+- Question: why do 045 and 052 lose, and can an encoder-computable rule
+  route difficult windows to pixels? Step 5 remains a fail.
+- Before new measurements: test 052's shot-cut explanation first. Compare
+  court-registration runs, video cut positions, reference frame indices and
+  judged indices; distinguish a cut anywhere from a reference crossing a cut.
+- Measurements on all eight K6 windows (008 and 033 are also development
+  windows, not two extra independent windows): registered share, player
+  heights, pose misses, camera motion/cuts, coded rate, LPIPS/DISTS envelope,
+  reference-to-target time/pose distance, and saved steps 2–5 margins.
+- Hypothesis: mixed shots explain 052, and small or poorly fitted players
+  explain 045. Competing explanation: reference selection stays in court
+  view and equally small successful players refute that explanation; errors
+  may be generator-specific. No causal claim from correlation alone.
+- Scope selection: first test a single-shot window (no detected internal cut);
+  then examine registered share, heights and fit coverage. Report exclusions
+  and pooled/scoped numerators and denominators side by side for every
+  step, billed and unbilled where available. Never infer missing scores.
+  Any discovered threshold is exploratory and requires unused-window
+  confirmation on every method with identical inclusion.
+- Budget: zero GPU-hours; saved data and CPU analysis only, no fitting,
+  Wan-Animate or 34-window final run. Stop with a measured explanation
+  or explicit uncertainty and a bounded, unexecuted confirmation proposal.
+- Provenance integration: step-5 run continuation copied verbatim from
+  d0a00e5b7e5a0fa2ec53a330eff62b4eea93e756, absent from origin/main
+  58f4eba9. Existing entries retained; no earlier verdict changed.

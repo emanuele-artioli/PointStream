@@ -152,7 +152,7 @@ marked `card ready` is waiting for the user to start it.
 | K6b players 4 | match fit, billed | `claude/k6b-players-zeroshot` @ `20eb7c3` | Opus | reported 2026-10-23: fail (67% unbilled, 58% billed); 7.0 GPU-hours of 7 |
 | K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5` | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11. PR #225 merged before this outcome commit: not on main yet |
 | K6m | the players' matte on tennis | — | Sonnet | card dismissed 2026-10-24: folded into T1 |
-| K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | card ready 2026-10-24 ([card](docs/cards/k6b-players-5b.md)); user agreed to run it |
+| K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | running 2026-10-24: CPU-only diagnosis; 0 of 0 GPU-hours |
 | T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | card ready 2026-10-24 ([card](docs/cards/t1.md)) |
 | K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
 | H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask` | Codex high | card ready 2026-10-24 ([card](docs/cards/h5p-4d.md)) |
