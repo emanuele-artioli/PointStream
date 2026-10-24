@@ -791,3 +791,47 @@ the decisions are in [experiments.md](../experiments.md).
   number of pairs affordable. A missing decoder interface or oracle that
   cannot dominate its proposed correction family is a design blocker,
   not a measured failure of decoder segmentation.
+- CPU submission (revision `f632732c`): P01_107
+  `20261024T082551Z-b86db128` (acknowledged pending). Input mask archive
+  SHA256 `049977f057a367a921255dbf894489b877d85c0f33e1baf2554e0ca1af96799a`;
+  packed environment `pointstream-20261009T214002Z`, SHA256
+  `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`.
+  Command: `python -m experiments.visor.h5_shape --masks {staged:fill_masks}
+  --item ITEM --frames {frames}`; frames 8 smoke / 240 full. No native
+  video encoder or decoder is used by this CPU shape experiment.
+- CPU submission P02_02: `20261024T082613Z-c3ff4ae0` (pending at
+  acknowledgement); same revision and staged inputs as P01_107.
+- CPU submission P03_10: `20261024T082655Z-eb51efd6` (pending at
+  acknowledgement). P01_107's real smoke completed three exact roundtrips;
+  smoke rates are infrastructure checks, not pilot evidence.
+- CPU submission P09_106: `20261024T082741Z-0dec552f` (acknowledged).
+- CPU full-stage results (240 frames, revision `f632732c`): intra |
+  temporal | motion, kbps: P01_107 44.53 | 14.80 | 15.07;
+  P02_02 50.79 | 24.79 | 25.83; P03_10 50.65 | 21.54 | 22.88;
+  P09_106 15.25 | 11.76 | 10.85. All 12 full encode/decode roundtrips
+  are exact on the reduced union. **Rule (a) fails, 0/4 ≤2 kbps.** This
+  rejects these three configurations, not every possible CAE/motion coder.
+- (b) Concrete configuration, fixed before GPU submission: the pinned
+  B1b SAM 3.1 mask tracker on each saved 4a decoded foreground point,
+  initialized with the first s=8 union mask, actually encoded and decoded
+  with the intra shape coder. No future human prompt is granted. The
+  predictor tracks the union as one object; it does not receive source
+  images, object labels, later masks, or corrections as tracking prompts.
+  Its full-size predictions are majority-reduced to s=8. Send the XOR
+  against the target s=8 union through the temporal shape coder; bill seed,
+  correction payload and two configuration bytes. Decoder XOR roundtrips
+  must recover 4a's exact reduced union on every frame. G_HO is the same
+  in both slots, so class identities cannot change the corrected image.
+- This is a **real corrected-mask configuration**, not a bound on all
+  segmentation/correction methods. Its unchanged binary masks allow the
+  measured 4a composites/metrics to be reused point by point with MASK
+  bytes replaced. Each foreground point has its own correction rate: never
+  apply one point's predictor to other points for free. Uncorrected IoU is
+  reported, not substituted for an unmeasured DISTS score. No claim about
+  uncorrected segmentation's BD-rate is made without scoring it.
+- GPU budget allocation: four jobs capped at 1800 seconds each (sum 2 h),
+  each smoke ≤300 s (8 frames, first point), full ≤1320 s (240 frames,
+  all saved foreground points), validator ≤60 s; remaining allowance for
+  overhead. SAM 3.1 on Ada/A6000 is already in the model–GPU table;
+  runtime/device and full checkpoint load are validated again. Per-point
+  results are saved immediately, preserving completed work if time runs out.
