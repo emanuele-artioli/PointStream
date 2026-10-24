@@ -2261,3 +2261,17 @@ a weaker claim automatically.
 - Fourth renderer submitted **`20261024T214544Z-7d7c0bb1`**, Med037@349 both240-frame/one-run units, fixed matching C recipe; spec SHA256 `ac44b5b6d5d4bbaecf032ddc77c83cfcae9e147d86718d143fee7d189d5802bc`, code6ccc5ec2,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen4-submit.json`.
 
 - CPU report integration probe succeeded with all12 real anchor sources and both completed generation receipts; zero judged rows/no quality verdict, output `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/report-input-probe-20261024T2147Z.json`, SHA256 `d946015f67695c6367f0614cb78f39ae30f586bcdfef7b83c9e68cfd2386ac0c`. All source artifact checksums and substantive smoke/full receipts accepted by the final report path. No CUDA visible/no GPU use.
+
+- Renderer3 `20261024T214351Z-3f29c4ca` complete; full scientific validation passes. Archive SHA256 `e01f05ebff35a4cf56f6e6b50e55d931567ded5ee205690d48183c4f35e8c3b5`; charged wall0.394257 h.
+
+- Renderer4 `20261024T214544Z-7d7c0bb1` complete; full scientific validation passes. Archive SHA256 `bf6a7b3ed374cdd8efe951b313dcfbf643369ceeb3905b4247748fc5b192b253`; charged wall0.371825 h.
+
+- Fifth renderer submitted **`20261024T220850Z-3f03ad01`**, Al023@228; spec SHA256 `c7c0bc1839046877c174297c3fca660c22e1ba43f36bf71ee07c46d04ff4bf70`, code48a7f136,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen5-submit.json`. Completed total **3.64351/8 h** before pilot windows5–6.
+
+- Sixth renderer submitted **`20261024T220858Z-76fbb3a9`**, Med002@338; spec SHA256 `1f9d62c14f4487fbc10bca662e0d2e419d79b647c3b7dc4189198cc38086332e`, code48a7f136,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen6-submit.json`. First-six pilot now fully submitted; remaining-six render jobs not released.
+
+- CPU preparation third3 complete with substantive full pose-map/run/crop/reference/source-decode validation; archive SHA256 `6bef89419065f5c7a28883027deb0f8828890a2982a804b9efd8893bb902e3fc`,0 GPU-h. All12 are prepared; remaining-six rendering remains unreleased pending the first-six quality decision.
+
+- CPU preparation fourth3 complete with substantive full pose-map/run/crop/reference/source-decode validation; archive SHA256 `1843fae75e58df685baa9b3e01b5ebad933595190ae27b1ec7996485d0fb2300`,0 GPU-h. All12 are prepared; remaining-six rendering remains unreleased pending the first-six quality decision.
+
+- Additional CPU preflight resolved saved-coordinate precision concern: native judge reconstructed the exact source R/S mask hashes on **all480 judged frames across all six pilot windows**, zero mismatches and no quality metrics. Initial null-image probe stopped on a hard-coded shape error; corrected to native `FRAME=(1920,1080)` before the successful audit;0 GPU-h. No scientific/source/renderer change. Evidence script and both logs archived as `tennis/k6b-confirm-20261024-execution/mask-preflight-20261024T2220Z.tar.gz`, SHA256 `f5a476fa9c3a06d4dff4ddf0671599e0d69b755568137f6cb2eca103d5a37591`. Judge work will be two three-window shards using the exact original preparation packs and corresponding generated archives, combined in one frozen-cohort report.

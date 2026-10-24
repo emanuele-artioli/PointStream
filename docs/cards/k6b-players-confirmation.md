@@ -14,7 +14,7 @@ confirmation. The stronger confirmation goal remains blocked. Step 5 remains fai
 ## Scope and stop conditions
 User approval (2026-10-24): **8 GPU-hours hard ceiling**, all smoke/failed/retry
 work included. Explicit clip-local scope approval resolves the earlier
-provenance condition for this diagnostic. **2.87743 spent** before the active third and fourth
+provenance condition for this diagnostic. **3.64351 spent** before the active fifth and sixth
 renderer shards; live accounting and job IDs are in the experiment entry. CPU source
 checks found no original Alcaraz/Medvedev videos or verified extraction receipts
 in the inspected archive/records; source-frame mapping remains unresolved.
