@@ -138,7 +138,9 @@ def analyze(args: argparse.Namespace) -> None:
         value['command'] = command
         rows.append(value)
         print(f'{wid}: {len(scenes)} frames; cuts {value["cuts"]}', flush=True)
-    output = {'rows': rows, 'inputs': inputs, 'ffmpeg': ffmpeg,
+    inventory = json.loads((Path(args.inputs) / 'inputs.json').read_text())
+    inventory = {w: r['window'] for w, r in inventory['windows'].items()}
+    output = {'rows': rows, 'inventory': inventory, 'inputs': inputs, 'ffmpeg': ffmpeg,
               'ffmpeg_version': subprocess.check_output([ffmpeg, '-version'], text=True).splitlines()[0],
               'cuda_visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES'), 'expected_windows': len(chosen)}
     (stage / 'scope.json').write_text(json.dumps(output, indent=2, allow_nan=False) + '\n')
@@ -199,6 +201,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='action', required=True)
     run = sub.add_parser('analyze')
+    run.add_argument('--inputs', required=True)
     run.add_argument('--k6-stage', action='append', required=True)
     run.add_argument('--windows', nargs='+', required=True)
     run.add_argument('--sources', nargs='+', required=True)

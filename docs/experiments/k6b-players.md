@@ -940,3 +940,11 @@ the decisions are in [experiments.md](../experiments.md).
   Boot-log SHA256 recorded in the export receipt; original request retained.
   Corrected request includes the fleet runtime dependencies; this is a
   diagnosed startup failure, not a replay of uncertain execution.
+- Corrected CPU request `20261024T082728Z-19b9b119`: pending at submission, code
+  `f7fa4cf6`; snapshot `b8a633ee0e96d58ea1b6c9a0124eec172dc2439d02867ffe7da81941c49d7216`. Same
+  inputs and 1,200 s CPU ceiling, zero GPU allocation.
+- Corrected request `20261024T082728Z-19b9b119` failed its smoke
+  before decoding: the reused specification passed `--inputs`, which the
+  analysis parser did not accept. Exit 2 confirmed in `smoke/command.log`;
+  no full stage ran. Added the input-manifest parser and archived-window
+  inventory, retained both failed jobs; still 0 GPU-hours.
