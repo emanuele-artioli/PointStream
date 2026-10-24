@@ -45,12 +45,13 @@ A card's prompt stands alone:
 
 ## The dispatch ledger
 
-The root session updates its ledger row at every event, not in batches:
-card sent, report received, pull request merged, item stopped. A fresh root
-session must be able to carry on from PLAN.md alone, so nothing it needs
-lives only in its conversation. The startup hook flags rows still marked
-queued whose branch already has a merged pull request
-([hooks](#hooks)).
+Whoever owns a row updates it at every event, not in batches: card
+written, session started, report sent, pull request merged, item stopped.
+Without a root session (from 2026-10-24) each item session owns its own row
+([Codex](#codex)). A fresh session must be able to carry on from PLAN.md
+alone, so nothing it needs lives only in a conversation. The startup hook
+flags rows still marked queued or card ready whose branch already has a
+merged pull request ([hooks](#hooks)).
 
 ## Asking the user
 

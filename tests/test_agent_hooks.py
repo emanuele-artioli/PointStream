@@ -49,6 +49,37 @@ def test_merged_prs_matches_whole_branch_names() -> None:
     assert "claude/j-experience-rejudge" not in merged
 
 
+def test_ledger_rows_read_the_branch_from_the_current_column_format() -> None:
+    plan = """### Dispatch ledger
+
+| item | card | branch | model / effort | status |
+|---|---|---|---|---|
+| J | rejudge | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: fail |
+| K6m | matte | — | Sonnet | card dismissed 2026-10-24 |
+| T1 | split | `codex/t1-tennis-split` | Codex high | card ready 2026-10-24 ([card](docs/cards/t1.md)) |
+"""
+    rows = ledger.ledger_rows(plan)
+    assert [(r.item, r.branch) for r in rows] == [
+        ("J", "claude/j-experience-rejudge"),
+        ("T1", "codex/t1-tennis-split"),
+    ]
+
+
+def test_the_ledger_on_main_parses() -> None:
+    rows = ledger.ledger_rows((ROOT / "PLAN.md").read_text(encoding="utf-8"))
+    assert rows and all("/" in r.branch and " " not in r.branch for r in rows)
+
+
+def test_card_ready_rows_with_merged_prs_are_stale_running_ones_are_not() -> None:
+    rows = [
+        ledger.Row("A", "claude/h5p-f-stream", "card ready 2026-10-24"),
+        ledger.Row("B", "claude/h5p-f-stream", "running 2026-10-24"),
+        ledger.Row("C", "claude/h5p-f-stream", "reported 2026-10-24: pass"),
+    ]
+    stale = ledger.stale_rows(rows, ledger.merged_prs(SUBJECTS))
+    assert len(stale) == 1 and stale[0].startswith("- A ")
+
+
 def test_stale_rows_flags_queued_rows_with_merged_prs_only() -> None:
     stale = ledger.stale_rows(ledger.ledger_rows(PLAN), ledger.merged_prs(SUBJECTS))
     assert len(stale) == 1
