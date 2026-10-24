@@ -835,3 +835,25 @@ the decisions are in [experiments.md](../experiments.md).
   overhead. SAM 3.1 on Ada/A6000 is already in the model–GPU table;
   runtime/device and full checkpoint load are validated again. Per-point
   results are saved immediately, preserving completed work if time runs out.
+- Local checks: pinned temporary Python 3.12 environment from `.[dev]`;
+  ruff passed. Initial base-Mac checks were unsuitable (numpy 2 / missing
+  stubs), so no result from them is treated as a project regression.
+  Full pinned pytest: 828 passed, 25 skipped, two platform-sensitive failures
+  (`ps` denied by sandbox; protected dangling `/home/.../Datasets` symlink
+  resolution on macOS). Rechecking those outside the sandbox separately.
+- Decoder submission P01_107: `20261024T083129Z-617103d1`, revision
+  `94178029`, pending at acknowledgement; ≤1800 seconds (0.5 GPU-hours).
+  No other decoder jobs submitted until this smoke is inspected.
+- Review correction before promoting decoder work: saved `decoded.mkv`
+  contains mask-placed G_HO enhancement, so using it directly is circular.
+  Cancelled only our job `20261024T083129Z-617103d1` after 50.6 s
+  (0.0141 GPU-hours), retaining its smoke artifacts but **excluding them
+  from scientific evidence**. This is a methodological error, not a SAM
+  failure. The corrected entrypoint independently decodes `stream.psdc`
+  with the matching stock/venue weights before loading SAM. Both native
+  decoder passes must agree. SAM then sees raw pre-enhancement RGB only.
+  Decoder processes finish before SAM is loaded, avoiding simultaneous
+  codec/tracker GPU memory. The saved enhanced frames supply no pixels.
+- Remaining allocation: first corrected job ≤1740 s, other three ≤1800 s;
+  plus the cancelled 50.6 s totals at most 7190.6 s (<2 GPU-hours). Full
+  first job ≤1260 s; no retry may exceed this aggregate allowance.

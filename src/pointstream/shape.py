@@ -37,7 +37,8 @@ def motion(current: np.ndarray, previous: np.ndarray, block: int = 32) -> np.nda
             th, tw = target.shape
             area = padded[y:y + th + 8, x:x + tw + 8]
             costs = cv2.matchTemplate(area, target, cv2.TM_SQDIFF)
-            best = np.unravel_index(int(costs.argmin()), costs.shape)
+            raw_best = np.unravel_index(int(costs.argmin()), costs.shape)
+            best = (int(raw_best[0]), int(raw_best[1]))
             # Prefer no motion on ties, including all-background blocks.
             if costs[4, 4] <= costs[best] + 0.01:
                 best = (4, 4)

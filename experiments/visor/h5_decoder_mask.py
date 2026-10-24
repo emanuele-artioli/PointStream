@@ -25,6 +25,9 @@ def main() -> int:
     p.add_argument('--foreground', action='append', default=[])
     p.add_argument('--item')
     p.add_argument('--checkpoint')
+    p.add_argument('--image-ckpt')
+    p.add_argument('--video-ckpt')
+    p.add_argument('--venue-arm')
     p.add_argument('--frames', type=int, default=240)
     p.add_argument('--points', type=int, default=0)
     p.add_argument('--validate', action='store_true')
@@ -40,7 +43,6 @@ def main() -> int:
                   'finite_rate': all(np.isfinite(x['kbps']) and x['kbps'] > 0 for x in r['rows'])}
         Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps({'passed': all(checks.values()), 'checks': checks}))
         return int(not all(checks.values()))
-    import av
     import cv2
     import torch
     from src.segmentation.sam31_tracker import Sam31MaskTracker, runtime
@@ -57,25 +59,48 @@ def main() -> int:
     seed = shape.decode(seed_bytes)[0]
     # Receiver obtains the very same full-size initial union from these bytes.
     initial = mk.upsample(seed[None], (clip.width, clip.height))[0] > 0
-    tracker = Sam31MaskTracker(args.checkpoint)
     paths = [(arm, f) for arm, root in enumerate(args.foreground)
              for f in sorted((Path(root) / 'publish/points').glob('*/decoded.mkv'))]
     if args.points:
         paths = paths[:args.points]
-    rows = []
+    from experiments.visor.h5 import dcvc_worker, coded_size
+    from experiments.background.g6 import load_arm
+    from experiments.background.g5 import yuv420_to_rgb
     scratch = Path(os.environ['PS_SCRATCH_DIR']) / 'decoder-mask'
     scratch.mkdir(parents=True, exist_ok=True)
+    _, venue_ckpt = load_arm(args.venue_arm)
+    raw_inputs = []
+    for index, (arm, path) in enumerate(paths):
+        point_dir = scratch / f'raw{index}'
+        point_dir.mkdir()
+        scale = int(path.parent.name.rsplit('_', 1)[1])
+        w, h = coded_size(scale)
+        video_ckpt = args.video_ckpt if arm == 0 else venue_ckpt
+        out = point_dir / 'raw.yuv'
+        plan = {'structure': 'htl', 'container': str(path.parent / 'stream.psdc'),
+                'src_type': 'yuv420', 'out_file': str(out),
+                'image_ckpt': args.image_ckpt, 'video_ckpt': video_ckpt,
+                'image_sha256': hashlib.sha256(Path(args.image_ckpt).read_bytes()).hexdigest(),
+                'video_sha256': hashlib.sha256(Path(video_ckpt).read_bytes()).hexdigest()}
+        native = dcvc_worker('decode', plan, point_dir)
+        if not native['deterministic']:
+            raise RuntimeError('native DCVC decode not deterministic; no segmentation evidence')
+        (stage / f'raw{index}-decode.json').write_text(json.dumps(native, indent=2))
+        raw_inputs.append((out, w, h))
+        publish_progress(os.environ['PS_STAGE'], index + 1)
+    tracker = Sam31MaskTracker(args.checkpoint)
+    rows = []
     for index, (arm, path) in enumerate(paths):
         started = time.monotonic()
         frames_dir = scratch / str(index)
         frames_dir.mkdir()
-        with av.open(str(path)) as video:
-            for t, frame in enumerate(video.decode(video=0)):
-                if t >= n:
-                    break
-                image = frame.to_ndarray(format='rgb24')
-                image = cv2.resize(image, (clip.width, clip.height), interpolation=cv2.INTER_CUBIC)
-                cv2.imwrite(str(frames_dir / f'{t}.png'), image[..., ::-1])
+        raw, w, h = raw_inputs[index]
+        planes = np.memmap(raw, np.uint8, mode='r').reshape(-1, h * 3 // 2, w)
+        for t in range(n):
+            image = yuv420_to_rgb(planes[t:t + 1])[0]
+            image = cv2.resize(image, (clip.width, clip.height), interpolation=cv2.INTER_CUBIC)
+            cv2.imwrite(str(frames_dir / f'{t}.png'), image[..., ::-1])
+        del planes
         images, height, width = tracker.load_frames(frames_dir)
         predicted = np.zeros_like(truth)
         inter = union = 0
@@ -103,10 +128,10 @@ def main() -> int:
         rows.append(record)
         result = {'item': args.item, 'frames': n, 'fps': clip.fps, 'rows': rows,
                   'expected_points': len(paths), 'runtime': runtime(), 'model': tracker.load_report,
-                  'native_decoder': {'pyav': av.__version__, 'libraries': {k: list(v) for k, v in av.library_versions.items()}},
+                  'native_decoder': 'src/codecs/dcvc_uf_worker.py; per-point rawN-decode.json',
                   'peak_gpu_mib': tracker.peak_gpu_mib()}
         (stage / 'decoder-mask.json').write_text(json.dumps(result, indent=2))
-        publish_progress(os.environ['PS_STAGE'], len(rows))
+        publish_progress(os.environ['PS_STAGE'], len(paths) + len(rows))
         print(json.dumps(record), flush=True)
         # Local scratch only; preserve stage evidence and all shared inputs.
         for frame_path in frames_dir.glob('*.png'):
