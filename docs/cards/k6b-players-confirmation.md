@@ -1,4 +1,4 @@
-# Card: tennis-player confirmation (CPU preparation complete; budget pending)
+# Card: tennis-player confirmation (8 GPU-hours approved; provenance gate unresolved)
 
 Effort: high. Report to the requesting chat and append to
 `docs/experiments/k6b-players.md`; do not launch chats or recurring monitors.
@@ -10,11 +10,13 @@ court-registration gate. This tests a same-match conditional hypothesis;
 it does not establish independent-match generalization. Step 5 remains failed.
 
 ## Scope and stop conditions
-Current authority: **CPU preparation only, 0 GPU-hours**. Preparation is complete;
-stop for explicit budget approval. No GPU runs, fitting, new generations or
-Wan-Animate are authorized. No other task is included. Proposed future ceiling:
-**8 GPU-hours**, all smoke/failed/retry work included, conditional on CPU
-provenance validation. Stop on unresolved overlap, validator failure, budget
+User approval (2026-10-24): **8 GPU-hours hard ceiling**, all smoke/failed/retry
+work included, contingent on CPU provenance validation. **0 spent**. CPU source
+checks found no original Alcaraz/Medvedev videos or verified extraction receipts
+in the inspected archive/records; source-frame mapping remains unresolved.
+Stop at that gate: no GPU runs or new generations until it clears. No fitting,
+Wan-Animate or other task is included. The authorization/outcome continuation
+is appended to the experiment entry. Stop on unresolved overlap, validator failure, budget
 exhaustion, mathematical futility or required user judgment. No automatic
 replacement, tuning, refit, or expansion of scope.
 
@@ -89,7 +91,7 @@ interim pass; futility stop only if all remaining wins cannot reach the bar.
 115 px results cannot rescue failure. No inference that frames are independent.
 
 Implement and test the substantive validator from the experiment entry before
-GPU dispatch: hashes and dependency/overlap joins, PTS/frame/fps exactness,
+GPU dispatch (only after the unresolved source gate clears): hashes and dependency/overlap joins, PTS/frame/fps exactness,
 227/228 gate boundaries and invalid homographies, identical mask/index sets,
 keypoint round trip, generated coverage/nonflatness, reference membership,
 byte/rate recomputation, real codec round trips, actual device/kernels and

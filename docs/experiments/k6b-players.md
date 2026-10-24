@@ -1538,3 +1538,57 @@ resolves recorded fitting lineage, not decoded replay/PTS independence.
   `gh pr merge 236 --auto --merge`, stating that merging main was not
   authorized. No merge or bypass attempted; explicit user approval is needed
   to resolve that approval block. Study budget remains unapproved.
+
+### 2026-10-24 — Confirmation authorization and CPU provenance gate
+
+- User approved the proposed **8 GPU-hour hard ceiling**, contingent on
+  completing CPU provenance checks (annotation “Yes” on the budget request).
+  This supersedes the prior pending-budget status, not the frozen protocol.
+- Current spending: **0 of 8 GPU-hours**. No new GPU jobs submitted.
+- Start with source PTS/replay/duplicate audit; do not generate or spend GPU
+  time until that gate and substantive validation prerequisites pass.
+- No fitting, Wan-Animate, additional chats or recurring monitors. Existing
+  PR auto-merge approval block is separate and not overridden by this budget
+  approval. Preserve the cohort, ≥228/240 K8b fit rule and granted matte.
+
+#### CPU provenance gate outcome: unresolved; no GPU dispatch
+
+- Read-only SSH checks on gpu1 verified the archive manifest remains SHA256
+  `2bd94e9966fc8b09c5ce5eb9bef79f49ad349e1310a1d445fa6a646e86db8dde`.
+  Its only `tennis_games/raw_1080p/` video is `nadal_kyrgios.mp4`.
+  Searching all archived video paths containing Alcaraz/Medvedev found 170
+  videos, all under the two existing match directories (scene clips and
+  derived videos); no alternative named source video exists in this inventory.
+  This is a bounded inventory search, not a claim that no copy exists anywhere.
+- Container metadata read with `/opt/local/bin/ffprobe` confirms local timestamp
+  reset: Alcaraz/031 starts at 0, duration 10.36 s, 259 frames at 25 fps;
+  Medvedev/014 starts at 0, duration 7.76 s, 388 frames at 50 fps. These
+  metadata observations are not generation/anchor quality scores.
+- Existing `scenes.txt` hashes: Alcaraz
+  `40cc90152baafa65c0db7b7b1b6f886bde5e957beb534b2e9252923eaf4c3a9d`;
+  Medvedev `a9e3bf63a4de0d7ab27bd1413a107d61f9494b6f9ac000209cce5a836432d68e`.
+  Cut times suggest nominal scene intervals but do not independently verify
+  extraction rounding, offsets, source frame identity or broadcast replays.
+- Searched current code/docs and tracked pre-reset code at
+  `archive/pre-reset-2026-10-05` for `scenes.txt`, source ID `B1Z3yet4TIQ`
+  and `alcaraz_hurkacz/031` (excluding archived research-report dumps).
+  No tracked extraction receipt/code mapping these source clips was found.
+  Container title/URL metadata is not a hash-verified extraction receipt.
+- Recorded fit/reference clip disjointness remains valid. Exact original-frame
+  mapping and decoded replay independence remain **unresolved**, not passed
+  or disproven. A duplicate scan of available clips alone cannot satisfy the
+  separately frozen original-source mapping requirement. No duplicate-scan,
+  generator, fitting or judge job was submitted after identifying this gate.
+- Stopped under the frozen card's condition: “Any overlap or unresolvable
+  mapping stops this card.” No threshold, cohort or provenance requirement
+  was silently relaxed following approval. The 115 px gate remains exploratory
+  and the reference/exact target matte remain granted and unbilled.
+- Budget: **8 GPU-hours approved; 0 spent; no fleet job IDs**. No other chats,
+  monitors, scheduling or wakeups created. Historical step-5 fail unchanged.
+- Needed to resume: point to original Alcaraz/Medvedev source files plus their
+  extraction/source-identity receipts, or explicitly revise the study to a
+  weaker clip-local overlap audit with the original-source uncertainty reported.
+  Recommendation: recover existing source/receipts first; retain the approved
+  budget untouched. No new download or source substitution was attempted.
+- Verification: metadata-only/doc-only continuation; `git diff --check` passed.
+  Earlier ruff/mypy/pytest results above still describe unchanged runtime code.

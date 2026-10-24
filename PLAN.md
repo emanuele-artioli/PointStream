@@ -155,7 +155,7 @@ marked `card ready` is waiting for the user to start it.
 | K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5` | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11. PR #225 merged before this outcome commit: not on main yet |
 | K6m | the players' matte on tennis | — | Sonnet | card dismissed 2026-10-24: folded into T1 |
 | K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | reported 2026-10-24: no cut in 052; registration gate 80% vs 67% pooled (hypothesis); 0 of 0 GPU-hours |
-| K6b players confirmation | unused same-match windows, CPU preparation | `codex/k6b-player-confirmation-plan` | Codex high | reported 2026-10-24: 12 windows frozen; conditional same-match only, decoded-source provenance gates pending; awaiting 8 GPU-hour approval; 0 of 0 authorized ([card](docs/cards/k6b-players-confirmation.md)) |
+| K6b players confirmation | unused same-match windows, CPU preparation | `codex/k6b-player-confirmation-plan` | Codex high | reported 2026-10-24: 12 windows frozen; conditional same-match only, decoded-source provenance gates pending; 8 GPU-hours approved; stopped at unresolved original-source mapping gate; 0 of 8 spent ([card](docs/cards/k6b-players-confirmation.md)) |
 | T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | reported 2026-10-24: CPU players/rackets 0.47–3.37%, MASK s=8 12.39–58.66 kbps; ball masks absent, scope choice pending; oracle not run; 0 of 4 GPU-hours |
 | K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
 | H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask`, PR #233 | Codex high | reported 2026-10-24: shape target fails (+16.6% wDISTS); decoder diagnostic 13.3–61.3 kbps, full curve blocked by native decode; 0.3171 GPU-hours of 2 |
@@ -180,8 +180,7 @@ but both gates are unconfirmed hypotheses. 045 shows appearance/view and
 racket errors, with no isolated causal explanation; step 5's fail stands.
 Confirmation preparation (2026-10-24): 12 new same-match windows frozen;
 all pass registration, so gate discrimination is untested. Recorded fit/reference
-clips are disjoint; decoded replay/PTS checks remain. Awaiting 8 GPU-hour
-approval, 0 spent; reference and matte remain granted
+clips are disjoint; decoded replay/PTS checks remain. 8 GPU-hours approved; original-source mapping unresolved, 0 spent; reference and matte remain granted
 ([card](docs/cards/k6b-players-confirmation.md)).
 Step 6 tries Wan-Animate, conditioned on the same unbilled reference as
 step 2 (zero-shot means no fitting, not no appearance); speed is
