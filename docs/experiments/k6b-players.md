@@ -1531,3 +1531,10 @@ resolves recorded fitting lineage, not decoded replay/PTS independence.
   study, contingent on the remaining CPU provenance gates, or keep it
   preparation-only. Recommendation: approve only with that limited claim;
   do not describe it as independent-match confirmation.
+
+- Publication: commit `a52c1bd9` pushed to
+  `codex/k6b-player-confirmation-plan`; [PR #236](https://github.com/emanuele-artioli/PointStream/pull/236).
+  Auto-merge remains off: automatic approval review rejected
+  `gh pr merge 236 --auto --merge`, stating that merging main was not
+  authorized. No merge or bypass attempted; explicit user approval is needed
+  to resolve that approval block. Study budget remains unapproved.
