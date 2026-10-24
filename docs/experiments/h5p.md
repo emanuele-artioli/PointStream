@@ -740,3 +740,54 @@ the decisions are in [experiments.md](../experiments.md).
 - Report: `pointstream-data/visor/h5-2026-10-16/report-h5p4c-9b4b3ba.tar`
   (sha256 `982fe3f7…915ecd`, read-only): the specs, every stage's
   `h5.json`, `gate4c.py` and its output.
+
+### 2026-10-24 — H5p 4d rules: binary shape and decoder-derived F
+- Scope: the four H5 pilots only; no final runs or Wan-Animate. Root report
+  address: `01a16cfc-1a88-7013-bd79-8489fe7c1eb2` (delegating Codex chat);
+  prior root: `session_01StNQ6dvxYRHhnMbQymNgNf`.
+- Ceiling: exact free masks preserve weighted DISTS (−15%, 4/4) but
+  **do not fix the established LPIPS loss** (+16% on 4a's pairs).
+- (a) Decision rule, before the run: at exactly lzma s=8's binary accuracy,
+  the cheapest of intra, previous-frame context, and motion-predicted
+  context must cost ≤2 kbps on at least 3/4 items. This is a feasibility
+  screen for the stated rate target, not a measured BD-rate verdict.
+  A pass proceeds to rebilling 4b's fixed pairs and the existing DISTS rule
+  (mean ≤−10%, ≥3/4 below zero); a fail closes only these configurations.
+- Hypothesis: binary contexts and motion reduce lzma's 36–116 kbps but
+  cannot remove enough boundary innovation to reach 2 kbps.
+  Competing explanation: contour coherence leaves almost no unpredictable
+  boundary information after motion, so the target becomes feasible.
+- Bound/permission to build: 4b's exact-free-F oracle passes DISTS, so
+  these coders can move that verdict; they are not built to rescue LPIPS.
+- Component: experimental adaptive binary arithmetic coder, not an MPEG-4
+  CAE or JBIG2 implementation. Five causal spatial neighbours and five
+  predicted temporal neighbours, adaptive counts; three modes (intra,
+  previous frame, ±4-cell integer search in 32-cell blocks). Motion vectors
+  are LZMA-compressed and billed, alongside the header and arithmetic bits.
+  No free encoder-only motion. The current foreground stream's DCVC motion
+  is latent rather than exposed vectors; this tests independent shape motion.
+  Union F only, since both enhancer slots use G_HO; excluding class bits
+  favours the candidate. Reduction uses the same majority cells as lzma,
+  guaranteeing identical binary IoU and boundary distance after upsampling.
+- Correctness smoke: real arithmetic encode/decode on moving shapes, full,
+  empty, random masks, odd dimensions and partial blocks; 12 tests passed.
+  Fleet smoke: 8 real pilot frames, all three modes and exact roundtrips;
+  full stage: all 240 frames, same input and processing path.
+- Budget (a): zero GPU-hours; four CPU jobs, each smoke ≤600 s, full ≤2400 s,
+  total per-job allowance ≤3100 s. No scaled run beyond the four pilots.
+- (b) Decision rule, before any segmentation run: use only already-decoded
+  streams and decoder-available prompts; record any granted prompts as an
+  oracle and bill any actual correction/initialization. Measure F accuracy
+  beside lzma s=8 and score the fixed 4a pairs against `dcvc-venue` at equal
+  adaptation: weighted DISTS mean ≤−10%, ≥3/4 below zero. Exact-free-F is
+  the motivating ceiling; it does not prove every inaccurate mask produces
+  a worse perceptual score. No gate will assume monotonicity without checking.
+- Hypothesis (b): segmentation can find hands but lacks the labelled object
+  identity and outlines that generated B1b's F. Competing explanation:
+  the decoded streams retain enough semantic evidence to recover F without
+  additional information. Audit that interface before allocating a GPU.
+- Budget (b): at most 2 GPU-hours including smokes and failed attempts;
+  every stage ≤45 min. Choose a representative smoke before estimating the
+  number of pairs affordable. A missing decoder interface or oracle that
+  cannot dominate its proposed correction family is a design blocker,
+  not a measured failure of decoder segmentation.
