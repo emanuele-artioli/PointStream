@@ -67,7 +67,7 @@ def check_anchor_rows(manifest: dict[str, Any], inputs: dict[str, Any], summary:
             raise ValueError('Scoring region changed')
 
 
-def check_generated(result: dict[str, Any], prepared: dict[str, Any], arrays: dict[str, Any]) -> None:
+def check_generated(result: dict[str, Any], prepared: dict[str, Any], arrays: dict[str, Any], expected_units: list[str] | None = None) -> None:
     """Require the exact frozen recipe/checkpoints and expected generated indices."""
     if result['profiles'] != ['match5'] or result['steps'] != 30 or result['from_t'] != 0:
         raise ValueError('Renderer recipe changed')
@@ -75,6 +75,9 @@ def check_generated(result: dict[str, Any], prepared: dict[str, Any], arrays: di
     if settings['size'] != [512, 784] or settings['cfg'] != {'match5': 2.0} or settings['context'] != [24, 4]:
         raise ValueError('Renderer settings changed')
     units = {u['unit']: u for w in prepared['windows'] for u in w['units']}
+    expected_units = sorted(units) if expected_units is None else sorted(expected_units)
+    if sorted(result['units']) != expected_units:
+        raise ValueError('Generated unit/player set differs from fixed job scope')
     if not result['units'] or len(set(result['units'])) != len(result['units']):
         raise ValueError('Missing/duplicate generated units')
     for name in result['units']:
@@ -105,15 +108,48 @@ def check_generated(result: dict[str, Any], prepared: dict[str, Any], arrays: di
             raise ValueError('Invalid generated crop shape/type')
 
 
-def main() -> int:
+def reference_index(row: dict[str, Any], poses: dict[str, Any], player: str) -> int:
+    fitted = [t for t in row['scored'] if poses[player][t] and poses[player][t].get('fitted')]
+    if not fitted:
+        raise ValueError('No source reference: keep the window unresolved')
+    return fitted[0]
+
+
+def check_prepare_references(root: Path, summary: dict[str, Any], anchors: dict[str, Path]) -> None:
+    from experiments.tennis.k4 import safe
+    from src.segmentation.masks import decompress
+
+    for window in summary['windows']:
+        wid = window['window']
+        source = anchors[wid]
+        row = read(source / 'window.json')
+        poses = json.loads(decompress((source / 'poses.json.zst').read_bytes()))
+        decoded = json.loads(decompress((source / 'keypoints.json.zst').read_bytes()))['decoded']['q4-velocity-e4']
+        if window['frames'] != row['frames'] or sorted(u['player'] for u in window['units']) != sorted(row['players']):
+            raise ValueError('Incomplete player/reference set')
+        for unit in window['units']:
+            player = unit['player']
+            if unit['reference_t'] != reference_index(row, poses, player):
+                raise ValueError('Reference is not the first fitted scored source frame')
+            expected = sorted(int(k.rsplit('@', 1)[1]) for k in decoded if k.rsplit('@',1)[0] == player)
+            a = np.load(root / 'publish/units' / (unit['unit'] + '.npz'))
+            if a['t'].tolist() != expected or a['judged'].tolist() != [t in row['judged'] for t in expected]:
+                raise ValueError('Prepared target/score coverage differs')
+            if not unit['unit'].startswith(safe(wid) + '__'):
+                raise ValueError('Cross-window player unit')
+
+
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--kind', required=True, choices=('anchors', 'prepare', 'generate', 'judge'))
     parser.add_argument('--manifest', required=True, type=Path)
     parser.add_argument('--inputs', type=Path)
     parser.add_argument('--prepared', type=Path)
-    args = parser.parse_args()
+    parser.add_argument('--windows', nargs='+')
+    parser.add_argument('--k6-stage', action='append', type=Path)
+    args = parser.parse_args(argv)
     check_manifest(read(args.manifest))
-    from experiments.visor.b1 import stage_dir, write_json
+    from experiments.tennis.k6b_generate import stage_dir, write_json
     stage = stage_dir()
     target = Path(os.environ['PS_VALIDATION_PATH'])
     with tempfile.TemporaryDirectory(prefix='k6b-confirm-stage-', dir='/tmp') as temp:
@@ -130,12 +166,26 @@ def main() -> int:
         elif args.kind in ('prepare', 'judge'):
             from experiments.tennis import k6b
             summary = read(stage / 'k6b.json')
+            if not args.k6_stage:
+                raise ValueError('Native anchor archives required for reference/score membership')
+            anchors = {}
+            for i, path in enumerate(args.k6_stage):
+                with tarfile.open(path) as archive:
+                    archive.extractall(root / f'anchors{i}', filter='data')
+                for rowpath in (root / f'anchors{i}/publish').glob('*/window.json'):
+                    wid = read(rowpath)['id']
+                    if wid in anchors:
+                        raise ValueError('Duplicate anchor window')
+                    anchors[wid] = rowpath.parent
             if args.kind == 'prepare':
                 checks = k6b.validate_prepare(stage, summary)
+                check_prepare_references(root, summary, anchors)
+                checks['references_and_target_indices_recomputed'] = True
             else:
                 checks = k6b.validate_judge(stage, summary)
                 checks['identical_scoring_masks'] = all(w.get('s_masks_match_k6') for w in summary['windows'])
                 checks['only_frozen_profile'] = summary['profiles'] == ['match5']
+                checks['identical_scoring_indices'] = all(w['judged'] == read(anchors[w['id']] / 'window.json')['judged'][:summary['max_judged'] or None] for w in summary['windows'])
             checks['qualified_scope'] = True
             report = {'passed': all(checks.values()), 'checks': checks}
         else:
@@ -154,7 +204,10 @@ def main() -> int:
             result = read(stage / 'k6b_generate.json')
             arrays = {n: (np.load(root / f'prepared/publish/units/{n}.npz'),
                           np.load(root / f'publish/{n}@match5.npz')) for n in result['units']}
-            check_generated(result, prepared, arrays)
+            if not args.windows or any(w not in check_manifest(read(args.manifest)) for w in args.windows):
+                raise ValueError('Fixed generator windows required')
+            expected_units = [u['unit'] for w in prepared['windows'] if w['window'] in args.windows for u in w['units']]
+            check_generated(result, prepared, arrays, expected_units)
             report['checks']['frozen_recipe_and_exact_coverage'] = True
     report['provenance'] = PROVENANCE
     write_json(target, report)

@@ -1985,3 +1985,58 @@ a weaker claim automatically.
   Focused tests27 passed,2 skipped; ruff/mypy pass (198 files). No quality
   scores opened. First-feature retry uses the same recipe and 2700 s reservation,
   deadline 2026-10-24T18:29:40.227745+00:00. Next returned job ID must be saved immediately.
+
+- Corrected feature job **`20261024T174553Z-ecc5ca36`**, returned pending. Spec SHA256
+  `1806ad8b15db6c45784b70b8146239677f535493a324bfcff8bfe32db48af49b`, code `9473f65c`, deadline2026-10-24T18:29:40Z,
+  reservation2700 s. Receipt `/tmp/k6b-confirm-features-submit-v2.json`;
+  canonical outputs `jobs/fleet/inbox/20261024T174553Z-ecc5ca36/`. Explicit empty chat ID
+  disables legacy heartbeat guidance. GPU spending before this job0.00286/8 h.
+
+- Corrected job admission verified running on gpu6; one bounded fleet wait
+  handle5839, result file `/tmp/k6b-confirm-features-wait-v2.json`, expires
+  within44 min. Original wait79316 already returned terminal failure; no
+  recurring model calls or wakeups. Continue independent CPU code preparation.
+- Geometry-only input-pack builder now freezes player IDs, scored/every-third
+  judged indices and actual R mask hashes from completed feature artifacts
+  before anchor/generator quality is produced. Its CPU validator rebuilds the
+  pack from the immutable feature archive and compares every artifact byte;
+  missing, extra or repeated content cannot pass. Native keypoint round trips,
+  generator coverage/recipe/checkpoint/guider billing and R/S mask agreement
+  checks remain separate substantive gates. No original-source PTS is inferred.
+
+- Job `20261024T174553Z-ecc5ca36` **failed its smoke validator**, with no full
+  promotion. Actual mask/pose extraction completed both windows in253.33 s;
+  supervisor total262.14 s. The installed manager expands staged placeholders
+  in workload arguments but not validator arguments; retained validator log
+  confirms literal `{staged:manifest}` FileNotFoundError. No source/model or
+  quality failure. Both failed attempts total272.43 s = **0.07568/8 GPU-h**.
+- Read the retained0.91 MB smoke masks/poses and independently ran the repaired
+  validator on CPU before another GPU attempt: **all20 checks pass**,480 frames,
+  including actual feature/mask recomputation, source placement/hash, native
+  SAM/CUDA policy and peak limits. Local receipt
+  `/tmp/k6b-confirm-smoke-v2-validation.json`; raw smoke artifacts remain
+  read-only in that job. No generator/anchor quality opened.
+- Corrected validator arguments use the immutable canonical manifest path,
+  with recorded manifest SHA rechecked, rather than an unsupported placeholder.
+  Future native stages run through a thin wrapper that validates full output
+  before return and independently revalidates saved artifacts for the fleet
+  gate. Full-stage checks therefore do not rely on the manager's smoke-only
+  validation. CPU input-pack reconstruction and reference-membership checks
+  implemented; focused checks and ruff/mypy pass (199 source files).
+- Third feature attempt keeps all recipe/scale/input identities; only tested
+  validation plumbing changes. Reservation2700 s; deadline2026-10-24T18:40:16.710230+00:00.
+  Based on measured two-window253 s smoke, six-window feature stage fits1800 s;
+  total study still projects6–8 GPU-h including paid failures, with exact
+  remaining projection required before renderer scale. No fitting or monitors.
+
+- Execution interrupted before third submission: automatic approval review hit
+  an account usage limit and did not execute the commit/push. Both jobs were
+  already terminal; no GPU task or recurring monitor was left running. User
+  explicitly instructs “Continue.” On resume, recheck saved job state/hosts;
+  old unsubmitted third-attempt deadline is expired and must be refreshed.
+- Code review also keeps the generator wrapper independent of main-environment
+  mask dependencies: the JCV lock lacks zstandard, so generator-scope checks
+  use NumPy/stdlib and the existing standalone generator's JSON/path helpers.
+  No new environment or provider, no model recipe change. Native mask/pose
+  validation remains in the pinned main environment. Original-source gate
+  stays unresolved; exact matte/reference remain granted.

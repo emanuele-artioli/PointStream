@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import hashlib
 import os
 import tarfile
 import tempfile
@@ -39,8 +40,6 @@ def gate(rows: list[Any]) -> list[int]:
 
 def check_manifest(manifest: dict[str, Any]) -> dict[str, list[int]]:
     """Reject changed cohort, overlap claims and mismatched per-clip placement."""
-    from experiments.tennis.k4b_features import plan_windows
-
     if manifest.get("provenance") != PROVENANCE or manifest.get("budget_gpu_hours") != 8:
         raise ValueError("Wrong diagnostic scope or budget")
     clips = manifest["clips"]
@@ -49,7 +48,14 @@ def check_manifest(manifest: dict[str, Any]) -> dict[str, list[int]]:
     old = manifest["old_clips"]
     if len(old) != 49 or set(old) & {r[0] for r in FROZEN}:
         raise ValueError("Old-manifest clip intersection or incomplete audit")
-    plan = plan_windows(manifest)
+    # Every frozen clip is >=240 frames and the review frame is start+120.
+    # Keep this gate independent of the main environment's mask dependencies:
+    # it also runs in the isolated AnimateAnyone environment.
+    plan = {f"{c['id']}@{f}": {"id": f"{c['id']}@{f}", "clip": c['id'],
+            "frame": f, "start": f-120, "frames": 240, "target": 120,
+            "fps": c['fps'], "sha256": c['sha256']} for c in clips for f in c['review_frames']}
+    if manifest.get('contains_human_marks') is not False or any(c['frames'] < 240 for c in clips):
+        raise ValueError('Wrong source-only window manifest')
     gates = {}
     for c, (cid, start, fps, digest) in zip(clips, FROZEN):
         wid = f"{cid}@{start + 120}"
@@ -86,10 +92,75 @@ def check_feature_rows(manifest: dict[str, Any], summary: dict[str, Any]) -> Non
             raise ValueError("Incomplete source decode")
 
 
+
+def build_inputs(manifest: dict[str, Any], archives: list[Path], destination: Path, max_windows: int = 0) -> None:
+    """Freeze geometry-only comparison masks/indices before quality is opened."""
+    from experiments.tennis.k6 import FRAME, frame_regions, window_players
+    from experiments.tennis.k4 import safe
+    from experiments.visor.b1 import file_sha256
+    from src.segmentation.masks import ClipMasks
+
+    gates = check_manifest(manifest)
+    clips = {c['id']: c for c in manifest['clips']}
+    record: dict[str, Any] = {'schema': 1, 'provenance': PROVENANCE, 'windows': {}}
+    with tempfile.TemporaryDirectory(prefix='k6b-confirm-inputs-', dir='/tmp') as temp:
+        root = Path(temp)
+        for i, archive in enumerate(archives):
+            with tarfile.open(archive) as tar:
+                tar.extractall(root / str(i), filter='data')
+        windows = sorted(root.glob('*/publish/*/window.json'))[:max_windows or None]
+        if not windows:
+            raise ValueError('No complete feature windows')
+        for window in windows:
+            w = json.loads(window.read_text())
+            wid, cid = w['id'], w['clip']
+            if wid in record['windows'] or wid not in gates:
+                raise ValueError('Repeated/unknown window')
+            for name, digest in w['files'].items():
+                if file_sha256(window.parent / name) != digest:
+                    raise ValueError('Changed feature bytes')
+            start = w['start']
+            c = clips[cid]
+            fits = {str(start+t): c['registration'][t]['homography'] for t in gates[wid]}
+            features = json.loads((window.parent / 'features.json').read_text())
+            clip = ClipMasks.load(window.parent / 'sam-masks.rle')
+            if len(clip.frames) != 240:
+                raise ValueError('Incomplete masks')
+            players = window_players(features, clip, start, {int(t): np.array(h) for t,h in fits.items()})['players']
+            if not players:
+                raise ValueError('No players: keep window unresolved, never replace it')
+            scored, hashes = [], {}
+            for t in gates[wid]:
+                regions = frame_regions(clip.frames[t], features['aliases'], players)['regions']
+                r = np.logical_or.reduce([*regions.values(), np.zeros((FRAME[1], FRAME[0]), bool)])
+                if r.any():
+                    scored.append(t)
+                    hashes[str(t)] = hashlib.sha256(np.packbits(r).tobytes()).hexdigest()
+            if not scored:
+                raise ValueError('No scored frames')
+            record['windows'][wid] = {'window': {k:w[k] for k in ('id','clip','frame','start','frames','target','fps','sha256')},
+                                     'fits': fits, 'files': {n:w['files'][n] for n in ('features.json','sam-masks.rle','pose.json.zst')},
+                                     'source': c['staged'], 'comparison': {'players': players, 'scored': scored,
+                                     'judged': [t for t in scored if t % 3 == 0], 'r_masks': hashes}}
+        with tarfile.open(destination, 'w') as tar:
+            import io
+            data = (json.dumps(record, sort_keys=True) + '\n').encode()
+            info = tarfile.TarInfo('inputs.json')
+            info.size = len(data)
+            tar.addfile(info, io.BytesIO(data))
+            for window in windows:
+                wid = json.loads(window.read_text())['id']
+                for name in ('features.json','sam-masks.rle','pose.json.zst'):
+                    tar.add(window.parent / name, arcname=f'windows/{safe(wid)}/{name}')
+    print(json.dumps({'windows': list(record['windows']), 'sha256': file_sha256(destination)}))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("features", "validate-features", "preflight"))
+    parser.add_argument("command", choices=("features", "validate-features", "preflight", "build-inputs", "validate-inputs"))
     parser.add_argument("--manifest", required=True, type=Path)
+    parser.add_argument("--feature-archive", action="append", type=Path)
+    parser.add_argument("--out", type=Path)
     parser.add_argument("--sam-checkpoint")
     parser.add_argument("--pose")
     parser.add_argument("--max-windows", type=int, default=0)
@@ -99,6 +170,31 @@ def main() -> int:
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text())
     gates = check_manifest(manifest)
+    if args.command in ("build-inputs", "validate-inputs"):
+        if not args.feature_archive:
+            raise ValueError("Feature archives required")
+        from experiments.visor.b1 import stage_dir, file_sha256, write_json
+        target = args.out or stage_dir() / "inputs.tar"
+        if args.command == "build-inputs":
+            build_inputs(manifest, args.feature_archive, target, args.max_windows)
+            write_json(stage_dir() / "confirm-inputs.json", {"windows": args.max_windows, "sha256": file_sha256(target)})
+            return 0
+        metadata = json.loads((stage_dir() / "confirm-inputs.json").read_text())
+        with tempfile.TemporaryDirectory(prefix="k6b-confirm-recheck-", dir="/tmp") as temp:
+            rebuilt = Path(temp) / "inputs.tar"
+            build_inputs(manifest, args.feature_archive, rebuilt, metadata["windows"])
+            with tarfile.open(target) as actual, tarfile.open(rebuilt) as expected:
+                names = actual.getnames()
+                checks = {"unique_files": len(names) == len(set(names)), "files_exact": names == expected.getnames(),
+                          "recorded_hash": file_sha256(target) == metadata["sha256"]}
+                for name in expected.getnames():
+                    a, b = actual.extractfile(name), expected.extractfile(name)
+                    checks[name] = a is not None and b is not None and a.read() == b.read()
+        report: dict[str, Any] = {"passed": all(checks.values()), "checks": checks, "provenance": PROVENANCE}
+        if path := os.environ.get("PS_VALIDATION_PATH"):
+            write_json(Path(path), report)
+        print(json.dumps(report))
+        return 0 if report["passed"] else 1
     if args.command == "preflight":
         print(json.dumps({"windows": len(gates), "fits": {k: len(v) for k, v in gates.items()}, **PROVENANCE}))
         return 0
@@ -110,7 +206,14 @@ def main() -> int:
             raise ValueError("Missing feature arguments")
         if len(set(args.windows)) != len(args.windows) or any(w not in gates for w in args.windows):
             raise ValueError("Unknown/duplicate window before GPU loading")
-        return k4b_features.run(args)
+        code = k4b_features.run(args)
+        if code:
+            return code
+        summary = json.loads((stage_dir() / "k4b-features.json").read_text())
+        check_feature_rows(manifest, summary)
+        checked = k4b_features.validate(Path(os.environ["PS_SCRATCH_DIR"]) / "publish", summary, args.manifest)
+        write_json(stage_dir() / "scientific-validation.json", checked)
+        return 0 if checked["passed"] else 1
     stage = stage_dir()
     summary = json.loads((stage / "k4b-features.json").read_text())
     check_feature_rows(manifest, summary)

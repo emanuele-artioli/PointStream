@@ -110,3 +110,14 @@ def test_generated_recipe_and_target_coverage_corruption():
     g['t'] = np.array([0, 0])
     with pytest.raises(ValueError):
         check_generated(result, prepared, {'u': (a, g)})
+
+
+
+def test_reference_uses_first_fitted_scored_source_and_retains_missingness():
+    from experiments.tennis.k6b_confirm_validate import reference_index
+
+    row = {'scored': [1, 2, 3], 'judged': [3]}
+    poses = {'p': [{'fitted': True}, None, {'fitted': True}, {'fitted': True}]}
+    assert reference_index(row, poses, 'p') == 2
+    with pytest.raises(ValueError):
+        reference_index({'scored': [1]}, poses, 'p')
