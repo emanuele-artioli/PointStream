@@ -153,7 +153,7 @@ marked `card ready` is waiting for the user to start it.
 | K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5` | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11. PR #225 merged before this outcome commit: not on main yet |
 | K6m | the players' matte on tennis | — | Sonnet | card dismissed 2026-10-24: folded into T1 |
 | K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | card ready 2026-10-24 ([card](docs/cards/k6b-players-5b.md)); user agreed to run it |
-| T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | card ready 2026-10-24 ([card](docs/cards/t1.md)) |
+| T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | reported 2026-10-24: CPU players/rackets 0.47–3.37%, MASK s=8 12.39–58.66 kbps; ball masks absent, scope choice pending; oracle not run; 0 of 4 GPU-hours |
 | K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
 | H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask` | Codex high | card ready 2026-10-24 ([card](docs/cards/h5p-4d.md)) |
 
@@ -164,8 +164,10 @@ mode, background by its own coder) beat SVT-AV1 and DCVC-UF on K6's
 windows once F is paid for? Egocentric F (median 24% of the frame) cost
 36–116 kbps and removed every win (H5p 4); tennis F is a few percent,
 where H5p 4c's key carrier was nearly free (P09_106, 2%: −30%). No
-tennis pipeline exists yet (H5 is egocentric): CPU first (F's rate on
-K6's windows), then the oracle and its rule.
+tennis pipeline exists yet (H5 is egocentric). T1 CPU accounting
+(2026-10-24): players/rackets cover 0.47–3.37%; MASK s=8 costs
+12.39–58.66 kbps. K6 saved no ball masks; joint oracle not run pending
+the ball-reference scope choice (0 of 4 GPU-hours; [entry](docs/experiments/t1.md)).
 
 **K6b players 5b and 6.** Steps 3–5 lose the same two windows:
 `rublev_auger-aliassime/052` is judged on 32 of its 240 frames (the rest is
