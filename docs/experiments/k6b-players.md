@@ -2077,3 +2077,45 @@ a weaker claim automatically.
   is infrastructure/CPU proof, not a paper quality result. Prior raw jobs and
   archives retained. Native registration-frame alignment now checked directly;
   all12 pass the strengthened CPU gate without changing the manifest.
+
+- Feature job `20261024T193537Z-12dffb55` **complete**, gpu6 Ada; substantive
+  smoke and full validators pass on all six windows/1440 frames. Full component
+  time698.57 s; complete claimed-job wall1046.78 s =0.29077 GPU-h.
+  Total spent **0.36645/8 h** including both failed attempts. Archive
+  `jobs/fleet/inbox/20261024T193537Z-12dffb55/full/published.tar`, SHA256
+  `e5547615a2680b1ee9d2345ea8bc8d554f1bf4cbbed4327d8042bf923e29c7c9`,2,529,280 bytes. Raw metadata/receipt preserved; no quality opened.
+- Resource-only audit of preserved exact K6 pipeline (no quality read) finds
+  Ada window times361–443 s for the comparable Alcaraz/Djokovic cases, versus
+  662–751 s on A6000. Therefore anchor/source-code jobs will be **three-window
+  shards**, not a six-window1800 s guess; full1800 s, smoke≤600 s. This changes
+  only scheduling, not any source, mask, score, codec setting or renderer recipe.
+  All12 source-code symbol sets are prepared before interpreting pilot quality
+  so pooled-rate denominators are fixed; remaining-six generations still await
+  pilot cost/futility checks. Small source preparation for those windows is
+  necessary to freeze the codec input set and remains charged within8 h.
+- Next dispatches: CPU geometry pack for first six (0 GPU-h), and fixed remaining
+  six feature inputs (reservation2700 s) using the same validated configuration.
+  Their actual returned IDs must be saved before waiting. Total study forecast
+  remains6–8 GPU-h; new staged cost proof required before generation scale.
+
+- Submitted inputs-first6: **`20261024T200247Z-b63794f9`**, spec SHA256 `c02707988e907513b279adcc181d98923497e0b231307f8bca58c61cef07e59f`, code `855a0caf`; returnedpending. Receipt `/tmp/k6b-confirm-inputs-first6-submit.json`. CPU-only,0 GPU-h.
+
+- Submitted features-remaining: **`20261024T200318Z-12faa9a8`**, spec SHA256 `c26265ea5ffe7a6a47e37412c88945968ab77d040ad02393c151d03132230d22`, code `855a0caf`; returnedpending. Receipt `/tmp/k6b-confirm-features-remaining-submit.json`. GPU reservation2700 s; pre-job spending0.36645/8 h.
+
+- CPU input job `20261024T200247Z-b63794f9` **complete**,0 GPU-h. First-six
+  geometry pack `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261024T200247Z-b63794f9/full/inputs.tar`, SHA256 `f3b946816950c0b605d865cb97e5dacc716588969552a252f56ac880653426f9`;
+  smoke reconstruction gate passes. Remaining-feature job
+  `20261024T200318Z-12faa9a8` was running on gpu6 at this batch event; keep
+  its ID and inspect before any replay. Current GPU spend0.36645/8 h plus that
+  running reservation. No remaining-six renderer release yet.
+- Anchor execution now explicitly schedules the frozen rough three settings
+  per codec before the remaining four potentially hull-improving K6 points.
+  Native defaults remain unchanged for other tasks; opt-in
+  `--rough-anchors-first` changes scheduling only, keeps all ten points and
+  the exact encoders/decoders/settings/masks. Tests cover no duplicate/missing
+  point and the exact initial lists; focused tests, ruff and mypy pass.
+  This is committed before any new codec/generator quality is produced.
+- Next: two first-six anchor/source-code shards of three windows each,1800 s
+  full/≤600 s smoke and2700 s job reservation, exclusive compatible Ada pool.
+  Native full output is substantively validated before return; same-job DCVC
+  encode/decode/judge retained. Save both IDs before the next batch wait.

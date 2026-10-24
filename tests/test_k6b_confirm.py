@@ -140,3 +140,15 @@ def test_descriptive_verdict_keeps_all_cells_and_never_passes_early():
     v = verdict(rows(6, 0, 0))
     assert v['decision'].startswith('futility:')
     assert v['scores']['unbilled']['maximum_possible_wins'] == 12
+
+
+
+def test_anchor_schedule_starts_with_three_per_codec_and_keeps_every_point():
+    from experiments.tennis.k6 import ANCHORS, anchor_batches
+
+    first, remaining = anchor_batches(True)
+    assert [a for a in first if a[0] == 'svt'] == [('svt',48,1), ('svt',63,4), ('svt',63,8)]
+    assert [a for a in first if a[0] == 'dcvc'] == [('dcvc',0,1), ('dcvc',0,2), ('dcvc',0,4)]
+    assert len(first + remaining) == len(set(first + remaining)) == len(ANCHORS)
+    assert set(first + remaining) == set(ANCHORS)
+    assert anchor_batches(False) == (ANCHORS,)
