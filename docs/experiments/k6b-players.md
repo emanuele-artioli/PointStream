@@ -2305,3 +2305,13 @@ a weaker claim automatically.
 - Tenth renderer submitted **`20261024T230918Z-b01ae9ae`**, Med029@138, two240-frame/one-run units, fixed C recipe; spec SHA256 `6b88c4fa4fbfdf5c93c9f8e4e85c34ac7034d05cb74e93329dfe462424e4353c`, code903e033a,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen10-submit.json`.
 
 - Remaining-six CPU exact-mask preflight passed: all476 judging frames reconstruct identical source R/S hashes, zero mismatches and no quality metrics; **956 frames across all12 windows** now covered. Four CPU threads/no CUDA. Archive `tennis/k6b-confirm-20261024-execution/mask-remaining-20261024T2317Z.tar.gz`, SHA256 `853cf3109711fad844d228f8484759a9380452c957578d7133408d884e5f0bc0`, includes source-run cost audit.
+
+- CPU comparison-completeness join confirms **all12 windows have all10 valid native anchor points**, zero failed/missing codec points (metadata only, no new quality decision). Thus no source curve is silently reduced before the remaining renderer/judge stages. Receipt `/tmp/k6b-confirm-all12-anchor-availability.json`.
+
+- Ninth renderer `20261024T230641Z-31aa2383` complete; full scientific validation passes, archive SHA256 `5958b32dd0f59e0dd94bf6a6d31fc18eaf690f19b7073025c5fb8153c22c45b2`, charged0.366273 h. Completed total **5.69738/8 h**, tenth renderer active.
+
+- Eleventh renderer submitted **`20261024T233009Z-28f16db9`**, Al047@123, two240-frame/one-run units, fixed C recipe; spec SHA256 `3f73094e5e929eda47dc422628b78e2e88e4b3dc949aefbcced37f53000e03f8`, code4c5cbea3,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen11-submit.json`.
+
+- Tenth renderer `20261024T230918Z-b01ae9ae` complete; full scientific validation passes, archive SHA256 `b2f54da54f7f5f6214df96d95f6487ced899d862355e1fb06bbf1b7a2a3d1400`, charged0.374804 h. Completed total **6.07218/8 h**, eleventh renderer active.
+
+- Twelfth/final renderer submitted **`20261024T233245Z-ebafc4f5`**, Med021@246, two240-frame/one-run units, fixed C recipe; spec SHA256 `ca802978925191bcff232602229e6e96387d50a754efea64c95d516ecb936794`, code4c5cbea3,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen12-submit.json`. All12 renderer windows now submitted under the unchanged cohort/recipe; completed total6.072180/8 h before active11–12 and final judging.
