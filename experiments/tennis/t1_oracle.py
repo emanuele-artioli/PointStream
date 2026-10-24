@@ -399,9 +399,9 @@ def main() -> int:
                   'all_metrics': set(data['summary']) == set(METRICS),
                   'all_comparisons': all(set(v) == set(METRICS) for v in data['windows'].values()),
                   'billed_companion': len(data['actual_billed']['windows']) == 8}
-        result = {'passed': all(checks.values()), 'checks': checks}
-        write_json(Path(os.environ['PS_VALIDATION_PATH']), result)
-        return 0 if result['passed'] else 1
+        report_validation = {'passed': all(checks.values()), 'checks': checks}
+        write_json(Path(os.environ['PS_VALIDATION_PATH']), report_validation)
+        return 0 if report_validation['passed'] else 1
     if args.command == 'validate':
         result = validate(stage_dir())
         write_json(Path(os.environ['PS_VALIDATION_PATH']), result)
