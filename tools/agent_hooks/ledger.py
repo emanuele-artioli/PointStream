@@ -1,7 +1,8 @@
 """Flag dispatch-ledger rows in PLAN.md that look stale.
 
-A row is stale when its status still says "queued" but its branch already
-has a merged pull request on origin/main. Prints nothing when every row is
+A row is stale when its status still says "queued" or "card ready" (work
+not started) but its branch already has a merged pull request on
+origin/main. Prints nothing when every row is
 consistent.
 """
 
@@ -13,7 +14,10 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-ROW = re.compile(r"^\|\s*(?P<item>[^|]+?)\s*\|[^|]*\|\s*`?(?P<branch>[^|`]+?)`?\s*\|[^|]*\|\s*(?P<status>[^|]+?)\s*\|\s*$")
+ROW = re.compile(r"^\|\s*(?P<item>[^|]+?)\s*\|[^|]*\|\s*(?P<branch>[^|]*?)\s*\|[^|]*\|\s*(?P<status>[^|]+?)\s*\|\s*$")
+# The branch column may add a commit and a PR: `claude/x` @ `abc1234`, PR #220.
+BRANCH = re.compile(r"`([^`]+)`|([^\s`@,]+)")
+NOT_STARTED = ("queued", "card ready")
 MERGE = re.compile(r"^Merge pull request #(?P<pr>\d+) from [^/]+/(?P<branch>.+)$")
 
 
@@ -35,8 +39,11 @@ def ledger_rows(plan_text: str) -> list[Row]:
         if not in_ledger:
             continue
         match = ROW.match(line)
-        if match and not set(match["item"]) <= {"-"} and match["item"].lower() != "item":
-            rows.append(Row(match["item"], match["branch"], match["status"]))
+        if not match or set(match["item"]) <= {"-"} or match["item"].lower() == "item":
+            continue
+        branch = BRANCH.search(match["branch"])
+        if branch and (branch.group(1) or branch.group(2)) not in {"—", "-"}:
+            rows.append(Row(match["item"], branch.group(1) or branch.group(2), match["status"]))
     return rows
 
 
@@ -54,7 +61,7 @@ def stale_rows(rows: list[Row], merged: dict[str, list[int]]) -> list[str]:
     out = []
     for row in rows:
         prs = merged.get(row.branch)
-        if prs and row.status.lower().startswith("queued"):
+        if prs and row.status.lower().startswith(NOT_STARTED):
             out.append(
                 f"- {row.item} (`{row.branch}`): status '{row.status}', but PR #{max(prs)} "
                 "from this branch is merged. Update the row."
@@ -80,7 +87,10 @@ def report(root: Path, fetch: bool = True) -> str:
     stale = stale_rows(ledger_rows(plan.read_text(encoding="utf-8")), merged_prs(subjects))
     if not stale:
         return ""
-    return "Dispatch ledger in PLAN.md may be stale (root session owns it):\n" + "\n".join(stale)
+    return (
+        "Dispatch ledger in PLAN.md may be stale (each item session keeps its own row; "
+        "fix a row only if it is yours, otherwise tell the user):\n" + "\n".join(stale)
+    )
 
 
 def main() -> int:

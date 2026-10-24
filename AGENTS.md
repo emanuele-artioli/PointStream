@@ -159,7 +159,7 @@ a good moment to `/compact` and give a one-line focus
 
 Compact instructions: keep verbatim the card's goal, scope and stop
 conditions; every fleet job ID with its state; GPU-hours spent of the budget;
-the decision rule's result so far; the root session's address; open questions
+the decision rule's result so far; the report address, if any; open questions
 for the user. Drop logs, file dumps, wait output and dead ends already
 recorded in files.
 
