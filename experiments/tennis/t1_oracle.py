@@ -9,6 +9,7 @@ import os
 import shutil
 import tarfile
 import time
+from concurrent.futures import ThreadPoolExecutor
 from fractions import Fraction
 from pathlib import Path
 from typing import Any
@@ -113,12 +114,12 @@ def reference(args: argparse.Namespace, wid: str, source: Path, work: Path) -> d
 
 
 def encode(args: argparse.Namespace, point: tuple[str, int, int], rgb: np.ndarray, w: dict[str, Any],
-           work: Path, stream_dir: Path, name: str, foreground: bool = False) -> dict[str, Any]:
+           work: Path, stream_dir: Path, name: str, foreground: bool = False,
+           cpus: list[int] | None = None, defer_rgb: bool = False) -> dict[str, Any]:
     import cv2
     import torch
     from experiments.background import g5
     from experiments.visor import h5
-    from experiments.visor.h3 import rgb_memmap
     from src.codecs import svtav1
 
     codec, value, scale = point
@@ -133,10 +134,11 @@ def encode(args: argparse.Namespace, point: tuple[str, int, int], rgb: np.ndarra
                 image = cv2.resize(np.asarray(rgb[t]), (width, height), interpolation=cv2.INTER_AREA) if scale != 1 else np.asarray(rgb[t])
                 small = image[None]
             target.write(g5.rgb_to_yuv420(small).tobytes())
-    torch.cuda.empty_cache()
+    if codec != 'svt':
+        torch.cuda.empty_cache()
     start = time.monotonic()
     if codec == 'svt':
-        cpus = sorted(os.sched_getaffinity(0))
+        cpus = cpus or sorted(os.sched_getaffinity(0))[:args.threads]
         rec = svtav1.code(source, work, width=width, height=height, fps=w['fps'], frames=w['frames'], crf=value,
                           preset=1, threads=len(cpus), full_range=True, encoder=args.encoder, decoder=args.decoder,
                           timeout=900, cpus=cpus)
@@ -158,21 +160,37 @@ def encode(args: argparse.Namespace, point: tuple[str, int, int], rgb: np.ndarra
     decoded = Path(rec['decoded'])
     if decoded.stat().st_size != w['frames'] * width * height * 3 // 2:
         raise ValueError('decoded size mismatch')
-    native_rgb = rgb_memmap(decoded, work / 'native.npy', w['frames'], width, height, True, 'cuda')
     shown_path = work / 'shown.npy'
-    shown = np.lib.format.open_memmap(shown_path, mode='w+', dtype=np.uint8, shape=(w['frames'], 1080, 1920, 3))
-    for t in range(w['frames']):
-        shown[t] = cv2.resize(np.asarray(native_rgb[t]), k6.FRAME, interpolation=cv2.INTER_CUBIC) if (width, height) != k6.FRAME else native_rgb[t]
     dest = stream_dir / (name + ('.ivf' if codec == 'svt' else '.psdc'))
     shutil.copyfile(native_stream, dest)
     result = {'name': name, 'codec': codec, 'value': value, 'scale': scale, 'size': [width, height],
               'payload_bytes': len(stream), 'stream_sha256': hashlib.sha256(stream).hexdigest(), 'native_stream': dest.name,
               'decoded': str(shown_path), 'stream': stream, 'encode_decode_seconds': time.monotonic() - start,
-              'input_sha256': file_sha256(source), 'checks': {k: rec[k] for k in ('deterministic', 'decoder_matches_encoder_intra', 'attempts', 'native_luma_psnr', 'encode_command', 'decode_command') if k in rec}}
-    del native_rgb, shown
-    for p in (source, decoded, work / 'native.npy'):
-        p.unlink(missing_ok=True)
+              'input_sha256': file_sha256(source), 'checks': {k: rec[k] for k in ('deterministic', 'decoder_matches_encoder_intra', 'attempts', 'native_luma_psnr', 'encode_command', 'decode_command', 'cpus') if k in rec}}
+    result['_native_yuv'] = str(decoded)
+    result['_input_yuv'] = str(source)
+    if not defer_rgb:
+        finish_rgb(result, w['frames'])
     return result
+
+
+def finish_rgb(record: dict[str, Any], frames: int) -> None:
+    """All color conversion stays on the GPU, after native work; CPU SVT threads never touch CUDA."""
+    import cv2
+    from experiments.visor.h3 import rgb_memmap
+
+    width, height = record['size']
+    shown_path = Path(record['decoded'])
+    work = shown_path.parent
+    decoded = Path(record.pop('_native_yuv'))
+    source = Path(record.pop('_input_yuv'))
+    native_rgb = rgb_memmap(decoded, work / 'native.npy', frames, width, height, True, 'cuda')
+    shown = np.lib.format.open_memmap(shown_path, mode='w+', dtype=np.uint8, shape=(frames, 1080, 1920, 3))
+    for t in range(frames):
+        shown[t] = cv2.resize(np.asarray(native_rgb[t]), k6.FRAME, interpolation=cv2.INTER_CUBIC) if (width, height) != k6.FRAME else native_rgb[t]
+    del native_rgb, shown
+    for path in (source, decoded, work / 'native.npy'):
+        path.unlink(missing_ok=True)
 
 
 def score_outputs(nets: dict[str, Any], outputs: list[np.ndarray], truth: np.ndarray, classes: np.ndarray) -> list[dict[str, float]]:
@@ -212,12 +230,34 @@ def process(args: argparse.Namespace, wid: str, source: Path, scratch: Path) -> 
     foreground: list[dict[str, Any]] = []
     backgrounds: list[dict[str, Any]] = []
     anchors: list[dict[str, Any]] = []
-    for kind, points, rgb, records in [('foreground', FG, w['truth'], foreground), ('background', GRID, w['filled'], backgrounds), ('anchor', GRID, w['truth'], anchors)]:
-        for point in points:
-            name = f'{kind}-{point[0]}-{point[1]}-s{point[2]}'
-            records.append(encode(args, point, rgb, w, work / name, streams, name, kind == 'foreground'))
-            print(f'phase=codec window={wid} point={name} bytes={records[-1]["payload_bytes"]}', flush=True)
+    groups = [('foreground', FG, w['truth'], foreground), ('background', GRID, w['filled'], backgrounds), ('anchor', GRID, w['truth'], anchors)]
+    cpus = sorted(os.sched_getaffinity(0))[:args.threads]
+    svt_cpus = cpus[:max(1, len(cpus) - 8)]
+    # One bounded CPU encoder overlaps the GPU coder, as K6 already does.
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        pending = []
+        for kind, points, rgb, records in groups:
+            for point in points:
+                if point[0] == 'svt':
+                    name = f'{kind}-{point[0]}-{point[1]}-s{point[2]}'
+                    future = pool.submit(encode, args, point, rgb, w, work / name, streams, name, False, svt_cpus, True)
+                    pending.append((records, future))
+        for kind, points, rgb, records in groups:
+            for point in points:
+                if point[0] == 'svt':
+                    continue
+                name = f'{kind}-{point[0]}-{point[1]}-s{point[2]}'
+                records.append(encode(args, point, rgb, w, work / name, streams, name, kind == 'foreground'))
+                print(f'phase=codec window={wid} point={name} bytes={records[-1]["payload_bytes"]}', flush=True)
+                publish_progress('codecs', sum(len(r) for r in (foreground, backgrounds, anchors)))
+        for records, future in pending:
+            record = future.result()
+            finish_rgb(record, w['frames'])
+            records.append(record)
+            print(f'phase=codec window={wid} point={record["name"]} bytes={record["payload_bytes"]}', flush=True)
             publish_progress('codecs', sum(len(r) for r in (foreground, backgrounds, anchors)))
+    for records in (backgrounds, anchors):
+        records.sort(key=lambda r: GRID.index((r['codec'], r['value'], r['scale'])))
     write_json(stage_dir() / (k4.safe(wid) + '-native.json'), {
         'id': wid, 'frames': w['frames'], 'source_sha256': w['source_sha256'],
         'ball_sha256': w['ball_sha256'], 'mask_bytes': len(w['mask']),
@@ -314,6 +354,7 @@ def main() -> int:
     run.add_argument('--sources', type=Path, nargs='+', required=True)
     run.add_argument('--frames', type=int, default=240)
     run.add_argument('--max-windows', type=int, default=1)
+    run.add_argument('--threads', type=int, default=32)
     run.add_argument('--ffmpeg', default='ffmpeg')
     run.add_argument('--encoder', default='SvtAv1EncApp')
     run.add_argument('--decoder', default='dav1d')
@@ -339,7 +380,7 @@ def main() -> int:
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
     result = {'requested': args.windows[:args.max_windows], 'device': 'cuda', 'gpu': torch.cuda.get_device_name(),
               'torch': torch.__version__, 'tools': {t: svtav1.tool(t) for t in [args.encoder, args.decoder, args.ffmpeg]},
-              'command': __import__('sys').argv, 'windows': []}
+              'command': __import__('sys').argv, 'cpu_threads': args.threads, 'windows': []}
     for wid, source in zip(args.windows[:args.max_windows], args.sources):
         result['windows'].append(process(args, wid, source, scratch))
         write_json(stage_dir() / 't1-oracle.json', result)
