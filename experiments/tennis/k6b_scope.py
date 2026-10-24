@@ -71,14 +71,14 @@ def diagnose(row: dict[str, Any], poses: dict[str, Any], fits: dict[str, Any], s
         reference = fitted[0] if fitted else None
         targets = [t for t in row['judged'] if poses[p][t] and poses[p][t].get('fitted')]
         distances = [pose_distance(poses[p][reference]['kps'], poses[p][t]['kps'], row['median_height'][p]) for t in targets] if reference is not None else []
-        distances = [x for x in distances if x is not None]
+        valid_distances = [x for x in distances if x is not None]
         players.append({'player': p, 'height_px': row['median_height'][p],
                         'fitted': len(fitted), 'miss_share_registered': 1 - len(fitted) / len(registered),
                         'reference_t': reference, 'target_range': [min(targets), max(targets)] if targets else [],
                         'reference_in_registered': reference in registered,
                         'cross_shot_targets': sum(shot_id(t, cuts) != shot_id(reference, cuts) for t in targets) if reference is not None else None,
                         'reference_time_gap_s_median': float(np.median([abs(t - reference) / row['fps'] for t in targets])) if targets else None,
-                        'reference_pose_distance_median': float(np.median(distances)) if distances else None})
+                        'reference_pose_distance_median': float(np.median(valid_distances)) if valid_distances else None})
     # Motion of court centre on the 960x540 registration plane, converted to 1080p px.
     centre = np.asarray([10.97 / 2, 23.77 / 2, 1.])
     projected = {}
@@ -159,6 +159,42 @@ def validate(directory: Path) -> dict[str, Any]:
     return {'passed': all(checks.values()), 'checks': checks}
 
 
+def summarize(scope: dict[str, Any], reports: list[dict[str, Any]]) -> dict[str, Any]:
+    """Apply an encoder-only inclusion rule to identical saved method/anchor rows.
+
+    The single-shot rule is the prespecified first hypothesis; the size rule is
+    exploratory. Missing generated windows never enter a reported denominator.
+    """
+    rules = {
+        'pooled': lambda r: True,
+        'single_shot': lambda r: not r['cuts'],
+        'court_95pct': lambda r: r['registered_share'] >= .95,
+        'single_shot_height_115': lambda r: not r['cuts'] and min(p['height_px'] for p in r['players']) >= 115,
+    }
+    by_window = {r['window']: r for r in scope['rows']}
+    output: dict[str, Any] = {}
+    for name, rule in rules.items():
+        included = sorted(w for w, r in by_window.items() if rule(r))
+        steps = []
+        for report in reports:
+            step = report.get('step', 2)
+            variant = {2: 'gen-original', 3: 'gen-fit', 4: 'gen-match', 5: 'gen-match5'}[step]
+            rows = [r for r in report['rows'] if r['window'] in included]
+            result: dict[str, Any] = {'step': step, 'windows': [r['window'] for r in rows],
+                                     'missing': sorted(set(included) - {r['window'] for r in rows})}
+            for method in [variant, 'warp@q4-velocity-e4', 'ref@q4-velocity-e4']:
+                for billed in (False, True):
+                    cells = [r[method]['billed'] if billed else r[method] for r in rows
+                             if method in r and (not billed or 'billed' in r[method])]
+                    if not cells:
+                        continue
+                    wins = sum(c[m]['won'] for c in cells for m in ('lpips', 'dists'))
+                    result[method + (' billed' if billed else '')] = {'won': wins, 'cells': 2 * len(cells), 'score': wins / (2 * len(cells))}
+            steps.append(result)
+        output[name] = {'included': included, 'excluded': sorted(set(by_window) - set(included)), 'steps': steps}
+    return output
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='action', required=True)
@@ -167,9 +203,19 @@ def main() -> int:
     run.add_argument('--windows', nargs='+', required=True)
     run.add_argument('--sources', nargs='+', required=True)
     run.add_argument('--max-windows', type=int, default=0)
+    report = sub.add_parser('report')
+    report.add_argument('--scope', type=Path, required=True)
+    report.add_argument('--reports', type=Path, nargs='+', required=True)
+    report.add_argument('--out', type=Path, required=True)
     check = sub.add_parser('validate')
     check.add_argument('--directory', type=Path, default=Path(os.environ.get('PS_STAGE_DIR', '.')))
     args = parser.parse_args()
+    if args.action == 'report':
+        result = {'scores': summarize(json.loads(args.scope.read_text()), [json.loads(p.read_text()) for p in args.reports]),
+                  'inputs': [{'path': str(p), 'sha256': sha(p)} for p in [args.scope, *args.reports]]}
+        with args.out.open('x') as stream:
+            stream.write(json.dumps(result, indent=2, allow_nan=False) + '\n')
+        return 0
     if args.action == 'analyze':
         if len(args.windows) != len(args.sources):
             parser.error('each window needs one source')

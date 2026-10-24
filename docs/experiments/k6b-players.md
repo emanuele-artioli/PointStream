@@ -925,3 +925,18 @@ the decisions are in [experiments.md](../experiments.md).
 - Provenance integration: step-5 run continuation copied verbatim from
   d0a00e5b7e5a0fa2ec53a330eff62b4eea93e756, absent from origin/main
   58f4eba9. Existing entries retained; no earlier verdict changed.
+- CPU job submitted: `20261024T082408Z-3cb3f467` (pending at submission),
+  code `dae3fe78a3ca7faa9a0da8af2eb86dbe68634267`; snapshot
+  `b7458237c73952f47a24040f57fb7978d9bbc1658d907f92f15fb8b52fb0cd86`.
+  Two CPU threads, no GPU claim; smoke 300 s, full 600 s, total ceiling
+  1,200 s. All six hosts inspected; eligible host pool retained. Original
+  clips and K6 bundles staged by the existing prepare specification's
+  SHA256 identities. Outputs go to the new job, never into prior evidence.
+- First CPU request `20261024T082408Z-3cb3f467`: startup failure, no
+  workload or smoke began. Fleet marked attention after owner disappearance;
+  inspected `run/supervisor.log` and `run/supervisor.json`: Python exits on
+  missing `experiments.jobs.monitor` because the selected snapshot included
+  only the analysis module. No run status, smoke or workload log exists.
+  Boot-log SHA256 recorded in the export receipt; original request retained.
+  Corrected request includes the fleet runtime dependencies; this is a
+  diagnosed startup failure, not a replay of uncertain execution.

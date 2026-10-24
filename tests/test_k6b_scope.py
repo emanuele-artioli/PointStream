@@ -17,3 +17,20 @@ def test_scene_metadata_and_pose_translation():
     b = [[10, 10, 1], [11, 10, 1], [10, 11, 1], [11, 11, 1]]
     assert pose_distance(a, b, 100) == 0
     assert pose_distance(a, [[0, 0, 0]] * 4, 100) is None
+
+
+def test_scope_keeps_anchor_and_method_denominators_identical():
+    from experiments.tennis.k6b_scope import summarize
+
+    cell = {'lpips': {'won': True}, 'dists': {'won': False}}
+    report = {'rows': [{'window': 'court', 'gen-original': cell, 'ref@q4-velocity-e4': cell},
+                       {'window': 'mixed', 'gen-original': cell, 'ref@q4-velocity-e4': cell}]}
+    scope = {'rows': [{'window': w, 'cuts': cuts, 'registered_share': share,
+                       'players': [{'height_px': 120}]} for w, cuts, share in
+                      [('court', [], 1), ('mixed', [110], .2), ('unrendered', [], 1)]]}
+    result = summarize(scope, [report])
+    assert result['pooled']['steps'][0]['gen-original']['cells'] == 4
+    single = result['single_shot']['steps'][0]
+    assert single['gen-original']['cells'] == single['ref@q4-velocity-e4']['cells'] == 2
+    assert single['missing'] == ['unrendered']
+    assert single['gen-original']['score'] == .5
