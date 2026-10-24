@@ -897,3 +897,29 @@ the decisions are in [experiments.md](../experiments.md).
   plus P02 retry, P03 and P09 each ≤1700 s =6800 s. Ended attempts
   ~215 s give <7015 s aggregate maximum, still under 7200 s. No further
   retries beyond these jobs without first re-auditing actual elapsed time.
+- P02_02 exclusive retry: `20261024T084111Z-1939a70f`, revision
+  `9e576c04`, ≤1700 s (pending at acknowledgement).
+- P03_10 `20261024T084139Z-eed9df04` and P09_106
+  `20261024T084208Z-f947299c`: code `9e576c04`, each ≤1700 s,
+  acknowledged pending. P01 `20261024T083825Z-d68be64f` stopped after
+  ~80.7 s: a full-stream point failed all three native determinism checks
+  even on an exclusive Ada GPU. Its raw per-attempt reports are retained.
+  This blocks a complete corrected-mask BD-rate curve for P01 at this
+  configuration; **no segmentation verdict follows from it**.
+- P02 exclusive retry `20261024T084111Z-1939a70f` also stopped at the
+  three-attempt native gate in full. P03/P09 continue under their existing
+  caps. **The requested full corrected-mask BD-rate result is blocked by
+  native decoder reliability, not established as a pass or fail.**
+- Revised bounded diagnostic, declared before full SAM results: first
+  stock foreground point `dcvc@0/4`, 240 frames on each item, with the
+  identical seed/tracker/correction pipeline. Four jobs ≤600 s each,
+  smoke ≤180 s (8 tracked frames), full ≤300 s, validator ≤60 s.
+  This tests whether that concrete decoder-mask configuration meets 2 kbps;
+  it cannot rule out other points, segmenters, or correction coders, and
+  cannot replace the missing full BD-rate curve. No extrapolated quality
+  or rate is reported as a measured result. P09's stock point is not on
+  4a's selected hull (its corresponding point used venue weights).
+- Budget reserve: four diagnostic caps =2400 s, remaining P03/P09 caps
+  =3400 s, plus ended jobs <450 s; total <6250 s (<2 GPU-hours). This
+  diagnostic is cheaper than changing or re-encoding the codec ladder,
+  which is outside this card's mask work.
