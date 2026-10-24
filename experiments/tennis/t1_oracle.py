@@ -325,7 +325,7 @@ def report(paths: list[Path], out: Path) -> int:
     from experiments.visor.h5 import compare
 
     windows = [w for p in paths for w in json.loads(p.read_text())['windows']]
-    result: dict[str, Any] = {'windows': {}, 'summary': {}}
+    result: dict[str, Any] = {'windows': {}, 'summary': {}, 'actual_billed': {'windows': {}, 'summary': {}}}
     for w in windows:
         comparisons: dict[str, Any] = {}
         for metric, sign in METRICS.items():
@@ -335,11 +335,22 @@ def report(paths: list[Path], out: Path) -> int:
                 anchor = [(r['kbps'], sign * r['scores'][metric]) for r in w['rows'] if r['kind'] == 'anchor' and (codec == 'pooled' or r['codec'] == codec)]
                 comparisons[metric][codec] = compare(test, anchor, 1e-6)
         result['windows'][w['id']] = comparisons
+        actual: dict[str, Any] = {}
+        for metric, sign in METRICS.items():
+            test = [(r['actual_kbps'], sign * r['scores'][metric]) for r in w['rows'] if r['kind'] == 'split']
+            anchor = [(r['kbps'], sign * r['scores'][metric]) for r in w['rows'] if r['kind'] == 'anchor']
+            actual[metric] = compare(test, anchor, 1e-6)
+        result['actual_billed']['windows'][w['id']] = actual
     for metric in METRICS:
         values = [v[metric]['pooled']['bd'] for v in result['windows'].values()]
         mean = float(np.mean(values)) if len(values) == 8 and all(v is not None for v in values) else None
         wins = sum(v[metric]['pooled']['bd'] is not None and v[metric]['pooled']['bd'] < 0 for v in result['windows'].values())
         result['summary'][metric] = {'mean_bd': mean, 'wins': wins, 'decision': 'unclear' if mean is None else 'pass' if mean <= -.1 and wins >= 6 else 'fail'}
+    for metric in METRICS:
+        values = [v[metric]['bd'] for v in result['actual_billed']['windows'].values()]
+        result['actual_billed']['summary'][metric] = {
+            'mean_bd': float(np.mean(values)) if len(values) == 8 and all(v is not None for v in values) else None,
+            'wins': sum(v is not None and v < 0 for v in values), 'of': len(values), 'descriptive_only': True}
     write_json(out, result)
     return 0
 
