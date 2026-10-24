@@ -125,11 +125,12 @@ def main() -> int:
     sub.add_parser('validate')
     identify = sub.add_parser('identify')
     identify.add_argument('--source-stage', type=Path, required=True)
+    identify.add_argument('--max-windows', type=int, default=8)
     args = parser.parse_args()
     if args.command == 'identify':
         info = {n: {'path': str(args.source_stage / n), 'sha256': file_sha256(args.source_stage / n)} for n in ['balls.tar', 't1-balls.json']}
         source = json.loads((args.source_stage / 't1-balls.json').read_text())
-        if len(source['windows']) != 8:
+        if len(source['windows']) != args.max_windows:
             raise ValueError('ball reference generation is incomplete')
         with tarfile.open(args.source_stage / 'balls.tar') as archive:
             for row in source['windows']:
