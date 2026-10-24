@@ -177,6 +177,7 @@ def summarize(scope: dict[str, Any], reports: list[dict[str, Any]]) -> dict[str,
         'single_shot': lambda r: not r['cuts'],
         'court_95pct': lambda r: r['registered_share'] >= .95,
         'single_shot_height_115': lambda r: not r['cuts'] and min(p['height_px'] for p in r['players']) >= 115,
+        'court_95pct_height_115': lambda r: r['registered_share'] >= .95 and min(p['height_px'] for p in r['players']) >= 115,
     }
     by_window = {r['window']: r for r in scope['rows']}
     output: dict[str, Any] = {}
