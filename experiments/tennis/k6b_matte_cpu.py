@@ -21,6 +21,13 @@ from src.pointstream import mask as mk
 from src.pointstream.composite import OBJECT
 
 SCALES = (8, 16, 32)
+PILOT_WINDOWS = ("alcaraz_hurkacz/031@129", "medvedev_struff/014@194")
+
+
+def ordered_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    order = (*PILOT_WINDOWS, "alcaraz_hurkacz/016@273")
+    indexed = {r["window"]: r for r in rows}
+    return [indexed[w] for w in order] + [r for r in rows if r["window"] not in order]
 
 
 def cpu() -> float:
@@ -250,6 +257,7 @@ def main() -> int:
     p.add_argument("--source", type=Path, action="append", default=[])
     p.add_argument("--manifest", type=Path)
     p.add_argument("--control", type=Path)
+    p.add_argument("--resume", type=Path)
     p.add_argument("--backbone", type=Path, action="append", default=[])
     p.add_argument("--max-windows", type=int, default=0)
     p.add_argument("--validate", action="store_true")
@@ -301,12 +309,28 @@ def main() -> int:
     if sha(a.diagnostic.read_bytes()) != DIAGNOSTIC_SHA:
         raise ValueError("Diagnostic changed")
     diagnostic = json.loads(a.diagnostic.read_text())
-    chosen = diagnostic["rows"][:a.max_windows or None]
+    chosen = ordered_rows(diagnostic["rows"])[:a.max_windows or None]
     manifest = json.loads(a.manifest.read_text())
     source_records = {c["id"]: c["staged"] for c in manifest["clips"]}
+    sources_by_sha = {sha(path.read_bytes()): path for path in a.source}
     result = {"rows": [], "pilots": [], "expected_windows": len(chosen), "cuda_visible": os.environ["CUDA_VISIBLE_DEVICES"], "gpu_hours": 0,
         "input_sha256": {str(q): sha(q.read_bytes()) for q in [a.diagnostic, a.transport, a.manifest, a.control, *a.anchor, *a.generated]},
         "code_sha256": sha(Path(__file__).read_bytes()), "numpy": np.__version__, "opencv": cv2.__version__}
+    if a.resume:
+        with tarfile.open(a.resume) as tar:
+            tar.extractall(scratch, filter="data")
+        prior = json.loads((publish / "matte.json").read_text())
+        for row in prior["rows"]:
+            for setting in row["settings"].values():
+                for candidate in setting["candidates"]:
+                    blob = (publish / candidate["file"]).read_bytes()
+                    _, planes = decode(blob)
+                    if sha(blob) != candidate["sha256"] or array_sha(planes) != setting["reduced_sha256"]:
+                        raise ValueError("Resume packet differs from preserved checkpoint")
+        result["rows"] = prior["rows"]
+        result["pilots"] = prior["pilots"]
+        result["resumed_archive_sha256"] = sha(a.resume.read_bytes())
+        result["prior_checkpoint_cpu_seconds"] = prior["cpu_seconds_self_and_children"]
     def checkpoint() -> None:
         result["cpu_seconds_self_and_children"] = cpu()
         result["wall_seconds"] = time.monotonic()-began
@@ -315,10 +339,13 @@ def main() -> int:
         with tarfile.open(stage / "published.tar", "w") as tar:
             tar.add(publish, arcname="publish")
     for i, row in enumerate(chosen):
+        if any(r["window"] == row["window"] for r in result["rows"]):
+            continue
         native = json.loads((anchors[row["window"]] / "window.json").read_text())
         result["rows"].append(rates(row, packets, publish, native))
-        if i < 2:
-            result["pilots"].append(metric_pilot(row, packets, anchors[row["window"]], generated, a.source[i],
+        if row["window"] in PILOT_WINDOWS:
+            source_record = source_records[row["window"].split("@")[0]]
+            result["pilots"].append(metric_pilot(row, packets, anchors[row["window"]], generated, sources_by_sha[source_record["sha256"]],
                 source_records[row["window"].split("@")[0]], control_root / "publish" / row["window"].replace("/", "__"), a.backbone, scratch, publish))
         checkpoint()
         from experiments.jobs.monitor import publish_progress

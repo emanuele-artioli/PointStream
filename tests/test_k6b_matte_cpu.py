@@ -37,3 +37,11 @@ def test_crop_footprint_never_grants_rgb_outside_saved_rectangle():
     assert coverage(mask, np.array([4., 4., 3., 3.])) == 5
     assert coverage(mask, None) == 9
     assert coverage(mask, np.array([-10., -10., 2., 2.])) == 9
+
+
+def test_pilot_selection_covers_both_matches_without_changing_cohort():
+    from experiments.tennis.k6b_matte_cpu import ordered_rows, PILOT_WINDOWS
+    ids = ["alcaraz_hurkacz/031@129", "alcaraz_hurkacz/013@213", "alcaraz_hurkacz/016@273", "medvedev_struff/014@194"]
+    rows = ordered_rows([{"window": w} for w in ids])
+    assert tuple(r["window"] for r in rows[:2]) == PILOT_WINDOWS
+    assert {r["window"] for r in rows} == set(ids)

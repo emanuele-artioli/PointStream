@@ -9,3 +9,5 @@ Stop: complete frozen18/24 rule decides, resource bound expires, artifacts canno
 Branch: codex/k6b-compressed-matte. Report directly to planning chat01a16cfc-1a88-7013-bd79-8489fe7c1eb2. Previous PR236 merged after explicit user auto-merge approval; previous compute ledgers stay closed.
 
 State: preregistered; no new measurements/jobs yet.
+
+CPU job20261025T095256Z-b7692db7 submitted; sourcec2f8e670. No GPU. Preserve and inspect this ID before acting.
