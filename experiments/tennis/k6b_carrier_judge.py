@@ -166,6 +166,8 @@ def judge_window(wid: str, anchor: Path, old_control: Path, packets: Path,
             frames.append(canvas)
             supports.append(alpha)
             diag = c['diagnostic_only']
+            if cpu_source is None:
+                raise ValueError('CPU source pixel identity unavailable')
             pixel_checks = {'source_cpu': array_sha(cpu_source) == diag['original_rgb_frame_sha256'][t],
                 'decoded_rgb': array_sha(image) == diag['decoded_rgb_frame_sha256'][t],
                 'decoded_alpha': array_sha(alpha) == diag['decoded_alpha_frame_sha256'][t]}
@@ -220,6 +222,8 @@ def validate(archive: Path, full: bool) -> dict[str, Any]:
             checks[label+':variants'] = row['variants'] == r['expected_variants'][label]
             checks[label+':source'] = row['source_sha256'] == SOURCE_SHA[PILOTS.index(label)]
             checks[label+':coverage'] = row['judged'] == row['expected_judged'] and (not full or row['judged'] == row['original_judged'])
+            if row.get('carrier_receipts'):
+                checks[label+':source_roundoff'] = set(row['source_cpu_vs_native_gpu']) == {str(t) for t in row['judged']} and all(v['max_abs_difference'] <= 1 for v in row['source_cpu_vs_native_gpu'].values())
             checks[label+':control'] = row['control_max_abs_difference'] <= 1e-4 and row.get('new_png_control_max_score_difference', 0) <= 1e-4
             dest = root/'publish'/safe(label)
             checks[label+':files'] = all(sha((dest/name).read_bytes()) == digest for name, digest in row['files'].items())
