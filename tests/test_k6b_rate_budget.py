@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import pytest
 import numpy as np
+import json
 
-from experiments.tennis.k6b_rate_budget import comparison, headroom
+from experiments.tennis.k6b_rate_budget import accounting, comparison, headroom
 from experiments.tennis.k6b_rate_streams import (
     decode_keypoints,
     decode_masks,
@@ -38,6 +39,9 @@ def test_inverse_censors_beyond_either_measured_end():
     lo = headroom(row(0.75), "lpips")
     assert lo["threshold_kbps"] is None and lo["headroom_upper_bound_kbps"] == 0.0
     assert comparison(row(0.1), "lpips", 7.0)["won"] is None
+    assert comparison(row(0.1), "lpips", 7.0)["observed_dominator"] is None
+    high_rate_loss = comparison(row(0.375), "lpips", 7.0)
+    assert high_rate_loss["won"] is None and high_rate_loss["observed_dominator"]["kbps"] == 6.0
     assert comparison(row(0.75), "lpips", 1.0)["won"] is None
 
 
@@ -51,6 +55,8 @@ def test_equality_at_each_anchor_endpoint_is_not_a_win():
 def test_inverse_uses_achievable_hull_and_rejects_nonfinite():
     r = row(0.375)
     r["anchor_points"]["dominated"] = {"kbps": 4.0, "lpips": 0.49}
+    r["anchor_points"]["high"]["unused_diagnostic"] = float("nan")
+    json.dumps(comparison(r, "lpips", 7.0), allow_nan=False)
     assert headroom(r, "lpips")["threshold_kbps"] == 4.0
     r["anchor_points"]["bad"] = {"kbps": float("nan"), "lpips": 0.1}
     with pytest.raises(ValueError):
@@ -102,3 +108,76 @@ def test_reference_png_is_color_and_pixel_exact_and_lossy_is_not_relabelled():
     assert meta["quality"] is None and np.array_equal(restored, image)
     _, lossy = decode_reference(encode_reference(image, {"unit": "u"}, 70))
     assert not np.array_equal(lossy, image)
+
+
+def accounting_fixture():
+    rows = []
+    costs = []
+    for i in range(12):
+        match = "alcaraz_hurkacz" if i < 6 else "medvedev_struff"
+        window = f"{match}/{i}"
+        r = row(0.375)
+        for a in r["anchor_points"].values():
+            a["dists"] = a["lpips"]
+        r.update(
+            window=window,
+            match=match,
+            method={"lpips": 0.375, "dists": 0.375},
+            keypoint_kbps=1.0,
+            registered_seconds=10.0,
+            whole_window_seconds=12.0,
+            billed={"lpips": {"won": True}, "dists": {"won": True}},
+        )
+        rows.append(r)
+        costs.append(
+            {
+                "window": window,
+                "match": match,
+                "keypoints": {"bytes": 1500, "equivalent": True},
+                "references": {x + "_bytes": 1000 for x in ("png", "jpeg70", "jpeg85", "jpeg95")},
+                "mattes": {x: {"bytes": 100} for x in ("exact", "half_grid", "quarter_grid")},
+            }
+        )
+    return (
+        {"rows": rows, "complete": True, "limitations": {}, "provenance": {}},
+        {"rows": costs, "provenance": {}},
+    )
+
+
+def test_accounting_replaces_entropy_once_and_pays_all_match_references():
+    d, t = accounting_fixture()
+    out = accounting(d, t)
+    s = next(
+        s
+        for s in out["scenarios"]
+        if s["reference"] == "png"
+        and s["matte"] == "exact"
+        and s["asset_amortization_seconds"] == 600
+    )
+    c = s["rows"][0]
+    assert c["components_kbps"] == pytest.approx(
+        {
+            "keypoints_and_metadata": 1.2,
+            "adapter_guider_7200s": 1.0,
+            "reference": 0.08,
+            "matte": 0.08,
+        }
+    )
+    assert c["total_kbps"] == pytest.approx(2.36)
+    assert c["whole_window_total_kbps"] == pytest.approx(1600 * 8 / 12 / 1000 + 1 + 0.08)
+    assert out["png_bank_bytes_by_match"]["alcaraz_hurkacz"] == 6000
+    lossy = next(
+        s for s in out["scenarios"] if s["reference"] == "jpeg70" and s["matte"] == "half_grid"
+    )
+    assert "counterfactual" in lossy["quality_status"]
+
+
+def test_accounting_rejects_duplicate_cohort_and_unverified_conditioning():
+    d, t = accounting_fixture()
+    t["rows"].append(t["rows"][0])
+    with pytest.raises(ValueError):
+        accounting(d, t)
+    t["rows"].pop()
+    t["rows"][0]["keypoints"]["equivalent"] = False
+    with pytest.raises(ValueError):
+        accounting(d, t)

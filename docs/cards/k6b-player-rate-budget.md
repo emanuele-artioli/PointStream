@@ -11,3 +11,7 @@ Branch: `codex/k6b-player-confirmation-plan` (the completed diagnostic's PR #236
 Preserve source/replay uncertainty, two familiar match clusters, the granted-side-information limitation and historical step-5 failure. Lossy or decoder-derived side information cannot inherit old quality as a measured result.
 
 State: rule frozen before new measurements; exact start/deadline and stage budgets are in the experiment entry.
+
+Completed CPU-only fleet job: `20261025T082944Z-29f021a5`; source `dfc06164`. Inspect this ID before acting; no GPU job exists for this audit.
+
+Transport job is terminal, with 219 full checks and independent archive decode passed. No audit jobs are active; accounting/reporting continues on CPU.

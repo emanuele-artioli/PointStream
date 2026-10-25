@@ -10,6 +10,7 @@ from pathlib import Path
 import resource
 import sys
 import tarfile
+import tempfile
 import time
 from typing import Any
 
@@ -252,14 +253,18 @@ def measure_window(
     }
 
 
-def validate(stage: Path, expected: int | None = None) -> dict[str, Any]:
+def validate(
+    stage: Path, expected: int | None = None, packet_root: Path | None = None
+) -> dict[str, Any]:
+    if packet_root is None and not (stage / "packets").is_dir():
+        return validate_archive(stage / "published.tar", expected)
     result = json.loads((stage / "transport.json").read_text())
     checks = {
         "cpu_only": result["cuda_visible"] == "",
         "unique_windows": len({r["window"] for r in result["rows"]}) == len(result["rows"]),
         "row_count": len(result["rows"]) == (expected or result["expected_windows"]),
     }
-    root = stage / "packets"
+    root = packet_root if packet_root is not None else stage / "packets"
     from experiments.tennis.k4 import safe
 
     for row in result["rows"]:
@@ -300,6 +305,15 @@ def validate(stage: Path, expected: int | None = None) -> dict[str, Any]:
     }
 
 
+def validate_archive(path: Path, expected: int | None = None) -> dict[str, Any]:
+    """Bulk-read one archive; all per-packet decoding happens on local scratch."""
+    with tempfile.TemporaryDirectory(prefix="k6b-rate-validate-", dir="/tmp") as temp:
+        root = Path(temp)
+        with tarfile.open(path) as archive:
+            archive.extractall(root, filter="data")
+        return validate(root / "publish" if (root / "publish").is_dir() else root, expected)
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--diagnostic", type=Path)
@@ -307,7 +321,28 @@ def main() -> int:
     p.add_argument("--prepared", type=Path, action="append", default=[])
     p.add_argument("--max-windows", type=int, default=0)
     p.add_argument("--validate", action="store_true")
+    p.add_argument("--check-archive", type=Path)
+    p.add_argument("--proof-out", type=Path)
     a = p.parse_args()
+    if a.check_archive:
+        if (
+            os.environ.get("CUDA_VISIBLE_DEVICES") != ""
+            or a.proof_out is None
+            or a.proof_out.exists()
+        ):
+            raise ValueError("CPU-only archive validation needs a new proof path")
+        out = validate_archive(a.check_archive)
+        write(a.proof_out, out)
+        print(
+            json.dumps(
+                {
+                    "passed": out["passed"],
+                    "checks": len(out["checks"]),
+                    "cpu_seconds": out["cpu_seconds"],
+                }
+            )
+        )
+        return int(not out["passed"])
     stage = Path(os.environ["PS_STAGE_DIR"])
     if a.validate:
         out = validate(stage)
@@ -386,14 +421,17 @@ def main() -> int:
         "quality_measurements": False,
         "gpu_hours": 0,
     }
-    (stage / "packets").mkdir()
+    publish = Path(os.environ["PS_SCRATCH_DIR"]) / "publish"
+    publish.mkdir()
+    packets = publish / "packets"
+    packets.mkdir()
     for row in rows:
         item = measure_window(
             row,
             anchors[row["window"]],
             units,
             prepared_meta,
-            stage / "packets" / safe(row["window"]),
+            packets / safe(row["window"]),
         )
         result["rows"].append(item)
         usage = resource.getrusage(resource.RUSAGE_SELF)
@@ -413,13 +451,14 @@ def main() -> int:
             ),
             flush=True,
         )
-    proof = validate(stage)
+    proof = validate(stage, packet_root=packets)
     write(stage / "scientific-validation.json", proof)
     if not proof["passed"]:
         return 1
+    write(publish / "transport.json", result)
+    write(publish / "scientific-validation.json", proof)
     with tarfile.open(stage / "published.tar", "w") as tar:
-        for name in ("packets", "transport.json", "scientific-validation.json"):
-            tar.add(stage / name, arcname=name)
+        tar.add(publish, arcname="publish")
     return 0
 
 
