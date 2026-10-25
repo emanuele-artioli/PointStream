@@ -3230,3 +3230,5 @@ CPUvsCUDA diagnosisconfirmed: only1channel differs by1level on samplet0;
 allactualdecodedRGB/alphahashes EXACTmatchCPUpackets. Originalneuralcontrol
 maxabsdiff0.0, CUDApeak5.703743GiB, realnative smoke37.938989s. Full
 Alstage running. PromoteMed throughsamevalidator, remaining600sreservation.
+
+DenseactualqualityMed job `20261025T190034Z-01c74a65` source7a364580 specSHA256`5f34e27b416ba2251492ff10bafb18cb391969925d59e6ef8800eac4afbd1cd2`;600GPU-sreserved inside1800densecap. Samefrozen4deliveredcarrierpoints andnativeoriginalcontrol.
