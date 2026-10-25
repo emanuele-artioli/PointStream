@@ -3254,3 +3254,12 @@ historical7pointAlreserve550 =>1446.284277s<1800. Original5variantAlcost
 252.161 incl38ssmoke; full8variant historicalprojection214*8/5+40<383s,
 under460fullcap;60ssmoke/20svalidator inside550s. Preserve distinctpreset8
 curves and selectedsinglepoints, never combinepreset1/4into oldcurves.
+
+Historicalstage submission20261025T190533Z-524c8807 NOTPUBLISHED,0GPU.
+Nativeverify_inputs rejected missingfull/published.tar; originalfailedCPU
+correctly retainedfull/partial.tar. Statusreportsunpublished; independent
+SSHinspection confirmedrequest.json ABSENT, directoryonlysource/events, so
+no worker canadmit it. Preserveunpublishedsource; no uncertainreplay. Correct
+only artifactpath tofull/partial.tar, remotelyverifiedSHA256matches
+45be9e1a39030246235fec3335b23b7ca798f55ead579639539893656a23996e.
+Subsequentcorrectedsubmission is newlypublishedrequest, not replayofrunningjob.
