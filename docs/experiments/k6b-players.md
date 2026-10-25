@@ -2721,3 +2721,375 @@ Common base shipped is primary. Charging its actual48,878,567-byte checkpoint ov
 Final immutable audit bundle `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-matte-judge-20261025T141700Z/k6b-matte-gpu-evidence.tar.gz`, SHA256`201e78036a7c2bd2354ddee110155354b9eb1a3faf3632970f211e7c276e3bbc` (6385271 bytes,167 members); all166 payload-member checksums independently verified. Native score/command/input/model/control receipts, original judge archives, delivered reference/keypoint/matte packets, source snapshots, failed trace, local tests and closed ledger retained. Large source clips/generated RGB/model weights remain SHA256-referenced immutable inputs. Final JSON in the same directory `k6b-matte-gpu-final-report.json`, SHA256`55112f6b10254197231b379ee0408a9924c07fcc846fbc47c053d6ee938ea606`; comparison CSV and resource ledger alongside. Remote SHA256 values verified before write protection. No old artifact overwritten.20 focused tests and configured ruff/mypy pass; final full local suite871 passed/24 skipped, only unchanged macOS protected-path symlink assertion fails (Linux CI verifies supported platform).
 
 GPU result published in PR #240 (result commit`7e7f0028`), merge-commit auto-merge enabled. Independent comparison/166-member checksum validation complete, all task jobs terminal, events acknowledged. Planning report includes the stopped prefix, rigorous16/24 optimistic bound and closed0.167674940/0.75 h ledger. No pending compute approval or follow-on run in this task.
+
+### 2026-10-25 — Reference/alpha video and temporal matte CPU comparison
+
+User explicitly requested color plus auxiliary alpha in one container versus
+3-channel black segmentation, foreground black lifted to a nonzero guard band,
+lightweight references, and an actual generated-quality experiment. The current
+codec sends sparse full RGB references and dynamic per-target-frame masks via
+RLE/Zstd or XOR/LZMA; it has not coded tennis masks as video. Reference-frame
+alpha cannot replace changing target silhouettes. New scope/card:
+[reference-video](../cards/k6b-player-reference-video.md), branch
+`codex/k6b-reference-video`; old closed budgets are not reopened.
+
+Hypothesis: motion compensation/alignment and reduced, temporally predicted
+reference banks lower delivered side information enough to justify a real
+changed-conditioning quality test. Alternative: alpha costs/black-key errors,
+conditioning distortion or poor inter-reference correlation erase savings.
+The saved exact-quality free-reference/free-matte result19/24 is a feasibility
+oracle for reducing reference cost at fixed quality, not a bound on changed
+conditioning or all lossy silhouettes; the17/24 PNG result cannot close those.
+No new quality scores are inspected before this entry.
+
+Freeze: same12 windows/anchors/R/S/judged frames/renderer/seeds and original
+>=18/24 strict bracketed decision;7200s reference/adaptation lifetime; common
+shipped base primary, actual base bytes separately. Actual CPU sparse-bank tests:
+all24 references, half-size256x392, bicubic512x784 restore; SVT-AV1 preset8,
+CRF20/35/50, full BT709 RGB/YUV420 conversion. Compare unmasked bank, segmented
+color+explicit alpha (two actual AV1 tracks, Matroska container with counted
+metadata), and black RGB with floors1/8/32, thresholds ceil(floor/2). Ordering
+by unit ID within each match is recorded and charged; no claim of source
+chronology/player identity. Saved encoder SAM at recorded reference tick0,
+native reference-box crop supplies alpha; no new segmenter or manual labels.
+Half-size JPEG70/PNG pricing controls come from the previous immutable audit.
+Record actual post-container track decodes, frame/ID/hash fidelity, foreground
+RGB MSE, silhouette IoU/FP/FN, all delivered bytes. Pixel MSE is only screening,
+not a learned-judge/generation surrogate. No JPEG AI implementation is introduced.
+
+Dynamic-mask pilot: Al031/Med014,240frames and both players each, scale8;
+binary/SDF video at the same3 CRFs and reversible bounding-box-center alignment
+with circular roll before XOR/LZMA (all shift/header bytes included). Compare
+mask IoU and boundary F at2 full pixels beside unaligned H5. All methods/anchors
+have identical windows; no quality-driven cohort replacement. Lossy candidates
+require actual composite quality before any rate-quality win claim.
+
+CPU authorization interpreted from "go ahead": new cap7200CPU-s including
+children,0GPU-h; smoke<=300s then full<=1200s, validator<=60s, overall supervised
+<=1680s on4 CPUs (conservative6720CPU-s plus480local/analysis allowance). Save
+each setting. Smoke only first match bank/Al031 atCRF35, full both banks/both
+mask windows/3CRFs. Validator checks complete real decodes/container tracks,
+source/packet identities, finite diagnostics, exact aligned-mask reversibility,
+and synthetic pure-black foreground guard-band contract. Inspect old terminal
+job20261025T141239Z-93456964 before dispatch and all six hosts; CPU admission
+requires no GPU. No new chats/agents/monitors. Generation is user-requested but
+requires a concrete new GPU cap after CPU screening, not unused old allowance.
+
+Stop on invalid decode/contract, cap exhaustion or completed bounded pilot.
+Keep byte/fidelity Pareto candidates; choose one fixed recipe before opening new
+generated quality. Report uncertain tradeoffs instead of declaring a conclusive
+close. Familiar two-match/source-replay limitations, exploratory115px, historical
+step5 failure, exact-matte history and granted target-derived background remain.
+
+CPU job submitted `20261025T163506Z-af342506`, source`b3d39171`, spec
+SHA256`a76e748dd74ca27f27d6fd5c20a137680e56cfa8a67caed0262bdb8273d7ac99`.
+Deadline2026-10-25T17:18:03.043086+00:00,1680s supervisor cap,4CPU threads,
+0GPU. Native fleet doctor passes; gpu1/2/3/5/6 verified reachable with CPU
+headroom, gpu4 refused SSH and excluded. Old final job inspected complete.
+Frozen packed main environment and previous CPU packet archive SHA256
+6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7.
+No completion-resume capability verified for this client; use one attended
+bounded native wait for this batch, no recurring or one-shot model monitor.
+Preserved spec/submit receipts locally `/tmp/k6b-refvideo-{spec,submit}.json`;
+output native `/jobs/fleet/inbox/20261025T163506Z-af342506/{smoke,full}/published.tar`.
+Three focused tests/configured ruff/mypy pass before dispatch. Inspect this ID
+before acting after interruption; never replay an uncertain submission.
+
+CPU job20261025T163506Z-af342506 failed at smoke validator: native fleet
+releases scratch before invoking it. Codec smoke itself completed9 rows with
+valid actual container track decodes,59.019865CPU-s; all artifacts preserved
+(smoke TAR4cc81a7466e3137fd833c54aaec92fa0f7738456aa61798cfab3613f3a6b56fe).
+The defect was validator artifact access, not codec output. Corrected validation
+extracts the immutable published TAR and independently decodes each delivered
+track, checks original native-decoded hashes and saved conditioning hashes,
+plus exact aligned packets and frozen packet input SHA. Both full and smoke
+now run these checks before publication as well. Original encoding path/settings
+unchanged. Failed admitted interval70.207587s charged conservatively as280.830348
+CPU-s. Retry is diagnosed, not replay of uncertain work; new cap1500s at4CPUs,
+plus failed280.831 and480local allowance =6760.831CPU-s <7200.
+Full local suite872passed/25skipped; two platform constraints: macOS protected
+symlink assertion and sandbox denial of ps process-state inspection. Focused
+contracts/configured ruff/mypy pass. No GPU used.
+
+Corrected CPU job submitted `20261025T163852Z-1d6ee39a`, source`b257ee03`,1500s cap
+inside unchanged7200CPU-s total. Both stages independently validate actual
+published codec evidence. No new GPU authority is implied.
+Retry spec SHA256`e51b1a762307ea18f79bf6c461a7c332a051beef0d59420c73486d96ee5240d5`; native deadline remains17:18:03UTC.
+
+Before dense carrier measurements, clarify user scope: also compare continuous
+foreground appearance, not only sparse reference banks. Dense CPU pilot is
+preregistered in the same card (Al031/Med014,240 identical original frames,
+960x540 area RGB, exact saved SAM union;3CRFs20/35/50;actual color+alpha container
+versus black RGB floors1/32;native source conversion, same decode/restore rule).
+No generator/keypoint/adapter cost applies to this separate foreground-video
+representation; all container bytes are paid over each window, common background
+still granted. Initial8frame smoke, full240; actual CPU reservation must fit the
+remaining unchanged7200CPU-s total after prior attempts. No new quality-based
+window/parameter choices. CPU FP/FN/IoU/MSE are not neural-judge evidence.
+
+Corrected sparse CPU job20261025T163852Z-1d6ee39a complete; full54 settings,
+4 exact alignment packets, substantive smoke/full checks passed. Native admitted
+191.603102s plus failed70.207587s => conservative1047.242756CPU-s so far.
+Dense reservation1200s x4CPUs +480local allowance gives total6327.242756CPU-s,
+inside unchanged7200. Native packed environment unchanged; dense sourceab54b032,
+smoke180s,full850s,validator60s,overall1200s. Before dispatch verified previous
+job terminal and re-inspected complete eligible CPU pool. Dense source native
+conversion/frame hashes and actual post-container video decodes are required.
+Sparse full TAR SHA2562e80a76d8e7ba1bc5bd6dcdadf6892cf465a5568c1377fa06f2760822f424e1d;
+no new neural quality result. No GPU budget has been spent or reopened.
+
+Dense CPU job `20261025T164351Z-3d27fbbf` submitted, source`ab54b032`, specSHA256`fd8534155bac7bc26c084d9a4563698a880a9bc2936f5613155b390b87ecb8ea`.
+1200s total supervisor cap,4threads,0GPU; native deadline2026-10-25T17:18:29.510627+00:00.
+Record immutable native source+packet hashes, original conversion/frame identity,
+delivered container RGB/alpha splits; no uncertain replay after interruptions.
+
+### Sparse/reference CPU outcome (dense carrier still in progress)
+
+Complete job20261025T163852Z-1d6ee39a, codeb257ee03;54 points =30 reference-bank
+settings plus24 dynamic-mask settings,4 reversible alignment packets. Both
+native stages independently check actual delivered container decodes and
+conditioning hashes; no new neural metric/generation. Independent local88
+packet, alignment and saved RGB/alpha conditioning checks pass. CPU report can
+be reproduced with `python -m experiments.tennis.k6b_reference_report --archive
+PUBLISHED_TAR --diagnostic ORIGINAL_DIAGNOSTIC --transport ORIGINAL_TRANSPORT
+--out REPORT` (paths as native receipts).
+
+Reference bank bytes (all12 references per match,256x392 restored512x784,
+actual container/index/restore metadata paid, preset8):
+
+| Recipe | CRF | Alcaraz bytes | Medvedev bytes | reference-mask IoU Al/Med | foreground RGB MSE Al/Med |
+|---|---:|---:|---:|---|---|
+| unmasked RGB |20|53793|75843|not applicable|25.52 /33.44|
+| unmasked RGB |35|28054|39040|not applicable|44.21 /53.85|
+| unmasked RGB |50|14149|18291|not applicable|100.14 /123.97|
+| color+alpha |20|89838|95327|.9865 /.9868|35.74 /51.67|
+| color+alpha |35|50905|54892|.9865 /.9868|58.31 /77.47|
+| color+alpha |50|28210|30393|.9865 /.9867|137.45 /170.58|
+| black floor1 |20|61608|66634|.8386 /.8452|35.76 /51.57|
+| black floor1 |35|32572|36317|.7690 /.7632|58.46 /77.33|
+| black floor1 |50|16887|18743|.5933 /.6058|137.29 /174.56|
+| black floor32 |20|61458|66513|.9833 /.9806|51.38 /62.81|
+| black floor32 |35|32077|35977|.9783 /.9761|73.81 /88.57|
+| black floor32 |50|16670|18660|.9538 /.9540|150.23 /183.25|
+
+Intermediate floor8 has IoU.9466/.9496 atCRF20,.9149/.9185 at35,.8184/.8399 at50;
+its banks are essentially the same size asfloor1. Raising all foreground RGB
+channels to1 disambiguates pure black *before coding*, but measured lossy output
+creates substantial false positives;32 improves the guard band at the expense
+of dark foreground colors. Explicit alpha costs more but avoids that clipping.
+These are pooled reference-pixel diagnostics, not temporal matte/generation
+quality. Unmasked references need no alpha; their all-one comparison mask is
+not an error claim. Native post-container track pixels equal dav1d output.
+
+Original PNG banks895487/1179150B; half-JPEG70 prior92631/117396B. The new CRF20
+unmasked bank is94.0%/93.6% belowPNG; CRF35 is96.9%/96.7% belowPNG. All15 new
+bank recipes give19/24 strict cells at *unchanged original generated quality*
+with actual KPS/adaptation,7200s bank lifetime and free dynamic mattes. This is
+only a sensitivity; actual changed-conditioning quality is untested. Sparse
+bank order is unitID, not proven chronology or same-player tracking. This does
+not isolate the causal gain of inter prediction from the codec/resize change;
+no all-intra ablation or JPEG AI implementation was tested.
+
+Dynamic masks: atscale8, all tested binary/SDF AV1 points cost more than the
+existing H5 route. Al031 two-player payload totals (including packet metadata):
+binary CRF20/35/50=164123/90565/37031B; SDF=71717/37283/18110B. Med014:
+binary200564/87028/25630B; SDF54141/26143/13476B. Plain separate H5 streams sum
+16414/10658B before shared timing metadata, substantially below video. The
+cheapest SDF is also much less accurate: Al IoU.6638/.7382 and boundary F.5801/.6171;
+Med.7396/.6257,F.6328/.6076 versus respective H5 AlIoU.8466/.8796,F.9325/.9326,
+MedIoU.8693/.8136,F.9295/.9336. These mask diagnostics are on960x540 native grid;
+boundary tolerance1native pixel=2 full pixels. No matched-accuracy video saving.
+Exact translation alignment also loses: Al7412+10216 vs6451+9963B; Med7209+5216
+vs6335+4323B. Alignment packets include shifts/headers; no claim that all
+pose-aware predictors or residual coders have been exhausted.
+
+Candidate freeze before new generated quality:half-size CRF20 preset8, one
+fixed recipe each: unmasked bank, explicit-alpha segmented bank, blackfloor32
+segmented bank. CRF20 is highest tested image fidelity and all its bank rates
+already fit the optimistic free-matte headroom. Segmented client conditioning
+zeros outside recovered full-size alpha after restoration. No tuning against
+new generated scores, no per-window recipe selection. Native original-reference
+control required. Detailed proposed new GPU budget/stages in card:0.5h dense
+judging plus4.0h two-window actual-generation pilot, combined4.5h maximum,
+estimate3.35h. This request is not authorized by the older closed ledgers.
+
+Platform verification: the isolated process-state test passes with read-only ps
+allowed, confirming its earlier failure was the sandbox restriction. The old
+macOS protected-path assertion remains the only unverified local platform check;
+Linux CI remains required. Sparse banks are preshipped/offline in unitID order,
+with no chronological/live reference-availability claim. No BD-rate is inferred
+from single-point reference recipes;3point dense curves use true overlap only.
+
+Before affine guard-band outcomes: user invited a better way to distinguish
+foreground black. Add one bounded CPU refinement, still inside7200CPU-s:
+foreground round(32+223*RGB/255), background0; client detects max(channel)>=16,
+then inverse round(clip((channel-32)*255/223)). This avoids the floor32 clamp's
+dark-color clipping; precodec inverse rounding error<=1 is explicitly tested.
+Same24 refs,halfsize,order,3CRFs20/35/50,preset8,actual container bytes and decoded
+RGB/alpha checks; smokeAl bankCRF35,fullbothbanks. Reserve<=200supervised s at4CPU
+(max800CPU-s), after dense ledger inspection. Even the previously reserved
+worst case6327.242756+800=7127.242756CPU-s including480local fits7200.
+Select affine rather than clamp as the single black recipe for future generation
+only if its CRF20 foreground RGB MSE improves on both matches and mask IoU is
+no more than.002 worse on either. Otherwise keep clamp. This refines CPU
+screening before any new generated scores; GPU request does not expand beyond
+three reference recipes. Sparse16-level threshold remains frozen. No new
+source/quality-driven window selection, no GPU or new learned models.
+
+Dense CPU attempt20261025T164351Z-3d27fbbf reached850s full-stage deadline;
+not a successful full matrix. Seven completed Al031 settings preserved in
+partial TAR SHA25645be9e1a39030246235fec3335b23b7ca798f55ead579639539893656a23996e.
+Short smoke39.926484s did not establish the assumed full-window runtime; the
+promotion's extrapolation was inadequate. No replay. Completed points are
+all240frames: color+alpha CRF20/35/50=784.783/417.661/176.287kbps; blackfloor1
+CRF20/35=412.312/197.941; blackfloor32=408.105/196.148. These are all above the
+Al031 highest measured anchor57.705kbps, so do not blindly finish the same
+high-rate matrix. CPU-only MSE/IoU remains diagnostic; no learned quality win.
+
+Preregister targeted operating-point refinement before its scores: same two
+240frame windows,960x540,preset8, color+alpha and robust blackfloor32 only,
+CRF63 (the existing anchor's low-rate end). This adds one justified lower-rate
+point rather than completing expensive irrelevant high-rate settings. Smoke8
+frames,full240,actual per-point projection required before new promotion. New
+full cap600s,smoke60s,validator30s,overall750s x4CPUs=3000CPU-s. Preserve all
+old settings; no genotype/seed/window substitution. This is not a full3point
+curve for Med014; report only measured coverage/overlap.
+
+Refined failure-inclusive CPU bound uses recorded CPU rather than assuming all
+four CPUs busy throughout: last full checkpoint900.022310CPU-s,wall818.758641s;
+charge unfinished tail4*(850-818.758641)=124.965436CPU-s. Smoke native47.071113;
+validator4*2.771559=11.086235. Charge all other admitted overhead at4CPUs:
+4*(924.007124-850-39.926484-2.771559)=125.236327. Dense bound1208.381421CPU-s.
+Together with earlier conservative1047.242756,480local,800affine reserve and
+3000refinement reserve =>6535.624177CPU-s < unchanged7200CPU-s. The earlier
+1800s aggregate wall-reservation shortcut is replaced by this auditable CPU
+bound; each job remains<=45min and no GPU/paid API is used. Old CPU results
+and GPU ledgers are immutable. If any counter/budget check fails, stop.
+
+Refinement cost gate uses the real failed full-size pilot:818.758641/7 x4
+settings +150s setup/variance =617.862081s <660s full cap, unlike the earlier
+short-smoke-only assumption. Smoke must also finish under55s. Overall750s
+reservation unchanged. Foreground MSE now selects foreground pixels *before*
+float conversion/squaring, avoiding three needless full-frame float arrays;
+identical per-pixel squared errors and summation order, no metric definition
+change. Record each point's actual wall time. New stage adds only CRF63 for
+alpha/floor32; old high-rate partial points remain immutable and reported.
+
+dense-lowrate CPU job `20261025T170625Z-c041d6b7` submitted, source`5469e9c9`, specSHA256`7a192defcd87d25a6374f7ff75ae51482387de94f0859443515275b9dfbd7609`.
+Caps750s(dense low-rate)/200s(affine),4CPU threads,0GPU; inside unchanged7200CPU-s.
+
+affine CPU job `20261025T170628Z-2ae1c4f3` submitted, source`5469e9c9`, specSHA256`10a337b3d2c800f4d27f86351663b3f908d5f4da086fdab3cc93ef10ba8e64ac`.
+Caps750s(dense low-rate)/200s(affine),4CPU threads,0GPU; inside unchanged7200CPU-s.
+
+Client format clarification: actual Matroska files carry independently decoded
+AV1 color and named alpha video tracks with paid custom layout/restore metadata;
+not an asserted standardized RGBA decoder. Dense alpha is the union of both
+visible players. Proposed quality judging reports full-frame/outside-original-R
+SSE and FP/FN alongside unchanged fixed-S LPIPS/DISTS, retaining background grant.
+
+Affine CPU job20261025T170628Z-2ae1c4f3 complete,6full bank points plus1smoke;
+native cumulative CPU62.621371s before final validation/overhead,0GPU. Native
+gate and post-container hashes pass, precodec inverse maximum RGB error1.
+Full TAR SHA2560afc0fa2bed6bb3c2825e877751dbaa52687814d5861434b5e2354794dd3ea26.
+CRF20 affine bank Al61400B,IoU.98404,foreground MSE38.988; Med64795B,IoU.98183,
+MSE55.024. Clamp32 was61458/66513B,IoU.9833/.9806,MSE51.38/62.81. Thus affine
+passes both predeclared selection conditions and becomes the one black-key
+reference recipe before any generated quality. AtCRF35:32227/35327B,IoU.98006/
+.97798,MSE66.939/87.370. AtCRF50:17168/18897B,IoU.95780/.95897,MSE160.044/
+198.157; inverse mapping amplifies heavy quantization, so do not claim universal
+superiority over clamp. Threshold16 is applied in the encoded lifted domain,
+then RGB is unlifted and restored, preserving a recovered alpha for black shoes.
+Only reference arrays are materialized for future generator input; all original
+motion/timing/seed arrays remain exactly hash-equivalent. Old clamp artifacts
+are preserved, not overwritten. GPU recipe count and proposed4.5h cap unchanged.
+
+### CPU phase closed — 2026-10-25
+
+Low-rate job20261025T170625Z-c041d6b7 complete; native smoke/full validity gates
+pass. Full wall581.031201s < measured617.862081s projection and660s cap.
+Four complete240frame points, actual container bytes and decoded track/source
+identities, no neural quality:
+
+| Window | CRF63 carrier | whole-window kbps | mask IoU | foreground RGB MSE |
+|---|---|---:|---:|---:|
+|Al031|color+alpha|45.7717|.94045|1765.662|
+|Al031|black clamp32|18.8675|.73465|1752.227|
+|Med014|color+alpha|71.0517|.93961|1925.201|
+|Med014|black clamp32|31.7100|.79818|1939.018|
+
+These rates enter each window's actual anchor bracket (max57.705/109.089kbps),
+so rate alone cannot close the dense route. Mask/color degradation is substantial;
+LPIPS/DISTS on identical original R/S plus outside-R diagnostics is required.
+No full-cohort success, equal-quality saving or generated-quality preservation
+is inferred. All11 completed dense points (7 earlier Al +4 new) remain available;
+other original high-rate matrix points were never completed and stay missing.
+Al alpha has4 coded qualities, black32 has3; Med has onlyCRF63, not a curve.
+
+Independent local checks:88 sparse packet/decoded-conditioning/alignment checks
+plus43 new affine/dense/prepared/source checks, all pass. Original full-source
+RGB frame hashes and half-size encoder-input RGB agree exactly across old/new
+CPU revisions for all Al points, confirming the MSE allocation optimization did
+not change source pixels. Every saved dense point has240 actual decoded frames.
+Source clips and prepared inputs remain frozen. Native full low-rate TAR SHA256
+1f9cd10f4e95c0446ae2c4103b2cbbd6b9b65e1bf71697e83fc36fd80b5bfeee.
+
+Selected generation inputs: unmasked/explicit-alpha CRF20 from sparse video and
+affine32 CRF20 from affine video, allhalf-size. Six units each in original
+first-group prepared archive; only reference arrays changed, all other arrays
+hash-identical. New affine prepared TAR SHA256
+300a8888827af98e423648c5ba241f9a1c7f40518330e1803495f7fd89b65651.
+Original and clamp variants preserved; no model call or fitting occurred.
+
+CPU ledger closed: conservative total5708.866274CPU-s of7200, including480local
+allowance and failed-stage unfinished-tail/overhead bounds;0 newGPU-h. The five
+native jobs are terminal:163506-af342506 failed validator;163852-1d6ee39a complete;
+164351-3d27fbbf failed full deadline with7points;170625-c041d6b7 complete low-rate;
+170628-2ae1c4f3 complete affine (all20261025T prefixes as above). No recurring
+monitors, new chats or agents. Full final local suite874passed/24skipped with
+only unchanged macOS protected-path failure;24focused tests/configured ruff/mypy
+pass after final changes. Linux CI required for PR. CPU phase reached its bounded
+screening stop; broader route remains open.
+
+Next proposed budget remains4.5newGPU-h (estimated3.35):0.5 dense native quality
+judging and4.0 actual reference-conditioned two-window generation/control pilot.
+The dense substage may add two CRF63 affine32 carrier points (one per pilot
+window) inside its unchanged0.5h cap to transfer the tested reference guard-band
+idea to dense video; record their actual encoded input bytes/quality, never
+borrow clamp rates. Prioritize both matches atCRF63; score saved higher points
+within allowance. Reference substage tests exactly3fixed recipes plus original
+controls with exact dynamic matte granted; paid-matte/end-to-end claims remain
+separate and limited. Existing closed GPU budgets grant no new spending. Await
+explicit new budget approval; no GPU submission, generation or Wan-Animate.
+
+Important scope of compression search: these CPU video points used fast preset8.
+They are not proof of the best attainable SVT compression. Proposed approved-only
+continuation includes a separate<=3600CPU-s preset4/preset1 preflight (tennis anchors actually use4 in k6.PRESET;1 is a
+slower comparison) before interpreting a negative quality result; compare
+actual bytes/decoded fidelity on fixed inputs and freeze the global preset
+before new neural scores. Three recipe families, GPU cap4.5h unchanged. If that
+preflight cannot fit, retain the tested-config limitation. No JPEG AI or learned
+mask predictor was tested. Current7200CPU-s ledger is closed and not reopened.
+
+CPU evidence published and remotely SHA256-verified in new read-only directory
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-reference-video-20261025T171900Z/`.
+Bundle `k6b-reference-video-evidence.tar.gz`,141164474bytes,72members,
+SHA256`6ba5e8ce6ce5cb454d0f07ff68ab5a1f945f1ad04c2a85462b263d76fd3df827`;
+70payload hashes independently verified. Final report SHA256
+`b5cc10c0d40bafa4f04ac548af91ee6c37cd983f472dbc7d02c84a23ec9d43bc`;
+resource ledger SHA256`941d6a57859e403ca7354d0e0829fc5adc18df73e2120907dc9271a622975208`.
+Bundle preserves native raw publications, full partial settings, code snapshots,
+source/command/environment receipts, original prepared inputs, materialized
+reference variants and reproducible report helpers. Original clips/weights are
+SHA-referenced, not duplicated. Task terminal events acknowledged, no monitors.
+The bundle captures completed CPU outcome; subsequent proposed preset preflight
+clarifications are in the current card/repository, not retroactive measurements.
+
+Publication push initially encountered an automatic approval-review usage-limit
+failure; the command was not executed and was not judged unsafe. After the user
+asked to continue, the same normal review path succeeded. No approval bypass.
+
+CPU code/report published as PR#241 (https://github.com/emanuele-artioli/PointStream/pull/241).
+Native evidence is remotely verified/read-only; local checks above pass with
+known platform exception. Linux CI pending; enable merge-commit auto-merge per
+AGENTS. New4.5GPU-h plus<=3600CPU-s preflight budget remains unapproved; no
+GPU submission/generation. This publication does not grant compute authority.
