@@ -3186,3 +3186,23 @@ bytes/IoU/FGerror; choosebeforeANYnewdensequalityscores. This resolves
 shortGOPuncertainty with available approvedCPU, withoutnewGPUvariants.
 
 Finaldensepreset1 CPUjob `20261025T184630Z-ace7057c` sourceecf496b1 specSHA256`d619552b0480fa40acec137b89721208cd02d8161b5f048f5fcbe358dc75ee92`;430s4CPU reservation; remainingcap as above.
+
+FinalCPU preset1densejob20261025T184630Z-ace7057c COMPLETE,4full240framepoints;
+archiveSHA25667d6cbfa616d3ef3acda140c25154c8633667b9e812c37e69583167f97781bd6.
+Affinepreset1 dominatespreset4 bothmatches: Al22464B/18.72kbps/IoU.809915/MSE1855.657;
+Med18858B/31.43kbps/IoU.840381/MSE1994.777. Alpha1larger with better fidelity:
+Al53354B/44.461667kbps/IoU.963230/MSE1559.672; Med42747B/71.245kbps/IoU.960539/MSE1697.876.
+FreezeONEglobalpreset per densefamily before newquality: alpha4 byfallback,
+affine1 bydominance. Referenceall3families remainpreset1CRF20. No extraGPU
+variant for the CPU Pareto alternatives; oldpreset8savedcarriers remainhistory.
+NewCPUledger COMPLETE conservative bound2647.198625565/3600CPU-s incl400local;0GPU inCPUphase.
+
+DenseGPU preregistration: firsttwo<=600s jobs, onefullwindoweach, selected
+alpha4/affine1 atCRF63 beside savedalpha8/clamp32preset8CRF63. Fourdelivered
+carriers+oldgeneratorcontrol perwindow, alloriginaljudgedindices. Smoke1judged
+frame but all240packetdecodes; validatefullcoverage/hash/source/R/S,control
+within1e-4, actualCUDAnets and12000MiBcap.60ssmoke/500sfull/20svalidator
+inside600total.<=600sleft for7historicalhighrateAlpoints ifbudget/runtimeallow.
+No additionalreferencefamily/presetvariant. Allselecteddense/refpresetsfrozen
+beforeANYnewquality. Currentreferencecontrols stillrunning, no candidate
+submission until fullcontrol cost/validity checked.

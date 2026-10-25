@@ -23,7 +23,7 @@ from experiments.tennis.k6b_rate_transport import array_sha, sha, write
 from experiments.tennis.k6b_reference_video import command, ffmpeg_args
 
 
-def unpack_carriers(archives: list[Path], scratch: Path, crfs: list[int], windows: list[str]) -> dict[str, list[dict[str, Any]]]:
+def unpack_carriers(archives: list[Path], scratch: Path, crfs: list[int], windows: list[str], settings: list[str]) -> dict[str, list[dict[str, Any]]]:
     out: dict[str, list[dict[str, Any]]] = {w: [] for w in PILOTS}
     for i, archive in enumerate(archives):
         root = scratch/str(i)
@@ -36,6 +36,9 @@ def unpack_carriers(archives: list[Path], scratch: Path, crfs: list[int], window
             if row['window'] not in windows or row['crf'] not in crfs:
                 continue
             rec = row['container']
+            name = f"{row['kind']}-floor{row['floor']}-p{rec['contract'].get('preset', 8)}-q{row['crf']}"
+            if settings and name not in settings:
+                continue
             path = root/'publish'/rec['file']
             if sha(path.read_bytes()) != rec['sha256'] or path.stat().st_size != rec['bytes']:
                 raise ValueError('Delivered dense packet changed')
@@ -58,7 +61,7 @@ def unpack_carriers(archives: list[Path], scratch: Path, crfs: list[int], window
             rgb = decoded[0]
             mask = decoded[1] if row['kind'] == 'alpha' else rgb.max(-1) >= (row['floor']+1)//2
             out[row['window']].append({**row, 'rgb': rgb, 'mask': mask,
-                'name': f"{row['kind']}-floor{row['floor']}-p{rec['contract'].get('preset', 8)}-q{row['crf']}", 'archive_sha256': sha(archive.read_bytes())})
+                'name': name, 'archive_sha256': sha(archive.read_bytes())})
     for rows in out.values():
         if len({r['name'] for r in rows}) != len(rows):
             raise ValueError('Duplicate carrier setting')
@@ -221,6 +224,7 @@ def main() -> int:
     p.add_argument('--transport', type=Path)
     p.add_argument('--windows', nargs='+', default=list(PILOTS))
     p.add_argument('--crfs', default='63')
+    p.add_argument('--carrier-setting', action='append', default=[])
     p.add_argument('--max-judged', type=int, default=0)
     p.add_argument('--validate', action='store_true')
     a = p.parse_args()
@@ -254,7 +258,9 @@ def main() -> int:
     for label, path in a.generated:
         labels.setdefault(label, []).append(path)
     generated = {label: load_generated(paths, scratch/label) for label, paths in labels.items()}
-    carriers = unpack_carriers(a.carrier, scratch/'carriers', [int(q) for q in a.crfs.split(',')], a.windows)
+    carriers = unpack_carriers(a.carrier, scratch/'carriers', [int(q) for q in a.crfs.split(',')], a.windows, a.carrier_setting)
+    if a.carrier_setting and any(set(c['name'] for c in carriers[wid]) != set(a.carrier_setting) for wid in a.windows):
+        raise ValueError('Declared delivered carrier setting missing')
     nets = {'lpips': load_lpips(a.backbone[0], 'cuda'), 'dists': load_dists(a.backbone[1], 'cuda')}
     sources = {sha(source.read_bytes()): source for source in a.source}
     result: dict[str, Any] = {'rows': [], 'requested': a.windows, 'device': device, 'memory_limit_mib': limit,
