@@ -71,6 +71,8 @@ def validate(root: Path) -> dict[str, Any]:
         projected = 818.7586409798823/7*4 + 150
         checks['historical_full_scale_projection_under_660s'] = projected < 660
         checks['real_smoke_under_55s'] = result['wall_seconds'] < 55
+    if n == 8 and result.get('preset') == 4 and {row['kind'] for row in result['rows']} == {'alpha', 'black-affine'}:
+        checks['measured_dense_preset4_projection_under_520s'] = result['wall_seconds']*30+150 < 520
     for i, row in enumerate(result['rows']):
         rec = row['container']
         path = root/rec['file']

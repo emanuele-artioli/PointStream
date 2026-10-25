@@ -3157,3 +3157,13 @@ Dense8frame CPUjob20261025T183643Z-dfd14984complete: preset1/4tradeoffs
 (Alalpha1slightlyworseMSE; Medaffine1slightlylargerpacket). Freezeglobaldense
 preset4 fallback BEFORE neural scores; short8frameGOP not full240rateevidence.
 CPUadmittedbound200.560948s, combinedwithprior320.786816+400local=921.347764/3600CPU-s.
+
+Remaining newCPU supports full dense preset4 scale confirmation before quality:
+4full240frame alpha/affine32CRF63points, sameAl031/Med014. Actual8frame
+preset4wall8.501167s x30+150margin=405.035s <520fullcap. Newnative
+smoke must re-establish this projection.30ssmoke/520sfull/20svalidator,
+580supervisedseconds x4=2320CPU-s reservation; combined conservative
+CPUbound320.786816+200.560949+400local+2320=3241.347765<3600.
+Saveeverypoint; ifcapfails preservecompletedpoints and state missingcurves,
+no blind retry. This completes selecteddensecarrier codec prep onCPU rather
+than reserving aGPU for conventional encoding, within approvedsameCPUcap.
