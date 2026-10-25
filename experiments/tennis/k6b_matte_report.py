@@ -9,14 +9,34 @@ from pathlib import Path
 import tarfile
 from typing import Any
 
-from experiments.tennis.k6b_matte_judge import assess, validate
+import numpy as np
+
+from experiments.tennis.k4 import safe
+from experiments.tennis.k6b_matte_judge import assess, validate, control_error
 from experiments.tennis.k6b_rate_budget import DIAGNOSTIC_SHA
 from experiments.tennis.k6b_rate_transport import sha, write
 
 
-def report(diagnostic: Path, transport: Path, matte: Path, archives: list[Path]) -> dict[str, Any]:
+def report(diagnostic: Path, transport: Path, matte: Path, archives: list[Path], references: list[Path]) -> dict[str, Any]:
     if sha(diagnostic.read_bytes()) != DIAGNOSTIC_SHA:
         raise ValueError("Original frozen report changed")
+    reference_controls = {}
+    for reference in references:
+        digest = sha(reference.read_bytes())
+        with tarfile.open(reference) as tar:
+            for member in tar:
+                if not member.name.endswith("/window.json"):
+                    continue
+                f = tar.extractfile(member)
+                if f is None:
+                    raise ValueError("Missing frozen original control")
+                row = json.load(f)
+                idx = row["variants"].index("gen-match5")
+                f = tar.extractfile(member.name.replace("window.json", "scores.npz"))
+                if f is None:
+                    raise ValueError("Missing frozen original score arrays")
+                with np.load(io.BytesIO(f.read())) as scores:
+                    reference_controls[row["id"]] = (row, np.stack([scores[m][idx] for m in ("lpips", "dists")]), digest)
     measured = []
     inputs = []
     for archive in archives:
@@ -28,9 +48,21 @@ def report(diagnostic: Path, transport: Path, matte: Path, archives: list[Path])
             if f is None:
                 raise ValueError("Missing native GPU report")
             stage = json.load(f)
+        reference_checks = {}
+        with tarfile.open(archive) as tar:
+            for row in stage["rows"]:
+                old, expected_scores, digest = reference_controls[row["id"]]
+                if digest not in stage["inputs"].values() or old["judged"] != row["judged"] or old["scoring_masks"] != row["scoring_masks"]:
+                    raise ValueError("Independent original frame/mask/source identities disagree")
+                f = tar.extractfile("publish/"+safe(row["id"])+"/scores.npz")
+                if f is None:
+                    raise ValueError("Missing new score arrays")
+                with np.load(io.BytesIO(f.read())) as scores:
+                    current = np.stack([scores[m][0, row["judged"]] for m in ("lpips", "dists")])
+                reference_checks[row["id"]] = control_error(current, expected_scores[:, row["judged"]])
         measured.extend(stage["rows"])
         inputs.append({"path": str(archive), "sha256": sha(archive.read_bytes()),
-                       "checks": validation["checks"], "source_sha256": stage["code_sha256"],
+                       "checks": validation["checks"], "independent_reference_max_abs_difference": reference_checks, "source_sha256": stage["code_sha256"],
                        "device": stage["device"], "input_sha256": stage["inputs"]})
     if len({r["id"] for r in measured}) != len(measured):
         raise ValueError("Duplicate window cannot increase the win count")
@@ -50,8 +82,9 @@ def main() -> int:
     for name in ("diagnostic", "transport", "matte", "out"):
         p.add_argument("--"+name, type=Path, required=True)
     p.add_argument("--archive", type=Path, action="append", required=True)
+    p.add_argument("--reference", type=Path, action="append", required=True)
     a = p.parse_args()
-    result = report(a.diagnostic, a.transport, a.matte, a.archive)
+    result = report(a.diagnostic, a.transport, a.matte, a.archive, a.reference)
     write(a.out, result)
     stream = io.StringIO()
     writer = csv.writer(stream)

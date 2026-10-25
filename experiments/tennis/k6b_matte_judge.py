@@ -215,6 +215,8 @@ def validate(archive: Path, stage: str) -> dict[str, Any]:
         data = json.loads((root / "publish/judge.json").read_text())
         checks = {"window_set": [r["id"] for r in data["rows"]] == data["requested"], "cuda": all(data["on_cuda"].values()),
                   "class": data["device"]["class_matches"], "memory": data["gpu_peak_gib"]*1024 <= data["gpu_memory_limit_mib"]}
+        if data.get("early_stopped"):
+            checks["planned_prefix_and_decision"] = data["requested"] == data["planned_requested"][:len(data["rows"])] and data["stop_decision"]["decision_made"]
         for row in data["rows"]:
             path = root / "publish" / safe(row["id"])
             checks[row["id"]+":hashes"] = all(sha((path/n).read_bytes()) == h for n, h in row["files"].items())
@@ -235,6 +237,7 @@ def main() -> int:
     p.add_argument("--max-windows", type=int, default=0)
     p.add_argument("--max-judged", type=int, default=0)
     p.add_argument("--validate", action="store_true")
+    p.add_argument("--prior-judge", type=Path)
     p.add_argument("--check-archive", type=Path)
     a = p.parse_args()
     stage = Path(os.environ.get("PS_STAGE_DIR", "/tmp"))
@@ -285,17 +288,34 @@ def main() -> int:
     on_cuda = {n: next(net.parameters()).is_cuda for n, net in nets.items()}
     if not all(on_cuda.values()):
         raise ValueError("Metric network is not on CUDA")
+    prior_rows = []
+    if a.prior_judge:
+        if not validate(a.prior_judge, "full")["passed"]:
+            raise ValueError("Prior complete-window checkpoint failed validation")
+        with tarfile.open(a.prior_judge) as tar:
+            f = tar.extractfile("publish/judge.json")
+            if f is None:
+                raise ValueError("Prior judge metadata missing")
+            prior_rows = json.load(f)["rows"]
     requested = a.windows[:a.max_windows or None]
-    result = {"requested": requested, "rows": [], "device": device, "on_cuda": on_cuda,
+    result = {"requested": requested, "planned_requested": requested, "rows": [], "device": device, "on_cuda": on_cuda,
         "gpu_memory_limit_mib": limit, "code_sha256": sha(Path(__file__).read_bytes()), "torch": torch.__version__,
         "lpips": lpips_record(a.backbone[0]), "dists_backbone_sha256": sha(a.backbone[1].read_bytes()),
-        "inputs": {str(q): sha(q.read_bytes()) for q in [a.diagnostic, a.transport, a.matte, a.manifest, *a.anchor, *a.control, *a.generated, *a.source]}}
+        "inputs": {str(q): sha(q.read_bytes()) for q in [a.diagnostic, a.transport, a.matte, a.manifest, *a.anchor, *a.control, *a.generated, *a.source, *([a.prior_judge] if a.prior_judge else [])]}}
     started = time.monotonic()
     for i, wid in enumerate(requested):
         source_sha = expected_sources[wid.split("@")[0]]
         result["rows"].append(judge_window(wid, anchors[wid], controls[wid], packet_root / "packets", matte_root, mask_rows[wid], generated, sources[source_sha], source_sha, nets, scratch, publish, a.max_judged))
         result["gpu_peak_gib"] = torch.cuda.max_memory_allocated()/2**30
         result["seconds"] = time.monotonic()-started
+        if a.max_judged == 0:
+            evaluated = prior_rows + result["rows"]
+            if len({r["id"] for r in evaluated}) != len(evaluated):
+                raise ValueError("Duplicate prior/new window")
+            result["stop_decision"] = assess(json.loads(a.diagnostic.read_text()), transport, matte, evaluated)
+            if result["stop_decision"]["decision_made"]:
+                result["early_stopped"] = True
+                result["requested"] = [r["id"] for r in result["rows"]]
         write(publish / "judge.json", result)
         write(stage / "judge.json", result)
         with tarfile.open(stage / "published.tar", "w") as tar:
@@ -303,8 +323,8 @@ def main() -> int:
         from experiments.jobs.monitor import publish_progress
         publish_progress(str(stage), i+1)
         print(json.dumps({"completed_windows": i+1, "seconds": result["seconds"], "peak_gib": result["gpu_peak_gib"]}), flush=True)
-    # Same accounting callable is available to the local CPU report; no smoke can decide the cohort.
-    _ = transport
+        if result.get("early_stopped"):
+            break
     return 0
 
 

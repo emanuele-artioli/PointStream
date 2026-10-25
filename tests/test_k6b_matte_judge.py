@@ -31,6 +31,8 @@ def test_prefix_stop_keeps_last_possible_eighteen_and_counts_unresolved_optimist
     three = assess(*evidence(3))
     assert not three["decision_made"]
     assert three["scales"]["8"]["optimistic_final_wins_bound"] == 18
+    four = assess(*evidence(4))
+    assert four["decision_made"] and four["scales"]["8"]["optimistic_final_wins_bound"] == 16
     six = assess(*evidence(6))
     assert six["decision_made"]
     assert six["scales"]["8"]["optimistic_final_wins_bound"] == 12
