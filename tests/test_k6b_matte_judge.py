@@ -46,3 +46,13 @@ def test_partial_smoke_cannot_decide_full_quality_and_actual_scores_replace_old_
     args[-1][0]["judged"] = [0]
     with pytest.raises(ValueError, match="Partial smoke"):
         assess(*args)
+
+
+def test_exclusive_fleet_has_no_shared_memory_override(monkeypatch):
+    from experiments.tennis.k6b_matte_judge import gpu_memory_limit
+    monkeypatch.delenv("PS_GPU_MEMORY_LIMIT_MIB", raising=False)
+    assert gpu_memory_limit() == 24000
+    monkeypatch.setenv("PS_GPU_MEMORY_LIMIT_MIB", "12000")
+    assert gpu_memory_limit() == 12000
+    monkeypatch.setenv("PS_GPU_MEMORY_LIMIT_MIB", "48000")
+    assert gpu_memory_limit() == 24000

@@ -24,6 +24,14 @@ from src.pointstream.composite import OBJECT
 VARIANTS = (0, *SCALES)
 
 
+def gpu_memory_limit() -> int:
+    # The fleet sets the override for shared mode; exclusive mode uses the declared 24GB contract.
+    limit = min(24000, int(os.environ.get("PS_GPU_MEMORY_LIMIT_MIB", "24000")))
+    if limit <= 0:
+        raise ValueError("Invalid GPU memory allowance")
+    return limit
+
+
 def extract(archives: list[Path], parent: Path) -> dict[str, Path]:
     found = {}
     for i, archive in enumerate(archives):
@@ -250,7 +258,7 @@ def main() -> int:
     device = device_record("RTX 6000 Ada")
     if not device["class_matches"]:
         raise ValueError("Unexpected GPU class")
-    limit = int(os.environ["PS_GPU_MEMORY_LIMIT_MIB"])
+    limit = gpu_memory_limit()
     torch.cuda.set_per_process_memory_fraction(min(1., limit*2**20/torch.cuda.get_device_properties(0).total_memory))
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
     publish = scratch / "publish"

@@ -33,3 +33,5 @@ Published: https://github.com/emanuele-artioli/PointStream/pull/239, merge-commi
 ## Approved GPU continuation
 
 The user explicitly approved the proposed0.75 GPU-hour cap on2026-10-25. Follow the new GPU entry in docs/experiments/k6b-players.md; separate2700 GPU-second ledger, four<=675 s three-window parts, no fitting/new generation or lossy-reference conditioning. Branchcodex/k6b-matte-judging. Frozen cohort, masks/scoring/rate rules and limitations unchanged. GPU stage not yet submitted. Previous CPU jobs remain terminal. Report directly to the planning chat.
+
+Approved GPU part1 job `20261025T135736Z-c830e267`, source679f0f94;675/2700 GPU-s reserved; later parts not submitted. Inspect this ID before acting.
