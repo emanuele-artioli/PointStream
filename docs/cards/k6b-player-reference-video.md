@@ -4,7 +4,8 @@ Current state2026-10-25: continuation APPROVED <=4.5newGPU-h plus3600CPU-s.
 Branch codex/k6b-reference-quality-pilot. Original CPU stage closed; PR241merged
 CIpassed. New reference preset comparison complete: preset1 globally dominates
 4/8 for allthree families on both matches, frozenCRF20/halfsize before quality.
-Dense8framepresettradeoff uses preset4 fallback, full240CPUconfirmation running.
+Dense full240CPUcomparison complete: alpha4fallback, affine1dominance.
+NewCPU phaseclosed at2647.198626/3600CPU-s conservative bound incl400local.
 OriginalPNG controls running; one diagnosed110s smoke timeout charged, corrected
 attempt recorded. Detailed immutable jobIDs and costs in experiment entry below.
 Historical proposed/unapproved statements below are superseded by the explicit
@@ -299,3 +300,13 @@ Reference GPU subledger14400s; dense GPU1800s. No candidate rendering/judging
 submitted yet. No uncertain replay, fitting or new sources.
 Presetselection: referenceCRF20preset1; denseCRF63preset4 by preregisteredfallback.
 Full-window reference controls remain mandatory; no newscores opened yet.
+
+CPU continuation now terminal: all4newCPUjobs COMPLETE,2647.198626/3600CPU-s
+conservativebound. Finaljob20261025T184630Z-ace7057c, not replayed. Global
+selectedreferencepreset1CRF20; densealpha4/affine1CRF63, chosenbeforequality.
+DenseGPUfirstsmoke20261025T185239Z-1df3ec6f FAILEDexactpixelgate before
+scoring; charge44.123715GPU-s. Correctedgate keeps metrictruthnativeCUDA,
+checks carriersource against independentlyrecreatedCPUtruth and logsCPU/CUDA
+roundoff<=1level; decodedcarrierRGB/alpha hashesremain EXACT. Corrected
+smoke mustconfirmdiagnosis. NewdenseGPUreservation44.123715+600+600+550
+=1794.123715/1800s. PR242draft, noauto-merge untilterminalpilotoutcome.
