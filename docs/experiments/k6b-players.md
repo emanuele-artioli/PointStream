@@ -3263,3 +3263,32 @@ no worker canadmit it. Preserveunpublishedsource; no uncertainreplay. Correct
 only artifactpath tofull/partial.tar, remotelyverifiedSHA256matches
 45be9e1a39030246235fec3335b23b7ca798f55ead579639539893656a23996e.
 Subsequentcorrectedsubmission is newlypublishedrequest, not replayofrunningjob.
+
+CorrectedHistorical7pointDenseAl job `20261025T190813Z-810bcaba` source2f91b731 specSHA256`9155b47c1e41ceae3942df7a991ae27d96b6718c49c10929a92785ad49e5f72b`;550GPU-sreserve, correctpartial.tar inputverified; unpublished524c8807neverrun.
+
+AlPNGcontrol20261025T183259Z-16af35e8 terminalFAILED1800s full deadline,
+1931.056334GPU-sadmittedcharged. Retainedfarplayer006complete240context/80
+judgedcrops, fullpartial.tarSHA2566008a1f00799029f865c040dbf9a28239e66ca916389243d5bad560fa7144ce6.
+IndependentCPUcomparisonagainstoriginalgen1archive8a927ae4...:tandRGBcrops
+BITEXACT, proof/tmp/k6b-quality-control-al-checkpoint-proof.json. No quality
+claimedforunfinishednearplayer001. ContinueONLY001 viaexplicitunit-subset
+validator(newoptionalflag;defaultstillfullwindow), exactknownfrozenunitset,
+full240context/30steps/CFG2/4bit/unmodifiedPNGinput. Separatecheckpoint
+archivescombinedlater, completebothplayers mandatorybeforecontrolclaim.
+Nativegen module unchanged; subsetcannotincludeunknown/duplicate/emptyIDs,
+focusedtestpasses. ExclusiveAdafullpoolgpu5/6,24000MiB,100ssmoke/800sfull/
+20svalidator/1000stotal basedoriginal598.9sfullunit. No replayoffinished006.
+Referenceledgerknownfailed131.172531+1931.056334=2062.228865GPU-s; Med
+controlstillrunningwith2000reservation,Almissing1000reservation. Future
+parts admittedonlyafteractualcosts andcompletecontrolgates.
+
+Dense2windowselected/historicalCRF63 complete: bothselectedalpha4/affine1
+0/4strictcells,no unresolved. Medjob20261025T190034Z-01c74a65 COMPLETE
+207.220136GPU-s, archiveSHA256ba072c0b90af5dec468479fa96888a0a482ed909d25ee9a61bccd00de5facf35.
+Medselectedalpha4at68.566667kbps LPIPS.219821640/DISTS.239993266;
+affine1at31.43 .294500768/.282842942. Historicalalpha8at71.051667
+.229989768/.248466691; clamp32p8at31.71 .313356146/.287229845.
+DenseGPUactualthroughbothwindows503.504413s, plus550historicalreserve
+=1053.504413<1800. Wholeframe/outsideRerrors and FP/FN saved; black-key
+FPmeanAl2635.4/Med1520.2pixels perjudgedframe versusalpha257.2/186.45.
+Allnativecontrols/pixel/R/S/coveragechecks passed; nofull12windowclaim.
