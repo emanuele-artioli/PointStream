@@ -3069,3 +3069,21 @@ actual bytes/decoded fidelity on fixed inputs and freeze the global preset
 before new neural scores. Three recipe families, GPU cap4.5h unchanged. If that
 preflight cannot fit, retain the tested-config limitation. No JPEG AI or learned
 mask predictor was tested. Current7200CPU-s ledger is closed and not reopened.
+
+CPU evidence published and remotely SHA256-verified in new read-only directory
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-reference-video-20261025T171900Z/`.
+Bundle `k6b-reference-video-evidence.tar.gz`,141164474bytes,72members,
+SHA256`6ba5e8ce6ce5cb454d0f07ff68ab5a1f945f1ad04c2a85462b263d76fd3df827`;
+70payload hashes independently verified. Final report SHA256
+`b5cc10c0d40bafa4f04ac548af91ee6c37cd983f472dbc7d02c84a23ec9d43bc`;
+resource ledger SHA256`941d6a57859e403ca7354d0e0829fc5adc18df73e2120907dc9271a622975208`.
+Bundle preserves native raw publications, full partial settings, code snapshots,
+source/command/environment receipts, original prepared inputs, materialized
+reference variants and reproducible report helpers. Original clips/weights are
+SHA-referenced, not duplicated. Task terminal events acknowledged, no monitors.
+The bundle captures completed CPU outcome; subsequent proposed preset preflight
+clarifications are in the current card/repository, not retroactive measurements.
+
+Publication push initially encountered an automatic approval-review usage-limit
+failure; the command was not executed and was not judged unsafe. After the user
+asked to continue, the same normal review path succeeded. No approval bypass.

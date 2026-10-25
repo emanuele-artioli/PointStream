@@ -256,3 +256,10 @@ generate extra preset variants outside the three fixed recipe families. No new s
 GPU budget are silently added. If slower coding cannot fit its CPU cap, report
 that tested-limit explicitly; do not call the whole route closed. JPEG AI,
 learned mask prediction and exhaustive compression optimality remain untested.
+
+Read-only CPU evidence published under
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-reference-video-20261025T171900Z/`;
+bundle SHA2566ba5e8ce6ce5cb454d0f07ff68ab5a1f945f1ad04c2a85462b263d76fd3df827.
+All raw completed/partial codec outputs and source snapshots preserved; terminal
+events acknowledged. No GPU job submitted. Next action requires the explicit
+new budget above; CPU-only publication and CI may complete independently.
