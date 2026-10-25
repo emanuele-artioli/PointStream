@@ -1,7 +1,7 @@
 # Tennis reference and mask video comparison
 
 Current state2026-10-25: sparse CPU comparison complete (54 settings,88 independent
-checks); dense CPU job20261025T164351Z-3d27fbbf running, preserve/inspect it.
+checks); dense CPU job20261025T164351Z-3d27fbbf timed out,7 complete Al points preserved.
 New GPU spending0; concrete combined4.5h request below remains unapproved.
 Three actual decoded reference variants materialized locally; only reference
 arrays change, all motion/seed/timing inputs preserved.
@@ -111,13 +111,14 @@ delivered container RGB/alpha splits; no uncertain replay after interruptions.
 ## Concrete next GPU stage — proposed, not authorized
 
 Keep separate new sub-ledgers, combined cap4.5GPU-hours; old GPU budgets closed.
-First dense saved-carrier judging <=0.5GPU-h (estimate0.25): all18 CPU encoded
-points on the two original windows, all original judged frames, native composite
+First dense saved-carrier judging <=0.5GPU-h (estimate0.25): the7 completed
+high-rate Al points and4 proposed CRF63 points on both original windows, all original judged frames, native composite
 onto the same original Telea background, fixed original R and oracle-union S;
 charge actual container/window registered duration. Original-output metric
 control within1e-4, finite CUDA LPIPS/DISTS, peak<=24GiB and input/frame/decoded
-hashes. Report per-window3point PCHIP BD-rate against achievable envelopes and
-strict bracketed cells. This pilot cannot establish18/24 on12 windows. Three
+hashes. Report PCHIP BD-rate only for actual curves with overlapping quality (Al
+alpha4points/black32 3points if refinement completes); Med has one point per
+representation, so strict bracketed cells only. This pilot cannot establish18/24 on12 windows. Three
 <=600s parts (all18 points split byCRF); substantive<=60s smoke, all stages<=45min.
 
 Then actual reference-conditioned generation <=4.0GPU-h (estimate3.1), if separately
@@ -168,3 +169,39 @@ Proposed generation runtime is the original packed JCV environment
 judging stays in pinned main environment32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661.
 Use original immutable weights/fit/base archives identified in prior generation
 specifications; no dependency migration or fitting is authorized.
+
+Dense high-rate full matrix timed out with7valid complete Al points; no Med240
+frame point. Targeted CRF63 refinement has4points and measured full-size
+projection617.862s <660s cap; smoke55s,validator20s,overall750s. No replay.
+The original1800s aggregate wall-reservation shortcut is superseded by recorded
+CPU counters plus strict four-CPU bounds on unobserved tail/overhead and new
+reservations; total6535.624177CPU-s including480local < unchanged7200CPU-s.
+All stages remain<=45min. See experiment entry for exact auditable ledger.
+
+dense-lowrate CPU job `20261025T170625Z-c041d6b7` submitted, source`5469e9c9`, specSHA256`7a192defcd87d25a6374f7ff75ae51482387de94f0859443515275b9dfbd7609`.
+Caps750s(dense low-rate)/200s(affine),4CPU threads,0GPU; inside unchanged7200CPU-s.
+
+affine CPU job `20261025T170628Z-2ae1c4f3` submitted, source`5469e9c9`, specSHA256`10a337b3d2c800f4d27f86351663b3f908d5f4da086fdab3cc93ef10ba8e64ac`.
+Caps750s(dense low-rate)/200s(affine),4CPU threads,0GPU; inside unchanged7200CPU-s.
+
+Dense GPU judging also reports whole-frame/outside-original-R RGB SSE and mask
+FP/FN beside fixed-S neural metrics, so black-key false positives cannot hide
+behind a foreground scoring region. The Matroska alpha is an explicitly named
+second AV1 video track with custom client metadata; no native RGBA decoder or
+standard automatic alpha-compositing support is claimed. Dense alpha is a union
+of the two visible players, not separate occluded-instance reconstruction.
+
+Selected black reference is now affine32 after its preregistered CPU dominance
+check passed (both matches lower foreground RGB MSE and higher IoU than clamp).
+The clamp-only prepared archive remains historical. Selected affine input
+materialized at /tmp/k6b-reference-affine-variant/black-affine-q20-prepared.tar;
+all6 units have exact original pose/timing/geometry/seed-array hashes.
+If the CRF63 CPU stage cannot complete both windows, the proposed0.5GPU-h
+dense stage may complete only missing deterministic native codec preparation
+and judge it inside that same cap (no learned generation/fitting). It must
+record actual encoded input hashes/bytes and validate native source conversion
+against original controls; never combine an old rate with changed pixels.
+Prioritize both alpha/floor32 CRF63 points in both windows, then saved high-rate
+points if the remaining allowance covers them. Scope reductions and missing
+curves stay explicit; no extrapolated full-cohort win. The4.0GPU-h generation
+substage and combined4.5h request remain unchanged and unapproved.

@@ -2974,3 +2974,31 @@ float conversion/squaring, avoiding three needless full-frame float arrays;
 identical per-pixel squared errors and summation order, no metric definition
 change. Record each point's actual wall time. New stage adds only CRF63 for
 alpha/floor32; old high-rate partial points remain immutable and reported.
+
+dense-lowrate CPU job `20261025T170625Z-c041d6b7` submitted, source`5469e9c9`, specSHA256`7a192defcd87d25a6374f7ff75ae51482387de94f0859443515275b9dfbd7609`.
+Caps750s(dense low-rate)/200s(affine),4CPU threads,0GPU; inside unchanged7200CPU-s.
+
+affine CPU job `20261025T170628Z-2ae1c4f3` submitted, source`5469e9c9`, specSHA256`10a337b3d2c800f4d27f86351663b3f908d5f4da086fdab3cc93ef10ba8e64ac`.
+Caps750s(dense low-rate)/200s(affine),4CPU threads,0GPU; inside unchanged7200CPU-s.
+
+Client format clarification: actual Matroska files carry independently decoded
+AV1 color and named alpha video tracks with paid custom layout/restore metadata;
+not an asserted standardized RGBA decoder. Dense alpha is the union of both
+visible players. Proposed quality judging reports full-frame/outside-original-R
+SSE and FP/FN alongside unchanged fixed-S LPIPS/DISTS, retaining background grant.
+
+Affine CPU job20261025T170628Z-2ae1c4f3 complete,6full bank points plus1smoke;
+native cumulative CPU62.621371s before final validation/overhead,0GPU. Native
+gate and post-container hashes pass, precodec inverse maximum RGB error1.
+Full TAR SHA2560afc0fa2bed6bb3c2825e877751dbaa52687814d5861434b5e2354794dd3ea26.
+CRF20 affine bank Al61400B,IoU.98404,foreground MSE38.988; Med64795B,IoU.98183,
+MSE55.024. Clamp32 was61458/66513B,IoU.9833/.9806,MSE51.38/62.81. Thus affine
+passes both predeclared selection conditions and becomes the one black-key
+reference recipe before any generated quality. AtCRF35:32227/35327B,IoU.98006/
+.97798,MSE66.939/87.370. AtCRF50:17168/18897B,IoU.95780/.95897,MSE160.044/
+198.157; inverse mapping amplifies heavy quantization, so do not claim universal
+superiority over clamp. Threshold16 is applied in the encoded lifted domain,
+then RGB is unlifted and restored, preserving a recovered alpha for black shoes.
+Only reference arrays are materialized for future generator input; all original
+motion/timing/seed arrays remain exactly hash-equivalent. Old clamp artifacts
+are preserved, not overwritten. GPU recipe count and proposed4.5h cap unchanged.

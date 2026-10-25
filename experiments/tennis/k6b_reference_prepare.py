@@ -15,13 +15,13 @@ from experiments.tennis.k6b_rate_transport import array_sha, sha, write
 
 def prepare(original: Path, video: Path, kind: str, target: Path) -> dict[str, Any]:
     import cv2
-    if target.exists() or kind not in ('full', 'alpha', 'black'):
+    if target.exists() or kind not in ('full', 'alpha', 'black', 'black-affine'):
         raise ValueError('New target and declared recipe required')
-    floor, crf = (32 if kind == 'black' else 0), 20
+    floor, crf = (32 if kind.startswith('black') else 0), 20
     decoded = {}
     banks = {}
     with tarfile.open(video) as source:
-        f = source.extractfile('publish/reference-video.json')
+        f = source.extractfile('publish/'+('affine.json' if kind == 'black-affine' else 'reference-video.json'))
         if f is None:
             raise ValueError('Missing sparse video report')
         report = json.load(f)
@@ -89,11 +89,13 @@ def main() -> None:
     p.add_argument('--original', type=Path, required=True)
     p.add_argument('--video', type=Path, required=True)
     p.add_argument('--out-dir', type=Path, required=True)
+    p.add_argument('--affine-only', action='store_true')
     a = p.parse_args()
     a.out_dir.mkdir(exist_ok=False)
     if sha(a.original.read_bytes()) != '674c40981a7d805a2d241b12bf499ca1a6e99351234581edebe30667cb6bfa0c':
         raise ValueError('Original first-group preparation identity changed')
-    records = [prepare(a.original, a.video, kind, a.out_dir/f'{kind}-q20-prepared.tar') for kind in ('full', 'alpha', 'black')]
+    kinds = ('black-affine',) if a.affine_only else ('full', 'alpha', 'black')
+    records = [prepare(a.original, a.video, kind, a.out_dir/f'{kind}-q20-prepared.tar') for kind in kinds]
     write(a.out_dir/'reference-variants.json', {'rows': records})
     print(json.dumps({'variants': len(records), 'changed_units_each': [len(r['units']) for r in records], 'gpu_hours': 0, 'out': str(a.out_dir)}))
 
