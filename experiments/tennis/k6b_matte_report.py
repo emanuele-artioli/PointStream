@@ -66,7 +66,25 @@ def report(diagnostic: Path, transport: Path, matte: Path, archives: list[Path],
                        "device": stage["device"], "input_sha256": stage["inputs"]})
     if len({r["id"] for r in measured}) != len(measured):
         raise ValueError("Duplicate window cannot increase the win count")
-    result = assess(json.loads(diagnostic.read_text()), json.loads(transport.read_text()), json.loads(matte.read_text()), measured)
+    original = json.loads(diagnostic.read_text())
+    result = assess(original, json.loads(transport.read_text()), json.loads(matte.read_text()), measured)
+    from experiments.background.g5 import envelope, pareto
+    from experiments.tennis.k5 import bd_rate
+    references_by_window = {r["window"]: r for r in original["rows"]}
+    curves: dict[str, Any] = {}
+    for row in measured:
+        wid = row["id"]
+        curves[wid] = {}
+        for metric in ("lpips", "dists"):
+            points = [(next(r for r in data["rows"] if r["window"] == wid)["kbps"], -row["means"][scale][metric]) for scale, data in result["scales"].items()]
+            anchor = [(r["kbps"], -r[metric]) for r in references_by_window[wid]["anchor_points"].values()]
+            front, hull = pareto(points), envelope(anchor)
+            lo, hi = max(front[0][1], hull[0][1]), min(front[-1][1], hull[-1][1])
+            curves[wid][metric] = {"bd_rate_fraction": bd_rate(points, anchor, 1e-12),
+                                  "quality_overlap": [lo, hi] if hi > lo else None,
+                                  "method_points": points, "anchor_envelope": hull,
+                                  "scope": "three matte settings on this measured window only; PCHIP log-rate, no quality extrapolation"}
+    result["prefix_bd_rate"] = curves
     return {**result, "inputs": inputs,
             "quality_status": "actual complete-window fixed-region LPIPS/DISTS; unmeasured windows are not scores",
             "accounting": "actual keypoints + all240-frame matte +7200s all-PNG match bank +7200s adapter/guider, shipped base primary",

@@ -1,5 +1,8 @@
 # Card: CPU-first compressed player mattes
 
+**Current state: complete.** Approved GPU judging stopped at the frozen mathematical bound after four fully judged windows: each scale 0/8 measured wins; even16 remaining wins gives16/24<18. 603.629785 GPU-s (0.167674940 h) of 0.75 h spent, including failed setup. Eight windows lack complete scores; no full-cohort mean claimed. No task GPU work active or further spending authorized by this closed task. See the GPU outcome in the experiment entry for all jobs, validation, rates and limitations.
+
+
 Goal: measure compressed-matte rates, artifact coverage and actual saved-render quality where feasible, following the new preregistered entry in docs/experiments/k6b-players.md. Preserve the frozen12 cohort, original R/S regions and frame sets, native saved crops/background and all earlier evidence.
 
 Scope: CPU only, 7200 aggregate CPU seconds/3 h wall, stages<=45 min, per-window checkpoints. Start H5 area-majority full-frame8/16/32 with LZMA temporal-XOR and COCO-RLE/Zstd of identical grids; bill all 240 frames and player identity/geometry/format metadata. Keep PNG/2 h and real keypoints primary; JPEG accounting conditional. No fitting, generation, new inference, GPU, new chats, agents or monitors.
@@ -12,7 +15,7 @@ State: preregistered; no new measurements/jobs yet.
 
 CPU job 20261025T095256Z-b7692db7 submitted; source `c2f8e670`. No GPU. Preserve and inspect this ID before acting.
 
-## Proposed follow-up — not authorized or dispatched
+## Proposed follow-up — subsequently approved below
 
 If the CPU projection is confirmed, complete only saved-generation judging on a newly approved maximum 0.75 GPU-hour ledger. No fitting, new generation or lossy-reference conditioning. Four resumable parts of three frozen windows, each total GPU occupancy <=675 s, correctness smoke<=60 s and full stage<=540 s plus validation/overhead. RTX6000 Ada compatible pool gpu5/gpu6 after rechecking all eligible hosts/existing jobs. Actual frozen LPIPS/DISTS backbones and packed main environment already support this class; assert CUDA/provider/device and memory in the first smoke.
 
@@ -26,7 +29,7 @@ Reference compression is a separate extension: CPU prices support testing half-s
 
 ## CPU outcome
 
-Complete native CPU job 20261025T095755Z-f5de5e93; earlier failed 20261025T095256Z-b7692db7 preserved and valid first-window work reused. All12 mask transports measured; independent77 packet and 120 statistical/coverage checks pass. Matte rates1/8:9.995–25.493,1/16:4.531–10.490,1/32:1.341–3.620 kbps. Actual two-frame neural smoke changes quality, with mixed1/8 effects and worse1/16–1/32 on both metrics. Full956-frame CPU neural projection23365–35623 CPU-s exceeds7200; full >=18/24 decision unresolved. Budget closed within cap,0 GPU, no active jobs/monitors. See experiment entry for exact native CPU ledger, all rates/coverage/background limitations and preserved evidence. Proposed0.75 GPU-hour judging stage remains unapproved and unlaunched. Lossy references remain separately untested for generated quality despite roughly90% half-size-JPEG bank byte savings.
+Complete native CPU job 20261025T095755Z-f5de5e93; earlier failed 20261025T095256Z-b7692db7 preserved and valid first-window work reused. All12 mask transports measured; independent77 packet and 120 statistical/coverage checks pass. Matte rates1/8:9.995–25.493,1/16:4.531–10.490,1/32:1.341–3.620 kbps. Actual two-frame neural smoke changes quality, with mixed1/8 effects and worse1/16–1/32 on both metrics. Full956-frame CPU neural projection23365–35623 CPU-s exceeds7200; full >=18/24 decision unresolved. Budget closed within cap,0 GPU, no active jobs/monitors. See experiment entry for exact native CPU ledger, all rates/coverage/background limitations and preserved evidence. At CPU close the proposed0.75 GPU-hour stage was unapproved; the later approval and continuation are recorded below. Lossy references remain separately untested for generated quality despite roughly90% half-size-JPEG bank byte savings.
 
 Published: https://github.com/emanuele-artioli/PointStream/pull/239, merge-commit auto-merge enabled. CPU evidence and terminal events verified; full judging still requires separate budget approval. Planning report delivered directly.
 
@@ -35,3 +38,5 @@ Published: https://github.com/emanuele-artioli/PointStream/pull/239, merge-commi
 The user explicitly approved the proposed0.75 GPU-hour cap on2026-10-25. Follow the new GPU entry in docs/experiments/k6b-players.md; separate2700 GPU-second ledger, four<=675 s three-window parts, no fitting/new generation or lossy-reference conditioning. Branchcodex/k6b-matte-judging. Frozen cohort, masks/scoring/rate rules and limitations unchanged. GPU stage not yet submitted. Previous CPU jobs remain terminal. Report directly to the planning chat.
 
 Approved GPU part1 job `20261025T135736Z-c830e267`, source679f0f94;675/2700 GPU-s reserved; later parts not submitted. Inspect this ID before acting.
+
+GPU part1 corrected20261025T140128Z-2dfd517f complete: three full windows, all scales0/6 billed wins, bound18/24 remains possible. Cumulative442.725219/2700 GPU-s spent, including first failed smoke. Part2 `20261025T141239Z-93456964` running; source052df444, per-complete-window conservative stop, later parts unsubmitted. No new generations.
