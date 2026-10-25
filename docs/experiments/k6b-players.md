@@ -3063,8 +3063,8 @@ explicit new budget approval; no GPU submission, generation or Wan-Animate.
 
 Important scope of compression search: these CPU video points used fast preset8.
 They are not proof of the best attainable SVT compression. Proposed approved-only
-continuation includes a separate<=3600CPU-s preset1 preflight (same slower preset
-as conventional anchors) before interpreting a negative quality result; compare
+continuation includes a separate<=3600CPU-s preset4/preset1 preflight (tennis anchors actually use4 in k6.PRESET;1 is a
+slower comparison) before interpreting a negative quality result; compare
 actual bytes/decoded fidelity on fixed inputs and freeze the global preset
 before new neural scores. Three recipe families, GPU cap4.5h unchanged. If that
 preflight cannot fit, retain the tested-config limitation. No JPEG AI or learned

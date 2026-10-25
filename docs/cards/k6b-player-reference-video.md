@@ -245,13 +245,14 @@ segmentation inference, sources, reference-lifetime changes or Wan-Animate.
 
 Compression optimality guard for the proposed stage: current CPU video screening
 uses preset8, so it is not a claim of best attainable AV1 compression. Before
-negative quality closure, compare preset1 (the existing conventional anchor's
-adopted slower preset) on the same declared carrier/reference inputs. After
+negative quality closure, compare preset4 (the tennis anchor's actual preset) and preset1 (a slower setting) on the same declared carrier/reference inputs. After
 budget approval this may use a separate<=3600CPU-s preflight ledger, with a
 representative<=600s smoke and measured projection; no old CPU ledger reopens.
 Keep three recipe families and fixed windows. Choose a single global preset
 per family by delivered-byte/decoded-pixel Pareto comparison before opening new
-neural scores; preserve both if the tradeoff is unresolved. No new settings or
+neural scores. Preserve unresolved CPU tradeoffs as artifacts; use matched-anchor
+preset4 for the GPU test if neither dominates and both meet headroom. Do not
+generate extra preset variants outside the three fixed recipe families. No new settings or
 GPU budget are silently added. If slower coding cannot fit its CPU cap, report
 that tested-limit explicitly; do not call the whole route closed. JPEG AI,
 learned mask prediction and exhaustive compression optimality remain untested.
