@@ -1,5 +1,11 @@
 # Tennis reference and mask video comparison
 
+Current state2026-10-25: sparse CPU comparison complete (54 settings,88 independent
+checks); dense CPU job20261025T164351Z-3d27fbbf running, preserve/inspect it.
+New GPU spending0; concrete combined4.5h request below remains unapproved.
+Three actual decoded reference variants materialized locally; only reference
+arrays change, all motion/seed/timing inputs preserved.
+
 Goal: determine whether cheaper references and temporally coded silhouettes merit
 an actual reference-conditioned generation test on the frozen 12-window tennis
 cohort. The descriptive target remains >=18/24 strictly bracketed window–metric
@@ -142,3 +148,8 @@ strict cells then delivered rate, keep Pareto tradeoffs. A full12-window actual
 quality confirmation requires a further explicitly sized budget and unchanged
 cohort. Failure of this pilot closes only tested recipes. Background/source
 independence/granted-matte limitations persist. No fitting or Wan-Animate.
+
+Sparse banks are preshipped in declared unit-ID order; no live/causal source
+chronology is claimed. The one-point-per-recipe reference generation pilot
+cannot produce BD-rate; report strict anchor-bracket cells only. Dense carrier
+has3 actual coded qualities, so PCHIP BD-rate is defined only on genuine overlap.

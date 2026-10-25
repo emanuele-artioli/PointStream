@@ -2897,7 +2897,7 @@ binary200564/87028/25630B; SDF54141/26143/13476B. Plain separate H5 streams sum
 16414/10658B before shared timing metadata, substantially below video. The
 cheapest SDF is also much less accurate: Al IoU.6638/.7382 and boundary F.5801/.6171;
 Med.7396/.6257,F.6328/.6076 versus respective H5 AlIoU.8466/.8796,F.9325/.9326,
-MedIoU.8694/.8140,F.9294/.9339. These mask diagnostics are on960x540 native grid;
+MedIoU.8693/.8136,F.9295/.9336. These mask diagnostics are on960x540 native grid;
 boundary tolerance1native pixel=2 full pixels. No matched-accuracy video saving.
 Exact translation alignment also loses: Al7412+10216 vs6451+9963B; Med7209+5216
 vs6335+4323B. Alignment packets include shifts/headers; no claim that all
@@ -2912,3 +2912,10 @@ new generated scores, no per-window recipe selection. Native original-reference
 control required. Detailed proposed new GPU budget/stages in card:0.5h dense
 judging plus4.0h two-window actual-generation pilot, combined4.5h maximum,
 estimate3.35h. This request is not authorized by the older closed ledgers.
+
+Platform verification: the isolated process-state test passes with read-only ps
+allowed, confirming its earlier failure was the sandbox restriction. The old
+macOS protected-path assertion remains the only unverified local platform check;
+Linux CI remains required. Sparse banks are preshipped/offline in unitID order,
+with no chronological/live reference-availability claim. No BD-rate is inferred
+from single-point reference recipes;3point dense curves use true overlap only.
