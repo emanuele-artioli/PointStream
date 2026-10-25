@@ -126,7 +126,7 @@ sessions update their own items and their files in `docs/experiments/`
   windows from the familiar Alcaraz and Medvedev broadcasts reaches
   **23/24 billed window–metric wins** (LPIPS 11/12, DISTS 12/12;
   descriptive bar 18/24), and 24/24 unbilled. Billing here covers the
-  match adapter/guider and keypoints, with a common shipped tennis base;
+  match adapter/guider and a pooled keypoint entropy bound, with a common shipped tennis base;
   references and exact target matte remain granted and unbilled.
   Charging the 48,878,567-byte base over 2 h adds 54.309519 kbps:
   0/12 bracketed cells win, and the other 12 are unbracketed, unresolved.
@@ -138,10 +138,21 @@ sessions update their own items and their files in `docs/experiments/`
   validated; 24 terminal GPU jobs used **6.995428306 of 8 GPU-hours**.
   Report commit `72228816`, [PR #236](https://github.com/emanuele-artioli/PointStream/pull/236)
   (auto-merge off after an approval-review block); no jobs remain active.
-  Step 6 (Wan-Animate 14B, zero-shot first) is outlined; it waits for
-  the user. Every player result so far grants the matte; the
-  matte's rate is unmeasured on tennis (H5p 4: on egocentric video the
-  billed mask removed every win). K6c after K6b; K7 (HiEve) later.
+  **CPU transport audit (2026-10-25, report `7b96dfac`, PR #236):**
+  actual decodable keypoints cost 3.284–6.432 kbps; with lossless PNG
+  reference banks amortized over 2 h, even free mattes retain only
+  **17/24 wins**, below 18/24. Exact mattes alone cost 40.648–110.142
+  kbps against 0.739–9.834 kbps of positive fixed-output extra-rate
+  headroom. The full exact route has 22 bracketed losses and 2 unresolved
+  equal-rate cells; all 24 have actual cheaper/no-worse pixel-anchor
+  witnesses. Thus these measured transport configurations fail, even
+  with the common base shipped. Lossy references/mattes have rate-only
+  measurements, not new quality results; other coders and outputs remain
+  unresolved. CPU job `20261025T082944Z-29f021a5` passed 219 checks;
+  no new GPU work, fitting or generation. [Full audit](https://github.com/emanuele-artioli/PointStream/blob/7b96dfaca9b688be5dd3315bd493464ce8038fef/docs/experiments/k6b-players.md#completed-cpu-rate-budget-audit--2026-10-25).
+  No complete deliverable route passed its gate, so no GPU smoke/pilot
+  is proposed. Step 6 (Wan-Animate 14B, zero-shot first) still waits for
+  the user; K6c's general player codec remains gated, K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
