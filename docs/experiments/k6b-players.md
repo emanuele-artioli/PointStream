@@ -3232,3 +3232,25 @@ maxabsdiff0.0, CUDApeak5.703743GiB, realnative smoke37.938989s. Full
 Alstage running. PromoteMed throughsamevalidator, remaining600sreservation.
 
 DenseactualqualityMed job `20261025T190034Z-01c74a65` source7a364580 specSHA256`5f34e27b416ba2251492ff10bafb18cb391969925d59e6ef8800eac4afbd1cd2`;600GPU-sreserved inside1800densecap. Samefrozen4deliveredcarrierpoints andnativeoriginalcontrol.
+
+Operational configuration for remainingreference renders: exclusiveadmission
+on unchangedfullcompatibleAda poolgpu5/6, original24000MiB allocation.
+Sharedcontrols materially slowed while acompatibleGPU becameidle ininventory;
+exclusiveadmission avoids wasting fixedbudgetoncontention. Nohostpin or
+changedrenderer/quality recipe. Originalexclusivefull-window evidence
+1232.62/1247.34s provides projection; everynewjobstillhasactualsmoke.
+Futurecandidate spec160ssmoke/1600sfull/20svalidator,1800stotal; reserve
+only affordableparts from14400referenceGPU-s afteractualcontrolcharges.
+
+Alactualquality20261025T185724Z-884dd4ce COMPLETE,80originaljudgedframes,
+allnativevalidation passes,252.160562GPU-s admitted. ArchiveSHA256
+377641e79cc06d4bd81c03d1a732817316ed604d4eba9304a2293c86391dc50c.
+Eachselected/historicalCRF63carrier0/2strictcells,resolved. Alpha4at42.791667kbps
+LPIPS.359325093/DISTS.270400329; affine1at18.72kbps .445457180/.318546036.
+Historicalalpha8at45.771667 .363348240/.274332323; clamp32p8at18.8675
+.472553771/.318922050. Cheaperachievableanchors dominateeachmetric.
+CurrentdenseGPUactual44.123715failed+252.160562complete; Medreserve600,
+historical7pointAlreserve550 =>1446.284277s<1800. Original5variantAlcost
+252.161 incl38ssmoke; full8variant historicalprojection214*8/5+40<383s,
+under460fullcap;60ssmoke/20svalidator inside550s. Preserve distinctpreset8
+curves and selectedsinglepoints, never combinepreset1/4into oldcurves.
