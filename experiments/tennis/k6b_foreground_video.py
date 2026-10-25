@@ -44,8 +44,9 @@ def accuracy(truth: np.ndarray, target_mask: np.ndarray, rgb: np.ndarray,
         counts = overlap(source_alpha, full_alpha)
         for k in totals:
             totals[k] += counts[k]
-        diff = (full_rgb.astype(np.float32)-np.asarray(truth[i]).astype(np.float32))**2
-        numerator += float(diff[source_alpha].sum())
+        # MSE is defined only on foreground: avoid allocating three full-frame float arrays.
+        diff = (full_rgb[source_alpha].astype(np.float32)-np.asarray(truth[i])[source_alpha].astype(np.float32))**2
+        numerator += float(diff.sum())
         denominator += int(source_alpha.sum())*3
         rgb_hashes.append(array_sha(full_rgb))
         mask_hashes.append(array_sha(full_alpha))
@@ -60,9 +61,15 @@ def validate(root: Path) -> dict[str, Any]:
     result = json.loads((root/'foreground-video.json').read_text())
     n = result['frames']
     checks = {'cpu': result['cuda_visible'] == '' and result['gpu_hours'] == 0,
-              'cohort': result['windows'] == list(PILOTS), 'row_count': len(result['rows']) == 18,
+              'cohort': result['windows'] == list(PILOTS), 'row_count': len(result['rows']) == len(result['expected_points']),
+              'settings': {(r['window'], r['crf'], r['kind'], r['floor']) for r in result['rows']} == {tuple(x) for x in result['expected_points']},
               'sources': [r['source_sha256'] for r in result['sources']] == list(SOURCE_SHA),
               'frames': n in (8, 240)}
+    if n == 8 and all(row['crf'] == 63 for row in result['rows']):
+        # Historical full-window pilot provides the measured scale basis, not a smoke-only guess.
+        projected = 818.7586409798823/7*4 + 150
+        checks['historical_full_scale_projection_under_660s'] = projected < 660
+        checks['real_smoke_under_55s'] = result['wall_seconds'] < 55
     for i, row in enumerate(result['rows']):
         rec = row['container']
         path = root/rec['file']
@@ -82,6 +89,8 @@ def main() -> int:
     parser.add_argument('--transport', type=Path)
     parser.add_argument('--source', type=Path, action='append', default=[])
     parser.add_argument('--frames', type=int, choices=(8, 240), default=8)
+    parser.add_argument('--crfs', default='20,35,50')
+    parser.add_argument('--formats', choices=('all', 'robust'), default='all')
     parser.add_argument('--validate', action='store_true')
     args = parser.parse_args()
     stage = Path(os.environ['PS_STAGE_DIR'])
@@ -101,6 +110,10 @@ def main() -> int:
     torch.set_num_threads(4)
     cv2.setNumThreads(1)
     os.sched_setaffinity(0, sorted(os.sched_getaffinity(0))[:4])
+    crfs = tuple(int(q) for q in args.crfs.split(','))
+    if crfs not in (CRFS, (63,)):
+        raise ValueError('Undeclared CRF refinement')
+    formats = (('alpha', 0), ('black', 32)) if args.formats == 'robust' else (('alpha', 0), ('black', 1), ('black', 32))
     n, w, h = args.frames, 960, 540
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
     publish = scratch/'publish'
@@ -108,6 +121,7 @@ def main() -> int:
     with tarfile.open(args.transport) as tar:
         tar.extractall(scratch/'packets', filter='data')
     result: dict[str, Any] = {'windows': list(PILOTS), 'rows': [], 'sources': [], 'frames': n,
+        'expected_points': [[wid, q, kind, floor] for wid in PILOTS for q in crfs for kind, floor in formats],
         'gpu_hours': 0, 'cuda_visible': os.environ['CUDA_VISIBLE_DEVICES'],
         'code_sha256': sha(Path(__file__).read_bytes()), 'packet_archive_sha256': sha(args.transport.read_bytes()),
         'tools': {tool: svtav1.tool(tool) for tool in ('ffmpeg', 'dav1d', 'SvtAv1EncApp')},
@@ -140,10 +154,12 @@ def main() -> int:
         alpha_raw = scratch/f'{label}-alpha.yuv'
         y = np.where(alpha, 255, 0).astype(np.uint8).reshape(n, -1)
         np.concatenate([y, np.full((n, h*w//2), 128, np.uint8)], 1).tofile(alpha_raw)
-        for crf in CRFS:
+        source_preparation_seconds = time.monotonic()-began-sum(row.get('point_wall_seconds', 0) for row in result['rows'])
+        for crf in crfs:
             alpha_rec = code_yuv(alpha_raw, scratch/f'{label}-alpha-q{crf}', n, w, h, crf, kmeta['fps'][0])
             back_alpha = np.fromfile(alpha_rec['decoded'], np.uint8).reshape(n, -1)[:, :w*h].reshape(n, h, w) >= 128
-            for kind, floor in (('alpha', 0), ('black', 1), ('black', 32)):
+            for kind, floor in formats:
+                point_began = time.monotonic()
                 tag = f'{label}-{kind}-{floor}-q{crf}'
                 root = scratch/tag
                 root.mkdir()
@@ -165,6 +181,8 @@ def main() -> int:
                     'codec': coded, 'alpha_codec': alpha_rec if kind == 'alpha' else None, 'container': delivered,
                     'diagnostic_only': diag, 'forward': forward, 'inverse': inverse,
                     'kbps_whole_window': delivered['bytes']*8/(n/kmeta['fps'][0])/1000,
+                    'point_wall_seconds': time.monotonic()-point_began,
+                    'source_preparation_seconds_cumulative': source_preparation_seconds,
                     'saved_kps_for_time_only_not_delivered': True})
                 raw.unlink()
                 # Release intermediates only; delivered containers and source/decoded identities persist.

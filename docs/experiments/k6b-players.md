@@ -2935,3 +2935,42 @@ no more than.002 worse on either. Otherwise keep clamp. This refines CPU
 screening before any new generated scores; GPU request does not expand beyond
 three reference recipes. Sparse16-level threshold remains frozen. No new
 source/quality-driven window selection, no GPU or new learned models.
+
+Dense CPU attempt20261025T164351Z-3d27fbbf reached850s full-stage deadline;
+not a successful full matrix. Seven completed Al031 settings preserved in
+partial TAR SHA25645be9e1a39030246235fec3335b23b7ca798f55ead579639539893656a23996e.
+Short smoke39.926484s did not establish the assumed full-window runtime; the
+promotion's extrapolation was inadequate. No replay. Completed points are
+all240frames: color+alpha CRF20/35/50=784.783/417.661/176.287kbps; blackfloor1
+CRF20/35=412.312/197.941; blackfloor32=408.105/196.148. These are all above the
+Al031 highest measured anchor57.705kbps, so do not blindly finish the same
+high-rate matrix. CPU-only MSE/IoU remains diagnostic; no learned quality win.
+
+Preregister targeted operating-point refinement before its scores: same two
+240frame windows,960x540,preset8, color+alpha and robust blackfloor32 only,
+CRF63 (the existing anchor's low-rate end). This adds one justified lower-rate
+point rather than completing expensive irrelevant high-rate settings. Smoke8
+frames,full240,actual per-point projection required before new promotion. New
+full cap600s,smoke60s,validator30s,overall750s x4CPUs=3000CPU-s. Preserve all
+old settings; no genotype/seed/window substitution. This is not a full3point
+curve for Med014; report only measured coverage/overlap.
+
+Refined failure-inclusive CPU bound uses recorded CPU rather than assuming all
+four CPUs busy throughout: last full checkpoint900.022310CPU-s,wall818.758641s;
+charge unfinished tail4*(850-818.758641)=124.965436CPU-s. Smoke native47.071113;
+validator4*2.771559=11.086235. Charge all other admitted overhead at4CPUs:
+4*(924.007124-850-39.926484-2.771559)=125.236327. Dense bound1208.381421CPU-s.
+Together with earlier conservative1047.242756,480local,800affine reserve and
+3000refinement reserve =>6535.624177CPU-s < unchanged7200CPU-s. The earlier
+1800s aggregate wall-reservation shortcut is replaced by this auditable CPU
+bound; each job remains<=45min and no GPU/paid API is used. Old CPU results
+and GPU ledgers are immutable. If any counter/budget check fails, stop.
+
+Refinement cost gate uses the real failed full-size pilot:818.758641/7 x4
+settings +150s setup/variance =617.862081s <660s full cap, unlike the earlier
+short-smoke-only assumption. Smoke must also finish under55s. Overall750s
+reservation unchanged. Foreground MSE now selects foreground pixels *before*
+float conversion/squaring, avoiding three needless full-frame float arrays;
+identical per-pixel squared errors and summation order, no metric definition
+change. Record each point's actual wall time. New stage adds only CRF63 for
+alpha/floor32; old high-rate partial points remain immutable and reported.
