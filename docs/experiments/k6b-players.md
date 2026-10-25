@@ -2721,3 +2721,62 @@ Common base shipped is primary. Charging its actual48,878,567-byte checkpoint ov
 Final immutable audit bundle `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-matte-judge-20261025T141700Z/k6b-matte-gpu-evidence.tar.gz`, SHA256`201e78036a7c2bd2354ddee110155354b9eb1a3faf3632970f211e7c276e3bbc` (6385271 bytes,167 members); all166 payload-member checksums independently verified. Native score/command/input/model/control receipts, original judge archives, delivered reference/keypoint/matte packets, source snapshots, failed trace, local tests and closed ledger retained. Large source clips/generated RGB/model weights remain SHA256-referenced immutable inputs. Final JSON in the same directory `k6b-matte-gpu-final-report.json`, SHA256`55112f6b10254197231b379ee0408a9924c07fcc846fbc47c053d6ee938ea606`; comparison CSV and resource ledger alongside. Remote SHA256 values verified before write protection. No old artifact overwritten.20 focused tests and configured ruff/mypy pass; final full local suite871 passed/24 skipped, only unchanged macOS protected-path symlink assertion fails (Linux CI verifies supported platform).
 
 GPU result published in PR #240 (result commit`7e7f0028`), merge-commit auto-merge enabled. Independent comparison/166-member checksum validation complete, all task jobs terminal, events acknowledged. Planning report includes the stopped prefix, rigorous16/24 optimistic bound and closed0.167674940/0.75 h ledger. No pending compute approval or follow-on run in this task.
+
+### 2026-10-25 — Reference/alpha video and temporal matte CPU comparison
+
+User explicitly requested color plus auxiliary alpha in one container versus
+3-channel black segmentation, foreground black lifted to a nonzero guard band,
+lightweight references, and an actual generated-quality experiment. The current
+codec sends sparse full RGB references and dynamic per-target-frame masks via
+RLE/Zstd or XOR/LZMA; it has not coded tennis masks as video. Reference-frame
+alpha cannot replace changing target silhouettes. New scope/card:
+[reference-video](../cards/k6b-player-reference-video.md), branch
+`codex/k6b-reference-video`; old closed budgets are not reopened.
+
+Hypothesis: motion compensation/alignment and reduced, temporally predicted
+reference banks lower delivered side information enough to justify a real
+changed-conditioning quality test. Alternative: alpha costs/black-key errors,
+conditioning distortion or poor inter-reference correlation erase savings.
+The saved exact-quality free-reference/free-matte result19/24 is a feasibility
+oracle for reducing reference cost at fixed quality, not a bound on changed
+conditioning or all lossy silhouettes; the17/24 PNG result cannot close those.
+No new quality scores are inspected before this entry.
+
+Freeze: same12 windows/anchors/R/S/judged frames/renderer/seeds and original
+>=18/24 strict bracketed decision;7200s reference/adaptation lifetime; common
+shipped base primary, actual base bytes separately. Actual CPU sparse-bank tests:
+all24 references, half-size256x392, bicubic512x784 restore; SVT-AV1 preset8,
+CRF20/35/50, full BT709 RGB/YUV420 conversion. Compare unmasked bank, segmented
+color+explicit alpha (two actual AV1 tracks, Matroska container with counted
+metadata), and black RGB with floors1/8/32, thresholds ceil(floor/2). Ordering
+by unit ID within each match is recorded and charged; no claim of source
+chronology/player identity. Saved encoder SAM at recorded reference tick0,
+native reference-box crop supplies alpha; no new segmenter or manual labels.
+Half-size JPEG70/PNG pricing controls come from the previous immutable audit.
+Record actual post-container track decodes, frame/ID/hash fidelity, foreground
+RGB MSE, silhouette IoU/FP/FN, all delivered bytes. Pixel MSE is only screening,
+not a learned-judge/generation surrogate. No JPEG AI implementation is introduced.
+
+Dynamic-mask pilot: Al031/Med014,240frames and both players each, scale8;
+binary/SDF video at the same3 CRFs and reversible bounding-box-center alignment
+with circular roll before XOR/LZMA (all shift/header bytes included). Compare
+mask IoU and boundary F at2 full pixels beside unaligned H5. All methods/anchors
+have identical windows; no quality-driven cohort replacement. Lossy candidates
+require actual composite quality before any rate-quality win claim.
+
+CPU authorization interpreted from "go ahead": new cap7200CPU-s including
+children,0GPU-h; smoke<=300s then full<=1200s, validator<=60s, overall supervised
+<=1680s on4 CPUs (conservative6720CPU-s plus480local/analysis allowance). Save
+each setting. Smoke only first match bank/Al031 atCRF35, full both banks/both
+mask windows/3CRFs. Validator checks complete real decodes/container tracks,
+source/packet identities, finite diagnostics, exact aligned-mask reversibility,
+and synthetic pure-black foreground guard-band contract. Inspect old terminal
+job20261025T141239Z-93456964 before dispatch and all six hosts; CPU admission
+requires no GPU. No new chats/agents/monitors. Generation is user-requested but
+requires a concrete new GPU cap after CPU screening, not unused old allowance.
+
+Stop on invalid decode/contract, cap exhaustion or completed bounded pilot.
+Keep byte/fidelity Pareto candidates; choose one fixed recipe before opening new
+generated quality. Report uncertain tradeoffs instead of declaring a conclusive
+close. Familiar two-match/source-replay limitations, exploratory115px, historical
+step5 failure, exact-matte history and granted target-derived background remain.
