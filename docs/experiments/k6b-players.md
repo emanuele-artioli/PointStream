@@ -3294,3 +3294,16 @@ FPmeanAl2635.4/Med1520.2pixels perjudgedframe versusalpha257.2/186.45.
 Allnativecontrols/pixel/R/S/coveragechecks passed; nofull12windowclaim.
 
 MissingAlplayer001 control job `20261025T191545Z-f67eebcb` sourceea6fd44e specSHA256`ce2aa7eef86db2f7d7e34a1f78212c3ba557ad787012b4963724b410fa41a97d`;1000GPU-sreservation, exclusivefullAda pool, retained006bitexact checkpoint not replayed.
+
+MedPNGcontrol20261025T184001Z-2e64d93e terminalFAILED1750sfull deadline,
+1892.709538GPU-sadmittedcharged. Retained003full240context/80judgedcrops;
+partialSHA2563caf5d7101ae059f60c142f0786711778cc480089d4e1a4b17d15d29b488ef0e.
+Independentcomparison withoriginalfullgen2:tBITEXACT, RGBmeanabsolute
+difference.059822591/channel,max44,5.6194%channelsdifferent. Thiscontrolis
+NOTpixelbitexact (Al006wasbitexact); originalmetrics1e-4gate remainsstrict
+andmustbecheckedbeforecandidateclaims. No newRGBtolerance invented.
+Retain003andcompleteONLYmissing004 onexclusiveAda,100ssmoke/800sfull/20s
+validator/1000stotal. FinalPNGassembled4unitsacrossbothwindows mustpass
+fulloriginalneuralcontrolwithin1e-4 orinvestigate/stop. No oldcropreplacement
+for newcontrol. Referenceknownspent3954.938403GPU-s (3failedjobs);
+Almissing1000+Medmissing1000reserves =>5954.938403/14400s beforecandidates.
