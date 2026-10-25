@@ -3002,3 +3002,61 @@ then RGB is unlifted and restored, preserving a recovered alpha for black shoes.
 Only reference arrays are materialized for future generator input; all original
 motion/timing/seed arrays remain exactly hash-equivalent. Old clamp artifacts
 are preserved, not overwritten. GPU recipe count and proposed4.5h cap unchanged.
+
+### CPU phase closed — 2026-10-25
+
+Low-rate job20261025T170625Z-c041d6b7 complete; native smoke/full validity gates
+pass. Full wall581.031201s < measured617.862081s projection and660s cap.
+Four complete240frame points, actual container bytes and decoded track/source
+identities, no neural quality:
+
+| Window | CRF63 carrier | whole-window kbps | mask IoU | foreground RGB MSE |
+|---|---|---:|---:|---:|
+|Al031|color+alpha|45.7717|.94045|1765.662|
+|Al031|black clamp32|18.8675|.73465|1752.227|
+|Med014|color+alpha|71.0517|.93961|1925.201|
+|Med014|black clamp32|31.7100|.79818|1939.018|
+
+These rates enter each window's actual anchor bracket (max57.705/109.089kbps),
+so rate alone cannot close the dense route. Mask/color degradation is substantial;
+LPIPS/DISTS on identical original R/S plus outside-R diagnostics is required.
+No full-cohort success, equal-quality saving or generated-quality preservation
+is inferred. All11 completed dense points (7 earlier Al +4 new) remain available;
+other original high-rate matrix points were never completed and stay missing.
+Al alpha has4 coded qualities, black32 has3; Med has onlyCRF63, not a curve.
+
+Independent local checks:88 sparse packet/decoded-conditioning/alignment checks
+plus43 new affine/dense/prepared/source checks, all pass. Original full-source
+RGB frame hashes and half-size encoder-input RGB agree exactly across old/new
+CPU revisions for all Al points, confirming the MSE allocation optimization did
+not change source pixels. Every saved dense point has240 actual decoded frames.
+Source clips and prepared inputs remain frozen. Native full low-rate TAR SHA256
+1f9cd10f4e95c0446ae2c4103b2cbbd6b9b65e1bf71697e83fc36fd80b5bfeee.
+
+Selected generation inputs: unmasked/explicit-alpha CRF20 from sparse video and
+affine32 CRF20 from affine video, allhalf-size. Six units each in original
+first-group prepared archive; only reference arrays changed, all other arrays
+hash-identical. New affine prepared TAR SHA256
+300a8888827af98e423648c5ba241f9a1c7f40518330e1803495f7fd89b65651.
+Original and clamp variants preserved; no model call or fitting occurred.
+
+CPU ledger closed: conservative total5708.866274CPU-s of7200, including480local
+allowance and failed-stage unfinished-tail/overhead bounds;0 newGPU-h. The five
+native jobs are terminal:163506-af342506 failed validator;163852-1d6ee39a complete;
+164351-3d27fbbf failed full deadline with7points;170625-c041d6b7 complete low-rate;
+170628-2ae1c4f3 complete affine (all20261025T prefixes as above). No recurring
+monitors, new chats or agents. Full final local suite874passed/24skipped with
+only unchanged macOS protected-path failure;24focused tests/configured ruff/mypy
+pass after final changes. Linux CI required for PR. CPU phase reached its bounded
+screening stop; broader route remains open.
+
+Next proposed budget remains4.5newGPU-h (estimated3.35):0.5 dense native quality
+judging and4.0 actual reference-conditioned two-window generation/control pilot.
+The dense substage may add two CRF63 affine32 carrier points (one per pilot
+window) inside its unchanged0.5h cap to transfer the tested reference guard-band
+idea to dense video; record their actual encoded input bytes/quality, never
+borrow clamp rates. Prioritize both matches atCRF63; score saved higher points
+within allowance. Reference substage tests exactly3fixed recipes plus original
+controls with exact dynamic matte granted; paid-matte/end-to-end claims remain
+separate and limited. Existing closed GPU budgets grant no new spending. Await
+explicit new budget approval; no GPU submission, generation or Wan-Animate.

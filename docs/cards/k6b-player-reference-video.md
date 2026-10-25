@@ -1,10 +1,12 @@
 # Tennis reference and mask video comparison
 
-Current state2026-10-25: sparse CPU comparison complete (54 settings,88 independent
-checks); dense CPU job20261025T164351Z-3d27fbbf timed out,7 complete Al points preserved.
-New GPU spending0; concrete combined4.5h request below remains unapproved.
-Three actual decoded reference variants materialized locally; only reference
-arrays change, all motion/seed/timing inputs preserved.
+Current state2026-10-25: CPU phase complete;5708.866274/7200CPU-s conservative
+bound,0GPU. All5jobs terminal, including2explicitly failed attempts with preserved
+results. Sparse54points, affine6points, dense11complete window-points (7Al
+high-rate +4both-match CRF63),131independent local checks pass. Actual generated
+quality and18/24 rule remain unresolved. Three decoded reference candidates are
+materialized; only reference arrays change. Await new4.5GPU-h approval below;
+no active jobs or recurring monitors.
 
 Goal: determine whether cheaper references and temporally coded silhouettes merit
 an actual reference-conditioned generation test on the frozen 12-window tennis
@@ -14,7 +16,7 @@ diagnostic, never proof of unchanged generated quality.
 
 Scope: user authorized the bounded comparison and subsequent quality experiment
 on 2026-10-25. CPU stage has a new 7200 CPU-second cap (including subprocesses;
-four threads, <=1800 supervised seconds); no GPU allocation in this stage. Older
+four threads, each job<=1800 supervised seconds); no GPU allocation in this stage. Older
 CPU/GPU ledgers remain closed. A concrete new generation GPU budget will be
 prepared from measured candidate sizes/runtime and requested before dispatch.
 No fitting, segmentation inference, Wan-Animate, new chats/agents or monitors.
@@ -205,3 +207,38 @@ Prioritize both alpha/floor32 CRF63 points in both windows, then saved high-rate
 points if the remaining allowance covers them. Scope reductions and missing
 curves stay explicit; no extrapolated full-cohort win. The4.0GPU-h generation
 substage and combined4.5h request remain unchanged and unapproved.
+
+CPU phase closed: low-rate native jobcomplete,4full240frame points atCRF63.
+Al alpha45.7717/black32 18.8675kbps; Med71.0517/31.7100; IoU.94045/.73465
+and.93961/.79818 respectively. These enter measured anchor brackets; actual
+neural quality remains unknown. Preserve all11completed dense points and11
+missing original matrix points (18planned-7completed=11missing in the original
+matrix; the4new points are a separate refinement). No full12window claim.
+
+Within proposed0.5h dense stage, additionally test affine32 atCRF63 on both
+pilot windows (2new conventional encodes, no learned generation), then score
+actual delivered decoded data/rates. This extends the CPU-proven guard-band
+idea to dense carrier without increasing the4.5h request. All newGPU work is
+unapproved; original0.75h/8h ledgers remain closed.
+
+## Frozen data and claim
+
+All cohort windows are240frames. Alcaraz–Hurkacz25fps:
+`alcaraz_hurkacz/031@129` frames9–248,
+`013@213`93–332,`023@228`108–347,`016@273`153–392,
+`008@261`141–380,`047@123`3–242. Medvedev–Struff50fps:
+`medvedev_struff/014@194`74–313,`037@349`229–468,
+`002@338`218–457,`017@206`86–325,`029@138`18–257,`021@246`126–365.
+Al031/Med014 above mean the first full IDs in each match; only these2pilot
+windows are in the proposed new4.5h stage. The full12window18/24 claim requires
+a further scaled budget if the pilot passes; the pilot cannot establish it.
+
+Frozen manifest `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/manifest-v2.json`,
+SHA2568b81c4b9645a24bb5b613bdda908440735fe932d23ea251b0c567a366bda090b.
+Original final diagnostic SHA256e12e296fcb505bc8d5da9a9f0d4398b99a29071da8d0c8a5b193527449a72e3f.
+Read exact scored/judged frame sets and R/S from immutable original native
+anchors/controls; never substitute allframes as the learned-judge sample.
+Original encoder-computable court registration remains >=228/240 finite court
+fits with error<=6px; it is not retuned using new CPU/GPU quality.115px remains
+exploratory, source/replay independence unresolved. No new model training,
+segmentation inference, sources, reference-lifetime changes or Wan-Animate.
