@@ -1,12 +1,14 @@
 # Tennis reference and mask video comparison
 
-Current state2026-10-25: CPU phase complete;5708.866274/7200CPU-s conservative
-bound,0GPU. All5jobs terminal, including2explicitly failed attempts with preserved
-results. Sparse54points, affine6points, dense11complete window-points (7Al
-high-rate +4both-match CRF63),131independent local checks pass. Actual generated
-quality and18/24 rule remain unresolved. Three decoded reference candidates are
-materialized; only reference arrays change. Await new4.5GPU-h approval below;
-no active jobs or recurring monitors.
+Current state2026-10-25: continuation APPROVED <=4.5newGPU-h plus3600CPU-s.
+Branch codex/k6b-reference-quality-pilot. Original CPU stage closed; PR241merged
+CIpassed. New reference preset comparison complete: preset1 globally dominates
+4/8 for allthree families on both matches, frozenCRF20/halfsize before quality.
+Dense8framepresettradeoff uses preset4 fallback, full240CPUconfirmation running.
+OriginalPNG controls running; one diagnosed110s smoke timeout charged, corrected
+attempt recorded. Detailed immutable jobIDs and costs in experiment entry below.
+Historical proposed/unapproved statements below are superseded by the explicit
+approved-continuation section. No expanded cohort or extra GPU allowance.
 
 Goal: determine whether cheaper references and temporally coded silhouettes merit
 an actual reference-conditioned generation test on the frozen 12-window tennis
@@ -283,3 +285,17 @@ and use matched preset4 per the existing fallback. Dense slower-preset tests
 remain subject to the same CPU cap; no rate extrapolation from short clips.
 GPU stage retains <=0.5h dense and <=4.0h reference generation/control subcaps.
 No new neural scores opened before global reference-preset selection.
+
+## Approved continuation ledger
+
+NewCPU preset job20261025T183121Z-18d2a212 COMPLETE; admitted4CPU bound320.786816s.
+Dense8frame preset job20261025T183643Z-dfd14984 COMPLETE; bound200.560949CPU-s.
+Full240dense preset4 job20261025T184009Z-0787c1cf RUNNING; reserve2320CPU-s.
+LocalCPU reserve400s. Combined bound+reservation3241.347765/3600CPU-s.
+ReferencePNG Alcontrol20261025T183259Z-16af35e8 RUNNING; reserve2000GPU-s.
+Medcontrol20261025T183318Z-34d149af FAILED110s smoke; charge131.172531GPU-s.
+CorrectedMedcontrol20261025T184001Z-2e64d93e RUNNING; reserve2000GPU-s.
+Reference GPU subledger14400s; dense GPU1800s. No candidate rendering/judging
+submitted yet. No uncertain replay, fitting or new sources.
+Presetselection: referenceCRF20preset1; denseCRF63preset4 by preregisteredfallback.
+Full-window reference controls remain mandatory; no newscores opened yet.

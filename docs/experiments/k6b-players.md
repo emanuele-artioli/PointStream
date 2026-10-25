@@ -3167,3 +3167,7 @@ CPUbound320.786816+200.560949+400local+2320=3241.347765<3600.
 Saveeverypoint; ifcapfails preservecompletedpoints and state missingcurves,
 no blind retry. This completes selecteddensecarrier codec prep onCPU rather
 than reserving aGPU for conventional encoding, within approvedsameCPUcap.
+
+control-med-retry job `20261025T184001Z-2e64d93e` source10556523 specSHA256`df6b0e38ad89aff4d8591a0e5552c72fb56ab7e5e5267c20c16581973423f9aa`; budgets as recorded above. Inspect this ID after interruptions, never replay unknown.
+
+dense-full job `20261025T184009Z-0787c1cf` source10556523 specSHA256`1a12a4a194823baa23e6239f9f196e6341961531aa7cacb7fcfb52d29edb1e28`; budgets as recorded above. Inspect this ID after interruptions, never replay unknown.

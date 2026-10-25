@@ -58,7 +58,7 @@ def unpack_carriers(archives: list[Path], scratch: Path, crfs: list[int]) -> dic
             rgb = decoded[0]
             mask = decoded[1] if row['kind'] == 'alpha' else rgb.max(-1) >= (row['floor']+1)//2
             out[row['window']].append({**row, 'rgb': rgb, 'mask': mask,
-                'name': f"{row['kind']}-floor{row['floor']}-q{row['crf']}", 'archive_sha256': sha(archive.read_bytes())})
+                'name': f"{row['kind']}-floor{row['floor']}-p{rec['contract'].get('preset', 8)}-q{row['crf']}", 'archive_sha256': sha(archive.read_bytes())})
     for rows in out.values():
         if len({r['name'] for r in rows}) != len(rows):
             raise ValueError('Duplicate carrier setting')
