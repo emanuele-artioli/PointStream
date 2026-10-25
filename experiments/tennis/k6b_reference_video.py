@@ -305,6 +305,8 @@ def main() -> int:
                 raw.unlink()
     save()
     write(Path(os.environ['PS_STAGE_DIR']) / 'reference-video.json', report)
+    if validate_archive(publish):
+        raise ValueError('Published codec evidence failed independent validation')
     print(json.dumps({'rows': len(report['rows']), 'alignments': len(report['alignments']), 'cpu_seconds': report['cpu_seconds'], 'report': str(publish / 'reference-video.json')}))
     return 0
 

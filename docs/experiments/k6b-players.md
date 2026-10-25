@@ -2794,3 +2794,19 @@ Preserved spec/submit receipts locally `/tmp/k6b-refvideo-{spec,submit}.json`;
 output native `/jobs/fleet/inbox/20261025T163506Z-af342506/{smoke,full}/published.tar`.
 Three focused tests/configured ruff/mypy pass before dispatch. Inspect this ID
 before acting after interruption; never replay an uncertain submission.
+
+CPU job20261025T163506Z-af342506 failed at smoke validator: native fleet
+releases scratch before invoking it. Codec smoke itself completed9 rows with
+valid actual container track decodes,59.019865CPU-s; all artifacts preserved
+(smoke TAR4cc81a7466e3137fd833c54aaec92fa0f7738456aa61798cfab3613f3a6b56fe).
+The defect was validator artifact access, not codec output. Corrected validation
+extracts the immutable published TAR and independently decodes each delivered
+track, checks original native-decoded hashes and saved conditioning hashes,
+plus exact aligned packets and frozen packet input SHA. Both full and smoke
+now run these checks before publication as well. Original encoding path/settings
+unchanged. Failed admitted interval70.207587s charged conservatively as280.830348
+CPU-s. Retry is diagnosed, not replay of uncertain work; new cap1500s at4CPUs,
+plus failed280.831 and480local allowance =6760.831CPU-s <7200.
+Full local suite872passed/25skipped; two platform constraints: macOS protected
+symlink assertion and sandbox denial of ps process-state inspection. Focused
+contracts/configured ruff/mypy pass. No GPU used.
