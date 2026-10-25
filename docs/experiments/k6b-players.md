@@ -3087,3 +3087,9 @@ clarifications are in the current card/repository, not retroactive measurements.
 Publication push initially encountered an automatic approval-review usage-limit
 failure; the command was not executed and was not judged unsafe. After the user
 asked to continue, the same normal review path succeeded. No approval bypass.
+
+CPU code/report published as PR#241 (https://github.com/emanuele-artioli/PointStream/pull/241).
+Native evidence is remotely verified/read-only; local checks above pass with
+known platform exception. Linux CI pending; enable merge-commit auto-merge per
+AGENTS. New4.5GPU-h plus<=3600CPU-s preflight budget remains unapproved; no
+GPU submission/generation. This publication does not grant compute authority.
