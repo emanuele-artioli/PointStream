@@ -3124,3 +3124,22 @@ is supported by original12.21GiB measured peak and revalidated by native smoke.
 All Ada GPUs busy; gpu5 has18777MiB free on both, gpu6 has19971MiB on one,
 so full compatible gpu5/6 pool is retained. No latency claim. Full controls
 may run while presetCPU executes; no new neural quality scores opened.
+
+PNG-control Al031 job `20261025T183259Z-16af35e8` submitted sourcee4b7a3a9 specSHA256`9e4e86be961d104ebc2b3806ea6beeb5a0aa351cd68fb2546998edbbb37e7288`; <=2000GPU-s reservation,14,000MiB, bothAda hosts. No candidate rendering yet.
+
+PNG-control Med014 job `20261025T183318Z-34d149af` submitted sourcee4b7a3a9 specSHA256`d6a7fb8fffadfd827091fdcb01939542f3253746903a81fdb53e5c064dc3166a`; <=2000GPU-s reservation. Combined controls reserve4000/14400referenceGPU-s; no candidate submission.
+
+CPU preset jobcomplete gpu3; full12rows, all native checks pass. ArchiveSHA256
+984f9b256e69c9b13643d3381b7a5e4b95fba3f641f22f41c510dc90839d93d1.
+Measured native executionCPU smoke12.535246/full59.181003s; conservative
+admitted4CPU bound320.786816s. Full programwall31.416s. Preset1 dominates
+preset4 AND prior8 on allthree families/bothmatches: fewer bytes, lowerFGMSE,
+segmentedIoU nondecreasing. Freeze preset1/CRF20/halfsize before quality.
+BankbytesAl/Med full48164/68193; alpha54934/58797; affine43870/47493.
+Decoded prepared variants materialized for original6units; only reference arrays
+change, all motion/geometry/timing/seed identity retained. NewSHA full03953043e4b4d3d4e4f70591afbc462a385d9347862985e43117cfea3b404547,
+alpha13230a0620906ae8f0dc834c76860268411bf7d3c29ba0ed1444141a9723db41,
+affine3fbcc34e8b174ee139981526e3d07afe8d52d3cfd06a7c124304cc98e62b0e7e.
+RemainingCPU permits representative8frame dense preset4/1 alpha+affine checks,
+430s supervised x4=1720CPU-s reservation; totalbound320.786816+1720+400local
+=2440.786816 <3600. These shortGOPs cannot establish full240frame rates.

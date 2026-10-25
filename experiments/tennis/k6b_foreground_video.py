@@ -19,6 +19,7 @@ import numpy as np
 
 from experiments.tennis.k6b_rate_streams import decode_masks, decode_keypoints
 from experiments.tennis.k6b_rate_transport import array_sha, sha, write
+from experiments.tennis.k6b_reference_affine import lift, unlift
 from experiments.tennis.k6b_reference_video import (
     CRFS, black_key, recover_key, overlap, command, ffmpeg_args,
     rgb_yuv, code_yuv, back_rgb, container,
@@ -65,7 +66,7 @@ def validate(root: Path) -> dict[str, Any]:
               'settings': {(r['window'], r['crf'], r['kind'], r['floor']) for r in result['rows']} == {tuple(x) for x in result['expected_points']},
               'sources': [r['source_sha256'] for r in result['sources']] == list(SOURCE_SHA),
               'frames': n in (8, 240)}
-    if n == 8 and all(row['crf'] == 63 for row in result['rows']):
+    if n == 8 and result.get('preset', 8) == 8 and all(row['crf'] == 63 for row in result['rows']):
         # Historical full-window pilot provides the measured scale basis, not a smoke-only guess.
         projected = 818.7586409798823/7*4 + 150
         checks['historical_full_scale_projection_under_660s'] = projected < 660
@@ -90,7 +91,8 @@ def main() -> int:
     parser.add_argument('--source', type=Path, action='append', default=[])
     parser.add_argument('--frames', type=int, choices=(8, 240), default=8)
     parser.add_argument('--crfs', default='20,35,50')
-    parser.add_argument('--formats', choices=('all', 'robust'), default='all')
+    parser.add_argument('--formats', choices=('all', 'robust', 'affine'), default='all')
+    parser.add_argument('--preset', type=int, choices=(1, 4, 8), default=8)
     parser.add_argument('--validate', action='store_true')
     args = parser.parse_args()
     stage = Path(os.environ['PS_STAGE_DIR'])
@@ -113,7 +115,7 @@ def main() -> int:
     crfs = tuple(int(q) for q in args.crfs.split(','))
     if crfs not in (CRFS, (63,)):
         raise ValueError('Undeclared CRF refinement')
-    formats = (('alpha', 0), ('black', 32)) if args.formats == 'robust' else (('alpha', 0), ('black', 1), ('black', 32))
+    formats = (('alpha', 0), ('black-affine', 32)) if args.formats == 'affine' else (('alpha', 0), ('black', 32)) if args.formats == 'robust' else (('alpha', 0), ('black', 1), ('black', 32))
     n, w, h = args.frames, 960, 540
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
     publish = scratch/'publish'
@@ -121,7 +123,7 @@ def main() -> int:
     with tarfile.open(args.transport) as tar:
         tar.extractall(scratch/'packets', filter='data')
     result: dict[str, Any] = {'windows': list(PILOTS), 'rows': [], 'sources': [], 'frames': n,
-        'expected_points': [[wid, q, kind, floor] for wid in PILOTS for q in crfs for kind, floor in formats],
+        'preset': args.preset, 'expected_points': [[wid, q, kind, floor] for wid in PILOTS for q in crfs for kind, floor in formats],
         'gpu_hours': 0, 'cuda_visible': os.environ['CUDA_VISIBLE_DEVICES'],
         'code_sha256': sha(Path(__file__).read_bytes()), 'packet_archive_sha256': sha(args.transport.read_bytes()),
         'tools': {tool: svtav1.tool(tool) for tool in ('ffmpeg', 'dav1d', 'SvtAv1EncApp')},
@@ -156,21 +158,23 @@ def main() -> int:
         np.concatenate([y, np.full((n, h*w//2), 128, np.uint8)], 1).tofile(alpha_raw)
         source_preparation_seconds = time.monotonic()-began-sum(row.get('point_wall_seconds', 0) for row in result['rows'])
         for crf in crfs:
-            alpha_rec = code_yuv(alpha_raw, scratch/f'{label}-alpha-q{crf}', n, w, h, crf, kmeta['fps'][0])
+            alpha_rec = code_yuv(alpha_raw, scratch/f'{label}-alpha-q{crf}', n, w, h, crf, kmeta['fps'][0], preset=args.preset, timeout=240)
             back_alpha = np.fromfile(alpha_rec['decoded'], np.uint8).reshape(n, -1)[:, :w*h].reshape(n, h, w) >= 128
             for kind, floor in formats:
                 point_began = time.monotonic()
                 tag = f'{label}-{kind}-{floor}-q{crf}'
                 root = scratch/tag
                 root.mkdir()
-                rgb = black_key(original, alpha, floor) if kind == 'black' else np.where(alpha[..., None], original, 0).astype(np.uint8)
+                rgb = lift(original, alpha) if kind == 'black-affine' else black_key(original, alpha, floor) if kind == 'black' else np.where(alpha[..., None], original, 0).astype(np.uint8)
                 raw, forward = rgb_yuv(rgb, root)
-                coded = code_yuv(raw, root/'codec', n, w, h, crf, kmeta['fps'][0])
+                coded = code_yuv(raw, root/'codec', n, w, h, crf, kmeta['fps'][0], preset=args.preset, timeout=240)
                 restored, inverse = back_rgb(coded, n, w, h, root)
-                decoded_alpha = recover_key(restored, floor) if kind == 'black' else back_alpha
+                decoded_alpha = recover_key(restored, floor) if kind in ('black', 'black-affine') else back_alpha
+                if kind == 'black-affine':
+                    restored = unlift(restored)
                 contract = {'window': wid, 'frames': n, 'size': [w, h], 'output_size': [1920, 1080],
                             'source_start': kmeta['clip_local_source_start'], 'fps': kmeta['fps'],
-                            'kind': kind, 'floor': floor, 'key_threshold': (floor+1)//2 if floor else None,
+                            'kind': kind, 'floor': floor, 'preset': args.preset, 'key_threshold': (floor+1)//2 if floor else None,
                             'rgb_restore': 'bicubic', 'alpha_restore': 'bilinear>=0.5',
                             'matrix': 'bt709', 'range': 'full', 'alpha': 'saved-SAM-union-both-players',
                             'tracks': ['color', 'alpha'] if kind == 'alpha' else ['color'],
