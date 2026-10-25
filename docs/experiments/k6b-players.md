@@ -3206,3 +3206,19 @@ inside600total.<=600sleft for7historicalhighrateAlpoints ifbudget/runtimeallow.
 No additionalreferencefamily/presetvariant. Allselecteddense/refpresetsfrozen
 beforeANYnewquality. Currentreferencecontrols stillrunning, no candidate
 submission until fullcontrol cost/validity checked.
+
+DenseactualqualityAl job `20261025T185239Z-1df3ec6f` sourcee182ad15 specSHA256`0fec287d438057d72f0b7ec94fa929f1d02a74b0f88d7ff33259eb9d4ba8b5cf`;600GPU-s reserved/1800densecap. Nativepoolgpu5/6,12000MiB, firstactualnewqualitystage; allpresetchoices frozen above.
+
+DenseAlquality20261025T185239Z-1df3ec6f FAILED correctnesssmoke beforeany
+qualityvalues, nofullstarted. Native27.006871s execution/44.123715s admitted
+charged to1800denseGPU-s. NativecontainerYUVhashes passed; combinedRGB/source
+pixelhash gatefailed. Diagnose separately instead of weakening packet/pixel
+hashes. CarrierCPU originalconversion was torchCPU; originalmetrictruth uses
+torchCUDA. Corrected gate computes exactCPUsource independently fromsameYUV,
+retains originalnativeCUDAtruth for metrics/control, records bothhashes and
+channel/maxdifference, requires<=1levelCPUvsCUDAroundoff. DecodedcarrierRGB
+andalpha still require EXACT originalCPUpixelhashes. Ifthese fail, logeach
+check and stop; no unproven continuation. Existingfulloriginalcontrolwithin1e-4
+remainsunchanged. Correctedjob mustprove thisdiagnosis in native smoke.
+Densefuture reservation44.123715+600Alretry+600Med+550historical=1794.123715
+<1800GPU-s; nobudgetincrease or oldledgerreuse.

@@ -79,6 +79,8 @@ def judge_window(wid: str, anchor: Path, old_control: Path, packets: Path,
     from experiments.visor.h3b import lpips_reduce, dists_crops
     from src.segmentation.masks import decompress
     from experiments.tennis.k6b_reference_affine import unlift
+    from src.codecs.quality import read_frames, yuv420_to_rgb
+    import torch
 
     began = time.monotonic()
     native_window = k6b.k6_window(anchor)
@@ -120,10 +122,18 @@ def judge_window(wid: str, anchor: Path, old_control: Path, packets: Path,
     arrays = {m: np.full((len(names), 240), np.nan) for m in ('lpips', 'dists', 'full_sse', 'outside_r_sse', 's_sse', 'mask_fp', 'mask_fn')}
     row: dict[str, Any] = {'id': wid, 'variants': names, 'judged': [], 'expected_judged': requested,
         'original_judged': native['judged'], 'scoring_masks': {}, 'source_sha256': sha(source.read_bytes()),
-        'source_conversion': convert_record, 'composite_sha256': {}, 'carrier_receipts': [
+        'source_conversion': convert_record, 'source_cpu_vs_native_gpu': {}, 'composite_sha256': {}, 'carrier_receipts': [
             {k: c[k] for k in ('name', 'container', 'kbps_whole_window', 'archive_sha256')} for c in carriers]}
     for n, t in enumerate(requested):
         truth_t = np.array(truth[t])
+        cpu_source = None
+        if carriers:
+            planes = torch.from_numpy(read_frames(work/'source.yuv', 1920, 1080, t, 1))
+            cpu_source = yuv420_to_rgb(planes, 1920, 1080, full_range=False)[0].permute(1, 2, 0).to(torch.uint8).numpy()
+            delta = np.abs(cpu_source.astype(np.int16)-truth_t.astype(np.int16))
+            row['source_cpu_vs_native_gpu'][str(t)] = {'cpu_sha256': array_sha(cpu_source), 'native_gpu_sha256': array_sha(truth_t), 'max_abs_difference': int(delta.max()), 'different_channels': int(np.count_nonzero(delta))}
+            if delta.max() > 1:
+                raise ValueError('CPU/carrier and nativeGPU source conversion differ beyond1level')
         r = np.logical_or.reduce([*regions[t].values(), np.zeros((1080, 1920), bool)])
         fill = k6.telea_fill(truth_t, r)
         _, drawn = k6b.k6_oracle(t, native_window, k6.variant_names()[-9:], truth, regions, fill,
@@ -156,8 +166,12 @@ def judge_window(wid: str, anchor: Path, old_control: Path, packets: Path,
             frames.append(canvas)
             supports.append(alpha)
             diag = c['diagnostic_only']
-            if array_sha(truth_t) != diag['original_rgb_frame_sha256'][t] or array_sha(image) != diag['decoded_rgb_frame_sha256'][t] or array_sha(alpha) != diag['decoded_alpha_frame_sha256'][t]:
-                raise ValueError('Actual dense decoded pixels differ from CPU evidence')
+            pixel_checks = {'source_cpu': array_sha(cpu_source) == diag['original_rgb_frame_sha256'][t],
+                'decoded_rgb': array_sha(image) == diag['decoded_rgb_frame_sha256'][t],
+                'decoded_alpha': array_sha(alpha) == diag['decoded_alpha_frame_sha256'][t]}
+            if not all(pixel_checks.values()):
+                write(Path(os.environ['PS_STAGE_DIR'])/'pixel-mismatch.json', {'window': wid, 't': t, 'variant': c['name'], 'checks': pixel_checks, 'source_roundoff': row['source_cpu_vs_native_gpu'][str(t)]})
+                raise ValueError('Actual dense decoded pixels differ from CPU evidence: '+json.dumps(pixel_checks))
         lp = lpips_reduce(nets['lpips'], frames, truth_t, [[s, support] for support in supports], 'cuda')
         ys, xs = np.nonzero(s)
         crop = (slice(max(0, ys.min()-k6.DISTS_PAD), min(1080, ys.max()+1+k6.DISTS_PAD)),
