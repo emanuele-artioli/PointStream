@@ -54,7 +54,9 @@ def report(diagnostic: Path, transport: Path, conditioning: Path, archives: list
                     continue
                 if variant in dense:
                     c = dense[variant]
-                    rate = c['kbps_whole_window']
+                    rate = c['container']['bytes']*8/base['registered_seconds']/1000
+                    if abs(rate-c['kbps_whole_window']) > 1e-9:
+                        raise ValueError('Dense source/registered duration differs')
                     rate_components = {'whole_delivered_color_and_alpha_container_kbps': rate}
                     scope = 'continuous-foreground-video-no-generator-no-keypoints-no-adapter'
                 elif reference_kind:
@@ -71,6 +73,11 @@ def report(diagnostic: Path, transport: Path, conditioning: Path, archives: list
                     'rate_components': rate_components, 'scope': scope,
                     'primary': {m: comparison(actual, m, rate) for m in ('lpips', 'dists')},
                     'base_charged': {m: comparison(actual, m, rate+base['base_checkpoint_bytes']*8/7200/1000) for m in ('lpips', 'dists')}}
+                if reference_kind:
+                    exact_rate = wire[wid]['mattes']['exact']['bytes']*8/base['registered_seconds']/1000
+                    cell['exact_dynamic_matte_paid'] = {'kbps': rate+exact_rate, 'matte_kbps': exact_rate,
+                        'same_measured_quality': True, 'packet': wire[wid]['mattes']['exact'],
+                        'primary': {m: comparison(actual, m, rate+exact_rate) for m in ('lpips', 'dists')}}
                 cells.setdefault(variant, []).append(cell)
     settings = {}
     for variant, rows in cells.items():

@@ -3184,3 +3184,5 @@ expansion. Measuredfullpreset4wall x measured8framepreset1/4ratio +75smargin
 <3600CPU-s. Densepreset4fallbackremainsunlessfullpreset1dominatesglobal
 bytes/IoU/FGerror; choosebeforeANYnewdensequalityscores. This resolves
 shortGOPuncertainty with available approvedCPU, withoutnewGPUvariants.
+
+Finaldensepreset1 CPUjob `20261025T184630Z-ace7057c` sourceecf496b1 specSHA256`d619552b0480fa40acec137b89721208cd02d8161b5f048f5fcbe358dc75ee92`;430s4CPU reservation; remainingcap as above.

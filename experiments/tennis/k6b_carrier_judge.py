@@ -23,7 +23,7 @@ from experiments.tennis.k6b_rate_transport import array_sha, sha, write
 from experiments.tennis.k6b_reference_video import command, ffmpeg_args
 
 
-def unpack_carriers(archives: list[Path], scratch: Path, crfs: list[int]) -> dict[str, list[dict[str, Any]]]:
+def unpack_carriers(archives: list[Path], scratch: Path, crfs: list[int], windows: list[str]) -> dict[str, list[dict[str, Any]]]:
     out: dict[str, list[dict[str, Any]]] = {w: [] for w in PILOTS}
     for i, archive in enumerate(archives):
         root = scratch/str(i)
@@ -33,7 +33,7 @@ def unpack_carriers(archives: list[Path], scratch: Path, crfs: list[int]) -> dic
         if report['frames'] != 240:
             raise ValueError('Only complete240-frame delivered carriers can be judged')
         for row in report['rows']:
-            if row['window'] not in out or row['crf'] not in crfs:
+            if row['window'] not in windows or row['crf'] not in crfs:
                 continue
             rec = row['container']
             path = root/'publish'/rec['file']
@@ -254,7 +254,7 @@ def main() -> int:
     for label, path in a.generated:
         labels.setdefault(label, []).append(path)
     generated = {label: load_generated(paths, scratch/label) for label, paths in labels.items()}
-    carriers = unpack_carriers(a.carrier, scratch/'carriers', [int(q) for q in a.crfs.split(',')])
+    carriers = unpack_carriers(a.carrier, scratch/'carriers', [int(q) for q in a.crfs.split(',')], a.windows)
     nets = {'lpips': load_lpips(a.backbone[0], 'cuda'), 'dists': load_dists(a.backbone[1], 'cuda')}
     sources = {sha(source.read_bytes()): source for source in a.source}
     result: dict[str, Any] = {'rows': [], 'requested': a.windows, 'device': device, 'memory_limit_mib': limit,
