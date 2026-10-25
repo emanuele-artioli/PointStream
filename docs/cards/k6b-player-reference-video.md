@@ -96,3 +96,49 @@ bounds and480local allowance. If unavailable, preserve this concrete stage as
 pending; no unbounded CPU extension. New GPU quality scoring/generation remains
 budget-gated. This stage is a separate representation, not a silent renderer
 change or a new independent-confirmation claim.
+
+Dense CPU job `20261025T164351Z-3d27fbbf` submitted, source`ab54b032`, specSHA256`fd8534155bac7bc26c084d9a4563698a880a9bc2936f5613155b390b87ecb8ea`.
+1200s total supervisor cap,4threads,0GPU; native deadline2026-10-25T17:18:29.510627+00:00.
+Record immutable native source+packet hashes, original conversion/frame identity,
+delivered container RGB/alpha splits; no uncertain replay after interruptions.
+
+## Concrete next GPU stage — proposed, not authorized
+
+Keep separate new sub-ledgers, combined cap4.5GPU-hours; old GPU budgets closed.
+First dense saved-carrier judging <=0.5GPU-h (estimate0.25): all18 CPU encoded
+points on the two original windows, all original judged frames, native composite
+onto the same original Telea background, fixed original R and oracle-union S;
+charge actual container/window registered duration. Original-output metric
+control within1e-4, finite CUDA LPIPS/DISTS, peak<=24GiB and input/frame/decoded
+hashes. Report per-window3point PCHIP BD-rate against achievable envelopes and
+strict bracketed cells. This pilot cannot establish18/24 on12 windows. Three
+<=600s parts (all18 points split byCRF); substantive<=60s smoke, all stages<=45min.
+
+Then actual reference-conditioned generation <=4.0GPU-h (estimate3.1), if separately
+approved as part of this combined request. Fix half-size SVT-AV1 CRF20 preset8
+for all candidates: highest tested fidelity, already well inside free-matte
+fixed-quality reference headroom on both matches. Compare unmasked bank, explicit
+alpha segmented bank, black-key floor32 bank (threshold16), plus original PNG
+control on Al031/Med014. Decode real delivered container, bicubic RGB restoration
+and alpha bilinear>=.5; segmented conditioning sets outside recovered alpha to
+black after restoring. No random seed/pose/crop/renderer/context/adapter change.
+This produces3 candidates x2windows plus2 full original controls =8 window renders.
+Native original runs took1232.62/1247.34s per window on Ada, about2.76h for8;
+reserve0.34h judging/smokes/overhead in estimate,1.24h cap margin. Eight <=1450s
+stages including <=60s real smoke, <=1300s full/validation/overhead, then <=600s
+metric stage and remaining reserve. GPUclass/Ada existing compatible poolgpu5/6,
+fleet recheck required. Save each finished unit/window, stop on failure/cap.
+
+Original PNG control must reproduce original saved judged crops/metrics under
+recorded tolerances, or investigate before candidate claims. Exact original
+matte is granted and disclosed in this reference-conditioning oracle; separately
+report selected paid dynamic-matte costs, with no pretending its image quality
+is unchanged. Recompute actual LPIPS/DISTS for each candidate with original R/S,
+same source frames and native paste/clipping/fallback. Pay actual bank7200s,
+KPS and adapter/guider; common base primary, actual base separately. Candidate
+pilot passes >=3/4 strictly bracketed cells (same75% descriptive target); no
+window-wise recipe selection, no12-window success inferred. Rank by achieved
+strict cells then delivered rate, keep Pareto tradeoffs. A full12-window actual
+quality confirmation requires a further explicitly sized budget and unchanged
+cohort. Failure of this pilot closes only tested recipes. Background/source
+independence/granted-matte limitations persist. No fitting or Wan-Animate.

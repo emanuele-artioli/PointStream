@@ -2826,3 +2826,89 @@ representation; all container bytes are paid over each window, common background
 still granted. Initial8frame smoke, full240; actual CPU reservation must fit the
 remaining unchanged7200CPU-s total after prior attempts. No new quality-based
 window/parameter choices. CPU FP/FN/IoU/MSE are not neural-judge evidence.
+
+Corrected sparse CPU job20261025T163852Z-1d6ee39a complete; full54 settings,
+4 exact alignment packets, substantive smoke/full checks passed. Native admitted
+191.603102s plus failed70.207587s => conservative1047.242756CPU-s so far.
+Dense reservation1200s x4CPUs +480local allowance gives total6327.242756CPU-s,
+inside unchanged7200. Native packed environment unchanged; dense sourceab54b032,
+smoke180s,full850s,validator60s,overall1200s. Before dispatch verified previous
+job terminal and re-inspected complete eligible CPU pool. Dense source native
+conversion/frame hashes and actual post-container video decodes are required.
+Sparse full TAR SHA2562e80a76d8e7ba1bc5bd6dcdadf6892cf465a5568c1377fa06f2760822f424e1d;
+no new neural quality result. No GPU budget has been spent or reopened.
+
+Dense CPU job `20261025T164351Z-3d27fbbf` submitted, source`ab54b032`, specSHA256`fd8534155bac7bc26c084d9a4563698a880a9bc2936f5613155b390b87ecb8ea`.
+1200s total supervisor cap,4threads,0GPU; native deadline2026-10-25T17:18:29.510627+00:00.
+Record immutable native source+packet hashes, original conversion/frame identity,
+delivered container RGB/alpha splits; no uncertain replay after interruptions.
+
+### Sparse/reference CPU outcome (dense carrier still in progress)
+
+Complete job20261025T163852Z-1d6ee39a, codeb257ee03;54 points =30 reference-bank
+settings plus24 dynamic-mask settings,4 reversible alignment packets. Both
+native stages independently check actual delivered container decodes and
+conditioning hashes; no new neural metric/generation. Independent local88
+packet, alignment and saved RGB/alpha conditioning checks pass. CPU report can
+be reproduced with `python -m experiments.tennis.k6b_reference_report --archive
+PUBLISHED_TAR --diagnostic ORIGINAL_DIAGNOSTIC --transport ORIGINAL_TRANSPORT
+--out REPORT` (paths as native receipts).
+
+Reference bank bytes (all12 references per match,256x392 restored512x784,
+actual container/index/restore metadata paid, preset8):
+
+| Recipe | CRF | Alcaraz bytes | Medvedev bytes | reference-mask IoU Al/Med | foreground RGB MSE Al/Med |
+|---|---:|---:|---:|---|---|
+| unmasked RGB |20|53793|75843|not applicable|25.52 /33.44|
+| unmasked RGB |35|28054|39040|not applicable|44.21 /53.85|
+| unmasked RGB |50|14149|18291|not applicable|100.14 /123.97|
+| color+alpha |20|89838|95327|.9865 /.9868|35.74 /51.67|
+| color+alpha |35|50905|54892|.9865 /.9868|58.31 /77.47|
+| color+alpha |50|28210|30393|.9865 /.9867|137.45 /170.58|
+| black floor1 |20|61608|66634|.8386 /.8452|35.76 /51.57|
+| black floor1 |35|32572|36317|.7690 /.7632|58.46 /77.33|
+| black floor1 |50|16887|18743|.5933 /.6058|137.29 /174.56|
+| black floor32 |20|61458|66513|.9833 /.9806|51.38 /62.81|
+| black floor32 |35|32077|35977|.9783 /.9761|73.81 /88.57|
+| black floor32 |50|16670|18660|.9538 /.9540|150.23 /183.25|
+
+Intermediate floor8 has IoU.9466/.9496 atCRF20,.9149/.9185 at35,.8184/.8399 at50;
+its banks are essentially the same size asfloor1. Raising all foreground RGB
+channels to1 disambiguates pure black *before coding*, but measured lossy output
+creates substantial false positives;32 improves the guard band at the expense
+of dark foreground colors. Explicit alpha costs more but avoids that clipping.
+These are pooled reference-pixel diagnostics, not temporal matte/generation
+quality. Unmasked references need no alpha; their all-one comparison mask is
+not an error claim. Native post-container track pixels equal dav1d output.
+
+Original PNG banks895487/1179150B; half-JPEG70 prior92631/117396B. The new CRF20
+unmasked bank is94.0%/93.6% belowPNG; CRF35 is96.9%/96.7% belowPNG. All15 new
+bank recipes give19/24 strict cells at *unchanged original generated quality*
+with actual KPS/adaptation,7200s bank lifetime and free dynamic mattes. This is
+only a sensitivity; actual changed-conditioning quality is untested. Sparse
+bank order is unitID, not proven chronology or same-player tracking. This does
+not isolate the causal gain of inter prediction from the codec/resize change;
+no all-intra ablation or JPEG AI implementation was tested.
+
+Dynamic masks: atscale8, all tested binary/SDF AV1 points cost more than the
+existing H5 route. Al031 two-player payload totals (including packet metadata):
+binary CRF20/35/50=164123/90565/37031B; SDF=71717/37283/18110B. Med014:
+binary200564/87028/25630B; SDF54141/26143/13476B. Plain separate H5 streams sum
+16414/10658B before shared timing metadata, substantially below video. The
+cheapest SDF is also much less accurate: Al IoU.6638/.7382 and boundary F.5801/.6171;
+Med.7396/.6257,F.6328/.6076 versus respective H5 AlIoU.8466/.8796,F.9325/.9326,
+MedIoU.8694/.8140,F.9294/.9339. These mask diagnostics are on960x540 native grid;
+boundary tolerance1native pixel=2 full pixels. No matched-accuracy video saving.
+Exact translation alignment also loses: Al7412+10216 vs6451+9963B; Med7209+5216
+vs6335+4323B. Alignment packets include shifts/headers; no claim that all
+pose-aware predictors or residual coders have been exhausted.
+
+Candidate freeze before new generated quality:half-size CRF20 preset8, one
+fixed recipe each: unmasked bank, explicit-alpha segmented bank, blackfloor32
+segmented bank. CRF20 is highest tested image fidelity and all its bank rates
+already fit the optimistic free-matte headroom. Segmented client conditioning
+zeros outside recovered full-size alpha after restoration. No tuning against
+new generated scores, no per-window recipe selection. Native original-reference
+control required. Detailed proposed new GPU budget/stages in card:0.5h dense
+judging plus4.0h two-window actual-generation pilot, combined4.5h maximum,
+estimate3.35h. This request is not authorized by the older closed ledgers.
