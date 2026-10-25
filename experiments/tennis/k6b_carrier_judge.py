@@ -122,7 +122,7 @@ def judge_window(wid: str, anchor: Path, old_control: Path, packets: Path,
     arrays = {m: np.full((len(names), 240), np.nan) for m in ('lpips', 'dists', 'full_sse', 'outside_r_sse', 's_sse', 'mask_fp', 'mask_fn')}
     row: dict[str, Any] = {'id': wid, 'variants': names, 'judged': [], 'expected_judged': requested,
         'original_judged': native['judged'], 'scoring_masks': {}, 'source_sha256': sha(source.read_bytes()),
-        'source_conversion': convert_record, 'source_cpu_vs_native_gpu': {}, 'composite_sha256': {}, 'carrier_receipts': [
+        'dists_effective_batch': min(4 if len(names) > 5 else 6, len(names)), 'source_conversion': convert_record, 'source_cpu_vs_native_gpu': {}, 'composite_sha256': {}, 'carrier_receipts': [
             {k: c[k] for k in ('name', 'container', 'kbps_whole_window', 'archive_sha256')} for c in carriers]}
     for n, t in enumerate(requested):
         truth_t = np.array(truth[t])
@@ -178,7 +178,13 @@ def judge_window(wid: str, anchor: Path, old_control: Path, packets: Path,
         ys, xs = np.nonzero(s)
         crop = (slice(max(0, ys.min()-k6.DISTS_PAD), min(1080, ys.max()+1+k6.DISTS_PAD)),
                 slice(max(0, xs.min()-k6.DISTS_PAD), min(1920, xs.max()+1+k6.DISTS_PAD)))
-        di = dists_crops(nets['dists'], [image[crop] for image in frames], truth_t[crop], s[crop], 'cuda')
+        # DISTS' default batch6 exceeds12GB for the eight-variant historical curve.
+        # Four is bounded by the full-window five-variant memory evidence.
+        if len(frames) > 5:
+            di = [value for first in range(0, len(frames), 4) for value in
+                dists_crops(nets['dists'], [image[crop] for image in frames[first:first+4]], truth_t[crop], s[crop], 'cuda')]
+        else:
+            di = dists_crops(nets['dists'], [image[crop] for image in frames], truth_t[crop], s[crop], 'cuda')
         values = np.array([[v[0] for v in lp], di])
         control_error(values[:, 0], expected_control[:, t])
         if not np.isfinite(values).all():

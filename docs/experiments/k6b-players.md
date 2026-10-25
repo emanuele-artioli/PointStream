@@ -3307,3 +3307,16 @@ validator/1000stotal. FinalPNGassembled4unitsacrossbothwindows mustpass
 fulloriginalneuralcontrolwithin1e-4 orinvestigate/stop. No oldcropreplacement
 for newcontrol. Referenceknownspent3954.938403GPU-s (3failedjobs);
 Almissing1000+Medmissing1000reserves =>5954.938403/14400s beforecandidates.
+
+MissingMedplayer004 control job `20261025T192327Z-591cb699` sourceee0de5da specSHA256`44d1be9f15f30c7d6051a80e379725a290d5d8e578d355c8ba9fdb78e46d39bf`;1000GPU-sreserved, full240context, existing003checkpoint retained; strictPNGscoregate unchanged.
+
+HistoricalAlstage20261025T190813Z-810bcaba terminalFAILED CUDAOOM in
+DISTSdefaultbatch6 duringfullrun;141.266623GPU-sadmittedcharged,
+81.831284sfullprocess. Smoke1framepeak6.829663GiB didnotcoverlarger
+laterfrozenS crop. No completecurve used. Correctresourceconfiguration
+ONLY: chunkDISTSinto4imagesfor>5variants; samefunction/weights/pixels/R/S,
+controltolerance1e-4unchanged. FullAl5variantnativepeak8.686928GiB across
+all80framesbounds chunk4byshape. Retest4originaljudgedframes instead1,
+75ssmoke/480sfull/20svalidator/600stotal. Actualdense503.504413+failed
+141.266623+reserve600=1244.771036<1800s. NoGPUcapincrease, no curve
+quality/CRF/presetselectionchange. Preservefailedpartialmetricsseparately.
