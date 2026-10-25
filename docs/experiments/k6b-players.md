@@ -2810,3 +2810,19 @@ plus failed280.831 and480local allowance =6760.831CPU-s <7200.
 Full local suite872passed/25skipped; two platform constraints: macOS protected
 symlink assertion and sandbox denial of ps process-state inspection. Focused
 contracts/configured ruff/mypy pass. No GPU used.
+
+Corrected CPU job submitted `20261025T163852Z-1d6ee39a`, source`b257ee03`,1500s cap
+inside unchanged7200CPU-s total. Both stages independently validate actual
+published codec evidence. No new GPU authority is implied.
+Retry spec SHA256`e51b1a762307ea18f79bf6c461a7c332a051beef0d59420c73486d96ee5240d5`; native deadline remains17:18:03UTC.
+
+Before dense carrier measurements, clarify user scope: also compare continuous
+foreground appearance, not only sparse reference banks. Dense CPU pilot is
+preregistered in the same card (Al031/Med014,240 identical original frames,
+960x540 area RGB, exact saved SAM union;3CRFs20/35/50;actual color+alpha container
+versus black RGB floors1/32;native source conversion, same decode/restore rule).
+No generator/keypoint/adapter cost applies to this separate foreground-video
+representation; all container bytes are paid over each window, common background
+still granted. Initial8frame smoke, full240; actual CPU reservation must fit the
+remaining unchanged7200CPU-s total after prior attempts. No new quality-based
+window/parameter choices. CPU FP/FN/IoU/MSE are not neural-judge evidence.

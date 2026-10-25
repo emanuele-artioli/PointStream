@@ -64,3 +64,35 @@ CPU job20261025T163506Z-af342506 submitted, sourceb3d39171, deadline17:18:03UTC
 on2026-10-25.1680supervised seconds at4threads inside7200CPU-s new ledger,0GPU.
 Same spec and native inputs as experiment entry. One attended native bounded
 wait; no monitors. Inspect existing ID after interruptions, never resubmit it.
+
+Corrected CPU job20261025T163852Z-1d6ee39a submitted after diagnosed validator failure;
+sourceb257ee03. First attempt terminal failed;59.019865CPU-s measured and
+280.831CPU-s conservative admitted bound charged. New1500s supervisory cap
+stays inside original7200CPU-s. Inspect the corrected existing ID before acting.
+
+## Clarified dense foreground extension (before new dense scores)
+
+The user's "that was my idea" also covers continuous foreground appearance.
+Include it as a separate CPU carrier pilot if remaining measured CPU allowance
+can cover it; do not substitute sparse reference coding for this request.
+First two original windows Al031/Med014, all240 frames. Native original limited
+YUV420 -> native rounded BT709 RGB, area-downsample to960x540; saved exact native
+SAM union for both players. Three CRFs20/35/50 preset8, color+union-alpha tracks
+versus black-key RGB floors1/32 (same fixed thresholds as sparse stage). Decode
+and split real delivered containers. Upsample RGB bicubic and union alpha
+bilinear>=0.5 for later native compositing. Original-background pixel values
+outside the foreground are not transmitted; common Telea background remains
+granted. This carries appearance every frame and does not use the generator,
+references, keypoints or match adapters; pay its entire container/window duration.
+It cannot claim a complete codec while the background is granted.
+
+Smoke first8frames of each original pilot window through every declared setting,
+full all240, same encoder/decoder path. Pure-black foreground guard-band control
+and actual independent container decodes remain mandatory. Record source/native
+conversion/frame hashes, FP/FN/IoU and foreground RGB MSE; scores are diagnostics,
+not LPIPS/DISTS claims. Finish/save each setting, deadline<=45min. Reserve only
+a cap that fits7200CPU-s minus both preceding attempts' conservative admitted
+bounds and480local allowance. If unavailable, preserve this concrete stage as
+pending; no unbounded CPU extension. New GPU quality scoring/generation remains
+budget-gated. This stage is a separate representation, not a silent renderer
+change or a new independent-confirmation claim.
