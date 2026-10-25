@@ -2637,3 +2637,87 @@ Complete CPU evidence `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-
 Publication retry succeeded through normal automatic approval review after the user asked to continue. Both evidence files were verified by remote SHA256 and made read-only; terminal events acknowledged. The earlier review failure was a usage-limit error, not an unsafe-action determination.
 
 CPU report published in PR #239 (`081f96c6` result commit), merge-commit auto-merge enabled; Linux CI pending at publication. Full report delivered to the planning chat. The earlier PR #236 merged after the user explicitly requested auto-merge; no merge approval remains blocked. CPU measurements ended before the original wall deadline; later usage-limit recovery resumed publication only, with no new compute.
+
+
+### 2026-10-25 — Approved GPU judging of saved compressed-matte composites
+
+**Authorization:** user explicitly approved the proposed maximum **0.75 GPU-hours (2700 GPU-seconds)**, estimated0.40 h, to finish the frozen saved-render judging. Separate ledger; old6.995428306/8 h diagnostic and completed CPU ledgers remain closed. Branch`codex/k6b-matte-judging` from merged CPU PR#239. No fitting, new generations, lossy-reference conditioning, segmentation inference, new chats/agents or monitors.
+
+**Question/hypothesis/alternative:** measure actual LPIPS/DISTS versus total rate at each predeclared1/8,1/16,1/32 H5 area/bilinear reconstruction using saved rectangular generated RGB. Hypothesis: at least one fixed scale reaches>=18/24 strictly bracketed window–metric wins with delivered matte, actual keypoints and PNG banks over 7200 s. Competing explanation: reduced mask/boundary fidelity and paid side information erase the original granted-matte advantage. Two CPU smoke frames showed actual metric changes; neither old unchanged-quality scores nor JPEG rate sensitivities decide this stage.
+
+**Frozen contract:** identical original 12 windows, original scored/judged frame sets (956 judged frames total), original exact R and oracle-union S with frame hashes, original source conversion, native far-to-near saved-crop clipping and same original exact-R Telea background. Decode the selected, already measured MTQ1 packets; verify units/shape/scale/hash against CPU artifact and actual KPS1 geometry. Keep generated pixels unchanged and preserve missing-crop fallback; never fill from target foreground. Score exact original control plus all three scales on every judged frame. Verify control against saved original GPU scores at absolute tolerance1e-4 per metric/frame, finite output for every expected variant/frame, original R/S identities, native model weights/versions/CUDA class, input hashes and model-memory cap.
+
+**Decision/accounting:** each scale uses all its windows, no per-window quality-based scale or coder choice. Fixed pixel-anchor achievable envelopes; strict interpolation only inside measured rate brackets, no extrapolated wins. Actual keypoint packet replaces pooled entropy once, plus all 240-frame matte packet bits, all 24 PNG references in match banks over 7200 s and existing adapter/guider over 7200 s. Common base shipped primary; actual48,878,567 bytes over 7200 s separate. Report per-match and per-cell. Lossy-reference pricing stays conditional and receives no generated-quality claim. Preserve source/replay uncertainty, two familiar broadcast clusters, granted matte history/target-derived background/fallback, exploratory 115 px and historical step 5 failure. This is not end-to-end compression.
+
+**Stages and hard budget:** four resumable parts, each three frozen windows, requested in original approved interleaved groups. Each native job reserves<=675 GPU-s total (sum<=2700), smoke<=60 s on first two windows/one original judging frame each, full<=540 s, substantive CPU validator<=30 s, remaining allowance for staging/validation. Only first part is promoted initially; its validated measured runtime must project remaining work within remaining allowance. Submit later parts sequentially; inspect existing IDs/host pool before dispatch. All wait stages<=45 min; attended bounded native fleet waits, no recurring wakeups. Save every completed window and partial per-frame checkpoints on scratch; preserve results on failure. No automatic replay.
+
+**Stop:** validity gate fails; remaining hard GPU budget cannot cover the next stage; any complete scale reaches the descriptive rule; or all scales are mathematically unable to reach18 even granting every unprocessed (and unresolved) cell a win. If the decision is already settled, report the measured prefix and honest optimistic bound rather than invent the unmeasured remainder. Any full-cohort descriptive number requires all original judging frames; partial results remain explicitly partial.
+
+Pre-dispatch implementation: new native module`experiments.tennis.k6b_matte_judge`, real original-score tolerance/partial-frame/optimistic-prefix tests;19 focused tests and configured ruff/mypy pass. GPU models are existing validated LPIPS/DISTS plain convolutions from fleet model–GPU table (Ada); code asserts actual parameters onCUDA, class and memory. Compatible poolgpu5/gpu6 inspected: both gpu5 GPUs lack24 GB free, gpu6 has an idle Ada with48 GB; dispatcher retains full compatible pool and claims the available device. Prior CPU job20261025T095755Z-f5de5e93 inspected terminal complete; existing fleet jobs preserved. Internal job time guard645 s sits inside675 s reserved per part, leaving30 s per-part reserve for supervisor overhead. Source, staged inputs and native commands pinned before dispatch.
+
+GPU part1 submitted: `20261025T135736Z-c830e267`, source`679f0f94`, spec SHA256`efc2b52c4c89e5874f1d913b9b441fa583ff98e4f1b6b97dbf7e9a0f42a6db22`. Windows Al031/Med014/Al013;675 GPU-s reserved of2700, zero known spent at submission. Only this part is active/promoted; later parts remain unsubmitted. Native request contains all immutable inputs and645 s supervised cap. Inspect this existing ID before any further action; no uncertain replay.
+
+GPU part1 job20261025T135736Z-c830e267 **failed in smoke before metric weights/scoring**: exclusive fleet does not export the shared-mode `PS_GPU_MEMORY_LIMIT_MIB` override. The new worker had indexed it unconditionally; existing native judge uses a24000 MiB fallback. Corrected to the explicit declared24 GB contract, honoring any smaller shared override and never exceeding24 GB; regression test added. No composite quality result was produced. Actual admitted interval10.262219 GPU-s is charged to this new ledger. Preserve the terminal job and artifacts. Corrected part1 is a new explicitly diagnosed attempt, not an uncertain replay. Tighten each remaining part's reserved occupancy to670 s and internal guard640 s;10.262219 +4×670=2690.262219 s stays within2700. Validated source/matte/rate/quality rules unchanged. Full local suite before this fix:870 passed/24 skipped, only unchanged macOS `/home` protected-path assertion failed.
+
+Corrected GPU part1 submitted `20261025T140128Z-2dfd517f`, source`a8faea75`, spec SHA256`2a9c8c59005396f12c59bbb653342d260fea94464bd67461ffd45ac434a2ebf6`.20 focused tests/configured ruff/mypy pass.10.262219 GPU-s known spent,670 s reserved for this part, later parts unsubmitted; overall cap2700 s. Prior failed job inspected and preserved.
+
+GPU corrected part1 job20261025T140128Z-2dfd517f **complete**, gpu6 Ada GPU1. Admitted occupancy432.463000 GPU-s; cumulative including failed smoke442.725219 s (0.122979228 h) of2700 s. All three windows' original judging frames complete; independent CPU report verifies full score arrays and original archived frame/R/S/control values, max control discrepancy2.80142e-5. All scales have0 known wins/6 measured cells,0 unresolved; optimistic total18/24 remains attainable, so do not stop yet. Pilot runtime379.68 s for three windows plus smoke/setup projects remaining stages within cap. Promote part2 only. Tighten operational stopping to each completed full window (same predeclared conservative bound), with effective/requested prefix and original three-window plan both recorded. Prior part1 immutable archive is SHA256-staged and independently validated before use; partial smoke never decides. Quality/model/packet/scoring settings unchanged.
+
+GPU part2 submitted `20261025T141239Z-93456964`, source`052df444`, spec SHA256`8b0a3815ebc8996d67b6893282df41be647a101d3370fcbefe460f8eafaaffec`. Planned Med037/Al023/Med002 with per-completed-window conservative stopping; prior part1 archive SHA256`d24508668cd4208cb0eaca54d9ce612113f92c26f60dc9d6017a098af528cef7`.442.725219 GPU-s spent,670 s reserved for this part,2257.274781 s total remaining before it. Parts3/4 remain unsubmitted.20 focused tests and configured ruff/mypy pass after checkpoint/independent-original-reference validation changes.
+
+
+#### GPU outcome — frozen criterion rejected; stopped after four complete windows
+
+**Decision:** each fixed matte scale (1/8,1/16,1/32) has **0 wins in 8 measured window–metric cells**, all strictly bracketed, no unresolved primary cells. Even if all 16 cells of the eight windows without complete scores won, each scale could reach at most **16/24**, below frozen 18/24. The predeclared optimistic-prefix rule therefore decides all three tested configurations; stop paid work. This is a valid negative bound on the declared12-window criterion, **not a claim that all12 were judged or that every remaining window loses**. No full-cohort mean or independent-match confirmation is reported.
+
+Measured windows: Alcaraz–Hurkacz031@129 and013@213; Medvedev–Struff014@194 and037@349. All original judged frames completed in each (320 total), original R/S hashes unchanged. Alcaraz0/4 and Medvedev0/4 measured cells per scale. Source/replay independence remains unresolved; these are two familiar broadcast clusters, not four independent matches.
+
+**Execution and budget:**
+
+| Native job | Result | Admitted GPU seconds |
+|---|---|---:|
+|`20261025T135736Z-c830e267`|setup smoke failed before scoring; preserved|10.262219|
+|`20261025T140128Z-2dfd517f`|part1 complete,3 windows|432.463000|
+|`20261025T141239Z-93456964`|part2 stopped after1 complete window by frozen bound|160.904566|
+
+Total **603.629785 GPU-s = 0.167674940 GPU-h of 0.75**, including failed setup. Remaining 2096.370215 s is unspent; ledger closed at decision, not a transferable generation budget. Parts3/4 and the remaining two full-window evaluations of part2 were never run. Part2 also ran its mandatory Al023 one-frame smoke; that is not a complete-window result and is excluded from the win tally. All three jobs terminal, claims released by native completion, terminal events acknowledged; no recurring monitors. Previous diagnostic/CPU ledgers stay closed.
+
+**Actual rate/quality, measured prefix only:** every point includes actual keypoints, all 240-frame mask packet bits, all 24 distinct PNG references in the two match banks over 7200 s, existing adapter/guider over 7200 s. Original pixel-anchor envelope and original scoring durations are unchanged. Lower LPIPS/DISTS is better; each cell is actual method / matched-rate anchor.
+
+| Window | Scale | Total kbps | LPIPS method / anchor | DISTS method / anchor |
+|---|---:|---:|---:|---:|
+|alcaraz_hurkacz/031@129|1/8|17.783|0.242458 / 0.170321|0.231960 / 0.177733|
+|medvedev_struff/014@194|1/8|25.782|0.173668 / 0.118906|0.201090 / 0.166316|
+|alcaraz_hurkacz/013@213|1/8|16.608|0.258683 / 0.176121|0.261187 / 0.198260|
+|medvedev_struff/037@349|1/8|29.309|0.225030 / 0.115292|0.207884 / 0.154115|
+|alcaraz_hurkacz/031@129|1/16|11.810|0.264402 / 0.189543|0.243423 / 0.190956|
+|medvedev_struff/014@194|1/16|15.745|0.197322 / 0.156424|0.221046 / 0.187637|
+|alcaraz_hurkacz/013@213|1/16|11.147|0.286992 / 0.194024|0.273951 / 0.212178|
+|medvedev_struff/037@349|1/16|16.220|0.242397 / 0.179250|0.226919 / 0.194365|
+|alcaraz_hurkacz/031@129|1/32|8.005|0.323660 / 0.230026|0.268397 / 0.214418|
+|medvedev_struff/014@194|1/32|11.095|0.263701 / 0.182409|0.267241 / 0.201242|
+|alcaraz_hurkacz/013@213|1/32|7.776|0.342936 / 0.229786|0.298952 / 0.231185|
+|medvedev_struff/037@349|1/32|10.939|0.319508 / 0.211758|0.271012 / 0.214614|
+
+1/8 modestly improves mean LPIPS relative to the exact original control on the two Alcaraz windows, while worsening DISTS; other tradeoffs are in the raw arrays. These actual changes were measured, not inherited from an unchanged-quality counterfactual. The total-rate penalty nevertheless leaves every measured primary cell with higher error than its matched-rate anchor.
+
+**BD-rate, measured four-window prefix only:** the three actual matte settings form each method curve; native tennis PCHIP log-rate integration over strictly overlapping quality ranges versus the achievable upper-concave anchor envelope. Positive means more bits at equal quality. This secondary curve summary does not alter the frozen fixed-scale18/24 decision or create eight missing complete-window results.
+
+| Window | LPIPS BD-rate | DISTS BD-rate |
+|---|---:|---:|
+|alcaraz_hurkacz/031@129|+424.90%|+540.08%|
+|medvedev_struff/014@194|+343.54%|+521.12%|
+|alcaraz_hurkacz/013@213|+618.77%|+879.12%|
+|medvedev_struff/037@349|+363.29%|+308.45%|
+
+Common base shipped is primary. Charging its actual48,878,567-byte checkpoint over 7200 s adds 54.309519 kbps to every point. Per scale the measured prefix then has0 known wins, 4 bracketed losses and 4 unbracketed cells; the latter stay unresolved rather than extrapolated. No base-charged full-cohort claim is made. Actual rates and every comparison/dominance witness are in the JSON/CSV.
+
+**Validation:** independent CPU reporting reopens original judge archives, requires their SHA256 identities in each new native job's inputs, verifies exact original judged-frame lists and every R/S hash, and compares the new exact-control score arrays directly with the original arrays (not just a producer-reported flag). Maximum absolute difference across 320 frames/LPIPS+DISTS is2.8014183e-5, below 1e-4. All four variants finite on all original judging frames; full-window means reproduced from saved arrays. Actual decoded selected MTQ1 packet hashes/dimensions/player identities match the CPU audit, and raw generator archives prove exact retained RGB coverage. Ada CUDA parameters asserted for both real networks, unchanged frozen backbones/main packed environment, peak 6.964 GiB within 24 GB. Plain convolution kernels already validated in fleet model–GPU table; no CPU metric fallback. Worker sources a8faea75/052df444, failed setup679f0f94; exact code-file hashes, model/input/archive hashes, native dispatch commands and immutable score arrays retained.
+
+**Scope and limits:** this rejects the tested H5 area/bilinear resolutions and paid PNG-bank/actual-keypoint route at the frozen criterion. It does not reject all lossy masks, all mask coders, lossy appearance references, JPEG AI or inter-frame reference streams. No JPEG-conditioned generation ran; the prior approximately90% half-size-JPEG byte saving is still only reference-packet pricing. No fitting, generations, new segmentation/pose inference, cohort changes or quality-based per-window scale selection occurred. Native saved-crop clipping/fallback remains; pixels beyond saved generated rectangles receive the identical original canvas, never target foreground. Original exact-R target-derived Telea background is still granted, as is the earlier diagnostic's granted-matte history; this remains foreground accounting rather than a delivered end-to-end codec. Familiar-match/source-replay/pretraining uncertainty, exploratory 115 px and historical step 5 failure remain explicit.
+
+**Stop condition met:** the conservative bound decides the frozen criterion after four windows; no further GPU work is proposed or dispatched in this task. Any reference-conditioned generations or redesigned mask route require a separately scoped question and budget.
+
+Final immutable audit bundle `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-matte-judge-20261025T141700Z/k6b-matte-gpu-evidence.tar.gz`, SHA256`201e78036a7c2bd2354ddee110155354b9eb1a3faf3632970f211e7c276e3bbc` (6385271 bytes,167 members); all166 payload-member checksums independently verified. Native score/command/input/model/control receipts, original judge archives, delivered reference/keypoint/matte packets, source snapshots, failed trace, local tests and closed ledger retained. Large source clips/generated RGB/model weights remain SHA256-referenced immutable inputs. Final JSON in the same directory `k6b-matte-gpu-final-report.json`, SHA256`55112f6b10254197231b379ee0408a9924c07fcc846fbc47c053d6ee938ea606`; comparison CSV and resource ledger alongside. Remote SHA256 values verified before write protection. No old artifact overwritten.20 focused tests and configured ruff/mypy pass; final full local suite871 passed/24 skipped, only unchanged macOS protected-path symlink assertion fails (Linux CI verifies supported platform).
+
+GPU result published in PR #240 (result commit`7e7f0028`), merge-commit auto-merge enabled. Independent comparison/166-member checksum validation complete, all task jobs terminal, events acknowledged. Planning report includes the stopped prefix, rigorous16/24 optimistic bound and closed0.167674940/0.75 h ledger. No pending compute approval or follow-on run in this task.
