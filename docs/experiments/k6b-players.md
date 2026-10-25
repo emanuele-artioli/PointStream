@@ -3112,3 +3112,15 @@ ungranted-background claim. New jobs recorded on submission, never replayed.
 Prior terminal affine job20261025T170628Z-2ae1c4f3 inspected complete before
 new dispatch; all6hosts inspected. New branch codex/k6b-reference-quality-pilot.
 CPUreservation800supervisedseconds x4 +400local=3600CPU-s maximum.
+
+CPU preset job `20261025T183121Z-18d2a212` submitted; source`7c8187b3`, specSHA256`0baa80a986dbe1410e7b18c892887390308dba587317ffd8a49789b66fac889c`. Deadline in /tmp/k6b-preset-quality-spec.json;800s x4CPU bound,0GPU. One attended native bounded wait, no monitors.
+
+Operational bound refinement before dispatch: original complete PNG-control smoke
+was78.946s, so the proposed60s bound would truncate valid initialization. Use
+<=110s smoke,<=1800s full,20s validator,2000s total for each initial control;
+all within45min and unchanged14400s reference subledger. Later reservations
+use actual control cost before admission. 14,000MiB shared cap +4096MiB margin
+is supported by original12.21GiB measured peak and revalidated by native smoke.
+All Ada GPUs busy; gpu5 has18777MiB free on both, gpu6 has19971MiB on one,
+so full compatible gpu5/6 pool is retained. No latency claim. Full controls
+may run while presetCPU executes; no new neural quality scores opened.
