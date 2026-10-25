@@ -73,6 +73,9 @@ def validate(root: Path) -> dict[str, Any]:
         checks['real_smoke_under_55s'] = result['wall_seconds'] < 55
     if n == 8 and result.get('preset') == 4 and {row['kind'] for row in result['rows']} == {'alpha', 'black-affine'}:
         checks['measured_dense_preset4_projection_under_520s'] = result['wall_seconds']*30+150 < 520
+    if n == 8 and result.get('preset') == 1 and {row['kind'] for row in result['rows']} == {'alpha', 'black-affine'}:
+        # Full preset4 cost is measured; use new smoke ratio and75s fixed margin.
+        checks['measured_dense_preset1_projection_under_350s'] = 173.9723972757347*result['wall_seconds']/8.501166507601738+75 < 350
     for i, row in enumerate(result['rows']):
         rec = row['container']
         path = root/rec['file']

@@ -3171,3 +3171,16 @@ than reserving aGPU for conventional encoding, within approvedsameCPUcap.
 control-med-retry job `20261025T184001Z-2e64d93e` source10556523 specSHA256`df6b0e38ad89aff4d8591a0e5552c72fb56ab7e5e5267c20c16581973423f9aa`; budgets as recorded above. Inspect this ID after interruptions, never replay unknown.
 
 dense-full job `20261025T184009Z-0787c1cf` source10556523 specSHA256`1a12a4a194823baa23e6239f9f196e6341961531aa7cacb7fcfb52d29edb1e28`; budgets as recorded above. Inspect this ID after interruptions, never replay unknown.
+
+Full dense preset4job20261025T184009Z-0787c1cf COMPLETE, all4points240frames.
+ArchiveSHA2565d27c429c92e437134f068a440eba0e9b5be5cc54941b2cf24d8fa33f2a1f32b.
+Programwall173.972397s, processCPU290.636557s; conservativeadmitted882.829598CPU-s.
+ActualratesAlalpha42.791667/affine18.994167kbps; Medalpha68.566667/affine31.666667.
+No newquality scores opened. CPUboundsofar320.786816+200.560949+882.829598
++400local=1804.177363CPU-s leaves1795.822637. Use<=430superviseds4CPU
+(1720CPU-s) for fullpreset1dense confirmation, same4points, nofamily/window
+expansion. Measuredfullpreset4wall x measured8framepreset1/4ratio +75smargin
+=306.1s<350fullcap;20ssmoke recheck,20svalidator. Totalreservation3524.177363
+<3600CPU-s. Densepreset4fallbackremainsunlessfullpreset1dominatesglobal
+bytes/IoU/FGerror; choosebeforeANYnewdensequalityscores. This resolves
+shortGOPuncertainty with available approvedCPU, withoutnewGPUvariants.
