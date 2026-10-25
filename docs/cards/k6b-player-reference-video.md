@@ -161,3 +161,10 @@ both sparse banks. Pick affine as the black candidate only if CRF20 foreground
 RGB MSE improves on both matches and IoU loses<=.002 on either. Otherwise keep
 clamp32. This avoids clipping dark colors; expected precodec inverse error<=1.
 Generation settings/cohort/three candidate count and proposed GPU cap unchanged.
+
+Proposed generation runtime is the original packed JCV environment
+`pointstream-jcv-20261022T124459Z.tar.gz`, SHA256
+`bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e`;
+judging stays in pinned main environment32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661.
+Use original immutable weights/fit/base archives identified in prior generation
+specifications; no dependency migration or fitting is authorized.

@@ -16,6 +16,7 @@ from experiments.tennis.k6b_reference_video import (
     recover_key, command, ffmpeg_args,
 )
 from experiments.tennis.k6b_rate_transport import array_sha, sha, write
+from src.codecs import svtav1
 
 
 def lift(rgb: np.ndarray, alpha: np.ndarray) -> np.ndarray:
@@ -74,6 +75,8 @@ def main() -> int:
     error = int(np.max(np.abs(unlift(lift(toy, np.ones(toy.shape[:-1], bool))).astype(int)-toy.astype(int))))
     report: dict[str, Any] = {'rows': [], 'mode': a.mode, 'cuda_visible': '', 'gpu_hours': 0,
         'input_sha256': sha(a.transport.read_bytes()), 'code_sha256': sha(Path(__file__).read_bytes()),
+        'tools': {tool: svtav1.tool(tool) for tool in ('ffmpeg', 'dav1d', 'SvtAv1EncApp')},
+        'numpy': np.__version__, 'opencv': cv2.__version__,
         'precodec_max_rgb_error': error, 'rule': 'foreground round(32+223*RGB/255), background0; mask max(channel)>=16; inverse clip(round((channel-32)*255/223))'}
     for match, entries in list(banks.items())[:1 if a.mode == 'smoke' else None]:
         rgb = np.stack([e['small'] for e in entries])
