@@ -21,7 +21,7 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-10-22)
+## Where PointStream stands (2026-10-25)
 
 The root session keeps this section and the dispatch ledger below; item
 sessions update their own items and their files in `docs/experiments/`
@@ -122,6 +122,22 @@ sessions update their own items and their files in `docs/experiments/`
   guider (1.65 kbps over 2 h) **fails at 67%, billed and unbilled**.
   Billing no longer costs a window. The same two windows (045, 052) lose
   in steps 3–5, so each recipe change moves the margins, not the score.
+  The frozen **clip-local diagnostic (2026-10-25)** on 12 new archive
+  windows from the familiar Alcaraz and Medvedev broadcasts reaches
+  **23/24 billed window–metric wins** (LPIPS 11/12, DISTS 12/12;
+  descriptive bar 18/24), and 24/24 unbilled. Billing here covers the
+  match adapter/guider and keypoints, with a common shipped tennis base;
+  references and exact target matte remain granted and unbilled.
+  Charging the 48,878,567-byte base over 2 h adds 54.309519 kbps:
+  0/12 bracketed cells win, and the other 12 are unbracketed, unresolved.
+  This is not a fully charged codec saving or independent-source
+  confirmation, and does not overturn step 5's historical failure.
+  Original-source/replay independence remains unresolved; every window
+  passes registration, so gate discrimination is untested and 115 px
+  remains exploratory. All 120 anchor points and 956 mask identities
+  validated; 24 terminal GPU jobs used **6.995428306 of 8 GPU-hours**.
+  Report commit `72228816`, [PR #236](https://github.com/emanuele-artioli/PointStream/pull/236)
+  (auto-merge off after an approval-review block); no jobs remain active.
   Step 6 (Wan-Animate 14B, zero-shot first) is outlined; it waits for
   the user. Every player result so far grants the matte; the
   matte's rate is unmeasured on tennis (H5p 4: on egocentric video the
@@ -159,6 +175,7 @@ marked `card ready` is waiting for the user to start it.
 | T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | reported 2026-10-24: primary oracle +10.00% BD weighted DISTS, 3/8 wins; billed split loses all metrics/windows; 3.12338 of 4 GPU-hours |
 | K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
 | H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask`, PR #233 | Codex high | reported 2026-10-24: shape target fails (+16.6% wDISTS); decoder diagnostic 13.3–61.3 kbps, full curve blocked by native decode; 0.3171 GPU-hours of 2 |
+| K6b players clip-local diagnostic | [frozen 12-window study](https://github.com/emanuele-artioli/PointStream/blob/72228816/docs/cards/k6b-players-confirmation.md) | `codex/k6b-player-confirmation-plan` @ `72228816`, PR #236 | Codex high | reported 2026-10-25: 23/24 billed wins with common base, reference and matte granted; base-charged 0/12 bracketed wins, 12 unresolved; 6.995428306 of 8 GPU-hours; all jobs terminal; auto-merge off |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
