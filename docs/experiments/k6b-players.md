@@ -2919,3 +2919,19 @@ macOS protected-path assertion remains the only unverified local platform check;
 Linux CI remains required. Sparse banks are preshipped/offline in unitID order,
 with no chronological/live reference-availability claim. No BD-rate is inferred
 from single-point reference recipes;3point dense curves use true overlap only.
+
+Before affine guard-band outcomes: user invited a better way to distinguish
+foreground black. Add one bounded CPU refinement, still inside7200CPU-s:
+foreground round(32+223*RGB/255), background0; client detects max(channel)>=16,
+then inverse round(clip((channel-32)*255/223)). This avoids the floor32 clamp's
+dark-color clipping; precodec inverse rounding error<=1 is explicitly tested.
+Same24 refs,halfsize,order,3CRFs20/35/50,preset8,actual container bytes and decoded
+RGB/alpha checks; smokeAl bankCRF35,fullbothbanks. Reserve<=200supervised s at4CPU
+(max800CPU-s), after dense ledger inspection. Even the previously reserved
+worst case6327.242756+800=7127.242756CPU-s including480local fits7200.
+Select affine rather than clamp as the single black recipe for future generation
+only if its CRF20 foreground RGB MSE improves on both matches and mask IoU is
+no more than.002 worse on either. Otherwise keep clamp. This refines CPU
+screening before any new generated scores; GPU request does not expand beyond
+three reference recipes. Sparse16-level threshold remains frozen. No new
+source/quality-driven window selection, no GPU or new learned models.

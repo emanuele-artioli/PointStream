@@ -42,3 +42,14 @@ def test_alignment_reversible_for_empty_and_edge_crossing_shapes():
     assert np.array_equal(decode_aligned(blob), masks)
     with pytest.raises((ValueError, RuntimeError)):
         decode_aligned(blob[:-1])
+
+
+def test_affine_guard_band_preserves_dark_colors_with_rounding_only():
+    from experiments.tennis.k6b_reference_affine import lift, unlift
+    rgb = np.arange(256, dtype=np.uint8).reshape(1, 16, 16, 1).repeat(3, -1)
+    mask = np.ones(rgb.shape[:-1], bool)
+    encoded = lift(rgb, mask)
+    assert encoded.min() == 32
+    assert np.array_equal(recover_key(encoded, 32), mask)
+    assert np.max(np.abs(unlift(encoded).astype(int)-rgb.astype(int))) <= 1
+    assert not lift(rgb, ~mask).any()

@@ -153,3 +153,11 @@ Sparse banks are preshipped in declared unit-ID order; no live/causal source
 chronology is claimed. The one-point-per-recipe reference generation pilot
 cannot produce BD-rate; report strict anchor-bracket cells only. Dense carrier
 has3 actual coded qualities, so PCHIP BD-rate is defined only on genuine overlap.
+
+Affine CPU guard-band refinement preregistered before outcomes: one<=200s
+4CPU stage (<=800CPU-s, total prior worst-case7127.242756<7200 incl480local).
+Use32+223*RGB/255 foreground with rounded inverse, threshold16, same3CRFs and
+both sparse banks. Pick affine as the black candidate only if CRF20 foreground
+RGB MSE improves on both matches and IoU loses<=.002 on either. Otherwise keep
+clamp32. This avoids clipping dark colors; expected precodec inverse error<=1.
+Generation settings/cohort/three candidate count and proposed GPU cap unchanged.
