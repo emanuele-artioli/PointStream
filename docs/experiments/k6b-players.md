@@ -3093,3 +3093,22 @@ Native evidence is remotely verified/read-only; local checks above pass with
 known platform exception. Linux CI pending; enable merge-commit auto-merge per
 AGENTS. New4.5GPU-h plus<=3600CPU-s preflight budget remains unapproved; no
 GPU submission/generation. This publication does not grant compute authority.
+
+
+## Approved two-window compression-quality pilot (2026-10-25)
+
+User approved <=4.5 NEW GPU-h plus <=3600CPU-s slower-preset preflight.
+Hypothesis: actual compressed reference conditioning can retain sufficient
+generated quality to pass >=3/4 strictly bracketed cells; competing explanation
+is that compression/segmentation damages identity or motion. Dense foreground
+is tested separately with all delivered appearance/alpha container bits paid.
+Card: docs/cards/k6b-player-reference-video.md, approved continuation.
+Old ledgers closed. NewCPU cap3600s, GPUdense1800s and GPUreference14400s.
+Freeze sameAl031/Med014 windows, R/S, seed/context/steps/adapters and exact-matte
+reference oracle before neural outcomes. Preset4/1 native bank comparison
+precedes quality; selection by global bytes/fidelity Pareto with preset4 fallback.
+No full12-window confirmation, fitting, Wan-Animate, source-independence or
+ungranted-background claim. New jobs recorded on submission, never replayed.
+Prior terminal affine job20261025T170628Z-2ae1c4f3 inspected complete before
+new dispatch; all6hosts inspected. New branch codex/k6b-reference-quality-pilot.
+CPUreservation800supervisedseconds x4 +400local=3600CPU-s maximum.

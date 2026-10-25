@@ -104,11 +104,12 @@ def rgb_yuv(rgb: np.ndarray, root: Path) -> tuple[Path, dict[str, Any]]:
     return out, rec
 
 
-def code_yuv(raw: Path, root: Path, n: int, w: int, h: int, crf: int, fps: int = 1) -> dict[str, Any]:
+def code_yuv(raw: Path, root: Path, n: int, w: int, h: int, crf: int, fps: int = 1, *,
+             preset: int = 8, timeout: int = 100) -> dict[str, Any]:
     root.mkdir()
     rec = svtav1.code(raw, root, width=w, height=h, fps=Fraction(fps), frames=n,
-                       crf=crf, preset=8, threads=4, full_range=True,
-                       encoder='SvtAv1EncApp', decoder='dav1d', timeout=100,
+                       crf=crf, preset=preset, threads=4, full_range=True,
+                       encoder='SvtAv1EncApp', decoder='dav1d', timeout=timeout,
                        cpus=list(os.sched_getaffinity(0)))
     if rec['decoded_frames'] != n or len(svtav1.ivf_frames(Path(rec['stream']).read_bytes())) < 1:
         raise ValueError('Incomplete real video decode')

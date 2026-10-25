@@ -268,3 +268,18 @@ CPU code/report publication: https://github.com/emanuele-artioli/PointStream/pul
 Linux CI pending; merge-commit auto-merge requested under existing authorization.
 Only the CPU report is published;4.5GPU-h +3600CPU-s continuation budget remains
 unapproved. No running fleet jobs or recurring monitors.
+
+## Approved continuation (2026-10-25)
+
+User explicitly approved the proposed <=4.5 new GPU-hours (estimate3.35) plus
+<=3600CPU-s preflight. New branch codex/k6b-reference-quality-pilot; old ledgers
+stay closed. Scope, two windows, three candidate families, controls and stop
+rules above are unchanged. CPU preflight reserves <=800 supervised seconds at
+4CPUs (=3200CPU-s upper bound) plus400CPU-s local preparation/analysis.
+Smoke compares both slower presets on a complete12-image original bank, not
+a shortened GOP. Full compares both matches/allthree CRF20 reference families.
+Measured smoke projection must fit full<=600s; otherwise retain partial evidence
+and use matched preset4 per the existing fallback. Dense slower-preset tests
+remain subject to the same CPU cap; no rate extrapolation from short clips.
+GPU stage retains <=0.5h dense and <=4.0h reference generation/control subcaps.
+No new neural scores opened before global reference-preset selection.
