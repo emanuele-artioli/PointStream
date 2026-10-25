@@ -171,10 +171,12 @@ marked `card ready` is waiting for the user to start it.
 | K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5` | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11. PR #225 merged before this outcome commit: not on main yet |
 | K6m | the players' matte on tennis | — | Sonnet | card dismissed 2026-10-24: folded into T1 |
 | K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | reported 2026-10-24: no cut in 052; registration gate 80% vs 67% pooled (hypothesis); 0 of 0 GPU-hours |
+| K6b players confirmation | unused same-match windows, CPU preparation | `codex/k6b-player-confirmation-plan` | Codex high | reported 2026-10-24: splitter logic recovered; 61-clip audit found no exact/screened duplicates; original identity unresolved, running 2026-10-24: clip-local scope approved; CPU gate passes; all12 masks/poses validated; anchor/source-code pilot running, 0.660 of 8 GPU-hours before running anchor ([card](docs/cards/k6b-players-confirmation.md)) |
 | T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | reported 2026-10-24: primary oracle +10.00% BD weighted DISTS, 3/8 wins; billed split loses all metrics/windows; 3.12338 of 4 GPU-hours |
 | K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
 | H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask`, PR #233 | Codex high | reported 2026-10-24: shape target fails (+16.6% wDISTS); decoder diagnostic 13.3–61.3 kbps, full curve blocked by native decode; 0.3171 GPU-hours of 2 |
 | K6b players clip-local diagnostic | [frozen 12-window study](https://github.com/emanuele-artioli/PointStream/blob/72228816/docs/cards/k6b-players-confirmation.md) | `codex/k6b-player-confirmation-plan` @ `72228816`, PR #236 | Codex high | reported 2026-10-25: 23/24 billed wins with common base, reference and matte granted; base-charged 0/12 bracketed wins, 12 unresolved; 6.995428306 of 8 GPU-hours; all jobs terminal; auto-merge off |
+| K6b players rate-budget audit | saved 12-window side-information headroom, CPU only | `codex/k6b-player-confirmation-plan` | Codex high | reported 2026-10-25: tested lossless route fails (0/24; 22 bracketed, 2 unresolved but dominated); even free mattes leave 17/24 with real keypoints + PNG bank 2 h; CPU job `20261025T082944Z-29f021a5` complete, 0 new GPU-hours; deployable alternatives unresolved ([card](docs/cards/k6b-player-rate-budget.md)) |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
@@ -185,6 +187,15 @@ view, 32/240 registered frames and seven judged. A ≥95% registration gate
 reads 80% beside 67% pooled; adding ≥115 px reads 100% on four windows,
 but both gates are unconfirmed hypotheses. 045 shows appearance/view and
 racket errors, with no isolated causal explanation; step 5's fail stands.
+Confirmation preparation (2026-10-24): 12 new same-match windows frozen;
+all pass registration, so gate discrimination is untested. Recorded fit/reference
+clips are disjoint. CPU recovery found splitter logic; the completed 61-clip
+audit found no exact/screened duplicates. Original-source identity/replay
+independence remains unresolved: the user explicitly approved the clip-local
+diagnostic scope; CPU validator prerequisites are still required before dispatch.
+Execution started: 0.076 of 8 approved GPU-hours before current feature job;
+reference and matte remain granted
+([card](docs/cards/k6b-players-confirmation.md)).
 Step 6 tries Wan-Animate, conditioned on the same unbilled reference as
 step 2 (zero-shot means no fitting, not no appearance); speed is
 secondary while quality is tested (user, 2026-10-24).

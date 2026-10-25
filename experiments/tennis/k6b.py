@@ -599,6 +599,7 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
     covered = np.zeros((n_v, frames), np.int64)
     pixels_s = np.zeros(frames, np.int64)
     pixels_r = np.zeros(frames, np.int64)
+    scoring_masks: dict[str, dict[str, str]] = {}
     review_at = judged[len(judged) // 2] if judged else None
     for n, t in enumerate(judged):
         truth_t = np.asarray(truth[t])
@@ -608,6 +609,8 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
         s_t = r_t.copy()
         for m in drawn.values():
             s_t |= m
+        scoring_masks[str(t)] = {"r": hashlib.sha256(np.packbits(r_t).tobytes()).hexdigest(),
+                                 "s": hashlib.sha256(np.packbits(s_t).tobytes()).hexdigest()}
         outs: dict[str, np.ndarray] = {}
         mine: dict[str, np.ndarray] = {}
         for profile, v in zip(profiles, gen_variants):
@@ -643,6 +646,8 @@ def judge_window(args: argparse.Namespace, wid: str, k6dir: Path, source: Path, 
     result = {
         "id": wid, "match": wid.split("/")[0], "frames": frames, "judged": judged, "players": players, "variants": list(variants),
         "k6_job_files": row["files"], "k6_lpips": k6_lp,
+        "scoring_masks": scoring_masks,
+        "s_masks_match_k6": scoring_masks == {str(t): row.get("scoring_masks", {}).get(str(t)) for t in judged},
         "s_pixels_match_k6": bool(np.array_equal(pixels_s[judged], k6_scores["pixels_s"][judged])),
         "seconds": round(time.time() - began, 2),
     }
