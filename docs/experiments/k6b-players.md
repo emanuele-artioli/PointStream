@@ -3222,3 +3222,11 @@ check and stop; no unproven continuation. Existingfulloriginalcontrolwithin1e-4
 remainsunchanged. Correctedjob mustprove thisdiagnosis in native smoke.
 Densefuture reservation44.123715+600Alretry+600Med+550historical=1794.123715
 <1800GPU-s; nobudgetincrease or oldledgerreuse.
+
+CorrectedDenseAlquality job `20261025T185724Z-884dd4ce` source13b2c9ec specSHA256`0fec287d438057d72f0b7ec94fa929f1d02a74b0f88d7ff33259eb9d4ba8b5cf`;600GPU-sreservation afterterminalfailed44.123715s. ExactdecodedRGB/alpha hashes not relaxed; native source CPU/CUDA distinction explicit.
+
+CorrectedDenseAlsmoke20261025T185724Z-884dd4ce PASSED allchecks. Source
+CPUvsCUDA diagnosisconfirmed: only1channel differs by1level on samplet0;
+allactualdecodedRGB/alphahashes EXACTmatchCPUpackets. Originalneuralcontrol
+maxabsdiff0.0, CUDApeak5.703743GiB, realnative smoke37.938989s. Full
+Alstage running. PromoteMed throughsamevalidator, remaining600sreservation.
