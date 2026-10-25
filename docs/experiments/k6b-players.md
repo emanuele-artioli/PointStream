@@ -3143,3 +3143,17 @@ affine3fbcc34e8b174ee139981526e3d07afe8d52d3cfd06a7c124304cc98e62b0e7e.
 RemainingCPU permits representative8frame dense preset4/1 alpha+affine checks,
 430s supervised x4=1720CPU-s reservation; totalbound320.786816+1720+400local
 =2440.786816 <3600. These shortGOPs cannot establish full240frame rates.
+
+Dense8frame presetCPU job `20261025T183643Z-dfd14984` submitted source65dc374d specSHA256`669220c35ec5a28aa82519099f518a9d755d4912845b1d0c0d4eab1127dfbe6b`;430s4CPU reservation, noGPU. Bothpreset4/1andbothwindows, alpha/affine atCRF63.
+
+MedPNGcontrol20261025T183318Z-34d149af terminalfailed, nofullstarted.
+Confirmed native reason: commandexceeded110s smoke allowance after both8frame
+player samples. No OOM/data/configfailure observed. Charge entireadmitted
+131.172530651GPU-s; preservepartialsmoke. Correctedattempt160s smoke/1750sfull,
+20svalidator/2000stotal, sameinputs/renderer/memory. Totalreferencefuture
+reservation failed131.173+Al2000+Medretry2000+6x1450+600judge=13431.173s
+<14400; actual costs checked before promotion. Not an uncertain replay.
+Dense8frame CPUjob20261025T183643Z-dfd14984complete: preset1/4tradeoffs
+(Alalpha1slightlyworseMSE; Medaffine1slightlylargerpacket). Freezeglobaldense
+preset4 fallback BEFORE neural scores; short8frameGOP not full240rateevidence.
+CPUadmittedbound200.560948s, combinedwithprior320.786816+400local=921.347764/3600CPU-s.

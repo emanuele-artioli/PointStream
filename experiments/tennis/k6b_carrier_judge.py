@@ -200,6 +200,8 @@ def validate(archive: Path, full: bool) -> dict[str, Any]:
             'memory': r['gpu_peak_gib']*1024 <= r['memory_limit_mib'], 'windows': [w['id'] for w in r['rows']] == r['requested']}
         for row in r['rows']:
             label = row['id']
+            checks[label+':variants'] = row['variants'] == r['expected_variants'][label]
+            checks[label+':source'] = row['source_sha256'] == SOURCE_SHA[PILOTS.index(label)]
             checks[label+':coverage'] = row['judged'] == row['expected_judged'] and (not full or row['judged'] == row['original_judged'])
             checks[label+':control'] = row['control_max_abs_difference'] <= 1e-4 and row.get('new_png_control_max_score_difference', 0) <= 1e-4
             dest = root/'publish'/safe(label)
@@ -257,6 +259,7 @@ def main() -> int:
     sources = {sha(source.read_bytes()): source for source in a.source}
     result: dict[str, Any] = {'rows': [], 'requested': a.windows, 'device': device, 'memory_limit_mib': limit,
         'on_cuda': {name: next(net.parameters()).is_cuda for name, net in nets.items()},
+        'expected_variants': {wid: list(labels)+[c['name'] for c in carriers[wid]] for wid in a.windows},
         'inputs': {str(q): sha(q.read_bytes()) for q in [a.transport, *a.anchor, *a.control, *a.source, *a.carrier, *[Path(v) for _, v in a.generated]]},
         'code_sha256': sha(Path(__file__).read_bytes()), 'torch': torch.__version__,
         'lpips': lpips_record(a.backbone[0]), 'dists_backbone_sha256': sha(a.backbone[1].read_bytes())}
