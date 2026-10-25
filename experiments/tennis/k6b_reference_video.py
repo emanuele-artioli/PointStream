@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import resource
 import tarfile
+import tempfile
 import time
 from typing import Any
 
@@ -309,6 +310,13 @@ def main() -> int:
 
 
 def validate() -> int:
+    with tempfile.TemporaryDirectory(prefix='k6b-refvideo-validate-', dir='/tmp') as tmp:
+        with tarfile.open(Path(os.environ['PS_STAGE_DIR']) / 'published.tar') as archive:
+            archive.extractall(tmp, filter='data')
+        return validate_archive(Path(tmp) / 'publish')
+
+
+def validate_archive(root: Path) -> int:
     report = json.loads((Path(os.environ['PS_STAGE_DIR']) / 'reference-video.json').read_text())
     checks = {'cpu_only': report['gpu_hours'] == 0 and report['cuda_visible'] == '',
               'rows_present': len(report['rows']) == (9 if report['mode'] == 'smoke' else 54),
@@ -319,13 +327,26 @@ def validate() -> int:
     mask = np.zeros((1, 4, 4), bool)
     mask[:, 1:3, 1:3] = True
     checks['precodec_guard_band'] = all(np.array_equal(recover_key(black_key(toy, mask, floor), floor), mask) for floor in FLOORS)
-    # Artifacts stay on scratch during smoke validation; validate bytes and actual decoded arrays.
-    root = Path(os.environ['PS_SCRATCH_DIR']) / 'publish'
+    checks['input_identity'] = report['input_sha256'] == '6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7'
+    # Scratch has been released. Independently decode the published container tracks.
+    checks['alpha_present'] = any(r['kind'] == 'alpha' for r in report['rows'])
+    checks['guard_bands_present'] = {r['floor'] for r in report['rows'] if r['kind'] == 'black'} == set(FLOORS)
     for i, row in enumerate(report['rows']):
         file = row['container'] if 'container' in row else row
         checks[f'{i}:packet'] = sha((root/file['file']).read_bytes()) == file['sha256'] and (root/file['file']).stat().st_size == file['bytes']
         checks[f'{i}:finite'] = all(np.isfinite(v) for v in (row.get('diagnostic_only', row.get('native_grid_accuracy', {}))).values() if isinstance(v, (int, float)))
         checks[f'{i}:frames'] = row['codec']['decoded_frames'] == row.get('references', row.get('frames'))
+        if 'container' in row:
+            for j, expected in enumerate(file['track_decoded_sha256']):
+                decoded = root / f'validate-{i}-{j}.yuv'
+                command([*ffmpeg_args(), '-i', str(root/file['file']), '-map', f'0:v:{j}', '-pix_fmt', 'yuv420p', '-f', 'rawvideo', str(decoded)])
+                checks[f'{i}:track{j}'] = sha(decoded.read_bytes()) == expected
+                decoded.unlink()
+            with np.load(root / (Path(file['file']).stem+'-conditioning.npz')) as arr:
+                checks[f'{i}:conditioning'] = arr['rgb'].shape == (row['references'], 784, 512, 3) and array_sha(arr['rgb']) == row['diagnostic_only']['decoded_rgb_sha256']
+        else:
+            meta, ivf = unseal((root/file['file']).read_bytes(), b'MVV1')
+            checks[f'{i}:mask_contract'] = meta['frames'] == 240 and meta['scale'] == 8 and meta['window'] == row['window'] and len(svtav1.ivf_frames(ivf)) > 0
     for i, row in enumerate(report['alignments']):
         blob = (root/row['file']).read_bytes()
         checks[f'align{i}'] = sha(blob) == row['sha256'] and array_sha(decode_aligned(blob)) == row['reduced_sha256']

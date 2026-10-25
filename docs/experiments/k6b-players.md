@@ -2780,3 +2780,17 @@ Keep byte/fidelity Pareto candidates; choose one fixed recipe before opening new
 generated quality. Report uncertain tradeoffs instead of declaring a conclusive
 close. Familiar two-match/source-replay limitations, exploratory115px, historical
 step5 failure, exact-matte history and granted target-derived background remain.
+
+CPU job submitted `20261025T163506Z-af342506`, source`b3d39171`, spec
+SHA256`a76e748dd74ca27f27d6fd5c20a137680e56cfa8a67caed0262bdb8273d7ac99`.
+Deadline2026-10-25T17:18:03.043086+00:00,1680s supervisor cap,4CPU threads,
+0GPU. Native fleet doctor passes; gpu1/2/3/5/6 verified reachable with CPU
+headroom, gpu4 refused SSH and excluded. Old final job inspected complete.
+Frozen packed main environment and previous CPU packet archive SHA256
+6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7.
+No completion-resume capability verified for this client; use one attended
+bounded native wait for this batch, no recurring or one-shot model monitor.
+Preserved spec/submit receipts locally `/tmp/k6b-refvideo-{spec,submit}.json`;
+output native `/jobs/fleet/inbox/20261025T163506Z-af342506/{smoke,full}/published.tar`.
+Three focused tests/configured ruff/mypy pass before dispatch. Inspect this ID
+before acting after interruption; never replay an uncertain submission.

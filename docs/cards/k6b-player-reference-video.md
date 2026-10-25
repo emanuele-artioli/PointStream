@@ -59,3 +59,8 @@ Branch: codex/k6b-reference-video. Report: docs/experiments/k6b-players.md and
 planning chat01a16cfc-1a88-7013-bd79-8489fe7c1eb2. State: preregistered CPU pilot;
 no new job submitted. Previous ledger's final job20261025T141239Z-93456964 is
 inspected before new dispatch, never replayed.
+
+CPU job20261025T163506Z-af342506 submitted, sourceb3d39171, deadline17:18:03UTC
+on2026-10-25.1680supervised seconds at4threads inside7200CPU-s new ledger,0GPU.
+Same spec and native inputs as experiment entry. One attended native bounded
+wait; no monitors. Inspect existing ID after interruptions, never resubmit it.
