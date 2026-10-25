@@ -2315,3 +2315,99 @@ a weaker claim automatically.
 - Tenth renderer `20261024T230918Z-b01ae9ae` complete; full scientific validation passes, archive SHA256 `b2f54da54f7f5f6214df96d95f6487ced899d862355e1fb06bbf1b7a2a3d1400`, charged0.374804 h. Completed total **6.07218/8 h**, eleventh renderer active.
 
 - Twelfth/final renderer submitted **`20261024T233245Z-ebafc4f5`**, Med021@246, two240-frame/one-run units, fixed C recipe; spec SHA256 `ca802978925191bcff232602229e6e96387d50a754efea64c95d516ecb936794`, code4c5cbea3,2100 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-gen12-submit.json`. All12 renderer windows now submitted under the unchanged cohort/recipe; completed total6.072180/8 h before active11–12 and final judging.
+
+- Eleventh renderer `20261024T233009Z-28f16db9` complete; full scientific validation passes, archive SHA256 `99bf174660f2106a6bed58c7b7bd7c0a09542e3b31d7d50b252e588c97ffc438`, charged0.366318 h. Completed total **6.4385/8 h**, final renderer active; first remaining-three scoring shard ready using exact original preparation/source/generation artifacts.
+
+- Third judge shard submitted **`20261024T235346Z-9b0af845`**, Al016/Med017/Al008, exact matched R/S and indices; spec SHA256 `d93159e5a574828557f7050e8af02c8e6b9222d885c83d3e0baa4393e2ca1364`, codee1277745,1800 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-judge3-submit.json`.
+
+- Final/twelfth renderer `20261024T233245Z-ebafc4f5` complete; full scientific validation passes, archive SHA256 `6557f1814ba1e7250b8c11bf15e23c1d5b17d6994f1dc4a272fe2f2dd30c0542`, charged0.375184 h. **All12 frozen windows now rendered and validated**, no new fitting. Completed total **6.81368/8 h**, third judge active; final judge ready.
+
+- Fourth/final judge shard submitted **`20261024T235616Z-1a85923b`**, Med029/Al047/Med021, exact matched R/S and indices; spec SHA256 `2509b835b81cccda501afd41c9cbf392607374844f2e1185036020b5f367bb81`, codee1277745,1800 s/fresh44-min deadline. Receipt `/tmp/k6b-confirm-judge4-submit.json`. Current completed6.813681/8 h, only judges3–4 active.
+
+- Third judge `20261024T235346Z-9b0af845` complete; all substantive full checks pass (exact R/S/indices and native source-oracle reproduction), archive SHA256 `07db4b9c20c6e318644aeaae94e3d98b114b685384277777e0ae2344de4ef45a`, charged0.089406 h. Completed total **6.90309/8 h**, only final judge active. No nine-window quality interpretation; full12 result follows its validation.
+
+- Final judge `20261024T235616Z-1a85923b` complete; all substantive full checks pass, archive SHA256 `d1c851f87e17ea748ee61ed9895ead7a5df73b00fcee96d775a207f694eb2c76`, charged0.092341 h. **All12 windows fully rendered, scored and validated; no active GPU jobs. Final spend 6.995428/8 h**, including smokes, validation reservations and both initial failed requests; no fitting/Wan-Animate. Next CPU final report only.
+
+## 2026-10-25 — completed frozen clip-local tennis-player diagnostic
+
+**Decision reached:** 23/24 window–metric comparisons win at the billed adapter/guider rate (95.83%, above the frozen 18/24 bar). LPIPS wins 11/12 and DISTS 12/12. Unbilled wins 24/24. Alcaraz–Hurkacz contributes 12/12 wins; Medvedev–Struff 11/12. All 24 primary cells resolve on complete native anchor envelopes; no window or failed cell was dropped. The full 12-window result follows a 12/12-cell first-six pilot; there was no interim pass.
+
+**Claim:** a descriptive result on clip-disjoint moments in two familiar broadcasts, with no overlap detected by the recorded clip tests. Original-source/extraction identity and replay independence remain unresolved. This is not independent-source, training-clean or unseen-match confirmation, and does not overturn the historical step-5 failure. References and exact target matte R remain granted and unbilled. The primary rate assumes a shipped common tennis-base decoder.
+
+### Frozen question and comparison
+
+Test whether the unchanged step-5 C renderer beats the achievable SVT-AV1/DCVC-UF anchor envelope on 12 previously unused clip-local 240-frame windows after a source-only court-registration gate. The competing explanation is that old view/registration and appearance difficulties, familiar-source adaptation, or granted side information explain the apparent gain. The present cohort cannot isolate those causes.
+
+The cohort, source hashes and inclusive native frame ranges are frozen in the [task card](../cards/k6b-players-confirmation.md). The execution manifest is `tennis/k6b-confirm-20261024-execution/manifest-v2.json`, SHA256 `8b81c4b9645a24bb5b613bdda908440735fe932d23ea251b0c567a366bda090b`. Each `@N` names the absolute review frame, not the extraction start. Source-only gate: at least 228/240 K8b `fits=true` rows (≤6 px), finite nonsingular homography; missing/invalid=false. All 12 pass, so pooled and gated sets coincide and gate discrimination/fallback benefits are untested. **115 px remains exploratory and was never a selection or rescue rule.**
+
+Native C settings: existing tennis base plus matching Alcaraz/Medvedev adapter and trained pose guider; 4-bit, guidance 2.0, 512×784, 30 DDIM steps, 24-frame contexts/overlap 4, source-deterministic unit/run seeds. No fitting, profile search, Wan-Animate or other study was run. Geometry-only preparation froze players, registration/scoring indices, pose runs/crop boxes and first-fitted-scored references before quality. Missing poses retain their native fallback; no quality-dependent frame filtering was introduced.
+
+Anchors and method use identical source windows, R/S masks, native 25/50 fps and every third predeclared scoring frame. All 120 anchor points are valid: `svt-48-s1`, `svt-62-s1`, `svt-63-s2`, `svt-55-s4`, `svt-63-s4`, `svt-63-s8`, `dcvc-0-s1`, `dcvc-0-s2`, `dcvc-0-s4`, `dcvc-21-s2`. Native codec round trips, R accounting, source keypoint codes, finite LPIPS/DISTS and CUDA/kernels were validated. CPU reconstruction and actual judge hashes agree on all 956 judging frames. There are 2872 registered scoring frames within 2880 unique target frames; registration exclusions were frozen before quality.
+
+Primary rate = the q4-velocity-e4 keypoint entropy bound pooled over all 12 windows plus adapter+trained-guider bytes amortized over 7200 s. These are optimistic pooled symbol costs, not a new deployed entropy bitstream. Alcaraz payload 1,488,252 bytes; Medvedev 1,495,592 bytes. Rates exactly reproduce the source-only freeze `source-rates-frozen-20261024T2145Z.json` (SHA256 `b84eed26aafa7a8298c5be52ba2356e996d4394617bfb9819b3f61b3261fd8cf`).
+
+Each metric is compared at the method rate with the upper concave achievable anchor envelope. Interpolation is permitted only inside the measured rate bracket; unbracketed cells stay unresolved. Strictly lower error wins. No BD-rate is reported from a single method operating point. The frozen descriptive bar is ≥18/24 cells; below the billed bar but ≥18 unbilled requires user judgment. Futility would stop only if all remaining unbilled wins could not reach 18. All 12 were completed. Two match clusters are not 12 independent samples.
+
+### Full-cohort measurements
+
+Lower error is better. Each metric cell shows method / matched-rate anchor envelope; bold identifies the sole loss. Foreground rates exclude the granted matte/reference and common base.
+
+| Window | Billed kbps | LPIPS method / envelope | DISTS method / envelope | Judged frames |
+|---|---:|---:|---:|---:|
+| `alcaraz_hurkacz/031@129` | 3.604463 | 0.245173 / 0.276848 | 0.223041 / 0.241554 | 80 |
+| `alcaraz_hurkacz/013@213` | 3.643203 | 0.263237 / 0.277799 | 0.251764 / 0.256243 | 80 |
+| `alcaraz_hurkacz/023@228` | 3.559647 | 0.211330 / 0.316932 | 0.214115 / 0.263014 | 80 |
+| `alcaraz_hurkacz/016@273` | 3.947866 | 0.231613 / 0.253207 | 0.212485 / 0.255857 | 76 |
+| `alcaraz_hurkacz/008@261` | 3.463794 | 0.209767 / 0.299849 | 0.216253 / 0.261582 | 80 |
+| `alcaraz_hurkacz/047@123` | 3.549074 | 0.231017 / 0.270606 | 0.210635 / 0.243777 | 80 |
+| `medvedev_struff/014@194` | 4.653833 | 0.170541 / 0.218405 | 0.192080 / 0.220090 | 80 |
+| `medvedev_struff/037@349` | 4.466766 | 0.223077 / 0.251592 | 0.201723 / 0.239426 | 80 |
+| `medvedev_struff/002@338` | 4.760868 | 0.223823 / 0.255021 | 0.194962 / 0.220377 | 80 |
+| `medvedev_struff/017@206` | 4.941293 | 0.188240 / 0.208610 | 0.203322 / 0.211307 | 80 |
+| `medvedev_struff/029@138` | 4.924546 | 0.274818 / 0.286920 | 0.220742 / 0.238160 | 80 |
+| `medvedev_struff/021@246` | 4.773184 | **0.265830 / 0.253451** | 0.202030 / 0.223712 | 80 |
+
+**Base-charged alternative:** charging the actual 48,878,567-byte tennis-base checkpoint over the same 2 h adds54.309519 kbps. It produces0 wins among 12 bracketed cells (the six Medvedev windows×two metrics); the 12 Alcaraz cells are above their measured rate brackets and remain unresolved. This alternative does not establish the bar. The primary result therefore cannot be presented as a fully charged end-to-end codec saving. Reference transport, target matte transport/estimation and background costs remain outside this diagnostic.
+
+### Resource ledger and evidence
+
+**Final charged GPU wall: 6.995428306 of 8 GPU-hours; 1.004571694 h unused.** Independently summed from all 24 terminal `run/status.json` receipts, including both initial failed requests, every smoke, setup and validation reservation. No GPU jobs remain active. The unpublished `20261024T204512Z-8a7d6449` had no spec/ready/run and used 0 h; its snapshot was retained, never replayed. Each native stage stayed within its ≤45-minute recovery bound; real Ada hardware/device/kernel checks passed. CPU audits used 0 GPU-hours.
+
+| Fleet job | Stage | Terminal state | Charged GPU-h |
+|---|---|---|---:|
+| `20261024T174042Z-463f42af` | initial invalid-source request | failed | 0.002858 |
+| `20261024T174553Z-ecc5ca36` | initial validator-placeholder failure | failed | 0.072818 |
+| `20261024T193537Z-12dffb55` | features first6 | complete | 0.290773 |
+| `20261024T200318Z-12faa9a8` | features remaining6 | complete | 0.293374 |
+| `20261024T201059Z-29586984` | anchors/source codes shard1 | complete | 0.374196 |
+| `20261024T203305Z-855eccf9` | anchors/source codes shard2 | complete | 0.365527 |
+| `20261024T205303Z-4928c016` | anchors/source codes shard3 | complete | 0.351748 |
+| `20261024T205730Z-869e62f2` | render alcaraz_hurkacz/031@129 | complete | 0.371330 |
+| `20261024T211935Z-d45d6fbb` | anchors/source codes shard4 | complete | 0.380167 |
+| `20261024T212140Z-f1459bd9` | render medvedev_struff/014@194 | complete | 0.374634 |
+| `20261024T214351Z-3f29c4ca` | render alcaraz_hurkacz/013@213 | complete | 0.394257 |
+| `20261024T214544Z-7d7c0bb1` | render medvedev_struff/037@349 | complete | 0.371825 |
+| `20261024T220850Z-3f03ad01` | render alcaraz_hurkacz/023@228 | complete | 0.392057 |
+| `20261024T220858Z-76fbb3a9` | render medvedev_struff/002@338 | complete | 0.386331 |
+| `20261024T223427Z-7029113c` | judge shard1 | complete | 0.095142 |
+| `20261024T223557Z-e5de30f5` | judge shard2 | complete | 0.092350 |
+| `20261024T224350Z-0cc91c89` | render alcaraz_hurkacz/016@273 | complete | 0.349830 |
+| `20261024T224543Z-9e1145bb` | render medvedev_struff/017@206 | complete | 0.371886 |
+| `20261024T230641Z-31aa2383` | render alcaraz_hurkacz/008@261 | complete | 0.366273 |
+| `20261024T230918Z-b01ae9ae` | render medvedev_struff/029@138 | complete | 0.374804 |
+| `20261024T233009Z-28f16db9` | render alcaraz_hurkacz/047@123 | complete | 0.366318 |
+| `20261024T233245Z-ebafc4f5` | render medvedev_struff/021@246 | complete | 0.375184 |
+| `20261024T235346Z-9b0af845` | judge shard3 | complete | 0.089406 |
+| `20261024T235616Z-1a85923b` | judge shard4 | complete | 0.092341 |
+
+CPU fleet preparation/pack jobs were `20261024T200247Z-b63794f9`, `20261024T203302Z-332cab62`, `20261024T204514Z-f427e93b`, `20261024T210930Z-91f893e4`, `20261024T212000Z-7d4ddcf5`, `20261024T214359Z-53bb8f6f`; each completed with substantive full validation and0 GPU-h. The clip-only recovery audit covered 61 clips/39,853 decoded frames, with 0 native equal-size frame-hash matches and 0 pairs at 64×36 RMSE ≤3; re-encoded/cropped/alternate-view replays and upstream pretraining are not ruled out. Its preserved bundle SHA256 is `2bfafa0c0115171d784dd3d79696207917362f85a9653fa7939c3f446b57ff5b`.
+
+Every native artifact is under `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/JOB_ID/full/`; `ready.json`, `spec.json`, `gate.json`, `scientific-validation.json`, native metadata and published tarballs retain code revision/selected patch checksums, commands, encoder/decoder paths/versions, model/input hashes, pinned environment and actual GPU identities. Main environment archive SHA256 `32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`; JCV `bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e`. No weights or raw experiment outputs were added to the checkout.
+
+Final CPU JSON: `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/final-report-20261025T000250Z.json`, SHA256 `e12e296fcb505bc8d5da9a9f0d4398b99a29071da8d0c8a5b193527449a72e3f`. It validates all 20 comparison/generation stage receipts and every referenced native artifact checksum. Runtime: Python 3.10.20, NumPy 1.26.4, SciPy 1.10.1, PyTorch 2.2.2+cu121 with CUDA hidden; source file hashes retained. Native GPU jobs used their separate pinned packed environments.
+
+Final reproducibility bundle: `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/final-evidence-20261025T072817Z.tar.gz`, SHA256 `f0b68ee73f98d4a6e8f659c758664a14f4616593755bc02611fd05db7b2b824b`, 1,960,964 bytes / 49 members; exclusive creation and remote hash verification. It contains report/runtime, all 24-job budget audit, receipts, exact spec factory, source-only mask/rate proofs and `k6b-confirm-reproduce-report.py NEW_OUTPUT_JSON`. Existing evidence remains untouched.
+
+Checks: substantive native smoke and full validators passed for every retained feature/anchor/prepare/generation/judge result; all 120 codec points and 956 mask identities passed. Local `ruff check`, configured mypy (200 files), focused scientific tests passed. Full local suite: 850 passed / 24 skipped / one unchanged macOS `/home`-symlink hook failure; no hook change was made. The PR Linux `checks` job passed for the same scientific source. No recurring model monitors, other chats, fitting or Wan-Animate were launched.
+
+**Stop condition reached:** the complete frozen-cohort descriptive decision is made within budget. Strong provenance confirmation remains unresolved; registration-gate discrimination and 115 px remain unconfirmed. Auto-merge remains off following the earlier automatic approval-review rejection of merge authorization; no merge retry or bypass was attempted. Root-owned PLAN standings/dispatch narrative are left for the planning chat.

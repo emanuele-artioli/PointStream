@@ -14,14 +14,14 @@ confirmation. The stronger confirmation goal remains blocked. Step 5 remains fai
 ## Scope and stop conditions
 User approval (2026-10-24): **8 GPU-hours hard ceiling**, all smoke/failed/retry
 work included. Explicit clip-local scope approval resolves the earlier
-provenance condition for this diagnostic. **6.07218 spent** before the active eleventh and twelfth
-renderer shards; live accounting and job IDs are in the experiment entry. CPU source
+provenance condition for this diagnostic. **6.99543 spent of 8; execution complete; no active GPU
+jobs**; live accounting and job IDs are in the experiment entry. CPU source
 checks found no original Alcaraz/Medvedev videos or verified extraction receipts
 in the inspected archive/records; source-frame mapping remains unresolved.
 Independent-source confirmation stays blocked at that gate. The original
 preparation/recovery phase ended CPU-only; the user has now instructed execution
-under the approved narrower scope and existing ceiling. Remaining CPU validation
-and staged compute gates still apply. This scope approval does not pass
+under the approved narrower scope and existing ceiling. Required CPU validation
+and staged compute gates passed; the completed outcome is recorded below. This scope approval does not pass
 the unresolved original-source confirmation gate. No fitting, Wan-Animate or other task is
 included. The authorization/outcome continuation is appended to the experiment
 entry. Stop on newly detected overlap, unresolved required validation, validator
@@ -169,3 +169,27 @@ The user subsequently explicitly instructed execution (“If not, do so”).
 Run the CPU validator prerequisites and staged diagnostic within these limits;
 no fitting or Wan-Animate. Current IDs and budget accounting live in the
 experiment entry, which controls continuation after each stage.
+
+## Completed outcome — 2026-10-25
+
+The entire frozen 12-window cohort completed: **23/24 billed window–metric wins**
+(bar 18/24), LPIPS 11/12 and DISTS 12/12; **24/24 unbilled**. All 24 primary
+cells resolve; Alcaraz–Hurkacz 12/12 and Medvedev–Struff 11/12. All 120 native
+anchor points and 956 identical judging-frame R/S masks passed validation.
+Final charged GPU wall **6.995428306/8 h**, including both initial failures;
+all 24 GPU jobs are terminal. No fitting, Wan-Animate or other study was run.
+
+Primary billing amortizes the existing adapter and trained guider over 2 h and
+assumes the common base decoder shipped. Charging its 48,878,567-byte checkpoint
+over 2 h adds54.309519 kbps:0/12 bracketed wins,12 other cells unbracketed; that
+alternative does not establish the bar. References and exact target matte remain
+granted/unbilled. Source/replay independence remains unresolved; two familiar
+broadcast clusters do not provide independent-source confirmation. All 12 pass
+registration, so gate discrimination is untested; 115 px remains exploratory.
+The historical step-5 failure is unchanged.
+
+Final self-contained measurements, ledger and provenance are in the
+[completed experiment entry](../experiments/k6b-players.md#2026-10-25--completed-frozen-clip-local-tennis-player-diagnostic).
+Raw report SHA256 `e12e296fcb505bc8d5da9a9f0d4398b99a29071da8d0c8a5b193527449a72e3f`;
+final evidence bundle SHA256 `f0b68ee73f98d4a6e8f659c758664a14f4616593755bc02611fd05db7b2b824b`.
+Stop condition reached; no additional compute is authorized or required by this card.
