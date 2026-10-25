@@ -88,7 +88,27 @@ def report(diagnostic: Path, transport: Path, conditioning: Path, archives: list
         settings[variant] = {'rows': rows, 'measured_cells': 2*len(rows), 'strict_wins': wins, 'unresolved': unresolved,
             'pilot_passes_3_of_4': wins >= 3 if len(rows) == 2 else None,
             'full12_confirmation': 'not performed; no18of24claim', 'bd_rate': 'not defined for one measured operating point per window/recipe'}
-    return {'settings': settings, 'native_receipts': receipts, 'control_errors': controls,
+    from experiments.background.g5 import envelope, pareto
+    from experiments.tennis.k5 import bd_rate
+    curves: dict[str, Any] = {}
+    for wid in PILOTS:
+        curves[wid] = {}
+        for family in ('alpha-floor0-p8', 'black-floor32-p8'):
+            measured = [r for name, rows in cells.items() if name.startswith(family+'-q') for r in rows if r['window'] == wid]
+            if len(measured) < 3:
+                curves[wid][family] = {'points': len(measured), 'bd_rate': None, 'scope': 'fewer than3 measured qualities; no curve claim'}
+                continue
+            curves[wid][family] = {}
+            for metric in ('lpips', 'dists'):
+                points = [(r['kbps'], -r['quality'][metric]) for r in measured]
+                anchors = [(r['kbps'], -r[metric]) for r in original[wid]['anchor_points'].values()]
+                front, hull = pareto(points), envelope(anchors)
+                lo, hi = max(front[0][1], hull[0][1]), min(front[-1][1], hull[-1][1])
+                curves[wid][family][metric] = {'method_points': points, 'anchor_envelope': hull,
+                    'quality_overlap': [lo, hi] if hi > lo else None,
+                    'bd_rate_fraction': bd_rate(points, anchors, 1e-12) if hi > lo else None,
+                    'scope': 'historical preset8 only, PCHIP lograte on overlapping quality, selectedpreset1/4 points excluded'}
+    return {'settings': settings, 'historical_dense_curves': curves, 'native_receipts': receipts, 'control_errors': controls,
         'scope': 'two frozen familiar-broadcast windows only',
         'limitations': ['target-derived Telea background granted', 'dynamic exact matte granted for reference generation',
             'source/replay independence unresolved', '115px exploratory', 'not exhaustive compression search',

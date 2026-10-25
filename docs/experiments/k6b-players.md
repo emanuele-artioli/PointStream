@@ -3292,3 +3292,5 @@ DenseGPUactualthroughbothwindows503.504413s, plus550historicalreserve
 =1053.504413<1800. Wholeframe/outsideRerrors and FP/FN saved; black-key
 FPmeanAl2635.4/Med1520.2pixels perjudgedframe versusalpha257.2/186.45.
 Allnativecontrols/pixel/R/S/coveragechecks passed; nofull12windowclaim.
+
+MissingAlplayer001 control job `20261025T191545Z-f67eebcb` sourceea6fd44e specSHA256`ce2aa7eef86db2f7d7e34a1f78212c3ba557ad787012b4963724b410fa41a97d`;1000GPU-sreservation, exclusivefullAda pool, retained006bitexact checkpoint not replayed.
