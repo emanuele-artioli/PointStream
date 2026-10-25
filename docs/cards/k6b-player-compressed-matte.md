@@ -40,3 +40,5 @@ The user explicitly approved the proposed0.75 GPU-hour cap on2026-10-25. Follow 
 Approved GPU part1 job `20261025T135736Z-c830e267`, source679f0f94;675/2700 GPU-s reserved; later parts not submitted. Inspect this ID before acting.
 
 GPU part1 corrected20261025T140128Z-2dfd517f complete: three full windows, all scales0/6 billed wins, bound18/24 remains possible. Cumulative442.725219/2700 GPU-s spent, including first failed smoke. Part2 `20261025T141239Z-93456964` running; source052df444, per-complete-window conservative stop, later parts unsubmitted. No new generations.
+
+GPU report published: https://github.com/emanuele-artioli/PointStream/pull/240, merge-commit auto-merge enabled. New GPU ledger closed at0.167674940/0.75 h; all task jobs terminal and events acknowledged. No outstanding compute request in this task.
