@@ -61,7 +61,8 @@ def control_error(current: np.ndarray, expected: np.ndarray, *, tolerance: float
 def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Path,
                  matte_row: dict[str, Any], generated: dict[Any, Any], source: Path, source_sha: str,
                  nets: dict[str, Any], scratch: Path, publish: Path, max_judged: int,
-                 *, control_variant: str = "gen-match5") -> dict[str, Any]:
+                 *, control_variant: str = "gen-match5",
+                 predicted_masks: dict[int, dict[int, np.ndarray]] | None = None) -> dict[str, Any]:
     import cv2
     from experiments.tennis import k6, k6b
     from experiments.tennis.k4b_features import convert
@@ -82,7 +83,8 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
         raise ValueError("Original mask frame/player/grid shape changed")
     reduced = {}
     selected_packets = {}
-    for scale in SCALES:
+    variants = VARIANTS if predicted_masks is None else (0, -1)
+    for scale in SCALES if predicted_masks is None else ():
         selected = matte_row["settings"][str(scale)]["selected"]
         blob = (matte / selected["file"]).read_bytes()
         meta, small = decode(blob)
@@ -117,16 +119,17 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
         expected_control = np.stack([a[m][old_index] for m in ("lpips", "dists")])
     dest = publish / safe(wid)
     dest.mkdir()
-    arrays = {m: np.full((4, 240), np.nan) for m in ("lpips", "dists", "outside_r_sse", "sse")}
+    arrays = {m: np.full((len(variants), 240), np.nan) for m in ("lpips", "dists", "outside_r_sse", "sse")}
     hashes = {}
     composite_hashes = {}
-    row: dict[str, Any] = {"id": wid, "scales": list(VARIANTS), "expected_judged": requested,
+    row: dict[str, Any] = {"id": wid, "scales": list(variants), "expected_judged": requested,
         "original_judged": native["judged"], "judged": [], "scored": native["scored"],
         "selected_packets": selected_packets, "source_sha256": source_sha, "converted": converted,
         "complete_window": max_judged == 0, "condition_boxes_sha256": [array_sha(np.stack(list(b.values()))) for b in boxes],
         "control_variant": control_variant, "crop_coverage": {}, "control_composite_hashes_match": True,
         "source_rgb_frame_sha256": {}, "source_player_masks_sha256": {},
-        "decoded_matte_frame_sha256": {str(scale): [array_sha(m) for m in reduced[scale]] for scale in SCALES}}
+        "decoded_matte_frame_sha256": {str(scale): [array_sha(m) for m in reduced[scale]] for scale in reduced}}
+    row["prediction_shape"] = {}
     row["setup_seconds"] = time.monotonic()-started
     row["scored_frame_seconds"] = {}
     for n, t in enumerate(requested):
@@ -147,13 +150,19 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
             raise ValueError("Frozen R/S judging regions changed")
         frames, supports = [], []
         coverage = []
-        for scale in VARIANTS:
+        for scale in variants:
             canvas, written = fill.copy(), np.zeros_like(r)
             requested_union = np.zeros_like(r)
             per_player_missing = {}
             for player in kp_meta["compositing_order"]:
                 i = native["players"].index(player)
-                mask = regions[t].get(player, np.zeros_like(r)) if not scale else mk.upsample(reduced[scale][t:t+1, i].astype(np.uint8)*OBJECT, (1920, 1080))[0] > 0
+                if scale == -1:
+                    assert predicted_masks is not None
+                    mask = predicted_masks[i][t]
+                    if mask.shape != r.shape or mask.dtype != bool:
+                        raise ValueError("Predicted receiver mask shape/type differs")
+                else:
+                    mask = regions[t].get(player, np.zeros_like(r)) if not scale else mk.upsample(reduced[scale][t:t+1, i].astype(np.uint8)*OBJECT, (1920, 1080))[0] > 0
                 requested_union |= mask
                 if t not in crops[i]:
                     per_player_missing[player] = int(mask.sum())
@@ -165,6 +174,12 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
                 "missing_union": int((requested_union & ~written).sum()), "per_player_missing": per_player_missing})
             frames.append(canvas)
             supports.append(written)
+        if predicted_masks is not None:
+            predicted = np.logical_or.reduce([predicted_masks[i][t] for i in range(len(units))])
+            intersection, union = int((predicted & r).sum()), int((predicted | r).sum())
+            row["prediction_shape"][str(t)] = {"iou": intersection / union if union else 1.0,
+                "fp": int((predicted & ~r).sum()), "fn": int((r & ~predicted).sum()),
+                "predicted_sha256": array_sha(predicted)}
         row["crop_coverage"][str(t)] = coverage
         if control_variant == "full":
             expected_rgb = old_row["composite_sha256"][str(t)][old_index]
@@ -191,7 +206,7 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
             write(dest / "partial.json", {"id": wid, "finished_frames": row["judged"], "expected_frames": requested})
         row["scored_frame_seconds"][str(t)] = time.monotonic()-frame_started
     row["control_max_abs_difference"] = control_error(np.stack([arrays[m][0, requested] for m in ("lpips", "dists")]), expected_control[:, requested])
-    row["means"] = {str(scale): {m: float(arrays[m][i, requested].mean()) for m in ("lpips", "dists")} for i, scale in enumerate(VARIANTS)}
+    row["means"] = {str(scale): {m: float(arrays[m][i, requested].mean()) for m in ("lpips", "dists")} for i, scale in enumerate(variants)}
     row["scoring_masks"] = hashes
     row["composite_hashes"] = composite_hashes
     row["seconds"] = time.monotonic()-started

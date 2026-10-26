@@ -3983,3 +3983,45 @@ The original raw generation archives remain in their prior immutable directory.
 Publication PR: https://github.com/emanuele-artioli/PointStream/pull/244.
 Merge-commit auto-merge enabled, subject to required Linux CI. Experiment
 stopped at the CPU input gate; no further task computation is scheduled.
+
+## 2026-10-26 — Sampled receiver-silhouette diagnostic: scope amendment, rule
+
+Planning explicitly selected the narrower80-tick quality diagnostic after the
+completed CPU input audit, under continuing human “Get started” authority.
+Audit and its765.100194CPU-s/0GPU remain preserved. Cumulative receiver-study
+caps stay3600CPU-s/2700GPU-s; no new budget is created. New scoped branch
+`codex/k6b-receiver-sampled-pilot`. The final amendment in the existing
+[card](../cards/k6b-receiver-silhouette.md#scope-amendment-sampled-zero-matte-diagnostic-planning2026-10-26)
+freezes one YOLOE26x candidate, keypoint-only instance choice, read-isolated
+fresh reset reproduction, exact control<=1e-4, measured smoke resource gate,
+2000s initial reservation and>=3/4 strict cells BEFORE inference or quality.
+
+This specifically tests zero-dynamic-matte composited quality on actual saved
+raw crops at0,3,...237 only. It does not repair or answer missing240-frame RGB,
+exact correction rate, full-stream determinism or wire delivery. Hypothesis:
+receiver-visible generated shape preserves enough fidelity to keep>=3/4 cells.
+Competitor: generated shape/context segmentation deviates enough to erase the
+advantage even without a matte bit bill. Target masks/source/canvas stay
+unreadable to the predictor; only evaluation gets originalR/S/Telea after masks
+are frozen. All original scope/provenance/background limitations remain.
+
+Frozen model hashes (CPU availability audit, no inference): YOLOE26x
+171640453bytes SHA256`d08d390a08f98195f7c87807839fe4ff93a5491645fef1bc3bf0700efafdd639`;
+MobileCLIP2 253794476bytes
+SHA256`35d7f213e4d75f38514e4656ad3cb91158bd33e3805d8ac349f23b186f66982f`.
+Both already installed in Models/YOLO; main packed environment remains
+`32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`.
+Actual Linux read-isolation function passed a CPU allowed/denied-file test on
+LandlockABI4/kernel6.8. No weights were loaded. Static checks and9 focused
+regressions pass. Geometry projection clips to saved crop support; no source
+pixel invention. Independent KPS decode confirmed units already have full
+native names, preserving original player order.
+
+Pre-admission six-host inspection: compatible Ada hosts5/6 considered; all
+were busy, gpu5 had23–28GiB free. Freeze shared12GB+8GiB margin, no timing claim,
+fresh reset pixel/mask hashes mandatory. First native reservation2000s
+(300 smoke/1500 full/40 validator/160 overhead),700GPU-s recovery unspent.
+GPU-stage CPU validators additionally require smoke<300CPU-s and full<1700CPU-s;
+combined with765.100194 prior conservative audit cost and remaining local/
+validation/check allowance this fits3600. No recurrent model wakeup; attended
+native fleet wait only, no verified completion-triggered model wakeup available.
