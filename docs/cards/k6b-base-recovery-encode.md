@@ -1,8 +1,8 @@
-# Proposed native whole-frame base recovery encode — NOT AUTHORIZED OR RUN
+# Native whole-frame base recovery encode — AUTHORIZED, NOT RUN
 
 Goal: produce verifiable actual whole-source SVT streams and decoded pixels for
 Al031@129 and Med014@194, as inputs to a later saved-80 feasibility test. This
-is a proposed CPU job, not a result or a delivered codec. No model inference,
+is an authorized CPU job, not a result or a delivered codec. No model inference,
 quality scores, ball reconstruction or new generation. Independently search
 only the exact paths identified by the inventory first; if matching streams
 and pixel manifests turn up, verify them instead of encoding duplicates.
@@ -46,8 +46,7 @@ complete point independently; validate all six file hashes and metadata. A
 mismatch blocks promotion. This is a whole-source base containing player and
 ball; no target matte/Telea is transmitted to receiver.
 
-Proposed budget: <=1800 aggregate CPU-s and <=45 min wall, 0 GPU, separately
-authorized; one-thread/small-thread native smoke <=300 wall seconds with measured
+Authorized budget: <=1800 aggregate CPU-s and <=45 min wall, 0 GPU; one-thread/small-thread native smoke <=300 wall seconds with measured
 child CPU, first 24 frames on both sources, scale2 and exact commands, then
 project the six full 240-frame encodes, all decoding/validation and overhead
 under both caps before promotion. A short stream's encode hash need not match
@@ -64,3 +63,48 @@ there is no measured GPU-hour quote yet. Ball needs exact-window encoder-side
 position/visibility/shape/color/appearance and packet/timing provenance,
 including unknown frames and cost. Any new detection/capture needs its own
 scope and authority. Prior player pass used granted Telea and is development.
+
+## Authorized continuation — preflight
+
+Planning explicitly authorized this stage, <=1800 measured aggregate CPU-s,
+<=45 minutes wall, 0 GPU. The proposed smoke, inputs, settings and validator
+remain unchanged. Do not submit until implementation, packed-native path,
+independent decode checks and total CPU accounting—including fleet setup and
+publication—are demonstrably enforceable. Any failure stops without promoting.
+
+## Durable overnight stop — 2026-10-26
+
+No job, smoke, worker implementation, executable job specification, stream,
+decoded pixels or quality result exists for this continuation. The scoped
+branch `codex/k6b-native-base-encode` starts from inventory commit `e517eb6b`;
+prior inventory PR #248 records actual archive/ball searches. The native
+anchor job `20261024T201059Z-29586984` was checked complete; it is historical,
+not a submitted job for this continuation. Old allocations are closed.
+
+The user's unattended-work request does not waive AGENTS.md: unattended
+execution requires verified isolation including enabled file and MCP tools.
+Planning reports its local scoped probe found filesystem isolation verified,
+but daemonized process lifetime unverified and no enabled-MCP isolation proof;
+the probe overall failed. Remote agent sessions are prohibited for this
+project. Stop unattended dispatch; no timers, recurring monitors, new agents,
+additional chats or fleet work. This is an operational stop, not a failed
+scientific test or exhausted budget. Resume attended, or only after the actual
+execution environment has independently verified both process lifetime and
+file/MCP isolation.
+
+Fleet `budget_seconds` controls wall time. Its cumulative child usage recorded
+at workload return can measure child CPU, but the saved snapshot does not
+establish an enforceable aggregate ceiling covering staging, supervisor,
+publication and the later smoke validator. The card's 1800 CPU-s remains the
+assigned cap; do not relabel it a workload-only cap or promise full accounting
+without a verified mechanism. A revised workload-only cap or explicitly
+bounded overhead requires separate authority. Do not modify fleet infrastructure
+just to claim strict global accounting. Before any eligible attended run,
+implement the retained-stream worker and independent validator; establish a
+measured and enforceable budget approach, then conduct the fixed 24-frame
+smoke and promote only when its projection fits. Native comparison converts
+YUV to RGB with `src.codecs.quality.yuv420_to_rgb` (bilinear chroma, limited
+range) and bicubic resizes RGB to 1920×1080 in `experiments.tennis.k6`; preserve
+this path and verify CPU/native pixel identities rather than substitute an
+unverified generic resize. Six streams must include all framing and complete
+240-tick pixels; no data produced yet.
