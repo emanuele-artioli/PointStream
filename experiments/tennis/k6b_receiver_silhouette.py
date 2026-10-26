@@ -87,7 +87,13 @@ def worker(a: argparse.Namespace) -> None:
     own.mkdir()
     (own / "tmp").mkdir()
     (own / "config").mkdir()
-    allowed = [Path(p) for p in ("/usr", "/lib", "/lib64", "/etc", "/dev", "/proc", "/sys", "/opt")]
+    allowed = [Path(p) for p in ("/usr", "/lib", "/lib64", "/etc", "/proc", "/sys", "/opt")]
+    # /dev/shm contains fleet caches, including forbidden source/mask packets.
+    # Allow concrete GPU/runtime devices, never the /dev directory recursively.
+    allowed += [
+        Path(p) for p in ("/dev/null", "/dev/zero", "/dev/urandom", "/dev/random", "/dev/dri")
+    ]
+    allowed += list(Path("/dev").glob("nvidia*"))
     allowed += [
         Path(sys.prefix).resolve(),
         Path(sys.base_prefix).resolve(),

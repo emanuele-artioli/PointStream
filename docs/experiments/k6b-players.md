@@ -4084,3 +4084,21 @@ Additional configured local checks measured164.913063CPU-s; audit765.100194,
 failed smoke1.485176 and300 new local/preflight allowance leave ample measured
 headroom for gated smoke/full CPU and actual validators under3600. Same primary
 criterion, no inference outputs or new quality scores opened yet.
+
+Instrumented recovery50c37ae0 FAILED the required privacy probe before model
+loading: recursive/dev allowance also exposed the fleet's/dev/shm source cache.
+This is an isolation implementation error caught by the gate, not segmentation
+or quality evidence. The probe read one source byte, then aborted before any
+prediction; nothing from that attempt is accepted. Native admitted duration
+10.275501728057861s, cumulative20.67448902130127/2700GPU-s. Full traceback is
+preserved in native smoke command/worker log; no unisolated fallback.
+
+Narrow device allowlist now contains only concrete GPU/runtime nodes, never/dev
+recursively. A CPU-only test using the actual fleet source-video and target-
+mask cache paths proves both reads denied while an allowed file still reads.
+The candidate/model/threshold/geometry/scoring remain unchanged. This concrete
+privacy repair is checked before one further native smoke, using released
+unspent reservation; remaining2679.325511GPU-s supports a2000s reservation.
+Ruff/mypy and9 focused tests pass. Full prior tests remain valid apart from this
+narrow allowance change; required real smoke must prove all4 forbidden reads
+and fresh reset outputs before evaluation. No quality scores opened.
