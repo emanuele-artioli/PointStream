@@ -1,17 +1,31 @@
 # Tennis reference and mask video comparison
 
-Current state (2026-10-26): approved continuation, at most 4.5 new GPU-hours
-and 3600 CPU-seconds. CPU preflight is closed at 2647.198626 CPU-seconds.
-Dense carriers each failed all four pilot metric cells. The full original-PNG
-calibration passes all 160 judged frames: fresh-render differences remain below
-1e-3, while identical saved-RGB metric replay remains below 1e-4. Terminal GPU
-charges are 6857.270955 seconds. Six frozen reference renders (1450 seconds
-each) and final judging (550 seconds) reserve at most 16107.270955 seconds
-including those charges, below the unchanged 16200-second cap. Candidate job
-IDs, revisions and specifications are recorded in the experiment entry.
-Three preset-1, CRF-20 reference families use the same Al031 and Med014 windows.
-No full-12-window result, independent-source claim or ungranted-matte result is
-authorized by this pilot. Exact matte and target-derived background remain granted.
+Current state (2026-10-26): **complete; stop because the pilot decision is reached.**
+The approved 4.5 new GPU-hour / 3600 CPU-second comparison used
+4.411018619 GPU-hours and a conservative 2647.198626 CPU-seconds, including
+failed and interrupted attempts. Old budgets remain closed. No GPU job or
+recurring model monitor remains active.
+
+Actual compressed-reference generation: unmasked full RGB passes 4/4 strict
+window–metric cells; explicit-alpha and affine-black segmented references each
+pass 1/4 and fail the frozen >=3/4 rule. The dense foreground alternatives each
+pass 0/4. Full RGB remains 4/4 under the predeclared ±0.001 sensitivity check.
+Preset 1 / CRF 20 / half-size was frozen globally before quality. Both original
+windows, two players each, 240 generated context frames and 80 stored judged
+crops per player are retained. The two affine Medvedev payloads are qualified
+complete unit checkpoints from terminal contended/failed jobs; the final native
+judge validates the complete window without rewriting their parent states.
+
+**Exact dynamic matte and target-derived background remain granted.** Charging
+the exact matte removes every reference-family win. Full-cohort >=18/24 and
+independent-source confirmation are untested; 115 px remains exploratory. This
+is a positive two-window reference-transport result, not a fully charged codec
+win or global compression optimum. Do not launch full-12 confirmation, fitting,
+new generation, Wan-Animate or further searches without a separately scoped
+approval. See the final 2026-10-26 outcome in the experiment entry for all jobs,
+controls, native hashes, rates, scores, limitations and immutable evidence.
+
+The historical stages and approvals below remain a chronological record.
 
 Goal: determine whether cheaper references and temporally coded silhouettes merit
 an actual reference-conditioned generation test on the frozen 12-window tennis
@@ -345,3 +359,9 @@ failed parent collection complete. All 160 judged calibration frames must pass
 before candidate admission. Retain exact delivered-pixel hashes, granted matte,
 target-derived Telea background and unresolved source-independence limitation.
 No full-12-window or independent-confirmation claim follows from this pilot.
+
+## Final immutable publication
+
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-reference-quality-20261026T093850Z`
+
+Metadata bundle SHA256 `75b489c2897f44c35a1cec12fbb0545e03c7dc51e65fcc5aba906141d108ce2e`;22 raw archives and110 metadata files verified read-only. Full outcome: final2026-10-26 entry in `docs/experiments/k6b-players.md`.

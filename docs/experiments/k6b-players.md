@@ -3526,3 +3526,94 @@ GPU-seconds; with550 final judging, maximum 16097.479467
 remains below16200. No scope, recipe, tolerance or total-budget change.
 
 Final joint native judge job `20261026T092648Z-ccf0633e`, source`1c1918e47f399990b1ba70376f8a5bccbee7f11d`, specSHA256`d0bfac4dfba2e51445bf723a7bfdf717a610924eab5a1bd36af37fe7a3ae5940`;550 GPU-second cap. All3 fixed families/both windows, original160 judged frames/R/S, savedRGB1e-4/freshPNG1e-3 controls, actual decoded-reference renders. Two complete affine Med unit checkpoints are explicitly identified as partial archives; parents remain failed/contended.
+
+## 2026-10-26 — Two-window compression-quality pilot: complete
+
+**Decision:** compressed, unmasked full RGB reference banks pass the frozen >=3/4 pilot rule (4/4). Explicit-alpha and affine-black segmented reference banks each fail (1/4). Each selected dense foreground carrier fails (0/4). These are actual generated/rendered quality results, not unchanged-quality rate predictions. The full 12-window >=18/24 claim remains untested.
+
+### Frozen comparison and accounting
+
+The two windows are Alcaraz–Hurkacz 031@129 (source frames 9–248, 25 fps, 9.6 seconds) and Medvedev–Struff 014@194 (74–313, 50 fps, 4.8 seconds). Each uses both original players, all 240 coded/context frames and its original 80 judged frames. Original method and anchors share those indices and court registration, R/S masks and target-derived Telea background. The 115 px threshold remains exploratory; original-source/replay independence remains unresolved. This is a familiar-broadcast, clip-local diagnostic.
+
+The three global reference recipes were frozen before new quality: native SVT-AV1 preset 1, CRF 20, half-size 256×392 decoded back to 512×784. The slower-preset CPU comparison established delivered-byte/decoded-fidelity dominance over presets 4 and 8 on both match banks. Both encoded color plus auxiliary alpha in a single Matroska container and a three-channel affine black-key video were actually decoded and tested. The black-key recipe reserves a guard band rather than relying on RGB 1 surviving lossy compression. Sparse reference masks accompany the reference bank; they do not deliver the per-target-frame dynamic matte. Dense foreground video, tested separately, delivers both appearance and silhouette over all 240 target frames.
+
+All generations retain the same base, 4-bit match adapter/pose guider, 30 DDIM steps, CFG 2, seed, geometry and 24/4 context. No fitting, segmentation inference or Wan-Animate. The primary rate pays keypoints, the actual delivered reference-bank container and adapter/guider over the original 7200-second match horizon; a common shipped base and exact dynamic matte remain granted. Single method operating points have no BD-rate curve; the decision uses the same achievable anchor envelope at the measured method rate. No quality extrapolation or per-window recipe selection.
+
+### Actual quality
+
+| Reference bank | Window | Paid rate, kbps | LPIPS | DISTS | Strict wins |
+|---|---|---:|---:|---:|---:|
+| full | alcaraz_hurkacz/031@129 | 5.237129 | 0.245873570 | 0.220013805 | 2/2 |
+| full | medvedev_struff/014@194 | 7.640872 | 0.172194882 | 0.186108082 | 2/2 |
+| alpha | alcaraz_hurkacz/031@129 | 5.244651 | 0.294567408 | 0.253369965 | 0/2 |
+| alpha | medvedev_struff/014@194 | 7.630432 | 0.203314784 | 0.207102623 | 1/2 |
+| black-affine | alcaraz_hurkacz/031@129 | 5.232358 | 0.293400037 | 0.253710111 | 0/2 |
+| black-affine | medvedev_struff/014@194 | 7.617872 | 0.202739390 | 0.205025694 | 1/2 |
+
+Full RGB banks are 48,164 bytes (Alcaraz) and 68,193 bytes (Medvedev), versus 895,487 and 1,179,150 original PNG bytes: 94.62% and 94.22% smaller. Relative to the fresh original-PNG control, full RGB changes LPIPS by +0.000704/+0.001648 and DISTS by -0.003048/-0.005982. Its 4/4 result survives both signs of the frozen ±0.001 renderer-envelope sensitivity. Alpha references lose 0.049398/0.032768 LPIPS and 0.030308/0.015013 DISTS versus the fresh PNG control; the two segmented families therefore do not preserve conditioning quality. The data support retaining background/context in the sparse reference crop for this model, not a universal claim about alpha containers.
+
+**Granted-matte limitation:** charging the measured exact dynamic matte raises full-RGB rates to 52.894629/77.540872 kbps and removes all four wins. All three reference families are 0/4 with that matte packet paid. Charging the 48,878,567-byte base adds 54.309519 kbps: each reference family has zero wins, two resolved losses and two unbracketed/unresolved cells. Thus this is not a fully charged codec win. The historical step-5 failure and unresolved source independence remain.
+
+The selected alpha-preset-4 and affine-black-preset-1 dense foreground videos each remain 0/4. The historical Alcaraz preset-8 multi-rate curves lose by +3550.75%/+3043.73% BD-rate (alpha, LPIPS/DISTS) and +6447.76%/+3061.17% (black32), PCHIP over the actual overlapping quality range against the achievable anchor envelope. Selected preset-1/4 single points are not mixed into those curves; Medvedev lacks a multi-point curve. These bounded tests do not establish global compression optimality. JPEG AI, learned mask prediction and exhaustive rate/resolution searches remain untested.
+
+### Correctness, recovery and provenance
+
+Both full original-PNG windows calibrated before any candidate quality was opened. Identical saved-RGB metric re-scoring retains the original 1e-4 guard; fresh FP16 generation uses the explicitly recorded pre-candidate 1e-3 amendment. The final joint judge passes all 160 original judged frames, source and R/S hashes, exact saved-output hashes, CUDA/class/memory and finite-score/mean checks. Final saved-RGB maximum errors are 0.000004709/0.000018775; fresh-PNG maxima are 0.000587463/0.000740707. Peak allocated GPU memory is 8.686927 GiB. No further tolerance changes followed candidate quality.
+
+The Medvedev affine job was stopped on foreign GPU contention after completing player 003. Its 004-only continuation saved the complete unit before a finalization timeout. Both raw parent states remain CONTENDED/FAILED. Explicit CPU qualification verifies each disjoint unit’s complete 240-frame context, all 80 original judged indices, NPZ hash/shape/dtype, seed/steps/profile and native smoke recipe/device/kernel gates. The final full-window judge consumes those two partial archives without replacing data or inventing global generation metadata. Both players and all original score frames are present. No completed unit was replayed.
+
+Final native judge: `20261026T092648Z-ccf0633e`, code revision `1c1918e4`, source SHA256 `d1a2350572c9127261fe6e45e7c576b18c6138fd11a26cefaa0d54cf5acbda7b`, gpu5 / NVIDIA RTX 6000 Ada Generation, UUID `GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162`. Native archive SHA256 `d5a9670d5a223d6c231476cbf7211442aa2ab77dfc01ba1cffbfb7265dee7457`. Native report includes pinned metric/backbone versions, input hashes and per-frame scores; frozen submitted specifications bind generation inputs/environments/weights and exact code revisions. CPU codec receipts record SVT-AV1/dav1d/ffmpeg paths and versions.
+
+Final reference report SHA256 `e9bbb4aca54cd5453f6c7e3472097881c37a200f6b685ec31221b5aff6c10797`; dense report SHA256 `86acf4a379594c1630507f8a608a350efc077b200ec5db9e8db302d329d7be85`. All raw complete and failed outputs are retained; the immutable publication index below supplies canonical paths and checksums.
+
+### Closed resource ledger
+
+New GPU total: **15879.667029/16200 seconds = 4.411018619/4.5 GPU-hours**, including every failed smoke, timeout, contention and recovery. Dense phase: 947.011110 seconds; reference/control/judge: 14932.655919. Slower-preset CPU preflight: **2647.198626/3600 CPU-seconds**, conservatively including the local allowance. Old 8-hour, 0.75-hour and CPU ledgers stay closed. No active GPU jobs or recurring model monitors remain.
+
+| GPU job | Role | Native terminal state | Admitted GPU seconds |
+|---|---|---|---:|
+| `20261025T183259Z-16af35e8` | al-control-full | failed | 1931.056334 |
+| `20261025T183318Z-34d149af` | med-control-smoke | failed | 131.172531 |
+| `20261025T184001Z-2e64d93e` | med-control-full | failed | 1892.709538 |
+| `20261025T185239Z-1df3ec6f` | al-pixel-smoke | failed | 44.123715 |
+| `20261025T185724Z-884dd4ce` | al-low | complete | 252.160562 |
+| `20261025T190034Z-01c74a65` | med-low | complete | 207.220136 |
+| `20261025T190813Z-810bcaba` | high-batch6 | failed | 141.266623 |
+| `20261025T193417Z-2387267a` | high-batch4 | complete | 302.240074 |
+| `20261026T070441Z-5b0eaf69` | al-original-missing-unit | complete | 731.520607 |
+| `20261026T070444Z-299584f1` | med-original-missing-unit | complete | 748.762351 |
+| `20261026T072949Z-aa61b482` | png-smoke-strict | failed | 30.384579 |
+| `20261026T073722Z-4ec3f83c` | png-calibration-two-windows | failed | 293.338359 |
+| `20261026T075201Z-db1ea276` | med-only-png-calibration | complete | 151.315546 |
+| `20261026T075716Z-f0549307` | full-al | complete | 1368.586064 |
+| `20261026T075730Z-e8d8f772` | alpha-al | complete | 1399.461311 |
+| `20261026T075723Z-e962542f` | full-med | complete | 1360.567544 |
+| `20261026T075737Z-a900b575` | alpha-med | complete | 1400.275787 |
+| `20261026T075746Z-ca0a46ed` | black-affine-al | complete | 1375.243978 |
+| `20261026T075753Z-75fd93fc` | black-affine-med | contended | 1050.864920 |
+| `20261026T091049Z-e429637f` | affine-med004-recovery | failed | 735.208909 |
+| `20261026T092648Z-ccf0633e` | joint-actual-reference-judge | complete | 332.187562 |
+
+Unstarted requests 20261025T191545Z-f67eebcb and 20261025T192327Z-591cb699 expired at zero GPU cost; unpublished 20261025T190533Z-524c8807 had no request/admission and zero charge. These IDs were inspected rather than replayed.
+
+**Stop:** the authorized two-window comparison is complete and its decision is reached. Retain compressed unmasked references as the candidate; do not advance segmented-reference or dense-foreground variants under this rule. A full-cohort quality confirmation would need a separately scoped budget and must retain the granted-matte, background, base-cost and source-independence limitations. No full-12 run is submitted.
+
+Immutable evidence publication: `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-reference-quality-20261026T093850Z`. Metadata bundle SHA256
+`75b489c2897f44c35a1cec12fbb0545e03c7dc51e65fcc5aba906141d108ce2e`; all22 copied raw artifacts and110 metadata
+files passed checksum verification and are read-only. Existing source data,
+weights, checkpoints and prior publications were not overwritten. Source
+requests/statuses/specifications and completed-unit qualification proofs remain
+inside the bundle; failed parent states remain explicit.
+
+Verification: configured `ruff check` and `mypy --config-file pyproject.toml`
+pass;21 focused tests pass, including explicit partial-collection rejection and
+completed-window recovery. Prior full local suite recorded873 passed/25 skipped
+plus the documented macOS protected-path assertion and sandbox process test;
+the latter passes when allowed read-only process inspection. Linux PR CI passes
+on the preceding code revision; final documentation commit is checked again.
+This is the fidelity track (LPIPS/DISTS); the experience track is untested.
+
+Saved checkpoints contain80 judged crops per player, while the native
+generation counter verifies all240 context frames were generated. They do not
+store240 decoded crops. Final primary decision and rates use original judged
+indices and original registered clip duration.
