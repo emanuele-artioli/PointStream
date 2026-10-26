@@ -4813,3 +4813,13 @@ and unusable Rublev candidates, requires source/PTS/replay/transitive training/
 reference/judge provenance and mechanically frozen eligibility before quality.
 No verified clean fresh cohort or new acquisition is asserted. No open user
 question to complete THIS pilot; any new stage needs separate authority.
+
+Immutable publication:
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-frame-20261026T192107Z`.
+Bundle SHA256`58e06ac014ebed49e4a401efe3dfd343d3aedab685140b82f7277d8198f47839`;
+83files independently verified, files444/directories555. Includes actual raw
+full/smoke archives, native commands/versions/gates/execution, private prompt/
+input/mask hashes and real per-frame scores, independent full validators,
+boundary/installation/sensitivity/cost evidence, supervision traces, code/patch
+hashes, card/report and both proposed next cards. Executed worker/judge file
+hashes match current sources. Existing source data/weights/results preserved.
