@@ -3390,3 +3390,18 @@ within1e-4 onall160judgedframes. OriginalR/S,source andsameactualCUDAjudges.
 Thisispre-candidatecorrectness verificationinsideapproved4.5GPU-h; no new
 qualitymethod/family/cohort or training. Firstcompressed-referenceconfiguration
 projection2x613.5s+nativeoverhead<1300sfull,110ssmoke+20validator within1450s.
+
+PNGwholecontrolQC job `20261026T072949Z-aa61b482` source1a15ddb4 specSHA256`47976c5da48ba848311a0c254fb194ad1063a04fc516388f19a58007d113eef2`;350GPU-sreserved, bothassembledfullwindows, unchanged1e-4scoregate.
+
+Newbudget bookkeeping: densephase CLOSED at947.011110GPU-s, belowits1800s
+planningallocation. ReallocateonlytheunusedNEWdensecontingencytooriginal
+controlrecovery/referencepilot: remainingreferenceceiling16200-947.011110
+=15252.988890s, while TOTALapproved4.5GPU-h remainsunchanged. Old8h/0.75h
+ledgersstayclosed. No newfamily/window/seed/steps/fit or search settings.
+Referenceactual5435.221361 +QC350 +6x1450referencewindowjobs +finaljudge550
+=15035.221361s; withclosed947.011110dense, combinedmaxreservation
+15982.232471<16200s, leaving217.767529soverheadcontingency. Admissionstill
+checksactualcostbeforeeachbatch; stopifcombinedcap cannotcoverremainingwork.
+Thisupdatesinternal0.5/4hplanningreservesusingactualcompletedcost, notthe
+user'sfrozenoverallbudget. Candidatebudgets110ssmoke/1300sfull/20validator,
+1450total, sameexclusivecompatibleAdapool,stoponnewforeigncontention.
