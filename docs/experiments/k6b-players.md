@@ -3983,3 +3983,355 @@ The original raw generation archives remain in their prior immutable directory.
 Publication PR: https://github.com/emanuele-artioli/PointStream/pull/244.
 Merge-commit auto-merge enabled, subject to required Linux CI. Experiment
 stopped at the CPU input gate; no further task computation is scheduled.
+
+## 2026-10-26 — Sampled receiver-silhouette diagnostic: scope amendment, rule
+
+Planning explicitly selected the narrower80-tick quality diagnostic after the
+completed CPU input audit, under continuing human “Get started” authority.
+Audit and its765.100194CPU-s/0GPU remain preserved. Cumulative receiver-study
+caps stay3600CPU-s/2700GPU-s; no new budget is created. New scoped branch
+`codex/k6b-receiver-sampled-pilot`. The final amendment in the existing
+[card](../cards/k6b-receiver-silhouette.md#scope-amendment-sampled-zero-matte-diagnostic-planning2026-10-26)
+freezes one YOLOE26x candidate, keypoint-only instance choice, read-isolated
+fresh reset reproduction, exact control<=1e-4, measured smoke resource gate,
+2000s initial reservation and>=3/4 strict cells BEFORE inference or quality.
+
+This specifically tests zero-dynamic-matte composited quality on actual saved
+raw crops at0,3,...237 only. It does not repair or answer missing240-frame RGB,
+exact correction rate, full-stream determinism or wire delivery. Hypothesis:
+receiver-visible generated shape preserves enough fidelity to keep>=3/4 cells.
+Competitor: generated shape/context segmentation deviates enough to erase the
+advantage even without a matte bit bill. Target masks/source/canvas stay
+unreadable to the predictor; only evaluation gets originalR/S/Telea after masks
+are frozen. All original scope/provenance/background limitations remain.
+
+Frozen model hashes (CPU availability audit, no inference): YOLOE26x
+171640453bytes SHA256`d08d390a08f98195f7c87807839fe4ff93a5491645fef1bc3bf0700efafdd639`;
+MobileCLIP2 253794476bytes
+SHA256`35d7f213e4d75f38514e4656ad3cb91158bd33e3805d8ac349f23b186f66982f`.
+Both already installed in Models/YOLO; main packed environment remains
+`32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661`.
+Actual Linux read-isolation function passed a CPU allowed/denied-file test on
+LandlockABI4/kernel6.8. No weights were loaded. Static checks and9 focused
+regressions pass. Geometry projection clips to saved crop support; no source
+pixel invention. Independent KPS decode confirmed units already have full
+native names, preserving original player order.
+
+Pre-admission six-host inspection: compatible Ada hosts5/6 considered; all
+were busy, gpu5 had23–28GiB free. Freeze shared12GB+8GiB margin, no timing claim,
+fresh reset pixel/mask hashes mandatory. First native reservation2000s
+(300 smoke/1500 full/40 validator/160 overhead),700GPU-s recovery unspent.
+GPU-stage CPU validators additionally require smoke<300CPU-s and full<1700CPU-s;
+combined with765.100194 prior conservative audit cost and remaining local/
+validation/check allowance this fits3600. No recurrent model wakeup; attended
+native fleet wait only, no verified completion-triggered model wakeup available.
+
+Submission ID`20261026T154114Z-808dc4f0`, source`a7f62e1e`: CLI reports
+outcome unknown after publisher rejected a Models path outside the permitted
+external-data input root. No automatic replay. Inspect canonical status before
+any replacement; existing weights must be staged by hash under Datasets first.
+
+Recovery inspection for808dc4f0: canonical status says unpublished; direct
+transfer inspection proves only`source/` and`events/`, no ready/spec/run record.
+Workers cannot admit it, so0GPU; retain its transfer. Existing immutable weights
+were copied/hash-verified into new read-only
+`Datasets/pointstream-data/tennis/k6b-receiver-inputs-20261026T154300Z/`.
+Only input locations changed, original Models preserved. This is a verified
+new submission after an unpublished transfer, not an unknown-job replay.
+
+Corrected native job`20261026T154300Z-b22eabc3`, source`a7f62e1e`, admitted
+reservation<=2000GPU-s of unchanged2700 cap. Published pending;
+sourceSHA256`47638c4e5d896b785d416c53d86fe01d06ef657664774fc219480baeb06d7522`,
+native specSHA256`b4f91f4d66061f7f6ea62ff37604fa2a6e6907f8767afea1958a7c8477dfb76b`.
+Local spec`/tmp/k6b-receiver-sampled-spec.json`; corrected submission receipt
+`/tmp/k6b-receiver-sampled-corrected-submission.json`. No new automation was
+created: the legacy CLI inherited chat_id and prints a heartbeat suggestion,
+which is intentionally not followed; waiting is a native bounded CLI command.
+Full local suite887pass/25skip, same2 Mac restrictions as audit; Ruff/mypy and
+9 focused tests pass. Full-stage CPU validator<1700, smoke<300; actual ledger
+will include all admitted setup/failures/validators, plus measured local checks.
+
+Accounting sensitivities fixed before reading new quality: primary remains7200s
+with common base and segmenter. Also show base-only, segmenter-only and combined
+installation charges, plus1800/7200/28800s amortization of actual bank/adapter
+and installation bytes with keypoint rate unchanged. These are fixed-quality
+accounting counterfactuals, not claims the observed80 frames generalize to those
+durations. Use the original measured anchor envelope; no quality extrapolation.
+A supported measured rate crossing can bound payback; censored crossings stay
+unresolved. These sensitivities cannot select or promote a different candidate.
+
+Job b22eabc3 FAILED smoke before model output. Canonical admitted GPU duration
+10.398987293243408s; native command0.717812s /child CPU1.485176s. Parent logged
+only a child exit, so no predictor failure detail or scientific result is
+claimed. The initial logging gap is retained rather than invented after fact.
+A CPU-only reproduction from/tmp proves the packed child cannot locate the new
+module without an explicit frozen-source PYTHONPATH, while `--help` succeeds
+with it. Correct this bootstrap, publish child logs before raising, and permit
+one bounded instrumented recovery within the same cumulative cap. No model,
+threshold, images, geometry, metric or decision-rule change. Remaining GPU
+2689.601013s before recovery;2000s new reservation fits. Failure metadata in
+`/tmp/k6b-receiver-sampled-terminal.json`; bootstrap proof in
+`/tmp/k6b-receiver-sampled-bootstrap-proof.json`.
+
+Recovery job`20261026T154832Z-50c37ae0`, source`9e9fb2ca`, published pending,
+<=2000GPU-s reservation. SourceSHA256
+`b446dcbe6c0d3392d7cb05c7306a3d86d5fc124386168a663bd36cf39ee0768e`,
+native specSHA256`bbda0c7b02db9784ebe299d15c63f7f9d990b19bde1534b36280a0682e6cd21d`.
+Receipt`/tmp/k6b-receiver-sampled-recovery-submission.json`. Explicit empty
+chat_id disables the legacy heartbeat suggestion; no automation created.
+Cumulative admitted GPU before this request10.398987293243408/2700s.
+Additional configured local checks measured164.913063CPU-s; audit765.100194,
+failed smoke1.485176 and300 new local/preflight allowance leave ample measured
+headroom for gated smoke/full CPU and actual validators under3600. Same primary
+criterion, no inference outputs or new quality scores opened yet.
+
+Instrumented recovery50c37ae0 FAILED the required privacy probe before model
+loading: recursive/dev allowance also exposed the fleet's/dev/shm source cache.
+This is an isolation implementation error caught by the gate, not segmentation
+or quality evidence. The probe read one source byte, then aborted before any
+prediction; nothing from that attempt is accepted. Native admitted duration
+10.275501728057861s, cumulative20.67448902130127/2700GPU-s. Full traceback is
+preserved in native smoke command/worker log; no unisolated fallback.
+
+Narrow device allowlist now contains only concrete GPU/runtime nodes, never/dev
+recursively. A CPU-only test using the actual fleet source-video and target-
+mask cache paths proves both reads denied while an allowed file still reads.
+The candidate/model/threshold/geometry/scoring remain unchanged. This concrete
+privacy repair is checked before one further native smoke, using released
+unspent reservation; remaining2679.325511GPU-s supports a2000s reservation.
+Ruff/mypy and9 focused tests pass. Full prior tests remain valid apart from this
+narrow allowance change; required real smoke must prove all4 forbidden reads
+and fresh reset outputs before evaluation. No quality scores opened.
+
+Narrow-device job`20261026T155233Z-07cca552`, source`7aba4282`, published
+pending,2000GPU-s reservation. SourceSHA256
+`d804c19d8ae1d17ff08b5f6031f3b998b648dc73387e60a31463fe0b6d972dd5`,
+native specSHA256`b0fc0755d9b371c735e5390799146f69f36b3a718adb39febed5959c0465a62d`.
+Receipt`/tmp/k6b-receiver-sampled-private-submission.json`; cumulative prior
+admitted20.67448902130127/2700GPU-s. Explicit empty chat metadata, no monitor.
+Actual isolation-cache CPU proof`/tmp/k6b-receiver-isolation-cache-probe.json`.
+
+Job07cca552 completed actual isolated prediction twice: all4 forbidden reads
+denied,4players×2ticks, exact fresh-reset input/output hashes, CUDA. Then the
+evaluator failed before scores because it assumed a`publish/` wrapper that the
+native transport archive does not have. Correct to the same root detection as
+prior native judges; actual archive CPU extraction confirms the KPS paths,
+plus a regression checks both supported layouts. No mask/model/prompt/quality
+change. Prediction receipt/masks retained in canonical smoke/partial.tar;
+this is valid infrastructure smoke evidence, not a quality result/full pilot.
+
+Native admitted60.83878016471863GPU-s; cumulative81.5132691860199/2700.
+Native child CPU53.848476s. Remaining2618.486731GPU-s supports2000s after the
+CPU-proven path repair. No full stage or neural quality scores completed.
+
+Scoring-layout job`20261026T155754Z-bbc4a300`, source`694dd06c`, published
+pending,2000GPU-s reservation. SourceSHA256
+`eeff18011d4c7b901e700bd38991adda6ae9a538b99629e49666f33bdf622945`,
+native specSHA256`0f0082564e266c7563bef2da4081ce7ce68ba47b5364931de332f9d4037edabe`.
+Receipt`/tmp/k6b-receiver-sampled-scoring-submission.json`; cumulative prior
+admitted81.5132691860199/2700GPU-s. No configuration changes after model output.
+Visual implementation check of the retained two-frame Alcaraz partial confirms
+actual masks cover generated players and leave crop background visible; this
+is not quantitative quality evidence and does not select a new profile.
+
+Job bbc4a300 scoring command completed both-window smoke successfully:
+86.014590CPU-s, full projection1345.326117s<1500. The template mistakenly kept
+`k6b_joint_matte` as validator; it searched for judge.json rather than the new
+receiver.json and stopped the fleet before full. Parent job remains FAILED.
+Native admitted90.88955974578857GPU-s; cumulative172.40282893180847/2700.
+
+Canonical scored smoke archive SHA256
+`0d7397fd25f6c20d09494af5d71064353d40d335853e1743f610491431aa1637`
+passes the intended receiver validator independently on CPU:31/31 checks.
+Additional per-frame neural-array/mean and source/shape-hash checks pass35/35.
+Both real controls, denied reads, fresh resets, actual masks, coverage, GPU
+class/memory and the measured resource projection pass. This is qualified
+infrastructure smoke evidence, not the full quality result. Only validator
+invocation/strength changes; no image/model/prompt/metric/rule change. Next
+native job rechecks this same representative smoke before full. Remaining
+2527.597171GPU-s supports2000s; no old ledger is reopened.
+
+Correct-validator job`20261026T171827Z-cf4da9e0`, source`115b9988`, published
+pending,2000GPU-s reservation. SourceSHA256
+`71542310799c36f127ece0e1ac36772105c1ec5aca836bfda425e8466732bb7f`,
+native specSHA256`dc2f5a8e84421c58b83cc8a1778728bb2089bebfb0b5d9606af867a9624d7d33`.
+Receipt`/tmp/k6b-receiver-sampled-qualified-submission.json`; prior admitted
+172.40282893180847/2700GPU-s. Correct module validator and stronger35 checks;
+no scientific configuration change. Re-inspect current native deadline/state
+before waiting after the client interruption; never replay this request.
+
+Correct native smoke gate cf4da9e0 PASSED35/35 substantive checks; full stage
+started on gpu5. Both denied-read and fresh-reset mask checks, exact controls,
+actual per-frame score arrays and measured full projection passed natively.
+Native current state recorded in
+`/tmp/k6b-receiver-sampled-qualified-gate-status.json`. No quality-dependent
+configuration choice. Resume bounded wait after acknowledging only the expected
+shared-contention event; job's own2000s/44min bounds stay unchanged.
+
+## 2026-10-26 — Sampled receiver silhouette: complete, fixed candidate fails
+
+**Decision:1/4 strict wins, below the frozen>=3/4 pilot bar.** This is a real
+inference-and-recomposition result on both original windows/all80 archived
+judged ticks each, not an IoU proxy or unchanged-quality substitution. No
+further segmentation, generation, fitting, full240 recovery or integration is
+launched. This closes this YOLOE26x/person/selection/projection profile; it does
+not prove every decoder-derived silhouette route fails.
+
+### Actual quality and conditional paid rate
+
+| Window | Rate kbps | Predicted LPIPS | Predicted DISTS | Strict wins |
+|---|---:|---:|---:|---:|
+| Alcaraz–Hurkacz031@129 | 5.237128889 | 0.262862106748 | 0.222578307986 | 1/2 (DISTS) |
+| Medvedev–Struff014@194 | 7.640872222 | 0.242911524930 | 0.236507502943 | 0/2 |
+
+All4 primary cells are bracketed; no unresolved primary cell or extrapolated
+quality. Actual exact/granted-matte controls remain4/4: Alcaraz LPIPS/DISTS
+0.245873567472/0.220013449341; Medvedev0.172194861869/0.186108257622. Every
+saved control composite RGB hash matches; maximum per-frame metric differences
+are3.939867e-5/2.163649e-5, below the unchanged1e-4 guard. No fresh generative
+re-render and no tolerance relaxation. There is one method operating point per
+window, so no method BD-rate curve is defined. Original achievable SVT-AV1/DCVC
+envelope and originalR/S remain unchanged.
+
+Rates pay the actual PR242 FULL reference banks, original KPS geometry/timing/
+identity streams and match adapter/guider over7200s. Alcaraz components are
+3.530000 keypoints+0.053515556 references+1.653613333 adaptation kbps; Medvedev
+5.903333333+0.075770000+1.661768889. Dynamic-matte payload and content-specific
+prompt/initialization bits are0 for this fixed installed person profile; no
+source mask, source-box prompt or source-driven crop is supplied to the client
+predictor. Common base+segmenter/text runtime installation is an explicit
+assumption. These are conditional sampled-frame rates, not a demonstrated
+complete240-frame wire/decode profile. All240 KPS ticks remain billed; there
+are only80 archived generated-RGB ticks, and no new240-frame matte/correction
+stream was constructed.
+
+### Receiver contract and failure diagnostics
+
+Both independent fresh-process predictions reproduce all inputs and masks
+bit-for-bit for each of the4players×80 archived ticks. Both actual native
+workers use CUDA and deny original source videos, target mask-bearing transport
+and quality-control archive reads. They see only unmasked generated crops,
+sanitized paid KPS, installed fixed profile/weights and runtime files. Raw crop
+context was retained. Evaluation reads originalR/S/canvas only after masks are
+frozen. Predictor determinism is demonstrated for these saved pixels on this
+hardware, not for new generative outputs or an independent all240-frame client.
+
+| Window | Mean per-tick union IoU | FP pixel-frames | FN pixel-frames | Missing RGB exact / predicted |
+|---|---:|---:|---:|---:|
+| Alcaraz | 0.650181056 | 79,499 | 272,155 | 9,104 / 0 |
+| Medvedev | 0.504735064 | 25,922 | 312,532 | 3,798 / 0 |
+
+These union IoUs describe shape, not the decision metric. Empty masks occur on
+0/80 and2/80 Alcaraz unit001/unit006 ticks, and1/80 and63/80 Medvedev unit003/
+unit004 ticks. In particular, the fixed detector frequently misses Medvedev's
+unit004 generated person. This is a measured cause of lost support for this
+profile, not evidence that no pose-prompted segmenter could recover it. No
+post-score confidence/threshold/model sweep was run.
+
+Predicted masks are projected and clipped using only the already-billed pose
+crop rule, so their requested support has no unavailable RGB. Exact target-R
+control still has the previously documented crop gaps; those pixels retain the
+identical native Telea fill. Zero predicted missing-RGB counts do not mean full
+original-body coverage: false negatives and empty predictions are explicitly
+counted. No source foreground pixels filled gaps. Per-frame predicted-mask,
+source RGB, source-player-mask, R/S, control/composite and score hashes are
+preserved with the actual mask arrays and all160 judged-frame scores.
+
+### Installation and amortization sensitivities
+
+The actual installed detector171640453B+local text encoder253794476B total
+425434929B. Charging that installation over7200s adds472.705477kbps; base alone
+48878567B adds54.309519kbps, combined527.014996kbps. At7200s: base-only has0 wins
+(2 bracketed losses/2 unbracketed), segmenter-only and combined have0 wins/all4
+unbracketed. In all installation-charged cases a measured cheaper/no-worse
+anchor witnesses dominance in every cell; unbracketed cells are not relabelled
+as interpolated losses. Combined rates are532.252124/534.655868kbps.
+
+Fixed-quality common-installation accounting at1800/7200/28800s yields0/4,
+1/4 and2/4 wins; none meets3/4. This changes byte amortization only, not the
+observed quality or cohort. For the measured Alcaraz quality, combined-install
+formal crossing horizons are>2740699s (31.72days, LPIPS) and>1207774s (13.98days,
+DISTS). They are algebraic fixed-quality sensitivities, not evidence the same
+profile/adapter works for those durations. Medvedev's measured crossings are
+2.260237/2.283348kbps, already below its5.903333kbps KPS floor; no positive
+amortization horizon repairs those two cells at the measured quality. This
+does not change the primary7200s failure or establish any temporal generality.
+
+### Actual native evidence, checks and closed budget
+
+Completed native job`20261026T171827Z-cf4da9e0`, executed source`115b9988`,
+gpu5 / RTX6000Ada, source/spec hashes in the preregistered job entry. Actual
+smoke projection1163.881537s passed the1500s full bound; full command325.814103s.
+These shared-GPU times are resource-cost records only, never latency evidence.
+Peak allocated3.553785GiB stays within the12000MiB declaration. Runtime Torch,
+backbone hashes, weight hashes, all input identities and executed code-file
+hashes accompany the result. Full raw archive SHA256
+`cc67ec2cc4bb58ca2ec713002a13e63bcc8f01b16e89656e59e6a1f3b2c1a01c`.
+
+Native smoke passes35 checks. The actual full archive independently passes34
+checks locally and on CPU in the original packed environment/frozen executed
+source: frame/mask arrays and hashes, fresh resets, source/hash coverage,
+per-frame score shapes/finite values/means, exact control, both complete original
+80-tick sets, memory/class and support accounting. No stand-in score is used.
+Full-stage process CPU366.902379s; successful supervisor's448.768725 child-CPU
+snapshot already includes smoke and its validator, so it is not added twice.
+
+| Job | Native state | Admitted GPU-s |
+|---|---|---:|
+| 20261026T154114Z-808dc4f0 | unpublished, inspected no ready/spec/run | 0 |
+| 20261026T154300Z-b22eabc3 | failed child bootstrap | 10.398987293 |
+| 20261026T154832Z-50c37ae0 | failed privacy gate before model loading | 10.275501728 |
+| 20261026T155233Z-07cca552 | private/reset inference passed, evaluator path failed | 60.838780165 |
+| 20261026T155754Z-bbc4a300 | scored smoke passed intended checks; wrong template validator failed | 90.889559746 |
+| 20261026T171827Z-cf4da9e0 | complete; native smoke and independent full validators pass | 414.611974239 |
+
+**GPU ledger CLOSED:587.014803171/2700s=0.163059668/0.75GPU-h**, all admitted
+setup/smokes/failures/validation included. CPU ledger CLOSED at conservative
+2334.860723/3600s: closed audit765.100194+additional measured configured checks
+164.913063+actual native child snapshots592.741714+local full validation2.977481
++native full validation9.128271+600 local/preflight/analysis/publication allowance
++200 native supervisor/unrecorded-validator allowance. Failed source/model
+transfers, source/checkpoint data and all partial results remain preserved.
+Unused allocations close with this study and do not transfer. No running or
+queued task job, generator, other chat/agent or recurring model monitor remains.
+
+Configured Ruff/mypy pass (226 sources),10 focused regressions pass. Full local
+suite887pass/25skip with the same2 known macOS restrictions (sandbox ps denial
+and protected Linux symlink expectation); the process test passes with read-only
+visibility outside the sandbox. Linux CI is the merge gate. Additive judge API
+preserves old default four-matte behavior; the receiver path uses two variants.
+No existing source data, weights, training or checkpoints were changed.
+
+### Scope and stopping decision
+
+The deciding failure is actual zero-matte silhouette/recomposition quality,
+not prediction repeatability or exhausted GPU budget. The test answers the
+narrow80-tick question for one fixed profile. Independent240-frame prediction,
+exact correction transport/init/framing/identity cost and full wire evidence
+remain unmeasured because160 raw ticks/player are absent. This does not infer
+that corrections are cheap or expensive, nor a full12 result.
+
+Target-derived exact-R Telea background remains granted. The broader purpose is
+still a fully accounted tennis system with players and ball; ball-only is not
+the intended endpoint. Source/replay independence, familiar two-match scope,
+115px exploratory status, historical step5 failure and granted-matte history
+remain explicit. No coded-background/ball integration or new full240 generation
+is launched after this failure. This is neither an end-to-end win nor a
+universal closure of receiver-derived silhouettes. Stop because the authorized
+candidate's>=3/4 decision is now reached, preserve its evidence and report it
+to planning.
+
+Immutable publication:
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-sampled-20261026T173715Z`.
+Bundle SHA256`f106e7235bd214e23845bf59d6fc3879166d67431ace070cd43566583829fce2`.
+All100 files independently hash-verified; files444/directories555. Includes real
+full/qualified-smoke/private-partial raw archives, source-identified mask/score
+arrays, native execution/environment/gate records, failed traces, fresh decoder
+proof, fixed-quality sensitivities, closed ledger, checks and report/card.
+Published code-file hashes match both executed receiver and judge hashes.
+Existing generated/source archives, Models and earlier publications were not
+overwritten or deleted. All reported events were acknowledged; no wakeup exists.
+
+Publication PR: https://github.com/emanuele-artioli/PointStream/pull/245.
+Merge-commit auto-merge follows required Linux CI. The scientific study and
+its cumulative resource ledgers are closed; no further inference is scheduled.

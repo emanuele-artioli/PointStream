@@ -1,6 +1,11 @@
 # K6b: receiver-derived player silhouette and exact corrections
 
-State: STOPPED at CPU input completeness gate. All4 actual player units retain
+Original audit: STOPPED at CPU input completeness gate.
+Current amendment below: COMPLETE. Actual sampled zero-matte quality1/4,
+below>=3/4. Fresh private predictions reproduce; exact controls pass.
+Cumulative GPU587.014803/2700s=0.163059668/0.75h, conservative CPU2334.860723/3600s.
+All jobs terminal, no further inference/integration. Full240 corrections remain
+unmeasured; background granted and source independence unresolved. All4 actual player units retain
 80/240 raw RGB ticks;160 missing each. Exact tennis question is distinct from
 H5p4d but remains unmeasured.0/2700 new GPU-seconds, no fleet submission or
 new inference. Conservative CPU765.100194/3600s, ledger closed. Narrow80-tick quality and explicit sparse-predictor alternatives
@@ -70,3 +75,48 @@ retain ball mode and use achievable coded background/T1 findings, equal-total-
 rate and fair-adaptation anchors; it does not run under this budget.
 
 Report: `docs/experiments/k6b-players.md`, receiver-silhouette audit entry.
+
+## Scope amendment: sampled zero-matte diagnostic (planning,2026-10-26)
+
+The stopped audit above is preserved. Planning selected option1 under the
+continuing human “Get started” authority: perform real inference/quality on
+ONLY the archived80 raw ticks/player. Branch`codex/k6b-receiver-sampled-pilot`.
+This amends scope, not cumulative caps: audit765.100194CPU-s/0GPU already
+spent, cumulative<=3600CPU-s/2700GPU-s. No all240 correction measurement or
+wire claim, no recovery generation. All240 missingness stays unresolved.
+
+Freeze one candidate before quality: installed YOLOE-26x-seg with local
+MobileCLIP2, constant text “person”, imgsz800, confidence0.25, retina_masks,
+FP16 CUDA, largest component. Per raw crop choose the person mask with most
+paid decoded confident keypoints inside it; ties by area then confidence then
+native result order. No target-derived prompt/init: fixed common profile and
+already-paid KPS determine selection. No post-score threshold/model sweep.
+
+Prediction worker read-isolated with Linux Landlock: only code/environment,
+system runtime/GPU devices, its own scratch, sanitized independently decoded
+KPS packets and original raw generated archives/installed weights are readable.
+It must prove source/control/target-mask archive reads denied. No canvas/R/S is
+passed. Run from fresh processes twice; all input and output arrays/hashes must
+match exactly before opening evaluation sources. Each mask projected using
+only billed keypoint crop rule; original generated RGB/crop order unchanged.
+
+Smoke: first2 saved ticks from ALL4 players, both original windows, fresh reset
+prediction hashes, finite real CUDA outputs, unmodified exact control pixels and
+scores<=1e-4. Resource gate uses measured prediction/reset scaling+native judging
+setup/frame cost+50% and60s allowance, must fit1500s full and remaining2700GPU-s.
+Initial native reservation<=2000s including<=300s smoke,1500s full,40s validation
+and160s overhead;700s cumulative recovery only after inspecting a known failure.
+Use one packed environment and qualified Ada host pool after live inspection.
+
+Full: all80 original judged ticks/window, two variants exact-granted control and
+predicted zero-matte, actual LPIPS/DISTS on unchanged oldR/S. Pass>=3/4 strict
+bracketed cells, missingness unresolved; report each metric/window and shape/
+false-positive/missing-RGB coverage. Pay existing actual compressed banks, KPS
+and7200s adapter bill, prompt/init0extra bits as installed constant/profile.
+Common base+segmenter explicit; separately charge both installations over7200s
+and show break-even horizon if supportable. No method BD-rate from one point.
+No correction-rate result, no all240 predictor/reset claim, no full12 result.
+
+If this sample fails, close only this candidate. If it passes, prepare a next
+full240-output preservation/correction/receiver contract gate; do not run it.
+Keep background granted/source independence unresolved and players+ball goal.
