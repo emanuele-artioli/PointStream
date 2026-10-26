@@ -34,6 +34,17 @@ WIDTHS = (0, 2, 4)
 FAMILIES = ("rgb-key", "luma-mask-only")
 
 
+def player_index(units: list[dict[str, Any]], name: str) -> int:
+    # Wire compositing IDs use person:000..., while stored unit files use person_000...
+    suffix = name.replace(":", "_")
+    found = [
+        i for i, u in enumerate(units) if u["name"] == suffix or u["name"].endswith("__" + suffix)
+    ]
+    if len(found) != 1:
+        raise ValueError("Ambiguous/missing wire-to-saved player identity")
+    return found[0]
+
+
 def decode_rgb(rgb: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     # Both outputs depend only on decoded channels and fixed paid constants.
     return unlift(rgb), rgb.max(axis=-1) > 16
@@ -315,25 +326,40 @@ def main() -> int:
         truth_list = []
         half_masks_list = []
         nearest_list = []
+        source_coverage = []
         for t in times:
-            full_mask = np.repeat(np.repeat(masks[t].any(0), 2, 0), 2, 1)
+            source_mask = np.repeat(np.repeat(masks[t].any(0), 2, 0), 2, 1)
+            full_mask = np.zeros_like(source_mask)
             canvas = np.zeros((1080, 1920, 3), np.uint8)
             for name in meta["compositing_order"]:
-                i = next(
-                    i
-                    for i, u in enumerate(units)
-                    if u["name"] == name or u["name"].endswith("__" + name)
-                )
+                i = player_index(units, name)
                 g = generated[(units[i]["name"], "match5")]
                 j = np.flatnonzero(g["t"] == t)
                 if len(j) != 1:
                     raise ValueError("Missing saved RGB: do not use target foreground")
                 mask = np.repeat(np.repeat(masks[t, i], 2, 0), 2, 1)
                 written = k6b.paste(canvas, g["crops"][int(j[0])], boxes[i][t], mask)
-                if not np.array_equal(written, mask):
-                    raise ValueError("Secondary excerpt lacks crop RGB for exact source mask")
-            image = cv2.resize(canvas, (960, 540), interpolation=cv2.INTER_AREA)
-            alpha = masks[t].any(0)
+                full_mask |= written
+            source_coverage.append(
+                {
+                    "tick": t,
+                    "source_requested": int(source_mask.sum()),
+                    "generated_available": int(full_mask.sum()),
+                    "missing_source_pixels": int((source_mask & ~full_mask).sum()),
+                    "source_mask_sha256": array_sha(source_mask),
+                }
+            )
+            coverage = cv2.resize(
+                full_mask.astype(np.float32), (960, 540), interpolation=cv2.INTER_AREA
+            )
+            premultiplied = cv2.resize(canvas, (960, 540), interpolation=cv2.INTER_AREA)
+            # Average only available generated colors. No target appearance fills a crop gap.
+            image = np.round(
+                np.clip(
+                    premultiplied.astype(np.float32) / np.maximum(coverage[..., None], 1e-6), 0, 255
+                )
+            ).astype(np.uint8)
+            alpha = coverage >= 0.5
             indices = distance_transform_edt(~alpha, return_distances=False, return_indices=True)
             extension = image[tuple(indices)]
             nearest_list.append(extension)
@@ -366,17 +392,23 @@ def main() -> int:
             "hard_mask_exact": np.array_equal(hard_mask, half_masks),
             "hard_rgb_max_error": error,
             "anti_leak": before == after,
+            "source_crop_coverage": source_coverage,
+            "mechanism_target": "native written support inside saved RGB crop; source-mask gaps separately counted",
         }
         r["sources"].append(source)
         expected_full = np.stack(
             [cv2.resize(im, (1920, 1080), interpolation=cv2.INTER_CUBIC) for im in nearest]
         )
         for width in WIDTHS:
-            alpha = np.stack(
-                [
-                    cv2.resize(alpha_ramp(m, width), (960, 540), interpolation=cv2.INTER_AREA)
-                    for m in truth
-                ]
+            alpha = (
+                half_masks.astype(np.float32)
+                if not width
+                else np.stack(
+                    [
+                        cv2.resize(alpha_ramp(m, width), (960, 540), interpolation=cv2.INTER_AREA)
+                        for m in truth
+                    ]
+                )
             )
             luma = np.round(alpha * 255).astype(np.uint8)
             for family in FAMILIES:
@@ -388,7 +420,7 @@ def main() -> int:
                         alpha[..., None] * (32 + nearest.astype(np.float32) * 223 / 255)
                     ).astype(np.uint8)
                     raw, _ = rgb_yuv(rgb, root)
-                    _, zero_mask = decode_rgb(rgb)
+                    zero_rgb, zero_mask = decode_rgb(rgb)
                 else:
                     raw = root / "source.yuv"
                     np.concatenate(
@@ -398,6 +430,7 @@ def main() -> int:
                         ],
                         1,
                     ).tofile(raw)
+                    zero_rgb = None
                     zero_mask = decode_luma(luma)
                 zero_full = np.stack(
                     [
@@ -408,7 +441,17 @@ def main() -> int:
                         for m in zero_mask
                     ]
                 )
-                zero_diag = diagnostics(truth, zero_full, None, expected_full)
+                zero_full_rgb = (
+                    None
+                    if zero_rgb is None
+                    else np.stack(
+                        [
+                            cv2.resize(im, (1920, 1080), interpolation=cv2.INTER_CUBIC)
+                            for im in zero_rgb
+                        ]
+                    )
+                )
+                zero_diag = diagnostics(truth, zero_full, zero_full_rgb, expected_full)
                 coded = code_yuv(
                     raw, root / "codec", a.frames, 960, 540, 35, fps, preset=4, timeout=100
                 )

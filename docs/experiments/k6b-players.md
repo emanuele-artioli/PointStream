@@ -3670,3 +3670,28 @@ Joint saved-render GPU job `20261026T122430Z-945020c3`, source`e0958ad2c27193af8
 CPU edge spec first attempt rejected locally before publication: missing required CPU-schema fields gpu_models/gpu_memory_mib. No job ID or admission,0CPU/GPU charge. Add empty gpu_models and zero GPU memory; algorithm/inputs/resource cap unchanged.
 
 CPU edge mechanism job `20261026T123044Z-a13c06af`, source`85ac55cebba5b1ea6dd4c1e447296a2cdd48bac5`, specSHA256`7c04d9a00afad56f090694c2fa6d7673a90216c930342278823684ad2d190c18`;800s at4threads reserved (=3200CPU-s) plus400local. Al4tick smoke gates both8tick excerpts; all width/family/codec settings frozen before results.
+
+CPU job a13c06af FAILED smoke before codec work: wire compositing IDs use
+`person:...` while saved crop unit files use `person_...`; suffix matching
+failed. New normalizer checks unique identity explicitly and has a focused
+regression test; no frame/order substitution. Conservative charge40.305241
+CPU-seconds. Corrected CPU reservation780admitted seconds x4 +40.305241
+spent +400local=3560.305241<3600, same60smoke/650full/30validator.
+
+Queued GPU 945020c3 was inspected unstarted and cancelled with no admission,
+0GPU cost, to add explicit source RGB/player-mask frame hashes and decoded
+matte hashes for all240 coded ticks before first judging. No pixels, quality
+rule, recipe, inputs or tolerance change; replacement will have a fresh ID.
+All Ada GPUs remain occupied. No uncertain replay or foreign-process action.
+
+Pre-codec source-coverage clarification (before any neural/codec result): local
+provenance construction shows some original matte pixels lie outside the saved
+generated crop. Primary test retains original masks, original R/S and native
+Telea fallback and reports every missing pixel. Secondary mechanism uses the
+native written support (exact mask intersect available crop) as its edge target,
+reports uncovered original-mask pixels separately, and averages only available
+generated colors at half resolution. It never fills a gap with target foreground
+or claims those colors exist. Hard baseline is binary at the coded grid; zero
+codec full-resolution geometry loss is reported separately. Width2/4 ramps are
+computed from the same written support. No quality-based selection or threshold
+change; this bounds the mechanism's scope rather than fabricating RGB evidence.

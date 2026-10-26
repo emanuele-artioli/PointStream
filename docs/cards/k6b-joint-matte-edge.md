@@ -94,3 +94,15 @@ Preserve every raw/partial artifact and report deviations. No fitting,
 generation, reference changes, full12 confirmation, new segmenter/model inference
 or Wan-Animate. Background remains target-derived; source/replay independence
 unresolved, two familiar matches,115px exploratory, historical step5 failure.
+
+Pre-codec source-coverage clarification (before any neural/codec result): local
+provenance construction shows some original matte pixels lie outside the saved
+generated crop. Primary test retains original masks, original R/S and native
+Telea fallback and reports every missing pixel. Secondary mechanism uses the
+native written support (exact mask intersect available crop) as its edge target,
+reports uncovered original-mask pixels separately, and averages only available
+generated colors at half resolution. It never fills a gap with target foreground
+or claims those colors exist. Hard baseline is binary at the coded grid; zero
+codec full-resolution geometry loss is reported separately. Width2/4 ramps are
+computed from the same written support. No quality-based selection or threshold
+change; this bounds the mechanism's scope rather than fabricating RGB evidence.

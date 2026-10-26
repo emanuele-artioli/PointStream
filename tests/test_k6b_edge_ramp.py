@@ -37,3 +37,13 @@ def test_edge_displacement_diagnostic_detects_one_pixel_shift():
     assert 0 < result['boundary_mean_px'] <= 1
     assert result['boundary_p95_px'] == 1
     assert result['temporal_boundary_error_flips_per_true_boundary_pixel'] == 0
+
+
+def test_wire_player_ids_map_to_saved_units_without_using_list_position():
+    from experiments.tennis.k6b_edge_ramp import player_index
+    units = [{'name': 'alcaraz__031_at129__person_000000000006'},
+             {'name': 'alcaraz__031_at129__person_000000000001'}]
+    assert player_index(units, 'person:000000000001') == 1
+    assert player_index(units, 'person:000000000006') == 0
+    with pytest.raises(ValueError, match='identity'):
+        player_index(units, 'person:000000000002')

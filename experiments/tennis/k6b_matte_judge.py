@@ -124,9 +124,13 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
         "original_judged": native["judged"], "judged": [], "scored": native["scored"],
         "selected_packets": selected_packets, "source_sha256": source_sha, "converted": converted,
         "complete_window": max_judged == 0, "condition_boxes_sha256": [array_sha(np.stack(list(b.values()))) for b in boxes],
-        "control_variant": control_variant, "crop_coverage": {}, "control_composite_hashes_match": True}
+        "control_variant": control_variant, "crop_coverage": {}, "control_composite_hashes_match": True,
+        "source_rgb_frame_sha256": {}, "source_player_masks_sha256": {},
+        "decoded_matte_frame_sha256": {str(scale): [array_sha(m) for m in reduced[scale]] for scale in SCALES}}
     for n, t in enumerate(requested):
         truth_t = np.array(truth[t])
+        row["source_rgb_frame_sha256"][str(t)] = array_sha(truth_t)
+        row["source_player_masks_sha256"][str(t)] = array_sha(source_masks[t])
         r = np.logical_or.reduce([*regions[t].values(), np.zeros((1080, 1920), bool)])
         fill = k6.telea_fill(truth_t, r)
         _, drawn = k6b.k6_oracle(t, w, k6.variant_names()[-9:], truth, regions, fill,

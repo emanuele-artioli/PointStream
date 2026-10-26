@@ -115,6 +115,18 @@ def validate(archive: Path, stage: str) -> dict[str, Any]:
             row["control_variant"] == "full" and row["control_composite_hashes_match"]
         )
         checks[row["id"] + ":source"] = row["source_sha256"] == SOURCE_SHA[PILOTS.index(row["id"])]
+        expected_ticks = {str(t) for t in row["judged"]}
+        checks[row["id"] + ":frame_hashes"] = all(
+            set(row[key]) == expected_ticks
+            and all(len(digest) == 64 for digest in row[key].values())
+            for key in ("source_rgb_frame_sha256", "source_player_masks_sha256")
+        )
+        checks[row["id"] + ":all240_matte_hashes"] = set(row["decoded_matte_frame_sha256"]) == {
+            str(s) for s in judge.SCALES
+        } and all(
+            len(hashes) == 240 and all(len(h) == 64 for h in hashes)
+            for hashes in row["decoded_matte_frame_sha256"].values()
+        )
         checks[row["id"] + ":crop_accounting"] = set(row["crop_coverage"]) == {
             str(t) for t in row["judged"]
         } and all(
