@@ -4586,3 +4586,42 @@ selected patch, visuals, checks, card/report and closed ledger. Executed SAM/
 judge code hashes match current files. Existing Models, inputs and earlier
 publications preserved. PR [#246](https://github.com/emanuele-artioli/PointStream/pull/246)
 contains the completed scoped study; merge-commit auto-merge follows Linux CI.
+
+## 2026-10-26 — Every-frame independent SAM: frozen last narrow profile
+
+New study authorized by the human's “Dispatch the next steps then” in planning,
+verified in that chat. [Card](../cards/k6b-receiver-frame.md), scoped branch
+`codex/k6b-receiver-frame-pilot`. Prior ledgers remain CLOSED; new cap2700
+admitted GPU-s/3600aggregate CPU-s/2hwall; native reservation2000s,300smoke/
+1500full/40validator/160overhead,700s known-failure reserve. No new measurement
+or GPU submission at this preregistration. This is the last narrow segmentation
+profile, not permission for a model/prompt search.
+
+Hypothesis: independent pose prompting every saved RGB frame removes the
+track-collapse failure and retains>=3/4strict bracketed LPIPS/DISTS cells at
+unchanged actual total rate. Competing explanations: silhouette boundaries
+remain inaccurate; pose/generated-body misalignment or missing support causes
+loss even without persistence; independent prompting costs too much compute;
+receiver nondeterminism/invalid control prevents a conclusion.
+
+All4units of Al031/Med014 use exactly PR246 prompt geometry/weights/preprocessing
+and logits>0, with a NEW one-frame state at EVERY tick0,3,...237. Use the native
+`add_new_points` returned video-resolution mask directly, no temporal propagation
+or memory-encoder preflight, no identity/window-specific settings. Source CPU
+inspection confirms the pinned method returns(frame,obj_ids,low,video_masks).
+Keep two fresh-process bitwise repeatability, read isolation and original exact
+control<=1e-4; substantive validator additionally verifies one prompt per saved
+tick. Method error±.001 additive sensitivity frozen before quality, primary
+unchanged. Boundary precision/recall/F1 at2px tolerance on1080p union is
+secondary; no target-guided prompts or shape-as-quality substitution.
+
+All240 paid KPS/actual compressed FULL references/7200s adaptation remain billed;
+common base+SAM assumption and installation/payback separate. Same original
+80judged frames/R/S/crop order/native source conversion/achievable SVTAV1+DCVC
+envelope. One point/window, no BD-rate or extrapolation. No correction sweep.
+Shared timings measured as resource cost only. Two windows are DEVELOPMENT
+after repeated experiments, not untouched confirmation. Missing160RGBticks/
+player, granted target-derived Telea/historical granted-matte limitation,
+source/replay uncertainty,115px exploratory and historicalstep5 remain explicit.
+If passes, prepare unlaunched fully accounted base/background+players+ball oracle
+card and fresh-evaluation protocol; if fails, stop this recipe's narrow search.

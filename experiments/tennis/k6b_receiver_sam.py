@@ -177,8 +177,9 @@ def worker(a: argparse.Namespace) -> None:
         masks, inputs = [], []
         loop_started = time.monotonic()
         prompts_record = []
-        for start in range(0, len(ticks), 20):
-            segment = ticks[start:start + 20]
+        step = 1 if a.independent_frames else 20
+        for start in range(0, len(ticks), step):
+            segment = ticks[start:start + step]
             images = torch.stack([
                 torch.from_numpy(np.array(Image.fromarray(g["crops"][start+j]).resize(
                     (int(model.image_size), int(model.image_size)))).transpose(2, 0, 1).copy())
@@ -195,17 +196,23 @@ def worker(a: argparse.Namespace) -> None:
                     state = model.init_state(video_height=784, video_width=512,
                                              num_frames=len(segment), offload_video_to_cpu=True)
                     state["images"] = images
-                    model.add_new_points(inference_state=state, frame_idx=0, obj_id=1,
+                    prompted = model.add_new_points(inference_state=state, frame_idx=0, obj_id=1,
                                          points=torch.from_numpy(points), labels=torch.from_numpy(labels),
                                          clear_old_points=True, rel_coordinates=True)
-                    model.propagate_in_video_preflight(state, run_mem_encoder=True)
                     outputs = {}
-                    for frame, ids, low, video, *rest in model.propagate_in_video(
-                            state, start_frame_idx=0, max_frame_num_to_track=len(segment)-1,
-                            reverse=False, tqdm_disable=True):
-                        if list(ids) != [1]:
-                            raise ValueError("SAM tracker changed object identity")
-                        outputs[int(frame)] = (video[0, 0] > 0).cpu().numpy()
+                    if a.independent_frames:
+                        frame, ids, low, video = prompted
+                        if int(frame) != 0 or list(ids) != [1] or len(segment) != 1:
+                            raise ValueError("Independent prompt output identity/frame changed")
+                        outputs[0] = (video[0, 0] > 0).cpu().numpy()
+                    else:
+                        model.propagate_in_video_preflight(state, run_mem_encoder=True)
+                        for frame, ids, low, video, *rest in model.propagate_in_video(
+                                state, start_frame_idx=0, max_frame_num_to_track=len(segment)-1,
+                                reverse=False, tqdm_disable=True):
+                            if list(ids) != [1]:
+                                raise ValueError("SAM tracker changed object identity")
+                            outputs[int(frame)] = (video[0, 0] > 0).cpu().numpy()
             if prof is not None:
                 kernels = sorted({event.key for event in prof.key_averages()
                                   if "flash" in event.key.lower()})
@@ -249,6 +256,7 @@ def worker(a: argparse.Namespace) -> None:
             "denied_reads": denied,
             "on_cuda": True,
             "sam_load": tracker.load_report,
+            "independent_frames": bool(a.independent_frames),
             "flash_events": kernels,
             "sam_runtime": runtime(),
             "device": torch.cuda.get_device_name(),
@@ -295,6 +303,8 @@ def predict_twice(a: argparse.Namespace, scratch: Path, kps: Path) -> tuple[dict
             "--max-judged",
             str(a.max_judged),
         ]
+        if a.independent_frames:
+            command += ["--independent-frames"]
         for p in a.generated:
             command += ["--generated", str(p)]
         for p in [*a.source, *a.control, a.transport]:
@@ -372,7 +382,7 @@ def assessment(
     }
 
 
-def validate(archive: Path, stage: str) -> dict[str, Any]:
+def validate(archive: Path, stage: str, *, independent_frames: bool = False) -> dict[str, Any]:
     from experiments.tennis.k4 import safe
 
     with tarfile.open(archive) as t:
@@ -392,6 +402,14 @@ def validate(archive: Path, stage: str) -> dict[str, Any]:
             "cpu_bound": r["cpu_seconds"] < (600 if stage == "smoke" else 2100),
         }
         expected = 2 if stage == "smoke" else 80
+        if independent_frames:
+            checks["independent_profile"] = all(
+                run.get("independent_frames") is True
+                and all(len(row["prompts"]) == expected
+                        and [p["t"] for p in row["prompts"]] == row["ticks"]
+                        for row in run["rows"])
+                for run in r["prediction"]["runs"]
+            )
         checks["memory"] = r["peak_gib"] * 1024 <= 12000
         checks["qualified_class"] = r["device"]["class_matches"]
         first, second = r["prediction"]["runs"]
@@ -476,19 +494,20 @@ def validate(archive: Path, stage: str) -> dict[str, Any]:
     return {"passed": all(checks.values()), "checks": checks}
 
 
-def main() -> int:
+def main(*, independent_default: bool = False) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     for name in ("weights", "text", "out", "kps", "diagnostic", "reference-report", "transport"):
         p.add_argument("--" + name, type=Path)
     for name in ("generated", "source", "control", "anchor", "backbone", "forbidden"):
         p.add_argument("--" + name, type=Path, action="append", default=[])
+    p.add_argument("--independent-frames", action="store_true", default=independent_default)
     p.add_argument("--worker", action="store_true")
     p.add_argument("--validate", action="store_true")
     p.add_argument("--max-judged", type=int, default=0)
     a = p.parse_args()
     stage = Path(os.environ.get("PS_STAGE_DIR", "/tmp"))
     if a.validate:
-        result = validate(stage / "published.tar", os.environ["PS_STAGE"])
+        result = validate(stage / "published.tar", os.environ["PS_STAGE"], independent_frames=a.independent_frames)
         write(Path(os.environ["PS_VALIDATION_PATH"]), result)
         return int(not result["passed"])
     if a.worker:
@@ -637,6 +656,17 @@ def main() -> int:
             result["rows"],
             a.weights.stat().st_size,
         )
+    if not a.max_judged and a.independent_frames:
+        diagnostic = json.loads(a.diagnostic.read_text())
+        reference = json.loads(a.reference_report.read_text())
+        result["frozen_quality_sensitivity"] = {}
+        for delta in (-0.001, 0.0, 0.001):
+            adjusted = [{**row, "means": {**row["means"], "-1": {
+                metric: value + delta for metric, value in row["means"]["-1"].items()
+            }}} for row in result["rows"]]
+            result["frozen_quality_sensitivity"][str(delta)] = assessment(
+                diagnostic, reference, adjusted, a.weights.stat().st_size
+            )
     write(publish / "receiver.json", result)
     write(stage / "receiver.json", result)
     for n in range(2):
