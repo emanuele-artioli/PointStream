@@ -3471,3 +3471,9 @@ original R/S and metric implementation remain in use. This
 raises only the internal judging reservation from 550; combined worst remaining
 reservation is 16075.318329/16200 seconds. No new GPU budget, recipes,
 quality thresholds, sources or fitting. Preserve all failed and complete jobs.
+
+Reference full med `20261026T075723Z-e962542f` COMPLETE; admitted 1360.567544 GPU-s; archive SHA256`ba752111fb9e2604a34dc560a06586cf820013ab398b6c834aac54546e6881e1`. Native validator status retained; actual quality still pending joint judging.
+
+Reference alpha med `20261026T075737Z-a900b575` COMPLETE; admitted 1400.275787 GPU-s; archive SHA256`e11f553f69aa4f3fb1347326b9d30afceed04ed9fdfa32328a60cca2d6f4b4fa`. Native validator status retained; actual quality still pending joint judging.
+
+Full RGB and explicit-alpha reference families now each have both complete native windows. Combined terminal cost 12386.161660 GPU-s; remaining two affine-black renders plus 650-second joint judging reserve imply at most 15936.161660/16200 seconds. All candidate quality remains unopened.
