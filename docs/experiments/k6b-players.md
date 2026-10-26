@@ -3617,3 +3617,50 @@ Saved checkpoints contain80 judged crops per player, while the native
 generation counter verifies all240 context frames were generated. They do not
 store240 decoded crops. Final primary decision and rates use original judged
 indices and original registered clip duration.
+
+## 2026-10-26 — Joint compressed RGB references/mattes and edge ramps (frozen before measurement)
+
+User explicitly requested the joint saved-render test and a CPU check of smoothing
+the foreground/key boundary, as recorded in planning chat. New scoped branch
+`codex/k6b-joint-matte-edge-pilot`; self-contained execution card
+`docs/cards/k6b-joint-matte-edge.md`. All prior ledgers are CLOSED.
+
+Primary hypothesis: the new FULL compressed-reference generations may retain
+enough quality when paired with actual1/8,1/16,1/32 matte packets to pass>=3/4
+strict LPIPS/DISTS cells on frozen Al031/Med014. Competing explanations: matte
+rate/shape error still dominates, or apparent benefit comes from missing crop
+pixels/changed regions/unpaid side information. All240 coded frames are paid;
+original80 judged ticks/window and R/S are unchanged. PR242 FULL saved-RGB
+control must reproduce composite hashes and scores within1e-4. Native missing
+pixel fallback stays Telea, never target foreground. Exact matte paid, common
+base and base charged are reported separately; no full12/independence claim.
+
+Secondary hypothesis: width2/4 full-pixel ramps reduce transform cost without
+material edge damage; competing explanation is threshold displacement/color
+contamination or an underdetermined RGB/alpha inverse. Freeze width0/2/4,
+preset4/CRF35/yuv420p/halfsize; first8 stored judged ticks of both windows with
+actual rational timing (smoke Al first4). RGB guard-key ramps and separate paid
+luma-mask ramps are labeled separately. Decoder uses decoded channels/constant
+metadata only. Zero-codec/anti-leak gates and an explicit non-identifiability
+example precede codec claims. Report IoU, symmetric edge mean/p95, temporal edge
+error changes, RGB boundary error and container rate. Global engineering
+promotion requires>=10% saving on both excerpts, IoU drop<=.005, mean boundary
+error rise<=.25px and temporal instability rise<=.005; not a paper verdict.
+No secondary neural quality run or sweep.
+
+Existing evidence audited before new measurements: H5p2 signed-distance/binary
+SVT video failed its matched-accuracy rule; XOR/LZMA remained cheaper. H5p4c
+flat RGB key carriers had accurate shapes but failed the paid-rate oracle.
+These concern VISOR/fixed old configurations, not a universal impossibility.
+The new check isolates small ramps on the saved tennis pixels and does not
+repeat that full sweep or assume deblurring can recover discarded information.
+
+New resource caps: GPU<=1800 admitted seconds, CPU<=3600 aggregate seconds and
+2h wall. First GPU reservation750s (60smoke/600full/20validator/70overhead);
+real prior five-variant judging took332.188s, new four-variant run fits. CPU
+reservation800s at4threads +400local=3600CPU-s (60smoke/650full/30validator/60
+overhead); measured projection gates full. All stages<=45min, qualified native
+Ada metrics only, exclusive/stop-on-contention, native bounded fleet waits.
+No new generation/fitting/reference change/segmenter inference/Wan-Animate,
+chats, parallel agents or recurring model monitors. Source uncertainty, granted
+background, exploratory115px and historicalstep5 failure remain explicit.
