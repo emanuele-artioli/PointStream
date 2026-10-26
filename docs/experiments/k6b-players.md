@@ -3524,3 +3524,5 @@ must verify all original R/S, source pixels and full80-frame score coverage.
 No further generation. Combined actual 15547.479467
 GPU-seconds; with550 final judging, maximum 16097.479467
 remains below16200. No scope, recipe, tolerance or total-budget change.
+
+Final joint native judge job `20261026T092648Z-ccf0633e`, source`1c1918e47f399990b1ba70376f8a5bccbee7f11d`, specSHA256`d0bfac4dfba2e51445bf723a7bfdf717a610924eab5a1bd36af37fe7a3ae5940`;550 GPU-second cap. All3 fixed families/both windows, original160 judged frames/R/S, savedRGB1e-4/freshPNG1e-3 controls, actual decoded-reference renders. Two complete affine Med unit checkpoints are explicitly identified as partial archives; parents remain failed/contended.
