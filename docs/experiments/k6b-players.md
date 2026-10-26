@@ -4150,3 +4150,12 @@ infrastructure smoke evidence, not the full quality result. Only validator
 invocation/strength changes; no image/model/prompt/metric/rule change. Next
 native job rechecks this same representative smoke before full. Remaining
 2527.597171GPU-s supports2000s; no old ledger is reopened.
+
+Correct-validator job`20261026T171827Z-cf4da9e0`, source`115b9988`, published
+pending,2000GPU-s reservation. SourceSHA256
+`71542310799c36f127ece0e1ac36772105c1ec5aca836bfda425e8466732bb7f`,
+native specSHA256`dc2f5a8e84421c58b83cc8a1778728bb2089bebfb0b5d9606af867a9624d7d33`.
+Receipt`/tmp/k6b-receiver-sampled-qualified-submission.json`; prior admitted
+172.40282893180847/2700GPU-s. Correct module validator and stronger35 checks;
+no scientific configuration change. Re-inspect current native deadline/state
+before waiting after the client interruption; never replay this request.
