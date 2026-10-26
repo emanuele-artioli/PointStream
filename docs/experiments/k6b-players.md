@@ -4381,3 +4381,17 @@ installation explicit;7200s installation charges/payback sensitivity separate.
 Target-derived Telea background remains GRANTED, source/replay independence
 unresolved,115px exploratory, historicalstep5 and granted-matte limitation
 retained; no end-to-end or independent confirmation claim.
+
+Submission: job **20261026T181328Z-57b68814**, pending at receipt, executed
+revision20b16dad177302998415722616fb16b0f156c7bb,
+sourceSHA`cd24b1509be1197da3f1a9dc16eb1f0cd28d9a9940c4f2fce8cd106230f88014`,
+specSHA`48afe7fc599e003012216489a109e682183491ca2018487a312033675aa51a85`.
+Compatible pool gpu2/3/5/6 (A6000/Ada), all6 inspected, job ledger checked.
+Native2000s reservation300smoke/1500full/40validator/160overhead; remaining700s
+recovery reserve within cumulative2700 only after known failure. Receipt
+`/tmp/k6b-sam-submission.json`, spec`/tmp/k6b-sam-spec.json`. Read-only staging
+of existing3502755717B SAM checkpoint hash-verified,5.572351CPU-s; no Models
+mutation/download. Static Ruff/mypy and5 focused prompt/projection tests pass.
+No automatic completion wakeup verified: attended native bounded batch wait,
+no recurring model monitor. Conservative preflight allowance150CPU-s plus
+visual3.465341 and weight check5.572351, actual check/runtime snapshots later.
