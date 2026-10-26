@@ -3440,3 +3440,5 @@ frameswithallgates beforeANYcompressed-referencequality. No newtolerance
 change or data replacement. Actualreference5758.944299s beforeMedQC;
 combinedterminal6705.955410/16200s. Admitfuturebatchesagainstactualcost,
 remainingworkforecast andfinaljudgingreserve, notunspentoldbudgets.
+
+Med-only remaining PNG calibration job `20261026T075201Z-db1ea276`, source10aaffd7, specSHA256`330431ae6f7f2d354100f341a0b52b55c04d123d82af0edc3a0f135f7596ee22`; 250GPU-s cap. Al retained partial archive SHA256`cc6d0e794369fad3b62f008abee9afff32664277fd642df2390630f23fea81af`; explicit prefix validator passed all complete-window checks, collection remains incomplete until Med passes.

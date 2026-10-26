@@ -327,3 +327,26 @@ PNGdifferences and±1e-3sensitivity. Primarystrict3/4andfrozencourt/cohort/
 recipes remainunchanged. Seeexperimententryamendment, no further tolerance
 adjustmentsaftercandidatequality. Newbudgetinternalreservations useclosed
 denseactualcost947.011110s; combinedapproved16200s unchanged.
+
+## Current recovery checkpoint (2026-10-26)
+
+The CPU preflight is closed at 2647.198626/3600 CPU-seconds. Dense foreground
+carriers are closed at 947.011110 GPU-seconds: selected alpha preset 4 and
+affine-black preset 1 each failed all four pilot metric cells. This does not
+close compressed-reference generation. Its frozen choices remain preset 1,
+CRF 20, three reference families and the original two windows.
+
+The approved combined GPU ceiling remains 16200 seconds. Reallocate the unused
+852.988890 seconds of the dense planning reserve to reference recovery; old
+ledgers stay closed. Before the current Med-only calibration job, terminal
+charges total 6705.955410 seconds. Full original-PNG controls are retained from
+completed unit checkpoints. The Alcaraz 80-frame calibration passes the frozen
+1e-3 fresh-render guard (maximum difference 0.000587463); saved identical RGB
+re-scoring still passes 1e-4. Med-only calibration job 20261026T075201Z-db1ea276
+has a 250-second cap. No compressed-reference generation has started.
+
+Recover the complete Alcaraz prefix with explicit validation; do not mark its
+failed parent collection complete. All 160 judged calibration frames must pass
+before candidate admission. Retain exact delivered-pixel hashes, granted matte,
+target-derived Telea background and unresolved source-independence limitation.
+No full-12-window or independent-confirmation claim follows from this pilot.
