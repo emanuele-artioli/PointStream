@@ -4625,3 +4625,5 @@ player, granted target-derived Telea/historical granted-matte limitation,
 source/replay uncertainty,115px exploratory and historicalstep5 remain explicit.
 If passes, prepare unlaunched fully accounted base/background+players+ball oracle
 card and fresh-evaluation protocol; if fails, stop this recipe's narrow search.
+
+Submission: **20261026T184618Z-186fe8b3**, pending at receipt, frozen code`a7fc29d281fc6ac1d339ba0965ba08affdf1181c`; sourceSHA`4595635ee6a829b2af637367185292508eed9ac5f1aa6df177def40c1bf67c46`, specSHA`f74222e84ee4f14bb4df1bd2f66176c8afcfaffb01064167fe5128a16e92ad97`. Compatible pool gpu2/3/5/6 inspected; prior20261026T181328Z-57b68814 verified COMPLETE and shared job ledger inspected. Existing pinned SAM checkpoint/environment/inputs reused without modification. Native2000s reservation, remaining700s known-failure reserve within2700s. Receipt/spec `/tmp/k6b-frame-submission.json` and `/tmp/k6b-frame-spec.json`. No verified automatic completion wakeup: attended bounded native wait, no recurring model monitor.
