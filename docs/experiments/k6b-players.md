@@ -3723,3 +3723,102 @@ Shared timings are resource checks only, never performance evidence.
 Shared resource smoke separates source/setup time from measured frame-loop time, extrapolates actual scored-frame cost to80/window with1.5x allowance for varying ROI size, then adds60s model/finalization reserve. It does not multiply fixed source preparation by40. Full is gated at projection<800; no scoring formula changes.
 
 Shared joint judge job `20261026T124922Z-b47be797`, source`c2fa3b4862bac25bada2502aef0e3fc315b739eb`, specSHA256`f6eb1212d8c6ed6dabee928333d72da0a139e5b784714582e47e12113f2dcbd5`;1000s reservation of unchanged1800s new cap,12GB process plus8GiB free margin. Prior exclusive queue b543788f confirmed cancelled/unstarted at0GPU cost. Fixed160 frames/4settings; no generation.
+
+### CPU edge mechanism result (complete; separate from neural joint test)
+
+Native job `20261026T124022Z-49e6c45a`, source `1579e807`, gpu6 CPU-only, SVT-AV1 preset4/CRF35, 960×540 4:2:0. All12 fixed points and container-only client reconstruction passed. Widths are in full-resolution pixels. Each excerpt contains the first8 stored judged ticks (0,3,…,21), coded at the actual25/3 or50/3 fps:0.96s Alcaraz and0.48s Medvedev. These container rates include headers/metadata and are NOT full240-frame stream-rate estimates.
+
+The RGB carrier mixes guard-lifted generated RGB into black with a known width but arbitrary foreground color. Decoder uses only decoded RGB and the fixed max-channel>16 test, then guard inverse; it does not know alpha. The mask-only control thresholds decoded luma at128 and is a separately paid stream with no foreground color. No oracle mask is available to either client; a fresh container decode alone reproduces each stored decoded-mask hash.
+
+| Excerpt | Ramp px | RGB container B | kbps | IoU | Edge mean/p95 px | Edge error flips | Boundary RGB MAE | FP RGB RMS |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Alcaraz | 0 | 8634 | 71.950 | 0.982795 | 0.163479/2.000 | 0.212668 | 12.188 | 20.914 |
+| Alcaraz | 2 | 7914 | 65.950 | 0.910214 | 0.904284/2.000 | 1.027755 | 15.039 | 17.897 |
+| Alcaraz | 4 | 7208 | 60.067 | 0.861151 | 1.548112/2.828 | 1.393094 | 19.729 | 16.621 |
+| Medvedev | 0 | 7857 | 130.950 | 0.979787 | 0.191872/2.000 | 0.228670 | 13.668 | 26.727 |
+| Medvedev | 2 | 7002 | 116.700 | 0.896763 | 1.053817/2.000 | 1.200524 | 17.098 | 20.990 |
+| Medvedev | 4 | 6524 | 108.733 | 0.847947 | 1.720738/2.828 | 1.632526 | 22.834 | 21.142 |
+
+Edge-error flips mean changed boundary-error pixels per true boundary pixel between consecutive sampled ticks; no motion alignment or perceptual interpretation is claimed. RGB errors use only available generated colors and the fixed4px boundary band; FP RGB RMS quantifies color written outside the mechanism target.
+
+| Excerpt | Ramp px | Mask-only container B | kbps | IoU | Edge mean/p95 px | Edge error flips |
+|---|---:|---:|---:|---:|---:|---:|
+| Alcaraz | 0 | 5669 | 47.242 | 0.999881 | 0.001027/0.000 | 0.001378 |
+| Alcaraz | 2 | 5883 | 49.025 | 0.999881 | 0.001027/0.000 | 0.001378 |
+| Alcaraz | 4 | 5746 | 47.883 | 0.999761 | 0.002147/0.000 | 0.003005 |
+| Medvedev | 0 | 5355 | 89.250 | 0.999292 | 0.006080/0.000 | 0.013517 |
+| Medvedev | 2 | 5386 | 89.767 | 0.999155 | 0.007334/0.000 | 0.015726 |
+| Medvedev | 4 | 5384 | 89.733 | 0.999110 | 0.007939/0.000 | 0.015875 |
+
+**Decision:** none of the four ramp/family alternatives passes the frozen global engineering bar. RGB width4 saves16.52%/16.97% bytes but IoU falls from0.982795/0.979787 to0.861151/0.847947; mean displacement increases from0.163/0.192px to1.548/1.721px, and temporal boundary error/color contamination increase. Width2 saves8.34%/10.88%, also failing the accuracy/global saving bar. Luma ramps are accurate but slightly larger than hard luma on both excerpts.
+
+The RGB edge problem exists before compression: width2 zero-codec IoU is0.921484/0.881378 and width4 is0.864715/0.848374. Hard zero-codec IoU is0.999881/0.999292 at full resolution (small half-grid geometry loss), with exact coded-grid hard mask recovery and guard inverse RGB error<=1. The luma ramp zero crossing preserves its target well; this does not imply recovery of the original boundary after quantization. A mixed RGB value64 is consistent with opaque foreground64 or half-opacity foreground128, even under the legal guard range. Arbitrary foreground RGB and alpha are generally not uniquely invertible from three received color channels; spatial/color priors may estimate an edge, but cannot guarantee an exact inverse.
+
+Four-pixel ramps do not earn promotion merely because they save bytes. Binary shapes are not inherently incompressible: H5 showed strong XOR/LZMA prediction, and here hard luma is already accurate/cheaper at the fixed setting. This is a bounded mechanism diagnostic, not a proof that all smooth carriers fail or that a different decoder/resolution/codec cannot improve. No secondary LPIPS/DISTS result is claimed.
+
+Target for these diagnostics is the native written support inside the saved RGB crop, not invented color outside it. Original source-mask pixels outside that support total44 (Alcaraz) and538 (Medvedev) over the8 sampled frames, explicitly retained in source-coverage records. The primary joint experiment retains original masks/R/S and native Telea fallback instead of changing its target.
+
+CPU conservative ledger:40.305241CPU-s failed identity-parser smoke +281.219577CPU-s corrected complete job +400 local allowance =721.524817/3600CPU-s. Corrected full program measured35.197832CPU-s /29.192039s wall; these narrower process timings exclude the separately supervised smoke/validators. All failure artifacts retained. Raw published archive SHA256 `938dbc2f6fd4428322f2ce8509c5085a686121f23aea6b8680959763d732c493`.
+
+## 2026-10-26 — Joint saved-render matte pilot: complete, tested recipes fail
+
+**Decision:** actual PR242 unmasked compressed-reference generations paired with paid1/8,1/16 or1/32 dynamic mattes each score0/4 strict LPIPS/DISTS wins (no unresolved primary cells), below the frozen>=3/4 pilot rule. The exact/granted-matte control reproduces4/4 and exactly the saved composite RGB hashes. All results use the original two windows/all240 coded frames billed/original80 judged frames per window, both players, R/S regions and crop order. No fitting, generation, new reference, new segmenter or Wan-Animate.
+
+### Actual joint rate and quality
+
+| Matte scale | Window | Whole paid rate kbps | Matte kbps | LPIPS | DISTS | Wins |
+|---|---|---:|---:|---:|---:|---:|
+| exact granted control | alcaraz_hurkacz/031@129 | 5.237129 | 47.657500 | 0.245873571 | 0.220013846 | 2/2 |
+| exact granted control | medvedev_struff/014@194 | 7.640872 | 69.900000 | 0.172194882 | 0.186108105 | 2/2 |
+| 1/8 | alcaraz_hurkacz/031@129 | 16.841296 | 11.604167 | 0.244257053 | 0.230332728 | 0/2 |
+| 1/8 | medvedev_struff/014@194 | 24.547539 | 16.906667 | 0.174497564 | 0.194600713 | 0/2 |
+| 1/16 | alcaraz_hurkacz/031@129 | 10.868796 | 5.631667 | 0.266268707 | 0.240286078 | 0/2 |
+| 1/16 | medvedev_struff/014@194 | 14.510872 | 6.870000 | 0.197085623 | 0.214699723 | 0/2 |
+| 1/32 | alcaraz_hurkacz/031@129 | 7.063796 | 1.826667 | 0.324610962 | 0.263390148 | 0/2 |
+| 1/32 | medvedev_struff/014@194 | 9.860872 | 2.220000 | 0.262879380 | 0.260517818 | 0/2 |
+
+For the granted control the matte column is its separately measured exact-packet rate, excluded from the displayed primary total; every reduced scale pays its actual packet in the total. Rates also pay actual keypoints, the PR242 preset1/CRF20 unmasked reference-bank containers and the adapter/guider over7200 seconds, with a common shipped base. No PNG reference-price estimate or quality-invariance assumption replaces the actual decoded-reference generations.
+
+The fine1/8 matte largely preserves LPIPS but costs11.604/16.907kbps on top of the reference/keypoint/adapter method. The coarse1/32 matte costs only1.827/2.220kbps, but quality falls substantially: LPIPS0.324611/0.262879 and DISTS0.263390/0.260518. The intermediate scale also loses. The measured exact-matte-paid control at52.894629/77.540872kbps has0/4 wins. All three reduced-scale decisions remain0/4 under either sign of the ±0.001 renderer-envelope sensitivity.
+
+Charging the base for each variant adds54.309519kbps (48,878,567bytes/7200s) and has zero wins, two resolved losses and two unbracketed/unresolved cells. There is one method operating point per scale/window; no method BD-rate curve is defined, and no rate or quality extrapolation is used. Comparisons use the same achievable SVT-AV1/DCVC anchor envelope.
+
+### Pixel, coverage and provenance gates
+
+Both original source clip hashes, decoded source RGB frame hashes, per-player source-mask frame hashes and the decoded matte frame hashes for ALL240 coded ticks are recorded. Packet bytes/CRC/header/unit-order/grid and native decoded-array hashes are checked. Every saved generated crop hashes and covers exactly its expected original judged timestamps. Original R/S hashes match; no region or source changes. The client compositor pastes only saved generated RGB inside the unchanged crop box. Requested pixels without available crop RGB retain native Telea fill; no target foreground is copied into the output.
+
+| Window | Missing union pixel-frames, exact | 1/8 | 1/16 | 1/32 |
+|---|---:|---:|---:|---:|
+| alcaraz_hurkacz/031@129 | 9104 | 8763 | 6303 | 1766 |
+| medvedev_struff/014@194 | 3798 | 3230 | 1963 | 560 |
+
+These are sums across80 judged frames, not unique spatial pixels or invented coverage. Native per-player counts and requested/written/missing unions are also saved. Even the exact control has crop gaps; reproducing its saved composite hashes proves that the fallback remains identical to PR242.
+
+Exact saved-RGB metric maximum differences are0.000001609 (Alcaraz) and0.000010014 (Medvedev), both below the unchanged1e-4 guard. No fresh generative re-render is performed here; the prior1e-3 fresh-render variation remains only a reported sensitivity. GPU CUDA/device/class, finite full-frame score coverage and declared memory pass; peak allocated memory6.963979GiB. Native both-window smoke projection549.249628seconds passed the800-second full bound. Shared timings are contaminated and are only resource/cost records, not performance evidence. One advisory progress-stall event occurred; the job completed and all substantive validators passed.
+
+Native judge `20261026T124922Z-b47be797`, code revision `c2fa3b48`, source SHA256 `27c5a38deed86cd1cfd9d8a511164b2e8af9f7145a9b13327e1d9f58115b3a84`, gpu5 / NVIDIA RTX 6000 Ada Generation, UUID `GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162`. Published archive SHA256 `60e8c42b40bbb93c47288dec31afc1663cc4663031ed81ebd8df0da4c41ef75e`. The result includes LPIPS/DISTS backbone hashes, environment/model provenance, all input hashes, per-frame scores and hashes of original/scored masks; source snapshot/specification checksum are preserved with the job.
+
+New GPU ledger CLOSED: **373.340391/1800 admitted seconds = 0.103705664/0.5 GPU-hours**. Both replaced exclusive requests were verified cancelled before admission and cost0GPU. CPU preprocessing/edge ledger CLOSED at721.524817/3600 conservative CPU-seconds, including failed smoke and400local allowance. GPU judge additionally records439.585437 child CPU-seconds across smoke/full, separately available; even adding these to the conservative preprocessing ledger gives1161.110254CPU-seconds before small supervision overhead. Prior budgets remain closed; no unused allocation is transferred to further work.
+
+Validation: configured Ruff and mypy pass;11 focused tests pass. Full local suite:887 passed,24 skipped, one pre-existing macOS protected-path hook assertion fails unchanged. The process-visibility test passes with read-only escalation. Linux CI is the merge gate. Native GPU and CPU full validators pass on the real data/components, including independent container-only edge-mask reconstruction.
+
+### Scope and stop
+
+This closes the three tested joint matte recipes under the two-window pilot criterion and rejects the fixed small-ramp carrier variants for promotion. It does NOT establish a full12-window statistic: ten windows remain untested for this changed generation/matte combination. It is not a universal compression optimum or proof that every smooth carrier/decoder fails. Binary masks are not inherently incompressible, and a sharpened decoded boundary is not guaranteed to equal the original boundary.
+
+Target-derived Telea background remains granted. Source/replay independence remains unresolved; both familiar broadcasts, exploratory115px and historical step5 failure remain explicit. This is fidelity-only (LPIPS/DISTS), not the experience track, independent confirmation or an end-to-end codec claim. Stop because both authorized decisions are reached. No further computation, fitting, generation or full12 run is launched.
+
+Post-run observability repair: publish native progress after each completed
+window/archive, using the existing fleet helper, to avoid the advisory stall
+seen while the completed study was healthy. This adds no recurring model call
+and changes no source pixels, masks, scores, rates or decision. Native evidence
+remains pinned to c2fa3b48; the read-only bundle retains that executed code and
+its input/output hashes. No GPU re-run is needed or launched for this logging
+change; normal static/focused checks cover the final source.
+
+Immutable joint-study publication: `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-joint-matte-edge-20261026T131206Z`. Metadata bundle SHA256
+`e39c6031cbc0bd54fffc06d2dcca25dacb4d585c993fb587740fc3ac07ca48be`. All8 raw archives and54 metadata files
+passed checksum verification and are read-only. The bundle's GPU/CPU executed
+code-file hashes exactly match the two native result receipts. Existing source
+files, weights and earlier publications were not overwritten. Final repository
+source adds only the documented native progress callback after those results.

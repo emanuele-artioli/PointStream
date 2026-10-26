@@ -145,6 +145,12 @@ sessions update their own items and their files in `docs/experiments/`
   >=18/24 on the full cohort. Exact dynamic matte is still granted: charging
   its measured packet removes all four pilot wins. The new pilot used
   4.411019/4.5 GPU-hours, including failures and recovery; no jobs remain.
+  Joint saved-render follow-up (2026-10-26): pairing the new compressed-RGB
+  generations with paid1/8,1/16,1/32 mattes gives0/4 at every scale, with the
+  exact/granted control reproduced at4/4. Small RGB boundary ramps damage shape
+  even before compression; separate luma ramps are accurate but not cheaper
+  on the bounded excerpts. The pilot stops; it does not imply a full-cohort
+  bound or global compression impossibility. It used0.103706/0.5 new GPU-hours.
   Step 6 (Wan-Animate 14B, zero-shot first) remains outlined and waits for
   the user. K6c after K6b; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
@@ -185,7 +191,7 @@ marked `card ready` is waiting for the user to start it.
 | K6b players compressed mattes | [CPU-first saved-render test](docs/cards/k6b-player-compressed-matte.md) | `codex/k6b-compressed-matte`, PR #239 | Codex high | reported 2026-10-25: CPU complete; all 12 mask rates/coverage and two real neural smoke frames; full quality exceeds CPU cap; CPU phase0 GPU, proposed0.75 GPU-h judging subsequently approved; half-size JPEG reference pricing~90% below PNG, generation quality untested |
 | K6b players matte GPU judging | [saved-render quality continuation](docs/cards/k6b-player-compressed-matte.md) | `codex/k6b-matte-judging`, PR #240 | Codex high | reported 2026-10-25: all scales0/8 measured wins after4 complete windows; best possible16/24<18, frozen stop reached;0.167674940 of0.75 GPU-h; all jobs terminal, no fitting/generation |
 | K6b players reference/alpha video | [bounded coding/quality pilot](docs/cards/k6b-player-reference-video.md) | `codex/k6b-reference-quality-pilot`, PR #242; prior #241 merged | Codex high | reported 2026-10-26: actual unmasked compressed references 4/4 (passes >=3/4); alpha/black each1/4; dense each0/4; exact-matte-paid all0/4; no full12 or independent-source claim; 4.411019/4.5 new GPU-h, CPU2647.199/3600s, no jobs remain |
-| K6b players joint matte/edge pilot | [saved-render joint test and CPU mechanism](docs/cards/k6b-joint-matte-edge.md) | `codex/k6b-joint-matte-edge-pilot` | Codex high | running 2026-10-26: rules frozen before measurement; new GPU<=0.5h/CPU<=3600s caps, no generation; prior ledgers closed |
+| K6b players joint matte/edge pilot | [saved-render joint test and CPU mechanism](docs/cards/k6b-joint-matte-edge.md) | `codex/k6b-joint-matte-edge-pilot` | Codex high | reported 2026-10-26: actual paid1/8,1/16,1/32 mattes each0/4; exact control4/4; RGB ramps lose shape, luma ramps not cheaper, none promoted; 0.103706/0.5GPU-h, CPU721.525/3600s; no full12/end-to-end/independence claim, no active jobs |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).

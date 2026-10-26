@@ -271,6 +271,9 @@ def main() -> int:
         write(stage / "judge.json", result)
         with tarfile.open(stage / "published.tar", "w") as t:
             t.add(publish, arcname="publish")
+        from experiments.jobs.monitor import publish_progress
+
+        publish_progress(str(stage), len(result["rows"]))
     print(
         json.dumps(
             {

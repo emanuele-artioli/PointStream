@@ -1,5 +1,26 @@
 # Joint compressed-reference/matte pilot and bounded edge mechanism check
 
+Current state (2026-10-26): COMPLETE; stop because both decisions are reached.
+Each actual paid1/8,1/16,1/32 dynamic-matte recipe scores0/4 strict metric cells;
+exact/granted-matte control reproduces4/4 and all saved composite hashes within
+unchanged1e-4 metric tolerance. No unresolved primary cells;0/4 remains under
+±0.001 sensitivity. No new generation/fitting/segmenter inference/Wan-Animate.
+GPU cost373.340391/1800s =0.103705664/0.5h, all attempts included.
+CPU preprocessing conservative721.524817/3600CPU-s, including failed smoke and
+local allowance. All current native jobs are terminal; no recurring monitor.
+
+Small RGB ramps save8–17% on the short excerpts but damage shape even before
+compression. Accurate separate-luma ramps are slightly larger. No secondary
+alternative passes the frozen engineering promotion bar; no secondary neural
+quality test is claimed. Written support/crop gaps and8-frame excerpt limits
+are explicit. All source/mask/frame/packet/score/native client checks pass.
+
+This rejects these tested recipes under the two-window pilot rule. Ten other
+cohort windows remain untested for this combination; target-derived background,
+source independence,115px and historical step5 limitations remain. Full
+self-contained outcomes are the final2026-10-26 entries in the experiment file.
+The protocol and operational amendments below preserve the execution history.
+
 Goal: test the new saved full-RGB-reference generations with actual compressed
 mattes, then determine whether small boundary ramps justify a later codec study.
 User's explicit “Perform that test” is recorded in planning chat
@@ -114,3 +135,5 @@ and1e-4 score controls, no latency claim. Reserve1000s first
 (100smoke/800full/20validator/80overhead),800recovery; same1800s cap. Both-window
 measured smoke projection plus60s must fit800 before full. CPU phase is closed
 at a conservative721.524817/3600CPU-s including failed smoke and local allowance.
+
+Final immutable evidence: `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-joint-matte-edge-20261026T131206Z`. Bundle SHA256 `e39c6031cbc0bd54fffc06d2dcca25dacb4d585c993fb587740fc3ac07ca48be`;8 raw/54 metadata files verified read-only; executed-code hashes match native receipts.
