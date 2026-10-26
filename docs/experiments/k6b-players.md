@@ -3426,3 +3426,5 @@ change: primarystrict3/4rule,anchors,R/S,registration/115pxstatus,cohort,all
 renderer-envelope sensitivitybesideprimarystrictcells. No pixelhashrelaxation
 for deliveredRGB/alpha. FullPNGcalibration maystillfail andstop; no further
 toleranceadjustment aftercandidatequality. Bothold/new tolerancestested.
+
+FullPNGcalibration job `20261026T073722Z-4ec3f83c` source20a319b6 specSHA256`599a80a04a19b39020b999e6cb74d64798092ac6f451b2d943abcdc51e15a9ca`;350GPU-sreserve, distinct1e-4savedRGB/1e-3freshFP16checks, all160frames beforecandidatequality.
