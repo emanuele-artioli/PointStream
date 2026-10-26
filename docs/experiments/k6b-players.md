@@ -4072,3 +4072,15 @@ threshold, images, geometry, metric or decision-rule change. Remaining GPU
 2689.601013s before recovery;2000s new reservation fits. Failure metadata in
 `/tmp/k6b-receiver-sampled-terminal.json`; bootstrap proof in
 `/tmp/k6b-receiver-sampled-bootstrap-proof.json`.
+
+Recovery job`20261026T154832Z-50c37ae0`, source`9e9fb2ca`, published pending,
+<=2000GPU-s reservation. SourceSHA256
+`b446dcbe6c0d3392d7cb05c7306a3d86d5fc124386168a663bd36cf39ee0768e`,
+native specSHA256`bbda0c7b02db9784ebe299d15c63f7f9d990b19bde1534b36280a0682e6cd21d`.
+Receipt`/tmp/k6b-receiver-sampled-recovery-submission.json`. Explicit empty
+chat_id disables the legacy heartbeat suggestion; no automation created.
+Cumulative admitted GPU before this request10.398987293243408/2700s.
+Additional configured local checks measured164.913063CPU-s; audit765.100194,
+failed smoke1.485176 and300 new local/preflight allowance leave ample measured
+headroom for gated smoke/full CPU and actual validators under3600. Same primary
+criterion, no inference outputs or new quality scores opened yet.
