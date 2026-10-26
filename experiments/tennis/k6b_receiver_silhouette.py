@@ -378,6 +378,31 @@ def validate(archive: Path, stage: str) -> dict[str, Any]:
             checks[row["id"] + ":finite"] = all(
                 np.isfinite(list(v.values())).all() for v in row["means"].values()
             )
+            score_stream = t.extractfile("publish/" + safe(row["id"]) + "/scores.npz")
+            if score_stream is None:
+                raise ValueError("Actual per-frame neural scores missing")
+            with np.load(io.BytesIO(score_stream.read()), allow_pickle=False) as z:
+                ticks = row["judged"]
+                checks[row["id"] + ":per_frame_scores"] = all(
+                    z[m].shape == (2, 240)
+                    and np.isfinite(z[m][:, ticks]).all()
+                    and np.allclose(
+                        z[m][:, ticks].mean(1),
+                        [row["means"][str(s)][m] for s in (0, -1)],
+                        atol=1e-12,
+                        rtol=0,
+                    )
+                    for m in ("lpips", "dists")
+                )
+            checks[row["id"] + ":shape_and_source_hashes"] = all(
+                set(row[key]) == {str(tick) for tick in row["judged"]}
+                for key in (
+                    "prediction_shape",
+                    "source_rgb_frame_sha256",
+                    "source_player_masks_sha256",
+                    "scoring_masks",
+                )
+            )
             checks[row["id"] + ":coverage"] = all(
                 len(v) == 2
                 and all(

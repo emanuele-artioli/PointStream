@@ -4133,3 +4133,20 @@ admitted81.5132691860199/2700GPU-s. No configuration changes after model output.
 Visual implementation check of the retained two-frame Alcaraz partial confirms
 actual masks cover generated players and leave crop background visible; this
 is not quantitative quality evidence and does not select a new profile.
+
+Job bbc4a300 scoring command completed both-window smoke successfully:
+86.014590CPU-s, full projection1345.326117s<1500. The template mistakenly kept
+`k6b_joint_matte` as validator; it searched for judge.json rather than the new
+receiver.json and stopped the fleet before full. Parent job remains FAILED.
+Native admitted90.88955974578857GPU-s; cumulative172.40282893180847/2700.
+
+Canonical scored smoke archive SHA256
+`0d7397fd25f6c20d09494af5d71064353d40d335853e1743f610491431aa1637`
+passes the intended receiver validator independently on CPU:31/31 checks.
+Additional per-frame neural-array/mean and source/shape-hash checks pass35/35.
+Both real controls, denied reads, fresh resets, actual masks, coverage, GPU
+class/memory and the measured resource projection pass. This is qualified
+infrastructure smoke evidence, not the full quality result. Only validator
+invocation/strength changes; no image/model/prompt/metric/rule change. Next
+native job rechecks this same representative smoke before full. Remaining
+2527.597171GPU-s supports2000s; no old ledger is reopened.
