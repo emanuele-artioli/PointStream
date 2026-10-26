@@ -3456,3 +3456,17 @@ Frozen reference alpha, med: job `20261026T075737Z-a900b575`, source`8cca9b19c00
 Frozen reference black-affine, al: job `20261026T075746Z-ca0a46ed`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`86af6ade26458455bf0886d469c4e43646dd1827d49c0817041f5b37d6ef8ba2`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
 
 Frozen reference black-affine, med: job `20261026T075753Z-75fd93fc`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`00e7dd1393a7a8e55fb19a6e93eed4c8a37120c088a40e270b3c2ec3c17c2653`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Reference full al `20261026T075716Z-f0549307` COMPLETE; admitted 1368.586064 GPU-s; archive SHA256`6a3f620b394871154290340d7700831aea62f098e2569bf0d130e6735a4a1ef1`. Native validator status retained; actual quality still pending joint judging.
+
+Reference alpha al `20261026T075730Z-e8d8f772` COMPLETE; admitted 1399.461311 GPU-s; archive SHA256`2335636c70cda0b2fbc27d6636f64d3727725b4b15396679d8586daeae122759`. Native validator status retained; actual quality still pending joint judging.
+
+The first two candidate jobs passed native full-window validation. Combined
+actual GPU cost is 9625.318329 seconds. Four outstanding renders reserve
+5800 seconds. Retain 650 seconds for final joint judging (60-second smoke,
+540-second full, 20-second validator plus overhead), using measured complete
+Med calibration as the timing basis: three scored signals versus five in the
+final comparison, with the same original R/S and metric implementation. This
+raises only the internal judging reservation from 550; combined worst remaining
+reservation is 16075.318329/16200 seconds. No new GPU budget, recipes,
+quality thresholds, sources or fitting. Preserve all failed and complete jobs.
