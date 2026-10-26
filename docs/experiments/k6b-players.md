@@ -3824,3 +3824,162 @@ files, weights and earlier publications were not overwritten. Final repository
 source adds only the documented native progress callback after those results.
 
 Publication PR: https://github.com/emanuele-artioli/PointStream/pull/243. Experiment stopped because both authorized decisions are reached; merge-commit auto-merge follows final Linux CI. All current jobs are terminal; no further computation or recurring model monitor.
+
+## 2026-10-26 — Receiver-silhouette audit: preregistration
+
+Card: [receiver-derived silhouette](../cards/k6b-receiver-silhouette.md).
+New branch `codex/k6b-receiver-silhouette-audit`, base58fec838. Human request
+verified in planning turn01a178c8-70d6-7ee3-91ad-3c0380fa4328: audit prior
+answers, pursue a selective semantic win, keep players and ball as the broader
+system objective. No new chats/agents. Prior ledgers remain closed.
+
+Before opening any new quality: audit actual full-generation archive identity,
+all saved timestamps/RGB shapes, native input geometry and prior experiment
+contracts. CPU measurement start2026-10-26T15:20:57Z; deadline17:20:57Z.
+CPU cap3600 aggregate seconds; GPU cap2700 admitted seconds, reserved450 smoke
++1650 pilot+300 validation+300 failures, only if the complete anti-circular
+receiver contract passes. Stage bounds<=45min. The hypothesis, competing
+explanations, >=3/4 strict four-cell bar, exact all240 correction/control and
+paid accounting are frozen in the card. No third setting. No inference before
+input coverage and isolation gates. Missing required RGB is a stop, not a
+license to substitute source pixels or an undeclared temporal predictor.
+
+Frozen raw archives from PR242 (source8cca9b19): Al job
+`20261026T075716Z-f0549307`, SHA256
+`6a3f620b394871154290340d7700831aea62f098e2569bf0d130e6735a4a1ef1`;
+Med job`20261026T075723Z-e962542f`, SHA256
+`ba752111fb9e2604a34dc560a06586cf820013ab398b6c834aac54546e6881e1`.
+Canonical records are cited for provenance only, no submissions/replays.
+Original immutable publication:
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-reference-quality-20261026T093850Z/raw/generated-full-{al,med}-0.tar`.
+Frozen window source SHA256 Al
+`054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76`,
+Med`a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be`.
+They are evaluator inputs only, forbidden to the proposed predictor.
+
+### Evidence matrix: prior answers, verified against reports and code
+
+| Question / evidence | Predictor input and decoder information | Observed result | What remains unanswered |
+|---|---|---|---|
+| H5p4d: segment decoded pixels, pay initialization and exact corrections ([report](h5p.md#2026-10-24--h5p-4d-final-accuracy-and-report); `experiments/visor/h5_decoder_mask.py`) | Real raw pre-enhancement DCVC RGB; installed B1b SAM3.1 tracker; actually coded first s=8 union; later masks only in encoder XOR residual. Temporal shape coder, seed and two config bytes billed. | One valid stock point/item:27.30/61.33/30.00/13.29kbps, all above2kbps. Corrections exactly recover reduced union. Full curve stopped on native codec repeatability; initially circular enhanced-RGB attempt excluded. | Independent fresh receiver SAM-mask repeatability unproven; no uncorrected neural quality/full BD-rate curve. Different domain, generated RGB, prompts and target grid here: related negative evidence, not the exact tennis answer. |
+| H3e: decoder-derived hand/forearm outlines ([report](h3e.md); `experiments/visor/h3e.py`) | V1 coded MANO pose supplies hand silhouette; V2 uses target R for hand+forearm and is an oracle. | V1 fidelity failed; report explicitly calls decoder-side forearm mask untested. | No generated-RGB silhouette plus correction transport test. |
+| K6 tennis pose warp ([report](k6.md), oracle variants; `experiments/tennis/k6.py`) | Skeleton warp of target/reference appearance; source-player mask and mask-height bandwidth; references selected per target from granted bank. | Pose/appearance upper bounds and reference-warp quality, with granted outline/history. | Not a fresh segmenter of unmasked generated RGB; cannot supply a free target-R initializer here. |
+| K6b hands3m (PLAN) | Proposed decoder matte for hand renderer. | Withdrawn after rung4 failed even with matte granted. | Not a completed matte experiment; cannot count as negative segmentation evidence. |
+| K6b player steps2–5 and clip-local diagnostic ([this file](k6b-players.md); `k6b.py`, `k6b_generate.py`) | RGB generation from reference+decoded pose maps; target R used in judge/compositor. | Conditional renderer evidence and historical step5 failure. | No mask prediction on raw generated RGB. Region/granted-background history is retained. |
+| PR239/240 compressed dynamic mattes (`k6b_matte_cpu.py`, `k6b_matte_judge.py`) | Receiver decodes actual transmitted reduced target mattes. | Judging stopped at0/8; full-cohort maximum16/24<18. | Transmitted mattes are not inferred silhouettes. |
+| PR241/242 reference/foreground video (`k6b_reference_video.py`, `k6b_reference_prepare.py`) | Sparse FULL RGB/alpha/key reference banks; separately, dense original segmented foreground video. | FULL-reference generated quality4/4 with exact matte granted; other banks1/4; dense carriers0/4. | Sparse reference alpha does not supply target silhouettes; no segmenter on FULL raw generated crops. Dense original foreground is not generated-RGB inference. |
+| PR243 joint matte/edge (`k6b_joint_matte.py`, `k6b_edge_ramp.py`) | Paid decoded target matte packets or explicit alpha/key carrier. | Reduced mattes each0/4; bounded RGB ramps lose shape before compression; accurate luma ramps not smaller. | No new segmenter. RGB-key ambiguity is not a proof learned segmentation fails. |
+
+Repository search covered `docs/experiments/k6*.md`, related cards, H3e/H5p,
+PLAN and tennis generation/transport/judging code. No overlooked completed
+experiment answering the exact raw-FULL-generated-tennis configuration was
+found. This is a scoped repository audit, not a claim that the general idea
+has never been studied elsewhere.
+
+### CPU input gate result: stopped, no new GPU work
+
+Both actual PR242 FULL-generation archive hashes match the preregistered
+identities; all4 NPZ member hashes match native metadata. Every unit reports
+240 generated frames but contains **only80 RGB crops at0,3,...,237**, shape
+`(80,784,512,3)` uint8. Every player lacks160/240 required prediction ticks
+(1,2,4,5,...,238,239),640 missing player-ticks total across both windows.
+Each archive contains only the two NPZs and their two metadata JSONs, with no
+retained full-context RGB member. The audit hashes every saved RGB frame and
+records every present/missing tick; it never opens original masks or new
+quality scores. This checks the specified publications, not every possible
+unregistered temporary file on the fleet.
+
+Executed generator revision8cca9b19 and current generator are byte-identical,
+SHA256`b25e8a1bd3a9c4444244df3a1010cf8652cf374971af55ee55089cb03982a4e2`.
+`k6b_generate.py` renders each native pose run, then retains only
+`judged[row]` (unless max_frames smoke is requested). Native metadata says
+240 generated/80 kept for every unit. Context RGB at the other ticks was
+transient and is not in these publications. PR243's card already explicitly
+states that saved crops contain only judged frames; its all240 matte billing
+used externally transmitted masks and never required segmentation there.
+We do not reinterpret “frames_generated=240” as retained RGB coverage.
+
+Anti-circularity audit: `k6b.py:prepare_window` derives full-run crop boxes and
+pose maps from decoded keypoints (`run_boxes`), not R. Reference selection/
+association and geometry were coded in the prior transport. The reference
+preparer replaces only `reference`; FULL uses decoded unmasked RGB without
+multiplying by alpha. Although that preparation reads alpha for other recipes,
+alpha does not modify the FULL reference. `Renderer.render` takes reference
+and pose maps, not target masks. Generation therefore has no direct target-R
+pixel gate. Training/adaptation/source provenance remains a separate limitation.
+The later exact-R composite is unsuitable segmentation input, as is its
+source-driven Telea canvas. Missing raw RGB must not be recovered from either.
+
+**Decision:** the exact new tennis question remains unanswered, but the
+specified saved-output/all240-frame correction configuration fails input
+completeness before segmentation. No candidate is promoted, no smoke submitted,
+no new quality or correction-rate number is invented. It is an input/receiver-
+contract blocker, not evidence of bad silhouette quality, excessive measured
+correction rate, nondeterministic SAM/YOLOE, or an exhausted GPU allowance.
+No installed-model choice, isolation/reset test, cost projection or model
+payback has been empirically validated for this new configuration. Therefore
+there is no basis for admitting the proposed full pilot under2700s.
+
+A valid narrower question is whether a silhouette estimated from each of the
+80 saved raw crops preserves the same80-frame LPIPS/DISTS advantage. That can
+answer sampled composite quality, but cannot alone answer all240 exact
+correction transport. A declared sparse-RGB predictor (for example, pose-
+registered hold/interpolation, or an explicit empty predictor on unsaved ticks)
+could define all240 masks using paid inputs. This would be a distinct receiver
+profile, with its own timestamp/run-boundary behavior, fresh-reset proof,
+correction bytes for **all** ticks and metadata bill; it must not inherit the
+native all240 generated-RGB prediction claim. Neither version is silently
+substituted or run here. The alternative is recover genuine retained raw RGB
+elsewhere, if it exists; regenerating it is outside this authorization.
+
+The next decision is consequently a concrete receiver-profile choice or raw
+artifact recovery, not another generator/model sweep or a claim that semantic
+players are conclusively closed. The broader objective remains a selective
+fully accounted win that can grow to players+ball. No background/ball
+integration is run because this pilot has no pass. Any later integration must
+use an achievable coded background informed by T1's billed-split failure,
+retain ball mode, and compare equal total rate with fair-adaptation anchors.
+
+All prior source, training/checkpoint and result artifacts remain unchanged.
+Target-derived background is still granted; familiar two-match/source/replay
+uncertainty,115px exploratory status, historical step5 failure and granted-
+matte history remain explicit. No full12, independent confirmation, whole-
+codec win or universal rejection of decoder-derived silhouettes is claimed.
+
+### Closed resources and verification
+
+New GPU ledger CLOSED at0/2700 admitted seconds: no new fleet job, inference,
+judging, fitting or generation. The two input jobs were independently checked
+with native `ps-fleet status`: both remain complete with passed gates. Native
+`ps-fleet inspect` returned all6 hosts with0 probe errors; no admission followed.
+There is no task-owned running process, pending request or model monitor.
+
+CPU archive audit measured4.503882CPU-s /1.825985wall-s. Configured Ruff/mypy/
+full pytest measured160.596312 child CPU-s /88.505228wall-s. Reserving600CPU-s
+for the remaining local inspection, isolated process-test recheck, Git and
+publication gives **765.100194/3600 conservative CPU-seconds**; closed within
+2h wall. Unused new/old budgets do not transfer to another test.
+
+Ruff and mypy pass (224 sources). Full pytest:885 pass,25 skip,2 known macOS
+limitations: sandbox denies `ps`, and the unchanged protected-path test expects
+Linux `/home/.../Datasets` symlink resolution. The process-suspension test
+passes with read-only process visibility outside that sandbox. No production
+code changed; the audit's actual archive SHA, member SHA, complete array shape,
+timestamp uniqueness/range and all4 stride3 schedules pass. Linux CI remains
+the merge gate. No new tests mirroring documentation were added.
+
+Immutable audit publication:
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-audit-20261026T152605Z`.
+Bundle SHA256`475f703b1812fde02e2644055c03dd126e5489d35e4aa5075596668c0e877f71`.
+All13 manifest-listed files hash-verified, files444/directories555. Contains
+standalone audit/check scripts, full timestamp/missing-tick/frame hashes,
+code-file hashes, six-host probe, closed ledger, card/report and check logs.
+The upload initially stopped after extraction because remote Python3.10 lacks
+`hashlib.file_digest`; the existing directory was inspected, verified using
+SHA256 read-bytes and finalized read-only without replay/overwrite. This
+publication-only recovery is within the600CPU-s allowance; no inference ran.
+The original raw generation archives remain in their prior immutable directory.
+
+Publication PR: https://github.com/emanuele-artioli/PointStream/pull/244.
+Merge-commit auto-merge enabled, subject to required Linux CI. Experiment
+stopped at the CPU input gate; no further task computation is scheduled.
