@@ -4586,3 +4586,244 @@ selected patch, visuals, checks, card/report and closed ledger. Executed SAM/
 judge code hashes match current files. Existing Models, inputs and earlier
 publications preserved. PR [#246](https://github.com/emanuele-artioli/PointStream/pull/246)
 contains the completed scoped study; merge-commit auto-merge follows Linux CI.
+
+## 2026-10-26 — Every-frame independent SAM: frozen last narrow profile
+
+New study authorized by the human's “Dispatch the next steps then” in planning,
+verified in that chat. [Card](../cards/k6b-receiver-frame.md), scoped branch
+`codex/k6b-receiver-frame-pilot`. Prior ledgers remain CLOSED; new cap2700
+admitted GPU-s/3600aggregate CPU-s/2hwall; native reservation2000s,300smoke/
+1500full/40validator/160overhead,700s known-failure reserve. No new measurement
+or GPU submission at this preregistration. This is the last narrow segmentation
+profile, not permission for a model/prompt search.
+
+Hypothesis: independent pose prompting every saved RGB frame removes the
+track-collapse failure and retains>=3/4strict bracketed LPIPS/DISTS cells at
+unchanged actual total rate. Competing explanations: silhouette boundaries
+remain inaccurate; pose/generated-body misalignment or missing support causes
+loss even without persistence; independent prompting costs too much compute;
+receiver nondeterminism/invalid control prevents a conclusion.
+
+All4units of Al031/Med014 use exactly PR246 prompt geometry/weights/preprocessing
+and logits>0, with a NEW one-frame state at EVERY tick0,3,...237. Use the native
+`add_new_points` returned video-resolution mask directly, no temporal propagation
+or memory-encoder preflight, no identity/window-specific settings. Source CPU
+inspection confirms the pinned method returns(frame,obj_ids,low,video_masks).
+Keep two fresh-process bitwise repeatability, read isolation and original exact
+control<=1e-4; substantive validator additionally verifies one prompt per saved
+tick. Method error±.001 additive sensitivity frozen before quality, primary
+unchanged. Boundary precision/recall/F1 at2px tolerance on1080p union is
+secondary; no target-guided prompts or shape-as-quality substitution.
+
+All240 paid KPS/actual compressed FULL references/7200s adaptation remain billed;
+common base+SAM assumption and installation/payback separate. Same original
+80judged frames/R/S/crop order/native source conversion/achievable SVTAV1+DCVC
+envelope. One point/window, no BD-rate or extrapolation. No correction sweep.
+Shared timings measured as resource cost only. Two windows are DEVELOPMENT
+after repeated experiments, not untouched confirmation. Missing160RGBticks/
+player, granted target-derived Telea/historical granted-matte limitation,
+source/replay uncertainty,115px exploratory and historicalstep5 remain explicit.
+If passes, prepare unlaunched fully accounted base/background+players+ball oracle
+card and fresh-evaluation protocol; if fails, stop this recipe's narrow search.
+
+Submission: **20261026T184618Z-186fe8b3**, pending at receipt, frozen code`a7fc29d281fc6ac1d339ba0965ba08affdf1181c`; sourceSHA`4595635ee6a829b2af637367185292508eed9ac5f1aa6df177def40c1bf67c46`, specSHA`f74222e84ee4f14bb4df1bd2f66176c8afcfaffb01064167fe5128a16e92ad97`. Compatible pool gpu2/3/5/6 inspected; prior20261026T181328Z-57b68814 verified COMPLETE and shared job ledger inspected. Existing pinned SAM checkpoint/environment/inputs reused without modification. Native2000s reservation, remaining700s known-failure reserve within2700s. Receipt/spec `/tmp/k6b-frame-submission.json` and `/tmp/k6b-frame-spec.json`. No verified automatic completion wakeup: attended bounded native wait, no recurring model monitor.
+
+Prepared [fresh-evaluation planning gate](../cards/k6b-fresh-evaluation-plan.md),
+not launched/approved: current pair and previous12 are development; existing
+Nadal–Kyrgios is candidate new-match generator transfer but court marks already
+used for design, and old finetuned_tennis saw all seven matches. Remaining
+Rublev manifest candidates fail prior registration floor; no verified clean
+fresh cohort is asserted. Source/replay/PTS/transitive training/reference/judge
+lineage and mechanically frozen eligible windows must precede fresh quality.
+No footage acquired or additional cohort GPU run. Proposed future CPU inventory
+cap1h, separate approval; unused current allocations do not transfer.
+
+Smoke PASSED gpu2 RTX A6000: native218.162526s, cumulative child CPU251.297288s; native gate elapsed264.893579s, projected full1327.847317s<1500. Both fresh processes independent_frames=True, one prompt per tick, identical masks/input hashes, all931weights/CUDA/bf16 actual flash and4forbidden reads denied/run. Peak3.086890221GiB. Original exact-control pixels/per-frame<=1e-4 pass, unchanged tolerance. Native full promoted under same reservation; no profile change. Expected sharing event reported+acknowledged. Continuing native wait handle97774; no verified automatic model wakeup or recurring monitor.
+
+Native full progress alert1f679b8a92075cc391a8f8945f3291bb after600s without
+whole-window checkpoint. Authoritative status remained running. Task-owned
+process inspection (no other users, no source/score reads) found all8complete
+unit NPZs across two fresh prediction passes. Recent Al partial checkpoint
+61/80 frames,39s old, confirms scoring progress. Same job continued under
+unchanged1500s full/2000s reservation/2700s cumulative cap, no replay or tuning.
+Expected shared GPU timing is contaminated; it is cost, not latency evidence.
+Alert reported and acknowledged. `/tmp/k6b-frame-progress.json` and
+`/tmp/k6b-frame-metric-progress.json` preserve counts/times. No new quality
+interpretation at this supervision inspection.
+
+Primary full result: **4/4 strict bracketed cells**, passes>=3/4. All320player
+masks nonempty, compared to Al00651/80empty under tracking. Frozen additive
+method-error sensitivity-.001/0/+.001 gives4/4/3wins; AlLPIPS margin0.000828473
+flips in +.001case, but pilot bar still passes. No new setting chosen or judged
+based on those results. Full immutable archive/local independent36checks pass;
+original-runtime CPU check and diagnostic/accounting complete below.
+
+Because the primary passed, prepared [unlaunched fully-accounted feasibility
+card](../cards/k6b-full-accounting-feasibility.md), starting with a proposed
+CPU inventory/rate screen, not more generations. T1 negative fixed-grid evidence
+is carried forward. Actual decoded base/background, players+ball, every side/
+update/reference/fallback bit, fair adaptation, simple ROI/pixel-enhancement
+alternatives, full-frame/foreground quality and achieved anchor envelope are
+required. Full240capture is necessary for wire/decoder claims but unnecessary
+before the cheaper saved80-frame screen. Later staged GPU budgets are proposals
+only; no integration/full240/new-generation work launched or authorized here.
+
+## 2026-10-26 — Independent every-frame SAM: complete, development pilot passes
+
+Decision: **4/4strict bracketed LPIPS/DISTS cells**, above>=3/4. All320player
+masks are nonempty; removing temporal propagation resolves the observed track
+loss. This is a saved-frame DEVELOPMENT component success, not untouched
+confirmation or a fully delivered codec win. No integration/new generation or
+additional segmentation profile follows under this budget.
+
+### Actual component evidence and unchanged controls
+
+One job **20261026T184618Z-186fe8b3**, COMPLETE, gpu2 RTX A6000, frozen code
+`a7fc29d2` (full revision in submission above), sourceSHA
+`4595635ee6a829b2af637367185292508eed9ac5f1aa6df177def40c1bf67c46`.
+Actual full archive SHA256
+`610a09038d13a8ad0b5aab84489fdb6128c46361b2853060cb0151b232401768`.
+Pinned packed environment32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661;
+SAM source2345a4ad109ac29c569da749c91d84f10dc08c40,
+checkpoint0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6.
+Native commands/versions/input SHA256s/environment and patch checksums retained.
+
+Same frozen FULL raw RGB crops and paid independently decoded KPS, same original
+80judged ticks/window, original R/S/crop order/source conversion and achievable
+SVT-AV1+DCVC envelope. Each frame has a NEW one-frame state and its own
+recomputable point/box prompt, using native point-prompt returned logits>0.
+No temporal propagation, mask-memory preflight, target-derived initialization,
+per-window tuning, alternate model, changed reference, fitting or generation.
+Both fresh prediction processes reproduce every saved input/output mask hash;
+all4units have exactly80prompt records at the exact ticks. Landlock denies both
+source videos, control and mask-bearing transport in both workers. All931
+weights, actual CUDA/bf16 flash kernels and native class/memory checks pass.
+Only after predictions freeze may evaluator access original R/S/Telea.
+
+| Window | Conditional total kbps | LPIPS (lower better) | Anchor envelope | DISTS | Anchor envelope | Cells |
+|---|---:|---:|---:|---:|---:|---|
+| Alcaraz–Hurkacz031@129 |5.237128888889|0.2586488135394658|0.25947728608433873|0.22287620678544046|0.23148708141753563|WIN / WIN|
+| Medvedev–Struff014@194 |7.640872222222224|0.1855657861498442|0.2017129652600654|0.19602894634008408|0.2113499321414575|WIN / WIN|
+
+All primary cells resolve within the measured anchor rate bracket; no method
+BD-rate from one point, no quality/rate extrapolation. Frozen additive
+method-error sensitivity-.001/0/+.001 gives **4/4/3wins**. AlLPIPS wins by
+0.000828472545 and flips under+.001; the>=3/4pilot bar still passes. This is a
+sensitivity, not a confidence interval or changed control tolerance.
+
+The exact/granted-matte controls remain4/4. Actual current control means:
+AlLPIPS0.24587292749259496,DISTS0.2200169526040554;
+Med0.17219056271915037/0.1861095041036606. Every saved composite RGB hash
+matches original control. Maximum per-frame score deviations
+7.206201553344727e-5 Al /4.0986102090218024e-5 Med are below unchanged1e-4.
+No relaxation/rerender. Native smoke37checks, independent local full36checks
+and original-packed-runtime/frozen-source CPU full36checks all pass.
+
+### Shape, boundary and missing RGB diagnostics
+
+Every Al001/Al006/Med003/Med004 mask is nonempty,0/80empty each. Prior tracked
+Al00651/80empty therefore disappears under the single global policy. No player
+or tick was dropped. Source masks are automatic original R, not new human
+boundary labels. Mean per-tick union IoU0.6513414871 Al /0.6783819460 Med;
+pixel-frame FP70,202/41,262; FN278,011/184,494. They diagnose shape, not quality.
+
+Frozen boundary diagnostic: inner3x3-eroded foreground edge, Euclidean2px
+matching on original1080p union, per-tick then mean. Alprecision0.423619299,
+recall0.423696173,F1**0.422914204**; Med0.516740715/0.528234119,
+F1**0.521057482**. Boundaries remain approximate despite metric wins. Code
+checks offset-within2px versus shifted/lost masks; actual full diagnostic
+4.225653CPU-s, prediction archive bound by SHA256. No boundary-width tuning.
+
+Predicted masks request0unsupported pixels because projection clips to paid
+crop rectangles, NOT because source support is fully recovered. Exact control
+still has9,104/3,798unsupported requested pixel-frames. Original generated RGB
+and crop order unchanged; no source pixels fill missing target foreground.
+
+### Rate/installation and compute accounting
+
+No transmitted dynamic matte or nonrecomputable prompt/init bits in this
+fixed installed profile. Paid all240KPS rates3.53/5.903333333kbps, actual
+compressed FULL banks0.053515556/0.07577kbps and adapter/guider
+1.653613333/1.661768889kbps at7200s remain unchanged. Common installed tennis
+base+SAM explicit. Unique SAM checkpoint3502755717B adds3891.950796667kbps
+at7200s; base48878567B adds54.309518889kbps. Charging both gives
+3951.497444444/3953.901187778kbps:0strict wins, all4unbracketed with real
+cheaper/no-worse SVT witnesses. No interpolated losses invented. Generic schema
+`segmenter_and_text` counts only SAM once; unused `--text` compatibility alias
+points to the same checkpoint, no text encoder is loaded/billed twice.
+
+Fixed observed quality/common installation gives1/4,4/4,4/4wins at
+1800/7200/28800s. Formal combined-installation payback horizons are
+Al15924598.351/9158830.154s (184.3/106.0days) and
+Med6143334.299/4076109.683s (71.1/47.2days), LPIPS/DISTS respectively. These
+are algebra at FIXED observed quality, not evidence of adapter/tracking/
+quality stability over those durations. Additional fixed-quality rate headroom
+is only0.077868445/1.396473331kbps Al and2.889522438/5.236165638kbps Med.
+Actual decoded-base fallback changes quality, so these are accounting
+sensitivities, not universal end-to-end feasibility bounds.
+
+Native full command1336.785562s fits1500s. Two-fresh-process prediction wall
+321.689091s includes setup/input checks/decompression; unit-loop totals
+96.977262/106.166222s per320crop prediction pass, including preprocessing and
+unit output work. A deployed pass is not the twice-reset verification batch;
+no generation cost is measured in this saved-RGB study. SAM peak3.086890221GiB;
+whole stage peak3.521436691GiB including judges. Shared GPU has a foreign
+compute process: timings are observed resource cost, NOT deployment latency,
+throughput or realtime proof. Generation/full240 decoder cost stays unresolved.
+
+### Closed budgets, limits and next cards
+
+Native admitted run1639.081948s; receipt-to-terminal1713.668027s includes
+queue/staging/finalization. Conservatively charge **1720/2700GPU-s =
+0.477777778/0.75GPU-h**. Native cumulative child CPU1696.886598s already
+includes smoke; conservative aggregate **2329.366896/3600CPU-s**, including
+configured local checks164.257940s, CPU validators, boundary work and explicit
+150preflight/focused/supervision+300analysis/future-card/publication allowances.
+All caps/stages/study wall fit. One GPU allocation, no retries or failed GPU
+runs. Progress alert inspected/acknowledged without replay; all waits ended and
+delivered events acknowledged. No recurring model monitor/new chat/subagent.
+Budgets CLOSED; unused allocations expire, previous ledgers stay closed.
+
+Retain **GRANTED target-derived Telea background and historical granted-matte
+limitation**, familiar two-broadcast development scope, unresolved source/replay
+independence,115px exploratory threshold and historicalstep5 failure.160rawRGB
+ticks/player are absent; no all240 correction/delivery stream, cross-generation
+reproducibility, clean-source confirmation or end-to-end win follows. No
+correction-coder rerun was done (the previous sampled XOR result remains).
+
+Ruff/mypy without paths pass;6focused boundary/prompt/projection tests pass.
+Full configured local suite892PASS/25SKIP/2known Mac restrictions; process-
+visibility test separately passes with visibility. Final Linux CI is merge gate.
+
+Stopped because primary decision reached: per-frame segmentation passes the
+saved-frame development criterion and removes empty-track failure, with an
+explicit fragile AlLPIPS cell. The next work is ONLY PREPARED in
+[k6b-full-accounting-feasibility.md](../cards/k6b-full-accounting-feasibility.md):
+a separate CPU inventory/rate screen before any more generations, actual
+coded base/background+players+ball, all per-content bits, achieved whole-frame/
+foreground metrics and anchor envelope, fair adaptation/ROI/pixel alternatives,
+and T1's negative fixed-grid evidence. Proposed later GPU budgets1.5h oracle,
+1.5hfull240wire capture and2hdelivered curves are conditional/unapproved, not
+extensions of this cap. Full240capture is required for a wire claim, but not
+before cheaper CPU/saved80oracle gates. No later stage launched.
+
+[Fresh evaluation plan](../cards/k6b-fresh-evaluation-plan.md) separately marks
+current windows DEVELOPMENT, audits candidate Nadal–Kyrgios/design exposure
+and unusable Rublev candidates, requires source/PTS/replay/transitive training/
+reference/judge provenance and mechanically frozen eligibility before quality.
+No verified clean fresh cohort or new acquisition is asserted. No open user
+question to complete THIS pilot; any new stage needs separate authority.
+
+Immutable publication:
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-frame-20261026T192107Z`.
+Bundle SHA256`58e06ac014ebed49e4a401efe3dfd343d3aedab685140b82f7277d8198f47839`;
+83files independently verified, files444/directories555. Includes actual raw
+full/smoke archives, native commands/versions/gates/execution, private prompt/
+input/mask hashes and real per-frame scores, independent full validators,
+boundary/installation/sensitivity/cost evidence, supervision traces, code/patch
+hashes, card/report and both proposed next cards. Executed worker/judge file
+hashes match current sources. Existing source data/weights/results preserved.
+
+Review: [PR #247](https://github.com/emanuele-artioli/PointStream/pull/247),
+completed scoped study and unlaunched next cards; merge-commit auto-merge after
+final Linux CI, under project policy.
