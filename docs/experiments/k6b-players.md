@@ -4405,3 +4405,172 @@ Exact-control maximum per-frame differences8.940696716308594e-7 Al and
 full931.171563s<1500, native substantive validator passed and full promoted.
 No prompt/profile/tolerance changes after smoke. Shared timings resource cost
 only. Metadata `/tmp/k6b-sam-smoke-deadline/`; native continuing wait handle27105.
+
+Native wait raised stall event3c525df3123b5a72b0a950d1c51d4752 while full
+prediction/scoring had not yet published a window checkpoint. Authoritative
+status after inspection remained running and `last_progress` advanced to
+1793038934.0818994, after the alert. Event acknowledged, same job continued;
+no replay, migration, profile change or extra allocation. Wait handle48947,
+remaining native bound1800s. This is supervision metadata, not quality evidence.
+
+## 2026-10-26 — Pose-prompted receiver SAM: complete, tracking profile fails
+
+Decision: **2/4 strict bracketed wins <3/4**, so the frozen zero-matte SAM
+profile fails this pilot. Medvedev–Struff's detection failure is removed, but
+Alcaraz–Hurkacz unit006 loses its tracked mask. This rejects this single
+prompt/reset/tracker profile, not every receiver segmenter or prompt schedule.
+No generator, fitting, new weight/environment, full240 recovery, full12 or
+background/ball integration was run. All compute is terminal; budgets CLOSED.
+
+### Actual inference, receiver contract and quality
+
+Job **20261026T181328Z-57b68814**, COMPLETE, executed
+`20b16dad177302998415722616fb16b0f156c7bb`, gpu6 RTX6000Ada, original packed
+runtime SHA32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661.
+Source/spec hashes and actual native commands/inputs are in the submission
+entry above and immutable raw archive. Full native command453.892643s; peak
+3.613847733GiB. Shared timings describe resource cost only, not performance.
+Full raw archive SHA256
+`c44b2ab0828612dcf3602746443a4831c88d265318ace0e54c717de2a51e732a`.
+
+All4 player units have80 raw unmasked generated RGB ticks0,3,...237. The
+worker independently decodes paid KPS and computes geometry/prompts. Both fresh
+subprocesses reproduce every input/output mask hash bit-for-bit, use actual
+CUDA/bf16 flash kernels, load all931 weights, deny all4 forbidden source/control/
+mask-bearing inputs. The evaluator sees R/S/source/Telea only after prediction
+is frozen. Native smoke36checks, local independent full35checks and original-
+packed-runtime/frozen-source CPU full35checks pass. No oracle mask initializes
+SAM. Profile details and20-tick resets remain exactly as preregistered.
+
+| Window | Actual conditional total kbps | LPIPS | DISTS | Strict cells |
+|---|---:|---:|---:|---|
+| Alcaraz–Hurkacz031@129 |5.237128888889|0.32516148852074284|0.25150804296135904|LOSS / LOSS|
+| Medvedev–Struff014@194 |7.640872222222224|0.18295907434004696|0.19509378224611282|WIN / WIN|
+
+These are real native LPIPS/DISTS on the original R/S scoring masks, all80
+judged frames/window, identical crop order, source conversion and achievable
+SVT-AV1/DCVC anchor envelope. Envelope errors at these rates are
+Al0.25947728608433873/0.23148708141753563 and
+Med0.2017129652600654/0.2113499321414575. No unbracketed primary cells, quality
+extrapolation or method BD-rate (only one point/window). Al LPIPS additionally
+has a real cheaper/no-worse DCVC21s2 witness1.445384305kbps/0.2998191253.
+
+Exact/granted-matte control remains4/4 with actual means
+Al0.24587356747176417/0.22001344934105874 and
+Med0.17219486186921676/0.18610825762152672. Every saved composite RGB hash
+matches. Maximum per-frame metric deviations3.93986701965332e-5 and
+2.1636486053466797e-5 remain below unchanged1e-4. No tolerance relaxation or
+fresh generative rerender.
+
+### What failed
+
+Empty crop masks: Al0010/80, **Al00651/80**, Med0030/80, Med0040/80.
+For Al006 all four reset frames0,60,120,180 yield nonempty masks, then each
+track collapses after6,10,8,5 saved ticks respectively; empty counts by segment
+14/10/12/15. Thus the observed failure is tracking/presence loss after successful
+initialization, not missing initial pose support or receiver nondeterminism.
+Inspection of raw generated RGB at lost ticks18,90,144,195 still shows the
+player. This is an observation on those inspected frames, not an assertion
+about every empty tick. No post-score prompt/reset/threshold tuning.
+
+Mean per-tick union IoU0.5183798257 Al /0.6881396313 Med; pixel-frame FP
+73,790/55,484 and FN405,164/168,338. These diagnose shape and do not substitute
+for quality. Projected predicted masks never request pixels outside paid crop
+support because projection clips to that rectangle; this does not imply target
+body coverage. Original exact control still has unsupported requested pixels;
+no source foreground is invented to fill unavailable generated RGB.
+
+### Real sampled correction payload, separate CPU follow-on
+
+After predictions were frozen, one CPU codec encodes temporal-XOR of the
+predicted-vs-exact-R residual at the **80 archived ticks only**. It bit-packs
+full1080p player masks and uses the existing Zstandard framing implementation,
+with window/unit identity, explicit native ticks/shape, predictor and decoded
+mask checksums, and constant recomputable prompt/reset profile. Independent
+fresh decoder subprocess receives only the actual predictor archive, paid KPS
+and transmitted packet, no target/source mask input. Every decoded R frame
+hash equals exact target R. Separate exact sampled-R payloads use the same
+coder, are retained and round-trip verified. This is one coder, no sweep or
+claim of optimal correction compression.
+
+| Window | Residual bytes, all framing | Sampled residual kbps | Same-coder exact-R bytes | Exact-R kbps |
+|---|---:|---:|---:|---:|
+| Al031,9.6s |147144|122.620000|80884|67.403333|
+| Med014,4.8s |127477|212.461667|61649|102.748333|
+
+Native timing is physical0,3,...237 at25/50fps. These rates are sampled80-tick
+payloads divided by the original9.6/4.8s windows, **not all240 measured rates**
+or dense extrapolations. Initial prompts and resets are recomputable from
+already-billed KPS/profile; packet identity/framing/checksums are included.
+The exact-R baseline is sampled equally; neither substitutes for the original
+all240 matte transport. This specific residual is larger than direct sampled R.
+
+Adding these actual sampled residual bits to the unchanged billed KPS/reference/
+adaptation would give127.857128889/220.102538889kbps. Exact decoded masks would
+recover the existing exact-control composition under the same available RGB/
+Telea/crop-order rule; no fresh GPU corrected-quality run is claimed. All4
+resulting accounting points are outside the measured anchor rate bracket, so
+no interpolated loss or extrapolated BD-rate is reported. All4 have actual
+cheaper/no-worse SVT62s1 witnesses (Al11.996104167kbps, Med21.722354167kbps).
+This coder offers no promising correction accounting at the sampled horizon.
+
+One CPU wrapper initially expected a `window` field in the native MATTE header;
+actual native timing is `shared_KPS1_window_header`. It stopped before encoding.
+The fix validates native shape/output grid/timing and binds target/KPS to the
+same SHA-verified transport member directory. Failed artifacts retained;
+conservative120CPU-s charged. No GPU rerun. A successful15.824936CPU-s run is
+retained, followed by17.660931CPU-s to also preserve/verify exact-R baselines;
+packets are byte-identical, no algorithm or quality/profile change.
+
+### Installation and limits
+
+Primary rates bill original all240 KPS3.53/5.903333333kbps, actual FULL banks
+0.053515556/0.07577kbps at7200s, adapter/guider1.653613333/1.661768889kbps;
+no dynamic matte or nonrecomputable prompt/init bits. Common tennis base+SAM
+installation is assumed shipped. Unique SAM checkpoint3502755717B costs
+3891.950796667kbps at7200s; base48878567B costs54.309518889kbps. Charging both
+produces3951.497444444/3953.901187778kbps,0strict wins/all4unbracketed with
+real cheaper/no-worse witnesses. `segmenter_and_text` in the generic accounting
+schema here denotes only the single SAM checkpoint; no text encoder is loaded
+or billed twice (`--text` is an unused compatibility alias to that same path).
+
+Fixed observed quality with common installation gives1/2/2wins of4 at
+1800/7200/28800s. Al quality crossings1.242075166/1.990218435kbps lie below its
+3.53kbps KPS floor, so longer amortization alone cannot rescue those cells.
+For Med, formal combined-installation horizons must exceed5580723.954s LPIPS
+or3897487.388s DISTS (about64.6/45.1days), fixed-quality algebra only. There is
+no evidence quality, tracking or per-match adapter generalizes for those times.
+
+Retain **GRANTED target-derived Telea background and historical granted-matte
+limitation**, unresolved source/replay independence, familiar two broadcasts,
+115px exploratory threshold and historicalstep5 failure. Missing160 raw ticks
+per player mean neither all240 receiver correctness/correction cost nor a
+complete delivery stream is measured. Determinism is demonstrated on these
+saved pixels/environment/GPU, not across hardware or fresh generations. This
+sampled player diagnostic is not independent confirmation or an end-to-end
+codec win; the intended broader system still includes players+ball.
+
+### Closed resource ledger and report
+
+One GPU job, no failed/replayed GPU allocations. Native admitted run
+577.565911s; receipt-to-terminal637.731448s includes queue/transfer/finalization.
+Conservatively charge **640/2700GPU-s=0.177777778/0.75GPU-h**. Full cumulative
+native child CPU snapshot631.598968s already includes smoke, so not counted
+twice. Conservative aggregate **1429.969250/3600CPU-s**, including static/
+focused/preflight allowances, full suite168.593484s, both CPU validations,
+known failed wrapper upper charge, both successful residual runs, visuals and
+300s analysis/publication/validator allowance. All stages and study wall fit
+bounds; unused GPU/CPU allocations expire, no carryover. Exact ledger and all
+raw job/validation/correction/accounting data retained with immutable publication.
+
+Ruff/mypy without paths PASS;6 focused tests PASS. Full local suite890PASS/
+25SKIP/2known Mac restrictions: process visibility and protected Linux home
+symlink; process test independently passes with read-only process visibility.
+Linux CI will check the complete final revision. No task-owned wakeups/recurring
+model calls created; all native batch waits ended and events acknowledged.
+
+Stopped because decision reached: fixed pose-prompted SAM tracking fails2/4,
+this sampled residual coder is costly, and the contract/repeatability controls
+pass. No further model/schedule search or full240 protocol launched. No open
+user question. Any new tracker/profile or full240 data capture is a separate
+planning decision and budget, not an automatic continuation of this failed pilot.

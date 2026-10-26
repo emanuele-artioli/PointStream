@@ -1,5 +1,12 @@
 # K6b: sampled pose-prompted receiver SAM tracker
 
+COMPLETE: actual2/4 strict wins<3/4. Med004 missed-person issue removed,
+Al006 track collapses on51/80 ticks. Receiver isolation/fresh-reset hashes and
+exact controls pass. Sampled exact XOR corrections122.62/212.461667kbps,
+larger than direct sampled R with the same coder. One terminal job
+20261026T181328Z-57b68814; conservative640/2700GPU-s and
+1429.969250/3600CPU-s CLOSED. No further run or user approval pending.
+
 Goal: determine whether a single pose-prompted installed SAM3.1 tracker removes
 YOLOE's missed-person failure and preserves at least3/4 strict LPIPS/DISTS
 metric-cell wins on the same saved raw FULL player crops. This remains a

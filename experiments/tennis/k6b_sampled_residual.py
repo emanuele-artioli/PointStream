@@ -74,8 +74,10 @@ def main() -> int:
     input_hashes = [array_sha(m) for m in masks]
     if a.target:
         target_meta, target = decode_masks(a.target.read_bytes())
-        if target_meta['window'] != meta['window']:
-            raise ValueError('Target identity differs')
+        if (target_meta['timing'] != 'shared_KPS1_window_header'
+                or target_meta['shape'] != [240, 2, 540, 960]
+                or target_meta['output_shape'] != [1080, 1920]):
+            raise ValueError('Native target grid/shared KPS timing differs')
         # Exact R is the native nearest-neighbor x2 source player mask, same as judge.
         exact = [np.repeat(np.repeat(target[tick].astype(bool), 2, axis=1), 2, axis=2)
                  for tick in ticks]
@@ -88,8 +90,14 @@ def main() -> int:
         blob = encode(info, residuals)
         a.packet.write_bytes(blob)
         standalone = encode({**info, 'prompt_init': 'standalone exact sampled R'}, exact)
+        a.packet.with_suffix('.exact.sxr').write_bytes(standalone)
+        _, baseline = decode(standalone)
+        baseline_hashes = [array_sha(r) for r in baseline]
+        if baseline_hashes != info['target_frame_sha256']:
+            raise ValueError('Standalone sampled R decode differs')
         write(a.out, {'bytes': len(blob), 'sha256': sha(blob),
                       'standalone_same_coder_bytes': len(standalone),
+                      'standalone_sha256': sha(standalone), 'standalone_exact': True,
                       'target_hashes': info['target_frame_sha256'],
                       'window': meta['window'], 'extra_init_identity_framing_included': True})
     else:
