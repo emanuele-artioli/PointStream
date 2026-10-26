@@ -3699,3 +3699,25 @@ change; this bounds the mechanism's scope rather than fabricating RGB evidence.
 Corrected GPU job `20261026T124013Z-b543788f`, source`1579e807a468dc292334bdafabcdc5031e23147b`, specSHA256`3751d7ef50442991e2a7233187ad18c3fe7a24e4ca7d91a888a39d80d733062f`; 750 admitted-second cap (8 CPU threads). Prior failed/cancelled IDs retained, never replayed.
 
 Corrected CPU job `20261026T124022Z-49e6c45a`, source`1579e807a468dc292334bdafabcdc5031e23147b`, specSHA256`0311cacaf8d1dc9bc7bd3b5ffc8ae163eef0c72f2a89aeb62a03158951d65523`; 780 admitted-second cap (4 CPU threads). Prior failed/cancelled IDs retained, never replayed.
+
+CPU mechanism COMPLETE: corrected job49e6c45a verified all12 fixed points,
+zero-codec/anti-leak and independent container-only client mask reconstruction.
+Admitted four-core bound 281.219577CPU-s; with40.305241failed smoke and400local
+allowance, new ledger 721.524817/3600CPU-s. No further CPU sweep. Native
+archiveSHA256938dbc2f6fd4428322f2ce8509c5085a686121f23aea6b8680959763d732c493.
+All four ramp/family alternatives fail the frozen engineering promotion bar.
+Full results will be reported separately from the pending primary neural test.
+
+Before any primary neural scores, resource-only amendment: exclusive Ada
+request b543788f remained unstarted and was cancelled at0GPU cost. The same
+Ada LPIPS/DISTS path is qualified in shared mode; saved RGB hashes and1e-4
+controls must pass, and no latency claim is made. Use shared admission with
+12000MiB process declaration plus8192MiB free-memory margin (excludes cramped
+GPUs), continue-on-contention. First reservation1000s (100smoke/800full/20
+validator/80overhead), leaving800 for concrete recovery inside unchanged1800s
+cap. Timing forecast332.188*(4/5)*2.5=664.376<800; native smoke must also
+extrapolate both complete frame loops plus60s to<800 before promotion. This
+changes scheduling/reservations, not pixels, models, masks, rates or tolerances.
+Shared timings are resource checks only, never performance evidence.
+
+Shared resource smoke separates source/setup time from measured frame-loop time, extrapolates actual scored-frame cost to80/window with1.5x allowance for varying ROI size, then adds60s model/finalization reserve. It does not multiply fixed source preparation by40. Full is gated at projection<800; no scoring formula changes.

@@ -20,6 +20,19 @@ REFERENCE_REPORT_SHA = "e9bbb4aca54cd5453f6c7e3472097881c37a200f6b685ec31221b5af
 CONTROL_SHA = "d5a9670d5a223d6c231476cbf7211442aa2ab77dfc01ba1cffbfb7265dee7457"
 
 
+def resource_projection(rows: list[dict[str, Any]]) -> float:
+    if len(rows) != 2 or any(not r["judged"] or r["seconds"] <= 0 for r in rows):
+        raise ValueError("Both measured smoke windows required for resource projection")
+    return 60 + sum(
+        r["setup_seconds"]
+        + 1.5
+        * sum(r["scored_frame_seconds"].values())
+        * len(r["original_judged"])
+        / len(r["judged"])
+        for r in rows
+    )
+
+
 def assess(
     diagnostic: dict[str, Any],
     reference: dict[str, Any],
@@ -110,6 +123,9 @@ def validate(archive: Path, stage: str) -> dict[str, Any]:
         r["reference_report_sha256"] == REFERENCE_REPORT_SHA
         and r["control_archive_sha256"] == CONTROL_SHA
     )
+    if stage == "smoke":
+        estimate = resource_projection(r["rows"])
+        checks["measured_shared_full_projection_under800s"] = estimate < 800
     for row in r["rows"]:
         checks[row["id"] + ":saved_rgb"] = (
             row["control_variant"] == "full" and row["control_composite_hashes_match"]

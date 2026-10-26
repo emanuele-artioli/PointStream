@@ -127,7 +127,10 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
         "control_variant": control_variant, "crop_coverage": {}, "control_composite_hashes_match": True,
         "source_rgb_frame_sha256": {}, "source_player_masks_sha256": {},
         "decoded_matte_frame_sha256": {str(scale): [array_sha(m) for m in reduced[scale]] for scale in SCALES}}
+    row["setup_seconds"] = time.monotonic()-started
+    row["scored_frame_seconds"] = {}
     for n, t in enumerate(requested):
+        frame_started = time.monotonic()
         truth_t = np.array(truth[t])
         row["source_rgb_frame_sha256"][str(t)] = array_sha(truth_t)
         row["source_player_masks_sha256"][str(t)] = array_sha(source_masks[t])
@@ -186,6 +189,7 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
         if n % 20 == 0 or n+1 == len(requested):
             np.savez_compressed(dest / "scores.npz", **arrays, judged=np.array(row["judged"]))
             write(dest / "partial.json", {"id": wid, "finished_frames": row["judged"], "expected_frames": requested})
+        row["scored_frame_seconds"][str(t)] = time.monotonic()-frame_started
     row["control_max_abs_difference"] = control_error(np.stack([arrays[m][0, requested] for m in ("lpips", "dists")]), expected_control[:, requested])
     row["means"] = {str(scale): {m: float(arrays[m][i, requested].mean()) for m in ("lpips", "dists")} for i, scale in enumerate(VARIANTS)}
     row["scoring_masks"] = hashes

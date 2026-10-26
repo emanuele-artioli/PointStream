@@ -106,3 +106,11 @@ or claims those colors exist. Hard baseline is binary at the coded grid; zero
 codec full-resolution geometry loss is reported separately. Width2/4 ramps are
 computed from the same written support. No quality-based selection or threshold
 change; this bounds the mechanism's scope rather than fabricating RGB evidence.
+
+Operational resource amendment before first primary scores: exclusive queues
+never admitted and were cancelled at0GPU cost. Use already-qualified shared
+Ada metrics with12000MiB limit+8192MiB free margin, deterministic saved-pixel
+and1e-4 score controls, no latency claim. Reserve1000s first
+(100smoke/800full/20validator/80overhead),800recovery; same1800s cap. Both-window
+measured smoke projection plus60s must fit800 before full. CPU phase is closed
+at a conservative721.524817/3600CPU-s including failed smoke and local allowance.

@@ -36,3 +36,11 @@ def test_partial_or_changed_pilot_cannot_decide():
     args[-1].reverse()
     with pytest.raises(ValueError, match='complete original'):
         assess(*args)
+
+
+def test_measured_resource_projection_requires_both_windows():
+    from experiments.tennis.k6b_joint_matte import resource_projection
+    rows = [{'judged': [0, 3], 'original_judged': list(range(80)), 'seconds': 5., 'setup_seconds': 3., 'scored_frame_seconds': {'0': 1., '3': 1.}} for _ in range(2)]
+    assert resource_projection(rows) == 306
+    with pytest.raises(ValueError):
+        resource_projection(rows[:1])
