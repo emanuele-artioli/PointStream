@@ -152,3 +152,14 @@ def test_anchor_schedule_starts_with_three_per_codec_and_keeps_every_point():
     assert len(first + remaining) == len(set(first + remaining)) == len(ANCHORS)
     assert set(first + remaining) == set(ANCHORS)
     assert anchor_batches(False) == (ANCHORS,)
+
+
+def test_checkpoint_unit_scope_defaults_to_full_and_rejects_substitution():
+    from experiments.tennis.k6b_confirm_validate import unit_scope
+
+    allowed = ['near', 'far']
+    assert unit_scope(allowed, None) == allowed
+    assert unit_scope(allowed, ['near']) == ['near']
+    for bad in ([], ['outside'], ['near', 'near']):
+        with pytest.raises(ValueError):
+            unit_scope(allowed, bad)

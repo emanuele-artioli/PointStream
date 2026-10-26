@@ -1,12 +1,31 @@
 # Tennis reference and mask video comparison
 
-Current state2026-10-25: CPU phase complete;5708.866274/7200CPU-s conservative
-bound,0GPU. All5jobs terminal, including2explicitly failed attempts with preserved
-results. Sparse54points, affine6points, dense11complete window-points (7Al
-high-rate +4both-match CRF63),131independent local checks pass. Actual generated
-quality and18/24 rule remain unresolved. Three decoded reference candidates are
-materialized; only reference arrays change. Await new4.5GPU-h approval below;
-no active jobs or recurring monitors.
+Current state (2026-10-26): **complete; stop because the pilot decision is reached.**
+The approved 4.5 new GPU-hour / 3600 CPU-second comparison used
+4.411018619 GPU-hours and a conservative 2647.198626 CPU-seconds, including
+failed and interrupted attempts. Old budgets remain closed. No GPU job or
+recurring model monitor remains active.
+
+Actual compressed-reference generation: unmasked full RGB passes 4/4 strict
+window–metric cells; explicit-alpha and affine-black segmented references each
+pass 1/4 and fail the frozen >=3/4 rule. The dense foreground alternatives each
+pass 0/4. Full RGB remains 4/4 under the predeclared ±0.001 sensitivity check.
+Preset 1 / CRF 20 / half-size was frozen globally before quality. Both original
+windows, two players each, 240 generated context frames and 80 stored judged
+crops per player are retained. The two affine Medvedev payloads are qualified
+complete unit checkpoints from terminal contended/failed jobs; the final native
+judge validates the complete window without rewriting their parent states.
+
+**Exact dynamic matte and target-derived background remain granted.** Charging
+the exact matte removes every reference-family win. Full-cohort >=18/24 and
+independent-source confirmation are untested; 115 px remains exploratory. This
+is a positive two-window reference-transport result, not a fully charged codec
+win or global compression optimum. Do not launch full-12 confirmation, fitting,
+new generation, Wan-Animate or further searches without a separately scoped
+approval. See the final 2026-10-26 outcome in the experiment entry for all jobs,
+controls, native hashes, rates, scores, limitations and immutable evidence.
+
+The historical stages and approvals below remain a chronological record.
 
 Goal: determine whether cheaper references and temporally coded silhouettes merit
 an actual reference-conditioned generation test on the frozen 12-window tennis
@@ -268,3 +287,81 @@ CPU code/report publication: https://github.com/emanuele-artioli/PointStream/pul
 Linux CI pending; merge-commit auto-merge requested under existing authorization.
 Only the CPU report is published;4.5GPU-h +3600CPU-s continuation budget remains
 unapproved. No running fleet jobs or recurring monitors.
+
+## Approved continuation (2026-10-25)
+
+User explicitly approved the proposed <=4.5 new GPU-hours (estimate3.35) plus
+<=3600CPU-s preflight. New branch codex/k6b-reference-quality-pilot; old ledgers
+stay closed. Scope, two windows, three candidate families, controls and stop
+rules above are unchanged. CPU preflight reserves <=800 supervised seconds at
+4CPUs (=3200CPU-s upper bound) plus400CPU-s local preparation/analysis.
+Smoke compares both slower presets on a complete12-image original bank, not
+a shortened GOP. Full compares both matches/allthree CRF20 reference families.
+Measured smoke projection must fit full<=600s; otherwise retain partial evidence
+and use matched preset4 per the existing fallback. Dense slower-preset tests
+remain subject to the same CPU cap; no rate extrapolation from short clips.
+GPU stage retains <=0.5h dense and <=4.0h reference generation/control subcaps.
+No new neural scores opened before global reference-preset selection.
+
+## Approved continuation ledger
+
+NewCPU preset job20261025T183121Z-18d2a212 COMPLETE; admitted4CPU bound320.786816s.
+Dense8frame preset job20261025T183643Z-dfd14984 COMPLETE; bound200.560949CPU-s.
+Full240dense preset4 job20261025T184009Z-0787c1cf RUNNING; reserve2320CPU-s.
+LocalCPU reserve400s. Combined bound+reservation3241.347765/3600CPU-s.
+ReferencePNG Alcontrol20261025T183259Z-16af35e8 RUNNING; reserve2000GPU-s.
+Medcontrol20261025T183318Z-34d149af FAILED110s smoke; charge131.172531GPU-s.
+CorrectedMedcontrol20261025T184001Z-2e64d93e RUNNING; reserve2000GPU-s.
+Reference GPU subledger14400s; dense GPU1800s. No candidate rendering/judging
+submitted yet. No uncertain replay, fitting or new sources.
+Presetselection: referenceCRF20preset1; denseCRF63preset4 by preregisteredfallback.
+Full-window reference controls remain mandatory; no newscores opened yet.
+
+CPU continuation now terminal: all4newCPUjobs COMPLETE,2647.198626/3600CPU-s
+conservativebound. Finaljob20261025T184630Z-ace7057c, not replayed. Global
+selectedreferencepreset1CRF20; densealpha4/affine1CRF63, chosenbeforequality.
+DenseGPUfirstsmoke20261025T185239Z-1df3ec6f FAILEDexactpixelgate before
+scoring; charge44.123715GPU-s. Correctedgate keeps metrictruthnativeCUDA,
+checks carriersource against independentlyrecreatedCPUtruth and logsCPU/CUDA
+roundoff<=1level; decodedcarrierRGB/alpha hashesremain EXACT. Corrected
+smoke mustconfirmdiagnosis. NewdenseGPUreservation44.123715+600+600+550
+=1794.123715/1800s. PR242draft, noauto-merge untilterminalpilotoutcome.
+
+Pre-candidateoperationalamendment2026-10-26: PNGfreshre-render differs
+0.000183225onfirstAlscore while savedRGBmetricreplaypassed1e-4. Separate
+checks: savedRGB1e-4 UNCHANGED; freshFP16PNG1e-3, full160framecalibration
+requiredbeforeANYcandidatequality. Originalcrops have~.05meanRGB-level
+crossGPUdifference; weights/inputs/seeds/pipelineunchanged. Reportpairednew
+PNGdifferences and±1e-3sensitivity. Primarystrict3/4andfrozencourt/cohort/
+recipes remainunchanged. Seeexperimententryamendment, no further tolerance
+adjustmentsaftercandidatequality. Newbudgetinternalreservations useclosed
+denseactualcost947.011110s; combinedapproved16200s unchanged.
+
+## Current recovery checkpoint (2026-10-26)
+
+The CPU preflight is closed at 2647.198626/3600 CPU-seconds. Dense foreground
+carriers are closed at 947.011110 GPU-seconds: selected alpha preset 4 and
+affine-black preset 1 each failed all four pilot metric cells. This does not
+close compressed-reference generation. Its frozen choices remain preset 1,
+CRF 20, three reference families and the original two windows.
+
+The approved combined GPU ceiling remains 16200 seconds. Reallocate the unused
+852.988890 seconds of the dense planning reserve to reference recovery; old
+ledgers stay closed. Before the current Med-only calibration job, terminal
+charges total 6705.955410 seconds. Full original-PNG controls are retained from
+completed unit checkpoints. The Alcaraz 80-frame calibration passes the frozen
+1e-3 fresh-render guard (maximum difference 0.000587463); saved identical RGB
+re-scoring still passes 1e-4. Med-only calibration job 20261026T075201Z-db1ea276
+has a 250-second cap. No compressed-reference generation has started.
+
+Recover the complete Alcaraz prefix with explicit validation; do not mark its
+failed parent collection complete. All 160 judged calibration frames must pass
+before candidate admission. Retain exact delivered-pixel hashes, granted matte,
+target-derived Telea background and unresolved source-independence limitation.
+No full-12-window or independent-confirmation claim follows from this pilot.
+
+## Final immutable publication
+
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-reference-quality-20261026T093850Z`
+
+Metadata bundle SHA256 `75b489c2897f44c35a1cec12fbb0545e03c7dc51e65fcc5aba906141d108ce2e`;22 raw archives and110 metadata files verified read-only. Full outcome: final2026-10-26 entry in `docs/experiments/k6b-players.md`.

@@ -137,11 +137,16 @@ sessions update their own items and their files in `docs/experiments/`
   remains exploratory. All 120 anchor points and 956 mask identities
   validated; 24 terminal GPU jobs used **6.995428306 of 8 GPU-hours**.
   Report commit `72228816`, [PR #236](https://github.com/emanuele-artioli/PointStream/pull/236)
-  (auto-merge off after an approval-review block); no jobs remain active.
-  Step 6 (Wan-Animate 14B, zero-shot first) is outlined; it waits for
-  the user. Every player result so far grants the matte; the
-  matte's rate is unmeasured on tennis (H5p 4: on egocentric video the
-  billed mask removed every win). K6c after K6b; K7 (HiEve) later.
+  (merged in `da6a42b1`); no jobs remain active.
+  The 2026-10-26 two-window compression pilot preserves actual quality with
+  unmasked video-coded reference banks: 4/4 strict metric cells, robust to
+  ±0.001 renderer sensitivity. Segmented alpha and black-key references each
+  reach only 1/4; dense foreground carriers each 0/4. This does not establish
+  >=18/24 on the full cohort. Exact dynamic matte is still granted: charging
+  its measured packet removes all four pilot wins. The new pilot used
+  4.411019/4.5 GPU-hours, including failures and recovery; no jobs remain.
+  Step 6 (Wan-Animate 14B, zero-shot first) remains outlined and waits for
+  the user. K6c after K6b; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
@@ -179,7 +184,7 @@ marked `card ready` is waiting for the user to start it.
 | K6b players rate-budget audit | saved 12-window side-information headroom, CPU only | `codex/k6b-player-confirmation-plan` | Codex high | reported 2026-10-25: tested lossless route fails (0/24; 22 bracketed, 2 unresolved but dominated); even free mattes leave 17/24 with real keypoints + PNG bank 2 h; CPU job `20261025T082944Z-29f021a5` complete, 0 new GPU-hours; deployable alternatives unresolved ([card](docs/cards/k6b-player-rate-budget.md)) |
 | K6b players compressed mattes | [CPU-first saved-render test](docs/cards/k6b-player-compressed-matte.md) | `codex/k6b-compressed-matte`, PR #239 | Codex high | reported 2026-10-25: CPU complete; all 12 mask rates/coverage and two real neural smoke frames; full quality exceeds CPU cap; CPU phase0 GPU, proposed0.75 GPU-h judging subsequently approved; half-size JPEG reference pricing~90% below PNG, generation quality untested |
 | K6b players matte GPU judging | [saved-render quality continuation](docs/cards/k6b-player-compressed-matte.md) | `codex/k6b-matte-judging`, PR #240 | Codex high | reported 2026-10-25: all scales0/8 measured wins after4 complete windows; best possible16/24<18, frozen stop reached;0.167674940 of0.75 GPU-h; all jobs terminal, no fitting/generation |
-| K6b players reference/alpha video | [bounded CPU coding comparison](docs/cards/k6b-player-reference-video.md) | `codex/k6b-reference-video`, PR #241 | Codex high | reported2026-10-25: CPU54 sparse+6affine settings and11complete dense window-points;131independent checks;5708.866/7200CPU-s bound,0GPU; all5jobs terminal;4.5newGPU-h quality request awaits approval |
+| K6b players reference/alpha video | [bounded coding/quality pilot](docs/cards/k6b-player-reference-video.md) | `codex/k6b-reference-quality-pilot`, PR #242; prior #241 merged | Codex high | reported 2026-10-26: actual unmasked compressed references 4/4 (passes >=3/4); alpha/black each1/4; dense each0/4; exact-matte-paid all0/4; no full12 or independent-source claim; 4.411019/4.5 new GPU-h, CPU2647.199/3600s, no jobs remain |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).

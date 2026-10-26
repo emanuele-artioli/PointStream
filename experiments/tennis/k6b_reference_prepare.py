@@ -13,7 +13,7 @@ import numpy as np
 from experiments.tennis.k6b_rate_transport import array_sha, sha, write
 
 
-def prepare(original: Path, video: Path, kind: str, target: Path) -> dict[str, Any]:
+def prepare(original: Path, video: Path, kind: str, target: Path, *, preset: int | None = None) -> dict[str, Any]:
     import cv2
     if target.exists() or kind not in ('full', 'alpha', 'black', 'black-affine'):
         raise ValueError('New target and declared recipe required')
@@ -21,12 +21,13 @@ def prepare(original: Path, video: Path, kind: str, target: Path) -> dict[str, A
     decoded = {}
     banks = {}
     with tarfile.open(video) as source:
-        f = source.extractfile('publish/'+('affine.json' if kind == 'black-affine' else 'reference-video.json'))
+        report_name = 'presets.json' if preset is not None else 'affine.json' if kind == 'black-affine' else 'reference-video.json'
+        f = source.extractfile('publish/'+report_name)
         if f is None:
             raise ValueError('Missing sparse video report')
         report = json.load(f)
         for row in report['rows']:
-            if row['kind'] != kind or row['crf'] != crf or row.get('floor') != floor:
+            if row['kind'] != kind or row['crf'] != crf or row.get('floor') != floor or (preset is not None and row.get('preset') != preset):
                 continue
             rec = row['container']
             stream = source.extractfile('publish/'+rec['file'])
@@ -78,7 +79,7 @@ def prepare(original: Path, video: Path, kind: str, target: Path) -> dict[str, A
     if len(changed) != 6 or len(banks) != 2:
         raise ValueError('First original prepared group / both banks required')
     return {'original_prepared_sha256': sha(original.read_bytes()), 'video_archive_sha256': sha(video.read_bytes()),
-            'kind': kind, 'crf': crf, 'floor': floor, 'banks': banks, 'units': changed,
+            'kind': kind, 'crf': crf, 'floor': floor, 'preset': preset, 'banks': banks, 'units': changed,
             'target': str(target), 'target_sha256': sha(target.read_bytes()),
             'only_reference_arrays_changed': True, 'generated_quality_measured': False,
             'segmented_outside_alpha_fill': 'black-after-bicubic-RGB-and-bilinear-alpha-restore'}

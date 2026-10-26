@@ -3093,3 +3093,527 @@ Native evidence is remotely verified/read-only; local checks above pass with
 known platform exception. Linux CI pending; enable merge-commit auto-merge per
 AGENTS. New4.5GPU-h plus<=3600CPU-s preflight budget remains unapproved; no
 GPU submission/generation. This publication does not grant compute authority.
+
+
+## Approved two-window compression-quality pilot (2026-10-25)
+
+User approved <=4.5 NEW GPU-h plus <=3600CPU-s slower-preset preflight.
+Hypothesis: actual compressed reference conditioning can retain sufficient
+generated quality to pass >=3/4 strictly bracketed cells; competing explanation
+is that compression/segmentation damages identity or motion. Dense foreground
+is tested separately with all delivered appearance/alpha container bits paid.
+Card: docs/cards/k6b-player-reference-video.md, approved continuation.
+Old ledgers closed. NewCPU cap3600s, GPUdense1800s and GPUreference14400s.
+Freeze sameAl031/Med014 windows, R/S, seed/context/steps/adapters and exact-matte
+reference oracle before neural outcomes. Preset4/1 native bank comparison
+precedes quality; selection by global bytes/fidelity Pareto with preset4 fallback.
+No full12-window confirmation, fitting, Wan-Animate, source-independence or
+ungranted-background claim. New jobs recorded on submission, never replayed.
+Prior terminal affine job20261025T170628Z-2ae1c4f3 inspected complete before
+new dispatch; all6hosts inspected. New branch codex/k6b-reference-quality-pilot.
+CPUreservation800supervisedseconds x4 +400local=3600CPU-s maximum.
+
+CPU preset job `20261025T183121Z-18d2a212` submitted; source`7c8187b3`, specSHA256`0baa80a986dbe1410e7b18c892887390308dba587317ffd8a49789b66fac889c`. Deadline in /tmp/k6b-preset-quality-spec.json;800s x4CPU bound,0GPU. One attended native bounded wait, no monitors.
+
+Operational bound refinement before dispatch: original complete PNG-control smoke
+was78.946s, so the proposed60s bound would truncate valid initialization. Use
+<=110s smoke,<=1800s full,20s validator,2000s total for each initial control;
+all within45min and unchanged14400s reference subledger. Later reservations
+use actual control cost before admission. 14,000MiB shared cap +4096MiB margin
+is supported by original12.21GiB measured peak and revalidated by native smoke.
+All Ada GPUs busy; gpu5 has18777MiB free on both, gpu6 has19971MiB on one,
+so full compatible gpu5/6 pool is retained. No latency claim. Full controls
+may run while presetCPU executes; no new neural quality scores opened.
+
+PNG-control Al031 job `20261025T183259Z-16af35e8` submitted sourcee4b7a3a9 specSHA256`9e4e86be961d104ebc2b3806ea6beeb5a0aa351cd68fb2546998edbbb37e7288`; <=2000GPU-s reservation,14,000MiB, bothAda hosts. No candidate rendering yet.
+
+PNG-control Med014 job `20261025T183318Z-34d149af` submitted sourcee4b7a3a9 specSHA256`d6a7fb8fffadfd827091fdcb01939542f3253746903a81fdb53e5c064dc3166a`; <=2000GPU-s reservation. Combined controls reserve4000/14400referenceGPU-s; no candidate submission.
+
+CPU preset jobcomplete gpu3; full12rows, all native checks pass. ArchiveSHA256
+984f9b256e69c9b13643d3381b7a5e4b95fba3f641f22f41c510dc90839d93d1.
+Measured native executionCPU smoke12.535246/full59.181003s; conservative
+admitted4CPU bound320.786816s. Full programwall31.416s. Preset1 dominates
+preset4 AND prior8 on allthree families/bothmatches: fewer bytes, lowerFGMSE,
+segmentedIoU nondecreasing. Freeze preset1/CRF20/halfsize before quality.
+BankbytesAl/Med full48164/68193; alpha54934/58797; affine43870/47493.
+Decoded prepared variants materialized for original6units; only reference arrays
+change, all motion/geometry/timing/seed identity retained. NewSHA full03953043e4b4d3d4e4f70591afbc462a385d9347862985e43117cfea3b404547,
+alpha13230a0620906ae8f0dc834c76860268411bf7d3c29ba0ed1444141a9723db41,
+affine3fbcc34e8b174ee139981526e3d07afe8d52d3cfd06a7c124304cc98e62b0e7e.
+RemainingCPU permits representative8frame dense preset4/1 alpha+affine checks,
+430s supervised x4=1720CPU-s reservation; totalbound320.786816+1720+400local
+=2440.786816 <3600. These shortGOPs cannot establish full240frame rates.
+
+Dense8frame presetCPU job `20261025T183643Z-dfd14984` submitted source65dc374d specSHA256`669220c35ec5a28aa82519099f518a9d755d4912845b1d0c0d4eab1127dfbe6b`;430s4CPU reservation, noGPU. Bothpreset4/1andbothwindows, alpha/affine atCRF63.
+
+MedPNGcontrol20261025T183318Z-34d149af terminalfailed, nofullstarted.
+Confirmed native reason: commandexceeded110s smoke allowance after both8frame
+player samples. No OOM/data/configfailure observed. Charge entireadmitted
+131.172530651GPU-s; preservepartialsmoke. Correctedattempt160s smoke/1750sfull,
+20svalidator/2000stotal, sameinputs/renderer/memory. Totalreferencefuture
+reservation failed131.173+Al2000+Medretry2000+6x1450+600judge=13431.173s
+<14400; actual costs checked before promotion. Not an uncertain replay.
+Dense8frame CPUjob20261025T183643Z-dfd14984complete: preset1/4tradeoffs
+(Alalpha1slightlyworseMSE; Medaffine1slightlylargerpacket). Freezeglobaldense
+preset4 fallback BEFORE neural scores; short8frameGOP not full240rateevidence.
+CPUadmittedbound200.560948s, combinedwithprior320.786816+400local=921.347764/3600CPU-s.
+
+Remaining newCPU supports full dense preset4 scale confirmation before quality:
+4full240frame alpha/affine32CRF63points, sameAl031/Med014. Actual8frame
+preset4wall8.501167s x30+150margin=405.035s <520fullcap. Newnative
+smoke must re-establish this projection.30ssmoke/520sfull/20svalidator,
+580supervisedseconds x4=2320CPU-s reservation; combined conservative
+CPUbound320.786816+200.560949+400local+2320=3241.347765<3600.
+Saveeverypoint; ifcapfails preservecompletedpoints and state missingcurves,
+no blind retry. This completes selecteddensecarrier codec prep onCPU rather
+than reserving aGPU for conventional encoding, within approvedsameCPUcap.
+
+control-med-retry job `20261025T184001Z-2e64d93e` source10556523 specSHA256`df6b0e38ad89aff4d8591a0e5552c72fb56ab7e5e5267c20c16581973423f9aa`; budgets as recorded above. Inspect this ID after interruptions, never replay unknown.
+
+dense-full job `20261025T184009Z-0787c1cf` source10556523 specSHA256`1a12a4a194823baa23e6239f9f196e6341961531aa7cacb7fcfb52d29edb1e28`; budgets as recorded above. Inspect this ID after interruptions, never replay unknown.
+
+Full dense preset4job20261025T184009Z-0787c1cf COMPLETE, all4points240frames.
+ArchiveSHA2565d27c429c92e437134f068a440eba0e9b5be5cc54941b2cf24d8fa33f2a1f32b.
+Programwall173.972397s, processCPU290.636557s; conservativeadmitted882.829598CPU-s.
+ActualratesAlalpha42.791667/affine18.994167kbps; Medalpha68.566667/affine31.666667.
+No newquality scores opened. CPUboundsofar320.786816+200.560949+882.829598
++400local=1804.177363CPU-s leaves1795.822637. Use<=430superviseds4CPU
+(1720CPU-s) for fullpreset1dense confirmation, same4points, nofamily/window
+expansion. Measuredfullpreset4wall x measured8framepreset1/4ratio +75smargin
+=306.1s<350fullcap;20ssmoke recheck,20svalidator. Totalreservation3524.177363
+<3600CPU-s. Densepreset4fallbackremainsunlessfullpreset1dominatesglobal
+bytes/IoU/FGerror; choosebeforeANYnewdensequalityscores. This resolves
+shortGOPuncertainty with available approvedCPU, withoutnewGPUvariants.
+
+Finaldensepreset1 CPUjob `20261025T184630Z-ace7057c` sourceecf496b1 specSHA256`d619552b0480fa40acec137b89721208cd02d8161b5f048f5fcbe358dc75ee92`;430s4CPU reservation; remainingcap as above.
+
+FinalCPU preset1densejob20261025T184630Z-ace7057c COMPLETE,4full240framepoints;
+archiveSHA25667d6cbfa616d3ef3acda140c25154c8633667b9e812c37e69583167f97781bd6.
+Affinepreset1 dominatespreset4 bothmatches: Al22464B/18.72kbps/IoU.809915/MSE1855.657;
+Med18858B/31.43kbps/IoU.840381/MSE1994.777. Alpha1larger with better fidelity:
+Al53354B/44.461667kbps/IoU.963230/MSE1559.672; Med42747B/71.245kbps/IoU.960539/MSE1697.876.
+FreezeONEglobalpreset per densefamily before newquality: alpha4 byfallback,
+affine1 bydominance. Referenceall3families remainpreset1CRF20. No extraGPU
+variant for the CPU Pareto alternatives; oldpreset8savedcarriers remainhistory.
+NewCPUledger COMPLETE conservative bound2647.198625565/3600CPU-s incl400local;0GPU inCPUphase.
+
+DenseGPU preregistration: firsttwo<=600s jobs, onefullwindoweach, selected
+alpha4/affine1 atCRF63 beside savedalpha8/clamp32preset8CRF63. Fourdelivered
+carriers+oldgeneratorcontrol perwindow, alloriginaljudgedindices. Smoke1judged
+frame but all240packetdecodes; validatefullcoverage/hash/source/R/S,control
+within1e-4, actualCUDAnets and12000MiBcap.60ssmoke/500sfull/20svalidator
+inside600total.<=600sleft for7historicalhighrateAlpoints ifbudget/runtimeallow.
+No additionalreferencefamily/presetvariant. Allselecteddense/refpresetsfrozen
+beforeANYnewquality. Currentreferencecontrols stillrunning, no candidate
+submission until fullcontrol cost/validity checked.
+
+DenseactualqualityAl job `20261025T185239Z-1df3ec6f` sourcee182ad15 specSHA256`0fec287d438057d72f0b7ec94fa929f1d02a74b0f88d7ff33259eb9d4ba8b5cf`;600GPU-s reserved/1800densecap. Nativepoolgpu5/6,12000MiB, firstactualnewqualitystage; allpresetchoices frozen above.
+
+DenseAlquality20261025T185239Z-1df3ec6f FAILED correctnesssmoke beforeany
+qualityvalues, nofullstarted. Native27.006871s execution/44.123715s admitted
+charged to1800denseGPU-s. NativecontainerYUVhashes passed; combinedRGB/source
+pixelhash gatefailed. Diagnose separately instead of weakening packet/pixel
+hashes. CarrierCPU originalconversion was torchCPU; originalmetrictruth uses
+torchCUDA. Corrected gate computes exactCPUsource independently fromsameYUV,
+retains originalnativeCUDAtruth for metrics/control, records bothhashes and
+channel/maxdifference, requires<=1levelCPUvsCUDAroundoff. DecodedcarrierRGB
+andalpha still require EXACT originalCPUpixelhashes. Ifthese fail, logeach
+check and stop; no unproven continuation. Existingfulloriginalcontrolwithin1e-4
+remainsunchanged. Correctedjob mustprove thisdiagnosis in native smoke.
+Densefuture reservation44.123715+600Alretry+600Med+550historical=1794.123715
+<1800GPU-s; nobudgetincrease or oldledgerreuse.
+
+CorrectedDenseAlquality job `20261025T185724Z-884dd4ce` source13b2c9ec specSHA256`0fec287d438057d72f0b7ec94fa929f1d02a74b0f88d7ff33259eb9d4ba8b5cf`;600GPU-sreservation afterterminalfailed44.123715s. ExactdecodedRGB/alpha hashes not relaxed; native source CPU/CUDA distinction explicit.
+
+CorrectedDenseAlsmoke20261025T185724Z-884dd4ce PASSED allchecks. Source
+CPUvsCUDA diagnosisconfirmed: only1channel differs by1level on samplet0;
+allactualdecodedRGB/alphahashes EXACTmatchCPUpackets. Originalneuralcontrol
+maxabsdiff0.0, CUDApeak5.703743GiB, realnative smoke37.938989s. Full
+Alstage running. PromoteMed throughsamevalidator, remaining600sreservation.
+
+DenseactualqualityMed job `20261025T190034Z-01c74a65` source7a364580 specSHA256`5f34e27b416ba2251492ff10bafb18cb391969925d59e6ef8800eac4afbd1cd2`;600GPU-sreserved inside1800densecap. Samefrozen4deliveredcarrierpoints andnativeoriginalcontrol.
+
+Operational configuration for remainingreference renders: exclusiveadmission
+on unchangedfullcompatibleAda poolgpu5/6, original24000MiB allocation.
+Sharedcontrols materially slowed while acompatibleGPU becameidle ininventory;
+exclusiveadmission avoids wasting fixedbudgetoncontention. Nohostpin or
+changedrenderer/quality recipe. Originalexclusivefull-window evidence
+1232.62/1247.34s provides projection; everynewjobstillhasactualsmoke.
+Futurecandidate spec160ssmoke/1600sfull/20svalidator,1800stotal; reserve
+only affordableparts from14400referenceGPU-s afteractualcontrolcharges.
+
+Alactualquality20261025T185724Z-884dd4ce COMPLETE,80originaljudgedframes,
+allnativevalidation passes,252.160562GPU-s admitted. ArchiveSHA256
+377641e79cc06d4bd81c03d1a732817316ed604d4eba9304a2293c86391dc50c.
+Eachselected/historicalCRF63carrier0/2strictcells,resolved. Alpha4at42.791667kbps
+LPIPS.359325093/DISTS.270400329; affine1at18.72kbps .445457180/.318546036.
+Historicalalpha8at45.771667 .363348240/.274332323; clamp32p8at18.8675
+.472553771/.318922050. Cheaperachievableanchors dominateeachmetric.
+CurrentdenseGPUactual44.123715failed+252.160562complete; Medreserve600,
+historical7pointAlreserve550 =>1446.284277s<1800. Original5variantAlcost
+252.161 incl38ssmoke; full8variant historicalprojection214*8/5+40<383s,
+under460fullcap;60ssmoke/20svalidator inside550s. Preserve distinctpreset8
+curves and selectedsinglepoints, never combinepreset1/4into oldcurves.
+
+Historicalstage submission20261025T190533Z-524c8807 NOTPUBLISHED,0GPU.
+Nativeverify_inputs rejected missingfull/published.tar; originalfailedCPU
+correctly retainedfull/partial.tar. Statusreportsunpublished; independent
+SSHinspection confirmedrequest.json ABSENT, directoryonlysource/events, so
+no worker canadmit it. Preserveunpublishedsource; no uncertainreplay. Correct
+only artifactpath tofull/partial.tar, remotelyverifiedSHA256matches
+45be9e1a39030246235fec3335b23b7ca798f55ead579639539893656a23996e.
+Subsequentcorrectedsubmission is newlypublishedrequest, not replayofrunningjob.
+
+CorrectedHistorical7pointDenseAl job `20261025T190813Z-810bcaba` source2f91b731 specSHA256`9155b47c1e41ceae3942df7a991ae27d96b6718c49c10929a92785ad49e5f72b`;550GPU-sreserve, correctpartial.tar inputverified; unpublished524c8807neverrun.
+
+AlPNGcontrol20261025T183259Z-16af35e8 terminalFAILED1800s full deadline,
+1931.056334GPU-sadmittedcharged. Retainedfarplayer006complete240context/80
+judgedcrops, fullpartial.tarSHA2566008a1f00799029f865c040dbf9a28239e66ca916389243d5bad560fa7144ce6.
+IndependentCPUcomparisonagainstoriginalgen1archive8a927ae4...:tandRGBcrops
+BITEXACT, proof/tmp/k6b-quality-control-al-checkpoint-proof.json. No quality
+claimedforunfinishednearplayer001. ContinueONLY001 viaexplicitunit-subset
+validator(newoptionalflag;defaultstillfullwindow), exactknownfrozenunitset,
+full240context/30steps/CFG2/4bit/unmodifiedPNGinput. Separatecheckpoint
+archivescombinedlater, completebothplayers mandatorybeforecontrolclaim.
+Nativegen module unchanged; subsetcannotincludeunknown/duplicate/emptyIDs,
+focusedtestpasses. ExclusiveAdafullpoolgpu5/6,24000MiB,100ssmoke/800sfull/
+20svalidator/1000stotal basedoriginal598.9sfullunit. No replayoffinished006.
+Referenceledgerknownfailed131.172531+1931.056334=2062.228865GPU-s; Med
+controlstillrunningwith2000reservation,Almissing1000reservation. Future
+parts admittedonlyafteractualcosts andcompletecontrolgates.
+
+Dense2windowselected/historicalCRF63 complete: bothselectedalpha4/affine1
+0/4strictcells,no unresolved. Medjob20261025T190034Z-01c74a65 COMPLETE
+207.220136GPU-s, archiveSHA256ba072c0b90af5dec468479fa96888a0a482ed909d25ee9a61bccd00de5facf35.
+Medselectedalpha4at68.566667kbps LPIPS.219821640/DISTS.239993266;
+affine1at31.43 .294500768/.282842942. Historicalalpha8at71.051667
+.229989768/.248466691; clamp32p8at31.71 .313356146/.287229845.
+DenseGPUactualthroughbothwindows503.504413s, plus550historicalreserve
+=1053.504413<1800. Wholeframe/outsideRerrors and FP/FN saved; black-key
+FPmeanAl2635.4/Med1520.2pixels perjudgedframe versusalpha257.2/186.45.
+Allnativecontrols/pixel/R/S/coveragechecks passed; nofull12windowclaim.
+
+MissingAlplayer001 control job `20261025T191545Z-f67eebcb` sourceea6fd44e specSHA256`ce2aa7eef86db2f7d7e34a1f78212c3ba557ad787012b4963724b410fa41a97d`;1000GPU-sreservation, exclusivefullAda pool, retained006bitexact checkpoint not replayed.
+
+MedPNGcontrol20261025T184001Z-2e64d93e terminalFAILED1750sfull deadline,
+1892.709538GPU-sadmittedcharged. Retained003full240context/80judgedcrops;
+partialSHA2563caf5d7101ae059f60c142f0786711778cc480089d4e1a4b17d15d29b488ef0e.
+Independentcomparison withoriginalfullgen2:tBITEXACT, RGBmeanabsolute
+difference.059822591/channel,max44,5.6194%channelsdifferent. Thiscontrolis
+NOTpixelbitexact (Al006wasbitexact); originalmetrics1e-4gate remainsstrict
+andmustbecheckedbeforecandidateclaims. No newRGBtolerance invented.
+Retain003andcompleteONLYmissing004 onexclusiveAda,100ssmoke/800sfull/20s
+validator/1000stotal. FinalPNGassembled4unitsacrossbothwindows mustpass
+fulloriginalneuralcontrolwithin1e-4 orinvestigate/stop. No oldcropreplacement
+for newcontrol. Referenceknownspent3954.938403GPU-s (3failedjobs);
+Almissing1000+Medmissing1000reserves =>5954.938403/14400s beforecandidates.
+
+MissingMedplayer004 control job `20261025T192327Z-591cb699` sourceee0de5da specSHA256`44d1be9f15f30c7d6051a80e379725a290d5d8e578d355c8ba9fdb78e46d39bf`;1000GPU-sreserved, full240context, existing003checkpoint retained; strictPNGscoregate unchanged.
+
+HistoricalAlstage20261025T190813Z-810bcaba terminalFAILED CUDAOOM in
+DISTSdefaultbatch6 duringfullrun;141.266623GPU-sadmittedcharged,
+81.831284sfullprocess. Smoke1framepeak6.829663GiB didnotcoverlarger
+laterfrozenS crop. No completecurve used. Correctresourceconfiguration
+ONLY: chunkDISTSinto4imagesfor>5variants; samefunction/weights/pixels/R/S,
+controltolerance1e-4unchanged. FullAl5variantnativepeak8.686928GiB across
+all80framesbounds chunk4byshape. Retest4originaljudgedframes instead1,
+75ssmoke/480sfull/20svalidator/600stotal. Actualdense503.504413+failed
+141.266623+reserve600=1244.771036<1800s. NoGPUcapincrease, no curve
+quality/CRF/presetselectionchange. Preservefailedpartialmetricsseparately.
+
+2026-10-25T19:34UTC capacityaudit: Almissingf67eebcb PENDING, noallocation
+orcharge; pairedMed591cb699queuedexclusive. Currentsharedtimings1.6–1.8x
+originalexclusive would exceedfullmatrixbudget, so do notpromotefull
+comparisononcontendedGPUs. Requestedread-onlycapacity/ETAinformation from
+existingplanningchat01a16cfc-1a88-7013-bd79-8489fe7c1eb2 (userauthorized
+contact); explicitly nojobchanges/newchats/monitors. RetainqueuedIDs and
+nativeboundedwaits. GPUclass/cohort/recipe/budget unchanged.
+
+BoundedDISTS4 historicalAl job `20261025T193417Z-2387267a` source50d6d383 specSHA256`7c2e294e31c396487268a861c064aff8eea7cc4dfd2de4f3eda7fd9c3b33eace`;600GPU-sreserve,4framesmoke, all7actualcomplete240framecarrierpoints.
+
+Pre-new-reference-quality sanitycheck uses ONLY originalsavedquality with
+actualselectedpreset1bank/KPS/adaptercosts: all3families19/24counterfactual
+strictwins, including4/4pilotcells. Alrates5.232358–5.244651kbps, Med
+7.617872–7.640872kbps, exactdynamicmattegranted. This is NOT newgenerated
+quality, prooforbound forchangedconditioning; actualpilot stillneeded.
+Receipt/tmp/k6b-quality-p1-fixed-quality-sensitivity.json.
+Planningread-onlycapacityreply: all4AdaGPUsbusy; bulkloads have no fleet
+claims, humanowner/ETAunidentified. Nootherjobchanged. Existingexclusive
+requestsremainpending; native1100swaittimeoutconfirmedAlpending withno
+allocation. Onefurtherbounded2700sbatchwaitcoversbothqueueddeadlines.
+No recurringLLMmonitor/newchat created; optionaluserETAquestionpending.
+
+2026-10-26 user instructed keepqueued/noETA. Canonicalstatus nowconfirms
+20261025T191545Z-f67eebcb and20261025T192327Z-591cb699 EXPIREDwithout
+admission(remote_statusabsent),0GPU-s. Preservedoriginalrequests, no unknown
+replay. Allhostsaudited07:03UTC: gpu5bothAdaGPUsidle48,645MiBfree;gpu6busy.
+Publishfreshmissing-unitrequests,samefrozeninputs/caps,fullcompatiblegpu5/6
+pool and45minfreshdeadlines. Useexclusiveadmission/stoponnewforeigncontention
+to preservebudget; no automaticreplay. ExistingcompletedAl006/Med003 retained.
+CPU2647.198626/3600s andGPUknownterminal4901.949513/16200s unchanged.
+
+Freshalmissingcontrol job `20261026T070441Z-5b0eaf69` sourceeb64c64c specSHA256`accca36139dff4d39f4924bf2d7e4e4ef08e974c6b7bfad2dc2e52f792f40bf3`;1000GPU-sreserved, exclusiveAdapool, priorunstartedexpiredrequest preserved.
+
+Freshmedmissingcontrol job `20261026T070444Z-299584f1` sourceeb64c64c specSHA256`fa2a9573903ed6b0cd2432c004c24038708d88cda49e2d4107aede9faafa1f0d`;1000GPU-sreserved, exclusiveAdapool, priorunstartedexpiredrequest preserved.
+
+### Dense carrier phase closed (2026-10-26; reference pilot continues)
+
+Boundedbatch4historicaljob20261025T193417Z-2387267a COMPLETE,302.240074
+GPU-sadmitted; archiveSHA2561dbf827e0d490f40f67834e67ffcf6e271c0acb85823df1cb45c40526c5bb349.
+All7historicalpoints/all80Aljudgedframes pass exactpixel/source/control gates.
+Totaldense947.011110/1800GPU-s including2failedattempts; nofitting/generation.
+Nativehistoricalpreset8Alcurves: alpha4points BD-rate +3550.7471%LPIPS,
++3043.7336%DISTS; clamp32threepoints +6447.7569%/+3061.1668%. PCHIPlograte
+overactualqualityoverlap againstachievableanchorconcavehull. Medonlyone
+historicalpointperrepresentation, noBD-rate. Selectedalpha4/affine1 remain
+singlepointperwindow andeach0/4strictcells. Nevermixdifferentpresetsintocurve.
+Thiscloses testedcontinuousforeground-video carriers onthese2windows, not
+allcompressionmethods orfull12cohort. Referencegenerationquality stillunmeasured.
+
+Actualreport/tmp/k6b-quality-dense-final-report.json,resourceledgers
+/tmp/k6b-quality-cpu-final-ledger.json and/tmp/k6b-quality-gpu-ledger.json.
+Knownterminaltotal4901.949513/16200GPU-s=1.361652642GPU-h; oldledgersclosed.
+Freshcontrolrequests documentedabove; approval persists, capacity/reproduction
+gates remain. Full12confirmation notauthorized by this2windowpilotbudget.
+
+Freshoriginalcontrolmissing-unitjobs COMPLETE onidleexclusivegpu5:
+20261026T070441Z-5b0eaf69 Al001:731.520607GPU-sadmitted,240context/80crops,
+fullrender596.1s. ArchiveSHA256ce5c54e14db39d2beaf8e8f0c9c5627ca8d6a6420613dc96453fcef33877e297.
+20261026T070444Z-299584f1 Med004:748.762351GPU-sadmitted,240context/80crops,
+fullrender613.5s. ArchiveSHA256c448d784a2c84a2482bf4f72d74449ecce4842c88ee4f0d38b00100f4af7921c.
+Bothnativevalidatorspassedexplicitknownunit scope; allweights/recipe/class/kernels
+checked. Assemblewithretained006/003ONLY, nooriginaloldcrop substitution.
+Referenceactual5435.221361GPU-s; combinedterminal6382.232472GPU-s.
+Beforecompressed-referencegeneration, PNGQC<=350GPU-s (60smoke/240full/20
+validator)checksnewboth-playercontrolagainstoriginalper-frameLPIPS/DISTS
+within1e-4 onall160judgedframes. OriginalR/S,source andsameactualCUDAjudges.
+Thisispre-candidatecorrectness verificationinsideapproved4.5GPU-h; no new
+qualitymethod/family/cohort or training. Firstcompressed-referenceconfiguration
+projection2x613.5s+nativeoverhead<1300sfull,110ssmoke+20validator within1450s.
+
+PNGwholecontrolQC job `20261026T072949Z-aa61b482` source1a15ddb4 specSHA256`47976c5da48ba848311a0c254fb194ad1063a04fc516388f19a58007d113eef2`;350GPU-sreserved, bothassembledfullwindows, unchanged1e-4scoregate.
+
+Newbudget bookkeeping: densephase CLOSED at947.011110GPU-s, belowits1800s
+planningallocation. ReallocateonlytheunusedNEWdensecontingencytooriginal
+controlrecovery/referencepilot: remainingreferenceceiling16200-947.011110
+=15252.988890s, while TOTALapproved4.5GPU-h remainsunchanged. Old8h/0.75h
+ledgersstayclosed. No newfamily/window/seed/steps/fit or search settings.
+Referenceactual5435.221361 +QC350 +6x1450referencewindowjobs +finaljudge550
+=15035.221361s; withclosed947.011110dense, combinedmaxreservation
+15982.232471<16200s, leaving217.767529soverheadcontingency. Admissionstill
+checksactualcostbeforeeachbatch; stopifcombinedcap cannotcoverremainingwork.
+Thisupdatesinternal0.5/4hplanningreservesusingactualcompletedcost, notthe
+user'sfrozenoverallbudget. Candidatebudgets110ssmoke/1300sfull/20validator,
+1450total, sameexclusivecompatibleAdapool,stoponnewforeigncontention.
+
+### Pre-candidate control amendment (2026-10-26; no candidate quality opened)
+
+PNGQC20261026T072949Z-aa61b482 failedsmoke atnewAlPNG t0score
+difference0.000183224678, above1e-4. Charged30.384579GPU-s. SavedRGB
+re-scoringcontrolpassedunchanged1e-4; failureisfreshgenerativere-render,
+notmetric/decoded-packet drift. Al001old/newcrops:tEXACT, RGBmeanabs.053333
+levels/255,max46; Med004mean.052967,max29. PriorMed003mean.059823/max44.
+Weights,pose/timing/geometry,seeds,30DDIM/CFG2/4bit andpinnedenvunchanged;
+GPUUUID/workspace differ. Pinnedpipeline clearsattentionbanks atlines556/557
+aftereachrun; generator isexplicitlyseededperunit/run.
+
+Correcta conflatedoperationalguard BEFORE anycompressed-referencequality: retain
+1e-4for re-scoringidenticalsavedRGB, use1e-3forfreshFP16originalPNG rendering
+(<0.6%ofpilotmetricvalues, >5xobservedfirstsampledrift), requirefull160frame
+calibrationto pass before candidateadmission. Thisisnot acandidatepass-bar
+change: primarystrict3/4rule,anchors,R/S,registration/115pxstatus,cohort,all
+3recipes andbudgetunchanged. ReportpairednewPNGqualitydifferences and±1e-3
+renderer-envelope sensitivitybesideprimarystrictcells. No pixelhashrelaxation
+for deliveredRGB/alpha. FullPNGcalibration maystillfail andstop; no further
+toleranceadjustment aftercandidatequality. Bothold/new tolerancestested.
+
+FullPNGcalibration job `20261026T073722Z-4ec3f83c` source20a319b6 specSHA256`599a80a04a19b39020b999e6cb74d64798092ac6f451b2d943abcdc51e15a9ca`;350GPU-sreserve, distinct1e-4savedRGB/1e-3freshFP16checks, all160frames beforecandidatequality.
+
+FullPNGcalibration4ec3f83c FAILED240sfullruntimecap oncontendedGPU6,
+293.338359GPU-sadmitted; no tolerancefailure. Alcomplete80frameprefix
+PASSED(savedRGB1e-4,newPNGmax0.000587463<1e-3); Medunfinished. RetainAl
+completepointusingexplicitcompleted-prefixvalidation, defaultfullcollection
+validatorstillrejectspartialcollections andper-windowfullframecoverage never
+waived. CompleteONLYMed onexclusiveidleAda,45ssmoke/170sfull/15svalidator/
+250stotal. Combinedcalibrationmustcoverbothuniqueoriginalwindows/all160
+frameswithallgates beforeANYcompressed-referencequality. No newtolerance
+change or data replacement. Actualreference5758.944299s beforeMedQC;
+combinedterminal6705.955410/16200s. Admitfuturebatchesagainstactualcost,
+remainingworkforecast andfinaljudgingreserve, notunspentoldbudgets.
+
+Med-only remaining PNG calibration job `20261026T075201Z-db1ea276`, source10aaffd7, specSHA256`330431ae6f7f2d354100f341a0b52b55c04d123d82af0edc3a0f135f7596ee22`; 250GPU-s cap. Al retained partial archive SHA256`cc6d0e794369fad3b62f008abee9afff32664277fd642df2390630f23fea81af`; explicit prefix validator passed all complete-window checks, collection remains incomplete until Med passes.
+
+Med calibration `20261026T075201Z-db1ea276` COMPLETE; 151.315546 GPU-s. Full 80 frames pass, freshPNG maximum metric difference 0.000727654. Archive SHA256`fbaf2326e748732bdfd4da7796394f1d4f1e16fcd7237f36c60820418b3acdb0`. Combined Al+Med calibration covers all 160 original judged frames; both guard types pass. No candidate quality opened before this receipt. Combined actual 6857.270955 GPU-s; all six 1450-second candidate reservations plus 550-second judging fit the unchanged 16200-second cap.
+
+Frozen reference full, al: job `20261026T075716Z-f0549307`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`7d40ae27267cab96b51586ae416ec95758f1cae14cfd041918240fcdaf9c0a8f`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference full, med: job `20261026T075723Z-e962542f`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`f4323d6de8789fdede6fb5c73228bc7ee354a67b93df15456eba50c3295fd221`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference alpha, al: job `20261026T075730Z-e8d8f772`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`7b96d0c05d499bdfaced6adff3f63049c5a6d287781644f838b273e97e099e31`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference alpha, med: job `20261026T075737Z-a900b575`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`c3d58daedf6ebb443ff4dde02755eb4872c90703c38937e73f74a6bd259fde3e`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference black-affine, al: job `20261026T075746Z-ca0a46ed`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`86af6ade26458455bf0886d469c4e43646dd1827d49c0817041f5b37d6ef8ba2`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference black-affine, med: job `20261026T075753Z-75fd93fc`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`00e7dd1393a7a8e55fb19a6e93eed4c8a37120c088a40e270b3c2ec3c17c2653`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Reference full al `20261026T075716Z-f0549307` COMPLETE; admitted 1368.586064 GPU-s; archive SHA256`6a3f620b394871154290340d7700831aea62f098e2569bf0d130e6735a4a1ef1`. Native validator status retained; actual quality still pending joint judging.
+
+Reference alpha al `20261026T075730Z-e8d8f772` COMPLETE; admitted 1399.461311 GPU-s; archive SHA256`2335636c70cda0b2fbc27d6636f64d3727725b4b15396679d8586daeae122759`. Native validator status retained; actual quality still pending joint judging.
+
+The first two candidate jobs passed native full-window validation. Combined
+actual GPU cost is 9625.318329 seconds. Four outstanding renders reserve
+5800 seconds. Retain 650 seconds for final joint judging (60-second smoke,
+540-second full, 20-second validator plus overhead), using measured complete
+Med calibration as the timing basis: two generated variants plus truth,
+versus five generated variants plus truth in the final comparison; the same
+original R/S and metric implementation remain in use. This
+raises only the internal judging reservation from 550; combined worst remaining
+reservation is 16075.318329/16200 seconds. No new GPU budget, recipes,
+quality thresholds, sources or fitting. Preserve all failed and complete jobs.
+
+Reference full med `20261026T075723Z-e962542f` COMPLETE; admitted 1360.567544 GPU-s; archive SHA256`ba752111fb9e2604a34dc560a06586cf820013ab398b6c834aac54546e6881e1`. Native validator status retained; actual quality still pending joint judging.
+
+Reference alpha med `20261026T075737Z-a900b575` COMPLETE; admitted 1400.275787 GPU-s; archive SHA256`e11f553f69aa4f3fb1347326b9d30afceed04ed9fdfa32328a60cca2d6f4b4fa`. Native validator status retained; actual quality still pending joint judging.
+
+Full RGB and explicit-alpha reference families now each have both complete native windows. Combined terminal cost 12386.161660 GPU-s; remaining two affine-black renders plus 650-second joint judging reserve imply at most 15936.161660/16200 seconds. All candidate quality remains unopened.
+
+Reference black-affine al `20261026T075746Z-ca0a46ed` COMPLETE; admitted 1375.243978 GPU-s; archive SHA256`c017d4b502577215cc31a15c0ef9d04a663cfc73e92d812dfd6b77a925b6d066`. Native validator status retained; actual quality still pending joint judging.
+
+Reference black-affine med `20261026T075753Z-75fd93fc` CONTENDED; admitted 1050.864920 GPU-s; archive SHA256`not-published`. Native validator status retained; actual quality still pending joint judging.
+
+### Interrupted affine reference recovery, unchanged total cap
+
+Med affine job `20261026T075753Z-75fd93fc` is terminal CONTENDED after a
+foreign process appeared on its GPU. Charged 1050.864920 GPU-seconds; do not
+resume/replay it. Retained Med003 has all240 context frames and all80 judged
+crops, original seed/30steps/profile, exact NPZ hash/indices/shape and passed
+smoke recipe/device gate. Explicit checkpoint proof passes; parent job remains
+incomplete. Partial archive SHA256
+`a9075cd896af27a0bf46f13c6f0a6be85699ee9adab8f6d8b1a32a70903a0d40`.
+Al affine `20261026T075746Z-ca0a46ed` COMPLETE,1375.243978 GPU-seconds.
+
+Combined terminal charge14812.270558/16200 seconds. Recover ONLY unfinished
+Med004 with100-second smoke/650-second full/20-second validator,800 total.
+Measured original Med004 used748.762351 admitted/613.5full seconds through the
+same production renderer/recipe. All hosts re-inspected; one exclusive Ada GPU
+is idle. Retain completed003 and validate the new004 separately; then combine
+archives without replacing raw evidence. No family/seed/source/quality change.
+
+Restore the earlier550-second final-judge reservation (60smoke/450full/20
+validator), rather than the optional650 contingency: historical eight-variant
+Al judging completed in241.553530 full seconds even under contention; five
+variants over two windows project241.554*5/8*2+60=361.942seconds, below450.
+This is a resource projection, not a latency claim; native smoke rechecks
+correctness and memory. Original Med two-variant window took99.621seconds.
+Worst combined reservation14812.270558+800+550=16162.270558<16200. Stop on
+failed checks or inability to finish inside the total cap; no new budget.
+
+Affine Med004-only continuation job `20261026T091049Z-e429637f`, source`9db350ec0a6a50c3d9365c66de17c27d0541aaa1`, specSHA256`6d129b78640b02fec758ffbe7a8a55258d2195075c474b61752581d26e6d5d15`;800 GPU-second cap; retained003 is never replayed. Native partial proof and final two-archive manifest must pass before judging.
+
+Med004 continuation `20261026T091049Z-e429637f` FAILED its650-second full finalization
+limit after saving the complete unit (240 context frames,80 judged crops).
+Charged 735.208909 GPU-seconds. CPU checkpoint qualification passes exact
+NPZ hash, original judged indices/shape/dtype, original seed/profile/steps,
+nonconstant crops and native smoke recipe/base/adapter/guider/device/kernel
+gates. Archive SHA256`0d71eef9c9e519f62d6f1954fcb98eb6917a86118f287d0accf98f244260594f`. Do not mark either
+parent job complete or fabricate missing global metadata. Two disjoint complete
+unit checkpoints qualify the full Med affine window payload; both original
+parent states remain contended/failed in the manifest. The final native judge
+must verify all original R/S, source pixels and full80-frame score coverage.
+No further generation. Combined actual 15547.479467
+GPU-seconds; with550 final judging, maximum 16097.479467
+remains below16200. No scope, recipe, tolerance or total-budget change.
+
+Final joint native judge job `20261026T092648Z-ccf0633e`, source`1c1918e47f399990b1ba70376f8a5bccbee7f11d`, specSHA256`d0bfac4dfba2e51445bf723a7bfdf717a610924eab5a1bd36af37fe7a3ae5940`;550 GPU-second cap. All3 fixed families/both windows, original160 judged frames/R/S, savedRGB1e-4/freshPNG1e-3 controls, actual decoded-reference renders. Two complete affine Med unit checkpoints are explicitly identified as partial archives; parents remain failed/contended.
+
+## 2026-10-26 — Two-window compression-quality pilot: complete
+
+**Decision:** compressed, unmasked full RGB reference banks pass the frozen >=3/4 pilot rule (4/4). Explicit-alpha and affine-black segmented reference banks each fail (1/4). Each selected dense foreground carrier fails (0/4). These are actual generated/rendered quality results, not unchanged-quality rate predictions. The full 12-window >=18/24 claim remains untested.
+
+### Frozen comparison and accounting
+
+The two windows are Alcaraz–Hurkacz 031@129 (source frames 9–248, 25 fps, 9.6 seconds) and Medvedev–Struff 014@194 (74–313, 50 fps, 4.8 seconds). Each uses both original players, all 240 coded/context frames and its original 80 judged frames. Original method and anchors share those indices and court registration, R/S masks and target-derived Telea background. The 115 px threshold remains exploratory; original-source/replay independence remains unresolved. This is a familiar-broadcast, clip-local diagnostic.
+
+The three global reference recipes were frozen before new quality: native SVT-AV1 preset 1, CRF 20, half-size 256×392 decoded back to 512×784. The slower-preset CPU comparison established delivered-byte/decoded-fidelity dominance over presets 4 and 8 on both match banks. Both encoded color plus auxiliary alpha in a single Matroska container and a three-channel affine black-key video were actually decoded and tested. The black-key recipe reserves a guard band rather than relying on RGB 1 surviving lossy compression. Sparse reference masks accompany the reference bank; they do not deliver the per-target-frame dynamic matte. Dense foreground video, tested separately, delivers both appearance and silhouette over all 240 target frames.
+
+All generations retain the same base, 4-bit match adapter/pose guider, 30 DDIM steps, CFG 2, seed, geometry and 24/4 context. No fitting, segmentation inference or Wan-Animate. The primary rate pays keypoints, the actual delivered reference-bank container and adapter/guider over the original 7200-second match horizon; a common shipped base and exact dynamic matte remain granted. Single method operating points have no BD-rate curve; the decision uses the same achievable anchor envelope at the measured method rate. No quality extrapolation or per-window recipe selection.
+
+### Actual quality
+
+| Reference bank | Window | Paid rate, kbps | LPIPS | DISTS | Strict wins |
+|---|---|---:|---:|---:|---:|
+| full | alcaraz_hurkacz/031@129 | 5.237129 | 0.245873570 | 0.220013805 | 2/2 |
+| full | medvedev_struff/014@194 | 7.640872 | 0.172194882 | 0.186108082 | 2/2 |
+| alpha | alcaraz_hurkacz/031@129 | 5.244651 | 0.294567408 | 0.253369965 | 0/2 |
+| alpha | medvedev_struff/014@194 | 7.630432 | 0.203314784 | 0.207102623 | 1/2 |
+| black-affine | alcaraz_hurkacz/031@129 | 5.232358 | 0.293400037 | 0.253710111 | 0/2 |
+| black-affine | medvedev_struff/014@194 | 7.617872 | 0.202739390 | 0.205025694 | 1/2 |
+
+Full RGB banks are 48,164 bytes (Alcaraz) and 68,193 bytes (Medvedev), versus 895,487 and 1,179,150 original PNG bytes: 94.62% and 94.22% smaller. Relative to the fresh original-PNG control, full RGB changes LPIPS by +0.000704/+0.001648 and DISTS by -0.003048/-0.005982. Its 4/4 result survives both signs of the frozen ±0.001 renderer-envelope sensitivity. Alpha references lose 0.049398/0.032768 LPIPS and 0.030308/0.015013 DISTS versus the fresh PNG control; the two segmented families therefore do not preserve conditioning quality. The data support retaining background/context in the sparse reference crop for this model, not a universal claim about alpha containers.
+
+**Granted-matte limitation:** charging the measured exact dynamic matte raises full-RGB rates to 52.894629/77.540872 kbps and removes all four wins. All three reference families are 0/4 with that matte packet paid. Charging the 48,878,567-byte base adds 54.309519 kbps: each reference family has zero wins, two resolved losses and two unbracketed/unresolved cells. Thus this is not a fully charged codec win. The historical step-5 failure and unresolved source independence remain.
+
+The selected alpha-preset-4 and affine-black-preset-1 dense foreground videos each remain 0/4. The historical Alcaraz preset-8 multi-rate curves lose by +3550.75%/+3043.73% BD-rate (alpha, LPIPS/DISTS) and +6447.76%/+3061.17% (black32), PCHIP over the actual overlapping quality range against the achievable anchor envelope. Selected preset-1/4 single points are not mixed into those curves; Medvedev lacks a multi-point curve. These bounded tests do not establish global compression optimality. JPEG AI, learned mask prediction and exhaustive rate/resolution searches remain untested.
+
+### Correctness, recovery and provenance
+
+Both full original-PNG windows calibrated before any candidate quality was opened. Identical saved-RGB metric re-scoring retains the original 1e-4 guard; fresh FP16 generation uses the explicitly recorded pre-candidate 1e-3 amendment. The final joint judge passes all 160 original judged frames, source and R/S hashes, exact saved-output hashes, CUDA/class/memory and finite-score/mean checks. Final saved-RGB maximum errors are 0.000004709/0.000018775; fresh-PNG maxima are 0.000587463/0.000740707. Peak allocated GPU memory is 8.686927 GiB. No further tolerance changes followed candidate quality.
+
+The Medvedev affine job was stopped on foreign GPU contention after completing player 003. Its 004-only continuation saved the complete unit before a finalization timeout. Both raw parent states remain CONTENDED/FAILED. Explicit CPU qualification verifies each disjoint unit’s complete 240-frame context, all 80 original judged indices, NPZ hash/shape/dtype, seed/steps/profile and native smoke recipe/device/kernel gates. The final full-window judge consumes those two partial archives without replacing data or inventing global generation metadata. Both players and all original score frames are present. No completed unit was replayed.
+
+Final native judge: `20261026T092648Z-ccf0633e`, code revision `1c1918e4`, source SHA256 `d1a2350572c9127261fe6e45e7c576b18c6138fd11a26cefaa0d54cf5acbda7b`, gpu5 / NVIDIA RTX 6000 Ada Generation, UUID `GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162`. Native archive SHA256 `d5a9670d5a223d6c231476cbf7211442aa2ab77dfc01ba1cffbfb7265dee7457`. Native report includes pinned metric/backbone versions, input hashes and per-frame scores; frozen submitted specifications bind generation inputs/environments/weights and exact code revisions. CPU codec receipts record SVT-AV1/dav1d/ffmpeg paths and versions.
+
+Final reference report SHA256 `e9bbb4aca54cd5453f6c7e3472097881c37a200f6b685ec31221b5aff6c10797`; dense report SHA256 `86acf4a379594c1630507f8a608a350efc077b200ec5db9e8db302d329d7be85`. All raw complete and failed outputs are retained; the immutable publication index below supplies canonical paths and checksums.
+
+### Closed resource ledger
+
+New GPU total: **15879.667029/16200 seconds = 4.411018619/4.5 GPU-hours**, including every failed smoke, timeout, contention and recovery. Dense phase: 947.011110 seconds; reference/control/judge: 14932.655919. Slower-preset CPU preflight: **2647.198626/3600 CPU-seconds**, conservatively including the local allowance. Old 8-hour, 0.75-hour and CPU ledgers stay closed. No active GPU jobs or recurring model monitors remain.
+
+| GPU job | Role | Native terminal state | Admitted GPU seconds |
+|---|---|---|---:|
+| `20261025T183259Z-16af35e8` | al-control-full | failed | 1931.056334 |
+| `20261025T183318Z-34d149af` | med-control-smoke | failed | 131.172531 |
+| `20261025T184001Z-2e64d93e` | med-control-full | failed | 1892.709538 |
+| `20261025T185239Z-1df3ec6f` | al-pixel-smoke | failed | 44.123715 |
+| `20261025T185724Z-884dd4ce` | al-low | complete | 252.160562 |
+| `20261025T190034Z-01c74a65` | med-low | complete | 207.220136 |
+| `20261025T190813Z-810bcaba` | high-batch6 | failed | 141.266623 |
+| `20261025T193417Z-2387267a` | high-batch4 | complete | 302.240074 |
+| `20261026T070441Z-5b0eaf69` | al-original-missing-unit | complete | 731.520607 |
+| `20261026T070444Z-299584f1` | med-original-missing-unit | complete | 748.762351 |
+| `20261026T072949Z-aa61b482` | png-smoke-strict | failed | 30.384579 |
+| `20261026T073722Z-4ec3f83c` | png-calibration-two-windows | failed | 293.338359 |
+| `20261026T075201Z-db1ea276` | med-only-png-calibration | complete | 151.315546 |
+| `20261026T075716Z-f0549307` | full-al | complete | 1368.586064 |
+| `20261026T075730Z-e8d8f772` | alpha-al | complete | 1399.461311 |
+| `20261026T075723Z-e962542f` | full-med | complete | 1360.567544 |
+| `20261026T075737Z-a900b575` | alpha-med | complete | 1400.275787 |
+| `20261026T075746Z-ca0a46ed` | black-affine-al | complete | 1375.243978 |
+| `20261026T075753Z-75fd93fc` | black-affine-med | contended | 1050.864920 |
+| `20261026T091049Z-e429637f` | affine-med004-recovery | failed | 735.208909 |
+| `20261026T092648Z-ccf0633e` | joint-actual-reference-judge | complete | 332.187562 |
+
+Unstarted requests 20261025T191545Z-f67eebcb and 20261025T192327Z-591cb699 expired at zero GPU cost; unpublished 20261025T190533Z-524c8807 had no request/admission and zero charge. These IDs were inspected rather than replayed.
+
+**Stop:** the authorized two-window comparison is complete and its decision is reached. Retain compressed unmasked references as the candidate; do not advance segmented-reference or dense-foreground variants under this rule. A full-cohort quality confirmation would need a separately scoped budget and must retain the granted-matte, background, base-cost and source-independence limitations. No full-12 run is submitted.
+
+Immutable evidence publication: `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-reference-quality-20261026T093850Z`. Metadata bundle SHA256
+`75b489c2897f44c35a1cec12fbb0545e03c7dc51e65fcc5aba906141d108ce2e`; all22 copied raw artifacts and110 metadata
+files passed checksum verification and are read-only. Existing source data,
+weights, checkpoints and prior publications were not overwritten. Source
+requests/statuses/specifications and completed-unit qualification proofs remain
+inside the bundle; failed parent states remain explicit.
+
+Verification: configured `ruff check` and `mypy --config-file pyproject.toml`
+pass;21 focused tests pass, including explicit partial-collection rejection and
+completed-window recovery. Prior full local suite recorded873 passed/25 skipped
+plus the documented macOS protected-path assertion and sandbox process test;
+the latter passes when allowed read-only process inspection. Linux PR CI passes
+on the preceding code revision; final documentation commit is checked again.
+This is the fidelity track (LPIPS/DISTS); the experience track is untested.
+
+Saved checkpoints contain80 judged crops per player, while the native
+generation counter verifies all240 context frames were generated. They do not
+store240 decoded crops. Final primary decision and rates use original judged
+indices and original registered clip duration.

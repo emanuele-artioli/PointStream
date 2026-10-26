@@ -155,6 +155,15 @@ def check_prepare_references(root: Path, summary: dict[str, Any], anchors: dict[
                 raise ValueError('Reference crop placement differs from first fitted source pose')
 
 
+def unit_scope(allowed: list[str], subset: list[str] | None) -> list[str]:
+    """A checkpoint continuation may declare only known units; default remains full."""
+    if subset is None:
+        return allowed
+    if not subset or len(set(subset)) != len(subset) or not set(subset).issubset(allowed):
+        raise ValueError('Explicit unit subset must be nonempty, unique and inside frozen windows')
+    return subset
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--kind', required=True, choices=('anchors', 'prepare', 'generate', 'judge'))
@@ -162,8 +171,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--inputs', type=Path)
     parser.add_argument('--prepared', type=Path)
     parser.add_argument('--windows', nargs='+')
+    parser.add_argument('--unit-subset', nargs='+')
     parser.add_argument('--k6-stage', action='append', type=Path)
     args = parser.parse_args(argv)
+    if args.unit_subset is not None and args.kind != 'generate':
+        raise ValueError('Unit continuation applies only to generation')
     check_manifest(read(args.manifest))
     from experiments.tennis.k6b_generate import stage_dir, write_json
     stage = stage_dir()
@@ -223,7 +235,8 @@ def main(argv: list[str] | None = None) -> int:
             if not args.windows or any(w not in check_manifest(read(args.manifest)) for w in args.windows):
                 raise ValueError('Fixed generator windows required')
             expected_units = [u['unit'] for w in prepared['windows'] if w['window'] in args.windows for u in w['units']]
-            check_generated(result, prepared, arrays, expected_units)
+            check_generated(result, prepared, arrays, unit_scope(expected_units, args.unit_subset))
+            report['unit_scope'] = {'declared_subset': args.unit_subset, 'complete_window_unit_set': args.unit_subset is None}
             report['checks']['frozen_recipe_and_exact_coverage'] = True
     report['provenance'] = PROVENANCE
     write_json(target, report)

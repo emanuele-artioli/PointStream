@@ -27,6 +27,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--prepared', type=Path)
     parser.add_argument('--k6-stage', action='append', type=Path, default=[])
     parser.add_argument('--windows', nargs='+')
+    parser.add_argument('--unit-subset', nargs='+')
     args = parser.parse_args(arguments[:split])
     from experiments.tennis.k6b_generate import stage_dir, write_json
     from experiments.tennis.k6b_confirm_validate import main as validate
@@ -38,6 +39,8 @@ def main(argv: list[str] | None = None) -> int:
         return validate(record['validation_arguments'])
     if args.manifest is None or args.kind is None:
         raise ValueError('Stage kind and frozen manifest required')
+    if args.unit_subset is not None and args.kind != 'generate':
+        raise ValueError('Unit continuation applies only to generation')
     check_manifest(json.loads(args.manifest.read_text()))
     validation = ['--kind', args.kind, '--manifest', str(args.manifest)]
     for key in ('inputs', 'prepared'):
@@ -47,6 +50,8 @@ def main(argv: list[str] | None = None) -> int:
         validation.extend(['--k6-stage', str(path)])
     if args.windows:
         validation.extend(['--windows', *args.windows])
+    if args.unit_subset is not None:
+        validation.extend(['--unit-subset', *args.unit_subset])
     write_json(record_path, {'validation_arguments': validation, 'native_arguments': arguments[split+1:]})
     native = arguments[split+1:]
     if args.kind == 'anchors':
