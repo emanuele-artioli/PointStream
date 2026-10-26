@@ -4331,3 +4331,7 @@ proof, fixed-quality sensitivities, closed ledger, checks and report/card.
 Published code-file hashes match both executed receiver and judge hashes.
 Existing generated/source archives, Models and earlier publications were not
 overwritten or deleted. All reported events were acknowledged; no wakeup exists.
+
+Publication PR: https://github.com/emanuele-artioli/PointStream/pull/245.
+Merge-commit auto-merge follows required Linux CI. The scientific study and
+its cumulative resource ledgers are closed; no further inference is scheduled.
