@@ -4123,3 +4123,13 @@ this is valid infrastructure smoke evidence, not a quality result/full pilot.
 Native admitted60.83878016471863GPU-s; cumulative81.5132691860199/2700.
 Native child CPU53.848476s. Remaining2618.486731GPU-s supports2000s after the
 CPU-proven path repair. No full stage or neural quality scores completed.
+
+Scoring-layout job`20261026T155754Z-bbc4a300`, source`694dd06c`, published
+pending,2000GPU-s reservation. SourceSHA256
+`eeff18011d4c7b901e700bd38991adda6ae9a538b99629e49666f33bdf622945`,
+native specSHA256`0f0082564e266c7563bef2da4081ce7ce68ba47b5364931de332f9d4037edabe`.
+Receipt`/tmp/k6b-receiver-sampled-scoring-submission.json`; cumulative prior
+admitted81.5132691860199/2700GPU-s. No configuration changes after model output.
+Visual implementation check of the retained two-frame Alcaraz partial confirms
+actual masks cover generated players and leave crop background visible; this
+is not quantitative quality evidence and does not select a new profile.
