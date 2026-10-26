@@ -3477,3 +3477,34 @@ Reference full med `20261026T075723Z-e962542f` COMPLETE; admitted 1360.567544 GP
 Reference alpha med `20261026T075737Z-a900b575` COMPLETE; admitted 1400.275787 GPU-s; archive SHA256`e11f553f69aa4f3fb1347326b9d30afceed04ed9fdfa32328a60cca2d6f4b4fa`. Native validator status retained; actual quality still pending joint judging.
 
 Full RGB and explicit-alpha reference families now each have both complete native windows. Combined terminal cost 12386.161660 GPU-s; remaining two affine-black renders plus 650-second joint judging reserve imply at most 15936.161660/16200 seconds. All candidate quality remains unopened.
+
+Reference black-affine al `20261026T075746Z-ca0a46ed` COMPLETE; admitted 1375.243978 GPU-s; archive SHA256`c017d4b502577215cc31a15c0ef9d04a663cfc73e92d812dfd6b77a925b6d066`. Native validator status retained; actual quality still pending joint judging.
+
+Reference black-affine med `20261026T075753Z-75fd93fc` CONTENDED; admitted 1050.864920 GPU-s; archive SHA256`not-published`. Native validator status retained; actual quality still pending joint judging.
+
+### Interrupted affine reference recovery, unchanged total cap
+
+Med affine job `20261026T075753Z-75fd93fc` is terminal CONTENDED after a
+foreign process appeared on its GPU. Charged 1050.864920 GPU-seconds; do not
+resume/replay it. Retained Med003 has all240 context frames and all80 judged
+crops, original seed/30steps/profile, exact NPZ hash/indices/shape and passed
+smoke recipe/device gate. Explicit checkpoint proof passes; parent job remains
+incomplete. Partial archive SHA256
+`a9075cd896af27a0bf46f13c6f0a6be85699ee9adab8f6d8b1a32a70903a0d40`.
+Al affine `20261026T075746Z-ca0a46ed` COMPLETE,1375.243978 GPU-seconds.
+
+Combined terminal charge14812.270558/16200 seconds. Recover ONLY unfinished
+Med004 with100-second smoke/650-second full/20-second validator,800 total.
+Measured original Med004 used748.762351 admitted/613.5full seconds through the
+same production renderer/recipe. All hosts re-inspected; one exclusive Ada GPU
+is idle. Retain completed003 and validate the new004 separately; then combine
+archives without replacing raw evidence. No family/seed/source/quality change.
+
+Restore the earlier550-second final-judge reservation (60smoke/450full/20
+validator), rather than the optional650 contingency: historical eight-variant
+Al judging completed in241.553530 full seconds even under contention; five
+variants over two windows project241.554*5/8*2+60=361.942seconds, below450.
+This is a resource projection, not a latency claim; native smoke rechecks
+correctness and memory. Original Med two-variant window took99.621seconds.
+Worst combined reservation14812.270558+800+550=16162.270558<16200. Stop on
+failed checks or inability to finish inside the total cap; no new budget.
