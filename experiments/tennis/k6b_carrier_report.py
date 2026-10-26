@@ -116,7 +116,7 @@ def report(diagnostic: Path, transport: Path, conditioning: Path, archives: list
         'scope': 'two frozen familiar-broadcast windows only',
         'limitations': ['target-derived Telea background granted', 'dynamic exact matte granted for reference generation',
             'source/replay independence unresolved', '115px exploratory', 'not exhaustive compression search',
-            'preset4 dense single operating points; historical preset8 curves separate', 'no fitting or Wan-Animate']}
+            'selected preset1/4 dense single operating points; historical preset8 curves separate', 'no fitting or Wan-Animate']}
 
 
 def main() -> None:
