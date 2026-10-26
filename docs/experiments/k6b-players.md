@@ -4951,3 +4951,52 @@ CPU reads, JSON arithmetic and source inspection only, no GPU or native fleet
 job. Stage CPU consumption was not instrumented end-to-end; individual local
 commands were brief, so do not present an invented aggregate charge. Budget
 closed, no auto-continuation or future compute authority.
+
+### 2026-10-26 — Bounded read-only archive recovery
+
+The native archive has now actually been inspected, resolving the earlier
+export-wrapper limitation. On gpu6, read-only Python SHA256 and tar member
+listing found job 20261024T201059Z-29586984 `full/published.tar` is
+5,601,280 bytes, SHA256
+`67444a2a8f56c8700fb073a1184ce207ec3ad38cc003dbafa6710bb33836dff9`.
+For each exact window its members are features, fits, keypoints, outline,
+poses, two review PNGs, source-derived SAM masks, score arrays and window
+JSON. No bitstream, full decoded video or decoded-pixel manifest appears in
+that archive. The full job directory contains only that tar, k6.json,
+validation, staging, dispatch, invocation, execution and log. The named job
+checkpoint directory and original gpu6 full scratch directory do not exist.
+The specific confirmation publication directory has source, manifests and
+metadata archives, not an obvious stream; its local final-evidence archive
+index was also examined in the initial inventory. This is bounded evidence for
+these paths, not a global proof that no copy survives elsewhere.
+
+The exact T1 raw SAM ball archive (81,920 bytes, SHA256
+`e1d07bd030fd18baea1b69b14379a3e7438b102634c9e44229fefd946852c6b2`)
+and filtered archive (81,920 bytes, SHA256
+`9d12d44f4ad6cdce45b559013a3d6903e7a25d282f66663aa53c9bb1b6891147`)
+were listed read-only: neither contains Al031@129 or Med014@194. T1's Al
+045/036 and Med033 are different windows, and K5b's quoted ball evaluations
+use labelled game3/game7/game10 clips, not these exact broadcasts. These are
+automatic reference masks, not a qualified delivered ball packet; there is no
+matched ball position/visibility/shape/appearance payload, native timing or
+cost established by the checked records. Cheapest capture is an encoder-side
+exact-window track plus per-frame visibility/unknown flags, shape/color or
+appearance mode, timestamps, independently decoded packet and byte accounting;
+new inference needs separate authorization.
+
+The remote read-only Python recorded 0.052702 CPU-s and 0.0412 s remote wall;
+the SSH process reported 0.01 user and 0.00 system CPU-s. Initial local
+continuation setup and document lookups were not wrapped in a process-wide CPU
+meter; no exact aggregate is asserted for the entire substep. The 600-CPU-s
+cap was not used for an expensive workload. No writes to Datasets, fleet jobs,
+GPU work, encoding, scoring, inference, source acquisition or extra model
+were performed. Other undocumented copies remain unknown. Preserve prior
+metadata-only report and its uninstrumented ledger.
+
+[Concrete native CPU recovery-encode proposal](../cards/k6b-base-recovery-encode.md)
+specifies the exact six source/scale encodes, original native tools, inputs,
+frames, framing, retained pixels, validator, 24-frame smoke and a proposed
+1800 CPU-s / 45-minute cap. This is unapproved and unrun; old 1.5/1.5/2 GPU-h
+placeholders are not validated quotes. A separate full-frame quality/DCVC cost
+quote remains pending real inputs and measured smoke. No earlier limited
+development/granted-Telea result or provenance limitation changes.
