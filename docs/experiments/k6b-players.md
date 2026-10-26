@@ -4574,3 +4574,15 @@ this sampled residual coder is costly, and the contract/repeatability controls
 pass. No further model/schedule search or full240 protocol launched. No open
 user question. Any new tracker/profile or full240 data capture is a separate
 planning decision and budget, not an automatic continuation of this failed pilot.
+
+Immutable publication:
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-sam-20261026T182951Z`.
+Bundle SHA256`2914076ee5d897ecf8d17e4e135d342c1a3b92619c76e8813ab084eae458cb4a`;
+125 files independently verified, files444/directories555. Includes native raw
+full/smoke archives, predictor masks and per-frame metrics, prompt/reset hashes,
+job/environment/validator and failure traces, exact correction+standalone
+packets/independent decode records, accounting scripts/results, code hashes,
+selected patch, visuals, checks, card/report and closed ledger. Executed SAM/
+judge code hashes match current files. Existing Models, inputs and earlier
+publications preserved. PR [#246](https://github.com/emanuele-artioli/PointStream/pull/246)
+contains the completed scoped study; merge-commit auto-merge follows Linux CI.
