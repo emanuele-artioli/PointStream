@@ -3979,3 +3979,7 @@ The upload initially stopped after extraction because remote Python3.10 lacks
 SHA256 read-bytes and finalized read-only without replay/overwrite. This
 publication-only recovery is within the600CPU-s allowance; no inference ran.
 The original raw generation archives remain in their prior immutable directory.
+
+Publication PR: https://github.com/emanuele-artioli/PointStream/pull/244.
+Merge-commit auto-merge enabled, subject to required Linux CI. Experiment
+stopped at the CPU input gate; no further task computation is scheduled.
