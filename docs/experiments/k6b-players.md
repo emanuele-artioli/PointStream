@@ -3444,3 +3444,15 @@ remainingworkforecast andfinaljudgingreserve, notunspentoldbudgets.
 Med-only remaining PNG calibration job `20261026T075201Z-db1ea276`, source10aaffd7, specSHA256`330431ae6f7f2d354100f341a0b52b55c04d123d82af0edc3a0f135f7596ee22`; 250GPU-s cap. Al retained partial archive SHA256`cc6d0e794369fad3b62f008abee9afff32664277fd642df2390630f23fea81af`; explicit prefix validator passed all complete-window checks, collection remains incomplete until Med passes.
 
 Med calibration `20261026T075201Z-db1ea276` COMPLETE; 151.315546 GPU-s. Full 80 frames pass, freshPNG maximum metric difference 0.000727654. Archive SHA256`fbaf2326e748732bdfd4da7796394f1d4f1e16fcd7237f36c60820418b3acdb0`. Combined Al+Med calibration covers all 160 original judged frames; both guard types pass. No candidate quality opened before this receipt. Combined actual 6857.270955 GPU-s; all six 1450-second candidate reservations plus 550-second judging fit the unchanged 16200-second cap.
+
+Frozen reference full, al: job `20261026T075716Z-f0549307`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`7d40ae27267cab96b51586ae416ec95758f1cae14cfd041918240fcdaf9c0a8f`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference full, med: job `20261026T075723Z-e962542f`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`f4323d6de8789fdede6fb5c73228bc7ee354a67b93df15456eba50c3295fd221`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference alpha, al: job `20261026T075730Z-e8d8f772`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`7b96d0c05d499bdfaced6adff3f63049c5a6d287781644f838b273e97e099e31`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference alpha, med: job `20261026T075737Z-a900b575`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`c3d58daedf6ebb443ff4dde02755eb4872c90703c38937e73f74a6bd259fde3e`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference black-affine, al: job `20261026T075746Z-ca0a46ed`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`86af6ade26458455bf0886d469c4e43646dd1827d49c0817041f5b37d6ef8ba2`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.
+
+Frozen reference black-affine, med: job `20261026T075753Z-75fd93fc`, source`8cca9b19c007532e24bcc33347e874f2573212c7`, specSHA256`00e7dd1393a7a8e55fb19a6e93eed4c8a37120c088a40e270b3c2ec3c17c2653`; 1450 GPU-second cap, exclusive compatible Ada, full two-player 240-context-frame window. Complete calibration passed before admission.

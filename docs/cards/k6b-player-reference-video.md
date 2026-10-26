@@ -1,22 +1,17 @@
 # Tennis reference and mask video comparison
 
-Current state2026-10-26: approved continuation <=4.5newGPU-h +3600CPU-s.
-CPU preflight complete2647.198626CPU-s. Dense quality phase complete
-947.011110GPU-s/1800s; selectedalpha4/affine1 each0/4strictcells on the two
-pilotwindows. HistoricalAlpreset8curves also lose (+3551%/+3044%BD-rate
-alpha, +6448%/+3061%black32 forLPIPS/DISTS onactualqualityoverlap).
-Referencepreset1CRF20halfsize frozen for allthree families. No compressed
-reference generation yet. ThreefailedPNGcontrolattempts cost3954.938402GPU-s;
-completedAl006/Med003checkpoints retained. Al006bitexact; Med003smallnumerical
-drift mustpass unchanged1e-4scoregate. Oldmissing-unitrequests expiredunstarted,
-0GPU. Userrequestedkeepqueued; idlecapacityfound07:03UTC. Freshmissingcontrols
-20261026T070441Z-5b0eaf69(Al001) and20261026T070444Z-299584f1(Med004)
-submitted onfullAda poolgpu5/6, exclusive/stoponcontention,1000seach.
-Knownterminaltotal1.361653/4.5GPU-h; pendingreservations accounted separately.
-Branch codex/k6b-reference-quality-pilot, draftPR242. Historicalunapproved
-statements below are superseded by explicituserapproval; no furtherbudget
-approval needed within scope. Grantedmatte/background andunresolvedsource
-independence remain. No fitting, Wan-Animate, newchats orrecurringmonitors.
+Current state (2026-10-26): approved continuation, at most 4.5 new GPU-hours
+and 3600 CPU-seconds. CPU preflight is closed at 2647.198626 CPU-seconds.
+Dense carriers each failed all four pilot metric cells. The full original-PNG
+calibration passes all 160 judged frames: fresh-render differences remain below
+1e-3, while identical saved-RGB metric replay remains below 1e-4. Terminal GPU
+charges are 6857.270955 seconds. Six frozen reference renders (1450 seconds
+each) and final judging (550 seconds) reserve at most 16107.270955 seconds
+including those charges, below the unchanged 16200-second cap. Candidate job
+IDs, revisions and specifications are recorded in the experiment entry.
+Three preset-1, CRF-20 reference families use the same Al031 and Med014 windows.
+No full-12-window result, independent-source claim or ungranted-matte result is
+authorized by this pilot. Exact matte and target-derived background remain granted.
 
 Goal: determine whether cheaper references and temporally coded silhouettes merit
 an actual reference-conditioned generation test on the frozen 12-window tennis
