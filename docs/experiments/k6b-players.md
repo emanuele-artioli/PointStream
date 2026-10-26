@@ -3510,3 +3510,17 @@ Worst combined reservation14812.270558+800+550=16162.270558<16200. Stop on
 failed checks or inability to finish inside the total cap; no new budget.
 
 Affine Med004-only continuation job `20261026T091049Z-e429637f`, source`9db350ec0a6a50c3d9365c66de17c27d0541aaa1`, specSHA256`6d129b78640b02fec758ffbe7a8a55258d2195075c474b61752581d26e6d5d15`;800 GPU-second cap; retained003 is never replayed. Native partial proof and final two-archive manifest must pass before judging.
+
+Med004 continuation `20261026T091049Z-e429637f` FAILED its650-second full finalization
+limit after saving the complete unit (240 context frames,80 judged crops).
+Charged 735.208909 GPU-seconds. CPU checkpoint qualification passes exact
+NPZ hash, original judged indices/shape/dtype, original seed/profile/steps,
+nonconstant crops and native smoke recipe/base/adapter/guider/device/kernel
+gates. Archive SHA256`0d71eef9c9e519f62d6f1954fcb98eb6917a86118f287d0accf98f244260594f`. Do not mark either
+parent job complete or fabricate missing global metadata. Two disjoint complete
+unit checkpoints qualify the full Med affine window payload; both original
+parent states remain contended/failed in the manifest. The final native judge
+must verify all original R/S, source pixels and full80-frame score coverage.
+No further generation. Combined actual 15547.479467
+GPU-seconds; with550 final judging, maximum 16097.479467
+remains below16200. No scope, recipe, tolerance or total-budget change.
