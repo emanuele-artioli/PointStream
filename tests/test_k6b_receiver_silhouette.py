@@ -20,3 +20,13 @@ def test_projection_clips_crop_without_inventing_support():
     assert full.shape == (1080, 1920)
     assert full.sum() == 4
     assert full[:2, :2].all()
+
+
+def test_transport_root_accepts_both_native_publication_layouts(tmp_path):
+    from experiments.tennis.k6b_receiver_silhouette import transport_root
+    for name, relative in [('direct', ''), ('wrapped', 'publish')]:
+        extracted = tmp_path / name
+        root = extracted / relative
+        (root / 'packets').mkdir(parents=True)
+        (root / 'transport.json').write_text('{}')
+        assert transport_root(extracted) == root

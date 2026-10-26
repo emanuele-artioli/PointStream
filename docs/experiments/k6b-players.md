@@ -4110,3 +4110,16 @@ native specSHA256`b0fc0755d9b371c735e5390799146f69f36b3a718adb39febed5959c0465a6
 Receipt`/tmp/k6b-receiver-sampled-private-submission.json`; cumulative prior
 admitted20.67448902130127/2700GPU-s. Explicit empty chat metadata, no monitor.
 Actual isolation-cache CPU proof`/tmp/k6b-receiver-isolation-cache-probe.json`.
+
+Job07cca552 completed actual isolated prediction twice: all4 forbidden reads
+denied,4players×2ticks, exact fresh-reset input/output hashes, CUDA. Then the
+evaluator failed before scores because it assumed a`publish/` wrapper that the
+native transport archive does not have. Correct to the same root detection as
+prior native judges; actual archive CPU extraction confirms the KPS paths,
+plus a regression checks both supported layouts. No mask/model/prompt/quality
+change. Prediction receipt/masks retained in canonical smoke/partial.tar;
+this is valid infrastructure smoke evidence, not a quality result/full pilot.
+
+Native admitted60.83878016471863GPU-s; cumulative81.5132691860199/2700.
+Native child CPU53.848476s. Remaining2618.486731GPU-s supports2000s after the
+CPU-proven path repair. No full stage or neural quality scores completed.

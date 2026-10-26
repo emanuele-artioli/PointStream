@@ -82,6 +82,13 @@ def project(mask: np.ndarray, box: np.ndarray) -> np.ndarray:
     return out
 
 
+def transport_root(extracted: Path) -> Path:
+    root = extracted / "publish" if (extracted / "publish").is_dir() else extracted
+    if not (root / "packets").is_dir() or not (root / "transport.json").is_file():
+        raise ValueError("Native transport layout is incomplete")
+    return root
+
+
 def worker(a: argparse.Namespace) -> None:
     own = a.out.resolve()
     own.mkdir()
@@ -460,7 +467,7 @@ def main() -> int:
     packets.mkdir()
     with tarfile.open(a.transport) as t:
         t.extractall(packets, filter="data")
-    packets = packets / "publish"
+    packets = transport_root(packets)
     generated = load_generated([str(q) for q in a.generated], scratch / "generated")
     nets = {"lpips": load_lpips(a.backbone[0], "cuda"), "dists": load_dists(a.backbone[1], "cuda")}
     result = {
