@@ -4102,3 +4102,11 @@ unspent reservation; remaining2679.325511GPU-s supports a2000s reservation.
 Ruff/mypy and9 focused tests pass. Full prior tests remain valid apart from this
 narrow allowance change; required real smoke must prove all4 forbidden reads
 and fresh reset outputs before evaluation. No quality scores opened.
+
+Narrow-device job`20261026T155233Z-07cca552`, source`7aba4282`, published
+pending,2000GPU-s reservation. SourceSHA256
+`d804c19d8ae1d17ff08b5f6031f3b998b648dc73387e60a31463fe0b6d972dd5`,
+native specSHA256`b0fc0755d9b371c735e5390799146f69f36b3a718adb39febed5959c0465a62d`.
+Receipt`/tmp/k6b-receiver-sampled-private-submission.json`; cumulative prior
+admitted20.67448902130127/2700GPU-s. Explicit empty chat metadata, no monitor.
+Actual isolation-cache CPU proof`/tmp/k6b-receiver-isolation-cache-probe.json`.
