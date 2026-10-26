@@ -3465,8 +3465,9 @@ The first two candidate jobs passed native full-window validation. Combined
 actual GPU cost is 9625.318329 seconds. Four outstanding renders reserve
 5800 seconds. Retain 650 seconds for final joint judging (60-second smoke,
 540-second full, 20-second validator plus overhead), using measured complete
-Med calibration as the timing basis: three scored signals versus five in the
-final comparison, with the same original R/S and metric implementation. This
+Med calibration as the timing basis: two generated variants plus truth,
+versus five generated variants plus truth in the final comparison; the same
+original R/S and metric implementation remain in use. This
 raises only the internal judging reservation from 550; combined worst remaining
 reservation is 16075.318329/16200 seconds. No new GPU budget, recipes,
 quality thresholds, sources or fitting. Preserve all failed and complete jobs.
