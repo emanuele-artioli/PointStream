@@ -3695,3 +3695,7 @@ or claims those colors exist. Hard baseline is binary at the coded grid; zero
 codec full-resolution geometry loss is reported separately. Width2/4 ramps are
 computed from the same written support. No quality-based selection or threshold
 change; this bounds the mechanism's scope rather than fabricating RGB evidence.
+
+Corrected GPU job `20261026T124013Z-b543788f`, source`1579e807a468dc292334bdafabcdc5031e23147b`, specSHA256`3751d7ef50442991e2a7233187ad18c3fe7a24e4ca7d91a888a39d80d733062f`; 750 admitted-second cap (8 CPU threads). Prior failed/cancelled IDs retained, never replayed.
+
+Corrected CPU job `20261026T124022Z-49e6c45a`, source`1579e807a468dc292334bdafabcdc5031e23147b`, specSHA256`0311cacaf8d1dc9bc7bd3b5ffc8ae163eef0c72f2a89aeb62a03158951d65523`; 780 admitted-second cap (4 CPU threads). Prior failed/cancelled IDs retained, never replayed.
