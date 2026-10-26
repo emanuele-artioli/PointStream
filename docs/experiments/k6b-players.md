@@ -4395,3 +4395,13 @@ mutation/download. Static Ruff/mypy and5 focused prompt/projection tests pass.
 No automatic completion wakeup verified: attended native bounded batch wait,
 no recurring model monitor. Conservative preflight allowance150CPU-s plus
 visual3.465341 and weight check5.572351, actual check/runtime snapshots later.
+
+Smoke gate PASSED on gpu6 RTX6000Ada: native93.832730s, actual child CPU
+113.830771s; application snapshot113.190485CPU-s. All931 weights load, actual
+bf16 `pytorch_flash::flash_fwd_kernel` events observed, peak3.469430447GiB,
+4 forbidden reads denied/run and two fresh predictions bitwise identical.
+Exact-control maximum per-frame differences8.940696716308594e-7 Al and
+1.168571836795973e-7 Med, unchanged tolerance1e-4. Conservative projected
+full931.171563s<1500, native substantive validator passed and full promoted.
+No prompt/profile/tolerance changes after smoke. Shared timings resource cost
+only. Metadata `/tmp/k6b-sam-smoke-deadline/`; native continuing wait handle27105.
