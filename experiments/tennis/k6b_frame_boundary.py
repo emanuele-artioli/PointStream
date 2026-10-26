@@ -21,9 +21,9 @@ def boundary_metrics(predicted: np.ndarray, target: np.ndarray) -> dict[str, flo
 
     kernel = np.ones((3, 3), np.uint8)
     p = predicted & ~cv2.erode(predicted.astype(np.uint8), kernel, borderType=cv2.BORDER_CONSTANT,
-                                borderValue=0).astype(bool)
+                                borderValue=(0.0,)).astype(bool)
     r = target & ~cv2.erode(target.astype(np.uint8), kernel, borderType=cv2.BORDER_CONSTANT,
-                            borderValue=0).astype(bool)
+                            borderValue=(0.0,)).astype(bool)
     yy, xx = np.mgrid[-2:3, -2:3]
     tolerance = (xx * xx + yy * yy <= 4).astype(np.uint8)
     near_p = cv2.dilate(p.astype(np.uint8), tolerance).astype(bool)

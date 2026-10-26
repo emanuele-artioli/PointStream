@@ -4637,3 +4637,5 @@ fresh cohort is asserted. Source/replay/PTS/transitive training/reference/judge
 lineage and mechanically frozen eligible windows must precede fresh quality.
 No footage acquired or additional cohort GPU run. Proposed future CPU inventory
 cap1h, separate approval; unused current allocations do not transfer.
+
+Smoke PASSED gpu2 RTX A6000: native218.162526s, cumulative child CPU251.297288s; native gate elapsed264.893579s, projected full1327.847317s<1500. Both fresh processes independent_frames=True, one prompt per tick, identical masks/input hashes, all931weights/CUDA/bf16 actual flash and4forbidden reads denied/run. Peak3.086890221GiB. Original exact-control pixels/per-frame<=1e-4 pass, unchanged tolerance. Native full promoted under same reservation; no profile change. Expected sharing event reported+acknowledged. Continuing native wait handle97774; no verified automatic model wakeup or recurring monitor.
