@@ -4827,3 +4827,176 @@ hashes match current sources. Existing source data/weights/results preserved.
 Review: [PR #247](https://github.com/emanuele-artioli/PointStream/pull/247),
 completed scoped study and unlaunched next cards; merge-commit auto-merge after
 final Linux CI, under project policy.
+
+## 2026-10-26 — Full-accounting CPU inventory: preregistration
+
+Authorized CPU-only stage: <=3600 aggregate CPU-s, <=2 h wall, 0 GPU. On the
+same Al031@129/Med014@194 development windows audit native whole-frame/base,
+ball and achievable anchor artifacts and all-bit receiver dependencies before
+opening any new quality scores. Existing saved-RGB PR247 is a 4/4 component
+pass with target-derived Telea granted, not an end-to-end win. Stop at missing
+inputs or a valid rate/coverage gate, or prepare a separately budgeted
+actual-base saved-tick test. No generation, new fitting, new footage or
+full240 capture is authorized. Card: [CPU inventory](../cards/k6b-full-accounting-inventory.md).
+T1 fixed-grid negative evidence remains binding for its own family.
+
+## 2026-10-26 — Full-accounting CPU inventory result
+
+**Stop: no validated actual decoded-base inputs and no qualified ball payload
+in the examined inventory.** This is an artifact/coverage gate, not a conclusive
+quality loss. No new quality, generation, fitting or GPU job. Native anchor job
+20261024T201059Z-29586984 was checked COMPLETE before read-only export of
+`full/k6.json` (SHA256
+`048bd1be47f23a7f6d02b263d60516a72d2d8f40ea21fa98c223e052d21d3024`).
+Its published archive is identified by SHA256
+`67444a2a8f56c8700fb073a1184ce207ec3ad38cc003dbafa6710bb33836dff9`;
+the status export interface declined a tar export, so this stage did not
+independently inspect that archive's members. The executed revision
+`3fb9ef183b82844604e117c2dbbf71ac5743b312`'s `experiments/tennis/k6.py`
+explicitly unlinks SVT IVF streams and decoded pictures, removes work scratch,
+and publishes window metadata, score arrays, source-derived masks/poses and
+review images. The native full `k6.json` carries stream hashes and payload
+sizes, not retained pixels. The evidence does not establish that no other
+copy exists elsewhere; search/recovery remains necessary. An independently
+recoverable stream must match the recorded hash or else be identified as a
+new encode with fresh decode/pixel hashes and rate accounting.
+
+Al source clip SHA `054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76`,
+frames 9–248, 25 fps, 9.6 s; Med SHA
+`a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be`,
+frames 74–313, 50 fps, 4.8 s. Both native conversions are 1920×1080 yuv420p,
+limited range, 240 frames and every-third-tick 80-frame quality subset. Their
+raw converted YUV SHA256s are respectively
+`e7b960cd2456b439c5439b337a45e47d2a0a44a2a32025a2de595af3feed4fa2` and
+`53633ce617b12d779bc8c5746d8d44cbe090ced6c49ba79dbe246cc6abacfb08`.
+Anchor encodes were of the whole source, including players/ball, not inpainted
+background. Native SVT-AV1 v4.2.0, dav1d 1.5.4 and ffmpeg 8.1.2 hashes in the
+exported receipt; native DCVC image/video checkpoints are
+`b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302` /
+`934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3`;
+anchor job gpu6 RTX 6000 Ada. PR247 SAM ran A6000 under its separately pinned
+checkpoint/profile. Decoded pixel identities for these whole-frame anchors were
+not preserved in the inspected receipt. Re-decode equivalence is unverified.
+
+The original published LPIPS/DISTS are player-region measurements: anchor
+pixels were pasted only inside target R onto the source, and region bits were
+allocated rather than full stream bytes. Those numbers cannot be used as
+whole-frame quality or as a whole-frame equal-rate dominance witness. The
+following are actual recorded **payload** rates (kbps); SVT IVF adds 2.4267 /
+4.8533 kbps for its 32-byte header and 240 twelve-byte frame headers, before
+any other delivery framing. DCVC payload framing and runtime need independent
+verification. No current sample is an actual delivered composite.
+
+| Native whole-source setting | Al payload kbps | Med payload kbps | Al payload + IVF + player side bits | Med payload + IVF + player side bits |
+|---|---:|---:|---:|---:|
+| SVT CRF63 scale 8 | 7.7708 | 14.7033 | 15.4346 | 27.1975 |
+| SVT CRF63 scale 4 | 14.7042 | 29.2867 | 22.3680 | 41.7809 |
+| SVT CRF63 scale 2 | 31.2583 | 75.4000 | 38.9221 | 87.8942 |
+| SVT CRF62 scale 1 | 96.1158 | 258.2333 | 103.7796 | 270.7275 |
+
+Illustrative DCVC QP0 scales 4/2/1: Al payload 2.1383/6.2283/17.3733,
+Med 5.0483/17.5633/50.3467 kbps; adding the same player side costs yields
+7.3755/11.4655/22.6105 and 12.6892/25.2042/57.9875 kbps, before any
+unverified transport framing and missing costs. These are conditional floors,
+not bitrate-quality comparisons or evidence the recorded native stream still
+exists. The three SVT scales 8/4/2 above are coarse native inventory
+candidates, not a promoted selection or final-quality tune; retain full native
+SVT/DCVC anchor envelope if recovery succeeds.
+
+Player side costs at 7200 s: all240 framed KPS 3.53/5.903333 kbps, FULL bank
+48,164/68,193 bytes = 0.053516/0.075770 kbps, adapter+guider
+1,488,252/1,495,592 bytes = 1.653613/1.661769 kbps; sum
+5.237129/7.640872 kbps. KPS packet contains run timing, visibility, identity
+and geometry; verify outer stream multiplexing and cross-window state costs.
+The common 48,878,567-byte generator base and 3,502,755,717-byte SAM weights
+add 54.309519 and 3891.950797 kbps at 7200 s if distributed; installation,
+bootstrap/runtime and adaptation fairness for anchor models remain to be
+fully specified. Reference update coverage over 7200 s is an assumption, not
+proved by two 240-frame windows. Dynamic matte is zero only for frozen PR247
+saved-frame prediction; all240 reproducibility, seed/mode, error recovery,
+framing, correction/fallback, player association, ball coordinates, appearance,
+updates and their bytes are unresolved, not zero. The input and mask hashes
+in PR247 bind the saved 80 ticks, not a decoded full240 stream. The examined
+PR242/247 player transport contains no qualified ball payload: it does not
+establish that other ball data cannot be recovered. T1 automatic ball references
+and disk fallback are not an independently qualified delivered ball packet.
+
+Cheapest next decision: separately authorize a bounded CPU provenance/recovery
+of same-window native bitstreams and ball packets; if absent, freeze a single
+native whole-source encode/decode recipe and re-create three SVT settings in
+scratch with exact 240-frame/time/pixel/hash checks and full framing, then
+quote any required DCVC decoding and substantive full-frame scorer. No
+unverified GPU-hour estimate is promoted while these prerequisites and the
+original pixel identities are missing. Actual-base saved-80 recomposition
+should compare frozen generated+SAM overlay, source-foreground/ball oracle,
+and no-overlay baseline on identical actual decoded base; source appearance
+is an oracle only. Include the actual overlay in the finite-family envelope:
+perceptual metrics are not monotone in perfect foreground, so failure bounds
+only these tested settings, not every architecture. Full-frame and foreground
+LPIPS/DISTS/PSNR and ball diagnostics, fair achievable SVT/DCVC anchors and a
+verified ROI/pixel-crop alternative remain mandatory. Any valid pilot needs
+its own smoke, substantive validator, projected resource cost, frozen >=3/4
+strict full-frame and >=3/4 foreground cells and sensitivity before separate
+authority; no full240 generation before this cheaper gate. Rate-only headroom
+from the granted-background experiment is not a universal bound.
+
+Prior T1 finite-grid free-F oracle failed weighted DISTS +10.00% (3/8 wins),
+LPIPS -10.08% (5/8), and fully billed DISTS +132.65%, 0/8; it does not
+rule out this distinct whole-base family. PR247's 4/4 and zero empty masks
+remain development component results with target-derived Telea granted, not a
+delivered result. Both matches are familiar; source/replay independence remains
+unresolved, 115 px exploratory, and historical step5 failure retained. Fresh
+match provenance and judge/training/reference audit await method freeze.
+CPU reads, JSON arithmetic and source inspection only, no GPU or native fleet
+job. Stage CPU consumption was not instrumented end-to-end; individual local
+commands were brief, so do not present an invented aggregate charge. Budget
+closed, no auto-continuation or future compute authority.
+
+### 2026-10-26 — Bounded read-only archive recovery
+
+The native archive has now actually been inspected, resolving the earlier
+export-wrapper limitation. On gpu6, read-only Python SHA256 and tar member
+listing found job 20261024T201059Z-29586984 `full/published.tar` is
+5,601,280 bytes, SHA256
+`67444a2a8f56c8700fb073a1184ce207ec3ad38cc003dbafa6710bb33836dff9`.
+For each exact window its members are features, fits, keypoints, outline,
+poses, two review PNGs, source-derived SAM masks, score arrays and window
+JSON. No bitstream, full decoded video or decoded-pixel manifest appears in
+that archive. The full job directory contains only that tar, k6.json,
+validation, staging, dispatch, invocation, execution and log. The named job
+checkpoint directory and original gpu6 full scratch directory do not exist.
+The specific confirmation publication directory has source, manifests and
+metadata archives, not an obvious stream; its local final-evidence archive
+index was also examined in the initial inventory. This is bounded evidence for
+these paths, not a global proof that no copy survives elsewhere.
+
+The exact T1 raw SAM ball archive (81,920 bytes, SHA256
+`e1d07bd030fd18baea1b69b14379a3e7438b102634c9e44229fefd946852c6b2`)
+and filtered archive (81,920 bytes, SHA256
+`9d12d44f4ad6cdce45b559013a3d6903e7a25d282f66663aa53c9bb1b6891147`)
+were listed read-only: neither contains Al031@129 or Med014@194. T1's Al
+045/036 and Med033 are different windows, and K5b's quoted ball evaluations
+use labelled game3/game7/game10 clips, not these exact broadcasts. These are
+automatic reference masks, not a qualified delivered ball packet; there is no
+matched ball position/visibility/shape/appearance payload, native timing or
+cost established by the checked records. Cheapest capture is an encoder-side
+exact-window track plus per-frame visibility/unknown flags, shape/color or
+appearance mode, timestamps, independently decoded packet and byte accounting;
+new inference needs separate authorization.
+
+The remote read-only Python recorded 0.052702 CPU-s and 0.0412 s remote wall;
+the SSH process reported 0.01 user and 0.00 system CPU-s. Initial local
+continuation setup and document lookups were not wrapped in a process-wide CPU
+meter; no exact aggregate is asserted for the entire substep. The 600-CPU-s
+cap was not used for an expensive workload. No writes to Datasets, fleet jobs,
+GPU work, encoding, scoring, inference, source acquisition or extra model
+were performed. Other undocumented copies remain unknown. Preserve prior
+metadata-only report and its uninstrumented ledger.
+
+[Concrete native CPU recovery-encode proposal](../cards/k6b-base-recovery-encode.md)
+specifies the exact six source/scale encodes, original native tools, inputs,
+frames, framing, retained pixels, validator, 24-frame smoke and a proposed
+1800 CPU-s / 45-minute cap. This is unapproved and unrun; old 1.5/1.5/2 GPU-h
+placeholders are not validated quotes. A separate full-frame quality/DCVC cost
+quote remains pending real inputs and measured smoke. No earlier limited
+development/granted-Telea result or provenance limitation changes.
