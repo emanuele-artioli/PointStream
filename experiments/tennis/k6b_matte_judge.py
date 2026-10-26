@@ -60,7 +60,8 @@ def control_error(current: np.ndarray, expected: np.ndarray, *, tolerance: float
 
 def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Path,
                  matte_row: dict[str, Any], generated: dict[Any, Any], source: Path, source_sha: str,
-                 nets: dict[str, Any], scratch: Path, publish: Path, max_judged: int) -> dict[str, Any]:
+                 nets: dict[str, Any], scratch: Path, publish: Path, max_judged: int,
+                 *, control_variant: str = "gen-match5") -> dict[str, Any]:
     import cv2
     from experiments.tennis import k6, k6b
     from experiments.tennis.k4b_features import convert
@@ -111,7 +112,7 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
     decoded_all = {key: {(n.rsplit("@", 1)[0], int(n.rsplit("@", 1)[1])): np.asarray(v, np.float64)
                          for n, v in d.items()} for key, d in json.loads(decompress((anchor / "keypoints.json.zst").read_bytes()))["decoded"].items()}
     old_row = json.loads((control / "window.json").read_text())
-    old_index = old_row["variants"].index("gen-match5")
+    old_index = old_row["variants"].index(control_variant)
     with np.load(control / "scores.npz") as a:
         expected_control = np.stack([a[m][old_index] for m in ("lpips", "dists")])
     dest = publish / safe(wid)
@@ -122,7 +123,8 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
     row: dict[str, Any] = {"id": wid, "scales": list(VARIANTS), "expected_judged": requested,
         "original_judged": native["judged"], "judged": [], "scored": native["scored"],
         "selected_packets": selected_packets, "source_sha256": source_sha, "converted": converted,
-        "complete_window": max_judged == 0, "condition_boxes_sha256": [array_sha(np.stack(list(b.values()))) for b in boxes]}
+        "complete_window": max_judged == 0, "condition_boxes_sha256": [array_sha(np.stack(list(b.values()))) for b in boxes],
+        "control_variant": control_variant, "crop_coverage": {}, "control_composite_hashes_match": True}
     for n, t in enumerate(requested):
         truth_t = np.array(truth[t])
         r = np.logical_or.reduce([*regions[t].values(), np.zeros((1080, 1920), bool)])
@@ -137,16 +139,30 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
         if hashes[str(t)] != native["scoring_masks"][str(t)] or hashes[str(t)] != old_row["scoring_masks"][str(t)]:
             raise ValueError("Frozen R/S judging regions changed")
         frames, supports = [], []
+        coverage = []
         for scale in VARIANTS:
             canvas, written = fill.copy(), np.zeros_like(r)
+            requested_union = np.zeros_like(r)
+            per_player_missing = {}
             for player in kp_meta["compositing_order"]:
                 i = native["players"].index(player)
-                if t not in crops[i]:
-                    continue  # identical native missing-pose/crop fallback
                 mask = regions[t].get(player, np.zeros_like(r)) if not scale else mk.upsample(reduced[scale][t:t+1, i].astype(np.uint8)*OBJECT, (1920, 1080))[0] > 0
-                written |= k6b.paste(canvas, crops[i][t], boxes[i][t], mask)
+                requested_union |= mask
+                if t not in crops[i]:
+                    per_player_missing[player] = int(mask.sum())
+                    continue  # identical native missing-pose/crop fallback
+                available = k6b.paste(canvas, crops[i][t], boxes[i][t], mask)
+                written |= available
+                per_player_missing[player] = int((mask & ~available).sum())
+            coverage.append({"requested_union": int(requested_union.sum()), "written_union": int(written.sum()),
+                "missing_union": int((requested_union & ~written).sum()), "per_player_missing": per_player_missing})
             frames.append(canvas)
             supports.append(written)
+        row["crop_coverage"][str(t)] = coverage
+        if control_variant == "full":
+            expected_rgb = old_row["composite_sha256"][str(t)][old_index]
+            if array_sha(frames[0]) != expected_rgb:
+                raise ValueError("Saved FULL reference composite pixels changed")
         lp = lpips_reduce(nets["lpips"], frames, truth_t, [[s, m] for m in supports], "cuda")
         ys, xs = np.nonzero(s)
         crop = (slice(max(0, ys.min()-k6.DISTS_PAD), min(1080, ys.max()+1+k6.DISTS_PAD)),
