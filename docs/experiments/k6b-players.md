@@ -4159,3 +4159,175 @@ Receipt`/tmp/k6b-receiver-sampled-qualified-submission.json`; prior admitted
 172.40282893180847/2700GPU-s. Correct module validator and stronger35 checks;
 no scientific configuration change. Re-inspect current native deadline/state
 before waiting after the client interruption; never replay this request.
+
+Correct native smoke gate cf4da9e0 PASSED35/35 substantive checks; full stage
+started on gpu5. Both denied-read and fresh-reset mask checks, exact controls,
+actual per-frame score arrays and measured full projection passed natively.
+Native current state recorded in
+`/tmp/k6b-receiver-sampled-qualified-gate-status.json`. No quality-dependent
+configuration choice. Resume bounded wait after acknowledging only the expected
+shared-contention event; job's own2000s/44min bounds stay unchanged.
+
+## 2026-10-26 — Sampled receiver silhouette: complete, fixed candidate fails
+
+**Decision:1/4 strict wins, below the frozen>=3/4 pilot bar.** This is a real
+inference-and-recomposition result on both original windows/all80 archived
+judged ticks each, not an IoU proxy or unchanged-quality substitution. No
+further segmentation, generation, fitting, full240 recovery or integration is
+launched. This closes this YOLOE26x/person/selection/projection profile; it does
+not prove every decoder-derived silhouette route fails.
+
+### Actual quality and conditional paid rate
+
+| Window | Rate kbps | Predicted LPIPS | Predicted DISTS | Strict wins |
+|---|---:|---:|---:|---:|
+| Alcaraz–Hurkacz031@129 | 5.237128889 | 0.262862106748 | 0.222578307986 | 1/2 (DISTS) |
+| Medvedev–Struff014@194 | 7.640872222 | 0.242911524930 | 0.236507502943 | 0/2 |
+
+All4 primary cells are bracketed; no unresolved primary cell or extrapolated
+quality. Actual exact/granted-matte controls remain4/4: Alcaraz LPIPS/DISTS
+0.245873567472/0.220013449341; Medvedev0.172194861869/0.186108257622. Every
+saved control composite RGB hash matches; maximum per-frame metric differences
+are3.939867e-5/2.163649e-5, below the unchanged1e-4 guard. No fresh generative
+re-render and no tolerance relaxation. There is one method operating point per
+window, so no method BD-rate curve is defined. Original achievable SVT-AV1/DCVC
+envelope and originalR/S remain unchanged.
+
+Rates pay the actual PR242 FULL reference banks, original KPS geometry/timing/
+identity streams and match adapter/guider over7200s. Alcaraz components are
+3.530000 keypoints+0.053515556 references+1.653613333 adaptation kbps; Medvedev
+5.903333333+0.075770000+1.661768889. Dynamic-matte payload and content-specific
+prompt/initialization bits are0 for this fixed installed person profile; no
+source mask, source-box prompt or source-driven crop is supplied to the client
+predictor. Common base+segmenter/text runtime installation is an explicit
+assumption. These are conditional sampled-frame rates, not a demonstrated
+complete240-frame wire/decode profile. All240 KPS ticks remain billed; there
+are only80 archived generated-RGB ticks, and no new240-frame matte/correction
+stream was constructed.
+
+### Receiver contract and failure diagnostics
+
+Both independent fresh-process predictions reproduce all inputs and masks
+bit-for-bit for each of the4players×80 archived ticks. Both actual native
+workers use CUDA and deny original source videos, target mask-bearing transport
+and quality-control archive reads. They see only unmasked generated crops,
+sanitized paid KPS, installed fixed profile/weights and runtime files. Raw crop
+context was retained. Evaluation reads originalR/S/canvas only after masks are
+frozen. Predictor determinism is demonstrated for these saved pixels on this
+hardware, not for new generative outputs or an independent all240-frame client.
+
+| Window | Mean per-tick union IoU | FP pixel-frames | FN pixel-frames | Missing RGB exact / predicted |
+|---|---:|---:|---:|---:|
+| Alcaraz | 0.650181056 | 79,499 | 272,155 | 9,104 / 0 |
+| Medvedev | 0.504735064 | 25,922 | 312,532 | 3,798 / 0 |
+
+These union IoUs describe shape, not the decision metric. Empty masks occur on
+0/80 and2/80 Alcaraz unit001/unit006 ticks, and1/80 and63/80 Medvedev unit003/
+unit004 ticks. In particular, the fixed detector frequently misses Medvedev's
+unit004 generated person. This is a measured cause of lost support for this
+profile, not evidence that no pose-prompted segmenter could recover it. No
+post-score confidence/threshold/model sweep was run.
+
+Predicted masks are projected and clipped using only the already-billed pose
+crop rule, so their requested support has no unavailable RGB. Exact target-R
+control still has the previously documented crop gaps; those pixels retain the
+identical native Telea fill. Zero predicted missing-RGB counts do not mean full
+original-body coverage: false negatives and empty predictions are explicitly
+counted. No source foreground pixels filled gaps. Per-frame predicted-mask,
+source RGB, source-player-mask, R/S, control/composite and score hashes are
+preserved with the actual mask arrays and all160 judged-frame scores.
+
+### Installation and amortization sensitivities
+
+The actual installed detector171640453B+local text encoder253794476B total
+425434929B. Charging that installation over7200s adds472.705477kbps; base alone
+48878567B adds54.309519kbps, combined527.014996kbps. At7200s: base-only has0 wins
+(2 bracketed losses/2 unbracketed), segmenter-only and combined have0 wins/all4
+unbracketed. In all installation-charged cases a measured cheaper/no-worse
+anchor witnesses dominance in every cell; unbracketed cells are not relabelled
+as interpolated losses. Combined rates are532.252124/534.655868kbps.
+
+Fixed-quality common-installation accounting at1800/7200/28800s yields0/4,
+1/4 and2/4 wins; none meets3/4. This changes byte amortization only, not the
+observed quality or cohort. For the measured Alcaraz quality, combined-install
+formal crossing horizons are>2740699s (31.72days, LPIPS) and>1207774s (13.98days,
+DISTS). They are algebraic fixed-quality sensitivities, not evidence the same
+profile/adapter works for those durations. Medvedev's measured crossings are
+2.260237/2.283348kbps, already below its5.903333kbps KPS floor; no positive
+amortization horizon repairs those two cells at the measured quality. This
+does not change the primary7200s failure or establish any temporal generality.
+
+### Actual native evidence, checks and closed budget
+
+Completed native job`20261026T171827Z-cf4da9e0`, executed source`115b9988`,
+gpu5 / RTX6000Ada, source/spec hashes in the preregistered job entry. Actual
+smoke projection1163.881537s passed the1500s full bound; full command325.814103s.
+These shared-GPU times are resource-cost records only, never latency evidence.
+Peak allocated3.553785GiB stays within the12000MiB declaration. Runtime Torch,
+backbone hashes, weight hashes, all input identities and executed code-file
+hashes accompany the result. Full raw archive SHA256
+`cc67ec2cc4bb58ca2ec713002a13e63bcc8f01b16e89656e59e6a1f3b2c1a01c`.
+
+Native smoke passes35 checks. The actual full archive independently passes34
+checks locally and on CPU in the original packed environment/frozen executed
+source: frame/mask arrays and hashes, fresh resets, source/hash coverage,
+per-frame score shapes/finite values/means, exact control, both complete original
+80-tick sets, memory/class and support accounting. No stand-in score is used.
+Full-stage process CPU366.902379s; successful supervisor's448.768725 child-CPU
+snapshot already includes smoke and its validator, so it is not added twice.
+
+| Job | Native state | Admitted GPU-s |
+|---|---|---:|
+| 20261026T154114Z-808dc4f0 | unpublished, inspected no ready/spec/run | 0 |
+| 20261026T154300Z-b22eabc3 | failed child bootstrap | 10.398987293 |
+| 20261026T154832Z-50c37ae0 | failed privacy gate before model loading | 10.275501728 |
+| 20261026T155233Z-07cca552 | private/reset inference passed, evaluator path failed | 60.838780165 |
+| 20261026T155754Z-bbc4a300 | scored smoke passed intended checks; wrong template validator failed | 90.889559746 |
+| 20261026T171827Z-cf4da9e0 | complete; native smoke and independent full validators pass | 414.611974239 |
+
+**GPU ledger CLOSED:587.014803171/2700s=0.163059668/0.75GPU-h**, all admitted
+setup/smokes/failures/validation included. CPU ledger CLOSED at conservative
+2334.860723/3600s: closed audit765.100194+additional measured configured checks
+164.913063+actual native child snapshots592.741714+local full validation2.977481
++native full validation9.128271+600 local/preflight/analysis/publication allowance
++200 native supervisor/unrecorded-validator allowance. Failed source/model
+transfers, source/checkpoint data and all partial results remain preserved.
+Unused allocations close with this study and do not transfer. No running or
+queued task job, generator, other chat/agent or recurring model monitor remains.
+
+Configured Ruff/mypy pass (226 sources),10 focused regressions pass. Full local
+suite887pass/25skip with the same2 known macOS restrictions (sandbox ps denial
+and protected Linux symlink expectation); the process test passes with read-only
+visibility outside the sandbox. Linux CI is the merge gate. Additive judge API
+preserves old default four-matte behavior; the receiver path uses two variants.
+No existing source data, weights, training or checkpoints were changed.
+
+### Scope and stopping decision
+
+The deciding failure is actual zero-matte silhouette/recomposition quality,
+not prediction repeatability or exhausted GPU budget. The test answers the
+narrow80-tick question for one fixed profile. Independent240-frame prediction,
+exact correction transport/init/framing/identity cost and full wire evidence
+remain unmeasured because160 raw ticks/player are absent. This does not infer
+that corrections are cheap or expensive, nor a full12 result.
+
+Target-derived exact-R Telea background remains granted. The broader purpose is
+still a fully accounted tennis system with players and ball; ball-only is not
+the intended endpoint. Source/replay independence, familiar two-match scope,
+115px exploratory status, historical step5 failure and granted-matte history
+remain explicit. No coded-background/ball integration or new full240 generation
+is launched after this failure. This is neither an end-to-end win nor a
+universal closure of receiver-derived silhouettes. Stop because the authorized
+candidate's>=3/4 decision is now reached, preserve its evidence and report it
+to planning.
+
+Immutable publication:
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-sampled-20261026T173715Z`.
+Bundle SHA256`f106e7235bd214e23845bf59d6fc3879166d67431ace070cd43566583829fce2`.
+All100 files independently hash-verified; files444/directories555. Includes real
+full/qualified-smoke/private-partial raw archives, source-identified mask/score
+arrays, native execution/environment/gate records, failed traces, fresh decoder
+proof, fixed-quality sensitivities, closed ledger, checks and report/card.
+Published code-file hashes match both executed receiver and judge hashes.
+Existing generated/source archives, Models and earlier publications were not
+overwritten or deleted. All reported events were acknowledged; no wakeup exists.

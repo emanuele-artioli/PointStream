@@ -1,7 +1,11 @@
 # K6b: receiver-derived player silhouette and exact corrections
 
 Original audit: STOPPED at CPU input completeness gate.
-Current amendment below: sampled80-tick inference pilot authorized and active. All4 actual player units retain
+Current amendment below: COMPLETE. Actual sampled zero-matte quality1/4,
+below>=3/4. Fresh private predictions reproduce; exact controls pass.
+Cumulative GPU587.014803/2700s=0.163059668/0.75h, conservative CPU2334.860723/3600s.
+All jobs terminal, no further inference/integration. Full240 corrections remain
+unmeasured; background granted and source independence unresolved. All4 actual player units retain
 80/240 raw RGB ticks;160 missing each. Exact tennis question is distinct from
 H5p4d but remains unmeasured.0/2700 new GPU-seconds, no fleet submission or
 new inference. Conservative CPU765.100194/3600s, ledger closed. Narrow80-tick quality and explicit sparse-predictor alternatives
