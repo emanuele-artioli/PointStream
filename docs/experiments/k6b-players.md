@@ -4823,3 +4823,7 @@ input/mask hashes and real per-frame scores, independent full validators,
 boundary/installation/sensitivity/cost evidence, supervision traces, code/patch
 hashes, card/report and both proposed next cards. Executed worker/judge file
 hashes match current sources. Existing source data/weights/results preserved.
+
+Review: [PR #247](https://github.com/emanuele-artioli/PointStream/pull/247),
+completed scoped study and unlaunched next cards; merge-commit auto-merge after
+final Linux CI, under project policy.
