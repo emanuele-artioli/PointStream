@@ -3442,3 +3442,5 @@ combinedterminal6705.955410/16200s. Admitfuturebatchesagainstactualcost,
 remainingworkforecast andfinaljudgingreserve, notunspentoldbudgets.
 
 Med-only remaining PNG calibration job `20261026T075201Z-db1ea276`, source10aaffd7, specSHA256`330431ae6f7f2d354100f341a0b52b55c04d123d82af0edc3a0f135f7596ee22`; 250GPU-s cap. Al retained partial archive SHA256`cc6d0e794369fad3b62f008abee9afff32664277fd642df2390630f23fea81af`; explicit prefix validator passed all complete-window checks, collection remains incomplete until Med passes.
+
+Med calibration `20261026T075201Z-db1ea276` COMPLETE; 151.315546 GPU-s. Full 80 frames pass, freshPNG maximum metric difference 0.000727654. Archive SHA256`fbaf2326e748732bdfd4da7796394f1d4f1e16fcd7237f36c60820418b3acdb0`. Combined Al+Med calibration covers all 160 original judged frames; both guard types pass. No candidate quality opened before this receipt. Combined actual 6857.270955 GPU-s; all six 1450-second candidate reservations plus 550-second judging fit the unchanged 16200-second cap.
