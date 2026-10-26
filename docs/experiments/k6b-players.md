@@ -4050,3 +4050,25 @@ which is intentionally not followed; waiting is a native bounded CLI command.
 Full local suite887pass/25skip, same2 Mac restrictions as audit; Ruff/mypy and
 9 focused tests pass. Full-stage CPU validator<1700, smoke<300; actual ledger
 will include all admitted setup/failures/validators, plus measured local checks.
+
+Accounting sensitivities fixed before reading new quality: primary remains7200s
+with common base and segmenter. Also show base-only, segmenter-only and combined
+installation charges, plus1800/7200/28800s amortization of actual bank/adapter
+and installation bytes with keypoint rate unchanged. These are fixed-quality
+accounting counterfactuals, not claims the observed80 frames generalize to those
+durations. Use the original measured anchor envelope; no quality extrapolation.
+A supported measured rate crossing can bound payback; censored crossings stay
+unresolved. These sensitivities cannot select or promote a different candidate.
+
+Job b22eabc3 FAILED smoke before model output. Canonical admitted GPU duration
+10.398987293243408s; native command0.717812s /child CPU1.485176s. Parent logged
+only a child exit, so no predictor failure detail or scientific result is
+claimed. The initial logging gap is retained rather than invented after fact.
+A CPU-only reproduction from/tmp proves the packed child cannot locate the new
+module without an explicit frozen-source PYTHONPATH, while `--help` succeeds
+with it. Correct this bootstrap, publish child logs before raising, and permit
+one bounded instrumented recovery within the same cumulative cap. No model,
+threshold, images, geometry, metric or decision-rule change. Remaining GPU
+2689.601013s before recovery;2000s new reservation fits. Failure metadata in
+`/tmp/k6b-receiver-sampled-terminal.json`; bootstrap proof in
+`/tmp/k6b-receiver-sampled-bootstrap-proof.json`.

@@ -210,6 +210,7 @@ def predict_twice(a: argparse.Namespace, scratch: Path, kps: Path) -> tuple[dict
             "YOLO_CONFIG_DIR": str(out / "config"),
             "PYTHONNOUSERSITE": "1",
             "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+            "PYTHONPATH": str(Path(__file__).resolve().parents[2]),
         }
         # Temporary/config paths belong to the worker's own allowlisted tree.
         env["TMPDIR"] = str(out / "tmp")
@@ -234,7 +235,12 @@ def predict_twice(a: argparse.Namespace, scratch: Path, kps: Path) -> tuple[dict
         for p in [*a.source, *a.control, a.transport]:
             command += ["--forbidden", str(p)]
         with (scratch / f"worker{n}.log").open("w") as log:
-            subprocess.run(command, env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
+            completed = subprocess.run(command, env=env, stdout=log, stderr=subprocess.STDOUT)
+        log_path = scratch / f"worker{n}.log"
+        (scratch / "publish" / log_path.name).write_bytes(log_path.read_bytes())
+        if completed.returncode:
+            print(log_path.read_text()[-6000:], flush=True)
+            raise RuntimeError(f"Isolated predictor exited {completed.returncode}; log preserved")
         records.append(json.loads((out / "prediction.json").read_text()))
     for left, right in zip(records[0]["rows"], records[1]["rows"]):
         if {k: v for k, v in left.items() if k != "inference_seconds"} != {
