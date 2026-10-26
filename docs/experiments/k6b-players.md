@@ -4335,3 +4335,49 @@ overwritten or deleted. All reported events were acknowledged; no wakeup exists.
 Publication PR: https://github.com/emanuele-artioli/PointStream/pull/245.
 Merge-commit auto-merge follows required Linux CI. The scientific study and
 its cumulative resource ledgers are closed; no further inference is scheduled.
+
+## 2026-10-26 — Pose-prompted receiver SAM: frozen bounded diagnostic
+
+New study authorized through planning after PR245 closed. Branch
+`codex/k6b-receiver-sam-pilot`; [self-contained card](../cards/k6b-receiver-sam.md).
+Fresh caps2700 admitted GPU-s/3600 aggregate CPU-s/2h wall. Previous ledgers
+remain closed. No new GPU submitted or quality opened at this preregistration.
+Hypothesis: paid-pose initialization removes detector nonrecognition while
+retaining rendered-player fidelity. Competing explanations: shape still differs
+from source; tracking includes generated context/background; pose prompt
+misaligns; nonrepeatable predictions invalidate receiver correction decoding.
+The exact granted control4/4 is the upper bound; SAM is tested only as the
+silhouette component. Pass>=3/4 strict bracketed LPIPS/DISTS cells on the same
+Al031/Med01480 ticks at actual conditional total rate; no tuning after scores.
+
+CPU audit:8 generated Med004 crops at ticks0,3,30,60,90,120,180,237 visibly
+contain the player with broadly aligned paid keypoints. YOLO selection cannot
+produce an empty mask from a nonempty candidate, so empty output is compatible
+with detection/confidence failure rather than absence of rendered person in
+these inspected frames; no all-frame detector-cause assertion. No target masks
+or new quality used. Figure and raw pose metadata `/tmp/k6b-sam-med004-pose.png`
+and `/tmp/k6b-sam-visual.json`; measured3.465341CPU-s plus conservative audit
+allowance to be charged. Existing standalone mask wrapper is not itself the
+point API; CPU source inspection verifies installed pinned
+`VideoTrackingMultiplexDemo.add_new_points` explicitly converts points through
+the interactive head then adds tracker state. Native corner labels2/3 plus
+positive torso points are frozen in card. No new dependency/model substitution.
+Checkpoint `/home/itec/emanuele/Models/SAM/sam3.1_multiplex.pt`,3502755717bytes,
+SHA256`0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6`;
+source2345a4ad109ac29c569da749c91d84f10dc08c40, existing packed environment
+32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661.
+Existing table qualifies Ada/A6000 mask tracking; fresh pose path must assert
+all loaded weights/CUDA/native flash kernels and independently repeated masks.
+
+The new module preserves historical YOLO implementation unchanged. Predictors
+read only independently decoded KPS/raw generated crops/checkpoint in the same
+Landlock contract, never target/source/mask/control. Evaluator opens R/S/Telea
+only after two matching prediction subprocesses. Exact control tolerance1e-4,
+original composites/crop order/quality/anchors retained. Empty/FP/FN/IoU and
+missing RGB diagnostic accompany actual quality. Fixed profile reset20 saved
+ticks is2.4s Al/1.2s Med, not dense240-frame tracking. Original missing160 raw
+ticks/player and all240 correction costs remain unmeasured. Common base+SAM
+installation explicit;7200s installation charges/payback sensitivity separate.
+Target-derived Telea background remains GRANTED, source/replay independence
+unresolved,115px exploratory, historicalstep5 and granted-matte limitation
+retained; no end-to-end or independent confirmation claim.
