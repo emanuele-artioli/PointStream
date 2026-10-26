@@ -1,5 +1,11 @@
 # K6b: independent pose-prompted segmentation at every archived frame
 
+COMPLETE:4/4strict wins, frozen+.001sensitivity3/4; all320player masks nonempty.
+Same job20261026T184618Z-186fe8b3COMPLETE. Conservative1720/2700GPU-s
+(0.477777778/0.75h),2329.366896/3600CPU-s CLOSED. Full36checks pass locally
+and in original runtime; no new generation/integration/correction run. Later
+full-accounting and fresh-evaluation cards PREPARED ONLY, unapproved/unlaunched.
+
 Goal: test whether removing temporal tracking persistence preserves>=3/4
 strictly bracketed LPIPS/DISTS cells with zero transmitted dynamic matte.
 This is the last narrow segmentation profile in the current dispatch.

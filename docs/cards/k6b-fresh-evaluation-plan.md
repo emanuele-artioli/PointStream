@@ -26,6 +26,8 @@ Candidate inventory from existing records, not new footage acquisition:
 - No verified clean new-match cohort is established by these names. An additional
   broadcast outside the archived seven is a future acquisition/provenance task;
   no invented match/date/download list and no acquisition authorized here.
+  Prefer independently sourced broadcasts recorded after the documented latest
+  frozen training cutoff when possible, to establish temporal nonoverlap.
 
 Before touching new quality: hash source/extraction records; resolve original
 broadcast/replay identity and PTS into a common timeline. Join every generator/
