@@ -44,14 +44,14 @@ def report(diagnostic: Path, transport: Path, conditioning: Path, archives: list
             for variant, quality in row['means'].items():
                 if variant == 'old-control':
                     continue
+                if variant == 'png-control':
+                    controls[wid].append(row['new_png_control_max_score_difference'])
+                    continue
                 key = (wid, variant)
                 if key in seen:
                     raise ValueError('Duplicate measured window/representation')
                 seen.add(key)
                 reference_kind = variant if variant in banks else None
-                if variant == 'png-control':
-                    controls[wid].append(row['new_png_control_max_score_difference'])
-                    continue
                 if variant in dense:
                     c = dense[variant]
                     rate = c['container']['bytes']*8/base['registered_seconds']/1000

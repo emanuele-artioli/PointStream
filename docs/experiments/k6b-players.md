@@ -3351,3 +3351,42 @@ Publishfreshmissing-unitrequests,samefrozeninputs/caps,fullcompatiblegpu5/6
 pool and45minfreshdeadlines. Useexclusiveadmission/stoponnewforeigncontention
 to preservebudget; no automaticreplay. ExistingcompletedAl006/Med003 retained.
 CPU2647.198626/3600s andGPUknownterminal4901.949513/16200s unchanged.
+
+Freshalmissingcontrol job `20261026T070441Z-5b0eaf69` sourceeb64c64c specSHA256`accca36139dff4d39f4924bf2d7e4e4ef08e974c6b7bfad2dc2e52f792f40bf3`;1000GPU-sreserved, exclusiveAdapool, priorunstartedexpiredrequest preserved.
+
+Freshmedmissingcontrol job `20261026T070444Z-299584f1` sourceeb64c64c specSHA256`fa2a9573903ed6b0cd2432c004c24038708d88cda49e2d4107aede9faafa1f0d`;1000GPU-sreserved, exclusiveAdapool, priorunstartedexpiredrequest preserved.
+
+### Dense carrier phase closed (2026-10-26; reference pilot continues)
+
+Boundedbatch4historicaljob20261025T193417Z-2387267a COMPLETE,302.240074
+GPU-sadmitted; archiveSHA2561dbf827e0d490f40f67834e67ffcf6e271c0acb85823df1cb45c40526c5bb349.
+All7historicalpoints/all80Aljudgedframes pass exactpixel/source/control gates.
+Totaldense947.011110/1800GPU-s including2failedattempts; nofitting/generation.
+Nativehistoricalpreset8Alcurves: alpha4points BD-rate +3550.7471%LPIPS,
++3043.7336%DISTS; clamp32threepoints +6447.7569%/+3061.1668%. PCHIPlograte
+overactualqualityoverlap againstachievableanchorconcavehull. Medonlyone
+historicalpointperrepresentation, noBD-rate. Selectedalpha4/affine1 remain
+singlepointperwindow andeach0/4strictcells. Nevermixdifferentpresetsintocurve.
+Thiscloses testedcontinuousforeground-video carriers onthese2windows, not
+allcompressionmethods orfull12cohort. Referencegenerationquality stillunmeasured.
+
+Actualreport/tmp/k6b-quality-dense-final-report.json,resourceledgers
+/tmp/k6b-quality-cpu-final-ledger.json and/tmp/k6b-quality-gpu-ledger.json.
+Knownterminaltotal4901.949513/16200GPU-s=1.361652642GPU-h; oldledgersclosed.
+Freshcontrolrequests documentedabove; approval persists, capacity/reproduction
+gates remain. Full12confirmation notauthorized by this2windowpilotbudget.
+
+Freshoriginalcontrolmissing-unitjobs COMPLETE onidleexclusivegpu5:
+20261026T070441Z-5b0eaf69 Al001:731.520607GPU-sadmitted,240context/80crops,
+fullrender596.1s. ArchiveSHA256ce5c54e14db39d2beaf8e8f0c9c5627ca8d6a6420613dc96453fcef33877e297.
+20261026T070444Z-299584f1 Med004:748.762351GPU-sadmitted,240context/80crops,
+fullrender613.5s. ArchiveSHA256c448d784a2c84a2482bf4f72d74449ecce4842c88ee4f0d38b00100f4af7921c.
+Bothnativevalidatorspassedexplicitknownunit scope; allweights/recipe/class/kernels
+checked. Assemblewithretained006/003ONLY, nooriginaloldcrop substitution.
+Referenceactual5435.221361GPU-s; combinedterminal6382.232472GPU-s.
+Beforecompressed-referencegeneration, PNGQC<=350GPU-s (60smoke/240full/20
+validator)checksnewboth-playercontrolagainstoriginalper-frameLPIPS/DISTS
+within1e-4 onall160judgedframes. OriginalR/S,source andsameactualCUDAjudges.
+Thisispre-candidatecorrectness verificationinsideapproved4.5GPU-h; no new
+qualitymethod/family/cohort or training. Firstcompressed-referenceconfiguration
+projection2x613.5s+nativeoverhead<1300sfull,110ssmoke+20validator within1450s.

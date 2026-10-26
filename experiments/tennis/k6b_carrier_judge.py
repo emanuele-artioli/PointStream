@@ -281,6 +281,8 @@ def main() -> int:
     labels: dict[str, list[str]] = {}
     for label, path in a.generated:
         labels.setdefault(label, []).append(path)
+    if set(labels) & {'full', 'alpha', 'black-affine'} and 'png-control' not in labels:
+        raise ValueError('Actual reference comparison requires the newly rendered PNG control')
     generated = {label: load_generated(paths, scratch/label) for label, paths in labels.items()}
     carriers = unpack_carriers(a.carrier, scratch/'carriers', [int(q) for q in a.crfs.split(',')], a.windows, a.carrier_setting)
     if a.carrier_setting and any(set(c['name'] for c in carriers[wid]) != set(a.carrier_setting) for wid in a.windows):

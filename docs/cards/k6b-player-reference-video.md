@@ -1,15 +1,22 @@
 # Tennis reference and mask video comparison
 
-Current state2026-10-25: continuation APPROVED <=4.5newGPU-h plus3600CPU-s.
-Branch codex/k6b-reference-quality-pilot. Original CPU stage closed; PR241merged
-CIpassed. New reference preset comparison complete: preset1 globally dominates
-4/8 for allthree families on both matches, frozenCRF20/halfsize before quality.
-Dense full240CPUcomparison complete: alpha4fallback, affine1dominance.
-NewCPU phaseclosed at2647.198626/3600CPU-s conservative bound incl400local.
-OriginalPNG controls running; one diagnosed110s smoke timeout charged, corrected
-attempt recorded. Detailed immutable jobIDs and costs in experiment entry below.
-Historical proposed/unapproved statements below are superseded by the explicit
-approved-continuation section. No expanded cohort or extra GPU allowance.
+Current state2026-10-26: approved continuation <=4.5newGPU-h +3600CPU-s.
+CPU preflight complete2647.198626CPU-s. Dense quality phase complete
+947.011110GPU-s/1800s; selectedalpha4/affine1 each0/4strictcells on the two
+pilotwindows. HistoricalAlpreset8curves also lose (+3551%/+3044%BD-rate
+alpha, +6448%/+3061%black32 forLPIPS/DISTS onactualqualityoverlap).
+Referencepreset1CRF20halfsize frozen for allthree families. No compressed
+reference generation yet. ThreefailedPNGcontrolattempts cost3954.938402GPU-s;
+completedAl006/Med003checkpoints retained. Al006bitexact; Med003smallnumerical
+drift mustpass unchanged1e-4scoregate. Oldmissing-unitrequests expiredunstarted,
+0GPU. Userrequestedkeepqueued; idlecapacityfound07:03UTC. Freshmissingcontrols
+20261026T070441Z-5b0eaf69(Al001) and20261026T070444Z-299584f1(Med004)
+submitted onfullAda poolgpu5/6, exclusive/stoponcontention,1000seach.
+Knownterminaltotal1.361653/4.5GPU-h; pendingreservations accounted separately.
+Branch codex/k6b-reference-quality-pilot, draftPR242. Historicalunapproved
+statements below are superseded by explicituserapproval; no furtherbudget
+approval needed within scope. Grantedmatte/background andunresolvedsource
+independence remain. No fitting, Wan-Animate, newchats orrecurringmonitors.
 
 Goal: determine whether cheaper references and temporally coded silhouettes merit
 an actual reference-conditioned generation test on the frozen 12-window tennis
