@@ -3822,3 +3822,5 @@ passed checksum verification and are read-only. The bundle's GPU/CPU executed
 code-file hashes exactly match the two native result receipts. Existing source
 files, weights and earlier publications were not overwritten. Final repository
 source adds only the documented native progress callback after those results.
+
+Publication PR: https://github.com/emanuele-artioli/PointStream/pull/243. Experiment stopped because both authorized decisions are reached; merge-commit auto-merge follows final Linux CI. All current jobs are terminal; no further computation or recurring model monitor.
