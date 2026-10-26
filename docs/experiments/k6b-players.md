@@ -4025,3 +4025,28 @@ GPU-stage CPU validators additionally require smoke<300CPU-s and full<1700CPU-s;
 combined with765.100194 prior conservative audit cost and remaining local/
 validation/check allowance this fits3600. No recurrent model wakeup; attended
 native fleet wait only, no verified completion-triggered model wakeup available.
+
+Submission ID`20261026T154114Z-808dc4f0`, source`a7f62e1e`: CLI reports
+outcome unknown after publisher rejected a Models path outside the permitted
+external-data input root. No automatic replay. Inspect canonical status before
+any replacement; existing weights must be staged by hash under Datasets first.
+
+Recovery inspection for808dc4f0: canonical status says unpublished; direct
+transfer inspection proves only`source/` and`events/`, no ready/spec/run record.
+Workers cannot admit it, so0GPU; retain its transfer. Existing immutable weights
+were copied/hash-verified into new read-only
+`Datasets/pointstream-data/tennis/k6b-receiver-inputs-20261026T154300Z/`.
+Only input locations changed, original Models preserved. This is a verified
+new submission after an unpublished transfer, not an unknown-job replay.
+
+Corrected native job`20261026T154300Z-b22eabc3`, source`a7f62e1e`, admitted
+reservation<=2000GPU-s of unchanged2700 cap. Published pending;
+sourceSHA256`47638c4e5d896b785d416c53d86fe01d06ef657664774fc219480baeb06d7522`,
+native specSHA256`b4f91f4d66061f7f6ea62ff37604fa2a6e6907f8767afea1958a7c8477dfb76b`.
+Local spec`/tmp/k6b-receiver-sampled-spec.json`; corrected submission receipt
+`/tmp/k6b-receiver-sampled-corrected-submission.json`. No new automation was
+created: the legacy CLI inherited chat_id and prints a heartbeat suggestion,
+which is intentionally not followed; waiting is a native bounded CLI command.
+Full local suite887pass/25skip, same2 Mac restrictions as audit; Ruff/mypy and
+9 focused tests pass. Full-stage CPU validator<1700, smoke<300; actual ledger
+will include all admitted setup/failures/validators, plus measured local checks.
