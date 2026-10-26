@@ -3721,3 +3721,5 @@ changes scheduling/reservations, not pixels, models, masks, rates or tolerances.
 Shared timings are resource checks only, never performance evidence.
 
 Shared resource smoke separates source/setup time from measured frame-loop time, extrapolates actual scored-frame cost to80/window with1.5x allowance for varying ROI size, then adds60s model/finalization reserve. It does not multiply fixed source preparation by40. Full is gated at projection<800; no scoring formula changes.
+
+Shared joint judge job `20261026T124922Z-b47be797`, source`c2fa3b4862bac25bada2502aef0e3fc315b739eb`, specSHA256`f6eb1212d8c6ed6dabee928333d72da0a139e5b784714582e47e12113f2dcbd5`;1000s reservation of unchanged1800s new cap,12GB process plus8GiB free margin. Prior exclusive queue b543788f confirmed cancelled/unstarted at0GPU cost. Fixed160 frames/4settings; no generation.
