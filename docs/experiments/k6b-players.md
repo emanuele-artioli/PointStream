@@ -5000,3 +5000,47 @@ frames, framing, retained pixels, validator, 24-frame smoke and a proposed
 placeholders are not validated quotes. A separate full-frame quality/DCVC cost
 quote remains pending real inputs and measured smoke. No earlier limited
 development/granted-Telea result or provenance limitation changes.
+
+## 2026-10-26 — Native whole-frame base encode: authorization and preflight
+
+The planning continuation authorizes a fresh, bounded CPU-only stage: at most
+1800 aggregate CPU-s and 45 minutes wall; no GPU, scoring, generation, fitting
+or ball inference. Use the exact two source hashes, intervals, 240 native frames,
+CRF63/preset4 and scales 8/4/2 in the recovery card. Retain six complete IVF
+streams, decoded pixels, 1080p reconstructed pixels, native geometry, frame
+hashes, color/timing/tool metadata, and validate fresh independent decode and
+all byte accounting. A 24-frame two-window scale-2 smoke must establish valid
+output and conservative projected full cost before promotion; failure or an
+unverifiable aggregate CPU bound stops the job. This is a new encode, not
+recovered historical bytes. No old budget carries over. Proposal and inputs:
+[base recovery](../cards/k6b-base-recovery-encode.md).
+
+### 2026-10-26 — Overnight operational stop
+
+No CPU job was submitted for this continuation, no smoke was run, and no new
+base-encode implementation or artifacts exist. Prior native anchor job
+20261024T201059Z-29586984 was read-only checked complete; it is not a new run.
+The user-authorized <=1800 aggregate CPU-s/45-minute/0-GPU cap has not been
+spent on a fleet allocation. Local source inspection is preflight, not
+scientific evidence; its aggregate CPU was not measured.
+
+Planning's scoped unattended-isolation probe reported filesystem verified,
+process-lifetime isolation unverified and overall verification failed; enabled
+file/MCP protection was not fully proved. AGENTS.md requires verified isolation
+for unattended execution, so stop until attended operation or independently
+verified protection. No new agents, remote agent sessions, fleet compute,
+timers or recurring monitors are authorized by this stop. This is not a
+scientific failure.
+
+The fleet worker's saved children-resource snapshot is useful for measured
+workload children, but `budget_seconds` bounds wall time; staging, publication,
+supervisor and later validator are not established as included in that snapshot.
+A strict aggregate CPU cap cannot be claimed from it alone. The original
+source's bilinear chroma-to-RGB and bicubic RGB reconstruction must be matched
+and checked; no new worker, validator or concrete runnable fleet spec has yet
+been created. Next: attended implementation and substantive corruption/decode
+checks, followed by a measured representative smoke only when a verified
+budget method or revised authority exists. Inputs, hashes, scope and stops are
+in the [recovery card](../cards/k6b-base-recovery-encode.md). Current player
+results remain development with target-derived Telea granted; no new quality,
+ball packet or fully accounted result follows.
