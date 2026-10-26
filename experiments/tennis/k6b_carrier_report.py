@@ -78,6 +78,10 @@ def report(diagnostic: Path, transport: Path, conditioning: Path, archives: list
                     cell['exact_dynamic_matte_paid'] = {'kbps': rate+exact_rate, 'matte_kbps': exact_rate,
                         'same_measured_quality': True, 'packet': wire[wid]['mattes']['exact'],
                         'primary': {m: comparison(actual, m, rate+exact_rate) for m in ('lpips', 'dists')}}
+                if reference_kind:
+                    cell['paired_new_png_quality'] = row['means']['png-control']
+                    cell['paired_quality_difference'] = {m: quality[m]-row['means']['png-control'][m] for m in ('lpips', 'dists')}
+                    cell['renderer_envelope_sensitivity'] = {m: {str(delta): comparison({**actual, 'method': {**quality, m: quality[m]+delta}}, m, rate) for delta in (-1e-3, 1e-3)} for m in ('lpips', 'dists')}
                 cells.setdefault(variant, []).append(cell)
     settings = {}
     for variant, rows in cells.items():

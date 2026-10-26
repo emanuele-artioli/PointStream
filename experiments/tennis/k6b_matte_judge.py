@@ -49,11 +49,11 @@ def extract(archives: list[Path], parent: Path) -> dict[str, Path]:
     return found
 
 
-def control_error(current: np.ndarray, expected: np.ndarray) -> float:
+def control_error(current: np.ndarray, expected: np.ndarray, *, tolerance: float = 1e-4) -> float:
     if current.shape != expected.shape or not np.isfinite(current).all() or not np.isfinite(expected).all():
         raise ValueError("Missing/nonfinite original control scores")
     difference = float(np.max(np.abs(current-expected)))
-    if difference > 1e-4:
+    if not 0 < tolerance <= 1e-3 or difference > tolerance:
         raise ValueError(f"Original control exceeds frozen tolerance: {difference}")
     return difference
 

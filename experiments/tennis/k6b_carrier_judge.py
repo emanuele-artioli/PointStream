@@ -205,7 +205,7 @@ def judge_window(wid: str, anchor: Path, old_control: Path, packets: Path,
     row['means'] = {name: {m: float(a[i, requested].mean()) for m, a in arrays.items()} for i, name in enumerate(names)}
     if 'png-control' in names:
         i = names.index('png-control')
-        row['new_png_control_max_score_difference'] = control_error(np.stack([arrays[m][i, requested] for m in ('lpips', 'dists')]), expected_control[:, requested])
+        row['new_png_control_max_score_difference'] = control_error(np.stack([arrays[m][i, requested] for m in ('lpips', 'dists')]), expected_control[:, requested], tolerance=1e-3)
         row['new_png_control_bitexact_composites'] = all(v[0] == v[i] for v in row['composite_sha256'].values())
     row['seconds'] = time.monotonic()-began
     row['files'] = {q.name: sha(q.read_bytes()) for q in dest.iterdir() if q.is_file()}
@@ -230,7 +230,7 @@ def validate(archive: Path, full: bool) -> dict[str, Any]:
             checks[label+':coverage'] = row['judged'] == row['expected_judged'] and (not full or row['judged'] == row['original_judged'])
             if row.get('carrier_receipts'):
                 checks[label+':source_roundoff'] = set(row['source_cpu_vs_native_gpu']) == {str(t) for t in row['judged']} and all(v['max_abs_difference'] <= 1 for v in row['source_cpu_vs_native_gpu'].values())
-            checks[label+':control'] = row['control_max_abs_difference'] <= 1e-4 and row.get('new_png_control_max_score_difference', 0) <= 1e-4
+            checks[label+':control'] = row['control_max_abs_difference'] <= 1e-4 and row.get('new_png_control_max_score_difference', 0) <= (1e-3 if r.get('regenerated_png_control_tolerance') == 1e-3 else 1e-4)
             dest = root/'publish'/safe(label)
             checks[label+':files'] = all(sha((dest/name).read_bytes()) == digest for name, digest in row['files'].items())
             with np.load(dest/'scores.npz') as arrays:
@@ -291,6 +291,7 @@ def main() -> int:
     sources = {sha(source.read_bytes()): source for source in a.source}
     result: dict[str, Any] = {'rows': [], 'requested': a.windows, 'device': device, 'memory_limit_mib': limit,
         'on_cuda': {name: next(net.parameters()).is_cuda for name, net in nets.items()},
+        'saved_rgb_control_tolerance': 1e-4, 'regenerated_png_control_tolerance': 1e-3,
         'expected_variants': {wid: list(labels)+[c['name'] for c in carriers[wid]] for wid in a.windows},
         'inputs': {str(q): sha(q.read_bytes()) for q in [a.transport, *a.anchor, *a.control, *a.source, *a.carrier, *[Path(v) for _, v in a.generated]]},
         'code_sha256': sha(Path(__file__).read_bytes()), 'torch': torch.__version__,

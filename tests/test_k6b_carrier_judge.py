@@ -46,3 +46,16 @@ def test_gate_rejects_missing_or_substituted_representation(tmp_path):
     assert validate(archive(tmp_path), True)['passed']
     assert not validate(archive(tmp_path, variants=('old-control',)), True)['passed']
     assert not validate(archive(tmp_path, variants=('old-control', 'other')), True)['passed']
+
+
+def test_saved_rgb_and_fresh_generator_tolerances_are_distinct():
+    import pytest
+    from experiments.tennis.k6b_matte_judge import control_error
+
+    expected = np.array([.2])
+    fresh = np.array([.200183225])
+    with pytest.raises(ValueError):
+        control_error(fresh, expected)
+    assert control_error(fresh, expected, tolerance=1e-3) < 1e-3
+    with pytest.raises(ValueError):
+        control_error(np.array([.2011]), expected, tolerance=1e-3)

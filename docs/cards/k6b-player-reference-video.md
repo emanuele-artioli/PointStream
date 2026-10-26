@@ -317,3 +317,13 @@ checks carriersource against independentlyrecreatedCPUtruth and logsCPU/CUDA
 roundoff<=1level; decodedcarrierRGB/alpha hashesremain EXACT. Corrected
 smoke mustconfirmdiagnosis. NewdenseGPUreservation44.123715+600+600+550
 =1794.123715/1800s. PR242draft, noauto-merge untilterminalpilotoutcome.
+
+Pre-candidateoperationalamendment2026-10-26: PNGfreshre-render differs
+0.000183225onfirstAlscore while savedRGBmetricreplaypassed1e-4. Separate
+checks: savedRGB1e-4 UNCHANGED; freshFP16PNG1e-3, full160framecalibration
+requiredbeforeANYcandidatequality. Originalcrops have~.05meanRGB-level
+crossGPUdifference; weights/inputs/seeds/pipelineunchanged. Reportpairednew
+PNGdifferences and±1e-3sensitivity. Primarystrict3/4andfrozencourt/cohort/
+recipes remainunchanged. Seeexperimententryamendment, no further tolerance
+adjustmentsaftercandidatequality. Newbudgetinternalreservations useclosed
+denseactualcost947.011110s; combinedapproved16200s unchanged.

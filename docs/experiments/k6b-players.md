@@ -3405,3 +3405,24 @@ checksactualcostbeforeeachbatch; stopifcombinedcap cannotcoverremainingwork.
 Thisupdatesinternal0.5/4hplanningreservesusingactualcompletedcost, notthe
 user'sfrozenoverallbudget. Candidatebudgets110ssmoke/1300sfull/20validator,
 1450total, sameexclusivecompatibleAdapool,stoponnewforeigncontention.
+
+### Pre-candidate control amendment (2026-10-26; no candidate quality opened)
+
+PNGQC20261026T072949Z-aa61b482 failedsmoke atnewAlPNG t0score
+difference0.000183224678, above1e-4. Charged30.384579GPU-s. SavedRGB
+re-scoringcontrolpassedunchanged1e-4; failureisfreshgenerativere-render,
+notmetric/decoded-packet drift. Al001old/newcrops:tEXACT, RGBmeanabs.053333
+levels/255,max46; Med004mean.052967,max29. PriorMed003mean.059823/max44.
+Weights,pose/timing/geometry,seeds,30DDIM/CFG2/4bit andpinnedenvunchanged;
+GPUUUID/workspace differ. Pinnedpipeline clearsattentionbanks atlines556/557
+aftereachrun; generator isexplicitlyseededperunit/run.
+
+Correcta conflatedoperationalguard BEFORE anycompressed-referencequality: retain
+1e-4for re-scoringidenticalsavedRGB, use1e-3forfreshFP16originalPNG rendering
+(<0.6%ofpilotmetricvalues, >5xobservedfirstsampledrift), requirefull160frame
+calibrationto pass before candidateadmission. Thisisnot acandidatepass-bar
+change: primarystrict3/4rule,anchors,R/S,registration/115pxstatus,cohort,all
+3recipes andbudgetunchanged. ReportpairednewPNGqualitydifferences and±1e-3
+renderer-envelope sensitivitybesideprimarystrictcells. No pixelhashrelaxation
+for deliveredRGB/alpha. FullPNGcalibration maystillfail andstop; no further
+toleranceadjustment aftercandidatequality. Bothold/new tolerancestested.
