@@ -3428,3 +3428,15 @@ for deliveredRGB/alpha. FullPNGcalibration maystillfail andstop; no further
 toleranceadjustment aftercandidatequality. Bothold/new tolerancestested.
 
 FullPNGcalibration job `20261026T073722Z-4ec3f83c` source20a319b6 specSHA256`599a80a04a19b39020b999e6cb74d64798092ac6f451b2d943abcdc51e15a9ca`;350GPU-sreserve, distinct1e-4savedRGB/1e-3freshFP16checks, all160frames beforecandidatequality.
+
+FullPNGcalibration4ec3f83c FAILED240sfullruntimecap oncontendedGPU6,
+293.338359GPU-sadmitted; no tolerancefailure. Alcomplete80frameprefix
+PASSED(savedRGB1e-4,newPNGmax0.000587463<1e-3); Medunfinished. RetainAl
+completepointusingexplicitcompleted-prefixvalidation, defaultfullcollection
+validatorstillrejectspartialcollections andper-windowfullframecoverage never
+waived. CompleteONLYMed onexclusiveidleAda,45ssmoke/170sfull/15svalidator/
+250stotal. Combinedcalibrationmustcoverbothuniqueoriginalwindows/all160
+frameswithallgates beforeANYcompressed-referencequality. No newtolerance
+change or data replacement. Actualreference5758.944299s beforeMedQC;
+combinedterminal6705.955410/16200s. Admitfuturebatchesagainstactualcost,
+remainingworkforecast andfinaljudgingreserve, notunspentoldbudgets.

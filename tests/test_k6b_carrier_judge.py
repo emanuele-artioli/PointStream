@@ -59,3 +59,22 @@ def test_saved_rgb_and_fresh_generator_tolerances_are_distinct():
     assert control_error(fresh, expected, tolerance=1e-3) < 1e-3
     with pytest.raises(ValueError):
         control_error(np.array([.2011]), expected, tolerance=1e-3)
+
+
+def test_completed_prefix_does_not_waive_full_window_frame_coverage(tmp_path):
+    # Collection recovery is explicit; per-window evidence remains complete.
+    path = archive(tmp_path)
+    with tarfile.open(path) as t:
+        payload = {m.name: t.extractfile(m).read() for m in t if m.isfile()}
+    report = json.loads(payload['publish/carrier-judge.json'])
+    report['requested'] = list(PILOTS)
+    payload['publish/carrier-judge.json'] = json.dumps(report).encode()
+    with tarfile.open(path, 'w') as t:
+        for name, data in payload.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            t.addfile(info, io.BytesIO(data))
+    assert not validate(path, True)['passed']
+    checked = validate(path, True, allow_completed_prefix=True)
+    assert checked['passed'] and not checked['complete_requested_collection']
+    assert not validate(archive(tmp_path, judged=(0,)), True, allow_completed_prefix=True)['passed']

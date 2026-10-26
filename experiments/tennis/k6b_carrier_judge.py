@@ -215,14 +215,17 @@ def judge_window(wid: str, anchor: Path, old_control: Path, packets: Path,
     return row
 
 
-def validate(archive: Path, full: bool) -> dict[str, Any]:
+def validate(archive: Path, full: bool, *, allow_completed_prefix: bool = False) -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix='carrier-check-', dir='/tmp') as tmp:
         root = Path(tmp)
         with tarfile.open(archive) as tar:
             tar.extractall(root, filter='data')
         r = json.loads((root/'publish/carrier-judge.json').read_text())
+        completed = [w['id'] for w in r['rows']]
+        collection_complete = completed == r['requested']
+        collection_valid = collection_complete or (allow_completed_prefix and bool(completed) and completed == r['requested'][:len(completed)])
         checks = {'cuda': all(r['on_cuda'].values()), 'class': r['device']['class_matches'],
-            'memory': r['gpu_peak_gib']*1024 <= r['memory_limit_mib'], 'windows': [w['id'] for w in r['rows']] == r['requested']}
+            'memory': r['gpu_peak_gib']*1024 <= r['memory_limit_mib'], 'windows': collection_valid}
         for row in r['rows']:
             label = row['id']
             checks[label+':variants'] = row['variants'] == r['expected_variants'][label]
@@ -237,7 +240,7 @@ def validate(archive: Path, full: bool) -> dict[str, Any]:
                 checks[label+':scores'] = all(np.isfinite(arrays[m][:, row['judged']]).all() and
                     np.allclose(arrays[m][:, row['judged']].mean(1), [row['means'][v][m] for v in row['variants']], rtol=0, atol=1e-10)
                     for m in row['means'][row['variants'][0]])
-        return {'passed': all(checks.values()), 'checks': checks}
+        return {'passed': all(checks.values()), 'checks': checks, 'complete_requested_collection': collection_complete}
 
 
 def main() -> int:
