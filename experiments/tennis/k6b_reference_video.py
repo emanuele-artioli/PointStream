@@ -104,7 +104,7 @@ def rgb_yuv(rgb: np.ndarray, root: Path) -> tuple[Path, dict[str, Any]]:
     return out, rec
 
 
-def code_yuv(raw: Path, root: Path, n: int, w: int, h: int, crf: int, fps: int = 1, *,
+def code_yuv(raw: Path, root: Path, n: int, w: int, h: int, crf: int, fps: int | Fraction = 1, *,
              preset: int = 8, timeout: int = 100) -> dict[str, Any]:
     root.mkdir()
     rec = svtav1.code(raw, root, width=w, height=h, fps=Fraction(fps), frames=n,

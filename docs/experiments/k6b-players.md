@@ -3664,3 +3664,5 @@ Ada metrics only, exclusive/stop-on-contention, native bounded fleet waits.
 No new generation/fitting/reference change/segmenter inference/Wan-Animate,
 chats, parallel agents or recurring model monitors. Source uncertainty, granted
 background, exploratory115px and historicalstep5 failure remain explicit.
+
+Joint saved-render GPU job `20261026T122430Z-945020c3`, source`e0958ad2c27193af80ffe506c217708074e20d42`, specSHA256`bc9ad969b0b2fe024e3e4e5a393df97556742d6de69ff7ab8d5591d864c5b49c`;750s reservation of new1800s cap. Both original windows, four settings, all original source/R/S hashes and FULL saved-pixel controls. No generator is loaded.
