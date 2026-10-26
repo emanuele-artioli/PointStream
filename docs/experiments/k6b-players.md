@@ -3320,3 +3320,34 @@ all80framesbounds chunk4byshape. Retest4originaljudgedframes instead1,
 75ssmoke/480sfull/20svalidator/600stotal. Actualdense503.504413+failed
 141.266623+reserve600=1244.771036<1800s. NoGPUcapincrease, no curve
 quality/CRF/presetselectionchange. Preservefailedpartialmetricsseparately.
+
+2026-10-25T19:34UTC capacityaudit: Almissingf67eebcb PENDING, noallocation
+orcharge; pairedMed591cb699queuedexclusive. Currentsharedtimings1.6–1.8x
+originalexclusive would exceedfullmatrixbudget, so do notpromotefull
+comparisononcontendedGPUs. Requestedread-onlycapacity/ETAinformation from
+existingplanningchat01a16cfc-1a88-7013-bd79-8489fe7c1eb2 (userauthorized
+contact); explicitly nojobchanges/newchats/monitors. RetainqueuedIDs and
+nativeboundedwaits. GPUclass/cohort/recipe/budget unchanged.
+
+BoundedDISTS4 historicalAl job `20261025T193417Z-2387267a` source50d6d383 specSHA256`7c2e294e31c396487268a861c064aff8eea7cc4dfd2de4f3eda7fd9c3b33eace`;600GPU-sreserve,4framesmoke, all7actualcomplete240framecarrierpoints.
+
+Pre-new-reference-quality sanitycheck uses ONLY originalsavedquality with
+actualselectedpreset1bank/KPS/adaptercosts: all3families19/24counterfactual
+strictwins, including4/4pilotcells. Alrates5.232358–5.244651kbps, Med
+7.617872–7.640872kbps, exactdynamicmattegranted. This is NOT newgenerated
+quality, prooforbound forchangedconditioning; actualpilot stillneeded.
+Receipt/tmp/k6b-quality-p1-fixed-quality-sensitivity.json.
+Planningread-onlycapacityreply: all4AdaGPUsbusy; bulkloads have no fleet
+claims, humanowner/ETAunidentified. Nootherjobchanged. Existingexclusive
+requestsremainpending; native1100swaittimeoutconfirmedAlpending withno
+allocation. Onefurtherbounded2700sbatchwaitcoversbothqueueddeadlines.
+No recurringLLMmonitor/newchat created; optionaluserETAquestionpending.
+
+2026-10-26 user instructed keepqueued/noETA. Canonicalstatus nowconfirms
+20261025T191545Z-f67eebcb and20261025T192327Z-591cb699 EXPIREDwithout
+admission(remote_statusabsent),0GPU-s. Preservedoriginalrequests, no unknown
+replay. Allhostsaudited07:03UTC: gpu5bothAdaGPUsidle48,645MiBfree;gpu6busy.
+Publishfreshmissing-unitrequests,samefrozeninputs/caps,fullcompatiblegpu5/6
+pool and45minfreshdeadlines. Useexclusiveadmission/stoponnewforeigncontention
+to preservebudget; no automaticreplay. ExistingcompletedAl006/Med003 retained.
+CPU2647.198626/3600s andGPUknownterminal4901.949513/16200s unchanged.
