@@ -3508,3 +3508,5 @@ This is a resource projection, not a latency claim; native smoke rechecks
 correctness and memory. Original Med two-variant window took99.621seconds.
 Worst combined reservation14812.270558+800+550=16162.270558<16200. Stop on
 failed checks or inability to finish inside the total cap; no new budget.
+
+Affine Med004-only continuation job `20261026T091049Z-e429637f`, source`9db350ec0a6a50c3d9365c66de17c27d0541aaa1`, specSHA256`6d129b78640b02fec758ffbe7a8a55258d2195075c474b61752581d26e6d5d15`;800 GPU-second cap; retained003 is never replayed. Native partial proof and final two-archive manifest must pass before judging.
