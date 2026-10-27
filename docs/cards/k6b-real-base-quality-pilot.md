@@ -202,6 +202,7 @@ full terminal accounting and checks are at the end of the experiment entry.
 
 The resumed root's [prospective cost revision](k6b-real-base-cost-revision.md)
 proposes smoke240/full2600/validator120/residual60 within the same3020s remainder.
-It awaits human acceptance; this link does not amend the accepted reservation
-or authorize GPU execution. A fresh representative smoke and current job/worker
-reconciliation remain mandatory.
+The human accepted this allocation on2026-10-27 in the resumed root chat.
+It prospectively amends both prior full-stage ceilings to2600s within the
+unchanged3020s remainder. A fresh representative smoke and current job/worker
+reconciliation remain mandatory; no scientific or identity gate is relaxed.

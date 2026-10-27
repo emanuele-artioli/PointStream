@@ -5443,3 +5443,68 @@ exit codes0/0/1. At11:59 UTC, worker heartbeat timestamps were gpu2
 11:43:11 UTC and gpu3 11:43:05 UTC (about16min old); these files do not
 establish current worker health. No worker was changed or restarted. Canonical
 management-path recovery and current health checks remain pre-dispatch gates.
+
+### 2026-10-27 — Accepted cost allocation; execution preflight stopped at fleet health
+
+The human accepted the previous entry's allocation in the resumed root chat
+(annotation "Approved"):240s smoke,2600s full,120s smoke validator,60s residual
+overhead,3020s total against the unchanged3600s study cap. This prospectively
+amends both prior1800/2400 full-stage ceilings. It does not change the frozen
+hypothesis, competing explanations, cohort, controls, decision rules or delivery
+limitations. Prior580s conservative charge remains; no new GPU cost incurred.
+
+Prepared worker change: both projection checks now read the frozen request's
+`full.seconds` rather than a hard-coded1800; old saved1800 specifications keep
+that limit. The unchanged estimator retains35% worker inflation and40-fold
+publication scaling. Nonfinite or negative resource evidence cannot promote.
+Worker source SHA256
+`8378688259d9842ebf64fd219dd86b9347c5b8d4facd9d1bde703da13423d80d`.
+[Revised spec](../cards/k6b-real-base-quality-revised-spec.json) SHA256
+`33dac90ad8af7018cafc6057cd73fe36028eb27bd22f432fb7d084e266e03f9f`;
+only smoke/full/total allowances and deadline differ from the previous spec.
+Validator remains120s; all input/environment hashes and processing/quality
+arguments are identical. Deadline2026-10-27 16:00 UTC (17:00 Vienna); not
+submitted. Refresh an expired deadline prospectively before freezing a future
+request, preserving this allocation and all scientific gates.
+
+Canonical status succeeded for all three prior IDs:
+20261027T072713Z-2888cefe COMPLETE,20261027T074823Z-135421ee COMPLETE,
+20261027T080644Z-9dba0803 FAILED at the old cost gate. No request was replayed.
+Canonical compatible-host inspect timed out on gpu2/gpu3 at20s; worker status
+reported both heartbeats stale. Two bounded doctor checks then independently
+verified gpu2 but timed out on gpu3 at the unchanged20s threshold; neither
+passed the participating-host gate or ran the shared atomic claim check.
+Local doctor reports:
+`/private/tmp/pointstream-approved-doctor-20261027.json` and
+`/private/tmp/pointstream-approved-doctor-after-diagnostic-20261027.json`.
+The canonical dispatcher also retains local_report paths in those receipts.
+
+One read-only timing diagnostic per compatible host completed the same probe
+body through system Python, without the additional explicit login-shell
+wrapper, in28.250233s on gpu2 /36.020682s on gpu3. Tracing showed delays across
+NFS marker/path/claim access, executable discovery and version queries; no
+single cause was isolated. gpu2's ffmpeg version call hit its10s sub-timeout;
+gpu3's took8.10s. These extended diagnostics are not passing20s health gates.
+Their raw logs are `/private/tmp/pointstream-probe-profile-gpu{2,3}-20261027.log`.
+At the diagnostic snapshots, gpu2 had >43GiB free per A6000; gpu3 had23183MiB,
+below the declared20000+8192MiB shared allowance. This is observed busy capacity,
+not a fleet-wide outage or justification to omit a compatible host. Do not infer
+current worker health from old heartbeat records or restart live workers past
+the failed gate. Worker rollout and live-storage state remain untouched.
+
+Verification: configured ruff passes; configured mypy passes243 source files;
+16 focused projection/curve/compositing tests pass. Full local pytest has only
+the two known platform/sandbox failures: child inspection via ps denied, and
+Linux protected-storage symlink resolution unavailable on macOS. The former
+passes when rerun with permitted child-process inspection. No scientific GPU
+smoke was attempted; local tests are infrastructure evidence only. Linux CI
+remains the merge gate. Review found no metric, input, estimator, compositing,
+early-stop or quality-threshold change.
+
+**Stop/continuation:** no new fleet request, no uncertain submission, no timer,
+no new GPU charge. Resource/admission gate failed before dispatch; preserve the
+accepted plan and remaining3020s. Resolve management-path latency and compatible
+worker freshness before a fresh representative smoke and possible gated full.
+An independently audited full scientific result is still absent. The saved
+80/240 ticks, optimistic rate floor, absent native DCVC/ROI/ball integration,
+source/replay independence and development-data caveats remain unchanged.

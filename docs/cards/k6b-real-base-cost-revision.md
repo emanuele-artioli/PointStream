@@ -1,7 +1,10 @@
 # Real-background player study: prospective cost revision
 
-Status: proposed, awaiting human acceptance before GPU execution. This is a
-revision of the existing study, not a new experiment or a budget reset.
+Status: human accepted on 2026-10-27 in the resumed root chat (annotation
+"Approved"). This prospectively amends the full-stage reservation to2600s
+within the unchanged3020s remainder. A fresh passing smoke, current job/worker
+health and all original gates still precede GPU execution. This is a revision
+of the existing study, not a new experiment or a budget reset.
 
 ## Decision and reason
 
@@ -76,7 +79,7 @@ No generation, training, new methods, missing160 ticks, new baseline, ball
 inference or new footage is included. These are development windows, not
 independent confirmation. No complete two-baseline or submission-ready claim.
 
-## Execution preparation after acceptance
+## Accepted execution preparation
 
 1. Recheck the three known jobs through canonical fleet status and resolve any
    management-path failure before dispatch. Inspect unknown jobs, never replay.
@@ -86,8 +89,9 @@ independent confirmation. No complete two-baseline or submission-ready claim.
 2. Make the validator's full-reservation limit explicit from the frozen saved
    specification; verify that both projection checks use that same limit and
    reject nonfinite projections. Test rejection below and acceptance above the
-   saved 2448.314646-second estimate, and preserve the historical 1800-second
-   default for old specifications. No metric or estimator change is needed.
+   saved 2448.314646-second estimate, and preserve the historical1800-second
+   limit when that is what an old saved specification declares. No metric or
+   estimator change is needed.
 3. Derive a new specification from `k6b-real-base-quality-spec.json`, preserving
    all input/environment hashes and processing arguments. Set smoke240,
    full2600, validator120, budget3020 and a fresh absolute deadline. Freeze
@@ -113,3 +117,26 @@ training/reference/judge lineage audits. Only then can the final paper claims,
 manuscript completeness and TOMM submission requirements be assessed. If this
 study fails its scientific rule, report that negative result and decide the
 research direction before funding another method.
+
+## Execution preflight outcome — 2026-10-27
+
+The accepted allocation is recorded; the validator reads `full.seconds` from
+the frozen request's spec.json and records it in validation.json. Its estimator
+and scientific path are unchanged. Sixteen focused projection/curve/compositing
+tests and configured ruff/mypy pass. The [revised specification](k6b-real-base-quality-revised-spec.json)
+is prepared with a16:00 UTC deadline (17:00 Vienna). It was **not submitted**;
+if that deadline expires before fleet recovery, refresh it prospectively before
+freezing/submitting, with the same allocation and identities.
+
+Canonical status rechecked all three prior requests as COMPLETE/COMPLETE/FAILED.
+The compatible pool cannot pass admission: initial inspect timed out on both
+hosts; both subsequent doctor calls verified gpu2 but timed out on gpu3 at the
+unchanged20s limit. Worker status also reported stale gpu2/gpu3 heartbeats.
+Read-only extended timing diagnostics completed in28.25s/36.02s without the
+explicit login-shell wrapper and showed latency across shared-filesystem path
+and claim reads, executable discovery and tool-version calls. These are not
+passing health gates or qualification timings. gpu2's diagnostic showed enough
+free GPU memory for the declared shared margin; gpu3's did not. No worker was
+restarted, health check relaxed, compatible host omitted, or job submitted.
+The next action is to resolve the fleet-management latency and obtain fresh
+health evidence, then run this accepted study through its original gates.

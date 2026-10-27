@@ -271,16 +271,30 @@ def compare_curves(row: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def projection_checks(worker_seconds: float, publication_seconds: float,
+                      full_reservation_seconds: float) -> tuple[dict[str, bool], float]:
+    """Keep the frozen estimator, gated by this request's saved full allowance."""
+    projected = worker_seconds + 40 * publication_seconds * 1.35
+    valid = all(math.isfinite(value) and value >= 0 for value in
+                (worker_seconds, publication_seconds, full_reservation_seconds, projected))
+    return {
+        'projection_including_publication': valid and projected < full_reservation_seconds,
+        'projection_under_full_reservation': valid and worker_seconds < full_reservation_seconds,
+    }, projected
+
+
 def validate() -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     summary = json.loads((stage / 'quality-summary.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     smoke_wall = time.time() - dispatch['started']
     publication = max(0.0, smoke_wall - summary['seconds'])
-    projected_with_publication = summary['projected_full_seconds'] + 40 * publication * 1.35
-    checks = {'projection_including_publication': projected_with_publication < 1800, 'two_windows': len(summary['rows']) == 2, 'both_old_controls': len(summary['calibration']) == 2 and all(r['exact_control'] and r['prediction_control'] for r in summary['calibration']),
+    spec = json.loads((stage.parent / 'spec.json').read_text())
+    full_reservation_seconds = spec['full']['seconds']
+    cost_checks, projected_with_publication = projection_checks(
+        summary['projected_full_seconds'], publication, full_reservation_seconds)
+    checks = {**cost_checks, 'two_windows': len(summary['rows']) == 2, 'both_old_controls': len(summary['calibration']) == 2 and all(r['exact_control'] and r['prediction_control'] for r in summary['calibration']),
               'representative_two_ticks': summary['frames_per_window'] == 2,
-              'projection_under_full_reservation': summary['projected_full_seconds'] < 1800,
               'qualified_gpu': summary['device']['class_matches'], 'memory_within_limit': summary['peak_gpu_gib'] < 20}
     with tempfile.TemporaryDirectory(prefix='k6b-realbase-validator-') as d:
         root = Path(d)
@@ -293,7 +307,7 @@ def validate() -> None:
                 checks[row['id'] + ':ticks'] = scores['ticks'].tolist() == row['ticks'] and row['ticks'] == [0, 3]
             checks[row['id'] + ':rates'] = len(row['rates']) == 3 and all(r['total_kbps'] > r['base_kbps'] > 0 and r['bootstrap_bytes'] > 0 for r in row['rates'])
             checks[row['id'] + ':composites'] = len(row['composite_hashes']) == 2 and all(len(v) == 6 for v in row['composite_hashes'].values())
-    Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps({'passed': all(checks.values()), 'checks': checks, 'projected_full_seconds': summary['projected_full_seconds'], 'projected_with_publication': projected_with_publication}))
+    Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps({'passed': all(checks.values()), 'checks': checks, 'projected_full_seconds': summary['projected_full_seconds'], 'projected_with_publication': projected_with_publication, 'full_reservation_seconds': full_reservation_seconds}))
     if not all(checks.values()):
         raise SystemExit(1)
 
