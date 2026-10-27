@@ -25,6 +25,10 @@ At the frozen global scale4, base rate17.130833kbps + side floor5.607129kbps
 | Fixed-foreground LPIPS | 0.345875574 | 0.612627101 | win | undefined: no quality overlap |
 | Fixed-foreground DISTS | 0.252551242 | 0.453136982 | win | undefined: no quality overlap |
 
+Foreground distances are better at every rate within the measured common
+rate interval15.804629–33.685000kbps; their quality ranges do not overlap,
+so no foreground BD-rate is reported and no extrapolation is used.
+
 All four central decisions survive the fixed+/-0.001 sensitivity. Both full
 metrics lose in the first window, so even two Med wins would allow at most2/4,
 below the required3/4. The full-frame AND foreground rule therefore FAILS.
