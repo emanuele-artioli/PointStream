@@ -22,6 +22,7 @@ def local(tmp_path, monkeypatch):
     root = tmp_path / "local" / "pointstream"
     root.parent.mkdir()
     monkeypatch.setenv(staging.LOCAL_ROOT_ENV, str(root))
+    monkeypatch.setattr(staging, "system_disk", lambda path: False)
     # Hosts' real free space varies; only the reserve tests constrain it.
     monkeypatch.setattr(staging, "available_bytes", lambda path: 2**50)
     return root
@@ -142,8 +143,13 @@ def stage_job(directory: Path, data: Path, work: str) -> None:
 
 
 def test_campaign_stages_inputs_and_publishes_scratch_once(campaign, local):
+    validator = campaign / "source" / "validate.py"
+    validator.write_text(validator.read_text() + "\nassert pathlib.Path(os.environ['TMPDIR']).is_dir()\n")
     stage_job(campaign, campaign.parents[3], '''import json,os,pathlib,sys
 clip=pathlib.Path(sys.argv[2]).read_bytes()
+import tempfile
+with tempfile.NamedTemporaryFile() as f:
+    assert pathlib.Path(f.name).parent == pathlib.Path(os.environ['TMPDIR'])
 scratch=pathlib.Path(os.environ['PS_SCRATCH_DIR'])
 (scratch/'publish').mkdir()
 (scratch/'publish'/'frames.txt').write_bytes(clip)
@@ -256,12 +262,36 @@ def test_ram_backed_root_always_leaves_the_memory_margin(tmp_path, monkeypatch):
 
 
 def test_root_falls_back_to_ram_and_never_adopts_a_foreign_directory(tmp_path, monkeypatch):
+    monkeypatch.setattr(staging, "system_disk", lambda path: False)
     shm = tmp_path / "shm"
     shm.mkdir()
     monkeypatch.setattr(staging, "_candidates", lambda: [tmp_path / "no-admin-dir" / "pointstream", shm / "me-pointstream"])
     assert staging.local_root() == shm / "me-pointstream"
     monkeypatch.setattr(staging.os, "getuid", lambda: -1)
     assert staging.local_root() is None
+
+
+def test_configured_root_disk_is_rejected_before_directory_creation(tmp_path, monkeypatch):
+    root = tmp_path / "pointstream"
+    monkeypatch.setenv(staging.LOCAL_ROOT_ENV, str(root))
+    monkeypatch.setattr(staging, "system_disk", lambda path: True)
+    with pytest.raises(staging.StagingError, match="system disk"):
+        staging.local_root()
+    assert not root.exists()
+
+
+def test_library_temporaries_survive_scratch_publication(tmp_path, monkeypatch):
+    monkeypatch.setenv("TMPDIR", "/var/tmp/old-default")
+    output = tmp_path / "job" / "smoke"
+    output.mkdir(parents=True)
+    env = staging.temporary_environment(tmp_path / "local", output)
+    assert env["TMPDIR"] == env["TEMP"] == env["TMP"]
+    assert Path(env["TMPDIR"]).is_dir()
+    assert Path(env["PYTHONPYCACHEPREFIX"]).is_dir()
+    assert not Path(env["TMPDIR"]).is_relative_to(output / "scratch")
+    staging.release_temporaries(env)
+    assert not Path(env["TMPDIR"]).exists()
+    assert Path(env["PYTHONPYCACHEPREFIX"]).is_dir()
 
 
 @pytest.mark.parametrize("declared", [False, True])

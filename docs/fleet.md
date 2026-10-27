@@ -255,7 +255,7 @@ Do per-file work locally and move bytes over NFS in a few large files.
   archive has a new identity, which jobs must declare.
 
 The local root is `PS_LOCAL_ROOT`, else `/local/users/$USER/pointstream` (disk;
-present only on gpu6; an administrator creates it), else
+administrator-provisioned on all six hosts, 2026-10-27), else
 `/dev/shm/$USER-pointstream` (RAM, 188–504 GB free on every host). A disk root
 keeps 50 GiB free. A RAM root always leaves at least 25% of RAM, and never less than
 64 GiB, available to everyone. systemd's default `RemoveIPC=yes` deletes a user's
@@ -266,6 +266,16 @@ and never synchronized between hosts. The first use on a host pays the NFS read
 (16–93 MB/s measured), and staging time counts against the stage budget. Nothing
 evicts cache entries automatically; delete `cache/<sha256>` directories (restore
 write permission on extracted trees first) to release space.
+
+Linux root-filesystem staging is refused, including `PS_LOCAL_ROOT` overrides
+and symlinks that resolve there. The servers' 100 GB root partitions must not
+hold large files under `/tmp` or `/var/tmp`. Each stage sets `TMPDIR`, `TMP`
+and `TEMP` outside its published scratch so validators can also use them;
+successful stages remove those temporaries and failed stages retain them.
+`PYTHONPYCACHEPREFIX` uses a reusable cache on the same safe storage.
+Manual commands, environment builds and editor installation must follow the
+same policy; check `df -h / /local/users/$USER` first. Existing compatibility
+symlinks are relocation records, not permission to create new root-disk files.
 
 The validator sees the smoke directory and must exit zero and write
 `{"passed": true, "checks": ...}` to `PS_VALIDATION_PATH`, with nonempty substantive
@@ -558,3 +568,8 @@ decode in the job that encoded it (`g5.code_dcvc` does); never decode a
 stored stream in a later job, on any host; to rescore, re-encode with the
 stored checkpoint and score that pair (`g5c.py checks`). The paper states
 it as a deployment limit of every DCVC-UF arm.
+
+The [2026-10-27 storage recovery](storage-maintenance-2026-10-27.md) records
+migration journals, fresh-shell checks, protected live files and the remaining
+gpu5/gpu6 live-path approval restriction. The shared startup script is maintained
+at `env/bootstrap-hostlocal.sh`; runtime aliases must be prepared before installation.

@@ -48,11 +48,20 @@ Notify only meaningful changes; persist state before waiting (user, 2026-10-24).
 
 ## Shared home is slow NFS
 
+The GPU servers' root disks are only 100 GB. Never place datasets, extracted
+archives, environments, editor servers, Python caches or experiment scratch in
+`/tmp` or `/var/tmp`. Use `/local/users/emanuele` (provisioned on every GPU
+server, 2026-10-27), with `PS_LOCAL_ROOT=/local/users/emanuele/pointstream`,
+or budgeted `/dev/shm`. Set `TMPDIR`, `TMP`, `TEMP` and Python cache locations
+there for manual tools too. Verify the destination is a separate filesystem
+and has space before copying. Preserve live processes, saved evidence and
+legacy paths when relocating files; never remove another user's files.
+
 ~200 ms per small-file create, 11–17 ms per open, minutes for a cold
 `import torch`. Never do per-file work on it. In fleet jobs, write intermediates
 to `PS_SCRATCH_DIR`, pass large or many-file inputs as SHA256-identified archives
 in `staged_inputs`, and run from a packed `environment`. Outside the fleet, keep
-caches and scratch in `/tmp` or `/dev/shm`. Datasets of many small files are
+caches and scratch in `/local/users/emanuele` or budgeted `/dev/shm`. Datasets of many small files are
 stored and moved as archives.
 
 ## First run of a model on a GPU class
