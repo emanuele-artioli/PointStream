@@ -5397,3 +5397,41 @@ independence remains unresolved, and the115px threshold stays exploratory.
 Local checks: ruff and mypy passed; final pytest897 passed,25 skipped and two
 known platform/sandbox failures (process suspension permission and Linux-only
 protected-storage symlink resolution). Linux CI remains the merge gate.
+
+### 2026-10-27 — Resumed root: prospective real-base allocation only
+
+Read the merged PR254 continuation, governing card, native worker, saved smoke
+validation and fleet enforcement before proposing further work. No scientific
+scores were selected or accepted. The current worker's two projection gates
+hard-code1800s; changing only the fleet specification would leave them failing.
+The fleet validates smoke only, so a successful full process also needs an
+independent post-publication audit. Preserve its unchanged conservative cost
+estimator rather than claim an unmeasured computational optimization.
+
+[Proposed revision](../cards/k6b-real-base-cost-revision.md): fresh smoke240s,
+full2600s, smoke validator120s and residual admitted overhead60s =3020s.
+Prior580s conservative charge stays, total ceiling3600s unchanged. Historical
+2448.314646s publication-inclusive forecast is151.685354s below the proposed
+full gate, already including the original safety multipliers. It is planning
+support only; a fresh smoke on the admitted host must qualify the complete
+unchanged test. The full2600s is43m20s, below the45min stage limit, but exceeds
+both the last1800s reservation and the initial2400s card ceiling. Human
+acceptance must explicitly amend these before any GPU execution. The proposal
+includes the narrow validator change, exact specification derivation, remaining-
+budget gate, independent result audit and subsequent paper dependencies.
+
+Hypothesis, competing explanations, cohort,80-tick membership, original controls,
+central scale4,scale8/2 curves, decision thresholds and optimistic-floor limits
+remain frozen. No new model, generation, fitting, ball, DCVC, ROI or full240
+semantic profile is authorized. No new job or monitor was created; no previous
+request was replayed. No additional GPU time has been charged.
+
+Live-state reconciliation attempted through canonical fleet status: the default
+management path on gpu1 timed out after120s. Earlier sandboxed attempts could
+not resolve its hostname; the network-enabled attempt reached the120s command
+limit. This is a management-path limitation, not proof that the three recorded
+terminal jobs changed state, or that compatible gpu2/gpu3 are unavailable.
+Last verified states remain the PR254 closure:20261027T072713Z-2888cefe COMPLETE,
+20261027T074823Z-135421ee COMPLETE,20261027T080644Z-9dba0803 FAILED cost gate.
+Resolve current shared-inbox and worker health before dispatch; do not bypass
+the rollout health gate. This CPU-only planning stage needs no remote workload.
