@@ -5642,3 +5642,43 @@ unchanged. Deadline is prospectively20:00 UTC (21:00 Vienna). Before creating
 the replacement, confirm the old request terminal and its task processes gone,
 freeze the new spec/source, and refresh the reviewed controller. The budget
 identity is700+2900=3600s, no additional GPU authority requested or assumed.
+
+### 2026-10-27 — Published replacement request, original cap retained
+
+Job **20261027T180347Z-0f65e6f6** is published, receipt pending admission.
+Source04ca05a759721bf6c3f12edce061117b51c35eb3, source archive SHA256
+9acaa6744b675f06c2575d8fdaa0b54ccbf79829d034f8d9a54559010d2bc831;
+normalized spec e8037a46de91510519125c893f8b259bf6fdecc218d11a68f751460971b2a042.
+Selected source closure src/experiments/pyproject.toml, no local patches.
+Compatible pool gpu2/gpu3, same scientific inputs and judging worker.
+Deadline2026-10-27T20:00:00Z; smoke120/full2600/validator120/overhead60,
+maximum2900s. Prior conservative charge700/3600s. Earlier setup request
+20261027T165235Z-f58a59af is CANCELLED before any scientific stage, charged120s.
+Inspect the new exact ID after lost connectivity; never replay publication.
+Native bounded wait: ps-fleet wait20261027T180347Z-0f65e6f6 --max-seconds2700
+(with normal spaces between CLI arguments). Canonical status is being read;
+no admission, smoke promotion or scientific outcome assumed from the receipt.
+
+### 2026-10-27 — Import-only failure and corrected source closure
+
+Canonical job20261027T180347Z-0f65e6f6 FAILED: smoke command0.467340s,
+ModuleNotFoundError: tools, before run(), CUDA construction, frame reading or
+scoring. The root selected src/experiments/pyproject.toml but omitted the
+transitive tools.datasets imports; this was a source-packaging mistake.
+Full never launched, no scientific controls or quality accepted. Admitted
+1793124294.5443547–1793124335.8873034 =41.342949s; salvage0.168807s.
+Conservatively charge60s: cumulative760/3600s, remaining2840s. Preserve
+all original artifacts and failed scratch. Foreign GPU process177484 untouched.
+
+Recovery includes the tools source subtree and CPU-only import preflight in
+the exact packed runtime, GPU hidden. No scientific implementation or input
+changes. Prospective smoke120/full2550/validator120/overhead50 =2840s,
+all below accepted ceilings. Prior full projected2448.314646s fits2550;
+the unchanged35%/40x projection and source/control/quality gates must pass
+afresh. No scored-data failure is retried. Deadline remains20:00 UTC.
+
+CPU preflight of corrected src/experiments/tools/pyproject.toml archive passed
+in the exact packed Python3.12.14 on gpu2 with CUDA hidden: eighteen module
+imports including transitive dataset helpers,0.517225s, no stderr. Judging
+worker SHA256 remains8378688259d9842ebf64fd219dd86b9347c5b8d4facd9d1bde703da13423d80d.
+Receipt: /local/users/emanuele/pointstream/preflight-real-base-closure-20261027/import-result.json.

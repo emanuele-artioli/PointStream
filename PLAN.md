@@ -52,30 +52,17 @@ conversion is validated and original controls passed in the smoke; the full
 quality run never launched because its projected 2448.315 s including
 publication exceeded the frozen 1800 s stage reservation. This is a cost stop,
 not a quality failure. No scientific quality result or BD-rate is accepted.
-The 3600 GPU-second study has conservatively spent **580 s**, leaving **3020 s**;
-that remainder does not authorize bypassing the failed gate. Prepare a CPU-only
-prospective cost/staging revision, keeping the cohort, global scale4 operating
-point, quality rules and total cap unchanged. Record acceptance of the revised plan
-before further GPU execution; do not reopen closed earlier budgets. The
-[actual-base card](docs/cards/k6b-real-base-quality-pilot.md) and its final report
-in [the player experiment record](docs/experiments/k6b-players.md) govern scope.
-
-The resumed root prepared a [prospective allocation revision](docs/cards/k6b-real-base-cost-revision.md):
-240 s fresh smoke +2600 s full +120 s validator +60 s residual overhead,
-within the unchanged3020 s remainder. The human accepted it on2026-10-27.
-The validator now reads the frozen request's full reservation; the revised
-[specification](docs/cards/k6b-real-base-quality-revised-spec.json) retains all
-input/environment identities and quality settings. Request
-`20261027T165235Z-f58a59af` is being published; inspect it, never replay.
-Canonical status confirms the three old terminal jobs. The infrastructure
-repair [PR #257](https://github.com/emanuele-artioli/PointStream/pull/257) is merged
-with CI passing; compatible gpu2/gpu3 workers were refreshed and their heartbeats
-verified fresh. The [recovery report](docs/fleet-health-recovery-2026-10-27.md)
-records the prospective60s infrastructure deadline and all required checks.
-The approved request `20261027T165235Z-f58a59af` is allocated; publication
-receipt is pending. Source89136561 and normalized spec cce9ccc1 are frozen in
-the experiment entry. Retain580/3600s prior charge; add actual new admission
-once confirmed. No scientific result is accepted yet.
+The original3600 GPU-second cap remains. Conservative charges are now
+**760s**, including120s for cancelled setup request20261027T165235Z-f58a59af and60s for the import-only failure
+(no scientific stage ran). The human accepted the same-budget allocation.
+Replacement **20261027T180347Z-0f65e6f6** failed before scoring because the
+selected source omitted tools. Charge60s conservatively; corrected source
+closure is undergoing CPU-only imports before a fresh request, deadline20:00 UTC. Its remaining2840s cover
+smoke120/full2550/validator120/overhead50. Inspect terminal IDs, never replay.
+The [actual-base card](docs/cards/k6b-real-base-quality-pilot.md) governs the
+unchanged scientific gates. The [recovery report](docs/fleet-health-recovery-2026-10-27.md)
+and latest [experiment entry](docs/experiments/k6b-players.md) preserve deployment
+and input identities. No new scientific quality result is accepted yet.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as

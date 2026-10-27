@@ -1,19 +1,13 @@
 # PointStream continuation after root-chat archive — 2026-10-27
 
-Resumed root update: CPU-only allocation proposal is now recorded in
-[the cost revision](cards/k6b-real-base-cost-revision.md), with its state in
-PLAN.md and the appended experiment entry. The human accepted its allocation
-on2026-10-27; execution still requires a fresh smoke and current fleet health.
-The original terminal research state and580/3600 conservative ledger below
-are unchanged. Canonical status now confirms all three terminal states.
-Execution preparation was merged in PR #256. The user then instructed the root
-to proceed. Fleet repair PR #257 is merged with CI passing; compatible gpu2/gpu3
-workers were refreshed and verified fresh. `codex/real-base-approved-run` is
-publishing request20261027T165235Z-f58a59af, with deadline18:00 UTC and the
-complete compatible pool retained. Source89136561/spec cce9ccc1 are frozen;
-inspect this ID after a lost receipt, never replay it. Read the latest experiment
-entry and recovery report for deployment identities, then the new job ledger
-before acting. Do not replay any previous request.
+Current root update:20261027T180347Z-0f65e6f6 FAILED before scoring because
+the selected source omitted tools. Its full stage never launched. Charge60s
+conservatively, cumulative760/3600s. Earlier setup20261027T165235Z-f58a59af
+is CANCELLED, charged120s. Corrected source closure is undergoing CPU-only
+imports before a fresh request. Remaining2840s: smoke120/full2550/validator120/
+overhead50, deadline20:00 UTC. Read the latest experiment entry before acting.
+Historical580s figures below describe the original stop only. No replacement
+scientific quality result accepted. Preserve terminal requests, never replay.
 
 ## Goal and current decision
 
