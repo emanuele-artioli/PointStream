@@ -677,10 +677,12 @@ def campaign(directory: Path) -> int:
                 staging.restore_checkpoint(resumed_from["checkpoint"], scratch / "checkpoint")
             packed = staging.stage_environment(spec["environment"], local_root) if spec.get("environment") else None
             python = packed["python"] if packed else sys.executable
+            temporary_env = staging.temporary_environment(local_root, output)
             staging_record: dict[str, Any] = {
                 "local_root": str(local_root) if local_root else None, "inputs": staged, "environment": packed,
                 "scratch": str(scratch), "attempt": attempt,
                 "restored_checkpoint": resumed_from["checkpoint"] if resumed_from else None,
+                "temporary_environment": temporary_env,
             }
             monitor.write_json(output / "staging.json", staging_record)
             command = phase_command(spec, stage, staged, python)
@@ -688,6 +690,7 @@ def campaign(directory: Path) -> int:
                 **os.environ, "PS_STAGE": stage, "PS_STAGE_DIR": str(output), "PS_SCRATCH_DIR": str(scratch),
                 "PS_CHECKPOINT_DIR": str(scratch / "checkpoint"), "PS_ATTEMPT": str(attempt),
                 "PS_VALIDATION_PATH": str(directory / "validation.json"),
+                **temporary_env,
             }
             if packed:
                 env.update(PATH=os.pathsep.join([packed["bin"], env.get("PATH", "")]), CONDA_PREFIX=packed["prefix"])
@@ -729,6 +732,7 @@ def campaign(directory: Path) -> int:
                 if checked or validation.get("passed") is not True or not validation.get("checks"):
                     raise fleet.FleetError("smoke validator must exit zero and publish passed:true with substantive checks")
                 monitor.write_json(directory / "gate.json", {"passed": True, "spec_sha256": digest(spec), "source_sha256": code_identity, "inputs": spec["inputs"], "validation": validation, "validator_seconds": time.time() - validator_started, "smoke_seconds": time.time() - started, "remaining_seconds": budget_end - time.time(), "attempt": attempt})
+            staging.release_temporaries(env)
         return 0
     except Exception as exc:
         monitor.write_json(directory / "campaign-error.json", {"error": str(exc), "updated": time.time()})

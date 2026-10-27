@@ -43,8 +43,7 @@ def _candidates() -> list[Path]:
     if configured:
         return [Path(configured)]
     user = getpass.getuser()
-    # /local/users/<user> exists only where an administrator created it (gpu6 on
-    # 2026-10-05); every host has a large RAM-backed /dev/shm.
+    # Administrators provisioned this directory on all six hosts (2026-10-27).
     return [Path("/local/users") / user / "pointstream", Path("/dev/shm") / f"{user}-pointstream"]
 
 
@@ -60,11 +59,39 @@ def local_root() -> Path | None:
         parent = root if root.is_dir() else root.parent
         if not parent.is_dir() or not os.access(parent, os.W_OK | os.X_OK):
             continue
+        if system_disk(parent):
+            if os.environ.get(LOCAL_ROOT_ENV):
+                raise StagingError(f"{LOCAL_ROOT_ENV} must not use the system disk: {root}; use /local/users/$USER/pointstream")
+            continue
         root.mkdir(mode=0o700, exist_ok=True)
         # /dev/shm is world-writable: never use a directory someone else created.
         if root.stat().st_uid == os.getuid():
             return root
     return None
+
+
+def system_disk(path: Path) -> bool:
+    """Reject Linux root-disk staging, including aliases and symlinks to it."""
+    return Path("/proc/mounts").exists() and path.stat().st_dev == Path("/").stat().st_dev
+
+
+def temporary_environment(root: Path | None, output: Path) -> dict[str, str]:
+    """Keep implicit library temporaries and bytecode off the system disk.
+
+    This lives outside scratch because validators run after scratch publication.
+    Failed runs retain these files alongside their other recoverable state.
+    """
+    base = root / "temporary" / output.parent.name / output.name if root else output / "temporary"
+    temporary = base / f"tmp-{uuid.uuid4().hex}"
+    bytecode = (root if root else output) / "python-cache"
+    temporary.mkdir(parents=True, exist_ok=True, mode=0o700)
+    bytecode.mkdir(parents=True, exist_ok=True, mode=0o700)
+    return {"TMPDIR": str(temporary), "TMP": str(temporary), "TEMP": str(temporary), "PYTHONPYCACHEPREFIX": str(bytecode)}
+
+
+def release_temporaries(env: dict[str, str]) -> None:
+    """Remove successful stage temporaries, keeping the reusable bytecode cache."""
+    shutil.rmtree(Path(env["TMPDIR"]))
 
 
 def ram_backed(path: Path) -> bool:

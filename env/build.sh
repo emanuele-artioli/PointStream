@@ -37,6 +37,12 @@ declare -A GENCODE=(
 )
 
 case "$ROOT" in /home/*) echo "ROOT must be host-local, not the NFS home: $ROOT" >&2; exit 2;; esac
+PS_BUILD_PARENT=$ROOT
+while [ ! -e "$PS_BUILD_PARENT" ]; do PS_BUILD_PARENT=$(dirname "$PS_BUILD_PARENT"); done
+if [ "$(stat -c %d "$PS_BUILD_PARENT")" = "$(stat -c %d /)" ]; then
+  echo "ROOT must be on a separate local disk, not /tmp or /var/tmp: use /local/users/$USER/envs" >&2
+  exit 2
+fi
 STEPS=(runtime build dcvc locks)
 case " ${STEPS[*]} " in *" $FIRST "*) ;; *) echo "unknown step $FIRST" >&2; exit 2;; esac
 run_step() {  # run_step NAME: true when NAME is FIRST or comes after it
@@ -53,6 +59,8 @@ if [ "$FIRST" = runtime ]; then
 fi
 mkdir -p "$ROOT" "$WORK" "$LOCKS"
 export CONDA_CHANNEL_PRIORITY=strict CONDA_PKGS_DIRS=$ROOT/conda-pkgs PIP_CACHE_DIR=$ROOT/pip-cache PIP_DISABLE_PIP_VERSION_CHECK=1
+mkdir -p "$ROOT/tmp"
+export TMPDIR=$ROOT/tmp TMP=$ROOT/tmp TEMP=$ROOT/tmp PYTHONPYCACHEPREFIX=$ROOT/python-cache
 log() { printf '\n== %s %s\n' "$(date -u +%H:%M:%S)" "$*"; }
 
 cd "$REPO"   # environment.yaml refers to env/requirements.txt relative to the repository
