@@ -5249,3 +5249,15 @@ and per-frame identities and a projected full budget including publication.
 Smoke <=120 s, full <=360 s, validator <=60 s and whole admission <=600 s;
 manager remaining-budget and measured smoke projection must both pass. Resource
 cost of the diagnostic counts toward the unchanged 3600 s study cap.
+The first conversion-spec submission was rejected locally before any job was
+created because `contention.policy=continue` lacked its required explicit
+basis; no GPU was consumed. The corrected specification states that exact
+conversion hashes and pixel differences do not depend on foreign-work timing.
+Corrected submission lost its client receipt. Fleet inspection found the same
+request as **20261027T074823Z-135421ee**, saved `ready.json` git commit
+`146f06ee628ba00fc84495d0471a89afc649d542`, normalized spec SHA256
+`b1518eb8b407fb1d235daf3a96ac70cf5f110134166305d63fa57a2818e322e6`, source
+SHA256 `24ca46c5954c64b96a34203772b099772880b069e0400b387e4cc23f43f84aea`,
+600 s admission cap and 08:25 UTC deadline. The saved spec identifies the
+native RGB diagnostic and pinned inputs. No replay; inspect this ID. At
+identity discovery it was pending, with no confirmed GPU time yet.

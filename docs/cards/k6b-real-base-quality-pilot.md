@@ -123,3 +123,8 @@ No quality metrics are accepted in this diagnostic. Stop on any failed identity,
 resource gate or control; full hybrid judging may resume only with exact source,
 base conversion and original granted-mask/SAM control validation and sufficient
 remaining original budget. No generation, new weights, ball or DCVC.
+
+Conversion diagnostic submitted as `20261027T074823Z-135421ee`, identified
+from the saved spec/ready record after the client receipt was lost. Pending
+at discovery; inspect this ID and do not replay. Total reservation <=600 s,
+charged against original 3600 s. Frozen worker source revision `146f06ee`.
