@@ -39,7 +39,11 @@ scripts/ps-fleet events JOB_ID
 scripts/ps-fleet cancel JOB_ID
 ```
 
-The default hosts are gpu1–gpu6. `doctor` verifies each host's environment,
+The default hosts are gpu1–gpu6. Remote environment probes have a60-second
+wall deadline, matching worker-local probes; every required check must still
+complete. Independent metadata queries overlap, and SSH connections expire
+after120idle seconds. See [health recovery](fleet-health-recovery-2026-10-27.md).
+`doctor` verifies each host's environment,
 cross-host visibility of a fresh token, and exactly one winner of concurrent
 atomic mkdir. It retains its report under `jobs/fleet/checks`; worker startup is
 blocked when these checks fail. `workers start` installs a HEAD snapshot once on

@@ -171,14 +171,15 @@ def read_json_safe(path: Path, default: Any = None) -> Any:
 
 
 def get_process_start_time(pid: int) -> float | None:
-    """Return process start time for local PID if available."""
+    """Return Linux's stable process birth time, not the proc inode's mtime."""
     if pid <= 0:
         return None
     try:
-        proc_stat = Path(f"/proc/{pid}")
-        if proc_stat.exists():
-            return proc_stat.stat().st_mtime
-    except (OSError, ValueError):
+        fields = Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()
+        boot = next(int(line.split()[1]) for line in Path('/proc/stat').read_text().splitlines()
+                    if line.startswith('btime '))
+        return boot + int(fields[19]) / os.sysconf('SC_CLK_TCK')
+    except (OSError, ValueError, IndexError, StopIteration):
         pass
     return None
 
@@ -205,9 +206,12 @@ def is_pid_alive(pid: int, expected_start_time: float | None = None) -> bool:
 
     if expected_start_time is not None:
         cur_start = get_process_start_time(pid)
-        if cur_start is not None and abs(cur_start - expected_start_time) > 2.0:
+        if cur_start is not None and cur_start - expected_start_time > 2.0:
             # Process start time does not match: PID was recycled
             return False
+        # Legacy records used a lazily materialized /proc inode's mtime, which
+        # may be later than birth. Protect that live process. A recycled PID
+        # necessarily starts after the saved record, so it is still rejected.
 
     return True
 

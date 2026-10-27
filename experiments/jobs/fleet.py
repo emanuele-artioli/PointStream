@@ -43,8 +43,12 @@ class FleetError(RuntimeError):
 
 def _ssh(host: str, remote_argv: list[str], *, timeout: float = 30) -> subprocess.CompletedProcess[str]:
     """Run one noninteractive SSH command and return text output."""
+    controls = DEFAULT_STATE_DIR / "ssh"
+    controls.mkdir(parents=True, exist_ok=True, mode=0o700)
     return subprocess.run(
-        ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(remote_argv)],
+        ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8",
+         "-o", "ControlMaster=auto", "-o", "ControlPersist=120",
+         "-o", f"ControlPath={controls}/%C", host, shlex.join(remote_argv)],
         check=False,
         capture_output=True,
         text=True,
@@ -52,13 +56,33 @@ def _ssh(host: str, remote_argv: list[str], *, timeout: float = 30) -> subproces
     )
 
 
-def _probe_script(remote_python: str) -> str:
-    return f"""set -eu
-exec {shlex.quote(remote_python)} -c {shlex.quote(_PROBE_PYTHON)}
-"""
-
-
 _PROBE_PYTHON = r'''import json, math, os, pathlib, shutil, subprocess
+from concurrent.futures import ThreadPoolExecutor
+# Independent metadata lookups overlap the live resource checks. Retain every
+# check and timeout; slow NFS PATH entries must not serialize four searches.
+def tool_record(name):
+    path = shutil.which(name)
+    record = None
+    if path and name != "codex":
+        try:
+            version = subprocess.run([path, "-version" if name == "ffmpeg" else "--version"], capture_output=True, text=True, timeout=10, check=False)
+            record = {"path": path, "version": (version.stdout or version.stderr).splitlines()[:3], "returncode": version.returncode}
+        except (OSError, subprocess.SubprocessError) as exc:
+            record = {"path": path, "version_error": str(exc)}
+    return path, record
+def python_record():
+    path = os.path.expanduser("~/.conda/envs/pointstream/bin/python")
+    available = os.path.isfile(path) and os.access(path, os.X_OK)
+    value = None
+    if os.path.isfile(path):
+        try:
+            version = subprocess.run([path, "--version"], capture_output=True, text=True, timeout=10, check=False)
+            value = (version.stdout or version.stderr).strip()
+        except (OSError, subprocess.SubprocessError): pass
+    return path, available, value
+metadata = ThreadPoolExecutor(max_workers=5)
+tool_futures = {name: metadata.submit(tool_record, name) for name in ("ffmpeg", "vvencapp", "vvdecapp", "codex")}
+python_future = metadata.submit(python_record)
 def query(args):
     p = subprocess.run(["nvidia-smi", *args], check=True, capture_output=True, text=True, timeout=12)
     return p.stdout.strip().splitlines()
@@ -130,32 +154,24 @@ try:
         gpu["pointstream_shared_claims"] = shared
 except (OSError, ValueError, KeyError, TypeError) as exc:
     print(json.dumps({"probe_error": "resource-claim path could not be checked: " + str(exc)})); raise SystemExit(0)
-env_python = os.path.expanduser("~/.conda/envs/pointstream/bin/python")
-tools = {name: shutil.which(name) for name in ("ffmpeg", "vvencapp", "vvdecapp", "codex")}
+tools = {}
 tool_versions = {}
-for name in ("ffmpeg", "vvencapp", "vvdecapp"):
-    path = tools[name]
-    if path:
-        try:
-            version = subprocess.run([path, "-version" if name == "ffmpeg" else "--version"], capture_output=True, text=True, timeout=10, check=False)
-            tool_versions[name] = {"path": path, "version": (version.stdout or version.stderr).splitlines()[:3], "returncode": version.returncode}
-        except (OSError, subprocess.SubprocessError) as exc:
-            tool_versions[name] = {"path": path, "version_error": str(exc)}
-python_version = None
-if os.path.isfile(env_python):
-    try:
-        version = subprocess.run([env_python, "--version"], capture_output=True, text=True, timeout=10, check=False)
-        python_version = (version.stdout or version.stderr).strip()
-    except (OSError, subprocess.SubprocessError): pass
-print(json.dumps({"host": __import__("socket").getfqdn(), "gpus": gpus, "cpu_capacity": capacity, "load1": load1, "cpu_headroom": max(0, math.floor(capacity - load1)), "data_root": data, "data_root_available": os.path.isdir(data) and os.access(data, os.W_OK), "python": env_python, "python_available": os.path.isfile(env_python) and os.access(env_python, os.X_OK), "python_version": python_version, "tools": tools, "tool_versions": tool_versions}))'''
+for name, future in tool_futures.items():
+    tools[name], record = future.result()
+    if record is not None: tool_versions[name] = record
+env_python, python_available, python_version = python_future.result()
+metadata.shutdown()
+print(json.dumps({"host": __import__("socket").getfqdn(), "gpus": gpus, "cpu_capacity": capacity, "load1": load1, "cpu_headroom": max(0, math.floor(capacity - load1)), "data_root": data, "data_root_available": os.path.isdir(data) and os.access(data, os.W_OK), "python": env_python, "python_available": python_available, "python_version": python_version, "tools": tools, "tool_versions": tool_versions}))'''
 
 
-def probe_host(host: str, *, remote_python: str = "/usr/bin/python3", timeout: float = 20) -> dict[str, Any]:
+def probe_host(host: str, *, remote_python: str = "/usr/bin/python3", timeout: float = 60) -> dict[str, Any]:
     """Query one server; a failed or incomplete response is never admitted."""
     if host not in DEFAULT_HOSTS:
         return {"alias": host, "available": False, "error": "server is not in the configured GPU fleet", "gpus": []}
     try:
-        result = _ssh(host, ["bash", "-lc", _probe_script(remote_python)], timeout=timeout)
+        # SSH already invokes the user's shell and its noninteractive startup.
+        # A nested login shell repeats NFS-heavy profile setup before the probe.
+        result = _ssh(host, [remote_python, "-c", _PROBE_PYTHON], timeout=timeout)
     except subprocess.TimeoutExpired:
         return {"alias": host, "available": False, "error": f"SSH/environment probe timed out after {timeout:g} seconds", "gpus": []}
     except (OSError, subprocess.SubprocessError) as exc:
@@ -502,7 +518,7 @@ def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str, *
         raise FleetError(f"{host}: snapshot extracted but its temporary archive could not be removed")
 
 
-def _remote_json(host: str, python: str, script: str, *, timeout: float = 30) -> dict[str, Any]:
+def _remote_json(host: str, python: str, script: str, *, timeout: float = 60) -> dict[str, Any]:
     result = _ssh(host, [python, "-c", script], timeout=timeout)
     if result.returncode:
         raise FleetError(f"{host}: remote operation failed: {result.stderr.strip()}")
