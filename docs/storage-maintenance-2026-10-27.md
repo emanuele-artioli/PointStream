@@ -92,3 +92,25 @@ skipped, with the two previously known macOS/sandbox failures: protected
 passes with permitted child inspection. Linux CI remains the complete gate.
 A Linux refusal test checks the builder before it can create a root-disk
 build directory. Worker deployment is recorded below when performed.
+
+### Worker rollout result
+
+All 258 fleet tests pass with permitted process inspection. The Linux build
+refusal check returned exit 2 before creating its forbidden build directory.
+The shared bootstrap is installed and verified on all six hosts.
+
+A fleet-manager refresh from code revision `ff81c561` was attempted but stopped
+at `doctor`, before snapshot deployment or stopping any worker: gpu2 and gpu3
+exceeded the existing 20-second SSH/environment probe limit. A bounded read-only
+diagnostic subsequently verified gpu2 in 38.84 seconds; gpu3's same probe did
+not finish within 60 seconds. This does not imply SSH or storage is unavailable:
+the separate fresh-shell/storage checks succeeded on both hosts. No scientific
+job was submitted or replayed, no worker was changed, and the health gate was
+not bypassed. The new manager-level safeguards need a successful worker refresh
+once this management-path latency is resolved. Existing long-running processes
+keep their original environments; the new bootstrap applies to fresh shells.
+
+Remaining actions are therefore: finish retained live originals when their
+sessions are idle (gpu5/gpu6 public live-tree switches require resolving the
+explicit approval rejection), then complete the gated worker rollout. Do not
+silently treat either action as complete.
