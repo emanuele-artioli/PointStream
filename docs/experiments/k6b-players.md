@@ -5603,3 +5603,42 @@ verifies attended foreground completion, not background wakeups; background
 model-resume callbacks and cache lifetime remain unknown. No recurring model
 monitor, keepalive or one-shot scheduler was created. Preserve the wait handle
 and output receipt; do not replace the wait with repeated model polling.
+
+### 2026-10-27 — Pre-smoke setup cancelled; staged-byte recovery within original cap
+
+Request20261027T165235Z-f58a59af was eventually published despite its lost
+reply. The original publisher was verified alive, hashing the final canonical
+GPU-base archive; no publication was replayed. Native worker preparation then
+repeated the large NFS input hashes. At admission the frozen2600s full lease
+could no longer fit before the request's18:00 UTC deadline. The root cancelled
+only this task-owned request while no quality stage had begun.
+
+Canonical state is CANCELLED. Native admitted interval
+1793121505.1932383–1793121557.9835675 = **52.790329GPU-s**, progress absent,
+no smoke gate or scientific score. Conservatively charge120s for this setup
+and cleanup, keeping prior580s unchanged: **700/3600s**, remaining2900s.
+No failed or unmeasured setup cost is forgiven and no closed budget is reused.
+All old artifacts, frozen request and source remain preserved.
+
+Prospective resource-pipeline recovery: an opt-in `verify_staged_inputs` flag
+validates the actual content-addressed staged payloads against the same SHA256s.
+Canonical paths must still exist under the external data root; direct/un-staged
+inputs retain full canonical-byte checks. Publication/admission hash or populate
+the local verified cache. Campaign prechecks defer only explicitly consumed
+staged placeholders to `stage_inputs`, which independently hashes every payload
+before either component stage can execute. Corrupt cache, changed direct data
+and corruption before full promotion fail closed in regression tests. No
+input/content, model, metric, source/control gate or quality threshold changes.
+Default behavior of all other jobs is unchanged. The frozen judging worker
+remains SHA2568378688259d9842ebf64fd219dd86b9347c5b8d4facd9d1bde703da13423d80d.
+
+The original component smoke was never invoked; the replacement is same-study
+infrastructure recovery, not a repeat of scored data. No uncertain request is
+replayed. All resource leases remain at or below their accepted ceilings:
+smoke120s (old measured command80.282832s,35%inflation108.381823<120), full2600s,
+validator120s, residual60s; total2900s. Source/runtime/import caches are prepared;
+the original full estimator and two-tick/both-window/control recipe are
+unchanged. Deadline is prospectively20:00 UTC (21:00 Vienna). Before creating
+the replacement, confirm the old request terminal and its task processes gone,
+freeze the new spec/source, and refresh the reviewed controller. The budget
+identity is700+2900=3600s, no additional GPU authority requested or assumed.

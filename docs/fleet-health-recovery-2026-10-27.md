@@ -85,3 +85,18 @@ management settings. No write is automatically retried or failed over.
 Client-side control-master reuse was removed after delayed captured receipts;
 normal SSH calls retain their bounded deadlines. The prior reuse description
 above records the earlier repair revision, not the final client configuration.
+
+### Opt-in actual staged-byte verification
+
+Repeated canonical NFS byte reads delayed both publication and pre-claim
+preparation despite verified disk caches. `verify_staged_inputs: true` permits
+publication/admission to hash the content-addressed local copy for an input
+that is explicitly passed as a staged placeholder. Canonical paths must still
+exist inside the external data root; a directly passed input is never
+substituted. Missing cache entries are copied and verified before admission.
+Campaign prechecks defer only those payloads to native stage_input verification,
+which rehashes every actual payload before invoking smoke or full. Corruption
+and direct-input mutation remain hard failures. All other jobs keep the old
+canonical-byte policy. This changes physical verification location, not the
+bytes, scientific method or decision. The reviewed worker refresh is recorded
+with its source and request below; no unknown submission is replayed.

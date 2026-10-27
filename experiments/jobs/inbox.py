@@ -63,6 +63,8 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
     required = {"hosts", "gpu_models", "gpu_memory_mib", "cpu_threads", "entrypoint", "arguments", "scale", "inputs", "smoke", "full", "budget_seconds", "deadline", "validator", "required_commands"}
     if required - spec.keys():
         raise fleet.FleetError(f"missing job fields: {sorted(required - spec.keys())}")
+    if 'verify_staged_inputs' in spec and not isinstance(spec['verify_staged_inputs'], bool):
+        raise fleet.FleetError('verify_staged_inputs must be boolean')
     if not spec["hosts"] or any(h not in fleet.DEFAULT_HOSTS for h in spec["hosts"]):
         raise fleet.FleetError("hosts must name configured GPU servers")
     if not isinstance(spec["gpu_models"], list) or any(not isinstance(n, str) or not n.strip() for n in spec["gpu_models"]):
@@ -350,13 +352,34 @@ def salvage(directory: Path, reason: str) -> int:
     return failed
 
 
-def verify_inputs(spec: dict[str, Any], data_root: Path) -> None:
+def verify_inputs(spec: dict[str, Any], data_root: Path, *, defer_staged: bool = False) -> None:
+    """Verify the exact consumed bytes; opt-in stages hash their staged payloads.
+
+    Publication/admission checks hash or populate the verified local cache.
+    Campaigns may defer those hashes only to stage_inputs, which independently
+    hashes every payload before the component is invoked. Direct inputs retain
+    their original canonical-file checks.
+    """
+    root = data_root.resolve()
+    use_cache = spec.get('verify_staged_inputs', False)
+    arguments = spec.get('arguments', [])
+    staged = {(s['path'], s['sha256']): s for s in spec.get('staged_inputs', [])
+              if '{staged:' + s['name'] + '}' in arguments}
+    local = staging.local_root() if use_cache and not defer_staged else None
     for item in spec["inputs"]:
         path = Path(item["path"]).resolve()
-        if not path.is_relative_to(data_root.resolve()) or not path.is_file():
+        if not path.is_relative_to(root) or not path.is_file():
             raise fleet.FleetError(f"input identity must be a file under the external data root: {path}")
-        if file_digest(path) != item["sha256"]:
-            raise fleet.FleetError(f"input identity changed: {path}")
+        payload = staged.get((item['path'], item['sha256'])) if use_cache and item['path'] not in arguments else None
+        if payload is not None and defer_staged:
+            continue  # stage_inputs must succeed before phase_command is run
+        verified = path
+        if payload is not None and local is not None:
+            verified = local / 'cache' / item['sha256'] / Path(item['path']).name
+            if not verified.is_file():
+                staging.stage_input({**payload, 'extract': False}, local)
+        if file_digest(verified) != item["sha256"]:
+            raise fleet.FleetError(f"input identity changed: {verified}")
 
 
 def event(directory: Path, kind: str, detail: Any = None) -> None:
@@ -664,7 +687,7 @@ def campaign(directory: Path) -> int:
         code_identity = source_identity(source)
         if code_identity != manifest["source_sha256"]:
             raise fleet.FleetError("frozen code identity changed")
-        verify_inputs(spec, directory.parents[3])
+        verify_inputs(spec, directory.parents[3], defer_staged=True)
         for item in [*spec.get("staged_inputs", []), *([spec["environment"]] if spec.get("environment") else [])]:
             path = Path(item["path"]).resolve()
             if not path.is_relative_to(directory.parents[3].resolve()) or not path.is_file():
@@ -676,7 +699,7 @@ def campaign(directory: Path) -> int:
                 raise fleet.FleetError("a resumed attempt requires the earlier smoke gate under unchanged identities")
         local_root = staging.local_root()
         for stage in pending_stages(directory):
-            verify_inputs(spec, directory.parents[3])
+            verify_inputs(spec, directory.parents[3], defer_staged=True)
             if digest(monitor.read_json(directory / "spec.json")) != manifest["spec_sha256"]:
                 raise fleet.FleetError("specification changed after smoke")
             if stage == "full" and source_identity(source) != code_identity:
@@ -991,7 +1014,7 @@ while is_pid_alive(pid,start) and time.monotonic()<deadline: time.sleep(.1)
 if is_pid_alive(pid,start): raise SystemExit('worker did not stop; inspect before retrying')
 print(json.dumps({'stopped_worker_pid':pid}))
 """.replace("RELEASE", repr(config["release"])).replace("BASE", repr(config["base"])).replace("ALIAS", repr(alias))
-    return fleet._remote_json(alias, config["pythons"][alias], script, timeout=60)
+    return fleet._remote_json(alias, config["pythons"][alias], script, timeout=120)
 
 
 def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
