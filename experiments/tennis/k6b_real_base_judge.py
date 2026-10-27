@@ -1,0 +1,317 @@
+"""Actual-base saved-player quality pilot, gated on prior-control reproduction."""
+from __future__ import annotations
+
+import argparse
+from fractions import Fraction
+import json
+import os
+from pathlib import Path
+import tarfile
+import tempfile
+import math
+import time
+from typing import Any
+
+import numpy as np
+
+from experiments.tennis.k6b_rate_transport import array_sha, sha, write
+from experiments.tennis.k6b_real_base_compose import compose
+
+
+def extract(archive: Path, root: Path) -> None:
+    root.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(archive) as tar:
+        tar.extractall(root, filter='data')
+
+
+def run(a: argparse.Namespace) -> None:
+    import cv2
+    import torch
+    from experiments.audit.env_smoke import device_record
+    from experiments.tennis import k6, k6b, k6b_matte_judge as judge
+    from experiments.tennis.k4 import safe
+    from experiments.tennis.k4b_features import convert
+    from experiments.tennis.k6b_foreground_video import PILOTS, SOURCE_SHA
+    from experiments.tennis.k6b_matte_cpu import box_maps
+    from experiments.tennis.k6b_rate_streams import decode_keypoints, decode_masks
+    from experiments.tennis.k6b_receiver_sam import project, transport_root
+    from experiments.visor.h3 import rgb_memmap
+    from experiments.visor.h3b import dists_crops, load_dists, lpips_reduce
+    from src.codecs.quality import load_lpips
+    from src.segmentation.masks import decompress
+
+    began = time.monotonic()
+    torch.set_num_threads(4)
+    cv2.setNumThreads(4)
+    if not torch.cuda.is_available():
+        raise ValueError('real CUDA metrics required')
+    torch.cuda.set_per_process_memory_fraction(min(1.0, 20000 * 2**20 / torch.cuda.get_device_properties(0).total_memory))
+    device = device_record('RTX A6000' if 'A6000' in torch.cuda.get_device_name() else 'RTX 6000 Ada')
+    if not device['class_matches']:
+        raise ValueError('unqualified CUDA class')
+    scratch = Path(os.environ['PS_SCRATCH_DIR'])
+    publish = scratch / 'publish'
+    publish.mkdir()
+    anchors = judge.extract([a.anchor], scratch / 'anchors')
+    controls = judge.extract([a.control], scratch / 'old-controls')
+    extract(a.transport, scratch / 'wire')
+    wire = transport_root(scratch / 'wire')
+    extract(a.masks, scratch / 'masks')
+    extract(a.gpu_base, scratch / 'gpu-base')
+    with tarfile.open(a.base) as outer:
+        member = outer.extractfile('publish/bundle.tar')
+        assert member is not None
+        with tarfile.open(fileobj=member, mode='r:') as inner:
+            base_manifest_file = inner.extractfile('base/manifest.json')
+            assert base_manifest_file is not None
+            source_base_manifest = json.load(base_manifest_file)
+    gpu_base = scratch / 'gpu-base' / 'publish'
+    diag = json.loads((gpu_base / 'diagnostic.json').read_text())
+    if len(diag['base']) != 6 or any(not r['source_matches'] or len(r['ticks']) != 80 for r in diag['source']):
+        raise ValueError('GPU source control or base coverage missing')
+    for row in diag['base']:
+        path = gpu_base / f"{row['window']}-s{row['scale']}-gpu.npy"
+        if sha(path.read_bytes()) != row['sha256']:
+            raise ValueError('GPU base input hash changed')
+    generated = k6b.load_generated([str(a.gen_al), str(a.gen_med)], scratch / 'generated')
+    previous = json.loads(a.prior.read_text())
+    prior_rows = {r['id']: r for r in previous['rows']}
+    source_map = {sha(path.read_bytes()): path for path in (a.al, a.med)}
+    nets = {'lpips': load_lpips(a.lpips, 'cuda'), 'dists': load_dists(a.dists, 'cuda')}
+    if not all(next(net.parameters()).is_cuda for net in nets.values()):
+        raise ValueError('metric network not on CUDA')
+    controls_root = publish / 'calibration'
+    controls_root.mkdir()
+    masks_by_window: dict[str, dict[int, dict[int, np.ndarray]]] = {}
+    units_by_window: dict[str, Any] = {}
+    calibration: list[dict[str, Any]] = []
+    # Both windows' original granted-matte and saved-prediction controls must
+    # pass before any actual-base hybrid quality is opened.
+    for wid, digest in zip(PILOTS, SOURCE_SHA):
+        kp_meta, units = decode_keypoints((wire / 'packets' / safe(wid) / 'keypoints.kps').read_bytes())
+        boxes = box_maps(units)
+        masks: dict[int, dict[int, np.ndarray]] = {}
+        for i, (unit, box) in enumerate(zip(units, boxes)):
+            file = scratch / 'masks' / 'publish' / (unit['name'] + '-masks.npz')
+            with np.load(file) as z:
+                original_prediction = next(q for q in previous['prediction']['runs'][0]['rows'] if q['name'] == unit['name'])
+                if z['t'].tolist() != list(range(0, 240, 3)) or array_sha(z['masks']) != original_prediction['output_sha256']:
+                    raise ValueError('saved SAM ticks or receiver prediction hash changed')
+                masks[i] = {int(t): project(m, box[int(t)]) for t, m in zip(z['t'], z['masks'])}
+        rec = judge.judge_window(wid, anchors[wid], controls[wid], wire / 'packets', scratch, {}, generated,
+                                 source_map[digest], digest, nets, scratch, controls_root, a.judged,
+                                 control_variant='full', predicted_masks=masks)
+        old = prior_rows[wid]
+        ticks = rec['judged']
+        if any(rec['composite_hashes'][str(t)] != old['composite_hashes'][str(t)] for t in ticks):
+            raise ValueError('old granted/predicted composite RGB hash mismatch')
+        old_scores = scratch / 'masks' / 'publish' / safe(wid) / 'scores.npz'
+        new_scores = controls_root / safe(wid) / 'scores.npz'
+        with np.load(old_scores) as prior_score, np.load(new_scores) as current_score:
+            for metric in ('lpips', 'dists'):
+                if np.max(np.abs(prior_score[metric][:, ticks] - current_score[metric][:, ticks])) > 1e-4:
+                    raise ValueError('original granted/predicted score control mismatch')
+        calibration.append({'id': wid, 'ticks': ticks, 'exact_control': True, 'prediction_control': True, 'seconds': rec['seconds']})
+        masks_by_window[wid] = masks
+        units_by_window[wid] = (kp_meta, units, boxes)
+    control_elapsed = time.monotonic() - began
+    rows: list[dict[str, Any]] = []
+    for wid, digest, prefix in zip(PILOTS, SOURCE_SHA, ('al', 'med')):
+        native = k6b.k6_window(anchors[wid])
+        row = native['row']
+        kp_meta, units, boxes = units_by_window[wid]
+        source_masks = decode_masks((wire / 'packets' / safe(wid) / 'exact-rle.matte').read_bytes())[1]
+        truth_dir = scratch / ('truth-' + prefix)
+        truth_dir.mkdir()
+        converted = convert('ffmpeg', {'id': wid, 'start': row['start'], 'frames': 240}, source_map[digest], truth_dir / 'source.yuv')
+        truth = rgb_memmap(truth_dir / 'source.yuv', truth_dir / 'source.npy', 240, 1920, 1080, False, 'cuda')
+        region_all = [{p: cv2.resize(source_masks[t, i].astype(np.uint8), (1920, 1080), interpolation=cv2.INTER_NEAREST).astype(bool)
+                       for i, p in enumerate(row['players']) if source_masks[t, i].any()} for t in range(240)]
+        heights = {(p, t): float(np.ptp(np.nonzero(r[p].any(1))[0]) + 1) if p in r and r[p].any() else 1.0
+                   for t, r in enumerate(region_all) for p in row['players']}
+        coded = json.loads(decompress((anchors[wid] / 'keypoints.json.zst').read_bytes()))['decoded']
+        decoded = {key: {(name.rsplit('@', 1)[0], int(name.rsplit('@', 1)[1])): np.asarray(v, np.float64)
+                         for name, v in values.items()} for key, values in coded.items()}
+        base_arrays = {scale: np.load(gpu_base / f'{prefix}-s{scale}-gpu.npy', mmap_mode='r') for scale in (8, 4, 2)}
+        ticks = row['judged'][:a.judged or None]
+        scores = {m: np.full((6, len(ticks)), np.nan) for m in ('full_lpips', 'foreground_lpips', 'full_dists', 'foreground_dists', 'full_psnr')}
+        hashes: dict[str, Any] = {}
+        frame_started = time.monotonic()
+        for j, t in enumerate(ticks):
+            true = np.asarray(truth[t])
+            if array_sha(true) != prior_rows[wid]['source_rgb_frame_sha256'][str(t)]:
+                raise ValueError('source RGB original control failed')
+            regions = region_all[t]
+            r = np.logical_or.reduce([*regions.values(), np.zeros((1080, 1920), bool)])
+            fill = k6.telea_fill(true, r)
+            _, drawn = k6b.k6_oracle(t, native, k6.variant_names()[-9:], truth, region_all, fill,
+                kp_meta['compositing_order'], row['scored'], heights, decoded,
+                max(1, round(k6.REF_GAP_S * float(Fraction(row['fps'])))))
+            s = r.copy()
+            for m in drawn.values():
+                s |= m
+            if sha(np.packbits(r).tobytes()) != row['scoring_masks'][str(t)]['r'] or sha(np.packbits(s).tobytes()) != row['scoring_masks'][str(t)]['s']:
+                raise ValueError('original scoring region changed')
+            ys, xs = np.nonzero(s)
+            crop = (slice(max(0, ys.min()-k6.DISTS_PAD), min(1080, ys.max()+1+k6.DISTS_PAD)),
+                    slice(max(0, xs.min()-k6.DISTS_PAD), min(1920, xs.max()+1+k6.DISTS_PAD)))
+            order = kp_meta['compositing_order']
+            player_crops, player_boxes, player_masks = {}, {}, {}
+            for i, unit in enumerate(units):
+                player = row['players'][i]
+                g = generated[(unit['name'], 'match5')]
+                idx = np.flatnonzero(g['t'] == t)
+                if len(idx) == 1:
+                    player_crops[player] = g['crops'][int(idx[0])]
+                if t in boxes[i]:
+                    player_boxes[player] = boxes[i][t]
+                player_masks[player] = masks_by_window[wid][i][t]
+            images = []
+            for scale in (8, 4, 2):
+                base = np.asarray(base_arrays[scale][t // 3])
+                method, _ = compose(base, player_crops, player_boxes, player_masks, order)
+                images.extend([base, method])
+            all_mask = np.ones((1080, 1920), dtype=bool)
+            frame_hashes = []
+            for i, image in enumerate(images):
+                frame_hashes.append(array_sha(image))
+                lp = lpips_reduce(nets['lpips'], [image], true, [[all_mask, s]], 'cuda')[0]
+                full_d = dists_crops(nets['dists'], [image], true, all_mask, 'cuda')[0]
+                fg_d = dists_crops(nets['dists'], [image[crop]], true[crop], s[crop], 'cuda')[0]
+                mse = float(np.mean((image.astype(np.float32) - true.astype(np.float32)) ** 2))
+                scores['full_lpips'][i, j], scores['foreground_lpips'][i, j] = lp
+                scores['full_dists'][i, j], scores['foreground_dists'][i, j] = full_d, fg_d
+                scores['full_psnr'][i, j] = 99.0 if mse == 0 else 10 * np.log10(255.0**2 / mse)
+            hashes[str(t)] = frame_hashes
+        if any(not np.isfinite(v).all() for v in scores.values()):
+            raise ValueError('nonfinite real metric')
+        out = publish / safe(wid)
+        out.mkdir()
+        np.savez_compressed(out / 'scores.npz', **scores, ticks=np.asarray(ticks))
+        rates = []
+        old_rate = next(r for r in previous['assessment']['rows'] if r['window'] == wid)['rate_components']
+        duration = 240 / float(row['fps'])
+        kps = (wire / 'packets' / safe(wid) / 'keypoints.kps').read_bytes()
+        kps_rate = len(kps) * 8 / duration / 1000
+        if abs(kps_rate - old_rate['keypoint_kbps']) > 1e-9:
+            raise ValueError('actual KPS packet differs from paid historical rate')
+        for scale in (8, 4, 2):
+            base_row = next(r for r in diag['base'] if r['window'] == prefix and r['scale'] == scale)
+            native_base = next(r for r in source_base_manifest['rows'] if r['window'] == prefix and r['scale'] == scale)
+            header = json.dumps({'version': 1, 'window': wid, 'fps': row['fps'], 'scale': scale,
+                                 'native_frames': 240, 'saved_ticks': '0:240:3',
+                                 'kps_sha256': sha(kps), 'players': [u['name'] for u in units],
+                                 'seeds': [k6b.unit_seed(u['name']) for u in units],
+                                 'fallback': 'decoded_base', 'base_ivf_sha256': native_base['ivf']['sha256']},
+                                sort_keys=True, separators=(',', ':')).encode()
+            header_path = out / f's{scale}-bootstrap.json'
+            header_path.write_bytes(header)
+            if json.loads(header_path.read_bytes())['fallback'] != 'decoded_base':
+                raise ValueError('receiver bootstrap corrupt')
+            base_rate = native_base['ivf']['bytes'] * 8 / duration / 1000
+            header_rate = len(header) * 8 / duration / 1000
+            side = kps_rate + old_rate['match_bank_kbps_7200'] + old_rate['adapter_guider_kbps_7200'] + header_rate
+            rates.append({'scale': scale, 'base_kbps': base_rate, 'side_kbps': side,
+                          'total_kbps': base_rate + side, 'bootstrap_bytes': len(header),
+                          'kps_bytes': len(kps), 'base_ivf_bytes': native_base['ivf']['bytes'],
+                          'base_rgb_sha256': base_row['sha256']})
+        item = {'id': wid, 'ticks': ticks, 'means': {m: v.mean(axis=1).tolist() for m, v in scores.items()},
+                'rates': rates, 'composite_hashes': hashes, 'score_seconds': time.monotonic() - frame_started,
+                'converted_sha256': converted['sha256']}
+        write(out / 'window.json', item)
+        rows.append(item)
+        if a.judged == 0:
+            item['comparisons'] = compare_curves(item)
+            futile = any(all(item['comparisons'][family + '_' + metric]['scale4']['won'] is False
+                             for metric in ('lpips', 'dists')) for family in ('full', 'foreground'))
+            if futile:
+                item['early_stop'] = 'both metrics lost in one family; three of four impossible'
+            write(out / 'window.json', item)
+        from experiments.jobs.monitor import publish_progress
+        publish_progress(os.environ['PS_STAGE'], len(rows))
+        if a.judged == 0 and item.get('early_stop'):
+            del truth
+            break
+        del truth
+    seconds = time.monotonic() - began
+    per_frame = sum(r['score_seconds'] for r in rows) / sum(len(r['ticks']) for r in rows)
+    calibration_per_frame = sum(r['seconds'] for r in calibration) / sum(len(r['ticks']) for r in calibration)
+    projected = (control_elapsed + (per_frame + calibration_per_frame) * 160) * 1.35
+    summary = {'rows': rows, 'calibration': calibration, 'seconds': seconds, 'projected_full_seconds': projected,
+               'device': device, 'peak_gpu_gib': torch.cuda.max_memory_allocated() / 2**30, 'frames_per_window': a.judged, 'scope': 'optimistic rate floor: fixed research header, 7200s bank/adaptation; tensor bootstrap and full framing unmeasured, no ball update or full semantic wire claim'}
+    write(publish / 'quality.json', summary)
+    write(Path(os.environ['PS_STAGE_DIR']) / 'quality-summary.json', summary)
+
+
+
+def compare_curves(row: dict[str, Any]) -> dict[str, Any]:
+    """PCHIP on overlapping quality; central scale4 is the frozen point."""
+    from scipy.interpolate import PchipInterpolator
+    from experiments.background.g5 import envelope, pareto
+    from experiments.tennis.k6b_confirm_validate import strict_won
+
+    out: dict[str, Any] = {}
+    for metric in ('full_lpips', 'foreground_lpips', 'full_dists', 'foreground_dists'):
+        values = row['means'][metric]
+        anchors = {str(r['scale']): {'kbps': r['base_kbps'], metric: values[2 * i]} for i, r in enumerate(row['rates'])}
+        points = [(r['total_kbps'], -values[2 * i + 1]) for i, r in enumerate(row['rates'])]
+        anchor_points = [(r['base_kbps'], -values[2 * i]) for i, r in enumerate(row['rates'])]
+        result = strict_won(anchors, metric, row['rates'][1]['total_kbps'], values[3])
+        sensitivity = {str(offset): strict_won(anchors, metric, row['rates'][1]['total_kbps'], values[3] + offset) for offset in (-0.001, 0, 0.001)}
+        test, hull = pareto(points), envelope(anchor_points)
+        bd = None
+        if len(test) >= 2 and len(hull) >= 2:
+            lo, hi = max(test[0][1], hull[0][1]), min(test[-1][1], hull[-1][1])
+            if hi > lo:
+                def area(p: list[tuple[float, float]]) -> float:
+                    return float(PchipInterpolator([q for _, q in p], [math.log(rate) for rate, _ in p]).integrate(lo, hi))
+                bd = math.exp((area(test) - area(hull)) / (hi - lo)) - 1
+        out[metric] = {'scale4': result, 'sensitivity': sensitivity, 'bd_rate_fraction': bd,
+                       'scope': 'three recovered SVT points only; no extrapolation'}
+    return out
+
+
+def validate() -> None:
+    stage = Path(os.environ['PS_STAGE_DIR'])
+    summary = json.loads((stage / 'quality-summary.json').read_text())
+    dispatch = json.loads((stage / 'dispatch.json').read_text())
+    smoke_wall = time.time() - dispatch['started']
+    publication = max(0.0, smoke_wall - summary['seconds'])
+    projected_with_publication = summary['projected_full_seconds'] + 40 * publication * 1.35
+    checks = {'projection_including_publication': projected_with_publication < 1800, 'two_windows': len(summary['rows']) == 2, 'both_old_controls': len(summary['calibration']) == 2 and all(r['exact_control'] and r['prediction_control'] for r in summary['calibration']),
+              'representative_two_ticks': summary['frames_per_window'] == 2,
+              'projection_under_full_reservation': summary['projected_full_seconds'] < 1800,
+              'qualified_gpu': summary['device']['class_matches'], 'memory_within_limit': summary['peak_gpu_gib'] < 20}
+    with tempfile.TemporaryDirectory(prefix='k6b-realbase-validator-') as d:
+        root = Path(d)
+        extract(stage / 'published.tar', root)
+        for row in summary['rows']:
+            from experiments.tennis.k4 import safe
+            item = root / 'publish' / safe(row['id'])
+            with np.load(item / 'scores.npz') as scores:
+                checks[row['id'] + ':finite'] = all(np.isfinite(scores[m]).all() and scores[m].shape == (6, 2) for m in ('full_lpips', 'foreground_lpips', 'full_dists', 'foreground_dists', 'full_psnr'))
+                checks[row['id'] + ':ticks'] = scores['ticks'].tolist() == row['ticks'] and row['ticks'] == [0, 3]
+            checks[row['id'] + ':rates'] = len(row['rates']) == 3 and all(r['total_kbps'] > r['base_kbps'] > 0 and r['bootstrap_bytes'] > 0 for r in row['rates'])
+            checks[row['id'] + ':composites'] = len(row['composite_hashes']) == 2 and all(len(v) == 6 for v in row['composite_hashes'].values())
+    Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps({'passed': all(checks.values()), 'checks': checks, 'projected_full_seconds': summary['projected_full_seconds'], 'projected_with_publication': projected_with_publication}))
+    if not all(checks.values()):
+        raise SystemExit(1)
+
+
+def main() -> None:
+    p = argparse.ArgumentParser()
+    p.add_argument('--validate', action='store_true')
+    for name in ('anchor', 'control', 'transport', 'masks', 'gpu-base', 'base', 'gen-al', 'gen-med', 'prior', 'al', 'med', 'lpips', 'dists'):
+        p.add_argument('--' + name, type=Path)
+    p.add_argument('--judged', type=int, default=2)
+    a = p.parse_args()
+    if a.validate:
+        validate()
+    else:
+        if any(getattr(a, n) is None for n in ('anchor', 'control', 'transport', 'masks', 'gpu_base', 'base', 'gen_al', 'gen_med', 'prior', 'al', 'med', 'lpips', 'dists')) or a.judged not in (0, 2):
+            p.error('all inputs and 0/2 judged frames are required')
+        run(a)
+
+
+if __name__ == '__main__':
+    main()

@@ -5154,3 +5154,246 @@ with provisional <=1.0 GPU-hour cap and <=600 s smoke is in
 approved or dispatched. Fair same-window DCVC reproduction and pixel/ROI control
 are required before a broad baseline claim and require their own measured cost.
 Ball packets and a full240 semantic overlay remain unresolved.
+
+## 2026-10-27 — Real-base players: pre-quality exact-control stop
+
+The human authorized <=3600 admitted GPU-s in this existing chat for the
+proposed players-only real-base study, with a <=600 s representative smoke,
+<=2400 s full and 600 s reserve; no generation, fitting, ball inference, new
+footage/models or other GPU work. Frozen hypothesis: generated players plus
+per-frame SAM improve real whole-frame bases enough at equal fully billed rate
+to pass >=3/4 strict LPIPS/DISTS full-frame cells and >=3/4 original fixed-R/S
+foreground cells, with frozen +/-0.001 sensitivity and, for overlapping
+three-point curves, <=-10% mean BD-rate and >=75% window wins against the
+achievable SVT hull. Competing explanations include base price and background
+errors outweighing player benefit, imperfect masks/seams, and output artifacts.
+Same-base no-overlay and fixed original source controls are required. No
+unmeasured ball payload, target-derived Telea or target matte at the delivered
+receiver; common installed base/SAM and distribution sensitivity explicit.
+Existing whole-frame DCVC and stronger SVT points have no verified retained
+pixel/score evidence here; ROI/pixel enhancement not yet qualified, so an SVT
+conditional win alone would not be a broad baseline win. Current two windows
+are development, with 80 saved generated ticks and no full240 player-wire claim.
+These are frozen before opening new quality scores.
+
+**Mandatory exact control failed, so STOP before any GPU job or new quality.**
+The completed CPU base job 20261027T072713Z-2888cefe was rechecked COMPLETE;
+its nested verified manifest SHA256
+`59f97141090865bafdd7c4b0d3593492de42de16eb057e63846feea5a5526058`
+reports source YUV hashes identical across all three settings and to the
+original native source: Al
+`e7b960cd2456b439c5439b337a45e47d2a0a44a2a32025a2de595af3feed4fa2`, Med
+`53633ce617b12d779bc8c5746d8d44cbe090ced6c49ba79dbe246cc6abacfb08`.
+The previous real GPU PR247 result JSON SHA256
+`b0a55a5c1440463fff97efa975a661c2c65db9ce35e0696fade9d5648c39ccdc`
+records original source RGB hashes at the exact same 0,3,...,237 ticks.
+Comparison of the actual contiguous uint8 RGB byte hashes gives **10/80
+matching Al and 0/80 matching Med**. Thus source frames are aligned and YUV
+identical, but exact RGB identity fails; we cannot tell difference magnitudes
+or exact numerical cause from hashes alone. No relaxed tolerance and no claim
+that the decoded-base RGB arrays themselves have been compared to GPU.
+The pinned CPU/native Torch conversion and prior GPU can differ in numerical
+execution, but attributing the observed mismatch to rounding is a hypothesis,
+not an established diagnosis. Reproducible script SHA256
+`7db9935c4f77662c6f67c361e4a51ba82d368b85c644735b1d36f5a25010042d`;
+[exact mismatch evidence](../cards/k6b-real-base-source-rgb-gate.json) SHA256
+`20ba456286f80ba5eb6a6ec28e83a0088c98cedc1dfc91910070cad584405c1a`.
+No GPU job was submitted, no new quality was opened, **0/3600 GPU-s** charged.
+The study stops at its frozen invalid-control condition, not a scientific
+failure of the tested hybrid. No budget carries automatically to a new study.
+
+Next separately bounded diagnostic: reconstruct source and retained base YUV
+through the original native GPU RGB+bicubic path, first compare the 160 source
+hashes to the prior GPU record and quantify exact CPU/GPU per-pixel differences;
+only if original source control reproduces, regenerate the six base RGB views
+with hashes and test alignment. Freeze inputs and cost, substantively validate,
+and obtain separate authority before GPU execution. No renewed experiment or
+quality-based tuning is implied. The old granted-Telea limitation, familiar
+broadcast/source independence caveats, 115px exploratory cutoff, historic
+step5 failure and absent 160 RGB ticks per player remain unchanged.
+
+Reproduction inputs are the `base/manifest.json` member of nested
+`publish/bundle.tar` in the read-only PR251 archive
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T072713Z-2888cefe/full/published.tar`
+and `evidence/metadata/k6b-frame-full-result.json` in immutable PR247 evidence
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-frame-20261026T192107Z`.
+The comparison reads no player-quality numbers; it uses only input identities,
+source-frame hashes and tick membership.
+
+### 2026-10-27 — Same-budget conversion-diagnostic amendment
+
+Planning clarified prospectively that diagnosing the failed exact RGB control
+is a correctness-recovery substage of the same human-approved 3600 GPU-s real-
+base study, not a fresh allocation. At amendment no GPU or quality scores have
+been used. Reserve <=600 admitted GPU-s including setup and validation; every
+second counts against the original cap. Run only a bounded original A6000-class
+native source/base conversion diagnostic after a representative smoke projects
+it inside that reservation. Verify original source YUV and exact 160 GPU source
+RGB hashes before regenerating six 80-frame base GPU RGB sets, repeating the
+conversion and checking decoded YUV identity. Record actual pixel differences
+without post-hoc tolerance and attribute only what is actually isolated. No
+neural quality is accepted before original controls; no generator/fitting/new
+weights/ball/DCVC or automatic budget reset. If source reproduction, smoke or
+budget fails, stop. Full judging remains conditional on exact controls and the
+remaining original 3600-second budget.
+
+The prospective conversion smoke uses the original A6000 class, Torch2.10.0
+native bilinear source conversion, 24 frames/window and all six base settings.
+Each source RGB is compared to original GPU source hashes; each base IVF is
+fresh-decoded against its stored complete YUV hash and GPU conversion is
+repeated, with output file/frame hashes. Source tick0 probes chroma, pre-round
+and rounded numeric differences; base tick0 reports before-resize difference
+and identical-input bicubic repeat; other frames report uint8 difference
+statistics only. The validator checks original source hashes, six output file
+and per-frame identities and a projected full budget including publication.
+Smoke <=120 s, full <=360 s, validator <=60 s and whole admission <=600 s;
+manager remaining-budget and measured smoke projection must both pass. Resource
+cost of the diagnostic counts toward the unchanged 3600 s study cap.
+The first conversion-spec submission was rejected locally before any job was
+created because `contention.policy=continue` lacked its required explicit
+basis; no GPU was consumed. The corrected specification states that exact
+conversion hashes and pixel differences do not depend on foreign-work timing.
+Corrected submission lost its client receipt. Fleet inspection found the same
+request as **20261027T074823Z-135421ee**, saved `ready.json` git commit
+`146f06ee628ba00fc84495d0471a89afc649d542`, normalized spec SHA256
+`b1518eb8b407fb1d235daf3a96ac70cf5f110134166305d63fa57a2818e322e6`, source
+SHA256 `24ca46c5954c64b96a34203772b099772880b069e0400b387e4cc23f43f84aea`,
+600 s admission cap and 08:25 UTC deadline. The saved spec identifies the
+native RGB diagnostic and pinned inputs. No replay; inspect this ID. At
+identity discovery it was pending, with no confirmed GPU time yet.
+
+Conversion smoke passed its 20 independent checks on the original RTX A6000
+class: 8/8 source RGB hashes per window reproduced the original GPU, all six
+smoke base sets passed repeated GPU conversion/file/frame validation and fresh
+IVF/YUV decode. Smoke workload23.023 s, conservative projection including
+publication306.032 s <360 s; fleet promoted the fixed full diagnostic. On the
+eight sampled ticks/window, CPU versus GPU source RGB differs at 14 Al and 195
+Med pixel-frames, maximum one 8-bit level. Source tick0's interpolated chroma
+was identical CPU/GPU, while pre-round RGB arithmetic differed by at most
+0.0000610352 and the rounded/clipped RGB differed in 1 Al /24 Med channel
+values. These are bounded smoke observations, not a quality score or a claim
+about every frame. Full job 20261027T074823Z-135421ee remains the same request;
+all admitted time counts against the original 3600 GPU-s cap.
+Before any hybrid quality is opened, the fixed point for the >=3/4 full-frame
+and >=3/4 foreground cell rules is **scale4 for both windows**. Scale8 and
+scale2 are additional curve points, not alternatives chosen after scores.
+The available envelope consists of the three recovered SVT points only;
+stronger saved native SVT points, DCVC and ROI controls remain absent here.
+
+Full conversion diagnostic job `20261027T074823Z-135421ee` completed on gpu2
+RTX A6000. All 80/80 original source GPU RGB hashes match for each window;
+all six saved-base YUV identities and independent IVF decodes match, and two
+fresh GPU conversion passes agree on every saved tick. CPU versus GPU source
+RGB differs on 160 Al pixel-frames and 2,208 Med pixel-frames over 80 frames
+each, maximum one 8-bit channel level, mean absolute channel difference
+3.2150e-7 /4.4367e-6. On source tick0, bilinear chroma arrays match exactly;
+pre-round RGB arithmetic differs up to 6.103515625e-5 and the final rounded
+values differ by one level on 1/24 channels. This isolates that particular
+source sample; it does not assert the same mechanism for every pixel or base.
+No tolerance was changed. Full diagnostic output is new distinct GPU-derived
+RGB, not a claim of exact CPU equality.
+
+Original 3600 GPU-s study ledger: diagnostic admitted282.821585 s, receipt to
+terminal368.930632 s; conservatively charge **370/3600 s**, leaving 3230 s
+before any quality smoke. Smoke/validation are included, not added again; CPU
+staging/supervisor costs are separate. Output archive, independent hashes and
+next quality-stage feasibility are pending verification. No new quality score
+has yet been accepted, and original granted-matte and predicted-mask control
+calibration is still required before hybrid quality.
+
+Independent post-publication audit (27.002513 CPU-s, outside GPU cap) verified
+all six GPU-derived 80-frame arrays and their 480 per-frame hashes against the
+recorded manifest, source 80/80 GPU hash matches per window and archive SHA256
+`5c4a0cfced5501e085f67d394f3a50ca7f92d2cb592f73fbd3ad661461cb691b`.
+Mode444, size2,986,301,440 bytes, at
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T074823Z-135421ee/full/published.tar`.
+Compared with the saved CPU RGB arrays, GPU-derived base scale8 is byte exact
+for both windows; scale4 and scale2 differ at 654/565 Al and 9878/4868 Med
+pixel-frames respectively, each maximum one 8-bit level. Same-input bicubic
+resize repeat matched in tick0 probes; before-resize tick0 byte difference was
+zero for Al scale8/4 and Med scale8, one-level for Al scale2 and Med scale4/2.
+These are numerical diagnostics only. Full per-stream file hashes and aggregate
+differences are in [independent audit](../cards/k6b-rgb-diagnostic-validation.json).
+Source control failure is resolved for the GPU path, not redefined as CPU/GPU
+byte identity. No original granted-matte/SAM control recalibration or real-base
+quality scoring has been performed yet.
+
+Before opening hybrid quality, receiver accounting was clarified: actual IVF
+and KPS1 framing and real reference/model payload bytes are known, but the
+quantized adapter/guider lacks a serialized tensor directory and complete
+receiver bootstrap. The fixed research header in the prospective quality
+worker is a counted additional cost, not a substitute for an independently
+decoded full bootstrap. Report all results as optimistic rate-floor
+comparisons: a negative result can reject this particular configuration even at
+that lower bound; a positive result remains conditional, not a fully accounted
+codec win. This changes no frozen quality rule or budget and is not selected
+from observed quality.
+
+The prospective saved-RGB quality job reserves <=2500 admitted GPU-s after
+370/3600 s conservative conversion charge: smoke <=500 s, full <=1800 s and
+remaining staging/validator reserve. Exact source, granted-matte and saved SAM
+prediction/control reproduction for BOTH windows precede any real-base score.
+Smoke evaluates two original ticks/window and all six anchor/hybrid paths, and
+must project all 160 frames plus publication under 1800 s. Predicted-mask
+compositing is a receiver-only function of the paid base, decoded KPS geometry,
+saved generated crops and saved predicted masks; unchanged base is the fallback.
+The independently scored foreground S uses target reference only in the judge.
+At full scale, two strict central-point losses in either family in the first
+window make >=3/4 impossible and trigger early stop; unresolved does not count
+as loss. Input/bootstrap/tensor accounting remains the explicitly documented
+optimistic floor; no result may be called a complete delivery win.
+
+Real-base quality/control job submitted **20261027T080644Z-9dba0803**, pending
+on receipt. Source commit `8bd01ff5703ebf5b1cf41feef4f564f948cf44b2`, source
+SHA256 `a3ae0b4ff10baa298c0407613de6940d11853b87b9d6c51451749a36673701db`,
+normalized spec SHA256 `7a5279094e4026e49e83cda8094580a3e963bab18ef02508298863f9c0d23ed4`.
+Reservation <=2500 admitted GPU-s against the 3230 s conservative remainder;
+deadline 08:48 UTC, smoke <=500 s and full <=1800 s gated by original controls,
+all-six representative actual 1080p paths and conservative cost projection.
+No retry or additional job without inspecting this exact ID. The compact JSON
+header is counted but receiver/model bootstrap remains incomplete: results
+are optimistic rate-floor comparisons, never complete delivery claims.
+
+
+### 2026-10-27 — Real-base quality smoke stopped at the cost gate
+
+Job `20261027T080644Z-9dba0803` terminated FAILED on gpu2 (RTX A6000):
+the substantive smoke validator rejected the projected full-stage cost. Both
+original granted-matte and predicted-mask controls reproduced for BOTH windows
+on the two predeclared smoke ticks/window; all six actual 1080p base/hybrid
+paths produced finite scores, valid rates and composite identities. Qualified
+GPU and memory checks passed. These are smoke controls only, not full80-frame
+quality evidence. The separate conversion diagnostic reproduced all80 original
+source GPU hashes/window.
+
+The projected full worker cost was **2227.523141 s**, or **2448.314646 s**
+including publication, above the frozen **1800 s** full-stage reservation.
+Both projection checks failed; every other substantive validation check passed.
+The full quality stage never launched. No win, loss, BD-rate or scientific
+quality conclusion is accepted from the two-tick smoke. The stop is a cost
+gate, not evidence that the hybrid fails its quality decision rule. Preserve
+the frozen cohort, central scale4 point and decision rules. No retry, expanded
+reservation or new GPU job is authorized by this result.
+
+Smoke validation: [exact JSON](../cards/k6b-real-base-quality-smoke-validation.json),
+SHA256 `fd5509a633ae0a4dccdc944d66b4f66113f3c8a2900c463630e92ed3b7455085`. Native smoke command exited0 after
+80.282832 wall seconds; measured child CPU106.369406 s. Shared-host timing is
+not an inference-speed claim. Terminal admitted GPU time was151.469499 s;
+receipt-to-terminal205.615705 s, conservatively charged210 s. With the
+conversion diagnostic charged370 s, the current study ledger is
+**580/3600 GPU-s** conservative (434.291084 admitted GPU-s). Unused3020 s
+does not relax the failed stage gate; a revised prospective plan needs a
+separate decision before execution. Both study jobs are terminal; no monitor
+or running quality stage remains.
+
+Limits persist: prior granted target-derived Telea evidence is not a delivered
+background result; this smoke's hybrid uses a real decoded base but has no
+accepted full quality result. Rates remain optimistic floors because the
+adapter tensor/bootstrap directory and complete delivery framing are missing.
+Only80/240 saved generator ticks/window exist, the SVT envelope has only three
+settings, no qualified ball/DCVC/ROI comparison exists, source/replay
+independence remains unresolved, and the115px threshold stays exploratory.
+
+Local checks: ruff and mypy passed; final pytest897 passed,25 skipped and two
+known platform/sandbox failures (process suspension permission and Linux-only
+protected-storage symlink resolution). Linux CI remains the merge gate.
