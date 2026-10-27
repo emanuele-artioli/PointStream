@@ -4,8 +4,12 @@ Current update after human acceptance: the separated timing contract is
 APPROVED, original cap unchanged. Prior conservative charge1030/3600s;
 2570s left = smoke300/full2000/validator120/residual150. Implementation and CPU checks on codex/real-base-separated-cost-model
 passed, source01888c76 and Linux CI green. Final exact request
-20261027T211451Z-f6a754eb is allocated/PREPARING, normalized spec33474777;
-publication unconfirmed. Inspect this ID after any lost reply; never replay. Prospectively refresh expired deadline to22:30 UTC.
+20261027T211451Z-f6a754eb is PUBLISHED/PENDING, normalized spec33474777,
+source identitybe7dfb19. Original transfer timed out, all210files and native
+identity were verified, then first publication completed under the same ID.
+Native wait handle45888, <=2700s, is active; receipt
+/private/tmp/pointstream-separated-approved-wait.json. No admission confirmed.
+Inspect this ID after any lost reply; never replay submission or publication. Prospectively refresh expired deadline to22:30 UTC.
 The last exact request20261027T181542Z-b22436b0 is canonically FAILED, no
 full stage. Its partial two-tick controls in both windows reproduce exactly
 in the independent durable audit. Existing requests remain terminal, no
