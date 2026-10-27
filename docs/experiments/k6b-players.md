@@ -5704,3 +5704,62 @@ Wait client started and preserved as native exec session11170, one bounded
 2700-second ps-fleet wait, output path above. At18:19 UTC canonical state
 PENDING, no admission assumed. Background model wakeups remain unverified;
 this is attended execution. Cache lifetime unknown.
+
+The bounded wait woke on contention eventd0d5d1c482b7588793eb018584b6f75a
+after164s. Canonical status RUNNING on gpu2, supervisor start1793125133.6438456,
+component PID218117, smoke progress0 at1793125215.8864255. Foreign177484
+retained under the predeclared shared-GPU/continue policy. Timing is cost only,
+not performance evidence. Event delivered and acknowledgement requested.
+Resume the same completion wait within its original45min observation window;
+no new job or recurring monitor. No smoke/full acceptance inferred.
+
+Contention acknowledgement succeeded. Resumed wait native exec session12169,
+maximum2400s (within original observation window), output
+/private/tmp/pointstream-real-base-closure-wait-resumed-20261027.json.
+This continuation handles the meaningful event; it is not another submission.
+
+### 2026-10-27 — Corrected source smoke hit resource limit; full not promoted
+
+Job **20261027T181542Z-b22436b0 FAILED** with command exceeded120s.
+No gate.json, full directory or complete quality summary exists. Native
+admitted interval1793125133.6438456–1793125343.782727 =210.138881GPU-s; salvage
+2.822310s, through salvage215.216819s. Canonical terminal reconciliation at
+1793125399.3646233 is265.720778s after start. Conservatively charge270s,
+cumulative **1030/3600s**, remaining **2570s**. No budget reset or GPU retry.
+Foreign177484 retained; canonical GPU claim is released.
+
+Salvaged smoke/partial.tar SHA256
+e6a2a8702871f2de95cc60abf6d65d0192a5f41b249351016a4be9f6d8eb5bcf,
+51200bytes,16members. Failed local scratch remains
+/local/users/emanuele/pointstream/scratch/20261027T181542Z-b22436b0-smoke.
+Independent CPU read of the partial archive reproduces both original and
+predicted controls on ticks[0,3] in both windows: all source/composite hashes
+match, and LPIPS/DISTS scores are exactly equal to prior arrays. Those are
+partial correctness checks, not a passed smoke or scientific quality result.
+Only Al's two real-base ticks completed (score_seconds10.703559); Med's
+real-base row and the complete resource projection are absent. No accepted
+quality/BD-rate or pass/fail of the scientific rule. Events acknowledged,
+all native waits completed; no recurring model monitor was installed.
+
+The old quote cannot justify another full attempt inside2570s: even the
+original2448.314646s projection plus240s smoke and120s validation exceeds
+the remainder, before setup. The truncated pilot is not a replacement quote.
+CPU inspection also found that the old estimator scales calibration setup
+like per-frame inference (22.587890+15.300573s over4ticks, although setup
+is13.885248+11.595944s), then adds control elapsed again. This is a reason
+to prepare a prospective separated setup/inference timing model and scale
+confirmation, not permission to bypass the failed gate or silently loosen it.
+
+Durable independent CPU audit bundle (new directory, all files read-only):
+/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-real-base-resource-review-20261027-b22436b0.
+Nine files include audit_partial.py, input metadata/prior arrays, the exact
+partial.tar, canonical terminal status, submission receipt and checksum
+manifest. Bundle archive SHA256
+47f50cb0519b91b20e7cec6e41afb3b54abcc14a8c3504550fb82224be4ed622;
+all extracted checksums verified. Reproducible CPU audit:0.017464wall seconds,
+0.173479selfCPU-s, no GPU use. These are audit costs only, not all client or
+setup CPU. It verifies partial controls only, never a full-stage scientific gate.
+
+The concrete [separated timing proposal](../cards/k6b-real-base-separated-cost-proposal.md)
+is pending explicit acceptance. No implementation or new GPU request is implied
+by merging that prospective card. Current accepted gates remain unchanged.

@@ -3,7 +3,7 @@
 PointStream is an object-centric semantic video codec. It splits a video into
 foreground (what the viewer watches) and background, and encodes each with the
 best tool for it. The paper targets racket sports and egocentric hand-object
-video. The submission venue and date are not yet set. Report searches
+video. The target submission venue is ACM TOMM; the submission date is not yet set. Report searches
 transparently, including negative results, and scope claims to the evidence.
 
 Read [README.md](README.md) for the layout, [PLAN.md](PLAN.md) for the order of

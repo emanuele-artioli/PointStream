@@ -100,3 +100,12 @@ and direct-input mutation remain hard failures. All other jobs keep the old
 canonical-byte policy. This changes physical verification location, not the
 bytes, scientific method or decision. The reviewed worker refresh is recorded
 with its source and request below; no unknown submission is replayed.
+
+The staged-verification worker was deployed on gpu2 from04ca05a7 at release
+`jobs/fleet/releases/20261027T175327Z-aef44f0a`, PID154609, doctor receipt
+`jobs/fleet/checks/d1f1140d403a418ca24d3b271e36316b`. gpu3 retains c24dfd19
+from the prior scoped release; other workers are unchanged. This is a partial
+rollout. Exact request outcomes and all study costs are in the experiment
+ledger. The subsequent source snapshot explicitly includes tools after an
+import-only failure; its unchanged judge and all direct/transitive imports
+passed CPU preflight with CUDA hidden before another GPU request.

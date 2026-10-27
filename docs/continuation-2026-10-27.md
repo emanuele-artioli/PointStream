@@ -1,15 +1,19 @@
 # PointStream continuation after root-chat archive — 2026-10-27
 
-Current root update: corrected request **20261027T181542Z-b22436b0** is
-published and pending, source64d77d8e/spec f053ebab. Source includes tools
-and passed CPU-only imports in the frozen runtime. One native2700s wait
-is active, exec session11170; receipt and exact identities are in the latest
-experiment entry. Deadline20:00 UTC, maximum2840s:
-smoke120/full2550/validator120/overhead50. Earlier setup requests
-20261027T165235Z-f58a59af CANCELLED and20261027T180347Z-0f65e6f6 FAILED
-before scoring, charged120+60s. Prior cumulative760/3600s. Historical580s
-figures below describe the original stop only. No replacement scientific
-quality result accepted. Preserve terminal requests, inspect exact IDs, never replay.
+Current root update: corrected request **20261027T181542Z-b22436b0 FAILED**
+its120s smoke allowance. No full stage, complete resource gate or scientific
+quality decision. CPU audit finds exact prior source/composite hashes and zero
+LPIPS/DISTS differences on both sampled ticks in both windows. Charge270s
+conservatively, cumulative **1030/3600s**, **2570s remaining**. All requests
+terminal, waits complete, events acknowledged; no recurring model monitor.
+
+Read the latest experiment entry and
+[prospective separated timing proposal](cards/k6b-real-base-separated-cost-proposal.md).
+It requires explicit acceptance before another GPU request: changed cost model
+and300s smoke/2000s full/120s validator/150s residual within2570s. No new
+quote is accepted and no retry is authorized. Preserve all original requests
+and partial scratch; never replay. Historical580s figures below describe the
+original stop only. Complete artifacts/provenance remain in the ledger.
 
 ## Goal and current decision
 

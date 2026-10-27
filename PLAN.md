@@ -35,8 +35,8 @@ budget, storage state and the next decision. The existing study chat is
 `01a16e7a-e752-78f3-b372-c338d8cdbf46` ("Prepare tennis confirmation study");
 its code and reports are merged. It is idle. Do not create duplicate studies or
 restart any terminal job. Pace active sessions to conserve tokens; do not launch
-several reasoning turns automatically. No research job or recurring model monitor was left
-running by this root chat.
+several reasoning turns automatically. All resumed requests are terminal; no research job or recurring model monitor
+is running. Read the current ledger below before taking action.
 
 **Current scientific position:** no complete PointStream win over both
 required baselines has been established. The best player component combines
@@ -52,17 +52,17 @@ conversion is validated and original controls passed in the smoke; the full
 quality run never launched because its projected 2448.315 s including
 publication exceeded the frozen 1800 s stage reservation. This is a cost stop,
 not a quality failure. No scientific quality result or BD-rate is accepted.
-The original3600 GPU-second cap remains. Conservative charges are
-**760s**, including120s for cancelled setup20261027T165235Z-f58a59af and60s
-for import-only failure20261027T180347Z-0f65e6f6; neither scored frames.
-Corrected request **20261027T181542Z-b22436b0** is published and pending,
-source64d77d8e/spec f053ebab. Its src/experiments/tools/pyproject.toml closure
-passed CPU imports in the frozen runtime. Deadline20:00 UTC; remaining2840s:
-smoke120/full2550/validator120/overhead50. A single native2700s completion
-wait is active (handle and receipt in the experiment record). Inspect exact
-IDs, never replay. The [actual-base card](docs/cards/k6b-real-base-quality-pilot.md)
-governs unchanged scientific gates; no new scientific quality result accepted.
-The [recovery report](docs/fleet-health-recovery-2026-10-27.md) and latest
+The original3600 GPU-second cap remains. Conservative charges are now
+**1030s**, remaining **2570s**. Corrected request20261027T181542Z-b22436b0
+FAILED its120s smoke allowance; no full stage or quality decision. Partial
+controls reproduce exactly on two ticks in both windows, independently checked
+on CPU. All waits ended and events were acknowledged. No new GPU request.
+The [separated timing proposal](docs/cards/k6b-real-base-separated-cost-proposal.md)
+explains the setup/inference scaling issue and proposes a300s smoke/2000s full
+within2570s. It changes the accepted resource contract and requires explicit
+acceptance; it is not an approved retry or a valid new quote. The
+[actual-base card](docs/cards/k6b-real-base-quality-pilot.md) governs unchanged
+science. The [recovery report](docs/fleet-health-recovery-2026-10-27.md) and latest
 [experiment entry](docs/experiments/k6b-players.md) preserve all identities.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
@@ -249,7 +249,7 @@ marked `card ready` is waiting for the user to start it.
 | Root continuation | [2026-10-27 handover](docs/continuation-2026-10-27.md) | `codex/root-handover-20261027`, [PR #254](https://github.com/emanuele-artioli/PointStream/pull/254) | Codex | reported: final handover for user-requested root-chat archive after merge; no new session or research job launched |
 | Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
-| Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: compatible workers refreshed; two setup-only terminal requests charged180s; corrected request20261027T181542Z-b22436b0 published, pending, source64d77d8e/spec f053ebab; prior760/3600s; native bounded wait active; inspect, never replay |
+| Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: compatible workers refreshed; corrected request20261027T181542Z-b22436b0 FAILED120s smoke limit, no full stage; exact two-tick controls both windows; conservative1030/3600s,2570 remain; separated timing proposal pending acceptance; no active wait or GPU request |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
