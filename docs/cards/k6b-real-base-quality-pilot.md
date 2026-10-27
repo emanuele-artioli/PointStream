@@ -1,4 +1,4 @@
-# Actual-base player enhancement pilot — GPU SOURCE CONTROL RECOVERED
+# Actual-base player enhancement pilot — QUALITY SMOKE COST GATE STOPPED
 
 Goal: test whether the frozen PR242 lossy-reference generation and PR247
 per-frame SAM players improve a REAL decoded whole-frame SVT base at equal
@@ -182,3 +182,20 @@ source revision `8bd01ff5`, <=2500 admitted seconds and 08:48 UTC deadline,
 under the original 3600-second study ledger. Inspect this ID, never replay an
 uncertain submission. The full stage may launch only after both controls and
 the representative projection pass.
+
+
+## Terminal quality-smoke decision (2026-10-27)
+
+Job `20261027T080644Z-9dba0803` FAILED its cost projection:2227.523141 s
+worker /2448.314646 s including publication exceeds the frozen1800 s full
+stage. Both historical control variants passed for both windows at the two
+smoke ticks/window; GPU, memory, finite scores, rates and composites passed.
+Full judging never launched. Smoke scores are not scientific evidence; no
+quality win/loss or BD-rate is accepted. No further GPU run under this plan.
+
+Conservative study charge580/3600 GPU-s (370 conversion +210 quality smoke);
+actual admitted434.291084 s. The unused3020 s does not override this gate.
+Any revised execution plan must be decided prospectively. Frozen inputs,
+cohort, quality rule and limitations remain as above. Exact gate evidence is
+[k6b-real-base-quality-smoke-validation.json](k6b-real-base-quality-smoke-validation.json);
+full terminal accounting and checks are at the end of the experiment entry.

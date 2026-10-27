@@ -5353,3 +5353,47 @@ all-six representative actual 1080p paths and conservative cost projection.
 No retry or additional job without inspecting this exact ID. The compact JSON
 header is counted but receiver/model bootstrap remains incomplete: results
 are optimistic rate-floor comparisons, never complete delivery claims.
+
+
+### 2026-10-27 — Real-base quality smoke stopped at the cost gate
+
+Job `20261027T080644Z-9dba0803` terminated FAILED on gpu2 (RTX A6000):
+the substantive smoke validator rejected the projected full-stage cost. Both
+original granted-matte and predicted-mask controls reproduced for BOTH windows
+on the two predeclared smoke ticks/window; all six actual 1080p base/hybrid
+paths produced finite scores, valid rates and composite identities. Qualified
+GPU and memory checks passed. These are smoke controls only, not full80-frame
+quality evidence. The separate conversion diagnostic reproduced all80 original
+source GPU hashes/window.
+
+The projected full worker cost was **2227.523141 s**, or **2448.314646 s**
+including publication, above the frozen **1800 s** full-stage reservation.
+Both projection checks failed; every other substantive validation check passed.
+The full quality stage never launched. No win, loss, BD-rate or scientific
+quality conclusion is accepted from the two-tick smoke. The stop is a cost
+gate, not evidence that the hybrid fails its quality decision rule. Preserve
+the frozen cohort, central scale4 point and decision rules. No retry, expanded
+reservation or new GPU job is authorized by this result.
+
+Smoke validation: [exact JSON](../cards/k6b-real-base-quality-smoke-validation.json),
+SHA256 `fd5509a633ae0a4dccdc944d66b4f66113f3c8a2900c463630e92ed3b7455085`. Native smoke command exited0 after
+80.282832 wall seconds; measured child CPU106.369406 s. Shared-host timing is
+not an inference-speed claim. Terminal admitted GPU time was151.469499 s;
+receipt-to-terminal205.615705 s, conservatively charged210 s. With the
+conversion diagnostic charged370 s, the current study ledger is
+**580/3600 GPU-s** conservative (434.291084 admitted GPU-s). Unused3020 s
+does not relax the failed stage gate; a revised prospective plan needs a
+separate decision before execution. Both study jobs are terminal; no monitor
+or running quality stage remains.
+
+Limits persist: prior granted target-derived Telea evidence is not a delivered
+background result; this smoke's hybrid uses a real decoded base but has no
+accepted full quality result. Rates remain optimistic floors because the
+adapter tensor/bootstrap directory and complete delivery framing are missing.
+Only80/240 saved generator ticks/window exist, the SVT envelope has only three
+settings, no qualified ball/DCVC/ROI comparison exists, source/replay
+independence remains unresolved, and the115px threshold stays exploratory.
+
+Local checks: ruff and mypy passed; final pytest897 passed,25 skipped and two
+known platform/sandbox failures (process suspension permission and Linux-only
+protected-storage symlink resolution). Linux CI remains the merge gate.
