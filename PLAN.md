@@ -59,14 +59,15 @@ exactly on two ticks in both windows, independently audited on CPU.
 The human now approved the [separated timing contract](docs/cards/k6b-real-base-separated-cost-proposal.md):
 300s smoke/2000s full/120s validator/150s residual within2570s. Implementation/checks passed on codex/real-base-separated-cost-model,
 source01888c76, Linux CI green. Final request20261027T211451Z-f6a754eb
-is PUBLISHED/PENDING, normalized spec33474777, source identitybe7dfb19.
+is RUNNING on gpu2 GPU1 (A6000), normalized spec33474777, source identitybe7dfb19.
 The original transfer timed out; all210files and native identity were verified
 before its first publication, with no duplicate request. Native bounded wait
-handle45888 is active; never replay submission or publication. Deadline refreshed prospectively to22:30 UTC because
-the old20:00 deadline expired while awaiting acceptance. Both eligible hosts
-currently lack the original required free-memory margin; preserve that gate.
+was45888, woke on acknowledged contention; resumed handle69521 within
+the original observation window. Never replay submission or publication. Deadline refreshed prospectively to22:30 UTC because
+the old20:00 deadline expired while awaiting acceptance. The request admitted only after44,229MiB became free, satisfying the
+original margin. Foreign process305859 is preserved; timing is cost only.
 The [actual-base card](docs/cards/k6b-real-base-quality-pilot.md) keeps every
-scientific threshold unchanged. Earlier requests are terminal and preserved; current admission is unconfirmed.
+scientific threshold unchanged. Earlier requests are terminal and preserved; admitted start1793137556.7579308, cap2570s, no accepted fresh gate/result yet.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as

@@ -5873,3 +5873,30 @@ Native bounded wait started as exec session45888; preserve that handle and
 receipt above. Last canonical state PENDING, no host/admission/remote_status.
 The wait uses the same request and original bound; meaningful events may be
 acknowledged before resuming the remaining observation, not a new request.
+
+One attended fallback deadline check is set for21:52 UTC (22:52 Vienna),
+using the same native wait/transport completion handle, not a recurring model
+monitor. By then22:30 minus now is <2300s, the mandatory300+2000s stage
+reservation. If still canonically pending with no admitted process, conditionally
+cancel only this request because full admission is mathematically infeasible.
+A running stage must be preserved and observed within the original bound.
+This is the single latest-feasible-admission checkpoint, no cache keepalive.
+
+Native wait woke after554s on contention eventefbef650e7e25ca2868fe195d3fc3536.
+Canonical RUNNING on gpu2 GPUindex1, UUIDGPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc,
+RTX A6000; admitted supervisor start1793137556.7579308, supervisorPID719674,
+componentPID719682. Admission observed44,229MiB free, satisfying the
+unchanged20,000+8,192MiB requirement. Foreign305859 (4,400MiB) preserved.
+Shared timing is cost only. Event delivered/acknowledged.
+
+The pending-only21:52 cancellation condition is now inapplicable; no scheduled
+wakeup was created. Resume the SAME native observation for <=2100s, within
+the original45min window, output
+/private/tmp/pointstream-separated-resumed-wait.json. Supervisor budget2570s
+and22:30 UTC deadline remain binding; hard budget cutoff from admission is
+approximately22:28:47 UTC. No fresh quote or scientific outcome accepted yet.
+
+Resumed native wait handle69521, bound2100s, same original observation
+window; receipt /private/tmp/pointstream-separated-resumed-wait.json. No
+recurring monitor, extra request or scheduled callback. Prior1030s is fixed;
+add this exact request's final admitted/salvage cost conservatively on closure.
