@@ -199,3 +199,9 @@ Any revised execution plan must be decided prospectively. Frozen inputs,
 cohort, quality rule and limitations remain as above. Exact gate evidence is
 [k6b-real-base-quality-smoke-validation.json](k6b-real-base-quality-smoke-validation.json);
 full terminal accounting and checks are at the end of the experiment entry.
+
+The resumed root's [prospective cost revision](k6b-real-base-cost-revision.md)
+proposes smoke240/full2600/validator120/residual60 within the same3020s remainder.
+It awaits human acceptance; this link does not amend the accepted reservation
+or authorize GPU execution. A fresh representative smoke and current job/worker
+reconciliation remain mandatory.
