@@ -38,35 +38,32 @@ restart any terminal job. Pace active sessions to conserve tokens; do not launch
 several reasoning turns automatically. All resumed requests are terminal; no research job or recurring model monitor
 is running. Read the current ledger below before taking action.
 
-**Current scientific position:** no complete PointStream win over both
-required baselines has been established. The best player component combines
-compressed full-RGB references with independent-frame, pose-prompted SAM:
-4/4 strict pilot metric cells with zero transmitted matte bits, but a granted
-target-derived background and only 80/240 saved generator ticks. Both windows
-are development data; source/replay independence remains unresolved. A ball
-component alone is insufficient for the intended paper.
+**Current scientific position:** no complete PointStream win over both required
+baselines has been established. The fixed player-overlay recipe now has an
+[audited real-base negative result](docs/k6b-real-base-quality-report-2026-10-27.md).
+At equal total rate on Al031@129, full LPIPS/DISTS lose (+31.25%/+17.33% BD-rate),
+although fixed-foreground quality wins. Both full cells lose robustly, making
+registered >=3/4 impossible. The prescribed early stop leaves Med actual-base
+metrics UNSCORED, not losses. Historical granted-background4/4 results do not
+transfer into a whole-frame paid-base win. Only80/240saved ticks were evaluated;
+these are familiar development windows, not untouched confirmation.
 
-**Immediate next decision:** complete the same players-only real decoded-SVT
-background feasibility test, rather than start another generator. Its native
-conversion is validated and original controls passed in the smoke; the full
-quality run never launched because its projected 2448.315 s including
-publication exceeded the frozen 1800 s stage reservation. This is a cost stop,
-not a quality failure. No scientific quality result or BD-rate is accepted.
-The original3600 GPU-second cap remains: **1030s charged,2570s left**.
-Corrected request20261027T181542Z-b22436b0 FAILED its120s smoke allowance;
-no full stage or scientific quality decision. Partial controls reproduce
-exactly on two ticks in both windows, independently audited on CPU.
-The human now approved the [separated timing contract](docs/cards/k6b-real-base-separated-cost-proposal.md):
-300s smoke/2000s full/120s validator/150s residual within2570s. Implementation/checks passed on codex/real-base-separated-cost-model,
-source01888c76, Linux CI green. Final request20261027T211451Z-f6a754eb
-is PUBLISHED/PENDING, normalized spec33474777, source identitybe7dfb19.
-The original transfer timed out; all210files and native identity were verified
-before its first publication, with no duplicate request. Native bounded wait
-handle45888 is active; never replay submission or publication. Deadline refreshed prospectively to22:30 UTC because
-the old20:00 deadline expired while awaiting acceptance. Both eligible hosts
-currently lack the original required free-memory margin; preserve that gate.
-The [actual-base card](docs/cards/k6b-real-base-quality-pilot.md) keeps every
-scientific threshold unchanged. Earlier requests are terminal and preserved; current admission is unconfirmed.
+**Study closed:** final job20261027T211451Z-f6a754eb is COMPLETE with a valid
+scientific early stop. Independent score/rate audit passed55checks, and CPU
+replay matched all240hybrids/480image hashes. Both control windows completed
+all80ticks. Conservative study cost **2350/3600GPU-s**, **1250s unspent**.
+All waits ended and events were acknowledged. No new GPU request is authorized
+by this result; do not complete receiver serialization or try another generator
+to evade the failed rule. Source01888c76/spec33474777 remain immutable.
+
+**Next research decision:** the [ideal-player appearance bound](docs/cards/k6b-ideal-player-bound.md)
+is PROPOSED, not approved: determine whether source-perfect players on the same
+paid scale4 base have enough whole-frame headroom before funding another
+renderer. Proposed1100s maximum fits the1250s remainder, but needs explicit
+acceptance of this NEW diagnostic and its resource contract. Exact source RGB
+for all80Al ticks is available and CPU-verified, so no GPU conversion is needed.
+The original registered failure remains unchanged; foreground-only gains are
+not a fair-ROI or two-baseline codec claim.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
@@ -252,7 +249,8 @@ marked `card ready` is waiting for the user to start it.
 | Root continuation | [2026-10-27 handover](docs/continuation-2026-10-27.md) | `codex/root-handover-20261027`, [PR #254](https://github.com/emanuele-artioli/PointStream/pull/254) | Codex | reported: final handover for user-requested root-chat archive after merge; no new session or research job launched |
 | Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
-| Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: compatible workers refreshed; corrected request20261027T181542Z-b22436b0 FAILED120s smoke limit, no full stage; exact two-tick controls both windows; conservative1030/3600s,2570 remain; separated timing proposal pending acceptance; no active wait or GPU request |
+| Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: final20261027T211451Z-f6a754eb COMPLETE; fresh separated smoke passes, full stops scientifically after Al loses both whole-frame metrics; audited55checks+240CPUhybrids;2350/3600s charged,1250unspent; no active wait/GPU job |
+| Ideal-player appearance bound | [proposed finite bound](docs/cards/k6b-ideal-player-bound.md) | `codex/k6b-ideal-player-bound` | Codex | planned branch not created; NEW question after scientific failure; sourceRGB80/80 CPU-verified, proposed1100s <=1250s remainder; no GPU authority or request |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).

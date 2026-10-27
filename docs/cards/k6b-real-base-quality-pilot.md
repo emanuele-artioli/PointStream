@@ -1,4 +1,4 @@
-# Actual-base player enhancement pilot — QUALITY SMOKE COST GATE STOPPED
+# Actual-base player enhancement pilot — AUDITED SCIENTIFIC FAIL
 
 Goal: test whether the frozen PR242 lossy-reference generation and PR247
 per-frame SAM players improve a REAL decoded whole-frame SVT base at equal
@@ -206,3 +206,15 @@ The human accepted this allocation on2026-10-27 in the resumed root chat.
 It prospectively amends both prior full-stage ceilings to2600s within the
 unchanged3020s remainder. A fresh representative smoke and current job/worker
 reconciliation remain mandatory; no scientific or identity gate is relaxed.
+
+## Final accepted outcome — 2026-10-27
+
+The accepted separated timing recovery passed its fresh smoke and completed
+job20261027T211451Z-f6a754eb with the registered arithmetic early stop. Al's
+full-frame LPIPS/DISTS both lose at the fixed total-rate scale4 point, robust
+to+/-0.001; full >=3/4 is therefore impossible. Both historical control windows
+passed all80ticks; Med actual-base scores remain unscored. Independent score,
+rate and native CPU-composite audits passed. See the complete
+[final report](../k6b-real-base-quality-report-2026-10-27.md).
+Conservative study2350/3600GPU-s,1250unspent. This closes the tested recipe,
+not the entire semantic-coding problem, and authorizes no fresh generator.

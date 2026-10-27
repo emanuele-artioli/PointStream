@@ -1,24 +1,38 @@
 # PointStream continuation after root-chat archive — 2026-10-27
 
-Current update after human acceptance: the separated timing contract is
-APPROVED, original cap unchanged. Prior conservative charge1030/3600s;
-2570s left = smoke300/full2000/validator120/residual150. Implementation and CPU checks on codex/real-base-separated-cost-model
-passed, source01888c76 and Linux CI green. Final exact request
-20261027T211451Z-f6a754eb is PUBLISHED/PENDING, normalized spec33474777,
-source identitybe7dfb19. Original transfer timed out, all210files and native
-identity were verified, then first publication completed under the same ID.
-Native wait handle45888, <=2700s, is active; receipt
-/private/tmp/pointstream-separated-approved-wait.json. No admission confirmed.
-Inspect this ID after any lost reply; never replay submission or publication. Prospectively refresh expired deadline to22:30 UTC.
-The last exact request20261027T181542Z-b22436b0 is canonically FAILED, no
-full stage. Its partial two-tick controls in both windows reproduce exactly
-in the independent durable audit. Existing requests remain terminal, no
-recurring model monitor. Both eligible hosts are currently memory-busy; do
-not reduce the fixed20,000MiB reservation or8,192MiB free-memory margin.
-Read the latest experiment entry before acting on this sole new request. Future failures close this accepted attempt. No scientific quality
-result or new quote is accepted until all fresh gates pass.
+Current accepted outcome: **SCIENTIFIC FAIL** of the fixed real-base player
+recipe. Job20261027T211451Z-f6a754eb is canonically COMPLETE, valid early stop
+after Al loses both full-frame metrics. Med actual-base scores remain UNSCORED.
+Both historical control windows passed all80ticks. Independent score/rate
+audit passed55checks; CPU replay matched240hybrids/480image hashes without
+source video or target RGB. Read the
+[final report](k6b-real-base-quality-report-2026-10-27.md) before any new work.
 
-## Goal and current decision
+Conservative study **2350/3600GPU-s**, **1250s unspent**. Final request
+charged1320s (1276.951465s primary,1318.620690s through terminal reconciliation).
+No active wait, scheduled callback or recurring model monitor; all events
+acknowledged. Background callbacks and model cache lifetime remain unknown.
+Do not replay any original request or treat unused time as a new-method grant.
+
+Source01888c76ce2dd2d7ffbb5ceb63f9a28e774a41f1, source identitybe7dfb19,
+normalized spec33474777; actual GPU2 index1, A6000, UUID40e9a544-b3d6-e5f3-a736-7020a6401bfc.
+Source archive0c153bba and full published archivee346844d are preserved.
+The original transfer timeout was recovered by verifying210files then completing
+the FIRST publish RPC under the SAME ID, never resubmitting. PR259 merged.
+Read the experiment ledger for complete checksums and all immutable input paths.
+
+The [ideal-player bound](cards/k6b-ideal-player-bound.md) is a NEW PROPOSAL
+requiring explicit acceptance: no training/generation, finite target-appearance
+oracle, proposed1100s within1250s left, fresh controls/cost gate and8,000MiB
+reservation supported by measured3.522GiB peak plus existing8,192MiB margin.
+CPU preflight confirms all80Al source RGB hashes in preserved failed-smoke
+truth-al/source.npy; protect that data until any new input archive is published.
+No GPU request exists for the proposal. The original failure is not relabeled.
+
+The historical archived state below predates this completed study and is kept
+for provenance; its580/3020figures and next steps are superseded by this header.
+
+## Historical goal and original stop
 
 Seek a selective semantic-coding win that can support a paper on players and
 ball, followed by extension beyond these development windows. A ball-only
@@ -107,7 +121,7 @@ this handover and their result is recorded in the closure note below.
 | `20261027T074823Z-135421ee` | COMPLETE, GPU conversion; 80/80 original source hashes per window; six80-frame base RGB sets independently repeated/verified | frozen diagnostic worker `146f06ee`; admitted282.821585s, conservatively370 GPU-s |
 | `20261027T080644Z-9dba0803` | FAILED **cost projection only**; both window controls pass on the predeclared two smoke ticks/window; full never launched | worker `8bd01ff5703ebf5b1cf41feef4f564f948cf44b2`; admitted151.469499s, conservatively210 GPU-s |
 
-**Current study total: 580/3600 GPU-s conservative (0.161111/1.0 GPU-hour),
+**Historical original checkpoint total: 580/3600 GPU-s conservative (0.161111/1.0 GPU-hour),
 434.291084 actually admitted; nominal3020s remain.** All setup, smoke, failure,
 validation and publication costs stay inside the same cap. Previous study
 budgets are closed. No accepted full quality score, win/loss, or BD-rate from
