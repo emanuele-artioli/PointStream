@@ -1,4 +1,4 @@
-# Native whole-frame base recovery encode — AUTHORIZED, NOT RUN
+# Native whole-frame base recovery encode — COMPLETE
 
 Goal: produce verifiable actual whole-source SVT streams and decoded pixels for
 Al031@129 and Med014@194, as inputs to a later saved-80 feasibility test. This
@@ -135,3 +135,21 @@ ticks/point are required. Six full decodes are independently repeated inside
 the worker. Source judged-frame RGB hashes are retained as controls. New streams
 are never labelled recovered. If any assumption, affinity, validation or
 projection fails, the stage stops; no GPU/quality work follows.
+
+Submitted CPU-only job `20261027T072713Z-2888cefe`, source `44ee278b`,
+normalized specification SHA256 `50d151e64a3fc48ed3d10533099475dcffc1ead7a921470a7fdfc516619fcfc8`,
+2026-10-27 08:10 UTC deadline. Inspect this same job, never replay. Full
+promotion is gated by substantive smoke and <=1300 s projection. Outcome and
+usage must be reported before deciding next steps.
+Smoke gate PASSED: 18/18 checks, 18.224570 workload CPU-s, conservative
+683.421375 s full projection below the 1300 s full guard. Full running; inspect
+job `20261027T072713Z-2888cefe` rather than resubmit.
+
+**COMPLETE:** `20261027T072713Z-2888cefe`, workload184.541090/1800 CPU-s;
+independent archive audit separately37.743262 CPU-s, supervisor/staging CPU
+unmeasured. All six 240-frame IVF/YUV and six 80-frame RGB arrays passed
+independent per-frame hashes. The six new IVF byte hashes match historical
+receipts. Immutable read-only archive and exact identities are recorded in the
+[experiment result](../experiments/k6b-players.md#2026-10-27--native-base-recovery-complete).
+No GPU work was run; the [quality proposal](k6b-real-base-quality-pilot.md)
+requires new authorization and measured smoke. CPU workload ledger closed.
