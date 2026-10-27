@@ -52,18 +52,18 @@ conversion is validated and original controls passed in the smoke; the full
 quality run never launched because its projected 2448.315 s including
 publication exceeded the frozen 1800 s stage reservation. This is a cost stop,
 not a quality failure. No scientific quality result or BD-rate is accepted.
-The original3600 GPU-second cap remains. Conservative charges are now
-**1030s**, remaining **2570s**. Corrected request20261027T181542Z-b22436b0
-FAILED its120s smoke allowance; no full stage or quality decision. Partial
-controls reproduce exactly on two ticks in both windows, independently checked
-on CPU. All waits ended and events were acknowledged. No new GPU request.
-The [separated timing proposal](docs/cards/k6b-real-base-separated-cost-proposal.md)
-explains the setup/inference scaling issue and proposes a300s smoke/2000s full
-within2570s. It changes the accepted resource contract and requires explicit
-acceptance; it is not an approved retry or a valid new quote. The
-[actual-base card](docs/cards/k6b-real-base-quality-pilot.md) governs unchanged
-science. The [recovery report](docs/fleet-health-recovery-2026-10-27.md) and latest
-[experiment entry](docs/experiments/k6b-players.md) preserve all identities.
+The original3600 GPU-second cap remains: **1030s charged,2570s left**.
+Corrected request20261027T181542Z-b22436b0 FAILED its120s smoke allowance;
+no full stage or scientific quality decision. Partial controls reproduce
+exactly on two ticks in both windows, independently audited on CPU.
+The human now approved the [separated timing contract](docs/cards/k6b-real-base-separated-cost-proposal.md):
+300s smoke/2000s full/120s validator/150s residual within2570s. CPU-only
+implementation/checks are under way on codex/real-base-separated-cost-model;
+no new GPU request yet. Deadline refreshed prospectively to22:30 UTC because
+the old20:00 deadline expired while awaiting acceptance. Both eligible hosts
+currently lack the original required free-memory margin; preserve that gate.
+The [actual-base card](docs/cards/k6b-real-base-quality-pilot.md) keeps every
+scientific threshold unchanged. Existing requests are terminal and preserved.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as

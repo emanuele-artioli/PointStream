@@ -758,8 +758,10 @@ def campaign(directory: Path) -> int:
             if returncode:
                 # Failed scratch stays on the host for inspection; staging.json names it.
                 raise fleet.FleetError(f"{stage} failed with exit code {returncode}")
+            publication_started = time.monotonic()
             staging_record["published"] = staging.publish_scratch(scratch, output)
             staging.release_scratch(scratch, output)
+            staging_record["publication_seconds"] = time.monotonic() - publication_started
             staging_record["released"] = time.time()
             monitor.write_json(output / "staging.json", staging_record)
             monitor.publish_progress(stage, 1)

@@ -1,19 +1,18 @@
 # PointStream continuation after root-chat archive — 2026-10-27
 
-Current root update: corrected request **20261027T181542Z-b22436b0 FAILED**
-its120s smoke allowance. No full stage, complete resource gate or scientific
-quality decision. CPU audit finds exact prior source/composite hashes and zero
-LPIPS/DISTS differences on both sampled ticks in both windows. Charge270s
-conservatively, cumulative **1030/3600s**, **2570s remaining**. All requests
-terminal, waits complete, events acknowledged; no recurring model monitor.
-
-Read the latest experiment entry and
-[prospective separated timing proposal](cards/k6b-real-base-separated-cost-proposal.md).
-It requires explicit acceptance before another GPU request: changed cost model
-and300s smoke/2000s full/120s validator/150s residual within2570s. No new
-quote is accepted and no retry is authorized. Preserve all original requests
-and partial scratch; never replay. Historical580s figures below describe the
-original stop only. Complete artifacts/provenance remain in the ledger.
+Current update after human acceptance: the separated timing contract is
+APPROVED, original cap unchanged. Prior conservative charge1030/3600s;
+2570s left = smoke300/full2000/validator120/residual150. Implementation and
+CPU checks on codex/real-base-separated-cost-model are in progress; no new
+request exists yet. Prospectively refresh expired deadline to22:30 UTC.
+The last exact request20261027T181542Z-b22436b0 is canonically FAILED, no
+full stage. Its partial two-tick controls in both windows reproduce exactly
+in the independent durable audit. Existing requests remain terminal, no
+recurring model monitor. Both eligible hosts are currently memory-busy; do
+not reduce the fixed20,000MiB reservation or8,192MiB free-memory margin.
+Read the latest experiment entry before freezing/submitting exactly one new
+request. Future failures close this accepted attempt. No scientific quality
+result or new quote is accepted until all fresh gates pass.
 
 ## Goal and current decision
 

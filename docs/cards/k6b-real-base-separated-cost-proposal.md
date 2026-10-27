@@ -1,10 +1,11 @@
-# Real-base recovery with separated timing — PROPOSED, NOT AUTHORIZED
+# Real-base recovery with separated timing — APPROVED — 2026-10-27
 
 The user approved the prior same-cap allocation, and execution proceeded.
 Request20261027T181542Z-b22436b0 then hit its120s smoke limit. No full stage
 launched. The accepted plan says "No retry or transfer from closed studies is
 authorized" and "Stop on any failed control, feasibility, resource or decision
-gate." This proposal requires explicit acceptance before another GPU request.
+gate." The human explicitly accepted this revised model and allocation on2026-10-27.
+Exactly one fresh request is authorized after CPU checks and freezing.
 It is not acceptance of the failed smoke, a quality result or additional budget.
 
 ## Evidence and remaining authority
@@ -41,7 +42,7 @@ A one-window extrapolation of the truncated smoke is not a promotion quote.
 | Total remaining ceiling | 2570 |
 
 The300s smoke exceeds the last accepted240s smoke allocation, and the timing
-model changes. Acceptance must explicitly authorize both, within the original
+model changes. The human acceptance explicitly authorizes both, within the original
 3600s study ceiling. No closed budget transfers or additional compute are
 requested. The150s residual is planning headroom; the native supervisor's
 2570s total and remaining-reservation check remain binding. Stop if the full
@@ -96,7 +97,7 @@ cover fixed/cold/warm accounting, missing/invalid/unstable samples, publication,
 strict boundaries and saved-spec selection. Review the diff to prove changes
 are timing/instrumentation only; run configured ruff, mypy and pytest/CI.
 Freeze the new source/spec/input identities, inspect all old requests and both
-eligible hosts, then submit exactly once only after explicit acceptance.
+eligible hosts, then submit exactly once under the recorded human acceptance.
 Use one native bounded observation, acknowledging meaningful events before
 resuming within its original deadline. No recurring model monitor.
 
