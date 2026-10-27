@@ -5682,3 +5682,25 @@ in the exact packed Python3.12.14 on gpu2 with CUDA hidden: eighteen module
 imports including transitive dataset helpers,0.517225s, no stderr. Judging
 worker SHA256 remains8378688259d9842ebf64fd219dd86b9347c5b8d4facd9d1bde703da13423d80d.
 Receipt: /local/users/emanuele/pointstream/preflight-real-base-closure-20261027/import-result.json.
+
+Corrected request **20261027T181542Z-b22436b0** allocated; current local statepreparing.
+Source64d77d8e81df4dbb9c3b640fec2a3c7503cc356b; source archive SHA256pending;
+normalized spec SHA256f053ebabb14798e620e6dc21ca865e18b959238a51c63fc03107ed4b0de46bdb. Source selection includes tools,
+no patches. Deadline20:00 UTC, maximum2840s; study charged760/3600s before
+this request. Re-read this entry then inspect canonical status; never replay.
+The complete compatible A6000 pool gpu2/gpu3 was inspected immediately before
+submission: gpu2 eligible, gpu3 resource-busy; neither had PointStream claims.
+CPU imports, including explicit k6/k6b/matte judge package imports, passed.
+
+Publication receipt confirmed for20261027T181542Z-b22436b0: pending, source
+archive SHA256c3be7ac433b11981f83eb7c88586a8453a1301b045dcc1bb23cd7e77f993e88c.
+One native bounded wait will cover this request: `scripts/ps-fleet wait
+20261027T181542Z-b22436b0 --max-seconds2700` (CLI separates option/value).
+Output /private/tmp/pointstream-real-base-closure-wait-20261027.json. No
+recurring model monitor or automatic submission retry. Deadline20:00 UTC,
+study prior charge760s and new request maximum2840s.
+
+Wait client started and preserved as native exec session11170, one bounded
+2700-second ps-fleet wait, output path above. At18:19 UTC canonical state
+PENDING, no admission assumed. Background model wakeups remain unverified;
+this is attended execution. Cache lifetime unknown.

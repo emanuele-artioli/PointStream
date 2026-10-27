@@ -1,13 +1,15 @@
 # PointStream continuation after root-chat archive — 2026-10-27
 
-Current root update:20261027T180347Z-0f65e6f6 FAILED before scoring because
-the selected source omitted tools. Its full stage never launched. Charge60s
-conservatively, cumulative760/3600s. Earlier setup20261027T165235Z-f58a59af
-is CANCELLED, charged120s. Corrected source closure is undergoing CPU-only
-imports before a fresh request. Remaining2840s: smoke120/full2550/validator120/
-overhead50, deadline20:00 UTC. Read the latest experiment entry before acting.
-Historical580s figures below describe the original stop only. No replacement
-scientific quality result accepted. Preserve terminal requests, never replay.
+Current root update: corrected request **20261027T181542Z-b22436b0** is
+published and pending, source64d77d8e/spec f053ebab. Source includes tools
+and passed CPU-only imports in the frozen runtime. One native2700s wait
+is active, exec session11170; receipt and exact identities are in the latest
+experiment entry. Deadline20:00 UTC, maximum2840s:
+smoke120/full2550/validator120/overhead50. Earlier setup requests
+20261027T165235Z-f58a59af CANCELLED and20261027T180347Z-0f65e6f6 FAILED
+before scoring, charged120+60s. Prior cumulative760/3600s. Historical580s
+figures below describe the original stop only. No replacement scientific
+quality result accepted. Preserve terminal requests, inspect exact IDs, never replay.
 
 ## Goal and current decision
 
