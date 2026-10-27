@@ -5044,3 +5044,113 @@ budget method or revised authority exists. Inputs, hashes, scope and stops are
 in the [recovery card](../cards/k6b-base-recovery-encode.md). Current player
 results remain development with target-derived Telea granted; no new quality,
 ball packet or fully accounted result follows.
+
+## 2026-10-27 — Attended native-base continuation and prospective CPU amendment
+
+Planning authorized attended CPU execution and amended the one card's CPU
+accounting prospectively: <=1800 CPU-s measured/enforced on the workload
+process tree including conversion, coding, decoding, internal validation and
+packaging; <=45 minutes fleet wall, 0 GPU. Fleet staging, supervision and the
+external validator are reported separately where observable, otherwise
+unmeasured. This is not a global fleet CPU guarantee or a retroactive change to
+closed ledgers. Same two windows and source/tool hashes, CRF63 preset4, scales
+8/4/2, 24-frame both-window scale-2 smoke, independent decode and complete
+framing/pixel preservation. Smoke must project all six full paths and work
+inside the cap before full promotion. No new generation, fitting, neural quality
+or ball inference; no unattended agent/timer. [Card](../cards/k6b-base-recovery-encode.md).
+
+The proposed workload pins its entire inherited process tree to one CPU, applies
+250/1300-second smoke/full wall alarms and reports self+completed-child CPU;
+under that affinity, the two alarm bounds plus startup/termination margin fit
+1800 workload CPU-s. The fleet's own staging/supervision and external validator
+are outside that cap. The smoke estimates all six full paths at 30 times the
+larger observed smoke CPU/wall plus 25% and gates at <=1300 seconds. The
+validator independently checks both short IVF streams, frame geometry/timing,
+input/tool identities, RGB hashes and fresh decodes and rejects truncation.
+No submission is implied by this preflight entry.
+
+Submission: CPU-only native job **20261027T072713Z-2888cefe**, pending on
+receipt. Frozen commit `44ee278b981f9ab2a0bfd5084ee8af40a20ded52`, native
+source SHA256 `4429eeb2f7f44593aa18b04233e5244fd21f392d6bdc68fb1ea573f4a6660e0f`,
+normalized spec SHA256 `50d151e64a3fc48ed3d10533099475dcffc1ead7a921470a7fdfc516619fcfc8`,
+request [specification](../cards/k6b-native-base-attended-spec.json), deadline
+2026-10-27 08:10 UTC, no GPU, <=1800 workload process-tree CPU-s and <=45min
+fleet wall. Both windows and scale2 smoke, substantive validation and projected
+full gate precede automatic full. Manager/staging/external validator are not
+included in the workload CPU cap. Attend through one bounded native fleet wait;
+no recurring monitor. Never replay an uncertain submission.
+
+Smoke gate PASSED: both 24-frame scale2 windows, 18 checks including fresh
+IVF decode, frame hashes and corruption rejection. Workload 18.224570 CPU-s,
+15.543971 measured in-run wall; projection 683.421375 s < 1300 s full guard.
+Fleet smoke execution 18.622696 s and its child CPU snapshot 18.572903 s;
+external validator elapsed 1.421865 s, CPU not separately measured. The two
+numbers differ in measurement boundaries; do not add cumulative child CPU to
+the workload CPU. Bundle SHA256
+`b3cc3999fb7c98502f4b108cbd741d28395805f7549ef938a76e91c38c6e3f7f`.
+Gate promoted the original full settings; no GPU involved.
+
+### 2026-10-27 — Native base recovery complete
+
+CPU job **20261027T072713Z-2888cefe** completed on gpu4; no GPU allocated.
+Both exact sources were converted to the historical 240-frame 1920×1080
+limited-range YUV hashes and encoded at CRF63/preset4, scales8/4/2, then each
+stream independently decoded twice. The six **new** IVF files match the
+recorded historical bitstream SHA256s byte for byte. This is reproducibility
+of the original encoded bytes, not recovery of the formerly deleted files.
+Full stream/frame identity, 25/50 fps, 240 IVF timestamps, 240 YUV frame
+hashes and 80 sampled 1080p RGB frame hashes per stream were independently
+recomputed from the published archive. Source RGB controls are saved as hashes;
+CPU-versus-original-GPU RGB equality is not yet asserted. Conversion uses the
+native limited-range YUV and bilinear chroma function, OpenCV4.10.0 bicubic RGB
+resize and torch2.10.0+cu128 on CPU, with no neural quality scoring.
+
+| Window | Scale | IVF bytes including all headers | IVF SHA256 |
+|---|---:|---:|---|
+| Al031@129 | 8 | 12,237 | `2425bd54f889b055da6408be3170bdde95b4dba96dcf240118aa5584950d7892` |
+| Al031@129 | 4 | 20,557 | `51d4ef06ed214d9c2e534e530aaf134414443fee19ad82364ee59ed0026defd9` |
+| Al031@129 | 2 | 40,422 | `5674a5a617706bdf4387aeecf6ceabac41dc7e1f2688670b115923993ddced70` |
+| Med014@194 | 8 | 11,734 | `db91ec5fbc691798048ab6cba6306d2f526bd1e555305dcb366c617bcb32ea1a` |
+| Med014@194 | 4 | 20,484 | `cf381fa8b8e8228600321dc7e7bcc5f14d323108971e2a4f71fdcebf2f499e0a` |
+| Med014@194 | 2 | 48,152 | `59cef123110d81c0f58fabc9cbb839e20493f7bcb0d437607e760a801f23c82b` |
+
+Read-only mode444 native publication:
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T072713Z-2888cefe/full/published.tar`,
+3,480,043,520 bytes, SHA256
+`00b13e89077a27a3e6ff23bf476e9795c2120c5b1f5252ddfdd6f533a8119a39`.
+Its nested `publish/bundle.tar` SHA256
+`66a6552edcf9ee0fc06693a4cd139e0f95c5d905520f1def49632548b7fbae45`;
+contains full IVF/YUV, 80 RGB frames for each of six settings and manifest
+with per-frame source, packet and pixel hashes, tool/command/framing metadata.
+Independent read-only verification recovered all six stream/YUV/RGB file
+hashes and recomputed each 240 YUV, 80 RGB and 240 IVF payload hash and every
+timestamp; all match. [Verification record](../cards/k6b-native-base-validation.json)
+SHA256 `7e6ad5eb07dc26b0dd4ad3830a0d55cf3cb6b3700f2075f6360e06ff227282f7`.
+Smoke independent validator 18/18 checks passes, including fresh decodes and
+corruption rejection. Native full worker independently re-decodes all six and
+requires exact output hashes. No unsupported claim that a separate full
+external decoder was rerun: independent final audit read the retained files.
+
+Workload CPU: smoke18.224570 + full166.316520 = **184.541090/1800 CPU-s**.
+Fleet cumulative child snapshot at full return 186.621958 s includes previous
+children and must not be added to those workload figures. Separate read-only
+archive/frame verification CPU27.222113 +10.521149 =37.743262 s; fleet staging,
+supervisor and smoke external-validator CPU were not separately measured.
+Receipt-to-terminal 273.935 s, native admitted 230.898 s, under 45 min. Stage
+projection in the full result is an unused smoke-only formula and not a future
+estimate. The terminal event was reported and acknowledged. No new GPU,
+generation, fitting, inference, metrics or ball work; this workload ledger
+is closed. The current two windows are development, source/replay independence
+unresolved, target-derived Telea remains a limitation of prior PR247 results,
+and 160 generated ticks/player remain absent. 115px remains exploratory and
+the historical step5 failure remains.
+
+Ruff/mypy pass; focused IVF corruption/timestamp test passes. Full Mac suite
+893 pass/25 skip and two known environment restrictions: sandbox denies `ps`
+and the Mac lacks the protected Linux `/home` symlink target. Linux CI is the
+project merge gate. A separately authorized SVT-only saved-80 quality proposal
+with provisional <=1.0 GPU-hour cap and <=600 s smoke is in
+[real-base pilot card](../cards/k6b-real-base-quality-pilot.md); no GPU budget is
+approved or dispatched. Fair same-window DCVC reproduction and pixel/ROI control
+are required before a broad baseline claim and require their own measured cost.
+Ball packets and a full240 semantic overlay remain unresolved.

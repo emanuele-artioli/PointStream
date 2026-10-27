@@ -1,4 +1,4 @@
-# Native whole-frame base recovery encode — AUTHORIZED, NOT RUN
+# Native whole-frame base recovery encode — COMPLETE
 
 Goal: produce verifiable actual whole-source SVT streams and decoded pixels for
 Al031@129 and Med014@194, as inputs to a later saved-80 feasibility test. This
@@ -108,3 +108,48 @@ range) and bicubic resizes RGB to 1920×1080 in `experiments.tennis.k6`; preserv
 this path and verify CPU/native pixel identities rather than substitute an
 unverified generic resize. Six streams must include all framing and complete
 240-tick pixels; no data produced yet.
+
+## Attended accounting amendment — 2026-10-27
+
+Planning amended this card prospectively to <=1800 measured/enforced CPU-s
+for the workload process tree (conversion, encodes, decodes, internal checks and
+packaging), <=45 min fleet wall and 0 GPU. Fleet staging, supervision and
+external validator CPU are separately measured where available or identified
+as unmeasured; the cap is not an aggregate fleet CPU guarantee. Earlier strict
+proposal and operational stop remain historical. Work is attended. The original
+two-window, 24-frame scale-2 smoke and substantive gate still govern promotion;
+no generation, scoring or ball inference. All earlier budgets remain closed.
+
+### Attended implementation gate
+
+The new worker restricts its workload and inherited children to one CPU,
+with 250 s smoke and 1300 s full workload wall alarms; under the verified
+inherited affinity this bounds their combined CPU by <=1550 s plus startup
+and termination margin within the 1800 s workload cap. It also records
+self+completed-child CPU; fleet staging and external validator remain separate.
+The smoke projects 30 times the larger measured smoke CPU/wall plus 25%, and
+requires <=1300 s, before the native manager may promote. It validates both
+24-frame windows at scale2 with independent decode and a truncated IVF fixture.
+Pinned paths/hashes, full framing, decoded all240 YUV and 80 reconstructed RGB
+ticks/point are required. Six full decodes are independently repeated inside
+the worker. Source judged-frame RGB hashes are retained as controls. New streams
+are never labelled recovered. If any assumption, affinity, validation or
+projection fails, the stage stops; no GPU/quality work follows.
+
+Submitted CPU-only job `20261027T072713Z-2888cefe`, source `44ee278b`,
+normalized specification SHA256 `50d151e64a3fc48ed3d10533099475dcffc1ead7a921470a7fdfc516619fcfc8`,
+2026-10-27 08:10 UTC deadline. Inspect this same job, never replay. Full
+promotion is gated by substantive smoke and <=1300 s projection. Outcome and
+usage must be reported before deciding next steps.
+Smoke gate PASSED: 18/18 checks, 18.224570 workload CPU-s, conservative
+683.421375 s full projection below the 1300 s full guard. Full running; inspect
+job `20261027T072713Z-2888cefe` rather than resubmit.
+
+**COMPLETE:** `20261027T072713Z-2888cefe`, workload184.541090/1800 CPU-s;
+independent archive audit separately37.743262 CPU-s, supervisor/staging CPU
+unmeasured. All six 240-frame IVF/YUV and six 80-frame RGB arrays passed
+independent per-frame hashes. The six new IVF byte hashes match historical
+receipts. Immutable read-only archive and exact identities are recorded in the
+[experiment result](../experiments/k6b-players.md#2026-10-27--native-base-recovery-complete).
+No GPU work was run; the [quality proposal](k6b-real-base-quality-pilot.md)
+requires new authorization and measured smoke. CPU workload ledger closed.
