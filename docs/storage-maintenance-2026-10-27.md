@@ -131,3 +131,15 @@ No further broad live-directory switching was attempted on gpu5/gpu6.
 PR #253 passed Linux CI and merged. Shared shell defaults are active; fleet
 manager deployment remains pending exactly as documented above. A new research
 root session should start with `docs/continuation-2026-10-27.md` and PLAN.md.
+
+### Later compatible-worker refresh
+
+The resumed root resolved the management health issue in PR #257 without
+changing scientific resource gates. See [fleet recovery](fleet-health-recovery-2026-10-27.md)
+for bounded60s infrastructure deadlines, stable process identity, advancing
+worker heartbeats, full doctor receipts and the inspected lost stop
+acknowledgement. gpu2/gpu3 now run the frozen repaired worker; the other four
+workers and all detached supervisors remain preserved. This is a partial
+rollout of the manager storage safeguards. No protected live-directory cleanup
+or gpu5/gpu6 live-path switching was attempted. The shell-startup trial was
+restored to the exact original configuration before this rollout.

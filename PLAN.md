@@ -35,8 +35,8 @@ budget, storage state and the next decision. The existing study chat is
 `01a16e7a-e752-78f3-b372-c338d8cdbf46` ("Prepare tennis confirmation study");
 its code and reports are merged. It is idle. Do not create duplicate studies or
 restart any terminal job. Pace active sessions to conserve tokens; do not launch
-several reasoning turns automatically. No research job or recurring model monitor was left
-running by this root chat.
+several reasoning turns automatically. All resumed requests are terminal; no research job or recurring model monitor
+is running. Read the current ledger below before taking action.
 
 **Current scientific position:** no complete PointStream win over both
 required baselines has been established. The best player component combines
@@ -52,33 +52,24 @@ conversion is validated and original controls passed in the smoke; the full
 quality run never launched because its projected 2448.315 s including
 publication exceeded the frozen 1800 s stage reservation. This is a cost stop,
 not a quality failure. No scientific quality result or BD-rate is accepted.
-The 3600 GPU-second study has conservatively spent **580 s**, leaving **3020 s**;
-that remainder does not authorize bypassing the failed gate. Prepare a CPU-only
-prospective cost/staging revision, keeping the cohort, global scale4 operating
-point, quality rules and total cap unchanged. Record acceptance of the revised plan
-before further GPU execution; do not reopen closed earlier budgets. The
-[actual-base card](docs/cards/k6b-real-base-quality-pilot.md) and its final report
-in [the player experiment record](docs/experiments/k6b-players.md) govern scope.
-
-The resumed root prepared a [prospective allocation revision](docs/cards/k6b-real-base-cost-revision.md):
-240 s fresh smoke +2600 s full +120 s validator +60 s residual overhead,
-within the unchanged3020 s remainder. The human accepted it on2026-10-27.
-The validator now reads the frozen request's full reservation; the revised
-[specification](docs/cards/k6b-real-base-quality-revised-spec.json) retains all
-input/environment identities and quality settings. No new request exists.
-Canonical status now confirms all three terminal jobs. Current admission is
-blocked: gpu3 still fails the unchanged20s environment probe, and gpu2/gpu3
-worker heartbeats were stale. Extended read-only diagnostics completed, but
-do not satisfy the gate or authorize omitting gpu3 from the compatible pool.
-Resolve current fleet health before dispatch; the approved budget remains
-580/3600s spent,3020s unused. See the latest experiment entry for diagnostics.
+The original3600 GPU-second cap remains. Conservative charges are now
+**1030s**, remaining **2570s**. Corrected request20261027T181542Z-b22436b0
+FAILED its120s smoke allowance; no full stage or quality decision. Partial
+controls reproduce exactly on two ticks in both windows, independently checked
+on CPU. All waits ended and events were acknowledged. No new GPU request.
+The [separated timing proposal](docs/cards/k6b-real-base-separated-cost-proposal.md)
+explains the setup/inference scaling issue and proposes a300s smoke/2000s full
+within2570s. It changes the accepted resource contract and requires explicit
+acceptance; it is not an approved retry or a valid new quote. The
+[actual-base card](docs/cards/k6b-real-base-quality-pilot.md) governs unchanged
+science. The [recovery report](docs/fleet-health-recovery-2026-10-27.md) and latest
+[experiment entry](docs/experiments/k6b-players.md) preserve all identities.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
 source of truth. The shared shell defaults are active and verified. Live
-application originals remain intentionally protected. Fleet manager safeguard
-rollout is pending a successful health gate (gpu2/gpu3 probe latency), so do
-not claim it deployed. See [storage closure](docs/storage-maintenance-2026-10-27.md).
+application originals remain intentionally protected. Fleet manager safeguards now run on gpu2/gpu3 after the
+verified scoped refresh; the other four workers remain unchanged. See [storage closure](docs/storage-maintenance-2026-10-27.md).
 The detailed historical findings follow; they do not supersede this resume state.
 
 ### Historical findings and completed components
@@ -258,6 +249,7 @@ marked `card ready` is waiting for the user to start it.
 | Root continuation | [2026-10-27 handover](docs/continuation-2026-10-27.md) | `codex/root-handover-20261027`, [PR #254](https://github.com/emanuele-artioli/PointStream/pull/254) | Codex | reported: final handover for user-requested root-chat archive after merge; no new session or research job launched |
 | Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
+| Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: compatible workers refreshed; corrected request20261027T181542Z-b22436b0 FAILED120s smoke limit, no full stage; exact two-tick controls both windows; conservative1030/3600s,2570 remain; separated timing proposal pending acceptance; no active wait or GPU request |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).

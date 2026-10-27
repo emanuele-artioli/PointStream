@@ -5508,3 +5508,258 @@ worker freshness before a fresh representative smoke and possible gated full.
 An independently audited full scientific result is still absent. The saved
 80/240 ticks, optimistic rate floor, absent native DCVC/ROI/ball integration,
 source/replay independence and development-data caveats remain unchanged.
+
+### 2026-10-27 — Fleet recovered; approved real-base request frozen before dispatch
+
+Goal: test whether the frozen PR242 lossy-reference generation and PR247
+per-frame SAM players improve a REAL decoded whole-frame SVT base at equal
+TOTAL rate on the same Al031@129 and Med014@194 development windows.
+
+The human approved smoke240/full2600/validator120/residual60 within the3020s
+remainder; the later instruction was to proceed. No scientific setting,
+cohort, source identity, original control, global scale4 point,80-tick
+membership, +/-0.001 sensitivity, >=3/4 full/foreground rules, early stop or
+PCHIP/anchor decision has changed. Rate-floor, missing160 generated ticks,
+DCVC/ROI/ball and development-source limitations remain. Stop on failed
+identity/control, resource/decision gate, exhausted budget or uncertain
+submission. No other generation, fitting, new method or baseline is included.
+
+Infrastructure repair PR #257 is merged with Linux CI passing. Its changes are
+bounded60s remote health/RPC deadlines matching worker-local probes, overlapping
+metadata checks, authenticated connection reuse, terminal-request caching,
+advancing-scan heartbeat and stable kernel process birth identity. Required
+resource, ownership, environment and atomic-claim checks remain. Both compatible
+hosts passed the doctor before refresh; gpu2/gpu3 now run that frozen source
+with fresh canonical worker heartbeats, other hosts and detached supervisors
+preserved. The lost gpu3 stop acknowledgement was inspected: its old PID was
+confirmed absent before starting its replacement. Details and receipts are in
+[recovery report](../fleet-health-recovery-2026-10-27.md). No resource failure
+was accepted as a passing check.
+
+The prepared scientific request retains the full A6000 compatible pool gpu2/
+gpu3. Its expired deadline was prospectively refreshed to2026-10-27 18:00 UTC
+(19:00 Vienna); no other field changed from the human-approved revised spec.
+Spec file SHA256 `d44c13ffe64d152c531e0ff17c28781f381c4ff377d447ceb44d6d5f4800044e`;
+worker SHA256 `8378688259d9842ebf64fd219dd86b9347c5b8d4facd9d1bde703da13423d80d`.
+Admission remains<=3020s, with prior580s conservative charge retained and
+no transfer from closed studies. Independent CPU-only cache preparation reads
+existing SHA256-identified archives and uses separate `/local/users/emanuele`
+storage; it preserves the original RAM cache and durable inputs and uses no
+GPU. Its costs/receipts will be recorded separately, not called GPU speedup.
+At this entry no new scientific request is submitted. Save its exact ID before
+one bounded fleet wait; inspect any lost receipt rather than replaying it.
+
+CPU preflight completed safely on separate local disks. All14 declared archive/
+weight inputs (including the packed runtime),12389884698bytes, independently
+rehashed on gpu2; final validation64.362724wall seconds /47.621686self CPU-s,
+report `/local/users/emanuele/pointstream/prewarm-real-base-20261027.json`.
+The system Python3.10 tar safety filter incorrectly treated the valid internal
+symlink `lib/terminfo -> ../share/terminfo` as archive-root-relative and rejected
+extraction. Its exact branch was inspected; a standalone legitimate-link test
+reproduced the failure. No extraction guard was disabled. The already qualified
+packed Python3.12.14 accepted that internal link with its standard data filter
+and safely extracted the unchanged SHA256-identified archive on both hosts.
+Environment preparation gpu2/gpu3:129.265279/139.438399wall seconds,
+128.984573/136.338261self CPU-s respectively. Original RAM prefixes remain
+unchanged. Native environment prefix probes passed on both new disk prefixes.
+CPU-only imports with CUDA hidden verify Torch2.10.0+cu128, NumPy1.26.4,
+OpenCV4.10.0 on both;5.900002/6.328046wall seconds and3.348017/2.882800self
+CPU-s. These are CPU setup measurements, not GPU inference timings. Failed
+setup attempts and earlier cache-copy CPU were not fully measured; no global
+CPU-budget claim is made. No GPU was reserved or executed by preparation.
+
+The first submission attempt stopped in the read-only management health RPC,
+before UUID allocation, local request record, remote prepare or publication.
+No scientific request existed and no GPU was charged. The client route had
+selected gpu3's NFS-based controller interpreter after its scoped refresh.
+A reviewed explicit management host/interpreter choice now routes shared-inbox
+operations through gpu2's local `/usr/bin/python3` (the controller dependency
+closure is standard-library-only). Canonical routed health succeeded and showed
+all six worker heartbeats fresh. Worker interpreter mappings, scientific packed
+runtime and both compute hosts remain unchanged. The verified local routing
+configuration was saved atomically with an exact backup; host2 is also first
+for old clients. There is no automatic retry or failover of writes. SSH control-
+master reuse was removed from the client to avoid background descriptor lifetime
+in captured command receipts. A new request may be created only after this
+pre-publication failure was established; this is not replaying an uncertain job.
+
+New request **20261027T165235Z-f58a59af** allocated and preserved in the local
+client record; publication receipt pending at this checkpoint. Source
+`891365612505e9067446be24094186bf79a5ff9d`, no selected/untracked patches;
+source archive SHA256 `f23d2b1d2d89539bee8f7d43768b8abfe6192fc2e770b15c0be3269a50ecb5a8`,
+selected complete code closure `src`, `experiments`, `pyproject.toml`.
+Normalized spec SHA256
+`cce9ccc1c0f9172cec2e029f745cd493904d7717baa0a23cfed3ef2fb84ce1f7`;
+deadline18:00 UTC, <=3020s admission, smoke240s/full2600s/validator120s.
+Expected durable request directory:
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T165235Z-f58a59af`.
+Inspect this exact ID after any lost receipt; do not submit again. No admission
+or scientific result is confirmed merely by allocation/publication.
+
+Monitoring will use one bounded native `scripts/ps-fleet wait` for this request,
+at most45min. A harmless2-second foreground command was actually awaited through
+the native tool and returned completion before the agent continued. This
+verifies attended foreground completion, not background wakeups; background
+model-resume callbacks and cache lifetime remain unknown. No recurring model
+monitor, keepalive or one-shot scheduler was created. Preserve the wait handle
+and output receipt; do not replace the wait with repeated model polling.
+
+### 2026-10-27 — Pre-smoke setup cancelled; staged-byte recovery within original cap
+
+Request20261027T165235Z-f58a59af was eventually published despite its lost
+reply. The original publisher was verified alive, hashing the final canonical
+GPU-base archive; no publication was replayed. Native worker preparation then
+repeated the large NFS input hashes. At admission the frozen2600s full lease
+could no longer fit before the request's18:00 UTC deadline. The root cancelled
+only this task-owned request while no quality stage had begun.
+
+Canonical state is CANCELLED. Native admitted interval
+1793121505.1932383–1793121557.9835675 = **52.790329GPU-s**, progress absent,
+no smoke gate or scientific score. Conservatively charge120s for this setup
+and cleanup, keeping prior580s unchanged: **700/3600s**, remaining2900s.
+No failed or unmeasured setup cost is forgiven and no closed budget is reused.
+All old artifacts, frozen request and source remain preserved.
+
+Prospective resource-pipeline recovery: an opt-in `verify_staged_inputs` flag
+validates the actual content-addressed staged payloads against the same SHA256s.
+Canonical paths must still exist under the external data root; direct/un-staged
+inputs retain full canonical-byte checks. Publication/admission hash or populate
+the local verified cache. Campaign prechecks defer only explicitly consumed
+staged placeholders to `stage_inputs`, which independently hashes every payload
+before either component stage can execute. Corrupt cache, changed direct data
+and corruption before full promotion fail closed in regression tests. No
+input/content, model, metric, source/control gate or quality threshold changes.
+Default behavior of all other jobs is unchanged. The frozen judging worker
+remains SHA2568378688259d9842ebf64fd219dd86b9347c5b8d4facd9d1bde703da13423d80d.
+
+The original component smoke was never invoked; the replacement is same-study
+infrastructure recovery, not a repeat of scored data. No uncertain request is
+replayed. All resource leases remain at or below their accepted ceilings:
+smoke120s (old measured command80.282832s,35%inflation108.381823<120), full2600s,
+validator120s, residual60s; total2900s. Source/runtime/import caches are prepared;
+the original full estimator and two-tick/both-window/control recipe are
+unchanged. Deadline is prospectively20:00 UTC (21:00 Vienna). Before creating
+the replacement, confirm the old request terminal and its task processes gone,
+freeze the new spec/source, and refresh the reviewed controller. The budget
+identity is700+2900=3600s, no additional GPU authority requested or assumed.
+
+### 2026-10-27 — Published replacement request, original cap retained
+
+Job **20261027T180347Z-0f65e6f6** is published, receipt pending admission.
+Source04ca05a759721bf6c3f12edce061117b51c35eb3, source archive SHA256
+9acaa6744b675f06c2575d8fdaa0b54ccbf79829d034f8d9a54559010d2bc831;
+normalized spec e8037a46de91510519125c893f8b259bf6fdecc218d11a68f751460971b2a042.
+Selected source closure src/experiments/pyproject.toml, no local patches.
+Compatible pool gpu2/gpu3, same scientific inputs and judging worker.
+Deadline2026-10-27T20:00:00Z; smoke120/full2600/validator120/overhead60,
+maximum2900s. Prior conservative charge700/3600s. Earlier setup request
+20261027T165235Z-f58a59af is CANCELLED before any scientific stage, charged120s.
+Inspect the new exact ID after lost connectivity; never replay publication.
+Native bounded wait: ps-fleet wait20261027T180347Z-0f65e6f6 --max-seconds2700
+(with normal spaces between CLI arguments). Canonical status is being read;
+no admission, smoke promotion or scientific outcome assumed from the receipt.
+
+### 2026-10-27 — Import-only failure and corrected source closure
+
+Canonical job20261027T180347Z-0f65e6f6 FAILED: smoke command0.467340s,
+ModuleNotFoundError: tools, before run(), CUDA construction, frame reading or
+scoring. The root selected src/experiments/pyproject.toml but omitted the
+transitive tools.datasets imports; this was a source-packaging mistake.
+Full never launched, no scientific controls or quality accepted. Admitted
+1793124294.5443547–1793124335.8873034 =41.342949s; salvage0.168807s.
+Conservatively charge60s: cumulative760/3600s, remaining2840s. Preserve
+all original artifacts and failed scratch. Foreign GPU process177484 untouched.
+
+Recovery includes the tools source subtree and CPU-only import preflight in
+the exact packed runtime, GPU hidden. No scientific implementation or input
+changes. Prospective smoke120/full2550/validator120/overhead50 =2840s,
+all below accepted ceilings. Prior full projected2448.314646s fits2550;
+the unchanged35%/40x projection and source/control/quality gates must pass
+afresh. No scored-data failure is retried. Deadline remains20:00 UTC.
+
+CPU preflight of corrected src/experiments/tools/pyproject.toml archive passed
+in the exact packed Python3.12.14 on gpu2 with CUDA hidden: eighteen module
+imports including transitive dataset helpers,0.517225s, no stderr. Judging
+worker SHA256 remains8378688259d9842ebf64fd219dd86b9347c5b8d4facd9d1bde703da13423d80d.
+Receipt: /local/users/emanuele/pointstream/preflight-real-base-closure-20261027/import-result.json.
+
+Corrected request **20261027T181542Z-b22436b0** allocated; current local statepreparing.
+Source64d77d8e81df4dbb9c3b640fec2a3c7503cc356b; source archive SHA256pending;
+normalized spec SHA256f053ebabb14798e620e6dc21ca865e18b959238a51c63fc03107ed4b0de46bdb. Source selection includes tools,
+no patches. Deadline20:00 UTC, maximum2840s; study charged760/3600s before
+this request. Re-read this entry then inspect canonical status; never replay.
+The complete compatible A6000 pool gpu2/gpu3 was inspected immediately before
+submission: gpu2 eligible, gpu3 resource-busy; neither had PointStream claims.
+CPU imports, including explicit k6/k6b/matte judge package imports, passed.
+
+Publication receipt confirmed for20261027T181542Z-b22436b0: pending, source
+archive SHA256c3be7ac433b11981f83eb7c88586a8453a1301b045dcc1bb23cd7e77f993e88c.
+One native bounded wait will cover this request: `scripts/ps-fleet wait
+20261027T181542Z-b22436b0 --max-seconds2700` (CLI separates option/value).
+Output /private/tmp/pointstream-real-base-closure-wait-20261027.json. No
+recurring model monitor or automatic submission retry. Deadline20:00 UTC,
+study prior charge760s and new request maximum2840s.
+
+Wait client started and preserved as native exec session11170, one bounded
+2700-second ps-fleet wait, output path above. At18:19 UTC canonical state
+PENDING, no admission assumed. Background model wakeups remain unverified;
+this is attended execution. Cache lifetime unknown.
+
+The bounded wait woke on contention eventd0d5d1c482b7588793eb018584b6f75a
+after164s. Canonical status RUNNING on gpu2, supervisor start1793125133.6438456,
+component PID218117, smoke progress0 at1793125215.8864255. Foreign177484
+retained under the predeclared shared-GPU/continue policy. Timing is cost only,
+not performance evidence. Event delivered and acknowledgement requested.
+Resume the same completion wait within its original45min observation window;
+no new job or recurring monitor. No smoke/full acceptance inferred.
+
+Contention acknowledgement succeeded. Resumed wait native exec session12169,
+maximum2400s (within original observation window), output
+/private/tmp/pointstream-real-base-closure-wait-resumed-20261027.json.
+This continuation handles the meaningful event; it is not another submission.
+
+### 2026-10-27 — Corrected source smoke hit resource limit; full not promoted
+
+Job **20261027T181542Z-b22436b0 FAILED** with command exceeded120s.
+No gate.json, full directory or complete quality summary exists. Native
+admitted interval1793125133.6438456–1793125343.782727 =210.138881GPU-s; salvage
+2.822310s, through salvage215.216819s. Canonical terminal reconciliation at
+1793125399.3646233 is265.720778s after start. Conservatively charge270s,
+cumulative **1030/3600s**, remaining **2570s**. No budget reset or GPU retry.
+Foreign177484 retained; canonical GPU claim is released.
+
+Salvaged smoke/partial.tar SHA256
+e6a2a8702871f2de95cc60abf6d65d0192a5f41b249351016a4be9f6d8eb5bcf,
+51200bytes,16members. Failed local scratch remains
+/local/users/emanuele/pointstream/scratch/20261027T181542Z-b22436b0-smoke.
+Independent CPU read of the partial archive reproduces both original and
+predicted controls on ticks[0,3] in both windows: all source/composite hashes
+match, and LPIPS/DISTS scores are exactly equal to prior arrays. Those are
+partial correctness checks, not a passed smoke or scientific quality result.
+Only Al's two real-base ticks completed (score_seconds10.703559); Med's
+real-base row and the complete resource projection are absent. No accepted
+quality/BD-rate or pass/fail of the scientific rule. Events acknowledged,
+all native waits completed; no recurring model monitor was installed.
+
+The old quote cannot justify another full attempt inside2570s: even the
+original2448.314646s projection plus240s smoke and120s validation exceeds
+the remainder, before setup. The truncated pilot is not a replacement quote.
+CPU inspection also found that the old estimator scales calibration setup
+like per-frame inference (22.587890+15.300573s over4ticks, although setup
+is13.885248+11.595944s), then adds control elapsed again. This is a reason
+to prepare a prospective separated setup/inference timing model and scale
+confirmation, not permission to bypass the failed gate or silently loosen it.
+
+Durable independent CPU audit bundle (new directory, all files read-only):
+/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-real-base-resource-review-20261027-b22436b0.
+Nine files include audit_partial.py, input metadata/prior arrays, the exact
+partial.tar, canonical terminal status, submission receipt and checksum
+manifest. Bundle archive SHA256
+47f50cb0519b91b20e7cec6e41afb3b54abcc14a8c3504550fb82224be4ed622;
+all extracted checksums verified. Reproducible CPU audit:0.017464wall seconds,
+0.173479selfCPU-s, no GPU use. These are audit costs only, not all client or
+setup CPU. It verifies partial controls only, never a full-stage scientific gate.
+
+The concrete [separated timing proposal](../cards/k6b-real-base-separated-cost-proposal.md)
+is pending explicit acceptance. No implementation or new GPU request is implied
+by merging that prospective card. Current accepted gates remain unchanged.

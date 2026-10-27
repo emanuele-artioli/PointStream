@@ -43,12 +43,8 @@ class FleetError(RuntimeError):
 
 def _ssh(host: str, remote_argv: list[str], *, timeout: float = 30) -> subprocess.CompletedProcess[str]:
     """Run one noninteractive SSH command and return text output."""
-    controls = DEFAULT_STATE_DIR / "ssh"
-    controls.mkdir(parents=True, exist_ok=True, mode=0o700)
     return subprocess.run(
-        ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8",
-         "-o", "ControlMaster=auto", "-o", "ControlPersist=120",
-         "-o", f"ControlPath={controls}/%C", host, shlex.join(remote_argv)],
+        ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(remote_argv)],
         check=False,
         capture_output=True,
         text=True,

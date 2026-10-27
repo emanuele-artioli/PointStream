@@ -202,11 +202,11 @@
     }
   },
   "smoke": {
-    "seconds": 240,
+    "seconds": 120,
     "representative_basis": "Two original judged ticks in both windows, both exact historical control variants, six 1080p base and predicted-overlay metric paths; fixed projected 160-frame full, setup and publication gate."
   },
   "full": {
-    "seconds": 2600
+    "seconds": 2550
   },
   "validator": [
     "{python}",
@@ -215,7 +215,8 @@
     "--validate"
   ],
   "validator_seconds": 120,
-  "budget_seconds": 3020,
+  "budget_seconds": 2840,
   "stall_seconds": 600,
-  "deadline": "2026-10-27T16:00:00+00:00"
+  "deadline": "2026-10-27T20:00:00+00:00",
+  "verify_staged_inputs": true
 }

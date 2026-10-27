@@ -1,16 +1,19 @@
 # PointStream continuation after root-chat archive — 2026-10-27
 
-Resumed root update: CPU-only allocation proposal is now recorded in
-[the cost revision](cards/k6b-real-base-cost-revision.md), with its state in
-PLAN.md and the appended experiment entry. The human accepted its allocation
-on2026-10-27; execution still requires a fresh smoke and current fleet health.
-The original terminal research state and580/3600 conservative ledger below
-are unchanged. Canonical status now confirms all three terminal states.
-Execution preparation is saved on `codex/real-base-cost-execution`: checked
-validator, revised specification and accepted allocation. No new request was
-submitted because gpu3 still fails the unchanged20s environment gate and
-compatible worker heartbeats were stale. The latest experiment entry and cost
-card hold the diagnostic result. Do not replay any previous request.
+Current root update: corrected request **20261027T181542Z-b22436b0 FAILED**
+its120s smoke allowance. No full stage, complete resource gate or scientific
+quality decision. CPU audit finds exact prior source/composite hashes and zero
+LPIPS/DISTS differences on both sampled ticks in both windows. Charge270s
+conservatively, cumulative **1030/3600s**, **2570s remaining**. All requests
+terminal, waits complete, events acknowledged; no recurring model monitor.
+
+Read the latest experiment entry and
+[prospective separated timing proposal](cards/k6b-real-base-separated-cost-proposal.md).
+It requires explicit acceptance before another GPU request: changed cost model
+and300s smoke/2000s full/120s validator/150s residual within2570s. No new
+quote is accepted and no retry is authorized. Preserve all original requests
+and partial scratch; never replay. Historical580s figures below describe the
+original stop only. Complete artifacts/provenance remain in the ledger.
 
 ## Goal and current decision
 
@@ -19,8 +22,9 @@ ball, followed by extension beyond these development windows. A ball-only
 contribution is insufficient (user). No complete, fully delivered PointStream
 win over both SVT-AV1 and the required neural baseline is established.
 
-The next task is CPU-only planning of a feasible continuation of the existing
-real-background player study. Do not start a new generator, fitting, full240
+The original handover required CPU-only planning. That allocation was accepted
+and the current task is the same real-background study, through fresh controls
+and resource gates. Do not start a new generator, fitting, full240
 rendering, ball integration or another baseline experiment as a substitute.
 
 The governing card's goal is:
