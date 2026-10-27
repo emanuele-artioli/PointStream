@@ -572,3 +572,82 @@ def test_wait_never_mutates_jobs(tmp_path, monkeypatch):
     inbox.wait_jobs(tmp_path, [WAIT_JOB], 60, sleep=lambda s: None)
     assert set(actions) <= {"status", "events"}
     assert not (tmp_path / "event-acks").exists()
+
+
+def test_worker_caches_only_terminal_requests_and_keeps_pending_inspection(tmp_path, monkeypatch):
+    base = tmp_path / 'fleet'
+    done = base / 'inbox' / '20261003T000000Z-12345678'
+    pending = base / 'inbox' / '20261003T000001Z-12345678'
+    monitor.write_json(done / 'ready.json', {})
+    monitor.write_json(done / 'state.json', {'status': 'complete'})
+    monitor.write_json(done / 'owner' / 'identity.json', {'alias': 'gpu1'})
+    monitor.write_json(pending / 'ready.json', {})
+    monitor.write_json(pending / 'state.json', {'status': 'pending'})
+    monitor.write_json(pending / 'spec.json', {'deadline_epoch': time.time() + 600, 'hosts': ['gpu2']})
+    settled = set()
+    monkeypatch.setattr(inbox, 'reconcile', lambda *args: pytest.fail('terminal request re-read'))
+    inbox.worker_tick(base, 'gpu1', settled)
+    assert settled == {done}
+    actual = monitor.read_json
+    reads = []
+    def read(path, *args):
+        assert not path.is_relative_to(done), 'cached terminal evidence reopened'
+        reads.append(path)
+        return actual(path, *args)
+    monkeypatch.setattr(monitor, 'read_json', read)
+    inbox.worker_tick(base, 'gpu1', settled)
+    assert pending / 'state.json' in reads
+    assert pending / 'spec.json' in reads
+
+
+def test_worker_refreshes_heartbeat_as_large_scan_advances(tmp_path, monkeypatch):
+    base = tmp_path / 'fleet'
+    for i in range(3):
+        directory = base / 'inbox' / str(i)
+        monitor.write_json(directory / 'ready.json', {})
+        monitor.write_json(directory / 'state.json', {'status': 'complete'})
+    clock = iter((0, 31, 32, 63, 64, 95, 96))
+    monkeypatch.setattr(inbox.time, 'monotonic', lambda: next(clock))
+    actual = monitor.write_json
+    heartbeats = []
+    def write(path, value):
+        if path.name == 'heartbeat.json':
+            heartbeats.append(value)
+        actual(path, value)
+    monkeypatch.setattr(monitor, 'write_json', write)
+    inbox.worker_tick(base, 'gpu1', set())
+    assert len(heartbeats) == 4
+    assert all(row['alias'] == 'gpu1' for row in heartbeats)
+
+
+def test_partial_worker_refresh_preserves_other_configured_hosts(tmp_path, monkeypatch):
+    from argparse import Namespace
+    import tarfile
+    state = tmp_path / 'state'
+    monitor.write_json(state / 'inbox.json', {
+        'base': '/data/jobs/fleet', 'hosts': ['gpu1', 'gpu2', 'gpu3', 'gpu4'],
+        'pythons': {host: '/old/python' for host in ('gpu1', 'gpu2', 'gpu3', 'gpu4')},
+    })
+    monkeypatch.setattr(inbox, 'doctor', lambda hosts: {
+        'passed': True, 'base': '/data/jobs/fleet', 'evidence_path': '/data/check',
+        'probes': [{'alias': host, 'python': '/new/python'} for host in hosts],
+    })
+    snapshot = tmp_path / 'source.tar'
+    with tarfile.open(snapshot, 'w'):
+        pass
+    monkeypatch.setattr(fleet, '_build_snapshot', lambda *a, **kw: (snapshot, 'hash', {'deleted_paths': []}))
+    monkeypatch.setattr(fleet, '_send_snapshot', lambda *a: None)
+    monkeypatch.setattr(fleet, '_remote_json', lambda *a, **kw: {})
+    stopped, started = [], []
+    monkeypatch.setattr(inbox, 'stop_worker', lambda config, alias: stopped.append(alias))
+    def remote(config, action, payload, **kwargs):
+        started.append(payload['alias'])
+        return {}
+    monkeypatch.setattr(inbox, 'remote_rpc', remote)
+    args = Namespace(hosts=['gpu2', 'gpu3'], operation='restart', state_dir=state,
+                     include_change=[], include_untracked=[])
+    result = inbox.workers_start(args, tmp_path)
+    assert result['config']['hosts'] == ['gpu2', 'gpu3', 'gpu1', 'gpu4']
+    assert result['config']['pythons']['gpu1'] == '/old/python'
+    assert result['config']['pythons']['gpu2'] == '/new/python'
+    assert stopped == started == ['gpu2', 'gpu3']

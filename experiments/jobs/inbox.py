@@ -498,7 +498,7 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
     transition(directory, "running", supervisor_pid=child.pid)
 
 
-def worker_tick(base: Path, alias: str) -> None:
+def worker_tick(base: Path, alias: str, settled: set[Path] | None = None) -> None:
     # Reap only our own completed supervisors before checking their liveness.
     while True:
         try:
@@ -508,16 +508,32 @@ def worker_tick(base: Path, alias: str) -> None:
         if reaped == 0:
             break
     worker = base / "workers" / alias
-    monitor.write_json(worker / "heartbeat.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid()), "updated": time.time(), "alias": alias})
+    def heartbeat() -> None:
+        monitor.write_json(worker / "heartbeat.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid()), "updated": time.time(), "alias": alias})
+    heartbeat()
+    last_heartbeat = time.monotonic()
     directories = sorted((base / "inbox").glob("*"))
     host = None
     for directory in directories:
+        # Refresh only while the scan actually advances, never from a timer
+        # that could conceal blocked filesystem I/O or a stuck admission.
+        if time.monotonic() - last_heartbeat >= POLL_SECONDS / 2:
+            heartbeat()
+            last_heartbeat = time.monotonic()
+        if settled is not None and directory in settled:
+            continue
         if not (directory / "ready.json").exists():
+            continue
+        state = monitor.read_json(directory / "state.json", {})
+        if state.get("status") in TERMINAL:
+            # Terminal requests are immutable: recovery creates a new request;
+            # declared resumes are decided before transition to terminal.
+            if settled is not None:
+                settled.add(directory)
             continue
         if (directory / "owner").exists():
             reconcile(directory, alias)
             continue
-        state = monitor.read_json(directory / "state.json", {})
         if state.get("status") != "pending":
             continue
         try:
@@ -569,10 +585,11 @@ def worker_loop(base: Path, alias: str) -> int:
         lock.rmdir()
         lock.mkdir()
     monitor.write_json(lock / "identity.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid()), "host": socket.getfqdn().lower()})
+    settled: set[Path] = set()
     try:
         while True:
             try:
-                worker_tick(base, alias)
+                worker_tick(base, alias, settled)
             except Exception as exc:
                 monitor.write_json(location / "error.json", {"error": str(exc), "updated": time.time()})
             time.sleep(POLL_SECONDS)
@@ -973,6 +990,12 @@ def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     release = str(Path(report["base"]) / "releases" / release_id)
     first = report["probes"][0]
     config = {"schema": SCHEMA, "hosts": args.hosts, "base": report["base"], "release": release, "pythons": {h["alias"]: h["python"] for h in report["probes"]}, "doctor": report["evidence_path"]}
+    previous = monitor.read_json(args.state_dir / 'inbox.json', {})
+    if previous.get('base') == report['base']:
+        # A scoped refresh must not deconfigure other verified hosts. They keep
+        # their current workers; fresh heartbeat checks still gate submissions.
+        config['hosts'] = list(dict.fromkeys([*args.hosts, *previous['hosts']]))
+        config['pythons'] = {**previous['pythons'], **config['pythons']}
     snapshot, sha, metadata = fleet._build_snapshot(root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked))
     original_snapshot = snapshot
     snapshot, identities = worker_bundle(original_snapshot)

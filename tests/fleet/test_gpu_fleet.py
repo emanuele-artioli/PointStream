@@ -295,7 +295,7 @@ def test_probe_timeout_reports_reason_without_dumping_the_remote_script(monkeypa
     monkeypatch.setattr(fleet, "_ssh", timeout)
     result = fleet.probe_host("gpu2")
     assert not result["available"]
-    assert result["error"] == "SSH/environment probe timed out after 20 seconds"
+    assert result["error"] == "SSH/environment probe timed out after 60 seconds"
 
 
 def test_selected_snapshot_timeout_bounds_transfer_and_extraction(tmp_path, monkeypatch):
@@ -348,3 +348,36 @@ def test_native_probe_records_successful_ffmpeg_version(monkeypatch, tmp_path, c
     assert report["tool_versions"]["ffmpeg"]["returncode"] == 0
     assert report["tool_versions"]["ffmpeg"]["version"] == ["ffmpeg version fixture"]
     assert report["gpus"][0]["compute_processes"] == []
+
+
+def test_native_probe_overlaps_independent_metadata_and_keeps_all_records(monkeypatch, tmp_path, capsys):
+    import shutil
+    import threading
+
+    # Every PATH lookup must start before any finishes: sequential searches
+    # would exceed this barrier instead of producing a partial passing report.
+    lookups = threading.Barrier(4, timeout=3)
+    def which(name):
+        lookups.wait()
+        return '/fixture/' + name
+
+    def run(command, **kwargs):
+        if command[0] == 'nvidia-smi':
+            output = '0, GPU-fixture, RTX A6000, 1, 49140, 48675, 0' if command[1].startswith('--query-gpu=') else ''
+            return subprocess.CompletedProcess(command, 0, output, '')
+        assert kwargs['timeout'] == 10
+        if command[0] == '/fixture/vvdecapp':
+            raise subprocess.TimeoutExpired(command, 10)
+        return subprocess.CompletedProcess(command, 0, 'version fixture', '')
+
+    monkeypatch.setattr(shutil, 'which', which)
+    monkeypatch.setattr(subprocess, 'run', run)
+    monkeypatch.setenv('PS_DATA_ROOT', str(tmp_path))
+    exec(compile(fleet._PROBE_PYTHON, 'fleet-probe-fixture', 'exec'), {})
+    report = json.loads(capsys.readouterr().out)
+    assert set(report['tools']) == {'ffmpeg', 'vvencapp', 'vvdecapp', 'codex'}
+    assert report['tools']['codex'] == '/fixture/codex'
+    assert report['tool_versions']['ffmpeg']['version'] == ['version fixture']
+    assert report['tool_versions']['vvencapp']['returncode'] == 0
+    assert 'timed out' in report['tool_versions']['vvdecapp']['version_error']
+    assert report['gpus'][0]['pointstream_shared_claims'] == []
