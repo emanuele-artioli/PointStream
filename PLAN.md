@@ -55,19 +55,23 @@ not a quality failure. No scientific quality result or BD-rate is accepted.
 The 3600 GPU-second study has conservatively spent **580 s**, leaving **3020 s**;
 that remainder does not authorize bypassing the failed gate. Prepare a CPU-only
 prospective cost/staging revision, keeping the cohort, global scale4 operating
-point, quality rules and total cap unchanged. Get the revised plan accepted
+point, quality rules and total cap unchanged. Record acceptance of the revised plan
 before further GPU execution; do not reopen closed earlier budgets. The
 [actual-base card](docs/cards/k6b-real-base-quality-pilot.md) and its final report
 in [the player experiment record](docs/experiments/k6b-players.md) govern scope.
 
 The resumed root prepared a [prospective allocation revision](docs/cards/k6b-real-base-cost-revision.md):
 240 s fresh smoke +2600 s full +120 s validator +60 s residual overhead,
-within the unchanged3020 s remainder. It awaits human acceptance and a new
-passing smoke; no GPU job has been submitted. Canonical status through gpu1
-timed out after120 s; read-only shared-inbox inspection through gpu2 confirmed
-all three saved terminal states. gpu2/gpu3 heartbeat files were about16 minutes
-old at11:59 UTC, so worker health remains unverified. Resolve management-path
-and current worker-health checks before dispatch; no fleet-wide outage is inferred.
+within the unchanged3020 s remainder. The human accepted it on2026-10-27.
+The validator now reads the frozen request's full reservation; the revised
+[specification](docs/cards/k6b-real-base-quality-revised-spec.json) retains all
+input/environment identities and quality settings. No new request exists.
+Canonical status now confirms all three terminal jobs. Current admission is
+blocked: gpu3 still fails the unchanged20s environment probe, and gpu2/gpu3
+worker heartbeats were stale. Extended read-only diagnostics completed, but
+do not satisfy the gate or authorize omitting gpu3 from the compatible pool.
+Resolve current fleet health before dispatch; the approved budget remains
+580/3600s spent,3020s unused. See the latest experiment entry for diagnostics.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
@@ -252,7 +256,8 @@ marked `card ready` is waiting for the user to start it.
 | K6b real-base quality | [actual-base pilot](docs/cards/k6b-real-base-quality-pilot.md) | `codex/k6b-real-base-player-quality`, PR #252 | Codex | stopped 2026-10-27: conversion `20261027T074823Z-135421ee` complete; quality `20261027T080644Z-9dba0803` failed cost gate, full never launched; original smoke controls pass both windows; no accepted quality/BD-rate; conservative580/3600 GPU-s,3020 unused, revised plan required |
 | Host-local storage safety | [maintenance report](docs/storage-maintenance-2026-10-27.md) | `codex/local-storage-safety-20261027`, PR #253 | Codex | merged 2026-10-27: inactive files moved/verified on six hosts, shared shell defaults active; live originals retained; fleet manager rollout stopped at health gate before changing workers |
 | Root continuation | [2026-10-27 handover](docs/continuation-2026-10-27.md) | `codex/root-handover-20261027`, [PR #254](https://github.com/emanuele-artioli/PointStream/pull/254) | Codex | reported: final handover for user-requested root-chat archive after merge; no new session or research job launched |
-| Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan` | Codex | proposed 2026-10-27: CPU-only review complete; smoke240/full2600/validator120/overhead60 within3020s remaining; acceptance and current fleet reconciliation required before GPU; no new job |
+| Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
+| Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
