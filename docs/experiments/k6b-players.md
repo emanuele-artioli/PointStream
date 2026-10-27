@@ -5828,3 +5828,48 @@ No publication/admission inferred from allocation; source archive digest is
 pending its receipt. Inspect this exact ID after any lost reply, never replay.
 Prior1030s conservative + maximum2570s = original3600s; deadline22:30 UTC.
 No new scientific result or validated cost quote at this checkpoint.
+
+Publication recovery for SAME20261027T211451Z-f6a754eb: original CLI timed
+out after300s inside tar extraction, before its publish RPC (control flow
+reviewed). Original extractor649345 exited; ready.json absent, no admission.
+The transferred source.tar SHA2560c153bba964116f8fd4e3a359224d8b9b78ddfa5a1f9193a4d7e127a0437a7ef
+identically matches the local frozen01888c76 archive. All210source files
+independently match, none missing/changed. Native full-tree source identity
+be7dfb1989b2609686941b980497f02fa9f381c49318a5daf5d1b8b3068de9b9
+match confirmed before publication;128.208722s. Exact production-path imports
+and resource arithmetic pass on gpu2/gpu3 with CUDA hidden,27.372669/141.068049s.
+These are CPU-only preparations, not timing evidence for GPU promotion.
+
+The FIRST native publish RPC for this existing ID is now being completed
+with its original normalized spec/snapshot, no extraction or job resubmission.
+CPU-only RPC allowance300s accounts for the measured128s source verification;
+all integrity checks and the original2570s GPU cap remain. Exact original
+local record and one-shot publish-start marker preserved under
+/Users/manu/.pointstream/fleet/jobs/publication-recovery/. Receipt pending at
+/private/tmp/pointstream-separated-completed-publication-receipt.json.
+If its reply is lost, inspect this exact ID and publisher; never call publish
+again or submit a replacement automatically. Source.tar remains preserved.
+
+FIRST publication receipt confirmed for SAME20261027T211451Z-f6a754eb,
+status PENDING. Source identitybe7dfb1989b2609686941b980497f02fa9f381c49318a5daf5d1b8b3068de9b9
+exactly equals the independently verified archive identity. Normalized spec
+33474777347537343ecf092ac9ede1ca5f515ba16926caa020d49c4253d420dd,
+source01888c76, original1030+2570=3600s unchanged. No second request,
+re-extraction or publish replay. The previous transfer error and exact record
+backup are retained in local state; authoritative request is now published.
+
+One bounded native completion observation: `scripts/ps-fleet wait
+20261027T211451Z-f6a754eb --max-seconds2700` (normal option/value spaces),
+receipt /private/tmp/pointstream-separated-approved-wait.json. Observation
+starts about21:37 UTC, ends by22:22 UTC; request deadline22:30 UTC. Native
+background model callbacks remain unverified; use attended foreground wait.
+Cache lifetime unknown. No recurring model calls or automation. Persist its
+handle before awaiting. A pending request cannot reserve300+2000s once its
+deadline is nearer than2300s; inspect/cancel only this pending task if the
+observation ends with no feasible admission. Never cancel a running full stage
+merely because queueing used the observation window.
+
+Native bounded wait started as exec session45888; preserve that handle and
+receipt above. Last canonical state PENDING, no host/admission/remote_status.
+The wait uses the same request and original bound; meaningful events may be
+acknowledged before resuming the remaining observation, not a new request.
