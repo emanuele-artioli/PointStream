@@ -2,16 +2,16 @@
 
 Current update after human acceptance: the separated timing contract is
 APPROVED, original cap unchanged. Prior conservative charge1030/3600s;
-2570s left = smoke300/full2000/validator120/residual150. Implementation and
-CPU checks on codex/real-base-separated-cost-model are in progress; no new
-request exists yet. Prospectively refresh expired deadline to22:30 UTC.
+2570s left = smoke300/full2000/validator120/residual150. Implementation and CPU checks on codex/real-base-separated-cost-model
+passed, source01888c76 and Linux CI green. Final exact request
+20261027T211451Z-f6a754eb is allocated/PREPARING, normalized spec33474777;
+publication unconfirmed. Inspect this ID after any lost reply; never replay. Prospectively refresh expired deadline to22:30 UTC.
 The last exact request20261027T181542Z-b22436b0 is canonically FAILED, no
 full stage. Its partial two-tick controls in both windows reproduce exactly
 in the independent durable audit. Existing requests remain terminal, no
 recurring model monitor. Both eligible hosts are currently memory-busy; do
 not reduce the fixed20,000MiB reservation or8,192MiB free-memory margin.
-Read the latest experiment entry before freezing/submitting exactly one new
-request. Future failures close this accepted attempt. No scientific quality
+Read the latest experiment entry before acting on this sole new request. Future failures close this accepted attempt. No scientific quality
 result or new quote is accepted until all fresh gates pass.
 
 ## Goal and current decision
