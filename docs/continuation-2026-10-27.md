@@ -180,5 +180,5 @@ root chat from current main.
 Canonical fleet status rechecked all three IDs at root-chat closure: CPU recovery
 COMPLETE, GPU conversion COMPLETE, real-base quality FAILED at its smoke gate.
 The full stage remains unlaunched. All scientific jobs listed here are terminal.
-Storage PR #253 merged with Linux CI passing. The final documentation PR is
+Storage PR #253 merged with Linux CI passing. The final documentation is in PR #254,
 linked in PLAN.md; no future session needs the archived conversation to resume.
