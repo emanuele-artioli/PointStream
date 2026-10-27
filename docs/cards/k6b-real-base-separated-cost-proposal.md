@@ -50,14 +50,19 @@ reservation cannot fit. Every waited stage stays below45min.
 ## Timing model to implement and test before freezing a new request
 
 Instrument per-frame elapsed time around the existing production operations;
-change no images, masks, crops, metrics or GPU processing. Use three saved ticks
+change no images, masks, crops, metrics or GPU processing. Measure the complete
+command duration from native execution.json, including imports; the internal
+run() timer starts after imports and is insufficient. Also instrument native
+publication/release duration directly, rather than mislabeling the entire
+dispatch-minus-internal-runtime gap as publication. Use three saved ticks
 0/3/6 per window for calibration and real-base scoring, providing a cold sample
 and two steady samples in each of four timing sequences. Assert that every
 sequence has finite positive times and both steady samples differ by<=25%.
 Otherwise the quote fails; do not add GPU trials automatically.
 
 For each sequence let `warm=max(t1,t2)` and
-`cold=max(0,t0-warm)`. Let `fixed=worker_seconds-sum(all twelve frame times)`;
+`cold=max(0,t0-warm)`. Let
+`fixed=native_command_seconds-sum(all twelve frame times)`;
 reject negative/nonfinite fixed time rather than clamp it. Project the full
 worker as `1.35*(fixed + sum(80*warm+cold))` over the four sequences. Account
 setup once, conservatively repeat the slower observed warm frame, and include
