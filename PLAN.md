@@ -63,10 +63,11 @@ in [the player experiment record](docs/experiments/k6b-players.md) govern scope.
 The resumed root prepared a [prospective allocation revision](docs/cards/k6b-real-base-cost-revision.md):
 240 s fresh smoke +2600 s full +120 s validator +60 s residual overhead,
 within the unchanged3020 s remainder. It awaits human acceptance and a new
-passing smoke; no GPU job has been submitted. Live fleet status could not be
-reconciled: the canonical management path through gpu1 timed out after120 s.
-That is a management-path limitation, not evidence that research jobs changed
-state or that all GPU hosts are unavailable. Resolve it before dispatch.
+passing smoke; no GPU job has been submitted. Canonical status through gpu1
+timed out after120 s; read-only shared-inbox inspection through gpu2 confirmed
+all three saved terminal states. gpu2/gpu3 heartbeat files were about16 minutes
+old at11:59 UTC, so worker health remains unverified. Resolve management-path
+and current worker-health checks before dispatch; no fleet-wide outage is inferred.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as

@@ -5435,3 +5435,11 @@ Last verified states remain the PR254 closure:20261027T072713Z-2888cefe COMPLETE
 20261027T074823Z-135421ee COMPLETE,20261027T080644Z-9dba0803 FAILED cost gate.
 Resolve current shared-inbox and worker health before dispatch; do not bypass
 the rollout health gate. This CPU-only planning stage needs no remote workload.
+
+Read-only fallback subsequently reached the shared inbox through gpu2 using
+/usr/bin/python3 without importing the old management release. All three
+state.json records retain those exact terminal states and recorded supervisor
+exit codes0/0/1. At11:59 UTC, worker heartbeat timestamps were gpu2
+11:43:11 UTC and gpu3 11:43:05 UTC (about16min old); these files do not
+establish current worker health. No worker was changed or restarted. Canonical
+management-path recovery and current health checks remain pre-dispatch gates.

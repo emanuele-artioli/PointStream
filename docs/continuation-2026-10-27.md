@@ -4,8 +4,10 @@ Resumed root update: CPU-only allocation proposal is now recorded in
 [the cost revision](cards/k6b-real-base-cost-revision.md), with its state in
 PLAN.md and the appended experiment entry. It is not accepted for execution;
 the original terminal research state and580/3600 conservative ledger below
-are unchanged. Canonical live status timed out through gpu1; do not treat this
-as a new terminal-state verification or replay any request.
+are unchanged. Canonical status timed out through gpu1; read-only shared-inbox
+inspection through gpu2 then confirmed all three terminal states. gpu2/gpu3
+heartbeat files were about16min old at11:59 UTC; current worker health remains
+unverified. Do not replay any request.
 
 ## Goal and current decision
 
