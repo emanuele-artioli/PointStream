@@ -21,11 +21,54 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-10-25)
+## Where PointStream stands (2026-10-27)
 
 The root session keeps this section and the dispatch ledger below; item
 sessions update their own items and their files in `docs/experiments/`
 ([sessions](docs/sessions.md)).
+
+### Resume here after the root chat is archived
+
+Read [the 2026-10-27 continuation](docs/continuation-2026-10-27.md) first. It
+contains the current scientific stop, exact job/artifact identities, remaining
+budget, storage state and the next decision. The existing study chat is
+`01a16e7a-e752-78f3-b372-c338d8cdbf46` ("Prepare tennis confirmation study");
+its code and reports are merged. It is idle. Do not create duplicate studies or
+restart any terminal job. Pace active sessions to conserve tokens; do not launch
+several reasoning turns automatically. No research job or recurring model monitor was left
+running by this root chat.
+
+**Current scientific position:** no complete PointStream win over both
+required baselines has been established. The best player component combines
+compressed full-RGB references with independent-frame, pose-prompted SAM:
+4/4 strict pilot metric cells with zero transmitted matte bits, but a granted
+target-derived background and only 80/240 saved generator ticks. Both windows
+are development data; source/replay independence remains unresolved. A ball
+component alone is insufficient for the intended paper.
+
+**Immediate next decision:** complete the same players-only real decoded-SVT
+background feasibility test, rather than start another generator. Its native
+conversion is validated and original controls passed in the smoke; the full
+quality run never launched because its projected 2448.315 s including
+publication exceeded the frozen 1800 s stage reservation. This is a cost stop,
+not a quality failure. No scientific quality result or BD-rate is accepted.
+The 3600 GPU-second study has conservatively spent **580 s**, leaving **3020 s**;
+that remainder does not authorize bypassing the failed gate. Prepare a CPU-only
+prospective cost/staging revision, keeping the cohort, global scale4 operating
+point, quality rules and total cap unchanged. Get the revised plan accepted
+before further GPU execution; do not reopen closed earlier budgets. The
+[actual-base card](docs/cards/k6b-real-base-quality-pilot.md) and its final report
+in [the player experiment record](docs/experiments/k6b-players.md) govern scope.
+
+**Infrastructure:** large inactive `/var/tmp` files were relocated to separate
+host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
+source of truth. The shared shell defaults are active and verified. Live
+application originals remain intentionally protected. Fleet manager safeguard
+rollout is pending a successful health gate (gpu2/gpu3 probe latency), so do
+not claim it deployed. See [storage closure](docs/storage-maintenance-2026-10-27.md).
+The detailed historical findings follow; they do not supersede this resume state.
+
+### Historical findings and completed components
 
 - **Protocol (2026-10-22):** two tracks, fidelity and experience. J
   (2026-10-22) re-judged the queued results on experience: H3e, FoundHand
@@ -179,12 +222,12 @@ marked `card ready` is waiting for the user to start it.
 | K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` @ `340d8d5` | Opus | reported 2026-10-22: fail (50%); 4.75 GPU-hours of 4 (overrun approved) |
 | K6b players 3 | overfit oracle (user approved) | `claude/k6b-players-zeroshot` @ `03a3df8` | Opus | reported 2026-10-23: pass (83%), matte and LoRA unbilled; 4.8 GPU-hours of 6 |
 | K6b players 4 | match fit, billed | `claude/k6b-players-zeroshot` @ `20eb7c3` | Opus | reported 2026-10-23: fail (67% unbilled, 58% billed); 7.0 GPU-hours of 7 |
-| K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5` | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11. PR #225 merged before this outcome commit: not on main yet |
+| K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5` | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11; historical failure retained in the merged experiment record |
 | K6m | the players' matte on tennis | — | Sonnet | card dismissed 2026-10-24: folded into T1 |
 | K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | reported 2026-10-24: no cut in 052; registration gate 80% vs 67% pooled (hypothesis); 0 of 0 GPU-hours |
-| K6b players confirmation | unused same-match windows, CPU preparation | `codex/k6b-player-confirmation-plan` | Codex high | reported 2026-10-24: splitter logic recovered; 61-clip audit found no exact/screened duplicates; original identity unresolved, running 2026-10-24: clip-local scope approved; CPU gate passes; all12 masks/poses validated; anchor/source-code pilot running, 0.660 of 8 GPU-hours before running anchor ([card](docs/cards/k6b-players-confirmation.md)) |
+| K6b players confirmation | unused same-match windows, CPU preparation | `codex/k6b-player-confirmation-plan` | Codex high | closed; preparation superseded by completed clip-local diagnostic below (PR #236), 6.995428306/8 GPU-hours; no running preparation/anchor job ([card](docs/cards/k6b-players-confirmation.md)) |
 | T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | reported 2026-10-24: primary oracle +10.00% BD weighted DISTS, 3/8 wins; billed split loses all metrics/windows; 3.12338 of 4 GPU-hours |
-| K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | card ready, waits for 5b and the user ([card](docs/cards/k6b-players-6.md)) |
+| K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | deferred; finish actual-base feasibility decision first; no new model budget or dispatch authorized ([card](docs/cards/k6b-players-6.md)) |
 | H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask`, PR #233 | Codex high | reported 2026-10-24: shape target fails (+16.6% wDISTS); decoder diagnostic 13.3–61.3 kbps, full curve blocked by native decode; 0.3171 GPU-hours of 2 |
 | K6b players clip-local diagnostic | [frozen 12-window study](https://github.com/emanuele-artioli/PointStream/blob/72228816/docs/cards/k6b-players-confirmation.md) | `codex/k6b-player-confirmation-plan` @ `72228816`, PR #236 | Codex high | reported 2026-10-25: 23/24 billed wins with common base, reference and matte granted; base-charged 0/12 bracketed wins, 12 unresolved; 6.995428306 of 8 GPU-hours; all jobs terminal; PR #236 merged 2026-10-25 after explicit user auto-merge approval |
 | K6b players rate-budget audit | saved 12-window side-information headroom, CPU only | `codex/k6b-player-confirmation-plan` | Codex high | reported 2026-10-25: tested lossless route fails (0/24; 22 bracketed, 2 unresolved but dominated); even free mattes leave 17/24 with real keypoints + PNG bank 2 h; CPU job `20261025T082944Z-29f021a5` complete, 0 new GPU-hours; deployable alternatives unresolved ([card](docs/cards/k6b-player-rate-budget.md)) |
@@ -196,6 +239,10 @@ marked `card ready` is waiting for the user to start it.
 | K6b players sampled silhouette | [80-tick scope amendment](docs/cards/k6b-receiver-silhouette.md) | `codex/k6b-receiver-sampled-pilot`, PR #245 | Codex high | reported 2026-10-26: actual zero-matte YOLOE26x profile1/4<3/4; private fresh-reset predictions reproduce/all160 judged frames scored; exact control4/4; cumulative0.163059668/0.75GPU-h, CPU2334.860723/3600s closed; all240 corrections/wire and end-to-end evidence remain unresolved, all jobs terminal |
 | K6b players pose-prompted SAM | [sampled receiver tracker](docs/cards/k6b-receiver-sam.md) | `codex/k6b-receiver-sam-pilot` | Codex high | reported 2026-10-26: actual pose-prompted SAM2/4<3/4; Med004 recovered but Al006 empty51/80; private reset/control checks pass; sampled XOR122.62/212.46kbps costs more than direct sampled R; conservative0.177777778/0.75GPU-h and1429.969250/3600CPU-s CLOSED, one terminal job; no full240/end-to-end claim |
 | K6b players independent-frame SAM | [last narrow receiver profile](docs/cards/k6b-receiver-frame.md) | `codex/k6b-receiver-frame-pilot`, PR #247 | Codex high | reported 2026-10-26: actual4/4strict wins (frozen+.0013/4),0/320empty player masks; read-isolated resets/control pass; conservative0.477777778/0.75GPU-h and2329.366896/3600CPU-s CLOSED; fullyaccounted/fresh-eval cards prepared only, no integration/full240/confirmation claim |
+| K6b native base recovery | [recovery card](docs/cards/k6b-base-recovery-encode.md) | `codex/k6b-native-base-attended`, PR #251 | Codex | closed 2026-10-27: CPU job `20261027T072713Z-2888cefe` complete, six native 240-frame SVT streams and retained YUV; 184.54109/1800 workload CPU-s, no GPU |
+| K6b real-base quality | [actual-base pilot](docs/cards/k6b-real-base-quality-pilot.md) | `codex/k6b-real-base-player-quality`, PR #252 | Codex | stopped 2026-10-27: conversion `20261027T074823Z-135421ee` complete; quality `20261027T080644Z-9dba0803` failed cost gate, full never launched; original smoke controls pass both windows; no accepted quality/BD-rate; conservative580/3600 GPU-s,3020 unused, revised plan required |
+| Host-local storage safety | [maintenance report](docs/storage-maintenance-2026-10-27.md) | `codex/local-storage-safety-20261027`, PR #253 | Codex | merged 2026-10-27: inactive files moved/verified on six hosts, shared shell defaults active; live originals retained; fleet manager rollout stopped at health gate before changing workers |
+| Root continuation | [2026-10-27 handover](docs/continuation-2026-10-27.md) | `codex/root-handover-20261027`, [PR #254](https://github.com/emanuele-artioli/PointStream/pull/254) | Codex | reported: final handover for user-requested root-chat archive after merge; no new session or research job launched |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
@@ -210,11 +257,11 @@ Confirmation preparation (2026-10-24): 12 new same-match windows frozen;
 all pass registration, so gate discrimination is untested. Recorded fit/reference
 clips are disjoint. CPU recovery found splitter logic; the completed 61-clip
 audit found no exact/screened duplicates. Original-source identity/replay
-independence remains unresolved: the user explicitly approved the clip-local
-diagnostic scope; CPU validator prerequisites are still required before dispatch.
-Execution started: 0.076 of 8 approved GPU-hours before current feature job;
-reference and matte remain granted
-([card](docs/cards/k6b-players-confirmation.md)).
+independence remains unresolved. The user approved the clip-local diagnostic,
+which subsequently completed at 6.995428306/8 GPU-hours (PR #236); the historical
+preparation and anchor jobs are terminal. Reference and matte were granted in
+that diagnostic. Later component and actual-base results are summarized in the
+resume section above ([card](docs/cards/k6b-players-confirmation.md)).
 Step 6 tries Wan-Animate, conditioned on the same unbilled reference as
 step 2 (zero-shot means no fitting, not no appearance); speed is
 secondary while quality is tested (user, 2026-10-24).

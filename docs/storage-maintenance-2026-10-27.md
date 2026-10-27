@@ -114,3 +114,20 @@ Remaining actions are therefore: finish retained live originals when their
 sessions are idle (gpu5/gpu6 public live-tree switches require resolving the
 explicit approval rejection), then complete the gated worker rollout. Do not
 silently treat either action as complete.
+
+
+### Root-chat closure audit
+
+The closing audit rechecked all six hosts. Every substantial remaining owned
+real `/var/tmp` tree has active executable, cwd, mapped-file or descriptor
+references. These files are intentionally preserved; do not stop an editor or
+remove a live database to claim zero root usage. The one inactive 1.3 MiB gpu1
+recovery duplicate was compared using a checksum dry run against its preserved
+`/local/users/emanuele/relocated-var-tmp-20261027/` destination, checked again
+for active references, and removed. Its completion is in `migration.jsonl`.
+The prior paragraph describing that duplicate as retained is historical.
+No further broad live-directory switching was attempted on gpu5/gpu6.
+
+PR #253 passed Linux CI and merged. Shared shell defaults are active; fleet
+manager deployment remains pending exactly as documented above. A new research
+root session should start with `docs/continuation-2026-10-27.md` and PLAN.md.
