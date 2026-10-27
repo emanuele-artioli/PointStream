@@ -1,4 +1,4 @@
-# Proposed actual-base player enhancement pilot — NOT AUTHORIZED OR RUN
+# Actual-base player enhancement pilot — CONTROL GATE FAILED
 
 Goal: test whether the frozen PR242 lossy-reference generation and PR247
 per-frame SAM players improve a REAL decoded whole-frame SVT base at equal
@@ -50,7 +50,7 @@ nonoverlap, never extrapolate or invent BD-rate. No threshold may be tuned on
 new scores. Without a fair valid ROI/pixel alternative or DCVC curve, report
 missing controls and do not promote a broad baseline claim.
 
-Resource quote is CONDITIONAL and unapproved: propose a total ceiling of 1.0
+Resource quote is authorized for this bounded study: total ceiling of 1.0
 GPU-hour for this SVT-only intermediate, with <=600 s smoke, <=2400 s full
 stage, and 600 s reserved for staging/validation/overhead. A provisional
 0.5–0.85 GPU-hour estimate is a planning range, not a measurement; stop if
@@ -61,11 +61,12 @@ included. Historical actual judge
 comparison; independent-frame study 20261026T184618Z-186fe8b3 used 1639.081948
 admitted GPU-s including two SAM passes, judging and overhead, with shared-GPU
 timing. These are cost references, not a validated quote for larger full-frame
-judges, extra streams, ROI controls or DCVC. First a separately authorized
-<=600 s native correctness/resource smoke must measure memory, complete
+judges, extra streams, ROI controls or DCVC. The authorized <=600 s
+native correctness/resource smoke must measure memory, complete
 per-frame real quality time, decode and validator overhead on representative
 1080p frames and both streams; use it to quote and gate bounded full stages,
-with every waited stage <=45 min. No GPU launch is authorized by this card.
+with every waited stage <=45 min. No GPU job was launched: the mandatory
+exact source-RGB control failed.
 
 This is players-only intermediate feasibility. No qualified ball metadata or
 payload on these exact windows has yet been located; the base retains its
@@ -76,3 +77,31 @@ The current two broadcasts are familiar development data with unresolved
 source/replay independence; fresh confirmation follows method freeze and its
 separate lineage audit. Historical 115px cutoff remains exploratory and the
 step5 failure remains part of the record.
+
+## 2026-10-27 — Exact source RGB gate failed; stopped
+
+The human approved <=3600 admitted GPU-seconds for this study; the specific
+stop rule requires exact CPU-versus-original-GPU RGB identity before quality.
+The source YUV hashes agree for all six base settings, and the original 80
+judged ticks agree in identity. However byte-exact CPU source RGB hashes match
+only **10/80 Al** and **0/80 Med** original GPU hashes. This is a hard control
+failure. No tolerance is substituted and no new score or GPU job was run.
+It does not establish the magnitude of the pixel differences, identify their
+precise numerical cause, or show a scientific gain or loss. The CPU-versus-GPU
+identity of the six decoded-base RGB arrays has not been separately measured.
+The underlying source YUV, encoded streams, model inputs and prior results remain
+unchanged. Exact mismatch ticks and reproducible identity-checked comparison
+are in [gate result](k6b-real-base-source-rgb-gate.json) and
+[source comparison](../../tools/analysis/k6b_source_rgb_gate.py). The study
+stops with **0/3600 GPU-s** spent; old budgets stay closed.
+
+The cheapest next separately scoped decision is a native GPU source and base
+conversion diagnostic, using saved YUV and original function to compare RGB
+hashes and pixel-difference distributions against CPU while reproducing PR247
+source hashes. If successful, reconstruct base RGB in the same native GPU path
+and freeze new identities before a quality smoke. Measure that diagnostic's
+cost and request its own budget before dispatch; no approximation, threshold
+change or assumed float-rounding explanation is authorized here. If exact GPU
+source hashes also cannot be reproduced, investigate version/device/environment
+rather than judging. DCVC, ROI, ball, missing 160 generated frames, development
+and granted-background limitations remain as above.

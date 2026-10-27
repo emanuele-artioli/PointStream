@@ -5154,3 +5154,68 @@ with provisional <=1.0 GPU-hour cap and <=600 s smoke is in
 approved or dispatched. Fair same-window DCVC reproduction and pixel/ROI control
 are required before a broad baseline claim and require their own measured cost.
 Ball packets and a full240 semantic overlay remain unresolved.
+
+## 2026-10-27 — Real-base players: pre-quality exact-control stop
+
+The human authorized <=3600 admitted GPU-s in this existing chat for the
+proposed players-only real-base study, with a <=600 s representative smoke,
+<=2400 s full and 600 s reserve; no generation, fitting, ball inference, new
+footage/models or other GPU work. Frozen hypothesis: generated players plus
+per-frame SAM improve real whole-frame bases enough at equal fully billed rate
+to pass >=3/4 strict LPIPS/DISTS full-frame cells and >=3/4 original fixed-R/S
+foreground cells, with frozen +/-0.001 sensitivity and, for overlapping
+three-point curves, <=-10% mean BD-rate and >=75% window wins against the
+achievable SVT hull. Competing explanations include base price and background
+errors outweighing player benefit, imperfect masks/seams, and output artifacts.
+Same-base no-overlay and fixed original source controls are required. No
+unmeasured ball payload, target-derived Telea or target matte at the delivered
+receiver; common installed base/SAM and distribution sensitivity explicit.
+Existing whole-frame DCVC and stronger SVT points have no verified retained
+pixel/score evidence here; ROI/pixel enhancement not yet qualified, so an SVT
+conditional win alone would not be a broad baseline win. Current two windows
+are development, with 80 saved generated ticks and no full240 player-wire claim.
+These are frozen before opening new quality scores.
+
+**Mandatory exact control failed, so STOP before any GPU job or new quality.**
+The completed CPU base job 20261027T072713Z-2888cefe was rechecked COMPLETE;
+its nested verified manifest SHA256
+`59f97141090865bafdd7c4b0d3593492de42de16eb057e63846feea5a5526058`
+reports source YUV hashes identical across all three settings and to the
+original native source: Al
+`e7b960cd2456b439c5439b337a45e47d2a0a44a2a32025a2de595af3feed4fa2`, Med
+`53633ce617b12d779bc8c5746d8d44cbe090ced6c49ba79dbe246cc6abacfb08`.
+The previous real GPU PR247 result JSON SHA256
+`b0a55a5c1440463fff97efa975a661c2c65db9ce35e0696fade9d5648c39ccdc`
+records original source RGB hashes at the exact same 0,3,...,237 ticks.
+Comparison of the actual contiguous uint8 RGB byte hashes gives **10/80
+matching Al and 0/80 matching Med**. Thus source frames are aligned and YUV
+identical, but exact RGB identity fails; we cannot tell difference magnitudes
+or exact numerical cause from hashes alone. No relaxed tolerance and no claim
+that the decoded-base RGB arrays themselves have been compared to GPU.
+The pinned CPU/native Torch conversion and prior GPU can differ in numerical
+execution, but attributing the observed mismatch to rounding is a hypothesis,
+not an established diagnosis. Reproducible script SHA256
+`7db9935c4f77662c6f67c361e4a51ba82d368b85c644735b1d36f5a25010042d`;
+[exact mismatch evidence](../cards/k6b-real-base-source-rgb-gate.json) SHA256
+`20ba456286f80ba5eb6a6ec28e83a0088c98cedc1dfc91910070cad584405c1a`.
+No GPU job was submitted, no new quality was opened, **0/3600 GPU-s** charged.
+The study stops at its frozen invalid-control condition, not a scientific
+failure of the tested hybrid. No budget carries automatically to a new study.
+
+Next separately bounded diagnostic: reconstruct source and retained base YUV
+through the original native GPU RGB+bicubic path, first compare the 160 source
+hashes to the prior GPU record and quantify exact CPU/GPU per-pixel differences;
+only if original source control reproduces, regenerate the six base RGB views
+with hashes and test alignment. Freeze inputs and cost, substantively validate,
+and obtain separate authority before GPU execution. No renewed experiment or
+quality-based tuning is implied. The old granted-Telea limitation, familiar
+broadcast/source independence caveats, 115px exploratory cutoff, historic
+step5 failure and absent 160 RGB ticks per player remain unchanged.
+
+Reproduction inputs are the `base/manifest.json` member of nested
+`publish/bundle.tar` in the read-only PR251 archive
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T072713Z-2888cefe/full/published.tar`
+and `evidence/metadata/k6b-frame-full-result.json` in immutable PR247 evidence
+`/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-frame-20261026T192107Z`.
+The comparison reads no player-quality numbers; it uses only input identities,
+source-frame hashes and tick membership.
