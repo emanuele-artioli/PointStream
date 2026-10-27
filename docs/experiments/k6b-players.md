@@ -5219,3 +5219,33 @@ and `evidence/metadata/k6b-frame-full-result.json` in immutable PR247 evidence
 `/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-frame-20261026T192107Z`.
 The comparison reads no player-quality numbers; it uses only input identities,
 source-frame hashes and tick membership.
+
+### 2026-10-27 — Same-budget conversion-diagnostic amendment
+
+Planning clarified prospectively that diagnosing the failed exact RGB control
+is a correctness-recovery substage of the same human-approved 3600 GPU-s real-
+base study, not a fresh allocation. At amendment no GPU or quality scores have
+been used. Reserve <=600 admitted GPU-s including setup and validation; every
+second counts against the original cap. Run only a bounded original A6000-class
+native source/base conversion diagnostic after a representative smoke projects
+it inside that reservation. Verify original source YUV and exact 160 GPU source
+RGB hashes before regenerating six 80-frame base GPU RGB sets, repeating the
+conversion and checking decoded YUV identity. Record actual pixel differences
+without post-hoc tolerance and attribute only what is actually isolated. No
+neural quality is accepted before original controls; no generator/fitting/new
+weights/ball/DCVC or automatic budget reset. If source reproduction, smoke or
+budget fails, stop. Full judging remains conditional on exact controls and the
+remaining original 3600-second budget.
+
+The prospective conversion smoke uses the original A6000 class, Torch2.10.0
+native bilinear source conversion, 24 frames/window and all six base settings.
+Each source RGB is compared to original GPU source hashes; each base IVF is
+fresh-decoded against its stored complete YUV hash and GPU conversion is
+repeated, with output file/frame hashes. Source tick0 probes chroma, pre-round
+and rounded numeric differences; base tick0 reports before-resize difference
+and identical-input bicubic repeat; other frames report uint8 difference
+statistics only. The validator checks original source hashes, six output file
+and per-frame identities and a projected full budget including publication.
+Smoke <=120 s, full <=360 s, validator <=60 s and whole admission <=600 s;
+manager remaining-budget and measured smoke projection must both pass. Resource
+cost of the diagnostic counts toward the unchanged 3600 s study cap.

@@ -105,3 +105,21 @@ change or assumed float-rounding explanation is authorized here. If exact GPU
 source hashes also cannot be reproduced, investigate version/device/environment
 rather than judging. DCVC, ROI, ball, missing 160 generated frames, development
 and granted-background limitations remain as above.
+
+## 2026-10-27 — Same-budget conversion recovery authorized
+
+Planning clarified that the required conversion-control diagnostic is part of
+the user's existing 3600 admitted GPU-second study, not a new budget. At this
+amendment 0 GPU-s has been spent and no new quality scores have been opened.
+Reserve at most 600 admitted GPU-s including setup and validation for the
+native conversion diagnostic; all costs subtract from the same 3600-second
+cap. Original exact control is unchanged; do not adopt a relaxed tolerance.
+A representative smoke must project the full diagnostic within the reservation.
+On original A6000-class native code/runtime, reproduce all original 160 GPU
+source RGB frame hashes, compare actual CPU and GPU pixel differences, then
+only on exact source success regenerate six 80-frame decoded-base GPU RGB sets
+with frame hashes, independent conversion repeat and retained-YUV validation.
+No quality metrics are accepted in this diagnostic. Stop on any failed identity,
+resource gate or control; full hybrid judging may resume only with exact source,
+base conversion and original granted-mask/SAM control validation and sufficient
+remaining original budget. No generation, new weights, ball or DCVC.
