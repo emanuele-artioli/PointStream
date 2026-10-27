@@ -15,8 +15,20 @@ from typing import Any
 import numpy as np
 
 from experiments.tennis.k4b_features import convert_command
-from experiments.tennis.k6b_native_base import SOURCES, sha
 from experiments.visor.h3 import rgb_memmap
+
+SOURCES = [
+    ('al', 9, 25, '054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76', 'e7b960cd2456b439c5439b337a45e47d2a0a44a2a32025a2de595af3feed4fa2'),
+    ('med', 74, 50, 'a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be', '53633ce617b12d779bc8c5746d8d44cbe090ced6c49ba79dbe246cc6abacfb08'),
+]
+
+
+def sha(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open('rb') as source:
+        for block in iter(lambda: source.read(1024 * 1024), b''):
+            h.update(block)
+    return h.hexdigest()
 
 
 def pixel_diff(a: np.ndarray, b: np.ndarray) -> dict[str, Any]:

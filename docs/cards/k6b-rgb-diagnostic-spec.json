@@ -1,0 +1,25 @@
+{
+  "schema": 1, "device": "gpu", "hosts": ["gpu2", "gpu3"], "gpu_models": ["RTX A6000"],
+  "cpu_threads": 4, "gpu_memory_mib": 12000, "local_storage_gib": 40,
+  "environment": {"path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz", "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"},
+  "required_commands": ["ffmpeg"],
+  "entrypoint": ["-m", "experiments.tennis.k6b_rgb_diagnostic"],
+  "arguments": ["--base", "{staged:base}", "--prior", "{staged:prior}", "--al", "{staged:al}", "--med", "{staged:med}", "--frames", "{frames}"],
+  "staged_inputs": [
+    {"name": "base", "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T072713Z-2888cefe/full/published.tar", "sha256": "00b13e89077a27a3e6ff23bf476e9795c2120c5b1f5252ddfdd6f533a8119a39", "extract": false},
+    {"name": "prior", "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-frame-20261026T192107Z/evidence/metadata/k6b-frame-full-result.json", "sha256": "b0a55a5c1440463fff97efa975a661c2c65db9ce35e0696fade9d5648c39ccdc", "extract": false},
+    {"name": "al", "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4", "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76", "extract": false},
+    {"name": "med", "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/medvedev_struff__014.mp4", "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be", "extract": false}
+  ],
+  "inputs": [
+    {"path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T072713Z-2888cefe/full/published.tar", "sha256": "00b13e89077a27a3e6ff23bf476e9795c2120c5b1f5252ddfdd6f533a8119a39"},
+    {"path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-frame-20261026T192107Z/evidence/metadata/k6b-frame-full-result.json", "sha256": "b0a55a5c1440463fff97efa975a661c2c65db9ce35e0696fade9d5648c39ccdc"},
+    {"path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4", "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"},
+    {"path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/medvedev_struff__014.mp4", "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be"}
+  ],
+  "gpu_sharing": {"mode": "shared", "basis": "Deterministic conversion and hash equality are independent of foreign GPU work; elapsed time is resource cost only.", "margin_mib": 8192},
+  "contention": {"policy": "continue"}, "scale": {"frames": {"smoke": 24, "full": 240}},
+  "smoke": {"seconds": 120, "representative_basis": "Both source windows, 24 frames and all six retained-base settings, GPU/CPU pixel comparison, independent IVF decode and two fresh GPU conversions; projected full cost includes publication."},
+  "full": {"seconds": 360}, "validator": ["{python}", "-m", "experiments.tennis.k6b_rgb_diagnostic", "--validate"], "validator_seconds": 60,
+  "budget_seconds": 600, "stall_seconds": 300, "deadline": "2026-10-27T08:25:00+00:00"
+}
