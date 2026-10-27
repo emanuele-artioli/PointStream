@@ -55,3 +55,19 @@ Current receipts are retained locally under
 `/private/tmp/pointstream-*-doctor-20261027.json` and test logs alongside them;
 successful doctor reports also name their durable shared checks directory.
 Rollout and research submission identities are appended below when confirmed.
+
+### Confirmed compatible-worker rollout
+
+PR #257 merged with Linux CI passing, source `c24dfd19` (merge `7c65b018`).
+The gpu2/gpu3 doctor passed all checks at shared receipt
+`jobs/fleet/checks/9bab43964d24470e86b63b03b42c72c2`.
+The first refresh froze release `20261027T160223Z-3313c3a0` and replaced gpu2's
+worker with PID4158772. gpu3's stop acknowledgement timed out; read-only
+inspection confirmed old PID714429 was gone before any next action. A gated
+`workers start --hosts gpu3` then froze the same source in release
+`20261027T160853Z-49771504`, starting PID2735228. Its doctor receipt is
+`jobs/fleet/checks/1075618d0cec47db9ba523f204359263`.
+Canonical worker status confirmed both new heartbeats fresh. All six hosts
+remain configured; only gpu2/gpu3 were refreshed, and all detached supervisors
+and other workers were preserved. Storage safeguards are therefore rolled out
+on these two hosts, not yet universally across the fleet.

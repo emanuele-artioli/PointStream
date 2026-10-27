@@ -66,19 +66,19 @@ within the unchanged3020 s remainder. The human accepted it on2026-10-27.
 The validator now reads the frozen request's full reservation; the revised
 [specification](docs/cards/k6b-real-base-quality-revised-spec.json) retains all
 input/environment identities and quality settings. No new request exists.
-Canonical status now confirms all three terminal jobs. Current admission is
-blocked: gpu3 still fails the unchanged20s environment probe, and gpu2/gpu3
-worker heartbeats were stale. Extended read-only diagnostics completed, but
-do not satisfy the gate or authorize omitting gpu3 from the compatible pool.
-Resolve current fleet health before dispatch; the approved budget remains
-580/3600s spent,3020s unused. See the latest experiment entry for diagnostics.
+Canonical status confirms the three old terminal jobs. The infrastructure
+repair [PR #257](https://github.com/emanuele-artioli/PointStream/pull/257) is merged
+with CI passing; compatible gpu2/gpu3 workers were refreshed and their heartbeats
+verified fresh. The [recovery report](docs/fleet-health-recovery-2026-10-27.md)
+records the prospective60s infrastructure deadline and all required checks.
+The approved study is now being prepared for dispatch, retaining580/3600s
+spent and3020s unused until a new admission.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
 source of truth. The shared shell defaults are active and verified. Live
-application originals remain intentionally protected. Fleet manager safeguard
-rollout is pending a successful health gate (gpu2/gpu3 probe latency), so do
-not claim it deployed. See [storage closure](docs/storage-maintenance-2026-10-27.md).
+application originals remain intentionally protected. Fleet manager safeguards now run on gpu2/gpu3 after the
+verified scoped refresh; the other four workers remain unchanged. See [storage closure](docs/storage-maintenance-2026-10-27.md).
 The detailed historical findings follow; they do not supersede this resume state.
 
 ### Historical findings and completed components
@@ -258,6 +258,7 @@ marked `card ready` is waiting for the user to start it.
 | Root continuation | [2026-10-27 handover](docs/continuation-2026-10-27.md) | `codex/root-handover-20261027`, [PR #254](https://github.com/emanuele-artioli/PointStream/pull/254) | Codex | reported: final handover for user-requested root-chat archive after merge; no new session or research job launched |
 | Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
+| Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: compatible workers refreshed, fresh heartbeats; approved request and verified local caches being prepared; no new research request at this checkpoint |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).

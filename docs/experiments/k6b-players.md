@@ -5508,3 +5508,62 @@ worker freshness before a fresh representative smoke and possible gated full.
 An independently audited full scientific result is still absent. The saved
 80/240 ticks, optimistic rate floor, absent native DCVC/ROI/ball integration,
 source/replay independence and development-data caveats remain unchanged.
+
+### 2026-10-27 — Fleet recovered; approved real-base request frozen before dispatch
+
+Goal: test whether the frozen PR242 lossy-reference generation and PR247
+per-frame SAM players improve a REAL decoded whole-frame SVT base at equal
+TOTAL rate on the same Al031@129 and Med014@194 development windows.
+
+The human approved smoke240/full2600/validator120/residual60 within the3020s
+remainder; the later instruction was to proceed. No scientific setting,
+cohort, source identity, original control, global scale4 point,80-tick
+membership, +/-0.001 sensitivity, >=3/4 full/foreground rules, early stop or
+PCHIP/anchor decision has changed. Rate-floor, missing160 generated ticks,
+DCVC/ROI/ball and development-source limitations remain. Stop on failed
+identity/control, resource/decision gate, exhausted budget or uncertain
+submission. No other generation, fitting, new method or baseline is included.
+
+Infrastructure repair PR #257 is merged with Linux CI passing. Its changes are
+bounded60s remote health/RPC deadlines matching worker-local probes, overlapping
+metadata checks, authenticated connection reuse, terminal-request caching,
+advancing-scan heartbeat and stable kernel process birth identity. Required
+resource, ownership, environment and atomic-claim checks remain. Both compatible
+hosts passed the doctor before refresh; gpu2/gpu3 now run that frozen source
+with fresh canonical worker heartbeats, other hosts and detached supervisors
+preserved. The lost gpu3 stop acknowledgement was inspected: its old PID was
+confirmed absent before starting its replacement. Details and receipts are in
+[recovery report](../fleet-health-recovery-2026-10-27.md). No resource failure
+was accepted as a passing check.
+
+The prepared scientific request retains the full A6000 compatible pool gpu2/
+gpu3. Its expired deadline was prospectively refreshed to2026-10-27 18:00 UTC
+(19:00 Vienna); no other field changed from the human-approved revised spec.
+Spec file SHA256 `d44c13ffe64d152c531e0ff17c28781f381c4ff377d447ceb44d6d5f4800044e`;
+worker SHA256 `8378688259d9842ebf64fd219dd86b9347c5b8d4facd9d1bde703da13423d80d`.
+Admission remains<=3020s, with prior580s conservative charge retained and
+no transfer from closed studies. Independent CPU-only cache preparation reads
+existing SHA256-identified archives and uses separate `/local/users/emanuele`
+storage; it preserves the original RAM cache and durable inputs and uses no
+GPU. Its costs/receipts will be recorded separately, not called GPU speedup.
+At this entry no new scientific request is submitted. Save its exact ID before
+one bounded fleet wait; inspect any lost receipt rather than replaying it.
+
+CPU preflight completed safely on separate local disks. All14 declared archive/
+weight inputs (including the packed runtime),12389884698bytes, independently
+rehashed on gpu2; final validation64.362724wall seconds /47.621686self CPU-s,
+report `/local/users/emanuele/pointstream/prewarm-real-base-20261027.json`.
+The system Python3.10 tar safety filter incorrectly treated the valid internal
+symlink `lib/terminfo -> ../share/terminfo` as archive-root-relative and rejected
+extraction. Its exact branch was inspected; a standalone legitimate-link test
+reproduced the failure. No extraction guard was disabled. The already qualified
+packed Python3.12.14 accepted that internal link with its standard data filter
+and safely extracted the unchanged SHA256-identified archive on both hosts.
+Environment preparation gpu2/gpu3:129.265279/139.438399wall seconds,
+128.984573/136.338261self CPU-s respectively. Original RAM prefixes remain
+unchanged. Native environment prefix probes passed on both new disk prefixes.
+CPU-only imports with CUDA hidden verify Torch2.10.0+cu128, NumPy1.26.4,
+OpenCV4.10.0 on both;5.900002/6.328046wall seconds and3.348017/2.882800self
+CPU-s. These are CPU setup measurements, not GPU inference timings. Failed
+setup attempts and earlier cache-copy CPU were not fully measured; no global
+CPU-budget claim is made. No GPU was reserved or executed by preparation.
