@@ -1,4 +1,4 @@
-# Actual-base player enhancement pilot — CONTROL GATE FAILED
+# Actual-base player enhancement pilot — GPU SOURCE CONTROL RECOVERED
 
 Goal: test whether the frozen PR242 lossy-reference generation and PR247
 per-frame SAM players improve a REAL decoded whole-frame SVT base at equal
@@ -65,8 +65,8 @@ judges, extra streams, ROI controls or DCVC. The authorized <=600 s
 native correctness/resource smoke must measure memory, complete
 per-frame real quality time, decode and validator overhead on representative
 1080p frames and both streams; use it to quote and gate bounded full stages,
-with every waited stage <=45 min. No GPU job was launched: the mandatory
-exact source-RGB control failed.
+with every waited stage <=45 min. Initially no GPU job was launched because the mandatory exact CPU/GPU source
+RGB control failed; the later same-budget diagnostic is recorded below.
 
 This is players-only intermediate feasibility. No qualified ball metadata or
 payload on these exact windows has yet been located; the base retains its
@@ -84,23 +84,23 @@ The human approved <=3600 admitted GPU-seconds for this study; the specific
 stop rule requires exact CPU-versus-original-GPU RGB identity before quality.
 The source YUV hashes agree for all six base settings, and the original 80
 judged ticks agree in identity. However byte-exact CPU source RGB hashes match
-only **10/80 Al** and **0/80 Med** original GPU hashes. This is a hard control
-failure. No tolerance is substituted and no new score or GPU job was run.
+only **10/80 Al** and **0/80 Med** original GPU hashes. This was a hard control
+failure at this checkpoint. No tolerance was substituted; the later GPU
+diagnostic is recorded below.
 It does not establish the magnitude of the pixel differences, identify their
 precise numerical cause, or show a scientific gain or loss. The CPU-versus-GPU
 identity of the six decoded-base RGB arrays has not been separately measured.
 The underlying source YUV, encoded streams, model inputs and prior results remain
 unchanged. Exact mismatch ticks and reproducible identity-checked comparison
 are in [gate result](k6b-real-base-source-rgb-gate.json) and
-[source comparison](../../tools/analysis/k6b_source_rgb_gate.py). The study
-stops with **0/3600 GPU-s** spent; old budgets stay closed.
+[source comparison](../../tools/analysis/k6b_source_rgb_gate.py). At that checkpoint **0/3600 GPU-s** had been spent; old budgets stayed closed.
 
-The cheapest next separately scoped decision is a native GPU source and base
+The next decision at that checkpoint was a native GPU source and base
 conversion diagnostic, using saved YUV and original function to compare RGB
 hashes and pixel-difference distributions against CPU while reproducing PR247
 source hashes. If successful, reconstruct base RGB in the same native GPU path
 and freeze new identities before a quality smoke. Measure that diagnostic's
-cost and request its own budget before dispatch; no approximation, threshold
+cost and resolve its authority before dispatch; no approximation, threshold
 change or assumed float-rounding explanation is authorized here. If exact GPU
 source hashes also cannot be reproduced, investigate version/device/environment
 rather than judging. DCVC, ROI, ball, missing 160 generated frames, development
@@ -128,3 +128,52 @@ Conversion diagnostic submitted as `20261027T074823Z-135421ee`, identified
 from the saved spec/ready record after the client receipt was lost. Pending
 at discovery; inspect this ID and do not replay. Total reservation <=600 s,
 charged against original 3600 s. Frozen worker source revision `146f06ee`.
+Smoke 20/20 checks passed, reproducing 8/8 prior GPU source hashes per window;
+the conservative full projection including publication was 306.032/360 s.
+Full diagnostic running under the same job; no new quality scores.
+
+Before any hybrid quality: the strict >=3/4 full-frame and >=3/4 foreground
+cells use the single global **scale4** operating point for both windows;
+scale8/scale2 form the other two curve points. This choice is based on the
+pre-existing native geometry/rate inventory, not new quality, and avoids
+post-hoc per-window operating-point selection. The achieved anchor envelope
+here is limited to the three recovered SVT points; missing stronger SVT, DCVC,
+and ROI/pixel alternatives remain explicit. If GPU control validation or the
+remaining-budget smoke fails, no hybrid score is accepted.
+Full conversion completed with 80/80 original GPU source hashes/window and
+six repeated GPU-base conversions. Conservatively charge 370/3600 s including
+admission, smoke and receipt overhead; remaining 3230 s. CPU/GPU source max
+1 level, with tick0 numerical attribution recorded in the experiment. The
+next gate is independent full artifact validation and original granted-matte/
+SAM control calibration, then a representative quality-smoke projection.
+
+## Receiver accounting clarification before quality
+
+The planning code audit found that PSTMContainer provides real typed framing
+and KPS1 is independently decodable, but the existing quantized adapter/guider
+billing does not serialize its receiver tensor-name/shape/dtype/offset and
+quantization/bootstrap directory. The diagnostic must not call this fully
+delivered. For the authorized development smoke, use a predeclared optimistic
+rate floor: full IVF bytes, actual framed KPS bytes, actual reference-bank and
+quantized model payload bytes amortized at 7200 s, plus the explicit research
+bootstrap JSON emitted by the worker. Installed common model assumption remains
+separate. The research header is not proof that every tensor/bootstrap field,
+transport/fallback or an independently decodable full240 semantic receiver is
+present. Missing metadata cannot be priced as zero for a delivered claim.
+A negative result even at this floor can reject this finite configuration; a
+positive result is conditional and requires actual complete receiver framing.
+No framing selection may be tuned after seeing quality. The original strict
+quality rules, source and granted/predicted control gates do not change.
+
+The prospective real-base scoring specification reserves <=2500 admitted s
+from the original study after conservatively charging 370 s for conversion;
+thus even a full reservation and prior cost total <=2870/3600 s. Smoke <=500 s
+uses two predeclared ticks/window, both original granted/predicted controls
+before any real-base scoring and all three fixed rates; full <=1800 s. The
+substantive smoke validator additionally projects publication and all 160-frame
+work within the full-stage reservation. If it fails, full does not launch.
+The bootstrap JSON is a counted research header only; omitted adapter tensor
+directory and other delivery framing keep the point an optimistic floor.
+At full scale, if both central-point metrics in either family lose in the
+first window, the 3/4 rule is arithmetically unattainable and stops early;
+unresolved cells are not losses. Otherwise evaluate both windows.

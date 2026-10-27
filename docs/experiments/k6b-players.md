@@ -5261,3 +5261,84 @@ SHA256 `24ca46c5954c64b96a34203772b099772880b069e0400b387e4cc23f43f84aea`,
 600 s admission cap and 08:25 UTC deadline. The saved spec identifies the
 native RGB diagnostic and pinned inputs. No replay; inspect this ID. At
 identity discovery it was pending, with no confirmed GPU time yet.
+
+Conversion smoke passed its 20 independent checks on the original RTX A6000
+class: 8/8 source RGB hashes per window reproduced the original GPU, all six
+smoke base sets passed repeated GPU conversion/file/frame validation and fresh
+IVF/YUV decode. Smoke workload23.023 s, conservative projection including
+publication306.032 s <360 s; fleet promoted the fixed full diagnostic. On the
+eight sampled ticks/window, CPU versus GPU source RGB differs at 14 Al and 195
+Med pixel-frames, maximum one 8-bit level. Source tick0's interpolated chroma
+was identical CPU/GPU, while pre-round RGB arithmetic differed by at most
+0.0000610352 and the rounded/clipped RGB differed in 1 Al /24 Med channel
+values. These are bounded smoke observations, not a quality score or a claim
+about every frame. Full job 20261027T074823Z-135421ee remains the same request;
+all admitted time counts against the original 3600 GPU-s cap.
+Before any hybrid quality is opened, the fixed point for the >=3/4 full-frame
+and >=3/4 foreground cell rules is **scale4 for both windows**. Scale8 and
+scale2 are additional curve points, not alternatives chosen after scores.
+The available envelope consists of the three recovered SVT points only;
+stronger saved native SVT points, DCVC and ROI controls remain absent here.
+
+Full conversion diagnostic job `20261027T074823Z-135421ee` completed on gpu2
+RTX A6000. All 80/80 original source GPU RGB hashes match for each window;
+all six saved-base YUV identities and independent IVF decodes match, and two
+fresh GPU conversion passes agree on every saved tick. CPU versus GPU source
+RGB differs on 160 Al pixel-frames and 2,208 Med pixel-frames over 80 frames
+each, maximum one 8-bit channel level, mean absolute channel difference
+3.2150e-7 /4.4367e-6. On source tick0, bilinear chroma arrays match exactly;
+pre-round RGB arithmetic differs up to 6.103515625e-5 and the final rounded
+values differ by one level on 1/24 channels. This isolates that particular
+source sample; it does not assert the same mechanism for every pixel or base.
+No tolerance was changed. Full diagnostic output is new distinct GPU-derived
+RGB, not a claim of exact CPU equality.
+
+Original 3600 GPU-s study ledger: diagnostic admitted282.821585 s, receipt to
+terminal368.930632 s; conservatively charge **370/3600 s**, leaving 3230 s
+before any quality smoke. Smoke/validation are included, not added again; CPU
+staging/supervisor costs are separate. Output archive, independent hashes and
+next quality-stage feasibility are pending verification. No new quality score
+has yet been accepted, and original granted-matte and predicted-mask control
+calibration is still required before hybrid quality.
+
+Independent post-publication audit (27.002513 CPU-s, outside GPU cap) verified
+all six GPU-derived 80-frame arrays and their 480 per-frame hashes against the
+recorded manifest, source 80/80 GPU hash matches per window and archive SHA256
+`5c4a0cfced5501e085f67d394f3a50ca7f92d2cb592f73fbd3ad661461cb691b`.
+Mode444, size2,986,301,440 bytes, at
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T074823Z-135421ee/full/published.tar`.
+Compared with the saved CPU RGB arrays, GPU-derived base scale8 is byte exact
+for both windows; scale4 and scale2 differ at 654/565 Al and 9878/4868 Med
+pixel-frames respectively, each maximum one 8-bit level. Same-input bicubic
+resize repeat matched in tick0 probes; before-resize tick0 byte difference was
+zero for Al scale8/4 and Med scale8, one-level for Al scale2 and Med scale4/2.
+These are numerical diagnostics only. Full per-stream file hashes and aggregate
+differences are in [independent audit](../cards/k6b-rgb-diagnostic-validation.json).
+Source control failure is resolved for the GPU path, not redefined as CPU/GPU
+byte identity. No original granted-matte/SAM control recalibration or real-base
+quality scoring has been performed yet.
+
+Before opening hybrid quality, receiver accounting was clarified: actual IVF
+and KPS1 framing and real reference/model payload bytes are known, but the
+quantized adapter/guider lacks a serialized tensor directory and complete
+receiver bootstrap. The fixed research header in the prospective quality
+worker is a counted additional cost, not a substitute for an independently
+decoded full bootstrap. Report all results as optimistic rate-floor
+comparisons: a negative result can reject this particular configuration even at
+that lower bound; a positive result remains conditional, not a fully accounted
+codec win. This changes no frozen quality rule or budget and is not selected
+from observed quality.
+
+The prospective saved-RGB quality job reserves <=2500 admitted GPU-s after
+370/3600 s conservative conversion charge: smoke <=500 s, full <=1800 s and
+remaining staging/validator reserve. Exact source, granted-matte and saved SAM
+prediction/control reproduction for BOTH windows precede any real-base score.
+Smoke evaluates two original ticks/window and all six anchor/hybrid paths, and
+must project all 160 frames plus publication under 1800 s. Predicted-mask
+compositing is a receiver-only function of the paid base, decoded KPS geometry,
+saved generated crops and saved predicted masks; unchanged base is the fallback.
+The independently scored foreground S uses target reference only in the judge.
+At full scale, two strict central-point losses in either family in the first
+window make >=3/4 impossible and trigger early stop; unresolved does not count
+as loss. Input/bootstrap/tensor accounting remains the explicitly documented
+optimistic floor; no result may be called a complete delivery win.
