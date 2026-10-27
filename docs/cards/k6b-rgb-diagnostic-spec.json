@@ -18,7 +18,7 @@
     {"path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/medvedev_struff__014.mp4", "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be"}
   ],
   "gpu_sharing": {"mode": "shared", "basis": "Deterministic conversion and hash equality are independent of foreign GPU work; elapsed time is resource cost only.", "margin_mib": 8192},
-  "contention": {"policy": "continue"}, "scale": {"frames": {"smoke": 24, "full": 240}},
+  "contention": {"policy": "continue", "basis": "Exact conversion hashes and pixel differences are independent of GPU contention timing."}, "scale": {"frames": {"smoke": 24, "full": 240}},
   "smoke": {"seconds": 120, "representative_basis": "Both source windows, 24 frames and all six retained-base settings, GPU/CPU pixel comparison, independent IVF decode and two fresh GPU conversions; projected full cost includes publication."},
   "full": {"seconds": 360}, "validator": ["{python}", "-m", "experiments.tennis.k6b_rgb_diagnostic", "--validate"], "validator_seconds": 60,
   "budget_seconds": 600, "stall_seconds": 300, "deadline": "2026-10-27T08:25:00+00:00"
