@@ -5342,3 +5342,14 @@ At full scale, two strict central-point losses in either family in the first
 window make >=3/4 impossible and trigger early stop; unresolved does not count
 as loss. Input/bootstrap/tensor accounting remains the explicitly documented
 optimistic floor; no result may be called a complete delivery win.
+
+Real-base quality/control job submitted **20261027T080644Z-9dba0803**, pending
+on receipt. Source commit `8bd01ff5703ebf5b1cf41feef4f564f948cf44b2`, source
+SHA256 `a3ae0b4ff10baa298c0407613de6940d11853b87b9d6c51451749a36673701db`,
+normalized spec SHA256 `7a5279094e4026e49e83cda8094580a3e963bab18ef02508298863f9c0d23ed4`.
+Reservation <=2500 admitted GPU-s against the 3230 s conservative remainder;
+deadline 08:48 UTC, smoke <=500 s and full <=1800 s gated by original controls,
+all-six representative actual 1080p paths and conservative cost projection.
+No retry or additional job without inspecting this exact ID. The compact JSON
+header is counted but receiver/model bootstrap remains incomplete: results
+are optimistic rate-floor comparisons, never complete delivery claims.

@@ -177,3 +177,8 @@ directory and other delivery framing keep the point an optimistic floor.
 At full scale, if both central-point metrics in either family lose in the
 first window, the 3/4 rule is arithmetically unattainable and stops early;
 unresolved cells are not losses. Otherwise evaluate both windows.
+Submitted control/quality job `20261027T080644Z-9dba0803`, initially pending;
+source revision `8bd01ff5`, <=2500 admitted seconds and 08:48 UTC deadline,
+under the original 3600-second study ledger. Inspect this ID, never replay an
+uncertain submission. The full stage may launch only after both controls and
+the representative projection pass.
