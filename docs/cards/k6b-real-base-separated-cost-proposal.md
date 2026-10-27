@@ -1,4 +1,4 @@
-# Real-base recovery with separated timing — APPROVED — 2026-10-27
+# Real-base recovery with separated timing — APPROVED AND EXECUTED — CLOSED 2026-10-27
 
 The user approved the prior same-cap allocation, and execution proceeded.
 Request20261027T181542Z-b22436b0 then hit its120s smoke limit. No full stage
@@ -106,3 +106,11 @@ receiver payload/framing and160 generated ticks, unresolved development lineage,
 no fair ROI or neural baseline, and no ball update. Independent full-result
 CPU audit precedes accepting evidence. A negative scientific decision closes
 this tested route; it does not license a fresh generator search.
+
+## Executed outcome
+
+Fresh gate passed, full stage completed with the registered scientific early
+stop after Al loses both whole-frame metrics. See the
+[audited report](../k6b-real-base-quality-report-2026-10-27.md).
+Final job20261027T211451Z-f6a754eb,1320s conservative new charge; study
+2350/3600s,1250unspent. This card is closed and authorizes no additional retry.

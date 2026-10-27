@@ -5900,3 +5900,109 @@ Resumed native wait handle69521, bound2100s, same original observation
 window; receipt /private/tmp/pointstream-separated-resumed-wait.json. No
 recurring monitor, extra request or scheduled callback. Prior1030s is fixed;
 add this exact request's final admitted/salvage cost conservatively on closure.
+
+### Fresh smoke passed; full stage running
+
+Canonical gate PASSED under exact sourcebe7dfb19/spec33474777, separated-v1.
+All seventeen resource/control/shape/device/memory checks passed on three
+original ticks in both windows. Native full projection1511.906996s worker
++137.144188s publication =1649.051184s <2000s; fixed command overhead87.943050s,
+35% safety retained. Four warm ratios1.103152/1.040385/1.006206/1.003328 all
+<=1.25. Native smoke elapsed180.026995s, validator3.611991s,2389.382129s
+remained at promotion. This is a resource/correctness gate, not a quality win.
+
+Full dispatch began1793137813.9460871, full progress0 at1793137814.1993854.
+Native wait woke after788s on stall event46ef5a5b142b53ac8c63bf5abb3fbed0,
+which flags10min since the coarse whole-window progress update. Read-only
+checkpoint inspection finds both calibration windows completed all80ticks,
+seconds243.376272/203.245848. Both task-owned controller processes remain
+live, no campaign error, source/score checks unchanged. Command log contains
+only the existing read-only NumPy-to-tensor warning; CUDA transfer copies
+before metric computation. No evidence here justifies cancellation or replay.
+Event acknowledged; preserve the full2000s worker bound and2570s total.
+
+Resume the same observation for <=1000s, still within original45min window;
+receipt /private/tmp/pointstream-separated-final-wait.json. All prior request
+costs remain1030s; current request final cost/quality decision still pending.
+
+Final segment of the SAME observation: native wait handle78718, <=1000s,
+receipt /private/tmp/pointstream-separated-final-wait.json. Full worker deadline
+from its dispatch is about22:23:34 UTC, total budget cutoff22:28:47 UTC.
+Preserve running full work and its partial arrays; no new request or recurring
+monitor is authorized. Gate metadata is saved in
+/private/tmp/pointstream-separated-terminal-or-attention.json.
+
+### 2026-10-27 — Audited scientific FAIL; prescribed early stop
+
+Final exact job20261027T211451Z-f6a754eb is canonically COMPLETE, exit0,
+with the predeclared early stop after Al031@129. Both control windows have
+all80ticks; only the first actual-base window was scored. Med actual-base
+cells are UNSCORED, not losses. At global scale4 and equal TOTAL22.737962kbps,
+Al full-frame LPIPS0.275786611 vs achievable SVT0.234056553 loses; full DISTS
+0.169612437 vs0.164586054 loses. Both stay losses at +/-0.001. Therefore
+full-frame >=3/4 is impossible (at most2/4 if Med won both), so the tested
+recipe FAILS its fixed rule. Foreground LPIPS and DISTS both win on Al, but
+that does not satisfy the required whole-frame AND foreground criterion.
+
+Independently recomputed Al PCHIP BD-rate over overlapping quality is
++31.247321% full LPIPS and+17.331683% full DISTS (positive is worse). These
+are FIRST-WINDOW numbers only, not a two-window mean. Foreground quality
+ranges do not overlap, so no foreground BD-rate is fabricated. No DCVC, fair
+ROI/pixel baseline, fully serialized delivery or untouched evaluation claim.
+Only80/240saved ticks and familiar development footage; all prior lineage,
+missing160ticks and optimistic-rate-floor limitations remain.
+
+Independent CPU score/provenance audit PASSED55checks: complete80-tick
+arrays/means, both old controls and source/composite hashes, native sourceYUV,
+base-frame identities, IVF/bootstrap/side-rate ledger, independent central
+decisions/BD-rate and arithmetic stop validity. Published archive SHA256
+e346844d20671e5dfd78828ec61d262aa13109bc1be9a1b421873facdc86daa1
+matches the native full/staging.json.
+
+Additional CPU replay of the actual frozen component PASSED: all240hybrids
+reconstructed from paid decoded bases, native KPS geometry, saved generated
+crops and saved receiver masks;480image hashes match the published rows.
+No source video/target RGB input is used in this replay, and pixels outside
+predicted support stay exactly equal to the paid base. All210frozen code
+files and six input archive identities are verified. This is component replay,
+not an independently implemented renderer or a complete receiver wire.
+CPU cost79.090832wall/76.897103selfCPU-s; no GPU. Report on gpu2:
+/local/users/emanuele/pointstream/audit-recompose-f6a754eb/publish/composite-audit.json.
+
+Resource closure: admitted interval1793137556.7579308–1793138833.7093961
+=1276.951465GPU-s; full worker1006.600970s, terminated by valid scientific
+early stop, not a resource failure. Through canonical terminal reconciliation
+1318.620690s; charge1320s conservatively. Study total **2350/3600s**
+(0.652778/1.0GPU-hour), **1250s unspent**. This is not authority for a new
+method or to reopen the now-closed tested recipe. All waits ended and all
+contention/stall/terminal events acknowledged; no recurring model monitor.
+
+Post-hoc CPU accounting diagnostic (registered failure unchanged): with ALL
+non-KPS costs free but current3.53kbps KPS packet unchanged, Al full LPIPS
+BD-rate remains+18.841831% and full DISTS+5.737559%. Both are still window
+losses; packaging/longer bank/adaptation amortization alone cannot repair
+these fixed curves. Scale4 extra-side break-even is0.784306kbps for LPIPS
+and4.604087kbps for DISTS. All-side-free counterfactual is-2.467586% LPIPS/
+-14.134389%DISTS. These are optimistic CPU bounds, not new delivered methods,
+not altered original scores and not measured Med outcomes.
+
+CPU input readiness for a future separately approved appearance bound:
+preserved failed-smoke truth-al/source.npy exists,240x1080x1920x3uint8; all
+80selected ticks exactly match original source RGB hashes. No new GPU
+conversion is needed. This finding authorizes no new GPU experiment.
+
+Completed evidence published as a NEW read-only archive+manifest:
+/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-real-base-quality-20261027-f6a754eb/.
+Evidence archive SHA256335e1b00c778ce04e68203b10a9dff81ab1ad8a671908132dc18cf910d90a462,
+1,873,920bytes/32members; all member hashes verified after transfer and final
+files0444. Includes raw scores/native metadata, historical input provenance,
+portable independent score/rate audit, component-replay report/source, CPU
+accounting diagnostic, and reviewed PNG/SVG rate-distortion figures. Original
+research outputs remain untouched. Detailed final report:
+[actual-base negative result](../k6b-real-base-quality-report-2026-10-27.md).
+
+New [ideal-player bound](../cards/k6b-ideal-player-bound.md) is a PROPOSAL only:
+new question after the negative result, <=1100GPU-s of1250unused, no training
+or generation. An8,000MiB allocation is proposed from measured3.522GiB peak
+with fresh qualification, preserving8,192MiB margin. No request exists and
+explicit acceptance is required; this closed study grants no new method.
