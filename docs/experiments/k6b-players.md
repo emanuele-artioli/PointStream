@@ -5582,3 +5582,24 @@ for old clients. There is no automatic retry or failover of writes. SSH control-
 master reuse was removed from the client to avoid background descriptor lifetime
 in captured command receipts. A new request may be created only after this
 pre-publication failure was established; this is not replaying an uncertain job.
+
+New request **20261027T165235Z-f58a59af** allocated and preserved in the local
+client record; publication receipt pending at this checkpoint. Source
+`891365612505e9067446be24094186bf79a5ff9d`, no selected/untracked patches;
+source archive SHA256 `f23d2b1d2d89539bee8f7d43768b8abfe6192fc2e770b15c0be3269a50ecb5a8`,
+selected complete code closure `src`, `experiments`, `pyproject.toml`.
+Normalized spec SHA256
+`cce9ccc1c0f9172cec2e029f745cd493904d7717baa0a23cfed3ef2fb84ce1f7`;
+deadline18:00 UTC, <=3020s admission, smoke240s/full2600s/validator120s.
+Expected durable request directory:
+`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T165235Z-f58a59af`.
+Inspect this exact ID after any lost receipt; do not submit again. No admission
+or scientific result is confirmed merely by allocation/publication.
+
+Monitoring will use one bounded native `scripts/ps-fleet wait` for this request,
+at most45min. A harmless2-second foreground command was actually awaited through
+the native tool and returned completion before the agent continued. This
+verifies attended foreground completion, not background wakeups; background
+model-resume callbacks and cache lifetime remain unknown. No recurring model
+monitor, keepalive or one-shot scheduler was created. Preserve the wait handle
+and output receipt; do not replace the wait with repeated model polling.

@@ -9,8 +9,9 @@ are unchanged. Canonical status now confirms all three terminal states.
 Execution preparation was merged in PR #256. The user then instructed the root
 to proceed. Fleet repair PR #257 is merged with CI passing; compatible gpu2/gpu3
 workers were refreshed and verified fresh. `codex/real-base-approved-run` is
-preparing the same approved request, with its deadline prospectively refreshed
-to18:00 UTC and the complete compatible pool retained. Read the latest experiment
+publishing request20261027T165235Z-f58a59af, with deadline18:00 UTC and the
+complete compatible pool retained. Source89136561/spec cce9ccc1 are frozen;
+inspect this ID after a lost receipt, never replay it. Read the latest experiment
 entry and recovery report for deployment identities, then the new job ledger
 before acting. Do not replay any previous request.
 

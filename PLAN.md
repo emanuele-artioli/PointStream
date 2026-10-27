@@ -65,14 +65,17 @@ The resumed root prepared a [prospective allocation revision](docs/cards/k6b-rea
 within the unchanged3020 s remainder. The human accepted it on2026-10-27.
 The validator now reads the frozen request's full reservation; the revised
 [specification](docs/cards/k6b-real-base-quality-revised-spec.json) retains all
-input/environment identities and quality settings. No new request exists.
+input/environment identities and quality settings. Request
+`20261027T165235Z-f58a59af` is being published; inspect it, never replay.
 Canonical status confirms the three old terminal jobs. The infrastructure
 repair [PR #257](https://github.com/emanuele-artioli/PointStream/pull/257) is merged
 with CI passing; compatible gpu2/gpu3 workers were refreshed and their heartbeats
 verified fresh. The [recovery report](docs/fleet-health-recovery-2026-10-27.md)
 records the prospective60s infrastructure deadline and all required checks.
-The approved study is now being prepared for dispatch, retaining580/3600s
-spent and3020s unused until a new admission.
+The approved request `20261027T165235Z-f58a59af` is allocated; publication
+receipt is pending. Source89136561 and normalized spec cce9ccc1 are frozen in
+the experiment entry. Retain580/3600s prior charge; add actual new admission
+once confirmed. No scientific result is accepted yet.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
@@ -258,7 +261,7 @@ marked `card ready` is waiting for the user to start it.
 | Root continuation | [2026-10-27 handover](docs/continuation-2026-10-27.md) | `codex/root-handover-20261027`, [PR #254](https://github.com/emanuele-artioli/PointStream/pull/254) | Codex | reported: final handover for user-requested root-chat archive after merge; no new session or research job launched |
 | Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
-| Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: compatible workers refreshed, fresh heartbeats; approved request and verified local caches being prepared; no new research request at this checkpoint |
+| Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: compatible workers refreshed, fresh heartbeats; request20261027T165235Z-f58a59af allocated, publication pending; source89136561/spec cce9ccc1; inspect, never replay |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
