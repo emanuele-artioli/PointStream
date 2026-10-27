@@ -627,6 +627,7 @@ def test_partial_worker_refresh_preserves_other_configured_hosts(tmp_path, monke
     monitor.write_json(state / 'inbox.json', {
         'base': '/data/jobs/fleet', 'hosts': ['gpu1', 'gpu2', 'gpu3', 'gpu4'],
         'pythons': {host: '/old/python' for host in ('gpu1', 'gpu2', 'gpu3', 'gpu4')},
+        'management_host': 'gpu2', 'management_python': '/usr/bin/python3',
     })
     monkeypatch.setattr(inbox, 'doctor', lambda hosts: {
         'passed': True, 'base': '/data/jobs/fleet', 'evidence_path': '/data/check',
@@ -648,6 +649,30 @@ def test_partial_worker_refresh_preserves_other_configured_hosts(tmp_path, monke
                      include_change=[], include_untracked=[])
     result = inbox.workers_start(args, tmp_path)
     assert result['config']['hosts'] == ['gpu2', 'gpu3', 'gpu1', 'gpu4']
+    assert result['config']['management_host'] == 'gpu2'
+    assert result['config']['management_python'] == '/usr/bin/python3'
     assert result['config']['pythons']['gpu1'] == '/old/python'
     assert result['config']['pythons']['gpu2'] == '/new/python'
     assert stopped == started == ['gpu2', 'gpu3']
+
+
+def test_management_routing_keeps_compute_pool_and_never_retries(tmp_path, monkeypatch):
+    import subprocess
+    config = {'hosts': ['gpu3', 'gpu2'], 'base': '/data/jobs/fleet',
+              'release': '/data/release', 'pythons': {'gpu2': '/python', 'gpu3': '/python'}}
+    monitor.write_json(tmp_path / 'inbox.json', config)
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', 'gpu2')
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_PYTHON', '/usr/bin/python3')
+    routed = inbox.load_config(tmp_path)
+    assert routed['hosts'] == ['gpu3', 'gpu2']
+    calls = []
+    def ssh(host, *args, **kwargs):
+        calls.append((host, args[0][0]))
+        return subprocess.CompletedProcess([], 0, '{}', '')
+    monkeypatch.setattr(fleet, '_ssh', ssh)
+    inbox.remote_rpc(routed, 'health', {})
+    inbox.remote_rpc(routed, 'worker_start', {}, alias='gpu3')
+    assert calls == [('gpu2', '/usr/bin/python3'), ('gpu3', '/python')]
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', 'gpu1')
+    with pytest.raises(fleet.FleetError, match='configured fleet host'):
+        inbox.load_config(tmp_path)

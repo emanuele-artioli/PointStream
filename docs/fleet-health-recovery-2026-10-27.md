@@ -71,3 +71,17 @@ Canonical worker status confirmed both new heartbeats fresh. All six hosts
 remain configured; only gpu2/gpu3 were refreshed, and all detached supervisors
 and other workers were preserved. Storage safeguards are therefore rolled out
 on these two hosts, not yet universally across the fleet.
+
+### Stable management routing
+
+Shared-inbox RPCs can select a verified configured `management_host` and an
+absolute `management_python`; temporary overrides are
+`PS_FLEET_MANAGEMENT_HOST` and `PS_FLEET_MANAGEMENT_PYTHON`. Explicit worker-host
+operations retain their recorded worker interpreters. The saved client route
+is gpu2 with `/usr/bin/python3`, after a successful read-only health call; the
+manager dependency closure is standard-library-only. All six compute hosts and
+worker interpreter mappings are retained. Scoped refreshes preserve these
+management settings. No write is automatically retried or failed over.
+Client-side control-master reuse was removed after delayed captured receipts;
+normal SSH calls retain their bounded deadlines. The prior reuse description
+above records the earlier repair revision, not the final client configuration.

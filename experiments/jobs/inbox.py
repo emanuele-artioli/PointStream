@@ -885,9 +885,11 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
 
 
 def remote_rpc(config: dict[str, Any], action: str, payload: dict[str, Any], *, alias: str | None = None) -> Any:
-    alias = alias or config["hosts"][0]
+    explicit_alias = alias is not None
+    alias = alias or config.get("management_host") or config["hosts"][0]
     script = "import json,sys; sys.path.insert(0," + repr(config["release"]) + "); from pathlib import Path; from experiments.jobs.inbox import rpc; print(json.dumps(rpc(Path(" + repr(config["base"]) + ")," + repr(action) + ",json.loads(" + repr(json.dumps(payload)) + "))))"
-    result = fleet._ssh(alias, [config["pythons"][alias], "-c", script], timeout=120)
+    python = config["pythons"][alias] if explicit_alias else config.get('management_python', config['pythons'][alias])
+    result = fleet._ssh(alias, [python, "-c", script], timeout=120)
     if result.returncode:
         raise fleet.FleetError(f"{alias}: {action} failed: {(result.stderr or result.stdout)[-4000:]}")
     return json.loads(result.stdout.strip().splitlines()[-1])
@@ -899,6 +901,16 @@ def load_config(state_dir: Path) -> dict[str, Any]:
         raise fleet.FleetError("workers are not configured; run workers start first")
     if not config.get("hosts") or any(h not in fleet.DEFAULT_HOSTS for h in config["hosts"]):
         raise fleet.FleetError("invalid fleet configuration")
+    management = os.environ.get('PS_FLEET_MANAGEMENT_HOST') or config.get('management_host')
+    if management:
+        if management not in config['hosts']:
+            raise fleet.FleetError('management host must be a configured fleet host')
+        config = {**config, 'management_host': management}
+    python = os.environ.get('PS_FLEET_MANAGEMENT_PYTHON') or config.get('management_python')
+    if python:
+        if not Path(python).is_absolute():
+            raise fleet.FleetError('management Python must be an absolute executable path')
+        config = {**config, 'management_python': python}
     return config
 
 
@@ -996,6 +1008,9 @@ def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         # their current workers; fresh heartbeat checks still gate submissions.
         config['hosts'] = list(dict.fromkeys([*args.hosts, *previous['hosts']]))
         config['pythons'] = {**previous['pythons'], **config['pythons']}
+        for key in ('management_host', 'management_python'):
+            if key in previous:
+                config[key] = previous[key]
     snapshot, sha, metadata = fleet._build_snapshot(root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked))
     original_snapshot = snapshot
     snapshot, identities = worker_bundle(original_snapshot)

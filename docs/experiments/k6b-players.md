@@ -5567,3 +5567,18 @@ OpenCV4.10.0 on both;5.900002/6.328046wall seconds and3.348017/2.882800self
 CPU-s. These are CPU setup measurements, not GPU inference timings. Failed
 setup attempts and earlier cache-copy CPU were not fully measured; no global
 CPU-budget claim is made. No GPU was reserved or executed by preparation.
+
+The first submission attempt stopped in the read-only management health RPC,
+before UUID allocation, local request record, remote prepare or publication.
+No scientific request existed and no GPU was charged. The client route had
+selected gpu3's NFS-based controller interpreter after its scoped refresh.
+A reviewed explicit management host/interpreter choice now routes shared-inbox
+operations through gpu2's local `/usr/bin/python3` (the controller dependency
+closure is standard-library-only). Canonical routed health succeeded and showed
+all six worker heartbeats fresh. Worker interpreter mappings, scientific packed
+runtime and both compute hosts remain unchanged. The verified local routing
+configuration was saved atomically with an exact backup; host2 is also first
+for old clients. There is no automatic retry or failover of writes. SSH control-
+master reuse was removed from the client to avoid background descriptor lifetime
+in captured command receipts. A new request may be created only after this
+pre-publication failure was established; this is not replaying an uncertain job.
