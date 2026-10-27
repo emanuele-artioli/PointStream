@@ -5763,3 +5763,68 @@ setup CPU. It verifies partial controls only, never a full-stage scientific gate
 The concrete [separated timing proposal](../cards/k6b-real-base-separated-cost-proposal.md)
 is pending explicit acceptance. No implementation or new GPU request is implied
 by merging that prospective card. Current accepted gates remain unchanged.
+
+### 2026-10-27 — Separated timing model and final same-cap recovery APPROVED
+
+The human explicitly approved the revised model and allocation. Exactly one
+fresh request may be frozen/submitted after correctness checks. No new GPU
+request exists at this checkpoint. Prior conservative charge1030/3600s;
+remaining2570s = smoke300/full2000/validator120/residual150. The earlier
+20:00 UTC deadline expired while awaiting acceptance; prospective replacement
+deadline22:30 UTC (23:30 Vienna), before freezing, changes no budget or science.
+
+Hypothesis: separately accounting fixed setup, cold excess, steady per-frame
+inference and direct publication can give a valid complete quote within2000s.
+Competing explanation: real neural cost, shared-host variability or preparation
+latency still make the full test infeasible. The three-tick two-window smoke
+is the bounded pilot and scale confirmation; every warm trace must be stable
+within25%, every original control must pass, full projection retains35% margin
+and publication, and the native remaining-budget/full-reservation gate remains
+binding. A failed gate closes this final attempt; no automatic further trial.
+The full scientific rule, source/mask/metric identities and80-tick cohort are
+unchanged. No generation, new model or alternative experiment is authorized.
+
+Implementation review: scientific source conversion, masks, crops, metric
+network calls, quality thresholds and compare_curves are unchanged. Only
+per-frame instrumentation, saved resource-model selection and validation
+change. Native campaign records publication/release elapsed time directly.
+Legacy requests retain the two-tick recipe and40x estimator; separated-v1
+requires three ticks, both original windows in both timing families, complete
+native timings, <=25% warm variability, and strict full-reservation checks.
+Invalid separated evidence cannot fall back to a legacy estimate.
+Configured ruff/mypy pass;49 focused scientific/resource tests pass. The
+full local run before the final diagnostic-only field update had959passes,
+24skips and the same existing macOS protected-symlink hook failure at
+tests/test_agent_hooks.py:218. Linux CI must verify the final revision.
+No GPU has been spent by this CPU-only preparation. Current compatible pool
+check finds no20,000+8,192MiB free slot on gpu2/gpu3; resource gating remains.
+
+Frozen source01888c76ce2dd2d7ffbb5ceb63f9a28e774a41f1 passed Linux CI
+on PR259 (all configured checks), after local ruff/mypy and focused/fleet
+regressions passed. Packed-runtime CPU preflight on gpu2 succeeded with CUDA
+hidden, complete source/helper imports and numerical resource-model/rejection
+checks; receipt/local preparation at
+/local/users/emanuele/pointstream/preflight-separated-01888c76/result.json.
+Judge file SHA256cb9a775dbb7f5b031a7be400bd2926a1628c8560c572f79f8690578c8022ef81.
+A CPU AST comparison against1f4ed97c verifies eleven production calls unchanged
+(including conversion, networks, composition and memory cap) and identical
+compare_curves; timing/metadata are the reviewed changes.
+
+Spec file SHA25687750e286db7a7767fd1ef3921ee0faeeebf702b0f40ec076b866e15753ebb8c.
+The single submit command was started at21:14 UTC, native exec session34827,
+receipt /private/tmp/pointstream-separated-approved-submission.json. UUID and
+publication acknowledgement pending; inspect the original local record after
+any delay. Never repeat this command. Source closure explicitly includes src,
+experiments, tools and pyproject.toml. Admission must preserve original memory
+constraints while the compatible pool is busy. Prior1030/3600s remains; no new
+admission assumed by this checkpoint. Deadline22:30 UTC (23:30 Vienna).
+
+Final approved request **20261027T211451Z-f6a754eb** is allocated, local
+PREPARING at this checkpoint. Frozen source01888c76ce2dd2d7ffbb5ceb63f9a28e774a41f1;
+normalized spec SHA25633474777347537343ecf092ac9ede1ca5f515ba16926caa020d49c4253d420dd.
+Expected remote directory
+/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T211451Z-f6a754eb.
+No publication/admission inferred from allocation; source archive digest is
+pending its receipt. Inspect this exact ID after any lost reply, never replay.
+Prior1030s conservative + maximum2570s = original3600s; deadline22:30 UTC.
+No new scientific result or validated cost quote at this checkpoint.

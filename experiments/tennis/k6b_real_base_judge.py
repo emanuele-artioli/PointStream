@@ -111,7 +111,8 @@ def run(a: argparse.Namespace) -> None:
             for metric in ('lpips', 'dists'):
                 if np.max(np.abs(prior_score[metric][:, ticks] - current_score[metric][:, ticks])) > 1e-4:
                     raise ValueError('original granted/predicted score control mismatch')
-        calibration.append({'id': wid, 'ticks': ticks, 'exact_control': True, 'prediction_control': True, 'seconds': rec['seconds']})
+        calibration.append({'id': wid, 'ticks': ticks, 'exact_control': True, 'prediction_control': True,
+                            'seconds': rec['seconds'], 'scored_frame_seconds': rec['scored_frame_seconds']})
         masks_by_window[wid] = masks
         units_by_window[wid] = (kp_meta, units, boxes)
     control_elapsed = time.monotonic() - began
@@ -136,8 +137,10 @@ def run(a: argparse.Namespace) -> None:
         ticks = row['judged'][:a.judged or None]
         scores = {m: np.full((6, len(ticks)), np.nan) for m in ('full_lpips', 'foreground_lpips', 'full_dists', 'foreground_dists', 'full_psnr')}
         hashes: dict[str, Any] = {}
+        frame_seconds: dict[str, float] = {}
         frame_started = time.monotonic()
         for j, t in enumerate(ticks):
+            tick_started = time.monotonic()
             true = np.asarray(truth[t])
             if array_sha(true) != prior_rows[wid]['source_rgb_frame_sha256'][str(t)]:
                 raise ValueError('source RGB original control failed')
@@ -183,6 +186,7 @@ def run(a: argparse.Namespace) -> None:
                 scores['full_dists'][i, j], scores['foreground_dists'][i, j] = full_d, fg_d
                 scores['full_psnr'][i, j] = 99.0 if mse == 0 else 10 * np.log10(255.0**2 / mse)
             hashes[str(t)] = frame_hashes
+            frame_seconds[str(t)] = time.monotonic() - tick_started
         if any(not np.isfinite(v).all() for v in scores.values()):
             raise ValueError('nonfinite real metric')
         out = publish / safe(wid)
@@ -217,6 +221,7 @@ def run(a: argparse.Namespace) -> None:
                           'base_rgb_sha256': base_row['sha256']})
         item = {'id': wid, 'ticks': ticks, 'means': {m: v.mean(axis=1).tolist() for m, v in scores.items()},
                 'rates': rates, 'composite_hashes': hashes, 'score_seconds': time.monotonic() - frame_started,
+                'frame_seconds': frame_seconds,
                 'converted_sha256': converted['sha256']}
         write(out / 'window.json', item)
         rows.append(item)
@@ -237,7 +242,10 @@ def run(a: argparse.Namespace) -> None:
     per_frame = sum(r['score_seconds'] for r in rows) / sum(len(r['ticks']) for r in rows)
     calibration_per_frame = sum(r['seconds'] for r in calibration) / sum(len(r['ticks']) for r in calibration)
     projected = (control_elapsed + (per_frame + calibration_per_frame) * 160) * 1.35
-    summary = {'rows': rows, 'calibration': calibration, 'seconds': seconds, 'projected_full_seconds': projected,
+    summary = {'rows': rows, 'calibration': calibration, 'seconds': seconds,
+               'projected_full_seconds': projected if a.cost_model == 'legacy' else None,
+               'legacy_projected_full_seconds': projected,
+               'cost_model': a.cost_model,
                'device': device, 'peak_gpu_gib': torch.cuda.max_memory_allocated() / 2**30, 'frames_per_window': a.judged, 'scope': 'optimistic rate floor: fixed research header, 7200s bank/adaptation; tensor bootstrap and full framing unmeasured, no ball update or full semantic wire claim'}
     write(publish / 'quality.json', summary)
     write(Path(os.environ['PS_STAGE_DIR']) / 'quality-summary.json', summary)
@@ -284,6 +292,8 @@ def projection_checks(worker_seconds: float, publication_seconds: float,
 
 
 def validate() -> None:
+    from experiments.tennis.k6b_real_base_cost import requested_model, resource_checks, separated_projection, timing_sequences
+
     stage = Path(os.environ['PS_STAGE_DIR'])
     summary = json.loads((stage / 'quality-summary.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
@@ -291,10 +301,31 @@ def validate() -> None:
     publication = max(0.0, smoke_wall - summary['seconds'])
     spec = json.loads((stage.parent / 'spec.json').read_text())
     full_reservation_seconds = spec['full']['seconds']
-    cost_checks, projected_with_publication = projection_checks(
-        summary['projected_full_seconds'], publication, full_reservation_seconds)
+    model = requested_model(spec)
+    projected_with_publication: float | None = None
+    cost_checks: dict[str, bool] = {}
+    if model == 'legacy':
+        cost_checks, projected_with_publication = projection_checks(
+            summary['projected_full_seconds'], publication, full_reservation_seconds)
+    expected_ticks = [0, 3]
+    projection: dict[str, Any] | None = None
+    projection_error: str | None = None
+    if model == 'separated-v1':
+        expected_ticks = [0, 3, 6]
+        try:
+            execution = json.loads((stage / 'execution.json').read_text())
+            staging_record = json.loads((stage / 'staging.json').read_text())
+            projection = separated_projection(execution['seconds'], timing_sequences(summary), staging_record['publication_seconds'])
+            cost_checks = resource_checks(projection, full_reservation_seconds)
+            projected_with_publication = projection['projected_full_seconds']
+        except (KeyError, TypeError, ValueError, OSError) as error:
+            cost_checks = {'separated_resource_evidence': False}
+            projection_error = str(error)
+            projected_with_publication = None
+    cost_checks['saved_model_matches'] = summary.get('cost_model', 'legacy') == model
+    cost_checks['saved_smoke_scale_matches'] = spec['scale']['judged']['smoke'] == len(expected_ticks)
     checks = {**cost_checks, 'two_windows': len(summary['rows']) == 2, 'both_old_controls': len(summary['calibration']) == 2 and all(r['exact_control'] and r['prediction_control'] for r in summary['calibration']),
-              'representative_two_ticks': summary['frames_per_window'] == 2,
+              'representative_ticks': summary['frames_per_window'] == len(expected_ticks),
               'qualified_gpu': summary['device']['class_matches'], 'memory_within_limit': summary['peak_gpu_gib'] < 20}
     with tempfile.TemporaryDirectory(prefix='k6b-realbase-validator-') as d:
         root = Path(d)
@@ -303,11 +334,12 @@ def validate() -> None:
             from experiments.tennis.k4 import safe
             item = root / 'publish' / safe(row['id'])
             with np.load(item / 'scores.npz') as scores:
-                checks[row['id'] + ':finite'] = all(np.isfinite(scores[m]).all() and scores[m].shape == (6, 2) for m in ('full_lpips', 'foreground_lpips', 'full_dists', 'foreground_dists', 'full_psnr'))
-                checks[row['id'] + ':ticks'] = scores['ticks'].tolist() == row['ticks'] and row['ticks'] == [0, 3]
+                checks[row['id'] + ':finite'] = all(np.isfinite(scores[m]).all() and scores[m].shape == (6, len(expected_ticks)) for m in ('full_lpips', 'foreground_lpips', 'full_dists', 'foreground_dists', 'full_psnr'))
+                checks[row['id'] + ':ticks'] = scores['ticks'].tolist() == row['ticks'] and row['ticks'] == expected_ticks
             checks[row['id'] + ':rates'] = len(row['rates']) == 3 and all(r['total_kbps'] > r['base_kbps'] > 0 and r['bootstrap_bytes'] > 0 for r in row['rates'])
-            checks[row['id'] + ':composites'] = len(row['composite_hashes']) == 2 and all(len(v) == 6 for v in row['composite_hashes'].values())
-    Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps({'passed': all(checks.values()), 'checks': checks, 'projected_full_seconds': summary['projected_full_seconds'], 'projected_with_publication': projected_with_publication, 'full_reservation_seconds': full_reservation_seconds}))
+            checks[row['id'] + ':composites'] = len(row['composite_hashes']) == len(expected_ticks) and all(len(v) == 6 for v in row['composite_hashes'].values())
+    projected_worker = projection['projected_worker_seconds'] if projection else (summary['projected_full_seconds'] if model == 'legacy' else None)
+    Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps({'passed': all(checks.values()), 'checks': checks, 'projected_full_seconds': projected_worker, 'projected_with_publication': projected_with_publication, 'full_reservation_seconds': full_reservation_seconds, 'cost_model': model, 'projection': projection, 'projection_error': projection_error}))
     if not all(checks.values()):
         raise SystemExit(1)
 
@@ -318,12 +350,14 @@ def main() -> None:
     for name in ('anchor', 'control', 'transport', 'masks', 'gpu-base', 'base', 'gen-al', 'gen-med', 'prior', 'al', 'med', 'lpips', 'dists'):
         p.add_argument('--' + name, type=Path)
     p.add_argument('--judged', type=int, default=2)
+    p.add_argument('--cost-model', choices=('legacy', 'separated-v1'), default='legacy')
     a = p.parse_args()
     if a.validate:
         validate()
     else:
-        if any(getattr(a, n) is None for n in ('anchor', 'control', 'transport', 'masks', 'gpu_base', 'base', 'gen_al', 'gen_med', 'prior', 'al', 'med', 'lpips', 'dists')) or a.judged not in (0, 2):
-            p.error('all inputs and 0/2 judged frames are required')
+        allowed = (0, 3) if a.cost_model == 'separated-v1' else (0, 2)
+        if any(getattr(a, n) is None for n in ('anchor', 'control', 'transport', 'masks', 'gpu_base', 'base', 'gen_al', 'gen_med', 'prior', 'al', 'med', 'lpips', 'dists')) or a.judged not in allowed:
+            p.error('all inputs and the resource model\'s original 0/2 or separated 0/3 judged frames are required')
         run(a)
 
 
