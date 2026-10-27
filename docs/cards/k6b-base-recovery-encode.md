@@ -108,3 +108,30 @@ range) and bicubic resizes RGB to 1920×1080 in `experiments.tennis.k6`; preserv
 this path and verify CPU/native pixel identities rather than substitute an
 unverified generic resize. Six streams must include all framing and complete
 240-tick pixels; no data produced yet.
+
+## Attended accounting amendment — 2026-10-27
+
+Planning amended this card prospectively to <=1800 measured/enforced CPU-s
+for the workload process tree (conversion, encodes, decodes, internal checks and
+packaging), <=45 min fleet wall and 0 GPU. Fleet staging, supervision and
+external validator CPU are separately measured where available or identified
+as unmeasured; the cap is not an aggregate fleet CPU guarantee. Earlier strict
+proposal and operational stop remain historical. Work is attended. The original
+two-window, 24-frame scale-2 smoke and substantive gate still govern promotion;
+no generation, scoring or ball inference. All earlier budgets remain closed.
+
+### Attended implementation gate
+
+The new worker restricts its workload and inherited children to one CPU,
+with 250 s smoke and 1300 s full workload wall alarms; under the verified
+inherited affinity this bounds their combined CPU by <=1550 s plus startup
+and termination margin within the 1800 s workload cap. It also records
+self+completed-child CPU; fleet staging and external validator remain separate.
+The smoke projects 30 times the larger measured smoke CPU/wall plus 25%, and
+requires <=1300 s, before the native manager may promote. It validates both
+24-frame windows at scale2 with independent decode and a truncated IVF fixture.
+Pinned paths/hashes, full framing, decoded all240 YUV and 80 reconstructed RGB
+ticks/point are required. Six full decodes are independently repeated inside
+the worker. Source judged-frame RGB hashes are retained as controls. New streams
+are never labelled recovered. If any assumption, affinity, validation or
+projection fails, the stage stops; no GPU/quality work follows.

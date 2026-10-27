@@ -5044,3 +5044,27 @@ budget method or revised authority exists. Inputs, hashes, scope and stops are
 in the [recovery card](../cards/k6b-base-recovery-encode.md). Current player
 results remain development with target-derived Telea granted; no new quality,
 ball packet or fully accounted result follows.
+
+## 2026-10-27 — Attended native-base continuation and prospective CPU amendment
+
+Planning authorized attended CPU execution and amended the one card's CPU
+accounting prospectively: <=1800 CPU-s measured/enforced on the workload
+process tree including conversion, coding, decoding, internal validation and
+packaging; <=45 minutes fleet wall, 0 GPU. Fleet staging, supervision and the
+external validator are reported separately where observable, otherwise
+unmeasured. This is not a global fleet CPU guarantee or a retroactive change to
+closed ledgers. Same two windows and source/tool hashes, CRF63 preset4, scales
+8/4/2, 24-frame both-window scale-2 smoke, independent decode and complete
+framing/pixel preservation. Smoke must project all six full paths and work
+inside the cap before full promotion. No new generation, fitting, neural quality
+or ball inference; no unattended agent/timer. [Card](../cards/k6b-base-recovery-encode.md).
+
+The proposed workload pins its entire inherited process tree to one CPU, applies
+250/1300-second smoke/full wall alarms and reports self+completed-child CPU;
+under that affinity, the two alarm bounds plus startup/termination margin fit
+1800 workload CPU-s. The fleet's own staging/supervision and external validator
+are outside that cap. The smoke estimates all six full paths at 30 times the
+larger observed smoke CPU/wall plus 25% and gates at <=1300 seconds. The
+validator independently checks both short IVF streams, frame geometry/timing,
+input/tool identities, RGB hashes and fresh decodes and rejects truncation.
+No submission is implied by this preflight entry.
