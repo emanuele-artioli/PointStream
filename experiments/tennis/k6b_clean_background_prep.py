@@ -227,7 +227,7 @@ def prepare(a: argparse.Namespace) -> None:
                 tar.add(path, arcname=path.relative_to(output).as_posix())
     elapsed = time.monotonic() - began
     result = {'frames': a.frames, 'cuda_hidden': True, 'setup_seconds': setup_seconds, 'seconds': elapsed,
-              'projected_full_seconds': (setup_seconds + (elapsed - setup_seconds) * 10) * 1.35,
+              'projected_full_seconds': (setup_seconds + (elapsed - setup_seconds) * (240 / a.frames)) * 1.35,
               'input_archive_sha256': digest(publish / 'input.tar'), 'rate_kbps': rate,
               'files': len(files), 'ivf': info, 'source_yuv_sha256': SOURCE_YUV, 'tools': tools}
     write(Path(os.environ['PS_STAGE_DIR']) / 'prepare-summary.json', result)

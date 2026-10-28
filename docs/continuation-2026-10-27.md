@@ -1,3 +1,29 @@
+## LATEST — paid clean-background FULL COMPLETE; gate failed (2026-10-28)
+
+Read [the audited full report](k6b-paid-clean-background-report-2026-10-28.md).
+CPUbf9f97d2 and SAMEGPU20261028T100153Z-27f39d64 COMPLETE, all80Al ticks.
+No replacement: first publication recovered after transfer/quota interruption;
+only expired queue deadline changed before admission, cap800unchanged.
+Original source/metric controls exact. Full command157.656945s; independent
+pixel/rate/decision audit PASS. New base saves898bytes; total21.989629kbps.
+ActualLPIPS/DISTS0.274039/0.168824; source-in-R0.268848/0.166890 versus
+SVT0.240532/0.168336. OracleDISTSrobustwin, bothLPIPSrobustloss. Formal
+MIXED/UNRESOLVED; NO one policy wins both>0.001. Fixed test CLOSED.
+Not a both-metric NO-GO theorem or codec/TOMM win. No further renderer/recipe
+or GPU request authority; one-request grant consumed, never replay old jobs.
+
+Newcharge250GPU-s; cumulative2980/3600GPU-s,620unused. GPU3A6000, native
+PIDs2778255/2778260gone, foreign2655895untouched. CPU/GPU waits ended, events
+acknowledged, no recurring LLM timer. Code10a1ae76/sourcearchive7bc3be42,
+nativetree82eee1d0/spec e1e7b877, fullrawpubeea71476; complete hashes inreport.
+Read-only evidence archive .../tennis/k6b-paid-clean-background-20261028-27f39d64/
+evidence.tar SHA3da5b858,8611840bytes/49members; raw prepared/GPU pixel payloads
+retained separately/read-only by exact native job paths. Branch
+codex/paid-clean-background; PR268 implementation merged with CI passing;
+final result/evidence changes are being published. Baselines, wire, untouched
+footage and experience-track gaps remain. All earlier running/pending headers
+below are history superseded by this completed state.
+
 ## CURRENT — same request publication RECOVERED, native observation starts
 
 ID20261028T100153Z-27f39d64 FIRST publication confirmed PENDING. Source identity

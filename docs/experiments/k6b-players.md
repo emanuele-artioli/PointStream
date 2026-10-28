@@ -6443,3 +6443,66 @@ Native same-ID status+wait session53591 saved at
 /private/tmp/clean-background-gpu-wait-handle.json; result
 /private/tmp/clean-background-gpu-native-wait.json, max2400s. No verified
 background model wakeup; attended wait, no recurring LLM timer.
+
+
+### 2026-10-28 — Paid clean-background FULL COMPLETE; registered gate FAILED
+
+SAME20261028T100153Z-27f39d64 COMPLETE on gpu3 A6000index0,
+UUIDGPU-6f70a27e-4171-22d7-3ffd-647e7f186a49. All80Al ticks0:240:3 scored.
+Fresh smoke passes19checks; timingsecondaryexplicit, base warmratio1.6043not
+vetoed. Full projectionincludingpublication239.300933s<350. Actual full
+command157.656945s/internal154.863009s; peakallocated3082.722168/reserved3744MiB.
+Original CUDA source RGB all80exact; original base/actual LPIPS/DISTS controls
+maxerror0. No training/generation/SAM. No new request or source extraction replay.
+
+New whole-frame means at paidtotal21.989628889kbps:
+actualLPIPS0.27403906852816357/DISTS0.1688237339258194;
+source-in-RLPIPS0.2688483820785711/DISTS0.1668904699385166;
+SVThullLPIPS0.24053159818214379/DISTS0.16833605570545862.
+Formal MIXED/UNRESOLVED: oracleDISTSrobustwin, bothLPIPSrobustloss; actual
+DISTScentrallyworse0.000487678butinsidesensitivity. Neither ONE policy wins
+BOTH>0.001, so fixed construction closes under the registered decision rule.
+Not a finite both-metric NO-GO, arbitrary-renderer bound, BD-rate, codec win
+or TOMM readiness. Prior real-base/ideal-player failures unchanged.
+
+Independent NumPy-only FULL audit PASS:240originalRGB checks,80oldactual/R
+replays,160newactual/oracle reconstructions, raw4x80scores/means/controls,
+source samples,240IVF timestamps,84preparedmember identities, byte counts,
+anchor/sensitivity and decision. Its quality_passed flag is audit integrity,
+not method promotion. Source37c6f1ce audit code unchanged from CPU preparation.
+Record ../k6b-clean-background-full-audit-2026-10-28.json and
+../k6b-paid-clean-background-report-2026-10-28.md.
+
+Full raw publicationSHAeea7147698b036c9182cee3ec635a57361854b049967febc753b03e979fc1ab5,
+497725440bytes/4members, includes all80new decoded GPU RGB frames. ArraySHA
+eb0ba78960ebfbf81a18496c001960e202e19c6bbe6e69b5bffaf280e36dbfb8.
+Native admitted223.966596842s; canonical terminalclosure240.366169930s;
+charge250GPU-s conservatively. Cumulative2980/3600GPU-s,620unused. The2h
+unpublished usage/source interruption had no GPU claim/time. Completed
+supervisor2778255/campaign2778260verifiedabsent; foreign2655895untouched.
+Terminal22561a234c465516ba9fd1c5b131d872 and contention0e9405897c745595a8060553ab639f62
+delivered/acknowledged. Native53591waitended, no timer. No further GPU request
+authorized by this result despite unused620s. DCVC/fairROI/fullwire/freshfootage
+and experience-track evaluation remain absent. Stop when decision is made.
+
+New evidence archive at /home/itec/emanuele/Datasets/pointstream-data/tennis/
+k6b-paid-clean-background-20261028-27f39d64/evidence.tar,
+SHA3da5b858f279f411938607bd92fd44fee76452473c8ffe4c0d40f9266e53af91,
+8611840bytes/49members. Contains exact213/214file source archives, native
+metadata/scores/stream/bootstrap, original controls, independent audits and
+same-ID recovery proof. Large660490240-byte prepared and497725440-byte GPU
+publications retained separately by canonical paths/fullSHA, protected0444.
+
+Post-result tooling fix: future CPU prepare summaries use240/frames instead
+of unconditionalx10 for projected_full_seconds. Smoke24formula unchanged;
+full240field no longer re-projects another tenfold run. This metadata-only
+change does not alter images, native commands, scores or gates. Completed
+frozen CPUe542/GPU10a evidence remains unchanged; no old job is re-run.
+
+Closure verification: published archive SHA and all49member identities PASS
+on destination; archive and both large native publications0444. Exact frozen
+Git source archives reconstruct checksums6a5cf437/7bc3be42. Ruff/full configured
+mypy255files PASS;32focused tests PASS. Full local suite989passed/25skipped,
+only prior sandboxps/absent-server-symlink limitations; ps passes outside
+sandbox. No new failure path. Linux CI remains merge gate. Independent artifact
+and implementation reviews completed. No active compute/wait or model timer.

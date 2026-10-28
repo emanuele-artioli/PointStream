@@ -1,4 +1,4 @@
-# Paid clean-background oracle — accepted 2026-10-28
+# Paid clean-background oracle — COMPLETE, two-metric gate failed
 
 Goal: test whether removing players BEFORE coding the background creates enough
 whole-frame headroom to pay the existing player side information. The previous
@@ -100,3 +100,18 @@ fresh inspection proved no readiness/admission, and only the expired absolute
 queue deadline was refreshed before first publication. New normalizedspec
 e1e7b877, deadline2026-10-28T13:01:15Z. All inputs, policies, thresholds and
 800s cap unchanged. Publication confirmed PENDING; no new quality accepted yet.
+
+
+## Accepted result and closure
+
+SAME20261028T100153Z-27f39d64 COMPLETE, all80ticks; independent audit PASS.
+Actual LPIPS/DISTS0.274039/0.168824; source-in-R0.268848/0.166890 versus
+SVT0.240532/0.168336 at new total21.989629kbps. The oracle wins DISTS but
+both new policies lose LPIPS robustly. Formal MIXED/UNRESOLVED; no one policy
+passes both>0.001. The fixed construction is CLOSED by its decision rule.
+Full command157.656945s; no stability veto. Original controls exact, peak
+reserved3744MiB. Charge250GPU-s including conservative canonical closure;
+shared2980/3600spent,620unused. One-request authority consumed; no new retry,
+training or recipe grant. Both task-owned PIDs gone; native waits ended and
+events acknowledged. Large payloads and evidence preserved read-only.
+See [audited full report](../k6b-paid-clean-background-report-2026-10-28.md).
