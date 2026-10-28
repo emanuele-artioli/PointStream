@@ -6119,3 +6119,38 @@ Attended native observation handle64442, max2200s, receipt
 /private/tmp/ideal-repaired-native-wait.json. Deadline08:12:12.913725UTC,
 smoke200/full550/validator100/total1100GPU-s. Preserve same request after
 attention/disconnect; no additional submission or recurring monitor.
+
+
+### 2026-10-28 — Repaired ideal-player FAILED stability gate, CLOSED
+
+Job20261028T073233Z-36f21aa5 canonically FAILED on gpu3 A6000. Smoke
+base/actual LPIPS/DISTS controls exact(error0); original byte identities pass,
+CUDA confirmed, peak allocated3082.784668MiB/reserved3740MiB<8000.
+Native smoke20.722436s; worker17.408332s; publication0.208046s.
+Warm ratios base1.008304/actual1.093178/ideal_R1.923337/ideal_Fhat1.929378;
+last two exceed predeclared1.25. Validator rejected ideal_R, no passing record
+or cost projection, full never launched. This is a resource stability rejection,
+not a measured550s exceedance and not a quality verdict. Do not promote smoke
+quality or relax the registered gate. Sharing timing marked contaminated.
+Native interval50.802413s; canonical reconciliation60.102499s. Charge70s
+conservatively. Total2480/3600GPU-s(0.688889/1hour),1120s unused.
+Independent CPU audit PASS:400input hashes, source/base/actual identities,
+160ideal compositions from originalR/projected saved support and three-tick
+score controls/ratios;25.405012wall/25.602478CPU-s, CUDA hidden.
+Audit/local/users/emanuele/pointstream/ideal-smoke-audit-36f21aa5.json.
+Supervisor2767729/campaign2767734 verified gone; foreign2655895 untouched.
+Contention621905bf05215544af3a9e66b5693b89,terminal5843f4f003645719bb657a87e9141b6c,
+decisionbd5ffe04ff415daaad6dd28a1f330574 delivered and acknowledged.
+All waits ended; no recurring monitor or retry. Both one-request grants consumed.
+No scientific NO-GO/HEADROOM/MIXED conclusion; appearance bound remains unanswered.
+See [final report](../k6b-ideal-player-report-2026-10-28.md).
+
+Final native-source audit passed40/40files against CPU-checked archive33205d53;
+native tree5d99fb963277d6159aa012a06cff63502ab217c67d8a32af3bb65dafd803feea.
+Repair PR263 merged with CI passing. Final closure on codex/ideal-player-bound-closure.
+New read-only final evidence archive:
+/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-ideal-player-20261028-36f21aa5/evidence.tar,
+SHAeea076e548e24262aebfe8254bc8e489e3277f7cae273ead6606816057e3583f,
+1239040bytes/26files; includes smoke arrays, raw native metadata, CPU/source
+audits and acknowledged events, plus first launch failure archive.
+Final budget2480/3600s;1120unused; no active GPU, wait, retry or timer.
