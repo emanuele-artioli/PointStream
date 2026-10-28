@@ -136,4 +136,6 @@ verification. No original dataset/model/checkpoint was deleted or overwritten.
 Configured Ruff/mypy and eight focused tests pass. Full macOS suite retains
 the two known platform failures; process test passes outside sandbox. Linux
 CI is the merge gate. [Implementation PR274](https://github.com/emanuele-artioli/PointStream/pull/274)
-merged with passing CI. No complete PointStream baseline win or TOMM readiness.
+merged with passing CI. [Results PR275](https://github.com/emanuele-artioli/PointStream/pull/275)
+contains the closed ledger and evidence; its live checks record final validation.
+No complete PointStream baseline win or TOMM readiness.

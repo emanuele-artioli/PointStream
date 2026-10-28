@@ -128,3 +128,6 @@
   Budget/source identities in [ledger](../single-budget-2026-10-28.json).
   Resume after token interruption inspected the recorded terminal requests;
   no job replay, request, timer or extra GPU charge was introduced.
+- Results [PR275](https://github.com/emanuele-artioli/PointStream/pull/275),
+  merge-commit auto-merge after Linux CI; current report/PLAN/continuation all
+  point to the closed batch. Root working copy contains no new research job.
