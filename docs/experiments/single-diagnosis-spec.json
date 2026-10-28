@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "device": "gpu",
+  "hosts": [
+    "gpu2",
+    "gpu3"
+  ],
+  "gpu_models": [
+    "RTX A6000"
+  ],
+  "cpu_threads": 4,
+  "environment": {
+    "path": "/home/itec/emanuele/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Saved-pixel evaluation is independent of contention timing; recorded wall time is cost only.",
+    "margin_mib": 8192
+  },
+  "contention": {
+    "policy": "continue",
+    "basis": "Quality/bytes independent of contention; timings only absolute budget accounting."
+  },
+  "verify_staged_inputs": true,
+  "gpu_memory_mib": 5000,
+  "local_storage_gib": 16,
+  "required_commands": [],
+  "stall_seconds": 180,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.single_decode_diagnosis"
+  ],
+  "arguments": [
+    "--source",
+    "{staged:source}",
+    "--image-ckpt",
+    "{staged:image_ckpt}",
+    "--video-ckpt",
+    "{staged:video_ckpt}",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+      "extract": false
+    },
+    {
+      "name": "image_ckpt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+    },
+    {
+      "name": "video_ckpt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+    }
+  ],
+  "scale": {
+    "frames": {
+      "smoke": 4,
+      "full": 24
+    }
+  },
+  "smoke": {
+    "seconds": 150,
+    "representative_basis": "Native QP21/960x544 HT-L YUV on fresh own stream; legacy/default variants, same A6000, each with two passes plus fresh decoder. Exact weights/source, first-frame reconstruction, container and output identities, memory. Default must pass and full cost projection<300seconds; no legacy success required."
+  },
+  "full": {
+    "seconds": 300
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.single_decode_diagnosis",
+    "--validate"
+  ],
+  "validator_seconds": 30,
+  "budget_seconds": 600,
+  "deadline": "2026-10-28T20:30:00+00:00"
+}
