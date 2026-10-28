@@ -1,4 +1,23 @@
-## LATEST — paid clean-background FULL COMPLETE; gate failed (2026-10-28)
+## LATEST — NEW parallel development batch RUNNING (2026-10-28)
+
+Human approved a NEW7200GPU-s allocation: background2700,pixelcorrections2700,
+DCVC/SVTROIbaselines1800, plus3600CPU-s. Old2980/3600study remains CLOSED,
+620unspent is not borrowed. Read docs/experiments/parallel-development.md and
+docs/cards/parallel-development-2026-10-28.md. Jobs submitted exactlyONCE:
+background20261028T143341Z-c50f6395, pixels20261028T143713Z-a3ae0af0,
+baselines20261028T143856Z-ae2c81a7. Re-read IDs in batchrecord and canonical
+ps-fleetstatus BEFORE any jobaction. Never replay unknown/terminalrequests.
+Source140b56ea, allsourcearchives211b4e69, pinned specs in parallel-specs/.
+Deadline2026-10-28T16:00:00Z. Background/pixels running at firststatus; baseline
+PENDINGreceipt, canonical status requested. No new quality accepted yet.
+CPU gap analysis complete; confirmation manifest NOTverified. Timingsecondary,
+correctness/memory/bytes/cost/deadlineshard. Root owns design/review/science;
+subagents now Luna6/max with precise simple launch/report-onlytasks (user).
+One bounded attended batch wait, no automatic modelcallback verified and no
+recurringLLMtimer. PR270 implementation, docschemaCIheaderfailurecorrected,
+focused docchecks pass; newCI pending. Preserve all priorread-onlyevidence.
+
+## PRIOR — paid clean-background FULL COMPLETE; gate failed (2026-10-28)
 
 Read [the audited full report](k6b-paid-clean-background-report-2026-10-28.md).
 CPUbf9f97d2 and SAMEGPU20261028T100153Z-27f39d64 COMPLETE, all80Al ticks.
