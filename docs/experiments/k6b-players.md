@@ -6056,3 +6056,37 @@ be used; no verified model-resuming background callback or recurring monitor.
 Native publish returned job **20261028T071835Z-2964e9ef**; submission succeeded,
 no recovery or replay. Inspect this ID then wait on the same request.
 Results: /home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261028T071835Z-2964e9ef/.
+Native wait handle19977 observes job20261028T071835Z-2964e9ef once for2250s,
+receipt/private/tmp/ideal-native-wait.json; absolute cutoff07:57:41UTC.
+First canonical state PREPARING; native admission/preparation is not yet a
+quality result. No periodic model calls, no additional request, no replay.
+
+
+### 2026-10-28 — Ideal-player launch FAILED before smoke
+
+Job20261028T071835Z-2964e9ef canonically FAILED on gpu3 A6000, before
+campaign import: selected34-file snapshot omitted experiments.jobs.inbox.
+No metric, validation, cost projection or full run; no scientific conclusion.
+Native command log explicitly reports missing module. Agent selected only the
+metric dependency closure and missed the native launch path. Native campaign
+run0.291026s; through terminal reconciliation59.084507s, charged60s conservatively.
+Study cumulative2410/3600GPU-s,1190s unused. Terminal6397a2e64a025727b6520e5cd3508da2
+and contentione405c8c5b6e55481b62ca7f3350f3071 reported and acknowledged.
+Foreign2655895 untouched; no retry, no live wait or recurring monitor.
+Corrected fleet submission automatically carries the native campaign runtime
+with narrowed snapshots. Focused fleet/oracle76tests, lint and mypy pass.
+See [failure report](../k6b-ideal-player-launch-report-2026-10-28.md); new
+[recovery proposal](../cards/k6b-ideal-launch-recovery.md) is NOT authorized.
+
+Repair CPU launch checks PASSED on both hosts: native inbox/monitor and packed
+oracle --help; repaired40-file archiveSHA33205d53c83a89045f861bb648d9a9be41f5e14a319a47684924ff94612854bb,
+gpu2 3.684005s/gpu3 5.896582s, CUDA hidden. Task-owned2766916/2766921
+verified gone; only foreign2655895 remains. Full local suite970pass/24skip,
+only known macOS protected-symlink assertion fails; lint and mypy pass.
+
+PR262 merged with Linux CI passing. Repair/failure report continued on
+codex/ideal-player-launch-repair. New read-only evidence archive:
+/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-ideal-launch-20261028-2964e9ef/evidence.tar,
+SHAc24e904e6cdbc6226f6f51891dae192a30b9a723b2993be2fb7d0e4866af023a,
+1116160bytes/20files; archive and member identities verified after copy.
+No new GPU request. Recovery proposal remains unapproved.

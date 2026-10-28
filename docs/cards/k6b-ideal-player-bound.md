@@ -5,7 +5,10 @@ of its registered decision. The [audited report](../k6b-real-base-quality-report
 records two full-frame losses on Al and a valid arithmetic early stop. The
 original study has1250GPU-s unspent; that is not automatic permission to fund
 another method. The user explicitly approved this ideal-player bound on
-2026-10-28, including the 1100GPU-s allocation below. No request exists yet.
+2026-10-28, including the 1100GPU-s allocation below. The single request
+20261028T071835Z-2964e9ef failed before campaign import; no quality result.
+See the [launch report](../k6b-ideal-player-launch-report-2026-10-28.md).
+Its one-request authority is consumed; no retry is authorized.
 
 ## Question, hypothesis and alternative
 

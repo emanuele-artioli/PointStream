@@ -1092,6 +1092,14 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
     job_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]
     archive_paths = tuple(getattr(args, "snapshot_path", []))
+    if archive_paths:
+        # The supervisor launches campaign/salvage from the workload snapshot,
+        # not from the installed manager release. Always carry that runtime
+        # with an explicitly narrowed workload dependency set.
+        required = ["experiments/__init__.py", "experiments/jobs", "src/__init__.py"]
+        if (source_root / "src" / "contracts").is_dir():
+            required.append("src/contracts")
+        archive_paths = tuple(dict.fromkeys((*archive_paths, *required)))
     archive_options = {"include_paths": archive_paths} if archive_paths else {}
     snapshot, sha, metadata = fleet._build_snapshot(source_root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked), **archive_options)
     record = {"job_id": job_id, "status": "preparing", "config": config, "spec_sha256": digest(spec), "snapshot": metadata, "chat_id": args.chat_id}
