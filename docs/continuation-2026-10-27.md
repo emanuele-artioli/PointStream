@@ -27,8 +27,9 @@ Luna6/max, precise simple launch/report tasks; rootownsdesign/review/science.
 Read-onlyevidence preserved at .../tennis/parallel-development-20261028-244ab9ae/
 evidence.tar SHA71900d0d,100720640bytes/105members, allmemberhashs verified;
 5nativepublications also0444. Portableauditor replay byte-identical. Source
-and result details in consolidatedreport. Final resultPR/CI publication follows
-in currentbranchcodex/parallel-feasibility-batch; no scientificwork pending.
+and result details in consolidatedreport. ResultsPR271 attached, auto-merge
+requested after requiredLinuxCI; inspect its live state for CI/merge outcome.
+Currentbranchcodex/parallel-feasibility-batch; no scientificwork pending.
 All earlier RUNNING/PENDING headers below are superseded history.
 
 ## PRIOR — NEW parallel development batch started (2026-10-28)

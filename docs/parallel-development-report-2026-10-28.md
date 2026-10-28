@@ -160,6 +160,7 @@ merged with CI passing, mergeadeab13c. The initial CI documentation-header
 failure was corrected; it did not affect executed science. Root reviewed the
 native paths and wire contracts, not just test results. Final Ruff and configured
 mypy pass (268source files),22focused/document checks pass. The archived portable
-auditor replay is byte-identical to the recorded full audit. Result PR and Linux
-CI are recorded at publication. User's latest Luna6/max,
+auditor replay is byte-identical to the recorded full audit.
+[Result PR271](https://github.com/emanuele-artioli/PointStream/pull/271) reruns
+the required Linux CI as its merge gate. User's latest Luna6/max,
 precise launch/report delegation policy is now written into AGENTS.md.

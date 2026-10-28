@@ -264,4 +264,6 @@ Python3.10hashlib.file_digest API. A CPU-only compatible verification read the
 SAMEfile in place; no retransmission/overwrite/newdirectory/newcompute.
 All oldDatasets/Models/sourceinputs preserved. Byte-identical replay of archived
 portableauditor PASS against all three acceptedpublications. Ruff/fullmypy268
-files and22focused/docchecks PASS. FinalresultPR/CI publication pending.
+files and22focused/docchecks PASS. ResultsPR271 attached; merge-commitauto-merge
+requested with requiredLinuxCI as gate. InspectPRstate for finalCI outcome.
+No requested scientific computation remains running or unsubmitted.
