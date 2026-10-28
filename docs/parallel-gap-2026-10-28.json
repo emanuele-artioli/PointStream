@@ -1,0 +1,132 @@
+{
+  "scope": "Saved fixed-pixel accounting only; no new quality or universal bound.",
+  "window": "alcaraz_hurkacz/031@129",
+  "ticks": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21,
+    24,
+    27,
+    30,
+    33,
+    36,
+    39,
+    42,
+    45,
+    48,
+    51,
+    54,
+    57,
+    60,
+    63,
+    66,
+    69,
+    72,
+    75,
+    78,
+    81,
+    84,
+    87,
+    90,
+    93,
+    96,
+    99,
+    102,
+    105,
+    108,
+    111,
+    114,
+    117,
+    120,
+    123,
+    126,
+    129,
+    132,
+    135,
+    138,
+    141,
+    144,
+    147,
+    150,
+    153,
+    156,
+    159,
+    162,
+    165,
+    168,
+    171,
+    174,
+    177,
+    180,
+    183,
+    186,
+    189,
+    192,
+    195,
+    198,
+    201,
+    204,
+    207,
+    210,
+    213,
+    216,
+    219,
+    222,
+    225,
+    228,
+    231,
+    234,
+    237
+  ],
+  "current_total_kbps": 21.989628888888888,
+  "clean_base_kbps": 16.3825,
+  "side_kbps": 5.607128888888887,
+  "input_sha256": {
+    "clean": "eea7147698b036c9182cee3ec635a57361854b049967febc753b03e979fc1ab5",
+    "prior": "e346844d20671e5dfd78828ec61d262aa13109bc1be9a1b421873facdc86daa1"
+  },
+  "policies": {
+    "clean_actual": {
+      "metrics": {
+        "lpips": {
+          "distance": 0.27403906852816357,
+          "anchor_distance": 0.24053159818214379,
+          "distance_reduction_for_strict_robust_win": 0.03450747034601978,
+          "max_side_kbps_fixed_pixels": 1.6190346380551581
+        },
+        "dists": {
+          "distance": 0.1688237339258194,
+          "anchor_distance": 0.16833605570545862,
+          "distance_reduction_for_strict_robust_win": 0.0014876782203607766,
+          "max_side_kbps_fixed_pixels": 5.31025454071656
+        }
+      },
+      "joint_side_ceiling_kbps": 1.6190346380551581
+    },
+    "clean_ideal_R": {
+      "metrics": {
+        "lpips": {
+          "distance": 0.2688483820785711,
+          "anchor_distance": 0.24053159818214379,
+          "distance_reduction_for_strict_robust_win": 0.029316783896427306,
+          "max_side_kbps_fixed_pixels": 2.2189321842943883
+        },
+        "dists": {
+          "distance": 0.1668904699385166,
+          "anchor_distance": 0.16833605570545862,
+          "distance_reduction_for_strict_robust_win": 0.0,
+          "max_side_kbps_fixed_pixels": 5.696047972535684
+        }
+      },
+      "joint_side_ceiling_kbps": 2.2189321842943883
+    }
+  },
+  "confirmation_manifest_status": "NOT FROZEN: development selection must finish first; exclude all fitted, tuned and scored footage, audit training overlap and judge exposure, then freeze source hashes, timestamps, provenance and split before confirmation.",
+  "analysis_code_sha256": "0af8b83171ca03d0be5d65dea172acfc0088b0559508b59855758a8b3a0b6d2a",
+  "wall_seconds": 0.3394957920536399
+}

@@ -23,6 +23,19 @@ new dependency.
 
 ## Where PointStream stands (2026-10-28)
 
+**New parallel development batch APPROVED (2026-10-28):** human authorized
+three concurrent GPU diagnostics plus CPU gap/accounting. New separate cap
+7200 GPU-s (temporal background2700, paid pixel corrections2700,
+DCVC/ROI baselines1800) and3600CPU-s. The old2980/3600ledger remains closed.
+Read [batch card](docs/cards/parallel-development-2026-10-28.md) and
+[live batch record](docs/experiments/parallel-development.md) for exact frozen
+settings, IDs and outcomes. No old job is restarted. No training/generation.
+Aggregate results after every task completes/stops. Background starts with Al;
+other two tasks cover both original development windows. Untouched confirmation
+and TOMM readiness are not established. Future delegated job launch/report tasks
+use GPT-6 Luna at max effort with precise narrow instructions (user,2026-10-28);
+root owns experiment design/review/decisions.
+
 The root session keeps this section and the dispatch ledger below; item
 sessions update their own items and their files in `docs/experiments/`
 ([sessions](docs/sessions.md)).
