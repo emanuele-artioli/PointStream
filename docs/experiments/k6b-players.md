@@ -6102,3 +6102,20 @@ scientific/control/resource gates remain unchanged. Repaired source51fa34c2;
 selected snapshot must explicitly include all experiments/jobs campaign runtime.
 Prior failed ID20261028T071835Z-2964e9ef must be canonically inspected first.
 No new request yet; original failure artifacts remain read-only.
+
+One repaired submit started2026-10-28T07:32UTC, sourcec3799664, complete
+experiments/jobs explicitly selected alongside reviewed metric closure.
+New spec/private/tmp/ideal-repaired-spec.json,1100s cap, fresh absolute deadline
+2026-10-28T08:12:12.913725+00:00. Submit handle7586;
+receipt/private/tmp/ideal-repaired-submission.json. No ID yet; inspect uncertain
+submission, never replay. Compatible pool unchanged; fresh inspect confirms
+prior FAILED, gpu2 insufficient memory, gpu3 23183MiBfree. No extra request.
+
+Repaired native request **20261028T073233Z-36f21aa5** published successfully;
+specSHAea4f2b02ac19f04f030fb721cc7b0ec4acba2157f3861037583412f61c00b264,
+archiveSHA0787aba9a89ef3620bdd9a3c4c8ab2f0e65fd55ac9624eeb75b94fbde3460445.
+Canonical outputs under /home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261028T073233Z-36f21aa5/.
+Attended native observation handle64442, max2200s, receipt
+/private/tmp/ideal-repaired-native-wait.json. Deadline08:12:12.913725UTC,
+smoke200/full550/validator100/total1100GPU-s. Preserve same request after
+attention/disconnect; no additional submission or recurring monitor.
