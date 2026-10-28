@@ -1,4 +1,21 @@
-## LATEST — parallel development batch CLOSED, all requests terminal (2026-10-28)
+## LATEST — single-stream search CLOSED, all requests terminal (2026-10-28)
+
+Read [single-stream report](single-stream-report-2026-10-28.md),
+[live record](experiments/single-stream-search.md) and PLAN.md first.
+Four terminal requests: restoration20261028T191318Z-b4727331 COMPLETE;
+CPUaudit20261028T190840Z-eb011d4b COMPLETE;
+initialdiagnosis20261028T190838Z-3dea4d74 FAILED unsupported default-stream API;
+supportedcompletion20261028T192649Z-867e69f2 COMPLETE. No request replay.
+Conservative1300/3600GPU-s, dedicatedCPU1120/3600s. Restoration loses whole/
+background metrics despite small foreground gains; no baseline win. Native
+legacy24-frame repro passes locally, historical nondeterminism NOT resolved.
+Training forwards exist; external optimized-latent entropy transport not
+exposed, so refinement0/1200GPU-s. No training/download, timer or live process.
+Next engineering: qualify native latent injection (or a separate DCVC-DC-family
+method retaining contemporary anchors) before optimizing perceptual objectives.
+Previous ledgers below are historical, separate and CLOSED.
+
+## Historical — parallel development batch CLOSED (2026-10-28)
 
 Read [consolidated report](parallel-development-report-2026-10-28.md) and
 [live record](experiments/parallel-development.md). Charged2400/7200GPU-s,

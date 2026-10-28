@@ -67,7 +67,7 @@
  4-frame arm passed both within-process passes and fresh decoder, encoderI
   equality, native container identities and memory. This does not reproduce
   or resolve the original24-frame nondeterminism. The API assumption was wrong.
-- Charge250GPU-s, including admission through canonical terminal229.6s and
+- Charge250GPU-s, including admission through canonical terminal232.8s and
   salvage/publication. Complete ONLY the unaffected24-frame legacy reproduction
   within the remaining350GPU-s of the same600 cap, with a fresh smoke. The
   [card](../cards/single-stream-search.md) explains this implementation correction;
@@ -88,3 +88,43 @@
 - Native bounded wait for restoration + supported completion writes
   /private/tmp/single-batch-final-wait.json, max1800seconds. All previous
   attention events acknowledged; no timer, no automatic model wakeup claimed.
+
+### 2026-10-28 — Batch complete, no whole-frame codec win
+
+- [Final report](../single-stream-report-2026-10-28.md),
+  [restoration audit](../single-restoration-audit-2026-10-28.json),
+  [source audit findings](../single-code-findings-2026-10-28.json),
+  [initial diagnosis audit](../single-diagnosis-audit-2026-10-28.json),
+  [supported native audit](../single-legacy-audit-2026-10-28.json).
+- Restoration COMPLETE96frames/32ticks, exact source/anchor/metric controls,
+  full command503.666s, projected948.070<1200, reserved3740MiB. Whole-frame
+  LPIPS BD-rate+0.531/+2.287/+4.892%, DISTS+0.297/+1.555/+4.141% at strengths
+ 0.15/0.35/0.60. Background loses too; foreground curve gains small. No robust
+  two-metric whole-frame point; no extra tuning. RestrictedSVT grid, development
+  only; this is not a learned-model or other-domain impossibility bound.
+- Supported legacy reproduction COMPLETE24frames, QP21/960x544/nativeYUV,
+  gpu3/A6000. Four decoded pass arrays equal saved pixels, encoderI matches,
+  original container/weight hashes pass. No stored-stream replay. This fresh
+  point passes; original nondeterminism was NOT resolved or made portable.
+- CPUaudit COMPLETE214files; gradient forwards exist, native optimized-latent
+  transport unqualified. Refinement0GPU-s; no estimated-bpp codec win reported.
+- Conservative new ledger: restoration750GPU-s, initialdiagnosis250,
+  supportedcompletion300, refinement0 =>1300/3600GPU-s,2300unspent.
+  DedicatedCPU audit489.457wall-s x2threads charged1000, localanalysis120 =>
+ 1120/3600CPU-s. Staging/publication included; GPU-job CPU support inside its
+  allocations. Old ledgers remain closed; unused balances imply no further run.
+- All requests/native waits terminal; completion events acknowledged. No
+  recurring model timer, API bridge or verified automatic wakeup claimed.
+  Exact source archives match all three snapshots byte-for-byte.
+- [Implementation PR274](https://github.com/emanuele-artioli/PointStream/pull/274)
+  MERGED b76c27565cb5ba88b0bdb708c526826ad248cd00, Linux CI passed.
+  Eight focused tests and configured Ruff/mypy pass. Full macOS suite has the
+  same two known platform failures, with process test passing outside sandbox.
+- Evidence archive100208640bytes/79manifested members verified at destination,
+  SHA71dcbd1cd30e26e56488aadb397ea75eff8cb47e78b7ed9d8376702bb267a5a3,
+  mode0444. [Receipt](../single-evidence-receipt-2026-10-28.json).
+  All7original completed/full/smoke publications also protected mode0444;
+  task-owned PIDs absent on gpu2/gpu3/gpu5, no PointStream GPU claims.
+  Budget/source identities in [ledger](../single-budget-2026-10-28.json).
+  Resume after token interruption inspected the recorded terminal requests;
+  no job replay, request, timer or extra GPU charge was introduced.

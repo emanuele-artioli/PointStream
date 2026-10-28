@@ -574,6 +574,16 @@ stored stream in a later job, on any host; to rescore, re-encode with the
 stored checkpoint and score that pair (`g5c.py checks`). The paper states
 it as a deployment limit of every DCVC-UF arm.
 
+**2026-10-28 native reproduction:** QP21/960x544/HT-L on shared A6000 gpu3
+passes fresh24-frame encoding, two decoder processes with two passes each,
+and encoder-I equality in `20261028T192649Z-867e69f2`. This did not reproduce
+the earlier failure and establishes no general reliability fix. Keep per-job
+native checks. The default-CUDA-stream experiment in
+`20261028T190838Z-3dea4d74` is unsupported by native CUDA graph capture and
+failed before encoding; it must not become a production default. See the
+[single-stream report](single-stream-report-2026-10-28.md). No stored stream
+was decoded again for these audits.
+
 The [2026-10-27 storage recovery](storage-maintenance-2026-10-27.md) records
 migration journals, fresh-shell checks, protected live files and the remaining
 gpu5/gpu6 live-path approval restriction. The shared startup script is maintained
