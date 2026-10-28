@@ -23,6 +23,25 @@ new dependency.
 
 ## Where PointStream stands (2026-10-28)
 
+**Persistent prediction search ACTIVE (user approved, 2026-10-28):** investigate
+representation, coding and deployment accounting jointly. Read the
+[research direction and bounded test contract](docs/cards/persistent-prediction.md)
+and [live record](docs/experiments/persistent-prediction.md) before dispatching.
+New independent ceiling: 3600 GPU-seconds and 3600 CPU-seconds, including failed
+attempts, validation and overhead; old closed balances are not transferred.
+First audit installed models, cached assets and decoded-history reuse against
+saved quality. Then test paid long/short reference prediction and object-aligned
+decoded history with actual corrections, on familiar development footage only.
+General codec-aware restoration and conditional feature coding are separate
+follow-ons: audit compatibility and useful headroom before training. No model
+or asset becomes free merely by sending it earlier. Report cold, warm and
+amortized costs, asset lifetime and refreshes; give anchors the same privileges.
+Generic frozen models need cross-content evidence; content-specific updates,
+geometry, selection and residuals remain paid. A ball-only win is insufficient:
+report foreground, background and whole-frame quality beside complete rates.
+Do not rebrand historical granted-matte/render results as delivered codec wins.
+
+
 **Parallel development batch CLOSED/REPORTED (2026-10-28):** human authorized
 three concurrent GPU diagnostics plus CPU gap/accounting. New separate cap
 7200 GPU-s (temporal background2700, paid pixel corrections2700,
