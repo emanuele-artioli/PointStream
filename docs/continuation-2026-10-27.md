@@ -1,3 +1,15 @@
+## 2026-10-28 CPU preparation request published
+
+CPU-only job20261028T091736Z-bf9f97d2 PENDING at receipt, sourcee542dfed,
+snapshot6a5cf437/specc6acbea3. Read its experiment entry and canonical fleet
+status before acting; never replay. All6CPU hosts eligible and workers fresh.
+GPU grant remains one <=800s request after successful CPU source/stream controls;
+no GPU request yet,2730/3600s spent/870unused. Native bounded attended wait,
+no recurring model monitor. Local spec/submission under
+/private/tmp/clean-background-cpu-{spec,submission}.json. CPU/GPU code frozen,
+27focused checks and ruff/mypy pass; full suite984pass/25skip plus the two
+previous macOS limitations. New quality-validator tests also10/10pass.
+
 ## 2026-10-28 paid clean-background oracle ACCEPTED
 
 Human accepted “Approve the paid-background oracle”: one new GPU request <=800

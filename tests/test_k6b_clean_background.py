@@ -77,3 +77,60 @@ def test_new_base_never_inherits_old_base_outside_written_support():
     images[2, 0, 0] = 2
     with pytest.raises(ValueError, match='replay'):
         new_images(images, overlay, written, region, base)
+
+
+@pytest.mark.parametrize('mutation', ['none', 'memory', 'input', 'budget', 'timing'])
+def test_native_quality_validator_keeps_hard_contract(tmp_path, monkeypatch, mutation):
+    import hashlib
+    import io
+    import json
+    import tarfile
+    from experiments.tennis.k6b_clean_background_prep import TOOLS
+    from experiments.tennis.k6b_clean_background_score import POLICIES, WEIGHTS, validate
+
+    stage = tmp_path / 'smoke'
+    stage.mkdir()
+    pixels = io.BytesIO()
+    np.save(pixels, np.zeros((3, 1080, 1920, 3), np.uint8))
+    summary = {'ticks': [0, 3, 6], 'policies': list(POLICIES),
+               'timings': {p: [1., .15, .3] for p in POLICIES},
+               'timing_secondary': True, 'source_rgb_checks': 3, 'cuda': True, 'gpu': 'RTX A6000',
+               'peak_allocated_mib': 3500, 'peak_reserved_mib': 4000,
+               'control_errors': {m: 0. for m in WEIGHTS}, 'weight_sha256': WEIGHTS,
+               'prepared_sha256': 'input', 'hashes': {str(t): ['h'] * 5 for t in (0, 3, 6)},
+               'native_decoder': {'sha256': TOOLS['dav1d']}, 'side_kbps': 5.607128888888889,
+               'clean_base_rgb_sha256': hashlib.sha256(pixels.getvalue()).hexdigest()}
+    spec = {'arguments': ['--timing-secondary'], 'full': {'seconds': 350}, 'budget_seconds': 800,
+            'scale': {'judged': {'smoke': 3, 'full': 0}},
+            'staged_inputs': [{'name': 'prepared', 'sha256': 'input'}]}
+    if mutation == 'memory':
+        summary['peak_reserved_mib'] = 8100
+    elif mutation == 'input':
+        summary['prepared_sha256'] = 'changed'
+    elif mutation == 'budget':
+        spec['budget_seconds'] = 900
+    elif mutation == 'timing':
+        spec['arguments'] = []
+        summary['timings'] = {p: [1., .3, .3] for p in POLICIES}
+    (tmp_path / 'spec.json').write_text(json.dumps(spec))
+    (stage / 'quality-summary.json').write_text(json.dumps(summary))
+    (stage / 'execution.json').write_text(json.dumps({'seconds': 15}))
+    (stage / 'staging.json').write_text(json.dumps({'publication_seconds': .1}))
+    data = io.BytesIO()
+    np.savez(data, ticks=[0, 3, 6], **{m: np.zeros((4, 3)) for m in WEIGHTS})
+    with tarfile.open(stage / 'published.tar', 'w') as tar:
+        for name, payload in [('scores.npz', data.getvalue()), ('quality.json', json.dumps(summary).encode()),
+                              ('clean-base-rgb.npy', pixels.getvalue())]:
+            member = tarfile.TarInfo('publish/' + name)
+            member.size = len(payload)
+            tar.addfile(member, io.BytesIO(payload))
+    monkeypatch.setenv('PS_STAGE_DIR', str(stage))
+    result = tmp_path / 'validation.json'
+    monkeypatch.setenv('PS_VALIDATION_PATH', str(result))
+    if mutation == 'none':
+        validate()
+        assert json.loads(result.read_text())['passed']
+    else:
+        with pytest.raises(SystemExit):
+            validate()
+        assert not json.loads(result.read_text())['passed']

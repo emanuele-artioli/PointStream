@@ -6319,3 +6319,26 @@ original anchor; all scored original pixels/R/actual overlays replay exactly.
 Native YUV-plane erasure preserves every unmasked sample. New source, decoded
 stream, frame inputs and receipts will be published separately, never replacing
 original evidence. GPU request is not yet submitted.
+
+CPU-only request **20261028T091736Z-bf9f97d2** published PENDING. Code
+`e542dfedd3a51118aba5cb3e7471305b7fc5c642`, snapshot
+`6a5cf4377738569d007097f7f684314675e2802ca23b4837aac73c3147599ce0`, spec
+`c6acbea3a34a27ed226e0e68d9c398b35272dfdb3d05bc740d2391ca5c322fb5`.
+Selected213tracked source/runtime/tool files; no local production changes or
+untracked data transferred. New validator tests were explicitly excluded from
+that frozen snapshot. All6worker heartbeats fresh. No GPU claim/time; original
+2730/3600s unchanged. Local receipts /private/tmp/clean-background-cpu-spec.json
+and /private/tmp/clean-background-cpu-submission.json. Native wait will be
+`scripts/ps-fleet wait 20261028T091736Z-bf9f97d2 --max-seconds2700`.
+No verified background model completion callback; attended wait, no recurring
+model timer. Inspect this exact request after interruptions; never resubmit.
+
+Attended status+native wait session21654 is preserved in
+/private/tmp/clean-background-cpu-wait-handle.json. Native result path
+/private/tmp/clean-background-cpu-wait.json; max2700s. Full local required suite
+984passed/25skipped and the same two macOS limitations; Ruff/mypy PASS.
+Additional native quality-validator tests10/10PASS, including memory, input,
+allocation and saved timing-policy rejection. These test-only additions do not
+change the frozen CPU production snapshot. No further full-suite rerun needed
+until production changes or new failures warrant it. PR267 is MERGED with
+LinuxCI PASS, merge db3671cae36c349d80412e8b9796547ddef67b53.
