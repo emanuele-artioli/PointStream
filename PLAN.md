@@ -51,17 +51,21 @@ these are familiar development windows, not untouched confirmation.
 **Study closed:** final job20261027T211451Z-f6a754eb is COMPLETE with a valid
 scientific early stop. Independent score/rate audit passed55checks, and CPU
 replay matched all240hybrids/480image hashes. Both control windows completed
-all80ticks. Conservative study cost **2350/3600GPU-s**, **1250s unspent**.
+all80ticks. The registered recipe cost2350GPU-s; including the follow-up diagnostics below,
+the shared ceiling ledger is now **2730/3600GPU-s**, **870s unspent**.
 All waits ended and events were acknowledged. No new GPU request is authorized
 by this result; do not complete receiver serialization or try another generator
 to evade the failed rule. Source01888c76/spec33474777 remain immutable.
 
-**Ideal-player full evaluation authorized:** on2026-10-28 the user directed
-launch because timing variation was the only rejected check. It is now secondary
-metadata; slower-warm projection with35% margin and all correctness/memory/hard
-budget limits remain. Saved evidence projects223.270s<550. One1100s request
-is authorized inside1120s remaining of the original3600s; scientific scope
-unchanged. See [accepted revision](docs/cards/k6b-ideal-timing-secondary.md).
+**Ideal-player full evaluation COMPLETE — finite NO-GO:** user-directed
+job20261028T080453Z-34e50ec2 scored all80Al ticks after making timing
+variation secondary. Controls exact; CPU audit400images/160oracle compositions
+passes. Even source pixels inside R lose full LPIPS0.270927 vs SVT0.234057
+and DISTS0.167818 vs0.164586 at same total22.737962kbps, robust+/-0.001.
+The other fixed support also loses both. Do not fund an appearance-only
+renderer at this point without a new dominating background/rate bound.
+Total **2730/3600GPU-s**, **870s unused**. Read
+[the full report](docs/k6b-ideal-player-full-report-2026-10-28.md); no active job.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
@@ -248,7 +252,7 @@ marked `card ready` is waiting for the user to start it.
 | Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
 | Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: final20261027T211451Z-f6a754eb COMPLETE; fresh separated smoke passes, full stops scientifically after Al loses both whole-frame metrics; audited55checks+240CPUhybrids;2350/3600s charged,1250unspent; no active wait/GPU job |
-| Ideal-player appearance bound | [stopped finite bound](docs/cards/k6b-ideal-player-bound.md) | `codex/ideal-player-timing-secondary` | Codex | human directs full evaluation2026-10-28; timing variability secondary, all correctness/memory/budget gates retained; one1100s request within1120left, preparing |
+| Ideal-player appearance bound | [completed finite bound](docs/cards/k6b-ideal-timing-secondary.md) | `codex/ideal-player-full-result` | Codex | COMPLETE20261028T080453Z-34e50ec2; all80ticks, exact controls, independently audited finite NO-GO both metrics/both ideal supports;2730/3600s charged,870unused; item stopped |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).

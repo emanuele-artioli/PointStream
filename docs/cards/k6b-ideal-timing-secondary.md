@@ -1,4 +1,4 @@
-# Ideal-player full evaluation — timing secondary, approved2026-10-28
+# Ideal-player full evaluation — timing secondary, COMPLETE2026-10-28
 
 The user explicitly directed launch if timing variation was the only reason
 full evaluation did not start. It was the only rejected check in repaired
@@ -24,3 +24,10 @@ smoke200/full550/validator100/overhead250,20unallocated. Hard deadlines and
 per-frame checkpointing remain. Stop at the local appearance decision or a
 real correctness/resource failure; no new renderer or training is authorized.
 Positive result is only local oracle headroom, never a codec win.
+
+## Result
+
+Job20261028T080453Z-34e50ec2 completed all80ticks. Independently audited
+finite NO-GO: both ideal supports lose both whole-frame metrics at original
+total rate, robust+/-0.001. Charged250s; cumulative2730/3600s,870unused.
+Decision made; stop. [Full report](../k6b-ideal-player-full-report-2026-10-28.md).

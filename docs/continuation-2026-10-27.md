@@ -1,11 +1,16 @@
-## 2026-10-28 latest direction — launch full, timing secondary
+## 2026-10-28 latest result — full ideal-player finite NO-GO
 
-User explicitly directed launch because timing variation was the ONLY failed
-gate in20261028T073233Z-36f21aa5. Prior stop below is superseded for ONE new
-1100s request within1120s remaining; all scientific/correctness/memory/budget
-gates retained. Saved slower-warm projection223.270s<550; no variability veto.
-Read the latest experiments entry and [accepted card](cards/k6b-ideal-timing-secondary.md).
-Never replay an uncertain submission. No new request ID yet.
+User directed full launch with timing secondary. Job20261028T080453Z-34e50ec2
+COMPLETE: all80Al ticks, exact original metric controls, full command144.138s.
+Independent CPU audit passes400input images/160oracle reconstructions, scores
+and decision. Best ideal_R LPIPS0.270927>anchor0.234057 and
+DISTS0.167818>0.164586 at total22.737962kbps, robust+/-0.001. Other support
+also loses both. Finite NO-GO; no new appearance-only renderer without a new
+dominating bound. Read [full report](k6b-ideal-player-full-report-2026-10-28.md).
+Cumulative2730/3600GPU-s,870unused. All task-owned processes/waits ended,
+events acknowledged, no timer. No new GPU request authorized by this result.
+Re-read latest experiment ID/status before any action; never replay unknown work.
+Original actual-player failure and TOMM baseline/wire/fresh-evaluation gaps remain.
 
 ## 2026-10-28 latest continuation — ideal-player attempt CLOSED
 
