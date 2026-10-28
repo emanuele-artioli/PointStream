@@ -23,15 +23,20 @@ new dependency.
 
 ## Where PointStream stands (2026-10-28)
 
-**New parallel development batch APPROVED (2026-10-28):** human authorized
+**Parallel development batch CLOSED/REPORTED (2026-10-28):** human authorized
 three concurrent GPU diagnostics plus CPU gap/accounting. New separate cap
 7200 GPU-s (temporal background2700, paid pixel corrections2700,
-DCVC/ROI baselines1800) and3600CPU-s. The old2980/3600ledger remains closed.
+DCVC/ROI baselines1800) and3600CPU-s. Charged2400/7200GPU-s,4800unused;
+CPUanalysis charged120/3600s conservatively. The old2980/3600ledger remains closed.
 Read [batch card](docs/cards/parallel-development-2026-10-28.md) and
 [live batch record](docs/experiments/parallel-development.md) for exact frozen
-settings, IDs and outcomes. No old job is restarted. No training/generation.
-Aggregate results after every task completes/stops. Background starts with Al;
-other two tasks cover both original development windows. Untouched confirmation
+settings, IDs and outcomes. All five requests terminal, no claims/processes/timer.
+No old job restarted. No training/generation. Read the
+[consolidated report](docs/parallel-development-report-2026-10-28.md): motion
+improves static background but LPIPS BD-rate+230.28% on overlap; pixel full
+Al/Med points beyond measured anchor coverage; DCVC native decode failure,
+SVT independent cost stop with no full evaluation. No validated baseline win.
+Background covered Al; pixels covered both development windows. Untouched confirmation
 and TOMM readiness are not established. Future delegated job launch/report tasks
 use GPT-6 Luna at max effort with precise narrow instructions (user,2026-10-28);
 root owns experiment design/review/decisions.

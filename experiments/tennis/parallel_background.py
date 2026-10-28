@@ -1,8 +1,7 @@
-"""Paid static court reference plus native-frame residual pilot (no learned model).
+"""Paid court reference plus native-frame residuals, with optional paid homographies.
 
-The camera transform is explicitly identity. Camera changes, uncovered content
-and foreground carried by the background are paid in the residual. This finite
-construction does not bound a motion-compensated panorama or arbitrary codec.
+Uncovered content and foreground carried by the background are paid in the
+residual. These finite constructions do not bound arbitrary panoramas/codecs.
 """
 from __future__ import annotations
 
@@ -65,18 +64,22 @@ def inspect_stream(path: Path, frames: int) -> dict[str, Any]:
     return {'bytes': len(data), 'sha256': digest(path), 'frames': frames, 'timestamps': ticks}
 
 
-def packet_header(reference: Path, residual: Path, frames: int) -> bytes:
-    return (json.dumps({'schema': 1, 'width': WIDTH, 'height': HEIGHT, 'frames': frames, 'fps': [25, 1],
+def packet_header(reference: Path, residual: Path, frames: int, motion: bytes | None = None) -> bytes:
+    header: dict[str, Any] = {'schema': 1, 'width': WIDTH, 'height': HEIGHT, 'frames': frames, 'fps': [25, 1],
                         'transform': 'identity', 'color': 'limited-yuv420', 'residual_color': 'full-range',
                         'residual_decode': {'scale': 2, 'offset': -256, 'clip': [0, 255]},
-                        'reference_sha256': digest(reference), 'residual_sha256': digest(residual)},
-                       sort_keys=True, separators=(',', ':')) + '\n').encode()
+                        'reference_sha256': digest(reference), 'residual_sha256': digest(residual)}
+    if motion is not None:
+        import hashlib
+        header.update(transform='homography-wire-v1', motion_sha256=hashlib.sha256(motion).hexdigest(),
+                      warp={'interpolation': 'linear', 'border_yuv': [16, 128, 128], 'chroma_scale': .5})
+    return (json.dumps(header, sort_keys=True, separators=(',', ':')) + '\n').encode()
 
 
-def header_decode(data: bytes, reference: Path, residual: Path, frames: int) -> dict[str, Any]:
+def header_decode(data: bytes, reference: Path, residual: Path, frames: int, motion: bytes | None = None) -> dict[str, Any]:
     """Decode only the paid schema; reject hidden geometry or transform changes."""
     header = json.loads(data)
-    expected = json.loads(packet_header(reference, residual, frames))
+    expected = json.loads(packet_header(reference, residual, frames, motion))
     if header != expected or frames not in (24, 240):
         raise ValueError('Paid packet contract or stream identity changed')
     return header
@@ -87,7 +90,7 @@ def reconstruct_packet(reference: np.ndarray, residual: np.ndarray, header: dict
     if (reference.dtype != np.uint8 or residual.dtype != np.uint8
             or reference.shape != residual.shape
             or reference.shape != (header['height'] * 3 // 2, header['width'])
-            or header['transform'] != 'identity' or header['color'] != 'limited-yuv420'
+            or header['transform'] not in ('identity', 'homography-wire-v1') or header['color'] != 'limited-yuv420'
             or header['residual_color'] != 'full-range'):
         raise ValueError('Decoded packet planes/transform differ from paid header')
     params = header['residual_decode']
@@ -118,12 +121,15 @@ def run(a: argparse.Namespace) -> None:
     from experiments.visor.h3b import dists_crops, load_dists, lpips_reduce
     from experiments.visor.h3c import downscale_planes
     from src.codecs.quality import load_lpips, yuv420_to_rgb
+    from experiments.tennis.parallel_motion import decode_motion, fit_motion, warp_reference
 
     started = time.monotonic()
     if not torch.cuda.is_available() or 'A6000' not in torch.cuda.get_device_name(0):
         raise ValueError('Qualified A6000 required')
     if digest(a.source) != INPUTS['source'] or digest(a.prepared) != PREPARED_SHA:
         raise ValueError('Frozen source/prepared publication changed')
+    if a.motion and (a.transport is None or digest(a.transport) != INPUTS['transport']):
+        raise ValueError('Frozen encoder-only source regions required for motion fitting')
     for metric, expected in WEIGHTS.items():
         if digest(getattr(a, metric)) != expected:
             raise ValueError('Metric weight changed')
@@ -184,24 +190,39 @@ def run(a: argparse.Namespace) -> None:
     encode(reference_raw, reference_ivf, 1, 35, False)
     decode(reference_ivf, reference_yuv, 1)
     reference = np.fromfile(reference_yuv, np.uint8).reshape(HEIGHT * 3 // 2, WIDTH)
+    encode_started = time.monotonic()
     down = downscaled_source(source, a.frames, 2, scratch / 'down.yuv')
     down_raw = np.memmap(down, np.uint8, 'r', shape=(a.frames, HEIGHT * 3 // 2, WIDTH))
+    motion = None
+    motion_summary = None
+    matrices = np.repeat(np.eye(3)[None], a.frames, axis=0)
+    if a.motion:
+        from experiments.tennis.k6b_rate_streams import decode_masks
+        from experiments.tennis.k6b_clean_background_prep import read
+        with tarfile.open(a.transport) as tar:
+            _, masks = decode_masks(read(tar, 'packets/alcaraz_hurkacz__031@129/exact-rle.matte').getvalue())
+        if masks.shape != (240, 2, 540, 960):
+            raise ValueError('Full frozen encoder regions required')
+        motion, motion_summary = fit_motion(reference, down_raw, masks[:a.frames].any(axis=1))
+        (publish / 'motion.bin').write_bytes(motion)
+        matrices = decode_motion((publish / 'motion.bin').read_bytes(), a.frames)
+        del masks
     residual_source = scratch / 'residual-source.yuv'
     with residual_source.open('wb') as handle:
-        for frame in down_raw:
-            handle.write(pack_residual(frame, reference).tobytes())
+        for t, frame in enumerate(down_raw):
+            predicted = warp_reference(reference, matrices[t]) if a.motion else reference
+            handle.write(pack_residual(frame, predicted).tobytes())
     decoded, rates, packet_receipts, contracts = [], [], [], []
-    encode_started = time.monotonic()
     for crf in CRFS:
         stream_path, decoded_path = publish / f'residual-q{crf}.ivf', scratch / f'residual-q{crf}.yuv'
         encode(residual_source, stream_path, a.frames, crf, True)
         decode(stream_path, decoded_path, a.frames)
-        header = packet_header(reference_ivf, stream_path, a.frames)
+        header = packet_header(reference_ivf, stream_path, a.frames, motion)
         header_path = publish / f'packet-q{crf}.json'
         header_path.write_bytes(header)
-        contract = header_decode(header_path.read_bytes(), reference_ivf, stream_path, a.frames)
+        contract = header_decode(header_path.read_bytes(), reference_ivf, stream_path, a.frames, motion)
         contracts.append(contract)
-        count = reference_ivf.stat().st_size + stream_path.stat().st_size + len(header)
+        count = reference_ivf.stat().st_size + stream_path.stat().st_size + len(header) + (len(motion) if motion else 0)
         # Retain the whole previous optimistic side cost, including its old
         # bootstrap. The new header is an additional paid cost, never a rebate.
         rate = count * 8 / (a.frames / 25) / 1000 + manifest['side_kbps']
@@ -237,7 +258,8 @@ def run(a: argparse.Namespace) -> None:
             raise ValueError('Native CUDA source identity failed')
         images = [original[1], original[2]]
         for residual, contract in zip(decoded, contracts):
-            plane = reconstruct_packet(reference, residual[tick], contract)
+            predicted = warp_reference(reference, matrices[tick]) if a.motion else reference
+            plane = reconstruct_packet(predicted, residual[tick], contract)
             base = cv2.resize(rgb(plane, contract['width'], contract['height']), (1920, 1080), interpolation=cv2.INTER_CUBIC)
             images.append(np.where(written[..., None], overlay, base))
         hashes[str(tick)] = [image_sha(x) for x in images]
@@ -251,7 +273,8 @@ def run(a: argparse.Namespace) -> None:
         publish_progress(os.environ['PS_STAGE'], j + 1)
         timings.append(time.monotonic() - tick_started)
     assessments = [compare({m: float(s[i+2].mean()) for m, s in scores.items()}, manifest['curves'], rates[i]) for i in range(3)]
-    summary = {'window': WINDOW, 'frames': a.frames, 'ticks': ticks, 'policies': POLICIES, 'crfs': CRFS,
+    summary = {'motion': a.motion, 'motion_fit': motion_summary, 'motion_bytes': len(motion) if motion else 0,
+               'window': WINDOW, 'frames': a.frames, 'ticks': ticks, 'policies': POLICIES, 'crfs': CRFS,
                'assessment': assessments if a.frames == 240 else None, 'smoke_scores_are_not_evidence': a.frames != 240,
                'packets': packet_receipts, 'parsed_contracts': contracts, 'side_kbps': manifest['side_kbps'], 'commands': commands, 'tools': tools,
                'reference_sha256': digest(reference_ivf), 'source_yuv_sha256': SOURCE_YUV,
@@ -262,7 +285,7 @@ def run(a: argparse.Namespace) -> None:
                'tick_seconds': timings, 'seconds': time.monotonic() - started,
                'peak_allocated_mib': torch.cuda.max_memory_allocated() / 2**20,
                'peak_reserved_mib': torch.cuda.max_memory_reserved() / 2**20, 'memory_limit_mib': memory_limit,
-               'scope': 'Al native240 static identity-reference residual pilot with frozen actual overlay; no panorama bound, BD-rate or untouched result.'}
+               'scope': 'Al native240 paid reference/residual pilot with frozen actual overlay; no arbitrary panorama bound, BD-rate or untouched result.'}
     write(publish / 'summary.json', summary)
     write(Path(os.environ['PS_STAGE_DIR']) / 'background-summary.json', summary)
 
@@ -290,12 +313,30 @@ def validate() -> None:
               'scale': spec['scale'] == {'frames': {'smoke': 24, 'full': 240}, 'judged': {'smoke': 3, 'full': 0}},
               'side_retained': abs(s['side_kbps'] - 5.607128888888889) < 1e-12,
               'timing_secondary': s['timing_secondary']}
+    checks['motion_contract'] = s['motion'] == ('--motion' in spec['arguments'])
+    if s['motion']:
+        checks['encoder_regions'] = any(x['name'] == 'transport' and x['sha256'] == INPUTS['transport'] for x in spec['staged_inputs'])
+        checks['motion_coverage'] = (s['motion_fit']['fitted'] + s['motion_fit']['identity_fallbacks'] == 24
+                                     and s['motion_fit']['fitted'] >= 22 and s['motion_bytes'] > 8)
     with tarfile.open(stage / 'published.tar') as tar:
         stream = tar.extractfile('publish/scores.npz')
         if stream is None:
             raise ValueError('Missing saved scores')
         with np.load(stream) as z:
             checks['saved_scores'] = z['ticks'].tolist() == [0, 3, 6] and all(z[m].shape == (5, 3) and np.isfinite(z[m]).all() for m in WEIGHTS)
+        motion_size = 0
+        if s['motion']:
+            from experiments.tennis.parallel_motion import decode_motion
+            from experiments.tennis.k6b_clean_background_prep import read
+            import hashlib
+            packet = read(tar, 'publish/motion.bin').getvalue()
+            motion_size = len(packet)
+            checks['delivered_camera'] = decode_motion(packet, 24).shape == (24, 3, 3)
+            checks['camera_hashes'] = all(c['motion_sha256'] == hashlib.sha256(packet).hexdigest() for c in s['parsed_contracts'])
+        for receipt in s['packets']:
+            count = sum(tar.getmember('publish/' + name).size for name in
+                        ('reference.ivf', f'residual-q{receipt["crf"]}.ivf', f'packet-q{receipt["crf"]}.json')) + motion_size
+            checks[f'paid_bytes:{receipt["crf"]}'] = count == receipt['total_bytes']
     write(Path(os.environ['PS_VALIDATION_PATH']), {'passed': all(checks.values()), 'checks': checks,
                                                  'projected_full_seconds': projection})
     if not all(checks.values()):
@@ -307,6 +348,8 @@ def main() -> None:
     p.add_argument('--validate', action='store_true')
     p.add_argument('--source', type=Path)
     p.add_argument('--prepared', type=Path)
+    p.add_argument('--transport', type=Path)
+    p.add_argument('--motion', action='store_true', help='Paid ORB homography before residual coding')
     p.add_argument('--lpips', type=Path)
     p.add_argument('--dists', type=Path)
     p.add_argument('--frames', type=int, choices=(24, 240), default=24)

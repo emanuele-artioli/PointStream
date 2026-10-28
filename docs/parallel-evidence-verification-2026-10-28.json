@@ -1,0 +1,9 @@
+{
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/parallel-development-20261028-244ab9ae/evidence.tar",
+  "sha256": "71900d0da6b7076b1ba4978da3663a1f5ec8a3f710f503cfa26fa2b524e20d5e",
+  "bytes": 100720640,
+  "members_verified": 105,
+  "archive_mode": "0o444",
+  "canonical_publications_read_only": 5,
+  "integrity_passed": true
+}

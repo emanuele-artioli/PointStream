@@ -1,0 +1,292 @@
+{
+  "audit_code_sha256": "9c8ca3daa2a604490a3046a5d7b1e15fd10329a04908197d80eee555ca93018d",
+  "prior_sha256": "e346844d20671e5dfd78828ec61d262aa13109bc1be9a1b421873facdc86daa1",
+  "neural_metrics_recomputed": false,
+  "background": {
+    "integrity_passed": true,
+    "rows": [
+      {
+        "crf": 45,
+        "bytes": 253200,
+        "rate_kbps": 216.6071288888889,
+        "mean": {
+          "lpips": 0.14370883611985194,
+          "dists": 0.08190623372793197
+        },
+        "measured_lower_rate_dominance": [
+          {
+            "rate_kbps": 33.685,
+            "better_metrics": [
+              "lpips"
+            ],
+            "means": {
+              "lpips": 0.13933597781334395,
+              "dists": 0.10972894132137298
+            }
+          }
+        ]
+      },
+      {
+        "crf": 55,
+        "bytes": 144033,
+        "rate_kbps": 125.6346288888889,
+        "mean": {
+          "lpips": 0.17395979186634958,
+          "dists": 0.09403963163495063
+        },
+        "measured_lower_rate_dominance": [
+          {
+            "rate_kbps": 33.685,
+            "better_metrics": [
+              "lpips"
+            ],
+            "means": {
+              "lpips": 0.13933597781334395,
+              "dists": 0.10972894132137298
+            }
+          }
+        ]
+      },
+      {
+        "crf": 63,
+        "bytes": 56776,
+        "rate_kbps": 52.92046222222222,
+        "mean": {
+          "lpips": 0.22445701165846837,
+          "dists": 0.11090642139315605
+        },
+        "measured_lower_rate_dominance": [
+          {
+            "rate_kbps": 33.685,
+            "better_metrics": [
+              "lpips",
+              "dists"
+            ],
+            "means": {
+              "lpips": 0.13933597781334395,
+              "dists": 0.10972894132137298
+            }
+          }
+        ]
+      }
+    ],
+    "historical_control_max_error": 0.0,
+    "scope": "Three paid-reference constructions on Al only; no arbitrary-background bound.",
+    "publication_sha256": "7b8766283f8fd3788850792e9e1795c1f0725f7bffe88a69b9a4e0227cd54916",
+    "members_sha256": {
+      "publish/packet-q45.json": "6ea019fc9f082b0e0deca281a78244bcba415534debb58cf514e9d44c2c8e74d",
+      "publish/packet-q55.json": "9e775b6e125ed2b5e263cb4c04bdb4aa06780f9c23698ea48630873354d7def0",
+      "publish/packet-q63.json": "ac5b6d4976580dd801e2dd4e99db97de11928f559575c0bef231f00a3b248beb",
+      "publish/reference.ivf": "4a66502bfb8cf466fa81a2901ae1e5825a480b9ec64690f0e7675e9b73fa5d1c",
+      "publish/residual-q45.ivf": "1846fed2521e9aad7092a42110c254a3ac4454694a58546557dab82ab064ac71",
+      "publish/residual-q55.ivf": "4b43658969f6cc1e96ce02bf4c534767ad00ec66087a1cffcd930531008b24f6",
+      "publish/residual-q63.ivf": "fe2f5a4362a1899fde82a19263381262153a980fb2377060f3ada95d0e171c01",
+      "publish/scores.npz": "c3bb0cca9b78892a8836db35a2219ed815ec91c3559f88abc684f144b63a32cd",
+      "publish/summary.json": "563a1e920a3e28724ce8aa20855853053f95adad70df2e8c42c4913073c20f02"
+    }
+  },
+  "motion": {
+    "integrity_passed": true,
+    "rows": [
+      {
+        "crf": 45,
+        "bytes": 240534,
+        "rate_kbps": 206.0521288888889,
+        "mean": {
+          "lpips": 0.13508448866855952,
+          "dists": 0.07852567881345748
+        },
+        "measured_lower_rate_dominance": []
+      },
+      {
+        "crf": 55,
+        "bytes": 123091,
+        "rate_kbps": 108.18296222222224,
+        "mean": {
+          "lpips": 0.15816991189085408,
+          "dists": 0.09022514745593072
+        },
+        "measured_lower_rate_dominance": [
+          {
+            "rate_kbps": 33.685,
+            "better_metrics": [
+              "lpips"
+            ],
+            "means": {
+              "lpips": 0.13933597781334395,
+              "dists": 0.10972894132137298
+            }
+          }
+        ]
+      },
+      {
+        "crf": 63,
+        "bytes": 49352,
+        "rate_kbps": 46.73379555555556,
+        "mean": {
+          "lpips": 0.17977667500060282,
+          "dists": 0.1009664073586464
+        },
+        "measured_lower_rate_dominance": [
+          {
+            "rate_kbps": 33.685,
+            "better_metrics": [
+              "lpips"
+            ],
+            "means": {
+              "lpips": 0.13933597781334395,
+              "dists": 0.10972894132137298
+            }
+          }
+        ]
+      }
+    ],
+    "historical_control_max_error": 0.0,
+    "scope": "Three paid-reference constructions on Al only; no arbitrary-background bound.",
+    "publication_sha256": "337421ee4597ed028d47336e3fb30648c05607581662a609d29b4ce75787e68e",
+    "members_sha256": {
+      "publish/motion.bin": "ab5bf54f512b93d4c55f28c849c5185e1c1039a6ac1b0129fda435f3be7d299c",
+      "publish/packet-q45.json": "f1c600d4d752127053ec994629bd412894ea8e872cb5407af2baa60ca1008463",
+      "publish/packet-q55.json": "eba7118b287c6828964d2810a232badd35151b32f3457b87b199d6edd59b00b6",
+      "publish/packet-q63.json": "9989b4ca976a411789306527ea0dde091024903fa5a7f47c09d2d29318bf1445",
+      "publish/reference.ivf": "4a66502bfb8cf466fa81a2901ae1e5825a480b9ec64690f0e7675e9b73fa5d1c",
+      "publish/residual-q45.ivf": "a1ebde14852756458ea30faddc05ecb2dce59590de77dcaf43cdca0d9626edae",
+      "publish/residual-q55.ivf": "687eb7b100ab8de1922775dc6ce7ffd9fa6ffeeda1ac84136c2c9fbd76493bf8",
+      "publish/residual-q63.ivf": "0887e11b4c6b86583ee305714eb59fa786a68c235d700e907389483f19ee8043",
+      "publish/scores.npz": "0f9e1e1f892e14781c1f4f9f294c3a552afff5a1fa887845bc144cd8ec7daaad",
+      "publish/summary.json": "47280fb89a864bc541043a53b9d7d4b3b85d5848474d6b95a2ff18207ccccb75"
+    }
+  },
+  "pixels": {
+    "integrity_passed": true,
+    "rows": [
+      {
+        "window": "alcaraz_hurkacz/031@129",
+        "points": [
+          {
+            "crf": 32,
+            "bytes": 1420127,
+            "rate_kbps": 1183.4391666666668,
+            "mean": {
+              "lpips": 0.11069988881805796,
+              "dists": 0.06388546526432037
+            }
+          },
+          {
+            "crf": 45,
+            "bytes": 629537,
+            "rate_kbps": 524.6141666666667,
+            "mean": {
+              "lpips": 0.11573677336139446,
+              "dists": 0.070510995388031
+            }
+          },
+          {
+            "crf": 58,
+            "bytes": 283289,
+            "rate_kbps": 236.07416666666668,
+            "mean": {
+              "lpips": 0.12484981084752964,
+              "dists": 0.08153153136372567
+            }
+          }
+        ],
+        "sizes": [
+          [
+            1216,
+            684
+          ],
+          [
+            1146,
+            676
+          ]
+        ]
+      },
+      {
+        "window": "medvedev_struff/014@194",
+        "points": [
+          {
+            "crf": 32,
+            "bytes": 1111340,
+            "rate_kbps": 1852.2333333333336,
+            "mean": {
+              "lpips": 0.3040066931453752,
+              "dists": 0.1293957054615021
+            }
+          },
+          {
+            "crf": 45,
+            "bytes": 504639,
+            "rate_kbps": 841.065,
+            "mean": {
+              "lpips": 0.3072201673719618,
+              "dists": 0.13409850597381592
+            }
+          },
+          {
+            "crf": 58,
+            "bytes": 214395,
+            "rate_kbps": 357.325,
+            "mean": {
+              "lpips": 0.31205588258342976,
+              "dists": 0.1405365377664566
+            }
+          }
+        ],
+        "sizes": [
+          [
+            600,
+            522
+          ],
+          [
+            456,
+            434
+          ]
+        ]
+      }
+    ],
+    "scope": "Scores/bytes/geometry/native framing and three saved support replays; no neural metric recomputation.",
+    "publication_sha256": "d462366799275314839b16d19b4d373ed7ceb259ace9ad9a7a20bb97946facee",
+    "members_sha256": {
+      "publish/al/base.ivf": "51d4ef06ed214d9c2e534e530aaf134414443fee19ad82364ee59ed0026defd9",
+      "publish/al/geometry.pxt": "f47a783962710735555f63acde784b4a4de48f4e752d253527ba598345b507a0",
+      "publish/al/q32/base.ivf": "51d4ef06ed214d9c2e534e530aaf134414443fee19ad82364ee59ed0026defd9",
+      "publish/al/q32/geometry.pxt": "f47a783962710735555f63acde784b4a4de48f4e752d253527ba598345b507a0",
+      "publish/al/q32/player-0.ivf": "9ad261f52064d337655865fb91a60477be16281f6f9405c936dd1c42472afb6e",
+      "publish/al/q32/player-1.ivf": "3fad844181b8783ca271f548f4292134951e38cdf5d1f0d0a63cf418b11d5162",
+      "publish/al/q45/base.ivf": "51d4ef06ed214d9c2e534e530aaf134414443fee19ad82364ee59ed0026defd9",
+      "publish/al/q45/geometry.pxt": "f47a783962710735555f63acde784b4a4de48f4e752d253527ba598345b507a0",
+      "publish/al/q45/player-0.ivf": "9646c795933c3c81eebfe64772f6e5e7fbc70d5cba85e0fb99194686d736913a",
+      "publish/al/q45/player-1.ivf": "288f87e5f23241cac6cf9cbeb35b4389901ae1f586cc07d49db877d47904f70f",
+      "publish/al/q58/base.ivf": "51d4ef06ed214d9c2e534e530aaf134414443fee19ad82364ee59ed0026defd9",
+      "publish/al/q58/geometry.pxt": "f47a783962710735555f63acde784b4a4de48f4e752d253527ba598345b507a0",
+      "publish/al/q58/player-0.ivf": "d9e1bbbefeeb7df8992af6f61a27b840dca75f8e3cc72241e3c428ef73148f68",
+      "publish/al/q58/player-1.ivf": "da1374ccc5834cea8925f07f4deff624c009b8bda1ffbab1671fcc6643296eab",
+      "publish/al/replay-000.npz": "f510a23ce2b97620a5771727bff108104c33b1f18e17b29a6e5127b464422c0f",
+      "publish/al/replay-003.npz": "728d9744e3479024f5771cb5a4926116925c1d9b587936106cd4b9f00a285fc5",
+      "publish/al/replay-006.npz": "28f02647d129d4160b3143722ae97422900d17214c7add940026b1cfa4e6ba7f",
+      "publish/al/row.json": "6bcef7c0b11eceb4dcb805fff6ccae7286e9879eb205c942754a8b50d74c38a3",
+      "publish/al/scores.npz": "fa100b4125ca104b6fa414ccfd9e706150e8bcfb36d0b2cf6f187fa471389ea6",
+      "publish/med/base.ivf": "cf381fa8b8e8228600321dc7e7bcc5f14d323108971e2a4f71fdcebf2f499e0a",
+      "publish/med/geometry.pxt": "a21d4feb11ff7215837cd80fe098fc28f109028336c2809caadd93afe0e81e93",
+      "publish/med/q32/base.ivf": "cf381fa8b8e8228600321dc7e7bcc5f14d323108971e2a4f71fdcebf2f499e0a",
+      "publish/med/q32/geometry.pxt": "a21d4feb11ff7215837cd80fe098fc28f109028336c2809caadd93afe0e81e93",
+      "publish/med/q32/player-0.ivf": "91db8b711558071a1885ee51175485ea3a4461a68a60c871b89841806285e484",
+      "publish/med/q32/player-1.ivf": "f935d3415eb32858debad82041f125d33ac280c3855f41efd5a46c6cbae787f7",
+      "publish/med/q45/base.ivf": "cf381fa8b8e8228600321dc7e7bcc5f14d323108971e2a4f71fdcebf2f499e0a",
+      "publish/med/q45/geometry.pxt": "a21d4feb11ff7215837cd80fe098fc28f109028336c2809caadd93afe0e81e93",
+      "publish/med/q45/player-0.ivf": "30269675eb83bceed63b72f8cb237d8c79106f4e98224643a16e26305badbaeb",
+      "publish/med/q45/player-1.ivf": "a59fff38a43afc63c134ba3737a3d3e0ab7f0018531df5713cf17a2e840df533",
+      "publish/med/q58/base.ivf": "cf381fa8b8e8228600321dc7e7bcc5f14d323108971e2a4f71fdcebf2f499e0a",
+      "publish/med/q58/geometry.pxt": "a21d4feb11ff7215837cd80fe098fc28f109028336c2809caadd93afe0e81e93",
+      "publish/med/q58/player-0.ivf": "9f2956a4c9702d4c83c0c22598e422536a28b3130b5edfaebc0b3a9efe5cff6e",
+      "publish/med/q58/player-1.ivf": "03a2c593f0ba683e9956398ca32978e64736e2fb7099b4311ef9aafc9891be70",
+      "publish/med/replay-000.npz": "2acde6dd1230211fef2c5cb238cd80e6348fed88c7fb29d760003d6cab6fe0af",
+      "publish/med/replay-003.npz": "f28d91179bd671872ba8944e18f6e645e963d00e9ae466f210b97927ee877362",
+      "publish/med/replay-006.npz": "2aa54ad198bf003cde4a6ab9265c7352635fd41ae4b3fb36d649405629ca8a15",
+      "publish/med/row.json": "99b635cb1a2ab2f6591c292e596f7d9ffd384b108caa345defb437a9b51e43ef",
+      "publish/med/scores.npz": "29d30bd0e94a4bc7d6ed5ed20e1d592286e89eef298544f7e5be1bf4c5cb2bf6",
+      "publish/pixels.json": "2127ce4703bd194392d086f2a7d130efdedb3cb4ca26dcd1ddbbf16693c28922"
+    }
+  }
+}
