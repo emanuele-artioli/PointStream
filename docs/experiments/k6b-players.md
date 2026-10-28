@@ -6181,3 +6181,17 @@ Inputs468250a7/runtime32e68872 unchanged. No other request submitted.
 Attended native wait handle50792/max2200s; receipt/private/tmp/ideal-secondary-native-wait.json.
 Full550/total1100GPU-s, deadline08:43:46.295474UTC. Native completion/attention
 only; no recurring model timer or replay. PR265 holds accepted timing revision.
+Admitted gpu3, expected sharing event0abfe97ec508523a8a5198c78fd56ca3
+reported/acknowledged. Continued same native observation handle24380/max2100s,
+receipt/private/tmp/ideal-secondary-resumed-wait.json; no second request.
+Local full suite971pass/25skip, two known platform/sandbox failures (ps denied
+and macOS protected symlink). The ps test passes outside sandbox. Ruff/mypy
+and36focused policy/oracle checks pass. Full Linux CI remains required.
+
+Fresh gate PASSED; full80-tick evaluation LAUNCHED for20261028T080453Z-34e50ec2.
+All correctness, CUDA, memory, identity and budget checks true. Saved policy
+stability_required:false. Conservative fresh projection225.031039s including
+publication<550; projected worker219.328376s. Warm ratios remain recorded
+(base1.2886/actual1.8870/ideal_R1.8661/ideal_Fhat1.2532), not admission vetoes.
+Canonical full/dispatch.json confirms --judged0 --timing-secondary and
+unchanged inputs, weights, runtime and1100total/550full limits. No result yet.
