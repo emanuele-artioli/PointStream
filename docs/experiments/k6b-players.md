@@ -6166,3 +6166,18 @@ safety and publication from saved evidence=223.26982723516414s<550; full hard ti
 Prior job20261028T073233Z-36f21aa5 canonically rechecked FAILED; all eligible
 hosts re-inspected. No new request yet. New spec/private/tmp/ideal-secondary-spec.json,
 deadline2026-10-28T08:43:46.295474+00:00. Scientific target/thresholds unchanged.
+
+Authorized submit started2026-10-28T08:05UTC from frozen sourcee20b587e.
+Complete campaign runtime explicitly selected; saved --timing-secondary flag.
+Submission receipt/private/tmp/ideal-secondary-submission.json; no ID yet.
+One request only; never replay an uncertain submission.1100s total/550s full,
+deadline2026-10-28T08:43:46.295474+00:00;2480/3600s already charged.
+
+User-directed request **20261028T080453Z-34e50ec2** published successfully.
+Sourcee20b587ee9709bacd110c561776695d48fd38848,
+specSHA72235ba850224ea8f87d6446001d8cd49d860233e0b97c7a2fc07c67ca1f70f7,
+snapshotSHA45d4f23ecc8c386d650a8295d68897b4f996b57ae0f13eee9ad4aee03de0dc1b.
+Inputs468250a7/runtime32e68872 unchanged. No other request submitted.
+Attended native wait handle50792/max2200s; receipt/private/tmp/ideal-secondary-native-wait.json.
+Full550/total1100GPU-s, deadline08:43:46.295474UTC. Native completion/attention
+only; no recurring model timer or replay. PR265 holds accepted timing revision.
