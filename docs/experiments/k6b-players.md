@@ -6228,3 +6228,63 @@ SHAb1ecfb5b5ded26dd11b9a18809b07b13f22b02a4dff4d97c01b21cc12b90a309,
 Portable NumPy-only audit also PASS, zero control error and finite NO-GO.
 Policy PR265 merged with Linux CI passing. Audited report continued on
 codex/ideal-player-full-result. No GPU work left;2730/3600s charged,870unused.
+
+
+### 2026-10-28 — CPU-only joint side-rate feasibility (registered)
+
+Goal: turn the completed finite appearance NO-GO into a quantitative gate for
+future background/pose work. No new neural scores, GPU time or scientific win.
+Hypothesis: both keypoint and non-keypoint costs must change to preserve even
+the measured ideal_R gain on the scale4 base. Competing explanation: replacing
+one packet or amortizing the other terms alone suffices.
+
+Decision rule: independently invert the achievable anchor hull at each saved
+policy's mean distance, centrally and with +0.001 adverse candidate sensitivity.
+Use the smaller LPIPS/DISTS side ceiling for a single global policy; never
+extrapolate or mix policies across metrics. Compare the actual 3.53kbps KPS
+packet and 2.077129kbps non-KPS cost separately and jointly to that ceiling.
+Report required reductions as constraints, not measured codec gains.
+
+A bounded lossless packing pilot may examine the ORIGINAL 4236-byte Al KPS
+packet: three declared encodings of its already-coded bytes (zlib level9,
+bzip2 level9, LZMA preset6), including an explicit 8-byte wrapper overhead.
+Stop after these three; do not tune predictors, quantization or image policies.
+Require exact decompression and original SHA/byte-count agreement with the
+preserved source evidence. This only bounds these three byte-wrapping choices,
+not arbitrary pose coders. It cannot repair a cost floor in the other terms.
+Budget: zero GPU-s, <=60 local CPU wall-seconds, read-only existing evidence;
+no remote computation. Preserve output/provenance in the repository as a small
+JSON report. Original ceiling stays2730/3600GPU-s with870unused. No job submitted.
+
+
+### 2026-10-28 — CPU side-rate feasibility COMPLETE; new background proposal
+
+Registered calculation completed in0.032753s local wall, zero GPU cost. Parent
+result/prior/transport archive SHA checks pass. All80base/actual controls exact.
+Central LPIPS-limited joint side ceilings: actual0.784306359, ideal_R1.345937165,
+ideal_Fhat1.068786703kbps; +0.001 adverse ceilings0.668734449/1.230365255/
+0.953214793. Current KPS3.53 and non-KPS2.077128889 each exceed best tested
+oracle's robust ceiling. Freeing either alone fails on these fixed pixels.
+Not a universal pose/rendering bound or a new codec-quality result.
+
+Canonical transport6865035e copied read-only after old scratch path was absent.
+Original4236-byte KPS SHA38c29a952e59e2aeb72de71284286dc2855df3cd0de948571c493bc23349ed50
+matches original bootstrap; duration9.6s from IVF bytes/rate. zlib9/bzip2-9/LZMA6
+with paid8-byte wrappers produce4255/4705/4304bytes, all exact roundtrips, all
+worse. Stop three-setting pilot; no coder adopted. No remote compute submitted.
+See ../k6b-side-feasibility-report-2026-10-28.md and machine-readable JSON.
+Cumulative2730/3600GPU-s,870unused. Original negatives unchanged.
+
+New paid clean-background card proposes removing players BEFORE encoding the
+base, then scoring frozen actual and finite source-pixel policies with every
+existing side cost charged. New research question; <=800 of870s proposed after
+exact CPU preflight and retained correctness/hard-cost gates. User decision
+requested; not accepted yet. No new source pack/stream/worker/fleet request.
+
+Verification: pinned-environment ruff/full mypy PASS;23focused analysis/oracle/
+ledger/process-control tests PASS. Complete macOS suite has only previously
+known sandbox-ps and absent-server-symlink failures; ps test passes outside
+sandbox. No change to those paths; Linux CI required before merge. An incomplete
+old temporary Python environment was replaced, not treated as an implementation
+failure. Manual implementation/constraints review completed; frozen JSON replay
+under pinned dependencies agrees exactly on numeric results and wrapper bytes.

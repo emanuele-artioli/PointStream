@@ -1,3 +1,17 @@
+## 2026-10-28 CPU follow-up — side-rate feasibility COMPLETE
+
+Read [the saved-score accounting report](k6b-side-feasibility-report-2026-10-28.md).
+No new GPU work. Robust joint side ceiling is0.668734kbps for actual overlay
+and1.230365kbps for ideal_R, compared with KPS3.53 and other side2.077129.
+Each group alone exceeds ideal_R's ceiling. All three predeclared lossless
+wrappers grow the original KPS packet; all roundtrips exact. Machine-readable
+JSON and CPU implementation are committed, with frozen parent archive checks.
+Next [paid clean-background proposal](cards/k6b-paid-clean-background.md) changes
+the base to remove players before encoding, then tests actual/source-pixel
+policies while retaining every side cost. Proposed <=800 of870 remaining GPU-s;
+awaiting explicit acceptance, no new stream/worker/request. Do not treat proposal
+as permission. Original finite NO-GO and TOMM evidence gaps remain unchanged.
+
 ## 2026-10-28 latest result — full ideal-player finite NO-GO
 
 User directed full launch with timing secondary. Job20261028T080453Z-34e50ec2

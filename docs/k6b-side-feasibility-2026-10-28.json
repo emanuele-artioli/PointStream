@@ -1,0 +1,256 @@
+{
+  "scope": "Post-hoc fixed-pixel CPU accounting; no codec win, new quality or universal bound.",
+  "window": "alcaraz_hurkacz/031@129",
+  "ticks": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21,
+    24,
+    27,
+    30,
+    33,
+    36,
+    39,
+    42,
+    45,
+    48,
+    51,
+    54,
+    57,
+    60,
+    63,
+    66,
+    69,
+    72,
+    75,
+    78,
+    81,
+    84,
+    87,
+    90,
+    93,
+    96,
+    99,
+    102,
+    105,
+    108,
+    111,
+    114,
+    117,
+    120,
+    123,
+    126,
+    129,
+    132,
+    135,
+    138,
+    141,
+    144,
+    147,
+    150,
+    153,
+    156,
+    159,
+    162,
+    165,
+    168,
+    171,
+    174,
+    177,
+    180,
+    183,
+    186,
+    189,
+    192,
+    195,
+    198,
+    201,
+    204,
+    207,
+    210,
+    213,
+    216,
+    219,
+    222,
+    225,
+    228,
+    231,
+    234,
+    237
+  ],
+  "input_sha256": {
+    "result": "d571699973a7bea8e4c65c2fb82a56c318520129e2cc3385ca6a9988c0c8105d",
+    "prior": "e346844d20671e5dfd78828ec61d262aa13109bc1be9a1b421873facdc86daa1",
+    "transport": "6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7"
+  },
+  "parent_jobs": [
+    "20261027T211451Z-f6a754eb",
+    "20261028T080453Z-34e50ec2"
+  ],
+  "base_kbps": 17.130833333333335,
+  "duration_seconds": 9.599999999999998,
+  "kps_kbps": 3.5300000000000007,
+  "other_side_kbps": 2.0771288888888884,
+  "hulls_rate_negative_distance": {
+    "lpips": [
+      [
+        10.1975,
+        -0.4509588020230518
+      ],
+      [
+        17.130833333333335,
+        -0.2825729174201871
+      ],
+      [
+        33.685,
+        -0.13933597781334395
+      ]
+    ],
+    "dists": [
+      [
+        10.1975,
+        -0.29936598166823386
+      ],
+      [
+        17.130833333333335,
+        -0.1926841489970684
+      ],
+      [
+        33.685,
+        -0.10972894132137298
+      ]
+    ]
+  },
+  "means": {
+    "lpips": [
+      0.2825729174201871,
+      0.2757866112979842,
+      0.27092703247070316,
+      0.2733251105414497
+    ],
+    "dists": [
+      0.1926841489970684,
+      0.1696124367415905,
+      0.16781825199723244,
+      0.16966643780469895
+    ]
+  },
+  "anchor_at_original_total": {
+    "lpips": 0.23405655303908085,
+    "dists": 0.1645860543718178
+  },
+  "policies": {
+    "base": {
+      "0.0": {
+        "per_metric_side_ceiling_kbps": {
+          "lpips": 0.0,
+          "dists": 0.0
+        },
+        "joint_side_ceiling_kbps": 0.0,
+        "kps_only_sufficient": false,
+        "other_only_sufficient": false
+      },
+      "0.001": {
+        "per_metric_side_ceiling_kbps": {
+          "lpips": -0.041175264480664,
+          "dists": -0.06499075952983091
+        },
+        "joint_side_ceiling_kbps": -0.06499075952983091,
+        "kps_only_sufficient": false,
+        "other_only_sufficient": false
+      }
+    },
+    "actual": {
+      "0.0": {
+        "per_metric_side_ceiling_kbps": {
+          "lpips": 0.7843063591439616,
+          "dists": 4.604086719373708
+        },
+        "joint_side_ceiling_kbps": 0.7843063591439616,
+        "kps_only_sufficient": false,
+        "other_only_sufficient": false
+      },
+      "0.001": {
+        "per_metric_side_ceiling_kbps": {
+          "lpips": 0.668734449327232,
+          "dists": 4.4045312347875765
+        },
+        "joint_side_ceiling_kbps": 0.668734449327232,
+        "kps_only_sufficient": false,
+        "other_only_sufficient": false
+      }
+    },
+    "ideal_R": {
+      "0.0": {
+        "per_metric_side_ceiling_kbps": {
+          "lpips": 1.3459371651177854,
+          "dists": 4.962126125471126
+        },
+        "joint_side_ceiling_kbps": 1.3459371651177854,
+        "kps_only_sufficient": false,
+        "other_only_sufficient": false
+      },
+      "0.001": {
+        "per_metric_side_ceiling_kbps": {
+          "lpips": 1.2303652553010558,
+          "dists": 4.762570640884995
+        },
+        "joint_side_ceiling_kbps": 1.2303652553010558,
+        "kps_only_sufficient": false,
+        "other_only_sufficient": false
+      }
+    },
+    "ideal_Fhat": {
+      "0.0": {
+        "per_metric_side_ceiling_kbps": {
+          "lpips": 1.0687867025919857,
+          "dists": 4.593310511056934
+        },
+        "joint_side_ceiling_kbps": 1.0687867025919857,
+        "kps_only_sufficient": false,
+        "other_only_sufficient": false
+      },
+      "0.001": {
+        "per_metric_side_ceiling_kbps": {
+          "lpips": 0.9532147927752526,
+          "dists": 4.393755026470803
+        },
+        "joint_side_ceiling_kbps": 0.9532147927752526,
+        "kps_only_sufficient": false,
+        "other_only_sufficient": false
+      }
+    }
+  },
+  "boundary": "Equality only; robust wins require side strictly below ceiling.",
+  "packet_sha256": "38c29a952e59e2aeb72de71284286dc2855df3cd0de948571c493bc23349ed50",
+  "lossless_wrappers": [
+    {
+      "profile": "ZL01",
+      "bytes": 4255,
+      "kbps": 3.545833333333334,
+      "sha256": "833b3c4d24341e80538fa11174fd4a67a81f194d9393af1e2c0fd27b228f78bf",
+      "roundtrip": true
+    },
+    {
+      "profile": "BZ01",
+      "bytes": 4705,
+      "kbps": 3.9208333333333343,
+      "sha256": "4b7e54bd9eed39acf6ee38a11096abaad9d7df5fb56cc497e9332314ec505e11",
+      "roundtrip": true
+    },
+    {
+      "profile": "XZ01",
+      "bytes": 4304,
+      "kbps": 3.5866666666666673,
+      "sha256": "1685994ee05b7d9e6074ab93e051d4ecbc3097a1aa2c7b5e8ca1cb7fc0e9a401",
+      "roundtrip": true
+    }
+  ],
+  "analysis_code_sha256": "6144babf45c5eb4af329f724a42d494d9cfcd97f58f23ea6c430e1228a0ac625",
+  "wall_seconds": 0.03275254229083657
+}
