@@ -60,6 +60,17 @@ Native waits<=45min, attended unless completion wakeup verified; no recurring
 model monitor. Preserve IDs before waiting; inspect uncertain requests, never
 resubmit. All source data and completed outputs remain read-only.
 
+Execution clarification after exact native API review: initial diagnosis's
+legacy4-frame arm passed, but the default-stream alternative is incompatible
+with CUDA graph capture and failed BEFORE encoding. It is not a quality result
+or a determinism verdict. Charge that request250GPU-s conservatively and use
+at most350GPU-s to complete the unaffected original24-frame legacy reproduction
+with a fresh4-frame correctness smoke. Same source/QP/geometry/checkpoints,
+no new alternative, no further request after this completion. This finishes
+the user-approved diagnosis inside its original600GPU-s, not a retry of a
+failed scientific configuration or extra research allocation. The unsupported
+default mode must never become the production default.
+
 Primary literature: https://arxiv.org/abs/2605.13476 (DCVC-DT),
 https://github.com/SunnyMass/DCVC-DT, https://github.com/Austin4USTC/DCMVC,
 https://openaccess.thecvf.com/content/CVPR2025/html/Zeng_Plug-and-Play_Versatile_Compressed_Video_Enhancement_CVPR_2025_paper.html.

@@ -34,7 +34,7 @@ def run(a: argparse.Namespace) -> None:
         raise ValueError('Original native source changed')
     raw = downscaled_source(source, a.frames, 2, scratch/'source-half.yuv')
     rows = []
-    for policy in ('legacy', 'default'):
+    for policy in (('legacy',) if a.legacy_only else ('legacy', 'default')):
         work = out/policy
         work.mkdir()
         plan: dict[str, Any] = {'structure': 'htl', 'qp': 21, 'frame_count': a.frames, 'width': 960,
@@ -86,7 +86,8 @@ def run(a: argparse.Namespace) -> None:
             'reports_sha256': {k: digest(work/(k+'.json')) for k in reports}})
         publish_progress(os.environ['PS_STAGE'], len(rows))
     summary = {'frames': a.frames, 'source_yuv_sha256': SOURCE_YUV,
-        'rows': rows, 'default_passed': rows[1]['passed'], 'seconds': time.monotonic()-began,
+        'rows': rows, 'legacy_only': a.legacy_only, 'legacy_passed': rows[0]['passed'],
+        'default_passed': rows[1]['passed'] if len(rows) > 1 else None, 'seconds': time.monotonic()-began,
         'scope': 'Fresh encoding on same claimed A6000; no stored-stream decode or quality evidence.',
         'inputs': expected, 'timing_secondary': True}
     write(out/'diagnosis.json', summary)
@@ -100,7 +101,8 @@ def validate() -> None:
     projection = 1.35*(sum(r['fixed_seconds']+r['native_seconds']*6 for r in s['rows'])
                        + max(0, s['seconds']-sum(r['fixed_seconds']+r['native_seconds'] for r in s['rows'])))
     checks = {'frames': s['frames'] == 4, 'source': s['source_yuv_sha256'] == SOURCE_YUV,
-        'default_correct': s['default_passed'], 'two_variants': [r['policy'] for r in s['rows']] == ['legacy', 'default'],
+        'selected_variant_correct': s['legacy_passed'] if s['legacy_only'] else s['default_passed'],
+        'variants': [r['policy'] for r in s['rows']] == (['legacy'] if s['legacy_only'] else ['legacy', 'default']),
         'cost': projection < spec['full']['seconds'], 'budget': spec['budget_seconds'] <= 600,
         'timing_secondary': s['timing_secondary']}
     write(Path(os.environ['PS_VALIDATION_PATH']), {'passed': all(checks.values()), 'checks': checks,
@@ -115,6 +117,7 @@ def main() -> None:
     for k in ('source', 'image_ckpt', 'video_ckpt'):
         p.add_argument('--'+k.replace('_', '-'), type=Path)
     p.add_argument('--frames', type=int, choices=(4, 24), default=4)
+    p.add_argument('--legacy-only', action='store_true', help='Complete original supported-path reproduction only')
     a = p.parse_args()
     if a.validate:
         validate()

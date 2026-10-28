@@ -35,3 +35,43 @@
  133120bytes; DCVC-DTe3deeda1cd99566498504231f6853fd554ec00e9,
  DCMVC4aa95ef4b0176b6076b1ba0396d2cd178258d506. Selected original files only,
  archived with per-file SHAs; no model download or source execution.
+
+### 2026-10-28 — Restoration submitted; batch monitoring begins
+
+- Restoration20261028T191318Z-b4727331 pending at receipt, cap1800GPU-s.
+  Source49ee1b931c7771876d5dd5aa55f7f2a96f8d1bcb,
+  snapshot4608ded8bfb28efd429d9f2164a1750a0b5afcf48beaf4814682d070d6963130,
+  spec66b1d70e8bfe19a3a208bdb97c2a59b02f19a04193325a17530a323c35d1d3b5.
+  Receipt/private/tmp/single-restoration-submission.json. No selected changes.
+- Eight focused alignment/transport/decoder-report/document tests pass;
+  configured ruff and mypy pass. Root owns independent audit code; delegates
+  only submitted frozen specs. Full local suite running separately.
+- One bounded native batch wait covers all three recorded IDs; no verified
+  automatic model wakeup, so attended execution with no recurring timer.
+  Native wait output/private/tmp/single-batch-wait.json, max2700seconds.
+  Initial diagnosis admittedgpu2/A6000; CPU audit admittedgpu5/noGPU.
+
+### 2026-10-28 — CPU audit complete; unsupported native alternative rejected
+
+- CPU audit20261028T190840Z-eb011d4b COMPLETE on gpu5, source inventory214files,
+  original Python/CUDA sources preserved. Differentiable UF forward_one_frame
+  exists; native bitstream compress delegates to C++ proxies taking pixels,
+  with no external optimized-latent input. DCVC-DT targets IntraNoAR/DCVC-DC,
+  not installed DMCI/HT-L. DCMVC is another DCVC-DC-based codec with its own
+  checkpoints/dependencies. Do NOT claim gradients are absent or substitute
+  estimated bpp for a native bitstream. Refinement gate remains unestablished;
+  spend0/1200GPU-s until a native optimized-latent transport path exists.
+- Initial diagnosis20261028T190838Z-3dea4d74 FAILED validator because the
+  default-stream encode raised 'operation not permitted when stream is capturing'
+  at dmc_common.cpp:15. No default-stream encode/metrics completed. Legacy
+ 4-frame arm passed both within-process passes and fresh decoder, encoderI
+  equality, native container identities and memory. This does not reproduce
+  or resolve the original24-frame nondeterminism. The API assumption was wrong.
+- Charge250GPU-s, including admission through canonical terminal229.6s and
+  salvage/publication. Complete ONLY the unaffected24-frame legacy reproduction
+  within the remaining350GPU-s of the same600 cap, with a fresh smoke. The
+  [card](../cards/single-stream-search.md) explains this implementation correction;
+  no changed quality rule, new alternative or extra allocation. No further request.
+- Initial events acknowledged; CPU stall event occurred during environment/
+  publication overhead, actual smoke command3.56s; CPU full succeeded. No
+  recurring model polling. Restoration remains the independent quality test.
