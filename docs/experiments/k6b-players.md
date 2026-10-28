@@ -6006,3 +6006,38 @@ new question after the negative result, <=1100GPU-s of1250unused, no training
 or generation. An8,000MiB allocation is proposed from measured3.522GiB peak
 with fresh qualification, preserving8,192MiB margin. No request exists and
 explicit acceptance is required; this closed study grants no new method.
+
+
+### 2026-10-28 — Ideal-player bound APPROVED, preparation
+
+User explicitly accepted the new diagnostic and allocation in
+[the card](../cards/k6b-ideal-player-bound.md): one request, at most1100GPU-s
+(smoke200/full550/validator100/overhead250), within1250s unused of original3600s.
+No training, generation or retry of the failed recipe. Al80ticks, scale4,
+source-perfect R/predicted-support overlays, same original total22.737962kbps.
+Byte-exact inputs and baseline/actual controls<=1e-4 precede full evaluation;
+cold/warm/warm four-policy projection with35% safety must fit550s.
+Stop on failed correctness/resource gate, no retries or automatic new build.
+Scientific hypothesis, alternative and three-way decision are frozen in card.
+Branch codex/k6b-ideal-player-bound; CPU preparation only, no request yet.
+Prior completed job ID is20261027T211451Z-f6a754eb; inspect canonical status
+before touching its evidence. Study spend remains2350/3600GPU-s.
+
+CPU preparation PASSED: source/base/actual all80image identities match prior;
+saved receiver mask tensors match original hashes; native compositing replay
+preserves every pixel outside predicted support. New read-only input archive:
+/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-ideal-player-input-20261028/input.tar
+SHA256468250a72a1ce764e9451fc7b4cd51bd29372d3e688b832e1e9c1f002e11bc6c,
+594739200bytes; manifestSHA85f6ae06d641e8be73804d9d6428ee8f7b386cc64326082fb5f0e9b0f7f04568.
+Preparation108.997904wall/116.270602CPU-s, CUDA hidden; no GPU charge.
+Exact34-file workload closure CPU-imports on both eligible hosts passed:
+2.095s gpu2 /2.009s gpu3, frozen runtime32e68872, torch2.10.0+cu128.
+This avoids repeating the prior210-file NFS snapshot timeout without changing
+metric code: h3b and src/codecs/quality remain byte-identical to prior source.
+All-host native inspect found gpu2 A6000s14849MiBfree each (below16192required),
+gpu3 A6000 23183MiBfree; both remain in compatible pool. Prior canonical
+job20261027T211451Z-f6a754eb confirmed complete. No predecessor replay.
+Lint/mypy pass, nine focused oracle tests pass including resource/identity
+mutation rejection. Full local suite962pass/25skip with two external failures:
+sandbox denies ps in contention test; known macOS nonexistent protected-symlink
+hook assertion. Linux CI is required before final closure.

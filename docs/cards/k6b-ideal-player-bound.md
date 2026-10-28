@@ -1,10 +1,11 @@
-# Ideal-player appearance bound — PROPOSED, no GPU authority
+# Ideal-player appearance bound — APPROVED 2026-10-28
 
 This is a NEW diagnostic after the fixed real-base recipe failed, not a retry
 of its registered decision. The [audited report](../k6b-real-base-quality-report-2026-10-27.md)
 records two full-frame losses on Al and a valid arithmetic early stop. The
 original study has1250GPU-s unspent; that is not automatic permission to fund
-another method. No GPU request for this card exists.
+another method. The user explicitly approved this ideal-player bound on
+2026-10-28, including the 1100GPU-s allocation below. No request exists yet.
 
 ## Question, hypothesis and alternative
 
@@ -69,7 +70,7 @@ The foreground gain, Med outcomes, full-curve BD-rate, fair ROI/neural baseline,
 wire serialization and untouched evaluation remain unestablished by this card.
 Stop when this local decision is made. No additional sampling after a failed gate.
 
-## Prospective quote requiring explicit acceptance
+## Accepted prospective allocation
 
 | Component | Maximum GPU-seconds |
 |---|---:|
@@ -99,8 +100,8 @@ safety and direct publication timing (80/3 scaling), and project strictly below
 550s. The native1100s total and remaining-full-reservation checks remain binding.
 If it cannot fit, stop; no automatic retry or unspent-budget transfer.
 
-CPU input preparation and provenance review may proceed before acceptance;
-GPU evaluation may not. Pack input images/metadata under Datasets, use verified
+The user accepted this resource contract on 2026-10-28. CPU preparation and
+one gated GPU request are authorized within it. Pack input images/metadata under Datasets, use verified
 host-local scratch/runtime, inspect existing jobs and all eligible hosts, and
 preserve every artifact. Use bounded completion-driven observation, acknowledge
 meaningful events, and install no recurring LLM monitor. Record CPU audit cost
