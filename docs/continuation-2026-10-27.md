@@ -1,3 +1,42 @@
+## CURRENT — same request publication RECOVERED, native observation starts
+
+ID20261028T100153Z-27f39d64 FIRST publication confirmed PENDING. Source identity
+82eee1d0 matches all214files/archive7bc3be42; Git10a1ae76 unchanged. New spec
+e1e7b877 changes only expired queue deadline to2026-10-28T13:01:15Z; cap800s,
+all scientific/resource checks unchanged. No replacement or extraction replay.
+Lastconfirmed2730/3600GPU-s before admission. Receipt
+/private/tmp/clean-background-gpu-first-publication-receipt.json. Read latest
+experiment entry/status before acting; never resubmit. CPUbf9f97d2complete,
+independent auditPASS. Await native smoke/full outcome; no new quality accepted.
+
+## CURRENT — same request FIRST publication in flight after usage reset
+
+ID20261028T100153Z-27f39d64 only. No replacement. Original extraction finished;
+214/214files exact, no extractor on actualhostgpu2, freshready/state/spec absent,
+no admission. CPU-only FIRST publish RPC session36504 is now running, max300s.
+Handle /private/tmp/clean-background-first-publish-handle.json; receipt
+/private/tmp/clean-background-gpu-first-publication-receipt.json. If interrupted,
+inspect same ID before any action; never replay publish or submit. Source code
+10a1ae76/archive7bc3be42/nativeidentity82eee1d0 unchanged. Only expired absolute
+queue deadline refreshed prospectively before any publication/admission; all
+inputs/settings/800s allocation unchanged. Last confirmed spend2730/3600GPU-s.
+Earlier auto-review failed from quota and DID NOT EXECUTE the recovery action;
+user explicitly resumed. Read latest experiment entry for complete digests.
+
+## URGENT current GPU request — publication uncertain, never resubmit
+
+The ONE approved request is20261028T100153Z-27f39d64, allocated but source
+extraction timed out90s before publish. SourceGit10a1ae76, archive7bc3be42,
+spec58c71c85; exact digests in latest experiment entry/local request JSON.
+No ready/admission/smoke/full confirmed. Last confirmed spend2730/3600s,
+800s cap on this same request;870unspent before admission. Do NOT create a
+new ID or replay extraction. Inspect exact214-source-file identities and
+canonical ready state. If complete/unpublished, recover FIRST publish under
+this same ID, using preserved spec/snapshot and bounded CPU-only RPC. This
+pattern previously recovered f6a754eb without a replacement submission.
+CPU source preparationbf9f97d2 COMPLETE and independently audited; no GPU cost.
+Source/meta recovery is the current task, not a new research decision.
+
 ## 2026-10-28 paid clean-background CPU preparation COMPLETE/audited
 
 Job20261028T091736Z-bf9f97d2 COMPLETE on gpu3, ZERO GPU time. All240source/

@@ -84,3 +84,19 @@ the original CUDA conversion, followed by original bicubic base upsampling.
 No alternate fill/color order after examining results.
 Branch `codex/paid-clean-background`. Parent report:
 [joint side-rate feasibility](../k6b-side-feasibility-report-2026-10-28.md).
+
+
+## Execution checkpoint
+
+CPU-only20261028T091736Z-bf9f97d2 COMPLETE and independently audited. Clean
+base19659bytes vs original20557; total21.989628889kbps with all existing side
+costs unchanged. Native source and per-frame controls pass preparation.
+The ONE GPU request20261028T100153Z-27f39d64 had an extraction acknowledgement
+timeout before publication. All214source files were verified exact and the
+original extractor confirmed gone; FIRST publication recovered under this SAME
+ID, no resubmission or extraction replay. Source10a1ae76/archive7bc3be42/native
+identity82eee1d0. Usage review failure executed no action; after human resume,
+fresh inspection proved no readiness/admission, and only the expired absolute
+queue deadline was refreshed before first publication. New normalizedspec
+e1e7b877, deadline2026-10-28T13:01:15Z. All inputs, policies, thresholds and
+800s cap unchanged. Publication confirmed PENDING; no new quality accepted yet.

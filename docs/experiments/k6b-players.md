@@ -6401,3 +6401,45 @@ sourceRGB/oldscore controls and strict memory/pixel/slow-warm cost gates;
 timing variation secondary. Exactly ONE new GPU request allowed, not yet
 submitted. Global2730/3600GPU-s,870unused. CPU production files remain
 byte-identical to executed Git e542dfed; only audit/tests/state were added.
+
+
+### 2026-10-28 — SINGLE GPU request allocated; publication recovery required
+
+Allocated **20261028T100153Z-27f39d64**; local statusSUBMISSION_UNKNOWN because
+source tar extraction on gpu2 exceeded90s BEFORE the publish RPC. Never submit
+a replacement. Git10a1ae76b57d1007b3959286791e2f8e223889d9, source archive
+7bc3be4243afee27ce19e1462165dd8e52ceeb8e4a3556a10a9587679dbab2a9,
+spec58c71c85ed14705774e8fca56d17730de83d8c2050a62a16118d6a8b6358ec5e.
+Frozen snapshot214files, no selected patches/untracked data. Local recorded
+request /Users/manu/.pointstream/fleet/jobs/20261028T100153Z-27f39d64.json.
+Submission session40564 endedexit2; stdoutreceipt empty, diagnostic identifies
+sameID. No smoke/full/admission confirmed, no GPU charge confirmed. Inspect
+canonical unpublished state and source against exact frozen archive; only if
+complete and not alreadyready, finish the FIRST publish of this SAME request.
+Prior real-base study used this same verified recovery pattern. Do not replay
+tar extraction or callsubmitagain. The one-GPU-request grant is now allocated.
+Original2730/3600s remains last confirmed spend; fullcap800 unchanged.
+
+Resume after usage interruption: auto-review could not run the planned recovery
+action, so it was NOT executed. Fresh canonical artifact inspection confirms
+ready/state/spec absent and no admissions. All214 transferred source files
+match archive7bc3be42; actual transfer hostgpu2 has no live extractor.
+FIRST publish of SAME27f39d64 is now in flight via CPU-only native RPC,
+session36504/300s bound. A guard verifies native source identity82eee1d08d6212e59830fc018f9aba3087622daf15c8cc4c66c45472eab9ca6c BEFORE readiness.
+The expired queue deadline alone is refreshed to 2026-10-28T13:01:15.065361+00:00;
+original normalizedspec58c71c85ed14705774e8fca56d17730de83d8c2050a62a16118d6a8b6358ec5e, new first-publication
+spece1e7b8772abd141d717a338db219519e37a7249e144469390dcc86dfd40388eb. Every other field,800s cap and
+scientific gates are unchanged. This is no new request, extraction replay or
+failed-gate retry. Marker/handle at /private/tmp/clean-background-first-publish-handle.json;
+if reply lost, inspect same ID and marker; NEVER call publish again blindly.
+
+FIRST publication confirmed for SAME20261028T100153Z-27f39d64, statusPENDING.
+Native source identity82eee1d08d6212e59830fc018f9aba3087622daf15c8cc4c66c45472eab9ca6c exactly matches verified
+archive; new normalizedspece1e7b8772abd141d717a338db219519e37a7249e144469390dcc86dfd40388eb. Only expired absolute
+queue deadline refreshed to2026-10-28T13:01:15.065361+00:00 before admission. Code/inputs/
+settings/gates and800GPU-s cap unchanged. No replacement/extraction replay.
+Original2730/3600s lastconfirmed; native bounded wait starts for this ID.
+Native same-ID status+wait session53591 saved at
+/private/tmp/clean-background-gpu-wait-handle.json; result
+/private/tmp/clean-background-gpu-native-wait.json, max2400s. No verified
+background model wakeup; attended wait, no recurring LLM timer.
