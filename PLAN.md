@@ -57,10 +57,10 @@ by this result; do not complete receiver serialization or try another generator
 to evade the failed rule. Source01888c76/spec33474777 remain immutable.
 
 **Next research decision:** the [ideal-player appearance bound](docs/cards/k6b-ideal-player-bound.md)
-is PROPOSED, not approved: determine whether source-perfect players on the same
+was approved by the user on2026-10-28: determine whether source-perfect players on the same
 paid scale4 base have enough whole-frame headroom before funding another
-renderer. Proposed1100s maximum fits the1250s remainder, but needs explicit
-acceptance of this NEW diagnostic and its resource contract. Exact source RGB
+renderer. The accepted1100s maximum fits the1250s remainder; one cost-gated
+request is authorized for this NEW diagnostic. Exact source RGB
 for all80Al ticks is available and CPU-verified, so no GPU conversion is needed.
 The original registered failure remains unchanged; foreground-only gains are
 not a fair-ROI or two-baseline codec claim.
@@ -250,7 +250,7 @@ marked `card ready` is waiting for the user to start it.
 | Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
 | Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: final20261027T211451Z-f6a754eb COMPLETE; fresh separated smoke passes, full stops scientifically after Al loses both whole-frame metrics; audited55checks+240CPUhybrids;2350/3600s charged,1250unspent; no active wait/GPU job |
-| Ideal-player appearance bound | [proposed finite bound](docs/cards/k6b-ideal-player-bound.md) | `codex/k6b-ideal-player-bound` | Codex | planned branch not created; NEW question after scientific failure; sourceRGB80/80 CPU-verified, proposed1100s <=1250s remainder; no GPU authority or request |
+| Ideal-player appearance bound | [approved finite bound](docs/cards/k6b-ideal-player-bound.md) | `codex/k6b-ideal-player-bound` | Codex | approved by user2026-10-28; CPU preparation in progress; sourceRGB80/80 CPU-verified; one1100s request within1250s remainder, no request yet |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
