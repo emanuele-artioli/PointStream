@@ -1,3 +1,18 @@
+## 2026-10-28 latest continuation — ideal-player launch stopped
+
+User approved the finite ideal-player bound. Exactly one request
+20261028T071835Z-2964e9ef FAILED before campaign import on gpu3: narrowed
+snapshot omitted experiments.jobs.inbox. No GPU metric or scientific result.
+The snapshot repair and CPU checks are recorded in the
+[launch report](k6b-ideal-player-launch-report-2026-10-28.md).
+Conservative total2410/3600GPU-s,1190s unused. No retry or live wait.
+Prepared read-only inputs468250a7 remain intact. A separate1100s recovery
+recovery was explicitly approved on2026-10-28; one fresh1100s request is
+authorized. Check the latest experiment entry before submitting; never replay
+an uncertain request. Re-read the experiment
+entry's job ID and canonical status before acting. Prior actual-player scientific
+failure and all its limitations stand. No new renderer/training is authorized.
+
 # PointStream continuation after root-chat archive — 2026-10-27
 
 Current accepted outcome: **SCIENTIFIC FAIL** of the fixed real-base player

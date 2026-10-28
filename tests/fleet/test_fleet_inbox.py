@@ -303,7 +303,8 @@ def test_lost_publication_reply_retains_id_and_does_not_resubmit(tmp_path, monke
     assert calls == ["health", "prepare", "publish"]
 
 
-def test_submit_recommends_bounded_completion_monitoring_without_recurring_heartbeat(tmp_path, monkeypatch):
+@pytest.mark.parametrize("selected", [False, True])
+def test_submit_recommends_bounded_completion_monitoring_without_recurring_heartbeat(tmp_path, monkeypatch, selected):
     from argparse import Namespace
     spec_path = tmp_path / "spec.json"
     spec_path.write_text(json.dumps(specification(tmp_path)))
@@ -322,7 +323,18 @@ def test_submit_recommends_bounded_completion_monitoring_without_recurring_heart
         return {"status": "pending"}
     monkeypatch.setattr(inbox, "remote_rpc", remote)
     args = Namespace(state_dir=tmp_path / "state", spec=spec_path, include_change=[], include_untracked=[], chat_id="chat")
+    if selected:
+        args.snapshot_path = ["experiments/tennis/k6b_ideal_player.py"]
+        captured = {}
+        def build(*a, **kw):
+            captured.update(kw)
+            return snapshot, "hash", {}
+        monkeypatch.setattr(fleet, "_build_snapshot", build)
     result = inbox.submit(args, tmp_path)
+    if selected:
+        assert set(captured["include_paths"]) == {
+            "experiments/tennis/k6b_ideal_player.py", "experiments/__init__.py",
+            "experiments/jobs", "src/__init__.py"}
     policy = result["monitoring"]
     assert calls == ["health", "prepare", "publish"]
     assert not policy["heartbeat_required"] and not policy["recurring_polling"]
