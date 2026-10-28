@@ -6342,3 +6342,167 @@ allocation and saved timing-policy rejection. These test-only additions do not
 change the frozen CPU production snapshot. No further full-suite rerun needed
 until production changes or new failures warrant it. PR267 is MERGED with
 LinuxCI PASS, merge db3671cae36c349d80412e8b9796547ddef67b53.
+
+Provenance clarification: the side-rate pilot's first guessed scratch member
+path included an incorrect outerpublishdirectory. The canonical transport is
+rooted atpackets/. That failed path read does NOT establish removal/absence
+of the old scratch tree. The pilot used the correctly SHA-verified canonical
+archive, so its byte/rate results are unchanged. No old scratch was modified.
+
+
+### 2026-10-28 — Paid clean-background CPU preparation COMPLETE, audited
+
+CPU-only20261028T091736Z-bf9f97d2 COMPLETE on gpu3, no GPU claim or seconds.
+Smoke gate passes all11checks; smoke projection575.360942s<1200. Full command
+225.812976s (internal215.061943s), all240frames encoded, all80saved tick inputs
+replayed. Stage paths confirm /local/users/emanuele/pointstream for scratch,
+temporary directories and Python cache. No system-root scratch or data changes.
+Full result's projected_full_seconds field reuses the smoke x10 formula and is
+NOT a full-run timing estimate/gate; use actual native225.812976s. No scientific
+threshold or resource cap was changed; the completed full run fits its1200s.
+
+Original source YUV hash e7b960cd and all pinned native tool identities pass.
+New complete IVF19659bytes vs original20557 (898saved); base16.382500kbps,
+unchanged optimistic side5.607128889, total21.989628889kbps. Native stream
+SHA9d7a96db9a9a6f2f7a50911bac11865247531ecb2fa29c65fe832b94d0f8d065.
+Fresh native decodes agree. Bootstrap remains444bytes, updated only base hash.
+CPU output outer published SHA
+56f54ccdc9db75ce98796597d2f2de0c849ad8041ab57c2def28dc5a4cd25ae0,
+660490240bytes/3members; inner input.tar
+7de12eb9dd7ba358f703a5d8334660819ad7fd4dad7b12cb5d8d24b1c4b48b2c.
+Canonical /home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/
+20261028T091736Z-bf9f97d2/full/published.tar. Terminal event
+8403f96212a55482b10d38ead579ea65 delivered/acknowledged; CPU wait21654 ended.
+
+Independent NumPy-only preparation audit PASS:240goldenRGB identities,80old
+actual overlay/fallback replays,80originalR source-oracle replays, sourceYUV
+sample hashes, complete240IVF framing, all84prepared-member hashes and total
+rate. Same result reproduced after freezing final auditor source checksum
+37c6f1ce1c05afc71c863c8628dad7052d2e8f7fe5ce4c16c0a3ecd6d3c2eee8.
+Record ../k6b-clean-background-preflight-2026-10-28.json. New rate is covered
+by both old achievable hulls: LPIPS anchor0.24053159818214379,
+DISTS0.16833605570545862. No NEW quality score exists yet.
+
+Both A6000 hosts re-inspected: gpu2free14849MiB per card insufficient8000+8192;
+gpu3free23183MiB sufficient, no PointStream GPU claim. All-history canonical
+status queries timed out after120s on BOTH gpu2 and supported management-host
+overridegpu3. This is a large-history metadata limitation, not evidence of
+fleet/GPU unavailability or an uncertain submission: no GPU request has been
+allocated yet. The task's recorded prior and CPU jobs are canonically terminal,
+inputs independently audited and current GPU claims checked. Native submit
+will additionally enforce fresh worker health and atomic resource admission.
+Do not replay any old request or weaken admission because of the history query.
+
+Approved GPU specification /private/tmp/clean-background-gpu-spec.json:
+A6000poolgpu2/gpu3,8000MiB,4CPUthreads,8GiBlocal, verified prepared outer SHA
+56f54ccd plus original LPIPS/DISTS backbones, packed runtime32e68872.
+Smoke120/full350/validator80/overhead250 within800GPU-s. Same4policies,
+sourceRGB/oldscore controls and strict memory/pixel/slow-warm cost gates;
+timing variation secondary. Exactly ONE new GPU request allowed, not yet
+submitted. Global2730/3600GPU-s,870unused. CPU production files remain
+byte-identical to executed Git e542dfed; only audit/tests/state were added.
+
+
+### 2026-10-28 — SINGLE GPU request allocated; publication recovery required
+
+Allocated **20261028T100153Z-27f39d64**; local statusSUBMISSION_UNKNOWN because
+source tar extraction on gpu2 exceeded90s BEFORE the publish RPC. Never submit
+a replacement. Git10a1ae76b57d1007b3959286791e2f8e223889d9, source archive
+7bc3be4243afee27ce19e1462165dd8e52ceeb8e4a3556a10a9587679dbab2a9,
+spec58c71c85ed14705774e8fca56d17730de83d8c2050a62a16118d6a8b6358ec5e.
+Frozen snapshot214files, no selected patches/untracked data. Local recorded
+request /Users/manu/.pointstream/fleet/jobs/20261028T100153Z-27f39d64.json.
+Submission session40564 endedexit2; stdoutreceipt empty, diagnostic identifies
+sameID. No smoke/full/admission confirmed, no GPU charge confirmed. Inspect
+canonical unpublished state and source against exact frozen archive; only if
+complete and not alreadyready, finish the FIRST publish of this SAME request.
+Prior real-base study used this same verified recovery pattern. Do not replay
+tar extraction or callsubmitagain. The one-GPU-request grant is now allocated.
+Original2730/3600s remains last confirmed spend; fullcap800 unchanged.
+
+Resume after usage interruption: auto-review could not run the planned recovery
+action, so it was NOT executed. Fresh canonical artifact inspection confirms
+ready/state/spec absent and no admissions. All214 transferred source files
+match archive7bc3be42; actual transfer hostgpu2 has no live extractor.
+FIRST publish of SAME27f39d64 is now in flight via CPU-only native RPC,
+session36504/300s bound. A guard verifies native source identity82eee1d08d6212e59830fc018f9aba3087622daf15c8cc4c66c45472eab9ca6c BEFORE readiness.
+The expired queue deadline alone is refreshed to 2026-10-28T13:01:15.065361+00:00;
+original normalizedspec58c71c85ed14705774e8fca56d17730de83d8c2050a62a16118d6a8b6358ec5e, new first-publication
+spece1e7b8772abd141d717a338db219519e37a7249e144469390dcc86dfd40388eb. Every other field,800s cap and
+scientific gates are unchanged. This is no new request, extraction replay or
+failed-gate retry. Marker/handle at /private/tmp/clean-background-first-publish-handle.json;
+if reply lost, inspect same ID and marker; NEVER call publish again blindly.
+
+FIRST publication confirmed for SAME20261028T100153Z-27f39d64, statusPENDING.
+Native source identity82eee1d08d6212e59830fc018f9aba3087622daf15c8cc4c66c45472eab9ca6c exactly matches verified
+archive; new normalizedspece1e7b8772abd141d717a338db219519e37a7249e144469390dcc86dfd40388eb. Only expired absolute
+queue deadline refreshed to2026-10-28T13:01:15.065361+00:00 before admission. Code/inputs/
+settings/gates and800GPU-s cap unchanged. No replacement/extraction replay.
+Original2730/3600s lastconfirmed; native bounded wait starts for this ID.
+Native same-ID status+wait session53591 saved at
+/private/tmp/clean-background-gpu-wait-handle.json; result
+/private/tmp/clean-background-gpu-native-wait.json, max2400s. No verified
+background model wakeup; attended wait, no recurring LLM timer.
+
+
+### 2026-10-28 — Paid clean-background FULL COMPLETE; registered gate FAILED
+
+SAME20261028T100153Z-27f39d64 COMPLETE on gpu3 A6000index0,
+UUIDGPU-6f70a27e-4171-22d7-3ffd-647e7f186a49. All80Al ticks0:240:3 scored.
+Fresh smoke passes19checks; timingsecondaryexplicit, base warmratio1.6043not
+vetoed. Full projectionincludingpublication239.300933s<350. Actual full
+command157.656945s/internal154.863009s; peakallocated3082.722168/reserved3744MiB.
+Original CUDA source RGB all80exact; original base/actual LPIPS/DISTS controls
+maxerror0. No training/generation/SAM. No new request or source extraction replay.
+
+New whole-frame means at paidtotal21.989628889kbps:
+actualLPIPS0.27403906852816357/DISTS0.1688237339258194;
+source-in-RLPIPS0.2688483820785711/DISTS0.1668904699385166;
+SVThullLPIPS0.24053159818214379/DISTS0.16833605570545862.
+Formal MIXED/UNRESOLVED: oracleDISTSrobustwin, bothLPIPSrobustloss; actual
+DISTScentrallyworse0.000487678butinsidesensitivity. Neither ONE policy wins
+BOTH>0.001, so fixed construction closes under the registered decision rule.
+Not a finite both-metric NO-GO, arbitrary-renderer bound, BD-rate, codec win
+or TOMM readiness. Prior real-base/ideal-player failures unchanged.
+
+Independent NumPy-only FULL audit PASS:240originalRGB checks,80oldactual/R
+replays,160newactual/oracle reconstructions, raw4x80scores/means/controls,
+source samples,240IVF timestamps,84preparedmember identities, byte counts,
+anchor/sensitivity and decision. Its quality_passed flag is audit integrity,
+not method promotion. Source37c6f1ce audit code unchanged from CPU preparation.
+Record ../k6b-clean-background-full-audit-2026-10-28.json and
+../k6b-paid-clean-background-report-2026-10-28.md.
+
+Full raw publicationSHAeea7147698b036c9182cee3ec635a57361854b049967febc753b03e979fc1ab5,
+497725440bytes/4members, includes all80new decoded GPU RGB frames. ArraySHA
+eb0ba78960ebfbf81a18496c001960e202e19c6bbe6e69b5bffaf280e36dbfb8.
+Native admitted223.966596842s; canonical terminalclosure240.366169930s;
+charge250GPU-s conservatively. Cumulative2980/3600GPU-s,620unused. The2h
+unpublished usage/source interruption had no GPU claim/time. Completed
+supervisor2778255/campaign2778260verifiedabsent; foreign2655895untouched.
+Terminal22561a234c465516ba9fd1c5b131d872 and contention0e9405897c745595a8060553ab639f62
+delivered/acknowledged. Native53591waitended, no timer. No further GPU request
+authorized by this result despite unused620s. DCVC/fairROI/fullwire/freshfootage
+and experience-track evaluation remain absent. Stop when decision is made.
+
+New evidence archive at /home/itec/emanuele/Datasets/pointstream-data/tennis/
+k6b-paid-clean-background-20261028-27f39d64/evidence.tar,
+SHA3da5b858f279f411938607bd92fd44fee76452473c8ffe4c0d40f9266e53af91,
+8611840bytes/49members. Contains exact213/214file source archives, native
+metadata/scores/stream/bootstrap, original controls, independent audits and
+same-ID recovery proof. Large660490240-byte prepared and497725440-byte GPU
+publications retained separately by canonical paths/fullSHA, protected0444.
+
+Post-result tooling fix: future CPU prepare summaries use240/frames instead
+of unconditionalx10 for projected_full_seconds. Smoke24formula unchanged;
+full240field no longer re-projects another tenfold run. This metadata-only
+change does not alter images, native commands, scores or gates. Completed
+frozen CPUe542/GPU10a evidence remains unchanged; no old job is re-run.
+
+Closure verification: published archive SHA and all49member identities PASS
+on destination; archive and both large native publications0444. Exact frozen
+Git source archives reconstruct checksums6a5cf437/7bc3be42. Ruff/full configured
+mypy255files PASS;32focused tests PASS. Full local suite989passed/25skipped,
+only prior sandboxps/absent-server-symlink limitations; ps passes outside
+sandbox. No new failure path. Linux CI remains merge gate. Independent artifact
+and implementation reviews completed. No active compute/wait or model timer.

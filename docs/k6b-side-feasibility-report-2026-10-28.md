@@ -37,8 +37,10 @@ adapter amortization alone is poorly targeted at the present failure.
 
 ## Bounded lossless packet pilot
 
-The canonical transport archive was copied read-only after the old scratch
-location proved unavailable. Its SHA matches the independently preserved input
+The canonical transport archive was copied read-only after an initial guessed
+member path with an outer `publish/` directory did not exist. That archive has
+`packets/` at its root; this does not establish that the old scratch tree is
+missing. Its SHA matches the independently preserved input
 identity. The Al packet is exactly 4236 bytes; its SHA matches the original
 paid stream's bootstrap. Duration is 9.6s, derived from native IVF bytes/rate,
 not the number of sparsely scored ticks.

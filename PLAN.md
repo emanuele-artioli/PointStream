@@ -21,7 +21,7 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-10-27)
+## Where PointStream stands (2026-10-28)
 
 The root session keeps this section and the dispatch ledger below; item
 sessions update their own items and their files in `docs/experiments/`
@@ -52,7 +52,7 @@ these are familiar development windows, not untouched confirmation.
 scientific early stop. Independent score/rate audit passed55checks, and CPU
 replay matched all240hybrids/480image hashes. Both control windows completed
 all80ticks. The registered recipe cost2350GPU-s; including the follow-up diagnostics below,
-the shared ceiling ledger is now **2730/3600GPU-s**, **870s unspent**.
+the shared ceiling ledger is now **2980/3600GPU-s**, **620s unspent**.
 All waits ended and events were acknowledged. No new GPU request is authorized
 by this result; do not complete receiver serialization or try another generator
 to evade the failed rule. Source01888c76/spec33474777 remain immutable.
@@ -64,7 +64,7 @@ passes. Even source pixels inside R lose full LPIPS0.270927 vs SVT0.234057
 and DISTS0.167818 vs0.164586 at same total22.737962kbps, robust+/-0.001.
 The other fixed support also loses both. Do not fund an appearance-only
 renderer at this point without a new dominating background/rate bound.
-Total **2730/3600GPU-s**, **870s unused**. Read
+That stage closed at2730/3600GPU-s; the later diagnostic below updates the ledger. Read
 [the full report](docs/k6b-ideal-player-full-report-2026-10-28.md); no active job.
 
 **CPU follow-up COMPLETE (2026-10-28):** fixed-pixel rate inversion finds
@@ -72,11 +72,23 @@ only0.668734kbps robust total-side allowance for the actual scale4 overlay,
 or1.230365kbps even with source pixels inside R. Current KPS3.53 and other
 side2.077129 each exceed the latter. Three lossless wrappers all grow KPS.
 Read [the feasibility report](docs/k6b-side-feasibility-report-2026-10-28.md).
-Next proposed test removes players BEFORE background encoding, retaining paid
-base bytes and every existing side cost. Its
-[card](docs/cards/k6b-paid-clean-background.md) requests at most800 of870GPU-s;
-accepted2026-10-28; CPU preflight starting, no new request. Existing negative results
-and baseline/serialization/fresh-evaluation requirements remain binding.
+The subsequent paid clean-background test is complete below.
+
+**Paid clean-background full evaluation COMPLETE — two-metric gate FAILED:**
+CPU preparation20261028T091736Z-bf9f97d2 and single GPU request
+20261028T100153Z-27f39d64 completed. The same request's first publication was
+recovered after a transfer timeout/usage interruption; no replacement or retry.
+All80Al ticks scored, original source/score controls exact; independent audit
+passes240goldenRGB checks/160new pixel reconstructions and raw rate/decision.
+Complete base saves898bytes (20557to19659), total21.989629kbps. Source-pixel
+oracle LPIPS0.268848 loses to SVT0.240532, while DISTS0.166890 beats0.168336.
+Formal MIXED/UNRESOLVED; neither new policy wins both by>0.001. Close this
+fixed construction, not arbitrary future backgrounds/renderers. Read
+[the full report](docs/k6b-paid-clean-background-report-2026-10-28.md).
+New250GPU-s charge; global **2980/3600GPU-s**, **620s unused**. Native jobs/
+waits ended, events acknowledged, own PIDs gone; no more GPU authority or timer.
+DCVC, fair pixel ROI, complete wire and untouched evaluation remain missing;
+no complete baseline win or TOMM readiness is established.
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
@@ -264,8 +276,8 @@ marked `card ready` is waiting for the user to start it.
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
 | Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: final20261027T211451Z-f6a754eb COMPLETE; fresh separated smoke passes, full stops scientifically after Al loses both whole-frame metrics; audited55checks+240CPUhybrids;2350/3600s charged,1250unspent; no active wait/GPU job |
 | Ideal-player appearance bound | [completed finite bound](docs/cards/k6b-ideal-timing-secondary.md) | `codex/ideal-player-full-result` | Codex | COMPLETE20261028T080453Z-34e50ec2; all80ticks, exact controls, independently audited finite NO-GO both metrics/both ideal supports;2730/3600s charged,870unused; item stopped |
-| Player joint side-rate feasibility | CPU saved-score inversion and three lossless packet wrappers | `codex/player-rate-feasibility` | Codex | COMPLETE2026-10-28; zero GPU; robust actual/ideal_R side ceilings0.668734/1.230365kbps; all three packet wrappers grow; paid clean-background proposal pending approval |
-| Paid clean-background oracle | [new finite background proposal](docs/cards/k6b-paid-clean-background.md) | `codex/paid-clean-background` | Codex | accepted2026-10-28; <=800 of870 remaining GPU-s; exact CPU preflight starting, no request |
+| Player joint side-rate feasibility | CPU saved-score inversion and three lossless packet wrappers | `codex/player-rate-feasibility` | Codex | COMPLETE2026-10-28; zero GPU; robust actual/ideal_R side ceilings0.668734/1.230365kbps; all three packet wrappers grow; follow-up paid clean-background test now complete |
+| Paid clean-background oracle | [new finite background proposal](docs/cards/k6b-paid-clean-background.md) | `codex/paid-clean-background` | Codex | COMPLETE2026-10-28; CPUbf9f97d2 and sameGPU27f39d64 audited; all80ticks; formal MIXED, two-metric gate FAILED;250s charge,2980/3600total,620unused; stopped |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
