@@ -141,7 +141,7 @@ def run(a: argparse.Namespace) -> None:
                'peak_reserved_mib': torch.cuda.max_memory_reserved() / 2**20,
                'input_sha256': digest(a.images), 'manifest_sha256': digest(inputs / 'manifest.json'),
                'weight_sha256': WEIGHTS, 'prior_job': manifest['prior_job'],
-               'rate_kbps': manifest['rate_kbps'], 'seconds': time.monotonic() - began,
+               'rate_kbps': manifest['rate_kbps'], 'timing_secondary': a.timing_secondary, 'seconds': time.monotonic() - began,
                'assessment': decision(scores, manifest['anchor']) if a.judged == 0 else None}
     write(publish / 'oracle.json', summary)
     write(Path(os.environ['PS_STAGE_DIR']) / 'oracle-summary.json', summary)
@@ -153,9 +153,12 @@ def validate() -> None:
     spec = json.loads((stage.parent / 'spec.json').read_text())
     execution = json.loads((stage / 'execution.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
-    projection = separated_projection(execution['seconds'], s['timings'], staging['publication_seconds'])
+    timing_secondary = spec.get('arguments', []).count('--timing-secondary') == 1
+    projection = separated_projection(execution['seconds'], s['timings'], staging['publication_seconds'],
+                                      require_stability=not timing_secondary)
     checks = resource_checks(projection, spec['full']['seconds'])
-    checks.update({'ticks': s['ticks'] == [0, 3, 6], 'policies': s['policies'] == list(POLICIES),
+    checks.update({'saved_timing_policy': s.get('timing_secondary', False) == timing_secondary,
+                   'ticks': s['ticks'] == [0, 3, 6], 'policies': s['policies'] == list(POLICIES),
                    'cuda': s['cuda'] and 'A6000' in s['gpu'],
                    'memory': 0 < s['peak_allocated_mib'] <= s['peak_reserved_mib'] < 8000,
                    'controls': all(0 <= v <= 1e-4 for v in s['control_errors'].values()) and set(s['control_errors']) == set(WEIGHTS),
@@ -184,6 +187,8 @@ def validate() -> None:
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--validate', action='store_true')
+    p.add_argument('--timing-secondary', action='store_true',
+                   help='Authorized variable-timing policy; retain slower-warm projection and hard budgets')
     p.add_argument('--images', type=Path)
     p.add_argument('--lpips', type=Path)
     p.add_argument('--dists', type=Path)

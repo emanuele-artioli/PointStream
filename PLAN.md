@@ -56,13 +56,12 @@ All waits ended and events were acknowledged. No new GPU request is authorized
 by this result; do not complete receiver serialization or try another generator
 to evade the failed rule. Source01888c76/spec33474777 remain immutable.
 
-**Ideal-player diagnostic CLOSED:** first request20261028T071835Z-2964e9ef
-failed before launch; separately approved repaired20261028T073233Z-36f21aa5
-reproduced smoke controls exactly but FAILED the25% warm timing stability gate
-(ideal-policy ratios1.9233/1.9294). Full never launched; no accepted quality
-result or appearance verdict. Independent CPU audit passed400input images and
-160oracle reconstructions. Total **2480/3600GPU-s**, **1120s unused**; no retry
-or new GPU authority. Read [the final report](docs/k6b-ideal-player-report-2026-10-28.md).
+**Ideal-player full evaluation authorized:** on2026-10-28 the user directed
+launch because timing variation was the only rejected check. It is now secondary
+metadata; slower-warm projection with35% margin and all correctness/memory/hard
+budget limits remain. Saved evidence projects223.270s<550. One1100s request
+is authorized inside1120s remaining of the original3600s; scientific scope
+unchanged. See [accepted revision](docs/cards/k6b-ideal-timing-secondary.md).
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
 host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
@@ -249,7 +248,7 @@ marked `card ready` is waiting for the user to start it.
 | Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
 | Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: final20261027T211451Z-f6a754eb COMPLETE; fresh separated smoke passes, full stops scientifically after Al loses both whole-frame metrics; audited55checks+240CPUhybrids;2350/3600s charged,1250unspent; no active wait/GPU job |
-| Ideal-player appearance bound | [stopped finite bound](docs/cards/k6b-ideal-player-bound.md) | `codex/ideal-player-bound-closure` | Codex | CLOSED: repaired20261028T073233Z-36f21aa5 failed warm-stability gate; controls exact, CPU400images audited, full never launched/no quality verdict; cumulative2480/3600s,1120s unused; no retry authority; final report recorded |
+| Ideal-player appearance bound | [stopped finite bound](docs/cards/k6b-ideal-player-bound.md) | `codex/ideal-player-timing-secondary` | Codex | human directs full evaluation2026-10-28; timing variability secondary, all correctness/memory/budget gates retained; one1100s request within1120left, preparing |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).

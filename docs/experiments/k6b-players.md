@@ -6154,3 +6154,44 @@ SHAeea076e548e24262aebfe8254bc8e489e3277f7cae273ead6606816057e3583f,
 1239040bytes/26files; includes smoke arrays, raw native metadata, CPU/source
 audits and acknowledged events, plus first launch failure archive.
 Final budget2480/3600s;1120unused; no active GPU, wait, retry or timer.
+
+
+### 2026-10-28 — User directs full evaluation; timing secondary
+
+Human explicitly authorizes launch because timing variation was the only
+reason for the previous rejection. New [accepted card](../cards/k6b-ideal-timing-secondary.md)
+supersedes stability veto and no-retry stop for ONE1100s request within1120left.
+All pixel/metric/CUDA/memory gates unchanged. Slower-warm projection plus35%
+safety and publication from saved evidence=223.26982723516414s<550; full hard timeout550.
+Prior job20261028T073233Z-36f21aa5 canonically rechecked FAILED; all eligible
+hosts re-inspected. No new request yet. New spec/private/tmp/ideal-secondary-spec.json,
+deadline2026-10-28T08:43:46.295474+00:00. Scientific target/thresholds unchanged.
+
+Authorized submit started2026-10-28T08:05UTC from frozen sourcee20b587e.
+Complete campaign runtime explicitly selected; saved --timing-secondary flag.
+Submission receipt/private/tmp/ideal-secondary-submission.json; no ID yet.
+One request only; never replay an uncertain submission.1100s total/550s full,
+deadline2026-10-28T08:43:46.295474+00:00;2480/3600s already charged.
+
+User-directed request **20261028T080453Z-34e50ec2** published successfully.
+Sourcee20b587ee9709bacd110c561776695d48fd38848,
+specSHA72235ba850224ea8f87d6446001d8cd49d860233e0b97c7a2fc07c67ca1f70f7,
+snapshotSHA45d4f23ecc8c386d650a8295d68897b4f996b57ae0f13eee9ad4aee03de0dc1b.
+Inputs468250a7/runtime32e68872 unchanged. No other request submitted.
+Attended native wait handle50792/max2200s; receipt/private/tmp/ideal-secondary-native-wait.json.
+Full550/total1100GPU-s, deadline08:43:46.295474UTC. Native completion/attention
+only; no recurring model timer or replay. PR265 holds accepted timing revision.
+Admitted gpu3, expected sharing event0abfe97ec508523a8a5198c78fd56ca3
+reported/acknowledged. Continued same native observation handle24380/max2100s,
+receipt/private/tmp/ideal-secondary-resumed-wait.json; no second request.
+Local full suite971pass/25skip, two known platform/sandbox failures (ps denied
+and macOS protected symlink). The ps test passes outside sandbox. Ruff/mypy
+and36focused policy/oracle checks pass. Full Linux CI remains required.
+
+Fresh gate PASSED; full80-tick evaluation LAUNCHED for20261028T080453Z-34e50ec2.
+All correctness, CUDA, memory, identity and budget checks true. Saved policy
+stability_required:false. Conservative fresh projection225.031039s including
+publication<550; projected worker219.328376s. Warm ratios remain recorded
+(base1.2886/actual1.8870/ideal_R1.8661/ideal_Fhat1.2532), not admission vetoes.
+Canonical full/dispatch.json confirms --judged0 --timing-secondary and
+unchanged inputs, weights, runtime and1100total/550full limits. No result yet.

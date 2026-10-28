@@ -69,3 +69,14 @@ def test_strict_reservation_and_publication_are_both_binding():
     assert checks['projection_under_full_reservation']
     assert not checks['projection_including_publication']
     assert not any(resource_checks(result, math.nan).values())
+
+
+def test_explicit_secondary_timing_keeps_slower_warm_and_budget_checks():
+    from experiments.tennis.k6b_real_base_cost import resource_checks
+    result = separated_projection(100, traces((1, 1, 2)), 0, require_stability=False)
+    assert result['stability_required'] is False
+    assert all(r['warm_ratio'] == 2 and r['warm_seconds'] == 2 for r in result['sequences'].values())
+    assert result['projected_full_seconds'] == pytest.approx(1.35 * (84 + 640))
+    assert not all(resource_checks(result, 550).values())
+    with pytest.raises(ValueError, match='25%'):
+        separated_projection(100, traces((1, 1, 2)), 0)
