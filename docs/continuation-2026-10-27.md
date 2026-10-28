@@ -1,3 +1,28 @@
+## 2026-10-28 CPU preparation request published
+
+CPU-only job20261028T091736Z-bf9f97d2 PENDING at receipt, sourcee542dfed,
+snapshot6a5cf437/specc6acbea3. Read its experiment entry and canonical fleet
+status before acting; never replay. All6CPU hosts eligible and workers fresh.
+GPU grant remains one <=800s request after successful CPU source/stream controls;
+no GPU request yet,2730/3600s spent/870unused. Native bounded attended wait,
+no recurring model monitor. Local spec/submission under
+/private/tmp/clean-background-cpu-{spec,submission}.json. CPU/GPU code frozen,
+27focused checks and ruff/mypy pass; full suite984pass/25skip plus the two
+previous macOS limitations. New quality-validator tests also10/10pass.
+
+## 2026-10-28 paid clean-background oracle ACCEPTED
+
+Human accepted “Approve the paid-background oracle”: one new GPU request <=800
+of870remaining, after exact CPU preparation and passing smoke, no retry. Read
+[candidate card](cards/k6b-paid-clean-background.md). CPU preparation and four-
+policy scoring code are on codex/paid-clean-background; ruff/mypy and27focused
+checks pass. No job submitted yet; re-read latest experiment entry for IDs.
+Frozen erasure is Telea3 independently on native YUV420 planes with original R
+nearest, then original scale4/CRF63/preset4. Source YUV hash must match and every
+judged source RGB/old actual control must reproduce exactly. No training,
+generation or SAM. Existing ledger2730/3600GPU-s,870unused; prior negatives
+stand. PR267 merged db3671cae36c349d80412e8b9796547ddef67b53 with LinuxCI PASS.
+
 ## 2026-10-28 CPU follow-up — side-rate feasibility COMPLETE
 
 Read [the saved-score accounting report](k6b-side-feasibility-report-2026-10-28.md).

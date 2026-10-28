@@ -1,4 +1,4 @@
-# Proposed paid clean-background oracle — not yet authorized
+# Paid clean-background oracle — accepted 2026-10-28
 
 Goal: test whether removing players BEFORE coding the background creates enough
 whole-frame headroom to pay the existing player side information. The previous
@@ -70,6 +70,17 @@ decision. This would leave at least70s of the original3600s ceiling. If prefligh
 finds the quote cannot fit, report that before submitting. The prior study's
 unused870s is not an automatic grant to this different method.
 
-Status: proposal only. No source pack, new stream, worker or request exists yet.
-Branch `codex/player-rate-feasibility`. Parent report:
+Status: human accepted “Approve the paid-background oracle” on2026-10-28.
+CPU preparation and at most ONE <=800s GPU request are authorized after the
+stated checks. Nothing has been submitted yet; original spend2730/3600s.
+
+Preflight choice, fixed BEFORE new encoding/scoring: apply Telea radius3 to
+native uint8 Y/U/V planes independently, using the original R union projected
+by nearest-neighbor onto each plane. Fill at source resolution BEFORE the
+unchanged scale4 area-downsample. This introduces no RGB round trip or change
+to source samples outside the corresponding plane mask. Native source YUV hash
+must match the original. Source and new decoded-base RGB at judging time use
+the original CUDA conversion, followed by original bicubic base upsampling.
+No alternate fill/color order after examining results.
+Branch `codex/paid-clean-background`. Parent report:
 [joint side-rate feasibility](../k6b-side-feasibility-report-2026-10-28.md).
