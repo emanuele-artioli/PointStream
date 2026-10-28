@@ -1,4 +1,6 @@
-# Parallel development batch — 2026-10-28
+# Experiments: parallel development batch
+
+### 2026-10-28 — Approved background, pixel and baseline pilots
 
 Human authorized the concrete batch in
 ../cards/parallel-development-2026-10-28.md, followed by “Go ahead with these
@@ -70,4 +72,47 @@ confirmation; this development batch spends no compute on unseen confirmation.
 
 ## Dispatch and results
 
-Pending source freeze and local checks. No new GPU spend yet.
+Source frozen at140b56ea7f54a386cfa607cee099c2ffdeabd9ad. Ruff/fullmypy262files
+and13focusedtests PASS. Full macOS suite retains only the two known sandbox/
+server-storage platform limitations. PR270 created, auto-merge requested.
+
+Background allocated **20261028T143341Z-c50f6395**. Local record PREPARING,
+native submit command still being collected; no receipt/admission confirmed.
+Snapshot211b4e6961f02fe8c657112f9401f3548ef674578d1504963a8954025f3ba57b,
+normalizedspec821a7a41898c7e128edb42531ddb8ce97df2ed425fba6fd055a78d5fdcfee8bc.
+Launch delegate GPT-6 Luna/max; native processhandle82096 belongs to that
+delegate. Never resubmit. Root inspecting canonical state before any recovery.
+Local receipt /private/tmp/parallel-background-submission.json currently empty.
+FIRST publication confirmed, no recovery/retry: background c50f6395 PENDING
+receipt; canonical firststatus RUNNING on gpu2, noerror. Exact source archive
+211b4e69 matches frozen140b56ea. No recurring monitor (native receipt explicitly
+heartbeat_requiredfalse,recurring_pollingfalse). Earlier PREPARING is historical.
+
+Pixel corrections allocated **20261028T143713Z-a3ae0af0**, PENDING receipt;
+same exact source211b4e6961f02fe8c657112f9401f3548ef674578d1504963a8954025f3ba57b,
+normalizedspecd1ff16e84f06c904234182454ff66196a9288352b3ea78c329e6220ed72f2a1a.
+Receipt /private/tmp/parallel-pixels-submission.json. Launch delegate Luna/max,
+single submission confirmed. Baseline launch now in progress; no allocatedID
+confirmed yet. Task caps unchanged2700/2700/1800, no retries or budgettransfers.
+Actual GPU charge pending native terminalintervals; 0 last finalized newcharge.
+
+CI40707362997 caught the new experiment log's required header/dated-entry
+format. The full local run had completed before this new documentation file
+was added, so it did not cover that file. Corrected to the repository schema;
+tests/test_experiments_docs.py3/3PASS. Scientific source/snapshot unchanged.
+Pixel canonical firststatus RUNNING on gpu3, noerror; background on gpu2.
+
+Baseline allocated **20261028T143856Z-ae2c81a7**, local PREPARING at inspection;
+submissioncommand still being collected by Luna/max delegate. Never resubmit.
+Receipt target /private/tmp/parallel-baselines-submission.json. Same frozen
+source140b56ea expected; exact native receipt/identity pending. All three
+allocations now have IDs; no extra request is authorized to replace an unknown.
+
+Baseline FIRST publication confirmed PENDING, same frozen source/archive
+211b4e6961f02fe8c657112f9401f3548ef674578d1504963a8954025f3ba57b,
+normalizedspec1614cd363193a8b20da4b1cbdaf2e25841c03460b01fdb6f127390317135ec7d.
+All three requests submitted exactly once by Luna/max delegates; no unknown
+submission remains. Canonical prior/status checks completed before batch wait.
+One bounded attended batch observation begins with all IDs, max2700seconds;
+handle/receipts under /private/tmp/parallel-batch-*. No verified automatic model
+completion wakeup in this harness; no recurring timer or paid API substitute.
