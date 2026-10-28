@@ -62,7 +62,7 @@ fleet launcher. No smoke or quality result, no headroom conclusion. The launcher
 snapshot repair is CPU-verified separately. Conservative cumulative cost
 **2410/3600GPU-s**, **1190s unused**. No new GPU request is authorized; the
 [concrete same-cap recovery proposal](docs/cards/k6b-ideal-launch-recovery.md)
-requires acceptance of one fresh1100s request. See the
+was approved for one fresh1100s request on2026-10-28. See the
 [launch report](docs/k6b-ideal-player-launch-report-2026-10-28.md).
 
 **Infrastructure:** large inactive `/var/tmp` files were relocated to separate
@@ -250,7 +250,7 @@ marked `card ready` is waiting for the user to start it.
 | Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
 | Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
 | Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: final20261027T211451Z-f6a754eb COMPLETE; fresh separated smoke passes, full stops scientifically after Al loses both whole-frame metrics; audited55checks+240CPUhybrids;2350/3600s charged,1250unspent; no active wait/GPU job |
-| Ideal-player appearance bound | [approved finite bound](docs/cards/k6b-ideal-player-bound.md) | `codex/ideal-player-launch-repair` | Codex | job20261028T071835Z-2964e9ef failed before campaign import; no scientific result; snapshot repair CPU-verified on both hosts; PR262 merged with CI passing; cumulative2410/3600s,1190s left; separate recovery proposal requires approval |
+| Ideal-player appearance bound | [approved finite bound](docs/cards/k6b-ideal-player-bound.md) | `codex/ideal-player-launch-repair` | Codex | job20261028T071835Z-2964e9ef failed before campaign import; no scientific result; snapshot repair CPU-verified on both hosts; PR262 merged with CI passing; cumulative2410/3600s,1190s left; repaired1100s attempt approved by user2026-10-28, no request yet |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).

@@ -6090,3 +6090,15 @@ codex/ideal-player-launch-repair. New read-only evidence archive:
 SHAc24e904e6cdbc6226f6f51891dae192a30b9a723b2993be2fb7d0e4866af023a,
 1116160bytes/20files; archive and member identities verified after copy.
 No new GPU request. Recovery proposal remains unapproved.
+
+
+### 2026-10-28 — Repaired ideal-player attempt APPROVED
+
+User explicitly approved the repaired same-cap attempt after reviewing the
+launcher failure and concrete PR263. Exactly one fresh request<=1100GPU-s
+(smoke200/full550/validator100/overhead250), within1190s remaining of3600.
+No further retry. Frozen pixels468250a7/runtime32e68872 and all original
+scientific/control/resource gates remain unchanged. Repaired source51fa34c2;
+selected snapshot must explicitly include all experiments/jobs campaign runtime.
+Prior failed ID20261028T071835Z-2964e9ef must be canonically inspected first.
+No new request yet; original failure artifacts remain read-only.

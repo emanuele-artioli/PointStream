@@ -7,7 +7,9 @@ The snapshot repair and CPU checks are recorded in the
 [launch report](k6b-ideal-player-launch-report-2026-10-28.md).
 Conservative total2410/3600GPU-s,1190s unused. No retry or live wait.
 Prepared read-only inputs468250a7 remain intact. A separate1100s recovery
-proposal requires acceptance; do not submit without it. Re-read the experiment
+recovery was explicitly approved on2026-10-28; one fresh1100s request is
+authorized. Check the latest experiment entry before submitting; never replay
+an uncertain request. Re-read the experiment
 entry's job ID and canonical status before acting. Prior actual-player scientific
 failure and all its limitations stand. No new renderer/training is authorized.
 

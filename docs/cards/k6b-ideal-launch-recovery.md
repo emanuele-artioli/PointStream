@@ -1,4 +1,4 @@
-# Ideal-player launch recovery — proposed, no new GPU authority
+# Ideal-player launch recovery — APPROVED 2026-10-28
 
 The user-approved ideal-player diagnostic failed before its campaign imported:
 job20261028T071835Z-2964e9ef omitted the fleet launcher from its selected source
@@ -25,4 +25,5 @@ any failure or gate rejection. Stop at the local decision or resource limit.
 Create a fresh absolute deadline only after acceptance. Inspect the failed ID
 canonically and all eligible hosts first. Use one native bounded observation,
 record ID/deadline/budget/paths before waiting, and preserve every artifact.
-No recurring model timer. No request exists for this proposal.
+No recurring model timer. The user explicitly approved this repaired attempt on2026-10-28. One fresh
+request is authorized within the allocation above; no request exists yet.
