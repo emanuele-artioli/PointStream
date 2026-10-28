@@ -23,7 +23,7 @@ new dependency.
 
 ## Where PointStream stands (2026-10-28)
 
-**Single-stream search ACTIVE (user approved, 2026-10-28):** run aligned
+**Single-stream search CLOSED/REPORTED (user approved, 2026-10-28):** run aligned
 decoder-only temporal restoration, a CPU audit of conditional coding/latent
 refinement, and native DCVC stream diagnosis in parallel. See
 [card](docs/cards/single-stream-search.md) and
@@ -34,6 +34,16 @@ unspent balances. Native decoding diagnosis must re-encode in its own job;
 stored DCVC streams are NOT portable even between otherwise qualified GPUs.
 No full training run. No automatic retry after a failed gate. Luna/max delegates
 receive exact frozen launch/report commands; root owns design and review.
+Read the [completed report](docs/single-stream-report-2026-10-28.md).
+Restoration20261028T191318Z-b4727331 COMPLETE: tiny foreground curve gains,
+whole/background losses at all strengths, no robust two-metric whole win.
+CPUaudit20261028T190840Z-eb011d4b COMPLETE: training gradients exist, but no
+native external-latent transport is exposed; refinement0/1200GPU-s.
+Initial diagnosis20261028T190838Z-3dea4d74 rejects unsupported default CUDA
+stream before encoding. Supported completion20261028T192649Z-867e69f2 COMPLETE:
+legacy24-frame native reproduction passes on gpu3, no fix/reliability claim.
+Conservative aggregate1300/3600GPU-s, dedicatedCPU1120/3600s, all processes
+and waits terminal. No further request or training follows these finite results.
 
 
 **Persistent prediction search CLOSED/REPORTED (user approved, 2026-10-28):** investigate
