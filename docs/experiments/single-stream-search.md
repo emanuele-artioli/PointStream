@@ -75,3 +75,16 @@
 - Initial events acknowledged; CPU stall event occurred during environment/
   publication overhead, actual smoke command3.56s; CPU full succeeded. No
   recurring model polling. Restoration remains the independent quality test.
+
+### 2026-10-28 — Supported-path completion receipt
+
+- Job20261028T192649Z-867e69f2 pending at receipt, cap350GPU-s; first diagnosis
+  charged250, aggregate diagnosis cap stays600. Frozen source
+  cc94686fcd8b9f8ae885d0987ebaf0af7999ccee, snapshot
+  e57f2c1f5b53581b324ba5b605dd9a592c1d694d8124d73df76b54e51e1cc6f2,
+  specd4c2a7d5a3591e9a0cb3c00c28345098d021e075cfb761a6fb978fdb58c137d9.
+  Receipt/private/tmp/single-legacy-completion-submission.json; no patches or
+  untracked code. Source and GPU pool refreshed before this completion.
+- Native bounded wait for restoration + supported completion writes
+  /private/tmp/single-batch-final-wait.json, max1800seconds. All previous
+  attention events acknowledged; no timer, no automatic model wakeup claimed.
