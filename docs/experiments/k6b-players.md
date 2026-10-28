@@ -6195,3 +6195,36 @@ publication<550; projected worker219.328376s. Warm ratios remain recorded
 (base1.2886/actual1.8870/ideal_R1.8661/ideal_Fhat1.2532), not admission vetoes.
 Canonical full/dispatch.json confirms --judged0 --timing-secondary and
 unchanged inputs, weights, runtime and1100total/550full limits. No result yet.
+
+
+### 2026-10-28 — Full ideal-player COMPLETE, audited finite NO-GO
+
+Job20261028T080453Z-34e50ec2 COMPLETE, all80Al ticks. User-authorized
+timing-secondary policy passed every retained gate (225.031039s projection
+including publication<550). Full command144.138064s; actual worker140.967117s.
+All80base/actual LPIPS/DISTS controls exact(maxerror0), CUDA/memory valid.
+Best tested ideal_R full LPIPS0.270927032 vs SVT0.234056553 and full
+DISTS0.167818252 vs0.164586054 at same original total22.737962kbps: both
+robust losses +/-0.001. Ideal_Fhat0.273325111/0.169666438 also loses both.
+Predeclared finite NO-GO; not an arbitrary-renderer theorem or codec win.
+CPU audit PASS400image identities/160oracle reconstructions/all80score
+controls/anchor/means/decision;25.178952wall/25.162208CPU-s.40/40native
+source files match exact reconstructed Git archive45d4f23e.
+Full payloadSHAd571699973a7bea8e4c65c2fb82a56c318520129e2cc3385ca6a9988c0c8105d,
+61440bytes, matches native staging. Native run223.461061s/canonical241.753302s,
+charged250s conservatively:2730/3600GPU-s,870s unused. No further request.
+Supervisor2768363/campaign2768368 gone; foreign2655895 untouched. Sharing
+0abfe97ec508523a8a5198c78fd56ca3 and terminal045eccc2e90756fda00144a60a776ca2
+delivered/acknowledged; all waits ended, no recurring model monitor.
+At KPS-only secondary20.660833kbps, LPIPS still loses; DISTS wins. Cannot
+promote primary NO-GO. Stop appearance-only build at this point; background/rate
+bound needed before more renderer compute. Original actual-player failure and
+TOMM evidence gaps unchanged. Read [full report](../k6b-ideal-player-full-report-2026-10-28.md).
+
+Full-result evidence published NEW/read-only:
+/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-ideal-player-full-20261028-34e50ec2/evidence.tar,
+SHAb1ecfb5b5ded26dd11b9a18809b07b13f22b02a4dff4d97c01b21cc12b90a309,
+1536000bytes/26files; all member and archive hashes verified after copy.
+Portable NumPy-only audit also PASS, zero control error and finite NO-GO.
+Policy PR265 merged with Linux CI passing. Audited report continued on
+codex/ideal-player-full-result. No GPU work left;2730/3600s charged,870unused.

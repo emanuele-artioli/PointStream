@@ -1,5 +1,9 @@
 # Ideal-player appearance bound — stopped at resource stability gate
 
+Historical stop. The user subsequently made timing variation secondary, and
+[a new full evaluation](k6b-ideal-player-full-report-2026-10-28.md) completed
+with an independently audited finite NO-GO. The old attempt remains unchanged.
+
 The separately approved ideal-player diagnostic has **no accepted quality
 result**. Repaired request `20261028T073233Z-36f21aa5` completed its three-tick
 smoke, reproduced both historical metric controls exactly, then failed the
