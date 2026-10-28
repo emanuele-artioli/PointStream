@@ -397,10 +397,10 @@ def decode(plan: dict[str, Any]) -> dict[str, Any]:
                 for offset, display_index in enumerate(nal_frames):
                     frame = recon[offset] if isinstance(recon, list) else recon
                     if out_file is not None:
-                        data = _to_yuv420_bytes(frame, sps["height"], sps["width"])
-                        hashes.append(_sha256(data))
+                        frame_bytes = _to_yuv420_bytes(frame, sps["height"], sps["width"])
+                        hashes.append(_sha256(frame_bytes))
                         if repeat == 0:
-                            out_file.write(data)
+                            out_file.write(frame_bytes)
                         continue
                     pixels = np.ascontiguousarray(_to_rgb_uint8(frame, sps["height"], sps["width"]))
                     hashes.append(_sha256(pixels.tobytes()))
