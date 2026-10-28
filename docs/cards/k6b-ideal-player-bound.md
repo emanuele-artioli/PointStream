@@ -1,4 +1,4 @@
-# Ideal-player appearance bound — APPROVED 2026-10-28
+# Ideal-player appearance bound — CLOSED 2026-10-28
 
 This is a NEW diagnostic after the fixed real-base recipe failed, not a retry
 of its registered decision. The [audited report](../k6b-real-base-quality-report-2026-10-27.md)
@@ -110,3 +110,11 @@ preserve every artifact. Use bounded completion-driven observation, acknowledge
 meaningful events, and install no recurring LLM monitor. Record CPU audit cost
 separately. A positive oracle remains optimistic and conditional; it cannot
 establish TOMM readiness or a complete two-baseline codec win.
+
+## Final disposition — 2026-10-28
+
+Both approved request grants are consumed. Repaired job20261028T073233Z-36f21aa5
+failed the predeclared warm-stability gate after exact smoke controls. Full
+never launched; no quality or appearance verdict. Stop; no further retry.
+Cumulative2480/3600GPU-s,1120s unused. See the
+[final report](../k6b-ideal-player-report-2026-10-28.md).

@@ -1,5 +1,8 @@
 # Ideal-player oracle: launch failure, no scientific result
 
+Historical first attempt. The separately approved repaired attempt also stopped,
+at its timing gate; read the [final closure](k6b-ideal-player-report-2026-10-28.md).
+
 The user approved the [finite appearance bound](cards/k6b-ideal-player-bound.md)
 on2026-10-28. Exactly one request was submitted:
 `20261028T071835Z-2964e9ef`. It failed before the campaign and before the smoke.

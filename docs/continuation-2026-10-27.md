@@ -1,17 +1,17 @@
-## 2026-10-28 latest continuation — ideal-player launch stopped
+## 2026-10-28 latest continuation — ideal-player attempt CLOSED
 
-User approved the finite ideal-player bound. Exactly one request
-20261028T071835Z-2964e9ef FAILED before campaign import on gpu3: narrowed
-snapshot omitted experiments.jobs.inbox. No GPU metric or scientific result.
-The snapshot repair and CPU checks are recorded in the
-[launch report](k6b-ideal-player-launch-report-2026-10-28.md).
-Conservative total2410/3600GPU-s,1190s unused. No retry or live wait.
-Prepared read-only inputs468250a7 remain intact. A separate1100s recovery
-recovery was explicitly approved on2026-10-28; one fresh1100s request is
-authorized. Check the latest experiment entry before submitting; never replay
-an uncertain request. Re-read the experiment
-entry's job ID and canonical status before acting. Prior actual-player scientific
-failure and all its limitations stand. No new renderer/training is authorized.
+Read [the final oracle report](k6b-ideal-player-report-2026-10-28.md).
+First request20261028T071835Z-2964e9ef failed before campaign import (60s).
+User approved one repaired request20261028T073233Z-36f21aa5; it reproduced
+smoke controls exactly but FAILED25% warm stability (ratios1.9233/1.9294).
+Full80-tick run never launched; NO accepted quality result or appearance verdict.
+CPU audit passed all400input images/160oracle reconstructions and smoke controls.
+Repaired request charged70s; cumulative2480/3600GPU-s,1120s unused.
+Both one-request grants consumed; NO further GPU authority, retry or live wait.
+All task-owned processes ended, foreign workload untouched, events acknowledged.
+Source inputs468250a7 and all evidence preserved read-only. Prior actual-player
+scientific failure and TOMM evidence gaps remain. Re-read the latest experiments
+entry and canonical status before acting on any ID; never replay an uncertain job.
 
 # PointStream continuation after root-chat archive — 2026-10-27
 
