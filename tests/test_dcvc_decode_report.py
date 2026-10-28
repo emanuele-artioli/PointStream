@@ -4,7 +4,20 @@ import hashlib
 import sys
 from types import SimpleNamespace
 
+import pytest
+
 from src.codecs import dcvc_uf_worker as worker
+
+
+def test_stream_policy_selects_real_default_handle_without_changing_legacy(monkeypatch):
+    received = []
+    monkeypatch.setitem(sys.modules, 'torch', SimpleNamespace(cuda=SimpleNamespace(
+        Stream=lambda *_: 'custom', default_stream=lambda *_: 'default', set_stream=received.append)))
+    worker.set_stream_policy('default')
+    worker.set_stream_policy('legacy')
+    assert received == ['default', 'custom']
+    with pytest.raises(ValueError):
+        worker.set_stream_policy('unknown')
 
 
 def test_yuv_report_preserves_container_identity_after_writing_pixels(tmp_path, monkeypatch):

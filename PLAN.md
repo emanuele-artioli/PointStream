@@ -23,6 +23,19 @@ new dependency.
 
 ## Where PointStream stands (2026-10-28)
 
+**Single-stream search ACTIVE (user approved, 2026-10-28):** run aligned
+decoder-only temporal restoration, a CPU audit of conditional coding/latent
+refinement, and native DCVC stream diagnosis in parallel. See
+[card](docs/cards/single-stream-search.md) and
+[live record](docs/experiments/single-stream-search.md). New independent ceiling
+3600GPU-s/3600CPU-s: restoration1800, diagnosis600, latent refinement1200 only
+after compatibility AND deterministic-decoding gates. No transfer of old
+unspent balances. Native decoding diagnosis must re-encode in its own job;
+stored DCVC streams are NOT portable even between otherwise qualified GPUs.
+No full training run. No automatic retry after a failed gate. Luna/max delegates
+receive exact frozen launch/report commands; root owns design and review.
+
+
 **Persistent prediction search CLOSED/REPORTED (user approved, 2026-10-28):** investigate
 representation, coding and deployment accounting jointly. Read the
 [research direction and bounded test contract](docs/cards/persistent-prediction.md)
