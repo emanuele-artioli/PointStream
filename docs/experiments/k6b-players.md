@@ -6342,3 +6342,62 @@ allocation and saved timing-policy rejection. These test-only additions do not
 change the frozen CPU production snapshot. No further full-suite rerun needed
 until production changes or new failures warrant it. PR267 is MERGED with
 LinuxCI PASS, merge db3671cae36c349d80412e8b9796547ddef67b53.
+
+Provenance clarification: the side-rate pilot's first guessed scratch member
+path included an incorrect outerpublishdirectory. The canonical transport is
+rooted atpackets/. That failed path read does NOT establish removal/absence
+of the old scratch tree. The pilot used the correctly SHA-verified canonical
+archive, so its byte/rate results are unchanged. No old scratch was modified.
+
+
+### 2026-10-28 — Paid clean-background CPU preparation COMPLETE, audited
+
+CPU-only20261028T091736Z-bf9f97d2 COMPLETE on gpu3, no GPU claim or seconds.
+Smoke gate passes all11checks; smoke projection575.360942s<1200. Full command
+225.812976s (internal215.061943s), all240frames encoded, all80saved tick inputs
+replayed. Stage paths confirm /local/users/emanuele/pointstream for scratch,
+temporary directories and Python cache. No system-root scratch or data changes.
+Full result's projected_full_seconds field reuses the smoke x10 formula and is
+NOT a full-run timing estimate/gate; use actual native225.812976s. No scientific
+threshold or resource cap was changed; the completed full run fits its1200s.
+
+Original source YUV hash e7b960cd and all pinned native tool identities pass.
+New complete IVF19659bytes vs original20557 (898saved); base16.382500kbps,
+unchanged optimistic side5.607128889, total21.989628889kbps. Native stream
+SHA9d7a96db9a9a6f2f7a50911bac11865247531ecb2fa29c65fe832b94d0f8d065.
+Fresh native decodes agree. Bootstrap remains444bytes, updated only base hash.
+CPU output outer published SHA
+56f54ccdc9db75ce98796597d2f2de0c849ad8041ab57c2def28dc5a4cd25ae0,
+660490240bytes/3members; inner input.tar
+7de12eb9dd7ba358f703a5d8334660819ad7fd4dad7b12cb5d8d24b1c4b48b2c.
+Canonical /home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/
+20261028T091736Z-bf9f97d2/full/published.tar. Terminal event
+8403f96212a55482b10d38ead579ea65 delivered/acknowledged; CPU wait21654 ended.
+
+Independent NumPy-only preparation audit PASS:240goldenRGB identities,80old
+actual overlay/fallback replays,80originalR source-oracle replays, sourceYUV
+sample hashes, complete240IVF framing, all84prepared-member hashes and total
+rate. Same result reproduced after freezing final auditor source checksum
+37c6f1ce1c05afc71c863c8628dad7052d2e8f7fe5ce4c16c0a3ecd6d3c2eee8.
+Record ../k6b-clean-background-preflight-2026-10-28.json. New rate is covered
+by both old achievable hulls: LPIPS anchor0.24053159818214379,
+DISTS0.16833605570545862. No NEW quality score exists yet.
+
+Both A6000 hosts re-inspected: gpu2free14849MiB per card insufficient8000+8192;
+gpu3free23183MiB sufficient, no PointStream GPU claim. All-history canonical
+status queries timed out after120s on BOTH gpu2 and supported management-host
+overridegpu3. This is a large-history metadata limitation, not evidence of
+fleet/GPU unavailability or an uncertain submission: no GPU request has been
+allocated yet. The task's recorded prior and CPU jobs are canonically terminal,
+inputs independently audited and current GPU claims checked. Native submit
+will additionally enforce fresh worker health and atomic resource admission.
+Do not replay any old request or weaken admission because of the history query.
+
+Approved GPU specification /private/tmp/clean-background-gpu-spec.json:
+A6000poolgpu2/gpu3,8000MiB,4CPUthreads,8GiBlocal, verified prepared outer SHA
+56f54ccd plus original LPIPS/DISTS backbones, packed runtime32e68872.
+Smoke120/full350/validator80/overhead250 within800GPU-s. Same4policies,
+sourceRGB/oldscore controls and strict memory/pixel/slow-warm cost gates;
+timing variation secondary. Exactly ONE new GPU request allowed, not yet
+submitted. Global2730/3600GPU-s,870unused. CPU production files remain
+byte-identical to executed Git e542dfed; only audit/tests/state were added.

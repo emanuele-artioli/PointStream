@@ -1,3 +1,21 @@
+## 2026-10-28 paid clean-background CPU preparation COMPLETE/audited
+
+Job20261028T091736Z-bf9f97d2 COMPLETE on gpu3, ZERO GPU time. All240source/
+stream frames and80saved controls prepared; independent audit PASS240RGB hashes,
+80overlay/Rreplays, rate/member checks. Raw outer prepared payload SHA56f54ccd
+(full digest in experiment entry),660490240bytes. Native new base19659bytes,
+16.3825kbps + unchanged side5.607128889 =21.989628889kbps, within both old
+SVT hulls. No new quality metrics yet. CPU wait21654ended; event acknowledged.
+
+One <=800GPU-s request remains accepted within870unspent of original3600cap;
+none submitted yet. Score code and inputs ready, spec at
+/private/tmp/clean-background-gpu-spec.json. Original2730s spent. A6000gpu3
+fits8000+8192margin, gpu2doesnotatlastprobe. Full-history inventory times out
+on both managers; own canonical jobs and qualified-host claims are checked,
+not uncertain research submissions. Native admission still required. Do NOT
+replay old jobs. Read card and latest experiment entry; preserve no-retry grant.
+Branchcodex/paid-clean-background; PR268 tracks implementation; PR267 merged.
+
 ## 2026-10-28 CPU preparation request published
 
 CPU-only job20261028T091736Z-bf9f97d2 PENDING at receipt, sourcee542dfed,
