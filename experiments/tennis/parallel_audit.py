@@ -91,12 +91,22 @@ def audit_background(tar: tarfile.TarFile, old: dict[str, np.ndarray],
         header_bytes = get(tar, f'publish/packet-q{crf}.json')
         header = json.loads(header_bytes)
         ivf(residual, 240, 960, 544, 25)
+        motion_bytes = b''
+        if summary.get('motion'):
+            motion_bytes = get(tar, 'publish/motion.bin')
+            if header['motion_sha256'] != sha(motion_bytes) or motion_bytes[:8] != b'HOM1' + struct.pack('<I', 240):
+                raise ValueError('Camera packet identity/cohort changed')
+            geometry = np.frombuffer(zlib.decompress(motion_bytes[8:]), '<f4')
+            if (geometry.size != 240 * 9 or not np.isfinite(geometry).all()
+                    or np.any(np.abs(np.linalg.det(geometry.reshape(240, 3, 3))) < 1e-8)
+                    or header['warp'] != {'interpolation': 'linear', 'border_yuv': [16, 128, 128], 'chroma_scale': .5}):
+                raise ValueError('Incomplete/nonfinite delivered camera geometry')
         if (header['reference_sha256'] != sha(reference) or header['residual_sha256'] != sha(residual)
-                or header['transform'] != 'identity' or header['residual_decode'] !=
+                or header['transform'] != ('homography-wire-v1' if summary.get('motion') else 'identity') or header['residual_decode'] !=
                 {'scale': 2, 'offset': -256, 'clip': [0, 255]}):
             raise ValueError('Background decoder contract changed')
         receipt = summary['packets'][i]
-        paid_bytes = len(reference) + len(residual) + len(header_bytes)
+        paid_bytes = len(reference) + len(residual) + len(header_bytes) + len(motion_bytes)
         if paid_bytes != receipt['total_bytes']:
             raise ValueError('Background incomplete byte accounting')
         rate = paid_bytes * 8 / 9.6 / 1000 + summary['side_kbps']
@@ -116,7 +126,7 @@ def audit_background(tar: tarfile.TarFile, old: dict[str, np.ndarray],
         rows.append({'crf': crf, 'bytes': paid_bytes, 'rate_kbps': rate, 'mean': means,
                      'measured_lower_rate_dominance': dominators})
     return {'integrity_passed': True, 'rows': rows, 'historical_control_max_error': 0.,
-            'scope': 'Three static-reference constructions on Al only; no arbitrary-background bound.'}
+            'scope': 'Three paid-reference constructions on Al only; no arbitrary-background bound.'}
 
 
 def audit_pixels(tar: tarfile.TarFile, old: dict[str, np.ndarray]) -> dict[str, Any]:
@@ -213,7 +223,7 @@ def audit_baselines(tar: tarfile.TarFile) -> dict[str, Any]:
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--prior', type=Path, required=True)
-    for name in ('background', 'pixels', 'baselines'):
+    for name in ('background', 'motion', 'pixels', 'baselines'):
         p.add_argument('--' + name, type=Path)
         p.add_argument('--' + name + '-sha')
     p.add_argument('--out', type=Path, required=True)
@@ -224,12 +234,12 @@ def main() -> None:
             old = {m: z['full_' + m].copy() for m in METRICS}
     output: dict[str, Any] = {'audit_code_sha256': sha(Path(__file__).read_bytes()),
                               'prior_sha256': PRIOR_SHA, 'neural_metrics_recomputed': False}
-    for name in ('background', 'pixels', 'baselines'):
+    for name in ('background', 'motion', 'pixels', 'baselines'):
         path = getattr(a, name)
         if path is None:
             continue
         with verified_tar(path, getattr(a, name + '_sha')) as tar:
-            result = (audit_background(tar, old, prior_row['rates']) if name == 'background' else
+            result = (audit_background(tar, old, prior_row['rates']) if name in ('background', 'motion') else
                       audit_pixels(tar, old) if name == 'pixels' else audit_baselines(tar))
             result['publication_sha256'] = getattr(a, name + '_sha')
             result['members_sha256'] = {m.name: sha(get(tar, m.name)) for m in tar if m.isfile()}

@@ -82,3 +82,15 @@ SVT-only request capped1450 plus100unallocated safety stays within the ORIGINAL
 1800 baseline allocation; no task-budget transfer, new total grant, DCVC retry
 or weakening of a failed scientific gate. Smoke240/full900/validation60/
 overhead250; no additional request if this independent smoke fails.
+
+Task1 camera-compensation completion: static-reference control consumed500s.
+CPU inspection over all80frozen ticks finds80valid homographies, median24.15px
+and p95=50.53px camera motion at coded960x544. The original approved camera
+motion hypothesis is untested by the identity control. Freeze ORB2000features,
+ratio.75/RANSAC2px/20inliers/medianerror<=1.5px; invalidfit=identity. Pay compressed
+float32homographies and an explicit linearwarp/border/chroma contract; construct
+encoder residuals using the SAME decoded deliveredgeometry as the receiver.
+Keep reference35/residual45,55,63 and all oldoverlay sidecosts. One motion
+configuration requestcap2000 within remainingTask1allocation;500+2000+200buffer
+=2700. Smoke300/full1300/validation80/overhead320. >=22/24validsmokefits and
+unchanged correctness/memory/cost controls required. No new overallallocation.

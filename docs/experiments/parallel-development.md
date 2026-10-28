@@ -150,3 +150,43 @@ exceedoldAlmax33.685kbps, motivating the stronger comparator. No stronger
 method setting selected from these results. New specification roi-only.json,
 smoke240/full900/validation60/overhead250; CPUchecks before one newindependent
 request. If this smoke fails, stop. Batch source/rules preserve all oldfailure.
+
+### 2026-10-28 — Independent SVT completion published within baseline cap
+
+SVT-only **20261028T150051Z-445e051d**, PENDINGreceipt, code0c1381c4,
+source3d4aa20888aea024376980f5b9076b936f65810e6412347b20150ff856da9fd5,
+normalizedspecdd940868446b332ea36f55add409012f46584762dc17ff25d4633c0a56680ae8.
+Exactlyone newindependent request, cap1450; prior250charge+1450+100buffer=1800.
+BothA6000hosts re-inspected, no PSclaims, sufficientmemory. No DCVCretry.
+Receipt /private/tmp/parallel-roi-submission.json. Originalthree requests all
+terminal; events delivered/acknowledged. Separate same-batch observation for
+this alreadyapproved unfinished comparator must retain original15:29:20Z
+observation bound. All request absolute deadlines remain16:00Z.
+
+Camera-motion version from approvedTask1 is being examined CPU-first, not yet
+submitted. Prototype uses2000ORBfeatures,RANSAC2px,>=20inliers,medianfiterror
+<=1.5px, invalidfits identityfallback; compressed float32 homographies are paid
+and decoded before encoder residual construction and decoder reconstruction.
+Nativeplane warp uses linearinterpolation and explicit16/128/128borders;
+reference/residual/geometry/header/oldside allcharged. No dynamic reference
+selection or training. Sourcecamera characterization over all80frozen ticks is
+the immediate cheap check; nativeproduction smoke would still be needed before
+any newquality result. No new GPU request or allocation yet.
+
+CPU characterization found all80/80fits valid: median24.1474half-resolution
+pixels of camera displacement, p95=50.5314,max55.5433. Thus the static pilot
+does not exercise the approved camera-compensation hypothesis. CPU runtime
+2.397s, no neural quality measured; source-ticks from originalSHA56f54ccd,
+uncoded reference for this characterization only. Production uses the paid
+decodedCRF35reference and serializeddecodedfloat32geometry. Unit checks verify
+identity, luma/chroma translation, borders, packetroundtrip and singular/cohort
+rejection; all21focused/docchecks, Ruff andmypy266files pass.
+
+Complete this originally approvedTask1camera-motion configuration under its
+UNCHANGED2700cap: staticpilot500charged + newmotioncap2000 +200unallocatedbuffer.
+No staticidentityretry, newrenderer, training or transferredbudget. Three CRFs
+45/55/63/reference35 remain unchanged. Motion spec motion.json:
+smoke300/full1300/validation80/overhead320. Require>=22/24validsmokefits,
+substantivepaidgeometry/native/reconstruction/source/neuralcontrols, memory
+and35%costprojection beforefull. If motion smoke fails, stop this configuration.
+No newrequest submitted yet; preserve all completed static/pixel/DCVC evidence.
