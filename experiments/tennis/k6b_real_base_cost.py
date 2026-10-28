@@ -9,14 +9,19 @@ WARM_RATIO = 1.25
 
 
 def separated_projection(command_seconds: float, sequences: dict[str, list[float]],
-                         publication_seconds: float) -> dict[str, Any]:
-    """Extrapolate four cold/warm/warm traces; reject incomplete or unstable data.
+                         publication_seconds: float, *, require_stability: bool = True) -> dict[str, Any]:
+    """Extrapolate four cold/warm/warm traces; reject unstable data by default.
+
+    Explicit secondary-timing policy retains the slower warm sample and budgets,
+    while recording variability without rejecting it.
 
     Native command timing includes imports and uninstrumented setup. Every
     frame trace covers the same production operations as the full worker.
     Publication is separately measured by the campaign, never inferred from
     dispatch minus an internal worker timer.
     """
+    if not isinstance(require_stability, bool):
+        raise ValueError('stability policy must be explicit boolean')
     if len(sequences) != 4:
         raise ValueError('four complete timing sequences required')
     values = [command_seconds, publication_seconds, *(v for trace in sequences.values() for v in trace)]
@@ -28,7 +33,7 @@ def separated_projection(command_seconds: float, sequences: dict[str, list[float
             raise ValueError('each trace requires three positive cold/warm/warm samples')
         warm = max(trace[1:])
         ratio = warm / min(trace[1:])
-        if ratio > WARM_RATIO:
+        if require_stability and ratio > WARM_RATIO:
             raise ValueError('steady timing samples differ by more than 25%: ' + name)
         cold = max(0.0, trace[0] - warm)
         records[name] = {'samples': trace, 'warm_seconds': warm, 'cold_excess_seconds': cold,
@@ -41,7 +46,7 @@ def separated_projection(command_seconds: float, sequences: dict[str, list[float
     total = worker + publication
     if not math.isfinite(total):
         raise ValueError('nonfinite full projection')
-    return {'model': 'separated-v1', 'fixed_seconds': fixed, 'sequences': records,
+    return {'model': 'separated-v1', 'stability_required': require_stability, 'fixed_seconds': fixed, 'sequences': records,
             'safety': SAFETY, 'publication_scale': 160 / 6,
             'projected_worker_seconds': worker, 'projected_publication_seconds': publication,
             'projected_full_seconds': total}

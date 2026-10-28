@@ -40,7 +40,7 @@ def test_original_shape_required():
         check_images(np.zeros((5, 12, 12, 3), dtype=np.uint8), [''] * 5)
 
 
-@pytest.mark.parametrize('mutation', ['none', 'input', 'cost', 'memory', 'coverage'])
+@pytest.mark.parametrize('mutation', ['none', 'input', 'cost', 'memory', 'coverage', 'timing_authorized', 'timing_mismatch'])
 def test_native_validator_rejects_changed_identity_and_resource_contract(tmp_path, monkeypatch, mutation):
     import io
     import json
@@ -57,6 +57,11 @@ def test_native_validator_rejects_changed_identity_and_resource_contract(tmp_pat
     spec = {'full': {'seconds': 550}, 'budget_seconds': 1100,
             'staged_inputs': [{'name': 'images', 'sha256': 'input'}],
             'scale': {'judged': {'smoke': 3, 'full': 0}}}
+    if mutation in ('timing_authorized', 'timing_mismatch'):
+        s['timing_secondary'] = True
+        if mutation == 'timing_authorized':
+            spec['arguments'] = ['--timing-secondary']
+            s['timings']['ideal_R'] = [1., .5, 1.]
     if mutation == 'input':
         s['input_sha256'] = 'changed'
     elif mutation == 'cost':
@@ -79,7 +84,7 @@ def test_native_validator_rejects_changed_identity_and_resource_contract(tmp_pat
     monkeypatch.setenv('PS_STAGE_DIR', str(stage))
     result = tmp_path / 'validation.json'
     monkeypatch.setenv('PS_VALIDATION_PATH', str(result))
-    if mutation == 'none':
+    if mutation in ('none', 'timing_authorized'):
         validate()
         assert json.loads(result.read_text())['passed']
     else:

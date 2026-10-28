@@ -6154,3 +6154,15 @@ SHAeea076e548e24262aebfe8254bc8e489e3277f7cae273ead6606816057e3583f,
 1239040bytes/26files; includes smoke arrays, raw native metadata, CPU/source
 audits and acknowledged events, plus first launch failure archive.
 Final budget2480/3600s;1120unused; no active GPU, wait, retry or timer.
+
+
+### 2026-10-28 — User directs full evaluation; timing secondary
+
+Human explicitly authorizes launch because timing variation was the only
+reason for the previous rejection. New [accepted card](../cards/k6b-ideal-timing-secondary.md)
+supersedes stability veto and no-retry stop for ONE1100s request within1120left.
+All pixel/metric/CUDA/memory gates unchanged. Slower-warm projection plus35%
+safety and publication from saved evidence=223.26982723516414s<550; full hard timeout550.
+Prior job20261028T073233Z-36f21aa5 canonically rechecked FAILED; all eligible
+hosts re-inspected. No new request yet. New spec/private/tmp/ideal-secondary-spec.json,
+deadline2026-10-28T08:43:46.295474+00:00. Scientific target/thresholds unchanged.

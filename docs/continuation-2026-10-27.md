@@ -1,3 +1,12 @@
+## 2026-10-28 latest direction — launch full, timing secondary
+
+User explicitly directed launch because timing variation was the ONLY failed
+gate in20261028T073233Z-36f21aa5. Prior stop below is superseded for ONE new
+1100s request within1120s remaining; all scientific/correctness/memory/budget
+gates retained. Saved slower-warm projection223.270s<550; no variability veto.
+Read the latest experiments entry and [accepted card](cards/k6b-ideal-timing-secondary.md).
+Never replay an uncertain submission. No new request ID yet.
+
 ## 2026-10-28 latest continuation — ideal-player attempt CLOSED
 
 Read [the final oracle report](k6b-ideal-player-report-2026-10-28.md).
