@@ -23,7 +23,7 @@ new dependency.
 
 ## Where PointStream stands (2026-10-28)
 
-**Persistent prediction search ACTIVE (user approved, 2026-10-28):** investigate
+**Persistent prediction search CLOSED/REPORTED (user approved, 2026-10-28):** investigate
 representation, coding and deployment accounting jointly. Read the
 [research direction and bounded test contract](docs/cards/persistent-prediction.md)
 and [live record](docs/experiments/persistent-prediction.md) before dispatching.
@@ -40,6 +40,16 @@ Generic frozen models need cross-content evidence; content-specific updates,
 geometry, selection and residuals remain paid. A ball-only win is insufficient:
 report foreground, background and whole-frame quality beside complete rates.
 Do not rebrand historical granted-matte/render results as delivered codec wins.
+Job20261028T181634Z-05c49090 COMPLETE, one request/no retry, conservative
+600/3600GPU-s and120/3600CPU-s. Read the
+[result report](docs/persistent-prediction-report-2026-10-28.md): both native
+memory/correction families lose foreground/background/whole-frame metrics to
+the restricted SVT grid, even with cached initial reference. No baseline win.
+Static discounts do not rescue old rendered pixels; a cached-reference plus
+free-correction relaxation shows headroom but requires roughly77–79% cheaper
+corrections at fixed quality. Conditional feature coding remains untested;
+general restoration stops at H.264/AV1 input compatibility. No training follows
+automatically. Decoder report hash shadowing fixed, pixel nondeterminism unresolved.
 
 
 **Parallel development batch CLOSED/REPORTED (2026-10-28):** human authorized

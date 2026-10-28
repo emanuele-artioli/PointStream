@@ -1,0 +1,233 @@
+{
+  "input_sha256": "b1b3ff486098fc8158b9cda1e0c323bd904a267860940eb6738ad78d94247e32",
+  "frames": 96,
+  "rows": [
+    {
+      "name": "background-43",
+      "cached_reference_and_free_correction_kbps": 45.420833333333334,
+      "scope": "Combined optimistic fixed-pixel rate relaxation; residual is NOT free in any deployable result.",
+      "metrics": {
+        "whole": {
+          "lpips": {
+            "maximum_rate_for_robust_equality": 77.46321078463683,
+            "allowed_correction_kbps": 32.042377451303494,
+            "actual_correction_kbps": 138.70625
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 101.21170981630522,
+            "allowed_correction_kbps": 55.79087648297188,
+            "actual_correction_kbps": 138.70625
+          }
+        },
+        "foreground": {
+          "lpips": {
+            "maximum_rate_for_robust_equality": 107.99905875645072,
+            "allowed_correction_kbps": 62.57822542311739,
+            "actual_correction_kbps": 138.70625
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 112.33781273242299,
+            "allowed_correction_kbps": 66.91697939908966,
+            "actual_correction_kbps": 138.70625
+          }
+        },
+        "background": {
+          "lpips": {
+            "maximum_rate_for_robust_equality": 76.60804914968456,
+            "allowed_correction_kbps": 31.187215816351227,
+            "actual_correction_kbps": 138.70625
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 99.08531034367935,
+            "allowed_correction_kbps": 53.66447701034602,
+            "actual_correction_kbps": 138.70625
+          }
+        }
+      }
+    },
+    {
+      "name": "background-53",
+      "cached_reference_and_free_correction_kbps": 45.420833333333334,
+      "scope": "Combined optimistic fixed-pixel rate relaxation; residual is NOT free in any deployable result.",
+      "metrics": {
+        "whole": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 53.53673374880735,
+            "allowed_correction_kbps": 8.115900415474016,
+            "actual_correction_kbps": 54.98541666666667
+          }
+        },
+        "foreground": {
+          "lpips": {
+            "maximum_rate_for_robust_equality": 63.787144703992226,
+            "allowed_correction_kbps": 18.36631137065889,
+            "actual_correction_kbps": 54.98541666666667
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 74.91107891566128,
+            "allowed_correction_kbps": 29.490245582327944,
+            "actual_correction_kbps": 54.98541666666667
+          }
+        },
+        "background": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 50.86191233100993,
+            "allowed_correction_kbps": 5.441078997676598,
+            "actual_correction_kbps": 54.98541666666667
+          }
+        }
+      }
+    },
+    {
+      "name": "background-63",
+      "cached_reference_and_free_correction_kbps": 45.420833333333334,
+      "scope": "Combined optimistic fixed-pixel rate relaxation; residual is NOT free in any deployable result.",
+      "metrics": {
+        "whole": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          }
+        },
+        "foreground": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          }
+        },
+        "background": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          }
+        }
+      }
+    },
+    {
+      "name": "objects-43",
+      "cached_reference_and_free_correction_kbps": 48.945833333333326,
+      "scope": "Combined optimistic fixed-pixel rate relaxation; residual is NOT free in any deployable result.",
+      "metrics": {
+        "whole": {
+          "lpips": {
+            "maximum_rate_for_robust_equality": 78.45451499219627,
+            "allowed_correction_kbps": 29.50868165886294,
+            "actual_correction_kbps": 138.17708333333334
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 99.45713547581782,
+            "allowed_correction_kbps": 50.511302142484496,
+            "actual_correction_kbps": 138.17708333333334
+          }
+        },
+        "foreground": {
+          "lpips": {
+            "maximum_rate_for_robust_equality": 107.02332647860553,
+            "allowed_correction_kbps": 58.0774931452722,
+            "actual_correction_kbps": 138.17708333333334
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 111.90394664792021,
+            "allowed_correction_kbps": 62.95811331458688,
+            "actual_correction_kbps": 138.17708333333334
+          }
+        },
+        "background": {
+          "lpips": {
+            "maximum_rate_for_robust_equality": 77.64946029324653,
+            "allowed_correction_kbps": 28.70362695991321,
+            "actual_correction_kbps": 138.17708333333334
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 97.30842966261406,
+            "allowed_correction_kbps": 48.362596329280734,
+            "actual_correction_kbps": 138.17708333333334
+          }
+        }
+      }
+    },
+    {
+      "name": "objects-53",
+      "cached_reference_and_free_correction_kbps": 48.945833333333326,
+      "scope": "Combined optimistic fixed-pixel rate relaxation; residual is NOT free in any deployable result.",
+      "metrics": {
+        "whole": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 54.406146690437616,
+            "allowed_correction_kbps": 5.46031335710429,
+            "actual_correction_kbps": 55.06875
+          }
+        },
+        "foreground": {
+          "lpips": {
+            "maximum_rate_for_robust_equality": 59.78711642431973,
+            "allowed_correction_kbps": 10.841283090986401,
+            "actual_correction_kbps": 55.06875
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 71.48714175750132,
+            "allowed_correction_kbps": 22.541308424167994,
+            "actual_correction_kbps": 55.06875
+          }
+        },
+        "background": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "maximum_rate_for_robust_equality": 52.06278263763522,
+            "allowed_correction_kbps": 3.1169493043018974,
+            "actual_correction_kbps": 55.06875
+          }
+        }
+      }
+    },
+    {
+      "name": "objects-63",
+      "cached_reference_and_free_correction_kbps": 48.945833333333326,
+      "scope": "Combined optimistic fixed-pixel rate relaxation; residual is NOT free in any deployable result.",
+      "metrics": {
+        "whole": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          }
+        },
+        "foreground": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          }
+        },
+        "background": {
+          "lpips": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          },
+          "dists": {
+            "status": "UNRESOLVED/QUALITY-COVERAGE"
+          }
+        }
+      }
+    }
+  ],
+  "scope": "CPU-only sensitivity. Same measured output pixels; combine cached initial reference with zero residual payload to isolate remaining opportunity. No deployed win or tested reference lifetime."
+}
