@@ -116,3 +116,37 @@ submission remains. Canonical prior/status checks completed before batch wait.
 One bounded attended batch observation begins with all IDs, max2700seconds;
 handle/receipts under /private/tmp/parallel-batch-*. No verified automatic model
 completion wakeup in this harness; no recurring timer or paid API substitute.
+
+### 2026-10-28 — Two full runs complete; native DCVC correctness stop
+
+Backgroundc50f6395 COMPLETE, all80Al ticks/controlmaxerror0, full331.216329s.
+Paid total rates216.607129/125.634629/52.920462kbps, LPIPS
+0.143709/0.173960/0.224457 and DISTS0.081906/0.094040/0.110906.
+OldSVT33.685kbpsLPIPS0.139336 is better by>0.001 at lower rate for ALLthree;
+no joint win possible for these fixed settings. Do not extrapolate the oldhull.
+Native admitted436.652432s, throughcanonicalclosure483.641327s; charge500.
+Rawfull491520bytes SHA7b8766283f8fd3788850792e9e1795c1f0725f7bffe88a69b9a4e0227cd54916.
+
+Pixelsa3ae0af0 COMPLETE, bothwindows/all80ticks each, full695.731800s;
+native metadata/export and independentaudit pending. Rawfull63528960bytes
+SHAd462366799275314839b16d19b4d373ed7ceb259ace9ad9a7a20bb97946facee.
+No decoder masks/oldrenderer sidecosts; all actual tile/header/base bytes paid.
+
+Baselinesae2c81a7 FAILED in correctness smoke, NOT timing/cost: first native
+AlQP0/scale4 passes; QP21/scale2 has two decodes disagreeing24/24frames and
+firstframe disagrees with encoder. Streamcontainer hashes/counts match,
+peak740.2MiB; no fullmetrics or ROI comparator ran. Preserve nativefailurereports
+and partial064e46352bb386e4581a9fc25aaa160bb62aea68557a070f1d681d1b41dc3e9c.
+Native admitted134.690518s, throughcanonicalclosure206.330955s; charge250.
+This DCVC configuration is closed, no retry. All terminal/shared events in
+nativewaits1/2delivered/acknowledged; finalpixel completion event pendingack.
+
+The independent SVT comparison remains authorized and unexecuted. Root will
+finish it under the SAME original1800 baselineallocation:250charged plus a
+newSVT-only cap1450 plus100unallocatedsafety. This is not a DCVC retry or
+budgetincrease. Original ROI settings unchanged; add nativefullSVTCRF63/preset4
+as missing upper-ratecoverage, frozen before its outcome. All newmethodpoints
+exceedoldAlmax33.685kbps, motivating the stronger comparator. No stronger
+method setting selected from these results. New specification roi-only.json,
+smoke240/full900/validation60/overhead250; CPUchecks before one newindependent
+request. If this smoke fails, stop. Batch source/rules preserve all oldfailure.

@@ -33,6 +33,14 @@ POINTS = [('dcvc', 0, 4), ('dcvc', 21, 2), ('dcvc', 42, 1),
           ('svt_roi', 43, 4), ('svt_roi', 53, 4), ('svt_roi', 63, 4)]
 
 
+def configured_points(roi_only: bool) -> list[tuple[str, int, int]]:
+    # Independent unfinished comparator, never a retry of failed DCVC pixels.
+    # The paid native-resolution encode adds coverage above the old33.685kbps
+    # ceiling; its setting is frozen before seeing its new quality outcomes.
+    return ([p for p in POINTS if p[0] == 'svt_roi'] + [('svt_plain', 63, 1)]
+            if roi_only else POINTS)
+
+
 def union_regions(regions: np.ndarray, metadata: dict[str, Any]) -> np.ndarray:
     if (regions.shape != (240, 2, 540, 960) or regions.dtype != bool
             or metadata['output_shape'] != [1080, 1920] or metadata['native_grid_factor'] != 1):
@@ -159,6 +167,7 @@ def run(a: argparse.Namespace) -> None:
     source_hashes: dict[str, list[str]] = {}
     peaks = []
     all_mask = np.ones((1080, 1920), bool)
+    points = configured_points(a.roi_only)
     for name, start, fps, source_hash, yuv_hash in SOURCES:
         if inputs_checked[name] != source_hash:
             raise ValueError('Source video changed: ' + name)
@@ -179,7 +188,7 @@ def run(a: argparse.Namespace) -> None:
             output.write(native_source[:n].tobytes())
         del native_source
         recons = []
-        for codec, qp, scale in POINTS:
+        for codec, qp, scale in points:
             point = work / f'{codec}-{qp}-{scale}'
             point.mkdir()
             width, height = {1: (1920, 1080), 2: (960, 544), 4: (480, 272)}[scale]
@@ -190,17 +199,20 @@ def run(a: argparse.Namespace) -> None:
                 peaks.append(native['peak_allocated_mib'])
             else:
                 roi = point / 'roi.txt'
-                roi.write_text(roi_text(regions[:n], width, height))
+                if codec == 'svt_roi':
+                    roi.write_text(roi_text(regions[:n], width, height))
                 cpus = sorted(os.sched_getaffinity(0))[:4]
                 rec = svtav1.code(raw, point, width=width, height=height, fps=Fraction(fps), frames=n,
                                   crf=qp, preset=4, threads=4, full_range=False, encoder='SvtAv1EncApp',
-                                  decoder='dav1d', timeout=500, cpus=cpus, extra=['--roi-map-file', str(roi)])
+                                  decoder='dav1d', timeout=500, cpus=cpus,
+                                  extra=['--roi-map-file', str(roi)] if codec == 'svt_roi' else [])
                 again = point / 'fresh.yuv'
                 subprocess.run(svtav1.decode_command('dav1d', Path(rec['stream']), again, threads=4), check=True, capture_output=True, timeout=60)
                 if digest(again) != digest(Path(rec['decoded'])) or len(svtav1.ivf_frames(Path(rec['stream']).read_bytes())) != n:
                     raise ValueError('Independent native SVT decode/count failed')
                 native = {'stream': Path(rec['stream']), 'decoded': Path(rec['decoded']), 'reports': rec,
-                          'roi_sha256': digest(roi), 'roi_grant': 'encoder-only frozen source R; no decoder mask'}
+                          'roi_sha256': digest(roi) if codec == 'svt_roi' else None,
+                          'roi_grant': 'encoder-only frozen source R; no decoder mask' if codec == 'svt_roi' else None}
             elapsed = time.monotonic() - started
             # Checkpoint setup is paid once per invocation in both stages; do
             # not expand that fixed cost tenfold with the frame count.
@@ -269,7 +281,8 @@ def run(a: argparse.Namespace) -> None:
     torch.cuda.synchronize()
     peaks.append(torch.cuda.max_memory_allocated() / 2**20)
     seconds = time.monotonic() - began
-    summary = {'frames': n, 'ticks': ticks, 'rows': rows, 'inputs': inputs_checked, 'tools': tools,
+    summary = {'roi_only': a.roi_only, 'points': points,
+               'frames': n, 'ticks': ticks, 'rows': rows, 'inputs': inputs_checked, 'tools': tools,
                'source_rgb_sha256': source_hashes, 'control_errors': control_errors,
                'cuda': True, 'gpu': torch.cuda.get_device_name(0), 'torch': torch.__version__,
                'peak_allocated_mib': max(peaks), 'native_seconds': native_seconds, 'scoring_seconds': scoring_seconds,
@@ -284,10 +297,12 @@ def validate() -> None:
     summary = json.loads((stage / 'baseline-summary.json').read_text())
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
+    roi_only = '--roi-only' in spec['arguments']
+    expected_points = configured_points(roi_only)
     projection = cost_projection(summary['setup_seconds'], summary['native_seconds'], summary['scoring_seconds'], staging['publication_seconds'])
     checks = {'cohort': summary['frames'] == 24 and summary['ticks'] == [0, 3, 6],
-              'rows': len(summary['rows']) == 12 and {r['window'] for r in summary['rows']} == {'al', 'med'},
-              'point_grid': all([(r['codec'], r['qp'], r['scale']) for r in summary['rows'] if r['window'] == w] == POINTS for w in WINDOWS),
+              'rows': len(summary['rows']) == 2 * len(expected_points) and {r['window'] for r in summary['rows']} == {'al', 'med'},
+              'point_grid': summary['roi_only'] == roi_only and all([(r['codec'], r['qp'], r['scale']) for r in summary['rows'] if r['window'] == w] == expected_points for w in WINDOWS),
               'scores': all(set(r['scores']) == set(WEIGHTS) and all(len(v) == 3 and np.isfinite(v).all() for v in r['scores'].values()) for r in summary['rows']),
               'controls': all(len(v) == 3 and max(v) <= 1e-4 for v in summary['control_errors'].values()),
               'memory': 0 < summary['peak_allocated_mib'] < 5000,
@@ -307,6 +322,7 @@ def validate() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--validate', action='store_true')
+    parser.add_argument('--roi-only', action='store_true', help='Complete independent SVT comparators; never invokes DCVC')
     for key in ('al', 'med', 'prepared', 'transport', 'image_ckpt', 'video_ckpt', 'lpips', 'dists'):
         parser.add_argument('--' + key.replace('_', '-'), type=Path)
     parser.add_argument('--frames', type=int, choices=(24, 240), default=24)
