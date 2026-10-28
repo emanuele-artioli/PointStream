@@ -123,4 +123,6 @@ remain closed. No retry follows this decision. No timer or model heartbeat.
 
 Code checks: focused wire/document tests, configured Ruff/mypy pass. Full macOS
 suite retains two unchanged platform failures; ps test passes outside sandbox.
-Linux CI is the merge gate. [PR272](https://github.com/emanuele-artioli/PointStream/pull/272).
+Linux CI is the merge gate. [Plan/implementation PR272](https://github.com/emanuele-artioli/PointStream/pull/272)
+merged with CI passing; [results PR273](https://github.com/emanuele-artioli/PointStream/pull/273)
+contains this report and the decoder hash fix. Its live checks record final validation.

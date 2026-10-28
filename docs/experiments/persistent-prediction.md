@@ -106,3 +106,8 @@
 - Implementation [PR272](https://github.com/emanuele-artioli/PointStream/pull/272)
   merged c4a27569a978d4e9e92bf3ec2d7965afd3ede7b6 with Linux CI successful.
   Completed results and the metadata-only DCVC fix are published separately.
+- Results [PR273](https://github.com/emanuele-artioli/PointStream/pull/273),
+  merge-commit auto-merge after Linux CI. Final local configured ruff/mypy pass
+  (273sourcefiles), eight focused transport/report/document checks pass. Final
+  gpu2/gpu3 inspection confirms no PointStream GPU claims. All processes/waits
+  terminal. Remaining3000GPU-s is unspent, not a prescribed retry.
