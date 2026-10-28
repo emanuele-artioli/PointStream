@@ -1,4 +1,37 @@
-## LATEST — NEW parallel development batch RUNNING (2026-10-28)
+## LATEST — parallel development batch CLOSED, all requests terminal (2026-10-28)
+
+Read [consolidated report](parallel-development-report-2026-10-28.md) and
+[live record](experiments/parallel-development.md). Charged2400/7200GPU-s,
+4800unused; CPUanalysis120/3600s conservative. Prior2980/3600study remains
+separate and CLOSED. No task-owned process, GPUclaim or recurringtimer remains.
+Five requests, each submitted once, all terminal:
+static20261028T143341Z-c50f6395 COMPLETE; pixels20261028T143713Z-a3ae0af0
+COMPLETEbothwindows; DCVC20261028T143856Z-ae2c81a7 FAILEDnativecorrectness;
+SVT20261028T150051Z-445e051d FAILEDcostgate/no full; motion
+20261028T152201Z-244ab9ae COMPLETE. Never replay these IDs or expiredspecs.
+On any futurejobaction, re-read its ID in batchrecord and canonicalps-fleetstatus.
+
+No validated baseline win: motion improves static but LPIPS BD-rate+230.28%
+on measured qualityoverlap; higherqualitypoint and pixelcurves lack stronger
+anchorcoverage. DISTSnoqualityoverlap is not a claimed equal-ratewin. DCVC's
+two decodedpasses differ24/24frames andfromencoderI; no metrics accepted.
+SVTsmoke correctness passes but1195sfullprojection>900allowance; nofullrun.
+Fullacceptedraw/bytes/controls/geometry auditpasses. No newrenderer training,
+generation, untouchedmanifest or completewire claim. Nextdecision: stronger
+reproducible baselines, potentially CPUencoding/GPUjudging placement; unexecuted.
+
+PR270implementation mergedCIpassing,adeab13c. Source140b56ea/0c1381c4/31421e6e,
+exact reconstructedarchives211b4e69/3d4aa208/1d46ff03. All10ownPIDsabsent,
+eventsacknowledged, foreignprocesses preserved. User's latestsubagentpolicy:
+Luna6/max, precise simple launch/report tasks; rootownsdesign/review/science.
+Read-onlyevidence preserved at .../tennis/parallel-development-20261028-244ab9ae/
+evidence.tar SHA71900d0d,100720640bytes/105members, allmemberhashs verified;
+5nativepublications also0444. Portableauditor replay byte-identical. Source
+and result details in consolidatedreport. Final resultPR/CI publication follows
+in currentbranchcodex/parallel-feasibility-batch; no scientificwork pending.
+All earlier RUNNING/PENDING headers below are superseded history.
+
+## PRIOR — NEW parallel development batch started (2026-10-28)
 
 Human approved a NEW7200GPU-s allocation: background2700,pixelcorrections2700,
 DCVC/SVTROIbaselines1800, plus3600CPU-s. Old2980/3600study remains CLOSED,

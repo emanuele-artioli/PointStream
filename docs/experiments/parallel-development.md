@@ -190,3 +190,78 @@ smoke300/full1300/validation80/overhead320. Require>=22/24validsmokefits,
 substantivepaidgeometry/native/reconstruction/source/neuralcontrols, memory
 and35%costprojection beforefull. If motion smoke fails, stop this configuration.
 No newrequest submitted yet; preserve all completed static/pixel/DCVC evidence.
+
+### 2026-10-28 — Motion published; SVT full blocked by projected cost
+
+Motion **20261028T152201Z-244ab9ae**, PENDINGreceipt. Executedsource31421e6e,
+archive1d46ff03cd2cfa325bc13dbe7be4f08a1eabc1aef5bb25389837cb4c47c139de,
+normalizedspec40d25b21fc644e13e2137931e12cd4c2ad2e0196a86a82e33fe5f8b8734b34ac.
+Receipt /private/tmp/parallel-motion-submission.json. One new camera-motion
+configuration under originalTask1cap, not an identityretry. No oldjob replay.
+
+SVT-only445e051d FAILED COST GATE: smokecommand112.474733s succeeds, every
+correctness/weights/source/neuralcontrol/nativebyte/memory check passes, but
+projectedfull1195.292118s exceeds its900s full allowance. No full run launched;
+smoke scores are not accepted quality evidence. This is an absolute budget
+projection, not a timing-variation gate. No further SVT request under this
+configuration. A future CPU-encoding/GPU-scoring split could avoid GPU idle
+time, but is not executed or claimed. Preserve native smoke outputs/metadata.
+
+Original three-job observation ended allterminal; its events acknowledged.
+Independent SVT also terminal. Motion is a new bounded stage observation
+(<=2000s and absolute16:00Z), within the per-stage45minute recovery rule; no
+indefinite/recurring timer and no extension of any runningrequestdeadline.
+Current source branch31421e6e; all old archivedsource identities remain immutable.
+
+### 2026-10-28 — All terminal, independently audited, batch closed
+
+Motion244ab9ae COMPLETE before the later usage interruption. Humanresume only
+inspected sameID, no replay. All240camera fits pass, geometry7581paidbytes,
+all80Al scores; old source/neural controls exact0. Full310.295421s,
+projection533.132041<1300; allocated3082.722168/reserved3740MiB<5000.
+Paid rates206.052129/108.182962/46.733796kbps; LPIPS
+0.135084/0.158170/0.179777, DISTS0.078526/0.090225/0.100966.
+Fullraw440320bytes SHA337421ee4597ed028d47336e3fb30648c05607581662a609d29b4ce75787e68e.
+Nativeadmitted454.451627s,throughcanonicalclosure490.483598s,charge500.
+All motion points outside originalAlratecoverage. Higherpointnotacceptedwin;
+two cheaperpointsLPIPSdominatedby33.685kbpsSVT. Post-hoc protocolPCHIP on
+overlappingquality givesLPIPS BD-rate+230.284898%, robust+224.34to+236.28under
+candidate-distance+/-0.001; DISTSnoqualityoverlap. Pointwisegate remains
+unresolvedoutsidecoverage; post-hoccurves do not upgrade it or establishDCVCwin.
+
+Pixel full nativeadmitted899.894516s,throughclosure935.706388s,charge950.
+Bothwindowsfull80, native/source/historicalscorecontrolswithin1e-4.
+Al236.074to1183.439kbps; Med357.325to1852.233kbps. Noqualityoverlap with old
+Alanchor; noBD-rate or equal-ratewin inferred. ROIstopthroughclosure185.398313s,
+charge200, rawsmoke276480bytes SHA36de384e6cfc543ef5dc37b2a3cf843c58007121c4b0a1a13f4afce58e0b2919.
+All partialsmokemetrics remain unacceptedfullquality. DCVC no retries.
+
+Independent CPUaudit ../parallel-development-audit-2026-10-28.json PASS for all
+three acceptedfullpublications: fullmeans/rawarrays/controlcohort, camera and
+rectangle geometry, nativeframing, completepaidbytes and savedpixelsupport.
+No neuralmetricrecomputation claimed. ../parallel-development-curves-2026-10-28.json
+contains post-hocnegative/overlap-qualifiedBDresults and sensitivities; report
+../parallel-development-report-2026-10-28.md explains limitations and exact jobs.
+
+Budget CLOSED: background1000/2700, pixels950/2700, baselines450/1800;
+newtotal2400/7200GPU-s,4800unused. DedicatedCPUanalysis conservatively120/3600s.
+Prior2980/3600study untouched. No furtherrequest, budgettransfer or modeltimer.
+All10own supervisor/campaign PIDs absent on their exacthosts; noPSGPUclaims
+on either qualifiedhost. Every completion/decision/contention event delivered
+and acknowledged. Existingworkers/foreignprocesses untouched. Sourcearchives
+byte-reconstructed fromGit match211b4e69/3d4aa208/1d46ff03 exactly; temporary
+transfer tars are normally removed after successful extraction, not lostevidence.
+PR270mergedCIpassing,adeab13cb713995c7f7c4d05f55138618c4c0b6a.
+Result/evidence publication follows; no new quality result or compute pending.
+
+Preservation COMPLETE: newexclusive
+/home/itec/emanuele/Datasets/pointstream-data/tennis/parallel-development-20261028-244ab9ae/evidence.tar,
+SHA71900d0da6b7076b1ba4978da3663a1f5ec8a3f710f503cfa26fa2b524e20d5e,
+100720640bytes/105members. Wholearchive and everymember identity verified at
+destination; archive and all5canonicalpublished/partialpayloads protected0444.
+The first upload wrote completebytes, but verification used an unavailable
+Python3.10hashlib.file_digest API. A CPU-only compatible verification read the
+SAMEfile in place; no retransmission/overwrite/newdirectory/newcompute.
+All oldDatasets/Models/sourceinputs preserved. Byte-identical replay of archived
+portableauditor PASS against all three acceptedpublications. Ruff/fullmypy268
+files and22focused/docchecks PASS. FinalresultPR/CI publication pending.
