@@ -6041,3 +6041,18 @@ Lint/mypy pass, nine focused oracle tests pass including resource/identity
 mutation rejection. Full local suite962pass/25skip with two external failures:
 sandbox denies ps in contention test; known macOS nonexistent protected-symlink
 hook assertion. Linux CI is required before final closure.
+
+Single authorized submit started2026-10-28T07:18UTC from source
+2e84c530512616b109b13a47327e53c42b63f0e3. Reviewed34-file snapshot selection;
+script/command must not be replayed on disconnect. Local submission receipt:
+/private/tmp/ideal-submission.json; execution handle78430. Saved specification
+/private/tmp/ideal-player-spec.json, deadline2026-10-28T07:57:41.004164+00:00,
+smoke200/full550/validator100/total1100. Input468250a7, runtime32e68872,
+LPIPS7be5be79, DISTS397923af, A6000 poolgpu2/gpu3,8000MiB+8192margin.
+No GPU job ID received yet; inspect the existing submission if uncertain.
+PR262 contains implementation; auto-merge requested. Attended native wait will
+be used; no verified model-resuming background callback or recurring monitor.
+
+Native publish returned job **20261028T071835Z-2964e9ef**; submission succeeded,
+no recovery or replay. Inspect this ID then wait on the same request.
+Results: /home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261028T071835Z-2964e9ef/.
