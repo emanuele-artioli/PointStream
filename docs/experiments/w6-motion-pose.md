@@ -133,3 +133,11 @@ judges ([j.md](j.md)).
   3,072 MiB margin. `20261029T224503Z-6d849ba1` (client timed out; only a
   `source` dir) is unpublished and abandoned.
 - Jobs (resubmitted): see below.
+- Jobs (A6000, gpu3, shared; as of 2026-10-29 23:55 UTC): player `...0001`:
+  `20261029T232858Z-1e077edd` (published, pending; 13,500 MiB + 3,072 margin, commit
+  `ddff2f89`/`5585edff` code). Player `...0006`: `20261029T224503Z-6d849ba1` was
+  published late with the old 16,000 + 8,192 MiB declaration and stayed pending; cancelled
+  by me (never started), to be resubmitted with the new declaration. Unpublished and
+  abandoned source-only entries: `20261029T225219Z-bf7f10e2`, `20261029T225231Z-909e690c`,
+  `20261029T233317Z-a9932064`, `20261029T234020Z-fc00eba0`, `20261029T234654Z-4f27910e`,
+  `20261029T234831Z-962535a8` (not replayed). Cancelled earlier: `20261029T195226Z-26f4c52d`.
