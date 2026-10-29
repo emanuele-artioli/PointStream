@@ -59,6 +59,17 @@ def encode(scale: int, controls: bool, threads: int, full_seconds: int) -> dict[
     return spec
 
 
+def roicheck() -> dict[str, Any]:
+    spec = base('experiments.tennis.w1_roicheck', ['--al', '{staged:al}', '--transport', '{staged:transport}', '--frames', '{frames}'],
+                ['al', 'transport'])
+    spec.update({'device': 'cpu', 'hosts': CPU_HOSTS, 'gpu_models': [], 'gpu_memory_mib': 0, 'cpu_threads': 16,
+                 'local_storage_gib': 30, 'scale': {'frames': {'smoke': 24, 'full': 240}},
+                 'smoke': {'seconds': 560, 'representative_basis': 'Same conversion, ROI maps, overlays, eight encodes at half and at quarter resolution, decode and region PSNR as the full stage, on 24 frames.'},
+                 'full': {'seconds': 2000}, 'validator_seconds': 120, 'budget_seconds': 3200, 'stall_seconds': 900.0,
+                 'contention': {'policy': 'stop', 'resume_attempts': 0}})
+    return spec
+
+
 def score(half: tuple[str, str], other: tuple[str, str], masks_archive: tuple[str, str]) -> dict[str, Any]:
     extra = {'encode_half': half, 'encode_full': other, 'masks': masks_archive}
     arguments = ['--al', '{staged:al}', '--masks', '{staged:masks}', '--hybrid', '{staged:hybrid}', '--lpips', '{staged:lpips}',
@@ -78,7 +89,7 @@ def main() -> None:
     out = Path(sys.argv[1])
     out.mkdir(parents=True, exist_ok=True)
     specs = {'masks': masks(), 'encode-half': encode(2, True, 16, 2600), 'encode-full': encode(1, False, 24, 2600),
-             'encode-quarter': encode(4, False, 12, 2600)}
+             'encode-quarter': encode(4, False, 12, 2600), 'roicheck': roicheck()}
     for name, spec in specs.items():
         (out / f'{name}.json').write_text(json.dumps(spec, indent=1) + '\n')
 

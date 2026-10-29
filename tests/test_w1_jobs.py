@@ -79,3 +79,20 @@ def test_assemble_applies_the_rule_to_scored_points():
     assert result['at_target']['s2_o0']['whole_lpips'] == pytest.approx(0.23)
     assert result['at_target']['s1_o0'] is None
     assert result['decision']['outcome'] == 'A'
+
+
+def test_roicheck_text_helpers_round_trip_and_psnr():
+    from experiments.tennis import w1_roicheck as rc
+
+    region = np.zeros((2, 128, 128), bool)
+    region[0, 70, 70] = True
+    inside = w.roi_text(region, 128, 128, -40)
+    outside = rc.outside_text(region, 128, 128, 20)
+    g_in, g_out = rc.parse_text(inside, 2, 2), rc.parse_text(outside, 2, 2)
+    assert (g_in[0] != 0).tolist() == [[False, False], [False, True]]
+    assert (g_out[0] != 0).tolist() == [[True, True], [True, False]]
+    assert (g_in[1] == 0).all() and (g_out[1] == 20).all()
+    with pytest.raises(ValueError):
+        rc.parse_text('1 0 0 0 0', 2, 2)
+    assert rc.psnr(0.0, 10) == 99.0 and rc.psnr(1.0, 0) is None
+    assert rc.psnr(255.0 ** 2, 1) == pytest.approx(0.0)

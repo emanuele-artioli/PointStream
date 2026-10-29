@@ -80,21 +80,27 @@ def roi_text(regions: np.ndarray, width: int, height: int, inside: int) -> str:
     """SVT-AV1 `--roi-map-file`: per frame, one QP offset per 64x64 block, `inside` for every
     block touched by the frozen source R and 0 elsewhere (a negative `inside` spends more
     bits there). Same blocks as parallel_baselines.roi_text; the sign convention differs."""
-    import cv2
-
     if regions.ndim != 3 or regions.dtype != bool or width % 2 or height % 2:
         raise ValueError('Boolean native regions and even coded geometry required')
     if not -63 <= inside <= 63:
         raise ValueError('ROI offset outside the encoder range')
-    rows, cols = (height + 63) // 64, (width + 63) // 64
     lines = []
     for t, region in enumerate(regions):
-        resized = cv2.resize(region.astype(np.uint8), (width, height), interpolation=cv2.INTER_NEAREST).astype(bool)
-        padded = np.zeros((rows * 64, cols * 64), bool)
-        padded[:height, :width] = resized
-        touched = padded.reshape(rows, 64, cols, 64).any(axis=(1, 3))
+        touched = touched_blocks(region, width, height)
         lines.append(str(t) + ' ' + ' '.join(str(inside) if x else '0' for x in touched.ravel()))
     return '\n'.join(lines) + '\n'
+
+
+def touched_blocks(region: np.ndarray, width: int, height: int) -> np.ndarray:
+    """(rows, cols) bool: 64x64 blocks of the coded frame that any pixel of `region` touches
+    (nearest-neighbour resize to the coded size, raster order, row 0 at the top)."""
+    import cv2
+
+    rows, cols = (height + 63) // 64, (width + 63) // 64
+    resized = cv2.resize(region.astype(np.uint8), (width, height), interpolation=cv2.INTER_NEAREST).astype(bool)
+    padded = np.zeros((rows * 64, cols * 64), bool)
+    padded[:height, :width] = resized
+    return padded.reshape(rows, 64, cols, 64).any(axis=(1, 3))
 
 
 # ---------------------------------------------------------------- the rate-only CRF search
