@@ -147,3 +147,9 @@ the decisions are in [experiments.md](../experiments.md). Context:
   but the job published late (pending). Full pytest on the Mac (miniconda env): 12 failures in
   court/segmentation/hook tests that do not touch W3 (cv2 and environment differences, plus the
   known `test_patches_into_models_or_datasets_are_blocked`); all W3 tests pass.
+- State (2026-10-29, after a 44 min `ps-fleet wait`): `20261029T123801Z-4da73ccd` is still `pending`,
+  never started. gpu6 (the only host in the spec) has both RTX 6000 Ada GPUs busy with other users
+  (36-42 GiB used, 99-100 % utilization) and `workers status` shows no fresh heartbeat for gpu6
+  (nor gpu5, where both Ada GPUs are idle). The exclusive job waits for an idle GPU; deadline
+  2026-10-30T12:00Z. No GPU time spent. Not cancelled, not resubmitted; the options (restart
+  workers, widen `hosts` in a new submission, wait) are root's.
