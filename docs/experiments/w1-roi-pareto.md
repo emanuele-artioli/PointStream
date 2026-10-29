@@ -263,3 +263,70 @@ the decisions are in [experiments.md](../experiments.md). Context:
   and −40 whole scores 0.2797/0.2791 and offset 0 at 0.2680); half resolution
   and DISTS are outside the policies' whole-score range (not extrapolated).
   Against the hybrid's foreground LPIPS 0.346.
+
+### 2026-10-29 — W1 validity check of the ROI map (CPU, before any re-scoring)
+- Why. At matched CRF the offsets raised the rate about 17% and left the
+  foreground unchanged, so the ROI baseline might be broken rather than weak.
+  CPU job `20261029T124159Z-64b465a7` (gpu2, revision `0e7ba923`, SVT-AV1 4.2.0,
+  all 240 frames, no GPU, 35 s): one CRF per resolution (half 67, quarter 62),
+  luma PSNR of the decoded stream against the coded source, inside and outside
+  R (R resized to the coded size) and inside and outside the 64×64 blocks
+  that R touches. R covers 0.56% of the half-resolution pixels, its blocks 5%.
+- Map geometry is right. The map read back from the file we wrote equals the
+  touched-block grid on every frame (half: 9 rows × 15 columns; quarter: 5 × 8,
+  raster order, row 0 on top, frame index 0 = window frame 0, the same
+  converted source frames as the judge, whose sha256 is checked). The encoder
+  applies it in that geometry: the opposite convention (below) lowers PSNR
+  in the background blocks and not in the player blocks, which would not
+  happen with transposed or shifted blocks. (Overlay PNGs for ticks 0, 120,
+  237 at half and quarter and on the full frame are in the job's
+  published.tar; the reading hook here could not open images, so the check
+  above is numerical.)
+- Result, half resolution, CRF 67 (luma PSNR dB; bytes):
+
+| map | bytes | in R | out of R | in R blocks | out of R blocks |
+|---|---|---|---|---|---|
+| none | 24,668 | 18.03 | 34.65 | 26.60 | 34.79 |
+| −10 inside | 28,933 | 18.00 | 34.64 | 26.61 | 34.77 |
+| −20 inside | 29,028 | 17.94 | 34.64 | 26.57 | 34.75 |
+| −40 inside | 28,920 | 17.81 | 34.63 | 26.45 | 34.76 |
+| −63 inside | 28,687 | 17.62 | 34.63 | 26.28 | 34.76 |
+| +20 outside | 26,685 | 17.95 | 33.81 | 26.47 | 33.90 |
+| +40 outside | 25,076 | 17.97 | 32.87 | 26.42 | 32.91 |
+| −40 inside, aq-mode 0 | 19,100 | 16.86 | 29.38 | 24.93 | 29.38 |
+
+  Quarter resolution, CRF 62, shows the same pattern (none 24,730 bytes,
+  in-R 18.76 dB; −40 inside 29,179 bytes, 18.67 dB; +40 outside 26,740
+  bytes, background 35.56 dB against 36.71).
+- Finding 1, the bug: **negative (inside) offsets are inert in SVT-AV1 4.2.0
+  CRF mode with the default aq-mode 2.** They add 4–5 kB per stream
+  (map signalling) and change no PSNR anywhere, from −10 to −63. Positive
+  offsets outside R do act: the background loses 0.8 dB (+20) and 1.9 dB
+  (+40) and the bytes fall with the offset. Our frozen policy is a
+  *relative* QP offset between R and the rest ("0, −20, −40 inside R relative
+  to the rest"), and +20/+40 outside R with 0 inside is the same relative
+  offset in the convention the encoder honours (and the one the older
+  comparator used). The −10…−63 inside realisation was an implementation
+  error of the sign convention, not a different policy.
+- Finding 2, a limit to keep in view: at CRF 62–67 the background at
+  CRF + 20 or + 40 meets the encoder's QP ceiling (70), so the relative offset
+  is partly clamped. The corrected search therefore places the base CRF lower
+  (the CRF in the table is the player-block CRF); the rate-only search finds
+  where 22.74 kbps lies.
+- Finding 3, separate: the plain SVT-AV1 half-resolution envelope at CRF 64–70
+  is much stronger than the CRF 63 anchors used in earlier studies. At
+  22.737962 kbps plain half resolution (offset 0, CRF 65–67) scores whole
+  LPIPS 0.179 and DISTS 0.128, against the earlier anchor envelope's 0.234 and
+  0.165 (and the hybrid's 0.276 and 0.170). The earlier anchors fixed CRF 63
+  and varied the resolution, which cannot reach 22.7 kbps at half resolution;
+  letting the CRF go to 70 beats the hybrid's whole-frame scores by a wide
+  margin. This does not depend on the ROI question.
+- Consequence. The outcome-A entries above used inert inside offsets; they
+  hold for offset 0 (plain) and say nothing about SVT with working ROI. They
+  stand as recorded and are superseded for offsets −20/−40 by the corrected
+  run below, under the same frozen rule: relative offsets −20/−40 realised
+  as +20/+40 outside R, the same CRF search on rate alone, the same 80
+  ticks, controls and scoring. Offset 0 is the same encode and keeps its
+  scores; full resolution stays replaced by quarter. The corrected run needs
+  about 600 GPU-s (smoke plus 15 streams), within the remaining cap (about
+  2,430 GPU-s).
