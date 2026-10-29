@@ -1366,6 +1366,9 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   W6 temporal stability at the full frame rate (the hybrid exists on 80 of
   240 frames); W7 untouched footage; W8 tennis base model lineage (trained
   on other matches, shipped as decoder weights) and complete framing costs.
+  W5 ([rule](docs/experiments/w5-med-pareto.md)) and W6
+  ([rule](docs/experiments/w6-motion-pose.md)) started 2026-10-29 after the
+  user's visual check ([page](https://claude.ai/artifact/HsxdSd4CaWWUjXcgf1L9Cj)).
 
 
 ### J. Experience-track re-judging (user, 2026-10-22)
