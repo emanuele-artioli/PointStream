@@ -136,3 +136,49 @@ def test_run_action_sets_cublas_workspace_and_reports_warnings(monkeypatch):
     worker.run_action('calibrate', {})
     assert 'CUBLAS_WORKSPACE_CONFIG' not in os.environ
     json.dumps(payload)
+
+
+def fake_worker(flip_second_decoder: bool):
+    """A stand-in for run_worker that writes plausible files; exercises code_point's bookkeeping only."""
+    import hashlib
+
+    frame = 240 * 136 * 3 // 2
+    pixels = np.random.default_rng(0).integers(0, 256, size=2 * frame, dtype=np.uint8)
+
+    def run_worker(action, plan, work, tag, timeout):
+        if action == 'encode':
+            Path(plan['container']).write_bytes(b'PSDC' + bytes(40))
+            Path(plan['i_recon_file']).write_bytes(pixels[:frame].tobytes())
+            return {'container_sha256': hashlib.sha256(Path(plan['container']).read_bytes()).hexdigest(),
+                    'container_bytes': 44, 'encode_seconds': 1.0, 'dpb_reachable': False, 'nals': [],
+                    'checkpoints': {'determinism': {}}}, 2.0
+        out = pixels.copy()
+        if flip_second_decoder and tag == 'decode-b':
+            out[frame + 5] ^= 1
+        Path(plan['out_file']).write_bytes(out.tobytes())
+        hashes = ['x' if (flip_second_decoder and tag == 'decode-b' and i == 1) else f'h{i}' for i in range(2)]
+        return {'deterministic': True, 'container_sha256': 'c', 'environment': {}, 'warnings': [],
+                'passes': [{'decode_seconds': 1.0, 'model_decode_seconds': 0.5, 'frame_sha256': hashes}] * 2}, 3.0
+
+    return run_worker
+
+
+@pytest.mark.parametrize('flip', [False, True])
+def test_code_point_accepts_identical_decoders_and_rejects_a_difference(tmp_path, monkeypatch, flip):
+    from argparse import Namespace
+
+    from experiments.tennis import w3_neural_baseline as job
+
+    source = tmp_path / 'source.yuv'
+    source.write_bytes(np.random.default_rng(1).integers(0, 256, size=2 * 1920 * 1620, dtype=np.uint8).tobytes())
+    work = tmp_path / 'work'
+    work.mkdir()
+    monkeypatch.setattr(job, 'run_worker', fake_worker(flip))
+    args = Namespace(image_ckpt=tmp_path / 'i', video_ckpt=tmp_path / 'v')
+    point = {'scale': 8, 'qp': 36, 'target_kbps': 30.0, 'est_kbps': 31.0}
+    record = job.code_point(args, source, work, 25, 2, point)
+    assert record['accepted'] is (not flip)
+    assert record['check_a_i_frame']['passed']
+    assert record['check_b_two_processes']['max_abs_diff'] == (1 if flip else 0)
+    assert record['kbps'] == pytest.approx(44 * 8 * 25 / 2 / 1000)
+    json.dumps(record)

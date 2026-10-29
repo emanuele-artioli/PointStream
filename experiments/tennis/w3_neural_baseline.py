@@ -197,12 +197,13 @@ def code_point(a: argparse.Namespace, source: Path, work: Path, fps: int, n: int
     hashes = [r['passes'][i]['frame_sha256'] for r in decodes.values() for i in (0, 1)]
     identical_hashes = all(h == hashes[0] for h in hashes) and len(hashes[0]) == n
     psnr = an.luma_psnr_per_frame(a_file, raw, width, height, n)
+    within = [bool(r['deterministic']) for r in decodes.values()]
     record.update(
         check_a_i_frame=check_a, check_b_two_processes=check_b, identical_frame_hashes=identical_hashes,
-        within_process_deterministic=[r['deterministic'] for r in decodes.values()],
+        within_process_deterministic=within,
         max_decode_diff=max(check_a['max_abs_diff'], check_b['max_abs_diff']),
         luma_psnr={'min': min(psnr), 'first_group_mean': float(np.mean(psnr[:8])), 'last_group_mean': float(np.mean(psnr[-8:]))},
-        accepted=bool(check_a['passed'] and check_b['passed'] and identical_hashes and all(record['within_process_deterministic'])),
+        accepted=bool(check_a['passed'] and check_b['passed'] and identical_hashes and all(within)),
         decoded=str(a_file))
     raw.unlink()
     (pdir / 'decode-b.yuv').unlink()

@@ -103,3 +103,13 @@ the decisions are in [experiments.md](../experiments.md). Context:
   same spec, 250-entry `--snapshot-path` set, default transfer timeout, revision `0f2238f6`
   (HEAD at submission; the code is that of `eba13641`, later commits change docs only).
   The two earlier IDs stay unpublished and untouched.
+- Outcome of `20261029T093021Z-81571456` (smoke, gpu6 GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553,
+  RTX 6000 Ada, exclusive; revision `0f2238f6`): FAILED after 52 s of workload (about 75 s of GPU
+  claim) with a bookkeeping bug of mine, not a codec result: `code_point` read
+  `record['within_process_deterministic']` inside the same `record.update(...)` call that
+  creates it (`KeyError`, `w3_neural_baseline.py:205`). Before it, on the real GPU, the source
+  conversion and identity check, the 18-candidate rate calibration, the encode of the 30 kbps
+  point and both decoder processes had run without error. Nothing was scored; no decode
+  verdict exists. Fix: compute the flag first; new test `test_code_point_...` runs `code_point`
+  against a stand-in worker (identical decoders accepted; a one-level difference rejected).
+  Resubmission needs root's approval (the approved single submission is used).
