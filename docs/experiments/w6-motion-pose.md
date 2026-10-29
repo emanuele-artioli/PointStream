@@ -41,3 +41,59 @@ judges ([j.md](j.md)).
 - Budget: ≤1.5 GPU-hours (generation ≈820 GPU-s per window on A6000 plus
   masks and judges); every stage ≤45 min, saving each finished frame.
 - Jobs: (none yet)
+
+### 2026-10-29 — W6 implementation choices (written before any W6 job ran; the rule above is unchanged)
+- Code: `experiments/tennis/k6b_generate.py` (`--keep-all`), `w6.py` (receiver
+  masks, judges, racket measure, clips, report), `w6_specs.py`, tests
+  `tests/test_w6.py`. Decisions the rule left open, made before any score:
+  1. **Regenerate the whole 240-frame run of each player, not 160 frames.**
+     The released long-video sampler renders 24-frame contexts overlapping by
+     4, so the saved ticks (every third frame) belong to one 240-frame
+     sequence and frames cannot be rendered alone. The rerun therefore
+     reproduces all 80 saved ticks per player (not 6) in the same pass;
+     cost is the original generation job's (`20261026T075716Z-f0549307`,
+     1,264 s for both players on Ada), not 820 s. If the 80 ticks match the
+     saved crops within 1 level, the rerun is the 240-frame set; if not, the
+     difference is recorded and the rerun is still used for all 240 frames.
+  2. **Ada, not A6000.** The model–GPU table has Moore-AnimateAnyone on
+     RTX 6000 Ada only ("A6000 not run") and the saved crops came from Ada
+     (gpu5/gpu6). A6000 would be a first run of the model on that class and a
+     weaker reproducibility test. One job per player, shared-GPU class
+     (outputs do not depend on wall time).
+  3. **Masks.** `k6b_receiver_sam`'s isolated worker, every-frame fresh
+     prompts, once per player (the earlier job ran it twice for a reset
+     check; the 80 saved ticks are compared with its saved masks instead).
+  4. **Anchor.** W1's plain half-resolution SVT-AV1 (policy `s2_o0`) at CRF 65
+     (24.64 kbps) and 66 (22.28 kbps), which bracket the hybrid's 22.737962
+     kbps; every per-frame quantity is combined linearly in log rate, never
+     extrapolated. DCVC-UF: no W3b point exists at this rate; not used.
+  5. **Pose judge.** `j_players.Judge` (YOLO11x-pose, K4b.2's crop path), on
+     the source frames and on each output frame, fitted to the player's
+     source region mask from the transport's exact matte (body plus touching
+     racket, as the paid S/R masks); error = mean distance over the keypoints
+     confident in the source's re-run over the region's height at that frame
+     (K6 used its pose fit's box; the denominator is the same for every
+     variant, so the ratios and the pass test are unaffected); a player not
+     fitted counts as 1 (`j.MISSED`). Coded-keypoint floor from the
+     transport's decoded keypoints, 1.5×. Per window means over the 240
+     frames and both players.
+  6. **Time judge.** `visor.j.residual_energies` over all 239 consecutive
+     pairs, on the union of the source player regions, flow from the source
+     (as H3e); outputs are whole frames (hybrid: paid base plus pasted
+     players; anchor: the decoded stream upscaled by the paid cubic), judged
+     on the source region. Pass by J's OR reading. A moving-block bootstrap
+     (24-frame blocks, 2,000 resamples) gives 95% intervals for
+     method−anchor beside the means (memory: significance, not threshold).
+  7. **Racket share.** The transport holds one region mask per player (body
+     plus touching racket), no separate racket mask. Racket region :=
+     source-region pixels farther than 10% of the player's height from the
+     dilated convex hull of the coded keypoints, counted only where ≥100 px.
+     Reported: share of (player, frame) cells with a racket region in which
+     the receiver's predicted mask overlaps it at all, covers ≥50% of it,
+     and the mean coverage. Reported beside; it decides nothing.
+  8. Clips: 25 fps, x264 crf 12, three 960×540 panels (source | plain SVT
+     CRF 66 | hybrid), and a 2× zoom of the near player (480×270 windows,
+     smoothed centre).
+- Budget check: generation ≈ 1,300 s + masks ≈ 400–900 s + judge ≈ 600 s ≈
+  0.7 GPU-h before smokes; Med only if Al finishes within 0.75 GPU-h.
+- Jobs: (none yet)

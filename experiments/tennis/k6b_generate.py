@@ -186,6 +186,11 @@ class Renderer:
         return kernels
 
 
+def keep_row(judged: bool, max_frames: int, keep_all: bool) -> bool:
+    """Whether a generated frame is saved: the judged ticks (the default), every frame of a smoke, or every frame (W6)."""
+    return judged or bool(max_frames) or keep_all
+
+
 def command_generate(args: argparse.Namespace) -> int:
     import torch
 
@@ -265,7 +270,7 @@ def command_generate(args: argparse.Namespace) -> int:
                 video = renderer.render(unit["reference"], unit["pose"][rows], args.steps, seed * 1009 + int(r))
                 frames += len(rows)
                 for i, row in enumerate(rows):
-                    if judged[row] or args.max_frames:
+                    if keep_row(bool(judged[row]), args.max_frames, args.keep_all):
                         keep_t.append(int(t[row]))
                         keep_crops.append(video[i])
                 print(f"phase=generate profile={profile} unit={name} run={int(r)} frames={len(rows)}", flush=True)
@@ -286,7 +291,7 @@ def command_generate(args: argparse.Namespace) -> int:
         tar.add(publish, arcname="publish")
     write_json(stage_dir() / "k6b_generate.json", {
         "command": "generate", "stage": os.environ.get("PS_STAGE"), "units": names, "profiles": profiles,
-        "steps": args.steps, "max_frames": args.max_frames, "from_t": args.from_t,
+        "steps": args.steps, "max_frames": args.max_frames, "from_t": args.from_t, "keep_all": args.keep_all,
         "fits": {k: {"path": str(v), "sha256": sha256(v), "base": str(bases[k]) if k in bases else None, "bits": bits.get(k, 0)}
                  for k, v in fits.items()}, "device": device_record(args.gpu_class), "models": records,
         "timings": timings, "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3), "gpu_memory_limit_mib": limit,
@@ -354,6 +359,7 @@ def main(argv: list[str] | None = None) -> int:
     gen.add_argument("--fit", action="append", nargs=2, default=[], metavar=("PROFILE", "CHECKPOINT"),
                      help="render a profile named PROFILE: `original` with k6b_fit's checkpoint merged")
     gen.add_argument("--fit-archive", action="append", default=[], help="k6b_fit's published.tar (repeatable); --fit names a member")
+    gen.add_argument("--keep-all", action="store_true", help="W6: save every generated frame, not only the judged ticks")
     gen.add_argument("--from-t", type=int, default=0, help="render only frames from here (step 3's held-out frames)")
     gen.add_argument("--fit-base", action="append", nargs=2, default=[], metavar=("PROFILE", "CHECKPOINT"),
                      help="step 5: merge this tennis base into PROFILE before its --fit checkpoint")
