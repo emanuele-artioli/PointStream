@@ -103,7 +103,7 @@ def test_spec_reads_the_diagnostic_and_keeps_4a_pairs() -> None:
     staged = {x["name"]: x for x in s["staged_inputs"]}
     assert staged["receiver_masks"]["path"].endswith("20261024T084607Z-e00640d5/full/arm0-dcvc-0_4.npz")
     assert staged["receiver_seed"]["sha256"] == w4_specs.DIAGNOSTICS["P03_10"]["seed"]
-    assert s["hosts"] == ["gpu5"] and s["budget_seconds"] == 600 + 300 + 120
+    assert s["hosts"] == ["gpu6"] and s["budget_seconds"] == 600 + 300 + 120
     assert base["arguments"][4] == "h5p4-gho" and len(base["staged_inputs"]) == 1  # the 4a spec is untouched
     with pytest.raises(ValueError):
         w4_specs.make_spec(base, "P03_10", "venue", "d", 600)
