@@ -373,3 +373,14 @@ the decisions are in [experiments.md](../experiments.md). Context:
   attempt was refused before any ID existed ("worker gpu5 has no fresh heartbeat"; heartbeats were fresh after a
   five-minute wait). Not resubmitted again: the rerun is still outstanding and needs root's go-ahead (suggested:
   a smaller `--snapshot-path` set, or the extraction host changed).
+- Third submission (root-approved, reduced snapshot): job `20261029T232113Z-47fe00a2`, published (status `pending` after the
+  client-side publish call timed out at 120 s; inspected, not resubmitted), ready.json `git_head`
+  `142aa3bb31caf923bfa0eeb762a1b143fe5aa159`, spec `w3b.json`, hosts gpu5 and gpu6. The snapshot lists the static import
+  closure of the workload instead of whole directories: `--snapshot-path` for `pyproject.toml` and 85 modules
+  (`src/codecs` 4, `src/pointstream` 3, `src/segmentation` 9, `experiments/tennis` 32 (the `w3_*`, `k4*`, `k5`, `k6*`,
+  `parallel_*`, `windows` modules the workload imports), `experiments/visor` 11, `experiments/background` 9,
+  `experiments/audit` 2, `experiments/jobs` 8, `tools/datasets` 2, package `__init__` files) = **88 files** on the extracted
+  tree (the earlier sets had 229-250). Proof before submitting: `git archive HEAD` of these paths extracted on gpu5 under
+  `/local/users/emanuele`, then `python -I` with the pointstream environment imported the fleet manager modules and the
+  workload (`w3_neural_baseline`, `dcvc_uf_worker`, `svtav1`, `quality`, the `k6b_*`, `h3*`, `masks` modules).
+  Two further attempts were refused before any ID existed (no fresh heartbeat on gpu5/gpu6; retried after waits).
