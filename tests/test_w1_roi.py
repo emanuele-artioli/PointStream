@@ -156,3 +156,17 @@ def test_best_foreground_is_reported_per_resolution_and_metric():
 
 def test_policy_names_are_stable():
     assert w.policy_name(2, 0) == 's2_o0' and w.policy_name(1, -40) == 's1_o40'
+
+
+def test_secondary_rate_is_the_primary_minus_the_packet_saving():
+    assert w.secondary_kbps(4236) == pytest.approx(w.TARGET_KBPS)
+    assert w.secondary_kbps(2174) == pytest.approx(w.TARGET_KBPS - (4236 - 2174) * 8 / 9.6 / 1000)
+
+
+def test_analyse_marks_a_policy_unresolved_when_the_target_leaves_its_points():
+    base = {'whole_lpips': 0.3, 'foreground_lpips': 0.4, 'whole_dists': 0.2, 'foreground_dists': 0.3}
+    by_policy = {'s2_o20': [{'crf': c, 'rate_kbps': r, **base} for c, r in ((67, 24.0), (68, 22.4), (69, 21.2))]}
+    primary = w.analyse(by_policy, (2,), w.TARGET_KBPS)
+    secondary = w.analyse(by_policy, (2,), w.secondary_kbps(1000))
+    assert primary['at_target']['s2_o20'] is not None and secondary['at_target']['s2_o20'] is None
+    assert 's2_o20' in secondary['decision']['unresolved']

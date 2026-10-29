@@ -34,6 +34,7 @@ TOOLS = {'SvtAv1EncApp': '4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cf
 TARGET_KBPS = 22.737962222222222  # the hybrid's total rate (job 20261027T211451Z-f6a754eb)
 HYBRID = {'lpips': {'whole': 0.2757866112979842, 'foreground': 0.34587557402445757},
           'dists': {'whole': 0.1696124367415905, 'foreground': 0.2525512419641018}}
+ORIGINAL_KPS_BYTES = 4236  # the keypoint packet inside the hybrid's 22.737962 kbps
 MARGIN = 0.001
 OFFSETS = (0, -20, -40)
 #: coded size per scale divisor: the K6b bases code the half resolution as 960x544.
@@ -60,6 +61,12 @@ def digest(path: Path) -> str:
 def rate_kbps(nbytes: int, frames: int = FRAMES, fps: int = FPS) -> float:
     """Complete IVF file bytes over the window's duration, as the existing anchors are rated."""
     return nbytes * 8 / (frames / fps) / 1000
+
+
+def secondary_kbps(new_packet_bytes: int) -> float:
+    """The hybrid re-billed with a smaller keypoint packet (same generated pixels): the saving is
+    (4236 - B) bytes over the 9.6 s window."""
+    return TARGET_KBPS - (ORIGINAL_KPS_BYTES - new_packet_bytes) * 8 / (FRAMES / FPS) / 1000
 
 
 def policy_name(scale: int, offset: int) -> str:
@@ -249,3 +256,14 @@ def best_foreground(policies: dict[str, dict[str, Any] | None], hybrid: dict[str
                 'foreground_at_hybrid_whole': foreground_at_whole(curve, hybrid[metric]['whole']),
                 'hybrid_foreground': hybrid[metric]['foreground'], 'points': sorted(curve)}
     return out
+
+
+def analyse(by_policy: dict[str, list[dict[str, Any]]], scales: tuple[int, ...], target: float,
+            hybrid: dict[str, dict[str, float]] = HYBRID) -> dict[str, Any]:
+    """The whole rule at one target rate over the scored points of every policy."""
+    policies: dict[str, dict[str, Any] | None] = {name: policy_at_target(rows, target) for name, rows in by_policy.items()}
+    for scale in scales:
+        for offset in OFFSETS:
+            policies.setdefault(policy_name(scale, offset), None)
+    return {'target_kbps': target, 'at_target': policies, 'decision': decide(policies, hybrid),
+            'best_foreground': best_foreground(policies, hybrid)}

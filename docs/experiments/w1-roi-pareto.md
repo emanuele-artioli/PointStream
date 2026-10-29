@@ -128,7 +128,7 @@ the decisions are in [experiments.md](../experiments.md). Context:
   already finished its smoke and full stages when this entry was written; its
   outputs were not opened. The addition below was fixed from the root
   message and W2's file, not from a W1 quality number.
-- Basis. W2 (`claude/w2-pose-rate`, `docs/experiments/w2-pose-rate-2026-10-29.json`,
+- Basis (W2's measurement of the packet content). W2 (`claude/w2-pose-rate`, `docs/experiments/w2-pose-rate-2026-10-29.json`,
   code `experiments/tennis/w2_pose_rate.py`) found an exact (round-trip
   identical, zero keypoint error) re-coding of Al's keypoint packet: key 4,
   4 px, linear interpolation, previous-frame prediction, 2,174 bytes =
@@ -136,13 +136,110 @@ the decisions are in [experiments.md](../experiments.md). Context:
   generated players are unchanged, so the hybrid's quality is identical at a
   total rate lower by 1.718333 kbps.
 - Primary (as frozen): the rule applies at 22.737962 kbps.
-- Secondary: the same rule (linear in log-rate between the two bracketing
-  points, dominance within 0.001 on both axes, outcome A or B, best
-  foreground at the hybrid's whole-frame score) applies at
-  22.737962 − (3.530000 − 1.811667) = 21.019629 kbps, with the hybrid's four
-  scores unchanged. A policy whose scored CRF points do not bracket 21.019629
-  is unresolved there; no new encodes are made for it. The selected CRFs were
-  chosen for the primary rate, so some policies will be unresolved at the
-  secondary rate by construction.
+- Secondary (definition corrected by root before any score was read): the
+  same rule (linear in log-rate between the two bracketing points, dominance
+  within 0.001 on both axes, outcome A or B, best foreground at the hybrid's
+  whole-frame score) applies at 22.737962 − (4236 − B)·8/9.6/1000 kbps, with
+  the hybrid's four scores unchanged, where B is the byte size of the real
+  new keypoint packet (format KPS2) wired into
+  `experiments/tennis/k6b_rate_streams.py`. W2's 2,174 bytes (1.811667 kbps)
+  is not used for this: it excludes the roughly 416-byte metadata block every
+  packet carries. B is pending from root; the secondary decision is computed
+  only once B is known (`python -m experiments.tennis.w1_report
+  SUMMARY.json B`). A policy whose scored CRF points do not bracket the
+  secondary rate is unresolved there; no new encodes are made for it. The
+  selected CRFs were chosen for the primary rate, so some policies will be
+  unresolved at the secondary rate by construction.
 - Full resolution: no retry is needed; its submission already ran (job
   `20261029T093403Z-0a9c7eba`) and is unresolved at all offsets (above).
+
+### 2026-10-29 — W1 outcome at the primary rate: A (no SVT bit allocation reaches the hybrid's pair)
+- Jobs and provenance. Scoring job `20261029T095649Z-43181442` (RTX A6000,
+  gpu3, shared GPU, torch 2.10.0+cu128, packed environment `32e68872…`),
+  code revision `62afc6604223c7ea885a8a59e2cba83156ee0c21` (ready.json
+  `git_head`; branch `claude/w1-roi-pareto`). Inputs: encodes half
+  `20261029T092919Z-a9e696a8` (published.tar sha256 `daf90628…`), quarter
+  `20261029T094410Z-40e65a2f` (`851cf909…`), masks `20261029T092537Z-88270f98`
+  (`fbb39eec…`), hybrid scores `e346844d…`; all in the spec. Full-resolution
+  preflight `20261029T093403Z-0a9c7eba` (no bracket, above). Encode jobs ran
+  at revisions `79663a43` (half `a9e696a8`, full, quarter; code identical to
+  `62afc660`, only the specification generator differs) and `0f5ea24b`
+  (masks). Scores: 80 ticks, whole and S-foreground LPIPS/DISTS, 21 streams
+  (3 controls + 18). Summary sha256 `44d4bbc3…`, published.tar `ff0d2474…`.
+- GPU cost. Scoring execution 125.6 s (smoke) + 612.2 s (full) = 737.8 s;
+  the request was admitted for 1,169 s from creation to completion, including
+  staging; no other GPU job. Charged 1,170 GPU-s of the 3,600 s cap. The
+  validator passed (controls, memory, projection 1,126 s). Timings are
+  contaminated by the shared GPU and are cost only.
+- Controls reproduce. The plain CRF 63 bases of scale 8/4/2 were re-encoded
+  (bytes equal the existing anchors), decoded to identical hashes, and their
+  per-tick whole and foreground LPIPS/DISTS differ from the hybrid job's
+  recorded scores by at most 3.7e-5 (limit 1e-4).
+- The 18 points (means over 80 ticks; rate = complete IVF bytes):
+
+| policy | CRF | kbps | whole LPIPS | fg LPIPS | whole DISTS | fg DISTS |
+|---|---|---|---|---|---|---|
+| half, offset 0 | 65 | 24.642 | 0.1654 | 0.5452 | 0.1240 | 0.4122 |
+| half, offset 0 | 66 | 22.284 | 0.1821 | 0.5737 | 0.1290 | 0.4299 |
+| half, offset 0 | 67 | 20.557 | 0.1937 | 0.5927 | 0.1411 | 0.4428 |
+| half, −20 | 67 | 24.190 | 0.1932 | 0.5893 | 0.1418 | 0.4470 |
+| half, −20 | 68 | 22.469 | 0.2125 | 0.6140 | 0.1496 | 0.4661 |
+| half, −20 | 69 | 21.218 | 0.2227 | 0.6255 | 0.1563 | 0.4745 |
+| half, −40 | 67 | 24.100 | 0.1931 | 0.6009 | 0.1405 | 0.4579 |
+| half, −40 | 68 | 22.478 | 0.2104 | 0.6195 | 0.1475 | 0.4737 |
+| half, −40 | 69 | 21.088 | 0.2234 | 0.6439 | 0.1581 | 0.4891 |
+| quarter, offset 0 | 61 | 24.110 | 0.2627 | 0.6250 | 0.1788 | 0.4332 |
+| quarter, offset 0 | 62 | 20.608 | 0.2699 | 0.6489 | 0.1841 | 0.4597 |
+| quarter, offset 0 | 63 | 17.131 | 0.2826 | 0.6830 | 0.1927 | 0.4975 |
+| quarter, −20 | 62 | 24.262 | 0.2688 | 0.6504 | 0.1844 | 0.4600 |
+| quarter, −20 | 63 | 20.549 | 0.2835 | 0.6912 | 0.1923 | 0.5000 |
+| quarter, −20 | 64 | 18.695 | 0.2919 | 0.7161 | 0.1987 | 0.5357 |
+| quarter, −40 | 62 | 24.316 | 0.2701 | 0.6539 | 0.1851 | 0.4608 |
+| quarter, −40 | 63 | 20.591 | 0.2821 | 0.6952 | 0.1915 | 0.5045 |
+| quarter, −40 | 64 | 18.661 | 0.2945 | 0.7215 | 0.2018 | 0.5317 |
+
+- Interpolated at 22.737962 kbps (log-rate, bracketing pair), against the
+  hybrid (whole LPIPS 0.2758, DISTS 0.1696; foreground LPIPS 0.3459, DISTS
+  0.2526). Full resolution: unresolved at all three offsets.
+
+| policy | whole LPIPS | fg LPIPS | whole DISTS | fg DISTS |
+|---|---|---|---|---|
+| half, 0 | 0.1787 | 0.5680 | 0.1280 | 0.4263 |
+| half, −20 | 0.2094 | 0.6100 | 0.1484 | 0.4630 |
+| half, −40 | 0.2075 | 0.6164 | 0.1463 | 0.4711 |
+| quarter, 0 | 0.2654 | 0.6339 | 0.1808 | 0.4431 |
+| quarter, −20 | 0.2745 | 0.6663 | 0.1875 | 0.4756 |
+| quarter, −40 | 0.2749 | 0.6706 | 0.1877 | 0.4784 |
+
+- Decision (primary rate, as frozen): **Outcome A.** No resolved policy has
+  foreground within 0.001 of the hybrid's on either metric: the best
+  foreground of any SVT allocation is LPIPS 0.568 (half, offset 0) and DISTS
+  0.426, against the hybrid's 0.346 and 0.253. The half-resolution plain
+  encode has a far better whole-frame score (LPIPS 0.179 against 0.276), so
+  the two sides trade: SVT wins the whole frame, the hybrid the player
+  region, and no SVT policy reaches both.
+- Best ROI foreground at the hybrid's whole-frame score: not computable
+  without extrapolating. The policies' whole scores span at most 0.2749
+  (quarter, −40; LPIPS) and 0.1877 (DISTS), just below the hybrid's 0.2758 and
+  0.1696 only for quarter DISTS, and the half-resolution curves lie entirely
+  below the hybrid's whole score. The nearest points: quarter, −40:
+  whole LPIPS 0.2749 with foreground 0.6706; quarter, −40: whole DISTS 0.1877
+  with foreground 0.4784. Both are far above 0.346 and 0.253.
+- Caveat that limits the strength of A (flagged, not resolved here). The ROI
+  offsets bought almost nothing for the players. At matched CRF the offset
+  raises the rate about 17% (half CRF 67: 20.56 to 24.19 kbps) but the
+  foreground scores hardly move (half CRF 67 foreground LPIPS 0.5927, 0.5893,
+  0.6009 for offsets 0, −20, −40); at matched total rate the foreground gets
+  worse with the offset, and −20 and −40 are indistinguishable in rate and
+  close in quality. SVT-AV1 4.2.0's ROI map in CRF mode therefore seems
+  weak or saturating at these CRFs (47–70). A CPU check of the decoded
+  quality inside R at a fixed CRF would confirm that the map works as intended
+  (not run, not part of the frozen rule). Until then A shows that the tested
+  SVT allocations (resolution and these ROI offsets) do not reach the pair,
+  not that no SVT allocation could.
+- Next step by the rule: outcome A, so score the Med window's actual-base
+  hybrid (never scored) and run the same grid on Med. Not started; Med is out
+  of W1's scope. The secondary-rate decision (entry above) waits for the byte
+  size B of the new keypoint packet; the points are fixed, so it needs no new
+  encodes or GPU time: `python -m experiments.tennis.w1_report
+  score-summary.json B`.
