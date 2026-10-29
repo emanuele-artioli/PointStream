@@ -47,12 +47,14 @@ def masks() -> dict[str, Any]:
     return spec
 
 
-def encode(scale: int, controls: bool, threads: int, full_seconds: int) -> dict[str, Any]:
+def encode(scale: int, controls: bool, threads: int, full_seconds: int, outside: bool = False) -> dict[str, Any]:
     arguments = ['--al', '{staged:al}', '--transport', '{staged:transport}', '--scale', str(scale), '--frames', '{frames}',
                  '--max-encodes', '{max_encodes}'] + (['--controls'] if controls else [])
+    if outside:
+        arguments += ['--convention', 'outside', '--offsets', '-20', '-40']
     spec = base('experiments.tennis.w1_encode', arguments, ['al', 'transport'])
     spec.update({'device': 'cpu', 'hosts': CPU_HOSTS, 'gpu_models': [], 'gpu_memory_mib': 0, 'cpu_threads': threads,
-                 'local_storage_gib': 30, 'scale': {'frames': {'smoke': 24, 'full': 240}, 'max_encodes': {'smoke': 2, 'full': 8}},
+                 'local_storage_gib': 30, 'scale': {'frames': {'smoke': 24, 'full': 240}, 'max_encodes': {'smoke': 2, 'full': 12 if outside else 8}},
                  'smoke': {'seconds': 560, 'representative_basis': f'Scale {scale}, 24 frames: the same conversion, ROI map, parallel offset lanes, two encodes per offset (same first CRF, so the ROI rate ordering is checked), independent dav1d decode and packaging as the full stage; 1.35x projection of the longest 8-encode chain.'},
                  'full': {'seconds': full_seconds}, 'validator_seconds': 120, 'budget_seconds': full_seconds + 1100,
                  'stall_seconds': 900.0, 'contention': {'policy': 'stop', 'resume_attempts': 0}})
@@ -70,12 +72,16 @@ def roicheck() -> dict[str, Any]:
     return spec
 
 
-def score(half: tuple[str, str], other: tuple[str, str], masks_archive: tuple[str, str]) -> dict[str, Any]:
+def score(half: tuple[str, str], other: tuple[str, str], masks_archive: tuple[str, str],
+          prior: tuple[str, str] | None = None) -> dict[str, Any]:
     extra = {'encode_half': half, 'encode_full': other, 'masks': masks_archive}
+    if prior:
+        extra['prior'] = prior
     arguments = ['--al', '{staged:al}', '--masks', '{staged:masks}', '--hybrid', '{staged:hybrid}', '--lpips', '{staged:lpips}',
                  '--dists', '{staged:dists}', '--encode-half', '{staged:encode_half}', '--encode-full', '{staged:encode_full}',
-                 '--judged', '{judged}']
-    spec = base('experiments.tennis.w1_score', arguments, ['al', 'masks', 'hybrid', 'lpips', 'dists', 'encode_half', 'encode_full'], extra)
+                 '--judged', '{judged}'] + (['--prior', '{staged:prior}'] if prior else [])
+    spec = base('experiments.tennis.w1_score', arguments,
+                ['al', 'masks', 'hybrid', 'lpips', 'dists', 'encode_half', 'encode_full'] + (['prior'] if prior else []), extra)
     spec.update({'device': 'gpu', 'hosts': ['gpu3'], 'gpu_models': ['RTX A6000'], 'gpu_memory_mib': 8000, 'cpu_threads': 4,
                  'local_storage_gib': 30, 'scale': {'judged': {'smoke': 3, 'full': 0}},
                  'gpu_sharing': {'mode': 'shared', 'basis': 'Saved-pixel scoring; scores do not depend on wall time', 'margin_mib': 8192},
@@ -89,7 +95,8 @@ def main() -> None:
     out = Path(sys.argv[1])
     out.mkdir(parents=True, exist_ok=True)
     specs = {'masks': masks(), 'encode-half': encode(2, True, 16, 2600), 'encode-full': encode(1, False, 24, 2600),
-             'encode-quarter': encode(4, False, 12, 2600), 'roicheck': roicheck()}
+             'encode-quarter': encode(4, False, 12, 2600), 'roicheck': roicheck(),
+             'encode-half-out': encode(2, True, 16, 2600, True), 'encode-quarter-out': encode(4, False, 12, 2600, True)}
     for name, spec in specs.items():
         (out / f'{name}.json').write_text(json.dumps(spec, indent=1) + '\n')
 

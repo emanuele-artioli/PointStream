@@ -31,7 +31,7 @@ from experiments.tennis.w1_roi import (CODED, CONTROL_CRF, CONTROL_IVF_BYTES, FP
 
 
 def encode_point(raw: Path, work: Path, *, scale: int, frames: int, crf: int, regions: np.ndarray | None,
-                 offset: int, cpus: list[int]) -> dict[str, Any]:
+                 offset: int, cpus: list[int], outside: bool = False) -> dict[str, Any]:
     """One encode and an independent dav1d decode; the decoded file is hashed and removed."""
     from src.codecs import svtav1
 
@@ -42,7 +42,7 @@ def encode_point(raw: Path, work: Path, *, scale: int, frames: int, crf: int, re
     if offset:
         assert regions is not None
         roi = work / 'roi.txt'
-        roi.write_text(roi_text(regions[:frames], width, height, offset))
+        roi.write_text(roi_text(regions[:frames], width, height, offset, outside))
         roi_sha = digest(roi)
         extra = ['--roi-map-file', str(roi)]
     started = time.monotonic()
@@ -62,7 +62,7 @@ def encode_point(raw: Path, work: Path, *, scale: int, frames: int, crf: int, re
     again.unlink()
     nbytes = stream.stat().st_size
     return {'scale': scale, 'offset': offset, 'crf': crf, 'size': [width, height], 'frames': frames,
-            'ivf_bytes': nbytes, 'payload_bytes': sum(sizes), 'rate_kbps': rate_kbps(nbytes, frames),
+            'outside': outside, 'ivf_bytes': nbytes, 'payload_bytes': sum(sizes), 'rate_kbps': rate_kbps(nbytes, frames),
             'stream_sha256': digest(stream), 'decoded_sha256': decoded_sha, 'roi_sha256': roi_sha,
             'encode_seconds': rec['encode_seconds'], 'encode_cpu_seconds': rec['encode_cpu_seconds'],
             'decode_seconds': rec['decode_seconds'], 'cpus': cpus, 'encode_command': rec['encode_command'],
@@ -96,23 +96,23 @@ class Ledger:
 
 
 def search_offset(raw: Path, work: Path, ledger: Ledger, *, scale: int, offset: int, frames: int, regions: np.ndarray,
-                  cpus: list[int], max_encodes: int, target: float) -> dict[str, Any]:
+                  cpus: list[int], max_encodes: int, target: float, outside: bool = False) -> dict[str, Any]:
     known: dict[int, float] = {}
     order: list[int] = []
     status = 'budget'
     while True:
-        status, crf = next_crf(known, target, start_crf(scale, offset))
+        status, crf = next_crf(known, target, start_crf(scale, offset, outside))
         if crf is None:
             break
         if len(known) >= max_encodes:
             status = 'budget'
             break
         row = encode_point(raw, work / f'crf{crf}', scale=scale, frames=frames, crf=crf, regions=regions,
-                           offset=offset, cpus=cpus)
+                           offset=offset, cpus=cpus, outside=outside)
         known[crf] = row['rate_kbps']
         order.append(crf)
         ledger.add(row, f'{policy_name(scale, offset)}_crf{crf}')
-    return {'scale': scale, 'offset': offset, 'status': status, 'order': order,
+    return {'scale': scale, 'offset': offset, 'outside': outside, 'status': status, 'order': order,
             'rates': {str(c): known[c] for c in sorted(known)}, 'selected': select_crfs(known, target)}
 
 
@@ -165,7 +165,8 @@ def run(a: argparse.Namespace) -> None:
     del masks
     raw = full if a.scale == 1 else downscaled_source(full, frames, a.scale, scratch / f'source-s{a.scale}.yuv')
     ledger = Ledger(publish)
-    workers = len(OFFSETS)
+    offsets = tuple(a.offsets)
+    workers = len(offsets)
     lanes = workers + (1 if a.controls else 0)
     share = max(1, len(cpus) // lanes)
     cpu_sets = [cpus[i * share:(i + 1) * share] or cpus for i in range(lanes)]
@@ -174,14 +175,14 @@ def run(a: argparse.Namespace) -> None:
     with ThreadPoolExecutor(max_workers=workers + (1 if a.controls else 0)) as pool:
         futures = [pool.submit(search_offset, raw, scratch / policy_name(a.scale, o), ledger, scale=a.scale, offset=o,
                                frames=frames, regions=regions, cpus=cpu_sets[i], max_encodes=a.max_encodes,
-                               target=TARGET_KBPS) for i, o in enumerate(OFFSETS)]
+                               target=TARGET_KBPS, outside=a.convention == 'outside') for i, o in enumerate(offsets)]
         if a.controls:
             control_future = pool.submit(controls, full, scratch, ledger, frames, cpu_sets[-1])
         searches = [f.result() for f in futures]
         if a.controls:
             control_rows = control_future.result()
     seconds = time.monotonic() - began
-    summary = {'scale': a.scale, 'frames': frames, 'max_encodes': a.max_encodes, 'target_kbps': TARGET_KBPS,
+    summary = {'scale': a.scale, 'convention': a.convention, 'offsets': list(offsets), 'frames': frames, 'max_encodes': a.max_encodes, 'target_kbps': TARGET_KBPS,
                'searches': searches, 'controls': control_rows, 'tools': tools, 'cpus': cpus, 'cpu_sets': cpu_sets,
                'source_command': command, 'host': os.uname().nodename, 'seconds': seconds,
                'encodes': len(ledger.rows), 'inputs': {'al': digest(a.al), 'transport': digest(a.transport)},
@@ -213,7 +214,7 @@ def validate() -> None:
         'multi_cpu': len(summary['cpus']) >= 3 * 2 and all(len(c) >= 2 for c in summary['cpu_sets']),
         'tools_pinned': all(summary['tools'][n]['sha256'] == d for n, d in TOOLS.items()),
         'inputs': all(summary['inputs'][x['name']] == x['sha256'] for x in spec['staged_inputs'] if x['name'] in summary['inputs']),
-        'offsets': [s['offset'] for s in summary['searches']] == list(OFFSETS)}
+        'offsets': [s['offset'] for s in summary['searches']] == summary['offsets'] and set(summary['offsets']) <= set(OFFSETS)}
     rows: list[dict[str, Any]] = []
     with tarfile.open(stage / 'published.tar') as tar:
         member = tar.extractfile('publish/encodes.json')
@@ -232,7 +233,8 @@ def validate() -> None:
     by = {(r['offset'], r['crf']): r['rate_kbps'] for r in rows if r['scale'] == summary['scale']}
     first = {s['offset']: s['order'][0] for s in summary['searches'] if s['order']}
     same = len(set(first.values())) == 1
-    checks['roi_raises_rate'] = (not same) or (by[(-40, first[-40])] > by[(0, first[0])] and by[(-20, first[-20])] >= by[(0, first[0])])
+    inside_full = summary['convention'] == 'inside' and set(first) == set(OFFSETS)
+    checks['roi_raises_rate'] = (not inside_full) or (not same) or (by[(-40, first[-40])] > by[(0, first[0])] and by[(-20, first[-20])] >= by[(0, first[0])])
     for s in summary['searches']:
         known = {int(c): r for c, r in s['rates'].items()}
         checks[f"offset{s['offset']}:search_consistent"] = (
@@ -271,6 +273,9 @@ def main() -> None:
     p.add_argument('--scale', type=int, choices=(1, 2, 4), default=2)
     p.add_argument('--frames', type=int, choices=(24, FRAMES), default=24)
     p.add_argument('--max-encodes', type=int, default=2)
+    p.add_argument('--convention', choices=('inside', 'outside'), default='inside',
+                   help='outside: the relative offset as 0 in the blocks R touches and +|offset| elsewhere')
+    p.add_argument('--offsets', type=int, nargs='+', default=list(OFFSETS))
     p.add_argument('--controls', action='store_true', help='also re-encode the plain CRF 63 bases of scale 8/4/2')
     a = p.parse_args()
     if a.validate:

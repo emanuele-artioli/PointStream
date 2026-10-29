@@ -76,10 +76,12 @@ def policy_name(scale: int, offset: int) -> str:
 # ---------------------------------------------------------------- the ROI map
 
 
-def roi_text(regions: np.ndarray, width: int, height: int, inside: int) -> str:
+def roi_text(regions: np.ndarray, width: int, height: int, inside: int, outside: bool = False) -> str:
     """SVT-AV1 `--roi-map-file`: per frame, one QP offset per 64x64 block, `inside` for every
     block touched by the frozen source R and 0 elsewhere (a negative `inside` spends more
-    bits there). Same blocks as parallel_baselines.roi_text; the sign convention differs."""
+    bits there). With `outside`, the same relative offset in the convention SVT-AV1 4.2.0 CRF
+    mode honours: 0 in the touched blocks and `-inside` (positive) everywhere else; a negative
+    offset inside is inert there (docs/experiments/w1-roi-pareto.md, validity check)."""
     if regions.ndim != 3 or regions.dtype != bool or width % 2 or height % 2:
         raise ValueError('Boolean native regions and even coded geometry required')
     if not -63 <= inside <= 63:
@@ -87,7 +89,11 @@ def roi_text(regions: np.ndarray, width: int, height: int, inside: int) -> str:
     lines = []
     for t, region in enumerate(regions):
         touched = touched_blocks(region, width, height)
-        lines.append(str(t) + ' ' + ' '.join(str(inside) if x else '0' for x in touched.ravel()))
+        if outside:
+            cells = ['0' if x else str(-inside) for x in touched.ravel()]
+        else:
+            cells = [str(inside) if x else '0' for x in touched.ravel()]
+        lines.append(str(t) + ' ' + ' '.join(cells))
     return '\n'.join(lines) + '\n'
 
 
@@ -177,9 +183,12 @@ def select_crfs(known: dict[int, float], target: float) -> list[int] | None:
     return sorted(chosen)
 
 
-def start_crf(scale: int, offset: int) -> int:
-    """First probe, from the plain CRF 63 rates already measured (half 33.685 kbps; ROI adds rate)."""
-    return {4: 60, 2: 67, 1: 70}[scale]
+def start_crf(scale: int, offset: int, outside: bool = False) -> int:
+    """First probe, from the plain CRF 63 rates already measured (half 33.685 kbps; ROI adds rate).
+    With the offset realised outside R the background sits at CRF + |offset|, capped by the encoder,
+    so the player-block CRF starts lower."""
+    base = {4: 60, 2: 67, 1: 70}[scale]
+    return max(CRF_MIN, base - abs(offset)) if outside and offset else base
 
 
 # ---------------------------------------------------------------- the frozen rule

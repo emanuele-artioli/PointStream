@@ -16,7 +16,7 @@ def test_search_offset_stops_at_the_encode_budget_and_publishes_each_encode(tmp_
     monkeypatch.delenv('PS_JOB_DIR', raising=False)
     seen = []
 
-    def fake(raw, work, *, scale, frames, crf, regions, offset, cpus):
+    def fake(raw, work, *, scale, frames, crf, regions, offset, cpus, outside=False):
         stream = tmp_path / f'tmp{len(seen)}.ivf'
         stream.write_bytes(b'x')
         seen.append(crf)
@@ -96,3 +96,21 @@ def test_roicheck_text_helpers_round_trip_and_psnr():
         rc.parse_text('1 0 0 0 0', 2, 2)
     assert rc.psnr(0.0, 10) == 99.0 and rc.psnr(1.0, 0) is None
     assert rc.psnr(255.0 ** 2, 1) == pytest.approx(0.0)
+
+
+def test_outside_convention_and_search_start():
+    region = np.zeros((1, 128, 128), bool)
+    region[0, 70, 70] = True
+    assert w.roi_text(region, 128, 128, -20, outside=True).split()[1:] == ['20', '20', '20', '0']
+    assert w.roi_text(region, 128, 128, -20).split()[1:] == ['0', '0', '0', '-20']
+    assert w.start_crf(2, -40, outside=True) == 27 and w.start_crf(2, -40) == 67 and w.start_crf(2, 0, outside=True) == 67
+
+
+def test_assemble_carries_the_plain_policy_from_an_earlier_run():
+    carried = {'s2_o0': [{'crf': c, 'rate_kbps': r, 'whole_lpips': 0.2, 'foreground_lpips': 0.5, 'whole_dists': 0.1,
+                          'foreground_dists': 0.4} for c, r in ((66, 22.0), (65, 24.0))]}
+    points = [{'kind': 'roi', 'policy': 's2_o20', 'name': f's2_o20_crf{c}', 'crf': c, 'rate_kbps': r}
+              for c, r in ((50, 21.0), (49, 24.0))]
+    scores = {p['name']: np.array([[0.3], [0.4], [0.2], [0.3]]) for p in points}
+    result = sc.assemble(points, scores, (2,), carried)
+    assert result['at_target']['s2_o0'] is not None and result['at_target']['s2_o20'] is not None

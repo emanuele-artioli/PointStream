@@ -23,6 +23,7 @@ from experiments.tennis.w1_roi import (CONTROL_CRF, CONTROL_ROW, CONTROL_TOLERAN
                                        WEIGHTS, WINDOW, best_foreground, decide, digest, policy_at_target, policy_name)
 
 #: the hybrid job's names for the four per-tick series, and ours in the same order.
+PRIOR_SUMMARY_SHA = '44d4bbc32aa74ac742091b55ba816f7025005138f7969ee161ca88f28b783a30'  # score job 20261029T095649Z-43181442
 SERIES = ('full_lpips', 'foreground_lpips', 'full_dists', 'foreground_dists')
 OURS = ('whole_lpips', 'foreground_lpips', 'whole_dists', 'foreground_dists')
 
@@ -93,7 +94,8 @@ def score_point(point: dict[str, Any], scratch: Path, ticks: list[int], truth: l
     return {'values': values, 'seconds': time.monotonic() - started}
 
 
-def assemble(points: list[dict[str, Any]], scores: dict[str, np.ndarray], scales: tuple[int, ...] = ()) -> dict[str, Any]:
+def assemble(points: list[dict[str, Any]], scores: dict[str, np.ndarray], scales: tuple[int, ...] = (),
+             carried: dict[str, list[dict[str, Any]]] | None = None) -> dict[str, Any]:
     by_policy: dict[str, list[dict[str, Any]]] = {}
     for point in points:
         if point['kind'] != 'roi':
@@ -101,6 +103,7 @@ def assemble(points: list[dict[str, Any]], scores: dict[str, np.ndarray], scales
         mean = scores[point['name']].mean(axis=1)
         by_policy.setdefault(point['policy'], []).append(
             {'crf': point['crf'], 'rate_kbps': point['rate_kbps'], **{name: float(mean[i]) for i, name in enumerate(OURS)}})
+    by_policy = {**(carried or {}), **by_policy}
     policies = {name: policy_at_target(rows) for name, rows in by_policy.items()}
     for scale in sorted({int(p['policy'].split('_')[0][1:]) for p in points if p['kind'] == 'roi'} | set(scales)):
         for offset in OFFSETS:
@@ -180,9 +183,15 @@ def run(a: argparse.Namespace) -> None:
         np.savez_compressed(publish / 'scores.npz', ticks=np.asarray(ticks), **scores)
         publish_progress(os.environ['PS_STAGE'], i + 1)
     torch.cuda.synchronize()
-    analysis = assemble(ordered, scores, (a_scale(half), a_scale(full)))
+    carried: dict[str, list[dict[str, Any]]] = {}
+    if a.prior is not None:
+        if digest(a.prior) != PRIOR_SUMMARY_SHA:
+            raise ValueError('prior summary changed')
+        old = json.loads(a.prior.read_text())['analysis']['by_policy']
+        carried = {n: rows for n, rows in old.items() if n.endswith('_o0') and n not in {p['policy'] for p in ordered}}
+    analysis = assemble(ordered, scores, (a_scale(half), a_scale(full)), carried)
     rows = [{k: v for k, v in p.items() if k not in ('path',)} for p in ordered]
-    summary = {'ticks': ticks, 'points': rows, 'control_errors': errors, 'score_seconds': seconds, 'analysis': analysis,
+    summary = {'ticks': ticks, 'points': rows, 'carried_policies': sorted(carried), 'control_errors': errors, 'score_seconds': seconds, 'analysis': analysis,
                'series': SERIES, 'tools': tools, 'target_kbps': TARGET_KBPS, 'window': WINDOW,
                'gpu': torch.cuda.get_device_name(0), 'torch': torch.__version__,
                'cudnn': torch.backends.cudnn.version(), 'cuda': True,
@@ -240,6 +249,7 @@ def main() -> None:
     p.add_argument('--validate', action='store_true')
     for name in ('al', 'masks', 'hybrid', 'lpips', 'dists', 'encode-half', 'encode-full'):
         p.add_argument('--' + name, type=Path)
+    p.add_argument('--prior', type=Path, help='earlier score summary whose offset-0 policies are carried over')
     p.add_argument('--judged', type=int, choices=(0, 3), default=3, help='first N ticks; 0 means all 80')
     a = p.parse_args()
     if a.validate:

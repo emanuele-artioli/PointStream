@@ -62,7 +62,7 @@ def region_psnr(source: Path, decoded: Path, regions: np.ndarray, width: int, he
 
     ys = np.memmap(source, np.uint8, 'r', shape=(frames, height * 3 // 2, width))
     yd = np.memmap(decoded, np.uint8, 'r', shape=(frames, height * 3 // 2, width))
-    acc = {k: [0.0, 0] for k in ('in_r', 'out_r', 'in_blocks', 'out_blocks')}
+    acc: dict[str, list[float]] = {k: [0.0, 0] for k in ('in_r', 'out_r', 'in_blocks', 'out_blocks')}
     for t in range(frames):
         r = cv2.resize(regions[t].astype(np.uint8), (width, height), interpolation=cv2.INTER_NEAREST).astype(bool)
         blocks = np.kron(touched_blocks(regions[t], width, height), np.ones((64, 64), bool))[:height, :width]
@@ -70,7 +70,7 @@ def region_psnr(source: Path, decoded: Path, regions: np.ndarray, width: int, he
         for key, mask in (('in_r', r), ('out_r', ~r), ('in_blocks', blocks), ('out_blocks', ~blocks)):
             acc[key][0] += float(err[mask].sum())
             acc[key][1] += int(mask.sum())
-    return {k: psnr(*v) for k, v in acc.items()} | {'pixels': {k: v[1] for k, v in acc.items()}}
+    return {k: psnr(v[0], int(v[1])) for k, v in acc.items()} | {'pixels': {k: v[1] for k, v in acc.items()}}
 
 
 def overlay(source: Path, regions: np.ndarray, grids: list[np.ndarray], width: int, height: int, tick: int, out: Path) -> None:
