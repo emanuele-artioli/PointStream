@@ -429,7 +429,11 @@ Use completion-driven monitoring, with one owner for the whole chat's jobs:
    with `scripts/ps-fleet ack EVENT_ID ...`. Rearm one bounded wait/check only
    while work remains. Delete any task-owned wakeup when the batch is terminal.
 
-Never create a five-minute recurring LLM heartbeat or a cache-keepalive loop.
+Never create a five-minute recurring LLM heartbeat or an unbounded
+cache-keepalive loop. Fleet waits need no keepalive: each 45-minute wait
+resumes the session inside Claude Code's cache hour. The only keepalive is the
+bounded one-shot chain for waits on the user in
+[sessions](sessions.md#keeping-the-cache-warm).
 One-shot checks must expire even if inference hits a usage limit, so a quota
 failure cannot produce an endless stream of wakeups. Do not add a paid API
 bridge or another provider to obtain callbacks. Never replay, migrate, expand
