@@ -330,3 +330,31 @@ the decisions are in [experiments.md](../experiments.md). Context:
   scores; full resolution stays replaced by quarter. The corrected run needs
   about 600 GPU-s (smoke plus 15 streams), within the remaining cap (about
   2,430 GPU-s).
+
+### 2026-10-29 — W1 corrected ROI encodes: rates (before scoring)
+- Relative offsets −20/−40 realised as 0 inside the blocks R touches and
+  +20/+40 outside (`--convention outside`), rate-only search as before; offset
+  0 is unchanged and not re-run. CPU jobs: half `20261029T125703Z-cb255d46`
+  (gpu2, 67 s, includes the three controls, bytes equal the anchors again),
+  quarter `20261029T131628Z-fb8af87e` (gpu3, 55 s), revision `0d8bd6f5`. Two
+  submissions of the quarter job (`20261029T130327Z-52535e47`,
+  `20261029T130956Z-0f82a736`) never published (snapshot extraction on gpu2
+  timed out twice, 300 s); both were inspected (unpublished, inert), not
+  replayed; the third submission is the one above. Further unpublished
+  attempt IDs, same cause, are not listed. The first search probes at low
+  CRF are far above the target (e.g. 413 kbps) and only place the search.
+- Half, offset −20 (CRF: kbps): 65: 26.30, 66: 24.05, 67: 22.24, 68: 20.68,
+  70: 18.48; selected 66–68. Offset −40: 64: 27.99, 65: 24.73, 66: 22.38,
+  67: 20.90, 69: 18.37; selected 65–67.
+- Quarter, offset −20: 60: 29.04, 61: 26.36, 62: 23.05, 63: 19.87, 64: 18.04,
+  65: 16.79; selected 62–64. Offset −40: 54: 42.53, 60: 27.79, 61: 25.49,
+  62: 22.28, 63: 19.33, 67: 14.85; selected 61–63.
+- Recorded before scoring: the rates that bracket 22.74 kbps again sit at the
+  same player-block CRF as plain (half 66–67), so the background at CRF + 20
+  or + 40 is at the encoder's ceiling (70) and the effective relative offset
+  is at most about 4 QP. At this rate SVT has almost no room to move bits
+  towards R by raising the background QP. The score will show it.
+- Scoring job: staged inputs as before with these two archives
+  (published.tar sha256 `5a48c109…` and `65b5ae9e…`) and the first scoring
+  summary (offset 0 carried over, sha256 `44d4bbc3…`); 3 controls + 12 new
+  streams.
