@@ -159,3 +159,20 @@ the decisions are in [experiments.md](../experiments.md). Context:
 - Jobs (sixth submission, root option b): `20261029T133843Z-d07fc947`, hosts gpu5 and gpu6, revision
   `4caba61b` (code of `f86d1067`). As before the publish call timed out client-side (outcome
   "unknown"); status is checked, not resubmitted.
+
+### 2026-10-29 — W3 protocol change before any quality is known: finer QP grid for the rate calibration
+- Reason. Smoke `20261029T133843Z-d07fc947` (gpu5 GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162,
+  RTX 6000 Ada, exclusive, revision `4caba61b`; 201.7 s of workload, 196.5 s inside the job) ran
+  the whole path: both windows, calibration, the 30 kbps point (Al scale 8 QP 48; Med scale 4 QP 0)
+  decoded by two separate processes with identical frames (max decode diff 0, I frame exact), SVT
+  scale 8 re-encode of Al = 10.1975 kbps as audited, foreground masks matching the original scoring
+  hashes, scoring, the audited score control (Al scale 8 max error 9.3e-5 over the four metrics) and
+  the projection (2,236 s against a full allowance now raised to 2,700 s). Its validator failed on
+  two flaws of mine, both outside the codec: (1) the bracket check judged the smoke's single
+  30 kbps point instead of the three-point plan (now `planned_bracket` on the candidate table);
+  (2) with the 6-QP grid Med's plan is 20.4, 25.4, 62.2 kbps, which does not reach 15 kbps. The QP
+  grid becomes {0, 6, 12, 18, 24, 30, 36, 42, 48, 56, 63} (33 candidates per window); selection
+  rule, targets (15, 30, 60), bracket test (lowest estimate <= 20, highest >= 45) are unchanged.
+  Only rates were looked at to decide this (the smoke's one-point quality is a 25-frame smoke).
+  Budget spent so far: about 145 + 250 = 400 of 7200 GPU-s. One more submission is needed;
+  it is requested from root.

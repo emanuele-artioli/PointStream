@@ -51,6 +51,13 @@ def test_selection_never_reuses_a_candidate_and_ties_prefer_resolution():
         an.select_points(grid, 2)
 
 
+def test_planned_bracket_judges_the_three_point_plan_not_the_smoke_point():
+    grid = candidates({(8, 24): 12.0, (4, 12): 17.1, (8, 48): 28.7, (4, 24): 33.4, (4, 36): 55.2, (2, 12): 43.2})
+    assert an.bracket_ok(an.select_points(grid, 1)) is False
+    assert an.planned_bracket(grid)
+    assert not an.planned_bracket(candidates({(8, 0): 5, (8, 12): 9, (4, 0): 12}))
+
+
 def test_bracket_requires_both_ends():
     assert not an.bracket_ok([{'est_kbps': 30.0}, {'est_kbps': 60.0}])
     assert not an.bracket_ok([{'est_kbps': 12.0}, {'est_kbps': 30.0}])
@@ -295,7 +302,8 @@ def synthetic_summary(tmp_path, monkeypatch):
         record['scores'], record['mean'] = scores, {m: 0.1 for m in an.METRICS}
         record.pop('decoded')
         scale8 = {'scale': 8, 'scores': scores, 'kbps': 10.1975}
-        candidates = [{'scale': s, 'qp': q, 'est_kbps': 20.0} for s in job.SCALES for q in job.CAL_QPS]
+        grid = [(s, q) for s in job.SCALES for q in job.CAL_QPS]
+        candidates = [{'scale': s, 'qp': q, 'est_kbps': 2.5 * 1.18 ** k} for k, (s, q) in enumerate(grid)]
         windows.append({'window': key, 'accepted': True, 'candidates': candidates, 'chosen': [point], 'bracket_ok': True,
                         'dcvc': [record], 'svt': [scale8], 'timings': {'convert': 5, 'calibration': 20, 'native_fixed': 8,
                         'native_variable': 2, 'svt_scale8': 3, 'masks': 4, 'scoring': 2},

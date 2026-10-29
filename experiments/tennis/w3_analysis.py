@@ -61,6 +61,13 @@ def bracket_ok(points: list[dict[str, Any]], low: float = 20.0, high: float = 45
     return min(rates) <= low and max(rates) >= high
 
 
+def planned_bracket(candidates: list[dict[str, Any]]) -> bool:
+    """Whether the three-point plan (15, 30, 60 kbps) that the full run codes brackets 15-60 kbps.
+
+    The smoke codes the 30 kbps point only, so the bracket is judged on the plan, not on the smoke's point."""
+    return bracket_ok(select_points(candidates, 3))
+
+
 def frame_max_diffs(first: Path, second: Path, frame_bytes: int, frames: int) -> list[int]:
     """Per-frame maximum absolute difference of two raw 8-bit files of equal frame size."""
     for path in (first, second):

@@ -180,7 +180,7 @@
     "representative_basis": "Both windows, native 240-frame source conversion and identity check, the full rate calibration (18 candidates x 25 frames), the 30 kbps point only coded at 25 frames by the real DCVC-UF encoder and decoded from its file in two separate processes with two passes each, SVT scale 8 re-encoded at 240 frames and checked against the audited Al base, foreground masks and real LPIPS/DISTS on 9 ticks; the same code path as the full run."
   },
   "full": {
-    "seconds": 2400
+    "seconds": 2700
   },
   "validator": [
     "{python}",

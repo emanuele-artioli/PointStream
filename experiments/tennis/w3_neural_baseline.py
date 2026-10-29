@@ -50,7 +50,7 @@ TOOLS = {'SvtAv1EncApp': '4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cf
          'dav1d': 'e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6',
          'ffmpeg': '7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2'}
 SCALES = {8: (240, 136), 4: (480, 272), 2: (960, 544)}
-CAL_QPS = (0, 12, 24, 36, 48, 63)
+CAL_QPS = (0, 6, 12, 18, 24, 30, 36, 42, 48, 56, 63)
 CAL_FRAMES = 25
 NATIVE_FRAMES = 240
 # Audited Al base rates of job 20261027T211451Z-f6a754eb (kbps), scale 8, 4, 2.
@@ -337,7 +337,7 @@ def run_window(a: argparse.Namespace, key: str, ctx: dict[str, Any]) -> dict[str
     write(out / 'candidates.json', {'candidates': candidates, 'chosen': chosen, 'cal_frames': CAL_FRAMES, 'cal_qps': list(CAL_QPS)})
     result: dict[str, Any] = {'window': key, 'wid': spec['wid'], 'fps': fps, 'frames': n, 'ticks': ticks,
                               'candidates': candidates, 'chosen': chosen, 'dcvc': [], 'svt': [], 'accepted': True,
-                              'bracket_ok': an.bracket_ok(chosen)}
+                              'bracket_ok': an.planned_bracket(candidates)}
     started = time.monotonic()
     source = full if n == NATIVE_FRAMES else work / 'source.yuv'
     if n != NATIVE_FRAMES:
@@ -532,7 +532,7 @@ def validate() -> None:
         'smoke_scale': summary['frames'] == 25 and summary['points'] == 1,
         'accepted': summary['accepted'],
         'rate_only_selection': all(len(w['candidates']) == len(CAL_QPS) * len(SCALES) and len(w['chosen']) == 1 for w in windows),
-        'bracket': all(w['bracket_ok'] for w in windows),
+        'bracket': all(w['bracket_ok'] and an.planned_bracket(w['candidates']) for w in windows),
         'gpu': summary['gpu_class'] in GPU_CLASSES and summary['gpu_uuid'].startswith('GPU-'),
         'extension': all(p['encode_report']['environment']['extension']['variant'] == GPU_CLASSES[summary['gpu_class']][1] for p in points),
         'determinism_recorded': all(p['encode_report']['checkpoints']['determinism']['final']['deterministic_algorithms']
