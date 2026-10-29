@@ -102,3 +102,20 @@ judges ([j.md](j.md)).
   recorded; a third entry `20261029T193013Z-1f570343` with a similar source
   archive appeared at 19:30 and may be a client retry or another session's).
   Inspect with `ps-fleet status JOB_ID`; not to be replayed.
+
+### 2026-10-29 — W6 deviation: A6000 on gpu3 (before any W6 job ran)
+- The two submissions above (`20261029T192854Z-225a66d0`,
+  `20261029T192855Z-09c2200b`) never published: the snapshot extraction on
+  gpu2 timed out after 300 s on both (inbox holds only `source.tar`, no spec
+  or ready); they are abandoned and not replayed. `20261029T193013Z-1f570343`
+  is not from this session's submit commands (both of which failed as above);
+  not touched. The Ada workers gpu5 and gpu6 have no fresh heartbeat (`ps-fleet
+  workers status`, 19:50 UTC), so the Ada plan (decision 2 above) cannot run.
+- Generation therefore runs on gpu3's RTX A6000, as the brief said, with
+  decision 1 unchanged. This is Moore-AnimateAnyone's first run on the A6000
+  class: the generator's built-in probe records kernels (flash attention,
+  CUTLASS) and the result goes into the model–GPU table. Expected
+  consequence: the 80 saved ticks may not match the Ada crops within 1 level;
+  the rule is then to record the difference and use the rerun for all 240
+  frames (it is). Memory declared 16,000 MiB (peak 12.2 GiB on Ada).
+- Jobs: (replaced below as submitted)

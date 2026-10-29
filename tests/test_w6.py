@@ -89,7 +89,8 @@ def test_generate_spec_keeps_the_frozen_recipe_and_adds_keep_all() -> None:
     assert args[args.index("--steps") + 1] == "30" and args[args.index("--from-t") + 1] == "0"
     assert args[args.index("--cfg") + 2] == "2.0" and "{frames}" in args
     assert spec["scale"]["frames"] == {"smoke": 8, "full": 0}
-    assert spec["gpu_models"] == ["RTX 6000 Ada"] and spec["smoke"]["seconds"] <= 600
+    assert spec["gpu_models"] == ["RTX A6000"] and spec["hosts"] == ["gpu3"] and spec["smoke"]["seconds"] <= 600
+    assert args[args.index("--gpu-class") + 1] == "RTX A6000"
     names = {x["name"] for x in spec["staged_inputs"]}
     assert all(f"{{staged:{n}}}" in args or n.startswith("w") for n in names)
 
