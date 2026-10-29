@@ -85,6 +85,42 @@ def parse_scales(text: str) -> list[int]:
     return scales
 
 
+def parse_point_list(text: str) -> dict[str, list[tuple[int, int]]]:
+    """Named points ``window:scale:qp,...`` (W3b), per window in the order given; QP 0..63, no duplicates."""
+    plan: dict[str, list[tuple[int, int]]] = {}
+    for item in text.split(','):
+        parts = item.split(':')
+        if len(parts) != 3 or parts[0] not in SOURCES:
+            raise ValueError(f'point {item!r} is not window:scale:qp with window in {sorted(SOURCES)}')
+        scale, qp = int(parts[1]), int(parts[2])
+        if scale not in SCALES or not 0 <= qp <= 63:
+            raise ValueError(f'point {item!r}: scale must be one of {sorted(SCALES)} and QP in 0..63')
+        if (scale, qp) in plan.setdefault(parts[0], []):
+            raise ValueError(f'point {item!r} listed twice')
+        plan[parts[0]].append((scale, qp))
+    if set(plan) != set(SOURCES):
+        raise ValueError('every window needs at least one point')
+    return plan
+
+
+def project_listed_seconds(timings: list[dict[str, float]], setup: float, publication: float, full_points: list[int],
+                           svt_factor: float, svt_streams: int) -> float:
+    """Full-stage seconds for a named point list, window by window (the windows differ in resolution).
+
+    ``timings[w]`` are the smoke's seconds of window ``w``: ``convert``, ``native_fixed`` and ``native_variable``
+    (per point; the smoke codes 25 frames), ``svt_scale8``, ``masks`` (9 ticks) and ``scoring`` (9 ticks, one SVT
+    stream and one DCVC point = 2 streams). ``svt_factor`` scales the SVT scale-8 time to the full SVT scales
+    (1 for scale 8 only, 21 for 8, 4, 2); ``svt_streams`` is how many SVT streams the full run scores."""
+    values = [setup, publication, svt_factor, *(v for t in timings for v in t.values())]
+    if any(v < 0 or v != v for v in values) or len(timings) != len(full_points):
+        raise ValueError('finite nonnegative timings, one set per window, required')
+    total = setup + 4 * publication
+    for t, n in zip(timings, full_points):
+        total += (t['convert'] + n * t['native_fixed'] + n * (NATIVE_FRAMES / CAL_FRAMES) * t['native_variable']
+                  + svt_factor * t['svt_scale8'] + (80 / 9) * t['masks'] + (svt_streams + n) / 2 * (80 / 9) * t['scoring'])
+    return PROJECTION_MARGIN * total
+
+
 def project_full_seconds(t: dict[str, float], publication: float) -> float:
     """Full-stage seconds from smoke timings: one 30 kbps point and one SVT scale at 25 frames.
 
@@ -331,13 +367,19 @@ def run_window(a: argparse.Namespace, key: str, ctx: dict[str, Any]) -> dict[str
         raise ValueError('native source YUV identity changed: ' + key)
     timings['convert'] = time.monotonic() - started
     started = time.monotonic()
-    candidates, calibration_seconds = calibrate_candidates(a, full, work, fps)
-    chosen = an.select_points(candidates, a.points)
+    if a.point_list:
+        # W3b: the points are named (chosen on measured rates in the rule entry), so no calibration encodes run.
+        candidates: list[dict[str, Any]] = []
+        chosen = [{'scale': scale, 'qp': qp, 'target_kbps': None, 'est_kbps': None}
+                  for scale, qp in parse_point_list(a.point_list)[key]]
+    else:
+        candidates, _ = calibrate_candidates(a, full, work, fps)
+        chosen = an.select_points(candidates, a.points)
     timings['calibration'] = time.monotonic() - started
     write(out / 'candidates.json', {'candidates': candidates, 'chosen': chosen, 'cal_frames': CAL_FRAMES, 'cal_qps': list(CAL_QPS)})
     result: dict[str, Any] = {'window': key, 'wid': spec['wid'], 'fps': fps, 'frames': n, 'ticks': ticks,
                               'candidates': candidates, 'chosen': chosen, 'dcvc': [], 'svt': [], 'accepted': True,
-                              'bracket_ok': an.planned_bracket(candidates)}
+                              'bracket_ok': None if a.point_list else an.planned_bracket(candidates)}
     started = time.monotonic()
     source = full if n == NATIVE_FRAMES else work / 'source.yuv'
     if n != NATIVE_FRAMES:
@@ -499,7 +541,7 @@ def run(a: argparse.Namespace) -> None:
         if not result['accepted']:
             break
     seconds = time.monotonic() - began
-    summary = {'frames': a.frames, 'points': a.points, 'svt_scales': ctx['svt_scales'], 'gpu': name, 'gpu_class': gpu_class,
+    summary = {'frames': a.frames, 'points': a.points, 'point_list': a.point_list, 'svt_scales': ctx['svt_scales'], 'gpu': name, 'gpu_class': gpu_class,
                'capability': capability, 'gpu_uuid': uuid, 'tools': tools, 'torch': torch.__version__,
                'accepted': all(r['accepted'] for r in results) and len(results) == 2, 'windows': results,
                'setup_seconds': setup, 'seconds': seconds, **summarize(results),
@@ -518,21 +560,40 @@ def validate() -> None:
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
     windows = summary['windows']
-    timings = {'setup': summary['setup_seconds'] + sum(w['timings']['convert'] for w in windows) / 2,
-               'calibration': sum(w['timings']['calibration'] for w in windows),
-               'native_fixed': sum(w['timings']['native_fixed'] for w in windows),
-               'native_variable': sum(w['timings']['native_variable'] for w in windows),
-               'svt_scale8': sum(w['timings']['svt_scale8'] for w in windows),
-               'masks': sum(w['timings']['masks'] for w in windows),
-               'scoring': sum(w['timings']['scoring'] for w in windows)}
-    projection = project_full_seconds(timings, staging['publication_seconds'])
+    listed = summary.get('point_list')
+    if listed:
+        smoke_plan = parse_point_list(spec['scale']['point_list']['smoke'])
+        full_plan = parse_point_list(spec['scale']['point_list']['full'])
+        full_svt = parse_scales(str(spec['scale']['svt_scales']['full']))
+        projection = project_listed_seconds(
+            [{'convert': w['timings']['convert'], 'native_fixed': w['timings']['native_fixed'],
+              'native_variable': w['timings']['native_variable'], 'svt_scale8': w['timings']['svt_scale8'],
+              'masks': w['timings']['masks'], 'scoring': w['timings']['scoring']} for w in windows],
+            summary['setup_seconds'], staging['publication_seconds'], [len(full_plan[w['window']]) for w in windows],
+            float(sum({8: 1, 4: 4, 2: 16}[x] for x in full_svt)), len(full_svt))
+        selection = {
+            'smoke_scale': summary['frames'] == 25 and listed == spec['scale']['point_list']['smoke'],
+            'points_as_named': all([(p['scale'], p['qp']) for p in w['chosen']] == smoke_plan[w['window']] for w in windows),
+            'smoke_points_in_full_plan': all(pt in full_plan[w] for w, pts in smoke_plan.items() for pt in pts),
+            'no_calibration': all(not w['candidates'] and w['bracket_ok'] is None for w in windows)}
+    else:
+        timings = {'setup': summary['setup_seconds'] + sum(w['timings']['convert'] for w in windows) / 2,
+                   'calibration': sum(w['timings']['calibration'] for w in windows),
+                   'native_fixed': sum(w['timings']['native_fixed'] for w in windows),
+                   'native_variable': sum(w['timings']['native_variable'] for w in windows),
+                   'svt_scale8': sum(w['timings']['svt_scale8'] for w in windows),
+                   'masks': sum(w['timings']['masks'] for w in windows),
+                   'scoring': sum(w['timings']['scoring'] for w in windows)}
+        projection = project_full_seconds(timings, staging['publication_seconds'])
+        selection = {
+            'smoke_scale': summary['frames'] == 25 and summary['points'] == 1,
+            'rate_only_selection': all(len(w['candidates']) == len(CAL_QPS) * len(SCALES) and len(w['chosen']) == 1 for w in windows),
+            'bracket': all(w['bracket_ok'] and an.planned_bracket(w['candidates']) for w in windows)}
     points = [p for w in windows for p in w['dcvc']]
     checks: dict[str, Any] = {
         'two_windows': [w['window'] for w in windows] == ['al', 'med'],
-        'smoke_scale': summary['frames'] == 25 and summary['points'] == 1,
+        **selection,
         'accepted': summary['accepted'],
-        'rate_only_selection': all(len(w['candidates']) == len(CAL_QPS) * len(SCALES) and len(w['chosen']) == 1 for w in windows),
-        'bracket': all(w['bracket_ok'] and an.planned_bracket(w['candidates']) for w in windows),
         'gpu': summary['gpu_class'] in GPU_CLASSES and summary['gpu_uuid'].startswith('GPU-'),
         'extension': all(p['encode_report']['environment']['extension']['variant'] == GPU_CLASSES[summary['gpu_class']][1] for p in points),
         'determinism_recorded': all(p['encode_report']['checkpoints']['determinism']['final']['deterministic_algorithms']
@@ -567,6 +628,7 @@ def main() -> None:
     parser.add_argument('--frames', type=int, choices=(25, 240), default=25)
     parser.add_argument('--points', type=int, choices=(1, 3), default=1)
     parser.add_argument('--svt-scales', default='8')
+    parser.add_argument('--point-list', default=None, help='W3b: window:scale:qp,... instead of the calibrated points')
     args = parser.parse_args()
     if args.validate:
         validate()

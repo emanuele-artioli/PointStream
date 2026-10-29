@@ -282,7 +282,7 @@ def test_foreground_masks_control_flow_with_stand_ins(tmp_path, monkeypatch):
     assert k6.DISTS_PAD > 0
 
 
-def synthetic_summary(tmp_path, monkeypatch):
+def synthetic_summary(tmp_path, monkeypatch, listed=None):
     """A smoke summary whose DCVC records come from code_point and a stand-in worker."""
     from argparse import Namespace
 
@@ -301,18 +301,20 @@ def synthetic_summary(tmp_path, monkeypatch):
         record['encode_report']['container_bytes'] = record['bytes']
         record['scores'], record['mean'] = scores, {m: 0.1 for m in an.METRICS}
         record.pop('decoded')
+        if listed:  # the stand-in codes scale 8 frames; the named point is what the validator compares
+            point = {'scale': 2 if key == 'al' else 4, 'qp': 24 if key == 'al' else 36, 'target_kbps': None, 'est_kbps': None}
         scale8 = {'scale': 8, 'scores': scores, 'kbps': 10.1975}
         grid = [(s, q) for s in job.SCALES for q in job.CAL_QPS]
-        candidates = [{'scale': s, 'qp': q, 'est_kbps': 2.5 * 1.18 ** k} for k, (s, q) in enumerate(grid)]
-        windows.append({'window': key, 'accepted': True, 'candidates': candidates, 'chosen': [point], 'bracket_ok': True,
+        candidates = [] if listed else [{'scale': s, 'qp': q, 'est_kbps': 2.5 * 1.18 ** k} for k, (s, q) in enumerate(grid)]
+        windows.append({'window': key, 'accepted': True, 'candidates': candidates, 'chosen': [point], 'bracket_ok': None if listed else True,
                         'dcvc': [record], 'svt': [scale8], 'timings': {'convert': 5, 'calibration': 20, 'native_fixed': 8,
                         'native_variable': 2, 'svt_scale8': 3, 'masks': 4, 'scoring': 2},
                         'audited_controls': {'applies': key == 'al', 'scales': {'8': {'score_max_error': {'full_lpips': 0.0}}}}})
-    return {'frames': 25, 'points': 1, 'gpu_class': 'RTX 6000 Ada', 'gpu_uuid': 'GPU-abc', 'accepted': True, 'windows': windows,
+    return {'frames': 25, 'points': 1, 'point_list': listed, 'gpu_class': 'RTX 6000 Ada', 'gpu_uuid': 'GPU-abc', 'accepted': True, 'windows': windows,
             'setup_seconds': 60.0}
 
 
-def run_validator(tmp_path, monkeypatch, summary):
+def run_validator(tmp_path, monkeypatch, summary, spec='w3'):
     import tarfile
 
     from experiments.tennis import w3_neural_baseline as job
@@ -322,7 +324,7 @@ def run_validator(tmp_path, monkeypatch, summary):
     summary = json.loads(json.dumps(summary))
     (stage / 'w3-summary.json').write_text(json.dumps(summary))
     (stage / 'staging.json').write_text(json.dumps({'publication_seconds': 5.0}))
-    (stage.parent / 'spec.json').write_text(Path('docs/experiments/w3-specs/w3.json').read_text())
+    (stage.parent / 'spec.json').write_text(Path(f'docs/experiments/w3-specs/{spec}.json').read_text())
     inner = tmp_path / 'summary.json'
     inner.write_text(json.dumps(summary))
     with tarfile.open(stage / 'published.tar', 'w') as tar:
@@ -345,3 +347,46 @@ def test_validator_catches_a_decoder_difference(tmp_path, monkeypatch):
         run_validator(tmp_path, monkeypatch, bad)
     checks = json.loads((tmp_path / 'validation.json').read_text())['checks']
     assert [k for k, v in checks.items() if not v] == ['decoders_bit_identical']
+
+
+def test_point_list_parses_validates_and_keeps_order():
+    from experiments.tennis.w3_neural_baseline import parse_point_list
+
+    assert parse_point_list('al:2:21,med:4:15,al:2:30') == {'al': [(2, 21), (2, 30)], 'med': [(4, 15)]}
+    for bad in ('al:2:21', 'al:2:21,med:4:64', 'al:1:21,med:4:15', 'al:2:21,al:2:21,med:4:15', 'x:2:1,med:4:1', 'al:2,med:4:1'):
+        with pytest.raises(ValueError):
+            parse_point_list(bad)
+    spec = json.loads(Path('docs/experiments/w3-specs/w3b.json').read_text())
+    full = parse_point_list(spec['scale']['point_list']['full'])
+    assert len(full['al']) == 6 and len(full['med']) == 3 and parse_point_list(spec['scale']['point_list']['smoke'])['al'][0] in full['al']
+    assert '--points' not in spec['arguments'] and '{point_list}' in spec['arguments']
+
+
+def test_listed_projection_is_per_window():
+    from experiments.tennis.w3_neural_baseline import project_listed_seconds
+
+    t = [dict(convert=2, native_fixed=10, native_variable=1, svt_scale8=2, masks=3, scoring=4),
+         dict(convert=1, native_fixed=20, native_variable=2, svt_scale8=1, masks=2, scoring=1)]
+    expected = 1.35 * (5 + 4 * 6 + (2 + 6 * 10 + 6 * 9.6 + 2 + 80 / 9 * 3 + 3.5 * 80 / 9 * 4)
+                       + (1 + 3 * 20 + 3 * 9.6 * 2 + 1 + 80 / 9 * 2 + 2 * 80 / 9 * 1))
+    assert project_listed_seconds(t, 5, 6, [6, 3], 1.0, 1) == pytest.approx(expected)
+    with pytest.raises(ValueError):
+        project_listed_seconds(t, 5, 6, [6], 1.0, 1)
+    with pytest.raises(ValueError):
+        project_listed_seconds([{**t[0], 'masks': float('nan')}, t[1]], 5, 6, [6, 3], 1.0, 1)
+
+
+def test_validator_passes_a_good_listed_smoke_and_rejects_a_changed_point(tmp_path, monkeypatch):
+    first, second = tmp_path / 'first', tmp_path / 'second'
+    first.mkdir()
+    second.mkdir()
+    good = synthetic_summary(first, monkeypatch, listed='al:2:24,med:4:36')
+    result = run_validator(first, monkeypatch, good, spec='w3b')
+    assert result['passed'] and result['projected_full_seconds'] < 2400
+    assert 'rate_only_selection' not in result['checks'] and result['checks']['points_as_named']
+    bad = synthetic_summary(second, monkeypatch, listed='al:2:24,med:4:36')
+    bad['windows'][0]['chosen'][0]['qp'] = 25
+    with pytest.raises(SystemExit):
+        run_validator(second, monkeypatch, bad, spec='w3b')
+    checks = json.loads((second / 'validation.json').read_text())['checks']
+    assert [k for k, v in checks.items() if not v] == ['points_as_named']
