@@ -303,3 +303,13 @@ def test_cheaper_tiers_are_offered_proactively() -> None:
     for name in ("sonnet-builder", "haiku-runner"):
         front = (AGENTS / f"{name}.md").read_text(encoding="utf-8").split("---")[1]
         assert "description: Use proactively" in front
+
+
+def test_large_read_lets_the_read_tool_open_images(tmp_path: Path) -> None:
+    image = tmp_path / "frame.png"
+    image.write_bytes(b"\x89PNG\r\n" + b"\n" * 9000)
+    payload = {"tool_name": "Read", "tool_input": {"file_path": str(image)}, "cwd": str(tmp_path)}
+    assert guard.check(payload) is None
+    text = tmp_path / "frame.txt"
+    text.write_bytes(b"\n" * 9000)
+    assert guard.check({**payload, "tool_input": {"file_path": str(text)}}) is not None
