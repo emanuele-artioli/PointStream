@@ -31,7 +31,7 @@ DIAGNOSTICS: dict[str, dict[str, str]] = {
                 "seed": "d7caf5293f9cd431271eade2934a1392d649ddc8e9573934a4bc5542e5fb844b"},
 }
 
-HOSTS = ["gpu6"]  # RTX 6000 Ada; gpu5's worker heartbeat was stale (835 s) on 2026-10-29, gpu2 times out smokes, gpu4 is reserved
+HOSTS = ["gpu5"]  # RTX 6000 Ada with a fresh worker heartbeat at submission; gpu2 times out smokes, gpu4 is reserved
 MODELS = ["RTX 6000 Ada"]
 SMOKE_FRAMES, SMOKE_PAIRS = 24, 2
 #: A full stage's cap: setup plus a pair's scoring (4a: 40 s; the first W4 job: 175 s under host contention).

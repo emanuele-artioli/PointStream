@@ -90,12 +90,15 @@ the decisions are in [experiments.md](../experiments.md). Context:
 - Host notes. gpu6's `/local` was 98% full (6.3 of 6.9 TB, 193 GB free) and
   another user's training job held one of its GPUs at 100% during the failed
   job; nothing there is touched or deleted. gpu5's worker heartbeat was 835 s
-  old (stale) when checked, so jobs go to gpu6 (`HOSTS` in `w4_specs.py`).
+  old (stale) when first checked and gpu6's 237 s old a few minutes later (the
+  submit gate refuses a stale host); jobs go to whichever Ada host is fresh at
+  submission, gpu5 at the first resubmission (`HOSTS` in `w4_specs.py`).
 - Caps: full stage 300 s + 200 s per pair; smoke 24 frames, 2 pairs (the
   failed job's smoke took 143 s). W4 total stays within 1.5 GPU-h; 758.7 s
   are charged, 4641 s remain, and nothing is started that cannot finish
   inside them.
-- Switch rule (fixed now). Resubmit P03_10 gho with its full 7 pairs. Read
+- Switch rule (fixed now). Resubmit P03_10 gho with its full 5 pairs (cap 1300 s; the first entry's
+  "7 pairs" was the venue job's count). Read
   `decode_files` of its first finished pair from the job's checkpoint rows.
   - at most 30 s: run the other seven full-set jobs (all 54 hull pairs);
   - more than 30 s (including 100 s or more): cancel this job at once (own
