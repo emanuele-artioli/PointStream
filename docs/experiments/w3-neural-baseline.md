@@ -384,3 +384,75 @@ the decisions are in [experiments.md](../experiments.md). Context:
   `/local/users/emanuele`, then `python -I` with the pointstream environment imported the fleet manager modules and the
   workload (`w3_neural_baseline`, `dcvc_uf_worker`, `svtav1`, `quality`, the `k6b_*`, `h3*`, `masks` modules).
   Two further attempts were refused before any ID existed (no fresh heartbeat on gpu5/gpu6; retried after waits).
+
+### 2026-10-29 — W3b outcome: DCVC-UF at the hybrid's rates does NOT dominate it on Al; it wins the whole frame by a wide margin and loses the players
+- Job `20261029T232113Z-47fe00a2` (third submission; smoke 95.9 s, full 505.0 s of execution; validator passed; no
+  contention, no resume), ran on gpu6, GPU `GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553` (RTX 6000 Ada, capability 8.9,
+  exclusive, torch 2.10.0+cu128), ready.json `git_head` `142aa3bb31caf923bfa0eeb762a1b143fe5aa159`, packed environment
+  as W3. Raw: `Datasets/pointstream-data/jobs/fleet/inbox/20261029T232113Z-47fe00a2/full/` (`published.tar`: nine
+  bitstreams, reports with every frame hash, masks, `summary.json`; `w3-summary.json`). GPU cost: about 0.60k s of
+  execution (about 0.7k s claimed including staging); with the stopped job (about 1.8k) W3b has used about 2.5k of 4,500.
+  Development windows, 240 native frames, 80 ticks, the real-base judge's code; not untouched footage.
+- Acceptance (as W3, all nine points): I frame max difference 0; the same file decoded in two separate processes, two
+  passes each, bit-identical on all 240 frames (max decode diff 0); reference buffer unreachable as before. The SVT
+  scale-8 control reproduced the audited job: bytes equal, max score error 9.3e-5 (limit 1e-3).
+- Points (kbps = container bytes; scores are means over 80 ticks):
+
+| Window | Point | kbps | whole LPIPS | whole DISTS | fg LPIPS | fg DISTS |
+|---|---|---:|---:|---:|---:|---:|
+| Al | DCVC s2 QP21 | 19.253 | 0.1514 | 0.1248 | 0.4229 | 0.3231 |
+| Al | DCVC s2 QP23 | 21.663 | 0.1447 | 0.1174 | 0.3988 | 0.3085 |
+| Al | DCVC s2 QP24 | 23.172 | 0.1406 | 0.1139 | 0.3885 | 0.3015 |
+| Al | DCVC s2 QP25 | 24.656 | 0.1373 | 0.1118 | 0.3809 | 0.2976 |
+| Al | DCVC s2 QP27 | 27.662 | 0.1329 | 0.1063 | 0.3654 | 0.2900 |
+| Al | DCVC s2 QP30 | 33.388 | 0.1240 | 0.0981 | 0.3421 | 0.2751 |
+| Med | DCVC s4 QP15 | 12.767 | 0.4314 | 0.2209 | 0.6899 | 0.4446 |
+| Med | DCVC s4 QP36 | 35.812 | 0.4000 | 0.1932 | 0.5901 | 0.3494 |
+| Med | DCVC s4 QP63 | 130.822 | 0.3822 | 0.1757 | 0.5308 | 0.3131 |
+
+  (W3's Al points: scale 2 QP6 8.396 kbps and QP18 16.078 kbps, scale 8 QP30 3.600 kbps, as in its table.) Med's points
+  bracket 15-40 kbps (12.8 below, 130.8 above); the middle one landed at 35.8, not the predicted 27, because the
+  measured/estimated ratio rises with QP at scale 4 (0.17 at QP12, 0.22 at QP36, 0.43 at QP63). Med has no hybrid
+  score, so no dominance test there.
+- Dominance at the hybrid's rates, Al, scale 2 (log-rate interpolation between the bracketing points: 21.663 and 23.172
+  kbps at 22.738; 19.253 and 21.663 at 21.459; scale 8 has one point near 3.6 kbps: unresolved). Hybrid: whole LPIPS
+  0.2758 / DISTS 0.1696, foreground LPIPS 0.3459 / DISTS 0.2526.
+
+| Rate | metric | DCVC whole | DCVC fg | hybrid whole | hybrid fg | verdict |
+|---|---|---:|---:|---:|---:|---|
+| 22.738 kbps | LPIPS | 0.1417 | 0.3914 | 0.2758 | 0.3459 | does not dominate (fg 0.0445 beyond the margin) |
+| 22.738 kbps | DISTS | 0.1149 | 0.3034 | 0.1696 | 0.2526 | does not dominate (fg 0.0499) |
+| 21.459 kbps | LPIPS | 0.1452 | 0.4007 | 0.2758 | 0.3459 | does not dominate (fg 0.0539) |
+| 21.459 kbps | DISTS | 0.1180 | 0.3097 | 0.1696 | 0.2526 | does not dominate (fg 0.0562) |
+
+  The hypothesis holds: DCVC's player region stays worse than the hybrid's (0.39-0.40 against 0.346 LPIPS) at the
+  hybrid's rates, and the competing explanation (player LPIPS <= 0.35 with whole <= 0.18) is not met at either rate.
+  The two sides trade, as in W1 for SVT: DCVC wins the whole frame by 0.13 LPIPS / 0.055 DISTS, the hybrid the player
+  region by 0.045 / 0.050. DCVC reaches the hybrid's foreground LPIPS 0.346 at about 32 kbps (interpolated between
+  QP27 and QP30; QP30 at 33.4 kbps gives 0.3421 with whole 0.124), 1.4 times the hybrid's rate; foreground DISTS 0.2526 is not reached even at 33.4 kbps (0.2751). Against
+  DCVC the hybrid is Pareto-incomparable on Al, not better; what that means for the claim is the paper's judgment.
+- DCVC against the stronger SVT envelope on Al (BD-rate, PCHIP over the overlapping quality range; anchor = upper
+  concave hull of W3's three CRF-63 bases and W1's plain half (CRF 65-67) and quarter (CRF 61-63) points of scoring
+  job `20261029T095649Z-43181442`; negative = DCVC needs fewer bits at equal quality; DCVC = all eight Al points of W3
+  and W3b):
+
+| | whole LPIPS | whole DISTS | fg LPIPS | fg DISTS |
+|---|---:|---:|---:|---:|
+| against the stronger envelope | -59.3 % | -54.2 % | -64.5 % | -66.1 % |
+| against the three CRF-63 bases (same DCVC points) | -64.9 % | -55.5 % | -67.5 % | -67.5 % |
+| W3's three DCVC points only, stronger envelope | -60.6 % | -57.7 % | -64.5 % | -65.9 % |
+
+  Overlap (negative distance): whole LPIPS 0.139-0.438, whole DISTS 0.110-0.290, fg LPIPS 0.475-0.794, fg DISTS
+  0.367-0.528; "better at every common rate" on all four metrics. The stronger SVT envelope shrinks DCVC's advantage
+  by 1-6 percentage points, not more: W3's -66 % was not an artifact of the thin anchor. Data:
+  `docs/experiments/w3-specs/w3b-report.json`; code `experiments/tennis/w3b_report.py`.
+- Cross-job byte identity (stopped job `20261029T190006Z-d48a344b`, gpu5 GPU-07aa7586, against this job, gpu6
+  GPU-ef96fc4f, both RTX 6000 Ada): the 240 decoded-frame hashes of all six Al points are equal, and the container
+  files are byte-identical for QP23, 24, 25, 27 and 30. QP21 is NOT: same length (23,104 bytes), 3,100 bytes differ,
+  the first at offset 4,556, container sha256 `a877f87b...` against `1435192d...`, the encoder's NAL sizes equal. Both
+  streams decode to the same 240 frames, which these records cannot explain. So the encoder is not bit-reproducible
+  across GPU instances of one class for every point, although the decoded frames agree. Open: decode each job's QP21
+  stream in the other job's environment.
+- Cautions. Two development windows, 80 ticks, no confidence interval; the hybrid's scores come from an earlier job and
+  were not re-scored here; the foreground is the judge's S region, the same for both codecs; streams still do not travel
+  between GPU classes (W3 limit unchanged).

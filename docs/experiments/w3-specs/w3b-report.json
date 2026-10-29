@@ -1,0 +1,490 @@
+{
+ "dcvc_points": [
+  {
+   "codec": "dcvc",
+   "scale": 8,
+   "qp": 30,
+   "rate_kbps": 3.6,
+   "whole_lpips": 0.43792259611906836,
+   "whole_dists": 0.2903248697519302,
+   "foreground_lpips": 0.7937148802194093,
+   "foreground_dists": 0.5282724596560001,
+   "max_decode_diff": 0,
+   "accepted": true
+  },
+  {
+   "codec": "dcvc",
+   "scale": 2,
+   "qp": 6,
+   "rate_kbps": 8.395833333333334,
+   "whole_lpips": 0.20862391172809364,
+   "whole_dists": 0.18107426688075065,
+   "foreground_lpips": 0.569198532791816,
+   "foreground_dists": 0.43106135353446007,
+   "max_decode_diff": 0,
+   "accepted": true
+  },
+  {
+   "codec": "dcvc",
+   "scale": 2,
+   "qp": 18,
+   "rate_kbps": 16.0775,
+   "whole_lpips": 0.15894861235441984,
+   "whole_dists": 0.13402994722127914,
+   "foreground_lpips": 0.44908178646994246,
+   "foreground_dists": 0.34137296080589297,
+   "max_decode_diff": 0,
+   "accepted": true
+  },
+  {
+   "codec": "dcvc",
+   "scale": 2,
+   "qp": 21,
+   "rate_kbps": 19.253333333333334,
+   "whole_lpips": 0.1514320782319999,
+   "whole_dists": 0.12479746714234352,
+   "foreground_lpips": 0.42286865964290765,
+   "foreground_dists": 0.32313695549964905,
+   "max_decode_diff": 0,
+   "accepted": true
+  },
+  {
+   "codec": "dcvc",
+   "scale": 2,
+   "qp": 23,
+   "rate_kbps": 21.6625,
+   "whole_lpips": 0.1446893052466122,
+   "whole_dists": 0.11741450354456902,
+   "foreground_lpips": 0.3988166147451072,
+   "foreground_dists": 0.30854097902774813,
+   "max_decode_diff": 0,
+   "accepted": true
+  },
+  {
+   "codec": "dcvc",
+   "scale": 2,
+   "qp": 24,
+   "rate_kbps": 23.171666666666667,
+   "whole_lpips": 0.140593443599748,
+   "whole_dists": 0.11389754861593246,
+   "foreground_lpips": 0.3885256356657473,
+   "foreground_dists": 0.30145239606499674,
+   "max_decode_diff": 0,
+   "accepted": true
+  },
+  {
+   "codec": "dcvc",
+   "scale": 2,
+   "qp": 25,
+   "rate_kbps": 24.655833333333334,
+   "whole_lpips": 0.13730255965244623,
+   "whole_dists": 0.11180969029664993,
+   "foreground_lpips": 0.3808968117458272,
+   "foreground_dists": 0.2976261705160141,
+   "max_decode_diff": 0,
+   "accepted": true
+  },
+  {
+   "codec": "dcvc",
+   "scale": 2,
+   "qp": 27,
+   "rate_kbps": 27.66166666666667,
+   "whole_lpips": 0.13285838807659384,
+   "whole_dists": 0.10626761540770531,
+   "foreground_lpips": 0.3653704109059374,
+   "foreground_dists": 0.28997238278388976,
+   "max_decode_diff": 0,
+   "accepted": true
+  },
+  {
+   "codec": "dcvc",
+   "scale": 2,
+   "qp": 30,
+   "rate_kbps": 33.388333333333335,
+   "whole_lpips": 0.12404527668894075,
+   "whole_dists": 0.09812002629041672,
+   "foreground_lpips": 0.34209925100522204,
+   "foreground_dists": 0.2750692114233971,
+   "max_decode_diff": 0,
+   "accepted": true
+  }
+ ],
+ "strong_svt_points": [
+  {
+   "codec": "svt",
+   "scale": 8,
+   "qp": 63,
+   "rate_kbps": 10.1975,
+   "whole_lpips": 0.4509179661126785,
+   "whole_dists": 0.29936772137880324,
+   "foreground_lpips": 0.840522260345616,
+   "foreground_dists": 0.6096338115632534
+  },
+  {
+   "codec": "svt",
+   "scale": 4,
+   "qp": 63,
+   "rate_kbps": 17.130833333333335,
+   "whole_lpips": 0.2825014704951534,
+   "whole_dists": 0.1926862969994545,
+   "foreground_lpips": 0.6829784697941181,
+   "foreground_dists": 0.4974688239395618
+  },
+  {
+   "codec": "svt-av1",
+   "scale": 4,
+   "qp": 63,
+   "rate_kbps": 17.130833333333335,
+   "whole_lpips": 0.2825729174201871,
+   "whole_dists": 0.19269585683941842,
+   "foreground_lpips": 0.6829807243427812,
+   "foreground_dists": 0.49747133925557135
+  },
+  {
+   "codec": "svt-av1",
+   "scale": 2,
+   "qp": 67,
+   "rate_kbps": 20.55666666666667,
+   "whole_lpips": 0.1936979618778935,
+   "whole_dists": 0.14110099002718926,
+   "foreground_lpips": 0.5927073263278919,
+   "foreground_dists": 0.44279359057545664
+  },
+  {
+   "codec": "svt-av1",
+   "scale": 4,
+   "qp": 62,
+   "rate_kbps": 20.608333333333334,
+   "whole_lpips": 0.2698868042745708,
+   "whole_dists": 0.184139733761549,
+   "foreground_lpips": 0.6489122804582903,
+   "foreground_dists": 0.4597379595041275
+  },
+  {
+   "codec": "svt-av1",
+   "scale": 2,
+   "qp": 66,
+   "rate_kbps": 22.284166666666668,
+   "whole_lpips": 0.1820549587673611,
+   "whole_dists": 0.1290247730910778,
+   "foreground_lpips": 0.5736746013950219,
+   "foreground_dists": 0.42988519072532655
+  },
+  {
+   "codec": "svt-av1",
+   "scale": 4,
+   "qp": 61,
+   "rate_kbps": 24.11,
+   "whole_lpips": 0.26271392972969715,
+   "whole_dists": 0.17880790904164315,
+   "foreground_lpips": 0.6249962323738563,
+   "foreground_dists": 0.4331968441605568
+  },
+  {
+   "codec": "svt-av1",
+   "scale": 2,
+   "qp": 65,
+   "rate_kbps": 24.64166666666667,
+   "whole_lpips": 0.1654405866081332,
+   "whole_dists": 0.12398363500833512,
+   "foreground_lpips": 0.5451838858342353,
+   "foreground_dists": 0.41224685683846474
+  },
+  {
+   "codec": "svt",
+   "scale": 2,
+   "qp": 63,
+   "rate_kbps": 33.685,
+   "whole_lpips": 0.13930432825912664,
+   "whole_dists": 0.10973345935344696,
+   "foreground_lpips": 0.47527503787354375,
+   "foreground_dists": 0.3665816232562065
+  }
+ ],
+ "dominance": {
+  "primary": {
+   "rate_kbps": 22.737962222222222,
+   "scale2": {
+    "lpips": {
+     "verdict": "does not dominate",
+     "whole": 0.1417425389764764,
+     "foreground": 0.39141277334315266,
+     "whole_margin": 0.1350440723215078,
+     "foreground_margin": -0.0445371993186951
+    },
+    "dists": {
+     "verdict": "does not dominate",
+     "whole": 0.11488423151615992,
+     "foreground": 0.30344110042377054,
+     "whole_margin": 0.055728205225430566,
+     "foreground_margin": -0.04988985845966876
+    }
+   },
+   "scale8": {
+    "lpips": {
+     "verdict": "unresolved",
+     "whole": null,
+     "foreground": null
+    },
+    "dists": {
+     "verdict": "unresolved",
+     "whole": null,
+     "foreground": null
+    }
+   }
+  },
+  "rebilled_kps2": {
+   "rate_kbps": 21.458795555555554,
+   "scale2": {
+    "lpips": {
+     "verdict": "does not dominate",
+     "whole": 0.1452296517882734,
+     "foreground": 0.4007440768305981,
+     "whole_margin": 0.1315569595097108,
+     "foreground_margin": -0.05386850280614053
+    },
+    "dists": {
+     "verdict": "does not dominate",
+     "whole": 0.11800615313086141,
+     "foreground": 0.3097106588354255,
+     "whole_margin": 0.05260628361072908,
+     "foreground_margin": -0.0561594168713237
+    }
+   },
+   "scale8": {
+    "lpips": {
+     "verdict": "unresolved",
+     "whole": null,
+     "foreground": null
+    },
+    "dists": {
+     "verdict": "unresolved",
+     "whole": null,
+     "foreground": null
+    }
+   }
+  }
+ },
+ "bd_rate_vs_strong_svt": {
+  "full_lpips": {
+   "bd_rate_percent": -59.319451570562535,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.43792259611906836,
+    -0.13930432825912664
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     33.388333333333335
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.015998634500201392,
+    "max_quality_gain": 0.25715852652352333
+   }
+  },
+  "full_dists": {
+   "bd_rate_percent": -54.16809779503764,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.2903248697519302,
+    -0.10973345935344696
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     33.388333333333335
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.012016673133714587,
+    "max_quality_gain": 0.13237065156964445
+   }
+  },
+  "foreground_lpips": {
+   "bd_rate_percent": -64.5120577964409,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.7937148802194093,
+    -0.47527503787354375
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     33.388333333333335
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.13515401152153578,
+    "max_quality_gain": 0.3072665814798634
+   }
+  },
+  "foreground_dists": {
+   "bd_rate_percent": -66.1432092586521,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.5282724596560001,
+    -0.3665816232562065
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     33.388333333333335
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.09280461008099106,
+    "max_quality_gain": 0.20541015466493057
+   }
+  }
+ },
+ "bd_rate_vs_crf63_bases": {
+  "full_lpips": {
+   "bd_rate_percent": -64.91176332970004,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.43792259611906836,
+    -0.13930432825912664
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     33.388333333333335
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.01713244254566143,
+    "max_quality_gain": 0.25715852652352333
+   }
+  },
+  "full_dists": {
+   "bd_rate_percent": -55.54594708224069,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.2903248697519302,
+    -0.10973345935344696
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     33.388333333333335
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.012698671881413728,
+    "max_quality_gain": 0.13237065156964445
+   }
+  },
+  "foreground_lpips": {
+   "bd_rate_percent": -67.50669884091695,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.7937148802194093,
+    -0.47527503787354375
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     33.388333333333335
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.1358930878483507,
+    "max_quality_gain": 0.3072665814798634
+   }
+  },
+  "foreground_dists": {
+   "bd_rate_percent": -67.46111940116015,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.5282724596560001,
+    -0.3665816232562065
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     33.388333333333335
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.09322475676327807,
+    "max_quality_gain": 0.20541015466493057
+   }
+  }
+ },
+ "bd_rate_w3_points_vs_strong_svt": {
+  "full_lpips": {
+   "bd_rate_percent": -60.63359811153789,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.43792259611906836,
+    -0.15894861235441984
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     16.0775
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.12492295874725459,
+    "max_quality_gain": 0.25715852652352333
+   }
+  },
+  "full_dists": {
+   "bd_rate_percent": -57.71540235774919,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.2903248697519302,
+    -0.13402994722127914
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     16.0775
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.07170710748224882,
+    "max_quality_gain": 0.13237065156964445
+   }
+  },
+  "foreground_lpips": {
+   "bd_rate_percent": -64.48719320558483,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.7937148802194093,
+    -0.47527503787354375
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     16.0775
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.23050201389584746,
+    "max_quality_gain": 0.3072665814798634
+   }
+  },
+  "foreground_dists": {
+   "bd_rate_percent": -65.93921524980185,
+   "status": "OVERLAP ONLY",
+   "quality_overlap_negative_distance": [
+    -0.5282724596560001,
+    -0.3665816232562065
+   ],
+   "rate_dominance": {
+    "status": "common rate range",
+    "rate_range_kbps": [
+     10.1975,
+     16.0775
+    ],
+    "verdict": "better at every common rate",
+    "min_quality_gain": 0.16981744666963605,
+    "max_quality_gain": 0.20541015466493057
+   }
+  }
+ }
+}
