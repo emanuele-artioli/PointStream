@@ -122,3 +122,27 @@ the decisions are in [experiments.md](../experiments.md). Context:
 - Scored set: 3 controls + 3 CRFs × 3 offsets × {half, quarter} = 21 points on
   the same 80 ticks. Masks job `20261029T092537Z-88270f98` (80 ticks rebuilt,
   every R and S hash equals the K6 window's record).
+
+### 2026-10-29 — W1 addition: secondary re-billed rate (written before any score was read)
+- Disclosure. The scoring job `20261029T095649Z-43181442` (gpu3, A6000) had
+  already finished its smoke and full stages when this entry was written; its
+  outputs were not opened. The addition below was fixed from the root
+  message and W2's file, not from a W1 quality number.
+- Basis. W2 (`claude/w2-pose-rate`, `docs/experiments/w2-pose-rate-2026-10-29.json`,
+  code `experiments/tennis/w2_pose_rate.py`) found an exact (round-trip
+  identical, zero keypoint error) re-coding of Al's keypoint packet: key 4,
+  4 px, linear interpolation, previous-frame prediction, 2,174 bytes =
+  1.811667 kbps against the original 4,236 bytes = 3.530000 kbps. The
+  generated players are unchanged, so the hybrid's quality is identical at a
+  total rate lower by 1.718333 kbps.
+- Primary (as frozen): the rule applies at 22.737962 kbps.
+- Secondary: the same rule (linear in log-rate between the two bracketing
+  points, dominance within 0.001 on both axes, outcome A or B, best
+  foreground at the hybrid's whole-frame score) applies at
+  22.737962 − (3.530000 − 1.811667) = 21.019629 kbps, with the hybrid's four
+  scores unchanged. A policy whose scored CRF points do not bracket 21.019629
+  is unresolved there; no new encodes are made for it. The selected CRFs were
+  chosen for the primary rate, so some policies will be unresolved at the
+  secondary rate by construction.
+- Full resolution: no retry is needed; its submission already ran (job
+  `20261029T093403Z-0a9c7eba`) and is unresolved at all offsets (above).
