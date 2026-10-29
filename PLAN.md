@@ -21,7 +21,18 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-10-28)
+## Where PointStream stands (2026-10-29)
+
+**Read first: [assessment 2026-10-29](docs/assessment-2026-10-29.md).** No
+configuration beats SVT-AV1 on whole-frame LPIPS and DISTS once every bit is
+paid for. In tennis the whole frame is decided by the background at the
+tested rate (~23 kbps, 1080p): even source pixels for the players gain only
+what SVT buys with ~1.3 kbps, and the player stream costs 5.6 kbps. The
+foreground wins by a wide margin at every measured rate. Item W (below,
+under Throughout) tests the four directions that can change the verdict.
+The 2026-10-28 records below stay as they were.
+
+### Records of 2026-10-28
 
 **Single-stream search CLOSED/REPORTED (user approved, 2026-10-28):** run aligned
 decoder-only temporal restoration, a CPU audit of conditional coding/latent
@@ -1324,6 +1335,23 @@ candidate encoding.
 As D1, per dataset and class, with the ball scored by point metrics.
 
 ## Throughout
+
+### W. Paths to a baseline win (root, 2026-10-29)
+
+From the [assessment](docs/assessment-2026-10-29.md). Each sub-item is
+independent; rules and budgets in its file. Total new GPU allowance 4.5
+GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
+
+- **W1. Pareto against ROI-SVT** ([rule](docs/experiments/w1-roi-pareto.md)):
+  does PointStream reach a (whole-frame, player) quality pair that no SVT
+  bit allocation reaches at the same rate? Decides the paper's tennis claim.
+- **W2. Keypoint rate** ([rule](docs/experiments/w2-pose-rate.md)): can two
+  players' keypoints cost ≤0.5 kbps within half the estimator's noise?
+- **W3. Neural baseline** ([rule](docs/experiments/w3-neural-baseline.md)):
+  DCVC-UF encoded and decoded exactly in one job, Al and Med.
+- **W4. Egocentric receiver masks** ([rule](docs/experiments/w4-ego-receiver-masks.md)):
+  does a zero-correction receiver mask keep H5q's DISTS win?
+
 
 ### J. Experience-track re-judging (user, 2026-10-22)
 
