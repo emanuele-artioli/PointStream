@@ -113,3 +113,8 @@ the decisions are in [experiments.md](../experiments.md). Context:
   verdict exists. Fix: compute the flag first; new test `test_code_point_...` runs `code_point`
   against a stand-in worker (identical decoders accepted; a one-level difference rejected).
   Resubmission needs root's approval (the approved single submission is used).
+- Status (2026-10-29): job `20261029T093021Z-81571456` = failed smoke (about 75 GPU-s of 7200,
+  bookkeeping `KeyError`, fixed at `367716fd`). Next step: one resubmission, same spec and flags
+  (`docs/experiments/w3-specs/w3.json`, `--source-worktree`, `--snapshot-path src experiments
+  tools pyproject.toml`, default transfer timeout), approved in principle by root, awaiting a
+  session with usage. Nothing submitted since.
