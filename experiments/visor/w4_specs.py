@@ -33,7 +33,7 @@ DIAGNOSTICS: dict[str, dict[str, str]] = {
 
 HOSTS = ["gpu5"]  # RTX 6000 Ada with a fresh worker heartbeat at submission; gpu2 times out smokes, gpu4 is reserved
 MODELS = ["RTX 6000 Ada"]
-SMOKE_FRAMES, SMOKE_PAIRS = 24, 2
+SMOKE_FRAMES, SMOKE_PAIRS = 24, 1
 #: A full stage's cap: setup plus a pair's scoring (4a: 40 s; the first W4 job: 175 s under host contention).
 FULL_BASE_SECONDS, FULL_PAIR_SECONDS = 300, 200
 

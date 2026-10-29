@@ -128,4 +128,11 @@ the decisions are in [experiments.md](../experiments.md). Context:
   code `2d7463c8` (ready git_head confirmed), gpu5 requested, 5 pairs, cap
   1300 s. The first submit call took over 5 minutes at the snapshot; it was
   not replayed.
+- Switch-rule reading (job `20261029T093413Z-491b07e4`, gpu5 Ada): the first
+  finished pair `enh-1080-63+dcvc-42_4` had decode_files 27.76 s (B2 harness
+  7.8, composite 2.6, DISTS 21.3), at most 30 s, so the **full-set** branch
+  applies: the other seven jobs run all 54 hull pairs. The earlier 117-145 s
+  were therefore host contention on gpu6 (not reproduced on gpu5). To keep
+  the remaining jobs inside the budget their smokes use one pair instead of
+  two (24 frames).
 
