@@ -149,6 +149,50 @@ Cards say how hard their item is, so cheaper models take the easier ones.
 - **Haiku:** mechanical, fully specified work: collecting files, rendering
   crops for a visual check, refreshing a table.
 
+## Subagents inside a session
+
+The same three tiers exist as Claude Code subagents in
+[`.claude/agents/`](../.claude/agents/): `opus-designer` (Opus, medium
+effort), `sonnet-builder` (Sonnet, high) and `haiku-runner` (Haiku, high).
+A card picks the session's model; a subagent takes one piece of a
+session's work and returns a short report.
+
+**What a subagent costs.** It starts cold: its own prompt, the brief, the
+full AGENTS.md and CLAUDE.md files and git status, but none of the
+conversation. It then re-reads whatever files it needs. Its report lands
+in the main context and is re-read on every later step. The total is
+roughly: startup + the brief + its own exploration + the report + any
+re-checking the main session does. Delegating saves tokens only when the
+work it absorbs (reads, logs, edit-test loops) is large next to the
+brief and the report, and when the cheaper model's rate outweighs the
+re-reading. An Opus subagent under an Opus session never saves on rate;
+use it for context isolation, not for savings.
+
+**Delegate** when the task:
+
+- is self-contained: a brief of a paragraph or two covers it;
+- would flood the main context: many files, long logs, many
+  edit-and-test rounds;
+- fits a cheaper tier than the session's model; or
+- runs independently in parallel with other work.
+
+**Keep in the main session** a task that:
+
+- takes a handful of tool calls;
+- needs the conversation's context, so the brief would retell it;
+- is a step you would re-verify in full anyway;
+- needs back-and-forth with the user.
+
+**Briefs.** Name the goal, the files or area, what done looks like, the
+GPU budget (zero unless stated) and whether to commit. A `haiku-runner`
+brief lists every step and its expected result; Haiku stops at the first
+surprise instead of improvising. Each agent caps its report length and
+cannot spawn further subagents, so the tree stays one level deep.
+
+**Escalate, don't retry.** If a `haiku-runner` stops, either finish the
+step in the main session or re-brief it to `sonnet-builder`; do not
+re-send the same brief.
+
 ## Codex
 
 Codex sessions follow the same protocol. What differs:

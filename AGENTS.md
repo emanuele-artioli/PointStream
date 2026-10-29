@@ -139,6 +139,12 @@ one frozen fleet job and reporting its results. The primary agent owns
 experiment design, implementation review and scientific decisions; do not
 delegate open-ended research or substantial implementation to Luna.
 
+Claude Code subagents come in three tiers in `.claude/agents/`
+(`opus-designer`, `sonnet-builder`, `haiku-runner`); when to delegate, and
+when it costs more than it saves, is in
+[sessions](docs/sessions.md#subagents-inside-a-session). The primary agent
+still owns scientific decisions: subagents return recommendations.
+
 ## Deciding and asking
 
 Decide alone, and record why, whenever a step can be undone: merges, Overleaf
