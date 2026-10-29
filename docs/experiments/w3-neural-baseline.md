@@ -141,3 +141,9 @@ the decisions are in [experiments.md](../experiments.md). Context:
   - SVT scale 8 re-encode of Al: 12,237 bytes = 10.1975 kbps, equal to the audited base.
   - Not yet exercised on a GPU: foreground masks, scoring, the audited score control, the
     validator. Per root's rule no further submission without root.
+- Jobs (fifth submission, root-approved): `20261029T123801Z-4da73ccd`, ready.json `git_head`
+  `f86d1067` (foreground truth over 240 frames, upstream determinism strictness kept, stand-in tests
+  of the foreground, scoring, control and validator tail). The publish call timed out client-side
+  but the job published late (pending). Full pytest on the Mac (miniconda env): 12 failures in
+  court/segmentation/hook tests that do not touch W3 (cv2 and environment differences, plus the
+  known `test_patches_into_models_or_datasets_are_blocked`); all W3 tests pass.
