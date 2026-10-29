@@ -69,6 +69,43 @@ Explain every internal name (item letters, part numbers, script names) the
 first time it appears. Sessions may reason in their own labels; the user
 should not have to decode them.
 
+## Reporting and waiting
+
+Agreed with the user on 2026-10-29: output tokens cost, and the user cannot
+read a stream of intermediate reports.
+
+- **Work silently.** Report once when a task or phase ends: outcome first,
+  about ten lines. Item sessions still send [the report](#the-report).
+- **Interrupt only for a change:** a decision the user must make, a blocker,
+  a budget about to be exceeded, or a result that changes the plan.
+- **A wake that changes nothing ends in one line.** Subagent completions,
+  fleet waits and keepalive pings each resume the session, and each turn ends
+  with a message. When nothing changed for the user, that message is one line
+  ("H5p: 3/5 jobs done, nothing to do").
+- **Progress lives in files:** the item's `docs/experiments/` entry and its
+  card row, updated at each event. The user reads them when they want, and
+  they survive compaction.
+
+### Keeping the cache warm
+
+Claude Code writes a one-hour prompt cache; the hour counts from the last
+request. Rewriting an expired cache costs about 2x the context's input price,
+reading it about 0.1x (Anthropic's multipliers as of 2026-10-29), so a ping
+costs about a twentieth of a rewrite. At 45-50 minute spacing, keepalives
+cost less than one rewrite for waits up to about 14 hours.
+
+- **Fleet waits** need no keepalive: each `scripts/ps-fleet wait` ends within
+  45 minutes and resumes the session inside the cache hour.
+- **Waiting on the user (Claude Code only).** When a turn ends waiting for
+  the user, schedule one one-shot wakeup about 50 minutes later (`send_later`
+  in cloud sessions; verify a local scheduler's one-shot semantics before
+  relying on it). A ping does no other work, ends in one line and arms only
+  the next ping. Stop the chain 8 hours after the user's last message. When
+  the user writes, cancel the pending ping. One-shot pings cannot loop if
+  inference hits a usage limit.
+- **Codex** gets no keepalives: its cache lifetime is not exposed, and a chat
+  kept 98% of its cache after 118 minutes (below).
+
 ## Compaction
 
 A session cannot run `/compact` itself. At a phase boundary (a pilot done, a
@@ -90,8 +127,9 @@ whether delegating paid off and adjust the
 Automatic compaction (at 80% in cloud sessions) is the safety net. When the
 next phase is a new task, a fresh session from a card is better than
 compacting. Cache behavior differs by harness. Claude Code's local check on
-2026-10-23 found one-hour cache writes; this is not a Codex guarantee. Retain
-45-minute bounded stages to avoid forgotten work, not to assume a fixed KV TTL.
+2026-10-23 found one-hour cache writes; this is not a Codex guarantee.
+45-minute bounded stages avoid forgotten work and, in Claude Code, also resume
+the session inside the cache hour.
 
 Codex's desktop cache lifetime is not exposed here. On 2026-10-24 this T1 chat
 (`gpt-6.1-sol`, medium) resumed after about 118 minutes: the first new inference
@@ -100,8 +138,9 @@ cache accounting, not proof of physical KV residency or a guaranteed TTL. The
 public API guide documents a 30-minute default minimum for GPT-5.6 and later,
 with a 12-hour API option; neither identifies this app's actual setting.
 Source: [OpenAI prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching).
-Do not wake a model to keep its cache warm. Save durable continuation state and
-use the [completion-first monitoring policy](fleet.md#monitoring-from-the-submitting-chat).
+In Codex, do not wake a model to keep its cache warm; Claude Code does so only
+as in [Keeping the cache warm](#keeping-the-cache-warm). Either way, save
+durable continuation state and use the [completion-first monitoring policy](fleet.md#monitoring-from-the-submitting-chat).
 
 ## Hooks
 

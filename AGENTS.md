@@ -42,8 +42,9 @@ eligible hosts before submitting to the compatible host pool. Uncertain
 submissions are inspected, never replayed; cancel only your own jobs. GPU hosts
 are gpu1–gpu6. Wait on fleet jobs only with `scripts/ps-fleet wait` (at most 45
 minutes). Prefer verified completion-triggered wakeups. Do not create recurring
-LLM polling or cache keepalives; when completion wakeups are unavailable, use
-one bounded deadline check as described in [docs/fleet.md](docs/fleet.md).
+LLM polling, nor cache keepalives beyond the bounded chain under
+[Reporting and waiting](#reporting-and-waiting); when completion wakeups are
+unavailable, use one bounded deadline check as described in [docs/fleet.md](docs/fleet.md).
 Notify only meaningful changes; persist state before waiting (user, 2026-10-24).
 
 ## Shared home is slow NFS
@@ -179,6 +180,17 @@ and risk, your recommendation, and exactly what you need. Explain every
 internal name the first time ("part 1a, the test of the hand detector on
 blurred frames"). Never make the user scroll back for context
 ([sessions](docs/sessions.md#asking-the-user)).
+
+## Reporting and waiting
+
+Work silently and report once when a task or phase ends, outcome first.
+Interrupt earlier only for a decision the user must make, a blocker, a budget
+about to be exceeded, or a result that changes the plan. A wake that changes
+nothing (a subagent or fleet completion, a keepalive ping) ends in one line.
+Progress lives in the item's experiments entry and card row, not in the chat.
+While waiting on the user, Claude Code keeps its one-hour cache warm with a
+bounded chain of one-shot wakeups; Codex does not
+([sessions](docs/sessions.md#reporting-and-waiting); user, 2026-10-29).
 
 ## Context and compaction
 
