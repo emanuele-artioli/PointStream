@@ -133,8 +133,9 @@ how much a better probability model or a body-motion predictor could save.
   240 frames at **50 fps = 4.8 s**, so the packet is **5.90 kbps**, not
   3.53). Code revision `67cade29` (branch `claude/w2-pose-rate`,
   `experiments/tennis/w2_pose_rate.py`, SHA256 `72f7067b…e3ba`), CPU only
-  (31 s wall for both stages on the Mac), no GPU, no images. Full result:
-  [JSON](w2-pose-rate-2026-10-29.json). Every row is a real encode and a
+  (31 s wall for both stages on the Mac), no GPU, no images. Summary result:
+  [JSON](w2-pose-rate-2026-10-29.json); the 156 second-stage rows per window
+  are omitted from it for size and regenerate with the module in about 30 s. Every row is a real encode and a
   decode from the produced bytes alone, checked equal to the encoder's
   expectation; rate = produced bytes including the 13-byte header.
 - First stage (predictor for (b) and (c): previous frame, which beat
