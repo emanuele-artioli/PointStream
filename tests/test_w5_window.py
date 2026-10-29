@@ -73,3 +73,21 @@ def test_early_stop_fires_on_two_losses_in_one_family_unless_disabled():
     assert judge.early_stop_applies(both, False) is True
     assert judge.early_stop_applies(both, True) is False
     assert judge.early_stop_applies(_item({'full_lpips', 'foreground_dists'}), False) is False
+
+
+def test_w5_specs_use_whole_argument_placeholders_and_staged_names():
+    from experiments.tennis import w5_specs as specs
+
+    jobs = {'masks': specs.masks(), **specs.encode_specs(42.5)}
+    jobs['score'] = specs.score_spec(('/m', 'a' * 64), ('/h', 'b' * 64), [('/e0', 'c' * 64), ('/e1', 'd' * 64)])
+    for name, spec in jobs.items():
+        staged = {x['name'] for x in spec['staged_inputs']}
+        used = {a[8:-1] for a in spec['arguments'] if a.startswith('{staged:')}
+        assert used <= staged, name
+        assert spec['deadline'] > '2026-10-29' and spec['validator'][-1] == '--validate'
+        assert all(a.startswith('{') or '{' not in a for a in spec['arguments'])
+    out = jobs['encode-half-out']['arguments']
+    assert out[out.index('--convention') + 1] == 'outside' and out[out.index('--offsets') + 1:] == ['-20', '-40']
+    assert jobs['encode-half']['arguments'][-1] == '--controls' and '--controls' not in jobs['encode-quarter']['arguments']
+    assert float(out[out.index('--target-kbps') + 1]) == 42.5
+    assert jobs['score']['gpu_models'] == ['RTX A6000'] and '--primary' in jobs['score']['arguments']
