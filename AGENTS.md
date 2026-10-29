@@ -133,17 +133,21 @@ python -m pytest
 
 Pass no paths to ruff or mypy: paths replace the configured file sets.
 
-Codex subagents use `gpt-6-luna` at `max` reasoning effort (user,
-2026-10-28). Give them extremely precise, simple tasks, typically launching
-one frozen fleet job and reporting its results. The primary agent owns
-experiment design, implementation review and scientific decisions; do not
-delegate open-ended research or substantial implementation to Luna.
+Subagents come in three tiers (user, 2026-10-29): a designer for open-ended
+judgment, a builder for scoped work whose details are still open, and a runner
+for fully specified steps such as launching one frozen fleet job and reporting
+its results.
 
-Claude Code subagents come in three tiers in `.claude/agents/`
-(`opus-designer`, `sonnet-builder`, `haiku-runner`); when to delegate, and
-when it costs more than it saves, is in
-[sessions](docs/sessions.md#subagents-inside-a-session). The primary agent
-still owns scientific decisions: subagents return recommendations.
+| Tier | Claude Code (`.claude/agents/`) | Codex |
+|---|---|---|
+| designer | `opus-designer`: Opus, `medium` | `gpt-6.1-sol`, `medium` |
+| builder | `sonnet-builder`: Sonnet, `high` | `gpt-6.1-terra`, `medium` |
+| runner | `haiku-runner`: Haiku, `medium` | `gpt-6.1-terra`, `low` |
+
+The Codex tiers replace GPT-6 Luna at `max` (user, 2026-10-28). The primary
+agent owns experiment design, implementation review and scientific decisions;
+subagents return recommendations. When to delegate, and when it costs more
+than it saves, is in [sessions](docs/sessions.md#subagents-inside-a-session).
 
 ## Deciding and asking
 
@@ -175,7 +179,8 @@ the full log when the summary shows anything unexpected.
 
 Keep state in files, not only in the conversation: record each fleet job ID in
 the experiments entry when submitting it. When a phase ends, tell the user it is
-a good moment to `/compact` and give a one-line focus
+a good moment to `/compact` and give a one-line focus; if the phase delegated
+to subagents, suggest running the `explain-usage` skill first
 ([sessions](docs/sessions.md#compaction)).
 
 Compact instructions: keep verbatim the card's goal, scope and stop

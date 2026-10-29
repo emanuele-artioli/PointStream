@@ -9,7 +9,7 @@ from pathlib import Path
 
 from tools.agent_hooks import guard_large_read as guard
 from tools.agent_hooks import guard_protected as protected
-from tools.agent_hooks import ledger, session_start
+from tools.agent_hooks import ledger, session_start, subagent_guard
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -226,3 +226,65 @@ def test_codex_hooks_file_runs_the_same_scripts() -> None:
     for module in ("session_start", "guard_large_read", "guard_protected"):
         assert f"tools.agent_hooks.{module}" in commands
     assert "git rev-parse --show-toplevel" in commands
+
+
+# Subagent hooks wired from .claude/agents/.
+
+AGENTS = ROOT / ".claude" / "agents"
+DOWNHILL = {
+    "opus-designer": ["sonnet-builder", "haiku-runner"],
+    "sonnet-builder": ["haiku-runner"],
+}
+
+
+def _agent_call(kind: str | None = None, model: str | None = None) -> dict:
+    tool_input: dict = {"prompt": "p", "description": "d"}
+    if kind:
+        tool_input["subagent_type"] = kind
+    if model:
+        tool_input["model"] = model
+    return {"tool_name": "Agent", "tool_input": tool_input}
+
+
+def test_spawn_guard_allows_only_listed_agents_at_their_own_model() -> None:
+    allowed = ["haiku-runner"]
+    assert subagent_guard.spawn_block(_agent_call("haiku-runner"), allowed) is None
+    assert subagent_guard.spawn_block(_agent_call("opus-designer"), allowed) is not None
+    assert subagent_guard.spawn_block(_agent_call(), allowed) is not None
+    assert subagent_guard.spawn_block(_agent_call("fork"), allowed) is not None
+    assert subagent_guard.spawn_block(_agent_call("haiku-runner", "opus"), allowed) is not None
+    assert subagent_guard.spawn_block({"tool_name": "Bash", "tool_input": {}}, allowed) is None
+
+
+def test_spawn_guard_runs_as_a_hook_and_exits_2_when_blocking() -> None:
+    done = subprocess.run(
+        [sys.executable, "-m", "tools.agent_hooks.subagent_guard", "spawn", "haiku-runner"],
+        cwd=ROOT, input=json.dumps(_agent_call("opus-designer")),
+        capture_output=True, text=True, timeout=60,
+    )
+    assert done.returncode == 2 and "haiku-runner" in done.stderr
+
+
+def test_failure_hook_tells_the_runner_to_stop_and_report() -> None:
+    payload = {"tool_name": "Bash", "tool_input": {"command": "pytest"}, "error": "Exit code 1\nboom"}
+    done = subprocess.run(
+        [sys.executable, "-m", "tools.agent_hooks.subagent_guard", "failed"],
+        cwd=ROOT, input=json.dumps(payload), capture_output=True, text=True, timeout=60,
+    )
+    output = json.loads(done.stdout)["hookSpecificOutput"]
+    assert done.returncode == 0
+    assert output["hookEventName"] == "PostToolUseFailure"
+    assert "Exit code 1" in output["additionalContext"] and "stop now" in output["additionalContext"]
+
+
+def test_agent_definitions_delegate_only_downhill() -> None:
+    texts = {path.stem: path.read_text(encoding="utf-8") for path in AGENTS.glob("*.md")}
+    assert set(texts) == {"opus-designer", "sonnet-builder", "haiku-runner"}
+    for name, allowed in DOWNHILL.items():
+        front = texts[name].split("---")[1]
+        assert "disallowedTools: Agent" not in front
+        assert f"subagent_guard spawn {' '.join(allowed)}\n" in front
+    runner = texts["haiku-runner"].split("---")[1]
+    assert "disallowedTools: Agent" in runner
+    assert "PostToolUseFailure" in runner and "subagent_guard failed" in runner
+    assert "effort: medium" in runner

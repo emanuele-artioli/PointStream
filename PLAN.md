@@ -32,8 +32,8 @@ refinement, and native DCVC stream diagnosis in parallel. See
 after compatibility AND deterministic-decoding gates. No transfer of old
 unspent balances. Native decoding diagnosis must re-encode in its own job;
 stored DCVC streams are NOT portable even between otherwise qualified GPUs.
-No full training run. No automatic retry after a failed gate. Luna/max delegates
-receive exact frozen launch/report commands; root owns design and review.
+No full training run. No automatic retry after a failed gate. Runner-tier delegates
+(AGENTS.md) receive exact frozen launch/report commands; root owns design and review.
 Read the [completed report](docs/single-stream-report-2026-10-28.md).
 Restoration20261028T191318Z-b4727331 COMPLETE: tiny foreground curve gains,
 whole/background losses at all strengths, no robust two-metric whole win.
@@ -90,7 +90,8 @@ Al/Med points beyond measured anchor coverage; DCVC native decode failure,
 SVT independent cost stop with no full evaluation. No validated baseline win.
 Background covered Al; pixels covered both development windows. Untouched confirmation
 and TOMM readiness are not established. Future delegated job launch/report tasks
-use GPT-6 Luna at max effort with precise narrow instructions (user,2026-10-28);
+use the runner tier (AGENTS.md: Codex `gpt-6.1-terra`/low, Claude `haiku-runner`)
+with precise narrow instructions (user, 2026-10-29, replacing Luna/max);
 root owns experiment design/review/decisions.
 
 The root session keeps this section and the dispatch ledger below; item
