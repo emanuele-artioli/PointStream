@@ -80,3 +80,10 @@ the decisions are in [experiments.md](../experiments.md). Context:
   against the audited real-base job `20261027T211451Z-f6a754eb`, and Med's SVT
   bases are scored for the first time. GPU: one exclusive RTX 6000 Ada (the
   only idle GPU; a shared GPU would add contention as a confounder).
+- Jobs (2026-10-29): `20261029T091713Z-46254121`, spec `docs/experiments/w3-specs/w3.json`
+  (gpu6 only, exclusive RTX 6000 Ada), revision `5d851c5c`. NOT PUBLISHED: the snapshot
+  extraction on gpu2 (`tar -xf source.tar`, 569 entries, 7.6 MB) timed out after 300 s
+  with 523 entries written; the inbox holds `source/`, `source.tar` and `events/` but no
+  request, `ps-fleet status` answers "job is unpublished or unknown". No GPU time spent.
+  Not resubmitted; a new submission needs the coordinator's go-ahead (suggested: a
+  smaller `--snapshot-path` set or a different extraction host).
