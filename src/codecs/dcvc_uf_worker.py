@@ -421,6 +421,7 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
         "timing": "model_encode_seconds: codec calls only (profiled runs are not timing evidence)",
         "container_bytes": len(container), "container_sha256": _sha256(container),
         "i_recon_sha256": result["i_recon_sha256"], recon_key: result["i_recon_sha256"], "kernels": result["kernels"],
+        "dpb_reachable": getattr(p_net, "ref_feature", None) is not None,
         "peak_allocated_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
         "environment": _environment(extension),
     }
