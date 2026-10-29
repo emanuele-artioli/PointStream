@@ -366,3 +366,10 @@ the decisions are in [experiments.md](../experiments.md). Context:
 - Cross-job byte-identity check (to report in the outcome). The first job's six Al streams, with `sha256` of the
   container files and the 240 frame hashes in its `*-reports.json` (kept in `partial.tar`), should equal this job's
   streams and hashes byte for byte; any difference is reported, not repaired.
+- Rerun submissions (revision `674a38b5`, spec `w3b.json` as above), none published, no GPU time spent: `20261029T194755Z-18bfb747`
+  and `20261029T225231Z-909e690c` (both: snapshot extraction on gpu2 `tar -xf source.tar` timed out after 300 s with
+  234 and 229 of about 250 files written; the inbox holds `source/`, `source.tar` and `events/` but no request or
+  spec; `ps-fleet status` answers "unpublished or unknown"; no live extraction process on gpu2). Between them one
+  attempt was refused before any ID existed ("worker gpu5 has no fresh heartbeat"; heartbeats were fresh after a
+  five-minute wait). Not resubmitted again: the rerun is still outstanding and needs root's go-ahead (suggested:
+  a smaller `--snapshot-path` set, or the extraction host changed).
