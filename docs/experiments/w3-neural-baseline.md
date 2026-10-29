@@ -178,3 +178,85 @@ the decisions are in [experiments.md](../experiments.md). Context:
   it is requested from root.
 - Jobs (seventh submission, root-approved): `20261029T181050Z-64feb092`, hosts gpu5 and gpu6,
   ready.json `git_head` `32606af7280d60051e4b77d5d36b7f6720389fc3`; published at once.
+
+### 2026-10-29 — W3 outcome: the DCVC-UF baseline is accepted on the RTX 6000 Ada; it beats the SVT bases at every measured quality, but its points sit at 2-16 kbps, below the requested 15-60
+- Job `20261029T181050Z-64feb092` (seventh submission; smoke 137 s and full 489 s of workload, both
+  complete; validator passed), hosts gpu5 and gpu6, ran the full stage on gpu6, GPU
+  `GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553` (RTX 6000 Ada, capability 8.9, extension `sm89`, torch
+  2.10.0+cu128, exclusive, no contention), ready.json `git_head` `32606af7280d60051e4b77d5d36b7f6720389fc3`.
+  Packed environment `pointstream-20261009T214002Z` (sha256 `32e68872...4661`); SVT-AV1 4.2.0 and dav1d
+  pinned by sha256 in `w3_neural_baseline.py`. GPU-seconds of this job: 626 (smoke 137, full 489);
+  all W3 attempts together about 1,000 of the 7,200 allowed. Development windows Al (Alcaraz-Hurkacz
+  031@129, 25 fps) and Med (Medvedev-Struff 014@194, 50 fps), 240 native frames, 80 ticks 0:240:3. Not
+  untouched footage; DCVC-UF saw none of it in training as far as is known (public checkpoints).
+  Raw: `Datasets/pointstream-data/jobs/fleet/inbox/20261029T181050Z-64feb092/full/` (`published.tar`
+  holds the six bitstreams, the reports with every frame hash, the foreground masks and `summary.json`;
+  `w3-summary.json` is the same summary).
+- Decision rule (as amended by the deviation entry above). Accepted on the RTX 6000 Ada: for all six
+  points (a) the decoded I frame equals the encoder's I reconstruction (max difference 0), and (b) the
+  same file decoded in two separate processes, two passes each, gives bit-identical frames on every
+  one of the 240 frames (0 frames differ in any byte; all four frame-hash lists equal). (c) The
+  encoder's reference buffer is not reachable from Python (`dpb_reachable: false`), so encoder/decoder
+  drift on P frames is not measured; decoded luma PSNR against the source does not decay across the
+  240 frames (Al first 8 frames vs last 8: 34.3/31.9, 31.8/30.7, 34.8/32.8 dB; Med 26.5/27.8,
+  29.9/30.4, 28.7/29.0; minima 24.7-32.7 dB).
+- Settings. Upstream `set_torch_env` already sets deterministic algorithms (strict) and leaves cuDNN
+  deterministic off, benchmark off; this job added `cudnn.deterministic = True`, set
+  `CUBLAS_WORKSPACE_CONFIG=:4096:8` and used the legacy CUDA stream. No nondeterminism warning was
+  raised. Which setting was needed is NOT established: no run without them was made, and the earlier
+  failures (shared GPUs, other users' processes) are not reproduced here because the GPU was exclusive.
+  Whether the 2026-10-16 failures came from contention or from missing settings stays open.
+- Points (kbps = container file bytes x 8 x fps / 240; QP higher = more bits; scale 8/4/2 =
+  240x136/480x272/960x544):
+
+| Window | Point | kbps | max decode diff | whole LPIPS | whole DISTS | fg LPIPS | fg DISTS |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Al | DCVC s8 QP30 | 3.600 | 0 | 0.4379 | 0.2903 | 0.7937 | 0.5283 |
+| Al | DCVC s2 QP6 | 8.396 | 0 | 0.2086 | 0.1811 | 0.5692 | 0.4311 |
+| Al | DCVC s2 QP18 | 16.078 | 0 | 0.1589 | 0.1340 | 0.4491 | 0.3414 |
+| Al | SVT s8 CRF63 | 10.197 | - | 0.4509 | 0.2994 | 0.8405 | 0.6096 |
+| Al | SVT s4 CRF63 | 17.131 | - | 0.2825 | 0.1927 | 0.6830 | 0.4975 |
+| Al | SVT s2 CRF63 | 33.685 | - | 0.1393 | 0.1097 | 0.4753 | 0.3666 |
+| Med | DCVC s8 QP6 | 2.330 | 0 | 0.5831 | 0.3794 | 0.8608 | 0.6374 |
+| Med | DCVC s8 QP18 | 4.685 | 0 | 0.5683 | 0.3257 | 0.8465 | 0.5699 |
+| Med | DCVC s4 QP12 | 10.593 | 0 | 0.4399 | 0.2291 | 0.7004 | 0.4645 |
+| Med | SVT s8 CRF63 | 19.557 | - | 0.5594 | 0.3030 | 0.8564 | 0.5538 |
+| Med | SVT s4 CRF63 | 34.140 | - | 0.4066 | 0.1992 | 0.6783 | 0.4426 |
+| Med | SVT s2 CRF63 | 80.253 | - | 0.2008 | 0.1043 | 0.4227 | 0.3223 |
+
+  SVT rows are re-encodes of the audited bases (scale 8/4/2, CRF 63, preset 4): Al's three rates and
+  bytes equal the audited 10.1975/17.130833/33.685 kbps, and the scores equal the audited job
+  `20261027T211451Z-f6a754eb` to at most 1.0e-4 (control passed); Med's SVT bases are scored here
+  for the first time. Foreground = the fixed scoring region S of the real-base judge (hash-checked
+  against the original scoring masks on every tick), whole-frame LPIPS/DISTS with the same code.
+- Envelope against the SVT envelope (BD-rate, PCHIP in log rate over the overlapping quality range only,
+  anchor = upper concave hull of the three SVT bases; negative = DCVC needs fewer bits at equal quality):
+
+| Window | whole LPIPS | whole DISTS | fg LPIPS | fg DISTS |
+|---|---:|---:|---:|---:|
+| Al | -66.2 % | -58.3 % | -67.5 % | -67.3 % |
+| Med | -64.9 % | -64.8 % | -68.4 % | -67.9 % |
+
+  Al: DCVC is also better at every common rate in 10.2-16.1 kbps on all four metrics. Med: the rate
+  ranges do not overlap (DCVC 2.3-10.6, SVT 19.6-80.3 kbps), so only the quality-domain BD-rate
+  exists; read it as "at the quality the SVT bases reach, DCVC reaches it at roughly a third of the rate".
+- Deviations and cautions, to be read before using the numbers.
+  1. The points do not bracket 15-60 kbps (actual 2.3-16.1 kbps). The rate-only selection used a
+     calibration estimate from the first 25 frames (one I frame plus the mean P-frame cost), which
+     overestimated the 240-frame rate by 3.5-6x (e.g. Al s2 QP18 estimated 58.3, measured 16.1 kbps).
+     The selection rule was followed as written; its estimator was biased. Covering 15-60 kbps needs
+     higher QPs or finer scales and a second job; not run (not in the rule).
+  2. The SVT envelope is thin: three CRF-63 bases at three scales, not a CRF sweep, so DCVC's
+     advantage over "the best SVT-AV1" at these rates may be smaller; the same limit holds for every
+     earlier W-item comparison. A BD-rate of -65 % is large; the overlap interval is narrow (Al
+     LPIPS 0.159-0.438 of DCVC against SVT 0.139-0.451).
+  3. Per-window results on two development windows, 80 ticks each; no confidence interval; the
+     foreground is the judge's S region, which is smaller than the whole frame.
+  4. Encoder/decoder P-frame agreement is untested (see (c)); the claim is "this file decodes
+     reproducibly in this job", not "the decoder reproduces the encoder's internal state".
+  5. Stored streams do not travel: decoding in a later job or on another GPU class remains untested
+     and stays a deployment limit as in docs/fleet.md.
+- Consequence for the paper: a neural baseline exists with real bitstreams and reproducible
+  decoding on the RTX 6000 Ada, and at these ultralow rates it is far ahead of SVT-AV1 on both whole
+  frame and foreground. Any PointStream claim against the two baselines must now beat DCVC, not only
+  SVT; W1's comparison and the 15-60 kbps coverage are the next consumers.
