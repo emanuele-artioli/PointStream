@@ -99,3 +99,18 @@ they were fixed before the first coder ran.
   skipping the coordinates of invisible joints, trained (not adaptive)
   probability tables, joint-structured transforms, frame-rate reduction
   below one key in eight.
+
+### 2026-10-29 — W2: additions after the first run (disclosed)
+The first run (code `698b4e50`, 32 s) gave no candidate in either stage;
+the exact re-coding of the reference (key 4, 4 px, linear) is the cheapest
+setting at every error level up to 2.64%. Two additions were made after
+seeing that, both analysis of the same inputs and neither able to create a
+candidate: (1) supplementary error levels 5.28% and 10.56% (p95 ≤ twice
+the mean) so the table shows where the curve leaves the exact point, and
+the unbeaten (bytes, worst-player mean) frontier per window; (2) a
+lower-bound diagnostic for the exact stream: the zeroth-order empirical
+entropy of the key residuals with a static optimal table (no learning
+cost), with and without subtracting each key frame's median residual
+(global motion compensation, its own entropy added), and the conditional
+entropy of visibility. It is not a coder and has no round trip; it bounds
+how much a better probability model or a body-motion predictor could save.

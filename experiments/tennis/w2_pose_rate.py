@@ -36,6 +36,7 @@ MEAN_LIMIT = 0.0066
 P95_LIMIT = 0.0132
 RATE_LIMIT_KBPS = 0.5
 LEVELS = (0.0033, 0.0066, 0.0132, 0.0264)
+LEVELS_SUPPLEMENTARY = (0.0528, 0.1056)  # added after the first results, to show where the curve goes
 
 # ----------------------------------------------------------------------------- range coder
 
@@ -549,6 +550,56 @@ def run_setting(units: list[dict[str, Any]], setting: Setting, seconds: float) -
     }
 
 
+def _entropy_bits(values: np.ndarray) -> float:
+    """Zeroth-order empirical entropy of the whole sample, in bits (a static, optimal table: no learning cost)."""
+    _, counts = np.unique(np.asarray(values).reshape(-1), return_counts=True)
+    p = counts / counts.sum()
+    return float(-(counts * np.log2(p)).sum())
+
+
+def entropy_floor(units: list[dict[str, Any]], setting: Setting) -> dict[str, float]:
+    """Lower-bound diagnostics for coding the key residuals of ``setting`` (not a coder, no round trip).
+
+    Bytes, excluding the first key and the header, of the zeroth-order empirical entropy of the residuals
+    pooled per axis over the window's players, with a table that costs nothing to learn. The ``_gmc``
+    variants first subtract each key frame's median residual over the 17 joints (global motion
+    compensation) and add the entropy of those medians; visibility is the empirical conditional entropy
+    given the same joint in the previous coded frame and the previous joint.
+    """
+    pools: dict[str, list[list[np.ndarray]]] = {k: [[], []] for k in
+                                                 ('previous', 'velocity', 'previous_gmc', 'velocity_gmc',
+                                                  'median_previous', 'median_velocity')}
+    vis_pool: dict[tuple[int, int], list[int]] = {}
+    for u in units:
+        kp = np.asarray(u['kp'], np.float64)
+        cursor = 0
+        for _, length in split_runs(u['t']):
+            xy, conf = kp[cursor:cursor + length, :, :2], kp[cursor:cursor + length, :, 2] >= CONF
+            cursor += length
+            q = quantize_keys(xy, setting)
+            prev = q[1:] - q[:-1]
+            vel = np.concatenate([prev[:1], q[2:] - (2 * q[1:-1] - q[:-2])]) if len(q) > 1 else prev
+            for name, r in (('previous', prev), ('velocity', vel)):
+                med = np.floor(np.median(r, axis=1)).astype(np.int64)  # (m-1, 2)
+                for a in (0, 1):
+                    pools[name][a].append(r[:, :, a].ravel())
+                    pools[name + '_gmc'][a].append((r[:, :, a] - med[:, None, a]).ravel())
+                    pools['median_' + name][a].append(med[:, a])
+            vt = _vis_times(length, setting)
+            v = conf[vt].astype(int)
+            for i in range(len(vt)):
+                for j in range(JOINTS):
+                    key = (2 if i == 0 else int(v[i - 1, j]), 2 if j == 0 else int(v[i, j - 1]))
+                    vis_pool.setdefault(key, []).append(int(v[i, j]))
+    out = {}
+    for name in ('previous', 'velocity'):
+        out[name] = sum(_entropy_bits(np.concatenate(pools[name][a])) for a in (0, 1)) / 8
+        med_bits = sum(_entropy_bits(np.concatenate(pools['median_' + name][a])) for a in (0, 1)) / 8
+        out[name + '_gmc'] = sum(_entropy_bits(np.concatenate(pools[name + '_gmc'][a])) for a in (0, 1)) / 8 + med_bits
+    out['visibility'] = sum(_entropy_bits(np.asarray(v)) for v in vis_pool.values()) / 8
+    return out
+
+
 def stage1_settings(predictor: str) -> dict[str, list[Setting]]:
     return {
         'a': [Setting(4, 1, p) for p in ('previous', 'velocity')],
@@ -568,11 +619,12 @@ def stage2_settings() -> list[Setting]:
     return out
 
 
-def best_at_levels(rows: dict[str, list[dict[str, Any]]]) -> dict[str, dict[str, Any]]:
+def best_at_levels(rows: dict[str, list[dict[str, Any]]],
+                   levels: tuple[float, ...] = LEVELS) -> dict[str, dict[str, Any]]:
     """Per window and error level: the lowest-rate setting whose every player passes (p95 <= 2 x mean limit)."""
     out: dict[str, dict[str, Any]] = {}
     for window, results in rows.items():
-        for level in LEVELS:
+        for level in levels:
             ok = [r for r in results
                   if all(p['mean'] <= level and p['p95'] <= 2 * level for p in r['players'])]
             best = min(ok, key=lambda r: r['bytes'], default=None)
@@ -580,6 +632,20 @@ def best_at_levels(rows: dict[str, list[dict[str, Any]]]) -> dict[str, dict[str,
                 None if best is None else {'label': best['label'], 'bytes': best['bytes'],
                                            'kbps': best['kbps'], 'visibility_mismatch': max(
                                                p['visibility_mismatch'] for p in best['players'])})
+    return out
+
+
+def frontier(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Settings not beaten on both bytes and worst-player mean error (cheaper first)."""
+    out: list[dict[str, Any]] = []
+    best = math.inf
+    for r in sorted(results, key=lambda r: (r['bytes'], max(p['mean'] for p in r['players']))):
+        worst = max(p['mean'] for p in r['players'])
+        if worst < best:
+            best = worst
+            out.append({'label': r['label'], 'bytes': r['bytes'], 'kbps': r['kbps'], 'worst_mean': worst,
+                        'worst_p95': max(p['p95'] for p in r['players']),
+                        'visibility_mismatch': max(p['visibility_mismatch'] for p in r['players'])})
     return out
 
 
@@ -676,11 +742,17 @@ def main() -> None:
                 grid[n].append(run_setting(d['units'], setting, d['seconds']))
         record['stage2'] = grid
         record['best_at_error_level'] = best_at_levels(grid)
+        record['best_at_error_level_supplementary'] = best_at_levels(grid, LEVELS_SUPPLEMENTARY)
+        record['frontier'] = {n: frontier(rows) for n, rows in grid.items()}
         labels = {r['label'] for r in grid['Al']}
         record['stage2_candidates'] = sorted(
             label for label in labels if all(
                 (lambda r: r['passes_error'] and r['kbps'] <= RATE_LIMIT_KBPS)(
                     next(x for x in grid[n] if x['label'] == label)) for n in data))
+    record['entropy_floor_bytes_q4_key4'] = {
+        n: entropy_floor(d['units'], Setting(4, 4)) for n, d in data.items()}
+    record['entropy_floor_note'] = ('zeroth-order static-table entropy of key residuals, excluding first key '
+                                    'and header; a lower-bound diagnostic for the zero-error stream, not a coder')
     record['analysis_code_sha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     record['wall_seconds'] = time.monotonic() - began
     with args.out.open('x') as f:

@@ -12,10 +12,12 @@ from experiments.tennis.w2_pose_rate import (
     Encoder,
     Setting,
     best_at_levels,
+    entropy_floor,
     code_signed,
     decode_window,
     encode_window,
     extent_height,
+    frontier,
     interpolate,
     key_times,
     load_packets,
@@ -209,3 +211,30 @@ def test_archive_sha_checked_before_members_are_read(tmp_path):
     assert hashlib.sha256(path.read_bytes()).hexdigest() != w2.TRANSPORT_SHA256
     with pytest.raises(ValueError, match='SHA256 mismatch'):
         load_packets(path)
+
+
+def test_entropy_floor_constant_velocity_and_global_shift():
+    n = 33
+    rng = np.random.default_rng(9)
+    xy = np.rint(rng.uniform(300, 600, size=(1, 17, 2)) / 4) * 4 + 8 * np.arange(n)[:, None, None]  # all joints at 8 px/frame
+    kp = np.concatenate([xy, np.ones((n, 17, 1))], 2)
+    floor = entropy_floor([{'t': np.arange(n), 'kp': kp}], Setting(4, 4))
+    assert floor['previous'] == 0.0 and floor['previous_gmc'] == 0.0  # 32 px per key every time: one symbol
+    assert 0.0 < floor['velocity'] < 25  # only the first velocity residual is not zero
+    assert floor['visibility'] == 0.0
+    # a body whose joints move by random per-key shifts shared by all joints is removed by the median
+    shifts = rng.integers(-5, 6, size=(9, 1, 2)) * 4
+    walk_xy = np.cumsum(shifts, axis=0) + np.rint(rng.uniform(300, 600, size=(1, 17, 2)))
+    full = np.repeat(walk_xy, 4, axis=0)[:33]
+    kp2 = np.concatenate([full, np.ones((33, 17, 1))], 2)
+    f2 = entropy_floor([{'t': np.arange(33), 'kp': kp2}], Setting(4, 4))
+    assert f2['previous_gmc'] < f2['previous']
+
+
+def test_frontier_keeps_only_unbeaten_settings():
+    def row(label, nbytes, mean):
+        return {'label': label, 'bytes': nbytes, 'kbps': nbytes, 'players': [
+            {'mean': mean, 'p95': 2 * mean, 'visibility_mismatch': 0.0}]}
+    rows = [row('big-exact', 100, 0.0), row('cheap-bad', 10, 0.05), row('dominated', 60, 0.06),
+            row('mid', 40, 0.02)]
+    assert [f['label'] for f in frontier(rows)] == ['cheap-bad', 'mid', 'big-exact']
