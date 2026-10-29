@@ -73,6 +73,7 @@ def main() -> int:
     p.add_argument("--score", type=Path, action="append", required=True)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--thin", action="store_true", help="score only the rate-position pairs (`thin`)")
+    p.add_argument("--thin-items", default="", help="comma-separated videos (e.g. P02_02) judged on the thinned pairs")
     args = p.parse_args()
     base = json.loads(args.inputs.read_text())
     stages = [json.loads(path.read_text()) for path in args.score]
@@ -82,7 +83,7 @@ def main() -> int:
         "items": {}}
     for item, selection in sorted(base["selection"].items()):
         chosen = {(pair, coder) for pair, coder, ms in selection if "wdists_fill" in ms}
-        if args.thin:
+        if args.thin or item.rsplit("_", 1)[0] in args.thin_items.split(","):
             rates = {(r["pair"], r["tag"].removeprefix("h5p4-")): r["kbps"] for st in base["scores"]
                      if st["item"] == item for r in st["rows"]}
             chosen = thin(chosen, rates)
@@ -95,7 +96,8 @@ def main() -> int:
             raise ValueError(f"{item}: {len(reference)} reference, {len(received)} receiver rows for "
                              f"{len(chosen)} pairs, {len(anchors)} anchors")
         masks = [st["mask"] for st in stages if st["item"] == item]
-        record = {"pairs": len(chosen), "receiver_mask": {
+        record = {"pairs": len(chosen), "thinned": len(chosen) < sum(1 for _, _, ms in selection if "wdists_fill" in ms),
+                  "receiver_mask": {
             k: masks[0][k] for k in ("iou", "iou_frame_mean", "iou_frame_min", "missed_share", "extra_share",
                                       "bytes", "seed_bytes", "kbps", "seed_is_first_union_mask")},
             "kbps": {"receiver": [min(r["kbps"] for r in received), max(r["kbps"] for r in received)]},

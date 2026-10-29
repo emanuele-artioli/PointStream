@@ -168,4 +168,18 @@ the decisions are in [experiments.md](../experiments.md). Context:
   the saved mask of middle quality (IoU 0.716), chosen by the reading order
   only, not by any receiver-mask score. If the budget is still short the last
   submitted job is cancelled and the item is reported as not completed.
+- Follow-on submissions (new IDs; six parallel attempts at 12:32 also ended
+  "outcome unknown" with only `source.tar` present, no request, and were not
+  used: `20261029T123217Z-71d50d25`, `-64283247`, `-b1eee23b`, `-711120d0`,
+  `-12820121`, `-11403559`). The source snapshot extraction on gpu2 (529
+  files) is what timed out, so these were submitted one at a time with
+  `--snapshot-path src --snapshot-path experiments/visor --snapshot-path
+  experiments/background --snapshot-path experiments/audit` (the h5 scoring
+  path; ~90 files). Specs from `w4_specs.py` with P02_02 thinned. Code
+  `648221d5` (`w4_report.py` edits after it do not touch the scoring job):
+  P03_10 venue `20261029T123948Z-d873ddb9`, P09_106 venue
+  `20261029T124323Z-f7254a25`, P09_106 gho `20261029T124721Z-2d5c6921`,
+  P01_107 venue `20261029T125137Z-c80c219d`, P02_02 gho
+  `20261029T125155Z-45a064df`, P02_02 venue `20261029T125225Z-f5261661`
+  (all gpu6 Ada requested; stale-heartbeat refusals created no job).
 
