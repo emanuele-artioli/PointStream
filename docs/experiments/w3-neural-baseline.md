@@ -377,9 +377,9 @@ the decisions are in [experiments.md](../experiments.md). Context:
   client-side publish call timed out at 120 s; inspected, not resubmitted), ready.json `git_head`
   `142aa3bb31caf923bfa0eeb762a1b143fe5aa159`, spec `w3b.json`, hosts gpu5 and gpu6. The snapshot lists the static import
   closure of the workload instead of whole directories: `--snapshot-path` for `pyproject.toml` and 85 modules
-  (`src/codecs` 4, `src/pointstream` 3, `src/segmentation` 9, `experiments/tennis` 32 (the `w3_*`, `k4*`, `k5`, `k6*`,
-  `parallel_*`, `windows` modules the workload imports), `experiments/visor` 11, `experiments/background` 9,
-  `experiments/audit` 2, `experiments/jobs` 8, `tools/datasets` 2, package `__init__` files) = **88 files** on the extracted
+  (`src/codecs` 4, `src/pointstream` 3, `src/segmentation` 10, `experiments/tennis` 33 (the `w3_*`, `k4*`, `k5`, `k6*`,
+  `parallel_*`, `windows` modules the workload imports), `experiments/visor` 12, `experiments/background` 10,
+  `experiments/audit` 2, `experiments/jobs` 7 plus the rest of that directory, which the fleet adds, `tools/datasets` 2, `experiments/__init__.py` and `src/__init__.py`) = **88 files** on the extracted
   tree (the earlier sets had 229-250). Proof before submitting: `git archive HEAD` of these paths extracted on gpu5 under
   `/local/users/emanuele`, then `python -I` with the pointstream environment imported the fleet manager modules and the
   workload (`w3_neural_baseline`, `dcvc_uf_worker`, `svtav1`, `quality`, the `k6b_*`, `h3*`, `masks` modules).
