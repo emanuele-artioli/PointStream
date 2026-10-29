@@ -34,3 +34,28 @@ the decisions are in [experiments.md](../experiments.md). Context:
 - Budget: ≤1.5 GPU-hours including smokes and failures; CPU encodes via
   the fleet; every stage ≤45 min.
 - Jobs: (none yet)
+
+### 2026-10-29 — W5 implementation notes (written before any run; no deviation from the rule above)
+- Step 1 reuses the frozen judge unchanged except for one switch, `--no-early-stop`
+  (default off, so every earlier invocation behaves as before): job `20261027T211451Z-f6a754eb`
+  stopped after Al by the registered arithmetic stop, so Med was never scored. The same spec
+  (inputs, hosts reduced to gpu3, RTX A6000, `separated-v1` cost model) is re-run with the switch;
+  it scores both windows, so Al doubles as a regression check against the recorded Al means.
+  Spec: `docs/experiments/w5-specs/judge.json`.
+- Med's hybrid rate = the scale 4 plain base file (20484 B, 34.140 kbps over 4.8 s) + side terms,
+  with the keypoint packet as KPS1 (3542 B, 5.903 kbps) in the judge's `rates`; the KPS2 rate
+  (primary) subtracts (3542 - 2193) B * 8 / 4.8 s = 2.2483 kbps. Same quality for both (pixels
+  unchanged).
+- Step 2 reuses W1's code parametrised by `--window med` (`w1_roi.Window`; Al is the default and
+  its constants are unchanged): masks S (`w1_masks`), CRF search and encodes (`w1_encode`),
+  scoring (`w1_score`). The CRF search brackets the KPS1 rate (the higher one); the usual three
+  selected CRFs (bracketing pair + the next-lower-rate neighbour) then also bracket the KPS2
+  rate, exactly as W1 did for Al's re-billed rate. First probes: quarter 60, half 70 (half-
+  resolution plain CRF 63 is already 80.3 kbps, above the hybrid; if CRF 70 is still above the
+  target the half-resolution family is unresolved there, never extrapolated).
+- Grid: plain (offset 0, inside = no ROI) and outside-R +20/+40 (W1's convention honoured by
+  SVT-AV1 4.2.0 CRF mode; the negative-inside convention was shown inert) at half and quarter
+  resolution; the three plain CRF 63 bases of scale 8/4/2 are re-encoded and must match the
+  base manifest's bytes (11734/20484/48152) and re-score within 1e-4 of the step 1 archive.
+- Rule application: primary rate KPS2, KPS1 beside; hybrid quality from step 1's `quality.json`
+  (scale 4 method means). DCVC: judged on W3b's Med triple if present; otherwise pending.
