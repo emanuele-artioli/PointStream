@@ -124,4 +124,8 @@ the decisions are in [experiments.md](../experiments.md). Context:
   reported as better or worse at every rate and counts as not passing for
   the mean.
 - Waits are handed to haiku-runner (`ps-fleet wait`, at most 45 minutes).
+- Resubmission (switch-rule probe): P03_10 gho `20261029T093413Z-491b07e4`,
+  code `2d7463c8` (ready git_head confirmed), gpu5 requested, 5 pairs, cap
+  1300 s. The first submit call took over 5 minutes at the snapshot; it was
+  not replayed.
 
