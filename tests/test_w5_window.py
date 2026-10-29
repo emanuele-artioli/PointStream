@@ -75,6 +75,21 @@ def test_early_stop_fires_on_two_losses_in_one_family_unless_disabled():
     assert judge.early_stop_applies(_item({'full_lpips', 'foreground_dists'}), False) is False
 
 
+def test_report_gives_one_outcome_per_anchor_family():
+    from experiments.tennis import w5_report as rep
+
+    hybrid = {'lpips': {'whole': 0.4, 'foreground': 0.4}, 'dists': {'whole': 0.2, 'foreground': 0.2}}
+    good = {'whole_lpips': 0.39, 'foreground_lpips': 0.40, 'whole_dists': 0.3, 'foreground_dists': 0.3}
+    bad = {'whole_lpips': 0.2, 'foreground_lpips': 0.6, 'whole_dists': 0.1, 'foreground_dists': 0.5}
+    at = {'s2_o0': None, 's2_o20': None, 's4_o0': good, 's4_o20': bad}
+    analysis = {'at_target': at, 'hybrid': hybrid, 'decision': w.decide(at, hybrid)}
+    out = rep.family_outcomes(analysis)
+    assert out['half']['outcome'] == 'unresolved' and out['half']['unresolved'] == ['s2_o0', 's2_o20']
+    assert out['quarter']['outcome'] == 'B' and out['quarter']['dominating']['lpips'] == ['s4_o0']
+    assert out['quarter']['dominating']['dists'] == []
+    assert {m[0] for m in rep.margins(analysis)} == {'s4_o0', 's4_o20'}
+
+
 def test_w5_specs_use_whole_argument_placeholders_and_staged_names():
     from experiments.tennis import w5_specs as specs
 

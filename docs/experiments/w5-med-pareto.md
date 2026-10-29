@@ -59,3 +59,4 @@ the decisions are in [experiments.md](../experiments.md). Context:
   base manifest's bytes (11734/20484/48152) and re-score within 1e-4 of the step 1 archive.
 - Rule application: primary rate KPS2, KPS1 beside; hybrid quality from step 1's `quality.json`
   (scale 4 method means). DCVC: judged on W3b's Med triple if present; otherwise pending.
+- Jobs (recorded at submission, 2026-10-29): step 1 judge `20261029T192002Z-9f6a6e45` (gpu3, A6000, ready.json git_head `ee3623a4`; client publish timed out, status pending afterwards); masks S `20261029T192450Z-bc8195a6` (CPU, started on gpu2; git_head from ready.json, to be confirmed). Encode and scoring job IDs follow below.
