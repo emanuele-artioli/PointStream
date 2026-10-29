@@ -118,4 +118,11 @@ judges ([j.md](j.md)).
   consequence: the 80 saved ticks may not match the Ada crops within 1 level;
   the rule is then to record the difference and use the rerun for all 240
   frames (it is). Memory declared 16,000 MiB (peak 12.2 GiB on Ada).
-- Jobs: (replaced below as submitted)
+- Jobs, inspected on gpu3's inbox at 20:00 UTC (spec/ready present = published).
+  Unpublished (only `source.tar`; never ran, not replayed):
+  `20261029T192854Z-225a66d0`, `20261029T192855Z-09c2200b`,
+  `20261029T193013Z-1f570343` (not ours), `20261029T194501Z-5bee16ea` (Ada
+  attempt abandoned and the A6000 attempt both timed out extracting on gpu2,
+  load 30). **Published**: generation, player `…person_000000000001`, A6000
+  gpu3, commit `5585edff`: `20261029T195226Z-26f4c52d` (the client's publish
+  call timed out at 120 s but it landed; state pending).
