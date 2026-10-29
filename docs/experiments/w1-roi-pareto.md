@@ -47,7 +47,13 @@ the decisions are in [experiments.md](../experiments.md). Context:
   the whole frame near the envelope, dominating the hybrid.
 - Budget: CPU encodes through the fleet (each stage ≤45 min, split by
   window/resolution); scoring ≤1 GPU-hour including smokes and failures.
-- Jobs: (none yet)
+- Jobs: see the entries below (masks `20261029T092537Z-88270f98`; encodes
+  half `20261029T092919Z-a9e696a8`, full `20261029T093403Z-0a9c7eba`,
+  quarter `20261029T094410Z-40e65a2f`). A first masks submission,
+  `20261029T091730Z-c2a7bbd0`, was never published (its snapshot transfer to
+  gpu2 timed out after the files had landed; it has no spec and cannot run);
+  it was inspected, not replayed, and the masks job was submitted again with
+  a reduced snapshot.
 
 ### 2026-10-29 — W1 implementation, rate-only preflight and substitution rule (before any run)
 - Written before any W1 job ran and before any W1 quality number exists.
@@ -86,3 +92,33 @@ the decisions are in [experiments.md](../experiments.md). Context:
   against the K6 window's recorded hashes of R and S on every tick.
 - Scoring runs on an RTX A6000 (the controls were scored on one); the job is a
   shared-GPU job, so its timings are cost only.
+
+### 2026-10-29 — W1 deviation: full resolution unresolved, quarter substituted (before any scoring)
+- Written after the rate-only encode jobs and before any quality number. CPU
+  jobs, no GPU time. Rates are complete IVF file kbps over 9.6 s, all 240
+  frames, SvtAv1EncApp 4.2.0 preset 4, keyint −1; every stream passed an
+  independent dav1d decode. Controls: the plain CRF 63 bases of scale 8/4/2
+  re-encoded to exactly 12,237 / 20,557 / 40,422 bytes, as the existing anchors.
+- Full resolution (1920×1080), job `20261029T093403Z-0a9c7eba`, gpu3: even at
+  CRF 70 the rate stays above the target: offset 0: 34.15, −20: 37.94, −40:
+  38.01 kbps (target 22.737962). All three offsets are unresolved by the rule.
+  By the root decision (2026-10-29) full is replaced by quarter resolution
+  (480×272 coded, scale 4); offsets and search unchanged.
+- Half resolution (960×544), job `20261029T092919Z-a9e696a8`, gpu2, all three
+  offsets bracket. Offset 0: CRF 64 28.01, 65 24.64, 66 22.28, 67 20.56.
+  Offset −20: 66 25.79, 67 24.19, 68 22.47, 69 21.22. Offset −40: 66 25.85,
+  67 24.10, 68 22.48, 69 21.09. Selected: 65–67 (offset 0), 67–69 (−20, −40).
+- Quarter resolution (480×272), job `20261029T094410Z-40e65a2f`, gpu3, all three
+  bracket. Offset 0: CRF 60 26.76, 61 24.11, 62 20.61, 63 17.13. Offset −20:
+  60 30.60, 61 27.69, 62 24.26, 63 20.55, 64 18.70, 65 17.31. Offset −40:
+  60 30.57, 61 27.80, 62 24.32, 63 20.59, 64 18.66, 65 17.31. Selected: 61–63
+  (offset 0), 62–64 (−20, −40).
+- Observation recorded before scoring: offsets −20 and −40 cost the same rate
+  within 1% at every CRF and both resolutions (e.g. half CRF 67: 24.19 vs
+  24.10). The grid is unchanged; either the encoder saturates the ROI offset
+  or the two policies are near-duplicates. The scores will show which; if −40
+  equals −20 in quality too, the two are one policy and the ROI curve has
+  effectively two points.
+- Scored set: 3 controls + 3 CRFs × 3 offsets × {half, quarter} = 21 points on
+  the same 80 ticks. Masks job `20261029T092537Z-88270f98` (80 ticks rebuilt,
+  every R and S hash equals the K6 window's record).
