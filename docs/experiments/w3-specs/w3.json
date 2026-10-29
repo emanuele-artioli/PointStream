@@ -2,7 +2,6 @@
   "schema": 1,
   "device": "gpu",
   "hosts": [
-    "gpu5",
     "gpu6"
   ],
   "gpu_models": [
