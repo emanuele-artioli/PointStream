@@ -96,4 +96,9 @@ judges ([j.md](j.md)).
      smoothed centre).
 - Budget check: generation ≈ 1,300 s + masks ≈ 400–900 s + judge ≈ 600 s ≈
   0.7 GPU-h before smokes; Med only if Al finishes within 0.75 GPU-h.
-- Jobs: (none yet)
+- Jobs: generation, one per player, submitted 2026-10-29 19:28 UTC from commit
+  `2b2f6eed` (Ada, shared): inbox entries `20261029T192854Z-225a66d0` and
+  `20261029T192855Z-09c2200b` (snapshot transfer still in flight when
+  recorded; a third entry `20261029T193013Z-1f570343` with a similar source
+  archive appeared at 19:30 and may be a client retry or another session's).
+  Inspect with `ps-fleet status JOB_ID`; not to be replayed.
