@@ -889,7 +889,14 @@ def command_score(args: argparse.Namespace) -> int:
     judges = Judges(args)
     mask_payload, mask_record = None, None
     shown_classes = w["classes"]
-    if args.mask_scale > 0:  # H5m: the client's F̂ from the coded class map replaces F
+    if args.receiver_masks:  # W4: the receiver's tracked masks, uncorrected; only the seed is billed
+        from experiments.visor import w4_receiver
+
+        if args.mask_scale <= 0 or not args.receiver_seed:
+            raise SystemExit("--receiver-masks needs --mask-scale and --receiver-seed")
+        shown_classes, mask_payload, mask_record = w4_receiver.receiver_classes(
+            w["classes"], args.mask_scale, Path(args.receiver_masks), Path(args.receiver_seed), float(w["fps"]))
+    elif args.mask_scale > 0:  # H5m: the client's F̂ from the coded class map replaces F
         shown_classes, mask_payload, mask_record = coded_classes(w["classes"], args.mask_scale, w["fps"])
     alpha = np.stack([cp.alpha_and_classes(c)[0] for c in shown_classes])
     fg_points, manifests = [], []
@@ -1428,6 +1435,15 @@ def venue_model_ok(result: dict[str, Any]) -> bool:
         result["item"].startswith(venue["id"].split("/")[-1] + "_")
 
 
+def mask_billed(mask: dict[str, Any] | None, rows: list[dict[str, Any]]) -> bool:
+    """The MASK segment is in every container, larger than its payload; the payload reproduces F̂ losslessly on
+    the reduced grid (H5m) or, for W4's receiver mask, is the seed that equals the first frame's union mask."""
+    if not mask:
+        return True
+    exact = mask["seed_is_first_union_mask"] if mask.get("receiver") else mask["lossless_on_reduced_grid"]
+    return bool(exact and all(r["breakdown"].get("mask", 0) > mask["bytes"] for r in rows))
+
+
 def validate_score(result: dict[str, Any]) -> dict[str, bool]:
     rows, anchors = result["rows"], result["anchors"]
     checks = {
@@ -1442,9 +1458,7 @@ def validate_score(result: dict[str, Any]) -> dict[str, bool]:
             "max_abs", 99) <= 1,
         "foreground_decodes_on_f": all(r["scores"][FILL]["psnr_fg"] > 15 for r in rows),
         "background_f_is_foreground_f": result["limit_frames"] > 0 or result["background_f_is_foreground_f"],
-        "mask_billed": not result.get("mask") or (
-            result["mask"]["lossless_on_reduced_grid"] and all(r["breakdown"].get("mask", 0) > result["mask"]["bytes"]
-                                                                for r in rows)),
+        "mask_billed": mask_billed(result.get("mask"), rows),
         # H5p 4c: the key and τ billed in every container, and no MASK beside them
         "carrier_billed": not result.get("carrier") or (not result.get("mask") and all(
             r["breakdown"].get("carrier", 0) == 2 + r["carrier"]["payload_bytes"] for r in rows)),
@@ -1933,6 +1947,10 @@ def main(argv: list[str] | None = None) -> int:
                    "(0: F granted, H5)")
     p.add_argument("--carrier", choices=("none", "key"), default="none", help="H5p 4c: composite with each "
                    "foreground point's F̃ (its key), the CARRIER segment billed, no MASK")
+    p.add_argument("--receiver-masks", help="W4: an NPZ with the receiver's tracked masks ('predicted', on the "
+                   "1/--mask-scale grid) composited in place of F̂, uncorrected; needs --receiver-seed")
+    p.add_argument("--receiver-seed", help="W4: the intra-coded first-frame union mask the tracker was seeded "
+                   "with; with two configuration bytes it is the whole MASK segment")
     p = sub.add_parser("time")
     add_window(p)
     for name in ("--arm", "--enhancers", "--propainter-tree", "--propainter-ckpt", "--raft-ckpt", "--flow-completion-ckpt"):
