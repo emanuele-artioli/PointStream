@@ -2,8 +2,8 @@
 
 Each spec is 4a's ``score-<video>-<coder>.json`` (same pairs, backgrounds, foreground archive, judges) with three
 changes: the tag is ``w4-<coder>``, the stage reads the diagnostic's saved tracker output and seed, and the limits
-and hosts are W4's. Usage: ``python -m experiments.visor.w4_specs SPECS_4A_DIR OUT_DIR DEADLINE [INPUTS_JSON]``; with the 4d scoring
-inputs, only the thinned pairs.
+and hosts are W4's. Usage: ``python -m experiments.visor.w4_specs SPECS_4A_DIR OUT_DIR DEADLINE [INPUTS_JSON [VIDEOS]]``; with the 4d
+scoring inputs, only the thinned pairs (of the comma-separated VIDEOS, else of all).
 """
 from __future__ import annotations
 
@@ -81,13 +81,14 @@ def thinned_pairs(inputs: Path) -> dict[str, set[tuple[str, str]]]:
 def main() -> int:
     specs, out, deadline = (Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3])
     keep = thinned_pairs(Path(sys.argv[4])) if len(sys.argv) > 4 else None
+    only = set(sys.argv[5].split(",")) if len(sys.argv) > 5 else None  # thin just these videos
     out.mkdir(parents=True, exist_ok=True)
     for video in DIAGNOSTICS:
         for coder in ("gho", "venue"):
             path = specs / f"score-{video}-{coder}.json"
             if path.is_file():
                 base = json.loads(path.read_text())
-                if keep is not None:
+                if keep is not None and (only is None or video in only):
                     a = base["arguments"]
                     wanted = [x for x in a[a.index("--pairs") + 1].split(",") if (x, coder) in keep[video]]
                     if not wanted:

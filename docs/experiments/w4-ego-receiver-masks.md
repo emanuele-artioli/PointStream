@@ -136,3 +136,36 @@ the decisions are in [experiments.md](../experiments.md). Context:
   the remaining jobs inside the budget their smokes use one pair instead of
   two (24 frames).
 
+### 2026-10-29 — W4 progress: two stages scored, submission trouble, budget
+- Done (validators 10/10, all planned pairs scored):
+  - P03_10 gho `20261029T093413Z-491b07e4`, gpu5 Ada, code `2d7463c8`, 5
+    pairs, 658.7 s; receiver mask IoU with exact F 0.381 (the 4d audit's
+    figure), 104 mask bytes (0.208 kbps).
+  - P01_107 gho `20261029T102050Z-5a803393`, gpu6 Ada, code `b393e8f4`, 10
+    pairs, 734.3 s; IoU 0.824, 114 mask bytes (0.190 kbps).
+- Charged so far: 755.4 + 3.3 (failed job) + 658.7 + 734.3 = 2151.7 s
+  (0.60 GPU-h); 3248 s remain.
+- Submission trouble. Five follow-on submissions ended "outcome unknown"
+  because the `tar -xf` of the source snapshot on gpu2 timed out after 300 s:
+  P03_10 venue `20261029T100418Z-9c01ffa5`, P09_106 gho
+  `20261029T100945Z-5fc6e8d1`, P09_106 venue `20261029T101527Z-a294e7bb`,
+  P01_107 venue `20261029T102338Z-77ebc741`, P02_02 gho
+  `20261029T102908Z-08475087`; P02_02 venue was refused (gpu6 heartbeat
+  stale). Inspected: each of the five has only `events`, `source` and
+  `source.tar`, no `spec.json`, `ready.json` or `state.json`, so none became a
+  request and none runs or costs GPU time. They are not replayed; the same
+  specs are submitted again under new IDs. Their directories are left as
+  they are.
+- Budget decision (fixed before the remaining runs, at P01 gho's measured
+  cost of about 55 s a pair plus about 180 s a job): the remaining full-set
+  jobs (P03 venue 7, P01 venue 5, P09 gho 5, P09 venue 9 pairs; P02 gho 3,
+  P02 venue 10) would need about 3225 s of the 3248 s left. To stay inside
+  the cap, **P02_02 alone uses the thinned set** (its four pairs from the
+  rule above: venue `enh-1080-32+dcvc-63_1`, `enh-1080-59+dcvc-63_1`,
+  `scene-540-0+dcvc-0_4`, gho `scene-540-25+dcvc-42_4`), about 330 s less.
+  P02_02's reference (4a F-hat) rows are taken on the same four pairs; the
+  other three items use their full hull-pair sets. P02_02 is the item with
+  the saved mask of middle quality (IoU 0.716), chosen by the reading order
+  only, not by any receiver-mask score. If the budget is still short the last
+  submitted job is cancelled and the item is reported as not completed.
+
