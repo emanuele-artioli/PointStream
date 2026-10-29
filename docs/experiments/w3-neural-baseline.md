@@ -306,4 +306,4 @@ the decisions are in [experiments.md](../experiments.md). Context:
   CRF points scored by W1's scoring jobs) instead of the three CRF-63 bases, reported only for
   metrics where the quality ranges overlap, otherwise "better/worse at every rate" as AGENTS.md
   requires. Inputs are the W3 and W3b DCVC points (all measured, decoded exactly).
-- Jobs: (none yet)
+- Jobs: `20261029T190006Z-d48a344b` (hosts gpu5 and gpu6, exclusive RTX 6000 Ada; spec `docs/experiments/w3-specs/w3b.json`; submitted 2026-10-29T19:00Z; ready.json `git_head` `1e10451a` per the submit output, to be confirmed from ready.json; the publish call returned normally; started on gpu5 GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162).
