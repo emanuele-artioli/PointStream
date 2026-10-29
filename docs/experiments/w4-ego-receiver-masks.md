@@ -252,7 +252,7 @@ the decisions are in [experiments.md](../experiments.md). Context:
   gpu6's `/local` was 98% full and another user's training job shared the
   machine; nothing there was touched. Source snapshots narrowed with
   `--snapshot-path` to the scoring path after full-repo snapshot extraction
-  timed out on gpu2 six times (twelve orphan snapshot directories with only
+  timed out on gpu2 eleven times (eleven orphan snapshot directories with only
   `source.tar`, no request, remain in the inbox; none ran).
 - Next. Nothing here supports building receiver-side masks with this
   tracker. Untested and cheap to try before giving up on zero-bit masks: a
