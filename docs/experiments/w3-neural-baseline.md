@@ -153,3 +153,6 @@ the decisions are in [experiments.md](../experiments.md). Context:
   (nor gpu5, where both Ada GPUs are idle). The exclusive job waits for an idle GPU; deadline
   2026-10-30T12:00Z. No GPU time spent. Not cancelled, not resubmitted; the options (restart
   workers, widen `hosts` in a new submission, wait) are root's.
+- Cancelled (root's option b): `20261029T123801Z-4da73ccd` is `cancelled` per `ps-fleet status`, never
+  started (no start time, no GPU time). New submission with `hosts: ["gpu5", "gpu6"]` (still RTX 6000
+  Ada, exclusive), otherwise the same spec, snapshot paths and revision of this commit. ID: below.
