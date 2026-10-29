@@ -1351,6 +1351,21 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   DCVC-UF encoded and decoded exactly in one job, Al and Med.
 - **W4. Egocentric receiver masks** ([rule](docs/experiments/w4-ego-receiver-masks.md)):
   does a zero-correction receiver mask keep H5q's DISTS win?
+- **Results (2026-10-29):** W2 closed (no keypoint coder ≤0.5 kbps; the exact
+  re-coding became KPS2, −36–38%, PR #284). W4 closed negative (uncorrected
+  receiver masks lose the hands; PR #285). W1: no SVT allocation reached the
+  hybrid's (whole, player) pair on Al, pending a check that the ROI map was
+  applied correctly; it also found the plain half-resolution SVT envelope far
+  stronger than earlier anchors (whole LPIPS 0.179 vs 0.234 at 22.74 kbps).
+  W3 pending.
+- **Foreground-first claim (user, 2026-10-29).** Candidate paper claim: at
+  equal rate, much better players (and ball) than any SVT allocation, with
+  the whole-frame cost reported. Tests, in order, each narrowing rather than
+  ending the claim if it fails: W1 ROI validity; a visual comparison page
+  (background acceptable? players stable?); W5 Med with full accounting;
+  W6 temporal stability at the full frame rate (the hybrid exists on 80 of
+  240 frames); W7 untouched footage; W8 tennis base model lineage (trained
+  on other matches, shipped as decoder weights) and complete framing costs.
 
 
 ### J. Experience-track re-judging (user, 2026-10-22)
