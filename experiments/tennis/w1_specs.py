@@ -19,7 +19,7 @@ FILES = {
     'lpips': (DATA + '/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth', WEIGHTS['lpips']),
     'dists': (DATA + '/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth', WEIGHTS['dists']),
 }
-DEADLINE = '2026-10-29T18:00:00+00:00'
+DEADLINE = '2026-10-30T12:00:00+00:00'
 CPU_HOSTS = ['gpu2', 'gpu3', 'gpu6']  # gpu1 and gpu5 workers had no fresh heartbeat on 2026-10-29
 
 

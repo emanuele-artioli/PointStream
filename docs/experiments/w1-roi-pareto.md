@@ -464,3 +464,39 @@ the decisions are in [experiments.md](../experiments.md). Context:
   its README is updated.
 - Code: `experiments/tennis/w1_maxbg.py`; scoring reuses `w1_score.py`
   (now accepting a single archive and carrying every earlier policy).
+
+### 2026-10-29 — W1 background-at-maximum: no SVT mode raises R's quality; stopped (outcome A unchanged)
+- Job `20261029T181500Z-e57e65a6` (CPU, gpu2, 23 s, all 240 frames, revision
+  `836eb4597af15d22bf7da4db477a2cce86a07817`, published.tar sha256
+  `31ca7374…`; the validator passed). Half resolution, quantizer 70, offsets
+  0 / −20 / −40 inside R in both pre-registered modes. No GPU time used.
+- Result (luma PSNR dB inside R / outside R / inside R's blocks / outside
+  them; bytes), identical in the two modes (the fixed-quantizer mode and
+  CRF 70 with aq-mode 0 give the same streams):
+
+| offset inside R | bytes | in R | out of R | in R blocks | out of R blocks |
+|---|---|---|---|---|---|
+| 0 | 12,156 | 16.31 | 26.76 | 23.60 | 26.76 |
+| −20 | 16,154 | 16.28 | 26.69 | 23.50 | 26.69 |
+| −40 | 16,234 | 16.32 | 26.75 | 23.60 | 26.74 |
+
+- The criterion (≥ 1.0 dB gain in R's blocks with the background within
+  0.3 dB) fails in both modes: the gain is 0.01 dB. The negative offset
+  costs about 4 kB per stream and changes nothing in the decoded picture, as in
+  the default mode. Under rule (3) of the root request, no mode of
+  SVT-AV1 4.2.0 tried (CRF with aq-mode 2, CRF with aq-mode 0, fixed
+  quantizer) lets the encoder raise R's quality relative to a fixed
+  background; the only direction the ROI map honours is raising the
+  background's quantizer, and at 22.7 kbps that is already at the ceiling
+  (above). Step 2 was therefore not run and nothing was scored.
+- Consequence for the claim. Outcome A (no SVT allocation reaches the hybrid's
+  pair on Al at 22.74 or 21.46 kbps) covers: resolution (half, quarter; full
+  unreachable), plain CRF to 70, and background-QP offsets of 20 and 40.
+  The remaining untried allocation is outside this encoder's ROI tool, for
+  example two separately coded layers (a player-region stream and a
+  background stream), which is a different codec design and not an SVT bit
+  allocation.
+- Visual-comparison files: the three half-resolution probe streams and
+  their decodes are in
+  `/local/users/emanuele/pointstream/w1-visual/maxbg-probe` beside the other
+  W1 files; the README there is updated.
