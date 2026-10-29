@@ -288,3 +288,18 @@ def test_agent_definitions_delegate_only_downhill() -> None:
     assert "disallowedTools: Agent" in runner
     assert "PostToolUseFailure" in runner and "subagent_guard failed" in runner
     assert "effort: medium" in runner
+
+
+def test_large_read_block_suggests_a_subagent_only_in_the_main_session(tmp_path: Path) -> None:
+    path = _long(tmp_path, "big.md", 1500)
+    main = {"tool_name": "Read", "tool_input": {"file_path": str(path)}}
+    inside = {**main, "agent_type": "haiku-runner"}
+    main_message, inside_message = guard.check(main), guard.check(inside)
+    assert main_message is not None and "subagent" in main_message
+    assert inside_message is not None and "subagent" not in inside_message
+
+
+def test_cheaper_tiers_are_offered_proactively() -> None:
+    for name in ("sonnet-builder", "haiku-runner"):
+        front = (AGENTS / f"{name}.md").read_text(encoding="utf-8").split("---")[1]
+        assert "description: Use proactively" in front

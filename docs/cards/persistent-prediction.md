@@ -66,4 +66,5 @@ confirmation and a reproducible neural comparator before a paper claim.
 Stop: decision reached, hard cap, failed correctness/cost gate, missing input
 or unsupported model path. Inspect uncertain requests; never replay them.
 No further training or larger experiment follows automatically from a pass.
-Delegates: gpt-6-luna/max, precise launch-and-report instructions only.
+Delegates: the runner tier (AGENTS.md; in Codex `gpt-6.1-terra`/low, replacing
+gpt-6-luna/max on 2026-10-29), precise launch-and-report instructions only.

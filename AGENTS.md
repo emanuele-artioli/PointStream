@@ -149,6 +149,18 @@ agent owns experiment design, implementation review and scientific decisions;
 subagents return recommendations. When to delegate, and when it costs more
 than it saves, is in [sessions](docs/sessions.md#subagents-inside-a-session).
 
+Delegate without being asked (user, 2026-10-29). When a piece of work can be
+briefed in a paragraph and would otherwise fill your context (searching or
+reading many files, digging through a long log, running and reporting a long
+command, many edit-and-test rounds), hand it to the cheapest tier that can do
+it. Keep in the main session what needs the conversation's context, takes a
+handful of tool calls, or needs the user.
+
+Not yet validated in Codex (2026-10-29): the tier table, the rule above and
+the subagent docs. The first Codex session that delegates works through the
+[Codex validation](docs/sessions.md#codex-validation) list, records the result
+there, and deletes this paragraph.
+
 ## Deciding and asking
 
 Decide alone, and record why, whenever a step can be undone: merges, Overleaf

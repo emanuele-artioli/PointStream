@@ -1,6 +1,6 @@
 ---
 name: sonnet-builder
-description: Well-scoped work with a known goal whose details still need research or coding decisions — implementing a component to a written spec, applying a written rule with existing code (judges, reports, re-scoring saved outputs), fixing a failing test, finding how something works across many files. Brief it with the goal, the files or area, and what done looks like.
+description: Use proactively, without being asked, for well-scoped work with a known goal whose details still need research or coding decisions — implementing a component to a written spec, applying a written rule with existing code (judges, reports, re-scoring saved outputs), fixing a failing test, finding how something works across many files. Brief it with the goal, the files or area, and what done looks like.
 model: sonnet
 effort: high
 maxTurns: 60

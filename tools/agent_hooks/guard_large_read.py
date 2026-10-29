@@ -10,8 +10,10 @@ Claude Code (.claude/settings.json) and Codex (.codex/hooks.json) both run it;
 Codex has no Read tool, so there only the Bash check applies.
 
 Blocking exits with code 2; the message on stderr tells the session what to
-do instead (search, a line range, or the tail plus error lines). Reads with
-an explicit range, piped or redirected output, and short files pass.
+do instead (search, a line range, or the tail plus error lines). In a main
+session (no `agent_type` in the payload) it also suggests handing the file to
+a subagent. Reads with an explicit range, piped or redirected output, and
+short files pass.
 """
 
 from __future__ import annotations
@@ -26,6 +28,10 @@ LIMIT_LINES = 1000
 LOG_LIMIT_LINES = 300
 LOG_SUFFIXES = {".log", ".out", ".err"}
 PRINTERS = {"cat", "less", "more", "bat"}
+DELEGATE_HINT = (
+    " If you need more than a few facts from it, brief a runner or builder subagent "
+    "with the question instead (AGENTS.md, subagent tiers)."
+)
 # Below this size no file can exceed the line limits worth counting.
 MIN_BYTES_TO_COUNT = 8_000
 
@@ -84,6 +90,13 @@ def printed_files(command: str) -> list[str]:
 
 def check(payload: dict) -> str | None:
     """The block message, or None to allow."""
+    message = _block(payload)
+    if message and not payload.get("agent_type"):
+        message += DELEGATE_HINT
+    return message
+
+
+def _block(payload: dict) -> str | None:
     tool = payload.get("tool_name")
     data = payload.get("tool_input") or {}
     cwd = Path(payload.get("cwd") or ".")
