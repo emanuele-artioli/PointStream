@@ -93,3 +93,9 @@ the decisions are in [experiments.md](../experiments.md). Context:
   --snapshot-path experiments --snapshot-path tools --snapshot-path pyproject.toml`
   (a `git archive` of these paths imports the fleet manager and the workload under
   `python -I`) and `--snapshot-transfer-seconds 240`. ID: (below, once known).
+- Jobs (second submission result): `20261029T092633Z-578b35ac`, revision `eba13641`,
+  same spec and snapshot set. The tool caps `--snapshot-transfer-seconds` at 90 (240 was
+  refused before any transfer). The extraction on gpu2 timed out at 90 s; the inbox
+  holds a complete `source/` (250 entries) and `source.tar` but no request, and
+  `ps-fleet status` answers "unpublished or unknown". Host load on gpu2/gpu3 was about 34.
+  No GPU time spent. No further resubmission without root.
