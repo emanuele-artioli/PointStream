@@ -123,6 +123,10 @@ Pass no paths to ruff or mypy: paths replace the configured file sets.
 
 Codex subagents use `gpt-6.1-sol` at `medium` reasoning effort (user,
 2026-10-16; Codex's own default) unless the task says otherwise.
+Claude Code subagents come in three tiers in `.claude/agents/`
+(`opus-designer`, `sonnet-builder`, `haiku-runner`); when to delegate, and
+when it costs more than it saves, is in
+[sessions](docs/sessions.md#subagents-inside-a-session).
 
 ## Deciding and asking
 
