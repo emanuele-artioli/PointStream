@@ -182,7 +182,8 @@ def apply_determinism(enabled: bool) -> dict[str, Any]:
     if enabled:
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
-        torch.use_deterministic_algorithms(True, warn_only=True)
+        # Keep upstream's strictness (it raises on a nondeterministic op); never weaken it.
+        torch.use_deterministic_algorithms(True, warn_only=torch.is_deterministic_algorithms_warn_only_enabled())
     return {"requested": enabled, "after_set_torch_env": after_upstream, "final": torch_determinism_state()}
 
 

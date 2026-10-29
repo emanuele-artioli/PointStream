@@ -118,3 +118,26 @@ the decisions are in [experiments.md](../experiments.md). Context:
   (`docs/experiments/w3-specs/w3.json`, `--source-worktree`, `--snapshot-path src experiments
   tools pyproject.toml`, default transfer timeout), approved in principle by root, awaiting a
   session with usage. Nothing submitted since.
+- Jobs (fourth submission = the approved resubmission): `20261029T101344Z-9e2e2d37`, gpu6
+  GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553 (RTX 6000 Ada, exclusive), ready.json `git_head`
+  `48e4d1f4` (the `code_point` fix of `367716fd` included). The publish call timed out on the
+  client side after 120 s but the job had published; its smoke FAILED after 51 s of workload
+  (about 70 GPU-s; running total about 145 of 7200).
+  - Failure: `foreground_masks` -> `k6b.k6_oracle` draws from reference frames anywhere in the
+    window (index 233) but the smoke built the truth RGB for 25 frames only (`IndexError`,
+    `w3_neural_baseline.py:265`). Fixed: the truth covers all 240 frames in both stages.
+  - What ran before it, on the real GPU (read from the retained scratch on gpu6): the
+    18-candidate rate calibration (estimated kbps at 240 frames, Al: scale 8 QP 0..63 = 2.8, 6.2,
+    12.0, 19.9, 28.7, 39.0; scale 4 = 9.0, 17.1, 33.4, 55.2, 79.2, 117.6; scale 2 = 20.9, 43.2,
+    81.8, 138.7, 214.2, 348.0), so the 15-60 kbps bracket is reachable at scales 8 and 4; the
+    30 kbps point was scale 8, QP 48 (5,203 bytes for 25 frames); the point passed the job's
+    acceptance code (the run proceeded to the foreground step): decoders A and B, two passes
+    each, gave identical frame hashes; the encoder report records `dpb_reachable: false`;
+    determinism state: DCVC's `set_torch_env` already sets deterministic algorithms (strict)
+    and the cuBLAS workspace config, leaves `cudnn.deterministic` off and benchmark off; this
+    job added `cudnn.deterministic = True` (and, wrongly, `warn_only=True`; fixed to keep
+    upstream's strict mode); no nondeterminism warning was raised. This is a 25-frame smoke,
+    not evidence.
+  - SVT scale 8 re-encode of Al: 12,237 bytes = 10.1975 kbps, equal to the audited base.
+  - Not yet exercised on a GPU: foreground masks, scoring, the audited score control, the
+    validator. Per root's rule no further submission without root.

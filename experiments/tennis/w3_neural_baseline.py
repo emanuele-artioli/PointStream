@@ -371,7 +371,8 @@ def run_window(a: argparse.Namespace, key: str, ctx: dict[str, Any]) -> dict[str
     timings['svt'] = time.monotonic() - started
     # Every codec subprocess is finished before the metric networks and the foreground are built.
     started = time.monotonic()
-    truth = rgb_memmap(source, work / 'truth.npy', n, 1920, 1080, False, 'cuda')
+    # The foreground oracle draws from reference frames anywhere in the window, so the truth covers all 240.
+    truth = rgb_memmap(full, work / 'truth.npy', NATIVE_FRAMES, 1920, 1080, False, 'cuda')
     masks = foreground_masks(spec['wid'], ctx['anchors'], ctx['wire'], truth, ticks, ctx['prior_rows'])
     np.savez_compressed(out / 'foreground-masks.npz', ticks=np.asarray(ticks), packed=np.stack([np.packbits(masks[t]) for t in ticks]))
     timings['masks'] = time.monotonic() - started
