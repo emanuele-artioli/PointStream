@@ -183,3 +183,82 @@ the decisions are in [experiments.md](../experiments.md). Context:
   `20261029T125155Z-45a064df`, P02_02 venue `20261029T125225Z-f5261661`
   (all gpu6 Ada requested; stale-heartbeat refusals created no job).
 
+### 2026-10-29 — W4 outcome: uncorrected receiver masks fail the rule
+- **Verdict: the rule fails.** Weighted DISTS mean BD-rate against
+  `dcvc-venue` at equal adaptation is **+494% over the three items scored,
+  0 of 3 below zero** (rule: at most -10% and at least 3 of 4 below zero).
+  P02_02 was not completed (below), so the verdict is on three items. It
+  cannot change: the best mean the missing item could give is
+  (3 x 4.94 - 1) / 4 = +3.45, and with 0 of 3 below zero at most 1 of 4 can
+  be, short of 3. Hypothesis (DISTS tolerates small boundary errors) is
+  rejected for the tracker's masks; the competing explanation (missed hands
+  put background pixels on the hands) holds.
+- Scope (root, accepted). Each item's saved 4d(b) mask (tracked on its
+  lowest-rate decode) was applied to all its hull pairs, a conservative
+  construction: this result does not reject receiver masks in general (a
+  real receiver tracks each point on its own decode, and a better tracker or
+  later prompts are untested). It shows that this pinned tracker, seeded once
+  and uncorrected, loses the hands. The 4a foreground stream was built for
+  the exact F-hat, so the receiver mask had a favourable input too.
+- Per item (receiver mask against the exact F on the full clip; BD-rate
+  against `dcvc-venue`; the 4a pairs, all billed):
+
+  | item | pairs | IoU (frame min) | missed / extra share of F | mask bytes (kbps) | total kbps range | wDISTS | wLPIPS | frame LPIPS | frame DISTS | wPSNR |
+  |---|---|---|---|---|---|---|---|---|---|---|
+  | P01_107 | 15 | 0.824 (0.728) | 0.115 / 0.075 | 114 (0.19) | 14-2587 | +51% | +69% | +53% | +4% | +219% |
+  | P03_10 | 12 | 0.381 (0.128) | 0.587 / 0.084 | 104 (0.21) | 16-4028 | +1170% | +1687% | +158% | +47% | worse at every rate |
+  | P09_106 | 14 | 0.652 (0.000) | 0.325 / 0.035 | 92 (0.15) | 29-7032 | +260% | +704% | +40% | +11% | +3646% |
+  | P02_02 | 13 | not run (4d audit: 0.716) | | 99 | | | | | | |
+
+  Means over the three: wDISTS +494%, wLPIPS +820%, frame LPIPS +84%, frame
+  DISTS +21%, wPSNR +1932% (large because the BD-rate integrates log rate
+  over a short overlap of low quality). On the same pairs, 4a's F-hat
+  composites with the mask bytes removed (F free): wDISTS 0 | -21 | -30%
+  (mean -17%, 2 of 3), wLPIPS +8 | +44 | -23% (mean +9%); with F billed
+  (the 4a rule): wDISTS +125 | +102 | 0%. Receiver masks are about 0.2 kbps,
+  so the bill is no longer the problem; the quality is. At the same pair the
+  weighted DISTS rises, e.g. P03_10 `scene-540-25+dcvc-42_4` 0.178 to 0.312,
+  and the rate falls by the mask's 36-116 kbps.
+- Jobs (all validators passed, every planned pair scored, ready git_head
+  equal to the commit named; gpu6 RTX 6000 Ada unless noted):
+  P03_10 gho `20261029T093413Z-491b07e4` (gpu5, `2d7463c8`, 658.7 s);
+  P01_107 gho `20261029T102050Z-5a803393` (`b393e8f4`, 734.3 s);
+  P03_10 venue `20261029T123948Z-d873ddb9` (`648221d5`, 903.9 s);
+  P09_106 venue `20261029T124323Z-f7254a25` (`648221d5`, 703 s);
+  P09_106 gho `20261029T124721Z-2d5c6921` (`648221d5`, 428 s);
+  P01_107 venue `20261029T125137Z-c80c219d` (`648221d5`, 526 s).
+  Failed: `20261029T090812Z-2488daa0` (755.4 s + 3.3 s salvage). Cancelled
+  unstarted: P02_02 gho `20261029T125155Z-45a064df` and venue
+  `20261029T125225Z-f5261661` (0 s).
+- Why P02_02 was cancelled. After P03_10's two jobs the weighted-DISTS rule
+  was decided arithmetically (P03_10 +1170% alone puts the four-item mean far
+  above -10%), so the rest was spent only on items whose per-item numbers
+  were already queued or running; P02_02's thinned jobs (4 pairs) were
+  cancelled to stay inside the budget (the contended gpu6 cost 100 s or more
+  a pair for the first jobs). Its mask IoU (0.716, 4d audit) is the only
+  P02_02 figure.
+- GPU-seconds charged: 755.4 + 3.3 + 658.7 + 734.3 + 903.9 + 703 + 428 + 526
+  = **4712.6 s = 1.31 GPU-h of 1.5** (jobs ran concurrently on gpu6; each
+  counted in full).
+- Evidence. Scores: each job's `h5.json` in its fleet directory
+  (`jobs/fleet/inbox/<job>/full/`); report: `experiments/visor/w4_report.py`
+  over H5p 4d's `h5p-scoring-inputs.json` (sha256 in its output) with
+  `--skip-items P02_02`. Anchor: `dcvc-venue` rows of 4a. Native paths as in
+  4a (DCVC-UF streams decoded in 4a's foreground jobs; this item adds no
+  native codec run). Receiver masks: 4d(b) jobs `20261024T084521Z-bc72ff4d`,
+  `…084534Z-c700da3b`, `…084607Z-e00640d5`, `…084640Z-668afb3e`
+  (`arm0-dcvc-0_4.npz`, P09 `arm0-dcvc-42_2.npz`, with `seed.shape`), hashes
+  in `w4_specs.py`. Environment `pointstream-20261009T214002Z`. Hosts:
+  gpu6's `/local` was 98% full and another user's training job shared the
+  machine; nothing there was touched. Source snapshots narrowed with
+  `--snapshot-path` to the scoring path after full-repo snapshot extraction
+  timed out on gpu2 six times (twelve orphan snapshot directories with only
+  `source.tar`, no request, remain in the inbox; none ran).
+- Next. Nothing here supports building receiver-side masks with this
+  tracker. Untested and cheap to try before giving up on zero-bit masks: a
+  tracker on each point's own decode with periodic re-seeding paid in
+  bytes (a few hundred bytes per reseed, not 13-61 kbps), judged by the same
+  rule; the lost-hands failure (P03_10 loses 59% of F, P09_106's
+  frame-minimum IoU is 0) says re-seeding, not boundary accuracy, is what is
+  missing.
+

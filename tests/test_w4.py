@@ -151,3 +151,14 @@ def test_thin_picks_four_pairs_by_rate_rank_only() -> None:
 
 def test_spec_caps_follow_the_pair_count() -> None:
     assert w4_specs.FULL_BASE_SECONDS + w4_specs.FULL_PAIR_SECONDS * 7 == 1700
+
+
+def test_rule_fails_on_fewer_items_but_never_passes_on_them() -> None:
+    items = {str(i): {"bd": {"receiver": {m: {"bd": b, "where": "overlap"} for m in w4_report.METRICS}}}
+             for i, b in enumerate([11.7, 0.4, 0.2])}
+    v = w4_report.verdict(w4_report.summarize(items))
+    assert not v["passes"] and v["fails_whatever_is_missing"] and v["planned"] == 4
+    good = {str(i): {"bd": {"receiver": {m: {"bd": b, "where": "overlap"} for m in w4_report.METRICS}}}
+            for i, b in enumerate([-0.3, -0.3, -0.3])}
+    v = w4_report.verdict(w4_report.summarize(good))
+    assert not v["passes"] and not v["fails_whatever_is_missing"]

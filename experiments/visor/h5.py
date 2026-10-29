@@ -1458,7 +1458,7 @@ def validate_score(result: dict[str, Any]) -> dict[str, bool]:
             "max_abs", 99) <= 1,
         "foreground_decodes_on_f": all(r["scores"][FILL]["psnr_fg"] > 15 for r in rows),
         "background_f_is_foreground_f": result["limit_frames"] > 0 or result["background_f_is_foreground_f"],
-        "mask_billed": mask_billed(result["mask"], rows),
+        "mask_billed": mask_billed(result.get("mask"), rows),
         # H5p 4c: the key and τ billed in every container, and no MASK beside them
         "carrier_billed": not result.get("carrier") or (not result.get("mask") and all(
             r["breakdown"].get("carrier", 0) == 2 + r["carrier"]["payload_bytes"] for r in rows)),

@@ -58,13 +58,21 @@ def summarize(items: dict[str, dict[str, Any]]) -> dict[str, Any]:
     return out
 
 
-def verdict(summary: dict[str, Any], variant: str = "receiver") -> dict[str, Any]:
+def verdict(summary: dict[str, Any], variant: str = "receiver", planned: int = 4) -> dict[str, Any]:
+    """The rule on the items scored. It can pass only with all ``planned`` items; it can fail on fewer: a mean
+    BD-rate above -10% over the scored items cannot be pulled down to -10% by the missing ones, each bounded
+    below by -100%, when ``bound`` (the best mean the missing items could still give) stays above the limit."""
     s = summary[f"{variant}|wdists_fill"]
     mean = s["mean_bd"]
-    passes = mean is not None and s["items_with_bd"] == s["items"] and mean <= RULE_MEAN \
+    missing = planned - s["items"]
+    passes = mean is not None and missing == 0 and s["items_with_bd"] == s["items"] and mean <= RULE_MEAN \
         and s["items_below_zero"] >= RULE_ITEMS
+    bound = None if mean is None else (mean * s["items_with_bd"] - missing) / planned
+    fails_whatever_is_missing = bool(bound is not None and bound > RULE_MEAN)
     return {"rule": f"weighted DISTS mean BD <= {RULE_MEAN:+.0%} and >= {RULE_ITEMS} items below zero",
-            "mean_bd": mean, "items_below_zero": s["items_below_zero"], "items": s["items"], "passes": bool(passes)}
+            "mean_bd": mean, "items_below_zero": s["items_below_zero"], "items": s["items"], "planned": planned,
+            "best_possible_mean_with_missing_items": bound,
+            "fails_whatever_is_missing": fails_whatever_is_missing, "passes": bool(passes)}
 
 
 def main() -> int:
@@ -73,6 +81,7 @@ def main() -> int:
     p.add_argument("--score", type=Path, action="append", required=True)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--thin", action="store_true", help="score only the rate-position pairs (`thin`)")
+    p.add_argument("--skip-items", default="", help="comma-separated videos with no receiver rows (not run)")
     p.add_argument("--thin-items", default="", help="comma-separated videos (e.g. P02_02) judged on the thinned pairs")
     args = p.parse_args()
     base = json.loads(args.inputs.read_text())
@@ -92,6 +101,8 @@ def main() -> int:
         received = [r for st in stages if st["item"] == item for r in st["rows"]
                     if (r["pair"], r["tag"].removeprefix("w4-")) in chosen and r["tag"].startswith("w4-")]
         anchors = [r for st in base["anchors"] if st["item"] == item for r in st["rows"] if r["codec"] == ANCHOR]
+        if not received and item.rsplit("_", 1)[0] in args.skip_items.split(","):
+            continue  # not run (budget); the verdict counts it as missing
         if len(reference) != len(chosen) or len(received) != len(chosen) or not anchors:
             raise ValueError(f"{item}: {len(reference)} reference, {len(received)} receiver rows for "
                              f"{len(chosen)} pairs, {len(anchors)} anchors")
