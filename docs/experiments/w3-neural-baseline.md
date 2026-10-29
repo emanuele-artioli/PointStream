@@ -176,3 +176,5 @@ the decisions are in [experiments.md](../experiments.md). Context:
   Only rates were looked at to decide this (the smoke's one-point quality is a 25-frame smoke).
   Budget spent so far: about 145 + 250 = 400 of 7200 GPU-s. One more submission is needed;
   it is requested from root.
+- Jobs (seventh submission, root-approved): `20261029T181050Z-64feb092`, hosts gpu5 and gpu6,
+  ready.json `git_head` `32606af7280d60051e4b77d5d36b7f6720389fc3`; published at once.
