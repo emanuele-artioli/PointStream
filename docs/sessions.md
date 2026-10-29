@@ -81,6 +81,12 @@ conversation, and what to drop:
 > (running), 3.1 of 8 GPU-hours spent, and the open question on crop size.
 > Drop logs and the dead ends already recorded.
 
+If the phase delegated work to subagents, suggest running the
+`explain-usage` skill before compacting, while the phase is still in the
+context. It shows where the phase's tokens went, so the user can check
+whether delegating paid off and adjust the
+[delegation rules](#subagents-inside-a-session).
+
 Automatic compaction (at 80% in cloud sessions) is the safety net. When the
 next phase is a new task, a fresh session from a card is better than
 compacting. Cache behavior differs by harness. Claude Code's local check on
@@ -153,13 +159,16 @@ Cards say how hard their item is, so cheaper models take the easier ones.
 
 The same three tiers exist as Claude Code subagents in
 [`.claude/agents/`](../.claude/agents/): `opus-designer` (Opus, medium
-effort), `sonnet-builder` (Sonnet, high) and `haiku-runner` (Haiku, high).
-A card picks the session's model; a subagent takes one piece of a
-session's work and returns a short report.
+effort), `sonnet-builder` (Sonnet, high) and `haiku-runner` (Haiku,
+medium). Codex's equivalents are in the table in AGENTS.md. A card picks
+the session's model; a subagent takes one piece of a session's work and
+returns a short report.
 
 **What a subagent costs.** It starts cold: its own prompt, the brief, the
 full AGENTS.md and CLAUDE.md files and git status, but none of the
-conversation. It then re-reads whatever files it needs. Its report lands
+conversation. It then reads the files its task needs, some of which the
+main session may already have read; a brief that carries the facts
+(paths, line ranges, numbers, the command) saves it that. Its report lands
 in the main context and is re-read on every later step. The total is
 roughly: startup + the brief + its own exploration + the report + any
 re-checking the main session does. Delegating saves tokens only when the
@@ -185,9 +194,24 @@ use it for context isolation, not for savings.
 
 **Briefs.** Name the goal, the files or area, what done looks like, the
 GPU budget (zero unless stated) and whether to commit. A `haiku-runner`
-brief lists every step and its expected result; Haiku stops at the first
-surprise instead of improvising. Each agent caps its report length and
-cannot spawn further subagents, so the tree stays one level deep.
+brief lists every step and its expected result, including an expected
+failure ("exit 1: no matches"). Each agent caps its report length.
+
+**Stopping at the first surprise.** Three things hold `haiku-runner` to
+it: its prompt says so; a `PostToolUseFailure` hook
+(`tools/agent_hooks/subagent_guard.py failed`) adds a reminder to stop
+and report after every failed step; and `maxTurns: 25` bounds the rest.
+A result that runs but differs from the expected one is caught only by
+the prompt, and by the main session comparing the report with the brief.
+
+**Delegating downhill.** `opus-designer` may launch `sonnet-builder` and
+`haiku-runner`; `sonnet-builder` may launch `haiku-runner`; `haiku-runner`
+launches nothing. Claude Code cannot restrict this in a subagent's
+definition (it ignores type lists there and lets the caller override the
+child's model), so a `PreToolUse` hook (`subagent_guard.py spawn`) blocks
+any other type and any model override. Each level summarizes the one
+below, so detail is lost at every hop: nest only when the sub-work is
+verbose and fully briefable, at most three launches per agent.
 
 **Escalate, don't retry.** If a `haiku-runner` stops, either finish the
 step in the main session or re-brief it to `sonnet-builder`; do not

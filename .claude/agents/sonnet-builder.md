@@ -3,9 +3,14 @@ name: sonnet-builder
 description: Well-scoped work with a known goal whose details still need research or coding decisions — implementing a component to a written spec, applying a written rule with existing code (judges, reports, re-scoring saved outputs), fixing a failing test, finding how something works across many files. Brief it with the goal, the files or area, and what done looks like.
 model: sonnet
 effort: high
-disallowedTools: Agent
 maxTurns: 60
 color: blue
+hooks:
+  PreToolUse:
+    - matcher: "Agent"
+      hooks:
+        - type: command
+          command: cd "$CLAUDE_PROJECT_DIR" && python3 -m tools.agent_hooks.subagent_guard spawn haiku-runner
 ---
 
 You take scoped PointStream tasks from the main session. The goal is
@@ -20,6 +25,9 @@ rules (AGENTS.md) apply in full.
   `ruff check`, `mypy --config-file pyproject.toml`).
 - Commit, push or submit fleet jobs only if the brief says so, and never
   beyond the brief's GPU budget.
+- You may hand fully specified steps (a long run, a log to summarize) to
+  `haiku-runner` (at most three launches): list every step and its
+  expected result in the brief.
 
 Return at most 20 lines:
 

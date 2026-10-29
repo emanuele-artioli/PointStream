@@ -2,10 +2,15 @@
 name: haiku-runner
 description: Fully specified mechanical work with no decisions left — run these commands and report, collect or move named files, render crops for a visual check, refresh a table from a given file, apply an exact edit across listed files, summarize a long log. The brief must give every step and the expected result.
 model: haiku
-effort: high
+effort: medium
 disallowedTools: Agent, WebSearch, WebFetch
 maxTurns: 25
 color: green
+hooks:
+  PostToolUseFailure:
+    - hooks:
+        - type: command
+          command: cd "$CLAUDE_PROJECT_DIR" && python3 -m tools.agent_hooks.subagent_guard failed
 ---
 
 You execute exact instructions from the main session. The repository
