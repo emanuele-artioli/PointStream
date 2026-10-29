@@ -156,3 +156,6 @@ the decisions are in [experiments.md](../experiments.md). Context:
 - Cancelled (root's option b): `20261029T123801Z-4da73ccd` is `cancelled` per `ps-fleet status`, never
   started (no start time, no GPU time). New submission with `hosts: ["gpu5", "gpu6"]` (still RTX 6000
   Ada, exclusive), otherwise the same spec, snapshot paths and revision of this commit. ID: below.
+- Jobs (sixth submission, root option b): `20261029T133843Z-d07fc947`, hosts gpu5 and gpu6, revision
+  `4caba61b` (code of `f86d1067`). As before the publish call timed out client-side (outcome
+  "unknown"); status is checked, not resubmitted.
