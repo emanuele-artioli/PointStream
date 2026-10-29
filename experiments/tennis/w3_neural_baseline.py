@@ -273,22 +273,27 @@ def foreground_masks(wid: str, anchor_dirs: dict[str, Path], wire: Path, truth: 
     return masks
 
 
+def decoded_rgb(frame: np.ndarray, width: int, height: int) -> np.ndarray:
+    """One limited-range 4:2:0 frame (h*3/2, w) to uint8 RGB on the GPU, as the baselines convert it."""
+    import torch
+    from src.codecs.quality import yuv420_to_rgb
+
+    plane = torch.from_numpy(frame[None]).cuda()
+    return yuv420_to_rgb(plane, width, height, full_range=False)[0].permute(1, 2, 0).to(torch.uint8).cpu().numpy()
+
+
 def score_stream(nets: dict[str, Any], decoded: Path, size: list[int], n: int, ticks: list[int], truth: Any,
                  masks: dict[int, np.ndarray]) -> dict[str, list[float]]:
     """Whole-frame and fixed-foreground LPIPS and DISTS of one decoded file, as the real-base judge computes them."""
-    import torch
     from experiments.tennis import k6
     from experiments.visor.h3b import dists_crops, lpips_reduce
-    from src.codecs.quality import yuv420_to_rgb
 
     width, height = size
     pixels = np.memmap(decoded, np.uint8, 'r', shape=(n, height * 3 // 2, width))
     scores: dict[str, list[float]] = {m: [] for m in an.METRICS}
     all_mask = np.ones((1080, 1920), bool)
     for t in ticks:
-        plane = torch.from_numpy(np.array(pixels[t], copy=True)[None]).cuda()
-        rgb = yuv420_to_rgb(plane, width, height, full_range=False)[0].permute(1, 2, 0).to(torch.uint8).cpu().numpy()
-        image = cv2.resize(rgb, (1920, 1080), interpolation=cv2.INTER_CUBIC)
+        image = cv2.resize(decoded_rgb(np.array(pixels[t], copy=True), width, height), (1920, 1080), interpolation=cv2.INTER_CUBIC)
         true, s = np.asarray(truth[t]), masks[t]
         ys, xs = np.nonzero(s)
         crop = (slice(max(0, ys.min() - k6.DISTS_PAD), min(1080, ys.max() + 1 + k6.DISTS_PAD)),
@@ -500,6 +505,7 @@ def run(a: argparse.Namespace) -> None:
                'setup_seconds': setup, 'seconds': seconds, **summarize(results),
                'inputs': {k: getattr(a, k).name for k in INPUTS},
                'scope': 'Two familiar development windows; real bitstreams; decoded in the encoding job; no timing claim.'}
+    summary = json.loads(json.dumps(summary))  # what the validator reads back: lists, not tuples
     write(publish / 'summary.json', summary)
     write(Path(os.environ['PS_STAGE_DIR']) / 'w3-summary.json', summary)
     if not summary['accepted']:
