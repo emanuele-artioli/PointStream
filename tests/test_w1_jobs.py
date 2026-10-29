@@ -57,7 +57,7 @@ def test_score_helpers_select_three_per_policy_and_flag_a_bad_control(tmp_path):
              'size': [960, 544], 'decoded_sha256': 'a' * 64} for c, r in ((68, 24.0), (69, 22.0), (70, 20.0), (67, 27.0))]
     rows.append({'scale': 2, 'offset': 0, 'crf': 63, 'stream': 'streams/control_s2_crf63.ivf', 'rate_kbps': 33.7,
                  'size': [960, 544], 'decoded_sha256': 'b' * 64})
-    summary = {'scale': 2, 'searches': [{'offset': -20, 'selected': [68, 69, 70]}, {'offset': 0, 'selected': None}],
+    summary = {'scale': 2, 'searches': [{'scale': 2, 'offset': -20, 'selected': [68, 69, 70]}, {'scale': 2, 'offset': 0, 'selected': None}],
                'controls': [{**rows[-1], 'scale': 2}]}
     (tmp_path / 'encodes.json').write_text(json.dumps(rows))
     (tmp_path / 'encode.json').write_text(json.dumps(summary))
@@ -114,3 +114,29 @@ def test_assemble_carries_the_plain_policy_from_an_earlier_run():
     scores = {p['name']: np.array([[0.3], [0.4], [0.2], [0.3]]) for p in points}
     result = sc.assemble(points, scores, (2,), carried)
     assert result['at_target']['s2_o0'] is not None and result['at_target']['s2_o20'] is not None
+
+
+def test_maxbg_command_modes_and_search_variable(tmp_path):
+    from experiments.tennis import w1_maxbg as mb
+
+    aq0 = mb.command('aq0', tmp_path / 'a.yuv', tmp_path / 'a.ivf', 960, 544, 240, None)
+    cqp = mb.command('cqp', tmp_path / 'a.yuv', tmp_path / 'a.ivf', 960, 544, 240, tmp_path / 'roi.txt')
+    assert aq0[aq0.index('--crf') + 1] == '70' and aq0[aq0.index('--aq-mode') + 1] == '0' and '--roi-map-file' not in aq0
+    assert '--crf' not in cqp and cqp[cqp.index('--cqp') + 1] == '70' and '--roi-map-file' in cqp
+    assert w.maxbg_roi_value(70) == 0 and w.maxbg_roi_value(30) == -40 and w.maxbg_k(-63) == 7
+    assert w.policy_name(2, w.MAXBG) == 's2_mb'
+
+
+def test_maxbg_search_stays_inside_the_offset_range():
+    known: dict[int, float] = {}
+    for _ in range(30):
+        status, k = w.next_crf(known, w.TARGET_KBPS, 44, lo=mb_low(), hi=70)
+        if k is None:
+            break
+        assert 7 <= k <= 70
+        known[k] = 60.0 * math.exp(-0.05 * (k - 20))
+    assert status == 'complete'
+
+
+def mb_low():
+    return w.MAXBG_BASE_Q - 63

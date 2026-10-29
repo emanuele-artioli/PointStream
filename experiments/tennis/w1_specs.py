@@ -61,6 +61,17 @@ def encode(scale: int, controls: bool, threads: int, full_seconds: int, outside:
     return spec
 
 
+def maxbg() -> dict[str, Any]:
+    spec = base('experiments.tennis.w1_maxbg', ['--al', '{staged:al}', '--transport', '{staged:transport}', '--frames', '{frames}',
+                                                '--max-encodes', '{max_encodes}'], ['al', 'transport'])
+    spec.update({'device': 'cpu', 'hosts': CPU_HOSTS, 'gpu_models': [], 'gpu_memory_mib': 0, 'cpu_threads': 24,
+                 'local_storage_gib': 40, 'scale': {'frames': {'smoke': 24, 'full': 240}, 'max_encodes': {'smoke': 2, 'full': 14}},
+                 'smoke': {'seconds': 560, 'representative_basis': 'Mode probe (two modes x offsets 0/-20/-40 at half resolution), then two encodes per scale and the three controls, decode, PSNR and packaging as in the full stage, on 24 frames.'},
+                 'full': {'seconds': 2400}, 'validator_seconds': 120, 'budget_seconds': 3500, 'stall_seconds': 900.0,
+                 'contention': {'policy': 'stop', 'resume_attempts': 0}})
+    return spec
+
+
 def roicheck() -> dict[str, Any]:
     spec = base('experiments.tennis.w1_roicheck', ['--al', '{staged:al}', '--transport', '{staged:transport}', '--frames', '{frames}'],
                 ['al', 'transport'])
@@ -72,16 +83,18 @@ def roicheck() -> dict[str, Any]:
     return spec
 
 
-def score(half: tuple[str, str], other: tuple[str, str], masks_archive: tuple[str, str],
+def score(half: tuple[str, str], other: tuple[str, str] | None, masks_archive: tuple[str, str],
           prior: tuple[str, str] | None = None) -> dict[str, Any]:
-    extra = {'encode_half': half, 'encode_full': other, 'masks': masks_archive}
+    extra = {'encode_half': half, 'masks': masks_archive}
+    if other:
+        extra['encode_full'] = other
     if prior:
         extra['prior'] = prior
     arguments = ['--al', '{staged:al}', '--masks', '{staged:masks}', '--hybrid', '{staged:hybrid}', '--lpips', '{staged:lpips}',
-                 '--dists', '{staged:dists}', '--encode-half', '{staged:encode_half}', '--encode-full', '{staged:encode_full}',
-                 '--judged', '{judged}'] + (['--prior', '{staged:prior}'] if prior else [])
+                 '--dists', '{staged:dists}', '--encode-half', '{staged:encode_half}',
+                 '--judged', '{judged}'] + (['--encode-full', '{staged:encode_full}'] if other else []) + (['--prior', '{staged:prior}'] if prior else [])
     spec = base('experiments.tennis.w1_score', arguments,
-                ['al', 'masks', 'hybrid', 'lpips', 'dists', 'encode_half', 'encode_full'] + (['prior'] if prior else []), extra)
+                ['al', 'masks', 'hybrid', 'lpips', 'dists', 'encode_half'] + (['encode_full'] if other else []) + (['prior'] if prior else []), extra)
     spec.update({'device': 'gpu', 'hosts': ['gpu3'], 'gpu_models': ['RTX A6000'], 'gpu_memory_mib': 8000, 'cpu_threads': 4,
                  'local_storage_gib': 30, 'scale': {'judged': {'smoke': 3, 'full': 0}},
                  'gpu_sharing': {'mode': 'shared', 'basis': 'Saved-pixel scoring; scores do not depend on wall time', 'margin_mib': 8192},
@@ -95,7 +108,7 @@ def main() -> None:
     out = Path(sys.argv[1])
     out.mkdir(parents=True, exist_ok=True)
     specs = {'masks': masks(), 'encode-half': encode(2, True, 16, 2600), 'encode-full': encode(1, False, 24, 2600),
-             'encode-quarter': encode(4, False, 12, 2600), 'roicheck': roicheck(),
+             'encode-quarter': encode(4, False, 12, 2600), 'roicheck': roicheck(), 'maxbg': maxbg(),
              'encode-half-out': encode(2, True, 16, 2600, True), 'encode-quarter-out': encode(4, False, 12, 2600, True)}
     for name, spec in specs.items():
         (out / f'{name}.json').write_text(json.dumps(spec, indent=1) + '\n')

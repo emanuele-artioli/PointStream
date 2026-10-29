@@ -69,8 +69,23 @@ def secondary_kbps(new_packet_bytes: int) -> float:
     return TARGET_KBPS - (ORIGINAL_KPS_BYTES - new_packet_bytes) * 8 / (FRAMES / FPS) / 1000
 
 
+MAXBG = 99  # label of the background-at-maximum policy: offset field of its rows and searches
+MAXBG_BASE_Q = 70
+
+
 def policy_name(scale: int, offset: int) -> str:
+    if offset == MAXBG:
+        return f's{scale}_mb'
     return f's{scale}_o{-offset}' if offset else f's{scale}_o0'
+
+
+def maxbg_k(roi_value: int) -> int:
+    """Search variable of the background-at-maximum policy: rate falls as k rises (k = 70 - |offset|)."""
+    return MAXBG_BASE_Q + roi_value
+
+
+def maxbg_roi_value(k: int) -> int:
+    return k - MAXBG_BASE_Q
 
 
 # ---------------------------------------------------------------- the ROI map
@@ -120,20 +135,21 @@ def _flip(known: dict[int, float], target: float) -> int | None:
     return None
 
 
-def next_crf(known: dict[int, float], target: float, start: int) -> tuple[str, int | None]:
+def next_crf(known: dict[int, float], target: float, start: int, lo: int = CRF_MIN,
+             hi: int = CRF_MAX) -> tuple[str, int | None]:
     """Decide the next CRF to encode from measured rates alone (never from quality).
 
     Returns ('encode', crf) or a terminal status with None:
     'complete' (a bracketing pair of adjacent CRFs plus one neighbour are measured),
-    'unbracketed_high' (the rate is still above the target at CRF 70) and
-    'unbracketed_low' (the rate is already below it at CRF 1).
+    'unbracketed_high' (the rate is still above the target at `hi`, CRF 70 by default) and
+    'unbracketed_low' (the rate is already below it at `lo`, CRF 1 by default).
     """
     if not known:
-        return 'encode', min(CRF_MAX, max(CRF_MIN, start))
+        return 'encode', min(hi, max(lo, start))
     flip = _flip(known, target)
     if flip is not None:
         for neighbour in (flip + 2, flip - 1):
-            if CRF_MIN <= neighbour <= CRF_MAX and neighbour not in known:
+            if lo <= neighbour <= hi and neighbour not in known:
                 return 'encode', neighbour
         return 'complete', None
     above = [c for c in known if known[c] >= target]
@@ -148,7 +164,7 @@ def next_crf(known: dict[int, float], target: float, start: int) -> tuple[str, i
             guess = a + (math.log(known[a]) - math.log(target)) / span * (b - a) if span > 0 else (a + b) / 2
             return 'encode', min(b - 1, max(a + 1, round(guess)))
         # Non-monotone: every lower-rate point sits at a smaller CRF. Probe just above the highest.
-        if a + 1 <= CRF_MAX and a + 1 not in known:
+        if a + 1 <= hi and a + 1 not in known:
             return 'encode', a + 1
         return 'unbracketed_high', None
     slope = SLOPE_PRIOR
@@ -159,15 +175,15 @@ def next_crf(known: dict[int, float], target: float, start: int) -> tuple[str, i
             slope = measured
     if above:
         top = max(above)
-        if top >= CRF_MAX:
+        if top >= hi:
             return 'unbracketed_high', None
         step = max(1, math.ceil((math.log(known[top]) - math.log(target)) / slope))
-        return 'encode', min(CRF_MAX, top + step)
+        return 'encode', min(hi, top + step)
     bottom = min(below)
-    if bottom <= CRF_MIN:
+    if bottom <= lo:
         return 'unbracketed_low', None
     step = max(1, math.ceil((math.log(target) - math.log(known[bottom])) / slope))
-    return 'encode', max(CRF_MIN, bottom - step)
+    return 'encode', max(lo, bottom - step)
 
 
 def select_crfs(known: dict[int, float], target: float) -> list[int] | None:

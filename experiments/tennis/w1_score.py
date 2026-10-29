@@ -42,7 +42,7 @@ def selected_points(published: Path) -> list[dict[str, Any]]:
     points = []
     for search in summary['searches']:
         for crf in search['selected'] or []:
-            row = next(r for r in rows if r['scale'] == summary['scale'] and r['offset'] == search['offset']
+            row = next(r for r in rows if r['scale'] == search['scale'] and r['offset'] == search['offset']
                        and r['crf'] == crf and 'control' not in r['stream'])
             points.append({**row, 'kind': 'roi', 'policy': policy_name(row['scale'], row['offset']),
                            'name': f"{policy_name(row['scale'], row['offset'])}_crf{crf}", 'path': published / row['stream']})
@@ -112,8 +112,8 @@ def assemble(points: list[dict[str, Any]], scores: dict[str, np.ndarray], scales
             'best_foreground': best_foreground(policies)}
 
 
-def a_scale(published: Path) -> int:
-    return int(json.loads((published / 'encode.json').read_text())['scale'])
+def scales_of(published: Path) -> tuple[int, ...]:
+    return tuple(sorted({int(x['scale']) for x in json.loads((published / 'encode.json').read_text())['searches']}))
 
 
 def run(a: argparse.Namespace) -> None:
@@ -141,7 +141,7 @@ def run(a: argparse.Namespace) -> None:
     publish = scratch / 'publish'
     publish.mkdir()
     half = extract(a.encode_half, scratch / 'half')
-    full = extract(a.encode_full, scratch / 'full')
+    full = extract(a.encode_full, scratch / 'full') if a.encode_full else None
     masks_root = extract(a.masks, scratch / 'masks')
     hybrid_root = extract(a.hybrid, scratch / 'hybrid')
     with np.load(masks_root / 'masks.npz') as z:
@@ -152,7 +152,7 @@ def run(a: argparse.Namespace) -> None:
     ticks = TICKS[:a.judged or None]
     if masks['ticks'].tolist()[:len(ticks)] != ticks or hybrid_ticks[:len(ticks)] != ticks:
         raise ValueError('tick cohorts disagree')
-    points = selected_points(half) + selected_points(full)
+    points = selected_points(half) + (selected_points(full) if full else [])
     controls = [p for p in points if p['kind'] == 'control']
     if [c['scale'] for c in controls] != [8, 4, 2]:
         raise ValueError('control encodes missing')
@@ -188,8 +188,8 @@ def run(a: argparse.Namespace) -> None:
         if digest(a.prior) != PRIOR_SUMMARY_SHA:
             raise ValueError('prior summary changed')
         old = json.loads(a.prior.read_text())['analysis']['by_policy']
-        carried = {n: rows for n, rows in old.items() if n.endswith('_o0') and n not in {p['policy'] for p in ordered}}
-    analysis = assemble(ordered, scores, (a_scale(half), a_scale(full)), carried)
+        carried = {n: rows for n, rows in old.items() if n not in {p['policy'] for p in ordered if p['kind'] == 'roi'}}
+    analysis = assemble(ordered, scores, scales_of(half) + (scales_of(full) if full else ()), carried)
     rows = [{k: v for k, v in p.items() if k not in ('path',)} for p in ordered]
     summary = {'ticks': ticks, 'points': rows, 'carried_policies': sorted(carried), 'control_errors': errors, 'score_seconds': seconds, 'analysis': analysis,
                'series': SERIES, 'tools': tools, 'target_kbps': TARGET_KBPS, 'window': WINDOW,
@@ -197,9 +197,9 @@ def run(a: argparse.Namespace) -> None:
                'cudnn': torch.backends.cudnn.version(), 'cuda': True,
                'peak_allocated_mib': torch.cuda.max_memory_allocated() / 2**20,
                'seconds': time.monotonic() - began, 'cpus': len(os.sched_getaffinity(0)),
-               'inputs': {k: digest(getattr(a, k)) for k in ('al', 'masks', 'hybrid', 'lpips', 'dists', 'encode_half', 'encode_full')},
+               'inputs': {k: digest(getattr(a, k)) for k in ('al', 'masks', 'hybrid', 'lpips', 'dists', 'encode_half', 'encode_full') if getattr(a, k) is not None},
                'encode_summaries': {'half': json.loads((half / 'encode.json').read_text()),
-                                    'full': json.loads((full / 'encode.json').read_text())}}
+                                    'full': json.loads((full / 'encode.json').read_text()) if full else None}}
     (publish / 'score.json').write_text(json.dumps(summary, indent=1))
     (Path(os.environ['PS_STAGE_DIR']) / 'score-summary.json').write_text(json.dumps(summary, indent=1))
 
@@ -254,7 +254,7 @@ def main() -> None:
     a = p.parse_args()
     if a.validate:
         validate()
-    elif any(getattr(a, n.replace('-', '_')) is None for n in ('al', 'masks', 'hybrid', 'lpips', 'dists', 'encode-half', 'encode-full')):
+    elif any(getattr(a, n.replace('-', '_')) is None for n in ('al', 'masks', 'hybrid', 'lpips', 'dists', 'encode-half')):
         p.error('every frozen input is required')
     else:
         run(a)

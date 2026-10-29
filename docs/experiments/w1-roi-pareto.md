@@ -429,3 +429,38 @@ the decisions are in [experiments.md](../experiments.md). Context:
   `outside/streams/s2_o40_crf66.ivf` (22.38 kbps) and
   `outside/streams/s4_o40_crf62.ivf`. The permanent copies are the encode
   jobs' published.tar archives named above.
+
+### 2026-10-29 — W1 robustness addition: background at the maximum quantizer (written before any such run)
+- Why. A reviewer will ask for the strongest SVT allocation: the background
+  at the encoder's maximum quantizer and the remaining rate spent on R. The
+  corrected ROI above could not do this because in CRF mode with aq-mode 2
+  the background already sits near the ceiling at 22.7 kbps and negative
+  offsets inside R are inert. Written before any quality number of this family
+  exists; the decision rule, dominance margin, 80 ticks, judge and controls
+  are unchanged. W1's GPU cap is raised by root to 4,500 s in total.
+- Step 1, CPU, mode probe (half resolution, all 240 frames). Modes, in this
+  order: `aq0` (`--crf 70 --aq-mode 0`) and `cqp` (`--cqp 70 --aq-mode 0`, fixed
+  quantizer). For each, offsets 0, −20 and −40 inside R (the same map as
+  before). Pre-registered criterion, computed from luma PSNR against the coded
+  source: offset −40 raises the PSNR inside the 64×64 blocks R touches by at
+  least 1.0 dB over offset 0, and moves the PSNR outside those blocks by at
+  most 0.3 dB. The first mode meeting it is used. If neither does, no mode
+  lets SVT raise R's quality at a fixed background; that is recorded and W1
+  stops there (outcome A stands as it is).
+- Step 2, only if a mode passes. Policy "background at maximum" (`s2_mb`,
+  `s4_mb`) at half and quarter resolution: quantizer 70 everywhere, offset
+  −(70 − k) inside the touched blocks (k from 7 to 70), k found by the same
+  rate-only bracketing search as the CRF: two adjacent k whose full 240-frame
+  rates bracket 22.737962 kbps plus one neighbour (the lower-rate side first),
+  at most 14 encodes. A policy without a bracket is unresolved, never
+  extrapolated. The same three controls are re-encoded and re-scored. Scoring
+  on the same 80 ticks with the same judge, the plain, −20 and −40 policies
+  carried over from the earlier runs; the rule is applied at 22.737962 kbps
+  (primary) and at 21.458796 kbps (re-billed, B = 2,701; a policy whose
+  points do not bracket it is unresolved there, no new encodes).
+- Dominance as before: whole and foreground within 0.001 of the hybrid's or
+  better on LPIPS, or on DISTS. Streams and decodes join those in
+  `/local/users/emanuele/pointstream/w1-visual` (a `maxbg/` directory) and
+  its README is updated.
+- Code: `experiments/tennis/w1_maxbg.py`; scoring reuses `w1_score.py`
+  (now accepting a single archive and carrying every earlier policy).
