@@ -23,6 +23,19 @@ differences (ported from the pre-reset adapter, ``archive/pre-reset-2026-10-05``
 
 Container: b"PSDC", version, flags, structure, frame count (big-endian uint16),
 then the native DCVC stream. Rate counts the whole file.
+
+Optional plan keys (all off by default, so older callers are unchanged):
+
+* ``deterministic``: cuDNN deterministic and benchmark off, deterministic
+  algorithms (warn only) and ``CUBLAS_WORKSPACE_CONFIG``; the report records the
+  state DCVC's ``set_torch_env`` left and the state finally used, plus the
+  warnings raised.
+* ``i_recon_file`` (encode, yuv420): the encoder's reconstruction of the I frame,
+  in the decoder's output format. The native P-frame compress returns only the
+  bit stream (``dmc_htl_proxy.cpp``), so the I frame is the only encoder-side
+  reconstruction there is.
+* ``calibrate`` action: encode ``frame_count`` frames at each of ``qps`` in one
+  process and report the NAL sizes; nothing is written and nothing is decoded.
 """
 
 from __future__ import annotations
@@ -143,19 +156,52 @@ def set_stream_policy(policy: str) -> None:
     torch.cuda.set_stream(stream)
 
 
+def torch_determinism_state() -> dict[str, Any]:
+    import torch
+
+    return {
+        "cudnn_deterministic": bool(torch.backends.cudnn.deterministic),
+        "cudnn_benchmark": bool(torch.backends.cudnn.benchmark),
+        "deterministic_algorithms": bool(torch.are_deterministic_algorithms_enabled()),
+        "deterministic_algorithms_warn_only": bool(torch.is_deterministic_algorithms_warn_only_enabled()),
+        "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
+        "cudnn_allow_tf32": bool(torch.backends.cudnn.allow_tf32),
+        "matmul_allow_tf32": bool(torch.backends.cuda.matmul.allow_tf32),
+    }
+
+
+def apply_determinism(enabled: bool) -> dict[str, Any]:
+    """Record the state DCVC's ``set_torch_env`` left, then (if asked) the deterministic settings.
+
+    ``CUBLAS_WORKSPACE_CONFIG`` must already be in the environment when cuBLAS
+    starts; ``main`` sets it before any torch call.
+    """
+    import torch
+
+    after_upstream = torch_determinism_state()
+    if enabled:
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+        # Keep upstream's strictness (it raises on a nondeterministic op); never weaken it.
+        torch.use_deterministic_algorithms(True, warn_only=torch.is_deterministic_algorithms_warn_only_enabled())
+    return {"requested": enabled, "after_set_torch_env": after_upstream, "final": torch_determinism_state()}
+
+
 def _build(plan: dict[str, Any]) -> tuple[Any, Any, int, dict[str, Any]]:
     import torch
     from src.models.image_model import DMCI
     from src.utils.common import ModelStructure, set_torch_env
 
     set_torch_env()
+    determinism = apply_determinism(bool(plan.get("deterministic", False)))
     stream_policy = plan.get("stream_policy", "legacy")
     set_stream_policy(stream_policy)
 
     def finalize(net: Any) -> Any:  # test_video.finalize_model
         return net.half().to("cuda:0").to(memory_format=torch.channels_last)
 
-    loaded: dict[str, Any] = {"strict_load": True, "precision": "float16", "stream_policy": stream_policy}
+    loaded: dict[str, Any] = {"strict_load": True, "precision": "float16", "stream_policy": stream_policy,
+                              "determinism": determinism}
     i_state, loaded["image"] = _load_state(plan["image_ckpt"], plan["image_sha256"])
     i_net = DMCI().eval()
     i_net.load_state_dict(i_state, strict=True)
@@ -284,19 +330,15 @@ def _environment(extension: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def encode(plan: dict[str, Any]) -> dict[str, Any]:
+def _encode_pass(plan: dict[str, Any], i_net: Any, p_net: Any, frame_delay: int, qp: int) -> dict[str, Any]:
+    """Encode ``frame_count`` frames at ``qp`` with built networks; the native stream and its bookkeeping."""
     import numpy as np
     import torch
     from src.models.image_model import DMCI
     from src.utils.stream_helper import SPSHelper, write_ip, write_sps
     from src.utils.video_reader import PNGReader, YUV420Reader
 
-    _require_claimed_device()
-    extension = _import_extension()
-    started = time.time()
-    i_net, p_net, frame_delay, loaded = _build(plan)
-    load_seconds = time.time() - started
-    qp, count = int(plan["qp"]), int(plan["frame_count"])
+    count = int(plan["frame_count"])
     height, width = int(plan["height"]), int(plan["width"])
     src_type = plan.get("src_type", "png")
     if src_type == "yuv420":
@@ -307,10 +349,8 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
         raise ValueError(f"unknown src_type {src_type!r}")
     padding_r, padding_b = DMCI.get_padding_size(height, width, 16)
     output, sps_helper, nals = io.BytesIO(), SPSHelper(), []
-    state: dict[str, Any] = {"i_recon_sha256": None}
+    state: dict[str, Any] = {"i_recon_sha256": None, "i_recon_bytes": None}
     timer = ModelTimer()
-    torch.cuda.reset_peak_memory_stats()
-    encode_started = time.time()
 
     def run() -> None:
         index = 0
@@ -323,10 +363,11 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
                 p_net.clear_dpb()
                 timer(p_net.add_ref_feature_from_frame, encoded["x_hat"])
                 if src_type == "yuv420":
-                    state["i_recon_sha256"] = _sha256(_to_yuv420_bytes(encoded["x_hat"], height, width))
+                    recon = _to_yuv420_bytes(encoded["x_hat"], height, width)
                 else:
-                    pixels = np.ascontiguousarray(_to_rgb_uint8(encoded["x_hat"], height, width))
-                    state["i_recon_sha256"] = _sha256(pixels.tobytes())
+                    recon = np.ascontiguousarray(_to_rgb_uint8(encoded["x_hat"], height, width)).tobytes()
+                state["i_recon_bytes"] = recon
+                state["i_recon_sha256"] = _sha256(recon)
                 reset = 0
             else:
                 reset = int(RESET_INTERVAL > 0 and (index + frame_delay) % RESET_INTERVAL == 1)
@@ -347,18 +388,68 @@ def encode(plan: dict[str, Any]) -> dict[str, Any]:
             kernels = _profile(run)
         else:
             run()
-    container = pack_container(output.getvalue(), structure=plan["structure"], frame_count=count)
+    return {"native": output.getvalue(), "nals": nals, "timer": timer, "kernels": kernels, **state}
+
+
+def encode(plan: dict[str, Any]) -> dict[str, Any]:
+    import torch
+
+    _require_claimed_device()
+    extension = _import_extension()
+    started = time.time()
+    i_net, p_net, frame_delay, loaded = _build(plan)
+    load_seconds = time.time() - started
+    qp, count = int(plan["qp"]), int(plan["frame_count"])
+    src_type = plan.get("src_type", "png")
+    torch.cuda.reset_peak_memory_stats()
+    encode_started = time.time()
+    result = _encode_pass(plan, i_net, p_net, frame_delay, qp)
+    timer = result["timer"]
+    container = pack_container(result["native"], structure=plan["structure"], frame_count=count)
     with Path(plan["container"]).open("xb") as handle:
         handle.write(container)
+    if plan.get("i_recon_file"):
+        if src_type != "yuv420":
+            raise ValueError("i_recon_file requires src_type yuv420")
+        with Path(plan["i_recon_file"]).open("xb") as handle:
+            handle.write(result["i_recon_bytes"])
     recon_key = "i_recon_rgb_sha256" if src_type == "png" else "i_recon_yuv420_sha256"
     return {
         "operation": "encode", "structure": plan["structure"], "src_type": src_type, "qp": qp, "frame_count": count,
         "frame_delay": frame_delay, "checkpoints": loaded, "load_seconds": round(load_seconds, 3),
-        "encode_seconds": round(time.time() - encode_started, 3), "nals": nals,
+        "encode_seconds": round(time.time() - encode_started, 3), "nals": result["nals"],
         "model_encode_seconds": round(timer.seconds, 4), "model_calls": timer.calls,
         "timing": "model_encode_seconds: codec calls only (profiled runs are not timing evidence)",
         "container_bytes": len(container), "container_sha256": _sha256(container),
-        "i_recon_sha256": state["i_recon_sha256"], recon_key: state["i_recon_sha256"], "kernels": kernels,
+        "i_recon_sha256": result["i_recon_sha256"], recon_key: result["i_recon_sha256"], "kernels": result["kernels"],
+        "dpb_reachable": getattr(p_net, "ref_feature", None) is not None,
+        "peak_allocated_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
+        "environment": _environment(extension),
+    }
+
+
+def calibrate(plan: dict[str, Any]) -> dict[str, Any]:
+    """Rate of the first ``frame_count`` frames at each of ``plan['qps']``; nothing is stored or decoded."""
+    import torch
+
+    _require_claimed_device()
+    extension = _import_extension()
+    started = time.time()
+    i_net, p_net, frame_delay, loaded = _build(plan)
+    load_seconds = time.time() - started
+    qps = [int(q) for q in plan["qps"]]
+    if not qps or len(set(qps)) != len(qps):
+        raise ValueError("calibration needs distinct QPs")
+    rows = []
+    for qp in qps:
+        pass_started = time.time()
+        result = _encode_pass(plan, i_net, p_net, frame_delay, qp)
+        rows.append({"qp": qp, "native_bytes": len(result["native"]), "nals": result["nals"],
+                     "seconds": round(time.time() - pass_started, 3)})
+    return {
+        "operation": "calibrate", "structure": plan["structure"], "frame_count": int(plan["frame_count"]),
+        "frame_delay": frame_delay, "width": int(plan["width"]), "height": int(plan["height"]),
+        "checkpoints": loaded, "load_seconds": round(load_seconds, 3), "rows": rows,
         "peak_allocated_mib": round(torch.cuda.max_memory_allocated() / 2**20, 1),
         "environment": _environment(extension),
     }
@@ -433,14 +524,29 @@ def decode(plan: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def run_action(action: str, plan: dict[str, Any]) -> dict[str, Any]:
+    """Run one action; warnings (for example from deterministic-algorithm checks) are reported."""
+    import warnings
+
+    if plan.get("deterministic"):
+        # Must precede the first cuBLAS call; torch is only imported inside the actions.
+        os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    actions = {"encode": encode, "decode": decode, "calibrate": calibrate}
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        payload = actions[action](plan)
+    payload["warnings"] = sorted({str(item.message)[:300] for item in caught})[:20]
+    return payload
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("action", choices=("encode", "decode"))
+    parser.add_argument("action", choices=("encode", "decode", "calibrate"))
     parser.add_argument("--plan", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args(argv)
     plan = json.loads(args.plan.read_text())
-    payload = encode(plan) if args.action == "encode" else decode(plan)
+    payload = run_action(args.action, plan)
     with args.report.open("x") as stream:
         json.dump(payload, stream, indent=2, sort_keys=True)
     return 0
