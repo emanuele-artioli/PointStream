@@ -218,13 +218,14 @@ the decisions are in [experiments.md](../experiments.md). Context:
   encode has a far better whole-frame score (LPIPS 0.179 against 0.276), so
   the two sides trade: SVT wins the whole frame, the hybrid the player
   region, and no SVT policy reaches both.
-- Best ROI foreground at the hybrid's whole-frame score: not computable
-  without extrapolating. The policies' whole scores span at most 0.2749
-  (quarter, −40; LPIPS) and 0.1877 (DISTS), just below the hybrid's 0.2758 and
-  0.1696 only for quarter DISTS, and the half-resolution curves lie entirely
-  below the hybrid's whole score. The nearest points: quarter, −40:
-  whole LPIPS 0.2749 with foreground 0.6706; quarter, −40: whole DISTS 0.1877
-  with foreground 0.4784. Both are far above 0.346 and 0.253.
+- Best ROI foreground at the hybrid's whole-frame score (primary rate),
+  interpolated across offsets at one resolution without extrapolating: not
+  computable. The quarter-resolution offsets span whole LPIPS 0.2654–0.2749
+  and DISTS 0.1808–0.1877, all below the hybrid's whole LPIPS 0.2758 and above
+  its DISTS 0.1696 only in the quarter case; the half-resolution curves lie
+  entirely below the hybrid's whole LPIPS. Nearest points: quarter, −40,
+  whole LPIPS 0.2749 with foreground 0.6706; quarter, −40, whole DISTS 0.1877
+  with foreground 0.4784. Both are far above the hybrid's 0.346 and 0.253.
 - Caveat that limits the strength of A (flagged, not resolved here). The ROI
   offsets bought almost nothing for the players. At matched CRF the offset
   raises the rate about 17% (half CRF 67: 20.56 to 24.19 kbps) but the
@@ -239,7 +240,26 @@ the decisions are in [experiments.md](../experiments.md). Context:
   not that no SVT allocation could.
 - Next step by the rule: outcome A, so score the Med window's actual-base
   hybrid (never scored) and run the same grid on Med. Not started; Med is out
-  of W1's scope. The secondary-rate decision (entry above) waits for the byte
-  size B of the new keypoint packet; the points are fixed, so it needs no new
-  encodes or GPU time: `python -m experiments.tennis.w1_report
-  score-summary.json B`.
+  of W1's scope. The secondary rate is decided in the next entry.
+
+### 2026-10-29 — W1 outcome at the secondary (re-billed) rate: A
+- B = 2,701 bytes: the real KPS2 packet for Al, metadata included, decoding
+  bit-identically to the KPS1 packet (SHA256 prefix `c1dd0ec56a5b00d1`, branch
+  `claude/kps-exact-coder`, from root). Secondary rate =
+  22.737962 − (4236 − 2701)·8/9.6/1000 = 21.458796 kbps. The hybrid's four
+  scores are unchanged. No new encodes or GPU time; computed from the scored
+  points with `python -m experiments.tennis.w1_report score-summary.json 2701`
+  (summary sha256 `44d4bbc3…`, job `20261029T095649Z-43181442`).
+- All six policies bracket 21.458796 kbps (full resolution is still
+  unresolved). Interpolated whole LPIPS / fg LPIPS / whole DISTS / fg DISTS:
+  half 0: 0.1875 / 0.5826 / 0.1347 / 0.4359; half −20: 0.2207 / 0.6232 /
+  0.1550 / 0.4728; half −40: 0.2198 / 0.6372 / 0.1552 / 0.4849; quarter 0:
+  0.2680 / 0.6427 / 0.1828 / 0.4529; quarter −20: 0.2797 / 0.6806 / 0.1902 /
+  0.4896; quarter −40: 0.2791 / 0.6849 / 0.1899 / 0.4936. Hybrid: 0.2758 /
+  0.3459 / 0.1696 / 0.2526.
+- Decision: **Outcome A** again; no policy dominates on LPIPS or DISTS.
+- Best ROI foreground at the hybrid's whole-frame score: LPIPS, quarter
+  resolution, 0.672 (the hybrid's whole LPIPS 0.2758 lies between quarter −20
+  and −40 whole scores 0.2797/0.2791 and offset 0 at 0.2680); half resolution
+  and DISTS are outside the policies' whole-score range (not extrapolated).
+  Against the hybrid's foreground LPIPS 0.346.
