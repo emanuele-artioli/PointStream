@@ -25,6 +25,7 @@ from experiments.tennis.k6b_rate_streams import (
     encode_keypoints,
     encode_masks,
     encode_reference,
+    transcode_kps1_to_kps2,
 )
 
 
@@ -170,7 +171,8 @@ def measure_window(
         "context": [24, 4],
         "seed_rule": "sha256(unit_name)[:7] then seed*1009+run",
     }
-    blob = encode_keypoints(metadata, units)
+    kps1 = encode_keypoints(metadata, units)
+    blob = transcode_kps1_to_kps2(kps1)
     _, decoded = decode_keypoints(blob)
     for a, b in zip(units, decoded):
         if not np.array_equal(a["kp"][:, :, :2], b["kp"][:, :, :2]) or not np.array_equal(
@@ -186,6 +188,8 @@ def measure_window(
         "compressed_metadata_and_symbols_bytes": len(blob) - HEADER.size,
         "file": path.name,
         "sha256": sha(blob),
+        "format": "KPS2",
+        "kps1_bytes": len(kps1),
         "equivalent": True,
         "contract": metadata,
         "native_equivalence": equivalence,

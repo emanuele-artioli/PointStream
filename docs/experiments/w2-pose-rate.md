@@ -223,3 +223,17 @@ how much a better probability model or a body-motion predictor could save.
   times larger, which changes no verdict because the exact point is the only
   setting under 2.6%.
 - Jobs: none (CPU).
+
+### 2026-10-29 — KPS2 adopted as the codec's keypoint packet
+- The exact re-coding found here is now the transport's keypoint packet
+  (`KPS2` in `experiments/tennis/k6b_rate_streams.py`; written by
+  `k6b_rate_transport.py`, which encodes KPS1 first and transcodes, so the sent
+  geometry is unchanged). `decode_keypoints` reads both formats.
+- Real packets, metadata included (the earlier 1.81 kbps excluded the
+  ~530 B metadata block), decoded keypoints bit-identical to KPS1:
+  Al 4236 → 2701 B (3.530 → 2.251 kbps, −36%), SHA256 prefix
+  `c1dd0ec56a5b00d1`; Med 3542 → 2193 B (5.903 → 3.655 kbps, −38%),
+  prefix `2fb5adc8c4ae1569`. CPU on the Mac, inputs as above.
+- Generated pixels are unchanged, so earlier quality results keep their
+  scores at the lower keypoint rate. W1 applies its rule at the re-billed
+  Al rate 21.458795 kbps.

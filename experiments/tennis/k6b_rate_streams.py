@@ -84,7 +84,69 @@ def encode_keypoints(metadata: dict[str, Any], units: list[dict[str, Any]]) -> b
     )
 
 
+#: KPS2 codes exactly the geometry KPS1 sends (q4 samples every 4 frames, linear
+#: in between, every-frame visibility) with W2's adaptive range coder instead of
+#: raw int16 symbols (docs/experiments/w2-pose-rate.md). Decoded keypoints are
+#: identical; only the bytes change.
+KPS2_PROFILE: dict[str, Any] = {"q": 4, "key": 4, "predictor": "previous", "interp": "linear", "vis": "all"}
+
+
+def encode_keypoints_kps2(metadata: dict[str, Any], units: list[dict[str, Any]]) -> bytes:
+    """Range-coded keypoints; raises unless the decoder reproduces every input exactly.
+
+    The inputs must already lie on KPS1's sent geometry (what ``decode_keypoints``
+    returns for a KPS1 packet); anything else is rejected, never approximated.
+    """
+    from experiments.tennis.w2_pose_rate import Setting, encode_window
+
+    coded = encode_window(
+        [{"t": np.asarray(u["t"], np.int64), "kp": np.asarray(u["kp"], np.float64)} for u in units],
+        Setting(q=4, key=4, predictor="previous", interp="linear", vis="all"),
+    )
+    for u, e in zip(units, coded.expected):
+        kp = np.asarray(u["kp"], np.float64)
+        if not (
+            np.array_equal(np.asarray(u["t"], np.int64), e["t"])
+            and np.array_equal(kp[:, :, :2], e["kp"][:, :, :2])
+            and np.array_equal(kp[:, :, 2] >= 0.5, e["kp"][:, :, 2] >= 0.5)
+        ):
+            raise ValueError("Keypoints are not on the KPS1 sent geometry; KPS2 would change them")
+    return seal(b"KPS2", {**metadata, "names": [u["name"] for u in units], "profile": KPS2_PROFILE}, coded.blob)
+
+
+def transcode_kps1_to_kps2(blob: bytes) -> bytes:
+    """Re-code a KPS1 packet as KPS2 and verify both decode to the same keypoints."""
+    meta, units = decode_keypoints(blob)
+    for key in ("units", "q", "every", "predictor", "visibility"):
+        meta.pop(key, None)
+    out = encode_keypoints_kps2(meta, units)
+    _, again = decode_keypoints(out)
+    for a, b in zip(units, again):
+        if not (np.array_equal(a["t"], b["t"]) and np.array_equal(a["kp"], b["kp"])):
+            raise ValueError("KPS2 transcoding changed the decoded keypoints")
+    return out
+
+
+def _decode_kps2(blob: bytes) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    from experiments.tennis.w2_pose_rate import decode_window
+
+    meta, raw = unseal(blob, b"KPS2")
+    if meta.get("profile") != KPS2_PROFILE:
+        raise ValueError("Unknown keypoint coding profile")
+    decoded = decode_window(raw)
+    if len(decoded) != len(meta["names"]):
+        raise ValueError("Unit count does not match the stream")
+    units = []
+    for name, u in zip(meta["names"], decoded):
+        if u["t"].size and (u["t"][0] < 0 or u["t"][-1] >= meta["native_frames"]):
+            raise ValueError("Invalid frame run")
+        units.append({"name": name, "t": u["t"], "kp": u["kp"]})
+    return meta, units
+
+
 def decode_keypoints(blob: bytes) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    if blob[:4] == b"KPS2":
+        return _decode_kps2(blob)
     meta, raw = unseal(blob, b"KPS1")
     offset = 0
     units = []
