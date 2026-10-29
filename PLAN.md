@@ -1477,3 +1477,33 @@ set than a dataset, and their size is stated; (3) only labels and clip
 identifiers can be released, since the footage is broadcast material. It
 may also be framed as the component that makes the tennis pipeline
 automatic, rather than as a contribution of its own.
+
+## After the paper
+
+### Agent tooling to coding-agent-config (user, 2026-10-29)
+
+Waits for: the paper's submission. Until then the tooling stays here.
+
+Move PointStream's generic agent tooling into the user's
+`coding-agent-config` repository (github.com/emanuele-artioli/coding-agent-config),
+whose `agentctl install` sets up Claude Code and Codex for every project,
+locally and on the GPU hosts (`--host`). Bring any other generic
+improvements PointStream has accumulated by then, and general updates.
+
+- **Moves:** the three subagents in `.claude/agents/` (with PointStream's
+  name and data paths taken out; each project's AGENTS.md adds its own
+  rules), `tools/agent_hooks/subagent_guard.py`,
+  `tools/agent_hooks/guard_large_read.py` and their tests; the tier table
+  and the "delegate without being asked" rule from AGENTS.md go into the
+  global personal policy for both harnesses.
+- **Stays:** `guard_protected.py`, `ledger.py`, `session_start.py` and the
+  session protocol in docs/sessions.md, which are tied to PointStream's
+  paths, PLAN.md and fleet.
+- **Installer:** `agentctl` installs instructions, skills and one safety
+  hook today; it needs to install agent files and these hooks too.
+- **Then delete the copies here.** A project's agent overrides the global
+  one with the same name, so stale copies would hide updates.
+- `coding-agent-config` asks for human review of new global rules: its PR
+  stays a draft for the user.
+- Fold in the [Codex validation](docs/sessions.md#codex-validation)
+  findings if a Codex session has run them by then.
