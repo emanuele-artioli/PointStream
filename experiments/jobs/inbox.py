@@ -63,6 +63,8 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
     required = {"hosts", "gpu_models", "gpu_memory_mib", "cpu_threads", "entrypoint", "arguments", "scale", "inputs", "smoke", "full", "budget_seconds", "deadline", "validator", "required_commands"}
     if required - spec.keys():
         raise fleet.FleetError(f"missing job fields: {sorted(required - spec.keys())}")
+    if 'verify_staged_inputs' in spec and not isinstance(spec['verify_staged_inputs'], bool):
+        raise fleet.FleetError('verify_staged_inputs must be boolean')
     if not spec["hosts"] or any(h not in fleet.DEFAULT_HOSTS for h in spec["hosts"]):
         raise fleet.FleetError("hosts must name configured GPU servers")
     if not isinstance(spec["gpu_models"], list) or any(not isinstance(n, str) or not n.strip() for n in spec["gpu_models"]):
@@ -350,13 +352,34 @@ def salvage(directory: Path, reason: str) -> int:
     return failed
 
 
-def verify_inputs(spec: dict[str, Any], data_root: Path) -> None:
+def verify_inputs(spec: dict[str, Any], data_root: Path, *, defer_staged: bool = False) -> None:
+    """Verify the exact consumed bytes; opt-in stages hash their staged payloads.
+
+    Publication/admission checks hash or populate the verified local cache.
+    Campaigns may defer those hashes only to stage_inputs, which independently
+    hashes every payload before the component is invoked. Direct inputs retain
+    their original canonical-file checks.
+    """
+    root = data_root.resolve()
+    use_cache = spec.get('verify_staged_inputs', False)
+    arguments = spec.get('arguments', [])
+    staged = {(s['path'], s['sha256']): s for s in spec.get('staged_inputs', [])
+              if '{staged:' + s['name'] + '}' in arguments}
+    local = staging.local_root() if use_cache and not defer_staged else None
     for item in spec["inputs"]:
         path = Path(item["path"]).resolve()
-        if not path.is_relative_to(data_root.resolve()) or not path.is_file():
+        if not path.is_relative_to(root) or not path.is_file():
             raise fleet.FleetError(f"input identity must be a file under the external data root: {path}")
-        if file_digest(path) != item["sha256"]:
-            raise fleet.FleetError(f"input identity changed: {path}")
+        payload = staged.get((item['path'], item['sha256'])) if use_cache and item['path'] not in arguments else None
+        if payload is not None and defer_staged:
+            continue  # stage_inputs must succeed before phase_command is run
+        verified = path
+        if payload is not None and local is not None:
+            verified = local / 'cache' / item['sha256'] / Path(item['path']).name
+            if not verified.is_file():
+                staging.stage_input({**payload, 'extract': False}, local)
+        if file_digest(verified) != item["sha256"]:
+            raise fleet.FleetError(f"input identity changed: {verified}")
 
 
 def event(directory: Path, kind: str, detail: Any = None) -> None:
@@ -498,7 +521,7 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
     transition(directory, "running", supervisor_pid=child.pid)
 
 
-def worker_tick(base: Path, alias: str) -> None:
+def worker_tick(base: Path, alias: str, settled: set[Path] | None = None) -> None:
     # Reap only our own completed supervisors before checking their liveness.
     while True:
         try:
@@ -508,16 +531,32 @@ def worker_tick(base: Path, alias: str) -> None:
         if reaped == 0:
             break
     worker = base / "workers" / alias
-    monitor.write_json(worker / "heartbeat.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid()), "updated": time.time(), "alias": alias})
+    def heartbeat() -> None:
+        monitor.write_json(worker / "heartbeat.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid()), "updated": time.time(), "alias": alias})
+    heartbeat()
+    last_heartbeat = time.monotonic()
     directories = sorted((base / "inbox").glob("*"))
     host = None
     for directory in directories:
+        # Refresh only while the scan actually advances, never from a timer
+        # that could conceal blocked filesystem I/O or a stuck admission.
+        if time.monotonic() - last_heartbeat >= POLL_SECONDS / 2:
+            heartbeat()
+            last_heartbeat = time.monotonic()
+        if settled is not None and directory in settled:
+            continue
         if not (directory / "ready.json").exists():
+            continue
+        state = monitor.read_json(directory / "state.json", {})
+        if state.get("status") in TERMINAL:
+            # Terminal requests are immutable: recovery creates a new request;
+            # declared resumes are decided before transition to terminal.
+            if settled is not None:
+                settled.add(directory)
             continue
         if (directory / "owner").exists():
             reconcile(directory, alias)
             continue
-        state = monitor.read_json(directory / "state.json", {})
         if state.get("status") != "pending":
             continue
         try:
@@ -569,10 +608,11 @@ def worker_loop(base: Path, alias: str) -> int:
         lock.rmdir()
         lock.mkdir()
     monitor.write_json(lock / "identity.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid()), "host": socket.getfqdn().lower()})
+    settled: set[Path] = set()
     try:
         while True:
             try:
-                worker_tick(base, alias)
+                worker_tick(base, alias, settled)
             except Exception as exc:
                 monitor.write_json(location / "error.json", {"error": str(exc), "updated": time.time()})
             time.sleep(POLL_SECONDS)
@@ -647,7 +687,7 @@ def campaign(directory: Path) -> int:
         code_identity = source_identity(source)
         if code_identity != manifest["source_sha256"]:
             raise fleet.FleetError("frozen code identity changed")
-        verify_inputs(spec, directory.parents[3])
+        verify_inputs(spec, directory.parents[3], defer_staged=True)
         for item in [*spec.get("staged_inputs", []), *([spec["environment"]] if spec.get("environment") else [])]:
             path = Path(item["path"]).resolve()
             if not path.is_relative_to(directory.parents[3].resolve()) or not path.is_file():
@@ -659,7 +699,7 @@ def campaign(directory: Path) -> int:
                 raise fleet.FleetError("a resumed attempt requires the earlier smoke gate under unchanged identities")
         local_root = staging.local_root()
         for stage in pending_stages(directory):
-            verify_inputs(spec, directory.parents[3])
+            verify_inputs(spec, directory.parents[3], defer_staged=True)
             if digest(monitor.read_json(directory / "spec.json")) != manifest["spec_sha256"]:
                 raise fleet.FleetError("specification changed after smoke")
             if stage == "full" and source_identity(source) != code_identity:
@@ -677,10 +717,12 @@ def campaign(directory: Path) -> int:
                 staging.restore_checkpoint(resumed_from["checkpoint"], scratch / "checkpoint")
             packed = staging.stage_environment(spec["environment"], local_root) if spec.get("environment") else None
             python = packed["python"] if packed else sys.executable
+            temporary_env = staging.temporary_environment(local_root, output)
             staging_record: dict[str, Any] = {
                 "local_root": str(local_root) if local_root else None, "inputs": staged, "environment": packed,
                 "scratch": str(scratch), "attempt": attempt,
                 "restored_checkpoint": resumed_from["checkpoint"] if resumed_from else None,
+                "temporary_environment": temporary_env,
             }
             monitor.write_json(output / "staging.json", staging_record)
             command = phase_command(spec, stage, staged, python)
@@ -688,6 +730,7 @@ def campaign(directory: Path) -> int:
                 **os.environ, "PS_STAGE": stage, "PS_STAGE_DIR": str(output), "PS_SCRATCH_DIR": str(scratch),
                 "PS_CHECKPOINT_DIR": str(scratch / "checkpoint"), "PS_ATTEMPT": str(attempt),
                 "PS_VALIDATION_PATH": str(directory / "validation.json"),
+                **temporary_env,
             }
             if packed:
                 env.update(PATH=os.pathsep.join([packed["bin"], env.get("PATH", "")]), CONDA_PREFIX=packed["prefix"])
@@ -715,8 +758,10 @@ def campaign(directory: Path) -> int:
             if returncode:
                 # Failed scratch stays on the host for inspection; staging.json names it.
                 raise fleet.FleetError(f"{stage} failed with exit code {returncode}")
+            publication_started = time.monotonic()
             staging_record["published"] = staging.publish_scratch(scratch, output)
             staging.release_scratch(scratch, output)
+            staging_record["publication_seconds"] = time.monotonic() - publication_started
             staging_record["released"] = time.time()
             monitor.write_json(output / "staging.json", staging_record)
             monitor.publish_progress(stage, 1)
@@ -729,6 +774,7 @@ def campaign(directory: Path) -> int:
                 if checked or validation.get("passed") is not True or not validation.get("checks"):
                     raise fleet.FleetError("smoke validator must exit zero and publish passed:true with substantive checks")
                 monitor.write_json(directory / "gate.json", {"passed": True, "spec_sha256": digest(spec), "source_sha256": code_identity, "inputs": spec["inputs"], "validation": validation, "validator_seconds": time.time() - validator_started, "smoke_seconds": time.time() - started, "remaining_seconds": budget_end - time.time(), "attempt": attempt})
+            staging.release_temporaries(env)
         return 0
     except Exception as exc:
         monitor.write_json(directory / "campaign-error.json", {"error": str(exc), "updated": time.time()})
@@ -864,9 +910,11 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
 
 
 def remote_rpc(config: dict[str, Any], action: str, payload: dict[str, Any], *, alias: str | None = None) -> Any:
-    alias = alias or config["hosts"][0]
+    explicit_alias = alias is not None
+    alias = alias or config.get("management_host") or config["hosts"][0]
     script = "import json,sys; sys.path.insert(0," + repr(config["release"]) + "); from pathlib import Path; from experiments.jobs.inbox import rpc; print(json.dumps(rpc(Path(" + repr(config["base"]) + ")," + repr(action) + ",json.loads(" + repr(json.dumps(payload)) + "))))"
-    result = fleet._ssh(alias, [config["pythons"][alias], "-c", script], timeout=120)
+    python = config["pythons"][alias] if explicit_alias else config.get('management_python', config['pythons'][alias])
+    result = fleet._ssh(alias, [python, "-c", script], timeout=120)
     if result.returncode:
         raise fleet.FleetError(f"{alias}: {action} failed: {(result.stderr or result.stdout)[-4000:]}")
     return json.loads(result.stdout.strip().splitlines()[-1])
@@ -878,6 +926,16 @@ def load_config(state_dir: Path) -> dict[str, Any]:
         raise fleet.FleetError("workers are not configured; run workers start first")
     if not config.get("hosts") or any(h not in fleet.DEFAULT_HOSTS for h in config["hosts"]):
         raise fleet.FleetError("invalid fleet configuration")
+    management = os.environ.get('PS_FLEET_MANAGEMENT_HOST') or config.get('management_host')
+    if management:
+        if management not in config['hosts']:
+            raise fleet.FleetError('management host must be a configured fleet host')
+        config = {**config, 'management_host': management}
+    python = os.environ.get('PS_FLEET_MANAGEMENT_PYTHON') or config.get('management_python')
+    if python:
+        if not Path(python).is_absolute():
+            raise fleet.FleetError('management Python must be an absolute executable path')
+        config = {**config, 'management_python': python}
     return config
 
 
@@ -958,7 +1016,7 @@ while is_pid_alive(pid,start) and time.monotonic()<deadline: time.sleep(.1)
 if is_pid_alive(pid,start): raise SystemExit('worker did not stop; inspect before retrying')
 print(json.dumps({'stopped_worker_pid':pid}))
 """.replace("RELEASE", repr(config["release"])).replace("BASE", repr(config["base"])).replace("ALIAS", repr(alias))
-    return fleet._remote_json(alias, config["pythons"][alias], script, timeout=60)
+    return fleet._remote_json(alias, config["pythons"][alias], script, timeout=120)
 
 
 def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
@@ -969,6 +1027,15 @@ def workers_start(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     release = str(Path(report["base"]) / "releases" / release_id)
     first = report["probes"][0]
     config = {"schema": SCHEMA, "hosts": args.hosts, "base": report["base"], "release": release, "pythons": {h["alias"]: h["python"] for h in report["probes"]}, "doctor": report["evidence_path"]}
+    previous = monitor.read_json(args.state_dir / 'inbox.json', {})
+    if previous.get('base') == report['base']:
+        # A scoped refresh must not deconfigure other verified hosts. They keep
+        # their current workers; fresh heartbeat checks still gate submissions.
+        config['hosts'] = list(dict.fromkeys([*args.hosts, *previous['hosts']]))
+        config['pythons'] = {**previous['pythons'], **config['pythons']}
+        for key in ('management_host', 'management_python'):
+            if key in previous:
+                config[key] = previous[key]
     snapshot, sha, metadata = fleet._build_snapshot(root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked))
     original_snapshot = snapshot
     snapshot, identities = worker_bundle(original_snapshot)
@@ -1025,6 +1092,14 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
     job_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]
     archive_paths = tuple(getattr(args, "snapshot_path", []))
+    if archive_paths:
+        # The supervisor launches campaign/salvage from the workload snapshot,
+        # not from the installed manager release. Always carry that runtime
+        # with an explicitly narrowed workload dependency set.
+        required = ["experiments/__init__.py", "experiments/jobs", "src/__init__.py"]
+        if (source_root / "src" / "contracts").is_dir():
+            required.append("src/contracts")
+        archive_paths = tuple(dict.fromkeys((*archive_paths, *required)))
     archive_options = {"include_paths": archive_paths} if archive_paths else {}
     snapshot, sha, metadata = fleet._build_snapshot(source_root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked), **archive_options)
     record = {"job_id": job_id, "status": "preparing", "config": config, "spec_sha256": digest(spec), "snapshot": metadata, "chat_id": args.chat_id}
@@ -1036,7 +1111,10 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         response = remote_rpc(config, "publish", {"job_id": job_id, "spec": spec, "snapshot": metadata})
         record.update(response)
         monitor.write_json(args.state_dir / f"{job_id}.json", record)
-        return {**record, "monitoring": {"chat_id": args.chat_id, "interval_minutes": 5, "events_command": str(root / "scripts" / "ps-fleet") + " events " + job_id, "heartbeat_required": bool(args.chat_id)}}
+        return {**record, "monitoring": {"chat_id": args.chat_id, "events_command": str(root / "scripts" / "ps-fleet") + " events " + job_id,
+                                      "wait_command": [str(root / "scripts" / "ps-fleet"), "wait", job_id, "--max-seconds", "2700"],
+                                      "mode": "completion_first", "watchdog_seconds": 2700,
+                                      "heartbeat_required": False, "recurring_polling": False}}
     except Exception as exc:
         # Publication/launch may have succeeded even when the reply was lost.
         monitor.write_json(args.state_dir / f"{job_id}.json", {**record, "status": "submission_unknown", "error": str(exc)})

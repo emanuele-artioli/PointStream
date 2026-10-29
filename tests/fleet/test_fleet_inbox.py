@@ -303,6 +303,47 @@ def test_lost_publication_reply_retains_id_and_does_not_resubmit(tmp_path, monke
     assert calls == ["health", "prepare", "publish"]
 
 
+@pytest.mark.parametrize("selected", [False, True])
+def test_submit_recommends_bounded_completion_monitoring_without_recurring_heartbeat(tmp_path, monkeypatch, selected):
+    from argparse import Namespace
+    spec_path = tmp_path / "spec.json"
+    spec_path.write_text(json.dumps(specification(tmp_path)))
+    snapshot = tmp_path / "snapshot.tar"
+    snapshot.write_bytes(b"snapshot")
+    monkeypatch.setattr(inbox, "load_config", lambda _: {"hosts": ["gpu1"]})
+    monkeypatch.setattr(fleet, "_build_snapshot", lambda *a, **kw: (snapshot, "hash", {}))
+    monkeypatch.setattr(fleet, "_send_snapshot", lambda *a: None)
+    calls = []
+    def remote(config, action, payload):
+        calls.append(action)
+        if action == "health":
+            return {"workers": {"gpu1": {"updated": time.time()}}}
+        if action == "prepare":
+            return {"directory": "/data/jobs/fleet/inbox/" + payload["job_id"]}
+        return {"status": "pending"}
+    monkeypatch.setattr(inbox, "remote_rpc", remote)
+    args = Namespace(state_dir=tmp_path / "state", spec=spec_path, include_change=[], include_untracked=[], chat_id="chat")
+    if selected:
+        args.snapshot_path = ["experiments/tennis/k6b_ideal_player.py"]
+        captured = {}
+        def build(*a, **kw):
+            captured.update(kw)
+            return snapshot, "hash", {}
+        monkeypatch.setattr(fleet, "_build_snapshot", build)
+    result = inbox.submit(args, tmp_path)
+    if selected:
+        assert set(captured["include_paths"]) == {
+            "experiments/tennis/k6b_ideal_player.py", "experiments/__init__.py",
+            "experiments/jobs", "src/__init__.py"}
+    policy = result["monitoring"]
+    assert calls == ["health", "prepare", "publish"]
+    assert not policy["heartbeat_required"] and not policy["recurring_polling"]
+    assert "interval_minutes" not in policy
+    assert policy["wait_command"] == [str(tmp_path / "scripts" / "ps-fleet"), "wait", result["job_id"], "--max-seconds", "2700"]
+    assert policy["watchdog_seconds"] == 2700
+    assert monitor.read_json(args.state_dir / (result["job_id"] + ".json"))["chat_id"] == "chat"
+
+
 def test_campaign_budget_includes_supervisor_startup(campaign):
     monitor.write_json(campaign / "run" / "status.json", {"started": time.time() - 100})
     monitor.write_json(campaign / "run" / "request.json", {"budget_seconds": 101})
@@ -543,3 +584,179 @@ def test_wait_never_mutates_jobs(tmp_path, monkeypatch):
     inbox.wait_jobs(tmp_path, [WAIT_JOB], 60, sleep=lambda s: None)
     assert set(actions) <= {"status", "events"}
     assert not (tmp_path / "event-acks").exists()
+
+
+def test_worker_caches_only_terminal_requests_and_keeps_pending_inspection(tmp_path, monkeypatch):
+    base = tmp_path / 'fleet'
+    done = base / 'inbox' / '20261003T000000Z-12345678'
+    pending = base / 'inbox' / '20261003T000001Z-12345678'
+    monitor.write_json(done / 'ready.json', {})
+    monitor.write_json(done / 'state.json', {'status': 'complete'})
+    monitor.write_json(done / 'owner' / 'identity.json', {'alias': 'gpu1'})
+    monitor.write_json(pending / 'ready.json', {})
+    monitor.write_json(pending / 'state.json', {'status': 'pending'})
+    monitor.write_json(pending / 'spec.json', {'deadline_epoch': time.time() + 600, 'hosts': ['gpu2']})
+    settled = set()
+    monkeypatch.setattr(inbox, 'reconcile', lambda *args: pytest.fail('terminal request re-read'))
+    inbox.worker_tick(base, 'gpu1', settled)
+    assert settled == {done}
+    actual = monitor.read_json
+    reads = []
+    def read(path, *args):
+        assert not path.is_relative_to(done), 'cached terminal evidence reopened'
+        reads.append(path)
+        return actual(path, *args)
+    monkeypatch.setattr(monitor, 'read_json', read)
+    inbox.worker_tick(base, 'gpu1', settled)
+    assert pending / 'state.json' in reads
+    assert pending / 'spec.json' in reads
+
+
+def test_worker_refreshes_heartbeat_as_large_scan_advances(tmp_path, monkeypatch):
+    base = tmp_path / 'fleet'
+    for i in range(3):
+        directory = base / 'inbox' / str(i)
+        monitor.write_json(directory / 'ready.json', {})
+        monitor.write_json(directory / 'state.json', {'status': 'complete'})
+    clock = iter((0, 31, 32, 63, 64, 95, 96))
+    monkeypatch.setattr(inbox.time, 'monotonic', lambda: next(clock))
+    actual = monitor.write_json
+    heartbeats = []
+    def write(path, value):
+        if path.name == 'heartbeat.json':
+            heartbeats.append(value)
+        actual(path, value)
+    monkeypatch.setattr(monitor, 'write_json', write)
+    inbox.worker_tick(base, 'gpu1', set())
+    assert len(heartbeats) == 4
+    assert all(row['alias'] == 'gpu1' for row in heartbeats)
+
+
+def test_partial_worker_refresh_preserves_other_configured_hosts(tmp_path, monkeypatch):
+    from argparse import Namespace
+    import tarfile
+    state = tmp_path / 'state'
+    monitor.write_json(state / 'inbox.json', {
+        'base': '/data/jobs/fleet', 'hosts': ['gpu1', 'gpu2', 'gpu3', 'gpu4'],
+        'pythons': {host: '/old/python' for host in ('gpu1', 'gpu2', 'gpu3', 'gpu4')},
+        'management_host': 'gpu2', 'management_python': '/usr/bin/python3',
+    })
+    monkeypatch.setattr(inbox, 'doctor', lambda hosts: {
+        'passed': True, 'base': '/data/jobs/fleet', 'evidence_path': '/data/check',
+        'probes': [{'alias': host, 'python': '/new/python'} for host in hosts],
+    })
+    snapshot = tmp_path / 'source.tar'
+    with tarfile.open(snapshot, 'w'):
+        pass
+    monkeypatch.setattr(fleet, '_build_snapshot', lambda *a, **kw: (snapshot, 'hash', {'deleted_paths': []}))
+    monkeypatch.setattr(fleet, '_send_snapshot', lambda *a: None)
+    monkeypatch.setattr(fleet, '_remote_json', lambda *a, **kw: {})
+    stopped, started = [], []
+    monkeypatch.setattr(inbox, 'stop_worker', lambda config, alias: stopped.append(alias))
+    def remote(config, action, payload, **kwargs):
+        started.append(payload['alias'])
+        return {}
+    monkeypatch.setattr(inbox, 'remote_rpc', remote)
+    args = Namespace(hosts=['gpu2', 'gpu3'], operation='restart', state_dir=state,
+                     include_change=[], include_untracked=[])
+    result = inbox.workers_start(args, tmp_path)
+    assert result['config']['hosts'] == ['gpu2', 'gpu3', 'gpu1', 'gpu4']
+    assert result['config']['management_host'] == 'gpu2'
+    assert result['config']['management_python'] == '/usr/bin/python3'
+    assert result['config']['pythons']['gpu1'] == '/old/python'
+    assert result['config']['pythons']['gpu2'] == '/new/python'
+    assert stopped == started == ['gpu2', 'gpu3']
+
+
+def test_management_routing_keeps_compute_pool_and_never_retries(tmp_path, monkeypatch):
+    import subprocess
+    config = {'hosts': ['gpu3', 'gpu2'], 'base': '/data/jobs/fleet',
+              'release': '/data/release', 'pythons': {'gpu2': '/python', 'gpu3': '/python'}}
+    monitor.write_json(tmp_path / 'inbox.json', config)
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', 'gpu2')
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_PYTHON', '/usr/bin/python3')
+    routed = inbox.load_config(tmp_path)
+    assert routed['hosts'] == ['gpu3', 'gpu2']
+    calls = []
+    def ssh(host, *args, **kwargs):
+        calls.append((host, args[0][0]))
+        return subprocess.CompletedProcess([], 0, '{}', '')
+    monkeypatch.setattr(fleet, '_ssh', ssh)
+    inbox.remote_rpc(routed, 'health', {})
+    inbox.remote_rpc(routed, 'worker_start', {}, alias='gpu3')
+    assert calls == [('gpu2', '/usr/bin/python3'), ('gpu3', '/python')]
+    monkeypatch.setenv('PS_FLEET_MANAGEMENT_HOST', 'gpu1')
+    with pytest.raises(fleet.FleetError, match='configured fleet host'):
+        inbox.load_config(tmp_path)
+
+
+def staged_verification_spec(tmp_path, monkeypatch):
+    from experiments.jobs import staging
+    source = tmp_path / 'data' / 'input.bin'
+    source.parent.mkdir()
+    source.write_bytes(b'original payload')
+    digest = inbox.file_digest(source)
+    root = tmp_path / 'local'
+    cached = root / 'cache' / digest / source.name
+    cached.parent.mkdir(parents=True)
+    cached.write_bytes(source.read_bytes())
+    monkeypatch.setattr(staging, 'local_root', lambda: root)
+    spec = {'inputs': [{'path': str(source), 'sha256': digest}],
+            'staged_inputs': [{'name': 'data', 'path': str(source), 'sha256': digest}],
+            'arguments': ['--input', '{staged:data}'], 'verify_staged_inputs': True}
+    return spec, source, cached
+
+
+def test_opt_in_verifies_consumed_cache_without_rehashing_nfs_source(tmp_path, monkeypatch):
+    spec, source, cached = staged_verification_spec(tmp_path, monkeypatch)
+    actual = inbox.file_digest
+    reads = []
+    def digest(path):
+        reads.append(path)
+        assert path != source, 'redundant canonical bytes reopened'
+        return actual(path)
+    monkeypatch.setattr(inbox, 'file_digest', digest)
+    inbox.verify_inputs(spec, source.parent)
+    assert reads == [cached]
+
+
+def test_opt_in_rejects_corrupt_cached_payload(tmp_path, monkeypatch):
+    spec, source, cached = staged_verification_spec(tmp_path, monkeypatch)
+    cached.write_bytes(b'corrupt payload')
+    with pytest.raises(fleet.FleetError, match='input identity changed'):
+        inbox.verify_inputs(spec, source.parent)
+
+
+def test_direct_input_never_defers_to_a_cache(tmp_path, monkeypatch):
+    spec, source, cached = staged_verification_spec(tmp_path, monkeypatch)
+    spec['arguments'].append(str(source))
+    source.write_bytes(b'changed direct input')
+    with pytest.raises(fleet.FleetError, match='input identity changed'):
+        inbox.verify_inputs(spec, source.parent, defer_staged=True)
+    assert cached.read_bytes() == b'original payload'
+
+
+def test_deferred_staged_payload_still_blocks_component_on_corruption(campaign, monkeypatch):
+    from experiments.jobs import staging
+    spec = monitor.read_json(campaign / 'spec.json')
+    item = spec['inputs'][0]
+    spec.update(verify_staged_inputs=True, staged_inputs=[{'name': 'data', **item}],
+                arguments=['--input', '{staged:data}', '--frames', '{frames}'])
+    local = campaign.parents[3] / 'local'
+    local.mkdir()
+    monkeypatch.setattr(staging, 'local_root', lambda: local)
+    monkeypatch.setattr(staging, 'available_bytes', lambda root: 10**12)
+    # The smoke succeeds. Its validator corrupts both the staged copy and the
+    # canonical source; full must stop during fresh stage verification.
+    cached = local / 'cache' / item['sha256'] / Path(item['path']).name
+    validator = campaign / 'source' / 'validate.py'
+    validator.write_text(validator.read_text() +
+        f"\npathlib.Path({str(cached)!r}).chmod(0o644)\npathlib.Path({str(cached)!r}).write_text('corrupt')\n" +
+        f"pathlib.Path({item['path']!r}).write_text('corrupt')\n")
+    monitor.write_json(campaign / 'spec.json', spec)
+    ready = monitor.read_json(campaign / 'ready.json')
+    ready.update(spec_sha256=inbox.digest(spec), source_sha256=inbox.source_identity(campaign / 'source'))
+    monitor.write_json(campaign / 'ready.json', ready)
+    assert inbox.campaign(campaign) == 1
+    assert monitor.read_json(campaign / 'gate.json')['passed']
+    assert not (campaign / 'full' / 'execution.json').exists()

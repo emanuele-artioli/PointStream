@@ -1,0 +1,1322 @@
+{
+  "job": "20261028T190840Z-eb011d4b",
+  "state": "complete",
+  "code_revision": "afe86f57620d85161aba5a8dc60e17c8e820fb4e",
+  "publication_sha256": "f932c85e526e01b135ac53a84b332695bbaaa627cb55770a5283b5b56a2fd04f",
+  "installed_source_count": 214,
+  "upstream": {
+    "dt": {
+      "repository": "SunnyMass/DCVC-DT",
+      "revision": "e3deeda1cd99566498504231f6853fd554ec00e9",
+      "files": {
+        "README.md": {
+          "sha256": "fc333e62cbc5090d6ffb59dd881ce73b6a2916b220175ed53045921655919d33",
+          "bytes": 8651,
+          "functions": [],
+          "excerpts": [
+            {
+              "line": 7,
+              "text": "This repository adds **`test_video_y_latent_optimized.py`** only: copy it into the **DCVC-DC project root** (next to `test_video.py`)."
+            },
+            {
+              "line": 11,
+              "text": "- [x] **Training Code:** Released! See the `test_video_y_latent_optimized.py` file, which **supports not only the RGB format mentioned in the paper but also optimizations specifically tailored for YUV**. The DCVC-DC decoder currently lacks cross-platform support, and decoding may fail across different devices even on identical hardware models. To a"
+            },
+            {
+              "line": 18,
+              "text": "* **Online latent refinement.** Encoder and decoder **weights stay fixed**; only the **current-frame latent** is adapted at inference with lightweight gradient steps and stochastic Gumbel\u2013annealing style quantization. Decoding cost is unchanged, while the encoder better fits the actual content."
+            },
+            {
+              "line": 31,
+              "text": "<img src=\"assets/online_latent_refinement.png\" alt=\"Online latent refinement and frame-level dynamic RD adjustment\" width=\"70%\" />"
+            },
+            {
+              "line": 139,
+              "text": "To test the pretrained model with four rate points (using RGB data organization), first copy the `test_video_y_latent_optimized.py` file into the DCVC-DC project root directory, then run the following command:"
+            },
+            {
+              "line": 142,
+              "text": "python test_video_y_latent_optimized.py --i_frame_model_path ./checkpoints/cvpr2023_image_psnr.pth.tar --p_frame_model_path ./checkpoints/cvpr2023_video_psnr.pth.tar --rate_num 4 --test_config ./dataset_config_example_rgb.json --yuv420 0 --cuda 1 --cuda_device 0,1,2,3 --worker 4 --write_stream 1 --stream_path ./stream --save_decoded_frame 1 --decod"
+            }
+          ]
+        },
+        "test_video_y_latent_optimized.py": {
+          "sha256": "5985dfb6efbc44d8c8ea2d1ddec68749d20015408bd3af28a036093a257f121c",
+          "bytes": 35099,
+          "functions": [
+            "parse_args",
+            "ste_round",
+            "quantize_sga",
+            "forward_enc",
+            "forward_dec",
+            "compress_",
+            "decompress_",
+            "encode_decode_",
+            "optimize_latent",
+            "np_image_to_tensor",
+            "PSNR",
+            "run_test",
+            "encode_one",
+            "worker",
+            "init_func",
+            "main",
+            "__init__",
+            "forward"
+          ],
+          "excerpts": [
+            {
+              "line": 25,
+              "text": "### LRQ for latent refine"
+            },
+            {
+              "line": 116,
+              "text": "def forward_enc(self, x,dpb, q_in_ckpt, q_index, frame_idx):"
+            },
+            {
+              "line": 144,
+              "text": "def forward_dec(self, mv_y, dpb, tau, mv_y_q_enc, mv_y_q_dec,frame_idx,x ,y_q_enc, y_q_dec, y,"
+            },
+            {
+              "line": 185,
+              "text": "def compress_(self, x, dpb, q_in_ckpt, q_index, frame_idx, y):"
+            },
+            {
+              "line": 245,
+              "text": "def decompress_(self,dpb, string, height, width, q_in_ckpt, q_index, frame_idx):"
+            },
+            {
+              "line": 317,
+              "text": "    def forward(self, y_pred, y_true):"
+            },
+            {
+              "line": 324,
+              "text": "def optimize_latent(model,x, dpb, q_in_ckpt, q_index, flag_yuv, frame_idx, iterations, lr):"
+            },
+            {
+              "line": 326,
+              "text": "    with torch.no_grad():"
+            },
+            {
+              "line": 331,
+              "text": "    y.requires_grad_(True)"
+            },
+            {
+              "line": 333,
+              "text": "    optimizer = torch.optim.Adam([y], lr=lr)"
+            },
+            {
+              "line": 335,
+              "text": "        optimizer, step_size=(iterations * 8 // 10), gamma=0.1"
+            },
+            {
+              "line": 376,
+              "text": "            optimizer.zero_grad()"
+            },
+            {
+              "line": 408,
+              "text": "            loss.backward()"
+            },
+            {
+              "line": 409,
+              "text": "            optimizer.step()"
+            },
+            {
+              "line": 419,
+              "text": "                            optimizer.param_groups[0][\"lr\"],"
+            },
+            {
+              "line": 425,
+              "text": "                        optimizer.param_groups[0][\"lr\"],"
+            },
+            {
+              "line": 432,
+              "text": "    y.requires_grad_(False)"
+            },
+            {
+              "line": 504,
+              "text": "    if flag == 1:  #with torch.no_grad():"
+            },
+            {
+              "line": 541,
+              "text": "                with torch.no_grad():"
+            },
+            {
+              "line": 566,
+              "text": "                y_latent = optimize_latent(p_frame_net, x_padded, dpb, args['q_in_ckpt'],"
+            },
+            {
+              "line": 580,
+              "text": "                with torch.no_grad():"
+            },
+            {
+              "line": 582,
+              "text": "                                                       args['i_frame_q_index'], y_latent,bin_path,"
+            }
+          ]
+        }
+      }
+    },
+    "cm": {
+      "repository": "Austin4USTC/DCMVC",
+      "revision": "4aa95ef4b0176b6076b1ba0396d2cd178258d506",
+      "files": {
+        "README.md": {
+          "sha256": "26e9a0e80d32d0627b933b7d60957443e6a32298f27057ed504e9b2da13e5960",
+          "bytes": 6159,
+          "functions": [],
+          "excerpts": []
+        },
+        "src/models/DCMVC_model.py": {
+          "sha256": "436f4c963f6adb2e415719e8450664f4b6119c740ffa9ec9149f5dd9e3a65eb2",
+          "bytes": 31303,
+          "functions": [
+            "__init__",
+            "forward",
+            "__init__",
+            "forward",
+            "__init__",
+            "forward",
+            "__init__",
+            "forward",
+            "__init__",
+            "forward",
+            "__init__",
+            "forward",
+            "__init__",
+            "forward",
+            "__init__",
+            "forward",
+            "__init__",
+            "load_state_dict",
+            "multi_scale_feature_extractor",
+            "decoder_side_memc",
+            "decoder_context_refine",
+            "motion_compensation",
+            "get_q_scales_from_ckpt",
+            "mv_prior_param_decoder",
+            "res_prior_param_decoder",
+            "get_recon_and_feature",
+            "motion_estimation_and_mv_encoding",
+            "get_q_for_inference",
+            "compress",
+            "decompress",
+            "encode_decode",
+            "forward_one_frame"
+          ],
+          "excerpts": [
+            {
+              "line": 47,
+              "text": "    def forward(self, x, aux_feature, flow):"
+            },
+            {
+              "line": 80,
+              "text": "    def forward(self, feature):"
+            },
+            {
+              "line": 107,
+              "text": "    def forward(self, context1, context2, context3):"
+            },
+            {
+              "line": 142,
+              "text": "    def forward(self, x, context, quant_step):"
+            },
+            {
+              "line": 169,
+              "text": "    def forward(self, x, quant_step):"
+            },
+            {
+              "line": 189,
+              "text": "    def forward(self, x, context1, context2, context3, quant_step):"
+            },
+            {
+              "line": 212,
+              "text": "    def forward(self, x, context2, context3, quant_step):"
+            },
+            {
+              "line": 231,
+              "text": "    def forward(self, ctx, res):"
+            },
+            {
+              "line": 343,
+              "text": "        with torch.no_grad():"
+            },
+            {
+              "line": 458,
+              "text": "    def compress(self, x, dpb, q_in_ckpt, q_index, frame_idx):"
+            },
+            {
+              "line": 516,
+              "text": "    def decompress(self, dpb, string, height, width, q_in_ckpt, q_index, frame_idx):"
+            },
+            {
+              "line": 592,
+              "text": "    def forward_one_frame(self, x, dpb, q_in_ckpt=False, q_index=None, frame_idx=0):"
+            }
+          ]
+        },
+        "src/models/common_model.py": {
+          "sha256": "cb457b1e67767ff7748638386acf89cb12f9151738f95bd2c728380212c6ffdc",
+          "bytes": 15637,
+          "functions": [
+            "__init__",
+            "quant",
+            "get_curr_q",
+            "probs_to_bits",
+            "get_y_gaussian_bits",
+            "get_y_laplace_bits",
+            "get_z_bits",
+            "update",
+            "pad_for_y",
+            "get_to_y_slice_shape",
+            "slice_to_y",
+            "separate_prior",
+            "process_with_mask",
+            "get_mask_four_parts",
+            "combine_four_parts",
+            "forward_four_part_prior",
+            "compress_four_part_prior",
+            "decompress_four_part_prior"
+          ],
+          "excerpts": [
+            {
+              "line": 142,
+              "text": "    def forward_four_part_prior(self, y, common_params,"
+            },
+            {
+              "line": 254,
+              "text": "    def compress_four_part_prior(self, y, common_params,"
+            },
+            {
+              "line": 261,
+              "text": "    def decompress_four_part_prior(self, common_params,"
+            }
+          ]
+        },
+        "test_video.py": {
+          "sha256": "0db76ca74b4d295ee56858ea9d006eb5f509b9cbfae82837e3e034c02fd14846",
+          "bytes": 18567,
+          "functions": [
+            "parse_args",
+            "np_image_to_tensor",
+            "PSNR",
+            "run_test",
+            "encode_one",
+            "worker",
+            "init_func",
+            "main"
+          ],
+          "excerpts": [
+            {
+              "line": 109,
+              "text": "    with torch.no_grad():"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "installed_selected": {
+    "src/models/image_model.py": {
+      "sha256": "95ff7158ffa592b608f346f3585e6111380bee08e50096a1e7c0355acf01089e",
+      "bytes": 7878,
+      "functions": [
+        "__init__",
+        "forward",
+        "__init__",
+        "forward",
+        "__init__",
+        "forward",
+        "__init__",
+        "forward",
+        "__init__",
+        "forward",
+        "__init__",
+        "forward",
+        "__init__",
+        "forward_one_frame",
+        "compress",
+        "decompress",
+        "forward"
+      ],
+      "excerpts": [
+        {
+          "line": 42,
+          "text": "    def forward(self, x, quant_step):"
+        },
+        {
+          "line": 65,
+          "text": "    def forward(self, x, quant_step):"
+        },
+        {
+          "line": 81,
+          "text": "    def forward(self, x):"
+        },
+        {
+          "line": 94,
+          "text": "    def forward(self, x):"
+        },
+        {
+          "line": 108,
+          "text": "    def forward(self, x):"
+        },
+        {
+          "line": 122,
+          "text": "    def forward(self, x):"
+        },
+        {
+          "line": 150,
+          "text": "    def forward_one_frame(self, x, qp, recon_only=False):"
+        },
+        {
+          "line": 194,
+          "text": "    def compress(self, x, qp, padding_b, padding_r):"
+        },
+        {
+          "line": 197,
+          "text": "                from inference_extensions_cuda import DMCIProxy"
+        },
+        {
+          "line": 205,
+          "text": "            self.proxy = DMCIProxy()"
+        },
+        {
+          "line": 214,
+          "text": "    def decompress(self, bit_stream, sps, qp, ec_part):"
+        },
+        {
+          "line": 219,
+          "text": "    def forward(self, x, qp, lambdas=None, get_loss_info=False, recon_only=False):"
+        }
+      ]
+    },
+    "src/models/video_model_ht.py": {
+      "sha256": "0ac7fe2f6c5e6520b0c452bf16105533ce80f02ac911d3975648be5b5f8b7d11",
+      "bytes": 19082,
+      "functions": [
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "forward",
+        "__init__",
+        "internal_forward",
+        "__init__",
+        "apply_feature_adaptor",
+        "clear_dpb",
+        "get_rd_info",
+        "get_recon_and_feature",
+        "res_prior_param_decoder",
+        "set_use_ckpt",
+        "set_ref_feature",
+        "add_ref_feature_from_frame",
+        "compress",
+        "decompress",
+        "forward_one_frame",
+        "forward"
+      ],
+      "excerpts": [
+        {
+          "line": 300,
+          "text": "    def forward(self, x1, x2=None):"
+        },
+        {
+          "line": 420,
+          "text": "                    from inference_extensions_cuda import DMCHTSProxy"
+        },
+        {
+          "line": 421,
+          "text": "                    proxy_cls = DMCHTSProxy"
+        },
+        {
+          "line": 423,
+          "text": "                    from inference_extensions_cuda import DMCHTLProxy"
+        },
+        {
+          "line": 424,
+          "text": "                    proxy_cls = DMCHTLProxy"
+        },
+        {
+          "line": 436,
+          "text": "    def compress(self, x, qp, reset_feature_memory, padding_b, padding_r):"
+        },
+        {
+          "line": 444,
+          "text": "    def decompress(self, bit_stream, sps, qp, ec_part, reset_feature_memory):"
+        },
+        {
+          "line": 452,
+          "text": "    def forward_one_frame(self, x, qp, reset_feature_memory=False):"
+        },
+        {
+          "line": 498,
+          "text": "    def forward(self, x, qp, lambdas=None, get_loss_info=False, curr_poc=0):"
+        }
+      ]
+    },
+    "src/models/common_model.py": {
+      "sha256": "e309a7144514836f29453f8d1fe65df8f7ab72d17ed1efea08ac35ee9f67469a",
+      "bytes": 10789,
+      "functions": [
+        "__init__",
+        "internal_forward",
+        "set_use_ckpt",
+        "forward",
+        "__init__",
+        "_initialize_weights",
+        "_reset_cuda_proxies",
+        "add_cdf_to_state_dict",
+        "add_noise",
+        "get_loss_info",
+        "get_mse",
+        "get_one_mask",
+        "get_padding_size",
+        "index_select_dim0",
+        "probs_to_bits",
+        "process_with_mask",
+        "qp_num",
+        "separate_prior_image",
+        "separate_prior_video",
+        "set_entropy_coder_parallel",
+        "update",
+        "get_mask_2x",
+        "get_mask_4x",
+        "get_y_bits",
+        "get_z_bits",
+        "load_state_dict",
+        "forward_prior_2x",
+        "forward_prior_4x"
+      ],
+      "excerpts": [
+        {
+          "line": 26,
+          "text": "    def forward(self, *args, **kwargs):"
+        },
+        {
+          "line": 157,
+          "text": "    @torch.no_grad()"
+        },
+        {
+          "line": 174,
+          "text": "    @torch.no_grad()"
+        },
+        {
+          "line": 212,
+          "text": "    def forward_prior_2x(self, y, common_params, y_spatial_prior):"
+        },
+        {
+          "line": 231,
+          "text": "    def forward_prior_4x(self, y, q_enc, q_dec,"
+        }
+      ]
+    },
+    "src/utils/common.py": {
+      "sha256": "1f1bcb84b4ef42be7e48967675b85875301a287c55970d6f8fb6bd17f1c1f009",
+      "bytes": 10227,
+      "functions": [
+        "cleanup_train",
+        "create_folder",
+        "dump_json",
+        "generate_log_json",
+        "generate_str",
+        "get_current_device",
+        "get_dataloader",
+        "get_latest_status_path",
+        "loss_func",
+        "get_state_dict",
+        "get_training_lambdas",
+        "init_train",
+        "load_existing_weights",
+        "save_ckpt",
+        "save_status",
+        "set_torch_env",
+        "start_train",
+        "str2bool",
+        "wrap_ddp",
+        "inner"
+      ],
+      "excerpts": []
+    },
+    "src/layers/extensions/inference/bind.cpp": {
+      "sha256": "ac97709dbd891315277f3e980b19448e795c2c4c7df61c26573c83bc4c60b474",
+      "bytes": 1406,
+      "functions": [],
+      "excerpts": [
+        {
+          "line": 13,
+          "text": "    py::class_<DMCIProxy>(m, \"DMCIProxy\")"
+        },
+        {
+          "line": 15,
+          "text": "        .def(\"set_param\", &DMCIProxy::set_param)"
+        },
+        {
+          "line": 16,
+          "text": "        .def(\"compress\", &DMCIProxy::compress)"
+        },
+        {
+          "line": 17,
+          "text": "        .def(\"decompress\", &DMCIProxy::decompress);"
+        },
+        {
+          "line": 19,
+          "text": "    py::class_<DMCHTLProxy>(m, \"DMCHTLProxy\")"
+        },
+        {
+          "line": 21,
+          "text": "        .def(\"set_param\", &DMCHTLProxy::set_param)"
+        },
+        {
+          "line": 22,
+          "text": "        .def(\"add_ref_feature_from_frame\", &DMCHTLProxy::add_ref_feature_from_frame)"
+        },
+        {
+          "line": 23,
+          "text": "        .def(\"compress\", &DMCHTLProxy::compress)"
+        },
+        {
+          "line": 24,
+          "text": "        .def(\"decompress\", &DMCHTLProxy::decompress);"
+        },
+        {
+          "line": 26,
+          "text": "    py::class_<DMCHTSProxy>(m, \"DMCHTSProxy\")"
+        },
+        {
+          "line": 28,
+          "text": "        .def(\"set_param\", &DMCHTSProxy::set_param)"
+        },
+        {
+          "line": 29,
+          "text": "        .def(\"add_ref_feature_from_frame\", &DMCHTSProxy::add_ref_feature_from_frame)"
+        },
+        {
+          "line": 30,
+          "text": "        .def(\"compress\", &DMCHTSProxy::compress)"
+        },
+        {
+          "line": 31,
+          "text": "        .def(\"decompress\", &DMCHTSProxy::decompress);"
+        },
+        {
+          "line": 33,
+          "text": "    py::class_<DMCLDProxy>(m, \"DMCLDProxy\")"
+        },
+        {
+          "line": 35,
+          "text": "        .def(\"set_param\", &DMCLDProxy::set_param)"
+        },
+        {
+          "line": 36,
+          "text": "        .def(\"add_ref_feature_from_frame\", &DMCLDProxy::add_ref_feature_from_frame)"
+        },
+        {
+          "line": 37,
+          "text": "        .def(\"compress\", &DMCLDProxy::compress)"
+        },
+        {
+          "line": 38,
+          "text": "        .def(\"decompress\", &DMCLDProxy::decompress);"
+        }
+      ]
+    },
+    "src/layers/extensions/inference/dmci_proxy.h": {
+      "sha256": "44afb02fe62894377542a5f7336cb1595397df6bcaeb7f4eeb84612bb1f7b954",
+      "bytes": 7584,
+      "functions": [],
+      "excerpts": [
+        {
+          "line": 9,
+          "text": "class DMCIDecoderProxy {"
+        },
+        {
+          "line": 11,
+          "text": "    DMCIDecoderProxy() = default;"
+        },
+        {
+          "line": 12,
+          "text": "    ~DMCIDecoderProxy() = default;"
+        },
+        {
+          "line": 19,
+          "text": "    ResidualBlockUpsampleProxy m_up;"
+        },
+        {
+          "line": 20,
+          "text": "    DepthConvBlockProxy m_conv1;"
+        },
+        {
+          "line": 21,
+          "text": "    DepthConvBlockProxy m_conv2;"
+        },
+        {
+          "line": 22,
+          "text": "    DepthConvBlockProxy m_conv3;"
+        },
+        {
+          "line": 23,
+          "text": "    DepthConvBlockProxy m_conv4;"
+        },
+        {
+          "line": 24,
+          "text": "    DepthConvBlockProxy m_conv5;"
+        },
+        {
+          "line": 25,
+          "text": "    DepthConvBlockProxy m_conv6;"
+        },
+        {
+          "line": 26,
+          "text": "    DepthConvBlockProxy m_conv7;"
+        },
+        {
+          "line": 27,
+          "text": "    DepthConvBlockProxy m_conv8;"
+        },
+        {
+          "line": 28,
+          "text": "    DepthConvBlockProxy m_conv9;"
+        },
+        {
+          "line": 29,
+          "text": "    DepthConvBlockProxy m_conv10;"
+        },
+        {
+          "line": 30,
+          "text": "    DepthConvBlockProxy m_conv11;"
+        },
+        {
+          "line": 31,
+          "text": "    DepthConvBlockProxy m_conv12;"
+        },
+        {
+          "line": 32,
+          "text": "    DepthConvBlockProxy m_dec_2;"
+        },
+        {
+          "line": 38,
+          "text": "class DMCIEncoderProxy {"
+        },
+        {
+          "line": 40,
+          "text": "    DMCIEncoderProxy() = default;"
+        },
+        {
+          "line": 41,
+          "text": "    ~DMCIEncoderProxy() = default;"
+        },
+        {
+          "line": 48,
+          "text": "    DepthConvBlockProxy m_enc_1;"
+        },
+        {
+          "line": 49,
+          "text": "    DepthConvBlockProxy m_enc_2_0;"
+        },
+        {
+          "line": 50,
+          "text": "    DepthConvBlockProxy m_enc_2_1;"
+        },
+        {
+          "line": 51,
+          "text": "    DepthConvBlockProxy m_enc_2_2;"
+        },
+        {
+          "line": 52,
+          "text": "    DepthConvBlockProxy m_enc_2_3;"
+        },
+        {
+          "line": 53,
+          "text": "    DepthConvBlockProxy m_enc_2_4;"
+        },
+        {
+          "line": 54,
+          "text": "    DepthConvBlockProxy m_enc_2_5;"
+        },
+        {
+          "line": 62,
+          "text": "class DMCIHyperDecoderProxy {"
+        },
+        {
+          "line": 64,
+          "text": "    DMCIHyperDecoderProxy() = default;"
+        },
+        {
+          "line": 65,
+          "text": "    ~DMCIHyperDecoderProxy() = default;"
+        },
+        {
+          "line": 72,
+          "text": "    ResidualBlockUpsampleProxy m_conv0;"
+        },
+        {
+          "line": 73,
+          "text": "    ResidualBlockUpsampleProxy m_conv1;"
+        },
+        {
+          "line": 74,
+          "text": "    DepthConvBlockProxy m_conv2;"
+        },
+        {
+          "line": 77,
+          "text": "class DMCIHyperEncoderProxy {"
+        },
+        {
+          "line": 79,
+          "text": "    DMCIHyperEncoderProxy() = default;"
+        },
+        {
+          "line": 80,
+          "text": "    ~DMCIHyperEncoderProxy() = default;"
+        },
+        {
+          "line": 87,
+          "text": "    DepthConvBlockProxy m_conv0;"
+        },
+        {
+          "line": 88,
+          "text": "    ResidualBlockWithStride2Proxy m_conv1;"
+        },
+        {
+          "line": 89,
+          "text": "    ResidualBlockWithStride2Proxy m_conv2;"
+        },
+        {
+          "line": 92,
+          "text": "class DMCISpatialPriorProxy {"
+        },
+        {
+          "line": 94,
+          "text": "    DMCISpatialPriorProxy() = default;"
+        },
+        {
+          "line": 95,
+          "text": "    ~DMCISpatialPriorProxy() = default;"
+        },
+        {
+          "line": 102,
+          "text": "    DepthConvBlockProxy m_conv0;"
+        },
+        {
+          "line": 103,
+          "text": "    DepthConvBlockProxy m_conv1;"
+        },
+        {
+          "line": 104,
+          "text": "    DepthConvBlockProxy m_conv2;"
+        },
+        {
+          "line": 112,
+          "text": "class DMCIYPriorFusionProxy {"
+        },
+        {
+          "line": 114,
+          "text": "    DMCIYPriorFusionProxy() = default;"
+        },
+        {
+          "line": 115,
+          "text": "    ~DMCIYPriorFusionProxy() = default;"
+        },
+        {
+          "line": 122,
+          "text": "    DepthConvBlockProxy m_conv0;"
+        },
+        {
+          "line": 123,
+          "text": "    DepthConvBlockProxy m_conv1;"
+        },
+        {
+          "line": 124,
+          "text": "    DepthConvBlockProxy m_conv2;"
+        },
+        {
+          "line": 132,
+          "text": "class DMCIProxy : public DMCCommon {"
+        },
+        {
+          "line": 139,
+          "text": "    DMCIProxy();"
+        },
+        {
+          "line": 140,
+          "text": "    ~DMCIProxy();"
+        },
+        {
+          "line": 167,
+          "text": "    DMCIEncoderProxy m_encoder;"
+        },
+        {
+          "line": 168,
+          "text": "    DMCIHyperEncoderProxy m_hyper_encoder;"
+        },
+        {
+          "line": 169,
+          "text": "    DMCIHyperDecoderProxy m_hyper_decoder;"
+        },
+        {
+          "line": 170,
+          "text": "    DMCIYPriorFusionProxy m_y_prior_fusion;"
+        },
+        {
+          "line": 172,
+          "text": "    DepthConvBlockProxy m_y_spatial_prior_adaptor_1;"
+        },
+        {
+          "line": 173,
+          "text": "    DepthConvBlockProxy m_y_spatial_prior_adaptor_2;"
+        },
+        {
+          "line": 174,
+          "text": "    DepthConvBlockProxy m_y_spatial_prior_adaptor_3;"
+        },
+        {
+          "line": 175,
+          "text": "    DMCISpatialPriorProxy m_y_spatial_prior;"
+        },
+        {
+          "line": 176,
+          "text": "    DMCIDecoderProxy m_decoder;"
+        }
+      ]
+    },
+    "src/layers/extensions/inference/dmc_htl_proxy.h": {
+      "sha256": "8928e5d1853d8a827690bb10838b4c1c1ac60f34cb65b3bd74f3cf5d107c1fb0",
+      "bytes": 12200,
+      "functions": [],
+      "excerpts": [
+        {
+          "line": 8,
+          "text": "class DMCHTLDecoderProxy {"
+        },
+        {
+          "line": 10,
+          "text": "    DMCHTLDecoderProxy() = default;"
+        },
+        {
+          "line": 11,
+          "text": "    ~DMCHTLDecoderProxy() = default;"
+        },
+        {
+          "line": 21,
+          "text": "    SubpelConv2xProxy m_up;"
+        },
+        {
+          "line": 22,
+          "text": "    DepthConvBlockProxy m_conv10;"
+        },
+        {
+          "line": 23,
+          "text": "    DepthConvBlockProxy m_conv11;"
+        },
+        {
+          "line": 24,
+          "text": "    DepthConvBlockProxy m_conv12;"
+        },
+        {
+          "line": 25,
+          "text": "    DepthConvBlockProxy m_conv13;"
+        },
+        {
+          "line": 26,
+          "text": "    DepthConvBlockProxy m_conv14;"
+        },
+        {
+          "line": 27,
+          "text": "    DepthConvBlockProxy m_conv15;"
+        },
+        {
+          "line": 28,
+          "text": "    DepthConvBlockProxy m_conv16;"
+        },
+        {
+          "line": 29,
+          "text": "    DepthConvBlockProxy m_conv17;"
+        },
+        {
+          "line": 30,
+          "text": "    DepthConvBlockProxy m_conv18;"
+        },
+        {
+          "line": 31,
+          "text": "    DepthConvBlockProxy m_conv19;"
+        },
+        {
+          "line": 32,
+          "text": "    DepthConvBlockProxy m_conv1a;"
+        },
+        {
+          "line": 38,
+          "text": "class DMCHTLEncoderProxy {"
+        },
+        {
+          "line": 40,
+          "text": "    DMCHTLEncoderProxy() = default;"
+        },
+        {
+          "line": 41,
+          "text": "    ~DMCHTLEncoderProxy() = default;"
+        },
+        {
+          "line": 48,
+          "text": "    DepthConvBlockProxy m_conv10;"
+        },
+        {
+          "line": 49,
+          "text": "    DepthConvBlockProxy m_conv11;"
+        },
+        {
+          "line": 50,
+          "text": "    DepthConvBlockProxy m_conv12;"
+        },
+        {
+          "line": 51,
+          "text": "    DepthConvBlockProxy m_conv13;"
+        },
+        {
+          "line": 52,
+          "text": "    DepthConvBlockProxy m_conv14;"
+        },
+        {
+          "line": 53,
+          "text": "    DepthConvBlockProxy m_conv15;"
+        },
+        {
+          "line": 54,
+          "text": "    DepthConvBlockProxy m_conv16;"
+        },
+        {
+          "line": 62,
+          "text": "class DMCHTLFeatureAdaptorIProxy {"
+        },
+        {
+          "line": 64,
+          "text": "    DMCHTLFeatureAdaptorIProxy() = default;"
+        },
+        {
+          "line": 65,
+          "text": "    ~DMCHTLFeatureAdaptorIProxy() = default;"
+        },
+        {
+          "line": 72,
+          "text": "    DepthConvBlockProxy m_conv0;"
+        },
+        {
+          "line": 73,
+          "text": "    DepthConvBlockProxy m_conv1;"
+        },
+        {
+          "line": 74,
+          "text": "    DepthConvBlockProxy m_conv2;"
+        },
+        {
+          "line": 77,
+          "text": "class DMCHTLFeatureAdaptorMProxy {"
+        },
+        {
+          "line": 79,
+          "text": "    DMCHTLFeatureAdaptorMProxy() = default;"
+        },
+        {
+          "line": 80,
+          "text": "    ~DMCHTLFeatureAdaptorMProxy() = default;"
+        },
+        {
+          "line": 87,
+          "text": "    DepthConvBlockProxy m_conv0;"
+        },
+        {
+          "line": 88,
+          "text": "    DepthConvBlockProxy m_conv1;"
+        },
+        {
+          "line": 89,
+          "text": "    DepthConvBlockProxy m_conv2;"
+        },
+        {
+          "line": 90,
+          "text": "    DepthConvBlockProxy m_conv3;"
+        },
+        {
+          "line": 91,
+          "text": "    DepthConvBlockProxy m_conv4;"
+        },
+        {
+          "line": 92,
+          "text": "    DepthConvBlockProxy m_conv5;"
+        },
+        {
+          "line": 93,
+          "text": "    DepthConvBlockProxy m_conv6;"
+        },
+        {
+          "line": 94,
+          "text": "    DepthConvBlockProxy m_conv7;"
+        },
+        {
+          "line": 95,
+          "text": "    DepthConvBlockProxy m_conv8;"
+        },
+        {
+          "line": 96,
+          "text": "    DepthConvBlockProxy m_conv9;"
+        },
+        {
+          "line": 99,
+          "text": "class DMCHTLFeatureExtractorProxy {"
+        },
+        {
+          "line": 101,
+          "text": "    DMCHTLFeatureExtractorProxy() = default;"
+        },
+        {
+          "line": 102,
+          "text": "    ~DMCHTLFeatureExtractorProxy() = default;"
+        },
+        {
+          "line": 109,
+          "text": "    DepthConvBlockProxy m_conv0;"
+        },
+        {
+          "line": 110,
+          "text": "    DepthConvBlockProxy m_conv1;"
+        },
+        {
+          "line": 113,
+          "text": "class DMCHTLHyperDecoderProxy {"
+        },
+        {
+          "line": 115,
+          "text": "    DMCHTLHyperDecoderProxy() = default;"
+        },
+        {
+          "line": 116,
+          "text": "    ~DMCHTLHyperDecoderProxy() = default;"
+        },
+        {
+          "line": 123,
+          "text": "    ResidualBlockUpsampleProxy m_conv0;"
+        },
+        {
+          "line": 124,
+          "text": "    ResidualBlockUpsampleProxy m_conv1;"
+        },
+        {
+          "line": 125,
+          "text": "    DepthConvBlockProxy m_conv2;"
+        },
+        {
+          "line": 128,
+          "text": "class DMCHTLHyperEncoderProxy {"
+        },
+        {
+          "line": 130,
+          "text": "    DMCHTLHyperEncoderProxy() = default;"
+        },
+        {
+          "line": 131,
+          "text": "    ~DMCHTLHyperEncoderProxy() = default;"
+        },
+        {
+          "line": 138,
+          "text": "    DepthConvBlockProxy m_conv0;"
+        },
+        {
+          "line": 139,
+          "text": "    ResidualBlockWithStride2Proxy m_conv1;"
+        },
+        {
+          "line": 140,
+          "text": "    ResidualBlockWithStride2Proxy m_conv2;"
+        },
+        {
+          "line": 143,
+          "text": "class DMCHTLPriorFusionProxy {"
+        },
+        {
+          "line": 145,
+          "text": "    DMCHTLPriorFusionProxy() = default;"
+        },
+        {
+          "line": 146,
+          "text": "    ~DMCHTLPriorFusionProxy() = default;"
+        },
+        {
+          "line": 153,
+          "text": "    DepthConvBlockProxy m_conv0;"
+        },
+        {
+          "line": 154,
+          "text": "    DepthConvBlockProxy m_conv1;"
+        },
+        {
+          "line": 155,
+          "text": "    DepthConvBlockProxy m_conv2;"
+        },
+        {
+          "line": 163,
+          "text": "class DMCHTLReconHeadProxy {"
+        },
+        {
+          "line": 166,
+          "text": "    DMCHTLReconHeadProxy() = default;"
+        },
+        {
+          "line": 167,
+          "text": "    ~DMCHTLReconHeadProxy() = default;"
+        },
+        {
+          "line": 175,
+          "text": "    DepthConvBlockProxy m_conv0[g_frame_delay];"
+        },
+        {
+          "line": 176,
+          "text": "    DepthConvBlockProxy m_conv1[g_frame_delay];"
+        },
+        {
+          "line": 177,
+          "text": "    DepthConvBlockProxy m_conv2[g_frame_delay];"
+        },
+        {
+          "line": 178,
+          "text": "    DepthConvBlockProxy m_conv3[g_frame_delay];"
+        },
+        {
+          "line": 179,
+          "text": "    DepthConvBlockProxy m_conv4[g_frame_delay];"
+        },
+        {
+          "line": 188,
+          "text": "class DMCHTLSpatialPriorProxy {"
+        },
+        {
+          "line": 190,
+          "text": "    DMCHTLSpatialPriorProxy() = default;"
+        },
+        {
+          "line": 191,
+          "text": "    ~DMCHTLSpatialPriorProxy() = default;"
+        },
+        {
+          "line": 198,
+          "text": "    DepthConvBlockProxy m_conv0;"
+        },
+        {
+          "line": 199,
+          "text": "    DepthConvBlockProxy m_conv1;"
+        },
+        {
+          "line": 200,
+          "text": "    DepthConvBlockProxy m_conv2;"
+        },
+        {
+          "line": 208,
+          "text": "class DMCHTLTemporalPriorEncoderProxy {"
+        },
+        {
+          "line": 210,
+          "text": "    DMCHTLTemporalPriorEncoderProxy() = default;"
+        },
+        {
+          "line": 211,
+          "text": "    ~DMCHTLTemporalPriorEncoderProxy() = default;"
+        },
+        {
+          "line": 218,
+          "text": "    ResidualBlockWithStride2Proxy m_conv;"
+        },
+        {
+          "line": 221,
+          "text": "class DMCHTLProxy : public DMCCommon {"
+        },
+        {
+          "line": 232,
+          "text": "    DMCHTLProxy();"
+        },
+        {
+          "line": 233,
+          "text": "    ~DMCHTLProxy();"
+        },
+        {
+          "line": 268,
+          "text": "    DMCHTLEncoderProxy m_encoder;"
+        },
+        {
+          "line": 269,
+          "text": "    DMCHTLHyperEncoderProxy m_hyper_encoder;"
+        },
+        {
+          "line": 270,
+          "text": "    DMCHTLTemporalPriorEncoderProxy m_temporal_prior_encoder;"
+        },
+        {
+          "line": 271,
+          "text": "    DMCHTLHyperDecoderProxy m_hyper_decoder;"
+        },
+        {
+          "line": 272,
+          "text": "    DMCHTLPriorFusionProxy m_y_prior_fusion;"
+        },
+        {
+          "line": 274,
+          "text": "    DepthConvBlockProxy m_y_spatial_prior_adaptor_1;"
+        },
+        {
+          "line": 275,
+          "text": "    DepthConvBlockProxy m_y_spatial_prior_adaptor_2;"
+        },
+        {
+          "line": 276,
+          "text": "    DepthConvBlockProxy m_y_spatial_prior_adaptor_3;"
+        },
+        {
+          "line": 277,
+          "text": "    DMCHTLSpatialPriorProxy m_y_spatial_prior;"
+        },
+        {
+          "line": 278,
+          "text": "    DMCHTLDecoderProxy m_decoder;"
+        },
+        {
+          "line": 279,
+          "text": "    DMCHTLFeatureAdaptorIProxy m_feature_adaptor_i;"
+        },
+        {
+          "line": 280,
+          "text": "    DMCHTLFeatureAdaptorMProxy m_feature_adaptor_m;"
+        }
+      ]
+    }
+  },
+  "findings": {
+    "differentiable_training_forward_exists": true,
+    "native_external_latent_transport_available": false,
+    "native_compress_api": "DMCI.compress(x,qp,padding_b,padding_r); HT-L.compress(x,qp,reset_feature_memory,padding_b,padding_r), both C++ proxies. No exposed external-y parameter.",
+    "training_rate": "Training forward returns estimated bits; this is not a native optimized-latent stream.",
+    "upstream_refinement": "DCVC-DT code imports IntraNoAR/DMC from DCVC-DC, has optimize_latent/forward_enc/forward_dec, requires cvpr2023 checkpoint inputs; not a drop-in UF path.",
+    "conditional_codec": "DCMVC also DCVC-DC based, different architecture/checkpoints. An executable source path is available for future qualification; it was not benchmarked here.",
+    "optimization_determinism": "Pinned DCVC-DT optimize_latent explicitly disables deterministic algorithms; any transplant needs independent native correctness checks."
+  },
+  "decision": "Current batch has no qualified native external-latent entropy transport. Do not launch latent GPU optimization or report estimated-bpp savings.",
+  "latent_gpu_seconds": 0,
+  "next_options": [
+    "Expose and verify latent injection through UF native entropy encoder, preserving fixed decoder/checkpoints.",
+    "Alternatively qualify the DCVC-DC-family method as a separate method while retaining a contemporary neural anchor; audit weights/dependencies before a run."
+  ],
+  "scope": "Static API compatibility findings, not a trained model result or impossibility proof."
+}

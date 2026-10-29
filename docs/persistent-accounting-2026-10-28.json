@@ -1,0 +1,47 @@
+{
+  "scope": "Fixed clean-actual pixels on familiar Al only; no new quality and no universal bound.",
+  "joint_side_equality_ceiling_kbps": 1.6190346380551581,
+  "dynamic_kps_kbps": 3.53,
+  "scenarios": [
+    {
+      "name": "existing delivery",
+      "remaining_side_kbps": 5.607128888888887,
+      "within_joint_equality_ceiling": false,
+      "excess_kbps": 3.988094250833729
+    },
+    {
+      "name": "all static overhead free; dynamic KPS paid",
+      "remaining_side_kbps": 3.53,
+      "within_joint_equality_ceiling": false,
+      "excess_kbps": 1.9109653619448417
+    },
+    {
+      "name": "all side information free (nondeployable diagnostic)",
+      "remaining_side_kbps": 0.0,
+      "within_joint_equality_ceiling": true,
+      "excess_kbps": 0.0
+    }
+  ],
+  "decision": "Static-asset discounts alone cannot rescue these fixed pixels; dynamic transport or prediction must change.",
+  "cache_formula": "effective_bps = ongoing_bps + 8*asset_bytes/lifetime_seconds + refresh_bps",
+  "rules": [
+    "Cold and warm delivery both reported; no arbitrary infinite lifetime.",
+    "Decoded-history reuse does not resend past pixels; startup and identifiers remain paid.",
+    "General preinstalled decoder must transfer to unseen content; content deltas paid.",
+    "Anchors get equal cache/adaptation privileges.",
+    "Viewer-count amortization does not reduce a single receiver download."
+  ],
+  "restoration_audit": {
+    "method": "PnP-VCVE CVPR2025",
+    "code": "https://github.com/ZeldaM1/PnP-VCVE",
+    "source": "https://openaccess.thecvf.com/content/CVPR2025/papers/Zeng_Plug-and-Play_Versatile_Compressed_Video_Enhancement_CVPR_2025_paper.pdf",
+    "available_setup": "H.264 decoded video plus codec-specific motion/partition/quality metadata.",
+    "local_path": "SVT-AV1/dav1d and DCVC-UF; no audited compatible PnP checkpoint or metadata adapter.",
+    "decision": "INPUT-COMPATIBILITY STOP; do not count H.264 checkpoint scores as an AV1 test.",
+    "training_or_inference_run": false
+  },
+  "next": "Measure paid decoded-memory predictors; conditional feature coding and general restoration remain separate follow-ons.",
+  "input_sha256": "e0e67e821a32b91da189d2ce446af9bdb566866364efaf5861192f774d7c6830",
+  "code_sha256": "943ba53aea00853c8dc6ce671af69aa1390dc89aff1c586740b285ebee92ed10",
+  "seconds": 0.0004829578101634979
+}

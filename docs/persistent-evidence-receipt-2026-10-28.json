@@ -1,0 +1,137 @@
+{
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/persistent-prediction-20261028-05c49090/evidence.tar",
+  "sha256": "05c99e3e9af4c15390d10c93670d98829983565ff3c063fbb0e297b60889d8f2",
+  "bytes": 42414080,
+  "members_verified": 32,
+  "mode": "0444",
+  "member_manifest": {
+    "raw/full.tar": {
+      "sha256": "2933ca5bcb82f52b832e20c21db7737acf72103d6905b1d816baacc992fa6554",
+      "bytes": 19589120
+    },
+    "raw/smoke.tar": {
+      "sha256": "889702a0b58658c8a8106900b3bcd9eaa0c6c67bac8aba6395fa90cb7755176a",
+      "bytes": 18718720
+    },
+    "source/frozen-source.tar": {
+      "sha256": "a20c7ca001e5b410b57425af839dfdb6f91d7871a674b5ee06fa7e748026e48b",
+      "bytes": 3696640
+    },
+    "receipts/submission.json": {
+      "sha256": "7742fac10aefd733ef2a868ee648e086f5bb70b5b59c60dc5c60c0279aca9c74",
+      "bytes": 2598
+    },
+    "receipts/wait.json": {
+      "sha256": "4d210bbd13f5a55ae2331a291f499041be79028062054d30cab4dc9c435e175f",
+      "bytes": 566
+    },
+    "receipts/ack.json": {
+      "sha256": "6cf3def43ac5c016b6bcfad7b716f18404b0e6c98005af7192184156501448ed",
+      "bytes": 67
+    },
+    "spec/spec.json": {
+      "sha256": "6cf319e72bd74d241ccba652141f2a3e25fa0c8eef3c5b10688cc488cb0287c5",
+      "bytes": 4416
+    },
+    "native/admission-index.json": {
+      "sha256": "4001036f317951f0dad0b7f70efd51c4ccb52aee62b0af43bac6d26e307ca351",
+      "bytes": 1169
+    },
+    "native/state.json": {
+      "sha256": "e0e17217ec895c68750246be467e489d479bcd9a775d432ccf1a755fc797b971",
+      "bytes": 1740
+    },
+    "native/export-receipt.json": {
+      "sha256": "2562ac45a8da4c6b8566e62777f821a059ce535b204e070d8950b25ae000a4df",
+      "bytes": 2372
+    },
+    "native/smoke/memory-summary.json": {
+      "sha256": "ccf1998f32ff446db898e8683a664fd655325cc6f25964c1277d1867da35979d",
+      "bytes": 10103
+    },
+    "native/smoke/execution.json": {
+      "sha256": "90e733597e56863bc53728c70ec12ba237fe98ca2f823ffc4121d170a3559a55",
+      "bytes": 633
+    },
+    "native/full/staging.json": {
+      "sha256": "38e704bff5c2b1c5beba107316041078edb9edea3e397328e593a1c11bdfdaba",
+      "bytes": 4269
+    },
+    "native/full/memory-summary.json": {
+      "sha256": "50c03a01bae427c08828da15c799984152752d791a7a08b3ed5dc1c48200510d",
+      "bytes": 32981
+    },
+    "native/full/execution.json": {
+      "sha256": "b7b262ca9306501c863b5dfdc2cfa2edc325af025433cfcd9b0d3e449cee2a13",
+      "bytes": 638
+    },
+    "native/run/status.json": {
+      "sha256": "653c21a10b1916b204edcc818674ccaeea69708a5d8fc64b894d8d4825cfccbd",
+      "bytes": 870
+    },
+    "gate/export-receipt.json": {
+      "sha256": "f866c9b924d75fb2fca94d381c4dd607c0210aea37c23fd809ac46b136a316cd",
+      "bytes": 717
+    },
+    "gate/gate.json": {
+      "sha256": "f2e15e44eaf26ea4c7d4afa2fb7c877317fac2b33b8ca754ed68a3ba28800eda",
+      "bytes": 2161
+    },
+    "gate/validation.json": {
+      "sha256": "6a0b10599cf83f5ec47d60220971ffa72f1fea81957fc4b54cd8e3404c193553",
+      "bytes": 650
+    },
+    "review/PLAN.md": {
+      "sha256": "20d71851a254220e6b1c6d61d852b26533cad85792827742abf5a64b4c3b42ee",
+      "bytes": 102803
+    },
+    "review/docs/cards/persistent-prediction.md": {
+      "sha256": "f6397645e24df5e4d9821e267ecbbf0a127b0bf0e00e6d746be4a8ef8d1705ae",
+      "bytes": 4789
+    },
+    "review/docs/experiments/persistent-prediction.md": {
+      "sha256": "34a02d74653f9cf3efe78c5c4c4a6de4fa52c11095eaab0b7bca6f426ad0df57",
+      "bytes": 6607
+    },
+    "review/docs/persistent-prediction-report-2026-10-28.md": {
+      "sha256": "b7cd8dbefe1582fed31641821547e57ede1c327b52d98d357b18eaf7dd703d81",
+      "bytes": 7509
+    },
+    "review/docs/persistent-accounting-2026-10-28.json": {
+      "sha256": "15fd547892f4085e02470ec5f76c714b2b6c4d12ba913e3f7c3abebf6f693731",
+      "bytes": 2352
+    },
+    "review/docs/persistent-memory-audit-2026-10-28.json": {
+      "sha256": "b1b3ff486098fc8158b9cda1e0c323bd904a267860940eb6738ad78d94247e32",
+      "bytes": 87520
+    },
+    "review/docs/persistent-memory-sensitivity-2026-10-28.json": {
+      "sha256": "b3c76d7d1304062c72217f4f1bc8ee6daa031b7c12203857cb8667f656e36c63",
+      "bytes": 8040
+    },
+    "review/experiments/tennis/persistent_memory.py": {
+      "sha256": "729dc10d7c70d88cf84bdc1eef4b3d658dc72cd7a2527460cd675a63b9cc813a",
+      "bytes": 18213
+    },
+    "review/experiments/tennis/persistent_report.py": {
+      "sha256": "5d07cee4935d2626624e7fea648cd0ac643701df7c9818f0e007104db8474bcf",
+      "bytes": 7255
+    },
+    "review/experiments/tennis/persistent_accounting.py": {
+      "sha256": "943ba53aea00853c8dc6ce671af69aa1390dc89aff1c586740b285ebee92ed10",
+      "bytes": 3391
+    },
+    "review/tests/test_persistent_memory.py": {
+      "sha256": "ec1ac711e47ef31253c98329d3afd67441195dc6582c539f28ec1ce1a0a257df",
+      "bytes": 2584
+    },
+    "review/tests/test_dcvc_decode_report.py": {
+      "sha256": "fcb6283d7fd4067e59a4ace05445f58b5e881e57bd947f96e2ad90efb894ea75",
+      "bytes": 2120
+    },
+    "review/src/codecs/dcvc_uf_worker.py": {
+      "sha256": "064e2137f5cd694360b0e4c6eae31df7eaad5c3c57c29e8af73b012b499ee2c7",
+      "bytes": 19898
+    }
+  }
+}

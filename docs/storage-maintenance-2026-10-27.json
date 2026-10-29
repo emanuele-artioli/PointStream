@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-27",
+  "bootstrap_sha256": "39f22ff09e764097ce2c25aa817fb6e00bc5d9cce3f8c0abf30f2f6532085329",
+  "hosts": [
+    {
+      "host": "gpu1",
+      "root_free_bytes": 23703584768,
+      "root_used_bytes": 76000190464,
+      "owned_var_tmp_remaining_bytes": 263647232,
+      "env": {
+        "TMPDIR": "/local/users/emanuele/runtime/tmp",
+        "PYTHONPYCACHEPREFIX": "/local/users/emanuele/runtime/pycache",
+        "PS_LOCAL_ROOT": "/local/users/emanuele/pointstream",
+        "AGENTCTL_RUNTIME": "/local/users/emanuele/runtime/agentctl",
+        "CODEX_INSTALL_DIR": "/local/users/emanuele/runtime/codex-bin",
+        "CODEX_HOME": "/local/users/emanuele/runtime/codex"
+      },
+      "tmp_device": 64515,
+      "root_device": 64513
+    },
+    {
+      "host": "gpu2",
+      "root_free_bytes": 23062970368,
+      "root_used_bytes": 76640804864,
+      "owned_var_tmp_remaining_bytes": 260612096,
+      "env": {
+        "TMPDIR": "/local/users/emanuele/runtime/tmp",
+        "PYTHONPYCACHEPREFIX": "/local/users/emanuele/runtime/pycache",
+        "PS_LOCAL_ROOT": "/local/users/emanuele/pointstream",
+        "AGENTCTL_RUNTIME": "/local/users/emanuele/runtime/agentctl",
+        "CODEX_INSTALL_DIR": "/local/users/emanuele/runtime/codex-bin",
+        "CODEX_HOME": "/local/users/emanuele/runtime/codex"
+      },
+      "tmp_device": 64515,
+      "root_device": 64514
+    },
+    {
+      "host": "gpu3",
+      "root_free_bytes": 21680922624,
+      "root_used_bytes": 78022852608,
+      "owned_var_tmp_remaining_bytes": 629129216,
+      "env": {
+        "TMPDIR": "/local/users/emanuele/runtime/tmp",
+        "PYTHONPYCACHEPREFIX": "/local/users/emanuele/runtime/pycache",
+        "PS_LOCAL_ROOT": "/local/users/emanuele/pointstream",
+        "AGENTCTL_RUNTIME": "/local/users/emanuele/runtime/agentctl",
+        "CODEX_INSTALL_DIR": "/local/users/emanuele/runtime/codex-bin",
+        "CODEX_HOME": "/local/users/emanuele/runtime/codex"
+      },
+      "tmp_device": 64513,
+      "root_device": 64512
+    },
+    {
+      "host": "gpu4",
+      "root_free_bytes": 38258266112,
+      "root_used_bytes": 61445509120,
+      "owned_var_tmp_remaining_bytes": 261025792,
+      "env": {
+        "TMPDIR": "/local/users/emanuele/runtime/tmp",
+        "PYTHONPYCACHEPREFIX": "/local/users/emanuele/runtime/pycache",
+        "PS_LOCAL_ROOT": "/local/users/emanuele/pointstream",
+        "AGENTCTL_RUNTIME": "/local/users/emanuele/runtime/agentctl",
+        "CODEX_INSTALL_DIR": "/local/users/emanuele/runtime/codex-bin",
+        "CODEX_HOME": "/local/users/emanuele/runtime/codex"
+      },
+      "tmp_device": 64513,
+      "root_device": 64512
+    },
+    {
+      "host": "gpu5",
+      "root_free_bytes": 26718273536,
+      "root_used_bytes": 72985501696,
+      "owned_var_tmp_remaining_bytes": 558374912,
+      "env": {
+        "TMPDIR": "/local/users/emanuele/runtime/tmp",
+        "PYTHONPYCACHEPREFIX": "/local/users/emanuele/runtime/pycache",
+        "PS_LOCAL_ROOT": "/local/users/emanuele/pointstream",
+        "AGENTCTL_RUNTIME": "/local/users/emanuele/runtime/agentctl",
+        "CODEX_INSTALL_DIR": "/local/users/emanuele/runtime/codex-bin",
+        "CODEX_HOME": "/local/users/emanuele/runtime/codex"
+      },
+      "tmp_device": 64513,
+      "root_device": 64512
+    },
+    {
+      "host": "gpu6",
+      "root_free_bytes": 33396711424,
+      "root_used_bytes": 66307063808,
+      "owned_var_tmp_remaining_bytes": 558473216,
+      "env": {
+        "TMPDIR": "/local/users/emanuele/runtime/tmp",
+        "PYTHONPYCACHEPREFIX": "/local/users/emanuele/runtime/pycache",
+        "PS_LOCAL_ROOT": "/local/users/emanuele/pointstream",
+        "AGENTCTL_RUNTIME": "/local/users/emanuele/runtime/agentctl",
+        "CODEX_INSTALL_DIR": "/local/users/emanuele/runtime/codex-bin",
+        "CODEX_HOME": "/local/users/emanuele/runtime/codex"
+      },
+      "tmp_device": 64514,
+      "root_device": 64513
+    }
+  ],
+  "migration_script_sha256": "604602db2d210c3c469da02da5a561e8d0cb0f3f0a9c119cee4b8dab838b4b3d",
+  "live_path_switch_script_sha256": "3594322cb3da67610360727d61815a8429de7b68b1c36c42f600ce68d939c80e",
+  "live_path_switch_rejected_hosts": [
+    "gpu5",
+    "gpu6"
+  ]
+}

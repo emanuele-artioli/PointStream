@@ -1,0 +1,43 @@
+{
+  "prepared_sha256": "56f54ccdc9db75ce98796597d2f2de0c849ad8041ab57c2def28dc5a4cd25ae0",
+  "golden_sha256": "85f6ae06d641e8be73804d9d6428ee8f7b386cc64326082fb5f0e9b0f7f04568",
+  "prior_sha256": "e346844d20671e5dfd78828ec61d262aa13109bc1be9a1b421873facdc86daa1",
+  "scope": "CPU pixel/rate/decision audit; no neural re-judging.",
+  "preparation_passed": true,
+  "frame_count": 80,
+  "golden_rgb_checks": 240,
+  "old_overlay_replays": 80,
+  "original_R_replays": 80,
+  "new_base_bytes": 19659,
+  "base_kbps": 16.3825,
+  "side_kbps": 5.607128888888889,
+  "total_kbps": 21.989628888888888,
+  "anchor": {
+    "lpips": 0.24053159818214379,
+    "dists": 0.16833605570545862
+  },
+  "anchor_covered": true,
+  "quality_passed": true,
+  "result_sha256": "eea7147698b036c9182cee3ec635a57361854b049967febc753b03e979fc1ab5",
+  "verdict": "MIXED/UNRESOLVED",
+  "means": {
+    "lpips": [
+      0.2825729174201871,
+      0.2757866112979842,
+      0.27403906852816357,
+      0.2688483820785711
+    ],
+    "dists": [
+      0.1926841489970684,
+      0.1696124367415905,
+      0.1688237339258194,
+      0.1668904699385166
+    ]
+  },
+  "max_control_error": {
+    "lpips": 0.0,
+    "dists": 0.0
+  },
+  "new_pixel_reconstructions": 160,
+  "audit_code_sha256": "37c6f1ce1c05afc71c863c8628dad7052d2e8f7fe5ce4c16c0a3ecd6d3c2eee8"
+}

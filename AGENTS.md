@@ -3,7 +3,7 @@
 PointStream is an object-centric semantic video codec. It splits a video into
 foreground (what the viewer watches) and background, and encodes each with the
 best tool for it. The paper targets racket sports and egocentric hand-object
-video. The submission venue and date are not yet set. Report searches
+video. The target submission venue is ACM TOMM; the submission date is not yet set. Report searches
 transparently, including negative results, and scope claims to the evidence.
 
 Read [README.md](README.md) for the layout, [PLAN.md](PLAN.md) for the order of
@@ -40,16 +40,28 @@ placeholders, a smoke of at most 600 s, a validator with substantive checks,
 sha256-identified inputs, a deadline and a budget. Check existing jobs and all
 eligible hosts before submitting to the compatible host pool. Uncertain
 submissions are inspected, never replayed; cancel only your own jobs. GPU hosts
-are gpu1–gpu6. Wait on fleet jobs only with `scripts/ps-fleet wait` (returns within 45
-minutes); summarize progress to the user at every return.
+are gpu1–gpu6. Wait on fleet jobs only with `scripts/ps-fleet wait` (at most 45
+minutes). Prefer verified completion-triggered wakeups. Do not create recurring
+LLM polling or cache keepalives; when completion wakeups are unavailable, use
+one bounded deadline check as described in [docs/fleet.md](docs/fleet.md).
+Notify only meaningful changes; persist state before waiting (user, 2026-10-24).
 
 ## Shared home is slow NFS
+
+The GPU servers' root disks are only 100 GB. Never place datasets, extracted
+archives, environments, editor servers, Python caches or experiment scratch in
+`/tmp` or `/var/tmp`. Use `/local/users/emanuele` (provisioned on every GPU
+server, 2026-10-27), with `PS_LOCAL_ROOT=/local/users/emanuele/pointstream`,
+or budgeted `/dev/shm`. Set `TMPDIR`, `TMP`, `TEMP` and Python cache locations
+there for manual tools too. Verify the destination is a separate filesystem
+and has space before copying. Preserve live processes, saved evidence and
+legacy paths when relocating files; never remove another user's files.
 
 ~200 ms per small-file create, 11–17 ms per open, minutes for a cold
 `import torch`. Never do per-file work on it. In fleet jobs, write intermediates
 to `PS_SCRATCH_DIR`, pass large or many-file inputs as SHA256-identified archives
 in `staged_inputs`, and run from a packed `environment`. Outside the fleet, keep
-caches and scratch in `/tmp` or `/dev/shm`. Datasets of many small files are
+caches and scratch in `/local/users/emanuele` or budgeted `/dev/shm`. Datasets of many small files are
 stored and moved as archives.
 
 ## First run of a model on a GPU class
@@ -121,12 +133,17 @@ python -m pytest
 
 Pass no paths to ruff or mypy: paths replace the configured file sets.
 
-Codex subagents use `gpt-6.1-sol` at `medium` reasoning effort (user,
-2026-10-16; Codex's own default) unless the task says otherwise.
+Codex subagents use `gpt-6-luna` at `max` reasoning effort (user,
+2026-10-28). Give them extremely precise, simple tasks, typically launching
+one frozen fleet job and reporting its results. The primary agent owns
+experiment design, implementation review and scientific decisions; do not
+delegate open-ended research or substantial implementation to Luna.
+
 Claude Code subagents come in three tiers in `.claude/agents/`
 (`opus-designer`, `sonnet-builder`, `haiku-runner`); when to delegate, and
 when it costs more than it saves, is in
-[sessions](docs/sessions.md#subagents-inside-a-session).
+[sessions](docs/sessions.md#subagents-inside-a-session). The primary agent
+still owns scientific decisions: subagents return recommendations.
 
 ## Deciding and asking
 
@@ -163,7 +180,7 @@ a good moment to `/compact` and give a one-line focus
 
 Compact instructions: keep verbatim the card's goal, scope and stop
 conditions; every fleet job ID with its state; GPU-hours spent of the budget;
-the decision rule's result so far; the root session's address; open questions
+the decision rule's result so far; the report address, if any; open questions
 for the user. Drop logs, file dumps, wait output and dead ends already
 recorded in files.
 

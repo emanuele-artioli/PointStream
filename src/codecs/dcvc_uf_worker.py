@@ -134,18 +134,28 @@ def _load_state(path: str, expected_sha256: str) -> tuple[dict[str, Any], dict[s
     return checkpoint, {"path": path, "sha256": actual, "bytes": len(data), "keys": len(checkpoint)}
 
 
+def set_stream_policy(policy: str) -> None:
+    import torch
+
+    if policy not in ("legacy", "default"):
+        raise ValueError("Unknown CUDA stream policy")
+    stream = torch.cuda.Stream("cuda:0", 0) if policy == "legacy" else torch.cuda.default_stream("cuda:0")
+    torch.cuda.set_stream(stream)
+
+
 def _build(plan: dict[str, Any]) -> tuple[Any, Any, int, dict[str, Any]]:
     import torch
     from src.models.image_model import DMCI
     from src.utils.common import ModelStructure, set_torch_env
 
     set_torch_env()
-    torch.cuda.set_stream(torch.cuda.Stream("cuda:0", 0))
+    stream_policy = plan.get("stream_policy", "legacy")
+    set_stream_policy(stream_policy)
 
     def finalize(net: Any) -> Any:  # test_video.finalize_model
         return net.half().to("cuda:0").to(memory_format=torch.channels_last)
 
-    loaded: dict[str, Any] = {"strict_load": True, "precision": "float16"}
+    loaded: dict[str, Any] = {"strict_load": True, "precision": "float16", "stream_policy": stream_policy}
     i_state, loaded["image"] = _load_state(plan["image_ckpt"], plan["image_sha256"])
     i_net = DMCI().eval()
     i_net.load_state_dict(i_state, strict=True)
@@ -397,10 +407,10 @@ def decode(plan: dict[str, Any]) -> dict[str, Any]:
                 for offset, display_index in enumerate(nal_frames):
                     frame = recon[offset] if isinstance(recon, list) else recon
                     if out_file is not None:
-                        data = _to_yuv420_bytes(frame, sps["height"], sps["width"])
-                        hashes.append(_sha256(data))
+                        frame_bytes = _to_yuv420_bytes(frame, sps["height"], sps["width"])
+                        hashes.append(_sha256(frame_bytes))
                         if repeat == 0:
-                            out_file.write(data)
+                            out_file.write(frame_bytes)
                         continue
                     pixels = np.ascontiguousarray(_to_rgb_uint8(frame, sps["height"], sps["width"]))
                     hashes.append(_sha256(pixels.tobytes()))

@@ -1,0 +1,135 @@
+{
+  "integrity_passed": true,
+  "checks": {
+    "cohort": true,
+    "legacy:encode:report_identity": true,
+    "legacy:decode:report_identity": true,
+    "legacy:fresh-decode:report_identity": true,
+    "legacy:container": true,
+    "legacy:container_hashes": true,
+    "legacy:pixel_bytes": true,
+    "legacy:fresh_bytes_equal": true,
+    "legacy:four_passes": true,
+    "legacy:encoder_intra": true
+  },
+  "rows": [
+    {
+      "policy": "legacy",
+      "native_commands_completed": true,
+      "frames": 24,
+      "container_sha256": "9b71e5573aaceceb2b5c21589bf19715b61203bc6dc88dede13dcef35db588cd",
+      "container_bytes": 12456,
+      "decoded_yuv_sha256": "cea4917492968dc4a6958757da671f8e329ab8749414df16c8e13bf1f7ee90e3",
+      "four_passes_equal": true,
+      "encoder_intra_equal": true,
+      "environment": {
+        "capability": [
+          8,
+          6
+        ],
+        "cuda_visible_devices": "GPU-6f70a27e-4171-22d7-3ffd-647e7f186a49",
+        "cwd": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/DCVC",
+        "device_name": "NVIDIA RTX A6000",
+        "extension": {
+          "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/dcvc-extensions/sm80/inference_extensions_cuda.cpython-312-x86_64-linux-gnu.so",
+          "sha256": "41c62ea6f87540dafec358c51582d5f97092140d82159c7cd640fc2250bee949",
+          "variant": "sm80"
+        },
+        "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+        "torch": "2.10.0+cu128",
+        "torch_cuda": "12.8"
+      },
+      "checkpoints": {
+        "image": {
+          "bytes": 168845375,
+          "keys": 398,
+          "path": "/local/users/emanuele/pointstream/cache/b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302/cvpr2026_image.pth.tar",
+          "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+        },
+        "precision": "float16",
+        "stream_policy": "legacy",
+        "strict_load": true,
+        "video": {
+          "bytes": 482470963,
+          "keys": 962,
+          "path": "/local/users/emanuele/pointstream/cache/934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3/cvpr2026_video_htl.pth.tar",
+          "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+        }
+      }
+    }
+  ],
+  "frames": 24,
+  "publication_sha256": "8a9a40c5254570855849283a59b9e3c02a14f813e1272cd37a2fbf58a229c98b",
+  "native_summary": {
+    "frames": 24,
+    "source_yuv_sha256": "e7b960cd2456b439c5439b337a45e47d2a0a44a2a32025a2de595af3feed4fa2",
+    "rows": [
+      {
+        "policy": "legacy",
+        "checks": {
+          "all_native_commands": true,
+          "container": true,
+          "frame_count": true,
+          "two_pass": true,
+          "fresh_process": true,
+          "intra": true,
+          "bytes_equal": true,
+          "memory": true,
+          "declared_policy": true,
+          "gpu": true
+        },
+        "passed": true,
+        "native_seconds": 2.294,
+        "fixed_seconds": 33.5881214735508,
+        "errors": [],
+        "commands": [
+          [
+            "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+            "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261028T192649Z-867e69f2/source/src/codecs/dcvc_uf_worker.py",
+            "encode",
+            "--plan",
+            "/local/users/emanuele/pointstream/scratch/20261028T192649Z-867e69f2-full/publish/legacy/encode-plan.json",
+            "--report",
+            "/local/users/emanuele/pointstream/scratch/20261028T192649Z-867e69f2-full/publish/legacy/encode.json"
+          ],
+          [
+            "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+            "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261028T192649Z-867e69f2/source/src/codecs/dcvc_uf_worker.py",
+            "decode",
+            "--plan",
+            "/local/users/emanuele/pointstream/scratch/20261028T192649Z-867e69f2-full/publish/legacy/decode-plan.json",
+            "--report",
+            "/local/users/emanuele/pointstream/scratch/20261028T192649Z-867e69f2-full/publish/legacy/decode.json"
+          ],
+          [
+            "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+            "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261028T192649Z-867e69f2/source/src/codecs/dcvc_uf_worker.py",
+            "decode",
+            "--plan",
+            "/local/users/emanuele/pointstream/scratch/20261028T192649Z-867e69f2-full/publish/legacy/fresh-decode-plan.json",
+            "--report",
+            "/local/users/emanuele/pointstream/scratch/20261028T192649Z-867e69f2-full/publish/legacy/fresh-decode.json"
+          ]
+        ],
+        "reports_sha256": {
+          "encode": "e2a2da1f6c9f6767e908a994609242495b5d57173e86c208f3924569601680c2",
+          "decode": "a3ac02f570cd4424bd7f1d4b2a3761c4981daff6b23fe69630cb6bf89edb2f9a",
+          "fresh-decode": "19fd3269f9b6d613bb00ff67a0d079f541514f1fcbe4f706c1f7962b6d0e3488"
+        }
+      }
+    ],
+    "legacy_only": true,
+    "legacy_passed": true,
+    "default_passed": null,
+    "seconds": 46.293331232853234,
+    "scope": "Fresh encoding on same claimed A6000; no stored-stream decode or quality evidence.",
+    "inputs": {
+      "source": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+      "image_ckpt": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302",
+      "video_ckpt": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+    },
+    "timing_secondary": true
+  },
+  "stored_bitstream_decoded_again": false,
+  "scope": "Saved report/pixel integrity only. A successful fresh reproduction does not resolve historical nondeterminism or establish cross-device decoding."
+}

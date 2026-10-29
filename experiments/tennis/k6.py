@@ -89,6 +89,15 @@ DECISION: dict[str, Any] = {
 }
 
 
+def anchor_batches(rough_first: bool) -> tuple[tuple[tuple[str, int, int], ...], ...]:
+    """Schedule the frozen three-point rough set before the remaining K6 points."""
+    if not rough_first:
+        return (ANCHORS,)
+    initial = (("svt", 48, 1), ("svt", 63, 4), ("svt", 63, 8),
+               ("dcvc", 0, 1), ("dcvc", 0, 2), ("dcvc", 0, 4))
+    return initial, tuple(a for a in ANCHORS if a not in initial)
+
+
 def code_name(c: tuple[int, str, int]) -> str:
     return f"q{c[0]}-{c[1]}-e{c[2]}"
 
@@ -567,17 +576,18 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
     scored_r[scored] = union[scored]
     parts = np.stack([f["labels"] for f in per_frame])
 
-    svt_jobs: dict[str, Future[dict[str, Any]]] = {}
-    for i, a in enumerate([a for a in ANCHORS if a[0] == "svt"]):
-        svt_jobs[anchor_name(a)] = pool.submit(code_svt, args, yuv, frames, fps, a[1], a[2], scored_r,
-                                               parts if a[2] == 1 else None, work / anchor_name(a), cpu_sets[i % len(cpu_sets)])
     timing["pose"] = round(time.time() - began, 1)
     anchors: dict[str, dict[str, Any]] = {}
-    for a in [a for a in ANCHORS if a[0] == "dcvc"]:
-        anchors[anchor_name(a)] = code_dcvc(args, yuv, frames, a[1], a[2], scored_r, work / anchor_name(a))
-    for a in ANCHORS:
-        if a[0] == "svt":
+    for batch_index, batch in enumerate(anchor_batches(getattr(args, "rough_anchors_first", False))):
+        svt_jobs: dict[str, Future[dict[str, Any]]] = {}
+        for i, a in enumerate(a for a in batch if a[0] == "svt"):
+            svt_jobs[anchor_name(a)] = pool.submit(code_svt, args, yuv, frames, fps, a[1], a[2], scored_r,
+                          parts if a[2] == 1 else None, work / anchor_name(a), cpu_sets[i % len(cpu_sets)])
+        for a in (a for a in batch if a[0] == "dcvc"):
+            anchors[anchor_name(a)] = code_dcvc(args, yuv, frames, a[1], a[2], scored_r, work / anchor_name(a))
+        for a in (a for a in batch if a[0] == "svt"):
             anchors[anchor_name(a)] = svt_jobs[anchor_name(a)].result()
+        print(f"phase=anchor_batch window={wid} batch={batch_index} points={len(batch)}", flush=True)
     timing["anchors"] = round(time.time() - began, 1)
     decodes = {}
     for name, rec in anchors.items():
@@ -606,6 +616,7 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
     outline: list[dict[str, Any]] = []
     references: dict[str, dict[str, int | None]] = {v: {} for v in oracle_names if v.startswith("ref")}
     identity_max_diff = None
+    scoring_masks: dict[str, dict[str, str]] = {}
     judged = [t for t in scored if t % JUDGE_EVERY == 0]
     review_at = set(review_frames(wid, judged))
     timing["prepare"] = round(time.time() - began, 1)
@@ -656,6 +667,8 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
             if mask_id.any():
                 identity_max_diff = int(np.abs(canvas[mask_id].astype(int) - truth_t[mask_id].astype(int)).max())
         s_t = r_t | drawn_all
+        scoring_masks[str(t)] = {"r": hashlib.sha256(np.packbits(r_t).tobytes()).hexdigest(),
+                                 "s": hashlib.sha256(np.packbits(s_t).tobytes()).hexdigest()}
         racket_t = per_frame[t]["racket"]
         outs = []
         for name in names[:len(ANCHORS)]:
@@ -701,7 +714,7 @@ def process_window(args: argparse.Namespace, entry: dict[str, Any], source: Path
         "id": wid, "k4_window": entry.get("k4_window"), "match": wid.split("/")[0], "fps": w["fps"], "frames": frames,
         "start": w["start"], "convert": converted, "players": players, "court": chosen["court"],
         "median_height": median_height, "scored": scored, "judged": judged, "scored_registered": scored_all,
-        "scored_seconds": seconds, "timing": timing,
+        "scored_seconds": seconds, "timing": timing, "scoring_masks": scoring_masks,
         "variants": names, "identity_max_diff": identity_max_diff,
         "anchors": {k: {**{x: v for x, v in rec.items() if x != "decoded"}, "kbps_r": rec["region_bits"] / seconds / 1000 if seconds and rec["region_bits"] is not None else None,
                         "kbps": 8 * rec["payload_bytes"] / (frames / float(fps)) / 1000}
@@ -753,7 +766,7 @@ def command_run(args: argparse.Namespace) -> int:
     def checkpoint(complete: bool) -> None:
         """Every finished window is published at once (the summary and the archive), so a stop keeps them."""
         summary = {"stage": os.environ.get("PS_STAGE"), "requested": args.windows, "configured_windows": int(args.max_windows),
-                   "frames_argument": int(args.frames), "windows": rows, "decision": DECISION, "codes": [list(c) for c in CODES],
+                   "frames_argument": int(args.frames), "rough_anchors_first": getattr(args, "rough_anchors_first", False), "windows": rows, "decision": DECISION, "codes": [list(c) for c in CODES],
                    "inputs_sha256": file_sha256(Path(args.inputs) / "inputs.json"), "window_records": {w: args_entry
                    for w, args_entry in ((w, {k: v for k, v in inputs["windows"][w].items() if k != "fits"}) for w in chosen)},
                    "tools": {"svt-av1": svtav1.tool(args.encoder), "dav1d": svtav1.tool(args.decoder), "ffmpeg": svtav1.tool(args.ffmpeg),
@@ -869,6 +882,7 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--max-windows", type=int, required=True, help="0 runs every listed window")
     run.add_argument("--windows", nargs="+", required=True)
     run.add_argument("--sources", nargs="+", required=True)
+    run.add_argument("--rough-anchors-first", action="store_true", help="schedule three fixed points/codec before all remaining K6 points")
     run.add_argument("--encoder", default="SvtAv1EncApp")
     run.add_argument("--decoder", default="dav1d")
     run.add_argument("--ffmpeg", default="ffmpeg")

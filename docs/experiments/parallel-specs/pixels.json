@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "device": "gpu",
+  "hosts": [
+    "gpu2",
+    "gpu3"
+  ],
+  "gpu_models": [
+    "RTX A6000"
+  ],
+  "cpu_threads": 4,
+  "environment": {
+    "path": "/home/itec/emanuele/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Saved-pixel evaluation is independent of contention timing; recorded wall time is cost only.",
+    "margin_mib": 8192
+  },
+  "contention": {
+    "policy": "continue",
+    "basis": "Identical saved inputs and deterministic scoring do not depend on foreign workload timing.",
+    "resume_attempts": 0
+  },
+  "verify_staged_inputs": true,
+  "gpu_memory_mib": 5000,
+  "local_storage_gib": 16,
+  "required_commands": [],
+  "stall_seconds": 650,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.parallel_pixels"
+  ],
+  "arguments": [
+    "--al",
+    "{staged:al}",
+    "--med",
+    "{staged:med}",
+    "--transport",
+    "{staged:transport}",
+    "--prior",
+    "{staged:prior}",
+    "--images",
+    "{staged:images}",
+    "--lpips",
+    "{staged:lpips}",
+    "--dists",
+    "{staged:dists}",
+    "--frames",
+    "{frames}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "al",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+      "extract": false
+    },
+    {
+      "name": "med",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/medvedev_struff__014.mp4",
+      "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be",
+      "extract": false
+    },
+    {
+      "name": "transport",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261025T082944Z-29f021a5/full/published.tar",
+      "sha256": "6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7",
+      "extract": false
+    },
+    {
+      "name": "prior",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T211451Z-f6a754eb/full/published.tar",
+      "sha256": "e346844d20671e5dfd78828ec61d262aa13109bc1be9a1b421873facdc86daa1",
+      "extract": false
+    },
+    {
+      "name": "images",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-ideal-player-input-20261028/input.tar",
+      "sha256": "468250a72a1ce764e9451fc7b4cd51bd29372d3e688b832e1e9c1f002e11bc6c",
+      "extract": false
+    },
+    {
+      "name": "lpips",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "extract": false
+    },
+    {
+      "name": "dists",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/medvedev_struff__014.mp4",
+      "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261025T082944Z-29f021a5/full/published.tar",
+      "sha256": "6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T211451Z-f6a754eb/full/published.tar",
+      "sha256": "e346844d20671e5dfd78828ec61d262aa13109bc1be9a1b421873facdc86daa1"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-ideal-player-input-20261028/input.tar",
+      "sha256": "468250a72a1ce764e9451fc7b4cd51bd29372d3e688b832e1e9c1f002e11bc6c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    }
+  ],
+  "scale": {
+    "frames": {
+      "smoke": 24,
+      "full": 240
+    }
+  },
+  "smoke": {
+    "seconds": 350,
+    "representative_basis": "Same frozen native240source/hash conversion, 24nativeframes and all three policy points on same real encoder/decoder/metric path; source RGB and saved neural controls, native double decode, byte accounting, actual memory and setup-separated full-cost projection with35%margin. Timing variation secondary."
+  },
+  "full": {
+    "seconds": 1800
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.parallel_pixels",
+    "--validate"
+  ],
+  "validator_seconds": 100,
+  "budget_seconds": 2700,
+  "deadline": "2026-10-28T16:00:00+00:00"
+}

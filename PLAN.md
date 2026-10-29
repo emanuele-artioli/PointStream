@@ -21,20 +21,182 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-10-22)
+## Where PointStream stands (2026-10-28)
+
+**Single-stream search CLOSED/REPORTED (user approved, 2026-10-28):** run aligned
+decoder-only temporal restoration, a CPU audit of conditional coding/latent
+refinement, and native DCVC stream diagnosis in parallel. See
+[card](docs/cards/single-stream-search.md) and
+[live record](docs/experiments/single-stream-search.md). New independent ceiling
+3600GPU-s/3600CPU-s: restoration1800, diagnosis600, latent refinement1200 only
+after compatibility AND deterministic-decoding gates. No transfer of old
+unspent balances. Native decoding diagnosis must re-encode in its own job;
+stored DCVC streams are NOT portable even between otherwise qualified GPUs.
+No full training run. No automatic retry after a failed gate. Luna/max delegates
+receive exact frozen launch/report commands; root owns design and review.
+Read the [completed report](docs/single-stream-report-2026-10-28.md).
+Restoration20261028T191318Z-b4727331 COMPLETE: tiny foreground curve gains,
+whole/background losses at all strengths, no robust two-metric whole win.
+CPUaudit20261028T190840Z-eb011d4b COMPLETE: training gradients exist, but no
+native external-latent transport is exposed; refinement0/1200GPU-s.
+Initial diagnosis20261028T190838Z-3dea4d74 rejects unsupported default CUDA
+stream before encoding. Supported completion20261028T192649Z-867e69f2 COMPLETE:
+legacy24-frame native reproduction passes on gpu3, no fix/reliability claim.
+Conservative aggregate1300/3600GPU-s, dedicatedCPU1120/3600s, all processes
+and waits terminal. No further request or training follows these finite results.
+
+
+**Persistent prediction search CLOSED/REPORTED (user approved, 2026-10-28):** investigate
+representation, coding and deployment accounting jointly. Read the
+[research direction and bounded test contract](docs/cards/persistent-prediction.md)
+and [live record](docs/experiments/persistent-prediction.md) before dispatching.
+New independent ceiling: 3600 GPU-seconds and 3600 CPU-seconds, including failed
+attempts, validation and overhead; old closed balances are not transferred.
+First audit installed models, cached assets and decoded-history reuse against
+saved quality. Then test paid long/short reference prediction and object-aligned
+decoded history with actual corrections, on familiar development footage only.
+General codec-aware restoration and conditional feature coding are separate
+follow-ons: audit compatibility and useful headroom before training. No model
+or asset becomes free merely by sending it earlier. Report cold, warm and
+amortized costs, asset lifetime and refreshes; give anchors the same privileges.
+Generic frozen models need cross-content evidence; content-specific updates,
+geometry, selection and residuals remain paid. A ball-only win is insufficient:
+report foreground, background and whole-frame quality beside complete rates.
+Do not rebrand historical granted-matte/render results as delivered codec wins.
+Job20261028T181634Z-05c49090 COMPLETE, one request/no retry, conservative
+600/3600GPU-s and120/3600CPU-s. Read the
+[result report](docs/persistent-prediction-report-2026-10-28.md): both native
+memory/correction families lose foreground/background/whole-frame metrics to
+the restricted SVT grid, even with cached initial reference. No baseline win.
+Static discounts do not rescue old rendered pixels; a cached-reference plus
+free-correction relaxation shows headroom but requires roughly77–79% cheaper
+corrections at fixed quality. Conditional feature coding remains untested;
+general restoration stops at H.264/AV1 input compatibility. No training follows
+automatically. Decoder report hash shadowing fixed, pixel nondeterminism unresolved.
+
+
+**Parallel development batch CLOSED/REPORTED (2026-10-28):** human authorized
+three concurrent GPU diagnostics plus CPU gap/accounting. New separate cap
+7200 GPU-s (temporal background2700, paid pixel corrections2700,
+DCVC/ROI baselines1800) and3600CPU-s. Charged2400/7200GPU-s,4800unused;
+CPUanalysis charged120/3600s conservatively. The old2980/3600ledger remains closed.
+Read [batch card](docs/cards/parallel-development-2026-10-28.md) and
+[live batch record](docs/experiments/parallel-development.md) for exact frozen
+settings, IDs and outcomes. All five requests terminal, no claims/processes/timer.
+No old job restarted. No training/generation. Read the
+[consolidated report](docs/parallel-development-report-2026-10-28.md): motion
+improves static background but LPIPS BD-rate+230.28% on overlap; pixel full
+Al/Med points beyond measured anchor coverage; DCVC native decode failure,
+SVT independent cost stop with no full evaluation. No validated baseline win.
+Background covered Al; pixels covered both development windows. Untouched confirmation
+and TOMM readiness are not established. Future delegated job launch/report tasks
+use GPT-6 Luna at max effort with precise narrow instructions (user,2026-10-28);
+root owns experiment design/review/decisions.
 
 The root session keeps this section and the dispatch ledger below; item
 sessions update their own items and their files in `docs/experiments/`
 ([sessions](docs/sessions.md)).
 
-- **Protocol (2026-10-22):** two tracks, fidelity and experience. Every
-  verdict so far is on fidelity; J re-judges the queued results on
-  experience.
+### Resume here after the root chat is archived
+
+Read [the 2026-10-27 continuation](docs/continuation-2026-10-27.md) first. It
+contains the current scientific stop, exact job/artifact identities, remaining
+budget, storage state and the next decision. The existing study chat is
+`01a16e7a-e752-78f3-b372-c338d8cdbf46` ("Prepare tennis confirmation study");
+its code and reports are merged. It is idle. Do not create duplicate studies or
+restart any terminal job. Pace active sessions to conserve tokens; do not launch
+several reasoning turns automatically. All resumed requests are terminal; no research job or recurring model monitor
+is running. Read the current ledger below before taking action.
+
+**Current scientific position:** no complete PointStream win over both required
+baselines has been established. The fixed player-overlay recipe now has an
+[audited real-base negative result](docs/k6b-real-base-quality-report-2026-10-27.md).
+At equal total rate on Al031@129, full LPIPS/DISTS lose (+31.25%/+17.33% BD-rate),
+although fixed-foreground quality wins. Both full cells lose robustly, making
+registered >=3/4 impossible. The prescribed early stop leaves Med actual-base
+metrics UNSCORED, not losses. Historical granted-background4/4 results do not
+transfer into a whole-frame paid-base win. Only80/240saved ticks were evaluated;
+these are familiar development windows, not untouched confirmation.
+
+**Study closed:** final job20261027T211451Z-f6a754eb is COMPLETE with a valid
+scientific early stop. Independent score/rate audit passed55checks, and CPU
+replay matched all240hybrids/480image hashes. Both control windows completed
+all80ticks. The registered recipe cost2350GPU-s; including the follow-up diagnostics below,
+the shared ceiling ledger is now **2980/3600GPU-s**, **620s unspent**.
+All waits ended and events were acknowledged. No new GPU request is authorized
+by this result; do not complete receiver serialization or try another generator
+to evade the failed rule. Source01888c76/spec33474777 remain immutable.
+
+**Ideal-player full evaluation COMPLETE — finite NO-GO:** user-directed
+job20261028T080453Z-34e50ec2 scored all80Al ticks after making timing
+variation secondary. Controls exact; CPU audit400images/160oracle compositions
+passes. Even source pixels inside R lose full LPIPS0.270927 vs SVT0.234057
+and DISTS0.167818 vs0.164586 at same total22.737962kbps, robust+/-0.001.
+The other fixed support also loses both. Do not fund an appearance-only
+renderer at this point without a new dominating background/rate bound.
+That stage closed at2730/3600GPU-s; the later diagnostic below updates the ledger. Read
+[the full report](docs/k6b-ideal-player-full-report-2026-10-28.md); no active job.
+
+**CPU follow-up COMPLETE (2026-10-28):** fixed-pixel rate inversion finds
+only0.668734kbps robust total-side allowance for the actual scale4 overlay,
+or1.230365kbps even with source pixels inside R. Current KPS3.53 and other
+side2.077129 each exceed the latter. Three lossless wrappers all grow KPS.
+Read [the feasibility report](docs/k6b-side-feasibility-report-2026-10-28.md).
+The subsequent paid clean-background test is complete below.
+
+**Paid clean-background full evaluation COMPLETE — two-metric gate FAILED:**
+CPU preparation20261028T091736Z-bf9f97d2 and single GPU request
+20261028T100153Z-27f39d64 completed. The same request's first publication was
+recovered after a transfer timeout/usage interruption; no replacement or retry.
+All80Al ticks scored, original source/score controls exact; independent audit
+passes240goldenRGB checks/160new pixel reconstructions and raw rate/decision.
+Complete base saves898bytes (20557to19659), total21.989629kbps. Source-pixel
+oracle LPIPS0.268848 loses to SVT0.240532, while DISTS0.166890 beats0.168336.
+Formal MIXED/UNRESOLVED; neither new policy wins both by>0.001. Close this
+fixed construction, not arbitrary future backgrounds/renderers. Read
+[the full report](docs/k6b-paid-clean-background-report-2026-10-28.md).
+New250GPU-s charge; global **2980/3600GPU-s**, **620s unused**. Native jobs/
+waits ended, events acknowledged, own PIDs gone; no more GPU authority or timer.
+DCVC, fair pixel ROI, complete wire and untouched evaluation remain missing;
+no complete baseline win or TOMM readiness is established.
+
+**Infrastructure:** large inactive `/var/tmp` files were relocated to separate
+host-local `/local/users/emanuele` storage on all six hosts, retaining NFS as
+source of truth. The shared shell defaults are active and verified. Live
+application originals remain intentionally protected. Fleet manager safeguards now run on gpu2/gpu3 after the
+verified scoped refresh; the other four workers remain unchanged. See [storage closure](docs/storage-maintenance-2026-10-27.md).
+The detailed historical findings follow; they do not supersede this resume state.
+
+### Historical findings and completed components
+
+- **Protocol (2026-10-22):** two tracks, fidelity and experience. J
+  (2026-10-22) re-judged the queued results on experience: H3e, FoundHand
+  and K6 `ref` fail, H3a/H3a2 were not re-judged (outputs not kept). The
+  binding check is time: objects driven by coded keypoints change 1.3–6 ×
+  as much as the source between frames, and K1f's bound (`warp`) fails it
+  too. J's jitter follow-up (2026-10-22, PR #218): smoothing the coded
+  keypoints at the decoder (σ = 1, 2, 4 frames) does not make the bound
+  pass, and neither do smoothed *uncoded* keypoints (2.6–2.9 × the
+  source's change against 1.25). Either the estimator's per-frame noise
+  (1.32% of the box, against the source's own motion of 2.24%) or K1c's
+  compositing (Telea fill, drawn outline) causes it. An identity warp
+  would separate the two (≤ 0.3 GPU-hours; open for the user).
 - **Hands, keypoints (K1f, K6b):** the bound (appearance granted) beats
   the pixel hull on 30 of 30 held-out items by LPIPS and DISTS. No real
-  renderer keeps it yet: FoundHand zero-shot fails (17%), a bank of free
-  references fails by one item-metric (67% at K = 16). Next: the
-  buildable bank; rung 3 (overfit) waits behind it.
+  renderer keeps it: FoundHand zero-shot fails (17%), a bank of in-window
+  references fails by one item-metric (67% at K = 16), and the buildable
+  bank chosen outside the window fails (2c, 12.5% at K = 16–64; free,
+  25%). References from other moments miss the forearm, sleeve and
+  lighting. The reference route closes at a buildable rate. Rung 3
+  (2026-10-23, user approved): FoundHand fitted 20 min on the window's
+  own frames, weights unbilled, **passes at 83%** (LPIPS 2 of 3, DISTS
+  3 of 3; 75% clean of G, at the bar; margins 0.006–0.010 on the hard
+  items). Rung 4 (2026-10-23, user's rule: the fit moved to other shots
+  of the video, delivered beforehand) **fails, 25%** (0% clean of G):
+  none of rung 3's gain transfers, and it lands on rung 2's zero-shot.
+  **Hands close on fidelity at the keypoint rate**; K1f's bound stays a
+  bound. Every hand result also granted R, which the decoder does not
+  have (H3b2: 72–170 kbps).
 
 - **Egocentric pipeline (H5):** runs end to end on the 4 pilot items
   (`src/pointstream/`, `experiments/visor/h5.py`). Against fairly
@@ -46,8 +208,25 @@ sessions update their own items and their files in `docs/experiments/`
   at best). The LPIPS cost is structural (F coded in both streams) and
   follows F's share of the frame, median 24% on egocentric video; it
   wins below about 10% (P09_106, 2%: −15%). Billing the mask F costs
-  most of the margin (H5m). **Next: H5p 4–5** (F carried by the
-  foreground stream; the visual check).
+  most of the margin (H5m). **H5p 4–5 done (2026-10-22): billing F
+  removes every win.** With F coded (lzma, 36–116 kbps), weighted DISTS
+  reads +93% (1 of 4) against the venue-adapted DCVC-UF, and every
+  metric loses against every anchor. F̂ itself costs no quality; the
+  mask's rate does, at rates where the venue codec needs 13–26 kbps. A
+  carrier inside the foreground stream would have to cost about 2 kbps,
+  and an exact F at zero bits still loses LPIPS (+16%). H5p 4c measured
+  one (a flat key colour outside K, 5-byte segment): F̃ is as accurate as
+  lzma's, but the key's border costs 26–129% more foreground rate where F
+  is large, so weighted DISTS reads +1% (1 of 4) even as an optimistic
+  bound; on P09_106 (F 2%) the key is nearly free and reads −30%. H5p 4
+  closes as a fail: no F coder tried keeps the egocentric win once F is
+  paid for. The key carrier is the candidate for small-F domains. The crops for the
+  visual check are ready (user). The egocentric claim is the user's to
+  reframe; small-F domains (tennis) are where F's rate matters least.
+  H5p 4d (2026-10-24): binary shape coding costs 10.9–24.8 kbps and
+  still fails (+16.6% weighted DISTS); decoder corrections cost 13.3–61.3
+  kbps at one point per item. The full decoder curve is blocked by native
+  decode instability; exact free masks still do not fix LPIPS.
 - **Background (G):** a scene model adapted to the venue, sent beforehand
   and unbilled (payback hours reported), plus a per-video enhancer route
   (G6).
@@ -65,23 +244,157 @@ sessions update their own items and their files in `docs/experiments/`
   judge; the ball mode kept with the streak renderer (user). K6 done
   (2026-10-21): with true appearance at the coded pose the players'
   keypoints save 95% of the pixel coders' rate, but a reference frame
-  warped to the pose loses to every pixel coder. Next: K6b (a learned
-  per-player renderer's oracle), then K6c; K7 (HiEve) later.
+  warped to the pose loses to every pixel coder. K6b step 2 (2026-10-22):
+  AnimateAnyone zero-shot, one unbilled reference and R granted as its
+  matte, wins 3 of 6 windows by LPIPS and by DISTS (50%, fail). It wins
+  all three Djokovic windows (up to 73% saving) and loses both Alcaraz
+  windows and Rublev's. Step 3 (2026-10-23, user approved): a LoRA
+  fitted 7.5 min per window on its own frames **passes at 83%** (LPIPS 4
+  of 6, DISTS 6 of 6; rate savings 35–84% where it wins), reference,
+  matte and LoRA (49 MB) unbilled. Step 4 (a fit per match, billed) is
+  Step 4 (2026-10-23): a rank-4 LoRA per match (1.55 MB, 8-bit LZMA,
+  1.73 kbps over 2 h), fitted on other shots of the match, **fails**:
+  67% unbilled, 58% billed (losses: alcaraz_hurkacz/045 and
+  rublev_auger-aliassime/052). About 60% of step 3's gain transfers
+  (hands: none), and payback is 0.4–2.1 h where it wins. **The
+  generative route for players closes at the keypoint rate by the
+  rule**, with the matte and reference still granted. Step 5
+  (2026-10-24, user approved): a tennis base LoRA (K6's windows
+  excluded, unbilled) plus a 4-bit rank-4 match LoRA with the pose
+  guider (1.65 kbps over 2 h) **fails at 67%, billed and unbilled**.
+  Billing no longer costs a window. The same two windows (045, 052) lose
+  in steps 3–5, so each recipe change moves the margins, not the score.
+  The frozen **clip-local diagnostic (2026-10-25)** on 12 new archive
+  windows from the familiar Alcaraz and Medvedev broadcasts reaches
+  **23/24 billed window–metric wins** (LPIPS 11/12, DISTS 12/12;
+  descriptive bar 18/24), and 24/24 unbilled. Billing here covers the
+  match adapter/guider and keypoints, with a common shipped tennis base;
+  references and exact target matte remain granted and unbilled.
+  Charging the 48,878,567-byte base over 2 h adds 54.309519 kbps:
+  0/12 bracketed cells win, and the other 12 are unbracketed, unresolved.
+  This is not a fully charged codec saving or independent-source
+  confirmation, and does not overturn step 5's historical failure.
+  Original-source/replay independence remains unresolved; every window
+  passes registration, so gate discrimination is untested and 115 px
+  remains exploratory. All 120 anchor points and 956 mask identities
+  validated; 24 terminal GPU jobs used **6.995428306 of 8 GPU-hours**.
+  Report commit `72228816`, [PR #236](https://github.com/emanuele-artioli/PointStream/pull/236)
+  (merged in `da6a42b1`); no jobs remain active.
+  The 2026-10-26 two-window compression pilot preserves actual quality with
+  unmasked video-coded reference banks: 4/4 strict metric cells, robust to
+  ±0.001 renderer sensitivity. Segmented alpha and black-key references each
+  reach only 1/4; dense foreground carriers each 0/4. This does not establish
+  >=18/24 on the full cohort. Exact dynamic matte is still granted: charging
+  its measured packet removes all four pilot wins. The new pilot used
+  4.411019/4.5 GPU-hours, including failures and recovery; no jobs remain.
+  Joint saved-render follow-up (2026-10-26): pairing the new compressed-RGB
+  generations with paid1/8,1/16,1/32 mattes gives0/4 at every scale, with the
+  exact/granted control reproduced at4/4. Small RGB boundary ramps damage shape
+  even before compression; separate luma ramps are accurate but not cheaper
+  on the bounded excerpts. The pilot stops; it does not imply a full-cohort
+  bound or global compression impossibility. It used0.103706/0.5 new GPU-hours.
+  Step 6 (Wan-Animate 14B, zero-shot first) remains outlined and waits for
+  the user. K6c after K6b; K7 (HiEve) later.
 - **Paper (I):** notes on what to state, the negative results, the order
   of writing; the 34-item final runs wait for the figure list.
 
 ### Dispatch ledger
 
-One row per item session started from the root session. The item
-session reports to the root session when its goal is reached or it
-stops; the root session fills in the outcome and the next step.
+The single record of open work: one row per item session, with its card,
+branch and status. Cards are prompts in [docs/cards](docs/cards/README.md)
+that the user pastes into a new session (Claude Code or Codex). From
+2026-10-24 there is no standing root session: each item session sets its
+own row to `running` when it starts and to `reported` with its outcome when
+it stops, and updates its item's bullet in "Where PointStream stands". A row
+marked `card ready` is waiting for the user to start it.
 
-| item | card | branch | suggested model | status |
+| item | card | branch | model / effort | status |
 |---|---|---|---|---|
-| H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` | Opus | queued 2026-10-22 |
-| K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` | Opus | queued 2026-10-22 |
-| K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` | Opus | queued 2026-10-22 |
-| J | experience-track re-judging | `claude/j-experience-rejudge` | Sonnet | queued 2026-10-22 |
+| J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
+| J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
+| H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` @ `3b11a36` | Opus | reported 2026-10-22: 4a fail (F billed +93% wDISTS), 4b not built (LPIPS), crops ready; 2.6 GPU-hours of 4 |
+| H5p 4c | key carrier for F (user's request) | `claude/h5p-f-stream` @ `41c37c8`, PR #220 | Opus | reported 2026-10-22: fail at the gate (+1%, 1 of 4; P09_106 −30%); 1.38 GPU-hours of 3 |
+| K6b hands 2c | buildable reference bank | `claude/k6b-hand-bank` @ `505f5a7` | Opus | reported 2026-10-22: fail (12.5%; free bank 25%); 2.6 GPU-hours of 3.5 |
+| K6b hands 3 | overfit oracle (user approved) | `claude/k6b-hand-bank` @ `3059660` | Opus | reported 2026-10-23: pass (83%; 75% clean of G), R granted; visual check supports it; 3.1 GPU-hours of 4 |
+| K6b hands 4 | the fit moved to other shots (user's rule) | `claude/k6b-hand-bank` @ `fd83eb7`, PR #221 | Opus | reported 2026-10-23: fail (25%; 0% clean of G); 1.3 GPU-hours of 3. Hands closed on fidelity |
+| K6b hands 3m | rung 3 with a decoder-side matte | — | Opus | withdrawn 2026-10-23: rung 4 failed with the matte granted |
+| K6b players 2 | AnimateAnyone zero-shot oracle | `claude/k6b-players-zeroshot` @ `340d8d5` | Opus | reported 2026-10-22: fail (50%); 4.75 GPU-hours of 4 (overrun approved) |
+| K6b players 3 | overfit oracle (user approved) | `claude/k6b-players-zeroshot` @ `03a3df8` | Opus | reported 2026-10-23: pass (83%), matte and LoRA unbilled; 4.8 GPU-hours of 6 |
+| K6b players 4 | match fit, billed | `claude/k6b-players-zeroshot` @ `20eb7c3` | Opus | reported 2026-10-23: fail (67% unbilled, 58% billed); 7.0 GPU-hours of 7 |
+| K6b players 5 | tennis base, guider, 4 bits (user approved) | `claude/k6b-players-zeroshot` @ `d0a00e5` | Opus | reported 2026-10-24: fail (67% billed and unbilled); 10.0 GPU-hours of 11; historical failure retained in the merged experiment record |
+| K6m | the players' matte on tennis | — | Sonnet | card dismissed 2026-10-24: folded into T1 |
+| K6b players 5b | why 045 and 052 lose; a content-blind scope rule (CPU) | `codex/k6b-players-5b` | Codex high | reported 2026-10-24: no cut in 052; registration gate 80% vs 67% pooled (hypothesis); 0 of 0 GPU-hours |
+| K6b players confirmation | unused same-match windows, CPU preparation | `codex/k6b-player-confirmation-plan` | Codex high | closed; preparation superseded by completed clip-local diagnostic below (PR #236), 6.995428306/8 GPU-hours; no running preparation/anchor job ([card](docs/cards/k6b-players-confirmation.md)) |
+| T1 | the split on tennis, F billed | `codex/t1-tennis-split` | Codex high | reported 2026-10-24: primary oracle +10.00% BD weighted DISTS, 3/8 wins; billed split loses all metrics/windows; 3.12338 of 4 GPU-hours |
+| K6b players 6 | Wan-Animate zero-shot (reference-conditioned) | `codex/k6b-players-6` | Codex high | deferred; finish actual-base feasibility decision first; no new model budget or dispatch authorized ([card](docs/cards/k6b-players-6.md)) |
+| H5p 4d | a cheaper foreground mask: binary shape coding, F at the client | `codex/h5p-4d-mask`, PR #233 | Codex high | reported 2026-10-24: shape target fails (+16.6% wDISTS); decoder diagnostic 13.3–61.3 kbps, full curve blocked by native decode; 0.3171 GPU-hours of 2 |
+| K6b players clip-local diagnostic | [frozen 12-window study](https://github.com/emanuele-artioli/PointStream/blob/72228816/docs/cards/k6b-players-confirmation.md) | `codex/k6b-player-confirmation-plan` @ `72228816`, PR #236 | Codex high | reported 2026-10-25: 23/24 billed wins with common base, reference and matte granted; base-charged 0/12 bracketed wins, 12 unresolved; 6.995428306 of 8 GPU-hours; all jobs terminal; PR #236 merged 2026-10-25 after explicit user auto-merge approval |
+| K6b players rate-budget audit | saved 12-window side-information headroom, CPU only | `codex/k6b-player-confirmation-plan` | Codex high | reported 2026-10-25: tested lossless route fails (0/24; 22 bracketed, 2 unresolved but dominated); even free mattes leave 17/24 with real keypoints + PNG bank 2 h; CPU job `20261025T082944Z-29f021a5` complete, 0 new GPU-hours; deployable alternatives unresolved ([card](docs/cards/k6b-player-rate-budget.md)) |
+| K6b players compressed mattes | [CPU-first saved-render test](docs/cards/k6b-player-compressed-matte.md) | `codex/k6b-compressed-matte`, PR #239 | Codex high | reported 2026-10-25: CPU complete; all 12 mask rates/coverage and two real neural smoke frames; full quality exceeds CPU cap; CPU phase0 GPU, proposed0.75 GPU-h judging subsequently approved; half-size JPEG reference pricing~90% below PNG, generation quality untested |
+| K6b players matte GPU judging | [saved-render quality continuation](docs/cards/k6b-player-compressed-matte.md) | `codex/k6b-matte-judging`, PR #240 | Codex high | reported 2026-10-25: all scales0/8 measured wins after4 complete windows; best possible16/24<18, frozen stop reached;0.167674940 of0.75 GPU-h; all jobs terminal, no fitting/generation |
+| K6b players reference/alpha video | [bounded coding/quality pilot](docs/cards/k6b-player-reference-video.md) | `codex/k6b-reference-quality-pilot`, PR #242; prior #241 merged | Codex high | reported 2026-10-26: actual unmasked compressed references 4/4 (passes >=3/4); alpha/black each1/4; dense each0/4; exact-matte-paid all0/4; no full12 or independent-source claim; 4.411019/4.5 new GPU-h, CPU2647.199/3600s, no jobs remain |
+| K6b players joint matte/edge pilot | [saved-render joint test and CPU mechanism](docs/cards/k6b-joint-matte-edge.md) | `codex/k6b-joint-matte-edge-pilot`, PR #243 | Codex high | reported 2026-10-26: actual paid1/8,1/16,1/32 mattes each0/4; exact control4/4; RGB ramps lose shape, luma ramps not cheaper, none promoted; 0.103706/0.5GPU-h, CPU721.525/3600s; no full12/end-to-end/independence claim, no active jobs |
+| K6b players receiver silhouette | [raw-generation/correction input audit](docs/cards/k6b-receiver-silhouette.md) | `codex/k6b-receiver-silhouette-audit`, PR #244 | Codex high | reported 2026-10-26: prior H5p4d related, exact tennis question untested; each actual raw unit saves80/240 RGB ticks, all240 correction test stops at input gate;0/0.75 new GPU-h, no inference/submission; sparse receiver profile or raw recovery remains a distinct next choice |
+| K6b players sampled silhouette | [80-tick scope amendment](docs/cards/k6b-receiver-silhouette.md) | `codex/k6b-receiver-sampled-pilot`, PR #245 | Codex high | reported 2026-10-26: actual zero-matte YOLOE26x profile1/4<3/4; private fresh-reset predictions reproduce/all160 judged frames scored; exact control4/4; cumulative0.163059668/0.75GPU-h, CPU2334.860723/3600s closed; all240 corrections/wire and end-to-end evidence remain unresolved, all jobs terminal |
+| K6b players pose-prompted SAM | [sampled receiver tracker](docs/cards/k6b-receiver-sam.md) | `codex/k6b-receiver-sam-pilot` | Codex high | reported 2026-10-26: actual pose-prompted SAM2/4<3/4; Med004 recovered but Al006 empty51/80; private reset/control checks pass; sampled XOR122.62/212.46kbps costs more than direct sampled R; conservative0.177777778/0.75GPU-h and1429.969250/3600CPU-s CLOSED, one terminal job; no full240/end-to-end claim |
+| K6b players independent-frame SAM | [last narrow receiver profile](docs/cards/k6b-receiver-frame.md) | `codex/k6b-receiver-frame-pilot`, PR #247 | Codex high | reported 2026-10-26: actual4/4strict wins (frozen+.0013/4),0/320empty player masks; read-isolated resets/control pass; conservative0.477777778/0.75GPU-h and2329.366896/3600CPU-s CLOSED; fullyaccounted/fresh-eval cards prepared only, no integration/full240/confirmation claim |
+| K6b native base recovery | [recovery card](docs/cards/k6b-base-recovery-encode.md) | `codex/k6b-native-base-attended`, PR #251 | Codex | closed 2026-10-27: CPU job `20261027T072713Z-2888cefe` complete, six native 240-frame SVT streams and retained YUV; 184.54109/1800 workload CPU-s, no GPU |
+| K6b real-base quality | [actual-base pilot](docs/cards/k6b-real-base-quality-pilot.md) | `codex/k6b-real-base-player-quality`, PR #252 | Codex | stopped 2026-10-27: conversion `20261027T074823Z-135421ee` complete; quality `20261027T080644Z-9dba0803` failed cost gate, full never launched; original smoke controls pass both windows; no accepted quality/BD-rate; conservative580/3600 GPU-s,3020 unused, revised plan required |
+| Host-local storage safety | [maintenance report](docs/storage-maintenance-2026-10-27.md) | `codex/local-storage-safety-20261027`, PR #253 | Codex | merged 2026-10-27: inactive files moved/verified on six hosts, shared shell defaults active; live originals retained; fleet manager rollout stopped at health gate before changing workers |
+| Root continuation | [2026-10-27 handover](docs/continuation-2026-10-27.md) | `codex/root-handover-20261027`, [PR #254](https://github.com/emanuele-artioli/PointStream/pull/254) | Codex | reported: final handover for user-requested root-chat archive after merge; no new session or research job launched |
+| Root real-base cost revision | [prospective same-budget plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-plan`, PR #255 merged | Codex | human accepted 2026-10-27: smoke240/full2600/validator120/overhead60 within3020s remaining; original quality/identity gates retained |
+| Root approved execution preflight | [accepted cost plan](docs/cards/k6b-real-base-cost-revision.md) | `codex/real-base-cost-execution` | Codex | 2026-10-27: validator and frozen spec prepared; local ruff/mypy and16focused tests pass; stopped before submission at current fleet health (gpu3 20s probe failure, stale compatible worker heartbeats); no new GPU cost |
+| Fleet health recovery and approved real-base run | [recovery report](docs/fleet-health-recovery-2026-10-27.md) | `codex/real-base-approved-run`; repair PR #257 merged | Codex | 2026-10-27: final20261027T211451Z-f6a754eb COMPLETE; fresh separated smoke passes, full stops scientifically after Al loses both whole-frame metrics; audited55checks+240CPUhybrids;2350/3600s charged,1250unspent; no active wait/GPU job |
+| Ideal-player appearance bound | [completed finite bound](docs/cards/k6b-ideal-timing-secondary.md) | `codex/ideal-player-full-result` | Codex | COMPLETE20261028T080453Z-34e50ec2; all80ticks, exact controls, independently audited finite NO-GO both metrics/both ideal supports;2730/3600s charged,870unused; item stopped |
+| Player joint side-rate feasibility | CPU saved-score inversion and three lossless packet wrappers | `codex/player-rate-feasibility` | Codex | COMPLETE2026-10-28; zero GPU; robust actual/ideal_R side ceilings0.668734/1.230365kbps; all three packet wrappers grow; follow-up paid clean-background test now complete |
+| Paid clean-background oracle | [new finite background proposal](docs/cards/k6b-paid-clean-background.md) | `codex/paid-clean-background` | Codex | COMPLETE2026-10-28; CPUbf9f97d2 and sameGPU27f39d64 audited; all80ticks; formal MIXED, two-metric gate FAILED;250s charge,2980/3600total,620unused; stopped |
+
+**T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
+The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
+
+**K6b players 5b and 6.** Steps 3–5 lose the same two windows:
+5b's CPU diagnosis (2026-10-24) finds **no cut** in 052: one oblique court
+view, 32/240 registered frames and seven judged. A ≥95% registration gate
+reads 80% beside 67% pooled; adding ≥115 px reads 100% on four windows,
+but both gates are unconfirmed hypotheses. 045 shows appearance/view and
+racket errors, with no isolated causal explanation; step 5's fail stands.
+Confirmation preparation (2026-10-24): 12 new same-match windows frozen;
+all pass registration, so gate discrimination is untested. Recorded fit/reference
+clips are disjoint. CPU recovery found splitter logic; the completed 61-clip
+audit found no exact/screened duplicates. Original-source identity/replay
+independence remains unresolved. The user approved the clip-local diagnostic,
+which subsequently completed at 6.995428306/8 GPU-hours (PR #236); the historical
+preparation and anchor jobs are terminal. Reference and matte were granted in
+that diagnostic. Later component and actual-base results are summarized in the
+resume section above ([card](docs/cards/k6b-players-confirmation.md)).
+Step 6 tries Wan-Animate, conditioned on the same unbilled reference as
+step 2 (zero-shot means no fitting, not no appearance); speed is
+secondary while quality is tested (user, 2026-10-24).
+
+**H5p 4d: a cheaper foreground mask.** Every mask coder tried on the
+egocentric pilot (lossless coding of downscaled frames XORed with the
+previous one, a video codec on the signed distance, a key colour) costs
+36–116 kbps, and billed it removes the split's win. The ceiling is H5p 4b:
+the exact F at zero bits wins weighted DISTS (−15%) and still loses
+weighted LPIPS (+16%), so a mask can at best restore the DISTS win, within
+about 2 kbps. 4d tests two further routes: binary shape coding with motion
+prediction (MPEG-4's context-based arithmetic coding; CPU), and F derived
+at the client from the decoded streams by the same segmenter (no bits, or
+a small correction stream). Measured 2026-10-24: shape coding fails
+the rate target and DISTS rule; SAM plus exact corrections also misses 2 kbps
+on the single-point diagnostic. Full decoder-side BD-rate is unresolved
+after native repeatability failures; [record](docs/experiments/h5p.md).
+
+**Handover (2026-10-24).** The Claude Code root session
+(`session_01StNQ6dvxYRHhnMbQymNgNf`) stopped when the weekly Claude
+tokens ran out. No root session replaces it: item sessions keep this
+ledger themselves (above). Open for the user: (1) how to reframe the
+egocentric claim (proposal: a negative result with its cause, F's rate,
+and the split's win where F is small, P09_106; tennis carries the
+positive claim); (2) whether to run step 6 after 5b; (3) the identity-warp
+check (J's caveat), only if the experience track stays a goal. Branches
+with work not on main: `claude/k6b-players-zeroshot` (step 5's outcome,
+`d0a00e5`). PR #218 (J) was open at handover.
 
 ## Done
 
@@ -558,8 +871,9 @@ objects (the tennis ball).
   1. Audit. Reference-conditioned pose-to-person models (an appearance
      image plus a pose sequence in, video out) and per-subject models,
      with weights, licences, inputs, size and inference cost per frame.
-     Small models are preferred: H3e's Wan2.1-14B took 27 min for 81
-     frames.
+     Small models were preferred at first (H3e's Wan2.1-14B took 27 min
+     for 81 frames); from 2026-10-24 speed is secondary while quality is
+     what is being tested (user).
   2. Zero-shot oracle, inference only. The audited model is given one
      reference crop of each player (granted, unbilled) and the coded
      keypoints. Its interface is K6c's, so a pass here decides K6c's
@@ -1016,7 +1330,7 @@ Results closed on fidelity are untested on the experience track (realism
 by KID, same content by the object's estimator, same over time by
 flicker; [protocol](docs/experiments.md#protocol)). J judges the four
 queued results on it, cheapest first, each against the anchor hull at its
-own rate. The rule, judges and budget are in experiments.md, "J:
+own rate. The rule, judges and budget are in [docs/experiments/j.md](docs/experiments/j.md), "J:
 experience-track re-judging (rule)".
 
 1. H3e V1, from its saved generations and judge archives (CPU, Inception

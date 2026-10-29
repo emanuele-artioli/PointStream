@@ -1,0 +1,108 @@
+{
+  "gpu_seconds_charged": 1300,
+  "gpu_cap_seconds": 3600,
+  "cpu_seconds_charged": 1120,
+  "cpu_cap_seconds": 3600,
+  "local_cpu_analysis_charge": 120,
+  "latent_refinement_gpu_seconds": 0,
+  "jobs": [
+    {
+      "name": "diagnosis",
+      "job": "20261028T190838Z-3dea4d74",
+      "terminal_state": "failed",
+      "host": "gpu2",
+      "gpu": {
+        "index": 0,
+        "uuid": "GPU-fc7e8fff-75be-4984-a185-fe8ce63edcd9",
+        "name": "NVIDIA RTX A6000",
+        "memory_used_mib": 35280,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 13395,
+        "utilization_pct": 99,
+        "compute_processes": [
+          {
+            "pid": 2244112,
+            "memory_mib": 35234
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "supervisor_started": 1793214709.68,
+      "canonical_terminal": 1793214942.4530423,
+      "allocation_wall_seconds": 232.77304220199585,
+      "conservative_charge_seconds": 250,
+      "charge_basis": "GPU allocation wall, rounded up including terminal publication"
+    },
+    {
+      "name": "restoration",
+      "job": "20261028T191318Z-b4727331",
+      "terminal_state": "complete",
+      "host": "gpu2",
+      "gpu": {
+        "index": 1,
+        "uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+        "name": "NVIDIA RTX A6000",
+        "memory_used_mib": 35278,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 13397,
+        "utilization_pct": 78,
+        "compute_processes": [
+          {
+            "pid": 2244113,
+            "memory_mib": 35232
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "supervisor_started": 1793215033.03,
+      "canonical_terminal": 1793215752.7799368,
+      "allocation_wall_seconds": 719.7499368190765,
+      "conservative_charge_seconds": 750,
+      "charge_basis": "GPU allocation wall, rounded up including terminal publication"
+    },
+    {
+      "name": "supported-completion",
+      "job": "20261028T192649Z-867e69f2",
+      "terminal_state": "complete",
+      "host": "gpu3",
+      "gpu": {
+        "index": 0,
+        "uuid": "GPU-6f70a27e-4171-22d7-3ffd-647e7f186a49",
+        "name": "NVIDIA RTX A6000",
+        "memory_used_mib": 25492,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 23183,
+        "utilization_pct": 100,
+        "compute_processes": [
+          {
+            "pid": 2655895,
+            "memory_mib": 25486
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      "supervisor_started": 1793215792.59,
+      "canonical_terminal": 1793216063.2625074,
+      "allocation_wall_seconds": 270.67250752449036,
+      "conservative_charge_seconds": 300,
+      "charge_basis": "GPU allocation wall, rounded up including terminal publication"
+    },
+    {
+      "name": "code-audit",
+      "job": "20261028T190840Z-eb011d4b",
+      "terminal_state": "complete",
+      "host": "gpu5",
+      "gpu": null,
+      "supervisor_started": 1793214692.51,
+      "canonical_terminal": 1793215181.966829,
+      "allocation_wall_seconds": 489.4568290710449,
+      "conservative_charge_seconds": 1000,
+      "charge_basis": "two CPU threads, rounded allocation reservation"
+    }
+  ],
+  "timers_created": false,
+  "scope": "Dedicated CPU allowance; GPU-job CPU support included in GPU allocations. Old budgets separate/closed."
+}

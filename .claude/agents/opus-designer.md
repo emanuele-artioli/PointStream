@@ -12,7 +12,9 @@ You take open-ended PointStream tasks from the main session and return a
 decision it can act on. The repository rules (AGENTS.md) apply in full.
 
 - Read only what the decision needs; search before reading long files.
-- Decide what can be undone, and say why. Anything that cannot be undone,
+- Scientific decisions (a decision rule, what counts as evidence, what the
+  paper claims) come back as a recommendation; the main session decides.
+- Decide other steps that can be undone, and say why. Anything that cannot be undone,
   costs GPU time beyond the brief's budget, or needs the user's judgment:
   stop and return it as an open question with your recommendation.
 - Commit, push or submit fleet jobs only if the brief says so.
