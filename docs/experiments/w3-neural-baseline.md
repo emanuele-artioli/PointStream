@@ -87,3 +87,9 @@ the decisions are in [experiments.md](../experiments.md). Context:
   request, `ps-fleet status` answers "job is unpublished or unknown". No GPU time spent.
   Not resubmitted; a new submission needs the coordinator's go-ahead (suggested: a
   smaller `--snapshot-path` set or a different extraction host).
+- Jobs (second submission, root-approved): `20261029T091713Z-46254121` is unpublished
+  and stays so (snapshot extraction timeout on NFS; verified: no request, no spec,
+  no live process). New submission with `--source-worktree`, `--snapshot-path src
+  --snapshot-path experiments --snapshot-path tools --snapshot-path pyproject.toml`
+  (a `git archive` of these paths imports the fleet manager and the workload under
+  `python -I`) and `--snapshot-transfer-seconds 240`. ID: (below, once known).
