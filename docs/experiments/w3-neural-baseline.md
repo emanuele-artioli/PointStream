@@ -260,3 +260,50 @@ the decisions are in [experiments.md](../experiments.md). Context:
   decoding on the RTX 6000 Ada, and at these ultralow rates it is far ahead of SVT-AV1 on both whole
   frame and foreground. Any PointStream claim against the two baselines must now beat DCVC, not only
   SVT; W1's comparison and the 15-60 kbps coverage are the next consumers.
+
+### 2026-10-29 — W3b: does DCVC-UF at the hybrid's rate dominate the PointStream hybrid on Al? (rule, written before any new quality is seen)
+- Question. W3's accepted DCVC-UF points reached 2.3–16.1 kbps. The PointStream
+  hybrid on Al (job `20261027T211451Z-f6a754eb`) is at 22.737962 kbps (whole
+  LPIPS 0.275787 / DISTS 0.169612; foreground LPIPS 0.345876 / DISTS 0.252551),
+  and 21.458796 kbps when re-billed with the KPS2 keypoint packet. Does any DCVC
+  point at those rates dominate it? (W3's Al points: scale 2 QP6 8.40 kbps whole
+  LPIPS .209 / fg .569; scale 2 QP18 16.08 kbps whole .159 / fg .449.)
+- Rule (W1's, [w1-roi-pareto](w1-roi-pareto.md)). DCVC *dominates* the hybrid on a
+  metric (LPIPS or DISTS) at a rate R if its whole score <= hybrid whole + 0.001 AND
+  its foreground score <= hybrid foreground + 0.001. Its score at R (22.737962 and
+  21.458796 kbps) is interpolated linearly in log-rate between the two bracketing
+  DCVC points of one scale; a rate without a bracketing pair is *unresolved*, never
+  extrapolated. Verdict per (rate, metric): dominates / does not dominate / unresolved.
+- Hypothesis. DCVC's player region at about 22 kbps stays worse than the hybrid's 0.346
+  foreground LPIPS because its players are blurred (W3: fg LPIPS .449 at 16 kbps).
+- Competing explanation. DCVC at about 22 kbps reaches player LPIPS <= 0.35 with whole
+  LPIPS <= 0.18 and dominates; the hybrid is then not Pareto-better against a neural
+  codec on Al.
+- Budget. <= 1 GPU-hour (3,600 s) including smoke and failures; W3's whole job needed 626 s.
+  RTX 6000 Ada, hosts gpu5 and gpu6, exclusive. Same job, validator and acceptance checks as
+  W3 (I frame within one level; two separate decoder processes, two passes each, bit-identical
+  on every frame; reference buffer status recorded); only the point list changes, and the
+  25-frame rate calibration is skipped because the points are named. SVT scale 8 stays as the
+  scoring control (Al must reproduce the audited job within 1e-3). Frame count 240, ticks
+  0:240:3, development windows, the real-base judge's code, as W3.
+- Point selection (rate alone, from W3's MEASURED 240-frame rates; the 25-frame estimator
+  overshot 3.6–6x and is used only as a within-scale shape). In each window and scale the
+  measured/estimated ratio is stable across QP: Al scale 2 QP6 8.396/30.1 = 0.279 and QP18
+  16.078/58.3 = 0.276 (mean 0.277); Med scale 4 QP12 10.593/62.2 = 0.170 (Med scale 8
+  drifts 0.178 -> 0.166 from QP6 to QP18). Predicted rate = ratio x the calibration estimate
+  (log-linear in QP between the 6-QP grid): 
+  - Al, scale 2 (scale 1 is not needed: scale 2 reaches the target and the worker has no
+    scale-1 path): QP 21, 23, 24, 25, 27, 30 -> predicted 19.2, 21.4, 22.7, 23.8, 26.3, 30.4 kbps.
+    At least one point below 21 (QP21) and one above 23 (QP25, 27, 30); W3's QP18 (16.08,
+    measured) is a third lower anchor. Choosing this many costs about 25 s each.
+  - Med, scale 4 (scale 8 tops out near 15 kbps at QP63): QP 15, 36, 63 -> predicted 12.9,
+    27.4, 52.1 kbps, a triple bracketing 15–40 (the high end carries the larger ratio-drift
+    risk; Med is secondary to the question).
+  No quality was looked at to choose these; if a bracket fails in the measured rates the Al
+  verdict at that rate is "unresolved" and the outcome entry says so.
+- Second analysis (same entry, rule fixed here). DCVC's whole and foreground BD-rate against
+  W1's stronger SVT envelope (the upper concave hull of the plain half- and quarter-resolution
+  CRF points scored by W1's scoring jobs) instead of the three CRF-63 bases, reported only for
+  metrics where the quality ranges overlap, otherwise "better/worse at every rate" as AGENTS.md
+  requires. Inputs are the W3 and W3b DCVC points (all measured, decoded exactly).
+- Jobs: (none yet)
