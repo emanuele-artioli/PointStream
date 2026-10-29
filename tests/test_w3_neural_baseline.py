@@ -390,3 +390,50 @@ def test_validator_passes_a_good_listed_smoke_and_rejects_a_changed_point(tmp_pa
         run_validator(second, monkeypatch, bad, spec='w3b')
     checks = json.loads((second / 'validation.json').read_text())['checks']
     assert [k for k, v in checks.items() if not v] == ['points_as_named']
+
+
+def curve_points(rows):
+    return [{'rate_kbps': r, 'whole_lpips': w, 'foreground_lpips': f, 'whole_dists': w, 'foreground_dists': f} for r, w, f in rows]
+
+
+def test_interpolation_is_log_rate_between_brackets_and_never_extrapolates():
+    pts = curve_points([(16.0, 0.4, 0.6), (25.0, 0.2, 0.4)])
+    assert an.interpolate_log_rate(pts, 20.0, 'whole_lpips') == pytest.approx(0.4 - 0.2 * math.log(20 / 16) / math.log(25 / 16))
+    assert an.interpolate_log_rate(pts, 16.0, 'whole_lpips') == pytest.approx(0.4)
+    assert an.interpolate_log_rate(pts, 15.9, 'whole_lpips') is None
+    assert an.interpolate_log_rate(pts, 26.0, 'whole_lpips') is None
+
+
+def test_dominance_needs_both_whole_and_foreground_within_margin_and_a_bracket():
+    hybrid = {'lpips': {'whole': 0.28, 'foreground': 0.35}, 'dists': {'whole': 0.17, 'foreground': 0.25}}
+    far = curve_points([(20.0, 0.15, 0.55), (25.0, 0.14, 0.45)])
+    verdict = an.dominance(far, 22.0, hybrid)
+    assert verdict['lpips']['verdict'] == 'does not dominate' and verdict['lpips']['whole_margin'] > 0
+    assert verdict['lpips']['foreground_margin'] < 0
+    near = curve_points([(20.0, 0.2, 0.36), (25.0, 0.2, 0.36)])
+    assert an.dominance(near, 22.0, hybrid)['lpips']['verdict'] == 'does not dominate'  # foreground 0.36 > 0.35 + 0.001
+    inside = curve_points([(20.0, 0.2, 0.3505), (25.0, 0.2, 0.3505)])
+    assert an.dominance(inside, 22.0, hybrid)['lpips']['verdict'] == 'dominates'
+    assert an.dominance(inside, 30.0, hybrid)['dists']['verdict'] == 'unresolved'
+
+
+def test_w3b_report_flattens_summaries_and_builds_the_stronger_envelope():
+    from experiments.tennis import w3b_report as rep
+
+    def point(scale, qp, kbps, w, f):
+        mean = {'full_lpips': w, 'full_dists': w / 2, 'foreground_lpips': f, 'foreground_dists': f / 2}
+        return {'scale': scale, 'qp': qp, 'kbps': kbps, 'mean': mean, 'max_decode_diff': 0, 'accepted': True}
+
+    w3 = {'windows': [{'window': 'al', 'dcvc': [point(2, 6, 8.4, 0.2, 0.57), point(2, 18, 16.1, 0.16, 0.45)],
+                       'svt': [point(8, 63, 10.2, 0.45, 0.84), point(2, 63, 33.7, 0.14, 0.48)]},
+                      {'window': 'med', 'dcvc': [], 'svt': []}]}
+    w3b = {'windows': [{'window': 'al', 'dcvc': [point(2, 24, 22.7, 0.12, 0.40), point(2, 27, 26.0, 0.11, 0.38)], 'svt': []}]}
+    w1 = {'analysis': {'by_policy': {'s2_o0': [{'crf': 66, 'rate_kbps': 22.3, 'whole_lpips': 0.18, 'foreground_lpips': 0.57,
+                                                'whole_dists': 0.13, 'foreground_dists': 0.43}], 's4_o0': []}}}
+    out = rep.report(w3, w3b, w1)
+    assert [p['qp'] for p in out['dcvc_points']] == [6, 18, 24, 27]
+    assert len(out['strong_svt_points']) == 3
+    assert out['dominance']['primary']['scale2']['lpips']['verdict'] == 'does not dominate'  # foreground 0.40 vs 0.346
+    assert rep.RATES['rebilled_kps2'] == pytest.approx(21.458796, abs=1e-5)
+    assert set(out['bd_rate_vs_strong_svt']) == set(an.METRICS)
+    json.dumps(out)
