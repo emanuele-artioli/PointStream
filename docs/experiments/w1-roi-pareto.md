@@ -48,3 +48,41 @@ the decisions are in [experiments.md](../experiments.md). Context:
 - Budget: CPU encodes through the fleet (each stage ≤45 min, split by
   window/resolution); scoring ≤1 GPU-hour including smokes and failures.
 - Jobs: (none yet)
+
+### 2026-10-29 — W1 implementation, rate-only preflight and substitution rule (before any run)
+- Written before any W1 job ran and before any W1 quality number exists.
+  The decision rule, grid and budget above are unchanged. Code:
+  `experiments/tennis/w1_roi.py` (ROI map, CRF search, rule),
+  `w1_masks.py` (fixed foreground S), `w1_encode.py` (CPU encodes),
+  `w1_score.py` (GPU scoring), `w1_specs.py` (job specifications).
+- ROI sign. The map is 0 outside and the offset (0, −20, −40) inside every
+  64×64 block touched by the frozen source R; offset 0 is the plain encode
+  with no map. Same blocks as the older comparator, which instead raised the
+  background by +32; ours only adds bits inside R, so a CRF at the ceiling
+  can still be lowered by the offset.
+- CRF range. SvtAv1EncApp 4.2.0 accepts `--crf` 1–70, not 63. The plain
+  half-resolution CRF 63 base already costs 33.685 kbps (40,422 bytes), above
+  the 22.74 kbps target, so reaching it needs CRF above 63.
+- Rate-only preflight. For each (resolution, offset) a search over integer
+  CRFs finds adjacent CRFs whose full 240-frame rates straddle 22.737962 kbps,
+  plus the neighbour CRF+2 (else CRF−1). Rate is the complete IVF file bytes
+  over 9.6 s, as for the existing anchors. The search is the preflight and its
+  encodes are the final ones; no quality is read by the encode job. Up to 8
+  encodes per policy. A policy that has no point at or below the target at CRF
+  70 (or none above it at CRF 1) is unresolved by the rule: never
+  extrapolated, never a dominator.
+- Substitution (root decision 2026-10-29). If full resolution is unresolved at
+  all three offsets, it is replaced by quarter resolution (480×272 coded,
+  scale 4; same offsets, same CRF search), where the existing SVT envelope
+  sits at this rate. The preflight rates and the substitution are recorded in
+  an entry below before anything is scored.
+- Controls. The plain CRF 63 bases of scale 8/4/2 are re-encoded (their bytes
+  must equal the existing 12,237 / 20,557 / 40,422) and rescored; their
+  per-tick whole and foreground LPIPS/DISTS must equal the hybrid job's
+  recorded scores within 1e-4 (the hybrid job's published scores, sha256
+  `e346844d…`).
+- Foreground S is the real-base judge's: R plus the warp-drawn player pixels,
+  rebuilt from the saved K6 window, keypoints and source mattes, checked
+  against the K6 window's recorded hashes of R and S on every tick.
+- Scoring runs on an RTX A6000 (the controls were scored on one); the job is a
+  shared-GPU job, so its timings are cost only.
