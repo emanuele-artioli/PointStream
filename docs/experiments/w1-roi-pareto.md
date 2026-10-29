@@ -358,3 +358,74 @@ the decisions are in [experiments.md](../experiments.md). Context:
   (published.tar sha256 `5a48c109…` and `65b5ae9e…`) and the first scoring
   summary (offset 0 carried over, sha256 `44d4bbc3…`); 3 controls + 12 new
   streams.
+
+### 2026-10-29 — W1 outcome with the corrected ROI: A stands (ROI is genuinely weak at this rate)
+- Scoring job `20261029T134158Z-f343a04e` (RTX A6000, gpu3, shared), revision
+  `ffdb7fd6c0353fd48cae4b442ffa0ce71434c4c6` (ready.json `git_head`); inputs:
+  the two corrected encode archives (`5a48c109…`, `65b5ae9e…`), the same masks
+  and hybrid scores, offset 0 carried from `20261029T095649Z-43181442`
+  (summary `44d4bbc3…`). Controls again within 3.7e-5. Summary sha256
+  `c4ae5c89…`, published.tar `9b674bfd…`. Execution 69.4 s (smoke) + 576.2 s
+  (full) = 645.6 s; request created to completed 1,996 s including
+  staging. Cumulative GPU use of the W1 cap: 1,170 + 1,996 = 3,166 s upper
+  bound (execution only: 738 + 646 = 1,384 s) of 3,600 s. A submission
+  `20261029T133234Z-e386a4f5` never published (inspected, inert); this one
+  published although its client call timed out, and was not resubmitted.
+- The 12 new points (means over 80 ticks):
+
+| policy | CRF | kbps | whole LPIPS | fg LPIPS | whole DISTS | fg DISTS |
+|---|---|---|---|---|---|---|
+| half, −20 (+20 outside) | 66 | 24.047 | 0.1946 | 0.5682 | 0.1415 | 0.4298 |
+| half, −20 | 67 | 22.238 | 0.2064 | 0.5925 | 0.1460 | 0.4426 |
+| half, −20 | 68 | 20.679 | 0.2254 | 0.6190 | 0.1560 | 0.4609 |
+| half, −40 (+40 outside) | 65 | 24.731 | 0.1901 | 0.5396 | 0.1377 | 0.4092 |
+| half, −40 | 66 | 22.382 | 0.2127 | 0.5818 | 0.1510 | 0.4323 |
+| half, −40 | 67 | 20.897 | 0.2280 | 0.5980 | 0.1617 | 0.4457 |
+| quarter, −20 | 62 | 23.053 | 0.2730 | 0.6465 | 0.1866 | 0.4569 |
+| quarter, −20 | 63 | 19.869 | 0.2894 | 0.6866 | 0.1993 | 0.4982 |
+| quarter, −20 | 64 | 18.036 | 0.3027 | 0.7230 | 0.2077 | 0.5268 |
+| quarter, −40 | 61 | 25.491 | 0.2718 | 0.6242 | 0.1859 | 0.4332 |
+| quarter, −40 | 62 | 22.283 | 0.2817 | 0.6489 | 0.1934 | 0.4573 |
+| quarter, −40 | 63 | 19.326 | 0.2969 | 0.6858 | 0.2075 | 0.4956 |
+
+- Interpolated at 22.737962 kbps (whole LPIPS / fg LPIPS / whole DISTS / fg
+  DISTS): half 0: 0.1787 / 0.5680 / 0.1280 / 0.4263; half −20: 0.2030 /
+  0.5856 / 0.1447 / 0.4390; half −40: 0.2091 / 0.5751 / 0.1489 / 0.4286;
+  quarter 0: 0.2654 / 0.6339 / 0.1808 / 0.4431; quarter −20: 0.2745 / 0.6502 /
+  0.1878 / 0.4608; quarter −40: 0.2802 / 0.6452 / 0.1923 / 0.4537. Hybrid:
+  0.2758 / 0.3459 / 0.1696 / 0.2526. At the re-billed rate 21.458796 kbps
+  (B = 2,701): half 0: 0.1875 / 0.5826 / 0.1347 / 0.4359; half −20: 0.2157 /
+  0.6055 / 0.1509 / 0.4516; half −40: 0.2221 / 0.5917 / 0.1576 / 0.4405;
+  quarter 0: 0.2680 / 0.6427 / 0.1828 / 0.4529; quarter −20: 0.2809 / 0.6659 /
+  0.1927 / 0.4768; quarter −40: 0.2858 / 0.6587 / 0.1971 / 0.4674.
+- Decision: **Outcome A at both rates; no policy dominates on LPIPS or DISTS.**
+  Full resolution is still unresolved (rate above the target at CRF 70).
+  Best ROI foreground at the hybrid's whole LPIPS 0.2758, quarter resolution:
+  0.649 at the primary rate and 0.657 at the re-billed rate, against the
+  hybrid's 0.346; half resolution and DISTS fall outside the whole-score range
+  of the policies (not extrapolated); the nearest points are far from 0.253.
+- What the working ROI does. At matched rate the offsets move the foreground
+  by at most 0.01–0.02 (half −40: foreground LPIPS 0.5751 against 0.5680 plain)
+  while the whole frame loses 0.02–0.03. The cause is the encoder's QP ceiling
+  (above): at this rate the player-block CRF is 61–67, the background cannot
+  go much above 70, and the relative offset reachable is a few QP. So SVT-AV1 has
+  almost no room to move bits to the players at 22.7 kbps; the hybrid's pair
+  (foreground 0.346) is far outside what any allocation tried reaches.
+- Scope of A. It holds for the tested family (plain, and R-block QP offsets
+  that the encoder honours) at half and quarter resolution; full resolution
+  cannot reach the rate. It does not say that no allocation could (an encoder
+  with unrestricted QP or a different tool, e.g. an explicit player-region
+  layer, was not tried). The earlier inert-offset results above are kept as
+  recorded.
+- Local copies for the visual comparison (server-local, not in Datasets):
+  `/local/users/emanuele/pointstream/w1-visual` on gpu3 (5.6 GB). Layout:
+  `inside/` (first, inert ROI realisation and the plain offset-0 policy) and
+  `outside/` (corrected realisation), each with `streams/*.ivf`,
+  `decoded/*.yuv` (dav1d output, 4:2:0, coded size) and the encodes tables;
+  `overlays/` with the ROI-map overlay PNGs (ticks 0/120/237) and the
+  validity-check JSON; `README.txt`. The best plain streams are
+  `inside/streams/s2_o0_crf66.ivf` (22.28 kbps, whole LPIPS 0.182) and
+  `…/s4_o0_crf61.ivf`; the working-ROI ones are
+  `outside/streams/s2_o40_crf66.ivf` (22.38 kbps) and
+  `outside/streams/s4_o40_crf62.ivf`. The permanent copies are the encode
+  jobs' published.tar archives named above.
