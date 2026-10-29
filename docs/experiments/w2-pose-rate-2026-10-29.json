@@ -1,0 +1,1199 @@
+{
+ "scope": "CPU coders on the decoded original keypoints of two development windows; no images.",
+ "input_sha256": {
+  "transport_published_tar": "6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7",
+  "Al": "38c29a952e59e2aeb72de71284286dc2855df3cd0de948571c493bc23349ed50",
+  "Med": "0246c32cafb59ce16a9b0514e58b615b6714f07f00cee3285515075efe77f915"
+ },
+ "windows": {
+  "Al": {
+   "packet_bytes": 4236,
+   "frames": 240,
+   "fps": 25.0,
+   "seconds": 9.6,
+   "window": "alcaraz_hurkacz/031@129"
+  },
+  "Med": {
+   "packet_bytes": 3542,
+   "frames": 240,
+   "fps": 50.0,
+   "seconds": 4.8,
+   "window": "medvedev_struff/014@194"
+  }
+ },
+ "rule": {
+  "mean": 0.0066,
+  "p95": 0.0132,
+  "kbps": 0.5
+ },
+ "original_packet_kbps": {
+  "Al": 3.53,
+  "Med": 5.903333333333334
+ },
+ "side_terms_al": {
+  "allowance_total_side_kbps": 0.668734,
+  "kps_kbps": 3.53,
+  "other_side_kbps": 2.0771288888888884,
+  "adapter_guider_kbps_approx": 1.65,
+  "bootstrap_kbps": 0.37,
+  "match_bank_kbps_by_subtraction": 0.05712888888888845,
+  "remaining_with_free_keypoints_kbps": -1.4083948888888882
+ },
+ "stage1_predictor_choice": {
+  "total_bytes_family_a": {
+   "previous": 6724,
+   "velocity": 6833
+  },
+  "chosen": "previous"
+ },
+ "stage1": {
+  "a": {
+   "Al": [
+    {
+     "setting": {
+      "q": 4,
+      "key": 1,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q4-k1-pre-lin-visall",
+     "bytes": 3918,
+     "header_bytes": 13,
+     "kbps": 3.265,
+     "estimated_bytes_by_section": {
+      "visibility": 156.63597254603616,
+      "coordinates": 3757.026905375534
+     },
+     "sha256": "0b44fc2cab3beaa00c4e12bf726889d4b752fabe828ad5c16d7e53f6c8e4eb88",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 96.0,
+       "crop_height_px": 188.86437499999997,
+       "frames": 240,
+       "confident_joints": 3765,
+       "mean": 0.012531055463095082,
+       "p95": 0.029462782549439483,
+       "mean_all17": 0.012527208498084613,
+       "p95_all17": 0.029462782549439483,
+       "mean_crop": 0.006369551295511015,
+       "p95_crop": 0.014975969527054484,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.010340807745428553,
+       "jitter_dec": 0.04159922825079487,
+       "jitter_ratio": 4.022821937598152,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 136.5,
+       "crop_height_px": 248.67499999999998,
+       "frames": 240,
+       "confident_joints": 3129,
+       "mean": 0.008742042841962486,
+       "p95": 0.020721077836968426,
+       "mean_all17": 0.00868778993768691,
+       "p95_all17": 0.020721077836968426,
+       "mean_crop": 0.004798587907621914,
+       "p95_crop": 0.011373990649426723,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.012089056438796044,
+       "jitter_dec": 0.03334143173749087,
+       "jitter_ratio": 2.757984620742772,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.1845339578576386
+    },
+    {
+     "setting": {
+      "q": 4,
+      "key": 1,
+      "predictor": "velocity",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q4-k1-vel-lin-visall",
+     "bytes": 3719,
+     "header_bytes": 13,
+     "kbps": 3.099166666666667,
+     "estimated_bytes_by_section": {
+      "visibility": 156.63597254603616,
+      "coordinates": 3553.0988812917412
+     },
+     "sha256": "2aad8e9bab0cc8ea9dfbeabeea5ae6c4365faeb4c876ea9190b152a8277deb90",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 96.0,
+       "crop_height_px": 188.86437499999997,
+       "frames": 240,
+       "confident_joints": 3765,
+       "mean": 0.012531055463095082,
+       "p95": 0.029462782549439483,
+       "mean_all17": 0.012527208498084613,
+       "p95_all17": 0.029462782549439483,
+       "mean_crop": 0.006369551295511015,
+       "p95_crop": 0.014975969527054484,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.010340807745428553,
+       "jitter_dec": 0.04159922825079487,
+       "jitter_ratio": 4.022821937598152,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 136.5,
+       "crop_height_px": 248.67499999999998,
+       "frames": 240,
+       "confident_joints": 3129,
+       "mean": 0.008742042841962486,
+       "p95": 0.020721077836968426,
+       "mean_all17": 0.00868778993768691,
+       "p95_all17": 0.020721077836968426,
+       "mean_crop": 0.004798587907621914,
+       "p95_crop": 0.011373990649426723,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.012089056438796044,
+       "jitter_dec": 0.03334143173749087,
+       "jitter_ratio": 2.757984620742772,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.16441016690805554
+    }
+   ],
+   "Med": [
+    {
+     "setting": {
+      "q": 4,
+      "key": 1,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q4-k1-pre-lin-visall",
+     "bytes": 2806,
+     "header_bytes": 13,
+     "kbps": 4.676666666666667,
+     "estimated_bytes_by_section": {
+      "visibility": 171.26954104152276,
+      "coordinates": 2623.802457250923
+     },
+     "sha256": "ebe4942318f96ed8c2c14809c87beab9490d4f22d0559a014ddc914812bf15f5",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 134.0,
+       "crop_height_px": 218.53999999999996,
+       "frames": 240,
+       "confident_joints": 3182,
+       "mean": 0.008694005432629676,
+       "p95": 0.021107665110046196,
+       "mean_all17": 0.008633463338439302,
+       "p95_all17": 0.021107665110046196,
+       "mean_crop": 0.005330816912109347,
+       "p95_crop": 0.012942377252430633,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.004486430278708406,
+       "jitter_dec": 0.02591070712980163,
+       "jitter_ratio": 5.775350450171498,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 68.0,
+       "crop_height_px": 137.2,
+       "frames": 240,
+       "confident_joints": 3715,
+       "mean": 0.016222529581961437,
+       "p95": 0.04159451654038515,
+       "mean_all17": 0.016237601109704528,
+       "p95_all17": 0.04159451654038515,
+       "mean_crop": 0.00804032078406252,
+       "p95_crop": 0.020615358052085937,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.008832490497544037,
+       "jitter_dec": 0.047147118586752995,
+       "jitter_ratio": 5.33791897085683,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.1513244160450995
+    },
+    {
+     "setting": {
+      "q": 4,
+      "key": 1,
+      "predictor": "velocity",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q4-k1-vel-lin-visall",
+     "bytes": 3114,
+     "header_bytes": 13,
+     "kbps": 5.19,
+     "estimated_bytes_by_section": {
+      "visibility": 171.26954104152276,
+      "coordinates": 2930.626250894311
+     },
+     "sha256": "5ca3e4cb9984fe6cc82455b546719f240596875b44574f56ac3f5419e338d06e",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 134.0,
+       "crop_height_px": 218.53999999999996,
+       "frames": 240,
+       "confident_joints": 3182,
+       "mean": 0.008694005432629676,
+       "p95": 0.021107665110046196,
+       "mean_all17": 0.008633463338439302,
+       "p95_all17": 0.021107665110046196,
+       "mean_crop": 0.005330816912109347,
+       "p95_crop": 0.012942377252430633,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.004486430278708406,
+       "jitter_dec": 0.02591070712980163,
+       "jitter_ratio": 5.775350450171498,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 68.0,
+       "crop_height_px": 137.2,
+       "frames": 240,
+       "confident_joints": 3715,
+       "mean": 0.016222529581961437,
+       "p95": 0.04159451654038515,
+       "mean_all17": 0.016237601109704528,
+       "p95_all17": 0.04159451654038515,
+       "mean_crop": 0.00804032078406252,
+       "p95_crop": 0.020615358052085937,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.008832490497544037,
+       "jitter_dec": 0.047147118586752995,
+       "jitter_ratio": 5.33791897085683,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.15601212484762073
+    }
+   ]
+  },
+  "b": {
+   "Al": [
+    {
+     "setting": {
+      "q": 8,
+      "key": 1,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q8-k1-pre-lin-visall",
+     "bytes": 2875,
+     "header_bytes": 13,
+     "kbps": 2.3958333333333335,
+     "estimated_bytes_by_section": {
+      "visibility": 156.63597254603616,
+      "coordinates": 2712.002511900169
+     },
+     "sha256": "4ff4dafc4fa2642e4a8522f49c693ef454e9af187853565efbadc34e17ca6785",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 96.0,
+       "crop_height_px": 188.86437499999997,
+       "frames": 240,
+       "confident_joints": 3765,
+       "mean": 0.0340068783353596,
+       "p95": 0.05892556509887897,
+       "mean_all17": 0.03385122517598383,
+       "p95_all17": 0.05892556509887897,
+       "mean_crop": 0.017285739145852793,
+       "p95_crop": 0.029951939054108968,
+       "max_px": 5.656854249492381,
+       "jitter_ref": 0.010340807745428553,
+       "jitter_dec": 0.06695169687616144,
+       "jitter_ratio": 6.474513260896794,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 136.5,
+       "crop_height_px": 248.67499999999998,
+       "frames": 240,
+       "confident_joints": 3129,
+       "mean": 0.023345537474958475,
+       "p95": 0.04144215567393685,
+       "mean_all17": 0.02331008291201626,
+       "p95_all17": 0.04144215567393685,
+       "mean_crop": 0.012814580739245329,
+       "p95_crop": 0.022747981298853446,
+       "max_px": 5.656854249492381,
+       "jitter_ref": 0.012089056438796044,
+       "jitter_dec": 0.05346882291148786,
+       "jitter_ratio": 4.422911182703755,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.15460274973884225
+    },
+    {
+     "setting": {
+      "q": 16,
+      "key": 1,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q16-k1-pre-lin-visall",
+     "bytes": 2128,
+     "header_bytes": 13,
+     "kbps": 1.7733333333333334,
+     "estimated_bytes_by_section": {
+      "visibility": 156.63597254603616,
+      "coordinates": 1962.3316139926676
+     },
+     "sha256": "a70291cd3f4c7699b5c5b8cfdeed9b0efa6f1c8cb37010612a457f52c84b158f",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 96.0,
+       "crop_height_px": 188.86437499999997,
+       "frames": 240,
+       "confident_joints": 3765,
+       "mean": 0.06516540253436914,
+       "p95": 0.10416666666666667,
+       "mean_all17": 0.06539808709954825,
+       "p95_all17": 0.10416666666666667,
+       "mean_crop": 0.03312365629197904,
+       "p95_crop": 0.05294804803711659,
+       "max_px": 11.313708498984761,
+       "jitter_ref": 0.010340807745428553,
+       "jitter_dec": 0.10467452699389657,
+       "jitter_ratio": 10.12247104585915,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 136.5,
+       "crop_height_px": 248.67499999999998,
+       "frames": 240,
+       "confident_joints": 3129,
+       "mean": 0.04574158646146458,
+       "p95": 0.07326007326007326,
+       "mean_all17": 0.04551891464255593,
+       "p95_all17": 0.07326007326007326,
+       "mean_crop": 0.025107978493977747,
+       "p95_crop": 0.040213129586810094,
+       "max_px": 11.313708498984761,
+       "jitter_ref": 0.012089056438796044,
+       "jitter_dec": 0.08974730329921733,
+       "jitter_ratio": 7.423846828210798,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.1378412079066038
+    }
+   ],
+   "Med": [
+    {
+     "setting": {
+      "q": 8,
+      "key": 1,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q8-k1-pre-lin-visall",
+     "bytes": 2062,
+     "header_bytes": 13,
+     "kbps": 3.436666666666667,
+     "estimated_bytes_by_section": {
+      "visibility": 171.26954104152276,
+      "coordinates": 1877.77015433548
+     },
+     "sha256": "57292c24ef71cb02ef9eaa57923c5a27f186b5481d8a2e4d85d05d11a913ff93",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 134.0,
+       "crop_height_px": 218.53999999999996,
+       "frames": 240,
+       "confident_joints": 3182,
+       "mean": 0.024126687738115885,
+       "p95": 0.04221533022009239,
+       "mean_all17": 0.02414700007874343,
+       "p95_all17": 0.04221533022009239,
+       "mean_crop": 0.014793521354935156,
+       "p95_crop": 0.025884754504861267,
+       "max_px": 5.656854249492381,
+       "jitter_ref": 0.004486430278708406,
+       "jitter_dec": 0.045334492641145634,
+       "jitter_ratio": 10.104802666006645,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 68.0,
+       "crop_height_px": 137.2,
+       "frames": 240,
+       "confident_joints": 3715,
+       "mean": 0.047178246436082406,
+       "p95": 0.0831890330807703,
+       "mean_all17": 0.04732554338756141,
+       "p95_all17": 0.0831890330807703,
+       "mean_crop": 0.02338280435607583,
+       "p95_crop": 0.04123071610417187,
+       "max_px": 5.656854249492381,
+       "jitter_ref": 0.008832490497544037,
+       "jitter_dec": 0.0745874620092333,
+       "jitter_ratio": 8.44466937495977,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.1343216672539711
+    },
+    {
+     "setting": {
+      "q": 16,
+      "key": 1,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q16-k1-pre-lin-visall",
+     "bytes": 1437,
+     "header_bytes": 13,
+     "kbps": 2.395,
+     "estimated_bytes_by_section": {
+      "visibility": 171.26954104152276,
+      "coordinates": 1252.35315682567
+     },
+     "sha256": "7214ef04539ac1a08960cf69da0f513f8b9e049b8295da7ec7a012276003e32e",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 134.0,
+       "crop_height_px": 218.53999999999996,
+       "frames": 240,
+       "confident_joints": 3182,
+       "mean": 0.046055090029636404,
+       "p95": 0.07462686567164178,
+       "mean_all17": 0.046024587704645174,
+       "p95_all17": 0.07462686567164178,
+       "mean_crop": 0.028239141868634025,
+       "p95_crop": 0.04575821359934109,
+       "max_px": 11.313708498984761,
+       "jitter_ref": 0.004486430278708406,
+       "jitter_dec": 0.055682144770255175,
+       "jitter_ratio": 12.411235951778895,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 68.0,
+       "crop_height_px": 137.2,
+       "frames": 240,
+       "confident_joints": 3715,
+       "mean": 0.09211671014583123,
+       "p95": 0.14705882352941177,
+       "mean_all17": 0.09231333175627245,
+       "p95_all17": 0.14705882352941177,
+       "mean_crop": 0.045655512317175836,
+       "p95_crop": 0.0728862973760933,
+       "max_px": 11.313708498984761,
+       "jitter_ref": 0.008832490497544037,
+       "jitter_dec": 0.10701384940850092,
+       "jitter_ratio": 12.115931450846983,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.13068229099735618
+    }
+   ]
+  },
+  "c": {
+   "Al": [
+    {
+     "setting": {
+      "q": 4,
+      "key": 2,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q4-k2-pre-lin-visall",
+     "bytes": 2930,
+     "header_bytes": 13,
+     "kbps": 2.441666666666667,
+     "estimated_bytes_by_section": {
+      "visibility": 156.63597254603616,
+      "coordinates": 2770.284027488105
+     },
+     "sha256": "f361915460aab8b7220852cadf7cbf0335e6051dc5467958be40480a72c8d91a",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 96.0,
+       "crop_height_px": 188.86437499999997,
+       "frames": 240,
+       "confident_joints": 3765,
+       "mean": 0.008697781620622519,
+       "p95": 0.029462782549439483,
+       "mean_all17": 0.00870300297726661,
+       "p95_all17": 0.029462782549439483,
+       "mean_crop": 0.004421093367024681,
+       "p95_crop": 0.014975969527054484,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.010340807745428553,
+       "jitter_dec": 0.0156135667337311,
+       "jitter_ratio": 1.509898174118315,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 136.5,
+       "crop_height_px": 248.67499999999998,
+       "frames": 240,
+       "confident_joints": 3129,
+       "mean": 0.00627144883318397,
+       "p95": 0.020721077836968426,
+       "mean_all17": 0.006238263237759634,
+       "p95_all17": 0.020721077836968426,
+       "mean_crop": 0.003442456080143207,
+       "p95_crop": 0.011373990649426723,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.012089056438796044,
+       "jitter_dec": 0.015549682342025698,
+       "jitter_ratio": 1.2862610428489571,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.1324139591306448
+    },
+    {
+     "setting": {
+      "q": 4,
+      "key": 2,
+      "predictor": "previous",
+      "interp": "cubic",
+      "vis": "all"
+     },
+     "label": "q4-k2-pre-cub-visall",
+     "bytes": 2930,
+     "header_bytes": 13,
+     "kbps": 2.441666666666667,
+     "estimated_bytes_by_section": {
+      "visibility": 156.63597254603616,
+      "coordinates": 2770.284027488105
+     },
+     "sha256": "0f72867f4851490d3b8160f2a0888f5a7990af80b771a402e1fe507d52d518a9",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 96.0,
+       "crop_height_px": 188.86437499999997,
+       "frames": 240,
+       "confident_joints": 3765,
+       "mean": 0.01005410665274711,
+       "p95": 0.029462782549439483,
+       "mean_all17": 0.01004272452537281,
+       "p95_all17": 0.029462782549439483,
+       "mean_crop": 0.0051105150913914954,
+       "p95_crop": 0.014975969527054484,
+       "max_px": 4.373213921133975,
+       "jitter_ref": 0.010340807745428553,
+       "jitter_dec": 0.01885791878589008,
+       "jitter_ratio": 1.8236407880445082,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 136.5,
+       "crop_height_px": 248.67499999999998,
+       "frames": 240,
+       "confident_joints": 3129,
+       "mean": 0.007928926270560402,
+       "p95": 0.020721077836968426,
+       "mean_all17": 0.007872169061339971,
+       "p95_all17": 0.020721077836968426,
+       "mean_crop": 0.004352260725571508,
+       "p95_crop": 0.011373990649426723,
+       "max_px": 7.00446286306095,
+       "jitter_ref": 0.012089056438796044,
+       "jitter_dec": 0.01921836647228736,
+       "jitter_ratio": 1.5897325460911924,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.13951204204931855
+    },
+    {
+     "setting": {
+      "q": 4,
+      "key": 4,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q4-k4-pre-lin-visall",
+     "bytes": 2174,
+     "header_bytes": 13,
+     "kbps": 1.8116666666666668,
+     "estimated_bytes_by_section": {
+      "visibility": 156.63597254603616,
+      "coordinates": 2015.5097161565757
+     },
+     "sha256": "1d1660789f3cae93fc73cab43782df609e0ce341b7344716a4291a8efb5fd915",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 96.0,
+       "crop_height_px": 188.86437499999997,
+       "frames": 240,
+       "confident_joints": 3765,
+       "mean": 0.0,
+       "p95": 0.0,
+       "mean_all17": 0.0,
+       "p95_all17": 0.0,
+       "mean_crop": 0.0,
+       "p95_crop": 0.0,
+       "max_px": 0.0,
+       "jitter_ref": 0.010340807745428553,
+       "jitter_dec": 0.010340807745428553,
+       "jitter_ratio": 1.0,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 136.5,
+       "crop_height_px": 248.67499999999998,
+       "frames": 240,
+       "confident_joints": 3129,
+       "mean": 0.0,
+       "p95": 0.0,
+       "mean_all17": 0.0,
+       "p95_all17": 0.0,
+       "mean_crop": 0.0,
+       "p95_crop": 0.0,
+       "max_px": 0.0,
+       "jitter_ref": 0.012089056438796044,
+       "jitter_dec": 0.012089056438796044,
+       "jitter_ratio": 1.0,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": true,
+     "seconds": 0.10299716610461473
+    },
+    {
+     "setting": {
+      "q": 4,
+      "key": 4,
+      "predictor": "previous",
+      "interp": "cubic",
+      "vis": "all"
+     },
+     "label": "q4-k4-pre-cub-visall",
+     "bytes": 2174,
+     "header_bytes": 13,
+     "kbps": 1.8116666666666668,
+     "estimated_bytes_by_section": {
+      "visibility": 156.63597254603616,
+      "coordinates": 2015.5097161565757
+     },
+     "sha256": "460a97c2eddb7c7bb73241883ecb0c161f098dd985ad9b4aab79f978a1bb9ec1",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 96.0,
+       "crop_height_px": 188.86437499999997,
+       "frames": 240,
+       "confident_joints": 3765,
+       "mean": 0.00901629892162836,
+       "p95": 0.02530389846686365,
+       "mean_all17": 0.008899067267479587,
+       "p95_all17": 0.024705294220065465,
+       "mean_crop": 0.004582996112826056,
+       "p95_crop": 0.012862003502878246,
+       "max_px": 7.7404805446755045,
+       "jitter_ref": 0.010340807745428553,
+       "jitter_dec": 0.013579188454857097,
+       "jitter_ratio": 1.3131651597391085,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 136.5,
+       "crop_height_px": 248.67499999999998,
+       "frames": 240,
+       "confident_joints": 3129,
+       "mean": 0.010656624021327415,
+       "p95": 0.0317542487515072,
+       "mean_all17": 0.010477324528191846,
+       "p95_all17": 0.031135531135531136,
+       "mean_crop": 0.0058495191672310945,
+       "p95_crop": 0.01743019987767461,
+       "max_px": 11.698858117354872,
+       "jitter_ref": 0.012089056438796044,
+       "jitter_dec": 0.015314566805318595,
+       "jitter_ratio": 1.2668124169038772,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.10486162500455976
+    }
+   ],
+   "Med": [
+    {
+     "setting": {
+      "q": 4,
+      "key": 2,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q4-k2-pre-lin-visall",
+     "bytes": 2112,
+     "header_bytes": 13,
+     "kbps": 3.52,
+     "estimated_bytes_by_section": {
+      "visibility": 171.26954104152276,
+      "coordinates": 1931.27923985134
+     },
+     "sha256": "97112d2d4b7461b5e33814449959b504ab4886de3a29acc718ff7523ac0f0b0d",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 134.0,
+       "crop_height_px": 218.53999999999996,
+       "frames": 240,
+       "confident_joints": 3182,
+       "mean": 0.00632569227328917,
+       "p95": 0.021107665110046196,
+       "mean_all17": 0.006339800653656358,
+       "p95_all17": 0.021107665110046196,
+       "mean_crop": 0.003878661867945222,
+       "p95_crop": 0.012942377252430633,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.004486430278708406,
+       "jitter_dec": 0.008550837953031127,
+       "jitter_ratio": 1.9059335422220847,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 68.0,
+       "crop_height_px": 137.2,
+       "frames": 240,
+       "confident_joints": 3715,
+       "mean": 0.01229184066636773,
+       "p95": 0.04159451654038515,
+       "mean_all17": 0.012278747053873445,
+       "p95_all17": 0.04159451654038515,
+       "mean_crop": 0.00609216592793736,
+       "p95_crop": 0.020615358052085937,
+       "max_px": 2.8284271247461903,
+       "jitter_ref": 0.008832490497544037,
+       "jitter_dec": 0.016868922634526055,
+       "jitter_ratio": 1.9098715859605655,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.10566450003534555
+    },
+    {
+     "setting": {
+      "q": 4,
+      "key": 2,
+      "predictor": "previous",
+      "interp": "cubic",
+      "vis": "all"
+     },
+     "label": "q4-k2-pre-cub-visall",
+     "bytes": 2112,
+     "header_bytes": 13,
+     "kbps": 3.52,
+     "estimated_bytes_by_section": {
+      "visibility": 171.26954104152276,
+      "coordinates": 1931.27923985134
+     },
+     "sha256": "50c21faede4e01d7d22cf5651cfd74f302746d3a782fe104b90a4e3ef9e0e32c",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 134.0,
+       "crop_height_px": 218.53999999999996,
+       "frames": 240,
+       "confident_joints": 3182,
+       "mean": 0.0069417522180787545,
+       "p95": 0.021107665110046196,
+       "mean_all17": 0.006950505183436049,
+       "p95_all17": 0.021107665110046196,
+       "mean_crop": 0.004256405222030535,
+       "p95_crop": 0.012942377252430633,
+       "max_px": 3.2596012026013246,
+       "jitter_ref": 0.004486430278708406,
+       "jitter_dec": 0.010183134832569218,
+       "jitter_ratio": 2.269763308458419,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 68.0,
+       "crop_height_px": 137.2,
+       "frames": 240,
+       "confident_joints": 3715,
+       "mean": 0.013538449261329608,
+       "p95": 0.04159451654038515,
+       "mean_all17": 0.013504014571097154,
+       "p95_all17": 0.04159451654038515,
+       "mean_crop": 0.006710018584332459,
+       "p95_crop": 0.020615358052085937,
+       "max_px": 4.190763653560053,
+       "jitter_ref": 0.008832490497544037,
+       "jitter_dec": 0.01992638884954181,
+       "jitter_ratio": 2.2560328658244857,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.10956274997442961
+    },
+    {
+     "setting": {
+      "q": 4,
+      "key": 4,
+      "predictor": "previous",
+      "interp": "linear",
+      "vis": "all"
+     },
+     "label": "q4-k4-pre-lin-visall",
+     "bytes": 1659,
+     "header_bytes": 13,
+     "kbps": 2.765,
+     "estimated_bytes_by_section": {
+      "visibility": 171.26954104152276,
+      "coordinates": 1478.9302768576501
+     },
+     "sha256": "43e6c4a47a1301e693c73e77f1065ef209ebd27a717dd1858919a019e1b67f11",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 134.0,
+       "crop_height_px": 218.53999999999996,
+       "frames": 240,
+       "confident_joints": 3182,
+       "mean": 0.0,
+       "p95": 0.0,
+       "mean_all17": 0.0,
+       "p95_all17": 0.0,
+       "mean_crop": 0.0,
+       "p95_crop": 0.0,
+       "max_px": 0.0,
+       "jitter_ref": 0.004486430278708406,
+       "jitter_dec": 0.004486430278708406,
+       "jitter_ratio": 1.0,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 68.0,
+       "crop_height_px": 137.2,
+       "frames": 240,
+       "confident_joints": 3715,
+       "mean": 0.0,
+       "p95": 0.0,
+       "mean_all17": 0.0,
+       "p95_all17": 0.0,
+       "mean_crop": 0.0,
+       "p95_crop": 0.0,
+       "max_px": 0.0,
+       "jitter_ref": 0.008832490497544037,
+       "jitter_dec": 0.008832490497544037,
+       "jitter_ratio": 1.0,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": true,
+     "seconds": 0.0800702078267932
+    },
+    {
+     "setting": {
+      "q": 4,
+      "key": 4,
+      "predictor": "previous",
+      "interp": "cubic",
+      "vis": "all"
+     },
+     "label": "q4-k4-pre-cub-visall",
+     "bytes": 1659,
+     "header_bytes": 13,
+     "kbps": 2.765,
+     "estimated_bytes_by_section": {
+      "visibility": 171.26954104152276,
+      "coordinates": 1478.9302768576501
+     },
+     "sha256": "90cd76ac58a457ff956b0daaab6b9d4aaff78bd937013cd8d9961d3b4f0f4b48",
+     "round_trip_exact": true,
+     "players": [
+      {
+       "height_px": 134.0,
+       "crop_height_px": 218.53999999999996,
+       "frames": 240,
+       "confident_joints": 3182,
+       "mean": 0.003988598444575374,
+       "p95": 0.012369702545803428,
+       "mean_all17": 0.003921209051176146,
+       "p95_all17": 0.011946127308643374,
+       "mean_crop": 0.0024456492704909866,
+       "p95_crop": 0.007584607582765899,
+       "max_px": 6.5,
+       "jitter_ref": 0.004486430278708406,
+       "jitter_dec": 0.005956769571891811,
+       "jitter_ratio": 1.327730333882888,
+       "visibility_mismatch": 0.0
+      },
+      {
+       "height_px": 68.0,
+       "crop_height_px": 137.2,
+       "frames": 240,
+       "confident_joints": 3715,
+       "mean": 0.007207754183980123,
+       "p95": 0.023719646876036653,
+       "mean_all17": 0.006977474724324501,
+       "p95_all17": 0.02296106411436133,
+       "mean_crop": 0.0035723563010980203,
+       "p95_crop": 0.011756093203866565,
+       "max_px": 5.347038461849699,
+       "jitter_ref": 0.008832490497544037,
+       "jitter_dec": 0.01190718294241625,
+       "jitter_ratio": 1.3481116051839694,
+       "visibility_mismatch": 0.0
+      }
+     ],
+     "passes_error": false,
+     "seconds": 0.08287833305075765
+    }
+   ]
+  }
+ },
+ "stage1_candidates": [],
+ "stage2": {
+  "omitted": "156 settings per window; regenerate with python -m experiments.tennis.w2_pose_rate (about 30 s CPU). Frontier, best-at-level and candidates below are computed from it.",
+  "settings_per_window": {
+   "Al": 156,
+   "Med": 156
+  }
+ },
+ "best_at_error_level": {
+  "0.33%": {
+   "Al": {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 2093,
+    "kbps": 1.7441666666666666,
+    "visibility_mismatch": 0.03357843137254902
+   },
+   "Med": {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 1557,
+    "kbps": 2.595,
+    "visibility_mismatch": 0.03504901960784314
+   }
+  },
+  "0.66%": {
+   "Al": {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 2093,
+    "kbps": 1.7441666666666666,
+    "visibility_mismatch": 0.03357843137254902
+   },
+   "Med": {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 1557,
+    "kbps": 2.595,
+    "visibility_mismatch": 0.03504901960784314
+   }
+  },
+  "1.32%": {
+   "Al": {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 2093,
+    "kbps": 1.7441666666666666,
+    "visibility_mismatch": 0.03357843137254902
+   },
+   "Med": {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 1557,
+    "kbps": 2.595,
+    "visibility_mismatch": 0.03504901960784314
+   }
+  },
+  "2.64%": {
+   "Al": {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 2093,
+    "kbps": 1.7441666666666666,
+    "visibility_mismatch": 0.03357843137254902
+   },
+   "Med": {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 1557,
+    "kbps": 2.595,
+    "visibility_mismatch": 0.03504901960784314
+   }
+  }
+ },
+ "best_at_error_level_supplementary": {
+  "5.28%": {
+   "Al": {
+    "label": "q8-k4-pre-lin-viskeys",
+    "bytes": 1590,
+    "kbps": 1.325,
+    "visibility_mismatch": 0.03357843137254902
+   },
+   "Med": {
+    "label": "q8-k4-pre-lin-viskeys",
+    "bytes": 1154,
+    "kbps": 1.9233333333333336,
+    "visibility_mismatch": 0.03504901960784314
+   }
+  },
+  "10.56%": {
+   "Al": {
+    "label": "q16-k8-pre-lin-viskeys",
+    "bytes": 775,
+    "kbps": 0.6458333333333334,
+    "visibility_mismatch": 0.06053921568627451
+   },
+   "Med": {
+    "label": "q16-k8-pre-lin-viskeys",
+    "bytes": 569,
+    "kbps": 0.9483333333333334,
+    "visibility_mismatch": 0.045098039215686274
+   }
+  }
+ },
+ "frontier": {
+  "Al": [
+   {
+    "label": "q32-k8-pre-lin-viskeys",
+    "bytes": 574,
+    "kbps": 0.4783333333333334,
+    "worst_mean": 0.11697081246211287,
+    "worst_p95": 0.2081767892607733,
+    "visibility_mismatch": 0.06053921568627451
+   },
+   {
+    "label": "q16-k8-pre-lin-viskeys",
+    "bytes": 775,
+    "kbps": 0.6458333333333334,
+    "worst_mean": 0.07551325810753913,
+    "worst_p95": 0.15526874885841144,
+    "visibility_mismatch": 0.06053921568627451
+   },
+   {
+    "label": "q8-k8-pre-cub-viskeys",
+    "bytes": 1033,
+    "kbps": 0.8608333333333333,
+    "worst_mean": 0.06076458473470373,
+    "worst_p95": 0.15123026812664117,
+    "visibility_mismatch": 0.06053921568627451
+   },
+   {
+    "label": "q16-k4-pre-lin-viskeys",
+    "bytes": 1157,
+    "kbps": 0.9641666666666667,
+    "worst_mean": 0.056149472111817526,
+    "worst_p95": 0.09316949906249124,
+    "visibility_mismatch": 0.03357843137254902
+   },
+   {
+    "label": "q4-k8-pre-cub-viskeys",
+    "bytes": 1316,
+    "kbps": 1.0966666666666667,
+    "worst_mean": 0.046124644810098724,
+    "worst_p95": 0.14581791328308555,
+    "visibility_mismatch": 0.06053921568627451
+   },
+   {
+    "label": "q8-k4-pre-lin-viskeys",
+    "bytes": 1590,
+    "kbps": 1.325,
+    "worst_mean": 0.035382866907653576,
+    "worst_p95": 0.05892556509887897,
+    "visibility_mismatch": 0.03357843137254902
+   },
+   {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 2093,
+    "kbps": 1.7441666666666666,
+    "worst_mean": 0.0,
+    "worst_p95": 0.0,
+    "visibility_mismatch": 0.03357843137254902
+   }
+  ],
+  "Med": [
+   {
+    "label": "q32-k8-pre-lin-viskeys",
+    "bytes": 388,
+    "kbps": 0.6466666666666667,
+    "worst_mean": 0.16148053498035275,
+    "worst_p95": 0.29411764705882354,
+    "visibility_mismatch": 0.045098039215686274
+   },
+   {
+    "label": "q16-k8-pre-lin-viskeys",
+    "bytes": 569,
+    "kbps": 0.9483333333333334,
+    "worst_mean": 0.09302548731499227,
+    "worst_p95": 0.17647058823529413,
+    "visibility_mismatch": 0.045098039215686274
+   },
+   {
+    "label": "q8-k8-pre-lin-viskeys",
+    "bytes": 768,
+    "kbps": 1.28,
+    "worst_mean": 0.06311845970364759,
+    "worst_p95": 0.1315334104411641,
+    "visibility_mismatch": 0.045098039215686274
+   },
+   {
+    "label": "q4-k8-pre-cub-viskeys",
+    "bytes": 1029,
+    "kbps": 1.715,
+    "worst_mean": 0.03568674677147565,
+    "worst_p95": 0.1277578366154731,
+    "visibility_mismatch": 0.045098039215686274
+   },
+   {
+    "label": "q4-k4-pre-lin-viskeys",
+    "bytes": 1557,
+    "kbps": 2.595,
+    "worst_mean": 0.0,
+    "worst_p95": 0.0,
+    "visibility_mismatch": 0.03504901960784314
+   }
+  ]
+ },
+ "stage2_candidates": [],
+ "entropy_floor_bytes_q4_key4": {
+  "Al": {
+   "previous": 2259.1136932982176,
+   "previous_gmc": 1715.1835403344485,
+   "velocity": 2079.2247964404437,
+   "velocity_gmc": 1901.0784711006936,
+   "visibility": 161.5778905953249
+  },
+  "Med": {
+   "previous": 1719.1602086305186,
+   "previous_gmc": 1309.607255550436,
+   "velocity": 1537.3228501366625,
+   "velocity_gmc": 1490.92124619999,
+   "visibility": 182.81600189644658
+  }
+ },
+ "entropy_floor_note": "zeroth-order static-table entropy of key residuals, excluding first key and header; a lower-bound diagnostic for the zero-error stream, not a coder",
+ "analysis_code_sha256": "72f7067bb1d9ff2919963fcbbdb883d74325ce8e2b3f479558e8035cbb53e3ba",
+ "wall_seconds": 30.922893916256726
+}
