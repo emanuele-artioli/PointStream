@@ -248,3 +248,26 @@ Codex sessions follow the same protocol. What differs:
   its own row of PLAN.md's dispatch ledger (`running` when it starts,
   `reported` with its outcome when it stops) and its item's bullet in
   "Where PointStream stands", so PLAN.md stays the single record.
+
+### Codex validation
+
+Pending since 2026-10-29. The subagent tiers were written and tested in
+Claude Code only. The first Codex session that delegates checks:
+
+1. **Models.** One trivial delegate per tier: `gpt-6.1-sol` at `medium`,
+   `gpt-6.1-terra` at `medium` and at `low`. Record the model and effort
+   the delegate actually reports.
+2. **Runner discipline.** A runner given a frozen launch-and-report brief
+   with one deliberately failing step stops there and reports, without a
+   workaround. Claude Code enforces this with a hook
+   (`tools/agent_hooks/subagent_guard.py failed`, wired from
+   `.claude/agents/haiku-runner.md`); Codex has no such hook, so say
+   whether its prompt alone holds, or what Codex needs instead.
+3. **Parity review.** Read the tier table and the delegation rule in
+   AGENTS.md, [Subagents inside a session](#subagents-inside-a-session),
+   and the delegation hint in `tools/agent_hooks/guard_large_read.py`
+   (which also runs under Codex). Note whatever does not hold for Codex.
+
+Record the date, the Codex version and the findings here, fix what is
+wrong in a PR, and delete the "Not yet validated in Codex" paragraph from
+AGENTS.md.

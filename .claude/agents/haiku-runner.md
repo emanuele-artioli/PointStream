@@ -1,6 +1,6 @@
 ---
 name: haiku-runner
-description: Fully specified mechanical work with no decisions left — run these commands and report, collect or move named files, render crops for a visual check, refresh a table from a given file, apply an exact edit across listed files, summarize a long log. The brief must give every step and the expected result.
+description: Use proactively, without being asked, for fully specified mechanical work with no decisions left — run these commands and report, collect or move named files, render crops for a visual check, refresh a table from a given file, apply an exact edit across listed files, summarize a long log. The brief must give every step and the expected result.
 model: haiku
 effort: medium
 disallowedTools: Agent, WebSearch, WebFetch
