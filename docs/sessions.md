@@ -261,8 +261,13 @@ Claude Code only. The first Codex session that delegates checks:
    with one deliberately failing step stops there and reports, without a
    workaround. Claude Code enforces this with a hook
    (`tools/agent_hooks/subagent_guard.py failed`, wired from
-   `.claude/agents/haiku-runner.md`); Codex has no such hook, so say
-   whether its prompt alone holds, or what Codex needs instead.
+   `.claude/agents/haiku-runner.md`). The same script cannot simply be
+   reused: Codex's `PostToolUse` does run after a non-zero Bash exit and
+   can add `additionalContext`, but its tool events carry no agent
+   identity and its hooks cannot be scoped to one subagent (Codex hooks
+   docs, read 2026-10-29), so the reminder would also reach the main
+   session. Check whether an agent role's config file can carry its own
+   hooks; if not, say whether the runner's prompt alone holds.
 3. **Parity review.** Read the tier table and the delegation rule in
    AGENTS.md, [Subagents inside a session](#subagents-inside-a-session),
    and the delegation hint in `tools/agent_hooks/guard_large_read.py`
