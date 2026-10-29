@@ -20,7 +20,7 @@ FILES = {
     'dists': (DATA + '/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth', WEIGHTS['dists']),
 }
 DEADLINE = '2026-10-29T18:00:00+00:00'
-CPU_HOSTS = ['gpu1', 'gpu2', 'gpu3', 'gpu5', 'gpu6']
+CPU_HOSTS = ['gpu1', 'gpu2', 'gpu3', 'gpu6']  # gpu5's worker had no fresh heartbeat on 2026-10-29
 
 
 def staged(names: list[str], extra: dict[str, tuple[str, str]] | None = None) -> list[dict[str, Any]]:
