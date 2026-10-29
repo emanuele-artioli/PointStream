@@ -126,3 +126,10 @@ judges ([j.md](j.md)).
   load 30). **Published**: generation, player `…person_000000000001`, A6000
   gpu3, commit `5585edff`: `20261029T195226Z-26f4c52d` (the client's publish
   call timed out at 120 s but it landed; state pending).
+- `20261029T195226Z-26f4c52d` stayed pending for 3 h: another user holds 25.5
+  GB of gpu3 (48 GB) and shared admission needed 16,000 + 8,192 MiB free
+  (23.6 GB free). It never started (no GPU time) and was cancelled by me
+  (own job). Resubmitted with 13,500 MiB declared (peak 12.2 GiB) and a
+  3,072 MiB margin. `20261029T224503Z-6d849ba1` (client timed out; only a
+  `source` dir) is unpublished and abandoned.
+- Jobs (resubmitted): see below.
