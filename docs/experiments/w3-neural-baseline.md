@@ -99,3 +99,7 @@ the decisions are in [experiments.md](../experiments.md). Context:
   holds a complete `source/` (250 entries) and `source.tar` but no request, and
   `ps-fleet status` answers "unpublished or unknown". Host load on gpu2/gpu3 was about 34.
   No GPU time spent. No further resubmission without root.
+- Jobs (third submission, root-approved option c): `20261029T093021Z-81571456`, published,
+  same spec, 250-entry `--snapshot-path` set, default transfer timeout, revision `0f2238f6`
+  (HEAD at submission; the code is that of `eba13641`, later commits change docs only).
+  The two earlier IDs stay unpublished and untouched.
