@@ -2,7 +2,8 @@
 
 Each spec is 4a's ``score-<video>-<coder>.json`` (same pairs, backgrounds, foreground archive, judges) with three
 changes: the tag is ``w4-<coder>``, the stage reads the diagnostic's saved tracker output and seed, and the limits
-and hosts are W4's. Usage: ``python -m experiments.visor.w4_specs SPECS_4A_DIR OUT_DIR DEADLINE``.
+and hosts are W4's. Usage: ``python -m experiments.visor.w4_specs SPECS_4A_DIR OUT_DIR DEADLINE [INPUTS_JSON]``; with the 4d scoring
+inputs, only the thinned pairs.
 """
 from __future__ import annotations
 
@@ -30,11 +31,11 @@ DIAGNOSTICS: dict[str, dict[str, str]] = {
                 "seed": "d7caf5293f9cd431271eade2934a1392d649ddc8e9573934a4bc5542e5fb844b"},
 }
 
-HOSTS = ["gpu5", "gpu6"]  # RTX 6000 Ada; gpu2's loaded A6000s time out smokes, gpu4 is reserved
+HOSTS = ["gpu6"]  # RTX 6000 Ada; gpu5's worker heartbeat was stale (835 s) on 2026-10-29, gpu2 times out smokes, gpu4 is reserved
 MODELS = ["RTX 6000 Ada"]
 SMOKE_FRAMES, SMOKE_PAIRS = 24, 2
-#: A full stage's cap: setup plus a pair's scoring (4a: 20 to 45 s a pair on an Ada GPU) with a margin.
-FULL_BASE_SECONDS, FULL_PAIR_SECONDS = 300, 50
+#: A full stage's cap: setup plus a pair's scoring (4a: 40 s; the first W4 job: 175 s under host contention).
+FULL_BASE_SECONDS, FULL_PAIR_SECONDS = 300, 200
 
 
 def make_spec(base: dict[str, Any], video: str, coder: str, deadline: str, full_seconds: int) -> dict[str, Any]:
@@ -63,14 +64,35 @@ def make_spec(base: dict[str, Any], video: str, coder: str, deadline: str, full_
     return s
 
 
+def thinned_pairs(inputs: Path) -> dict[str, set[tuple[str, str]]]:
+    """Per video, the fallback pair set of ``w4_report.thin`` from H5p 4d's ``h5p-scoring-inputs.json``."""
+    from experiments.visor.w4_report import thin
+
+    base = json.loads(inputs.read_text())
+    out: dict[str, set[tuple[str, str]]] = {}
+    for item, selection in base["selection"].items():
+        chosen = {(pair, coder) for pair, coder, ms in selection if "wdists_fill" in ms}
+        rates = {(r["pair"], r["tag"].removeprefix("h5p4-")): r["kbps"] for st in base["scores"]
+                 if st["item"] == item for r in st["rows"]}
+        out[item.rsplit("_", 1)[0]] = thin(chosen, rates)
+    return out
+
+
 def main() -> int:
     specs, out, deadline = (Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3])
+    keep = thinned_pairs(Path(sys.argv[4])) if len(sys.argv) > 4 else None
     out.mkdir(parents=True, exist_ok=True)
     for video in DIAGNOSTICS:
         for coder in ("gho", "venue"):
             path = specs / f"score-{video}-{coder}.json"
             if path.is_file():
                 base = json.loads(path.read_text())
+                if keep is not None:
+                    a = base["arguments"]
+                    wanted = [x for x in a[a.index("--pairs") + 1].split(",") if (x, coder) in keep[video]]
+                    if not wanted:
+                        continue
+                    a[a.index("--pairs") + 1] = ",".join(wanted)
                 pairs = len(base["arguments"][base["arguments"].index("--pairs") + 1].split(","))
                 spec = make_spec(base, video, coder, deadline, FULL_BASE_SECONDS + FULL_PAIR_SECONDS * pairs)
                 (out / f"w4-{video}-{coder}.json").write_text(json.dumps(spec, indent=1))

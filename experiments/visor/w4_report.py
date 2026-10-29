@@ -22,6 +22,18 @@ RULE_ITEMS = 3
 ANCHOR = "dcvc-venue"
 
 
+THIN_PAIRS = 4
+
+
+def thin(chosen: set[tuple[str, str]], rate: dict[tuple[str, str], float], count: int = THIN_PAIRS) -> set[tuple[str, str]]:
+    """The fallback pair set, by rate position only: the item's hull pairs sorted by 4a's billed rate, the ones at
+    ranks round(k (n - 1) / (count - 1)) for k = 0 .. count - 1 (all of them when there are at most ``count``)."""
+    ranked = sorted(chosen, key=lambda key: (rate[key], key))
+    if len(ranked) <= count:
+        return set(ranked)
+    return {ranked[round(k * (len(ranked) - 1) / (count - 1))] for k in range(count)}
+
+
 def without_mask(row: dict[str, Any]) -> dict[str, Any]:
     """4a's row with the MASK segment's bytes taken off its rate (F̂ granted)."""
     return {**row, "kbps": row["kbps"] * (1.0 - row["breakdown"].get("mask", 0) / row["bytes"])}
@@ -60,6 +72,7 @@ def main() -> int:
     p.add_argument("--inputs", type=Path, required=True)
     p.add_argument("--score", type=Path, action="append", required=True)
     p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--thin", action="store_true", help="score only the rate-position pairs (`thin`)")
     args = p.parse_args()
     base = json.loads(args.inputs.read_text())
     stages = [json.loads(path.read_text()) for path in args.score]
@@ -69,6 +82,10 @@ def main() -> int:
         "items": {}}
     for item, selection in sorted(base["selection"].items()):
         chosen = {(pair, coder) for pair, coder, ms in selection if "wdists_fill" in ms}
+        if args.thin:
+            rates = {(r["pair"], r["tag"].removeprefix("h5p4-")): r["kbps"] for st in base["scores"]
+                     if st["item"] == item for r in st["rows"]}
+            chosen = thin(chosen, rates)
         reference = [r for st in base["scores"] if st["item"] == item for r in st["rows"]
                      if (r["pair"], r["tag"].removeprefix("h5p4-")) in chosen]
         received = [r for st in stages if st["item"] == item for r in st["rows"]

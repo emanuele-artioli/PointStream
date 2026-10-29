@@ -103,7 +103,7 @@ def test_spec_reads_the_diagnostic_and_keeps_4a_pairs() -> None:
     staged = {x["name"]: x for x in s["staged_inputs"]}
     assert staged["receiver_masks"]["path"].endswith("20261024T084607Z-e00640d5/full/arm0-dcvc-0_4.npz")
     assert staged["receiver_seed"]["sha256"] == w4_specs.DIAGNOSTICS["P03_10"]["seed"]
-    assert s["hosts"] == ["gpu5", "gpu6"] and s["budget_seconds"] == 600 + 300 + 120
+    assert s["hosts"] == ["gpu6"] and s["budget_seconds"] == 600 + 300 + 120
     assert base["arguments"][4] == "h5p4-gho" and len(base["staged_inputs"]) == 1  # the 4a spec is untouched
     with pytest.raises(ValueError):
         w4_specs.make_spec(base, "P03_10", "venue", "d", 600)
@@ -136,3 +136,18 @@ def test_compare_variants_ranks_a_cheaper_curve_below_zero() -> None:
     better = curve([10, 20, 40, 80], [0.30, 0.25, 0.20, 0.16])
     out = w4_report.compare_variants({"receiver": better}, anchors)
     assert out["receiver"]["wdists_fill"]["bd"] < -0.4
+
+
+def test_thin_picks_four_pairs_by_rate_rank_only() -> None:
+    chosen = {(f"p{i}", "gho") for i in range(10)}
+    rate = {(f"p{i}", "gho"): float(100 - i) for i in range(10)}  # p9 is the cheapest
+    # ranks 0, 3, 6, 9 of the 10 sorted by rate: p9, p6, p3, p0
+    assert w4_report.thin(chosen, rate) == {("p9", "gho"), ("p6", "gho"), ("p3", "gho"), ("p0", "gho")}
+    few = {("a", "venue"), ("b", "gho")}
+    assert w4_report.thin(few, {("a", "venue"): 1.0, ("b", "gho"): 2.0}) == few
+    many = {(f"p{i}", "gho") for i in range(15)}
+    assert len(w4_report.thin(many, {(f"p{i}", "gho"): float(i) for i in range(15)})) == 4
+
+
+def test_spec_caps_follow_the_pair_count() -> None:
+    assert w4_specs.FULL_BASE_SECONDS + w4_specs.FULL_PAIR_SECONDS * 7 == 1700

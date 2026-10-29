@@ -77,3 +77,48 @@ the decisions are in [experiments.md](../experiments.md). Context:
   4a's F̂ composites on the same thinned pairs beside them so the comparison
   stays like for like. The decision is made before any receiver-mask score
   is seen.
+
+### 2026-10-29 — W4 plan after the failed job (written before any resubmission)
+- Scope of the claim (root, accepted). Each item's saved 4d(b) mask, tracked
+  on that item's lowest-rate decode (P09_106: `dcvc@42/2`), is applied to all
+  of its hull pairs. This is a conservative construction: a **pass supports**
+  the claim that zero-correction receiver masks keep the DISTS win; a **fail
+  does not reject receiver masks in general**, because a real receiver would
+  track on its own decode of each point, which is better than the lowest-rate
+  one. The seed and the two configuration bytes are the only mask bytes
+  billed.
+- Host notes. gpu6's `/local` was 98% full (6.3 of 6.9 TB, 193 GB free) and
+  another user's training job held one of its GPUs at 100% during the failed
+  job; nothing there is touched or deleted. gpu5's worker heartbeat was 835 s
+  old (stale) when checked, so jobs go to gpu6 (`HOSTS` in `w4_specs.py`).
+- Caps: full stage 300 s + 200 s per pair; smoke 24 frames, 2 pairs (the
+  failed job's smoke took 143 s). W4 total stays within 1.5 GPU-h; 758.7 s
+  are charged, 4641 s remain, and nothing is started that cannot finish
+  inside them.
+- Switch rule (fixed now). Resubmit P03_10 gho with its full 7 pairs. Read
+  `decode_files` of its first finished pair from the job's checkpoint rows.
+  - at most 30 s: run the other seven full-set jobs (all 54 hull pairs);
+  - more than 30 s (including 100 s or more): cancel this job at once (own
+    job only) and run the thinned set below.
+- Thinned set (`w4_report.thin`, rate position only, no score looked at).
+  Per item, the weighted-DISTS hull pairs sorted by their billed rate in 4a
+  (the F-hat composites, mask bytes included), the pairs at ranks
+  round(k (n - 1) / 3) for k = 0..3. That gives four pairs per item:
+  P01_107: `enh-1080-63+dcvc-42_2` (gho), `scene-1080-63+dcvc-63_1` (venue),
+  `scene-540-0+dcvc-0_4` (venue), `scene-540-13+dcvc-21_2` (gho).
+  P02_02: `enh-1080-32+dcvc-63_1`, `enh-1080-59+dcvc-63_1`,
+  `scene-540-0+dcvc-0_4` (all venue), `scene-540-25+dcvc-42_4` (gho).
+  P03_10: `enh-1080-63+dcvc-42_4` (gho), `scene-1080-63+dcvc-63_1` (venue),
+  `scene-540-0+dcvc-0_4` (gho), `scene-540-25+dcvc-42_4` (gho).
+  P09_106: `enh-1080-32+dcvc-63_1`, `enh-1080-59+dcvc-63_1`,
+  `scene-540-0+dcvc-0_4` (all venue), `scene-540-13+dcvc-42_2` (gho).
+  The matching 4a F-hat composites (billed, and with the mask bytes removed)
+  are taken from the same four pairs by `w4_report.py --thin`, and the
+  verdict is judged on the thinned receiver curve with the same rule
+  (weighted DISTS mean <= -10%, >= 3 of 4 items below zero, against
+  `dcvc-venue`). A thinned curve is a coarser hull than the full one and is
+  reported as such; if a thinned item has no BD-rate (no overlap), it is
+  reported as better or worse at every rate and counts as not passing for
+  the mean.
+- Waits are handed to haiku-runner (`ps-fleet wait`, at most 45 minutes).
+
