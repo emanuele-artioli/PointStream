@@ -307,3 +307,42 @@ the decisions are in [experiments.md](../experiments.md). Context:
   metrics where the quality ranges overlap, otherwise "better/worse at every rate" as AGENTS.md
   requires. Inputs are the W3 and W3b DCVC points (all measured, decoded exactly).
 - Jobs: `20261029T190006Z-d48a344b` (hosts gpu5 and gpu6, exclusive RTX 6000 Ada; spec `docs/experiments/w3-specs/w3b.json`; submitted 2026-10-29T19:00Z; ready.json `git_head` `1e10451a` per the submit output, to be confirmed from ready.json; the publish call returned normally; started on gpu5 GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162).
+
+### 2026-10-29 — W3b outcome of `20261029T190006Z-d48a344b`: terminated by GPU contention before any quality was scored; the rule is not yet applied (stopped for root)
+- Job `20261029T190006Z-d48a344b`, ready.json `git_head` `1e10451ad961655711f1ef1ee3535705f9489ef4`
+  (the revision of the spec and the named point list), gpu5 GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162
+  (RTX 6000 Ada, exclusive claim). The smoke passed (144 s; validator passed, projected full 1,930 s of the
+  2,400 s allowance). In the full stage another user's process appeared on the claimed GPU twice (pids
+  577752, then 586791); the first pause cleared after 156 s, the second lasted the full 900 s pause allowance
+  and the supervisor ended the job as `contended` (terminal; `resume_declined: full published no checkpoint`,
+  because the job checkpoints per window and Al's scoring had not finished). Nothing was scored; no `result.json`,
+  no `summary.json`, no validator verdict for the full stage. Wall time of the claim about 1,626 s plus
+  144 s smoke (about 1,056 s of it paused), productive GPU time about 710 s; about 1.8k of the 3.6k GPU-s
+  budget is charged at most. Not resubmitted (root's rule).
+- What exists (`full/partial.tar` in the job's inbox, copy extracted on gpu5 at
+  `/local/users/emanuele/w3b-partial`): Al's six named points were encoded to real bitstreams and each file was
+  decoded by two separate processes, two passes each; for all six the four lists of 240 frame hashes are equal
+  and the decoders reported deterministic (this is the rule's check (b); check (a), the I frame, is in the
+  unwritten `result.json`, and the reference buffer stays unreachable). Rates from the container sizes (no quality
+  looked at):
+
+| Al point | bytes | kbps |
+|---|---:|---:|
+| scale 2 QP21 | 23,104 | 19.253 |
+| scale 2 QP23 | 25,995 | 21.663 |
+| scale 2 QP24 | 27,806 | 23.172 |
+| scale 2 QP25 | 29,587 | 24.656 |
+| scale 2 QP27 | 33,194 | 27.662 |
+| scale 2 QP30 | 40,066 | 33.388 |
+
+  The prediction (19.2 / 21.4 / 22.7 / 23.8 / 26.3 / 30.4) was within 1–10 %; both hybrid rates are bracketed:
+  21.4588 by QP21 and QP23, and 22.7380 by QP23 and QP24 (with W3's QP18 at 16.08 kbps below). Med's points,
+  the Al scores, the foreground masks' use and the SVT control were not completed.
+- Consequence. The dominance verdict at 22.737962 and 21.458796 kbps and the BD-rates against the stronger
+  SVT envelope are NOT available; `experiments/tennis/w3b_report.py` (tested on stand-in data) produces them
+  from the saved summaries once a scored summary exists. Options for root, both about 10 GPU-minutes: (a) the
+  same job again (the encoder is deterministic, so the streams should reproduce byte for byte and can be
+  checked against the sha256 of the saved files); (b) a scoring job that decodes the six saved Al streams
+  (and a Med run) and compares the decoded frame hashes with the saved ones, which also tests decoding in a
+  later job on the same GPU class, an open W3 limit. Suggest widening the contention allowance or
+  checkpointing after the encode stage so a pause cannot discard an encode.
