@@ -346,3 +346,23 @@ the decisions are in [experiments.md](../experiments.md). Context:
   (and a Med run) and compares the decoded frame hashes with the saved ones, which also tests decoding in a
   later job on the same GPU class, an open W3 limit. Suggest widening the contention allowance or
   checkpointing after the encode stage so a pause cannot discard an encode.
+
+### 2026-10-29 — W3b rerun (root's option a): two changes recorded before submitting
+- Decision rule, hypothesis, competing explanation, points and analysis are unchanged from the W3b rule
+  entry; no quality has been seen (the stopped job scored nothing). Root's instruction: rerun the same job once.
+- Change 1, checkpoints per item. `run_window` now builds the foreground masks and loads the metric networks
+  first, then for every named DCVC point (and the SVT scale-8 control) encodes, decodes in two separate processes,
+  scores it, publishes its files and checkpoints it (record with scores, stream, reports, written under a dot-name
+  and renamed into place) before the next item starts. A stop loses only the item in progress; a declared resume
+  restores finished items and codes the rest. Order changed from "all codecs, then all scoring" to per item;
+  it does not touch the codec subprocesses, so the bitstreams and decode checks are those of the first job. Tests
+  with stand-ins cover scoring, checkpointing, resume without recoding, and a rejected point.
+- Change 2, contention allowance. `pause_seconds` 1,800 (was 900), `resume_attempts` 1 (as before). The spec's
+  budget is now 2,700 s (smoke allowance 300 s, full 2,300 s; the first job's smoke took 144 s) because W3b's cap is
+  4,500 GPU-s and about 1.8k is charged. Limit to note: the budget is wall time and a resume needs the remaining
+  budget to cover the full stage allowance, so a stop after the long pause will be declined as "remaining budget
+  cannot support"; the 1,800 s pause is then the protection, and the per-item checkpoints and `partial.tar` keep the
+  finished items either way (a later scoring-only run could use them).
+- Cross-job byte-identity check (to report in the outcome). The first job's six Al streams, with `sha256` of the
+  container files and the 240 frame hashes in its `*-reports.json` (kept in `partial.tar`), should equal this job's
+  streams and hashes byte for byte; any difference is reported, not repaired.

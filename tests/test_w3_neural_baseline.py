@@ -437,3 +437,94 @@ def test_w3b_report_flattens_summaries_and_builds_the_stronger_envelope():
     assert rep.RATES['rebilled_kps2'] == pytest.approx(21.458796, abs=1e-5)
     assert set(out['bd_rate_vs_strong_svt']) == set(an.METRICS)
     json.dumps(out)
+
+
+def stand_in_window(tmp_path, monkeypatch, calls, fail_qp=None):
+    """run_window with every heavy dependency replaced; exercises per-item scoring, checkpointing and resume only."""
+    import sys
+    from argparse import Namespace
+    from types import SimpleNamespace
+
+    from experiments.jobs import monitor
+    from experiments.tennis import w3_neural_baseline as job
+    from experiments.visor import h3, h3b
+    from src.codecs import quality
+
+    net = SimpleNamespace(parameters=lambda: iter([SimpleNamespace(is_cuda=True)]))
+    monkeypatch.setitem(sys.modules, 'torch', SimpleNamespace(cuda=SimpleNamespace(empty_cache=lambda: None)))
+    monkeypatch.setattr(job.subprocess, 'run', lambda *a, **k: None)
+    monkeypatch.setattr(job, 'digest', lambda path: job.SOURCES['al']['yuv'])
+    monkeypatch.setattr(h3, 'rgb_memmap', lambda *a, **k: object())
+    monkeypatch.setattr(quality, 'load_lpips', lambda *a: net)
+    monkeypatch.setattr(h3b, 'load_dists', lambda *a: net)
+    monkeypatch.setattr(monitor, 'publish_progress', lambda *a, **k: None)
+    monkeypatch.setattr(job, 'foreground_masks', lambda *a: {t: np.zeros((8, 8), bool) for t in range(0, 240, 3)})
+    monkeypatch.setattr(job, 'audited_controls', lambda *a: {'applies': False})
+    monkeypatch.setattr(job, 'score_stream', lambda *a: {m: [0.1] * 80 for m in an.METRICS})
+    monkeypatch.setenv('PS_STAGE', 'full')
+
+    def code_point(args, source, work, fps, n, point):
+        calls.append(f'dcvc-s{point["scale"]}-q{point["qp"]}')
+        pdir = work / calls[-1]
+        pdir.mkdir()
+        (pdir / 'stream.psdc').write_bytes(b'PSDC' + bytes(point['qp']))
+        (pdir / 'reports.json').write_text('{}')
+        yuv = pdir / 'decode-a.yuv'
+        yuv.write_bytes(b'')
+        return {'codec': 'dcvc-uf-htl', 'scale': point['scale'], 'qp': point['qp'], 'size': [960, 544], 'kbps': 20.0 + point['qp'],
+                'accepted': point['qp'] != fail_qp, 'seconds': {'process': 20.0, 'variable': 5.0}, 'decoded': str(yuv)}
+
+    def code_svt(source, work, fps, scale):
+        calls.append(f'svt-s{scale}')
+        (work / f'svt-s{scale}').mkdir()
+        (work / f'svt-s{scale}' / 'stream.ivf').write_bytes(b'ivf')
+        return {'codec': 'svt-av1', 'scale': scale, 'size': [240, 136], 'kbps': 10.2, 'stream': 'stream.ivf', 'decoded': 'x'}
+
+    monkeypatch.setattr(job, 'code_point', code_point)
+    monkeypatch.setattr(job, 'code_svt', code_svt)
+    args = Namespace(frames=240, al=tmp_path / 'al.mp4', point_list='al:2:21,al:2:23,med:4:15', points=1)
+
+    def run(root, checkpoint):
+        scratch, publish = root / 'scratch', root / 'publish'
+        scratch.mkdir(parents=True)
+        publish.mkdir()
+        ctx = {'scratch': scratch, 'publish': publish, 'checkpoint': checkpoint, 'svt_scales': [8], 'anchors': {}, 'wire': None,
+               'prior_rows': {}, 'lpips': None, 'dists': None}
+        return job.run_window(args, 'al', ctx), publish / 'al'
+
+    return run
+
+
+def test_run_window_scores_and_checkpoints_each_item_and_resumes_without_recoding(tmp_path, monkeypatch):
+    calls: list[str] = []
+    run = stand_in_window(tmp_path, monkeypatch, calls)
+    checkpoint = tmp_path / 'ck'
+    checkpoint.mkdir()
+    first, out = run(tmp_path / 'first', checkpoint)
+    assert calls == ['dcvc-s2-q21', 'dcvc-s2-q23', 'svt-s8'] and first['accepted']
+    assert sorted(p.name for p in checkpoint.iterdir()) == ['al__dcvc-s2-q21', 'al__dcvc-s2-q23', 'al__svt-s8']
+    assert (out / 'dcvc-s2-q21.psdc').exists() and (out / 'svt-s8.ivf').exists()
+    record = json.loads((checkpoint / 'al__dcvc-s2-q23' / 'record.json').read_text())
+    assert record['mean']['full_lpips'] == pytest.approx(0.1) and 'decoded' not in record and (checkpoint / 'al__dcvc-s2-q23' / 'dcvc-s2-q23.psdc').exists()
+    # a stop after the first point: only that item survives; the next attempt codes the rest and keeps the first untouched
+    import shutil
+
+    for name in ('al__dcvc-s2-q23', 'al__svt-s8'):
+        shutil.rmtree(checkpoint / name)
+    calls.clear()
+    second, out2 = run(tmp_path / 'second', checkpoint)
+    assert calls == ['dcvc-s2-q23', 'svt-s8']
+    assert second['dcvc'][0]['resumed_from_checkpoint'] and 'resumed_from_checkpoint' not in second['dcvc'][1]
+    assert (out2 / 'dcvc-s2-q21.psdc').read_bytes() == (out / 'dcvc-s2-q21.psdc').read_bytes()
+    assert [p['qp'] for p in second['dcvc']] == [21, 23] and second['timings']['scoring'] > 0
+    json.dumps(second)
+
+
+def test_run_window_stops_at_a_rejected_point_without_checkpointing_it(tmp_path, monkeypatch):
+    calls: list[str] = []
+    run = stand_in_window(tmp_path, monkeypatch, calls, fail_qp=23)
+    checkpoint = tmp_path / 'ck'
+    checkpoint.mkdir()
+    result, out = run(tmp_path / 'run', checkpoint)
+    assert not result['accepted'] and result['stopped_at'] == {'scale': 2, 'qp': 23}
+    assert [p.name for p in checkpoint.iterdir()] == ['al__dcvc-s2-q21'] and (out / 'result.json').exists()

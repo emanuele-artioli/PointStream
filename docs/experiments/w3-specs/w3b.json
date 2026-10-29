@@ -18,7 +18,7 @@
   "verify_staged_inputs": true,
   "contention": {
     "policy": "pause",
-    "pause_seconds": 900,
+    "pause_seconds": 1800,
     "resume_attempts": 1
   },
   "required_commands": [
@@ -176,11 +176,11 @@
     }
   },
   "smoke": {
-    "seconds": 600,
+    "seconds": 300,
     "representative_basis": "W3b. Both windows, native 240-frame source conversion and identity check, one named mid point per window (Al scale 2 QP24, Med scale 4 QP36) coded at 25 frames by the real DCVC-UF encoder and decoded from its file in two separate processes with two passes each, SVT scale 8 re-encoded at 240 frames and checked against the audited Al base, foreground masks and real LPIPS/DISTS on 9 ticks; the same code path as the full run, which codes nine named points (docs/experiments/w3-neural-baseline.md, W3b) and no calibration."
   },
   "full": {
-    "seconds": 2400
+    "seconds": 2300
   },
   "validator": [
     "{python}",
@@ -189,6 +189,6 @@
     "--validate"
   ],
   "validator_seconds": 120,
-  "budget_seconds": 3300,
+  "budget_seconds": 2700,
   "deadline": "2026-10-30T18:00:00+00:00"
 }

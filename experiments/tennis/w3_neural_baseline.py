@@ -380,67 +380,107 @@ def run_window(a: argparse.Namespace, key: str, ctx: dict[str, Any]) -> dict[str
     result: dict[str, Any] = {'window': key, 'wid': spec['wid'], 'fps': fps, 'frames': n, 'ticks': ticks,
                               'candidates': candidates, 'chosen': chosen, 'dcvc': [], 'svt': [], 'accepted': True,
                               'bracket_ok': None if a.point_list else an.planned_bracket(candidates)}
-    started = time.monotonic()
     source = full if n == NATIVE_FRAMES else work / 'source.yuv'
     if n != NATIVE_FRAMES:
         with full.open('rb') as src, source.open('wb') as dst:
             dst.write(src.read(n * 1920 * 1620))
-    native_fixed = native_variable = 0.0
-    for point in chosen:
-        record = code_point(a, source, work, fps, n, point)
-        result['dcvc'].append(record)
-        tag = f'dcvc-s{point["scale"]}-q{point["qp"]}'
-        for name, target in (('stream.psdc', f'{tag}.psdc'), ('reports.json', f'{tag}-reports.json')):
-            if (work / tag / name).exists():
-                shutil.copyfile(work / tag / name, out / target)
-        if record['accepted']:
-            native_fixed += max(0.0, record['seconds']['process'] - record['seconds']['variable'])
-            native_variable += record['seconds']['variable']
-        publish_progress(os.environ['PS_STAGE'], len(result['dcvc']))
-        if not record['accepted']:
-            result['accepted'] = False
-            result['stopped_at'] = {'scale': point['scale'], 'qp': point['qp']}
-            write(out / 'result.json', result)
-            return result
-    timings['native'] = time.monotonic() - started
-    timings['native_fixed'] = native_fixed / max(1, len(chosen))
-    timings['native_variable'] = native_variable / max(1, len(chosen))
-    started = time.monotonic()
-    svt_first = None
-    for scale in ctx['svt_scales']:
-        before = time.monotonic()
-        record = code_svt(full, work, fps, scale)
-        if svt_first is None:
-            svt_first = time.monotonic() - before
-        shutil.copyfile(work / f'svt-s{scale}' / record['stream'], out / f'svt-s{scale}.ivf')
-        result['svt'].append(record)
-    timings['svt_scale8'] = svt_first or 0.0
-    timings['svt'] = time.monotonic() - started
-    # Every codec subprocess is finished before the metric networks and the foreground are built.
-    started = time.monotonic()
     # The foreground oracle draws from reference frames anywhere in the window, so the truth covers all 240.
+    # Masks and metric networks come first so that every item can be scored, and checkpointed, as it finishes.
+    begin = time.monotonic()
     truth = rgb_memmap(full, work / 'truth.npy', NATIVE_FRAMES, 1920, 1080, False, 'cuda')
     masks = foreground_masks(spec['wid'], ctx['anchors'], ctx['wire'], truth, ticks, ctx['prior_rows'])
     np.savez_compressed(out / 'foreground-masks.npz', ticks=np.asarray(ticks), packed=np.stack([np.packbits(masks[t]) for t in ticks]))
-    timings['masks'] = time.monotonic() - started
-    started = time.monotonic()
+    timings['masks'] = time.monotonic() - begin
     nets = {'lpips': load_lpips(ctx['lpips'], 'cuda'), 'dists': load_dists(ctx['dists'], 'cuda')}
     if not all(next(net.parameters()).is_cuda for net in nets.values()):
         raise ValueError('CUDA metric networks required')
-    for record in [*result['svt'], *result['dcvc']]:
-        scores = score_stream(nets, Path(record['decoded']), record['size'], n, ticks, truth, masks)
-        record['scores'] = scores
-        record['mean'] = {m: float(np.mean(v)) for m, v in scores.items()}
-        publish_progress(os.environ['PS_STAGE'], len(result['dcvc']) + len(result['svt']))
-    timings['scoring'] = time.monotonic() - started
-    del nets
+
+    def finish(record: dict[str, Any], tag: str, files: dict[str, Path], item_seconds: float) -> None:
+        """Score one item, then publish and checkpoint it (a stop loses only the item in progress)."""
+        before = time.monotonic()
+        record['scores'] = score_stream(nets, Path(record['decoded']), record['size'], n, ticks, truth, masks)
+        record['mean'] = {m: float(np.mean(v)) for m, v in record['scores'].items()}
+        record['seconds_item'] = {'code': item_seconds, 'score': time.monotonic() - before}
+        record.pop('decoded', None)
+        for name, path in files.items():
+            shutil.copyfile(path, out / name)
+        save_item(ctx, key, tag, record, files)
+
+    native_fixed = native_variable = score_seconds = svt_first = 0.0
+    done = 0
+    for point in chosen:
+        tag = f'dcvc-s{point["scale"]}-q{point["qp"]}'
+        loaded = load_item(ctx, key, tag, out)
+        if loaded is not None:
+            record = loaded
+        else:
+            before = time.monotonic()
+            record = code_point(a, source, work, fps, n, point)
+            if not record['accepted']:
+                result['dcvc'].append(record)
+                result['accepted'] = False
+                result['stopped_at'] = {'scale': point['scale'], 'qp': point['qp']}
+                write(out / 'result.json', result)
+                return result
+            finish(record, tag, {f'{tag}.psdc': work / tag / 'stream.psdc', f'{tag}-reports.json': work / tag / 'reports.json'},
+                   time.monotonic() - before)
+        result['dcvc'].append(record)
+        native_fixed += max(0.0, record['seconds']['process'] - record['seconds']['variable'])
+        native_variable += record['seconds']['variable']
+        score_seconds += record['seconds_item']['score']
+        done += 1
+        publish_progress(os.environ['PS_STAGE'], done)
+    timings['native_fixed'] = native_fixed / max(1, len(chosen))
+    timings['native_variable'] = native_variable / max(1, len(chosen))
+    for scale in ctx['svt_scales']:
+        tag = f'svt-s{scale}'
+        item = load_item(ctx, key, tag, out)
+        if item is None:
+            before = time.monotonic()
+            item = code_svt(full, work, fps, scale)
+            finish(item, tag, {f'{tag}.ivf': work / tag / item['stream']}, time.monotonic() - before)
+        result['svt'].append(item)
+        score_seconds += item['seconds_item']['score']
+        if not svt_first:
+            svt_first = item['seconds_item']['code']
+        done += 1
+        publish_progress(os.environ['PS_STAGE'], done)
+    timings['svt_scale8'] = svt_first
+    timings['scoring'] = score_seconds
+    nets.clear()
     torch.cuda.empty_cache()
     result['timings'] = timings
     result['audited_controls'] = audited_controls(key, result, ctx, ticks)
-    for record in [*result['svt'], *result['dcvc']]:
-        record.pop('decoded', None)
     write(out / 'result.json', result)
     return result
+
+
+def save_item(ctx: dict[str, Any], key: str, tag: str, record: dict[str, Any], files: dict[str, Path]) -> None:
+    """Checkpoint one finished item (record with scores, stream, reports) under a dot-name, then rename it into place."""
+    checkpoint = ctx.get('checkpoint')
+    if checkpoint is None:
+        return
+    temporary = checkpoint / f'.{key}__{tag}.tmp'
+    shutil.rmtree(temporary, ignore_errors=True)
+    temporary.mkdir()
+    write(temporary / 'record.json', record)
+    for name, path in files.items():
+        shutil.copyfile(path, temporary / name)
+    os.replace(temporary, checkpoint / f'{key}__{tag}')
+
+
+def load_item(ctx: dict[str, Any], key: str, tag: str, out: Path) -> dict[str, Any] | None:
+    """A checkpointed item of an earlier attempt: its record, with its published files restored under ``out``."""
+    checkpoint = ctx.get('checkpoint')
+    saved = checkpoint / f'{key}__{tag}' if checkpoint is not None else None
+    if saved is None or not (saved / 'record.json').is_file():
+        return None
+    for path in saved.iterdir():
+        if path.name != 'record.json':
+            shutil.copyfile(path, out / path.name)
+    record: dict[str, Any] = json.loads((saved / 'record.json').read_text())
+    record['resumed_from_checkpoint'] = True
+    return record
 
 
 def audited_controls(key: str, result: dict[str, Any], ctx: dict[str, Any], ticks: list[int]) -> dict[str, Any]:
@@ -519,10 +559,10 @@ def run(a: argparse.Namespace) -> None:
     from experiments.tennis.k6b_matte_judge import extract
     from experiments.tennis.k6b_receiver_sam import transport_root
     prior_rows, prior_scores = load_prior(a)
-    ctx = {'scratch': scratch, 'publish': publish, 'anchors': extract([a.anchor], scratch / 'anchors'),
+    checkpoint = Path(os.environ.get('PS_CHECKPOINT_DIR', ''))
+    ctx = {'checkpoint': checkpoint if checkpoint.name else None, 'scratch': scratch, 'publish': publish, 'anchors': extract([a.anchor], scratch / 'anchors'),
            'wire': transport_root(scratch / 'wire'), 'prior_rows': prior_rows, 'prior_scores': prior_scores,
            'lpips': a.lpips, 'dists': a.dists, 'svt_scales': parse_scales(a.svt_scales)}
-    checkpoint = Path(os.environ.get('PS_CHECKPOINT_DIR', ''))
     results: list[dict[str, Any]] = []
     setup = time.monotonic() - began
     for key in SOURCES:
