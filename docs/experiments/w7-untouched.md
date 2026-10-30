@@ -363,3 +363,4 @@ foreground-first claim.
   DCVC first job `20261030T213822Z-0acbf07b` (gpu6 Ada): smoke 66.4 s GPU ran and wrote its summary; the fleet validator failed two checks of its own: `svt_control_ran` (requires the audited Al control, which exists only for the
   frozen windows) and `budget` (spec `budget_seconds` 3,400 against the validator's 3,300 cap). Both are spec/validator bugs; the other 19 checks passed (projected full 635 s). Fixed (control required for the frozen pair only; spec budget 3,300),
   test added. GPU total 5,498 s of 5,940 s.
+  DCVC second job: `20261030T214920Z-ea50a2cf` (the earlier submit attempt was refused by the client for a stale gpu6 heartbeat; nothing was published).
