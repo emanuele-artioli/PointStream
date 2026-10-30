@@ -224,4 +224,10 @@ foreground-first claim.
   GPU-seconds counted from each GPU job's `execution.json` (smoke + full). CPU jobs are not counted.
 - Specs: `python -m experiments.tennis.w7_specs first-window STAGE windows.json OUT [NAME=PATH:SHA ...]`; upstream archive hashes from `sha256sum` of the
   upstream job's `full/published.tar` on the server.
-- features: `20261030T142453Z-b8bc4336` (submitted 14:24Z, gpu6 Ada; code = branch HEAD `git_head` in its ready.json). Outcome: pending.
+- features, first submission `20261030T142453Z-b8bc4336` (gpu6 Ada): smoke ran (145 s GPU, scientific checks passed when the validator was rerun by hand) but the
+  fleet validator failed: validator argv is not placeholder-expanded (`{staged:manifest}` reached `validate-features` literally). Fix: the validator names the manifest by
+  its path (commit "features validator names the manifest literally"). Resubmitted as `20261030T143125Z-8785a55b` (a failed job is not replayed; this is a new job).
+- native base (CPU, no GPU): `20261030T142923Z-f6699fe5` complete on gpu6, smoke 8 s + full 58 s; `full/published.tar` sha256
+  `9744754d6acd62f7d872e804b5af09b00de1187f100062f9369e526b3e285239`, code `aaf6ae4a`. The fleet validator is smoke-only (24 frames hard-coded); the full stage was validated by a
+  generalised validator (`grid_checks`, `--validate` now reads the frame count from `base-result.json`; test in `tests/test_k6b_native_base.py`): 26 checks passed,
+  including the source conversion hash against `windows.json`.

@@ -326,6 +326,10 @@ def first_window(argv: list[str]) -> None:
         spec = features(first, confirm, source)
     elif stage == 'native-base':
         spec = native_base([first], windows_ref, 24)
+    elif stage == 'anchors':
+        spec = anchors(first, confirm, ups['inputs'], source)
+    elif stage == 'prepare':
+        spec = prepare(first, confirm, ups['inputs'], ups['anchor'], source)
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:
