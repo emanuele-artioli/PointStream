@@ -360,3 +360,6 @@ foreground-first claim.
 - The first window's sub-budget rises from 1.5 to 1.65 GPU-h (5,940 s). Reason: the first-window DCVC run completes the window's anchor set (SVT half/quarter, outside-R and DCVC) and also smokes the DCVC chain for the other five
   windows. Projected Tier 1 total with the five windows batched by stage: about 7.4 of the 8 GPU-h card. GPU spent before this decision: 5,432 s; 508 s remain.
 - DCVC (GPU, Ada, shared): `20261030T213822Z-0acbf07b` submitted (first-window spec `w7_specs.dcvc`; calibrated points 15/30/60 kbps targets, SVT scales 8, 4, 2).
+  DCVC first job `20261030T213822Z-0acbf07b` (gpu6 Ada): smoke 66.4 s GPU ran and wrote its summary; the fleet validator failed two checks of its own: `svt_control_ran` (requires the audited Al control, which exists only for the
+  frozen windows) and `budget` (spec `budget_seconds` 3,400 against the validator's 3,300 cap). Both are spec/validator bugs; the other 19 checks passed (projected full 635 s). Fixed (control required for the frozen pair only; spec budget 3,300),
+  test added. GPU total 5,498 s of 5,940 s.

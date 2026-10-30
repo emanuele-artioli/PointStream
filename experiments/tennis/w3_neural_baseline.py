@@ -668,7 +668,7 @@ def validate() -> None:
         'dpb_status_recorded': all(isinstance(p['dpb_reachable'], bool) for p in points),
         'rate_from_file': all(p['bytes'] == p['encode_report']['container_bytes'] for p in points),
         'scores': all(np.isfinite(v).all() and len(v) == 9 for w in windows for p in [*w['dcvc'], *w['svt']] for v in p['scores'].values()),
-        'svt_control_ran': windows[0]['audited_controls']['applies'] and all('score_max_error' in e for e in windows[0]['audited_controls']['scales'].values()),
+        'svt_control_ran': manifest_item is not None or (windows[0]['audited_controls']['applies'] and all('score_max_error' in e for e in windows[0]['audited_controls']['scales'].values())),
         'projection': projection < spec['full']['seconds'],
         'budget': spec['budget_seconds'] <= 3300,
         'scale': spec['scale']['frames'] == {'smoke': 25, 'full': 240},

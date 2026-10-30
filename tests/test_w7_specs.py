@@ -126,3 +126,10 @@ def test_packet_file_finds_both_transport_layouts(tmp_path):
             stream = w1_roi.packet_file(tar, window, 'exact-rle.matte')
             assert stream is not None and stream.read() == b'abc'
             assert w1_roi.packet_file(tar, window, 'keypoints.kps') is None
+
+
+def test_dcvc_spec_meets_the_w3_validator_caps():
+    windows = wm.from_selection(json.loads(SELECTION.read_text()))
+    pend = (sp.W7_DIR + '/x.tar', sp.PENDING)
+    spec = sp.dcvc(windows, (sp.W7_DIR + '/windows.json', 'b' * 64), pend, pend, pend, 25)
+    assert spec['budget_seconds'] <= 3300 and spec['hosts'] == ['gpu5', 'gpu6'] and spec['gpu_models'] == ['RTX 6000 Ada']

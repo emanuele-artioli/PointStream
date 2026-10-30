@@ -257,6 +257,7 @@ def dcvc(windows: list[wm.WindowSpec], manifest: tuple[str, str], anchor: tuple[
     basis = 'Rates and scores of saved decoded streams do not depend on wall time or foreign load; recorded seconds are cost only, never evidence'
     spec['gpu_sharing'] = {'mode': 'shared', 'basis': basis, 'margin_mib': 8192}
     spec['contention'] = {'policy': 'continue', 'basis': basis, 'resume_attempts': 0}
+    spec['budget_seconds'] = 3300  # the W3 validator's cap (full 2,600 s plus overhead)
     spec['hosts'] = ['gpu5', 'gpu6']  # the Ada hosts; DCVC has been run on that class only (W3, W3b)
     return spec
 
