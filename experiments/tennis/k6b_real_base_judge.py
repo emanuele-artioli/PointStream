@@ -227,14 +227,12 @@ def run(a: argparse.Namespace) -> None:
         rows.append(item)
         if a.judged == 0:
             item['comparisons'] = compare_curves(item)
-            futile = any(all(item['comparisons'][family + '_' + metric]['scale4']['won'] is False
-                             for metric in ('lpips', 'dists')) for family in ('full', 'foreground'))
-            if futile:
+            if early_stop_applies(item, a.no_early_stop):
                 item['early_stop'] = 'both metrics lost in one family; three of four impossible'
             write(out / 'window.json', item)
         from experiments.jobs.monitor import publish_progress
         publish_progress(os.environ['PS_STAGE'], len(rows))
-        if a.judged == 0 and item.get('early_stop'):
+        if a.judged == 0 and item.get('early_stop') and not a.no_early_stop:
             del truth
             break
         del truth
@@ -250,6 +248,15 @@ def run(a: argparse.Namespace) -> None:
     write(publish / 'quality.json', summary)
     write(Path(os.environ['PS_STAGE_DIR']) / 'quality-summary.json', summary)
 
+
+
+def early_stop_applies(item: dict[str, Any], disabled: bool) -> bool:
+    """The registered arithmetic early stop: both metrics lost in one family at scale 4. W5 scores the second
+    window the first one's stop skipped, so it passes `--no-early-stop`; the default is unchanged."""
+    if disabled:
+        return False
+    return any(all(item['comparisons'][family + '_' + metric]['scale4']['won'] is False for metric in ('lpips', 'dists'))
+               for family in ('full', 'foreground'))
 
 
 def compare_curves(row: dict[str, Any]) -> dict[str, Any]:
@@ -350,6 +357,7 @@ def main() -> None:
     for name in ('anchor', 'control', 'transport', 'masks', 'gpu-base', 'base', 'gen-al', 'gen-med', 'prior', 'al', 'med', 'lpips', 'dists'):
         p.add_argument('--' + name, type=Path)
     p.add_argument('--judged', type=int, default=2)
+    p.add_argument('--no-early-stop', action='store_true', help='score the second window even when the first fails the rule')
     p.add_argument('--cost-model', choices=('legacy', 'separated-v1'), default='legacy')
     a = p.parse_args()
     if a.validate:

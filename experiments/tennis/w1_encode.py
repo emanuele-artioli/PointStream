@@ -24,14 +24,13 @@ from typing import Any
 
 import numpy as np
 
-from experiments.tennis.w1_roi import (CODED, CONTROL_CRF, CONTROL_IVF_BYTES, FPS, FRAMES, OFFSETS, PACKET_DIR,
-                                       SOURCE_SHA, SOURCE_START, SOURCE_YUV_SHA, TARGET_KBPS, TOOLS,
-                                       TRANSPORT_SHA, digest, next_crf, policy_name, rate_kbps, roi_text,
+from experiments.tennis.w1_roi import (AL, CODED, CONTROL_CRF, FRAMES, OFFSETS, TARGET_KBPS, TOOLS, TRANSPORT_SHA,
+                                       WINDOWS, Window, digest, next_crf, policy_name, rate_kbps, roi_text,
                                        select_crfs, start_crf)
 
 
 def encode_point(raw: Path, work: Path, *, scale: int, frames: int, crf: int, regions: np.ndarray | None,
-                 offset: int, cpus: list[int], outside: bool = False) -> dict[str, Any]:
+                 offset: int, cpus: list[int], outside: bool = False, window: Window = AL) -> dict[str, Any]:
     """One encode and an independent dav1d decode; the decoded file is hashed and removed."""
     from src.codecs import svtav1
 
@@ -46,7 +45,7 @@ def encode_point(raw: Path, work: Path, *, scale: int, frames: int, crf: int, re
         roi_sha = digest(roi)
         extra = ['--roi-map-file', str(roi)]
     started = time.monotonic()
-    rec = svtav1.code(raw, work, width=width, height=height, fps=Fraction(FPS), frames=frames, crf=crf, preset=4,
+    rec = svtav1.code(raw, work, width=width, height=height, fps=Fraction(window.fps), frames=frames, crf=crf, preset=4,
                       threads=min(4, len(cpus)), full_range=False, encoder='SvtAv1EncApp', decoder='dav1d',
                       timeout=2400, cpus=cpus, extra=extra)
     stream, decoded = Path(rec['stream']), Path(rec['decoded'])
@@ -62,7 +61,7 @@ def encode_point(raw: Path, work: Path, *, scale: int, frames: int, crf: int, re
     again.unlink()
     nbytes = stream.stat().st_size
     return {'scale': scale, 'offset': offset, 'crf': crf, 'size': [width, height], 'frames': frames,
-            'outside': outside, 'ivf_bytes': nbytes, 'payload_bytes': sum(sizes), 'rate_kbps': rate_kbps(nbytes, frames),
+            'outside': outside, 'ivf_bytes': nbytes, 'payload_bytes': sum(sizes), 'rate_kbps': rate_kbps(nbytes, frames, window.fps),
             'stream_sha256': digest(stream), 'decoded_sha256': decoded_sha, 'roi_sha256': roi_sha,
             'encode_seconds': rec['encode_seconds'], 'encode_cpu_seconds': rec['encode_cpu_seconds'],
             'decode_seconds': rec['decode_seconds'], 'cpus': cpus, 'encode_command': rec['encode_command'],
@@ -96,19 +95,19 @@ class Ledger:
 
 
 def search_offset(raw: Path, work: Path, ledger: Ledger, *, scale: int, offset: int, frames: int, regions: np.ndarray,
-                  cpus: list[int], max_encodes: int, target: float, outside: bool = False) -> dict[str, Any]:
+                  cpus: list[int], max_encodes: int, target: float, outside: bool = False, window: Window = AL) -> dict[str, Any]:
     known: dict[int, float] = {}
     order: list[int] = []
     status = 'budget'
     while True:
-        status, crf = next_crf(known, target, start_crf(scale, offset, outside))
+        status, crf = next_crf(known, target, start_crf(scale, offset, outside, window))
         if crf is None:
             break
         if len(known) >= max_encodes:
             status = 'budget'
             break
         row = encode_point(raw, work / f'crf{crf}', scale=scale, frames=frames, crf=crf, regions=regions,
-                           offset=offset, cpus=cpus, outside=outside)
+                           offset=offset, cpus=cpus, outside=outside, window=window)
         known[crf] = row['rate_kbps']
         order.append(crf)
         ledger.add(row, f'{policy_name(scale, offset)}_crf{crf}')
@@ -116,18 +115,19 @@ def search_offset(raw: Path, work: Path, ledger: Ledger, *, scale: int, offset: 
             'rates': {str(c): known[c] for c in sorted(known)}, 'selected': select_crfs(known, target)}
 
 
-def controls(raw_full: Path, scratch: Path, ledger: Ledger, frames: int, cpus: list[int]) -> list[dict[str, Any]]:
+def controls(raw_full: Path, scratch: Path, ledger: Ledger, frames: int, cpus: list[int],
+             window: Window = AL) -> list[dict[str, Any]]:
     from experiments.tennis.k6 import downscaled_source
 
     out = []
     for scale in (8, 4, 2):
         raw = downscaled_source(raw_full, frames, scale, scratch / f'control-s{scale}.yuv')
         row = encode_point(raw, scratch / f'control-s{scale}', scale=scale, frames=frames, crf=CONTROL_CRF,
-                           regions=None, offset=0, cpus=cpus)
+                           regions=None, offset=0, cpus=cpus, window=window)
         raw.unlink()
         row = ledger.add(row, f'control_s{scale}_crf{CONTROL_CRF}')
-        row['control_expected_bytes'] = CONTROL_IVF_BYTES[scale]
-        row['control_bytes_match'] = row['ivf_bytes'] == CONTROL_IVF_BYTES[scale] if frames == FRAMES else None
+        row['control_expected_bytes'] = window.control_ivf_bytes[scale]
+        row['control_bytes_match'] = row['ivf_bytes'] == window.control_ivf_bytes[scale] if frames == FRAMES else None
         out.append(row)
     return out
 
@@ -139,7 +139,8 @@ def run(a: argparse.Namespace) -> None:
     from src.codecs import svtav1
 
     began = time.monotonic()
-    for path, expected in ((a.al, SOURCE_SHA), (a.transport, TRANSPORT_SHA)):
+    window = WINDOWS[a.window]
+    for path, expected in ((a.al, window.source_sha), (a.transport, TRANSPORT_SHA)):
         if digest(path) != expected:
             raise ValueError('pinned input changed: ' + path.name)
     tools = {name: svtav1.tool(name) for name in TOOLS}
@@ -151,12 +152,12 @@ def run(a: argparse.Namespace) -> None:
     cpus = sorted(os.sched_getaffinity(0))
     frames = a.frames
     full = scratch / 'source-full.yuv'
-    command = convert_command('ffmpeg', a.al, full, SOURCE_START, frames)
+    command = convert_command('ffmpeg', a.al, full, window.source_start, frames)
     subprocess.run(command, check=True, capture_output=True, timeout=900)
-    if frames == FRAMES and digest(full) != SOURCE_YUV_SHA:
+    if frames == FRAMES and digest(full) != window.source_yuv_sha:
         raise ValueError('source conversion changed')
     with tarfile.open(a.transport) as tar:
-        member = tar.extractfile(PACKET_DIR + 'exact-rle.matte')
+        member = tar.extractfile(window.packet_dir + 'exact-rle.matte')
         assert member is not None
         _, masks = decode_masks(member.read())
     if masks.shape != (240, 2, 540, 960) or masks.dtype != bool:
@@ -175,18 +176,18 @@ def run(a: argparse.Namespace) -> None:
     with ThreadPoolExecutor(max_workers=workers + (1 if a.controls else 0)) as pool:
         futures = [pool.submit(search_offset, raw, scratch / policy_name(a.scale, o), ledger, scale=a.scale, offset=o,
                                frames=frames, regions=regions, cpus=cpu_sets[i], max_encodes=a.max_encodes,
-                               target=TARGET_KBPS, outside=a.convention == 'outside') for i, o in enumerate(offsets)]
+                               target=a.target_kbps, outside=a.convention == 'outside', window=window) for i, o in enumerate(offsets)]
         if a.controls:
-            control_future = pool.submit(controls, full, scratch, ledger, frames, cpu_sets[-1])
+            control_future = pool.submit(controls, full, scratch, ledger, frames, cpu_sets[-1], window)
         searches = [f.result() for f in futures]
         if a.controls:
             control_rows = control_future.result()
     seconds = time.monotonic() - began
-    summary = {'scale': a.scale, 'convention': a.convention, 'offsets': list(offsets), 'frames': frames, 'max_encodes': a.max_encodes, 'target_kbps': TARGET_KBPS,
+    summary = {'window': window.name, 'scale': a.scale, 'convention': a.convention, 'offsets': list(offsets), 'frames': frames, 'max_encodes': a.max_encodes, 'target_kbps': a.target_kbps,
                'searches': searches, 'controls': control_rows, 'tools': tools, 'cpus': cpus, 'cpu_sets': cpu_sets,
                'source_command': command, 'host': os.uname().nodename, 'seconds': seconds,
-               'encodes': len(ledger.rows), 'inputs': {'al': digest(a.al), 'transport': digest(a.transport)},
-               'scope': 'rate-only search; no quality read; Al window of 240 frames, preset 4, keyint -1'}
+               'encodes': len(ledger.rows), 'inputs': {window.name: digest(a.al), 'transport': digest(a.transport)},
+               'scope': f'rate-only search; no quality read; {window.name} window of 240 frames, preset 4, keyint -1'}
     (publish / 'encode.json').write_text(json.dumps(summary, indent=1))
     (Path(os.environ['PS_STAGE_DIR']) / 'encode-summary.json').write_text(json.dumps(summary, indent=1))
 
@@ -209,6 +210,8 @@ def validate() -> None:
     spec = json.loads((stage.parent / 'spec.json').read_text())
     frames = summary['frames']
     smoke = frames != FRAMES
+    fps = WINDOWS[summary.get('window', 'al')].fps
+    target = summary['target_kbps']
     checks: dict[str, bool] = {
         'frames': frames in (24, FRAMES) and spec['scale']['frames'] == {'smoke': 24, 'full': FRAMES},
         'multi_cpu': len(summary['cpus']) >= 3 * 2 and all(len(c) >= 2 for c in summary['cpu_sets']),
@@ -227,7 +230,7 @@ def validate() -> None:
             data = blob.read()
             ok &= hashlib.sha256(data).hexdigest() == row['stream_sha256'] and len(data) == row['ivf_bytes']
             ok &= len(svtav1.ivf_frames(data)) == frames and row['frames'] == frames
-            ok &= abs(row['rate_kbps'] - rate_kbps(len(data), frames)) < 1e-9 and row['rate_kbps'] > 0
+            ok &= abs(row['rate_kbps'] - rate_kbps(len(data), frames, fps)) < 1e-9 and row['rate_kbps'] > 0
             ok &= len(row['decoded_sha256']) == 64
         checks['streams_match_rows'] = ok
     by = {(r['offset'], r['crf']): r['rate_kbps'] for r in rows if r['scale'] == summary['scale']}
@@ -238,13 +241,13 @@ def validate() -> None:
     for s in summary['searches']:
         known = {int(c): r for c, r in s['rates'].items()}
         checks[f"offset{s['offset']}:search_consistent"] = (
-            s['selected'] == select_crfs(known, TARGET_KBPS)
+            s['selected'] == select_crfs(known, target)
             and all(known[c] == by[(s['offset'], c)] for c in known))
         if not smoke:
             checks[f"offset{s['offset']}:status"] = s['status'] in ('complete', 'unbracketed_high', 'unbracketed_low', 'budget')
             checks[f"offset{s['offset']}:selected_bracket"] = (s['status'] != 'complete') or (
                 s['selected'] is not None and len(s['selected']) == 3
-                and any(known[c] >= TARGET_KBPS > known[c + 1] for c in s['selected'] if c + 1 in s['selected']))
+                and any(known[c] >= target > known[c + 1] for c in s['selected'] if c + 1 in s['selected']))
     if summary['controls']:
         checks['controls_scales'] = [c['scale'] for c in summary['controls']] == [8, 4, 2]
         if not smoke:
@@ -268,7 +271,9 @@ def validate() -> None:
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--validate', action='store_true')
-    p.add_argument('--al', type=Path)
+    p.add_argument('--al', '--source', dest='al', type=Path, help='the window\'s source video')
+    p.add_argument('--window', choices=sorted(WINDOWS), default='al')
+    p.add_argument('--target-kbps', type=float, default=TARGET_KBPS, help='the rate the CRF search brackets (the hybrid\'s total)')
     p.add_argument('--transport', type=Path)
     p.add_argument('--scale', type=int, choices=(1, 2, 4), default=2)
     p.add_argument('--frames', type=int, choices=(24, FRAMES), default=24)
