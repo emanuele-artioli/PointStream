@@ -272,3 +272,4 @@ foreground-first claim.
 - rgb diagnostic, shared job `20261030T163628Z-d8f52f8f` (gpu3, A6000): smoke ran 45.5 s GPU (summary: 27.2 s, projected full 321 s) but failed the fleet validator again, on `full_projection_with_publication`:
   the check multiplies the smoke's staging/publication time (73 s on this shared host, 150 MB archive) by 10 and compared it with the 600 s reservation. Not a result problem (all other 12 checks true).
   Fix: the allowance is now the job spec's own full reservation (1,800 s for this stage, reservation only; expected about 320 s), test extended. GPU total now 3,637 s of 4,680 s.
+  Resubmitted rgb diagnostic: `20261030T174459Z-2ad62629`.
