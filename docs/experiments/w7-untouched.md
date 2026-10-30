@@ -332,3 +332,26 @@ foreground-first claim.
   **Deviation, decided after seeing the control error and before any anchor score existed:** manifest windows use W3's tolerance for the same kind of control, 1e-3 (`control_tolerance`; frozen windows keep 1e-4); the
   observed control errors are recorded in the summary either way. GPU total now 4,456 s of 5,400 s (944 s left); the rescoring needs about 850 s (smoke 225 + full about 620), which leaves no room for DCVC (about 350 s).
   Rescoring job: `20261030T201626Z-e32a981b` (same inputs).
+- W1 scoring: `20261030T201626Z-e32a981b` complete on gpu2 (A6000, shared); smoke 106.2 s + full 870.3 s GPU; `full/published.tar` sha256 `48846a4a9404a7a0834cbe156a5d57988db114240773ba2a9657b7a08246db21`;
+  `w1_score --validate` on the full output: 10 checks passed. Control errors as written (max over the three plain bases, full-stage 80 ticks): full LPIPS 7.7e-5, foreground LPIPS 1.18e-4, full DISTS 1.7e-5, foreground DISTS 4.5e-5 (all under 1e-3).
+  As written by the job (kps2 primary, target 18.461418333333334 kbps; the hybrid's scale-4 means are LPIPS whole 0.2845 / foreground 0.3042, DISTS whole 0.1750 / foreground 0.2420; no interpretation here):
+  `analysis.decision`: outcome A, dominating lpips [] dists [], resolved s2_o0, s2_o20, s2_o40, s4_o0, s4_o20, s4_o40, unresolved [].
+  SVT at the hybrid's rate (whole LPIPS, foreground LPIPS, whole DISTS, foreground DISTS): s2_o0 0.1908, 0.5933, 0.1458, 0.4344; s4_o0 0.2761, 0.6416, 0.1909, 0.4347; s2_o20 0.2380, 0.6496, 0.1682, 0.4645;
+  s2_o40 0.2388, 0.6308, 0.1743, 0.4528; s4_o20 0.2903, 0.6961, 0.2012, 0.4718; s4_o40 0.2929, 0.6945, 0.2012, 0.4716. Full tables: `score-summary.json` / `score.json` in the archive.
+- First-window GPU ledger, final (smoke + full from execution.json, every job including one-off failures): earlier 4,109 s (through the judge) + W1 scoring 347 (failed job: 225 + 121.5) + 976 (106 + 870) = **5,432 s = 1.509 GPU-h,
+  32 s over the 5,400 s sub-budget** (the rescoring's smoke and full ran longer than the 850 s planned; the full stage took 870 s). Nothing was submitted after reaching the limit.
+- DCVC: not run. `w3_neural_baseline` (manifest mode: `activate_manifest`, unpinned inputs, per-window checkpoints, `--point-list` optional) and `w5_dcvc` (points table argument) were already generalised and tested
+  (`tests/test_window_manifest.py::test_w3_manifest_mode_...`); this pass added the first-window spec (`w7_specs.dcvc`, Ada, shared, `first-window dcvc`) and fixed nothing else, because no GPU budget was left to run its smoke.
+  Its points would be the rate-only calibrated targets 15/30/60 kbps (`w3_analysis.TARGET_KBPS`), which bracket the hybrid's 18.46 kbps. The first-window DCVC anchor is therefore missing, so W1's dominance outcome A above covers the SVT anchor families only.
+
+### Projection for the other five Tier 1 windows (GPU seconds, successful smoke + full only, one-off failures excluded)
+- Per window, from the first window's successful jobs: features 319 (163 + 156); anchors 733 (136 + 597); generation 1,416 (92 + 1,324); rgb diagnostic 126 (18.5 + 107.5); receiver 435 (104 + 331); judge 317 (34 + 283);
+  W1 scoring 976 (106 + 870); DCVC about 300 (estimate: 245 s from the W3 record plus a smoke; not measured). CPU stages (native base, build-inputs, prepare, rate transport, rates, W1 masks and encodes) cost no GPU.
+  Total without DCVC 4,322 s (1.20 GPU-h); with the DCVC estimate about 4,620 s (1.28 GPU-h).
+- Five windows: 21,610 s (6.00 GPU-h) without DCVC, about 23,100 s (6.42 GPU-h) with it. With the first window's actual 5,432 s: 27,042 s (7.51 GPU-h) without DCVC, about 28,500 s (7.9 GPU-h) with DCVC for the five and none
+  for the first. DCVC for all six would bring it to about 28,800 s = 8.0 GPU-h, with no margin against the 8 GPU-h card. Caveats: Med windows are 50 fps clips with other match adapters and were not timed; the shared GPUs add queue
+  time but not GPU seconds.
+- Where the fleet smoke is the cost: a successful smoke costs about 650 s per window (163 + 136 + 92 + 18.5 + 104 + 34 + 106). Stages that take several windows (`features`, `anchors`, `prepare`, `receiver`, `judge`, `native_base`,
+  `rgb_diagnostic`, `rate_transport`; not the `w1_*` stages, which take one window) pay it once per job instead of per window; batching the five windows by stage (anchors in 2 + 3 and generation per window to stay inside
+  the 2,600 s stage cap) would save about 4 x 540 = 2,200 s, i.e. about 6.6 GPU-h for the five instead of 6.0 + smokes already counted above (the figures above already assume one smoke per window, so batching is pure saving).
+- Validators and code paths fixed on this window (all merged into this branch) were the main one-off cost: 1,300 s of GPU went to failed smokes and the crashed receiver full stage.
