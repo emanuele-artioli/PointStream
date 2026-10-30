@@ -168,6 +168,11 @@ def subprocess_run(command: list[str]) -> None:
     subprocess.run(command, check=True, capture_output=True)
 
 
+def reservation_seconds(frozen: bool, n_windows: int) -> float:
+    """Seconds the validator allows the full stage: the frozen pair's 360 s for two windows, else the W7 spec's 600 s full reservation."""
+    return 360 * n_windows / 2 if frozen else 600.0
+
+
 def validate() -> None:
     root = Path(os.environ['PS_STAGE_DIR'])
     data = json.loads((root / 'diagnostic-summary.json').read_text())
@@ -175,13 +180,19 @@ def validate() -> None:
     dispatch = dispatch_record['command']
     frozen = '--prior' in dispatch  # manifest windows have no prior run; their allowance scales with the window count
     n_windows = 2 if frozen else max(1, dispatch.count('--source'))
-    allowance = 360 * n_windows / 2
-    checks = {'smoke_24': data['frames'] == 24, 'exact_source': data['source_passed'], 'six_base_sets': data['base_sets'] == (6 if frozen else 3 * n_windows),
-              'full_projection_under_reservation': data['projected_full_seconds'] < allowance}
-    total_smoke = time.time() - dispatch_record['started']
-    publication_and_startup = max(0.0, total_smoke - data['seconds'])
-    projected_with_publication = (data['setup_seconds'] + (data['seconds'] - data['setup_seconds'] + publication_and_startup) * 10) * 1.25
-    checks['full_projection_with_publication'] = projected_with_publication < allowance
+    frames = data['frames']
+    smoke = frames == 24
+    allowance = reservation_seconds(frozen, n_windows)
+    checks = {'frame_grid': frames in (24, 240), 'exact_source': data['source_passed'], 'six_base_sets': data['base_sets'] == (6 if frozen else 3 * n_windows)}
+    projected_with_publication = 0.0
+    if smoke:
+        checks['full_projection_under_reservation'] = data['projected_full_seconds'] < allowance
+        total_smoke = time.time() - dispatch_record['started']
+        publication_and_startup = max(0.0, total_smoke - data['seconds'])
+        projected_with_publication = (data['setup_seconds'] + (data['seconds'] - data['setup_seconds'] + publication_and_startup) * 10) * 1.25
+        checks['full_projection_with_publication'] = projected_with_publication < allowance
+    else:
+        checks['full_within_reservation'] = data['seconds'] < allowance
     old: dict[str, Any] = {}
     if frozen:
         prior = Path(dispatch[dispatch.index('--prior') + 1])
@@ -196,13 +207,13 @@ def validate() -> None:
         report = json.loads((published / 'diagnostic.json').read_text())
         checks['original_gpu_class'] = 'A6000' in report['cuda']
         for row in report['source']:
-            checks[row['window'] + ':original_hashes'] = (all(h == old[row['window']][str(t)] for t, h in zip(row['ticks'], row['gpu_hashes'])) if frozen else True) and len(row['ticks']) == 8
+            checks[row['window'] + ':original_hashes'] = (all(h == old[row['window']][str(t)] for t, h in zip(row['ticks'], row['gpu_hashes'])) if frozen else True) and len(row['ticks']) == len(range(0, frames, 3))
         for row in report['base']:
             name = f"{row['window']}-s{row['scale']}"
             path = published / (name + '-gpu.npy')
-            frames = np.load(path, mmap_mode='r')
+            pixels = np.load(path, mmap_mode='r')
             checks[name + ':file'] = sha(path) == row['sha256']
-            checks[name + ':frames'] = frames.shape == (8, 1080, 1920, 3) and [hashlib.sha256(f.tobytes()).hexdigest() for f in frames] == row['frame_sha256']
+            checks[name + ':frames'] = pixels.shape == (len(range(0, frames, 3)), 1080, 1920, 3) and [hashlib.sha256(f.tobytes()).hexdigest() for f in pixels] == row['frame_sha256']
     Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps({'passed': all(checks.values()), 'checks': checks, 'result': data, 'projected_with_publication': projected_with_publication}))
     if not all(checks.values()):
         raise SystemExit(1)

@@ -67,6 +67,6 @@ def test_first_window_stage_specs_all_stages():
         assert placeholders <= {i['name'] for i in spec['staged_inputs']}, (name, placeholders)
         assert len({i['name'] for i in spec['staged_inputs']}) == len(spec['staged_inputs'])
     assert specs['generate']['environment'] == sp.JCV_ENVIRONMENT and '--fit' in specs['generate']['arguments']
-    assert specs['generate']['arguments'][specs['generate']['arguments'].index('--fit') + 1] == 'match5 ah-C@fit-100-fp16.pt'
+    assert specs['generate']['arguments'][specs['generate']['arguments'].index('--fit') + 1:][:2] == ['match5', 'ah-C@fit-100-fp16.pt']  # two argv items, as the 2026-10-24 renderer job
     assert specs['receiver']['gpu_models'] == ['RTX 6000 Ada']
     assert specs['dcvc']['scale']['frames'] == {'smoke': 25, 'full': 240}
