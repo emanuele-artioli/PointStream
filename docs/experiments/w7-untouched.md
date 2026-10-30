@@ -355,3 +355,7 @@ foreground-first claim.
   `rgb_diagnostic`, `rate_transport`; not the `w1_*` stages, which take one window) pay it once per job instead of per window; batching the five windows by stage (anchors in 2 + 3 and generation per window to stay inside
   the 2,600 s stage cap) would save about 4 x 540 = 2,200 s, i.e. the five windows would cost about 19,400 s (5.4 GPU-h) instead of 21,610 s.
 - Validators and code paths fixed on this window (all merged into this branch) were the main one-off cost: about 1,100 s of GPU (145 + 95 + 520 + 3 + 347) went to failed smokes and the crashed receiver full stage.
+
+### 2026-10-30 — W7 first-window sub-budget raised to 1.65 GPU-h; DCVC run (lead decision)
+- The first window's sub-budget rises from 1.5 to 1.65 GPU-h (5,940 s). Reason: the first-window DCVC run completes the window's anchor set (SVT half/quarter, outside-R and DCVC) and also smokes the DCVC chain for the other five
+  windows. Projected Tier 1 total with the five windows batched by stage: about 7.4 of the 8 GPU-h card. GPU spent before this decision: 5,432 s; 508 s remain.
