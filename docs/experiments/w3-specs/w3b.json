@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "device": "gpu",
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 12000,
+  "cpu_threads": 4,
+  "local_storage_gib": 40,
+  "environment": {
+    "path": "/home/itec/emanuele/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "verify_staged_inputs": true,
+  "contention": {
+    "policy": "pause",
+    "pause_seconds": 1800,
+    "resume_attempts": 1
+  },
+  "required_commands": [
+    "ffmpeg"
+  ],
+  "stall_seconds": 1200,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.w3_neural_baseline"
+  ],
+  "arguments": [
+    "--al",
+    "{staged:al}",
+    "--med",
+    "{staged:med}",
+    "--anchor",
+    "{staged:anchor}",
+    "--transport",
+    "{staged:transport}",
+    "--prior-frame",
+    "{staged:prior_frame}",
+    "--prior-quality",
+    "{staged:prior_quality}",
+    "--image-ckpt",
+    "{staged:image_ckpt}",
+    "--video-ckpt",
+    "{staged:video_ckpt}",
+    "--lpips",
+    "{staged:lpips}",
+    "--dists",
+    "{staged:dists}",
+    "--frames",
+    "{frames}",
+    "--svt-scales",
+    "{svt_scales}",
+    "--point-list",
+    "{point_list}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "al",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+      "extract": false
+    },
+    {
+      "name": "med",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/medvedev_struff__014.mp4",
+      "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be",
+      "extract": false
+    },
+    {
+      "name": "anchor",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261024T201059Z-29586984/full/published.tar",
+      "sha256": "67444a2a8f56c8700fb073a1184ce207ec3ad38cc003dbafa6710bb33836dff9",
+      "extract": false
+    },
+    {
+      "name": "transport",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261025T082944Z-29f021a5/full/published.tar",
+      "sha256": "6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7",
+      "extract": false
+    },
+    {
+      "name": "prior_frame",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-frame-20261026T192107Z/evidence/metadata/k6b-frame-full-result.json",
+      "sha256": "b0a55a5c1440463fff97efa975a661c2c65db9ce35e0696fade9d5648c39ccdc",
+      "extract": false
+    },
+    {
+      "name": "prior_quality",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T211451Z-f6a754eb/full/published.tar",
+      "sha256": "e346844d20671e5dfd78828ec61d262aa13109bc1be9a1b421873facdc86daa1",
+      "extract": false
+    },
+    {
+      "name": "image_ckpt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302",
+      "extract": false
+    },
+    {
+      "name": "video_ckpt",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3",
+      "extract": false
+    },
+    {
+      "name": "lpips",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "extract": false
+    },
+    {
+      "name": "dists",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/medvedev_struff__014.mp4",
+      "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261024T201059Z-29586984/full/published.tar",
+      "sha256": "67444a2a8f56c8700fb073a1184ce207ec3ad38cc003dbafa6710bb33836dff9"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261025T082944Z-29f021a5/full/published.tar",
+      "sha256": "6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-receiver-frame-20261026T192107Z/evidence/metadata/k6b-frame-full-result.json",
+      "sha256": "b0a55a5c1440463fff97efa975a661c2c65db9ce35e0696fade9d5648c39ccdc"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T211451Z-f6a754eb/full/published.tar",
+      "sha256": "e346844d20671e5dfd78828ec61d262aa13109bc1be9a1b421873facdc86daa1"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    }
+  ],
+  "scale": {
+    "frames": {
+      "smoke": 25,
+      "full": 240
+    },
+    "point_list": {
+      "smoke": "al:2:24,med:4:36",
+      "full": "al:2:21,al:2:23,al:2:24,al:2:25,al:2:27,al:2:30,med:4:15,med:4:36,med:4:63"
+    },
+    "svt_scales": {
+      "smoke": "8",
+      "full": "8"
+    }
+  },
+  "smoke": {
+    "seconds": 300,
+    "representative_basis": "W3b. Both windows, native 240-frame source conversion and identity check, one named mid point per window (Al scale 2 QP24, Med scale 4 QP36) coded at 25 frames by the real DCVC-UF encoder and decoded from its file in two separate processes with two passes each, SVT scale 8 re-encoded at 240 frames and checked against the audited Al base, foreground masks and real LPIPS/DISTS on 9 ticks; the same code path as the full run, which codes nine named points (docs/experiments/w3-neural-baseline.md, W3b) and no calibration."
+  },
+  "full": {
+    "seconds": 2300
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.w3_neural_baseline",
+    "--validate"
+  ],
+  "validator_seconds": 120,
+  "budget_seconds": 2700,
+  "deadline": "2026-10-30T18:00:00+00:00"
+}
