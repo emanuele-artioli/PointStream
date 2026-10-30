@@ -109,3 +109,21 @@ def test_w7_rates_and_state():
     assert st['control_ivf_bytes'] == {8: 8000, 4: 4000, 2: 2000} and st['kps1_bytes'] == 4236 and st['kps2_bytes'] == 2701
     with pytest.raises(ValueError):
         r.window_state(base[:2], row, 'al028')
+
+
+def test_w3_manifest_mode_leaves_the_frozen_sources_alone_until_activated():
+    from experiments.tennis import w3_neural_baseline as w3
+    from experiments.tennis import w5_dcvc
+    saved_sources, saved_inputs = dict(w3.SOURCES), dict(w3.INPUTS)
+    try:
+        names = w3.activate_manifest(Path(__file__).resolve().parents[1] / 'docs/experiments/w7-specs/windows.json', ['al028', 'med000'])
+        assert names == ['al028', 'med000'] and w3.SOURCES['al028']['wid'] == 'alcaraz_hurkacz/028@120'
+        assert 'anchor' not in w3.INPUTS and 'lpips' in w3.INPUTS
+        assert w3.parse_point_list('al028:8:30,med000:8:30') == {'al028': [(8, 30)], 'med000': [(8, 30)]}
+    finally:
+        w3.SOURCES.clear()
+        w3.SOURCES.update(saved_sources)
+        w3.INPUTS.clear()
+        w3.INPUTS.update(saved_inputs)
+    assert list(w3.SOURCES) == ['al', 'med'] and w5_dcvc.points()[0]['crf'] == 15
+    assert w5_dcvc.points([(10, 5.0, .1, .2, .3, .4)])[0]['rate_kbps'] == 5.0

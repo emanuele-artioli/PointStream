@@ -66,6 +66,20 @@ class WorkerFailure(RuntimeError):
     pass
 
 
+def activate_manifest(windows_file: Path, names: list[str] | None) -> list[str]:
+    """Replace the frozen Al/Med `SOURCES` by manifest windows (key = window name). Without it nothing here changes. Manifest windows have
+    no prior hybrid run, so the audited-SVT controls (Al only) do not apply to them and the anchor/transport/prior archives are not pinned."""
+    from experiments.tennis import window_manifest as wm
+
+    chosen = wm.select(wm.load(windows_file), names or None)
+    SOURCES.clear()
+    for w in chosen:
+        SOURCES[w.name] = {'wid': w.id, 'start': w.start, 'fps': w.fps, 'source': w.source_sha256, 'yuv': w.source_yuv_sha256}
+    for key in ('anchor', 'transport', 'prior_frame', 'prior_quality'):
+        INPUTS.pop(key, None)
+    return list(SOURCES)
+
+
 def digest(path: Path) -> str:
     h = hashlib.sha256()
     with path.open('rb') as stream:
@@ -519,6 +533,8 @@ def load_prior(a: argparse.Namespace) -> tuple[dict[str, Any], dict[str, np.ndar
     import io
 
     rows = {r['id']: r for r in json.loads(a.prior_frame.read_text())['rows']}
+    if a.prior_quality is None:  # manifest windows: no audited hybrid scores to compare the SVT bases with
+        return rows, {}
     with tarfile.open(a.prior_quality) as tar:
         member = tar.extractfile('publish/alcaraz_hurkacz__031@129/scores.npz')
         if member is None:
@@ -583,10 +599,12 @@ def run(a: argparse.Namespace) -> None:
     seconds = time.monotonic() - began
     summary = {'frames': a.frames, 'points': a.points, 'point_list': a.point_list, 'svt_scales': ctx['svt_scales'], 'gpu': name, 'gpu_class': gpu_class,
                'capability': capability, 'gpu_uuid': uuid, 'tools': tools, 'torch': torch.__version__,
-               'accepted': all(r['accepted'] for r in results) and len(results) == 2, 'windows': results,
+               'accepted': all(r['accepted'] for r in results) and len(results) == len(SOURCES), 'windows': results,
                'setup_seconds': setup, 'seconds': seconds, **summarize(results),
                'inputs': {k: getattr(a, k).name for k in INPUTS},
                'scope': 'Two familiar development windows; real bitstreams; decoded in the encoding job; no timing claim.'}
+    if a.windows_file is not None:
+        summary['expected_windows'] = list(SOURCES)
     summary = json.loads(json.dumps(summary))  # what the validator reads back: lists, not tuples
     write(publish / 'summary.json', summary)
     write(Path(os.environ['PS_STAGE_DIR']) / 'w3-summary.json', summary)
@@ -598,6 +616,10 @@ def validate() -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     summary = json.loads((stage / 'w3-summary.json').read_text())
     spec = json.loads((stage.parent / 'spec.json').read_text())
+    manifest_item = next((i for i in spec['staged_inputs'] if i['name'] == 'windows'), None)
+    if manifest_item is not None:
+        arguments = spec['arguments']
+        activate_manifest(Path(manifest_item['path']), [arguments[i + 1] for i, x in enumerate(arguments) if x == '--window'])
     staging = json.loads((stage / 'staging.json').read_text())
     windows = summary['windows']
     listed = summary.get('point_list')
@@ -631,7 +653,7 @@ def validate() -> None:
             'bracket': all(w['bracket_ok'] and an.planned_bracket(w['candidates']) for w in windows)}
     points = [p for w in windows for p in w['dcvc']]
     checks: dict[str, Any] = {
-        'two_windows': [w['window'] for w in windows] == ['al', 'med'],
+        'two_windows': [w['window'] for w in windows] == summary.get('expected_windows', ['al', 'med']),
         **selection,
         'accepted': summary['accepted'],
         'gpu': summary['gpu_class'] in GPU_CLASSES and summary['gpu_uuid'].startswith('GPU-'),
@@ -650,7 +672,7 @@ def validate() -> None:
         'projection': projection < spec['full']['seconds'],
         'budget': spec['budget_seconds'] <= 3300,
         'scale': spec['scale']['frames'] == {'smoke': 25, 'full': 240},
-        'inputs': all(item['sha256'] in INPUTS.values() or item['sha256'] in {s['source'] for s in SOURCES.values()} for item in spec['staged_inputs']),
+        'inputs': manifest_item is not None or all(item['sha256'] in INPUTS.values() or item['sha256'] in {s['source'] for s in SOURCES.values()} for item in spec['staged_inputs']),
     }
     with tarfile.open(stage / 'published.tar') as tar:
         member = tar.extractfile('publish/summary.json')
@@ -669,10 +691,20 @@ def main() -> None:
     parser.add_argument('--points', type=int, choices=(1, 3), default=1)
     parser.add_argument('--svt-scales', default='8')
     parser.add_argument('--point-list', default=None, help='W3b: window:scale:qp,... instead of the calibrated points')
+    parser.add_argument('--windows-file', type=Path, help='window manifest instead of the frozen Al/Med pair (then --window/--source per window; '
+                        '--anchor, --transport and --prior-frame (the receiver stage result of these windows) are required but not hash-pinned; --prior-quality is not used)')
+    parser.add_argument('--window', action='append')
+    parser.add_argument('--source', type=Path, action='append')
     args = parser.parse_args()
+    if args.windows_file is not None and not args.validate:
+        names = activate_manifest(args.windows_file, args.window)
+        if len(args.source or []) != len(names):
+            parser.error('one --source per selected window, in order')
+        for name, path in zip(names, args.source):
+            setattr(args, name, path)
     if args.validate:
         validate()
-    elif any(getattr(args, k) is None for k in [*INPUTS, 'al', 'med']):
+    elif any(getattr(args, k) is None for k in [*INPUTS, *SOURCES, 'anchor', 'transport', 'prior_frame']):
         parser.error('all frozen inputs are required')
     else:
         run(args)
