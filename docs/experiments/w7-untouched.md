@@ -364,3 +364,13 @@ foreground-first claim.
   frozen windows) and `budget` (spec `budget_seconds` 3,400 against the validator's 3,300 cap). Both are spec/validator bugs; the other 19 checks passed (projected full 635 s). Fixed (control required for the frozen pair only; spec budget 3,300),
   test added. GPU total 5,498 s of 5,940 s.
   DCVC second job: `20261030T214920Z-ea50a2cf` (the earlier submit attempt was refused by the client for a stale gpu6 heartbeat; nothing was published).
+- DCVC: `20261030T214920Z-ea50a2cf` complete on gpu6 (Ada, shared); smoke 65.7 s + full 242.7 s GPU; `full/published.tar` sha256 `66a715b22f6bcde05ce28f94d2eb586b7a215558964599302bff5105e8bab6ec`;
+  `w3_neural_baseline --validate` on the full output (the validator now covers the 240-frame stage: 3 points, 80 ticks, no smoke projection): 21 checks passed. Accepted (decode checks), 3 DCVC points (rate-only calibrated targets 15, 30, 60 kbps; scale, QP chosen on the 25-frame estimates).
+  As written by the job (DCVC points: scale, QP, kbps, whole LPIPS, whole DISTS, foreground LPIPS, foreground DISTS; table in `docs/experiments/w7-specs/dcvc-points-al028.json` in the `w5_dcvc` column order QP, kbps, whole LPIPS, whole DISTS, fg LPIPS, fg DISTS):
+  scale 8, QP 30: 3.306 kbps, 0.4441, 0.2915, 0.8186, 0.5307; scale 2, QP 6: 7.654 kbps, 0.2127, 0.1845, 0.5946, 0.4291; scale 2, QP 18: 14.572 kbps, 0.1669, 0.1419, 0.4435, 0.3324.
+  The job's own SVT bases (same pixels as the judge): scale 8 9.338 kbps 0.4502, 0.2971, 0.8578, 0.5924; scale 4 14.121 kbps 0.2937, 0.2002, 0.7180, 0.4961; scale 2 27.231 kbps 0.1460, 0.1202, 0.4810, 0.3624.
+  `w5_dcvc` on this window (score summary `e32a981b` and the points file): at the hybrid's rate (kps2 18.4614 kbps; kps1 19.6823 kbps) the DCVC value is **None**: the highest DCVC point is 14.572 kbps, so the hybrid's rate lies outside
+  their span and is unresolved, not extrapolated (rule of W3b/W5). So with DCVC included, the W1 dominance outcome is the SVT-only outcome A above, with the DCVC family unresolved at this rate. The job's envelope comparison (DCVC
+  pareto against the SVT hull, common range 9.34-14.57 kbps) is in `w3-summary.json`: whole LPIPS BD-rate -63.9 %, whole DISTS -56.0 % (status OVERLAP ONLY).
+  Next test (not run; 134 s of the 5,940 s left): re-run DCVC with points chosen on the measured 240-frame rates so that the span reaches the hybrid's rate (the 25-frame estimates overshot: targets 15/30/60 kbps gave 3.3/7.7/14.6 kbps), about 250 s GPU.
+- First-window GPU ledger, final: 5,432 s (through W1 scoring) + DCVC 66 (failed validator) + 66 + 243 = **5,806 s = 1.613 GPU-h of the 1.65 GPU-h (5,940 s) sub-budget**.
