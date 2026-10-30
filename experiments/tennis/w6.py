@@ -223,12 +223,14 @@ def command_masks(a: argparse.Namespace) -> int:
             prediction = json.loads((out / "prediction.json").read_text())
             row = next(r for r in prediction["rows"] if r["name"] == unit)
             shutil.copyfile(out / row["file"], publish / f"{unit}-masks.npz")
-            predicted = np.load(publish / f"{unit}-masks.npz")["masks"]
+            with np.load(publish / f"{unit}-masks.npz") as zp:
+                predicted, judged = zp["masks"], {int(t): i for i, t in enumerate(zp["t"].tolist())}
             same: dict[str, Any] = {"unit": unit}
             with np.load(old_masks / "publish" / f"{unit}-masks.npz") as z:
                 ticks = z["t"].tolist()
-                keep = [k for k, t in enumerate(ticks) if t in index]
-                got = predicted[[index[ticks[k]] for k in keep]]
+                # The worker judges the first --max-judged frames (16 in the smoke), not every regenerated frame.
+                keep = [k for k, t in enumerate(ticks) if t in judged]
+                got = predicted[[judged[ticks[k]] for k in keep]]
                 prior = z["masks"][keep]
                 same.update({"saved_ticks": len(keep), "identical_ticks": int((got == prior).reshape(len(keep), -1).all(1).sum()),
                              "differing_pixels": int((got != prior).sum())})
