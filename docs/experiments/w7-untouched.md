@@ -285,3 +285,4 @@ foreground-first claim.
 - judge (compose + score, shared GPU): `20261030T184549Z-d9fe4272` submitted (first attempt refused by the client: a shared spec needs contention `continue`; fixed in the builder).
 - judge first job `20261030T184549Z-d9fe4272` (gpu6): crashed in the first 3.3 s of the smoke: `GPU source control or base coverage missing` (the check hard-coded six base rows, two windows). Code bug, fixed
   (three scales per window, one source row per window). GPU total 3,792 s of 4,680 s.
+  Judge resubmitted: `20261030T185245Z-e51a4dec`.
