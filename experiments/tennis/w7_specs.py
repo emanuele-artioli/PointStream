@@ -230,8 +230,14 @@ def receiver(windows: list[wm.WindowSpec], manifest: tuple[str, str], transport:
             '--max-judged', '{judged}', '--weights', '{staged:sam}', '--text', '{staged:sam}']
     files = {'windows': manifest, 'transport': transport, 'a0': anchor, **assets('lpips', 'dists', 'sam'),
              **{w.name: source_files(windows)[w.name] for w in chosen}, **{f'g{i}': g for i, g in enumerate(generated[:len(chosen)])}}
-    return gpu_stage('experiments.tennis.k6b_receiver_frame', args, files, models=['RTX 6000 Ada'], mem_mib=12000, threads=4, smoke_seconds=300,
+    spec = gpu_stage('experiments.tennis.k6b_receiver_frame', args, files, models=GPU_MODELS, mem_mib=12000, threads=4, smoke_seconds=300,
                      full_seconds=FULL_SECONDS, scale={'judged': {'smoke': 2, 'full': 0}}, basis='First window, two judged ticks: SAM prompting twice, masks, composites and metrics.')
+    spec['hosts'] = ['gpu2', *HOSTS_GPU]
+    basis = 'SAM existing weights and native CUDA flash; fresh deterministic private receiver predictions; outputs do not depend on wall time (as the 2026-10-26 receiver job 20261026T184618Z-186fe8b3)'
+    spec['gpu_sharing'] = {'mode': 'shared', 'basis': basis, 'margin_mib': 8192}
+    spec['contention'] = {'policy': 'continue', 'basis': basis, 'resume_attempts': 0}
+    spec['validator'] = ['{python}', '-m', 'experiments.tennis.k6b_receiver_frame', '--validate']
+    return spec
 
 
 def dcvc(windows: list[wm.WindowSpec], manifest: tuple[str, str], anchor: tuple[str, str], transport: tuple[str, str], prior_frame: tuple[str, str],
@@ -339,6 +345,8 @@ def first_window(argv: list[str]) -> None:
         spec = rate_transport([first], windows_ref, [ups['anchor']], [ups['prepared']], 1)
     elif stage == 'rgb-diagnostic':
         spec = rgb_diagnostic([first], windows_ref, ups['base'], 24, shared='shared' in ups)
+    elif stage == 'receiver':
+        spec = receiver([first], windows_ref, ups['transport'], ups['anchor'], [ups['generated']], 1)
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:
