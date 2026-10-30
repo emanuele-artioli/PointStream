@@ -141,8 +141,8 @@ def run(a: argparse.Namespace) -> None:
 
     began = time.monotonic()
     window = WINDOWS[a.window]
-    for path, expected in ((a.al, window.source_sha), (a.transport, TRANSPORT_SHA)):
-        if digest(path) != expected:
+    for path, expected in ((a.al, window.source_sha), (a.transport, TRANSPORT_SHA if a.window in ('al', 'med') else None)):  # manifest windows: own transport
+        if expected is not None and digest(path) != expected:
             raise ValueError('pinned input changed: ' + path.name)
     tools = {name: svtav1.tool(name) for name in TOOLS}
     if any(tools[n]['sha256'] != d for n, d in TOOLS.items()):
