@@ -31,7 +31,9 @@ def rates(transport: dict[str, Any]) -> dict[str, dict[str, float]]:
         bank_bytes = row['references']['png_bytes'] * BANK_CROPS / crops
         out[row['window']] = {'keypoint_kbps': kbps(row['keypoints']['bytes'], 240 / fps),
                               'match_bank_kbps_7200': kbps(bank_bytes, AMORTISED_SECONDS),
-                              'adapter_guider_kbps_7200': kbps(ADAPTER_BYTES[row['match']], AMORTISED_SECONDS)}
+                              'adapter_guider_kbps_7200': kbps(ADAPTER_BYTES[row['match']], AMORTISED_SECONDS),
+                              # worst-case sensitivity: the window's own crops billed over the 240-frame window alone
+                              'bank_worst_case_kbps': kbps(row['references']['png_bytes'], 240 / fps)}
     return out
 
 

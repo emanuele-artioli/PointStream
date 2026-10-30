@@ -264,6 +264,9 @@ def run(a: argparse.Namespace) -> None:
                           'total_kbps': base_rate + side, 'bootstrap_bytes': len(header),
                           'kps_bytes': len(kps), 'base_ivf_bytes': native_base['ivf']['bytes'],
                           'base_rgb_sha256': base_row['sha256']})
+            if 'bank_worst_case_kbps' in old_rate:  # manifest windows: worst-case sensitivity row, own crops billed over the window alone
+                rates[-1]['bank_worst_case_kbps'] = old_rate['bank_worst_case_kbps']
+                rates[-1]['total_kbps_bank_worst_case'] = rates[-1]['total_kbps'] - old_rate['match_bank_kbps_7200'] + old_rate['bank_worst_case_kbps']
         item = {'id': wid, 'ticks': ticks, 'means': {m: v.mean(axis=1).tolist() for m, v in scores.items()},
                 'rates': rates, 'composite_hashes': hashes, 'score_seconds': time.monotonic() - frame_started,
                 'frame_seconds': frame_seconds,

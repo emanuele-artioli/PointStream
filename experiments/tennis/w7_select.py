@@ -295,8 +295,15 @@ def cmd_stage(args: argparse.Namespace) -> None:
     from experiments.tennis import window_manifest as wm
 
     root = Path(args.datasets)
-    dest = Path(args.dest) / "sources"
-    dest.mkdir(parents=True, exist_ok=False)
+    top = Path(args.dest)
+    dest = top / "sources"
+    dest.mkdir(parents=True, exist_ok=False)  # never reuses or overwrites an existing directory
+    manifest_copy = top / "windows.json"
+    if manifest_copy.exists():
+        raise FileExistsError(manifest_copy)
+    shutil.copyfile(args.windows, manifest_copy)
+    if file_sha256(manifest_copy) != file_sha256(Path(args.windows)):
+        raise ValueError("windows.json copy differs")
     for w in wm.load(Path(args.windows)):
         target = dest / w.source_file
         shutil.copyfile(root / ARCHIVE / (w.clip_id + ".mp4"), target)

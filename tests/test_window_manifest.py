@@ -103,6 +103,7 @@ def test_w7_rates_and_state():
     out = r.rates({'rows': [row]})['alcaraz_hurkacz/028@120']
     assert abs(out['keypoint_kbps'] - 2701 * 8 / 9.6 / 1000) < 1e-12
     assert abs(out['match_bank_kbps_7200'] - 150000 * 6 * 8 / 7200 / 1000) < 1e-12
+    assert abs(out['bank_worst_case_kbps'] - 150000 * 8 / 9.6 / 1000) < 1e-9
     base = [{'window': 'al028', 'scale': s, 'ivf': {'bytes': 1000 * s}} for s in (8, 4, 2)]
     st = r.window_state(base, row, 'al028')
     assert st['control_ivf_bytes'] == {8: 8000, 4: 4000, 2: 2000} and st['kps1_bytes'] == 4236 and st['kps2_bytes'] == 2701

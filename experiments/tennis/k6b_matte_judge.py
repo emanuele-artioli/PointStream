@@ -58,7 +58,7 @@ def control_error(current: np.ndarray, expected: np.ndarray, *, tolerance: float
     return difference
 
 
-def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Path,
+def judge_window(wid: str, anchor: Path, control: Path | None, packets: Path, matte: Path,
                  matte_row: dict[str, Any], generated: dict[Any, Any], source: Path, source_sha: str,
                  nets: dict[str, Any], scratch: Path, publish: Path, max_judged: int,
                  *, control_variant: str = "gen-match5",
@@ -113,10 +113,18 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
                for t, r in enumerate(regions) for p in native["players"]}
     decoded_all = {key: {(n.rsplit("@", 1)[0], int(n.rsplit("@", 1)[1])): np.asarray(v, np.float64)
                          for n, v in d.items()} for key, d in json.loads(decompress((anchor / "keypoints.json.zst").read_bytes()))["decoded"].items()}
-    old_row = json.loads((control / "window.json").read_text())
-    old_index = old_row["variants"].index(control_variant)
-    with np.load(control / "scores.npz") as a:
-        expected_control = np.stack([a[m][old_index] for m in ("lpips", "dists")])
+    # `control` None: a window with no prior run. The prior-score gate is replaced by an in-job control: the first variant is scored a
+    # second time on its own and must agree within the same tolerance (control_error); no saved-composite hash check either.
+    old_row: dict[str, Any] | None = None
+    expected_control: np.ndarray | None = None
+    old_index = 0
+    in_job_differences: list[float] = []
+    if control is not None:
+        loaded: dict[str, Any] = json.loads((control / "window.json").read_text())
+        old_row = loaded
+        old_index = loaded["variants"].index(control_variant)
+        with np.load(control / "scores.npz") as a:
+            expected_control = np.stack([a[m][old_index] for m in ("lpips", "dists")])
     dest = publish / safe(wid)
     dest.mkdir()
     arrays = {m: np.full((len(variants), 240), np.nan) for m in ("lpips", "dists", "outside_r_sse", "sse")}
@@ -146,7 +154,7 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
         for m in drawn.values():
             s |= m
         hashes[str(t)] = {"r": sha(np.packbits(r).tobytes()), "s": sha(np.packbits(s).tobytes())}
-        if hashes[str(t)] != native["scoring_masks"][str(t)] or hashes[str(t)] != old_row["scoring_masks"][str(t)]:
+        if hashes[str(t)] != native["scoring_masks"][str(t)] or (old_row is not None and hashes[str(t)] != old_row["scoring_masks"][str(t)]):
             raise ValueError("Frozen R/S judging regions changed")
         frames, supports = [], []
         coverage = []
@@ -181,7 +189,7 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
                 "fp": int((predicted & ~r).sum()), "fn": int((r & ~predicted).sum()),
                 "predicted_sha256": array_sha(predicted)}
         row["crop_coverage"][str(t)] = coverage
-        if control_variant == "full":
+        if control_variant == "full" and old_row is not None:
             expected_rgb = old_row["composite_sha256"][str(t)][old_index]
             if array_sha(frames[0]) != expected_rgb:
                 raise ValueError("Saved FULL reference composite pixels changed")
@@ -191,7 +199,12 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
                 slice(max(0, xs.min()-k6.DISTS_PAD), min(1920, xs.max()+1+k6.DISTS_PAD)))
         di = dists_crops(nets["dists"], [im[crop] for im in frames], truth_t[crop], s[crop], "cuda")
         values = np.array([[v[0] for v in lp], di])
-        control_error(values[:, 0], expected_control[:, t])
+        if expected_control is None:
+            again_lpips = lpips_reduce(nets["lpips"], frames[:1], truth_t, [[s, supports[0]]], "cuda")[0][0]
+            again_dists = dists_crops(nets["dists"], [frames[0][crop]], truth_t[crop], s[crop], "cuda")[0]
+            in_job_differences.append(control_error(values[:, 0], np.array([again_lpips, again_dists])))
+        else:
+            control_error(values[:, 0], expected_control[:, t])
         if not np.isfinite(values).all():
             raise ValueError("Nonfinite actual neural scores")
         arrays["lpips"][:, t], arrays["dists"][:, t] = values
@@ -205,7 +218,10 @@ def judge_window(wid: str, anchor: Path, control: Path, packets: Path, matte: Pa
             np.savez_compressed(dest / "scores.npz", **arrays, judged=np.array(row["judged"]))
             write(dest / "partial.json", {"id": wid, "finished_frames": row["judged"], "expected_frames": requested})
         row["scored_frame_seconds"][str(t)] = time.monotonic()-frame_started
-    row["control_max_abs_difference"] = control_error(np.stack([arrays[m][0, requested] for m in ("lpips", "dists")]), expected_control[:, requested])
+    row["control_max_abs_difference"] = (max(in_job_differences) if in_job_differences else 0.0) if expected_control is None else control_error(
+        np.stack([arrays[m][0, requested] for m in ("lpips", "dists")]), expected_control[:, requested])
+    if expected_control is None:
+        row["control"] = "in-job: first variant scored twice"
     row["means"] = {str(scale): {m: float(arrays[m][i, requested].mean()) for m in ("lpips", "dists")} for i, scale in enumerate(variants)}
     row["scoring_masks"] = hashes
     row["composite_hashes"] = composite_hashes
