@@ -162,3 +162,34 @@ judges ([j.md](j.md)).
 - Resubmitted post: **`20261030T132001Z-e3d70926`** (code `40f390a1`).
 - Post `20261030T132001Z-e3d70926` FAILED in its smoke (gpu6): the mask-reproduction check indexed saved ticks beyond the 16 judged smoke frames. Fix: match on the frame numbers the masks file records. Resubmitted below.
 - Resubmitted post: **`20261030T132449Z-75957f16`** (code `c3b90760`).
+
+### 2026-10-30 — W6 outcome: pose passes, time fails (narrowed: sharp, correctly posed players that flicker more than SVT's)
+- Jobs: generation `20261030T120630Z-9190e75a` (gpu3, RTX A6000, full 1,908 s, code `6f10fef4` + main); masks and judges
+  `20261030T132449Z-75957f16` (gpu5, RTX 6000 Ada, smoke 115 s + full 410 s, ready.json code `c3b90760`; failed
+  attempts `…130413Z-325dde3b` and `…132001Z-e3d70926` were code bugs in the smoke, fixed above). Validator re-run
+  locally on the full stage from the job's own source: 18/18 checks pass. Judges archive sha256 `4d71f6cc…c353f1`.
+  GPU time for W6 in total about 5,500 s (1.5 GPU-h) of the 2.5 GPU-h cap.
+- Reproduction (step 1): the full-rate regeneration does not match the saved 80 ticks within one level (max abs
+  diff 165 and 80 levels per player, mean 0.09 and 0.09, 7.5% of pixels differ, 0 frames identical); the saved
+  receiver masks differ on every tick too. The long-video sampler's 24-frame contexts now cover all 240 frames, so
+  each tick is denoised in a different context; within one recipe generation is deterministic (unit `…0006`
+  bit-identical across two jobs). By the rule, the rerun is the reference for all 240 frames.
+- Pose (YOLO11x-pose error as a share of the box, 240 frames, both players): hybrid **0.063**, SVT at the hybrid's
+  rate 0.901 (interpolated between CRF 65/66), coded keypoints 0.026. Limit max(0.901, 1.5 × 0.026) = 0.901:
+  **pass**; block-bootstrap 95% interval of hybrid − anchor [−0.90, −0.80]. Caveat: the detector misses SVT's
+  players on 78–88% of player-frames (hybrid 1.0%), so the anchor's error is mostly failed detections. The hybrid's
+  pose error is 2.4× the coded keypoints' own, i.e. the generator adds pose error beyond the keypoints.
+- Time (239 frame pairs): `h3b.flicker` hybrid **28.6** vs SVT 18.6 (interval of the difference [+9.3, +11.4]);
+  residual energy 23.1 vs limit 16.6 (1.25 × source 13.3; interval [+5.9, +7.5]). **Both fail.**
+- Racket (beside): the generated player overlaps the source racket region in 40% of 270 player-frames with a
+  racket, covering 3% of it on average (written pixels 4%): the racket is essentially absent, as the visual check
+  showed.
+- Narrowed claim, stated before looking further: at equal rate PointStream's players are sharp and correctly posed
+  where SVT's are blurred beyond detection, but at the full frame rate they change more from frame to frame than
+  SVT's players do (and than the source does), and the racket is not drawn. Next test: split the flicker between
+  its two sources on the saved outputs, without new generation: the receiver masks (fresh per frame, no
+  propagation) and the generated pixels (score the hybrid with the source matte, and with temporally smoothed
+  masks). The larger share decides whether mask propagation or a temporal generator is the fix.
+- Effect on W7: W6 did not pass its rule, so W7 keeps the frozen W5 recipe (players on every third frame).
+- Clips: `full/clips/w6-side-by-side-source-svt-hybrid.mp4` and `w6-zoom2x-near-player-source-svt-hybrid.mp4` in
+  the post job's stage directory.

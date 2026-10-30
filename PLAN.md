@@ -1377,6 +1377,14 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   ([rule](docs/experiments/w7-untouched.md)) written 2026-10-30: Tier 1
   untouched clips of Al/Med, Tier 2 the Nadal–Kyrgios match the base never
   trained on.
+- **W6 outcome (2026-10-30, [entry](docs/experiments/w6-motion-pose.md)).**
+  Full-rate Al hybrid, all 240 frames. Pose passes: YOLO11x-pose error 0.063
+  of the box vs SVT 0.90, whose players the detector mostly misses. Time
+  fails: flicker 28.6 vs SVT 18.6, residual energy 23.1 vs a limit of 16.6.
+  The racket is essentially absent (3% coverage). Narrowed claim: sharp,
+  correctly posed players that flicker more than SVT's. Next test: split the
+  flicker between the per-frame receiver masks and the generated pixels, on
+  saved outputs. W7 keeps the every-third-frame recipe.
 - **W9. Adapter break-even and live adaptation (user, 2026-10-30).** The
   per-match adapter (about 1.49 MB) is billed as if spread over a 2-hour
   match, an arbitrary choice. Replace it with the break-even length L*: the
