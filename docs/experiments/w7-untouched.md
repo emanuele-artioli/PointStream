@@ -310,3 +310,4 @@ foreground-first claim.
 - W1 CPU jobs submitted: masks `20261030T190740Z-8890c377`, encode half (plain + controls) `20261030T190853Z-dc5b4815`, quarter `20261030T191012Z-2ddae924`, half outside-R `20261030T191136Z-93c95de1`, quarter outside-R `20261030T191258Z-54a3c17c`.
 - The five W1 CPU jobs above all failed their smokes within seconds on `pinned input changed: published.tar`: `w1_masks` and `w1_encode` pinned the anchor/transport archives to the frozen pair's hashes.
   Code bug, fixed (the pins apply to `al`/`med` only; manifest windows are identified by the fleet's staged hashes). 0 GPU s. Jobs not replayed; new ones below.
+  Resubmitted: masks `20261030T191755Z-f17c13d7`, encode half `20261030T191856Z-82bf32b2`, quarter `20261030T192015Z-34f84816`, half outside-R `20261030T192145Z-768aceab`, quarter outside-R `20261030T192314Z-cfd1f3d3`.
