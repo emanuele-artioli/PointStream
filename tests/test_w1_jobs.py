@@ -16,7 +16,7 @@ def test_search_offset_stops_at_the_encode_budget_and_publishes_each_encode(tmp_
     monkeypatch.delenv('PS_JOB_DIR', raising=False)
     seen = []
 
-    def fake(raw, work, *, scale, frames, crf, regions, offset, cpus, outside=False):
+    def fake(raw, work, *, scale, frames, crf, regions, offset, cpus, outside=False, window=w.AL):
         stream = tmp_path / f'tmp{len(seen)}.ivf'
         stream.write_bytes(b'x')
         seen.append(crf)

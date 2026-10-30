@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -48,6 +49,46 @@ CONTROL_ROW = {8: 0, 4: 2, 2: 4}
 SLOPE_PRIOR = 0.07  # d ln(rate) / d CRF, only to place the first guesses
 METRICS = ('lpips', 'dists')
 CONTROL_TOLERANCE = 1e-4
+
+
+@dataclass(frozen=True)
+class Window:
+    """Everything that differs between the development windows the W1 grid can run on."""
+    name: str
+    id: str
+    packet_dir: str
+    fps: int
+    source_sha: str
+    source_yuv_sha: str
+    source_start: int
+    hybrid_dir: str  # directory of the window's scores.npz inside the real-base judge's archive
+    control_ivf_bytes: dict[int, int]  # plain CRF 63 base files of scale 8/4/2 (real-base base manifest)
+    start_base: dict[int, int]  # first CRF probe per scale (only places the search; never read as a result)
+    kps1_bytes: int  # keypoint packet inside the hybrid's recorded rate
+    kps2_bytes: int  # the same geometry in the KPS2 packet (docs/experiments/w2-pose-rate.md)
+    hybrid_archive_sha: str | None = None
+
+    @property
+    def duration(self) -> float:
+        return FRAMES / self.fps
+
+
+AL = Window('al', WINDOW, PACKET_DIR, FPS, SOURCE_SHA, SOURCE_YUV_SHA, SOURCE_START, 'alcaraz_hurkacz__031@129',
+            CONTROL_IVF_BYTES, {4: 60, 2: 67, 1: 70}, ORIGINAL_KPS_BYTES, 2701, HYBRID_ARCHIVE_SHA)
+#: Medvedev-Struff 014 from frame 194: 240 frames at 50 fps. Rates of the plain bases (11734/20484/48152 B) are 19.557, 34.140
+#: and 80.253 kbps; the hybrid (scale 4 base + side terms, about 42.5 kbps) lies above the scale 4 base, so the first
+#: probes start lower than Al's for the quarter-resolution search and at the encoder maximum for the half-resolution one.
+MED = Window('med', 'medvedev_struff/014@194', 'packets/medvedev_struff__014@194/', 50,
+             'a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be',
+             '53633ce617b12d779bc8c5746d8d44cbe090ced6c49ba79dbe246cc6abacfb08', 74, 'medvedev_struff__014@194',
+             {8: 11734, 4: 20484, 2: 48152}, {4: 60, 2: 70, 1: 70}, 3542, 2193,
+             '4e2a337d34489cf2e65bb1527f3c511dad334bad6ec84761d035678e9f94aa6d')  # step 1 archive, job 20261030T072024Z-10c9606e
+WINDOWS = {w.name: w for w in (AL, MED)}
+
+
+def rebilled_kbps(total_kbps: float, old_bytes: int, new_bytes: int, window: Window = AL) -> float:
+    """`total_kbps` with the keypoint packet of `old_bytes` replaced by one of `new_bytes`."""
+    return total_kbps - (old_bytes - new_bytes) * 8 / window.duration / 1000
 
 
 def digest(path: Path) -> str:
@@ -199,11 +240,11 @@ def select_crfs(known: dict[int, float], target: float) -> list[int] | None:
     return sorted(chosen)
 
 
-def start_crf(scale: int, offset: int, outside: bool = False) -> int:
+def start_crf(scale: int, offset: int, outside: bool = False, window: Window = AL) -> int:
     """First probe, from the plain CRF 63 rates already measured (half 33.685 kbps; ROI adds rate).
     With the offset realised outside R the background sits at CRF + |offset|, capped by the encoder,
     so the player-block CRF starts lower."""
-    base = {4: 60, 2: 67, 1: 70}[scale]
+    base = window.start_base[scale]
     return max(CRF_MIN, base - abs(offset)) if outside and offset else base
 
 

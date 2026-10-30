@@ -22,14 +22,14 @@ from typing import Any
 
 import numpy as np
 
-from experiments.tennis.w1_roi import (ANCHOR_SHA, PACKET_DIR, TICKS, TRANSPORT_SHA, WINDOW, digest)
+from experiments.tennis.w1_roi import AL, ANCHOR_SHA, TICKS, TRANSPORT_SHA, WINDOWS, Window, digest
 
 
 def pack_bits(mask: np.ndarray) -> bytes:
     return np.packbits(mask).tobytes()
 
 
-def build(anchor: Path, transport: Path, scratch: Path, ticks: list[int]) -> dict[str, Any]:
+def build(anchor: Path, transport: Path, scratch: Path, ticks: list[int], window: Window = AL) -> dict[str, Any]:
     import cv2
 
     from experiments.tennis import k6, k6b
@@ -38,13 +38,13 @@ def build(anchor: Path, transport: Path, scratch: Path, ticks: list[int]) -> dic
     from src.segmentation.masks import decompress
 
     stages = k6b.extract_stages([str(anchor)], scratch / 'anchor')
-    native = k6b.k6_window(stages[WINDOW])
+    native = k6b.k6_window(stages[window.id])
     row = native['row']
-    if row['id'] != WINDOW or row['judged'] != TICKS:
+    if row['id'] != window.id or row['judged'] != TICKS:
         raise ValueError('K6 window or judged ticks changed')
     with tarfile.open(transport) as tar:
-        member = tar.extractfile(PACKET_DIR + 'exact-rle.matte')
-        keypoints = tar.extractfile(PACKET_DIR + 'keypoints.kps')
+        member = tar.extractfile(window.packet_dir + 'exact-rle.matte')
+        keypoints = tar.extractfile(window.packet_dir + 'keypoints.kps')
         if member is None or keypoints is None:
             raise ValueError('transport members missing')
         _, source_masks = decode_masks(member.read())
@@ -54,7 +54,7 @@ def build(anchor: Path, transport: Path, scratch: Path, ticks: list[int]) -> dic
                    for i, p in enumerate(players) if source_masks[t, i].any()} for t in range(240)]
     heights = {(p, t): float(np.ptp(np.nonzero(r[p].any(1))[0]) + 1) if p in r and r[p].any() else 1.0
                for t, r in enumerate(region_all) for p in players}
-    coded = json.loads(decompress((stages[WINDOW] / 'keypoints.json.zst').read_bytes()))['decoded']
+    coded = json.loads(decompress((stages[window.id] / 'keypoints.json.zst').read_bytes()))['decoded']
     decoded = {key: {(name.rsplit('@', 1)[0], int(name.rsplit('@', 1)[1])): np.asarray(v, np.float64)
                      for name, v in values.items()} for key, values in coded.items()}
     blank = np.zeros((1080, 1920, 3), np.uint8)
@@ -74,7 +74,7 @@ def build(anchor: Path, transport: Path, scratch: Path, ticks: list[int]) -> dic
         r_bits.append(np.frombuffer(pack_bits(r), np.uint8))
         s_bits.append(np.frombuffer(pack_bits(s), np.uint8))
         counts.append((int(r.sum()), int(s.sum())))
-    return {'ticks': ticks, 'r': np.stack(r_bits), 's': np.stack(s_bits), 'counts': counts, 'safe': safe(WINDOW),
+    return {'ticks': ticks, 'r': np.stack(r_bits), 's': np.stack(s_bits), 'counts': counts, 'safe': safe(window.id),
             'hashes': {str(t): row['scoring_masks'][str(t)] for t in ticks}}
 
 
@@ -101,7 +101,7 @@ def run(a: argparse.Namespace) -> None:
     publish = scratch / 'publish'
     publish.mkdir()
     ticks = TICKS[:a.judged or None]
-    result = build(a.anchor, a.transport, scratch, ticks)
+    result = build(a.anchor, a.transport, scratch, ticks, WINDOWS[a.window])
     np.savez_compressed(publish / 'masks.npz', ticks=np.asarray(ticks), r=result['r'], s=result['s'])
     summary = {'ticks': ticks, 'counts': result['counts'], 'hashes': result['hashes'], 'matches_k6_record': True,
                'seconds': time.monotonic() - began, 'cpus': len(os.sched_getaffinity(0)),
@@ -140,6 +140,7 @@ def main() -> None:
     p.add_argument('--validate', action='store_true')
     p.add_argument('--anchor', type=Path)
     p.add_argument('--transport', type=Path)
+    p.add_argument('--window', choices=sorted(WINDOWS), default='al')
     p.add_argument('--judged', type=int, default=3, help='first N ticks; 0 means all 80')
     a = p.parse_args()
     if a.validate:
