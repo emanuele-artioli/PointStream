@@ -79,7 +79,8 @@ def generate(unit: str, gpu_class: str = 'RTX') -> dict[str, Any]:
             'inputs': [{'path': x['path'], 'sha256': x['sha256']} for x in items], 'required_commands': [],
             'smoke': {'seconds': 400, 'representative_basis': 'The same player unit, first 8 frames, frozen 30 DDIM steps / 512x784 / 4 bit / C base plus matching adapter / guidance 2.0, the released long-video sampler and --keep-all; the full stage renders all 240 frames of the unit.'},
             'full': {'seconds': 2600}, 'validator': ['{python}', '-m', 'experiments.tennis.w6', 'validate-generate'], 'validator_seconds': 60,
-            'budget_seconds': 4400, 'stall_seconds': 1500.0, 'deadline': deadline(10), **shared(basis, 3072)}
+            'budget_seconds': 4400, 'stall_seconds': 1500.0, 'deadline': deadline(10), **shared(basis, 3072),
+            'verify_staged_inputs': True}
 
 
 def post(generated: list[str]) -> dict[str, Any]:
@@ -101,7 +102,8 @@ def post(generated: list[str]) -> dict[str, Any]:
             'staged_inputs': staged(items), 'inputs': [{'path': p, 'sha256': d} for p, d in items.values()],
             'smoke': {'seconds': 560, 'representative_basis': 'The first 16 frames of both players through the full path: comparison with the saved crops and masks, the isolated every-frame SAM worker, source conversion, paid scale-4 base decode with its saved ticks compared, both W1 half-resolution streams decoded with the encoder job hashes, composite, YOLO11x-pose on source/hybrid/anchors, flow residuals, racket measure and both clips.'},
             'full': {'seconds': 2600}, 'validator': ['{python}', '-m', 'experiments.tennis.w6', 'validate-post'], 'validator_seconds': 120,
-            'budget_seconds': 4200, 'stall_seconds': 900.0, 'deadline': deadline(12), **shared(basis, 4096)}
+            'budget_seconds': 4200, 'stall_seconds': 900.0, 'deadline': deadline(12), **shared(basis, 4096),
+            'verify_staged_inputs': True}
 
 
 def main() -> None:
