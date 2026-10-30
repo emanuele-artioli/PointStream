@@ -382,3 +382,4 @@ foreground-first claim.
   of the hybrid's KPS2 rate (18.461 kbps). From the first run's own measurements the measured/estimated ratio at scale 2 is 0.2574 (QP 6) and 0.2502 (QP 18) (the 25-frame estimate overstates the 240-frame rate about 4x, as the W3 entry 2026-10-29 found);
   the calibration estimates are 79.62 kbps (QP 24) and 107.11 kbps (QP 30), so the predicted rates are about 19.6 and 26 kbps (ratio drifting down by 0.0036 per 12 QP: 0.246 and 0.243). **Chosen before submitting: scale 2, QP 24 and QP 30**
   (the lead's suggestion; QP 30 is predicted well above 19.68 kbps, QP 24 close to it). Named points, no calibration encodes: smoke `al028:2:24`, full `al028:2:24,al028:2:30`; SVT base scale 8 only (the SVT bases of the first run are not re-coded).
+- DCVC bracket job: `20261030T221148Z-4973d2f4` submitted (points scale 2 QP 24 and 30, SVT scale 8).
