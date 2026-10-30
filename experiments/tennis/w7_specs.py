@@ -334,6 +334,50 @@ def real_base_judge(windows: list[wm.WindowSpec], files: dict[str, tuple[str, st
     return spec
 
 
+def w1_masks_spec(window: wm.WindowSpec, manifest: tuple[str, str], state: tuple[str, str], anchor: tuple[str, str], transport: tuple[str, str]) -> dict[str, Any]:
+    """R and S masks of the window (w1_masks), CPU; the W5 job's shape with the manifest window."""
+    spec = w1_window_stage('experiments.tennis.w1_masks', window, manifest, state,
+                           ['--anchor', '{staged:anchor}', '--transport', '{staged:transport}', '--judged', '{judged}'],
+                           {'anchor': anchor, 'transport': transport}, gpu=False, full_seconds=1500)
+    spec.update({'cpu_threads': 2, 'local_storage_gib': 20, 'scale': {'judged': {'smoke': 3, 'full': 0}}, 'stall_seconds': 600.0,
+                 'smoke': {'seconds': 400, 'representative_basis': 'First three saved ticks of the window rebuilt with the full K6 drawing path and compared with the K6 window hashes of R and S.'},
+                 'budget_seconds': 2400})
+    return spec
+
+
+def w1_encode_spec(window: wm.WindowSpec, manifest: tuple[str, str], state: tuple[str, str], transport: tuple[str, str], scale: int,
+                   target_kbps: float, *, controls: bool, outside: bool) -> dict[str, Any]:
+    """Plain (offset 0) or outside-R (+20/+40) CRF search at one resolution, rate only, 240 frames, bracketing `target_kbps` (the hybrid's total)."""
+    extra = ['--source', '{staged:' + window.name + '}', '--transport', '{staged:transport}', '--scale', str(scale), '--frames', '{frames}',
+             '--max-encodes', '{max_encodes}', '--target-kbps', repr(target_kbps)]
+    extra += ['--convention', 'outside', '--offsets', '-20', '-40'] if outside else ['--offsets', '0']
+    extra += ['--controls'] if controls else []
+    spec = w1_window_stage('experiments.tennis.w1_encode', window, manifest, state, extra, {'transport': transport}, gpu=False, full_seconds=2600)
+    threads = 16 if outside else 8
+    spec.update({'cpu_threads': threads, 'stall_seconds': 900.0,
+                 'scale': {'frames': {'smoke': 24, 'full': 240}, 'max_encodes': {'smoke': 2, 'full': 12 if outside else 8}},
+                 'smoke': {'seconds': 560, 'representative_basis': f'Scale {scale}, 24 frames: the same conversion, ROI map, parallel offset lanes, two encodes per offset, independent dav1d decode and packaging as the full stage.'}})
+    return spec
+
+
+def w1_score_spec(window: wm.WindowSpec, manifest: tuple[str, str], state: tuple[str, str], masks: tuple[str, str], hybrid: tuple[str, str],
+                  encodes: list[tuple[str, str]]) -> dict[str, Any]:
+    """GPU scoring of every selected encode (w1_score, primary rate KPS2); `encodes[0]` carries the plain controls. A6000 only (the controls were scored on one); shared."""
+    extra_files = {'masks': masks, 'hybrid': hybrid, 'encode_half': encodes[0], **assets('lpips', 'dists')}
+    extra = ['--source', '{staged:' + window.name + '}', '--masks', '{staged:masks}', '--hybrid', '{staged:hybrid}', '--lpips', '{staged:lpips}',
+             '--dists', '{staged:dists}', '--encode-half', '{staged:encode_half}', '--primary', 'kps2', '--judged', '{judged}']
+    if len(encodes) > 1:
+        extra += ['--encode-extra', *['{staged:encode_x%d}' % i for i in range(len(encodes) - 1)]]
+        extra_files.update({f'encode_x{i}': e for i, e in enumerate(encodes[1:])})
+    spec = w1_window_stage('experiments.tennis.w1_score', window, manifest, state, extra, extra_files, gpu=True, full_seconds=2400)
+    basis = 'Deterministic scoring of saved streams does not depend on foreign workload timing.'
+    spec.update({'hosts': ['gpu3', 'gpu2'], 'gpu_models': ['RTX A6000'], 'gpu_memory_mib': 8000, 'scale': {'judged': {'smoke': 3, 'full': 0}},
+                 'gpu_sharing': {'mode': 'shared', 'basis': basis, 'margin_mib': 8192}, 'contention': {'policy': 'continue', 'basis': basis, 'resume_attempts': 0},
+                 'stall_seconds': 900.0,
+                 'smoke': {'seconds': 560, 'representative_basis': 'Three saved ticks (0/3/6) of every selected stream and the plain CRF 63 controls, with decode hashes, S masks and all four metrics.'}})
+    return spec
+
+
 def first_window(argv: list[str]) -> None:
     """`first-window STAGE WINDOWS.json OUT_DIR [NAME=PATH:SHA256 ...]`: the spec of one stage of the first window (al028), written to OUT_DIR/STAGE.json.
     Upstream archives come as NAME=PATH:SHA256 (path under the data root; sha256sum of the completed job's full/published.tar)."""
@@ -366,6 +410,14 @@ def first_window(argv: list[str]) -> None:
         files = {'windows': windows_ref, 'anchor': ups['anchor'], 'transport': ups['transport'], 'masks': ups['masks'], 'gpu_base': ups['gpu_base'],
                  'base': ups['base'], 'prior': ups['prior'], **assets('lpips', 'dists')}
         spec = real_base_judge([first], files, [ups['generated']], ups['rates'], 0)
+    elif stage == 'w1-masks':
+        spec = w1_masks_spec(first, windows_ref, ups['state'], ups['anchor'], ups['transport'])
+    elif stage.startswith('w1-encode-'):
+        kind = stage[len('w1-encode-'):]  # half | quarter | half-out | quarter-out
+        spec = w1_encode_spec(first, windows_ref, ups['state'], ups['transport'], 2 if kind.startswith('half') else 4, float(ups['target'][0]),
+                              controls=kind == 'half', outside=kind.endswith('-out'))
+    elif stage == 'w1-score':
+        spec = w1_score_spec(first, windows_ref, ups['state'], ups['masks'], ups['hybrid'], [ups['encode_half'], *[v for k, v in sorted(ups.items()) if k.startswith('encode_x')]])
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:
