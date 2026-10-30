@@ -99,7 +99,7 @@ def run(a: argparse.Namespace) -> None:
             source_base_manifest = json.load(base_manifest_file)
     gpu_base = scratch / 'gpu-base' / 'publish'
     diag = json.loads((gpu_base / 'diagnostic.json').read_text())
-    if len(diag['base']) != 6 or any(not r['source_matches'] or len(r['ticks']) != 80 for r in diag['source']):
+    if len(diag['base']) != 3 * len(P['sources']) or len(diag['source']) != len(P['sources']) or any(not r['source_matches'] or len(r['ticks']) != 80 for r in diag['source']):
         raise ValueError('GPU source control or base coverage missing')
     for row in diag['base']:
         path = gpu_base / f"{row['window']}-s{row['scale']}-gpu.npy"

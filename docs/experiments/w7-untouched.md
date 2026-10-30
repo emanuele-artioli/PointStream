@@ -283,3 +283,5 @@ foreground-first claim.
   full output rechecked by hand (`--validate`, stage full): 12 checks passed. GPU total so far 3,789 s of 4,680 s (891 s left): the judge (smoke + full, estimate about 500 s) is submitted next;
   W1 scoring (estimate 681 s) and DCVC (245 s) cannot fit in what remains.
 - judge (compose + score, shared GPU): `20261030T184549Z-d9fe4272` submitted (first attempt refused by the client: a shared spec needs contention `continue`; fixed in the builder).
+- judge first job `20261030T184549Z-d9fe4272` (gpu6): crashed in the first 3.3 s of the smoke: `GPU source control or base coverage missing` (the check hard-coded six base rows, two windows). Code bug, fixed
+  (three scales per window, one source row per window). GPU total 3,792 s of 4,680 s.
