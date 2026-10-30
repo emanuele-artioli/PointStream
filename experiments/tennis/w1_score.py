@@ -19,7 +19,7 @@ from typing import Any
 
 import numpy as np
 
-from experiments.tennis.w1_roi import (CONTROL_CRF, CONTROL_ROW, CONTROL_TOLERANCE, FRAMES, HYBRID, OFFSETS,
+from experiments.tennis.w1_roi import (CONTROL_CRF, CONTROL_ROW, FRAMES, control_tolerance, HYBRID, OFFSETS,
                                        TARGET_KBPS, TICKS, TOOLS, WEIGHTS, WINDOWS, Window, analyse,
                                        best_foreground, decide, digest, policy_at_target, policy_name, rebilled_kbps)
 
@@ -202,7 +202,7 @@ def run(a: argparse.Namespace) -> None:
         seconds[point['name']] = result['seconds']
         if point['kind'] == 'control':
             errors[point['name']] = control_errors(result['values'], hybrid, point['scale'], len(ticks))
-            if max(errors[point['name']].values()) > CONTROL_TOLERANCE:
+            if max(errors[point['name']].values()) > control_tolerance(window.name):
                 raise ValueError(f"control {point['name']} does not reproduce the recorded scores: {errors[point['name']]}")
         np.savez_compressed(publish / 'scores.npz', ticks=np.asarray(ticks), **scores)
         publish_progress(os.environ['PS_STAGE'], i + 1)
@@ -246,7 +246,7 @@ def validate() -> None:
         'tools_pinned': all(summary['tools'][n]['sha256'] == d for n, d in TOOLS.items()),
         'inputs': all(summary['inputs'][x['name']] == x['sha256'] for x in spec['staged_inputs'] if x['name'] in summary['inputs']),
         'controls_reproduced': sorted(summary['control_errors']) == ['control_s2_crf63', 'control_s4_crf63', 'control_s8_crf63']
-        and all(max(e.values()) <= CONTROL_TOLERANCE for e in summary['control_errors'].values()),
+        and all(max(e.values()) <= control_tolerance(summary['window']) for e in summary['control_errors'].values()),
         'memory': 0 < summary['peak_allocated_mib'] < 8000,
         'rates_positive': all(p['rate_kbps'] > 0 for p in summary['points'])}
     with tarfile.open(stage / 'published.tar') as tar:

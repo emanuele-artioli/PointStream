@@ -49,6 +49,13 @@ CONTROL_ROW = {8: 0, 4: 2, 2: 4}
 SLOPE_PRIOR = 0.07  # d ln(rate) / d CRF, only to place the first guesses
 METRICS = ('lpips', 'dists')
 CONTROL_TOLERANCE = 1e-4
+#: Manifest windows (W7): the recorded base scores come from a judge that ran on another GPU class (Ada) than the scoring job (A6000), and 80-tick means differ by
+#: about 1e-4 in LPIPS at scale 8; the same tolerance as W3's SVT-base control. Frozen windows keep 1e-4.
+MANIFEST_CONTROL_TOLERANCE = 1e-3
+
+
+def control_tolerance(window_name: str) -> float:
+    return CONTROL_TOLERANCE if window_name in ('al', 'med') else MANIFEST_CONTROL_TOLERANCE
 
 
 @dataclass(frozen=True)

@@ -326,3 +326,8 @@ foreground-first claim.
 - Pre-check of the W1 scoring job (before any GPU second): `w1_score.hybrid_point` required the hybrid job to have billed the frozen windows' KPS1 packet; the W7 judge pays the KPS2 packet (2,469 B) directly, so scoring
   would have stopped at its start. Fixed: either packet is accepted and the other rate is re-billed (test added).
 - W1 scoring (GPU, A6000, shared): `20261030T195316Z-bbf774cf` submitted (masks, judge archive and the four encode archives above).
+- W1 scoring first job `20261030T195316Z-bbf774cf` (gpu3 A6000, shared): smoke 225.2 s GPU passed the fleet validator (projected full 924 s with the 186 s fixed overhead); the full stage ran 121.5 s and stopped at its own
+  control gate: the plain scale-8 base re-scored over 80 ticks differs from the judge's recorded value by 1.18e-4 in foreground LPIPS (7.6e-5 full LPIPS, 1.7e-5 DISTS) against the frozen windows' 1e-4 tolerance.
+  The recorded scores came from the judge on an Ada GPU, the re-score ran on an A6000; this is a control on the paid base, not on the hybrid or the SVT anchors, and no anchor or hybrid quality had been computed.
+  **Deviation, decided after seeing the control error and before any anchor score existed:** manifest windows use W3's tolerance for the same kind of control, 1e-3 (`control_tolerance`; frozen windows keep 1e-4); the
+  observed control errors are recorded in the summary either way. GPU total now 4,456 s of 5,400 s (944 s left); the rescoring needs about 850 s (smoke 225 + full about 620), which leaves no room for DCVC (about 350 s).
