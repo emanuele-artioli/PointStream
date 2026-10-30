@@ -9,7 +9,7 @@ WARM_RATIO = 1.25
 
 
 def separated_projection(command_seconds: float, sequences: dict[str, list[float]],
-                         publication_seconds: float, *, require_stability: bool = True) -> dict[str, Any]:
+                         publication_seconds: float, *, require_stability: bool = True, expected_sequences: int = 4) -> dict[str, Any]:
     """Extrapolate four cold/warm/warm traces; reject unstable data by default.
 
     Explicit secondary-timing policy retains the slower warm sample and budgets,
@@ -22,8 +22,8 @@ def separated_projection(command_seconds: float, sequences: dict[str, list[float
     """
     if not isinstance(require_stability, bool):
         raise ValueError('stability policy must be explicit boolean')
-    if len(sequences) != 4:
-        raise ValueError('four complete timing sequences required')
+    if len(sequences) != expected_sequences:
+        raise ValueError('four complete timing sequences required' if expected_sequences == 4 else f'{expected_sequences} complete timing sequences required')
     values = [command_seconds, publication_seconds, *(v for trace in sequences.values() for v in trace)]
     if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0 for v in values):
         raise ValueError('timing evidence must be finite and nonnegative')
@@ -65,14 +65,17 @@ def requested_model(spec: dict[str, Any]) -> str:
     return str(model)
 
 
-def timing_sequences(summary: dict[str, Any]) -> dict[str, list[float]]:
-    windows = {'alcaraz_hurkacz/031@129', 'medvedev_struff/014@194'}
+def timing_sequences(summary: dict[str, Any], manifest_windows: list[str] | None = None) -> dict[str, list[float]]:
+    """Cold/warm/warm traces of the three representative ticks. The frozen pair has a control and a base trace per window (four);
+    manifest windows (`manifest_windows`) have no prior-run control to time, only the base trace of each window."""
+    windows = set(manifest_windows) if manifest_windows is not None else {'alcaraz_hurkacz/031@129', 'medvedev_struff/014@194'}
+    families = (('base', 'rows', 'frame_seconds'),) if manifest_windows is not None else (
+        ('control', 'calibration', 'scored_frame_seconds'), ('base', 'rows', 'frame_seconds'))
     result = {}
-    for family, collection, field in (('control', 'calibration', 'scored_frame_seconds'),
-                                       ('base', 'rows', 'frame_seconds')):
+    for family, collection, field in families:
         rows = summary[collection]
-        if len(rows) != 2 or {row['id'] for row in rows} != windows:
-            raise ValueError('both original windows required for each timing family')
+        if len(rows) != len(windows) or {row['id'] for row in rows} != windows:
+            raise ValueError('every window required for each timing family')
         for row in rows:
             if row['ticks'] != [0, 3, 6] or set(row[field]) != {'0', '3', '6'}:
                 raise ValueError('three original representative ticks required')

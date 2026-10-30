@@ -276,3 +276,6 @@ foreground-first claim.
 - rgb diagnostic `20261030T174459Z-2ad62629` (gpu3): smoke 26.3 s GPU, failed the fleet validator on the same check: the validator started 186 s after dispatch (16.8 s of work, NFS/staging latency of the shared host), and the check
   multiplied that latency by 10 (2,316 s against 1,800 s). All other checks true. Fix: for manifest windows the publication/startup time is added once instead of ten times (the frozen pair keeps the old arithmetic);
   the projection is then about 400 s. GPU total now 3,663 s of 4,680 s.
+  Resubmitted rgb diagnostic: `20261030T181751Z-a498ddf7`.
+- Judge pre-check (before any judge GPU job): the judge's smoke validator still hard-coded the frozen pair's four timing sequences (`k6b_real_base_cost.timing_sequences`), which a one-window manifest run
+  cannot supply, and its full-stage checks assumed the 3-tick smoke. Fixed before submitting: manifest windows use their base trace only (`expected_sequences`), and the validator covers the 80-tick full stage (tests added).

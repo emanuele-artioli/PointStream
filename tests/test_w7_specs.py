@@ -95,3 +95,13 @@ def test_w7_rates_cli_writes_rates_and_state_and_validates(tmp_path, monkeypatch
     with tarfile.open(outer, 'w') as t:
         t.add(inner, arcname='publish/bundle.tar')
     assert [r['scale'] for r in w7_rates.base_rows(outer)] == [8, 4, 2]
+
+
+def test_timing_sequences_for_manifest_windows_use_the_base_trace_only():
+    from experiments.tennis.k6b_real_base_cost import separated_projection, timing_sequences
+
+    row = {'id': 'alcaraz_hurkacz/028@120', 'ticks': [0, 3, 6], 'frame_seconds': {'0': 3.0, '3': 2.0, '6': 2.1}}
+    seq = timing_sequences({'rows': [row]}, ['alcaraz_hurkacz/028@120'])
+    assert list(seq) == ['alcaraz_hurkacz/028@120/base']
+    projection = separated_projection(60.0, seq, 5.0, expected_sequences=1)
+    assert projection['projected_full_seconds'] > projection['projected_worker_seconds'] > 0
