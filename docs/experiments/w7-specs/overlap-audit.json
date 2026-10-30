@@ -1,0 +1,305 @@
+{
+ "complete": true,
+ "collection_receipts": [
+  {
+   "report_sha256": "202a92a98be050d0b1393af2856569d3d9c981b8900e99162e125d8bde2666ad",
+   "descriptors_sha256": "c2a68c654c70685b26d4bd0000b6ad3c29fe434675e85f38a4e8c50d9e027084",
+   "checkpoint": false
+  }
+ ],
+ "exact_pairs": [],
+ "clips": 67,
+ "decoded_frames": 43814,
+ "rmse_flag_threshold": 3,
+ "definition": "64x36 grayscale closest-frame RMSE; screen only, not independence proof",
+ "candidates": [
+  {
+   "clip": "alcaraz_hurkacz/028",
+   "start": 0,
+   "frames": 240,
+   "flagged_frames": 0,
+   "minimum_rmse": 8.957073412869583,
+   "median_nearest_rmse": 9.176178663855001,
+   "nearest": [
+    {
+     "frame": 126,
+     "rmse": 8.957073412869583,
+     "other": "alcaraz_hurkacz/011",
+     "other_frame": 679
+    },
+    {
+     "frame": 127,
+     "rmse": 8.987355993228679,
+     "other": "alcaraz_hurkacz/011",
+     "other_frame": 680
+    },
+    {
+     "frame": 57,
+     "rmse": 9.013685629390913,
+     "other": "alcaraz_hurkacz/011",
+     "other_frame": 680
+    }
+   ]
+  },
+  {
+   "clip": "alcaraz_hurkacz/034",
+   "start": 0,
+   "frames": 240,
+   "flagged_frames": 0,
+   "minimum_rmse": 5.415384502761013,
+   "median_nearest_rmse": 5.618900976284606,
+   "nearest": [
+    {
+     "frame": 76,
+     "rmse": 5.415384502761013,
+     "other": "alcaraz_hurkacz/036",
+     "other_frame": 18
+    },
+    {
+     "frame": 4,
+     "rmse": 5.425953499110706,
+     "other": "alcaraz_hurkacz/036",
+     "other_frame": 45
+    },
+    {
+     "frame": 5,
+     "rmse": 5.431550026213131,
+     "other": "alcaraz_hurkacz/036",
+     "other_frame": 45
+    }
+   ]
+  },
+  {
+   "clip": "alcaraz_hurkacz/043",
+   "start": 0,
+   "frames": 240,
+   "flagged_frames": 0,
+   "minimum_rmse": 7.134375042775405,
+   "median_nearest_rmse": 7.305819598101229,
+   "nearest": [
+    {
+     "frame": 174,
+     "rmse": 7.134375042775405,
+     "other": "alcaraz_hurkacz/036",
+     "other_frame": 43
+    },
+    {
+     "frame": 173,
+     "rmse": 7.149082108914403,
+     "other": "alcaraz_hurkacz/036",
+     "other_frame": 43
+    },
+    {
+     "frame": 190,
+     "rmse": 7.164970847880441,
+     "other": "alcaraz_hurkacz/036",
+     "other_frame": 43
+    }
+   ]
+  },
+  {
+   "clip": "medvedev_struff/000",
+   "start": 0,
+   "frames": 240,
+   "flagged_frames": 0,
+   "minimum_rmse": 5.600099167626932,
+   "median_nearest_rmse": 6.049993955734411,
+   "nearest": [
+    {
+     "frame": 22,
+     "rmse": 5.600099167626932,
+     "other": "medvedev_struff/006",
+     "other_frame": 448
+    },
+    {
+     "frame": 2,
+     "rmse": 5.624845714572458,
+     "other": "medvedev_struff/006",
+     "other_frame": 448
+    },
+    {
+     "frame": 11,
+     "rmse": 5.6260802185436605,
+     "other": "medvedev_struff/006",
+     "other_frame": 448
+    }
+   ]
+  },
+  {
+   "clip": "medvedev_struff/024",
+   "start": 0,
+   "frames": 240,
+   "flagged_frames": 0,
+   "minimum_rmse": 4.044457851522765,
+   "median_nearest_rmse": 4.946589423090252,
+   "nearest": [
+    {
+     "frame": 207,
+     "rmse": 4.044457851522765,
+     "other": "medvedev_struff/033",
+     "other_frame": 77
+    },
+    {
+     "frame": 208,
+     "rmse": 4.0650098823530465,
+     "other": "medvedev_struff/033",
+     "other_frame": 77
+    },
+    {
+     "frame": 205,
+     "rmse": 4.073116574011635,
+     "other": "medvedev_struff/033",
+     "other_frame": 77
+    }
+   ]
+  },
+  {
+   "clip": "medvedev_struff/019",
+   "start": 0,
+   "frames": 240,
+   "flagged_frames": 0,
+   "minimum_rmse": 3.8210855337681293,
+   "median_nearest_rmse": 4.246117400987901,
+   "nearest": [
+    {
+     "frame": 125,
+     "rmse": 3.8210855337681293,
+     "other": "medvedev_struff/033",
+     "other_frame": 294
+    },
+    {
+     "frame": 126,
+     "rmse": 3.824264635194589,
+     "other": "medvedev_struff/033",
+     "other_frame": 294
+    },
+    {
+     "frame": 118,
+     "rmse": 3.825626351926976,
+     "other": "medvedev_struff/033",
+     "other_frame": 294
+    }
+   ]
+  }
+ ],
+ "old_collections": [
+  {
+   "folder": "k6b-recovery-20261024-v2-full",
+   "report_sha256": "f0f7eba0adb9edeff8342a5199c910a26b3ffcd9c653a6d1aa56fa8068eed746",
+   "descriptors_sha256": "f8ee7a270f97d62c675fe74623f23c3f929385621d8da450c1c27af2f86d5b24"
+  },
+  {
+   "folder": "k6b-recovery-20261024-v3-part0",
+   "report_sha256": "665f2c05cc7e8249569c2db92e6d864e93e82b2f692e9ab6818a2a96c255573b",
+   "descriptors_sha256": "84f9107f31bf71f72f6f965124ab644d037bf690e1ffa8dac0c9011290608d0b"
+  },
+  {
+   "folder": "k6b-recovery-20261024-v3-part1",
+   "report_sha256": "8c6a16b344a50cbe34353fb1b660166842f52c03eaae3014a89afe7f5b443299",
+   "descriptors_sha256": "5a6a2add68870d210d508a4405acc691f20fc6c90d15108a1dda107e859a8f2d"
+  },
+  {
+   "folder": "k6b-recovery-20261024-v3-part2",
+   "report_sha256": "f7710a3c89530add88d2872eeca3e69da075ce406602e86fed790e5cc580e467",
+   "descriptors_sha256": "5ba549f8c424767004a13d9fbc711f90d5d9da63e1ae49404b9076a16eaeb095"
+  },
+  {
+   "folder": "k6b-recovery-20261024-v3-part3",
+   "report_sha256": "0a055cef3931ccfeaf60a340f5831232e49bf15004c676bf255fc016adff2d48",
+   "descriptors_sha256": "3e577dbf01ac123e41304679ed116af3af9f901ccbe80a47f957ee52c3075a1d"
+  }
+ ],
+ "selected": [
+  {
+   "clip": "alcaraz_hurkacz/028",
+   "start": 0
+  },
+  {
+   "clip": "alcaraz_hurkacz/034",
+   "start": 0
+  },
+  {
+   "clip": "alcaraz_hurkacz/043",
+   "start": 0
+  },
+  {
+   "clip": "medvedev_struff/000",
+   "start": 0
+  },
+  {
+   "clip": "medvedev_struff/024",
+   "start": 0
+  },
+  {
+   "clip": "medvedev_struff/019",
+   "start": 0
+  }
+ ],
+ "screened_against": {
+  "old_clips": [
+   "alcaraz_hurkacz/002",
+   "alcaraz_hurkacz/006",
+   "alcaraz_hurkacz/011",
+   "alcaraz_hurkacz/036",
+   "alcaraz_hurkacz/045",
+   "djokovic_federer/015",
+   "djokovic_federer/033",
+   "djokovic_federer/038",
+   "djokovic_federer/057",
+   "djokovic_federer/069",
+   "djokovic_federer/072",
+   "djokovic_federer/077",
+   "djokovic_federer/079",
+   "djokovic_zverev/000",
+   "djokovic_zverev/002",
+   "djokovic_zverev/004",
+   "djokovic_zverev/006",
+   "djokovic_zverev/008",
+   "djokovic_zverev/010",
+   "djokovic_zverev/012",
+   "djokovic_zverev/014",
+   "medvedev_struff/006",
+   "medvedev_struff/007",
+   "medvedev_struff/008",
+   "medvedev_struff/016",
+   "medvedev_struff/023",
+   "medvedev_struff/028",
+   "medvedev_struff/033",
+   "medvedev_struff/034",
+   "rublev_auger-aliassime/000",
+   "rublev_auger-aliassime/002",
+   "rublev_auger-aliassime/003",
+   "rublev_auger-aliassime/004",
+   "rublev_auger-aliassime/006",
+   "rublev_auger-aliassime/021",
+   "rublev_auger-aliassime/024",
+   "rublev_auger-aliassime/027",
+   "rublev_auger-aliassime/029",
+   "rublev_auger-aliassime/035",
+   "rublev_auger-aliassime/038",
+   "rublev_auger-aliassime/039",
+   "rublev_auger-aliassime/040",
+   "rublev_auger-aliassime/048",
+   "rublev_auger-aliassime/052",
+   "rublev_auger-aliassime/054",
+   "rublev_auger-aliassime/059",
+   "rublev_auger-aliassime/061",
+   "rublev_auger-aliassime/062",
+   "rublev_auger-aliassime/063"
+  ],
+  "confirmation_clips_whole": [
+   "alcaraz_hurkacz/008",
+   "alcaraz_hurkacz/013",
+   "alcaraz_hurkacz/016",
+   "alcaraz_hurkacz/023",
+   "alcaraz_hurkacz/031",
+   "alcaraz_hurkacz/047",
+   "medvedev_struff/002",
+   "medvedev_struff/014",
+   "medvedev_struff/017",
+   "medvedev_struff/021",
+   "medvedev_struff/029",
+   "medvedev_struff/037"
+  ]
+ }
+}

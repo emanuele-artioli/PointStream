@@ -79,8 +79,12 @@ def run(a: argparse.Namespace) -> None:
     publish = root / 'publish'
     publish.mkdir()
     begin = time.monotonic()
-    gpu_old = json.loads(a.prior.read_text())
-    rows_old = {r['id']: r for r in gpu_old['rows']}
+    from experiments.tennis import window_manifest as wm
+
+    paths, sources, ids = wm.plan(a, [a.al, a.med], SOURCES)
+    # Windows with no prior run (manifest mode) have no original GPU hashes to reproduce: their control is that two fresh GPU
+    # conversions are identical (below) and that the base IVF decodes to the encoder's recon (below); the hashes are recorded.
+    rows_old = {r['id']: r for r in json.loads(a.prior.read_text())['rows']} if a.prior is not None else {}
     # Outer/inner tar are SHA256-pinned by the fleet and validated again here.
     with tarfile.open(a.base) as outer:
         member = outer.extractfile('publish/bundle.tar')
@@ -92,8 +96,7 @@ def run(a: argparse.Namespace) -> None:
     setup = time.monotonic() - begin
     records: list[dict[str, Any]] = []
     source_arrays: dict[str, np.ndarray] = {}
-    for source, (name, start, fps, source_hash, yuv_hash) in zip([a.al, a.med], SOURCES):
-        wid = 'alcaraz_hurkacz/031@129' if name == 'al' else 'medvedev_struff/014@194'
+    for source, (name, start, fps, source_hash, yuv_hash), wid in zip(paths, sources, ids):
         if sha(source) != source_hash:
             raise ValueError('source identity')
         raw = root / (name + '-source.yuv')
@@ -103,8 +106,8 @@ def run(a: argparse.Namespace) -> None:
         gpu = rgb_memmap(raw, root / (name + '-gpu-source.npy'), a.frames, 1920, 1080, False, 'cuda')
         cpu = rgb_memmap(raw, root / (name + '-cpu-source.npy'), a.frames, 1920, 1080, False, 'cpu')
         ticks = list(range(0, a.frames, 3))
-        original = rows_old[wid]['source_rgb_frame_sha256']
-        mismatches = [t for t in ticks if hashlib.sha256(gpu[t].tobytes()).hexdigest() != original[str(t)]]
+        original = rows_old[wid]['source_rgb_frame_sha256'] if rows_old else None
+        mismatches = [t for t in ticks if original is not None and hashlib.sha256(gpu[t].tobytes()).hexdigest() != original[str(t)]]
         differences = [pixel_diff(cpu[t], gpu[t]) for t in ticks]
         records.append({'window': wid, 'source_matches': not mismatches, 'mismatches': mismatches,
                         'ticks': ticks, 'gpu_hashes': [hashlib.sha256(gpu[t].tobytes()).hexdigest() for t in ticks],
@@ -168,18 +171,23 @@ def subprocess_run(command: list[str]) -> None:
 def validate() -> None:
     root = Path(os.environ['PS_STAGE_DIR'])
     data = json.loads((root / 'diagnostic-summary.json').read_text())
-    checks = {'smoke_24': data['frames'] == 24, 'exact_source': data['source_passed'], 'six_base_sets': data['base_sets'] == 6,
-              'full_projection_under_reservation': data['projected_full_seconds'] < 360}
     dispatch_record = json.loads((root / 'dispatch.json').read_text())
     dispatch = dispatch_record['command']
+    frozen = '--prior' in dispatch  # manifest windows have no prior run; their allowance scales with the window count
+    n_windows = 2 if frozen else max(1, dispatch.count('--source'))
+    allowance = 360 * n_windows / 2
+    checks = {'smoke_24': data['frames'] == 24, 'exact_source': data['source_passed'], 'six_base_sets': data['base_sets'] == (6 if frozen else 3 * n_windows),
+              'full_projection_under_reservation': data['projected_full_seconds'] < allowance}
     total_smoke = time.time() - dispatch_record['started']
     publication_and_startup = max(0.0, total_smoke - data['seconds'])
     projected_with_publication = (data['setup_seconds'] + (data['seconds'] - data['setup_seconds'] + publication_and_startup) * 10) * 1.25
-    checks['full_projection_with_publication'] = projected_with_publication < 360
-    prior = Path(dispatch[dispatch.index('--prior') + 1])
-    if sha(prior) != 'b0a55a5c1440463fff97efa975a661c2c65db9ce35e0696fade9d5648c39ccdc':
-        raise ValueError('prior result identity')
-    old = {r['id']: r['source_rgb_frame_sha256'] for r in json.loads(prior.read_text())['rows']}
+    checks['full_projection_with_publication'] = projected_with_publication < allowance
+    old: dict[str, Any] = {}
+    if frozen:
+        prior = Path(dispatch[dispatch.index('--prior') + 1])
+        if sha(prior) != 'b0a55a5c1440463fff97efa975a661c2c65db9ce35e0696fade9d5648c39ccdc':
+            raise ValueError('prior result identity')
+        old = {r['id']: r['source_rgb_frame_sha256'] for r in json.loads(prior.read_text())['rows']}
     with tempfile.TemporaryDirectory(prefix='k6b-rgb-validate-') as temp:
         out = Path(temp)
         with tarfile.open(root / 'published.tar') as tar:
@@ -188,7 +196,7 @@ def validate() -> None:
         report = json.loads((published / 'diagnostic.json').read_text())
         checks['original_gpu_class'] = 'A6000' in report['cuda']
         for row in report['source']:
-            checks[row['window'] + ':original_hashes'] = all(h == old[row['window']][str(t)] for t, h in zip(row['ticks'], row['gpu_hashes'])) and len(row['ticks']) == 8
+            checks[row['window'] + ':original_hashes'] = (all(h == old[row['window']][str(t)] for t, h in zip(row['ticks'], row['gpu_hashes'])) if frozen else True) and len(row['ticks']) == 8
         for row in report['base']:
             name = f"{row['window']}-s{row['scale']}"
             path = published / (name + '-gpu.npy')
@@ -208,10 +216,13 @@ def main() -> None:
     p.add_argument('--al', type=Path)
     p.add_argument('--med', type=Path)
     p.add_argument('--frames', type=int, default=24)
+    p.add_argument('--windows-file', type=Path, help='window manifest instead of --al/--med/--prior')
+    p.add_argument('--window', action='append')
+    p.add_argument('--source', type=Path, action='append')
     a = p.parse_args()
     if a.validate:
         validate()
-    elif any(v is None for v in (a.base, a.prior, a.al, a.med)) or a.frames not in (24, 240):
+    elif any(v is None for v in ((a.base, a.prior, a.al, a.med) if a.windows_file is None else (a.base,))) or a.frames not in (24, 240):
         p.error('all inputs and 24/240 frames required')
     else:
         run(a)

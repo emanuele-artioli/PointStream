@@ -1,0 +1,688 @@
+{
+ "seed": 20261030,
+ "rule": ">= 228 of 240 frames fits and finite nonsingular H, earliest start",
+ "matches": {
+  "alcaraz_hurkacz": {
+   "clips_total": 21,
+   "admissible": [
+    "alcaraz_hurkacz/028",
+    "alcaraz_hurkacz/034",
+    "alcaraz_hurkacz/043"
+   ],
+   "excluded": {
+    "alcaraz_hurkacz/002": [
+     "old manifest window",
+     "step-5 fit/evaluation clip"
+    ],
+    "alcaraz_hurkacz/006": [
+     "old manifest window",
+     "step-5 fit/evaluation clip"
+    ],
+    "alcaraz_hurkacz/008": [
+     "2026-10-25 confirmation window"
+    ],
+    "alcaraz_hurkacz/011": [
+     "old manifest window",
+     "step-5 fit/evaluation clip"
+    ],
+    "alcaraz_hurkacz/013": [
+     "2026-10-25 confirmation window"
+    ],
+    "alcaraz_hurkacz/016": [
+     "2026-10-25 confirmation window"
+    ],
+    "alcaraz_hurkacz/023": [
+     "2026-10-25 confirmation window"
+    ],
+    "alcaraz_hurkacz/031": [
+     "2026-10-25 confirmation window"
+    ],
+    "alcaraz_hurkacz/036": [
+     "old manifest window",
+     "step-5 fit/evaluation clip"
+    ],
+    "alcaraz_hurkacz/045": [
+     "old manifest window",
+     "step-5 fit/evaluation clip"
+    ],
+    "alcaraz_hurkacz/047": [
+     "2026-10-25 confirmation window"
+    ]
+   },
+   "short": {
+    "alcaraz_hurkacz/000": 158,
+    "alcaraz_hurkacz/004": 149,
+    "alcaraz_hurkacz/018": 127,
+    "alcaraz_hurkacz/020": 169,
+    "alcaraz_hurkacz/026": 172,
+    "alcaraz_hurkacz/039": 153,
+    "alcaraz_hurkacz/049": 142
+   },
+   "method": "first three in ID order",
+   "chosen_order": [
+    "alcaraz_hurkacz/028",
+    "alcaraz_hurkacz/034",
+    "alcaraz_hurkacz/043"
+   ],
+   "selected": [
+    {
+     "clip": "alcaraz_hurkacz/028",
+     "start": 0,
+     "valid": 240,
+     "best_valid": 240,
+     "best_start": 0,
+     "frames": 492,
+     "valid_frames_total": 492,
+     "fps": 25.0,
+     "sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+     "size": "1920x1080",
+     "r_frame_rate": "25/1"
+    },
+    {
+     "clip": "alcaraz_hurkacz/034",
+     "start": 0,
+     "valid": 240,
+     "best_valid": 240,
+     "best_start": 0,
+     "frames": 619,
+     "valid_frames_total": 619,
+     "fps": 25.0,
+     "sha256": "7db0c143cd416ad17b4bda4eaa191d51da197eccc1143e9eb402f8bb2a7f0ee6",
+     "size": "1920x1080",
+     "r_frame_rate": "25/1"
+    },
+    {
+     "clip": "alcaraz_hurkacz/043",
+     "start": 0,
+     "valid": 240,
+     "best_valid": 240,
+     "best_start": 0,
+     "frames": 246,
+     "valid_frames_total": 246,
+     "fps": 25.0,
+     "sha256": "847cb8272134bd31a5447ff3cce02b28a906fae44559b3e0a58661d8171b6c16",
+     "size": "1920x1080",
+     "r_frame_rate": "25/1"
+    }
+   ],
+   "failed_registration": []
+  },
+  "medvedev_struff": {
+   "clips_total": 41,
+   "admissible": [
+    "medvedev_struff/000",
+    "medvedev_struff/004",
+    "medvedev_struff/019",
+    "medvedev_struff/024",
+    "medvedev_struff/027",
+    "medvedev_struff/031",
+    "medvedev_struff/042"
+   ],
+   "excluded": {
+    "medvedev_struff/002": [
+     "2026-10-25 confirmation window"
+    ],
+    "medvedev_struff/006": [
+     "old manifest window",
+     "step-5 fit/evaluation clip"
+    ],
+    "medvedev_struff/007": [
+     "old manifest window",
+     "unused old-manifest clip"
+    ],
+    "medvedev_struff/008": [
+     "old manifest window",
+     "step-5 fit/evaluation clip"
+    ],
+    "medvedev_struff/014": [
+     "2026-10-25 confirmation window"
+    ],
+    "medvedev_struff/016": [
+     "old manifest window",
+     "unused old-manifest clip"
+    ],
+    "medvedev_struff/017": [
+     "2026-10-25 confirmation window"
+    ],
+    "medvedev_struff/021": [
+     "2026-10-25 confirmation window"
+    ],
+    "medvedev_struff/023": [
+     "old manifest window",
+     "unused old-manifest clip"
+    ],
+    "medvedev_struff/028": [
+     "old manifest window",
+     "unused old-manifest clip"
+    ],
+    "medvedev_struff/029": [
+     "2026-10-25 confirmation window"
+    ],
+    "medvedev_struff/033": [
+     "old manifest window",
+     "step-5 fit/evaluation clip"
+    ],
+    "medvedev_struff/034": [
+     "old manifest window",
+     "unused old-manifest clip"
+    ],
+    "medvedev_struff/037": [
+     "2026-10-25 confirmation window"
+    ]
+   },
+   "short": {
+    "medvedev_struff/005": 46,
+    "medvedev_struff/009": 1,
+    "medvedev_struff/010": 37,
+    "medvedev_struff/011": 179,
+    "medvedev_struff/012": 197,
+    "medvedev_struff/013": 49,
+    "medvedev_struff/015": 1,
+    "medvedev_struff/018": 48,
+    "medvedev_struff/020": 104,
+    "medvedev_struff/022": 81,
+    "medvedev_struff/025": 63,
+    "medvedev_struff/026": 32,
+    "medvedev_struff/030": 93,
+    "medvedev_struff/032": 58,
+    "medvedev_struff/035": 49,
+    "medvedev_struff/036": 12,
+    "medvedev_struff/038": 118,
+    "medvedev_struff/039": 132,
+    "medvedev_struff/040": 163,
+    "medvedev_struff/041": 38
+   },
+   "method": "numpy.random.default_rng(20261030).choice(sorted(admissible), size=3, replace=False)",
+   "chosen_order": [
+    "medvedev_struff/000",
+    "medvedev_struff/024",
+    "medvedev_struff/019"
+   ],
+   "selected": [
+    {
+     "clip": "medvedev_struff/000",
+     "start": 0,
+     "valid": 240,
+     "best_valid": 240,
+     "best_start": 0,
+     "frames": 1914,
+     "valid_frames_total": 1914,
+     "fps": 50.0,
+     "sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+     "size": "1920x1080",
+     "r_frame_rate": "50/1"
+    },
+    {
+     "clip": "medvedev_struff/024",
+     "start": 0,
+     "valid": 240,
+     "best_valid": 240,
+     "best_start": 0,
+     "frames": 435,
+     "valid_frames_total": 435,
+     "fps": 50.0,
+     "sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+     "size": "1920x1080",
+     "r_frame_rate": "50/1"
+    },
+    {
+     "clip": "medvedev_struff/019",
+     "start": 0,
+     "valid": 240,
+     "best_valid": 240,
+     "best_start": 0,
+     "frames": 458,
+     "valid_frames_total": 458,
+     "fps": 50.0,
+     "sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+     "size": "1920x1080",
+     "r_frame_rate": "50/1"
+    }
+   ],
+   "failed_registration": []
+  }
+ },
+ "inputs": {
+  "scope_sha256": "ac640ae8f2ee0d807a085555f5504a354de9cba554aaf465cd036673c0d046d2",
+  "k8b_report": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k8b-2026-10-20/review/k8b-report.json",
+  "k8b_report_sha256": "8230bf1a2239978dfb7912bd5f3ed8367f5c85d1ea9e75c42e8ab8fb3fdc3314",
+  "old_manifest_windows": 57,
+  "old_manifest_clips": 49
+ },
+ "inventory": {
+  "alcaraz_hurkacz/000": {
+   "frames": 158,
+   "fps": 25.0,
+   "sha256": "4be8734e89a62e1b1d16b8dbea2670debf386c0e4eddfa0b76f875d31d9f67f0",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/002": {
+   "frames": 317,
+   "fps": 25.0,
+   "sha256": "48a06aae54b5c265e3113ff2d2f7e1f9244a4c41f1f1e6e81160412e676047ae",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/004": {
+   "frames": 149,
+   "fps": 25.0,
+   "sha256": "0aefad9eab9145e2887460d3538429e6c30e1d3ee14722600f15700c62a7468f",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/006": {
+   "frames": 390,
+   "fps": 25.0,
+   "sha256": "09c47e0966a2b99a69bf93a91d2cdad1b62e45d7b8f5d27d12ffccbaff24d828",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/008": {
+   "frames": 522,
+   "fps": 25.0,
+   "sha256": "355e4b0a3408e4c8f049baadf749c937e52930f57df5018867e5baa0cdd49e54",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/011": {
+   "frames": 744,
+   "fps": 25.0,
+   "sha256": "2b8234f204616d16c447f702bc59f8a63ac6e12f8d784dec521528edbcbe542a",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/013": {
+   "frames": 426,
+   "fps": 25.0,
+   "sha256": "1af169200b28659c503499979863b6219b0d331f532962ac69fb505d13c4976c",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/016": {
+   "frames": 547,
+   "fps": 25.0,
+   "sha256": "305a369d74882a628ff7efd6b49cf3f75c56a985d78ffd798863542df20551bd",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/018": {
+   "frames": 127,
+   "fps": 25.0,
+   "sha256": "6757aeaaa295c043e7bf8aeed14902a2e9132a4a8cc117a68fce28ffa2bc6d0a",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/020": {
+   "frames": 169,
+   "fps": 25.0,
+   "sha256": "8c09509c7070af0a2939a94b8d491064abfd72f651cdd5af8d60b0de0457d62d",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/023": {
+   "frames": 456,
+   "fps": 25.0,
+   "sha256": "88345a9deac75a4b6180daa56a2ec7cda2afea25babb5b549b937105bca45d1a",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/026": {
+   "frames": 172,
+   "fps": 25.0,
+   "sha256": "b2e4e2b363fe48693c646197ffc305ced9ec629463dcc910b8929e45fd257dbf",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/028": {
+   "frames": 492,
+   "fps": 25.0,
+   "sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/031": {
+   "frames": 259,
+   "fps": 25.0,
+   "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/034": {
+   "frames": 619,
+   "fps": 25.0,
+   "sha256": "7db0c143cd416ad17b4bda4eaa191d51da197eccc1143e9eb402f8bb2a7f0ee6",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/036": {
+   "frames": 250,
+   "fps": 25.0,
+   "sha256": "d8532d6499c871452517b14fa96a84eed2e961ffc25d4ee7749ace18dd686365",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/039": {
+   "frames": 153,
+   "fps": 25.0,
+   "sha256": "b56c55617fd60f02323729ff98693b78a5eda2aa588ae3615db98942471f2db3",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/043": {
+   "frames": 246,
+   "fps": 25.0,
+   "sha256": "847cb8272134bd31a5447ff3cce02b28a906fae44559b3e0a58661d8171b6c16",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/045": {
+   "frames": 383,
+   "fps": 25.0,
+   "sha256": "0c90790899b8bc3ba0cf92764145ce28ea8b324011448da2076c79d1ef38a6e2",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/047": {
+   "frames": 247,
+   "fps": 25.0,
+   "sha256": "7bb3a53e3b416d3b84c0344c99b29d1374f8c49b54f970034f4f29a95609e99b",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "alcaraz_hurkacz/049": {
+   "frames": 142,
+   "fps": 25.0,
+   "sha256": "57357df3085f3371b06c371f1b670d34fc6f77857612f031d0dd82ffaf053829",
+   "size": "1920x1080",
+   "r_frame_rate": "25/1"
+  },
+  "medvedev_struff/000": {
+   "frames": 1914,
+   "fps": 50.0,
+   "sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/002": {
+   "frames": 677,
+   "fps": 50.0,
+   "sha256": "49cc09d072d740bd4d5ed02fdd24f2b3edbdc5fb16a660f66f1e8148ff8be14a",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/004": {
+   "frames": 355,
+   "fps": 50.0,
+   "sha256": "cd351cb99348607756081bbbb07e689916ef0ab07a660625d31b776ae5d68868",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/005": {
+   "frames": 46,
+   "fps": 50.0,
+   "sha256": "e1a7bcec6672fe2aa8c408ccb2f602e678c952f793821b7136d9bfab79e7820e",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/006": {
+   "frames": 459,
+   "fps": 50.0,
+   "sha256": "174cfe9e3309ef2ed2c12138edd2b3947b46093b93a34794c4b80a8278f92629",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/007": {
+   "frames": 64,
+   "fps": 50.0,
+   "sha256": "ce6f8c88d6401ffeb894b4d5f4f7ffb70475050c01dfebe71f05fba915239da7",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/008": {
+   "frames": 569,
+   "fps": 50.0,
+   "sha256": "5942ddf13cfcc74d2f4d24e6d29ade98e0334eab7ba3b0de765562382cbc44b5",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/009": {
+   "frames": 1,
+   "fps": 50.0,
+   "sha256": "b250c40d0b83809eaec6d8a041ebcc49ef2612b018e07e2249bd5686add750c1",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/010": {
+   "frames": 37,
+   "fps": 50.0,
+   "sha256": "aafc9cdba37728d59bff646837ea30e32b895a0d0381ccf6d279cf4ca34d0497",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/011": {
+   "frames": 179,
+   "fps": 50.0,
+   "sha256": "625c77d42f32fc3d3acb36a7b5d26a53f18f6d398fc577133084fffca25cd973",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/012": {
+   "frames": 197,
+   "fps": 50.0,
+   "sha256": "89e9348b8d70542760f478ee7ae1b0aa8a8f79b4669a38255d23973a8905f8db",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/013": {
+   "frames": 49,
+   "fps": 50.0,
+   "sha256": "c00551228931a462892639802c67b96cf314763fe1f2aa4b157404b11db41cc7",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/014": {
+   "frames": 388,
+   "fps": 50.0,
+   "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/015": {
+   "frames": 1,
+   "fps": 50.0,
+   "sha256": "4aa8a0e299ebece94ff5c3ff9714481c73a5bb0b46392829d5ab94f7421e35f1",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/016": {
+   "frames": 77,
+   "fps": 50.0,
+   "sha256": "edcf5ab337a89a1e06a248092e5e5cbcbb77cd37efe3b635f359ad1fc7dadcee",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/017": {
+   "frames": 412,
+   "fps": 50.0,
+   "sha256": "64cc4bc0a0712b5daa6bc00c5ed592b31a0f8333cb36a4caf5b05d24f9e39873",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/018": {
+   "frames": 48,
+   "fps": 50.0,
+   "sha256": "997dc39e4f20dfa302453ffb4db37df0b8712fb0126bd12e24f384a0a54ce565",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/019": {
+   "frames": 458,
+   "fps": 50.0,
+   "sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/020": {
+   "frames": 104,
+   "fps": 50.0,
+   "sha256": "32b84f6f69627a6ccecd294f9d8f4c09796070d2f542d8a74546e194b8dd7c3e",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/021": {
+   "frames": 492,
+   "fps": 50.0,
+   "sha256": "fa2da44fdc64d6d95c9a111953dd6d16a088cb534dc7336a98d3cb2557d30b4a",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/022": {
+   "frames": 81,
+   "fps": 50.0,
+   "sha256": "1067bf329010f21636335e77a0f4b6179c314f797304d99e529ef62ad2303d8d",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/023": {
+   "frames": 96,
+   "fps": 50.0,
+   "sha256": "04c57fb3f60fb8cad652a7be4a9e93476d2cc20904002fb57b1e3997418f4d2e",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/024": {
+   "frames": 435,
+   "fps": 50.0,
+   "sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/025": {
+   "frames": 63,
+   "fps": 50.0,
+   "sha256": "89e00254d21673b2616ec466a476dba03677040a8bc65bcd84d4b1753337da7f",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/026": {
+   "frames": 32,
+   "fps": 50.0,
+   "sha256": "54662b950da685e7bc231f424b37555d120aa9aabd4bcf1bd9dc756c0dd24009",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/027": {
+   "frames": 675,
+   "fps": 50.0,
+   "sha256": "9c515414786b43da268859cde30832ce418f8d5cf910eef268e33cdd8c9d3f2b",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/028": {
+   "frames": 124,
+   "fps": 50.0,
+   "sha256": "db3a3d2071cc8b366b0149c147c632970f505d8c82acda9ab33ad08e64d48784",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/029": {
+   "frames": 277,
+   "fps": 50.0,
+   "sha256": "013979d403ec9ae3e48ce3dc49bbf261b37fb6a3dd78af71d5b8d81419612e8f",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/030": {
+   "frames": 93,
+   "fps": 50.0,
+   "sha256": "cadefc8b0f131ac41980fd69db33baa2fb194130cfef803825b2b10159e21398",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/031": {
+   "frames": 305,
+   "fps": 50.0,
+   "sha256": "7012050ded94b00eb0688ced564fc478e653fccd65d1bbcad2b931ecadb8813b",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/032": {
+   "frames": 58,
+   "fps": 50.0,
+   "sha256": "5d2584bc4ec7865b27a71ffce0891161ad3d43f578ca01767cae06cee691c5b9",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/033": {
+   "frames": 308,
+   "fps": 50.0,
+   "sha256": "43f17c970830875902c1256601e9b91070614555cb57bfe5a70549693674f4d4",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/034": {
+   "frames": 108,
+   "fps": 50.0,
+   "sha256": "bf325ecfb7377ee6081fac458435185da2f59c75509e1b8a71d719913fcb91a5",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/035": {
+   "frames": 49,
+   "fps": 50.0,
+   "sha256": "9bc00905fd765d8766f3b6e4cf6bdf8fda17b93c8c8bb9dae5a8170e633c7463",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/036": {
+   "frames": 12,
+   "fps": 50.0,
+   "sha256": "c1dca0ab16cf862557b3c72c9bfd9a66d8a1af18462ceb374bad78fffcdd1f3a",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/037": {
+   "frames": 698,
+   "fps": 50.0,
+   "sha256": "97372d45ba53068078fdc85300a550221b2c4bd31a3074958b52081326e3feeb",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/038": {
+   "frames": 118,
+   "fps": 50.0,
+   "sha256": "837066109da4a5eb8237802391999a5bf3370c02143590c4877661e8de165894",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/039": {
+   "frames": 132,
+   "fps": 50.0,
+   "sha256": "af51594ca5cb17281a1ce27a155370876bf315c0efeba80a04451e67402e94a0",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/040": {
+   "frames": 163,
+   "fps": 50.0,
+   "sha256": "76aeb211363f8ef64d61b17dc55cbe7cf339779b08a4b0e2fda3f7d25c29ba65",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/041": {
+   "frames": 38,
+   "fps": 50.0,
+   "sha256": "3c747fac7afbf1b30a54021fda449c1b0344e72ac764dcc93e65845166d4d55b",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  },
+  "medvedev_struff/042": {
+   "frames": 462,
+   "fps": 50.0,
+   "sha256": "1f65e88d58979957afb497e150041913a3e58d4e1cb7476b90225837f84c46aa",
+   "size": "1920x1080",
+   "r_frame_rate": "50/1"
+  }
+ }
+}

@@ -38,15 +38,29 @@ def gate(rows: list[Any]) -> list[int]:
     return valid
 
 
-def check_manifest(manifest: dict[str, Any]) -> dict[str, list[int]]:
-    """Reject changed cohort, overlap claims and mismatched per-clip placement."""
+def cohort_of(manifest: dict[str, Any]) -> tuple[tuple[str, int, int, str], ...]:
+    """The cohort a manifest freezes: its `cohort` list (W7 manifests, experiments/tennis/window_manifest.py) or `FROZEN`."""
+    if "cohort" not in manifest:
+        return FROZEN
+    return tuple((str(c), int(s), int(f), str(h)) for c, s, f, h in manifest["cohort"])
+
+
+def check_manifest(manifest: dict[str, Any], frozen: tuple[tuple[str, int, int, str], ...] | None = None,
+                   centered: bool | None = None) -> dict[str, list[int]]:
+    """Reject changed cohort, overlap claims and mismatched per-clip placement.
+
+    `frozen`/`centered` default to the manifest's own `cohort` and `centered` fields, and for a manifest without them to the
+    2026-10-25 cohort, centered; those manifests are checked exactly as before.
+    """
+    frozen = cohort_of(manifest) if frozen is None else frozen
+    centered = manifest.get("centered", True) if centered is None else centered
     if manifest.get("provenance") != PROVENANCE or manifest.get("budget_gpu_hours") != 8:
         raise ValueError("Wrong diagnostic scope or budget")
     clips = manifest["clips"]
-    if [c["id"] for c in clips] != [r[0] for r in FROZEN]:
+    if [c["id"] for c in clips] != [r[0] for r in frozen]:
         raise ValueError("Frozen cohort changed or duplicated")
     old = manifest["old_clips"]
-    if len(old) != 49 or set(old) & {r[0] for r in FROZEN}:
+    if len(old) != 49 or set(old) & {r[0] for r in frozen}:
         raise ValueError("Old-manifest clip intersection or incomplete audit")
     # Every frozen clip is >=240 frames and the review frame is start+120.
     # Keep this gate independent of the main environment's mask dependencies:
@@ -57,12 +71,12 @@ def check_manifest(manifest: dict[str, Any]) -> dict[str, list[int]]:
     if manifest.get('contains_human_marks') is not False or any(c['frames'] < 240 for c in clips):
         raise ValueError('Wrong source-only window manifest')
     gates = {}
-    for c, (cid, start, fps, digest) in zip(clips, FROZEN):
+    for c, (cid, start, fps, digest) in zip(clips, frozen):
         wid = f"{cid}@{start + 120}"
         w = plan.get(wid, {})
         if (w.get("start"), w.get("frames"), w.get("target"), w.get("fps"), w.get("sha256")) != (start, 240, 120, fps, digest):
             raise ValueError(f"Changed source/span/fps: {cid}")
-        if c["review_frames"] != [start + 120] or (c["frames"] - 240) // 2 != start:
+        if c["review_frames"] != [start + 120] or (centered and (c["frames"] - 240) // 2 != start):
             raise ValueError(f"Wrong centered frame placement: {cid}")
         if c["staged"]["sha256"] != digest:
             raise ValueError(f"Staged source mismatch: {cid}")
@@ -72,7 +86,7 @@ def check_manifest(manifest: dict[str, Any]) -> dict[str, list[int]]:
         # All 12 frozen windows passed in the original pre-quality audit.
         if len(gates[wid]) < 228:
             raise ValueError(f"Changed registration eligibility: {cid}")
-    if len(plan) != 12:
+    if len(plan) != len(frozen):
         raise ValueError("Extra windows")
     return gates
 

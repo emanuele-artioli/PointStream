@@ -311,7 +311,7 @@ def validate(
 
 def validate_archive(path: Path, expected: int | None = None) -> dict[str, Any]:
     """Bulk-read one archive; all per-packet decoding happens on local scratch."""
-    with tempfile.TemporaryDirectory(prefix="k6b-rate-validate-", dir="/tmp") as temp:
+    with tempfile.TemporaryDirectory(prefix="k6b-rate-validate-", dir=os.environ.get("TMPDIR") or "/tmp") as temp:
         root = Path(temp)
         with tarfile.open(path) as archive:
             archive.extractall(root, filter="data")
@@ -324,6 +324,8 @@ def main() -> int:
     p.add_argument("--anchor", type=Path, action="append", default=[])
     p.add_argument("--prepared", type=Path, action="append", default=[])
     p.add_argument("--max-windows", type=int, default=0)
+    p.add_argument("--windows-file", type=Path, help="window manifest: transport for these windows instead of the frozen diagnostic rows")
+    p.add_argument("--window", action="append", help="manifest window name (repeat; default all)")
     p.add_argument("--validate", action="store_true")
     p.add_argument("--check-archive", type=Path)
     p.add_argument("--proof-out", type=Path)
@@ -365,9 +367,9 @@ def main() -> int:
     import cv2
 
     cv2.setNumThreads(4)
-    if os.environ.get("CUDA_VISIBLE_DEVICES") != "" or a.diagnostic is None:
-        raise ValueError("CPU-only visibility and diagnostic required")
-    if sha(a.diagnostic.read_bytes()) != DIAGNOSTIC_SHA:
+    if os.environ.get("CUDA_VISIBLE_DEVICES") != "" or (a.diagnostic is None and a.windows_file is None):
+        raise ValueError("CPU-only visibility and diagnostic (or a window manifest) required")
+    if a.windows_file is None and sha(a.diagnostic.read_bytes()) != DIAGNOSTIC_SHA:
         raise ValueError("Frozen diagnostic changed")
     from experiments.tennis.k4 import safe
 
@@ -398,9 +400,15 @@ def main() -> int:
                     if q.stem in units:
                         raise ValueError("Duplicate prepared unit")
                     units[q.stem] = q
-    diagnostic = json.loads(a.diagnostic.read_text())
-    rows = diagnostic["rows"]
-    if a.max_windows:
+    if a.windows_file is not None:
+        # Windows outside the frozen twelve have no diagnostic row; `measure_window` needs only the window id and match.
+        from experiments.tennis import window_manifest as wm
+
+        rows = [{"window": w.id, "match": w.match} for w in wm.select(wm.load(a.windows_file), a.window or None)]
+    else:
+        diagnostic = json.loads(a.diagnostic.read_text())
+        rows = diagnostic["rows"]
+    if a.max_windows and a.windows_file is None:
         smoke = ["alcaraz_hurkacz/031@129", "medvedev_struff/014@194", "alcaraz_hurkacz/016@273"][
             : a.max_windows
         ]
@@ -410,7 +418,7 @@ def main() -> int:
         "expected_windows": len(rows),
         "cuda_visible": os.environ.get("CUDA_VISIBLE_DEVICES"),
         "provenance": {
-            "diagnostic_sha256": DIAGNOSTIC_SHA,
+            "diagnostic_sha256": DIAGNOSTIC_SHA if a.windows_file is None else None,
             "archives": receipts,
             "command": sys.argv,
             "python": sys.version,

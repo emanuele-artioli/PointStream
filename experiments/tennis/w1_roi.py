@@ -86,6 +86,36 @@ MED = Window('med', 'medvedev_struff/014@194', 'packets/medvedev_struff__014@194
 WINDOWS = {w.name: w for w in (AL, MED)}
 
 
+def window_from_spec(spec: Any, state: dict[str, Any]) -> Window:
+    """A `Window` for a manifest window (experiments/tennis/window_manifest.py). `state` holds what earlier stages measured:
+    control_ivf_bytes, start_base, kps1_bytes, kps2_bytes and optionally hybrid_archive_sha. For the frozen pair this
+    reproduces `AL` and `MED` exactly (tests/test_window_manifest.py)."""
+    return Window(spec.name, spec.id, f'packets/{spec.safe_id}/', spec.fps, spec.source_sha256, spec.source_yuv_sha256 or '',
+                  spec.start, spec.safe_id, {int(k): v for k, v in state['control_ivf_bytes'].items()},
+                  {int(k): v for k, v in state['start_base'].items()}, state['kps1_bytes'], state['kps2_bytes'],
+                  state.get('hybrid_archive_sha'))
+
+
+def preload_windows(argv: list[str]) -> list[str]:
+    """Register the windows of `--windows-file F --window-state S` (both optional; without them nothing changes) into WINDOWS."""
+    import json
+    from experiments.tennis import window_manifest as wm
+
+    def value(flag: str) -> str | None:
+        return argv[argv.index(flag) + 1] if flag in argv and argv.index(flag) + 1 < len(argv) else None
+
+    manifest, state = value('--windows-file'), value('--window-state')
+    if manifest is None:
+        return []
+    states = json.loads(Path(state).read_text()) if state else {}
+    added = []
+    for spec in wm.load(Path(manifest)):
+        if spec.name in states:
+            WINDOWS[spec.name] = window_from_spec(spec, states[spec.name])
+            added.append(spec.name)
+    return added
+
+
 def rebilled_kbps(total_kbps: float, old_bytes: int, new_bytes: int, window: Window = AL) -> float:
     """`total_kbps` with the keypoint packet of `old_bytes` replaced by one of `new_bytes`."""
     return total_kbps - (old_bytes - new_bytes) * 8 / window.duration / 1000

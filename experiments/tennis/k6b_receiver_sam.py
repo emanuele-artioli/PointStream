@@ -392,13 +392,13 @@ def validate(archive: Path, stage: str, *, independent_frames: bool = False) -> 
         r = json.load(f)
         checks = {
             "fresh_reset": r["prediction"]["fresh_reset_equal"],
-            "four_units": len(r["prediction"]["runs"][0]["rows"]) == 4,
+            "four_units": len(r["prediction"]["runs"][0]["rows"]) == 2 * r.get("windows", 2),
             "on_cuda": all(x["on_cuda"] for x in r["prediction"]["runs"]),
             "denied_reads": all(
                 all(x["denied_reads"].values()) and len(x["denied_reads"]) == 4
                 for x in r["prediction"]["runs"]
             ),
-            "two_windows": len(r["rows"]) == 2,
+            "two_windows": len(r["rows"]) == r.get("windows", 2),
             "cpu_bound": r["cpu_seconds"] < (600 if stage == "smoke" else 2100),
         }
         expected = 2 if stage == "smoke" else 80
@@ -504,6 +504,8 @@ def main(*, independent_default: bool = False) -> int:
     p.add_argument("--worker", action="store_true")
     p.add_argument("--validate", action="store_true")
     p.add_argument("--max-judged", type=int, default=0)
+    p.add_argument("--windows-file", type=Path, help="window manifest instead of the frozen Al/Med pair (no --diagnostic/--reference-report/--control)")
+    p.add_argument("--window", action="append", help="manifest window name (repeat; default all)")
     a = p.parse_args()
     stage = Path(os.environ.get("PS_STAGE_DIR", "/tmp"))
     if a.validate:
@@ -514,6 +516,7 @@ def main(*, independent_default: bool = False) -> int:
         worker(a)
         return 0
     from experiments.tennis import k6b_matte_judge as judge
+    from experiments.tennis import window_manifest as wm
     from experiments.tennis.k6b_foreground_video import PILOTS, SOURCE_SHA
     from experiments.tennis.k6b_joint_matte import REFERENCE_REPORT_SHA, CONTROL_SHA
     from experiments.tennis.k6b import load_generated
@@ -521,10 +524,16 @@ def main(*, independent_default: bool = False) -> int:
     from experiments.tennis.k6b_rate_streams import decode_keypoints
     from experiments.tennis.k6b_rate_budget import DIAGNOSTIC_SHA
 
+    # Frozen pair by default; with --windows-file the manifest windows (no frozen old-run inputs exist for them; their control is in-job).
+    if a.windows_file is None:
+        pilots, pilot_shas = list(PILOTS), list(SOURCE_SHA)
+    else:
+        chosen = wm.select(wm.load(a.windows_file), a.window or None)
+        pilots, pilot_shas = [w.id for w in chosen], [w.source_sha256 for w in chosen]
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
     publish = scratch / "publish"
     publish.mkdir()
-    if (
+    if a.windows_file is None and (
         sha(a.diagnostic.read_bytes()) != DIAGNOSTIC_SHA
         or sha(a.reference_report.read_bytes()) != REFERENCE_REPORT_SHA
         or sha(a.control[0].read_bytes()) != CONTROL_SHA
@@ -540,12 +549,12 @@ def main(*, independent_default: bool = False) -> int:
                 assert stream is not None
                 blob = stream.read()
                 meta, _ = decode_keypoints(blob)
-                if meta["window"] in PILOTS:
+                if meta["window"] in pilots:
                     (
                         kps / (meta["window"].replace("/", "__").replace("@", "_at") + ".kps")
                     ).write_bytes(blob)
-    if len(list(kps.glob("*.kps"))) != 2:
-        raise ValueError("Both paid keypoint streams required")
+    if len(list(kps.glob("*.kps"))) != len(pilots):
+        raise ValueError("Every window's paid keypoint stream required")
     prediction, output = predict_twice(a, scratch, kps)
     write(publish / "prediction.json", prediction)
     # Evaluation only starts after both isolated masks are frozen and match.
@@ -564,7 +573,7 @@ def main(*, independent_default: bool = False) -> int:
     if not device["class_matches"]:
         raise ValueError("Qualified Ada required")
     anchors = judge.extract(a.anchor, scratch / "anchors")
-    controls = judge.extract(a.control, scratch / "controls")
+    controls = judge.extract(a.control, scratch / "controls") if a.control else {}
     packets = scratch / "wire"
     packets.mkdir()
     with tarfile.open(a.transport) as t:
@@ -593,11 +602,14 @@ def main(*, independent_default: bool = False) -> int:
                 *a.control,
                 *a.generated,
             ]
+            if q is not None
         },
     }
     sources = {sha(q.read_bytes()): q for q in a.source}
+    if a.windows_file is not None:
+        result["windows"] = len(pilots)
     began = time.monotonic()
-    for wid, digest in zip(PILOTS, SOURCE_SHA):
+    for wid, digest in zip(pilots, pilot_shas):
         _, units = decode_keypoints(
             (kps / (wid.replace("/", "__").replace("@", "_at") + ".kps")).read_bytes()
         )
@@ -612,7 +624,7 @@ def main(*, independent_default: bool = False) -> int:
             judge.judge_window(
                 wid,
                 anchors[wid],
-                controls[wid],
+                controls.get(wid),
                 packets / "packets",
                 scratch,
                 {},
