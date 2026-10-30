@@ -231,3 +231,6 @@ foreground-first claim.
   `9744754d6acd62f7d872e804b5af09b00de1187f100062f9369e526b3e285239`, code `aaf6ae4a`. The fleet validator is smoke-only (24 frames hard-coded); the full stage was validated by a
   generalised validator (`grid_checks`, `--validate` now reads the frame count from `base-result.json`; test in `tests/test_k6b_native_base.py`): 26 checks passed,
   including the source conversion hash against `windows.json`.
+- features: `20261030T143125Z-8785a55b` complete on gpu6 Ada (code `256b18d8`), `full/published.tar` sha256 `c2e0a4aba701c2c2f294b63ad780e9565d203cee5cc56858ee4253755da9d2f5`;
+  smoke 162.8 s + full 155.8 s GPU; full output rechecked by hand with `validate-features`: 19 checks passed. GPU total so far 464 s (incl. the 145 s failed-validator smoke); budget 4,680 s.
+- build-inputs (CPU): `20261030T144100Z-2d3ae276` submitted.
