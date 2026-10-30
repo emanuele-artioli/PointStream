@@ -100,3 +100,50 @@ def test_post_spec_stages_every_input_once_and_pins_it() -> None:
     assert len(spec["staged_inputs"]) == len(spec["inputs"]) and spec["scale"]["frames"]["full"] == 240
     assert all(len(x["sha256"]) == 64 for x in spec["staged_inputs"])
     assert spec["full"]["seconds"] <= 2700 and spec["smoke"]["seconds"] <= 600
+
+
+def test_majority_vote_and_smoothing():
+    a = np.array([[1, 1, 0, 0]], bool)
+    b = np.array([[1, 0, 0, 1]], bool)
+    c = np.array([[0, 1, 0, 1]], bool)
+    assert w6.majority_vote([a, b, c]).tolist() == [[True, True, False, True]]
+    assert w6.majority_vote([a, b]).tolist() == [[True, True, False, True]]  # a tie is foreground
+    assert w6.majority_vote([a]).tolist() == a.tolist()
+    with pytest.raises(ValueError):
+        w6.majority_vote([])
+    seq = {0: a, 1: b, 2: c, 3: ~a}
+    assert np.array_equal(w6.smooth_masks(seq, 1), w6.majority_vote([a, b, c]))
+    assert np.array_equal(w6.smooth_masks(seq, 0), w6.majority_vote([a, b]))  # the ends use the neighbours that exist
+    assert np.array_equal(w6.smooth_masks(seq, 3), w6.majority_vote([c, ~a]))
+    flicker = np.zeros((1, 8), bool)
+    flicker[0, 3] = True  # one frame of noise is removed by the vote
+    assert not w6.smooth_masks({t: np.roll(flicker, 0)[:, t:t + 1] for t in range(8)}, 3).any()
+
+
+def test_split_shares_and_decision():
+    shares = w6.split_shares(10.0, 4.0, 9.0)
+    assert shares["mask_share"] == pytest.approx(0.6) and shares["content_share"] == pytest.approx(0.1)
+    assert np.isnan(w6.split_shares(0.0, 1.0, 1.0)["mask_share"])
+    assert w6.split_decision(0.6, 0.1)["fix"] == "masks"
+    assert w6.split_decision(0.1, 0.6)["fix"] == "content"
+    assert w6.split_decision(0.25, 0.05)["fix"] == "composite"  # the larger share is below 0.3
+    assert w6.split_decision(0.5, 0.45)["fix"] == "composite"  # within 0.1 of each other
+    assert w6.split_decision(0.5, 0.4)["fix"] == "masks"
+    assert w6.split_decision(float("nan"), 0.4)["fix"] == "undefined"
+    out = w6.excess_shares({"H": 28.0, "G+S": 22.0, "S+R": 25.0, "G+Rs": 27.0, "B": 17.0}, 18.0)
+    assert out["excess"]["H"] == pytest.approx(10.0)
+    assert out["mask_share"] == pytest.approx(0.6) and out["content_share"] == pytest.approx(0.3)
+    assert out["decision"]["fix"] == "masks"
+
+
+def test_split_bootstrap_and_control():
+    rng = np.random.default_rng(1)
+    h = 28 + rng.normal(0, 0.5, 96)
+    series = {"H": h, "G+S": h - 6, "S+R": h - 1, "G+Rs": h - 0.5, "B": h * 0 + 17}
+    boot = w6.split_bootstrap(series, np.full(96, 18.0), draws=200)
+    assert boot["mask_share"][0] < 0.65 and boot["mask_share"][1] > 0.55 and boot["content_share"][1] < 0.3
+    assert boot["share_mask_larger_by_lead"] == 1.0
+    idx = w6.block_resamples(50, block=24, draws=5)
+    assert idx.shape == (5, 50) and idx.max() < 50
+    assert w6.control_max_diff(np.array([np.nan, 1.0]), np.array([np.nan, 1.0 + 1e-8])) == pytest.approx(1e-8)
+    assert w6.control_max_diff(np.array([np.nan, 1.0]), np.array([0.0, 1.0])) == float("inf")

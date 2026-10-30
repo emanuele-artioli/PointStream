@@ -193,3 +193,69 @@ judges ([j.md](j.md)).
 - Effect on W7: W6 did not pass its rule, so W7 keeps the frozen W5 recipe (players on every third frame).
 - Clips: `full/clips/w6-side-by-side-source-svt-hybrid.mp4` and `w6-zoom2x-near-player-source-svt-hybrid.mp4` in
   the post job's stage directory.
+
+### 2026-10-30 — W6b: where does the flicker come from? (rule)
+- Question. W6's full-rate hybrid flickers more than SVT on 99.6% of frame pairs (28.6 vs 18.6), at a constant
+  level over the 240 frames (quarters 28.7 / 27.7 / 29.7 / 28.5; no drift). Is the excess caused by the receiver
+  masks (SAM fresh on every frame, no propagation) or by the generated pixels?
+- Variants, on Al's 240 frames from W6's saved inputs (generation `20261030T120630Z-9190e75a`, masks and judges
+  `20261030T132449Z-75957f16`), flicker and residual energy computed exactly as W6 (`h3b.flicker`, DIS flow on the
+  source, the same region union, the same composite and base):
+  - H: the hybrid. Control: W6's per-frame values reproduced to 1e-6.
+  - G+S: generated crops, the source's player matte (from the source masks W6 uses for its region).
+  - S+R: source pixels, the receiver masks.
+  - G+Rs: generated crops, receiver masks smoothed over t−1, t, t+1 (majority vote in box-normalised coordinates).
+  - B: the paid base alone, no players.
+  The source matte and source pixels are diagnostics only, never a coded variant.
+- Decision rule. Excess E(V) = flicker(V) − 18.6 (W6's SVT anchor at the hybrid's rate). Mask share
+  = (E(H) − E(G+S)) / E(H); content share = (E(H) − E(S+R)) / E(H). The larger share, if it leads by ≥ 0.1,
+  names the fix: masks → mask propagation across frames (G+Rs is its first, cheap estimate); content → temporal
+  consistency in the generator (a video model or temporal smoothing of the generated crops). Both < 0.3 or within
+  0.1 of each other: the flicker lives where generated content meets the base; next test, a feathered composite.
+  Residual energy is reported beside with the same shares.
+- Hypothesis: the masks dominate; SAM run fresh per frame moves the outline by a few pixels each frame.
+- Competing explanation: the generated texture changes from frame to frame (W6 residual energy 1.7× the source's)
+  and dominates whatever the outline does.
+- Budget: CPU only (≤ 2 CPU-hours on one server, scratch in `/local/users/emanuele`), no GPU job.
+
+### 2026-10-30 — W6b outcome: the flicker is not in the masks; control caveat (stopped at the control, reported)
+- Run. CPU run of `python -m experiments.tennis.w6 flicker-split` (code `502a58d7`, branch `claude/w6b-work`), gpu2 CPUs
+  (pointstream env, torch 2.2.2 CPU, cv2 4.11.0, 4 threads), 236 s wall, 343 s CPU (the cold `import torch` from NFS took about 20 min more
+  wall, no CPU). Log `/local/users/emanuele/pointstream/w6b/full.log`, outputs `/local/users/emanuele/pointstream/w6b/out/`
+  (`flicker-split.npz` per-frame arrays); result JSON `docs/experiments/w6-specs/w6b-flicker-split.json`. No GPU, no fleet job.
+  Inputs (sha256 prefixes, all verified): source `054e4535`, transport `6865035e`, anchor `67444a2a`, base `00b13e89`, gpu_base `5c4a0cfc`,
+  generation `031ea5d7`, post archive `48c352ae` (judges.npz `4d71f6cc`; post job `20261030T132449Z-75957f16`); the SVT anchor is W6's saved per-frame series at
+  the hybrid's rate (no re-encode). Base stream decoded with aomdec (dav1d is not on gpu2; AV1 decoding is normative, ticks of the CPU RGB base
+  differ from the saved GPU RGB by at most 1 level).
+- Control (H against W6's saved per-frame values): **not met at the rule's 1e-6.** Max absolute difference 2.2e-3 (flicker), 2.9e-3 (energy),
+  1.1e-3 on the source's own energy; 62 of 239 pairs differ by more than 1e-6, median 0, 90th percentile 2.3e-5; the means agree to 6e-6
+  (28.636547 against 28.636553). The source's energy depends only on the source and the DIS flow, so the difference is CPU against CUDA
+  rounding in the YUV-to-RGB conversion and flow, not the composite. Per the brief this is reported, not argued away; the differences are
+  four orders of magnitude below the effects below.
+- Flicker (239 pairs; anchor 18.59; mean [block-bootstrap 95%]): H 28.64 [28.11, 30.07]; G+S 30.68 [30.05, 32.18]; S+R 8.33 [7.77, 9.09];
+  G+Rs 27.96 [27.46, 29.31]; B 17.36 [16.58, 18.77]. Excess E: H +10.05, G+S +12.09, S+R −10.26, G+Rs +9.37, B −1.23.
+  **Mask share −0.20 [−0.24, −0.16]; content share 2.02 [1.86, 2.21]**; lead 2.2 (content larger by ≥ 0.1 in 100% of resamples).
+- Residual energy (anchor 11.15; E(H) = +11.96): H 23.11, G+S 25.70, S+R 13.23, G+Rs 22.20, B 8.40; mask share −0.22 [−0.26, −0.17],
+  content share 0.83 [0.77, 0.88].
+- Decision by the rule: the larger share is content (≥ 0.3, lead ≥ 0.1): the fix is temporal consistency of the generated content, not mask
+  propagation. Reading it honestly: (i) the exact source matte does not help, it makes flicker worse (+2.0), because the receiver masks cover
+  77% of the source matte's area (IoU 0.64) and the source matte exposes more generated pixels; (ii) smoothing the receiver masks over
+  t−1..t+1 removes only 7% of the excess (28.64 to 27.96) although it raises consecutive-mask IoU from 0.72 to 0.81; (iii) S+R is below the
+  anchor by construction (source pixels carry the source's own temporal residual, so its flicker is the measure's floor) and content share above 1
+  says only that nothing but generated pixels is left; (iv) the paid base alone (B) already flickers 17.4, close to the SVT anchor's 18.6, so
+  roughly 11 of the hybrid's 28.6 sit in the generated pixels on top of that floor. Not tested: whether a feathered composite, not covered by
+  this rule, changes the generated-pixel share.
+- Lead's reading (2026-10-30). The control misses the literal 1e-6 because this run is on CPU and W6's on CUDA: the
+  source's own residual energy, which involves no PointStream output, differs by up to 1.1e-3 too, and the mean
+  flicker agrees to 6e-6. The largest per-frame difference (2.2e-3) is four orders of magnitude below the
+  effects being compared (excesses of about ±10), so the decision stands; the 1e-6 tolerance was set without
+  allowing for a CPU rerun and is recorded as a deviation, not relaxed after the fact for the decision.
+- Decision: content. The extra flicker is in the generated pixels; better outlines do not reduce it (the exact
+  source matte raises it, because it shows more generated pixels). With source pixels inside the receiver
+  masks, the composite flickers less than SVT (8.3 vs 18.6), so the pipeline's temporal floor is fine and the
+  generator is the problem.
+- Narrowed claim (unchanged from W6): sharp, correctly posed players that flicker; the cause is per-frame
+  generation. Next test, cheapest first: temporal smoothing of the generated crops on saved outputs
+  (flow-guided blend of each crop with its warped predecessor, two or three blend weights), scored on flicker
+  and on per-frame player LPIPS/DISTS together, since smoothing can trade sharpness for stability. Then a
+  video-native generator under W10.
