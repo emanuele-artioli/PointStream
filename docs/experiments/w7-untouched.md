@@ -237,3 +237,4 @@ foreground-first claim.
 - build-inputs: `20261030T144100Z-2d3ae276` complete (CPU, gpu6), `full/inputs.tar` sha256 `bc8a01c7ae4321abee4e42b6871ab5f31c9d880067b9d0baf9c99a602f00ac0f`; `validate-inputs` on the full output: 7 checks passed.
 - anchors (K6 run, GPU): `20261030T144525Z-de7adcd2` submitted.
 - anchors: `20261030T144525Z-de7adcd2` complete on gpu6 Ada, smoke 136.4 s + full 596.9 s GPU; `full/published.tar` sha256 `18e7294f7ca82ce4e118ced88bf9ee31690d23f862809f986f5003c36da291f8`; full output rechecked by hand (`k6b_confirm_run --validate-only`): 20 checks passed. GPU total so far 1,197 s of 4,680 s.
+- prepare (CPU): `20261030T150213Z-99604e48` submitted. rgb diagnostic (GPU, A6000 gpu3/gpu2): `20261030T150335Z-9e58b2cc` submitted in parallel (needs only the native base).
