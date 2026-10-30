@@ -361,6 +361,10 @@ def first_window(argv: list[str]) -> None:
         spec = receiver([first], windows_ref, ups['transport'], ups['anchor'], [ups['generated']], 1)
     elif stage == 'rates':
         spec = rates_job([first], windows_ref, ups['transport_json'], ups['base'])
+    elif stage == 'judge':
+        files = {'windows': windows_ref, 'anchor': ups['anchor'], 'transport': ups['transport'], 'masks': ups['masks'], 'gpu_base': ups['gpu_base'],
+                 'base': ups['base'], 'prior': ups['prior'], **assets('lpips', 'dists')}
+        spec = real_base_judge([first], files, [ups['generated']], ups['rates'], 0)
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:

@@ -264,3 +264,8 @@ foreground-first claim.
   Fix: both frozen-only blocks run only when `--diagnostic` and `--reference-report` are given. GPU total now 3,157 s of 4,680 s. A third job follows (id below); no result of the crashed run is used.
   Third receiver job: `20261030T170824Z-6b51342b`.
   rates job first run `20261030T170319Z-3524601c` failed its smoke validator (int vs string JSON keys in the recompute; fixed); resubmitted as `20261030T171203Z-7d1145b6` (CPU).
+- rates/window-state: `20261030T171203Z-7d1145b6` complete (CPU, gpu6); `full/rates.json` sha256 `e0a5ffc02000a4f98d8141c8d688872da739c28fb31df45e7579ef0ec13f5e8d`, `full/window-state.json` sha256
+  `121dd9e1eb2534b1e24e35ff06a1b015e6f93cbf4fa97257bed88e8373ec0b5e`; validator rerun on the full output: 5 checks passed (rates equal to the hand computation made earlier).
+- receiver masks: `20261030T170824Z-6b51342b` complete on gpu5 Ada (shared); smoke 103.6 s + full 331.0 s GPU; `full/published.tar` sha256 `6b0cc2c23122e974a0b03d976a11787ee465f4deea5a5ea88eab84aea8728f4a`,
+  `full/receiver.json` (the judge's `--prior`) sha256 `86d4dcb264a2ea0c40ffaa647e7b4ff2fb4d6150e3ccf0a2378e47f5c121eaf7`; full output rechecked by hand (`k6b_receiver_frame --validate`, stage full): 24 checks passed.
+  GPU total so far 3,592 s of 4,680 s (rgb diagnostic `20261030T163628Z-d8f52f8f` running on gpu3, judge, W1 scoring, DCVC still to count).
