@@ -286,3 +286,16 @@ foreground-first claim.
 - judge first job `20261030T184549Z-d9fe4272` (gpu6): crashed in the first 3.3 s of the smoke: `GPU source control or base coverage missing` (the check hard-coded six base rows, two windows). Code bug, fixed
   (three scales per window, one source row per window). GPU total 3,792 s of 4,680 s.
   Judge resubmitted: `20261030T185245Z-e51a4dec`.
+- judge (compose + score): `20261030T185245Z-e51a4dec` complete on gpu5 Ada (shared; code = branch HEAD `git_head` in its ready.json); smoke 33.8 s + full 283.3 s GPU; `full/published.tar` sha256
+  `cbc26962935b3542b0b7cf77f724010de19323fedd6fe02cb822ec6e43e75837`; full output rechecked by hand (`k6b_real_base_judge --validate`, stage full; the `representative_ticks` check now
+  expects `frames_per_window == 0` for the full stage): 11 checks passed, in-job controls (hybrid without players equals the paid base; plain base scored twice identical) both true.
+  As written by the judge (`quality-summary.json`, 80 saved ticks; order per scale: base then hybrid, scales 8, 4, 2), no interpretation here:
+  full LPIPS [0.4502, 0.4375, 0.2937, 0.2845, 0.1460, 0.1415]; player-region LPIPS [0.8578, 0.3275, 0.7180, 0.3042, 0.4810, 0.2778];
+  full DISTS [0.2971, 0.2656, 0.2002, 0.1750, 0.1202, 0.1040]; player-region DISTS [0.5924, 0.2505, 0.4961, 0.2420, 0.3624, 0.2329];
+  hybrid total rate kbps at scales 8/4/2: 13.68 / 18.46 / 31.57 (paid base 9.34 / 14.12 / 27.23). The judge's own `comparisons` (scale 4 against the recovered SVT envelope) are in `window.json` of the archive.
+- GPU-seconds, first window (smoke + full from execution.json; failed smokes included): features 145 + 163 + 156 = 464; anchors 136 + 597 = 733 (cum. 1,197); generation 92 + 1,324 (cum. 2,613);
+  rgb diagnostic 24 + 46 + 26 + 18.5 + 107.5 (cum. 3,789 with the receiver's two attempts below); receiver 86 + 100 + 334 + 104 + 331; judge 3.3 + 34 + 283. **Total about 4,109 s = 1.14 GPU-h of 1.3 h (4,680 s); 571 s left.**
+  CPU jobs, no GPU: native base, build-inputs, prepare, rate transport, rates/window-state.
+- Where the chain stands: features, build-inputs, anchors, prepare, generation, rate transport, native base, rgb diagnostic, receiver, judge done and validated on their full output. Not run: the W1 stages
+  (masks and encodes are CPU and free; scoring is estimated at 681 s GPU plus a smoke, which does not fit in the 571 s left) and DCVC (estimated 245 s plus smoke, fits alone, not yet generalised end to end).
+  The lead decides: raise the budget by about 0.1 GPU-h for W1 scoring, or run DCVC first within the remainder.

@@ -388,7 +388,7 @@ def validate() -> None:
     in_job = summary.get('in_job_controls') or None  # set only for manifest windows, which have no prior run to reproduce
     checks = {**cost_checks, 'two_windows': len(summary['rows']) == (len(summary['calibration']) if in_job else 2),
               'both_old_controls': (len(in_job) == len(summary['rows']) and all(all(c.values()) for c in in_job.values())) if in_job else len(summary['calibration']) == 2 and all(r['exact_control'] and r['prediction_control'] for r in summary['calibration']),
-              'representative_ticks': summary['frames_per_window'] == len(expected_ticks),
+              'representative_ticks': summary['frames_per_window'] == (0 if full_stage else len(expected_ticks)),  # the full stage is judged with 0 = every saved tick
               'qualified_gpu': summary['device']['class_matches'], 'memory_within_limit': summary['peak_gpu_gib'] < 20}
     with tempfile.TemporaryDirectory(prefix='k6b-realbase-validator-') as d:
         root = Path(d)
