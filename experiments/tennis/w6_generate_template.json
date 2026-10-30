@@ -1,0 +1,142 @@
+{
+ "environment": {
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz",
+  "sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e"
+ },
+ "staged_inputs": [
+  {
+   "name": "prepared",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-reference-quality-20261025T183100Z/conditioning/full-p1-q20-prepared.tar",
+   "sha256": "03953043e4b4d3d4e4f70591afbc462a385d9347862985e43117cfea3b404547",
+   "extract": false
+  },
+  {
+   "name": "w0",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/config.json",
+   "sha256": "92d3dfb746fca211a2c9e019e285f8597412211728dce3c5bcf4eda0f2d62e7e",
+   "extract": false
+  },
+  {
+   "name": "w1",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/diffusion_pytorch_model.safetensors",
+   "sha256": "a1d993488569e928462932c8c38a0760b874d166399b14414135bd9c42df5815",
+   "extract": false
+  },
+  {
+   "name": "w2",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/config.json",
+   "sha256": "ba41139cc9dad159163a53e2aa847356b627f53fef988ad461659bd2d587d886",
+   "extract": false
+  },
+  {
+   "name": "w3",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/pytorch_model.bin",
+   "sha256": "89d2aa29b5fdf64f3ad4f45fb4227ea98bc45156bbae673b85be1af7783dbabb",
+   "extract": false
+  },
+  {
+   "name": "w4",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/denoising_unet.pth",
+   "sha256": "b9e5a2c34fac369e8a922972ca2210916c6af175a0dad907deccf6235816ad52",
+   "extract": false
+  },
+  {
+   "name": "w5",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/reference_unet.pth",
+   "sha256": "beddccb08d49a8b29b0f4d6d456c6521d4382a8d8d48884fa60ba8802509c214",
+   "extract": false
+  },
+  {
+   "name": "w6",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth",
+   "sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+   "extract": false
+  },
+  {
+   "name": "w7",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/motion_module.pth",
+   "sha256": "0d11e01a281b39880da2efeea892215c1313e5713fca3d100a7fbb72ee312ef9",
+   "extract": false
+  },
+  {
+   "name": "base",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261023T194934Z-b0dcbb19/full/published.tar",
+   "sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285",
+   "extract": false
+  },
+  {
+   "name": "fits",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261023T221650Z-3d7cbe2f/full/published.tar",
+   "sha256": "f1a488f2a3ddecf57cff451801f64bc07ae652c2b8b998d4ac844ba8685f5fa2",
+   "extract": false
+  }
+ ],
+ "arguments": [
+  "--kind",
+  "generate",
+  "--manifest",
+  "{staged:manifest}",
+  "--prepared",
+  "{staged:prepared}",
+  "--windows",
+  "alcaraz_hurkacz/031@129",
+  "--",
+  "generate",
+  "--prepared",
+  "{staged:prepared}",
+  "--weight",
+  "vae/config.json",
+  "{staged:w0}",
+  "--weight",
+  "vae/diffusion_pytorch_model.safetensors",
+  "{staged:w1}",
+  "--weight",
+  "image_encoder/config.json",
+  "{staged:w2}",
+  "--weight",
+  "image_encoder/pytorch_model.bin",
+  "{staged:w3}",
+  "--weight",
+  "original/denoising_unet.pth",
+  "{staged:w4}",
+  "--weight",
+  "original/reference_unet.pth",
+  "{staged:w5}",
+  "--weight",
+  "original/pose_guider.pth",
+  "{staged:w6}",
+  "--weight",
+  "original/motion_module.pth",
+  "{staged:w7}",
+  "--units",
+  "alcaraz_hurkacz__031_at129__person_000000000001,alcaraz_hurkacz__031_at129__person_000000000006",
+  "--max-units",
+  "0",
+  "--max-frames",
+  "{frames}",
+  "--profiles",
+  "",
+  "--fit-archive",
+  "{staged:base}",
+  "--fit-archive",
+  "{staged:fits}",
+  "--from-t",
+  "0",
+  "--steps",
+  "30",
+  "--gpu-class",
+  "RTX 6000 Ada",
+  "--fit",
+  "match5",
+  "ah-C@fit-100-fp16.pt",
+  "--fit-base",
+  "match5",
+  "tennis-base@fit-100.pt",
+  "--fit-bits",
+  "match5",
+  "4",
+  "--cfg",
+  "match5",
+  "2.0"
+ ]
+}
