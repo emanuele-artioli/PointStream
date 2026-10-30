@@ -299,6 +299,18 @@ def rate_transport(windows: list[wm.WindowSpec], manifest: tuple[str, str], anch
     return spec
 
 
+def rates_job(windows: list[wm.WindowSpec], manifest: tuple[str, str], transport_json: tuple[str, str], base: tuple[str, str]) -> dict[str, Any]:
+    """CPU: the judge's `--rates` file and the w1_* stages' `--window-state` file from the rate-transport and native-base outputs (w7_rates)."""
+    arguments = ['--windows-file', '{staged:windows}', *sum((['--window', w.name] for w in windows), []), '--transport', '{staged:transport}',
+                 '--base', '{staged:base}', '--expect', '{windows}']
+    spec = common('experiments.tennis.w7_rates', arguments, {'windows': manifest, 'transport': transport_json, 'base': base})
+    spec.update({'device': 'cpu', 'hosts': HOSTS_GPU, 'gpu_models': [], 'gpu_memory_mib': 0, 'cpu_threads': 2, 'local_storage_gib': 20,
+                 'scale': {'windows': {'smoke': len(windows), 'full': len(windows)}},
+                 'smoke': {'seconds': 300, 'representative_basis': 'The first window: the same arithmetic on the saved transport rows and native-base manifest as the full stage.'},
+                 'full': {'seconds': 600}, 'validator_seconds': 120, 'budget_seconds': 1000})
+    return spec
+
+
 def real_base_judge(windows: list[wm.WindowSpec], files: dict[str, tuple[str, str]], gens: list[tuple[str, str]], rates: tuple[str, str],
                     judged: int) -> dict[str, Any]:
     """Hybrid compose and score on manifest windows (in-job controls replace the prior-run gate). `files` needs anchor, transport, masks,
@@ -347,6 +359,8 @@ def first_window(argv: list[str]) -> None:
         spec = rgb_diagnostic([first], windows_ref, ups['base'], 24, shared='shared' in ups)
     elif stage == 'receiver':
         spec = receiver([first], windows_ref, ups['transport'], ups['anchor'], [ups['generated']], 1)
+    elif stage == 'rates':
+        spec = rates_job([first], windows_ref, ups['transport_json'], ups['base'])
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:

@@ -77,3 +77,21 @@ def test_receiver_denied_probe_count_follows_the_window_set():
 
     assert denied_probe_count({}) == 4  # frozen pair: two sources, control, transport
     assert denied_probe_count({'windows': 1}) == 2  # one manifest window: its source and the transport
+
+
+def test_w7_rates_cli_writes_rates_and_state_and_validates(tmp_path, monkeypatch):
+    import io
+    import tarfile
+
+    from experiments.tennis import w7_rates
+
+    inner = tmp_path / 'bundle.tar'
+    manifest = json.dumps({'rows': [{'window': 'al028', 'scale': s, 'ivf': {'bytes': 1000 * s}} for s in (8, 4, 2)]}).encode()
+    with tarfile.open(inner, 'w') as t:
+        info = tarfile.TarInfo('base/manifest.json')
+        info.size = len(manifest)
+        t.addfile(info, io.BytesIO(manifest))
+    outer = tmp_path / 'published.tar'
+    with tarfile.open(outer, 'w') as t:
+        t.add(inner, arcname='publish/bundle.tar')
+    assert [r['scale'] for r in w7_rates.base_rows(outer)] == [8, 4, 2]

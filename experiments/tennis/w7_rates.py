@@ -8,6 +8,7 @@ crops of the same size) over 7200 s, to keep the charge comparable to the old wi
 """
 from __future__ import annotations
 
+import json
 from typing import Any
 
 AMORTISED_SECONDS = 7200
@@ -44,3 +45,74 @@ def window_state(base_rows: list[dict[str, Any]], transport_row: dict[str, Any],
         raise ValueError(f'{name}: native base needs scales 8, 4 and 2')
     return {'control_ivf_bytes': ivf, 'start_base': dict(START_BASE), 'kps1_bytes': int(transport_row['keypoints']['kps1_bytes']),
             'kps2_bytes': int(transport_row['keypoints']['bytes']), 'hybrid_archive_sha': None}
+
+
+def base_rows(archive: Any) -> list[dict[str, Any]]:
+    """Rows of the native-base manifest inside a `k6b_native_base` stage archive (published.tar -> publish/bundle.tar -> base/manifest.json)."""
+    import tarfile
+
+    with tarfile.open(archive) as outer:
+        member = outer.extractfile('publish/bundle.tar')
+        if member is None:
+            raise ValueError('native base archive has no bundle')
+        with tarfile.open(fileobj=member) as bundle:
+            manifest = bundle.extractfile('base/manifest.json')
+            if manifest is None:
+                raise ValueError('native base bundle has no manifest')
+            return list(json.loads(manifest.read())['rows'])
+
+
+def compute(transport_json: Any, base_archive: Any, windows_file: Any, names: list[str]) -> dict[str, Any]:
+    from pathlib import Path
+
+    from experiments.tennis import window_manifest as wm
+
+    transport = json.loads(Path(transport_json).read_text())
+    specs = {w.name: w for w in wm.select(wm.load(Path(windows_file)), names or None)}
+    rows = base_rows(base_archive)
+    by_id = {r['window']: r for r in transport['rows']}
+    state = {name: window_state(rows, by_id[spec.id], name) for name, spec in specs.items()}
+    return {'rates': rates({'rows': [by_id[spec.id] for spec in specs.values()]}), 'window_state': state}
+
+
+def main(argv: list[str] | None = None) -> int:
+    """`--transport transport.json --base published.tar --windows-file windows.json [--window NAME]...` writes rates.json and window-state.json
+    to PS_STAGE_DIR (the `--rates` file of the judge and the `--window-state` file of the w1_* stages); `--validate` recomputes both from the
+    inputs recorded in dispatch.json and compares them."""
+    import argparse
+    import os
+    from pathlib import Path
+
+    p = argparse.ArgumentParser(description=main.__doc__)
+    p.add_argument('--transport')
+    p.add_argument('--base')
+    p.add_argument('--windows-file')
+    p.add_argument('--window', action='append', default=[])
+    p.add_argument('--expect', type=int, default=0, help='number of windows the job is meant to cover (a fleet scale parameter); 0 = unchecked')
+    p.add_argument('--validate', action='store_true')
+    a = p.parse_args(argv)
+    stage = Path(os.environ['PS_STAGE_DIR'])
+    if a.validate:
+        command = json.loads((stage / 'dispatch.json').read_text())['command']
+        names = [command[i + 1] for i, c in enumerate(command) if c == '--window']
+        value = lambda flag: command[command.index(flag) + 1]  # noqa: E731
+        again = compute(value('--transport'), value('--base'), value('--windows-file'), names)
+        got = {'rates': json.loads((stage / 'rates.json').read_text()), 'window_state': json.loads((stage / 'window-state.json').read_text())}
+        checks = {'rates_recomputed': got['rates'] == again['rates'], 'state_recomputed': got['window_state'] == again['window_state'],
+                  'one_per_window': len(got['rates']) == len(names) == len(got['window_state']),
+                  'positive': all(v > 0 for r in got['rates'].values() for v in r.values()),
+                  'scales_8_4_2': all(sorted(int(k) for k in s['control_ivf_bytes']) == [2, 4, 8] for s in got['window_state'].values())}
+        Path(os.environ['PS_VALIDATION_PATH']).write_text(json.dumps({'passed': all(checks.values()), 'checks': checks}))
+        return int(not all(checks.values()))
+    if not (a.transport and a.base and a.windows_file):
+        p.error('--transport, --base and --windows-file are required')
+    if a.expect and a.expect != len(a.window):
+        p.error('--expect does not match the number of --window arguments')
+    out = compute(a.transport, a.base, a.windows_file, a.window)
+    (stage / 'rates.json').write_text(json.dumps(out['rates'], indent=1, sort_keys=True))
+    (stage / 'window-state.json').write_text(json.dumps(out['window_state'], indent=1, sort_keys=True))
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
