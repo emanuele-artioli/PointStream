@@ -324,11 +324,12 @@ def first_window(argv: list[str]) -> None:
     source = source_files(windows)[first.name]
     if stage == 'features':
         spec = features(first, confirm, source)
+    elif stage == 'native-base':
+        spec = native_base([first], windows_ref, 24)
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:
         raise SystemExit(f'unknown stage {stage}')
-    del windows_ref
     out.mkdir(parents=True, exist_ok=True)
     (out / f'{stage}.json').write_text(json.dumps(spec, indent=1) + '\n')
 
