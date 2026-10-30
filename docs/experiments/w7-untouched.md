@@ -325,3 +325,4 @@ foreground-first claim.
   quarter outside-R `…194800Z-92e26eca`: +20: 62, 63, 64 (19.56, 17.24, 15.88 kbps); +40: 62, 63, 64 (19.44, 17.22, 15.65 kbps); sha256 `2a7068cbcfb547a1aca857c16901b68f53c3f8410a3c7622362eb952702d353f`; 13 checks passed.
 - Pre-check of the W1 scoring job (before any GPU second): `w1_score.hybrid_point` required the hybrid job to have billed the frozen windows' KPS1 packet; the W7 judge pays the KPS2 packet (2,469 B) directly, so scoring
   would have stopped at its start. Fixed: either packet is accepted and the other rate is re-billed (test added).
+- W1 scoring (GPU, A6000, shared): `20261030T195316Z-bbf774cf` submitted (masks, judge archive and the four encode archives above).
