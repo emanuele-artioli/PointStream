@@ -331,3 +331,4 @@ foreground-first claim.
   The recorded scores came from the judge on an Ada GPU, the re-score ran on an A6000; this is a control on the paid base, not on the hybrid or the SVT anchors, and no anchor or hybrid quality had been computed.
   **Deviation, decided after seeing the control error and before any anchor score existed:** manifest windows use W3's tolerance for the same kind of control, 1e-3 (`control_tolerance`; frozen windows keep 1e-4); the
   observed control errors are recorded in the summary either way. GPU total now 4,456 s of 5,400 s (944 s left); the rescoring needs about 850 s (smoke 225 + full about 620), which leaves no room for DCVC (about 350 s).
+  Rescoring job: `20261030T201626Z-e32a981b` (same inputs).
