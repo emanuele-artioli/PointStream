@@ -1,10 +1,9 @@
 """W6 fleet job specifications.
 
     python -m experiments.tennis.w6_specs OUT_DIR generate            # one job per Al player
-    python -m experiments.tennis.w6_specs OUT_DIR masks  GEN_TAR GEN_TAR
-    python -m experiments.tennis.w6_specs OUT_DIR judge  GEN_TAR GEN_TAR MASKS_TAR
+    python -m experiments.tennis.w6_specs OUT_DIR post GEN_TAR@SHA
 
-``GEN_TAR`` and ``MASKS_TAR`` are PATH@SHA256 of the ``published.tar`` of the earlier stage's full run.
+``GEN_TAR`` is PATH@SHA256 of the generation job's ``published.tar`` (both players are in one archive).
 """
 from __future__ import annotations
 
@@ -16,7 +15,7 @@ from typing import Any
 
 from experiments.tennis.w1_roi import ANCHOR_SHA, SOURCE_SHA, TRANSPORT_SHA
 
-SAM_SHA = 'FILL'  # sam3.1_multiplex.pt
+SAM_SHA = '0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6'  # sam3.1_multiplex.pt
 DATA = '/home/itec/emanuele/Datasets/pointstream-data'
 MODELS = '/home/itec/emanuele/Models'
 TEMPLATE = Path(__file__).with_name('w6_generate_template.json')
@@ -80,45 +79,30 @@ def generate(unit: str, gpu_class: str = 'RTX A6000') -> dict[str, Any]:
             'arguments': native, 'scale': {'frames': {'smoke': 8, 'full': 0}}, 'staged_inputs': items,
             'inputs': [{'path': x['path'], 'sha256': x['sha256']} for x in items], 'required_commands': [],
             'smoke': {'seconds': 400, 'representative_basis': 'The same player unit, first 8 frames, frozen 30 DDIM steps / 512x784 / 4 bit / C base plus matching adapter / guidance 2.0, the released long-video sampler and --keep-all; the full stage renders all 240 frames of the unit.'},
-            'full': {'seconds': 1500}, 'validator': ['{python}', '-m', 'experiments.tennis.w6', 'validate-generate'], 'validator_seconds': 60,
-            'budget_seconds': 4000, 'stall_seconds': 1500.0, 'deadline': deadline(10), **shared(basis, 8192 if ada else 3072)}
+            'full': {'seconds': 2600}, 'validator': ['{python}', '-m', 'experiments.tennis.w6', 'validate-generate'], 'validator_seconds': 60,
+            'budget_seconds': 4400, 'stall_seconds': 1500.0, 'deadline': deadline(10), **shared(basis, 8192 if ada else 3072)}
 
 
-def masks(generated: list[str]) -> dict[str, Any]:
-    items = {**{k: FILES[k] for k in ('transport', 'al', 'old_generated', 'old_masks')}, 'weights': FILES['sam'],
-             **{f'g{i}': pair(g) for i, g in enumerate(generated)}}
-    arguments = ['masks', '--transport', '{staged:transport}', '--source', '{staged:al}', '--old-generated', '{staged:old_generated}',
-                 '--old-masks', '{staged:old_masks}', '--weights', '{staged:weights}', '--judged', '{judged}']
-    for i in range(len(generated)):
-        arguments += ['--generated', f'{{staged:g{i}}}']
-    basis = 'SAM predictions on saved crops are deterministic and do not depend on wall time; 12 GB plus the sharing margin.'
-    return {'schema': 1, 'device': 'gpu', 'hosts': ['gpu2', 'gpu3', 'gpu5', 'gpu6'], 'gpu_models': BOTH, 'gpu_memory_mib': 12000, 'cpu_threads': 4,
-            'local_storage_gib': 35, 'environment': ENVIRONMENT, 'required_commands': ['ffmpeg'],
-            'entrypoint': ['-m', 'experiments.tennis.w6'], 'arguments': arguments, 'scale': {'judged': {'smoke': 2, 'full': 0}},
-            'staged_inputs': staged(items), 'inputs': [{'path': p, 'sha256': d} for p, d in items.values()],
-            'smoke': {'seconds': 560, 'representative_basis': 'Both Al players, first 2 regenerated frames each, the isolated Landlock worker with every-frame fresh prompts (k6b_receiver_sam --independent-frames), the comparison with the saved crops and masks; the full stage runs all 240 frames.'},
-            'full': {'seconds': 2400}, 'validator': ['{python}', '-m', 'experiments.tennis.w6', 'validate-masks'], 'validator_seconds': 60,
-            'budget_seconds': 3200, 'stall_seconds': 900.0, 'deadline': deadline(10), **shared(basis)}
-
-
-def judge(generated: list[str], masks_tar: str) -> dict[str, Any]:
-    items = {k: FILES[k] for k in ('al', 'transport', 'anchor', 'base', 'gpu_base', 'encode_half', 'pose')}
-    items['masks'] = pair(masks_tar)
+def post(generated: list[str]) -> dict[str, Any]:
+    """Receiver masks and the judges in one job: the inputs are staged once."""
+    items = {k: FILES[k] for k in ('al', 'transport', 'anchor', 'base', 'gpu_base', 'encode_half', 'pose', 'old_generated', 'old_masks')}
+    items['weights'] = FILES['sam']
     for i, g in enumerate(generated):
         items[f'g{i}'] = pair(g)
-    arguments = ['judge', '--al', '{staged:al}', '--transport', '{staged:transport}', '--anchor', '{staged:anchor}', '--base', '{staged:base}',
-                 '--gpu-base', '{staged:gpu_base}', '--encode-half', '{staged:encode_half}', '--pose', '{staged:pose}', '--masks', '{staged:masks}',
+    arguments = ['post', '--al', '{staged:al}', '--transport', '{staged:transport}', '--anchor', '{staged:anchor}', '--base', '{staged:base}',
+                 '--gpu-base', '{staged:gpu_base}', '--encode-half', '{staged:encode_half}', '--pose', '{staged:pose}',
+                 '--old-generated', '{staged:old_generated}', '--old-masks', '{staged:old_masks}', '--weights', '{staged:weights}',
                  '--frames', '{frames}', '--clips']
     for i in range(len(generated)):
         arguments += ['--generated', f'{{staged:g{i}}}']
-    basis = 'Scores on saved pixels and a deterministic pose detector; nothing depends on wall time.'
+    basis = 'SAM on saved crops, scores on saved pixels and a deterministic pose detector; nothing depends on wall time.'
     return {'schema': 1, 'device': 'gpu', 'hosts': ['gpu3', 'gpu5', 'gpu6'], 'gpu_models': BOTH, 'gpu_memory_mib': 12000, 'cpu_threads': 8,
-            'local_storage_gib': 40, 'environment': ENVIRONMENT, 'required_commands': ['ffmpeg'],
+            'local_storage_gib': 45, 'environment': ENVIRONMENT, 'required_commands': ['ffmpeg'],
             'entrypoint': ['-m', 'experiments.tennis.w6'], 'arguments': arguments, 'scale': {'frames': {'smoke': 16, 'full': 240}},
             'staged_inputs': staged(items), 'inputs': [{'path': p, 'sha256': d} for p, d in items.values()],
-            'smoke': {'seconds': 560, 'representative_basis': 'The first 16 frames through the full path: source conversion, paid scale-4 base decode with its saved ticks compared, both W1 half-resolution streams decoded with the encoder job hashes, composite with the receiver masks, YOLO11x-pose on source/hybrid/anchors, flow residuals, racket measure and both clips.'},
-            'full': {'seconds': 2400}, 'validator': ['{python}', '-m', 'experiments.tennis.w6', 'validate-judge'], 'validator_seconds': 120,
-            'budget_seconds': 3200, 'stall_seconds': 900.0, 'deadline': deadline(10), **shared(basis)}
+            'smoke': {'seconds': 560, 'representative_basis': 'The first 16 frames of both players through the full path: comparison with the saved crops and masks, the isolated every-frame SAM worker, source conversion, paid scale-4 base decode with its saved ticks compared, both W1 half-resolution streams decoded with the encoder job hashes, composite, YOLO11x-pose on source/hybrid/anchors, flow residuals, racket measure and both clips.'},
+            'full': {'seconds': 2600}, 'validator': ['{python}', '-m', 'experiments.tennis.w6', 'validate-post'], 'validator_seconds': 120,
+            'budget_seconds': 4200, 'stall_seconds': 900.0, 'deadline': deadline(12), **shared(basis, 4096)}
 
 
 def main() -> None:
@@ -127,13 +111,11 @@ def main() -> None:
     kind, rest = sys.argv[2], sys.argv[3:]
     specs: dict[str, dict[str, Any]]
     if kind == 'generate':
-        specs = {f'generate-{i}': generate(u) for i, u in enumerate(UNITS)}
-    elif kind == 'masks':
-        specs = {'masks': masks(rest)}
-    elif kind == 'judge':
-        specs = {'judge': judge(rest[:-1], rest[-1])}
+        specs = {'generate': generate(','.join(UNITS))}
+    elif kind == 'post':
+        specs = {'post': post(rest)}
     else:
-        raise SystemExit('kind: generate | masks | judge')
+        raise SystemExit('kind: generate | post')
     for name, spec in specs.items():
         (out / f'{name}.json').write_text(json.dumps(spec, indent=1) + '\n')
         print(out / f'{name}.json')

@@ -400,7 +400,7 @@ def command_judge(a: argparse.Namespace) -> int:
     generated = load_generated([str(p) for p in a.generated], scratch / "generated")
     crops = {u: g for (u, _), g in generated.items()}
     unit_names = [u["name"] for u in wire["units"]]
-    masks_root = extract_all(a.masks, scratch / "masks") / "publish"
+    masks_root = a.masks_dir if a.masks_dir is not None else extract_all(a.masks, scratch / "masks") / "publish"
     predicted_masks = {}
     for i, name in enumerate(unit_names):
         with np.load(masks_root / f"{name}-masks.npz") as z:
@@ -520,7 +520,7 @@ def command_judge(a: argparse.Namespace) -> int:
                "tools": {"dav1d": tool_version(["dav1d", "--version"]), "ffmpeg": tool_version(["ffmpeg", "-version"])},
                "pose": poses.record(), "gpu": torch.cuda.get_device_name(0), "device": device_record(a.gpu_class),
                "gpu_peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 3), "seconds": round(time.monotonic() - began, 1),
-               "inputs": {k: digest(getattr(a, k)) for k in ("al", "transport", "anchor", "base", "gpu_base", "encode_half", "pose", "masks")},
+               "inputs": {k: digest(getattr(a, k)) for k in ("al", "transport", "anchor", "base", "gpu_base", "encode_half", "pose", "masks") if getattr(a, k) is not None},
                "judges_sha256": digest(publish / "judges.npz"), "clips": sorted(p.name for p in clip_dir.glob("*.mp4")) if a.clips else []}
     (publish / "w6-judge.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
     stage = Path(os.environ["PS_STAGE_DIR"])
@@ -528,6 +528,18 @@ def command_judge(a: argparse.Namespace) -> int:
         tar.add(publish, arcname="publish")
     (stage / "w6-judge.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
     return 0
+
+
+def command_post(a: argparse.Namespace) -> int:
+    """Receiver masks on the regenerated crops, then the judges, in one job; the smoke's frame count limits both."""
+    a.judged = a.frames
+    a.source = a.al
+    a.masks = None
+    code = command_masks(a)
+    if code:
+        return code
+    a.masks_dir = Path(os.environ["PS_SCRATCH_DIR"]) / "publish"
+    return command_judge(a)
 
 
 def validate_judge() -> dict[str, bool]:
@@ -639,14 +651,25 @@ def main(argv: list[str] | None = None) -> int:
     m.add_argument("--generated", type=Path, action="append", required=True)
     m.add_argument("--judged", type=int, default=0)
     j = sub.add_parser("judge")
-    for name in ("al", "transport", "anchor", "base", "gpu_base", "encode_half", "pose", "masks"):
+    for name in ("al", "transport", "anchor", "base", "gpu_base", "encode_half", "pose"):
         j.add_argument("--" + name.replace("_", "-"), type=Path, required=True, dest=name)
+    j.add_argument("--masks", type=Path, required=True)
     j.add_argument("--generated", type=Path, action="append", required=True)
     j.add_argument("--frames", type=int, default=0)
     j.add_argument("--clips", action="store_true")
     j.add_argument("--clip-anchor", default="svt_crf66")
     j.add_argument("--gpu-class", default="RTX")
-    for name in ("validate-generate", "validate-masks", "validate-judge"):
+    j.set_defaults(masks_dir=None)
+    # post: receiver masks and then the judges, in one job (the inputs are staged once)
+    q = sub.add_parser("post")
+    for name in ("al", "transport", "anchor", "base", "gpu_base", "encode_half", "pose", "old_generated", "old_masks", "weights"):
+        q.add_argument("--" + name.replace("_", "-"), type=Path, required=True, dest=name)
+    q.add_argument("--generated", type=Path, action="append", required=True)
+    q.add_argument("--frames", type=int, default=0)
+    q.add_argument("--clips", action="store_true")
+    q.add_argument("--clip-anchor", default="svt_crf66")
+    q.add_argument("--gpu-class", default="RTX")
+    for name in ("validate-generate", "validate-masks", "validate-judge", "validate-post"):
         sub.add_parser(name)
     r = sub.add_parser("report")
     r.add_argument("judges", type=Path)
@@ -656,10 +679,13 @@ def main(argv: list[str] | None = None) -> int:
         return command_masks(a)
     if a.command == "judge":
         return command_judge(a)
+    if a.command == "post":
+        return command_post(a)
     if a.command == "report":
         print(json.dumps(report(a.judges, a.summary), indent=1))
         return 0
-    checks = {"validate-generate": validate_generate, "validate-masks": validate_masks, "validate-judge": validate_judge}[a.command]()
+    checks = {"validate-generate": validate_generate, "validate-masks": validate_masks, "validate-judge": validate_judge,
+              "validate-post": lambda: {**validate_masks(), **validate_judge()}}[a.command]()
     result = {"passed": all(checks.values()), "checks": checks}
     if target := os.environ.get("PS_VALIDATION_PATH"):
         Path(target).write_text(json.dumps(result, indent=1) + "\n")

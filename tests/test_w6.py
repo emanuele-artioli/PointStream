@@ -82,23 +82,21 @@ def test_keep_row_keeps_ticks_smokes_and_keep_all() -> None:
 
 
 def test_generate_spec_keeps_the_frozen_recipe_and_adds_keep_all() -> None:
-    spec = w6_specs.generate(w6_specs.UNITS[0])
+    spec = w6_specs.generate(",".join(w6_specs.UNITS))
     args = spec["arguments"]
     assert args[0] == "generate" and args[-1] == "--keep-all"
-    assert args[args.index("--units") + 1] == w6_specs.UNITS[0]
+    assert args[args.index("--units") + 1] == ",".join(w6_specs.UNITS)
     assert args[args.index("--steps") + 1] == "30" and args[args.index("--from-t") + 1] == "0"
     assert args[args.index("--cfg") + 2] == "2.0" and "{frames}" in args
     assert spec["scale"]["frames"] == {"smoke": 8, "full": 0}
     assert spec["gpu_models"] == ["RTX A6000"] and spec["hosts"] == ["gpu3"] and spec["smoke"]["seconds"] <= 600
-    assert args[args.index("--gpu-class") + 1] == "RTX A6000"
-    names = {x["name"] for x in spec["staged_inputs"]}
-    assert all(f"{{staged:{n}}}" in args or n.startswith("w") for n in names)
+    assert args[args.index("--gpu-class") + 1] == "RTX A6000" and spec["full"]["seconds"] <= 2700
 
 
-def test_masks_and_judge_specs_pin_every_staged_input() -> None:
-    gens = [f"/d/g{i}/published.tar@{'a' * 63}{i}" for i in range(2)]
-    spec = w6_specs.masks(gens)
-    assert len(spec["staged_inputs"]) == len(spec["inputs"]) and spec["arguments"].count("--generated") == 2
-    judge = w6_specs.judge(gens, f"/d/m/published.tar@{'b' * 64}")
-    assert judge["scale"]["frames"]["full"] == 240 and "--clips" in judge["arguments"]
-    assert all(len(x["sha256"]) == 64 for x in judge["staged_inputs"] if x["name"] != "weights")
+def test_post_spec_stages_every_input_once_and_pins_it() -> None:
+    gens = [f"/d/g/published.tar@{'a' * 64}"]
+    spec = w6_specs.post(gens)
+    assert spec["arguments"][0] == "post" and "--clips" in spec["arguments"]
+    assert len(spec["staged_inputs"]) == len(spec["inputs"]) and spec["scale"]["frames"]["full"] == 240
+    assert all(len(x["sha256"]) == 64 for x in spec["staged_inputs"])
+    assert spec["full"]["seconds"] <= 2700 and spec["smoke"]["seconds"] <= 600
