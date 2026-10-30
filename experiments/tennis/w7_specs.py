@@ -330,6 +330,12 @@ def first_window(argv: list[str]) -> None:
         spec = anchors(first, confirm, ups['inputs'], source)
     elif stage == 'prepare':
         spec = prepare(first, confirm, ups['inputs'], ups['anchor'], source)
+    elif stage == 'generate':
+        spec = generate(first, confirm, ups['prepared'], ups['units'][0].split(','))
+    elif stage == 'rate-transport':
+        spec = rate_transport([first], windows_ref, [ups['anchor']], [ups['prepared']], 1)
+    elif stage == 'rgb-diagnostic':
+        spec = rgb_diagnostic([first], windows_ref, ups['base'], 24)
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:
