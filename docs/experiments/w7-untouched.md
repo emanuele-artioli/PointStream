@@ -238,3 +238,7 @@ foreground-first claim.
 - anchors (K6 run, GPU): `20261030T144525Z-de7adcd2` submitted.
 - anchors: `20261030T144525Z-de7adcd2` complete on gpu6 Ada, smoke 136.4 s + full 596.9 s GPU; `full/published.tar` sha256 `18e7294f7ca82ce4e118ced88bf9ee31690d23f862809f986f5003c36da291f8`; full output rechecked by hand (`k6b_confirm_run --validate-only`): 20 checks passed. GPU total so far 1,197 s of 4,680 s.
 - prepare (CPU): `20261030T150213Z-99604e48` submitted. rgb diagnostic (GPU, A6000 gpu3/gpu2): `20261030T150335Z-9e58b2cc` submitted in parallel (needs only the native base).
+- prepare: `20261030T150213Z-99604e48` complete (CPU, gpu6; smoke 27.8 s, full 26.5 s); `full/published.tar` sha256 `e30c6d97a6a8406f85bcc6c6928d9b7fb21ddf8280ad25a629f78f178478cfdb`; units
+  `alcaraz_hurkacz__028_at120__person_000000000006` and `…000000000004`; full output rechecked by hand: 14 checks passed.
+- generation (GPU, Ada): `20261030T150651Z-a58b2ce2` submitted (every-third-frame recipe; 2 units, adapter ah-C, C base). rate transport (CPU): `20261030T150852Z-d4e7cd41` submitted
+  (first attempt refused by the client: a spec needs a named scale parameter; fixed by passing the ignored `--max-windows {windows}`).
