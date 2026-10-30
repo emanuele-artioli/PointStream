@@ -353,5 +353,5 @@ foreground-first claim.
   time but not GPU seconds.
 - Where the fleet smoke is the cost: a successful smoke costs about 650 s per window (163 + 136 + 92 + 18.5 + 104 + 34 + 106). Stages that take several windows (`features`, `anchors`, `prepare`, `receiver`, `judge`, `native_base`,
   `rgb_diagnostic`, `rate_transport`; not the `w1_*` stages, which take one window) pay it once per job instead of per window; batching the five windows by stage (anchors in 2 + 3 and generation per window to stay inside
-  the 2,600 s stage cap) would save about 4 x 540 = 2,200 s, i.e. about 6.6 GPU-h for the five instead of 6.0 + smokes already counted above (the figures above already assume one smoke per window, so batching is pure saving).
-- Validators and code paths fixed on this window (all merged into this branch) were the main one-off cost: 1,300 s of GPU went to failed smokes and the crashed receiver full stage.
+  the 2,600 s stage cap) would save about 4 x 540 = 2,200 s, i.e. the five windows would cost about 19,400 s (5.4 GPU-h) instead of 21,610 s.
+- Validators and code paths fixed on this window (all merged into this branch) were the main one-off cost: about 1,100 s of GPU (145 + 95 + 520 + 3 + 347) went to failed smokes and the crashed receiver full stage.
