@@ -96,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
         command = json.loads((stage / 'dispatch.json').read_text())['command']
         names = [command[i + 1] for i, c in enumerate(command) if c == '--window']
         value = lambda flag: command[command.index(flag) + 1]  # noqa: E731
-        again = compute(value('--transport'), value('--base'), value('--windows-file'), names)
+        again = json.loads(json.dumps(compute(value('--transport'), value('--base'), value('--windows-file'), names)))  # as written: string keys
         got = {'rates': json.loads((stage / 'rates.json').read_text()), 'window_state': json.loads((stage / 'window-state.json').read_text())}
         checks = {'rates_recomputed': got['rates'] == again['rates'], 'state_recomputed': got['window_state'] == again['window_state'],
                   'one_per_window': len(got['rates']) == len(names) == len(got['window_state']),
