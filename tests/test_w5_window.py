@@ -90,6 +90,16 @@ def test_report_gives_one_outcome_per_anchor_family():
     assert {m[0] for m in rep.margins(analysis)} == {'s4_o0', 's4_o20'}
 
 
+def test_dcvc_med_points_bracket_the_hybrid_rates_and_do_not_dominate():
+    from experiments.tennis import w5_dcvc as dcvc
+
+    hybrid = {'lpips': {'whole': 0.4020, 'foreground': 0.3748}, 'dists': {'whole': 0.1866, 'foreground': 0.2529}}
+    out = dcvc.verdicts(hybrid, {'kps2': 40.2725, 'kps1': 42.5209, 'low': 5.0})
+    assert out['kps2']['verdict'] == {'lpips': False, 'dists': False}
+    assert out['kps1']['value']['foreground_lpips'] == pytest.approx(0.582, abs=1e-3)
+    assert out['low']['verdict'] is None  # below the first point: unresolved, never extrapolated
+
+
 def test_w5_specs_use_whole_argument_placeholders_and_staged_names():
     from experiments.tennis import w5_specs as specs
 

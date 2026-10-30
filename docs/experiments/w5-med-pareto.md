@@ -70,3 +70,50 @@ the decisions are in [experiments.md](../experiments.md). Context:
 - Step 1 result (Med hybrid, scale 4 method, 80 ticks; Al regression reproduces the recorded 0.2758/0.3459/0.1696/0.2526): whole LPIPS 0.4020, fg LPIPS 0.3748, whole DISTS 0.1866, fg DISTS 0.2529; its plain base 0.4066/0.6782/0.1992/0.4427. Rates: 42.5209 kbps (KPS1), 40.2725 kbps (KPS2, primary). The player gain over the plain base is large (fg LPIPS -0.30), the whole-frame gain small (-0.005 LPIPS, -0.0126 DISTS).
 - Scoring job spec `docs/experiments/w5-specs/score.json` (gpu3 A6000, 80 ticks, step 1 archive as the hybrid input, controls re-scored and compared with the step 1 archive within 1e-4).
 - Scoring job `20261030T075339Z-428285e7` stayed pending for ~2 h (gpu3 only; 8000 MiB + 8192 MiB margin; no worker admitted it) and was cancelled by me before it started. Resubmitted with the judge's admission shape: margin 4096 MiB and hosts gpu3 and gpu2 (both A6000; the scorer requires an A6000). No scientific change.
+
+### 2026-10-30 — W5 outcome: A for both SVT families and for DCVC-UF, at both rates
+- Scoring job `20261030T091552Z-fe376abe` (gpu2, RTX A6000, COMPLETE, validator passed; ready.json git_head
+  `c27a5842`, whose scoring code equals `3ad7a1cc`'s; the earlier `20261030T075339Z-428285e7` was cancelled
+  unstarted). 80 ticks; the three plain CRF 63 controls reproduce the step 1 archive to 1.9e-5 (limit 1e-4).
+  Worker 676 s on a contended GPU. Summary `docs/experiments/w5-specs/score-summary.json`; table by
+  `python -m experiments.tennis.w5_report`.
+- Hybrid (Med 014@194, scale 4 paid base 34.140 kbps + side; job `20261030T072024Z-10c9606e`; the Al row of the
+  same job reproduces the recorded means): whole LPIPS 0.4020, fg LPIPS 0.3748, whole DISTS 0.1866, fg DISTS
+  0.2529; rate 40.2725 kbps (KPS2, primary), 42.5209 kbps (KPS1). Its plain base: 0.4066 / 0.6782 / 0.1992 / 0.4427.
+- Anchors at the primary rate, relative to the hybrid (positive = worse than the hybrid):
+
+| policy | LPIPS whole | LPIPS fg | DISTS whole | DISTS fg |
+|---|---:|---:|---:|---:|
+| half plain | -0.117 | +0.232 | -0.046 | +0.185 |
+| half +20 outside | unresolved (lowest rate 41.76 > 40.27) | | | |
+| half +40 outside | -0.084 | +0.231 | -0.027 | +0.175 |
+| quarter plain | -0.004 | +0.273 | +0.005 | +0.160 |
+| quarter +20 outside | +0.005 | +0.298 | +0.014 | +0.184 |
+| quarter +40 outside | +0.008 | +0.290 | +0.015 | +0.175 |
+
+  At the KPS1 rate all six policies are resolved and the picture is the same (foreground +0.15 to +0.29 worse).
+- Verdict by the frozen rule (dominance needs whole AND fg within +0.001): **A. No policy dominates on LPIPS or
+  DISTS, in the half family or the quarter family, at the KPS2 primary rate or at the KPS1 rate.** Half
+  resolution wins the whole frame (LPIPS -0.12, DISTS -0.05) but is 0.23 / 0.19 worse on the players; quarter
+  ties the hybrid on the whole frame (the hybrid adds only -0.004 LPIPS and -0.013 DISTS to its own base) and is
+  0.27 / 0.16 worse on the players. The best foreground a quarter policy reaches at the hybrid's whole LPIPS is
+  0.659 against 0.375; the half family cannot reach the hybrid's whole score at the rate range, so that figure is
+  undefined there.
+- DCVC-UF (W3b Med scale 4 points QP15/36/63 at 12.77/35.81/130.82 kbps; `experiments/tennis/w5_dcvc.py`): the
+  hybrid's rates lie between QP36 and QP63 (interpolation weight 0.09-0.10 on QP63; the curve in between is
+  unmeasured). At 40.27 kbps: whole LPIPS 0.398 / DISTS 0.192, fg 0.585 / 0.346; at 42.52: 0.398 / 0.191, 0.582 /
+  0.345. **Outcome A for DCVC at both rates**: marginally better on the whole frame in LPIPS (-0.004), worse in
+  DISTS (+0.005), far worse on the players (fg +0.21 LPIPS, +0.09 DISTS). Caveat: the bracket spans 3.7x in
+  rate; the whole-frame difference is within what a measured point near 40 kbps could change, the foreground gap
+  is not.
+- Hypothesis check: the hybrid's player gain over its base is larger than on Al (fg LPIPS 0.678 -> 0.375, -0.30,
+  against 0.683 -> 0.346 on Al, similar), the whole-frame cost is small, and half-resolution SVT is a whole-frame
+  win as on Al. The competing explanation (plain half-resolution SVT dominates at 50 fps) is rejected: it loses
+  the player region by about 0.2.
+- Scope: Med is a development window (no untouched-test claim); rates are the optimistic floor of the real-base
+  report (tensor bootstrap and framing unmeasured); the +20/+40 convention is W1's outside-R one; the grid is
+  plain and +20/+40 at half and quarter (no full resolution).
+- GPU-seconds (claims, approximate): failed judge full stage 814, judge 816 s worker plus smoke (about 1000 in
+  all), scoring 676 s worker plus smoke (about 900), about 2.7k of 5.4k; the encodes are CPU jobs.
+- Visual material: `/local/users/emanuele/pointstream/w5-visual` on gpu2 (README inside): the four plain SVT
+  streams nearest the hybrid's rate. The judge does not save hybrid frames (hashes only); they need a re-run.
