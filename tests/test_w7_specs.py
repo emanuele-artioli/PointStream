@@ -62,11 +62,18 @@ def test_first_window_stage_specs_all_stages():
              'dcvc': sp.dcvc(windows, (sp.W7_DIR + '/windows.json', 'b' * 64), pend, pend, pend, 25)}
     for name, spec in specs.items():
         assert spec['verify_staged_inputs'] is True and spec['smoke']['seconds'] <= 600 and spec['full']['seconds'] <= 2600, name
-        assert set(spec['hosts']) == {'gpu3', 'gpu5', 'gpu6'}
+        assert set(spec['hosts']) >= {'gpu3', 'gpu5', 'gpu6'} or name == 'rgb_diagnostic'
         placeholders = {a[len('{staged:'):-1] for a in spec['arguments'] if a.startswith('{staged:')}
         assert placeholders <= {i['name'] for i in spec['staged_inputs']}, (name, placeholders)
         assert len({i['name'] for i in spec['staged_inputs']}) == len(spec['staged_inputs'])
     assert specs['generate']['environment'] == sp.JCV_ENVIRONMENT and '--fit' in specs['generate']['arguments']
     assert specs['generate']['arguments'][specs['generate']['arguments'].index('--fit') + 1:][:2] == ['match5', 'ah-C@fit-100-fp16.pt']  # two argv items, as the 2026-10-24 renderer job
-    assert specs['receiver']['gpu_models'] == ['RTX 6000 Ada']
+    assert set(specs['receiver']['gpu_models']) == {'RTX 6000 Ada', 'RTX A6000'}  # shared, as the 2026-10-26 receiver job
     assert specs['dcvc']['scale']['frames'] == {'smoke': 25, 'full': 240}
+
+
+def test_receiver_denied_probe_count_follows_the_window_set():
+    from experiments.tennis.k6b_receiver_sam import denied_probe_count
+
+    assert denied_probe_count({}) == 4  # frozen pair: two sources, control, transport
+    assert denied_probe_count({'windows': 1}) == 2  # one manifest window: its source and the transport

@@ -382,6 +382,11 @@ def assessment(
     }
 
 
+def denied_probe_count(report: dict[str, Any]) -> int:
+    """Forbidden-read probes the predictor must fail: frozen pair = two sources, the control and the transport; manifest windows = their sources and the transport (no control)."""
+    return report["windows"] + 1 if "windows" in report else 4
+
+
 def validate(archive: Path, stage: str, *, independent_frames: bool = False) -> dict[str, Any]:
     from experiments.tennis.k4 import safe
 
@@ -395,7 +400,7 @@ def validate(archive: Path, stage: str, *, independent_frames: bool = False) -> 
             "four_units": len(r["prediction"]["runs"][0]["rows"]) == 2 * r.get("windows", 2),
             "on_cuda": all(x["on_cuda"] for x in r["prediction"]["runs"]),
             "denied_reads": all(
-                all(x["denied_reads"].values()) and len(x["denied_reads"]) == 4
+                all(x["denied_reads"].values()) and len(x["denied_reads"]) == denied_probe_count(r)
                 for x in r["prediction"]["runs"]
             ),
             "two_windows": len(r["rows"]) == r.get("windows", 2),
