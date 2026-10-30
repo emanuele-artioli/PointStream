@@ -27,6 +27,8 @@ from pathlib import Path
 LIMIT_LINES = 1000
 LOG_LIMIT_LINES = 300
 LOG_SUFFIXES = {".log", ".out", ".err"}
+# The Read tool shows these as images or pages, not as text lines.
+MEDIA_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".pdf"}
 PRINTERS = {"cat", "less", "more", "bat"}
 DELEGATE_HINT = (
     " If you need more than a few facts from it, brief a runner or builder subagent "
@@ -104,6 +106,8 @@ def _block(payload: dict) -> str | None:
         if data.get("limit") is not None or not data.get("file_path"):
             return None
         path = Path(data["file_path"])
+        if path.suffix.lower() in MEDIA_SUFFIXES:
+            return None
         lines = too_long(path)
         return advice(path, lines) if lines is not None else None
     if tool == "Bash":
