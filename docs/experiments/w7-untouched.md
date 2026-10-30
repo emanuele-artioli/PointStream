@@ -316,3 +316,5 @@ foreground-first claim.
   Third round: masks `20261030T193203Z-878a0fb9`, encode half `20261030T193323Z-20cc826d`, quarter `20261030T193510Z-affda602`, half outside-R `20261030T193631Z-b4cda4e7`, quarter outside-R `20261030T193750Z-1da1280c`.
 - W1 masks (CPU): `20261030T193203Z-878a0fb9` complete on gpu6. The four encode jobs of that round failed their smoke validator only (`KeyError: 'al028'`: `w1_encode.validate` did not register the manifest window; fixed with
   `w1_roi.preload_from_spec`; the corrected validator passes all 10 checks on a smoke output). 0 GPU s. Fourth round of encodes follows.
+- W1 masks `20261030T193203Z-878a0fb9`: `full/published.tar` sha256 `39b061484dee4d2adfac0f17f3cc84ea8c803756e2cbc8e8508d146d889786c7`; `w1_masks --validate` on the full output: 8 checks passed (full: 80 ticks).
+  Encodes, fourth round: half (plain + controls) `20261030T194352Z-c8a65737`, quarter `20261030T194520Z-f1e8f664`, half outside-R `20261030T194640Z-cefe70d1`, quarter outside-R `20261030T194800Z-92e26eca`.
