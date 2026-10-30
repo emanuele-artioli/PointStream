@@ -160,7 +160,7 @@ def features(first: wm.WindowSpec, manifest: tuple[str, str], source: tuple[str,
     return gpu_stage('experiments.tennis.k6b_confirm', args, {'manifest': manifest, **assets('sam', 'yolo11x_pose'), 'c0': source},
                      models=['RTX 6000 Ada'], mem_mib=32000, threads=8, smoke_seconds=600, full_seconds=1800,
                      scale={'windows': {'smoke': 1, 'full': 0}}, basis='The first window with the full 240-frame decode; the smallest grid the stage supports is one whole window.',
-                     validator=['{python}', '-m', 'experiments.tennis.k6b_confirm', 'validate-features', '--manifest', '{staged:manifest}'])
+                     validator=['{python}', '-m', 'experiments.tennis.k6b_confirm', 'validate-features', '--manifest', manifest[0]])  # the validator gets no placeholder expansion
 
 
 def build_inputs(first: wm.WindowSpec, confirm: tuple[str, str], features_archive: tuple[str, str]) -> dict[str, Any]:
