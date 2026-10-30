@@ -198,6 +198,22 @@ def compact_decode(report: dict[str, Any]) -> dict[str, Any]:
                         'first_frame_sha256': p['frame_sha256'][0]} for p in report['passes']]}
 
 
+def probe_rate_kbps(a: argparse.Namespace, source: Path, work: Path, fps: int, point: dict[str, Any]) -> float:
+    """Rate of one encode of all 240 frames (encoder only: no decode, no scoring), to turn the 25-frame calibration estimates into 240-frame predictions."""
+    from experiments.tennis.k6 import downscaled_source
+
+    scale, qp = point['scale'], point['qp']
+    width, height = SCALES[scale]
+    pdir = work / f'probe-s{scale}-q{qp}'
+    pdir.mkdir()
+    raw = downscaled_source(source, NATIVE_FRAMES, scale, pdir / 'input.yuv')
+    plan = {**base_plan(a, width, height, NATIVE_FRAMES, raw), 'qp': qp, 'container': str(pdir / 'stream.psdc'), 'i_recon_file': str(pdir / 'i_recon.yuv')}
+    run_worker('encode', plan, pdir, 'encode', 900)
+    kbps = (pdir / 'stream.psdc').stat().st_size * 8 * fps / NATIVE_FRAMES / 1000
+    shutil.rmtree(pdir)
+    return kbps
+
+
 def code_point(a: argparse.Namespace, source: Path, work: Path, fps: int, n: int, point: dict[str, Any]) -> dict[str, Any]:
     """Encode one point, decode its file in two separate processes; acceptance (a) and (b) of the deviation."""
     from experiments.tennis.k6 import downscaled_source
@@ -374,6 +390,7 @@ def run_window(a: argparse.Namespace, key: str, ctx: dict[str, Any]) -> dict[str
     out = ctx['publish'] / key
     out.mkdir()
     timings: dict[str, float] = {}
+    bracket_info: dict[str, Any] | None = None
     started = time.monotonic()
     full = work / 'source-full.yuv'
     subprocess.run(convert_command('ffmpeg', getattr(a, key), full, spec['start'], NATIVE_FRAMES), check=True, capture_output=True, timeout=300)
@@ -386,6 +403,16 @@ def run_window(a: argparse.Namespace, key: str, ctx: dict[str, Any]) -> dict[str
         candidates: list[dict[str, Any]] = []
         chosen = [{'scale': scale, 'qp': qp, 'target_kbps': None, 'est_kbps': None}
                   for scale, qp in parse_point_list(a.point_list)[key]]
+    elif a.bracket:
+        # Rates measured at 240 frames, not the 15/30/60 kbps targets: one encode-only probe gives the measured/estimated ratio,
+        # then the points are the two scale-2 candidates whose predicted rates bracket [low, high] (rate alone; no quality is read).
+        low, high = a.bracket
+        candidates, _ = calibrate_candidates(a, full, work, fps)
+        probe = an.probe_candidate(candidates, 2, low, high)
+        ratio = probe_rate_kbps(a, full, work, fps, probe) / probe['est_kbps']
+        chosen = [{**c, 'target_kbps': None} for c in an.select_bracketing(candidates, ratio, low, high)]
+        bracket_info = {'low': low, 'high': high, 'probe': {'scale': probe['scale'], 'qp': probe['qp']}, 'ratio': ratio,
+                        'predicted': {f"{c['scale']}:{c['qp']}": c['pred_kbps'] for c in chosen}, 'holds': an.bracket_holds(chosen, low, high)}
     else:
         candidates, _ = calibrate_candidates(a, full, work, fps)
         chosen = an.select_points(candidates, a.points)
@@ -393,7 +420,8 @@ def run_window(a: argparse.Namespace, key: str, ctx: dict[str, Any]) -> dict[str
     write(out / 'candidates.json', {'candidates': candidates, 'chosen': chosen, 'cal_frames': CAL_FRAMES, 'cal_qps': list(CAL_QPS)})
     result: dict[str, Any] = {'window': key, 'wid': spec['wid'], 'fps': fps, 'frames': n, 'ticks': ticks,
                               'candidates': candidates, 'chosen': chosen, 'dcvc': [], 'svt': [], 'accepted': True,
-                              'bracket_ok': None if a.point_list else an.planned_bracket(candidates)}
+                              'bracket_ok': None if a.point_list else (bracket_info['holds'] if bracket_info else an.planned_bracket(candidates)),
+                              'bracket': bracket_info}
     source = full if n == NATIVE_FRAMES else work / 'source.yuv'
     if n != NATIVE_FRAMES:
         with full.open('rb') as src, source.open('wb') as dst:
@@ -597,7 +625,7 @@ def run(a: argparse.Namespace) -> None:
         if not result['accepted']:
             break
     seconds = time.monotonic() - began
-    summary = {'frames': a.frames, 'points': a.points, 'point_list': a.point_list, 'svt_scales': ctx['svt_scales'], 'gpu': name, 'gpu_class': gpu_class,
+    summary = {'frames': a.frames, 'points': a.points, 'point_list': a.point_list, 'bracket': a.bracket, 'svt_scales': ctx['svt_scales'], 'gpu': name, 'gpu_class': gpu_class,
                'capability': capability, 'gpu_uuid': uuid, 'tools': tools, 'torch': torch.__version__,
                'accepted': all(r['accepted'] for r in results) and len(results) == len(SOURCES), 'windows': results,
                'setup_seconds': setup, 'seconds': seconds, **summarize(results),
@@ -640,6 +668,16 @@ def validate() -> None:
             'points_as_named': all([(p['scale'], p['qp']) for p in w['chosen']] == plan[w['window']] for w in windows),
             'smoke_points_in_full_plan': all(pt in full_plan[w] for w, pts in smoke_plan.items() for pt in pts),
             'no_calibration': all(not w['candidates'] and w['bracket_ok'] is None for w in windows)}
+    elif summary.get('bracket'):
+        low, high = summary['bracket']
+        full_stage = summary['frames'] == NATIVE_FRAMES
+        projection = 0.0  # the bracket run's cost is checked against the reservation by the fleet's deadline, not projected here
+        selection = {
+            'smoke_scale': summary['frames'] == (NATIVE_FRAMES if full_stage else CAL_FRAMES),
+            'rate_only_selection': all(len(w['candidates']) == len(CAL_QPS) * len(SCALES) and 1 <= len(w['chosen']) <= 2 for w in windows),
+            'ratio_measured_at_240_frames': all(w['bracket']['ratio'] > 0 and w['bracket']['probe']['scale'] == 2 for w in windows),
+            'predicted_bracket': all(w['bracket']['holds'] for w in windows),
+            'measured_bracket': (not full_stage) or all(an.bracket_holds(w['dcvc'], low, high, 'kbps') for w in windows)}
     else:
         timings = {'setup': summary['setup_seconds'] + sum(w['timings']['convert'] for w in windows) / 2,
                    'calibration': sum(w['timings']['calibration'] for w in windows),
@@ -693,6 +731,7 @@ def main() -> None:
     parser.add_argument('--frames', type=int, choices=(25, 240), default=25)
     parser.add_argument('--points', type=int, choices=(1, 3), default=1)
     parser.add_argument('--svt-scales', default='8')
+    parser.add_argument('--bracket', type=float, nargs=2, metavar=('LOW', 'HIGH'), default=None, help='choose two scale-2 points on predicted 240-frame rates bracketing [LOW, HIGH] kbps (the hybrid\'s KPS2 and KPS1 rates)')
     parser.add_argument('--point-list', default=None, help='W3b: window:scale:qp,... instead of the calibrated points')
     parser.add_argument('--windows-file', type=Path, help='window manifest instead of the frozen Al/Med pair (then --window/--source per window; '
                         '--anchor, --transport and --prior-frame (the receiver stage result of these windows) are required but not hash-pinned; --prior-quality is not used)')

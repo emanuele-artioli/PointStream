@@ -133,3 +133,16 @@ def test_dcvc_spec_meets_the_w3_validator_caps():
     pend = (sp.W7_DIR + '/x.tar', sp.PENDING)
     spec = sp.dcvc(windows, (sp.W7_DIR + '/windows.json', 'b' * 64), pend, pend, pend, 25)
     assert spec['budget_seconds'] <= 3300 and spec['hosts'] == ['gpu5', 'gpu6'] and spec['gpu_models'] == ['RTX 6000 Ada']
+
+
+def test_dcvc_spec_modes_calibrated_named_and_bracketing():
+    windows = wm.from_selection(json.loads(SELECTION.read_text()))
+    pend = (sp.W7_DIR + '/x.tar', sp.PENDING)
+    man = (sp.W7_DIR + '/windows.json', 'b' * 64)
+    calibrated = sp.dcvc(windows, man, pend, pend, pend, 25)
+    assert '--points' in calibrated['arguments'] and 'points' in calibrated['scale']
+    named = sp.dcvc(windows, man, pend, pend, pend, 25, ('al028:2:24', 'al028:2:24,al028:2:30'))
+    assert '--point-list' in named['arguments'] and named['scale']['svt_scales']['full'] == '8'
+    bracket = sp.dcvc(windows, man, pend, pend, pend, 25, None, (18.46, 19.68))
+    i = bracket['arguments'].index('--bracket')
+    assert bracket['arguments'][i + 1:i + 3] == ['18.46', '19.68'] and '--points' not in bracket['arguments'] and 'points' not in bracket['scale']

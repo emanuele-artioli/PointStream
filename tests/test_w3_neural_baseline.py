@@ -528,3 +528,33 @@ def test_run_window_stops_at_a_rejected_point_without_checkpointing_it(tmp_path,
     result, out = run(tmp_path / 'run', checkpoint)
     assert not result['accepted'] and result['stopped_at'] == {'scale': 2, 'qp': 23}
     assert [p.name for p in checkpoint.iterdir()] == ['al__dcvc-s2-q21'] and (out / 'result.json').exists()
+
+
+# Al 028 @ 0, scale 2 (job 20261030T214920Z-ea50a2cf): 25-frame calibration estimates and the measured 240-frame rates of QP 6 and QP 18.
+AL028_S2 = {0: 20.73, 6: 29.74, 12: 41.83, 18: 58.23, 24: 79.62, 30: 107.11, 36: 135.0, 42: 166.42, 48: 205.58, 56: 268.24, 63: 334.86}
+
+
+def _candidates():
+    return [{'scale': 2, 'qp': q, 'est_kbps': e} for q, e in AL028_S2.items()] + [{'scale': 8, 'qp': 30, 'est_kbps': 15.22}]
+
+
+def test_probe_candidate_targets_the_middle_of_the_bracket_with_the_typical_ratio():
+    probe = an.probe_candidate(_candidates(), 2, 18.46, 19.68)
+    assert probe['scale'] == 2 and probe['qp'] == 24  # 79.62 x 0.25 = 19.9 kbps, the closest to 19.1
+    with pytest.raises(ValueError):
+        an.probe_candidate(_candidates(), 4, 18.46, 19.68)
+
+
+def test_bracketing_points_use_rates_measured_at_240_frames_not_the_15_30_60_targets():
+    ratio = 14.572 / 58.23  # measured at QP 18
+    points = an.select_bracketing(_candidates(), ratio, 18.461, 19.682)
+    assert [(p['scale'], p['qp']) for p in points] == [(2, 18), (2, 30)] or [(p['scale'], p['qp']) for p in points] == [(2, 18), (2, 24)]
+    assert an.bracket_holds(points, 18.461, 19.682)
+    # with the old 15/30/60 kbps rule the same table would have chosen estimates (58 kbps -> 14.6 kbps measured): never above the hybrid's rate
+    old = an.select_points([c for c in _candidates() if c['scale'] == 2], 3)
+    assert max(c['est_kbps'] * ratio for c in old) < 19.682
+    # no candidate above the high end: the pair is not a bracket and says so
+    low_only = an.select_bracketing([c for c in _candidates() if c['qp'] <= 18], ratio, 18.461, 19.682)
+    assert not an.bracket_holds(low_only, 18.461, 19.682)
+    with pytest.raises(ValueError):
+        an.select_bracketing(_candidates(), 0.0, 18.4, 19.7)
