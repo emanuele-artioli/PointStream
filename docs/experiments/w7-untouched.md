@@ -282,3 +282,4 @@ foreground-first claim.
 - rgb diagnostic: `20261030T181751Z-a498ddf7` complete on gpu2 (A6000, shared); smoke 18.5 s + full 107.5 s GPU; `full/published.tar` sha256 `ce6a92f875b9c7b48a3b8b516dccac46aad4dfe44d9622a4da330905c84232c6`;
   full output rechecked by hand (`--validate`, stage full): 12 checks passed. GPU total so far 3,789 s of 4,680 s (891 s left): the judge (smoke + full, estimate about 500 s) is submitted next;
   W1 scoring (estimate 681 s) and DCVC (245 s) cannot fit in what remains.
+- judge (compose + score, shared GPU): `20261030T184549Z-d9fe4272` submitted (first attempt refused by the client: a shared spec needs contention `continue`; fixed in the builder).
