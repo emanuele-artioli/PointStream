@@ -307,3 +307,4 @@ foreground-first claim.
 - W1 stages (CPU first), plan recorded before any W1 quality exists: the SVT anchors are searched on rate alone (`w1_encode` CRF search, W5 recipe: plain at half and quarter resolution, outside-R +20/+40 QP at both,
   240 frames) to bracket the hybrid's total rate at scale 4 with KPS2 as the primary side rate: target 18.461418333333334 kbps (the judge's `rates[scale 4].total_kbps`; no quality value is read by the searches).
   Start CRFs come from `window-state.json` (`7d1145b6`, sha256 `121dd9e1…0b5e`). The selected CRF pairs are copied here from the encode jobs' outputs before the scoring job is submitted.
+- W1 CPU jobs submitted: masks `20261030T190740Z-8890c377`, encode half (plain + controls) `20261030T190853Z-dc5b4815`, quarter `20261030T191012Z-2ddae924`, half outside-R `20261030T191136Z-93c95de1`, quarter outside-R `20261030T191258Z-54a3c17c`.
