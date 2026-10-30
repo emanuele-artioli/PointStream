@@ -304,3 +304,6 @@ foreground-first claim.
 - The first window's sub-budget rises from 1.3 to 1.5 GPU-h (5,400 s). Reason: it is also the smoke of the whole chain for the other five windows, so the one-off failures (validators written
   for the frozen pair, a crashed receiver full stage) are charged to it; the raise stays inside the user's 8 GPU-h Tier 1 card budget (user, 2026-10-30). GPU spent before this decision: about 4,109 s; 1,291 s remain.
   Order from here: W1 stages (CRFs chosen on rate alone before any quality is computed), then DCVC only if its smoke plus full fits in what is left; then a per-window projection for the other five.
+- W1 stages (CPU first), plan recorded before any W1 quality exists: the SVT anchors are searched on rate alone (`w1_encode` CRF search, W5 recipe: plain at half and quarter resolution, outside-R +20/+40 QP at both,
+  240 frames) to bracket the hybrid's total rate at scale 4 with KPS2 as the primary side rate: target 18.461418333333334 kbps (the judge's `rates[scale 4].total_kbps`; no quality value is read by the searches).
+  Start CRFs come from `window-state.json` (`7d1145b6`, sha256 `121dd9e1…0b5e`). The selected CRF pairs are copied here from the encode jobs' outputs before the scoring job is submitted.
