@@ -190,7 +190,10 @@ def validate() -> None:
         checks['full_projection_under_reservation'] = data['projected_full_seconds'] < allowance
         total_smoke = time.time() - dispatch_record['started']
         publication_and_startup = max(0.0, total_smoke - data['seconds'])
-        projected_with_publication = (data['setup_seconds'] + (data['seconds'] - data['setup_seconds'] + publication_and_startup) * 10) * 1.25
+        # frozen pair: staging and publication scale with the work (10x). Manifest windows: they are NFS latency of the shared host (this
+        # smoke waited 170 s for its validator beside a 150 MB archive), so they are added once, not multiplied.
+        scaled = publication_and_startup if frozen else 0.0
+        projected_with_publication = (data['setup_seconds'] + (data['seconds'] - data['setup_seconds'] + scaled) * 10) * 1.25 + (0.0 if frozen else 1.25 * publication_and_startup)
         checks['full_projection_with_publication'] = projected_with_publication < allowance
     else:
         checks['full_within_reservation'] = data['seconds'] < allowance

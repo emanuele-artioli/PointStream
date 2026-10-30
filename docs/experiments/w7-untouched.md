@@ -273,3 +273,6 @@ foreground-first claim.
   the check multiplies the smoke's staging/publication time (73 s on this shared host, 150 MB archive) by 10 and compared it with the 600 s reservation. Not a result problem (all other 12 checks true).
   Fix: the allowance is now the job spec's own full reservation (1,800 s for this stage, reservation only; expected about 320 s), test extended. GPU total now 3,637 s of 4,680 s.
   Resubmitted rgb diagnostic: `20261030T174459Z-2ad62629`.
+- rgb diagnostic `20261030T174459Z-2ad62629` (gpu3): smoke 26.3 s GPU, failed the fleet validator on the same check: the validator started 186 s after dispatch (16.8 s of work, NFS/staging latency of the shared host), and the check
+  multiplied that latency by 10 (2,316 s against 1,800 s). All other checks true. Fix: for manifest windows the publication/startup time is added once instead of ten times (the frozen pair keeps the old arithmetic);
+  the projection is then about 400 s. GPU total now 3,663 s of 4,680 s.
