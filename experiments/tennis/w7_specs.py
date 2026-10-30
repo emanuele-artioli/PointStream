@@ -250,10 +250,14 @@ def dcvc(windows: list[wm.WindowSpec], manifest: tuple[str, str], anchor: tuple[
             '--lpips', '{staged:lpips}', '--dists', '{staged:dists}', '--frames', '{frames}', '--points', '{points}', '--svt-scales', '{svt_scales}']
     files = {'windows': manifest, 'anchor': anchor, 'transport': transport, 'prior_frame': prior_frame,
              **assets('dcvc_image', 'dcvc_video', 'lpips', 'dists'), **{w.name: source_files(windows)[w.name] for w in chosen}}
-    return gpu_stage('experiments.tennis.w3_neural_baseline', args, files, models=['RTX 6000 Ada', 'RTX A6000'], mem_mib=12000, threads=4,
+    spec = gpu_stage('experiments.tennis.w3_neural_baseline', args, files, models=['RTX 6000 Ada'], mem_mib=12000, threads=4,
                      smoke_seconds=600, full_seconds=FULL_SECONDS,
                      scale={'frames': {'smoke': 25, 'full': 240}, 'points': {'smoke': 1, 'full': 3}, 'svt_scales': {'smoke': '8', 'full': '8,4,2'}},
                      basis='First window, 25 frames, one DCVC point and the scale 8 SVT base (the W3 smoke grid).')
+    basis = 'Rates and scores of saved decoded streams do not depend on wall time or foreign load; recorded seconds are cost only, never evidence'
+    spec['gpu_sharing'] = {'mode': 'shared', 'basis': basis, 'margin_mib': 8192}
+    spec['contention'] = {'policy': 'continue', 'basis': basis, 'resume_attempts': 0}
+    return spec
 
 
 def _first(windows: list[wm.WindowSpec], frames_or_smoke: bool) -> list[wm.WindowSpec]:
@@ -418,6 +422,8 @@ def first_window(argv: list[str]) -> None:
                               controls=kind == 'half', outside=kind.endswith('-out'))
     elif stage == 'w1-score':
         spec = w1_score_spec(first, windows_ref, ups['state'], ups['masks'], ups['hybrid'], [ups['encode_half'], *[v for k, v in sorted(ups.items()) if k.startswith('encode_x')]])
+    elif stage == 'dcvc':
+        spec = dcvc([first], windows_ref, ups['anchor'], ups['transport'], ups['prior_frame'], 25)
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:
