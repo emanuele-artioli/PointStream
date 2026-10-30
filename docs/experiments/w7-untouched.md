@@ -359,3 +359,4 @@ foreground-first claim.
 ### 2026-10-30 — W7 first-window sub-budget raised to 1.65 GPU-h; DCVC run (lead decision)
 - The first window's sub-budget rises from 1.5 to 1.65 GPU-h (5,940 s). Reason: the first-window DCVC run completes the window's anchor set (SVT half/quarter, outside-R and DCVC) and also smokes the DCVC chain for the other five
   windows. Projected Tier 1 total with the five windows batched by stage: about 7.4 of the 8 GPU-h card. GPU spent before this decision: 5,432 s; 508 s remain.
+- DCVC (GPU, Ada, shared): `20261030T213822Z-0acbf07b` submitted (first-window spec `w7_specs.dcvc`; calibrated points 15/30/60 kbps targets, SVT scales 8, 4, 2).

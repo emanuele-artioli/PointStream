@@ -62,7 +62,7 @@ def test_first_window_stage_specs_all_stages():
              'dcvc': sp.dcvc(windows, (sp.W7_DIR + '/windows.json', 'b' * 64), pend, pend, pend, 25)}
     for name, spec in specs.items():
         assert spec['verify_staged_inputs'] is True and spec['smoke']['seconds'] <= 600 and spec['full']['seconds'] <= 2600, name
-        assert set(spec['hosts']) >= {'gpu3', 'gpu5', 'gpu6'} or name == 'rgb_diagnostic'
+        assert set(spec['hosts']) >= {'gpu3', 'gpu5', 'gpu6'} or name in ('rgb_diagnostic', 'dcvc')
         placeholders = {a[len('{staged:'):-1] for a in spec['arguments'] if a.startswith('{staged:')}
         assert placeholders <= {i['name'] for i in spec['staged_inputs']}, (name, placeholders)
         assert len({i['name'] for i in spec['staged_inputs']}) == len(spec['staged_inputs'])
