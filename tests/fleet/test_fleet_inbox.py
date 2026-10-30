@@ -690,52 +690,6 @@ def test_management_routing_keeps_compute_pool_and_never_retries(tmp_path, monke
         inbox.load_config(tmp_path)
 
 
-def staged_verification_spec(tmp_path, monkeypatch):
-    from experiments.jobs import staging
-    source = tmp_path / 'data' / 'input.bin'
-    source.parent.mkdir()
-    source.write_bytes(b'original payload')
-    digest = inbox.file_digest(source)
-    root = tmp_path / 'local'
-    cached = root / 'cache' / digest / source.name
-    cached.parent.mkdir(parents=True)
-    cached.write_bytes(source.read_bytes())
-    monkeypatch.setattr(staging, 'local_root', lambda: root)
-    spec = {'inputs': [{'path': str(source), 'sha256': digest}],
-            'staged_inputs': [{'name': 'data', 'path': str(source), 'sha256': digest}],
-            'arguments': ['--input', '{staged:data}'], 'verify_staged_inputs': True}
-    return spec, source, cached
-
-
-def test_opt_in_verifies_consumed_cache_without_rehashing_nfs_source(tmp_path, monkeypatch):
-    spec, source, cached = staged_verification_spec(tmp_path, monkeypatch)
-    actual = inbox.file_digest
-    reads = []
-    def digest(path):
-        reads.append(path)
-        assert path != source, 'redundant canonical bytes reopened'
-        return actual(path)
-    monkeypatch.setattr(inbox, 'file_digest', digest)
-    inbox.verify_inputs(spec, source.parent)
-    assert reads == [cached]
-
-
-def test_opt_in_rejects_corrupt_cached_payload(tmp_path, monkeypatch):
-    spec, source, cached = staged_verification_spec(tmp_path, monkeypatch)
-    cached.write_bytes(b'corrupt payload')
-    with pytest.raises(fleet.FleetError, match='input identity changed'):
-        inbox.verify_inputs(spec, source.parent)
-
-
-def test_direct_input_never_defers_to_a_cache(tmp_path, monkeypatch):
-    spec, source, cached = staged_verification_spec(tmp_path, monkeypatch)
-    spec['arguments'].append(str(source))
-    source.write_bytes(b'changed direct input')
-    with pytest.raises(fleet.FleetError, match='input identity changed'):
-        inbox.verify_inputs(spec, source.parent, defer_staged=True)
-    assert cached.read_bytes() == b'original payload'
-
-
 def test_deferred_staged_payload_still_blocks_component_on_corruption(campaign, monkeypatch):
     from experiments.jobs import staging
     spec = monitor.read_json(campaign / 'spec.json')

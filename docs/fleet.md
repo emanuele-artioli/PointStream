@@ -340,6 +340,44 @@ they are inspected, not resubmitted.
   change keep their `source/` directory and run unchanged. Worker releases are
   still unpacked on NFS: eleven files, installed once per release.
 
+### Input verification
+
+Every byte a stage reads is hashed against its declared SHA256 by the campaign,
+right before that stage's command runs. Publication and admission only run
+bounded checks (2026-10-30). Before this, publication hashed every input over
+NFS on the management host, inside the client's 120 s SSH limit, and admission
+hashed them again inside the worker's scan. With NFS at ~8 MB/s on 2026-10-30,
+the 3.4 GB AnimateAnyone UNet alone took 429 s. Eleven W6 submissions timed out
+unpublished (`source.tar` and `events/`, no `spec.json` or `ready.json`).
+Admitting a job with 10.3 GB of inputs stalled the scan for 576 s on gpu5 and
+462 s on gpu6, so their heartbeats went stale and clients refused to submit
+("no fresh heartbeat").
+
+- **Publication and admission** require every file in `inputs`, `staged_inputs`
+  and `environment` to be a regular file under the data root. They hash files,
+  smallest first, while the total stays within 64 MiB (`PRECHECK_HASH_BYTES`), so
+  a wrong digest on a manifest still fails at submission. Hashing the rest is
+  left to the campaign. `ready.json` and the publish reply record `input_check`:
+  which paths were hashed, which were deferred, and how many bytes were deferred.
+  On gpu2, against the W6 generation job's 11 inputs (10.3 GB, plus a packed
+  environment): 10.4 s, with a cold or warm cache alike, since the check never
+  reads the cache.
+- **The campaign**, before each stage, hashes direct inputs on NFS
+  (`verify_inputs`). It hashes staged payloads and the environment in
+  `stage_inputs`, either as they stream into the host cache or from the cache
+  entry on a hit. A file changed after publication fails the stage before its
+  command starts (`campaign-error.json`: "input identity changed"). With
+  `verify_staged_inputs: true`, an input the command reads only through its
+  `{staged:NAME}` copy is hashed once, in staging. Without it, that input is
+  hashed on NFS and again in staging.
+- **Cost.** A cold copy into a host's cache now happens inside the job's budget,
+  not at admission. Neither stage `seconds` nor the 600 s smoke cap includes it.
+  At 8 MB/s, 8.2 GB takes about 17 minutes, so add that to `budget_seconds` for
+  a host whose cache is cold. A wrong digest on a large input now shows up as a
+  failed job after admission, not at submission.
+- Mixed releases are safe: an older publisher or worker only hashes more. Filling
+  the management host's cache by hand before submitting is no longer needed.
+
 ## GPU contention, partial outputs and checkpoints
 
 Exclusive admission requires an idle GPU, but another user can start a process on

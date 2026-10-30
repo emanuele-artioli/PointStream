@@ -38,6 +38,11 @@ POLL_SECONDS = 60
 SOURCE_ARCHIVE = "source.tar"
 WORKER_CAPABILITIES = ("source_archive",)
 SOURCE_EXTRACT_SECONDS = 300
+# Publication runs under the client's 120 s SSH limit and admission inside the
+# worker scan that also refreshes the heartbeat, so neither may stream large
+# inputs over NFS (8 MB/s on 2026-10-30: 429 s for one 3.4 GB UNet). They hash
+# at most this many bytes; the campaign hashes everything before each stage.
+PRECHECK_HASH_BYTES = 64 * 2**20
 
 
 def digest(value: Any) -> str:
@@ -359,34 +364,61 @@ def salvage(directory: Path, reason: str) -> int:
     return failed
 
 
-def verify_inputs(spec: dict[str, Any], data_root: Path, *, defer_staged: bool = False) -> None:
-    """Verify the exact consumed bytes; opt-in stages hash their staged payloads.
+def data_file(value: str, root: Path, label: str) -> Path:
+    path = Path(value).resolve()
+    if not path.is_relative_to(root) or not path.is_file():
+        raise fleet.FleetError(f"{label} must be a file under the external data root: {path}")
+    return path
 
-    Publication/admission checks hash or populate the verified local cache.
-    Campaigns may defer those hashes only to stage_inputs, which independently
-    hashes every payload before the component is invoked. Direct inputs retain
-    their original canonical-file checks.
+
+def precheck_inputs(spec: dict[str, Any], data_root: Path) -> dict[str, Any]:
+    """Bounded input checks for publication and admission; never a long read.
+
+    Every declared input, staged input and environment must be a file under the
+    data root. Files are hashed, smallest first, while their total stays within
+    PRECHECK_HASH_BYTES, so a wrong manifest digest still fails at submission.
+    The rest are hashed by the campaign before each stage's command runs:
+    verify_inputs for direct inputs, stage_inputs for staged payloads.
+    """
+    root = data_root.resolve()
+    declared = [*spec["inputs"], *spec.get("staged_inputs", []), *([spec["environment"]] if spec.get("environment") else [])]
+    files: dict[tuple[str, str], int] = {}
+    for item in declared:
+        files[(item["path"], item["sha256"])] = data_file(item["path"], root, "input identity").stat().st_size
+    hashed: list[str] = []
+    deferred: list[str] = []
+    remaining, deferred_bytes = PRECHECK_HASH_BYTES, 0
+    for (path, sha256), size in sorted(files.items(), key=lambda entry: entry[1]):
+        if size > remaining:
+            deferred.append(path)
+            deferred_bytes += size
+            continue
+        remaining -= size
+        if file_digest(Path(path).resolve()) != sha256:
+            raise fleet.FleetError(f"input identity changed: {path}")
+        hashed.append(path)
+    return {"hashed": hashed, "deferred": deferred, "deferred_bytes": deferred_bytes, "deferred_to": "campaign"}
+
+
+def verify_inputs(spec: dict[str, Any], data_root: Path) -> None:
+    """The campaign's check of every consumed byte, repeated before each stage.
+
+    Direct inputs are hashed here. With ``verify_staged_inputs``, an input that
+    the command reads only through its ``{staged:NAME}`` copy is left to
+    stage_inputs, which hashes every staged payload right after this call and
+    before the command is built.
     """
     root = data_root.resolve()
     use_cache = spec.get('verify_staged_inputs', False)
     arguments = spec.get('arguments', [])
-    staged = {(s['path'], s['sha256']): s for s in spec.get('staged_inputs', [])
+    staged = {(s['path'], s['sha256']) for s in spec.get('staged_inputs', [])
               if '{staged:' + s['name'] + '}' in arguments}
-    local = staging.local_root() if use_cache and not defer_staged else None
     for item in spec["inputs"]:
-        path = Path(item["path"]).resolve()
-        if not path.is_relative_to(root) or not path.is_file():
-            raise fleet.FleetError(f"input identity must be a file under the external data root: {path}")
-        payload = staged.get((item['path'], item['sha256'])) if use_cache and item['path'] not in arguments else None
-        if payload is not None and defer_staged:
+        path = data_file(item["path"], root, "input identity")
+        if use_cache and item['path'] not in arguments and (item['path'], item['sha256']) in staged:
             continue  # stage_inputs must succeed before phase_command is run
-        verified = path
-        if payload is not None and local is not None:
-            verified = local / 'cache' / item['sha256'] / Path(item['path']).name
-            if not verified.is_file():
-                staging.stage_input({**payload, 'extract': False}, local)
-        if file_digest(verified) != item["sha256"]:
-            raise fleet.FleetError(f"input identity changed: {verified}")
+        if file_digest(path) != item["sha256"]:
+            raise fleet.FleetError(f"input identity changed: {path}")
 
 
 def event(directory: Path, kind: str, detail: Any = None) -> None:
@@ -501,7 +533,8 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
     if digest(spec) != manifest["spec_sha256"]:
         transition(directory, "attention", error="Saved specification identity changed")
         return
-    verify_inputs(spec, base.parent.parent)
+    # Bounded: the worker scan refreshes its heartbeat only between inbox entries.
+    precheck_inputs(spec, base.parent.parent)
     # Archive-mode code runs from host-local disk; legacy jobs keep their NFS tree.
     source = local_source(directory, manifest) if manifest.get("source_archive") else directory / "source"
     run = directory / "run"
@@ -707,11 +740,9 @@ def campaign(directory: Path) -> int:
         code_identity = source_identity(source)
         if code_identity != manifest["source_sha256"]:
             raise fleet.FleetError("frozen code identity changed")
-        verify_inputs(spec, directory.parents[3], defer_staged=True)
+        verify_inputs(spec, directory.parents[3])
         for item in [*spec.get("staged_inputs", []), *([spec["environment"]] if spec.get("environment") else [])]:
-            path = Path(item["path"]).resolve()
-            if not path.is_relative_to(directory.parents[3].resolve()) or not path.is_file():
-                raise fleet.FleetError(f"staged input must be a file under the external data root: {path}")
+            data_file(item["path"], directory.parents[3].resolve(), "staged input")
         if "smoke" in completed:
             # A resumed attempt keeps an earlier attempt's gate only under identical identities.
             gate = monitor.read_json(directory / "gate.json", {}) or {}
@@ -719,7 +750,7 @@ def campaign(directory: Path) -> int:
                 raise fleet.FleetError("a resumed attempt requires the earlier smoke gate under unchanged identities")
         local_root = staging.local_root()
         for stage in pending_stages(directory):
-            verify_inputs(spec, directory.parents[3], defer_staged=True)
+            verify_inputs(spec, directory.parents[3])
             if digest(monitor.read_json(directory / "spec.json")) != manifest["spec_sha256"]:
                 raise fleet.FleetError("specification changed after smoke")
             if stage == "full" and source_identity(source) != code_identity:
@@ -921,7 +952,7 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
         if (directory / "ready.json").exists():
             raise fleet.FleetError("request is already published")
         spec = validate_spec(payload["spec"], now=time.time())
-        verify_inputs(spec, base.parent.parent)
+        input_check = precheck_inputs(spec, base.parent.parent)
         archive_fields: dict[str, Any] = {}
         if payload.get("source_archive"):
             archive = directory / SOURCE_ARCHIVE
@@ -946,8 +977,8 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
         (directory / "spec.json").chmod(0o444)
         transition(directory, "pending", job_id=directory.name, created=time.time())
         # Publish last: workers cannot observe an incompletely transferred job.
-        monitor.write_json(directory / "ready.json", {**payload["snapshot"], "spec_sha256": digest(spec), "source_sha256": identity, **archive_fields, "published": time.time()})
-        return {"job_id": directory.name, "status": "pending", "source_sha256": identity}
+        monitor.write_json(directory / "ready.json", {**payload["snapshot"], "spec_sha256": digest(spec), "source_sha256": identity, **archive_fields, "input_check": input_check, "published": time.time()})
+        return {"job_id": directory.name, "status": "pending", "source_sha256": identity, "input_check": input_check}
     if action in {"status", "events", "cancel"}:
         directories = [job_directory(base, payload["job_id"])] if payload.get("job_id") else sorted((base / "inbox").glob("*"))
         results = []
