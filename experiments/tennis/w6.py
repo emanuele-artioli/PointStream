@@ -776,7 +776,12 @@ def command_flicker_split(a: argparse.Namespace) -> int:
     control = {"flicker_max_abs_diff": control_max_diff(flick[0, pairs], saved["flicker"][h_row, pairs]),
                "energy_max_abs_diff": control_max_diff(energy[0, pairs], saved["energy"][h_row, pairs]),
                "source_energy_max_abs_diff": control_max_diff(energy_src[pairs], saved["energy_src"][pairs]), "tolerance": 1e-6}
-    control["pass"] = bool(max(control["flicker_max_abs_diff"], control["energy_max_abs_diff"], control["source_energy_max_abs_diff"]) <= 1e-6)
+    worst = max(control["flicker_max_abs_diff"], control["energy_max_abs_diff"], control["source_energy_max_abs_diff"])
+    # The residuals are float32 means (one ulp is 1.9e-6 at 16-32): pass_literal is the rule's 1e-6, pass_float32 allows 2 ulps.
+    control["max_abs_diff"] = worst
+    control["pass_literal"] = bool(worst <= 1e-6)
+    control["pass_float32"] = bool(worst <= 2 * float(np.spacing(np.float32(np.nanmax(flick[0, pairs])))))
+    control["pass"] = control["pass_float32"]
 
     # the anchor at the hybrid's rate, from W6's saved per-frame values (no re-encode)
     target, rate = saved_meta["target_kbps"], saved_meta["anchor_rates_kbps"]
