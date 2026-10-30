@@ -259,3 +259,6 @@ foreground-first claim.
   Resubmitted receiver masks: `20261030T164758Z-6191ce05`.
 - rates and window-state (CPU): the judge's `--rates` and the w1_* `--window-state` files must be staged files under the data root, and writing a new file there by hand was refused by the permission system, so they are a
   fleet stage: `experiments.tennis.w7_rates` CLI (`rates.json`, `window-state.json` from the rate-transport `transport.json` and the native-base archive; validator recomputes). Job `20261030T170319Z-3524601c` submitted.
+- receiver masks, second submission `20261030T164758Z-6191ce05` (gpu5): smoke 100.4 s passed the fleet validator; the full stage ran 334.1 s GPU, scored the whole window, and then crashed at the last step
+  (`k6b_receiver_sam.main`: the frozen-pair `assessment` and `frozen_quality_sensitivity` read `--diagnostic`, which manifest windows do not have). Code bug; its scratch results were lost (only `partial.tar`).
+  Fix: both frozen-only blocks run only when `--diagnostic` and `--reference-report` are given. GPU total now 3,157 s of 4,680 s. A third job follows (id below); no result of the crashed run is used.

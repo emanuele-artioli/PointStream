@@ -666,14 +666,15 @@ def main(*, independent_default: bool = False) -> int:
     u = resource.getrusage(resource.RUSAGE_SELF)
     c = resource.getrusage(resource.RUSAGE_CHILDREN)
     result["cpu_seconds"] = u.ru_utime + u.ru_stime + c.ru_utime + c.ru_stime
-    if not a.max_judged:
+    frozen_inputs = a.diagnostic is not None and a.reference_report is not None  # manifest windows have no frozen assessment to compare with
+    if not a.max_judged and frozen_inputs:
         result["assessment"] = assessment(
             json.loads(a.diagnostic.read_text()),
             json.loads(a.reference_report.read_text()),
             result["rows"],
             a.weights.stat().st_size,
         )
-    if not a.max_judged and a.independent_frames:
+    if not a.max_judged and a.independent_frames and frozen_inputs:
         diagnostic = json.loads(a.diagnostic.read_text())
         reference = json.loads(a.reference_report.read_text())
         result["frozen_quality_sensitivity"] = {}
