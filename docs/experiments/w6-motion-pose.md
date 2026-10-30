@@ -217,3 +217,31 @@ judges ([j.md](j.md)).
 - Competing explanation: the generated texture changes from frame to frame (W6 residual energy 1.7× the source's)
   and dominates whatever the outline does.
 - Budget: CPU only (≤ 2 CPU-hours on one server, scratch in `/local/users/emanuele`), no GPU job.
+
+### 2026-10-30 — W6b outcome: the flicker is not in the masks; control caveat (stopped at the control, reported)
+- Run. `scripts`-free CPU run of `python -m experiments.tennis.w6 flicker-split` (code `502a58d7`, branch `claude/w6b-work`), gpu2 CPUs
+  (pointstream env, torch 2.2.2 CPU, cv2 4.11.0, 4 threads), 236 s wall, 343 s CPU (the cold `import torch` from NFS took about 20 min more
+  wall, no CPU). Log `/local/users/emanuele/pointstream/w6b/full.log`, outputs `/local/users/emanuele/pointstream/w6b/out/`
+  (`flicker-split.npz` per-frame arrays); result JSON `docs/experiments/w6-specs/w6b-flicker-split.json`. No GPU, no fleet job.
+  Inputs (sha256 prefixes, all verified): source `054e4535`, transport `6865035e`, anchor `67444a2a`, base `00b13e89`, gpu_base `5c4a0cfc`,
+  generation `031ea5d7`, post archive judges `4d71f6cc` (post job `20261030T132449Z-75957f16`); the SVT anchor is W6's saved per-frame series at
+  the hybrid's rate (no re-encode). Base stream decoded with aomdec (dav1d is not on gpu2; AV1 decoding is normative, ticks of the CPU RGB base
+  differ from the saved GPU RGB by at most 1 level).
+- Control (H against W6's saved per-frame values): **not met at the rule's 1e-6.** Max absolute difference 2.2e-3 (flicker), 2.9e-3 (energy),
+  1.1e-3 on the source's own energy; 62 of 239 pairs differ by more than 1e-6, median 0, 90th percentile 2.3e-5; the means agree to 6e-6
+  (28.636547 against 28.636553). The source's energy depends only on the source and the DIS flow, so the difference is CPU against CUDA
+  rounding in the YUV-to-RGB conversion and flow, not the composite. Per the brief this is reported, not argued away; the differences are
+  four orders of magnitude below the effects below.
+- Flicker (239 pairs; anchor 18.59; mean [block-bootstrap 95%]): H 28.64 [28.11, 30.07]; G+S 30.68 [30.05, 32.18]; S+R 8.33 [7.77, 9.09];
+  G+Rs 27.96 [27.46, 29.31]; B 17.36 [16.58, 18.77]. Excess E: H +10.05, G+S +12.09, S+R −10.26, G+Rs +9.37, B −1.23.
+  **Mask share −0.20 [−0.24, −0.16]; content share 2.02 [1.86, 2.21]**; lead 2.2 (content larger by ≥ 0.1 in 100% of resamples).
+- Residual energy (anchor 11.15; E(H) = +11.96): H 23.11, G+S 25.70, S+R 13.23, G+Rs 22.20, B 8.40; mask share −0.22 [−0.26, −0.17],
+  content share 0.83 [0.77, 0.88].
+- Decision by the rule: the larger share is content (≥ 0.3, lead ≥ 0.1): the fix is temporal consistency of the generated content, not mask
+  propagation. Reading it honestly: (i) the exact source matte does not help, it makes flicker worse (+2.0), because the receiver masks cover
+  77% of the source matte's area (IoU 0.64) and the source matte exposes more generated pixels; (ii) smoothing the receiver masks over
+  t−1..t+1 removes only 7% of the excess (28.64 to 27.96) although it raises consecutive-mask IoU from 0.72 to 0.81; (iii) S+R is below the
+  anchor by construction (source pixels carry the source's own temporal residual, so its flicker is the measure's floor) and content share above 1
+  says only that nothing but generated pixels is left; (iv) the paid base alone (B) already flickers 17.4, close to the SVT anchor's 18.6, so
+  roughly 11 of the hybrid's 28.6 sit in the generated pixels on top of that floor. Not tested: whether a feathered composite, not covered by
+  this rule, changes the generated-pixel share.
