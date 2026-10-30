@@ -279,3 +279,6 @@ foreground-first claim.
   Resubmitted rgb diagnostic: `20261030T181751Z-a498ddf7`.
 - Judge pre-check (before any judge GPU job): the judge's smoke validator still hard-coded the frozen pair's four timing sequences (`k6b_real_base_cost.timing_sequences`), which a one-window manifest run
   cannot supply, and its full-stage checks assumed the 3-tick smoke. Fixed before submitting: manifest windows use their base trace only (`expected_sequences`), and the validator covers the 80-tick full stage (tests added).
+- rgb diagnostic: `20261030T181751Z-a498ddf7` complete on gpu2 (A6000, shared); smoke 18.5 s + full 107.5 s GPU; `full/published.tar` sha256 `ce6a92f875b9c7b48a3b8b516dccac46aad4dfe44d9622a4da330905c84232c6`;
+  full output rechecked by hand (`--validate`, stage full): 12 checks passed. GPU total so far 3,789 s of 4,680 s (891 s left): the judge (smoke + full, estimate about 500 s) is submitted next;
+  W1 scoring (estimate 681 s) and DCVC (245 s) cannot fit in what remains.
