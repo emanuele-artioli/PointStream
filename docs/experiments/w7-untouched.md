@@ -299,3 +299,8 @@ foreground-first claim.
 - Where the chain stands: features, build-inputs, anchors, prepare, generation, rate transport, native base, rgb diagnostic, receiver, judge done and validated on their full output. Not run: the W1 stages
   (masks and encodes are CPU and free; scoring is estimated at 681 s GPU plus a smoke, which does not fit in the 571 s left) and DCVC (estimated 245 s plus smoke, fits alone, not yet generalised end to end).
   The lead decides: raise the budget by about 0.1 GPU-h for W1 scoring, or run DCVC first within the remainder.
+
+### 2026-10-30 — W7 first-window GPU sub-budget raised to 1.5 GPU-h (lead decision)
+- The first window's sub-budget rises from 1.3 to 1.5 GPU-h (5,400 s). Reason: it is also the smoke of the whole chain for the other five windows, so the one-off failures (validators written
+  for the frozen pair, a crashed receiver full stage) are charged to it; the raise stays inside the user's 8 GPU-h Tier 1 card budget (user, 2026-10-30). GPU spent before this decision: about 4,109 s; 1,291 s remain.
+  Order from here: W1 stages (CRFs chosen on rate alone before any quality is computed), then DCVC only if its smoke plus full fits in what is left; then a per-window projection for the other five.
