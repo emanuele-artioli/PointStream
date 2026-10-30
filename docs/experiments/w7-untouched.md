@@ -263,3 +263,4 @@ foreground-first claim.
   (`k6b_receiver_sam.main`: the frozen-pair `assessment` and `frozen_quality_sensitivity` read `--diagnostic`, which manifest windows do not have). Code bug; its scratch results were lost (only `partial.tar`).
   Fix: both frozen-only blocks run only when `--diagnostic` and `--reference-report` are given. GPU total now 3,157 s of 4,680 s. A third job follows (id below); no result of the crashed run is used.
   Third receiver job: `20261030T170824Z-6b51342b`.
+  rates job first run `20261030T170319Z-3524601c` failed its smoke validator (int vs string JSON keys in the recompute; fixed); resubmitted as `20261030T171203Z-7d1145b6` (CPU).
