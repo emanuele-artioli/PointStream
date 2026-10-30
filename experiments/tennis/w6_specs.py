@@ -37,7 +37,7 @@ FILES = {
                  '5c4a0cfced5501e085f67d394f3a50ca7f92d2cb592f73fbd3ad661461cb691b'),
     'encode_half': (DATA + '/jobs/fleet/inbox/20261029T092919Z-a9e696a8/full/published.tar',
                     'daf906285f206c7821c29856eddf12a6e39c390319ac5c501e958876415faa87'),
-    'pose': (MODELS + '/YOLO/yolo11x-pose.pt', '013c43543b0751b8918486ba96e01ee44a59040683a07f96cc22bcc2cb7785f8'),
+    'pose': (DATA + '/tennis/k4-2026-10-13/inputs/yolo/yolo11x-pose.pt', '013c43543b0751b8918486ba96e01ee44a59040683a07f96cc22bcc2cb7785f8'),
 }
 BOTH = ['RTX 6000 Ada', 'RTX A6000']
 
