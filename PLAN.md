@@ -1369,6 +1369,14 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   W5 ([rule](docs/experiments/w5-med-pareto.md)) and W6
   ([rule](docs/experiments/w6-motion-pose.md)) started 2026-10-29 after the
   user's visual check ([page](https://claude.ai/artifact/HsxdSd4CaWWUjXcgf1L9Cj)).
+  Results so far: W1 outcome A on Al once the ROI map was applied as
+  positive offsets outside R (negative offsets inside R are inert in SVT-AV1
+  4.2.0); W3b: DCVC-UF does not dominate on Al; W5 outcome A on Med against
+  SVT and DCVC-UF (PR #292). Player LPIPS at equal rate: Al 0.346 vs DCVC
+  0.391 / SVT 0.574; Med 0.375 vs DCVC 0.585 / SVT about 0.61. W7
+  ([rule](docs/experiments/w7-untouched.md)) written 2026-10-30: Tier 1
+  untouched clips of Al/Med, Tier 2 the Nadal–Kyrgios match the base never
+  trained on.
 
 
 ### J. Experience-track re-judging (user, 2026-10-22)
