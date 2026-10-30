@@ -313,3 +313,4 @@ foreground-first claim.
   Resubmitted: masks `20261030T191755Z-f17c13d7`, encode half `20261030T191856Z-82bf32b2`, quarter `20261030T192015Z-34f84816`, half outside-R `20261030T192145Z-768aceab`, quarter outside-R `20261030T192314Z-cfd1f3d3`.
 - Second W1 CPU round also failed in seconds (0 GPU s): the W7 transport archive stores `publish/packets/...` while `w1_masks`/`w1_encode` looked for `packets/...` (the 2026-10-25 layout). Code bug, fixed
   (`w1_roi.packet_file` accepts both layouts; test added). New jobs follow; ids below.
+  Third round: masks `20261030T193203Z-878a0fb9`, encode half `20261030T193323Z-20cc826d`, quarter `20261030T193510Z-affda602`, half outside-R `20261030T193631Z-b4cda4e7`, quarter outside-R `20261030T193750Z-1da1280c`.
