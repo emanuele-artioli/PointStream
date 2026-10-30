@@ -134,12 +134,14 @@ def assets(*names: str) -> dict[str, tuple[str, str]]:
 
 def gpu_stage(module: str, arguments: list[str], files: dict[str, tuple[str, str]], *, models: list[str], mem_mib: int, threads: int,
               smoke_seconds: int, full_seconds: int, scale: dict[str, Any], basis: str, environment: dict[str, str] | None = None,
-              device: str = 'gpu', validator_module: str | None = None) -> dict[str, Any]:
+              device: str = 'gpu', validator_module: str | None = None, validator: list[str] | None = None) -> dict[str, Any]:
     spec = common(module, arguments, files)
     if environment is not None:
         spec['environment'] = environment
     if validator_module is not None:
         spec['validator'] = ['{python}', '-m', validator_module, '--validate-only']
+    if validator is not None:
+        spec['validator'] = validator
     spec.update({'device': device, 'hosts': HOSTS_GPU, 'gpu_models': models if device == 'gpu' else [], 'gpu_memory_mib': mem_mib if device == 'gpu' else 0,
                  'cpu_threads': threads, 'local_storage_gib': 60, 'scale': scale,
                  'smoke': {'seconds': min(smoke_seconds, SMOKE_SECONDS), 'representative_basis': basis},
@@ -153,7 +155,8 @@ def features(first: wm.WindowSpec, manifest: tuple[str, str], source: tuple[str,
             '--max-windows', '{windows}', '--windows', first.id, '--sources', '{staged:c0}']
     return gpu_stage('experiments.tennis.k6b_confirm', args, {'manifest': manifest, **assets('sam', 'yolo11x_pose'), 'c0': source},
                      models=['RTX 6000 Ada'], mem_mib=32000, threads=8, smoke_seconds=600, full_seconds=1800,
-                     scale={'windows': {'smoke': 1, 'full': 0}}, basis='The first window with the full 240-frame decode; the smallest grid the stage supports is one whole window.')
+                     scale={'windows': {'smoke': 1, 'full': 0}}, basis='The first window with the full 240-frame decode; the smallest grid the stage supports is one whole window.',
+                     validator=['{python}', '-m', 'experiments.tennis.k6b_confirm', 'validate-features', '--manifest', '{staged:manifest}'])
 
 
 def anchors(first: wm.WindowSpec, manifest: tuple[str, str], inputs: tuple[str, str], source: tuple[str, str]) -> dict[str, Any]:
@@ -290,7 +293,28 @@ def real_base_judge(windows: list[wm.WindowSpec], files: dict[str, tuple[str, st
     return spec
 
 
+def first_window(argv: list[str]) -> None:
+    """`first-window STAGE WINDOWS.json OUT_DIR [NAME=PATH:SHA256 ...]`: the spec of one stage of the first window (al028), written to OUT_DIR/STAGE.json.
+    Upstream archives come as NAME=PATH:SHA256 (path under the data root; sha256sum of the completed job's full/published.tar)."""
+    stage, manifest_path, out = argv[0], Path(argv[1]), Path(argv[2])
+    ups = {k: (v.rsplit(':', 1)[0], v.rsplit(':', 1)[1]) for k, v in (a.split('=', 1) for a in argv[3:])}
+    windows = wm.load(manifest_path)
+    first = windows[0]
+    windows_ref = (W7_DIR + '/windows.json', wm.file_sha256(manifest_path))
+    confirm = ups.get('manifest', (W7_DIR + '/manifest.json', ''))
+    source = source_files(windows)[first.name]
+    if stage == 'features':
+        spec = features(first, confirm, source)
+    else:
+        raise SystemExit(f'unknown stage {stage}')
+    del windows_ref
+    out.mkdir(parents=True, exist_ok=True)
+    (out / f'{stage}.json').write_text(json.dumps(spec, indent=1) + '\n')
+
+
 def main(argv: list[str]) -> None:
+    if argv and argv[0] == 'first-window':
+        return first_window(argv[1:])
     manifest_path, out = Path(argv[0]), Path(argv[1])
     windows = wm.load(manifest_path)
     out.mkdir(parents=True, exist_ok=True)
