@@ -86,6 +86,15 @@ MED = Window('med', 'medvedev_struff/014@194', 'packets/medvedev_struff__014@194
 WINDOWS = {w.name: w for w in (AL, MED)}
 
 
+def preload_from_spec(spec: dict[str, Any]) -> list[str]:
+    """`preload_windows` for a validator: the manifest and state files are the job spec's staged inputs named `windows` and `state`."""
+    paths = {x['name']: x['path'] for x in spec.get('staged_inputs', [])}
+    if 'windows' not in paths:
+        return []
+    argv = ['--windows-file', paths['windows']] + (['--window-state', paths['state']] if 'state' in paths else [])
+    return preload_windows(argv)
+
+
 def packet_file(tar: Any, window: Window, name: str) -> Any:
     """A window packet of a transport archive: the 2026-10-25 archive stores `packets/...`, the W7 stage output `publish/packets/...`."""
     for prefix in ('', 'publish/'):

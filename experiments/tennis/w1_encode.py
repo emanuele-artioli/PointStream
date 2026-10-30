@@ -26,7 +26,7 @@ from typing import Any
 import numpy as np
 
 from experiments.tennis.w1_roi import (AL, CODED, CONTROL_CRF, FRAMES, OFFSETS, TARGET_KBPS, TOOLS, TRANSPORT_SHA,
-                                       WINDOWS, Window, digest, next_crf, packet_file, policy_name, rate_kbps, roi_text,
+                                       WINDOWS, Window, digest, next_crf, packet_file, policy_name, preload_from_spec, rate_kbps, roi_text,
                                        select_crfs, start_crf)
 
 
@@ -209,6 +209,7 @@ def validate() -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     summary = json.loads((stage / 'encode-summary.json').read_text())
     spec = json.loads((stage.parent / 'spec.json').read_text())
+    preload_from_spec(spec)  # manifest windows are not in WINDOWS until registered
     frames = summary['frames']
     smoke = frames != FRAMES
     fps = WINDOWS[summary.get('window', 'al')].fps

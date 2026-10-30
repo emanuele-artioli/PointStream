@@ -314,3 +314,5 @@ foreground-first claim.
 - Second W1 CPU round also failed in seconds (0 GPU s): the W7 transport archive stores `publish/packets/...` while `w1_masks`/`w1_encode` looked for `packets/...` (the 2026-10-25 layout). Code bug, fixed
   (`w1_roi.packet_file` accepts both layouts; test added). New jobs follow; ids below.
   Third round: masks `20261030T193203Z-878a0fb9`, encode half `20261030T193323Z-20cc826d`, quarter `20261030T193510Z-affda602`, half outside-R `20261030T193631Z-b4cda4e7`, quarter outside-R `20261030T193750Z-1da1280c`.
+- W1 masks (CPU): `20261030T193203Z-878a0fb9` complete on gpu6. The four encode jobs of that round failed their smoke validator only (`KeyError: 'al028'`: `w1_encode.validate` did not register the manifest window; fixed with
+  `w1_roi.preload_from_spec`; the corrected validator passes all 10 checks on a smoke output). 0 GPU s. Fourth round of encodes follows.
