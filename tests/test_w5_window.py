@@ -116,3 +116,8 @@ def test_w5_specs_use_whole_argument_placeholders_and_staged_names():
     assert jobs['encode-half']['arguments'][-1] == '--controls' and '--controls' not in jobs['encode-quarter']['arguments']
     assert float(out[out.index('--target-kbps') + 1]) == 42.5
     assert jobs['score']['gpu_models'] == ['RTX A6000'] and '--primary' in jobs['score']['arguments']
+
+
+def test_hybrid_point_when_the_judge_billed_the_kps2_packet_directly():
+    point = sc.hybrid_point(_quality(2193), w.MED)  # W7 windows: the transport packet is already KPS2
+    assert point['kps2_kbps'] == 42.5 and point['kps1_kbps'] == pytest.approx(42.5 + 1349 * 8 / 4.8 / 1000)

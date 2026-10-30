@@ -100,13 +100,15 @@ def hybrid_point(quality: dict[str, Any], window: Window) -> dict[str, Any]:
     quality.json; the scale 4 method is series row 3 of the judge's arrays."""
     row = next(r for r in quality['rows'] if r['id'] == window.id)
     rate = next(r for r in row['rates'] if r['scale'] == 4)
-    if rate['kps_bytes'] != window.kps1_bytes:
-        raise ValueError('the hybrid job billed a different keypoint packet than the pinned KPS1')
+    if rate['kps_bytes'] not in (window.kps1_bytes, window.kps2_bytes):
+        raise ValueError('the hybrid job billed a different keypoint packet than the pinned KPS1 or KPS2')
+    billed_kps2 = rate['kps_bytes'] == window.kps2_bytes != window.kps1_bytes  # W7 windows: the judge pays the KPS2 packet directly
     means = {'lpips': {'whole': row['means']['full_lpips'][3], 'foreground': row['means']['foreground_lpips'][3]},
              'dists': {'whole': row['means']['full_dists'][3], 'foreground': row['means']['foreground_dists'][3]}}
-    kps1 = rate['total_kbps']
-    return {'hybrid': means, 'kps1_kbps': kps1, 'kps2_kbps': rebilled_kbps(kps1, window.kps1_bytes, window.kps2_bytes, window),
-            'rate': rate}
+    total = rate['total_kbps']
+    if billed_kps2:
+        return {'hybrid': means, 'kps1_kbps': rebilled_kbps(total, window.kps2_bytes, window.kps1_bytes, window), 'kps2_kbps': total, 'rate': rate}
+    return {'hybrid': means, 'kps1_kbps': total, 'kps2_kbps': rebilled_kbps(total, window.kps1_bytes, window.kps2_bytes, window), 'rate': rate}
 
 
 def assemble(points: list[dict[str, Any]], scores: dict[str, np.ndarray], scales: tuple[int, ...] = (),

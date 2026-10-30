@@ -323,3 +323,5 @@ foreground-first claim.
   quarter plain `…194520Z-f1e8f664`: 61, 62, 63 at 18.71, 16.62, 14.12 kbps; sha256 `970de450d9131bd8bd7ded4e10b8a6951918dc9da838746fe0f95efe4037b77f`; 10 checks passed.
   half outside-R `…194640Z-cefe70d1`: +20: 68, 69, 70 (18.71, 17.67, 16.83 kbps); +40: 67, 68, 69 (18.51, 17.56, 16.64 kbps); sha256 `4bae9b44296be1132c389d21e4ba49272bdb5f16b57be5179261bac7aec8037a`; 13 checks passed.
   quarter outside-R `…194800Z-92e26eca`: +20: 62, 63, 64 (19.56, 17.24, 15.88 kbps); +40: 62, 63, 64 (19.44, 17.22, 15.65 kbps); sha256 `2a7068cbcfb547a1aca857c16901b68f53c3f8410a3c7622362eb952702d353f`; 13 checks passed.
+- Pre-check of the W1 scoring job (before any GPU second): `w1_score.hybrid_point` required the hybrid job to have billed the frozen windows' KPS1 packet; the W7 judge pays the KPS2 packet (2,469 B) directly, so scoring
+  would have stopped at its start. Fixed: either packet is accepted and the other rate is re-billed (test added).
