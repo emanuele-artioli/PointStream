@@ -328,6 +328,7 @@ def real_base_judge(windows: list[wm.WindowSpec], files: dict[str, tuple[str, st
     spec.update({'device': 'gpu', 'hosts': HOSTS_GPU, 'gpu_models': GPU_MODELS, 'gpu_memory_mib': 16500, 'cpu_threads': 4, 'local_storage_gib': 60,
                  'scale': {'judged': {'smoke': 3, 'full': 0}},
                  'gpu_sharing': {'mode': 'shared', 'basis': 'Saved-pixel scoring; scores do not depend on wall time', 'margin_mib': 4096},
+                 'contention': {'policy': 'continue', 'basis': 'Saved-pixel scoring; scores do not depend on wall time', 'resume_attempts': 0},
                  'smoke': {'seconds': SMOKE_SECONDS, 'representative_basis': 'Three saved ticks (0/3/6) of the first window: all three base scales, hybrid, the in-job controls and all four metrics.'},
                  'full': {'seconds': FULL_SECONDS}, 'validator_seconds': 120, 'budget_seconds': FULL_SECONDS + 800})
     return spec
