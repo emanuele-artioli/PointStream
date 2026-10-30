@@ -253,3 +253,7 @@ foreground-first claim.
 - receiver masks (GPU, shared as the 2026-10-26 job): `20261030T163803Z-51dfa688` submitted (inputs: rate-transport, anchors and generation archives above).
 - GPU seconds so far (smoke + full from execution.json, failed smokes included): features 145 + 163 + 156, anchors 136 + 597, generation 92 + 1,324, rgb 24 (failed validator) = 2,637 s of 4,680 s
   (rgb diagnostic rerun, receiver, judge, W1 scoring and DCVC still to count).
+- receiver masks, first submission `20261030T163803Z-51dfa688` (gpu6): smoke ran 86 s GPU (projected full 601 s) but the fleet validator failed on one check, `denied_reads`: it required 4 forbidden-read
+  probes (frozen pair: two sources, control, transport) while a one-window manifest run has 2 (source, transport). Code bug, fixed (`denied_probe_count`, test); the corrected validator passes all 25 checks
+  on that smoke output. Not replayed: a new job follows (id below).
+  Resubmitted receiver masks: `20261030T164758Z-6191ce05`.
