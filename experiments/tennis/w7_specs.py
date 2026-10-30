@@ -275,7 +275,7 @@ def rate_transport(windows: list[wm.WindowSpec], manifest: tuple[str, str], anch
     """CPU transport packets (KPS2 keypoints, exact mattes, reference crops) for the windows; `--max-windows` is not used in manifest
     mode, so the smoke is the first window by `--window`. Per-window rows are written as they finish."""
     chosen = windows[:1] if max_windows else windows
-    arguments = ['--windows-file', '{staged:windows}', *sum((['--window', w.name] for w in chosen), [])]
+    arguments = ['--windows-file', '{staged:windows}', *sum((['--window', w.name] for w in chosen), []), '--max-windows', '{windows}']
     files: dict[str, tuple[str, str]] = {'windows': manifest}
     for i, a in enumerate(anchors):
         arguments += ['--anchor', '{staged:a%d}' % i]
@@ -285,7 +285,7 @@ def rate_transport(windows: list[wm.WindowSpec], manifest: tuple[str, str], anch
         files[f'p{i}'] = q
     spec = common('experiments.tennis.k6b_rate_transport', arguments, files)
     spec.update({'device': 'cpu', 'hosts': HOSTS_GPU, 'gpu_models': [], 'gpu_memory_mib': 0, 'cpu_threads': 4, 'local_storage_gib': 30,
-                 'scale': {}, 'smoke': {'seconds': 400, 'representative_basis': 'First window, every packet kind, validator included.'},
+                 'scale': {'windows': {'smoke': 1, 'full': len(chosen)}}, 'smoke': {'seconds': 400, 'representative_basis': 'First window, every packet kind, validator included.'},
                  'full': {'seconds': 900}, 'validator_seconds': 120, 'budget_seconds': 1500})
     return spec
 
