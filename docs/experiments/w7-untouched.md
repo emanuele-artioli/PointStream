@@ -318,3 +318,8 @@ foreground-first claim.
   `w1_roi.preload_from_spec`; the corrected validator passes all 10 checks on a smoke output). 0 GPU s. Fourth round of encodes follows.
 - W1 masks `20261030T193203Z-878a0fb9`: `full/published.tar` sha256 `39b061484dee4d2adfac0f17f3cc84ea8c803756e2cbc8e8508d146d889786c7`; `w1_masks --validate` on the full output: 8 checks passed (full: 80 ticks).
   Encodes, fourth round: half (plain + controls) `20261030T194352Z-c8a65737`, quarter `20261030T194520Z-f1e8f664`, half outside-R `20261030T194640Z-cefe70d1`, quarter outside-R `20261030T194800Z-92e26eca`.
+- W1 encodes complete (CPU, rate-only searches; no quality read yet), target 18.461418333333334 kbps. Chosen CRF triples (bracketing the target by the search's own rule), recorded before scoring:
+  half plain `20261030T194352Z-c8a65737` (also the plain CRF 63 controls): 66, 67, 68 at 18.87, 17.72, 16.48 kbps (65 at 20.99); sha256 `f3de1ea7f0bd74a621ffb79fb2bd97cc622fb1ae05f504e4815c7470bd2540d8`; 12 validator checks passed on the full output.
+  quarter plain `…194520Z-f1e8f664`: 61, 62, 63 at 18.71, 16.62, 14.12 kbps; sha256 `970de450d9131bd8bd7ded4e10b8a6951918dc9da838746fe0f95efe4037b77f`; 10 checks passed.
+  half outside-R `…194640Z-cefe70d1`: +20: 68, 69, 70 (18.71, 17.67, 16.83 kbps); +40: 67, 68, 69 (18.51, 17.56, 16.64 kbps); sha256 `4bae9b44296be1132c389d21e4ba49272bdb5f16b57be5179261bac7aec8037a`; 13 checks passed.
+  quarter outside-R `…194800Z-92e26eca`: +20: 62, 63, 64 (19.56, 17.24, 15.88 kbps); +40: 62, 63, 64 (19.44, 17.22, 15.65 kbps); sha256 `2a7068cbcfb547a1aca857c16901b68f53c3f8410a3c7622362eb952702d353f`; 13 checks passed.
