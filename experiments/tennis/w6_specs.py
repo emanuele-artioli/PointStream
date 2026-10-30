@@ -63,7 +63,7 @@ def shared(basis: str, margin: int = 8192) -> dict[str, Any]:
             'contention': {'policy': 'continue', 'basis': basis, 'resume_attempts': 0}}
 
 
-def generate(unit: str, gpu_class: str = 'RTX A6000') -> dict[str, Any]:
+def generate(unit: str, gpu_class: str = 'RTX') -> dict[str, Any]:
     template = json.loads(TEMPLATE.read_text())
     arguments = list(template['arguments'])
     start = arguments.index('--') + 1
@@ -71,16 +71,15 @@ def generate(unit: str, gpu_class: str = 'RTX A6000') -> dict[str, Any]:
     native[native.index('--units') + 1] = unit
     native[native.index('--gpu-class') + 1] = gpu_class
     native.append('--keep-all')
-    ada = gpu_class == 'RTX 6000 Ada'
     basis = 'Generation outputs do not depend on wall time (fixed seeds); peak 12.2 GiB in the model-GPU table.'
     items = template['staged_inputs']
-    return {'schema': 1, 'device': 'gpu', 'hosts': ['gpu5', 'gpu6'] if ada else ['gpu3'], 'gpu_models': [gpu_class], 'gpu_memory_mib': 24000 if ada else 13500, 'cpu_threads': 8,
+    return {'schema': 1, 'device': 'gpu', 'hosts': ['gpu3', 'gpu5', 'gpu6'], 'gpu_models': BOTH, 'gpu_memory_mib': 13500, 'cpu_threads': 8,
             'local_storage_gib': 40, 'environment': template['environment'], 'entrypoint': ['-m', 'experiments.tennis.k6b_generate'],
             'arguments': native, 'scale': {'frames': {'smoke': 8, 'full': 0}}, 'staged_inputs': items,
             'inputs': [{'path': x['path'], 'sha256': x['sha256']} for x in items], 'required_commands': [],
             'smoke': {'seconds': 400, 'representative_basis': 'The same player unit, first 8 frames, frozen 30 DDIM steps / 512x784 / 4 bit / C base plus matching adapter / guidance 2.0, the released long-video sampler and --keep-all; the full stage renders all 240 frames of the unit.'},
             'full': {'seconds': 2600}, 'validator': ['{python}', '-m', 'experiments.tennis.w6', 'validate-generate'], 'validator_seconds': 60,
-            'budget_seconds': 4400, 'stall_seconds': 1500.0, 'deadline': deadline(10), **shared(basis, 8192 if ada else 3072)}
+            'budget_seconds': 4400, 'stall_seconds': 1500.0, 'deadline': deadline(10), **shared(basis, 3072)}
 
 
 def post(generated: list[str]) -> dict[str, Any]:
