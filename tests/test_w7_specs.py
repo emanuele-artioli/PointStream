@@ -49,3 +49,24 @@ def test_budget_check_against_the_raised_tier1_budget():
     assert b['per_window_s'] == 4654 and b['first_ok'] and b['total_ok']  # 4,654 s <= 4,680 s; 27,924 s <= 28,800 s
     assert b['margin_total_s'] == 28800 - 6 * 4654
     assert not sp.budget_check(per_window=5000)['total_ok']
+
+
+def test_first_window_stage_specs_all_stages():
+    windows = wm.from_selection(json.loads(SELECTION.read_text()))
+    first = windows[0]
+    man, src, pend = (sp.W7_DIR + '/manifest.json', 'a' * 64), (sp.W7_DIR + '/sources/alcaraz_hurkacz__028.mp4', first.source_sha256), (sp.W7_DIR + '/x.tar', sp.PENDING)
+    units = ['alcaraz_hurkacz__028_at120__person_000000000000', 'alcaraz_hurkacz__028_at120__person_000000000001']
+    specs = {'features': sp.features(first, man, src), 'anchors': sp.anchors(first, man, pend, src), 'prepare': sp.prepare(first, man, pend, pend, src),
+             'generate': sp.generate(first, man, pend, units),
+             'receiver': sp.receiver(windows, (sp.W7_DIR + '/windows.json', 'b' * 64), pend, pend, [pend], 2),
+             'dcvc': sp.dcvc(windows, (sp.W7_DIR + '/windows.json', 'b' * 64), pend, pend, pend, 25)}
+    for name, spec in specs.items():
+        assert spec['verify_staged_inputs'] is True and spec['smoke']['seconds'] <= 600 and spec['full']['seconds'] <= 2600, name
+        assert set(spec['hosts']) == {'gpu3', 'gpu5', 'gpu6'}
+        placeholders = {a[len('{staged:'):-1] for a in spec['arguments'] if a.startswith('{staged:')}
+        assert placeholders <= {i['name'] for i in spec['staged_inputs']}, (name, placeholders)
+        assert len({i['name'] for i in spec['staged_inputs']}) == len(spec['staged_inputs'])
+    assert specs['generate']['environment'] == sp.JCV_ENVIRONMENT and '--fit' in specs['generate']['arguments']
+    assert specs['generate']['arguments'][specs['generate']['arguments'].index('--fit') + 1] == 'match5 ah-C@fit-100-fp16.pt'
+    assert specs['receiver']['gpu_models'] == ['RTX 6000 Ada']
+    assert specs['dcvc']['scale']['frames'] == {'smoke': 25, 'full': 240}

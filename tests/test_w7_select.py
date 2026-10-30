@@ -42,3 +42,20 @@ def test_exclusions_cover_confirmation_and_fit_clips():
     for clip in ("alcaraz_hurkacz/031", "medvedev_struff/014", "medvedev_struff/007", "alcaraz_hurkacz/002", "alcaraz_hurkacz/036"):
         assert clip in ex
     assert "alcaraz_hurkacz/028" not in ex
+
+
+def test_confirm_manifest_passes_the_cohort_check():
+    import json
+    from pathlib import Path
+
+    from experiments.tennis import window_manifest as wm
+    from experiments.tennis.k6b_confirm import check_manifest
+
+    sel = json.loads((Path(__file__).resolve().parents[1] / 'docs/experiments/w7-specs/selection.json').read_text())
+    windows = wm.from_selection(sel)
+    rows = {c: rows_ok for c in {w.clip_id for w in windows}
+            for rows_ok in [[{'frame': t, 'fits': True, 'homography': np.eye(3).tolist()} for t in range(sel['inventory'][c]['frames'])]]}
+    manifest = w7.confirm_manifest(windows, sel['inventory'], rows, [f'old/{i}' for i in range(49)], '/d', '/a')
+    gates = check_manifest(manifest)
+    assert sorted(gates) == sorted(w.id for w in windows) and all(len(v) == 240 for v in gates.values())
+    assert manifest['clips'][0]['staged']['path'] == '/d/sources/alcaraz_hurkacz__028.mp4'

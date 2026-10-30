@@ -312,6 +312,49 @@ def cmd_stage(args: argparse.Namespace) -> None:
     print("staged", dest)
 
 
+def confirm_manifest(windows: list[Any], inventory: dict[str, dict[str, Any]], rows: dict[str, list[Any]], old_clips: list[str],
+                     staged_dir: str, origin: str) -> dict[str, Any]:
+    """The confirm-style manifest.json (k6b_confirm.check_manifest, k4b_features.plan_windows) of the manifest windows: `cohort` and
+    `centered: false` make `check_manifest` use these windows instead of the frozen twelve. Registration rows are K8b's for
+    [start, start + 240) of each clip (native decoded frame index)."""
+    from experiments.tennis import window_manifest as wm
+    from experiments.tennis.k6b_confirm import PROVENANCE
+
+    clips = []
+    for w in windows:
+        meta = inventory[w.clip_id]
+        width, height = (int(x) for x in meta["size"].split("x"))
+        clips.append({"id": w.clip_id, "frames": meta["frames"], "fps": w.fps, "width": width, "height": height, "sha256": w.source_sha256,
+                      "review_frames": [w.start + w.frames // 2], "source_origin": f"{origin}/{w.match}/{w.clip}.mp4",
+                      "staged": {"path": f"{staged_dir}/sources/{w.source_file}", "sha256": w.source_sha256},
+                      "registration": rows[w.clip_id][w.start:w.start + w.frames]})
+    return {"schema": 1, "budget_gpu_hours": 8, "contains_human_marks": False, "provenance": dict(PROVENANCE), "centered": False,
+            "old_clips": sorted(old_clips), "cohort": wm.cohort_tuples(windows), "clips": clips}
+
+
+def cmd_confirm_manifest(args: argparse.Namespace) -> None:
+    from experiments.tennis import window_manifest as wm
+    from experiments.tennis.k6b_confirm import check_manifest
+    from tools.datasets.k6b_recovery import SCOPE, sha
+
+    root = Path(args.datasets)
+    windows = wm.load(Path(args.windows))
+    selection = json.loads(Path(args.selection).read_text())
+    scope = root / "pointstream-data/jobs/fleet/inbox/20261024T083117Z-2e644b08/full/scope.json"
+    if sha(scope) != SCOPE:
+        raise ValueError("changed old input inventory")
+    old = sorted({v["clip"] for v in json.loads(scope.read_text())["inventory"].values()})
+    report = json.loads((root / "pointstream-data/tennis/k8b-2026-10-20/review/k8b-report.json").read_text())
+    rows = {c["id"]: c["registration"] for c in report["clips"]}
+    manifest = confirm_manifest(windows, selection["inventory"], rows, old, str(Path(args.dest)), str(root / ARCHIVE))
+    gates = check_manifest(manifest)
+    out = Path(args.dest) / "manifest.json"
+    if out.exists():
+        raise FileExistsError(out)
+    out.write_text(json.dumps(manifest))
+    print("manifest", out, {k: len(v) for k, v in gates.items()})
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -334,8 +377,14 @@ def main(argv: list[str] | None = None) -> int:
     g.add_argument("--datasets", default="/home/itec/emanuele/Datasets")
     g.add_argument("--windows", required=True)
     g.add_argument("--dest", required=True)
+    c = sub.add_parser("confirm-manifest")
+    c.add_argument("--datasets", default="/home/itec/emanuele/Datasets")
+    c.add_argument("--windows", required=True)
+    c.add_argument("--selection", required=True)
+    c.add_argument("--dest", required=True)
     args = parser.parse_args(argv)
-    {"select": cmd_select, "audit": cmd_audit, "manifest": cmd_manifest, "stage": cmd_stage}[args.command](args)
+    {"select": cmd_select, "audit": cmd_audit, "manifest": cmd_manifest, "stage": cmd_stage,
+     "confirm-manifest": cmd_confirm_manifest}[args.command](args)
     return 0
 
 

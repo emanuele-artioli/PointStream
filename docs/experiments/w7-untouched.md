@@ -200,3 +200,20 @@ foreground-first claim.
   `k6b_matte_judge.judge_window`, whose `control` argument is compared to an old run at tolerance 1e-4); `w3_neural_baseline`/`w5_dcvc` (`SOURCES` al/med,
   `two_windows`, prior inputs); per-window checkpointing in `k6b_native_base` (one bundle per job); spec builders for features, anchors, prepare, generation,
   receiver masks and DCVC; the confirm-style manifest.json (clips, registration rows) the features stage reads.
+
+### 2026-10-30 — W7 stages generalised, specs for the first window, clips staged (CPU only; nothing submitted, no GPU job)
+- Bank term (lead accepted): the window's own frame-0 crop bytes scaled to a 12-crop bank over 7200 s, which keeps the term the size of Al/Med's. The worst-case
+  sensitivity row (the window's own crops billed over the 4.8 s window alone, `bank_worst_case_kbps`) is written by `w7_rates` and carried into the
+  judge's per-scale rates as `bank_worst_case_kbps` and `total_kbps_bank_worst_case`. Deviation recorded: `k6b_rgb_diagnostic` runs on A6000 hosts only (the code asserts the class), so its spec uses gpu3/gpu2.
+- Generalised since the last entry, frozen pair unchanged: `k6b_matte_judge.judge_window(control=None)` (the first variant is scored a second time in the job and must agree within
+  the 1e-4 control tolerance; the saved-composite and old scoring-mask hash checks apply only when a prior control exists); `k6b_receiver_sam` / `k6b_receiver_frame`
+  (`--windows-file --window`, no frozen diagnostic/reference-report/control hashes, `windows` recorded for the validator); `w3_neural_baseline` (`activate_manifest`: SOURCES
+  from the manifest, anchor/transport/prior hashes unpinned, no audited-Al control, per-window checkpoints as before, validator reads the manifest from the spec) and `w5_dcvc` (optional points file).
+- `w7_select confirm-manifest` wrote `manifest.json` (clips, K8b registration rows, 49 old clips, `cohort`, `centered: false`) and it passes `k6b_confirm.check_manifest` for all six windows.
+- Staged under the fleet data root by `w7_select stage` on gpu1 (new files only, sha256 verified after copy): `/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/`
+  with `sources/` (six clips), `windows.json` (sha256 `18d184cd…c5e15`) and `manifest.json`.
+- `w7_specs.py` now builds first-window (Al 028) smoke/full specs for features, anchors, prepare, generation, receiver masks, DCVC, native base, rgb diagnostic, rate transport and the judge
+  (`verify_staged_inputs`, gpu3/gpu5/gpu6 except where a class is required; smoke ≤600 s on the shortest grid each stage supports; full ≤2,600 s). Upstream archive hashes that do not exist yet
+  are `PENDING` (all zeros) and generation needs the prepared unit names; both are filled when the upstream job completes. Stage order: features, `k6b_confirm build-inputs`, anchors, prepare,
+  generation, rate transport (needs a manifest-mode `--anchor/--prepared`), native base, rgb diagnostic, receiver, judge, W1 stages, DCVC.
+- Still open: the `build-inputs` step has no spec; generation units come from the prepare output; the W1 `--window-state` and judge `--rates` files are made from stage outputs by `w7_rates`; the new GPU paths are unit-tested for plumbing only.
