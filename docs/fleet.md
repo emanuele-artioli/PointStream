@@ -300,12 +300,45 @@ from that HEAD and record the selection in provenance. Include the complete
 workload and manager dependency set; missing imports must fail local checks
 before submission. Without these arguments the complete HEAD is archived; the client checkout
 is preserved. For a task with tighter file-operation limits, add
-`--snapshot-transfer-seconds 90` (or less) to bound both archive transfer and
-extraction; omitting it retains the existing fleet default. Add only intended tracked edits with
+`--snapshot-transfer-seconds 90` (or less) to bound the archive transfer (and,
+for legacy submissions, the extraction); omitting it retains the existing fleet default. Add only intended tracked edits with
 `--include-change PATH` and new source files with `--include-untracked PATH`;
 never transfer the entire dirty checkout. Submission is published only after its
 snapshot and specification are complete. Source/spec changes after smoke block
 promotion. Full runs are not accessible through the old unrestricted `fleet launch`.
+
+### Source archive, unpacked host-locally
+
+The shared inbox keeps a job's code only as `source.tar`, never as a tree of
+files (2026-10-30). Before this, the client ran `tar -xf` on the management host
+into the NFS inbox; on 2026-10-29 at least 15 submissions died there at the 300 s
+limit, after writing 229–523 of 250–569 files (≈1.3 s per file under load). Those
+inbox directories hold `source.tar`, a partial `source/` and `events/` with no
+`spec.json` or `ready.json`: they were never published, no worker sees them, and
+they are inspected, not resubmitted.
+
+- The client uploads `source.tar` with `noclobber` and checks its SHA256 against
+  the local archive. Publication checks it against `snapshot_sha256`, unpacks it
+  into a throwaway directory under the management host's local root to compute
+  `source_sha256` (the same identity an NFS `source/` tree would have had, after
+  `deleted_paths`), removes that directory, and marks the archive read-only.
+  `ready.json` adds `source_archive: "source.tar"`; `git_head`,
+  `snapshot_sha256`, the selected paths and the patch checksums are unchanged.
+- At launch the worker checks the archive again, unpacks it into
+  `$PS_LOCAL_ROOT/sources/<job_id>`, requires the published `source_sha256`, and
+  links `<job>/source` to it. The supervisor, campaign, validator and salvage run
+  from that local tree; the link keeps campaigns from older snapshots working. A
+  declared resume unpacks again on whichever host takes it. A host without a
+  local root sends the job to `attention` rather than unpacking onto NFS.
+- After the job is terminal and its supervisor has exited, the worker removes
+  the local tree. `source.tar` stays in the inbox as the job's code record; the
+  `<job>/source` link then points at nothing.
+- Workers advertise `capabilities: ["source_archive"]` in their heartbeat. A
+  client uses archive mode only when every host in the spec advertises it and
+  `prepare` confirms it; otherwise it falls back to the old NFS extraction, so
+  mixed versions never publish a job without code. Jobs published before this
+  change keep their `source/` directory and run unchanged. Worker releases are
+  still unpacked on NFS: eleven files, installed once per release.
 
 ## GPU contention, partial outputs and checkpoints
 

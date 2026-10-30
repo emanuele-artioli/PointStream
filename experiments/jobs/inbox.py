@@ -15,6 +15,7 @@ import math
 import os
 import resource
 from pathlib import Path
+import shutil
 import socket
 import subprocess
 import sys
@@ -31,6 +32,12 @@ TERMINAL = {"complete", "failed", "cancelled", "contended", "interrupted", "budg
 SCHEMA = 1
 DEVICES = ("gpu", "cpu")
 POLL_SECONDS = 60
+# Archive-mode jobs keep only this checksummed file in the shared inbox; each
+# worker unpacks it under its host-local root. Workers advertise the capability
+# in their heartbeat so a client never uses it against an older worker.
+SOURCE_ARCHIVE = "source.tar"
+WORKER_CAPABILITIES = ("source_archive",)
+SOURCE_EXTRACT_SECONDS = 300
 
 
 def digest(value: Any) -> str:
@@ -490,14 +497,16 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
     if remaining < sum(spec[stage]["seconds"] for stage in pending_stages(directory)):
         transition(directory, "expired", error="Insufficient time remains before the deadline")
         return
-    if digest(spec) != monitor.read_json(directory / "ready.json")["spec_sha256"]:
+    manifest = monitor.read_json(directory / "ready.json")
+    if digest(spec) != manifest["spec_sha256"]:
         transition(directory, "attention", error="Saved specification identity changed")
         return
     verify_inputs(spec, base.parent.parent)
+    # Archive-mode code runs from host-local disk; legacy jobs keep their NFS tree.
+    source = local_source(directory, manifest) if manifest.get("source_archive") else directory / "source"
     run = directory / "run"
     run.mkdir()
     (run / "events").mkdir()
-    source = directory / "source"
     claims: dict[str, Any] = {"gpu": gpu["uuid"] if gpu else None, "cpu_threads": spec["cpu_threads"], "claims_dir": str(base.parent / "claims"), "min_free_memory_mb": spec["gpu_memory_mib"] + fleet.DEFAULT_MEMORY_MARGIN_MIB}
     sharing = gpu_sharing(spec) if gpu else None
     if sharing and sharing["mode"] == "shared":
@@ -532,11 +541,13 @@ def worker_tick(base: Path, alias: str, settled: set[Path] | None = None) -> Non
             break
     worker = base / "workers" / alias
     def heartbeat() -> None:
-        monitor.write_json(worker / "heartbeat.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid()), "updated": time.time(), "alias": alias})
+        monitor.write_json(worker / "heartbeat.json", {"pid": os.getpid(), "proc_start_time": get_process_start_time(os.getpid()), "updated": time.time(), "alias": alias, "capabilities": list(WORKER_CAPABILITIES)})
     heartbeat()
     last_heartbeat = time.monotonic()
     directories = sorted((base / "inbox").glob("*"))
     host = None
+    local_root: Path | None = None
+    local_root_checked = False  # resolved once per tick, only if a terminal job needs it
     for directory in directories:
         # Refresh only while the scan actually advances, never from a timer
         # that could conceal blocked filesystem I/O or a stuck admission.
@@ -553,6 +564,14 @@ def worker_tick(base: Path, alias: str, settled: set[Path] | None = None) -> Non
             # declared resumes are decided before transition to terminal.
             if settled is not None:
                 settled.add(directory)
+            if not local_root_checked:
+                local_root_checked = True
+                try:
+                    local_root = staging.local_root()
+                except (OSError, staging.StagingError):
+                    local_root = None
+            if local_root is not None:
+                release_local_source(directory, local_root)
             continue
         if (directory / "owner").exists():
             reconcile(directory, alias)
@@ -675,7 +694,8 @@ def campaign(directory: Path) -> int:
         return 1
     spec = monitor.read_json(directory / "spec.json")
     manifest = monitor.read_json(directory / "ready.json")
-    source = directory / "source"
+    # Archive-mode jobs link source/ to host-local disk: read it there, not through NFS.
+    source = (directory / "source").resolve()
     run = directory / "run"
     started = time.time()
     supervisor_state = monitor.read_json(run / "status.json", {})
@@ -806,6 +826,74 @@ def source_identity(source: Path) -> str:
     return digest(records)
 
 
+def extract_source(archive: Path, destination: Path, snapshot: dict[str, Any]) -> str:
+    """Unpack a job's snapshot archive into ``destination`` and return its code identity.
+
+    The archive must match the submitted snapshot checksum. Explicit deletions
+    are applied as the legacy NFS publication did, so the identity is the same
+    ``source_identity`` an extracted ``source/`` directory would have had.
+    """
+    if file_digest(archive) != snapshot.get("snapshot_sha256"):
+        raise fleet.FleetError("source archive does not match the submitted snapshot checksum")
+    if destination.is_symlink() or (destination.exists() and not destination.is_dir()):
+        raise fleet.FleetError(f"unexpected entry at the local source path: {destination}")
+    if destination.exists():
+        shutil.rmtree(destination)
+    destination.mkdir(mode=0o700, parents=True)
+    result = subprocess.run(
+        ["tar", "-xf", str(archive), "-C", str(destination)],
+        capture_output=True, text=True, timeout=SOURCE_EXTRACT_SECONDS, check=False,
+    )
+    if result.returncode:
+        raise fleet.FleetError(f"source archive extraction failed: {result.stderr.strip()[-2000:]}")
+    for rel in snapshot.get("deleted_paths", []):
+        path = Path(rel)
+        if path.is_absolute() or ".." in path.parts:
+            raise fleet.FleetError("unsafe deleted snapshot path")
+        (destination / path).unlink(missing_ok=True)
+    return source_identity(destination)
+
+
+def required_local_root() -> Path:
+    root = staging.local_root()
+    if root is None:
+        raise fleet.FleetError("no host-local root to unpack the source archive; set PS_LOCAL_ROOT")
+    return root
+
+
+def local_source(directory: Path, manifest: dict[str, Any]) -> Path:
+    """Unpack an archive-mode job on this host and point ``<job>/source`` at it.
+
+    The link keeps every reader of ``<job>/source`` working, including the
+    campaign code of snapshots taken before this change. The target path is the
+    same on every host, so a declared resume elsewhere reuses the same link.
+    """
+    local = required_local_root() / "sources" / directory.name
+    identity = extract_source(directory / manifest["source_archive"], local, manifest)
+    if identity != manifest["source_sha256"]:
+        raise fleet.FleetError("unpacked source identity differs from the published identity")
+    link = directory / "source"
+    if link.is_symlink():
+        if os.readlink(link) == str(local):
+            return local
+        link.unlink()
+    elif link.exists():
+        raise fleet.FleetError("archive-mode job already has an extracted source directory")
+    link.symlink_to(local, target_is_directory=True)
+    return local
+
+
+def release_local_source(directory: Path, root: Path) -> None:
+    """Remove a terminal job's host-local source; the archive stays in the inbox."""
+    local = root / "sources" / directory.name
+    if not local.is_dir() or local.is_symlink():
+        return
+    supervisor = monitor.read_json(directory / "run" / "supervisor.json", {}) or {}
+    if supervisor.get("pid") and is_pid_alive(supervisor["pid"], supervisor.get("proc_start_time")):
+        return
+    shutil.rmtree(local, ignore_errors=True)
+
+
 def job_directory(base: Path, job_id: str) -> Path:
     if not fleet.JOB_ID_RE.fullmatch(job_id):
         raise fleet.FleetError("invalid job ID")
@@ -822,8 +910,11 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
     if action == "prepare":
         directory = job_directory(base, payload["job_id"])
         directory.mkdir(parents=True, exist_ok=False)
-        (directory / "source").mkdir()
         (directory / "events").mkdir()
+        if payload.get("source_archive"):
+            # The client uploads source.tar only; workers unpack it host-locally.
+            return {"directory": str(directory), "source_archive": True}
+        (directory / "source").mkdir()
         return {"directory": str(directory)}
     if action == "publish":
         directory = job_directory(base, payload["job_id"])
@@ -831,17 +922,31 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
             raise fleet.FleetError("request is already published")
         spec = validate_spec(payload["spec"], now=time.time())
         verify_inputs(spec, base.parent.parent)
-        for rel in payload["snapshot"].get("deleted_paths", []):
-            path = Path(rel)
-            if path.is_absolute() or ".." in path.parts:
-                raise fleet.FleetError("unsafe deleted snapshot path")
-            (directory / "source" / path).unlink(missing_ok=True)
-        identity = source_identity(directory / "source")
+        archive_fields: dict[str, Any] = {}
+        if payload.get("source_archive"):
+            archive = directory / SOURCE_ARCHIVE
+            if (directory / "source").exists() or archive.is_symlink() or not archive.is_file():
+                raise fleet.FleetError("archive-mode request needs source.tar and no extracted source")
+            # Same identity as the legacy NFS tree, computed on local disk and discarded.
+            check = required_local_root() / "sources" / f".publish-{directory.name}-{uuid.uuid4().hex[:8]}"
+            try:
+                identity = extract_source(archive, check, payload["snapshot"])
+            finally:
+                shutil.rmtree(check, ignore_errors=True)
+            archive.chmod(0o444)
+            archive_fields = {"source_archive": SOURCE_ARCHIVE}
+        else:
+            for rel in payload["snapshot"].get("deleted_paths", []):
+                path = Path(rel)
+                if path.is_absolute() or ".." in path.parts:
+                    raise fleet.FleetError("unsafe deleted snapshot path")
+                (directory / "source" / path).unlink(missing_ok=True)
+            identity = source_identity(directory / "source")
         monitor.write_json(directory / "spec.json", spec)
         (directory / "spec.json").chmod(0o444)
         transition(directory, "pending", job_id=directory.name, created=time.time())
         # Publish last: workers cannot observe an incompletely transferred job.
-        monitor.write_json(directory / "ready.json", {**payload["snapshot"], "spec_sha256": digest(spec), "source_sha256": identity, "published": time.time()})
+        monitor.write_json(directory / "ready.json", {**payload["snapshot"], "spec_sha256": digest(spec), "source_sha256": identity, **archive_fields, "published": time.time()})
         return {"job_id": directory.name, "status": "pending", "source_sha256": identity}
     if action in {"status", "events", "cancel"}:
         directories = [job_directory(base, payload["job_id"])] if payload.get("job_id") else sorted((base / "inbox").glob("*"))
@@ -1090,7 +1195,9 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         heartbeat = health["workers"].get(alias)
         if not heartbeat or time.time() - heartbeat["updated"] > 3 * POLL_SECONDS:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
-    job_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]
+    # Keep the archive on NFS and unpack host-locally only when every eligible worker can.
+    archive_mode = all("source_archive" in (health["workers"][alias].get("capabilities") or []) for alias in spec["hosts"])
+    job_id =datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]
     archive_paths = tuple(getattr(args, "snapshot_path", []))
     if archive_paths:
         # The supervisor launches campaign/salvage from the workload snapshot,
@@ -1105,10 +1212,21 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     record = {"job_id": job_id, "status": "preparing", "config": config, "spec_sha256": digest(spec), "snapshot": metadata, "chat_id": args.chat_id}
     monitor.write_json(args.state_dir / f"{job_id}.json", record)
     try:
-        prepared = remote_rpc(config, "prepare", {"job_id": job_id})
-        transfer_options = {"timeout": transfer_seconds} if transfer_seconds is not None else {}
+        prepare: dict[str, Any] = {"job_id": job_id}
+        if archive_mode:
+            prepare["source_archive"] = True
+        prepared = remote_rpc(config, "prepare", prepare)
+        # An older management release ignores the request and prepares source/.
+        archive_mode = archive_mode and prepared.get("source_archive") is True
+        record["source_archive"] = archive_mode
+        transfer_options: dict[str, Any] = {"timeout": transfer_seconds} if transfer_seconds is not None else {}
+        if archive_mode:
+            transfer_options["extract"] = False
         fleet._send_snapshot(config["hosts"][0], snapshot, str(Path(prepared["directory"]) / "source"), sha, **transfer_options)
-        response = remote_rpc(config, "publish", {"job_id": job_id, "spec": spec, "snapshot": metadata})
+        publish: dict[str, Any] = {"job_id": job_id, "spec": spec, "snapshot": metadata}
+        if archive_mode:
+            publish["source_archive"] = True
+        response = remote_rpc(config, "publish", publish)
         record.update(response)
         monitor.write_json(args.state_dir / f"{job_id}.json", record)
         return {**record, "monitoring": {"chat_id": args.chat_id, "events_command": str(root / "scripts" / "ps-fleet") + " events " + job_id,

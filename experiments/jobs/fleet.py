@@ -483,7 +483,16 @@ def _remote_path(host: dict[str, Any], *parts: str) -> str:
     return str(Path(host["data_root"]).joinpath("jobs", "fleet", *parts))
 
 
-def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str, *, timeout: float | None = None) -> None:
+def _send_snapshot(
+    host: str, source: Path, target: str, expected_sha256: str, *, timeout: float | None = None, extract: bool = True,
+) -> None:
+    """Upload ``source`` as ``<target>.tar`` and verify its checksum.
+
+    With ``extract`` the archive is unpacked into ``target`` and removed; worker
+    releases need their files in place. Inbox jobs pass ``extract=False``: the
+    shared NFS inbox keeps only the checksummed archive, and workers unpack it on
+    host-local disk, because per-file writes on NFS time out under load.
+    """
     timeout = SNAPSHOT_TRANSFER_TIMEOUT_SECONDS if timeout is None else timeout
     if not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
         raise FleetError("snapshot transfer timeout must be positive and finite")
@@ -502,13 +511,15 @@ def _send_snapshot(host: str, source: Path, target: str, expected_sha256: str, *
     checksum = _ssh(host, ["sha256sum", "--", remote_tar])
     if checksum.returncode or checksum.stdout.split(maxsplit=1)[0] != expected_sha256:
         raise FleetError(f"{host}: transferred snapshot checksum does not match the local archive")
-    extract = _ssh(
+    if not extract:
+        return
+    unpacked = _ssh(
         host,
         ["tar", "-xf", remote_tar, "-C", target],
         timeout=timeout,
     )
-    if extract.returncode:
-        raise FleetError(f"{host}: snapshot extraction failed: {extract.stderr.strip()}")
+    if unpacked.returncode:
+        raise FleetError(f"{host}: snapshot extraction failed: {unpacked.stderr.strip()}")
     remove_archive = _ssh(host, ["/usr/bin/python3", "-c", "import pathlib,sys; pathlib.Path(sys.argv[1]).unlink()", remote_tar])
     if remove_archive.returncode:
         raise FleetError(f"{host}: snapshot extracted but its temporary archive could not be removed")
