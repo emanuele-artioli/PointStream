@@ -26,7 +26,7 @@ from typing import Any
 import numpy as np
 
 from experiments.tennis.w1_roi import (AL, CODED, CONTROL_CRF, FRAMES, OFFSETS, TARGET_KBPS, TOOLS, TRANSPORT_SHA,
-                                       WINDOWS, Window, digest, next_crf, policy_name, rate_kbps, roi_text,
+                                       WINDOWS, Window, digest, next_crf, packet_file, policy_name, rate_kbps, roi_text,
                                        select_crfs, start_crf)
 
 
@@ -158,7 +158,7 @@ def run(a: argparse.Namespace) -> None:
     if frames == FRAMES and digest(full) != window.source_yuv_sha:
         raise ValueError('source conversion changed')
     with tarfile.open(a.transport) as tar:
-        member = tar.extractfile(window.packet_dir + 'exact-rle.matte')
+        member = packet_file(tar, window, 'exact-rle.matte')
         assert member is not None
         _, masks = decode_masks(member.read())
     if masks.shape != (240, 2, 540, 960) or masks.dtype != bool:

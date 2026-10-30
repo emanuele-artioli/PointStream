@@ -86,6 +86,17 @@ MED = Window('med', 'medvedev_struff/014@194', 'packets/medvedev_struff__014@194
 WINDOWS = {w.name: w for w in (AL, MED)}
 
 
+def packet_file(tar: Any, window: Window, name: str) -> Any:
+    """A window packet of a transport archive: the 2026-10-25 archive stores `packets/...`, the W7 stage output `publish/packets/...`."""
+    for prefix in ('', 'publish/'):
+        try:
+            tar.getmember(prefix + window.packet_dir + name)
+        except KeyError:
+            continue
+        return tar.extractfile(prefix + window.packet_dir + name)
+    return None
+
+
 def window_from_spec(spec: Any, state: dict[str, Any]) -> Window:
     """A `Window` for a manifest window (experiments/tennis/window_manifest.py). `state` holds what earlier stages measured:
     control_ivf_bytes, start_base, kps1_bytes, kps2_bytes and optionally hybrid_archive_sha. For the frozen pair this

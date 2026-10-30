@@ -23,7 +23,7 @@ from typing import Any
 
 import numpy as np
 
-from experiments.tennis.w1_roi import AL, ANCHOR_SHA, TICKS, TRANSPORT_SHA, WINDOWS, Window, digest
+from experiments.tennis.w1_roi import AL, ANCHOR_SHA, TICKS, TRANSPORT_SHA, WINDOWS, Window, digest, packet_file
 
 
 def pack_bits(mask: np.ndarray) -> bytes:
@@ -44,8 +44,8 @@ def build(anchor: Path, transport: Path, scratch: Path, ticks: list[int], window
     if row['id'] != window.id or row['judged'] != TICKS:
         raise ValueError('K6 window or judged ticks changed')
     with tarfile.open(transport) as tar:
-        member = tar.extractfile(window.packet_dir + 'exact-rle.matte')
-        keypoints = tar.extractfile(window.packet_dir + 'keypoints.kps')
+        member = packet_file(tar, window, 'exact-rle.matte')
+        keypoints = packet_file(tar, window, 'keypoints.kps')
         if member is None or keypoints is None:
             raise ValueError('transport members missing')
         _, source_masks = decode_masks(member.read())

@@ -105,3 +105,24 @@ def test_timing_sequences_for_manifest_windows_use_the_base_trace_only():
     assert list(seq) == ['alcaraz_hurkacz/028@120/base']
     projection = separated_projection(60.0, seq, 5.0, expected_sequences=1)
     assert projection['projected_full_seconds'] > projection['projected_worker_seconds'] > 0
+
+
+def test_packet_file_finds_both_transport_layouts(tmp_path):
+    import tarfile
+
+    from experiments.tennis import w1_roi
+
+    w = wm.from_selection(json.loads(SELECTION.read_text()))[0]
+    window = w1_roi.window_from_spec(w, {'control_ivf_bytes': {'8': 1, '4': 2, '2': 3}, 'start_base': {'4': 60, '2': 67, '1': 70}, 'kps1_bytes': 1, 'kps2_bytes': 1})
+    for prefix in ('', 'publish/'):
+        path = tmp_path / (prefix.strip('/') or 'plain')
+        path.mkdir()
+        member = path / 'x'
+        member.write_bytes(b'abc')
+        archive = tmp_path / f'{prefix.strip("/") or "plain"}.tar'
+        with tarfile.open(archive, 'w') as tar:
+            tar.add(member, arcname=prefix + window.packet_dir + 'exact-rle.matte')
+        with tarfile.open(archive) as tar:
+            stream = w1_roi.packet_file(tar, window, 'exact-rle.matte')
+            assert stream is not None and stream.read() == b'abc'
+            assert w1_roi.packet_file(tar, window, 'keypoints.kps') is None

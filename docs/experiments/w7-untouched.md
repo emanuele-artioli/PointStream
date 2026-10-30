@@ -311,3 +311,5 @@ foreground-first claim.
 - The five W1 CPU jobs above all failed their smokes within seconds on `pinned input changed: published.tar`: `w1_masks` and `w1_encode` pinned the anchor/transport archives to the frozen pair's hashes.
   Code bug, fixed (the pins apply to `al`/`med` only; manifest windows are identified by the fleet's staged hashes). 0 GPU s. Jobs not replayed; new ones below.
   Resubmitted: masks `20261030T191755Z-f17c13d7`, encode half `20261030T191856Z-82bf32b2`, quarter `20261030T192015Z-34f84816`, half outside-R `20261030T192145Z-768aceab`, quarter outside-R `20261030T192314Z-cfd1f3d3`.
+- Second W1 CPU round also failed in seconds (0 GPU s): the W7 transport archive stores `publish/packets/...` while `w1_masks`/`w1_encode` looked for `packets/...` (the 2026-10-25 layout). Code bug, fixed
+  (`w1_roi.packet_file` accepts both layouts; test added). New jobs follow; ids below.
