@@ -234,3 +234,5 @@ foreground-first claim.
 - features: `20261030T143125Z-8785a55b` complete on gpu6 Ada (code `256b18d8`), `full/published.tar` sha256 `c2e0a4aba701c2c2f294b63ad780e9565d203cee5cc56858ee4253755da9d2f5`;
   smoke 162.8 s + full 155.8 s GPU; full output rechecked by hand with `validate-features`: 19 checks passed. GPU total so far 464 s (incl. the 145 s failed-validator smoke); budget 4,680 s.
 - build-inputs (CPU): `20261030T144100Z-2d3ae276` submitted.
+- build-inputs: `20261030T144100Z-2d3ae276` complete (CPU, gpu6), `full/inputs.tar` sha256 `bc8a01c7ae4321abee4e42b6871ab5f31c9d880067b9d0baf9c99a602f00ac0f`; `validate-inputs` on the full output: 7 checks passed.
+- anchors (K6 run, GPU): `20261030T144525Z-de7adcd2` submitted.
