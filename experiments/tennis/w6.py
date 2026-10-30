@@ -203,6 +203,9 @@ def command_masks(a: argparse.Namespace) -> int:
             out = scratch / "isolated" / unit
             if (publish / f"{unit}-masks.npz").exists():
                 continue
+            # The worker creates its own directory and refuses an existing one; clear an unfinished attempt.
+            shutil.rmtree(out, ignore_errors=True)
+            out.parent.mkdir(parents=True, exist_ok=True)
             env = {**os.environ, "HOME": str(out), "TMPDIR": str(out / "tmp"), "YOLO_CONFIG_DIR": str(out / "config"),
                    "PYTHONNOUSERSITE": "1", "CUBLAS_WORKSPACE_CONFIG": ":4096:8", "PYTHONPATH": str(Path(__file__).resolve().parents[2])}
             command = [sys.executable, "-m", "experiments.tennis.k6b_receiver_sam", "--worker", "--independent-frames", "--out", str(out),
@@ -483,7 +486,7 @@ def command_judge(a: argparse.Namespace) -> int:
                     pts = k[k[:, 2] >= 0.5, :2].astype(np.int32)
                     if len(pts) >= 3:
                         hull = np.zeros((1080, 1920), np.uint8)
-                        cv2.fillConvexPoly(hull, cv2.convexHull(pts), 1)
+                        cv2.fillConvexPoly(hull, np.asarray(cv2.convexHull(pts), np.int32), (1,))
                         size = max(3, int(2 * RACKET_MARGIN * heights[(p, t)]) | 1)
                         body = cv2.dilate(hull, np.ones((size, size), np.uint8)) > 0
                         beyond = racket_stats(racket_region(region[t][p], body), extras[t][0][p], extras[t][1])
