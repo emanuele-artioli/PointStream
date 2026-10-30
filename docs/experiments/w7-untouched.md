@@ -129,3 +129,43 @@ foreground-first claim.
   Med) and whether a window may contain a cut (proposal: shots only, no cut inside).
 - Pipeline for one window (Al031@129, Med014@194) and what a new window needs: recorded in the report of this task; summary in `docs/experiments/w7-specs/pipeline-map.md`.
 - Jobs: none (CPU on gpu1 outside the fleet, attended).
+
+### 2026-10-30 — W7 Tier 2 decisions (lead), written before any extraction
+- The seeded draw (seed 20261030) on nadal_kyrgios ranges over shots of at least 240 frames that start in the second half of the broadcast
+  (frame ≥ 57,753 of 115,505); a window never contains a cut; the adaptation split is the shots of the first half. Within a drawn shot the
+  window is the first 240-frame interval the frozen registration rule admits (as Tier 1). No Tier 2 extraction has been run.
+
+### 2026-10-30 — W7 generic window manifest, reference-bank answer, GPU estimate (CPU only; nothing submitted)
+- Code. `experiments/tennis/window_manifest.py`: one `WindowSpec` (name, match, clip, start, frames, fps, source sha256, conversion sha256,
+  reference mode; adapter from the match) and `FROZEN_PAIR`, which reproduces the old Al031@129 / Med014@194 constants. Generalised to read it:
+  `k6b_native_base` (`--windows-file --window --source`; `sources_for`), `w1_roi` (`window_from_spec`, `preload_windows`) with `w1_masks`,
+  `w1_encode`, `w1_score` (`--windows-file --window-state`), and the `k6b_confirm` family (`cohort_of`: a manifest may carry a `cohort` list and
+  `centered: false`; a manifest without them is checked against the frozen twelve exactly as before). `tests/test_window_manifest.py` shows that
+  the frozen pair gives `k6b_native_base.SOURCES`, `w1_roi.AL`/`MED` and the frozen cohort unchanged, and that the six W7 windows pass.
+  `w7_select manifest` writes `windows.json` (adds K4's conversion sha256 per window), `w7_select stage` copies the six clips under the fleet
+  data root (not run). `experiments/tennis/w7_specs.py`: spec builder (`verify_staged_inputs: true`, gpu3/gpu5/gpu6, A6000 or Ada, smoke ≤600 s,
+  full ≤2,600 s) for the generalised stages and the stage table below.
+- Not generalised (code still pins Al031/Med014 or prior-run controls): `k6b_rgb_diagnostic`, `k6b_receiver_frame`, `k6b_real_base_judge`
+  (`PILOTS`, `--gen-al/--gen-med/--al/--med`, controls that reproduce the prior run), `k6b_rate_transport`, `w3_neural_baseline`/`w5_dcvc`
+  (`SOURCES` al/med, `two_windows`). The cohort field lets the features, anchors, prepare, generate and judge validators of `k6b_confirm_run`
+  accept the W7 manifest, but those stages have never run on a window outside the frozen twelve. The w1_* jobs take one `--window`, so the
+  anchor stages are one job per window, not one job for six.
+- The 12-image reference bank (from `k6b_reference_video.reference_banks` and the 2026-10-25 accounting): it is the set of `*.png.ref`
+  conditioning crops of the match's six confirmation windows, one per player unit at `reference_frame == 0` of that window (6 windows x 2
+  players = 12 per match; 53,793 B for Al and 75,843 B for Med as SVT preset 8 CRF 20 half-size images; 895,487 / 1,179,150 B as PNG). So every
+  Al/Med window so far conditioned its players on a crop from its own first frame, and the "bank" is the pooled set. It holds no crop of a
+  new window. Using a bank crop for a new window would need a player-identity mapping (units are SAM tracks, not named players) that does not
+  exist. The manifest therefore records `reference: window_frame0` (the same recipe applied to each new window: first fitted scored frame per
+  player, the encoder sends the two crops, billed with the window), not the old bank. The rule's wording "existing reference banks" needs the
+  lead's reading: if it must mean the old 12 crops, that is a cross-window reference test and needs the identity mapping first.
+- GPU estimate per window (seconds, A6000 unless noted; from the job records cited in `w7_specs.STAGES`): features 175, anchors/keypoint codes
+  444, prepare 60, generation 1,735 (863 s per player-unit; Ada about 1,365), GPU source control 84, receiver masks 820, compose and hybrid
+  score 410, anchor scoring 681, DCVC 245; CPU only: paid base 84, rates, W1 encodes. Total 4,654 s per window (4,284 s with Ada rendering).
+  Against the rule's Tier 1 budget: first window 4,654 s = 1.29 GPU-h against ≤1 h; the other five 23,270 s = 6.46 GPU-h against ≤4 h; all six
+  7.76 GPU-h against 5 h (about 7.1 h with Ada rendering). The estimate exceeds the budget by about 1.5x; generation (37%), receiver masks
+  (18%) and anchor scoring (15%) dominate. Dropping the K6 anchor codes and the source control, if the new-window judge does not need them,
+  gives about 4,126 s per window, still above. This needs a decision (raise the budget to about 8 GPU-h, cut windows, or cut stages) before
+  any GPU job; the stage times are from two-window jobs and ignore queueing and failed smokes.
+- Saved manifest of the six Tier 1 windows: `docs/experiments/w7-specs/windows.json` (sha256 `18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15`;
+  conversion hashes computed on gpu1 from the archive clips). Checks: ruff and mypy clean; full pytest 1155 passed, 24 skipped, 1 failed
+  (`test_agent_hooks::test_patches_into_models_or_datasets_are_blocked`, the macOS protected-path failure recorded since 2026-10-24, unrelated).

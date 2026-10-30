@@ -259,6 +259,52 @@ def cmd_audit(args: argparse.Namespace) -> None:
                       "decoded_frames": result["decoded_frames"]}, indent=1))
 
 
+def cmd_manifest(args: argparse.Namespace) -> None:
+    """windows.json: the selected windows with the sha256 of K4's conversion of each (k4b_features.convert_command, 240 frames)."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from experiments.tennis import window_manifest as wm
+    from experiments.tennis.k4b_features import convert_command
+
+    root = Path(args.datasets)
+    selection = json.loads(Path(args.selection).read_text())
+    windows = wm.from_selection(selection)
+    tmp = Path(args.scratch)
+    tmp.mkdir(parents=True, exist_ok=True)
+
+    def one(w: Any) -> tuple[str, str]:
+        raw = tmp / f"{w.name}.yuv"
+        subprocess.run(convert_command("/opt/local/bin/ffmpeg", root / ARCHIVE / (w.clip_id + ".mp4"), raw, w.start, w.frames),
+                       check=True, capture_output=True, timeout=1800)
+        if raw.stat().st_size != w.frames * 1920 * 1080 * 3 // 2:
+            raise ValueError(f"{w.name}: wrong converted size")
+        digest = file_sha256(raw)
+        raw.unlink()
+        return w.clip_id, digest
+
+    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+        yuv = dict(pool.map(one, windows))
+    wm.dump(wm.from_selection(selection, yuv), Path(args.out), selection_sha256=file_sha256(Path(args.selection)), seed=SEED)
+    print(json.dumps(yuv, indent=1))
+
+
+def cmd_stage(args: argparse.Namespace) -> None:
+    """Copy the selected clips to `<dest>/sources/` (the fleet data root; sha256 checked after the copy). Not run by the W7 CPU stage."""
+    import shutil
+
+    from experiments.tennis import window_manifest as wm
+
+    root = Path(args.datasets)
+    dest = Path(args.dest) / "sources"
+    dest.mkdir(parents=True, exist_ok=False)
+    for w in wm.load(Path(args.windows)):
+        target = dest / w.source_file
+        shutil.copyfile(root / ARCHIVE / (w.clip_id + ".mp4"), target)
+        if file_sha256(target) != w.source_sha256:
+            raise ValueError(f"{w.name}: copy differs from the archive")
+    print("staged", dest)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -271,8 +317,18 @@ def main(argv: list[str] | None = None) -> int:
     a.add_argument("--scratch", required=True)
     a.add_argument("--workers", type=int, default=8)
     a.add_argument("--out", required=True)
+    m = sub.add_parser("manifest")
+    m.add_argument("--datasets", default="/home/itec/emanuele/Datasets")
+    m.add_argument("--selection", required=True)
+    m.add_argument("--scratch", required=True)
+    m.add_argument("--workers", type=int, default=6)
+    m.add_argument("--out", required=True)
+    g = sub.add_parser("stage")
+    g.add_argument("--datasets", default="/home/itec/emanuele/Datasets")
+    g.add_argument("--windows", required=True)
+    g.add_argument("--dest", required=True)
     args = parser.parse_args(argv)
-    {"select": cmd_select, "audit": cmd_audit}[args.command](args)
+    {"select": cmd_select, "audit": cmd_audit, "manifest": cmd_manifest, "stage": cmd_stage}[args.command](args)
     return 0
 
 

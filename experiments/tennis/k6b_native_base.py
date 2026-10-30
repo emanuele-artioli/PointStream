@@ -40,6 +40,18 @@ SOURCES = [
 TOOLS = {'SvtAv1EncApp': '4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4', 'dav1d': 'e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6', 'ffmpeg': '7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2'}
 
 
+def sources_for(args: argparse.Namespace) -> tuple[list[Path], list[tuple[str, int, int, str, str]]]:
+    """Source files and `SOURCES` tuples: the frozen Al/Med pair (`--al --med`) or a window manifest (`--windows-file` + `--source`)."""
+    if args.windows_file is None:
+        return [args.al, args.med], SOURCES
+    from experiments.tennis import window_manifest as wm
+
+    windows = wm.select(wm.load(args.windows_file), args.window or None)
+    if len(args.source or []) != len(windows):
+        raise ValueError('one --source per selected window, in order')
+    return list(args.source), wm.legacy_sources(windows)
+
+
 def sha(path: Path) -> str:
     h = hashlib.sha256()
     with path.open('rb') as f:
@@ -97,7 +109,7 @@ def run(args: argparse.Namespace) -> None:
         if tools[name]['sha256'] != expected:
             raise ValueError('native tool mismatch: ' + name)
     rows: list[dict[str, Any]] = []
-    for source, (name, start, fps, source_hash, yuv_hash) in zip([args.al, args.med], SOURCES):
+    for source, (name, start, fps, source_hash, yuv_hash) in zip(*sources_for(args)):
         if sha(source) != source_hash:
             raise ValueError('source identity mismatch')
         raw = scratch / (name + '-source.yuv')
@@ -158,6 +170,8 @@ def run(args: argparse.Namespace) -> None:
     wall = time.monotonic() - began
     projected = max(measured, wall) * 30 * 1.25
     result = {'frames': n, 'rows': len(rows), 'workload_cpu_seconds': measured, 'workload_wall_seconds': wall, 'single_cpu': True, 'projected_full_seconds': projected, 'bundle_sha256': bundle_hash}
+    if args.windows_file is not None:
+        result['source_sha256'] = [t[3] for t in sources_for(args)[1]]
     (Path(os.environ['PS_STAGE_DIR']) / 'base-result.json').write_text(json.dumps(result))
     signal.alarm(0)
 
@@ -165,7 +179,8 @@ def run(args: argparse.Namespace) -> None:
 def validate() -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     result = json.loads((stage / 'base-result.json').read_text())
-    checks = {'two_windows': result['rows'] == 2, 'smoke_24': result['frames'] == 24, 'single_cpu': result['single_cpu'], 'projection': result['projected_full_seconds'] <= 1300, 'cpu_under_guard': result['workload_cpu_seconds'] <= 270}
+    expected_sources = result.get('source_sha256', [r[3] for r in SOURCES])
+    checks = {'two_windows': result['rows'] == len(expected_sources), 'smoke_24': result['frames'] == 24, 'single_cpu': result['single_cpu'], 'projection': result['projected_full_seconds'] <= 1300, 'cpu_under_guard': result['workload_cpu_seconds'] <= 270}
     with tempfile.TemporaryDirectory(prefix='k6b-base-validator-') as tmp:
         root = Path(tmp)
         with tarfile.open(stage / 'published.tar') as outer:
@@ -181,7 +196,7 @@ def validate() -> None:
             tar.extractall(root, filter='data')
         data = root / 'base'
         manifest = json.loads((data / 'manifest.json').read_text())
-        checks['source_identities'] = [r['source_sha256'] for r in manifest['rows']] == [r[3] for r in SOURCES]
+        checks['source_identities'] = [r['source_sha256'] for r in manifest['rows']] == expected_sources
         checks['pinned_tools'] = all(manifest['tools'][n]['sha256'] == d for n, d in TOOLS.items())
         for row in manifest['rows']:
             prefix = f"{row['window']}-s{row['scale']}"
@@ -215,12 +230,15 @@ def main() -> None:
     parser.add_argument('--al', type=Path)
     parser.add_argument('--med', type=Path)
     parser.add_argument('--frames', type=int, default=24)
+    parser.add_argument('--windows-file', type=Path, help='window manifest (experiments/tennis/window_manifest.py) instead of --al/--med')
+    parser.add_argument('--window', action='append', help='window name from the manifest (repeat; default all)')
+    parser.add_argument('--source', type=Path, action='append', help='source clip of each selected window, in order')
     args = parser.parse_args()
     if args.validate:
         validate()
     else:
-        if args.al is None or args.med is None or args.frames not in (24, 240):
-            parser.error('both sources and 24 or 240 frames are required')
+        if (args.windows_file is None and (args.al is None or args.med is None)) or args.frames not in (24, 240):
+            parser.error('both sources (or --windows-file with --source) and 24 or 240 frames are required')
         run(args)
 
 

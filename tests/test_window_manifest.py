@@ -1,0 +1,96 @@
+"""The generic window manifest reproduces the frozen two-window constants and rejects malformed manifests."""
+import json
+from argparse import Namespace
+from pathlib import Path
+
+import pytest
+
+from experiments.tennis import k6b_confirm as kc
+from experiments.tennis import k6b_native_base as nb
+from experiments.tennis import w1_roi
+from experiments.tennis import window_manifest as wm
+from experiments.tennis.k6b_confirm_validate import check_anchor_rows  # noqa: F401  (imports with the cohort helper)
+
+SELECTION = Path(__file__).resolve().parents[1] / 'docs/experiments/w7-specs/selection.json'
+
+
+def test_frozen_pair_reproduces_native_base_sources():
+    assert wm.legacy_sources() == nb.SOURCES
+    args = Namespace(windows_file=None, al=Path('a.mp4'), med=Path('m.mp4'), window=None, source=None)
+    paths, sources = nb.sources_for(args)
+    assert paths == [Path('a.mp4'), Path('m.mp4')] and sources is nb.SOURCES
+
+
+def test_frozen_pair_reproduces_w1_windows():
+    al = w1_roi.window_from_spec(wm.FROZEN_PAIR[0], {'control_ivf_bytes': w1_roi.AL.control_ivf_bytes, 'start_base': w1_roi.AL.start_base,
+                                                     'kps1_bytes': w1_roi.AL.kps1_bytes, 'kps2_bytes': w1_roi.AL.kps2_bytes,
+                                                     'hybrid_archive_sha': w1_roi.AL.hybrid_archive_sha})
+    med = w1_roi.window_from_spec(wm.FROZEN_PAIR[1], {'control_ivf_bytes': w1_roi.MED.control_ivf_bytes, 'start_base': w1_roi.MED.start_base,
+                                                      'kps1_bytes': w1_roi.MED.kps1_bytes, 'kps2_bytes': w1_roi.MED.kps2_bytes,
+                                                      'hybrid_archive_sha': w1_roi.MED.hybrid_archive_sha})
+    assert al == w1_roi.AL and med == w1_roi.MED
+    assert [w.id for w in wm.FROZEN_PAIR] == [w1_roi.WINDOW, 'medvedev_struff/014@194']
+
+
+def test_old_cohort_checks_are_unchanged():
+    assert kc.cohort_of({}) == kc.FROZEN and len(kc.FROZEN) == 12
+    # a manifest without `cohort` is checked against FROZEN, centered, exactly as before
+    with pytest.raises(ValueError):
+        kc.check_manifest({'provenance': {}, 'budget_gpu_hours': 8, 'clips': [], 'old_clips': []})
+    assert [w.id for w in wm.FROZEN_PAIR] == [f'{c}@{s + 120}' for c, s, _, _ in kc.FROZEN[:1]] + ['medvedev_struff/014@194']
+
+
+def test_w7_manifest_from_selection():
+    sel = json.loads(SELECTION.read_text())
+    windows = wm.from_selection(sel)
+    assert [w.name for w in windows] == ['al028', 'al034', 'al043', 'med000', 'med024', 'med019']
+    assert [w.id for w in windows][0] == 'alcaraz_hurkacz/028@120' and all(w.start == 0 and w.frames == 240 for w in windows)
+    assert windows[3].adapter['key'] == 'med' and windows[0].adapter['key'] == 'al'
+    assert wm.cohort_tuples(windows)[0][:3] == ['alcaraz_hurkacz/028', 0, 25]
+    assert [w.name for w in wm.select(windows, ['med019'])] == ['med019']
+    with pytest.raises(ValueError):
+        wm.select(windows, ['nope'])
+
+
+def test_check_rejects_bad_manifests():
+    a = wm.FROZEN_PAIR[0]
+    with pytest.raises(ValueError):
+        wm.check([a, a])
+    with pytest.raises(ValueError):
+        wm.check([a, wm.WindowSpec('al2', a.match, a.clip, a.start + 100, 240, 25, a.source_sha256, None)])  # overlap in one clip
+    with pytest.raises(ValueError):
+        wm.check([wm.WindowSpec('x_y', a.match, a.clip, 0, 240, 25, a.source_sha256, None)])
+    with pytest.raises(ValueError):
+        wm.legacy_sources([wm.WindowSpec('al2', a.match, a.clip, 300, 240, 25, a.source_sha256, None)])
+
+
+def test_native_base_sources_from_manifest(tmp_path):
+    windows = wm.from_selection(json.loads(SELECTION.read_text()), {c: '0' * 64 for c in ('alcaraz_hurkacz/028', 'medvedev_struff/000')})
+    path = tmp_path / 'w.json'
+    wm.dump(windows, path)
+    args = Namespace(windows_file=path, window=['al028', 'med000'], source=[Path('a'), Path('b')], al=None, med=None)
+    paths, sources = nb.sources_for(args)
+    assert paths == [Path('a'), Path('b')] and [s[0] for s in sources] == ['al028', 'med000'] and sources[1][1:3] == (0, 50)
+    with pytest.raises(ValueError):
+        nb.sources_for(Namespace(windows_file=path, window=['al028'], source=[Path('a'), Path('b')], al=None, med=None))
+
+
+def test_manifest_cohort_is_checked_by_confirm(tmp_path):
+    windows = wm.from_selection(json.loads(SELECTION.read_text()))
+    cohort = kc.cohort_of({'cohort': wm.cohort_tuples(windows)})
+    assert cohort[0] == ('alcaraz_hurkacz/028', 0, 25, windows[0].source_sha256) and len(cohort) == 6
+
+
+def test_check_manifest_accepts_a_noncentered_manifest_cohort():
+    import numpy as np
+    windows = wm.from_selection(json.loads(SELECTION.read_text()))
+    clips = [{'id': w.clip_id, 'frames': 400, 'fps': w.fps, 'sha256': w.source_sha256, 'review_frames': [w.start + 120],
+              'staged': {'sha256': w.source_sha256},
+              'registration': [{'frame': w.start + t, 'fits': True, 'homography': np.eye(3).tolist()} for t in range(240)]}
+             for w in windows]
+    manifest = {'contains_human_marks': False, 'provenance': dict(kc.PROVENANCE), 'budget_gpu_hours': 8, 'centered': False,
+                'old_clips': [f'old/{i}' for i in range(49)], 'cohort': wm.cohort_tuples(windows), 'clips': clips}
+    assert sorted(kc.check_manifest(manifest)) == sorted(w.id for w in windows)
+    manifest.pop('cohort')  # the same manifest against the frozen 12 windows is rejected, as before
+    with pytest.raises(ValueError):
+        kc.check_manifest(manifest)

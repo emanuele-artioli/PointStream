@@ -11,7 +11,7 @@ from typing import Any
 
 import numpy as np
 
-from experiments.tennis.k6b_confirm import FROZEN, PROVENANCE, check_manifest
+from experiments.tennis.k6b_confirm import PROVENANCE, check_manifest, cohort_of
 
 BASE_SHA = '85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4'
 ADAPTER_SHA = {'alcaraz_hurkacz': '5c6caf090f90a66eac5808abdaadfa50a74114331e610da4ea9a7f61db282d7a',
@@ -44,7 +44,7 @@ def check_anchor_rows(manifest: dict[str, Any], inputs: dict[str, Any], summary:
     requested = summary['requested'][:summary['configured_windows'] or None]
     if not rows or [w['id'] for w in rows] != requested or len(set(requested)) != len(requested):
         raise ValueError('Incomplete/duplicated anchor windows')
-    fixed = {f'{c}@{s+120}': (s, fps, sha) for c, s, fps, sha in FROZEN}
+    fixed = {f'{c}@{s+120}': (s, fps, sha) for c, s, fps, sha in cohort_of(manifest)}
     for row in rows:
         wid = row['id']
         start, fps, sha = fixed[wid]

@@ -10,7 +10,7 @@ from typing import Any
 
 import numpy as np
 
-from experiments.tennis.k6b_confirm import FROZEN, PROVENANCE, check_manifest
+from experiments.tennis.k6b_confirm import PROVENANCE, check_manifest, cohort_of
 from experiments.tennis.k6b_confirm_validate import strict_won
 
 
@@ -62,7 +62,7 @@ def report(manifest: dict[str, Any], anchor_stages: list[Path], judge_stages: li
     from src.segmentation.masks import decompress
 
     check_manifest(manifest)
-    ids = [f'{c}@{s+120}' for c,s,_,_ in FROZEN]
+    ids = [f'{c}@{s+120}' for c,s,_,_ in cohort_of(manifest)]
     sources = []
     anchors = {}
     judges = {}

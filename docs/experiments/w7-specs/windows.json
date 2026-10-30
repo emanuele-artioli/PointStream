@@ -1,0 +1,98 @@
+{
+ "schema": 1,
+ "base": {
+  "job": "20261023T194934Z-b0dcbb19",
+  "published_sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285",
+  "weights": "AnimateAnyone original, tennis-base@fit-100.pt"
+ },
+ "adapters": {
+  "alcaraz_hurkacz": {
+   "key": "al",
+   "job": "20261023T221650Z-3d7cbe2f",
+   "name": "ah-C",
+   "published_sha256": "f1a488f2a3ddecf57cff451801f64bc07ae652c2b8b998d4ac844ba8685f5fa2"
+  },
+  "medvedev_struff": {
+   "key": "med",
+   "job": "20261023T204452Z-d5c90446",
+   "name": "med-C",
+   "published_sha256": "5fc200fc50f5af68e561fa10baba54520043e5770555712caf6e89092b175427"
+  }
+ },
+ "selection_sha256": "e8803edafc2466e89318d78d24971dfd9ae45f1ef7e57601ef7190f5fc041951",
+ "seed": 20261030,
+ "windows": [
+  {
+   "name": "al028",
+   "match": "alcaraz_hurkacz",
+   "clip": "028",
+   "start": 0,
+   "frames": 240,
+   "fps": 25,
+   "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+   "source_yuv_sha256": "5788a0f1b0b2ce3c8d57ea842807a43dda1f9fa3cc06cd90c3aa4b27ff31d22a",
+   "reference": "window_frame0",
+   "tier": "w7-tier1"
+  },
+  {
+   "name": "al034",
+   "match": "alcaraz_hurkacz",
+   "clip": "034",
+   "start": 0,
+   "frames": 240,
+   "fps": 25,
+   "source_sha256": "7db0c143cd416ad17b4bda4eaa191d51da197eccc1143e9eb402f8bb2a7f0ee6",
+   "source_yuv_sha256": "3734897c6b329649ff886c053a9c6fe0bb215a30bec5629934fdc5fd10b0d317",
+   "reference": "window_frame0",
+   "tier": "w7-tier1"
+  },
+  {
+   "name": "al043",
+   "match": "alcaraz_hurkacz",
+   "clip": "043",
+   "start": 0,
+   "frames": 240,
+   "fps": 25,
+   "source_sha256": "847cb8272134bd31a5447ff3cce02b28a906fae44559b3e0a58661d8171b6c16",
+   "source_yuv_sha256": "0d90ad9784493401561e4390ca83d31c9dc40ac1752eb9ee40ef75190d0837d6",
+   "reference": "window_frame0",
+   "tier": "w7-tier1"
+  },
+  {
+   "name": "med000",
+   "match": "medvedev_struff",
+   "clip": "000",
+   "start": 0,
+   "frames": 240,
+   "fps": 50,
+   "source_sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+   "source_yuv_sha256": "da27e6d44ae9760a19a0dd1d2ac5eea2e3f826806b19c38a6000c63145f7ed11",
+   "reference": "window_frame0",
+   "tier": "w7-tier1"
+  },
+  {
+   "name": "med024",
+   "match": "medvedev_struff",
+   "clip": "024",
+   "start": 0,
+   "frames": 240,
+   "fps": 50,
+   "source_sha256": "4d602291ebea0fcb9698d86d3f93ce4c3076a13005e33079a82975b8b64605f2",
+   "source_yuv_sha256": "6d369add978de6caf939e8dd1b611df8d3f14943d500a9bfeb498a9cd04683cc",
+   "reference": "window_frame0",
+   "tier": "w7-tier1"
+  },
+  {
+   "name": "med019",
+   "match": "medvedev_struff",
+   "clip": "019",
+   "start": 0,
+   "frames": 240,
+   "fps": 50,
+   "source_sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+   "source_yuv_sha256": "4ae6aa9fdcebc922cc8c7ef5f2b86160844e6335f46aea0feadf01655bb247e7",
+   "reference": "window_frame0",
+   "tier": "w7-tier1"
+  }
+ ]
+}

@@ -7,6 +7,7 @@ scored first and must reproduce the hybrid job's recorded per-tick scores within
 from __future__ import annotations
 
 import argparse
+import sys
 import io
 import json
 import os
@@ -272,7 +273,11 @@ def validate() -> None:
 
 
 def main() -> None:
+    from experiments.tennis.w1_roi import preload_windows
+    preload_windows(sys.argv)
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--windows-file', type=Path, help='window manifest (window_manifest.py); registers its windows next to al/med')
+    p.add_argument('--window-state', type=Path, help='what earlier stages measured per manifest window (w1_roi.window_from_spec)')
     p.add_argument('--validate', action='store_true')
     for name in ('masks', 'hybrid', 'lpips', 'dists', 'encode-half', 'encode-full'):
         p.add_argument('--' + name, type=Path)
