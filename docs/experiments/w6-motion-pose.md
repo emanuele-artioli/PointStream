@@ -219,12 +219,12 @@ judges ([j.md](j.md)).
 - Budget: CPU only (≤ 2 CPU-hours on one server, scratch in `/local/users/emanuele`), no GPU job.
 
 ### 2026-10-30 — W6b outcome: the flicker is not in the masks; control caveat (stopped at the control, reported)
-- Run. `scripts`-free CPU run of `python -m experiments.tennis.w6 flicker-split` (code `502a58d7`, branch `claude/w6b-work`), gpu2 CPUs
+- Run. CPU run of `python -m experiments.tennis.w6 flicker-split` (code `502a58d7`, branch `claude/w6b-work`), gpu2 CPUs
   (pointstream env, torch 2.2.2 CPU, cv2 4.11.0, 4 threads), 236 s wall, 343 s CPU (the cold `import torch` from NFS took about 20 min more
   wall, no CPU). Log `/local/users/emanuele/pointstream/w6b/full.log`, outputs `/local/users/emanuele/pointstream/w6b/out/`
   (`flicker-split.npz` per-frame arrays); result JSON `docs/experiments/w6-specs/w6b-flicker-split.json`. No GPU, no fleet job.
   Inputs (sha256 prefixes, all verified): source `054e4535`, transport `6865035e`, anchor `67444a2a`, base `00b13e89`, gpu_base `5c4a0cfc`,
-  generation `031ea5d7`, post archive judges `4d71f6cc` (post job `20261030T132449Z-75957f16`); the SVT anchor is W6's saved per-frame series at
+  generation `031ea5d7`, post archive `48c352ae` (judges.npz `4d71f6cc`; post job `20261030T132449Z-75957f16`); the SVT anchor is W6's saved per-frame series at
   the hybrid's rate (no re-encode). Base stream decoded with aomdec (dav1d is not on gpu2; AV1 decoding is normative, ticks of the CPU RGB base
   differ from the saved GPU RGB by at most 1 level).
 - Control (H against W6's saved per-frame values): **not met at the rule's 1e-6.** Max absolute difference 2.2e-3 (flicker), 2.9e-3 (energy),
