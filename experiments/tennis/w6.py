@@ -8,6 +8,7 @@ Fleet stages (docs/experiments/w6-motion-pose.md; the rule is frozen there):
             paid scale-4 base and of plain SVT-AV1 at the hybrid's rate, the racket measure, and the visual clips
     validate-generate | validate-masks | validate-judge   the stages' fleet validators
     report  (CPU, local) the decision from the judge's arrays
+    flicker-split  (CPU, W6b) the flicker and residual energy of five variants of the composite, from the saved inputs
 
 Generation itself is ``k6b_generate generate --keep-all``. The pure functions (interpolation, checks, bootstrap, racket
 and reproducibility statistics) are at the top so that tests cover them.
@@ -135,6 +136,89 @@ def decide(rows: dict[str, Any]) -> dict[str, Any]:
 
 def tick_series(values: np.ndarray, ticks: list[int]) -> np.ndarray:
     return values[..., ticks]
+
+
+# ---------------------------------------------------------------- W6b: where the flicker comes from (pure functions)
+
+#: the variants of the split (docs/experiments/w6-motion-pose.md, "W6b"): the hybrid, generated crops with the source's
+#: matte, source pixels through the receiver masks, generated crops with temporally smoothed receiver masks, the base.
+SPLIT_VARIANTS = ("H", "G+S", "S+R", "G+Rs", "B")
+SPLIT_MIN_SHARE = 0.3  # the larger share must reach this ...
+SPLIT_LEAD = 0.1  # ... and lead the other by this much, else the flicker lives where generated content meets the base
+
+
+def majority_vote(masks: list[np.ndarray]) -> np.ndarray:
+    """Pixel-wise majority of boolean masks of one shape; a tie (two masks at the ends of a sequence) is foreground."""
+    if not masks:
+        raise ValueError("no masks to vote on")
+    stack = np.stack([np.asarray(m, bool) for m in masks])
+    return stack.sum(0) * 2 >= len(masks)
+
+
+def smooth_masks(sequence: dict[int, np.ndarray], t: int, radius: int = 1) -> np.ndarray:
+    """The majority of the masks at t-radius..t+radius that exist (all in the same box-normalised coordinates)."""
+    return majority_vote([sequence[s] for s in range(t - radius, t + radius + 1) if s in sequence])
+
+
+def split_shares(e_h: float, e_gs: float, e_sr: float) -> dict[str, float]:
+    """Mask share (H against the hybrid with the source matte) and content share (H against source pixels through the
+    receiver masks), each as the fraction of the hybrid's excess removed."""
+    if not e_h > 0:
+        return {"mask_share": float("nan"), "content_share": float("nan")}
+    return {"mask_share": (e_h - e_gs) / e_h, "content_share": (e_h - e_sr) / e_h}
+
+
+def split_decision(mask_share: float, content_share: float) -> dict[str, Any]:
+    """The frozen rule: the larger share names the fix if it reaches 0.3 and leads by 0.1, else the composite."""
+    if not (math.isfinite(mask_share) and math.isfinite(content_share)):
+        return {"fix": "undefined", "lead": float("nan")}
+    lead = abs(mask_share - content_share)
+    if max(mask_share, content_share) < SPLIT_MIN_SHARE - 1e-9 or lead < SPLIT_LEAD - 1e-9:  # tolerance for float rounding
+        return {"fix": "composite", "lead": lead}
+    return {"fix": "masks" if mask_share > content_share else "content", "lead": lead}
+
+
+def excess_shares(means: dict[str, float], anchor: float) -> dict[str, Any]:
+    """E(V) = mean(V) - anchor for every variant, the two shares and the decision."""
+    excess = {v: float(m) - anchor for v, m in means.items()}
+    shares = split_shares(excess["H"], excess["G+S"], excess["S+R"])
+    return {"excess": excess, **shares, "decision": split_decision(shares["mask_share"], shares["content_share"])}
+
+
+def block_resamples(n: int, block: int = BLOCK, draws: int = 2000, seed: int = 0) -> np.ndarray:
+    """(draws, n) frame indices: blocks of consecutive frames drawn with replacement (the bootstrap's resamples)."""
+    rng = np.random.default_rng(seed)
+    blocks = max(1, math.ceil(n / block))
+    starts = rng.integers(0, max(1, n - block + 1), size=(draws, blocks))
+    return np.array([np.concatenate([np.arange(s, min(s + block, n)) for s in row])[:n] for row in starts])
+
+
+def split_bootstrap(series: dict[str, np.ndarray], anchor: np.ndarray, draws: int = 2000, seed: int = 0) -> dict[str, Any]:
+    """Block-bootstrap 95% intervals of the mean, the excess, both shares and the share lead, on paired frames."""
+    n = len(anchor)
+    index = block_resamples(n, draws=draws, seed=seed)
+    means = {v: series[v][index].mean(1) for v in series}
+    anchor_mean = anchor[index].mean(1)
+    excess = {v: means[v] - anchor_mean for v in series}
+    mask = (excess["H"] - excess["G+S"]) / excess["H"]
+    content = (excess["H"] - excess["S+R"]) / excess["H"]
+
+    def interval(x: np.ndarray) -> list[float]:
+        return [float(np.percentile(x, 2.5)), float(np.percentile(x, 97.5))]
+
+    return {"mean": {v: interval(means[v]) for v in series}, "excess": {v: interval(excess[v]) for v in series},
+            "mask_share": interval(mask), "content_share": interval(content), "lead": interval(mask - content),
+            "share_mask_larger_by_lead": float(((mask - content) >= SPLIT_LEAD).mean()),
+            "share_content_larger_by_lead": float(((content - mask) >= SPLIT_LEAD).mean())}
+
+
+def control_max_diff(new: np.ndarray, saved: np.ndarray) -> float:
+    """Largest absolute difference over the frames where either is finite (NaN against a number counts as infinite)."""
+    new, saved = np.asarray(new, np.float64), np.asarray(saved, np.float64)
+    both_nan = np.isnan(new) & np.isnan(saved)
+    if np.isnan(new[~both_nan]).any() or np.isnan(saved[~both_nan]).any():
+        return float("inf")
+    return float(np.abs(new[~both_nan] - saved[~both_nan]).max()) if (~both_nan).any() else 0.0
 
 
 # ---------------------------------------------------------------- shared helpers
@@ -294,10 +378,10 @@ def load_wire(a: argparse.Namespace, scratch: Path) -> dict[str, Any]:
     return {"row": row, "players": players, "order": meta["compositing_order"], "units": units, "boxes": boxes, "region": region, "coded": coded}
 
 
-def plane_rgb(raw: Any, t: int, width: int, height: int, torch: Any) -> np.ndarray:
+def plane_rgb(raw: Any, t: int, width: int, height: int, torch: Any, device: str = "cuda") -> np.ndarray:
     from src.codecs.quality import yuv420_to_rgb
 
-    plane = torch.from_numpy(np.array(raw[t], copy=True)[None]).cuda()
+    plane = torch.from_numpy(np.array(raw[t], copy=True)[None]).to(device)
     return yuv420_to_rgb(plane, width, height, full_range=False)[0].permute(1, 2, 0).to(torch.uint8).cpu().numpy()
 
 
@@ -547,6 +631,185 @@ def command_post(a: argparse.Namespace) -> int:
     return command_judge(a)
 
 
+def decode_av1(stream: Path, out: Path, threads: int) -> dict[str, str]:
+    """dav1d where installed (as the paid pipeline did), else aomdec: both are conformant, so the planes are identical."""
+    from src.codecs import svtav1
+
+    if shutil.which("dav1d"):
+        subprocess.run(svtav1.decode_command("dav1d", stream, out, threads=threads), check=True, capture_output=True, timeout=900)
+        return {"decoder": "dav1d", "version": tool_version(["dav1d", "--version"])}
+    aom = shutil.which("aomdec") or str(Path(sys.executable).parent / "aomdec")
+    subprocess.run([aom, "--rawvideo", f"--threads={threads}", "-o", str(out), str(stream)], check=True, capture_output=True, timeout=900)
+    return {"decoder": "aomdec", "version": tool_version([aom, "--help"])}
+
+
+def command_flicker_split(a: argparse.Namespace) -> int:
+    """W6b (CPU): the post path's composite, flow and flicker, with the five variants of the split, from saved inputs."""
+    import cv2
+    import torch
+
+    from experiments.tennis.k4b_features import convert_command
+    from experiments.tennis.k6b import load_generated
+    from experiments.tennis.k6b_real_base_compose import compose
+    from experiments.tennis.k6b_receiver_sam import project
+    from experiments.visor.j import residual_energies
+
+    began, cpu_began = time.monotonic(), time.process_time()
+    torch.set_num_threads(a.threads)
+    cv2.setNumThreads(a.threads)
+    scratch, out_dir = a.scratch, a.out
+    out_dir.mkdir(parents=True, exist_ok=True)
+    scratch.mkdir(parents=True, exist_ok=True)
+    hashes = {k: digest(getattr(a, k)) for k in ("al", "transport", "anchor", "base", "gpu_base", "generated", "post_archive")}
+    if hashes["al"] != SOURCE_SHA:
+        raise ValueError("source clip changed")
+    for key, want in (("transport", "6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7"),
+                      ("base", "00b13e89077a27a3e6ff23bf476e9795c2120c5b1f5252ddfdd6f533a8119a39"),
+                      ("gpu_base", "5c4a0cfced5501e085f67d394f3a50ca7f92d2cb592f73fbd3ad661461cb691b"),
+                      ("generated", "031ea5d7b744a0c52f9ee769fb38d5b9d30340f567ca042c6079d4f9240f354c")):
+        if hashes[key] != want:
+            raise ValueError(f"{key} input changed")
+    frames = a.frames or FRAMES
+    post = extract_all(a.post_archive, scratch / "post") / "publish"
+    saved = np.load(post / "judges.npz")
+    saved_meta = json.loads((post / "w6-judge.json").read_text())
+    wire = load_wire(a, scratch)
+    players, order, boxes, region = wire["players"], wire["order"], wire["boxes"], wire["region"]
+    unit_names = [u["name"] for u in wire["units"]]
+
+    source_yuv = scratch / "source.yuv"
+    subprocess.run(convert_command("ffmpeg", a.al, source_yuv, SOURCE_START, FRAMES), check=True, capture_output=True, timeout=900)
+    if digest(source_yuv) != SOURCE_YUV_SHA:
+        raise ValueError("source conversion changed")
+    raw_source = np.memmap(source_yuv, np.uint8, "r", shape=(FRAMES, 1620, 1920))
+    base_ivf = scratch / "base" / "al-s4.ivf"
+    base_ivf.parent.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(a.base) as outer:
+        bundle = outer.extractfile("publish/bundle.tar")
+        assert bundle is not None
+        with tarfile.open(fileobj=bundle, mode="r:") as inner:
+            manifest = json.load(inner.extractfile("base/manifest.json"))  # type: ignore[arg-type]
+            ivf_row = next(r for r in manifest["rows"] if r["window"] == "al" and r["scale"] == 4)
+            with inner.extractfile("base/al-s4.ivf") as src, base_ivf.open("wb") as dst:  # type: ignore[union-attr]
+                shutil.copyfileobj(src, dst)
+    if digest(base_ivf) != ivf_row["ivf"]["sha256"]:
+        raise ValueError("paid base stream changed")
+    base_yuv = scratch / "base" / "al-s4.yuv"
+    decoder = decode_av1(base_ivf, base_yuv, a.threads)
+    raw_base = np.memmap(base_yuv, np.uint8, "r", shape=(FRAMES, 272 * 3 // 2, 480))
+    gpu_saved = np.load(extract_member(a.gpu_base, "publish/al-s4-gpu.npy", scratch / "base" / "al-s4-gpu.npy"), mmap_mode="r")
+
+    def base_frame(t: int) -> np.ndarray:
+        return cv2.resize(plane_rgb(raw_base, t, 480, 272, torch, "cpu"), (1920, 1080), interpolation=cv2.INTER_CUBIC)
+
+    base_diff = max(int(np.abs(base_frame(t).astype(np.int16) - np.asarray(gpu_saved[t // 3]).astype(np.int16)).max()) for t in range(0, FRAMES, 3))
+
+    generated = load_generated([str(a.generated)], scratch / "generated")
+    crops = {u: g for (u, _), g in generated.items()}
+    predicted: dict[int, dict[int, np.ndarray]] = {}
+    for i, name in enumerate(unit_names):
+        with np.load(post / f"{name}-masks.npz") as z:
+            predicted[i] = {int(t): m.astype(bool) for t, m in zip(z["t"], z["masks"])}
+    union = [np.logical_or.reduce([*r.values(), np.zeros((1080, 1920), bool)]) for r in region]
+    empty = np.zeros((1080, 1920), bool)
+
+    variants = list(SPLIT_VARIANTS)
+    flick = np.full((len(variants), frames), np.nan)
+    energy = np.full((len(variants), frames), np.nan)
+    energy_src = np.full(frames, np.nan)
+    iou_source = np.full((frames, len(players)), np.nan)   # receiver mask against the source's own mask, frame space
+    iou_smooth = np.full((frames, len(players)), np.nan)   # smoothed mask against the source's own mask
+    jitter_recv = np.full((frames, len(players)), np.nan)  # IoU of consecutive receiver masks, box-normalised
+    jitter_smooth = np.full((frames, len(players)), np.nan)
+    area_ratio = np.full((frames, len(players)), np.nan)   # receiver mask area against the source mask area (box-scaled)
+    previous: dict[str, np.ndarray] = {}
+    previous_source: np.ndarray | None = None
+
+    def iou(x: np.ndarray, y: np.ndarray) -> float:
+        union_area = int((x | y).sum())
+        return float((x & y).sum() / union_area) if union_area else math.nan
+
+    smooth_cache: dict[tuple[int, int], np.ndarray] = {}
+    for t in range(frames):
+        source = plane_rgb(raw_source, t, 1920, 1080, torch, "cpu")
+        base = base_frame(t)
+        player_crops, player_boxes = {}, {}
+        recv, smooth, matte = {}, {}, {}
+        for i, p in enumerate(players):
+            g = crops[unit_names[i]]
+            idx = np.flatnonzero(g["t"] == t)
+            if len(idx) == 1:
+                player_crops[p] = g["crops"][int(idx[0])]
+            player_boxes[p] = boxes[i][t]
+            recv[p] = project(predicted[i][t], boxes[i][t])
+            smooth_cache[(i, t)] = smooth_masks(predicted[i], t)
+            smooth[p] = project(smooth_cache[(i, t)], boxes[i][t])
+            matte[p] = region[t].get(p, empty)
+            if p in region[t]:
+                iou_source[t, i] = iou(recv[p], region[t][p])
+                iou_smooth[t, i] = iou(smooth[p], region[t][p])
+                area_ratio[t, i] = float(recv[p].sum() / max(1, region[t][p].sum()))
+            if t > 0:
+                jitter_recv[t, i] = iou(predicted[i][t], predicted[i][t - 1])
+                jitter_smooth[t, i] = iou(smooth_cache[(i, t)], smooth_cache[(i, t - 1)])
+        images: dict[str, np.ndarray] = {}
+        images["H"], written = compose(base, player_crops, player_boxes, recv, order)
+        images["G+S"], _ = compose(base, player_crops, player_boxes, matte, order)
+        images["G+Rs"], _ = compose(base, player_crops, player_boxes, smooth, order)
+        images["S+R"] = base.copy()
+        images["S+R"][written] = source[written]
+        images["B"] = base
+        if t > 0 and previous_source is not None:
+            for v_i, v in enumerate(variants):
+                residual = residual_energies(images[v], previous[v], source, previous_source, union[t], union[t - 1])
+                if residual is not None:
+                    flick[v_i, t], energy[v_i, t], energy_src[t] = residual
+        previous, previous_source = images, source
+        if t % 20 == 0:
+            print(f"phase=flicker-split frames={t + 1}/{frames} seconds={time.monotonic() - began:.0f}", flush=True)
+
+    # control: the hybrid reproduces W6's per-frame values, and the source energy its own
+    svt = [v for v in (str(x) for x in saved["variants"]) if v.startswith("svt_")]
+    names = [str(x) for x in saved["variants"]]
+    h_row = names.index("hybrid")
+    pairs = slice(1, frames)
+    control = {"flicker_max_abs_diff": control_max_diff(flick[0, pairs], saved["flicker"][h_row, pairs]),
+               "energy_max_abs_diff": control_max_diff(energy[0, pairs], saved["energy"][h_row, pairs]),
+               "source_energy_max_abs_diff": control_max_diff(energy_src[pairs], saved["energy_src"][pairs]), "tolerance": 1e-6}
+    control["pass"] = bool(max(control["flicker_max_abs_diff"], control["energy_max_abs_diff"], control["source_energy_max_abs_diff"]) <= 1e-6)
+
+    # the anchor at the hybrid's rate, from W6's saved per-frame values (no re-encode)
+    target, rate = saved_meta["target_kbps"], saved_meta["anchor_rates_kbps"]
+    low, high = svt[0], svt[1]
+    anchor_flicker = at_rate(target, (rate[low], saved["flicker"][names.index(low)][:frames]), (rate[high], saved["flicker"][names.index(high)][:frames]))
+    anchor_energy = at_rate(target, (rate[low], saved["energy"][names.index(low)][:frames]), (rate[high], saved["energy"][names.index(high)][:frames]))
+    valid = np.isfinite(flick[0]) & np.isfinite(anchor_flicker)
+    series = {v: flick[i][valid] for i, v in enumerate(variants)}
+    e_series = {v: energy[i][valid] for i, v in enumerate(variants)}
+    anchor_f, anchor_e, src_e = float(anchor_flicker[valid].mean()), float(anchor_energy[valid].mean()), float(energy_src[valid].mean())
+    flicker_result = {"mean": {v: float(s.mean()) for v, s in series.items()}, "anchor": anchor_f,
+                      **excess_shares({v: float(s.mean()) for v, s in series.items()}, anchor_f),
+                      "bootstrap95": split_bootstrap(series, anchor_flicker[valid])}
+    energy_result = {"mean": {v: float(s.mean()) for v, s in e_series.items()}, "anchor": anchor_e, "source": src_e,
+                     **excess_shares({v: float(s.mean()) for v, s in e_series.items()}, anchor_e),
+                     "bootstrap95": split_bootstrap(e_series, anchor_energy[valid])}
+    masks = {"iou_receiver_vs_source": mean_of(iou_source), "iou_smoothed_vs_source": mean_of(iou_smooth),
+             "receiver_over_source_area": mean_of(area_ratio), "consecutive_iou_receiver": mean_of(jitter_recv),
+             "consecutive_iou_smoothed": mean_of(jitter_smooth)}
+    result = {"frames": frames, "pairs": int(valid.sum()), "variants": variants, "flicker": flicker_result, "energy": energy_result,
+              "control": control, "masks": masks, "base_tick_max_abs_diff_vs_paid_rgb": base_diff, "base_decoder": decoder,
+              "anchor_rates_kbps": rate, "inputs": hashes, "post_job_judges_sha256": saved_meta["judges_sha256"], "device": "cpu",
+              "threads": a.threads, "seconds": round(time.monotonic() - began, 1), "cpu_seconds": round(time.process_time() - cpu_began, 1),
+              "tools": {"ffmpeg": tool_version(["ffmpeg", "-version"]), "torch": torch.__version__, "cv2": cv2.__version__}}
+    np.savez_compressed(out_dir / "flicker-split.npz", variants=np.asarray(variants), flicker=flick, energy=energy, energy_src=energy_src,
+                        valid=valid, anchor_flicker=anchor_flicker, anchor_energy=anchor_energy, iou_source=iou_source, iou_smooth=iou_smooth,
+                        jitter_recv=jitter_recv, jitter_smooth=jitter_smooth, area_ratio=area_ratio)
+    (out_dir / "w6b-flicker-split.json").write_text(json.dumps(result, indent=1, default=str) + "\n")
+    print(json.dumps({"control": control, "flicker": {k: flicker_result[k] for k in ("mean", "anchor", "mask_share", "content_share", "decision")},
+                      "seconds": result["seconds"]}, indent=1, default=str), flush=True)
+    return 0 if control["pass"] else 2
+
+
 def validate_judge() -> dict[str, bool]:
     stage = Path(os.environ["PS_STAGE_DIR"])
     summary = json.loads((stage / "w6-judge.json").read_text())
@@ -674,6 +937,14 @@ def main(argv: list[str] | None = None) -> int:
     q.add_argument("--clips", action="store_true")
     q.add_argument("--clip-anchor", default="svt_crf66")
     q.add_argument("--gpu-class", default="RTX")
+    # flicker-split: W6b, CPU, from W6's saved inputs (no fleet job)
+    s = sub.add_parser("flicker-split")
+    for name in ("al", "transport", "anchor", "base", "gpu_base", "generated", "post_archive"):
+        s.add_argument("--" + name.replace("_", "-"), type=Path, required=True, dest=name)
+    s.add_argument("--scratch", type=Path, required=True)
+    s.add_argument("--out", type=Path, required=True)
+    s.add_argument("--frames", type=int, default=0)
+    s.add_argument("--threads", type=int, default=4)
     for name in ("validate-generate", "validate-masks", "validate-judge", "validate-post"):
         sub.add_parser(name)
     r = sub.add_parser("report")
@@ -686,6 +957,8 @@ def main(argv: list[str] | None = None) -> int:
         return command_judge(a)
     if a.command == "post":
         return command_post(a)
+    if a.command == "flicker-split":
+        return command_flicker_split(a)
     if a.command == "report":
         print(json.dumps(report(a.judges, a.summary), indent=1))
         return 0
