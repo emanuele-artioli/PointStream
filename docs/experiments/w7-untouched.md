@@ -245,3 +245,11 @@ foreground-first claim.
 - rate transport: `20261030T150852Z-d4e7cd41` complete (CPU, gpu6; 17 s + 18 s); `full/published.tar` sha256 `8b0871ab633edcf4c77cb810cf2d3617a2a9593f0aa51af451c2a2ec21e30607`; `--validate` on the full output: 21 checks passed.
 - rgb diagnostic: `20261030T150335Z-9e58b2cc` (exclusive, A6000 on gpu3/gpu2) stayed pending 12 min (every A6000 holds another user's process); cancelled while still pending (0 GPU s) and resubmitted
   as a shared-GPU job `20261030T151619Z-33fb8db4` (same code and arguments; GPU colour conversion and resize are deterministic; class A6000 still required by the code).
+- generation: `20261030T150651Z-a58b2ce2` complete on gpu5 Ada (every-third-frame recipe, 2 units, adapter ah-C); smoke 92.2 s + full 1,323.9 s GPU; `full/published.tar` sha256
+  `d88f1c79cd78f292dc70105540cde4b659a4726138d34de02f343b4bb9edbd91`; full output rechecked by hand (`k6b_confirm_run --validate-only`): 15 checks passed.
+- rgb diagnostic, shared job `20261030T151619Z-33fb8db4` (gpu2, A6000): smoke ran 24 s but the fleet validator failed: the allowance (180 s, the frozen pair's 360 s / 2) was below the
+  one-window projection (191 s under contention). Code bug, fixed (`reservation_seconds`: 600 s, the spec's full reservation, for manifest windows; the validator also covers the 240-frame stage; test added).
+  Rerun by hand on the smoke output: every check true except the publication-time projection, which a replay cannot reproduce. Resubmitted as `20261030T163628Z-d8f52f8f`.
+- receiver masks (GPU, shared as the 2026-10-26 job): `20261030T163803Z-51dfa688` submitted (inputs: rate-transport, anchors and generation archives above).
+- GPU seconds so far (smoke + full from execution.json, failed smokes included): features 145 + 163 + 156, anchors 136 + 597, generation 92 + 1,324, rgb 24 (failed validator) = 2,637 s of 4,680 s
+  (rgb diagnostic rerun, receiver, judge, W1 scoring and DCVC still to count).
