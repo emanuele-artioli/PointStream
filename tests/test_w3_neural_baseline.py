@@ -282,7 +282,7 @@ def test_foreground_masks_control_flow_with_stand_ins(tmp_path, monkeypatch):
     assert k6.DISTS_PAD > 0
 
 
-def synthetic_summary(tmp_path, monkeypatch):
+def synthetic_summary(tmp_path, monkeypatch, listed=None):
     """A smoke summary whose DCVC records come from code_point and a stand-in worker."""
     from argparse import Namespace
 
@@ -301,18 +301,20 @@ def synthetic_summary(tmp_path, monkeypatch):
         record['encode_report']['container_bytes'] = record['bytes']
         record['scores'], record['mean'] = scores, {m: 0.1 for m in an.METRICS}
         record.pop('decoded')
+        if listed:  # the stand-in codes scale 8 frames; the named point is what the validator compares
+            point = {'scale': 2 if key == 'al' else 4, 'qp': 24 if key == 'al' else 36, 'target_kbps': None, 'est_kbps': None}
         scale8 = {'scale': 8, 'scores': scores, 'kbps': 10.1975}
         grid = [(s, q) for s in job.SCALES for q in job.CAL_QPS]
-        candidates = [{'scale': s, 'qp': q, 'est_kbps': 2.5 * 1.18 ** k} for k, (s, q) in enumerate(grid)]
-        windows.append({'window': key, 'accepted': True, 'candidates': candidates, 'chosen': [point], 'bracket_ok': True,
+        candidates = [] if listed else [{'scale': s, 'qp': q, 'est_kbps': 2.5 * 1.18 ** k} for k, (s, q) in enumerate(grid)]
+        windows.append({'window': key, 'accepted': True, 'candidates': candidates, 'chosen': [point], 'bracket_ok': None if listed else True,
                         'dcvc': [record], 'svt': [scale8], 'timings': {'convert': 5, 'calibration': 20, 'native_fixed': 8,
                         'native_variable': 2, 'svt_scale8': 3, 'masks': 4, 'scoring': 2},
                         'audited_controls': {'applies': key == 'al', 'scales': {'8': {'score_max_error': {'full_lpips': 0.0}}}}})
-    return {'frames': 25, 'points': 1, 'gpu_class': 'RTX 6000 Ada', 'gpu_uuid': 'GPU-abc', 'accepted': True, 'windows': windows,
+    return {'frames': 25, 'points': 1, 'point_list': listed, 'gpu_class': 'RTX 6000 Ada', 'gpu_uuid': 'GPU-abc', 'accepted': True, 'windows': windows,
             'setup_seconds': 60.0}
 
 
-def run_validator(tmp_path, monkeypatch, summary):
+def run_validator(tmp_path, monkeypatch, summary, spec='w3'):
     import tarfile
 
     from experiments.tennis import w3_neural_baseline as job
@@ -322,7 +324,7 @@ def run_validator(tmp_path, monkeypatch, summary):
     summary = json.loads(json.dumps(summary))
     (stage / 'w3-summary.json').write_text(json.dumps(summary))
     (stage / 'staging.json').write_text(json.dumps({'publication_seconds': 5.0}))
-    (stage.parent / 'spec.json').write_text(Path('docs/experiments/w3-specs/w3.json').read_text())
+    (stage.parent / 'spec.json').write_text(Path(f'docs/experiments/w3-specs/{spec}.json').read_text())
     inner = tmp_path / 'summary.json'
     inner.write_text(json.dumps(summary))
     with tarfile.open(stage / 'published.tar', 'w') as tar:
@@ -345,3 +347,184 @@ def test_validator_catches_a_decoder_difference(tmp_path, monkeypatch):
         run_validator(tmp_path, monkeypatch, bad)
     checks = json.loads((tmp_path / 'validation.json').read_text())['checks']
     assert [k for k, v in checks.items() if not v] == ['decoders_bit_identical']
+
+
+def test_point_list_parses_validates_and_keeps_order():
+    from experiments.tennis.w3_neural_baseline import parse_point_list
+
+    assert parse_point_list('al:2:21,med:4:15,al:2:30') == {'al': [(2, 21), (2, 30)], 'med': [(4, 15)]}
+    for bad in ('al:2:21', 'al:2:21,med:4:64', 'al:1:21,med:4:15', 'al:2:21,al:2:21,med:4:15', 'x:2:1,med:4:1', 'al:2,med:4:1'):
+        with pytest.raises(ValueError):
+            parse_point_list(bad)
+    spec = json.loads(Path('docs/experiments/w3-specs/w3b.json').read_text())
+    full = parse_point_list(spec['scale']['point_list']['full'])
+    assert len(full['al']) == 6 and len(full['med']) == 3 and parse_point_list(spec['scale']['point_list']['smoke'])['al'][0] in full['al']
+    assert '--points' not in spec['arguments'] and '{point_list}' in spec['arguments']
+
+
+def test_listed_projection_is_per_window():
+    from experiments.tennis.w3_neural_baseline import project_listed_seconds
+
+    t = [dict(convert=2, native_fixed=10, native_variable=1, svt_scale8=2, masks=3, scoring=4),
+         dict(convert=1, native_fixed=20, native_variable=2, svt_scale8=1, masks=2, scoring=1)]
+    expected = 1.35 * (5 + 4 * 6 + (2 + 6 * 10 + 6 * 9.6 + 2 + 80 / 9 * 3 + 3.5 * 80 / 9 * 4)
+                       + (1 + 3 * 20 + 3 * 9.6 * 2 + 1 + 80 / 9 * 2 + 2 * 80 / 9 * 1))
+    assert project_listed_seconds(t, 5, 6, [6, 3], 1.0, 1) == pytest.approx(expected)
+    with pytest.raises(ValueError):
+        project_listed_seconds(t, 5, 6, [6], 1.0, 1)
+    with pytest.raises(ValueError):
+        project_listed_seconds([{**t[0], 'masks': float('nan')}, t[1]], 5, 6, [6, 3], 1.0, 1)
+
+
+def test_validator_passes_a_good_listed_smoke_and_rejects_a_changed_point(tmp_path, monkeypatch):
+    first, second = tmp_path / 'first', tmp_path / 'second'
+    first.mkdir()
+    second.mkdir()
+    good = synthetic_summary(first, monkeypatch, listed='al:2:24,med:4:36')
+    result = run_validator(first, monkeypatch, good, spec='w3b')
+    assert result['passed'] and result['projected_full_seconds'] < 2400
+    assert 'rate_only_selection' not in result['checks'] and result['checks']['points_as_named']
+    bad = synthetic_summary(second, monkeypatch, listed='al:2:24,med:4:36')
+    bad['windows'][0]['chosen'][0]['qp'] = 25
+    with pytest.raises(SystemExit):
+        run_validator(second, monkeypatch, bad, spec='w3b')
+    checks = json.loads((second / 'validation.json').read_text())['checks']
+    assert [k for k, v in checks.items() if not v] == ['points_as_named']
+
+
+def curve_points(rows):
+    return [{'rate_kbps': r, 'whole_lpips': w, 'foreground_lpips': f, 'whole_dists': w, 'foreground_dists': f} for r, w, f in rows]
+
+
+def test_interpolation_is_log_rate_between_brackets_and_never_extrapolates():
+    pts = curve_points([(16.0, 0.4, 0.6), (25.0, 0.2, 0.4)])
+    assert an.interpolate_log_rate(pts, 20.0, 'whole_lpips') == pytest.approx(0.4 - 0.2 * math.log(20 / 16) / math.log(25 / 16))
+    assert an.interpolate_log_rate(pts, 16.0, 'whole_lpips') == pytest.approx(0.4)
+    assert an.interpolate_log_rate(pts, 15.9, 'whole_lpips') is None
+    assert an.interpolate_log_rate(pts, 26.0, 'whole_lpips') is None
+
+
+def test_dominance_needs_both_whole_and_foreground_within_margin_and_a_bracket():
+    hybrid = {'lpips': {'whole': 0.28, 'foreground': 0.35}, 'dists': {'whole': 0.17, 'foreground': 0.25}}
+    far = curve_points([(20.0, 0.15, 0.55), (25.0, 0.14, 0.45)])
+    verdict = an.dominance(far, 22.0, hybrid)
+    assert verdict['lpips']['verdict'] == 'does not dominate' and verdict['lpips']['whole_margin'] > 0
+    assert verdict['lpips']['foreground_margin'] < 0
+    near = curve_points([(20.0, 0.2, 0.36), (25.0, 0.2, 0.36)])
+    assert an.dominance(near, 22.0, hybrid)['lpips']['verdict'] == 'does not dominate'  # foreground 0.36 > 0.35 + 0.001
+    inside = curve_points([(20.0, 0.2, 0.3505), (25.0, 0.2, 0.3505)])
+    assert an.dominance(inside, 22.0, hybrid)['lpips']['verdict'] == 'dominates'
+    assert an.dominance(inside, 30.0, hybrid)['dists']['verdict'] == 'unresolved'
+
+
+def test_w3b_report_flattens_summaries_and_builds_the_stronger_envelope():
+    from experiments.tennis import w3b_report as rep
+
+    def point(scale, qp, kbps, w, f):
+        mean = {'full_lpips': w, 'full_dists': w / 2, 'foreground_lpips': f, 'foreground_dists': f / 2}
+        return {'scale': scale, 'qp': qp, 'kbps': kbps, 'mean': mean, 'max_decode_diff': 0, 'accepted': True}
+
+    w3 = {'windows': [{'window': 'al', 'dcvc': [point(2, 6, 8.4, 0.2, 0.57), point(2, 18, 16.1, 0.16, 0.45)],
+                       'svt': [point(8, 63, 10.2, 0.45, 0.84), point(2, 63, 33.7, 0.14, 0.48)]},
+                      {'window': 'med', 'dcvc': [], 'svt': []}]}
+    w3b = {'windows': [{'window': 'al', 'dcvc': [point(2, 24, 22.7, 0.12, 0.40), point(2, 27, 26.0, 0.11, 0.38)], 'svt': []}]}
+    w1 = {'analysis': {'by_policy': {'s2_o0': [{'crf': 66, 'rate_kbps': 22.3, 'whole_lpips': 0.18, 'foreground_lpips': 0.57,
+                                                'whole_dists': 0.13, 'foreground_dists': 0.43}], 's4_o0': []}}}
+    out = rep.report(w3, w3b, w1)
+    assert [p['qp'] for p in out['dcvc_points']] == [6, 18, 24, 27]
+    assert len(out['strong_svt_points']) == 3
+    assert out['dominance']['primary']['scale2']['lpips']['verdict'] == 'does not dominate'  # foreground 0.40 vs 0.346
+    assert rep.RATES['rebilled_kps2'] == pytest.approx(21.458796, abs=1e-5)
+    assert set(out['bd_rate_vs_strong_svt']) == set(an.METRICS)
+    json.dumps(out)
+
+
+def stand_in_window(tmp_path, monkeypatch, calls, fail_qp=None):
+    """run_window with every heavy dependency replaced; exercises per-item scoring, checkpointing and resume only."""
+    import sys
+    from argparse import Namespace
+    from types import SimpleNamespace
+
+    from experiments.jobs import monitor
+    from experiments.tennis import w3_neural_baseline as job
+    from experiments.visor import h3, h3b
+    from src.codecs import quality
+
+    net = SimpleNamespace(parameters=lambda: iter([SimpleNamespace(is_cuda=True)]))
+    monkeypatch.setitem(sys.modules, 'torch', SimpleNamespace(cuda=SimpleNamespace(empty_cache=lambda: None)))
+    monkeypatch.setattr(job.subprocess, 'run', lambda *a, **k: None)
+    monkeypatch.setattr(job, 'digest', lambda path: job.SOURCES['al']['yuv'])
+    monkeypatch.setattr(h3, 'rgb_memmap', lambda *a, **k: object())
+    monkeypatch.setattr(quality, 'load_lpips', lambda *a: net)
+    monkeypatch.setattr(h3b, 'load_dists', lambda *a: net)
+    monkeypatch.setattr(monitor, 'publish_progress', lambda *a, **k: None)
+    monkeypatch.setattr(job, 'foreground_masks', lambda *a: {t: np.zeros((8, 8), bool) for t in range(0, 240, 3)})
+    monkeypatch.setattr(job, 'audited_controls', lambda *a: {'applies': False})
+    monkeypatch.setattr(job, 'score_stream', lambda *a: {m: [0.1] * 80 for m in an.METRICS})
+    monkeypatch.setenv('PS_STAGE', 'full')
+
+    def code_point(args, source, work, fps, n, point):
+        calls.append(f'dcvc-s{point["scale"]}-q{point["qp"]}')
+        pdir = work / calls[-1]
+        pdir.mkdir()
+        (pdir / 'stream.psdc').write_bytes(b'PSDC' + bytes(point['qp']))
+        (pdir / 'reports.json').write_text('{}')
+        yuv = pdir / 'decode-a.yuv'
+        yuv.write_bytes(b'')
+        return {'codec': 'dcvc-uf-htl', 'scale': point['scale'], 'qp': point['qp'], 'size': [960, 544], 'kbps': 20.0 + point['qp'],
+                'accepted': point['qp'] != fail_qp, 'seconds': {'process': 20.0, 'variable': 5.0}, 'decoded': str(yuv)}
+
+    def code_svt(source, work, fps, scale):
+        calls.append(f'svt-s{scale}')
+        (work / f'svt-s{scale}').mkdir()
+        (work / f'svt-s{scale}' / 'stream.ivf').write_bytes(b'ivf')
+        return {'codec': 'svt-av1', 'scale': scale, 'size': [240, 136], 'kbps': 10.2, 'stream': 'stream.ivf', 'decoded': 'x'}
+
+    monkeypatch.setattr(job, 'code_point', code_point)
+    monkeypatch.setattr(job, 'code_svt', code_svt)
+    args = Namespace(frames=240, al=tmp_path / 'al.mp4', point_list='al:2:21,al:2:23,med:4:15', points=1)
+
+    def run(root, checkpoint):
+        scratch, publish = root / 'scratch', root / 'publish'
+        scratch.mkdir(parents=True)
+        publish.mkdir()
+        ctx = {'scratch': scratch, 'publish': publish, 'checkpoint': checkpoint, 'svt_scales': [8], 'anchors': {}, 'wire': None,
+               'prior_rows': {}, 'lpips': None, 'dists': None}
+        return job.run_window(args, 'al', ctx), publish / 'al'
+
+    return run
+
+
+def test_run_window_scores_and_checkpoints_each_item_and_resumes_without_recoding(tmp_path, monkeypatch):
+    calls: list[str] = []
+    run = stand_in_window(tmp_path, monkeypatch, calls)
+    checkpoint = tmp_path / 'ck'
+    checkpoint.mkdir()
+    first, out = run(tmp_path / 'first', checkpoint)
+    assert calls == ['dcvc-s2-q21', 'dcvc-s2-q23', 'svt-s8'] and first['accepted']
+    assert sorted(p.name for p in checkpoint.iterdir()) == ['al__dcvc-s2-q21', 'al__dcvc-s2-q23', 'al__svt-s8']
+    assert (out / 'dcvc-s2-q21.psdc').exists() and (out / 'svt-s8.ivf').exists()
+    record = json.loads((checkpoint / 'al__dcvc-s2-q23' / 'record.json').read_text())
+    assert record['mean']['full_lpips'] == pytest.approx(0.1) and 'decoded' not in record and (checkpoint / 'al__dcvc-s2-q23' / 'dcvc-s2-q23.psdc').exists()
+    # a stop after the first point: only that item survives; the next attempt codes the rest and keeps the first untouched
+    import shutil
+
+    for name in ('al__dcvc-s2-q23', 'al__svt-s8'):
+        shutil.rmtree(checkpoint / name)
+    calls.clear()
+    second, out2 = run(tmp_path / 'second', checkpoint)
+    assert calls == ['dcvc-s2-q23', 'svt-s8']
+    assert second['dcvc'][0]['resumed_from_checkpoint'] and 'resumed_from_checkpoint' not in second['dcvc'][1]
+    assert (out2 / 'dcvc-s2-q21.psdc').read_bytes() == (out / 'dcvc-s2-q21.psdc').read_bytes()
+    assert [p['qp'] for p in second['dcvc']] == [21, 23] and second['timings']['scoring'] > 0
+    json.dumps(second)
+
+
+def test_run_window_stops_at_a_rejected_point_without_checkpointing_it(tmp_path, monkeypatch):
+    calls: list[str] = []
+    run = stand_in_window(tmp_path, monkeypatch, calls, fail_qp=23)
+    checkpoint = tmp_path / 'ck'
+    checkpoint.mkdir()
+    result, out = run(tmp_path / 'run', checkpoint)
+    assert not result['accepted'] and result['stopped_at'] == {'scale': 2, 'qp': 23}
+    assert [p.name for p in checkpoint.iterdir()] == ['al__dcvc-s2-q21'] and (out / 'result.json').exists()

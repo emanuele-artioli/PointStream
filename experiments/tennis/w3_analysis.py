@@ -140,3 +140,41 @@ def envelope_comparison(test: dict[str, list[tuple[float, float]]], anchor: dict
         result['rate_dominance'] = rate_dominance(t, a)
         out[metric] = result
     return out
+
+
+# W3b: W1's dominance rule applied to the DCVC points (docs/experiments/w3-neural-baseline.md, W3b).
+DOMINANCE_MARGIN = 0.001
+
+
+def interpolate_log_rate(points: list[dict[str, Any]], rate: float, metric: str) -> float | None:
+    """Metric at ``rate``, linear in log-rate between the nearest points at or below and at or above it.
+
+    Never extrapolates: None when no point lies on one side. ``points`` need ``rate_kbps`` and the metric."""
+    below = [p for p in points if p['rate_kbps'] <= rate]
+    above = [p for p in points if p['rate_kbps'] >= rate]
+    if not below or not above:
+        return None
+    lo, hi = max(below, key=lambda p: p['rate_kbps']), min(above, key=lambda p: p['rate_kbps'])
+    if hi['rate_kbps'] == lo['rate_kbps']:
+        return float(lo[metric])
+    weight = (math.log(rate) - math.log(lo['rate_kbps'])) / (math.log(hi['rate_kbps']) - math.log(lo['rate_kbps']))
+    return float(lo[metric] + weight * (hi[metric] - lo[metric]))
+
+
+def dominance(points: list[dict[str, Any]], rate: float, hybrid: dict[str, dict[str, float]],
+              margin: float = DOMINANCE_MARGIN) -> dict[str, Any]:
+    """W1's rule at ``rate`` for one curve: per distance (lpips, dists) whole <= hybrid whole + margin AND
+    foreground <= hybrid foreground + margin; unresolved if either interpolation lacks a bracket.
+
+    ``points`` hold ``rate_kbps`` and ``whole_<m>`` / ``foreground_<m>``; ``hybrid[m]`` has ``whole`` and ``foreground``."""
+    out: dict[str, Any] = {}
+    for m, ref in hybrid.items():
+        whole = interpolate_log_rate(points, rate, f'whole_{m}')
+        fg = interpolate_log_rate(points, rate, f'foreground_{m}')
+        if whole is None or fg is None:
+            out[m] = {'verdict': 'unresolved', 'whole': whole, 'foreground': fg}
+            continue
+        ok_whole, ok_fg = whole <= ref['whole'] + margin, fg <= ref['foreground'] + margin
+        out[m] = {'verdict': 'dominates' if ok_whole and ok_fg else 'does not dominate', 'whole': whole, 'foreground': fg,
+                  'whole_margin': ref['whole'] + margin - whole, 'foreground_margin': ref['foreground'] + margin - fg}
+    return out

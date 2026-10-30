@@ -260,3 +260,199 @@ the decisions are in [experiments.md](../experiments.md). Context:
   decoding on the RTX 6000 Ada, and at these ultralow rates it is far ahead of SVT-AV1 on both whole
   frame and foreground. Any PointStream claim against the two baselines must now beat DCVC, not only
   SVT; W1's comparison and the 15-60 kbps coverage are the next consumers.
+
+### 2026-10-29 — W3b: does DCVC-UF at the hybrid's rate dominate the PointStream hybrid on Al? (rule, written before any new quality is seen)
+- Question. W3's accepted DCVC-UF points reached 2.3–16.1 kbps. The PointStream
+  hybrid on Al (job `20261027T211451Z-f6a754eb`) is at 22.737962 kbps (whole
+  LPIPS 0.275787 / DISTS 0.169612; foreground LPIPS 0.345876 / DISTS 0.252551),
+  and 21.458796 kbps when re-billed with the KPS2 keypoint packet. Does any DCVC
+  point at those rates dominate it? (W3's Al points: scale 2 QP6 8.40 kbps whole
+  LPIPS .209 / fg .569; scale 2 QP18 16.08 kbps whole .159 / fg .449.)
+- Rule (W1's, [w1-roi-pareto](w1-roi-pareto.md)). DCVC *dominates* the hybrid on a
+  metric (LPIPS or DISTS) at a rate R if its whole score <= hybrid whole + 0.001 AND
+  its foreground score <= hybrid foreground + 0.001. Its score at R (22.737962 and
+  21.458796 kbps) is interpolated linearly in log-rate between the two bracketing
+  DCVC points of one scale; a rate without a bracketing pair is *unresolved*, never
+  extrapolated. Verdict per (rate, metric): dominates / does not dominate / unresolved.
+- Hypothesis. DCVC's player region at about 22 kbps stays worse than the hybrid's 0.346
+  foreground LPIPS because its players are blurred (W3: fg LPIPS .449 at 16 kbps).
+- Competing explanation. DCVC at about 22 kbps reaches player LPIPS <= 0.35 with whole
+  LPIPS <= 0.18 and dominates; the hybrid is then not Pareto-better against a neural
+  codec on Al.
+- Budget. <= 1 GPU-hour (3,600 s) including smoke and failures; W3's whole job needed 626 s.
+  RTX 6000 Ada, hosts gpu5 and gpu6, exclusive. Same job, validator and acceptance checks as
+  W3 (I frame within one level; two separate decoder processes, two passes each, bit-identical
+  on every frame; reference buffer status recorded); only the point list changes, and the
+  25-frame rate calibration is skipped because the points are named. SVT scale 8 stays as the
+  scoring control (Al must reproduce the audited job within 1e-3). Frame count 240, ticks
+  0:240:3, development windows, the real-base judge's code, as W3.
+- Point selection (rate alone, from W3's MEASURED 240-frame rates; the 25-frame estimator
+  overshot 3.6–6x and is used only as a within-scale shape). In each window and scale the
+  measured/estimated ratio is stable across QP: Al scale 2 QP6 8.396/30.1 = 0.279 and QP18
+  16.078/58.3 = 0.276 (mean 0.277); Med scale 4 QP12 10.593/62.2 = 0.170 (Med scale 8
+  drifts 0.178 -> 0.166 from QP6 to QP18). Predicted rate = ratio x the calibration estimate
+  (log-linear in QP between the 6-QP grid): 
+  - Al, scale 2 (scale 1 is not needed: scale 2 reaches the target and the worker has no
+    scale-1 path): QP 21, 23, 24, 25, 27, 30 -> predicted 19.2, 21.4, 22.7, 23.8, 26.3, 30.4 kbps.
+    At least one point below 21 (QP21) and one above 23 (QP25, 27, 30); W3's QP18 (16.08,
+    measured) is a third lower anchor. Choosing this many costs about 25 s each.
+  - Med, scale 4 (scale 8 tops out near 15 kbps at QP63): QP 15, 36, 63 -> predicted 12.9,
+    27.4, 52.1 kbps, a triple bracketing 15–40 (the high end carries the larger ratio-drift
+    risk; Med is secondary to the question).
+  No quality was looked at to choose these; if a bracket fails in the measured rates the Al
+  verdict at that rate is "unresolved" and the outcome entry says so.
+- Second analysis (same entry, rule fixed here). DCVC's whole and foreground BD-rate against
+  W1's stronger SVT envelope (the upper concave hull of the plain half- and quarter-resolution
+  CRF points scored by W1's scoring jobs) instead of the three CRF-63 bases, reported only for
+  metrics where the quality ranges overlap, otherwise "better/worse at every rate" as AGENTS.md
+  requires. Inputs are the W3 and W3b DCVC points (all measured, decoded exactly).
+- Jobs: `20261029T190006Z-d48a344b` (hosts gpu5 and gpu6, exclusive RTX 6000 Ada; spec `docs/experiments/w3-specs/w3b.json`; submitted 2026-10-29T19:00Z; ready.json `git_head` `1e10451a` per the submit output, to be confirmed from ready.json; the publish call returned normally; started on gpu5 GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162).
+
+### 2026-10-29 — W3b outcome of `20261029T190006Z-d48a344b`: terminated by GPU contention before any quality was scored; the rule is not yet applied (stopped for root)
+- Job `20261029T190006Z-d48a344b`, ready.json `git_head` `1e10451ad961655711f1ef1ee3535705f9489ef4`
+  (the revision of the spec and the named point list), gpu5 GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162
+  (RTX 6000 Ada, exclusive claim). The smoke passed (144 s; validator passed, projected full 1,930 s of the
+  2,400 s allowance). In the full stage another user's process appeared on the claimed GPU twice (pids
+  577752, then 586791); the first pause cleared after 156 s, the second lasted the full 900 s pause allowance
+  and the supervisor ended the job as `contended` (terminal; `resume_declined: full published no checkpoint`,
+  because the job checkpoints per window and Al's scoring had not finished). Nothing was scored; no `result.json`,
+  no `summary.json`, no validator verdict for the full stage. Wall time of the claim about 1,626 s plus
+  144 s smoke (about 1,056 s of it paused), productive GPU time about 710 s; about 1.8k of the 3.6k GPU-s
+  budget is charged at most. Not resubmitted (root's rule).
+- What exists (`full/partial.tar` in the job's inbox, copy extracted on gpu5 at
+  `/local/users/emanuele/w3b-partial`): Al's six named points were encoded to real bitstreams and each file was
+  decoded by two separate processes, two passes each; for all six the four lists of 240 frame hashes are equal
+  and the decoders reported deterministic (this is the rule's check (b); check (a), the I frame, is in the
+  unwritten `result.json`, and the reference buffer stays unreachable). Rates from the container sizes (no quality
+  looked at):
+
+| Al point | bytes | kbps |
+|---|---:|---:|
+| scale 2 QP21 | 23,104 | 19.253 |
+| scale 2 QP23 | 25,995 | 21.663 |
+| scale 2 QP24 | 27,806 | 23.172 |
+| scale 2 QP25 | 29,587 | 24.656 |
+| scale 2 QP27 | 33,194 | 27.662 |
+| scale 2 QP30 | 40,066 | 33.388 |
+
+  The prediction (19.2 / 21.4 / 22.7 / 23.8 / 26.3 / 30.4) was within 1–10 %; both hybrid rates are bracketed:
+  21.4588 by QP21 and QP23, and 22.7380 by QP23 and QP24 (with W3's QP18 at 16.08 kbps below). Med's points,
+  the Al scores, the foreground masks' use and the SVT control were not completed.
+- Consequence. The dominance verdict at 22.737962 and 21.458796 kbps and the BD-rates against the stronger
+  SVT envelope are NOT available; `experiments/tennis/w3b_report.py` (tested on stand-in data) produces them
+  from the saved summaries once a scored summary exists. Options for root, both about 10 GPU-minutes: (a) the
+  same job again (the encoder is deterministic, so the streams should reproduce byte for byte and can be
+  checked against the sha256 of the saved files); (b) a scoring job that decodes the six saved Al streams
+  (and a Med run) and compares the decoded frame hashes with the saved ones, which also tests decoding in a
+  later job on the same GPU class, an open W3 limit. Suggest widening the contention allowance or
+  checkpointing after the encode stage so a pause cannot discard an encode.
+
+### 2026-10-29 — W3b rerun (root's option a): two changes recorded before submitting
+- Decision rule, hypothesis, competing explanation, points and analysis are unchanged from the W3b rule
+  entry; no quality has been seen (the stopped job scored nothing). Root's instruction: rerun the same job once.
+- Change 1, checkpoints per item. `run_window` now builds the foreground masks and loads the metric networks
+  first, then for every named DCVC point (and the SVT scale-8 control) encodes, decodes in two separate processes,
+  scores it, publishes its files and checkpoints it (record with scores, stream, reports, written under a dot-name
+  and renamed into place) before the next item starts. A stop loses only the item in progress; a declared resume
+  restores finished items and codes the rest. Order changed from "all codecs, then all scoring" to per item;
+  it does not touch the codec subprocesses, so the bitstreams and decode checks are those of the first job. Tests
+  with stand-ins cover scoring, checkpointing, resume without recoding, and a rejected point.
+- Change 2, contention allowance. `pause_seconds` 1,800 (was 900), `resume_attempts` 1 (as before). The spec's
+  budget is now 2,700 s (smoke allowance 300 s, full 2,300 s; the first job's smoke took 144 s) because W3b's cap is
+  4,500 GPU-s and about 1.8k is charged. Limit to note: the budget is wall time and a resume needs the remaining
+  budget to cover the full stage allowance, so a stop after the long pause will be declined as "remaining budget
+  cannot support"; the 1,800 s pause is then the protection, and the per-item checkpoints and `partial.tar` keep the
+  finished items either way (a later scoring-only run could use them).
+- Cross-job byte-identity check (to report in the outcome). The first job's six Al streams, with `sha256` of the
+  container files and the 240 frame hashes in its `*-reports.json` (kept in `partial.tar`), should equal this job's
+  streams and hashes byte for byte; any difference is reported, not repaired.
+- Rerun submissions (revision `674a38b5`, spec `w3b.json` as above), none published, no GPU time spent: `20261029T194755Z-18bfb747`
+  and `20261029T225231Z-909e690c` (both: snapshot extraction on gpu2 `tar -xf source.tar` timed out after 300 s with
+  234 and 229 of about 250 files written; the inbox holds `source/`, `source.tar` and `events/` but no request or
+  spec; `ps-fleet status` answers "unpublished or unknown"; no live extraction process on gpu2). Between them one
+  attempt was refused before any ID existed ("worker gpu5 has no fresh heartbeat"; heartbeats were fresh after a
+  five-minute wait). Not resubmitted again: the rerun is still outstanding and needs root's go-ahead (suggested:
+  a smaller `--snapshot-path` set, or the extraction host changed).
+- Third submission (root-approved, reduced snapshot): job `20261029T232113Z-47fe00a2`, published (status `pending` after the
+  client-side publish call timed out at 120 s; inspected, not resubmitted), ready.json `git_head`
+  `142aa3bb31caf923bfa0eeb762a1b143fe5aa159`, spec `w3b.json`, hosts gpu5 and gpu6. The snapshot lists the static import
+  closure of the workload instead of whole directories: `--snapshot-path` for `pyproject.toml` and 85 modules
+  (`src/codecs` 4, `src/pointstream` 3, `src/segmentation` 10, `experiments/tennis` 33 (the `w3_*`, `k4*`, `k5`, `k6*`,
+  `parallel_*`, `windows` modules the workload imports), `experiments/visor` 12, `experiments/background` 10,
+  `experiments/audit` 2, `experiments/jobs` 7 plus the rest of that directory, which the fleet adds, `tools/datasets` 2, `experiments/__init__.py` and `src/__init__.py`) = **88 files** on the extracted
+  tree (the earlier sets had 229-250). Proof before submitting: `git archive HEAD` of these paths extracted on gpu5 under
+  `/local/users/emanuele`, then `python -I` with the pointstream environment imported the fleet manager modules and the
+  workload (`w3_neural_baseline`, `dcvc_uf_worker`, `svtav1`, `quality`, the `k6b_*`, `h3*`, `masks` modules).
+  Two further attempts were refused before any ID existed (no fresh heartbeat on gpu5/gpu6; retried after waits).
+
+### 2026-10-29 — W3b outcome: DCVC-UF at the hybrid's rates does NOT dominate it on Al; it wins the whole frame by a wide margin and loses the players
+- Job `20261029T232113Z-47fe00a2` (third submission; smoke 95.9 s, full 505.0 s of execution; validator passed; no
+  contention, no resume), ran on gpu6, GPU `GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553` (RTX 6000 Ada, capability 8.9,
+  exclusive, torch 2.10.0+cu128), ready.json `git_head` `142aa3bb31caf923bfa0eeb762a1b143fe5aa159`, packed environment
+  as W3. Raw: `Datasets/pointstream-data/jobs/fleet/inbox/20261029T232113Z-47fe00a2/full/` (`published.tar`: nine
+  bitstreams, reports with every frame hash, masks, `summary.json`; `w3-summary.json`). GPU cost: about 0.60k s of
+  execution (about 0.7k s claimed including staging); with the stopped job (about 1.8k) W3b has used about 2.5k of 4,500.
+  Development windows, 240 native frames, 80 ticks, the real-base judge's code; not untouched footage.
+- Acceptance (as W3, all nine points): I frame max difference 0; the same file decoded in two separate processes, two
+  passes each, bit-identical on all 240 frames (max decode diff 0); reference buffer unreachable as before. The SVT
+  scale-8 control reproduced the audited job: bytes equal, max score error 9.3e-5 (limit 1e-3).
+- Points (kbps = container bytes; scores are means over 80 ticks):
+
+| Window | Point | kbps | whole LPIPS | whole DISTS | fg LPIPS | fg DISTS |
+|---|---|---:|---:|---:|---:|---:|
+| Al | DCVC s2 QP21 | 19.253 | 0.1514 | 0.1248 | 0.4229 | 0.3231 |
+| Al | DCVC s2 QP23 | 21.663 | 0.1447 | 0.1174 | 0.3988 | 0.3085 |
+| Al | DCVC s2 QP24 | 23.172 | 0.1406 | 0.1139 | 0.3885 | 0.3015 |
+| Al | DCVC s2 QP25 | 24.656 | 0.1373 | 0.1118 | 0.3809 | 0.2976 |
+| Al | DCVC s2 QP27 | 27.662 | 0.1329 | 0.1063 | 0.3654 | 0.2900 |
+| Al | DCVC s2 QP30 | 33.388 | 0.1240 | 0.0981 | 0.3421 | 0.2751 |
+| Med | DCVC s4 QP15 | 12.767 | 0.4314 | 0.2209 | 0.6899 | 0.4446 |
+| Med | DCVC s4 QP36 | 35.812 | 0.4000 | 0.1932 | 0.5901 | 0.3494 |
+| Med | DCVC s4 QP63 | 130.822 | 0.3822 | 0.1757 | 0.5308 | 0.3131 |
+
+  (W3's Al points: scale 2 QP6 8.396 kbps and QP18 16.078 kbps, scale 8 QP30 3.600 kbps, as in its table.) Med's points
+  bracket 15-40 kbps (12.8 below, 130.8 above); the middle one landed at 35.8, not the predicted 27, because the
+  measured/estimated ratio rises with QP at scale 4 (0.17 at QP12, 0.22 at QP36, 0.43 at QP63). Med has no hybrid
+  score, so no dominance test there.
+- Dominance at the hybrid's rates, Al, scale 2 (log-rate interpolation between the bracketing points: 21.663 and 23.172
+  kbps at 22.738; 19.253 and 21.663 at 21.459; scale 8 has one point near 3.6 kbps: unresolved). Hybrid: whole LPIPS
+  0.2758 / DISTS 0.1696, foreground LPIPS 0.3459 / DISTS 0.2526.
+
+| Rate | metric | DCVC whole | DCVC fg | hybrid whole | hybrid fg | verdict |
+|---|---|---:|---:|---:|---:|---|
+| 22.738 kbps | LPIPS | 0.1417 | 0.3914 | 0.2758 | 0.3459 | does not dominate (fg 0.0445 beyond the margin) |
+| 22.738 kbps | DISTS | 0.1149 | 0.3034 | 0.1696 | 0.2526 | does not dominate (fg 0.0499) |
+| 21.459 kbps | LPIPS | 0.1452 | 0.4007 | 0.2758 | 0.3459 | does not dominate (fg 0.0539) |
+| 21.459 kbps | DISTS | 0.1180 | 0.3097 | 0.1696 | 0.2526 | does not dominate (fg 0.0562) |
+
+  The hypothesis holds: DCVC's player region stays worse than the hybrid's (0.39-0.40 against 0.346 LPIPS) at the
+  hybrid's rates, and the competing explanation (player LPIPS <= 0.35 with whole <= 0.18) is not met at either rate.
+  The two sides trade, as in W1 for SVT: DCVC wins the whole frame by 0.13 LPIPS / 0.055 DISTS, the hybrid the player
+  region by 0.045 / 0.050. DCVC reaches the hybrid's foreground LPIPS 0.346 at about 32 kbps (interpolated between
+  QP27 and QP30; QP30 at 33.4 kbps gives 0.3421 with whole 0.124), 1.4 times the hybrid's rate; foreground DISTS 0.2526 is not reached even at 33.4 kbps (0.2751). Against
+  DCVC the hybrid is Pareto-incomparable on Al, not better; what that means for the claim is the paper's judgment.
+- DCVC against the stronger SVT envelope on Al (BD-rate, PCHIP over the overlapping quality range; anchor = upper
+  concave hull of W3's three CRF-63 bases and W1's plain half (CRF 65-67) and quarter (CRF 61-63) points of scoring
+  job `20261029T095649Z-43181442`; negative = DCVC needs fewer bits at equal quality; DCVC = all eight Al points of W3
+  and W3b):
+
+| | whole LPIPS | whole DISTS | fg LPIPS | fg DISTS |
+|---|---:|---:|---:|---:|
+| against the stronger envelope | -59.3 % | -54.2 % | -64.5 % | -66.1 % |
+| against the three CRF-63 bases (same DCVC points) | -64.9 % | -55.5 % | -67.5 % | -67.5 % |
+| W3's three DCVC points only, stronger envelope | -60.6 % | -57.7 % | -64.5 % | -65.9 % |
+
+  Overlap (negative distance): whole LPIPS 0.139-0.438, whole DISTS 0.110-0.290, fg LPIPS 0.475-0.794, fg DISTS
+  0.367-0.528; "better at every common rate" on all four metrics. The stronger SVT envelope shrinks DCVC's advantage
+  by 1-6 percentage points, not more: W3's -66 % was not an artifact of the thin anchor. Data:
+  `docs/experiments/w3-specs/w3b-report.json`; code `experiments/tennis/w3b_report.py`.
+- Cross-job byte identity (stopped job `20261029T190006Z-d48a344b`, gpu5 GPU-07aa7586, against this job, gpu6
+  GPU-ef96fc4f, both RTX 6000 Ada): the 240 decoded-frame hashes of all six Al points are equal, and the container
+  files are byte-identical for QP23, 24, 25, 27 and 30. QP21 is NOT: same length (23,104 bytes), 3,100 bytes differ,
+  the first at offset 4,556, container sha256 `a877f87b...` against `1435192d...`, the encoder's NAL sizes equal. Both
+  streams decode to the same 240 frames, which these records cannot explain. So the encoder is not bit-reproducible
+  across GPU instances of one class for every point, although the decoded frames agree. Open: decode each job's QP21
+  stream in the other job's environment.
+- Cautions. Two development windows, 80 ticks, no confidence interval; the hybrid's scores come from an earlier job and
+  were not re-scored here; the foreground is the judge's S region, the same for both codecs; streams still do not travel
+  between GPU classes (W3 limit unchanged).

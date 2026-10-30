@@ -85,6 +85,42 @@ def parse_scales(text: str) -> list[int]:
     return scales
 
 
+def parse_point_list(text: str) -> dict[str, list[tuple[int, int]]]:
+    """Named points ``window:scale:qp,...`` (W3b), per window in the order given; QP 0..63, no duplicates."""
+    plan: dict[str, list[tuple[int, int]]] = {}
+    for item in text.split(','):
+        parts = item.split(':')
+        if len(parts) != 3 or parts[0] not in SOURCES:
+            raise ValueError(f'point {item!r} is not window:scale:qp with window in {sorted(SOURCES)}')
+        scale, qp = int(parts[1]), int(parts[2])
+        if scale not in SCALES or not 0 <= qp <= 63:
+            raise ValueError(f'point {item!r}: scale must be one of {sorted(SCALES)} and QP in 0..63')
+        if (scale, qp) in plan.setdefault(parts[0], []):
+            raise ValueError(f'point {item!r} listed twice')
+        plan[parts[0]].append((scale, qp))
+    if set(plan) != set(SOURCES):
+        raise ValueError('every window needs at least one point')
+    return plan
+
+
+def project_listed_seconds(timings: list[dict[str, float]], setup: float, publication: float, full_points: list[int],
+                           svt_factor: float, svt_streams: int) -> float:
+    """Full-stage seconds for a named point list, window by window (the windows differ in resolution).
+
+    ``timings[w]`` are the smoke's seconds of window ``w``: ``convert``, ``native_fixed`` and ``native_variable``
+    (per point; the smoke codes 25 frames), ``svt_scale8``, ``masks`` (9 ticks) and ``scoring`` (9 ticks, one SVT
+    stream and one DCVC point = 2 streams). ``svt_factor`` scales the SVT scale-8 time to the full SVT scales
+    (1 for scale 8 only, 21 for 8, 4, 2); ``svt_streams`` is how many SVT streams the full run scores."""
+    values = [setup, publication, svt_factor, *(v for t in timings for v in t.values())]
+    if any(v < 0 or v != v for v in values) or len(timings) != len(full_points):
+        raise ValueError('finite nonnegative timings, one set per window, required')
+    total = setup + 4 * publication
+    for t, n in zip(timings, full_points):
+        total += (t['convert'] + n * t['native_fixed'] + n * (NATIVE_FRAMES / CAL_FRAMES) * t['native_variable']
+                  + svt_factor * t['svt_scale8'] + (80 / 9) * t['masks'] + (svt_streams + n) / 2 * (80 / 9) * t['scoring'])
+    return PROJECTION_MARGIN * total
+
+
 def project_full_seconds(t: dict[str, float], publication: float) -> float:
     """Full-stage seconds from smoke timings: one 30 kbps point and one SVT scale at 25 frames.
 
@@ -331,74 +367,120 @@ def run_window(a: argparse.Namespace, key: str, ctx: dict[str, Any]) -> dict[str
         raise ValueError('native source YUV identity changed: ' + key)
     timings['convert'] = time.monotonic() - started
     started = time.monotonic()
-    candidates, calibration_seconds = calibrate_candidates(a, full, work, fps)
-    chosen = an.select_points(candidates, a.points)
+    if a.point_list:
+        # W3b: the points are named (chosen on measured rates in the rule entry), so no calibration encodes run.
+        candidates: list[dict[str, Any]] = []
+        chosen = [{'scale': scale, 'qp': qp, 'target_kbps': None, 'est_kbps': None}
+                  for scale, qp in parse_point_list(a.point_list)[key]]
+    else:
+        candidates, _ = calibrate_candidates(a, full, work, fps)
+        chosen = an.select_points(candidates, a.points)
     timings['calibration'] = time.monotonic() - started
     write(out / 'candidates.json', {'candidates': candidates, 'chosen': chosen, 'cal_frames': CAL_FRAMES, 'cal_qps': list(CAL_QPS)})
     result: dict[str, Any] = {'window': key, 'wid': spec['wid'], 'fps': fps, 'frames': n, 'ticks': ticks,
                               'candidates': candidates, 'chosen': chosen, 'dcvc': [], 'svt': [], 'accepted': True,
-                              'bracket_ok': an.planned_bracket(candidates)}
-    started = time.monotonic()
+                              'bracket_ok': None if a.point_list else an.planned_bracket(candidates)}
     source = full if n == NATIVE_FRAMES else work / 'source.yuv'
     if n != NATIVE_FRAMES:
         with full.open('rb') as src, source.open('wb') as dst:
             dst.write(src.read(n * 1920 * 1620))
-    native_fixed = native_variable = 0.0
-    for point in chosen:
-        record = code_point(a, source, work, fps, n, point)
-        result['dcvc'].append(record)
-        tag = f'dcvc-s{point["scale"]}-q{point["qp"]}'
-        for name, target in (('stream.psdc', f'{tag}.psdc'), ('reports.json', f'{tag}-reports.json')):
-            if (work / tag / name).exists():
-                shutil.copyfile(work / tag / name, out / target)
-        if record['accepted']:
-            native_fixed += max(0.0, record['seconds']['process'] - record['seconds']['variable'])
-            native_variable += record['seconds']['variable']
-        publish_progress(os.environ['PS_STAGE'], len(result['dcvc']))
-        if not record['accepted']:
-            result['accepted'] = False
-            result['stopped_at'] = {'scale': point['scale'], 'qp': point['qp']}
-            write(out / 'result.json', result)
-            return result
-    timings['native'] = time.monotonic() - started
-    timings['native_fixed'] = native_fixed / max(1, len(chosen))
-    timings['native_variable'] = native_variable / max(1, len(chosen))
-    started = time.monotonic()
-    svt_first = None
-    for scale in ctx['svt_scales']:
-        before = time.monotonic()
-        record = code_svt(full, work, fps, scale)
-        if svt_first is None:
-            svt_first = time.monotonic() - before
-        shutil.copyfile(work / f'svt-s{scale}' / record['stream'], out / f'svt-s{scale}.ivf')
-        result['svt'].append(record)
-    timings['svt_scale8'] = svt_first or 0.0
-    timings['svt'] = time.monotonic() - started
-    # Every codec subprocess is finished before the metric networks and the foreground are built.
-    started = time.monotonic()
     # The foreground oracle draws from reference frames anywhere in the window, so the truth covers all 240.
+    # Masks and metric networks come first so that every item can be scored, and checkpointed, as it finishes.
+    begin = time.monotonic()
     truth = rgb_memmap(full, work / 'truth.npy', NATIVE_FRAMES, 1920, 1080, False, 'cuda')
     masks = foreground_masks(spec['wid'], ctx['anchors'], ctx['wire'], truth, ticks, ctx['prior_rows'])
     np.savez_compressed(out / 'foreground-masks.npz', ticks=np.asarray(ticks), packed=np.stack([np.packbits(masks[t]) for t in ticks]))
-    timings['masks'] = time.monotonic() - started
-    started = time.monotonic()
+    timings['masks'] = time.monotonic() - begin
     nets = {'lpips': load_lpips(ctx['lpips'], 'cuda'), 'dists': load_dists(ctx['dists'], 'cuda')}
     if not all(next(net.parameters()).is_cuda for net in nets.values()):
         raise ValueError('CUDA metric networks required')
-    for record in [*result['svt'], *result['dcvc']]:
-        scores = score_stream(nets, Path(record['decoded']), record['size'], n, ticks, truth, masks)
-        record['scores'] = scores
-        record['mean'] = {m: float(np.mean(v)) for m, v in scores.items()}
-        publish_progress(os.environ['PS_STAGE'], len(result['dcvc']) + len(result['svt']))
-    timings['scoring'] = time.monotonic() - started
-    del nets
+
+    def finish(record: dict[str, Any], tag: str, files: dict[str, Path], item_seconds: float) -> None:
+        """Score one item, then publish and checkpoint it (a stop loses only the item in progress)."""
+        before = time.monotonic()
+        record['scores'] = score_stream(nets, Path(record['decoded']), record['size'], n, ticks, truth, masks)
+        record['mean'] = {m: float(np.mean(v)) for m, v in record['scores'].items()}
+        record['seconds_item'] = {'code': item_seconds, 'score': time.monotonic() - before}
+        record.pop('decoded', None)
+        for name, path in files.items():
+            shutil.copyfile(path, out / name)
+        save_item(ctx, key, tag, record, files)
+
+    native_fixed = native_variable = score_seconds = svt_first = 0.0
+    done = 0
+    for point in chosen:
+        tag = f'dcvc-s{point["scale"]}-q{point["qp"]}'
+        loaded = load_item(ctx, key, tag, out)
+        if loaded is not None:
+            record = loaded
+        else:
+            before = time.monotonic()
+            record = code_point(a, source, work, fps, n, point)
+            if not record['accepted']:
+                result['dcvc'].append(record)
+                result['accepted'] = False
+                result['stopped_at'] = {'scale': point['scale'], 'qp': point['qp']}
+                write(out / 'result.json', result)
+                return result
+            finish(record, tag, {f'{tag}.psdc': work / tag / 'stream.psdc', f'{tag}-reports.json': work / tag / 'reports.json'},
+                   time.monotonic() - before)
+        result['dcvc'].append(record)
+        native_fixed += max(0.0, record['seconds']['process'] - record['seconds']['variable'])
+        native_variable += record['seconds']['variable']
+        score_seconds += record['seconds_item']['score']
+        done += 1
+        publish_progress(os.environ['PS_STAGE'], done)
+    timings['native_fixed'] = native_fixed / max(1, len(chosen))
+    timings['native_variable'] = native_variable / max(1, len(chosen))
+    for scale in ctx['svt_scales']:
+        tag = f'svt-s{scale}'
+        item = load_item(ctx, key, tag, out)
+        if item is None:
+            before = time.monotonic()
+            item = code_svt(full, work, fps, scale)
+            finish(item, tag, {f'{tag}.ivf': work / tag / item['stream']}, time.monotonic() - before)
+        result['svt'].append(item)
+        score_seconds += item['seconds_item']['score']
+        if not svt_first:
+            svt_first = item['seconds_item']['code']
+        done += 1
+        publish_progress(os.environ['PS_STAGE'], done)
+    timings['svt_scale8'] = svt_first
+    timings['scoring'] = score_seconds
+    nets.clear()
     torch.cuda.empty_cache()
     result['timings'] = timings
     result['audited_controls'] = audited_controls(key, result, ctx, ticks)
-    for record in [*result['svt'], *result['dcvc']]:
-        record.pop('decoded', None)
     write(out / 'result.json', result)
     return result
+
+
+def save_item(ctx: dict[str, Any], key: str, tag: str, record: dict[str, Any], files: dict[str, Path]) -> None:
+    """Checkpoint one finished item (record with scores, stream, reports) under a dot-name, then rename it into place."""
+    checkpoint = ctx.get('checkpoint')
+    if checkpoint is None:
+        return
+    temporary = checkpoint / f'.{key}__{tag}.tmp'
+    shutil.rmtree(temporary, ignore_errors=True)
+    temporary.mkdir()
+    write(temporary / 'record.json', record)
+    for name, path in files.items():
+        shutil.copyfile(path, temporary / name)
+    os.replace(temporary, checkpoint / f'{key}__{tag}')
+
+
+def load_item(ctx: dict[str, Any], key: str, tag: str, out: Path) -> dict[str, Any] | None:
+    """A checkpointed item of an earlier attempt: its record, with its published files restored under ``out``."""
+    checkpoint = ctx.get('checkpoint')
+    saved = checkpoint / f'{key}__{tag}' if checkpoint is not None else None
+    if saved is None or not (saved / 'record.json').is_file():
+        return None
+    for path in saved.iterdir():
+        if path.name != 'record.json':
+            shutil.copyfile(path, out / path.name)
+    record: dict[str, Any] = json.loads((saved / 'record.json').read_text())
+    record['resumed_from_checkpoint'] = True
+    return record
 
 
 def audited_controls(key: str, result: dict[str, Any], ctx: dict[str, Any], ticks: list[int]) -> dict[str, Any]:
@@ -477,10 +559,10 @@ def run(a: argparse.Namespace) -> None:
     from experiments.tennis.k6b_matte_judge import extract
     from experiments.tennis.k6b_receiver_sam import transport_root
     prior_rows, prior_scores = load_prior(a)
-    ctx = {'scratch': scratch, 'publish': publish, 'anchors': extract([a.anchor], scratch / 'anchors'),
+    checkpoint = Path(os.environ.get('PS_CHECKPOINT_DIR', ''))
+    ctx = {'checkpoint': checkpoint if checkpoint.name else None, 'scratch': scratch, 'publish': publish, 'anchors': extract([a.anchor], scratch / 'anchors'),
            'wire': transport_root(scratch / 'wire'), 'prior_rows': prior_rows, 'prior_scores': prior_scores,
            'lpips': a.lpips, 'dists': a.dists, 'svt_scales': parse_scales(a.svt_scales)}
-    checkpoint = Path(os.environ.get('PS_CHECKPOINT_DIR', ''))
     results: list[dict[str, Any]] = []
     setup = time.monotonic() - began
     for key in SOURCES:
@@ -499,7 +581,7 @@ def run(a: argparse.Namespace) -> None:
         if not result['accepted']:
             break
     seconds = time.monotonic() - began
-    summary = {'frames': a.frames, 'points': a.points, 'svt_scales': ctx['svt_scales'], 'gpu': name, 'gpu_class': gpu_class,
+    summary = {'frames': a.frames, 'points': a.points, 'point_list': a.point_list, 'svt_scales': ctx['svt_scales'], 'gpu': name, 'gpu_class': gpu_class,
                'capability': capability, 'gpu_uuid': uuid, 'tools': tools, 'torch': torch.__version__,
                'accepted': all(r['accepted'] for r in results) and len(results) == 2, 'windows': results,
                'setup_seconds': setup, 'seconds': seconds, **summarize(results),
@@ -518,21 +600,40 @@ def validate() -> None:
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
     windows = summary['windows']
-    timings = {'setup': summary['setup_seconds'] + sum(w['timings']['convert'] for w in windows) / 2,
-               'calibration': sum(w['timings']['calibration'] for w in windows),
-               'native_fixed': sum(w['timings']['native_fixed'] for w in windows),
-               'native_variable': sum(w['timings']['native_variable'] for w in windows),
-               'svt_scale8': sum(w['timings']['svt_scale8'] for w in windows),
-               'masks': sum(w['timings']['masks'] for w in windows),
-               'scoring': sum(w['timings']['scoring'] for w in windows)}
-    projection = project_full_seconds(timings, staging['publication_seconds'])
+    listed = summary.get('point_list')
+    if listed:
+        smoke_plan = parse_point_list(spec['scale']['point_list']['smoke'])
+        full_plan = parse_point_list(spec['scale']['point_list']['full'])
+        full_svt = parse_scales(str(spec['scale']['svt_scales']['full']))
+        projection = project_listed_seconds(
+            [{'convert': w['timings']['convert'], 'native_fixed': w['timings']['native_fixed'],
+              'native_variable': w['timings']['native_variable'], 'svt_scale8': w['timings']['svt_scale8'],
+              'masks': w['timings']['masks'], 'scoring': w['timings']['scoring']} for w in windows],
+            summary['setup_seconds'], staging['publication_seconds'], [len(full_plan[w['window']]) for w in windows],
+            float(sum({8: 1, 4: 4, 2: 16}[x] for x in full_svt)), len(full_svt))
+        selection = {
+            'smoke_scale': summary['frames'] == 25 and listed == spec['scale']['point_list']['smoke'],
+            'points_as_named': all([(p['scale'], p['qp']) for p in w['chosen']] == smoke_plan[w['window']] for w in windows),
+            'smoke_points_in_full_plan': all(pt in full_plan[w] for w, pts in smoke_plan.items() for pt in pts),
+            'no_calibration': all(not w['candidates'] and w['bracket_ok'] is None for w in windows)}
+    else:
+        timings = {'setup': summary['setup_seconds'] + sum(w['timings']['convert'] for w in windows) / 2,
+                   'calibration': sum(w['timings']['calibration'] for w in windows),
+                   'native_fixed': sum(w['timings']['native_fixed'] for w in windows),
+                   'native_variable': sum(w['timings']['native_variable'] for w in windows),
+                   'svt_scale8': sum(w['timings']['svt_scale8'] for w in windows),
+                   'masks': sum(w['timings']['masks'] for w in windows),
+                   'scoring': sum(w['timings']['scoring'] for w in windows)}
+        projection = project_full_seconds(timings, staging['publication_seconds'])
+        selection = {
+            'smoke_scale': summary['frames'] == 25 and summary['points'] == 1,
+            'rate_only_selection': all(len(w['candidates']) == len(CAL_QPS) * len(SCALES) and len(w['chosen']) == 1 for w in windows),
+            'bracket': all(w['bracket_ok'] and an.planned_bracket(w['candidates']) for w in windows)}
     points = [p for w in windows for p in w['dcvc']]
     checks: dict[str, Any] = {
         'two_windows': [w['window'] for w in windows] == ['al', 'med'],
-        'smoke_scale': summary['frames'] == 25 and summary['points'] == 1,
+        **selection,
         'accepted': summary['accepted'],
-        'rate_only_selection': all(len(w['candidates']) == len(CAL_QPS) * len(SCALES) and len(w['chosen']) == 1 for w in windows),
-        'bracket': all(w['bracket_ok'] and an.planned_bracket(w['candidates']) for w in windows),
         'gpu': summary['gpu_class'] in GPU_CLASSES and summary['gpu_uuid'].startswith('GPU-'),
         'extension': all(p['encode_report']['environment']['extension']['variant'] == GPU_CLASSES[summary['gpu_class']][1] for p in points),
         'determinism_recorded': all(p['encode_report']['checkpoints']['determinism']['final']['deterministic_algorithms']
@@ -567,6 +668,7 @@ def main() -> None:
     parser.add_argument('--frames', type=int, choices=(25, 240), default=25)
     parser.add_argument('--points', type=int, choices=(1, 3), default=1)
     parser.add_argument('--svt-scales', default='8')
+    parser.add_argument('--point-list', default=None, help='W3b: window:scale:qp,... instead of the calibrated points')
     args = parser.parse_args()
     if args.validate:
         validate()
