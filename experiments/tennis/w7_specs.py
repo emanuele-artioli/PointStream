@@ -61,8 +61,12 @@ def budget_check(n_windows: int = 6, per_window: int | None = None) -> dict[str,
             'margin_total_s': BUDGET_TOTAL_S - total}
 
 
+#: staged inputs that are directories packed as a tar (the build-inputs output, read as `--inputs DIR`); every other tar stays packed.
+EXTRACTED = frozenset({'inputs'})
+
+
 def staged(items: dict[str, tuple[str, str]]) -> list[dict[str, Any]]:
-    return [{'name': n, 'path': p, 'sha256': h, 'extract': False} for n, (p, h) in items.items()]
+    return [{'name': n, 'path': p, 'sha256': h, 'extract': n in EXTRACTED} for n, (p, h) in items.items()]
 
 
 def common(module: str, arguments: list[str], files: dict[str, tuple[str, str]]) -> dict[str, Any]:
@@ -159,6 +163,19 @@ def features(first: wm.WindowSpec, manifest: tuple[str, str], source: tuple[str,
                      validator=['{python}', '-m', 'experiments.tennis.k6b_confirm', 'validate-features', '--manifest', '{staged:manifest}'])
 
 
+def build_inputs(first: wm.WindowSpec, confirm: tuple[str, str], features_archive: tuple[str, str]) -> dict[str, Any]:
+    """Geometry-only masks, player selection and indices from the feature archive (k6b_confirm build-inputs), CPU. The 2026-10-24 job
+    `20261024T200247Z-b63794f9` ran it the same way; the validator rebuilds and compares byte for byte, so it names its inputs literally."""
+    spec = common('experiments.tennis.k6b_confirm', ['build-inputs', '--manifest', '{staged:manifest}', '--feature-archive', '{staged:f0}',
+                                                      '--max-windows', '{windows}'], {'manifest': confirm, 'f0': features_archive})
+    spec.update({'device': 'cpu', 'hosts': HOSTS_GPU, 'gpu_models': [], 'gpu_memory_mib': 0, 'cpu_threads': 4, 'local_storage_gib': 40,
+                 'scale': {'windows': {'smoke': 1, 'full': 0}},
+                 'smoke': {'seconds': 300, 'representative_basis': 'The one feature window of the first window: geometry-only masks, player selection, indices and archive; full is the same.'},
+                 'full': {'seconds': 600}, 'validator_seconds': 180, 'budget_seconds': 1200,
+                 'validator': ['{python}', '-m', 'experiments.tennis.k6b_confirm', 'validate-inputs', '--manifest', confirm[0], '--feature-archive', features_archive[0]]})
+    return spec
+
+
 def anchors(first: wm.WindowSpec, manifest: tuple[str, str], inputs: tuple[str, str], source: tuple[str, str]) -> dict[str, Any]:
     """K6 run: SVT/DCVC rough anchors, keypoint codes and window rows (k6b_confirm_run --kind anchors); `inputs` = `k6b_confirm build-inputs` output."""
     args = ['--kind', 'anchors', '--manifest', '{staged:manifest}', '--inputs', '{staged:inputs}', '--', 'run', '--rough-anchors-first',
@@ -193,12 +210,14 @@ def generate(first: wm.WindowSpec, manifest: tuple[str, str], prepared: tuple[st
     args = ['--kind', 'generate', '--manifest', '{staged:manifest}', '--prepared', '{staged:prepared}', '--windows', first.id, '--', 'generate',
             '--prepared', '{staged:prepared}', *weights, '--units', ','.join(units), '--max-units', '0', '--max-frames', '{frames}', '--profiles', '',
             '--fit-archive', '{staged:base}', '--fit-archive', '{staged:fits}', '--from-t', '0', '--steps', '30', '--gpu-class', 'RTX 6000 Ada',
-            '--fit', f"match5 {adapter['name']}@fit-100-fp16.pt", '--fit-base', 'match5 tennis-base@fit-100.pt', '--fit-bits', 'match5 4', '--cfg', 'match5 2.0']
+            '--fit', 'match5', f"{adapter['name']}@fit-100-fp16.pt", '--fit-base', 'match5', 'tennis-base@fit-100.pt', '--fit-bits', 'match5', '4', '--cfg', 'match5', '2.0']
     files = {'manifest': manifest, 'prepared': prepared, **assets(*[f'w{k}' for k in range(8)]), 'base': base, 'fits': fits}
-    return gpu_stage('experiments.tennis.k6b_confirm_run', args, files, models=['RTX 6000 Ada'], mem_mib=24000, threads=8, smoke_seconds=180,
+    spec = gpu_stage('experiments.tennis.k6b_confirm_run', args, files, models=['RTX 6000 Ada'], mem_mib=24000, threads=8, smoke_seconds=180,
                      full_seconds=1700, scale={'frames': {'smoke': 8, 'full': 0}}, environment=JCV_ENVIRONMENT,
                      basis='First window, 8 frames of every unit (the 2026-10-24 smoke grid); the full stage renders both players of one window (about 1,370 s Ada).',
                      validator_module='experiments.tennis.k6b_confirm_run')
+    spec['contention'] = {'policy': 'continue', 'basis': 'the sampler is seeded per unit and run; outputs do not depend on wall time; recorded seconds are not evidence', 'resume_attempts': 0}
+    return spec
 
 
 def receiver(windows: list[wm.WindowSpec], manifest: tuple[str, str], transport: tuple[str, str], anchor: tuple[str, str],
@@ -305,6 +324,8 @@ def first_window(argv: list[str]) -> None:
     source = source_files(windows)[first.name]
     if stage == 'features':
         spec = features(first, confirm, source)
+    elif stage == 'build-inputs':
+        spec = build_inputs(first, confirm, ups['features'])
     else:
         raise SystemExit(f'unknown stage {stage}')
     del windows_ref

@@ -217,3 +217,11 @@ foreground-first claim.
   are `PENDING` (all zeros) and generation needs the prepared unit names; both are filled when the upstream job completes. Stage order: features, `k6b_confirm build-inputs`, anchors, prepare,
   generation, rate transport (needs a manifest-mode `--anchor/--prepared`), native base, rgb diagnostic, receiver, judge, W1 stages, DCVC.
 - Still open: the `build-inputs` step has no spec; generation units come from the prepare output; the W1 `--window-state` and judge `--rates` files are made from stage outputs by `w7_rates`; the new GPU paths are unit-tested for plumbing only.
+
+### 2026-10-30 — W7 first window (Al 028 @ 0): progress (agent run on branch `claude/w7-first-window`)
+- Recipe decision (recorded before the first W7 GPU job): W6's full-rate generation did not pass its rule (pose passes, time fails; W6 outcome entry),
+  so the frozen W5 recipe stays: players generated on every third frame. Budget: first window up to 1.3 GPU-h (user, 2026-10-30), smokes included;
+  GPU-seconds counted from each GPU job's `execution.json` (smoke + full). CPU jobs are not counted.
+- Specs: `python -m experiments.tennis.w7_specs first-window STAGE windows.json OUT [NAME=PATH:SHA ...]`; upstream archive hashes from `sha256sum` of the
+  upstream job's `full/published.tar` on the server.
+- features: `20261030T142453Z-b8bc4336` (submitted 14:24Z, gpu6 Ada; code = branch HEAD `git_head` in its ready.json). Outcome: pending.
