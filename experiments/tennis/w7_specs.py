@@ -254,7 +254,7 @@ def _first(windows: list[wm.WindowSpec], frames_or_smoke: bool) -> list[wm.Windo
     return windows[:1] if frames_or_smoke else windows
 
 
-def rgb_diagnostic(windows: list[wm.WindowSpec], manifest: tuple[str, str], base: tuple[str, str], frames: int) -> dict[str, Any]:
+def rgb_diagnostic(windows: list[wm.WindowSpec], manifest: tuple[str, str], base: tuple[str, str], frames: int, shared: bool = False) -> dict[str, Any]:
     """GPU decode and resize of the paid bases (their `-gpu.npy` pixels are what the judge scores). A6000 only (the code asserts it).
     Smoke = 24 frames of the first window; it reads the 240-frame native-base bundle (3 scales), so that job must have run first.
     No prior run: the control is two identical fresh conversions and the IVF-to-recon decode check, hashes recorded."""
@@ -267,6 +267,9 @@ def rgb_diagnostic(windows: list[wm.WindowSpec], manifest: tuple[str, str], base
                  'scale': {'frames': {'smoke': 24, 'full': 240}},
                  'smoke': {'seconds': 360, 'representative_basis': 'First window, 24 frames (8 ticks): same GPU conversion, bicubic resize and base decode checks as the full stage.'},
                  'full': {'seconds': 600}, 'validator_seconds': 120, 'budget_seconds': 1000})
+    if shared:
+        spec['gpu_sharing'] = {'mode': 'shared', 'basis': 'GPU colour conversion and bicubic resize of saved frames: pixels do not depend on wall time or neighbours', 'margin_mib': 4096}
+        spec['contention'] = {'policy': 'continue', 'basis': 'deterministic conversion; outputs do not depend on wall time', 'resume_attempts': 0}
     return spec
 
 
@@ -335,7 +338,7 @@ def first_window(argv: list[str]) -> None:
     elif stage == 'rate-transport':
         spec = rate_transport([first], windows_ref, [ups['anchor']], [ups['prepared']], 1)
     elif stage == 'rgb-diagnostic':
-        spec = rgb_diagnostic([first], windows_ref, ups['base'], 24)
+        spec = rgb_diagnostic([first], windows_ref, ups['base'], 24, shared='shared' in ups)
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:
