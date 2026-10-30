@@ -211,3 +211,15 @@ def test_submit_uses_archive_mode_only_when_workers_and_release_support_it(tmp_p
     assert payloads["publish"].get("source_archive", False) is expected
     assert sent[0].get("extract", True) is (not expected)
     assert result["source_archive"] is expected
+
+
+def test_selftest_spec_is_valid_and_allows_a_cold_nfs_torch_import(tmp_path, monkeypatch):
+    from argparse import Namespace
+    monkeypatch.setattr(inbox, "load_config", lambda _: {"hosts": ["gpu6"]})
+    identity = tmp_path / "input.json"
+    identity.write_text("{}")
+    monkeypatch.setattr(inbox, "remote_rpc", lambda *a: {"path": str(identity), "sha256": inbox.file_digest(identity)})
+    monkeypatch.setattr(inbox, "submit", lambda args, root: json.loads(args.spec.read_text()))
+    spec = inbox.validate_spec(inbox.selftest_submit(Namespace(state_dir=tmp_path / "state", hosts=["gpu6"]), tmp_path))
+    assert spec["smoke"]["seconds"] >= 3 * 61 - 3 and spec["full"]["seconds"] >= spec["smoke"]["seconds"]
+    assert spec["deadline_epoch"] - time.time() > spec["budget_seconds"]

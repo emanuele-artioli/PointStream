@@ -1275,10 +1275,12 @@ def selftest_submit(args: argparse.Namespace, root: Path) -> Any:
         "entrypoint": ["-m", "experiments.jobs.fleet_smoke"],
         "arguments": ["--input", identity["path"], "--iterations", "{iterations}"],
         "scale": {"iterations": {"smoke": 2, "full": 8}}, "inputs": [identity],
-        "smoke": {"seconds": 60, "representative_basis": "Infrastructure only: same input and CUDA operation in both stages"},
-        "full": {"seconds": 60}, "budget_seconds": 300,
+        # The bare NFS environment's cold `import torch` took 61 s on gpu6
+        # (2026-10-30), so each stage allows three times that.
+        "smoke": {"seconds": 180, "representative_basis": "Infrastructure only: same input and CUDA operation in both stages"},
+        "full": {"seconds": 180}, "budget_seconds": 600,
         "validator": ["{python}", "-m", "experiments.jobs.fleet_smoke", "--validate"],
-        "validator_seconds": 30, "required_commands": [],
+        "validator_seconds": 60, "required_commands": [],
         "deadline": datetime.fromtimestamp(time.time() + 900, timezone.utc).isoformat(),
     }
     args.spec = args.state_dir / "smoke-specs" / (uuid.uuid4().hex + ".json")
