@@ -242,3 +242,6 @@ foreground-first claim.
   `alcaraz_hurkacz__028_at120__person_000000000006` and `…000000000004`; full output rechecked by hand: 14 checks passed.
 - generation (GPU, Ada): `20261030T150651Z-a58b2ce2` submitted (every-third-frame recipe; 2 units, adapter ah-C, C base). rate transport (CPU): `20261030T150852Z-d4e7cd41` submitted
   (first attempt refused by the client: a spec needs a named scale parameter; fixed by passing the ignored `--max-windows {windows}`).
+- rate transport: `20261030T150852Z-d4e7cd41` complete (CPU, gpu6; 17 s + 18 s); `full/published.tar` sha256 `8b0871ab633edcf4c77cb810cf2d3617a2a9593f0aa51af451c2a2ec21e30607`; `--validate` on the full output: 21 checks passed.
+- rgb diagnostic: `20261030T150335Z-9e58b2cc` (exclusive, A6000 on gpu3/gpu2) stayed pending 12 min (every A6000 holds another user's process); cancelled while still pending (0 GPU s) and resubmitted
+  as a shared-GPU job `20261030T151619Z-33fb8db4` (same code and arguments; GPU colour conversion and resize are deterministic; class A6000 still required by the code).
