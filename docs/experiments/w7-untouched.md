@@ -177,3 +177,26 @@ foreground-first claim.
   window. Manifest field `reference: window_frame0`.
 - Budget. Tier 1's budget is being raised by the user; no stage is cut yet. The keypoint codes stay. The GPU source control (`k6b_rgb_diagnostic`) is dropped
   for new windows only if nothing downstream reads it (to be stated when its consumers are checked below).
+
+### 2026-10-30 — W7 Tier 1 budget raised (user, 2026-10-30)
+- (user, 2026-10-30) The Tier 1 GPU budget is raised from 5 to 8 GPU-hours: the first window (also the smoke) up to 1.3 GPU-h, all six
+  windows up to 8 GPU-h. All stages stay, keypoint codes included. `w7_specs.budget_check()` applies it: estimate 4,654 s per window
+  (1.29 GPU-h, inside 1.3 h) and 27,924 s for six (7.76 h, 876 s of margin). The estimate carries no allowance for queueing or failed smokes; the
+  stage times come from two-window jobs, and generation (A6000, 1,735 s) is 37% of it. The Ada render figure would add margin.
+- Source control: `k6b_rgb_diagnostic` is kept. Its `-gpu.npy` base pixels are what `k6b_real_base_judge` scores (`--gpu-base`), so it is not droppable;
+  only its prior-run hash gate is dropped for manifest windows (two fresh GPU conversions must agree and the IVF must decode to the encoder's recon).
+
+### 2026-10-30 — W7 generalisation status (end of this pass; nothing submitted, nothing run on GPU)
+- Done, with the frozen pair unchanged by test: `k6b_native_base`; `w1_masks`/`w1_encode`/`w1_score` via `w1_roi.window_from_spec`; the `k6b_confirm`
+  family's cohort; `k6b_rgb_diagnostic` (`--windows-file --window --source`, no `--prior`); `k6b_rate_transport` (`--windows-file`: the window id and
+  match are the only row fields it needs, so no diagnostic is required; its scratch dir now honours `TMPDIR`); `k6b_real_base_judge` (`plan`,
+  `rate_components`, `identity_controls`: for manifest windows the prior-control gate is replaced by two in-job controls, hybrid-without-players equals
+  the paid base and the plain base scored twice is identical, plus the source RGB hash check against the receiver result; the frozen gate is unchanged);
+  `w7_rates.py` (`--rates` file and `--window-state` entries from the transport and native-base outputs; the bank term is the window's own PNG bytes
+  scaled to a 12-crop bank over 7200 s, a reading to be confirmed); `w7_specs.py` builders with first-window smoke/full for native base, rgb diagnostic,
+  rate transport and the judge. The new GPU code paths (judge manifest mode, rgb diagnostic manifest mode) are unit-tested only for argument plumbing and
+  have not run on a GPU.
+- Not done: `k6b_receiver_sam`/`k6b_receiver_frame` (pins PILOTS, three frozen input hashes, and its per-window judge needs prior control scores through
+  `k6b_matte_judge.judge_window`, whose `control` argument is compared to an old run at tolerance 1e-4); `w3_neural_baseline`/`w5_dcvc` (`SOURCES` al/med,
+  `two_windows`, prior inputs); per-window checkpointing in `k6b_native_base` (one bundle per job); spec builders for features, anchors, prepare, generation,
+  receiver masks and DCVC; the confirm-style manifest.json (clips, registration rows) the features stage reads.

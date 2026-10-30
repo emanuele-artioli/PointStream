@@ -47,6 +47,20 @@ def per_window_gpu_seconds() -> int:
     return sum(s['gpu_s'] for s in STAGES)
 
 
+#: Tier 1 GPU budget (user, 2026-10-30): the first window, which is also the smoke, up to 1.3 GPU-h; all six windows up to 8 GPU-h.
+BUDGET_FIRST_S = 1.3 * 3600
+BUDGET_TOTAL_S = 8 * 3600
+
+
+def budget_check(n_windows: int = 6, per_window: int | None = None) -> dict[str, Any]:
+    """Estimated GPU seconds against the Tier 1 budget; every stage kept, keypoint codes included."""
+    each = per_window_gpu_seconds() if per_window is None else per_window
+    total = each * n_windows
+    return {'per_window_s': each, 'first_window_s': each, 'first_window_budget_s': BUDGET_FIRST_S, 'total_s': total,
+            'total_budget_s': BUDGET_TOTAL_S, 'first_ok': each <= BUDGET_FIRST_S, 'total_ok': total <= BUDGET_TOTAL_S,
+            'margin_total_s': BUDGET_TOTAL_S - total}
+
+
 def staged(items: dict[str, tuple[str, str]]) -> list[dict[str, Any]]:
     return [{'name': n, 'path': p, 'sha256': h, 'extract': False} for n, (p, h) in items.items()]
 
@@ -92,6 +106,68 @@ def w1_window_stage(module: str, window: wm.WindowSpec, manifest: tuple[str, str
     return spec
 
 
+def _first(windows: list[wm.WindowSpec], frames_or_smoke: bool) -> list[wm.WindowSpec]:
+    return windows[:1] if frames_or_smoke else windows
+
+
+def rgb_diagnostic(windows: list[wm.WindowSpec], manifest: tuple[str, str], base: tuple[str, str], frames: int) -> dict[str, Any]:
+    """GPU decode and resize of the paid bases (their `-gpu.npy` pixels are what the judge scores). A6000 only (the code asserts it).
+    Smoke = 24 frames of the first window; it reads the 240-frame native-base bundle (3 scales), so that job must have run first.
+    No prior run: the control is two identical fresh conversions and the IVF-to-recon decode check, hashes recorded."""
+    chosen = _first(windows, frames == 24)
+    arguments = ['--base', '{staged:base}', '--windows-file', '{staged:windows}', *sum((['--window', w.name] for w in chosen), []),
+                 *sum((['--source', '{staged:' + w.name + '}'] for w in chosen), []), '--frames', '{frames}']
+    spec = common('experiments.tennis.k6b_rgb_diagnostic', arguments,
+                  {'windows': manifest, 'base': base, **{w.name: source_files(windows)[w.name] for w in chosen}})
+    spec.update({'device': 'gpu', 'hosts': ['gpu3', 'gpu2'], 'gpu_models': ['RTX A6000'], 'gpu_memory_mib': 12000, 'cpu_threads': 4, 'local_storage_gib': 40,
+                 'scale': {'frames': {'smoke': 24, 'full': 240}},
+                 'smoke': {'seconds': 360, 'representative_basis': 'First window, 24 frames (8 ticks): same GPU conversion, bicubic resize and base decode checks as the full stage.'},
+                 'full': {'seconds': 600}, 'validator_seconds': 120, 'budget_seconds': 1000})
+    return spec
+
+
+def rate_transport(windows: list[wm.WindowSpec], manifest: tuple[str, str], anchors: list[tuple[str, str]],
+                   prepared: list[tuple[str, str]], max_windows: int) -> dict[str, Any]:
+    """CPU transport packets (KPS2 keypoints, exact mattes, reference crops) for the windows; `--max-windows` is not used in manifest
+    mode, so the smoke is the first window by `--window`. Per-window rows are written as they finish."""
+    chosen = windows[:1] if max_windows else windows
+    arguments = ['--windows-file', '{staged:windows}', *sum((['--window', w.name] for w in chosen), [])]
+    files: dict[str, tuple[str, str]] = {'windows': manifest}
+    for i, a in enumerate(anchors):
+        arguments += ['--anchor', '{staged:a%d}' % i]
+        files[f'a{i}'] = a
+    for i, q in enumerate(prepared):
+        arguments += ['--prepared', '{staged:p%d}' % i]
+        files[f'p{i}'] = q
+    spec = common('experiments.tennis.k6b_rate_transport', arguments, files)
+    spec.update({'device': 'cpu', 'hosts': HOSTS_GPU, 'gpu_models': [], 'gpu_memory_mib': 0, 'cpu_threads': 4, 'local_storage_gib': 30,
+                 'scale': {}, 'smoke': {'seconds': 400, 'representative_basis': 'First window, every packet kind, validator included.'},
+                 'full': {'seconds': 900}, 'validator_seconds': 120, 'budget_seconds': 1500})
+    return spec
+
+
+def real_base_judge(windows: list[wm.WindowSpec], files: dict[str, tuple[str, str]], gens: list[tuple[str, str]], rates: tuple[str, str],
+                    judged: int) -> dict[str, Any]:
+    """Hybrid compose and score on manifest windows (in-job controls replace the prior-run gate). `files` needs anchor, transport, masks,
+    gpu_base, base, prior (the receiver stage's result), lpips, dists, windows. Smoke = 3 judged ticks of the first window."""
+    chosen = _first(windows, judged != 0)
+    arguments = ['--windows-file', '{staged:windows}', *sum((['--window', w.name] for w in chosen), []),
+                 *sum((['--source', '{staged:' + w.name + '}'] for w in chosen), []),
+                 *sum((['--gen', '{staged:g%d}' % i] for i in range(len(chosen))), []), '--rates', '{staged:rates}',
+                 '--anchor', '{staged:anchor}', '--transport', '{staged:transport}', '--masks', '{staged:masks}',
+                 '--gpu-base', '{staged:gpu_base}', '--base', '{staged:base}', '--prior', '{staged:prior}',
+                 '--lpips', '{staged:lpips}', '--dists', '{staged:dists}', '--judged', '{judged}', '--cost-model', 'separated-v1', '--no-early-stop']
+    staged_files = {**files, 'rates': rates, **{w.name: source_files(windows)[w.name] for w in chosen}}
+    staged_files.update({f'g{i}': g for i, g in enumerate(gens[:len(chosen)])})
+    spec = common('experiments.tennis.k6b_real_base_judge', arguments, staged_files)
+    spec.update({'device': 'gpu', 'hosts': HOSTS_GPU, 'gpu_models': GPU_MODELS, 'gpu_memory_mib': 16500, 'cpu_threads': 4, 'local_storage_gib': 60,
+                 'scale': {'judged': {'smoke': 3, 'full': 0}},
+                 'gpu_sharing': {'mode': 'shared', 'basis': 'Saved-pixel scoring; scores do not depend on wall time', 'margin_mib': 4096},
+                 'smoke': {'seconds': SMOKE_SECONDS, 'representative_basis': 'Three saved ticks (0/3/6) of the first window: all three base scales, hybrid, the in-job controls and all four metrics.'},
+                 'full': {'seconds': FULL_SECONDS}, 'validator_seconds': 120, 'budget_seconds': FULL_SECONDS + 800})
+    return spec
+
+
 def main(argv: list[str]) -> None:
     manifest_path, out = Path(argv[0]), Path(argv[1])
     windows = wm.load(manifest_path)
@@ -101,7 +177,11 @@ def main(argv: list[str]) -> None:
     for frames in (24, 240):
         spec = native_base(windows, manifest, frames)
         (out / f'native-base-{"smoke" if frames == 24 else "full"}.json').write_text(json.dumps(spec, indent=1) + '\n')
-    (out / 'stages.json').write_text(json.dumps({'stages': STAGES, 'gpu_seconds_per_window': per_window_gpu_seconds(),
+    base = (W7_DIR + '/native-base-published.tar', '0' * 64)  # placeholder until the native-base job's archive hash is known
+    spec = rgb_diagnostic(windows, manifest, base, 24)
+    (out / 'rgb-diagnostic-smoke.json').write_text(json.dumps(spec, indent=1) + '\n')
+    (out / 'rgb-diagnostic-full.json').write_text(json.dumps(rgb_diagnostic(windows, manifest, base, 240), indent=1) + '\n')
+    (out / 'stages.json').write_text(json.dumps({'stages': STAGES, 'gpu_seconds_per_window': per_window_gpu_seconds(), 'budget': budget_check(len(windows)),
                                                  'windows': [w.name for w in windows]}, indent=1) + '\n')
 
 

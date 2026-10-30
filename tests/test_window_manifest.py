@@ -94,3 +94,17 @@ def test_check_manifest_accepts_a_noncentered_manifest_cohort():
     manifest.pop('cohort')  # the same manifest against the frozen 12 windows is rejected, as before
     with pytest.raises(ValueError):
         kc.check_manifest(manifest)
+
+
+def test_w7_rates_and_state():
+    from experiments.tennis import w7_rates as r
+    row = {'window': 'alcaraz_hurkacz/028@120', 'match': 'alcaraz_hurkacz', 'reference_files': ['a.ref', 'b.ref'],
+           'references': {'png_bytes': 150000}, 'keypoints': {'bytes': 2701, 'kps1_bytes': 4236, 'contract': {'fps': [25, 1]}}}
+    out = r.rates({'rows': [row]})['alcaraz_hurkacz/028@120']
+    assert abs(out['keypoint_kbps'] - 2701 * 8 / 9.6 / 1000) < 1e-12
+    assert abs(out['match_bank_kbps_7200'] - 150000 * 6 * 8 / 7200 / 1000) < 1e-12
+    base = [{'window': 'al028', 'scale': s, 'ivf': {'bytes': 1000 * s}} for s in (8, 4, 2)]
+    st = r.window_state(base, row, 'al028')
+    assert st['control_ivf_bytes'] == {8: 8000, 4: 4000, 2: 2000} and st['kps1_bytes'] == 4236 and st['kps2_bytes'] == 2701
+    with pytest.raises(ValueError):
+        r.window_state(base[:2], row, 'al028')

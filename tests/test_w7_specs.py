@@ -28,3 +28,24 @@ def test_w1_stage_is_single_window_and_gpu_estimate_recorded():
     assert spec['arguments'][:6] == ['--windows-file', '{staged:windows}', '--window-state', '{staged:state}', '--window', 'al028']
     assert spec['gpu_models'] == ['RTX A6000', 'RTX 6000 Ada'] and spec['full']['seconds'] == 2400
     assert sp.per_window_gpu_seconds() == 4654
+
+
+def test_first_window_specs_for_the_generalised_gpu_stages():
+    windows = wm.from_selection(json.loads(SELECTION.read_text()))
+    manifest = (sp.W7_DIR + '/windows.json', 'a' * 64)
+    d = sp.rgb_diagnostic(windows, manifest, (sp.W7_DIR + '/b.tar', 'b' * 64), 24)
+    assert d['gpu_models'] == ['RTX A6000'] and d['arguments'].count('--window') == 1 and d['smoke']['seconds'] <= 600
+    t = sp.rate_transport(windows, manifest, [(sp.W7_DIR + '/a.tar', 'c' * 64)], [(sp.W7_DIR + '/p.tar', 'd' * 64)], 1)
+    assert t['device'] == 'cpu' and t['arguments'].count('--window') == 1 and t['verify_staged_inputs'] is True
+    files = {k: (sp.W7_DIR + f'/{k}', 'e' * 64) for k in ('windows', 'anchor', 'transport', 'masks', 'gpu_base', 'base', 'prior', 'lpips', 'dists')}
+    j = sp.real_base_judge(windows, files, [(sp.W7_DIR + '/g0.tar', 'f' * 64)], (sp.W7_DIR + '/rates.json', '1' * 64), 3)
+    assert j['arguments'].count('--gen') == 1 and '--no-early-stop' in j['arguments'] and j['scale']['judged']['smoke'] == 3
+    full = sp.real_base_judge(windows, files, [(sp.W7_DIR + f'/g{i}.tar', 'f' * 64) for i in range(6)], (sp.W7_DIR + '/rates.json', '1' * 64), 0)
+    assert full['arguments'].count('--gen') == 6 and full['full']['seconds'] <= 2600
+
+
+def test_budget_check_against_the_raised_tier1_budget():
+    b = sp.budget_check()
+    assert b['per_window_s'] == 4654 and b['first_ok'] and b['total_ok']  # 4,654 s <= 4,680 s; 27,924 s <= 28,800 s
+    assert b['margin_total_s'] == 28800 - 6 * 4654
+    assert not sp.budget_check(per_window=5000)['total_ok']
