@@ -193,3 +193,27 @@ judges ([j.md](j.md)).
 - Effect on W7: W6 did not pass its rule, so W7 keeps the frozen W5 recipe (players on every third frame).
 - Clips: `full/clips/w6-side-by-side-source-svt-hybrid.mp4` and `w6-zoom2x-near-player-source-svt-hybrid.mp4` in
   the post job's stage directory.
+
+### 2026-10-30 — W6b: where does the flicker come from? (rule)
+- Question. W6's full-rate hybrid flickers more than SVT on 99.6% of frame pairs (28.6 vs 18.6), at a constant
+  level over the 240 frames (quarters 28.7 / 27.7 / 29.7 / 28.5; no drift). Is the excess caused by the receiver
+  masks (SAM fresh on every frame, no propagation) or by the generated pixels?
+- Variants, on Al's 240 frames from W6's saved inputs (generation `20261030T120630Z-9190e75a`, masks and judges
+  `20261030T132449Z-75957f16`), flicker and residual energy computed exactly as W6 (`h3b.flicker`, DIS flow on the
+  source, the same region union, the same composite and base):
+  - H: the hybrid. Control: W6's per-frame values reproduced to 1e-6.
+  - G+S: generated crops, the source's player matte (from the source masks W6 uses for its region).
+  - S+R: source pixels, the receiver masks.
+  - G+Rs: generated crops, receiver masks smoothed over t−1, t, t+1 (majority vote in box-normalised coordinates).
+  - B: the paid base alone, no players.
+  The source matte and source pixels are diagnostics only, never a coded variant.
+- Decision rule. Excess E(V) = flicker(V) − 18.6 (W6's SVT anchor at the hybrid's rate). Mask share
+  = (E(H) − E(G+S)) / E(H); content share = (E(H) − E(S+R)) / E(H). The larger share, if it leads by ≥ 0.1,
+  names the fix: masks → mask propagation across frames (G+Rs is its first, cheap estimate); content → temporal
+  consistency in the generator (a video model or temporal smoothing of the generated crops). Both < 0.3 or within
+  0.1 of each other: the flicker lives where generated content meets the base; next test, a feathered composite.
+  Residual energy is reported beside with the same shares.
+- Hypothesis: the masks dominate; SAM run fresh per frame moves the outline by a few pixels each frame.
+- Competing explanation: the generated texture changes from frame to frame (W6 residual energy 1.7× the source's)
+  and dominates whatever the outline does.
+- Budget: CPU only (≤ 2 CPU-hours on one server, scratch in `/local/users/emanuele`), no GPU job.

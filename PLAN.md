@@ -1414,6 +1414,22 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   3.6 s per frame per player on an A6000 (W6 job, 30 DDIM steps), roughly
   180 times slower than 50 fps. Live use also needs a few-step or distilled
   generator (W10).
+- **W11. Racket (user, 2026-10-30).** The generator does not draw the racket.
+  W6 found it covers 3% of the source racket region, so the racket gets its
+  own object path like the ball (K5/K5b) instead of being left to the player
+  generator. Steps, oracle first:
+  1. An oracle on W6's saved outputs: paste the source racket pixels into the
+     hybrid and measure the gain in the player region and the whole frame,
+     including the experience judges. If even a perfect racket gains nothing
+     measurable at the W1 operating point, the racket stays a reported
+     limitation.
+  2. A racket tracker and judge. RacketVision labels racket keypoints next to
+     the ball, so start off the shelf as K5b did with BallTrack.
+  3. Coding: a few racket keypoints per frame, rate measured as for KPS2.
+  4. Rendering, cheapest first: a parametric racket drawn from the keypoints
+     (head ellipse, frame, handle, colour sent once per match), as the ball
+     mode draws its disk or streak; then racket keypoints added to the
+     generator's pose map.
 - **W10. A stronger generator and a larger tennis base (user, 2026-10-30).**
   The adapter is near its ceiling: an adapter fitted on the judged window
   itself gains only about 0.012 player LPIPS (0.250 vs 0.262, K6b step 3 vs
