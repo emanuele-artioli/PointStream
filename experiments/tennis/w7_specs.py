@@ -272,7 +272,7 @@ def rgb_diagnostic(windows: list[wm.WindowSpec], manifest: tuple[str, str], base
     spec.update({'device': 'gpu', 'hosts': ['gpu3', 'gpu2'], 'gpu_models': ['RTX A6000'], 'gpu_memory_mib': 12000, 'cpu_threads': 4, 'local_storage_gib': 40,
                  'scale': {'frames': {'smoke': 24, 'full': 240}},
                  'smoke': {'seconds': 360, 'representative_basis': 'First window, 24 frames (8 ticks): same GPU conversion, bicubic resize and base decode checks as the full stage.'},
-                 'full': {'seconds': 600}, 'validator_seconds': 120, 'budget_seconds': 1000})
+                 'full': {'seconds': 1800}, 'validator_seconds': 120, 'budget_seconds': 2600})  # reservation, not expected time (about 320 s on an A6000); shared hosts publish slowly
     if shared:
         spec['gpu_sharing'] = {'mode': 'shared', 'basis': 'GPU colour conversion and bicubic resize of saved frames: pixels do not depend on wall time or neighbours', 'margin_mib': 4096}
         spec['contention'] = {'policy': 'continue', 'basis': 'deterministic conversion; outputs do not depend on wall time', 'resume_attempts': 0}

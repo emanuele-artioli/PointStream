@@ -269,3 +269,6 @@ foreground-first claim.
 - receiver masks: `20261030T170824Z-6b51342b` complete on gpu5 Ada (shared); smoke 103.6 s + full 331.0 s GPU; `full/published.tar` sha256 `6b0cc2c23122e974a0b03d976a11787ee465f4deea5a5ea88eab84aea8728f4a`,
   `full/receiver.json` (the judge's `--prior`) sha256 `86d4dcb264a2ea0c40ffaa647e7b4ff2fb4d6150e3ccf0a2378e47f5c121eaf7`; full output rechecked by hand (`k6b_receiver_frame --validate`, stage full): 24 checks passed.
   GPU total so far 3,592 s of 4,680 s (rgb diagnostic `20261030T163628Z-d8f52f8f` running on gpu3, judge, W1 scoring, DCVC still to count).
+- rgb diagnostic, shared job `20261030T163628Z-d8f52f8f` (gpu3, A6000): smoke ran 45.5 s GPU (summary: 27.2 s, projected full 321 s) but failed the fleet validator again, on `full_projection_with_publication`:
+  the check multiplies the smoke's staging/publication time (73 s on this shared host, 150 MB archive) by 10 and compared it with the 600 s reservation. Not a result problem (all other 12 checks true).
+  Fix: the allowance is now the job spec's own full reservation (1,800 s for this stage, reservation only; expected about 320 s), test extended. GPU total now 3,637 s of 4,680 s.

@@ -20,3 +20,4 @@ def test_reservation_follows_the_stage_not_the_frozen_pair():
 
     assert reservation_seconds(True, 2) == 360
     assert reservation_seconds(False, 1) == 600
+    assert reservation_seconds(False, 1, 1800) == 1800

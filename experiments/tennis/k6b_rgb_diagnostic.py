@@ -168,9 +168,9 @@ def subprocess_run(command: list[str]) -> None:
     subprocess.run(command, check=True, capture_output=True)
 
 
-def reservation_seconds(frozen: bool, n_windows: int) -> float:
-    """Seconds the validator allows the full stage: the frozen pair's 360 s for two windows, else the W7 spec's 600 s full reservation."""
-    return 360 * n_windows / 2 if frozen else 600.0
+def reservation_seconds(frozen: bool, n_windows: int, spec_full_seconds: float = 600.0) -> float:
+    """Seconds the validator allows the full stage: the frozen pair's 360 s for two windows, else the job spec's full reservation."""
+    return 360 * n_windows / 2 if frozen else float(spec_full_seconds)
 
 
 def validate() -> None:
@@ -182,7 +182,8 @@ def validate() -> None:
     n_windows = 2 if frozen else max(1, dispatch.count('--source'))
     frames = data['frames']
     smoke = frames == 24
-    allowance = reservation_seconds(frozen, n_windows)
+    spec_path = root.parent / 'spec.json'
+    allowance = reservation_seconds(frozen, n_windows, json.loads(spec_path.read_text())['full']['seconds'] if spec_path.exists() else 600.0)
     checks = {'frame_grid': frames in (24, 240), 'exact_source': data['source_passed'], 'six_base_sets': data['base_sets'] == (6 if frozen else 3 * n_windows)}
     projected_with_publication = 0.0
     if smoke:
