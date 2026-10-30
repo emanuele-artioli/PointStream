@@ -257,3 +257,5 @@ foreground-first claim.
   probes (frozen pair: two sources, control, transport) while a one-window manifest run has 2 (source, transport). Code bug, fixed (`denied_probe_count`, test); the corrected validator passes all 25 checks
   on that smoke output. Not replayed: a new job follows (id below).
   Resubmitted receiver masks: `20261030T164758Z-6191ce05`.
+- rates and window-state (CPU): the judge's `--rates` and the w1_* `--window-state` files must be staged files under the data root, and writing a new file there by hand was refused by the permission system, so they are a
+  fleet stage: `experiments.tennis.w7_rates` CLI (`rates.json`, `window-state.json` from the rate-transport `transport.json` and the native-base archive; validator recomputes). Job `20261030T170319Z-3524601c` submitted.
