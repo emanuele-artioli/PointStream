@@ -1,0 +1,176 @@
+{
+ "schema": 1,
+ "entrypoint": [
+  "-m",
+  "experiments.tennis.w1_score"
+ ],
+ "arguments": [
+  "--source",
+  "{staged:med}",
+  "--window",
+  "med",
+  "--masks",
+  "{staged:masks}",
+  "--hybrid",
+  "{staged:hybrid}",
+  "--lpips",
+  "{staged:lpips}",
+  "--dists",
+  "{staged:dists}",
+  "--encode-half",
+  "{staged:encode_half}",
+  "--primary",
+  "kps2",
+  "--judged",
+  "{judged}",
+  "--encode-extra",
+  "{staged:encode_x0}",
+  "{staged:encode_x1}",
+  "{staged:encode_x2}"
+ ],
+ "staged_inputs": [
+  {
+   "name": "med",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/medvedev_struff__014.mp4",
+   "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be",
+   "extract": false
+  },
+  {
+   "name": "masks",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261029T192450Z-bc8195a6/full/published.tar",
+   "sha256": "8a8c240eb872b676118c52b8947583ddc3b72510fed0c6c012e8ee4938475f93",
+   "extract": false
+  },
+  {
+   "name": "hybrid",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072024Z-10c9606e/full/published.tar",
+   "sha256": "4e2a337d34489cf2e65bb1527f3c511dad334bad6ec84761d035678e9f94aa6d",
+   "extract": false
+  },
+  {
+   "name": "lpips",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+   "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+   "extract": false
+  },
+  {
+   "name": "dists",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+   "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+   "extract": false
+  },
+  {
+   "name": "encode_half",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072109Z-eaff2f20/full/published.tar",
+   "sha256": "9a6256ee09263275e797ad272733cc1ba792c12db3fd344ee2b3e881cd3dbb8a",
+   "extract": false
+  },
+  {
+   "name": "encode_x0",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072138Z-4c6ec4e5/full/published.tar",
+   "sha256": "cad1608759ac176f4cdd42fcc277703458630f5c4ac3b07af458ee4ae5e7a9ea",
+   "extract": false
+  },
+  {
+   "name": "encode_x1",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072250Z-581e1ff7/full/published.tar",
+   "sha256": "7b20a01e54a42cd8fcf90033b93a34d45e421fef70cd0ea047193621932e838f",
+   "extract": false
+  },
+  {
+   "name": "encode_x2",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072402Z-837f2dac/full/published.tar",
+   "sha256": "4e2b3202da96c1f1bcdc257fd0be95fe5e62e21cbf68134c22b67d6bbb922815",
+   "extract": false
+  }
+ ],
+ "inputs": [
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/medvedev_struff__014.mp4",
+   "sha256": "a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261029T192450Z-bc8195a6/full/published.tar",
+   "sha256": "8a8c240eb872b676118c52b8947583ddc3b72510fed0c6c012e8ee4938475f93"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072024Z-10c9606e/full/published.tar",
+   "sha256": "4e2a337d34489cf2e65bb1527f3c511dad334bad6ec84761d035678e9f94aa6d"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+   "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+   "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072109Z-eaff2f20/full/published.tar",
+   "sha256": "9a6256ee09263275e797ad272733cc1ba792c12db3fd344ee2b3e881cd3dbb8a"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072138Z-4c6ec4e5/full/published.tar",
+   "sha256": "cad1608759ac176f4cdd42fcc277703458630f5c4ac3b07af458ee4ae5e7a9ea"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072250Z-581e1ff7/full/published.tar",
+   "sha256": "7b20a01e54a42cd8fcf90033b93a34d45e421fef70cd0ea047193621932e838f"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T072402Z-837f2dac/full/published.tar",
+   "sha256": "4e2b3202da96c1f1bcdc257fd0be95fe5e62e21cbf68134c22b67d6bbb922815"
+  }
+ ],
+ "environment": {
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+  "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+ },
+ "required_commands": [
+  "ffmpeg"
+ ],
+ "validator": [
+  "{python}",
+  "-m",
+  "experiments.tennis.w1_score",
+  "--validate"
+ ],
+ "deadline": "2026-10-31T12:00:00+00:00",
+ "verify_staged_inputs": true,
+ "device": "gpu",
+ "hosts": [
+  "gpu3"
+ ],
+ "gpu_models": [
+  "RTX A6000"
+ ],
+ "gpu_memory_mib": 8000,
+ "cpu_threads": 4,
+ "local_storage_gib": 30,
+ "scale": {
+  "judged": {
+   "smoke": 3,
+   "full": 0
+  }
+ },
+ "gpu_sharing": {
+  "mode": "shared",
+  "basis": "Saved-pixel scoring; scores do not depend on wall time",
+  "margin_mib": 8192
+ },
+ "contention": {
+  "policy": "continue",
+  "basis": "Deterministic scoring of saved streams does not depend on foreign workload timing.",
+  "resume_attempts": 0
+ },
+ "smoke": {
+  "seconds": 560,
+  "representative_basis": "Three saved ticks (0/3/6) of every selected stream and the three plain CRF 63 controls, with decode hashes, S masks, all four metrics and the per-tick reproduction of the step 1 job controls within 1e-4."
+ },
+ "full": {
+  "seconds": 2400
+ },
+ "validator_seconds": 120,
+ "budget_seconds": 3400,
+ "stall_seconds": 900.0
+}

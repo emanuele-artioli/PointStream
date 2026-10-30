@@ -81,7 +81,8 @@ AL = Window('al', WINDOW, PACKET_DIR, FPS, SOURCE_SHA, SOURCE_YUV_SHA, SOURCE_ST
 MED = Window('med', 'medvedev_struff/014@194', 'packets/medvedev_struff__014@194/', 50,
              'a2898b5cdfb463f59b5084fddfe23a2442cf2ba5feaaddb9d5414873e52dd0be',
              '53633ce617b12d779bc8c5746d8d44cbe090ced6c49ba79dbe246cc6abacfb08', 74, 'medvedev_struff__014@194',
-             {8: 11734, 4: 20484, 2: 48152}, {4: 60, 2: 70, 1: 70}, 3542, 2193)
+             {8: 11734, 4: 20484, 2: 48152}, {4: 60, 2: 70, 1: 70}, 3542, 2193,
+             '4e2a337d34489cf2e65bb1527f3c511dad334bad6ec84761d035678e9f94aa6d')  # step 1 archive, job 20261030T072024Z-10c9606e
 WINDOWS = {w.name: w for w in (AL, MED)}
 
 
