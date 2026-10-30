@@ -139,7 +139,8 @@
  "verify_staged_inputs": true,
  "device": "gpu",
  "hosts": [
-  "gpu3"
+  "gpu3",
+  "gpu2"
  ],
  "gpu_models": [
   "RTX A6000"
@@ -156,7 +157,7 @@
  "gpu_sharing": {
   "mode": "shared",
   "basis": "Saved-pixel scoring; scores do not depend on wall time",
-  "margin_mib": 8192
+  "margin_mib": 4096
  },
  "contention": {
   "policy": "continue",
