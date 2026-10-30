@@ -633,9 +633,11 @@ def validate() -> None:
               'masks': w['timings']['masks'], 'scoring': w['timings']['scoring']} for w in windows],
             summary['setup_seconds'], staging['publication_seconds'], [len(full_plan[w['window']]) for w in windows],
             float(sum({8: 1, 4: 4, 2: 16}[x] for x in full_svt)), len(full_svt))
+        full_stage = summary['frames'] == NATIVE_FRAMES
+        plan = full_plan if full_stage else smoke_plan
         selection = {
-            'smoke_scale': summary['frames'] == 25 and listed == spec['scale']['point_list']['smoke'],
-            'points_as_named': all([(p['scale'], p['qp']) for p in w['chosen']] == smoke_plan[w['window']] for w in windows),
+            'smoke_scale': (summary['frames'], listed) == ((NATIVE_FRAMES, spec['scale']['point_list']['full']) if full_stage else (CAL_FRAMES, spec['scale']['point_list']['smoke'])),
+            'points_as_named': all([(p['scale'], p['qp']) for p in w['chosen']] == plan[w['window']] for w in windows),
             'smoke_points_in_full_plan': all(pt in full_plan[w] for w, pts in smoke_plan.items() for pt in pts),
             'no_calibration': all(not w['candidates'] and w['bracket_ok'] is None for w in windows)}
     else:

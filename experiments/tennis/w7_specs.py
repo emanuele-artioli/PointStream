@@ -241,18 +241,22 @@ def receiver(windows: list[wm.WindowSpec], manifest: tuple[str, str], transport:
 
 
 def dcvc(windows: list[wm.WindowSpec], manifest: tuple[str, str], anchor: tuple[str, str], transport: tuple[str, str], prior_frame: tuple[str, str],
-         frames: int) -> dict[str, Any]:
-    """DCVC-UF points and SVT bases with decode checks (w3_neural_baseline, manifest mode: per-window checkpoints under PS_CHECKPOINT_DIR)."""
+         frames: int, point_list: tuple[str, str] | None = None) -> dict[str, Any]:
+    """DCVC-UF points and SVT bases with decode checks (w3_neural_baseline, manifest mode: per-window checkpoints under PS_CHECKPOINT_DIR).
+    `point_list` = (smoke, full) lists `window:scale:qp,...` named on measured rates (no calibration encodes); the SVT bases are then scale 8 only."""
     chosen = windows[:1] if frames == 25 else windows
     args = ['--windows-file', '{staged:windows}', *sum((['--window', w.name] for w in chosen), []),
             *sum((['--source', '{staged:' + w.name + '}'] for w in chosen), []), '--anchor', '{staged:anchor}', '--transport', '{staged:transport}',
             '--prior-frame', '{staged:prior_frame}', '--image-ckpt', '{staged:dcvc_image}', '--video-ckpt', '{staged:dcvc_video}',
-            '--lpips', '{staged:lpips}', '--dists', '{staged:dists}', '--frames', '{frames}', '--points', '{points}', '--svt-scales', '{svt_scales}']
+            '--lpips', '{staged:lpips}', '--dists', '{staged:dists}', '--frames', '{frames}',
+            *(['--point-list', '{point_list}'] if point_list else ['--points', '{points}']), '--svt-scales', '{svt_scales}']
     files = {'windows': manifest, 'anchor': anchor, 'transport': transport, 'prior_frame': prior_frame,
              **assets('dcvc_image', 'dcvc_video', 'lpips', 'dists'), **{w.name: source_files(windows)[w.name] for w in chosen}}
     spec = gpu_stage('experiments.tennis.w3_neural_baseline', args, files, models=['RTX 6000 Ada'], mem_mib=12000, threads=4,
                      smoke_seconds=600, full_seconds=FULL_SECONDS,
-                     scale={'frames': {'smoke': 25, 'full': 240}, 'points': {'smoke': 1, 'full': 3}, 'svt_scales': {'smoke': '8', 'full': '8,4,2'}},
+                     scale={'frames': {'smoke': 25, 'full': 240},
+                            **({'point_list': {'smoke': point_list[0], 'full': point_list[1]}, 'svt_scales': {'smoke': '8', 'full': '8'}} if point_list else
+                               {'points': {'smoke': 1, 'full': 3}, 'svt_scales': {'smoke': '8', 'full': '8,4,2'}})},
                      basis='First window, 25 frames, one DCVC point and the scale 8 SVT base (the W3 smoke grid).')
     basis = 'Rates and scores of saved decoded streams do not depend on wall time or foreign load; recorded seconds are cost only, never evidence'
     spec['gpu_sharing'] = {'mode': 'shared', 'basis': basis, 'margin_mib': 8192}
@@ -425,7 +429,8 @@ def first_window(argv: list[str]) -> None:
     elif stage == 'w1-score':
         spec = w1_score_spec(first, windows_ref, ups['state'], ups['masks'], ups['hybrid'], [ups['encode_half'], *[v for k, v in sorted(ups.items()) if k.startswith('encode_x')]])
     elif stage == 'dcvc':
-        spec = dcvc([first], windows_ref, ups['anchor'], ups['transport'], ups['prior_frame'], 25)
+        listed = (ups['smoke_points'][0], ups['full_points'][0]) if 'full_points' in ups else None
+        spec = dcvc([first], windows_ref, ups['anchor'], ups['transport'], ups['prior_frame'], 25, listed)
     elif stage == 'build-inputs':
         spec = build_inputs(first, confirm, ups['features'])
     else:
