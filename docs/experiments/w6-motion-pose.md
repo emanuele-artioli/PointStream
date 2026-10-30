@@ -245,3 +245,17 @@ judges ([j.md](j.md)).
   says only that nothing but generated pixels is left; (iv) the paid base alone (B) already flickers 17.4, close to the SVT anchor's 18.6, so
   roughly 11 of the hybrid's 28.6 sit in the generated pixels on top of that floor. Not tested: whether a feathered composite, not covered by
   this rule, changes the generated-pixel share.
+- Lead's reading (2026-10-30). The control misses the literal 1e-6 because this run is on CPU and W6's on CUDA: the
+  source's own residual energy, which involves no PointStream output, differs by up to 1.1e-3 too, and the mean
+  flicker agrees to 6e-6. The largest per-frame difference (2.2e-3) is four orders of magnitude below the
+  effects being compared (excesses of about ±10), so the decision stands; the 1e-6 tolerance was set without
+  allowing for a CPU rerun and is recorded as a deviation, not relaxed after the fact for the decision.
+- Decision: content. The extra flicker is in the generated pixels; better outlines do not reduce it (the exact
+  source matte raises it, because it shows more generated pixels). With source pixels inside the receiver
+  masks, the composite flickers less than SVT (8.3 vs 18.6), so the pipeline's temporal floor is fine and the
+  generator is the problem.
+- Narrowed claim (unchanged from W6): sharp, correctly posed players that flicker; the cause is per-frame
+  generation. Next test, cheapest first: temporal smoothing of the generated crops on saved outputs
+  (flow-guided blend of each crop with its warped predecessor, two or three blend weights), scored on flicker
+  and on per-frame player LPIPS/DISTS together, since smoothing can trade sharpness for stability. Then a
+  video-native generator under W10.
