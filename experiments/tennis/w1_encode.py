@@ -26,7 +26,7 @@ from typing import Any
 import numpy as np
 
 from experiments.tennis.w1_roi import (AL, CODED, CONTROL_CRF, FRAMES, OFFSETS, TARGET_KBPS, TOOLS, TRANSPORT_SHA,
-                                       WINDOWS, Window, digest, next_crf, policy_name, rate_kbps, roi_text,
+                                       WINDOWS, Window, digest, next_crf, packet_file, policy_name, preload_from_spec, rate_kbps, roi_text,
                                        select_crfs, start_crf)
 
 
@@ -141,8 +141,8 @@ def run(a: argparse.Namespace) -> None:
 
     began = time.monotonic()
     window = WINDOWS[a.window]
-    for path, expected in ((a.al, window.source_sha), (a.transport, TRANSPORT_SHA)):
-        if digest(path) != expected:
+    for path, expected in ((a.al, window.source_sha), (a.transport, TRANSPORT_SHA if a.window in ('al', 'med') else None)):  # manifest windows: own transport
+        if expected is not None and digest(path) != expected:
             raise ValueError('pinned input changed: ' + path.name)
     tools = {name: svtav1.tool(name) for name in TOOLS}
     if any(tools[n]['sha256'] != d for n, d in TOOLS.items()):
@@ -158,7 +158,7 @@ def run(a: argparse.Namespace) -> None:
     if frames == FRAMES and digest(full) != window.source_yuv_sha:
         raise ValueError('source conversion changed')
     with tarfile.open(a.transport) as tar:
-        member = tar.extractfile(window.packet_dir + 'exact-rle.matte')
+        member = packet_file(tar, window, 'exact-rle.matte')
         assert member is not None
         _, masks = decode_masks(member.read())
     if masks.shape != (240, 2, 540, 960) or masks.dtype != bool:
@@ -209,6 +209,7 @@ def validate() -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     summary = json.loads((stage / 'encode-summary.json').read_text())
     spec = json.loads((stage.parent / 'spec.json').read_text())
+    preload_from_spec(spec)  # manifest windows are not in WINDOWS until registered
     frames = summary['frames']
     smoke = frames != FRAMES
     fps = WINDOWS[summary.get('window', 'al')].fps

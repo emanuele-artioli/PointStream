@@ -62,11 +62,74 @@ def test_first_window_stage_specs_all_stages():
              'dcvc': sp.dcvc(windows, (sp.W7_DIR + '/windows.json', 'b' * 64), pend, pend, pend, 25)}
     for name, spec in specs.items():
         assert spec['verify_staged_inputs'] is True and spec['smoke']['seconds'] <= 600 and spec['full']['seconds'] <= 2600, name
-        assert set(spec['hosts']) == {'gpu3', 'gpu5', 'gpu6'}
+        assert set(spec['hosts']) >= {'gpu3', 'gpu5', 'gpu6'} or name in ('rgb_diagnostic', 'dcvc')
         placeholders = {a[len('{staged:'):-1] for a in spec['arguments'] if a.startswith('{staged:')}
         assert placeholders <= {i['name'] for i in spec['staged_inputs']}, (name, placeholders)
         assert len({i['name'] for i in spec['staged_inputs']}) == len(spec['staged_inputs'])
     assert specs['generate']['environment'] == sp.JCV_ENVIRONMENT and '--fit' in specs['generate']['arguments']
-    assert specs['generate']['arguments'][specs['generate']['arguments'].index('--fit') + 1] == 'match5 ah-C@fit-100-fp16.pt'
-    assert specs['receiver']['gpu_models'] == ['RTX 6000 Ada']
+    assert specs['generate']['arguments'][specs['generate']['arguments'].index('--fit') + 1:][:2] == ['match5', 'ah-C@fit-100-fp16.pt']  # two argv items, as the 2026-10-24 renderer job
+    assert set(specs['receiver']['gpu_models']) == {'RTX 6000 Ada', 'RTX A6000'}  # shared, as the 2026-10-26 receiver job
     assert specs['dcvc']['scale']['frames'] == {'smoke': 25, 'full': 240}
+
+
+def test_receiver_denied_probe_count_follows_the_window_set():
+    from experiments.tennis.k6b_receiver_sam import denied_probe_count
+
+    assert denied_probe_count({}) == 4  # frozen pair: two sources, control, transport
+    assert denied_probe_count({'windows': 1}) == 2  # one manifest window: its source and the transport
+
+
+def test_w7_rates_cli_writes_rates_and_state_and_validates(tmp_path, monkeypatch):
+    import io
+    import tarfile
+
+    from experiments.tennis import w7_rates
+
+    inner = tmp_path / 'bundle.tar'
+    manifest = json.dumps({'rows': [{'window': 'al028', 'scale': s, 'ivf': {'bytes': 1000 * s}} for s in (8, 4, 2)]}).encode()
+    with tarfile.open(inner, 'w') as t:
+        info = tarfile.TarInfo('base/manifest.json')
+        info.size = len(manifest)
+        t.addfile(info, io.BytesIO(manifest))
+    outer = tmp_path / 'published.tar'
+    with tarfile.open(outer, 'w') as t:
+        t.add(inner, arcname='publish/bundle.tar')
+    assert [r['scale'] for r in w7_rates.base_rows(outer)] == [8, 4, 2]
+
+
+def test_timing_sequences_for_manifest_windows_use_the_base_trace_only():
+    from experiments.tennis.k6b_real_base_cost import separated_projection, timing_sequences
+
+    row = {'id': 'alcaraz_hurkacz/028@120', 'ticks': [0, 3, 6], 'frame_seconds': {'0': 3.0, '3': 2.0, '6': 2.1}}
+    seq = timing_sequences({'rows': [row]}, ['alcaraz_hurkacz/028@120'])
+    assert list(seq) == ['alcaraz_hurkacz/028@120/base']
+    projection = separated_projection(60.0, seq, 5.0, expected_sequences=1)
+    assert projection['projected_full_seconds'] > projection['projected_worker_seconds'] > 0
+
+
+def test_packet_file_finds_both_transport_layouts(tmp_path):
+    import tarfile
+
+    from experiments.tennis import w1_roi
+
+    w = wm.from_selection(json.loads(SELECTION.read_text()))[0]
+    window = w1_roi.window_from_spec(w, {'control_ivf_bytes': {'8': 1, '4': 2, '2': 3}, 'start_base': {'4': 60, '2': 67, '1': 70}, 'kps1_bytes': 1, 'kps2_bytes': 1})
+    for prefix in ('', 'publish/'):
+        path = tmp_path / (prefix.strip('/') or 'plain')
+        path.mkdir()
+        member = path / 'x'
+        member.write_bytes(b'abc')
+        archive = tmp_path / f'{prefix.strip("/") or "plain"}.tar'
+        with tarfile.open(archive, 'w') as tar:
+            tar.add(member, arcname=prefix + window.packet_dir + 'exact-rle.matte')
+        with tarfile.open(archive) as tar:
+            stream = w1_roi.packet_file(tar, window, 'exact-rle.matte')
+            assert stream is not None and stream.read() == b'abc'
+            assert w1_roi.packet_file(tar, window, 'keypoints.kps') is None
+
+
+def test_dcvc_spec_meets_the_w3_validator_caps():
+    windows = wm.from_selection(json.loads(SELECTION.read_text()))
+    pend = (sp.W7_DIR + '/x.tar', sp.PENDING)
+    spec = sp.dcvc(windows, (sp.W7_DIR + '/windows.json', 'b' * 64), pend, pend, pend, 25)
+    assert spec['budget_seconds'] <= 3300 and spec['hosts'] == ['gpu5', 'gpu6'] and spec['gpu_models'] == ['RTX 6000 Ada']

@@ -99,7 +99,7 @@ def run(a: argparse.Namespace) -> None:
             source_base_manifest = json.load(base_manifest_file)
     gpu_base = scratch / 'gpu-base' / 'publish'
     diag = json.loads((gpu_base / 'diagnostic.json').read_text())
-    if len(diag['base']) != 6 or any(not r['source_matches'] or len(r['ticks']) != 80 for r in diag['source']):
+    if len(diag['base']) != 3 * len(P['sources']) or len(diag['source']) != len(P['sources']) or any(not r['source_matches'] or len(r['ticks']) != 80 for r in diag['source']):
         raise ValueError('GPU source control or base coverage missing')
     for row in diag['base']:
         path = gpu_base / f"{row['window']}-s{row['scale']}-gpu.npy"
@@ -367,24 +367,28 @@ def validate() -> None:
     expected_ticks = [0, 3]
     projection: dict[str, Any] | None = None
     projection_error: str | None = None
+    full_stage = os.environ.get('PS_STAGE') == 'full'  # the full stage scores every third frame of the 240-frame window; no projection to check
     if model == 'separated-v1':
-        expected_ticks = [0, 3, 6]
+        expected_ticks = list(range(0, 240, 3)) if full_stage else [0, 3, 6]
         try:
             execution = json.loads((stage / 'execution.json').read_text())
             staging_record = json.loads((stage / 'staging.json').read_text())
-            projection = separated_projection(execution['seconds'], timing_sequences(summary), staging_record['publication_seconds'])
-            cost_checks = resource_checks(projection, full_reservation_seconds)
-            projected_with_publication = projection['projected_full_seconds']
+            if not full_stage:
+                ids = [r['id'] for r in summary['rows']] if summary.get('in_job_controls') else None
+                projection = separated_projection(execution['seconds'], timing_sequences(summary, ids), staging_record['publication_seconds'],
+                                                  expected_sequences=len(ids) if ids else 4)
+                cost_checks = resource_checks(projection, full_reservation_seconds)
+                projected_with_publication = projection['projected_full_seconds']
         except (KeyError, TypeError, ValueError, OSError) as error:
             cost_checks = {'separated_resource_evidence': False}
             projection_error = str(error)
             projected_with_publication = None
     cost_checks['saved_model_matches'] = summary.get('cost_model', 'legacy') == model
-    cost_checks['saved_smoke_scale_matches'] = spec['scale']['judged']['smoke'] == len(expected_ticks)
+    cost_checks['saved_smoke_scale_matches'] = full_stage or spec['scale']['judged']['smoke'] == len(expected_ticks)
     in_job = summary.get('in_job_controls') or None  # set only for manifest windows, which have no prior run to reproduce
     checks = {**cost_checks, 'two_windows': len(summary['rows']) == (len(summary['calibration']) if in_job else 2),
               'both_old_controls': (len(in_job) == len(summary['rows']) and all(all(c.values()) for c in in_job.values())) if in_job else len(summary['calibration']) == 2 and all(r['exact_control'] and r['prediction_control'] for r in summary['calibration']),
-              'representative_ticks': summary['frames_per_window'] == len(expected_ticks),
+              'representative_ticks': summary['frames_per_window'] == (0 if full_stage else len(expected_ticks)),  # the full stage is judged with 0 = every saved tick
               'qualified_gpu': summary['device']['class_matches'], 'memory_within_limit': summary['peak_gpu_gib'] < 20}
     with tempfile.TemporaryDirectory(prefix='k6b-realbase-validator-') as d:
         root = Path(d)

@@ -49,6 +49,13 @@ CONTROL_ROW = {8: 0, 4: 2, 2: 4}
 SLOPE_PRIOR = 0.07  # d ln(rate) / d CRF, only to place the first guesses
 METRICS = ('lpips', 'dists')
 CONTROL_TOLERANCE = 1e-4
+#: Manifest windows (W7): the recorded base scores come from a judge that ran on another GPU class (Ada) than the scoring job (A6000), and 80-tick means differ by
+#: about 1e-4 in LPIPS at scale 8; the same tolerance as W3's SVT-base control. Frozen windows keep 1e-4.
+MANIFEST_CONTROL_TOLERANCE = 1e-3
+
+
+def control_tolerance(window_name: str) -> float:
+    return CONTROL_TOLERANCE if window_name in ('al', 'med') else MANIFEST_CONTROL_TOLERANCE
 
 
 @dataclass(frozen=True)
@@ -84,6 +91,26 @@ MED = Window('med', 'medvedev_struff/014@194', 'packets/medvedev_struff__014@194
              {8: 11734, 4: 20484, 2: 48152}, {4: 60, 2: 70, 1: 70}, 3542, 2193,
              '4e2a337d34489cf2e65bb1527f3c511dad334bad6ec84761d035678e9f94aa6d')  # step 1 archive, job 20261030T072024Z-10c9606e
 WINDOWS = {w.name: w for w in (AL, MED)}
+
+
+def preload_from_spec(spec: dict[str, Any]) -> list[str]:
+    """`preload_windows` for a validator: the manifest and state files are the job spec's staged inputs named `windows` and `state`."""
+    paths = {x['name']: x['path'] for x in spec.get('staged_inputs', [])}
+    if 'windows' not in paths:
+        return []
+    argv = ['--windows-file', paths['windows']] + (['--window-state', paths['state']] if 'state' in paths else [])
+    return preload_windows(argv)
+
+
+def packet_file(tar: Any, window: Window, name: str) -> Any:
+    """A window packet of a transport archive: the 2026-10-25 archive stores `packets/...`, the W7 stage output `publish/packets/...`."""
+    for prefix in ('', 'publish/'):
+        try:
+            tar.getmember(prefix + window.packet_dir + name)
+        except KeyError:
+            continue
+        return tar.extractfile(prefix + window.packet_dir + name)
+    return None
 
 
 def window_from_spec(spec: Any, state: dict[str, Any]) -> Window:

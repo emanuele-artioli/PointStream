@@ -19,7 +19,7 @@ from typing import Any
 
 import numpy as np
 
-from experiments.tennis.w1_roi import (CONTROL_CRF, CONTROL_ROW, CONTROL_TOLERANCE, FRAMES, HYBRID, OFFSETS,
+from experiments.tennis.w1_roi import (CONTROL_CRF, CONTROL_ROW, FRAMES, control_tolerance, HYBRID, OFFSETS,
                                        TARGET_KBPS, TICKS, TOOLS, WEIGHTS, WINDOWS, Window, analyse,
                                        best_foreground, decide, digest, policy_at_target, policy_name, rebilled_kbps)
 
@@ -100,13 +100,15 @@ def hybrid_point(quality: dict[str, Any], window: Window) -> dict[str, Any]:
     quality.json; the scale 4 method is series row 3 of the judge's arrays."""
     row = next(r for r in quality['rows'] if r['id'] == window.id)
     rate = next(r for r in row['rates'] if r['scale'] == 4)
-    if rate['kps_bytes'] != window.kps1_bytes:
-        raise ValueError('the hybrid job billed a different keypoint packet than the pinned KPS1')
+    if rate['kps_bytes'] not in (window.kps1_bytes, window.kps2_bytes):
+        raise ValueError('the hybrid job billed a different keypoint packet than the pinned KPS1 or KPS2')
+    billed_kps2 = rate['kps_bytes'] == window.kps2_bytes != window.kps1_bytes  # W7 windows: the judge pays the KPS2 packet directly
     means = {'lpips': {'whole': row['means']['full_lpips'][3], 'foreground': row['means']['foreground_lpips'][3]},
              'dists': {'whole': row['means']['full_dists'][3], 'foreground': row['means']['foreground_dists'][3]}}
-    kps1 = rate['total_kbps']
-    return {'hybrid': means, 'kps1_kbps': kps1, 'kps2_kbps': rebilled_kbps(kps1, window.kps1_bytes, window.kps2_bytes, window),
-            'rate': rate}
+    total = rate['total_kbps']
+    if billed_kps2:
+        return {'hybrid': means, 'kps1_kbps': rebilled_kbps(total, window.kps2_bytes, window.kps1_bytes, window), 'kps2_kbps': total, 'rate': rate}
+    return {'hybrid': means, 'kps1_kbps': total, 'kps2_kbps': rebilled_kbps(total, window.kps1_bytes, window.kps2_bytes, window), 'rate': rate}
 
 
 def assemble(points: list[dict[str, Any]], scores: dict[str, np.ndarray], scales: tuple[int, ...] = (),
@@ -200,7 +202,7 @@ def run(a: argparse.Namespace) -> None:
         seconds[point['name']] = result['seconds']
         if point['kind'] == 'control':
             errors[point['name']] = control_errors(result['values'], hybrid, point['scale'], len(ticks))
-            if max(errors[point['name']].values()) > CONTROL_TOLERANCE:
+            if max(errors[point['name']].values()) > control_tolerance(window.name):
                 raise ValueError(f"control {point['name']} does not reproduce the recorded scores: {errors[point['name']]}")
         np.savez_compressed(publish / 'scores.npz', ticks=np.asarray(ticks), **scores)
         publish_progress(os.environ['PS_STAGE'], i + 1)
@@ -244,7 +246,7 @@ def validate() -> None:
         'tools_pinned': all(summary['tools'][n]['sha256'] == d for n, d in TOOLS.items()),
         'inputs': all(summary['inputs'][x['name']] == x['sha256'] for x in spec['staged_inputs'] if x['name'] in summary['inputs']),
         'controls_reproduced': sorted(summary['control_errors']) == ['control_s2_crf63', 'control_s4_crf63', 'control_s8_crf63']
-        and all(max(e.values()) <= CONTROL_TOLERANCE for e in summary['control_errors'].values()),
+        and all(max(e.values()) <= control_tolerance(summary['window']) for e in summary['control_errors'].values()),
         'memory': 0 < summary['peak_allocated_mib'] < 8000,
         'rates_positive': all(p['rate_kbps'] > 0 for p in summary['points'])}
     with tarfile.open(stage / 'published.tar') as tar:

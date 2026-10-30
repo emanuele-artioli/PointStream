@@ -176,11 +176,21 @@ def run(args: argparse.Namespace) -> None:
     signal.alarm(0)
 
 
+def grid_checks(result: dict[str, Any], windows: int) -> dict[str, bool]:
+    """Stage-length checks of `base-result.json`: the 24-frame smoke (one scale per window) or the 240-frame stage (scales 8, 4, 2)."""
+    frames = result['frames']
+    per_window = 1 if frames == 24 else 3
+    return {'windows': result['rows'] == windows * per_window, 'frame_grid': frames in (24, 240), 'single_cpu': result['single_cpu'],
+            'projection': frames == 240 or result['projected_full_seconds'] <= 1300,
+            'cpu_under_guard': result['workload_cpu_seconds'] <= (270 if frames == 24 else 1300)}
+
+
 def validate() -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     result = json.loads((stage / 'base-result.json').read_text())
     expected_sources = result.get('source_sha256', [r[3] for r in SOURCES])
-    checks = {'two_windows': result['rows'] == len(expected_sources), 'smoke_24': result['frames'] == 24, 'single_cpu': result['single_cpu'], 'projection': result['projected_full_seconds'] <= 1300, 'cpu_under_guard': result['workload_cpu_seconds'] <= 270}
+    frames = result['frames']
+    checks = grid_checks(result, len(expected_sources))
     with tempfile.TemporaryDirectory(prefix='k6b-base-validator-') as tmp:
         root = Path(tmp)
         with tarfile.open(stage / 'published.tar') as outer:
@@ -196,12 +206,12 @@ def validate() -> None:
             tar.extractall(root, filter='data')
         data = root / 'base'
         manifest = json.loads((data / 'manifest.json').read_text())
-        checks['source_identities'] = [r['source_sha256'] for r in manifest['rows']] == expected_sources
+        checks['source_identities'] = [r['source_sha256'] for r in manifest['rows']] == [h for h in expected_sources for _ in range(1 if frames == 24 else 3)]
         checks['pinned_tools'] = all(manifest['tools'][n]['sha256'] == d for n, d in TOOLS.items())
         for row in manifest['rows']:
             prefix = f"{row['window']}-s{row['scale']}"
             stream, yuv = data / (prefix + '.ivf'), data / (prefix + '.yuv')
-            info = ivf(stream, 24, row['size'][0], row['size'][1], row['fps'])
+            info = ivf(stream, frames, row['size'][0], row['size'][1], row['fps'])
             checks[prefix + ':ivf'] = info == row['ivf']
             checks[prefix + ':yuv'] = sha(yuv) == row['yuv_sha256']
             second = root / (prefix + '-fresh.yuv')
@@ -209,12 +219,12 @@ def validate() -> None:
             checks[prefix + ':fresh_decode'] = sha(second) == row['yuv_sha256']
             rgb = data / (prefix + '-rgb.npy')
             checks[prefix + ':rgb_file'] = sha(rgb) == row['rgb_sha256']
-            frames = np.load(rgb, mmap_mode='r')
-            checks[prefix + ':rgb_frames'] = frames.shape == (8, 1080, 1920, 3) and [hashlib.sha256(f.tobytes()).hexdigest() for f in frames] == row['rgb_frame_sha256']
+            pixels = np.load(rgb, mmap_mode='r')
+            checks[prefix + ':rgb_frames'] = row['frames'] == frames and pixels.shape == (len(range(0, frames, 3)), 1080, 1920, 3) and [hashlib.sha256(f.tobytes()).hexdigest() for f in pixels] == row['rgb_frame_sha256']
             bad = root / 'corrupt.ivf'
             bad.write_bytes(stream.read_bytes()[:-1])
             try:
-                ivf(bad, 24, row['size'][0], row['size'][1], row['fps'])
+                ivf(bad, frames, row['size'][0], row['size'][1], row['fps'])
                 checks[prefix + ':corruption_rejected'] = False
             except ValueError:
                 checks[prefix + ':corruption_rejected'] = True

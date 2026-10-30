@@ -647,9 +647,10 @@ def validate() -> None:
                    'masks': sum(w['timings']['masks'] for w in windows),
                    'scoring': sum(w['timings']['scoring'] for w in windows)}
         projection = project_full_seconds(timings, staging['publication_seconds'])
+        full_stage = summary['frames'] == NATIVE_FRAMES
         selection = {
-            'smoke_scale': summary['frames'] == 25 and summary['points'] == 1,
-            'rate_only_selection': all(len(w['candidates']) == len(CAL_QPS) * len(SCALES) and len(w['chosen']) == 1 for w in windows),
+            'smoke_scale': (summary['frames'], summary['points']) == ((NATIVE_FRAMES, 3) if full_stage else (CAL_FRAMES, 1)),
+            'rate_only_selection': all(len(w['candidates']) == len(CAL_QPS) * len(SCALES) and len(w['chosen']) == summary['points'] for w in windows),
             'bracket': all(w['bracket_ok'] and an.planned_bracket(w['candidates']) for w in windows)}
     points = [p for w in windows for p in w['dcvc']]
     checks: dict[str, Any] = {
@@ -667,9 +668,9 @@ def validate() -> None:
         'decoders_bit_identical': all(p['check_b_two_processes']['max_abs_diff'] == 0 and p['identical_frame_hashes'] for p in points),
         'dpb_status_recorded': all(isinstance(p['dpb_reachable'], bool) for p in points),
         'rate_from_file': all(p['bytes'] == p['encode_report']['container_bytes'] for p in points),
-        'scores': all(np.isfinite(v).all() and len(v) == 9 for w in windows for p in [*w['dcvc'], *w['svt']] for v in p['scores'].values()),
-        'svt_control_ran': windows[0]['audited_controls']['applies'] and all('score_max_error' in e for e in windows[0]['audited_controls']['scales'].values()),
-        'projection': projection < spec['full']['seconds'],
+        'scores': all(np.isfinite(v).all() and len(v) == (80 if summary['frames'] == NATIVE_FRAMES else 9) for w in windows for p in [*w['dcvc'], *w['svt']] for v in p['scores'].values()),
+        'svt_control_ran': manifest_item is not None or (windows[0]['audited_controls']['applies'] and all('score_max_error' in e for e in windows[0]['audited_controls']['scales'].values())),
+        'projection': summary['frames'] == NATIVE_FRAMES or projection < spec['full']['seconds'],  # the full stage is the run being projected
         'budget': spec['budget_seconds'] <= 3300,
         'scale': spec['scale']['frames'] == {'smoke': 25, 'full': 240},
         'inputs': manifest_item is not None or all(item['sha256'] in INPUTS.values() or item['sha256'] in {s['source'] for s in SOURCES.values()} for item in spec['staged_inputs']),

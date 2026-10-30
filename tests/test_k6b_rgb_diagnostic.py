@@ -13,3 +13,11 @@ def test_pixel_diff_counts_and_channel_means():
     assert row['different_pixels'] == 1
     assert row['channel_sum'] == [255, 1, 255]
     assert row['channel_mean_absolute'] == [127.5, 0.5, 127.5]
+
+
+def test_reservation_follows_the_stage_not_the_frozen_pair():
+    from experiments.tennis.k6b_rgb_diagnostic import reservation_seconds
+
+    assert reservation_seconds(True, 2) == 360
+    assert reservation_seconds(False, 1) == 600
+    assert reservation_seconds(False, 1, 1800) == 1800

@@ -119,7 +119,7 @@ def build_inputs(manifest: dict[str, Any], archives: list[Path], destination: Pa
     gates = check_manifest(manifest)
     clips = {c['id']: c for c in manifest['clips']}
     record: dict[str, Any] = {'schema': 1, 'provenance': PROVENANCE, 'windows': {}}
-    with tempfile.TemporaryDirectory(prefix='k6b-confirm-inputs-', dir='/tmp') as temp:
+    with tempfile.TemporaryDirectory(prefix='k6b-confirm-inputs-') as temp:
         root = Path(temp)
         for i, archive in enumerate(archives):
             with tarfile.open(archive) as tar:
@@ -196,7 +196,7 @@ def main() -> int:
             write_json(stage_dir() / "confirm-inputs.json", {"windows": args.max_windows, "sha256": file_sha256(target)})
             return 0
         metadata = json.loads((stage_dir() / "confirm-inputs.json").read_text())
-        with tempfile.TemporaryDirectory(prefix="k6b-confirm-recheck-", dir="/tmp") as temp:
+        with tempfile.TemporaryDirectory(prefix="k6b-confirm-recheck-") as temp:
             rebuilt = Path(temp) / "inputs.tar"
             build_inputs(manifest, args.feature_archive, rebuilt, metadata["windows"])
             with tarfile.open(target) as actual, tarfile.open(rebuilt) as expected:
@@ -233,7 +233,7 @@ def main() -> int:
     stage = stage_dir()
     summary = json.loads((stage / "k4b-features.json").read_text())
     check_feature_rows(manifest, summary)
-    with tempfile.TemporaryDirectory(prefix="k6b-confirm-validate-", dir="/tmp") as temp:
+    with tempfile.TemporaryDirectory(prefix="k6b-confirm-validate-") as temp:
         with tarfile.open(stage / "published.tar") as archive:
             archive.extractall(temp, filter="data")
         report = k4b_features.validate(Path(temp) / "publish", summary, args.manifest)
