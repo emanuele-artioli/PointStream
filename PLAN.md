@@ -1369,6 +1369,56 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   W5 ([rule](docs/experiments/w5-med-pareto.md)) and W6
   ([rule](docs/experiments/w6-motion-pose.md)) started 2026-10-29 after the
   user's visual check ([page](https://claude.ai/artifact/HsxdSd4CaWWUjXcgf1L9Cj)).
+  Results so far: W1 outcome A on Al once the ROI map was applied as
+  positive offsets outside R (negative offsets inside R are inert in SVT-AV1
+  4.2.0); W3b: DCVC-UF does not dominate on Al; W5 outcome A on Med against
+  SVT and DCVC-UF (PR #292). Player LPIPS at equal rate: Al 0.346 vs DCVC
+  0.391 / SVT 0.574; Med 0.375 vs DCVC 0.585 / SVT about 0.61. W7
+  ([rule](docs/experiments/w7-untouched.md)) written 2026-10-30: Tier 1
+  untouched clips of Al/Med, Tier 2 the Nadal–Kyrgios match the base never
+  trained on.
+- **W9. Adapter break-even and live adaptation (user, 2026-10-30).** The
+  per-match adapter (about 1.49 MB) is billed as if spread over a 2-hour
+  match, an arbitrary choice. Replace it with the break-even length L*: the
+  shortest match for which the player win still holds once the adapter is
+  paid over L seconds (hybrid rate = rest + 11.9 Mbit / L). From saved
+  scores (KPS2 rates; CPU, 2026-10-30):
+  - Al vs DCVC-UF: L* = 15.8 min on player LPIPS (DCVC reaches the hybrid's
+    0.346 at 32.4 kbps); on DISTS the win holds for every L ≥ 14.6 min, the
+    highest measured DCVC rate (33.4 kbps).
+  - Al vs SVT: the win holds for every L ≥ 40 min. Shorter is unresolved,
+    because SVT was measured only up to 24.7 kbps.
+  - Med vs DCVC-UF: the win holds for every L ≥ 2.2 min. DCVC at 130.8 kbps
+    is still worse on the players (0.531 vs 0.375).
+  - Next: anchor points at higher rates (SVT half up to about 130 kbps, DCVC
+    Al above 33 kbps) to resolve L* everywhere; cheap CPU encodes plus about
+    0.3 GPU-h of scoring.
+  Live streaming follows from the same accounting. The encoder streams the
+  base-only hybrid (tennis base, no adapter) or plain SVT, fits the adapter
+  on the first N minutes (a fit takes about 10 GPU-minutes on 1,440 crops),
+  sends it, and switches; the adapter is paid over the rest of the match.
+  Tests, in order:
+  - the base-only hybrid scored as in W1/W5. Is it already a player win at
+    minute 0?
+  - adapters fitted on the first 2, 5 and 10 minutes of a match, judged on
+    later windows (the W7 Tier 2 match, whose split is already by time).
+  Blocker for live use, independent of the adapter: generation runs at about
+  3.6 s per frame per player on an A6000 (W6 job, 30 DDIM steps), roughly
+  180 times slower than 50 fps. Live use also needs a few-step or distilled
+  generator (W10).
+- **W10. A stronger generator and a larger tennis base (user, 2026-10-30).**
+  The adapter is near its ceiling: an adapter fitted on the judged window
+  itself gains only about 0.012 player LPIPS (0.250 vs 0.262, K6b step 3 vs
+  step 5). Rank 4 matched rank 64 and 10 minutes matched 20. The base gained
+  about 0.007. Two levers are untested:
+  - a newer human-animation or video-diffusion backbone in place of
+    AnimateAnyone (SD 1.5, 512×784, 2023);
+  - a base trained on far more matches and for longer. Ours saw 8,597 crops
+    from 36 windows for 25 minutes, less than one epoch.
+  Each starts with an oracle, the new backbone zero-shot and overfit on one
+  window, at the W1 operating point, before any training run. W7 Tier 2
+  shows first how much the base's familiarity with a match is worth. A
+  few-step or distilled version is the route to live decoding (W9).
 
 
 ### J. Experience-track re-judging (user, 2026-10-22)
