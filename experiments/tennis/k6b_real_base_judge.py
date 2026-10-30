@@ -24,14 +24,46 @@ def extract(archive: Path, root: Path) -> None:
         tar.extractall(root, filter='data')
 
 
+def plan(a: argparse.Namespace) -> dict[str, Any]:
+    """Windows, sources and generated archives: the frozen Al/Med pair (`--al --med --gen-al --gen-med`) or a window manifest
+    (`--windows-file`, `--window`, `--source`, `--gen`, one each per selected window, in order)."""
+    if a.windows_file is None:
+        from experiments.tennis.k6b_foreground_video import PILOTS, SOURCE_SHA
+        return {'manifest': False, 'ids': list(PILOTS), 'shas': list(SOURCE_SHA), 'prefixes': ['al', 'med'],
+                'sources': [a.al, a.med], 'gens': [a.gen_al, a.gen_med]}
+    from experiments.tennis import window_manifest as wm
+
+    windows = wm.select(wm.load(a.windows_file), a.window or None)
+    if len(a.source or []) != len(windows) or len(a.gen or []) != len(windows):
+        raise ValueError('one --source and one --gen per selected window, in order')
+    return {'manifest': True, 'ids': [w.id for w in windows], 'shas': [w.source_sha256 for w in windows],
+            'prefixes': [w.name for w in windows], 'sources': list(a.source), 'gens': list(a.gen)}
+
+
+def rate_components(a: argparse.Namespace, previous: dict[str, Any], wid: str) -> dict[str, float]:
+    """Bank and adapter kbps of the 7200 s amortisation and the paid keypoint rate for window `wid`: from the prior run's
+    assessment (frozen pair) or from `--rates` (JSON {window id: {...}} written by the generalised rate stage)."""
+    if a.windows_file is None:
+        return next(r for r in previous['assessment']['rows'] if r['window'] == wid)['rate_components']
+    return json.loads(a.rates.read_text())[wid]
+
+
+def identity_controls(images: list[np.ndarray], base: np.ndarray, composed: np.ndarray, again: np.ndarray,
+                      scores: tuple[Any, Any]) -> dict[str, bool]:
+    """In-job controls for windows with no prior run: the hybrid with every generated crop removed is the paid base,
+    and scoring the same plain base twice gives identical numbers."""
+    return {'hybrid_without_players_is_base': bool(np.array_equal(composed, base)),
+            'plain_base_scored_twice_identical': bool(np.array_equal(scores[0], scores[1])) and bool(np.array_equal(images[0], again))}
+
+
 def run(a: argparse.Namespace) -> None:
+    P = plan(a)
     import cv2
     import torch
     from experiments.audit.env_smoke import device_record
     from experiments.tennis import k6, k6b, k6b_matte_judge as judge
     from experiments.tennis.k4 import safe
     from experiments.tennis.k4b_features import convert
-    from experiments.tennis.k6b_foreground_video import PILOTS, SOURCE_SHA
     from experiments.tennis.k6b_matte_cpu import box_maps
     from experiments.tennis.k6b_rate_streams import decode_keypoints, decode_masks
     from experiments.tennis.k6b_receiver_sam import project, transport_root
@@ -53,7 +85,7 @@ def run(a: argparse.Namespace) -> None:
     publish = scratch / 'publish'
     publish.mkdir()
     anchors = judge.extract([a.anchor], scratch / 'anchors')
-    controls = judge.extract([a.control], scratch / 'old-controls')
+    controls = judge.extract([a.control], scratch / 'old-controls') if a.control is not None else {}
     extract(a.transport, scratch / 'wire')
     wire = transport_root(scratch / 'wire')
     extract(a.masks, scratch / 'masks')
@@ -73,10 +105,10 @@ def run(a: argparse.Namespace) -> None:
         path = gpu_base / f"{row['window']}-s{row['scale']}-gpu.npy"
         if sha(path.read_bytes()) != row['sha256']:
             raise ValueError('GPU base input hash changed')
-    generated = k6b.load_generated([str(a.gen_al), str(a.gen_med)], scratch / 'generated')
+    generated = k6b.load_generated([str(g) for g in P['gens']], scratch / 'generated')
     previous = json.loads(a.prior.read_text())
     prior_rows = {r['id']: r for r in previous['rows']}
-    source_map = {sha(path.read_bytes()): path for path in (a.al, a.med)}
+    source_map = {sha(path.read_bytes()): path for path in P['sources']}
     nets = {'lpips': load_lpips(a.lpips, 'cuda'), 'dists': load_dists(a.dists, 'cuda')}
     if not all(next(net.parameters()).is_cuda for net in nets.values()):
         raise ValueError('metric network not on CUDA')
@@ -87,7 +119,7 @@ def run(a: argparse.Namespace) -> None:
     calibration: list[dict[str, Any]] = []
     # Both windows' original granted-matte and saved-prediction controls must
     # pass before any actual-base hybrid quality is opened.
-    for wid, digest in zip(PILOTS, SOURCE_SHA):
+    for wid, digest in zip(P['ids'], P['shas']):
         kp_meta, units = decode_keypoints((wire / 'packets' / safe(wid) / 'keypoints.kps').read_bytes())
         boxes = box_maps(units)
         masks: dict[int, dict[int, np.ndarray]] = {}
@@ -98,6 +130,11 @@ def run(a: argparse.Namespace) -> None:
                 if z['t'].tolist() != list(range(0, 240, 3)) or array_sha(z['masks']) != original_prediction['output_sha256']:
                     raise ValueError('saved SAM ticks or receiver prediction hash changed')
                 masks[i] = {int(t): project(m, box[int(t)]) for t, m in zip(z['t'], z['masks'])}
+        if P['manifest']:  # no prior run to reproduce: the in-job controls below replace the gate
+            calibration.append({'id': wid, 'gate': 'in-job controls (identity_controls), no prior run'})
+            masks_by_window[wid] = masks
+            units_by_window[wid] = (kp_meta, units, boxes)
+            continue
         rec = judge.judge_window(wid, anchors[wid], controls[wid], wire / 'packets', scratch, {}, generated,
                                  source_map[digest], digest, nets, scratch, controls_root, a.judged,
                                  control_variant='full', predicted_masks=masks)
@@ -117,7 +154,8 @@ def run(a: argparse.Namespace) -> None:
         units_by_window[wid] = (kp_meta, units, boxes)
     control_elapsed = time.monotonic() - began
     rows: list[dict[str, Any]] = []
-    for wid, digest, prefix in zip(PILOTS, SOURCE_SHA, ('al', 'med')):
+    identity: dict[str, Any] = {}
+    for wid, digest, prefix in zip(P['ids'], P['shas'], P['prefixes']):
         native = k6b.k6_window(anchors[wid])
         row = native['row']
         kp_meta, units, boxes = units_by_window[wid]
@@ -179,6 +217,13 @@ def run(a: argparse.Namespace) -> None:
             for i, image in enumerate(images):
                 frame_hashes.append(array_sha(image))
                 lp = lpips_reduce(nets['lpips'], [image], true, [[all_mask, s]], 'cuda')[0]
+                if P['manifest'] and i == 0 and j == 0:
+                    again = lpips_reduce(nets['lpips'], [image], true, [[all_mask, s]], 'cuda')[0]
+                    empty, _ = compose(images[0], {}, player_boxes, player_masks, order)
+                    controls_ok = identity_controls(images, images[0], empty, images[0], (np.asarray(lp), np.asarray(again)))
+                    if not all(controls_ok.values()):
+                        raise ValueError(f'in-job control failed for {wid}: {controls_ok}')
+                    identity[wid] = controls_ok
                 full_d = dists_crops(nets['dists'], [image], true, all_mask, 'cuda')[0]
                 fg_d = dists_crops(nets['dists'], [image[crop]], true[crop], s[crop], 'cuda')[0]
                 mse = float(np.mean((image.astype(np.float32) - true.astype(np.float32)) ** 2))
@@ -193,7 +238,7 @@ def run(a: argparse.Namespace) -> None:
         out.mkdir()
         np.savez_compressed(out / 'scores.npz', **scores, ticks=np.asarray(ticks))
         rates = []
-        old_rate = next(r for r in previous['assessment']['rows'] if r['window'] == wid)['rate_components']
+        old_rate = rate_components(a, previous, wid)
         duration = 240 / float(row['fps'])
         kps = (wire / 'packets' / safe(wid) / 'keypoints.kps').read_bytes()
         kps_rate = len(kps) * 8 / duration / 1000
@@ -238,13 +283,15 @@ def run(a: argparse.Namespace) -> None:
         del truth
     seconds = time.monotonic() - began
     per_frame = sum(r['score_seconds'] for r in rows) / sum(len(r['ticks']) for r in rows)
-    calibration_per_frame = sum(r['seconds'] for r in calibration) / sum(len(r['ticks']) for r in calibration)
+    calibration_per_frame = 0.0 if P['manifest'] else sum(r['seconds'] for r in calibration) / sum(len(r['ticks']) for r in calibration)
     projected = (control_elapsed + (per_frame + calibration_per_frame) * 160) * 1.35
     summary = {'rows': rows, 'calibration': calibration, 'seconds': seconds,
                'projected_full_seconds': projected if a.cost_model == 'legacy' else None,
                'legacy_projected_full_seconds': projected,
                'cost_model': a.cost_model,
                'device': device, 'peak_gpu_gib': torch.cuda.max_memory_allocated() / 2**30, 'frames_per_window': a.judged, 'scope': 'optimistic rate floor: fixed research header, 7200s bank/adaptation; tensor bootstrap and full framing unmeasured, no ball update or full semantic wire claim'}
+    if P['manifest']:
+        summary['in_job_controls'] = identity
     write(publish / 'quality.json', summary)
     write(Path(os.environ['PS_STAGE_DIR']) / 'quality-summary.json', summary)
 
@@ -331,7 +378,9 @@ def validate() -> None:
             projected_with_publication = None
     cost_checks['saved_model_matches'] = summary.get('cost_model', 'legacy') == model
     cost_checks['saved_smoke_scale_matches'] = spec['scale']['judged']['smoke'] == len(expected_ticks)
-    checks = {**cost_checks, 'two_windows': len(summary['rows']) == 2, 'both_old_controls': len(summary['calibration']) == 2 and all(r['exact_control'] and r['prediction_control'] for r in summary['calibration']),
+    in_job = summary.get('in_job_controls') or None  # set only for manifest windows, which have no prior run to reproduce
+    checks = {**cost_checks, 'two_windows': len(summary['rows']) == (len(summary['calibration']) if in_job else 2),
+              'both_old_controls': (len(in_job) == len(summary['rows']) and all(all(c.values()) for c in in_job.values())) if in_job else len(summary['calibration']) == 2 and all(r['exact_control'] and r['prediction_control'] for r in summary['calibration']),
               'representative_ticks': summary['frames_per_window'] == len(expected_ticks),
               'qualified_gpu': summary['device']['class_matches'], 'memory_within_limit': summary['peak_gpu_gib'] < 20}
     with tempfile.TemporaryDirectory(prefix='k6b-realbase-validator-') as d:
@@ -356,6 +405,11 @@ def main() -> None:
     p.add_argument('--validate', action='store_true')
     for name in ('anchor', 'control', 'transport', 'masks', 'gpu-base', 'base', 'gen-al', 'gen-med', 'prior', 'al', 'med', 'lpips', 'dists'):
         p.add_argument('--' + name, type=Path)
+    p.add_argument('--windows-file', type=Path, help='window manifest instead of the frozen Al/Med pair (needs --source and --gen per window, --rates)')
+    p.add_argument('--window', action='append')
+    p.add_argument('--source', type=Path, action='append')
+    p.add_argument('--gen', type=Path, action='append')
+    p.add_argument('--rates', type=Path, help='per window id: keypoint-independent bank and adapter kbps (the generalised rate stage)')
     p.add_argument('--judged', type=int, default=2)
     p.add_argument('--no-early-stop', action='store_true', help='score the second window even when the first fails the rule')
     p.add_argument('--cost-model', choices=('legacy', 'separated-v1'), default='legacy')
@@ -364,7 +418,8 @@ def main() -> None:
         validate()
     else:
         allowed = (0, 3) if a.cost_model == 'separated-v1' else (0, 2)
-        if any(getattr(a, n) is None for n in ('anchor', 'control', 'transport', 'masks', 'gpu_base', 'base', 'gen_al', 'gen_med', 'prior', 'al', 'med', 'lpips', 'dists')) or a.judged not in allowed:
+        required = ('anchor', 'transport', 'masks', 'gpu_base', 'base', 'prior', 'lpips', 'dists') + (('rates',) if a.windows_file else ('control', 'gen_al', 'gen_med', 'al', 'med'))
+        if any(getattr(a, n) is None for n in required) or a.judged not in allowed:
             p.error('all inputs and the resource model\'s original 0/2 or separated 0/3 judged frames are required')
         run(a)
 

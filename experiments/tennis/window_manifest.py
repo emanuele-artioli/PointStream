@@ -165,3 +165,15 @@ def file_sha256(path: Path) -> str:
         for chunk in iter(lambda: stream.read(1 << 22), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def plan(args: Any, frozen_paths: list[Path], frozen_sources: list[tuple[str, int, int, str, str]],
+         ) -> tuple[list[Path], list[tuple[str, int, int, str, str]], list[str]]:
+    """Source files, `SOURCES` tuples and window ids of a stage: the frozen Al/Med pair when `args.windows_file` is None
+    (the stage's own `--al --med` and `SOURCES`), else the selected manifest windows with one `--source` each, in order."""
+    if args.windows_file is None:
+        return frozen_paths, frozen_sources, [w.id for w in FROZEN_PAIR]
+    windows = select(load(args.windows_file), args.window or None)
+    if len(args.source or []) != len(windows):
+        raise ValueError("one --source per selected window, in order")
+    return list(args.source), legacy_sources(windows), [w.id for w in windows]

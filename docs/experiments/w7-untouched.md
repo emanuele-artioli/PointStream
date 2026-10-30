@@ -169,3 +169,11 @@ foreground-first claim.
 - Saved manifest of the six Tier 1 windows: `docs/experiments/w7-specs/windows.json` (sha256 `18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15`;
   conversion hashes computed on gpu1 from the archive clips). Checks: ruff and mypy clean; full pytest 1155 passed, 24 skipped, 1 failed
   (`test_agent_hooks::test_patches_into_models_or_datasets_are_blocked`, the macOS protected-path failure recorded since 2026-10-24, unrelated).
+
+### 2026-10-30 — W7 decisions (lead), before any W7 run: reference reading, budget
+- Reference. "Existing reference banks" is read as the same billed reference recipe per window: the crop at the window's frame 0 for each
+  player unit, coded and billed as before, the bank's per-window bytes recomputed for every new window; adapters stay the existing Al and Med ones.
+  Reason: the old 12-image bank is the pooled frame-0 crops of the old windows, and no player-identity mapping exists to reuse them for a new
+  window. Manifest field `reference: window_frame0`.
+- Budget. Tier 1's budget is being raised by the user; no stage is cut yet. The keypoint codes stay. The GPU source control (`k6b_rgb_diagnostic`) is dropped
+  for new windows only if nothing downstream reads it (to be stated when its consumers are checked below).
