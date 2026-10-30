@@ -293,8 +293,8 @@ foreground-first claim.
   full LPIPS [0.4502, 0.4375, 0.2937, 0.2845, 0.1460, 0.1415]; player-region LPIPS [0.8578, 0.3275, 0.7180, 0.3042, 0.4810, 0.2778];
   full DISTS [0.2971, 0.2656, 0.2002, 0.1750, 0.1202, 0.1040]; player-region DISTS [0.5924, 0.2505, 0.4961, 0.2420, 0.3624, 0.2329];
   hybrid total rate kbps at scales 8/4/2: 13.68 / 18.46 / 31.57 (paid base 9.34 / 14.12 / 27.23). The judge's own `comparisons` (scale 4 against the recovered SVT envelope) are in `window.json` of the archive.
-- GPU-seconds, first window (smoke + full from execution.json; failed smokes included): features 145 + 163 + 156 = 464; anchors 136 + 597 = 733 (cum. 1,197); generation 92 + 1,324 (cum. 2,613);
-  rgb diagnostic 24 + 46 + 26 + 18.5 + 107.5 (cum. 3,789 with the receiver's two attempts below); receiver 86 + 100 + 334 + 104 + 331; judge 3.3 + 34 + 283. **Total about 4,109 s = 1.14 GPU-h of 1.3 h (4,680 s); 571 s left.**
+- GPU-seconds, first window (smoke + full from execution.json; failed smokes and the crashed receiver full included): features 464 (145 + 163 + 156); anchors 733 (136 + 597); generation 1,416 (92 + 1,324);
+  rgb diagnostic 221 (four jobs: 24, 45, 26, 18.5 + 107.5); receiver 955 (86, 100 + 334, 104 + 331); judge 320 (3.3, 34 + 283). **Total about 4,109 s = 1.14 GPU-h of 1.3 h (4,680 s); 571 s left.**
   CPU jobs, no GPU: native base, build-inputs, prepare, rate transport, rates/window-state.
 - Where the chain stands: features, build-inputs, anchors, prepare, generation, rate transport, native base, rgb diagnostic, receiver, judge done and validated on their full output. Not run: the W1 stages
   (masks and encodes are CPU and free; scoring is estimated at 681 s GPU plus a smoke, which does not fit in the 571 s left) and DCVC (estimated 245 s plus smoke, fits alone, not yet generalised end to end).
