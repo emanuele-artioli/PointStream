@@ -32,6 +32,8 @@ def local_root(tmp_path, monkeypatch):
     root = tmp_path / "local" / "pointstream"
     root.parent.mkdir()
     monkeypatch.setenv(staging.LOCAL_ROOT_ENV, str(root))
+    # CI's temporary directory is on the runner's root disk, which real hosts refuse.
+    monkeypatch.setattr(staging, "system_disk", lambda path: False)
     return root
 
 
