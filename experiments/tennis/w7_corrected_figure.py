@@ -26,8 +26,8 @@ def main() -> None:
     out = parser.parse_args().out_dir
     out.mkdir(parents=True, exist_ok=True)
     data = []
-    for tier, expected in enumerate(HASHES, 1):
-        path = INPUTS / f'w7-tier{tier}-billing-corrected.json'
+    for tier_number, expected in enumerate(HASHES, 1):
+        path = INPUTS / f'w7-tier{tier_number}-billing-corrected.json'
         raw = path.read_bytes()
         if hashlib.sha256(raw).hexdigest() != expected:
             raise ValueError(f'input checksum mismatch: {path}')
@@ -44,8 +44,8 @@ def main() -> None:
         ax.axhline(4.25, color='0.82', linewidth=.7)
         for y, n in zip(y_positions, names):
             ax.plot(rows[n]['gap'][metric]['delta'], y, 'o', color='0.38', markersize=3.8, zorder=3)
-        for y, tier in ((5, data[0]), (.4, data[1])):
-            s = tier['group'][metric]
+        for y, tier_result in ((5, data[0]), (.4, data[1])):
+            s = tier_result['group'][metric]
             ax.plot([s['lo'], s['hi']], [y, y], color='black', linewidth=1.4, zorder=4)
             ax.plot([s['lo'], s['hi']], [y, y], '|', color='black', markersize=7, markeredgewidth=1)
             ax.plot(s['mean'], y, 'D', color='black', markersize=4.5, zorder=5)
