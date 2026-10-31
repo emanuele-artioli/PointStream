@@ -474,3 +474,5 @@ foreground-first claim.
   - med019 `20261031T084324Z-90b32e8a`: smoke 17.5 + full 111.6 = 129.1 GPU-s (estimate 153); published archive `e5fd7f6623e2bce761a460cf509e3f5738c4f6250bd1853462da39e56fbebc1b` (1493155840 bytes). The full stage's own validator (`--validate`) runs on the stage directory and cannot run from this Mac; the judge's in-job controls read this base.
 - al043+med000 rgb `20261031T084251Z-50f81640` still running on gpu2.
 - GPU ledger after these two: 6,909 + 370.7 = 7279.7 s of 30,600 s; remaining 23320.3 s.
+- rgb-diagnostic al043+med000 `20261031T084251Z-50f81640` **complete** on gpu2: smoke 32.3 + full 215.8 = 248.1 GPU-s (estimate 265; timing contaminated by the contention recorded above, so cost only); published archive `5176ee591512198b88b9567a74df015110121c02e05c26bdb1957a622667c4a2` (2986301440 bytes).
+- GPU ledger after all three rgb jobs: 7,279.7 + 248.1 = 7527.8 s of 30,600 s; anchors still running.
