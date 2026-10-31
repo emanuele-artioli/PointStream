@@ -1,0 +1,62 @@
+{
+ "schema": 1,
+ "base": {
+  "job": "20261023T194934Z-b0dcbb19",
+  "published_sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285",
+  "weights": "AnimateAnyone original, tennis-base@fit-100.pt"
+ },
+ "adapters": {
+  "alcaraz_hurkacz": {
+   "key": "al",
+   "job": "20261023T221650Z-3d7cbe2f",
+   "name": "ah-C",
+   "published_sha256": "f1a488f2a3ddecf57cff451801f64bc07ae652c2b8b998d4ac844ba8685f5fa2"
+  },
+  "medvedev_struff": {
+   "key": "med",
+   "job": "20261023T204452Z-d5c90446",
+   "name": "med-C",
+   "published_sha256": "5fc200fc50f5af68e561fa10baba54520043e5770555712caf6e89092b175427"
+  }
+ },
+ "selection_sha256": "6b06b0ad08250a37f65f57e5fe35ce44fdedbdc0bf05e41e2c9917eeed651d56",
+ "seed": 20261030,
+ "windows": [
+  {
+   "name": "nad100",
+   "match": "nadal_kyrgios",
+   "clip": "100",
+   "start": 0,
+   "frames": 240,
+   "fps": 50,
+   "source_sha256": "b28255b7fffb713a90f79bfdbac4e226cc6d4af1c07197a7b134ced5f2b70da4",
+   "source_yuv_sha256": "e83e5ca95838cf948740eadc70740f4e7047dcc02275a0e1f80dfea5f1910c53",
+   "reference": "window_frame0",
+   "tier": "w7-tier2"
+  },
+  {
+   "name": "nad101",
+   "match": "nadal_kyrgios",
+   "clip": "101",
+   "start": 0,
+   "frames": 240,
+   "fps": 50,
+   "source_sha256": "74df5c6035df32c3f39afb1c0ae45414ab5c4155ed146839da3120b402bdf0f3",
+   "source_yuv_sha256": "9cde36e9db6247232ccdaa0bd044e1143705e08c79bdb90509b670117defde2b",
+   "reference": "window_frame0",
+   "tier": "w7-tier2"
+  },
+  {
+   "name": "nad102",
+   "match": "nadal_kyrgios",
+   "clip": "102",
+   "start": 0,
+   "frames": 240,
+   "fps": 50,
+   "source_sha256": "89f9f82ddbade37910608f4859a40f75144bc5f3576a510c4df6c4822024f1cf",
+   "source_yuv_sha256": "839b98cf45c11bff596c6ed03621d83d265702f299c3b851a8ac54f9ed84ff7a",
+   "reference": "window_frame0",
+   "tier": "w7-tier2"
+  }
+ ]
+}
