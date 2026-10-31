@@ -203,7 +203,14 @@ def projection(summary: dict[str, Any], full_encodes: int, full_seconds: float) 
     return {'projected_full_seconds': projected, 'per_frame_seconds': per_frame, 'under_allowance': projected < full_seconds}
 
 
-def validate() -> None:
+def cpu_profile_valid(cpus: list[int], cpu_sets: list[list[int]], *, single_cpu: bool) -> bool:
+    """Single-CPU budget profile or the existing parallel execution profile."""
+    if single_cpu:
+        return len(cpus) == 1 and bool(cpu_sets) and all(c == cpus for c in cpu_sets)
+    return len(cpus) >= 6 and all(len(c) >= 2 for c in cpu_sets)
+
+
+def validate(*, single_cpu: bool = False) -> None:
     from src.codecs import svtav1
 
     stage = Path(os.environ['PS_STAGE_DIR'])
@@ -216,7 +223,7 @@ def validate() -> None:
     target = summary['target_kbps']
     checks: dict[str, bool] = {
         'frames': frames in (24, FRAMES) and spec['scale']['frames'] == {'smoke': 24, 'full': FRAMES},
-        'multi_cpu': len(summary['cpus']) >= 3 * 2 and all(len(c) >= 2 for c in summary['cpu_sets']),
+        'cpu_profile': cpu_profile_valid(summary['cpus'], summary['cpu_sets'], single_cpu=single_cpu),
         'tools_pinned': all(summary['tools'][n]['sha256'] == d for n, d in TOOLS.items()),
         'inputs': all(summary['inputs'][x['name']] == x['sha256'] for x in spec['staged_inputs'] if x['name'] in summary['inputs']),
         'offsets': [s['offset'] for s in summary['searches']] == summary['offsets'] and set(summary['offsets']) <= set(OFFSETS)}
