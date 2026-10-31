@@ -70,6 +70,6 @@ The Tier 1 card `docs/cards/w7-tier1-batch.md` shows the working style that succ
   - check the fleet and all hosts before submitting.
 
 ## Branch and finish
-Use a branch from `origin/main`. Edit `docs/experiments/w7-untouched.md` (append entries at its end), the Tier 2 specs and
+Branch `claude/w7-tier2` from `origin/main` (or the app-assigned name; record it). Edit `docs/experiments/w7-untouched.md` (append entries at its end), the Tier 2 specs and
 manifest, and the code you fix (with tests: `ruff check`, `mypy --config-file pyproject.toml`, `python -m pytest`). Open pull
 requests with auto-merge as you go. At a stop condition, send the report ([format](../sessions.md#the-report)) to the root session.
