@@ -476,3 +476,4 @@ foreground-first claim.
 - GPU ledger after these two: 6,909 + 370.7 = 7279.7 s of 30,600 s; remaining 23320.3 s.
 - rgb-diagnostic al043+med000 `20261031T084251Z-50f81640` **complete** on gpu2: smoke 32.3 + full 215.8 = 248.1 GPU-s (estimate 265; timing contaminated by the contention recorded above, so cost only); published archive `5176ee591512198b88b9567a74df015110121c02e05c26bdb1957a622667c4a2` (2986301440 bytes).
 - GPU ledger after all three rgb jobs: 7,279.7 + 248.1 = 7527.8 s of 30,600 s; anchors still running.
+- Anchors job 0 `20261031T084058Z-5369a7ac` (al034, med024) **complete** on gpu6: smoke 133.8 + full 1110.9 = 1244.6 GPU-s (estimate 136 + 1,343); published archive `cad726a8d4f91b3c6ef2ff42c6d437d754f2db2195c4d2e747397549e9614644` (3727360 bytes). The fleet validator covers only its smoke; the full archive is read by `prepare`.
