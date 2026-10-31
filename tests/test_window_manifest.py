@@ -136,3 +136,35 @@ def test_new_match_can_be_prepared_before_its_adapter_is_fitted(tmp_path):
     assert wm.load(path) == [w]
     with pytest.raises(KeyError):
         _ = w.adapter
+
+
+def test_new_match_rates_bill_explicit_adapter_bytes():
+    from experiments.tennis import w7_rates as r
+
+    row = {'window': 'nadal_kyrgios/000@120', 'match': 'nadal_kyrgios', 'reference_files': ['a', 'b'],
+           'references': {'png_bytes': 1000}, 'keypoints': {'bytes': 100, 'contract': {'fps': [50, 1]}}}
+    with pytest.raises(KeyError):
+        r.rates({'rows': [row]})
+    rate = r.rates({'rows': [row]}, {'nadal_kyrgios': 1234567})[row['window']]
+    assert rate['adapter_guider_kbps_7200'] == pytest.approx(1234567 * 8 / 7200 / 1000)
+    with pytest.raises(ValueError, match='positive integer'):
+        r.rates({'rows': [row]}, {'nadal_kyrgios': 0})
+
+
+def test_rate_computation_rejects_charge_without_fitted_adapter_identity(tmp_path, monkeypatch):
+    from experiments.tennis import w7_rates as r
+
+    window = wm.WindowSpec('nad000', 'nadal_kyrgios', '000', 0, 240, 50, 'a' * 64, 'b' * 64)
+    path = tmp_path / 'windows.json'
+    wm.dump([window], path, adapter_bytes={'nadal_kyrgios': 1234567})
+    transport = tmp_path / 'transport.json'
+    row = {'window': window.id, 'match': window.match, 'reference_files': ['a', 'b'], 'references': {'png_bytes': 1000},
+           'keypoints': {'bytes': 100, 'kps1_bytes': 200, 'contract': {'fps': [50, 1]}}}
+    transport.write_text(json.dumps({'rows': [row]}))
+    monkeypatch.setattr(r, 'base_rows', lambda _: [{'window': window.name, 'scale': s, 'ivf': {'bytes': 10}} for s in (2, 4, 8)])
+    with pytest.raises(ValueError, match='no matching fitted adapter identity'):
+        r.compute(transport, 'base.tar', path, [window.name])
+    monkeypatch.setitem(wm.ADAPTERS, 'nadal_kyrgios', {'key': 'nad', 'job': 'fit', 'name': 'nk-C', 'published_sha256': 'c' * 64})
+    wm.dump([window], path, adapter_bytes={'nadal_kyrgios': 1234567})
+    result = r.compute(transport, 'base.tar', path, [window.name])
+    assert result['rates'][window.id]['adapter_guider_kbps_7200'] == pytest.approx(1234567 * 8 / 7200 / 1000)

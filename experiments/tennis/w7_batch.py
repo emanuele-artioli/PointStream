@@ -376,7 +376,7 @@ def batch(argv: list[str]) -> Path:
     if not set(chosen_names) <= {w.name for w in campaign}:
         raise SystemExit('--windows must belong to the campaign')
     check_group(a.stage, ws)
-    windows_ref = (sp.W7_DIR + '/windows.json', wm.file_sha256(a.windows_json))
+    windows_ref = (sp.W7_DIR + '/' + a.windows_json.name, wm.file_sha256(a.windows_json))
     spec = finish(a.stage, build_spec(a.stage, ws, campaign, windows_ref, Upstream(parse_ups(a.upstream), a.pending), a), ws)
     a.out_dir.mkdir(parents=True, exist_ok=True)
     target = a.out_dir / f"{a.stage}-{'+'.join(chosen_names)}.json"
