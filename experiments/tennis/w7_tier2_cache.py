@@ -25,6 +25,8 @@ def chunks_for(scene: str, count: int) -> list[int]:
 
 
 def ranges(starts: list[int]) -> list[tuple[int, int]]:
+    if starts != sorted(set(starts)) or any(s < 0 or s >= w7_tier2_select.FRAMES or s % k8b.CHUNK for s in starts):
+        raise ValueError('chunks must be unique, ordered native 200-frame starts')
     out: list[tuple[int, int]] = []
     for start in starts:
         end = min(start + k8b.CHUNK, w7_tier2_select.FRAMES)
