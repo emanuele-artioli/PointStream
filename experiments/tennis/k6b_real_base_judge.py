@@ -56,6 +56,12 @@ def identity_controls(images: list[np.ndarray], base: np.ndarray, composed: np.n
             'plain_base_scored_twice_identical': bool(np.array_equal(scores[0], scores[1])) and bool(np.array_equal(images[0], again))}
 
 
+def prediction_ticks(row: dict[str, Any], manifest: bool) -> list[int]:
+    """Frames a saved receiver prediction must cover. The frozen pair predicts every third frame of the 240-frame window; a manifest
+    window's unit has no pose at some of those frames, so its receiver predicted only the recorded ticks (job 20261031T102650Z-8d510571)."""
+    return list(row["ticks"]) if manifest else list(range(0, 240, 3))
+
+
 def run(a: argparse.Namespace) -> None:
     P = plan(a)
     import cv2
@@ -127,7 +133,7 @@ def run(a: argparse.Namespace) -> None:
             file = scratch / 'masks' / 'publish' / (unit['name'] + '-masks.npz')
             with np.load(file) as z:
                 original_prediction = next(q for q in previous['prediction']['runs'][0]['rows'] if q['name'] == unit['name'])
-                if z['t'].tolist() != list(range(0, 240, 3)) or array_sha(z['masks']) != original_prediction['output_sha256']:
+                if z['t'].tolist() != prediction_ticks(original_prediction, P['manifest']) or array_sha(z['masks']) != original_prediction['output_sha256']:
                     raise ValueError('saved SAM ticks or receiver prediction hash changed')
                 masks[i] = {int(t): project(m, box[int(t)]) for t, m in zip(z['t'], z['masks'])}
         if P['manifest']:  # no prior run to reproduce: the in-job controls below replace the gate
