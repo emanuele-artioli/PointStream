@@ -163,3 +163,21 @@ def test_checkpoint_unit_scope_defaults_to_full_and_rejects_substitution():
     for bad in ([], ['outside'], ['near', 'near']):
         with pytest.raises(ValueError):
             unit_scope(allowed, bad)
+
+
+def test_generated_nadal_adapter_identity_is_strict():
+    from experiments.tennis.k6b_confirm_validate import ADAPTER_SHA, BASE_SHA, check_generated
+
+    prepared = {'windows': [{'units': [{'unit': 'u', 'window': 'nadal_kyrgios/000@120'}]}]}
+    result = {'profiles': ['match5'], 'steps': 30, 'from_t': 0,
+              'settings': {'size': [512, 784], 'cfg': {'match5': 2.0}, 'context': [24, 4]},
+              'units': ['u'], 'max_frames': 0,
+              'fits': {'match5': {'sha256': ADAPTER_SHA['nadal_kyrgios'], 'bits': 4}},
+              'models': {'match5': {'fit': {'base': {'sha256': BASE_SHA},
+                         'billing': {'pose_guider_billed': True, 'pose_guider_bytes': 4, 'bytes': 8}}}}}
+    a = {'t': np.array([0, 1, 2, 3]), 'run': np.zeros(4), 'judged': np.array([True, False, False, True])}
+    g = {'t': np.array([0, 3]), 'crops': np.zeros((2, 784, 512, 3), dtype=np.uint8)}
+    check_generated(result, prepared, {'u': (a, g)})
+    result['fits']['match5']['sha256'] = '0' * 64
+    with pytest.raises(ValueError, match='Wrong match adapter'):
+        check_generated(result, prepared, {'u': (a, g)})

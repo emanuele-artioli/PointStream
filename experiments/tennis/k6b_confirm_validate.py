@@ -15,7 +15,8 @@ from experiments.tennis.k6b_confirm import PROVENANCE, check_manifest, cohort_of
 
 BASE_SHA = '85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4'
 ADAPTER_SHA = {'alcaraz_hurkacz': '5c6caf090f90a66eac5808abdaadfa50a74114331e610da4ea9a7f61db282d7a',
-               'medvedev_struff': 'aa7bb8391f0e644c92df447a10d8ff3f76837ec58ad98311db3ecb454a5b98b4'}
+               'medvedev_struff': 'aa7bb8391f0e644c92df447a10d8ff3f76837ec58ad98311db3ecb454a5b98b4',
+               'nadal_kyrgios': '525830aa39c14f3549084a422cda6cfc61cf1ad76b07b531dd899034e6f57570'}
 
 
 def read(path: Path) -> Any:
