@@ -91,6 +91,8 @@ def run(args: argparse.Namespace) -> None:
         raise ValueError('changed old input inventory')
     old = sorted({v['clip'] for v in json.loads(scope.read_text())['inventory'].values()})
     manifest = w7_select.confirm_manifest(windows, inventories, all_rows, old, str(dest), str(work / 'sources'))
+    manifest['broadcast_sha256'] = SOURCE_SHA256
+    manifest['selection_sha256'] = w7_select.file_sha256(selection_path)
     manifest['broadcast_lineage'] = lineage
     k6b_confirm.check_manifest(manifest)
     dest.mkdir(parents=True, exist_ok=False)
