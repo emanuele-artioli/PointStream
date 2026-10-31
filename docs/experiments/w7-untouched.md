@@ -562,3 +562,15 @@ foreground-first claim.
 - GPU ledger: ~20,357 s realized of 30,600 s (the W1 score for med019 `014c1510`, estimate 756, and the two judges, estimate 1,274, are not yet counted).
 - W1 score med019 `20261031T105818Z-014c1510` **complete** on gpu3 (A6000, shared): smoke 42.9 + full 321.0 = **363.9 GPU-s** (estimate 106 + 650; contention, cost only); published archive `65aec2bca1f0238bfdcc5f42cc9c03d032dcafbaaf1923e4139fb69ec8922a17` (92160 bytes).
 - GPU ledger: 20,357.3 + 363.9 = **~20,721 s of 30,600 s**; remaining ~9,879 s. Still to run at estimate: judges al034+med024 and al043+med000 (1,358), W1 score for al034, al043, med000 and med024 (2,764), DCVC for the five windows (1,899): about 6,021 s, margin about 3,860 s. DCVC's bracket (KPS1 total) is still open.
+- Judges and W1 masks (2026-10-31, after the receiver.json identities above).
+- Judge al034+med024 `20261031T110824Z-9d59bd9b` (gpu3, RTX A6000, shared): running in its smoke. One contention event (foreign GPU pid 2655895; policy `continue`; timing contaminated, cost only), acknowledged as `5d281b84…`. The tracked wait on both judges (`bj91fjk6b`) exited with code 10, which the wait reports when an event needs attention; this contention event was the only event.
+- Judge al043+med000 `20261031T110838Z-ff9d8b4f` (gpu6, RTX 6000 Ada, shared): gate passed (spec sha256 `9c503180…`; validator checks all true; projected full 430.6 s, 471.1 s with publication). Smoke 138.6 s; now in its full stage (reservation 2,600 s; 3,261 s remaining at the last status). No events.
+- Tracked wait re-armed on both judges (`bwip4fgmi`, at most 2,700 s).
+- W1 masks (CPU; no judge input: the masks spec reads the anchor, transport and window state only). Built with `w7_specs batch w1-masks` from anchor0 `5369a7ac` (al034+med024), anchor1 `d0f4e6f0` (al043+med000), state0 `1a1f3d4e`, state1 `deb5d1ea`, transport `7d2f62ea`:
+  - al034 `20261031T111515Z-d91a68a5` (spec sha256 `aec9b785…`)
+  - med024 `20261031T111535Z-398b3fe3` (spec `85a1abce…`)
+  - al043 `20261031T111553Z-3d69fe4d` (spec `60ddff42…`)
+  - med000 `20261031T111609Z-f9aba36a` (spec `9196067e…`)
+  All pending. CPU jobs add no GPU seconds.
+- W1 encodes wait for the judges' scale-4 KPS2 totals (judges `9d59bd9b` and `ff9d8b4f`), so they are not submitted yet.
+- GPU ledger: still ~20,721 s of 30,600 s. Remaining at estimate: judges 1,358 (running), W1 scores 2,764, DCVC 1,899 = 6,021 s; margin about 3,860 s.
