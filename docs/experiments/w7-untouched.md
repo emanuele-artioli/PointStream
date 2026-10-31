@@ -501,3 +501,5 @@ foreground-first claim.
 - Generation med000 `20261031T092144Z-0a920df0` **complete** on gpu5 (Ada): smoke 74.0 + full 1281.6 = **1355.5 GPU-s** (estimate 92 + 1,655); published archive `f018b9b1cb0aafcdb021836290d8e153c3e1d1bb3d31b4e933d1f242a53d3611` (84910080 bytes); contention 0, contaminated False.
   - ledger after it: 14,414.9 + 1355.5 = 15770.4 s of 30,600 s (med019 still running).
 - GPU ledger: **15,770.4 s of 30,600 s** after med000; remaining 14,829.6 s. Still running: med019 `096edaef` (full, gpu6); its estimate is 1,747 GPU-s.
+- Generation med019 `20261031T092222Z-096edaef` **complete** on gpu6 (Ada): smoke 66.3 + full 1297.9 = **1364.2 GPU-s** (estimate 92 + 1,655); published archive `cde43aa31bb1802853ce9db47ada53ecf4d4e4c9bdf38be48cd4869c8627cdbb` (80220160 bytes); contention 0, contaminated False.
+- All five generation jobs complete. GPU ledger: **17134.6 s of 30,600 s**; remaining 13465.4 s.
