@@ -280,7 +280,7 @@ The detailed historical findings follow; they do not supersede this resume state
   windows from the familiar Alcaraz and Medvedev broadcasts reaches
   **23/24 billed window–metric wins** (LPIPS 11/12, DISTS 12/12;
   descriptive bar 18/24), and 24/24 unbilled. Billing here covers the
-  match adapter/guider and keypoints, with a common shipped tennis base;
+  match adapter/guider and a pooled keypoint entropy bound, with a common shipped tennis base;
   references and exact target matte remain granted and unbilled.
   Charging the 48,878,567-byte base over 2 h adds 54.309519 kbps:
   0/12 bracketed cells win, and the other 12 are unbracketed, unresolved.
@@ -292,6 +292,14 @@ The detailed historical findings follow; they do not supersede this resume state
   validated; 24 terminal GPU jobs used **6.995428306 of 8 GPU-hours**.
   Report commit `72228816`, [PR #236](https://github.com/emanuele-artioli/PointStream/pull/236)
   (merged in `da6a42b1`); no jobs remain active.
+  **CPU transport audit (2026-10-25, job `20261025T082944Z-29f021a5`,
+  0 GPU-hours):** actual decodable keypoints cost 3.284–6.432 kbps; with
+  lossless PNG reference banks amortized over 2 h, even free mattes keep
+  only **17/24 wins**, below 18/24. Exact mattes alone cost 40.648–110.142
+  kbps against 0.739–9.834 kbps of headroom, so the exact route fails
+  (22 bracketed losses, 2 unresolved equal-rate cells). Lossy references
+  and mattes have rate-only measurements, no quality results
+  ([audit](docs/experiments/k6b-players.md#completed-cpu-rate-budget-audit--2026-10-25)).
   The 2026-10-26 two-window compression pilot preserves actual quality with
   unmasked video-coded reference banks: 4/4 strict metric cells, robust to
   ±0.001 renderer sensitivity. Segmented alpha and black-key references each
