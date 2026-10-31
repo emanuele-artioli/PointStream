@@ -888,3 +888,22 @@ wrote docs/experiments/w7-specs/w7-tier1-result.json
 - Ada-enabled nad002 scoring replacement **`20261031T192632Z-002fd19f`** submitted pending; spec `97045c90c0525f317b50f4cb4362c1e5b1929ef6d7c0dc37bad9f22cc9f24d36`, git `520015d59a880350cbffad65246525ba01276397`, empty patch, snapshot `d2512fbcf1762080cdf55562b3fbcceab96852049bf917cd6483bc3b8a882c67`, source `1c907dce4364aa5da16430d21306b4904a113df293dac1bbab89975ea50d9e43`; estimate 756 planned GPU-s; no replay.
 - nad001 W1 score `20261031T182114Z-3bfa1a68` **complete** on gpu2 RTX A6000, smoke 76.75 + full 455.19 = **531.94 GPU-s**, shared timing contaminated; smoke gate 10/10, full maximum control error 0.00012455 < 0.001. Published archive `b7f4c4a8ca83fa48bcf5fba69c9401615dfeb6327a8b252899e454767b3c72d5`, summary `6f760f1786b9c4f7db52ae80ade8048ef14825101a5bb9d9de538aca96e26d00`. Planned ledger **11,154.23/18,000 GPU-s**, reserve **509.78/2,000**; two Ada-enabled scoring jobs in flight. Completion event `544fc8385dd6589a89853892561eefeb` observed.
 - nad000 W1 score `20261031T192320Z-47fdb78c` **complete** on gpu6 RTX 6000 Ada: smoke 32.86 + full 208.96 = **241.82 GPU-s**, shared timing marked contaminated; smoke 10/10 and full maximum control error 0.00005228 < 0.001. Archive `763d366d2b534dd7c90fd23d6eda435f7653ddccd88da22d4153e15b0e658706`, summary `8b604bab7cc7ee07729c07c431c0641cb74ae56fbdbc0c1f57692ebec3106c40`. Planned ledger **11,396.05/18,000 GPU-s**, reserve **509.78/2,000**; nad002 scoring remains running. Event `64d0a65cf0b554048aad42e7407ee72b` observed.
+- nad002 W1 score `20261031T192632Z-002fd19f` **complete** on gpu5 RTX 6000 Ada: smoke 31.66 + full 233.54 = **265.20 GPU-s**, shared timing marked contaminated; smoke gate passed and full maximum control error 0.00002921 < 0.001. Archive `c6f14fe6e360df9e7e6e09c64b96069a1ee9c55dca585ea3f5a6b463e5f075f4`, summary `d76ac47fbb3de8584ead061ee34763927cc8df1d18c8183768139c9529994b00`. Event `981ec7900a7658c2a30dcbf44c074460` observed. Final planned GPU ledger **11,661.25/18,000 GPU-s**, reserve **509.78/2,000**; no queued scoring jobs remain. Scoring classes: nad000 Ada, nad001 A6000, nad002 Ada; all three control checks passed.
+
+### 2026-10-31 — Tier 2 analysis
+
+Ran `python -m experiments.tennis.w7_analysis` on the three windows' SHA256-verified judge, W1 score and accepted DCVC archives recorded above, with each full digest passed to `sha256=`. The result `docs/experiments/w7-specs/w7-tier2-result.json` has SHA256 `05ad3dc62f163609b664632943b0e6dd922c4b8478f40eec81c5b3726bb08f3a`; `complete: true`, no missing windows. The printed summary was:
+
+```text
+W7 Tier 2 player gap (best anchor - hybrid, player region; > 0 favours the hybrid), rate = hybrid KPS2 total
+  nad000   42.787 kbps  lpips +0.0587 (dcvc)  dists +0.0665 (dcvc)  whole -0.1151/-0.0432  W1 A
+  nad001   43.257 kbps  lpips +0.1035 (dcvc)  dists +0.0796 (dcvc)  whole -0.1167/-0.0410  W1 A
+  nad002   49.617 kbps  lpips +0.0543 (dcvc)  dists +0.0631 (dcvc)  whole -0.1281/-0.0440  W1 A
+pooled                   n=3  lpips +0.0722 [+0.0046, +0.1397]  dists +0.0697 [+0.0481, +0.0913]  holds=True
+cluster nad              n=3  lpips +0.0722 [+0.0046, +0.1397]  dists +0.0697 [+0.0481, +0.0913]  holds=True
+sensitivity (none)       n=3  lpips +0.0722 [+0.0046, +0.1397]  dists +0.0697 [+0.0481, +0.0913]  holds=True
+Tier 2 player win HOLDS
+wrote docs/experiments/w7-specs/w7-tier2-result.json
+```
+
+Exposure: K8 and K8b used Nadal court marks for registration design; no generator input contains Nadal evaluation frames. The adapter was fitted on three disjoint first-half clips of the same match as recorded above. The Ada scoring deviation and the pre-score lead decision are recorded above; the 1e-3 control gate passed on each window.
