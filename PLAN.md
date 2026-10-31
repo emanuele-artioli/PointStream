@@ -1422,7 +1422,8 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   Full-rate Al hybrid, all 240 frames. Pose passes: YOLO11x-pose error 0.063
   of the box vs SVT 0.90, whose players the detector mostly misses. Time
   fails: flicker 28.6 vs SVT 18.6, residual energy 23.1 vs a limit of 16.6.
-  The racket is essentially absent (3% coverage). Narrowed claim: sharp,
+  The racket appears largely absent (3% coverage of a body-hull proxy, not
+  independently labelled racket recall). Narrowed claim: sharp,
   correctly posed players that flicker more than SVT's. Next test: split the
   flicker between the per-frame receiver masks and the generated pixels, on
   saved outputs. W7 keeps the every-third-frame recipe.
@@ -1456,7 +1457,10 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   180 times slower than 50 fps. Live use also needs a few-step or distilled
   generator (W10).
 - **W11. Racket (user, 2026-10-30).** The generator does not draw the racket.
-  W6 found it covers 3% of the source racket region, so the racket gets its
+  W6 found 3% coverage of a source-mask/body-hull proxy, not independent racket
+  recall. The W11 annotation audit found no eligible pixel mask linked to those
+  frames ([audit](docs/experiments/w11-racket.md)); a proxy paste cannot gate
+  a true racket path. The racket gets its
   own object path like the ball (K5/K5b) instead of being left to the player
   generator. Steps, oracle first:
   1. An oracle on W6's saved outputs: paste the source racket pixels into the
