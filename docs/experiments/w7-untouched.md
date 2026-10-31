@@ -907,3 +907,21 @@ wrote docs/experiments/w7-specs/w7-tier2-result.json
 ```
 
 Exposure: K8 and K8b used Nadal court marks for registration design; no generator input contains Nadal evaluation frames. The adapter was fitted on three disjoint first-half clips of the same match as recorded above. The Ada scoring deviation and the pre-score lead decision are recorded above; the 1e-3 control gate passed on each window.
+
+### 2026-10-31 — W7 Tier 2 outcome and W7 conclusion (lead reading of PR #313)
+- **By the rule: Tier 2 holds.** On three second-half windows of nadal_kyrgios, a match the tennis base never trained on, with an
+  adapter fitted on three disjoint first-half clips (billed): player gap LPIPS +0.072 [95% CI +0.005, +0.140], DISTS +0.070
+  [+0.048, +0.091], n = 3. Every window positive on both metrics; DCVC-UF is the best anchor in all three; W1 outcome A in all three;
+  the whole frame is worse than the best anchor in every window (LPIPS −0.115 to −0.128, DISTS −0.041 to −0.044).
+- Reading. The LPIPS interval clears zero by 0.005 with n = 3, so it is the fragile half of the result; DISTS is clear. The gap is
+  smaller than on Tier 1 (LPIPS +0.072 vs +0.103 pooled, +0.080 without med000), as the hypothesis predicted for an unseen match; the
+  competing explanation (the win was an artefact of development windows) is not supported on either tier.
+- **W7 conclusion.** The foreground-first claim holds on footage no experiment had used, both on familiar matches (Tier 1, six windows)
+  and on an unseen match with its own billed adapter (Tier 2, three windows): at equal total rate the hybrid's players are better
+  than the best of SVT-AV1 (three ROI policies) and DCVC-UF, and the whole frame is worse. Scope: 240-frame broadcast windows, players
+  generated on every third frame (W6 flicker applies), Tier 1 at about 18 kbps (25 fps) and 41 kbps (50 fps), Tier 2 at 43–50 kbps
+  (50 fps); adapters billed over 2 h (W9 replaces that with the break-even length); judges LPIPS/DISTS (ImageNet networks).
+- Deviations recorded in the Codex entries: two Tier 2 W1 scores ran on RTX 6000 Ada instead of A6000 (lead decision before any
+  Tier 2 score was read; the 1e-3 control gate passed in each window); the 50 fps registration-decoder fix (PR #307).
+- Budget: Tier 2 used 11,661 of 18,000 planned GPU-s plus 510 of the 2,000 s reserve. W7 total: Tier 1 about 25,718 s, Tier 2 about
+  12,171 s, about 10.5 GPU-h.

@@ -111,6 +111,10 @@ sessions update their own items and their files in `docs/experiments/`
 
 ### Resume here after the root chat is archived
 
+**Latest (2026-10-31): read [the 2026-10-31 continuation](docs/continuation-2026-10-31.md) first.** W7 is closed
+(the foreground-first claim holds on untouched footage, Tiers 1 and 2), work continues in Codex sessions, and the
+next items are listed there in order. The 2026-10-27 text below is historical.
+
 Read [the 2026-10-27 continuation](docs/continuation-2026-10-27.md) first. It
 contains the current scientific stop, exact job/artifact identities, remaining
 budget, storage state and the next decision. The existing study chat is
@@ -369,7 +373,7 @@ marked `card ready` is waiting for the user to start it.
 | Player joint side-rate feasibility | CPU saved-score inversion and three lossless packet wrappers | `codex/player-rate-feasibility` | Codex | COMPLETE2026-10-28; zero GPU; robust actual/ideal_R side ceilings0.668734/1.230365kbps; all three packet wrappers grow; follow-up paid clean-background test now complete |
 | Paid clean-background oracle | [new finite background proposal](docs/cards/k6b-paid-clean-background.md) | `codex/paid-clean-background` | Codex | COMPLETE2026-10-28; CPUbf9f97d2 and sameGPU27f39d64 audited; all80ticks; formal MIXED, two-metric gate FAILED;250s charge,2980/3600total,620unused; stopped |
 | W7 Tier 1 batch (five remaining windows) | [card](docs/cards/w7-tier1-batch.md) | `claude/w7-tier1-batch` | Sonnet (local, Mac) | reported 2026-10-31: Tier 1 HOLDS (pooled n=6: player LPIPS gap +0.103 [+0.041, +0.165], DISTS +0.085 [+0.057, +0.112]; Med cluster alone does not); whole frame worse in every window; ~7.1 of 8.5 GPU-h; PRs #303, #305 |
-| W7 Tier 2 (nadal_kyrgios, unseen match) | [card](docs/cards/w7-tier2.md) | `claude/w7-tier2` | Sonnet (local, Mac) | card ready 2026-10-31; budget 5 GPU-h (user); report to root `session_01MbpYHe92aChsjy7MqXQ6jZ` |
+| W7 Tier 2 (nadal_kyrgios, unseen match) | [card](docs/cards/w7-tier2.md) | `claude/w7-tier2` | Sonnet (local, Mac) | reported 2026-10-31 (Codex, PRs #307, #309, #312, #313): Tier 2 HOLDS (n=3: player LPIPS gap +0.072 [+0.005, +0.140], DISTS +0.070 [+0.048, +0.091]); whole frame worse; 12,171 of 20,000 GPU-s |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
@@ -1391,7 +1395,13 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   Al/Med windows: player gap LPIPS +0.103 [+0.041, +0.165], DISTS +0.085
   [+0.057, +0.112]; DCVC-UF is the strongest anchor; the whole frame is worse
   in every window; the Medvedev cluster alone does not pass (n = 3)
-  ([outcome](docs/experiments/w7-untouched.md)). Tier 2 is next.
+  ([outcome](docs/experiments/w7-untouched.md)).
+  **W7 Tier 2 (2026-10-31):** holds on three windows of nadal_kyrgios, a
+  match the base never trained on (adapter fitted on its first half,
+  billed): player gap LPIPS +0.072 [+0.005, +0.140], DISTS +0.070
+  [+0.048, +0.091]; DCVC-UF strongest anchor; whole frame worse. The LPIPS
+  interval barely clears zero (n = 3). W7 is closed: the foreground-first
+  claim holds on untouched footage, familiar and unseen matches.
 - **W6 outcome (2026-10-30, [entry](docs/experiments/w6-motion-pose.md)).**
   Full-rate Al hybrid, all 240 frames. Pose passes: YOLO11x-pose error 0.063
   of the box vs SVT 0.90, whose players the detector mostly misses. Time
