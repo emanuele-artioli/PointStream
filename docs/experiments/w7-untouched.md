@@ -490,3 +490,4 @@ foreground-first claim.
   - med024 `20261031T092202Z-22cfb8a8` (spec `da1c6b4e…`; estimate 92 + 1,655)
   - med019 `20261031T092222Z-096edaef` (spec `29ba7418…`; estimate 92 + 1,655)
 - Projected GPU ledger after these five at estimate: 10,328.5 + 8,073 = 18,401.5 s of 30,600 s. Remaining after them (estimate): 12,198.5 s; the rest of the plan (W1 scoring, receiver, judge, DCVC) is about 9,433 s at estimate.
+- Generation status at 10:40 (local): al034 `27e4a54a` and al043 `e6a8696a` running their full stages; med024 `22cfb8a8` running its full stage; med000 `0a920df0` and med019 `096edaef` pending for a GPU.
