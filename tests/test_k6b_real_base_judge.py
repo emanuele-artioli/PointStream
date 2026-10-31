@@ -1,7 +1,19 @@
 import numpy as np
 import pytest
 
-from experiments.tennis.k6b_real_base_judge import prediction_ticks, unit_mask
+from experiments.tennis.k6b_real_base_judge import check_diagnostic_coverage, prediction_ticks, unit_mask
+
+
+def test_diagnostic_accepts_a_superset_but_requires_each_selected_window():
+    diag = {'source': [{'window': w, 'source_matches': True, 'ticks': list(range(80))} for w in ('match/0', 'match/1')],
+            'base': [{'window': w, 'scale': s} for w in ('w0', 'w1') for s in (8, 4, 2)]}
+    check_diagnostic_coverage(diag, ['match/0'], ['w0'])
+    check_diagnostic_coverage(diag, ['match/1'], ['w1'])
+    with pytest.raises(ValueError):
+        check_diagnostic_coverage(diag, ['match/2'], ['w1'])
+    diag['base'].append({'window': 'w0', 'scale': 2})
+    with pytest.raises(ValueError):
+        check_diagnostic_coverage(diag, ['match/0'], ['w0'])
 
 
 def test_frozen_pair_expects_the_full_grid_and_a_manifest_window_its_recorded_ticks():
