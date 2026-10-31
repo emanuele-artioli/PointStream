@@ -1,0 +1,158 @@
+{
+  "windows": [
+    {
+      "window": "nad000",
+      "rate_kbps": 56.907631111111115,
+      "unresolved": "nad000: no anchor family resolved at 56.9076 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 366161,
+        "intended_bank_bytes": 2196966.0,
+        "old_bank_bytes": 549241.5,
+        "adapter_bytes": 1489876,
+        "length_seconds": 1800.0,
+        "old_rate_kbps": 42.78735277777778,
+        "added_rate_kbps": 14.120278333333335
+      }
+    },
+    {
+      "window": "nad001",
+      "judge_row": "nadal_kyrgios/001@120",
+      "rate_kbps": 54.77827111111111,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.46797966888804493,
+          "foreground": 0.3601001420760501
+        },
+        "dists": {
+          "whole": 0.21462907865643502,
+          "foreground": 0.25445307418704033
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.06617586804239683,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.42627601011844696,
+          "hybrid_score": 0.3601001420760501,
+          "per_anchor": {
+            "dcvc": 0.06617586804239683
+          }
+        },
+        "dists": {
+          "delta": 0.06038411355093487,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.3148371877379752,
+          "hybrid_score": 0.25445307418704033,
+          "per_anchor": {
+            "dcvc": 0.06038411355093487
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.12794676798398363,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.46797966888804493,
+          "per_anchor": {
+            "dcvc": -0.12794676798398363
+          }
+        },
+        "dists": {
+          "difference": -0.052791980578749426,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.21462907865643502,
+          "per_anchor": {
+            "dcvc": -0.052791980578749426
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc"
+      ],
+      "anchors_excluded": {
+        "s2_o0": "unresolved",
+        "s4_o0": "unresolved",
+        "s2_o20": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          18.0,
+          41.18666666666667,
+          0.35359373191550925,
+          0.1761175774037838,
+          0.47133426076946305,
+          0.3379985086619854
+        ],
+        [
+          24.0,
+          56.74166666666667,
+          0.33835834795163,
+          0.16007367968559266,
+          0.42071201285343046,
+          0.31197712272405625
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        41.18666666666667,
+        56.74166666666667
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.3400329009040613,
+          "foreground_lpips": 0.42627601011844696,
+          "whole_dists": 0.1618370980776856,
+          "foreground_dists": 0.3148371877379752
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 1.15e+01 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 262185,
+        "intended_bank_bytes": 1573110.0,
+        "old_bank_bytes": 393277.5,
+        "adapter_bytes": 1489876,
+        "length_seconds": 1800.0,
+        "old_rate_kbps": 43.25739277777778,
+        "added_rate_kbps": 11.520878333333332
+      }
+    },
+    {
+      "window": "nad002",
+      "rate_kbps": 62.563857777777784,
+      "unresolved": "nad002: no anchor family resolved at 62.5639 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 319207,
+        "intended_bank_bytes": 1915242.0,
+        "old_bank_bytes": 478810.5,
+        "adapter_bytes": 1489876,
+        "length_seconds": 1800.0,
+        "old_rate_kbps": 49.61742944444445,
+        "added_rate_kbps": 12.946428333333333
+      }
+    }
+  ],
+  "group": null,
+  "unresolved_windows": [
+    "nad000",
+    "nad002"
+  ]
+}

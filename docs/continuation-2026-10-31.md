@@ -1,5 +1,16 @@
 # Continuation, 2026-10-31: W7 closed; work moves to Codex
 
+**Later same-day audit:** W7's historical closure below is superseded. The
+reference-bank billing code counted encoding variants as independent crops,
+undercharging the modeled bank by four. The corrected saved-evidence Tier 1
+LPIPS gap is +0.0965 [0.0349, 0.1581], DISTS +0.0810 [0.0529, 0.1091],
+conditional on resolved anchors. Tier 2 LPIPS is +0.0671 [−0.0011, 0.1354]
+and DISTS +0.0667 [0.0440, 0.0894]: the original two-metric rule does not pass.
+Several SVT curves need higher-rate points; these conditional comparisons are
+optimistic while families are unresolved. The unseen-match result is
+inconclusive. See [W9](experiments/w9-adapter-break-even.md) and the current
+PLAN ledger. Original results are preserved. No new GPU job was submitted.
+
 From here on the work runs in Codex sessions on the Mac (user, 2026-10-31). The cloud root
 session is wrapped up: no job, timer or process of it remains. There is no root session now, so
 each Codex session owns its own dispatch-ledger row in PLAN.md

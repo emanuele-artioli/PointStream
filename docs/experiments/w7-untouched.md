@@ -925,3 +925,13 @@ Exposure: K8 and K8b used Nadal court marks for registration design; no generato
   Tier 2 score was read; the 1e-3 control gate passed in each window); the 50 fps registration-decoder fix (PR #307).
 - Budget: Tier 2 used 11,661 of 18,000 planned GPU-s plus 510 of the 2,000 s reserve. W7 total: Tier 1 about 25,718 s, Tier 2 about
   12,171 s, about 10.5 GPU-h.
+
+### 2026-10-31 — Reference-bank billing correction (supersedes the historical closure)
+
+The subsequent W9 audit found that `w7_rates.rates` counted PNG and three JPEG alternatives of each crop as four crops. The intended twelve-crop reference-bank model was undercharged fourfold. Fix `002c89cc` counts the two PNG crops and verifies their byte total. Original job outputs, metrics and historical result JSON files remain immutable.
+
+Recomputing comparisons at corrected two-hour rates from SHA256-verified saved archives gives Tier 1 LPIPS gap +0.0965 [0.0349, 0.1581] and DISTS +0.0810 [0.0529, 0.1091], conditional on resolved anchor families. Tier 2 LPIPS is +0.0671 [-0.0011, 0.1354], DISTS +0.0667 [0.0440, 0.0894]; the original two-metric rule **does not pass**. The unseen-match result is inconclusive, not a rejection of the semantic approach. The familiar-match pooled intervals treat windows within a match as independent; the Medvedev subgroup still does not pass. Every Tier 2 window now has at least one unresolved anchor family; omitted families make these gaps optimistic. A minimum of nine extra upper-bracket SVT points is needed to restore the original coverage, independently of the original missing med000 DCVC and two Medvedev ROI comparisons.
+
+The best resolved anchor still has lower whole-frame LPIPS and DISTS in each of the nine windows (checked directly in the corrected per-window outputs). The twelve-crop reuse model and two-hour duration remain assumptions, and operational framing remains unmeasured. No complete-codec or live-use claim follows.
+
+Exact output JSON, source archive identities, reproduction command, finite-duration limitations and the proposed unsubmitted follow-up are in [the W9 audit](w9-adapter-break-even.md) and its `w9-inputs/` files. No new GPU time was used. This entry supersedes the earlier statement that both tiers hold; it does not edit or erase the original evidence.

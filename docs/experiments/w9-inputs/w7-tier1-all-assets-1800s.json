@@ -1,0 +1,219 @@
+{
+  "windows": [
+    {
+      "window": "al028",
+      "judge_row": "alcaraz_hurkacz/028@120",
+      "rate_kbps": 27.314333333333334,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.2845294694311825,
+          "foreground": 0.30418113154134874
+        },
+        "dists": {
+          "whole": 0.17501250877976418,
+          "foreground": 0.24202542155981063
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.028905228790706783,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.3330863603320555,
+          "hybrid_score": 0.30418113154134874,
+          "per_anchor": {
+            "dcvc": 0.028905228790706783
+          }
+        },
+        "dists": {
+          "delta": 0.033132084545860446,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.2751575061056711,
+          "hybrid_score": 0.24202542155981063,
+          "per_anchor": {
+            "dcvc": 0.033132084545860446
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.1580810317723952,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.2845294694311825,
+          "per_anchor": {
+            "dcvc": -0.1580810317723952
+          }
+        },
+        "dists": {
+          "difference": -0.0720623518490739,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.17501250877976418,
+          "per_anchor": {
+            "dcvc": -0.0720623518490739
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc"
+      ],
+      "anchors_excluded": {
+        "s2_o0": "unresolved",
+        "s4_o0": "unresolved",
+        "s2_o20": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          6.0,
+          7.654166666666667,
+          0.2126950907766083,
+          0.18453151881694793,
+          0.5946132595299871,
+          0.4291407875716686
+        ],
+        [
+          18.0,
+          14.571666666666665,
+          0.1668881487434293,
+          0.14189233258366585,
+          0.4435467873708201,
+          0.3324119679629803
+        ],
+        [
+          24.0,
+          20.41166666666667,
+          0.1414015951274354,
+          0.11617572605609894,
+          0.37139389169089004,
+          0.2967290930449963
+        ],
+        [
+          30.0,
+          28.82916666666667,
+          0.12367776121916593,
+          0.10049958601593971,
+          0.3259883427515868,
+          0.2711604982614517
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        20.41166666666667,
+        28.82916666666667
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.12644843765878733,
+          "foreground_lpips": 0.3330863603320555,
+          "whole_dists": 0.10295015693069028,
+          "foreground_dists": 0.2751575061056711
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 8.85e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 155683,
+        "intended_bank_bytes": 934098.0000000001,
+        "old_bank_bytes": 233524.5,
+        "adapter_bytes": 1488252,
+        "length_seconds": 1800.0,
+        "old_rate_kbps": 18.461418333333334,
+        "added_rate_kbps": 8.852915
+      }
+    },
+    {
+      "window": "al034",
+      "rate_kbps": 26.897393333333333,
+      "unresolved": "al034: no anchor family resolved at 26.8974 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 164079,
+        "intended_bank_bytes": 984473.9999999999,
+        "old_bank_bytes": 246118.5,
+        "adapter_bytes": 1488252,
+        "length_seconds": 1800.0,
+        "old_rate_kbps": 17.834578333333333,
+        "added_rate_kbps": 9.062814999999999
+      }
+    },
+    {
+      "window": "al043",
+      "rate_kbps": 26.87216,
+      "unresolved": "al043: no anchor family resolved at 26.8722 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 152664,
+        "intended_bank_bytes": 915984.0,
+        "old_bank_bytes": 228996.0,
+        "adapter_bytes": 1488252,
+        "length_seconds": 1800.0,
+        "old_rate_kbps": 18.094720000000002,
+        "added_rate_kbps": 8.77744
+      }
+    },
+    {
+      "window": "med000",
+      "rate_kbps": 51.26319555555556,
+      "unresolved": "med000: no anchor family resolved at 51.2632 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 201292,
+        "intended_bank_bytes": 1207752.0,
+        "old_bank_bytes": 301938.0,
+        "adapter_bytes": 1495592,
+        "length_seconds": 1800.0,
+        "old_rate_kbps": 41.245588888888896,
+        "added_rate_kbps": 10.017606666666666
+      }
+    },
+    {
+      "window": "med024",
+      "rate_kbps": 50.635755555555555,
+      "unresolved": "med024: no anchor family resolved at 50.6358 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 189263,
+        "intended_bank_bytes": 1135578.0,
+        "old_bank_bytes": 283894.5,
+        "adapter_bytes": 1495592,
+        "length_seconds": 1800.0,
+        "old_rate_kbps": 40.91887388888889,
+        "added_rate_kbps": 9.716881666666666
+      }
+    },
+    {
+      "window": "med019",
+      "rate_kbps": 50.90219555555555,
+      "unresolved": "med019: no anchor family resolved at 50.9022 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 195067,
+        "intended_bank_bytes": 1170402.0,
+        "old_bank_bytes": 292600.5,
+        "adapter_bytes": 1495592,
+        "length_seconds": 1800.0,
+        "old_rate_kbps": 41.040213888888886,
+        "added_rate_kbps": 9.861981666666665
+      }
+    }
+  ],
+  "group": null,
+  "unresolved_windows": [
+    "al034",
+    "al043",
+    "med000",
+    "med024",
+    "med019"
+  ]
+}

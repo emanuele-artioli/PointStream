@@ -260,14 +260,14 @@ re-send the same brief.
 
 Codex sessions follow the same protocol. What differs:
 
-- **Reports and cards.** Codex cannot message other sessions or show cards.
-  An item session ends its last reply with the report and writes the same
-  text into its experiments entry, then pushes; the user forwards it, or
-  the root session reads it from the pushed branch. The root session writes
-  a card as a prompt the user pastes into a new Codex session.
-- **Model per card.** Codex runs `gpt-6.1-sol` (AGENTS.md); the tier
-  becomes reasoning effort: Opus work at `high`, Sonnet work at `medium`,
-  Haiku work at `low`.
+- **Reports and cards.** Availability of cross-chat tools depends on the
+  client. In-chat subagents can report directly to their parent. Independent
+  item sessions also save their reports in the experiment entry and push;
+  the root can read the branch if no authorized messaging path is available.
+  A card remains a standalone prompt for starting an item session.
+- **Model per card.** Use the explicit model and effort in AGENTS.md's tier
+  table, subject to the user's requested override. Do not map every tier to
+  the primary model. A requested setting is not verified runtime telemetry.
 - **Waiting on the fleet.** Use the
   [completion-first policy](fleet.md#monitoring-from-the-submitting-chat):
   verified completion wakeups, otherwise one self-expiring deadline check.
@@ -315,3 +315,23 @@ Claude Code only. The first Codex session that delegates checks:
 Record the date, the Codex version and the findings here, fix what is
 wrong in a PR, and delete the "Not yet validated in Codex" paragraph from
 AGENTS.md.
+
+#### 2026-10-31 partial validation
+
+Codex CLI reports `0.152.0` on this Mac. The desktop continuation explicitly
+requested three independent `gpt-6.1-terra` delegates at `medium` effort with
+fresh contexts. All started, exchanged messages, read the shared worktree,
+and returned reviewable artifacts. One finished delegate resumed successfully
+with a follow-up task. None could independently observe its actual model or
+effort, so runtime settings remain unverified. The user requested Terra at
+medium effort; no other model/effort was launched to fill the validation grid.
+
+The old Codex paragraphs above incorrectly asserted that messaging was
+unavailable and that every tier used the primary model; they now distinguish
+client capabilities and explicit tier settings. Shared-worktree delegates
+received disjoint file ownership and did not commit independently. The
+large-read hook's recommendation to delegate is applicable, but it does not
+enforce model choice. Runner deliberate-failure discipline, per-role hooks,
+and the other two tier probes remain untested. Keep the AGENTS.md pending
+validation notice until those checks are actually completed; this entry is
+not evidence that they passed.
