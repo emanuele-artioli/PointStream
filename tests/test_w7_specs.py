@@ -428,3 +428,18 @@ def test_batch_uses_manifest_filename_for_immutable_final_manifest(tmp_path):
     windows = next(x for x in spec['staged_inputs'] if x['name'] == 'windows')
     assert windows['path'] == sp.W7_DIR + '/windows-final.json'
     assert windows['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def test_bank_counts_png_crops_not_codec_variants():
+    from experiments.tennis import w7_rates
+
+    refs = [{'file': f'{crop}.{codec}.ref', 'codec': codec, 'bytes': size}
+            for crop, size in (('a', 100), ('b', 200))
+            for codec in ('png', 'jpeg70', 'jpeg85', 'jpeg95')]
+    row = {'window': 'al028', 'match': 'alcaraz_hurkacz', 'reference_files': refs,
+           'references': {'png_bytes': 300}, 'keypoints': {'contract': {'fps': [25, 1]}, 'bytes': 100}}
+    rate = w7_rates.rates({'rows': [row]})['al028']
+    assert rate['match_bank_kbps_7200'] == pytest.approx(w7_rates.kbps(1800, 7200))
+    row['references']['png_bytes'] = 301
+    with pytest.raises(ValueError, match='byte total mismatch'):
+        w7_rates.rates({'rows': [row]})

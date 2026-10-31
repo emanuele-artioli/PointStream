@@ -31,10 +31,14 @@ def rates(transport: dict[str, Any], adapter_bytes: dict[str, int] | None = None
     out: dict[str, dict[str, float]] = {}
     for row in transport['rows']:
         fps = row['keypoints']['contract']['fps'][0]
-        crops = len(row['reference_files'])
-        if crops == 0:
-            raise ValueError(f"{row['window']}: no reference crops")
-        bank_bytes = row['references']['png_bytes'] * BANK_CROPS / crops
+        # Each crop has PNG plus JPEG alternatives. Count only the transmitted
+        # lossless PNG entries, not the number of encoded alternatives.
+        png = [f for f in row['reference_files'] if f['codec'] == 'png']
+        if not png or len({f['file'] for f in png}) != len(png):
+            raise ValueError(f"{row['window']}: missing or duplicate PNG references")
+        if sum(f['bytes'] for f in png) != row['references']['png_bytes']:
+            raise ValueError(f"{row['window']}: PNG reference byte total mismatch")
+        bank_bytes = row['references']['png_bytes'] * BANK_CROPS / len(png)
         out[row['window']] = {'keypoint_kbps': kbps(row['keypoints']['bytes'], 240 / fps),
                               'match_bank_kbps_7200': kbps(bank_bytes, AMORTISED_SECONDS),
                               'adapter_guider_kbps_7200': kbps(charges[row['match']], AMORTISED_SECONDS),
