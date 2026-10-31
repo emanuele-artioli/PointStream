@@ -1,0 +1,38 @@
+{
+  "al028": {
+    "sha256": "54da68060648a241d24fd0714d540579970b15c4c8edae4efb01698c3ed3bf3f",
+    "audit_sha256": "d746ea2041fb1abce67e53130cb6976bc7fc63b7e96f08ad18983904cd6920c8",
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T215041Z-2f1dee96/full/published.tar",
+    "audit": "docs/experiments/w9-inputs/repair-audits/al028.json"
+  },
+  "al034": {
+    "sha256": "5ba7375751b54a3a07d5991f3594104aa472e2bf491b7674bf9e5ce4f20b0a4c",
+    "audit_sha256": "6bd1ec6108a68de3a439d0388389cf08915cb052815d16e0f6964e58bc4cc738",
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T215039Z-d1695e8d/full/published.tar",
+    "audit": "docs/experiments/w9-inputs/repair-audits/al034.json"
+  },
+  "al043": {
+    "sha256": "ba791cd19a6d6923a4681857bfd75eea2a3c98096aebbcc5930eada31ab46ec4",
+    "audit_sha256": "a33b4b6e0eace8dcd2bc0c3efb17e1cda4f4dd644732e69f7efc32433c2c590f",
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T215041Z-3ab89852/full/published.tar",
+    "audit": "docs/experiments/w9-inputs/repair-audits/al043.json"
+  },
+  "nad000": {
+    "sha256": "28aeb71d62c64d642f1c5157af6bca691cbb4f6f0c3ebdfdea94887a88177ba4",
+    "audit_sha256": "61d38bdef643cb7f5326fd58fefc7a402e8c6c749642a0cfa05a3b67ae45b11d",
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T214253Z-429aabab/full/published.tar",
+    "audit": "docs/experiments/w9-inputs/repair-audits/nad000.json"
+  },
+  "nad001": {
+    "sha256": "16f56faa178d459c18a05344489575a688a1ad8f55790f325b1cf4012c1cd1f0",
+    "audit_sha256": "7a864ee50ca21c59ddbafb19bb7990886003a6b06a5a4772883ba2c382192173",
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T215041Z-74e3424a/full/published.tar",
+    "audit": "docs/experiments/w9-inputs/repair-audits/nad001.json"
+  },
+  "nad002": {
+    "sha256": "f216642eea35bc7a71e467054d5eb3bedd32b88d69161f3320958f91a1a313a3",
+    "audit_sha256": "619551ef24191d4e030c37e9947503d3fa80886fcf1a40dc6f04c05646891559",
+    "archive": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T215042Z-994d0829/full/published.tar",
+    "audit": "docs/experiments/w9-inputs/repair-audits/nad002.json"
+  }
+}

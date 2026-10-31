@@ -1,0 +1,67 @@
+{
+  "scope": "conditional original-family-exclusion sensitivity; no repair scores",
+  "omitted_families": {
+    "al028": [],
+    "al034": [],
+    "al043": [],
+    "med000": [
+      "s2_o20",
+      "dcvc"
+    ],
+    "med024": [],
+    "med019": [
+      "s2_o20"
+    ],
+    "nad000": [],
+    "nad001": [],
+    "nad002": []
+  },
+  "tier1": {
+    "coverage": [
+      8964.749421742488,
+      11903.50235626764
+    ],
+    "intervals": [
+      {
+        "seconds": [
+          8964.749421742488,
+          11903.50235626764
+        ],
+        "verdict": "pass"
+      }
+    ],
+    "note": "None is infinity; lower-rate bracketing edges are moved inward; quality equality is a tie; unresolved cells are not passes."
+  },
+  "tier2": {
+    "coverage": [
+      11843.88869565219,
+      1130948.6769229928
+    ],
+    "intervals": [
+      {
+        "seconds": [
+          11843.88869565219,
+          1130948.6769229928
+        ],
+        "verdict": "pass"
+      }
+    ],
+    "note": "None is infinity; lower-rate bracketing edges are moved inward; quality equality is a tie; unresolved cells are not passes."
+  },
+  "joint": {
+    "coverage": [
+      11843.88869565219,
+      11903.50235626764
+    ],
+    "intervals": [
+      {
+        "seconds": [
+          11843.88869565219,
+          11903.50235626764
+        ],
+        "verdict": "pass"
+      }
+    ],
+    "note": "None is infinity; lower-rate bracketing edges are moved inward; quality equality is a tie; unresolved cells are not passes."
+  }
+}

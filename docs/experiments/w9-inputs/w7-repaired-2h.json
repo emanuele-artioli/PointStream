@@ -1,0 +1,1539 @@
+{
+  "scope": "corrected 2h W7; conditional on resolved anchor families",
+  "tier1": {
+    "windows": [
+      {
+        "window": "al028",
+        "judge_row": "alcaraz_hurkacz/028@120",
+        "rate_kbps": 19.239833333333333,
+        "hybrid": {
+          "lpips": {
+            "whole": 0.2845294694311825,
+            "foreground": 0.30418113154134874
+          },
+          "dists": {
+            "whole": 0.17501250877976418,
+            "foreground": 0.24202542155981063
+          }
+        },
+        "gap": {
+          "lpips": {
+            "delta": 0.07987034850255531,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.38405148004390405,
+            "hybrid_score": 0.30418113154134874,
+            "per_anchor": {
+              "s2_o0": 0.2764033321212933,
+              "s4_o0": 0.32888232059386524,
+              "s2_o20": 0.32240847053818644,
+              "dcvc": 0.07987034850255531
+            }
+          },
+          "dists": {
+            "delta": 0.06096342222294518,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.3029888437827558,
+            "hybrid_score": 0.24202542155981063,
+            "per_anchor": {
+              "s2_o0": 0.18323876850279477,
+              "s4_o0": 0.1859960955407192,
+              "s2_o20": 0.21161361687827066,
+              "dcvc": 0.06096342222294518
+            }
+          }
+        },
+        "whole_frame": {
+          "lpips": {
+            "difference": -0.1386568367775567,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.2845294694311825,
+            "per_anchor": {
+              "s2_o0": -0.10200610267615218,
+              "s4_o0": -0.01098375452392475,
+              "s2_o20": -0.06128897119044313,
+              "dcvc": -0.1386568367775567
+            }
+          },
+          "dists": {
+            "difference": -0.054325387634182806,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.17501250877976418,
+            "per_anchor": {
+              "s2_o0": -0.03528765478583526,
+              "s4_o0": 0.014073166040116714,
+              "s2_o20": -0.012663116249654799,
+              "dcvc": -0.054325387634182806
+            }
+          }
+        },
+        "anchors_used": [
+          "dcvc",
+          "s2_o0",
+          "s2_o20",
+          "s4_o0"
+        ],
+        "anchors_excluded": {},
+        "svt_only_best_anchor": false,
+        "dcvc_points": [
+          [
+            6.0,
+            7.654166666666667,
+            0.2126950907766083,
+            0.18453151881694793,
+            0.5946132595299871,
+            0.4291407875716686
+          ],
+          [
+            18.0,
+            14.571666666666665,
+            0.1668881487434293,
+            0.14189233258366585,
+            0.4435467873708201,
+            0.3324119679629803
+          ],
+          [
+            24.0,
+            20.41166666666667,
+            0.1414015951274354,
+            0.11617572605609894,
+            0.37139389169089004,
+            0.2967290930449963
+          ],
+          [
+            30.0,
+            28.82916666666667,
+            0.12367776121916593,
+            0.10049958601593971,
+            0.3259883427515868,
+            0.2711604982614517
+          ]
+        ],
+        "dcvc_bracket_kbps": [
+          14.571666666666665,
+          20.41166666666667
+        ],
+        "dominance": {
+          "outcome": "A",
+          "outcome_svt_only": "A",
+          "dominating": {
+            "lpips": [],
+            "dists": []
+          },
+          "margin": 0.001,
+          "per_family": {
+            "dcvc": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o20": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o20": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o40": {
+              "lpips": false,
+              "dists": false
+            }
+          }
+        },
+        "w1_embedded_outcome": null,
+        "at_hybrid_rate": {
+          "dcvc": {
+            "whole_lpips": 0.14587263265362582,
+            "foreground_lpips": 0.38405148004390405,
+            "whole_dists": 0.12068712114558137,
+            "foreground_dists": 0.3029888437827558
+          },
+          "s2_o0": {
+            "whole_lpips": 0.18252336675503034,
+            "foreground_lpips": 0.580584463662642,
+            "whole_dists": 0.13972485399392892,
+            "foreground_dists": 0.4252641900626054
+          },
+          "s2_o20": {
+            "whole_lpips": 0.22324049824073938,
+            "foreground_lpips": 0.6265896020795352,
+            "whole_dists": 0.16234939253010938,
+            "foreground_dists": 0.4536390384380813
+          },
+          "s4_o0": {
+            "whole_lpips": 0.27354571490725776,
+            "foreground_lpips": 0.633063452135214,
+            "whole_dists": 0.1890856748198809,
+            "foreground_dists": 0.4280215171005298
+          },
+          "s4_o20": {
+            "whole_lpips": 0.2857548851228314,
+            "foreground_lpips": 0.6796722537509245,
+            "whole_dists": 0.1975118535235139,
+            "foreground_dists": 0.45763699802195856
+          },
+          "s4_o40": {
+            "whole_lpips": 0.28814960131191236,
+            "foreground_lpips": 0.6766357821745175,
+            "whole_dists": 0.19799201172768327,
+            "foreground_dists": 0.45996426580752114
+          }
+        },
+        "warnings": [
+          "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 7.78e-01 kbps)",
+          "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+        ]
+      },
+      {
+        "window": "al034",
+        "judge_row": "alcaraz_hurkacz/034@120",
+        "rate_kbps": 18.654973333333334,
+        "hybrid": {
+          "lpips": {
+            "whole": 0.29171356464904036,
+            "foreground": 0.28360516770027416
+          },
+          "dists": {
+            "whole": 0.17899955213069915,
+            "foreground": 0.23253990709781647
+          }
+        },
+        "gap": {
+          "lpips": {
+            "delta": 0.08378653107453865,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.3673916987748128,
+            "hybrid_score": 0.28360516770027416,
+            "per_anchor": {
+              "s2_o0": 0.25569460900998126,
+              "s4_o0": 0.28683965474191747,
+              "s2_o20": 0.3017866177078066,
+              "dcvc": 0.08378653107453865
+            }
+          },
+          "dists": {
+            "delta": 0.0848198495554926,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.31735975665330907,
+            "hybrid_score": 0.23253990709781647,
+            "per_anchor": {
+              "s2_o0": 0.18176059292274654,
+              "s4_o0": 0.17500724109129762,
+              "s2_o20": 0.20986538837764812,
+              "dcvc": 0.0848198495554926
+            }
+          }
+        },
+        "whole_frame": {
+          "lpips": {
+            "difference": -0.143747536115614,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.29171356464904036,
+            "per_anchor": {
+              "s2_o0": -0.10333738777076906,
+              "s4_o0": -0.02221881207833254,
+              "s2_o20": -0.05379464476325088,
+              "dcvc": -0.143747536115614
+            }
+          },
+          "dists": {
+            "difference": -0.059578969476760085,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.17899955213069915,
+            "per_anchor": {
+              "s2_o0": -0.03541990040458376,
+              "s4_o0": 0.0023977808631313047,
+              "s2_o20": -0.01415143259068416,
+              "dcvc": -0.059578969476760085
+            }
+          }
+        },
+        "anchors_used": [
+          "dcvc",
+          "s2_o0",
+          "s2_o20",
+          "s4_o0"
+        ],
+        "anchors_excluded": {},
+        "svt_only_best_anchor": false,
+        "dcvc_points": [
+          [
+            18.0,
+            14.093333333333334,
+            0.17064715425467786,
+            0.1394660770893097,
+            0.41685792912330194,
+            0.345709652453661
+          ],
+          [
+            24.0,
+            19.36916666666667,
+            0.14492719315893857,
+            0.1167348712682724,
+            0.3607641736478432,
+            0.3135614149272442
+          ]
+        ],
+        "dcvc_bracket_kbps": [
+          14.093333333333334,
+          19.36916666666667
+        ],
+        "dominance": {
+          "outcome": "A",
+          "outcome_svt_only": "A",
+          "dominating": {
+            "lpips": [],
+            "dists": []
+          },
+          "margin": 0.001,
+          "per_family": {
+            "dcvc": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o20": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o0": {
+              "lpips": false,
+              "dists": false
+            }
+          }
+        },
+        "w1_embedded_outcome": null,
+        "at_hybrid_rate": {
+          "dcvc": {
+            "whole_lpips": 0.14796602853342636,
+            "foreground_lpips": 0.3673916987748128,
+            "whole_dists": 0.11942058265393907,
+            "foreground_dists": 0.31735975665330907
+          },
+          "s2_o0": {
+            "whole_lpips": 0.1883761768782713,
+            "foreground_lpips": 0.5392997767102554,
+            "whole_dists": 0.1435796517261154,
+            "foreground_dists": 0.414300500020563
+          },
+          "s2_o20": {
+            "whole_lpips": 0.23791891988578948,
+            "foreground_lpips": 0.5853917854080808,
+            "whole_dists": 0.164848119540015,
+            "foreground_dists": 0.4424052954754646
+          },
+          "s4_o0": {
+            "whole_lpips": 0.2694947525707078,
+            "foreground_lpips": 0.5704448224421916,
+            "whole_dists": 0.18139733299383046,
+            "foreground_dists": 0.4075471481891141
+          }
+        },
+        "warnings": [
+          "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 8.20e-01 kbps)",
+          "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+        ]
+      },
+      {
+        "window": "al043",
+        "judge_row": "alcaraz_hurkacz/043@120",
+        "rate_kbps": 18.858040000000003,
+        "hybrid": {
+          "lpips": {
+            "whole": 0.28466437935534816,
+            "foreground": 0.30236475792679773
+          },
+          "dists": {
+            "whole": 0.17958575263619422,
+            "foreground": 0.24428740441799163
+          }
+        },
+        "gap": {
+          "lpips": {
+            "delta": 0.06898277708300848,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.3713475350098062,
+            "hybrid_score": 0.30236475792679773,
+            "per_anchor": {
+              "s2_o0": 0.24916785566779842,
+              "s4_o0": 0.270652868347936,
+              "s2_o20": 0.29219349461488275,
+              "dcvc": 0.06898277708300848
+            }
+          },
+          "dists": {
+            "delta": 0.07453799029034508,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.3188253947083367,
+            "hybrid_score": 0.24428740441799163,
+            "per_anchor": {
+              "s2_o0": 0.17836687914882993,
+              "s4_o0": 0.1720409185557209,
+              "s2_o20": 0.2053381817392243,
+              "dcvc": 0.07453799029034508
+            }
+          }
+        },
+        "whole_frame": {
+          "lpips": {
+            "difference": -0.1374215728132675,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.28466437935534816,
+            "per_anchor": {
+              "s2_o0": -0.0930305740752794,
+              "s4_o0": -0.016373458105831074,
+              "s2_o20": -0.05070231931671976,
+              "dcvc": -0.1374215728132675
+            }
+          },
+          "dists": {
+            "difference": -0.06022995868570341,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.17958575263619422,
+            "per_anchor": {
+              "s2_o0": -0.0354840250098733,
+              "s4_o0": 0.0020099404930868092,
+              "s2_o20": -0.014067037802130006,
+              "dcvc": -0.06022995868570341
+            }
+          }
+        },
+        "anchors_used": [
+          "dcvc",
+          "s2_o0",
+          "s2_o20",
+          "s4_o0"
+        ],
+        "anchors_excluded": {},
+        "svt_only_best_anchor": false,
+        "dcvc_points": [
+          [
+            18.0,
+            14.386666666666667,
+            0.17053827488275222,
+            0.1369298480451107,
+            0.42194110279002023,
+            0.34810633957386017
+          ],
+          [
+            24.0,
+            20.02583333333333,
+            0.14207102024408033,
+            0.11545420885086059,
+            0.3601153452643084,
+            0.312324783205986
+          ]
+        ],
+        "dcvc_bracket_kbps": [
+          14.386666666666667,
+          20.02583333333333
+        ],
+        "dominance": {
+          "outcome": "A",
+          "outcome_svt_only": "A",
+          "dominating": {
+            "lpips": [],
+            "dists": []
+          },
+          "margin": 0.001,
+          "per_family": {
+            "dcvc": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o20": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o0": {
+              "lpips": false,
+              "dists": false
+            }
+          }
+        },
+        "w1_embedded_outcome": null,
+        "at_hybrid_rate": {
+          "dcvc": {
+            "whole_lpips": 0.14724280654208066,
+            "foreground_lpips": 0.3713475350098062,
+            "whole_dists": 0.11935579395049081,
+            "foreground_dists": 0.3188253947083367
+          },
+          "s2_o0": {
+            "whole_lpips": 0.19163380528006876,
+            "foreground_lpips": 0.5515326135945962,
+            "whole_dists": 0.14410172762632092,
+            "foreground_dists": 0.42265428356682155
+          },
+          "s2_o20": {
+            "whole_lpips": 0.2339620600386284,
+            "foreground_lpips": 0.5945582525416805,
+            "whole_dists": 0.16551871483406422,
+            "foreground_dists": 0.44962558615721593
+          },
+          "s4_o0": {
+            "whole_lpips": 0.2682909212495171,
+            "foreground_lpips": 0.5730176262747337,
+            "whole_dists": 0.18159569312928103,
+            "foreground_dists": 0.41632832297371253
+          }
+        },
+        "warnings": [
+          "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 7.63e-01 kbps)",
+          "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+        ]
+      },
+      {
+        "window": "med000",
+        "judge_row": "medvedev_struff/000@120",
+        "rate_kbps": 42.25204888888889,
+        "hybrid": {
+          "lpips": {
+            "whole": 0.3951207493911555,
+            "foreground": 0.3138478860252585
+          },
+          "dists": {
+            "whole": 0.17988866865634917,
+            "foreground": 0.23645192310214042
+          }
+        },
+        "gap": {
+          "lpips": {
+            "delta": 0.2151028854758118,
+            "best_anchor": "s2_o0",
+            "best_anchor_score": 0.5289507715010703,
+            "hybrid_score": 0.3138478860252585,
+            "per_anchor": {
+              "s2_o0": 0.2151028854758118,
+              "s4_o0": 0.275057765150309
+            }
+          },
+          "dists": {
+            "delta": 0.13257688333431028,
+            "best_anchor": "s4_o0",
+            "best_anchor_score": 0.3690288064364507,
+            "hybrid_score": 0.23645192310214042,
+            "per_anchor": {
+              "s2_o0": 0.14749251047309747,
+              "s4_o0": 0.13257688333431028
+            }
+          }
+        },
+        "whole_frame": {
+          "lpips": {
+            "difference": -0.11954652959602097,
+            "best_anchor": "s2_o0",
+            "hybrid_score": 0.3951207493911555,
+            "per_anchor": {
+              "s2_o0": -0.11954652959602097,
+              "s4_o0": -0.002226482101470195
+            }
+          },
+          "dists": {
+            "difference": -0.04726365376001379,
+            "best_anchor": "s2_o0",
+            "hybrid_score": 0.17988866865634917,
+            "per_anchor": {
+              "s2_o0": -0.04726365376001379,
+              "s4_o0": 0.0078005725648724045
+            }
+          }
+        },
+        "anchors_used": [
+          "s2_o0",
+          "s4_o0"
+        ],
+        "anchors_excluded": {
+          "s2_o20": "unresolved",
+          "dcvc": "missing"
+        },
+        "svt_only_best_anchor": true,
+        "dcvc_points": [],
+        "dcvc_bracket_kbps": null,
+        "dominance": {
+          "outcome": "A",
+          "outcome_svt_only": "A",
+          "dominating": {
+            "lpips": [],
+            "dists": []
+          },
+          "margin": 0.001,
+          "per_family": {
+            "s2_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o0": {
+              "lpips": false,
+              "dists": false
+            }
+          }
+        },
+        "w1_embedded_outcome": "A",
+        "at_hybrid_rate": {
+          "s2_o0": {
+            "whole_lpips": 0.2755742197951345,
+            "foreground_lpips": 0.5289507715010703,
+            "whole_dists": 0.13262501489633538,
+            "foreground_dists": 0.3839444335752379
+          },
+          "s4_o0": {
+            "whole_lpips": 0.3928942672896853,
+            "foreground_lpips": 0.5889056511755675,
+            "whole_dists": 0.18768924122122158,
+            "foreground_dists": 0.3690288064364507
+          }
+        },
+        "warnings": [
+          "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 1.01e+00 kbps)",
+          "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+        ]
+      },
+      {
+        "window": "med024",
+        "judge_row": "medvedev_struff/024@120",
+        "rate_kbps": 41.86518888888889,
+        "hybrid": {
+          "lpips": {
+            "whole": 0.37337089180652006,
+            "foreground": 0.3170799096819713
+          },
+          "dists": {
+            "whole": 0.17248089462518693,
+            "foreground": 0.24375004172325135
+          }
+        },
+        "gap": {
+          "lpips": {
+            "delta": 0.0709518503118281,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.3880317599937994,
+            "hybrid_score": 0.3170799096819713,
+            "per_anchor": {
+              "s2_o0": 0.25189454418217305,
+              "s4_o0": 0.2825483941744904,
+              "s2_o20": 0.2548410789768445,
+              "dcvc": 0.0709518503118281
+            }
+          },
+          "dists": {
+            "delta": 0.07142919432200259,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.31517923604525394,
+            "hybrid_score": 0.24375004172325135,
+            "per_anchor": {
+              "s2_o0": 0.16677810081454789,
+              "s4_o0": 0.14756599522362265,
+              "s2_o20": 0.1744868285530026,
+              "dcvc": 0.07142919432200259
+            }
+          }
+        },
+        "whole_frame": {
+          "lpips": {
+            "difference": -0.15033935222992428,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.37337089180652006,
+            "per_anchor": {
+              "s2_o0": -0.11296449394160024,
+              "s4_o0": -0.0006739136633938103,
+              "s2_o20": -0.08137266385345954,
+              "dcvc": -0.15033935222992428
+            }
+          },
+          "dists": {
+            "difference": -0.04675384321948037,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.17248089462518693,
+            "per_anchor": {
+              "s2_o0": -0.04049957247982067,
+              "s4_o0": 0.010563998261656299,
+              "s2_o20": -0.0274033332169088,
+              "dcvc": -0.04675384321948037
+            }
+          }
+        },
+        "anchors_used": [
+          "dcvc",
+          "s2_o0",
+          "s2_o20",
+          "s4_o0"
+        ],
+        "anchors_excluded": {},
+        "svt_only_best_anchor": false,
+        "dcvc_points": [
+          [
+            12.0,
+            33.48166666666666,
+            0.23421267455301167,
+            0.1363908402621746,
+            0.428646574463672,
+            0.34229491502046583
+          ],
+          [
+            18.0,
+            45.91833333333334,
+            0.2184076165093316,
+            0.12131707519292831,
+            0.3712356317030651,
+            0.3039656326174736
+          ]
+        ],
+        "dcvc_bracket_kbps": [
+          33.48166666666666,
+          45.91833333333334
+        ],
+        "dominance": {
+          "outcome": "A",
+          "outcome_svt_only": "A",
+          "dominating": {
+            "lpips": [],
+            "dists": []
+          },
+          "margin": 0.001,
+          "per_family": {
+            "dcvc": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o20": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o0": {
+              "lpips": false,
+              "dists": false
+            }
+          }
+        },
+        "w1_embedded_outcome": "A",
+        "at_hybrid_rate": {
+          "dcvc": {
+            "whole_lpips": 0.22303153957659577,
+            "foreground_lpips": 0.3880317599937994,
+            "whole_dists": 0.12572705140570656,
+            "foreground_dists": 0.31517923604525394
+          },
+          "s2_o0": {
+            "whole_lpips": 0.2604063978649198,
+            "foreground_lpips": 0.5689744538641444,
+            "whole_dists": 0.13198132214536626,
+            "foreground_dists": 0.41052814253779923
+          },
+          "s2_o20": {
+            "whole_lpips": 0.2919982279530605,
+            "foreground_lpips": 0.5719209886588158,
+            "whole_dists": 0.14507756140827813,
+            "foreground_dists": 0.41823687027625395
+          },
+          "s4_o0": {
+            "whole_lpips": 0.37269697814312625,
+            "foreground_lpips": 0.5996283038564617,
+            "whole_dists": 0.18304489288684322,
+            "foreground_dists": 0.391316036946874
+          }
+        },
+        "warnings": [
+          "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 9.46e-01 kbps)",
+          "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+        ]
+      },
+      {
+        "window": "med019",
+        "judge_row": "medvedev_struff/019@120",
+        "rate_kbps": 42.01554888888889,
+        "hybrid": {
+          "lpips": {
+            "whole": 0.39460041752568,
+            "foreground": 0.3552090447820079
+          },
+          "dists": {
+            "whole": 0.18422582894563674,
+            "foreground": 0.25726505145430567
+          }
+        },
+        "gap": {
+          "lpips": {
+            "delta": 0.060299508662969625,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.4155085534449775,
+            "hybrid_score": 0.3552090447820079,
+            "per_anchor": {
+              "s2_o0": 0.22240962378619789,
+              "s4_o0": 0.259826315497491,
+              "dcvc": 0.060299508662969625
+            }
+          },
+          "dists": {
+            "delta": 0.061619036886905676,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.31888408834121135,
+            "hybrid_score": 0.25726505145430567,
+            "per_anchor": {
+              "s2_o0": 0.15475458847165469,
+              "s4_o0": 0.1367851744984822,
+              "dcvc": 0.061619036886905676
+            }
+          }
+        },
+        "whole_frame": {
+          "lpips": {
+            "difference": -0.16204905335895073,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.39460041752568,
+            "per_anchor": {
+              "s2_o0": -0.12302702834237467,
+              "s4_o0": -0.0023383810316336406,
+              "dcvc": -0.16204905335895073
+            }
+          },
+          "dists": {
+            "difference": -0.05820966686589696,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.18422582894563674,
+            "per_anchor": {
+              "s2_o0": -0.052904927865567414,
+              "s4_o0": 0.0034000512186259657,
+              "dcvc": -0.05820966686589696
+            }
+          }
+        },
+        "anchors_used": [
+          "dcvc",
+          "s2_o0",
+          "s4_o0"
+        ],
+        "anchors_excluded": {
+          "s2_o20": "unresolved"
+        },
+        "svt_only_best_anchor": false,
+        "dcvc_points": [
+          [
+            12.0,
+            36.015,
+            0.24119969139570072,
+            0.13237885683774947,
+            0.44824793437927274,
+            0.33535511419177055
+          ],
+          [
+            18.0,
+            48.99333333333333,
+            0.2239288392243562,
+            0.11967245042324066,
+            0.38286685046244734,
+            0.30246220380067823
+          ]
+        ],
+        "dcvc_bracket_kbps": [
+          36.015,
+          48.99333333333333
+        ],
+        "dominance": {
+          "outcome": "A",
+          "outcome_svt_only": "A",
+          "dominating": {
+            "lpips": [],
+            "dists": []
+          },
+          "margin": 0.001,
+          "per_family": {
+            "dcvc": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o0": {
+              "lpips": false,
+              "dists": false
+            }
+          }
+        },
+        "w1_embedded_outcome": "A",
+        "at_hybrid_rate": {
+          "dcvc": {
+            "whole_lpips": 0.23255136416672925,
+            "foreground_lpips": 0.4155085534449775,
+            "whole_dists": 0.12601616207973979,
+            "foreground_dists": 0.31888408834121135
+          },
+          "s2_o0": {
+            "whole_lpips": 0.2715733891833053,
+            "foreground_lpips": 0.5776186685682058,
+            "whole_dists": 0.13132090108006933,
+            "foreground_dists": 0.41201963992596036
+          },
+          "s4_o0": {
+            "whole_lpips": 0.39226203649404634,
+            "foreground_lpips": 0.6150353602794989,
+            "whole_dists": 0.1876258801642627,
+            "foreground_dists": 0.3940502259527879
+          }
+        },
+        "warnings": [
+          "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 9.75e-01 kbps)",
+          "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+        ]
+      }
+    ],
+    "pooled": {
+      "windows": [
+        "al028",
+        "al034",
+        "al043",
+        "med000",
+        "med024",
+        "med019"
+      ],
+      "lpips": {
+        "n": 6,
+        "mean": 0.09649898351845199,
+        "sd": 0.05869446842868468,
+        "t": 2.5705818356363146,
+        "lo": 0.034902916484640625,
+        "hi": 0.15809505055226336,
+        "excludes_zero_above": true
+      },
+      "dists": {
+        "n": 6,
+        "mean": 0.0809910627686669,
+        "sd": 0.026777638943281685,
+        "t": 2.5705818356363146,
+        "lo": 0.05288965410932045,
+        "hi": 0.10909247142801334,
+        "excludes_zero_above": true
+      },
+      "holds": true
+    },
+    "clusters": {
+      "al": {
+        "windows": [
+          "al028",
+          "al034",
+          "al043"
+        ],
+        "lpips": {
+          "n": 3,
+          "mean": 0.07754655222003415,
+          "sd": 0.007670580482103732,
+          "t": 4.302652729749462,
+          "lo": 0.05849177397342424,
+          "hi": 0.09660133046664406,
+          "excludes_zero_above": true
+        },
+        "dists": {
+          "n": 3,
+          "mean": 0.07344042068959429,
+          "sd": 0.011966025887471917,
+          "t": 4.302652729749462,
+          "lo": 0.043715164522744585,
+          "hi": 0.103165676856444,
+          "excludes_zero_above": true
+        },
+        "holds": true
+      },
+      "med": {
+        "windows": [
+          "med000",
+          "med024",
+          "med019"
+        ],
+        "lpips": {
+          "n": 3,
+          "mean": 0.11545141481686984,
+          "sd": 0.086464905013644,
+          "t": 4.302652729749462,
+          "lo": -0.09933931647043341,
+          "hi": 0.3302421461041731,
+          "excludes_zero_above": false
+        },
+        "dists": {
+          "n": 3,
+          "mean": 0.08854170484773953,
+          "sd": 0.03844973999240379,
+          "t": 4.302652729749462,
+          "lo": -0.006972744274385573,
+          "hi": 0.18405615396986463,
+          "excludes_zero_above": false
+        },
+        "holds": false
+      }
+    },
+    "missing_families": {
+      "med000": {
+        "s2_o20": "unresolved",
+        "dcvc": "missing"
+      },
+      "med019": {
+        "s2_o20": "unresolved"
+      }
+    },
+    "sensitivity_without_missing_dcvc": {
+      "windows": [
+        "al028",
+        "al034",
+        "al043",
+        "med024",
+        "med019"
+      ],
+      "lpips": {
+        "n": 5,
+        "mean": 0.07277820312698004,
+        "sd": 0.009286286249304521,
+        "t": 2.7764451051977934,
+        "lo": 0.06124775581420395,
+        "hi": 0.08430865043975613,
+        "excludes_zero_above": true
+      },
+      "dists": {
+        "n": 5,
+        "mean": 0.07067389865553822,
+        "sd": 0.009898149786284208,
+        "t": 2.7764451051977934,
+        "lo": 0.05838372241708084,
+        "hi": 0.0829640748939956,
+        "excludes_zero_above": true
+      },
+      "holds": true
+    }
+  },
+  "tier2": {
+    "windows": [
+      {
+        "window": "nad000",
+        "judge_row": "nadal_kyrgios/000@120",
+        "rate_kbps": 44.618157777777775,
+        "hybrid": {
+          "lpips": {
+            "whole": 0.4586274591139805,
+            "foreground": 0.33213653907050866
+          },
+          "dists": {
+            "whole": 0.20828497856855394,
+            "foreground": 0.2377184011042118
+          }
+        },
+        "gap": {
+          "lpips": {
+            "delta": 0.053302312508833216,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.3854388515793419,
+            "hybrid_score": 0.33213653907050866,
+            "per_anchor": {
+              "s2_o0": 0.23024709146017663,
+              "s4_o0": 0.2875512295330107,
+              "s2_o20": 0.26315786310987044,
+              "dcvc": 0.053302312508833216
+            }
+          },
+          "dists": {
+            "delta": 0.06279385390437683,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.30051225500858864,
+            "hybrid_score": 0.2377184011042118,
+            "per_anchor": {
+              "s2_o0": 0.1279597404264146,
+              "s4_o0": 0.13488531787660787,
+              "s2_o20": 0.14266241276170302,
+              "dcvc": 0.06279385390437683
+            }
+          }
+        },
+        "whole_frame": {
+          "lpips": {
+            "difference": -0.11744690771975375,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.4586274591139805,
+            "per_anchor": {
+              "s2_o0": -0.08271310419087868,
+              "s4_o0": -0.004152383694216111,
+              "s2_o20": -0.04248736576345463,
+              "dcvc": -0.11744690771975375
+            }
+          },
+          "dists": {
+            "difference": -0.04551283672484582,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.20828497856855394,
+            "per_anchor": {
+              "s2_o0": -0.034247234208496485,
+              "s4_o0": 0.0021669365768465787,
+              "s2_o20": -0.013152197907451424,
+              "dcvc": -0.04551283672484582
+            }
+          }
+        },
+        "anchors_used": [
+          "dcvc",
+          "s2_o0",
+          "s2_o20",
+          "s4_o0"
+        ],
+        "anchors_excluded": {},
+        "svt_only_best_anchor": false,
+        "dcvc_points": [
+          [
+            18.0,
+            36.825,
+            0.3517093641493056,
+            0.1734144203364849,
+            0.410284243617431,
+            0.31764566600322724
+          ],
+          [
+            24.0,
+            49.778333333333336,
+            0.33517806027259356,
+            0.15670496374368667,
+            0.37127445825302047,
+            0.2907444730401039
+          ]
+        ],
+        "dcvc_bracket_kbps": [
+          36.825,
+          49.778333333333336
+        ],
+        "dominance": {
+          "outcome": "A",
+          "outcome_svt_only": "A",
+          "dominating": {
+            "lpips": [],
+            "dists": []
+          },
+          "margin": 0.001,
+          "per_family": {
+            "dcvc": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o20": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o0": {
+              "lpips": false,
+              "dists": false
+            }
+          }
+        },
+        "w1_embedded_outcome": null,
+        "at_hybrid_rate": {
+          "dcvc": {
+            "whole_lpips": 0.34118055139422676,
+            "foreground_lpips": 0.3854388515793419,
+            "whole_dists": 0.1627721418437081,
+            "foreground_dists": 0.30051225500858864
+          },
+          "s2_o0": {
+            "whole_lpips": 0.3759143549231018,
+            "foreground_lpips": 0.5623836305306853,
+            "whole_dists": 0.17403774436005745,
+            "foreground_dists": 0.3656781415306264
+          },
+          "s2_o20": {
+            "whole_lpips": 0.4161400933505259,
+            "foreground_lpips": 0.5952944021803791,
+            "whole_dists": 0.1951327806611025,
+            "foreground_dists": 0.3803808138659148
+          },
+          "s4_o0": {
+            "whole_lpips": 0.4544750754197644,
+            "foreground_lpips": 0.6196877686035194,
+            "whole_dists": 0.21045191514540051,
+            "foreground_dists": 0.3726037189808197
+          }
+        },
+        "warnings": [
+          "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 1.83e+00 kbps)",
+          "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+        ]
+      },
+      {
+        "window": "nad001",
+        "judge_row": "nadal_kyrgios/001@120",
+        "rate_kbps": 44.56831777777778,
+        "hybrid": {
+          "lpips": {
+            "whole": 0.46797966888804493,
+            "foreground": 0.3601001420760501
+          },
+          "dists": {
+            "whole": 0.21462907865643502,
+            "foreground": 0.25445307418704033
+          }
+        },
+        "gap": {
+          "lpips": {
+            "delta": 0.0987665595580332,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.45886670163408333,
+            "hybrid_score": 0.3601001420760501,
+            "per_anchor": {
+              "s2_o0": 0.23940788840065497,
+              "s4_o0": 0.29978941650126156,
+              "s2_o20": 0.2508685398762832,
+              "dcvc": 0.0987665595580332
+            }
+          },
+          "dists": {
+            "delta": 0.07713672721042786,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.3315898013974682,
+            "hybrid_score": 0.25445307418704033,
+            "per_anchor": {
+              "s2_o0": 0.12953837936257134,
+              "s4_o0": 0.13598226598306828,
+              "s2_o20": 0.1361559352108846,
+              "dcvc": 0.07713672721042786
+            }
+          }
+        },
+        "whole_frame": {
+          "lpips": {
+            "difference": -0.11813820121087903,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.46797966888804493,
+            "per_anchor": {
+              "s2_o0": -0.07390204672792888,
+              "s4_o0": -0.006318753093060958,
+              "s2_o20": -0.03612055742514114,
+              "dcvc": -0.11813820121087903
+            }
+          },
+          "dists": {
+            "difference": -0.04246289124021793,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.21462907865643502,
+            "per_anchor": {
+              "s2_o0": -0.03392988673863073,
+              "s4_o0": -0.0004243562222693842,
+              "s2_o20": -0.015016021746551311,
+              "dcvc": -0.04246289124021793
+            }
+          }
+        },
+        "anchors_used": [
+          "dcvc",
+          "s2_o0",
+          "s2_o20",
+          "s4_o0"
+        ],
+        "anchors_excluded": {},
+        "svt_only_best_anchor": false,
+        "dcvc_points": [
+          [
+            18.0,
+            41.18666666666667,
+            0.35359373191550925,
+            0.1761175774037838,
+            0.47133426076946305,
+            0.3379985086619854
+          ],
+          [
+            24.0,
+            56.74166666666667,
+            0.33835834795163,
+            0.16007367968559266,
+            0.42071201285343046,
+            0.31197712272405625
+          ]
+        ],
+        "dcvc_bracket_kbps": [
+          41.18666666666667,
+          56.74166666666667
+        ],
+        "dominance": {
+          "outcome": "A",
+          "outcome_svt_only": "A",
+          "dominating": {
+            "lpips": [],
+            "dists": []
+          },
+          "margin": 0.001,
+          "per_family": {
+            "dcvc": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o20": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o0": {
+              "lpips": false,
+              "dists": false
+            }
+          }
+        },
+        "w1_embedded_outcome": null,
+        "at_hybrid_rate": {
+          "dcvc": {
+            "whole_lpips": 0.3498414676771659,
+            "foreground_lpips": 0.45886670163408333,
+            "whole_dists": 0.1721661874162171,
+            "foreground_dists": 0.3315898013974682
+          },
+          "s2_o0": {
+            "whole_lpips": 0.39407762216011605,
+            "foreground_lpips": 0.5995080304767051,
+            "whole_dists": 0.18069919191780429,
+            "foreground_dists": 0.38399145354961167
+          },
+          "s2_o20": {
+            "whole_lpips": 0.4318591114629038,
+            "foreground_lpips": 0.6109686819523333,
+            "whole_dists": 0.1996130569098837,
+            "foreground_dists": 0.3906090093979249
+          },
+          "s4_o0": {
+            "whole_lpips": 0.461660915794984,
+            "foreground_lpips": 0.6598895585773117,
+            "whole_dists": 0.21420472243416563,
+            "foreground_dists": 0.3904353401701086
+          }
+        },
+        "warnings": [
+          "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 1.31e+00 kbps)",
+          "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+        ]
+      },
+      {
+        "window": "nad002",
+        "judge_row": "nadal_kyrgios/002@120",
+        "rate_kbps": 51.21346444444445,
+        "hybrid": {
+          "lpips": {
+            "whole": 0.4476534943757233,
+            "foreground": 0.36751551457760456
+          },
+          "dists": {
+            "whole": 0.20974427610635757,
+            "foreground": 0.2526476442813873
+          }
+        },
+        "gap": {
+          "lpips": {
+            "delta": 0.049331415815479784,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.41684693039308435,
+            "hybrid_score": 0.36751551457760456,
+            "per_anchor": {
+              "s2_o0": 0.24748147202896242,
+              "s4_o0": 0.3109054827290494,
+              "s2_o20": 0.2690797458520777,
+              "dcvc": 0.049331415815479784
+            }
+          },
+          "dists": {
+            "delta": 0.06012157539855256,
+            "best_anchor": "dcvc",
+            "best_anchor_score": 0.31276921967993987,
+            "hybrid_score": 0.2526476442813873,
+            "per_anchor": {
+              "s2_o0": 0.12965446363772942,
+              "s4_o0": 0.1462462135254775,
+              "s2_o20": 0.14088745608597825,
+              "dcvc": 0.06012157539855256
+            }
+          }
+        },
+        "whole_frame": {
+          "lpips": {
+            "difference": -0.12989191285720397,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.4476534943757233,
+            "per_anchor": {
+              "s2_o0": -0.08497894952033408,
+              "s4_o0": -0.002770222341214379,
+              "s2_o20": -0.052152665823596234,
+              "dcvc": -0.12989191285720397
+            }
+          },
+          "dists": {
+            "difference": -0.04570770338000002,
+            "best_anchor": "dcvc",
+            "hybrid_score": 0.20974427610635757,
+            "per_anchor": {
+              "s2_o0": -0.03827879391779415,
+              "s4_o0": 0.0027026164488072046,
+              "s2_o20": -0.026184240465915748,
+              "dcvc": -0.04570770338000002
+            }
+          }
+        },
+        "anchors_used": [
+          "dcvc",
+          "s2_o0",
+          "s2_o20",
+          "s4_o0"
+        ],
+        "anchors_excluded": {},
+        "svt_only_best_anchor": false,
+        "dcvc_points": [
+          [
+            18.0,
+            37.96,
+            0.33481584110966434,
+            0.1803860157728195,
+            0.46409986616012733,
+            0.34050826281309127
+          ],
+          [
+            24.0,
+            52.39333333333334,
+            0.31646447829258295,
+            0.1627930760383606,
+            0.4132529933422949,
+            0.310659459233284
+          ]
+        ],
+        "dcvc_bracket_kbps": [
+          37.96,
+          52.39333333333334
+        ],
+        "dominance": {
+          "outcome": "A",
+          "outcome_svt_only": "A",
+          "dominating": {
+            "lpips": [],
+            "dists": []
+          },
+          "margin": 0.001,
+          "per_family": {
+            "dcvc": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o0": {
+              "lpips": false,
+              "dists": false
+            },
+            "s2_o20": {
+              "lpips": false,
+              "dists": false
+            },
+            "s4_o0": {
+              "lpips": false,
+              "dists": false
+            }
+          }
+        },
+        "w1_embedded_outcome": null,
+        "at_hybrid_rate": {
+          "dcvc": {
+            "whole_lpips": 0.31776158151851935,
+            "foreground_lpips": 0.41684693039308435,
+            "whole_dists": 0.16403657272635755,
+            "foreground_dists": 0.31276921967993987
+          },
+          "s2_o0": {
+            "whole_lpips": 0.36267454485538925,
+            "foreground_lpips": 0.614996986606567,
+            "whole_dists": 0.17146548218856342,
+            "foreground_dists": 0.38230210791911673
+          },
+          "s2_o20": {
+            "whole_lpips": 0.3955008285521271,
+            "foreground_lpips": 0.6365952604296823,
+            "whole_dists": 0.18356003564044182,
+            "foreground_dists": 0.39353510036736555
+          },
+          "s4_o0": {
+            "whole_lpips": 0.44488327203450895,
+            "foreground_lpips": 0.678420997306654,
+            "whole_dists": 0.21244689255516477,
+            "foreground_dists": 0.3988938578068648
+          }
+        },
+        "warnings": [
+          "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 1.60e+00 kbps)",
+          "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+        ]
+      }
+    ],
+    "pooled": {
+      "windows": [
+        "nad000",
+        "nad001",
+        "nad002"
+      ],
+      "lpips": {
+        "n": 3,
+        "mean": 0.06713342929411541,
+        "sd": 0.02746694746159128,
+        "t": 4.302652729749462,
+        "lo": -0.0010982507218884885,
+        "hi": 0.1353651093101193,
+        "excludes_zero_above": false
+      },
+      "dists": {
+        "n": 3,
+        "mean": 0.06668405217111908,
+        "sd": 0.009150359539996999,
+        "t": 4.302652729749462,
+        "lo": 0.043953298961738135,
+        "hi": 0.08941480538050003,
+        "excludes_zero_above": true
+      },
+      "holds": false
+    },
+    "clusters": {
+      "nad": {
+        "windows": [
+          "nad000",
+          "nad001",
+          "nad002"
+        ],
+        "lpips": {
+          "n": 3,
+          "mean": 0.06713342929411541,
+          "sd": 0.02746694746159128,
+          "t": 4.302652729749462,
+          "lo": -0.0010982507218884885,
+          "hi": 0.1353651093101193,
+          "excludes_zero_above": false
+        },
+        "dists": {
+          "n": 3,
+          "mean": 0.06668405217111908,
+          "sd": 0.009150359539996999,
+          "t": 4.302652729749462,
+          "lo": 0.043953298961738135,
+          "hi": 0.08941480538050003,
+          "excludes_zero_above": true
+        },
+        "holds": false
+      }
+    },
+    "missing_families": {}
+  }
+}
