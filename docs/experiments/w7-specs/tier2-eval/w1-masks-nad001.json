@@ -1,0 +1,120 @@
+{
+ "schema": 1,
+ "entrypoint": [
+  "-m",
+  "experiments.tennis.w1_masks"
+ ],
+ "arguments": [
+  "--windows-file",
+  "{staged:windows}",
+  "--window-state",
+  "{staged:state}",
+  "--window",
+  "nad001",
+  "--anchor",
+  "{staged:anchor}",
+  "--transport",
+  "{staged:transport}",
+  "--judged",
+  "{judged}"
+ ],
+ "staged_inputs": [
+  {
+   "name": "windows",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+   "sha256": "540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed",
+   "extract": false
+  },
+  {
+   "name": "state",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172501Z-a37a90cd/full/window-state.json",
+   "sha256": "f2b4131e1231fe654840aa41465a424d9f9337957ee5cb50f1a432ca57c6ca30",
+   "extract": false
+  },
+  {
+   "name": "nad001",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__001.mp4",
+   "sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d",
+   "extract": false
+  },
+  {
+   "name": "anchor",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T155454Z-e86a61b6/full/published.tar",
+   "sha256": "965b8879a821b90dd1e6afba415b8eed269a35a768e1f9891e0f4df96a37a51a",
+   "extract": false
+  },
+  {
+   "name": "transport",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T171359Z-aba3845f/full/published.tar",
+   "sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+   "extract": false
+  }
+ ],
+ "inputs": [
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+   "sha256": "540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172501Z-a37a90cd/full/window-state.json",
+   "sha256": "f2b4131e1231fe654840aa41465a424d9f9337957ee5cb50f1a432ca57c6ca30"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__001.mp4",
+   "sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T155454Z-e86a61b6/full/published.tar",
+   "sha256": "965b8879a821b90dd1e6afba415b8eed269a35a768e1f9891e0f4df96a37a51a"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T171359Z-aba3845f/full/published.tar",
+   "sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017"
+  }
+ ],
+ "environment": {
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+  "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+ },
+ "required_commands": [
+  "ffmpeg"
+ ],
+ "validator": [
+  "{python}",
+  "-m",
+  "experiments.tennis.w1_masks",
+  "--validate"
+ ],
+ "deadline": "2026-11-02T12:00:00+00:00",
+ "verify_staged_inputs": true,
+ "stall_seconds": 600.0,
+ "contention": {
+  "policy": "stop",
+  "resume_attempts": 0
+ },
+ "device": "cpu",
+ "hosts": [
+  "gpu3",
+  "gpu5",
+  "gpu6"
+ ],
+ "gpu_models": [],
+ "gpu_memory_mib": 0,
+ "cpu_threads": 2,
+ "local_storage_gib": 20,
+ "smoke": {
+  "seconds": 400,
+  "representative_basis": "First three saved ticks of the window rebuilt with the full K6 drawing path and compared with the K6 window hashes of R and S."
+ },
+ "full": {
+  "seconds": 1500
+ },
+ "validator_seconds": 120,
+ "budget_seconds": 2400,
+ "scale": {
+  "judged": {
+   "smoke": 3,
+   "full": 0
+  }
+ }
+}

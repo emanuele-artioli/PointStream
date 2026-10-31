@@ -134,8 +134,7 @@ def test_new_match_can_be_prepared_before_its_adapter_is_fitted(tmp_path):
     path = tmp_path / 'windows.json'
     wm.dump([w], path)
     assert wm.load(path) == [w]
-    with pytest.raises(KeyError):
-        _ = w.adapter
+    assert w.adapter['job'] == '20261031T150848Z-a582ecc0'
 
 
 def test_new_match_rates_bill_explicit_adapter_bytes():
@@ -157,6 +156,9 @@ def test_rate_computation_rejects_charge_without_fitted_adapter_identity(tmp_pat
     window = wm.WindowSpec('nad000', 'nadal_kyrgios', '000', 0, 240, 50, 'a' * 64, 'b' * 64)
     path = tmp_path / 'windows.json'
     wm.dump([window], path, adapter_bytes={'nadal_kyrgios': 1234567})
+    data = json.loads(path.read_text())
+    del data['adapters']['nadal_kyrgios']
+    path.write_text(json.dumps(data))
     transport = tmp_path / 'transport.json'
     row = {'window': window.id, 'match': window.match, 'reference_files': ['a', 'b'], 'references': {'png_bytes': 1000},
            'keypoints': {'bytes': 100, 'kps1_bytes': 200, 'contract': {'fps': [50, 1]}}}

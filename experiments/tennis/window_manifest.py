@@ -28,6 +28,8 @@ ADAPTERS: dict[str, dict[str, str]] = {
                         "published_sha256": "f1a488f2a3ddecf57cff451801f64bc07ae652c2b8b998d4ac844ba8685f5fa2"},
     "medvedev_struff": {"key": "med", "job": "20261023T204452Z-d5c90446", "name": "med-C",
                         "published_sha256": "5fc200fc50f5af68e561fa10baba54520043e5770555712caf6e89092b175427"},
+    "nadal_kyrgios": {"key": "nad", "job": "20261031T150848Z-a582ecc0", "name": "nk-C",
+                      "published_sha256": "cceb49b3d593c770e5b0d8dcd5d69b5b358bf88d76030cef8034674417907584"},
 }
 #: Keys are known before an adapter is fitted; its archive identity is added only after validation.
 MATCH_KEYS = {"alcaraz_hurkacz": "al", "medvedev_struff": "med", "nadal_kyrgios": "nad"}
