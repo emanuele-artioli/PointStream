@@ -57,9 +57,14 @@ def register_raw(path: Path, offset: int, start: int, end: int) -> list[dict[str
     with path.open('rb') as f:
         f.seek(offset)
         for frame in range(start, end):
-            data = f.read(FRAME_BYTES)
-            if len(data) != FRAME_BYTES:
-                raise ValueError(f'truncated cached frame {frame}')
+            # K8b's pipe reader builds a writable bytearray for every frame.
+            # Mirror its allocation and conversion path exactly.
+            data = bytearray()
+            while len(data) < FRAME_BYTES:
+                block = f.read(FRAME_BYTES - len(data))
+                if not block:
+                    raise ValueError(f'truncated cached frame {frame}')
+                data.extend(block)
             rgb = windows.yuv_to_rgb(np.frombuffer(data, np.uint8).reshape(1080 * 3 // 2, 1920), 1920, 1080)
             row = court.register_v2(rgb, previous)
             previous = np.array(row['homography']) if row['homography'] is not None else None
