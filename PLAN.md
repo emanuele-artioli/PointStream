@@ -30,14 +30,20 @@ four. Saved-evidence recomputation gives Tier 1 player LPIPS +0.0965
 [+0.0349, +0.1581], DISTS +0.0810 [+0.0529, +0.1091], conditional on the
 anchor families still resolved at the corrected rates. Tier 2 no longer
 passes the original rule: LPIPS +0.0671 [−0.0011, +0.1354], DISTS +0.0667
-[+0.0440, +0.0894]. Several SVT curves now lack upper brackets; a minimum
-of nine new points would restore the original coverage. The unseen-match
-result is inconclusive. Neither tier establishes a fully covered comparison.
+[+0.0440, +0.0894]. All nine SVT coverage gaps caused by the correction are
+now repaired from verified archived encodes, using 1,043 GPU-s. Tier 2 has
+all four anchor families bracketed and remains inconclusive at two hours.
+Tier 1 retains three original missing Med comparisons. The conditional joint
+duration model passes about 133–198 minutes within measured coverage; this is
+not a global minimum break-even length or a complete bitstream result.
 Historical W7 closure claims below are superseded by this correction. Original
-outputs remain unchanged; no new GPU work is launched. See
-[W9's audit](docs/experiments/w9-adapter-break-even.md) and [PR #315](https://github.com/emanuele-artioli/PointStream/pull/315).
+outputs remain unchanged; all repair jobs are terminal. The 23-page Overleaf
+draft includes the result, with fresh decoding, reference persistence and
+flicker still unresolved. See [W9's audit](docs/experiments/w9-adapter-break-even.md),
+merged [PR #315](https://github.com/emanuele-artioli/PointStream/pull/315), and
+[repair PR #316](https://github.com/emanuele-artioli/PointStream/pull/316).
 
-**Read first: [assessment 2026-10-29](docs/assessment-2026-10-29.md).** No
+**Historical background: [assessment 2026-10-29](docs/assessment-2026-10-29.md).** No
 configuration beats SVT-AV1 on whole-frame LPIPS and DISTS once every bit is
 paid for. In tennis the whole frame is decided by the background at the
 tested rate (~23 kbps, 1080p): even source pixels for the players gain only
@@ -348,7 +354,7 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
-| Paper continuation and W7 accounting audit | [2026-10-31 handoff](docs/continuation-2026-10-31.md) | `codex/paper-continuation-2026-10-31` | primary plus Terra 6.1 medium delegates | running 2026-10-31: correction reproduced, Overleaf `fc0343f9` includes corrected figure (23 pages), PR #315; W6b timing completed at 99.82/1,800 CPU-s, scale gate stops (metrics alone project >2,473 CPU-s), no smoothing result; user approved new independent W7 repair caps 5,400 GPU-s + 5,400 workload CPU-s, no training; queue preflight in progress, no job submitted |
+| Paper continuation and W7 accounting audit | [2026-10-31 handoff](docs/continuation-2026-10-31.md) | `codex/w7-anchor-repair-2026-10-31` (correction merged #315; follow-up #316) | primary plus Terra 6.1 medium delegates | repair complete 2026-10-31: all six GPU requests independently full-audited, root recomputation exact, GPU 1,043/5,400 s, CPU ≤1,924/5,400 s, no active jobs/reservations; at 2 h familiar-match rule passes conditionally, unseen-match LPIPS includes zero despite all four anchors; conditional modeled joint pass about 133–198 min, not global L*; Overleaf `a3e2888d` updated (23 pages). W6b scale stop, W11 labels blocked, W8 fresh-decoder witness proposed for separate authority |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 | J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
 | H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` @ `3b11a36` | Opus | reported 2026-10-22: 4a fail (F billed +93% wDISTS), 4b not built (LPIPS), crops ready; 2.6 GPU-hours of 4 |
@@ -1424,10 +1430,27 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   fails: flicker 28.6 vs SVT 18.6, residual energy 23.1 vs a limit of 16.6.
   The racket appears largely absent (3% coverage of a body-hull proxy, not
   independently labelled racket recall). Narrowed claim: sharp,
-  correctly posed players that flicker more than SVT's. Next test: split the
-  flicker between the per-frame receiver masks and the generated pixels, on
-  saved outputs. W7 keeps the every-third-frame recipe.
+  correctly posed players that flicker more than SVT's. The saved-output split
+  identifies generated content as the main excess. The 2026-10-31 smoothing
+  timing pilot completed at 99.82/1,800 CPU-s but stopped before scale: metrics
+  alone project more than the remaining cap, and no smoothing quality result
+  exists. Any full smoothing run needs a separately budgeted proposal and a
+  packed host-local environment. W7 keeps the every-third-frame recipe.
+- **W8 wire audit (2026-10-31).** Actual IVF, KPS2 and research header bytes
+  coexist with modeled bank/adaptation charges; a complete payload and fresh
+  source-hidden reconstruction remain unproved. See [audit](docs/experiments/w8-wire-audit.md)
+  and [proposed witness](docs/cards/w8-fresh-decoder-witness.md), not yet authorized.
 - **W9. Adapter break-even and live adaptation (user, 2026-10-30).** The
+  2026-10-31 all-assets analysis is complete within measured coverage:
+  [result](docs/experiments/w9-adapter-break-even.md). Original Med omissions
+  prevent strict full-family joint coverage. With those explicit omissions,
+  the joint rule passes about 133–198 min, fails at two hours, and is unresolved
+  outside common coverage; no global L* is established. The nine corrected-rate
+  anchor gaps are repaired, all jobs terminal, 1,043/5,400 GPU-s and ≤1,924/5,400
+  CPU-s. Live-adaptation experiments below have not run. The adapter-only
+  development-window estimates and 0.3-hour cost estimate below are historical:
+  they must not substitute for the corrected all-assets/two-tier analysis.
+  The
   per-match adapter (about 1.49 MB) is billed as if spread over a 2-hour
   match, an arbitrary choice. Replace it with the break-even length L*: the
   shortest match for which the player win still holds once the adapter is

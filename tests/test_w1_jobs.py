@@ -147,3 +147,115 @@ def test_maxbg_search_stays_inside_the_offset_range():
 
 def mb_low():
     return w.MAXBG_BASE_Q - 63
+
+
+def test_repair_selection_and_verified_merge(tmp_path):
+    import dataclasses
+    import tarfile
+
+    root = tmp_path / 'fixture' / 'publish'
+    (root / 'streams').mkdir(parents=True)
+    window = dataclasses.replace(w.AL, name='test', control_ivf_bytes={8: 8, 4: 9, 2: 10})
+    rows = []
+    for scale, count, control in [(8, 8, True), (4, 9, True), (2, 10, True), (2, 15, False)]:
+        name = f"{'control_' if control else ''}s{scale}_crf63.ivf"
+        path = root / 'streams' / name
+        path.write_bytes(bytes([count]) * count)
+        rows.append({'stream': 'streams/' + name, 'scale': scale, 'offset': 0, 'crf': 63,
+                     'outside': False, 'frames': 240, 'size': list(w.CODED[scale]), 'ivf_bytes': count,
+                     'rate_kbps': count * 8 * window.fps / 240 / 1000, 'stream_sha256': sc.digest(path),
+                     'decoded_sha256': 'a' * 64})
+    (root / 'encodes.json').write_text(json.dumps(rows))
+    metadata = {'controls': rows[:3], 'searches': [], 'window': window.name, 'frames': 240,
+                'inputs': {window.name: window.source_sha, 'transport': 'd' * 64},
+                'source_command': ['ffmpeg', '-vf', r'select=between(n\,9\,248),scale=1920:1080:flags=area:out_range=tv,format=yuv420p'],
+                'tools': {k: {'sha256': v} for k, v in w.TOOLS.items()}}
+    (root / 'encode.json').write_text(json.dumps(metadata))
+    archive = tmp_path / 'encodes.tar'
+    with tarfile.open(archive, 'w') as tar:
+        tar.add(root, arcname='publish')
+    archive_sha = sc.digest(archive)
+    def entry(row, control):
+        return {'policy': f"control_s{row['scale']}" if control else 's2_o0',
+                'scale': row['scale'], 'offset': 0, 'crf': 63, 'rate_kbps': row['rate_kbps'],
+                'bytes': row['ivf_bytes'], 'stream_sha256': row['stream_sha256'],
+                'decoded_sha256': row['decoded_sha256'], 'archive_sha256': archive_sha,
+                'member': 'publish/' + row['stream']}
+    manifest = {'window': 'test', 'controls': [entry(r, True) for r in rows[:3]], 'points': [entry(rows[3], False)]}
+    selected = sc.repair_points(manifest, [(archive, root)], window, 'd' * 64)
+    assert sc.repair_summary_matches(manifest, selected) and len(selected) == 4
+    with pytest.raises(ValueError, match='exactly three controls'):
+        sc.repair_points({**manifest, 'controls': manifest['controls'][:2]}, [(archive, root)], window, 'd' * 64)
+    with pytest.raises(ValueError, match='duplicate'):
+        sc.repair_points({**manifest, 'points': manifest['points'] * 2}, [(archive, root)], window, 'd' * 64)
+    assert not sc.repair_summary_matches(manifest, [*selected[:3], {**selected[3], 'stream_sha256': 'e' * 64}])
+    (root / 'encode.json').write_text(json.dumps({**metadata, 'window': 'foreign'}))
+    with pytest.raises(ValueError, match='window, source, transport'):
+        sc.repair_points(manifest, [(archive, root)], window, 'd' * 64)
+    (root / 'encode.json').write_text(json.dumps(metadata))
+    broken = dict(manifest['points'][0], stream_sha256='b' * 64)
+    with pytest.raises(ValueError, match='metadata mismatch'):
+        sc.repair_points({**manifest, 'points': [broken]}, [(archive, root)], window, 'd' * 64)
+    (root / rows[3]['stream']).write_bytes(b'x' * 15)
+    with pytest.raises(ValueError, match='hash or bytes'):
+        sc.repair_points(manifest, [(archive, root)], window, 'd' * 64)
+
+    old = {'window': 'test', 'analysis': {'by_policy': {'s2_o0': [
+        {'crf': 63, 'rate_kbps': 0.005, **{k: 0.5 for k in sc.OURS}}]}},
+        'points': [{'kind': 'roi', 'policy': 's2_o0', 'crf': 63, 'rate_kbps': 0.005, 'stream_sha256': 'c' * 64}]}
+    out = tmp_path / 'out' / 'publish'
+    out.mkdir(parents=True)
+    (out / 'score.json').write_text(json.dumps(old))
+    old_tar = tmp_path / 'old.tar'
+    with tarfile.open(old_tar, 'w') as tar:
+        tar.add(out, arcname='publish')
+    repair = {'window': 'test', 'repair_manifest': manifest, 'analysis': None, 'ticks': w.TICKS,
+              'points': [{k: v for k, v in point.items() if k != 'path'} for point in selected],
+              'control_errors': {p['name']: {k: 0.0 for k in sc.SERIES} for p in selected[:3]}}
+    (out / 'score.json').write_text(json.dumps(repair))
+    np.savez(out / 'scores.npz', ticks=np.asarray(w.TICKS), **{p['name']: np.full((4, 80), 0.2) for p in selected})
+    repair_tar = tmp_path / 'repair.tar'
+    with tarfile.open(repair_tar, 'w') as tar:
+        tar.add(out, arcname='publish')
+    hybrid_dir = tmp_path / 'hybrid' / 'publish' / 'original'
+    hybrid_dir.mkdir(parents=True)
+    np.savez(hybrid_dir / 'scores.npz', ticks=np.asarray(w.TICKS),
+             **{name: np.full((5, 80), 0.2) for name in sc.SERIES})
+    hybrid_tar = tmp_path / 'hybrid.tar'
+    with tarfile.open(hybrid_tar, 'w') as tar:
+        tar.add(hybrid_dir.parent, arcname='publish')
+    errors = sc.audit_repair_controls(repair_tar, sc.digest(repair_tar), hybrid_tar, sc.digest(hybrid_tar), 'original')
+    assert len(errors) == 3 and all(max(e.values()) == 0 for e in errors.values())
+    control_arrays = {p['name']: np.full((4, 80), 0.2) for p in selected}
+    control_arrays[selected[0]['name']][0, 0] += 0.1
+    np.savez(out / 'scores.npz', ticks=np.asarray(w.TICKS), **control_arrays)
+    with tarfile.open(repair_tar, 'w') as tar:
+        tar.add(out, arcname='publish')
+    with pytest.raises(ValueError, match='raw control errors'):
+        sc.audit_repair_controls(repair_tar, sc.digest(repair_tar), hybrid_tar, sc.digest(hybrid_tar), 'original')
+    np.savez(out / 'scores.npz', ticks=np.asarray(w.TICKS), **{p['name']: np.full((4, 80), 0.2) for p in selected})
+    with tarfile.open(repair_tar, 'w') as tar:
+        tar.add(out, arcname='publish')
+    manifest_path = tmp_path / 'selection.json'
+    manifest_path.write_text(json.dumps(manifest))
+    manifest_sha = sc.digest(manifest_path)
+    staged = {'inputs': [{'name': 'repair_manifest', 'path': str(manifest_path), 'sha256': manifest_sha}]}
+    spec = {'staged_inputs': [{'name': 'repair_manifest', 'sha256': manifest_sha}]}
+    summary = {'inputs': {'repair_manifest': manifest_sha}, 'repair_manifest': manifest}
+    assert sc.repair_manifest_matches_stage(summary, spec, staged)
+    assert not sc.repair_manifest_matches_stage({**summary, 'repair_manifest': {**manifest, 'window': 'wrong'}}, spec, staged)
+    manifest_path.write_text('{}')
+    assert not sc.repair_manifest_matches_stage(summary, spec, staged)
+    target = (0.005 + rows[3]['rate_kbps']) / 2
+    merged = sc.merge_repair_scores(old_tar, sc.digest(old_tar), repair_tar, sc.digest(repair_tar), target)
+    assert len(merged['by_policy']['s2_o0']) == 2  # same CRF, distinct streams and rates
+    assert merged['at_target']['s2_o0'] is not None
+    assert sc.merge_repair_scores(old_tar, sc.digest(old_tar), repair_tar, sc.digest(repair_tar), 100)['at_target']['s2_o0'] is None
+    with pytest.raises(ValueError, match='archive hash mismatch'):
+        sc.merge_repair_scores(old_tar, '0' * 64, repair_tar, sc.digest(repair_tar), target)
+    repair['points'][-1]['stream_sha256'] = 'e' * 64
+    (out / 'score.json').write_text(json.dumps(repair))
+    with tarfile.open(repair_tar, 'w') as tar:
+        tar.add(out, arcname='publish')
+    with pytest.raises(ValueError, match='differs from manifest'):
+        sc.merge_repair_scores(old_tar, sc.digest(old_tar), repair_tar, sc.digest(repair_tar), target)

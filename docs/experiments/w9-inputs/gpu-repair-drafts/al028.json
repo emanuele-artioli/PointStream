@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.w1_score"
+  ],
+  "arguments": [
+    "--windows-file",
+    "{staged:windows}",
+    "--window-state",
+    "{staged:state}",
+    "--window",
+    "al028",
+    "--source",
+    "{staged:al028}",
+    "--masks",
+    "{staged:masks}",
+    "--hybrid",
+    "{staged:hybrid}",
+    "--lpips",
+    "{staged:lpips}",
+    "--dists",
+    "{staged:dists}",
+    "--encode-half",
+    "{staged:encode_half}",
+    "--primary",
+    "kps2",
+    "--judged",
+    "{judged}",
+    "--encode-extra",
+    "{staged:encode_x0}",
+    "{staged:encode_x1}",
+    "--repair-manifest",
+    "{staged:repair_manifest}",
+    "--allow-ada"
+  ],
+  "staged_inputs": [
+    {
+      "name": "windows",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/windows.json",
+      "sha256": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+      "extract": false
+    },
+    {
+      "name": "state",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T171203Z-7d1145b6/full/window-state.json",
+      "sha256": "121dd9e1eb2534b1e24e35ff06a1b015e6f93cbf4fa97257bed88e8373ec0b5e",
+      "extract": false
+    },
+    {
+      "name": "al028",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__028.mp4",
+      "sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+      "extract": false
+    },
+    {
+      "name": "masks",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T193203Z-878a0fb9/full/published.tar",
+      "sha256": "39b061484dee4d2adfac0f17f3cc84ea8c803756e2cbc8e8508d146d889786c7",
+      "extract": false
+    },
+    {
+      "name": "hybrid",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T185245Z-e51a4dec/full/published.tar",
+      "sha256": "cbc26962935b3542b0b7cf77f724010de19323fedd6fe02cb822ec6e43e75837",
+      "extract": false
+    },
+    {
+      "name": "encode_half",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194352Z-c8a65737/full/published.tar",
+      "sha256": "f3de1ea7f0bd74a621ffb79fb2bd97cc622fb1ae05f504e4815c7470bd2540d8",
+      "extract": false
+    },
+    {
+      "name": "lpips",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "extract": false
+    },
+    {
+      "name": "dists",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    },
+    {
+      "name": "encode_x0",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194640Z-cefe70d1/full/published.tar",
+      "sha256": "4bae9b44296be1132c389d21e4ba49272bdb5f16b57be5179261bac7aec8037a",
+      "extract": false
+    },
+    {
+      "name": "encode_x1",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194520Z-f1e8f664/full/published.tar",
+      "sha256": "970de450d9131bd8bd7ded4e10b8a6951918dc9da838746fe0f95efe4037b77f",
+      "extract": false
+    },
+    {
+      "name": "repair_manifest",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w9-repair-20261031T2120Z/manifests/al028.json",
+      "sha256": "720dce44eb02311d0b4b5c16658fbefc7475c9351bc3878d768c94e86a39e667",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/windows.json",
+      "sha256": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T171203Z-7d1145b6/full/window-state.json",
+      "sha256": "121dd9e1eb2534b1e24e35ff06a1b015e6f93cbf4fa97257bed88e8373ec0b5e"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__028.mp4",
+      "sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T193203Z-878a0fb9/full/published.tar",
+      "sha256": "39b061484dee4d2adfac0f17f3cc84ea8c803756e2cbc8e8508d146d889786c7"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T185245Z-e51a4dec/full/published.tar",
+      "sha256": "cbc26962935b3542b0b7cf77f724010de19323fedd6fe02cb822ec6e43e75837"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194352Z-c8a65737/full/published.tar",
+      "sha256": "f3de1ea7f0bd74a621ffb79fb2bd97cc622fb1ae05f504e4815c7470bd2540d8"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194640Z-cefe70d1/full/published.tar",
+      "sha256": "4bae9b44296be1132c389d21e4ba49272bdb5f16b57be5179261bac7aec8037a"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194520Z-f1e8f664/full/published.tar",
+      "sha256": "970de450d9131bd8bd7ded4e10b8a6951918dc9da838746fe0f95efe4037b77f"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w9-repair-20261031T2120Z/manifests/al028.json",
+      "sha256": "720dce44eb02311d0b4b5c16658fbefc7475c9351bc3878d768c94e86a39e667"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [
+    "ffmpeg"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.w1_score",
+    "--validate"
+  ],
+  "deadline": "2026-10-31T22:30:00+00:00",
+  "verify_staged_inputs": true,
+  "stall_seconds": 900.0,
+  "contention": {
+    "policy": "continue",
+    "basis": "Deterministic scoring of saved streams does not depend on foreign workload timing.",
+    "resume_attempts": 0
+  },
+  "device": "gpu",
+  "hosts": [
+    "gpu2",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX A6000",
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 8000,
+  "cpu_threads": 4,
+  "local_storage_gib": 30,
+  "smoke": {
+    "seconds": 120,
+    "representative_basis": "Three original ticks for each exact selected saved upper trial and all three original CRF63 controls; source and mask identities, decode SHA and four metrics."
+  },
+  "full": {
+    "seconds": 600
+  },
+  "validator_seconds": 60,
+  "budget_seconds": 900,
+  "scale": {
+    "judged": {
+      "smoke": 3,
+      "full": 0
+    }
+  },
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Deterministic scoring of saved streams does not depend on foreign workload timing.",
+    "margin_mib": 8192
+  }
+}

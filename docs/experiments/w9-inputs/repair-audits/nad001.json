@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "archive_sha256": "16f56faa178d459c18a05344489575a688a1ad8f55790f325b1cf4012c1cd1f0",
+  "spec_sha256": "7d3a52d28a0f51551a7ff0514ae17cc422c6b82510226366e73d816470802f2b",
+  "manifest_sha256": "dcb8932a764370b2fe160fbdb8249f8d713becc96667ce56cf3aee36d460d4bc",
+  "raw_control_errors": {
+    "control_s8_crf63": {
+      "full_lpips": 0.0,
+      "foreground_lpips": 0.0,
+      "full_dists": 5.7220458984375e-06,
+      "foreground_dists": 2.4020671844482422e-05
+    },
+    "control_s4_crf63": {
+      "full_lpips": 0.0,
+      "foreground_lpips": 0.0,
+      "full_dists": 6.556510925292969e-06,
+      "foreground_dists": 2.6464462280273438e-05
+    },
+    "control_s2_crf63": {
+      "full_lpips": 0.0,
+      "foreground_lpips": 0.0,
+      "full_dists": 3.933906555175781e-06,
+      "foreground_dists": 2.3126602172851562e-05
+    }
+  },
+  "checks": {
+    "ticks": true,
+    "cuda_qualified": true,
+    "tools_pinned": true,
+    "inputs": true,
+    "controls_reproduced": true,
+    "memory": true,
+    "rates_positive": true,
+    "scores_complete": true,
+    "roi_points_present": true,
+    "repair_manifest_pinned": true,
+    "repair_no_decision": true,
+    "repair_exact_selection": true
+  }
+}

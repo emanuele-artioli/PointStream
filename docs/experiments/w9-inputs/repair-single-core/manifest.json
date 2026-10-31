@@ -1,0 +1,313 @@
+{
+  "submission_ready": false,
+  "reason": "Pending full queue preflight and pilot; fixed four-probe budget requires measured scale confirmation before promotion",
+  "budget": "5400 CPU seconds total including up to 100 CPU seconds reserved for input preparation; individual requests <=600 seconds, serialize and reserve prior to submitting",
+  "candidates": [
+    {
+      "window": "al028",
+      "policy": "s2_o0",
+      "target_kbps": 19.239833333333333,
+      "candidate_file": "al028-s2_o0.json",
+      "spec_sha256": "6bd1ee35121ee3e82764ce1484b3b92d9ddfc826235096d7caa94c97e566d40b",
+      "source_draft_sha256": "522f739bf346319a156bd0cc8b701c4317db172d634c656effdaab7d97ee45dc",
+      "staged_inputs": [
+        {
+          "name": "windows",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/windows.json",
+          "sha256": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+          "extract": false
+        },
+        {
+          "name": "state",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T171203Z-7d1145b6/full/window-state.json",
+          "sha256": "121dd9e1eb2534b1e24e35ff06a1b015e6f93cbf4fa97257bed88e8373ec0b5e",
+          "extract": false
+        },
+        {
+          "name": "al028",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__028.mp4",
+          "sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+          "extract": false
+        },
+        {
+          "name": "transport",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T150852Z-d4e7cd41/full/published.tar",
+          "sha256": "8b0871ab633edcf4c77cb810cf2d3617a2a9593f0aa51af451c2a2ec21e30607",
+          "extract": false
+        }
+      ]
+    },
+    {
+      "window": "al028",
+      "policy": "s4_o0",
+      "target_kbps": 19.239833333333333,
+      "candidate_file": "al028-s4_o0.json",
+      "spec_sha256": "8fdb19d1c692a7eda72352cf51e78eea20d985293e0d445cfc1f7271ca4958c9",
+      "source_draft_sha256": "d36bfcd70d183b806364b2ad22731da4d2f0fa4738f768e9248ef23b61d44855",
+      "staged_inputs": [
+        {
+          "name": "windows",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/windows.json",
+          "sha256": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+          "extract": false
+        },
+        {
+          "name": "state",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T171203Z-7d1145b6/full/window-state.json",
+          "sha256": "121dd9e1eb2534b1e24e35ff06a1b015e6f93cbf4fa97257bed88e8373ec0b5e",
+          "extract": false
+        },
+        {
+          "name": "al028",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__028.mp4",
+          "sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+          "extract": false
+        },
+        {
+          "name": "transport",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T150852Z-d4e7cd41/full/published.tar",
+          "sha256": "8b0871ab633edcf4c77cb810cf2d3617a2a9593f0aa51af451c2a2ec21e30607",
+          "extract": false
+        }
+      ]
+    },
+    {
+      "window": "al028",
+      "policy": "s2_o20",
+      "target_kbps": 19.239833333333333,
+      "candidate_file": "al028-s2_o20.json",
+      "spec_sha256": "10a7317b4f16b6fce818380673e87d7e105733eab2dd5d88831882aeb6670501",
+      "source_draft_sha256": "28541929577dc79b0de29db87cfc160acd0d686e8371101940872ad13dc982f7",
+      "staged_inputs": [
+        {
+          "name": "windows",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/windows.json",
+          "sha256": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+          "extract": false
+        },
+        {
+          "name": "state",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T171203Z-7d1145b6/full/window-state.json",
+          "sha256": "121dd9e1eb2534b1e24e35ff06a1b015e6f93cbf4fa97257bed88e8373ec0b5e",
+          "extract": false
+        },
+        {
+          "name": "al028",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__028.mp4",
+          "sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+          "extract": false
+        },
+        {
+          "name": "transport",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T150852Z-d4e7cd41/full/published.tar",
+          "sha256": "8b0871ab633edcf4c77cb810cf2d3617a2a9593f0aa51af451c2a2ec21e30607",
+          "extract": false
+        }
+      ]
+    },
+    {
+      "window": "al034",
+      "policy": "s4_o0",
+      "target_kbps": 18.654973333333334,
+      "candidate_file": "al034-s4_o0.json",
+      "spec_sha256": "f8692c22888b150059441ebdb4d1bafcc45b9c39611e8c2bda66afd72e6d9549",
+      "source_draft_sha256": "c1f58186bd293ba6ce54685f938763822fed1f197046a91d9b5d9ba73473eef7",
+      "staged_inputs": [
+        {
+          "name": "windows",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/windows.json",
+          "sha256": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+          "extract": false
+        },
+        {
+          "name": "state",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T101051Z-1a1f3d4e/full/window-state.json",
+          "sha256": "0ae2202aeb16825ef1ab06f81927d42ff8ba6ee5d930d2694694ce04266df4b8",
+          "extract": false
+        },
+        {
+          "name": "al034",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__034.mp4",
+          "sha256": "7db0c143cd416ad17b4bda4eaa191d51da197eccc1143e9eb402f8bb2a7f0ee6",
+          "extract": false
+        },
+        {
+          "name": "transport",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T091524Z-7d2f62ea/full/published.tar",
+          "sha256": "70cfa5b37cbb579be788202148cf3fa88fafca0c45252ac02b91fd25f44fa0e2",
+          "extract": false
+        }
+      ]
+    },
+    {
+      "window": "al043",
+      "policy": "s2_o0",
+      "target_kbps": 18.858040000000003,
+      "candidate_file": "al043-s2_o0.json",
+      "spec_sha256": "987e18b433b71cbec4eb63c3ed7f5f8313546615f9b1b2b5ef3d62b4fefc2a78",
+      "source_draft_sha256": "4f7742c3a08eee3048e320d6a4335be9f6991f5bb84fbbd333be2d41db44fca5",
+      "staged_inputs": [
+        {
+          "name": "windows",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/windows.json",
+          "sha256": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+          "extract": false
+        },
+        {
+          "name": "state",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T101100Z-deb5d1ea/full/window-state.json",
+          "sha256": "96f8eee7bec42558fc1711a6f0ae03a85bffd0c1fd89235e291325455c5b9afb",
+          "extract": false
+        },
+        {
+          "name": "al043",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier1-20261030/sources/alcaraz_hurkacz__043.mp4",
+          "sha256": "847cb8272134bd31a5447ff3cce02b28a906fae44559b3e0a58661d8171b6c16",
+          "extract": false
+        },
+        {
+          "name": "transport",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T091524Z-7d2f62ea/full/published.tar",
+          "sha256": "70cfa5b37cbb579be788202148cf3fa88fafca0c45252ac02b91fd25f44fa0e2",
+          "extract": false
+        }
+      ]
+    },
+    {
+      "window": "nad000",
+      "policy": "s4_o0",
+      "target_kbps": 44.618157777777775,
+      "candidate_file": "nad000-s4_o0.json",
+      "spec_sha256": "61d6f10f7a56ea086821929bc822a237ada9b5e3c4f8528025b44f911fb594a0",
+      "source_draft_sha256": "3f3f96039da29326bdaa6d2afddbdba8479ec946bc29115bdb2d762efd110944",
+      "staged_inputs": [
+        {
+          "name": "windows",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+          "sha256": "540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed",
+          "extract": false
+        },
+        {
+          "name": "state",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172501Z-a37a90cd/full/window-state.json",
+          "sha256": "f2b4131e1231fe654840aa41465a424d9f9337957ee5cb50f1a432ca57c6ca30",
+          "extract": false
+        },
+        {
+          "name": "nad000",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+          "sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+          "extract": false
+        },
+        {
+          "name": "transport",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T171359Z-aba3845f/full/published.tar",
+          "sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+          "extract": false
+        }
+      ]
+    },
+    {
+      "window": "nad001",
+      "policy": "s2_o0",
+      "target_kbps": 44.56831777777778,
+      "candidate_file": "nad001-s2_o0.json",
+      "spec_sha256": "c9befbbb2cb4b933df95de32a121edc8e3aec2446d3b50bfe0559b17906aea2a",
+      "source_draft_sha256": "25cf642a695cbf26722bf691f0c85854102497daf076c2c814148b7ac8f5b044",
+      "staged_inputs": [
+        {
+          "name": "windows",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+          "sha256": "540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed",
+          "extract": false
+        },
+        {
+          "name": "state",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172501Z-a37a90cd/full/window-state.json",
+          "sha256": "f2b4131e1231fe654840aa41465a424d9f9337957ee5cb50f1a432ca57c6ca30",
+          "extract": false
+        },
+        {
+          "name": "nad001",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__001.mp4",
+          "sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d",
+          "extract": false
+        },
+        {
+          "name": "transport",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T171359Z-aba3845f/full/published.tar",
+          "sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+          "extract": false
+        }
+      ]
+    },
+    {
+      "window": "nad001",
+      "policy": "s4_o0",
+      "target_kbps": 44.56831777777778,
+      "candidate_file": "nad001-s4_o0.json",
+      "spec_sha256": "32bc4eb3512348a2aba9de3b77cbbcce77e0047f7189f3bbd5b78066ca285ff8",
+      "source_draft_sha256": "d55503519b959a26cfa39683c607340f19233c76fbc52617ffc538877093fe4f",
+      "staged_inputs": [
+        {
+          "name": "windows",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+          "sha256": "540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed",
+          "extract": false
+        },
+        {
+          "name": "state",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172501Z-a37a90cd/full/window-state.json",
+          "sha256": "f2b4131e1231fe654840aa41465a424d9f9337957ee5cb50f1a432ca57c6ca30",
+          "extract": false
+        },
+        {
+          "name": "nad001",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__001.mp4",
+          "sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d",
+          "extract": false
+        },
+        {
+          "name": "transport",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T171359Z-aba3845f/full/published.tar",
+          "sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+          "extract": false
+        }
+      ]
+    },
+    {
+      "window": "nad002",
+      "policy": "s2_o0",
+      "target_kbps": 51.21346444444445,
+      "candidate_file": "nad002-s2_o0.json",
+      "spec_sha256": "30d1df1d8ab9a8b13587c499f9ddc395bbcaa30eb9c666251c80fad47b3e4c62",
+      "source_draft_sha256": "ba06bd4c67d10a99d5999cfe82f45448933fed8a1576c401c3443078c228d737",
+      "staged_inputs": [
+        {
+          "name": "windows",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+          "sha256": "540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed",
+          "extract": false
+        },
+        {
+          "name": "state",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172542Z-bfdc4461/full/window-state.json",
+          "sha256": "85c7b4da885eb232deb4e96fcd43a910c180e4aa675dac443cd78058e282c058",
+          "extract": false
+        },
+        {
+          "name": "nad002",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__002.mp4",
+          "sha256": "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a",
+          "extract": false
+        },
+        {
+          "name": "transport",
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T171359Z-aba3845f/full/published.tar",
+          "sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+          "extract": false
+        }
+      ]
+    }
+  ]
+}

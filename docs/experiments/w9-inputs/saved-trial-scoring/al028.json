@@ -1,0 +1,79 @@
+{
+  "window": "al028",
+  "points": [
+    {
+      "policy": "s2_o0",
+      "scale": 2,
+      "offset": 0,
+      "crf": 65,
+      "rate_kbps": 20.986666666666668,
+      "bytes": 25184,
+      "stream_sha256": "a2495d3c8557931e6e2fec7d4500f264229b6ee5499363c53fbe4762dd777614",
+      "decoded_sha256": "ee213b2e6c4c131bf4e82534d7a655621a13cd801efe30219637ecefa43ea4a6",
+      "archive_sha256": "f3de1ea7f0bd74a621ffb79fb2bd97cc622fb1ae05f504e4815c7470bd2540d8",
+      "member": "publish/streams/s2_o0_crf65.ivf"
+    },
+    {
+      "policy": "s4_o0",
+      "scale": 4,
+      "offset": 0,
+      "crf": 60,
+      "rate_kbps": 20.625,
+      "bytes": 24750,
+      "stream_sha256": "3950eecf0f3c8939871f230d35f168b431c8a63073b7548039819169b07dddc6",
+      "decoded_sha256": "5ec818e509ec43713bf0f3b4dfc26befd1affff03af7c64f2ca737d33f9ac75c",
+      "archive_sha256": "970de450d9131bd8bd7ded4e10b8a6951918dc9da838746fe0f95efe4037b77f",
+      "member": "publish/streams/s4_o0_crf60.ivf"
+    },
+    {
+      "policy": "s2_o20",
+      "scale": 2,
+      "offset": -20,
+      "crf": 67,
+      "rate_kbps": 19.74,
+      "bytes": 23688,
+      "stream_sha256": "d404c706c405eab7ea23d721f665e375bf681291a59bc8a6190216b49e55844c",
+      "decoded_sha256": "9a0736987f21488f966391b784baa68afb7ce2e7f3726bc8e028768ad2e94302",
+      "archive_sha256": "4bae9b44296be1132c389d21e4ba49272bdb5f16b57be5179261bac7aec8037a",
+      "member": "publish/streams/s2_o20_crf67.ivf"
+    }
+  ],
+  "controls": [
+    {
+      "policy": "control_s8",
+      "scale": 8,
+      "offset": 0,
+      "crf": 63,
+      "rate_kbps": 9.338333333333335,
+      "bytes": 11206,
+      "stream_sha256": "c6826121aaf4f5d288b70638a78a06a98de55a5b77f3b5d906b2ec538ffe73b4",
+      "decoded_sha256": "4a3f6a5426c105b7c42f207540789f40aa712f19f18bdfb6d1ecafcc525e54fb",
+      "archive_sha256": "f3de1ea7f0bd74a621ffb79fb2bd97cc622fb1ae05f504e4815c7470bd2540d8",
+      "member": "publish/streams/control_s8_crf63.ivf"
+    },
+    {
+      "policy": "control_s4",
+      "scale": 4,
+      "offset": 0,
+      "crf": 63,
+      "rate_kbps": 14.120833333333334,
+      "bytes": 16945,
+      "stream_sha256": "d8a5a02003872ff1890bba80a0bc453ecc81cf354ba7acdf35b377eb08c251ea",
+      "decoded_sha256": "1ff3542dc2034a3ea4b7b519e5dd2f0041d006bd5e996668e9a0fac4e746cc30",
+      "archive_sha256": "f3de1ea7f0bd74a621ffb79fb2bd97cc622fb1ae05f504e4815c7470bd2540d8",
+      "member": "publish/streams/control_s4_crf63.ivf"
+    },
+    {
+      "policy": "control_s2",
+      "scale": 2,
+      "offset": 0,
+      "crf": 63,
+      "rate_kbps": 27.230833333333337,
+      "bytes": 32677,
+      "stream_sha256": "b206613e503f525ec28f6e277d176ea71eff294f31eb898adecac658433da843",
+      "decoded_sha256": "bebf7d41b70351b0df09ab658fdcf5e68b60fe8e197ae57f10bfd7826e970bb6",
+      "archive_sha256": "f3de1ea7f0bd74a621ffb79fb2bd97cc622fb1ae05f504e4815c7470bd2540d8",
+      "member": "publish/streams/control_s2_crf63.ivf"
+    }
+  ]
+}

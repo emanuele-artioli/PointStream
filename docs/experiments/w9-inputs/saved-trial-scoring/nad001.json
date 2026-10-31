@@ -1,0 +1,67 @@
+{
+  "window": "nad001",
+  "points": [
+    {
+      "policy": "s2_o0",
+      "scale": 2,
+      "offset": 0,
+      "crf": 67,
+      "rate_kbps": 48.83166666666667,
+      "bytes": 29299,
+      "stream_sha256": "6775f5086072fa4f4cca95851ef4c7a96efbc3d73cafd4907c5d68d09ea175ff",
+      "decoded_sha256": "179fa800ec0e1a5dea4d65cbf47e6ffb8fdb737e3c154b13e67345aff670af1f",
+      "archive_sha256": "90821602470b60204cb93d7ff111baf9e50cdfcee91ea1fe1f3be1597a6c315c",
+      "member": "publish/streams/s2_o0_crf67.ivf"
+    },
+    {
+      "policy": "s4_o0",
+      "scale": 4,
+      "offset": 0,
+      "crf": 61,
+      "rate_kbps": 49.94666666666667,
+      "bytes": 29968,
+      "stream_sha256": "f98e98557dce339f8f585aeff0fab9762df5a4783ec9d6b75c4df9ba30e3e980",
+      "decoded_sha256": "d06b85086cf28054ba0e83a1619ba29ae98b00da60cb05febbe0b41f158da2b6",
+      "archive_sha256": "4a6e35c2766c5c802cf3e596def616363ae4b6d953436714ef7ea26cc63c7ea4",
+      "member": "publish/streams/s4_o0_crf61.ivf"
+    }
+  ],
+  "controls": [
+    {
+      "policy": "control_s8",
+      "scale": 8,
+      "offset": 0,
+      "crf": 63,
+      "rate_kbps": 21.0,
+      "bytes": 12600,
+      "stream_sha256": "a6d9899474083776029ede804eda7ee32cf6c2f0547e45755c027c3afafd52ff",
+      "decoded_sha256": "6086b1bbf2c4af3a096b8019679fb92d916c4b76d52c4043e8cba61684e833eb",
+      "archive_sha256": "90821602470b60204cb93d7ff111baf9e50cdfcee91ea1fe1f3be1597a6c315c",
+      "member": "publish/streams/control_s8_crf63.ivf"
+    },
+    {
+      "policy": "control_s4",
+      "scale": 4,
+      "offset": 0,
+      "crf": 63,
+      "rate_kbps": 36.94666666666667,
+      "bytes": 22168,
+      "stream_sha256": "661d06b67f0d7dc3c2c9682fbc5fa766d0d4e75a4c54b7383d701c0d32324f1d",
+      "decoded_sha256": "53d5ecd7b2fd783e1fe7dd86f8c78f96acee8a17349628094fd95d0e45816331",
+      "archive_sha256": "90821602470b60204cb93d7ff111baf9e50cdfcee91ea1fe1f3be1597a6c315c",
+      "member": "publish/streams/control_s4_crf63.ivf"
+    },
+    {
+      "policy": "control_s2",
+      "scale": 2,
+      "offset": 0,
+      "crf": 63,
+      "rate_kbps": 80.27333333333334,
+      "bytes": 48164,
+      "stream_sha256": "34b49da11784c05c86ee797a328ce7cff62b19f57662beee1972a2fb9755bb2c",
+      "decoded_sha256": "f09da336867e5e05957eb7cdae9b107a1c006005b53e9cd8278da46046f7efb3",
+      "archive_sha256": "90821602470b60204cb93d7ff111baf9e50cdfcee91ea1fe1f3be1597a6c315c",
+      "member": "publish/streams/control_s2_crf63.ivf"
+    }
+  ]
+}

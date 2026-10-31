@@ -1,0 +1,25 @@
+{
+  "gpu_execution_revision": "9a74db87",
+  "python": "3.12.7",
+  "numpy": "2.0.0",
+  "scipy": "1.18.1",
+  "analysis_source_sha256": {
+    "experiments/tennis/w7_analysis.py": "b7f4a888fd4cd59011e0c7d1f9ce224ab3988ca0e43b9e2925963f88a2c5066b",
+    "experiments/tennis/w1_score.py": "26f056f05fba7a8132f57c7b3c4fd9a0e67555f7985d617255916499e9df7743",
+    "experiments/tennis/w9_repair_w7.py": "37652a35665cf19d767d380e942a6eccec7bf559f9ca4edac3c36f40c98fd8d6",
+    "experiments/tennis/w9_repair_intervals.py": "903664de2144423f6982a226eaa25a1bd7c2ad23ae1f1e479a5decc14b59852f",
+    "experiments/tennis/w9_saved_intervals.py": "2f92451fa2c2d0fdaed97a4ebbaada287d48cb83929b5596f8dca733b4077913",
+    "experiments/tennis/w9_tier_intervals.py": "c005a58031231ee15c6c3d9ca830cb7cc6d0a33c7691e0f27a729f4ff4ceea09"
+  },
+  "output_sha256": {
+    "repair-accepted.json": "8fa9109e9a18e23d1d50600c468aa3cdfdfe5d58c2f622a8bc6adb680a74dea6",
+    "w7-repaired-2h.json": "5245d83df6f8ee16ade28174f6f3c46a94b42ae4d32520c2165fa602e83e9d86",
+    "w7-repaired-all-assets-intervals.json": "6d00095001d2e149db33b714cd523df2a6e605ef2bea69cae142dfd47a214c37"
+  },
+  "independent_root_checks": [
+    "six published archive and full-audit hash pairs verified",
+    "two-hour means and t intervals recomputed directly",
+    "both full derived JSONs recomputed from verified local original/repair archives with exact structural equality"
+  ],
+  "scope": "modeled research rates and original W7 confidence rule; no complete-wire or long-stream validation"
+}

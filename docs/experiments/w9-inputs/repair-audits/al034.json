@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "archive_sha256": "5ba7375751b54a3a07d5991f3594104aa472e2bf491b7674bf9e5ce4f20b0a4c",
+  "spec_sha256": "7fb598650a2b1ebadf1202249921f2b5abc9a81150970e9a7bdb889701b80707",
+  "manifest_sha256": "454d63000a8c6de40e6df97117d5dac0174cef4e83f4b39361d29748aaf5a363",
+  "raw_control_errors": {
+    "control_s8_crf63": {
+      "full_lpips": 6.41095196759478e-05,
+      "foreground_lpips": 0.00010868009782838417,
+      "full_dists": 3.522634506225586e-05,
+      "foreground_dists": 2.9802322387695312e-05
+    },
+    "control_s4_crf63": {
+      "full_lpips": 7.565345293208958e-05,
+      "foreground_lpips": 6.531777039087139e-05,
+      "full_dists": 3.504753112792969e-05,
+      "foreground_dists": 3.635883331298828e-05
+    },
+    "control_s2_crf63": {
+      "full_lpips": 3.8384331597196564e-05,
+      "foreground_lpips": 8.935546874999645e-05,
+      "full_dists": 4.1425228118896484e-05,
+      "foreground_dists": 2.7120113372802734e-05
+    }
+  },
+  "checks": {
+    "ticks": true,
+    "cuda_qualified": true,
+    "tools_pinned": true,
+    "inputs": true,
+    "controls_reproduced": true,
+    "memory": true,
+    "rates_positive": true,
+    "scores_complete": true,
+    "roi_points_present": true,
+    "repair_manifest_pinned": true,
+    "repair_no_decision": true,
+    "repair_exact_selection": true
+  }
+}

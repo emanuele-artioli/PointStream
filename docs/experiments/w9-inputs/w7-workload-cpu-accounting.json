@@ -1,0 +1,138 @@
+{
+  "scope": "CPU consumed by experiment workload processes including GPU scoring subprocesses, validator children, and separately budgeted CPU work; excludes long-lived fleet manager/worker infrastructure and shared cache staging per parent clarification",
+  "source_revision": "9a74db8744690c5998b97c38a989fb042f6f81f5",
+  "method": "At each phase completion inbox.campaign saves resource.getrusage(RUSAGE_CHILDREN), which is cumulative across children waited by the same campaign process. The full snapshot follows the smoke validator, so includes it. Summing smoke and full snapshots intentionally double-counts smoke (and any prior waited staging children), yielding a conservative bound on the recorded child usage. Separate fresh-process full audits are included in the standalone 641-second bound. No full validator runs automatically within the fleet full stage.",
+  "standalone_and_audits_bound_seconds": 641,
+  "gpu_companion_recorded_smoke_plus_full_seconds": 1282.600081,
+  "gpu_companion_ceiling_seconds": 1283,
+  "combined_bound_seconds": 1924,
+  "budget_seconds": 5400,
+  "jobs": [
+    {
+      "window": "nad000",
+      "job_id": "20261031T214253Z-429aabab",
+      "phases": {
+        "smoke": {
+          "job_artifact": "smoke/execution.json",
+          "sha256": "aa942fc550a2b6ec250429dfb34bca5f5c05272003470842a91123e18d9e5ed7",
+          "user_seconds": 16.435656,
+          "system_seconds": 6.443289,
+          "sum_seconds": 22.878945
+        },
+        "full": {
+          "job_artifact": "full/execution.json",
+          "sha256": "1d32e420bfc2c9685a0bd7a501108acf8cb72265f29077df913819b2171c8d0b",
+          "user_seconds": 163.13071,
+          "system_seconds": 56.764677,
+          "sum_seconds": 219.895387
+        }
+      },
+      "sum_smoke_and_full_seconds": 242.77433200000002
+    },
+    {
+      "window": "al028",
+      "job_id": "20261031T215041Z-2f1dee96",
+      "phases": {
+        "smoke": {
+          "job_artifact": "smoke/execution.json",
+          "sha256": "d2e7b71b4f1867bd483adbcee785985199e5741c6f0b66af2ee6172f50754021",
+          "user_seconds": 16.074378,
+          "system_seconds": 3.619234,
+          "sum_seconds": 19.693611999999998
+        },
+        "full": {
+          "job_artifact": "full/execution.json",
+          "sha256": "c23bb69bd363670a0e03488932022709db01b654559763e884ca5505d40a3844",
+          "user_seconds": 188.370491,
+          "system_seconds": 12.949572,
+          "sum_seconds": 201.32006299999998
+        }
+      },
+      "sum_smoke_and_full_seconds": 221.01367499999998
+    },
+    {
+      "window": "al034",
+      "job_id": "20261031T215039Z-d1695e8d",
+      "phases": {
+        "smoke": {
+          "job_artifact": "smoke/execution.json",
+          "sha256": "2890a8d9827936d737986ed04aa18e20ac3cda043fa6946903204eab644461aa",
+          "user_seconds": 15.399836,
+          "system_seconds": 3.440793,
+          "sum_seconds": 18.840629
+        },
+        "full": {
+          "job_artifact": "full/execution.json",
+          "sha256": "cb7a646a73f4973fc5186921d9513d15be84ef78508a0faa3646b352b244f256",
+          "user_seconds": 158.507866,
+          "system_seconds": 10.471734,
+          "sum_seconds": 168.9796
+        }
+      },
+      "sum_smoke_and_full_seconds": 187.820229
+    },
+    {
+      "window": "al043",
+      "job_id": "20261031T215041Z-3ab89852",
+      "phases": {
+        "smoke": {
+          "job_artifact": "smoke/execution.json",
+          "sha256": "d4c3dd587ba339ac23dc97080652aa2128cdc84714d7784b3454dbca00e91fdb",
+          "user_seconds": 14.163828,
+          "system_seconds": 3.369282,
+          "sum_seconds": 17.53311
+        },
+        "full": {
+          "job_artifact": "full/execution.json",
+          "sha256": "962ba071779a578f636087753fd3e4f081e7797418acfa722a866a535e7008f9",
+          "user_seconds": 157.201596,
+          "system_seconds": 10.474642,
+          "sum_seconds": 167.67623799999998
+        }
+      },
+      "sum_smoke_and_full_seconds": 185.20934799999998
+    },
+    {
+      "window": "nad001",
+      "job_id": "20261031T215041Z-74e3424a",
+      "phases": {
+        "smoke": {
+          "job_artifact": "smoke/execution.json",
+          "sha256": "b8a4cb7d2146f315920dbd4b1d00d3c4e2cdb27f1a64430880ee3d4798680051",
+          "user_seconds": 15.643557,
+          "system_seconds": 3.392812,
+          "sum_seconds": 19.036369
+        },
+        "full": {
+          "job_artifact": "full/execution.json",
+          "sha256": "ae22d376826aa5b92fec7fb1bb00fba463effc02e71f2228db2bfa3f1e49ec3b",
+          "user_seconds": 172.57702,
+          "system_seconds": 11.387887,
+          "sum_seconds": 183.964907
+        }
+      },
+      "sum_smoke_and_full_seconds": 203.00127600000002
+    },
+    {
+      "window": "nad002",
+      "job_id": "20261031T215042Z-994d0829",
+      "phases": {
+        "smoke": {
+          "job_artifact": "smoke/execution.json",
+          "sha256": "245a57f7abaa31a6939e597795cf6fb6b02fdc20f3557d2e17e76908331b2614",
+          "user_seconds": 17.82473,
+          "system_seconds": 6.686023,
+          "sum_seconds": 24.510752999999998
+        },
+        "full": {
+          "job_artifact": "full/execution.json",
+          "sha256": "7f0683e878c84c316f14baaef9294191e6e0866e881bf60a776abe64b9cf99ea",
+          "user_seconds": 165.96705,
+          "system_seconds": 52.303418,
+          "sum_seconds": 218.270468
+        }
+      },
+      "sum_smoke_and_full_seconds": 242.781221
+    }
+  ]
+}
