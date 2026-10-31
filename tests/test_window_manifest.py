@@ -127,3 +127,12 @@ def test_w3_manifest_mode_leaves_the_frozen_sources_alone_until_activated():
         w3.INPUTS.update(saved_inputs)
     assert list(w3.SOURCES) == ['al', 'med'] and w5_dcvc.points()[0]['crf'] == 15
     assert w5_dcvc.points([(10, 5.0, .1, .2, .3, .4)])[0]['rate_kbps'] == 5.0
+
+
+def test_new_match_can_be_prepared_before_its_adapter_is_fitted(tmp_path):
+    w = wm.WindowSpec('nad001', 'nadal_kyrgios', '001', 0, 240, 50, 'a' * 64, 'b' * 64, tier='w7-tier2')
+    path = tmp_path / 'windows.json'
+    wm.dump([w], path)
+    assert wm.load(path) == [w]
+    with pytest.raises(KeyError):
+        _ = w.adapter

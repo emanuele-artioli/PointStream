@@ -410,3 +410,11 @@ def test_batch_scores_only_the_rules_svt_anchors(tmp_path):
     args = out['arguments']
     assert args[args.index('--offsets') + 1:args.index('--offsets') + 2] == ['-20'] and '-40' not in args
     assert out['scale']['max_encodes']['full'] == 6
+
+
+def test_w7_data_directory_can_be_isolated_for_tier2():
+    assert sp.data_dir(sp.DATA + '/tennis/w7-tier2-20261031/fit').endswith('/w7-tier2-20261031/fit')
+    with pytest.raises(ValueError):
+        sp.data_dir(sp.DATA + '/tennis/../other')
+    with pytest.raises(ValueError):
+        sp.data_dir('/tmp/w7')
