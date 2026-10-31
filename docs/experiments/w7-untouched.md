@@ -728,3 +728,12 @@ wrote docs/experiments/w7-specs/w7-tier1-result.json
   Medvedev cluster alone does not pass. Tier 2 (a match the base never saw) is the test of generalisation beyond this scope.
 - Budget: Tier 1 used about 25,718 of 30,600 GPU-s (8.5 GPU-h card, raised by the user 2026-10-31). The DCVC decode nondeterminism
   (intermittent, same bitstream) is a recorded codec finding; every accepted DCVC point passed the two-process decode check.
+
+### 2026-10-31 — W7 Tier 2: budget and frozen choices (lead, before any Tier 2 extraction)
+- Budget (user, 2026-10-31): Tier 2 rises from ≤3 to **5 GPU-h (18,000 GPU-s)**, adapter fit and failed smokes included. Reason: Tier 1
+  measured about 1.1 GPU-h per window including failures, so three windows alone exceed 3 GPU-h; with n = 2 the rule's t-interval
+  (t = 12.7) could not pass, so cutting a window is not an option.
+- Frozen choices, recorded in the [Tier 2 card](../cards/w7-tier2.md): three evaluation windows by the seeded draw over second-half shots
+  (as the Tier 2 decisions entry); adapter fitted with the Al adapter's step-5 recipe on three first-half fit clips drawn with the same
+  seed; pipeline and anchors exactly as Tier 1 (W1 families plain half, plain quarter, half +20 outside R; DCVC with one rerun allowed per
+  window); a CPU-stage GPU projection gates the GPU stage at 18,000 s. The rule and its narrowing are unchanged (rule entry).
