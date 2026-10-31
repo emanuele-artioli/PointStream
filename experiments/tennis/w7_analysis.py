@@ -50,7 +50,8 @@ from experiments.tennis import w1_roi as w
 from experiments.tennis import w5_dcvc
 
 WINDOWS = ('al028', 'al034', 'al043', 'med000', 'med024', 'med019')
-MATCHES = {'al': 'alcaraz_hurkacz', 'med': 'medvedev_struff'}
+MATCHES = {'al': 'alcaraz_hurkacz', 'med': 'medvedev_struff', 'nad': 'nadal_kyrgios'}
+TIER2_WINDOWS = ('nad000', 'nad001', 'nad002')
 ANCHORS = ('s2_o0', 's4_o0', 's2_o20', 'dcvc')
 SVT = ('s2_o0', 's4_o0', 's2_o20')
 METRICS = w.METRICS
@@ -128,14 +129,15 @@ def read_json(path: Path, kind: str) -> Any:
 
 
 def window_prefix(name: str) -> str:
-    m = re.fullmatch(r'(al|med)(\d{3})', name)
+    m = re.fullmatch(r'(al|med|nad)(\d{3})', name)
     if m is None:
         raise ValueError(f'unknown window name: {name}')
     return f'{MATCHES[m.group(1)]}/{m.group(2)}@'
 
 
 def match_of(name: str) -> str:
-    return 'al' if name.startswith('al') else 'med'
+    window_prefix(name)
+    return next(key for key in MATCHES if name.startswith(key))
 
 
 def hybrid_from_judge(quality: dict[str, Any], name: str) -> dict[str, Any]:
@@ -304,6 +306,11 @@ def analyse(inputs: dict[str, dict[str, list[Path]]], checks: dict[Path, str | N
             cache[(path, kind)] = read_json(path, kind)
         return cache[(path, kind)]
 
+    tier2 = any(name.startswith('nad') for name in inputs)
+    if tier2 and any(not name.startswith('nad') for name in inputs):
+        raise ValueError('Tier 1 and Tier 2 windows cannot be pooled')
+    expected = TIER2_WINDOWS if tier2 else WINDOWS
+    tier = 2 if tier2 else 1
     results = []
     for name, files in inputs.items():
         judge, score = files.get('judge', []), files.get('score', [])
@@ -315,10 +322,10 @@ def analyse(inputs: dict[str, dict[str, list[Path]]], checks: dict[Path, str | N
                 if any(match_of(r['window']) == m for r in results)}
     kept = [r for r in results if r['anchors_excluded'].get('dcvc') != 'missing']
     sensitivity = {'excluded': [r['window'] for r in results if r['anchors_excluded'].get('dcvc') == 'missing'], **summarize_group(kept)}
-    missing = [n for n in WINDOWS if n not in inputs]
-    return {'rule': 'W7 Tier 1 player gap: mean of (best anchor player-region score - hybrid player-region score) over windows, 95% two-sided t-interval above zero on LPIPS and on DISTS',
+    missing = [n for n in expected if n not in inputs]
+    return {'tier': tier, 'rule': f'W7 Tier {tier} player gap: mean of (best anchor player-region score - hybrid player-region score) over windows, 95% two-sided t-interval above zero on LPIPS and on DISTS',
             'rate': 'KPS2 total of the scale-4 hybrid', 'anchors': list(ANCHORS), 'dcvc_scale': DCVC_SCALE,
-            'complete': not missing, 'missing_windows': missing, 'tier1_holds': bool(pooled['holds'] and not missing),
+            'complete': not missing, 'missing_windows': missing, f'tier{tier}_holds': bool(pooled['holds'] and not missing),
             'pooled': pooled, 'clusters': clusters, 'sensitivity_without_missing_dcvc': sensitivity,
             'windows': {r['window']: r for r in results}, 'input_sha256': digests}
 
@@ -336,7 +343,8 @@ def interval_line(label: str, g: dict[str, Any]) -> str:
 
 
 def summary_text(result: dict[str, Any]) -> str:
-    lines = ['W7 Tier 1 player gap (best anchor - hybrid, player region; > 0 favours the hybrid), rate = hybrid KPS2 total']
+    tier = result.get('tier', 1)
+    lines = [f'W7 Tier {tier} player gap (best anchor - hybrid, player region; > 0 favours the hybrid), rate = hybrid KPS2 total']
     for name, r in result['windows'].items():
         flag = '  [SVT-only best anchor]' if r['svt_only_best_anchor'] else ''
         excl = ('  excluded: ' + ', '.join(f'{f} ({s})' for f, s in r['anchors_excluded'].items())) if r['anchors_excluded'] else ''
@@ -351,8 +359,8 @@ def summary_text(result: dict[str, Any]) -> str:
     lines.append(interval_line('without ' + ','.join(s['excluded']) if s['excluded'] else 'sensitivity (none)', s))
     warns = [f"{n}: {x}" for n, r in result['windows'].items() for x in r['warnings']]
     lines += ['  warning ' + x for x in warns]
-    verdict = 'HOLDS' if result['tier1_holds'] else 'does not hold'
-    lines.append(f"Tier 1 player win {verdict}" + ('' if result['complete'] else f" (INCOMPLETE: missing {', '.join(result['missing_windows'])})"))
+    verdict = 'HOLDS' if result[f'tier{tier}_holds'] else 'does not hold'
+    lines.append(f"Tier {tier} player win {verdict}" + ('' if result['complete'] else f" (INCOMPLETE: missing {', '.join(result['missing_windows'])})"))
     return '\n'.join(lines)
 
 
