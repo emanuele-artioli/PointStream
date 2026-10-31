@@ -533,3 +533,5 @@ foreground-first claim.
 - Replacements at `00fe0a78` (same specs): med019 `20261031T102650Z-8d510571`; al043+med000 `20261031T102659Z-0ea13d2e`; both pending.
 - Al034 receiver `5209ba30` ran before both fixes and completed, so neither fix changes its result: no judged frame lacked a crop for that window.
 - GPU ledger: 18,441 + 254.6 + ~390 = **~19,086 s of 30,600 s**; remaining ~11,514 s. Still to run at estimate: receivers 518 + 875, judge 1,746, W1 scoring 3,520, DCVC 1,899 = 8,558 s; margin ~2,956 s.
+- Receiver med019 `20261031T102650Z-8d510571` **complete** on gpu5 (at `00fe0a78`): smoke 84.6 + full 274.3 = **358.9 GPU-s** (estimate 104 + 414; timing contaminated by contention, cost only); published archive `7727fc3f12a84d5b15994997d3b11cc8194adf05ce5724607a4fa6e98b93c165` (1187840 bytes); its `receiver.json` is the judge's `prior` for med019 and its masks the `masks` role.
+- GPU ledger: 19,086 + 358.9 = **~19,445 s of 30,600 s**; remaining ~11,155 s. Still to run: receiver al043+med000 `0ea13d2e` (running, estimate 875), judge (1,746), W1 scoring (3,520), DCVC (1,899): 8,040 s at estimate, margin ~3,100 s.
