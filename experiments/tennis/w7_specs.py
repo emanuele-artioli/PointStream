@@ -1,5 +1,9 @@
 """W7 fleet job specifications for the Tier 1 windows (python -m experiments.tennis.w7_specs WINDOWS.json OUT_DIR).
 
+Subcommands: `first-window STAGE WINDOWS.json OUT [NAME=PATH:SHA ...]` (the first window, al028) and, for the other five windows batched by stage,
+`plan WINDOWS.json` (jobs per stage with estimated GPU seconds) and `batch STAGE WINDOWS.json OUT --windows A,B,... [NAME=PATH:SHA ...]`
+(experiments/tennis/w7_batch.py).
+
 Nothing is submitted here. Only stage groups whose entrypoint already reads the window manifest get a spec
 (`k6b_native_base`, `w1_masks`, `w1_encode`, `w1_score`); the others are listed in `STAGES` with their status, so the
 GPU estimate of the whole chain is in one place (docs/experiments/w7-untouched.md, 2026-10-30 estimate entry).
@@ -153,11 +157,21 @@ def gpu_stage(module: str, arguments: list[str], files: dict[str, tuple[str, str
     return spec
 
 
+def source_args(windows: list[wm.WindowSpec]) -> list[str]:
+    """`--windows ID... --sources {staged:c0}...`: the confirm family's parallel lists (nargs +), `--max-windows N` keeps the first N of them."""
+    return ['--windows', *[w.id for w in windows], '--sources', *['{staged:c%d}' % i for i in range(len(windows))]]
+
+
 def features(first: wm.WindowSpec, manifest: tuple[str, str], source: tuple[str, str]) -> dict[str, Any]:
     """SAM 3.1 + YOLO11x-pose features of the window (k6b_confirm features); smoke = the same window, one-window grid."""
+    return features_for([first], manifest, [source])
+
+
+def features_for(windows: list[wm.WindowSpec], manifest: tuple[str, str], sources: list[tuple[str, str]]) -> dict[str, Any]:
+    """`features` over several windows in one job (`--max-windows` 1 in the smoke keeps the first listed window); one source staged per window."""
     args = ['features', '--manifest', '{staged:manifest}', '--sam-checkpoint', '{staged:sam}', '--pose', '{staged:yolo11x_pose}',
-            '--max-windows', '{windows}', '--windows', first.id, '--sources', '{staged:c0}']
-    return gpu_stage('experiments.tennis.k6b_confirm', args, {'manifest': manifest, **assets('sam', 'yolo11x_pose'), 'c0': source},
+            '--max-windows', '{windows}', *source_args(windows)]
+    return gpu_stage('experiments.tennis.k6b_confirm', args, {'manifest': manifest, **assets('sam', 'yolo11x_pose'), **{f'c{i}': s for i, s in enumerate(sources)}},
                      models=['RTX 6000 Ada'], mem_mib=32000, threads=8, smoke_seconds=600, full_seconds=1800,
                      scale={'windows': {'smoke': 1, 'full': 0}}, basis='The first window with the full 240-frame decode; the smallest grid the stage supports is one whole window.',
                      validator=['{python}', '-m', 'experiments.tennis.k6b_confirm', 'validate-features', '--manifest', manifest[0]])  # the validator gets no placeholder expansion
@@ -166,33 +180,53 @@ def features(first: wm.WindowSpec, manifest: tuple[str, str], source: tuple[str,
 def build_inputs(first: wm.WindowSpec, confirm: tuple[str, str], features_archive: tuple[str, str]) -> dict[str, Any]:
     """Geometry-only masks, player selection and indices from the feature archive (k6b_confirm build-inputs), CPU. The 2026-10-24 job
     `20261024T200247Z-b63794f9` ran it the same way; the validator rebuilds and compares byte for byte, so it names its inputs literally."""
-    spec = common('experiments.tennis.k6b_confirm', ['build-inputs', '--manifest', '{staged:manifest}', '--feature-archive', '{staged:f0}',
-                                                      '--max-windows', '{windows}'], {'manifest': confirm, 'f0': features_archive})
+    return build_inputs_for(confirm, [features_archive])
+
+
+def build_inputs_for(confirm: tuple[str, str], archives: list[tuple[str, str]]) -> dict[str, Any]:
+    """`build-inputs` over one or several feature archives (`--feature-archive` repeats; the smoke keeps the first window found)."""
+    spec = common('experiments.tennis.k6b_confirm', ['build-inputs', '--manifest', '{staged:manifest}',
+                                                      *sum((['--feature-archive', '{staged:f%d}' % i] for i in range(len(archives))), []),
+                                                      '--max-windows', '{windows}'], {'manifest': confirm, **{f'f{i}': a for i, a in enumerate(archives)}})
     spec.update({'device': 'cpu', 'hosts': HOSTS_GPU, 'gpu_models': [], 'gpu_memory_mib': 0, 'cpu_threads': 4, 'local_storage_gib': 40,
                  'scale': {'windows': {'smoke': 1, 'full': 0}},
                  'smoke': {'seconds': 300, 'representative_basis': 'The one feature window of the first window: geometry-only masks, player selection, indices and archive; full is the same.'},
                  'full': {'seconds': 600}, 'validator_seconds': 180, 'budget_seconds': 1200,
-                 'validator': ['{python}', '-m', 'experiments.tennis.k6b_confirm', 'validate-inputs', '--manifest', confirm[0], '--feature-archive', features_archive[0]]})
+                 'validator': ['{python}', '-m', 'experiments.tennis.k6b_confirm', 'validate-inputs', '--manifest', confirm[0],
+                               *sum((['--feature-archive', a[0]] for a in archives), [])]})
     return spec
 
 
 def anchors(first: wm.WindowSpec, manifest: tuple[str, str], inputs: tuple[str, str], source: tuple[str, str]) -> dict[str, Any]:
     """K6 run: SVT/DCVC rough anchors, keypoint codes and window rows (k6b_confirm_run --kind anchors); `inputs` = `k6b_confirm build-inputs` output."""
+    return anchors_for([first], manifest, inputs, [source])
+
+
+def anchors_for(windows: list[wm.WindowSpec], manifest: tuple[str, str], inputs: tuple[str, str], sources: list[tuple[str, str]]) -> dict[str, Any]:
     args = ['--kind', 'anchors', '--manifest', '{staged:manifest}', '--inputs', '{staged:inputs}', '--', 'run', '--rough-anchors-first',
             '--inputs', '{staged:inputs}', '--pose', '{staged:yolo11x_pose}', '--inspect', '{staged:inspect}',
             '--image-ckpt', '{staged:dcvc_image}', '--image-sha256', ASSETS['dcvc_image'][1], '--video-ckpt', '{staged:dcvc_video}',
             '--video-sha256', ASSETS['dcvc_video'][1], '--lpips-backbone', '{staged:lpips}', '--dists-backbone', '{staged:dists}',
-            '--frames', '{frames}', '--max-windows', '{windows}', '--windows', first.id, '--sources', '{staged:c0}']
-    files = {'manifest': manifest, 'inputs': inputs, **assets('yolo11x_pose', 'inspect', 'dcvc_image', 'dcvc_video', 'lpips', 'dists'), 'c0': source}
+            '--frames', '{frames}', '--max-windows', '{windows}', *source_args(windows)]
+    files = {'manifest': manifest, 'inputs': inputs, **assets('yolo11x_pose', 'inspect', 'dcvc_image', 'dcvc_video', 'lpips', 'dists'),
+             **{f'c{i}': s for i, s in enumerate(sources)}}
     return gpu_stage('experiments.tennis.k6b_confirm_run', args, files, models=['RTX 6000 Ada'], mem_mib=24000, threads=16,
                      smoke_seconds=600, full_seconds=1800, scale={'frames': {'smoke': 48, 'full': 240}, 'windows': {'smoke': 1, 'full': 0}},
                      basis='First window, 48 frames (the 2026-10-24 smoke grid).', validator_module='experiments.tennis.k6b_confirm_run')
 
 
 def prepare(first: wm.WindowSpec, manifest: tuple[str, str], inputs: tuple[str, str], anchor: tuple[str, str], source: tuple[str, str]) -> dict[str, Any]:
-    args = ['--kind', 'prepare', '--manifest', '{staged:manifest}', '--inputs', '{staged:inputs}', '--k6-stage', '{staged:a0}', '--', 'prepare',
-            '--inputs', '{staged:inputs}', '--k6-stage', '{staged:a0}', '--windows', first.id, '--sources', '{staged:c0}', '--max-windows', '{windows}']
-    return gpu_stage('experiments.tennis.k6b_confirm_run', args, {'manifest': manifest, 'inputs': inputs, 'a0': anchor, 'c0': source},
+    return prepare_for([first], manifest, inputs, [anchor], [source])
+
+
+def prepare_for(windows: list[wm.WindowSpec], manifest: tuple[str, str], inputs: tuple[str, str], anchors_: list[tuple[str, str]],
+                sources: list[tuple[str, str]]) -> dict[str, Any]:
+    """`prepare` over several windows; every K6 anchor archive that holds one of them is passed as its own `--k6-stage`."""
+    stages = sum((['--k6-stage', '{staged:a%d}' % i] for i in range(len(anchors_))), [])
+    args = ['--kind', 'prepare', '--manifest', '{staged:manifest}', '--inputs', '{staged:inputs}', *stages, '--', 'prepare',
+            '--inputs', '{staged:inputs}', *stages, *source_args(windows), '--max-windows', '{windows}']
+    return gpu_stage('experiments.tennis.k6b_confirm_run', args,
+                     {'manifest': manifest, 'inputs': inputs, **{f'a{i}': a for i, a in enumerate(anchors_)}, **{f'c{i}': s for i, s in enumerate(sources)}},
                      models=GPU_MODELS, mem_mib=0, threads=8, smoke_seconds=300, full_seconds=900, device='cpu',
                      scale={'windows': {'smoke': 1, 'full': 0}}, basis='The first window: prepare-match is per window, so smoke equals full.',
                      validator_module='experiments.tennis.k6b_confirm_run')
@@ -220,15 +254,19 @@ def generate(first: wm.WindowSpec, manifest: tuple[str, str], prepared: tuple[st
     return spec
 
 
-def receiver(windows: list[wm.WindowSpec], manifest: tuple[str, str], transport: tuple[str, str], anchor: tuple[str, str],
-             generated: list[tuple[str, str]], judged: int) -> dict[str, Any]:
-    """Receiver masks (every-frame fresh-prompt SAM, k6b_receiver_frame, manifest mode: no frozen diagnostic or old controls)."""
-    chosen = windows[:1] if judged else windows
+def receiver(windows: list[wm.WindowSpec], manifest: tuple[str, str], transport: tuple[str, str], anchor: tuple[str, str] | list[tuple[str, str]],
+             generated: list[tuple[str, str]], judged: int, *, all_windows: bool = False) -> dict[str, Any]:
+    """Receiver masks (every-frame fresh-prompt SAM, k6b_receiver_frame, manifest mode: no frozen diagnostic or old controls).
+    `anchor` may be a list (`--anchor` repeats): one K6 archive per anchor job that holds one of the windows. `all_windows` keeps every
+    window in a job whose smoke has the same argument list (a fleet spec has one)."""
+    chosen = windows[:1] if judged and not all_windows else windows
+    anchors_ = anchor if isinstance(anchor, list) else [anchor]
     args = ['--windows-file', '{staged:windows}', *sum((['--window', w.name] for w in chosen), []), '--transport', '{staged:transport}',
-            '--anchor', '{staged:a0}', *sum((['--source', '{staged:' + w.name + '}'] for w in chosen), []), '--backbone', '{staged:lpips}',
+            *sum((['--anchor', '{staged:a%d}' % i] for i in range(len(anchors_))), []),
+            *sum((['--source', '{staged:' + w.name + '}'] for w in chosen), []), '--backbone', '{staged:lpips}',
             '--backbone', '{staged:dists}', *sum((['--generated', '{staged:g%d}' % i] for i in range(len(chosen))), []),
             '--max-judged', '{judged}', '--weights', '{staged:sam}', '--text', '{staged:sam}']
-    files = {'windows': manifest, 'transport': transport, 'a0': anchor, **assets('lpips', 'dists', 'sam'),
+    files = {'windows': manifest, 'transport': transport, **{f'a{i}': a for i, a in enumerate(anchors_)}, **assets('lpips', 'dists', 'sam'),
              **{w.name: source_files(windows)[w.name] for w in chosen}, **{f'g{i}': g for i, g in enumerate(generated[:len(chosen)])}}
     spec = gpu_stage('experiments.tennis.k6b_receiver_frame', args, files, models=GPU_MODELS, mem_mib=12000, threads=4, smoke_seconds=300,
                      full_seconds=FULL_SECONDS, scale={'judged': {'smoke': 2, 'full': 0}}, basis='First window, two judged ticks: SAM prompting twice, masks, composites and metrics.')
@@ -357,16 +395,16 @@ def w1_masks_spec(window: wm.WindowSpec, manifest: tuple[str, str], state: tuple
 
 
 def w1_encode_spec(window: wm.WindowSpec, manifest: tuple[str, str], state: tuple[str, str], transport: tuple[str, str], scale: int,
-                   target_kbps: float, *, controls: bool, outside: bool) -> dict[str, Any]:
-    """Plain (offset 0) or outside-R (+20/+40) CRF search at one resolution, rate only, 240 frames, bracketing `target_kbps` (the hybrid's total)."""
+                   target_kbps: float, *, controls: bool, outside: bool, offsets: tuple[str, ...] = ('-20', '-40')) -> dict[str, Any]:
+    """Plain (offset 0) or outside-R (`offsets`, default +20/+40) CRF search at one resolution, rate only, 240 frames, bracketing `target_kbps`."""
     extra = ['--source', '{staged:' + window.name + '}', '--transport', '{staged:transport}', '--scale', str(scale), '--frames', '{frames}',
              '--max-encodes', '{max_encodes}', '--target-kbps', repr(target_kbps)]
-    extra += ['--convention', 'outside', '--offsets', '-20', '-40'] if outside else ['--offsets', '0']
+    extra += ['--convention', 'outside', '--offsets', *offsets] if outside else ['--offsets', '0']
     extra += ['--controls'] if controls else []
     spec = w1_window_stage('experiments.tennis.w1_encode', window, manifest, state, extra, {'transport': transport}, gpu=False, full_seconds=2600)
     threads = 16 if outside else 8
     spec.update({'cpu_threads': threads, 'stall_seconds': 900.0,
-                 'scale': {'frames': {'smoke': 24, 'full': 240}, 'max_encodes': {'smoke': 2, 'full': 12 if outside else 8}},
+                 'scale': {'frames': {'smoke': 24, 'full': 240}, 'max_encodes': {'smoke': 2, 'full': 6 * len(offsets) if outside else 8}},
                  'smoke': {'seconds': 560, 'representative_basis': f'Scale {scale}, 24 frames: the same conversion, ROI map, parallel offset lanes, two encodes per offset, independent dav1d decode and packaging as the full stage.'}})
     return spec
 
@@ -444,6 +482,11 @@ def first_window(argv: list[str]) -> None:
 def main(argv: list[str]) -> None:
     if argv and argv[0] == 'first-window':
         return first_window(argv[1:])
+    if argv and argv[0] in ('batch', 'plan'):
+        from experiments.tennis import w7_batch  # imports this module: loaded on use
+
+        w7_batch.batch(argv[1:]) if argv[0] == 'batch' else w7_batch.plan_command(argv[1:])
+        return None
     manifest_path, out = Path(argv[0]), Path(argv[1])
     windows = wm.load(manifest_path)
     out.mkdir(parents=True, exist_ok=True)

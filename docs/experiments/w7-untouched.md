@@ -395,3 +395,41 @@ foreground-first claim.
   gives the measured/estimated ratio, and the two scale-2 points whose predicted 240-frame rates bracket [LOW, HIGH] are coded; the validator checks the predicted bracket and, in the full stage, the measured one. Pure parts tested
   (`tests/test_w3_neural_baseline.py`, `tests/test_w7_specs.py`); the in-job path has not run on a GPU (it runs first in the next window's smoke). Spec: `w7_specs first-window dcvc ... low=L:x high=H:x`.
 - First-window GPU ledger, final: 5,806 s + DCVC bracket 46.8 + 164.4 = **6,017 s = 1.671 GPU-h of the 1.75 GPU-h (6,300 s) sub-budget**.
+
+### 2026-10-31 — W7 Tier 1 batch specs (code only; nothing submitted)
+- Code: `python -m experiments.tennis.w7_specs plan docs/experiments/w7-specs/windows.json` prints the jobs per stage for the five remaining windows (al034, al043, med000, med024, med019) with
+  estimated GPU seconds; `batch STAGE windows.json OUT --windows A,B,... [--pending] [NAME=PATH:SHA ...]` writes one job's spec (`experiments/tennis/w7_batch.py`; tests in
+  `tests/test_w7_specs.py`; the first-window specs are byte-identical to before, checked against `tests/fixtures/w7_first_window.sha256.json`). Upstream archives: `role` (one archive covers
+  all), `roleK` (K-th job of the upstream stage in `plan`, e.g. `anchor0`, `anchor1`, `base0`, `masks2`) or `role.WINDOW` (`generated.al034`, `w1masks.al034`, `encode_x0.al034`);
+  `--units W=u1,u2` (generation), `--bracket W=LOW,HIGH` (DCVC), `--target W=KBPS` (w1 encodes); `--pending` fills a missing archive with the all-zero hash.
+- What batches, from each module's arguments: `features`, `build-inputs`, `anchors`, `prepare` (`k6b_confirm*`) take parallel `--windows`/`--sources` lists and `--max-windows {windows}` (smoke 1, full 0 = all),
+  so the smoke is the first named window. `native-base`, `rates`, `rgb-diagnostic`, `rate-transport`, `receiver`, `judge` take `--window`/`--source` lists but have NO first-window limiter: their smoke runs every named
+  window on the smoke grid, and their smoke validators bound the group (native base: 37.5 x smoke CPU seconds < 1,300 s; receiver: projected full stage < 1,500 s, 601 s per Al window; rgb: 10 x smoke
+  against the spec's reservation, set to 2,600 s). Single-archive arguments tie the groups together: judge, receiver `--masks/--prior`, rgb and rates `--base`, judge `--anchor` and `--rates` take one archive, so a judge
+  group lies inside one anchor, native-base and receiver job (`plan` searches the grouping under these caps). Not batchable: generation (per adapter, 1,324 s per Al window, so one window per job), DCVC
+  (`--bracket LOW HIGH` is one pair for every window of a job and each window has its own hybrid rates: one job per window, not per-window brackets), the `w1_*` stages (one `--window` by design).
+- Plan (A6000/Ada GPU seconds, successful smoke + full, Med windows assumed 1.25x the first window's full times, untimed): features 1 job, anchors 2 (al034+med024; al043+med000+med019: 1,343 / 2,090 s estimated),
+  generation 5, rgb diagnostic 2, receiver 3, judge 3, W1 scoring 5, DCVC 5; CPU: build-inputs, prepare, rate transport 1 each, native base 2, rates 2, W1 masks and encodes per window.
+  Total 24,952 GPU-s = 6.93 GPU-h (21,996 s = 6.11 GPU-h if Med is as fast as Al), against 26,261 s one job per window and stage: batching saves about 1,300 s, not the 2,200 s of the projection above,
+  because generation (368 s of smokes), W1 scoring (424 s), DCVC (264 s) cannot share a smoke and the limiter-less smokes grow with the windows (assumed +25 % of the one-window smoke per added window).
+  This includes DCVC (about 273 s per window: 243 s measured plus a 30 s probe, assumed). With the first window's 6,017 s the Tier 1 total is 8.6 GPU-h (7.8 without the Med factor) against the 8 GPU-h card: it needs the lead's decision before the Med windows run.
+- Operator order (each hash is `sha256sum` of the upstream job's `full/published.tar`, or the named file): start `features` (manifest.json hash) and both `native-base` jobs together (CPU; no upstream). Then
+  `build-inputs` (`features0`) -> `anchors` x2 (`inputs`) -> `prepare` (`inputs`, `anchor0`, `anchor1`; read the unit names from its prepare.json) -> `generate` x5 (`prepared`, `--units`; parallel across hosts) and
+  `rate-transport` (`anchor0`, `anchor1`, `prepared`). In parallel once the native-base jobs are done: `rgb-diagnostic` x2 (`base{k}`). After rate transport: `rates` x2 (`transport_json` = its transport.json, `base{k}`) -> `rates{k}`, `state{k}`.
+  `receiver` x3 (`transport`, `anchor{k}`, `generated.W`) needs the generation of its windows -> `masks{r}`, `prior{r}` (receiver.json). `judge` x3 (`anchor{k}`, `transport`, `masks{r}`, `gpu_base{k}`, `base{k}`, `prior{r}`, `rates{k}`, `generated.W`) ->
+  `hybrid{r}`. Then per window: `w1-masks` (`state{k}`, `anchor{k}`, `transport`), the four `w1-encode-*` (`state{k}`, `transport`, `--target` = judge scale-4 KPS2 total), `w1-score` (`w1masks.W`, `hybrid{r}`, `encode_half.W`, `encode_x0..2.W`) and `dcvc`
+  (`anchor{k}`, `transport`, `prior{r}`, `--bracket W=KPS2,KPS1` totals of the window's hybrid). Index K counts the jobs of the stage in `plan` order.
+- Risks for the first in-fleet run: (1) DCVC `--bracket` ran only as pure functions: the in-job probe path is untested on a GPU and its smoke runs first on the next window; (2) Med windows are 50 fps and untimed: all Med estimates and the 2,090 s anchors job
+  rest on 1.25x; anchors publish per finished window, so a timeout keeps the finished ones; (3) the limiter-less smokes (rgb, receiver, judge, native base) cover all named windows, so their validators see the multi-window case for the first time; the receiver's
+  `cpu_bound` check (< 600 s smoke, < 2,100 s full CPU seconds) was written for two windows and has no measured value for three; (4) allowing the receiver's 1,500 s check to follow the spec reservation (as the rgb check does) and the judge `--anchor` to repeat would
+  merge receiver and judge into one job each (about 280 GPU-s saved); not done, to avoid unvalidated validator changes.
+
+### 2026-10-31 — W7 Tier 1: GPU access and anchor scope for the batch (lead decisions, before any batch job)
+- GPU access: the cloud root session cannot reach gpu1–gpu6 (port 22 blocked, no keys), and Remote Control attachment of the Mac failed with an unexplained
+  "not available" (not iCloud, not privacy settings, app updated). The batch runs from a local item session on the Mac
+  ([card](../cards/w7-tier1-batch.md)), reporting to the root session.
+- Anchor scope: the rule entry (2026-10-30) names plain SVT half and quarter, SVT half +20 outside R, and DCVC. The first window also scored +40 and
+  quarter outside-R; the batch drops those two families (encodes are CPU; scoring costs per point, 12 of the first window's 21 points). Decided on cost
+  alone, before any batch quality exists; the first window's extra families stay in its record and are not used by the rule.
+- Revised plan (`w7_specs plan`): **22,940 GPU-s = 6.37 GPU-h** with Med at 1.25x the Al full times, 20,246 s = 5.62 GPU-h at 1.0x. Remaining card budget after the first window's
+  6,017 s: 22,783 s (6.33 GPU-h). At the 1.25x assumption the plan is 157 s over; the card states the stop rule.
