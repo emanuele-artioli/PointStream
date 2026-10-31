@@ -99,7 +99,7 @@ def decode_command(ffmpeg: str, video: Path, start: int, end: int) -> list[str]:
     scale = f"scale={SIZE[0]}:{SIZE[1]}:flags=area:out_range=tv,format=yuv420p"
     return [ffmpeg, "-v", "error", "-nostdin", "-threads", "1", "-i", str(video),
             "-vf", f"trim=start_frame={start}:end_frame={end},setpts=PTS-STARTPTS,{scale}",
-            "-frames:v", str(end - start), "-f", "rawvideo", "-pix_fmt", "yuv420p", "pipe:1"]
+            "-frames:v", str(end - start), "-fps_mode", "passthrough", "-f", "rawvideo", "-pix_fmt", "yuv420p", "pipe:1"]
 
 
 def frames(command: list[str], count: int) -> Any:
