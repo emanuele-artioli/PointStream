@@ -9,6 +9,7 @@ Nothing is submitted here. Only stage groups whose entrypoint already reads the 
 GPU estimate of the whole chain is in one place (docs/experiments/w7-untouched.md, 2026-10-30 estimate entry).
 Staged files must live under the fleet data root (a 2026-10-24 attempt failed on sources outside it): `W7_DIR` is
 where `w7_select stage` copies the six clips; windows.json, the window state and prior-stage archives come as (path, sha256).
+Set PS_W7_DATA_DIR to a distinct directory beneath the fleet tennis data root for another campaign.
 """
 from __future__ import annotations
 
