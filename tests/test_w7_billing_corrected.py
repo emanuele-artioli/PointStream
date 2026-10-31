@@ -36,3 +36,9 @@ def test_correction_changes_the_tier_decision_without_changing_scores():
 def test_refuses_existing_output_directory(tmp_path):
     with pytest.raises(FileExistsError):
         w7_billing_corrected.analyse(tmp_path, tmp_path)
+
+
+@pytest.mark.parametrize('length', [0, -1, float('nan'), float('inf'), -float('inf')])
+def test_rejects_invalid_length_before_reading_inputs(tmp_path, length):
+    with pytest.raises(ValueError, match='finite and positive'):
+        w7_billing_corrected.analyse(tmp_path, tmp_path / 'output', length)

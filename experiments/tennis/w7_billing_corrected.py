@@ -74,7 +74,13 @@ def analyse(inbox: Path, out_dir: Path, length_seconds: float = 7200) -> None:
             amount = row['references']['png_bytes']
             bank_bytes, old_bank_bytes, _ = corrected_bank(row)
             adapter = {'alcaraz_hurkacz': 1_488_252, 'medvedev_struff': 1_495_592, 'nadal_kyrgios': 1_489_876}[row['match']]
-            correction = w7_rates.kbps(adapter + bank_bytes, length_seconds) - w7_rates.kbps(adapter + old_bank_bytes, 7200)
+            if length_seconds == 7200:
+                # Preserve the arithmetic and JSON types of the published 2-hour artifact.
+                png_count = sum(f['codec'] == 'png' for f in row['reference_files'])
+                bank_bytes = amount * w7_rates.BANK_CROPS // png_count
+                correction = (bank_bytes - old_bank_bytes) * 8 / 7200 / 1000
+            else:
+                correction = w7_rates.kbps(adapter + bank_bytes, length_seconds) - w7_rates.kbps(adapter + old_bank_bytes, 7200)
             judge_row = next(r for r in quality['rows'] if r['id'] == original['id'])
             next(r for r in judge_row['rates'] if r['scale'] == 4)['total_kbps'] += correction
             if name == 'al028':
@@ -91,12 +97,15 @@ def analyse(inbox: Path, out_dir: Path, length_seconds: float = 7200) -> None:
                 result = {'window': name, 'rate_kbps': original['rate_kbps'] + correction,
                           'unresolved': str(exc)}
             result['billing_correction'] = {'png_bytes_two_crops': amount, 'intended_bank_bytes': bank_bytes,
-                                            'old_bank_bytes': old_bank_bytes, 'adapter_bytes': adapter, 'length_seconds': length_seconds, 'old_rate_kbps': original['rate_kbps'],
+                                            'old_bank_bytes': old_bank_bytes, 'old_rate_kbps': original['rate_kbps'],
                                             'added_rate_kbps': correction}
+            if length_seconds != 7200:
+                result['billing_correction'].update({'adapter_bytes': adapter, 'length_seconds': length_seconds})
             windows.append(result)
         unresolved = [r['window'] for r in windows if 'unresolved' in r]
-        results[tier] = {'windows': windows, 'group': None if unresolved else w.summarize_group(windows),
-                         'unresolved_windows': unresolved}
+        results[tier] = {'windows': windows, 'group': None if unresolved else w.summarize_group(windows)}
+        if length_seconds != 7200:
+            results[tier]['unresolved_windows'] = unresolved
     out_dir.mkdir(parents=True, exist_ok=False)
     for tier, result in results.items():
         path = out_dir / f'w7-tier{tier}-billing-corrected.json'
