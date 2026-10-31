@@ -1,0 +1,72 @@
+{
+ "schema": 1,
+ "base": {
+  "job": "20261023T194934Z-b0dcbb19",
+  "published_sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285",
+  "weights": "AnimateAnyone original, tennis-base@fit-100.pt"
+ },
+ "adapters": {
+  "alcaraz_hurkacz": {
+   "key": "al",
+   "job": "20261023T221650Z-3d7cbe2f",
+   "name": "ah-C",
+   "published_sha256": "f1a488f2a3ddecf57cff451801f64bc07ae652c2b8b998d4ac844ba8685f5fa2"
+  },
+  "medvedev_struff": {
+   "key": "med",
+   "job": "20261023T204452Z-d5c90446",
+   "name": "med-C",
+   "published_sha256": "5fc200fc50f5af68e561fa10baba54520043e5770555712caf6e89092b175427"
+  },
+  "nadal_kyrgios": {
+   "key": "nad",
+   "job": "20261031T150848Z-a582ecc0",
+   "name": "nk-C",
+   "published_sha256": "cceb49b3d593c770e5b0d8dcd5d69b5b358bf88d76030cef8034674417907584"
+  }
+ },
+ "selection_sha256": "fe3c89f300ac9ba67b7202492cb16232fcbb7b8d96d0bcbdc6c5a52dcb8c9926",
+ "seed": 20261030,
+ "adapter_bytes": {
+  "nadal_kyrgios": 1489876
+ },
+ "billing_sha256": "3c35b15e5f1545c4e96c3a26fbbd5d06e936b9be0146b29ff9fb36834edb9eb1",
+ "windows": [
+  {
+   "name": "nad000",
+   "match": "nadal_kyrgios",
+   "clip": "000",
+   "start": 0,
+   "frames": 240,
+   "fps": 50,
+   "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+   "source_yuv_sha256": "5a26ceb4c08fdfac2726805bb37c5cefe29ff18b9a3c733690fd4e263d3d972d",
+   "reference": "window_frame0",
+   "tier": "w7-tier2"
+  },
+  {
+   "name": "nad001",
+   "match": "nadal_kyrgios",
+   "clip": "001",
+   "start": 0,
+   "frames": 240,
+   "fps": 50,
+   "source_sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d",
+   "source_yuv_sha256": "77dfb59c82928d2cb0a3e546c005c84859fb48cc38ebbac321d684dcfd160621",
+   "reference": "window_frame0",
+   "tier": "w7-tier2"
+  },
+  {
+   "name": "nad002",
+   "match": "nadal_kyrgios",
+   "clip": "002",
+   "start": 0,
+   "frames": 240,
+   "fps": 50,
+   "source_sha256": "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a",
+   "source_yuv_sha256": "f21eea57871b9bf4aa1d20eb50082dff22de0b066471263b6ef9c9c8101b90ad",
+   "reference": "window_frame0",
+   "tier": "w7-tier2"
+  }
+ ]
+}
