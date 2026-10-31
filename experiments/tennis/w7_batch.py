@@ -31,7 +31,11 @@ MED_FACTOR = 1.25  # 50 fps clips: untimed, assumed up to this much slower than 
 CAP_FRACTION = 0.9  # a group's estimated full stage stays under this share of the 2,600 s stage cap
 SMOKE_EXTRA = 0.25  # added smoke GPU-s per extra window, as a share of the one-window smoke, where the smoke runs every window (estimate)
 RESERVE_MARGIN = 1.3  # `full.seconds` = estimate x this, at least the single-window reservation
-NATIVE_SMOKE_S = {25: 8.0, 50: 10.0}  # native-base smoke wall seconds of one window (8 s measured, job f6699fe5); validator limit 1300 / 37.5
+# Native-base smoke wall seconds per window, fitted to the two multi-window smokes measured on this grid (2026-10-31): al034+med024
+# 29.6 s (job 0b16c855, passed, projected 1,110 s) and al043+med000+med019 36.2 s (job 8fb0a603, projected 1,357 s, failed the 1,300 s
+# validator). The one-window smoke measured 8 s (job f6699fe5). The per-window values are a fit, not a timing law: the validator's
+# 37.5 x smoke projection stays the gate. Limit 1300 / 37.5.
+NATIVE_SMOKE_S = {25: 12.0, 50: 15.0}
 NATIVE_SMOKE_LIMIT = 1300 / 37.5
 RECEIVER_PROJECTION_S = 601.0  # the first window's smoke projected 601 s for its full stage (job 6191ce05); the validator requires < 1,500 s
 RECEIVER_PROJECTION_LIMIT = 1450.0

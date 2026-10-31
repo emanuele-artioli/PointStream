@@ -215,6 +215,17 @@ def test_plan_groups_respect_every_cap_and_nest():
             assert any({w.name for w in g} <= {w.name for w in u} for u in groups[upstream]), (upstream, [w.name for w in g])
 
 
+def test_native_groups_admit_the_passing_smoke_and_exclude_the_failed_one():
+    # Measured on this grid (2026-10-31): al034+med024 smoke wall 29.6 s passed the validator (projected 1,110 s); al043+med000+med019
+    # 36.2 s failed it (projected 1,357 s, job 8fb0a603).
+    by_name = {w.name: w for w in _campaign()}
+    assert wb.group_ok('native', 'native-base', [by_name['al034'], by_name['med024']])
+    assert not wb.group_ok('native', 'native-base', [by_name['al043'], by_name['med000'], by_name['med019']])
+    # the native partition is the receiver partition: each judge group reads one native-base archive
+    groups = wb.plan_groups(_campaign())
+    assert {frozenset(w.name for w in g) for g in groups['native-base']} == {frozenset(w.name for w in g) for g in groups['receiver']}
+
+
 def test_plan_totals_and_the_saving_over_one_job_per_window():
     result = wb.plan(_campaign())
     assert result['saved_gpu_s'] > 0 and result['total_gpu_s'] < result['unbatched_gpu_s']
