@@ -66,3 +66,11 @@ Each item starts with its rule entry in `docs/experiments/` before any GPU time 
 - **Commit and open the PR as you go.** A fix that sits uncommitted in a worktree is lost with it.
 - **Local test failures.** About 12–13 pytest failures and 7 mypy errors also fail on unchanged `main` on the Mac (missing packages, macOS paths). Compare with `origin/main`; CI is the check.
 - **Decisions the user must make** (budget beyond a card, scope) go to the user in that session, with the context the question needs.
+
+## Later Codex continuation: corrected accounting and approved anchor repair
+
+The billing fix and reproduced corrected evidence are on `codex/paper-continuation-2026-10-31`, PR #315, commits `002c89cc`, `4ce348a6`, `2da6447d`. The manuscript has been fast-forward pushed to Overleaf main as `9a4491f4b33173fcaaf6fc47dbb5627f9656a8d7`; it states the conditional familiar-match result and inconclusive unseen-match result, not submission readiness. The reviewed working PDF is `/private/tmp/pointstream-w7-manuscript/build/main.pdf` (23 pages). See `docs/paper/readiness-2026-10-31.md`.
+
+The user subsequently approved a **new independent anchor-repair budget of 5,400 GPU-seconds and 5,400 workload CPU-seconds**, with pilots and cost stops, no training. This restores nine comparisons lost at corrected rates; original missing DCVC/ROI comparisons are explicitly outside this repair. No GPU job had been submitted and none of this new budget had been spent when approved. Runtime enforcement, frozen hashes/specifications and existing-job/host preflight precede dispatch. The W9 experiment entry owns IDs, budget accounting and results. Do not use old closed budget balances. Full fleet status through gpu2 timed out after 120 seconds; this is a management-path limitation, not evidence that existing jobs stopped or the fleet is unavailable.
+
+The separate W6b CPU timing pilot uses session `5929` on gpu2, fresh directory `/local/users/emanuele/pointstream/w6b-metric-pilot2-20261031/`, with a 20-minute timeout; inspect its recorded state in `docs/experiments/w6-motion-pose.md`, do not replay it. It has no GPU authority. Its timing data are not smoothing-quality evidence.
