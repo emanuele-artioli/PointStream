@@ -192,7 +192,7 @@ def judge_window(wid: str, anchor: Path, control: Path | None, packets: Path, ma
             frames.append(canvas)
             supports.append(written)
         if predicted_masks is not None:
-            predicted = np.logical_or.reduce([predicted_masks[i][t] for i in range(len(units))])
+            predicted = np.logical_or.reduce([receiver_mask(predicted_masks, crops[i], i, t, r.shape) for i in range(len(units))])
             intersection, union = int((predicted & r).sum()), int((predicted | r).sum())
             row["prediction_shape"][str(t)] = {"iou": intersection / union if union else 1.0,
                 "fp": int((predicted & ~r).sum()), "fn": int((r & ~predicted).sum()),
