@@ -11,6 +11,13 @@ from experiments.tennis import w1_roi as w
 from experiments.tennis import w1_score as sc
 
 
+def test_scoring_gpu_class_requires_explicit_ada_opt_in():
+    assert sc.qualified_gpu('NVIDIA RTX A6000', False)
+    assert not sc.qualified_gpu('NVIDIA RTX 6000 Ada Generation', False)
+    assert sc.qualified_gpu('NVIDIA RTX 6000 Ada Generation', True)
+    assert not sc.qualified_gpu('Quadro RTX 8000', True)
+
+
 def test_search_offset_stops_at_the_encode_budget_and_publishes_each_encode(tmp_path, monkeypatch):
     monkeypatch.setenv('PS_STAGE', 'smoke')
     monkeypatch.delenv('PS_JOB_DIR', raising=False)
