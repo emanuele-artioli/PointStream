@@ -706,3 +706,24 @@ without med000           n=5  lpips +0.0795 [+0.0661, +0.0929]  dists +0.0744 [+
 Tier 1 player win HOLDS
 wrote docs/experiments/w7-specs/w7-tier1-result.json
 ```
+### 2026-10-31 — W7 Tier 1 outcome (lead reading of the analysis, PR #305)
+- Source: `w7_analysis` on the 14 archives listed in the analysis entry, result `docs/experiments/w7-specs/w7-tier1-result.json`
+  (sha256 `d71ef815…3ced`), code `7c2d3040`. Six windows, all judged on A6000/Ada; hybrid = scale-4, rate = KPS2 total.
+- **By the rule: Tier 1 holds.** Pooled player gap (best anchor − hybrid, player region; > 0 favours the hybrid), n = 6:
+  LPIPS +0.103 [95% CI +0.041, +0.165], DISTS +0.085 [+0.057, +0.112]. Every window's gap is positive on both metrics
+  (LPIPS +0.065 to +0.223, DISTS +0.064 to +0.135). DCVC-UF is the best anchor in every window where it ran; SVT never is.
+- Clusters, reported beside the pooled interval as the rule asks: Alcaraz (n = 3) holds on both (LPIPS +0.086 [+0.066, +0.105],
+  DISTS +0.078 [+0.048, +0.108]). Medvedev (n = 3) does not hold on its own: LPIPS +0.121 [−0.098, +0.340], DISTS +0.091
+  [−0.004, +0.186]. The width comes from med000, whose gap is measured against SVT only (DCVC dropped, user decision) and is the
+  largest (+0.223 / +0.135). Sensitivity, med000 excluded (n = 5): LPIPS +0.080 [+0.066, +0.093], DISTS +0.074 [+0.062, +0.087], holds.
+- Secondary: W1 dominance outcome A in all six windows (no SVT policy and no DCVC point dominates the hybrid's (whole, player) pair).
+  Whole frame at equal rate: the best anchor is better than the hybrid in every window (LPIPS −0.114 to −0.161, DISTS −0.045 to
+  −0.058). The foreground-first trade-off of W1/W5 holds on untouched clips: much better players, worse whole frame.
+- Scope of the claim, as measured: untouched clips of two matches whose other footage trained the tennis base (and whose own match
+  adapters are used); 240-frame windows, players generated on every third frame (W6's flicker finding still applies); Al windows near
+  18 kbps (25 fps), Med near 41 kbps (50 fps). `s2_o20` (half +20 outside R) was unresolved at the hybrid's rate in med000 and med019
+  (no bracketing encode), so those windows' best anchor ranges over the other families. The six windows come from two matches, so
+  the pooled t-interval treats windows as independent within a match; the per-match clusters are the conservative reading, and the
+  Medvedev cluster alone does not pass. Tier 2 (a match the base never saw) is the test of generalisation beyond this scope.
+- Budget: Tier 1 used about 25,718 of 30,600 GPU-s (8.5 GPU-h card, raised by the user 2026-10-31). The DCVC decode nondeterminism
+  (intermittent, same bitstream) is a recorded codec finding; every accepted DCVC point passed the two-process decode check.

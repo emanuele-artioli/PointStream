@@ -368,7 +368,7 @@ marked `card ready` is waiting for the user to start it.
 | Ideal-player appearance bound | [completed finite bound](docs/cards/k6b-ideal-timing-secondary.md) | `codex/ideal-player-full-result` | Codex | COMPLETE20261028T080453Z-34e50ec2; all80ticks, exact controls, independently audited finite NO-GO both metrics/both ideal supports;2730/3600s charged,870unused; item stopped |
 | Player joint side-rate feasibility | CPU saved-score inversion and three lossless packet wrappers | `codex/player-rate-feasibility` | Codex | COMPLETE2026-10-28; zero GPU; robust actual/ideal_R side ceilings0.668734/1.230365kbps; all three packet wrappers grow; follow-up paid clean-background test now complete |
 | Paid clean-background oracle | [new finite background proposal](docs/cards/k6b-paid-clean-background.md) | `codex/paid-clean-background` | Codex | COMPLETE2026-10-28; CPUbf9f97d2 and sameGPU27f39d64 audited; all80ticks; formal MIXED, two-metric gate FAILED;250s charge,2980/3600total,620unused; stopped |
-| W7 Tier 1 batch (five remaining windows) | [card](docs/cards/w7-tier1-batch.md) | `claude/w7-tier1-batch` | Sonnet (local, Mac) | card ready 2026-10-31; budget 6.33 GPU-h left of 8; report to root `session_01MbpYHe92aChsjy7MqXQ6jZ` |
+| W7 Tier 1 batch (five remaining windows) | [card](docs/cards/w7-tier1-batch.md) | `claude/w7-tier1-batch` | Sonnet (local, Mac) | reported 2026-10-31: Tier 1 HOLDS (pooled n=6: player LPIPS gap +0.103 [+0.041, +0.165], DISTS +0.085 [+0.057, +0.112]; Med cluster alone does not); whole frame worse in every window; ~7.1 of 8.5 GPU-h; PRs #303, #305 |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
@@ -1386,6 +1386,11 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   ([rule](docs/experiments/w7-untouched.md)) written 2026-10-30: Tier 1
   untouched clips of Al/Med, Tier 2 the Nadal–Kyrgios match the base never
   trained on.
+  **W7 Tier 1 outcome (2026-10-31):** holds by the rule on six untouched
+  Al/Med windows: player gap LPIPS +0.103 [+0.041, +0.165], DISTS +0.085
+  [+0.057, +0.112]; DCVC-UF is the strongest anchor; the whole frame is worse
+  in every window; the Medvedev cluster alone does not pass (n = 3)
+  ([outcome](docs/experiments/w7-untouched.md)). Tier 2 is next.
 - **W6 outcome (2026-10-30, [entry](docs/experiments/w6-motion-pose.md)).**
   Full-rate Al hybrid, all 240 frames. Pose passes: YOLO11x-pose error 0.063
   of the box vs SVT 0.90, whose players the detector mostly misses. Time
