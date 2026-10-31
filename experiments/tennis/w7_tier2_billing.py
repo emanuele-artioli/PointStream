@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import io
 import json
 import tarfile
 from pathlib import Path
@@ -18,7 +20,8 @@ def bill(archive: Path, checkpoint: str, guider: Path, archive_sha: str, guider_
         member = tar.extractfile(f'publish/{checkpoint}')
         if member is None:
             raise ValueError('adapter checkpoint missing')
-        state = torch.load(member, map_location='cpu', weights_only=True)
+        payload = member.read()
+        state = torch.load(io.BytesIO(payload), map_location='cpu', weights_only=True)
     base = torch.load(guider, map_location='cpu', weights_only=True)
     # Match apply_fit's exact pre-quantization conversions and original guider.
     converted = {**state, **{k: {n: v.float() for n, v in state[k].items()}
@@ -27,6 +30,7 @@ def bill(archive: Path, checkpoint: str, guider: Path, archive_sha: str, guider_
     if billing['bits'] != 4 or not billing['pose_guider_billed'] or billing['pose_guider_bytes'] <= 0 or billing['bytes'] <= 0:
         raise ValueError('invalid adapter/guider billing')
     return {'archive_sha256': w7_select.file_sha256(archive), 'checkpoint': checkpoint,
+            'checkpoint_sha256': hashlib.sha256(payload).hexdigest(),
             'guider_sha256': w7_select.file_sha256(guider), 'billing': billing}
 
 
