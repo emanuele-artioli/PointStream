@@ -348,7 +348,7 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
-| Paper continuation and W7 accounting audit | [2026-10-31 handoff](docs/continuation-2026-10-31.md) | `codex/paper-continuation-2026-10-31` | primary plus Terra 6.1 medium delegates | running 2026-10-31: correction reproduced, Overleaf `9a4491f4` updated (23 pages), PR #315; W6b CPU timing pilot in progress; user approved new independent W7 anchor-repair caps 5,400 GPU-s + 5,400 workload CPU-s, no training, pilots before scale; spent 0 at approval |
+| Paper continuation and W7 accounting audit | [2026-10-31 handoff](docs/continuation-2026-10-31.md) | `codex/paper-continuation-2026-10-31` | primary plus Terra 6.1 medium delegates | running 2026-10-31: correction reproduced, Overleaf `fc0343f9` includes corrected figure (23 pages), PR #315; W6b timing completed at 99.82/1,800 CPU-s, scale gate stops (metrics alone project >2,473 CPU-s), no smoothing result; user approved new independent W7 repair caps 5,400 GPU-s + 5,400 workload CPU-s, no training; queue preflight in progress, no job submitted |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 | J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
 | H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` @ `3b11a36` | Opus | reported 2026-10-22: 4a fail (F billed +93% wDISTS), 4b not built (LPIPS), crops ready; 2.6 GPU-hours of 4 |
