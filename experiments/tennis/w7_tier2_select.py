@@ -53,6 +53,8 @@ def run(args: argparse.Namespace) -> None:
     if args.cache_dir:
         cache_dir = Path(args.cache_dir)
         cache = json.loads((cache_dir / 'index.json').read_text())
+        if cache is None:
+            raise ValueError('cached index is null')
         raw = cache_dir / 'frames.yuv'
         from experiments.tennis.w7_tier2_cache import FRAME_BYTES, chunks_for
 
