@@ -66,8 +66,10 @@ MODEL: dict[str, StageModel] = {
     'w1-encode-half': StageModel(False, 0, 0, 600, False, 'window'),
     'w1-encode-quarter': StageModel(False, 0, 0, 600, False, 'window'),
     'w1-encode-half-out': StageModel(False, 0, 0, 900, False, 'window'),
-    'w1-encode-quarter-out': StageModel(False, 0, 0, 900, False, 'window'),
-    'w1-score': StageModel(True, 106, 870, 870, False, 'window'),
+    # The W7 rule's SVT anchors are plain half, plain quarter and half +20 outside R (rule entry, 2026-10-30). The first window also scored
+    # +40 and quarter outside-R; the batch drops them (scoring costs per point: 12 of the first window's 21 points, 870 s x 12/21 = 497 s,
+    # rounded up to 520 s; an estimate, not measured).
+    'w1-score': StageModel(True, 106, 520, 520, False, 'window'),
     'dcvc': StageModel(True, 66, 273, 273, False, 'window'),
 }
 STAGE_ORDER = list(MODEL)
@@ -324,7 +326,7 @@ def build_spec(stage: str, ws: list[wm.WindowSpec], campaign: list[wm.WindowSpec
         if target is None:
             raise SystemExit(f'{stage} needs --target {w.name}=KBPS (the judge\'s scale-4 total_kbps, KPS2)')
         return sp.w1_encode_spec(w, windows_ref, up.pick('state', names, native_groups), up.need('transport'), 2 if kind.startswith('half') else 4,
-                                 float(target), controls=kind == 'half', outside=kind.endswith('-out'))
+                                 float(target), controls=kind == 'half', outside=kind.endswith('-out'), offsets=('-20',))
     if stage == 'w1-score':
         extra = [up.window(f'encode_x{i}', w.name) for i in range(8) if f'encode_x{i}.{w.name}' in up.ups]
         return sp.w1_score_spec(w, windows_ref, up.pick('state', names, native_groups), up.window('w1masks', w.name), up.pick('hybrid', names, receiver_groups),

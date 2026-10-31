@@ -395,16 +395,16 @@ def w1_masks_spec(window: wm.WindowSpec, manifest: tuple[str, str], state: tuple
 
 
 def w1_encode_spec(window: wm.WindowSpec, manifest: tuple[str, str], state: tuple[str, str], transport: tuple[str, str], scale: int,
-                   target_kbps: float, *, controls: bool, outside: bool) -> dict[str, Any]:
-    """Plain (offset 0) or outside-R (+20/+40) CRF search at one resolution, rate only, 240 frames, bracketing `target_kbps` (the hybrid's total)."""
+                   target_kbps: float, *, controls: bool, outside: bool, offsets: tuple[str, ...] = ('-20', '-40')) -> dict[str, Any]:
+    """Plain (offset 0) or outside-R (`offsets`, default +20/+40) CRF search at one resolution, rate only, 240 frames, bracketing `target_kbps`."""
     extra = ['--source', '{staged:' + window.name + '}', '--transport', '{staged:transport}', '--scale', str(scale), '--frames', '{frames}',
              '--max-encodes', '{max_encodes}', '--target-kbps', repr(target_kbps)]
-    extra += ['--convention', 'outside', '--offsets', '-20', '-40'] if outside else ['--offsets', '0']
+    extra += ['--convention', 'outside', '--offsets', *offsets] if outside else ['--offsets', '0']
     extra += ['--controls'] if controls else []
     spec = w1_window_stage('experiments.tennis.w1_encode', window, manifest, state, extra, {'transport': transport}, gpu=False, full_seconds=2600)
     threads = 16 if outside else 8
     spec.update({'cpu_threads': threads, 'stall_seconds': 900.0,
-                 'scale': {'frames': {'smoke': 24, 'full': 240}, 'max_encodes': {'smoke': 2, 'full': 12 if outside else 8}},
+                 'scale': {'frames': {'smoke': 24, 'full': 240}, 'max_encodes': {'smoke': 2, 'full': 6 * len(offsets) if outside else 8}},
                  'smoke': {'seconds': 560, 'representative_basis': f'Scale {scale}, 24 frames: the same conversion, ROI map, parallel offset lanes, two encodes per offset, independent dav1d decode and packaging as the full stage.'}})
     return spec
 

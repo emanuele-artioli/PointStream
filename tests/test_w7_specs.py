@@ -390,3 +390,12 @@ def test_group_caps_are_enforced_when_a_job_is_too_big(tmp_path):
         wb.batch(['receiver', str(WINDOWS_JSON), str(tmp_path), '--windows', ','.join(w.name for w in ws), '--pending'])
     with pytest.raises(SystemExit):  # four Al-speed windows would take 2,388 s of the 2,600 s anchors cap
         wb.batch(['anchors', str(WINDOWS_JSON), str(tmp_path), '--windows', 'al034,al043,med000,med024,med019', '--pending'])
+
+
+def test_batch_scores_only_the_rules_svt_anchors(tmp_path):
+    """W7's rule names plain half, plain quarter and half +20 outside R; the batch drops +40 and quarter outside-R."""
+    assert 'w1-encode-quarter-out' not in wb.MODEL
+    out = _batch(tmp_path, 'w1-encode-half-out', ['al034'], extra=('--target', 'al034=18.5'))
+    args = out['arguments']
+    assert args[args.index('--offsets') + 1:args.index('--offsets') + 2] == ['-20'] and '-40' not in args
+    assert out['scale']['max_encodes']['full'] == 6

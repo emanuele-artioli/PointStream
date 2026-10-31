@@ -423,3 +423,13 @@ foreground-first claim.
   rest on 1.25x; anchors publish per finished window, so a timeout keeps the finished ones; (3) the limiter-less smokes (rgb, receiver, judge, native base) cover all named windows, so their validators see the multi-window case for the first time; the receiver's
   `cpu_bound` check (< 600 s smoke, < 2,100 s full CPU seconds) was written for two windows and has no measured value for three; (4) allowing the receiver's 1,500 s check to follow the spec reservation (as the rgb check does) and the judge `--anchor` to repeat would
   merge receiver and judge into one job each (about 280 GPU-s saved); not done, to avoid unvalidated validator changes.
+
+### 2026-10-31 — W7 Tier 1: GPU access and anchor scope for the batch (lead decisions, before any batch job)
+- GPU access: the cloud root session cannot reach gpu1–gpu6 (port 22 blocked, no keys), and Remote Control attachment of the Mac failed with an unexplained
+  "not available" (not iCloud, not privacy settings, app updated). The batch runs from a local item session on the Mac
+  ([card](../cards/w7-tier1-batch.md)), reporting to the root session.
+- Anchor scope: the rule entry (2026-10-30) names plain SVT half and quarter, SVT half +20 outside R, and DCVC. The first window also scored +40 and
+  quarter outside-R; the batch drops those two families (encodes are CPU; scoring costs per point, 12 of the first window's 21 points). Decided on cost
+  alone, before any batch quality exists; the first window's extra families stay in its record and are not used by the rule.
+- Revised plan (`w7_specs plan`): **22,940 GPU-s = 6.37 GPU-h** with Med at 1.25x the Al full times, 20,246 s = 5.62 GPU-h at 1.0x. Remaining card budget after the first window's
+  6,017 s: 22,783 s (6.33 GPU-h). At the 1.25x assumption the plan is 157 s over; the card states the stop rule.
