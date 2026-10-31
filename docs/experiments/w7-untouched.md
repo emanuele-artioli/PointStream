@@ -648,3 +648,61 @@ foreground-first claim.
 - Tally of bracket-path QP 18 decodes so far: 240 frames, 4 of 5 passed (al043, al034, med019 and the med024 rerun passed; med024 `c4df5a5f` failed); 25 frames, 6 of 8 passed (both failures are med000's two smokes).
 - **Card status:** DCVC accepted for al043, al034, med019 and med024 (the last on its rerun); dropped for med000 by user decision. All four W1 scores complete (al043, med000, al034, med024). The judge, masks and encodes for all five windows were complete before this entry.
 - GPU ledger: realized about **25,718 s of 30,600 s** through this entry (25,250 s through the diagnostic and W1 scores, plus the med000 rerun smoke 108.6, plus the med024 rerun 359.9). No further GPU job is planned for the card.
+
+### 2026-10-31 — W7 Tier 1 analysis run: archives, command, printed summary (no GPU; nothing submitted)
+
+- Scope: `python -m experiments.tennis.w7_analysis` over the accepted jobs in this file, writing `docs/experiments/w7-specs/w7-tier1-result.json`. No rule, input or number was changed. Code: branch `claude/w7-tier1-analysis` from `origin/main`, revision `7c2d3040` (PR #304 merge; the analysis script is at `53e986f1`). The checkout was clean when the run started.
+- Archives: each job's `full/published.tar` was copied from gpu5 (`/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/<job>/full/published.tar`) into its own new directory in the session scratchpad, outside the repository. For each, the remote and local sha256 were equal, and the digest matched the listed full hash or prefix. The DCVC rerun `4242c23c` had no listed hash; its digest is recorded here.
+
+| Job | Used for | Bytes | sha256 (full) |
+|---|---|---:|---|
+| `20261030T185245Z-e51a4dec` | al028 judge | 122,880 | `cbc26962935b3542b0b7cf77f724010de19323fedd6fe02cb822ec6e43e75837` |
+| `20261030T201626Z-e32a981b` | al028 score | 153,600 | `48846a4a9404a7a0834cbe156a5d57988db114240773ba2a9657b7a08246db21` |
+| `20261031T110824Z-9d59bd9b` | judge, al034 and med024 | 245,760 | `e9c32cdef93b4fdf76dc34fd5b50bb94778918d12cd32245a7453b54cc560a47` |
+| `20261031T113142Z-4be48588` | al034 score | 112,640 | `477e8bd044e810cf146db2ef9d3786aea044dcd63b3930ad807ad86b3f6efeb6` |
+| `20261031T113203Z-cec062e0` | al034 DCVC | 716,800 | `68ebe3216f2ac98cf3b43fc3d8bb97d7ee25852a33531c4e3b02e6a1798a9202` |
+| `20261031T110838Z-ff9d8b4f` | judge, al043 and med000 | 245,760 | `2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03` |
+| `20261031T112231Z-b3a5d0d6` | al043 score | 122,880 | `cbf3c7268fb267aeaa6229105f6a0b5ed249ac01ad3d88ef2feb9a15d70b703a` |
+| `20261031T112311Z-074b29fc` | al043 DCVC | 716,800 | `dc2c33e08d059c9d3717658f6c9218795e9919204234df19badf8268ea63dbb1` |
+| `20261031T112710Z-7930b798` | med000 score | 92,160 | `936e866c31a527d837c0bc0d22d05d6f672612cfa556aa1b8a64d1cb2ec52344` |
+| `20261031T113152Z-f858b1c5` | med024 score | 112,640 | `13ad9d70efc0c3db96f6fc7044f2ad1c47278843fc4b63ad2e33767678ae3199` |
+| `20261031T115155Z-4242c23c` | med024 DCVC rerun (digest computed here; no listed hash) | 757,760 | `a457870bf4b14720cea9b4a8a968163eb9aa4f801d96f869b2df208f884426c0` |
+| `20261031T104813Z-6d29c907` | judge, med019 | 122,880 | `812c18a2aa7943c1d9ce28a4685529a5fcfebefabf8d30b441a238f4b9d92335` |
+| `20261031T105818Z-014c1510` | med019 score | 92,160 | `65aec2bca1f0238bfdcc5f42cc9c03d032dcafbaaf1923e4139fb69ec8922a17` |
+| `20261031T112733Z-80920718` | med019 DCVC | 747,520 | `edca7d76224be9eade2e66c49d3444c99998b78cb1168b45771b73ed14e7a043` |
+
+- The al028 DCVC input is the committed points file `docs/experiments/w7-specs/dcvc-points-al028-scale2.json` (sha256 `e5d05fe54feedf186bc83b44b153bd2e6ae3247d60648859ef69e73f154408f1`), as the listing gives it. al028 is the first W7 window (entry 2026-10-30); the other five are the batch windows.
+- First attempt, no result: the listing's prefixes are 8 hex digits, and I first passed them as `sha256=` arguments. The script's check requires at least 12 (`verify`, `experiments/tennis/w7_analysis.py:111`), so it raised `sha256 mismatch` on the first archive (`9d59bd9b`) and wrote nothing. The rule was not changed. The command below passes the full digests of the local copies instead; each was already checked against the listed prefix or hash above.
+- Command, run from the worktree root (`sha256=` values are the full digests above):
+
+```bash
+cd "$(git rev-parse --show-toplevel)" || exit 1
+A=/private/tmp/claude-501/-Users-manu-Desktop-PointStream--claude-worktrees-zealous-nightingale-52e721/7da50dac-3ff3-430d-945c-76670d5400ab/scratchpad/w7-archives
+python -m experiments.tennis.w7_analysis \
+  --window al028 judge=$A/20261030T185245Z-e51a4dec/published.tar sha256=cbc26962935b3542b0b7cf77f724010de19323fedd6fe02cb822ec6e43e75837 score=$A/20261030T201626Z-e32a981b/published.tar sha256=48846a4a9404a7a0834cbe156a5d57988db114240773ba2a9657b7a08246db21 dcvc=docs/experiments/w7-specs/dcvc-points-al028-scale2.json \
+  --window al034 judge=$A/20261031T110824Z-9d59bd9b/published.tar sha256=e9c32cdef93b4fdf76dc34fd5b50bb94778918d12cd32245a7453b54cc560a47 score=$A/20261031T113142Z-4be48588/published.tar sha256=477e8bd044e810cf146db2ef9d3786aea044dcd63b3930ad807ad86b3f6efeb6 dcvc=$A/20261031T113203Z-cec062e0/published.tar sha256=68ebe3216f2ac98cf3b43fc3d8bb97d7ee25852a33531c4e3b02e6a1798a9202 \
+  --window al043 judge=$A/20261031T110838Z-ff9d8b4f/published.tar sha256=2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03 score=$A/20261031T112231Z-b3a5d0d6/published.tar sha256=cbf3c7268fb267aeaa6229105f6a0b5ed249ac01ad3d88ef2feb9a15d70b703a dcvc=$A/20261031T112311Z-074b29fc/published.tar sha256=dc2c33e08d059c9d3717658f6c9218795e9919204234df19badf8268ea63dbb1 \
+  --window med000 judge=$A/20261031T110838Z-ff9d8b4f/published.tar sha256=2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03 score=$A/20261031T112710Z-7930b798/published.tar sha256=936e866c31a527d837c0bc0d22d05d6f672612cfa556aa1b8a64d1cb2ec52344 \
+  --window med024 judge=$A/20261031T110824Z-9d59bd9b/published.tar sha256=e9c32cdef93b4fdf76dc34fd5b50bb94778918d12cd32245a7453b54cc560a47 score=$A/20261031T113152Z-f858b1c5/published.tar sha256=13ad9d70efc0c3db96f6fc7044f2ad1c47278843fc4b63ad2e33767678ae3199 dcvc=$A/20261031T115155Z-4242c23c/published.tar sha256=a457870bf4b14720cea9b4a8a968163eb9aa4f801d96f869b2df208f884426c0 \
+  --window med019 judge=$A/20261031T104813Z-6d29c907/published.tar sha256=812c18a2aa7943c1d9ce28a4685529a5fcfebefabf8d30b441a238f4b9d92335 score=$A/20261031T105818Z-014c1510/published.tar sha256=65aec2bca1f0238bfdcc5f42cc9c03d032dcafbaaf1923e4139fb69ec8922a17 dcvc=$A/20261031T112733Z-80920718/published.tar sha256=edca7d76224be9eade2e66c49d3444c99998b78cb1168b45771b73ed14e7a043 \
+  --out docs/experiments/w7-specs/w7-tier1-result.json
+```
+
+- Exit 0. The result file `docs/experiments/w7-specs/w7-tier1-result.json` has sha256 `d71ef8150864c7da6b7910d55432e5e0724d269d49c2eb4ac71371860b9f3ced`; its `input_sha256` field records each input's digest.
+- Printed summary, verbatim:
+
+```text
+W7 Tier 1 player gap (best anchor - hybrid, player region; > 0 favours the hybrid), rate = hybrid KPS2 total
+  al028    18.461 kbps  lpips +0.0887 (dcvc)  dists +0.0653 (dcvc)  whole -0.1355/-0.0512  W1 A
+  al034    17.835 kbps  lpips +0.0917 (dcvc)  dists +0.0894 (dcvc)  whole -0.1401/-0.0564  W1 A
+  al043    18.095 kbps  lpips +0.0767 (dcvc)  dists +0.0790 (dcvc)  whole -0.1339/-0.0575  W1 A
+  med000   41.246 kbps  lpips +0.2225 (s2_o0)  dists +0.1349 (s4_o0)  whole -0.1140/-0.0448  W1 A  [SVT-only best anchor]  excluded: s2_o20 (unresolved), dcvc (missing)
+  med024   40.919 kbps  lpips +0.0751 (dcvc)  dists +0.0742 (dcvc)  whole -0.1492/-0.0457  W1 A
+  med019   41.040 kbps  lpips +0.0653 (dcvc)  dists +0.0641 (dcvc)  whole -0.1607/-0.0572  W1 A  excluded: s2_o20 (unresolved)
+pooled                   n=6  lpips +0.1033 [+0.0412, +0.1654]  dists +0.0845 [+0.0568, +0.1122]  holds=True
+cluster al               n=3  lpips +0.0857 [+0.0660, +0.1054]  dists +0.0779 [+0.0480, +0.1078]  holds=True
+cluster med              n=3  lpips +0.1210 [-0.0978, +0.3398]  dists +0.0911 [-0.0040, +0.1861]  holds=False
+without med000           n=5  lpips +0.0795 [+0.0661, +0.0929]  dists +0.0744 [+0.0615, +0.0873]  holds=True
+Tier 1 player win HOLDS
+wrote docs/experiments/w7-specs/w7-tier1-result.json
+```
