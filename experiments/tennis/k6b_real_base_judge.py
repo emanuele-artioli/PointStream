@@ -73,6 +73,16 @@ def prediction_ticks(row: dict[str, Any], manifest: bool) -> list[int]:
     return list(row["ticks"]) if manifest else list(range(0, 240, 3))
 
 
+def check_diagnostic_coverage(diag: dict[str, Any], ids: list[str], prefixes: list[str]) -> None:
+    """Require exactly one valid source and each base scale for every selected window."""
+    for wid, prefix in zip(ids, prefixes, strict=True):
+        sources = [r for r in diag['source'] if r['window'] == wid]
+        bases = [r for r in diag['base'] if r['window'] == prefix]
+        if (len(sources) != 1 or not sources[0]['source_matches'] or len(sources[0]['ticks']) != 80
+                or sorted(r['scale'] for r in bases) != [2, 4, 8]):
+            raise ValueError('GPU source control or base coverage missing')
+
+
 def run(a: argparse.Namespace) -> None:
     P = plan(a)
     import cv2
@@ -116,8 +126,7 @@ def run(a: argparse.Namespace) -> None:
             source_base_manifest = json.load(base_manifest_file)
     gpu_base = scratch / 'gpu-base' / 'publish'
     diag = json.loads((gpu_base / 'diagnostic.json').read_text())
-    if len(diag['base']) != 3 * len(P['sources']) or len(diag['source']) != len(P['sources']) or any(not r['source_matches'] or len(r['ticks']) != 80 for r in diag['source']):
-        raise ValueError('GPU source control or base coverage missing')
+    check_diagnostic_coverage(diag, P['ids'], P['prefixes'])
     for row in diag['base']:
         path = gpu_base / f"{row['window']}-s{row['scale']}-gpu.npy"
         if sha(path.read_bytes()) != row['sha256']:
