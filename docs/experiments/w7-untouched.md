@@ -503,3 +503,14 @@ foreground-first claim.
 - GPU ledger: **15,770.4 s of 30,600 s** after med000; remaining 14,829.6 s. Still running: med019 `096edaef` (full, gpu6); its estimate is 1,747 GPU-s.
 - Generation med019 `20261031T092222Z-096edaef` **complete** on gpu6 (Ada): smoke 66.3 + full 1297.9 = **1364.2 GPU-s** (estimate 92 + 1,655); published archive `cde43aa31bb1802853ce9db47ada53ecf4d4e4c9bdf38be48cd4869c8627cdbb` (80220160 bytes); contention 0, contaminated False.
 - All five generation jobs complete. GPU ledger: **17134.6 s of 30,600 s**; remaining 13465.4 s.
+- Correction: the five generation jobs total **6,806.1 GPU-s** (1,333.3 + 1,316.1 + 1,437.0 + 1,355.5 + 1,364.2); the commit message of `322c3b6b` says 6,727.5 in error. The ledger (17,134.6 s) is unaffected.
+- Rate transport archive `70cfa5b3…` (4,474,880 bytes) and `transport.json` (sha256 `549f9ea2…`) are the upstreams of the rates and receiver jobs below.
+- Rates (CPU; `transport_json` and `base0`/`base1`/`base2` = the native base archives; each writes `rates.json` and `window-state.json`):
+  - al034+med024 `20261031T101051Z-1a1f3d4e` (spec `b4f6b05f…`)
+  - al043+med000 `20261031T101100Z-deb5d1ea` (spec `37e23f5b…`)
+  - med019 `20261031T101111Z-30492f02` (spec `c4a6e589…`)
+- Receiver (GPU, RTX A6000 or Ada; upstreams `transport`, the anchor archive of the group, and each window's generation archive):
+  - al034+med024 `20261031T101120Z-5209ba30` (spec `72a1841e…`; estimate 130 + 745 GPU-s)
+  - al043+med000 `20261031T101130Z-b97dc455` (spec `047a782f…`; estimate 130 + 745)
+  - med019 `20261031T101138Z-b73a54fa` (spec `6353f882…`; estimate 104 + 414)
+- Projected ledger if these run to estimate: 17,134.6 + 2,268 = 19,402.6 s; the judge, W1 and DCVC stages add about 7,165 s at estimate.
