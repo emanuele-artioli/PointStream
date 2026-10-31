@@ -706,6 +706,7 @@ without med000           n=5  lpips +0.0795 [+0.0661, +0.0929]  dists +0.0744 [+
 Tier 1 player win HOLDS
 wrote docs/experiments/w7-specs/w7-tier1-result.json
 ```
+
 ### 2026-10-31 — W7 Tier 1 outcome (lead reading of the analysis, PR #305)
 - Source: `w7_analysis` on the 14 archives listed in the analysis entry, result `docs/experiments/w7-specs/w7-tier1-result.json`
   (sha256 `d71ef815…3ced`), code `7c2d3040`. Six windows, all judged on A6000/Ada; hybrid = scale-4, rate = KPS2 total.
