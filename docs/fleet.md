@@ -34,10 +34,17 @@ scripts/ps-fleet inspect
 scripts/ps-fleet selftest                 # bounded, non-citable CUDA campaign
 scripts/ps-fleet submit /absolute/path/job.json
 scripts/ps-fleet status                  # all shared-inbox requests
+scripts/ps-fleet status --status-timeout-seconds 600  # bounded slow-NFS status read
 scripts/ps-fleet status JOB_ID
 scripts/ps-fleet events JOB_ID
 scripts/ps-fleet cancel JOB_ID
 ```
+
+Status RPCs default to 120 seconds. An explicit `--status-timeout-seconds`
+accepts 1–600 seconds for a slow shared-filesystem status read, preserving the
+same query and results. It does not change submission, cancellation, waiting,
+host probes or artifact-export deadlines. A timed-out status read leaves job
+state unknown; it never authorizes replay.
 
 The default hosts are gpu1–gpu6. Remote environment probes have a60-second
 wall deadline, matching worker-local probes; every required check must still

@@ -1045,12 +1045,16 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
     raise fleet.FleetError("unknown remote operation")
 
 
-def remote_rpc(config: dict[str, Any], action: str, payload: dict[str, Any], *, alias: str | None = None) -> Any:
+def remote_rpc(config: dict[str, Any], action: str, payload: dict[str, Any], *, alias: str | None = None,
+               status_timeout: int | None = None) -> Any:
+    if status_timeout is not None and (action != "status" or isinstance(status_timeout, bool)
+                                       or not isinstance(status_timeout, int) or not 1 <= status_timeout <= 600):
+        raise fleet.FleetError("status timeout must be an integer from 1 to 600 seconds and applies only to status")
     explicit_alias = alias is not None
     alias = alias or config.get("management_host") or config["hosts"][0]
     script = "import json,sys; sys.path.insert(0," + repr(config["release"]) + "); from pathlib import Path; from experiments.jobs.inbox import rpc; print(json.dumps(rpc(Path(" + repr(config["base"]) + ")," + repr(action) + ",json.loads(" + repr(json.dumps(payload)) + "))))"
     python = config["pythons"][alias] if explicit_alias else config.get('management_python', config['pythons'][alias])
-    result = fleet._ssh(alias, [python, "-c", script], timeout=120)
+    result = fleet._ssh(alias, [python, "-c", script], timeout=status_timeout if status_timeout is not None else 120)
     if result.returncode:
         raise fleet.FleetError(f"{alias}: {action} failed: {(result.stderr or result.stdout)[-4000:]}")
     return json.loads(result.stdout.strip().splitlines()[-1])
@@ -1273,6 +1277,8 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
 
 
 def remote_job(args: argparse.Namespace) -> Any:
+    status_timeout = getattr(args, "status_timeout_seconds", None)
+    timeout_options = {"status_timeout": status_timeout} if status_timeout is not None else {}
     if args.job_id:
         path = args.state_dir / f"{args.job_id}.json"
         if not fleet.JOB_ID_RE.fullmatch(args.job_id):
@@ -1281,6 +1287,8 @@ def remote_job(args: argparse.Namespace) -> Any:
         if not record:
             raise fleet.FleetError("no local job record")
         if "config" not in record:
+            if status_timeout is not None:
+                raise fleet.FleetError("--status-timeout-seconds is unavailable for legacy jobs")
             if args.action == "events":
                 raise fleet.FleetError("legacy job events are in the recorded remote run directory")
             return fleet.cancel_job(args.job_id, args.state_dir) if args.action == "cancel" else fleet.status_job(args.job_id, args.state_dir)
@@ -1288,13 +1296,13 @@ def remote_job(args: argparse.Namespace) -> Any:
         # current compatible management release for this same shared inbox.
         current = monitor.read_json(args.state_dir / "inbox.json", {})
         management = current if current.get("base") == record["config"].get("base") and current.get("hosts") else record["config"]
-        result = remote_rpc(management, args.action, {"job_id": args.job_id})
+        result = remote_rpc(management, args.action, {"job_id": args.job_id}, **timeout_options)
         if args.action == "events":
             # Acknowledge only after the consumer actually reports the event.
             seen = monitor.read_json(args.state_dir / "event-acks.json", {})
             result["events"] = [e for e in result["events"] if e["id"] not in seen and not (args.state_dir / "event-acks" / (e["id"] + ".json")).exists()]
         return result
-    return remote_rpc(load_config(args.state_dir), "status", {})
+    return remote_rpc(load_config(args.state_dir), "status", {}, **timeout_options)
 
 
 def selftest_submit(args: argparse.Namespace, root: Path) -> Any:
@@ -1392,6 +1400,16 @@ def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, poll_s
         sleep(min(poll_seconds, remaining))
 
 
+def status_timeout_arg(value: str) -> int:
+    try:
+        seconds = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("status timeout must be an integer from 1 to 600 seconds") from exc
+    if not 1 <= seconds <= 600:
+        raise argparse.ArgumentTypeError("status timeout must be an integer from 1 to 600 seconds")
+    return seconds
+
+
 def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-dir", type=Path, default=fleet.DEFAULT_STATE_DIR)
@@ -1418,6 +1436,7 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     selftest.add_argument("--include-untracked", action="append", default=[])
     status = actions.add_parser("status")
     status.add_argument("job_id", nargs="?")
+    status.add_argument("--status-timeout-seconds", type=status_timeout_arg, help="status RPC timeout in seconds (1–600; default 120)")
     status.add_argument("--artifact", action="append", default=[], help="bounded read-only export of a selected job artifact")
     status.add_argument("--output", type=Path, help="new local artifact export directory")
     for name in ("events", "cancel"):
@@ -1486,6 +1505,8 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
             value = {"acknowledged": args.event_ids}
         else:
             if getattr(args, "artifact", []):
+                if args.status_timeout_seconds is not None:
+                    raise fleet.FleetError("--status-timeout-seconds does not apply to artifact exports")
                 if not args.job_id or args.output is None:
                     raise fleet.FleetError("artifact export needs a recorded job ID and --output")
                 if not fleet.JOB_ID_RE.fullmatch(args.job_id):

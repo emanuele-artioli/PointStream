@@ -714,3 +714,52 @@ def test_deferred_staged_payload_still_blocks_component_on_corruption(campaign, 
     assert inbox.campaign(campaign) == 1
     assert monitor.read_json(campaign / 'gate.json')['passed']
     assert not (campaign / 'full' / 'execution.json').exists()
+
+
+def test_status_rpc_timeout_is_bounded_and_never_changes_other_actions(monkeypatch):
+    import subprocess
+
+    config = {"hosts": ["gpu1"], "release": "/release", "base": "/base", "pythons": {"gpu1": "/python"}}
+    calls = []
+
+    def ssh(host, argv, *, timeout):
+        calls.append((host, timeout))
+        return subprocess.CompletedProcess(argv, 0, '{"status": "ok"}', '')
+
+    monkeypatch.setattr(fleet, "_ssh", ssh)
+    assert inbox.remote_rpc(config, "status", {}) == {"status": "ok"}
+    assert inbox.remote_rpc(config, "status", {}, status_timeout=600) == {"status": "ok"}
+    assert inbox.remote_rpc(config, "cancel", {}) == {"status": "ok"}
+    assert calls == [("gpu1", 120), ("gpu1", 600), ("gpu1", 120)]
+    for value in (0, -1, 601, True, 1.5):
+        with pytest.raises(fleet.FleetError, match="status timeout"):
+            inbox.remote_rpc(config, "status", {}, status_timeout=value)
+    with pytest.raises(fleet.FleetError, match="only to status"):
+        inbox.remote_rpc(config, "cancel", {}, status_timeout=600)
+    assert len(calls) == 3
+
+
+def test_status_timeout_cli_validation_and_status_only(tmp_path, monkeypatch):
+    from argparse import Namespace
+
+    config = {"hosts": ["gpu1"], "release": "/release", "base": "/base", "pythons": {"gpu1": "/python"}}
+    monitor.write_json(tmp_path / "inbox.json", config)
+    calls = []
+    monkeypatch.setattr(inbox, "remote_rpc", lambda *a, **kw: calls.append((a, kw)) or [])
+    assert inbox.main(["--state-dir", str(tmp_path), "status", "--status-timeout-seconds", "600"]) == 0
+    assert calls[0][0][1:] == ("status", {}) and calls[0][1] == {"status_timeout": 600}
+    for value in ("0", "601", "nan", "1.5"):
+        with pytest.raises(SystemExit):
+            inbox.main(["status", "--status-timeout-seconds", value])
+    with pytest.raises(SystemExit):
+        inbox.main(["cancel", "job", "--status-timeout-seconds", "600"])
+    with pytest.raises(fleet.FleetError, match="legacy jobs"):
+        job_id = "20261003T000000Z-12345678"
+        monitor.write_json(tmp_path / f"{job_id}.json", {"status": "pending"})
+        inbox.remote_job(Namespace(state_dir=tmp_path, action="status", job_id=job_id, status_timeout_seconds=600))
+    job_id = "20261003T000000Z-12345678"
+    monitor.write_json(tmp_path / f"{job_id}.json", {"config": config})
+    assert inbox.main(["--state-dir", str(tmp_path), "status", job_id, "--status-timeout-seconds", "1"]) == 0
+    assert calls[-1][0][1:] == ("status", {"job_id": job_id}) and calls[-1][1] == {"status_timeout": 1}
+    assert inbox.main(["--state-dir", str(tmp_path), "status", job_id, "--artifact", "x", "--output", str(tmp_path / "out"), "--status-timeout-seconds", "600"]) == 2
+    assert len(calls) == 2
