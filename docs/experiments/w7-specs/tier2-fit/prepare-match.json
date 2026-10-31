@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada",
+    "RTX A6000"
+  ],
+  "gpu_memory_mib": 8000,
+  "cpu_threads": 8,
+  "local_storage_gib": 40,
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.k6b"
+  ],
+  "arguments": [
+    "prepare-match",
+    "--inputs",
+    "{staged:inputs}",
+    "--pose",
+    "{staged:pose}",
+    "--windows",
+    "nadal_kyrgios/100@120",
+    "nadal_kyrgios/101@120",
+    "nadal_kyrgios/102@120",
+    "--sources",
+    "{staged:c0}",
+    "{staged:c1}",
+    "{staged:c2}",
+    "--max-windows",
+    "{windows}"
+  ],
+  "scale": {
+    "windows": {
+      "smoke": 1,
+      "full": 0
+    }
+  },
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T142857Z-3c09fb40/full/inputs.tar",
+      "sha256": "03341714f7dcca8bef9c2c1f9c0549361bc7bd415ea8f377d0df55375d9a820a"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/yolo/yolo11x-pose.pt",
+      "sha256": "013c43543b0751b8918486ba96e01ee44a59040683a07f96cc22bcc2cb7785f8"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/fit/sources/nadal_kyrgios__100.mp4",
+      "sha256": "b28255b7fffb713a90f79bfdbac4e226cc6d4af1c07197a7b134ced5f2b70da4"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/fit/sources/nadal_kyrgios__101.mp4",
+      "sha256": "74df5c6035df32c3f39afb1c0ae45414ab5c4155ed146839da3120b402bdf0f3"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/fit/sources/nadal_kyrgios__102.mp4",
+      "sha256": "89f9f82ddbade37910608f4859a40f75144bc5f3576a510c4df6c4822024f1cf"
+    }
+  ],
+  "staged_inputs": [
+    {
+      "name": "inputs",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T142857Z-3c09fb40/full/inputs.tar",
+      "sha256": "03341714f7dcca8bef9c2c1f9c0549361bc7bd415ea8f377d0df55375d9a820a",
+      "extract": true
+    },
+    {
+      "name": "pose",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/yolo/yolo11x-pose.pt",
+      "sha256": "013c43543b0751b8918486ba96e01ee44a59040683a07f96cc22bcc2cb7785f8",
+      "extract": false
+    },
+    {
+      "name": "c0",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/fit/sources/nadal_kyrgios__100.mp4",
+      "sha256": "b28255b7fffb713a90f79bfdbac4e226cc6d4af1c07197a7b134ced5f2b70da4",
+      "extract": false
+    },
+    {
+      "name": "c1",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/fit/sources/nadal_kyrgios__101.mp4",
+      "sha256": "74df5c6035df32c3f39afb1c0ae45414ab5c4155ed146839da3120b402bdf0f3",
+      "extract": false
+    },
+    {
+      "name": "c2",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/fit/sources/nadal_kyrgios__102.mp4",
+      "sha256": "89f9f82ddbade37910608f4859a40f75144bc5f3576a510c4df6c4822024f1cf",
+      "extract": false
+    }
+  ],
+  "smoke": {
+    "seconds": 600,
+    "representative_basis": "First drawn Nadal fit window; K4 conversion, adopted players, regions and YOLO pose, as Al step 5."
+  },
+  "full": {
+    "seconds": 2700
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.k6b",
+    "validate"
+  ],
+  "validator_seconds": 300,
+  "required_commands": [],
+  "budget_seconds": 4200,
+  "deadline": "2026-11-02T12:00:00+00:00",
+  "stall_seconds": 1800.0,
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "YOLO detections and crops do not depend on wall time",
+    "margin_mib": 4096
+  },
+  "device": "gpu",
+  "contention": {
+    "policy": "continue",
+    "basis": "YOLO detections and crops do not depend on wall time",
+    "resume_attempts": 0
+  },
+  "verify_staged_inputs": true
+}
