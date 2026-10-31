@@ -491,3 +491,5 @@ foreground-first claim.
   - med019 `20261031T092222Z-096edaef` (spec `29ba7418…`; estimate 92 + 1,655)
 - Projected GPU ledger after these five at estimate: 10,328.5 + 8,073 = 18,401.5 s of 30,600 s. Remaining after them (estimate): 12,198.5 s; the rest of the plan (W1 scoring, receiver, judge, DCVC) is about 9,433 s at estimate.
 - Generation status at 10:40 (local): al034 `27e4a54a` and al043 `e6a8696a` running their full stages; med024 `22cfb8a8` running its full stage; med000 `0a920df0` and med019 `096edaef` pending for a GPU.
+- Generation al034 `20261031T092112Z-27e4a54a` **complete** on gpu5 (Ada): smoke 73.7 + full 1,259.6 = **1,333.3 GPU-s** (estimate 92 + 1,324); published archive `4b72a0327a2537b3b0c07c409e38cbcce5956fa75f54de904025ee0020720d5f` (57,518,080 bytes); no contention, timing not contaminated. The fleet validator covers only its smoke; `full` is read by the receiver and judge.
+- GPU ledger: 10,328.5 + 1,333.3 = **11,661.8 s of 30,600 s**; remaining 18,938.2 s. Generation still running or pending: al043 `e6a8696a` (full, gpu6), med000 `0a920df0` (smoke, gpu5), med024 `22cfb8a8` (full, gpu5), med019 `096edaef` (pending).
