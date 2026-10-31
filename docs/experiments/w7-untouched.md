@@ -574,3 +574,12 @@ foreground-first claim.
   All pending. CPU jobs add no GPU seconds.
 - W1 encodes wait for the judges' scale-4 KPS2 totals (judges `9d59bd9b` and `ff9d8b4f`), so they are not submitted yet.
 - GPU ledger: still ~20,721 s of 30,600 s. Remaining at estimate: judges 1,358 (running), W1 scores 2,764, DCVC 1,899 = 6,021 s; margin about 3,860 s.
+- Judge al043+med000 `20261031T110838Z-ff9d8b4f` **complete** (gpu6, RTX 6000 Ada, shared): smoke 38.0 + full 313.7 = **351.7 GPU-s** (`execution.json`; estimate 679; timing contaminated by the shared GPU, cost only). In-job controls passed for both windows (`hybrid_without_players_is_base`, `plain_base_scored_twice_identical`). Published archive `2f01e4df…` (245,760 bytes). `full/quality-summary.json` exported whole (sha256 `e42f2ae9…`).
+- Scale-4 KPS2 `total_kbps` as written by the judge (the W1 encode targets): al043 (`alcaraz_hurkacz/043@120`) **18.094720000000002** kbps; med000 (`medvedev_struff/000@120`) **41.245588888888896** kbps. The file's bank worst-case totals are not used.
+- W1 masks (CPU) **complete**: med000 `f9aba36a` (archive `d0c03809…`, 225,280 bytes, gate and validator passed); al043 `3d69fe4d` (`7995421c…`, 215,040 bytes); med024 `398b3fe3` (`8fcf4312…`, 235,520 bytes). al034 `d91a68a5` still running on gpu3.
+- W1 encodes (CPU) submitted with those targets, spec builder `w1-encode-{half,quarter,half-out}`:
+  - al043: half (scale 2, plain, controls) `20261031T111842Z-e8a80705`; quarter (scale 4) `20261031T111852Z-25707e03`; half +20 outside R (scale 2, offset -20) `20261031T111859Z-4ea82817`.
+  - med000: half `20261031T111906Z-fe5c2c88`; quarter `20261031T111919Z-c00a4777`; half +20 outside R `20261031T111927Z-2d513709`.
+  All pending. CPU jobs add no GPU seconds.
+- Judge al034+med024 `9d59bd9b` is still running (full stage, gpu3). Its scale-4 totals gate the al034 and med024 encodes.
+- GPU ledger: **~21,073 s of 30,600 s** realized (previous ~20,721 s plus 351.7 s). Remaining at estimate: judge al034+med024 679, W1 scores 2,764, DCVC 1,899 = 5,342 s; projected total about 26,415 s, margin about 4,185 s. DCVC's KPS1 bracket is still open.
