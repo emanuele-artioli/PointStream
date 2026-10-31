@@ -374,3 +374,24 @@ foreground-first claim.
   pareto against the SVT hull, common range 9.34-14.57 kbps) is in `w3-summary.json`: whole LPIPS BD-rate -63.9 %, whole DISTS -56.0 % (status OVERLAP ONLY).
   Next test (not run; 134 s of the 5,940 s left): re-run DCVC with points chosen on the measured 240-frame rates so that the span reaches the hybrid's rate (the 25-frame estimates overshot: targets 15/30/60 kbps gave 3.3/7.7/14.6 kbps), about 250 s GPU.
 - First-window GPU ledger, final: 5,432 s (through W1 scoring) + DCVC 66 (failed validator) + 66 + 243 = **5,806 s = 1.613 GPU-h of the 1.65 GPU-h (5,940 s) sub-budget**.
+
+### 2026-10-30 — W7 first-window sub-budget raised to 1.75 GPU-h; DCVC bracket points (lead decision; rate only, no quality read)
+- The first window's sub-budget rises from 1.65 to 1.75 GPU-h (6,300 s). Reason: DCVC is the state-of-the-art neural baseline and an unresolved family leaves the window incomplete; the same rate fix is needed for the five batched
+  windows anyway. Projected Tier 1 total about 7.5 of the 8 GPU-h card. GPU spent before this decision: 5,806 s; 494 s remain.
+- Rate rule: keep the scale-2 points (QP 6: 7.654 kbps, QP 18: 14.572 kbps) and add higher-quality QP indexes until at least one point exceeds 19.68 kbps (the hybrid's KPS1 rate); the existing 14.572 kbps point is the lower bracket
+  of the hybrid's KPS2 rate (18.461 kbps). From the first run's own measurements the measured/estimated ratio at scale 2 is 0.2574 (QP 6) and 0.2502 (QP 18) (the 25-frame estimate overstates the 240-frame rate about 4x, as the W3 entry 2026-10-29 found);
+  the calibration estimates are 79.62 kbps (QP 24) and 107.11 kbps (QP 30), so the predicted rates are about 19.6 and 26 kbps (ratio drifting down by 0.0036 per 12 QP: 0.246 and 0.243). **Chosen before submitting: scale 2, QP 24 and QP 30**
+  (the lead's suggestion; QP 30 is predicted well above 19.68 kbps, QP 24 close to it). Named points, no calibration encodes: smoke `al028:2:24`, full `al028:2:24,al028:2:30`; SVT base scale 8 only (the SVT bases of the first run are not re-coded).
+- DCVC bracket job: `20261030T221148Z-4973d2f4` submitted (points scale 2 QP 24 and 30, SVT scale 8).
+- DCVC bracket: `20261030T221148Z-4973d2f4` complete on gpu6 (Ada, shared); smoke 46.8 s + full 164.4 s GPU; `full/published.tar` sha256 `63104b7832ab9d8f8e6125bc2acf852feffd4954ff3950ce33d08f6523270e49`; `w3_neural_baseline --validate` on the full
+  output (named-point full stage): 22 checks passed; accepted (decode checks). As written (scale 2: QP, kbps, whole LPIPS, whole DISTS, foreground LPIPS, foreground DISTS):
+  QP 24: 20.412 kbps, 0.1414, 0.1162, 0.3714, 0.2967; QP 30: 28.829 kbps, 0.1237, 0.1005, 0.3260, 0.2712. QP 24 exceeds 19.68 kbps (predicted 19.6, measured 20.4); the prediction held to 4 %.
+  Scale-2 DCVC curve with the first run's points (QP 6 7.654, QP 18 14.572 kbps): `docs/experiments/w7-specs/dcvc-points-al028-scale2.json` (`w5_dcvc` column order QP, kbps, whole LPIPS, whole DISTS, fg LPIPS, fg DISTS).
+  `w5_dcvc` (log-rate interpolation between the bracketing points QP 18 and QP 24, no extrapolation), as written:
+  at the hybrid's KPS2 rate 18.4614 kbps: whole LPIPS 0.1490, foreground LPIPS 0.3929, whole DISTS 0.1238, foreground DISTS 0.3074; verdict (DCVC dominates the hybrid? per metric) LPIPS False, DISTS False;
+  at the KPS1 rate 19.6823 kbps: whole LPIPS 0.1442, foreground LPIPS 0.3792, whole DISTS 0.1190, foreground DISTS 0.3006; verdict LPIPS False, DISTS False.
+  Hybrid's scale-4 means for reference (from the judge, as written): whole LPIPS 0.2845, foreground LPIPS 0.3042, whole DISTS 0.1750, foreground DISTS 0.2420. With DCVC resolved, the W1 dominance outcome stays A (SVT: no policy dominates; DCVC: no dominance on either metric).
+- Calibration fix for the batched windows (code): `w3_neural_baseline --bracket LOW HIGH` replaces the 15/30/60 kbps targets: one encode-only 240-frame probe (the scale-2 candidate whose estimate x the typical ratio 0.25 is nearest the middle of [LOW, HIGH])
+  gives the measured/estimated ratio, and the two scale-2 points whose predicted 240-frame rates bracket [LOW, HIGH] are coded; the validator checks the predicted bracket and, in the full stage, the measured one. Pure parts tested
+  (`tests/test_w3_neural_baseline.py`, `tests/test_w7_specs.py`); the in-job path has not run on a GPU (it runs first in the next window's smoke). Spec: `w7_specs first-window dcvc ... low=L:x high=H:x`.
+- First-window GPU ledger, final: 5,806 s + DCVC bracket 46.8 + 164.4 = **6,017 s = 1.671 GPU-h of the 1.75 GPU-h (6,300 s) sub-budget**.

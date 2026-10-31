@@ -55,6 +55,38 @@ def select_points(candidates: list[dict[str, Any]], count: int) -> list[dict[str
     return sorted(taken, key=lambda c: c['target_kbps'])
 
 
+#: measured/estimated rate ratio of the 25-frame calibration at 240 frames, from the W3 and W7 runs (0.17-0.43); only the probe's choice uses it.
+TYPICAL_RATIO = 0.25
+
+
+def probe_candidate(candidates: list[dict[str, Any]], scale: int, low: float, high: float) -> dict[str, Any]:
+    """The candidate whose estimate, times the typical ratio, is closest in log-rate to the middle of [low, high]: the one 240-frame rate probe."""
+    pool = [c for c in candidates if c['scale'] == scale]
+    if not pool or not 0 < low <= high:
+        raise ValueError('candidates of the probe scale and 0 < low <= high required')
+    mid = math.sqrt(low * high)
+    return min(pool, key=lambda c: (abs(math.log(c['est_kbps'] * TYPICAL_RATIO / mid)), c['qp']))
+
+
+def select_bracketing(candidates: list[dict[str, Any]], ratio: float, low: float, high: float, scale: int = 2) -> list[dict[str, Any]]:
+    """Two points of one scale whose predicted 240-frame rates (ratio x calibration estimate) bracket [low, high]: the highest rate at or below `low`
+    and the lowest rate at or above `high`. Rate alone decides; a side with no candidate falls back to the extreme one and the pair is then not a bracket."""
+    if ratio <= 0 or not 0 < low <= high:
+        raise ValueError('a positive ratio and 0 < low <= high are required')
+    pool = sorted(({**c, 'pred_kbps': c['est_kbps'] * ratio} for c in candidates if c['scale'] == scale), key=lambda c: c['pred_kbps'])
+    if not pool:
+        raise ValueError(f'no candidates at scale {scale}')
+    lower = [c for c in pool if c['pred_kbps'] <= low]
+    upper = [c for c in pool if c['pred_kbps'] >= high]
+    chosen = [lower[-1] if lower else pool[0], upper[0] if upper else pool[-1]]
+    return chosen if chosen[0] is not chosen[1] else chosen[:1]
+
+
+def bracket_holds(points: list[dict[str, Any]], low: float, high: float, key: str = 'pred_kbps') -> bool:
+    rates = [p[key] for p in points]
+    return bool(rates) and min(rates) <= low and max(rates) >= high
+
+
 def bracket_ok(points: list[dict[str, Any]], low: float = 20.0, high: float = 45.0) -> bool:
     """Whether estimated rates of the chosen points bracket (most of) 15-60 kbps."""
     rates = [p['est_kbps'] for p in points]
