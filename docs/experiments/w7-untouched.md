@@ -433,3 +433,16 @@ foreground-first claim.
   alone, before any batch quality exists; the first window's extra families stay in its record and are not used by the rule.
 - Revised plan (`w7_specs plan`): **22,940 GPU-s = 6.37 GPU-h** with Med at 1.25x the Al full times, 20,246 s = 5.62 GPU-h at 1.0x. Remaining card budget after the first window's
   6,017 s: 22,783 s (6.33 GPU-h). At the 1.25x assumption the plan is 157 s over; the card states the stop rule.
+
+### 2026-10-31 — W7 Tier 1 batch: budget raised to 8.5 GPU-h; pre-submission checks; first jobs (local item session; card [w7-tier1-batch](../cards/w7-tier1-batch.md))
+- Budget (user, 2026-10-31): the Tier 1 card rises from 8 to 8.5 GPU-h, +0.5 GPU-h of headroom so that a couple of failed test runs do not leave a window without its DCVC comparison. Ledger: first window 6,017 s spent; batch remainder 30,600 − 6,017 = **24,583 s (6.83 GPU-h)**. Plan at the 1.25x Med factor: 22,940 s, margin 1,643 s. The card's stop rule is unchanged: no job is submitted if it would push the card past 30,600 s in total.
+- Model deviation: the card asks for a Sonnet session at effort high; this item runs in a Haiku 5.5 session (user's choice of session; recorded here, not changed).
+- Code: `origin/main` 6a5213c5 (includes `609cfdfa`, `ac9b4452`, `a3c3c133`); worktree branch `claude/w7-tier1-batch-card-cc9411`, clean.
+- Fleet pre-check (before any batch job): `scripts/ps-fleet inspect` reached all six hosts (available, no PointStream claim on any GPU). Foreign processes: gpu2 both A6000 (one at 100 % utilisation), gpu3 A6000, gpu4 both RTX 8000 (1.7–1.9 GB free), gpu6 GPU 0 (100 % utilisation). `scripts/ps-fleet status` (all requests) timed out after 120 s through the default management route (gpu2) and through `PS_FLEET_MANAGEMENT_HOST=gpu5`. Per-request status works (0.1 s). This card has no earlier requests; the listing failure is a management-path limitation, not evidence about the fleet, and it is recorded rather than skipped.
+- Inputs: `windows.json` sha256 `18d184cd…c5e15` (matches the first window). `manifest.json` sha256 `3ece701e…5c14`, taken from the first-window features job's staged inputs (`20261030T143125Z-8785a55b`); the Mac has no Datasets link, so the file was not re-hashed here.
+- Specs: written with `w7_specs batch` into the session scratchpad (not committed). Spec sha256: features `aac7c772…9dab`; native base al034+med024 `6ce75159…1ed4`; native base al043+med000+med019 `96a200b4…6492`.
+- Jobs (submitted 2026-10-31 08:15Z, `git_head` 6a5213c5 in each job's record; operator order above):
+  - features, five windows (`al034,al043,med000,med024,med019`; smoke = al034; gpu3/5/6, Ada required): `20261031T081537Z-8cff0ebc` (pending)
+  - native base al034+med024 (CPU): `20261031T081537Z-0b16c855` (preparing)
+  - native base al043+med000+med019 (CPU): `20261031T081537Z-8fb0a603` (pending)
+- GPU ledger: 6,017 s spent before the batch; batch jobs so far 0 s. Remaining 24,583 s.
