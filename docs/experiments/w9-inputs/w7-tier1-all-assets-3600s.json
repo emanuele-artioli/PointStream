@@ -1,0 +1,573 @@
+{
+  "windows": [
+    {
+      "window": "al028",
+      "judge_row": "alcaraz_hurkacz/028@120",
+      "rate_kbps": 21.931333333333335,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.2845294694311825,
+          "foreground": 0.30418113154134874
+        },
+        "dists": {
+          "whole": 0.17501250877976418,
+          "foreground": 0.24202542155981063
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.05776955204242923,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.36195068358377797,
+          "hybrid_score": 0.30418113154134874,
+          "per_anchor": {
+            "dcvc": 0.05776955204242923
+          }
+        },
+        "dists": {
+          "delta": 0.04938604914192993,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.29141147070174056,
+          "hybrid_score": 0.24202542155981063,
+          "per_anchor": {
+            "dcvc": 0.04938604914192993
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.1468139843929658,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.2845294694311825,
+          "per_anchor": {
+            "dcvc": -0.1468139843929658
+          }
+        },
+        "dists": {
+          "difference": -0.06209702417374312,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.17501250877976418,
+          "per_anchor": {
+            "dcvc": -0.06209702417374312
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc"
+      ],
+      "anchors_excluded": {
+        "s2_o0": "unresolved",
+        "s4_o0": "unresolved",
+        "s2_o20": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          6.0,
+          7.654166666666667,
+          0.2126950907766083,
+          0.18453151881694793,
+          0.5946132595299871,
+          0.4291407875716686
+        ],
+        [
+          18.0,
+          14.571666666666665,
+          0.1668881487434293,
+          0.14189233258366585,
+          0.4435467873708201,
+          0.3324119679629803
+        ],
+        [
+          24.0,
+          20.41166666666667,
+          0.1414015951274354,
+          0.11617572605609894,
+          0.37139389169089004,
+          0.2967290930449963
+        ],
+        [
+          30.0,
+          28.82916666666667,
+          0.12367776121916593,
+          0.10049958601593971,
+          0.3259883427515868,
+          0.2711604982614517
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        20.41166666666667,
+        28.82916666666667
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.1377154850382167,
+          "foreground_lpips": 0.36195068358377797,
+          "whole_dists": 0.11291548460602106,
+          "foreground_dists": 0.29141147070174056
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 3.47e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 155683,
+        "intended_bank_bytes": 934098.0000000001,
+        "old_bank_bytes": 233524.5,
+        "adapter_bytes": 1488252,
+        "length_seconds": 3600.0,
+        "old_rate_kbps": 18.461418333333334,
+        "added_rate_kbps": 3.469915
+      }
+    },
+    {
+      "window": "al034",
+      "rate_kbps": 21.402446666666666,
+      "unresolved": "al034: no anchor family resolved at 21.4024 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 164079,
+        "intended_bank_bytes": 984473.9999999999,
+        "old_bank_bytes": 246118.5,
+        "adapter_bytes": 1488252,
+        "length_seconds": 3600.0,
+        "old_rate_kbps": 17.834578333333333,
+        "added_rate_kbps": 3.567868333333333
+      }
+    },
+    {
+      "window": "al043",
+      "rate_kbps": 21.529413333333338,
+      "unresolved": "al043: no anchor family resolved at 21.5294 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 152664,
+        "intended_bank_bytes": 915984.0,
+        "old_bank_bytes": 228996.0,
+        "adapter_bytes": 1488252,
+        "length_seconds": 3600.0,
+        "old_rate_kbps": 18.094720000000002,
+        "added_rate_kbps": 3.4346933333333336
+      }
+    },
+    {
+      "window": "med000",
+      "judge_row": "medvedev_struff/000@120",
+      "rate_kbps": 45.25576444444445,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.3951207493911555,
+          "foreground": 0.3138478860252585
+        },
+        "dists": {
+          "whole": 0.17988866865634917,
+          "foreground": 0.23645192310214042
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.19401885308775257,
+          "best_anchor": "s2_o0",
+          "best_anchor_score": 0.5078667391130111,
+          "hybrid_score": 0.3138478860252585,
+          "per_anchor": {
+            "s2_o0": 0.19401885308775257,
+            "s4_o0": 0.26535105188356234
+          }
+        },
+        "dists": {
+          "delta": 0.1261008483444847,
+          "best_anchor": "s4_o0",
+          "best_anchor_score": 0.3625527714466251,
+          "hybrid_score": 0.23645192310214042,
+          "per_anchor": {
+            "s2_o0": 0.13781048791333317,
+            "s4_o0": 0.1261008483444847
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.13520395160950693,
+          "best_anchor": "s2_o0",
+          "hybrid_score": 0.3951207493911555,
+          "per_anchor": {
+            "s2_o0": -0.13520395160950693,
+            "s4_o0": -0.00339803429746377
+          }
+        },
+        "dists": {
+          "difference": -0.05418123103249625,
+          "best_anchor": "s2_o0",
+          "hybrid_score": 0.17988866865634917,
+          "per_anchor": {
+            "s2_o0": -0.05418123103249625,
+            "s4_o0": 0.005978220432104109
+          }
+        }
+      },
+      "anchors_used": [
+        "s2_o0",
+        "s4_o0"
+      ],
+      "anchors_excluded": {
+        "s2_o20": "unresolved",
+        "dcvc": "missing"
+      },
+      "svt_only_best_anchor": true,
+      "dcvc_points": [],
+      "dcvc_bracket_kbps": null,
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "s2_o0": {
+            "lpips": false,
+            "dists": false
+          },
+          "s4_o0": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "s2_o0": {
+          "whole_lpips": 0.25991679778164856,
+          "foreground_lpips": 0.5078667391130111,
+          "whole_dists": 0.12570743762385292,
+          "foreground_dists": 0.3742624110154736
+        },
+        "s4_o0": {
+          "whole_lpips": 0.3917227150936917,
+          "foreground_lpips": 0.5791989379088208,
+          "whole_dists": 0.18586688908845328,
+          "foreground_dists": 0.3625527714466251
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 4.01e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 201292,
+        "intended_bank_bytes": 1207752.0,
+        "old_bank_bytes": 301938.0,
+        "adapter_bytes": 1495592,
+        "length_seconds": 3600.0,
+        "old_rate_kbps": 41.245588888888896,
+        "added_rate_kbps": 4.010175555555556
+      }
+    },
+    {
+      "window": "med024",
+      "judge_row": "medvedev_struff/024@120",
+      "rate_kbps": 44.78871111111111,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.37337089180652006,
+          "foreground": 0.3170799096819713
+        },
+        "dists": {
+          "whole": 0.17248089462518693,
+          "foreground": 0.24375004172325135
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.058682986486862154,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.37576289616883346,
+          "hybrid_score": 0.3170799096819713,
+          "per_anchor": {
+            "s2_o0": 0.22814640635704608,
+            "s2_o20": 0.24352556039287454,
+            "dcvc": 0.058682986486862154
+          }
+        },
+        "dists": {
+          "delta": 0.06323812962773587,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.3069881713509872,
+          "hybrid_score": 0.24375004172325135,
+          "per_anchor": {
+            "s2_o0": 0.15187390937689269,
+            "s2_o20": 0.16269023717808237,
+            "dcvc": 0.06323812962773587
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.15371693315020568,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.37337089180652006,
+          "per_anchor": {
+            "s2_o0": -0.12780746954547212,
+            "s2_o20": -0.09856141106659022,
+            "dcvc": -0.15371693315020568
+          }
+        },
+        "dists": {
+          "difference": -0.04997514497958677,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.17248089462518693,
+          "per_anchor": {
+            "s2_o0": -0.049344035000715214,
+            "s2_o20": -0.03540078181053802,
+            "dcvc": -0.04997514497958677
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc",
+        "s2_o0",
+        "s2_o20"
+      ],
+      "anchors_excluded": {
+        "s4_o0": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          12.0,
+          33.48166666666666,
+          0.23421267455301167,
+          0.1363908402621746,
+          0.428646574463672,
+          0.34229491502046583
+        ],
+        [
+          18.0,
+          45.91833333333334,
+          0.2184076165093316,
+          0.12131707519292831,
+          0.3712356317030651,
+          0.3039656326174736
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        33.48166666666666,
+        45.91833333333334
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          },
+          "s2_o0": {
+            "lpips": false,
+            "dists": false
+          },
+          "s2_o20": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.21965395865631437,
+          "foreground_lpips": 0.37576289616883346,
+          "whole_dists": 0.12250574964560015,
+          "foreground_dists": 0.3069881713509872
+        },
+        "s2_o0": {
+          "whole_lpips": 0.24556342226104794,
+          "foreground_lpips": 0.5452263160390174,
+          "whole_dists": 0.12313685962447171,
+          "foreground_dists": 0.39562395110014403
+        },
+        "s2_o20": {
+          "whole_lpips": 0.27480948073992983,
+          "foreground_lpips": 0.5606054700748458,
+          "whole_dists": 0.1370801128146489,
+          "foreground_dists": 0.4064402789013337
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 3.87e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 189263,
+        "intended_bank_bytes": 1135578.0,
+        "old_bank_bytes": 283894.5,
+        "adapter_bytes": 1495592,
+        "length_seconds": 3600.0,
+        "old_rate_kbps": 40.91887388888889,
+        "added_rate_kbps": 3.869837222222222
+      }
+    },
+    {
+      "window": "med019",
+      "judge_row": "medvedev_struff/019@120",
+      "rate_kbps": 44.97776444444444,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.39460041752568,
+          "foreground": 0.3552090447820079
+        },
+        "dists": {
+          "whole": 0.18422582894563674,
+          "foreground": 0.25726505145430567
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.04582564145572465,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.40103468623773253,
+          "hybrid_score": 0.3552090447820079,
+          "per_anchor": {
+            "s2_o0": 0.19135908102531707,
+            "dcvc": 0.04582564145572465
+          }
+        },
+        "dists": {
+          "delta": 0.054337303569878814,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.3116023550241845,
+          "hybrid_score": 0.25726505145430567,
+          "per_anchor": {
+            "s2_o0": 0.14330218339794293,
+            "dcvc": 0.054337303569878814
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.165872422534078,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.39460041752568,
+          "per_anchor": {
+            "s2_o0": -0.13645336426861626,
+            "dcvc": -0.165872422534078
+          }
+        },
+        "dists": {
+          "difference": -0.06102257280301554,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.18422582894563674,
+          "per_anchor": {
+            "s2_o0": -0.05793795987877323,
+            "dcvc": -0.06102257280301554
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc",
+        "s2_o0"
+      ],
+      "anchors_excluded": {
+        "s4_o0": "unresolved",
+        "s2_o20": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          12.0,
+          36.015,
+          0.24119969139570072,
+          0.13237885683774947,
+          0.44824793437927274,
+          0.33535511419177055
+        ],
+        [
+          18.0,
+          48.99333333333333,
+          0.2239288392243562,
+          0.11967245042324066,
+          0.38286685046244734,
+          0.30246220380067823
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        36.015,
+        48.99333333333333
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          },
+          "s2_o0": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.22872799499160198,
+          "foreground_lpips": 0.40103468623773253,
+          "whole_dists": 0.1232032561426212,
+          "foreground_dists": 0.3116023550241845
+        },
+        "s2_o0": {
+          "whole_lpips": 0.2581470532570637,
+          "foreground_lpips": 0.546568125807325,
+          "whole_dists": 0.1262878690668635,
+          "foreground_dists": 0.4005672348522486
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 3.94e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 195067,
+        "intended_bank_bytes": 1170402.0,
+        "old_bank_bytes": 292600.5,
+        "adapter_bytes": 1495592,
+        "length_seconds": 3600.0,
+        "old_rate_kbps": 41.040213888888886,
+        "added_rate_kbps": 3.937550555555555
+      }
+    }
+  ],
+  "group": null,
+  "unresolved_windows": [
+    "al034",
+    "al043"
+  ]
+}

@@ -98,7 +98,7 @@ def test_check_manifest_accepts_a_noncentered_manifest_cohort():
 
 def test_w7_rates_and_state():
     from experiments.tennis import w7_rates as r
-    row = {'window': 'alcaraz_hurkacz/028@120', 'match': 'alcaraz_hurkacz', 'reference_files': ['a.ref', 'b.ref'],
+    row = {'window': 'alcaraz_hurkacz/028@120', 'match': 'alcaraz_hurkacz', 'reference_files': [{'file': 'a.ref', 'codec': 'png', 'bytes': 60000}, {'file': 'b.ref', 'codec': 'png', 'bytes': 90000}],
            'references': {'png_bytes': 150000}, 'keypoints': {'bytes': 2701, 'kps1_bytes': 4236, 'contract': {'fps': [25, 1]}}}
     out = r.rates({'rows': [row]})['alcaraz_hurkacz/028@120']
     assert abs(out['keypoint_kbps'] - 2701 * 8 / 9.6 / 1000) < 1e-12
@@ -140,7 +140,7 @@ def test_new_match_can_be_prepared_before_its_adapter_is_fitted(tmp_path):
 def test_new_match_rates_bill_explicit_adapter_bytes():
     from experiments.tennis import w7_rates as r
 
-    row = {'window': 'nadal_kyrgios/000@120', 'match': 'nadal_kyrgios', 'reference_files': ['a', 'b'],
+    row = {'window': 'nadal_kyrgios/000@120', 'match': 'nadal_kyrgios', 'reference_files': [{'file': 'a', 'codec': 'png', 'bytes': 400}, {'file': 'b', 'codec': 'png', 'bytes': 600}],
            'references': {'png_bytes': 1000}, 'keypoints': {'bytes': 100, 'contract': {'fps': [50, 1]}}}
     with pytest.raises(KeyError):
         r.rates({'rows': [row]})
@@ -160,7 +160,7 @@ def test_rate_computation_rejects_charge_without_fitted_adapter_identity(tmp_pat
     del data['adapters']['nadal_kyrgios']
     path.write_text(json.dumps(data))
     transport = tmp_path / 'transport.json'
-    row = {'window': window.id, 'match': window.match, 'reference_files': ['a', 'b'], 'references': {'png_bytes': 1000},
+    row = {'window': window.id, 'match': window.match, 'reference_files': [{'file': 'a', 'codec': 'png', 'bytes': 400}, {'file': 'b', 'codec': 'png', 'bytes': 600}], 'references': {'png_bytes': 1000},
            'keypoints': {'bytes': 100, 'kps1_bytes': 200, 'contract': {'fps': [50, 1]}}}
     transport.write_text(json.dumps({'rows': [row]}))
     monkeypatch.setattr(r, 'base_rows', lambda _: [{'window': window.name, 'scale': s, 'ivf': {'bytes': 10}} for s in (2, 4, 8)])

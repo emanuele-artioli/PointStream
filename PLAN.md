@@ -21,7 +21,21 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-10-29)
+## Where PointStream stands (2026-10-31)
+
+**2026-10-31 accounting correction:** the W7 transport lists PNG and
+JPEG variants of two reference crops. `w7_rates.rates` counted eight files as
+eight crops, undercharging the modeled 12-crop reference bank by a factor of
+four. Saved-evidence recomputation gives Tier 1 player LPIPS +0.0965
+[+0.0349, +0.1581], DISTS +0.0810 [+0.0529, +0.1091], conditional on the
+anchor families still resolved at the corrected rates. Tier 2 no longer
+passes the original rule: LPIPS +0.0671 [−0.0011, +0.1354], DISTS +0.0667
+[+0.0440, +0.0894]. Several SVT curves now lack upper brackets; a minimum
+of nine new points would restore the original coverage. The unseen-match
+result is inconclusive. Neither tier establishes a fully covered comparison.
+Historical W7 closure claims below are superseded by this correction. Original
+outputs remain unchanged; no new GPU work is launched. See
+[W9's audit](docs/experiments/w9-adapter-break-even.md) and [PR #315](https://github.com/emanuele-artioli/PointStream/pull/315).
 
 **Read first: [assessment 2026-10-29](docs/assessment-2026-10-29.md).** No
 configuration beats SVT-AV1 on whole-frame LPIPS and DISTS once every bit is
@@ -111,9 +125,9 @@ sessions update their own items and their files in `docs/experiments/`
 
 ### Resume here after the root chat is archived
 
-**Latest (2026-10-31): read [the 2026-10-31 continuation](docs/continuation-2026-10-31.md) first.** W7 is closed
-(the foreground-first claim holds on untouched footage, Tiers 1 and 2), work continues in Codex sessions, and the
-next items are listed there in order. The 2026-10-27 text below is historical.
+**Latest (2026-10-31): read [the 2026-10-31 continuation](docs/continuation-2026-10-31.md) first.**
+The later billing correction above supersedes the earlier two-tier W7 closure.
+Work continues in Codex sessions; the 2026-10-27 text below is historical.
 
 Read [the 2026-10-27 continuation](docs/continuation-2026-10-27.md) first. It
 contains the current scientific stop, exact job/artifact identities, remaining
@@ -334,6 +348,7 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
+| Paper continuation and W7 accounting audit | [2026-10-31 handoff](docs/continuation-2026-10-31.md) | `codex/paper-continuation-2026-10-31` | primary plus Terra 6.1 medium delegates | running 2026-10-31: correction reproduced, Overleaf `fc0343f9` includes corrected figure (23 pages), PR #315; W6b timing completed at 99.82/1,800 CPU-s, scale gate stops (metrics alone project >2,473 CPU-s), no smoothing result; user approved new independent W7 repair caps 5,400 GPU-s + 5,400 workload CPU-s, no training; queue preflight in progress, no job submitted |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 | J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
 | H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` @ `3b11a36` | Opus | reported 2026-10-22: 4a fail (F billed +93% wDISTS), 4b not built (LPIPS), crops ready; 2.6 GPU-hours of 4 |
@@ -1391,6 +1406,7 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   ([rule](docs/experiments/w7-untouched.md)) written 2026-10-30: Tier 1
   untouched clips of Al/Med, Tier 2 the Nadal–Kyrgios match the base never
   trained on.
+  **Historical W7 outcomes, superseded by the billing correction above:**
   **W7 Tier 1 outcome (2026-10-31):** holds by the rule on six untouched
   Al/Med windows: player gap LPIPS +0.103 [+0.041, +0.165], DISTS +0.085
   [+0.057, +0.112]; DCVC-UF is the strongest anchor; the whole frame is worse
@@ -1406,7 +1422,8 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   Full-rate Al hybrid, all 240 frames. Pose passes: YOLO11x-pose error 0.063
   of the box vs SVT 0.90, whose players the detector mostly misses. Time
   fails: flicker 28.6 vs SVT 18.6, residual energy 23.1 vs a limit of 16.6.
-  The racket is essentially absent (3% coverage). Narrowed claim: sharp,
+  The racket appears largely absent (3% coverage of a body-hull proxy, not
+  independently labelled racket recall). Narrowed claim: sharp,
   correctly posed players that flicker more than SVT's. Next test: split the
   flicker between the per-frame receiver masks and the generated pixels, on
   saved outputs. W7 keeps the every-third-frame recipe.
@@ -1440,7 +1457,10 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   180 times slower than 50 fps. Live use also needs a few-step or distilled
   generator (W10).
 - **W11. Racket (user, 2026-10-30).** The generator does not draw the racket.
-  W6 found it covers 3% of the source racket region, so the racket gets its
+  W6 found 3% coverage of a source-mask/body-hull proxy, not independent racket
+  recall. The W11 annotation audit found no eligible pixel mask linked to those
+  frames ([audit](docs/experiments/w11-racket.md)); a proxy paste cannot gate
+  a true racket path. The racket gets its
   own object path like the ball (K5/K5b) instead of being left to the player
   generator. Steps, oracle first:
   1. An oracle on W6's saved outputs: paste the source racket pixels into the

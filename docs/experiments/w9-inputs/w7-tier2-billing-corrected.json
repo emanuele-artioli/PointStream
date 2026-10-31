@@ -1,0 +1,457 @@
+{
+  "windows": [
+    {
+      "window": "nad000",
+      "judge_row": "nadal_kyrgios/000@120",
+      "rate_kbps": 44.618157777777775,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.4586274591139805,
+          "foreground": 0.33213653907050866
+        },
+        "dists": {
+          "whole": 0.20828497856855394,
+          "foreground": 0.2377184011042118
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.053302312508833216,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.3854388515793419,
+          "hybrid_score": 0.33213653907050866,
+          "per_anchor": {
+            "s2_o0": 0.23024709146017663,
+            "s2_o20": 0.26315786310987044,
+            "dcvc": 0.053302312508833216
+          }
+        },
+        "dists": {
+          "delta": 0.06279385390437683,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.30051225500858864,
+          "hybrid_score": 0.2377184011042118,
+          "per_anchor": {
+            "s2_o0": 0.1279597404264146,
+            "s2_o20": 0.14266241276170302,
+            "dcvc": 0.06279385390437683
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.11744690771975375,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.4586274591139805,
+          "per_anchor": {
+            "s2_o0": -0.08271310419087868,
+            "s2_o20": -0.04248736576345463,
+            "dcvc": -0.11744690771975375
+          }
+        },
+        "dists": {
+          "difference": -0.04551283672484582,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.20828497856855394,
+          "per_anchor": {
+            "s2_o0": -0.034247234208496485,
+            "s2_o20": -0.013152197907451424,
+            "dcvc": -0.04551283672484582
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc",
+        "s2_o0",
+        "s2_o20"
+      ],
+      "anchors_excluded": {
+        "s4_o0": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          18.0,
+          36.825,
+          0.3517093641493056,
+          0.1734144203364849,
+          0.410284243617431,
+          0.31764566600322724
+        ],
+        [
+          24.0,
+          49.778333333333336,
+          0.33517806027259356,
+          0.15670496374368667,
+          0.37127445825302047,
+          0.2907444730401039
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        36.825,
+        49.778333333333336
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          },
+          "s2_o0": {
+            "lpips": false,
+            "dists": false
+          },
+          "s2_o20": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.34118055139422676,
+          "foreground_lpips": 0.3854388515793419,
+          "whole_dists": 0.1627721418437081,
+          "foreground_dists": 0.30051225500858864
+        },
+        "s2_o0": {
+          "whole_lpips": 0.3759143549231018,
+          "foreground_lpips": 0.5623836305306853,
+          "whole_dists": 0.17403774436005745,
+          "foreground_dists": 0.3656781415306264
+        },
+        "s2_o20": {
+          "whole_lpips": 0.4161400933505259,
+          "foreground_lpips": 0.5952944021803791,
+          "whole_dists": 0.1951327806611025,
+          "foreground_dists": 0.3803808138659148
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 1.83e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 366161,
+        "intended_bank_bytes": 2196966,
+        "old_bank_bytes": 549241.5,
+        "old_rate_kbps": 42.78735277777778,
+        "added_rate_kbps": 1.830805
+      }
+    },
+    {
+      "window": "nad001",
+      "judge_row": "nadal_kyrgios/001@120",
+      "rate_kbps": 44.56831777777778,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.46797966888804493,
+          "foreground": 0.3601001420760501
+        },
+        "dists": {
+          "whole": 0.21462907865643502,
+          "foreground": 0.25445307418704033
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.0987665595580332,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.45886670163408333,
+          "hybrid_score": 0.3601001420760501,
+          "per_anchor": {
+            "s2_o20": 0.2508685398762832,
+            "dcvc": 0.0987665595580332
+          }
+        },
+        "dists": {
+          "delta": 0.07713672721042786,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.3315898013974682,
+          "hybrid_score": 0.25445307418704033,
+          "per_anchor": {
+            "s2_o20": 0.1361559352108846,
+            "dcvc": 0.07713672721042786
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.11813820121087903,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.46797966888804493,
+          "per_anchor": {
+            "s2_o20": -0.03612055742514114,
+            "dcvc": -0.11813820121087903
+          }
+        },
+        "dists": {
+          "difference": -0.04246289124021793,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.21462907865643502,
+          "per_anchor": {
+            "s2_o20": -0.015016021746551311,
+            "dcvc": -0.04246289124021793
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc",
+        "s2_o20"
+      ],
+      "anchors_excluded": {
+        "s2_o0": "unresolved",
+        "s4_o0": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          18.0,
+          41.18666666666667,
+          0.35359373191550925,
+          0.1761175774037838,
+          0.47133426076946305,
+          0.3379985086619854
+        ],
+        [
+          24.0,
+          56.74166666666667,
+          0.33835834795163,
+          0.16007367968559266,
+          0.42071201285343046,
+          0.31197712272405625
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        41.18666666666667,
+        56.74166666666667
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          },
+          "s2_o20": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.3498414676771659,
+          "foreground_lpips": 0.45886670163408333,
+          "whole_dists": 0.1721661874162171,
+          "foreground_dists": 0.3315898013974682
+        },
+        "s2_o20": {
+          "whole_lpips": 0.4318591114629038,
+          "foreground_lpips": 0.6109686819523333,
+          "whole_dists": 0.1996130569098837,
+          "foreground_dists": 0.3906090093979249
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 1.31e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 262185,
+        "intended_bank_bytes": 1573110,
+        "old_bank_bytes": 393277.5,
+        "old_rate_kbps": 43.25739277777778,
+        "added_rate_kbps": 1.310925
+      }
+    },
+    {
+      "window": "nad002",
+      "judge_row": "nadal_kyrgios/002@120",
+      "rate_kbps": 51.21346444444445,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.4476534943757233,
+          "foreground": 0.36751551457760456
+        },
+        "dists": {
+          "whole": 0.20974427610635757,
+          "foreground": 0.2526476442813873
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.049331415815479784,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.41684693039308435,
+          "hybrid_score": 0.36751551457760456,
+          "per_anchor": {
+            "s4_o0": 0.3109054827290494,
+            "s2_o20": 0.2690797458520777,
+            "dcvc": 0.049331415815479784
+          }
+        },
+        "dists": {
+          "delta": 0.06012157539855256,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.31276921967993987,
+          "hybrid_score": 0.2526476442813873,
+          "per_anchor": {
+            "s4_o0": 0.1462462135254775,
+            "s2_o20": 0.14088745608597825,
+            "dcvc": 0.06012157539855256
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.12989191285720397,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.4476534943757233,
+          "per_anchor": {
+            "s4_o0": -0.002770222341214379,
+            "s2_o20": -0.052152665823596234,
+            "dcvc": -0.12989191285720397
+          }
+        },
+        "dists": {
+          "difference": -0.04570770338000002,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.20974427610635757,
+          "per_anchor": {
+            "s4_o0": 0.0027026164488072046,
+            "s2_o20": -0.026184240465915748,
+            "dcvc": -0.04570770338000002
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc",
+        "s2_o20",
+        "s4_o0"
+      ],
+      "anchors_excluded": {
+        "s2_o0": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          18.0,
+          37.96,
+          0.33481584110966434,
+          0.1803860157728195,
+          0.46409986616012733,
+          0.34050826281309127
+        ],
+        [
+          24.0,
+          52.39333333333334,
+          0.31646447829258295,
+          0.1627930760383606,
+          0.4132529933422949,
+          0.310659459233284
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        37.96,
+        52.39333333333334
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          },
+          "s2_o20": {
+            "lpips": false,
+            "dists": false
+          },
+          "s4_o0": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.31776158151851935,
+          "foreground_lpips": 0.41684693039308435,
+          "whole_dists": 0.16403657272635755,
+          "foreground_dists": 0.31276921967993987
+        },
+        "s2_o20": {
+          "whole_lpips": 0.3955008285521271,
+          "foreground_lpips": 0.6365952604296823,
+          "whole_dists": 0.18356003564044182,
+          "foreground_dists": 0.39353510036736555
+        },
+        "s4_o0": {
+          "whole_lpips": 0.44488327203450895,
+          "foreground_lpips": 0.678420997306654,
+          "whole_dists": 0.21244689255516477,
+          "foreground_dists": 0.3988938578068648
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 1.60e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 319207,
+        "intended_bank_bytes": 1915242,
+        "old_bank_bytes": 478810.5,
+        "old_rate_kbps": 49.61742944444445,
+        "added_rate_kbps": 1.596035
+      }
+    }
+  ],
+  "group": {
+    "windows": [
+      "nad000",
+      "nad001",
+      "nad002"
+    ],
+    "lpips": {
+      "n": 3,
+      "mean": 0.06713342929411541,
+      "sd": 0.02746694746159128,
+      "t": 4.302652729749462,
+      "lo": -0.0010982507218884885,
+      "hi": 0.1353651093101193,
+      "excludes_zero_above": false
+    },
+    "dists": {
+      "n": 3,
+      "mean": 0.06668405217111908,
+      "sd": 0.009150359539996999,
+      "t": 4.302652729749462,
+      "lo": 0.043953298961738135,
+      "hi": 0.08941480538050003,
+      "excludes_zero_above": true
+    },
+    "holds": false
+  }
+}

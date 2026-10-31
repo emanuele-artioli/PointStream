@@ -1,0 +1,264 @@
+{
+  "windows": [
+    {
+      "window": "nad000",
+      "judge_row": "nadal_kyrgios/000@120",
+      "rate_kbps": 48.71464888888889,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.4586274591139805,
+          "foreground": 0.33213653907050866
+        },
+        "dists": {
+          "whole": 0.20828497856855394,
+          "foreground": 0.2377184011042118
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.04193355504238627,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.37407009411289494,
+          "hybrid_score": 0.33213653907050866,
+          "per_anchor": {
+            "dcvc": 0.04193355504238627
+          }
+        },
+        "dists": {
+          "delta": 0.05495394564805364,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.29267234675226544,
+          "hybrid_score": 0.2377184011042118,
+          "per_anchor": {
+            "dcvc": 0.05495394564805364
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.12226468312207461,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.4586274591139805,
+          "per_anchor": {
+            "dcvc": -0.12226468312207461
+          }
+        },
+        "dists": {
+          "difference": -0.050382531793021074,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.20828497856855394,
+          "per_anchor": {
+            "dcvc": -0.050382531793021074
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc"
+      ],
+      "anchors_excluded": {
+        "s2_o0": "unresolved",
+        "s4_o0": "unresolved",
+        "s2_o20": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          18.0,
+          36.825,
+          0.3517093641493056,
+          0.1734144203364849,
+          0.410284243617431,
+          0.31764566600322724
+        ],
+        [
+          24.0,
+          49.778333333333336,
+          0.33517806027259356,
+          0.15670496374368667,
+          0.37127445825302047,
+          0.2907444730401039
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        36.825,
+        49.778333333333336
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.3363627759919059,
+          "foreground_lpips": 0.37407009411289494,
+          "whole_dists": 0.15790244677553286,
+          "foreground_dists": 0.29267234675226544
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 5.93e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 366161,
+        "intended_bank_bytes": 2196966.0,
+        "old_bank_bytes": 549241.5,
+        "adapter_bytes": 1489876,
+        "length_seconds": 3600.0,
+        "old_rate_kbps": 42.78735277777778,
+        "added_rate_kbps": 5.927296111111112
+      }
+    },
+    {
+      "window": "nad001",
+      "judge_row": "nadal_kyrgios/001@120",
+      "rate_kbps": 47.97163555555556,
+      "hybrid": {
+        "lpips": {
+          "whole": 0.46797966888804493,
+          "foreground": 0.3601001420760501
+        },
+        "dists": {
+          "whole": 0.21462907865643502,
+          "foreground": 0.25445307418704033
+        }
+      },
+      "gap": {
+        "lpips": {
+          "delta": 0.0871398751436201,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.4472400172196702,
+          "hybrid_score": 0.3601001420760501,
+          "per_anchor": {
+            "dcvc": 0.0871398751436201
+          }
+        },
+        "dists": {
+          "delta": 0.07116025530764353,
+          "best_anchor": "dcvc",
+          "best_anchor_score": 0.32561332949468386,
+          "hybrid_score": 0.25445307418704033,
+          "per_anchor": {
+            "dcvc": 0.07116025530764353
+          }
+        }
+      },
+      "whole_frame": {
+        "lpips": {
+          "difference": -0.12163739392895534,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.46797966888804493,
+          "per_anchor": {
+            "dcvc": -0.12163739392895534
+          }
+        },
+        "dists": {
+          "difference": -0.046147779668245514,
+          "best_anchor": "dcvc",
+          "hybrid_score": 0.21462907865643502,
+          "per_anchor": {
+            "dcvc": -0.046147779668245514
+          }
+        }
+      },
+      "anchors_used": [
+        "dcvc"
+      ],
+      "anchors_excluded": {
+        "s2_o0": "unresolved",
+        "s4_o0": "unresolved",
+        "s2_o20": "unresolved"
+      },
+      "svt_only_best_anchor": false,
+      "dcvc_points": [
+        [
+          18.0,
+          41.18666666666667,
+          0.35359373191550925,
+          0.1761175774037838,
+          0.47133426076946305,
+          0.3379985086619854
+        ],
+        [
+          24.0,
+          56.74166666666667,
+          0.33835834795163,
+          0.16007367968559266,
+          0.42071201285343046,
+          0.31197712272405625
+        ]
+      ],
+      "dcvc_bracket_kbps": [
+        41.18666666666667,
+        56.74166666666667
+      ],
+      "dominance": {
+        "outcome": "A",
+        "outcome_svt_only": "A",
+        "dominating": {
+          "lpips": [],
+          "dists": []
+        },
+        "margin": 0.001,
+        "per_family": {
+          "dcvc": {
+            "lpips": false,
+            "dists": false
+          }
+        }
+      },
+      "w1_embedded_outcome": "A",
+      "at_hybrid_rate": {
+        "dcvc": {
+          "whole_lpips": 0.3463422749590896,
+          "foreground_lpips": 0.4472400172196702,
+          "whole_dists": 0.1684812989881895,
+          "foreground_dists": 0.32561332949468386
+        }
+      },
+      "warnings": [
+        "judge and score summaries disagree on the hybrid (max score diff 0.00e+00, rate diff 4.71e+00 kbps)",
+        "score summary was computed at another target rate; its at_target is not used (recomputed from by_policy)"
+      ],
+      "billing_correction": {
+        "png_bytes_two_crops": 262185,
+        "intended_bank_bytes": 1573110.0,
+        "old_bank_bytes": 393277.5,
+        "adapter_bytes": 1489876,
+        "length_seconds": 3600.0,
+        "old_rate_kbps": 43.25739277777778,
+        "added_rate_kbps": 4.714242777777778
+      }
+    },
+    {
+      "window": "nad002",
+      "rate_kbps": 54.99692888888889,
+      "unresolved": "nad002: no anchor family resolved at 54.9969 kbps",
+      "billing_correction": {
+        "png_bytes_two_crops": 319207,
+        "intended_bank_bytes": 1915242.0,
+        "old_bank_bytes": 478810.5,
+        "adapter_bytes": 1489876,
+        "length_seconds": 3600.0,
+        "old_rate_kbps": 49.61742944444445,
+        "added_rate_kbps": 5.379499444444444
+      }
+    }
+  ],
+  "group": null,
+  "unresolved_windows": [
+    "nad002"
+  ]
+}

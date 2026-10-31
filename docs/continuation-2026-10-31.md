@@ -1,5 +1,16 @@
 # Continuation, 2026-10-31: W7 closed; work moves to Codex
 
+**Later same-day audit:** W7's historical closure below is superseded. The
+reference-bank billing code counted encoding variants as independent crops,
+undercharging the modeled bank by four. The corrected saved-evidence Tier 1
+LPIPS gap is +0.0965 [0.0349, 0.1581], DISTS +0.0810 [0.0529, 0.1091],
+conditional on resolved anchors. Tier 2 LPIPS is +0.0671 [−0.0011, 0.1354]
+and DISTS +0.0667 [0.0440, 0.0894]: the original two-metric rule does not pass.
+Several SVT curves need higher-rate points; these conditional comparisons are
+optimistic while families are unresolved. The unseen-match result is
+inconclusive. See [W9](experiments/w9-adapter-break-even.md) and the current
+PLAN ledger. Original results are preserved. No new GPU job was submitted.
+
 From here on the work runs in Codex sessions on the Mac (user, 2026-10-31). The cloud root
 session is wrapped up: no job, timer or process of it remains. There is no root session now, so
 each Codex session owns its own dispatch-ledger row in PLAN.md
@@ -55,3 +66,13 @@ Each item starts with its rule entry in `docs/experiments/` before any GPU time 
 - **Commit and open the PR as you go.** A fix that sits uncommitted in a worktree is lost with it.
 - **Local test failures.** About 12–13 pytest failures and 7 mypy errors also fail on unchanged `main` on the Mac (missing packages, macOS paths). Compare with `origin/main`; CI is the check.
 - **Decisions the user must make** (budget beyond a card, scope) go to the user in that session, with the context the question needs.
+
+## Later Codex continuation: corrected accounting and approved anchor repair
+
+The billing fix and reproduced corrected evidence are on `codex/paper-continuation-2026-10-31`, PR #315, commits `002c89cc`, `4ce348a6`, `2da6447d`. The manuscript has been fast-forward pushed to Overleaf main as `9a4491f4b33173fcaaf6fc47dbb5627f9656a8d7`; it states the conditional familiar-match result and inconclusive unseen-match result, not submission readiness. The reviewed working PDF is `/private/tmp/pointstream-w7-manuscript/build/main.pdf` (23 pages). See `docs/paper/readiness-2026-10-31.md`.
+
+The user subsequently approved a **new independent anchor-repair budget of 5,400 GPU-seconds and 5,400 workload CPU-seconds**, with pilots and cost stops, no training. This restores nine comparisons lost at corrected rates; original missing DCVC/ROI comparisons are explicitly outside this repair. No GPU job had been submitted and none of this new budget had been spent when approved. Runtime enforcement, frozen hashes/specifications and existing-job/host preflight precede dispatch. The W9 experiment entry owns IDs, budget accounting and results. Do not use old closed budget balances. Full fleet status through gpu2 timed out after 120 seconds; this is a management-path limitation, not evidence that existing jobs stopped or the fleet is unavailable.
+
+The separate W6b CPU timing pilot **completed normally**, session `5929` on gpu2, fresh directory `/local/users/emanuele/pointstream/w6b-metric-pilot2-20261031/`. Its process is absent. It used 89.82 CPU-s plus a conservative 10 CPU-s for a terminated faulty startup (99.82/1,800 total); wall 1,112.46 s. Even warmed metric timings project 2,473 CPU-s for the required 240 metric pairs before composition, flow, flicker and controls. The scale gate stops; there is no smoothing-quality result or running W6b job. See `docs/experiments/w6-motion-pose.md`; do not replay either pilot. Any new full smoothing proposal needs separate authority and a packed host-local environment.
+
+Latest manuscript main is `fc0343f989ac038ee8d37462bcff9b47fe5a67cb`, including the corrected W7 figure and conditional caption, still 23 pages. Code checkpoint `ac2b82ba` adds an optional bounded read-only status timeout; all existing mutation/probe deadlines remain unchanged. One all-queue status read through gpu5 with a 600-second bound is pending; W9 owns its handle. No duplicate query or repair submission should be inferred from a timeout.
