@@ -56,6 +56,17 @@ def identity_controls(images: list[np.ndarray], base: np.ndarray, composed: np.n
             'plain_base_scored_twice_identical': bool(np.array_equal(scores[0], scores[1])) and bool(np.array_equal(images[0], again))}
 
 
+def unit_mask(predicted: dict[int, np.ndarray], cropped: bool, t: int, shape: tuple[int, int] = (1080, 1920)) -> np.ndarray:
+    """A unit's receiver mask at frame t for composing. A frame without a crop has no receiver mask by construction, and compose never
+    pastes a player without a crop, so that frame gets an empty mask; a cropped frame must have its receiver mask."""
+    mask = predicted.get(t)
+    if mask is None:
+        if cropped:
+            raise ValueError("Receiver mask missing for a cropped frame")
+        return np.zeros(shape, dtype=bool)
+    return mask
+
+
 def prediction_ticks(row: dict[str, Any], manifest: bool) -> list[int]:
     """Frames a saved receiver prediction must cover. The frozen pair predicts every third frame of the 240-frame window; a manifest
     window's unit has no pose at some of those frames, so its receiver predicted only the recorded ticks (job 20261031T102650Z-8d510571)."""
@@ -212,7 +223,7 @@ def run(a: argparse.Namespace) -> None:
                     player_crops[player] = g['crops'][int(idx[0])]
                 if t in boxes[i]:
                     player_boxes[player] = boxes[i][t]
-                player_masks[player] = masks_by_window[wid][i][t]
+                player_masks[player] = unit_mask(masks_by_window[wid][i], len(idx) == 1, t)
             images = []
             for scale in (8, 4, 2):
                 base = np.asarray(base_arrays[scale][t // 3])
