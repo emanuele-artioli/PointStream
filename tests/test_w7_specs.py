@@ -410,3 +410,21 @@ def test_batch_scores_only_the_rules_svt_anchors(tmp_path):
     args = out['arguments']
     assert args[args.index('--offsets') + 1:args.index('--offsets') + 2] == ['-20'] and '-40' not in args
     assert out['scale']['max_encodes']['full'] == 6
+
+
+def test_w7_data_directory_can_be_isolated_for_tier2():
+    assert sp.data_dir(sp.DATA + '/tennis/w7-tier2-20261031/fit').endswith('/w7-tier2-20261031/fit')
+    with pytest.raises(ValueError):
+        sp.data_dir(sp.DATA + '/tennis/../other')
+    with pytest.raises(ValueError):
+        sp.data_dir('/tmp/w7')
+
+
+def test_batch_uses_manifest_filename_for_immutable_final_manifest(tmp_path):
+    path = tmp_path / 'windows-final.json'
+    path.write_bytes(WINDOWS_JSON.read_bytes())
+    output = wb.batch(['native-base', str(path), str(tmp_path), '--windows', 'al034'])
+    spec = json.loads(output.read_text())
+    windows = next(x for x in spec['staged_inputs'] if x['name'] == 'windows')
+    assert windows['path'] == sp.W7_DIR + '/windows-final.json'
+    assert windows['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()

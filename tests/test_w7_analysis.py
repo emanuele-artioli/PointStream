@@ -293,3 +293,16 @@ def test_inputs_table_lists_the_accepted_jobs_and_matches_the_docstring(capsys):
         for d in entry['dcvc']:
             assert 'job' not in d or d['job'] in doc
     assert 'c4df5a5f' not in ''.join(e['job'] for v in a.W7_INPUTS.values() for e in v['dcvc'] if 'job' in e)
+
+
+def test_tier2_uses_its_own_cohort_and_match_cluster(tmp_path):
+    inputs = {name: window_inputs(tmp_path, name, dcvc=False) for name in a.TIER2_WINDOWS}
+    result = a.analyse(inputs)
+    assert result['tier'] == 2 and result['complete'] and result['missing_windows'] == []
+    assert result['clusters']['nad']['windows'] == list(a.TIER2_WINDOWS)
+    assert result['pooled']['lpips']['n'] == 3
+    assert 'Tier 2 player win' in a.summary_text(result)
+    partial = a.analyse({'nad000': inputs['nad000']})
+    assert partial['missing_windows'] == ['nad001', 'nad002'] and not partial['tier2_holds']
+    with pytest.raises(ValueError, match='cannot be pooled'):
+        a.analyse({'nad000': inputs['nad000'], 'al028': window_inputs(tmp_path)})
