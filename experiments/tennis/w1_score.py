@@ -134,6 +134,10 @@ def scales_of(published: Path) -> tuple[int, ...]:
     return tuple(sorted({int(x['scale']) for x in json.loads((published / 'encode.json').read_text())['searches']}))
 
 
+def qualified_gpu(name: str, allow_ada: bool) -> bool:
+    return 'A6000' in name or (allow_ada and 'RTX 6000 Ada' in name)
+
+
 def run(a: argparse.Namespace) -> None:
     import torch
 
@@ -145,8 +149,10 @@ def run(a: argparse.Namespace) -> None:
 
     began = time.monotonic()
     window = WINDOWS[a.window]
-    if not torch.cuda.is_available() or 'A6000' not in torch.cuda.get_device_name(0):
-        raise ValueError('a qualified RTX A6000 is required (the controls were scored on one)')
+    if a.allow_ada and (a.windows_file is None or control_tolerance(window.name) != 1e-3):
+        raise ValueError('Ada requires a manifest window with the 1e-3 control gate')
+    if not torch.cuda.is_available() or not qualified_gpu(torch.cuda.get_device_name(0), a.allow_ada):
+        raise ValueError('a qualified RTX A6000 or explicitly enabled RTX 6000 Ada is required')
     torch.set_num_threads(4)
     limit = int(os.environ.get('PS_GPU_MEMORY_LIMIT_MIB', '8000'))
     torch.cuda.set_per_process_memory_fraction(min(1.0, limit * 2**20 / torch.cuda.get_device_properties(0).total_memory))
@@ -242,7 +248,8 @@ def validate() -> None:
     smoke = len(summary['ticks']) != len(TICKS)
     checks: dict[str, bool] = {
         'ticks': summary['ticks'] in (TICKS[:3], TICKS),
-        'cuda_a6000': bool(summary['cuda']) and 'A6000' in summary['gpu'],
+        'cuda_qualified': bool(summary['cuda']) and qualified_gpu(summary['gpu'], '--allow-ada' in spec['arguments'])
+        and ('A6000' in summary['gpu'] or control_tolerance(summary['window']) == 1e-3),
         'tools_pinned': all(summary['tools'][n]['sha256'] == d for n, d in TOOLS.items()),
         'inputs': all(summary['inputs'][x['name']] == x['sha256'] for x in spec['staged_inputs'] if x['name'] in summary['inputs']),
         'controls_reproduced': sorted(summary['control_errors']) == ['control_s2_crf63', 'control_s4_crf63', 'control_s8_crf63']
@@ -281,6 +288,7 @@ def main() -> None:
     p.add_argument('--windows-file', type=Path, help='window manifest (window_manifest.py); registers its windows next to al/med')
     p.add_argument('--window-state', type=Path, help='what earlier stages measured per manifest window (w1_roi.window_from_spec)')
     p.add_argument('--validate', action='store_true')
+    p.add_argument('--allow-ada', action='store_true', help='allow Ada for manifest windows with the 1e-3 control gate')
     for name in ('masks', 'hybrid', 'lpips', 'dists', 'encode-half', 'encode-full'):
         p.add_argument('--' + name, type=Path)
     p.add_argument('--al', '--source', dest='al', type=Path, help='the window\'s source video')
