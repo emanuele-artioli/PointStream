@@ -267,7 +267,8 @@ def worker_config(source: Path, worker_out: Path, allow_paths: list[str], denied
             'allow_paths': [str(source), str(worker_out), *allow_paths], 'denied_paths': denied_paths,
             'cpu_seconds': 12, 'environment': {'CUDA_VISIBLE_DEVICES': '', 'TMPDIR': str(worker_out),
                                               'TMP': str(worker_out), 'TEMP': str(worker_out),
-                                              'HOME': str(worker_out)},
+                                              'XDG_CACHE_HOME': str(worker_out / '.cache'),
+                                              'TORCH_HOME': str(worker_out / '.cache' / 'torch')},
             'files': {}, 'tensor_fingerprints': {}, 'unit': '', 'output': str(worker_out),
             'worker_kind': 'preflight', 'protected_receipt': {'path': str(identity_receipt),
                                                              'sha256': sha(identity_receipt)}}
