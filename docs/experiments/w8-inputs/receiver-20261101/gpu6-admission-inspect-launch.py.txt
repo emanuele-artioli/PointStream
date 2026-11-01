@@ -1,0 +1,13 @@
+import json,resource,shlex,signal,subprocess,time
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(1,1));p=Path('/private/tmp/w8-final-gpu6-inspect-20261101');cmd='/usr/bin/timeout 23 /usr/bin/python3 -I -S -B -c '+shlex.quote((p/'remote.py').read_text())
+def cap():resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+with (p/'stdout').open('xb') as out,(p/'stderr').open('xb') as err:
+ proc=subprocess.Popen(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=8','gpu6',cmd],stdin=subprocess.DEVNULL,stdout=out,stderr=err,preexec_fn=cap);(p/'handle.json').write_text(json.dumps({'pid':proc.pid,'started':time.time()}))
+ def alarm(a,b):raise TimeoutError()
+ signal.signal(signal.SIGALRM,alarm);signal.alarm(25)
+ try:status=proc.wait();timeout=False
+ except TimeoutError:proc.terminate();status=proc.wait();timeout=True
+ finally:signal.alarm(0)
+(p/'execution.json').write_text(json.dumps({'exit':status,'timeout':timeout,'finished':time.time()}))
+if status or timeout:raise SystemExit(1)

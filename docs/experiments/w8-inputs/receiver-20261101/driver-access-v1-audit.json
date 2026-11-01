@@ -1,0 +1,46 @@
+{
+  "added_jcv_paths": [
+    "/dev/nvidia-modeset",
+    "/dev/nvidia-uvm",
+    "/dev/nvidia-uvm-tools",
+    "/dev/nvidia0",
+    "/dev/nvidia1",
+    "/dev/nvidiactl",
+    "/dev/nvidia-caps/nvidia-cap1",
+    "/dev/nvidia-caps/nvidia-cap2",
+    "/dev/null",
+    "/dev/urandom",
+    "/proc/driver/nvidia/version"
+  ],
+  "bundle_sha256": "8ab330809c2b39a93e02aee4e74b9eb576df3969434da6675b6a0095430258f9",
+  "fresh_namespaces": true,
+  "network_loopback_checked_by_executed_probe": true,
+  "original_bundle_sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5",
+  "owned_processes_absent": {
+    "pgid:4034249": false,
+    "pgid:4034331": false,
+    "pgid:4034333": false,
+    "pid:4034269": false,
+    "pid:4034331": false,
+    "pid:4034333": false
+  },
+  "passed": true,
+  "proc_read_denied_then_allowed": true,
+  "protected_denials_each": 10,
+  "raw_file_hashes": {
+    "existing.exit.json": "01c444bce2871a7afc658b414d7d0fa9a3409551771720d2ef7c2bad598920d8",
+    "existing.start.json": "edf35d0f535cbad81cb292656082e2b906b299101e981ff4699a5e33ec5e675f",
+    "existing.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "existing.stdout": "28c31c6804a62b6001e5610fdf91eb677e0ab9bc047d505c03e01a90d19e460f",
+    "metadata.json": "f77fa7bd18628a7150066e5b70a188e2d28822134e21303c914b1340ef9e4efc",
+    "narrow.exit.json": "92028c5a81ba57c4f9acb5b846360a013ea87d7034f5e395cb7447b66eb47987",
+    "narrow.start.json": "03d5a3d91c5c69ad67cd5c4b1ac48a8a30fb2384548a09541f7643bcf33ed46e",
+    "narrow.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "narrow.stdout": "73138118f7bb6e45e814e2016d9c2ed24d5de7d940e0b680c41732afe99a27dc",
+    "parent.json": "ad306fdf99b2d4e2c1a703519e77d18476bd42008a7c029be8ea18b967d14ec7",
+    "probe.py": "75f7a2e81fa9e0302498eda735ee4f62139be2996a7eb17b45f687ab2f18166f"
+  },
+  "scope": "CPU Landlock public path permissions only; no CUDA initialization or GPU qualification",
+  "source_archive_sha256": "6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713",
+  "source_files_match": 236
+}

@@ -1,0 +1,38 @@
+{
+  "job_id": "20261101T151030Z-df638d2f",
+  "host": "gpu2",
+  "root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261101T151030Z-df638d2f",
+  "read_only": true,
+  "seconds": 34.07996725011617,
+  "files": [
+    {
+      "path": "smoke/command.log",
+      "status": "read",
+      "source_bytes": 1260,
+      "truncated": false,
+      "sha256": "4f0f749fc9c10262396a47a360745d8838ae870b2b2a97c4f3ae193505759fef",
+      "seconds": 2.449477881193161
+    },
+    {
+      "path": "smoke/execution.json",
+      "status": "read",
+      "source_bytes": 367,
+      "truncated": false,
+      "sha256": "06bbf8fdbc9cbfab6a4de0622add03799a192948548d8de6ad593f56c5d3e775",
+      "seconds": 0.5793714891187847
+    },
+    {
+      "path": "smoke/staging.json",
+      "status": "read",
+      "source_bytes": 8686,
+      "truncated": false,
+      "sha256": "1ea0adfccb59e4ce10223ee3f5a3efd36806c72166047a48a25763155c0898b1",
+      "seconds": 0.09427523100748658
+    },
+    {
+      "path": "smoke/ledger.json",
+      "status": "missing",
+      "seconds": 0.9308999890927225
+    }
+  ]
+}

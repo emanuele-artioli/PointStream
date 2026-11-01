@@ -1,0 +1,84 @@
+"""Proposed metadata/permission probe; never initialize CUDA or open NVIDIA devices."""
+import base64, errno, hashlib, importlib.util, json, os, pathlib, resource, signal, socket, stat, subprocess, sys, time
+from pathlib import Path
+MODE = sys.argv[1] if len(sys.argv) > 1 else 'parent'
+ROOT = Path('/local/users/emanuele/pointstream/audits/w8-driver-access-probe-v1-20261101')
+SOURCE = Path('/local/users/emanuele/pointstream/audits/w8-cost-source-repair-cpu-v1-20261101/source')
+MODULE = SOURCE/'experiments/tennis/w8_receiver_bootstrap.py'
+MODULE_SHA = '3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49'
+IDENTITY = Path('/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json')
+IDENTITY_SHA = '0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe'
+MAIN = Path('/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree')
+JCV = Path('/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree')
+def digest(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+def cap(): resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+def stat_record(p):
+ try:
+  s=p.lstat(); return {'path':str(p),'mode':oct(s.st_mode),'device':s.st_dev,'inode':s.st_ino,'rdev':s.st_rdev,'symlink':stat.S_ISLNK(s.st_mode)}
+ except FileNotFoundError: return {'path':str(p),'missing':True}
+if MODE == 'parent':
+ active=None
+ def stop_owned():
+  global active
+  if active is None or active.poll() is not None: return
+  try: os.killpg(active.pid,signal.SIGTERM)
+  except ProcessLookupError: pass
+  try: active.wait(timeout=2)
+  except subprocess.TimeoutExpired:
+   try: os.killpg(active.pid,signal.SIGKILL)
+   except ProcessLookupError: pass
+   active.wait()
+ def interrupted(signum,_frame):
+  stop_owned(); raise SystemExit(128+signum)
+ signal.signal(signal.SIGTERM,interrupted); signal.signal(signal.SIGXCPU,interrupted)
+ resource.setrlimit(resource.RLIMIT_CPU,(1,2)); os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
+ if digest(MODULE)!=MODULE_SHA or digest(IDENTITY)!=IDENTITY_SHA: raise ValueError('source/identity hash')
+ assets=json.loads(IDENTITY.read_bytes())['protected_inputs']
+ if set(assets)!={'source','prepared','fit','golden','masks'}: raise ValueError('protected category set')
+ ROOT.mkdir(mode=0o700,exist_ok=False); (ROOT/'parent.json').write_text(json.dumps({'pid':os.getpid(),'pgid':os.getpgrp(),'source_sha256':digest(MODULE),'timestamp':time.time()})); script=base64.b64decode(sys.argv[2],validate=True); (ROOT/'probe.py').write_bytes(script); aliases=ROOT/'aliases';aliases.mkdir(); denied=[]
+ for name,record in sorted(assets.items()):
+  p=Path(record['path']); s=p.stat()
+  if (s.st_dev,s.st_ino)!=(record['device'],record['inode']): raise ValueError('protected identity')
+  a=aliases/name;a.symlink_to(p.resolve(strict=True));denied.extend([str(p),str(a)])
+ public=[Path('/dev/null'),Path('/dev/urandom'),Path('/proc/driver/nvidia/version')]
+ devices=sorted(Path('/dev').glob('nvidia*'))
+ caps=Path('/dev/nvidia-caps')
+ if caps.is_dir(): devices += sorted(caps.iterdir())
+ devices=list(dict.fromkeys(p for p in devices if not p.is_dir()))
+ metadata={'kernel':os.uname().release,'module_sha256':digest(MODULE),'identity_sha256':digest(IDENTITY),'public':[stat_record(p) for p in public],'devices':[stat_record(p) for p in devices],'device_directory':stat_record(caps),'denied':denied,'parent_namespaces':{x:os.readlink('/proc/self/ns/'+x) for x in ('user','net')}}
+ (ROOT/'metadata.json').write_text(json.dumps(metadata,sort_keys=True))
+ for mode in ('existing','narrow'):
+  with (ROOT/(mode+'.stdout')).open('xb') as out,(ROOT/(mode+'.stderr')).open('xb') as err:
+   p=subprocess.Popen(['/usr/bin/unshare','--user','--map-root-user','--net',str(MAIN/'bin/python'),'-I','-S','-B',str(ROOT/'probe.py'),mode],stdin=subprocess.DEVNULL,stdout=out,stderr=err,close_fds=True,env={'CUDA_VISIBLE_DEVICES':'','PYTHONDONTWRITEBYTECODE':'1'},preexec_fn=cap,start_new_session=True)
+   active=p; (ROOT/(mode+'.start.json')).write_text(json.dumps({'pid':p.pid,'pgid':p.pid,'timestamp':time.time()}))
+   try: status=p.wait(timeout=20)
+   except subprocess.TimeoutExpired:
+    stop_owned(); raise TimeoutError(mode+" child timed out")
+   active=None
+  (ROOT/(mode+'.exit.json')).write_text(json.dumps({'pid':p.pid,'exit':status}))
+  if status: raise RuntimeError(mode+' child failed')
+ print(json.dumps({'passed':True,'root':str(ROOT),'parent_cpu':sum(resource.getrusage(resource.RUSAGE_SELF)[:2])}))
+else:
+ cap(); meta=json.loads((ROOT/'metadata.json').read_bytes())
+ if digest(MODULE)!=MODULE_SHA: raise ValueError('module changed')
+ spec=importlib.util.spec_from_file_location('bootstrap_probe',MODULE); mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
+ ns={x:os.readlink('/proc/self/ns/'+x) for x in ('user','net')}
+ if any(ns[x]==meta['parent_namespaces'][x] for x in ns) or [n for _,n in socket.if_nameindex()]!=['lo']: raise ValueError('namespace')
+ roots=[SOURCE,ROOT,JCV,Path('/usr/lib'),Path('/lib'),Path('/lib64')]
+ public=[Path('/dev/null'),Path('/dev/urandom'),Path('/proc/driver/nvidia/version')]
+ if MODE=='narrow': roots += [p for p in public if p.exists()] + [Path(x['path']) for x in meta['devices'] if not x.get('missing') and not x.get('symlink')]
+ elif MODE!='existing': raise ValueError('mode')
+ abi=mod._restrict(roots); denials=mod._check_denials([Path(p) for p in meta['denied']]); checks={}
+ for path in public:
+  if not path.exists(): checks[str(path)]='missing';continue
+  try:
+   with path.open('rb') as f:f.read(1)
+   checks[str(path)]='readable'
+  except OSError as e: checks[str(path)]={'errno':e.errno}
+ for name in ('/dev/null','/dev/urandom'):
+  if MODE=='existing' and checks[name] not in ({'errno':errno.EACCES},{'errno':errno.EPERM}): raise ValueError('expected denied '+name)
+  if MODE=='narrow' and checks[name]!='readable': raise ValueError('expected readable '+name)
+ if checks['/proc/driver/nvidia/version']!='missing':
+  if MODE=='existing' and checks['/proc/driver/nvidia/version'] not in ({'errno':errno.EACCES},{'errno':errno.EPERM}): raise ValueError('expected denied proc')
+  if MODE=='narrow' and checks['/proc/driver/nvidia/version']!='readable': raise ValueError('expected readable proc')
+ print(json.dumps({'mode':MODE,'abi':abi,'roots':[str(x) for x in roots],'namespaces':ns,'protected_denials':denials,'public_checks':checks,'cpu':sum(resource.getrusage(resource.RUSAGE_SELF)[:2])},sort_keys=True))

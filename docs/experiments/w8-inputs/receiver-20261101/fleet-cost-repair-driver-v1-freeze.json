@@ -1,0 +1,75 @@
+{
+  "GPU_initialization_unqualified_until_smoke": true,
+  "administrative_CPU_accounting": "64 includes conservative35 provision for prior inspections with missing remote counters; not a measured strict12CPU bound.",
+  "bundle_sha256": "8ab330809c2b39a93e02aee4e74b9eb576df3969434da6675b6a0095430258f9",
+  "closed_CPU_before": 2165,
+  "closed_GPU_before": 352,
+  "deadline": "2026-11-01T15:35:00+00:00",
+  "local_generated_snapshot": "/var/folders/dm/2nks9rj5417726rl0kgrsg4h0000gn/T/pointstream-fleet-06p72inl.tar",
+  "metadata": {
+    "deleted_paths": [],
+    "git_head": "044425c6fa0de8b111acc9f315c2027dd61a79a4",
+    "included_untracked_sha256": {},
+    "snapshot_sha256": "6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713",
+    "tracked_archive_paths_selected": [
+      "experiments",
+      "src",
+      "pyproject.toml",
+      "README.md",
+      "tools/datasets/k4b_inputs.py",
+      "tools/datasets/k4_inputs.py",
+      "experiments/__init__.py",
+      "experiments/jobs",
+      "src/__init__.py"
+    ],
+    "tracked_changes_excluded": [
+      "docs/cards/w8-source-package-repair.md",
+      "docs/experiments/w8-wire-audit.md",
+      "docs/paper/author-statements-2026-11-01.md"
+    ],
+    "tracked_changes_included": [],
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_excluded_count": 9,
+    "untracked_excluded_paths_sha256": "746e2210931b0b8b0a05d64a1c98603905b7dce7b1669361bcd1c6b5567a93fd",
+    "untracked_excluded_sample": [
+      "docs/experiments/w8-inputs/receiver-20261101/cost-source-repair-v1-fleet-draft.json",
+      "docs/experiments/w8-inputs/receiver-20261101/driver-access-probe-v1-launcher.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/driver-access-probe-v1-plan.md",
+      "docs/experiments/w8-inputs/receiver-20261101/driver-access-probe-v1-remote.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/driver-access-probe-v1-root-gate.json",
+      "docs/experiments/w8-inputs/receiver-20261101/driver-prerequisite-publication-v2-root-gate.json",
+      "docs/experiments/w8-inputs/receiver-20261101/fleet-cost-repair-driver-v1-final.json",
+      "docs/paper/cover-letter-draft-2026-11-01.txt",
+      "docs/paper/tennis-source-provenance-2026-11-01.md"
+    ]
+  },
+  "no_30_step_admission": true,
+  "normalized_spec_sha256": "1d20d1bd35b3dbc2208604c3988436f4ff7824ef7910dd80047203bf803ce136",
+  "phase": {
+    "CPU_total": 580,
+    "GPU_total_upper": 476,
+    "audit_CPU": 20,
+    "campaign_CPU_GPU_upper": 476,
+    "monitoring_CPU": 20,
+    "preallocation_CPU": 64
+  },
+  "remaining_after_phase_CPU": 855,
+  "remaining_after_phase_GPU": 2772,
+  "root_reviewed": true,
+  "source_archive_sha256": "6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713",
+  "source_bytes": 4659200,
+  "source_preserved_snapshot": "/private/tmp/w8-cost-source-repair-044425c6-frozen-20261101.tar",
+  "source_selection": [
+    "experiments",
+    "src",
+    "pyproject.toml",
+    "README.md",
+    "tools/datasets/k4b_inputs.py",
+    "tools/datasets/k4_inputs.py"
+  ],
+  "spec_file_sha256": "5e54fa6e2f53f430f1b28a573275486587acba3e0151a87443b0035b568729d0",
+  "user_approved_phase_CPU": 580,
+  "user_approved_phase_GPU": 500,
+  "worst_CPU_after_phase": 2745,
+  "worst_GPU_after_phase": 828
+}

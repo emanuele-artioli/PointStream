@@ -1,0 +1,17 @@
+import base64,hashlib,json,resource,shlex,signal,subprocess,time,zlib
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(1,1));root=Path('/private/tmp/w8-driver-access-probe-v1-independent-audit');script=(root/'publisher-remote-v2.py').read_text();bundle=(root/'bundle.json').read_bytes();cmd='/usr/bin/timeout 35 /usr/bin/python3 -I -S -B -c '+shlex.quote(script)+' '+shlex.quote(base64.b64encode(zlib.compress(bundle,9)).decode());out=Path('/private/tmp/w8-driver-prereq-publish-v2-20261101');out.mkdir(mode=0o700,exist_ok=False);(out/'command.sha256').write_text(hashlib.sha256(cmd.encode()).hexdigest()+'\n')
+def cap():resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+with (out/'stdout').open('xb') as stdout,(out/'stderr').open('xb') as stderr:
+ p=subprocess.Popen(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=8','gpu6',cmd],stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr,preexec_fn=cap);(out/'handle.json').write_text(json.dumps({'pid':p.pid,'started':time.time()}))
+ def alarm(a,b):raise TimeoutError()
+ signal.signal(signal.SIGALRM,alarm);signal.alarm(40)
+ try:status=p.wait();timedout=False
+ except TimeoutError:
+  p.terminate()
+  try:status=p.wait(timeout=2)
+  except subprocess.TimeoutExpired:p.kill();status=p.wait()
+  timedout=True
+ finally:signal.alarm(0)
+(out/'execution.json').write_text(json.dumps({'status':status,'timedout':timedout}))
+if status or timedout:raise SystemExit(1)

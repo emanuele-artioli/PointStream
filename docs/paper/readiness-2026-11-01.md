@@ -19,7 +19,7 @@ does not turn unmeasured comparisons into completed evidence.
   beside DISTS/PSNR gains; post hoc selections and failed decodes are disclosed.
   A cost-stopped smoothing pilot and absent racket masks are not presented as
   quality negatives. See [negative-evidence audit](negative-evidence-2026-11-01.md).
-- Overleaf main `a6679181fcbe8104702bf3b0231140cc301d9ca1` includes that appendix, the
+- Overleaf main `5fe009ae71e13bafe34397cd86669cc909be6716` includes that appendix, the
   hand-transfer/reference-bank negatives and the passing conditional W8
   saved-quality screen described below.
   PDF `/private/tmp/pointstream-w7-manuscript/build/main.pdf`: **25 pages,
@@ -69,23 +69,13 @@ Historical PGIDs were not recorded; known child PIDs and current matching task
 processes were absent. This does not establish full cached-environment equivalence
 or any fresh pixel, mask or perceptual-quality result.
 
-The cost-only pilot `20261101T135101Z-d67fe593` failed on two omitted
-source helpers before packet decode. The corrected package then passed the
-actual isolated CPU decoder, independent audit and root comparison (237 source
-files,480 tensors and both NPZ hashes; protected inputs remain denied). This is
-no learned inference or fresh-quality result. Original W8 cumulative is
-**≤2,165/3,600 CPU-s and352/3,600 GPU-s**; at least1,435 CPU-s /3,248 GPU-s
-remain. No live reservation/process/claim/wait. The root-reviewed [source repair amendment](../cards/w8-source-package-repair.md)
-awaits the user: one cost-only1/3-step campaign, ≤580 CPU-s /500 GPU-s inside
-original totals, no added budget or changed scientific rules. No retry or
-30-step admission is inferred. The [W8 entry](../experiments/w8-wire-audit.md)
-controls exact receipts and ledger.
+The approved sole replacement `20261101T151030Z-df638d2f` stopped and is closed. Its exact packet worker passed, then CUDA initialization returned `cudaGetDeviceCount` error 2/out-of-memory and CUDA was unavailable before model construction, kernel probe or sampling. The underlying cause is unknown; do not infer a physical-memory OOM, quality negative or 1/3-step cost slope. All task-owned PIDs/process groups, claims and wait are closed and events acknowledged; no live job, reservation or timer remains. No GPU retry or 30-step run is admitted.
 
-Overleaf main/local manuscript is **a6679181fcbe8104702bf3b0231140cc301d9ca1**:
-user-confirmed author block, ATHENA acknowledgment, PRESLEY beside ELVIS/GenStream;
-MoQSplat/TIGAS were reviewed and omitted as indirect. Checker/registrytests pass
-with26 cited keys. Review22 body/reference+3 appendix pages; alternate small
-probe23+3, no overfull lines. Current live venue workflow remains unverified.
+The root-accepted phase charge is ≤292 CPU-s /188 GPU-s, including 64 CPU-s preallocation, 188 s one-core campaign wall, 20 CPU-s audit and 20 CPU-s monitoring. Original W8 cumulative is **≤2,457/3,600 CPU-s and 540/3,600 GPU-s**, leaving at least 1,143 CPU-s and 3,060 GPU-s in the accounting envelope. Historical administrative-inspection CPU telemetry uncertainty remains disclosed in W8; these are not invented aggregate measurements. A CUDA-only diagnostic is a future proposal, not authorized.
+
+The author-approved empirical paper closes on its CPU input proof and conditional saved-quality results, with the fresh-decoder limitation visible. A full witness is not mandatory for the retained claims. Final W8 note and artifact pin are being prepared separately; do not invent a final identity. Complete final PDF, marker-registry, citation and evidence checks plus author filing review before requesting submission authority.
+
+Overleaf main/local manuscript is **5fe009ae71e13bafe34397cd86669cc909be6716**: confirmed author block, ATHENA, ELVIS/GenStream/PRESLEY, four-tool AI disclosure and bounded YouTube provenance statement. PointStream is an independent paper building directly on GenStream and less on PRESLEY, not a conference extension; MoQSplat/TIGAS were omitted as indirect. Review PDF 22 body/reference +3 appendix pages; isolated small-format probe 23+3. PR #325 merged `06ce6374` after exact `044425c6` CI passed; current source-repair branch has uncommitted documentation and unchanged runtime. Live venue workflow is unverified, cover letter is an unsent draft, concurrent-review status is not explicitly confirmed, and submission needs explicit authority.
 
 ## What remains for submission
 
@@ -93,9 +83,10 @@ probe23+3, no overfull lines. Current live venue workflow remains unverified.
    two hours, original Med-family omissions, correlated-window uncertainty,
    whole-frame losses, and W9's conditional measured-duration range. Neither
    the modeled rate nor the assembled bytes establish a complete codec.
-2. **Fresh reconstruction:** only the authorized witness's specified inputs,
-   payload, installation/cache contract, strict equality or prospective numerical
-   gates, and final offline output validation can establish its narrow claim.
+2. **Fresh reconstruction:** the empirical paper retains this as an explicit
+   limitation; a complete witness is not mandatory for its current bounded
+   claims. A stronger fresh-decoder claim would need validated reconstruction
+   under the specified inputs, payload, isolation and offline output contract.
    Full-rate, sustained-reference and live claims require separate evidence.
 3. **Other current holes:** matched ablations, a qualified generative peer,
    historical benchmark/source recertification, independently labelled all-frame
@@ -103,11 +94,12 @@ probe23+3, no overfull lines. Current live venue workflow remains unverified.
    that rely on them or remain explicit limitations. The evidence matrix names
    the exact artifacts and gaps; this is not a claim that all are mandatory
    experiments for an honestly narrowed empirical study.
-4. **Author facts:** exact source permissions/terms and any shared media, full
-   AI-assistance history and the relationship to prior/concurrent papers await
-   author answers; the [concrete inventory and proposed wording](author-statements-2026-11-01.md)
-   are prepared. Names/order/affiliation, ATHENA and requested relevant citations
-   are complete.
+4. **Author facts:** the user confirmed names/order/affiliation, ATHENA, the four
+   AI tools and the independent prior-work relationship; disclosures are in the
+   paper. Source-specific permissions remain unknown and the bounded provenance
+   search did not resolve the full archive. Concurrent-review status was not
+   explicitly answered. The [inventory](author-statements-2026-11-01.md) retains
+   the concrete evidence and limits.
 5. **Final publication review:** reconcile abstract/conclusions and all active
    markers with the chosen contribution, audit references/rights/provenance,
    verify format and final PDF, and obtain explicit authority to submit.

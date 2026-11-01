@@ -1,0 +1,9 @@
+# Current submission-policy checks, 2026-11-01
+
+ACM's [authorship policy, updated14May2026](https://prod-www.acm.bloomreach.cloud/publications/policies/new-acm-policy-on-authorship) was recovered through its indexed ACM publishing-backend page after direct official-page fetches returned403. It requires research uses of AI to be described in the methods, while writing assistance alone no longer requires disclosure. It also requires authors' accountability/consent, absence of concurrent review and appropriate documentation of prior publications. This supersedes reliance on older conference-specific AI summaries for the current general policy; TOMM-specific instructions can add requirements.
+
+The user supplied four tool names and confirmed PointStream's independent relationship to GenStream/PRESLEY. The manuscript revision now adds a concrete research-workflow description in its methods as well as the author-requested acknowledgment. Detailed per-tool model/version histories are not invented. Author review of the complete scientific content and filing declarations remains necessary; this check does not certify coauthor approval or concurrent-review status.
+
+The [accessible legacy TOMM guide](https://tomccap.hosting.acm.org/guide.html) specifies23main/reference pages plus5online-appendix pages. Current review and isolated small-format builds fit that split. Live TOMM-specific review format/anonymity and submission form requirements remain unverified because current author/portal guidance was inaccessible; use the actual filing workflow to confirm them. No fabricated journal volume/date/DOI from the alternate-format probe belongs in the submission.
+
+No paper was submitted or external person contacted. Source-specific tennis upload/licensing metadata remain incomplete as visibly disclosed; no legal permission conclusion is inferred from local availability or the YouTube origin.

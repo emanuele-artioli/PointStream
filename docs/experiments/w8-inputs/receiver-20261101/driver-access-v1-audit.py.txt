@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,hashlib,tarfile,copy
+p=Path('/private/tmp/w8-driver-access-probe-v1-independent-audit');x=json.loads((p/'raw.json').read_bytes());f=x['files'];
+for n,v in f.items():assert hashlib.sha256(v['text'].encode()).hexdigest()==v['sha256']
+assert f['probe.py']['sha256']=='75f7a2e81fa9e0302498eda735ee4f62139be2996a7eb17b45f687ab2f18166f'; assert not any(x['owned'].values())
+m=json.loads(f['metadata.json']['text']); a=json.loads(f['existing.stdout']['text']);b=json.loads(f['narrow.stdout']['text']); assert m['module_sha256']=='3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49'
+assert len(m['denied'])==10 and set(a['protected_denials'])==set(b['protected_denials'])==set(m['denied']) and all(y in (1,13) for z in (a,b) for y in z['protected_denials'].values())
+for z in (a,b):
+ assert z['abi']>=1 and all(z['namespaces'][n]!=m['parent_namespaces'][n] for n in ('user','net'))
+for n in ('/dev/null','/dev/urandom','/proc/driver/nvidia/version'):assert a['public_checks'][n]['errno'] in (1,13) and b['public_checks'][n]=='readable'
+assert all(json.loads(f[n]['text'])['exit']==0 for n in ('existing.exit.json','narrow.exit.json'))
+old=Path('/private/tmp/w8-preflight-bundle-b581-20261101/bundle.json');assert hashlib.sha256(old.read_bytes()).hexdigest()=='ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5'; orig=json.loads(old.read_bytes()); new=copy.deepcopy(orig)
+extra=[n['path'] for n in m['devices'] if not n.get('missing') and not n['symlink']]+['/dev/null','/dev/urandom','/proc/driver/nvidia/version']; assert len(extra)==11 and set(extra).issubset(set(b['roots']));new['runtimes']['jcv']['allow_paths']+=extra
+q=p/'bundle.json';q.write_bytes(json.dumps(new,sort_keys=True).encode());actual=copy.deepcopy(new);actual['runtimes']['jcv']['allow_paths']=orig['runtimes']['jcv']['allow_paths'];assert actual==orig
+from experiments.tennis.w8_receiver_job import check_preflight_bundle,check_preflight_sources
+check_preflight_bundle(new,Path('/private/tmp/w8-preflight-bundle-b581-20261101/identity.json'));check_preflight_sources(new,Path.cwd())
+arc=Path('/private/tmp/w8-cost-source-repair-044425c6-frozen-20261101.tar');sm=json.loads(Path('docs/experiments/w8-inputs/receiver-20261101/cost-source-repair-cpu-v1-audit-source-map.json').read_bytes()); files={}
+with tarfile.open(arc) as t:
+ for entry in t:
+  if entry.isfile():files[entry.name]=hashlib.sha256(t.extractfile(entry).read()).hexdigest()
+assert len(files)==236 and all(sm.get(k)==v for k,v in files.items())
+report={'passed':True,'scope':'CPU Landlock public path permissions only; no CUDA initialization or GPU qualification','bundle_sha256':hashlib.sha256(q.read_bytes()).hexdigest(),'original_bundle_sha256':hashlib.sha256(old.read_bytes()).hexdigest(),'added_jcv_paths':extra,'protected_denials_each':10,'proc_read_denied_then_allowed':True,'fresh_namespaces':True,'network_loopback_checked_by_executed_probe':True,'owned_processes_absent':x['owned'],'source_archive_sha256':hashlib.sha256(arc.read_bytes()).hexdigest(),'source_files_match':len(files),'raw_file_hashes':{n:v['sha256'] for n,v in f.items()}}
+(p/'audit.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n');print(json.dumps({'bundle_sha256':report['bundle_sha256'],'added':extra,'audit_sha256':hashlib.sha256((p/'audit.json').read_bytes()).hexdigest()}))

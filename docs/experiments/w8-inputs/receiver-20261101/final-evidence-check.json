@@ -1,0 +1,12 @@
+{
+  "carrier_and_summary_sha_entries_checked": 38,
+  "carrier_sha_mismatches": [],
+  "files_over_1MB": [],
+  "files_with_nul": [],
+  "ignored_raw_log_carrier_pending": "cost-df638-command.log is ignored; root asked to add byte-identical .txt carrier",
+  "index_missing_relative_links": [],
+  "limits": "Pattern scan only; not a general secret detector. Raw immutable report logical filenames require carrier mapping.",
+  "new_evidence_files_scanned": 47,
+  "recognizable_secret_pattern_hits": [],
+  "tests": "3 source-closure and launcher tests passed; full ruff passed"
+}

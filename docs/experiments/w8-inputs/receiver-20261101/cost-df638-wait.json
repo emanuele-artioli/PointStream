@@ -1,0 +1,31 @@
+{
+  "reason": "attention",
+  "attention": true,
+  "waited_seconds": 130,
+  "max_seconds": 1500.0,
+  "jobs": [
+    {
+      "job_id": "20261101T151030Z-df638d2f",
+      "status": "failed",
+      "host": "gpu6",
+      "stage": "attention",
+      "minutes_since_start": 3.1,
+      "minutes_since_progress": 0.7,
+      "attention": true,
+      "unacknowledged_event_ids": [
+        "119a5c6f5fcb5269983986b0e8c3ed63",
+        "38701a5f38005a18bfe596cf4952c326"
+      ],
+      "events": [
+        {
+          "id": "119a5c6f5fcb5269983986b0e8c3ed63",
+          "kind": "terminal:failed"
+        },
+        {
+          "id": "38701a5f38005a18bfe596cf4952c326",
+          "kind": "decision:63688ea731b159c1be9aa89b8e1154cc"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+EDITORIAL NOTE — DRAFT, NOT SENT
+
+Update the description if the pending fresh-decoder witness changes the evidence. Before filing, the authors must review the final letter and complete the submission system's applicable declarations; this draft does not assert facts about concurrent review, coauthor approval or permissions.
+
+Dear Editors,
+
+Please consider our manuscript, “PointStream: An Empirical Study of Object-Centric Semantic Video Coding,” for publication as a regular paper in ACM Transactions on Multimedia Computing, Communications, and Applications.
+
+PointStream is an independent paper that builds directly on our earlier GenStream work and, to a lesser extent, on PRESLEY and ELVIS. GenStream examines semantic streaming using human motion, viewpoint and a pre-scanned scene; PRESLEY and ELVIS investigate selective degradation or removal followed by client-side restoration. PointStream instead studies a modular decomposition of foreground appearance, motion and background, and asks what must be transmitted, initialized, adapted and corrected to reconstruct the original event. The manuscript cites these methodological predecessors and does not present them as matched PointStream experiments.
+
+The paper combines conventional foreground-removal diagnostics with original-target rescoring, recorded rate–quality observations, transport and scoring controls, and tennis and egocentric studies. It accounts explicitly for startup and adaptation assumptions and reports negative and mixed results alongside conditional foreground findings. In particular, the tennis player-region comparison is limited by modeled rates, incomplete anchor coverage and unverified sustained reuse; whole-frame quality is worse in the tested windows, and the unseen-match result is inconclusive under the stated rule. The manuscript does not claim a qualified end-to-end codec win or complete fresh-decoder proof.
+
+We believe these findings are relevant to TOMM's multimedia systems audience because they connect representation and streaming choices to measured reconstruction costs and reproducibility requirements. The manuscript states the limits of its historical source and artifact provenance, and its appendix preserves bounded negative results.
+
+Thank you for considering our work.
+
+Sincerely,
+
+Emanuele Artioli, Daniele Lorenzi, Farzad Tashtarian and Christian Timmerer
+Alpen-Adria-Universitaet, Klagenfurt, Austria

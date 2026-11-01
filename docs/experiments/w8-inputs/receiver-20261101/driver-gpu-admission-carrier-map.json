@@ -1,0 +1,149 @@
+{
+  "files": [
+    {
+      "bytes": 2110,
+      "evidence": "driver-access-v1-audit.json",
+      "sha256": "fff314a7895d1883ab65619b2422a87c6f1935797f6ab87195aec27986e36597",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/audit.json"
+    },
+    {
+      "bytes": 3366,
+      "evidence": "driver-access-v1-audit.py.txt",
+      "sha256": "6c0c3d332b5513419afed10ec83c60b129493ad2aaa8bcfd9393eec421f1d6e6",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/audit.py"
+    },
+    {
+      "bytes": 34127,
+      "evidence": "driver-access-v1-bundle.json",
+      "sha256": "8ab330809c2b39a93e02aee4e74b9eb576df3969434da6675b6a0095430258f9",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/bundle.json"
+    },
+    {
+      "bytes": 77,
+      "evidence": "driver-access-v1-execution.json",
+      "sha256": "5aaeb2f2a2c954887da911119ea4576d75b138700cea987d18be57441f975e96",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/execution.json"
+    },
+    {
+      "bytes": 989,
+      "evidence": "driver-access-v1-fetch.py.txt",
+      "sha256": "3090d0b24e4c90de8b5608e3199ccb8e32a14e2feaf9aeb78ae88ba75ecc0a93",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/fetch.py"
+    },
+    {
+      "bytes": 1071,
+      "evidence": "driver-access-v1-publisher-check-v2.py.txt",
+      "sha256": "80eacd68ab4c4217e35d021e3b23bdf7e9371f24ffbc96a05e4183e83cb338bb",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/publisher-check-v2.py"
+    },
+    {
+      "bytes": 1418,
+      "evidence": "driver-access-v1-publisher-launcher-v2.py.txt",
+      "sha256": "f0aa015e9576557d452b3aba5ff771ba13aba5ca29a920e54b68e0d5b6e95797",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/publisher-launcher-v2.py"
+    },
+    {
+      "bytes": 1415,
+      "evidence": "driver-access-v1-publisher-launcher.py.txt",
+      "sha256": "328052dd113e47d3f2dd1d76a1dfdd0f48625450691edc4b3d7547ec48e3b9d9",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/publisher-launcher.py"
+    },
+    {
+      "bytes": 65,
+      "evidence": "driver-access-v1-publisher-regression-v2.json",
+      "sha256": "4d1bff36da61f11f437dc32a053ab580b162755a6c5498d1e28d172e65b07358",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/publisher-regression-v2.json"
+    },
+    {
+      "bytes": 3268,
+      "evidence": "driver-access-v1-publisher-remote-v2.py.txt",
+      "sha256": "c7854c31b4b44aab895f3988fcf619cb23e3c376bc6988afe4e0efa4325cad84",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/publisher-remote-v2.py"
+    },
+    {
+      "bytes": 1279,
+      "evidence": "driver-access-v1-publisher-remote.py.txt",
+      "sha256": "77557daf551d630ea68284efc3410be39a0078e06e783c827bb09839083db48b",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/publisher-remote.py"
+    },
+    {
+      "bytes": 15033,
+      "evidence": "driver-access-v1-raw.json",
+      "sha256": "a8d92b89e9fbf9d73ca8d4f585e4a6848a95b40d676179ffa04e72156877f230",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/raw.json"
+    },
+    {
+      "bytes": 0,
+      "evidence": "driver-access-v1-stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/private/tmp/w8-driver-access-probe-v1-independent-audit/stderr"
+    },
+    {
+      "bytes": 65,
+      "evidence": "driver-prereq-v2-command.sha256",
+      "sha256": "2f23c6df82cd062b4fa592eb6bf821ba27c1eed72001f66a0547b32264611a11",
+      "source": "/private/tmp/w8-driver-prereq-publish-v2-20261101/command.sha256"
+    },
+    {
+      "bytes": 32,
+      "evidence": "driver-prereq-v2-execution.json",
+      "sha256": "f84ab172835b5b7bb519cbc9d5f163412db28ff5094adf2b84f7e26d644d06d3",
+      "source": "/private/tmp/w8-driver-prereq-publish-v2-20261101/execution.json"
+    },
+    {
+      "bytes": 45,
+      "evidence": "driver-prereq-v2-handle.json",
+      "sha256": "a4ecd74acfe4794a5423795282d99a98d181da66ddb484c586fa17b489c56401",
+      "source": "/private/tmp/w8-driver-prereq-publish-v2-20261101/handle.json"
+    },
+    {
+      "bytes": 0,
+      "evidence": "driver-prereq-v2-stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/private/tmp/w8-driver-prereq-publish-v2-20261101/stderr"
+    },
+    {
+      "bytes": 1210,
+      "evidence": "driver-prereq-v2-stdout",
+      "sha256": "6ef77415a27a83ef60776290391033208156fdf88be7be76fb65f16429e3562d",
+      "source": "/private/tmp/w8-driver-prereq-publish-v2-20261101/stdout"
+    },
+    {
+      "bytes": 60,
+      "evidence": "gpu6-admission-inspect-execution.json",
+      "sha256": "7886b3d9a067af4d18308641f33a4d23a22cdd6f51338032690ae1ffae0b7bf2",
+      "source": "/private/tmp/w8-final-gpu6-inspect-20261101/execution.json"
+    },
+    {
+      "bytes": 44,
+      "evidence": "gpu6-admission-inspect-handle.json",
+      "sha256": "225f8fe615905c12f76c45d5badcc772fcde75c672a28c43f692b9f32e1c2971",
+      "source": "/private/tmp/w8-final-gpu6-inspect-20261101/handle.json"
+    },
+    {
+      "bytes": 994,
+      "evidence": "gpu6-admission-inspect-launch.py.txt",
+      "sha256": "121fee57e7a501e5b279c7f6514744ae715a06e969ee75b495f44f6a492950bf",
+      "source": "/private/tmp/w8-final-gpu6-inspect-20261101/launch.py"
+    },
+    {
+      "bytes": 1923,
+      "evidence": "gpu6-admission-inspect-remote.py.txt",
+      "sha256": "ba67f2dcab1fd927ad940d0a9ed45115a81ca032d04fe15a8ee091cb7f422313",
+      "source": "/private/tmp/w8-final-gpu6-inspect-20261101/remote.py"
+    },
+    {
+      "bytes": 0,
+      "evidence": "gpu6-admission-inspect-stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/private/tmp/w8-final-gpu6-inspect-20261101/stderr"
+    },
+    {
+      "bytes": 547,
+      "evidence": "gpu6-admission-inspect-stdout",
+      "sha256": "60a9e0e73756b926ebe2f4fbc302e89c69b08ae2123be8d4df445ac42326c852",
+      "source": "/private/tmp/w8-final-gpu6-inspect-20261101/stdout"
+    }
+  ],
+  "scope": "byte-identical copies; .py scripts carried with .py.txt suffix"
+}

@@ -1,0 +1,23 @@
+import json,pathlib,hashlib,os,resource
+resource.setrlimit(resource.RLIMIT_CPU,(2,2)); root=pathlib.Path('/local/users/emanuele/pointstream/scratch/20261101T151030Z-df638d2f-smoke');o={}
+for w in ('packet-worker','cost-worker'):
+ for n in ('stdout','stderr','start.json','exit.json'):
+  p=root/w/n
+  try:
+   b=p.read_bytes()
+   if len(b)>100000:raise ValueError('too large')
+   o[w+'/'+n]={'sha256':hashlib.sha256(b).hexdigest(),'text':b.decode('utf8','replace')}
+  except FileNotFoundError:o[w+'/'+n]={'missing':True}
+ids={4055982,4056173}
+for w in ('packet-worker','cost-worker'):
+ v=o.get(w+'/start.json',{})
+ if 'text' in v:
+  j=json.loads(v['text']);ids.update([j['pid'],j['pgid']])
+presence={}
+for i in sorted(ids):
+ pid=os.path.exists('/proc/'+str(i))
+ try:os.killpg(i,0);pgid=True
+ except ProcessLookupError:pgid=False
+ except PermissionError:pgid=True
+ presence[str(i)]={'pid_exists':pid,'pgid_exists':pgid}
+c=pathlib.Path('/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/claims');print(json.dumps({'files':o,'presence':presence,'claims':sorted(p.name for p in c.iterdir()) if c.exists() else []}))

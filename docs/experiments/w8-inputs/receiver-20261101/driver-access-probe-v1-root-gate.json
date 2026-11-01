@@ -1,0 +1,34 @@
+{
+  "approved_by_root": true,
+  "scope": "CPU-only public system path and protected-read permission mechanics, no GPU device read/ioctl or CUDA",
+  "CPU_upper": 6,
+  "subcaps": {
+    "remote_parent_soft": 1,
+    "remote_parent_hard": 2,
+    "two_children_hard_each": 1,
+    "SSH_hard": 1,
+    "local_hard": 1
+  },
+  "within_existing_580_phase": true,
+  "phase_reallocation": {
+    "preallocation": 64,
+    "one_core_campaign": 476,
+    "independent_audit": 20,
+    "monitoring": 20,
+    "total_CPU": 580,
+    "GPU_upper": 476
+  },
+  "preallocation_basis": {
+    "prior_inspection_provision": 35,
+    "probe": 6,
+    "prerequisite_publication": 10,
+    "source_management": 6,
+    "fresh_inspection": 6,
+    "margin": 1
+  },
+  "uncertainty": "Original fleet inspect batch lacked remote CPU counters;35 is conservative provision, not a measured or proven12-second aggregate. Tiny uncapped spec read separately covered by wall-derived allowance.",
+  "command_sha256": "3debb241fd9171de59e2d9d8868104fb985b8f0113b83e9cd255d0e1c40cde61",
+  "remote_sha256": "75f7a2e81fa9e0302498eda735ee4f62139be2996a7eb17b45f687ab2f18166f",
+  "launcher_sha256": "b6b86bc8093db4d3b7261c1e2b6c57589b4818b70ca606681f7a90213dee9b26",
+  "no_GPU_submission_yet": true
+}
