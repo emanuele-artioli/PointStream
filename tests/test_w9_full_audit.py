@@ -1,11 +1,53 @@
 import io
 import json
 import tarfile
+import copy
 
 import pytest
 
 from experiments.jobs.inbox import digest
 from experiments.tennis import w9_full_audit
+
+
+def extra_fixture(name='encode_x1'):
+    spec = {'staged_inputs': [{'name': 'hybrid', 'sha256': 'hybrid-sha'},
+                              {'name': name, 'sha256': 'extra-sha'}],
+            'arguments': ['--hybrid', '{staged:hybrid}', '--encode-extra', f'{{staged:{name}}}']}
+    return spec, {'hybrid': 'hybrid-sha', 'encode_x0': 'extra-sha'}
+
+
+@pytest.mark.parametrize('name', ['encode_x1', 'encode_x0'])
+def test_extra_position_is_bound_to_frozen_staged_argument(name):
+    spec, inputs = extra_fixture(name)
+    w9_full_audit.check_score_inputs(spec, inputs)
+
+
+def test_multiple_extra_positions_follow_argument_order():
+    spec, inputs = extra_fixture()
+    spec['staged_inputs'].append({'name': 'encode_x0', 'sha256': 'second-sha'})
+    spec['arguments'].append('{staged:encode_x0}')
+    inputs['encode_x1'] = 'second-sha'
+    w9_full_audit.check_score_inputs(spec, inputs)
+
+
+@pytest.mark.parametrize('mutate', [
+    lambda s, i: i.update(encode_x0='changed-sha'),
+    lambda s, i: (i.pop('encode_x0'), i.update(encode_x1='extra-sha')),
+    lambda s, i: s['arguments'].append('{staged:encode_x1}'),
+    lambda s, i: s['arguments'].extend(['--encode-extra', '{staged:encode_x1}']),
+    lambda s, i: s['arguments'].__setitem__(-1, 'prefix{staged:encode_x1}'),
+    lambda s, i: s['arguments'].__setitem__(-1, '{staged:missing}'),
+    lambda s, i: s['arguments'].pop(),
+    lambda s, i: s.update(arguments=[]),
+    lambda s, i: s['staged_inputs'].append({'name': 'encode_x1', 'sha256': 'extra-sha'}),
+    lambda s, i: s['staged_inputs'].append({'name': 'encode_x0', 'sha256': 'extra-sha'}),
+    lambda s, i: i.update(encode_x1='extra-sha'),
+])
+def test_extra_binding_rejects_wrong_or_ambiguous_inputs(mutate):
+    spec, inputs = copy.deepcopy(extra_fixture())
+    mutate(spec, inputs)
+    with pytest.raises(ValueError):
+        w9_full_audit.check_score_inputs(spec, inputs)
 
 
 def test_audit_checks_published_summary_and_manifest_before_validation(tmp_path, monkeypatch):

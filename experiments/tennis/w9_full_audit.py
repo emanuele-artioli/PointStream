@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import tarfile
 from pathlib import Path
@@ -24,6 +25,47 @@ def sha(path: Path) -> str:
         for block in iter(lambda: f.read(1024 * 1024), b''):
             h.update(block)
     return h.hexdigest()
+
+
+def check_score_inputs(spec: dict, score_inputs: dict) -> None:
+    """Bind W1's positional extra names to the frozen staged arguments."""
+    staged = spec['staged_inputs']
+    names = [item['name'] for item in staged]
+    if len(names) != len(set(names)):
+        raise ValueError('duplicate staged input names')
+    args = spec.get('arguments', [])
+    if not isinstance(args, list) or any(not isinstance(arg, str) for arg in args):
+        raise ValueError('invalid scorer arguments')
+    if any(arg.startswith('--encode-extra=') for arg in args) or args.count('--encode-extra') > 1:
+        raise ValueError('ambiguous encode-extra binding')
+    extras = []
+    if '--encode-extra' in args:
+        position = args.index('--encode-extra') + 1
+        while position < len(args) and not args[position].startswith('--'):
+            match = re.fullmatch(r'\{staged:([A-Za-z_][A-Za-z0-9_]*)\}', args[position])
+            if match is None:
+                raise ValueError('encode-extra must be a whole staged placeholder')
+            extras.append(match.group(1))
+            position += 1
+        if not extras:
+            raise ValueError('encode-extra requires staged inputs')
+    if (len(extras) != len(set(extras)) or
+            any(name not in names or name in ('windows', 'state') or args.count(f'{{staged:{name}}}') != 1
+                for name in extras)):
+        raise ValueError('duplicate, missing or invalid extra input binding')
+    if any(re.fullmatch(r'encode_x[0-9]+', name) and name not in extras for name in names):
+        raise ValueError('unbound staged extra input')
+    mapping = {name: f'encode_x{index}' for index, name in enumerate(extras)}
+    direct = {name for name in names if name not in extras and name not in ('windows', 'state')}
+    if direct & set(mapping.values()):
+        raise ValueError('extra input summary key collision')
+    expected_extra_keys = set(mapping.values())
+    if {key for key in score_inputs if re.fullmatch(r'encode_x[0-9]+', key)} != expected_extra_keys:
+        raise ValueError('missing or unexpected extra summary keys')
+    for item in staged:
+        name = item['name']
+        if name not in ('windows', 'state') and score_inputs.get(mapping.get(name, name)) != item['sha256']:
+            raise ValueError(f'full summary missing or changed staged input: {name}')
 
 
 def audit(job: Path, manifest: Path, hybrid: Path, windows: Path, output: Path, archive_sha: str, expected_spec_sha: str) -> None:
@@ -50,9 +92,7 @@ def audit(job: Path, manifest: Path, hybrid: Path, windows: Path, output: Path, 
     if not execution_path.is_file() or json.loads(execution_path.read_text()).get('exit_code') != 0:
         raise ValueError('successful full-stage execution record required')
     score_inputs = summary.get('inputs', {})
-    for item in spec['staged_inputs']:
-        if item['name'] not in ('windows', 'state') and score_inputs.get(item['name']) != item['sha256']:
-            raise ValueError(f"full summary missing or changed staged input: {item['name']}")
+    check_score_inputs(spec, score_inputs)
     if summary.get('repair_manifest') != json.loads(manifest.read_text()):
         raise ValueError('embedded and pinned selection manifests disagree')
     matches = [w for w in window_manifest.load(windows) if w.name == summary['window']]
