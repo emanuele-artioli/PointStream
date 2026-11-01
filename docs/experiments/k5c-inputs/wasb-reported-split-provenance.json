@@ -1,0 +1,46 @@
+{
+  "scope": "primary-author documented split and model-name mapping; not independent audit of checkpoint training logs",
+  "author_repository": "nttcom/WASB-SBDT",
+  "revision": "923462cacdeb3353b84ddebdedb3f4b7a8553b0f",
+  "retrieval": "GitHub contents API, pinned revision, 2026-11-01",
+  "files": {
+    "src/configs/dataset/tennis.yaml": {
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+      "bytes": 429,
+      "primary_url": "https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/src/configs/dataset/tennis.yaml"
+    },
+    "src/datasets/tennis.py": {
+      "sha256": "ca9b099d3afe30a0f6719a77c0354996ee167ca3b4038d42e24e924d22a27fc4",
+      "bytes": 12859,
+      "primary_url": "https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/src/datasets/tennis.py"
+    },
+    "GET_STARTED.md": {
+      "sha256": "008b86e4d228054a9a268d499ec17e9fe16ff1978306b3c9393b0d2332837fc5",
+      "bytes": 11728,
+      "primary_url": "https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/GET_STARTED.md"
+    }
+  },
+  "train_games": [
+    "game1",
+    "game2",
+    "game3",
+    "game4",
+    "game5",
+    "game6",
+    "game7"
+  ],
+  "test_games": [
+    "game8",
+    "game9",
+    "game10"
+  ],
+  "checkpoint_name": "wasb_tennis_best.pth.tar",
+  "checkpoint_sha256_in_original_k5b_run": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "checkpoint_hash_source": "docs/experiments/k5b-inputs/recovered-20261101/k5b1b.json",
+  "limitations": [
+    "No new model download or training",
+    "Checkpoint identity from historical run receipt; local/remote actual pilot input hash must be verified before execution",
+    "game8/Clip6 is historical development footage, not an unseen confirmation sample",
+    "Public configuration is author-reported training provenance, not proof of all historic optimizer inputs"
+  ]
+}

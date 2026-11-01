@@ -23,6 +23,20 @@ new dependency.
 
 ## Where PointStream stands (2026-11-01)
 
+**Latest checkpoint:** Overleaf `0d983288c2c7b6182fffcd8093d12bb1d307d03e`
+is pushed: eight main figures and two appendix figures, 23 body/reference pages
+(references on 22–23) plus five appendix pages. The ball is now explicit in
+the abstract, contributions, method and evaluation, with dependent judging,
+historical component-rate framing omissions and the failed PSNR BD-rate guard
+retained. Source-specific footage permissions and coauthor approval remain
+unresolved; no paper has been submitted. The user separately approved the
+[new independent-judge pilot](docs/cards/k5c-independent-ball-pilot.md) at
+900 GPU-s / 1,800 workload CPU-s. Ten CPU tests and the substantive artifact
+and cost gates pass their fixtures; target-device/model/native execution is
+still pending admission. The approved pilot does not reopen K5b/W8 stopped
+work, train, or authorize a larger confirmation. Preflight receipts and
+the next exact job identity live in [K5c](docs/experiments/k5c-independent-ball.md).
+
 **Paper strengthening reopened (user, 2026-11-01):** the research roadmap is
 not complete and the earlier technically prepared package is a preserved review
 checkpoint, not the final submission candidate. The user approved a stronger
@@ -393,6 +407,7 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
+| Paper strengthening and independent ball pilot preparation | [research priorities](docs/paper/research-and-figure-priorities-2026-11-01.md) | `codex/paper-strengthening-2026-11-01`, draft PR #329 | primary plus requested Terra 6.1 medium delegates; actual tier telemetry unavailable | running: four original K5b window records recovered read-only, all 15 archived checks and PCHIP arithmetic replay; retained ball result restored to main-paper revision in progress, eight-figure/appendix revision approved. Two SVT gap artifacts are being inspected; med000 DCVC remains dropped. New sequential independent-image-judge worker is CPU-only preparation; no pilot/confirmation GPU budget or launch is authorized. PRESLEY untouched; earlier eb7e3a3 package preserved, paper not submission-ready. |
 | W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-results-2026-11-01` (policy PR #322 merged) | primary plus Terra 6.1 medium delegates | complete: `20261101T081828Z-d70bc44f`, gpu6 exclusive Ada, frozen source `c0f25e4e` / spec `e9d926b6`; independent full audit and raw screen pass all 8 cells at 46.3151 kbps. Initial two cost stops preserved. Combined inclusive scoring 224 GPU-s / ≤304 CPU-s of 450/450; original total after 15 CPU-s runtime preflight: 224 GPU-s / ≤1,169 CPU-s of 3,600/3,600. Processes/claims/waits closed. No training/encoding/model/payload/quality-rule change. |
 | W8 Linux exact-input oracle and fresh receiver gates | [original W8 card](docs/cards/w8-fresh-decoder-witness.md); [approved repair](docs/cards/w8-source-package-repair.md) | `codex/w8-source-repair-2026-11-01` | primary plus scoped delegates | Input/runtime/native/pixel gates passed within recorded scope. Sole replacement `20261101T151030Z-df638d2f` packet worker passed, then CUDA device count error 2/unavailable before model/kernel/sampling; cause unknown, no quality result or cost slope. All task-owned processes/claims/wait/events closed. Phase ≤292 CPU-s/188 GPU-s; original cumulative ≤2,457/540 of 3,600 each. No retry or 30-step admission. Empirical paper retains fresh-decoder limitation; CUDA-only diagnostic is an unauthorized future proposal. PR #325 merged `06ce6374`; final documentation update belongs to [PR #326](https://github.com/emanuele-artioli/PointStream/pull/326), whose live checks/merge state should be consulted. |
 | W8 approved upper-baseline amendment (historical, followed by exclusive repair) | [coverage follow-up](docs/experiments/w8-inputs/prospective-coverage-followup.md) | `codex/w8-cost-reallocation-2026-11-01` (predecessor PR #320 merged) | primary plus Terra 6.1 medium delegates | stopped 2026-11-01: first request `20261101T071706Z-afde26d5` passed correctness but failed cost projection, second `20261101T073429Z-04a50c10` hit its smoke limit on shared GPU; both terminal/claims released, no full quality point or third run. Amendment ≤87 CPU-s/67 GPU-s of 300/300; cumulative W8 ≤937 CPU-s/67 GPU-s of 3,600/3,600. Subsequent exclusive-GPU 450/450 inclusive scoring-cap amendment approved; its distinct request is tracked in the row above, original totals unchanged. Fixed packet/rate and quality/receiver gates unchanged. |

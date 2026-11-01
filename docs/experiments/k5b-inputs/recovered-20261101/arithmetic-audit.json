@@ -63,7 +63,10 @@
     "experiments/tennis/k5.py:verdict",
     "experiments/background/g5.py:pareto",
     "experiments/background/g5.py:envelope",
-    "experiments/background/g5.py:anchor_quality"
+    "experiments/background/g5.py:anchor_quality",
+    "experiments/tennis/k5.py:code_svt",
+    "experiments/tennis/k5b.py:segment_bytes",
+    "src/codecs/svtav1.py:code"
   ],
   "recomputed_qp0_equal_window_means": {
     "decode": {
@@ -168,6 +171,13 @@
     "four development windows; original all-gate decision failed; user retained streak despite frame guard",
     "published archive contains result JSONs and H264 contact-sheet videos, no serialized BALL/native codec streams",
     "historical archive full digest not rechecked at this checkpoint; selected raw members independently SHA256 identified",
-    "same underlying codec settings plus billed ball bytes; not exact equal-total-rate screenshots or full PointStream codec result"
-  ]
+    "same underlying codec settings plus billed ball bytes; not exact equal-total-rate screenshots or full PointStream codec result",
+    "Historical SVT rates omit IVF framing and both variants omit a common outer envelope; native-plus-BALL rates are component accounting, not full-package rates"
+  ],
+  "rate_accounting_scope": {
+    "dcvc": "physical native PSDC container bytes + BALL tag/LEB128/payload bytes",
+    "svt": "sum of coded IVF frame payloads + BALL tag/LEB128/payload bytes; IVF 32-byte file header and 12-byte per-frame headers excluded",
+    "common_outer_envelope": "not charged in historical component rate",
+    "not_a_complete_physical_packet_rate": true
+  }
 }

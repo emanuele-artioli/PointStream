@@ -552,7 +552,17 @@ BD-rate is -42.0484%, -33.7903%, -27.3578% and -35.7053%; frame-PSNR BD-rate
 is +2.8231%, +2.2543%, +2.5746% and +1.7930%, respectively for game3/Clip3,
 game3/Clip6, game7/Clip2 and game10/Clip10. The original +1% frame guard still
 fails on all four; the user's 2026-10-21 decision to keep the streak is retained,
-not rewritten as a prespecified pass.
+not rewritten as a prespecified pass. The guard fails because of rate, not
+lower PSNR at the same underlying setting.
+
+The frozen native helper charges DCVC container bytes, but SVT charges only
+the sum of IVF frame payload bytes, excluding its 32-byte file header and
+12-byte frame headers. The BALL charge includes its tag, LEB128 length and
+payload, but no common outer envelope. These are historical native-plus-BALL
+component rates, not complete physical package rates. The source functions
+implementing these conventions were also AST-compared with `d4bed15` and match.
+The proposed independent-judge pilot instead must account for actual physical
+native streams and the complete framed BALL packet.
 
 The archive inventory has window records and H.264 contact-sheet videos, but
 no serialized BALL packets or native codec streams. Reported round trips and

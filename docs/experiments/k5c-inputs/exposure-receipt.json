@@ -1,0 +1,26 @@
+{
+  "scope": "author-reported-split-not-training-log",
+  "window": "tracknet/game8/Clip6",
+  "wasb_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+  "config_sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+  "window_manifest_sha256": "d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516",
+  "train_games": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "test_games": [
+    8,
+    9,
+    10
+  ],
+  "author_revision": "923462cacdeb3353b84ddebdedb3f4b7a8553b0f",
+  "basis": "docs/experiments/k5c-inputs/wasb-reported-split-provenance.json",
+  "training_logs_independently_verified": false,
+  "historical_development_footage": true,
+  "reviewed_by": "PointStream root, 2026-11-01; primary configuration/loader/model mapping and archived checkpoint identity reviewed; actual staged hashes must match"
+}
