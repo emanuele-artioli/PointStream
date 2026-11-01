@@ -1,0 +1,154 @@
+"""One source-only publication proposal. Run only after root authorization."""
+import resource
+resource.setrlimit(resource.RLIMIT_CPU, (2, 2))
+import base64
+import hashlib
+import json
+import os
+from pathlib import Path
+import shlex
+import signal
+import subprocess
+import tarfile
+import time
+import zlib
+
+EVIDENCE = Path(__file__).resolve().parent
+OLD = Path('/private/tmp/pointstream-w8-receiver-source-2677c179.tar')
+NEW = Path('/private/tmp/pointstream-w8-runtime-source-b58155b4-scoped-20261101.tar')
+OUT = Path('/private/tmp/w8-source-delta-publish-b581-scoped-20261101')
+OLD_SHA = 'fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635'
+NEW_SHA = '26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5'
+ARG_SHA = '98d6f753ce110919ca26770552893cf0ba9f144c390c90a1c5e346bd737afabd'
+PROGRAM_SHA = '2e09b21b4e6aed64a99a496de7cf0cca59d30ae14d2761170f541530a3a41efd'
+COMMAND_SHA = 'f57a81df6cea3db4942f8b7effb81b00292d20f882b4c2621dd2a65b27fb5657'
+REV = 'b58155b46cea2232ad572effed9dd6c727676498'
+REMOTE_TARGET = '/local/users/emanuele/pointstream/audits/w8-source-publish-b581-scoped-20261101/source.tar'
+FOUR = {
+ 'experiments/__init__.py': '06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9',
+ 'experiments/tennis/__init__.py': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+ 'experiments/tennis/w8_receiver_preflight.py': '86f604c37e94880f4654a35678edb2f217ac22c96eb990adaeeb558f34f631dd',
+ 'experiments/tennis/w8_receiver_bootstrap.py': '3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49',
+}
+
+
+def alarm_handler(_signal, _frame):
+    raise TimeoutError('local source publication deadline')
+
+
+def limit_ssh():
+    resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+
+
+def main():
+    signal.signal(signal.SIGALRM, alarm_handler)
+    signal.alarm(130)
+    old, new = OLD.read_bytes(), NEW.read_bytes()
+    arg = (EVIDENCE / 'source-b581-scoped-delta.b64.txt').read_bytes()
+    program = (EVIDENCE / 'source-b581-scoped-remote.py.txt').read_bytes()
+    if (len(old) != 10741760 or hashlib.sha256(old).hexdigest() != OLD_SHA or len(new) != 4638720
+            or hashlib.sha256(new).hexdigest() != NEW_SHA or hashlib.sha256(arg).hexdigest() != ARG_SHA
+            or hashlib.sha256(program).hexdigest() != PROGRAM_SHA):
+        raise ValueError('local frozen publication inputs changed')
+    with tarfile.open(NEW, 'r:') as tar:
+        entries = tar.getmembers()
+        regular = [item for item in entries if item.isfile()]
+        if (tar.pax_headers.get('comment') != REV or len(entries) != 249 or len(regular) != 235
+                or any(not item.isfile() and not item.isdir() for item in entries)
+                or len({item.name for item in entries}) != len(entries)):
+            raise ValueError('local scoped source archive shape or revision changed')
+        for name, digest in FOUR.items():
+            matches = [item for item in regular if item.name == name]
+            if len(matches) != 1 or matches[0].size > 1000000:
+                raise ValueError('local source member missing or ambiguous')
+            stream = tar.extractfile(matches[0])
+            body = stream.read() if stream is not None else None
+            if body is None or len(body) != matches[0].size or hashlib.sha256(body).hexdigest() != digest:
+                raise ValueError('local source member changed: ' + name)
+    decoder = zlib.decompressobj()
+    raw = decoder.decompress(base64.b64decode(arg, validate=True), 2000001)
+    if len(raw) > 2000000 or not decoder.eof or decoder.unused_data or decoder.unconsumed_tail:
+        raise ValueError('delta decompression bounds')
+    delta = json.loads(raw)
+    if (delta['schema'], delta['old_sha256'], delta['old_size'], delta['new_sha256'],
+            delta['new_size'], delta['block_bytes']) != (1, OLD_SHA, len(old), NEW_SHA, len(new), 512):
+        raise ValueError('delta identities changed')
+    digest = hashlib.sha256()
+    position = 0
+    for operation in delta['runs']:
+        if operation[0] == 'r' and len(operation) == 3:
+            start, length = operation[1:]
+            if (type(start) is not int or type(length) is not int or start < 0 or length <= 0
+                    or start % 512 or length % 512 or start + length > len(old)):
+                raise ValueError('invalid delta reference')
+            chunk = old[start:start + length]
+        elif operation[0] == 'l' and len(operation) == 2:
+            chunk = base64.b64decode(operation[1], validate=True)
+            if not chunk or len(chunk) % 512:
+                raise ValueError('invalid delta literal')
+        else:
+            raise ValueError('invalid delta opcode')
+        if new[position:position + len(chunk)] != chunk:
+            raise ValueError('independent local delta comparison failed')
+        position += len(chunk)
+        digest.update(chunk)
+    if position != len(new) or digest.hexdigest() != NEW_SHA:
+        raise ValueError('independent target reconstruction failed')
+    command = ' '.join(shlex.quote(x) for x in ('/usr/bin/timeout', '--signal=TERM', '--kill-after=2',
+               '120s', '/usr/bin/python3', '-B', '-c', program.decode(), arg.decode('ascii')))
+    argv = ['/usr/bin/ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', 'gpu6', command]
+    env = dict(os.environ)
+    command_bytes = len(command.encode())
+    exec_bytes = sum(len(x.encode()) + 1 for x in argv) + sum(len((k + '=' + v).encode()) + 1 for k, v in env.items())
+    if (command_bytes > 120000 or exec_bytes > 200000
+            or hashlib.sha256(command.encode()).hexdigest() != COMMAND_SHA):
+        raise ValueError('SSH command identity or size bound')
+    OUT.mkdir(mode=0o700, exist_ok=False)
+    (OUT / 'launch.json').write_text(json.dumps({'old_sha256': OLD_SHA, 'new_sha256': NEW_SHA,
+        'argument_sha256': ARG_SHA, 'program_sha256': PROGRAM_SHA, 'command_sha256': COMMAND_SHA,
+        'command_bytes': command_bytes, 'exec_argv_plus_env_bytes': exec_bytes, 'stdin': 'DEVNULL',
+        'remote_wall_seconds': 120, 'local_wall_seconds': 130, 'parent_cpu_seconds': 2,
+        'remote_cpu_reserve_seconds': 3, 'ssh_cpu_seconds': 1, 'shell_cpu_reserve_seconds': 1,
+        'independent_audit_and_external_cpu_reserve_seconds': 3, 'cpu_reservation_seconds': 10,
+        'gpu_seconds': 0, 'pax_revision': REV, 'regular_files': 235, 'tar_entries': 249,
+        'source_members': FOUR, 'remote_target': REMOTE_TARGET}, indent=2) + '\n')
+    started = time.monotonic()
+    proc = None
+    with (OUT / 'stdout').open('xb') as stdout, (OUT / 'stderr').open('xb') as stderr:
+        try:
+            old_mask = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
+            try:
+                proc = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, env=env,
+                                        close_fds=True, start_new_session=True, preexec_fn=limit_ssh)
+                (OUT / 'handle.json').write_text(json.dumps({'pid': proc.pid, 'pgid': proc.pid,
+                    'started_monotonic': started, 'remote_target': REMOTE_TARGET}, indent=2) + '\n')
+            finally:
+                signal.pthread_sigmask(signal.SIG_SETMASK, old_mask)
+            status = 'completed'
+            code = proc.wait(timeout=max(0.001, 130 - (time.monotonic() - started)))
+        except (TimeoutError, subprocess.TimeoutExpired):
+            status = 'unknown_inspect_do_not_replay'
+            if proc is None:
+                code = None
+            else:
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                code = proc.wait(timeout=5)
+        record = {'status': status, 'returncode': code, 'wall_seconds': time.monotonic() - started,
+                  'local_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+                  'ssh_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2])}
+        (OUT / 'execution.json').write_text(json.dumps(record, indent=2) + '\n')
+        if status != 'completed' or code:
+            raise RuntimeError(f'publication not confirmed; inspect existing state: {record}')
+    result = json.loads((OUT / 'stdout').read_text())
+    if (result.get('passed') is not True or result.get('bytes') != 4638720 or result.get('new_sha256') != NEW_SHA
+            or result.get('mode') != '0444' or result.get('path') != REMOTE_TARGET):
+        raise ValueError('remote publication receipt mismatch')
+    signal.alarm(0)
+    print(json.dumps({'passed': True, 'output': str(OUT), 'target': REMOTE_TARGET}))
+
+
+if __name__ == '__main__':
+    main()

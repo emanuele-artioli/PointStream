@@ -1,5 +1,7 @@
 # Submission actions for the empirical study — 2026-11-01
 
+**Historical review snapshot:** later manuscripta667 and the [current readiness record](readiness-2026-11-01.md) supersede actionable status below. The empirical marker policy/checker was subsequently resolved without clearing missing evidence; final source now uses `companion/marker-dispositions.json`. Earlier snapshot facts/JSON are preserved.
+
 Read-only manuscript audit of the working snapshot `cdfad811bf8572b5c64a930b6fcfb2b5f9c10a85` in `/private/tmp/pointstream-w7-manuscript`; line numbers can move while that independently owned checkout changes. Its `AGENTS.md` approves an empirical study without a codec win. This list separates improvements possible from saved evidence and prose from claims that actually require new data. It does not certify submission readiness, change the manuscript or reopen W8.
 
 ## Ranked work possible now

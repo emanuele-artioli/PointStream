@@ -1,0 +1,88 @@
+{
+  "status": "PROPOSED_NOT_AUTHORIZED_OR_LAUNCHED",
+  "objective": "Full fresh AA/SAM plus immutable runtime/model/source identity and MAIN/JCV CPU bootstrap qualification; no GPU/model inference.",
+  "source": {
+    "revision": "b58155b46cea2232ad572effed9dd6c727676498",
+    "archive": "/private/tmp/pointstream-w8-runtime-source-b58155b4-scoped-20261101.tar",
+    "sha256": "26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5",
+    "bytes": 4638720,
+    "remote_published_path": "/local/users/emanuele/pointstream/audits/w8-source-publish-b581-scoped-v2-20261101/source.tar",
+    "status": "not yet published; root-approved independent publication audit required",
+    "expected_mode": "0444",
+    "scope": "scoped full source archive; no complete cached-environment equivalence claim"
+  },
+  "cheap_v3": {
+    "status": "independent audit passed",
+    "module_sha256": "86f604c37e94880f4654a35678edb2f217ac22c96eb990adaeeb558f34f631dd",
+    "config_sha256": "1e8c279415dc595464f1dc0b37c3b0cec3031ba1fdc4fe60fc40abea925ae557",
+    "result_path": "/private/tmp/w8-aa-sam-cheap-b58155b4-independent-v2-20261101/result.json",
+    "result_sha256": "45756e894839c78229d11c3edadaadce0e0f4e521e372291053edcbf31826f64",
+    "checkpoint_path": "/private/tmp/w8-aa-sam-cheap-b58155b4-independent-v2-20261101/result.json.checkpoint.jsonl",
+    "checkpoint_sha256": "e1d8b5df8f35347990869207194a4e229f5e32faa463b61cd6c85e309b1c4f4b",
+    "independent_audit_path": "/private/tmp/w8-aa-sam-cheap-b58155b4-independent-v2-20261101/audit.json",
+    "independent_audit_sha256": "d5bf6388f0f2e704fcc11b49ad1b2f9138d816c165ef5c64cbb4c8f67b352dcd",
+    "coverage": "91 exact AA source/config files, exact recorded packaging exception excluded from grants, 160 SAM RECORD hashes; no model or GPU"
+  },
+  "launcher": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/runtime-qual-b581-scoped-launcher.py.txt",
+    "sha256": "eba6506615dbcafcb709dc80036e283344152114f0516d1aa10468a0638608d2",
+    "host": "gpu6",
+    "stdin": "DEVNULL",
+    "wait": "blocking waitpid + SIGALRM; on timeout only own SSH PID is terminated",
+    "unknown": "preserve artifacts; inspect existing handle/process, never replay",
+    "gate": "future root-reviewed JSON with cheap_v3 and source_audit pass/identity fields; SHA required at launch"
+  },
+  "gate_contract": {
+    "cheap_v3": {
+      "passed": true,
+      "module_sha256": "86f604c37e94880f4654a35678edb2f217ac22c96eb990adaeeb558f34f631dd",
+      "config_sha256": "1e8c279415dc595464f1dc0b37c3b0cec3031ba1fdc4fe60fc40abea925ae557",
+      "result_sha256": "45756e894839c78229d11c3edadaadce0e0f4e521e372291053edcbf31826f64",
+      "checkpoint_sha256": "e1d8b5df8f35347990869207194a4e229f5e32faa463b61cd6c85e309b1c4f4b",
+      "audit_sha256": "d5bf6388f0f2e704fcc11b49ad1b2f9138d816c165ef5c64cbb4c8f67b352dcd"
+    },
+    "source_audit": {
+      "passed": "<ROOT_REVIEWED_TRUE_AFTER_AUDIT>",
+      "source_sha256": "26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5",
+      "mode": "0444",
+      "independently_audited": "<ROOT_REVIEWED_TRUE_AFTER_AUDIT>",
+      "receipt_sha256": "<ACTUAL_AUDIT_RECEIPT_SHA256>"
+    }
+  },
+  "cpu_caps_seconds": {
+    "identity": 125,
+    "main_worker": 12,
+    "jcv_worker": 12,
+    "remote_parent": 6,
+    "external_local_ssh_shell_audit_closeout": 13,
+    "total": 168
+  },
+  "gpu_seconds": 0,
+  "wall_limits_seconds": {
+    "identity_max": 1200,
+    "main_max": 120,
+    "jcv_max": 120,
+    "remaining_worker_reserve_each": 120,
+    "closeout_reserve": 5,
+    "internal_monotonic": 1490,
+    "remote_outer": 1500,
+    "local_outer": 1515
+  },
+  "remote_output": "/local/users/emanuele/pointstream/audits/w8-receiver-runtime-qual-b581-full-v1-20261101",
+  "local_output": "/private/tmp/w8-receiver-runtime-qual-b581-full-v1-20261101",
+  "pilot": "unchanged 2x slowest measured hash CPU/byte plus five CPU seconds; includes prior cheap-check CPU and stops if 125 CPU cap cannot fit",
+  "preconditions": [
+    "v3 cheap check passed and independently audited (done)",
+    "scoped source independently published and audited (pending)",
+    "root assembles and reviews exact gate and independent source-audit receipt",
+    "root reserves 168 CPU seconds after reconciling current ledger and other work",
+    "fresh eligible host, cache, source and free-space checks; fresh exclusive outputs",
+    "attended; no retry or recurring poll"
+  ],
+  "nonclaims": [
+    "measured pilot is not a speed guarantee",
+    "no GPU or model inference",
+    "no complete cached-runtime equivalence",
+    "no codec or perceptual quality result"
+  ]
+}

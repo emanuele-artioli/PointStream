@@ -1,0 +1,73 @@
+{
+  "CPU_basis": "One-core GPU campaign <=500 wall bounds taskCPU<=500 including staging/validation; additional80CPU reserves preallocation/source-management40 (measured14.234CPU for larger19.8GB identity pass, 2x+5 plus local overhead), independent20CPU audit and postmonitoring20. Internal worker/validator caps420+staging80=500. No final30step promotion.",
+  "CPU_phase_reservation_upper": 580,
+  "GPU_phase_reservation_upper": 500,
+  "closed_W8_CPU_upper_before": 1917,
+  "closed_W8_GPU_before": 224,
+  "metadata": {
+    "deleted_paths": [],
+    "git_head": "b58155b46cea2232ad572effed9dd6c727676498",
+    "included_untracked_sha256": {},
+    "snapshot_sha256": "c9442ad63e973181ba2cfe8c64ed41033d8de4349fa8a598a530c66031586318",
+    "tracked_archive_paths_selected": [
+      "experiments",
+      "src",
+      "pyproject.toml",
+      "README.md",
+      "experiments/__init__.py",
+      "experiments/jobs",
+      "src/__init__.py"
+    ],
+    "tracked_changes_excluded": [
+      "PLAN.md",
+      "docs/continuation-2026-11-01.md",
+      "docs/experiments/w8-wire-audit.md",
+      "docs/paper/bibliography-format-review-2026-11-01.md",
+      "docs/paper/final-hygiene-2026-11-01.md",
+      "docs/paper/marker-dispositions-2026-11-01.md",
+      "docs/paper/readiness-2026-11-01.md",
+      "docs/paper/submission-actions-2026-11-01.md"
+    ],
+    "tracked_changes_included": [],
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_excluded_count": 109,
+    "untracked_excluded_paths_sha256": "12af03bb8999b144becc4f6b06307c5972579dde358d36d97434f065bd630637",
+    "untracked_excluded_sample": [
+      "docs/experiments/w8-inputs/receiver-20261101/aa-archive-structural-inspection.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-command.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-config.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-execution-plan.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-execution.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-launcher.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-payload.b64",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-remote.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-stderr",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-stdout",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-command.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-config.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-execution-plan.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-execution.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-launcher.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-payload.b64",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-remote.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-stderr",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-stdout",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-b58155b4-command.txt"
+    ]
+  },
+  "new_full_witness_admission": false,
+  "normalized_spec_sha256": "abb5c4ab808b39b30a52d78fe816cfa8132d717ff82176efd7db73b416d217a6",
+  "remaining_after_reservation_CPU": 1103,
+  "remaining_after_reservation_GPU": 2876,
+  "selected_snapshot_cli_paths": [
+    "experiments",
+    "src",
+    "pyproject.toml",
+    "README.md"
+  ],
+  "source_sha256": "c9442ad63e973181ba2cfe8c64ed41033d8de4349fa8a598a530c66031586318",
+  "source_snapshot": "/private/tmp/w8-cost-source-b581-frozen-20261101.tar",
+  "spec_file_sha256": "7c24124b9eabd3283b71f57969a4b7733ea18ff84bae5b6c3108ab106cd7587c",
+  "worst_after_CPU": 2497,
+  "worst_after_GPU": 724
+}

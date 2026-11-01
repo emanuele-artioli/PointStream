@@ -1,0 +1,25 @@
+{
+  "processes": [
+    {
+      "pid": 3870822,
+      "ppid": 3870821,
+      "state": "S"
+    }
+  ],
+  "counts": {
+    "failed": 284,
+    "complete": 1069,
+    "cancelled": 173,
+    "unknown": 65,
+    "contended": 19,
+    "expired": 3,
+    "attention": 1,
+    "budget_exhausted": 1
+  },
+  "unknown": 65,
+  "unknown_ready": 0,
+  "unknown_owner": 0,
+  "unknown_remote": 0,
+  "claims": [],
+  "limitations": "State reads are a non-atomic snapshot; unknown missing states are not established published requests; terminal entries not overlaid."
+}

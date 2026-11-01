@@ -1,5 +1,7 @@
 # Final manuscript hygiene review — 2026-11-01
 
+**Historical review snapshot:** later manuscripta667 and the [current readiness record](readiness-2026-11-01.md) supersede actionable status below. The empirical marker policy/checker was subsequently resolved without clearing missing evidence; final source now uses `companion/marker-dispositions.json`. Earlier snapshot facts/JSON are preserved.
+
 Read-only review of Overleaf manuscript `c879bf1beec35ef51a2fff47c915518a57086e15` in `/private/tmp/pointstream-w7-manuscript`; no experiment or manuscript edits. This is an issue list, not submission certification. Page count of its existing reviewed build is 22 body/references plus three online appendix pages; the body/appendix boundary and heading are in `main.tex:117–124`.
 
 ## Clear, locally fixable issues

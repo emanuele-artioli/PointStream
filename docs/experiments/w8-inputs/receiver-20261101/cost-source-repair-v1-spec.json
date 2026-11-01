@@ -1,0 +1,44 @@
+{
+  "status": "prospective_not_authorized_not_dispatchable",
+  "purpose": "source-only repair to failed packet decoder import",
+  "source_selection": [
+    "experiments",
+    "src",
+    "pyproject.toml",
+    "README.md",
+    "tools/datasets/k4b_inputs.py",
+    "tools/datasets/k4_inputs.py"
+  ],
+  "source_revision": "ROOT_TO_FREEZE_AFTER_COMMIT",
+  "source_sha256": "ROOT_TO_FREEZE_AFTER_COMMIT",
+  "deadline": "ROOT_TO_CHOOSE_AT_REVIEW",
+  "preflight": "PROPOSED_20_CPU_INCLUSIVE_PACKET_BOOTSTRAP_AND_INDEPENDENT_VALIDATION_NOT_RUN",
+  "cost_campaign": {
+    "gpu_hosts": [
+      "gpu6"
+    ],
+    "steps": [
+      1,
+      3
+    ],
+    "gpu_allocation_wall_cap_seconds": 500,
+    "phase_total_cpu_cap_seconds": 580,
+    "quality_scope": "qualification_only",
+    "automatic_retry": false,
+    "candidate_30_step_authorized": false
+  },
+  "budget_before_new_work": {
+    "cpu_closed_upper_seconds": 2125,
+    "gpu_closed_upper_seconds": 352,
+    "cpu_remaining_lower_seconds": 1475,
+    "gpu_remaining_lower_seconds": 3248
+  },
+  "requirements": [
+    "reviewed revision and user decision before another paid GPU attempt",
+    "exact frozen source and physical archive SHA",
+    "isolated packet decoder gate with protected data denied",
+    "fresh deadline and host/job inspection",
+    "review CPU staging/monitoring and GPU wall reservations",
+    "separate retained-output audit and downstream dual-budget admission"
+  ]
+}

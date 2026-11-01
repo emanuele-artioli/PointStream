@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-2677-existing-20261101/source/experiments/tennis/w8_receiver_preflight.py", line 434, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-2677-existing-20261101/source/experiments/tennis/w8_receiver_preflight.py", line 422, in main
+    asset_phase(json.loads(args.assets.read_text()), args.assets_output, args.identity_cpu_seconds)
+  File "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-2677-existing-20261101/source/experiments/tennis/w8_receiver_preflight.py", line 241, in asset_phase
+    aa = verify_aa_tree(Path(entries['aa_archive']['path']), jcv_prefix / 'opt/Moore-AnimateAnyone')
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-2677-existing-20261101/source/experiments/tennis/w8_receiver_preflight.py", line 92, in verify_aa_tree
+    raise ValueError('unsupported AA archive entry')
+ValueError: unsupported AA archive entry

@@ -1,0 +1,74 @@
+"""One source-archive delta publication; do not run until root authorizes it."""
+import base64,hashlib,json,os,resource,shlex,signal,subprocess,time,zlib
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(2,2))
+BASE=Path('/private/tmp/w8-source-delta-5651-to-2677-20261101')
+OLD=Path('/private/tmp/pointstream-w8-receiver-source-5651a24b.tar')
+NEW=Path('/private/tmp/pointstream-w8-receiver-source-2677c179.tar')
+PROGRAM=Path('/private/tmp/w8-source-delta-remote-2677.py')
+OUTPUT=Path('/private/tmp/w8-source-delta-publish-2677-20261101')
+OLD_SHA='d3fbd915d12184e99d0e7e847a268190bd81e2067aeed1f25fbc79f0d8aec7b4'
+NEW_SHA='fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635'
+ARG_SHA='47e2cfe8c0ff02a774727b6e19dddf0e416040eea985101968a7d58559bf3177'
+PROGRAM_SHA='30b1b3a58250d2ee75dfca2315d96a7379f724d9f9900dffc864caec5e2eae21'
+COMMAND_SHA='04b7c027081f2e452b63ac357b703d554ab43d8fd7299d4374b5eb22669b4730'
+
+
+def limit_ssh():
+ resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+
+
+def main():
+ old=OLD.read_bytes();new=NEW.read_bytes();arg=(BASE/'delta.b64').read_bytes();program=PROGRAM.read_bytes()
+ if (len(old)!=10711040 or hashlib.sha256(old).hexdigest()!=OLD_SHA or len(new)!=10741760
+     or hashlib.sha256(new).hexdigest()!=NEW_SHA or hashlib.sha256(arg).hexdigest()!=ARG_SHA
+     or hashlib.sha256(program).hexdigest()!=PROGRAM_SHA):raise ValueError('local input identity mismatch')
+ d=zlib.decompressobj();raw=d.decompress(base64.b64decode(arg,validate=True),2_000_001)
+ if len(raw)>2_000_000 or not d.eof or d.unused_data or d.unconsumed_tail:raise ValueError('delta decompression bounds')
+ obj=json.loads(raw);check=hashlib.sha256();pos=0
+ if (obj['schema'],obj['old_sha256'],obj['old_size'],obj['new_sha256'],obj['new_size'],obj['block_bytes'])!=(1,OLD_SHA,len(old),NEW_SHA,len(new),512):raise ValueError('delta metadata mismatch')
+ for op in obj['runs']:
+  if op[0]=='r' and len(op)==3:
+   start,length=op[1:]
+   if type(start) is not int or type(length) is not int or start<0 or length<=0 or start+length>len(old):raise ValueError('invalid reference')
+   chunk=old[start:start+length]
+  elif op[0]=='l' and len(op)==2:chunk=base64.b64decode(op[1],validate=True)
+  else:raise ValueError('invalid delta run')
+  if new[pos:pos+len(chunk)]!=chunk:raise ValueError('independent local byte comparison failed')
+  pos+=len(chunk);check.update(chunk)
+ if pos!=len(new) or check.hexdigest()!=NEW_SHA:raise ValueError('independent local reconstruction failed')
+ command=' '.join(shlex.quote(x) for x in ('/usr/bin/timeout','--signal=TERM','--kill-after=2','120s','/usr/bin/python3','-B','-c',program.decode(),arg.decode('ascii')))
+ argv=['/usr/bin/ssh','-o','BatchMode=yes','-o','ConnectTimeout=5','gpu6',command]
+ env=dict(os.environ)
+ command_bytes=len(command.encode());exec_bytes=sum(len(x.encode())+1 for x in argv)+sum(len((k+'='+v).encode())+1 for k,v in env.items())
+ if command_bytes>120000 or exec_bytes>200000 or hashlib.sha256(command.encode()).hexdigest()!=COMMAND_SHA:raise ValueError('command identity or size bound')
+ OUTPUT.mkdir(mode=0o700,exist_ok=False)
+ (OUTPUT/'launch.json').write_text(json.dumps({'old_sha256':OLD_SHA,'new_sha256':NEW_SHA,'argument_sha256':ARG_SHA,
+  'program_sha256':PROGRAM_SHA,'command_sha256':COMMAND_SHA,'command_bytes':command_bytes,
+  'exec_argv_plus_env_bytes':exec_bytes,'stdin':'DEVNULL','remote_wall_seconds':120,'local_wall_seconds':130,
+  'remote_cpu_seconds':2,'local_cpu_seconds':2,'ssh_cpu_seconds':1,'gpu_seconds':0},indent=2)+'\n')
+ started=time.monotonic()
+ with (OUTPUT/'stdout').open('xb') as stdout,(OUTPUT/'stderr').open('xb') as stderr:
+  proc=subprocess.Popen(argv,stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr,env=env,close_fds=True,
+                        start_new_session=True,preexec_fn=limit_ssh)
+  (OUTPUT/'handle.json').write_text(json.dumps({'pid':proc.pid,'pgid':proc.pid,'started_monotonic':started},indent=2)+'\n')
+  status='completed'
+  try:code=proc.wait(timeout=130)
+  except subprocess.TimeoutExpired:
+   status='unknown_inspect_do_not_replay'
+   try:os.killpg(proc.pid,signal.SIGKILL)
+   except ProcessLookupError:pass
+   code=proc.wait(timeout=5)
+  record={'status':status,'returncode':code,'wall_seconds':time.monotonic()-started,
+          'local_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+          'ssh_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2])}
+  (OUTPUT/'execution.json').write_text(json.dumps(record,indent=2)+'\n')
+  print(json.dumps({'status':status,'returncode':code,'output':str(OUTPUT)}))
+  if status!='completed' or code:raise SystemExit(1)
+ result=json.loads((OUTPUT/'stdout').read_text())
+ if (result.get('passed') is not True or result.get('bytes')!=10741760 or result.get('new_sha256')!=NEW_SHA
+     or result.get('mode')!='0444' or result.get('path')!='/local/users/emanuele/pointstream/audits/w8-source-publish-2677-delta-20261101/source.tar'):
+  raise ValueError('remote publication receipt mismatch')
+
+
+if __name__=='__main__':main()

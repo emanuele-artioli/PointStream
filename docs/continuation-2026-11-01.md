@@ -1,54 +1,51 @@
-> Latest operational closeout: CPU source staging and full-archive transport diagnostic are terminal; no matching remote diagnostic remains. Original cumulative≤1654CPU-s/224GPU-s; no live compute reservation. Exact-source delta recovery is being prepared, not executed. See latest W8 card for all historical charges and stop receipts.
+# Continuation, 2026-11-01: W8 cost smoke stopped
 
+**Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
+Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library
+inventory and CPU input/runtime qualification passed their recorded narrow gates.
+The latter qualifies 91 AA source/config files, one exact generated-manifest
+exception excluded from source grants, 160 SAM hashes and the original isolated
+MAIN/JCV runtime guards. Historical process-group IDs were not recorded; current
+known children/task processes were absent. This is no fresh decoder-quality,
+full cached-environment, sustained-reference or live-rate claim.
 
-# Continuation, 2026-11-01: exclusive W8 coverage repair completed
+**Cost pilot closed:** `20261101T135101Z-d67fe593` failed importing a
+required helper omitted from its source snapshot, before packet decode or
+model execution. Root accepted conservative inclusive charges of208 CPU-s and
+128 GPU-s. Original W8 cumulative is **≤2,125/3,600 CPU-s and352/3,600 GPU-s**,
+leaving at least1,475 CPU-s /3,248 GPU-s. Processes/claim/wait are absent and
+terminal events acknowledged; no live reservation remains. Minimal two-file
+source repair passes a local static-import regression, but its prospective
+plan/CPU qualification are under review. No automatic retry or30-step admission.
+See [W8](experiments/w8-wire-audit.md) and the `cost-d67-*` immutable receipts.
 
-## Current decision
+Overleaf main is `a6679181`, with the confirmed author block, ATHENA
+acknowledgment and organic PRESLEY citation beside ELVIS/GenStream. Review:
+22 body/reference pages plus 3 appendix pages; isolated small-format probe:
+23+3, within the user's 23+5 limit. Useful scientific negatives remain in the
+appendix. MoQSplat/TIGAS were reviewed and omitted as indirect. The paper is not
+submission-ready: finish the bounded witness decision and final publication
+checks. Code `b58155b4` passed CI; draft PR #325 will need exact-head checks after
+its evidence/documentation update.
 
-The user asked whether the larger saved bitstream meant PointStream costs more.
-Root clarified that the saved 49.6733-kbps stream belongs to the **baseline**:
-its score would bracket the fixed PointStream rate, not add bytes to PointStream.
-For a standalone 4.8-s clip PointStream's assembled cold payload really is much
-larger (3,816.4 kbps); 46.3151 kbps assumes exact match/reference reuse over
-7,200 s, not demonstrated reuse quality. Whole-frame results favor the baseline;
-the positive player-region claim is conditional.
+Submission local handle `54766` completed exit0; the canonical client record is
+`/Users/manu/.pointstream/fleet/jobs/20261101T135101Z-d67fe593.json`.
+The first exact-ID status command, handle `21660`, exited zero and found the
+request terminal failed at its correctness smoke. Its raw output is
+`/private/tmp/w8-cost-initial-status-d67fe593-20261101.json`; no wait or replay is
+needed. Read-only diagnosis and resource/lifecycle closeout are complete.
+The actual source snapshot is preserved at
+`/private/tmp/w8-cost-source-b581-frozen-20261101.tar`. The exact spec and source
+freeze are under `docs/experiments/w8-inputs/receiver-20261101/`.
 
-The approved exclusive scoring request **`20261101T081828Z-d70bc44f`** is
-complete on gpu6 Ada, independently full-audited, with all eight strict rate
-cells passing at unchanged 46.315062222222224 kbps. This opens the original
-CPU input/isolation gate; it does not prove fresh decoding or two-hour reuse.
-Scorer source `c0f25e4e`, normalized spec
-`e9d926b6f61685a288e90225c38bd1d84050c9187dfa25180d298ce317b03230`.
-Full archive `f87e9cba68063fb115828dddbffb9b7fbaffa1e61003ac4292f4adfaab1cc41f`;
-durable full audit and raw screen are in `docs/experiments/w8-inputs/exclusive-20261101/`.
-All three scoring requests, waits and task claims are closed; never replay them.
-
-The corrected Linux CPU input oracle **`20261101T093351Z-24914a4d`**
-completed from frozen source `e8f8827b` and original MAIN environment `32e688`;
-all four independent input, golden/exact-match, isolation and payload checks pass
-for one profile. It covers the full 240-frame context and 80 judged ticks, not
-fresh crops, masks, native RGB, composites, reuse or timing. The independent report
-SHA256 is `8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc`;
-[audit](experiments/w8-inputs/linux-input-20261101/bootstrap-independent-full-audit.json)
-and [closeout](experiments/w8-inputs/linux-input-20261101/bootstrap-closeout.json)
-record details. The job, process group and CPU claim are closed; wait `70480`
-ended and event `b2ef4c7dacbf5f0d93f9d76e0cd37d7d` was delivered and acknowledged.
-Do not replay it. Its conservative charge is 101 CPU-s (61 campaign plus 40
-extras). Golden qualification closed with a conservative 150 CPU-s charge;
-15 reference files are sealed read-only. The later bootstrap stopped at its cost
-projection (60+5 CPU-s); the first native inventory failed on transient loader-cache
-access (20 CPU-s). The corrected native inventory failed before decoder launch,
-closed at ≤4 CPU-s. Source staging for utility `61563` stopped after identity-guarded
-termination of only task-owned processes; handle is terminal 137 with SSH -9,
-no source archive, asset/runtime/inference or quality result. Its closed charge is
-30 CPU-s inclusive of diagnostics and stops, replacing the unused 165 reservation.
-A separate tiny 28-byte SSH/EOF smoke passed and closed at 4 CPU-s. Thus W8 closed
-cumulative is **≤1,654/3,600 CPU-s and 224/3,600 GPU-s** after the full-archive
-transport diagnostic73336 timed out (4 CPU-s) and its bounded closeout (5 CPU-s)
-found no matching process. No live reservation remains; exact-source delta recovery
-is under review, not executed. No fresh GPU job or receiver qualification
-exists; these stops are not quality negatives. See [W8](experiments/w8-wire-audit.md)
-for immutable identities and closeout receipts; inspect existing work, never replay.
+CPU qualification: raw receipts at
+`/private/tmp/w8-receiver-full-audit-b581-v2-20261101/receipts`; root acceptance
+`616abd67…`, partial audit `8108c849…` and current lifecycle `3fee152a…` retain
+the missing historical-PGID boundary. Actual child CPU18.236780 s; closed at51 s
+including the parent and complete audit/closeout reserves. Shared prerequisites
+are immutable under
+`Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/`:
+bundle `ab5f1b93…`, identity `0953c528…`, original oracle `8047b676…`.
 
 ## Immutable scientific state
 
@@ -138,12 +135,19 @@ and all three native binaries were checked; all scientific imports came from
 clean frozen source. Source/input artifacts and diagnostics are referenced in
 [W8](experiments/w8-wire-audit.md) and its amendment input directory.
 
-Overleaf main and the local manuscript are **`525f423bca542148645890063474e4a85723c6cf`**,
-pushed. It links both the initial `21931f6` recovery dossier and subsequent
-controls at `5a6f892b`; it retains the qualified claims and evidence boundaries.
-The review format has 22 body/reference plus 3 appendix pages; an isolated
-small-format check has 22+3 after bibliography corrections, without clipped paths. Live venue format instructions
-remain unverified. The paper is not submission-ready.
-Negative results and conditional saved-quality boundaries remain.
-No recurring timer or cache keepalive remains; the bounded transport-only diagnostic is active as recorded above.
-Cache lifetime is unknown.
+The manuscript is pushed at `a6679181fcbe8104702bf3b0231140cc301d9ca1`.
+The user confirmed the author block and requested ATHENA acknowledgment and
+organic self-citations, now integrated. No authority to submit has been given.
+The current review/alternate-format page counts are 22+3 and23+3. No recurring
+model timer/cache keepalive is active; cache lifetime is unknown. Native
+completion after returning the chat remains unverified, so execution is attended.
+
+Next: review the prospective source-only repair and CPU qualification within
+the original budget; do not replay the closed pilot. Admit final
+30-step work only after a
+complete remaining CPU/GPU forecast that includes SAM/native/RGB/composition,
+post-seal scoring, validation and publication. Worker primitives exist; a full
+fleet witness driver/validator is still needed if the cost oracle passes. Final
+paper outcome/pins/checks/PDF and venue workflow remain; the full task audit and
+negative appendix already triage the rest of PLAN. Submission needs explicit
+user authority. Do not reopen deferred training/live/racket/large-sweep work.

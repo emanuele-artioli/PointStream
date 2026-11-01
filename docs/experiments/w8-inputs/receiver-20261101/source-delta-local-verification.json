@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "bytes": 10741760,
+  "sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+  "same_target_bytes": true,
+  "argument_bytes": 109088,
+  "argument_sha256": "47e2cfe8c0ff02a774727b6e19dddf0e416040eea985101968a7d58559bf3177",
+  "verifier_sha256": "a5906621df10d002976b94a4a408f8a05331684b6ae0f7ce0fbf42002b154cef"
+}

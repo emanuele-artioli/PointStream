@@ -1,0 +1,19 @@
+{
+  "aa_regular": 91,
+  "checkpoint_sha256": "e1d8b5df8f35347990869207194a4e229f5e32faa463b61cd6c85e309b1c4f4b",
+  "config_sha256": "1e8c279415dc595464f1dc0b37c3b0cec3031ba1fdc4fe60fc40abea925ae557",
+  "local_cpu_seconds": 0.064494,
+  "packaging_exceptions": 1,
+  "passed": true,
+  "pid_absence": {
+    "3795832": false,
+    "3795901": false
+  },
+  "remote_cpu_seconds": 0.059706999999999996,
+  "result_sha256": "45756e894839c78229d11c3edadaadce0e0f4e521e372291053edcbf31826f64",
+  "sam_hashed_files": 160,
+  "sam_hashed_sources": 152,
+  "scope": "independent local audit of cheap AA/SAM results; no GPU or full environment verification",
+  "ssh_cpu_seconds": 0.017469,
+  "wall_seconds": 9.155677542090416
+}

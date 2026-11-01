@@ -1,0 +1,47 @@
+import base64,hashlib,json,zlib
+from pathlib import Path
+old=Path('/private/tmp/pointstream-w8-receiver-source-5651a24b.tar').read_bytes()
+new=Path('/private/tmp/pointstream-w8-receiver-source-2677c179.tar').read_bytes()
+old_sha='d3fbd915d12184e99d0e7e847a268190bd81e2067aeed1f25fbc79f0d8aec7b4'
+new_sha='fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635'
+if len(old)!=10711040 or hashlib.sha256(old).hexdigest()!=old_sha or len(new)!=10741760 or hashlib.sha256(new).hexdigest()!=new_sha:
+ raise ValueError('source identity mismatch')
+block=512;index={}
+for offset in range(0,len(old),block):
+ b=old[offset:offset+block];index.setdefault(hashlib.sha256(b).digest(),[]).append(offset)
+runs=[];literal=bytearray();expected=-1
+for off in range(0,len(new),block):
+ b=new[off:off+block];candidates=index.get(hashlib.sha256(b).digest(),[])
+ loc=expected if expected in candidates else (candidates[0] if candidates else None)
+ if loc is not None and old[loc:loc+len(b)]!=b:raise ValueError('block hash collision')
+ if loc is None:
+  literal.extend(b);expected=-1;continue
+ if literal:
+  runs.append(['l',base64.b64encode(literal).decode('ascii')]);literal.clear()
+ if runs and runs[-1][0]=='r' and runs[-1][1]+runs[-1][2]==loc:
+  runs[-1][2]+=len(b)
+ else:runs.append(['r',loc,len(b)])
+ expected=loc+len(b)
+if literal:runs.append(['l',base64.b64encode(literal).decode('ascii')])
+payload={'schema':1,'old_sha256':old_sha,'old_size':len(old),'new_sha256':new_sha,'new_size':len(new),'block_bytes':block,'runs':runs}
+raw=json.dumps(payload,separators=(',',':')).encode();compressed=zlib.compress(raw,9);argument=base64.b64encode(compressed)
+if len(argument)>96*1024:raise RuntimeError(f'delta argument exceeds 96 KiB: {len(argument)}')
+reconstructed=bytearray()
+for op in runs:
+ if op[0]=='r':reconstructed.extend(old[op[1]:op[1]+op[2]])
+ elif op[0]=='l':reconstructed.extend(base64.b64decode(op[1],validate=True))
+ else:raise ValueError('unknown delta opcode')
+if reconstructed!=new or hashlib.sha256(reconstructed).hexdigest()!=new_sha:raise ValueError('local reconstruction mismatch')
+out=Path('/private/tmp/w8-source-delta-5651-to-2677-20261101');out.mkdir(mode=0o700,exist_ok=False)
+(out/'delta.b64').write_bytes(argument)
+(out/'delta.zlib').write_bytes(compressed)
+(out/'reconstructed.tar').write_bytes(reconstructed)
+receipt={'old_sha256':old_sha,'old_bytes':len(old),'new_sha256':new_sha,'new_bytes':len(new),'block_bytes':block,
+         'delta_json_bytes':len(raw),'delta_compressed_bytes':len(compressed),'argument_bytes':len(argument),
+         'delta_sha256':hashlib.sha256(compressed).hexdigest(),'argument_sha256':hashlib.sha256(argument).hexdigest(),
+         'reference_runs':sum(r[0]=='r' for r in runs),'literal_runs':sum(r[0]=='l' for r in runs),
+         'literal_bytes':sum(len(base64.b64decode(r[1])) for r in runs if r[0]=='l'),
+         'local_reconstruction_sha256':hashlib.sha256(reconstructed).hexdigest(),'exact_local_bytes':bytes(reconstructed)==new,
+         'scope':'archive transport only; no code or model qualification'}
+(out/'build-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+print(json.dumps(receipt,sort_keys=True))

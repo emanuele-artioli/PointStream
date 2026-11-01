@@ -1,0 +1,76 @@
+import csv,hashlib,json,os,resource,tarfile
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(2,2))
+archive=Path('/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/env/moore-animateanyone-67c4229.tar')
+expected='bfca6cf1129a0154bf2c3431c0e01b34f5e815eda5ba504f54e001c8ceeb99ee'
+h=hashlib.sha256()
+with archive.open('rb') as stream:
+ for block in iter(lambda:stream.read(1048576),b''):h.update(block)
+if h.hexdigest()!=expected:raise ValueError('AA archive SHA mismatch')
+tree=Path('/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone').resolve(strict=True)
+def candidate(path,hash_content=False):
+ cursor=tree;plain=True
+ for part in path.relative_to(tree).parts:
+  cursor=cursor/part
+  if cursor.is_symlink():plain=False;break
+ if not plain:return {'path':str(path),'plain':False,'accepted':False,'reason':'symlink path not dereferenced'}
+ try:
+  st=path.lstat();exists=True;is_file=path.is_file();is_symlink=path.is_symlink()
+ except FileNotFoundError:
+  st=None;exists=False;is_file=False;is_symlink=False
+ result={'path':str(path),'lexists':exists,'file':is_file,'symlink':is_symlink,'plain':plain,'accepted':plain and is_file}
+ if st is not None:result.update({'device':st.st_dev,'inode':st.st_ino,'size':st.st_size,'mode':oct(st.st_mode&0o777)})
+ if hash_content and result['accepted']:
+  hh=hashlib.sha256()
+  with path.open('rb') as f:
+   for block in iter(lambda:f.read(1048576),b''):hh.update(block)
+  result['sha256']=hh.hexdigest()
+ return result
+rows=[];regular=0;target=None
+with tarfile.open(archive,'r:*') as tar:
+ for item in tar:
+  if not item.isfile():continue
+  regular+=1;parts=Path(item.name).parts
+  if not parts or Path(item.name).is_absolute() or '..' in parts:raise ValueError('unsafe archive member')
+  paths=[tree.joinpath(*parts)]
+  if len(parts)>1:paths.append(tree.joinpath(*parts[1:]))
+  candidates=[candidate(p,item.name=='animate_anyone/scripts/lmks2vid.py') for p in paths]
+  count=sum(c['accepted'] for c in candidates)
+  row={'archive_name':item.name,'archive_size':item.size,'accepted_count':count,'candidates':candidates}
+  if item.name=='animate_anyone/scripts/lmks2vid.py':
+   f=tar.extractfile(item);row['archive_sha256']=hashlib.sha256(f.read()).hexdigest() if f else None;target=row
+  if count!=1:
+   if len(rows)>=200:raise ValueError('too many mismatched paths')
+   rows.append(row)
+if target is None:raise ValueError('original failing member missing from archive')
+checkpoint=Path('/local/users/emanuele/pointstream/audits/w8-aa-sam-cheap-7483d95e-20261101/result.json.checkpoint.jsonl')
+check={'exists':checkpoint.is_file()}
+if checkpoint.is_file():
+ if checkpoint.stat().st_size>2000000:raise ValueError('checkpoint too large')
+ raw=checkpoint.read_bytes();records=[json.loads(line) for line in raw.splitlines()]
+ check.update({'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'record_count':len(records),'records':records})
+main=Path('/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree')
+sites=sorted({p.resolve(strict=True) for p in main.glob('lib/python*/site-packages') if p.is_dir()})
+dists=sorted({p.resolve(strict=True) for site in sites for p in site.glob('sam3*.dist-info') if p.is_dir()})
+sam=[]
+for dist in dists[:4]:
+ row={'path':str(dist)};direct=dist/'direct_url.json';record=dist/'RECORD'
+ if direct.is_file() and direct.stat().st_size<100000:row['direct_url']=json.loads(direct.read_text())
+ if record.is_file() and record.stat().st_size<2000000:
+  counts={'total':0,'unhashed_pyc':0,'unhashed_other':0,'pth':0}
+  with record.open(newline='') as f:
+   for line in csv.reader(f):
+    if len(line)!=3:raise ValueError('SAM malformed record')
+    name,digest,_=line;counts['total']+=1
+    if name.endswith('.pth'):counts['pth']+=1
+    if not digest and name.endswith('.pyc'):counts['unhashed_pyc']+=1
+    elif not digest and not name.endswith('/RECORD'):counts['unhashed_other']+=1
+  row['counts']=counts
+ sam.append(row)
+procs={str(pid):Path('/proc',str(pid)).exists() for pid in (3778360,3778314)}
+result={'archive_sha256':h.hexdigest(),'archive_bytes':archive.stat().st_size,'regular_members':regular,
+        'failing_member':target,'invalid_count':len(rows),'invalid_members':rows,'checkpoint':check,
+        'resolved_sam_sites':[str(p) for p in sites],'distinct_sam_distributions':sam,'recorded_pids_exist':procs,
+        'remote_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+        'scope':'read-only layout and distribution metadata; no Torch/model/GPU or full source equality'}
+print(json.dumps(result,sort_keys=True))

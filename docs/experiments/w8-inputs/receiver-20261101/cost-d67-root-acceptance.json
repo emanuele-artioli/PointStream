@@ -1,0 +1,14 @@
+{
+  "accepted": true,
+  "scope": "Closed failed source-package smoke; not decoder quality or generator cost evidence",
+  "job": "20261101T135101Z-d67fe593",
+  "closeout_summary_sha256": "07ced9b11d14d300abb9016b37e0da113e3518fcacc7441115f4816b45eb0c32",
+  "CPU_upper": 208,
+  "GPU_upper": 128,
+  "cumulative_CPU_upper": 2125,
+  "cumulative_GPU_upper": 352,
+  "remaining_CPU_lower": 1475,
+  "remaining_GPU_lower": 3248,
+  "live_reservation": false,
+  "basis": "Canonical terminal reconciliation after supervisor exit bounds single-core campaign and GPU claim by 128 seconds; preallocation40, independent audit20 and monitoring20 charged in full. Recorded processes absent and claims empty. Source archive has no tools entries; traceback matches the missing tracked helper import. No model ran."
+}

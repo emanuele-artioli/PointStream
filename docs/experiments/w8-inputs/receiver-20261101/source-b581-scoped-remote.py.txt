@@ -1,0 +1,56 @@
+import base64,hashlib,json,os,resource,sys,zlib
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(2,2))
+OLD=Path('/local/users/emanuele/pointstream/audits/w8-source-publish-2677-delta-20261101/source.tar')
+OUT=Path('/local/users/emanuele/pointstream/audits/w8-source-publish-b581-scoped-20261101')
+OLD_SHA='fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635'
+NEW_SHA='26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5'
+DELTA_SHA='44083b583c7f6a4eceeb408c5c04679b6537de18998987d9f98b6ab873e7c584'
+if len(sys.argv)!=2 or len(sys.argv[1])>120000:raise ValueError('one bounded delta argument required')
+compressed=base64.b64decode(sys.argv[1],validate=True)
+if hashlib.sha256(compressed).hexdigest()!=DELTA_SHA:raise ValueError('delta digest mismatch')
+d=zlib.decompressobj();raw=d.decompress(compressed,2_000_001)
+if len(raw)>2_000_000 or not d.eof or d.unconsumed_tail or d.unused_data:raise ValueError('delta decompression bounds')
+p=json.loads(raw)
+if set(p)!={'schema','old_sha256','old_size','new_sha256','new_size','block_bytes','runs'} or (p['schema'],p['old_sha256'],p['old_size'],p['new_sha256'],p['new_size'],p['block_bytes'])!=(1,OLD_SHA,10741760,NEW_SHA,4638720,512):raise ValueError('delta metadata mismatch')
+if not isinstance(p['runs'],list) or not 1<=len(p['runs'])<=4096:raise ValueError('delta run count')
+local=Path('/local/users/emanuele/pointstream'); data=Path('/home/itec/emanuele/Datasets/pointstream-data')
+if local.stat().st_dev==data.stat().st_dev or os.statvfs(local).f_bavail*os.statvfs(local).f_frsize<200_000_000:raise ValueError('local filesystem or capacity')
+fd=os.open(OLD,os.O_RDONLY|os.O_NOFOLLOW)
+try:
+ before=os.fstat(fd)
+ with os.fdopen(fd,'rb',closefd=False) as f:old=f.read(10711041)
+ after=os.fstat(fd)
+ if (before.st_dev,before.st_ino,before.st_size,before.st_mtime_ns)!=(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns) or len(old)!=10741760 or hashlib.sha256(old).hexdigest()!=OLD_SHA:raise ValueError('prior archive mismatch')
+finally:os.close(fd)
+OUT.mkdir(mode=0o700,exist_ok=False)
+target=OUT/'source.tar';outfd=os.open(target,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+total=0;digest=hashlib.sha256()
+try:
+ with os.fdopen(outfd,'wb',closefd=False) as out:
+  for op in p['runs']:
+   if not isinstance(op,list) or not op:raise ValueError('invalid delta run')
+   if op[0]=='r' and len(op)==3:
+    start,length=op[1:]
+    if type(start) is not int or type(length) is not int or start<0 or length<=0 or start%512 or length%512 or start+length>len(old):raise ValueError('invalid reference')
+    block=old[start:start+length]
+   elif op[0]=='l' and len(op)==2:
+    block=base64.b64decode(op[1],validate=True)
+    if not block or len(block)%512:raise ValueError('invalid literal')
+   else:raise ValueError('unknown delta run')
+   total+=len(block)
+   if total>4638720:raise ValueError('reconstruction exceeds target size')
+   digest.update(block);out.write(block)
+  out.flush();os.fsync(outfd)
+ if total!=4638720 or digest.hexdigest()!=NEW_SHA:raise ValueError('reconstruction digest mismatch')
+ os.fchmod(outfd,0o444)
+finally:os.close(outfd)
+h=hashlib.sha256()
+with target.open('rb') as stream:
+ for block in iter(lambda:stream.read(1048576),b''):h.update(block)
+st=target.stat()
+if st.st_size!=4638720 or h.hexdigest()!=NEW_SHA or st.st_mode&0o777!=0o444:raise ValueError('readback identity mismatch')
+print(json.dumps({'passed':True,'old_sha256':OLD_SHA,'delta_sha256':DELTA_SHA,'new_sha256':NEW_SHA,
+                  'bytes':total,'path':str(target),'mode':'0444','old_device':before.st_dev,'old_inode':before.st_ino,
+                  'new_device':st.st_dev,'new_inode':st.st_ino,'cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+                  'scope':'source archive publication only; no qualification, inference or GPU'},sort_keys=True))

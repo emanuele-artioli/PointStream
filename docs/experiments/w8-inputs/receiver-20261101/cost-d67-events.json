@@ -1,0 +1,58 @@
+{
+  "job_id": "20261101T135101Z-d67fe593",
+  "status": "failed",
+  "events": [
+    {
+      "id": "68319bef68335e09a675cdff101e733d",
+      "kind": "terminal:failed",
+      "timestamp": 1793541261.0871592,
+      "status": {
+        "status": "failed",
+        "started": 1793541191.2100806,
+        "last_progress": 1793541243.1459355,
+        "emitted": [
+          "decision:63688ea731b159c1be9aa89b8e1154cc"
+        ],
+        "gpu_sharing": {
+          "mode": "exclusive"
+        },
+        "pid": 3911215,
+        "proc_start_time": 1793541193.74,
+        "process_group_id": 3911215,
+        "progress": {
+          "stage": "attention",
+          "completed": 0,
+          "updated": 1793541242.7892556,
+          "decision": "smoke failed with exit code 1"
+        },
+        "exit_code": 1,
+        "ended": 1793541261.0871592
+      },
+      "one_shot": true
+    },
+    {
+      "id": "2ce32d49a89c5938b0a8fe5752b04454",
+      "kind": "decision:63688ea731b159c1be9aa89b8e1154cc",
+      "timestamp": 1793541243.1459355,
+      "status": {
+        "status": "running",
+        "started": 1793541191.2100806,
+        "last_progress": 1793541243.1459355,
+        "emitted": [],
+        "gpu_sharing": {
+          "mode": "exclusive"
+        },
+        "pid": 3911215,
+        "proc_start_time": 1793541193.74,
+        "process_group_id": 3911215,
+        "progress": {
+          "stage": "attention",
+          "completed": 0,
+          "updated": 1793541242.7892556,
+          "decision": "smoke failed with exit code 1"
+        }
+      },
+      "one_shot": true
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "mode": "0444",
+  "old_source": {
+    "bytes": 10741760,
+    "mode": "0444",
+    "path": "/local/users/emanuele/pointstream/audits/w8-source-publish-2677-delta-20261101/source.tar",
+    "sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+    "stamp": [
+      64514,
+      41358263,
+      10741760,
+      1793534341629610448,
+      1793534341635609914
+    ]
+  },
+  "passed": true,
+  "publication_processes": {
+    "matches": [],
+    "owned_processes_inspected": 22,
+    "scope": "same-user processes; this audit and its ancestors excluded"
+  },
+  "remote_cpu_seconds": 0.080008,
+  "scope": "source publication only; no runtime or codec qualification",
+  "source": {
+    "bytes": 4638720,
+    "mode": "0444",
+    "modules": {
+      "experiments/__init__.py": {
+        "bytes": 154,
+        "sha256": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9"
+      },
+      "experiments/tennis/__init__.py": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "experiments/tennis/w8_receiver_bootstrap.py": {
+        "bytes": 15388,
+        "sha256": "3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49"
+      },
+      "experiments/tennis/w8_receiver_preflight.py": {
+        "bytes": 35607,
+        "sha256": "86f604c37e94880f4654a35678edb2f217ac22c96eb990adaeeb558f34f631dd"
+      }
+    },
+    "path": "/local/users/emanuele/pointstream/audits/w8-source-publish-b581-scoped-v2-20261101/source.tar",
+    "pax_comment": "b58155b46cea2232ad572effed9dd6c727676498",
+    "regular_files": 235,
+    "sha256": "26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5",
+    "stamp": [
+      64514,
+      41359267,
+      4638720,
+      1793537810800888118,
+      1793537810804887762
+    ],
+    "tar_entries": 249
+  },
+  "source_sha256": "26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5"
+}

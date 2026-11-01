@@ -1,0 +1,28 @@
+{
+  "GPU_dispatch_authorized_by_this_record": false,
+  "GPU_seconds": 0,
+  "accepted_utc": "2026-11-01T13:22:09.328101+00:00",
+  "child_CPU_measured": 18.23678,
+  "closed_CPU_basis": {
+    "all_three_children_ceil": 19,
+    "current_process_closeout_reserve": 5,
+    "extra_second_audit_reserve": 8,
+    "original_inclusive_external_reserve": 13,
+    "remote_parent_hard_soft_cap": 6
+  },
+  "closed_CPU_upper": 51,
+  "historical_process_group_ids_recorded": false,
+  "independent_receipt_audit_sha256": "8108c84974a9ef1ab19d7aad3d474d8d4c5bd68e8b88eadb87e112a0d4d63cb0",
+  "lifecycle_acceptance_basis": "All three explicit awaited children exited0, independently recorded PIDs absent; current same-user task scan matches only audit wrapper. Historical exact process-group absence is not claimed. Frozen CPU-only code starts no workload outside its three awaited child entrypoints.",
+  "lifecycle_closeout_sha256": "3fee152a0058ca150279173845387c9871acf896e09a459d38a09495e6dc33dc",
+  "original_W8_closed_CPU_upper": 1871,
+  "original_W8_closed_GPU_upper": 224,
+  "original_caps_each": 3600,
+  "passed": true,
+  "remaining_CPU_lower": 1729,
+  "remaining_GPU_lower": 3376,
+  "scope": "CPU source/input identity and isolated MAIN/JCV runtime qualification only; no GPU model inference, pixels, quality, reuse or full cached-environment equivalence",
+  "source_archive_sha256": "26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5",
+  "source_files": 235,
+  "source_revision": "b58155b46cea2232ad572effed9dd6c727676498"
+}

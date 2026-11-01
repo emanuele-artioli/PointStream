@@ -1,5 +1,3 @@
-> Latest operational closeout: CPU source staging and full-archive transport diagnostic are terminal; no matching remote diagnostic remains. Original cumulative≤1654CPU-s/224GPU-s; no live compute reservation. Exact-source delta recovery is being prepared, not executed. See latest W8 card for all historical charges and stop receipts.
-
 # Manuscript readiness, 2026-11-01
 
 The decoder witness is **one gate, not the complete submission checklist**.
@@ -21,7 +19,7 @@ does not turn unmeasured comparisons into completed evidence.
   beside DISTS/PSNR gains; post hoc selections and failed decodes are disclosed.
   A cost-stopped smoothing pilot and absent racket masks are not presented as
   quality negatives. See [negative-evidence audit](negative-evidence-2026-11-01.md).
-- Overleaf main `525f423bca542148645890063474e4a85723c6cf` includes that appendix, the
+- Overleaf main `a6679181fcbe8104702bf3b0231140cc301d9ca1` includes that appendix, the
   hand-transfer/reference-bank negatives and the passing conditional W8
   saved-quality screen described below.
   PDF `/private/tmp/pointstream-w7-manuscript/build/main.pdf`: **25 pages,
@@ -62,23 +60,29 @@ independent checks for one profile from frozen source `e8f8827b`; report SHA256
 It establishes exact packet-derived conditioning and isolation under that tested
 profile, not fresh generated crops, masks, native RGB or composites, sustained
 reuse or timing. The job, claim and wait are closed and its terminal event was
-acknowledged. Golden qualification closed at 150 CPU-s; 15 reference files are
-sealed read-only. Later asset bootstrap and native inventory stopped on cost and
-transient loader-cache checks, respectively; corrected native prelaunch failed
-before decoding. Staging-only utility `61563` is terminal after guarded process
-stops and charged 30 CPU-s inclusive; no asset/runtime/inference was started.
-A separate tiny transport smoke passed and closed at 4 CPU-s. W8 closed cumulative
-is **≤1,654/3,600 CPU-s and 224/3,600 GPU-s** after transport-only hash diagnostic
-73336 timed out (4 CPU-s) and its bounded closeout (5 CPU-s) found no matching
-process. No live reservation remains; exact-source delta recovery is under review,
-not executed. It has no model or GPU scope. None of these stops is a quality result;
-no fresh GPU job or receiver qualification exists. Current branch is
-`codex/w8-receiver-witness-2026-11-01`, draft PR #325; CI passed for `5651`,
-run `41301707915`. See the [continuation](../continuation-2026-11-01.md).
+acknowledged. Golden qualification closed at150 CPU-s; the15 original reference files are
+read-only. Later native inventory and CPU identity/runtime checks passed their
+specific gates. CPU acceptance `616abd67…` independently binds11 large assets,
+five protected identities,91 AA source/config files, the exact generated-manifest
+exception outside source grants,160 SAM hashes and the two isolated runtimes.
+Historical PGIDs were not recorded; known child PIDs and current matching task
+processes were absent. This does not establish full cached-environment equivalence
+or any fresh pixel, mask or perceptual-quality result.
 
-Overleaf main and the local manuscript are at `525f423bca542148645890063474e4a85723c6cf`. Its reviewed predecessors clarified claims, added exact visible-boundary checks, wrapped appendix paths and pinned the initial recovery and subsequent controls; this revision corrects three bibliography entries. The current review PDF is 22 body/reference plus 3 appendix pages;
-the isolated small-format check is 22+3 after the bibliography corrections. Current venue instructions remain
-unverified. No training or new codec claim follows from the saved-quality screen.
+The cost-only pilot `20261101T135101Z-d67fe593` failed on a source-package
+omission before packet decode or model execution. Root accepted208 CPU-s /128
+GPU-s inclusive; original cumulative **≤2,125/3,600 CPU-s and352/3,600 GPU-s**.
+At least1,475 CPU-s /3,248 GPU-s remain; no live reservation, process or claim.
+Minimal source-only repair passes the local static-import regression but its
+prospective plan/CPU qualification are under review. No fresh quality or final
+30-step work is admitted. Sourceb581 passed CI; PR#325 needs final evidence
+commit/checks. The [W8 entry](../experiments/w8-wire-audit.md) controls the ledger.
+
+Overleaf main/local manuscript is **a6679181fcbe8104702bf3b0231140cc301d9ca1**:
+user-confirmed author block, ATHENA acknowledgment, PRESLEY beside ELVIS/GenStream;
+MoQSplat/TIGAS were reviewed and omitted as indirect. Checker/registrytests pass
+with26 cited keys. Review22 body/reference+3 appendix pages; alternate small
+probe23+3, no overfull lines. Current live venue workflow remains unverified.
 
 ## What remains for submission
 

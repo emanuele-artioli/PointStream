@@ -1,0 +1,31 @@
+{
+  "audit_python_pid": 3850531,
+  "audit_wrapper_pid": 3850475,
+  "historical_process_groups": "not recorded; cannot reconstruct or assert absence of exact historical process groups",
+  "prior_partial_report_sha256": "8108c84974a9ef1ab19d7aad3d474d8d4c5bd68e8b88eadb87e112a0d4d63cb0",
+  "qualification_child_pids": [
+    3813871,
+    3814344,
+    3814415
+  ],
+  "raw_receipts": {
+    "config.json": "747026e9b16d3c36ffa3b619a0c94fd64a9933624882b536aebc91ad551d4c8e",
+    "identities/assets.json": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe",
+    "identities/exit.json": "3ae8ddab97f646261fcabf67d1aae130d15954281a4c120cfc83fb3fdda01666",
+    "identities/inventory.json": "4a8d0b9b5557e1589b54e5de99dbcd7fa938b38ec1b69c654ee1ed01229a7165",
+    "identities/pilot.json": "ef5b8900de50bd53e62d3577fc5b524e9c8f797e97421be1192dc3566c246419",
+    "identities/process.json": "7abe427bd928ced101b16264464a29ab49c6ae46edcf7fd9658a598fbbc72777",
+    "identities/verified-checkpoint.jsonl": "f41ee5e047f13c9b72ae3e7c3528074da3103477d1c970a0ffb10082558de13b",
+    "jcv/exit.json": "ec5bab5bbdb645cf71ef48a9bd73f45cdc35c7f34b62892f71e36861c973965a",
+    "jcv/process.json": "59a747b08be801bc810f7d216543db5055d728467fcd8c01cc6461ee86a7da9a",
+    "jcv/worker-config.json": "c9da1c7808a90b42dd4a5b52dda85dc88a64c51fbfb62c74eddb81f827a3eafe",
+    "jcv/worker/preflight.json": "02ed54d645cab5098685ec9dafb3e3b9a12a9815d3067a9eda7d74e085ecf1b5",
+    "main/exit.json": "be4700ffee060551514c3d95f30aece51e4374896a537126f81e3a309fa2e259",
+    "main/process.json": "afd78cfe1f1aee590b5559b407ef0211abc73846581c73168a1383def6e20994",
+    "main/worker-config.json": "a5410dbdace94b2d9a10cf825145302ed3aa71fb7cf486bc8e3b501651cd5ed5",
+    "main/worker/preflight.json": "f3be7108251a296e08e4ca36a15dcbe89af49d2d2dde584f7078055dcafe416d",
+    "result.json": "75992ba2e25fe7798e6db12b66bf788dcf925a6e382e3c08eafe9c83b32c1e66"
+  },
+  "raw_scan_sha256": "340b6d76a142bfd9b75a84ef500cfe2f04675999afd2f51e7681f556b3011c4b",
+  "status": "current scan found no matching qualification processes; one match is the audit-owned timeout wrapper"
+}
