@@ -6,6 +6,11 @@ external wire locations in `local-oracle-provenance-20261101.json`. These are
 not fresh-receiver or production-runtime qualifications. Original data and wire
 files remain outside the checkout.
 
+`frozen-reproduction-8f6d0ece.json` records a later, contemporaneously pinned
+same-configuration reproduction of both packet hashes. It resolves current
+implementation reproducibility only; it does not qualify fresh inference or
+erase limitations of the original diagnostic receipts.
+
 The fixed candidate stopped unresolved at 46.3151 kbps: one measured anchor
 ends at 45.8233 kbps. `input-oracle-draft.json` is **not submission-ready and
 must not be submitted** under the stopped card. Its Landlock confinement and

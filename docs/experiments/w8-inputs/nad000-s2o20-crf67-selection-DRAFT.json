@@ -7,9 +7,9 @@
       "offset": -20,
       "crf": 67,
       "rate_kbps": 49.67333333333334,
-      "bytes": null,
-      "stream_sha256": null,
-      "decoded_sha256": null,
+      "bytes": 29804,
+      "stream_sha256": "182c7eee4a0ea2e98ef0a967ecfcdf8958898ad7ce035e54f0ea91b5109b6fa3",
+      "decoded_sha256": "71b3ee98cc83349d6377394e5003ae2da872c0e4a0e3a56685eed3a81a7dfe9f",
       "archive_sha256": "9736920b256b2b770c3b35e8784570a50df2720115fbb134970439adea4240f0",
       "member": "publish/streams/s2_o20_crf67.ivf"
     }

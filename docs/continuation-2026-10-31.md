@@ -1,5 +1,15 @@
 # Continuation, 2026-10-31: W7 closed; work moves to Codex
 
+**Latest continuation, 2026-11-01:** user approved the separate W8 witness and
+confirmed 23 pages of body/references plus five additional appendix pages.
+The full PLAN/evidence audit and expanded negative-results appendix are done;
+Overleaf `e366440` is 22+3 pages. W8's actual fixed-payload rate screen stopped
+unresolved before any fleet/GPU submission (46.3151 kbps versus one family's
+45.8233 upper bracket). Local tensor diagnostics do not establish a fresh
+receiver. See [current readiness](paper/readiness-2026-11-01.md) and
+[W8 outcome](experiments/w8-wire-audit.md); old pending-approval statements below
+are historical. No unchanged card may be replayed from this older handoff.
+
 **Later same-day audit:** W7's historical closure below is superseded. The
 reference-bank billing code counted encoding variants as independent crops,
 undercharging the modeled bank by four. The corrected saved-evidence Tier 1

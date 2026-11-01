@@ -1,0 +1,63 @@
+{
+  "scope": "independent same-configuration verification, no revised candidate or promotion",
+  "revision": "8f6d0eced0a6fb3c4773d8feb09fd5e2eddd9236",
+  "commands": [
+    {
+      "command": [
+        "/Users/manu/miniconda3/envs/tigas/bin/python",
+        "-m",
+        "experiments.tennis.w8_checkpoint_oracle",
+        "--fits",
+        "/private/tmp/w8-input-recovery-20261101/fits.tar",
+        "--guider",
+        "/private/tmp/w8-input-recovery-20261101/original-guider.pth",
+        "--out",
+        "/private/tmp/w8-frozen-reproduction-8f6d0ece/checkpoint"
+      ],
+      "exit": 0,
+      "wall_s": 5.879848208278418,
+      "whole_child_cpu_s": 5.248181999999999
+    },
+    {
+      "command": [
+        "/Users/manu/miniconda3/bin/python",
+        "-m",
+        "experiments.tennis.w8_bundle_oracle",
+        "--ivf",
+        "/private/tmp/w8-native-correct-layout-20261101/nad000-s4.ivf",
+        "--ivf-sha256",
+        "f9622b6af4cddea3d70226c0b22e12374f4c77aadf2120e54d5d21ba55bfbbb8",
+        "--transport",
+        "/private/tmp/w9-inbox/20261031T171359Z-aba3845f/full/published.tar",
+        "--match",
+        "/private/tmp/w8-frozen-reproduction-8f6d0ece/checkpoint/match.psw8",
+        "--common-base",
+        "/private/tmp/w8-input-recovery-20261101/common-base.tar",
+        "--inbox",
+        "/private/tmp/w9-inbox",
+        "--repairs",
+        "/private/tmp/w8-frozen-reproduction-8f6d0ece/repair.json",
+        "--out",
+        "/private/tmp/w8-frozen-reproduction-8f6d0ece/bundle"
+      ],
+      "exit": 0,
+      "wall_s": 1.485173833090812,
+      "whole_child_cpu_s": 1.1349569999999995
+    }
+  ],
+  "output_hashes": {
+    "checkpoint/match.psw8": "fef98258469b57ae4518a1ef570579e9918de7435b310737a04cdfaeb15bb810",
+    "bundle/window.psw8": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+    "checkpoint/receipt.json": "27d78d110bb0c5289d7687f31ddd54ff594cc765f59a1972d3af14970a710816",
+    "bundle/receipt.json": "38eb8075ef394d5fbcc402cf61c287716274b5fdf7a6e752e289afe0075baa7c"
+  },
+  "code_hashes": {
+    "experiments/tennis/w8_checkpoint_oracle.py": "67912b5d733aa31b5602ea53b67af2b79d4f659d9c51955f7bf818b57ba51d11",
+    "experiments/tennis/w8_inputs.py": "6a90df71b2183147dd3880ba4001919f0aed5b36b7f0f427db529b4027bcad03",
+    "experiments/tennis/w8_oracle.py": "64cdb820b457c608ce6ec361cefe48cec605a4e55173b40494e627577320a249",
+    "experiments/tennis/w8_input_job.py": "d0a9492b3e6c032f62d133979b95d578514da4b36dc82413232ca59c41f73b0f",
+    "experiments/tennis/w8_bundle_oracle.py": "b21ebafe60724ad3c3864bd9429f17dbf596b534cac18546b4ad649dae5e5881",
+    "experiments/tennis/w8_anchor_oracle.py": "68ac9adde1232f85b29008dae350e24f48fe78f6dadb02f15e97556451535bc9",
+    "experiments/tennis/w8_payload.py": "9629bc596923540cf9eb3e17ebcc6b1c2b3000de15cf5019c33e083153a69a64"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "status": "DRAFT_NOT_SUBMITTABLE",
-  "reason": "Await user stop-rule amendment, verified trial member hashes, immutable manifest staging, enforceable aggregate workload CPU cap, pilot projection and root review.",
+  "reason": "Await user stop-rule amendment, immutable manifest staging, enforceable aggregate workload CPU cap, pilot projection and root review.",
   "fixed_candidate_rate_kbps": 46.315062222222224,
   "post_audit_merge_target_kbps": 46.315062222222224,
   "selection_draft": "nad000-s2o20-crf67-selection-DRAFT.json",
@@ -100,7 +100,7 @@
       {
         "name": "repair_manifest",
         "path": "REQUIRES_VERIFIED_NEW_IMMUTABLE_SELECTION_MANIFEST",
-        "sha256": "REQUIRES_VERIFIED_NEW_MANIFEST_SHA256",
+        "sha256": "4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0",
         "extract": false
       }
     ],
@@ -143,7 +143,7 @@
       },
       {
         "path": "REQUIRES_VERIFIED_NEW_IMMUTABLE_SELECTION_MANIFEST",
-        "sha256": "REQUIRES_VERIFIED_NEW_MANIFEST_SHA256"
+        "sha256": "4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0"
       }
     ],
     "environment": {
