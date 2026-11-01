@@ -1,5 +1,11 @@
 # Card: W8 fresh-decoder witness (authorized 2026-11-01)
 
+**Exclusive attempt subsequently approved:** the user authorized one new
+exclusive-GPU scoring request with an inclusive **450 GPU-s / 450 CPU-s** internal
+cap, still inside the original **3,600/3,600 totals**. Previous charges remain
+included. Follow the [approved amendment](../experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md),
+fresh preflight, frozen policy and the original strict quality/decoder gates.
+
 **Latest stop:** the approved 300/300-s coverage amendment ended with two cost
 stops and no full quality point. Requests `20261101T071706Z-afde26d5` and
 `20261101T073429Z-04a50c10` are terminal; first correctness checks passed but

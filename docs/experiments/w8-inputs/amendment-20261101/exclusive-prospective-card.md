@@ -1,8 +1,9 @@
-# Prospective exclusive-GPU scoring amendment — not authorized
+# Exclusive-GPU scoring amendment — authorized 2026-11-01
 
-This is a concrete proposal for user decision, not authority to submit a job.
-The two attempts authorized under the 300/300 amendment have ended and that
-allocation is closed. Do not create a third request under that approval.
+The user explicitly approved this exclusive attempt within the original W8
+totals. The earlier 300/300 amendment's two requests remain closed and their
+charges remain included below. This approval permits one new frozen request
+after the stated checks; it does not permit replaying either old request.
 
 The unchanged objective is to score the saved `nad000` `s2_o20` CRF-67
 stream SHA256 `182c7eee4a0ea2e98ef0a967ecfcdf8958898ad7ce035e54f0ea91b5109b6fa3`
@@ -28,7 +29,7 @@ seconds of amendment preparation, this amendment closes at at most 87 CPU-s
 and 67 GPU-s. Original W8 cumulative charges are at most 937 CPU-s and 67
 GPU-s of its unchanged 3,600/3,600 ceilings.
 
-**Proposed authority.** Permit at most 450 GPU-s and 450 workload CPU-s for
+**Approved authority.** Permit at most 450 GPU-s and 450 workload CPU-s for
 this scoring portion, *within* the original W8 caps and inclusive of the
 previous 67 CPU-s/GPU-s and preparation; this is not 450 seconds added to
 previous expenditure. Reserve a single 280 s one-core campaign, 30 s for
@@ -53,9 +54,9 @@ The 10 s audit must be independently hard-bounded; a previous development audit
 of the retained W9 full result used 0.122 CPU-s on this Mac, which is not a
 guarantee for the new output or environment.
 
-**Not runnable.** The expired 2000 deadline deliberately blocks submission.
-The current scoring wrapper and policy do not authorize these new limits or the
-proposed output bound. A reviewed implementation, focused checks, immutable
-source revision and normalized spec identity, fresh deadline and preflight are
-needed after explicit approval. Do not infer any scientific result from the two
-failed attempts or this prospective allocation.
+**Execution prerequisites.** The archived prospective spec retains its expired
+2000 deadline and is not itself runnable. The newly approved source policy,
+focused checks, immutable revision/spec, fresh deadline and preflight must be
+frozen in a separate execution specification. Do not infer a scientific result
+from the earlier failed attempts or this allocation. The quality/input/receiver
+gates remain unchanged.
