@@ -1,0 +1,51 @@
+{
+  "accepted_source_members": 235,
+  "budget": "charge full 40 CPU, zero GPU",
+  "files_sha256": {
+    "cost-source-repair-cpu-v1-audit-audit.py": "e30c9ac5defd64828c2f51f0fc26d864eeb4b62b50e74350d1ca8bc6f9676436",
+    "cost-source-repair-cpu-v1-audit-execution-v2.json": "7da77c312c2a5d59f9b13fb18ff592082216417f6d64417545fd06f4c13858e6",
+    "cost-source-repair-cpu-v1-audit-execution.json": "939f5f8f173b82168a496d624b2d252313dce156cf409514a342d611a0fb5653",
+    "cost-source-repair-cpu-v1-audit-output-decoded-manifest.json": "1dd379c078933a163b9f4eb659e11c3e70cf3ca1d2d125eaab19e52d40a0f926",
+    "cost-source-repair-cpu-v1-audit-remote-v2.py": "9d949dde87390679d912d5010d1f0692b94f1170f0455b65c48ae7e6919fc55e",
+    "cost-source-repair-cpu-v1-audit-remote.py": "45c127d7201c6b78fae3229dd1e33fbb7963fda8c7323f4074a39ab5135f570e",
+    "cost-source-repair-cpu-v1-audit-result.json": "ad76dfaec460608d87c34e4cdd993ef22d360e116c2b59625dbd897b7e5c8941",
+    "cost-source-repair-cpu-v1-audit-source-hashes.json": "c5c6b952a6e26e0207f7f6dbb87bc5f879628c15dd640ad1cb83fb9b4b3e1a8b",
+    "cost-source-repair-cpu-v1-audit-source-map.json": "80caace86bd8da04123f2ac2944cf3ead2107748cb9e39c7d8ba7b2d0d55e154",
+    "cost-source-repair-cpu-v1-audit-stderr": "dda0b624c226388a29cd4f15606561b5ba9acd200374bc71e4c5d524f3a9740c",
+    "cost-source-repair-cpu-v1-audit-validator.exit.json": "f3d92fe6d0d8306b656c284f700cde11136c8f2b3c9afd4d4b07616ba913718f",
+    "cost-source-repair-cpu-v1-audit-validator.start.json": "389cdcb116631a2e8b0ea84b6e3db28d9ceae9344bde2dbbf13f71512677f420",
+    "cost-source-repair-cpu-v1-audit-validator.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cost-source-repair-cpu-v1-audit-validator.stdout": "c6e3298c5514c3dd7ebeeca2dbe329a79c9c9deebc6749cedb19e20667dfb9ed",
+    "cost-source-repair-cpu-v1-audit-worker-config.json": "57bbb70d67f1601c285b3114749a28395122ef872597aadf901ca4be5ac80abd",
+    "cost-source-repair-cpu-v1-audit-worker.exit.json": "33e461c9edda52f868de9923fd5cdee8773ac8db98548d14b0ce93eb02540090",
+    "cost-source-repair-cpu-v1-audit-worker.start.json": "c5d8c82ffd6df9671731a2ece3a8471a8f0d393b4e2ab25a48f8fe817093f905",
+    "cost-source-repair-cpu-v1-audit-worker.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cost-source-repair-cpu-v1-audit-worker.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "first_fetch": "read-only, stopped at 60KB size guard; no receipt emitted",
+  "independent_original_oracle_sha256": "6f6fe14fd433d77aa880e5936b2d48a77b554af201d0cdc84ef9743364528ba2",
+  "original_oracle_units_and_fingerprints_match": true,
+  "owned_processes": {
+    "3964656": {
+      "pgid_exists": false,
+      "pid_exists": false
+    },
+    "3964880": {
+      "pgid_exists": false,
+      "pid_exists": false
+    }
+  },
+  "parent_cpu_seconds": 0.097813,
+  "passed": true,
+  "protected_denials": 10,
+  "scope": "CPU-only packet qualification; no GPU or quality",
+  "second_fetch_packed_bytes": 57141,
+  "source_members": 237,
+  "tensor_fingerprints": 480,
+  "unit_sha256": {
+    "nadal_kyrgios__000_at120__person_000000000000": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+    "nadal_kyrgios__000_at120__person_000000000001": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7"
+  },
+  "validator_cpu_seconds": 2.1033389999999996,
+  "worker_cpu_seconds": 7.822298999999999
+}

@@ -1,0 +1,32 @@
+{
+  "status": "closed_AA_archive_parser_failure_before_runtime_workers",
+  "source_revision": "2677c17902004dbf7a556a9e6167ce0032fec008",
+  "physical_source_archive_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+  "independent_publication_audit_sha256": "e0a484c2b235701e9fa647b1e2d55b8b125e171cce5ebc9e0ab6a093b2e423f9",
+  "launcher_sha256": "7adfc778ec9a3b481822856931f832130e215297c41124a05c74fde9c6e3ace3",
+  "source_archive": "/local/users/emanuele/pointstream/audits/w8-source-publish-2677-delta-20261101/source.tar",
+  "new_remote_root": "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-2677-existing-20261101",
+  "local_receipts": "/private/tmp/w8-receiver-cpu-preflight-2677-existing-20261101",
+  "host": "gpu6",
+  "stdin": "DEVNULL",
+  "caps_CPU_s": {
+    "asset_identity": 125,
+    "MAIN": 12,
+    "JCV": 12,
+    "parent": 6,
+    "external_and_audit": 10
+  },
+  "total_CPU_s": 165,
+  "GPU_s": 0,
+  "remote_wall_s": 1500,
+  "local_wall_s": 1515,
+  "previous_closed_W8_CPU_s_upper": 1666,
+  "W8_GPU_s": 224,
+  "worst_W8_CPU_s": 1831,
+  "original_caps_each": 3600,
+  "scope": "same identity/pilot/isolation rules, source transport fixed, no model inference or GPU",
+  "stop": "mismatch, resource/deadline failure or unknown state stops; preserve/read existing state, no replay",
+  "local_execution_handle": 88040,
+  "outcome": "pilot fit98.015CPU/125; identity41.050653CPU/878.386wall then unsupported AA archive link; no assets.json/SAM/MAIN/JCV; localwaiterSIGXCPU152 and recordedSSH absent",
+  "closed_CPU_charge_upper_s": 65
+}

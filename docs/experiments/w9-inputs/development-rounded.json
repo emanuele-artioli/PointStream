@@ -1,0 +1,9 @@
+{
+ "description": "Rounded development tables from docs/experiments/w3-neural-baseline.md and w5-med-pareto.md; historical KPS2 adapter-only accounting, not a complete bitstream.",
+ "cases": [
+  {"name":"Al DCVC player LPIPS", "hybrid":0.3459,"rate_7200_kbps":21.458796,"adapter_bytes":1488252,"points":[[19.253,0.4229],[21.663,0.3988],[23.172,0.3885],[24.656,0.3809],[27.662,0.3654],[33.388,0.3421]]},
+  {"name":"Al DCVC player DISTS", "hybrid":0.2526,"rate_7200_kbps":21.458796,"adapter_bytes":1488252,"points":[[19.253,0.3231],[21.663,0.3085],[23.172,0.3015],[24.656,0.2976],[27.662,0.2900],[33.388,0.2751]]},
+  {"name":"Med DCVC player LPIPS", "hybrid":0.3748,"rate_7200_kbps":40.272539,"adapter_bytes":1495592,"points":[[12.767,0.6899],[35.812,0.5901],[130.822,0.5308]]},
+  {"name":"Med DCVC player DISTS", "hybrid":0.2529,"rate_7200_kbps":40.272539,"adapter_bytes":1495592,"points":[[12.767,0.4446],[35.812,0.3494],[130.822,0.3131]]}
+ ]
+}

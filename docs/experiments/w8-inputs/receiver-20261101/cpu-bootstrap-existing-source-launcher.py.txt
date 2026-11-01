@@ -1,0 +1,81 @@
+"""One 165-CPU-s preflight from published source; no stdin, do not run without root approval."""
+import hashlib,json,os,resource,shlex,signal,subprocess,tarfile,time
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+REV='2677c17902004dbf7a556a9e6167ce0032fec008'
+SHA='fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635'
+ARCHIVE=Path('/private/tmp/pointstream-w8-receiver-source-2677c179.tar')
+REMOTE_SOURCE='/local/users/emanuele/pointstream/audits/w8-source-publish-2677-delta-20261101/source.tar'
+REMOTE_ROOT='/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-2677-existing-20261101'
+LOCAL_OUT=Path('/private/tmp/w8-receiver-cpu-preflight-2677-existing-20261101')
+PYTHON=('/local/users/emanuele/pointstream/cache/'
+        '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python')
+
+def ssh_limit():resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+
+def main():
+ data=ARCHIVE.read_bytes()
+ if len(data)!=10741760 or hashlib.sha256(data).hexdigest()!=SHA:raise ValueError('local source archive mismatch')
+ with tarfile.open(ARCHIVE) as tar:
+  if tar.pax_headers.get('comment')!=REV:raise ValueError('archive revision mismatch')
+  member=tar.getmember('docs/experiments/w8-inputs/receiver-20261101/cpu-bootstrap-preflight-template.json')
+  if not member.isfile() or member.size>100000:raise ValueError('invalid frozen config')
+  stream=tar.extractfile(member)
+  if stream is None:raise ValueError('config missing')
+  config=json.load(stream)
+ config['source_archive']=REMOTE_SOURCE;config['source_tree']=REMOTE_ROOT+'/source'
+ remote=r'''import hashlib,json,os,resource,sys,tarfile,time
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(6,165))
+deadline=time.monotonic()+1490
+os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
+local=Path('/local/users/emanuele/pointstream');data=Path('/home/itec/emanuele/Datasets/pointstream-data')
+if local.stat().st_dev==data.stat().st_dev:raise ValueError('separate local filesystem required')
+if os.statvfs(local).f_bavail*os.statvfs(local).f_frsize<2*1024**3:raise ValueError('insufficient local space')
+archive=Path(REMOTE_SOURCE)
+if archive.is_symlink() or archive.stat().st_size!=10741760 or archive.stat().st_mode&0o777!=0o444:raise ValueError('source archive identity or mode')
+h=hashlib.sha256()
+with archive.open('rb') as f:
+ for block in iter(lambda:f.read(1048576),b''):h.update(block)
+if h.hexdigest()!=SHA:raise ValueError('published source SHA mismatch')
+out=Path(REMOTE_ROOT);out.mkdir(mode=0o700,exist_ok=False)
+source=out/'source';source.mkdir()
+with tarfile.open(archive,'r:') as tar:
+ members=tar.getmembers()
+ if len(members)>5000 or sum(m.size for m in members)>64*1024**2:raise ValueError('source extraction cap')
+ if any(m.issym() or m.islnk() or m.name.startswith('/') or '..' in Path(m.name).parts for m in members):raise ValueError('source archive member')
+ tar.extractall(source,filter='data')
+config=json.loads(CONFIG)
+with (out/'config.json').open('x') as f:json.dump(config,f,sort_keys=True)
+output=out/'results';output.mkdir()
+env={'PATH':'/usr/bin:/bin','CUDA_VISIBLE_DEVICES':'','PYTHONPATH':str(source),'PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1','MKL_NUM_THREADS':'1','NUMEXPR_NUM_THREADS':'1','TMPDIR':str(out),'TMP':str(out),'TEMP':str(out),'XDG_CACHE_HOME':str(out),'TORCH_HOME':str(out)}
+os.execve(PYTHON,[PYTHON,'-B',str(source/'experiments/tennis/w8_receiver_preflight.py'),'--config',str(out/'config.json'),'--source-sha256',SHA,'--output',str(output),'--identity-cpu-seconds','125','--identity-wall-seconds','1200','--deadline-monotonic',str(deadline)],env)
+'''
+ values={'REMOTE_SOURCE':REMOTE_SOURCE,'REMOTE_ROOT':REMOTE_ROOT,'SHA':SHA,'CONFIG':json.dumps(config),'PYTHON':PYTHON}
+ program='\n'.join(f'{k}={v!r}' for k,v in values.items())+'\n'+remote
+ command=' '.join(shlex.quote(x) for x in ('/usr/bin/timeout','--signal=TERM','--kill-after=2','1500s',PYTHON,'-B','-c',program))
+ LOCAL_OUT.mkdir(mode=0o700,exist_ok=False)
+ (LOCAL_OUT/'config.json').write_text(json.dumps(config,sort_keys=True,indent=2)+'\n')
+ (LOCAL_OUT/'remote-program.py.txt').write_text(program)
+ started=time.monotonic()
+ with (LOCAL_OUT/'stdout').open('xb') as stdout,(LOCAL_OUT/'stderr').open('xb') as stderr:
+  proc=subprocess.Popen(['/usr/bin/ssh','-o','BatchMode=yes','-o','ConnectTimeout=5','gpu6',command],
+                        stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr,close_fds=True,
+                        start_new_session=True,preexec_fn=ssh_limit)
+  (LOCAL_OUT/'handle.json').write_text(json.dumps({'pid':proc.pid,'pgid':proc.pid,'started_monotonic':started,
+      'remote_root':REMOTE_ROOT,'source_sha256':SHA,'cpu_reservation_seconds':165,'gpu_seconds':0},indent=2)+'\n')
+  status='completed'
+  try:code=proc.wait(timeout=1515)
+  except subprocess.TimeoutExpired:
+   status='unknown_inspect_do_not_replay'
+   try:os.killpg(proc.pid,signal.SIGKILL)
+   except ProcessLookupError:pass
+   code=proc.wait(timeout=5)
+  receipt={'status':status,'returncode':code,'wall_seconds':time.monotonic()-started,
+           'local_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+           'ssh_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2])}
+  (LOCAL_OUT/'execution.json').write_text(json.dumps(receipt,indent=2)+'\n')
+  print(json.dumps({'status':status,'returncode':code,'output':str(LOCAL_OUT)}))
+  if status!='completed' or code:raise SystemExit(1)
+
+if __name__=='__main__':main()

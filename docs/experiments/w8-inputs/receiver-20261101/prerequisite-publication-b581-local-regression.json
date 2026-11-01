@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": "actual remote program with target substituted to new local temporary directory and Linux affinity call replaced for Mac",
+  "remote_program_sha256": "d8657645d1e1d18b9cc5905b1ba4b0183a9d017a1f97e946a597986712c400a8",
+  "output_files": [
+    "bundle.json",
+    "identity.json",
+    "manifest.json",
+    "oracle.json"
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "nadal_kyrgios__000_at120__person_000000000000": {
+    "reference": {
+      "exact": true,
+      "decoded_shape": [
+        784,
+        512,
+        3
+      ],
+      "golden_shape": [
+        784,
+        512,
+        3
+      ],
+      "decoded_dtype": "uint8",
+      "golden_dtype": "uint8"
+    },
+    "reference_box": {
+      "exact": true,
+      "decoded_shape": [
+        4
+      ],
+      "golden_shape": [
+        4
+      ],
+      "decoded_dtype": "float64",
+      "golden_dtype": "float64"
+    },
+    "t": {
+      "exact": true,
+      "decoded_shape": [
+        240
+      ],
+      "golden_shape": [
+        240
+      ],
+      "decoded_dtype": "int64",
+      "golden_dtype": "int64"
+    },
+    "run": {
+      "exact": true,
+      "decoded_shape": [
+        240
+      ],
+      "golden_shape": [
+        240
+      ],
+      "decoded_dtype": "int64",
+      "golden_dtype": "int64"
+    },
+    "box": {
+      "exact": false,
+      "decoded_shape": [
+        240,
+        4
+      ],
+      "golden_shape": [
+        240,
+        4
+      ],
+      "decoded_dtype": "float64",
+      "golden_dtype": "float64",
+      "max_abs": 4.547473508864641e-13,
+      "different": 120,
+      "first_index": [
+        73,
+        0
+      ]
+    },
+    "pose": {
+      "exact": true,
+      "decoded_shape": [
+        240,
+        784,
+        512,
+        3
+      ],
+      "golden_shape": [
+        240,
+        784,
+        512,
+        3
+      ],
+      "decoded_dtype": "uint8",
+      "golden_dtype": "uint8"
+    },
+    "judged": {
+      "exact": false,
+      "decoded_shape": [
+        240
+      ],
+      "golden_shape": [
+        240
+      ],
+      "decoded_dtype": "bool",
+      "golden_dtype": "bool",
+      "max_abs": 1.0,
+      "different": 160,
+      "first_index": [
+        1
+      ]
+    }
+  },
+  "nadal_kyrgios__000_at120__person_000000000001": {
+    "reference": {
+      "exact": true,
+      "decoded_shape": [
+        784,
+        512,
+        3
+      ],
+      "golden_shape": [
+        784,
+        512,
+        3
+      ],
+      "decoded_dtype": "uint8",
+      "golden_dtype": "uint8"
+    },
+    "reference_box": {
+      "exact": true,
+      "decoded_shape": [
+        4
+      ],
+      "golden_shape": [
+        4
+      ],
+      "decoded_dtype": "float64",
+      "golden_dtype": "float64"
+    },
+    "t": {
+      "exact": true,
+      "decoded_shape": [
+        240
+      ],
+      "golden_shape": [
+        240
+      ],
+      "decoded_dtype": "int64",
+      "golden_dtype": "int64"
+    },
+    "run": {
+      "exact": true,
+      "decoded_shape": [
+        240
+      ],
+      "golden_shape": [
+        240
+      ],
+      "decoded_dtype": "int64",
+      "golden_dtype": "int64"
+    },
+    "box": {
+      "exact": false,
+      "decoded_shape": [
+        240,
+        4
+      ],
+      "golden_shape": [
+        240,
+        4
+      ],
+      "decoded_dtype": "float64",
+      "golden_dtype": "float64",
+      "max_abs": 2.2737367544323206e-13,
+      "different": 172,
+      "first_index": [
+        161,
+        0
+      ]
+    },
+    "pose": {
+      "exact": true,
+      "decoded_shape": [
+        240,
+        784,
+        512,
+        3
+      ],
+      "golden_shape": [
+        240,
+        784,
+        512,
+        3
+      ],
+      "decoded_dtype": "uint8",
+      "golden_dtype": "uint8"
+    },
+    "judged": {
+      "exact": false,
+      "decoded_shape": [
+        240
+      ],
+      "golden_shape": [
+        240
+      ],
+      "decoded_dtype": "bool",
+      "golden_dtype": "bool",
+      "max_abs": 1.0,
+      "different": 160,
+      "first_index": [
+        1
+      ]
+    }
+  },
+  "native_equivalence": "ValueError: Transport changes target crop geometry",
+  "cpu_s": 2.949675,
+  "wall_s": 2.8718417501077056,
+  "numpy_version": "2.0.0"
+}

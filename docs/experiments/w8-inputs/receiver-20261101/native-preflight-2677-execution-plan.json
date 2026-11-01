@@ -1,0 +1,49 @@
+{
+  "status": "closed_before_config_or_decode",
+  "source_revision": "2677c17902004dbf7a556a9e6167ce0032fec008",
+  "source_archive_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+  "source_archive_bytes": 10741760,
+  "source_archive_path": "/private/tmp/pointstream-w8-receiver-source-2677c179.tar",
+  "existing_remote_source_base": "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-2677c1790200-qualification-20261101",
+  "four_source_members_sha256": {
+    "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+    "experiments/tennis/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/tennis/w8_receiver_native_bootstrap.py": "dc40011f61f2e9a2fccc6c2f3abc4568907cb996a6638f34131b896b754a44ba",
+    "experiments/tennis/w8_receiver_native_preflight.py": "d12531b7a16c031f7aac47788cea1e062ff113afbe511e73cfc7cffccd7eae68"
+  },
+  "launcher_sha256": "837049828af56d42556b1e974c0db471b6988a7c12c8a0228b9f6a167be984b0",
+  "config_sha256": "e6b155d6b78cef47c2d531531cc73cd42feab8f5b844d3246b66f91b46725dce",
+  "host": "gpu6",
+  "new_output": "/local/users/emanuele/pointstream/audits/w8-native-preflight-2677c179-retry-20261101",
+  "cpu_cap_inclusive_seconds": 20,
+  "gpu_seconds": 0,
+  "cpu_phases": {
+    "parent": 6,
+    "version": 1,
+    "decode": 9,
+    "external_and_closeout": 4
+  },
+  "remote_wall_seconds": 140,
+  "local_wall_seconds": 150,
+  "source_prerequisite": "CPU preflight source staging must have finished; independently rehash source.tar and compare all four source modules to archive. The MAIN/JCV CPU qualification outcome is not a native inventory prerequisite.",
+  "checks": "CPU FFmpeg/libdav1d inventory including exact /etc/ld.so.cache hash and all 240 decoded YUV frames; no RGB, GPU or isolated receiver proof.",
+  "stop": "Missing source, changed assets, mapped-library violations, checksum mismatch or cap/deadline exhaustion stops; preserve outputs, inspect existing state, never replay.",
+  "recovery": {
+    "script": "docs/experiments/w8-inputs/receiver-20261101/cpu-bootstrap-2677-recovery.py.txt",
+    "sha256": "6e7d0d15297df3979b0944beb526cbd7bbd63ee0bbeea01527bea655cf6a282d",
+    "scope": "one bounded read-only 2677 CPU-preflight receipt and process snapshot, no cancellation or GPU",
+    "remote_cpu_seconds": 3,
+    "local_cpu_seconds": 1,
+    "ssh_cpu_seconds": 1,
+    "shell_timeout_reserve_seconds": 1,
+    "operational_reserve_seconds": 1,
+    "total_cpu_seconds": 7,
+    "accounting": "Within 165-second CPU-preflight external10; do not double charge or consume native20.",
+    "prerequisite": "root explicitly assigns receipt recovery; do not run while simply preparing."
+  },
+  "closed_W8_CPU_s_upper": 1607,
+  "closed_W8_GPU_s": 224,
+  "parallel_CPU_qualification_reservation_s": 165,
+  "worst_W8_CPU_after_this20_s": 1792,
+  "outcome": "Missing source archive; no config/output/decode. Proven4CPU upper replaces20reservation."
+}

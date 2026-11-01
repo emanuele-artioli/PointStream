@@ -1,0 +1,220 @@
+{
+  "probe_sha256": "22c08c8cc937e0732d6293d443d89db2b667f3f24a1d4388a1653f85d76366f6",
+  "chosen_host": "gpu5",
+  "results": [
+    {
+      "host": "gpu2",
+      "mode": "inventory",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=5",
+        "gpu2",
+        "env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES=-1 TMPDIR=/local/users/emanuele/pointstream TMP=/local/users/emanuele/pointstream TEMP=/local/users/emanuele/pointstream /usr/bin/timeout --signal=TERM --kill-after=1 15s /usr/bin/python3 -B - inventory"
+      ],
+      "status": "local_timeout_remote_bounded",
+      "exit_code": null,
+      "elapsed_seconds": 16.007184165995568,
+      "local_child_usage_before": {
+        "user_seconds": 0.0,
+        "system_seconds": 0.0
+      },
+      "local_child_usage_after": {
+        "user_seconds": 0.008773,
+        "system_seconds": 0.009143
+      },
+      "parent_usage": {
+        "user_seconds": 0.031416,
+        "system_seconds": 0.030754
+      },
+      "remote_cpu_charge_upper_seconds": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "host": "gpu5",
+      "mode": "inventory",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=5",
+        "gpu5",
+        "env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES=-1 TMPDIR=/local/users/emanuele/pointstream TMP=/local/users/emanuele/pointstream TEMP=/local/users/emanuele/pointstream /usr/bin/timeout --signal=TERM --kill-after=1 15s /usr/bin/python3 -B - inventory"
+      ],
+      "status": "completed",
+      "exit_code": 0,
+      "elapsed_seconds": 4.098522792104632,
+      "local_child_usage_before": {
+        "user_seconds": 0.008773,
+        "system_seconds": 0.009143
+      },
+      "local_child_usage_after": {
+        "user_seconds": 0.020959,
+        "system_seconds": 0.020228
+      },
+      "parent_usage": {
+        "user_seconds": 0.032085999999999996,
+        "system_seconds": 0.032879
+      },
+      "remote_cpu_charge_upper_seconds": 1,
+      "stdout_sha256": "65680287f837773f5cd4be8abf396100e9348c33d275690102c8595e5d975e8f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": {
+        "mode": "inventory",
+        "host": "gpu5",
+        "root_exists": true,
+        "cache_tree_exists": true,
+        "python_exists": true,
+        "local_device": 64513,
+        "root_device": 64512,
+        "separate_filesystem": true,
+        "free_bytes": 1727018627072
+      }
+    },
+    {
+      "host": "gpu6",
+      "mode": "inventory",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=5",
+        "gpu6",
+        "env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES=-1 TMPDIR=/local/users/emanuele/pointstream TMP=/local/users/emanuele/pointstream TEMP=/local/users/emanuele/pointstream /usr/bin/timeout --signal=TERM --kill-after=1 15s /usr/bin/python3 -B - inventory"
+      ],
+      "status": "completed",
+      "exit_code": 0,
+      "elapsed_seconds": 3.7333583342842758,
+      "local_child_usage_before": {
+        "user_seconds": 0.020959,
+        "system_seconds": 0.020228
+      },
+      "local_child_usage_after": {
+        "user_seconds": 0.029883999999999997,
+        "system_seconds": 0.026739
+      },
+      "parent_usage": {
+        "user_seconds": 0.032933,
+        "system_seconds": 0.035051
+      },
+      "remote_cpu_charge_upper_seconds": 1,
+      "stdout_sha256": "953bad8026b4a20a8528b7d2f5a7973014e0214272977e206b1ac20ca6cbbe59",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": {
+        "mode": "inventory",
+        "host": "gpu6",
+        "root_exists": true,
+        "cache_tree_exists": true,
+        "python_exists": true,
+        "local_device": 64514,
+        "root_device": 64513,
+        "separate_filesystem": true,
+        "free_bytes": 4981228158976
+      }
+    },
+    {
+      "host": "gpu5",
+      "mode": "qualify",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=5",
+        "gpu5",
+        "env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES=-1 TMPDIR=/local/users/emanuele/pointstream TMP=/local/users/emanuele/pointstream TEMP=/local/users/emanuele/pointstream /usr/bin/timeout --signal=TERM --kill-after=1 20s /local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python -B - qualify"
+      ],
+      "status": "completed",
+      "exit_code": 0,
+      "elapsed_seconds": 2.3853374579921365,
+      "local_child_usage_before": {
+        "user_seconds": 0.029883999999999997,
+        "system_seconds": 0.026739
+      },
+      "local_child_usage_after": {
+        "user_seconds": 0.041901999999999995,
+        "system_seconds": 0.040642
+      },
+      "parent_usage": {
+        "user_seconds": 0.034335,
+        "system_seconds": 0.038477
+      },
+      "remote_cpu_charge_upper_seconds": 3,
+      "stdout_sha256": "d1c58bf3c4dad922401579723b35bf1f23a3c3ac8a2035cfce98c464c1d1c5d8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": {
+        "mode": "qualify",
+        "host": "gpu5",
+        "executable": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+        "prefix": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+        "numpy_import_version": "1.26.4",
+        "numpy_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/numpy/__init__.py",
+        "opencv_import_version": "4.10.0",
+        "opencv_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/cv2/__init__.py",
+        "metadata": {
+          "numpy": {
+            "version": "1.26.4",
+            "record_sha256": "e207443a3783f9a0bd6fdf4e8d791e36e4181c362cc44bd2316b8eacc54b5766"
+          },
+          "opencv-python-headless": {
+            "version": "4.10.0.84",
+            "record_sha256": "2a5a98a1fa5410ffc8d2d3b1408d1e50da741540d1b172e1415fa07a12b4066a"
+          }
+        }
+      }
+    },
+    {
+      "host": "gpu5",
+      "mode": "namespace",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=5",
+        "gpu5",
+        "env -i PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES=-1 TMPDIR=/local/users/emanuele/pointstream TMP=/local/users/emanuele/pointstream TEMP=/local/users/emanuele/pointstream /usr/bin/timeout --signal=TERM --kill-after=1 10s /usr/bin/python3 -B - namespace"
+      ],
+      "status": "completed",
+      "exit_code": 0,
+      "elapsed_seconds": 1.064839624799788,
+      "local_child_usage_before": {
+        "user_seconds": 0.041901999999999995,
+        "system_seconds": 0.040642
+      },
+      "local_child_usage_after": {
+        "user_seconds": 0.054672,
+        "system_seconds": 0.050786
+      },
+      "parent_usage": {
+        "user_seconds": 0.03521,
+        "system_seconds": 0.040764
+      },
+      "remote_cpu_charge_upper_seconds": 1,
+      "stdout_sha256": "960d74bc24509e2d87e1d88e4027be83edd4f588ab8304de34a499b8bdd42e65",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": {
+        "parent_net": "net:[4026531840]",
+        "child_net": "net:[4026537876]",
+        "different": true,
+        "socket_created": true
+      }
+    }
+  ],
+  "parent_usage": {
+    "user_seconds": 0.035373,
+    "system_seconds": 0.040952999999999996
+  },
+  "local_children_usage": {
+    "user_seconds": 0.054672,
+    "system_seconds": 0.050786
+  },
+  "elapsed_seconds": 27.298226832877845,
+  "remote_cpu_charge_upper_seconds": 7,
+  "note": "Remote CPU charged at hard limits; namespace feasibility is not complete isolation proof."
+}

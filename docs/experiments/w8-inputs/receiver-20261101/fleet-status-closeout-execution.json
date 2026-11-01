@@ -1,0 +1,9 @@
+{
+  "exit": 0,
+  "timeout": false,
+  "wall": 2.287730624899268,
+  "ssh_pid": 62398,
+  "snapshot_execution_mtime": 1793539731.5285723,
+  "remote_cpu_cap": 1,
+  "ssh_cpu_cap": 1
+}

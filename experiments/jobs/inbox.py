@@ -77,6 +77,16 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
         raise fleet.FleetError(f"missing job fields: {sorted(required - spec.keys())}")
     if 'verify_staged_inputs' in spec and not isinstance(spec['verify_staged_inputs'], bool):
         raise fleet.FleetError('verify_staged_inputs must be boolean')
+    if 'single_cpu_campaign' in spec:
+        if not isinstance(spec['single_cpu_campaign'], bool):
+            raise fleet.FleetError('single_cpu_campaign must be boolean')
+        if spec['single_cpu_campaign'] and (type(spec.get('cpu_threads')) is not int or spec['cpu_threads'] != 1):
+            raise fleet.FleetError('single_cpu_campaign requires cpu_threads: 1')
+    if 'defer_failed_publication' in spec:
+        if not isinstance(spec['defer_failed_publication'], bool):
+            raise fleet.FleetError('defer_failed_publication must be boolean')
+        if spec['defer_failed_publication'] and spec.get('single_cpu_campaign') is not True:
+            raise fleet.FleetError('defer_failed_publication requires single_cpu_campaign')
     if not spec["hosts"] or any(h not in fleet.DEFAULT_HOSTS for h in spec["hosts"]):
         raise fleet.FleetError("hosts must name configured GPU servers")
     if not isinstance(spec["gpu_models"], list) or any(not isinstance(n, str) or not n.strip() for n in spec["gpu_models"]):
@@ -549,7 +559,10 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
         "cwd": str(source), "budget_seconds": remaining, "deadline_epoch": spec["deadline_epoch"],
         "thread": None, "codex": "codex", "cancel_path": str(directory / "cancel.json"),
         "contention": spec.get("contention") or {"policy": "stop"}, "attempt": state.get("attempt", 1),
-        "salvage": [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)],
+        # Preserve host-local failed scratch for a separately budgeted manual
+        # salvage when explicitly requested; automatic salvage is otherwise unchanged.
+        **({} if spec.get("defer_failed_publication") else
+           {"salvage": [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)]}),
         # Without a GPU claim the supervisor claims only CPU threads and hides every GPU.
         "claims": claims, "gpu_sharing": sharing,
     })
@@ -713,8 +726,39 @@ def contention_during(run: Path, started: float, ended: float) -> dict[str, Any]
     return {"timing_contaminated": bool(episodes), "contention": episodes, "paused_seconds": monitor.paused_seconds(status, started, ended)}
 
 
+def campaign_cpu_affinity(spec: dict[str, Any]) -> list[int] | None:
+    """Restrict CPU campaigns, or an explicitly opted-in GPU campaign.
+
+    Affinity is inherited by ordinary children, but is not a security boundary:
+    reviewed workload code and native tools must not widen it or escape teardown.
+    """
+    if spec.get("device", "gpu") != "cpu" and not spec.get("single_cpu_campaign", False):
+        return None
+    count = spec.get("cpu_threads")
+    if isinstance(count, bool) or not isinstance(count, int) or count <= 0:
+        raise fleet.FleetError("cpu_threads must be a positive integer")
+    if spec.get("single_cpu_campaign", False) and count != 1:
+        raise fleet.FleetError("single_cpu_campaign requires cpu_threads: 1")
+    get_affinity = getattr(os, "sched_getaffinity", None)
+    set_affinity = getattr(os, "sched_setaffinity", None)
+    if get_affinity is None or set_affinity is None:
+        raise fleet.FleetError("CPU campaign requires process affinity support")
+    try:
+        available = sorted(get_affinity(0))
+        if len(available) < count:
+            raise fleet.FleetError(f"CPU campaign needs {count} allowed CPUs; only {len(available)} available")
+        selected = available[:count]
+        set_affinity(0, selected)
+        if set(get_affinity(0)) != set(selected):
+            raise fleet.FleetError("CPU campaign affinity did not take effect")
+    except OSError as exc:
+        raise fleet.FleetError(f"CPU campaign cannot enforce affinity: {exc}") from exc
+    return selected
+
+
 def campaign(directory: Path) -> int:
     """The monitor owns this process group across smoke, validation, and full."""
+    campaign_started_monotonic = time.monotonic()
     previous = monitor.read_json(directory / "run" / "status.json", {})
     resume = resume_record(directory)
     attempt = resume.get("attempt", 1)
@@ -726,15 +770,17 @@ def campaign(directory: Path) -> int:
         print("campaign: existing attempt is preserved; create a new request instead of replaying", file=sys.stderr)
         return 1
     spec = monitor.read_json(directory / "spec.json")
-    manifest = monitor.read_json(directory / "ready.json")
-    # Archive-mode jobs link source/ to host-local disk: read it there, not through NFS.
-    source = (directory / "source").resolve()
-    run = directory / "run"
-    started = time.time()
-    supervisor_state = monitor.read_json(run / "status.json", {})
-    supervisor_request = monitor.read_json(run / "request.json", {})
-    budget_end = min(supervisor_state.get("started", started) + supervisor_request.get("budget_seconds", spec["budget_seconds"]), spec["deadline_epoch"])
     try:
+        cpu_affinity = campaign_cpu_affinity(spec)
+        manifest = monitor.read_json(directory / "ready.json")
+        # Archive-mode jobs link source/ to host-local disk: read it there, not through NFS.
+        source = (directory / "source").resolve()
+        run = directory / "run"
+        started = time.time()
+        supervisor_state = monitor.read_json(run / "status.json", {})
+        supervisor_request = monitor.read_json(run / "request.json", {})
+        budget_end = min(supervisor_state.get("started", started) + supervisor_request.get("budget_seconds", spec["budget_seconds"]), spec["deadline_epoch"])
+        budget_end_monotonic = time.monotonic() + max(0.0, budget_end - time.time())
         if digest(spec) != manifest["spec_sha256"]:
             raise fleet.FleetError("saved specification identity changed")
         code_identity = source_identity(source)
@@ -790,6 +836,11 @@ def campaign(directory: Path) -> int:
                 "code": manifest, "environment": monitor.read_json(directory / "environment.json", {}), "started": time.time(),
                 "citable": False if stage == "smoke" else None, "attempt": attempt, "resumed_from": resumed_from,
                 "contention_policy": spec.get("contention"), "gpu_sharing": gpu_sharing(spec),
+                **({"cpu_affinity": cpu_affinity} if cpu_affinity is not None else {}),
+                **({"campaign_clock": {"started": campaign_started_monotonic,
+                                        "phase_started": time.monotonic(),
+                                        "budget_end": budget_end_monotonic}}
+                   if spec.get("single_cpu_campaign") else {}),
             })
             monitor.publish_progress(stage, 0)
             phase_started = time.time()
@@ -981,12 +1032,11 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
         return {"job_id": directory.name, "status": "pending", "source_sha256": identity, "input_check": input_check}
     if action in {"status", "events", "cancel"}:
         directories = [job_directory(base, payload["job_id"])] if payload.get("job_id") else sorted((base / "inbox").glob("*"))
-        results = []
-        for directory in directories:
+        def read_request(directory: Path) -> dict[str, Any] | None:
             if not (directory / "ready.json").exists():
                 if payload.get("job_id"):
                     raise fleet.FleetError("job is unpublished or unknown; inspect transfer before retrying")
-                continue
+                return None
             state = monitor.read_json(directory / "state.json", {})
             remote = monitor.read_json(directory / "run" / "status.json", {})
             if remote.get("status"):
@@ -1014,9 +1064,16 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
                     if record["kind"].startswith("terminal:"):
                         record["id"] = uuid.uuid5(uuid.NAMESPACE_URL, str(directory) + record["kind"]).hex
                     unique[record["id"]] = record
-                results.append({"job_id": directory.name, "status": state.get("status"), "events": list(unique.values())})
-            else:
-                results.append({**state, "job_id": directory.name, "directory": str(directory), "gate": monitor.read_json(directory / "gate.json"), "campaign_error": monitor.read_json(directory / "campaign-error.json")})
+                return {"job_id": directory.name, "status": state.get("status"), "events": list(unique.values())}
+            return {**state, "job_id": directory.name, "directory": str(directory), "gate": monitor.read_json(directory / "gate.json"), "campaign_error": monitor.read_json(directory / "campaign-error.json")}
+
+        # Bound concurrent NFS reads; do not cache history or omit live overlays.
+        if action == "status" and not payload.get("job_id"):
+            with ThreadPoolExecutor(max_workers=16) as pool:
+                requests = list(pool.map(read_request, directories))
+        else:
+            requests = [read_request(directory) for directory in directories]
+        results = [request for request in requests if request is not None]
         return results[0] if payload.get("job_id") else results
     if action == "worker_start":
         alias = payload["alias"]
@@ -1045,12 +1102,16 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
     raise fleet.FleetError("unknown remote operation")
 
 
-def remote_rpc(config: dict[str, Any], action: str, payload: dict[str, Any], *, alias: str | None = None) -> Any:
+def remote_rpc(config: dict[str, Any], action: str, payload: dict[str, Any], *, alias: str | None = None,
+               status_timeout: int | None = None) -> Any:
+    if status_timeout is not None and (action != "status" or isinstance(status_timeout, bool)
+                                       or not isinstance(status_timeout, int) or not 1 <= status_timeout <= 600):
+        raise fleet.FleetError("status timeout must be an integer from 1 to 600 seconds and applies only to status")
     explicit_alias = alias is not None
     alias = alias or config.get("management_host") or config["hosts"][0]
     script = "import json,sys; sys.path.insert(0," + repr(config["release"]) + "); from pathlib import Path; from experiments.jobs.inbox import rpc; print(json.dumps(rpc(Path(" + repr(config["base"]) + ")," + repr(action) + ",json.loads(" + repr(json.dumps(payload)) + "))))"
     python = config["pythons"][alias] if explicit_alias else config.get('management_python', config['pythons'][alias])
-    result = fleet._ssh(alias, [python, "-c", script], timeout=120)
+    result = fleet._ssh(alias, [python, "-c", script], timeout=status_timeout if status_timeout is not None else 120)
     if result.returncode:
         raise fleet.FleetError(f"{alias}: {action} failed: {(result.stderr or result.stdout)[-4000:]}")
     return json.loads(result.stdout.strip().splitlines()[-1])
@@ -1273,6 +1334,8 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
 
 
 def remote_job(args: argparse.Namespace) -> Any:
+    status_timeout = getattr(args, "status_timeout_seconds", None)
+    timeout_options = {"status_timeout": status_timeout} if status_timeout is not None else {}
     if args.job_id:
         path = args.state_dir / f"{args.job_id}.json"
         if not fleet.JOB_ID_RE.fullmatch(args.job_id):
@@ -1281,6 +1344,8 @@ def remote_job(args: argparse.Namespace) -> Any:
         if not record:
             raise fleet.FleetError("no local job record")
         if "config" not in record:
+            if status_timeout is not None:
+                raise fleet.FleetError("--status-timeout-seconds is unavailable for legacy jobs")
             if args.action == "events":
                 raise fleet.FleetError("legacy job events are in the recorded remote run directory")
             return fleet.cancel_job(args.job_id, args.state_dir) if args.action == "cancel" else fleet.status_job(args.job_id, args.state_dir)
@@ -1288,13 +1353,13 @@ def remote_job(args: argparse.Namespace) -> Any:
         # current compatible management release for this same shared inbox.
         current = monitor.read_json(args.state_dir / "inbox.json", {})
         management = current if current.get("base") == record["config"].get("base") and current.get("hosts") else record["config"]
-        result = remote_rpc(management, args.action, {"job_id": args.job_id})
+        result = remote_rpc(management, args.action, {"job_id": args.job_id}, **timeout_options)
         if args.action == "events":
             # Acknowledge only after the consumer actually reports the event.
             seen = monitor.read_json(args.state_dir / "event-acks.json", {})
             result["events"] = [e for e in result["events"] if e["id"] not in seen and not (args.state_dir / "event-acks" / (e["id"] + ".json")).exists()]
         return result
-    return remote_rpc(load_config(args.state_dir), "status", {})
+    return remote_rpc(load_config(args.state_dir), "status", {}, **timeout_options)
 
 
 def selftest_submit(args: argparse.Namespace, root: Path) -> Any:
@@ -1392,6 +1457,16 @@ def wait_jobs(state_dir: Path, job_ids: list[str], max_seconds: float, *, poll_s
         sleep(min(poll_seconds, remaining))
 
 
+def status_timeout_arg(value: str) -> int:
+    try:
+        seconds = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("status timeout must be an integer from 1 to 600 seconds") from exc
+    if not 1 <= seconds <= 600:
+        raise argparse.ArgumentTypeError("status timeout must be an integer from 1 to 600 seconds")
+    return seconds
+
+
 def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-dir", type=Path, default=fleet.DEFAULT_STATE_DIR)
@@ -1418,6 +1493,7 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     selftest.add_argument("--include-untracked", action="append", default=[])
     status = actions.add_parser("status")
     status.add_argument("job_id", nargs="?")
+    status.add_argument("--status-timeout-seconds", type=status_timeout_arg, help="status RPC timeout in seconds (1–600; default 120)")
     status.add_argument("--artifact", action="append", default=[], help="bounded read-only export of a selected job artifact")
     status.add_argument("--output", type=Path, help="new local artifact export directory")
     for name in ("events", "cancel"):
@@ -1486,6 +1562,8 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
             value = {"acknowledged": args.event_ids}
         else:
             if getattr(args, "artifact", []):
+                if args.status_timeout_seconds is not None:
+                    raise fleet.FleetError("--status-timeout-seconds does not apply to artifact exports")
                 if not args.job_id or args.output is None:
                     raise fleet.FleetError("artifact export needs a recorded job ID and --output")
                 if not fleet.JOB_ID_RE.fullmatch(args.job_id):

@@ -1,0 +1,28 @@
+import base64,hashlib,json,os,resource,sys,zlib
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(5,5))
+os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
+root=Path('/local/users/emanuele/pointstream/audits/w8-receiver-runtime-qual-b581-full-v1-20261101'); base=root/'results'
+names=['result.json','config.json','identities/assets.json','identities/pilot.json','identities/inventory.json','identities/exit.json','identities/verified-checkpoint.jsonl','identities/process.json','main/worker/preflight.json','main/worker-config.json','main/exit.json','main/process.json','jcv/worker/preflight.json','jcv/worker-config.json','jcv/exit.json','jcv/process.json']
+files={}; total=0
+for name in names:
+ p=base/name; a=p.stat();
+ if not p.is_file() or p.is_symlink() or a.st_size>2000000:raise ValueError('invalid file '+name)
+ b=p.read_bytes(); c=p.stat();
+ if (a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns,a.st_ctime_ns)!=(c.st_dev,c.st_ino,c.st_size,c.st_mtime_ns,c.st_ctime_ns):raise ValueError('changed file '+name)
+ total+=len(b)
+ if total>4000000:raise ValueError('total read cap')
+ files[name]={'sha256':hashlib.sha256(b).hexdigest(),'data':b.decode('utf-8'),'identity':[a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns,a.st_ctime_ns]}
+pids=[json.loads(files[n]['data'])['pid'] for n in ['identities/process.json','main/process.json','jcv/process.json']]
+processes={str(pid):os.path.exists('/proc/'+str(pid)) for pid in pids}
+source=root/'source'; modules={}
+for n in ['main/worker/preflight.json','jcv/worker/preflight.json']:
+ for m in json.loads(files[n]['data'])['source_modules'].values():
+  p=Path(m['path']); p.relative_to(source); a=p.stat()
+  if p.is_symlink() or a.st_size>2000000:raise ValueError('source bound')
+  b=p.read_bytes(); c=p.stat();total+=len(b)
+  if total>4000000 or (a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns,a.st_ctime_ns)!=(c.st_dev,c.st_ino,c.st_size,c.st_mtime_ns,c.st_ctime_ns):raise ValueError('source cap or change')
+  modules[str(p)]={'sha256':hashlib.sha256(b).hexdigest(),'identity':[a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns,a.st_ctime_ns]}
+raw=json.dumps({'files':files,'processes_present':processes,'source_modules':modules,'bytes_read':total},separators=(',',':')).encode(); payload=base64.b64encode(zlib.compress(raw,9))
+if len(payload)>60000:raise ValueError('compressed transfer cap: encoded=%d raw=%d' % (len(payload),len(raw)))
+sys.stdout.buffer.write(payload)

@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "<string>", line 53, in <module>
+  File "<pinned-aa-sam-preflight>", line 584, in main
+  File "<pinned-aa-sam-preflight>", line 560, in run_cheap
+  File "<pinned-aa-sam-preflight>", line 300, in cheap_assets
+  File "<pinned-aa-sam-preflight>", line 187, in verify_aa_tree
+ValueError: AA installed source mismatch: moore_animateanyone.egg-info/SOURCES.txt

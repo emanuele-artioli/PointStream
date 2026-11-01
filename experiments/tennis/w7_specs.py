@@ -9,10 +9,12 @@ Nothing is submitted here. Only stage groups whose entrypoint already reads the 
 GPU estimate of the whole chain is in one place (docs/experiments/w7-untouched.md, 2026-10-30 estimate entry).
 Staged files must live under the fleet data root (a 2026-10-24 attempt failed on sources outside it): `W7_DIR` is
 where `w7_select stage` copies the six clips; windows.json, the window state and prior-stage archives come as (path, sha256).
+Set PS_W7_DATA_DIR to a distinct directory beneath the fleet tennis data root for another campaign.
 """
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -20,7 +22,16 @@ from typing import Any
 from experiments.tennis import window_manifest as wm
 from experiments.tennis.w1_specs import DATA, ENVIRONMENT
 
-W7_DIR = DATA + '/tennis/w7-tier1-20261030'
+def data_dir(value: str | None = None) -> str:
+    """Select an isolated staged tennis directory, defaulting to the original Tier 1 data."""
+    path = Path(value if value is not None else os.environ.get('PS_W7_DATA_DIR', DATA + '/tennis/w7-tier1-20261030'))
+    root = Path(DATA) / 'tennis'
+    if not path.is_absolute() or '..' in path.parts or not path.is_relative_to(root) or path == root:
+        raise ValueError('PS_W7_DATA_DIR must be a directory beneath the fleet tennis data root')
+    return str(path)
+
+
+W7_DIR = data_dir()
 DEADLINE = '2026-11-02T12:00:00+00:00'
 HOSTS_GPU = ['gpu3', 'gpu5', 'gpu6']
 GPU_MODELS = ['RTX A6000', 'RTX 6000 Ada']

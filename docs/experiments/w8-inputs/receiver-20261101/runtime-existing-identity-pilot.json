@@ -1,0 +1,1 @@
+{"fixed_aa_sam_cpu_reserve": 5, "phase_cpu_limit": 125, "projected_cpu_seconds": 98.01506829399095, "safety_factor": 2, "sample_count": 13, "scope": "bounded CPU pilot; not a runtime guarantee", "status": "fit", "used_cpu_seconds": 0.10374499999999999, "worst_cpu_seconds_per_byte": 2.3422241210937465e-09}

@@ -1,0 +1,114 @@
+"""One CPU-only read-only AA member and frozen SAM verifier diagnostic."""
+import base64
+import hashlib
+import json
+import os
+from pathlib import Path
+import resource
+import sys
+import tarfile
+import zlib
+
+resource.setrlimit(resource.RLIMIT_CPU, (5, 5))
+MODULE_SHA = 'd294e744c0be90e8c5cc5b9045e8dd3f9bd54483abc505304ae6298325cea308'
+PAYLOAD_SHA = '803437a6a59490a85c2df14654512d55983d82f445f85e7e376e65b5550ff1e9'
+AA_SHA = 'bfca6cf1129a0154bf2c3431c0e01b34f5e815eda5ba504f54e001c8ceeb99ee'
+if len(sys.argv) != 2 or hashlib.sha256(sys.argv[1].encode()).hexdigest() != PAYLOAD_SHA:
+    raise ValueError('frozen payload identity mismatch')
+d = zlib.decompressobj()
+raw = d.decompress(base64.b64decode(sys.argv[1], validate=True), 100001)
+if len(raw) > 100000 or not d.eof or d.unconsumed_tail or d.unused_data:
+    raise ValueError('payload bounds')
+payload = json.loads(raw)
+module_bytes = base64.b64decode(payload['module_b64'], validate=True)
+if hashlib.sha256(module_bytes).hexdigest() != MODULE_SHA:
+    raise ValueError('frozen module identity mismatch')
+namespace = {'__name__': 'w8_frozen_diagnostic', '__file__': '<frozen-module-74d38881>'}
+exec(compile(module_bytes, '<frozen-module-74d38881>', 'exec'), namespace)
+if 'torch' in sys.modules or os.environ.get('CUDA_VISIBLE_DEVICES') != '':
+    raise RuntimeError('Torch or GPU visibility prohibited')
+archive = Path('/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/env/moore-animateanyone-67c4229.tar').resolve(strict=True)
+tree = Path('/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone').resolve(strict=True)
+archive_record = namespace['stable_file_hash'](archive)
+if archive_record['sha256'] != AA_SHA:
+    raise ValueError('AA archive identity mismatch')
+regular = []
+links = []
+source_detail = None
+with tarfile.open(archive, 'r:*') as tar:
+    for member in tar:
+        if member.isdir():
+            continue
+        parts = Path(member.name).parts
+        if not parts or Path(member.name).is_absolute() or '..' in parts:
+            raise ValueError('unsafe AA archive member')
+        name = str(Path(*parts))
+        path = tree / name
+        if member.issym():
+            row = {'name': name, 'target': member.linkname, 'archive_expected': namespace['AA_LINKS'].get(name) == member.linkname}
+            if not namespace['_plain_path'](tree, path.parent):
+                row['installed'] = 'unsafe-parent-symlink'
+            elif not os.path.lexists(path):
+                row['installed'] = 'absent'
+            elif not path.is_symlink():
+                row['installed'] = 'not-a-symlink'
+            else:
+                actual = os.readlink(path)
+                row['installed_target'] = actual
+                row['installed'] = 'matched' if actual == member.linkname else 'mismatch'
+                if not Path(actual).is_absolute():
+                    target = tree / actual
+                    row['relative_contained_plain'] = bool(namespace['_plain_path'](tree, target) and target.exists()
+                                                           and target.resolve().is_relative_to(tree))
+            links.append(row)
+            continue
+        if not member.isfile():
+            raise ValueError('unsupported nonregular AA archive member')
+        stream = tar.extractfile(member)
+        if stream is None:
+            raise ValueError('unreadable AA archive member')
+        contents = stream.read()
+        archive_sha = hashlib.sha256(contents).hexdigest()
+        row = {'name': name, 'archive_sha256': archive_sha, 'archive_bytes': len(contents)}
+        if not namespace['_plain_path'](tree, path):
+            row['status'] = 'unsafe-symlink-path'
+        elif not path.is_file():
+            row['status'] = 'missing'
+        else:
+            record = namespace['stable_file_hash'](path)
+            row['installed_sha256'] = record['sha256']
+            row['installed_bytes'] = record['size']
+            row['status'] = 'match' if record['sha256'] == archive_sha else 'mismatch'
+            if name == 'moore_animateanyone.egg-info/SOURCES.txt':
+                if record['size'] > 100000 or len(contents) > 100000:
+                    raise ValueError('SOURCES contents oversized')
+                installed = path.read_bytes()
+                if len(installed) > 100000 or hashlib.sha256(installed).hexdigest() != record['sha256']:
+                    raise ValueError('SOURCES installed contents changed or oversized')
+                source_detail = {'archive_sha256': archive_sha, 'installed_sha256': record['sha256'],
+                                 'archive_base64': base64.b64encode(contents).decode(),
+                                 'installed_base64': base64.b64encode(installed).decode()}
+        regular.append(row)
+current = archive.stat(follow_symlinks=False)
+if ((current.st_dev, current.st_ino, current.st_size, current.st_mtime_ns, current.st_ctime_ns)
+        != (archive_record['device'], archive_record['inode'], archive_record['size'],
+            archive_record['mtime_ns'], archive_record['ctime_ns'])):
+    raise ValueError('archive changed during diagnostic')
+if len(regular) != 92 or source_detail is None:
+    raise ValueError('unexpected AA archive member coverage')
+sam_records = []
+try:
+    sam = {'passed': True, 'receipt': namespace['verify_sam_distribution'](Path(sys.prefix), sam_records.append)}
+except Exception as exc:
+    sam = {'passed': False, 'error': f'{type(exc).__name__}: {exc}'}
+if 'torch' in sys.modules:
+    raise RuntimeError('unexpected Torch import')
+result = {'module_sha256': MODULE_SHA, 'payload_sha256': PAYLOAD_SHA, 'archive': archive_record,
+          'regular_members': regular, 'regular_count': len(regular),
+          'mismatches': [item for item in regular if item['status'] != 'match'],
+          'link_metadata': links, 'sources_txt': source_detail, 'sam': sam,
+          'sam_checkpoint_records': sam_records,
+          'recorded_pids_exist': {str(pid): Path('/proc', str(pid)).exists() for pid in (3785618, 3785605)},
+          'cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]), 'torch_imported': False,
+          'scope': 'read-only AA source and frozen SAM RECORD checks; no model, GPU or codec result'}
+print(json.dumps(result, sort_keys=True))

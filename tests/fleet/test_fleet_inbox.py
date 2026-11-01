@@ -177,6 +177,10 @@ def test_events_repeat_until_explicit_ack(tmp_path, monkeypatch):
 @pytest.mark.parametrize("mutation", [
     lambda s: s.update(entrypoint=["-c", "arbitrary()"]),
     lambda s: s.update(cpu_threads=True),
+    lambda s: s.update(single_cpu_campaign="true"),
+    lambda s: s.update(single_cpu_campaign=True, cpu_threads=2),
+    lambda s: s.update(defer_failed_publication="true"),
+    lambda s: s.update(defer_failed_publication=True),
     lambda s: s.update(deadline="tomorrow"),
     lambda s: s.update(arguments=["{unknown}"]),
     lambda s: s["smoke"].update(representative_basis=""),
@@ -714,3 +718,234 @@ def test_deferred_staged_payload_still_blocks_component_on_corruption(campaign, 
     assert inbox.campaign(campaign) == 1
     assert monitor.read_json(campaign / 'gate.json')['passed']
     assert not (campaign / 'full' / 'execution.json').exists()
+
+
+def test_status_rpc_timeout_is_bounded_and_never_changes_other_actions(monkeypatch):
+    import subprocess
+
+    config = {"hosts": ["gpu1"], "release": "/release", "base": "/base", "pythons": {"gpu1": "/python"}}
+    calls = []
+
+    def ssh(host, argv, *, timeout):
+        calls.append((host, timeout))
+        return subprocess.CompletedProcess(argv, 0, '{"status": "ok"}', '')
+
+    monkeypatch.setattr(fleet, "_ssh", ssh)
+    assert inbox.remote_rpc(config, "status", {}) == {"status": "ok"}
+    assert inbox.remote_rpc(config, "status", {}, status_timeout=600) == {"status": "ok"}
+    assert inbox.remote_rpc(config, "cancel", {}) == {"status": "ok"}
+    assert calls == [("gpu1", 120), ("gpu1", 600), ("gpu1", 120)]
+    for value in (0, -1, 601, True, 1.5):
+        with pytest.raises(fleet.FleetError, match="status timeout"):
+            inbox.remote_rpc(config, "status", {}, status_timeout=value)
+    with pytest.raises(fleet.FleetError, match="only to status"):
+        inbox.remote_rpc(config, "cancel", {}, status_timeout=600)
+    assert len(calls) == 3
+
+
+def test_status_timeout_cli_validation_and_status_only(tmp_path, monkeypatch):
+    from argparse import Namespace
+
+    config = {"hosts": ["gpu1"], "release": "/release", "base": "/base", "pythons": {"gpu1": "/python"}}
+    monitor.write_json(tmp_path / "inbox.json", config)
+    calls = []
+    monkeypatch.setattr(inbox, "remote_rpc", lambda *a, **kw: calls.append((a, kw)) or [])
+    assert inbox.main(["--state-dir", str(tmp_path), "status", "--status-timeout-seconds", "600"]) == 0
+    assert calls[0][0][1:] == ("status", {}) and calls[0][1] == {"status_timeout": 600}
+    for value in ("0", "601", "nan", "1.5"):
+        with pytest.raises(SystemExit):
+            inbox.main(["status", "--status-timeout-seconds", value])
+    with pytest.raises(SystemExit):
+        inbox.main(["cancel", "job", "--status-timeout-seconds", "600"])
+    with pytest.raises(fleet.FleetError, match="legacy jobs"):
+        job_id = "20261003T000000Z-12345678"
+        monitor.write_json(tmp_path / f"{job_id}.json", {"status": "pending"})
+        inbox.remote_job(Namespace(state_dir=tmp_path, action="status", job_id=job_id, status_timeout_seconds=600))
+    job_id = "20261003T000000Z-12345678"
+    monitor.write_json(tmp_path / f"{job_id}.json", {"config": config})
+    assert inbox.main(["--state-dir", str(tmp_path), "status", job_id, "--status-timeout-seconds", "1"]) == 0
+    assert calls[-1][0][1:] == ("status", {"job_id": job_id}) and calls[-1][1] == {"status_timeout": 1}
+    assert inbox.main(["--state-dir", str(tmp_path), "status", job_id, "--artifact", "x", "--output", str(tmp_path / "out"), "--status-timeout-seconds", "600"]) == 2
+    assert len(calls) == 2
+
+
+def test_cpu_campaign_affinity_precedes_source_checks(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / "spec.json")
+    spec.update(device="cpu", gpu_memory_mib=0, cpu_threads=2)
+    monitor.write_json(campaign / "spec.json", spec)
+    ready = monitor.read_json(campaign / "ready.json")
+    ready["spec_sha256"] = inbox.digest(spec)
+    monitor.write_json(campaign / "ready.json", ready)
+    current = {3, 5, 7}
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", lambda _: current.copy(), raising=False)
+    def set_affinity(_pid, cpus):
+        current.clear()
+        current.update(cpus)
+    monkeypatch.setattr(inbox.os, "sched_setaffinity", set_affinity, raising=False)
+    original = inbox.source_identity
+    def check_affinity(source):
+        assert current == {3, 5}
+        return original(source)
+    monkeypatch.setattr(inbox, "source_identity", check_affinity)
+    assert inbox.campaign(campaign) == 0
+    assert monitor.read_json(campaign / "full" / "dispatch.json")["cpu_affinity"] == [3, 5]
+
+
+def test_gpu_campaign_does_not_touch_affinity(monkeypatch):
+    def unexpected(*_args):
+        raise AssertionError("GPU campaign must not change affinity")
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", unexpected, raising=False)
+    monkeypatch.setattr(inbox.os, "sched_setaffinity", unexpected, raising=False)
+    assert inbox.campaign_cpu_affinity({"cpu_threads": 1}) is None
+    assert inbox.campaign_cpu_affinity({"device": "gpu", "cpu_threads": 1}) is None
+
+
+def test_gpu_campaign_opt_in_applies_affinity_before_hashing(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / "spec.json")
+    spec["single_cpu_campaign"] = True
+    assert inbox.validate_spec(spec)["single_cpu_campaign"] is True
+    monitor.write_json(campaign / "spec.json", spec)
+    ready = monitor.read_json(campaign / "ready.json")
+    ready["spec_sha256"] = inbox.digest(spec)
+    monitor.write_json(campaign / "ready.json", ready)
+    current = {3, 5}
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", lambda _: current.copy(), raising=False)
+    def select(_pid, cpus):
+        current.clear()
+        current.update(cpus)
+    monkeypatch.setattr(inbox.os, "sched_setaffinity", select, raising=False)
+    original = inbox.source_identity
+    def check_affinity(source):
+        assert current == {3}
+        return original(source)
+    monkeypatch.setattr(inbox, "source_identity", check_affinity)
+    assert inbox.campaign(campaign) == 0
+    assert monitor.read_json(campaign / "full" / "dispatch.json")["cpu_affinity"] == [3]
+
+
+def test_gpu_campaign_opt_in_fails_closed_without_affinity(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / "spec.json")
+    spec["single_cpu_campaign"] = True
+    monitor.write_json(campaign / "spec.json", spec)
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", None, raising=False)
+    assert inbox.campaign(campaign) == 1
+    assert "affinity" in monitor.read_json(campaign / "campaign-error.json")["error"]
+    assert not (campaign / "smoke").exists()
+
+
+@pytest.mark.parametrize('defer', [False, True])
+def test_deferred_failed_publication_only_changes_opted_in_request(campaign, monkeypatch, defer):
+    spec = monitor.read_json(campaign / 'spec.json')
+    spec.update(single_cpu_campaign=True, defer_failed_publication=defer)
+    inbox.validate_spec(spec)
+    monitor.write_json(campaign / 'spec.json', spec)
+    ready = monitor.read_json(campaign / 'ready.json')
+    ready['spec_sha256'] = inbox.digest(spec)
+    monitor.write_json(campaign / 'ready.json', ready)
+    monitor.write_json(campaign / 'state.json', {'status': 'pending'})
+    (campaign / 'run').rmdir()
+    monkeypatch.setattr(inbox, 'acquire_request', lambda *_: True)
+    monkeypatch.setattr(inbox, 'precheck_inputs', lambda *_: None)
+    monkeypatch.setattr(inbox, 'transition', lambda *_args, **_kwargs: None)
+    class Child:
+        pid = 12345
+    monkeypatch.setattr(inbox.subprocess, 'Popen', lambda *_args, **_kwargs: Child())
+    monkeypatch.setattr(inbox, 'get_process_start_time', lambda *_: 1)
+    inbox.start_request(campaign, spec, None, {'alias': 'gpu1', 'host': 'host'}, campaign.parent)
+    request = monitor.read_json(campaign / 'run' / 'request.json')
+    assert ('salvage' not in request) == defer
+    if not defer:
+        assert request['salvage'][-2:] == ['salvage', str(campaign)]
+
+
+@pytest.mark.parametrize("mode", ["missing", "insufficient", "set_error", "ineffective"])
+def test_cpu_affinity_failure_blocks_source_checks(campaign, monkeypatch, mode):
+    spec = monitor.read_json(campaign / "spec.json")
+    spec.update(device="cpu", gpu_memory_mib=0, cpu_threads=2)
+    monitor.write_json(campaign / "spec.json", spec)
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", None if mode == "missing" else lambda _: {3} if mode == "insufficient" else {3, 5, 7}, raising=False)
+    def set_affinity(_pid, _cpus):
+        if mode == "set_error":
+            raise OSError("denied")
+    monkeypatch.setattr(inbox.os, "sched_setaffinity", set_affinity, raising=False)
+    def unexpected(_source):
+        raise AssertionError("source checks must not run")
+    monkeypatch.setattr(inbox, "source_identity", unexpected)
+    assert inbox.campaign(campaign) == 1
+    assert "affinity" in monitor.read_json(campaign / "campaign-error.json")["error"] or mode == "insufficient"
+    assert not (campaign / "smoke").exists()
+
+
+def test_cpu_affinity_inherited_by_subprocess_on_linux():
+    import os
+    import subprocess
+    import sys
+
+    if not hasattr(os, "sched_getaffinity") or not hasattr(os, "sched_setaffinity"):
+        pytest.skip("Linux process affinity unavailable")
+    code = '''import json,os,subprocess,sys
+from experiments.jobs.inbox import campaign_cpu_affinity
+selected = campaign_cpu_affinity({"device": "gpu", "cpu_threads": 1, "single_cpu_campaign": True})
+child = subprocess.check_output([sys.executable, "-c", "import os; print(sorted(os.sched_getaffinity(0)))"], text=True)
+print(json.dumps({"selected": selected, "child": child.strip()}))
+'''
+    result = subprocess.run([sys.executable, "-c", code], check=True, capture_output=True, text=True)
+    value = json.loads(result.stdout)
+    assert len(value["selected"]) == 1
+    assert value["child"] == str(value["selected"])
+
+
+def test_all_status_reads_each_published_request_with_live_semantics(tmp_path):
+    base = tmp_path / "jobs" / "fleet"
+    inbox_dir = base / "inbox"
+    states = {
+        "20261003T000000Z-00000001": {"status": "attention", "error": "old attention"},
+        "20261003T000000Z-00000002": {"status": "running"},
+        "20261003T000000Z-00000003": {"status": "complete", "result": "stable"},
+        "20261003T000000Z-00000004": {},  # Missing state metadata remains visible.
+    }
+    for name, state in states.items():
+        directory = inbox_dir / name
+        monitor.write_json(directory / "ready.json", {})
+        if state:
+            monitor.write_json(directory / "state.json", state)
+    monitor.write_json(inbox_dir / "20261003T000000Z-00000002" / "run" / "status.json", {"status": "running", "stage": "full"})
+    monitor.write_json(inbox_dir / "20261003T000000Z-00000003" / "gate.json", {"accepted": True})
+    (inbox_dir / "unpublished").mkdir()
+
+    expected = [inbox.rpc(base, "status", {"job_id": name}) for name in states]
+    assert inbox.rpc(base, "status", {}) == expected
+    monitor.write_json(inbox_dir / "20261003T000000Z-00000002" / "run" / "status.json", {"status": "complete"})
+    updated = inbox.rpc(base, "status", {})
+    assert updated[1]["status"] == "complete"
+    assert updated[0]["status"] == "attention"
+    assert updated[2] == expected[2]
+    assert "status" not in updated[3]
+
+
+def test_all_status_fails_on_corrupt_published_metadata(tmp_path):
+    base = tmp_path / "jobs" / "fleet"
+    directory = base / "inbox" / "corrupt"
+    monitor.write_json(directory / "ready.json", {})
+    (directory / "state.json").write_text("{")
+    with pytest.raises(ValueError):
+        inbox.rpc(base, "status", {})
+
+
+def test_all_status_reads_requests_concurrently(tmp_path, monkeypatch):
+    from threading import Barrier
+
+    base = tmp_path / "jobs" / "fleet"
+    for name in ("first", "second"):
+        monitor.write_json(base / "inbox" / name / "ready.json", {})
+        monitor.write_json(base / "inbox" / name / "state.json", {"status": "pending"})
+    barrier = Barrier(2, timeout=5)
+    original = monitor.read_json
+
+    def synchronized_read(path, default=None):
+        if path.name == "state.json":
+            barrier.wait()
+        return original(path, default)
+
+    monkeypatch.setattr(monitor, "read_json", synchronized_read)
+    assert [result["job_id"] for result in inbox.rpc(base, "status", {})] == ["first", "second"]

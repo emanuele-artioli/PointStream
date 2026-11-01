@@ -1,0 +1,242 @@
+#!/usr/bin/env python3
+"""Review draft: historical W8 pixel goldens, CPU only. Run only via reviewed launcher.
+
+pilot creates a new task directory and verifies archived inputs, then compares four ticks.
+full reads the sealed pilot directory and compares all ticks into a new full directory.
+No subprocesses, network, model inference or GPU operations. A successful pilot is not
+permission to run full; root must check the budget projection and dispatch separately.
+"""
+import hashlib, json, os, resource, stat, struct, sys, tarfile, time, traceback, zlib
+from pathlib import Path, PurePosixPath
+
+ROOT = Path('/home/itec/emanuele/Datasets/pointstream-data')
+LOCAL = Path('/local/users/emanuele/pointstream')
+TASK = LOCAL / 'audits/w8-golden-recovery-20261101'
+JOBROOT = ROOT / 'jobs/fleet/inbox'
+ENV_SHA = '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661'
+JOBS = {
+ 'rgb': ('20261031T172705Z-92d5a784/full/published.tar', '91a1426879ec85bfaadd9e01b07086654267efeccf38d192853729ccf27b1332'),
+ 'masks': ('20261031T173041Z-afee870c/full/published.tar', 'a60cd08a254945a7f0f180b7ba783dda1b127814ba9f4c0ac04d1333758d4ba7'),
+ 'generated': ('20261031T163512Z-1d0712ad/full/published.tar', 'cce89567a57bd202db8dbd6a39599688bce8a52e048d53f2b38fd7fda7da4985'),
+ 'judge': ('20261031T180054Z-b9927a25/full/published.tar', 'bf05e2630d898a2ec68452f81407e063b0f0ad0490365c41d53a3988f5adb299'),
+ 'source': ('20261031T180054Z-b9927a25/source.tar', '365882dad4dabbbe0d132d7a4d1cf08f2a68b0f8afcb01bee16b66cce8537c2a'),
+ 'transport': ('20261031T171359Z-aba3845f/full/published.tar', 'd80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017'),
+}
+PACKET = ROOT / 'tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8'
+PACKET_SHA = 'eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4'
+KPS_SHA = '2e8452e4c458cf0998b6b8e004812575bdb2a638dd927b087dbc330d11d67070'
+UNITS = ['nadal_kyrgios__000_at120__person_000000000000', 'nadal_kyrgios__000_at120__person_000000000001']
+TICKS = list(range(0, 240, 3)); WID = 'nadal_kyrgios/000@120'
+SOURCE_HASHES = {
+ 'experiments/tennis/k6b.py': '0c07d5fc502abf0ed0b62785648c25ef0d2e6dbec5c25ef58f192f768fa00ad6',
+ 'experiments/tennis/k6b_matte_cpu.py': '872f38ae4f8f50b9a2ea0dad3ccec624c17072fb45401e7edfa870631e30233b',
+ 'experiments/tennis/k6b_rate_streams.py': 'c542131875729b06bf2606136350f46bff04e88689db938b1848aefea85010ea',
+ 'experiments/tennis/k6b_receiver_sam.py': 'abc11fd7297f199d333c81d484f66571edbfc52379f4a966603b2a94ff368f3c',
+ 'experiments/tennis/k6b_real_base_compose.py': 'c34821ac03dadb07f78207bcde711a0f31020a7dcbff9d1da10672e4deb36916',
+ 'experiments/tennis/k6b_real_base_judge.py': '5ecd4c4ae292a88b7b12cf11392747dd0219f53a100da5e34d3960cc366aa0d6',
+}
+CROP_HASHES = dict(zip(UNITS, ['dad82d637a445cc1c1b92907c3a274e485f26e33cd88a3206770f3efb71e80ff', 'bc5a67fb5a81578f605131151c6dd68a98612374e1564fd8e0dab5515a718fde']))
+
+def cpu():
+    r = resource.getrusage(resource.RUSAGE_SELF); return r.ru_utime + r.ru_stime
+
+def digest(path):
+    h = hashlib.sha256()
+    with path.open('rb') as f:
+        for b in iter(lambda: f.read(1024*1024), b''): h.update(b)
+    return h.hexdigest()
+
+def datahash(data): return hashlib.sha256(data).hexdigest()
+
+def ident(path):
+    s = path.stat(); return (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns, s.st_ctime_ns)
+
+def checkfile(path, sha, cap):
+    s = path.lstat()
+    if not stat.S_ISREG(s.st_mode) or s.st_size > cap: raise ValueError('invalid input ' + str(path))
+    before = ident(path)
+    if digest(path) != sha or ident(path) != before: raise ValueError('input mismatch ' + str(path))
+    return {'bytes': s.st_size, 'sha256': sha}
+
+def safe_name(name):
+    p = PurePosixPath(name)
+    return not p.is_absolute() and all(x not in ('', '.', '..') for x in p.parts)
+
+def selected(tarpath, requests, target):
+    """Each request maps exact member to a flat exclusive destination and cap."""
+    seen = set()
+    with tarfile.open(tarpath, 'r:') as tf:
+        for m in tf:
+            if m.name not in requests: continue
+            name, cap = requests[m.name]
+            if m.name in seen or not m.isfile() or not 0 < m.size <= cap: raise ValueError('bad selected member ' + m.name)
+            src = tf.extractfile(m)
+            if src is None: raise ValueError('missing member body')
+            left = m.size
+            with (target / name).open('xb') as out:
+                while left:
+                    b = src.read(min(left, 1024*1024))
+                    if not b: raise ValueError('truncated member')
+                    out.write(b); left -= len(b)
+            seen.add(m.name)
+    if seen != set(requests): raise ValueError('missing members: ' + repr(set(requests)-seen))
+
+def snapshot(tarpath, target):
+    """Extract only Python source from the hash-pinned judge source snapshot."""
+    count = size = 0; seen = set()
+    with tarfile.open(tarpath, 'r:*') as tf:
+        for m in tf:
+            if not m.name.endswith('.py'): continue
+            if not safe_name(m.name) or not m.isfile() or m.name in seen: raise ValueError('unsafe source member')
+            count += 1; size += m.size
+            if count > 10000 or size > 150_000_000 or m.size > 4_000_000: raise ValueError('source cap')
+            dest = target / m.name; dest.parent.mkdir(parents=True, exist_ok=True)
+            src = tf.extractfile(m)
+            if src is None: raise ValueError('missing source')
+            with dest.open('xb') as out:
+                left = m.size
+                while left:
+                    b = src.read(min(left, 1024*1024))
+                    if not b: raise ValueError('short source')
+                    out.write(b); left -= len(b)
+            seen.add(m.name)
+    for path, sha in SOURCE_HASHES.items():
+        checkfile(target/path, sha, 4_000_000)
+
+def paid_kps(path):
+    b = path.read_bytes()
+    if datahash(b) != PACKET_SHA or b[:5] != b'PSW8\x02': raise ValueError('packet identity')
+    coded, raw = struct.unpack('>II', b[5:13])
+    if coded > 4_194_304 or raw > 4_194_304: raise ValueError('packet header size')
+    d = zlib.decompressobj(); text = d.decompress(b[13:13+coded], raw+1)
+    if len(text) != raw or not d.eof or d.unused_data or d.unconsumed_tail: raise ValueError('packet header invalid')
+    h = json.loads(text); pos = 13+coded; result = None; names = set()
+    for e in h['sections']:
+        name, length = e['name'], e['length']
+        if name in names or type(length) is not int or length < 0 or pos+length > len(b): raise ValueError('packet section')
+        names.add(name); part = b[pos:pos+length]; pos += length
+        if datahash(part) != e['sha256']: raise ValueError('packet section hash')
+        if name == h['profile']['kps']: result = part
+    if pos != len(b) or result is None or datahash(result) != KPS_SHA: raise ValueError('packet KPS mismatch')
+    return result
+
+def inspect_data(d, count, outdir, source):
+    sys.path.insert(0, str(source))
+    import numpy as np
+    import cv2
+    from experiments.tennis.k6b_rate_streams import decode_keypoints
+    from experiments.tennis.k6b_matte_cpu import box_maps
+    from experiments.tennis.k6b_receiver_sam import project
+    from experiments.tennis.k6b_real_base_compose import compose
+    from experiments.tennis.k6b import unit_name
+    cv2.setNumThreads(1)
+    if np.__version__ != '1.26.4' or cv2.__version__ != '4.10.0': raise ValueError('original preparation runtime versions required')
+    def array_sha(a): return datahash(np.ascontiguousarray(a).tobytes())
+    kps = (d/'keypoints.kps').read_bytes()
+    if datahash(kps) != KPS_SHA or kps != paid_kps(PACKET): raise ValueError('KPS differs from paid packet')
+    meta, units = decode_keypoints(kps); order = meta['compositing_order']
+    if meta['window'] != WID or len(units) != 2 or {u['name'] for u in units} != set(UNITS) or len(order) != 2 or {unit_name(WID, x) for x in order} != set(UNITS): raise ValueError('unit binding')
+    boxes = box_maps(units); byname = {u['name']: i for i,u in enumerate(units)}
+    diag = json.loads((d/'diagnostic.json').read_text())
+    dr = [r for r in diag['base'] if r['window'] == 'nad000' and r['scale'] == 4]
+    if len(dr)!=1 or dr[0]['ticks'] != TICKS or dr[0]['sha256'] != 'f5795d8a30277d6624b327cffae6fd0500ab8bcb196e1248b37df5a610dab0db': raise ValueError('diagnostic identity')
+    judge = json.loads((d/'window.json').read_text())
+    if judge['id'] != WID or judge['ticks'] != TICKS: raise ValueError('judge ticks')
+    receiver = json.loads((d/'receiver.json').read_text()); runs = receiver['prediction']['runs']
+    if len(runs) != 2: raise ValueError('receiver runs')
+    masks = {}; crops = {}
+    for unit in UNITS:
+        rows = [[r for r in run['rows'] if r['name'] == unit] for run in runs]
+        if any(len(row)!=1 for row in rows): raise ValueError('mask metadata binding')
+        with np.load(d/(unit+'-masks.npz'), allow_pickle=False) as z:
+            a = z['masks']; ticks = z['t'].tolist()
+            if a.shape != (80,784,512) or a.dtype != np.bool_ or ticks != TICKS: raise ValueError('mask dimensions')
+            for row in rows:
+                if row[0]['ticks'] != TICKS or row[0]['output_sha256'] != array_sha(a) or row[0]['frames'] != [array_sha(x) for x in a]: raise ValueError('mask hash mismatch')
+            masks[unit] = a.copy()
+        with np.load(d/(unit+'@match5.npz'), allow_pickle=False) as z:
+            a = z['crops']; ticks = z['t'].tolist()
+            if ticks != TICKS or a.shape != (80,784,512,3) or a.dtype != np.uint8: raise ValueError('generated crops')
+            crops[unit] = a.copy()
+    base = np.load(d/'nad000-s4-gpu.npy', mmap_mode='r', allow_pickle=False)
+    if base.shape != (80,1080,1920,3) or base.dtype != np.uint8: raise ValueError('RGB array shape')
+    out = np.lib.format.open_memmap(outdir/'composite.npy', mode='w+', dtype=np.uint8, shape=(count,1080,1920,3))
+    hashes = []; frame_cpu = []
+    for j, t in enumerate(TICKS[:count]):
+        start_cpu = cpu()
+        frame = np.asarray(base[j]); reference = judge['composite_hashes'][str(t)]
+        if len(reference)!=6 or array_sha(frame) != reference[2] or reference[2] != dr[0]['frame_sha256'][j]: raise ValueError('base frame '+str(t))
+        player_crops = {}; player_boxes = {}; player_masks = {}
+        for p in order:
+            unit = unit_name(WID,p); i = byname[unit]
+            player_crops[p] = crops[unit][j]; player_boxes[p] = boxes[i][t]; player_masks[p] = project(masks[unit][j], boxes[i][t])
+        composed, _ = compose(frame, player_crops, player_boxes, player_masks, order)
+        h = array_sha(composed)
+        if h != reference[3]: raise ValueError('composite frame '+str(t))
+        out[j] = composed; hashes.append(h); frame_cpu.append(cpu()-start_cpu)
+    out.flush(); del out
+    return {'ticks': TICKS[:count], 'composite_frame_sha256': hashes, 'frame_cpu_s': frame_cpu, 'numpy': np.__version__, 'opencv': cv2.__version__, 'python': sys.version, 'order': order}
+
+def main():
+    phase = sys.argv[1]
+    if phase not in ('pilot','full'): raise ValueError('expected pilot or full')
+    cap = 30 if phase == 'pilot' else 90
+    resource.setrlimit(resource.RLIMIT_CPU, (cap, cap))
+    if len(os.sched_getaffinity(0)) != 1: raise ValueError('one CPU affinity required')
+    if os.environ.get('CUDA_VISIBLE_DEVICES') not in ('', '-1'): raise ValueError('GPU must be disabled')
+    if not str(Path(sys.executable).resolve()).startswith(str((LOCAL/'cache'/ENV_SHA/'tree').resolve())+'/'): raise ValueError('wrong MAIN python')
+    if LOCAL.stat().st_dev == ROOT.stat().st_dev: raise ValueError('scratch is not separate filesystem')
+    fs = os.statvfs(LOCAL)
+    if fs.f_bavail * fs.f_frsize < 2 * 1024**3: raise ValueError('insufficient space')
+    start = time.monotonic()
+    if phase == 'pilot':
+        TASK.mkdir(mode=0o700, parents=False, exist_ok=False)
+        work = TASK/'pilot'; work.mkdir(); d = work/'inputs'; d.mkdir(); (d/'source').mkdir()
+        records = {}; total = sum((JOBROOT/rel).stat().st_size for rel,sha in JOBS.values())
+        if total > 4*1024**3: raise ValueError('aggregate archive read cap')
+        stamps = {}
+        for name,(rel,sha) in JOBS.items():
+            path = JOBROOT/rel; records[name] = checkfile(path,sha,4*1024**3); stamps[name] = ident(path)
+        records['packet'] = checkfile(PACKET, PACKET_SHA, 5_000_000)
+        snapshot(JOBROOT/JOBS['source'][0], d/'source')
+        selected(JOBROOT/JOBS['rgb'][0], {'publish/nad000-s4-gpu.npy':('nad000-s4-gpu.npy',498_000_000), 'publish/diagnostic.json':('diagnostic.json',4_000_000)}, d)
+        selected(JOBROOT/JOBS['masks'][0], {'publish/receiver.json':('receiver.json',8_000_000), **{f'publish/{u}-masks.npz':(u+'-masks.npz',50_000_000) for u in UNITS}}, d)
+        selected(JOBROOT/JOBS['generated'][0], {f'publish/{u}@match5.{ext}':(u+'@match5.'+ext,100_000_000 if ext=='npz' else 1_000_000) for u in UNITS for ext in ('json','npz')}, d)
+        selected(JOBROOT/JOBS['judge'][0], {'publish/nadal_kyrgios__000@120/window.json':('window.json',4_000_000)}, d)
+        selected(JOBROOT/JOBS['transport'][0], {'publish/packets/nadal_kyrgios__000@120/keypoints.kps':('keypoints.kps',4_000_000)}, d)
+        if any(ident(JOBROOT/rel) != stamps[name] for name,(rel,sha) in JOBS.items()): raise ValueError('source archive changed during extraction')
+        checkfile(d/'nad000-s4-gpu.npy','f5795d8a30277d6624b327cffae6fd0500ab8bcb196e1248b37df5a610dab0db',498_000_000)
+        checkfile(d/'receiver.json','46ae0e636f9efe44741cae1dd4731c39d54aa845b3ed3ddb7cff3611ca582751',8_000_000)
+        for u in UNITS:
+            side = json.loads((d/(u+'@match5.json')).read_text())
+            if side['npz_sha256'] != CROP_HASHES[u]: raise ValueError('crop metadata mismatch')
+            checkfile(d/(u+'@match5.npz'), CROP_HASHES[u],100_000_000)
+        files = {p.name: {'sha256':digest(p), 'bytes':p.stat().st_size} for p in d.iterdir() if p.is_file()}
+        result = inspect_data(d,4,work,d/'source')
+        result.update(input_archives=records, extracted=files)
+    else:
+        pilot = TASK/'pilot'
+        if len(sys.argv) != 3 or digest(pilot/'receipt.json') != sys.argv[2]: raise ValueError('approved pilot receipt SHA required')
+        receipt = json.loads((pilot/'receipt.json').read_text())
+        if receipt['phase'] != 'pilot' or receipt['ticks'] != TICKS[:4] or not receipt['passed'] or receipt['driver_sha256'] != digest(Path(__file__)): raise ValueError('pilot not passed or code changed')
+        d = pilot/'inputs'
+        for name, row in receipt['extracted'].items(): checkfile(d/name, row['sha256'], row['bytes'])
+        # Source files are re-bound to the same original snapshot in a fresh directory.
+        checkfile(JOBROOT/JOBS['source'][0], JOBS['source'][1], 150_000_000)
+        work = TASK/'full'; work.mkdir(mode=0o700, exist_ok=False)
+        source_fresh = work/'source'; source_fresh.mkdir(); snapshot(JOBROOT/JOBS['source'][0],source_fresh)
+        # Use a fresh, hash-pinned source snapshot; leave pilot untouched.
+        result = inspect_data(d,80,work,source_fresh)
+        result['pilot_receipt_sha256'] = digest(pilot/'receipt.json')
+        result['mask_npz'] = {u: {'path':str(d/(u+'-masks.npz')), 'sha256':digest(d/(u+'-masks.npz'))} for u in UNITS}
+    composite_sha = digest(work/'composite.npy'); driver_sha = digest(Path(__file__))
+    result.update(phase=phase, passed=True, cpu_s=cpu(), wall_s=time.monotonic()-start,
+                  composite_file_sha256=composite_sha, source_snapshot_sha256=JOBS['source'][1],
+                  path=str(work), driver_sha256=driver_sha)
+    (work/'receipt.json').write_text(json.dumps(result,indent=2)+'\n')
+    print(json.dumps({'phase':phase,'passed':True,'cpu_s':cpu(),'wall_s':time.monotonic()-start,'directory':str(work)}))
+
+if __name__ == '__main__':
+    try: main()
+    except Exception:
+        traceback.print_exc(); raise

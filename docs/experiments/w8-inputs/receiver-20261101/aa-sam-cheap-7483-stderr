@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "<string>", line 53, in <module>
+  File "<pinned-aa-sam-preflight>", line 585, in main
+  File "<pinned-aa-sam-preflight>", line 561, in run_cheap
+  File "<pinned-aa-sam-preflight>", line 301, in cheap_assets
+  File "<pinned-aa-sam-preflight>", line 179, in verify_aa_tree
+ValueError: AA installed path missing or ambiguous: animate_anyone/scripts/lmks2vid.py

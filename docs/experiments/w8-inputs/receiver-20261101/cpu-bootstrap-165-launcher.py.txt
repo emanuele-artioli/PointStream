@@ -1,0 +1,119 @@
+"""Reviewed-launch candidate. Do not run until root freezes source and spec.
+
+No new result is created merely by saving this file. Arguments bind exact local
+source archive bytes, source revision, new host-local remote destination, and
+new local receipt directory. Existing attempts are never reused or overwritten.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import re
+import resource
+import shlex
+import subprocess
+import time
+import tarfile
+
+
+def main() -> int:
+    resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--archive', type=Path, required=True)
+    parser.add_argument('--archive-sha256', required=True)
+    parser.add_argument('--revision', required=True)
+    parser.add_argument('--attempt-id', required=True)
+    parser.add_argument('--receipt-dir', type=Path, required=True)
+    args = parser.parse_args()
+    if not re.fullmatch(r'[0-9a-f]{64}', args.archive_sha256) or not re.fullmatch(r'[0-9a-f]{40}', args.revision):
+        raise ValueError('exact frozen archive SHA256 and commit revision required')
+    if not re.fullmatch(r'[a-z0-9-]{1,40}', args.attempt_id):
+        raise ValueError('lowercase unique attempt ID required')
+    blob = args.archive.read_bytes()
+    if len(blob) > 32 * 1024**2 or hashlib.sha256(blob).hexdigest() != args.archive_sha256:
+        raise ValueError('frozen archive bytes differ')
+    with tarfile.open(args.archive) as tar:
+        if tar.pax_headers.get('comment') != args.revision:
+            raise ValueError('source archive revision marker mismatch')
+        member = tar.getmember('docs/experiments/w8-inputs/receiver-20261101/cpu-bootstrap-preflight-template.json')
+        if not member.isfile() or member.size > 100_000:
+            raise ValueError('invalid frozen preflight config')
+        stream = tar.extractfile(member)
+        if stream is None:
+            raise ValueError('frozen config not readable')
+        config = json.load(stream)
+    root = ('/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-'
+            + args.revision[:12] + '-' + args.attempt_id)
+    config['source_archive'] = root + '/source.tar'
+    config['source_tree'] = root + '/source'
+    python = ('/local/users/emanuele/pointstream/cache/'
+              '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python')
+    bootstrap = '''import resource
+resource.setrlimit(resource.RLIMIT_CPU,(6,165))
+import hashlib,json,os,sys,tarfile,time
+from pathlib import Path
+deadline=time.monotonic()+1490
+os.sched_setaffinity(0,{{min(os.sched_getaffinity(0))}})
+local=Path('/local/users/emanuele/pointstream')
+if local.stat().st_dev==Path('/home/itec/emanuele/Datasets/pointstream-data').stat().st_dev:raise RuntimeError('source must use separate local filesystem')
+v=os.statvfs(local)
+if v.f_bavail*v.f_frsize<2*1024**3:raise RuntimeError('insufficient local space')
+out=Path({root!r});out.mkdir(mode=0o700,exist_ok=False)
+blob=sys.stdin.buffer.read(32*1024**2+1)
+if len(blob)>32*1024**2 or hashlib.sha256(blob).hexdigest()!={sha!r}:raise ValueError('archive transport changed')
+archive=out/'source.tar'
+with archive.open('xb') as f:f.write(blob)
+source=out/'source';source.mkdir()
+with tarfile.open(archive,'r:') as tar:
+ members=tar.getmembers()
+ if len(members)>5000 or sum(m.size for m in members)>64*1024**2:raise ValueError('source extraction cap')
+ if any(m.issym() or m.islnk() or m.name.startswith('/') or '..' in Path(m.name).parts for m in members):raise ValueError('source archive member')
+ tar.extractall(source,filter='data')
+config=json.loads({config!r})
+config_path=out/'config.json'
+with config_path.open('x') as f:json.dump(config,f,sort_keys=True)
+output=out/'results';output.mkdir()
+env={{'PATH':'/usr/bin:/bin','CUDA_VISIBLE_DEVICES':'','PYTHONPATH':str(source),'PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1','MKL_NUM_THREADS':'1','NUMEXPR_NUM_THREADS':'1','TMPDIR':str(out),'TMP':str(out),'TEMP':str(out),'XDG_CACHE_HOME':str(out),'TORCH_HOME':str(out)}}
+python={python!r}
+os.execve(python,[python,'-B',str(source/'experiments/tennis/w8_receiver_preflight.py'),'--config',str(config_path),'--source-sha256',{sha!r},'--output',str(output),'--identity-cpu-seconds','125','--identity-wall-seconds','1200','--deadline-monotonic',str(deadline)],env)
+'''.format(root=root, sha=args.archive_sha256, config=json.dumps(config), python=python)
+    command = ' '.join(shlex.quote(x) for x in
+                       ('/usr/bin/timeout', '--signal=TERM', '--kill-after=2', '1500s', python, '-B', '-c', bootstrap))
+    args.receipt_dir.mkdir(mode=0o700, parents=False, exist_ok=False)
+    (args.receipt_dir / 'frozen-config.json').write_text(json.dumps(config, sort_keys=True, indent=2) + '\n')
+    (args.receipt_dir / 'launch.json').write_text(json.dumps({
+        'revision': args.revision, 'source_archive_sha256': args.archive_sha256,
+        'source_archive_bytes': len(blob), 'remote_directory': root,
+        'identity_cpu_seconds': 125, 'runtime_cpu_seconds_each': 12,
+        'supervisor_cpu_seconds': 6, 'external_cpu_reserve_seconds': 10,
+        'total_cpu_reservation_seconds': 165, 'gpu_seconds': 0,
+        'identity_wall_seconds': 1200, 'remote_wall_seconds': 1500,
+    }, sort_keys=True, indent=2) + '\n')
+    def ssh_limit() -> None:
+        resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+    started = time.monotonic()
+    try:
+        result = subprocess.run(['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', 'gpu6', command],
+                                input=blob, capture_output=True, timeout=1515, close_fds=True,
+                                preexec_fn=ssh_limit, check=False)
+    except subprocess.TimeoutExpired as exc:
+        (args.receipt_dir / 'stdout.partial').write_bytes(exc.stdout or b'')
+        (args.receipt_dir / 'stderr.partial').write_bytes(exc.stderr or b'')
+        (args.receipt_dir / 'unknown.json').write_text(json.dumps({'status': 'unknown_inspect_do_not_replay'}))
+        raise
+    (args.receipt_dir / 'stdout').write_bytes(result.stdout)
+    (args.receipt_dir / 'stderr').write_bytes(result.stderr)
+    (args.receipt_dir / 'execution.json').write_text(json.dumps({
+        'exit_code': result.returncode, 'wall_seconds': time.monotonic() - started,
+        'local_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+        'ssh_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2]),
+        'remote_directory': root,
+    }, sort_keys=True, indent=2) + '\n')
+    print(json.dumps({'exit_code': result.returncode, 'receipt_directory': str(args.receipt_dir)}))
+    return result.returncode
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

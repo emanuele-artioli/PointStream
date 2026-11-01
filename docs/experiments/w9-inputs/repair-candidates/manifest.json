@@ -1,0 +1,79 @@
+{
+  "status": "DRAFT; DO NOT SUBMIT: pilot CPU budget and resource enforcement, runtime, deadline, current code snapshot, and fleet preflight not yet validated",
+  "candidates": [
+    {
+      "window": "al028",
+      "policy": "s2_o0",
+      "target_kbps": 19.239833333333333,
+      "source": "20261030T194352Z-c8a65737",
+      "spec": "docs/experiments/w9-inputs/repair-candidates/al028-s2_o0.json",
+      "sha256": "522f739bf346319a156bd0cc8b701c4317db172d634c656effdaab7d97ee45dc"
+    },
+    {
+      "window": "al028",
+      "policy": "s4_o0",
+      "target_kbps": 19.239833333333333,
+      "source": "20261030T194520Z-f1e8f664",
+      "spec": "docs/experiments/w9-inputs/repair-candidates/al028-s4_o0.json",
+      "sha256": "d36bfcd70d183b806364b2ad22731da4d2f0fa4738f768e9248ef23b61d44855"
+    },
+    {
+      "window": "al028",
+      "policy": "s2_o20",
+      "target_kbps": 19.239833333333333,
+      "source": "20261030T194640Z-cefe70d1",
+      "spec": "docs/experiments/w9-inputs/repair-candidates/al028-s2_o20.json",
+      "sha256": "28541929577dc79b0de29db87cfc160acd0d686e8371101940872ad13dc982f7"
+    },
+    {
+      "window": "al034",
+      "policy": "s4_o0",
+      "target_kbps": 18.654973333333334,
+      "source": "20261031T112538Z-9a06a436",
+      "spec": "docs/experiments/w9-inputs/repair-candidates/al034-s4_o0.json",
+      "sha256": "c1f58186bd293ba6ce54685f938763822fed1f197046a91d9b5d9ba73473eef7"
+    },
+    {
+      "window": "al043",
+      "policy": "s2_o0",
+      "target_kbps": 18.858040000000003,
+      "source": "20261031T111842Z-e8a80705",
+      "spec": "docs/experiments/w9-inputs/repair-candidates/al043-s2_o0.json",
+      "sha256": "4f7742c3a08eee3048e320d6a4335be9f6991f5bb84fbbd333be2d41db44fca5"
+    },
+    {
+      "window": "nad000",
+      "policy": "s4_o0",
+      "target_kbps": 44.618157777777775,
+      "source": "w1-encode-quarter-nad000",
+      "spec": "docs/experiments/w9-inputs/repair-candidates/nad000-s4_o0.json",
+      "sha256": "3f3f96039da29326bdaa6d2afddbdba8479ec946bc29115bdb2d762efd110944"
+    },
+    {
+      "window": "nad001",
+      "policy": "s2_o0",
+      "target_kbps": 44.56831777777778,
+      "source": "w1-encode-half-nad001",
+      "spec": "docs/experiments/w9-inputs/repair-candidates/nad001-s2_o0.json",
+      "sha256": "25cf642a695cbf26722bf691f0c85854102497daf076c2c814148b7ac8f5b044"
+    },
+    {
+      "window": "nad001",
+      "policy": "s4_o0",
+      "target_kbps": 44.56831777777778,
+      "source": "w1-encode-quarter-nad001",
+      "spec": "docs/experiments/w9-inputs/repair-candidates/nad001-s4_o0.json",
+      "sha256": "d55503519b959a26cfa39683c607340f19233c76fbc52617ffc538877093fe4f"
+    },
+    {
+      "window": "nad002",
+      "policy": "s2_o0",
+      "target_kbps": 51.21346444444445,
+      "source": "w1-encode-half-nad002",
+      "spec": "docs/experiments/w9-inputs/repair-candidates/nad002-s2_o0.json",
+      "sha256": "ba06bd4c67d10a99d5999cfe82f45448933fed8a1576c401c3443078c228d737"
+    }
+  ],
+  "submission_ready": false,
+  "reason": "CPU process-tree enforcement and fresh fleet preflight not verified; final GPU specs require selected encoder output hashes"
+}

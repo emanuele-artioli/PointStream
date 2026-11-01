@@ -1,0 +1,108 @@
+{
+  "status": "PROPOSED_ROOT_REVIEW_REQUIRED_NOT_LAUNCHED",
+  "selected_module": {
+    "commit": "b58155b46cea2232ad572effed9dd6c727676498",
+    "path": "experiments/tennis/w8_receiver_preflight.py",
+    "sha256": "86f604c37e94880f4654a35678edb2f217ac22c96eb990adaeeb558f34f631dd",
+    "bytes": 35607,
+    "provenance": "exact committed module bytes, selected rather than a full source archive"
+  },
+  "config": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-b58155b4-config.json",
+    "sha256": "1e8c279415dc595464f1dc0b37c3b0cec3031ba1fdc4fe60fc40abea925ae557",
+    "bytes": 3902,
+    "provenance": "exact recovered immutable 88040 config; contains paths, no video bytes"
+  },
+  "payload": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-b58155b4-payload.b64",
+    "sha256": "92672214766e94edf5e6d586d983a893ef24f7f9163ad53da260eadd04383ee0",
+    "bytes": 22976,
+    "encoding": "base64(zlib(JSON(base64(module),base64(config))))",
+    "transport": "single shell-quoted argument; stdin DEVNULL"
+  },
+  "remote_program": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-b58155b4-remote.py.txt",
+    "sha256": "b61074d3aff6c6a605983d0847bb88325f3d82f80ab3cfab3a0f3b578b0ed20e",
+    "bytes": 3495
+  },
+  "launcher": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-b58155b4-launcher.py.txt",
+    "sha256": "39dd7df42b96dbf977093bd54dcb45ec12a3d51b8ea59314af8cdf5c327d7eae",
+    "host": "gpu6",
+    "stdin": "DEVNULL",
+    "local_wait": "blocking waitpid with SIGALRM, no repeated polling",
+    "timeout_cleanup": "kill only own local SSH PID; remote timeout controls only its own child",
+    "unknown": "inspect existing PID and outputs, never replay"
+  },
+  "remote_command": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-b58155b4-command.txt",
+    "sha256": "6c31fd8d7f3714d01a4bbb58f99ee7e4cbbf09dc693fc9ea2142c46e8060b093",
+    "bytes": 27293,
+    "current_local_argv_plus_environment_bytes": 31406,
+    "bounds": {
+      "command": 120000,
+      "argv_and_environment": 200000
+    },
+    "launch_time_rechecked": true
+  },
+  "runtime": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+  "runtime_flags": [
+    "-I",
+    "-S",
+    "-B"
+  ],
+  "gpu_visible_devices": "",
+  "remote_output_directory": "/local/users/emanuele/pointstream/audits/w8-aa-sam-cheap-b58155b4-20261101",
+  "remote_files": [
+    "config.json",
+    "result.json",
+    "result.json.checkpoint.jsonl"
+  ],
+  "local_output_directory": "/private/tmp/w8-aa-sam-cheap-b58155b4-20261101",
+  "local_files": [
+    "launch.json",
+    "handle.json",
+    "stdout",
+    "stderr",
+    "execution.json"
+  ],
+  "cpu_seconds": {
+    "remote_child": 5,
+    "local_parent": 2,
+    "ssh": 1,
+    "remote_shell_and_timeout": 1,
+    "separate_readonly_closeout_and_audit": 1,
+    "total": 10
+  },
+  "gpu_seconds": 0,
+  "wall_seconds": {
+    "remote_timeout": 110,
+    "local_whole_operation": 120
+  },
+  "scope": "AA 10.4-MB archive/source and SAM metadata/RECORD only; no 19-GB asset pass, Torch import, model, GPU, receiver quality or complete environment proof",
+  "preconditions": [
+    "root reviews and reserves at most 10 CPU-s inside original totals",
+    "fresh gpu6 host capacity and separate local filesystem",
+    "new output paths absent; no retries",
+    "actual MAIN `-I -S` prefix/import behavior unqualified and must fail closed if incompatible",
+    "review result and independent closeout before any full 19-GB hash campaign"
+  ],
+  "previous_attempt": {
+    "commit": "74d388813f5a28669146bd28aba3d11a0308c738",
+    "exit_code": 1,
+    "failure": "known generated AA packaging SOURCES.txt archive/install mismatch",
+    "archive_member_sha256": "ea1c5985073896d678a1e43c06a148f22ec35782284606551ce5a35392d6a92a",
+    "installed_member_sha256": "2df8039adeeeef1add25cf3c02f45cdaa1189093278b87f8174c014d65b9e7e2",
+    "comprehensive_diagnostic": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-comprehensive-74d-receipt.json",
+    "comprehensive_diagnostic_sha256": "b922eda247365122a8c723c08231ac16dc87cd3ac5ec384c35c79f9469fbc374"
+  },
+  "change": "Only the observed packaging-manifest pair is admitted and recorded; it is excluded from executable/source grants. All other archive members and executing modules require exact verification.",
+  "budget_context": {
+    "closed_cpu_seconds": 1789,
+    "closed_gpu_seconds": 224,
+    "proposed_cpu_seconds": 10,
+    "worst_cpu_after_reservation": 1799,
+    "original_cpu_cap": 3600,
+    "original_gpu_cap": 3600
+  }
+}

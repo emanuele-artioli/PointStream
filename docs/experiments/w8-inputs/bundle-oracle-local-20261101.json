@@ -1,0 +1,320 @@
+{
+  "scope": "optimistic payload accounting screen only; Gate 1 input equivalence remains unverified",
+  "candidate_sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+  "candidate_bytes": 2289836,
+  "bytes_by_unit": {
+    "frame": 23876,
+    "reference": 366161,
+    "match": 1897395,
+    "window": 2404
+  },
+  "rates_kbps": {
+    "cold_kbps": 3816.3933333333334,
+    "conditional_kbps": 46.315062222222224,
+    "warm_kbps": 43.8
+  },
+  "cache_contract": {
+    "match_sha256": "fef98258469b57ae4518a1ef570579e9918de7435b310737a04cdfaeb15bb810",
+    "reference_sha256_by_unit": {
+      "nadal_kyrgios__000_at120__person_000000000000": "63d214f5631fd5557d86a9c8c7c2936e2ef45afe539e882001d60e6115896559",
+      "nadal_kyrgios__000_at120__person_000000000001": "c8a4d5355f06d72281751a0d936d5e28c1d80d189021b20000ccfc1dc62e7d6a"
+    }
+  },
+  "cache_assumption": "exact match and two reference packets retained for 7200 s; no reuse quality demonstrated",
+  "input_sha256": {
+    "ivf": "f9622b6af4cddea3d70226c0b22e12374f4c77aadf2120e54d5d21ba55bfbbb8",
+    "transport_archive": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+    "match": "fef98258469b57ae4518a1ef570579e9918de7435b310737a04cdfaeb15bb810",
+    "common_base_archive": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285",
+    "repairs_config": "290780552a9ee463ef2fff2bba31602f021fcd4feabb9a8d9047fddb20943355",
+    "generate_spec": "ad9de12ed24cf37b88a971df281d6a23c6e5dd52d9d2177fb0bd320067618195",
+    "receiver_spec": "002b13fa11954d8d28032f8f69a0a5a91a5f2d255b6af3f2cf2201d897aa1f69",
+    "judge_spec": "e3232de4232efd258f6ba1675f3caca1a5f99da6edda4e56b74e90a88d32538a"
+  },
+  "profile": {
+    "window": "nadal_kyrgios/000@120",
+    "models": {
+      "vae_config": "92d3dfb746fca211a2c9e019e285f8597412211728dce3c5bcf4eda0f2d62e7e",
+      "vae_weights": "a1d993488569e928462932c8c38a0760b874d166399b14414135bd9c42df5815",
+      "image_encoder_config": "ba41139cc9dad159163a53e2aa847356b627f53fef988ad461659bd2d587d886",
+      "image_encoder_weights": "89d2aa29b5fdf64f3ad4f45fb4227ea98bc45156bbae673b85be1af7783dbabb",
+      "denoising_unet": "b9e5a2c34fac369e8a922972ca2210916c6af175a0dad907deccf6235816ad52",
+      "reference_unet": "beddccb08d49a8b29b0f4d6d456c6521d4382a8d8d48884fa60ba8802509c214",
+      "pose_guider": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+      "motion_module": "0d11e01a281b39880da2efeea892215c1313e5713fca3d100a7fbb72ee312ef9",
+      "tennis_base": "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4",
+      "sam": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+      "generator_env": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+      "sam_env": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "native_env": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "native_decoder": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "native_ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "generator_code": "00248aa4fdd47e634f82b37a7a33c99f1794440d65cbfe9395255a4225735542",
+      "receiver_code": "abc11fd7297f199d333c81d484f66571edbfc52379f4a966603b2a94ff368f3c",
+      "geometry_code": "0c07d5fc502abf0ed0b62785648c25ef0d2e6dbec5c25ef58f192f768fa00ad6",
+      "packet_code": "c542131875729b06bf2606136350f46bff04e88689db938b1848aefea85010ea",
+      "native_color_code": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46",
+      "native_rgb_code": "913c05c591d8ed6456dd1b7f1b49792a55dac4b65c7e20af19ca48b2007f9e5e",
+      "native_memmap_code": "55d1e32f7c9cf50c54d5b69ecd10f3ecb11e88b9c510d279304d3f5cb565ed4d",
+      "payload_decoder_code": "9629bc596923540cf9eb3e17ebcc6b1c2b3000de15cf5019c33e083153a69a64",
+      "conditioning_decoder_code": "6a90df71b2183147dd3880ba4001919f0aed5b36b7f0f427db529b4027bcad03"
+    },
+    "recipe": {
+      "profile": "match5",
+      "steps": 30,
+      "guidance": 2,
+      "context": [
+        24,
+        4
+      ],
+      "seed_rule": "sha256(unit_name)[:7] then seed*1009+run",
+      "native_frames": 240,
+      "fps": [
+        50,
+        1
+      ],
+      "saved_ticks": [
+        0,
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21,
+        24,
+        27,
+        30,
+        33,
+        36,
+        39,
+        42,
+        45,
+        48,
+        51,
+        54,
+        57,
+        60,
+        63,
+        66,
+        69,
+        72,
+        75,
+        78,
+        81,
+        84,
+        87,
+        90,
+        93,
+        96,
+        99,
+        102,
+        105,
+        108,
+        111,
+        114,
+        117,
+        120,
+        123,
+        126,
+        129,
+        132,
+        135,
+        138,
+        141,
+        144,
+        147,
+        150,
+        153,
+        156,
+        159,
+        162,
+        165,
+        168,
+        171,
+        174,
+        177,
+        180,
+        183,
+        186,
+        189,
+        192,
+        195,
+        198,
+        201,
+        204,
+        207,
+        210,
+        213,
+        216,
+        219,
+        222,
+        225,
+        228,
+        231,
+        234,
+        237
+      ],
+      "fallback": "decoded_base",
+      "scheduler": {
+        "beta_start": 0.00085,
+        "beta_end": 0.012,
+        "beta_schedule": "linear",
+        "clip_sample": false,
+        "steps_offset": 1,
+        "prediction_type": "v_prediction",
+        "rescale_betas_zero_snr": true,
+        "timestep_spacing": "trailing"
+      },
+      "rank": 4,
+      "compositing_order": [
+        "person:000000000001",
+        "person:000000000000"
+      ],
+      "color_path": "dav1d yuv420; limited-range yuv420_to_rgb cuda; bicubic resize RGB to 1920x1080",
+      "generator_input_size": [
+        512,
+        784
+      ],
+      "run_policy": "all native run frames; retain judged ticks",
+      "guider": "original plus decoded match delta",
+      "adapter": "nk-C@fit-100-fp16.pt 4-bit",
+      "native_scale": 4,
+      "sync_start_tick": 0,
+      "match_duration_assumption_s": 7200
+    },
+    "units": [
+      {
+        "id": "nadal_kyrgios__000_at120__person_000000000000",
+        "reference": "ref0",
+        "reference_tick": 0,
+        "box": [
+          994.5792864118301,
+          668.4099853515625,
+          210.33141741071427,
+          322.0699829101562
+        ]
+      },
+      {
+        "id": "nadal_kyrgios__000_at120__person_000000000001",
+        "reference": "ref1",
+        "reference_tick": 0,
+        "box": [
+          638.4481767926897,
+          223.052001953125,
+          100.97370256696429,
+          154.61598205566406
+        ]
+      }
+    ],
+    "ivf": "ivf",
+    "kps": "kps",
+    "judged": "judged",
+    "match": {
+      "section": "match",
+      "sha256": "fef98258469b57ae4518a1ef570579e9918de7435b310737a04cdfaeb15bb810"
+    }
+  },
+  "strict_rate_gate": {
+    "decision": "unresolved",
+    "cells": {
+      "s2_o0:lpips": {
+        "bracket_kbps": [
+          39.16,
+          46.895
+        ],
+        "bracket_headroom_kbps": 0.5799377777777792,
+        "won": true,
+        "gap": 0.2233801014757556,
+        "interpolated_error": 0.5555166405462643
+      },
+      "s2_o0:dists": {
+        "bracket_kbps": [
+          39.16,
+          46.895
+        ],
+        "bracket_headroom_kbps": 0.5799377777777792,
+        "won": true,
+        "gap": 0.12410944868427173,
+        "interpolated_error": 0.36182784978848354
+      },
+      "s4_o0:lpips": {
+        "bracket_kbps": [
+          33.108333333333334,
+          49.958333333333336
+        ],
+        "bracket_headroom_kbps": 3.643271111111112,
+        "won": true,
+        "gap": 0.2847400855182598,
+        "interpolated_error": 0.6168766245887685
+      },
+      "s4_o0:dists": {
+        "bracket_kbps": [
+          33.108333333333334,
+          49.958333333333336
+        ],
+        "bracket_headroom_kbps": 3.643271111111112,
+        "won": true,
+        "gap": 0.13288795895150654,
+        "interpolated_error": 0.37060636005571834
+      },
+      "s2_o20:lpips": {
+        "bracket_kbps": [
+          39.43333333333334,
+          45.82333333333334
+        ],
+        "bracket_headroom_kbps": -0.4917288888888862,
+        "won": null,
+        "gap": null
+      },
+      "s2_o20:dists": {
+        "bracket_kbps": [
+          39.43333333333334,
+          45.82333333333334
+        ],
+        "bracket_headroom_kbps": -0.4917288888888862,
+        "won": null,
+        "gap": null
+      },
+      "dcvc:lpips": {
+        "bracket_kbps": [
+          36.825,
+          49.778333333333336
+        ],
+        "bracket_headroom_kbps": 3.463271111111112,
+        "won": true,
+        "gap": 0.04847126360699405,
+        "interpolated_error": 0.3806078026775027
+      },
+      "dcvc:dists": {
+        "bracket_kbps": [
+          36.825,
+          49.778333333333336
+        ],
+        "bracket_headroom_kbps": 3.463271111111112,
+        "won": true,
+        "gap": 0.05946235701177341,
+        "interpolated_error": 0.2971807581159852
+      }
+    }
+  },
+  "win_intervals": {
+    "intervals_kbps": [
+      [
+        39.43333333333334,
+        45.82333333333334
+      ]
+    ],
+    "maximum_win_rate_supremum_kbps": 45.82333333333334,
+    "common_bracket_kbps": [
+      39.43333333333334,
+      45.82333333333334
+    ],
+    "note": "interval endpoints require separate strict gate evaluation"
+  },
+  "rate_headroom_kbps": -0.4917288888888862,
+  "cpu_seconds": 1.102784,
+  "wall_seconds": 1.4155513332225382,
+  "cpu_limit_s": 180,
+  "wall_limit_s": 300
+}

@@ -1,0 +1,48 @@
+{
+  "submission_ready": false,
+  "reason": "Requires independently reviewed scoring profile, full-output audit, tested frozen source snapshot, queue preflight and parent GPU go/no-go",
+  "specs": [
+    {
+      "window": "al028",
+      "spec": "docs/experiments/w9-inputs/gpu-repair-drafts/al028.json",
+      "sha256": "f1be8388712f3cce51a68e6a8a85791e8708716198b97cc7cd843779fba73440",
+      "points": 3,
+      "gpu_cap_seconds": 900
+    },
+    {
+      "window": "al034",
+      "spec": "docs/experiments/w9-inputs/gpu-repair-drafts/al034.json",
+      "sha256": "796644407b217a512965c42989c27915acf1438201b0fa41d1f11e26e1d5e96c",
+      "points": 1,
+      "gpu_cap_seconds": 900
+    },
+    {
+      "window": "al043",
+      "spec": "docs/experiments/w9-inputs/gpu-repair-drafts/al043.json",
+      "sha256": "66e891b92296c870deb8d2dd1431d54cef77d011176d54fe2017edabf1f01a4d",
+      "points": 1,
+      "gpu_cap_seconds": 900
+    },
+    {
+      "window": "nad000",
+      "spec": "docs/experiments/w9-inputs/gpu-repair-drafts/nad000.json",
+      "sha256": "b53be31af5c520a202cce55335fd83298b7380be3f9f72a78fe27173767d25ca",
+      "points": 1,
+      "gpu_cap_seconds": 900
+    },
+    {
+      "window": "nad001",
+      "spec": "docs/experiments/w9-inputs/gpu-repair-drafts/nad001.json",
+      "sha256": "984243d9c7d17c76c9d46a28a81f39a5f0cef4316b7adc750a80aa5551daa89e",
+      "points": 2,
+      "gpu_cap_seconds": 900
+    },
+    {
+      "window": "nad002",
+      "spec": "docs/experiments/w9-inputs/gpu-repair-drafts/nad002.json",
+      "sha256": "c0a7598c92d7276b089d0640f3bd02fdc5dc8c61586563c37ec6eb4b3ddb33eb",
+      "points": 1,
+      "gpu_cap_seconds": 900
+    }
+  ]
+}

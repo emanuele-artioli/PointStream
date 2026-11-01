@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""One 10.7-MB SSH stdin/hash diagnostic; do not run until root reviews."""
+import hashlib
+import json
+from pathlib import Path
+import resource
+import shlex
+import subprocess
+import time
+
+resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+ARCHIVE = Path('/private/tmp/pointstream-w8-receiver-source-2677c179.tar')
+EXPECTED_SHA = 'fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635'
+EXPECTED_SIZE = 10741760
+OUTPUT = Path('/private/tmp/w8-ssh-full-archive-stdin-smoke-2677-20261101')
+REMOTE = r'''import hashlib,json,resource,sys,time
+resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+started=time.monotonic();h=hashlib.sha256();size=0
+while True:
+ block=sys.stdin.buffer.read1(65536)
+ if not block:break
+ size+=len(block)
+ if size>10741760:raise ValueError('stdin exceeds exact byte cap')
+ h.update(block)
+print(json.dumps({'bytes':size,'sha256':h.hexdigest(),'eof':True,'wall_seconds':time.monotonic()-started,
+                  'cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2])},sort_keys=True),flush=True)
+if size!=10741760 or h.hexdigest()!='fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635':
+ raise ValueError('stdin bytes differ from frozen archive')'''
+
+
+def limit_ssh():
+    resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+
+
+def main():
+    started = time.monotonic()
+    data = ARCHIVE.read_bytes()
+    if len(data) != EXPECTED_SIZE or hashlib.sha256(data).hexdigest() != EXPECTED_SHA:
+        raise ValueError('local frozen archive identity mismatch')
+    OUTPUT.mkdir(mode=0o700, exist_ok=False)
+    command = ' '.join(shlex.quote(x) for x in ('/usr/bin/timeout', '--signal=TERM', '--kill-after=1',
+                                                '18s', '/usr/bin/python3', '-B', '-c', REMOTE))
+    remaining = 20 - (time.monotonic() - started)
+    if remaining <= 0:
+        raise RuntimeError('local setup exhausted whole 20-second wall budget')
+    try:
+        result = subprocess.run(['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', 'gpu6', command],
+                                input=data, capture_output=True, close_fds=True, timeout=remaining,
+                                preexec_fn=limit_ssh, check=False)
+    except subprocess.TimeoutExpired as exc:
+        (OUTPUT / 'stdout.partial').write_bytes(exc.stdout or b'')
+        (OUTPUT / 'stderr.partial').write_bytes(exc.stderr or b'')
+        (OUTPUT / 'unknown.json').write_text(json.dumps({'status': 'unknown_inspect_do_not_replay'}))
+        raise
+    (OUTPUT / 'stdout').write_bytes(result.stdout)
+    (OUTPUT / 'stderr').write_bytes(result.stderr)
+    receipt = {'exit_code': result.returncode, 'wall_seconds': time.monotonic() - started,
+               'local_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+               'ssh_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2]),
+               'cpu_upper_seconds': 4, 'remote_cpu_limit_seconds': 1, 'local_cpu_limit_seconds': 1,
+               'ssh_cpu_limit_seconds': 1, 'remote_shell_timeout_reserve_seconds': 1,
+               'remote_writes': False, 'gpu_seconds': 0, 'scope': 'stdin transport diagnostic only'}
+    (OUTPUT / 'execution.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
+    if result.returncode:
+        raise RuntimeError('stdin smoke failed; retain receipt and inspect, do not replay')
+    returned = json.loads(result.stdout)
+    if (returned.get('bytes') != EXPECTED_SIZE or returned.get('sha256') != EXPECTED_SHA
+            or returned.get('eof') is not True):
+        raise ValueError('remote EOF, byte count or digest mismatch')
+    print(json.dumps({'passed': True, 'output': str(OUTPUT), 'wall_seconds': receipt['wall_seconds']}))
+
+
+if __name__ == '__main__':
+    main()

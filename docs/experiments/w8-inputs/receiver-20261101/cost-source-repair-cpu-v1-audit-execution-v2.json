@@ -1,0 +1,8 @@
+{
+  "exit": 0,
+  "timeout": false,
+  "wall": 1.812948124948889,
+  "ssh_pid": 70773,
+  "remote_cpu_cap": 4,
+  "ssh_cpu_cap": 1
+}

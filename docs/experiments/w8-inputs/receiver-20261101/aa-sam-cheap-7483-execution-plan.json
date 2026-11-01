@@ -1,0 +1,90 @@
+{
+  "status": "PROPOSED_ROOT_REVIEW_REQUIRED_NOT_LAUNCHED",
+  "selected_module": {
+    "commit": "7483d95e75c79f13dbae0d6330cd7ea653882783",
+    "path": "experiments/tennis/w8_receiver_preflight.py",
+    "sha256": "6f0f816fac4d1699988e2a762739ef71efc19e24e7981d2c46ee6589a93f8aad",
+    "bytes": 33928,
+    "provenance": "exact committed module bytes, selected rather than a full source archive"
+  },
+  "config": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-config.json",
+    "sha256": "1e8c279415dc595464f1dc0b37c3b0cec3031ba1fdc4fe60fc40abea925ae557",
+    "bytes": 3902,
+    "provenance": "exact recovered immutable 88040 config; contains paths, no video bytes"
+  },
+  "payload": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-payload.b64",
+    "sha256": "c7aedd916b731494f572226c32da35c6876203a44e467644ba5799e1fcc5d5f7",
+    "bytes": 21836,
+    "encoding": "base64(zlib(JSON(base64(module),base64(config))))",
+    "transport": "single shell-quoted argument; stdin DEVNULL"
+  },
+  "remote_program": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-remote.py.txt",
+    "sha256": "4ff1339072105c0e15133ce5857501ca153f3a317512fb8ddf3b3b64a1ebaf62",
+    "bytes": 3495
+  },
+  "launcher": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-launcher.py.txt",
+    "sha256": "f45074ba0fb86347f413c3256a1df7a2afc25aabd41be3b80f579ae4b75f0fae",
+    "host": "gpu6",
+    "stdin": "DEVNULL",
+    "local_wait": "blocking waitpid with SIGALRM, no repeated polling",
+    "timeout_cleanup": "kill only own local SSH PID; remote timeout controls only its own child",
+    "unknown": "inspect existing PID and outputs, never replay"
+  },
+  "remote_command": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-command.txt",
+    "sha256": "5106db3fb247cd917c9a59ba227580f5b0c9a70edc4ee3ae9cee6476e4fde139",
+    "bytes": 26153,
+    "current_local_argv_plus_environment_bytes": 30266,
+    "bounds": {
+      "command": 120000,
+      "argv_and_environment": 200000
+    },
+    "launch_time_rechecked": true
+  },
+  "runtime": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+  "runtime_flags": [
+    "-I",
+    "-S",
+    "-B"
+  ],
+  "gpu_visible_devices": "",
+  "remote_output_directory": "/local/users/emanuele/pointstream/audits/w8-aa-sam-cheap-7483d95e-20261101",
+  "remote_files": [
+    "config.json",
+    "result.json",
+    "result.json.checkpoint.jsonl"
+  ],
+  "local_output_directory": "/private/tmp/w8-aa-sam-cheap-7483d95e-20261101",
+  "local_files": [
+    "launch.json",
+    "handle.json",
+    "stdout",
+    "stderr",
+    "execution.json"
+  ],
+  "cpu_seconds": {
+    "remote_child": 5,
+    "local_parent": 2,
+    "ssh": 1,
+    "remote_shell_and_timeout": 1,
+    "separate_readonly_closeout_and_audit": 1,
+    "total": 10
+  },
+  "gpu_seconds": 0,
+  "wall_seconds": {
+    "remote_timeout": 110,
+    "local_whole_operation": 120
+  },
+  "scope": "AA 10.4-MB archive/source and SAM metadata/RECORD only; no 19-GB asset pass, Torch import, model, GPU, receiver quality or complete environment proof",
+  "preconditions": [
+    "root reviews and reserves at most 10 CPU-s inside original totals",
+    "fresh gpu6 host capacity and separate local filesystem",
+    "new output paths absent; no retries",
+    "actual MAIN `-I -S` prefix/import behavior unqualified and must fail closed if incompatible",
+    "review result and independent closeout before any full 19-GB hash campaign"
+  ]
+}

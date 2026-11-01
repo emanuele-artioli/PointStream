@@ -1,0 +1,319 @@
+{
+  "status": "draft; saved encodes only, no new quality scores; full original smoke gates and terminal states passed, full stream hashes and bytes independently verified; actual decoded SHA must be checked again by scorer",
+  "windows": [
+    {
+      "window": "al028",
+      "manifest_sha256": "720dce44eb02311d0b4b5c16658fbefc7475c9351bc3878d768c94e86a39e667",
+      "manifest": "docs/experiments/w9-inputs/saved-trial-scoring/al028.json",
+      "point_count": 3,
+      "controls_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194352Z-c8a65737/full/published.tar",
+      "controls_archive_sha256": "f3de1ea7f0bd74a621ffb79fb2bd97cc622fb1ae05f504e4815c7470bd2540d8",
+      "controls_gate_passed": true,
+      "trials": [
+        {
+          "policy": "s2_o0",
+          "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194352Z-c8a65737/full/published.tar",
+          "archive_sha256": "f3de1ea7f0bd74a621ffb79fb2bd97cc622fb1ae05f504e4815c7470bd2540d8",
+          "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+          "transport_sha256": "8b0871ab633edcf4c77cb810cf2d3617a2a9593f0aa51af451c2a2ec21e30607",
+          "target_kbps": 19.239833333333333,
+          "roi_sha256": null,
+          "original_job": "20261030T194352Z-c8a65737",
+          "gate": {
+            "status": "complete",
+            "gate_passed": true,
+            "checks": {
+              "frames": true,
+              "multi_cpu": true,
+              "tools_pinned": true,
+              "inputs": true,
+              "offsets": true,
+              "streams_match_rows": true,
+              "roi_raises_rate": true,
+              "offset0:search_consistent": true,
+              "controls_scales": true,
+              "projection": true
+            },
+            "spec_sha256": "732f9eaa9d6f9ee7a85ad1ab3cfacfcc593f88820d74bc28b4c6280aee8b001a",
+            "source_sha256": "090a585422af3724b64cbe36c9e02e5e21e0a180d1ce18b59370facf14a823fc"
+          }
+        },
+        {
+          "policy": "s4_o0",
+          "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194520Z-f1e8f664/full/published.tar",
+          "archive_sha256": "970de450d9131bd8bd7ded4e10b8a6951918dc9da838746fe0f95efe4037b77f",
+          "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+          "transport_sha256": "8b0871ab633edcf4c77cb810cf2d3617a2a9593f0aa51af451c2a2ec21e30607",
+          "target_kbps": 19.239833333333333,
+          "roi_sha256": null,
+          "original_job": "20261030T194520Z-f1e8f664",
+          "gate": {
+            "status": "complete",
+            "gate_passed": true,
+            "checks": {
+              "frames": true,
+              "multi_cpu": true,
+              "tools_pinned": true,
+              "inputs": true,
+              "offsets": true,
+              "streams_match_rows": true,
+              "roi_raises_rate": true,
+              "offset0:search_consistent": true,
+              "projection": true
+            },
+            "spec_sha256": "cffb351b7058757f05b9671f03823fbbd5fc43c78f6d78c0b589494059d8b737",
+            "source_sha256": "090a585422af3724b64cbe36c9e02e5e21e0a180d1ce18b59370facf14a823fc"
+          }
+        },
+        {
+          "policy": "s2_o20",
+          "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T194640Z-cefe70d1/full/published.tar",
+          "archive_sha256": "4bae9b44296be1132c389d21e4ba49272bdb5f16b57be5179261bac7aec8037a",
+          "source_sha256": "c51dace59349914da401356984de4e83da658c878011db3f54ff233077152934",
+          "transport_sha256": "8b0871ab633edcf4c77cb810cf2d3617a2a9593f0aa51af451c2a2ec21e30607",
+          "target_kbps": 19.239833333333333,
+          "roi_sha256": "ecf8220e0694fcd6a726b780dc7b8696f2680980c651b98aff15f65fa9060a3f",
+          "original_job": "20261030T194640Z-cefe70d1",
+          "gate": {
+            "status": "complete",
+            "gate_passed": true,
+            "checks": {
+              "frames": true,
+              "multi_cpu": true,
+              "tools_pinned": true,
+              "inputs": true,
+              "offsets": true,
+              "streams_match_rows": true,
+              "roi_raises_rate": true,
+              "offset-20:search_consistent": true,
+              "offset-40:search_consistent": true,
+              "projection": true
+            },
+            "spec_sha256": "18a114d17544f4bb0ad8b65f893a537cfa7b8ff4db7ec075bf6fb971fc74e71f",
+            "source_sha256": "090a585422af3724b64cbe36c9e02e5e21e0a180d1ce18b59370facf14a823fc"
+          }
+        }
+      ]
+    },
+    {
+      "window": "al034",
+      "manifest_sha256": "454d63000a8c6de40e6df97117d5dac0174cef4e83f4b39361d29748aaf5a363",
+      "manifest": "docs/experiments/w9-inputs/saved-trial-scoring/al034.json",
+      "point_count": 1,
+      "controls_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T112504Z-853c04be/full/published.tar",
+      "controls_archive_sha256": "b1e554807b317a9c08ae779e0f92640165d9ef9d96bc95b06c8ac6b4bfa5c691",
+      "controls_gate_passed": true,
+      "trials": [
+        {
+          "policy": "s4_o0",
+          "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T112538Z-9a06a436/full/published.tar",
+          "archive_sha256": "3a5f8ec716165248e0ea44c70005b6fe0c4597fda4a411fc0b59d34c9301f7c1",
+          "source_sha256": "7db0c143cd416ad17b4bda4eaa191d51da197eccc1143e9eb402f8bb2a7f0ee6",
+          "transport_sha256": "70cfa5b37cbb579be788202148cf3fa88fafca0c45252ac02b91fd25f44fa0e2",
+          "target_kbps": 18.654973333333334,
+          "roi_sha256": null,
+          "original_job": "20261031T112538Z-9a06a436",
+          "gate": {
+            "status": "complete",
+            "gate_passed": true,
+            "checks": {
+              "frames": true,
+              "multi_cpu": true,
+              "tools_pinned": true,
+              "inputs": true,
+              "offsets": true,
+              "streams_match_rows": true,
+              "roi_raises_rate": true,
+              "offset0:search_consistent": true,
+              "projection": true
+            },
+            "spec_sha256": "a9eae2d18ebb7af7d9344e09e47404432bef4798604cdf5742ecebddd0792a24",
+            "source_sha256": "79a3ea215c06610deccc73c610989252ca4d983f4a6fc41ba84fe8795f8ace94"
+          }
+        }
+      ]
+    },
+    {
+      "window": "al043",
+      "manifest_sha256": "74d2a1987ad5d73f45bc984b7b30dc47460c69bd9dc10e5ae8fb5eb6fe5ca50e",
+      "manifest": "docs/experiments/w9-inputs/saved-trial-scoring/al043.json",
+      "point_count": 1,
+      "controls_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T111842Z-e8a80705/full/published.tar",
+      "controls_archive_sha256": "f1bbd7e7c32c264bc8e14f5275acfee4a72944ff8beb784c1170166a9b395d86",
+      "controls_gate_passed": true,
+      "trials": [
+        {
+          "policy": "s2_o0",
+          "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T111842Z-e8a80705/full/published.tar",
+          "archive_sha256": "f1bbd7e7c32c264bc8e14f5275acfee4a72944ff8beb784c1170166a9b395d86",
+          "source_sha256": "847cb8272134bd31a5447ff3cce02b28a906fae44559b3e0a58661d8171b6c16",
+          "transport_sha256": "70cfa5b37cbb579be788202148cf3fa88fafca0c45252ac02b91fd25f44fa0e2",
+          "target_kbps": 18.858040000000003,
+          "roi_sha256": null,
+          "original_job": "20261031T111842Z-e8a80705",
+          "gate": {
+            "status": "complete",
+            "gate_passed": true,
+            "checks": {
+              "frames": true,
+              "multi_cpu": true,
+              "tools_pinned": true,
+              "inputs": true,
+              "offsets": true,
+              "streams_match_rows": true,
+              "roi_raises_rate": true,
+              "offset0:search_consistent": true,
+              "controls_scales": true,
+              "projection": true
+            },
+            "spec_sha256": "f80f98abe9430120b8b2892ef273fd3b35b53212407835bab64843aac4b29edb",
+            "source_sha256": "8c93953f3c5614e30ff0cf9219763a11caa084403b0a3ba2725eb551b74f5b6c"
+          }
+        }
+      ]
+    },
+    {
+      "window": "nad000",
+      "manifest_sha256": "e53053e8daef1760c00e919deb556cd0ada63f8dbc754c89b59553aa53d4b21e",
+      "manifest": "docs/experiments/w9-inputs/saved-trial-scoring/nad000.json",
+      "point_count": 1,
+      "controls_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-01d5aa85/full/published.tar",
+      "controls_archive_sha256": "6496e427f4aa282c1a77acd0924685ded8d5323a11ca6df757b3bd9e598a8030",
+      "controls_gate_passed": true,
+      "trials": [
+        {
+          "policy": "s4_o0",
+          "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-616fee3a/full/published.tar",
+          "archive_sha256": "78b224f5086a048b227eea825b25b4546926a51cfb638f7c860e1d3374bd1f27",
+          "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+          "transport_sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+          "target_kbps": 44.618157777777775,
+          "roi_sha256": null,
+          "original_job": "20261031T181055Z-616fee3a",
+          "gate": {
+            "status": "complete",
+            "gate_passed": true,
+            "checks": {
+              "frames": true,
+              "multi_cpu": true,
+              "tools_pinned": true,
+              "inputs": true,
+              "offsets": true,
+              "streams_match_rows": true,
+              "roi_raises_rate": true,
+              "offset0:search_consistent": true,
+              "projection": true
+            },
+            "spec_sha256": "5e230e81205321c6be9a0b0ef34e5dee91661aa9ad50720c7770cc14ff9ac8a5",
+            "source_sha256": "ac60d56682802ef98654c3791ec8fbdef8cbea39dcf68cdde50ffe57340370a6"
+          }
+        }
+      ]
+    },
+    {
+      "window": "nad001",
+      "manifest_sha256": "dcb8932a764370b2fe160fbdb8249f8d713becc96667ce56cf3aee36d460d4bc",
+      "manifest": "docs/experiments/w9-inputs/saved-trial-scoring/nad001.json",
+      "point_count": 2,
+      "controls_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181305Z-b0dccc5e/full/published.tar",
+      "controls_archive_sha256": "90821602470b60204cb93d7ff111baf9e50cdfcee91ea1fe1f3be1597a6c315c",
+      "controls_gate_passed": true,
+      "trials": [
+        {
+          "policy": "s2_o0",
+          "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181305Z-b0dccc5e/full/published.tar",
+          "archive_sha256": "90821602470b60204cb93d7ff111baf9e50cdfcee91ea1fe1f3be1597a6c315c",
+          "source_sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d",
+          "transport_sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+          "target_kbps": 44.56831777777778,
+          "roi_sha256": null,
+          "original_job": "20261031T181305Z-b0dccc5e",
+          "gate": {
+            "status": "complete",
+            "gate_passed": true,
+            "checks": {
+              "frames": true,
+              "multi_cpu": true,
+              "tools_pinned": true,
+              "inputs": true,
+              "offsets": true,
+              "streams_match_rows": true,
+              "roi_raises_rate": true,
+              "offset0:search_consistent": true,
+              "controls_scales": true,
+              "projection": true
+            },
+            "spec_sha256": "07d2b058d2439939c8bcacfbed4ab8c98a62e711ef032a4c683244d6cf965f0d",
+            "source_sha256": "180c07f62bae30ca985d18a5e4a674859be4bcbc3c66e9dee11afda6ba3bb9ba"
+          }
+        },
+        {
+          "policy": "s4_o0",
+          "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181305Z-17a9b4b3/full/published.tar",
+          "archive_sha256": "4a6e35c2766c5c802cf3e596def616363ae4b6d953436714ef7ea26cc63c7ea4",
+          "source_sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d",
+          "transport_sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+          "target_kbps": 44.56831777777778,
+          "roi_sha256": null,
+          "original_job": "20261031T181305Z-17a9b4b3",
+          "gate": {
+            "status": "complete",
+            "gate_passed": true,
+            "checks": {
+              "frames": true,
+              "multi_cpu": true,
+              "tools_pinned": true,
+              "inputs": true,
+              "offsets": true,
+              "streams_match_rows": true,
+              "roi_raises_rate": true,
+              "offset0:search_consistent": true,
+              "projection": true
+            },
+            "spec_sha256": "1c2d16d29fd7f6bbd09b4748df383130d42698c6dfbf117e9edf00221b9434ee",
+            "source_sha256": "180c07f62bae30ca985d18a5e4a674859be4bcbc3c66e9dee11afda6ba3bb9ba"
+          }
+        }
+      ]
+    },
+    {
+      "window": "nad002",
+      "manifest_sha256": "28e6f6d599b274243afd433941e8229ee0ef59053ac890ee0345c9086d5f1239",
+      "manifest": "docs/experiments/w9-inputs/saved-trial-scoring/nad002.json",
+      "point_count": 1,
+      "controls_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T175608Z-acf7c868/full/published.tar",
+      "controls_archive_sha256": "add5f8cdd2bd18c6906e47e39bc96bcca4152867479e28f3802221bf0694b258",
+      "controls_gate_passed": true,
+      "trials": [
+        {
+          "policy": "s2_o0",
+          "archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T175608Z-acf7c868/full/published.tar",
+          "archive_sha256": "add5f8cdd2bd18c6906e47e39bc96bcca4152867479e28f3802221bf0694b258",
+          "source_sha256": "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a",
+          "transport_sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+          "target_kbps": 51.21346444444445,
+          "roi_sha256": null,
+          "original_job": "20261031T175608Z-acf7c868",
+          "gate": {
+            "status": "complete",
+            "gate_passed": true,
+            "checks": {
+              "frames": true,
+              "multi_cpu": true,
+              "tools_pinned": true,
+              "inputs": true,
+              "offsets": true,
+              "streams_match_rows": true,
+              "roi_raises_rate": true,
+              "offset0:search_consistent": true,
+              "controls_scales": true,
+              "projection": true
+            },
+            "spec_sha256": "436ed5be7843a416104724021bb91d0f559652d5e8e3d1c638da521f31f52a89",
+            "source_sha256": "56e13dc9a5b521f684dad9c88c48ca07d3704c0cedc83c2a76f3eea54fc9f9f0"
+          }
+        }
+      ]
+    }
+  ]
+}

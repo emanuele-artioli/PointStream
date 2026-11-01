@@ -1,0 +1,28 @@
+{
+  "command": [
+    "/Users/manu/miniconda3/bin/python",
+    "-m",
+    "experiments.tennis.w9_full_audit",
+    "--job",
+    "/private/tmp/w8-exclusive-recovery-20261101",
+    "--manifest",
+    "docs/experiments/w8-inputs/amendment-20261101/selection.json",
+    "--hybrid",
+    "/private/tmp/w9-inbox/20261031T180054Z-b9927a25/full/published.tar",
+    "--windows",
+    "/private/tmp/w9-real-parser-inputs/540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed",
+    "--out-dir",
+    "/private/tmp/w8-exclusive-independent-audit-20261101",
+    "--archive-sha256",
+    "f87e9cba68063fb115828dddbffb9b7fbaffa1e61003ac4292f4adfaab1cc41f",
+    "--spec-sha256",
+    "e9d926b6f61685a288e90225c38bd1d84050c9187dfa25180d298ce317b03230"
+  ],
+  "exit_code": 1,
+  "cpu_seconds": 0.129421,
+  "wall_seconds": 0.1837275829166174,
+  "cpu_hard_limit_s": 10,
+  "wall_limit_s": 30,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/Users/manu/.codex/worktrees/3cb5/PointStream/experiments/tennis/w9_full_audit.py\", line 110, in <module>\n    main()\n  File \"/Users/manu/.codex/worktrees/3cb5/PointStream/experiments/tennis/w9_full_audit.py\", line 106, in main\n    audit(a.job, a.manifest, a.hybrid, a.windows, a.out_dir, a.archive_sha256, a.spec_sha256)\n  File \"/Users/manu/.codex/worktrees/3cb5/PointStream/experiments/tennis/w9_full_audit.py\", line 55, in audit\n    raise ValueError(f\"full summary missing or changed staged input: {item['name']}\")\nValueError: full summary missing or changed staged input: encode_x1\n"
+}

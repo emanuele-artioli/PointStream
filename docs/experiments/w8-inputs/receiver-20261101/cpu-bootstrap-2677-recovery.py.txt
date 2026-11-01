@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""One read-only recovery and process snapshot; run only when root assigns it."""
+import base64
+import json
+from pathlib import Path
+import resource
+import shlex
+import subprocess
+import time
+
+resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+OUTPUT = Path('/private/tmp/w8-receiver-cpu-preflight-2677-recovery-20261101')
+ROOT = '/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-2677c1790200-qualification-20261101'
+EXPECTED = 'fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635'
+REMOTE = r'''import base64,hashlib,json,os,resource
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(3,3))
+root=Path(ROOT); result={'root_exists':root.is_dir(),'receipts':{},'matching_pids':[]}
+source=root/'source.tar'
+if source.is_file():
+ h=hashlib.sha256()
+ with source.open('rb') as f:
+  for block in iter(lambda:f.read(1048576),b''):h.update(block)
+ result['source_archive']={'bytes':source.stat().st_size,'sha256':h.hexdigest(),'expected_match':h.hexdigest()==EXPECTED}
+paths=['results/result.json','results/config.json','results/identities/inventory.json','results/identities/pilot.json',
+       'results/identities/process.json','results/identities/exit.json','results/identities/stdout',
+       'results/identities/stderr','results/identities/assets.json','results/main/worker-config.json',
+       'results/main/process.json','results/main/exit.json','results/main/stdout','results/main/stderr',
+       'results/main/worker/preflight.json','results/jcv/worker-config.json','results/jcv/process.json',
+       'results/jcv/exit.json','results/jcv/stdout','results/jcv/stderr','results/jcv/worker/preflight.json']
+total=0
+for name in paths:
+ path=root/name
+ if not path.is_file():continue
+ size=path.stat().st_size
+ if size>2*1024*1024 or total+size>4*1024*1024:raise ValueError('receipt size bound exceeded')
+ data=path.read_bytes()
+ if len(data)!=size:raise ValueError('receipt changed during read')
+ total+=size
+ result['receipts'][name]={'bytes':size,'sha256':hashlib.sha256(data).hexdigest(),'base64':base64.b64encode(data).decode()}
+needle=str(root).encode()
+for proc in Path('/proc').iterdir():
+ if not proc.name.isdigit() or int(proc.name) in (os.getpid(),os.getppid()):continue
+ try:argv=(proc/'cmdline').read_bytes().split(b'\0')
+ except OSError:continue
+ if any(needle in a for a in argv) and any(a.endswith(b'/w8_receiver_preflight.py') or a==b'experiments.tennis.w8_receiver_bootstrap' for a in argv):
+  result['matching_pids'].append(int(proc.name))
+print(json.dumps(result,sort_keys=True))'''
+
+
+def ssh_limit():
+    resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+
+
+def main():
+    OUTPUT.mkdir(mode=0o700, exist_ok=False)
+    program = 'ROOT=' + repr(ROOT) + '\nEXPECTED=' + repr(EXPECTED) + '\n' + REMOTE
+    command = ' '.join(shlex.quote(x) for x in ('/usr/bin/timeout', '--signal=TERM', '--kill-after=2',
+                                                '45s', 'python3', '-B', '-c', program))
+    start = time.monotonic()
+    try:
+        proc = subprocess.run(['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', 'gpu6', command],
+                              stdin=subprocess.DEVNULL, capture_output=True, close_fds=True, timeout=55,
+                              preexec_fn=ssh_limit, check=False)
+    except subprocess.TimeoutExpired:
+        (OUTPUT / 'unknown.json').write_text(json.dumps({'status': 'unknown_inspect_do_not_replay'}))
+        raise
+    (OUTPUT / 'stderr').write_bytes(proc.stderr)
+    if proc.returncode or len(proc.stdout) > 6 * 1024 * 1024:
+        (OUTPUT / 'failure.json').write_text(json.dumps({'exit': proc.returncode, 'stdout_bytes': len(proc.stdout)}))
+        raise RuntimeError('read-only recovery failed or exceeded size limit')
+    payload = json.loads(proc.stdout)
+    (OUTPUT / 'snapshot.json').write_text(json.dumps({k: v for k, v in payload.items() if k != 'receipts'}, indent=2))
+    for name, entry in payload['receipts'].items():
+        import hashlib
+        data = base64.b64decode(entry['base64'], validate=True)
+        if len(data) != entry['bytes'] or hashlib.sha256(data).hexdigest() != entry['sha256']:
+            raise ValueError('recovered receipt identity mismatch')
+        target = OUTPUT.joinpath(*Path(name).parts)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open('xb') as stream:
+            stream.write(data)
+    usage = {'remote_cpu_ceiling_seconds': 3, 'local_cpu_ceiling_seconds': 1, 'ssh_cpu_ceiling_seconds': 1,
+             'shell_and_timeout_reserve_seconds': 1, 'operational_reserve_seconds': 1, 'total_upper_seconds': 7,
+             'wall_seconds': time.monotonic() - start, 'local_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+             'ssh_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2]),
+             'receipt_count': len(payload['receipts']), 'matching_pids': payload['matching_pids']}
+    (OUTPUT / 'recovery.json').write_text(json.dumps(usage, indent=2))
+    print(json.dumps({'output': str(OUTPUT), 'receipt_count': usage['receipt_count'], 'matching_pids': usage['matching_pids']}))
+
+
+if __name__ == '__main__':
+    main()

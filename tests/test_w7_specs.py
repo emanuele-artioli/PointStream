@@ -215,6 +215,17 @@ def test_plan_groups_respect_every_cap_and_nest():
             assert any({w.name for w in g} <= {w.name for w in u} for u in groups[upstream]), (upstream, [w.name for w in g])
 
 
+def test_native_groups_admit_the_passing_smoke_and_exclude_the_failed_one():
+    # Measured on this grid (2026-10-31): al034+med024 smoke wall 29.6 s passed the validator (projected 1,110 s); al043+med000+med019
+    # 36.2 s failed it (projected 1,357 s, job 8fb0a603).
+    by_name = {w.name: w for w in _campaign()}
+    assert wb.group_ok('native', 'native-base', [by_name['al034'], by_name['med024']])
+    assert not wb.group_ok('native', 'native-base', [by_name['al043'], by_name['med000'], by_name['med019']])
+    # the native partition is the receiver partition: each judge group reads one native-base archive
+    groups = wb.plan_groups(_campaign())
+    assert {frozenset(w.name for w in g) for g in groups['native-base']} == {frozenset(w.name for w in g) for g in groups['receiver']}
+
+
 def test_plan_totals_and_the_saving_over_one_job_per_window():
     result = wb.plan(_campaign())
     assert result['saved_gpu_s'] > 0 and result['total_gpu_s'] < result['unbatched_gpu_s']
@@ -399,3 +410,36 @@ def test_batch_scores_only_the_rules_svt_anchors(tmp_path):
     args = out['arguments']
     assert args[args.index('--offsets') + 1:args.index('--offsets') + 2] == ['-20'] and '-40' not in args
     assert out['scale']['max_encodes']['full'] == 6
+
+
+def test_w7_data_directory_can_be_isolated_for_tier2():
+    assert sp.data_dir(sp.DATA + '/tennis/w7-tier2-20261031/fit').endswith('/w7-tier2-20261031/fit')
+    with pytest.raises(ValueError):
+        sp.data_dir(sp.DATA + '/tennis/../other')
+    with pytest.raises(ValueError):
+        sp.data_dir('/tmp/w7')
+
+
+def test_batch_uses_manifest_filename_for_immutable_final_manifest(tmp_path):
+    path = tmp_path / 'windows-final.json'
+    path.write_bytes(WINDOWS_JSON.read_bytes())
+    output = wb.batch(['native-base', str(path), str(tmp_path), '--windows', 'al034'])
+    spec = json.loads(output.read_text())
+    windows = next(x for x in spec['staged_inputs'] if x['name'] == 'windows')
+    assert windows['path'] == sp.W7_DIR + '/windows-final.json'
+    assert windows['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def test_bank_counts_png_crops_not_codec_variants():
+    from experiments.tennis import w7_rates
+
+    refs = [{'file': f'{crop}.{codec}.ref', 'codec': codec, 'bytes': size}
+            for crop, size in (('a', 100), ('b', 200))
+            for codec in ('png', 'jpeg70', 'jpeg85', 'jpeg95')]
+    row = {'window': 'al028', 'match': 'alcaraz_hurkacz', 'reference_files': refs,
+           'references': {'png_bytes': 300}, 'keypoints': {'contract': {'fps': [25, 1]}, 'bytes': 100}}
+    rate = w7_rates.rates({'rows': [row]})['al028']
+    assert rate['match_bank_kbps_7200'] == pytest.approx(w7_rates.kbps(1800, 7200))
+    row['references']['png_bytes'] = 301
+    with pytest.raises(ValueError, match='byte total mismatch'):
+        w7_rates.rates({'rows': [row]})

@@ -1,0 +1,31 @@
+{
+  "command": [
+    "/Users/manu/miniconda3/bin/python",
+    "-m",
+    "experiments.tennis.w9_full_audit",
+    "--job",
+    "/private/tmp/w8-exclusive-recovery-20261101",
+    "--manifest",
+    "docs/experiments/w8-inputs/amendment-20261101/selection.json",
+    "--hybrid",
+    "/private/tmp/w9-inbox/20261031T180054Z-b9927a25/full/published.tar",
+    "--windows",
+    "/private/tmp/w9-real-parser-inputs/540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed",
+    "--out-dir",
+    "/private/tmp/w8-exclusive-independent-audit-20261101-v2",
+    "--archive-sha256",
+    "f87e9cba68063fb115828dddbffb9b7fbaffa1e61003ac4292f4adfaab1cc41f",
+    "--spec-sha256",
+    "e9d926b6f61685a288e90225c38bd1d84050c9187dfa25180d298ce317b03230"
+  ],
+  "code_revision": "142b6cc5c3920ded37017b7547c34a75abe7c883",
+  "audit_code_sha256": "e1e9316e2b438a512243d433eeccf13a7611f429f2ad45050eb74519d3d14b5d",
+  "exit_code": 0,
+  "cpu_seconds": 0.14022,
+  "wall_seconds": 0.21068066684529185,
+  "cpu_hard_limit_s": 9,
+  "wall_limit_s": 30,
+  "prior_audit_cpu_s": 0.129421,
+  "stdout": "",
+  "stderr": ""
+}

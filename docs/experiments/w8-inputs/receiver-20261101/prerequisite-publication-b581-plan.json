@@ -1,0 +1,37 @@
+{
+  "GPU_seconds": 0,
+  "acceptance": "separate child Python rereads 3 files and manifest with stable stat, hashes, size, 0444 and exact directory membership",
+  "command_bytes": 70527,
+  "command_sha256": "3af2eebea433afc86d8491095404fbbccb1daa595d1b453fbcf25f2997de4fab",
+  "cpu_allocation": {
+    "external_audit_reserve": 3,
+    "local_launcher": 2,
+    "remote_audit": 1,
+    "remote_writer": 2,
+    "shell": 1,
+    "ssh": 1
+  },
+  "inputs": {
+    "bundle.json": [
+      36391,
+      "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5"
+    ],
+    "identity.json": [
+      67065,
+      "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe"
+    ],
+    "oracle.json": [
+      145765,
+      "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc"
+    ]
+  },
+  "local_wall_seconds": 130,
+  "max_cpu_seconds": 10,
+  "payload_sha256": "815e65a95587f9980e165faef1785e437abda535fd70d1fb73f7274331f90a6d",
+  "remote_program_sha256": "d8657645d1e1d18b9cc5905b1ba4b0183a9d017a1f97e946a597986712c400a8",
+  "remote_wall_seconds": 120,
+  "scope": "CPU preflight prerequisites; does not authorize GPU work",
+  "source": "shared Datasets, exact new directory only",
+  "state": "prepared_not_launched",
+  "target": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101"
+}

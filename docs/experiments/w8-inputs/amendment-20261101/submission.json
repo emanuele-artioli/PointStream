@@ -1,0 +1,78 @@
+{
+  "job_id": "20261101T071706Z-afde26d5",
+  "status": "pending",
+  "config": {
+    "schema": 1,
+    "hosts": [
+      "gpu2",
+      "gpu5",
+      "gpu6",
+      "gpu1",
+      "gpu4",
+      "gpu3"
+    ],
+    "base": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet",
+    "release": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261101T071313Z-74a9271d",
+    "pythons": {
+      "gpu1": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu2": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu3": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu4": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu5": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu6": "/home/itec/emanuele/.conda/envs/pointstream/bin/python"
+    },
+    "doctor": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/c99532e05e31483db412c337536ba0ec",
+    "management_host": "gpu2",
+    "management_python": "/usr/bin/python3"
+  },
+  "spec_sha256": "781dc0ba6fef4db759f7b1d24a755b452fcf312e44cc40ee668b965fde20c840",
+  "snapshot": {
+    "git_head": "a5fdb23536c646851a83b226789ee3e68ccc50a9",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 0,
+    "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_excluded_sample": [],
+    "deleted_paths": [],
+    "snapshot_sha256": "5a168fe0de1c99c4e97866cd963a1b6ba976e8ff24bed8765cf8df42d03c4be4"
+  },
+  "chat_id": "01a193b2-6eb8-7821-a4b4-86db3e8f8d69",
+  "source_archive": true,
+  "source_sha256": "a318757b0e8144a34f2079462e99433175abeb50c7e29b93048059565b906e77",
+  "input_check": {
+    "hashed": [
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172501Z-a37a90cd/full/window-state.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-amendment-20261101/selection-4f5af8c9.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T180054Z-b9927a25/full/published.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-01d5aa85/full/published.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173108Z-0782499a/full/published.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-e4dc2d25/full/published.tar"
+    ],
+    "deferred": [
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+      "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz"
+    ],
+    "deferred_bytes": 5813050390,
+    "deferred_to": "campaign"
+  },
+  "monitoring": {
+    "chat_id": "01a193b2-6eb8-7821-a4b4-86db3e8f8d69",
+    "events_command": "/Users/manu/.codex/worktrees/3cb5/PointStream/scripts/ps-fleet events 20261101T071706Z-afde26d5",
+    "wait_command": [
+      "/Users/manu/.codex/worktrees/3cb5/PointStream/scripts/ps-fleet",
+      "wait",
+      "20261101T071706Z-afde26d5",
+      "--max-seconds",
+      "2700"
+    ],
+    "mode": "completion_first",
+    "watchdog_seconds": 2700,
+    "heartbeat_required": false,
+    "recurring_polling": false
+  }
+}

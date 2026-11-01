@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.w8_score_job"
+  ],
+  "arguments": [
+    "--windows-file",
+    "{staged:windows}",
+    "--window-state",
+    "{staged:state}",
+    "--window",
+    "nad000",
+    "--source",
+    "{staged:nad000}",
+    "--masks",
+    "{staged:masks}",
+    "--hybrid",
+    "{staged:hybrid}",
+    "--lpips",
+    "{staged:lpips}",
+    "--dists",
+    "{staged:dists}",
+    "--encode-half",
+    "{staged:encode_half}",
+    "--primary",
+    "kps2",
+    "--judged",
+    "{judged}",
+    "--allow-ada",
+    "--encode-extra",
+    "{staged:encode_x1}",
+    "--repair-manifest",
+    "{staged:repair_manifest}"
+  ],
+  "staged_inputs": [
+    {
+      "name": "windows",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+      "sha256": "540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed",
+      "extract": false
+    },
+    {
+      "name": "state",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172501Z-a37a90cd/full/window-state.json",
+      "sha256": "f2b4131e1231fe654840aa41465a424d9f9337957ee5cb50f1a432ca57c6ca30",
+      "extract": false
+    },
+    {
+      "name": "nad000",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+      "sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+      "extract": false
+    },
+    {
+      "name": "masks",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173108Z-0782499a/full/published.tar",
+      "sha256": "4eb91e79c287a49accc17fcd115819e7345bc078d49e1477ce43ccdf87cd549b",
+      "extract": false
+    },
+    {
+      "name": "hybrid",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T180054Z-b9927a25/full/published.tar",
+      "sha256": "bf05e2630d898a2ec68452f81407e063b0f0ad0490365c41d53a3988f5adb299",
+      "extract": false
+    },
+    {
+      "name": "encode_half",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-01d5aa85/full/published.tar",
+      "sha256": "6496e427f4aa282c1a77acd0924685ded8d5323a11ca6df757b3bd9e598a8030",
+      "extract": false
+    },
+    {
+      "name": "lpips",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "extract": false
+    },
+    {
+      "name": "dists",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    },
+    {
+      "name": "encode_x1",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-e4dc2d25/full/published.tar",
+      "sha256": "9736920b256b2b770c3b35e8784570a50df2720115fbb134970439adea4240f0",
+      "extract": false
+    },
+    {
+      "name": "repair_manifest",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-amendment-20261101/selection-4f5af8c9.json",
+      "sha256": "4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+      "sha256": "540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172501Z-a37a90cd/full/window-state.json",
+      "sha256": "f2b4131e1231fe654840aa41465a424d9f9337957ee5cb50f1a432ca57c6ca30"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+      "sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173108Z-0782499a/full/published.tar",
+      "sha256": "4eb91e79c287a49accc17fcd115819e7345bc078d49e1477ce43ccdf87cd549b"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T180054Z-b9927a25/full/published.tar",
+      "sha256": "bf05e2630d898a2ec68452f81407e063b0f0ad0490365c41d53a3988f5adb299"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-01d5aa85/full/published.tar",
+      "sha256": "6496e427f4aa282c1a77acd0924685ded8d5323a11ca6df757b3bd9e598a8030"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-e4dc2d25/full/published.tar",
+      "sha256": "9736920b256b2b770c3b35e8784570a50df2720115fbb134970439adea4240f0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-amendment-20261101/selection-4f5af8c9.json",
+      "sha256": "4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [
+    "ffmpeg"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.w8_score_job",
+    "--validate"
+  ],
+  "deadline": "2026-11-01T07:56:32.398155+00:00",
+  "verify_staged_inputs": true,
+  "stall_seconds": 900.0,
+  "contention": {
+    "policy": "continue",
+    "basis": "Deterministic scoring of saved streams does not depend on foreign workload timing.",
+    "resume_attempts": 0
+  },
+  "device": "gpu",
+  "hosts": [
+    "gpu2",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX A6000",
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 8000,
+  "cpu_threads": 1,
+  "local_storage_gib": 30,
+  "smoke": {
+    "seconds": 40,
+    "representative_basis": "Three original ticks for the exact saved CRF 67 trial and all three original CRF63 controls; source and mask identities, decode SHA and four metrics; measured projection must fit full and remaining GPU/CPU caps."
+  },
+  "full": {
+    "seconds": 160
+  },
+  "validator_seconds": 20,
+  "budget_seconds": 230,
+  "scale": {
+    "judged": {
+      "smoke": 3,
+      "full": 0
+    }
+  },
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Deterministic scoring of saved streams does not depend on foreign workload timing.",
+    "margin_mib": 8192
+  },
+  "single_cpu_campaign": true,
+  "defer_failed_publication": true,
+  "deadline_epoch": 1793519792.398155
+}

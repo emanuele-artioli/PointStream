@@ -22,17 +22,26 @@ def kbps(n_bytes: float, seconds: float) -> float:
     return n_bytes * 8 / seconds / 1000
 
 
-def rates(transport: dict[str, Any]) -> dict[str, dict[str, float]]:
+def rates(transport: dict[str, Any], adapter_bytes: dict[str, int] | None = None) -> dict[str, dict[str, float]]:
+    if any(k in ADAPTER_BYTES and v != ADAPTER_BYTES[k] for k, v in (adapter_bytes or {}).items()):
+        raise ValueError('a frozen adapter charge changed')
+    charges = {**ADAPTER_BYTES, **(adapter_bytes or {})}
+    if any(not isinstance(v, int) or isinstance(v, bool) or v <= 0 for v in charges.values()):
+        raise ValueError('adapter charges must be positive integer bytes')
     out: dict[str, dict[str, float]] = {}
     for row in transport['rows']:
         fps = row['keypoints']['contract']['fps'][0]
-        crops = len(row['reference_files'])
-        if crops == 0:
-            raise ValueError(f"{row['window']}: no reference crops")
-        bank_bytes = row['references']['png_bytes'] * BANK_CROPS / crops
+        # Each crop has PNG plus JPEG alternatives. Count only the transmitted
+        # lossless PNG entries, not the number of encoded alternatives.
+        png = [f for f in row['reference_files'] if f['codec'] == 'png']
+        if not png or len({f['file'] for f in png}) != len(png):
+            raise ValueError(f"{row['window']}: missing or duplicate PNG references")
+        if sum(f['bytes'] for f in png) != row['references']['png_bytes']:
+            raise ValueError(f"{row['window']}: PNG reference byte total mismatch")
+        bank_bytes = row['references']['png_bytes'] * BANK_CROPS / len(png)
         out[row['window']] = {'keypoint_kbps': kbps(row['keypoints']['bytes'], 240 / fps),
                               'match_bank_kbps_7200': kbps(bank_bytes, AMORTISED_SECONDS),
-                              'adapter_guider_kbps_7200': kbps(ADAPTER_BYTES[row['match']], AMORTISED_SECONDS),
+                              'adapter_guider_kbps_7200': kbps(charges[row['match']], AMORTISED_SECONDS),
                               # worst-case sensitivity: the window's own crops billed over the 240-frame window alone
                               'bank_worst_case_kbps': kbps(row['references']['png_bytes'], 240 / fps)}
     return out
@@ -68,11 +77,15 @@ def compute(transport_json: Any, base_archive: Any, windows_file: Any, names: li
     from experiments.tennis import window_manifest as wm
 
     transport = json.loads(Path(transport_json).read_text())
+    manifest = json.loads(Path(windows_file).read_text())
+    charges = manifest.get('adapter_bytes', {})
+    if any(match not in wm.ADAPTERS or manifest.get('adapters', {}).get(match) != wm.ADAPTERS[match] for match in charges):
+        raise ValueError('adapter charge has no matching fitted adapter identity')
     specs = {w.name: w for w in wm.select(wm.load(Path(windows_file)), names or None)}
     rows = base_rows(base_archive)
     by_id = {r['window']: r for r in transport['rows']}
     state = {name: window_state(rows, by_id[spec.id], name) for name, spec in specs.items()}
-    return {'rates': rates({'rows': [by_id[spec.id] for spec in specs.values()]}), 'window_state': state}
+    return {'rates': rates({'rows': [by_id[spec.id] for spec in specs.values()]}, charges), 'window_state': state}
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -1,0 +1,35 @@
+{
+  "scope": "W8 local diagnostic and accounting evidence; no full Gate 1 claim",
+  "receipt_sha256": {
+    "checkpoint-oracle-local-20261101.json": "8655599b52f20f06cfaed26e4629c0d3301b299f6b5e58cd3d0a5efadb650f28",
+    "anchor-oracle-local-20261101.json": "99e8c4aa97bd7a8b840c88dc6cabaef4c398c21b363fadf8b2ac8795640eb53c",
+    "bundle-oracle-local-20261101.json": "86c4e53a21d1d60685963bcba41530c3fc7e1a4a90fe31e5c21cb09c1d8e114c",
+    "bundle-setup-failure-20261101.json": "c76d9269f67851d568633d29e19e35e406b3f81bdbcca8e70bc1c4b06f628f0a"
+  },
+  "original_receipt_paths": {
+    "checkpoint-oracle-local-20261101.json": "/private/tmp/w8-checkpoint-oracle-20261101/receipt.json",
+    "anchor-oracle-local-20261101.json": "/private/tmp/w8-anchor-oracle-20261101/receipt.json",
+    "bundle-oracle-local-20261101.json": "/private/tmp/w8-bundle-oracle-20261101-v2/receipt.json",
+    "bundle-setup-failure-20261101.json": "/private/tmp/w8-bundle-oracle-20261101-failure.json"
+  },
+  "candidate_wire": {
+    "path": "/private/tmp/w8-bundle-oracle-20261101-v2/window.psw8",
+    "sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+    "bytes": 2289836
+  },
+  "match_wire": {
+    "path": "/private/tmp/w8-checkpoint-oracle-20261101/match.psw8",
+    "sha256": "fef98258469b57ae4518a1ef570579e9918de7435b310737a04cdfaeb15bb810",
+    "bytes": 1897395
+  },
+  "code_sha256_at_closeout": {
+    "experiments/tennis/w8_payload.py": "9629bc596923540cf9eb3e17ebcc6b1c2b3000de15cf5019c33e083153a69a64",
+    "experiments/tennis/w8_oracle.py": "64cdb820b457c608ce6ec361cefe48cec605a4e55173b40494e627577320a249",
+    "experiments/tennis/w8_checkpoint_oracle.py": "67912b5d733aa31b5602ea53b67af2b79d4f659d9c51955f7bf818b57ba51d11",
+    "experiments/tennis/w8_anchor_oracle.py": "68ac9adde1232f85b29008dae350e24f48fe78f6dadb02f15e97556451535bc9",
+    "experiments/tennis/w8_bundle_oracle.py": "b21ebafe60724ad3c3864bd9429f17dbf596b534cac18546b4ad649dae5e5881"
+  },
+  "code_identity_limitation": "These are closeout hashes, not contemporaneously captured code hashes for every run. The checkpoint and anchor diagnostics predate later edits to shared helper modules; do not represent these closeout hashes as proof of their exact historical code. The bundle receipt captures its declared receiver/renderer source hashes, and its hash-identified output remains available at the recorded path.",
+  "runtime": "Checkpoint receipt records local torch 2.5.1 one thread; bundle and anchor used local CPU Python; these do not establish the packed production environment.",
+  "conservative_cpu_ledger": "Suggested rounded charges: checkpoint 6 s; anchor 1 s; bundle 2 s; setup failure 1 s. Receipts snapshot process CPU before receipt publication/teardown, so these are estimates, not independently measured whole-process upper bounds. Transfers and other jobs are accounted separately."
+}

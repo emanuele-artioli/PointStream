@@ -21,9 +21,59 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-10-29)
+## Where PointStream stands (2026-11-01)
 
-**Read first: [assessment 2026-10-29](docs/assessment-2026-10-29.md).** No
+**Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
+Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library
+inventory and CPU input/runtime qualification passed their recorded narrow gates.
+The latter qualifies 91 AA source/config files, one exact generated-manifest
+exception excluded from source grants, 160 SAM hashes and the original isolated
+MAIN/JCV runtime guards. Historical process-group IDs were not recorded; current
+known children/task processes were absent. This is no fresh decoder-quality,
+full cached-environment, sustained-reference or live-rate claim.
+
+**Current receiver decision:** the cost pilot `20261101T135101Z-d67fe593`
+failed before packet decode because its source package omitted two required
+helpers. That request is closed. The corrected package passed the real isolated
+CPU decoder and an independent audit:237 source files,480 tensor fingerprints,
+both unit hashes and the recorded isolation checks match. No learned output or
+fresh quality claim follows. Original W8 cumulative is **≤2,165/3,600 CPU-s
+and352/3,600 GPU-s**; at least1,435 CPU-s /3,248 GPU-s remain. No live job,
+reservation or wait exists. The root-reviewed [source repair amendment](docs/cards/w8-source-package-repair.md)
+asks the user for one bounded replacement cost pilot (580 CPU-s /500 GPU-s,
+inside original totals). No retry or30-step work is authorized until the answer
+and subsequent source, host and budget gates. See the [W8 entry](docs/experiments/w8-wire-audit.md).
+
+Overleaf main is `a6679181`, with the confirmed author block, ATHENA
+acknowledgment and organic PRESLEY citation beside ELVIS/GenStream. Review:
+22 body/reference pages plus 3 appendix pages; isolated small-format probe:
+23+3, within the user's 23+5 limit. Useful scientific negatives remain in the
+appendix. MoQSplat/TIGAS were reviewed and omitted as indirect. The paper is not
+submission-ready: finish the bounded witness decision and final publication
+checks. Code `b58155b4` passed CI; draft PR #325 will need exact-head checks after
+its evidence/documentation update.
+
+**2026-10-31 accounting correction:** the W7 transport lists PNG and
+JPEG variants of two reference crops. `w7_rates.rates` counted eight files as
+eight crops, undercharging the modeled 12-crop reference bank by a factor of
+four. Saved-evidence recomputation gives Tier 1 player LPIPS +0.0965
+[+0.0349, +0.1581], DISTS +0.0810 [+0.0529, +0.1091], conditional on the
+anchor families still resolved at the corrected rates. Tier 2 no longer
+passes the original rule: LPIPS +0.0671 [−0.0011, +0.1354], DISTS +0.0667
+[+0.0440, +0.0894]. All nine SVT coverage gaps caused by the correction are
+now repaired from verified archived encodes, using 1,043 GPU-s. Tier 2 has
+all four anchor families bracketed and remains inconclusive at two hours.
+Tier 1 retains three original missing Med comparisons. The conditional joint
+duration model passes about 133–198 minutes within measured coverage; this is
+not a global minimum break-even length or a complete bitstream result.
+Historical W7 closure claims below are superseded by this correction. Original
+outputs remain unchanged; all repair jobs are terminal. The then-current 23-page Overleaf
+draft included the result, with fresh decoding, reference persistence and
+flicker still unresolved. See [W9's audit](docs/experiments/w9-adapter-break-even.md),
+merged [PR #315](https://github.com/emanuele-artioli/PointStream/pull/315), and
+[repair PR #316](https://github.com/emanuele-artioli/PointStream/pull/316).
+
+**Historical background: [assessment 2026-10-29](docs/assessment-2026-10-29.md).** No
 configuration beats SVT-AV1 on whole-frame LPIPS and DISTS once every bit is
 paid for. In tennis the whole frame is decided by the background at the
 tested rate (~23 kbps, 1080p): even source pixels for the players gain only
@@ -110,6 +160,10 @@ sessions update their own items and their files in `docs/experiments/`
 ([sessions](docs/sessions.md)).
 
 ### Resume here after the root chat is archived
+
+**Latest (2026-11-01): read [the 2026-11-01 continuation](docs/continuation-2026-11-01.md) first.**
+The later billing correction above supersedes the earlier two-tier W7 closure.
+Work continues in Codex sessions; the 2026-10-27 text below is historical.
 
 Read [the 2026-10-27 continuation](docs/continuation-2026-10-27.md) first. It
 contains the current scientific stop, exact job/artifact identities, remaining
@@ -330,6 +384,12 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
+| W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-results-2026-11-01` (policy PR #322 merged) | primary plus Terra 6.1 medium delegates | complete: `20261101T081828Z-d70bc44f`, gpu6 exclusive Ada, frozen source `c0f25e4e` / spec `e9d926b6`; independent full audit and raw screen pass all 8 cells at 46.3151 kbps. Initial two cost stops preserved. Combined inclusive scoring 224 GPU-s / ≤304 CPU-s of 450/450; original total after 15 CPU-s runtime preflight: 224 GPU-s / ≤1,169 CPU-s of 3,600/3,600. Processes/claims/waits closed. No training/encoding/model/payload/quality-rule change. |
+| W8 Linux exact-input oracle and fresh receiver gates | [original W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/w8-receiver-witness-2026-11-01`, draft PR #325 | primary plus scoped delegates | Exact inputs, saved pixels, native inventory and CPU source/runtime gates independently accepted with scoped lifecycle metadata. Cost request `20261101T135101Z-d67fe593` failed on two omitted source helpers before packet decode; closed ≤208 CPU-s /128 GPU-s. Corrected-source CPU qualification independently passes; original cumulative ≤2,165 CPU-s /352 GPU-s, no live reservation. One bounded580 CPU/500 GPU replacement awaits user amendment; no fresh quality/30-step admission. |
+| W8 approved upper-baseline amendment (historical, followed by exclusive repair) | [coverage follow-up](docs/experiments/w8-inputs/prospective-coverage-followup.md) | `codex/w8-cost-reallocation-2026-11-01` (predecessor PR #320 merged) | primary plus Terra 6.1 medium delegates | stopped 2026-11-01: first request `20261101T071706Z-afde26d5` passed correctness but failed cost projection, second `20261101T073429Z-04a50c10` hit its smoke limit on shared GPU; both terminal/claims released, no full quality point or third run. Amendment ≤87 CPU-s/67 GPU-s of 300/300; cumulative W8 ≤937 CPU-s/67 GPU-s of 3,600/3,600. Subsequent exclusive-GPU 450/450 inclusive scoring-cap amendment approved; its distinct request is tracked in the row above, original totals unchanged. Fixed packet/rate and quality/receiver gates unchanged. |
+| Fleet all-status read latency | [fleet status contract](docs/fleet.md) | `codex/fleet-status-read-concurrency-2026-11-01` | primary plus Terra 6.1 medium delegate | local fix reviewed 2026-11-01 after a 600-s NFS all-status timeout: bounded concurrent per-request reads, unchanged sorted live-state semantics, no history cache/filter or mutations. Focused tests pass; runtime speed/server impact unverified. No deployment, worker restart or GPU work; publish/verify a manager release only through reviewed fleet operations after inspecting existing worker identity. |
+| Submission readiness and W8 witness (initial screen; see later rows) | [authorized W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/submission-readiness-2026-11-01` | primary plus three Terra 6.1 medium delegates | verification 2026-11-01: complete PLAN/evidence audit and negative-results online appendix done; W8 initial fixed actual-payload rate screen stopped unresolved (46.3151 kbps vs one anchor's 45.8233 upper bracket), 0/3,600 GPU-s, ≤850/3,600 CPU-s conservative envelope, no new fleet jobs/reservations. Local tensor bytes exact; Mac geometry equality and original packed/source-hidden inference unverified. No retry, redesign or repair under stopped card without amendment. Main+refs 23 pages plus 5 appendix allowed; current draft 22+3. Other open PLAN tasks triaged in paper task/evidence audits; scientific limits remain. |
+| Paper continuation and W7 accounting audit | [2026-10-31 handoff](docs/continuation-2026-10-31.md) | `codex/w7-anchor-repair-2026-10-31` (merged #315 and #316) | primary plus Terra 6.1 medium delegates | repair complete 2026-10-31: all six GPU requests independently full-audited, root recomputation exact, GPU 1,043/5,400 s, CPU ≤1,924/5,400 s, no active jobs/reservations; at 2 h familiar-match rule passes conditionally, unseen-match LPIPS includes zero despite all four anchors; conditional modeled joint pass about 133–198 min, not global L*; Overleaf `a3e2888d` updated (23 pages). W6b scale stop, W11 labels blocked, W8 fresh-decoder witness proposed for separate authority |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 | J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
 | H5p 4–5 | F in the foreground stream; visual check | `claude/h5p-f-stream` @ `3b11a36` | Opus | reported 2026-10-22: 4a fail (F billed +93% wDISTS), 4b not built (LPIPS), crops ready; 2.6 GPU-hours of 4 |
@@ -368,7 +428,8 @@ marked `card ready` is waiting for the user to start it.
 | Ideal-player appearance bound | [completed finite bound](docs/cards/k6b-ideal-timing-secondary.md) | `codex/ideal-player-full-result` | Codex | COMPLETE20261028T080453Z-34e50ec2; all80ticks, exact controls, independently audited finite NO-GO both metrics/both ideal supports;2730/3600s charged,870unused; item stopped |
 | Player joint side-rate feasibility | CPU saved-score inversion and three lossless packet wrappers | `codex/player-rate-feasibility` | Codex | COMPLETE2026-10-28; zero GPU; robust actual/ideal_R side ceilings0.668734/1.230365kbps; all three packet wrappers grow; follow-up paid clean-background test now complete |
 | Paid clean-background oracle | [new finite background proposal](docs/cards/k6b-paid-clean-background.md) | `codex/paid-clean-background` | Codex | COMPLETE2026-10-28; CPUbf9f97d2 and sameGPU27f39d64 audited; all80ticks; formal MIXED, two-metric gate FAILED;250s charge,2980/3600total,620unused; stopped |
-| W7 Tier 1 batch (five remaining windows) | [card](docs/cards/w7-tier1-batch.md) | `claude/w7-tier1-batch` | Sonnet (local, Mac) | card ready 2026-10-31; budget 6.33 GPU-h left of 8; report to root `session_01MbpYHe92aChsjy7MqXQ6jZ` |
+| W7 Tier 1 batch (five remaining windows) | [card](docs/cards/w7-tier1-batch.md) | `claude/w7-tier1-batch` | Sonnet (local, Mac) | reported 2026-10-31: Tier 1 HOLDS (pooled n=6: player LPIPS gap +0.103 [+0.041, +0.165], DISTS +0.085 [+0.057, +0.112]; Med cluster alone does not); whole frame worse in every window; ~7.1 of 8.5 GPU-h; PRs #303, #305 |
+| W7 Tier 2 (nadal_kyrgios, unseen match) | [card](docs/cards/w7-tier2.md) | `claude/w7-tier2` | Sonnet (local, Mac) | reported 2026-10-31 (Codex, PRs #307, #309, #312, #313): Tier 2 HOLDS (n=3: player LPIPS gap +0.072 [+0.005, +0.140], DISTS +0.070 [+0.048, +0.091]); whole frame worse; 12,171 of 20,000 GPU-s |
 
 **T1: the split on tennis, F billed.** Fixed-grid oracle fails weighted DISTS: +10.00% mean BD-rate, 3/8 wins even with foreground payload free.
 The fully billed split loses every metric/window; 3.12338 of 4 GPU-hours used ([report](docs/experiments/t1.md#2026-10-24--report-t1-the-billed-tennis-pixel-split)).
@@ -1386,15 +1447,49 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   ([rule](docs/experiments/w7-untouched.md)) written 2026-10-30: Tier 1
   untouched clips of Al/Med, Tier 2 the Nadal–Kyrgios match the base never
   trained on.
+  **Historical W7 outcomes, superseded by the billing correction above:**
+  **W7 Tier 1 outcome (2026-10-31):** holds by the rule on six untouched
+  Al/Med windows: player gap LPIPS +0.103 [+0.041, +0.165], DISTS +0.085
+  [+0.057, +0.112]; DCVC-UF is the strongest anchor; the whole frame is worse
+  in every window; the Medvedev cluster alone does not pass (n = 3)
+  ([outcome](docs/experiments/w7-untouched.md)).
+  **W7 Tier 2 (2026-10-31):** holds on three windows of nadal_kyrgios, a
+  match the base never trained on (adapter fitted on its first half,
+  billed): player gap LPIPS +0.072 [+0.005, +0.140], DISTS +0.070
+  [+0.048, +0.091]; DCVC-UF strongest anchor; whole frame worse. The LPIPS
+  interval barely clears zero (n = 3). W7 is closed: the foreground-first
+  claim holds on untouched footage, familiar and unseen matches.
 - **W6 outcome (2026-10-30, [entry](docs/experiments/w6-motion-pose.md)).**
   Full-rate Al hybrid, all 240 frames. Pose passes: YOLO11x-pose error 0.063
   of the box vs SVT 0.90, whose players the detector mostly misses. Time
   fails: flicker 28.6 vs SVT 18.6, residual energy 23.1 vs a limit of 16.6.
-  The racket is essentially absent (3% coverage). Narrowed claim: sharp,
-  correctly posed players that flicker more than SVT's. Next test: split the
-  flicker between the per-frame receiver masks and the generated pixels, on
-  saved outputs. W7 keeps the every-third-frame recipe.
+  The racket appears largely absent (3% coverage of a body-hull proxy, not
+  independently labelled racket recall). Narrowed claim: sharp,
+  correctly posed players that flicker more than SVT's. The saved-output split
+  identifies generated content as the main excess. The 2026-10-31 smoothing
+  timing pilot completed at 99.82/1,800 CPU-s but stopped before scale: metrics
+  alone project more than the remaining cap, and no smoothing quality result
+  exists. Any full smoothing run needs a separately budgeted proposal and a
+  packed host-local environment. W7 keeps the every-third-frame recipe.
+- **W8 wire audit and witness.** The assembled payload's saved-quality rate
+  screen now passes for one window against all four bracketed families under
+  conditional 7,200 s reuse. A source-hidden fresh reconstruction and sustained
+  reuse remain unproved. See the [audit](docs/experiments/w8-wire-audit.md) and
+  [witness](docs/cards/w8-fresh-decoder-witness.md), authorized for at most
+  3,600 GPU-s plus 3,600 workload CPU-s. The one-profile Linux CPU input
+  and isolation oracle passed independent audit; fresh GPU generation and
+  receiver reconstruction remain unqualified.
 - **W9. Adapter break-even and live adaptation (user, 2026-10-30).** The
+  2026-10-31 all-assets analysis is complete within measured coverage:
+  [result](docs/experiments/w9-adapter-break-even.md). Original Med omissions
+  prevent strict full-family joint coverage. With those explicit omissions,
+  the joint rule passes about 133–198 min, fails at two hours, and is unresolved
+  outside common coverage; no global L* is established. The nine corrected-rate
+  anchor gaps are repaired, all jobs terminal, 1,043/5,400 GPU-s and ≤1,924/5,400
+  CPU-s. Live-adaptation experiments below have not run. The adapter-only
+  development-window estimates and 0.3-hour cost estimate below are historical:
+  they must not substitute for the corrected all-assets/two-tier analysis.
+  The
   per-match adapter (about 1.49 MB) is billed as if spread over a 2-hour
   match, an arbitrary choice. Replace it with the break-even length L*: the
   shortest match for which the player win still holds once the adapter is
@@ -1424,7 +1519,10 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   180 times slower than 50 fps. Live use also needs a few-step or distilled
   generator (W10).
 - **W11. Racket (user, 2026-10-30).** The generator does not draw the racket.
-  W6 found it covers 3% of the source racket region, so the racket gets its
+  W6 found 3% coverage of a source-mask/body-hull proxy, not independent racket
+  recall. The W11 annotation audit found no eligible pixel mask linked to those
+  frames ([audit](docs/experiments/w11-racket.md)); a proxy paste cannot gate
+  a true racket path. The racket gets its
   own object path like the ball (K5/K5b) instead of being left to the player
   generator. Steps, oracle first:
   1. An oracle on W6's saved outputs: paste the source racket pixels into the

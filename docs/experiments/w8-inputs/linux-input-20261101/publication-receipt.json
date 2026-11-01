@@ -1,0 +1,27 @@
+{
+  "exclusive_create": true,
+  "files": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8",
+      "bytes": 2289836,
+      "sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+      "mode": "0444"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json",
+      "bytes": 4869,
+      "sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+      "mode": "0444"
+    }
+  ],
+  "execution": {
+    "exit_code": 0,
+    "wall_seconds": 18.65015933290124,
+    "process_cpu_limits_total_s": 5,
+    "cpu_ceiling_with_shell_timeout_reserve_s": 6,
+    "local_parent_cpu_s": 0.111267,
+    "local_children_cpu_s": 0.06063299999999999,
+    "remote_wall_limit_s": 30
+  },
+  "script_sha256": "0794fe2d2318eecd86976d94715cca32c584c22981ab247c074c0f829642d9f4"
+}

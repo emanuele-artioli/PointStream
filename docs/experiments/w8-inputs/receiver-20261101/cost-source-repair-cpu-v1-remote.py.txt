@@ -1,0 +1,79 @@
+import base64, hashlib, json, os, pathlib, resource, signal, subprocess, sys, time, zlib
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU, (6, 12))
+os.sched_setaffinity(0, {min(os.sched_getaffinity(0))})
+sha = lambda b: hashlib.sha256(b).hexdigest()
+old = Path('/local/users/emanuele/pointstream/audits/w8-receiver-runtime-qual-b581-full-v1-20261101/source')
+root = Path('/local/users/emanuele/pointstream/audits/w8-cost-source-repair-cpu-v1-20261101')
+shared = Path('/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101')
+cache = Path('/local/users/emanuele/pointstream/cache')
+main = cache / '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree'
+payload = json.loads(zlib.decompress(base64.b64decode(sys.argv[1], validate=True)))
+if set(payload) != {'map', 'extra'} or len(payload['map']) != 235 or set(payload['extra']) != {'tools/datasets/k4b_inputs.py', 'tools/datasets/k4_inputs.py'}:
+    raise ValueError('source payload schema')
+known = {'tools/datasets/k4b_inputs.py': '3e321f00892312fec4619e1f2388689d045a12d87ad61216127e463f0cd0728e', 'tools/datasets/k4_inputs.py': '36cd6e67e297204f36ebee921b7ac3039a331722f61c5db20e37993632984069'}
+for name, value in payload['extra'].items():
+    if sha(base64.b64decode(value, validate=True)) != known[name]: raise ValueError('extra source SHA mismatch')
+for name, value in payload['map'].items():
+    p = Path(name)
+    if p.is_absolute() or '..' in p.parts or len(value) != 64: raise ValueError('unsafe source map')
+local = root.parent
+if local.stat().st_dev == shared.stat().st_dev or os.statvfs(local).f_bavail * os.statvfs(local).f_frsize < 2 * 1024**3: raise ValueError('scratch filesystem or space')
+root.mkdir(mode=0o700, exist_ok=False)
+source = root/'source'; source.mkdir()
+for name, digest in sorted(payload['map'].items()):
+    src = old/name
+    if src.is_symlink() or not src.is_file() or src.stat().st_size > 2_000_000: raise ValueError('source member')
+    b = src.read_bytes()
+    if sha(b) != digest: raise ValueError('source member SHA')
+    dest = source/name; dest.parent.mkdir(parents=True, exist_ok=True)
+    with dest.open('xb') as f: f.write(b)
+for name, encoded in payload['extra'].items():
+    dest = source/name; dest.parent.mkdir(parents=True, exist_ok=True)
+    with dest.open('xb') as f: f.write(base64.b64decode(encoded, validate=True))
+(root/'source-map.json').write_text(json.dumps({**payload['map'], **known}, sort_keys=True))
+identity = shared/'identity.json'; oracle = shared/'oracle.json'
+if sha(identity.read_bytes()) != '0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe' or sha(oracle.read_bytes()) != '8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc': raise ValueError('identity/oracle SHA')
+assets = json.loads(identity.read_bytes())['protected_inputs']; oracle_data = json.loads(oracle.read_bytes())['scientific_result']; fingerprints = oracle_data['match']['tensor_fingerprints']
+if len(fingerprints) != 480 or sha(json.dumps(fingerprints,sort_keys=True,separators=(',',':')).encode()) != 'd6fe0331cf5fdbb7ab70bb761be8dc62d4e06c8f43f715c489064d2fc3375dd2': raise ValueError('oracle fingerprints')
+aliases = root/'aliases'; aliases.mkdir(); denied = {}
+for name, record in assets.items():
+    if name not in {'source','prepared','fit','golden','masks'}: raise ValueError('protected category')
+    path = Path(record['path']); st = path.stat()
+    if (st.st_dev,st.st_ino) != (record['device'],record['inode']): raise ValueError('protected inode changed')
+    denied[name] = [str(path)]; (aliases/name).symlink_to(path.resolve(strict=True))
+if set(denied) != {'source','prepared','fit','golden','masks'}: raise ValueError('protected coverage')
+denied['aliases'] = [str(aliases/name) for name in sorted(assets)]
+items = {'bundle': ('eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4','packet-eff1aca8.psw8'), 'profile': ('bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107','profile-bec98d67.json'), 'guider': ('1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488','pose_guider.pth')}
+files = {name:{'path':str(cache/digest/basename),'sha256':digest} for name,(digest,basename) in items.items()}
+out = root/'output'; out.mkdir()
+config = {'parent_user_namespace':os.readlink('/proc/self/ns/user'),'parent_network_namespace':os.readlink('/proc/self/ns/net'),'allow_paths':[str(source),str(out),str(main),'/usr/lib','/lib','/lib64',*[x['path'] for x in files.values()]],'denied_paths':denied,'cpu_seconds':12,'environment':{'CUDA_VISIBLE_DEVICES':'','TMPDIR':str(out),'TMP':str(out),'TEMP':str(out),'XDG_CACHE_HOME':str(out/'.cache'),'TORCH_HOME':str(out/'.cache'/'torch')},'files':files,'tensor_fingerprints':fingerprints,'unit':'nadal_kyrgios__000_at120__person_000000000000','output':str(out),'worker_kind':'packet','protected_receipt':{'path':str(identity),'sha256':'0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe'}}
+config_path = root/'worker-config.json'; raw=json.dumps(config,sort_keys=True).encode();config_path.write_bytes(raw)
+python = str(main/'bin/python3.12'); env={'PYTHONPATH':str(source),'PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','CUDA_VISIBLE_DEVICES':'','OMP_NUM_THREADS':'1','OPENBLAS_NUM_THREADS':'1','MKL_NUM_THREADS':'1','NUMEXPR_NUM_THREADS':'1'}
+active = None
+def terminate(signum, frame):
+    if active is not None:
+        try: os.killpg(active.pid, signal.SIGKILL)
+        except ProcessLookupError: pass
+    raise SystemExit(128+signum)
+for sig in (signal.SIGTERM,signal.SIGINT,signal.SIGALRM,signal.SIGXCPU): signal.signal(sig,terminate)
+signal.alarm(75)
+def run(name, argv, cap, wall):
+    global active
+    def limit(): resource.setrlimit(resource.RLIMIT_CPU,(cap,cap))
+    start=time.monotonic(); before=resource.getrusage(resource.RUSAGE_CHILDREN)
+    with (root/(name+'.stdout')).open('xb') as outlog, (root/(name+'.stderr')).open('xb') as errlog:
+        active=subprocess.Popen(argv,env=env,stdin=subprocess.DEVNULL,stdout=outlog,stderr=errlog,close_fds=True,start_new_session=True,preexec_fn=limit)
+        (root/(name+'.start.json')).write_text(json.dumps({'pid':active.pid,'pgid':active.pid,'argv':argv,'monotonic':start}))
+        try: status=active.wait(timeout=wall)
+        except subprocess.TimeoutExpired:
+            os.killpg(active.pid,signal.SIGKILL);status=active.wait();raise RuntimeError(name+' timeout; partials preserved')
+    after=resource.getrusage(resource.RUSAGE_CHILDREN);(root/(name+'.exit.json')).write_text(json.dumps({'status':status,'cpu_seconds':after.ru_utime+after.ru_stime-before.ru_utime-before.ru_stime,'wall_seconds':time.monotonic()-start}));active=None
+    if status: raise RuntimeError(name+' failed; inspect preserved files')
+run('worker',['/usr/bin/unshare','--user','--map-root-user','--net',python,'-m','experiments.tennis.w8_receiver_bootstrap','--config',str(config_path),'--config-sha256',sha(raw),'--cpu-seconds','12'],12,55)
+validator = '''import hashlib,json,sys,torch\nfrom pathlib import Path\nfrom experiments.tennis import w8_input_job as fixed\np=Path(sys.argv[1]); expected=json.loads(Path(sys.argv[2]).read_bytes())['scientific_result']; cfg=json.loads(Path(sys.argv[3]).read_bytes()); m=json.loads((p/'decoded-manifest.json').read_bytes()); t=expected['match']['tensor_fingerprints']; s=torch.load(p/'decoded.pt',map_location='cpu',weights_only=True); actual=fixed.tensor_fingerprints(s)\ni=m['isolation']; boot=i['cpu_bootstrap']; want={x for paths in cfg['denied_paths'].values() for x in paths}\nif m['packet_sha256']!=fixed.WINDOW_SHA or m['profile_sha256']!=fixed.PROFILE_SHA or set(i['denials'])!=want or any(v not in (1,13) for v in i['denials'].values()) or i['network_interfaces']!=['lo'] or i['landlock_abi']<1 or i['pre_sandbox_threads']!=1 or i['extra_fds'] is not False or i['namespaces']['user']==cfg['parent_user_namespace'] or i['namespaces']['net']==cfg['parent_network_namespace'] or boot['before_landlock_sha256']!=boot['after_landlock_sha256'] or boot['cuda_initialized_before_isolation'] is not False:raise ValueError('worker isolation or packet/profile')\nif torch.cuda.is_initialized() or __import__('os').environ.get('CUDA_VISIBLE_DEVICES')!='':raise ValueError('validator CUDA state')\nif len(actual)!=480 or actual!=t or m['match_tensors']!=t or len(expected['decoded_sha256'])!=2 or set(m['unit_sha256'])!=set(expected['decoded_sha256']) or m['checkpoint_sha256']!=hashlib.sha256((p/'decoded.pt').read_bytes()).hexdigest():raise ValueError('fingerprints or checkpoint')\nfor n,h in expected['decoded_sha256'].items():\n b=(p/'publish'/'units'/(n+'.npz')).read_bytes()\n if hashlib.sha256(b).hexdigest()!=h or m['unit_sha256'][n]!=h:raise ValueError('unit sha')\nprint(json.dumps({'passed':True,'tensor_count':len(actual),'cuda_initialized':torch.cuda.is_initialized(),'visible_devices':__import__('os').environ.get('CUDA_VISIBLE_DEVICES'),'unit_sha256':expected['decoded_sha256'],'checkpoint_sha256':hashlib.sha256((p/'decoded.pt').read_bytes()).hexdigest()}))\n'''
+(root/'validator.py').write_text(validator)
+run('validator',[python,'-B','-c',validator,str(out),str(oracle),str(config_path)],10,30)
+signal.alarm(0)
+(root/'result.json').write_text(json.dumps({'passed':True,'scope':'CPU-only isolated packet repair qualification; no GPU or quality','source_files':237,'worker_config_sha256':sha(raw)},sort_keys=True))
+print(json.dumps({'passed':True,'output':str(root),'parent_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2])}))

@@ -28,7 +28,12 @@ ADAPTERS: dict[str, dict[str, str]] = {
                         "published_sha256": "f1a488f2a3ddecf57cff451801f64bc07ae652c2b8b998d4ac844ba8685f5fa2"},
     "medvedev_struff": {"key": "med", "job": "20261023T204452Z-d5c90446", "name": "med-C",
                         "published_sha256": "5fc200fc50f5af68e561fa10baba54520043e5770555712caf6e89092b175427"},
+    "nadal_kyrgios": {"key": "nad", "job": "20261031T150848Z-a582ecc0", "name": "nk-C",
+                      "published_sha256": "cceb49b3d593c770e5b0d8dcd5d69b5b358bf88d76030cef8034674417907584"},
 }
+#: Keys are known before an adapter is fitted; its archive identity is added only after validation.
+MATCH_KEYS = {"alcaraz_hurkacz": "al", "medvedev_struff": "med", "nadal_kyrgios": "nad"}
+
 #: How each window gets its conditioning crops (docs/experiments/w7-untouched.md, 2026-10-30 bank entry): every Al/Med window so
 #: far took one crop per player from its own frame 0 (reference_frame == 0 in the window's packets), and the "12-image bank" is
 #: the set of those crops over the match's six windows. `window_frame0` is that recipe applied to the new window.
@@ -97,7 +102,7 @@ def check(windows: list[WindowSpec]) -> None:
     if len(set(names)) != len(names) or len(set(ids)) != len(ids):
         raise ValueError("duplicate window")
     for w in windows:
-        if w.frames != FRAMES or w.start < 0 or w.match not in ADAPTERS or w.reference not in REFERENCE_MODES:
+        if w.frames != FRAMES or w.start < 0 or w.match not in MATCH_KEYS or w.reference not in REFERENCE_MODES:
             raise ValueError(f"{w.name}: bad frames, start, match or reference mode")
         if not SHA.match(w.source_sha256) or (w.source_yuv_sha256 is not None and not SHA.match(w.source_yuv_sha256)):
             raise ValueError(f"{w.name}: bad hash")
@@ -134,7 +139,7 @@ def from_selection(selection: dict[str, Any], yuv: dict[str, str] | None = None)
     Names are `al028`, `med000`...; `yuv` maps a clip id to the conversion hash once it has been computed."""
     out: list[WindowSpec] = []
     for match, m in selection["matches"].items():
-        short = ADAPTERS[match]["key"]
+        short = MATCH_KEYS[match]
         for s in m["selected"]:
             clip = s["clip"].split("/")[1]
             out.append(WindowSpec(f"{short}{clip}", match, clip, s["start"], FRAMES, int(s["fps"]), s["sha256"],

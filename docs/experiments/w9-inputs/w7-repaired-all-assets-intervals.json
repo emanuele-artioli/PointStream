@@ -1,0 +1,148 @@
+{
+  "scope": "conditional original-family-exclusion sensitivity and strict full-family coverage",
+  "audited_repairs": [
+    "al028",
+    "al034",
+    "al043",
+    "nad000",
+    "nad001",
+    "nad002"
+  ],
+  "missing_repairs": [],
+  "omitted_families": {
+    "al028": [],
+    "al034": [],
+    "al043": [],
+    "med000": [
+      "s2_o20",
+      "dcvc"
+    ],
+    "med024": [],
+    "med019": [
+      "s2_o20"
+    ],
+    "nad000": [],
+    "nad001": [],
+    "nad002": []
+  },
+  "conditional": {
+    "tier1": {
+      "coverage": [
+        7174.592974821264,
+        11903.50235626764
+      ],
+      "intervals": [
+        {
+          "seconds": [
+            7174.592974821264,
+            11903.50235626764
+          ],
+          "verdict": "pass"
+        }
+      ],
+      "note": "None is infinity; lower-rate bracketing edges are moved inward; quality equality is a tie; unresolved cells are not passes."
+    },
+    "tier2": {
+      "coverage": [
+        5845.69613733905,
+        1130948.6769229928
+      ],
+      "intervals": [
+        {
+          "seconds": [
+            5845.69613733905,
+            7961.957136851226
+          ],
+          "verdict": "fail"
+        },
+        {
+          "seconds": [
+            7961.957136851226,
+            7962.162912565895
+          ],
+          "verdict": "unresolved"
+        },
+        {
+          "seconds": [
+            7962.162912565895,
+            1130948.6769229928
+          ],
+          "verdict": "pass"
+        }
+      ],
+      "note": "None is infinity; lower-rate bracketing edges are moved inward; quality equality is a tie; unresolved cells are not passes."
+    },
+    "joint": {
+      "coverage": [
+        7174.592974821264,
+        11903.50235626764
+      ],
+      "intervals": [
+        {
+          "seconds": [
+            7174.592974821264,
+            7962.032727103737
+          ],
+          "verdict": "fail"
+        },
+        {
+          "seconds": [
+            7962.032727103737,
+            7962.0862894841175
+          ],
+          "verdict": "unresolved"
+        },
+        {
+          "seconds": [
+            7962.0862894841175,
+            11903.50235626764
+          ],
+          "verdict": "pass"
+        }
+      ],
+      "note": "None is infinity; lower-rate bracketing edges are moved inward; quality equality is a tie; unresolved cells are not passes."
+    }
+  },
+  "strict": {
+    "tier1": {
+      "coverage": null,
+      "intervals": [],
+      "reason": "missing family or no common measured bracket"
+    },
+    "tier2": {
+      "coverage": [
+        5845.69613733905,
+        1130948.6769229928
+      ],
+      "intervals": [
+        {
+          "seconds": [
+            5845.69613733905,
+            7961.957136851226
+          ],
+          "verdict": "fail"
+        },
+        {
+          "seconds": [
+            7961.957136851226,
+            7962.162912565895
+          ],
+          "verdict": "unresolved"
+        },
+        {
+          "seconds": [
+            7962.162912565895,
+            1130948.6769229928
+          ],
+          "verdict": "pass"
+        }
+      ],
+      "note": "None is infinity; lower-rate bracketing edges are moved inward; quality equality is a tie; unresolved cells are not passes."
+    },
+    "joint": {
+      "coverage": null,
+      "intervals": [],
+      "reason": "missing family or no common measured bracket"
+    }
+  }
+}

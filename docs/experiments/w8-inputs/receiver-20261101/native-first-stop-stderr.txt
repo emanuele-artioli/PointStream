@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-5651a24b-20261101/source/experiments/tennis/w8_receiver_native_preflight.py", line 264, in <module>
+    main()
+  File "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-5651a24b-20261101/source/experiments/tennis/w8_receiver_native_preflight.py", line 260, in main
+    run(json.loads(data))
+  File "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-5651a24b-20261101/source/experiments/tennis/w8_receiver_native_preflight.py", line 204, in run
+    maps = mapped_files(Path(f'/proc/{proc.pid}/maps').read_text(), roots)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-5651a24b-20261101/source/experiments/tennis/w8_receiver_native_preflight.py", line 98, in mapped_files
+    raise ValueError(f'unapproved mapped file: {path}')
+ValueError: unapproved mapped file: /etc/ld.so.cache

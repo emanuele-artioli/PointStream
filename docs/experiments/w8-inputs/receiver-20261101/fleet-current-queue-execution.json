@@ -1,0 +1,10 @@
+{
+  "ssh_pid": 61749,
+  "exit": 0,
+  "timeout": false,
+  "wall": 47.306642416864634,
+  "remote_cpu_cap": 4,
+  "ssh_cpu_cap": 1,
+  "remote_command": "timeout 75 /usr/bin/python3 -I -S -B -c <remote.py>",
+  "remote_cpu_note": "per process, inherited by any children"
+}

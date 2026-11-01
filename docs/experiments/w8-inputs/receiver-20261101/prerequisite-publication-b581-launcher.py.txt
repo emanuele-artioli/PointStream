@@ -1,0 +1,18 @@
+import hashlib,json,os,resource,signal,subprocess,time
+from pathlib import Path
+HERE=Path('/private/tmp/w8-prerequisites-publisher-b581-20261101');OUT=Path('/private/tmp/w8-prerequisites-publication-b581-20261101');SHA='3af2eebea433afc86d8491095404fbbccb1daa595d1b453fbcf25f2997de4fab'
+resource.setrlimit(resource.RLIMIT_CPU,(2,2));command=(HERE/'remote-command.txt').read_bytes()
+if hashlib.sha256(command).hexdigest()!=SHA or len(command)>=120000 or len(command)+sum(len(k)+len(v)+2 for k,v in os.environ.items())>=200000:raise ValueError('frozen command identity or size')
+OUT.mkdir(mode=0o700,exist_ok=False)
+def alarm(*_):raise TimeoutError()
+def limit():resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+signal.signal(signal.SIGALRM,alarm);signal.alarm(130);started=time.monotonic()
+with (OUT/'stdout').open('xb') as stdout,(OUT/'stderr').open('xb') as stderr:
+ proc=subprocess.Popen(['/usr/bin/ssh','-o','BatchMode=yes','-o','ConnectTimeout=5','gpu6',command.decode()],stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr,close_fds=True,preexec_fn=limit)
+ (OUT/'handle.json').write_text(json.dumps({'pid':proc.pid,'started_monotonic':started,'command_sha256':SHA}))
+ try:code=proc.wait();status='completed'
+ except TimeoutError:status='unknown_inspect_do_not_replay';proc.kill();code=proc.wait()
+ signal.alarm(0)
+(OUT/'execution.json').write_text(json.dumps({'status':status,'returncode':code,'wall_seconds':time.monotonic()-started,'local_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),'ssh_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2])},indent=2)+'\n')
+print(json.dumps({'status':status,'returncode':code,'output':str(OUT)}))
+if status!='completed' or code:raise SystemExit(1)

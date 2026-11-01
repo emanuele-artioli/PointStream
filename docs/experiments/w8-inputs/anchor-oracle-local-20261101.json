@@ -1,0 +1,120 @@
+{
+  "scope": "accepted historical raw anchors; no candidate payload rate evaluated",
+  "repairs_config_sha256": "290780552a9ee463ef2fff2bba31602f021fcd4feabb9a8d9047fddb20943355",
+  "repair": {
+    "sha256": "28aeb71d62c64d642f1c5157af6bca691cbb4f6f0c3ebdfdea94887a88177ba4",
+    "audit_sha256": "61d38bdef643cb7f5326fd58fefc7a402e8c6c749642a0cfa05a3b67ae45b11d",
+    "archive": "/private/tmp/w9-gpu-pilot-artifacts/full/published.tar",
+    "audit": "/Users/manu/.codex/worktrees/3cb5/PointStream/docs/experiments/w9-inputs/repair-audits/nad000.json"
+  },
+  "hybrid": {
+    "lpips": 0.33213653907050866,
+    "dists": 0.2377184011042118
+  },
+  "anchors": {
+    "s2_o0": [
+      {
+        "kbps": 46.895,
+        "lpips": 0.5532273264434211,
+        "dists": 0.360544241219759
+      },
+      {
+        "kbps": 42.553333333333335,
+        "lpips": 0.5711007114691508,
+        "dists": 0.3705657713115215
+      },
+      {
+        "kbps": 39.16,
+        "lpips": 0.6004293610145892,
+        "dists": 0.38248683884739876
+      }
+    ],
+    "s4_o0": [
+      {
+        "kbps": 43.95666666666667,
+        "lpips": 0.6208126834409657,
+        "dists": 0.37340298742055894
+      },
+      {
+        "kbps": 36.605,
+        "lpips": 0.6578311232043127,
+        "dists": 0.3982048168778419
+      },
+      {
+        "kbps": 33.108333333333334,
+        "lpips": 0.6910154440249754,
+        "dists": 0.4151360757648945
+      },
+      {
+        "kbps": 49.958333333333336,
+        "lpips": 0.6111737935587196,
+        "dists": 0.36655441522598264
+      }
+    ],
+    "s2_o20": [
+      {
+        "kbps": 45.82333333333334,
+        "lpips": 0.594514353008283,
+        "dists": 0.37633655667304994
+      },
+      {
+        "kbps": 42.375,
+        "lpips": 0.596804081405594,
+        "dists": 0.3882079243659973
+      },
+      {
+        "kbps": 39.43333333333334,
+        "lpips": 0.623039793882741,
+        "dists": 0.39861242175102235
+      }
+    ],
+    "dcvc": [
+      {
+        "kbps": 36.825,
+        "lpips": 0.410284243617431,
+        "dists": 0.31764566600322724
+      },
+      {
+        "kbps": 49.778333333333336,
+        "lpips": 0.37127445825302047,
+        "dists": 0.2907444730401039
+      }
+    ]
+  },
+  "strict_wins": {
+    "intervals_kbps": [
+      [
+        39.43333333333334,
+        45.82333333333334
+      ]
+    ],
+    "maximum_win_rate_supremum_kbps": 45.82333333333334,
+    "common_bracket_kbps": [
+      39.43333333333334,
+      45.82333333333334
+    ],
+    "note": "interval endpoints require separate strict gate evaluation"
+  },
+  "bounds_kbps": {
+    "s2_o0": [
+      39.16,
+      46.895
+    ],
+    "s4_o0": [
+      33.108333333333334,
+      49.958333333333336
+    ],
+    "s2_o20": [
+      39.43333333333334,
+      45.82333333333334
+    ],
+    "dcvc": [
+      36.825,
+      49.778333333333336
+    ]
+  },
+  "cpu_limit_s": 60,
+  "wall_limit_s": 120,
+  "cpu_seconds": 0.8685239999999999,
+  "wall_seconds": 10.808020709082484
+}

@@ -1,0 +1,70 @@
+{
+  "status": "failed_cpuinfo_initialization_closed",
+  "source_revision": "dc6e729a83c3b8a8bff56e6396d6b790f9120415",
+  "source_worktree": "/private/tmp/pointstream-w8-input-source-dc6e729a",
+  "normalized_spec_sha256": "c7c5dbb20c883ed058acd46f3f9908d04997a7999a23fd71f6cd9d907f4c333d",
+  "deadline": "2026-11-01T09:33:35.703575+00:00",
+  "manager_override": "gpu6",
+  "manager_release": "20261101T071313Z-74a9271d",
+  "queue_preflight": "/private/tmp/w8-linux-input-fleet-preflight-20261101/queue.json",
+  "queue_counts": {
+    "budget_exhausted": 1,
+    "expired": 3,
+    "complete": 1068,
+    "failed": 282,
+    "cancelled": 173,
+    "contended": 19,
+    "attention": 1
+  },
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "cpu_allocation_s": {
+    "campaign": 300,
+    "preparation_publication": 10,
+    "monitor_cleanup": 20,
+    "independent_audit": 10
+  },
+  "prior_cumulative_cpu_upper_bound_s": 1169,
+  "prior_gpu_s": 224,
+  "cumulative_reserved_ceiling_s": {
+    "cpu": 1509,
+    "gpu": 224
+  },
+  "original_caps_s": {
+    "cpu": 3600,
+    "gpu": 3600
+  },
+  "publication_receipt": "docs/experiments/w8-inputs/linux-input-20261101/publication-receipt.json",
+  "command": [
+    "scripts/ps-fleet",
+    "submit",
+    "docs/experiments/w8-inputs/linux-input-20261101/input-spec.json",
+    "--source-worktree",
+    "/private/tmp/pointstream-w8-input-source-dc6e729a",
+    "--snapshot-transfer-seconds",
+    "90"
+  ],
+  "submission_handle": 42467,
+  "submission_stdout": "/private/tmp/w8-linux-input-submit-20261101.json",
+  "submission_stderr": "/private/tmp/w8-linux-input-submit-20261101.stderr",
+  "job_id": "20261101T085408Z-6d60d6c4",
+  "source_snapshot_sha256": "d78d23cb8d2fe42dbab1ad50815cd2137ea179da839e54bdc45246a64c037f89",
+  "source_identity": "3171bec2e5bfb06ec7918a07eb9460302cb1252dcd153cf2d30ab7d26e3497a0",
+  "submission_ended": true,
+  "initial_status_read_handle": 54913,
+  "wait_handle": 60845,
+  "wait_max_seconds": 600,
+  "failure_recovery_script_sha256": "bb61af904f6e37ee7e62699d96512ac6f02c1cb8b1805254ab7081ab2372009e",
+  "wait_ended": true,
+  "failure_recovery_ended": true,
+  "campaign_cpu_charge_s": 22,
+  "cpu_closeout_upper_bound_s": 61,
+  "original_cumulative_cpu_upper_bound_after_closeout_s": 1230,
+  "claim_and_process_closeout": "/private/tmp/w8-linux-input-closeout-20261101",
+  "events_acknowledged": [
+    "776d796905d35ac1bce76b2c4b874c19",
+    "920f0ef766855e928483b14654ada38c"
+  ]
+}

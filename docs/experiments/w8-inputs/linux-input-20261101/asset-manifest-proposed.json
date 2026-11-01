@@ -1,0 +1,150 @@
+{
+  "status": "PROPOSED_NOT_SUBMITTABLE",
+  "profile": {
+    "path": "docs/experiments/w8-inputs/linux-input-20261101/expected-profile.json",
+    "sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+    "provenance": "docs/experiments/w8-inputs/bundle-oracle-local-20261101.json",
+    "note": "copied frozen pre-score candidate profile; independent expected object, not derived at runtime from packet"
+  },
+  "receiver": {
+    "packet": {
+      "path": "/private/tmp/w8-bundle-oracle-20261101-v2/window.psw8",
+      "sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+      "bytes": 2289836,
+      "remote_immutable_path": null
+    },
+    "generator_environment": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz",
+      "sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e"
+    },
+    "input_oracle_environment": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+      "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+    }
+  },
+  "validator_only": {
+    "prepared": {
+      "name": "prepared",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T162058Z-c9b2c47b/full/published.tar",
+      "sha256": "94a5d6318fc113557fb24c8a32f2edffdf368f7a289484fddd4b19a749302bfa",
+      "extract": false
+    },
+    "fit_archive": {
+      "name": "fits",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T150848Z-a582ecc0/full/published.tar",
+      "sha256": "cceb49b3d593c770e5b0d8dcd5d69b5b358bf88d76030cef8034674417907584",
+      "extract": false,
+      "member": "publish/nk-C@fit-100-fp16.pt",
+      "member_sha256": "525830aa39c14f3549084a422cda6cfc61cf1ad76b07b531dd899034e6f57570"
+    },
+    "original_guider": {
+      "name": "w6",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth",
+      "sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+      "extract": false
+    },
+    "common_base": {
+      "name": "base",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261023T194934Z-b0dcbb19/full/published.tar",
+      "sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285",
+      "extract": false,
+      "member": "publish/tennis-base@fit-100.pt",
+      "member_sha256": "85e3c65c9777b799f9ed0df3a5c8da567fe8a92e4ac83d115719527acb739eb4"
+    },
+    "golden_generated": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T163512Z-1d0712ad/full/published.tar",
+      "sha256": "cce89567a57bd202db8dbd6a39599688bce8a52e048d53f2b38fd7fda7da4985"
+    },
+    "source": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+      "sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d"
+    },
+    "masks": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173108Z-0782499a/full/published.tar",
+      "sha256": "4eb91e79c287a49accc17fcd115819e7345bc078d49e1477ce43ccdf87cd549b"
+    }
+  },
+  "declared_installed_models_from_original_generation_spec": {
+    "w0": {
+      "name": "w0",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/config.json",
+      "sha256": "92d3dfb746fca211a2c9e019e285f8597412211728dce3c5bcf4eda0f2d62e7e",
+      "extract": false
+    },
+    "w1": {
+      "name": "w1",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/diffusion_pytorch_model.safetensors",
+      "sha256": "a1d993488569e928462932c8c38a0760b874d166399b14414135bd9c42df5815",
+      "extract": false
+    },
+    "w2": {
+      "name": "w2",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/config.json",
+      "sha256": "ba41139cc9dad159163a53e2aa847356b627f53fef988ad461659bd2d587d886",
+      "extract": false
+    },
+    "w3": {
+      "name": "w3",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/pytorch_model.bin",
+      "sha256": "89d2aa29b5fdf64f3ad4f45fb4227ea98bc45156bbae673b85be1af7783dbabb",
+      "extract": false
+    },
+    "w4": {
+      "name": "w4",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/denoising_unet.pth",
+      "sha256": "b9e5a2c34fac369e8a922972ca2210916c6af175a0dad907deccf6235816ad52",
+      "extract": false
+    },
+    "w5": {
+      "name": "w5",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/reference_unet.pth",
+      "sha256": "beddccb08d49a8b29b0f4d6d456c6521d4382a8d8d48884fa60ba8802509c214",
+      "extract": false
+    },
+    "w6": {
+      "name": "w6",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth",
+      "sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+      "extract": false
+    },
+    "w7": {
+      "name": "w7",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/motion_module.pth",
+      "sha256": "0d11e01a281b39880da2efeea892215c1313e5713fca3d100a7fbb72ee312ef9",
+      "extract": false
+    }
+  },
+  "recorded_generation_spec": {
+    "path": "docs/experiments/w7-specs/tier2-eval/generate-nad000.json",
+    "sha256": "ad9de12ed24cf37b88a971df281d6a23c6e5dd52d9d2177fb0bd320067618195"
+  },
+  "locks": {
+    "generator_pip": {
+      "path": "env/locks/pointstream-jcv.pip.txt",
+      "sha256": "052f30335c87d0f50fcc1c982a859e35292f1ff8e337bb2676443db9b27bada3",
+      "numpy": "2.5.4",
+      "opencv_python_headless": "4.11.0.86"
+    },
+    "generator_conda": {
+      "path": "env/locks/pointstream-jcv.conda.txt",
+      "sha256": "d9281ef5136efb0ff2bf0ae9cea565edab6832da6ea82740ffce3bbba172679a"
+    },
+    "native_pip": {
+      "path": "env/locks/pointstream.pip.txt",
+      "sha256": "2ba157573bdf0b2fd6d74c5dcd9230f87f9455e1d2ee1a6141236a7a9eb04af9",
+      "numpy": "1.26.4",
+      "opencv_python_headless": "4.10.0.84"
+    }
+  },
+  "unverified": [
+    "installed assets and native binary actual hashes on selected host",
+    "packed environment internal lock correspondence and current accessibility",
+    "fresh independent profile publication and packet publication",
+    "guard CLI, isolation and resource enforcement",
+    "validator-only path separation including symlink/mount aliases"
+  ],
+  "recorded_preparation_spec": {
+    "path": "docs/experiments/w7-specs/tier2-eval/prepare-nad000+nad001+nad002.json",
+    "sha256": "6aa451191e0f49fa7bd993b417e06a18e1ddf73dbb1ee831416d9d84cfbadb3c"
+  }
+}

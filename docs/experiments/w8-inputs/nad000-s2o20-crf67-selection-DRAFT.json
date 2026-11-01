@@ -1,0 +1,55 @@
+{
+  "window": "nad000",
+  "points": [
+    {
+      "policy": "s2_o20",
+      "scale": 2,
+      "offset": -20,
+      "crf": 67,
+      "rate_kbps": 49.67333333333334,
+      "bytes": 29804,
+      "stream_sha256": "182c7eee4a0ea2e98ef0a967ecfcdf8958898ad7ce035e54f0ea91b5109b6fa3",
+      "decoded_sha256": "71b3ee98cc83349d6377394e5003ae2da872c0e4a0e3a56685eed3a81a7dfe9f",
+      "archive_sha256": "9736920b256b2b770c3b35e8784570a50df2720115fbb134970439adea4240f0",
+      "member": "publish/streams/s2_o20_crf67.ivf"
+    }
+  ],
+  "controls": [
+    {
+      "policy": "control_s8",
+      "scale": 8,
+      "offset": 0,
+      "crf": 63,
+      "rate_kbps": 21.68166666666667,
+      "bytes": 13009,
+      "stream_sha256": "2408423bb48b498f3a8cc163e6cfcc0d759f5cebf0db135446a561770c2a7043",
+      "decoded_sha256": "4897e730ea1aec82c0b9435aad3bf1b190890d4f64c7e40f5edfd2211bd327ed",
+      "archive_sha256": "6496e427f4aa282c1a77acd0924685ded8d5323a11ca6df757b3bd9e598a8030",
+      "member": "publish/streams/control_s8_crf63.ivf"
+    },
+    {
+      "policy": "control_s4",
+      "scale": 4,
+      "offset": 0,
+      "crf": 63,
+      "rate_kbps": 36.605,
+      "bytes": 21963,
+      "stream_sha256": "f9622b6af4cddea3d70226c0b22e12374f4c77aadf2120e54d5d21ba55bfbbb8",
+      "decoded_sha256": "7490edf9b678db805c23baae49a2a3b5e9d7b037b18dd216320aad47a061beff",
+      "archive_sha256": "6496e427f4aa282c1a77acd0924685ded8d5323a11ca6df757b3bd9e598a8030",
+      "member": "publish/streams/control_s4_crf63.ivf"
+    },
+    {
+      "policy": "control_s2",
+      "scale": 2,
+      "offset": 0,
+      "crf": 63,
+      "rate_kbps": 73.32166666666667,
+      "bytes": 43993,
+      "stream_sha256": "0cdd1eb218fdc8cb2a164a68111e244c0248a830e8cf4b888084d28d4e99bd91",
+      "decoded_sha256": "595dec08236aafe895dc9d3a02eafe8f9f7b2811e0e3332426203a823193e237",
+      "archive_sha256": "6496e427f4aa282c1a77acd0924685ded8d5323a11ca6df757b3bd9e598a8030",
+      "member": "publish/streams/control_s2_crf63.ivf"
+    }
+  ]
+}

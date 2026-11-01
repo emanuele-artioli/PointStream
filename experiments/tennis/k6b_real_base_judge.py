@@ -56,6 +56,33 @@ def identity_controls(images: list[np.ndarray], base: np.ndarray, composed: np.n
             'plain_base_scored_twice_identical': bool(np.array_equal(scores[0], scores[1])) and bool(np.array_equal(images[0], again))}
 
 
+def unit_mask(predicted: dict[int, np.ndarray], cropped: bool, t: int, shape: tuple[int, int] = (1080, 1920)) -> np.ndarray:
+    """A unit's receiver mask at frame t for composing. A frame without a crop has no receiver mask by construction, and compose never
+    pastes a player without a crop, so that frame gets an empty mask; a cropped frame must have its receiver mask."""
+    mask = predicted.get(t)
+    if mask is None:
+        if cropped:
+            raise ValueError("Receiver mask missing for a cropped frame")
+        return np.zeros(shape, dtype=bool)
+    return mask
+
+
+def prediction_ticks(row: dict[str, Any], manifest: bool) -> list[int]:
+    """Frames a saved receiver prediction must cover. The frozen pair predicts every third frame of the 240-frame window; a manifest
+    window's unit has no pose at some of those frames, so its receiver predicted only the recorded ticks (job 20261031T102650Z-8d510571)."""
+    return list(row["ticks"]) if manifest else list(range(0, 240, 3))
+
+
+def check_diagnostic_coverage(diag: dict[str, Any], ids: list[str], prefixes: list[str]) -> None:
+    """Require exactly one valid source and each base scale for every selected window."""
+    for wid, prefix in zip(ids, prefixes, strict=True):
+        sources = [r for r in diag['source'] if r['window'] == wid]
+        bases = [r for r in diag['base'] if r['window'] == prefix]
+        if (len(sources) != 1 or not sources[0]['source_matches'] or len(sources[0]['ticks']) != 80
+                or sorted(r['scale'] for r in bases) != [2, 4, 8]):
+            raise ValueError('GPU source control or base coverage missing')
+
+
 def run(a: argparse.Namespace) -> None:
     P = plan(a)
     import cv2
@@ -99,8 +126,7 @@ def run(a: argparse.Namespace) -> None:
             source_base_manifest = json.load(base_manifest_file)
     gpu_base = scratch / 'gpu-base' / 'publish'
     diag = json.loads((gpu_base / 'diagnostic.json').read_text())
-    if len(diag['base']) != 3 * len(P['sources']) or len(diag['source']) != len(P['sources']) or any(not r['source_matches'] or len(r['ticks']) != 80 for r in diag['source']):
-        raise ValueError('GPU source control or base coverage missing')
+    check_diagnostic_coverage(diag, P['ids'], P['prefixes'])
     for row in diag['base']:
         path = gpu_base / f"{row['window']}-s{row['scale']}-gpu.npy"
         if sha(path.read_bytes()) != row['sha256']:
@@ -127,7 +153,7 @@ def run(a: argparse.Namespace) -> None:
             file = scratch / 'masks' / 'publish' / (unit['name'] + '-masks.npz')
             with np.load(file) as z:
                 original_prediction = next(q for q in previous['prediction']['runs'][0]['rows'] if q['name'] == unit['name'])
-                if z['t'].tolist() != list(range(0, 240, 3)) or array_sha(z['masks']) != original_prediction['output_sha256']:
+                if z['t'].tolist() != prediction_ticks(original_prediction, P['manifest']) or array_sha(z['masks']) != original_prediction['output_sha256']:
                     raise ValueError('saved SAM ticks or receiver prediction hash changed')
                 masks[i] = {int(t): project(m, box[int(t)]) for t, m in zip(z['t'], z['masks'])}
         if P['manifest']:  # no prior run to reproduce: the in-job controls below replace the gate
@@ -206,7 +232,7 @@ def run(a: argparse.Namespace) -> None:
                     player_crops[player] = g['crops'][int(idx[0])]
                 if t in boxes[i]:
                     player_boxes[player] = boxes[i][t]
-                player_masks[player] = masks_by_window[wid][i][t]
+                player_masks[player] = unit_mask(masks_by_window[wid][i], len(idx) == 1, t)
             images = []
             for scale in (8, 4, 2):
                 base = np.asarray(base_arrays[scale][t // 3])

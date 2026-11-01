@@ -1,0 +1,47 @@
+{
+  "status": "failed_cost_gate_no_full_stage",
+  "source_revision": "a5fdb23536c646851a83b226789ee3e68ccc50a9",
+  "source_worktree": "/private/tmp/pointstream-w8-source-a5fdb235",
+  "spec_sha256": "781dc0ba6fef4db759f7b1d24a755b452fcf312e44cc40ee668b965fde20c840",
+  "deadline": "2026-11-01T07:56:32.398155+00:00",
+  "cpu_allocation_s": {
+    "campaign": 230,
+    "teardown_polling": 30,
+    "independent_audit": 20,
+    "preparation_publication": 20
+  },
+  "gpu_allocation_s": 300,
+  "original_w8_gpu_cap_s": 3600,
+  "original_w8_cpu_cap_s": 3600,
+  "prior_cpu_charge_upper_bound_s": 850,
+  "selection_sha256": "4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0",
+  "manager_release": "20261101T071313Z-74a9271d",
+  "worker_hosts": [
+    "gpu2",
+    "gpu5",
+    "gpu6"
+  ],
+  "queue_preflight": "/private/tmp/w8-amendment-fleet-preflight-20261101/all-status.json",
+  "job_id": "20261101T071706Z-afde26d5",
+  "submission_started_utc": "2026-11-01T07:16:53.193822+00:00",
+  "command": [
+    "scripts/ps-fleet",
+    "submit",
+    "/Users/manu/.codex/worktrees/3cb5/PointStream/docs/experiments/w8-inputs/amendment-20261101/score-spec.json",
+    "--source-worktree",
+    "/private/tmp/pointstream-w8-source-a5fdb235",
+    "--snapshot-transfer-seconds",
+    "90"
+  ],
+  "submission_handle": 75212,
+  "source_identity": "a318757b0e8144a34f2079462e99433175abeb50c7e29b93048059565b906e77",
+  "source_snapshot_sha256": "5a168fe0de1c99c4e97866cd963a1b6ba976e8ff24bed8765cf8df42d03c4be4",
+  "normalized_spec_sha256": "781dc0ba6fef4db759f7b1d24a755b452fcf312e44cc40ee668b965fde20c840",
+  "wait_handle": 31915,
+  "wait_max_seconds": 600,
+  "first_attempt_gpu_charge_upper_bound_s": 33,
+  "first_attempt_cpu_charge_upper_bound_s": 33,
+  "actual_supervisor_seconds": 32.19217538833618,
+  "smoke_projection_s": 170.7293615300674,
+  "correctness_checks_all_passed": true
+}

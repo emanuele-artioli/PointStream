@@ -1,0 +1,40 @@
+{
+  "status": "failed",
+  "started": 1793518537.5449193,
+  "last_progress": 1793518571.2168028,
+  "emitted": [
+    "contention:1793518538.6023688",
+    "terminal:failed",
+    "decision:5cc303803d9153619605c3034b564943"
+  ],
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Deterministic scoring of saved streams does not depend on foreign workload timing.",
+    "margin_mib": 8192
+  },
+  "timing_contaminated": true,
+  "pid": 2890311,
+  "proc_start_time": 1793518537.95,
+  "process_group_id": 2890311,
+  "contention": [
+    {
+      "detected": 1793518538.6023688,
+      "action": "continue",
+      "foreign_gpu_pids": [
+        2659325
+      ],
+      "ended": 1793518571.2168028
+    }
+  ],
+  "foreign_gpu_pids": [
+    2659325
+  ],
+  "progress": {
+    "stage": "attention",
+    "completed": 0,
+    "updated": 1793518564.8722262,
+    "decision": "command exceeded its 20 s allowance or the budget"
+  },
+  "exit_code": 1,
+  "ended": 1793518571.2168028
+}

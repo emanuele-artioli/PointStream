@@ -1,0 +1,8 @@
+{
+  "exit_code": 0,
+  "wall_s": 7.398249667137861,
+  "cpu_ceiling_s": 8,
+  "local_parent_cpu_s": 0.09307299999999999,
+  "local_children_cpu_s": 0.025271,
+  "probe_sha256": "992c9b324f3c9aca7b8d9778f7e1f1d7f7bb88339abf8b1f4ec8d902e7869413"
+}

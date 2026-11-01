@@ -1,0 +1,139 @@
+{
+ "schema": 1,
+ "entrypoint": [
+  "-m",
+  "experiments.tennis.k6b_confirm"
+ ],
+ "arguments": [
+  "features",
+  "--manifest",
+  "{staged:manifest}",
+  "--sam-checkpoint",
+  "{staged:sam}",
+  "--pose",
+  "{staged:yolo11x_pose}",
+  "--max-windows",
+  "{windows}",
+  "--windows",
+  "nadal_kyrgios/000@120",
+  "nadal_kyrgios/001@120",
+  "nadal_kyrgios/002@120",
+  "--sources",
+  "{staged:c0}",
+  "{staged:c1}",
+  "{staged:c2}"
+ ],
+ "staged_inputs": [
+  {
+   "name": "manifest",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/manifest.json",
+   "sha256": "458bada0e4165fb5b81dadb4ce15a7f38e90ecc9bd951fd533a68a11821f4043",
+   "extract": false
+  },
+  {
+   "name": "sam",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+   "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+   "extract": false
+  },
+  {
+   "name": "yolo11x_pose",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/yolo/yolo11x-pose.pt",
+   "sha256": "013c43543b0751b8918486ba96e01ee44a59040683a07f96cc22bcc2cb7785f8",
+   "extract": false
+  },
+  {
+   "name": "c0",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+   "sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+   "extract": false
+  },
+  {
+   "name": "c1",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__001.mp4",
+   "sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d",
+   "extract": false
+  },
+  {
+   "name": "c2",
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__002.mp4",
+   "sha256": "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a",
+   "extract": false
+  }
+ ],
+ "inputs": [
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/manifest.json",
+   "sha256": "458bada0e4165fb5b81dadb4ce15a7f38e90ecc9bd951fd533a68a11821f4043"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/background/g1-2026-10-08/inputs/sam3.1_multiplex.pt",
+   "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/yolo/yolo11x-pose.pt",
+   "sha256": "013c43543b0751b8918486ba96e01ee44a59040683a07f96cc22bcc2cb7785f8"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+   "sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__001.mp4",
+   "sha256": "c86ea9283b68d7a42b4c13c891534b42722ff07e15fffa1847eebc368351760d"
+  },
+  {
+   "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__002.mp4",
+   "sha256": "f0551443eaff4e4b3539f21cd0c6ac66f55601d480ad099a571e8626db735e4a"
+  }
+ ],
+ "environment": {
+  "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+  "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+ },
+ "required_commands": [
+  "ffmpeg"
+ ],
+ "validator": [
+  "{python}",
+  "-m",
+  "experiments.tennis.k6b_confirm",
+  "validate-features",
+  "--manifest",
+  "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/manifest.json"
+ ],
+ "deadline": "2026-11-02T12:00:00+00:00",
+ "verify_staged_inputs": true,
+ "stall_seconds": 900.0,
+ "contention": {
+  "policy": "stop",
+  "resume_attempts": 0
+ },
+ "device": "gpu",
+ "hosts": [
+  "gpu3",
+  "gpu5",
+  "gpu6"
+ ],
+ "gpu_models": [
+  "RTX 6000 Ada"
+ ],
+ "gpu_memory_mib": 32000,
+ "cpu_threads": 8,
+ "local_storage_gib": 60,
+ "scale": {
+  "windows": {
+   "smoke": 1,
+   "full": 0
+  }
+ },
+ "smoke": {
+  "seconds": 600,
+  "representative_basis": "The first window with the full 240-frame decode; the smallest grid the stage supports is one whole window. In this batch job the smoke keeps only the first named window (`--max-windows 1`)."
+ },
+ "full": {
+  "seconds": 1800
+ },
+ "validator_seconds": 120,
+ "budget_seconds": 2600
+}

@@ -1,0 +1,25 @@
+# Manuscript readiness, 2026-10-31
+
+Historical snapshot. See the [2026-11-01 readiness audit](readiness-2026-11-01.md)
+for the separately approved W8 outcome, full task audit, expanded negative
+evidence and corrected 23+5 page allowance.
+
+Overleaf main is `a3e2888dff74d6c07e1cd73d10b5dc711bd994b0`. The original October empirical draft's abstract, introduction, evaluation and conclusion now include the corrected foreground-first experiment and its limitations. Figure 3 shows the independently audited repaired comparison; the former figure remains preserved. The manuscript remains **a qualified working draft, not submission-ready**.
+
+The reviewed PDF is `/private/tmp/pointstream-w7-manuscript/build/main.pdf`, built from the independent local manuscript clone at that path. It has 23 pages, including three appendix pages, within the project limit. The empirical checker and figure renderer pass. Parent and delegate inspected the rendered results pages; the final appendix had also been inspected. NumPy, SciPy and Matplotlib are available through `/Users/manu/miniconda3/bin/python` for these presentation tools. The server checkout was left untouched; Overleaf pushes were ordinary fast-forwards.
+
+## Accepted result and its scope
+
+The reference-bank correction and all nine resulting upper-bracket gaps are resolved. Six GPU scoring jobs passed separate full-output/raw-control audits. Repaired two-hour data: `docs/experiments/w9-inputs/w7-repaired-2h.json`, SHA256 `5245d83df6f8ee16ade28174f6f3c46a94b42ae4d32520c2165fa602e83e9d86`. Familiar-match Tier 1 passes conditionally; unseen-match Tier 2 has all four anchor families bracketed but its LPIPS interval includes zero, so the frozen two-metric rule does not pass. All nine whole frames lose both metrics to the best resolved anchor. The Medvedev subgroup alone does not pass; the window-level confidence intervals do not establish independence between windows from one match.
+
+Duration data: `docs/experiments/w9-inputs/w7-repaired-all-assets-intervals.json`, SHA256 `6d00095001d2e149db33b714cd523df2a6e605ef2bea69cae142dfd47a214c37`. With the original missing-family exclusions, the joint rule passes for modeled durations of roughly 133–198 min within common measured coverage of about 119.6–198.4 min. This is not a global minimum break-even length, a win for all longer matches, or proof of sustained reference reuse. The source is the [W9 record](../experiments/w9-adapter-break-even.md); `experiments/tennis/w7_repaired_figure.py` regenerates the new figure from its full input digest. Historical underbilled and intermediate corrected files remain intact; the old insertion draft is explicitly unsafe to integrate.
+
+## Remaining decisions and evidence
+
+- **Fresh decoding and complete rate:** actual IVF, KPS2 and research-header bytes coexist with modeled bank/adapter charges. A complete payload and source-hidden fresh receiver witness are still missing. The [W8 audit](../experiments/w8-wire-audit.md) identifies the required input and framing checks. The [proposed witness](../cards/w8-fresh-decoder-witness.md) requests separate authority; none has been granted by the anchor-repair budget.
+- **Original anchor omissions:** med000 DCVC and half-out SVT, plus med019 half-out SVT, remain unresolved. Strict four-family joint coverage is therefore unresolved; the repaired Tier 2 comparison itself has full four-family coverage.
+- **Time:** generated players flicker more than SVT. The separate CPU smoothing pilot stopped at its scale-cost gate, with no smoothing-quality result ([W6](../experiments/w6-motion-pose.md)).
+- **Rackets:** W6's 3% is a body-hull proxy, not racket recall. The [W11 native-label audit](../experiments/w11-racket.md) found no eligible pixel mask linked to those saved frames; sparse boxes/keypoints and anonymous clip IDs leave correspondence/coverage unresolved. A proxy paste cannot gate a true racket path; no oracle was run and no manual labels are authorized.
+- **Broader paper scope:** existing markers also retain historical benchmark-provenance, matched-ablation, generative-peer, egocentric-label and timing qualifications. These are distinct gaps; not every historical study must be completed to support a carefully narrowed empirical paper. The submission claim and remaining experimental investment need author judgment.
+
+Prior reviewed manuscript milestones `9a4491f4b33173fcaaf6fc47dbb5627f9656a8d7` and `fc0343f989ac038ee8d37462bcff9b47fe5a67cb` remain in Overleaf history. Their figures and the original negative results are preserved.

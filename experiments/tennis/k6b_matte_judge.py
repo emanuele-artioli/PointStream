@@ -58,6 +58,17 @@ def control_error(current: np.ndarray, expected: np.ndarray, *, tolerance: float
     return difference
 
 
+def receiver_mask(predicted: dict[int, dict[int, np.ndarray]], crop_frames: Any, i: int, t: int, shape: tuple[int, ...]) -> np.ndarray:
+    """Receiver mask of unit i at judged frame t. The receiver predicts only the frames the unit has a crop for, so a judged
+    frame without a crop has no mask by construction and is empty, the native missing-crop fallback. A cropped frame must have one."""
+    if t not in crop_frames:
+        return np.zeros(shape, bool)
+    mask = predicted[i][t]
+    if mask.shape != shape or mask.dtype != bool:
+        raise ValueError("Predicted receiver mask shape/type differs")
+    return mask
+
+
 def judge_window(wid: str, anchor: Path, control: Path | None, packets: Path, matte: Path,
                  matte_row: dict[str, Any], generated: dict[Any, Any], source: Path, source_sha: str,
                  nets: dict[str, Any], scratch: Path, publish: Path, max_judged: int,
@@ -166,9 +177,7 @@ def judge_window(wid: str, anchor: Path, control: Path | None, packets: Path, ma
                 i = native["players"].index(player)
                 if scale == -1:
                     assert predicted_masks is not None
-                    mask = predicted_masks[i][t]
-                    if mask.shape != r.shape or mask.dtype != bool:
-                        raise ValueError("Predicted receiver mask shape/type differs")
+                    mask = receiver_mask(predicted_masks, crops[i], i, t, r.shape)
                 else:
                     mask = regions[t].get(player, np.zeros_like(r)) if not scale else mk.upsample(reduced[scale][t:t+1, i].astype(np.uint8)*OBJECT, (1920, 1080))[0] > 0
                 requested_union |= mask
@@ -183,7 +192,7 @@ def judge_window(wid: str, anchor: Path, control: Path | None, packets: Path, ma
             frames.append(canvas)
             supports.append(written)
         if predicted_masks is not None:
-            predicted = np.logical_or.reduce([predicted_masks[i][t] for i in range(len(units))])
+            predicted = np.logical_or.reduce([receiver_mask(predicted_masks, crops[i], i, t, r.shape) for i in range(len(units))])
             intersection, union = int((predicted & r).sum()), int((predicted | r).sum())
             row["prediction_shape"][str(t)] = {"iou": intersection / union if union else 1.0,
                 "fp": int((predicted & ~r).sum()), "fn": int((r & ~predicted).sum()),
