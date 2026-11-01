@@ -78,6 +78,21 @@ def source_files(archive: Path, tree: Path, expected_sha: str) -> dict[str, str]
     return files
 
 
+AA_PACKAGING_MANIFEST = 'moore_animateanyone.egg-info/SOURCES.txt'
+AA_PACKAGING_ARCHIVE_SHA = 'ea1c5985073896d678a1e43c06a148f22ec35782284606551ce5a35392d6a92a'
+AA_PACKAGING_INSTALLED_SHA = '2df8039adeeeef1add25cf3c02f45cdaa1189093278b87f8174c014d65b9e7e2'
+
+
+def classify_aa_member(name: str, archive_sha: str, installed_sha: str, archive_identity: str) -> str:
+    """Allow exactly one observed packaging-only difference in the pinned archive."""
+    if archive_sha == installed_sha:
+        return 'exact'
+    if (archive_identity == AA_SHA and name == AA_PACKAGING_MANIFEST
+            and archive_sha == AA_PACKAGING_ARCHIVE_SHA and installed_sha == AA_PACKAGING_INSTALLED_SHA):
+        return 'known_generated_packaging_manifest_difference'
+    raise ValueError(f'AA installed source mismatch: {name}')
+
+
 AA_LINKS = {
     'Models/finetuned_tennis': '/home/itec/emanuele/Models/AnimateAnyone/profiles/finetuned_tennis',
     'Models/original': '/home/itec/emanuele/Models/AnimateAnyone/profiles/original',
@@ -137,6 +152,7 @@ def verify_aa_tree(archive: Path, tree: Path, *, expected_links: dict[str, str] 
     installed_links: dict[str, str] = {}
     seen: set[str] = set()
     files: dict[str, str] = {}
+    packaging_manifest: dict[str, Any] | None = None
     with tarfile.open(archive, 'r:*') as tar:
         for member in tar:
             parts = Path(member.name).parts
@@ -183,8 +199,16 @@ def verify_aa_tree(archive: Path, tree: Path, *, expected_links: dict[str, str] 
             for block in iter(lambda: stream.read(1024 * 1024), b''):
                 digest.update(block)
             record = stable_file_hash(installed)
-            if record['sha256'] != digest.hexdigest():
-                raise ValueError(f'AA installed source mismatch: {name}')
+            archive_member_sha = digest.hexdigest()
+            classification = classify_aa_member(name, archive_member_sha, record['sha256'], expected_archive_sha)
+            if name == AA_PACKAGING_MANIFEST:
+                packaging_manifest = {'path': str(installed), 'archive_sha256': archive_member_sha,
+                                      'installed_sha256': record['sha256'], 'classification': classification,
+                                      'content_class': 'generated packaging manifest; excluded from source grant map'}
+                if checkpoint:
+                    checkpoint({'kind': 'aa_packaging_manifest', 'archive_sha256': archive_member_sha,
+                                'classification': classification, **record})
+                continue
             files[str(installed)] = record['sha256']
             if checkpoint:
                 checkpoint({'kind': 'aa_regular', **record})
@@ -196,9 +220,11 @@ def verify_aa_tree(archive: Path, tree: Path, *, expected_links: dict[str, str] 
     if found_links != set(links) or not files:
         raise ValueError('AA expected link or regular-file coverage mismatch')
     return {'tree': str(tree), 'verified_files': len(files), 'files': files,
+            'packaging_manifest': packaging_manifest,
             'link_metadata': {name: links[name] for name in sorted(found_links)},
             'installed_link_status': installed_links,
-            'scope': 'regular archive members and exact link metadata; no cached-environment equivalence'}
+            'scope': 'canonical archive files byte-checked; exact known packaging-manifest pair recorded separately; '
+                     'exact link metadata; no cached-environment equivalence'}
 
 
 def verify_sam_distribution(prefix: Path, checkpoint: Callable[[dict[str, Any]], None] | None = None) -> dict[str, Any]:

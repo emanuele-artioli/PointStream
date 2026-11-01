@@ -334,3 +334,51 @@ def test_aa_canonical_member_does_not_use_legacy_alternative(tmp_path):
     legacy.write_bytes(b'expected')
     with pytest.raises(ValueError, match='canonical installed path missing'):
         preflight.verify_aa_tree(archive, tree, expected_links={}, expected_archive_sha=preflight.sha(archive))
+
+
+def test_pinned_packaging_difference_never_enters_source_grant_map(tmp_path, monkeypatch):
+    tree = tmp_path / 'installed'
+    (tree / 'moore_animateanyone.egg-info').mkdir(parents=True)
+    (tree / 'animate_anyone').mkdir()
+    manifest = tree / preflight.AA_PACKAGING_MANIFEST
+    manifest.write_bytes(b'installed packaging list')
+    python_file = tree / 'animate_anyone/module.py'
+    python_file.write_bytes(b'original python')
+    archive = tmp_path / 'aa.tar'
+    with tarfile.open(archive, 'w') as tar:
+        for name, data in [(preflight.AA_PACKAGING_MANIFEST, b'archive packaging list'),
+                           ('animate_anyone/module.py', b'original python')]:
+            entry = tarfile.TarInfo(name)
+            entry.size = len(data)
+            tar.addfile(entry, io.BytesIO(data))
+    archive_sha = preflight.sha(archive)
+    monkeypatch.setattr(preflight, 'AA_SHA', archive_sha)
+    monkeypatch.setattr(preflight, 'AA_PACKAGING_ARCHIVE_SHA', hashlib.sha256(b'archive packaging list').hexdigest())
+    monkeypatch.setattr(preflight, 'AA_PACKAGING_INSTALLED_SHA', hashlib.sha256(b'installed packaging list').hexdigest())
+    records = []
+    result = preflight.verify_aa_tree(archive, tree, expected_links={}, expected_archive_sha=archive_sha,
+                                      checkpoint=records.append)
+    assert result['verified_files'] == 1 and str(python_file) in result['files']
+    assert str(manifest) not in result['files']
+    assert result['packaging_manifest']['classification'] == 'known_generated_packaging_manifest_difference'
+    assert result['packaging_manifest']['archive_sha256'] == hashlib.sha256(b'archive packaging list').hexdigest()
+    assert {record['kind'] for record in records} == {'aa_packaging_manifest', 'aa_regular'}
+    manifest.write_bytes(b'another packaging list')
+    with pytest.raises(ValueError, match='AA installed source mismatch'):
+        preflight.verify_aa_tree(archive, tree, expected_links={}, expected_archive_sha=archive_sha)
+    manifest.write_bytes(b'installed packaging list')
+    python_file.write_bytes(b'changed python')
+    with pytest.raises(ValueError, match='AA installed source mismatch'):
+        preflight.verify_aa_tree(archive, tree, expected_links={}, expected_archive_sha=archive_sha)
+
+
+def test_packaging_exception_requires_exact_pair_path_and_archive_identity():
+    name = preflight.AA_PACKAGING_MANIFEST
+    old, new = preflight.AA_PACKAGING_ARCHIVE_SHA, preflight.AA_PACKAGING_INSTALLED_SHA
+    assert preflight.classify_aa_member(name, old, new, preflight.AA_SHA) == 'known_generated_packaging_manifest_difference'
+    for actual_name, archive_hash, installed_hash, source in [
+        ('elsewhere/SOURCES.txt', old, new, preflight.AA_SHA), (name, '0' * 64, new, preflight.AA_SHA),
+        (name, old, '0' * 64, preflight.AA_SHA), (name, old, new, '0' * 64),
+    ]:
+        with pytest.raises(ValueError, match='AA installed source mismatch'):
+            preflight.classify_aa_member(actual_name, archive_hash, installed_hash, source)
