@@ -268,6 +268,9 @@ Codex sessions follow the same protocol. What differs:
 - **Model per card.** Use the explicit model and effort in AGENTS.md's tier
   table, subject to the user's requested override. Do not map every tier to
   the primary model. A requested setting is not verified runtime telemetry.
+  With the desktop collaboration tool, explicit overrides require
+  `fork_turns="none"`; full-history forks inherit the parent configuration.
+  Give an isolated delegate a complete scoped brief.
 - **Waiting on the fleet.** Use the
   [completion-first policy](fleet.md#monitoring-from-the-submitting-chat):
   verified completion wakeups, otherwise one self-expiring deadline check.
@@ -290,8 +293,31 @@ Codex sessions follow the same protocol. What differs:
 
 ### Codex validation
 
-Pending since 2026-10-29. The subagent tiers were written and tested in
-Claude Code only. The first Codex session that delegates checks:
+First desktop audit: **2026-11-01**, during MoQSplat reproduction work. The
+installed local CLI reports `codex-cli 0.152.0`; the desktop runtime version
+was not exposed, so the CLI version does not identify the desktop harness.
+
+- Requested a designer (`gpt-6.1-sol`, medium), builder (`gpt-6.1-terra`, medium)
+  and runner (`gpt-6.1-terra`, low), each with an isolated factual brief.
+  The tool accepted all overrides. Every delegate reported that its actual
+  model and effort were unavailable. Effective tier identities remain
+  **unverified**; this is not evidence of different models being selected.
+- The frozen fork-audit runner stopped at its first DNS failure without
+  retrying. In a separate one-step deliberate `false` probe it reported exit1
+  and stopped without further tools. This verifies observed prompt discipline
+  in those two turns, not general enforcement by a hook.
+- The available collaboration API exposes no role-specific hook field.
+  Role-configuration hook enforcement was not demonstrated. Keep the frozen
+  brief's stop-at-first-surprise rule; do not describe Claude's agent-identity
+  hook as active under this Codex interface.
+- Reviewed the tier table, delegation criteria and large-read hook. Scoped
+  briefs and compact reports worked. The old Codex paragraph incorrectly
+  reduced tiers to reasoning effort on one model; it now references the
+  model-and-effort table. Full-history forks cannot carry explicit overrides
+  in this interface, so cheaper-tier delegates need isolated briefs.
+
+Repeat these checks when the harness exposes effective-model telemetry or
+role-specific hooks, or after an interface change:
 
 1. **Models.** One trivial delegate per tier: `gpt-6.1-sol` at `medium`,
    `gpt-6.1-terra` at `medium` and at `low`. Record the model and effort
