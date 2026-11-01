@@ -1,5 +1,10 @@
 # Continuation, 2026-10-31: W7 closed; work moves to Codex
 
+**Resume from the [2026-11-01 continuation](continuation-2026-11-01.md):** the
+approved W8 coverage amendment ran two cost-stopped requests; both are terminal,
+no full upper-anchor result exists, and an exclusive-GPU cap amendment is pending.
+The older summaries below are retained as history, not current authority.
+
 **Latest continuation, 2026-11-01:** user approved the separate W8 witness and
 confirmed 23 pages of body/references plus five additional appendix pages.
 The full PLAN/evidence audit and expanded negative-results appendix are done;

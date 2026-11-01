@@ -41,20 +41,25 @@ conditional rate with exact named reference/match objects reused for 7,200 s is
 new fleet request or GPU work followed. The other three saved-quality family
 comparisons are positive on both metrics. Reuse quality is unproved.
 
-W8: **0 / 3,600 GPU-s; at most 850 / 3,600 CPU-s** under a deliberately
-conservative envelope. No experimental reservation remains. A separate packet
+W8 after the approved baseline-coverage amendment: **67 / 3,600 GPU-s; at most
+937 / 3,600 CPU-s** under a deliberately conservative envelope. Both requests
+are terminal; no experimental reservation remains. First correctness checks
+passed, but cost promotion failed; the second smoke timed out on a shared GPU.
+No full upper-anchor quality point or decoder run was produced. A separate packet
 input diagnostic fails exact geometry on the Mac at about 4.55e-13, despite
 matching pose-map pixels. The original packed runtime and Linux read isolation
 remain untested. A paid judged-frame selection was added because registration
 and generated-output sampling differ. None establishes fresh output quality.
 
 The preserved unsubmitted CPU qualification/scoring drafts cannot be submitted
-under the stopped card. An existing upper ROI-SVT bitstream is now independently
-verified at 49.6733 kbps, but is unscored. The pending prospective amendment asks
-to score that one point and the original raw controls with at most 300 GPU-s and
-300 CPU-s inside the existing ceilings; only a passing coverage screen could
-reopen the original input/isolation/receiver gates. No training, encoding or
-model changes follow. No amendment is approved while the question is pending.
+under the stopped card. An existing upper ROI-SVT bitstream is independently
+verified at 49.6733 kbps, but its required full quality point is still missing.
+The user-approved 300/300-s amendment stopped after two cost failures and no
+third request is authorized. The prospective exclusive-GPU amendment requests
+an inclusive internal cap of 450 GPU-s and 450 CPU-s, keeping the original
+3,600/3,600 totals. Only a passing coverage screen could reopen the original
+input/isolation/receiver gates. No training, encoding or model changes follow.
+The proposal is not approved while the decision is pending.
 
 ## What remains for submission
 

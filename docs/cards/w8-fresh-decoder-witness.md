@@ -1,5 +1,14 @@
 # Card: W8 fresh-decoder witness (authorized 2026-11-01)
 
+**Latest stop:** the approved 300/300-s coverage amendment ended with two cost
+stops and no full quality point. Requests `20261101T071706Z-afde26d5` and
+`20261101T073429Z-04a50c10` are terminal; first correctness checks passed but
+its full-cost projection did not fit, second smoke timed out on a shared GPU.
+Amendment charges ≤87 CPU-s and 67 GPU-s; cumulative W8 ≤937 CPU-s and 67 GPU-s.
+No third automatic run. The [exclusive-GPU proposal](../experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md)
+is not authority; it requests an inclusive 450/450-s internal cap within the
+unchanged original totals. The original coverage/input/receiver gates remain.
+
 **Current state:** the initial actual-payload rate screen stopped unresolved on
 2026-11-01: 46.3151 kbps exceeds one required anchor family's 45.8233 kbps upper
 bracket. That result remains intact. The user subsequently approved the
