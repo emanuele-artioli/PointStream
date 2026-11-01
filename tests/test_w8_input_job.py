@@ -102,6 +102,19 @@ def test_cpu_bootstrap_receipt_requires_exact_bytes_and_real_denial():
             job.check_bootstrap_receipt({**record, name: value})
 
 
+def test_landlock_requires_single_thread_and_receipt():
+    from experiments.tennis import w8_input_job as job
+
+    job.check_pre_sandbox_threads(['123'], 123)
+    job.check_thread_receipt({'pre_sandbox_thread_count': 1})
+    for threads in ([], ['123', '456'], ['456']):
+        with pytest.raises(RuntimeError, match='exactly'):
+            job.check_pre_sandbox_threads(threads, 123)
+    for value in ({}, {'pre_sandbox_thread_count': 2}, {'pre_sandbox_thread_count': True}):
+        with pytest.raises(ValueError, match='single-thread'):
+            job.check_thread_receipt(value)
+
+
 def test_installed_worker_guider_requires_exact_file_and_profile(tmp_path, monkeypatch):
     from experiments.tennis import w8_input_job as job
 

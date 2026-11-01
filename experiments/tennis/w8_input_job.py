@@ -251,6 +251,16 @@ def check_bootstrap_receipt(record: dict[str, Any]) -> None:
         raise ValueError('synthetic CPU bootstrap or cpuinfo denial not established')
 
 
+def check_pre_sandbox_threads(tasks: list[str], pid: int) -> None:
+    if tasks != [str(pid)]:
+        raise RuntimeError('Landlock requires exactly the current process thread')
+
+
+def check_thread_receipt(isolation: dict[str, Any]) -> None:
+    if type(isolation.get('pre_sandbox_thread_count')) is not int or isolation['pre_sandbox_thread_count'] != 1:
+        raise ValueError('single-thread pre-sandbox receipt required')
+
+
 def fixed_worker(bundle: Path, profile_path: Path, guider: Path, output: Path, forbidden: list[Path], parent_net: str) -> None:
     """Consume only the fixed payload after namespace and read isolation."""
     if sys.platform != 'linux':
@@ -289,6 +299,10 @@ def fixed_worker(bundle: Path, profile_path: Path, guider: Path, output: Path, f
         allowed.append(model_path.resolve())
     from experiments.tennis.k6b_receiver_sam import restrict_reads
 
+    tasks = os.listdir('/proc/self/task')
+    check_pre_sandbox_threads(tasks, os.getpid())
+    if any(int(fd) > 2 and Path('/proc/self/fd', fd).exists() for fd in os.listdir('/proc/self/fd')):
+        raise RuntimeError('unexpected descriptor before read isolation')
     abi = restrict_reads(allowed)
     try:
         with Path('/proc/cpuinfo').open('rb') as cpuinfo:
@@ -336,6 +350,7 @@ def fixed_worker(bundle: Path, profile_path: Path, guider: Path, output: Path, f
                'allowed': [str(p) for p in allowed], 'network_namespace_distinct': True,
                'parent_network_namespace': parent_net, 'worker_network_namespace': child_net,
                'network_interfaces': interfaces,
+               'pre_sandbox_thread_count': len(tasks),
                'extra_inherited_fds': False},
                'scope': 'input decode only; unused generator, SAM and native installations remain unverified'})
 
@@ -394,6 +409,7 @@ def validate_fixed(stage: Path, decoded_dir: Path, temporary_root: Path) -> dict
     check_bootstrap_receipt(result['cpu_bootstrap'])
     launch = json.loads((stage / 'fixed-launch.json').read_text())
     isolation = result['isolation']
+    check_thread_receipt(isolation)
     if (result['bundle_sha256'] != WINDOW_SHA or result['profile_sha256'] != PROFILE_SHA
             or isolation['landlock_abi'] < 1 or isolation['network_namespace_distinct'] is not True
             or not isolation.get('parent_network_namespace') or not isolation.get('worker_network_namespace')
