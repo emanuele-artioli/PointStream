@@ -36,9 +36,12 @@ def protected(path: str, cwd: Path) -> bool:
         return True
     try:
         resolved = str(candidate.resolve())
+        # macOS /home may resolve through /System/Volumes/Data/home. Compare
+        # canonical targets as well as literal Linux paths, including for aliases.
+        stores = tuple(str(Path(store).resolve()) for store in STORES)
     except OSError:
         return False
-    return any(resolved == store or resolved.startswith(store + "/") for store in STORES)
+    return any(resolved == store or resolved.startswith(store + "/") for store in stores)
 
 
 def git_block(command: str) -> str | None:
