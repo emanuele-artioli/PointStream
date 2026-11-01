@@ -97,6 +97,40 @@ def _landlock(files: list[Path], dirs: list[Path], execute: list[Path], output: 
     return abi
 
 
+def validate_inventory(path: Path, expected_sha: str, binary: Path, loader: Path,
+                       loader_sha: str, libraries: dict[Path, str]) -> dict[str, Any]:
+    """Bind the exact native grant to a separately sealed live-mapping inventory."""
+    if path.stat().st_size > 4_000_000:
+        raise ValueError('native inventory receipt identity mismatch')
+    data = path.read_bytes()
+    if len(data) > 4_000_000 or hashlib.sha256(data).hexdigest() != expected_sha:
+        raise ValueError('native inventory receipt identity mismatch')
+    inventory = json.loads(data)
+    if (inventory.get('passed') is not True or inventory.get('ffmpeg_sha256') != FFMPEG_SHA
+            or inventory.get('ivf_sha256') != IVF_SHA or inventory.get('yuv_sha256') != EXPECTED_YUV
+            or inventory.get('libdav1d_version') != '1.5.4'
+            or inventory.get('ffmpeg_path') != str(binary) or inventory.get('elf_interpreter') != str(loader)):
+        raise ValueError('native inventory scientific identity mismatch')
+    mapped = inventory.get('mapped_files')
+    if not isinstance(mapped, dict) or not mapped:
+        raise ValueError('native mapped-file inventory missing')
+    recorded = {}
+    for name, row in mapped.items():
+        candidate = Path(name)
+        if (not candidate.is_absolute() or candidate.resolve(strict=True) != candidate
+                or not isinstance(row, dict) or not isinstance(row.get('sha256'), str)):
+            raise ValueError('invalid native inventory entry')
+        recorded[candidate] = row['sha256']
+    if (recorded.get(binary) != FFMPEG_SHA or recorded.get(loader) != loader_sha
+            or not set(recorded) >= {binary, loader}
+            or libraries != {name: sha for name, sha in recorded.items() if name not in (binary, loader)}):
+        raise ValueError('native executable or library grant differs from inventory')
+    dav1d = Path(inventory['libdav1d_path'])
+    if dav1d not in libraries or 'libdav1d.so' not in dav1d.name:
+        raise ValueError('mapped libdav1d identity missing')
+    return inventory
+
+
 def run(config: dict[str, Any]) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
@@ -116,6 +150,9 @@ def run(config: dict[str, Any]) -> None:
     libraries = {Path(row['path']).resolve(strict=True): row['sha256'] for row in config['libraries']}
     if not libraries or len(libraries) != len(config['libraries']):
         raise ValueError('exact nonempty library list required')
+    inventory_path = Path(config['inventory']['path']).resolve(strict=True)
+    inventory = validate_inventory(inventory_path, config['inventory']['sha256'], binary, loader,
+                                   config['loader']['sha256'], libraries)
     for path, expected in {binary: FFMPEG_SHA, ivf: IVF_SHA, loader: config['loader']['sha256'], **libraries}.items():
         if not path.is_file() or file_sha(path) != expected:
             raise ValueError(f'native input hash: {path}')
@@ -187,6 +224,8 @@ def run(config: dict[str, Any]) -> None:
     if file_sha(target) != EXPECTED_YUV:
         raise ValueError('native decoded YUV does not match the original')
     receipt = {'version': 1, 'binary_sha256': FFMPEG_SHA, 'ivf_sha256': IVF_SHA,
+               'inventory_sha256': config['inventory']['sha256'],
+               'libdav1d_version': inventory['libdav1d_version'],
                'loader_sha256': config['loader']['sha256'],
                'libraries': {str(path): sha for path, sha in libraries.items()},
                'yuv_sha256': file_sha(target), 'yuv_bytes': target.stat().st_size,

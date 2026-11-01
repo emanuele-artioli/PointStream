@@ -42,6 +42,8 @@ def stage_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any]]:
     if (spec.get('device', 'gpu') != 'gpu' or spec.get('single_cpu_campaign') is not True
             or spec.get('cpu_threads') != 1 or len(dispatch.get('cpu_affinity', [])) != 1
             or spec.get('environment', {}).get('sha256') != JCV_ENV
+            or spec.get('gpu_sharing', {'mode': 'exclusive'}) != {'mode': 'exclusive'}
+            or spec.get('contention', {}).get('policy') != 'stop'
             or not 0 < spec.get('budget_seconds', 0) <= 500):
         raise ValueError('one-core JCV GPU campaign with at most 500 seconds required')
     wanted = {'packet': fixed.WINDOW_SHA, 'profile': fixed.PROFILE_SHA, 'oracle': ORACLE_SHA,
@@ -490,6 +492,23 @@ def cost_validate(stage: Path, output: Path) -> int:
         return 1
 
 
+def _measured_stage_overhead(stage: Path, validation: dict[str, Any]) -> float:
+    """Retain all observed non-model work in each future unit's reservation."""
+    execution = json.loads((stage / 'execution.json').read_text())
+    elapsed = execution.get('seconds')
+    if (execution.get('exit_code') != 0 or execution.get('timing_contaminated') is not False
+            or execution.get('gpu_sharing') != {'mode': 'exclusive'}
+            or not isinstance(elapsed, (int, float))
+            or not math.isfinite(elapsed) or elapsed <= 0):
+        raise ValueError('invalid completed stage execution receipt')
+    phases = validation['phase_costs']
+    accounted = sum(phases[name]['gpu_reserved_wall_seconds'] for name in
+                    ('model_load', 'original_probe', 'context_probe', 'sampling', 'publication'))
+    if not math.isfinite(accounted) or accounted < 0 or accounted > elapsed + 0.01:
+        raise ValueError('phase costs exceed full stage execution time')
+    return max(0.0, elapsed - accounted)
+
+
 def audit_pair(one_path: Path, three_path: Path, oracle_path: Path, remaining_gpu: float,
                downstream_reserve: float, extra_generation_overhead: float) -> dict[str, Any]:
     """Independently inspect retained crops for both bounded cost stages."""
@@ -531,8 +550,13 @@ def audit_pair(one_path: Path, three_path: Path, oracle_path: Path, remaining_gp
     b = {k: v for k, v in seals[1]['files'].items() if k not in dynamic}
     if a != b or seals[0]['device'] != seals[1]['device']:
         raise ValueError('cost stages used different installed inputs or GPU class')
+    measured_overhead = max(_measured_stage_overhead(one_path, validations[0]),
+                            _measured_stage_overhead(three_path, validations[1]))
+    if extra_generation_overhead < measured_overhead:
+        raise ValueError('per-unit setup reserve is below measured stage overhead')
     decision = projection(validations[0], validations[1], remaining_gpu, downstream_reserve,
                           extra_generation_overhead)
+    decision['measured_stage_overhead_seconds_per_unit'] = measured_overhead
     return {'passed': True, 'scope': 'cost projection only, not quality or promotion authority',
             'one_step': validations[0], 'three_step': validations[1], 'projection': decision}
 
@@ -557,10 +581,18 @@ def main() -> int:
     audit.add_argument('--downstream-reserve', type=float, required=True)
     audit.add_argument('--extra-generation-overhead', type=float, required=True)
     audit.add_argument('--output', type=Path, required=True)
+    audit.add_argument('--cpu-seconds', type=int, required=True)
     args = parser.parse_args()
     if args.command == 'cost-audit':
+        if not 1 <= args.cpu_seconds <= 20:
+            raise ValueError('independent cost audit requires a CPU limit of at most 20 seconds')
+        if sys.platform == 'linux' and len(os.sched_getaffinity(0)) != 1:
+            raise ValueError('independent cost audit requires one CPU')
+        resource.setrlimit(resource.RLIMIT_CPU, (args.cpu_seconds, args.cpu_seconds))
         result = audit_pair(args.one, args.three, args.oracle, args.remaining_gpu, args.downstream_reserve,
                             args.extra_generation_overhead)
+        result['audit_cpu_seconds'] = sum(resource.getrusage(resource.RUSAGE_SELF)[:2])
+        result['audit_cpu_limit'] = args.cpu_seconds
         with args.output.open('x') as stream:
             json.dump(result, stream, sort_keys=True)
         return 0

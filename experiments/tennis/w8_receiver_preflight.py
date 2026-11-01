@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import resource
@@ -162,8 +163,22 @@ def verify_sam_distribution(prefix: Path) -> dict[str, Any]:
             'bytecode_scope': 'cache bytes unverified; SAM worker must enforce source-only loading'}
 
 
-def asset_phase(config: dict[str, Any], output: Path) -> None:
+def identity_projection(samples: list[float], total_bytes: int, used_cpu: float, limit: int) -> dict[str, Any]:
+    if (not samples or any(rate < 0 for rate in samples) or total_bytes <= 0 or used_cpu < 0
+            or type(limit) is not int or not 1 <= limit <= 125):
+        raise ValueError('invalid identity pilot')
+    projected = 2 * max(samples) * total_bytes + 5.0
+    return {'sample_count': len(samples), 'worst_cpu_seconds_per_byte': max(samples),
+            'fixed_aa_sam_cpu_reserve': 5, 'safety_factor': 2, 'used_cpu_seconds': used_cpu,
+            'projected_cpu_seconds': projected, 'phase_cpu_limit': limit,
+            'status': 'fit' if used_cpu + projected <= limit else 'stop',
+            'scope': 'bounded CPU pilot; not a runtime guarantee'}
+
+
+def asset_phase(config: dict[str, Any], output: Path, identity_cpu_limit: int = 20) -> None:
     """Hash declared assets and installed source under the bounded identity phase."""
+    if type(identity_cpu_limit) is not int or not 1 <= identity_cpu_limit <= 125:
+        raise ValueError('identity CPU limit must be between 1 and 125 seconds')
     entries = config['identity_files']
     required = {'main_archive': ENV_SHAS['main'], 'jcv_archive': ENV_SHAS['jcv'], 'aa_archive': AA_SHA}
     if not required.keys() <= entries.keys():
@@ -197,15 +212,11 @@ def asset_phase(config: dict[str, Any], output: Path) -> None:
         raise ValueError('identity hashing pilot has no representative large file')
     used = resource.getrusage(resource.RUSAGE_SELF)
     used_cpu = used.ru_utime + used.ru_stime
-    projected = 2 * max(samples) * total_bytes + 5.0
+    pilot = identity_projection(samples, total_bytes, used_cpu, identity_cpu_limit)
     with (output.parent / 'pilot.json').open('x') as stream:
-        json.dump({'sample_count': len(samples), 'worst_cpu_seconds_per_byte': max(samples),
-                   'fixed_aa_sam_cpu_reserve': 5, 'safety_factor': 2,
-                   'used_cpu_seconds': used_cpu, 'projected_cpu_seconds': projected,
-                   'phase_cpu_limit': 20, 'status': 'fit' if used_cpu + projected <= 20 else 'stop',
-                   'scope': 'bounded CPU pilot; not a runtime guarantee'}, stream, sort_keys=True)
-    if used_cpu + projected > 20:
-        raise RuntimeError('measured identity pilot does not fit the remaining 20 CPU-s bound')
+        json.dump(pilot, stream, sort_keys=True)
+    if pilot['status'] != 'fit':
+        raise RuntimeError('measured identity pilot does not fit the configured CPU-s bound')
     hashes = {}
     for name, entry in entries.items():
         if set(entry) != {'path', 'sha256'}:
@@ -235,7 +246,7 @@ def asset_phase(config: dict[str, Any], output: Path) -> None:
 
 
 def _child_limit(seconds: int) -> None:
-    resource.setrlimit(resource.RLIMIT_CPU, (seconds, 60))
+    resource.setrlimit(resource.RLIMIT_CPU, (seconds, 165))
     resource.setrlimit(resource.RLIMIT_FSIZE, (2 * 1024 * 1024, 2 * 1024 * 1024))
 
 
@@ -274,7 +285,23 @@ def worker_config(source: Path, worker_out: Path, allow_paths: list[str], denied
                                                              'sha256': sha(identity_receipt)}}
 
 
-def run(config: dict[str, Any], archive_sha: str, out: Path) -> dict[str, Any]:
+def wall_allowance(deadline: float, now: float, requested: int, remaining_workers: int) -> int:
+    """Reserve each 120-second worker ceiling and five seconds of closeout."""
+    if (not math.isfinite(deadline) or not math.isfinite(now) or type(requested) is not int
+            or requested <= 0 or type(remaining_workers) is not int or remaining_workers < 0):
+        raise ValueError('invalid wall deadline')
+    available = math.floor(deadline - now - 120 * remaining_workers - 5)
+    if available < 1:
+        raise RuntimeError('insufficient remaining wall time for reserved stages')
+    return min(requested, available)
+
+
+def run(config: dict[str, Any], archive_sha: str, out: Path, identity_cpu_limit: int = 20,
+        identity_wall_limit: int = 120, deadline_monotonic: float | None = None) -> dict[str, Any]:
+    if type(identity_cpu_limit) is not int or not 1 <= identity_cpu_limit <= 125:
+        raise ValueError('identity CPU limit must be between 1 and 125 seconds')
+    if type(identity_wall_limit) is not int or not 1 <= identity_wall_limit <= 1200:
+        raise ValueError('identity wall limit must be between 1 and 1200 seconds')
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux one-core affinity required')
     if set(config) != {'source_archive', 'source_tree', 'runtimes', 'identity_files', 'denied_paths'}:
@@ -287,7 +314,7 @@ def run(config: dict[str, Any], archive_sha: str, out: Path) -> dict[str, Any]:
         raise ValueError('both frozen runtimes required')
     if any(out.iterdir()):
         raise ValueError('new empty output required')
-    resource.setrlimit(resource.RLIMIT_CPU, (6, 60))
+    resource.setrlimit(resource.RLIMIT_CPU, (6, 165))
     archive = Path(config['source_archive']).resolve(strict=True)
     if not archive.is_relative_to(local):
         raise ValueError('source archive must be host-local')
@@ -321,8 +348,10 @@ def run(config: dict[str, Any], archive_sha: str, out: Path) -> dict[str, Any]:
     if not main_python.is_relative_to(main_prefix.resolve(strict=True)):
         raise ValueError('MAIN interpreter outside frozen cache')
     command = [str(main_python), str(Path(__file__).resolve()), '--assets', str(frozen_config),
-               '--assets-output', str(identities / 'assets.json')]
-    asset_usage = _invoke(command, base_env, source, identities, 20, 120)
+               '--assets-output', str(identities / 'assets.json'), '--identity-cpu-seconds', str(identity_cpu_limit)]
+    identity_wall = (wall_allowance(deadline_monotonic, time.monotonic(), identity_wall_limit, 2)
+                     if deadline_monotonic is not None else identity_wall_limit)
+    asset_usage = _invoke(command, base_env, source, identities, identity_cpu_limit, identity_wall)
     parent_user = os.readlink('/proc/self/ns/user')
     parent_net = os.readlink('/proc/self/ns/net')
     results = {}
@@ -345,7 +374,10 @@ def run(config: dict[str, Any], archive_sha: str, out: Path) -> dict[str, Any]:
         argv = ['/usr/bin/unshare', '--user', '--map-root-user', '--net', str(python), '-m',
                 'experiments.tennis.w8_receiver_bootstrap', '--config', str(config_file),
                 '--config-sha256', sha(config_file), '--cpu-seconds', '12']
-        usage = _invoke(argv, base_env, source, stage, 12, 120)
+        remaining_workers = 1 if name == 'main' else 0
+        wall = (wall_allowance(deadline_monotonic, time.monotonic(), 120, remaining_workers)
+                if deadline_monotonic is not None else 120)
+        usage = _invoke(argv, base_env, source, stage, 12, wall)
         receipt = json.loads((worker_out / 'preflight.json').read_text())
         if (receipt['torch'] != EXPECTED_TORCH[name] or receipt['cuda_initialized'] is not False
                 or receipt['visible_devices'] != '' or Path(receipt['executable']).resolve() != python
@@ -379,14 +411,21 @@ def main() -> int:
     parser.add_argument('--output', type=Path)
     parser.add_argument('--assets', type=Path)
     parser.add_argument('--assets-output', type=Path)
+    parser.add_argument('--identity-cpu-seconds', type=int, default=20)
+    parser.add_argument('--identity-wall-seconds', type=int, default=120)
+    parser.add_argument('--deadline-monotonic', type=float)
     args = parser.parse_args()
     if args.assets and args.assets_output and not any((args.config, args.source_sha256, args.output)):
-        asset_phase(json.loads(args.assets.read_text()), args.assets_output)
+        if not 1 <= args.identity_cpu_seconds <= 125:
+            raise ValueError('identity CPU limit must be between 1 and 125 seconds')
+        resource.setrlimit(resource.RLIMIT_CPU, (args.identity_cpu_seconds, 165))
+        asset_phase(json.loads(args.assets.read_text()), args.assets_output, args.identity_cpu_seconds)
         return 0
     if not args.config or not args.source_sha256 or not args.output or args.assets or args.assets_output:
         parser.error('config, source-sha256 and output required')
     config = json.loads(args.config.read_text())
-    result = run(config, args.source_sha256, args.output)
+    result = run(config, args.source_sha256, args.output, args.identity_cpu_seconds, args.identity_wall_seconds,
+                 args.deadline_monotonic)
     (args.output / 'result.json').write_text(json.dumps(result, sort_keys=True))
     return 0
 

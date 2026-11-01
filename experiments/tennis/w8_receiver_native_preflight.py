@@ -32,6 +32,7 @@ LOCAL = Path('/local/users/emanuele/pointstream')
 MAIN = LOCAL / 'cache' / ENV_SHA / 'tree'
 DATA = Path('/home/itec/emanuele/Datasets/pointstream-data')
 SYSTEM = tuple(Path(p).resolve() for p in ('/usr/lib', '/usr/lib64', '/lib', '/lib64'))
+LD_CACHE = Path('/etc/ld.so.cache')
 
 
 def sha(data: bytes) -> str:
@@ -94,7 +95,8 @@ def mapped_files(text: str, roots: tuple[Path, ...]) -> list[Path]:
         if name.endswith(' (deleted)') or not name.startswith('/'):
             raise ValueError('deleted or unrecognized file-backed mapping')
         path = Path(name).resolve(strict=True)
-        if not path.is_file() or not any(path == root or path.is_relative_to(root) for root in roots):
+        cache = Path(name) == LD_CACHE and path == LD_CACHE
+        if not path.is_file() or not (cache or any(path == root or path.is_relative_to(root) for root in roots)):
             raise ValueError(f'unapproved mapped file: {path}')
         result.add(path)
     return sorted(result)

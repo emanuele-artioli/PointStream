@@ -102,13 +102,20 @@ def test_stage_input_mapping_rejects_substituted_bytes(tmp_path, monkeypatch):
         declared.append({'name': name, 'path': str(path), 'sha256': digest, 'extract': False})
         staged.append({'name': name, 'path': str(path), 'sha256': digest, 'extract': False})
     spec = {'device': 'gpu', 'single_cpu_campaign': True, 'cpu_threads': 1,
-            'environment': {'sha256': job.JCV_ENV}, 'budget_seconds': 500, 'staged_inputs': declared}
+            'environment': {'sha256': job.JCV_ENV}, 'budget_seconds': 500, 'staged_inputs': declared,
+            'contention': {'policy': 'stop'}}
     (stage.parent / 'spec.json').write_text(json.dumps(spec))
     (stage / 'staging.json').write_text(json.dumps({'inputs': staged}))
     (stage / 'dispatch.json').write_text(json.dumps({'cpu_affinity': [0]}))
     monkeypatch.setattr(job.fixed, 'file_sha', lambda path: expected[path.name])
     result, _ = job.stage_inputs(stage)
     assert set(result) == set(expected)
+    spec['gpu_sharing'] = {'mode': 'shared', 'basis': 'test', 'margin_mib': 1024}
+    (stage.parent / 'spec.json').write_text(json.dumps(spec))
+    with pytest.raises(ValueError, match='one-core JCV'):
+        job.stage_inputs(stage)
+    del spec['gpu_sharing']
+    (stage.parent / 'spec.json').write_text(json.dumps(spec))
     staged[0]['sha256'] = 'wrong'
     (stage / 'staging.json').write_text(json.dumps({'inputs': staged}))
     with pytest.raises(ValueError, match='staged identity mismatch'):
@@ -192,3 +199,78 @@ def test_retained_decoder_audit_checks_unit_and_manifest_binding(tmp_path, monke
     unit.write_bytes(b'tampered')
     with pytest.raises(ValueError, match='do not bind'):
         job.audit_retained_inputs(tmp_path, seal, fingerprints)
+
+
+def test_projection_reserves_complete_observed_stage_overhead(tmp_path):
+    import json
+
+    validation = _cost(3, 14)
+    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': 45.0, 'timing_contaminated': False, 'gpu_sharing': {'mode': 'exclusive'}}))
+    # 30 seconds were recorded in model/probe/sample/publication phases; the
+    # remaining 15 seconds include packet setup and the enclosing process.
+    assert job._measured_stage_overhead(tmp_path, validation) == pytest.approx(15.0)
+    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': 45.0, 'timing_contaminated': True, 'gpu_sharing': {'mode': 'exclusive'}}))
+    with pytest.raises(ValueError, match='execution receipt'):
+        job._measured_stage_overhead(tmp_path, validation)
+    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': 29.0, 'timing_contaminated': False, 'gpu_sharing': {'mode': 'exclusive'}}))
+    with pytest.raises(ValueError, match='phase costs exceed'):
+        job._measured_stage_overhead(tmp_path, validation)
+    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 1, 'seconds': 45.0, 'timing_contaminated': False, 'gpu_sharing': {'mode': 'exclusive'}}))
+    with pytest.raises(ValueError, match='execution receipt'):
+        job._measured_stage_overhead(tmp_path, validation)
+
+
+def test_independent_cost_audit_rejects_unreserved_observed_overhead(tmp_path, monkeypatch):
+    import json
+    from pathlib import Path
+
+    campaign = tmp_path / 'job-id'
+    smoke, full = campaign / 'smoke', campaign / 'full'
+    smoke.mkdir(parents=True)
+    full.mkdir()
+    retained = {smoke: tmp_path / 'retained-smoke', full: tmp_path / 'retained-full'}
+    seal = {'files': {'unit': 'same'}, 'device': {'name': 'same'}}
+    for path in retained.values():
+        path.mkdir()
+        (path / 'sealed.json').write_text(json.dumps(seal))
+    for stage, seconds in ((smoke, 45.0), (full, 49.0)):
+        (stage / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': seconds, 'timing_contaminated': False, 'gpu_sharing': {'mode': 'exclusive'}}))
+    validation = {1: _cost(1, 10), 3: _cost(3, 14)}
+    def summary(stage):
+        steps = 1 if stage == smoke else 3
+        return {'scope': 'qualification_only', 'quality_claim': False, 'steps': steps,
+                'retained_output': str(retained[stage]), 'generation_seal': seal,
+                'validation': validation[steps], 'inputs': {}, 'preflight_sha256': 'same'}
+    monkeypatch.setattr(job, 'read_published_summary', summary)
+    monkeypatch.setattr(job, 'check_summary_resources', lambda *_: None)
+    monkeypatch.setattr(job, 'read_oracle', lambda *_: {})
+    monkeypatch.setattr(job, 'retained_path', lambda stage: retained[stage])
+    monkeypatch.setattr(job, 'audit_retained_inputs', lambda *_: None)
+    monkeypatch.setattr(job.receiver, 'validate_cost_probe', lambda _out, _expected, steps: validation[steps])
+    original_resolve = Path.resolve
+    monkeypatch.setattr(Path, 'resolve', lambda self, strict=False: self if str(self) == '/local/users/emanuele'
+                        else original_resolve(self, strict=strict))
+    monkeypatch.setattr(Path, 'is_relative_to', lambda *_: True)
+    with pytest.raises(ValueError, match='below measured stage overhead'):
+        job.audit_pair(smoke, full, tmp_path / 'oracle', 500, 10, 18)
+    result = job.audit_pair(smoke, full, tmp_path / 'oracle', 500, 10, 19)
+    assert result['projection']['measured_stage_overhead_seconds_per_unit'] == pytest.approx(19)
+
+
+def test_cost_audit_requires_and_records_cpu_cap(tmp_path, monkeypatch):
+    import json
+    import sys
+
+    output = tmp_path / 'audit.json'
+    captured = []
+    monkeypatch.setattr(job.resource, 'setrlimit', lambda which, limits: captured.append((which, limits)))
+    monkeypatch.setattr(job, 'audit_pair', lambda *_: {'passed': True})
+    monkeypatch.setattr(sys, 'argv', ['w8_receiver_job', 'cost-audit', '--one', 'smoke', '--three', 'full',
+                                     '--oracle', 'oracle', '--remaining-gpu', '100', '--downstream-reserve', '10',
+                                     '--extra-generation-overhead', '15', '--cpu-seconds', '7', '--output', str(output)])
+    assert job.main() == 0
+    assert captured == [(job.resource.RLIMIT_CPU, (7, 7))]
+    assert json.loads(output.read_text())['audit_cpu_limit'] == 7
+    sys.argv[sys.argv.index('--cpu-seconds') + 1] = '21'
+    with pytest.raises(ValueError, match='at most 20 seconds'):
+        job.main()

@@ -114,3 +114,32 @@ def test_preflight_worker_config_passes_actual_bootstrap_parser(tmp_path, monkey
     config_path.write_text(json.dumps(config, sort_keys=True))
     assert bootstrap.load_config(config_path, preflight.sha(config_path)) == config
     assert config['cpu_seconds'] == 12 and config['environment']['CUDA_VISIBLE_DEVICES'] == ''
+
+
+def test_identity_budget_amendment_preserves_pilot_rule():
+    rate = 2.6378631591796985e-9
+    size = 19856141745
+    before = preflight.identity_projection([rate], size, 0.11, 20)
+    after = preflight.identity_projection([rate], size, 0.11, 125)
+    assert before['safety_factor'] == after['safety_factor'] == 2
+    assert before['fixed_aa_sam_cpu_reserve'] == after['fixed_aa_sam_cpu_reserve'] == 5
+    assert before['projected_cpu_seconds'] == after['projected_cpu_seconds']
+    assert before['status'] == 'stop' and after['status'] == 'fit'
+    with pytest.raises(ValueError, match='invalid identity pilot'):
+        preflight.identity_projection([rate], size, 0.11, 126)
+
+
+def test_amended_preflight_rejects_caps_before_any_host_action(tmp_path):
+    with pytest.raises(ValueError, match='identity CPU limit'):
+        preflight.run({}, '0' * 64, tmp_path, identity_cpu_limit=126)
+    with pytest.raises(ValueError, match='identity wall limit'):
+        preflight.run({}, '0' * 64, tmp_path, identity_cpu_limit=125, identity_wall_limit=1201)
+
+
+def test_wall_allowance_reserves_unstarted_workers_and_closeout():
+    assert preflight.wall_allowance(600, 100, 510, 2) == 255
+    assert preflight.wall_allowance(600, 450, 120, 1) == 25
+    with pytest.raises(RuntimeError, match='insufficient remaining wall'):
+        preflight.wall_allowance(600, 355, 120, 2)
+    with pytest.raises(ValueError, match='invalid wall deadline'):
+        preflight.wall_allowance(float('nan'), 1, 120, 0)
