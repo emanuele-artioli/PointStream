@@ -2,10 +2,15 @@
 
 **Current state:** the initial actual-payload rate screen stopped unresolved on
 2026-11-01: 46.3151 kbps exceeds one required anchor family's 45.8233 kbps upper
-bracket. No GPU or new fleet job ran. See the [outcome](../experiments/w8-wire-audit.md).
-This card is not permission to replay the stopped candidate, silently redesign
-its payload or submit the untested CPU draft. A new prospective amendment must
-retain the failed screen and its separate exact-input qualification gap.
+bracket. That result remains intact. The user subsequently approved the
+[prospective coverage amendment](../experiments/w8-inputs/prospective-coverage-followup.md):
+score one verified existing baseline bitstream at 49.6733 kbps plus the three
+original controls, using at most **300 GPU-s and 300 workload CPU-s inside the
+original 3,600/3,600 ceilings**. No training, new encoding, changed payload or
+increased total budget. Resume the original exact-input, isolation and receiver
+gates only if the independently audited four-family rate screen passes. Other
+failures still stop; the original unresolved screen and Mac geometry diagnostic
+are not waived. No new job had run when this amendment was approved.
 
 **Goal.** Test whether the frozen W7 scale-4 hybrid for one specified window can be reconstructed by a fresh receiver from a complete, actually serialized payload and explicitly installed decoder models, at a rate that still supports a narrowly defined single-window player comparison. This is a feasibility witness; it does not claim a complete codec win, Tier 2 success, 240-frame coverage, reference reuse, live operation or generalization.
 

@@ -160,6 +160,17 @@ the workload with `CUDA_VISIBLE_DEVICES=""`. Staging, the smoke gate, the
 validator, budgets and deadlines are unchanged. Workers admit cpu jobs only from
 a release that includes this path (`workers restart`).
 
+GPU campaigns may opt in to `"single_cpu_campaign": true` with
+`"cpu_threads": 1`. Before campaign input checks and staging, the campaign
+selects and verifies one allowed Linux CPU; ordinary children inherit that
+affinity, and the selected CPU and monotonic campaign timings are recorded in
+each stage's `dispatch.json`. This is cooperative workload containment, not an
+immutable security boundary: reviewed code and native tools must not widen
+affinity or escape the process group. It does not itself impose a CPU-time
+limit, cover earlier worker admission or a separate audit, or eliminate monitor
+polling and termination overhead. Those need their own accounting and bounds.
+Workers must run the release implementing the opt-in before it is used.
+
 Children inherit `PS_STAGE` (smoke/full), `PS_STAGE_DIR` (separate output directory),
 `PS_JOB_DIR` (supervisor directory), `PS_VALIDATION_PATH`, `PS_SCRATCH_DIR`,
 `PS_CHECKPOINT_DIR` and `PS_ATTEMPT` (1 unless a declared resume started it). Write outputs to
@@ -228,8 +239,8 @@ Do per-file work locally and move bytes over NFS in a few large files.
   intermediates there. Anything placed in `$PS_SCRATCH_DIR/publish/` returns to
   the stage directory as one `published.tar`, recorded with its SHA256. Local
   scratch is deleted after a successful stage and kept on the host after a failure
-  (`staging.json` names it). A stage that stops for any reason publishes
-  `partial.tar` instead ([below](#partial-outputs)).
+  (`staging.json` names it). Normally a stage that stops publishes `partial.tar`
+  instead; a campaign may explicitly defer that salvage ([below](#partial-outputs)).
 - Optional `staged_inputs` entries, `{"name", "path", "sha256", "extract"}`, name
   files under the data root. Pass them as whole-argument `{staged:NAME}`
   placeholders. Each stage copies a file once into the host's cache, keyed by
@@ -427,6 +438,13 @@ stage that was running:
 Scratch stays on the host as before. Outputs that a stage already wrote directly
 to `PS_STAGE_DIR` stay where they are. Write each finished result to `publish/` as
 soon as it completes, so a stop loses only the item in progress.
+
+An explicitly opted-in `"defer_failed_publication": true` requires
+`"single_cpu_campaign": true` and disables automatic salvage for that request.
+Failed scratch and checkpoints remain on the host at the paths in `staging.json`;
+no `partial.tar` or `checkpoint.tar` is promised. Any later manual salvage must
+be separately authorized and charged to an available budget. Requests without
+this flag retain the normal automatic salvage behavior above.
 
 ### Checkpoints
 
