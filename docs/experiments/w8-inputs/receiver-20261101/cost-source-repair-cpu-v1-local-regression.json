@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "scope": "stdlib pre-I/O source payload guard: valid passes, missing map, tampered source and traversal reject; no worker/config execution",
+  "config_check": "actual stdlib bootstrap rejects malformed packet config with matching digest before accessing paths",
+  "embedded_validator_syntax": "passed",
+  "all_planned_executable_syntax": "passed"
+}

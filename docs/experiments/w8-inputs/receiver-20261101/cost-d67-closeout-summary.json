@@ -1,0 +1,42 @@
+{
+  "job": "20261101T135101Z-d67fe593",
+  "result": "failed before packet decode; no generator or full stage",
+  "host": "gpu6",
+  "gpu_index": 0,
+  "source_archive_sha_prefix": "c9442ad6",
+  "fleet_source_sha_prefix": "931e6b38",
+  "spec_sha_prefix": "abb5c4ab",
+  "supervisor_status_started": 1793541191.2100806,
+  "supervisor_terminal_status_ended": 1793541261.0871592,
+  "terminal_reconciled_after_supervisor_exit": 1793541318.8354883,
+  "conservative_allocation_upper_seconds": 128,
+  "basis": "monitor starts before claim; worker reconciles terminal only after supervisor exit; monitor finally releases claim before exit",
+  "campaign_single_cpu_upper_seconds": 128,
+  "preallocation_cpu_upper": 40,
+  "independent_audit_allowance_cpu": 20,
+  "monitoring_allowance_cpu": 20,
+  "pilot_cpu_upper": 208,
+  "pilot_gpu_upper": 128,
+  "prior_cpu_upper": 1917,
+  "prior_gpu": 224,
+  "proposed_cumulative_cpu_upper": 2125,
+  "proposed_cumulative_gpu_upper": 352,
+  "remaining_cpu_lower": 1475,
+  "remaining_gpu_lower": 3248,
+  "notes": [
+    "Campaign and GPU charges are conservative wall upper bounds, not measured CPU or GPU use.",
+    "The independent audit allowance and monitoring allowance are conservatively charged in full.",
+    "No 30-step quality conclusion."
+  ],
+  "sha256": {
+    "cost-d67-status.json": "bfbec4c937d5fbbe59274e17fd1a3eadc63bb74ea8520199eb82558cc1864345",
+    "cost-d67-events.json": "5cd9a84105c1e1b7a23ffbcf1fe00258a60861fa8692b354c327fef04939da46",
+    "cost-d67-packet-worker.json": "0d5560fc1d942e095f641bed2a253f58fb3c8806838e25ec23136c5d28d8e0b6",
+    "cost-d67-process-closeout.json": "531c9df86accbc8695346b348a5c3b92e8a479e97a72a035e7e2b27d4b38ab68",
+    "cost-d67-event-ack.json": "e6ceeb1aea29ccfddcfebe082b9cd811c9bb1be76eda583d86326e724e3423f2",
+    "cost-d67-command.log": "1009c2722d8ed866cc09bf5f98a2097de423502babd277587e0ac5fa61627271",
+    "cost-d67-execution.json": "cbf8e87462dc3d4b5368cf175a90f203489d509d98229a2d6b2316732b2f1ff9",
+    "cost-d67-staging.json": "bf4454dc94bc72e849a58a305f565a597c0be591da7dcd73deb2a8bcf8c00cff",
+    "cost-d67-export-receipt.json": "83a2437b531bc0ec761a77d5f31e000cab0797bd8515a8eb9772032d02659c13"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "job_id": "20261101T093351Z-24914a4d",
+  "supervisor_pid": 3432793,
+  "supervisor_start_time": 1793525643.61,
+  "workload_pid": 3432799,
+  "workload_process_group_id": 3432799,
+  "processes_absent": true,
+  "process_group_empty": true,
+  "cpu_allocations_empty": true,
+  "closeout": {
+    "job_id": "20261101T093351Z-24914a4d",
+    "processes": {
+      "3432793": null,
+      "3432799": null
+    },
+    "process_group_members": [],
+    "cpu_claim": {
+      "host": "gpu6.itec.aau.at",
+      "available_cores": 85,
+      "cap": 85,
+      "allocations": {},
+      "updated_at": 1793525704.247389
+    },
+    "cpu_s": 0.091096
+  },
+  "execution": {
+    "exit_code": 0,
+    "cpu_ceiling_s": 5,
+    "local_cpu_s": 0.052310999999999996,
+    "ssh_cpu_s": 0.025113
+  },
+  "terminal_event_id": "b2ef4c7dacbf5f0d93f9d76e0cd37d7d",
+  "event_delivered_and_acknowledged": true,
+  "native_wait_handle": 70480,
+  "campaign_cpu_s_upper": 61,
+  "extra_reservation_cpu_s": 40,
+  "closed_cpu_s_upper": 101,
+  "w8_cumulative_cpu_s_upper": 1372,
+  "w8_cumulative_gpu_s_upper": 224,
+  "original_cpu_s_cap": 3600,
+  "original_gpu_s_cap": 3600
+}

@@ -1,0 +1,179 @@
+#!/usr/bin/env python3
+"""One source-pinned runtime qualification; do not run without root approval."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import resource
+import shlex
+import signal
+import subprocess
+import tarfile
+import time
+
+resource.setrlimit(resource.RLIMIT_CPU, (2, 2))
+REV = 'b58155b46cea2232ad572effed9dd6c727676498'
+SHA = '26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5'
+MODULE_SHA = '86f604c37e94880f4654a35678edb2f217ac22c96eb990adaeeb558f34f631dd'
+CONFIG_SHA = '1e8c279415dc595464f1dc0b37c3b0cec3031ba1fdc4fe60fc40abea925ae557'
+CHEAP_RESULT_SHA = '45756e894839c78229d11c3edadaadce0e0f4e521e372291053edcbf31826f64'
+CHEAP_CHECKPOINT_SHA = 'e1d8b5df8f35347990869207194a4e229f5e32faa463b61cd6c85e309b1c4f4b'
+CHEAP_AUDIT_SHA = 'd5bf6388f0f2e704fcc11b49ad1b2f9138d816c165ef5c64cbb4c8f67b352dcd'
+ARCHIVE = Path('/private/tmp/pointstream-w8-runtime-source-b58155b4-scoped-20261101.tar')
+REMOTE_SOURCE = '/local/users/emanuele/pointstream/audits/w8-source-publish-b581-scoped-v2-20261101/source.tar'
+REMOTE_ROOT = '/local/users/emanuele/pointstream/audits/w8-receiver-runtime-qual-b581-full-v1-20261101'
+LOCAL_OUT = Path('/private/tmp/w8-receiver-runtime-qual-b581-full-v1-20261101')
+PYTHON = ('/local/users/emanuele/pointstream/cache/'
+          '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python')
+
+
+def ssh_limit():
+    resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+
+
+def alarm(_signum, _frame):
+    raise TimeoutError('whole launcher wall deadline expired')
+
+
+def main():
+    started = time.monotonic()
+    signal.signal(signal.SIGALRM, alarm)
+    signal.alarm(1515)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gate', type=Path, required=True)
+    parser.add_argument('--gate-sha256', required=True)
+    parser.add_argument('--cheap-result', type=Path, required=True)
+    parser.add_argument('--cheap-checkpoint', type=Path, required=True)
+    parser.add_argument('--cheap-audit', type=Path, required=True)
+    parser.add_argument('--source-audit', type=Path, required=True)
+    args = parser.parse_args()
+    gate_bytes = args.gate.read_bytes()
+    if len(gate_bytes) > 100000 or hashlib.sha256(gate_bytes).hexdigest() != args.gate_sha256:
+        raise ValueError('reviewed qualification gate identity mismatch')
+    gate = json.loads(gate_bytes)
+    cheap, audit = gate['cheap_v3'], gate['source_audit']
+    if (cheap.get('passed') is not True or cheap.get('module_sha256') != MODULE_SHA
+            or cheap.get('config_sha256') != CONFIG_SHA
+            or cheap.get('result_sha256') != CHEAP_RESULT_SHA
+            or cheap.get('checkpoint_sha256') != CHEAP_CHECKPOINT_SHA
+            or cheap.get('audit_sha256') != CHEAP_AUDIT_SHA
+            or audit.get('passed') is not True or audit.get('source_sha256') != SHA
+            or audit.get('mode') != '0444' or audit.get('independently_audited') is not True):
+        raise ValueError('passing reviewed cheap check and independent source audit required')
+    result_bytes = args.cheap_result.read_bytes()
+    checkpoint_bytes = args.cheap_checkpoint.read_bytes()
+    audit_bytes = args.source_audit.read_bytes()
+    cheap_audit_bytes = args.cheap_audit.read_bytes()
+    if (max(len(result_bytes), len(checkpoint_bytes), len(audit_bytes), len(cheap_audit_bytes)) > 2_000_000
+            or hashlib.sha256(cheap_audit_bytes).hexdigest() != CHEAP_AUDIT_SHA
+            or hashlib.sha256(result_bytes).hexdigest() != cheap['result_sha256']
+            or hashlib.sha256(checkpoint_bytes).hexdigest() != cheap['checkpoint_sha256']
+            or hashlib.sha256(audit_bytes).hexdigest() != audit.get('receipt_sha256')):
+        raise ValueError('reviewed cheap or source audit evidence identity mismatch')
+    cheap_audit = json.loads(cheap_audit_bytes)
+    if (cheap_audit.get('passed') is not True or cheap_audit.get('result_sha256') != CHEAP_RESULT_SHA
+            or cheap_audit.get('checkpoint_sha256') != CHEAP_CHECKPOINT_SHA):
+        raise ValueError('independent cheap-check audit mismatch')
+    result = json.loads(result_bytes)
+    aa, sam = result['aa_installed'], result['sam_distribution']
+    exception = aa['packaging_manifest']
+    if (aa['verified_files'] != 91 or len(aa['files']) != 91
+            or exception['archive_sha256'] != 'ea1c5985073896d678a1e43c06a148f22ec35782284606551ce5a35392d6a92a'
+            or exception['installed_sha256'] != '2df8039adeeeef1add25cf3c02f45cdaa1189093278b87f8174c014d65b9e7e2'
+            or exception['classification'] != 'known_generated_packaging_manifest_difference'
+            or exception['path'] in aa['files'] or sam['record_hashed_files'] != 160
+            or sam['commit'] != '2345a4ad109ac29c569da749c91d84f10dc08c40'):
+        raise ValueError('cheap-check result does not contain the approved AA/SAM evidence')
+    records = [json.loads(line) for line in checkpoint_bytes.splitlines()]
+    if (sum(row.get('kind') == 'aa_regular' for row in records) != 91
+            or sum(row.get('kind') == 'aa_packaging_manifest' for row in records) != 1
+            or sum(row.get('kind') == 'sam_record' for row in records) != 160):
+        raise ValueError('cheap-check checkpoint coverage mismatch')
+    audit_result = json.loads(audit_bytes)
+    if (audit_result.get('passed') is not True or audit_result.get('source_sha256') != SHA
+            or audit_result.get('mode') != '0444'):
+        raise ValueError('independent source audit does not bind approved archive')
+    data = ARCHIVE.read_bytes()
+    if len(data) != 4638720 or hashlib.sha256(data).hexdigest() != SHA:
+        raise ValueError('local scoped source archive identity mismatch')
+    with tarfile.open(ARCHIVE) as tar:
+        if tar.pax_headers.get('comment') != REV:
+            raise ValueError('source archive revision marker mismatch')
+        member = tar.getmember('docs/experiments/w8-inputs/receiver-20261101/cpu-bootstrap-preflight-template.json')
+        if not member.isfile() or member.size > 100000:
+            raise ValueError('invalid frozen preflight config')
+        stream = tar.extractfile(member)
+        if stream is None:
+            raise ValueError('frozen config missing')
+        config = json.load(stream)
+        module = tar.extractfile('experiments/tennis/w8_receiver_preflight.py')
+        if module is None or hashlib.sha256(module.read()).hexdigest() != MODULE_SHA:
+            raise ValueError('source archive module differs from approved cheap check')
+    config['source_archive'] = REMOTE_SOURCE
+    config['source_tree'] = REMOTE_ROOT + '/source'
+    remote = r'''import hashlib,json,os,resource,sys,tarfile,time
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(6,165))
+deadline=time.monotonic()+1490
+os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
+local=Path('/local/users/emanuele/pointstream');data=Path('/home/itec/emanuele/Datasets/pointstream-data')
+if local.stat().st_dev==data.stat().st_dev:raise ValueError('separate local filesystem required')
+if os.statvfs(local).f_bavail*os.statvfs(local).f_frsize<2*1024**3:raise ValueError('insufficient local space')
+archive=Path(REMOTE_SOURCE)
+if archive.is_symlink() or archive.stat().st_size!=4638720 or archive.stat().st_mode&0o777!=0o444:raise ValueError('source archive identity or mode')
+h=hashlib.sha256()
+with archive.open('rb') as f:
+ for block in iter(lambda:f.read(1048576),b''):h.update(block)
+if h.hexdigest()!=SHA:raise ValueError('published source SHA mismatch')
+out=Path(REMOTE_ROOT);out.mkdir(mode=0o700,exist_ok=False)
+source=out/'source';source.mkdir()
+with tarfile.open(archive,'r:') as tar:
+ members=tar.getmembers()
+ if len(members)>5000 or sum(m.size for m in members)>64*1024**2:raise ValueError('source extraction cap')
+ if any(m.issym() or m.islnk() or m.name.startswith('/') or '..' in Path(m.name).parts for m in members):raise ValueError('source archive member')
+ tar.extractall(source,filter='data')
+config=json.loads(CONFIG)
+with (out/'config.json').open('x') as f:json.dump(config,f,sort_keys=True)
+output=out/'results';output.mkdir()
+env={'PATH':'/usr/bin:/bin','CUDA_VISIBLE_DEVICES':'','PYTHONPATH':str(source),'PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1','MKL_NUM_THREADS':'1','NUMEXPR_NUM_THREADS':'1','TMPDIR':str(out),'TMP':str(out),'TEMP':str(out),'XDG_CACHE_HOME':str(out),'TORCH_HOME':str(out)}
+os.execve(PYTHON,[PYTHON,'-B',str(source/'experiments/tennis/w8_receiver_preflight.py'),'--config',str(out/'config.json'),'--source-sha256',SHA,'--output',str(output),'--identity-cpu-seconds','125','--identity-wall-seconds','1200','--deadline-monotonic',str(deadline)],env)
+'''
+    values = {'REMOTE_SOURCE': REMOTE_SOURCE, 'REMOTE_ROOT': REMOTE_ROOT, 'SHA': SHA,
+              'CONFIG': json.dumps(config), 'PYTHON': PYTHON}
+    program = '\n'.join(f'{key}={value!r}' for key, value in values.items()) + '\n' + remote
+    command = ' '.join(shlex.quote(x) for x in ('/usr/bin/timeout', '--signal=TERM', '--kill-after=2',
+                                                '1500s', PYTHON, '-B', '-c', program))
+    LOCAL_OUT.mkdir(mode=0o700, exist_ok=False)
+    (LOCAL_OUT / 'gate.json').write_bytes(gate_bytes)
+    (LOCAL_OUT / 'config.json').write_text(json.dumps(config, sort_keys=True, indent=2) + '\n')
+    (LOCAL_OUT / 'remote-program.py.txt').write_text(program)
+    with (LOCAL_OUT / 'stdout').open('xb') as stdout, (LOCAL_OUT / 'stderr').open('xb') as stderr:
+        proc = subprocess.Popen(['/usr/bin/ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', 'gpu6', command],
+                                stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, close_fds=True,
+                                preexec_fn=ssh_limit)
+        (LOCAL_OUT / 'handle.json').write_text(json.dumps({'pid': proc.pid, 'started_monotonic': started,
+            'source_sha256': SHA, 'gate_sha256': args.gate_sha256, 'remote_root': REMOTE_ROOT,
+            'cpu_reservation_seconds': 168, 'gpu_seconds': 0}, indent=2) + '\n')
+        status = 'completed'
+        try:
+            code = proc.wait()  # blocking waitpid; alarm bounds the entire local operation
+        except TimeoutError:
+            status = 'unknown_inspect_do_not_replay'
+            try:
+                proc.kill()  # only the launcher-owned local SSH PID
+            except ProcessLookupError:
+                pass
+            code = proc.wait()
+        signal.alarm(0)
+        receipt = {'status': status, 'returncode': code, 'wall_seconds': time.monotonic() - started,
+                   'local_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+                   'ssh_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2])}
+        (LOCAL_OUT / 'execution.json').write_text(json.dumps(receipt, indent=2) + '\n')
+        print(json.dumps({'status': status, 'returncode': code, 'output': str(LOCAL_OUT)}))
+        if status != 'completed' or code:
+            raise SystemExit(1)
+
+
+if __name__ == '__main__':
+    main()

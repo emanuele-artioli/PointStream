@@ -1,0 +1,124 @@
+/usr/bin/timeout --signal=TERM --kill-after=2 40s /usr/bin/python3 -I -S -B -c '"""Read-only independent source publication audit; invoked once on gpu6."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import resource
+import stat
+import tarfile
+
+resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+NEW = Path('"'"'/local/users/emanuele/pointstream/audits/w8-source-publish-b581-scoped-v2-20261101/source.tar'"'"')
+OLD = Path('"'"'/local/users/emanuele/pointstream/audits/w8-source-publish-2677-delta-20261101/source.tar'"'"')
+NEW_SHA = '"'"'26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5'"'"'
+OLD_SHA = '"'"'fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635'"'"'
+REV = '"'"'b58155b46cea2232ad572effed9dd6c727676498'"'"'
+FOUR = {
+ '"'"'experiments/__init__.py'"'"': '"'"'06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9'"'"',
+ '"'"'experiments/tennis/__init__.py'"'"': '"'"'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'"'"',
+ '"'"'experiments/tennis/w8_receiver_preflight.py'"'"': '"'"'86f604c37e94880f4654a35678edb2f217ac22c96eb990adaeeb558f34f631dd'"'"',
+ '"'"'experiments/tennis/w8_receiver_bootstrap.py'"'"': '"'"'3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49'"'"',
+}
+
+def stamp(s):
+    return [s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns, s.st_ctime_ns]
+
+
+def inspect(path, expected_size, expected_sha, inspect_tar=False):
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    try:
+        before = os.fstat(fd)
+        if not stat.S_ISREG(before.st_mode) or before.st_size != expected_size:
+            raise ValueError('"'"'source archive size or type'"'"')
+        digest = hashlib.sha256()
+        with os.fdopen(os.dup(fd), '"'"'rb'"'"') as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b'"'"''"'"'):
+                digest.update(block)
+        if digest.hexdigest() != expected_sha or stamp(before) != stamp(os.fstat(fd)):
+            raise ValueError('"'"'source archive hash or stability'"'"')
+        row = {'"'"'path'"'"': str(path), '"'"'bytes'"'"': before.st_size, '"'"'sha256'"'"': digest.hexdigest(),
+               '"'"'mode'"'"': format(stat.S_IMODE(before.st_mode), '"'"'04o'"'"'), '"'"'stamp'"'"': stamp(before)}
+        if inspect_tar:
+            if row['"'"'mode'"'"'] != '"'"'0444'"'"':
+                raise ValueError('"'"'new archive is not read-only'"'"')
+            os.lseek(fd, 0, os.SEEK_SET)
+            with os.fdopen(os.dup(fd), '"'"'rb'"'"') as stream, tarfile.open(fileobj=stream, mode='"'"'r:'"'"') as tar:
+                entries = tar.getmembers()
+                regular = [member for member in entries if member.isfile()]
+                if (len(entries) != 249 or len(regular) != 235 or tar.pax_headers.get('"'"'comment'"'"') != REV
+                        or len({member.name for member in entries}) != len(entries)
+                        or any(not member.isfile() and not member.isdir() for member in entries)):
+                    raise ValueError('"'"'archive contents, PAX revision or entry count'"'"')
+                modules = {}
+                for name, expected in FOUR.items():
+                    matches = [item for item in regular if item.name == name]
+                    if len(matches) != 1 or matches[0].size > 1000000:
+                        raise ValueError('"'"'source module missing or ambiguous'"'"')
+                    member = tar.extractfile(matches[0])
+                    data = member.read() if member is not None else None
+                    if data is None or len(data) != matches[0].size or hashlib.sha256(data).hexdigest() != expected:
+                        raise ValueError('"'"'source module identity'"'"')
+                    modules[name] = {'"'"'bytes'"'"': len(data), '"'"'sha256'"'"': expected}
+                row.update(pax_comment=REV, tar_entries=249, regular_files=235, modules=modules)
+        if stamp(before) != stamp(os.fstat(fd)) or stamp(before) != stamp(path.stat()):
+            raise ValueError('"'"'source archive changed during audit'"'"')
+        return row
+    finally:
+        os.close(fd)
+
+
+def own_ancestors():
+    seen = set()
+    pid = os.getpid()
+    while pid > 1 and pid not in seen:
+        seen.add(pid)
+        try:
+            text = (Path('"'"'/proc'"'"') / str(pid) / '"'"'stat'"'"').read_text()
+            pid = int(text.rsplit('"'"')'"'"', 1)[1].split()[1])
+        except (OSError, ValueError, IndexError):
+            break
+    return seen
+
+
+def publication_processes():
+    ancestors = own_ancestors()
+    matches = []
+    inspected = 0
+    marker = b'"'"'w8-source-publish-b581-scoped-v2-20261101'"'"'
+    for entry in Path('"'"'/proc'"'"').iterdir():
+        if not entry.name.isdecimal() or int(entry.name) in ancestors:
+            continue
+        try:
+            if entry.stat().st_uid != os.getuid():
+                continue
+            command = (entry / '"'"'cmdline'"'"').read_bytes()
+        except (FileNotFoundError, ProcessLookupError):
+            continue
+        except PermissionError as exc:
+            raise RuntimeError('"'"'owned process inspection incomplete'"'"') from exc
+        inspected += 1
+        if marker in command:
+            matches.append(int(entry.name))
+    return {'"'"'matches'"'"': sorted(matches), '"'"'owned_processes_inspected'"'"': inspected,
+            '"'"'scope'"'"': '"'"'same-user processes; this audit and its ancestors excluded'"'"'}
+
+
+def main():
+    old = inspect(OLD, 10741760, OLD_SHA)
+    new = inspect(NEW, 4638720, NEW_SHA, inspect_tar=True)
+    processes = publication_processes()
+    if processes['"'"'matches'"'"']:
+        raise ValueError('"'"'matching publication process still exists'"'"')
+    result = {'"'"'passed'"'"': True, '"'"'source_sha256'"'"': NEW_SHA, '"'"'mode'"'"': '"'"'0444'"'"', '"'"'source'"'"': new,
+              '"'"'old_source'"'"': old, '"'"'publication_processes'"'"': processes,
+              '"'"'remote_cpu_seconds'"'"': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+              '"'"'scope'"'"': '"'"'source publication only; no runtime or codec qualification'"'"'}
+    encoded = json.dumps(result, sort_keys=True)
+    if len(encoded.encode()) > 19000:
+        raise ValueError('"'"'audit receipt exceeds size bound'"'"')
+    print(encoded)
+
+
+if __name__ == '"'"'__main__'"'"':
+    main()
+'

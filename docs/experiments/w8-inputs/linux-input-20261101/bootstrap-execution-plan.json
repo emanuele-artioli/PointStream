@@ -1,0 +1,64 @@
+{
+  "status": "complete_full_pending_independent_audit",
+  "source_revision": "e8f8827be53d9b0ed3df85394aab9fac7f263de0",
+  "source_worktree": "/private/tmp/pointstream-w8-input-source-e8f8827b",
+  "spec_sha256": "289607bce206fc71f4c7da4fabdf668598cb79e6c455e6e44c04844a38d58ffa",
+  "deadline": "2026-11-01T10:13:26.359814+00:00",
+  "manager_override": "gpu6",
+  "queue_preflight": "/private/tmp/w8-linux-input-bootstrap-fleet-preflight-20261101/queue.json",
+  "queue_counts": {
+    "budget_exhausted": 1,
+    "expired": 3,
+    "complete": 1068,
+    "failed": 283,
+    "cancelled": 173,
+    "contended": 19,
+    "attention": 1
+  },
+  "prior_cpu_request": "20261101T085408Z-6d60d6c4",
+  "prior_cpu_request_state": "failed_closed_do_not_replay",
+  "prior_cumulative_cpu_upper_s": 1271,
+  "prior_gpu_s": 224,
+  "allocation_s": {
+    "campaign": 300,
+    "preparation_publication": 10,
+    "monitor_cleanup": 12,
+    "independent_full_audit": 18
+  },
+  "worst_cumulative_s": {
+    "cpu": 1611,
+    "gpu": 224
+  },
+  "original_caps_s": {
+    "cpu": 3600,
+    "gpu": 3600
+  },
+  "bootstrap_pass_receipt": "docs/experiments/w8-inputs/linux-input-20261101/bootstrap-preflight-stdout.json",
+  "command": [
+    "scripts/ps-fleet",
+    "submit",
+    "docs/experiments/w8-inputs/linux-input-20261101/input-spec-bootstrap.json",
+    "--source-worktree",
+    "/private/tmp/pointstream-w8-input-source-e8f8827b",
+    "--snapshot-transfer-seconds",
+    "90"
+  ],
+  "submission_handle": 71913,
+  "submission_stdout": "/private/tmp/w8-linux-input-bootstrap-submit-20261101.json",
+  "submission_stderr": "/private/tmp/w8-linux-input-bootstrap-submit-20261101.stderr",
+  "job_id": "20261101T093351Z-24914a4d",
+  "source_snapshot_sha256": "0af41871c8cb5a650264fc08c1a6deb19c2337cf06849e71bd686bf623270d4c",
+  "source_identity": "5bec7e943e030f1d681a654cff540e192f993a27e475ff6998e0aabe9fc1485b",
+  "submission_ended": true,
+  "host": "gpu6",
+  "supervisor_pid": 3432793,
+  "campaign_pid": 3432799,
+  "campaign_pgid": 3432799,
+  "initial_status": "/private/tmp/w8-linux-input-bootstrap-initial-status-20261101.json",
+  "metadata_recovery_handle": 19349,
+  "metadata_recovery_ended": true,
+  "full_archive_sha256": "3b80afe8c159b6d572acf24e879e4c924b4c81ced06d33185a83f77b6649fe10",
+  "full_archive_bytes": 2897920,
+  "source_archive_physical_sha256": "0af41871c8cb5a650264fc08c1a6deb19c2337cf06849e71bd686bf623270d4c",
+  "independent_audit_script_sha256": "da84fc8637ec31792352f9ff97d4d2b7572c996454f2e96de73f641b8029bcfc"
+}

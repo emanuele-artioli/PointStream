@@ -1,0 +1,107 @@
+{
+  "job_id": "20261101T135101Z-d67fe593",
+  "status": "pending",
+  "config": {
+    "schema": 1,
+    "hosts": [
+      "gpu2",
+      "gpu5",
+      "gpu6",
+      "gpu1",
+      "gpu4",
+      "gpu3"
+    ],
+    "base": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet",
+    "release": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261101T071313Z-74a9271d",
+    "pythons": {
+      "gpu1": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu2": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu3": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu4": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu5": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+      "gpu6": "/home/itec/emanuele/.conda/envs/pointstream/bin/python"
+    },
+    "doctor": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/c99532e05e31483db412c337536ba0ec",
+    "management_host": "gpu6",
+    "management_python": "/usr/bin/python3"
+  },
+  "spec_sha256": "abb5c4ab808b39b30a52d78fe816cfa8132d717ff82176efd7db73b416d217a6",
+  "snapshot": {
+    "git_head": "b58155b46cea2232ad572effed9dd6c727676498",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [
+      "PLAN.md",
+      "docs/continuation-2026-11-01.md",
+      "docs/experiments/w8-wire-audit.md",
+      "docs/paper/bibliography-format-review-2026-11-01.md",
+      "docs/paper/final-hygiene-2026-11-01.md",
+      "docs/paper/marker-dispositions-2026-11-01.md",
+      "docs/paper/readiness-2026-11-01.md",
+      "docs/paper/submission-actions-2026-11-01.md"
+    ],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 117,
+    "untracked_excluded_paths_sha256": "6e5a4c6d097758253906265e53f4231aa8f09111b81b70f8861f9a702b9df970",
+    "untracked_excluded_sample": [
+      "docs/experiments/w8-inputs/receiver-20261101/aa-archive-structural-inspection.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-command.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-config.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-execution-plan.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-execution.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-launcher.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-payload.b64",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-remote.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-stderr",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-7483-stdout",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-command.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-config.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-execution-plan.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-execution.json",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-launcher.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-payload.b64",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-remote.py.txt",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-stderr",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-74d38881-stdout",
+      "docs/experiments/w8-inputs/receiver-20261101/aa-sam-cheap-b58155b4-command.txt"
+    ],
+    "deleted_paths": [],
+    "snapshot_sha256": "c9442ad63e973181ba2cfe8c64ed41033d8de4349fa8a598a530c66031586318",
+    "tracked_archive_paths_selected": [
+      "experiments",
+      "src",
+      "pyproject.toml",
+      "README.md",
+      "experiments/__init__.py",
+      "experiments/jobs",
+      "src/__init__.py"
+    ]
+  },
+  "chat_id": "01a193b2-6eb8-7821-a4b4-86db3e8f8d69",
+  "source_archive": true,
+  "source_sha256": "931e6b38209861b1d93d4ecac9312e05cae4efa6e44aee44783c54355ad66101",
+  "input_check": {
+    "hashed": [
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/config.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/config.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/bundle.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/oracle.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/env/moore-animateanyone-67c4229.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261023T194934Z-b0dcbb19/full/published.tar"
+    ],
+    "deferred": [
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/diffusion_pytorch_model.safetensors",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/pytorch_model.bin",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/motion_module.pth",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/reference_unet.pth",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/denoising_unet.pth",
+      "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz"
+    ],
+    "deferred_bytes": 14708499640,
+    "deferred_to": "campaign"
+  }
+}

@@ -1,0 +1,41 @@
+import base64,hashlib,json,resource,shlex,subprocess,sys,time
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+phase=sys.argv[1]
+if phase not in ('pilot','full'):raise ValueError('phase')
+code=Path('/private/tmp/w8-golden-recovery-20261101/reconstruct_main.py').read_bytes()
+sha=hashlib.sha256(code).hexdigest()
+if sha!='b80e7f3d3eef61109ab9380e65f3c88449882c3d0a5cd509c4711bcaaf0eb45d':raise ValueError('reviewed driver changed')
+cap=30 if phase=='pilot' else 90
+pilot_sha=sys.argv[2] if phase=='full' else ''
+if phase=='full' and (len(pilot_sha)!=64 or any(c not in '0123456789abcdef' for c in pilot_sha)):raise ValueError('pilot receipt digest required')
+out=Path('/private/tmp/w8-golden-reconstruction-'+phase+'-20261101');out.mkdir(mode=0o700,exist_ok=False)
+bootstrap="""import hashlib,os,resource,sys
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,({cap},{cap}))
+os.sched_setaffinity(0,{{min(os.sched_getaffinity(0))}})
+root=Path('/local/users/emanuele/pointstream')
+if root.stat().st_dev==Path('/home/itec/emanuele/Datasets/pointstream-data').stat().st_dev:raise RuntimeError('not separate storage')
+code=sys.stdin.buffer.read(100001)
+if len(code)>100000 or hashlib.sha256(code).hexdigest()!='{sha}':raise ValueError('driver transport')
+path=root/'audits/w8-golden-reconstruction-driver-b80e7f3d.py'
+if '{phase}'=='pilot':
+ with path.open('xb') as f:f.write(code)
+elif path.read_bytes()!=code:raise ValueError('existing driver changed')
+python=str(root/'cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python')
+env={{'PATH':'/usr/bin:/bin','CUDA_VISIBLE_DEVICES':'','PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1','MKL_NUM_THREADS':'1','NUMEXPR_NUM_THREADS':'1','TMPDIR':str(root),'TMP':str(root),'TEMP':str(root),'XDG_CACHE_HOME':str(root),'TORCH_HOME':str(root)}}
+args=[python,'-B',str(path),'{phase}']
+if '{phase}'=='full':args.append('{pilot_sha}')
+os.execve(python,args,env)
+""".format(cap=cap,sha=sha,phase=phase,pilot_sha=pilot_sha)
+remote=' '.join(shlex.quote(x) for x in ['/usr/bin/timeout','--signal=TERM','--kill-after=2','240s','/usr/bin/python3','-B','-c',bootstrap])
+def limitssh():resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+start=time.monotonic()
+try:r=subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=5','gpu6',remote],input=code,capture_output=True,timeout=250,preexec_fn=limitssh,close_fds=True,check=False)
+except subprocess.TimeoutExpired as exc:
+ (out/'stdout.partial').write_bytes(exc.stdout or b'');(out/'stderr.partial').write_bytes(exc.stderr or b'')
+ (out/'unknown.json').write_text(json.dumps({'phase':phase,'status':'unknown_inspect_do_not_replay'}));raise
+(out/'stdout.json').write_bytes(r.stdout);(out/'stderr.txt').write_bytes(r.stderr)
+(out/'execution.json').write_text(json.dumps({'phase':phase,'exit_code':r.returncode,'driver_sha256':sha,'inclusive_cpu_ceiling_s':cap+5,'wall_s':time.monotonic()-start,'local_cpu_s':sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),'ssh_cpu_s':sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2])},indent=2)+'\n')
+print(json.dumps({'phase':phase,'exit_code':r.returncode,'output':str(out)}))
+raise SystemExit(r.returncode)

@@ -1,0 +1,7 @@
+{
+  "exit": 0,
+  "stdout": "{\"received_bytes\": 28, \"expected\": true}\n",
+  "stderr": "",
+  "wall": 4.7469597910530865,
+  "CPU_cap_inclusive_s": 4
+}

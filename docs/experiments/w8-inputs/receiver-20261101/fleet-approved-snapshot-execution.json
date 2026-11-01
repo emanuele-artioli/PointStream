@@ -1,0 +1,45 @@
+{
+  "commands": {
+    "inspect": [
+      "scripts/ps-fleet",
+      "inspect",
+      "--hosts",
+      "gpu1",
+      "gpu2",
+      "gpu3",
+      "gpu4",
+      "gpu5",
+      "gpu6"
+    ],
+    "status": [
+      "scripts/ps-fleet",
+      "status",
+      "--status-timeout-seconds",
+      "75"
+    ],
+    "workers": [
+      "scripts/ps-fleet",
+      "workers",
+      "status",
+      "--hosts",
+      "gpu1",
+      "gpu2",
+      "gpu3",
+      "gpu4",
+      "gpu5",
+      "gpu6"
+    ]
+  },
+  "elapsed_wall_seconds": 75.12740408303216,
+  "timeout": false,
+  "exit_codes": {
+    "inspect": 0,
+    "status": 2,
+    "workers": 0
+  },
+  "local_process_cpu_cap_seconds": 2,
+  "management_host": "gpu6",
+  "network_remote_cpu_accounting": "not directly measured",
+  "local_parent_cpu": 0.052299,
+  "local_children_cpu": 0.44952499999999995
+}

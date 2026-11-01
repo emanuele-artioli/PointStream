@@ -1,0 +1,67 @@
+{
+  "workers": {
+    "gpu2": {
+      "pid": 3631985,
+      "proc_start_time": 1793517250.07,
+      "updated": 1793539642.4642372,
+      "alias": "gpu2",
+      "capabilities": [
+        "source_archive"
+      ]
+    },
+    "gpu5": {
+      "pid": 2846365,
+      "proc_start_time": 1793517261.85,
+      "updated": 1793539622.7198753,
+      "alias": "gpu5",
+      "capabilities": [
+        "source_archive"
+      ]
+    },
+    "gpu6": {
+      "pid": 3171514,
+      "proc_start_time": 1793517267.69,
+      "updated": 1793539636.0676455,
+      "alias": "gpu6",
+      "capabilities": [
+        "source_archive"
+      ]
+    },
+    "gpu1": {
+      "pid": 829619,
+      "proc_start_time": 1793369725.5,
+      "updated": 1793539624.6847246,
+      "alias": "gpu1",
+      "capabilities": [
+        "source_archive"
+      ]
+    },
+    "gpu4": {
+      "pid": 2497079,
+      "proc_start_time": 1793369798.44,
+      "updated": 1793539624.7296696,
+      "alias": "gpu4",
+      "capabilities": [
+        "source_archive"
+      ]
+    },
+    "gpu3": {
+      "pid": 2899604,
+      "proc_start_time": 1793343222.33,
+      "updated": 1793539634.717355,
+      "alias": "gpu3",
+      "capabilities": [
+        "source_archive"
+      ]
+    }
+  },
+  "base": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet",
+  "fresh": {
+    "gpu2": true,
+    "gpu5": true,
+    "gpu6": true,
+    "gpu1": true,
+    "gpu4": true,
+    "gpu3": true
+  }
+}

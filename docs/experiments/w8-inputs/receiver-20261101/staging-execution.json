@@ -1,0 +1,7 @@
+{
+  "exit_code": -9,
+  "local_cpu_seconds": 0.118032,
+  "remote_directory": "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-2677c1790200-qualification-20261101",
+  "ssh_cpu_seconds": 0.053218,
+  "wall_seconds": 748.4510286673903
+}

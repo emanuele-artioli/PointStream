@@ -1,0 +1,25 @@
+{
+  "accepted": true,
+  "scope": "CPU-only source-corrected real isolated packet decoder and independent validator; no learned inference or quality",
+  "audit_report_sha256": "eb19646ec7216af1e4f2394799c25599a0248db1c53f18b32ccf7973dce08f62",
+  "root_original_oracle_sha256": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc",
+  "root_comparison": "All480 actual manifest tensors and both NPZ hashes equal original oracle;237source entries bind original235plus2pinned helpers; ten denials/fresh namespaces/lo-only/noextraFD/singlethread/CPUbootstrap identity/CUDAhidden verified independently",
+  "actual_CPU_seconds": {
+    "worker": 7.822299,
+    "validator": 2.103339,
+    "parent": 0.097813,
+    "local_launcher": 0.04313,
+    "SSH_launcher": 0.024481
+  },
+  "phase_CPU_charged_upper": 40,
+  "phase_GPU_charged": 0,
+  "cumulative_CPU_upper": 2165,
+  "cumulative_GPU_upper": 352,
+  "remaining_CPU_lower": 1435,
+  "remaining_GPU_lower": 3248,
+  "live_reservation": false,
+  "replacement_GPU_authority": false,
+  "lifecycle": "Recorded own fresh PIDs/PGIDs3964656/3964880 absent. No GPU allocated.",
+  "original_oracle_summary_sha256": "6f6fe14fd433d77aa880e5936b2d48a77b554af201d0cdc84ef9743364528ba2",
+  "original_oracle_summary_scope": "Repository summary pins full8047 report; independent audit compared its fingerprints digest and unit hashes. Root additionally compared full actual480 fingerprint objects against full8047."
+}

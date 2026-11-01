@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+"""One bounded AA/SAM cheap check; do not run until root authorizes."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import resource
+import shlex
+import signal
+import subprocess
+import time
+
+resource.setrlimit(resource.RLIMIT_CPU, (2, 2))
+BASE = Path('/Users/manu/.codex/worktrees/3cb5/PointStream/docs/experiments/w8-inputs/receiver-20261101')
+MODULE = Path('/Users/manu/.codex/worktrees/3cb5/PointStream/experiments/tennis/w8_receiver_preflight.py')
+OUTPUT = Path('/private/tmp/w8-aa-sam-cheap-7483d95e-20261101')
+MODULE_SHA = '6f0f816fac4d1699988e2a762739ef71efc19e24e7981d2c46ee6589a93f8aad'
+CONFIG_SHA = '1e8c279415dc595464f1dc0b37c3b0cec3031ba1fdc4fe60fc40abea925ae557'
+PAYLOAD_SHA = 'c7aedd916b731494f572226c32da35c6876203a44e467644ba5799e1fcc5d5f7'
+PROGRAM_SHA = '4ff1339072105c0e15133ce5857501ca153f3a317512fb8ddf3b3b64a1ebaf62'
+COMMAND_SHA = '5106db3fb247cd917c9a59ba227580f5b0c9a70edc4ee3ae9cee6476e4fde139'
+MAIN = ('/local/users/emanuele/pointstream/cache/'
+        '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python')
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def limit_ssh():
+    resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+
+
+def alarm(_signum, _frame):
+    raise TimeoutError('whole launcher wall deadline expired')
+
+
+def main():
+    started = time.monotonic()
+    signal.signal(signal.SIGALRM, alarm)
+    signal.alarm(120)
+    module = MODULE.read_bytes()
+    config = (BASE / 'aa-sam-cheap-7483-config.json').read_bytes()
+    payload = (BASE / 'aa-sam-cheap-7483-payload.b64').read_bytes()
+    program = (BASE / 'aa-sam-cheap-7483-remote.py.txt').read_bytes()
+    if (sha(module), sha(config), sha(payload), sha(program)) != (MODULE_SHA, CONFIG_SHA, PAYLOAD_SHA, PROGRAM_SHA):
+        raise ValueError('frozen module, config, payload or program changed')
+    payload_text = payload.decode('ascii')
+    if not all(c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=' for c in payload_text):
+        raise ValueError('payload alphabet')
+    prefix = ['/bin/sh', '-c', 'ulimit -S -t 1; exec "$@"', '_', '/usr/bin/timeout', '--signal=TERM',
+              '--kill-after=2', '110s', '/usr/bin/env', '-i', 'PATH=/usr/bin:/bin', 'HOME=/nonexistent',
+              'CUDA_VISIBLE_DEVICES=', 'PYTHONDONTWRITEBYTECODE=1', 'PYTHONNOUSERSITE=1', MAIN,
+              '-I', '-S', '-B', '-c', program.decode()]
+    command = ' '.join(shlex.quote(x) for x in prefix) + " '" + payload_text + "'"
+    saved = (BASE / 'aa-sam-cheap-7483-command.txt').read_bytes()
+    if command.encode() != saved or sha(saved) != COMMAND_SHA or len(saved) > 120000:
+        raise ValueError('remote command identity or size mismatch')
+    argv = ['/usr/bin/ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', 'gpu6', command]
+    env = dict(os.environ)
+    exec_bytes = sum(len(x.encode()) + 1 for x in argv) + sum(len((k + '=' + v).encode()) + 1 for k, v in env.items())
+    if exec_bytes > 200000:
+        raise ValueError('local argv and environment exceed bound')
+    OUTPUT.mkdir(mode=0o700, exist_ok=False)
+    launch = {'module_sha256': MODULE_SHA, 'config_sha256': CONFIG_SHA, 'payload_sha256': PAYLOAD_SHA,
+              'program_sha256': PROGRAM_SHA, 'command_sha256': COMMAND_SHA, 'command_bytes': len(saved),
+              'argv_environment_bytes': exec_bytes, 'remote_cpu_seconds': 5, 'local_cpu_seconds': 2,
+              'ssh_cpu_seconds': 1, 'remote_shell_timeout_reserve_seconds': 1,
+              'independent_closeout_reserve_seconds': 1, 'total_cpu_upper_seconds': 10,
+              'remote_wall_seconds': 110, 'whole_local_wall_seconds': 120, 'gpu_seconds': 0,
+              'stdin': 'DEVNULL', 'remote_output': '/local/users/emanuele/pointstream/audits/w8-aa-sam-cheap-7483d95e-20261101'}
+    (OUTPUT / 'launch.json').write_text(json.dumps(launch, sort_keys=True, indent=2) + '\n')
+    with (OUTPUT / 'stdout').open('xb') as stdout, (OUTPUT / 'stderr').open('xb') as stderr:
+        proc = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
+                                env=env, close_fds=True, preexec_fn=limit_ssh)
+        (OUTPUT / 'handle.json').write_text(json.dumps({'pid': proc.pid, 'started_monotonic': started}) + '\n')
+        status = 'completed'
+        try:
+            code = proc.wait()  # blocking waitpid; SIGALRM enforces the whole-operation wall bound
+        except TimeoutError:
+            status = 'unknown_inspect_do_not_replay'
+            try:
+                proc.kill()  # only our own SSH PID; never signal a process group
+            except ProcessLookupError:
+                pass
+            code = proc.wait()
+        signal.alarm(0)
+        receipt = {'status': status, 'exit_code': code, 'wall_seconds': time.monotonic() - started,
+                   'local_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+                   'ssh_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2])}
+        (OUTPUT / 'execution.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
+        print(json.dumps({'status': status, 'exit_code': code, 'output': str(OUTPUT)}))
+        if status != 'completed' or code:
+            raise SystemExit(1)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,18 @@
+{
+  "pid": 44030,
+  "pgid": 44030,
+  "started_monotonic": 3028675.52029475,
+  "remote_deadline_seconds": 140,
+  "local_deadline_seconds": 150,
+  "remote_output": "/local/users/emanuele/pointstream/audits/w8-native-preflight-2677c179-v4-20261101",
+  "remote_source": "/local/users/emanuele/pointstream/audits/w8-native-preflight-2677c179-v4-20261101-source",
+  "source_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+  "config_sha256": "3a4f58b96748f36c44b4e2a2cf7917cfb417660fe5974701c311a47ed5adc4c1",
+  "status": "completed",
+  "returncode": 0,
+  "wall_seconds": 9.943521999754012,
+  "local_cpu_seconds": 0.077335,
+  "ssh_cpu_seconds": 0.028002,
+  "cpu_reservation_s": 20,
+  "revision": "2677c17902004dbf7a556a9e6167ce0032fec008"
+}

@@ -1,0 +1,13 @@
+{
+  "remote_cpu_ceiling_seconds": 3,
+  "local_cpu_ceiling_seconds": 1,
+  "ssh_cpu_ceiling_seconds": 1,
+  "shell_and_timeout_reserve_seconds": 1,
+  "operational_reserve_seconds": 1,
+  "total_upper_seconds": 7,
+  "wall_seconds": 5.041592000052333,
+  "local_cpu_seconds": 0.06828999999999999,
+  "ssh_cpu_seconds": 0.027398,
+  "receipt_count": 7,
+  "matching_pids": []
+}

@@ -1,37 +1,54 @@
-# Continuation, 2026-11-01: exclusive W8 coverage repair completed
+# Continuation, 2026-11-01: CPU source repair passed; user amendment pending
 
-## Current decision
+**Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
+Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library
+inventory and CPU input/runtime qualification passed their recorded narrow gates.
+The latter qualifies 91 AA source/config files, one exact generated-manifest
+exception excluded from source grants, 160 SAM hashes and the original isolated
+MAIN/JCV runtime guards. Historical process-group IDs were not recorded; current
+known children/task processes were absent. This is no fresh decoder-quality,
+full cached-environment, sustained-reference or live-rate claim.
 
-The user asked whether the larger saved bitstream meant PointStream costs more.
-Root clarified that the saved 49.6733-kbps stream belongs to the **baseline**:
-its score would bracket the fixed PointStream rate, not add bytes to PointStream.
-For a standalone 4.8-s clip PointStream's assembled cold payload really is much
-larger (3,816.4 kbps); 46.3151 kbps assumes exact match/reference reuse over
-7,200 s, not demonstrated reuse quality. Whole-frame results favor the baseline;
-the positive player-region claim is conditional.
+**Current receiver decision:** failed pilot `20261101T135101Z-d67fe593`
+is closed; it omitted two required source helpers and produced no learned
+output. The corrected source package passed the real isolated CPU decoder,
+independent audit and root comparison:237 source files,480 tensor fingerprints,
+both NPZs and isolation checks match. Charge full40 CPU-s for this qualification.
+Original W8 closed **≤2,165/3,600 CPU-s and352/3,600 GPU-s**; at least1,435
+CPU-s /3,248 GPU-s remain. All owned processes/claims/waits are closed; no live
+reservation. One replacement cost-only1/3-step campaign, bounded580 CPU-s /500
+GPU-s inside original totals, **awaits the user** under the [source repair amendment](cards/w8-source-package-repair.md).
+There is no authority to retry or run30 steps until that answer and the
+subsequent complete source/host/budget gates. Raw receipts and the root
+acceptance are linked in [W8](experiments/w8-wire-audit.md).
 
-The approved exclusive scoring request **`20261101T081828Z-d70bc44f`** is
-complete on gpu6 Ada, independently full-audited, with all eight strict rate
-cells passing at unchanged 46.315062222222224 kbps. This opens the original
-CPU input/isolation gate; it does not prove fresh decoding or two-hour reuse.
-Scorer source `c0f25e4e`, normalized spec
-`e9d926b6f61685a288e90225c38bd1d84050c9187dfa25180d298ce317b03230`.
-Full archive `f87e9cba68063fb115828dddbffb9b7fbaffa1e61003ac4292f4adfaab1cc41f`;
-durable full audit and raw screen are in `docs/experiments/w8-inputs/exclusive-20261101/`.
-All three scoring requests, waits and task claims are closed; never replay them.
+Overleaf main is `a6679181`, with the confirmed author block, ATHENA
+acknowledgment and organic PRESLEY citation beside ELVIS/GenStream. Review:
+22 body/reference pages plus 3 appendix pages; isolated small-format probe:
+23+3, within the user's 23+5 limit. Useful scientific negatives remain in the
+appendix. MoQSplat/TIGAS were reviewed and omitted as indirect. The paper is not
+submission-ready: finish the bounded witness decision and final publication
+checks. Code `b58155b4` passed CI; draft PR #325 will need exact-head checks after
+its evidence/documentation update.
 
-Current work: implement and review the corrected complete-packet CPU oracle.
-The legacy transport/recipe CLI is disabled. Original preparation used MAIN
-packed environment `32e688…`, distinct from later JCV generator `bf738ce5…`.
-A bounded read-only preflight verified actual MAIN NumPy 1.26.4/OpenCV 4.10.0
-on gpu5 and distinct user/network namespaces. It does not prove Landlock or the
-actual oracle. gpu6 has the expected cache and separate storage; gpu2 inventory
-timed out and remains unknown. Receipt `/private/tmp/w8-linux-runtime-preflight-20261101/`;
-local handle 18407 ended. Charge its full 15 CPU-s allowance: **cumulative W8
-≤1,169/3,600 CPU-s and 224/3,600 GPU-s**, leaving at least 2,431 CPU-s / 3,376 GPU-s.
-No CPU input-oracle fleet job or receiver job exists yet. Proposed input campaign ≤300 CPU-s plus
-≤40 s for monitor/audit/preparation still needs root review, frozen source, immutable
-packet/profile publication, fresh preflight and real future deadline.
+Submission local handle `54766` completed exit0; the canonical client record is
+`/Users/manu/.pointstream/fleet/jobs/20261101T135101Z-d67fe593.json`.
+The first exact-ID status command, handle `21660`, exited zero and found the
+request terminal failed at its correctness smoke. Its raw output is
+`/private/tmp/w8-cost-initial-status-d67fe593-20261101.json`; no wait or replay is
+needed. Read-only diagnosis and resource/lifecycle closeout are complete.
+The actual source snapshot is preserved at
+`/private/tmp/w8-cost-source-b581-frozen-20261101.tar`. The exact spec and source
+freeze are under `docs/experiments/w8-inputs/receiver-20261101/`.
+
+CPU qualification: raw receipts at
+`/private/tmp/w8-receiver-full-audit-b581-v2-20261101/receipts`; root acceptance
+`616abd67…`, partial audit `8108c849…` and current lifecycle `3fee152a…` retain
+the missing historical-PGID boundary. Actual child CPU18.236780 s; closed at51 s
+including the parent and complete audit/closeout reserves. Shared prerequisites
+are immutable under
+`Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/`:
+bundle `ab5f1b93…`, identity `0953c528…`, original oracle `8047b676…`.
 
 ## Immutable scientific state
 
@@ -91,18 +108,19 @@ The original 300/300 amendment closed after 67 GPU-s / ≤87 CPU-s. Subsequent
 user-approved inclusive 450/450 scoring closeout is **224 GPU-s / ≤304 CPU-s**:
 prior 67 + 157 for the request, plus 30 for monitoring + 10 for audit + 40 for all preparation (includes
 prior 20). This is inside original 3,600/3,600, not extra budget. Original local
-≤850 CPU-s + 304 for scoring + 15 for runtime preflight = **≤1,169 CPU-s**; 224 GPU-s.
+≤850 CPU-s + 304 for scoring + 15 for runtime preflight = **≤1,169 CPU-s**; 224 GPU-s at that historical checkpoint. Later CPU-oracle accounting is above.
 No scoring reservation remains. No balance transfers to other cards.
 
 ## Code, fleet and manuscript
 
 PR #318 merged `538b1022`, PR #319 merged `1b282587`, PR #320 merged `02c6c10e`.
 PR #321 merged `b014067c`; exclusive-policy PR #322 merged `f5597299` after
-CI passed on exact `c0f25e4e`. Current results/auditor branch is
-`codex/w8-exclusive-results-2026-11-01`, auditor commit `142b6cc5`. Input-oracle
-implementation remains under review; do not infer it is dispatch-ready from
-local tests. Focused tests/Ruff pass; mypy retains the same seven unrelated
-Mac errors. Earlier full pytest has the same thirteen Mac baseline failures.
+CI passed on exact `c0f25e4e`. Current branch is
+`codex/w8-receiver-witness-2026-11-01`, draft PR #325. CI passed for `5651`, run `41301707915`. The accepted input gate
+is described above; fresh GPU generation remains unqualified. Frozen source
+`5651a24b` full pytest had the same 13 failing node names as the saved clean-main
+Mac run, with 1,407 passed and 32 skipped; its 42 receiver tests passed. Frozen
+Ruff passed and mypy reported the seven known Mac baseline errors.
 
 Manager release `20261101T071313Z-74a9271d` runs commit `a5fdb235` on gpu2/5/6.
 Verified bundle SHA256
@@ -120,13 +138,25 @@ and all three native binaries were checked; all scientific imports came from
 clean frozen source. Source/input artifacts and diagnostics are referenced in
 [W8](experiments/w8-wire-audit.md) and its amendment input directory.
 
-Overleaf main is **`7a7381e31526c304af16da79dfd96941c0d4a6e9`**, local
-`/private/tmp/pointstream-w7-manuscript`, tracking `overleaf/main`; original server
-checkout is untouched. Reviewed PDF `build/main.pdf`: **22 pages body/references
-and 3 online appendix pages**, within user's 23+5. Negative hand/object representation
-results, hand-transfer/reference-bank limits, the passing conditional W8
-saved-quality screen and mixed-metric ego adaptation are included; no cost stop
-is presented as a quality negative. [Readiness](paper/readiness-2026-11-01.md) and the evidence
-matrix distinguish other submission gaps from deferred PLAN research. The paper
-is not submission-ready. No recurring timer/cache keepalive or active task-owned
-experiment remains. Cache lifetime is unknown.
+The manuscript is pushed at `a6679181fcbe8104702bf3b0231140cc301d9ca1`.
+The user confirmed the author block and requested ATHENA acknowledgment and
+organic self-citations, now integrated. No authority to submit has been given.
+The current review/alternate-format page counts are 22+3 and23+3. No recurring
+model timer/cache keepalive is active; cache lifetime is unknown. Native
+completion after returning the chat remains unverified, so execution is attended.
+
+Next: record the user decision on the source-only GPU repair amendment; do
+not replay the closed pilot. CPU repair acceptance is complete. Admit final
+30-step work only after a
+complete remaining CPU/GPU forecast that includes SAM/native/RGB/composition,
+post-seal scoring, validation and publication. Worker primitives exist; a full
+fleet witness driver/validator is still needed if the cost oracle passes. Final
+paper outcome/pins/checks/PDF and venue workflow remain; the full task audit and
+negative appendix already triage the rest of PLAN. Submission needs explicit
+user authority. Do not reopen deferred training/live/racket/large-sweep work.
+
+Author questions are pending about the exact footage/source terms and any
+shared media, the complete AI-assistance disclosure and the relation to prior
+papers/concurrent review. See [author statements](paper/author-statements-2026-11-01.md).
+Author names/order/affiliation, ATHENA support and organic citations are already
+confirmed/integrated. Submission itself is not authorized.

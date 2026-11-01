@@ -1,0 +1,394 @@
+[
+  {
+    "host": "gpu1.itec.aau.at",
+    "gpus": [
+      {
+        "index": 0,
+        "uuid": "GPU-5ffa6674-72d4-2b5d-831b-99e54c600fc5",
+        "name": "Quadro RTX 8000",
+        "memory_used_mib": 44405,
+        "memory_total_mib": 49152,
+        "memory_free_mib": 4187,
+        "utilization_pct": 14,
+        "compute_processes": [
+          {
+            "pid": 782157,
+            "memory_mib": 8988
+          },
+          {
+            "pid": 782156,
+            "memory_mib": 15884
+          },
+          {
+            "pid": 1022186,
+            "memory_mib": 19530
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      {
+        "index": 1,
+        "uuid": "GPU-85b90e14-9a4f-a01e-4a5b-c85e67fb34cf",
+        "name": "Quadro GV100",
+        "memory_used_mib": 13353,
+        "memory_total_mib": 32768,
+        "memory_free_mib": 19145,
+        "utilization_pct": 2,
+        "compute_processes": [
+          {
+            "pid": 782157,
+            "memory_mib": 308
+          },
+          {
+            "pid": 782156,
+            "memory_mib": 308
+          },
+          {
+            "pid": 782570,
+            "memory_mib": 12426
+          },
+          {
+            "pid": 1022186,
+            "memory_mib": 308
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      }
+    ],
+    "cpu_capacity": 128.0,
+    "load1": 118.46337890625,
+    "cpu_headroom": 9,
+    "data_root": "/home/itec/emanuele/Datasets/pointstream-data",
+    "data_root_available": true,
+    "python": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+    "python_available": true,
+    "python_version": "Python 3.10.20",
+    "tools": {
+      "ffmpeg": "/opt/local/bin/ffmpeg",
+      "vvencapp": "/opt/local/bin/vvencapp",
+      "vvdecapp": null,
+      "codex": "/local/users/emanuele/runtime/codex-bin/codex"
+    },
+    "tool_versions": {
+      "ffmpeg": {
+        "path": "/opt/local/bin/ffmpeg",
+        "version": [
+          "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+          "built with gcc 11 (Ubuntu 11.4.0-1ubuntu1~22.04)",
+          "configuration: --prefix=/opt/local --enable-pthreads --enable-pic --enable-shared --enable-rpath --enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libvmaf --enable-nonfree --enable-ffnvcodec --enable-demuxer=dash --enable-libxml2 --enable-libvvenc"
+        ],
+        "returncode": 0
+      },
+      "vvencapp": {
+        "path": "/opt/local/bin/vvencapp",
+        "version": [
+          "vvencapp version 1.11.0"
+        ],
+        "returncode": 0
+      }
+    },
+    "alias": "gpu1",
+    "available": true,
+    "error": null
+  },
+  {
+    "host": "gpu2.itec.aau.at",
+    "gpus": [
+      {
+        "index": 0,
+        "uuid": "GPU-fc7e8fff-75be-4984-a185-fe8ce63edcd9",
+        "name": "NVIDIA RTX A6000",
+        "memory_used_mib": 35278,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 13397,
+        "utilization_pct": 100,
+        "compute_processes": [
+          {
+            "pid": 2244112,
+            "memory_mib": 35232
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      {
+        "index": 1,
+        "uuid": "GPU-40e9a544-b3d6-e5f3-a736-7020a6401bfc",
+        "name": "NVIDIA RTX A6000",
+        "memory_used_mib": 35278,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 13397,
+        "utilization_pct": 0,
+        "compute_processes": [
+          {
+            "pid": 2244113,
+            "memory_mib": 35232
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      }
+    ],
+    "cpu_capacity": 128.0,
+    "load1": 21.71826171875,
+    "cpu_headroom": 106,
+    "data_root": "/home/itec/emanuele/Datasets/pointstream-data",
+    "data_root_available": true,
+    "python": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+    "python_available": true,
+    "python_version": "Python 3.10.20",
+    "tools": {
+      "ffmpeg": "/opt/local/bin/ffmpeg",
+      "vvencapp": "/opt/local/bin/vvencapp",
+      "vvdecapp": null,
+      "codex": "/local/users/emanuele/runtime/codex-bin/codex"
+    },
+    "tool_versions": {
+      "ffmpeg": {
+        "path": "/opt/local/bin/ffmpeg",
+        "version_error": "Command '['/opt/local/bin/ffmpeg', '-version']' timed out after 10 seconds"
+      },
+      "vvencapp": {
+        "path": "/opt/local/bin/vvencapp",
+        "version": [
+          "vvencapp version 1.11.0"
+        ],
+        "returncode": 0
+      }
+    },
+    "alias": "gpu2",
+    "available": true,
+    "error": null
+  },
+  {
+    "alias": "gpu3",
+    "available": false,
+    "error": "SSH/environment probe timed out after 60 seconds",
+    "gpus": []
+  },
+  {
+    "host": "gpu4.itec.aau.at",
+    "gpus": [
+      {
+        "index": 0,
+        "uuid": "GPU-7533842d-17aa-19f5-8337-70904e341994",
+        "name": "Quadro RTX 8000",
+        "memory_used_mib": 46741,
+        "memory_total_mib": 49152,
+        "memory_free_mib": 1851,
+        "utilization_pct": 0,
+        "compute_processes": [
+          {
+            "pid": 2524165,
+            "memory_mib": 12366
+          },
+          {
+            "pid": 2524266,
+            "memory_mib": 16354
+          },
+          {
+            "pid": 2524950,
+            "memory_mib": 18008
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      {
+        "index": 1,
+        "uuid": "GPU-7e1adbd6-c7cd-cbf3-78c1-00df6bf80fda",
+        "name": "Quadro RTX 8000",
+        "memory_used_mib": 46851,
+        "memory_total_mib": 49152,
+        "memory_free_mib": 1741,
+        "utilization_pct": 0,
+        "compute_processes": [
+          {
+            "pid": 2524165,
+            "memory_mib": 11648
+          },
+          {
+            "pid": 2524266,
+            "memory_mib": 16718
+          },
+          {
+            "pid": 2524950,
+            "memory_mib": 18472
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      }
+    ],
+    "cpu_capacity": 80.0,
+    "load1": 0.05615234375,
+    "cpu_headroom": 79,
+    "data_root": "/home/itec/emanuele/Datasets/pointstream-data",
+    "data_root_available": true,
+    "python": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+    "python_available": true,
+    "python_version": "Python 3.10.20",
+    "tools": {
+      "ffmpeg": "/opt/local/bin/ffmpeg",
+      "vvencapp": "/opt/local/bin/vvencapp",
+      "vvdecapp": null,
+      "codex": "/local/users/emanuele/runtime/codex-bin/codex"
+    },
+    "tool_versions": {
+      "ffmpeg": {
+        "path": "/opt/local/bin/ffmpeg",
+        "version": [
+          "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+          "built with gcc 11 (Ubuntu 11.4.0-1ubuntu1~22.04)",
+          "configuration: --prefix=/opt/local --enable-pthreads --enable-pic --enable-shared --enable-rpath --enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libvmaf --enable-nonfree --enable-ffnvcodec --enable-demuxer=dash --enable-libxml2 --enable-libvvenc"
+        ],
+        "returncode": 0
+      },
+      "vvencapp": {
+        "path": "/opt/local/bin/vvencapp",
+        "version": [
+          "vvencapp version 1.11.0"
+        ],
+        "returncode": 0
+      }
+    },
+    "alias": "gpu4",
+    "available": true,
+    "error": null
+  },
+  {
+    "host": "gpu5.itec.aau.at",
+    "gpus": [
+      {
+        "index": 0,
+        "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 989,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 47657,
+        "utilization_pct": 0,
+        "compute_processes": [
+          {
+            "pid": 3607193,
+            "memory_mib": 982
+          }
+        ],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      {
+        "index": 1,
+        "uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 4,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 48643,
+        "utilization_pct": 0,
+        "compute_processes": [],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      }
+    ],
+    "cpu_capacity": 256.0,
+    "load1": 7.17919921875,
+    "cpu_headroom": 248,
+    "data_root": "/home/itec/emanuele/Datasets/pointstream-data",
+    "data_root_available": true,
+    "python": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+    "python_available": true,
+    "python_version": "Python 3.10.20",
+    "tools": {
+      "ffmpeg": "/opt/local/bin/ffmpeg",
+      "vvencapp": "/opt/local/bin/vvencapp",
+      "vvdecapp": null,
+      "codex": "/local/users/emanuele/runtime/codex-bin/codex"
+    },
+    "tool_versions": {
+      "ffmpeg": {
+        "path": "/opt/local/bin/ffmpeg",
+        "version": [
+          "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+          "built with gcc 11 (Ubuntu 11.4.0-1ubuntu1~22.04)",
+          "configuration: --prefix=/opt/local --enable-pthreads --enable-pic --enable-shared --enable-rpath --enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libvmaf --enable-nonfree --enable-ffnvcodec --enable-demuxer=dash --enable-libxml2 --enable-libvvenc"
+        ],
+        "returncode": 0
+      },
+      "vvencapp": {
+        "path": "/opt/local/bin/vvencapp",
+        "version": [
+          "vvencapp version 1.11.0"
+        ],
+        "returncode": 0
+      }
+    },
+    "alias": "gpu5",
+    "available": true,
+    "error": null
+  },
+  {
+    "host": "gpu6.itec.aau.at",
+    "gpus": [
+      {
+        "index": 0,
+        "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 1,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 48645,
+        "utilization_pct": 0,
+        "compute_processes": [],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      },
+      {
+        "index": 1,
+        "uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "memory_used_mib": 1,
+        "memory_total_mib": 49140,
+        "memory_free_mib": 48645,
+        "utilization_pct": 0,
+        "compute_processes": [],
+        "pointstream_claimed": false,
+        "pointstream_shared_claims": []
+      }
+    ],
+    "cpu_capacity": 96.0,
+    "load1": 1.6806640625,
+    "cpu_headroom": 94,
+    "data_root": "/home/itec/emanuele/Datasets/pointstream-data",
+    "data_root_available": true,
+    "python": "/home/itec/emanuele/.conda/envs/pointstream/bin/python",
+    "python_available": true,
+    "python_version": "Python 3.10.20",
+    "tools": {
+      "ffmpeg": "/opt/local/bin/ffmpeg",
+      "vvencapp": "/opt/local/bin/vvencapp",
+      "vvdecapp": null,
+      "codex": "/local/users/emanuele/runtime/codex-bin/codex"
+    },
+    "tool_versions": {
+      "ffmpeg": {
+        "path": "/opt/local/bin/ffmpeg",
+        "version": [
+          "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+          "built with gcc 11 (Ubuntu 11.4.0-1ubuntu1~22.04)",
+          "configuration: --prefix=/opt/local --enable-pthreads --enable-pic --enable-shared --enable-rpath --enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libvmaf --enable-nonfree --enable-ffnvcodec --enable-demuxer=dash --enable-libxml2 --enable-libvvenc"
+        ],
+        "returncode": 0
+      },
+      "vvencapp": {
+        "path": "/opt/local/bin/vvencapp",
+        "version": [
+          "vvencapp version 1.11.0"
+        ],
+        "returncode": 0
+      }
+    },
+    "alias": "gpu6",
+    "available": true,
+    "error": null
+  }
+]

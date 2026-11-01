@@ -1,0 +1,120 @@
+{
+  "pilot_receipt_sha256": "b057d7ec0dcd05a6157f6001ff84a5e8a01053a6976edd510ab9931ba912c55f",
+  "pilot": {
+    "ticks": [
+      0,
+      3,
+      6,
+      9
+    ],
+    "composite_frame_sha256": [
+      "4798ceec4370ab853ff02aa76435fdec90151c19c7199d555e28b9782ee712f5",
+      "ffa048b5ac5f99f6e7447bbda767f3ee85ffed4463c30ba013231a5b2b505f4c",
+      "223577da5dcd2a893dd37936389411bddb4b5f4d318efaffd0da96b1d08ae69e",
+      "69c8e813d513928b570ec1c99d96d2434fc1fb9b43d318efbd20f32277074331"
+    ],
+    "frame_cpu_s": [
+      0.0793689999999998,
+      0.07901300000000067,
+      0.06885899999999978,
+      0.0681219999999989
+    ],
+    "numpy": "1.26.4",
+    "opencv": "4.10.0",
+    "python": "3.12.14 (main, Sep  2 2026, 23:27:36) [GCC 15.3.0]",
+    "order": [
+      "person:000000000001",
+      "person:000000000000"
+    ],
+    "input_archives": {
+      "rgb": {
+        "bytes": 2986311680,
+        "sha256": "91a1426879ec85bfaadd9e01b07086654267efeccf38d192853729ccf27b1332"
+      },
+      "masks": {
+        "bytes": 1269760,
+        "sha256": "a60cd08a254945a7f0f180b7ba783dda1b127814ba9f4c0ac04d1333758d4ba7"
+      },
+      "generated": {
+        "bytes": 94740480,
+        "sha256": "cce89567a57bd202db8dbd6a39599688bce8a52e048d53f2b38fd7fda7da4985"
+      },
+      "judge": {
+        "bytes": 122880,
+        "sha256": "bf05e2630d898a2ec68452f81407e063b0f0ad0490365c41d53a3988f5adb299"
+      },
+      "source": {
+        "bytes": 9021440,
+        "sha256": "365882dad4dabbbe0d132d7a4d1cf08f2a68b0f8afcb01bee16b66cce8537c2a"
+      },
+      "transport": {
+        "bytes": 3430400,
+        "sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017"
+      },
+      "packet": {
+        "bytes": 2289836,
+        "sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4"
+      }
+    },
+    "extracted": {
+      "nadal_kyrgios__000_at120__person_000000000000@match5.json": {
+        "sha256": "965042fb2402bff93348782fea831c553a11f9db107433b43228b852057d2644",
+        "bytes": 337
+      },
+      "nad000-s4-gpu.npy": {
+        "sha256": "f5795d8a30277d6624b327cffae6fd0500ab8bcb196e1248b37df5a610dab0db",
+        "bytes": 497664128
+      },
+      "nadal_kyrgios__000_at120__person_000000000001@match5.npz": {
+        "sha256": "bc5a67fb5a81578f605131151c6dd68a98612374e1564fd8e0dab5515a718fde",
+        "bytes": 44531013
+      },
+      "keypoints.kps": {
+        "sha256": "2e8452e4c458cf0998b6b8e004812575bdb2a638dd927b087dbc330d11d67070",
+        "bytes": 1913
+      },
+      "nadal_kyrgios__000_at120__person_000000000001-masks.npz": {
+        "sha256": "55aa9117378b6ed706d9edfbd8373405ec62ea488067e81f08229668f80a5714",
+        "bytes": 315522
+      },
+      "window.json": {
+        "sha256": "e4525a0b0c7024db5358734449294ff62279b9b33136378fc7f9d080093b8494",
+        "bytes": 43510
+      },
+      "nadal_kyrgios__000_at120__person_000000000000@match5.npz": {
+        "sha256": "dad82d637a445cc1c1b92907c3a274e485f26e33cd88a3206770f3efb71e80ff",
+        "bytes": 50195737
+      },
+      "nadal_kyrgios__000_at120__person_000000000000-masks.npz": {
+        "sha256": "146948eceef602859cc85e9524b10311b77885b7c511286cdf7fcd6e7af0eadb",
+        "bytes": 234458
+      },
+      "receiver.json": {
+        "sha256": "46ae0e636f9efe44741cae1dd4731c39d54aa845b3ed3ddb7cff3611ca582751",
+        "bytes": 352414
+      },
+      "nadal_kyrgios__000_at120__person_000000000001@match5.json": {
+        "sha256": "dd9a8b610ed95ba443f4ca5db63f03fb92f342ac5245193b1be96212d3f9c35b",
+        "bytes": 333
+      },
+      "diagnostic.json": {
+        "sha256": "910fc22c51498f28b18e83e2a2dd4dced41f07835dd4c0432896ae8e6a2f5861",
+        "bytes": 301859
+      }
+    },
+    "phase": "pilot",
+    "passed": true,
+    "cpu_s": 6.544449,
+    "wall_s": 8.932214952073991,
+    "composite_file_sha256": "9e4ba796bb2c166533e31a4cf95a81b17850636c44181e1cb78f1eb5f7108c31",
+    "source_snapshot_sha256": "365882dad4dabbbe0d132d7a4d1cf08f2a68b0f8afcb01bee16b66cce8537c2a",
+    "path": "/local/users/emanuele/pointstream/audits/w8-golden-recovery-20261101/pilot",
+    "driver_sha256": "b80e7f3d3eef61109ab9380e65f3c88449882c3d0a5cd509c4711bcaaf0eb45d"
+  },
+  "conservative_full_cpu_s_projection": 28.15298599999997,
+  "projection_rule": "2 * (entire measured pilot CPU + 76 * slowest measured frame CPU) + 3 s extra hashing; pilot already includes full archive verification/imports",
+  "full_remote_cpu_s_cap": 90,
+  "full_inclusive_cpu_s_cap": 95,
+  "full_wall_s_cap": 240,
+  "root_decision": "permit one full all-80 saved-pixel verification within existing150CPU-s golden reservation; no GPU/inference/new decode"
+}

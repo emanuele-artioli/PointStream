@@ -1,0 +1,177 @@
+"""Review-only stdin script: independent CPU audit of one completed W8 job.
+
+The launcher must use the original MAIN Python, one-core affinity, sanitized
+environment, and a 60 s remote / 70 s local wall limit. No GPU is used.
+This script creates only the named new host-local audit directory; it does not
+modify the completed job or automatically retry. Stdout contains a base64
+report intended for a capturing supervisor, not a terminal dump.
+"""
+from __future__ import annotations
+
+import os
+import resource
+import sys
+
+# Enforce the process CPU limit and one-core confinement before scientific imports.
+resource.setrlimit(resource.RLIMIT_CPU, (15, 15))
+if not hasattr(os, 'sched_getaffinity') or len(os.sched_getaffinity(0)) != 1:
+    raise RuntimeError('one-core affinity required before importing scientific modules')
+sys.dont_write_bytecode = True
+
+import base64  # noqa: E402
+import hashlib  # noqa: E402
+import json  # noqa: E402
+from pathlib import Path  # noqa: E402
+import shutil  # noqa: E402
+import tarfile  # noqa: E402
+import time  # noqa: E402
+import traceback  # noqa: E402
+
+JOB_ID = '20261101T093351Z-24914a4d'
+JOB = Path('/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox') / JOB_ID
+LOCAL_ROOT = Path('/local/users/emanuele/pointstream')
+AUDIT = LOCAL_ROOT / 'audits/w8-input-24914a4d-independent-20261101'
+SOURCE_SHA = '0af41871c8cb5a650264fc08c1a6deb19c2337cf06849e71bd686bf623270d4c'
+SOURCE_ID = '5bec7e943e030f1d681a654cff540e192f993a27e475ff6998e0aabe9fc1485b'
+SPEC_SHA = '289607bce206fc71f4c7da4fabdf668598cb79e6c455e6e44c04844a38d58ffa'
+PUBLICATION_SHA = '3b80afe8c159b6d572acf24e879e4c924b4c81ced06d33185a83f77b6649fe10'
+REVISION = 'e8f8827be53d9b0ed3df85394aab9fac7f263de0'
+ENV_SHA = '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661'
+PYTHON = f'/local/users/emanuele/pointstream/cache/{ENV_SHA}/tree/bin/python'
+
+
+def file_sha(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            h.update(block)
+    return h.hexdigest()
+
+
+def read_json(path: Path) -> dict:
+    with path.open() as stream:
+        value = json.load(stream)
+    if not isinstance(value, dict):
+        raise ValueError(f'expected JSON object: {path}')
+    return value
+
+
+def write_new(path: Path, value: dict) -> bytes:
+    data = (json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + '\n').encode()
+    with path.open('xb') as stream:
+        stream.write(data)
+    return data
+
+
+def main() -> None:
+    start = time.monotonic()
+    if sys.executable != PYTHON:
+        raise RuntimeError('original cached MAIN interpreter required')
+    if not LOCAL_ROOT.is_dir() or LOCAL_ROOT.stat().st_dev == Path('/').stat().st_dev:
+        raise RuntimeError('local audit root must exist on a separate filesystem')
+    if shutil.disk_usage(LOCAL_ROOT).free < 50 * 1024**3:
+        raise RuntimeError('local audit filesystem has less than 50 GiB free')
+    AUDIT.parent.mkdir(parents=True, exist_ok=True)
+    if (AUDIT.parent.is_symlink() or AUDIT.parent.resolve() != AUDIT.parent
+            or AUDIT.parent.stat().st_dev != LOCAL_ROOT.stat().st_dev):
+        raise RuntimeError('audit parent must remain on the verified local filesystem')
+    AUDIT.mkdir(exist_ok=False)
+    try:
+        tmp = AUDIT / 'tmp'
+        source = AUDIT / 'source'
+        tmp.mkdir(mode=0o700)
+        source.mkdir(mode=0o700)
+        # Clear inherited credentials, proxies and user-site configuration.
+        os.environ.clear()
+        os.environ.update({'PATH': str(Path(sys.executable).parent) + ':/usr/bin:/bin',
+                           'TMPDIR': str(tmp), 'TMP': str(tmp), 'TEMP': str(tmp),
+                           'XDG_CACHE_HOME': str(tmp), 'TORCH_HOME': str(tmp),
+                           'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONNOUSERSITE': '1',
+                           'CUDA_VISIBLE_DEVICES': '', 'OMP_NUM_THREADS': '1',
+                           'OPENBLAS_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1',
+                           'NUMEXPR_NUM_THREADS': '1', 'HF_HUB_OFFLINE': '1',
+                           'TRANSFORMERS_OFFLINE': '1'})
+        write_new(AUDIT / 'execution-start.json', {'job_id': JOB_ID, 'audit_dir': str(AUDIT),
+                  'python': sys.executable, 'affinity': sorted(os.sched_getaffinity(0)),
+                  'cpu_limit_seconds': 15, 'status': 'started'})
+        source_tar = JOB / 'source.tar'
+        if file_sha(source_tar) != SOURCE_SHA:
+            raise ValueError('source archive SHA mismatch')
+        with tarfile.open(source_tar) as archive:
+            members = archive.getmembers()
+            if (not members or any(item.size < 0 or item.size > 64 * 1024**2 for item in members)
+                    or sum(item.size for item in members) > 64 * 1024**2):
+                raise ValueError('invalid or oversized source archive')
+            archive.extractall(source, members=members, filter='data')
+        # Do not use the terminal job's cleaned-up source symlink or cwd.
+        os.chdir(AUDIT)
+        sys.path[:] = [str(source)] + [p for p in sys.path if p and Path(p).resolve().is_relative_to(Path(sys.prefix).resolve())]
+        from experiments.jobs import inbox
+        from experiments.tennis import w8_input_job
+
+        if inbox.source_identity(source) != SOURCE_ID:
+            raise ValueError('extracted source identity mismatch')
+        ready = read_json(JOB / 'ready.json')
+        spec = read_json(JOB / 'spec.json')
+        status = read_json(JOB / 'run/status.json')
+        full = JOB / 'full'
+        execution = read_json(full / 'execution.json')
+        staging = read_json(full / 'staging.json')
+        if (staging.get('environment', {}).get('sha256') != ENV_SHA
+                or staging['environment'].get('python') != PYTHON):
+            raise ValueError('original MAIN environment identity mismatch')
+        if (ready.get('git_head') != REVISION or ready.get('source_sha256') != SOURCE_ID
+                or ready.get('snapshot_sha256') != SOURCE_SHA or ready.get('source_archive') != 'source.tar'
+                or ready.get('spec_sha256') != SPEC_SHA or inbox.digest(spec) != SPEC_SHA):
+            raise ValueError('frozen revision, source or specification identity mismatch')
+        if status.get('status') != 'complete' or status.get('exit_code') != 0 or execution.get('exit_code') != 0:
+            raise ValueError('job and full stage must have completed successfully')
+        publication = full / 'published.tar'
+        if (file_sha(publication) != PUBLICATION_SHA or staging.get('published', {}).get('sha256') != PUBLICATION_SHA
+                or staging['published'].get('partial') is not False):
+            raise ValueError('published archive identity or staging mismatch')
+        original = read_json(full / 'fixed-validation.json')
+        recovered = w8_input_job.recover_fixed_publication(full, tmp)
+        fresh = w8_input_job.validate_fixed(full, recovered, tmp)
+        ignored = {'cpu_seconds', 'temporary_golden_directory'}
+        original_science = {key: value for key, value in original.items() if key not in ignored}
+        fresh_science = {key: value for key, value in fresh.items() if key not in ignored}
+        if original_science != fresh_science or fresh.get('passed') is not True:
+            raise ValueError('fresh independent scientific results differ from the sealed full validation')
+        # All in-repository scientific/runtime imports must come from this source.
+        closure = {}
+        for name, module in sorted(sys.modules.items()):
+            if name == 'experiments' or name.startswith('experiments.') or name == 'src' or name.startswith('src.'):
+                location = getattr(module, '__file__', None)
+                if not location or not Path(location).resolve().is_relative_to(source.resolve()):
+                    raise ValueError(f'import escaped verified source: {name}')
+                closure[name] = str(Path(location).resolve().relative_to(source.resolve()))
+        usage = resource.getrusage(resource.RUSAGE_SELF)
+        children = resource.getrusage(resource.RUSAGE_CHILDREN)
+        execution_record = {'job_id': JOB_ID, 'source': str(source), 'audit_dir': str(AUDIT),
+                            'python': sys.executable, 'affinity': sorted(os.sched_getaffinity(0)),
+                            'cpu_seconds': usage.ru_utime + usage.ru_stime,
+                            'child_cpu_seconds': children.ru_utime + children.ru_stime,
+                            'wall_seconds': time.monotonic() - start, 'cpu_limit_seconds': 15,
+                            'scientific_module_closure': closure}
+        report = {'passed': True, 'scope': 'independent CPU input oracle post-publication audit; no GPU or generation',
+                  'job_id': JOB_ID, 'revision': REVISION, 'source_archive_sha256': SOURCE_SHA,
+                  'source_identity_sha256': SOURCE_ID, 'spec_sha256': SPEC_SHA,
+                  'publication_sha256': PUBLICATION_SHA, 'ignored_runtime_fields': sorted(ignored),
+                  'scientific_result': fresh_science, 'execution': execution_record}
+        write_new(AUDIT / 'execution.json', execution_record)
+        data = write_new(AUDIT / 'report.json', report)
+        # The supervisor must capture this JSON to a file; do not print base64 in tool results.
+        print(json.dumps({'passed': True, 'report_sha256': hashlib.sha256(data).hexdigest(),
+                          'report_bytes': len(data), 'report_base64': base64.b64encode(data).decode('ascii'),
+                          'audit_dir': str(AUDIT)}, separators=(',', ':')))
+    except BaseException as exc:
+        failure = {'passed': False, 'error': f'{type(exc).__name__}: {exc}',
+                   'traceback': traceback.format_exc(), 'wall_seconds': time.monotonic() - start}
+        write_new(AUDIT / 'failure.json', failure)
+        print(json.dumps({'passed': False, 'error': failure['error'], 'audit_dir': str(AUDIT)}), file=sys.stderr)
+        raise
+
+
+if __name__ == '__main__':
+    main()

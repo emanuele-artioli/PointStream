@@ -1,0 +1,931 @@
+{
+  "schema_version": 1,
+  "manuscript_revision": "7a7381e31526c304af16da79dfd96941c0d4a6e9",
+  "scope": "Active HOLE/NOTE in main.tex, sections/*.tex, appendices/*.tex; excludes companion legacy. No marker disposition approved and no missing evidence is inferred complete.",
+  "disposition_key": {
+    "essential_claim_boundary": "Caveat essential to interpreting an already retained finding; not a claim that closing this gap is mandatory.",
+    "disclosed_limitation": "No stronger claim under empirical framing; whether new experiments are required is author judgment."
+  },
+  "records": [
+    {
+      "id": "main.tex:87:NOTE(paper-framing)",
+      "marker": {
+        "file": "main.tex",
+        "line": 87,
+        "kind": "NOTE",
+        "anchor": "paper-framing",
+        "verbatim": "% NOTE(paper-framing): Empirical framing includes conditional foreground results, not whole-frame superiority.",
+        "text": "Empirical framing includes conditional foreground results, not whole-frame superiority."
+      },
+      "precise_gap_or_caveat": "Empirical framing includes conditional foreground results, not whole-frame superiority.",
+      "visible_qualification": {
+        "file": "main.tex",
+        "line": 100,
+        "anchor": "abstract",
+        "exact_sentence_tex": "A later hybrid shows a conditional player-region perceptual advantage on unused windows of familiar matches, but whole-frame quality worsens, anchor coverage is incomplete, and its test on an unseen match is inconclusive.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Conditional player-region result, not whole-frame superiority",
+      "evidence_for_stronger_claim": "Full physical stream, fresh decode, matched complete-rate anchors, independent matches",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "main.tex:89:NOTE(paper-provenance)",
+      "marker": {
+        "file": "main.tex",
+        "line": 89,
+        "kind": "NOTE",
+        "anchor": "paper-provenance",
+        "verbatim": "% NOTE(paper-provenance): Recovery dossier pinned to PointStream 21931f6; that recovery performed no GPU reruns.",
+        "text": "Recovery dossier pinned to PointStream 21931f6; that recovery performed no GPU reruns. Subsequent registered CPU native controls and GPU guide smokes retain separate access/environment qualification; historical observations, native BP21 replay, derived arithmetic and unresolved comparisons remain distinct."
+      },
+      "precise_gap_or_caveat": "Recovery dossier pinned to PointStream 21931f6; that recovery performed no GPU reruns. Subsequent registered CPU native controls and GPU guide smokes retain separate access/environment qualification; historical observations, native BP21 replay, derived arithmetic and unresolved comparisons remain distinct.",
+      "visible_qualification": {
+        "file": "sections/introduction.tex",
+        "line": 20,
+        "anchor": "sec:introduction",
+        "exact_sentence_tex": "Recovered artifacts, code identities, and arithmetic checks improve traceability; they are not independent reruns of every historical encoder, decoder, or scorer.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Retrospective intake and later controls have different trust levels",
+      "evidence_for_stronger_claim": "Independent replay of relevant historic runs; 21931f6 recovery itself performed no GPU reruns",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": "The historical recovery was a read-only intake; later CPU and GPU controls are separate qualifications."
+    },
+    {
+      "id": "main.tex:92:HOLE(abstract)",
+      "marker": {
+        "file": "main.tex",
+        "line": 92,
+        "kind": "HOLE",
+        "anchor": "abstract",
+        "verbatim": "% HOLE(abstract): A future compression headline requires a completely charged persisted stream,",
+        "text": "A future compression headline requires a completely charged persisted stream, payload-only fresh-client decode and matched input/access/quality curves or valid dominance. Egocentric task claims additionally require independent labels and all-frame missingness."
+      },
+      "precise_gap_or_caveat": "A future compression headline requires a completely charged persisted stream, payload-only fresh-client decode and matched input/access/quality curves or valid dominance. Egocentric task claims additionally require independent labels and all-frame missingness.",
+      "visible_qualification": {
+        "file": "main.tex",
+        "line": 100,
+        "anchor": "abstract",
+        "exact_sentence_tex": "A favorable posthoc interval in one historical curve requires complete-payload and fresh receiver qualification.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Posthoc historical interval and conditional W7 foreground observations",
+      "evidence_for_stronger_claim": "Persist all candidate/anchor bytes, independent source-hidden receiver, matched support; independent all-frame labels for task claim",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null,
+      "additional_visible_qualifications": [
+        {
+          "file": "sections/future_work.tex",
+          "line": 23,
+          "anchor": "sec:future-work",
+          "exact_sentence_tex": "A perceptual-quality claim needs qualified visual evaluation; a task-specific claim needs independent labels, all-frame denominators, missingness, and the same task objective for both arms."
+        }
+      ]
+    },
+    {
+      "id": "sections/evaluation.tex:2:NOTE(sec:evaluation)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 2,
+        "kind": "NOTE",
+        "anchor": "sec:evaluation",
+        "verbatim": "% NOTE(sec:evaluation): Each source/window/quality contract is separate. Dossier 21931f6 is the intake authority.",
+        "text": "Each source/window/quality contract is separate. Dossier 21931f6 is the intake authority."
+      },
+      "precise_gap_or_caveat": "Each source/window/quality contract is separate. Dossier 21931f6 is the intake authority.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 9,
+        "anchor": "subsec:eval-setup",
+        "exact_sentence_tex": "Each comparison preserves its source windows, resolution, access, metrics, and receiver qualification.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Each campaign is interpreted under its own contract",
+      "evidence_for_stronger_claim": "Common protocol and independently recertified source/metric provenance for pooled benchmark",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:3:HOLE(sec:evaluation)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 3,
+        "kind": "HOLE",
+        "anchor": "sec:evaluation",
+        "verbatim": "% HOLE(sec:evaluation): Independently recertify native streams, decoded frames and metric provenance for a final benchmark.",
+        "text": "Independently recertify native streams, decoded frames and metric provenance for a final benchmark."
+      },
+      "precise_gap_or_caveat": "Independently recertify native streams, decoded frames and metric provenance for a final benchmark.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 9,
+        "anchor": "subsec:eval-setup",
+        "exact_sentence_tex": "Other historical payloads retain unresolved qualifications.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Recovered reports plus selected native/receiver replay, not full benchmark recertification",
+      "evidence_for_stronger_claim": "Recertify original native streams, decoded frames and metric lineage",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:38:HOLE(subsec:w7)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 38,
+        "kind": "HOLE",
+        "anchor": "subsec:w7",
+        "verbatim": "% HOLE(subsec:w7): Restore med000 DCVC and the med000/med019 half-out SVT",
+        "text": "Restore med000 DCVC and the med000/med019 half-out SVT comparisons; qualify framing, fresh decoding and the 12-crop reuse assumption."
+      },
+      "precise_gap_or_caveat": "Restore med000 DCVC and the med000/med019 half-out SVT comparisons; qualify framing, fresh decoding and the 12-crop reuse assumption.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 43,
+        "anchor": "subsec:w7",
+        "exact_sentence_tex": "DCVC and the half-out SVT policy are missing for one Medvedev window, and half-out SVT is missing for another; all four families are bracketed in the unseen-match windows.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Conditional six-window familiar and three-window unseen results with reported omissions",
+      "evidence_for_stronger_claim": "Missing Medvedev family points, complete framing, fresh decode, twelve-crop reuse quality",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null,
+      "additional_visible_qualifications": [
+        {
+          "file": "sections/evaluation.tex",
+          "line": 41,
+          "anchor": "subsec:w7",
+          "exact_sentence_tex": "Reference reuse, complete serialization and isolated fresh reconstruction remain unproved; the duration sensitivity below is modeled."
+        }
+      ]
+    },
+    {
+      "id": "sections/evaluation.tex:62:NOTE(subsec:eval-ladder)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 62,
+        "kind": "NOTE",
+        "anchor": "subsec:eval-ladder",
+        "verbatim": "% NOTE(subsec:eval-ladder): Generation disabled; curves are not a replicated generative-decoder benchmark.",
+        "text": "Generation disabled; curves are not a replicated generative-decoder benchmark."
+      },
+      "precise_gap_or_caveat": "Generation disabled; curves are not a replicated generative-decoder benchmark.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 64,
+        "anchor": "subsec:eval-ladder",
+        "exact_sentence_tex": "Generation is disabled in the linked runner.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Saved Gate A results apply to generation-disabled configured path",
+      "evidence_for_stronger_claim": "A qualified generative decoder on same inputs and rates",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:82:HOLE(gate-a-full-confirmation)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 82,
+        "kind": "HOLE",
+        "anchor": "gate-a-full-confirmation",
+        "verbatim": "% HOLE(gate-a-full-confirmation): Registered full C2/C3 jobs each use both original96-frame windows;",
+        "text": "Registered full C2/C3 jobs each use both original96-frame windows; full registration SHA256=1c756bee1db8d181f53d0eddeedf0042bce9cd177b608144ba91b4c0bd52719a. Both registered jobs stopped on failed foreground correctness; first96-frame scene packages retained. Correct temporal placement/foreground reconstruction and pass representative motion smoke before new full receiver/stronger VVC/AV1 comparison. No full192 result or compression negative/positive inferred."
+      },
+      "precise_gap_or_caveat": "Registered full C2/C3 jobs each use both original96-frame windows; full registration SHA256=1c756bee1db8d181f53d0eddeedf0042bce9cd177b608144ba91b4c0bd52719a. Both registered jobs stopped on failed foreground correctness; first96-frame scene packages retained. Correct temporal placement/foreground reconstruction and pass representative motion smoke before new full receiver/stronger VVC/AV1 comparison. No full192 result or compression negative/positive inferred.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 191,
+        "anchor": "subsec:eval-ladder",
+        "exact_sentence_tex": "These development controls lack dense matched-quality native observations and do not recertify the historical crossing.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Source-only single-window controls expose placement defects, not original 192-frame confirmation",
+      "evidence_for_stronger_claim": "Repair motion/foreground, pass representative smoke, full two-window fresh payload and stronger matched anchors",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": "The registered two-window C2/C3 confirmation stopped after foreground correctness failed; it provides no 192-frame coding result."
+    },
+    {
+      "id": "sections/evaluation.tex:130:NOTE(gate-a-fresh-guide-selection)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 130,
+        "kind": "NOTE",
+        "anchor": "gate-a-fresh-guide-selection",
+        "verbatim": "% NOTE(gate-a-fresh-guide-selection): Oldsource-onlyYOLOsmoke rejected ninthperson againstmax_tracks8;",
+        "text": "Oldsource-onlyYOLOsmoke rejected ninthperson againstmax_tracks8; preserved partial frame is failedinstrument, no algorithmnegative. New ab7a5f4 collector uses unchanged production tennisHeuristicSelector posthoc, retaining raw/excluded/held/stale records and playerroles. New2-framefleetjob20261003T100918Z-4ef3f1e7 completeexit0; frame/artifact/selection joins PASS, promotion HELD: distributionmetadata torch2.5.1 differs from loaded2.2.2+cu121/CUDA12.1; selected runtimebinary hashes pass; loaded2.2.2/CUDA12.1 source and extension identity now inspected. Newe314305 guard pins loadedruntime separately; registeredv3f2job20261003T154643Z-8df22c3a completesexit0/releasesclaims and independent all2frame/runtime/artifact/selector checks pass. Rootvisualreview38/39 retains armclipping; frozen12guidepilot only admitted after freshfleetinspection. That2-frame smoke alone does not qualify longerprefix/full96/freshsender or tasktruth. Farathletebbox clips arm."
+      },
+      "precise_gap_or_caveat": "Oldsource-onlyYOLOsmoke rejected ninthperson againstmax_tracks8; preserved partial frame is failedinstrument, no algorithmnegative. New ab7a5f4 collector uses unchanged production tennisHeuristicSelector posthoc, retaining raw/excluded/held/stale records and playerroles. New2-framefleetjob20261003T100918Z-4ef3f1e7 completeexit0; frame/artifact/selection joins PASS, promotion HELD: distributionmetadata torch2.5.1 differs from loaded2.2.2+cu121/CUDA12.1; selected runtimebinary hashes pass; loaded2.2.2/CUDA12.1 source and extension identity now inspected. Newe314305 guard pins loadedruntime separately; registeredv3f2job20261003T154643Z-8df22c3a completesexit0/releasesclaims and independent all2frame/runtime/artifact/selector checks pass. Rootvisualreview38/39 retains armclipping; frozen12guidepilot only admitted after freshfleetinspection. That2-frame smoke alone does not qualify longerprefix/full96/freshsender or tasktruth. Farathletebbox clips arm.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 191,
+        "anchor": "subsec:eval-ladder",
+        "exact_sentence_tex": "Placement restores presence using static initial poses; clipping and background ghost traces remain.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Fresh development controls expose placement and clipping, not task truth",
+      "evidence_for_stronger_claim": "Full temporal coverage, protected receiver, independent labels, corrected clipping",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": "The selected source-guidance smoke retained one far-player arm clipping; it does not qualify longer runs or task truth."
+    },
+    {
+      "id": "sections/evaluation.tex:150:NOTE(gate-a-fresh-guide-promotion)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 150,
+        "kind": "NOTE",
+        "anchor": "gate-a-fresh-guide-promotion",
+        "verbatim": "% NOTE(gate-a-fresh-guide-promotion): Job20261003T170004Z-87a04c7b completesexit0/releasesclaims;",
+        "text": "Job20261003T170004Z-87a04c7b completesexit0/releasesclaims; regsha=5fbff21a0b9ee4b152ab9a5199126060cbddeeb1e876e59a893526a93f94a33b. This qualifies source-access/mechanics only, not historical Gate A recertification or a codec win. Fresh sender registration exposes only two-frame runnable arms; longer original index-onlyreceiver arms remain held pending separately registered actual temporal coverage/motion/protected decoding."
+      },
+      "precise_gap_or_caveat": "Job20261003T170004Z-87a04c7b completesexit0/releasesclaims; regsha=5fbff21a0b9ee4b152ab9a5199126060cbddeeb1e876e59a893526a93f94a33b. This qualifies source-access/mechanics only, not historical Gate A recertification or a codec win. Fresh sender registration exposes only two-frame runnable arms; longer original index-onlyreceiver arms remain held pending separately registered actual temporal coverage/motion/protected decoding.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 191,
+        "anchor": "subsec:eval-ladder",
+        "exact_sentence_tex": "These development controls lack dense matched-quality native observations and do not recertify the historical crossing.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Bounded source-only and two-frame mechanics, not recertification",
+      "evidence_for_stronger_claim": "Independent full temporal coverage with payload-only decoding and fair matched anchors",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": "The fresh-guidance smoke qualifies only its source-access mechanics and two-frame runnable arms, not the original two-window benchmark."
+    },
+    {
+      "id": "sections/evaluation.tex:160:HOLE(gate-a-native-pooling-receipts)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 160,
+        "kind": "HOLE",
+        "anchor": "gate-a-native-pooling-receipts",
+        "verbatim": "% HOLE(gate-a-native-pooling-receipts): Future dense nativeworker must persist perframeY-MSE/SSIM",
+        "text": "Future dense nativeworker must persist perframeY-MSE/SSIM and actual affinity/nice/AS/childRSS observations; existing96control reports only pooledY/SSIM and selfRSS. Exact96-frame VMAF logmean independently verified; do not claim independently checked Y/SSIM arithmetic."
+      },
+      "precise_gap_or_caveat": "Future dense nativeworker must persist perframeY-MSE/SSIM and actual affinity/nice/AS/childRSS observations; existing96control reports only pooledY/SSIM and selfRSS. Exact96-frame VMAF logmean independently verified; do not claim independently checked Y/SSIM arithmetic.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 191,
+        "anchor": "subsec:eval-ladder",
+        "exact_sentence_tex": "These development controls lack dense matched-quality native observations and do not recertify the historical crossing.",
+        "coverage": "missing"
+      },
+      "supported_claim": "Exact 96-frame VMAF averaging is independently checked; existing pooled Y/SSIM arithmetic not independently certified",
+      "evidence_for_stronger_claim": "Persist per-frame Y-MSE and SSIM and actual affinity/nice/address-space/child RSS observations",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": "The retained 96-frame native controls do not include the per-frame Y-MSE and SSIM needed for independent pooling verification; their VMAF log mean was checked separately."
+    },
+    {
+      "id": "sections/evaluation.tex:167:NOTE(gate-a-preexecution-rejection)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 167,
+        "kind": "NOTE",
+        "anchor": "gate-a-preexecution-rejection",
+        "verbatim": "% NOTE(gate-a-preexecution-rejection): source000C3f2 failed oldliteraldata-root check before sender/output;",
+        "text": "source000C3f2 failed oldliteraldata-root check before sender/output; retain logs, no algorithmnegative or replay. Freshguide sender freezes logical/canonical root aliases."
+      },
+      "precise_gap_or_caveat": "source000C3f2 failed oldliteraldata-root check before sender/output; retain logs, no algorithmnegative or replay. Freshguide sender freezes logical/canonical root aliases.",
+      "visible_qualification": {
+        "file": "sections/future_work.tex",
+        "line": 9,
+        "anchor": "sec:future-work",
+        "exact_sentence_tex": "Conversely, source-assisted assembly or an unavailable checkpoint cannot become a coding success or an algorithmic negative.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Pre-execution source-root failure is an instrument failure, not codec evidence",
+      "evidence_for_stronger_claim": "Correct path admission and independently executed registered receiver, without replaying unknown requests",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": "The rejected C3 smoke stopped at a source-path admission check before output; it is not a codec performance result."
+    },
+    {
+      "id": "sections/evaluation.tex:169:NOTE(gate-a-source000-access)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 169,
+        "kind": "NOTE",
+        "anchor": "gate-a-source000-access",
+        "verbatim": "% NOTE(gate-a-source000-access): Source-only modelguide96 and fresh C2 sender/receiver12 controls now qualify",
+        "text": "Source-only modelguide96 and fresh C2 sender/receiver12 controls now qualify bounded development mechanics. Old cached-guide/context scores remain unequal-access diagnostics; no originaltwo-window recertification or generalization inferred. Preserve all frozen results/specifications."
+      },
+      "precise_gap_or_caveat": "Source-only modelguide96 and fresh C2 sender/receiver12 controls now qualify bounded development mechanics. Old cached-guide/context scores remain unequal-access diagnostics; no originaltwo-window recertification or generalization inferred. Preserve all frozen results/specifications.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 191,
+        "anchor": "subsec:eval-ladder",
+        "exact_sentence_tex": "These development controls lack dense matched-quality native observations and do not recertify the historical crossing.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Source-only guide and sender/receiver checks qualify bounded mechanics",
+      "evidence_for_stronger_claim": "Matched same-input, same-access, full two-window protected decoding and held-out confirmation",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": "The source-only guide and fresh sender controls are bounded mechanics checks; cached-guide comparisons do not have matched access."
+    },
+    {
+      "id": "sections/evaluation.tex:184:HOLE(gate-a-fresh-native-overlap)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 184,
+        "kind": "HOLE",
+        "anchor": "gate-a-fresh-native-overlap",
+        "verbatim": "% HOLE(gate-a-fresh-native-overlap): Dense same-input VVC/AV1 observations around candidate VMAF63",
+        "text": "Dense same-input VVC/AV1 observations around candidate VMAF63 and unseen-scene confirmation remain missing; complete96 receiver alone does not establish a win."
+      },
+      "precise_gap_or_caveat": "Dense same-input VVC/AV1 observations around candidate VMAF63 and unseen-scene confirmation remain missing; complete96 receiver alone does not establish a win.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 191,
+        "anchor": "subsec:eval-ladder",
+        "exact_sentence_tex": "These development controls lack dense matched-quality native observations and do not recertify the historical crossing.",
+        "coverage": "complete"
+      },
+      "supported_claim": "One receiver control and sparse anchors do not establish compression win",
+      "evidence_for_stronger_claim": "Dense same-input native VVC/AV1 around candidate VMAF and unseen-scene confirmation",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:221:HOLE(subsec:gate-a-local)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 221,
+        "kind": "HOLE",
+        "anchor": "subsec:gate-a-local",
+        "verbatim": "% HOLE(subsec:gate-a-local): Fresh physical C2/C3 payload decoding and VMAF rescoring;",
+        "text": "Fresh physical C2/C3 payload decoding and VMAF rescoring; denser matched VVC anchors, resolution-qualified overlapping AV1 anchors, and unseen scenes. Verify unused-mask elision by fresh pixel parity, actual placement coverage and foreground-region fidelity; whole-frame VMAF cannot alone establish event/motion preservation."
+      },
+      "precise_gap_or_caveat": "Fresh physical C2/C3 payload decoding and VMAF rescoring; denser matched VVC anchors, resolution-qualified overlapping AV1 anchors, and unseen scenes. Verify unused-mask elision by fresh pixel parity, actual placement coverage and foreground-region fidelity; whole-frame VMAF cannot alone establish event/motion preservation.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 225,
+        "anchor": "tab:gate-overlap",
+        "exact_sentence_tex": "Fresh payload/metric checks, denser anchors, and unseen scenes are needed before promotion.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Posthoc stored-score local PCHIP/cubic sensitivity, no sampled native gain",
+      "evidence_for_stronger_claim": "Fresh C2/C3 payload/pixel parity, VMAF, matched overlapping anchors, foreground motion fidelity and unseen scenes",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:248:NOTE(subsec:consecutive-region)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 248,
+        "kind": "NOTE",
+        "anchor": "subsec:consecutive-region",
+        "verbatim": "% NOTE(subsec:consecutive-region): Fixed image crop, not certified clean background; same-CRF points",
+        "text": "Fixed image crop, not certified clean background; same-CRF points do not establish quality-matched rate savings. Shorter prefixes have no matched native anchors."
+      },
+      "precise_gap_or_caveat": "Fixed image crop, not certified clean background; same-CRF points do not establish quality-matched rate savings. Shorter prefixes have no matched native anchors.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 251,
+        "anchor": "subsec:consecutive-region",
+        "exact_sentence_tex": "An upper-quarter crop is bicubically scaled to $640\\times90$ YUV420p; it is a fixed image region, not a semantically certified clean background.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Consecutive fixed-region hold and refresh observations at stated CRFs",
+      "evidence_for_stronger_claim": "Semantically verified clean background and quality-matched anchors for shorter horizons",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null,
+      "additional_visible_qualifications": [
+        {
+          "file": "sections/evaluation.tex",
+          "line": 255,
+          "anchor": "subsec:consecutive-region",
+          "exact_sentence_tex": "The cheaper points therefore do not establish a matched-quality saving."
+        },
+        {
+          "file": "sections/evaluation.tex",
+          "line": 255,
+          "anchor": "subsec:consecutive-region",
+          "exact_sentence_tex": "Separate one/five/ten/thirty-second hold-prefix ledgers describe observed startup amortization; they cannot substitute for shorter matched anchors or extrapolate an entire match."
+        }
+      ]
+    },
+    {
+      "id": "sections/evaluation.tex:286:NOTE(tab:component-cost)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 286,
+        "kind": "NOTE",
+        "anchor": "tab:component-cost",
+        "verbatim": "% NOTE(tab:component-cost): Original verdict is Rate comparison is withheld. Container charge is zero;",
+        "text": "Original verdict is Rate comparison is withheld. Container charge is zero; exact source-window/patch/native environment and fresh receiver qualification remain missing."
+      },
+      "precise_gap_or_caveat": "Original verdict is Rate comparison is withheld. Container charge is zero; exact source-window/patch/native environment and fresh receiver qualification remain missing.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 289,
+        "anchor": "subsec:eval-object",
+        "exact_sentence_tex": "The report explicitly withholds a rate comparison; missing run identity and full-package qualification remain unresolved.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Component-byte and PSNR observations from unmatched windows, no codec rate comparison",
+      "evidence_for_stronger_claim": "Original source-window/patch/tool identities, container and full receiver qualification",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:319:HOLE(subsec:eval-object)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 319,
+        "kind": "HOLE",
+        "anchor": "subsec:eval-object",
+        "verbatim": "% HOLE(subsec:eval-object): Qualified appearance-conditioned decoder with matched reference/target transforms,",
+        "text": "Qualified appearance-conditioned decoder with matched reference/target transforms, checkpoint exposure, transported conditions and same-source coded/warped controls remains missing."
+      },
+      "precise_gap_or_caveat": "Qualified appearance-conditioned decoder with matched reference/target transforms, checkpoint exposure, transported conditions and same-source coded/warped controls remains missing.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 324,
+        "anchor": "subsec:eval-conditioning",
+        "exact_sentence_tex": "Training and evaluation window mapping also remains unresolved; that is an exposure gap rather than proof of leakage.",
+        "coverage": "complete"
+      },
+      "supported_claim": "One repaired Pix2Pix configuration and conditioning diagnostics, not general generator ranking",
+      "evidence_for_stronger_claim": "Qualified conditioned decoder, matched transforms, exposure, transported conditions and same-source coded/warped controls",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:393:HOLE(tab:common-perception)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 393,
+        "kind": "HOLE",
+        "anchor": "tab:common-perception",
+        "verbatim": "% HOLE(tab:common-perception): One prepared development window; native extraction, held-out",
+        "text": "One prepared development window; native extraction, held-out exposure, temporal/human preference and independent task truth remain unqualified."
+      },
+      "precise_gap_or_caveat": "One prepared development window; native extraction, held-out exposure, temporal/human preference and independent task truth remain unqualified.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 408,
+        "anchor": "tab:common-perception",
+        "exact_sentence_tex": "No BD-rate is inferred, and native extraction and held-out exposure remain unresolved.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Sampled full-frame proxy dominance on one prepared development window",
+      "evidence_for_stronger_claim": "Native extraction, held-out exposure, temporal/human preference and independent task truth",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:427:HOLE(subsec:eval-general)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 427,
+        "kind": "HOLE",
+        "anchor": "subsec:eval-general",
+        "verbatim": "% HOLE(subsec:eval-general): Independently labeled all-frame egocentric task comparison with registered input,",
+        "text": "Independently labeled all-frame egocentric task comparison with registered input, decoded hand packets, foreground-free background and full rate/adaptation accounting is unestablished."
+      },
+      "precise_gap_or_caveat": "Independently labeled all-frame egocentric task comparison with registered input, decoded hand packets, foreground-free background and full rate/adaptation accounting is unestablished.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 456,
+        "anchor": "subsec:guided-receiver",
+        "exact_sentence_tex": "Independent labels, explicit association, missed encoder detections, missed decoded outputs, and every registered source frame are needed for a task claim.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Model-reference denominator/alignment controls, not independent task accuracy",
+      "evidence_for_stronger_claim": "All-frame independent labels, registered input, packet decode, foreground-free background and complete adaptation/rate",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:478:NOTE(subsec:eval-operating)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 478,
+        "kind": "NOTE",
+        "anchor": "subsec:eval-operating",
+        "verbatim": "% NOTE(subsec:eval-operating): Historical heterogeneous timings are descriptive only.",
+        "text": "Historical heterogeneous timings are descriptive only."
+      },
+      "precise_gap_or_caveat": "Historical heterogeneous timings are descriptive only.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 482,
+        "anchor": "subsec:eval-operating",
+        "exact_sentence_tex": "Historical measurements span different hardware, loading, adaptation, cached inputs, and scoring scopes.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Historical timing is descriptive and heterogeneous",
+      "evidence_for_stronger_claim": "Controlled full-pipeline timing and resource accounting with hardware and cache state",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/evaluation.tex:479:HOLE(subsec:eval-operating)",
+      "marker": {
+        "file": "sections/evaluation.tex",
+        "line": 479,
+        "kind": "HOLE",
+        "anchor": "subsec:eval-operating",
+        "verbatim": "% HOLE(subsec:eval-operating): Comparable end-to-end encode/decode/adaptation/compositing timings on uncontaminated",
+        "text": "Comparable end-to-end encode/decode/adaptation/compositing timings on uncontaminated hardware and declared cache state are required before speed, live or client-budget claims."
+      },
+      "precise_gap_or_caveat": "Comparable end-to-end encode/decode/adaptation/compositing timings on uncontaminated hardware and declared cache state are required before speed, live or client-budget claims.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 482,
+        "anchor": "subsec:eval-operating",
+        "exact_sentence_tex": "No causal live, handset, or end-to-end speed advantage is established here.",
+        "coverage": "complete"
+      },
+      "supported_claim": "No speed or live performance claim",
+      "evidence_for_stronger_claim": "Uncontaminated end-to-end encode/decode/adaptation/compositing timings and declared cache state",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/future_work.tex:2:HOLE(sec:future-work)",
+      "marker": {
+        "file": "sections/future_work.tex",
+        "line": 2,
+        "kind": "HOLE",
+        "anchor": "sec:future-work",
+        "verbatim": "% HOLE(sec:future-work): Neither AV1 egocentric visual/task advantage nor matched generative-codec advantage",
+        "text": "Neither AV1 egocentric visual/task advantage nor matched generative-codec advantage has qualified artifacts. Both require the full receiver and metric contract before headline promotion."
+      },
+      "precise_gap_or_caveat": "Neither AV1 egocentric visual/task advantage nor matched generative-codec advantage has qualified artifacts. Both require the full receiver and metric contract before headline promotion.",
+      "visible_qualification": {
+        "file": "sections/future_work.tex",
+        "line": 23,
+        "anchor": "sec:future-work",
+        "exact_sentence_tex": "A perceptual-quality claim needs qualified visual evaluation; a task-specific claim needs independent labels, all-frame denominators, missingness, and the same task objective for both arms.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Egocentric and generative-peer paths are research hypotheses",
+      "evidence_for_stronger_claim": "Complete receiver, independent egocentric visual/task comparison, and matched actual-stream generative peer",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": null,
+      "additional_visible_qualifications": [
+        {
+          "file": "sections/future_work.tex",
+          "line": 25,
+          "anchor": "sec:future-work",
+          "exact_sentence_tex": "A failed setup or unsuitable out-of-domain invocation is not a performance win for PointStream."
+        }
+      ]
+    },
+    {
+      "id": "sections/introduction.tex:1:NOTE(sec:introduction)",
+      "marker": {
+        "file": "sections/introduction.tex",
+        "line": 1,
+        "kind": "NOTE",
+        "anchor": "sec:introduction",
+        "verbatim": "% NOTE(sec:introduction): This is an empirical study, not a codec-wide superiority claim.",
+        "text": "This is an empirical study, not a codec-wide superiority claim. Historical campaigns and new controlled qualification studies preserve their separate protocols."
+      },
+      "precise_gap_or_caveat": "This is an empirical study, not a codec-wide superiority claim. Historical campaigns and new controlled qualification studies preserve their separate protocols.",
+      "visible_qualification": {
+        "file": "sections/introduction.tex",
+        "line": 20,
+        "anchor": "sec:introduction",
+        "exact_sentence_tex": "The strongest current claim is about tested trade-offs and the conditions needed to establish a coding advantage.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Empirical study of trade-offs, not a complete codec win",
+      "evidence_for_stronger_claim": "Fully charged independently decoded comparison under matched rate/quality contract",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/problem.tex:4:NOTE(sec:problem)",
+      "marker": {
+        "file": "sections/problem.tex",
+        "line": 4,
+        "kind": "NOTE",
+        "anchor": "sec:problem",
+        "verbatim": "% NOTE(sec:problem): Diagnostic reduction is not a causal allocation of player bits or a PointStream gain.",
+        "text": "Diagnostic reduction is not a causal allocation of player bits or a PointStream gain."
+      },
+      "precise_gap_or_caveat": "Diagnostic reduction is not a causal allocation of player bits or a PointStream gain.",
+      "visible_qualification": {
+        "file": "sections/problem.tex",
+        "line": 28,
+        "anchor": "tab:headroom",
+        "exact_sentence_tex": "We use this experiment as an \\emph{opportunity diagnostic}, not an upper bound on a complete semantic codec.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Removal savings on changed targets, not player-bit causal attribution",
+      "evidence_for_stronger_claim": "Full reconstruction and controlled causal allocation on original targets",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/problem.tex:59:NOTE(subsec:native-removal)",
+      "marker": {
+        "file": "sections/problem.tex",
+        "line": 59,
+        "kind": "NOTE",
+        "anchor": "subsec:native-removal",
+        "verbatim": "% NOTE(subsec:native-removal): This qualifies a removal diagnostic only, not a PointStream package,",
+        "text": "This qualifies a removal diagnostic only, not a PointStream package, independent match sampling, mask truth, original MP4 extraction, or subjective/task performance."
+      },
+      "precise_gap_or_caveat": "This qualifies a removal diagnostic only, not a PointStream package, independent match sampling, mask truth, original MP4 extraction, or subjective/task performance.",
+      "visible_qualification": {
+        "file": "sections/problem.tex",
+        "line": 64,
+        "anchor": "subsec:native-removal",
+        "exact_sentence_tex": "These are distinct measurements, not a weighted-dB estimate of whole-frame quality or evidence about task accuracy.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Independent retained-stream AV1/VVC target rescoring only",
+      "evidence_for_stronger_claim": "Original MP4 extraction, independent mask truth/match sampling, PointStream package and subjective/task validation",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": "This replay qualifies the retained streams and prepared masks, not independent original-video extraction, mask truth, or a complete PointStream package.",
+      "additional_visible_qualifications": [
+        {
+          "file": "sections/evaluation.tex",
+          "line": 9,
+          "anchor": "subsec:eval-setup",
+          "exact_sentence_tex": "Other historical payloads retain unresolved qualifications."
+        }
+      ]
+    },
+    {
+      "id": "sections/related_work.tex:1:NOTE(sec:related-work)",
+      "marker": {
+        "file": "sections/related_work.tex",
+        "line": 1,
+        "kind": "NOTE",
+        "anchor": "sec:related-work",
+        "verbatim": "% NOTE(sec:related-work): Literature claims are author reports, not PointStream replications.",
+        "text": "Literature claims are author reports, not PointStream replications. Primary author papers and official repositories checked 2026-09-30; search is not exhaustive."
+      },
+      "precise_gap_or_caveat": "Literature claims are author reports, not PointStream replications. Primary author papers and official repositories checked 2026-09-30; search is not exhaustive.",
+      "visible_qualification": {
+        "file": "sections/related_work.tex",
+        "line": 51,
+        "anchor": "subsec:gvcrt-intake",
+        "exact_sentence_tex": "The literature review uses primary papers, author copies, proceedings, and official repositories.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Attribution to authors and bounded repository inspection, not replication",
+      "evidence_for_stronger_claim": "Independent native replication under matched domain and complete rates",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": "These literature findings are reported by their authors or from bounded source inspection, not PointStream replications; the search is not exhaustive."
+    },
+    {
+      "id": "sections/related_work.tex:48:HOLE(subsec:gvcrt-intake)",
+      "marker": {
+        "file": "sections/related_work.tex",
+        "line": 48,
+        "kind": "HOLE",
+        "anchor": "subsec:gvcrt-intake",
+        "verbatim": "% HOLE(subsec:gvcrt-intake): Native encoding, persisted-stream fresh decoding/parity and matched GVC comparison remain unqualified.",
+        "text": "Native encoding, persisted-stream fresh decoding/parity and matched GVC comparison remain unqualified."
+      },
+      "precise_gap_or_caveat": "Native encoding, persisted-stream fresh decoding/parity and matched GVC comparison remain unqualified.",
+      "visible_qualification": {
+        "file": "sections/related_work.tex",
+        "line": 49,
+        "anchor": "subsec:gvcrt-intake",
+        "exact_sentence_tex": "Native encoding, fresh decode parity and matched evaluation remain unqualified after admission failures and contended partial execution; no algorithmic negative follows.\\label{subsec:gvcrt-intake}",
+        "coverage": "complete"
+      },
+      "supported_claim": "Hash-verified checkpoints and CPU symbol roundtrips, not native quality",
+      "evidence_for_stronger_claim": "Native GVC encoding, persisted fresh decode parity and matched evaluation",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/system_design.tex:1:NOTE(sec:system-design)",
+      "marker": {
+        "file": "sections/system_design.tex",
+        "line": 1,
+        "kind": "NOTE",
+        "anchor": "sec:system-design",
+        "verbatim": "% NOTE(sec:system-design): Contract and implementation description; qualification is per experiment.",
+        "text": "Contract and implementation description; qualification is per experiment."
+      },
+      "precise_gap_or_caveat": "Contract and implementation description; qualification is per experiment.",
+      "visible_qualification": {
+        "file": "sections/system_design.tex",
+        "line": 14,
+        "anchor": "subsec:lattice",
+        "exact_sentence_tex": "Those tests establish software behavior under their fixtures rather than dataset accuracy or rate--quality superiority.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Instrument interfaces and fixture tests only",
+      "evidence_for_stronger_claim": "Experiment-specific real-data qualified reconstruction and rate--quality evaluation",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/system_design.tex:6:HOLE(sec:system-design)",
+      "marker": {
+        "file": "sections/system_design.tex",
+        "line": 6,
+        "kind": "HOLE",
+        "anchor": "sec:system-design",
+        "verbatim": "% HOLE(sec:system-design): Demonstrate complete persisted payload-only decoding for a candidate and anchors;",
+        "text": "Demonstrate complete persisted payload-only decoding for a candidate and anchors; reconcile decoded pixels, envelope bytes, checkpoint/adaptation costs and all-frame scores."
+      },
+      "precise_gap_or_caveat": "Demonstrate complete persisted payload-only decoding for a candidate and anchors; reconcile decoded pixels, envelope bytes, checkpoint/adaptation costs and all-frame scores.",
+      "visible_qualification": {
+        "file": "sections/system_design.tex",
+        "line": 33,
+        "anchor": "subsec:measured",
+        "exact_sentence_tex": "A coding claim requires that a receiver reconstruct from the persisted stream and explicitly permitted preinstalled resources.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Explicit receiver contract, not proof that all candidates meet it",
+      "evidence_for_stronger_claim": "Full candidate/anchor payloads, pixel parity, nonoverlap ledger, model costs and all-frame scores",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "sections/system_design.tex:8:HOLE(subsec:lattice)",
+      "marker": {
+        "file": "sections/system_design.tex",
+        "line": 8,
+        "kind": "HOLE",
+        "anchor": "subsec:lattice",
+        "verbatim": "% HOLE(subsec:lattice): Matched component-on/off rate ladders with qualified common quality support are missing.",
+        "text": "Matched component-on/off rate ladders with qualified common quality support are missing."
+      },
+      "precise_gap_or_caveat": "Matched component-on/off rate ladders with qualified common quality support are missing.",
+      "visible_qualification": {
+        "file": "sections/system_design.tex",
+        "line": 12,
+        "anchor": "subsec:lattice",
+        "exact_sentence_tex": "The purpose is to measure what each representation buys and costs; a configuration switch alone is not an empirical ablation.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Component switches are interfaces rather than matched ablation findings",
+      "evidence_for_stronger_claim": "Matched component-on/off rate ladders with common quality support",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": "No matched component-on/off rate ladders with common quality support are presented."
+    },
+    {
+      "id": "appendices/evaluation_notes.tex:3:NOTE(app:eval-notes)",
+      "marker": {
+        "file": "appendices/evaluation_notes.tex",
+        "line": 3,
+        "kind": "NOTE",
+        "anchor": "app:eval-notes",
+        "verbatim": "% NOTE(app:eval-notes): Recovery and arithmetic verification are not independent benchmark reproduction.",
+        "text": "Recovery and arithmetic verification are not independent benchmark reproduction."
+      },
+      "precise_gap_or_caveat": "Recovery and arithmetic verification are not independent benchmark reproduction.",
+      "visible_qualification": {
+        "file": "sections/introduction.tex",
+        "line": 20,
+        "anchor": "sec:introduction",
+        "exact_sentence_tex": "Recovered artifacts, code identities, and arithmetic checks improve traceability; they are not independent reruns of every historical encoder, decoder, or scorer.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Recovery is not independent benchmark reproduction",
+      "evidence_for_stronger_claim": "Fresh native benchmark under verified data, code and metric identities",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "appendices/evaluation_notes.tex:18:NOTE(app:eval-notes)",
+      "marker": {
+        "file": "appendices/evaluation_notes.tex",
+        "line": 18,
+        "kind": "NOTE",
+        "anchor": "app:eval-notes",
+        "verbatim": "% NOTE(app:eval-notes): Initial rewrite from Overleaf fc65fb8 reviewed GPU3's",
+        "text": "Initial rewrite from Overleaf fc65fb8 reviewed GPU3's 2f96b25 and dirty corrections as source claims; its initial pass ran no GPU. Later CPU qualifications do not recertify the whole historical benchmark."
+      },
+      "precise_gap_or_caveat": "Initial rewrite from Overleaf fc65fb8 reviewed GPU3's 2f96b25 and dirty corrections as source claims; its initial pass ran no GPU. Later CPU qualifications do not recertify the whole historical benchmark.",
+      "visible_qualification": {
+        "file": "sections/evaluation.tex",
+        "line": 9,
+        "anchor": "subsec:eval-setup",
+        "exact_sentence_tex": "Other historical payloads retain unresolved qualifications.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Initial recovery and later CPU/GPU checks are separate, not whole-benchmark certification",
+      "evidence_for_stronger_claim": "Independent replications for historic runs",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": "The initial historical recovery performed no GPU reruns; later CPU and GPU checks qualify only their own registered studies."
+    },
+    {
+      "id": "appendices/headroom_measurement.tex:4:NOTE(app:headroom)",
+      "marker": {
+        "file": "appendices/headroom_measurement.tex",
+        "line": 4,
+        "kind": "NOTE",
+        "anchor": "app:headroom",
+        "verbatim": "% NOTE(app:headroom): CPU follow-up qualifies retained BP21 AV1/VVC streams and scorer inputs only;",
+        "text": "CPU follow-up qualifies retained BP21 AV1/VVC streams and scorer inputs only; original MP4 extraction, mask truth, other codec streams and complete PointStream packages remain unqualified."
+      },
+      "precise_gap_or_caveat": "CPU follow-up qualifies retained BP21 AV1/VVC streams and scorer inputs only; original MP4 extraction, mask truth, other codec streams and complete PointStream packages remain unqualified.",
+      "visible_qualification": {
+        "file": "sections/problem.tex",
+        "line": 62,
+        "anchor": "subsec:native-removal",
+        "exact_sentence_tex": "This verifies the retained windows and measurements; it does not recertify extraction from the original MP4s or establish independent mask truth.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Retained BP21 AV1/VVC stream and scorer checks, not original extraction or complete codec",
+      "evidence_for_stronger_claim": "Independent source MP4 extraction, mask truth, additional native codecs and complete payload",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "appendices/roi_verification.tex:6:NOTE(app:roi)",
+      "marker": {
+        "file": "appendices/roi_verification.tex",
+        "line": 6,
+        "kind": "NOTE",
+        "anchor": "app:roi",
+        "verbatim": "% NOTE(app:roi): Historical ROI controls were not a qualified matched-rate redistribution result;",
+        "text": "Historical ROI controls were not a qualified matched-rate redistribution result; retain primary provenance in companion/legacy-markers.tex rather than an unsupported headline."
+      },
+      "precise_gap_or_caveat": "Historical ROI controls were not a qualified matched-rate redistribution result; retain primary provenance in companion/legacy-markers.tex rather than an unsupported headline.",
+      "visible_qualification": {
+        "file": "sections/problem.tex",
+        "line": 28,
+        "anchor": "tab:headroom",
+        "exact_sentence_tex": "Matching quality against different targets further prevents subtracting those percentages directly from the cost of a PointStream package.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Changed-target diagnostic is not matched-rate perceptual ROI redistribution",
+      "evidence_for_stronger_claim": "Matched-rate original-target ROI controls with qualified perceptual scoring",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": "The historical conventional ROI controls do not establish matched-rate perceptual quality redistribution."
+    },
+    {
+      "id": "appendices/roi_verification.tex:16:HOLE(app:corrections)",
+      "marker": {
+        "file": "appendices/roi_verification.tex",
+        "line": 16,
+        "kind": "HOLE",
+        "anchor": "app:corrections",
+        "verbatim": "% HOLE(app:corrections): Persist and independently decode the complete candidate/anchor packages;",
+        "text": "Persist and independently decode the complete candidate/anchor packages; freeze input hashes, native tools, weights and metrics, then run matched quality ladders."
+      },
+      "precise_gap_or_caveat": "Persist and independently decode the complete candidate/anchor packages; freeze input hashes, native tools, weights and metrics, then run matched quality ladders.",
+      "visible_qualification": {
+        "file": "appendices/evaluation_notes.tex",
+        "line": 14,
+        "anchor": "app:eval-notes",
+        "exact_sentence_tex": "The complete physical package must reconcile with nonoverlapping components, and a fresh receiver must consume only that package and declared resources.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Historical correction findings and access boundaries, not complete package qualification",
+      "evidence_for_stronger_claim": "Persist and decode candidate and anchors, freeze identities/tools/metrics and matched ladders",
+      "empirical_framing_disposition": "essential_claim_boundary",
+      "proposed_editorial_fix": null
+    },
+    {
+      "id": "appendices/roi_verification.tex:18:HOLE(app:roi)",
+      "marker": {
+        "file": "appendices/roi_verification.tex",
+        "line": 18,
+        "kind": "HOLE",
+        "anchor": "app:roi",
+        "verbatim": "% HOLE(app:roi): Matched-rate quality redistribution for conventional ROI controls remains unmeasured;",
+        "text": "Matched-rate quality redistribution for conventional ROI controls remains unmeasured; implementation option presence or a component byte change does not establish perceptual benefit."
+      },
+      "precise_gap_or_caveat": "Matched-rate quality redistribution for conventional ROI controls remains unmeasured; implementation option presence or a component byte change does not establish perceptual benefit.",
+      "visible_qualification": {
+        "file": "sections/problem.tex",
+        "line": 28,
+        "anchor": "tab:headroom",
+        "exact_sentence_tex": "Matching quality against different targets further prevents subtracting those percentages directly from the cost of a PointStream package.",
+        "coverage": "partial"
+      },
+      "supported_claim": "Removal controls cannot establish historical matched-rate ROI benefit",
+      "evidence_for_stronger_claim": "Matched-rate and original-target quality redistribution for specific conventional ROI controls",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": "The historical conventional ROI controls do not establish matched-rate perceptual quality redistribution."
+    },
+    {
+      "id": "appendices/roi_verification.tex:20:HOLE(app:headroom)",
+      "marker": {
+        "file": "appendices/roi_verification.tex",
+        "line": 20,
+        "kind": "HOLE",
+        "anchor": "app:headroom",
+        "verbatim": "% HOLE(app:headroom): Retained BP21 RGB windows, masks and AV1/VVC native scoring are now checked,",
+        "text": "Retained BP21 RGB windows, masks and AV1/VVC native scoring are now checked, with CLAIM(subsec:native-removal). Independent MP4 extraction and mask truth, AVC/HEVC rescoring, and whole PointStream package qualification remain missing; the CPU diagnostic does not close them."
+      },
+      "precise_gap_or_caveat": "Retained BP21 RGB windows, masks and AV1/VVC native scoring are now checked, with CLAIM(subsec:native-removal). Independent MP4 extraction and mask truth, AVC/HEVC rescoring, and whole PointStream package qualification remain missing; the CPU diagnostic does not close them.",
+      "visible_qualification": {
+        "file": "sections/problem.tex",
+        "line": 62,
+        "anchor": "subsec:native-removal",
+        "exact_sentence_tex": "This verifies the retained windows and measurements; it does not recertify extraction from the original MP4s or establish independent mask truth.",
+        "coverage": "complete"
+      },
+      "supported_claim": "Retained BP21 RGB/masks/AV1/VVC source-target scorer replay only",
+      "evidence_for_stronger_claim": "Independent MP4 extraction and mask truth, AVC/HEVC rescoring and full PointStream package",
+      "empirical_framing_disposition": "disclosed_limitation",
+      "proposed_editorial_fix": null
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "status": "root_authorizes_one_CPU_only_preflight",
+  "source_revision": "5651a24bbc262ece8f0fa0bd23abb4c29ff6c9a8",
+  "source_archive_sha256": "d3fbd915d12184e99d0e7e847a268190bd81e2067aeed1f25fbc79f0d8aec7b4",
+  "source_archive_bytes": 10711040,
+  "launcher_sha256": "98c48bfd9cd6315ad4952460d07623fea8401e7a5a5e68eaaba0fb74fa236394",
+  "local_launcher": "/private/tmp/w8-receiver-cpu-preflight-run-20261101.py",
+  "host": "gpu6",
+  "one_CPU_affinity": true,
+  "gpu_hidden": true,
+  "CPU_cap_inclusive_s": 60,
+  "phases": {
+    "asset_identity": 20,
+    "MAIN": 12,
+    "JCV": 12,
+    "remote_parent_and_source_staging": 6,
+    "external_staging_ssh_audit_cleanup": 10
+  },
+  "wall_cap_s": 420,
+  "deadline_UTC": "2026-11-01T11:29:34.690620+00:00",
+  "remote_directory": "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-5651a24b-20261101",
+  "local_directory": "/private/tmp/w8-receiver-cpu-preflight-5651a24b-20261101",
+  "closed_w8_cpu_upper_s": 1522,
+  "closed_w8_gpu_s": 224,
+  "worst_cpu_if_reserved_spent": 1582,
+  "original_cpu_cap_s": 3600,
+  "original_gpu_cap_s": 3600,
+  "scope": "archive/model identity and synthetic CPU namespace/Landlock runtime only, no inference or GPU",
+  "stop_conditions": [
+    "any archive/source/protected/runtime mismatch",
+    "measured identity pilot exceeds20CPU-s",
+    "either runtime CPU/wall/isolation gate fails",
+    "unknown execution: inspect existing directory/process, never replay"
+  ]
+}

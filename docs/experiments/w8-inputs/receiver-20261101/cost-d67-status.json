@@ -1,0 +1,52 @@
+{
+  "job_id": "20261101T135101Z-d67fe593",
+  "created": 1793541148.8330097,
+  "status": "failed",
+  "updated": 1793541318.8354883,
+  "host_alias": "gpu6",
+  "gpu": {
+    "index": 0,
+    "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "memory_used_mib": 1,
+    "memory_total_mib": 49140,
+    "memory_free_mib": 48645,
+    "utilization_pct": 0,
+    "compute_processes": [],
+    "pointstream_claimed": false,
+    "pointstream_shared_claims": []
+  },
+  "gpu_sharing": {
+    "mode": "exclusive"
+  },
+  "supervisor_pid": 3911062,
+  "remote_status": {
+    "status": "failed",
+    "started": 1793541191.2100806,
+    "last_progress": 1793541243.1459355,
+    "emitted": [
+      "decision:63688ea731b159c1be9aa89b8e1154cc",
+      "terminal:failed"
+    ],
+    "gpu_sharing": {
+      "mode": "exclusive"
+    },
+    "pid": 3911215,
+    "proc_start_time": 1793541193.74,
+    "process_group_id": 3911215,
+    "progress": {
+      "stage": "attention",
+      "completed": 0,
+      "updated": 1793541242.7892556,
+      "decision": "smoke failed with exit code 1"
+    },
+    "exit_code": 1,
+    "ended": 1793541261.0871592
+  },
+  "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261101T135101Z-d67fe593",
+  "gate": null,
+  "campaign_error": {
+    "error": "smoke failed with exit code 1",
+    "updated": 1793541242.2612753
+  }
+}

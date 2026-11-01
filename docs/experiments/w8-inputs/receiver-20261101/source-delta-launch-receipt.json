@@ -1,0 +1,16 @@
+{
+  "old_sha256": "d3fbd915d12184e99d0e7e847a268190bd81e2067aeed1f25fbc79f0d8aec7b4",
+  "new_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+  "argument_sha256": "47e2cfe8c0ff02a774727b6e19dddf0e416040eea985101968a7d58559bf3177",
+  "program_sha256": "30b1b3a58250d2ee75dfca2315d96a7379f724d9f9900dffc864caec5e2eae21",
+  "command_sha256": "04b7c027081f2e452b63ac357b703d554ab43d8fd7299d4374b5eb22669b4730",
+  "command_bytes": 113502,
+  "exec_argv_plus_env_bytes": 117592,
+  "stdin": "DEVNULL",
+  "remote_wall_seconds": 120,
+  "local_wall_seconds": 130,
+  "remote_cpu_seconds": 2,
+  "local_cpu_seconds": 2,
+  "ssh_cpu_seconds": 1,
+  "gpu_seconds": 0
+}

@@ -1,0 +1,25 @@
+{
+  "GPU_upper": 224,
+  "authorized_utc": "2026-11-01T12:59:59.360523+00:00",
+  "cheap_v3": {
+    "audit_sha256": "d5bf6388f0f2e704fcc11b49ad1b2f9138d816c165ef5c64cbb4c8f67b352dcd",
+    "checkpoint_sha256": "e1d8b5df8f35347990869207194a4e229f5e32faa463b61cd6c85e309b1c4f4b",
+    "config_sha256": "1e8c279415dc595464f1dc0b37c3b0cec3031ba1fdc4fe60fc40abea925ae557",
+    "module_sha256": "86f604c37e94880f4654a35678edb2f217ac22c96eb990adaeeb558f34f631dd",
+    "passed": true,
+    "result_sha256": "45756e894839c78229d11c3edadaadce0e0f4e521e372291053edcbf31826f64"
+  },
+  "closed_CPU_upper": 1820,
+  "latest_local_deadline_utc": "2026-11-01T13:25:14.360523+00:00",
+  "original_caps_each": 3600,
+  "scope": "CPU identity/runtime probes only; no model inference, GPU, fresh pixels or whole-environment claim",
+  "source_audit": {
+    "independently_audited": true,
+    "mode": "0444",
+    "passed": true,
+    "receipt_sha256": "aaf2ee2cad5a7af307a7f34f3482aa82c0eb28ef3ff268fd00f7c726be4ec140",
+    "source_sha256": "26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5"
+  },
+  "this_reservation_CPU": 168,
+  "worst_CPU_upper": 1988
+}

@@ -1,0 +1,24 @@
+{
+  "job_id": "20261101T093351Z-24914a4d",
+  "physical_archives": {
+    "source.tar": {
+      "path": "source.tar",
+      "status": "read",
+      "bytes": 10301440,
+      "sha256": "0af41871c8cb5a650264fc08c1a6deb19c2337cf06849e71bd686bf623270d4c",
+      "transferred": false
+    },
+    "full/published.tar": {
+      "path": "full/published.tar",
+      "status": "read",
+      "bytes": 2897920,
+      "sha256": "3b80afe8c159b6d572acf24e879e4c924b4c81ced06d33185a83f77b6649fe10",
+      "transferred": false
+    }
+  },
+  "source_revision": "e8f8827be53d9b0ed3df85394aab9fac7f263de0",
+  "source_identity": "5bec7e943e030f1d681a654cff540e192f993a27e475ff6998e0aabe9fc1485b",
+  "spec_sha256": "289607bce206fc71f4c7da4fabdf668598cb79e6c455e6e44c04844a38d58ffa",
+  "status": "independently_pinned_before_fresh_full_audit",
+  "metadata_receipt_sha256": "f15422473347d55d615f2ceea0b12f3c00b588229330436986c8b8b114adefc6"
+}

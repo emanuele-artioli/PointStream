@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""Review draft: one bounded CPU-only native inventory; do not run without root reservation."""
+import resource
+resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+import hashlib
+import json
+import os
+from pathlib import Path
+import shlex
+import signal
+import subprocess
+import sys
+import time
+
+REVISION = '2677c17902004dbf7a556a9e6167ce0032fec008'
+ARCHIVE_SHA = 'fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635'
+ENV_SHA = '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661'
+LOCAL_ARCHIVE = Path('/private/tmp/pointstream-w8-receiver-source-2677c179.tar')
+LOCAL_OUTPUT = Path('/private/tmp/w8-native-preflight-2677c179-v4-20261101')
+BASE = '/local/users/emanuele/pointstream'
+SOURCE_BASE = BASE + '/audits/w8-native-preflight-2677c179-v4-20261101-source'
+PUBLISHED_ARCHIVE = BASE + '/audits/w8-source-publish-2677-delta-20261101/source.tar'
+REMOTE_OUTPUT = BASE + '/audits/w8-native-preflight-2677c179-v4-20261101'
+REMOTE_CONFIG = BASE + '/audits/w8-native-preflight-2677c179-v4-20261101-config.json'
+EMPTY_PYCACHE = BASE + '/audits/w8-native-preflight-2677c179-v4-20261101-pycache'
+TREE = BASE + '/cache/' + ENV_SHA + '/tree'
+PACKET = '/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8'
+CONFIG = {'packet': PACKET, 'ffmpeg': TREE + '/bin/ffmpeg', 'library_dirs': [TREE + '/lib'],
+          'output': REMOTE_OUTPUT, 'parent_cpu': 6, 'version_cpu': 1, 'decode_cpu': 9, 'wall_seconds': 120}
+CONFIG_BYTES = json.dumps(CONFIG, sort_keys=True, separators=(',', ':')).encode('ascii')
+CONFIG_SHA = hashlib.sha256(CONFIG_BYTES).hexdigest()
+
+def file_sha(path):
+    h = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            h.update(block)
+    return h.hexdigest()
+
+
+def limit_ssh():
+    resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+
+
+def main():
+    if LOCAL_ARCHIVE.stat().st_size != 10741760 or file_sha(LOCAL_ARCHIVE) != ARCHIVE_SHA:
+        raise ValueError('local physical source archive changed')
+    # This Python script is passed as one safely quoted argument, not generated shell code.
+    bootstrap = r'''import ctypes,hashlib,json,os,resource,signal,stat,sys,tarfile
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(6,9))
+os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
+source=Path(SOURCE_BASE); archive=Path(PUBLISHED_ARCHIVE)
+parent=os.getppid(); libc=ctypes.CDLL(None,use_errno=True)
+if libc.prctl(1,signal.SIGKILL,0,0,0) or os.getppid()!=parent:raise RuntimeError('parent-death signal setup failed')
+local=Path(BASE); data=Path('/home/itec/emanuele/Datasets/pointstream-data')
+if local.stat().st_dev==data.stat().st_dev:raise ValueError('host local filesystem required')
+if os.statvfs(local).f_bavail*os.statvfs(local).f_frsize<200_000_000:raise ValueError('host local space')
+if any(Path(p).exists() for p in (REMOTE_OUTPUT,REMOTE_CONFIG,EMPTY_PYCACHE,SOURCE_BASE)):raise ValueError('v4 output, source, config or cache already exists')
+names={
+ 'experiments/__init__.py':'06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9',
+ 'experiments/tennis/__init__.py':'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+ 'experiments/tennis/w8_receiver_native_bootstrap.py':'dc40011f61f2e9a2fccc6c2f3abc4568907cb996a6638f34131b896b754a44ba',
+ 'experiments/tennis/w8_receiver_native_preflight.py':'d12531b7a16c031f7aac47788cea1e062ff113afbe511e73cfc7cffccd7eae68',
+}
+def stamp(st):return (st.st_dev,st.st_ino,st.st_size,st.st_mtime_ns,st.st_ctime_ns)
+fd=os.open(archive,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
+try:
+ with os.fdopen(fd,'rb') as f:
+  before=os.fstat(f.fileno())
+  if not stat.S_ISREG(before.st_mode) or before.st_size!=10741760 or before.st_mode & 0o777 != 0o444:raise ValueError('physical archive type, size or mode')
+  h=hashlib.sha256()
+  for b in iter(lambda:f.read(1048576),b''):h.update(b)
+  if h.hexdigest()!=ARCHIVE_SHA or stamp(before)!=stamp(os.fstat(f.fileno())):raise ValueError('physical archive SHA mismatch')
+  f.seek(0)
+  with tarfile.open(fileobj=f,mode='r:') as tar:
+   members=tar.getmembers()
+   if len(members)!=923 or tar.pax_headers.get('comment')!=REVISION:raise ValueError('archive member count or revision')
+   content={}
+   for name,digest in names.items():
+    matches=[x for x in members if x.name==name]
+    if len(matches)!=1 or not matches[0].isfile() or matches[0].size>1000000:raise ValueError('invalid source member '+name)
+    item=tar.extractfile(matches[0]);raw=item.read() if item is not None else None
+    if raw is None or len(raw)!=matches[0].size or hashlib.sha256(raw).hexdigest()!=digest:raise ValueError('source member identity '+name)
+    content[name]=raw
+  if stamp(before)!=stamp(os.fstat(f.fileno())) or stamp(before)!=stamp(archive.stat()):raise ValueError('archive changed during inspection')
+except BaseException:
+ raise
+source.mkdir(mode=0o700,exist_ok=False)
+for name,raw in content.items():
+ target=source/name;target.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
+ with target.open('xb') as f:f.write(raw)
+ target.chmod(0o444)
+ if hashlib.sha256(target.read_bytes()).hexdigest()!=names[name]:raise ValueError('extracted source differs: '+name)
+config=CONFIG_BYTES
+with open(REMOTE_CONFIG,'xb') as f:f.write(config)
+if hashlib.sha256(config).hexdigest()!=CONFIG_SHA:raise ValueError('config SHA')
+if os.getppid()!=parent:raise RuntimeError('parent disappeared before exec')
+print(json.dumps({'status':'exec','pid':os.getpid(),'ppid':parent,'pgid':os.getpgrp(),'source_archive_sha256':ARCHIVE_SHA,'config_sha256':CONFIG_SHA}),flush=True)
+env={'PATH':'/usr/bin:/bin','PYTHONPATH':str(source),'PYTHONNOUSERSITE':'1','PYTHONDONTWRITEBYTECODE':'1','PYTHONPYCACHEPREFIX':EMPTY_PYCACHE,'CUDA_VISIBLE_DEVICES':'','OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1','MKL_NUM_THREADS':'1','NUMEXPR_NUM_THREADS':'1','LD_LIBRARY_PATH':TREE+'/lib','TMPDIR':BASE,'TMP':BASE,'TEMP':BASE,'XDG_CACHE_HOME':BASE}
+python=TREE+'/bin/python'
+os.execve(python,[python,'-B','-m','experiments.tennis.w8_receiver_native_preflight','--config',REMOTE_CONFIG,'--config-sha256',CONFIG_SHA],env)
+'''
+    values = {'SOURCE_BASE': SOURCE_BASE, 'PUBLISHED_ARCHIVE': PUBLISHED_ARCHIVE, 'BASE': BASE, 'REMOTE_OUTPUT': REMOTE_OUTPUT,
+              'REMOTE_CONFIG': REMOTE_CONFIG, 'EMPTY_PYCACHE': EMPTY_PYCACHE, 'ARCHIVE_SHA': ARCHIVE_SHA,
+              'CONFIG_BYTES': CONFIG_BYTES, 'CONFIG_SHA': CONFIG_SHA, 'TREE': TREE, 'REVISION': REVISION}
+    program = '\n'.join(f'{key}={value!r}' for key, value in values.items()) + '\n' + bootstrap
+    command = ' '.join(shlex.quote(x) for x in ['/bin/sh', '-c', 'ulimit -S -t 1; exec "$@"', '_',
+                                                 '/usr/bin/timeout', '--signal=TERM', '--kill-after=2',
+                                                 '140s', '/usr/bin/python3', '-B', '-c', program])
+    LOCAL_OUTPUT.mkdir(mode=0o700, exist_ok=False)
+    (LOCAL_OUTPUT/'config.json').write_bytes(CONFIG_BYTES)
+    (LOCAL_OUTPUT/'remote-program.py.txt').write_text(program)
+    started = time.monotonic()
+    with (LOCAL_OUTPUT/'stdout.log').open('xb') as stdout, (LOCAL_OUTPUT/'stderr.log').open('xb') as stderr:
+        proc = subprocess.Popen(['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', 'gpu6', command],
+                                stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, close_fds=True,
+                                start_new_session=True, preexec_fn=limit_ssh)
+        handle = {'pid': proc.pid, 'pgid': proc.pid, 'started_monotonic': started,
+                  'remote_deadline_seconds': 140, 'local_deadline_seconds': 150,
+                  'remote_output': REMOTE_OUTPUT, 'remote_source': SOURCE_BASE,
+                  'source_sha256': ARCHIVE_SHA, 'config_sha256': CONFIG_SHA}
+        (LOCAL_OUTPUT/'handle.json').write_text(json.dumps(handle, indent=2))
+        status = 'completed'
+        try:
+            code = proc.wait(timeout=150)
+        except subprocess.TimeoutExpired:
+            status = 'unknown_inspect_do_not_replay'
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            code = proc.wait(timeout=5)
+        result = {**handle, 'status': status, 'returncode': code, 'wall_seconds': time.monotonic()-started,
+                  'local_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+                  'ssh_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2]),
+                  'cpu_reservation_s': 20, 'revision': REVISION}
+        (LOCAL_OUTPUT/'execution.json').write_text(json.dumps(result, indent=2))
+        print(json.dumps({'status': status, 'returncode': code, 'local_output': str(LOCAL_OUTPUT)}))
+        if status != 'completed' or code:
+            raise SystemExit(1)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,90 @@
+"""One CPU-bounded read-only audit of the existing b581 source publication."""
+import resource
+resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+import hashlib
+import json
+import os
+from pathlib import Path
+import shlex
+import signal
+import subprocess
+import time
+
+EVIDENCE = Path(__file__).resolve().parent
+PROGRAM = EVIDENCE / 'source-b581-scoped-v2-audit-remote.py.txt'
+PROGRAM_SHA = '414e7df8ca62a400d4b770c6a9a0cc205b9b8d25531c835a6e7a82e986912c05'
+OUT = Path('/private/tmp/w8-source-b581-scoped-v2-independent-audit-20261101')
+
+
+def alarm_handler(_signal, _frame):
+    raise TimeoutError('local source audit deadline')
+
+
+def limit_ssh():
+    resource.setrlimit(resource.RLIMIT_CPU, (1, 1))
+
+
+def main():
+    signal.signal(signal.SIGALRM, alarm_handler)
+    signal.alarm(45)
+    code = PROGRAM.read_bytes()
+    if len(code) > 20000 or hashlib.sha256(code).hexdigest() != PROGRAM_SHA:
+        raise ValueError('audit program changed')
+    command = ' '.join(shlex.quote(x) for x in ['/usr/bin/timeout', '--signal=TERM', '--kill-after=2', '40s',
+                        '/usr/bin/python3', '-I', '-S', '-B', '-c', code.decode()])
+    if len(command.encode()) > 20000:
+        raise ValueError('audit command too large')
+    OUT.mkdir(mode=0o700, exist_ok=False)
+    (OUT/'remote-command.txt').write_text(command)
+    (OUT/'request.json').write_text(json.dumps({'program_sha256': PROGRAM_SHA,
+        'command_sha256': hashlib.sha256(command.encode()).hexdigest(), 'cpu_reservation_seconds': 3,
+        'remote_wall_seconds': 40, 'local_wall_seconds': 45, 'stdin': 'DEVNULL'}, indent=2))
+    started = time.monotonic()
+    proc = None
+    with (OUT/'stdout.json').open('xb') as stdout, (OUT/'stderr.txt').open('xb') as stderr:
+        try:
+            old = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
+            try:
+                proc = subprocess.Popen(['/usr/bin/ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5',
+                                         'gpu6', command], stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
+                                        close_fds=True, start_new_session=True, preexec_fn=limit_ssh)
+                (OUT/'handle.json').write_text(json.dumps({'pid': proc.pid, 'pgid': proc.pid,
+                    'started_monotonic': started}, sort_keys=True))
+            finally:
+                signal.pthread_sigmask(signal.SIG_SETMASK, old)
+            status = 'completed'
+            exit_code = proc.wait()
+        except TimeoutError:
+            status = 'unknown_inspect_do_not_replay'
+            exit_code = None
+            if proc is not None:
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                signal.alarm(3)
+                try:
+                    exit_code = proc.wait()
+                except TimeoutError:
+                    pass
+                finally:
+                    signal.alarm(0)
+        execution = {'status': status, 'returncode': exit_code, 'wall_seconds': time.monotonic()-started,
+                     'local_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+                     'ssh_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2])}
+        (OUT/'execution.json').write_text(json.dumps(execution, indent=2))
+        if status != 'completed' or exit_code:
+            raise RuntimeError('audit did not complete; inspect existing state')
+    path = OUT/'stdout.json'
+    if path.stat().st_size > 20000:
+        raise ValueError('audit output exceeds 20 KB')
+    result = json.loads(path.read_bytes())
+    if result.get('passed') is not True or result.get('source_sha256') != '26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5' or result.get('mode') != '0444':
+        raise ValueError('independent audit failed')
+    (OUT/'accepted.json').write_text(json.dumps(result, sort_keys=True, indent=2)+'\n')
+    signal.alarm(0)
+    print(json.dumps({'passed': True, 'output': str(OUT)}))
+
+
+if __name__ == '__main__':
+    main()

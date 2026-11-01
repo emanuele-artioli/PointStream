@@ -1,0 +1,43 @@
+{
+  "inspect": {
+    "pid": 60771,
+    "pgid": 60771,
+    "command": [
+      "scripts/ps-fleet",
+      "inspect",
+      "--hosts",
+      "gpu1",
+      "gpu2",
+      "gpu3",
+      "gpu4",
+      "gpu5",
+      "gpu6"
+    ]
+  },
+  "status": {
+    "pid": 60772,
+    "pgid": 60772,
+    "command": [
+      "scripts/ps-fleet",
+      "status",
+      "--status-timeout-seconds",
+      "75"
+    ]
+  },
+  "workers": {
+    "pid": 60773,
+    "pgid": 60773,
+    "command": [
+      "scripts/ps-fleet",
+      "workers",
+      "status",
+      "--hosts",
+      "gpu1",
+      "gpu2",
+      "gpu3",
+      "gpu4",
+      "gpu5",
+      "gpu6"
+    ]
+  }
+}

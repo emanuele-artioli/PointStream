@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.w8_receiver_job"
+  ],
+  "arguments": [
+    "cost-run",
+    "--steps",
+    "{steps}",
+    "--parent-cpu",
+    "30",
+    "--packet-cpu",
+    "30",
+    "--generator-cpu",
+    "120",
+    "--worker-wall",
+    "350",
+    "--preflight",
+    "{staged:preflight}",
+    "--preflight-sha256",
+    "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5"
+  ],
+  "staged_inputs": [
+    {
+      "name": "packet",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8",
+      "sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+      "extract": false
+    },
+    {
+      "name": "profile",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json",
+      "sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107",
+      "extract": false
+    },
+    {
+      "name": "oracle",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/oracle.json",
+      "sha256": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc",
+      "extract": false
+    },
+    {
+      "name": "preflight",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/bundle.json",
+      "sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5",
+      "extract": false
+    },
+    {
+      "name": "identity",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json",
+      "sha256": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe",
+      "extract": false
+    },
+    {
+      "name": "base",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261023T194934Z-b0dcbb19/full/published.tar",
+      "sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285",
+      "extract": false
+    },
+    {
+      "name": "aa",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/env/moore-animateanyone-67c4229.tar",
+      "sha256": "bfca6cf1129a0154bf2c3431c0e01b34f5e815eda5ba504f54e001c8ceeb99ee",
+      "extract": false
+    },
+    {
+      "name": "w0",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/config.json",
+      "sha256": "92d3dfb746fca211a2c9e019e285f8597412211728dce3c5bcf4eda0f2d62e7e",
+      "extract": false
+    },
+    {
+      "name": "w1",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/diffusion_pytorch_model.safetensors",
+      "sha256": "a1d993488569e928462932c8c38a0760b874d166399b14414135bd9c42df5815",
+      "extract": false
+    },
+    {
+      "name": "w2",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/config.json",
+      "sha256": "ba41139cc9dad159163a53e2aa847356b627f53fef988ad461659bd2d587d886",
+      "extract": false
+    },
+    {
+      "name": "w3",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/pytorch_model.bin",
+      "sha256": "89d2aa29b5fdf64f3ad4f45fb4227ea98bc45156bbae673b85be1af7783dbabb",
+      "extract": false
+    },
+    {
+      "name": "w4",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/denoising_unet.pth",
+      "sha256": "b9e5a2c34fac369e8a922972ca2210916c6af175a0dad907deccf6235816ad52",
+      "extract": false
+    },
+    {
+      "name": "w5",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/reference_unet.pth",
+      "sha256": "beddccb08d49a8b29b0f4d6d456c6521d4382a8d8d48884fa60ba8802509c214",
+      "extract": false
+    },
+    {
+      "name": "w6",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth",
+      "sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+      "extract": false
+    },
+    {
+      "name": "w7",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/motion_module.pth",
+      "sha256": "0d11e01a281b39880da2efeea892215c1313e5713fca3d100a7fbb72ee312ef9",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/packet-eff1aca8.psw8",
+      "sha256": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-linux-input-20261101-eff1aca8/profile-bec98d67.json",
+      "sha256": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/oracle.json",
+      "sha256": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/bundle.json",
+      "sha256": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/identity.json",
+      "sha256": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261023T194934Z-b0dcbb19/full/published.tar",
+      "sha256": "075b001a3ae9dcc9fdda9fb81e4240aaf3a9da228d707ac58733db094d983285"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/env/moore-animateanyone-67c4229.tar",
+      "sha256": "bfca6cf1129a0154bf2c3431c0e01b34f5e815eda5ba504f54e001c8ceeb99ee"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/config.json",
+      "sha256": "92d3dfb746fca211a2c9e019e285f8597412211728dce3c5bcf4eda0f2d62e7e"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/vae/diffusion_pytorch_model.safetensors",
+      "sha256": "a1d993488569e928462932c8c38a0760b874d166399b14414135bd9c42df5815"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/config.json",
+      "sha256": "ba41139cc9dad159163a53e2aa847356b627f53fef988ad461659bd2d587d886"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/image_encoder/pytorch_model.bin",
+      "sha256": "89d2aa29b5fdf64f3ad4f45fb4227ea98bc45156bbae673b85be1af7783dbabb"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/denoising_unet.pth",
+      "sha256": "b9e5a2c34fac369e8a922972ca2210916c6af175a0dad907deccf6235816ad52"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/reference_unet.pth",
+      "sha256": "beddccb08d49a8b29b0f4d6d456c6521d4382a8d8d48884fa60ba8802509c214"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/pose_guider.pth",
+      "sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-2026-10-22/inputs/aa/original/motion_module.pth",
+      "sha256": "0d11e01a281b39880da2efeea892215c1313e5713fca3d100a7fbb72ee312ef9"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz",
+    "sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e"
+  },
+  "required_commands": [
+    "unshare"
+  ],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.w8_receiver_job",
+    "cost-validate"
+  ],
+  "deadline": "<ROOT_REVIEWED_FUTURE_DEADLINE>",
+  "verify_staged_inputs": true,
+  "stall_seconds": 180,
+  "device": "gpu",
+  "hosts": [
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 24000,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "defer_failed_publication": true,
+  "local_storage_gib": 40,
+  "scale": {
+    "steps": {
+      "smoke": 1,
+      "full": 3
+    }
+  },
+  "smoke": {
+    "seconds": 160,
+    "representative_basis": "Full 240 native frames at one DDIM step, 80 ticks, same packet and models; qualification only."
+  },
+  "full": {
+    "seconds": 220
+  },
+  "validator_seconds": 70,
+  "budget_seconds": 500,
+  "receiver_cpu_budget_seconds": 440,
+  "receiver_validator_cpu_seconds": 60,
+  "receiver_external_cpu_reserve_seconds": 20,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  }
+}

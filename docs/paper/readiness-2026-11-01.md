@@ -19,7 +19,7 @@ does not turn unmeasured comparisons into completed evidence.
   beside DISTS/PSNR gains; post hoc selections and failed decodes are disclosed.
   A cost-stopped smoothing pilot and absent racket masks are not presented as
   quality negatives. See [negative-evidence audit](negative-evidence-2026-11-01.md).
-- Overleaf main `7a7381e31526c304af16da79dfd96941c0d4a6e9` includes that appendix, the
+- Overleaf main `a6679181fcbe8104702bf3b0231140cc301d9ca1` includes that appendix, the
   hand-transfer/reference-bank negatives and the passing conditional W8
   saved-quality screen described below.
   PDF `/private/tmp/pointstream-w7-manuscript/build/main.pdf`: **25 pages,
@@ -54,16 +54,38 @@ recorded; reviewed auditor `142b6cc5` resolved argument binding without changing
 scores, identities or thresholds. The full audit passed all 12 checks on 80 ticks;
 maximum original-control difference 5.2273e-5 <0.001.
 
-Original W8 cumulative after a separately bounded 15 CPU-s runtime preflight:
-**224/3,600 GPU-s, ≤1,169/3,600 CPU-s**. MAIN preparation runtime and network namespace
-feasibility were verified on gpu5. Exact packet geometry on the Mac previously
-failed at ~4.55e-13 despite matching pose pixels; no tolerance waiver. Linux
-Landlock, packet-derived inputs and independent full validation are not yet
-qualified. The corrected complete-packet CPU oracle is under review; the older
-transport-based draft is disabled. No CPU input-oracle fleet job or receiver job exists yet.
-Unused generator/SAM/native installed-model qualifications remain a separate
-pre-GPU gate, with unchanged original budgets. No training, encoding or model
-changes follow from the scoring repair.
+The Linux CPU input oracle `20261101T093351Z-24914a4d` passed all four
+independent checks for one profile from frozen source `e8f8827b`; report SHA256
+`8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc`.
+It establishes exact packet-derived conditioning and isolation under that tested
+profile, not fresh generated crops, masks, native RGB or composites, sustained
+reuse or timing. The job, claim and wait are closed and its terminal event was
+acknowledged. Golden qualification closed at150 CPU-s; the15 original reference files are
+read-only. Later native inventory and CPU identity/runtime checks passed their
+specific gates. CPU acceptance `616abd67…` independently binds11 large assets,
+five protected identities,91 AA source/config files, the exact generated-manifest
+exception outside source grants,160 SAM hashes and the two isolated runtimes.
+Historical PGIDs were not recorded; known child PIDs and current matching task
+processes were absent. This does not establish full cached-environment equivalence
+or any fresh pixel, mask or perceptual-quality result.
+
+The cost-only pilot `20261101T135101Z-d67fe593` failed on two omitted
+source helpers before packet decode. The corrected package then passed the
+actual isolated CPU decoder, independent audit and root comparison (237 source
+files,480 tensors and both NPZ hashes; protected inputs remain denied). This is
+no learned inference or fresh-quality result. Original W8 cumulative is
+**≤2,165/3,600 CPU-s and352/3,600 GPU-s**; at least1,435 CPU-s /3,248 GPU-s
+remain. No live reservation/process/claim/wait. The root-reviewed [source repair amendment](../cards/w8-source-package-repair.md)
+awaits the user: one cost-only1/3-step campaign, ≤580 CPU-s /500 GPU-s inside
+original totals, no added budget or changed scientific rules. No retry or
+30-step admission is inferred. The [W8 entry](../experiments/w8-wire-audit.md)
+controls exact receipts and ledger.
+
+Overleaf main/local manuscript is **a6679181fcbe8104702bf3b0231140cc301d9ca1**:
+user-confirmed author block, ATHENA acknowledgment, PRESLEY beside ELVIS/GenStream;
+MoQSplat/TIGAS were reviewed and omitted as indirect. Checker/registrytests pass
+with26 cited keys. Review22 body/reference+3 appendix pages; alternate small
+probe23+3, no overfull lines. Current live venue workflow remains unverified.
 
 ## What remains for submission
 
@@ -81,7 +103,12 @@ changes follow from the scoring repair.
    that rely on them or remain explicit limitations. The evidence matrix names
    the exact artifacts and gaps; this is not a claim that all are mandatory
    experiments for an honestly narrowed empirical study.
-4. **Final publication review:** reconcile abstract/conclusions and all active
+4. **Author facts:** exact source permissions/terms and any shared media, full
+   AI-assistance history and the relationship to prior/concurrent papers await
+   author answers; the [concrete inventory and proposed wording](author-statements-2026-11-01.md)
+   are prepared. Names/order/affiliation, ATHENA and requested relevant citations
+   are complete.
+5. **Final publication review:** reconcile abstract/conclusions and all active
    markers with the chosen contribution, audit references/rights/provenance,
    verify format and final PDF, and obtain explicit authority to submit.
 

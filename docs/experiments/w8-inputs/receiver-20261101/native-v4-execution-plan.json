@@ -1,0 +1,30 @@
+{
+  "status": "closed_independently_audited_PASS",
+  "source_revision": "2677c17902004dbf7a556a9e6167ce0032fec008",
+  "archive_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+  "archive_independent_audit_sha256": "e0a484c2b235701e9fa647b1e2d55b8b125e171cce5ebc9e0ab6a093b2e423f9",
+  "launcher_sha256": "4beb19f4da670b4e00abec3170bd8e70ea0737d3dddd7047c52dfe2013e2a119",
+  "source_closure": "only four exact hash-pinned imported modules from independently qualified archive, extracted into new exclusive source directory",
+  "source_independent_of_88040": true,
+  "remote_output": "/local/users/emanuele/pointstream/audits/w8-native-preflight-2677c179-v4-20261101",
+  "local_receipts": "/private/tmp/w8-native-preflight-2677c179-v4-20261101",
+  "CPU_s": {
+    "parent_with_extraction": 6,
+    "version": 1,
+    "decode": 9,
+    "external_closeout": 4
+  },
+  "total_CPU_s": 20,
+  "GPU_s": 0,
+  "remote_wall_s": 140,
+  "local_wall_s": 150,
+  "closed_W8_CPU_upper_s": 1666,
+  "parallel_qualification_CPU_s": 165,
+  "worst_combined_CPU_s": 1851,
+  "W8_GPU_s": 224,
+  "original_caps_each_s": 3600,
+  "scope": "CPU native YUV/library inventory only; restricted execution/RGB and receiver unproved",
+  "stop": "source/provider/mapped-path/YUV/CPU/wall failure stops; preserve/inspect existing state, never replay",
+  "accepted_audit_sha256": "2946a64fdef7ac7f3d293704b729c1b73348e35ccf8657b5da2b898be19d3745",
+  "closed_CPU_charge_upper_s": 20
+}

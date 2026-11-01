@@ -1,0 +1,63 @@
+"""Isolated MAIN-runtime AA/SAM metadata check from one frozen argv payload."""
+import base64
+import hashlib
+import json
+import os
+from pathlib import Path
+import resource
+import sys
+import time
+import zlib
+
+resource.setrlimit(resource.RLIMIT_CPU, (5, 5))
+MODULE_SHA = '86f604c37e94880f4654a35678edb2f217ac22c96eb990adaeeb558f34f631dd'
+CONFIG_SHA = '1e8c279415dc595464f1dc0b37c3b0cec3031ba1fdc4fe60fc40abea925ae557'
+PAYLOAD_SHA = '92672214766e94edf5e6d586d983a893ef24f7f9163ad53da260eadd04383ee0'
+OUT = Path('/local/users/emanuele/pointstream/audits/w8-aa-sam-cheap-b58155b4-20261101')
+if len(sys.argv) != 2:
+    raise ValueError('one frozen payload argument required')
+payload = sys.argv[1].encode('ascii')
+if len(payload) != 22976 or hashlib.sha256(payload).hexdigest() != PAYLOAD_SHA:
+    raise ValueError('payload identity mismatch')
+codec = zlib.decompressobj()
+raw = codec.decompress(base64.b64decode(payload, validate=True), 100001)
+if len(raw) > 100000 or not codec.eof or codec.unused_data or codec.unconsumed_tail:
+    raise ValueError('payload decompression bounds')
+data = json.loads(raw)
+if set(data) != {'module_b64', 'config_b64'}:
+    raise ValueError('payload schema mismatch')
+module = base64.b64decode(data['module_b64'], validate=True)
+config = base64.b64decode(data['config_b64'], validate=True)
+if hashlib.sha256(module).hexdigest() != MODULE_SHA or hashlib.sha256(config).hexdigest() != CONFIG_SHA:
+    raise ValueError('module or configuration identity mismatch')
+local = Path('/local/users/emanuele/pointstream')
+data_root = Path('/home/itec/emanuele/Datasets/pointstream-data')
+if local.stat().st_dev == data_root.stat().st_dev:
+    raise ValueError('separate local filesystem required')
+space = os.statvfs(local)
+if space.f_bavail * space.f_frsize < 100_000_000:
+    raise ValueError('insufficient host-local space')
+if 'torch' in sys.modules or os.environ.get('CUDA_VISIBLE_DEVICES') != '':
+    raise ValueError('GPU-visible or Torch-loaded environment prohibited')
+OUT.mkdir(mode=0o700, exist_ok=False)
+config_path = OUT / 'config.json'
+with config_path.open('xb') as stream:
+    stream.write(config)
+sys.argv = ['w8_receiver_preflight.py', '--cheap-config', str(config_path),
+            '--cheap-config-sha256', CONFIG_SHA, '--cheap-output', str(OUT / 'result.json')]
+namespace = {'__name__': 'w8_selected_module', '__file__': '<pinned-aa-sam-preflight>'}
+exec(compile(module, '<pinned-aa-sam-preflight>', 'exec'), namespace)
+print(json.dumps({'event': 'start', 'pid': os.getpid(), 'pgid': os.getpgrp(),
+                  'module_sha256': MODULE_SHA, 'config_sha256': CONFIG_SHA,
+                  'payload_sha256': PAYLOAD_SHA, 'started_monotonic': time.monotonic()}, sort_keys=True), flush=True)
+code = namespace['main']()
+if code != 0 or 'torch' in sys.modules:
+    raise RuntimeError('cheap checker failed or imported Torch')
+result = OUT / 'result.json'
+checkpoint = OUT / 'result.json.checkpoint.jsonl'
+print(json.dumps({'event': 'complete', 'result_sha256': hashlib.sha256(result.read_bytes()).hexdigest(),
+                  'checkpoint_sha256': hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
+                  'result_bytes': result.stat().st_size, 'checkpoint_bytes': checkpoint.stat().st_size,
+                  'cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+                  'torch_imported': False, 'gpu_visible': False,
+                  'scope': 'AA/SAM cheap metadata and source checks only'}, sort_keys=True), flush=True)

@@ -1,0 +1,10 @@
+import base64,hashlib,json,shlex,zlib
+from pathlib import Path
+p=Path(__file__).resolve().parent
+bundle=Path('/private/tmp/w8-preflight-bundle-b581-20261101/bundle.json').read_bytes()
+if hashlib.sha256(bundle).hexdigest()!='ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5':raise ValueError('bundle SHA')
+root=Path.cwd();mapping=json.loads(bundle)['frozen_source_files']; extra={n:base64.b64encode((root/n).read_bytes()).decode() for n in ('tools/datasets/k4b_inputs.py','tools/datasets/k4_inputs.py')};payload=base64.b64encode(zlib.compress(json.dumps({'map':mapping,'extra':extra},sort_keys=True,separators=(',',':')).encode(),9)).decode();(p/'cost-source-repair-cpu-v1-payload.txt').write_text(payload)
+remote=(p/'cost-source-repair-cpu-v1-remote.py.txt').read_text();command=' '.join(shlex.quote(x) for x in ['/usr/bin/timeout','--signal=TERM','--kill-after=2','85s','/usr/bin/python3','-I','-S','-B','-c',remote,payload]);
+if len(command.encode())>=120000:raise ValueError('argv cap')
+(p/'cost-source-repair-cpu-v1-command.txt').write_text(command)
+print('command bytes',len(command),'sha256',hashlib.sha256(command.encode()).hexdigest(),'payload',len(payload))

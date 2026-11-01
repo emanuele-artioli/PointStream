@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "actual_bytes": 4638720,
+  "actual_sha256": "26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5",
+  "byte_identical_to_target": true,
+  "archive_mode": "0444",
+  "old_bytes": 10741760,
+  "publisher_result": {
+    "bytes": 4638720,
+    "cpu_seconds": 0.048575,
+    "delta_sha256": "44083b583c7f6a4eceeb408c5c04679b6537de18998987d9f98b6ab873e7c584",
+    "mode": "0444",
+    "new_device": 16777229,
+    "new_inode": 611297072,
+    "new_sha256": "26c2c2f4a52ee6102244d1a11c172e7531deb9e2660810415e9d16c9514ce5a5",
+    "old_device": 16777229,
+    "old_inode": 611268071,
+    "old_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+    "passed": true,
+    "path": "/private/tmp/w8-scoped-publisher-v2-regression-20261101/published/source.tar",
+    "scope": "source archive publication only; no qualification, inference or GPU"
+  },
+  "changes": [
+    "OLD path",
+    "OUT path",
+    "host filesystem check only"
+  ],
+  "wall_seconds": 0.0694927079603076
+}

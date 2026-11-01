@@ -1,0 +1,50 @@
+{
+  "entry_count": 923,
+  "new_archive": {
+    "mode": "0444",
+    "path": "/local/users/emanuele/pointstream/audits/w8-source-publish-2677-delta-20261101/source.tar",
+    "sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+    "size": 10741760,
+    "stamp": [
+      64514,
+      41358263,
+      10741760,
+      1793534341629610448,
+      1793534341635609914
+    ]
+  },
+  "old_archive": {
+    "mode": "0644",
+    "path": "/local/users/emanuele/pointstream/audits/w8-receiver-cpu-preflight-5651a24b-20261101/source.tar",
+    "sha256": "d3fbd915d12184e99d0e7e847a268190bd81e2067aeed1f25fbc79f0d8aec7b4",
+    "size": 10711040,
+    "stamp": [
+      64514,
+      41357258,
+      10711040,
+      1793532246744034766,
+      1793532246744034766
+    ]
+  },
+  "passed": true,
+  "pax_comment": "2677c17902004dbf7a556a9e6167ce0032fec008",
+  "remote_cpu_seconds": 0.102125,
+  "source_members": {
+    "experiments/__init__.py": {
+      "bytes": 154,
+      "sha256": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9"
+    },
+    "experiments/tennis/__init__.py": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/tennis/w8_receiver_native_bootstrap.py": {
+      "bytes": 18474,
+      "sha256": "dc40011f61f2e9a2fccc6c2f3abc4568907cb996a6638f34131b896b754a44ba"
+    },
+    "experiments/tennis/w8_receiver_native_preflight.py": {
+      "bytes": 13875,
+      "sha256": "d12531b7a16c031f7aac47788cea1e062ff113afbe511e73cfc7cffccd7eae68"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "status": "root_authorizes_one_source_only_delta_publication",
+  "source_revision": "2677c17902004dbf7a556a9e6167ce0032fec008",
+  "old_archive_sha256": "d3fbd915d12184e99d0e7e847a268190bd81e2067aeed1f25fbc79f0d8aec7b4",
+  "target_archive_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+  "target_archive_bytes": 10741760,
+  "old_archive_immutable": true,
+  "new_output_exclusive": true,
+  "target_mode": "0444",
+  "cpu_cap_inclusive_s": 12,
+  "gpu_s": 0,
+  "phases": {
+    "prior_local_preparation": 2,
+    "local_launcher": 2,
+    "SSH": 1,
+    "remote": 2,
+    "shell_timeout": 1,
+    "readback_audit_closeout": 4
+  },
+  "remote_wall_s": 120,
+  "local_wall_s": 130,
+  "stdin": "DEVNULL",
+  "delta_b64_bytes": 109088,
+  "remote_command_bytes": 113502,
+  "remote_command_cap_bytes": 120000,
+  "local_argv_environment_cap_bytes": 200000,
+  "prior_closed_W8_CPU_s": 1654,
+  "worst_W8_CPU_s_with_reservation": 1666,
+  "W8_GPU_s": 224,
+  "original_caps_each": 3600,
+  "scope": "exact source recovery only, no qualification, inference or new GPU",
+  "stop": "any SHA/size/CPU/wall/command-bound failure or unknown state; preserve and inspect, never replay",
+  "files_sha256": {
+    "source-delta-launcher.py.txt": "ea174a978e0a048289b5773e8103c2c0ca83fb919868f19769912eb5dba0a3fc",
+    "source-delta-remote.py.txt": "30b1b3a58250d2ee75dfca2315d96a7379f724d9f9900dffc864caec5e2eae21",
+    "source-delta-builder.py.txt": "c8921c9a876dbae043c024e8c4005ad87a7769d438d6a3242466312506d16a51"
+  }
+}
