@@ -64,6 +64,9 @@ def test_stage_validation_survives_scratch_removal(tmp_path, monkeypatch):
     monkeypatch.setenv("TMPDIR", str(temp))
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "")
     monkeypatch.setattr(job, "cpu_limit", lambda _: None)
+    # The real validator starts in a fresh process; pytest may already have
+    # consumed more than its 120-second process-wide CPU limit.
+    monkeypatch.setattr(job, "cpu_seconds", lambda: 0.0)
     monkeypatch.setattr(job, "validate_golden", lambda *_: None)
     contents = {"keypoints.kps": b"keypoints", **{f"{n}.png.ref": n.encode() for n in job.UNITS}}
     for name, content in contents.items():
@@ -96,6 +99,9 @@ def test_stage_validation_survives_scratch_removal(tmp_path, monkeypatch):
     result = job.validate(stage)
     assert result["passed"], result
     assert not scratch.exists()
+    monkeypatch.setattr(job, "cpu_seconds", lambda: 121.0)
+    assert not job.validate(stage)["checks"]["process_cpu_limits"]
+    monkeypatch.setattr(job, "cpu_seconds", lambda: 0.0)
     manifest = job.evidence_manifest(stage)
     (packets / "keypoints.kps").write_bytes(b"tampered")
     assert manifest != job.evidence_manifest(stage)
