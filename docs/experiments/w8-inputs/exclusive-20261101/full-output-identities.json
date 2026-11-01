@@ -1,0 +1,11 @@
+{
+  "job_id": "20261101T081828Z-d70bc44f",
+  "archive": "/private/tmp/w8-exclusive-recovery-20261101/full/published.tar",
+  "archive_sha256": "f87e9cba68063fb115828dddbffb9b7fbaffa1e61003ac4292f4adfaab1cc41f",
+  "archive_bytes": 51200,
+  "normalized_spec_sha256": "e9d926b6f61685a288e90225c38bd1d84050c9187dfa25180d298ce317b03230",
+  "status": "independently_hashed_before_audit",
+  "first_audit_code_sha256": "459a1c0c8eccbafc116d88841ac67174602ca6fd08ce854636d309223a1e91b4",
+  "first_audit_outcome": "failed_before_output_on_extra_archive_positional_name_binding",
+  "first_audit_cpu_s": 0.129421
+}

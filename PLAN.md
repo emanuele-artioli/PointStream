@@ -23,6 +23,19 @@ new dependency.
 
 ## Where PointStream stands (2026-10-31)
 
+**Current W8 status, 2026-11-01:** exclusive scoring job
+`20261101T081828Z-d70bc44f` completed and passed an independent full audit;
+the [raw screen](docs/experiments/w8-inputs/exclusive-20261101/rate-screen.json)
+passes all eight player-metric cells for one saved window at the fixed,
+conditionally amortized 46.3151 kbps rate. The result assumes named assets are reused for 7,200 s; it
+is not fresh reconstruction, demonstrated reuse, or a W7 population-level pass.
+All scoring jobs and task claims are closed. Cumulative W8 cost is 224/3,600
+GPU-s and ≤1,169/3,600 CPU-s, including the 15 CPU-s runtime preflight. The
+complete-packet CPU input oracle remains under review; no input-oracle fleet
+job or receiver job exists. The latest [continuation](docs/continuation-2026-11-01.md) is the
+resume point. Overleaf `7a7381e3` has 22 body/reference pages and three online
+appendix pages, within the 23 + 5 allowance; the paper is not submission-ready.
+
 **2026-10-31 accounting correction:** the W7 transport lists PNG and
 JPEG variants of two reference crops. `w7_rates.rates` counted eight files as
 eight crops, undercharging the modeled 12-crop reference bank by a factor of
@@ -37,8 +50,8 @@ Tier 1 retains three original missing Med comparisons. The conditional joint
 duration model passes about 133–198 minutes within measured coverage; this is
 not a global minimum break-even length or a complete bitstream result.
 Historical W7 closure claims below are superseded by this correction. Original
-outputs remain unchanged; all repair jobs are terminal. The 23-page Overleaf
-draft includes the result, with fresh decoding, reference persistence and
+outputs remain unchanged; all repair jobs are terminal. The then-current 23-page Overleaf
+draft included the result, with fresh decoding, reference persistence and
 flicker still unresolved. See [W9's audit](docs/experiments/w9-adapter-break-even.md),
 merged [PR #315](https://github.com/emanuele-artioli/PointStream/pull/315), and
 [repair PR #316](https://github.com/emanuele-artioli/PointStream/pull/316).
@@ -131,7 +144,7 @@ sessions update their own items and their files in `docs/experiments/`
 
 ### Resume here after the root chat is archived
 
-**Latest (2026-10-31): read [the 2026-10-31 continuation](docs/continuation-2026-10-31.md) first.**
+**Latest (2026-11-01): read [the 2026-11-01 continuation](docs/continuation-2026-11-01.md) first.**
 The later billing correction above supersedes the earlier two-tier W7 closure.
 Work continues in Codex sessions; the 2026-10-27 text below is historical.
 
@@ -354,10 +367,11 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
-| W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-approved-2026-11-01` | primary plus Terra 6.1 medium delegates | running: user approved one exclusive attempt, inclusive scoring cap 450 GPU-s/450 CPU-s inside original W8 3,600/3,600. Prior charges 67 GPU-s/≤87 CPU-s retained; no new request at approval. Proposed envelope 377 GPU-s/417 CPU-s inclusive, fresh smoke and strict measured projection before full, independent raw-control audit before rate screen. No training/encoding/model/payload/quality-rule change. |
-| W8 approved upper-baseline amendment | [coverage follow-up](docs/experiments/w8-inputs/prospective-coverage-followup.md) | `codex/w8-cost-reallocation-2026-11-01` (predecessor PR #320 merged) | primary plus Terra 6.1 medium delegates | stopped 2026-11-01: first request `20261101T071706Z-afde26d5` passed correctness but failed cost projection, second `20261101T073429Z-04a50c10` hit its smoke limit on shared GPU; both terminal/claims released, no full quality point or third run. Amendment ≤87 CPU-s/67 GPU-s of 300/300; cumulative W8 ≤937 CPU-s/67 GPU-s of 3,600/3,600. Exclusive-GPU 450/450 inclusive scoring-cap proposal awaits user authority, original totals unchanged. Fixed packet/rate and quality/receiver gates unchanged. |
+| W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-results-2026-11-01` (policy PR #322 merged) | primary plus Terra 6.1 medium delegates | complete: `20261101T081828Z-d70bc44f`, gpu6 exclusive Ada, frozen source `c0f25e4e` / spec `e9d926b6`; independent full audit and raw screen pass all 8 cells at 46.3151 kbps. Initial two cost stops preserved. Combined inclusive scoring 224 GPU-s / ≤304 CPU-s of 450/450; original total after 15 CPU-s runtime preflight: 224 GPU-s / ≤1,169 CPU-s of 3,600/3,600. Processes/claims/waits closed. No training/encoding/model/payload/quality-rule change. |
+| W8 Linux exact-input oracle | [original W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/w8-exclusive-results-2026-11-01` | primary plus Terra 6.1 medium builders | preparation: passing saved-quality rate screen reopens original gates. Corrected whole-packet/profile/paid-bitmap decoder, independent tensor/geometry validation and Linux isolation under review; legacy CLI disabled. Original MAIN NumPy 1.26.4 / OpenCV 4.10 runtime and namespace feasibility verified on gpu5, not actual Landlock/input equality. No job; proposed ≤300 CPU-s campaign + ≤40 CPU-s extra reserve needs root approval/fresh preflight/frozen source. Remaining original ≥2,431 CPU-s / 3,376 GPU-s, no transfer from other cards. |
+| W8 approved upper-baseline amendment (historical, followed by exclusive repair) | [coverage follow-up](docs/experiments/w8-inputs/prospective-coverage-followup.md) | `codex/w8-cost-reallocation-2026-11-01` (predecessor PR #320 merged) | primary plus Terra 6.1 medium delegates | stopped 2026-11-01: first request `20261101T071706Z-afde26d5` passed correctness but failed cost projection, second `20261101T073429Z-04a50c10` hit its smoke limit on shared GPU; both terminal/claims released, no full quality point or third run. Amendment ≤87 CPU-s/67 GPU-s of 300/300; cumulative W8 ≤937 CPU-s/67 GPU-s of 3,600/3,600. Subsequent exclusive-GPU 450/450 inclusive scoring-cap amendment approved; its distinct request is tracked in the row above, original totals unchanged. Fixed packet/rate and quality/receiver gates unchanged. |
 | Fleet all-status read latency | [fleet status contract](docs/fleet.md) | `codex/fleet-status-read-concurrency-2026-11-01` | primary plus Terra 6.1 medium delegate | local fix reviewed 2026-11-01 after a 600-s NFS all-status timeout: bounded concurrent per-request reads, unchanged sorted live-state semantics, no history cache/filter or mutations. Focused tests pass; runtime speed/server impact unverified. No deployment, worker restart or GPU work; publish/verify a manager release only through reviewed fleet operations after inspecting existing worker identity. |
-| Submission readiness and W8 witness | [authorized W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/submission-readiness-2026-11-01` | primary plus three Terra 6.1 medium delegates | verification 2026-11-01: complete PLAN/evidence audit and negative-results online appendix done; W8 initial fixed actual-payload rate screen stopped unresolved (46.3151 kbps vs one anchor's 45.8233 upper bracket), 0/3,600 GPU-s, ≤850/3,600 CPU-s conservative envelope, no new fleet jobs/reservations. Local tensor bytes exact; Mac geometry equality and original packed/source-hidden inference unverified. No retry, redesign or repair under stopped card without amendment. Main+refs 23 pages plus 5 appendix allowed; current draft 22+3. Other open PLAN tasks triaged in paper task/evidence audits; scientific limits remain. |
+| Submission readiness and W8 witness (initial screen; see later rows) | [authorized W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/submission-readiness-2026-11-01` | primary plus three Terra 6.1 medium delegates | verification 2026-11-01: complete PLAN/evidence audit and negative-results online appendix done; W8 initial fixed actual-payload rate screen stopped unresolved (46.3151 kbps vs one anchor's 45.8233 upper bracket), 0/3,600 GPU-s, ≤850/3,600 CPU-s conservative envelope, no new fleet jobs/reservations. Local tensor bytes exact; Mac geometry equality and original packed/source-hidden inference unverified. No retry, redesign or repair under stopped card without amendment. Main+refs 23 pages plus 5 appendix allowed; current draft 22+3. Other open PLAN tasks triaged in paper task/evidence audits; scientific limits remain. |
 | Paper continuation and W7 accounting audit | [2026-10-31 handoff](docs/continuation-2026-10-31.md) | `codex/w7-anchor-repair-2026-10-31` (merged #315 and #316) | primary plus Terra 6.1 medium delegates | repair complete 2026-10-31: all six GPU requests independently full-audited, root recomputation exact, GPU 1,043/5,400 s, CPU ≤1,924/5,400 s, no active jobs/reservations; at 2 h familiar-match rule passes conditionally, unseen-match LPIPS includes zero despite all four anchors; conditional modeled joint pass about 133–198 min, not global L*; Overleaf `a3e2888d` updated (23 pages). W6b scale stop, W11 labels blocked, W8 fresh-decoder witness proposed for separate authority |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 | J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
@@ -1440,11 +1454,13 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   alone project more than the remaining cap, and no smoothing quality result
   exists. Any full smoothing run needs a separately budgeted proposal and a
   packed host-local environment. W7 keeps the every-third-frame recipe.
-- **W8 wire audit (2026-10-31).** Actual IVF, KPS2 and research header bytes
-  coexist with modeled bank/adaptation charges; a complete payload and fresh
-  source-hidden reconstruction remain unproved. See [audit](docs/experiments/w8-wire-audit.md)
-  and [witness](docs/cards/w8-fresh-decoder-witness.md), separately authorized
-  2026-11-01 for at most 3,600 GPU-s plus 3,600 workload CPU-s; CPU gates first.
+- **W8 wire audit and witness.** The assembled payload's saved-quality rate
+  screen now passes for one window against all four bracketed families under
+  conditional 7,200 s reuse. A source-hidden fresh reconstruction and sustained
+  reuse remain unproved. See the [audit](docs/experiments/w8-wire-audit.md) and
+  [witness](docs/cards/w8-fresh-decoder-witness.md), authorized for at most
+  3,600 GPU-s plus 3,600 workload CPU-s. The CPU input and isolation gates come
+  next; the oracle is under review and no oracle or receiver job exists.
 - **W9. Adapter break-even and live adaptation (user, 2026-10-30).** The
   2026-10-31 all-assets analysis is complete within measured coverage:
   [result](docs/experiments/w9-adapter-break-even.md). Original Med omissions
