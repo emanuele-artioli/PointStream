@@ -1,32 +1,46 @@
 import copy
 import math
+import tarfile
 
 import pytest
 
-from experiments.tennis.w8_score_job import projection
+from experiments.tennis.w8_score_job import check_publication, projection
 
 
 def example():
     spec = {'device': 'gpu', 'single_cpu_campaign': True, 'defer_failed_publication': True, 'cpu_threads': 1,
-            'scale': {'judged': {'smoke': 3, 'full': 0}}, 'smoke': {'seconds': 40},
-            'full': {'seconds': 150}, 'validator_seconds': 20, 'budget_seconds': 230}
-    dispatch = {'cpu_affinity': [2], 'campaign_clock': {'started': 100, 'phase_started': 110, 'budget_end': 330}}
+            'arguments': ['--repair-manifest', '{staged:repair_manifest}'],
+            'staged_inputs': [{'name': 'repair_manifest', 'sha256': 'a' * 64}],
+            'scale': {'judged': {'smoke': 3, 'full': 0}}, 'smoke': {'seconds': 20},
+            'full': {'seconds': 175}, 'validator_seconds': 5, 'budget_seconds': 212}
+    dispatch = {'cpu_affinity': [2], 'campaign_clock': {'started': 100, 'phase_started': 110, 'budget_end': 312}}
     return spec, dispatch, {'passed': True, 'projected_full_seconds': 140}
 
 
 def test_projection_admits_only_when_the_whole_remaining_work_fits():
     spec, dispatch, validation = example()
-    result = projection(spec, dispatch, validation, 130)
-    assert result['second_staging_reserve_seconds'] == 15
-    assert result['required_seconds'] == 180
+    result = projection(spec, dispatch, validation, 122)
+    assert result['second_staging_reserve_seconds'] == 12.5
+    assert result['required_seconds'] == 189.5
     with pytest.raises(ValueError, match='remaining'):
-        projection(spec, dispatch, validation, 161)
+        projection(spec, dispatch, validation, 123)
 
 
 def test_measured_setup_expands_future_staging_reserve():
     spec, dispatch, validation = example()
     dispatch['campaign_clock']['phase_started'] = 120
-    assert projection(spec, dispatch, validation, 130)['second_staging_reserve_seconds'] == 30
+    spec['full']['seconds'] = 150
+    assert projection(spec, dispatch, validation, 130)['second_staging_reserve_seconds'] == 25
+
+
+def test_recorded_first_attempt_and_revised_allocation():
+    assert 33 + 212 + 30 + 5 + 20 == 300
+    spec, dispatch, validation = example()
+    dispatch['campaign_clock']['phase_started'] = 106.61884
+    validation['projected_full_seconds'] = 170.7293615
+    result = projection(spec, dispatch, validation, 124.82815)
+    assert result['required_seconds'] == pytest.approx(185.27355)
+    assert result['remaining_seconds'] - result['required_seconds'] == pytest.approx(1.8983)
 
 
 @pytest.mark.parametrize('mutation', [
@@ -34,16 +48,60 @@ def test_measured_setup_expands_future_staging_reserve():
     lambda s, d, v: s.update(defer_failed_publication=False),
     lambda s, d, v: s.update(cpu_threads=2),
     lambda s, d, v: s['scale']['judged'].update(full=3),
-    lambda s, d, v: s.update(budget_seconds=231),
+    lambda s, d, v: s.update(budget_seconds=213),
+    lambda s, d, v: s.update(arguments=[]),
+    lambda s, d, v: s.update(arguments=['--repair-manifest', 'wrong']),
+    lambda s, d, v: s.update(staged_inputs=[]),
     lambda s, d, v: d.pop('campaign_clock'),
     lambda s, d, v: d['campaign_clock'].update(phase_started=99),
     lambda s, d, v: d.update(cpu_affinity=[1, 2]),
     lambda s, d, v: v.update(passed=False),
     lambda s, d, v: v.update(projected_full_seconds=math.nan),
-    lambda s, d, v: v.update(projected_full_seconds=151),
+    lambda s, d, v: v.update(projected_full_seconds=176),
 ])
 def test_projection_rejects_missing_unsafe_or_nonfinite_inputs(mutation):
     spec, dispatch, validation = copy.deepcopy(example())
     mutation(spec, dispatch, validation)
     with pytest.raises((ValueError, KeyError)):
-        projection(spec, dispatch, validation, 130)
+        projection(spec, dispatch, validation, 122)
+
+
+def test_publication_bound_accepts_two_small_regular_files(tmp_path):
+    publish = tmp_path / 'publish'
+    publish.mkdir()
+    (publish / 'score.json').write_bytes(b'{}')
+    (publish / 'scores.npz').write_bytes(b'abc')
+    estimate = check_publication(tmp_path)
+    archive = tmp_path / 'result.tar'
+    with tarfile.open(archive, 'w') as bundle:
+        bundle.add(publish, arcname='publish')
+    assert archive.stat().st_size <= estimate < 200 * 1024
+
+
+@pytest.mark.parametrize('size', [512, 7169, 17409, 110593])
+def test_publication_tar_estimate_covers_record_padding(tmp_path, size):
+    publish = tmp_path / 'publish'
+    publish.mkdir()
+    (publish / 'score.json').write_bytes(b'x' * size)
+    (publish / 'scores.npz').write_bytes(b'y' * 513)
+    estimate = check_publication(tmp_path)
+    archive = tmp_path / 'result.tar'
+    with tarfile.open(archive, 'w') as bundle:
+        bundle.add(publish, arcname='publish')
+    assert archive.stat().st_size <= estimate
+
+
+@pytest.mark.parametrize('kind', ['extra', 'symlink', 'oversized'])
+def test_publication_bound_rejects_unsafe_outputs(tmp_path, kind):
+    publish = tmp_path / 'publish'
+    publish.mkdir()
+    (publish / 'score.json').write_bytes(b'{}')
+    scores = publish / 'scores.npz'
+    if kind == 'symlink':
+        scores.symlink_to(publish / 'score.json')
+    else:
+        scores.write_bytes(b'x' * (200 * 1024 if kind == 'oversized' else 3))
+    if kind == 'extra':
+        (publish / 'extra').write_bytes(b'x')
+    with pytest.raises(ValueError):
+        check_publication(tmp_path)

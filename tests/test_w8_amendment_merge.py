@@ -48,3 +48,20 @@ def test_candidate_normalizes_and_expired_deadline_blocks_submission():
     assert spec['entrypoint'] == ['-m', 'experiments.tennis.w8_score_job']
     assert spec['single_cpu_campaign'] is True
     assert spec['cpu_threads'] == 1
+
+
+def test_second_candidate_keeps_first_identities_and_allocations():
+    from pathlib import Path
+
+    from experiments.jobs import inbox
+
+    root = Path(__file__).resolve().parents[1] / 'docs/experiments/w8-inputs/amendment-20261101'
+    first = json.loads((root / 'score-spec-candidate.json').read_text())
+    second = json.loads((root / 'score-spec-second-candidate.json').read_text())
+    assert inbox.validate_spec(second) == second
+    for key in ('inputs', 'staged_inputs', 'environment', 'arguments', 'hosts', 'gpu_models',
+                'cpu_threads', 'single_cpu_campaign', 'defer_failed_publication'):
+        assert second[key] == first[key]
+    assert (second['smoke']['seconds'], second['full']['seconds'], second['validator_seconds'],
+            second['budget_seconds']) == (20, 175, 5, 212)
+    assert second['deadline'] == '2026-11-01T07:56:32.398155Z'

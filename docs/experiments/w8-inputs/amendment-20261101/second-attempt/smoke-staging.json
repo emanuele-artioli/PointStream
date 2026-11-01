@@ -1,0 +1,116 @@
+{
+  "local_root": "/local/users/emanuele/pointstream",
+  "inputs": [
+    {
+      "name": "windows",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/windows-final.json",
+      "sha256": "540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/540156339f8577c0b629e0e65403e2547a90fc4383afeff3597b6f96807ec0ed/windows-final.json",
+      "seconds": 0.00039267539978027344
+    },
+    {
+      "name": "state",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172501Z-a37a90cd/full/window-state.json",
+      "sha256": "f2b4131e1231fe654840aa41465a424d9f9337957ee5cb50f1a432ca57c6ca30",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/f2b4131e1231fe654840aa41465a424d9f9337957ee5cb50f1a432ca57c6ca30/window-state.json",
+      "seconds": 0.00015282630920410156
+    },
+    {
+      "name": "nad000",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+      "sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d/nadal_kyrgios__000.mp4",
+      "seconds": 0.07730603218078613
+    },
+    {
+      "name": "masks",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173108Z-0782499a/full/published.tar",
+      "sha256": "4eb91e79c287a49accc17fcd115819e7345bc078d49e1477ce43ccdf87cd549b",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/4eb91e79c287a49accc17fcd115819e7345bc078d49e1477ce43ccdf87cd549b/published.tar",
+      "seconds": 0.0004703998565673828
+    },
+    {
+      "name": "hybrid",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T180054Z-b9927a25/full/published.tar",
+      "sha256": "bf05e2630d898a2ec68452f81407e063b0f0ad0490365c41d53a3988f5adb299",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/bf05e2630d898a2ec68452f81407e063b0f0ad0490365c41d53a3988f5adb299/published.tar",
+      "seconds": 0.0001659393310546875
+    },
+    {
+      "name": "encode_half",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-01d5aa85/full/published.tar",
+      "sha256": "6496e427f4aa282c1a77acd0924685ded8d5323a11ca6df757b3bd9e598a8030",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/6496e427f4aa282c1a77acd0924685ded8d5323a11ca6df757b3bd9e598a8030/published.tar",
+      "seconds": 0.00025773048400878906
+    },
+    {
+      "name": "lpips",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+      "seconds": 0.21785330772399902
+    },
+    {
+      "name": "dists",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+      "seconds": 0.47980666160583496
+    },
+    {
+      "name": "encode_x1",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T181055Z-e4dc2d25/full/published.tar",
+      "sha256": "9736920b256b2b770c3b35e8784570a50df2720115fbb134970439adea4240f0",
+      "extract": false,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/9736920b256b2b770c3b35e8784570a50df2720115fbb134970439adea4240f0/published.tar",
+      "seconds": 0.004438161849975586
+    },
+    {
+      "name": "repair_manifest",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-amendment-20261101/selection-4f5af8c9.json",
+      "sha256": "4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0",
+      "extract": false,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0/selection-4f5af8c9.json",
+      "seconds": 0.0010154247283935547
+    }
+  ],
+  "environment": {
+    "name": "environment",
+    "source": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "extract": true,
+    "mode": "local-hit",
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+    "seconds": 4.1882429122924805,
+    "prefix": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+    "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+    "bin": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin"
+  },
+  "scratch": "/local/users/emanuele/pointstream/scratch/20261101T073429Z-04a50c10-smoke",
+  "attempt": 1,
+  "restored_checkpoint": null,
+  "temporary_environment": {
+    "TMPDIR": "/local/users/emanuele/pointstream/temporary/20261101T073429Z-04a50c10/smoke/tmp-93c24b179ba64149870651d3af8cd15e",
+    "TMP": "/local/users/emanuele/pointstream/temporary/20261101T073429Z-04a50c10/smoke/tmp-93c24b179ba64149870651d3af8cd15e",
+    "TEMP": "/local/users/emanuele/pointstream/temporary/20261101T073429Z-04a50c10/smoke/tmp-93c24b179ba64149870651d3af8cd15e",
+    "PYTHONPYCACHEPREFIX": "/local/users/emanuele/pointstream/python-cache"
+  }
+}

@@ -1,0 +1,20 @@
+{
+ "passed": false,
+ "checks": {
+  "ticks": true,
+  "cuda_qualified": true,
+  "tools_pinned": true,
+  "inputs": true,
+  "controls_reproduced": true,
+  "memory": true,
+  "rates_positive": true,
+  "scores_complete": true,
+  "roi_points_present": true,
+  "repair_manifest_pinned": true,
+  "repair_no_decision": true,
+  "repair_exact_selection": true,
+  "projection": false
+ },
+ "projected_full_seconds": 170.7293615300674,
+ "execution_seconds": 15.943566083908081
+}

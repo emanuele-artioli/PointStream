@@ -64,3 +64,20 @@ job, root must audit and refresh each selected worker to the committed guard-awa
 release. Complete compatible-pool selection must also consider protocol and host
 fitness, not GPU class alone. A passing actual smoke and its measured remaining
 budget projection are prerequisites for full GPU scoring.
+
+The first request `20261101T071706Z-afde26d5` passed all correctness checks
+in its three-tick smoke but stopped at the cost gate: the original W1 full
+projection was 170.7294 seconds, above its 160-second full allowance. No full
+scoring ran. The conservative first charge is 33 CPU-s and 33 GPU-s.
+
+`score-spec-second-candidate.json` is a separate root-reviewed prospective
+allocation inside the same user-approved caps, not new budget: 20-second smoke,
+175-second full, 5-second validator, 212-second campaign. It retains all input
+and stream identities and the original deadline, 2026-11-01 07:56:32.398155
+UTC. The CPU reservation is first attempt 33, preparation/final publication
+20, second campaign 212, monitoring/cleanup 30, and independent audit 5
+seconds: 300 seconds total. The corresponding GPU maximum is 275 seconds.
+The new attempt still requires the actual fresh smoke and runtime projection to
+pass before full scoring; the previous pilot provides only a narrow margin.
+The second candidate and new wrapper source require root review, a frozen
+revision and fresh preflight; no new request is implied by this file.
