@@ -77,6 +77,16 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
         raise fleet.FleetError(f"missing job fields: {sorted(required - spec.keys())}")
     if 'verify_staged_inputs' in spec and not isinstance(spec['verify_staged_inputs'], bool):
         raise fleet.FleetError('verify_staged_inputs must be boolean')
+    if 'single_cpu_campaign' in spec:
+        if not isinstance(spec['single_cpu_campaign'], bool):
+            raise fleet.FleetError('single_cpu_campaign must be boolean')
+        if spec['single_cpu_campaign'] and (type(spec.get('cpu_threads')) is not int or spec['cpu_threads'] != 1):
+            raise fleet.FleetError('single_cpu_campaign requires cpu_threads: 1')
+    if 'defer_failed_publication' in spec:
+        if not isinstance(spec['defer_failed_publication'], bool):
+            raise fleet.FleetError('defer_failed_publication must be boolean')
+        if spec['defer_failed_publication'] and spec.get('single_cpu_campaign') is not True:
+            raise fleet.FleetError('defer_failed_publication requires single_cpu_campaign')
     if not spec["hosts"] or any(h not in fleet.DEFAULT_HOSTS for h in spec["hosts"]):
         raise fleet.FleetError("hosts must name configured GPU servers")
     if not isinstance(spec["gpu_models"], list) or any(not isinstance(n, str) or not n.strip() for n in spec["gpu_models"]):
@@ -549,7 +559,10 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
         "cwd": str(source), "budget_seconds": remaining, "deadline_epoch": spec["deadline_epoch"],
         "thread": None, "codex": "codex", "cancel_path": str(directory / "cancel.json"),
         "contention": spec.get("contention") or {"policy": "stop"}, "attempt": state.get("attempt", 1),
-        "salvage": [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)],
+        # Preserve host-local failed scratch for a separately budgeted manual
+        # salvage when explicitly requested; automatic salvage is otherwise unchanged.
+        **({} if spec.get("defer_failed_publication") else
+           {"salvage": [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)]}),
         # Without a GPU claim the supervisor claims only CPU threads and hides every GPU.
         "claims": claims, "gpu_sharing": sharing,
     })
@@ -714,12 +727,18 @@ def contention_during(run: Path, started: float, ended: float) -> dict[str, Any]
 
 
 def campaign_cpu_affinity(spec: dict[str, Any]) -> list[int] | None:
-    """Restrict a CPU campaign and its children to its admitted CPU count."""
-    if spec.get("device", "gpu") != "cpu":
+    """Restrict CPU campaigns, or an explicitly opted-in GPU campaign.
+
+    Affinity is inherited by ordinary children, but is not a security boundary:
+    reviewed workload code and native tools must not widen it or escape teardown.
+    """
+    if spec.get("device", "gpu") != "cpu" and not spec.get("single_cpu_campaign", False):
         return None
     count = spec.get("cpu_threads")
     if isinstance(count, bool) or not isinstance(count, int) or count <= 0:
         raise fleet.FleetError("cpu_threads must be a positive integer")
+    if spec.get("single_cpu_campaign", False) and count != 1:
+        raise fleet.FleetError("single_cpu_campaign requires cpu_threads: 1")
     get_affinity = getattr(os, "sched_getaffinity", None)
     set_affinity = getattr(os, "sched_setaffinity", None)
     if get_affinity is None or set_affinity is None:
@@ -739,6 +758,7 @@ def campaign_cpu_affinity(spec: dict[str, Any]) -> list[int] | None:
 
 def campaign(directory: Path) -> int:
     """The monitor owns this process group across smoke, validation, and full."""
+    campaign_started_monotonic = time.monotonic()
     previous = monitor.read_json(directory / "run" / "status.json", {})
     resume = resume_record(directory)
     attempt = resume.get("attempt", 1)
@@ -760,6 +780,7 @@ def campaign(directory: Path) -> int:
         supervisor_state = monitor.read_json(run / "status.json", {})
         supervisor_request = monitor.read_json(run / "request.json", {})
         budget_end = min(supervisor_state.get("started", started) + supervisor_request.get("budget_seconds", spec["budget_seconds"]), spec["deadline_epoch"])
+        budget_end_monotonic = time.monotonic() + max(0.0, budget_end - time.time())
         if digest(spec) != manifest["spec_sha256"]:
             raise fleet.FleetError("saved specification identity changed")
         code_identity = source_identity(source)
@@ -816,6 +837,10 @@ def campaign(directory: Path) -> int:
                 "citable": False if stage == "smoke" else None, "attempt": attempt, "resumed_from": resumed_from,
                 "contention_policy": spec.get("contention"), "gpu_sharing": gpu_sharing(spec),
                 **({"cpu_affinity": cpu_affinity} if cpu_affinity is not None else {}),
+                **({"campaign_clock": {"started": campaign_started_monotonic,
+                                        "phase_started": time.monotonic(),
+                                        "budget_end": budget_end_monotonic}}
+                   if spec.get("single_cpu_campaign") else {}),
             })
             monitor.publish_progress(stage, 0)
             phase_started = time.time()

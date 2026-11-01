@@ -177,6 +177,10 @@ def test_events_repeat_until_explicit_ack(tmp_path, monkeypatch):
 @pytest.mark.parametrize("mutation", [
     lambda s: s.update(entrypoint=["-c", "arbitrary()"]),
     lambda s: s.update(cpu_threads=True),
+    lambda s: s.update(single_cpu_campaign="true"),
+    lambda s: s.update(single_cpu_campaign=True, cpu_threads=2),
+    lambda s: s.update(defer_failed_publication="true"),
+    lambda s: s.update(defer_failed_publication=True),
     lambda s: s.update(deadline="tomorrow"),
     lambda s: s.update(arguments=["{unknown}"]),
     lambda s: s["smoke"].update(representative_basis=""),
@@ -796,6 +800,64 @@ def test_gpu_campaign_does_not_touch_affinity(monkeypatch):
     assert inbox.campaign_cpu_affinity({"device": "gpu", "cpu_threads": 1}) is None
 
 
+def test_gpu_campaign_opt_in_applies_affinity_before_hashing(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / "spec.json")
+    spec["single_cpu_campaign"] = True
+    assert inbox.validate_spec(spec)["single_cpu_campaign"] is True
+    monitor.write_json(campaign / "spec.json", spec)
+    ready = monitor.read_json(campaign / "ready.json")
+    ready["spec_sha256"] = inbox.digest(spec)
+    monitor.write_json(campaign / "ready.json", ready)
+    current = {3, 5}
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", lambda _: current.copy(), raising=False)
+    def select(_pid, cpus):
+        current.clear()
+        current.update(cpus)
+    monkeypatch.setattr(inbox.os, "sched_setaffinity", select, raising=False)
+    original = inbox.source_identity
+    def check_affinity(source):
+        assert current == {3}
+        return original(source)
+    monkeypatch.setattr(inbox, "source_identity", check_affinity)
+    assert inbox.campaign(campaign) == 0
+    assert monitor.read_json(campaign / "full" / "dispatch.json")["cpu_affinity"] == [3]
+
+
+def test_gpu_campaign_opt_in_fails_closed_without_affinity(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / "spec.json")
+    spec["single_cpu_campaign"] = True
+    monitor.write_json(campaign / "spec.json", spec)
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", None, raising=False)
+    assert inbox.campaign(campaign) == 1
+    assert "affinity" in monitor.read_json(campaign / "campaign-error.json")["error"]
+    assert not (campaign / "smoke").exists()
+
+
+@pytest.mark.parametrize('defer', [False, True])
+def test_deferred_failed_publication_only_changes_opted_in_request(campaign, monkeypatch, defer):
+    spec = monitor.read_json(campaign / 'spec.json')
+    spec.update(single_cpu_campaign=True, defer_failed_publication=defer)
+    inbox.validate_spec(spec)
+    monitor.write_json(campaign / 'spec.json', spec)
+    ready = monitor.read_json(campaign / 'ready.json')
+    ready['spec_sha256'] = inbox.digest(spec)
+    monitor.write_json(campaign / 'ready.json', ready)
+    monitor.write_json(campaign / 'state.json', {'status': 'pending'})
+    (campaign / 'run').rmdir()
+    monkeypatch.setattr(inbox, 'acquire_request', lambda *_: True)
+    monkeypatch.setattr(inbox, 'precheck_inputs', lambda *_: None)
+    monkeypatch.setattr(inbox, 'transition', lambda *_args, **_kwargs: None)
+    class Child:
+        pid = 12345
+    monkeypatch.setattr(inbox.subprocess, 'Popen', lambda *_args, **_kwargs: Child())
+    monkeypatch.setattr(inbox, 'get_process_start_time', lambda *_: 1)
+    inbox.start_request(campaign, spec, None, {'alias': 'gpu1', 'host': 'host'}, campaign.parent)
+    request = monitor.read_json(campaign / 'run' / 'request.json')
+    assert ('salvage' not in request) == defer
+    if not defer:
+        assert request['salvage'][-2:] == ['salvage', str(campaign)]
+
+
 @pytest.mark.parametrize("mode", ["missing", "insufficient", "set_error", "ineffective"])
 def test_cpu_affinity_failure_blocks_source_checks(campaign, monkeypatch, mode):
     spec = monitor.read_json(campaign / "spec.json")
@@ -823,7 +885,7 @@ def test_cpu_affinity_inherited_by_subprocess_on_linux():
         pytest.skip("Linux process affinity unavailable")
     code = '''import json,os,subprocess,sys
 from experiments.jobs.inbox import campaign_cpu_affinity
-selected = campaign_cpu_affinity({"device": "cpu", "cpu_threads": 1})
+selected = campaign_cpu_affinity({"device": "gpu", "cpu_threads": 1, "single_cpu_campaign": True})
 child = subprocess.check_output([sys.executable, "-c", "import os; print(sorted(os.sched_getaffinity(0)))"], text=True)
 print(json.dumps({"selected": selected, "child": child.strip()}))
 '''
