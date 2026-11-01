@@ -1,5 +1,12 @@
 # Card: W8 fresh-decoder witness (authorized 2026-11-01)
 
+**Current state:** the initial actual-payload rate screen stopped unresolved on
+2026-11-01: 46.3151 kbps exceeds one required anchor family's 45.8233 kbps upper
+bracket. No GPU or new fleet job ran. See the [outcome](../experiments/w8-wire-audit.md).
+This card is not permission to replay the stopped candidate, silently redesign
+its payload or submit the untested CPU draft. A new prospective amendment must
+retain the failed screen and its separate exact-input qualification gap.
+
 **Goal.** Test whether the frozen W7 scale-4 hybrid for one specified window can be reconstructed by a fresh receiver from a complete, actually serialized payload and explicitly installed decoder models, at a rate that still supports a narrowly defined single-window player comparison. This is a feasibility witness; it does not claim a complete codec win, Tier 2 success, 240-frame coverage, reference reuse, live operation or generalization.
 
 **User-approved new authority, 2026-11-01:** at most **3,600 GPU-seconds and 3,600 workload CPU-seconds total**, including all setup, failed smokes, validation and publication attributable to this proposal; zero training, model changes or downloads. Approval was given in the continuation chat ("I approve it") in response to the separate witness-budget question. Existing data and artifacts stay immutable; write a separate identified run. A failure, unresolved rate comparison, cap exhaustion or inadequate projection stops the work; no automatic retry or borrowed budget. Root reviews the CPU oracle and frozen specifications before GPU execution. This authority does not cover W6b, W9 live adaptation, W10, W11 or other experiments.

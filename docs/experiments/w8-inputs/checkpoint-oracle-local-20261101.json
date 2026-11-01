@@ -1,0 +1,21 @@
+{
+  "scope": "local torch diagnostic only; packed production runtime remains unverified",
+  "fits_archive_sha256": "cceb49b3d593c770e5b0d8dcd5d69b5b358bf88d76030cef8034674417907584",
+  "checkpoint_sha256": "525830aa39c14f3549084a422cda6cfc61cf1ad76b07b531dd899034e6f57570",
+  "guider_sha256": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+  "match_sha256": "fef98258469b57ae4518a1ef570579e9918de7435b310737a04cdfaeb15bb810",
+  "match_bytes": 1897395,
+  "prior_billed_tensor_bytes": 1489876,
+  "tensor_counts_exact": {
+    "reference_unet": 208,
+    "denoising_unet": 256,
+    "pose_guider": 16
+  },
+  "torch": "2.5.1",
+  "threads": 1,
+  "cpu_seconds": 5.309768,
+  "wall_seconds": 5.7411620412021875,
+  "max_rss_platform_units": 261947392,
+  "cpu_limit_s": 180,
+  "wall_limit_s": 300
+}

@@ -713,6 +713,30 @@ def contention_during(run: Path, started: float, ended: float) -> dict[str, Any]
     return {"timing_contaminated": bool(episodes), "contention": episodes, "paused_seconds": monitor.paused_seconds(status, started, ended)}
 
 
+def campaign_cpu_affinity(spec: dict[str, Any]) -> list[int] | None:
+    """Restrict a CPU campaign and its children to its admitted CPU count."""
+    if spec.get("device", "gpu") != "cpu":
+        return None
+    count = spec.get("cpu_threads")
+    if isinstance(count, bool) or not isinstance(count, int) or count <= 0:
+        raise fleet.FleetError("cpu_threads must be a positive integer")
+    get_affinity = getattr(os, "sched_getaffinity", None)
+    set_affinity = getattr(os, "sched_setaffinity", None)
+    if get_affinity is None or set_affinity is None:
+        raise fleet.FleetError("CPU campaign requires process affinity support")
+    try:
+        available = sorted(get_affinity(0))
+        if len(available) < count:
+            raise fleet.FleetError(f"CPU campaign needs {count} allowed CPUs; only {len(available)} available")
+        selected = available[:count]
+        set_affinity(0, selected)
+        if set(get_affinity(0)) != set(selected):
+            raise fleet.FleetError("CPU campaign affinity did not take effect")
+    except OSError as exc:
+        raise fleet.FleetError(f"CPU campaign cannot enforce affinity: {exc}") from exc
+    return selected
+
+
 def campaign(directory: Path) -> int:
     """The monitor owns this process group across smoke, validation, and full."""
     previous = monitor.read_json(directory / "run" / "status.json", {})
@@ -726,15 +750,16 @@ def campaign(directory: Path) -> int:
         print("campaign: existing attempt is preserved; create a new request instead of replaying", file=sys.stderr)
         return 1
     spec = monitor.read_json(directory / "spec.json")
-    manifest = monitor.read_json(directory / "ready.json")
-    # Archive-mode jobs link source/ to host-local disk: read it there, not through NFS.
-    source = (directory / "source").resolve()
-    run = directory / "run"
-    started = time.time()
-    supervisor_state = monitor.read_json(run / "status.json", {})
-    supervisor_request = monitor.read_json(run / "request.json", {})
-    budget_end = min(supervisor_state.get("started", started) + supervisor_request.get("budget_seconds", spec["budget_seconds"]), spec["deadline_epoch"])
     try:
+        cpu_affinity = campaign_cpu_affinity(spec)
+        manifest = monitor.read_json(directory / "ready.json")
+        # Archive-mode jobs link source/ to host-local disk: read it there, not through NFS.
+        source = (directory / "source").resolve()
+        run = directory / "run"
+        started = time.time()
+        supervisor_state = monitor.read_json(run / "status.json", {})
+        supervisor_request = monitor.read_json(run / "request.json", {})
+        budget_end = min(supervisor_state.get("started", started) + supervisor_request.get("budget_seconds", spec["budget_seconds"]), spec["deadline_epoch"])
         if digest(spec) != manifest["spec_sha256"]:
             raise fleet.FleetError("saved specification identity changed")
         code_identity = source_identity(source)
@@ -790,6 +815,7 @@ def campaign(directory: Path) -> int:
                 "code": manifest, "environment": monitor.read_json(directory / "environment.json", {}), "started": time.time(),
                 "citable": False if stage == "smoke" else None, "attempt": attempt, "resumed_from": resumed_from,
                 "contention_policy": spec.get("contention"), "gpu_sharing": gpu_sharing(spec),
+                **({"cpu_affinity": cpu_affinity} if cpu_affinity is not None else {}),
             })
             monitor.publish_progress(stage, 0)
             phase_started = time.time()

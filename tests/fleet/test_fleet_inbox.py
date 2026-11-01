@@ -763,3 +763,71 @@ def test_status_timeout_cli_validation_and_status_only(tmp_path, monkeypatch):
     assert calls[-1][0][1:] == ("status", {"job_id": job_id}) and calls[-1][1] == {"status_timeout": 1}
     assert inbox.main(["--state-dir", str(tmp_path), "status", job_id, "--artifact", "x", "--output", str(tmp_path / "out"), "--status-timeout-seconds", "600"]) == 2
     assert len(calls) == 2
+
+
+def test_cpu_campaign_affinity_precedes_source_checks(campaign, monkeypatch):
+    spec = monitor.read_json(campaign / "spec.json")
+    spec.update(device="cpu", gpu_memory_mib=0, cpu_threads=2)
+    monitor.write_json(campaign / "spec.json", spec)
+    ready = monitor.read_json(campaign / "ready.json")
+    ready["spec_sha256"] = inbox.digest(spec)
+    monitor.write_json(campaign / "ready.json", ready)
+    current = {3, 5, 7}
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", lambda _: current.copy(), raising=False)
+    def set_affinity(_pid, cpus):
+        current.clear()
+        current.update(cpus)
+    monkeypatch.setattr(inbox.os, "sched_setaffinity", set_affinity, raising=False)
+    original = inbox.source_identity
+    def check_affinity(source):
+        assert current == {3, 5}
+        return original(source)
+    monkeypatch.setattr(inbox, "source_identity", check_affinity)
+    assert inbox.campaign(campaign) == 0
+    assert monitor.read_json(campaign / "full" / "dispatch.json")["cpu_affinity"] == [3, 5]
+
+
+def test_gpu_campaign_does_not_touch_affinity(monkeypatch):
+    def unexpected(*_args):
+        raise AssertionError("GPU campaign must not change affinity")
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", unexpected, raising=False)
+    monkeypatch.setattr(inbox.os, "sched_setaffinity", unexpected, raising=False)
+    assert inbox.campaign_cpu_affinity({"cpu_threads": 1}) is None
+    assert inbox.campaign_cpu_affinity({"device": "gpu", "cpu_threads": 1}) is None
+
+
+@pytest.mark.parametrize("mode", ["missing", "insufficient", "set_error", "ineffective"])
+def test_cpu_affinity_failure_blocks_source_checks(campaign, monkeypatch, mode):
+    spec = monitor.read_json(campaign / "spec.json")
+    spec.update(device="cpu", gpu_memory_mib=0, cpu_threads=2)
+    monitor.write_json(campaign / "spec.json", spec)
+    monkeypatch.setattr(inbox.os, "sched_getaffinity", None if mode == "missing" else lambda _: {3} if mode == "insufficient" else {3, 5, 7}, raising=False)
+    def set_affinity(_pid, _cpus):
+        if mode == "set_error":
+            raise OSError("denied")
+    monkeypatch.setattr(inbox.os, "sched_setaffinity", set_affinity, raising=False)
+    def unexpected(_source):
+        raise AssertionError("source checks must not run")
+    monkeypatch.setattr(inbox, "source_identity", unexpected)
+    assert inbox.campaign(campaign) == 1
+    assert "affinity" in monitor.read_json(campaign / "campaign-error.json")["error"] or mode == "insufficient"
+    assert not (campaign / "smoke").exists()
+
+
+def test_cpu_affinity_inherited_by_subprocess_on_linux():
+    import os
+    import subprocess
+    import sys
+
+    if not hasattr(os, "sched_getaffinity") or not hasattr(os, "sched_setaffinity"):
+        pytest.skip("Linux process affinity unavailable")
+    code = '''import json,os,subprocess,sys
+from experiments.jobs.inbox import campaign_cpu_affinity
+selected = campaign_cpu_affinity({"device": "cpu", "cpu_threads": 1})
+child = subprocess.check_output([sys.executable, "-c", "import os; print(sorted(os.sched_getaffinity(0)))"], text=True)
+print(json.dumps({"selected": selected, "child": child.strip()}))
+'''
+    result = subprocess.run([sys.executable, "-c", code], check=True, capture_output=True, text=True)
+    value = json.loads(result.stdout)
+    assert len(value["selected"]) == 1
+    assert value["child"] == str(value["selected"])
