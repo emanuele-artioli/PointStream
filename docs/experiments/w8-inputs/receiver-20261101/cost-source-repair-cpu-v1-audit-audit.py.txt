@@ -1,0 +1,20 @@
+import json,base64,zlib,hashlib,shutil
+from pathlib import Path
+p=Path('/private/tmp/w8-cost-source-repair-cpu-v1-independent-audit'); d=p/'recovered'; root=Path('docs/experiments/w8-inputs/receiver-20261101'); payload=json.loads(zlib.decompress(base64.b64decode((root/'cost-source-repair-cpu-v1-payload.txt').read_bytes()))); h=json.loads((p/'source-hashes.json').read_bytes()); sm=json.loads((d/'source-map.json').read_bytes()); actual=h['actual_source']; extra={'tools/datasets/k4b_inputs.py':'3e321f00892312fec4619e1f2388689d045a12d87ad61216127e463f0cd0728e','tools/datasets/k4_inputs.py':'36cd6e67e297204f36ebee921b7ac3039a331722f61c5db20e37993632984069'}
+assert len(sm)==237 and sm=={**payload['map'],**extra} and sm==actual and len(payload['map'])==235
+c=json.loads((d/'worker-config.json').read_bytes()); m=json.loads((d/'output/decoded-manifest.json').read_bytes()); v=json.loads((d/'validator.stdout').read_bytes()); w=json.loads((d/'worker.exit.json').read_bytes()); ve=json.loads((d/'validator.exit.json').read_bytes()); res=json.loads((d/'result.json').read_bytes()); iso=m['isolation']; boot=iso['cpu_bootstrap']; fingerprints=c['tensor_fingerprints']; fp_hash=hashlib.sha256(json.dumps(fingerprints,sort_keys=True,separators=(',',':')).encode()).hexdigest(); denials={x for paths in c['denied_paths'].values() for x in paths}
+assert fp_hash=='d6fe0331cf5fdbb7ab70bb761be8dc62d4e06c8f43f715c489064d2fc3375dd2' and len(fingerprints)==480 and m['match_tensors']==fingerprints
+assert res['passed'] and res['worker_config_sha256']==hashlib.sha256((d/'worker-config.json').read_bytes()).hexdigest() and w['status']==ve['status']==0 and w['cpu_seconds']<=12 and ve['cpu_seconds']<=10
+assert len(denials)==10 and set(iso['denials'])==denials and all(x in (1,13) for x in iso['denials'].values()) and iso['landlock_abi']>=1 and iso['network_interfaces']==['lo'] and iso['pre_sandbox_threads']==1 and iso['extra_fds'] is False
+assert iso['namespaces']['user']!=c['parent_user_namespace'] and iso['namespaces']['net']!=c['parent_network_namespace'] and boot['before_landlock_sha256']==boot['after_landlock_sha256'] and boot['cuda_initialized_before_isolation'] is False
+assert c['environment']['CUDA_VISIBLE_DEVICES']=='' and v['passed'] and v['tensor_count']==480 and v['visible_devices']=='' and v['cuda_initialized'] is False and len(v['unit_sha256'])==2 and v['unit_sha256']==m['unit_sha256'] and v['checkpoint_sha256']==m['checkpoint_sha256']
+assert all(not z['pid_exists'] and not z['pgid_exists'] for z in h['owned_ids'].values())
+parent=json.loads(Path('/private/tmp/w8-cost-source-repair-cpu-v1-20261101/stdout').read_bytes()); assert parent['passed'] and parent['parent_cpu_seconds']<=6
+hashes={}
+for f in d.rglob('*'):
+ if f.is_file():
+  q=root/('cost-source-repair-cpu-v1-audit-'+str(f.relative_to(d)).replace('/','-')); q.write_bytes(f.read_bytes());q.chmod(0o444);hashes[q.name]=hashlib.sha256(q.read_bytes()).hexdigest()
+for f in [p/'remote.py',p/'remote-v2.py',p/'execution.json',p/'execution-v2.json',p/'stderr',p/'source-hashes.json',p/'audit.py']:
+ q=root/('cost-source-repair-cpu-v1-audit-'+f.name);q.write_bytes(f.read_bytes());q.chmod(0o444);hashes[q.name]=hashlib.sha256(q.read_bytes()).hexdigest()
+report={'passed':True,'scope':'CPU-only packet qualification; no GPU or quality','source_members':237,'accepted_source_members':235,'protected_denials':10,'tensor_fingerprints':480,'unit_sha256':v['unit_sha256'],'worker_cpu_seconds':w['cpu_seconds'],'validator_cpu_seconds':ve['cpu_seconds'],'parent_cpu_seconds':parent['parent_cpu_seconds'],'owned_processes':h['owned_ids'],'first_fetch':'read-only, stopped at 60KB size guard; no receipt emitted','second_fetch_packed_bytes':(p/'stdout-v2').stat().st_size,'budget':'charge full 40 CPU, zero GPU','files_sha256':hashes}
+q=root/'cost-source-repair-cpu-v1-audit-report.json';q.write_text(json.dumps(report,indent=2,sort_keys=True)+'\n');q.chmod(0o444);print(hashlib.sha256(q.read_bytes()).hexdigest())

@@ -1,0 +1,24 @@
+import base64,hashlib,json,os,pathlib,resource,zlib,re
+resource.setrlimit(resource.RLIMIT_CPU,(4,4))
+r=pathlib.Path('/local/users/emanuele/pointstream/audits/w8-cost-source-repair-cpu-v1-20261101')
+names=['source-map.json','worker-config.json','result.json','worker.start.json','worker.exit.json','worker.stdout','worker.stderr','validator.start.json','validator.exit.json','validator.stdout','validator.stderr','output/decoded-manifest.json']
+files={}
+for n in names:
+ b=(r/n).read_bytes()
+ if len(b)>400000: raise ValueError('file bound')
+ files[n]={'sha256':hashlib.sha256(b).hexdigest(),'text':b.decode('utf8')}
+mp=json.loads(files['source-map.json']['text']); actual={}
+for n in mp:
+ p=r/'source'/n
+ if p.is_symlink() or not p.is_file() or p.stat().st_size>2000000: raise ValueError('source member')
+ actual[n]=hashlib.sha256(p.read_bytes()).hexdigest()
+starts=[json.loads(files[n]['text']) for n in ('worker.start.json','validator.start.json')]
+ids=sorted({int(x[k]) for x in starts for k in ('pid','pgid')})
+proc={str(i):{'pid_exists':os.path.exists('/proc/'+str(i)),'pgid_exists':None} for i in ids}
+for i in ids:
+ try: os.killpg(i,0); proc[str(i)]['pgid_exists']=True
+ except ProcessLookupError: proc[str(i)]['pgid_exists']=False
+ except PermissionError: proc[str(i)]['pgid_exists']=True
+text=json.dumps({'files':files,'actual_source':actual,'owned_ids':proc},separators=(',',':')); values=list(dict.fromkeys(re.findall(r'(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])',text))); indices={h:i for i,h in enumerate(values)}; text=re.sub(r'(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])',lambda m:'~H'+str(indices[m.group()])+'~',text); raw=json.dumps({'tokens':values,'payload':text},separators=(',',':')).encode(); packed=base64.b64encode(zlib.compress(raw,9))
+if len(packed)>60000: raise ValueError('output bound')
+print(packed.decode())

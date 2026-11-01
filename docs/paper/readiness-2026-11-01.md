@@ -69,14 +69,17 @@ Historical PGIDs were not recorded; known child PIDs and current matching task
 processes were absent. This does not establish full cached-environment equivalence
 or any fresh pixel, mask or perceptual-quality result.
 
-The cost-only pilot `20261101T135101Z-d67fe593` failed on a source-package
-omission before packet decode or model execution. Root accepted208 CPU-s /128
-GPU-s inclusive; original cumulative **≤2,125/3,600 CPU-s and352/3,600 GPU-s**.
-At least1,475 CPU-s /3,248 GPU-s remain; no live reservation, process or claim.
-Minimal source-only repair passes the local static-import regression but its
-prospective plan/CPU qualification are under review. No fresh quality or final
-30-step work is admitted. Sourceb581 passed CI; PR#325 needs final evidence
-commit/checks. The [W8 entry](../experiments/w8-wire-audit.md) controls the ledger.
+The cost-only pilot `20261101T135101Z-d67fe593` failed on two omitted
+source helpers before packet decode. The corrected package then passed the
+actual isolated CPU decoder, independent audit and root comparison (237 source
+files,480 tensors and both NPZ hashes; protected inputs remain denied). This is
+no learned inference or fresh-quality result. Original W8 cumulative is
+**≤2,165/3,600 CPU-s and352/3,600 GPU-s**; at least1,435 CPU-s /3,248 GPU-s
+remain. No live reservation/process/claim/wait. The root-reviewed [source repair amendment](../cards/w8-source-package-repair.md)
+awaits the user: one cost-only1/3-step campaign, ≤580 CPU-s /500 GPU-s inside
+original totals, no added budget or changed scientific rules. No retry or
+30-step admission is inferred. The [W8 entry](../experiments/w8-wire-audit.md)
+controls exact receipts and ledger.
 
 Overleaf main/local manuscript is **a6679181fcbe8104702bf3b0231140cc301d9ca1**:
 user-confirmed author block, ATHENA acknowledgment, PRESLEY beside ELVIS/GenStream;
@@ -100,7 +103,12 @@ probe23+3, no overfull lines. Current live venue workflow remains unverified.
    that rely on them or remain explicit limitations. The evidence matrix names
    the exact artifacts and gaps; this is not a claim that all are mandatory
    experiments for an honestly narrowed empirical study.
-4. **Final publication review:** reconcile abstract/conclusions and all active
+4. **Author facts:** exact source permissions/terms and any shared media, full
+   AI-assistance history and the relationship to prior/concurrent papers await
+   author answers; the [concrete inventory and proposed wording](author-statements-2026-11-01.md)
+   are prepared. Names/order/affiliation, ATHENA and requested relevant citations
+   are complete.
+5. **Final publication review:** reconcile abstract/conclusions and all active
    markers with the chosen contribution, audit references/rights/provenance,
    verify format and final PDF, and obtain explicit authority to submit.
 

@@ -1,0 +1,17 @@
+{
+  "scope": "Byte-identical executed audit programs archived as text; immutable original audit report retains logical export filenames. Raw originals remain in the local independent audit directory.",
+  "files": {
+    "cost-source-repair-cpu-v1-audit-audit.py": {
+      "archive_carrier": "cost-source-repair-cpu-v1-audit-audit.py.txt",
+      "sha256": "e30c9ac5defd64828c2f51f0fc26d864eeb4b62b50e74350d1ca8bc6f9676436"
+    },
+    "cost-source-repair-cpu-v1-audit-remote-v2.py": {
+      "archive_carrier": "cost-source-repair-cpu-v1-audit-remote-v2.py.txt",
+      "sha256": "9d949dde87390679d912d5010d1f0692b94f1170f0455b65c48ae7e6919fc55e"
+    },
+    "cost-source-repair-cpu-v1-audit-remote.py": {
+      "archive_carrier": "cost-source-repair-cpu-v1-audit-remote.py.txt",
+      "sha256": "45c127d7201c6b78fae3229dd1e33fbb7963fda8c7323f4074a39ab5135f570e"
+    }
+  }
+}

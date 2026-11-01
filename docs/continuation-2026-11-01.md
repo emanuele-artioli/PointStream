@@ -1,4 +1,4 @@
-# Continuation, 2026-11-01: W8 cost smoke stopped
+# Continuation, 2026-11-01: CPU source repair passed; user amendment pending
 
 **Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
 Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library
@@ -9,15 +9,18 @@ MAIN/JCV runtime guards. Historical process-group IDs were not recorded; current
 known children/task processes were absent. This is no fresh decoder-quality,
 full cached-environment, sustained-reference or live-rate claim.
 
-**Cost pilot closed:** `20261101T135101Z-d67fe593` failed importing a
-required helper omitted from its source snapshot, before packet decode or
-model execution. Root accepted conservative inclusive charges of208 CPU-s and
-128 GPU-s. Original W8 cumulative is **≤2,125/3,600 CPU-s and352/3,600 GPU-s**,
-leaving at least1,475 CPU-s /3,248 GPU-s. Processes/claim/wait are absent and
-terminal events acknowledged; no live reservation remains. Minimal two-file
-source repair passes a local static-import regression, but its prospective
-plan/CPU qualification are under review. No automatic retry or30-step admission.
-See [W8](experiments/w8-wire-audit.md) and the `cost-d67-*` immutable receipts.
+**Current receiver decision:** failed pilot `20261101T135101Z-d67fe593`
+is closed; it omitted two required source helpers and produced no learned
+output. The corrected source package passed the real isolated CPU decoder,
+independent audit and root comparison:237 source files,480 tensor fingerprints,
+both NPZs and isolation checks match. Charge full40 CPU-s for this qualification.
+Original W8 closed **≤2,165/3,600 CPU-s and352/3,600 GPU-s**; at least1,435
+CPU-s /3,248 GPU-s remain. All owned processes/claims/waits are closed; no live
+reservation. One replacement cost-only1/3-step campaign, bounded580 CPU-s /500
+GPU-s inside original totals, **awaits the user** under the [source repair amendment](cards/w8-source-package-repair.md).
+There is no authority to retry or run30 steps until that answer and the
+subsequent complete source/host/budget gates. Raw receipts and the root
+acceptance are linked in [W8](experiments/w8-wire-audit.md).
 
 Overleaf main is `a6679181`, with the confirmed author block, ATHENA
 acknowledgment and organic PRESLEY citation beside ELVIS/GenStream. Review:
@@ -142,8 +145,8 @@ The current review/alternate-format page counts are 22+3 and23+3. No recurring
 model timer/cache keepalive is active; cache lifetime is unknown. Native
 completion after returning the chat remains unverified, so execution is attended.
 
-Next: review the prospective source-only repair and CPU qualification within
-the original budget; do not replay the closed pilot. Admit final
+Next: record the user decision on the source-only GPU repair amendment; do
+not replay the closed pilot. CPU repair acceptance is complete. Admit final
 30-step work only after a
 complete remaining CPU/GPU forecast that includes SAM/native/RGB/composition,
 post-seal scoring, validation and publication. Worker primitives exist; a full
@@ -151,3 +154,9 @@ fleet witness driver/validator is still needed if the cost oracle passes. Final
 paper outcome/pins/checks/PDF and venue workflow remain; the full task audit and
 negative appendix already triage the rest of PLAN. Submission needs explicit
 user authority. Do not reopen deferred training/live/racket/large-sweep work.
+
+Author questions are pending about the exact footage/source terms and any
+shared media, the complete AI-assistance disclosure and the relation to prior
+papers/concurrent review. See [author statements](paper/author-statements-2026-11-01.md).
+Author names/order/affiliation, ATHENA support and organic citations are already
+confirmed/integrated. Submission itself is not authorized.

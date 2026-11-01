@@ -1,0 +1,35 @@
+{
+  "root_reviewed": true,
+  "authority": "CPU input/source correction within original W8 totals; no GPU retry admitted",
+  "CPU_phase_upper": 40,
+  "GPU_phase_upper": 0,
+  "subcaps": {
+    "parent": 6,
+    "packet_worker": 12,
+    "independent_validator": 10,
+    "external_complete": 12
+  },
+  "closed_CPU_before": 2125,
+  "closed_GPU_before": 352,
+  "worst_CPU_after": 2165,
+  "worst_GPU_after": 352,
+  "remaining_CPU_after": 1435,
+  "remaining_GPU_after": 3248,
+  "code_revision": "10a1eb8604717ff59e21633ece79a11f35e2e0cc",
+  "unchanged_235_source_map": "accepted b581 CPU qualification",
+  "source_additions": [
+    "tools/datasets/k4b_inputs.py",
+    "tools/datasets/k4_inputs.py"
+  ],
+  "hashes": {
+    "remote.py.txt": "41fee4e33146e2b1183050d80dfff43b4950be8cad26ce9ec7f5b175189f8582",
+    "launcher.py.txt": "ebd023ec3eb441dc0abe319a9145549fcca17214dcfccbf254d9e17b2501e84a",
+    "command.txt": "848317d21bc9218f784fd8c5c574ddbd96cf905c5308d2968691cdc4ca5b9219",
+    "payload.txt": "019b6f836c6b3d0544d481d888bf680a22fce284e6f20417332be556c73fb6b1",
+    "local-regression.json": "d04e89b30d4e666032eb4c44269ea5082138051e97bb84e4f4cd275df9d4bb7e"
+  },
+  "scope": "One source-copy and real CPU packet decoding qualification; no retry on failure or new GPU allocation",
+  "remote_wall_seconds": 85,
+  "local_wall_seconds": 95,
+  "result_path": "/private/tmp/w8-cost-source-repair-cpu-v1-20261101"
+}

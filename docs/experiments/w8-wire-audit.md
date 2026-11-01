@@ -2,6 +2,19 @@
 
 The current amendment checkpoint is first; earlier records remain below. The protocol and entry template are in [experiments.md](../experiments.md).
 
+### 2026-11-01 — CPU source repair accepted; GPU amendment awaits user decision
+
+- Actual CPU qualification49528 completed successfully in17.7805 wall-s including transport; worker7.822299, validator2.103339 and parent0.097813 CPU-s. The independent [audit](w8-inputs/receiver-20261101/cost-source-repair-cpu-v1-audit-report.json) and [root acceptance](w8-inputs/receiver-20261101/cost-source-repair-cpu-v1-root-acceptance.json) verify237 actual source files,480 original tensor fingerprints, both NPZ identities and the ten protected-path/alias denials, fresh namespaces, loopback-only, one thread/no extra FDs and CPU-only bootstrap. Root compared directly with original8047b676… oracle. No learned model or GPU output is established.
+- Charge the full **40 CPU-s /0 GPU-s** envelope, including the two bounded read-only audit transfers (first exceeded its output-size guard; second preserved identical receipts). Original W8 closed **≤2,165/3,600 CPU-s and352/3,600 GPU-s**; at least **1,435 CPU-s /3,248 GPU-s** remain. Own recorded PIDs/PGIDs absent; no live reservation/job/wait.
+- The root-reviewed [source-package repair card](../cards/w8-source-package-repair.md) proposes one replacement cost-only1/3-step pilot, at most580 CPU-s /500 GPU-s within the original totals, leaving at least855/2748 if fully charged. It awaits user amendment of the stopped card; no GPU retry or30-step admission is authorized. Root will record the answer and perform fresh source/spec/host gates before any submission. Final author questions about source permissions, AI assistance and prior-paper relationship are separately pending; author block/funding/citations are already handled.
+
+### 2026-11-01 — CPU source-repair qualification admitted
+
+- Execution launched once, local handle **49528**. Launcher stdout `/private/tmp/w8-cost-source-repair-cpu-v1-launch.stdout`, stderr sibling; internal receipts `/private/tmp/w8-cost-source-repair-cpu-v1-20261101/`. Inspect this existing handle and owned remote state after interruption; never replay.
+
+- Root reviewed the exact source-copy/packet-decoder helper and independent validator; the [gate](w8-inputs/receiver-20261101/cost-source-repair-cpu-v1-root-gate.json) records command848317d2…, remote41fee4e3…, launcher ebd023ec… and local malformed-payload/config regression d04e89b3…. All code is unchanged except adding the two omitted tracked helper files to the copied source tree. Actual runtime fit is unproved; the caps stop the phase.
+- One CPU-only qualification is admitted inside original totals: **≤40 CPU-s /0 GPU-s**, parent6+worker12+validator10+external12. Original closed2,125 CPU /352 GPU; worst2,165/352, at least1,435 CPU /3,248 GPU unreserved. One-core, GPU hidden, fresh namespaces/Landlock and five protected inputs plus aliases; independently verify480 tensors and both NPZs. No source-data/golden access, GPU retry or quality claim. Remote85/local95 wall limits; preserve source/config/argv/receipts/output. Unknown execution must be inspected and never replayed.
+
 ### 2026-11-01 — Failed cost pilot closed; source-only repair under review
 
 - Root accepts the [closeout](w8-inputs/receiver-20261101/cost-d67-closeout-summary.json) and [accounting record](w8-inputs/receiver-20261101/cost-d67-root-acceptance.json) for **`20261101T135101Z-d67fe593`**: conservative **≤208 CPU-s /128 GPU-s**, inclusive of staging, claim lifetime, preparation and full audit/monitoring allowances. Original W8 cumulative **≤2,125/3,600 CPU-s and352/3,600 GPU-s**; at least **1,475 CPU-s /3,248 GPU-s** remain. No live reservation, process, GPU claim or wait remains; delivered terminal events are acknowledged.

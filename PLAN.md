@@ -32,15 +32,17 @@ MAIN/JCV runtime guards. Historical process-group IDs were not recorded; current
 known children/task processes were absent. This is no fresh decoder-quality,
 full cached-environment, sustained-reference or live-rate claim.
 
-**Cost pilot closed:** `20261101T135101Z-d67fe593` failed before packet
- decoding because its source package omitted two required dataset helpers.
-Root accepted conservative inclusive charges of208 CPU-s /128 GPU-s. Original
-W8 cumulative is **≤2,125/3,600 CPU-s and352/3,600 GPU-s**; at least1,475 CPU-s
-and3,248 GPU-s remain, with no live reservation or job. A local regression
-reproduces the missing import and checks the minimal two-file source repair.
-The prospective repair and its CPU qualification remain under review; there is
-no automatic retry or30-step admission. See the [W8 entry](docs/experiments/w8-wire-audit.md)
-for exact identities, receipts, closed events and budget history.
+**Current receiver decision:** the cost pilot `20261101T135101Z-d67fe593`
+failed before packet decode because its source package omitted two required
+helpers. That request is closed. The corrected package passed the real isolated
+CPU decoder and an independent audit:237 source files,480 tensor fingerprints,
+both unit hashes and the recorded isolation checks match. No learned output or
+fresh quality claim follows. Original W8 cumulative is **≤2,165/3,600 CPU-s
+and352/3,600 GPU-s**; at least1,435 CPU-s /3,248 GPU-s remain. No live job,
+reservation or wait exists. The root-reviewed [source repair amendment](docs/cards/w8-source-package-repair.md)
+asks the user for one bounded replacement cost pilot (580 CPU-s /500 GPU-s,
+inside original totals). No retry or30-step work is authorized until the answer
+and subsequent source, host and budget gates. See the [W8 entry](docs/experiments/w8-wire-audit.md).
 
 Overleaf main is `a6679181`, with the confirmed author block, ATHENA
 acknowledgment and organic PRESLEY citation beside ELVIS/GenStream. Review:
@@ -383,7 +385,7 @@ marked `card ready` is waiting for the user to start it.
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
 | W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-results-2026-11-01` (policy PR #322 merged) | primary plus Terra 6.1 medium delegates | complete: `20261101T081828Z-d70bc44f`, gpu6 exclusive Ada, frozen source `c0f25e4e` / spec `e9d926b6`; independent full audit and raw screen pass all 8 cells at 46.3151 kbps. Initial two cost stops preserved. Combined inclusive scoring 224 GPU-s / ≤304 CPU-s of 450/450; original total after 15 CPU-s runtime preflight: 224 GPU-s / ≤1,169 CPU-s of 3,600/3,600. Processes/claims/waits closed. No training/encoding/model/payload/quality-rule change. |
-| W8 Linux exact-input oracle and fresh receiver gates | [original W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/w8-receiver-witness-2026-11-01`, draft PR #325 | primary plus scoped delegates | Exact inputs, saved pixels, native inventory and CPU source/runtime gates independently accepted with scoped lifecycle metadata. Cost request `20261101T135101Z-d67fe593` failed on two omitted source helpers before packet decode; closed ≤208 CPU-s /128 GPU-s. Original cumulative ≤2,125 CPU-s /352 GPU-s, no live reservation. Minimal source-only repair under review; no automatic retry/fresh quality/30-step admission. |
+| W8 Linux exact-input oracle and fresh receiver gates | [original W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/w8-receiver-witness-2026-11-01`, draft PR #325 | primary plus scoped delegates | Exact inputs, saved pixels, native inventory and CPU source/runtime gates independently accepted with scoped lifecycle metadata. Cost request `20261101T135101Z-d67fe593` failed on two omitted source helpers before packet decode; closed ≤208 CPU-s /128 GPU-s. Corrected-source CPU qualification independently passes; original cumulative ≤2,165 CPU-s /352 GPU-s, no live reservation. One bounded580 CPU/500 GPU replacement awaits user amendment; no fresh quality/30-step admission. |
 | W8 approved upper-baseline amendment (historical, followed by exclusive repair) | [coverage follow-up](docs/experiments/w8-inputs/prospective-coverage-followup.md) | `codex/w8-cost-reallocation-2026-11-01` (predecessor PR #320 merged) | primary plus Terra 6.1 medium delegates | stopped 2026-11-01: first request `20261101T071706Z-afde26d5` passed correctness but failed cost projection, second `20261101T073429Z-04a50c10` hit its smoke limit on shared GPU; both terminal/claims released, no full quality point or third run. Amendment ≤87 CPU-s/67 GPU-s of 300/300; cumulative W8 ≤937 CPU-s/67 GPU-s of 3,600/3,600. Subsequent exclusive-GPU 450/450 inclusive scoring-cap amendment approved; its distinct request is tracked in the row above, original totals unchanged. Fixed packet/rate and quality/receiver gates unchanged. |
 | Fleet all-status read latency | [fleet status contract](docs/fleet.md) | `codex/fleet-status-read-concurrency-2026-11-01` | primary plus Terra 6.1 medium delegate | local fix reviewed 2026-11-01 after a 600-s NFS all-status timeout: bounded concurrent per-request reads, unchanged sorted live-state semantics, no history cache/filter or mutations. Focused tests pass; runtime speed/server impact unverified. No deployment, worker restart or GPU work; publish/verify a manager release only through reviewed fleet operations after inspecting existing worker identity. |
 | Submission readiness and W8 witness (initial screen; see later rows) | [authorized W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/submission-readiness-2026-11-01` | primary plus three Terra 6.1 medium delegates | verification 2026-11-01: complete PLAN/evidence audit and negative-results online appendix done; W8 initial fixed actual-payload rate screen stopped unresolved (46.3151 kbps vs one anchor's 45.8233 upper bracket), 0/3,600 GPU-s, ≤850/3,600 CPU-s conservative envelope, no new fleet jobs/reservations. Local tensor bytes exact; Mac geometry equality and original packed/source-hidden inference unverified. No retry, redesign or repair under stopped card without amendment. Main+refs 23 pages plus 5 appendix allowed; current draft 22+3. Other open PLAN tasks triaged in paper task/evidence audits; scientific limits remain. |
