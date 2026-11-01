@@ -1,0 +1,182 @@
+{
+  "target_kbps": 46.315062222222224,
+  "hybrid": {
+    "lpips": 0.33213653907050866,
+    "dists": 0.2377184011042118
+  },
+  "anchors": {
+    "s2_o0": [
+      {
+        "kbps": 46.895,
+        "lpips": 0.5532273264434211,
+        "dists": 0.360544241219759
+      },
+      {
+        "kbps": 42.553333333333335,
+        "lpips": 0.5711007114691508,
+        "dists": 0.3705657713115215
+      },
+      {
+        "kbps": 39.16,
+        "lpips": 0.6004293610145892,
+        "dists": 0.38248683884739876
+      }
+    ],
+    "s4_o0": [
+      {
+        "kbps": 43.95666666666667,
+        "lpips": 0.6208126834409657,
+        "dists": 0.37340298742055894
+      },
+      {
+        "kbps": 36.605,
+        "lpips": 0.6578311232043127,
+        "dists": 0.3982048168778419
+      },
+      {
+        "kbps": 33.108333333333334,
+        "lpips": 0.6910154440249754,
+        "dists": 0.4151360757648945
+      },
+      {
+        "kbps": 49.958333333333336,
+        "lpips": 0.6111737935587196,
+        "dists": 0.36655441522598264
+      }
+    ],
+    "s2_o20": [
+      {
+        "kbps": 45.82333333333334,
+        "lpips": 0.594514353008283,
+        "dists": 0.37633655667304994
+      },
+      {
+        "kbps": 42.375,
+        "lpips": 0.596804081405594,
+        "dists": 0.3882079243659973
+      },
+      {
+        "kbps": 39.43333333333334,
+        "lpips": 0.623039793882741,
+        "dists": 0.39861242175102235
+      },
+      {
+        "kbps": 49.67333333333334,
+        "lpips": 0.5557639481407814,
+        "dists": 0.3629685163497925
+      }
+    ],
+    "dcvc": [
+      {
+        "kbps": 36.825,
+        "lpips": 0.410284243617431,
+        "dists": 0.31764566600322724
+      },
+      {
+        "kbps": 49.778333333333336,
+        "lpips": 0.37127445825302047,
+        "dists": 0.2907444730401039
+      }
+    ]
+  },
+  "gate": {
+    "decision": "pass",
+    "cells": {
+      "s2_o0:lpips": {
+        "bracket_kbps": [
+          39.16,
+          46.895
+        ],
+        "bracket_headroom_kbps": 0.5799377777777792,
+        "won": true,
+        "gap": 0.2233801014757556,
+        "interpolated_error": 0.5555166405462643
+      },
+      "s2_o0:dists": {
+        "bracket_kbps": [
+          39.16,
+          46.895
+        ],
+        "bracket_headroom_kbps": 0.5799377777777792,
+        "won": true,
+        "gap": 0.12410944868427173,
+        "interpolated_error": 0.36182784978848354
+      },
+      "s4_o0:lpips": {
+        "bracket_kbps": [
+          33.108333333333334,
+          49.958333333333336
+        ],
+        "bracket_headroom_kbps": 3.643271111111112,
+        "won": true,
+        "gap": 0.2847400855182598,
+        "interpolated_error": 0.6168766245887685
+      },
+      "s4_o0:dists": {
+        "bracket_kbps": [
+          33.108333333333334,
+          49.958333333333336
+        ],
+        "bracket_headroom_kbps": 3.643271111111112,
+        "won": true,
+        "gap": 0.13288795895150654,
+        "interpolated_error": 0.37060636005571834
+      },
+      "s2_o20:lpips": {
+        "bracket_kbps": [
+          39.43333333333334,
+          49.67333333333334
+        ],
+        "bracket_headroom_kbps": 3.358271111111115,
+        "won": true,
+        "gap": 0.25725088296014786,
+        "interpolated_error": 0.5893874220306565
+      },
+      "s2_o20:dists": {
+        "bracket_kbps": [
+          39.43333333333334,
+          49.67333333333334
+        ],
+        "bracket_headroom_kbps": 3.358271111111115,
+        "won": true,
+        "gap": 0.13684947675689244,
+        "interpolated_error": 0.37456787786110424
+      },
+      "dcvc:lpips": {
+        "bracket_kbps": [
+          36.825,
+          49.778333333333336
+        ],
+        "bracket_headroom_kbps": 3.463271111111112,
+        "won": true,
+        "gap": 0.04847126360699405,
+        "interpolated_error": 0.3806078026775027
+      },
+      "dcvc:dists": {
+        "bracket_kbps": [
+          36.825,
+          49.778333333333336
+        ],
+        "bracket_headroom_kbps": 3.463271111111112,
+        "won": true,
+        "gap": 0.05946235701177341,
+        "interpolated_error": 0.2971807581159852
+      }
+    }
+  },
+  "prior_repair": {
+    "archive": "/private/tmp/w9-gpu-pilot-artifacts/full/published.tar",
+    "sha256": "28aeb71d62c64d642f1c5157af6bca691cbb4f6f0c3ebdfdea94887a88177ba4",
+    "audit": "docs/experiments/w9-inputs/repair-audits/nad000.json",
+    "audit_sha256": "61d38bdef643cb7f5326fd58fefc7a402e8c6c749642a0cfa05a3b67ae45b11d"
+  },
+  "trial": {
+    "archive": "/private/tmp/w8-exclusive-recovery-20261101/full/published.tar",
+    "sha256": "f87e9cba68063fb115828dddbffb9b7fbaffa1e61003ac4292f4adfaab1cc41f",
+    "audit": "docs/experiments/w8-inputs/exclusive-20261101/full-audit.json",
+    "audit_sha256": "c01c4a820ca41612089b97e1aa0ab79bad0db85a2ffbece849845d91cc7e036a"
+  },
+  "spec_sha256": "e9d926b6f61685a288e90225c38bd1d84050c9187dfa25180d298ce317b03230",
+  "selection_sha256": "4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0",
+  "stream_sha256": "182c7eee4a0ea2e98ef0a967ecfcdf8958898ad7ce035e54f0ea91b5109b6fa3"
+}

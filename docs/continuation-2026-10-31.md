@@ -1,19 +1,15 @@
 # Continuation, 2026-10-31: W7 closed; work moves to Codex
 
-**Resume from the [2026-11-01 continuation](continuation-2026-11-01.md):** the
-approved W8 coverage amendment ran two cost-stopped requests; both are terminal,
-no full upper-anchor result exists, and an exclusive-GPU cap amendment is pending.
-The older summaries below are retained as history, not current authority.
-
-**Latest continuation, 2026-11-01:** user approved the separate W8 witness and
-confirmed 23 pages of body/references plus five additional appendix pages.
-The full PLAN/evidence audit and expanded negative-results appendix are done;
-Overleaf `e366440` is 22+3 pages. W8's actual fixed-payload rate screen stopped
-unresolved before any fleet/GPU submission (46.3151 kbps versus one family's
-45.8233 upper bracket). Local tensor diagnostics do not establish a fresh
-receiver. See [current readiness](paper/readiness-2026-11-01.md) and
-[W8 outcome](experiments/w8-wire-audit.md); old pending-approval statements below
-are historical. No unchanged card may be replayed from this older handoff.
+**Resume from the [2026-11-01 continuation](continuation-2026-11-01.md).**
+The approved exclusive W8 scoring request `20261101T081828Z-d70bc44f` completed
+and passed an independent full audit. Its [raw screen](experiments/w8-inputs/exclusive-20261101/rate-screen.json)
+passes all eight player-metric cells at the fixed 46.3151 kbps candidate rate
+under conditional 7,200 s reuse. It does not prove fresh decoding, sustained
+reuse or a W7 population-level pass. All scoring requests and claims are closed;
+the complete-packet CPU input oracle is under review, with no oracle or receiver
+job. Cumulative W8 is 224/3,600 GPU-s and ≤1,169/3,600 CPU-s. Overleaf
+`7a7381e3` is 22 + 3 pages under the 23 + 5 allowance. Older statements below
+are historical checkpoints and do not supply current authority or job state.
 
 **Later same-day audit:** W7's historical closure below is superseded. The
 reference-bank billing code counted encoding variants as independent crops,
@@ -135,8 +131,8 @@ All-assets duration model `w7-repaired-all-assets-intervals.json`, SHA256 `6d000
 
 Overleaf main is now **`a3e2888dff74d6c07e1cd73d10b5dc711bd994b0`** with repaired Figure 3, rounded duration sensitivity and W8 limitations. Working PDF `/private/tmp/pointstream-w7-manuscript/build/main.pdf`: 23 pages, empirical checker passes, final results pages visually reviewed by parent and delegate. PR #316 contains the repair; latest derived code/data and this closure are being finalized on `codex/w7-anchor-repair-2026-10-31`.
 
-**Next decision:** the proposed [W8 fresh-decoder witness](cards/w8-fresh-decoder-witness.md) needs separate user authority: at most 3,600 GPU-s and 3,600 workload CPU-s, CPU payload/input oracle first, then one source-hidden receiver witness at the 80 saved ticks if its rate and projection gates pass. No implementation/job has begun under that proposal. W6b smoothing likewise has no new authority beyond its stopped CPU pilot; W11 lacks eligible linked independent racket masks. The paper is a qualified working draft, not submission-ready.
+**Historical next decision, superseded 2026-11-01:** the proposed [W8 fresh-decoder witness](cards/w8-fresh-decoder-witness.md) needs separate user authority: at most 3,600 GPU-s and 3,600 workload CPU-s, CPU payload/input oracle first, then one source-hidden receiver witness at the 80 saved ticks if its rate and projection gates pass. No implementation/job has begun under that proposal. W6b smoothing likewise has no new authority beyond its stopped CPU pilot; W11 lacks eligible linked independent racket masks. The paper is a qualified working draft, not submission-ready.
 
 CPU accounting clarification: the earlier 641-second figure was the standalone CPU/audit subtotal. GPU smoke/full child user+system snapshots add a conservative 1,283 CPU-s (1,282.600081 recorded), producing **≤1,924/5,400 total workload CPU-s**, still within the cap. The cumulative full snapshots include the smoke validator; summing smoke again deliberately overcounts it. Receipt `w7-workload-cpu-accounting.json` SHA256 `914d2ff5b90395f09bec6deedbf40afd83aa5faefc12c4009ed5d6d2cc4c95ea` pins all records and scope. Long-lived fleet infrastructure is excluded as previously agreed. No GPU or CPU workload remains active.
 
-Final publication state: PR #315 merged `d14e9678`; repair PR #316 merged **`5af6199f0519189c848004dbf58ed5c6f4b5586c`** after CI passed on exact `60a77b1a1d50ddbd41f8594494514a5839df00d0`. Final local checks: Ruff passes; pytest 1,265 passed, 27 skipped and the same 13 failures reproduced on unchanged Mac main; mypy the same seven baseline errors. The working tree was clean after publication. The user has been asked for the separate W8 witness authority; it remains pending, with no new receiver implementation or computation started. No recurring model monitor or task-owned wakeup was created.
+**Historical publication state (2026-10-31):** PR #315 merged `d14e9678`; repair PR #316 merged **`5af6199f0519189c848004dbf58ed5c6f4b5586c`** after CI passed on exact `60a77b1a1d50ddbd41f8594494514a5839df00d0`. Final local checks: Ruff passes; pytest 1,265 passed, 27 skipped and the same 13 failures reproduced on unchanged Mac main; mypy the same seven baseline errors. The working tree was clean after publication. The user has been asked for the separate W8 witness authority; it remains pending, with no new receiver implementation or computation started. No recurring model monitor or task-owned wakeup was created.

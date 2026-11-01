@@ -19,8 +19,10 @@ does not turn unmeasured comparisons into completed evidence.
   beside DISTS/PSNR gains; post hoc selections and failed decodes are disclosed.
   A cost-stopped smoothing pilot and absent racket masks are not presented as
   quality negatives. See [negative-evidence audit](negative-evidence-2026-11-01.md).
-- Overleaf main `e366440` includes that appendix and the unresolved W8 accounting
-  screen. PDF `/private/tmp/pointstream-w7-manuscript/build/main.pdf`: **25 pages,
+- Overleaf main `7a7381e31526c304af16da79dfd96941c0d4a6e9` includes that appendix, the
+  hand-transfer/reference-bank negatives and the passing conditional W8
+  saved-quality screen described below.
+  PDF `/private/tmp/pointstream-w7-manuscript/build/main.pdf`: **25 pages,
   body plus references 1–22, Online Appendix 23–25**. This meets the user's and
   TOMM guide's allowance of **23 + 5 additional appendix pages**. The empirical
   checker passes; modified results and appendix pages were visually reviewed;
@@ -32,34 +34,36 @@ does not turn unmeasured comparisons into completed evidence.
   byte, including the added tensor directory and sign information. A frozen
   implementation reproduction at `8f6d0ece` matches both complete wire objects.
 
-## Scientific stop and resources
+## Current evidence and resources
 
-The [W8 outcome](../experiments/w8-wire-audit.md) is **unresolved**, not a quality
-loss. The fixed 2,289,836-byte candidate costs 3,816.4 kbps cold for 4.8 s. Its
-conditional rate with exact named reference/match objects reused for 7,200 s is
-46.3151 kbps; one required ROI-SVT family ends at 45.8233 kbps. No extrapolation,
-new fleet request or GPU work followed. The other three saved-quality family
-comparisons are positive on both metrics. Reuse quality is unproved.
+The [W8 rate screen](../experiments/w8-inputs/exclusive-20261101/rate-screen.json)
+now **passes all eight cells** after independently audited exclusive request
+`20261101T081828Z-d70bc44f`. The fixed 2,289,836-byte candidate costs 3,816.4 kbps
+cold for 4.8 s; 46.3151 kbps assumes exact named reference/match objects reused
+for 7,200 s, with reuse quality unproved. The additional 49.6733 kbps ROI-SVT
+point closes the original 45.8233 kbps gap. All four families bracket the rate,
+without extrapolation, and saved hybrid player quality favors both metrics.
+This optimistic one-window saved-quality screen is not fresh output quality,
+complete receiver qualification or a change to the W7 population result.
 
-W8 after the approved baseline-coverage amendment: **67 / 3,600 GPU-s; at most
-937 / 3,600 CPU-s** under a deliberately conservative envelope. Both requests
-are terminal; no experimental reservation remains. First correctness checks
-passed, but cost promotion failed; the second smoke timed out on a shared GPU.
-No full upper-anchor quality point or decoder run was produced. A separate packet
-input diagnostic fails exact geometry on the Mac at about 4.55e-13, despite
-matching pose-map pixels. The original packed runtime and Linux read isolation
-remain untested. A paid judged-frame selection was added because registration
-and generated-output sampling differ. None establishes fresh output quality.
+All three scoring jobs are terminal, process groups/claims released, waits
+ended and completion events acknowledged. Inclusive scoring charge is 224 GPU-s
+and ≤304 CPU-s of the approved 450/450 internal ceilings, inside original 3,600/3,600.
+The initial two cost stops and initial audit's positional-name failure remain
+recorded; reviewed auditor `142b6cc5` resolved argument binding without changing
+scores, identities or thresholds. The full audit passed all 12 checks on 80 ticks;
+maximum original-control difference 5.2273e-5 <0.001.
 
-The preserved unsubmitted CPU qualification/scoring drafts cannot be submitted
-under the stopped card. An existing upper ROI-SVT bitstream is independently
-verified at 49.6733 kbps, but its required full quality point is still missing.
-The user-approved 300/300-s amendment stopped after two cost failures and no
-third request is authorized. The prospective exclusive-GPU amendment requests
-an inclusive internal cap of 450 GPU-s and 450 CPU-s, keeping the original
-3,600/3,600 totals. Only a passing coverage screen could reopen the original
-input/isolation/receiver gates. No training, encoding or model changes follow.
-The proposal is not approved while the decision is pending.
+Original W8 cumulative after a separately bounded 15 CPU-s runtime preflight:
+**224/3,600 GPU-s, ≤1,169/3,600 CPU-s**. MAIN preparation runtime and network namespace
+feasibility were verified on gpu5. Exact packet geometry on the Mac previously
+failed at ~4.55e-13 despite matching pose pixels; no tolerance waiver. Linux
+Landlock, packet-derived inputs and independent full validation are not yet
+qualified. The corrected complete-packet CPU oracle is under review; the older
+transport-based draft is disabled. No CPU input-oracle fleet job or receiver job exists yet.
+Unused generator/SAM/native installed-model qualifications remain a separate
+pre-GPU gate, with unchanged original budgets. No training, encoding or model
+changes follow from the scoring repair.
 
 ## What remains for submission
 

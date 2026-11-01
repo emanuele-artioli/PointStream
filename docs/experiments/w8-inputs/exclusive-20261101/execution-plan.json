@@ -1,0 +1,84 @@
+{
+  "status": "full_audited_rate_screen_pass",
+  "source_revision": "c0f25e4ed23fd74aca05608ca6bd05b43639f7af",
+  "source_worktree": "/private/tmp/pointstream-w8-source-c0f25e4e",
+  "normalized_spec_sha256": "e9d926b6f61685a288e90225c38bd1d84050c9187dfa25180d298ce317b03230",
+  "deadline": "2026-11-01T08:58:08.634808+00:00",
+  "manager_override": "gpu6",
+  "manager_release": "20261101T071313Z-74a9271d",
+  "queue_preflight": "/private/tmp/w8-exclusive-preflight-gpu6-20261101/status.json",
+  "queue_counts": {
+    "budget_exhausted": 1,
+    "expired": 3,
+    "complete": 1067,
+    "failed": 282,
+    "cancelled": 173,
+    "contended": 19,
+    "attention": 1
+  },
+  "host_preflight": "/private/tmp/w8-exclusive-preflight-gpu6-20261101/inspect.json",
+  "internal_inclusive_cap_s": {
+    "cpu": 450,
+    "gpu": 450
+  },
+  "prior_charges_s": {
+    "cpu_upper_bound": 87,
+    "gpu": 67
+  },
+  "allocation_s": {
+    "campaign": 280,
+    "monitor_cleanup": 30,
+    "independent_audit": 10,
+    "all_preparation_publication_including_prior20": 40
+  },
+  "inclusive_envelope_s": {
+    "cpu": 427,
+    "gpu": 377
+  },
+  "original_caps_s": {
+    "cpu": 3600,
+    "gpu": 3600
+  },
+  "command": [
+    "scripts/ps-fleet",
+    "submit",
+    "docs/experiments/w8-inputs/exclusive-20261101/score-spec.json",
+    "--source-worktree",
+    "/private/tmp/pointstream-w8-source-c0f25e4e",
+    "--snapshot-transfer-seconds",
+    "90"
+  ],
+  "submission_handle": 33826,
+  "submission_stdout": "/private/tmp/w8-exclusive-submit-20261101.json",
+  "submission_stderr": "/private/tmp/w8-exclusive-submit-20261101.stderr",
+  "job_id": "20261101T081828Z-d70bc44f",
+  "source_snapshot_sha256": "7ca52d70a4d620797e8e51bf1c4094083a2d7548cec718812d1d27f869a74619",
+  "source_identity": "2b17c137a6982d6b8b903c234086e0874a73a808bac804793a760b378ca895c3",
+  "wait_handle": 67073,
+  "wait_max_seconds": 600,
+  "wait_output": "/private/tmp/w8-exclusive-wait-20261101.json",
+  "gpu_uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+  "supervisor_pid": 3291120,
+  "wait_ended": true,
+  "terminal_status": "/private/tmp/w8-exclusive-terminal-status-20261101.json",
+  "recovery_handle": 44829,
+  "recovery_script": "/private/tmp/w8-exclusive-recover-20261101.py",
+  "recovery_script_sha256": "d3ac259bab709cdcc220783df61e8f45a06f468dbf9b63ed7d0af98cc2b892a7",
+  "recovery_cpu_max_s": 9,
+  "recovery_destination": "/private/tmp/w8-exclusive-recovery-20261101",
+  "recovery_ended": true,
+  "audit_code_revision": "142b6cc5c3920ded37017b7547c34a75abe7c883",
+  "full_archive_sha256": "f87e9cba68063fb115828dddbffb9b7fbaffa1e61003ac4292f4adfaab1cc41f",
+  "full_audit_sha256": "c01c4a820ca41612089b97e1aa0ab79bad0db85a2ffbece849845d91cc7e036a",
+  "rate_screen_sha256": "ced3d413523ba93355e0d345fa6129f78a77028832a3a61dfbbef1de3e6591fe",
+  "rate_screen_decision": "pass",
+  "terminal_event_acknowledged": "48e93fc725d7528a91c612b39a44ecee",
+  "conservative_closeout_s": {
+    "gpu": 224,
+    "cpu_upper_bound": 304
+  },
+  "original_w8_cumulative_s": {
+    "gpu": 224,
+    "cpu_upper_bound": 1154
+  }
+}

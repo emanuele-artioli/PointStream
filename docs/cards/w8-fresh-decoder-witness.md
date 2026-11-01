@@ -1,31 +1,26 @@
 # Card: W8 fresh-decoder witness (authorized 2026-11-01)
 
-**Exclusive attempt subsequently approved:** the user authorized one new
-exclusive-GPU scoring request with an inclusive **450 GPU-s / 450 CPU-s** internal
-cap, still inside the original **3,600/3,600 totals**. Previous charges remain
-included. Follow the [approved amendment](../experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md),
-fresh preflight, frozen policy and the original strict quality/decoder gates.
+**Current state, 2026-11-01:** the separately approved exclusive scoring
+request `20261101T081828Z-d70bc44f` completed on gpu6 and passed its independent
+full audit. The [raw rate screen](../experiments/w8-inputs/exclusive-20261101/rate-screen.json)
+passes all eight player-metric cells across four anchor families at the fixed
+46.3151 kbps candidate rate, without extrapolation. This is an optimistic
+single-window screen using saved quality and conditional 7,200 s reuse, not a
+fresh-decoder result or a revision of W7's population outcome. The original
+45.8233 kbps upper-bracket gap is closed by the audited 49.6733 kbps baseline
+point. The two earlier cost-stopped requests and original unresolved screen
+remain recorded in the [wire audit](../experiments/w8-wire-audit.md).
 
-**Latest stop:** the approved 300/300-s coverage amendment ended with two cost
-stops and no full quality point. Requests `20261101T071706Z-afde26d5` and
-`20261101T073429Z-04a50c10` are terminal; first correctness checks passed but
-its full-cost projection did not fit, second smoke timed out on a shared GPU.
-Amendment charges ≤87 CPU-s and 67 GPU-s; cumulative W8 ≤937 CPU-s and 67 GPU-s.
-No third automatic run. The [exclusive-GPU proposal](../experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md)
-is not authority; it requests an inclusive 450/450-s internal cap within the
-unchanged original totals. The original coverage/input/receiver gates remain.
-
-**Current state:** the initial actual-payload rate screen stopped unresolved on
-2026-11-01: 46.3151 kbps exceeds one required anchor family's 45.8233 kbps upper
-bracket. That result remains intact. The user subsequently approved the
-[prospective coverage amendment](../experiments/w8-inputs/prospective-coverage-followup.md):
-score one verified existing baseline bitstream at 49.6733 kbps plus the three
-original controls, using at most **300 GPU-s and 300 workload CPU-s inside the
-original 3,600/3,600 ceilings**. No training, new encoding, changed payload or
-increased total budget. Resume the original exact-input, isolation and receiver
-gates only if the independently audited four-family rate screen passes. Other
-failures still stop; the original unresolved screen and Mac geometry diagnostic
-are not waived. No new job had run when this amendment was approved.
+All three scoring requests, waits and task claims are closed. Inclusive scoring
+cost is **224 GPU-s and ≤304 CPU-s** of the approved 450/450 internal cap.
+With the separately bounded 15 CPU-s runtime preflight, cumulative W8 cost is
+**224/3,600 GPU-s and ≤1,169/3,600 CPU-s**. No training, new encoding, model,
+payload or quality-rule change was made. The original preparation environment
+(MAIN, NumPy 1.26.4 and OpenCV 4.10.0) and namespace feasibility were checked
+on gpu5; this did not establish Landlock, input equality or fresh decoding. The
+corrected complete-packet CPU input oracle is under review; no input-oracle
+fleet job or receiver job exists. The original strict input, isolation, projection and
+receiver gates still apply; see the [current continuation](../continuation-2026-11-01.md).
 
 **Goal.** Test whether the frozen W7 scale-4 hybrid for one specified window can be reconstructed by a fresh receiver from a complete, actually serialized payload and explicitly installed decoder models, at a rate that still supports a narrowly defined single-window player comparison. This is a feasibility witness; it does not claim a complete codec win, Tier 2 success, 240-frame coverage, reference reuse, live operation or generalization.
 
@@ -63,4 +58,4 @@ Planning envelope, not guaranteed reservation: ≤500 GPU-s smoke; ≤2,200 gene
 
 ## Next frozen-spec preparation
 
-First write the experiment rule/ledger and pin exact immutable assets, reference hashes, checkpoint serialization contract, base decode/color path, accessible host-local environment locks and output directories. Validate synthetic malformed/truncated packets and isolation, then run the bounded CPU oracle before drafting or submitting GPU specs. Set actual deadlines only after preflight; preserve job IDs, resource ledger and raw results. Approval does not waive any identity, input-equivalence, rate, isolation or cost gate above.
+Review the corrected complete-packet CPU oracle and its frozen specification, including immutable assets, reference hashes, checkpoint serialization contract, base decode/color path, accessible host-local environment locks and output directories. Validate synthetic malformed/truncated packets and isolation, then run the bounded CPU oracle before drafting or submitting receiver GPU specs. Set actual deadlines only after preflight; preserve job IDs, resource ledger and raw results. Approval does not waive any identity, input-equivalence, rate, isolation or cost gate above.

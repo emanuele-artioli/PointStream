@@ -1,4 +1,4 @@
-# Continuation, 2026-11-01: W8 coverage repair stopped at cost gates
+# Continuation, 2026-11-01: exclusive W8 coverage repair completed
 
 ## Current decision
 
@@ -10,28 +10,42 @@ larger (3,816.4 kbps); 46.3151 kbps assumes exact match/reference reuse over
 7,200 s, not demonstrated reuse quality. Whole-frame results favor the baseline;
 the positive player-region claim is conditional.
 
-The user conditionally approved the 300 GPU-s / 300 CPU-s internal W8 amendment;
-root proceeded after the clarification. Two requests stopped before full scoring. Root
-has now asked for one **exclusive-GPU** attempt with an internal inclusive cap
-of **450 GPU-s and 450 CPU-s**, retaining the original W8 **3,600/3,600 totals**.
-That question is **pending**, not approved. The concrete
-[proposal](experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md)
-and expired, non-runnable spec preserve the original point, controls and rule.
-No new encoding, training, model/payload change or original-total increase.
-Do not run a third request without authority and a reviewed source/policy update.
+The approved exclusive scoring request **`20261101T081828Z-d70bc44f`** is
+complete on gpu6 Ada, independently full-audited, with all eight strict rate
+cells passing at unchanged 46.315062222222224 kbps. This opens the original
+CPU input/isolation gate; it does not prove fresh decoding or two-hour reuse.
+Scorer source `c0f25e4e`, normalized spec
+`e9d926b6f61685a288e90225c38bd1d84050c9187dfa25180d298ce317b03230`.
+Full archive `f87e9cba68063fb115828dddbffb9b7fbaffa1e61003ac4292f4adfaab1cc41f`;
+durable full audit and raw screen are in `docs/experiments/w8-inputs/exclusive-20261101/`.
+All three scoring requests, waits and task claims are closed; never replay them.
+
+Current work: implement and review the corrected complete-packet CPU oracle.
+The legacy transport/recipe CLI is disabled. Original preparation used MAIN
+packed environment `32e688…`, distinct from later JCV generator `bf738ce5…`.
+A bounded read-only preflight verified actual MAIN NumPy 1.26.4/OpenCV 4.10.0
+on gpu5 and distinct user/network namespaces. It does not prove Landlock or the
+actual oracle. gpu6 has the expected cache and separate storage; gpu2 inventory
+timed out and remains unknown. Receipt `/private/tmp/w8-linux-runtime-preflight-20261101/`;
+local handle 18407 ended. Charge its full 15 CPU-s allowance: **cumulative W8
+≤1,169/3,600 CPU-s and 224/3,600 GPU-s**, leaving at least 2,431 CPU-s / 3,376 GPU-s.
+No CPU input-oracle fleet job or receiver job exists yet. Proposed input campaign ≤300 CPU-s plus
+≤40 s for monitor/audit/preparation still needs root review, frozen source, immutable
+packet/profile publication, fresh preflight and real future deadline.
 
 ## Immutable scientific state
 
 - Fixed candidate: 2,289,836 B, SHA256
   `eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4`;
   conditional 46.315062222222224 kbps. Original `s2_o20` upper quality point
-  ends at 45.82333333333334 kbps. The full four-family screen is unresolved.
+  ended at 45.82333333333334 kbps; the accepted 49.67333333333334 kbps repair
+  now brackets it. The single-window four-family screen passes both metrics.
 - Selected new baseline: nad000, scale 2, outside +20, CRF 67,
   29,804 B / 49.67333333333334 kbps, stream SHA256
   `182c7eee4a0ea2e98ef0a967ecfcdf8958898ad7ce035e54f0ea91b5109b6fa3`;
   original encoder archive `20261031T181055Z-e4dc2d25`, SHA256
   `9736920b256b2b770c3b35e8784570a50df2720115fbb134970439adea4240f0`.
-  It is verified as bytes but has no accepted full 80-tick quality score.
+  It now has an independently audited full 80-tick quality score.
 - Original three CRF-63 controls, 80 full ticks and four per-tick metrics,
   all raw-control differences ≤0.001, exact source/native/environment identities,
   independent full-output audit, no extrapolation. Strict pass on both player
@@ -60,24 +74,35 @@ Do not run a third request without authority and a reviewed source/policy update
    accepted smoke quality point. Supervisor 33.6719 s; charge
    **34 GPU-s / 34 CPU-s**. Native wait 96739 ended; events acknowledged.
 
-Both recorded supervisors/process groups are absent; relevant task claims empty,
+3. **`20261101T081828Z-d70bc44f` — complete, full-audited, gpu6 exclusive.**
+   Source/spec above, full 105.5921 s, projected 173.8745 s <195 s allowance.
+   All 12 full checks pass; maximum control discrepancy 5.227327e-5 <0.001.
+   Audit code `142b6cc5` corrects frozen extra-argument positional binding;
+   initial 0.129421 CPU-s audit failure is preserved, fresh successful audit
+   used 0.140220 CPU-s, no score/spec/tolerance change. Native wait 67073 ended;
+   terminal event `48e93fc725d7528a91c612b39a44ecee` acknowledged.
+
+All recorded supervisors/process groups are absent; relevant task claims empty,
 verified read-only. No process was signaled. Failed host-local scratch is retained;
 automatic salvage was explicitly deferred to prevent unbudgeted copying.
 Never replay either request or delete their artifacts.
 
-Closed amendment: **67 / 300 GPU-s; ≤87 / 300 CPU-s** including a conservative
-20 CPU-s preparation/publication charge. No reservation remains. Cumulative W8:
-**67 / 3,600 GPU-s; ≤937 / 3,600 CPU-s**. Remaining original headroom is
-3,533 GPU-s and at least 2,663 CPU-s; it does not override the internal stop rule.
+The original 300/300 amendment closed after 67 GPU-s / ≤87 CPU-s. Subsequent
+user-approved inclusive 450/450 scoring closeout is **224 GPU-s / ≤304 CPU-s**:
+prior 67 + 157 for the request, plus 30 for monitoring + 10 for audit + 40 for all preparation (includes
+prior 20). This is inside original 3,600/3,600, not extra budget. Original local
+≤850 CPU-s + 304 for scoring + 15 for runtime preflight = **≤1,169 CPU-s**; 224 GPU-s.
+No scoring reservation remains. No balance transfers to other cards.
 
 ## Code, fleet and manuscript
 
 PR #318 merged `538b1022`, PR #319 merged `1b282587`, PR #320 merged `02c6c10e`.
-PR #321 (cost reallocation) passed CI on exact `67291ddb`, run 41285565801;
-final result/continuation documentation is being published on
-`codex/w8-cost-reallocation-2026-11-01`. Inspect current PR/head before claiming
-the final merged state. Focused tests/Ruff pass; seven unrelated Mac mypy errors
-remain. Earlier full pytest has the same thirteen Mac baseline failures.
+PR #321 merged `b014067c`; exclusive-policy PR #322 merged `f5597299` after
+CI passed on exact `c0f25e4e`. Current results/auditor branch is
+`codex/w8-exclusive-results-2026-11-01`, auditor commit `142b6cc5`. Input-oracle
+implementation remains under review; do not infer it is dispatch-ready from
+local tests. Focused tests/Ruff pass; mypy retains the same seven unrelated
+Mac errors. Earlier full pytest has the same thirteen Mac baseline failures.
 
 Manager release `20261101T071313Z-74a9271d` runs commit `a5fdb235` on gpu2/5/6.
 Verified bundle SHA256
@@ -95,12 +120,13 @@ and all three native binaries were checked; all scientific imports came from
 clean frozen source. Source/input artifacts and diagnostics are referenced in
 [W8](experiments/w8-wire-audit.md) and its amendment input directory.
 
-Overleaf main remains **`e366440`**, local
+Overleaf main is **`7a7381e31526c304af16da79dfd96941c0d4a6e9`**, local
 `/private/tmp/pointstream-w7-manuscript`, tracking `overleaf/main`; original server
 checkout is untouched. Reviewed PDF `build/main.pdf`: **22 pages body/references
 and 3 online appendix pages**, within user's 23+5. Negative hand/object representation
-results and mixed-metric ego adaptation are included; no cost stop is presented
-as a quality negative. [Readiness](paper/readiness-2026-11-01.md) and the evidence
+results, hand-transfer/reference-bank limits, the passing conditional W8
+saved-quality screen and mixed-metric ego adaptation are included; no cost stop
+is presented as a quality negative. [Readiness](paper/readiness-2026-11-01.md) and the evidence
 matrix distinguish other submission gaps from deferred PLAN research. The paper
 is not submission-ready. No recurring timer/cache keepalive or active task-owned
 experiment remains. Cache lifetime is unknown.
