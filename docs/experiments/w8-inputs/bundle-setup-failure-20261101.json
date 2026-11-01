@@ -1,0 +1,13 @@
+{
+  "stage": "KPS2 decode",
+  "status": "failed",
+  "exception": "RuntimeError: this mask file is zstd-compressed; install zstandard",
+  "environment": "/Users/manu/miniconda3/envs/tigas/bin/python",
+  "cpu_seconds_upper_bound_conservative": 1,
+  "wall_seconds_upper_bound": 1,
+  "cpu_limit_s": 180,
+  "wall_limit_s": 300,
+  "candidate_built": false,
+  "rate_evaluated": false,
+  "retry": "not attempted"
+}

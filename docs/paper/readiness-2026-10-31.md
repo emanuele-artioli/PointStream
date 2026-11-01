@@ -1,5 +1,9 @@
 # Manuscript readiness, 2026-10-31
 
+Historical snapshot. See the [2026-11-01 readiness audit](readiness-2026-11-01.md)
+for the separately approved W8 outcome, full task audit, expanded negative
+evidence and corrected 23+5 page allowance.
+
 Overleaf main is `a3e2888dff74d6c07e1cd73d10b5dc711bd994b0`. The original October empirical draft's abstract, introduction, evaluation and conclusion now include the corrected foreground-first experiment and its limitations. Figure 3 shows the independently audited repaired comparison; the former figure remains preserved. The manuscript remains **a qualified working draft, not submission-ready**.
 
 The reviewed PDF is `/private/tmp/pointstream-w7-manuscript/build/main.pdf`, built from the independent local manuscript clone at that path. It has 23 pages, including three appendix pages, within the project limit. The empirical checker and figure renderer pass. Parent and delegate inspected the rendered results pages; the final appendix had also been inspected. NumPy, SciPy and Matplotlib are available through `/Users/manu/miniconda3/bin/python` for these presentation tools. The server checkout was left untouched; Overleaf pushes were ordinary fast-forwards.

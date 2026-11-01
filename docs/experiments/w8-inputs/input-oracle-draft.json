@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.w8_input_job"
+  ],
+  "arguments": [
+    "run",
+    "--transport",
+    "{staged:transport}",
+    "--prepared",
+    "{staged:prepared}",
+    "--recipe",
+    "0:240:3",
+    "--windows",
+    "{windows}",
+    "--deny-source",
+    "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4"
+  ],
+  "staged_inputs": [
+    {
+      "name": "transport",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T171359Z-aba3845f/full/published.tar",
+      "sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+      "extract": false
+    },
+    {
+      "name": "prepared",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T162058Z-c9b2c47b/full/published.tar",
+      "sha256": "94a5d6318fc113557fb24c8a32f2edffdf368f7a289484fddd4b19a749302bfa",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T171359Z-aba3845f/full/published.tar",
+      "sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T162058Z-c9b2c47b/full/published.tar",
+      "sha256": "94a5d6318fc113557fb24c8a32f2edffdf368f7a289484fddd4b19a749302bfa"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.w8_input_job",
+    "validate"
+  ],
+  "deadline": "2026-11-02T12:00:00+00:00",
+  "verify_staged_inputs": true,
+  "stall_seconds": 180,
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "local_storage_gib": 10,
+  "scale": {
+    "windows": {
+      "smoke": 1,
+      "full": 1
+    }
+  },
+  "smoke": {
+    "seconds": 180,
+    "representative_basis": "The complete 240 ticks and both actual player units exercise the same packet decoder and exact validator as the full fresh-process repeat; smoke is not quality evidence."
+  },
+  "full": {
+    "seconds": 180
+  },
+  "validator_seconds": 90,
+  "budget_seconds": 650
+}

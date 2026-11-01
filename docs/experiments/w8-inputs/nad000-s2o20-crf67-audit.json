@@ -1,0 +1,57 @@
+{
+  "scope": "read-only saved trial and control metadata audit; no decode, encoding, scoring or quality result",
+  "encoder_job": "20261031T181055Z-e4dc2d25",
+  "encoder_archive_sha256": "9736920b256b2b770c3b35e8784570a50df2720115fbb134970439adea4240f0",
+  "archive_verification": "root reader streamed and hashed original archive; see /private/tmp/w8-prospective-upper-trial-20261101/recovery.json",
+  "reader_cpu_seconds": 0.038968,
+  "encodes_member_sha256": "21834c1b0c3905c5fa9d9d06c7127f68154d1af323d5e2854057da442ec2f519",
+  "trial": {
+    "member": "publish/streams/s2_o20_crf67.ivf",
+    "bytes": 29804,
+    "sha256": "182c7eee4a0ea2e98ef0a967ecfcdf8958898ad7ce035e54f0ea91b5109b6fa3",
+    "decoded_sha256_recorded": "71b3ee98cc83349d6377394e5003ae2da872c0e4a0e3a56685eed3a81a7dfe9f",
+    "roi_sha256_recorded": "f00e397789e9aa23b096e5cec18dfdb04e08663a44bb4978638cb52c1593ac98",
+    "scale": 2,
+    "size": [
+      960,
+      544
+    ],
+    "frames": 240,
+    "fps": [
+      50,
+      1
+    ],
+    "offset": -20,
+    "outside": true,
+    "crf": 67,
+    "rate_kbps": 49.67333333333334
+  },
+  "source_sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d",
+  "transport_sha256": "d80fac2ab880743e100a90a0dbb46af6173bc2479389a6d8f75663578b9db017",
+  "controls_archive_sha256": "6496e427f4aa282c1a77acd0924685ded8d5323a11ca6df757b3bd9e598a8030",
+  "controls": [
+    {
+      "scale": 8,
+      "member": "publish/streams/control_s8_crf63.ivf",
+      "bytes": 13009,
+      "sha256": "2408423bb48b498f3a8cc163e6cfcc0d759f5cebf0db135446a561770c2a7043",
+      "decoded_sha256_recorded": "4897e730ea1aec82c0b9435aad3bf1b190890d4f64c7e40f5edfd2211bd327ed"
+    },
+    {
+      "scale": 4,
+      "member": "publish/streams/control_s4_crf63.ivf",
+      "bytes": 21963,
+      "sha256": "f9622b6af4cddea3d70226c0b22e12374f4c77aadf2120e54d5d21ba55bfbbb8",
+      "decoded_sha256_recorded": "7490edf9b678db805c23baae49a2a3b5e9d7b037b18dd216320aad47a061beff"
+    },
+    {
+      "scale": 2,
+      "member": "publish/streams/control_s2_crf63.ivf",
+      "bytes": 43993,
+      "sha256": "0cdd1eb218fdc8cb2a164a68111e244c0248a830e8cf4b888084d28d4e99bd91",
+      "decoded_sha256_recorded": "595dec08236aafe895dc9d3a02eafe8f9f7b2811e0e3332426203a823193e237"
+    }
+  ],
+  "selection_sha256": "4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0",
+  "unresolved": "The stream has not been independently decoded or scored; saved decoded and ROI hashes are metadata identities. No quality result or stop-rule amendment is implied."
+}
