@@ -87,6 +87,21 @@ def test_worker_must_publish_every_expected_match_tensor():
         job.check_worker_match({'match_tensors': changed}, {'tensor_fingerprints': fingerprints})
 
 
+def test_cpu_bootstrap_receipt_requires_exact_bytes_and_real_denial():
+    import errno
+    from experiments.tennis import w8_input_job as job
+
+    expected = job.digest(np.array([-1.0, -0.0, 1.0], np.float32).tobytes()
+                          + np.array([0.5, -0.0, 1.5], np.float16).tobytes())
+    record = {'before_landlock_sha256': expected, 'after_landlock_sha256': expected,
+              'cpuinfo_denied_errno': errno.EACCES}
+    job.check_bootstrap_receipt(record)
+    for name, value in [('before_landlock_sha256', 'changed'), ('after_landlock_sha256', 'changed'),
+                        ('cpuinfo_denied_errno', errno.ENOENT)]:
+        with pytest.raises(ValueError, match='bootstrap'):
+            job.check_bootstrap_receipt({**record, name: value})
+
+
 def test_installed_worker_guider_requires_exact_file_and_profile(tmp_path, monkeypatch):
     from experiments.tennis import w8_input_job as job
 
@@ -203,6 +218,7 @@ def test_fixed_run_launches_separate_isolated_worker_and_validator(tmp_path, mon
     monkeypatch.setattr(job.os, 'access', lambda *_: True)
     monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '')
     monkeypatch.setenv('PS_SCRATCH_DIR', str(tmp_path))
+    monkeypatch.setenv('TMPDIR', str(tmp_path))
     monkeypatch.setattr(job, 'publish_fixed_outputs', lambda *_: None)
     calls = []
     def run(command, **kwargs):
@@ -215,6 +231,7 @@ def test_fixed_run_launches_separate_isolated_worker_and_validator(tmp_path, mon
     assert calls[0][0][calls[0][0].index('--guider') + 1] == str(paths['guider'])
     assert all(call[1]['close_fds'] is True and call[1]['stdin'] == job.subprocess.DEVNULL for call in calls)
     assert 'HOME' not in calls[0][1]['env'] and calls[0][1]['env']['CUDA_VISIBLE_DEVICES'] == ''
+    assert calls[0][1]['env']['XDG_CACHE_HOME'] == str(tmp_path) == calls[0][1]['env']['TORCH_HOME']
 
 
 def test_publication_contains_only_checked_outputs_and_detects_tampering(tmp_path):

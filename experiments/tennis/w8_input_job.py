@@ -228,6 +228,29 @@ def pinned_profile(path: Path) -> dict[str, Any]:
     return result
 
 
+def synthetic_torch_bootstrap(torch: Any) -> str:
+    """Initialize CPU dispatch with synthetic decoder operations, without model data."""
+    fp16 = np.array([0.5, -0.0, 1.5], dtype=np.float16)
+    symbols = np.array([-2, 0, 2], dtype=np.int8)
+    scales = torch.from_numpy(fp16.copy()).float()
+    q = torch.from_numpy(symbols.copy()).float()
+    value = q * scales[0]
+    value = torch.where(torch.tensor([False, True, False]), -torch.zeros_like(value), value)
+    actual = value.contiguous().numpy().tobytes()
+    expected = np.array([-1.0, -0.0, 1.0], dtype=np.float32).tobytes()
+    if actual != expected or scales.half().contiguous().numpy().tobytes() != fp16.tobytes():
+        raise RuntimeError('synthetic CPU decoder arithmetic changed')
+    return digest(actual + fp16.tobytes())
+
+
+def check_bootstrap_receipt(record: dict[str, Any]) -> None:
+    expected = digest(np.array([-1.0, -0.0, 1.0], dtype=np.float32).tobytes()
+                      + np.array([0.5, -0.0, 1.5], dtype=np.float16).tobytes())
+    if (record.get('before_landlock_sha256') != expected or record.get('after_landlock_sha256') != expected
+            or record.get('cpuinfo_denied_errno') not in (errno.EACCES, errno.EPERM)):
+        raise ValueError('synthetic CPU bootstrap or cpuinfo denial not established')
+
+
 def fixed_worker(bundle: Path, profile_path: Path, guider: Path, output: Path, forbidden: list[Path], parent_net: str) -> None:
     """Consume only the fixed payload after namespace and read isolation."""
     if sys.platform != 'linux':
@@ -252,6 +275,10 @@ def fixed_worker(bundle: Path, profile_path: Path, guider: Path, output: Path, f
     torch.set_num_interop_threads(1)
     if np.__version__ != '1.26.4' or cv2.__version__ != '4.10.0':
         raise ValueError('original preparation NumPy/OpenCV versions required')
+    with Path('/proc/cpuinfo').open('rb') as cpuinfo:
+        if not cpuinfo.read(1):
+            raise RuntimeError('cpuinfo pre-isolation probe is empty')
+    before_bootstrap = synthetic_torch_bootstrap(torch)
     output.mkdir(parents=True, exist_ok=False)
     allowed = _allowed_read_paths(bundle, output, forbidden)
     if any(p.resolve() == profile_path.resolve() or profile_path.resolve().is_relative_to(p.resolve()) for p in forbidden):
@@ -263,6 +290,19 @@ def fixed_worker(bundle: Path, profile_path: Path, guider: Path, output: Path, f
     from experiments.tennis.k6b_receiver_sam import restrict_reads
 
     abi = restrict_reads(allowed)
+    try:
+        with Path('/proc/cpuinfo').open('rb') as cpuinfo:
+            cpuinfo.read(1)
+    except OSError as exc:
+        if exc.errno not in (errno.EACCES, errno.EPERM):
+            raise RuntimeError('cpuinfo probe did not prove read denial') from exc
+        cpuinfo_denied = exc.errno
+    else:
+        raise RuntimeError('cpuinfo remained readable after isolation')
+    bootstrap = {'before_landlock_sha256': before_bootstrap,
+                 'after_landlock_sha256': synthetic_torch_bootstrap(torch),
+                 'cpuinfo_denied_errno': cpuinfo_denied}
+    check_bootstrap_receipt(bootstrap)
     denied = {}
     for path in forbidden:
         try:
@@ -290,7 +330,7 @@ def fixed_worker(bundle: Path, profile_path: Path, guider: Path, output: Path, f
         np.savez_compressed(path, **arrays[name])
         hashes[name] = digest(path.read_bytes())
     write_json(output / 'worker.json', {'bundle_sha256': WINDOW_SHA, 'profile_sha256': PROFILE_SHA,
-               'hashes': hashes, 'bindings': bindings, 'match_tensors': fingerprints,
+               'hashes': hashes, 'bindings': bindings, 'match_tensors': fingerprints, 'cpu_bootstrap': bootstrap,
                'numpy': np.__version__, 'opencv': cv2.__version__,
                'cpu_s': cpu_seconds(), 'isolation': {'landlock_abi': abi, 'denied': denied,
                'allowed': [str(p) for p in allowed], 'network_namespace_distinct': True,
@@ -351,6 +391,7 @@ def validate_fixed(stage: Path, decoded_dir: Path, temporary_root: Path) -> dict
     paths, forbidden = fixed_inputs(stage)
     profile = pinned_profile(paths['profile'])
     result = json.loads((decoded_dir / 'worker.json').read_text())
+    check_bootstrap_receipt(result['cpu_bootstrap'])
     launch = json.loads((stage / 'fixed-launch.json').read_text())
     isolation = result['isolation']
     if (result['bundle_sha256'] != WINDOW_SHA or result['profile_sha256'] != PROFILE_SHA
