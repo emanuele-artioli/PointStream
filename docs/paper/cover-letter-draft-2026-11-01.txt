@@ -1,6 +1,6 @@
 EDITORIAL NOTE — DRAFT, NOT SENT
 
-Update the description if the pending fresh-decoder witness changes the evidence. Before filing, the authors must review the final letter and complete the submission system's applicable declarations; this draft does not assert facts about concurrent review, coauthor approval or permissions.
+The bounded fresh-decoder attempt stopped during CUDA initialization before generation; the manuscript retains that limitation. Before filing, the authors must review the final letter and complete the submission system's applicable declarations; this draft does not assert facts about concurrent review, coauthor approval or permissions.
 
 Dear Editors,
 

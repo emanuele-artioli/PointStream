@@ -2,6 +2,12 @@
 
 The current amendment checkpoint is first; earlier records remain below. The protocol and entry template are in [experiments.md](../experiments.md).
 
+### 2026-11-01 — Empirical manuscript package prepared; no further experiment
+
+- Pushed manuscript **b9102fb10b8a65aa5921580856d95f37a81be9aa** retains the CPU input proof, conditional saved-quality result and explicit failed GPU initialization/fresh-quality boundary. Evidence is pinned publicly to48a95400f307. GenStream/PRESLEY relations, ATHENA, four AI tools in acknowledgment/methods and incomplete YouTube metadata are integrated. Genuine ACM style replaces the historically mislabeled archival IEEE dependency; both format checks fit23main/reference+3appendix pages. Checker26citations and5registry tests pass, with no final overfull/undefined reference.
+- Immutable author-review package `/private/tmp/pointstream-submission-20261101-b9102fb/`: PDFSHA5880189891733a2b7cc2c447b49ab5b7cccbb12f8af9e417a184ca7e825f55a9; sourceZIPfa51f1b376f268f3f36e8e72047f8da53f1cb82a81af299887f4a76dcecd8e5d; manifest8af3acbd…. The18-file source ZIP includes genuine style and a fresh ordinary latexmk/BibTeX rebuild exactly matches normalized text/pages. Oldf68 packet marked superseded, no raw material deleted. Cover letter remains an unsent draft.
+- All W8 resource/claim/process/wait/event closure below remains unchanged. No new experiment or retry is admitted. Remaining author facts are final approval, concurrent-review status and live TOMM portal format/anonymity; a final text question was sent. No answer or submission authority is inferred. Technical preparation for the supported empirical scope is complete; no paper was submitted.
+
 ### 2026-11-01 — Replacement closed; fresh-generation gate remains unqualified
 
 - Root accepts the [terminal diagnosis and resource closeout](w8-inputs/receiver-20261101/cost-df638-closeout-summary.json) and [scope decision](w8-inputs/receiver-20261101/cost-df638-root-acceptance.json). Sole approved replacement **`20261101T151030Z-df638d2f`** failed on exclusive gpu6 Ada0 UUIDGPU-dbbb295f… during CUDA initialization: `cudaGetDeviceCount` error2 reported out-of-memory, then `CUDA unavailable`. The underlying cause is unresolved; this does not establish physical GPU memory exhaustion. The real packet worker succeeded; no model construction, representative kernel profiling or sampling occurred, so there is no new generated output, quality result or valid1/3-step cost slope.

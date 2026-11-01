@@ -19,11 +19,11 @@ does not turn unmeasured comparisons into completed evidence.
   beside DISTS/PSNR gains; post hoc selections and failed decodes are disclosed.
   A cost-stopped smoothing pilot and absent racket masks are not presented as
   quality negatives. See [negative-evidence audit](negative-evidence-2026-11-01.md).
-- Overleaf main `5fe009ae71e13bafe34397cd86669cc909be6716` includes that appendix, the
+- Overleaf main `b9102fb10b8a65aa5921580856d95f37a81be9aa` includes that appendix, the
   hand-transfer/reference-bank negatives and the passing conditional W8
   saved-quality screen described below.
-  PDF `/private/tmp/pointstream-w7-manuscript/build/main.pdf`: **25 pages,
-  body plus references 1–22, Online Appendix 23–25**. This meets the user's and
+  PDF `/private/tmp/pointstream-w7-manuscript/build/main.pdf`: **26 pages,
+  body plus references 1–23, Online Appendix 24–26**. This meets the user's and
   TOMM guide's allowance of **23 + 5 additional appendix pages**. The empirical
   checker passes; modified results and appendix pages were visually reviewed;
   no overfull/undefined-reference warning remains. Venue-specific review format
@@ -73,38 +73,18 @@ The approved sole replacement `20261101T151030Z-df638d2f` stopped and is closed.
 
 The root-accepted phase charge is ≤292 CPU-s /188 GPU-s, including 64 CPU-s preallocation, 188 s one-core campaign wall, 20 CPU-s audit and 20 CPU-s monitoring. Original W8 cumulative is **≤2,457/3,600 CPU-s and 540/3,600 GPU-s**, leaving at least 1,143 CPU-s and 3,060 GPU-s in the accounting envelope. Historical administrative-inspection CPU telemetry uncertainty remains disclosed in W8; these are not invented aggregate measurements. A CUDA-only diagnostic is a future proposal, not authorized.
 
-The author-approved empirical paper closes on its CPU input proof and conditional saved-quality results, with the fresh-decoder limitation visible. A full witness is not mandatory for the retained claims. Final W8 note and artifact pin are being prepared separately; do not invent a final identity. Complete final PDF, marker-registry, citation and evidence checks plus author filing review before requesting submission authority.
+The author-approved empirical manuscript is technically prepared at pushed Overleaf **b9102fb10b8a65aa5921580856d95f37a81be9aa**. The final W8 stop and fixed48a95400f307 evidence link are visible. Title, abstract, conclusions, numerical scope and all38 limitation-marker dispositions agree with the retained empirical framing; a full fresh codec qualification is not asserted.
 
-Overleaf main/local manuscript is **5fe009ae71e13bafe34397cd86669cc909be6716**: confirmed author block, ATHENA, ELVIS/GenStream/PRESLEY, four-tool AI disclosure and bounded YouTube provenance statement. PointStream is an independent paper building directly on GenStream and less on PRESLEY, not a conference extension; MoQSplat/TIGAS were omitted as indirect. Review PDF 22 body/reference +3 appendix pages; isolated small-format probe 23+3. PR #325 merged `06ce6374` after exact `044425c6` CI passed; current source-repair branch has uncommitted documentation and unchanged runtime. Live venue workflow is unverified, cover letter is an unsent draft, concurrent-review status is not explicitly confirmed, and submission needs explicit authority.
+The genuine ACM Transactions bibliography style is pinned at SHAee0d9fd846b95ca8b9b7721e8d9aaa066c64c9e7a61284c6315cfbb844794a39. The older archive's IEEE-derived style is preserved and explicitly excluded. Native clean review and isolated small-format builds both fit **23 body/reference +3 appendix pages**. The empirical checker passes26 citation keys; all five marker-registry tests pass. Reflowed pages and references were visually reviewed; no final overfull or undefined citation/reference remains. Optional/unverified bibliography fields are not invented; the primary metadata checks explain them.
+
+The immutable [review PDF](/private/tmp/pointstream-submission-20261101-b9102fb/PointStream-review.pdf), [source ZIP](/private/tmp/pointstream-submission-20261101-b9102fb/PointStream-source.zip), cover draft, README and manifest are prepared. A fresh ordinary latexmk/BibTeX rebuild used the included genuine style and exactly matched normalized PDF text and the23+3 split. Source ZIP has18 active files, no archive/private history/raw media. The oldf68 package is marked superseded. [PR326](https://github.com/emanuele-artioli/PointStream/pull/326) records the final evidence/preparation; its CI/merge state is authoritative there. No experiment is live.
 
 ## What remains for submission
 
-1. **Claim and evidence:** retain W7's inconclusive unseen-match interval at
-   two hours, original Med-family omissions, correlated-window uncertainty,
-   whole-frame losses, and W9's conditional measured-duration range. Neither
-   the modeled rate nor the assembled bytes establish a complete codec.
-2. **Fresh reconstruction:** the empirical paper retains this as an explicit
-   limitation; a complete witness is not mandatory for its current bounded
-   claims. A stronger fresh-decoder claim would need validated reconstruction
-   under the specified inputs, payload, isolation and offline output contract.
-   Full-rate, sustained-reference and live claims require separate evidence.
-3. **Other current holes:** matched ablations, a qualified generative peer,
-   historical benchmark/source recertification, independently labelled all-frame
-   egocentric tasks, and clean operational timing must be resolved for claims
-   that rely on them or remain explicit limitations. The evidence matrix names
-   the exact artifacts and gaps; this is not a claim that all are mandatory
-   experiments for an honestly narrowed empirical study.
-4. **Author facts:** the user confirmed names/order/affiliation, ATHENA, the four
-   AI tools and the independent prior-work relationship; disclosures are in the
-   paper. Source-specific permissions remain unknown and the bounded provenance
-   search did not resolve the full archive. Concurrent-review status was not
-   explicitly answered. The [inventory](author-statements-2026-11-01.md) retains
-   the concrete evidence and limits.
-5. **Final publication review:** reconcile abstract/conclusions and all active
-   markers with the chosen contribution, audit references/rights/provenance,
-   verify format and final PDF, and obtain explicit authority to submit.
+1. **Author filing review:** confirm all four authors reviewed/approve the exact final PDF and whether it is currently under review elsewhere. Names/order/affiliation, ATHENA, requested AI tool names and the independent GenStream/PRESLEY relationship were already confirmed and integrated. The final text question links the frozen PDF; no answer is inferred.
+2. **Current portal requirements:** confirm TOMM's live review format/anonymity and required form declarations. Current venue pages were inaccessible. Both prepared format checks fit23+5; this does not certify a portal requirement. No invented publication metadata is active.
+3. **Rights/provenance judgment:** source-specific tennis upload/licensing metadata remain incomplete as explicitly disclosed. The bounded search did not exhaust the large archive manifest, and no legal permission or ethics conclusion is inferred. The figures are plots/a diagram; no raw evaluated video is redistributed in the prepared paper/source package. Authors must judge applicable requirements for the actual material and filing.
 
-W6b smoothing, W9 live adaptation, W10 new generators/larger training, W11 racket
-tracking/rendering, historical broad final sweeps and tooling migration remain
-deferred or separately gated. Existing closed budgets do not authorize reopening
-them. The paper remains **a qualified working draft, not submission-ready**.
+W7's inconclusive unseen-match rule, Med omissions, whole-frame losses, correlation/overlap, modeled reuse, temporal artifacts and incomplete fresh decoding remain visible limitations. Matched ablations, generative peers, independent all-frame labels and operational claims are unqualified where evidence is missing. W6b, W9 live adaptation, W10, W11, broad historical sweeps and tool migration remain deferred or separately gated; none is silently promoted or automatically funded.
+
+**Technical manuscript preparation is complete for the bounded empirical scope. Filing awaits the author/portal confirmations above and explicit authority to submit.** No paper has been submitted; no new compute is authorized.

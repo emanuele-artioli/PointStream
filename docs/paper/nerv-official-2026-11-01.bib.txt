@@ -1,0 +1,11 @@
+@inproceedings{NEURIPS2021_b4418237,
+ author = {Chen, Hao and He, Bo and Wang, Hanyu and Ren, Yixuan and Lim, Ser Nam and Shrivastava, Abhinav},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {M. Ranzato and A. Beygelzimer and Y. Dauphin and P.S. Liang and J. Wortman Vaughan},
+ pages = {21557--21568},
+ publisher = {Curran Associates, Inc.},
+ title = {NeRV: Neural Representations for Videos},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2021/file/b44182379bf9fae976e6ae5996e13cd8-Paper.pdf},
+ volume = {34},
+ year = {2021}
+}

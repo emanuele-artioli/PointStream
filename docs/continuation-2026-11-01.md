@@ -1,4 +1,4 @@
-# Continuation, 2026-11-01: cost pilot closed; empirical paper proceeds
+# Continuation, 2026-11-01: empirical review package prepared; author filing checks remain
 
 **Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
 Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library
@@ -13,28 +13,11 @@ full cached-environment, sustained-reference or live-rate claim.
 
 The root-accepted phase charge is ≤292 CPU-s /188 GPU-s, including 64 CPU-s preallocation, 188 s one-core campaign wall, 20 CPU-s audit and 20 CPU-s monitoring. Original W8 cumulative is **≤2,457/3,600 CPU-s and 540/3,600 GPU-s**, leaving at least 1,143 CPU-s and 3,060 GPU-s in the accounting envelope. Historical administrative-inspection CPU telemetry uncertainty remains disclosed in W8; these are not invented aggregate measurements. A CUDA-only diagnostic is a future proposal, not authorized.
 
-The author-approved empirical paper closes on its CPU input proof and conditional saved-quality results, with the fresh-decoder limitation visible. A full witness is not mandatory for the retained claims. Final W8 note and artifact pin are being prepared separately; do not invent a final identity. Complete final PDF, marker-registry, citation and evidence checks plus author filing review before requesting submission authority.
+The empirical manuscript is technically prepared at pushed Overleaf **b9102fb10b8a65aa5921580856d95f37a81be9aa**. It includes the final W8 runtime-stop qualification and public evidence pin48a95400f307, direct GenStream/lesser PRESLEY relationship, ATHENA, four AI tools in acknowledgment and methods, and incomplete YouTube upload/licensing metadata. Genuine ACM style SHAee0d9fd846b95ca8b9b7721e8d9aaa066c64c9e7a61284c6315cfbb844794a39 replaces the mislabeled historical IEEE dependency; the old archive remains untouched. Normal and small-format builds both23+3. Checker26 citations, five marker-registry tests, page/visual checks pass; optional bibliographic metadata warnings are documented without invented fields.
 
-Overleaf main is `5fe009ae71e13bafe34397cd86669cc909be6716` with confirmed authors, ATHENA, ELVIS/GenStream/PRESLEY, four-tool AI disclosure and bounded YouTube provenance statement. PointStream is independent, builds directly on GenStream and to a lesser extent PRESLEY, and is not a conference extension; MoQSplat/TIGAS were omitted as indirect. Review PDF 22+3; isolated small-format probe 23+3. PR #325 merged `06ce6374` after exact `044425c6` CI passed; current `codex/w8-source-repair-2026-11-01` documentation is uncommitted and runtime unchanged. Cover letter is a draft, unsent. Concurrent-review status is not explicitly confirmed; submission needs explicit authority.
+Final package `/private/tmp/pointstream-submission-20261101-b9102fb/` has immutable PDF58801898…, source ZIPfa51f1b3… (18 active files including actual ACM BST), cover-letter DRAFT, README and manifest8af3acbd…. Fresh ordinary latexmk/BibTeX source rebuild matches the PDF's normalized text and23+3 split. Oldf68 package is marked superseded. [PR326](https://github.com/emanuele-artioli/PointStream/pull/326) records source evidence/preparation; consult its live CI/merge status. Source044425c6 passed complete CI; no runtime changes were introduced in this documentation phase.
 
-Submission local handle `54766` completed exit0; the canonical client record is
-`/Users/manu/.pointstream/fleet/jobs/20261101T135101Z-d67fe593.json`.
-The first exact-ID status command, handle `21660`, exited zero and found the
-request terminal failed at its correctness smoke. Its raw output is
-`/private/tmp/w8-cost-initial-status-d67fe593-20261101.json`; no wait or replay is
-needed. Read-only diagnosis and resource/lifecycle closeout are complete.
-The actual source snapshot is preserved at
-`/private/tmp/w8-cost-source-b581-frozen-20261101.tar`. The exact spec and source
-freeze are under `docs/experiments/w8-inputs/receiver-20261101/`.
-
-CPU qualification: raw receipts at
-`/private/tmp/w8-receiver-full-audit-b581-v2-20261101/receipts`; root acceptance
-`616abd67…`, partial audit `8108c849…` and current lifecycle `3fee152a…` retain
-the missing historical-PGID boundary. Actual child CPU18.236780 s; closed at51 s
-including the parent and complete audit/closeout reserves. Shared prerequisites
-are immutable under
-`Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/`:
-bundle `ab5f1b93…`, identity `0953c528…`, original oracle `8047b676…`.
+**Next requires author facts:** all four authors' review/approval of exact revisionb9102fb, whether the paper is currently under review elsewhere, and the live TOMM filing format/anonymity requirements (current instructions inaccessible here). A text question was sent with the frozen PDF link; elapsed time or UI defaults are not confirmation. Source-specific permissions remain unknown/disclosed; no legal clearance is claimed. No paper may be submitted without explicit instruction. No new research, GPU retry or30-step run is authorized by unused budget. All our experiment processes, claims, waits and timers are closed; cache lifetime is unknown. Native completion after returning chat remains unverified; no background watcher is left by this phase.
 
 ## Immutable scientific state
 
@@ -123,11 +106,4 @@ and all three native binaries were checked; all scientific imports came from
 clean frozen source. Source/input artifacts and diagnostics are referenced in
 [W8](experiments/w8-wire-audit.md) and its amendment input directory.
 
-The manuscript is pushed at `5fe009ae71e13bafe34397cd86669cc909be6716`.
-The user confirmed the author block and requested ATHENA acknowledgment and
-organic self-citations, now integrated. No authority to submit has been given.
-The current review/alternate-format page counts are 22+3 and23+3. No recurring
-model timer/cache keepalive is active; cache lifetime is unknown. Native
-completion after returning the chat remains unverified, so execution is attended.
-
-Next: integrate the separately prepared final W8 limitation and artifact pin, then run final manuscript PDF, registry, citation and evidence checks and complete author filing review. A complete fresh witness is not required for the bounded empirical claims; a CUDA-only diagnosis is a separate unauthorized future proposal. Do not replay the closed request or start a 30-step run. Submission requires author approval.
+The current manuscript/package identities and remaining author filing checks are recorded at the top. Historical W7 evidence above remains unchanged. The cover letter is a draft and has not been sent; no paper was submitted. Do not replay either closed W8 cost request or reopen deferred training/live/racket/sweep cards without their own authority.
