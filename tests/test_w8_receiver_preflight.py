@@ -40,11 +40,12 @@ def test_source_snapshot_rejects_traversal(tmp_path):
 def test_aa_source_archive_checks_installed_files(tmp_path):
     tree = tmp_path / 'installed'
     tree.mkdir()
-    (tree / 'module.py').write_bytes(b'expected')
+    (tree / 'project').mkdir()
+    (tree / 'project/module.py').write_bytes(b'expected')
     archive = tmp_path / 'aa.tar'
     _tar(archive, 'project/module.py', b'expected')
     assert preflight.verify_aa_tree(archive, tree, expected_links={}, expected_archive_sha=preflight.sha(archive))['verified_files'] == 1
-    (tree / 'module.py').write_bytes(b'changed')
+    (tree / 'project/module.py').write_bytes(b'changed')
     with pytest.raises(ValueError, match='source mismatch'):
         preflight.verify_aa_tree(archive, tree, expected_links={}, expected_archive_sha=preflight.sha(archive))
 
@@ -315,3 +316,21 @@ def test_cheap_command_verifies_config_and_refuses_reuse(tmp_path, monkeypatch):
     assert 'checked' in output.with_name(output.name + '.checkpoint.jsonl').read_text()
     with pytest.raises(ValueError, match='must be new'):
         preflight.run_cheap(config, preflight.sha(config), output, tmp_path)
+
+
+def test_aa_canonical_member_does_not_use_legacy_alternative(tmp_path):
+    tree = tmp_path / 'installed'
+    (tree / 'package/scripts').mkdir(parents=True)
+    (tree / 'scripts').mkdir()
+    canonical = tree / 'package/scripts/render.py'
+    legacy = tree / 'scripts/render.py'
+    canonical.write_bytes(b'expected')
+    legacy.write_bytes(b'legacy-different')
+    archive = tmp_path / 'aa.tar'
+    _tar(archive, 'package/scripts/render.py', b'expected')
+    result = preflight.verify_aa_tree(archive, tree, expected_links={}, expected_archive_sha=preflight.sha(archive))
+    assert result['files'] == {str(canonical): hashlib.sha256(b'expected').hexdigest()}
+    canonical.unlink()
+    legacy.write_bytes(b'expected')
+    with pytest.raises(ValueError, match='canonical installed path missing'):
+        preflight.verify_aa_tree(archive, tree, expected_links={}, expected_archive_sha=preflight.sha(archive))

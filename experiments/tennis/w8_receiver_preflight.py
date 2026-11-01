@@ -171,22 +171,21 @@ def verify_aa_tree(archive: Path, tree: Path, *, expected_links: dict[str, str] 
                 continue  # Absolute model aliases are metadata only; never resolve their target.
             if not member.isfile():
                 raise ValueError(f'unsupported AA archive entry: {name}')
-            candidates = [tree.joinpath(*parts)]
-            if len(parts) > 1:
-                candidates.append(tree.joinpath(*parts[1:]))
-            matches = [p for p in candidates if _plain_path(tree, p) and p.is_file()]
-            if len(matches) != 1:
-                raise ValueError(f'AA installed path missing or ambiguous: {name}')
+            # Archive names are canonical. Prefix-stripped legacy scripts may
+            # coexist with different bytes and must never substitute for them.
+            installed = tree.joinpath(*parts)
+            if not _plain_path(tree, installed) or not installed.is_file():
+                raise ValueError(f'AA canonical installed path missing or unsafe: {name}')
             stream = tar.extractfile(member)
             if stream is None:
                 raise ValueError('unreadable AA archive member')
             digest = hashlib.sha256()
             for block in iter(lambda: stream.read(1024 * 1024), b''):
                 digest.update(block)
-            record = stable_file_hash(matches[0])
+            record = stable_file_hash(installed)
             if record['sha256'] != digest.hexdigest():
                 raise ValueError(f'AA installed source mismatch: {name}')
-            files[str(matches[0])] = record['sha256']
+            files[str(installed)] = record['sha256']
             if checkpoint:
                 checkpoint({'kind': 'aa_regular', **record})
     current = archive.stat(follow_symlinks=False)
