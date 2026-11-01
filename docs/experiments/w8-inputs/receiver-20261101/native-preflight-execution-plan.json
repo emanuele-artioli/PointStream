@@ -1,0 +1,26 @@
+{
+  "status": "root_authorizes_one_CPU_only_native_inventory",
+  "source_revision": "5651a24bbc262ece8f0fa0bd23abb4c29ff6c9a8",
+  "source_archive_sha256": "d3fbd915d12184e99d0e7e847a268190bd81e2067aeed1f25fbc79f0d8aec7b4",
+  "launcher_sha256": "604c76ba5ae2957bda36e38bb4733b1d9c9ff8e1a2f624fe43a39ed7247409de",
+  "host": "gpu6",
+  "CPU_cap_inclusive_s": 20,
+  "GPU_s": 0,
+  "phases": {
+    "parent": 6,
+    "version": 1,
+    "decode": 9,
+    "external_and_closeout": 4
+  },
+  "wall_remote_s": 140,
+  "wall_local_s": 150,
+  "closed_W8_CPU_upper_s": 1587,
+  "closed_W8_GPU_s": 224,
+  "worst_W8_CPU_after_reservation_s": 1607,
+  "original_CPU_cap_s": 3600,
+  "original_GPU_cap_s": 3600,
+  "remote_output": "/local/users/emanuele/pointstream/audits/w8-native-preflight-5651a24b-20261101",
+  "scope": "unisolated CPU FFmpeg/libdav1d inventory and original native YUV identity; no RGB, GPU or receiver proof",
+  "prerequisite": "previous source staging reached driver; launcher independently compares its four imported files to physical frozen source archive",
+  "stop": "any source/native/provider/YUV mismatch or CPU/wall failure; inspect existing output and processes, never replay"
+}

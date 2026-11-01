@@ -1,0 +1,28 @@
+{
+  "status": "closed_timeout_without_result",
+  "script": "docs/experiments/w8-inputs/receiver-20261101/stdin-full-archive-smoke.py.txt",
+  "script_sha256": "2a01dd2945d60978562109e64a8bb76dae9f090f213aeaa7d1a37875f1d83a12",
+  "input": "/private/tmp/pointstream-w8-receiver-source-2677c179.tar",
+  "input_bytes": 10741760,
+  "input_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+  "host": "gpu6",
+  "remote_executable": "/usr/bin/python3",
+  "remote_file_writes": false,
+  "gpu_seconds": 0,
+  "cpu_caps": {
+    "local": 1,
+    "ssh": 1,
+    "remote": 1,
+    "shell_timeout_reserve": 1,
+    "total": 4
+  },
+  "remote_timeout_seconds": 18,
+  "local_timeout_seconds": 20,
+  "pass": "remote EOF and exact byte count plus SHA256, within limits",
+  "failure": "preserve receipts and inspect; no replay",
+  "scope": "transport diagnosis only; no source staging, model, decoder, inference, or qualification result",
+  "closed_W8_CPU_upper_s": 1645,
+  "worst_after_this_CPU_s": 1649,
+  "W8_GPU_s": 224,
+  "outcome": "20-s local deadline; no hash/EOF pass, one bounded remote closeout found no matching process. Charge4CPU plus5CPU closeout."
+}

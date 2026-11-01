@@ -1,0 +1,109 @@
+{
+  "status": "closed_source_staging_only",
+  "objective": "Same protected inputs; CPU-only MAIN/JCV receiver bootstrap identity qualification, with unchanged measured pilot rule.",
+  "previous_attempt": {
+    "revision": "5651a24bbc262ece8f0fa0bd23abb4c29ff6c9a8",
+    "source_archive_sha256": "d3fbd915d12184e99d0e7e847a268190bd81e2067aeed1f25fbc79f0d8aec7b4",
+    "identity_pid": 3638282,
+    "identity_exit_status": 1,
+    "identity_cpu_seconds": 0.122715,
+    "pilot_projected_cpu_seconds": 109.75556958517119,
+    "pilot_limit_cpu_seconds": 20,
+    "outcome": "failed closed; no runtime workers or GPU",
+    "closeout_receipt": "/private/tmp/w8-receiver-cpu-preflight-closeout-20261101.json",
+    "closeout": "recorded PID absent, no matching prior process; no signals",
+    "closeout_cpu_accounting": "Prior 60-second reservation plus 5-second diagnostic charge covers the earlier read-only closeout; no charge to this 165-second reservation."
+  },
+  "source": {
+    "revision": "2677c17902004dbf7a556a9e6167ce0032fec008",
+    "physical_archive_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+    "reason": "reviewed source committed and physical archive independently frozen",
+    "driver_sha256": "ca1ffc7a0589d903486939f409e7b635b6215bc1d4ec8cbdde357b989656bd3e",
+    "driver_tests_sha256": "d7ec95577fbfc7c0471b6af21ebf1bc1ffa94e9dfb4709e5fa41876c44e5bf03",
+    "note": "freeze full new source archive; do not relabel prior archive or modify it"
+  },
+  "launcher": {
+    "path": "docs/experiments/w8-inputs/receiver-20261101/cpu-bootstrap-165-launcher.py.txt",
+    "sha256": "f1b064816a3aa2bddd8acb3a719086f3a394ced5296d6191fed8fc55af855dc1",
+    "host": "gpu6",
+    "source_archive_sha256_required": true,
+    "new_remote_directory_required": true,
+    "new_local_receipt_directory_required": true,
+    "single_submission_only": true,
+    "unknown_result": "inspect existing process and artifacts; never replay"
+  },
+  "caps": {
+    "identity_cpu_seconds": 125,
+    "main_cpu_seconds": 12,
+    "jcv_cpu_seconds": 12,
+    "supervisor_cpu_seconds": 6,
+    "external_staging_monitor_audit_closeout_cpu_seconds": 10,
+    "total_cpu_seconds": 165,
+    "gpu_seconds": 0,
+    "identity_wall_seconds_max": 1200,
+    "per_runtime_wall_seconds_max": 120,
+    "remote_outer_wall_seconds": 1500,
+    "monotonic_deadline_seconds": 1490,
+    "closeout_wall_reserve_seconds": 5,
+    "external_breakdown_cpu_seconds": {
+      "new_launcher_local": 1,
+      "new_launcher_ssh": 1,
+      "remote_shell_timeout": 1,
+      "future_receipt_audit_cleanup": 7
+    },
+    "local_timeout_seconds": 1515
+  },
+  "pilot": {
+    "input_bytes": 19856141745,
+    "previous_worst_cpu_seconds_per_byte": 2.6378631591796985e-09,
+    "unchanged_safety_factor": 2,
+    "unchanged_aa_sam_cpu_reserve_seconds": 5,
+    "unscaled_note": "measured sample, not CPU or wall guarantee"
+  },
+  "budget": {
+    "original_cpu_cap_seconds": 3600,
+    "original_gpu_cap_seconds": 3600,
+    "previous_closed_cpu_seconds": 1607,
+    "parallel_native_cpu_reservation_seconds": 0,
+    "new_preflight_cpu_reservation_seconds": 165,
+    "combined_worst_cpu_seconds": 1772,
+    "gpu_consumed_or_reserved_seconds": 224,
+    "budget_transfer": false
+  },
+  "launch_arguments": [
+    "/Users/manu/miniconda3/bin/python",
+    "/Users/manu/.codex/worktrees/3cb5/PointStream/docs/experiments/w8-inputs/receiver-20261101/cpu-bootstrap-165-launcher.py.txt",
+    "--archive",
+    "/private/tmp/pointstream-w8-receiver-source-2677c179.tar",
+    "--archive-sha256",
+    "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+    "--revision",
+    "2677c17902004dbf7a556a9e6167ce0032fec008",
+    "--attempt-id",
+    "qualification-20261101",
+    "--receipt-dir",
+    "/private/tmp/w8-receiver-cpu-preflight-2677c179-20261101"
+  ],
+  "wall_gate": "Before identity, reserve both 120-second worker ceilings and five seconds; before each worker reserve subsequent ceiling and closeout. If a phase cannot fit, stop. Outer timeout applies across source staging and all stages.",
+  "preconditions": [
+    "Root reviews and commits exact source including concurrent agent changes",
+    "Root independently freezes source archive bytes, revision and config",
+    "One-core affinity and host-local storage/space checked by launcher; CPU utility claims no GPU and makes no latency claim",
+    "Prior native inventory closed and charged; no concurrent native process remains",
+    "Existing paths remain read-only; new attempt directory absent",
+    "Attended execution; no automatic retry or recurring polling"
+  ],
+  "limitations": [
+    "identity 125-second limit is not measured proof of fit",
+    "NFS wall time can exceed 1500 seconds",
+    "SAM/AA/runtime qualification fails closed on unknown install format",
+    "No GPU work, output quality, or cost-probe authorization"
+  ],
+  "source_revision": "2677c17902004dbf7a556a9e6167ce0032fec008",
+  "source_archive_sha256": "fc3846bb0c788bbe55fa1b67d71f5ef6468b64b21559ad19f3b71036ed88f635",
+  "source_archive_bytes": 10741760,
+  "closed_w8_cpu_upper_s": 1607,
+  "closed_w8_gpu_s": 224,
+  "worst_cpu_if_reserved_spent": 1772,
+  "outcome": "No archive arrived, identity/runtime phases never started; exact guarded stop and closed30CPU incl diagnostics replace unused165reservation."
+}

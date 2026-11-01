@@ -29,12 +29,24 @@ the [raw screen](docs/experiments/w8-inputs/exclusive-20261101/rate-screen.json)
 passes all eight player-metric cells for one saved window at the fixed,
 conditionally amortized 46.3151 kbps rate. The result assumes named assets are reused for 7,200 s; it
 is not fresh reconstruction, demonstrated reuse, or a W7 population-level pass.
-All scoring jobs and task claims are closed. Cumulative W8 cost is 224/3,600
-GPU-s and ≤1,169/3,600 CPU-s, including the 15 CPU-s runtime preflight. The
-complete-packet CPU input oracle remains under review; no input-oracle fleet
-job or receiver job exists. The latest [continuation](docs/continuation-2026-11-01.md) is the
-resume point. Overleaf `7a7381e3` has 22 body/reference pages and three online
-appendix pages, within the 23 + 5 allowance; the paper is not submission-ready.
+The Linux CPU input oracle `20261101T093351Z-24914a4d` passed all four
+independent checks on one profile; processes, claims and wait are closed. Golden
+qualification closed at a conservative 150 CPU-s; 15 reference files are sealed
+read-only. The subsequent bootstrap stopped at its cost projection (60+5 CPU-s),
+the first native inventory failed on transient loader-cache access (20 CPU-s),
+and the corrected native prelaunch failed before decoding (≤4 CPU-s). The 2677
+staging-only utility `61563` is terminal after guarded task-owned process stops;
+no asset/runtime/inference work began. It closes at 30 CPU-s inclusive of diagnosis;
+a 28-byte transport smoke passed at 4 CPU-s. The full-archive transport diagnostic
+`73336` timed out at 20 wall-s without a hash result; its bounded closeout found no
+matching process. Charge 4 CPU-s plus 5 closeout: W8 closed ≤1,654/3,600 CPU-s
+and 224/3,600 GPU-s, with no live reservation. Exact-source delta recovery is under
+review, not executed. Neither
+stop is a quality result; fresh generation remains unqualified. Current branch
+`codex/w8-receiver-witness-2026-11-01`, draft PR #325; CI passed for `5651`,
+run `41301707915`. See the [continuation](docs/continuation-2026-11-01.md).
+Overleaf main is `525f423`, with 22 body/reference plus 3 appendix pages; the
+isolated small-format check is also 22+3 after reference corrections. The paper is not submission-ready.
 
 **2026-10-31 accounting correction:** the W7 transport lists PNG and
 JPEG variants of two reference crops. `w7_rates.rates` counted eight files as
@@ -368,7 +380,7 @@ marked `card ready` is waiting for the user to start it.
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
 | W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-results-2026-11-01` (policy PR #322 merged) | primary plus Terra 6.1 medium delegates | complete: `20261101T081828Z-d70bc44f`, gpu6 exclusive Ada, frozen source `c0f25e4e` / spec `e9d926b6`; independent full audit and raw screen pass all 8 cells at 46.3151 kbps. Initial two cost stops preserved. Combined inclusive scoring 224 GPU-s / ≤304 CPU-s of 450/450; original total after 15 CPU-s runtime preflight: 224 GPU-s / ≤1,169 CPU-s of 3,600/3,600. Processes/claims/waits closed. No training/encoding/model/payload/quality-rule change. |
-| W8 Linux exact-input oracle | [original W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/w8-exclusive-results-2026-11-01` | primary plus Terra 6.1 medium builders | preparation: passing saved-quality rate screen reopens original gates. Corrected whole-packet/profile/paid-bitmap decoder, independent tensor/geometry validation and Linux isolation under review; legacy CLI disabled. Original MAIN NumPy 1.26.4 / OpenCV 4.10 runtime and namespace feasibility verified on gpu5, not actual Landlock/input equality. No job; proposed ≤300 CPU-s campaign + ≤40 CPU-s extra reserve needs root approval/fresh preflight/frozen source. Remaining original ≥2,431 CPU-s / 3,376 GPU-s, no transfer from other cards. |
+| W8 Linux exact-input oracle | [original W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/w8-receiver-witness-2026-11-01`, draft PR #325 | primary | exact input oracle `20261101T093351Z-24914a4d` passed independently; golden qualification closed at 150 CPU-s, 15 reference files sealed. Later bootstrap stopped on cost projection, native inventory on transient loader-cache access, corrected native prelaunch before decoding; 2677 staging-only utility `61563` closed at 30 CPU-s after guarded task-owned process stops, no runtime/inference. Tiny transport smoke passed; full transport hash `73336` timed out and closed with no matching process; W8 closed ≤1,654 CPU-s /224 GPU-s, no live reservation. Exact-source delta recovery under review, not executed. No new GPU job or receiver qualification; CI for 5651 passed, run 41301707915. |
 | W8 approved upper-baseline amendment (historical, followed by exclusive repair) | [coverage follow-up](docs/experiments/w8-inputs/prospective-coverage-followup.md) | `codex/w8-cost-reallocation-2026-11-01` (predecessor PR #320 merged) | primary plus Terra 6.1 medium delegates | stopped 2026-11-01: first request `20261101T071706Z-afde26d5` passed correctness but failed cost projection, second `20261101T073429Z-04a50c10` hit its smoke limit on shared GPU; both terminal/claims released, no full quality point or third run. Amendment ≤87 CPU-s/67 GPU-s of 300/300; cumulative W8 ≤937 CPU-s/67 GPU-s of 3,600/3,600. Subsequent exclusive-GPU 450/450 inclusive scoring-cap amendment approved; its distinct request is tracked in the row above, original totals unchanged. Fixed packet/rate and quality/receiver gates unchanged. |
 | Fleet all-status read latency | [fleet status contract](docs/fleet.md) | `codex/fleet-status-read-concurrency-2026-11-01` | primary plus Terra 6.1 medium delegate | local fix reviewed 2026-11-01 after a 600-s NFS all-status timeout: bounded concurrent per-request reads, unchanged sorted live-state semantics, no history cache/filter or mutations. Focused tests pass; runtime speed/server impact unverified. No deployment, worker restart or GPU work; publish/verify a manager release only through reviewed fleet operations after inspecting existing worker identity. |
 | Submission readiness and W8 witness (initial screen; see later rows) | [authorized W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/submission-readiness-2026-11-01` | primary plus three Terra 6.1 medium delegates | verification 2026-11-01: complete PLAN/evidence audit and negative-results online appendix done; W8 initial fixed actual-payload rate screen stopped unresolved (46.3151 kbps vs one anchor's 45.8233 upper bracket), 0/3,600 GPU-s, ≤850/3,600 CPU-s conservative envelope, no new fleet jobs/reservations. Local tensor bytes exact; Mac geometry equality and original packed/source-hidden inference unverified. No retry, redesign or repair under stopped card without amendment. Main+refs 23 pages plus 5 appendix allowed; current draft 22+3. Other open PLAN tasks triaged in paper task/evidence audits; scientific limits remain. |
@@ -1459,8 +1471,9 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
   conditional 7,200 s reuse. A source-hidden fresh reconstruction and sustained
   reuse remain unproved. See the [audit](docs/experiments/w8-wire-audit.md) and
   [witness](docs/cards/w8-fresh-decoder-witness.md), authorized for at most
-  3,600 GPU-s plus 3,600 workload CPU-s. The CPU input and isolation gates come
-  next; the oracle is under review and no oracle or receiver job exists.
+  3,600 GPU-s plus 3,600 workload CPU-s. The one-profile Linux CPU input
+  and isolation oracle passed independent audit; fresh GPU generation and
+  receiver reconstruction remain unqualified.
 - **W9. Adapter break-even and live adaptation (user, 2026-10-30).** The
   2026-10-31 all-assets analysis is complete within measured coverage:
   [result](docs/experiments/w9-adapter-break-even.md). Original Med omissions

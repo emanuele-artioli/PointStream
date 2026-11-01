@@ -1,0 +1,17 @@
+{
+  "pid": 35695,
+  "pgid": 35695,
+  "started_monotonic": 3026177.424478458,
+  "remote_deadline_seconds": 140,
+  "local_deadline_seconds": 150,
+  "remote_output": "/local/users/emanuele/pointstream/audits/w8-native-preflight-5651a24b-20261101",
+  "source_sha256": "d3fbd915d12184e99d0e7e847a268190bd81e2067aeed1f25fbc79f0d8aec7b4",
+  "config_sha256": "0c10207f6e4ab432154f3e18508e45507dd940b3f97bfb65a170a304881e37b4",
+  "status": "completed",
+  "returncode": 1,
+  "wall_seconds": 5.2117219171486795,
+  "local_cpu_seconds": 0.06342099999999999,
+  "ssh_cpu_seconds": 0.022369,
+  "cpu_reservation_s": 20,
+  "revision": "5651a24bbc262ece8f0fa0bd23abb4c29ff6c9a8"
+}

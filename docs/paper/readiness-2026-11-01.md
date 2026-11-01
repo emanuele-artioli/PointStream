@@ -1,3 +1,5 @@
+> Latest operational closeout: CPU source staging and full-archive transport diagnostic are terminal; no matching remote diagnostic remains. Original cumulative≤1654CPU-s/224GPU-s; no live compute reservation. Exact-source delta recovery is being prepared, not executed. See latest W8 card for all historical charges and stop receipts.
+
 # Manuscript readiness, 2026-11-01
 
 The decoder witness is **one gate, not the complete submission checklist**.
@@ -19,7 +21,7 @@ does not turn unmeasured comparisons into completed evidence.
   beside DISTS/PSNR gains; post hoc selections and failed decodes are disclosed.
   A cost-stopped smoothing pilot and absent racket masks are not presented as
   quality negatives. See [negative-evidence audit](negative-evidence-2026-11-01.md).
-- Overleaf main `7a7381e31526c304af16da79dfd96941c0d4a6e9` includes that appendix, the
+- Overleaf main `525f423bca542148645890063474e4a85723c6cf` includes that appendix, the
   hand-transfer/reference-bank negatives and the passing conditional W8
   saved-quality screen described below.
   PDF `/private/tmp/pointstream-w7-manuscript/build/main.pdf`: **25 pages,
@@ -54,16 +56,29 @@ recorded; reviewed auditor `142b6cc5` resolved argument binding without changing
 scores, identities or thresholds. The full audit passed all 12 checks on 80 ticks;
 maximum original-control difference 5.2273e-5 <0.001.
 
-Original W8 cumulative after a separately bounded 15 CPU-s runtime preflight:
-**224/3,600 GPU-s, ≤1,169/3,600 CPU-s**. MAIN preparation runtime and network namespace
-feasibility were verified on gpu5. Exact packet geometry on the Mac previously
-failed at ~4.55e-13 despite matching pose pixels; no tolerance waiver. Linux
-Landlock, packet-derived inputs and independent full validation are not yet
-qualified. The corrected complete-packet CPU oracle is under review; the older
-transport-based draft is disabled. No CPU input-oracle fleet job or receiver job exists yet.
-Unused generator/SAM/native installed-model qualifications remain a separate
-pre-GPU gate, with unchanged original budgets. No training, encoding or model
-changes follow from the scoring repair.
+The Linux CPU input oracle `20261101T093351Z-24914a4d` passed all four
+independent checks for one profile from frozen source `e8f8827b`; report SHA256
+`8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc`.
+It establishes exact packet-derived conditioning and isolation under that tested
+profile, not fresh generated crops, masks, native RGB or composites, sustained
+reuse or timing. The job, claim and wait are closed and its terminal event was
+acknowledged. Golden qualification closed at 150 CPU-s; 15 reference files are
+sealed read-only. Later asset bootstrap and native inventory stopped on cost and
+transient loader-cache checks, respectively; corrected native prelaunch failed
+before decoding. Staging-only utility `61563` is terminal after guarded process
+stops and charged 30 CPU-s inclusive; no asset/runtime/inference was started.
+A separate tiny transport smoke passed and closed at 4 CPU-s. W8 closed cumulative
+is **≤1,654/3,600 CPU-s and 224/3,600 GPU-s** after transport-only hash diagnostic
+73336 timed out (4 CPU-s) and its bounded closeout (5 CPU-s) found no matching
+process. No live reservation remains; exact-source delta recovery is under review,
+not executed. It has no model or GPU scope. None of these stops is a quality result;
+no fresh GPU job or receiver qualification exists. Current branch is
+`codex/w8-receiver-witness-2026-11-01`, draft PR #325; CI passed for `5651`,
+run `41301707915`. See the [continuation](../continuation-2026-11-01.md).
+
+Overleaf main and the local manuscript are at `525f423bca542148645890063474e4a85723c6cf`. Its reviewed predecessors clarified claims, added exact visible-boundary checks, wrapped appendix paths and pinned the initial recovery and subsequent controls; this revision corrects three bibliography entries. The current review PDF is 22 body/reference plus 3 appendix pages;
+the isolated small-format check is 22+3 after the bibliography corrections. Current venue instructions remain
+unverified. No training or new codec claim follows from the saved-quality screen.
 
 ## What remains for submission
 

@@ -1,3 +1,6 @@
+> Latest operational closeout: CPU source staging and full-archive transport diagnostic are terminal; no matching remote diagnostic remains. Original cumulative≤1654CPU-s/224GPU-s; no live compute reservation. Exact-source delta recovery is being prepared, not executed. See latest W8 card for all historical charges and stop receipts.
+
+
 # Continuation, 2026-11-01: exclusive W8 coverage repair completed
 
 ## Current decision
@@ -20,18 +23,32 @@ Full archive `f87e9cba68063fb115828dddbffb9b7fbaffa1e61003ac4292f4adfaab1cc41f`;
 durable full audit and raw screen are in `docs/experiments/w8-inputs/exclusive-20261101/`.
 All three scoring requests, waits and task claims are closed; never replay them.
 
-Current work: implement and review the corrected complete-packet CPU oracle.
-The legacy transport/recipe CLI is disabled. Original preparation used MAIN
-packed environment `32e688…`, distinct from later JCV generator `bf738ce5…`.
-A bounded read-only preflight verified actual MAIN NumPy 1.26.4/OpenCV 4.10.0
-on gpu5 and distinct user/network namespaces. It does not prove Landlock or the
-actual oracle. gpu6 has the expected cache and separate storage; gpu2 inventory
-timed out and remains unknown. Receipt `/private/tmp/w8-linux-runtime-preflight-20261101/`;
-local handle 18407 ended. Charge its full 15 CPU-s allowance: **cumulative W8
-≤1,169/3,600 CPU-s and 224/3,600 GPU-s**, leaving at least 2,431 CPU-s / 3,376 GPU-s.
-No CPU input-oracle fleet job or receiver job exists yet. Proposed input campaign ≤300 CPU-s plus
-≤40 s for monitor/audit/preparation still needs root review, frozen source, immutable
-packet/profile publication, fresh preflight and real future deadline.
+The corrected Linux CPU input oracle **`20261101T093351Z-24914a4d`**
+completed from frozen source `e8f8827b` and original MAIN environment `32e688`;
+all four independent input, golden/exact-match, isolation and payload checks pass
+for one profile. It covers the full 240-frame context and 80 judged ticks, not
+fresh crops, masks, native RGB, composites, reuse or timing. The independent report
+SHA256 is `8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc`;
+[audit](experiments/w8-inputs/linux-input-20261101/bootstrap-independent-full-audit.json)
+and [closeout](experiments/w8-inputs/linux-input-20261101/bootstrap-closeout.json)
+record details. The job, process group and CPU claim are closed; wait `70480`
+ended and event `b2ef4c7dacbf5f0d93f9d76e0cd37d7d` was delivered and acknowledged.
+Do not replay it. Its conservative charge is 101 CPU-s (61 campaign plus 40
+extras). Golden qualification closed with a conservative 150 CPU-s charge;
+15 reference files are sealed read-only. The later bootstrap stopped at its cost
+projection (60+5 CPU-s); the first native inventory failed on transient loader-cache
+access (20 CPU-s). The corrected native inventory failed before decoder launch,
+closed at ≤4 CPU-s. Source staging for utility `61563` stopped after identity-guarded
+termination of only task-owned processes; handle is terminal 137 with SSH -9,
+no source archive, asset/runtime/inference or quality result. Its closed charge is
+30 CPU-s inclusive of diagnostics and stops, replacing the unused 165 reservation.
+A separate tiny 28-byte SSH/EOF smoke passed and closed at 4 CPU-s. Thus W8 closed
+cumulative is **≤1,654/3,600 CPU-s and 224/3,600 GPU-s** after the full-archive
+transport diagnostic73336 timed out (4 CPU-s) and its bounded closeout (5 CPU-s)
+found no matching process. No live reservation remains; exact-source delta recovery
+is under review, not executed. No fresh GPU job or receiver qualification
+exists; these stops are not quality negatives. See [W8](experiments/w8-wire-audit.md)
+for immutable identities and closeout receipts; inspect existing work, never replay.
 
 ## Immutable scientific state
 
@@ -91,18 +108,19 @@ The original 300/300 amendment closed after 67 GPU-s / ≤87 CPU-s. Subsequent
 user-approved inclusive 450/450 scoring closeout is **224 GPU-s / ≤304 CPU-s**:
 prior 67 + 157 for the request, plus 30 for monitoring + 10 for audit + 40 for all preparation (includes
 prior 20). This is inside original 3,600/3,600, not extra budget. Original local
-≤850 CPU-s + 304 for scoring + 15 for runtime preflight = **≤1,169 CPU-s**; 224 GPU-s.
+≤850 CPU-s + 304 for scoring + 15 for runtime preflight = **≤1,169 CPU-s**; 224 GPU-s at that historical checkpoint. Later CPU-oracle accounting is above.
 No scoring reservation remains. No balance transfers to other cards.
 
 ## Code, fleet and manuscript
 
 PR #318 merged `538b1022`, PR #319 merged `1b282587`, PR #320 merged `02c6c10e`.
 PR #321 merged `b014067c`; exclusive-policy PR #322 merged `f5597299` after
-CI passed on exact `c0f25e4e`. Current results/auditor branch is
-`codex/w8-exclusive-results-2026-11-01`, auditor commit `142b6cc5`. Input-oracle
-implementation remains under review; do not infer it is dispatch-ready from
-local tests. Focused tests/Ruff pass; mypy retains the same seven unrelated
-Mac errors. Earlier full pytest has the same thirteen Mac baseline failures.
+CI passed on exact `c0f25e4e`. Current branch is
+`codex/w8-receiver-witness-2026-11-01`, draft PR #325. CI passed for `5651`, run `41301707915`. The accepted input gate
+is described above; fresh GPU generation remains unqualified. Frozen source
+`5651a24b` full pytest had the same 13 failing node names as the saved clean-main
+Mac run, with 1,407 passed and 32 skipped; its 42 receiver tests passed. Frozen
+Ruff passed and mypy reported the seven known Mac baseline errors.
 
 Manager release `20261101T071313Z-74a9271d` runs commit `a5fdb235` on gpu2/5/6.
 Verified bundle SHA256
@@ -120,13 +138,12 @@ and all three native binaries were checked; all scientific imports came from
 clean frozen source. Source/input artifacts and diagnostics are referenced in
 [W8](experiments/w8-wire-audit.md) and its amendment input directory.
 
-Overleaf main is **`7a7381e31526c304af16da79dfd96941c0d4a6e9`**, local
-`/private/tmp/pointstream-w7-manuscript`, tracking `overleaf/main`; original server
-checkout is untouched. Reviewed PDF `build/main.pdf`: **22 pages body/references
-and 3 online appendix pages**, within user's 23+5. Negative hand/object representation
-results, hand-transfer/reference-bank limits, the passing conditional W8
-saved-quality screen and mixed-metric ego adaptation are included; no cost stop
-is presented as a quality negative. [Readiness](paper/readiness-2026-11-01.md) and the evidence
-matrix distinguish other submission gaps from deferred PLAN research. The paper
-is not submission-ready. No recurring timer/cache keepalive or active task-owned
-experiment remains. Cache lifetime is unknown.
+Overleaf main and the local manuscript are **`525f423bca542148645890063474e4a85723c6cf`**,
+pushed. It links both the initial `21931f6` recovery dossier and subsequent
+controls at `5a6f892b`; it retains the qualified claims and evidence boundaries.
+The review format has 22 body/reference plus 3 appendix pages; an isolated
+small-format check has 22+3 after bibliography corrections, without clipped paths. Live venue format instructions
+remain unverified. The paper is not submission-ready.
+Negative results and conditional saved-quality boundaries remain.
+No recurring timer or cache keepalive remains; the bounded transport-only diagnostic is active as recorded above.
+Cache lifetime is unknown.
