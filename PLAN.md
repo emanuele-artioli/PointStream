@@ -354,6 +354,7 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
+| Submission readiness and W8 witness | [authorized W8 card](docs/cards/w8-fresh-decoder-witness.md) | `codex/submission-readiness-2026-11-01` | primary plus three Terra 6.1 medium delegates | running 2026-11-01: user approved separate 3,600 GPU-s + 3,600 workload CPU-s witness; CPU oracle/isolation/rate/cost gates precede GPU, no training/model changes. At authorization 0 spent/reserved, no new jobs. Independent complete PLAN audit and negative-evidence manuscript work proceed in parallel; main+refs 23 pages plus up to 5 appendix pages authorized. Other experiments require their own valid authority. |
 | Paper continuation and W7 accounting audit | [2026-10-31 handoff](docs/continuation-2026-10-31.md) | `codex/w7-anchor-repair-2026-10-31` (merged #315 and #316) | primary plus Terra 6.1 medium delegates | repair complete 2026-10-31: all six GPU requests independently full-audited, root recomputation exact, GPU 1,043/5,400 s, CPU ≤1,924/5,400 s, no active jobs/reservations; at 2 h familiar-match rule passes conditionally, unseen-match LPIPS includes zero despite all four anchors; conditional modeled joint pass about 133–198 min, not global L*; Overleaf `a3e2888d` updated (23 pages). W6b scale stop, W11 labels blocked, W8 fresh-decoder witness proposed for separate authority |
 | J | experience-track re-judging | `claude/j-experience-rejudge` @ `a7cec43` | Sonnet | reported 2026-10-22: 3 fail (time, content), H3a/H3a2 not kept; 1.25 GPU-hours of 4 |
 | J, jitter follow-up | coded keypoints' jitter, smoothing oracle | `claude/j-experience-rejudge` @ `6a1b09a`, PR #218 | Sonnet | reported 2026-10-22: smoothing fails; estimator or compositing; 0.53 GPU-hours of 1 |
@@ -1439,7 +1440,8 @@ GPU-hours (W1 ≤1, W3 ≤2, W4 ≤1.5; W2 CPU only).
 - **W8 wire audit (2026-10-31).** Actual IVF, KPS2 and research header bytes
   coexist with modeled bank/adaptation charges; a complete payload and fresh
   source-hidden reconstruction remain unproved. See [audit](docs/experiments/w8-wire-audit.md)
-  and [proposed witness](docs/cards/w8-fresh-decoder-witness.md), not yet authorized.
+  and [witness](docs/cards/w8-fresh-decoder-witness.md), separately authorized
+  2026-11-01 for at most 3,600 GPU-s plus 3,600 workload CPU-s; CPU gates first.
 - **W9. Adapter break-even and live adaptation (user, 2026-10-30).** The
   2026-10-31 all-assets analysis is complete within measured coverage:
   [result](docs/experiments/w9-adapter-break-even.md). Original Med omissions
