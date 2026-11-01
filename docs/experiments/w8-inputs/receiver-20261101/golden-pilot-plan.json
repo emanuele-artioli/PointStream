@@ -1,0 +1,31 @@
+{
+  "status": "root_reviewed_pilot_only_no_gpu",
+  "driver_sha256": "b80e7f3d3eef61109ab9380e65f3c88449882c3d0a5cd509c4711bcaaf0eb45d",
+  "launcher_sha256": "35ff8063c1742808c1c82f3875a1077d0616100e3b45f370cb361c7fce2fc3d3",
+  "source_snapshot_sha256": "365882dad4dabbbe0d132d7a4d1cf08f2a68b0f8afcb01bee16b66cce8537c2a",
+  "pilot_cpu_s_ceiling": 35,
+  "full_cpu_s_ceiling": 95,
+  "metadata_cpu_s_ceiling": 6,
+  "audit_and_recovery_reserve_cpu_s": 14,
+  "inclusive_cpu_cap": 150,
+  "pilot_wall_s": 240,
+  "full_not_authorized_until_pilot_review": true,
+  "one_cpu_affinity": true,
+  "gpu_hidden": true,
+  "scope": "rehash saved references and reconstruct historical composite using original Linux CPU geometry; no new inference or decoding",
+  "canonical_statuses": {
+    "20261031T172705Z-92d5a784": "complete_exit0",
+    "20261031T173041Z-afee870c": "complete_exit0"
+  },
+  "archive_sizes": {
+    "rgb": 2986311680,
+    "masks": 1269760
+  },
+  "paid_kps_sha256": "2e8452e4c458cf0998b6b8e004812575bdb2a638dd927b087dbc330d11d67070",
+  "stop_conditions": [
+    "any archive/source/runtime/packet/hash/tick mismatch",
+    "pilot predicts remaining work cannot fit",
+    "CPU/wall cap or unknown execution",
+    "any GPU inference or original-data write requested"
+  ]
+}

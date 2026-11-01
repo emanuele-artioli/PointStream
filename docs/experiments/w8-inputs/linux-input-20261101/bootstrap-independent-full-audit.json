@@ -1,0 +1,99 @@
+{
+  "ignored_runtime_fields": [
+    "cpu_seconds",
+    "temporary_golden_directory"
+  ],
+  "job_id": "20261101T093351Z-24914a4d",
+  "passed": true,
+  "publication_sha256": "3b80afe8c159b6d572acf24e879e4c924b4c81ced06d33185a83f77b6649fe10",
+  "revision": "e8f8827be53d9b0ed3df85394aab9fac7f263de0",
+  "scope": "independent CPU input oracle post-publication audit; no GPU or generation",
+  "source_archive_sha256": "0af41871c8cb5a650264fc08c1a6deb19c2337cf06849e71bd686bf623270d4c",
+  "source_identity_sha256": "5bec7e943e030f1d681a654cff540e192f993a27e475ff6998e0aabe9fc1485b",
+  "spec_sha256": "289607bce206fc71f4c7da4fabdf668598cb79e6c455e6e44c04844a38d58ffa",
+  "report_sha256": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc",
+  "report_path": "/private/tmp/w8-linux-input-full-audit-20261101/report.json",
+  "remote_report_directory": "/local/users/emanuele/pointstream/audits/w8-input-24914a4d-independent-20261101",
+  "checks": {
+    "exact_conditioning_and_golden": true,
+    "exact_match": true,
+    "isolation": true,
+    "payload_identity": true
+  },
+  "decoded_sha256": {
+    "nadal_kyrgios__000_at120__person_000000000000": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+    "nadal_kyrgios__000_at120__person_000000000001": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7"
+  },
+  "tensor_counts": {
+    "denoising_unet": 256,
+    "pose_guider": 16,
+    "reference_unet": 208
+  },
+  "tensor_fingerprints_sha256": "d6fe0331cf5fdbb7ab70bb761be8dc62d4e06c8f43f715c489064d2fc3375dd2",
+  "execution": {
+    "affinity": [
+      0
+    ],
+    "audit_dir": "/local/users/emanuele/pointstream/audits/w8-input-24914a4d-independent-20261101",
+    "child_cpu_seconds": 0.0,
+    "cpu_limit_seconds": 15,
+    "cpu_seconds": 10.6639,
+    "job_id": "20261101T093351Z-24914a4d",
+    "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+    "source": "/local/users/emanuele/pointstream/audits/w8-input-24914a4d-independent-20261101/source",
+    "wall_seconds": 11.54538785573095
+  },
+  "scientific_module_closure": {
+    "experiments": "experiments/__init__.py",
+    "experiments.background": "experiments/background/__init__.py",
+    "experiments.background.camera": "experiments/background/camera.py",
+    "experiments.background.depth": "experiments/background/depth.py",
+    "experiments.background.g1": "experiments/background/g1.py",
+    "experiments.background.g1d": "experiments/background/g1d.py",
+    "experiments.background.g5": "experiments/background/g5.py",
+    "experiments.jobs": "experiments/jobs/__init__.py",
+    "experiments.jobs.claims": "experiments/jobs/claims.py",
+    "experiments.jobs.fleet": "experiments/jobs/fleet.py",
+    "experiments.jobs.inbox": "experiments/jobs/inbox.py",
+    "experiments.jobs.monitor": "experiments/jobs/monitor.py",
+    "experiments.jobs.staging": "experiments/jobs/staging.py",
+    "experiments.tennis": "experiments/tennis/__init__.py",
+    "experiments.tennis.k4": "experiments/tennis/k4.py",
+    "experiments.tennis.k4b": "experiments/tennis/k4b.py",
+    "experiments.tennis.k4b_court": "experiments/tennis/k4b_court.py",
+    "experiments.tennis.k4b_features": "experiments/tennis/k4b_features.py",
+    "experiments.tennis.k4b_pose": "experiments/tennis/k4b_pose.py",
+    "experiments.tennis.k4b_rate": "experiments/tennis/k4b_rate.py",
+    "experiments.tennis.k4b_rules": "experiments/tennis/k4b_rules.py",
+    "experiments.tennis.k4b_score": "experiments/tennis/k4b_score.py",
+    "experiments.tennis.k6": "experiments/tennis/k6.py",
+    "experiments.tennis.k6b": "experiments/tennis/k6b.py",
+    "experiments.tennis.k6b_fit": "experiments/tennis/k6b_fit.py",
+    "experiments.tennis.k6b_generate": "experiments/tennis/k6b_generate.py",
+    "experiments.tennis.k6b_rate_budget": "experiments/tennis/k6b_rate_budget.py",
+    "experiments.tennis.k6b_rate_streams": "experiments/tennis/k6b_rate_streams.py",
+    "experiments.tennis.k6b_rate_transport": "experiments/tennis/k6b_rate_transport.py",
+    "experiments.tennis.w2_pose_rate": "experiments/tennis/w2_pose_rate.py",
+    "experiments.tennis.w8_input_job": "experiments/tennis/w8_input_job.py",
+    "experiments.tennis.w8_inputs": "experiments/tennis/w8_inputs.py",
+    "experiments.tennis.w8_payload": "experiments/tennis/w8_payload.py",
+    "experiments.tennis.windows": "experiments/tennis/windows.py",
+    "experiments.visor": "experiments/visor/__init__.py",
+    "experiments.visor.b1": "experiments/visor/b1.py",
+    "experiments.visor.h1": "experiments/visor/h1.py",
+    "src": "src/__init__.py",
+    "src.segmentation": "src/segmentation/__init__.py",
+    "src.segmentation.evaluate": "src/segmentation/evaluate.py",
+    "src.segmentation.masks": "src/segmentation/masks.py",
+    "src.segmentation.storage": "src/segmentation/storage.py",
+    "src.segmentation.visor": "src/segmentation/visor.py"
+  },
+  "launcher": {
+    "exit_code": 0,
+    "wall_s": 26.047218666877598,
+    "combined_cpu_ceiling_s": 18,
+    "audit_script_sha256": "da84fc8637ec31792352f9ff97d4d2b7572c996454f2e96de73f641b8029bcfc",
+    "local_cpu_s": 0.06329499999999999,
+    "ssh_cpu_s": 0.021528
+  }
+}

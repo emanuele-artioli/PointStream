@@ -1,0 +1,59 @@
+"""Bounded fresh-process full audit, with its complete report captured locally."""
+import resource
+resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+import base64
+import hashlib
+import json
+from pathlib import Path
+import shlex
+import subprocess
+import time
+
+SCRIPT=Path('/private/tmp/w8-linux-input-full-audit-20261101.py')
+OUT=Path('/private/tmp/w8-linux-input-full-audit-20261101')
+code=SCRIPT.read_bytes()
+if hashlib.sha256(code).hexdigest() != 'da84fc8637ec31792352f9ff97d4d2b7572c996454f2e96de73f641b8029bcfc':
+    raise ValueError('audit script changed after review')
+OUT.mkdir(mode=0o700,exist_ok=False)
+launcher=r'''import os,resource
+resource.setrlimit(resource.RLIMIT_CPU,(15,15))
+os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
+root='/local/users/emanuele/pointstream'
+env={'PATH':'/usr/bin:/bin','CUDA_VISIBLE_DEVICES':'','PYTHONDONTWRITEBYTECODE':'1',
+'PYTHONNOUSERSITE':'1','OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1','MKL_NUM_THREADS':'1',
+'NUMEXPR_NUM_THREADS':'1','TMPDIR':root,'TMP':root,'TEMP':root,'XDG_CACHE_HOME':root,'TORCH_HOME':root}
+python=root+'/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python'
+os.execve(python,[python,'-B','-'],env)
+'''
+remote=' '.join(shlex.quote(x) for x in ['/usr/bin/timeout','--signal=TERM','--kill-after=2','60s',
+    '/usr/bin/env','PYTHONDONTWRITEBYTECODE=1','/usr/bin/python3','-c',launcher])
+def limit():resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+started=time.monotonic()
+try:
+    r=subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=5','gpu6',remote],
+        input=code,capture_output=True,timeout=70,close_fds=True,preexec_fn=limit,check=False)
+except subprocess.TimeoutExpired as exc:
+    (OUT/'stdout.partial').write_bytes(exc.stdout or b'')
+    (OUT/'stderr.partial').write_bytes(exc.stderr or b'')
+    (OUT/'timeout.json').write_text(json.dumps({'status':'unknown_do_not_replay','wall_s':time.monotonic()-started}))
+    raise
+(OUT/'stdout.json').write_bytes(r.stdout)
+(OUT/'stderr.txt').write_bytes(r.stderr)
+receipt={'exit_code':r.returncode,'wall_s':time.monotonic()-started,'combined_cpu_ceiling_s':18,
+    'audit_script_sha256':hashlib.sha256(code).hexdigest(),
+    'local_cpu_s':sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+    'ssh_cpu_s':sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2])}
+(OUT/'execution.json').write_text(json.dumps(receipt,indent=2)+'\n')
+if r.returncode:
+    print(json.dumps({'exit_code':r.returncode,'directory':str(OUT)}))
+    raise SystemExit(r.returncode)
+value=json.loads(r.stdout)
+data=base64.b64decode(value['report_base64'],validate=True)
+if (value.get('passed') is not True or len(data)!=value['report_bytes']
+        or len(data)>512*1024 or hashlib.sha256(data).hexdigest()!=value['report_sha256']):
+    raise ValueError('full audit report transport or result mismatch')
+report=json.loads(data)
+if report.get('passed') is not True:raise ValueError('audit did not pass')
+with (OUT/'report.json').open('xb') as handle:handle.write(data)
+print(json.dumps({'passed':True,'report_sha256':value['report_sha256'],
+    'directory':str(OUT),'remote_audit_cpu_s':report['execution']['cpu_seconds']}))

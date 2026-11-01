@@ -1,0 +1,193 @@
+{
+  "rows": [
+    {
+      "job": "20261031T172705Z-92d5a784",
+      "path": "spec.json",
+      "stat": [
+        59,
+        20088507,
+        3849,
+        1793467656586418022,
+        1793467656607418303
+      ],
+      "sha256": "63964dd631b93624ef41d40c12e23c21c6314c638295b4590917f924350a661d",
+      "status": "ok"
+    },
+    {
+      "job": "20261031T172705Z-92d5a784",
+      "path": "ready.json",
+      "stat": [
+        59,
+        5538916,
+        1502,
+        1793467656684419337,
+        1793467656730419954
+      ],
+      "sha256": "f967b492290384428b7ae5dcbc892a92287de6340f9c84794a83aa8310e04db9",
+      "status": "ok"
+    },
+    {
+      "job": "20261031T172705Z-92d5a784",
+      "path": "run/status.json",
+      "stat": [
+        59,
+        20094490,
+        880,
+        1793468983233224291,
+        1793468984300238614
+      ],
+      "sha256": "52654a0ef0dc69243c9447bdcc0cdaecc859b9384e5373d8af9fe823d837c59b",
+      "status": "ok",
+      "terminal": {
+        "status": "complete",
+        "exit_code": 0,
+        "ended": 1793468946.9497917,
+        "timing_contaminated": true
+      }
+    },
+    {
+      "job": "20261031T172705Z-92d5a784",
+      "path": "full/execution.json",
+      "stat": [
+        59,
+        5539883,
+        650,
+        1793468847403401087,
+        1793468847413401221
+      ],
+      "sha256": "21e266bba3a32497afdfa5bc31204b4349bd0f04c63e1c76c27df28fa3a1b2f0",
+      "status": "ok"
+    },
+    {
+      "job": "20261031T172705Z-92d5a784",
+      "path": "full/staging.json",
+      "stat": [
+        59,
+        5550951,
+        3825,
+        1793468898730090027,
+        1793468900357111866
+      ],
+      "sha256": "c87c4b0b3ef8454afcf2d1b05eabeea561f46ebdf22ac272d3b46b05c9eeb631",
+      "status": "ok",
+      "publication": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T172705Z-92d5a784/full/published.tar",
+        "sha256": "91a1426879ec85bfaadd9e01b07086654267efeccf38d192853729ccf27b1332",
+        "bytes": 2986311680,
+        "members": 8,
+        "partial": false
+      }
+    },
+    {
+      "job": "20261031T172705Z-92d5a784",
+      "path": "full/published.tar",
+      "stat": [
+        59,
+        20090821,
+        2986311680,
+        1793468869617699257,
+        1793468869617699257
+      ],
+      "status": "ok"
+    },
+    {
+      "job": "20261031T173041Z-afee870c",
+      "path": "spec.json",
+      "stat": [
+        59,
+        20092832,
+        6028,
+        1793467862349179619,
+        1793467862459181096
+      ],
+      "sha256": "a43d3a40ab253c3daf4e72e41845a468f48605f2681f257122282a3280bb35ef",
+      "status": "ok"
+    },
+    {
+      "job": "20261031T173041Z-afee870c",
+      "path": "ready.json",
+      "stat": [
+        59,
+        20092833,
+        1941,
+        1793467862552182344,
+        1793467862565182518
+      ],
+      "sha256": "a44c865c13f03cd0095bbf13f52576a929a593883bc6e4843903e6687bda9e64",
+      "status": "ok"
+    },
+    {
+      "job": "20261031T173041Z-afee870c",
+      "path": "run/status.json",
+      "stat": [
+        59,
+        20091671,
+        698,
+        1793468202448744327,
+        1793468202491744905
+      ],
+      "sha256": "8ae0be93d8ad13ac60d0544e8cd43d582e27346df194f70001ede095713e18d1",
+      "status": "ok",
+      "terminal": {
+        "status": "complete",
+        "exit_code": 0,
+        "ended": 1793468201.3122954,
+        "timing_contaminated": true
+      }
+    },
+    {
+      "job": "20261031T173041Z-afee870c",
+      "path": "full/execution.json",
+      "stat": [
+        59,
+        5541086,
+        596,
+        1793468199342702638,
+        1793468199363702920
+      ],
+      "sha256": "1d3336646ef71c03c33cadd41192a262ab74370025399dc803e59f282178edd1",
+      "status": "ok"
+    },
+    {
+      "job": "20261031T173041Z-afee870c",
+      "path": "full/staging.json",
+      "stat": [
+        59,
+        20094607,
+        5691,
+        1793468199782708544,
+        1793468199802708813
+      ],
+      "sha256": "c7c012597af55f412a11e31d75118fc8f71406969f146d839f50c51e4f719a5a",
+      "status": "ok",
+      "publication": {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173041Z-afee870c/full/published.tar",
+        "sha256": "a60cd08a254945a7f0f180b7ba783dda1b127814ba9f4c0ac04d1333758d4ba7",
+        "bytes": 1269760,
+        "members": 11,
+        "partial": false
+      }
+    },
+    {
+      "job": "20261031T173041Z-afee870c",
+      "path": "full/published.tar",
+      "stat": [
+        59,
+        20087923,
+        1269760,
+        1793468199468704329,
+        1793468199468704329
+      ],
+      "status": "ok"
+    }
+  ],
+  "remote_cpu_s": 0.03834,
+  "inclusive_cpu_charge_s": 6,
+  "local_execution": {
+    "script_sha256": "9d90342298851566e7937e86e71355e9850c05cbf07d73e518a5bf66d4e0dfe9",
+    "local_self_cpu_s": 0.054806,
+    "local_children_cpu_s": 0.020787
+  },
+  "scope": "metadata and stat only; no full archive read or pixel acceptance",
+  "local_raw_receipt": "/private/tmp/w8-golden-recovery-20261101/metadata-receipt"
+}
