@@ -16,7 +16,7 @@ import subprocess
 import sys
 import tarfile
 import time
-from typing import Any
+from typing import Any, Callable
 
 ENV_SHAS = {
     'main': '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661',
@@ -78,45 +78,151 @@ def source_files(archive: Path, tree: Path, expected_sha: str) -> dict[str, str]
     return files
 
 
-def verify_aa_tree(archive: Path, tree: Path) -> dict[str, Any]:
-    """Match each regular archive member to the installed AA tree."""
+AA_LINKS = {
+    'Models/finetuned_tennis': '/home/itec/emanuele/Models/AnimateAnyone/profiles/finetuned_tennis',
+    'Models/original': '/home/itec/emanuele/Models/AnimateAnyone/profiles/original',
+    'configs': 'animate_anyone/configs',
+    'src': 'animate_anyone',
+}
+
+
+def stable_file_hash(path: Path) -> dict[str, Any]:
+    """Hash one regular file and reject changes during or immediately after its read."""
+    import stat
+
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    try:
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode):
+            raise ValueError(f'not a regular file: {path}')
+        digest = hashlib.sha256()
+        with os.fdopen(descriptor, 'rb', closefd=False) as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b''):
+                digest.update(block)
+        after = os.fstat(descriptor)
+        current = path.stat(follow_symlinks=False)
+        def identity(value: os.stat_result) -> tuple[int, int, int, int, int]:
+            return value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, value.st_ctime_ns
+        if identity(before) != identity(after) or identity(before) != identity(current):
+            raise ValueError(f'file changed during hash: {path}')
+        return {'path': str(path), 'sha256': digest.hexdigest(), 'size': before.st_size,
+                'device': before.st_dev, 'inode': before.st_ino,
+                'mtime_ns': before.st_mtime_ns, 'ctime_ns': before.st_ctime_ns}
+    finally:
+        os.close(descriptor)
+
+
+def _plain_path(tree: Path, path: Path) -> bool:
+    """Reject symlinks in every installed member's path without dereferencing them."""
+    if not path.is_relative_to(tree):
+        return False
+    cursor = tree
+    for part in path.relative_to(tree).parts:
+        cursor = cursor / part
+        if cursor.is_symlink():
+            return False
+    return True
+
+
+def verify_aa_tree(archive: Path, tree: Path, *, expected_links: dict[str, str] | None = None,
+                   expected_archive_sha: str = AA_SHA,
+                   checkpoint: Callable[[dict[str, Any]], None] | None = None) -> dict[str, Any]:
+    """Verify every regular source byte and four exact symlink metadata records."""
     tree = tree.resolve(strict=True)
-    count = 0
-    files = {}
+    archive_record = stable_file_hash(archive)
+    if archive_record['sha256'] != expected_archive_sha:
+        raise ValueError('AA archive identity mismatch')
+    links = AA_LINKS if expected_links is None else expected_links
+    found_links: set[str] = set()
+    installed_links: dict[str, str] = {}
+    seen: set[str] = set()
+    files: dict[str, str] = {}
     with tarfile.open(archive, 'r:*') as tar:
         for member in tar:
+            parts = Path(member.name).parts
+            if not parts and member.isdir():
+                continue
+            if not parts or Path(member.name).is_absolute() or '..' in parts:
+                raise ValueError(f'unsafe AA archive entry: {member.name}')
+            name = str(Path(*parts))
+            if name in seen:
+                raise ValueError(f'duplicate AA archive entry: {name}')
+            seen.add(name)
             if member.isdir():
                 continue
-            parts = Path(member.name).parts
-            if not parts or Path(member.name).is_absolute() or '..' in parts or not member.isfile():
-                raise ValueError('unsupported AA archive entry')
+            if member.issym():
+                if name not in links or links[name] != member.linkname:
+                    raise ValueError(f'unexpected AA link metadata: {name}')
+                installed = tree / name
+                if not _plain_path(tree, installed.parent):
+                    raise ValueError(f'AA link parent is a symlink: {name}')
+                if not os.path.lexists(installed):
+                    installed_links[name] = 'absent'
+                    found_links.add(name)
+                    continue
+                if not installed.is_symlink() or os.readlink(installed) != member.linkname:
+                    raise ValueError(f'installed AA link metadata mismatch: {name}')
+                installed_links[name] = 'matched'
+                if not Path(member.linkname).is_absolute():
+                    target = tree / member.linkname
+                    if not _plain_path(tree, target) or not target.exists() or not target.resolve().is_relative_to(tree):
+                        raise ValueError(f'AA relative alias escapes or is repointed: {name}')
+                found_links.add(name)
+                continue  # Absolute model aliases are metadata only; never resolve their target.
+            if not member.isfile():
+                raise ValueError(f'unsupported AA archive entry: {name}')
             candidates = [tree.joinpath(*parts)]
             if len(parts) > 1:
                 candidates.append(tree.joinpath(*parts[1:]))
-            matches = [p.resolve(strict=True) for p in candidates if p.is_file()]
-            if len(set(matches)) != 1 or not matches[0].is_relative_to(tree):
-                raise ValueError(f'AA installed path missing or ambiguous: {member.name}')
+            matches = [p for p in candidates if _plain_path(tree, p) and p.is_file()]
+            if len(matches) != 1:
+                raise ValueError(f'AA installed path missing or ambiguous: {name}')
             stream = tar.extractfile(member)
             if stream is None:
                 raise ValueError('unreadable AA archive member')
             digest = hashlib.sha256()
             for block in iter(lambda: stream.read(1024 * 1024), b''):
                 digest.update(block)
-            if sha(matches[0]) != digest.hexdigest():
-                raise ValueError(f'AA installed source mismatch: {member.name}')
-            files[str(matches[0])] = digest.hexdigest()
-            count += 1
-    if not count:
-        raise ValueError('empty AA archive')
-    return {'tree': str(tree), 'verified_files': count, 'files': files}
+            record = stable_file_hash(matches[0])
+            if record['sha256'] != digest.hexdigest():
+                raise ValueError(f'AA installed source mismatch: {name}')
+            files[str(matches[0])] = record['sha256']
+            if checkpoint:
+                checkpoint({'kind': 'aa_regular', **record})
+    current = archive.stat(follow_symlinks=False)
+    if ((current.st_dev, current.st_ino, current.st_size, current.st_mtime_ns, current.st_ctime_ns)
+            != (archive_record['device'], archive_record['inode'], archive_record['size'],
+                archive_record['mtime_ns'], archive_record['ctime_ns'])):
+        raise ValueError('AA archive changed during member verification')
+    if found_links != set(links) or not files:
+        raise ValueError('AA expected link or regular-file coverage mismatch')
+    return {'tree': str(tree), 'verified_files': len(files), 'files': files,
+            'link_metadata': {name: links[name] for name in sorted(found_links)},
+            'installed_link_status': installed_links,
+            'scope': 'regular archive members and exact link metadata; no cached-environment equivalence'}
 
 
-def verify_sam_distribution(prefix: Path) -> dict[str, Any]:
+def verify_sam_distribution(prefix: Path, checkpoint: Callable[[dict[str, Any]], None] | None = None) -> dict[str, Any]:
     """Check installed SAM git identity and every hashed wheel RECORD entry."""
     import base64
     from importlib import metadata
 
-    dist = metadata.distribution('sam3')
+    prefix = prefix.resolve(strict=True)
+    site_paths = sorted({p.resolve(strict=True) for p in prefix.glob('lib/python*/site-packages') if p.is_dir()})
+    if not site_paths or any(not path.is_relative_to(prefix) for path in site_paths):
+        raise ValueError('SAM site-packages paths missing or outside environment')
+    found: dict[Path, Any] = {}
+    for site in site_paths:
+        for candidate in metadata.distributions(path=[str(site)]):
+            if str(candidate.metadata.get('Name', '')).lower().replace('-', '_') != 'sam3':
+                continue
+            location = Path(str(getattr(candidate, '_path', ''))).resolve(strict=True)
+            if not location.is_relative_to(site):
+                raise ValueError('SAM distribution metadata outside its site-packages')
+            found[location] = candidate
+    if len(found) != 1:
+        raise ValueError(f'ambiguous SAM installations: {len(found)}')
+    dist = next(iter(found.values()))
     direct = dist.read_text('direct_url.json')
     if direct is None:
         raise ValueError('SAM direct_url metadata absent')
@@ -146,21 +252,56 @@ def verify_sam_distribution(prefix: Path) -> dict[str, Any]:
         actual = Path(str(dist.locate_file(entry))).resolve(strict=True)
         if not actual.is_relative_to(prefix.resolve(strict=True)) or not actual.is_file():
             raise ValueError('SAM RECORD path outside installed environment')
-        hex_digest = sha(actual)
+        record = stable_file_hash(actual)
+        hex_digest = record['sha256']
         digest = base64.urlsafe_b64encode(bytes.fromhex(hex_digest)).rstrip(b'=').decode()
         if digest != entry.hash.value:
             raise ValueError(f'SAM RECORD mismatch: {entry}')
         verified_files[str(actual)] = hex_digest
+        if checkpoint:
+            checkpoint({'kind': 'sam_record', **record})
         if str(entry).endswith('.py'):
             source_files_count += 1
         count += 1
     if not count or not source_files_count:
         raise ValueError('SAM RECORD has no hashed Python source')
     return {'commit': url['vcs_info']['commit_id'], 'direct_url_sha256': hashlib.sha256(direct.encode()).hexdigest(),
+            'distribution_path': str(next(iter(found))), 'site_paths': [str(path) for path in site_paths],
             'record_hashed_files': count, 'record_hashed_sources': source_files_count,
             'verified_files': verified_files,
             'excluded_generated_bytecode': generated_bytecode,
             'bytecode_scope': 'cache bytes unverified; SAM worker must enforce source-only loading'}
+
+
+def start_checkpoint(path: Path) -> Callable[[dict[str, Any]], None]:
+    """Create a new provenance-only JSONL checkpoint; never read or resume an old one."""
+    with path.open('x'):
+        pass
+    def append(record: dict[str, Any]) -> None:
+        with path.open('a') as stream:
+            stream.write(json.dumps(record, sort_keys=True) + '\n')
+            stream.flush()
+    return append
+
+
+def cheap_assets(config: dict[str, Any], checkpoint: Callable[[dict[str, Any]], None]) -> dict[str, Any]:
+    """Verify the small AA archive and SAM distribution before the large-file pilot."""
+    entry = config['identity_files']['aa_archive']
+    if set(entry) != {'path', 'sha256'} or entry['sha256'] != AA_SHA:
+        raise ValueError('frozen AA archive identity required')
+    archive = Path(entry['path']).resolve(strict=True)
+    record = stable_file_hash(archive)
+    if record['sha256'] != AA_SHA:
+        raise ValueError('AA archive identity mismatch')
+    checkpoint({'kind': 'aa_archive', **record})
+    prefix = Path(config['runtimes']['main']['python']).resolve(strict=True).parents[1]
+    if Path(sys.prefix).resolve() != prefix:
+        raise ValueError('SAM identity check must run in MAIN environment')
+    jcv_prefix = Path(config['runtimes']['jcv']['python']).resolve(strict=True).parents[1]
+    aa = verify_aa_tree(archive, jcv_prefix / 'opt/Moore-AnimateAnyone', checkpoint=checkpoint)
+    sam = verify_sam_distribution(prefix, checkpoint=checkpoint)
+    return {'aa_installed': aa, 'sam_distribution': sam,
+            'scope': 'small AA/SAM identity checks only; no Torch, models, GPU or full environment equivalence'}
 
 
 def identity_projection(samples: list[float], total_bytes: int, used_cpu: float, limit: int) -> dict[str, Any]:
@@ -183,6 +324,9 @@ def asset_phase(config: dict[str, Any], output: Path, identity_cpu_limit: int = 
     required = {'main_archive': ENV_SHAS['main'], 'jcv_archive': ENV_SHAS['jcv'], 'aa_archive': AA_SHA}
     if not required.keys() <= entries.keys():
         raise ValueError('environment and AA archives required')
+    checkpoint = start_checkpoint(output.parent / 'verified-checkpoint.jsonl')
+    cheap = cheap_assets(config, checkpoint)
+    aa, sam = cheap['aa_installed'], cheap['sam_distribution']
     inventory: dict[str, dict[str, Any]] = {}
     for name, entry in entries.items():
         path = Path(entry['path']).resolve(strict=True)
@@ -224,22 +368,20 @@ def asset_phase(config: dict[str, Any], output: Path, identity_cpu_limit: int = 
         if name in required and entry['sha256'] != required[name]:
             raise ValueError(f'changed frozen archive identity: {name}')
         path = Path(entry['path']).resolve(strict=True)
-        digest = sha(path)
-        if digest != entry['sha256']:
+        record = stable_file_hash(path)
+        if record['sha256'] != entry['sha256']:
             raise ValueError(f'asset hash mismatch: {name}')
-        hashes[name] = {'path': str(path), 'sha256': digest, 'bytes': path.stat().st_size}
+        checkpoint({'kind': 'asset', 'name': name, **record})
+        hashes[name] = {'path': str(path), 'sha256': record['sha256'], 'bytes': record['size']}
     protected = {}
     for group, (name, expected) in PROTECTED.items():
-        if config['denied_paths'].get(group) != [name] or sha(Path(name)) != expected:
+        if config['denied_paths'].get(group) != [name]:
             raise ValueError(f'protected probe input identity mismatch: {group}')
-        stat = Path(name).stat()
-        protected[group] = {'path': name, 'sha256': expected, 'device': stat.st_dev, 'inode': stat.st_ino}
-    prefix = Path(config['runtimes']['main']['python']).resolve(strict=True).parents[1]
-    if Path(sys.prefix).resolve() != prefix:
-        raise ValueError('SAM identity check must run in MAIN environment')
-    jcv_prefix = Path(config['runtimes']['jcv']['python']).resolve(strict=True).parents[1]
-    aa = verify_aa_tree(Path(entries['aa_archive']['path']), jcv_prefix / 'opt/Moore-AnimateAnyone')
-    sam = verify_sam_distribution(prefix)
+        record = stable_file_hash(Path(name).resolve(strict=True))
+        if record['sha256'] != expected:
+            raise ValueError(f'protected probe input identity mismatch: {group}')
+        checkpoint({'kind': 'protected', 'name': group, **record})
+        protected[group] = {'path': name, 'sha256': expected, 'device': record['device'], 'inode': record['inode']}
     output.write_text(json.dumps({'files': hashes, 'protected_inputs': protected, 'aa_installed': aa, 'sam_distribution': sam,
                                   'scope': 'archive hashes and AA/SAM file checks; full cached-env equivalence not proven'},
                                  sort_keys=True))
@@ -404,6 +546,23 @@ def run(config: dict[str, Any], archive_sha: str, out: Path, identity_cpu_limit:
             'scope': 'CPU isolation/runtime probes; no GPU, model run, or cached-environment equivalence'}
 
 
+def run_cheap(config_path: Path, config_sha256: str, output: Path, local_root: Path) -> None:
+    """Write only new bounded AA/SAM receipts under a verified host-local root."""
+    local = local_root.resolve(strict=True)
+    if not output.is_absolute() or not output.parent.resolve(strict=True).is_relative_to(local):
+        raise ValueError('cheap result must be in existing host-local directory')
+    raw = config_path.read_bytes()
+    if len(raw) > 100_000 or hashlib.sha256(raw).hexdigest() != config_sha256:
+        raise ValueError('cheap config identity mismatch')
+    checkpoint_path = output.with_name(output.name + '.checkpoint.jsonl')
+    if os.path.lexists(output) or os.path.lexists(checkpoint_path):
+        raise ValueError('cheap output and checkpoint must be new')
+    checkpoint = start_checkpoint(checkpoint_path)
+    result = cheap_assets(json.loads(raw), checkpoint)
+    with output.open('x') as stream:
+        json.dump(result, stream, sort_keys=True)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=Path)
@@ -414,7 +573,17 @@ def main() -> int:
     parser.add_argument('--identity-cpu-seconds', type=int, default=20)
     parser.add_argument('--identity-wall-seconds', type=int, default=120)
     parser.add_argument('--deadline-monotonic', type=float)
+    parser.add_argument('--cheap-config', type=Path)
+    parser.add_argument('--cheap-config-sha256')
+    parser.add_argument('--cheap-output', type=Path)
     args = parser.parse_args()
+    if args.cheap_config or args.cheap_output or args.cheap_config_sha256:
+        if not args.cheap_config or not args.cheap_output or not args.cheap_config_sha256 or any(
+                (args.assets, args.assets_output, args.config, args.source_sha256, args.output)):
+            parser.error('cheap mode requires only cheap-config, cheap-config-sha256 and cheap-output')
+        resource.setrlimit(resource.RLIMIT_CPU, (5, 5))
+        run_cheap(args.cheap_config, args.cheap_config_sha256, args.cheap_output, Path('/local/users/emanuele'))
+        return 0
     if args.assets and args.assets_output and not any((args.config, args.source_sha256, args.output)):
         if not 1 <= args.identity_cpu_seconds <= 125:
             raise ValueError('identity CPU limit must be between 1 and 125 seconds')
