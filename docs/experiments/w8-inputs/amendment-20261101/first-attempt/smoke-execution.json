@@ -1,0 +1,30 @@
+{
+  "exit_code": 0,
+  "seconds": 15.943566083908081,
+  "children_resource_usage": [
+    11.613131,
+    2.121498,
+    2148760,
+    0,
+    0,
+    0,
+    759805,
+    0,
+    0,
+    8,
+    2311680,
+    0,
+    0,
+    0,
+    9537,
+    8258
+  ],
+  "timing_contaminated": true,
+  "contention": [],
+  "paused_seconds": 0.0,
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Deterministic scoring of saved streams does not depend on foreign workload timing.",
+    "margin_mib": 8192
+  }
+}

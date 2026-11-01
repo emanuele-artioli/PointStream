@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "modules": {
+    "experiments.tennis.w8_score_job": "/local/users/emanuele/pointstream/preflights/w8-a5fdb235-20261101/source/experiments/tennis/w8_score_job.py",
+    "experiments.tennis.w1_score": "/local/users/emanuele/pointstream/preflights/w8-a5fdb235-20261101/source/experiments/tennis/w1_score.py",
+    "experiments.tennis.w9_full_audit": "/local/users/emanuele/pointstream/preflights/w8-a5fdb235-20261101/source/experiments/tennis/w9_full_audit.py",
+    "experiments.tennis.w8_amendment_merge": "/local/users/emanuele/pointstream/preflights/w8-a5fdb235-20261101/source/experiments/tennis/w8_amendment_merge.py",
+    "experiments.tennis.k4b_features": "/local/users/emanuele/pointstream/preflights/w8-a5fdb235-20261101/source/experiments/tennis/k4b_features.py",
+    "tools.agent_hooks.guard_protected": "/local/users/emanuele/pointstream/preflights/w8-a5fdb235-20261101/source/tools/agent_hooks/guard_protected.py"
+  },
+  "native": {
+    "SvtAv1EncApp": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+    "dav1d": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+    "ffmpeg": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2"
+  },
+  "python": "3.12.14 (main, Sep  2 2026, 23:27:36) [GCC 15.3.0]",
+  "prefix": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+  "affinity": [
+    0
+  ],
+  "cpu_s": 1.471314,
+  "cuda_visible_devices": ""
+}

@@ -1,0 +1,26 @@
+{
+  "status": "failed",
+  "started": 1793517534.0481994,
+  "last_progress": 1793517566.2403748,
+  "emitted": [
+    "terminal:failed",
+    "decision:e89aad82358f5294be37cf04993305ef"
+  ],
+  "gpu_sharing": {
+    "mode": "shared",
+    "basis": "Deterministic scoring of saved streams does not depend on foreign workload timing.",
+    "margin_mib": 8192
+  },
+  "timing_contaminated": true,
+  "pid": 3179728,
+  "proc_start_time": 1793517534.74,
+  "process_group_id": 3179728,
+  "progress": {
+    "stage": "attention",
+    "completed": 0,
+    "updated": 1793517559.1473088,
+    "decision": "smoke validator must exit zero and publish passed:true with substantive checks"
+  },
+  "exit_code": 1,
+  "ended": 1793517566.2403748
+}
