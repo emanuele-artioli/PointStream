@@ -12,12 +12,13 @@ import math
 import os
 from pathlib import Path
 import resource
+import stat
 import shutil
 import subprocess
 import sys
 import tarfile
 import time
-from typing import Any
+from typing import Any, Callable
 
 from experiments.tennis import w8_input_job as fixed
 from experiments.tennis import w8_receiver_generate as receiver
@@ -35,7 +36,55 @@ WEIGHT_NAMES = {
 }
 
 
-def stage_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any]]:
+class StableDigests:
+    """Reuse an actual digest only while the exact path's file identity is unchanged.
+
+    The cache lives in one process and is never a substitute for the separate
+    staged-input verification in another worker or validator process.
+    """
+    def __init__(self) -> None:
+        self._cache: dict[Path, tuple[tuple[int, int, int, int, int], str]] = {}
+        self.reads = 0
+        self.bytes_read = 0
+        self.cpu_seconds = 0.0
+
+    @staticmethod
+    def _stamp(info: os.stat_result) -> tuple[int, int, int, int, int]:
+        if not stat.S_ISREG(info.st_mode):
+            raise ValueError('digest input is not a regular file')
+        return info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns
+
+    def digest(self, path: Path) -> str:
+        # Key the path, not its inode: distinct aliases are independently read.
+        key = path.absolute()
+        current = self._stamp(key.stat())
+        cached = self._cache.get(key)
+        if cached is not None and cached[0] == current:
+            return cached[1]
+        start = time.process_time()
+        digest = hashlib.sha256()
+        with key.open('rb') as stream:
+            before = self._stamp(os.fstat(stream.fileno()))
+            if before != current:
+                raise ValueError('digest input changed before read')
+            while block := stream.read(1024 * 1024):
+                digest.update(block)
+            after = self._stamp(os.fstat(stream.fileno()))
+        if before != after or after != self._stamp(key.stat()):
+            raise ValueError('digest input changed during read')
+        result = digest.hexdigest()
+        self._cache[key] = (after, result)
+        self.reads += 1
+        self.bytes_read += after[2]
+        self.cpu_seconds += time.process_time() - start
+        return result
+
+    def receipt(self) -> dict[str, Any]:
+        return {'whole_file_reads': self.reads, 'bytes_read': self.bytes_read,
+                'hash_cpu_seconds': self.cpu_seconds, 'scope': 'this process only'}
+
+
+def stage_inputs(stage: Path, digest_file: Callable[[Path], str] | None = None) -> tuple[dict[str, Path], dict[str, Any]]:
     spec = json.loads((stage.parent / 'spec.json').read_text())
     staging = json.loads((stage / 'staging.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
@@ -58,12 +107,13 @@ def stage_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any]]:
     for extra in ('preflight', 'identity'):
         wanted[extra] = declared[extra]['sha256']
     paths = {}
+    digest_file = digest_file or fixed.file_sha
     for name, expected in wanted.items():
         if (declared[name]['sha256'] != expected or actual[name]['sha256'] != expected
                 or declared[name].get('extract', False) or actual[name].get('extract', False)):
             raise ValueError(f'staged identity mismatch: {name}')
         path = Path(actual[name]['path']).resolve(strict=True)
-        if fixed.file_sha(path) != expected:
+        if digest_file(path) != expected:
             raise ValueError(f'staged bytes mismatch: {name}')
         paths[name] = path
     return paths, spec
@@ -84,8 +134,9 @@ def read_oracle(path: Path) -> dict[str, Any]:
     return fingerprints
 
 
-def extract_base(archive_path: Path, out: Path) -> Path:
-    if fixed.file_sha(archive_path) != BASE_ARCHIVE_SHA:
+def extract_base(archive_path: Path, out: Path, digest_file: Callable[[Path], str] | None = None) -> Path:
+    digest_file = digest_file or fixed.file_sha
+    if digest_file(archive_path) != BASE_ARCHIVE_SHA:
         raise ValueError('common base archive mismatch')
     with tarfile.open(archive_path) as archive:
         found = [entry for entry in archive if entry.name == 'publish/tennis-base@fit-100.pt']
@@ -96,13 +147,13 @@ def extract_base(archive_path: Path, out: Path) -> Path:
             raise ValueError('common base member unreadable')
         with out.open('xb') as target:
             shutil.copyfileobj(stream, target, 1024 * 1024)
-    if fixed.file_sha(out) != receiver.BASE_SHA:
+    if digest_file(out) != receiver.BASE_SHA:
         raise ValueError('common base checkpoint mismatch')
     return out
 
 
-def _item(path: Path) -> dict[str, str]:
-    return {'path': str(path), 'sha256': fixed.file_sha(path)}
+def _item(path: Path, digest_file: Callable[[Path], str] | None = None) -> dict[str, str]:
+    return {'path': str(path), 'sha256': (digest_file or fixed.file_sha)(path)}
 
 
 def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int) -> dict[str, Any]:
@@ -225,6 +276,39 @@ def check_preflight_bundle(preflight: dict[str, Any], identity_path: Path) -> No
                 raise ValueError('preflight source closure mismatch')
 
 
+def check_preflight_sources(preflight: dict[str, Any], root: Path) -> None:
+    """Recheck the exact preflight entrypoints and imported project closure.
+
+    Unexecuted files in the same source archive may change in the separately
+    frozen fleet revision; the fleet independently verifies that full snapshot.
+    """
+    source = Path(preflight['source_tree'])
+    if not source.is_absolute():
+        raise ValueError('preflight source tree must be absolute')
+    required = {'experiments/tennis/w8_receiver_preflight.py',
+                'experiments/tennis/w8_receiver_bootstrap.py'}
+    for receipt in preflight['receipts'].values():
+        for module in receipt['source_modules'].values():
+            try:
+                required.add(str(Path(module['path']).relative_to(source)))
+            except ValueError as exc:
+                raise ValueError('preflight source module outside frozen tree') from exc
+    for name in required:
+        expected = preflight['frozen_source_files'].get(name)
+        if not isinstance(expected, str):
+            raise ValueError(f'preflight source identity missing: {name}')
+        actual = (root / name).resolve(strict=True)
+        if not actual.is_relative_to(root) or fixed.file_sha(actual) != expected:
+            raise ValueError(f'preflight-qualified source changed: {name}')
+
+
+def validator_cpu_limit(spec: dict[str, Any]) -> int:
+    limit = spec.get('receiver_validator_cpu_seconds', 20)
+    if type(limit) is not int or not 1 <= limit <= 60:
+        raise ValueError('validator CPU limit must be between 1 and 60 seconds')
+    return limit
+
+
 def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generator_cpu: int,
              worker_wall: int, preflight_path: Path, preflight_sha: str) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
@@ -238,11 +322,13 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
     if parent_cpu > 60 or packet_cpu > 60 or generator_cpu > 300 or worker_wall > 450:
         raise ValueError('worker limit exceeds reviewed ceiling')
     resource.setrlimit(resource.RLIMIT_CPU, (parent_cpu, 3600))
-    paths, spec = stage_inputs(stage)
+    digests = StableDigests()
+    paths, spec = stage_inputs(stage, digests.digest)
     if preflight_path.resolve(strict=True) != paths['preflight'] or fixed.file_sha(preflight_path) != preflight_sha:
         raise ValueError('CLI preflight path or SHA differs from staged input')
     external = spec['receiver_external_cpu_reserve_seconds']
-    total_cpu = 2 * (parent_cpu + packet_cpu + generator_cpu) + 20 + external
+    validator_cap = validator_cpu_limit(spec)
+    total_cpu = 2 * (parent_cpu + packet_cpu + generator_cpu) + validator_cap + external
     if (type(external) not in (int, float) or not 0 < external <= 100
             or not total_cpu <= spec['receiver_cpu_budget_seconds'] <= 2018):
         raise ValueError('campaign CPU reservations exceed remaining budget')
@@ -256,10 +342,7 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
         if item != {'path': protected_path, 'sha256': protected_sha, 'device': st.st_dev, 'inode': st.st_ino}:
             raise ValueError(f'protected preflight identity changed: {group}')
     root = Path(__file__).resolve().parents[2]
-    for name, source_sha in preflight['frozen_source_files'].items():
-        source_file = (root / name).resolve(strict=True)
-        if not source_file.is_relative_to(root) or fixed.file_sha(source_file) != source_sha:
-            raise ValueError(f'preflight-qualified source changed: {name}')
+    check_preflight_sources(preflight, root)
     scratch = fixed.checked_scratch()
     aliases = scratch / 'protected-aliases'
     aliases.mkdir()
@@ -271,7 +354,7 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
         denials['aliases'].append(str(alias))
     parent_user = os.readlink('/proc/self/ns/user')
     parent_net = os.readlink('/proc/self/ns/net')
-    base = extract_base(paths['base'], scratch / 'tennis-base.pt')
+    base = extract_base(paths['base'], scratch / 'tennis-base.pt', digests.digest)
     decoder_work = scratch / 'packet-worker'
     decoder_work.mkdir()
     decoder_out = decoder_work / 'output'
@@ -304,15 +387,16 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
                                 'TEMP': str(out), 'XDG_CACHE_HOME': str(out / '.cache'),
                                 'TORCH_HOME': str(out / '.cache' / 'torch'),
                                 'PS_GPU_MEMORY_LIMIT_MIB': str(spec['gpu_memory_mib'])}}
-    packet_files = {'bundle': _item(paths['packet']), 'profile': _item(paths['profile']), 'guider': _item(paths['w6'])}
+    packet_files = {'bundle': _item(paths['packet'], digests.digest),
+                    'profile': _item(paths['profile'], digests.digest), 'guider': _item(paths['w6'], digests.digest)}
     packet_cfg = config('packet', packet_files, decoder_out, policies['main'], packet_cpu, '')
     packet_usage = _worker(Path(policies['main']['python']), packet_cfg, decoder_work, packet_cpu, worker_wall)
     decoder_manifest = decoder_out / 'decoded-manifest.json'
-    generated = {'checkpoint': _item(decoder_out / 'decoded.pt'),
-                 'decoder_manifest': _item(decoder_manifest),
-                 'unit': _item(decoder_out / 'publish' / 'units' / f'{fixed.UNITS[0]}.npz'),
-                 'base': _item(base), 'aa_archive': _item(paths['aa']),
-                 **{f'weight:{name}': _item(paths[key]) for key, name in WEIGHT_NAMES.items()}}
+    generated = {'checkpoint': _item(decoder_out / 'decoded.pt', digests.digest),
+                 'decoder_manifest': _item(decoder_manifest, digests.digest),
+                 'unit': _item(decoder_out / 'publish' / 'units' / f'{fixed.UNITS[0]}.npz', digests.digest),
+                 'base': _item(base, digests.digest), 'aa_archive': _item(paths['aa'], digests.digest),
+                 **{f'weight:{name}': _item(paths[key], digests.digest) for key, name in WEIGHT_NAMES.items()}}
     aa_root = (cached_jcv / 'opt' / 'Moore-AnimateAnyone' / 'animate_anyone').resolve(strict=True)
     for source_path, digest in identity['aa_installed']['files'].items():
         path = Path(source_path).resolve(strict=True)
@@ -361,7 +445,8 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
     publication.mkdir(exist_ok=False)
     summary = {'scope': 'qualification_only', 'steps': steps, 'unit': fixed.UNITS[0],
                'validation': validation, 'generation_seal': seal, 'packet_usage': packet_usage,
-               'generation_usage': gpu_usage, 'inputs': {k: fixed.file_sha(v) for k, v in paths.items()},
+               'generation_usage': gpu_usage, 'inputs': {k: digests.digest(v) for k, v in paths.items()},
+               'hash_accounting': digests.receipt(),
                'preflight_sha256': fixed.file_sha(paths['preflight']),
                'actual_parent_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
                'parent_cpu_limit': parent_cpu, 'packet_cpu_limit': packet_cpu, 'generator_cpu_limit': generator_cpu,
@@ -427,10 +512,13 @@ def audit_retained_inputs(retained: Path, seal: dict[str, Any], fingerprints: di
 def cost_validate(stage: Path, output: Path) -> int:
     """Independently re-open the retained smoke crops and the bounded publication."""
     try:
-        resource.setrlimit(resource.RLIMIT_CPU, (20, 3600))
+        pre_spec = json.loads((stage.parent / 'spec.json').read_text())
+        validator_cap = validator_cpu_limit(pre_spec)
+        resource.setrlimit(resource.RLIMIT_CPU, (validator_cap, 3600))
         if stage.name != 'smoke':
             raise ValueError('fleet promotion validator applies only to smoke')
-        paths, spec = stage_inputs(stage)
+        digests = StableDigests()
+        paths, spec = stage_inputs(stage, digests.digest)
         summary = read_published_summary(stage)
         check_summary_resources(summary)
         if (summary.get('scope') != 'qualification_only' or summary.get('steps') != 1
@@ -451,10 +539,10 @@ def cost_validate(stage: Path, output: Path) -> int:
         if validation != summary['validation']:
             raise ValueError('independent cost output validation differs')
         for key, name in WEIGHT_NAMES.items():
-            if seal['files'][f'weight:{name}'] != fixed.file_sha(paths[key]):
+            if seal['files'][f'weight:{name}'] != digests.digest(paths[key]):
                 raise ValueError(f'cost output weight binding mismatch: {name}')
-        if (summary['inputs'] != {k: fixed.file_sha(v) for k, v in paths.items()}
-                or seal['files']['aa_archive'] != fixed.file_sha(paths['aa'])
+        if (summary['inputs'] != {k: digests.digest(v) for k, v in paths.items()}
+                or seal['files']['aa_archive'] != digests.digest(paths['aa'])
                 or summary['preflight_sha256'] != fixed.file_sha(paths['preflight'])):
             raise ValueError('cost output staged-input binding mismatch')
         clock = json.loads((stage / 'dispatch.json').read_text())['campaign_clock']
@@ -474,16 +562,20 @@ def cost_validate(stage: Path, output: Path) -> int:
         packet_cap = summary['packet_cpu_limit']
         generator_cap = summary['generator_cpu_limit']
         external = spec['receiver_external_cpu_reserve_seconds']
-        total_cap = 2 * (parent_cap + packet_cap + generator_cap) + 20 + external
+        if validator_cpu_limit(spec) != validator_cap:
+            raise ValueError('validator CPU limit changed during validation')
+        total_cap = 2 * (parent_cap + packet_cap + generator_cap) + validator_cap + external
         if (not 0 < external <= 100 or total_cap > spec['receiver_cpu_budget_seconds']
                 or spec['receiver_cpu_budget_seconds'] > 2018):
             raise ValueError('aggregate CPU reservation exceeds declared remaining budget')
         result = {'passed': True, 'checks': {'qualification_only': True, 'oracle_binding': True,
                   'independent_crop_validation': True, 'remaining_budget': True, 'cpu_reservation': True},
                   'scope': '1-step cost probe only, no quality claim', 'validation': validation,
+                  'hash_accounting': digests.receipt(),
                   'projection': {'measured_smoke_wall_seconds': measured, 'three_step_allowance': projected,
                                  'stage_reserve_seconds': stage_reserve, 'remaining_seconds': end - now,
-                                 'cpu_reservation_seconds': total_cap}}
+                                 'cpu_reservation_seconds': total_cap,
+                                 'validator_cpu_limit_seconds': validator_cap}}
         output.write_text(json.dumps(result, sort_keys=True))
         return 0
     except Exception as exc:

@@ -219,6 +219,7 @@
   "validator_seconds": 50,
   "budget_seconds": 500,
   "receiver_cpu_budget_seconds": 400,
+  "receiver_validator_cpu_seconds": 20,
   "receiver_external_cpu_reserve_seconds": 20,
   "contention": {
     "policy": "stop",

@@ -274,3 +274,58 @@ def test_cost_audit_requires_and_records_cpu_cap(tmp_path, monkeypatch):
     sys.argv[sys.argv.index('--cpu-seconds') + 1] = '21'
     with pytest.raises(ValueError, match='at most 20 seconds'):
         job.main()
+
+
+def test_digest_reuse_requires_unchanged_file_and_is_process_local(tmp_path):
+    import hashlib
+    import os
+
+    path = tmp_path / 'weights'
+    path.write_bytes(b'first')
+    original_stat = path.stat()
+    cache = job.StableDigests()
+    assert cache.digest(path) == hashlib.sha256(b'first').hexdigest()
+    assert cache.digest(path) == hashlib.sha256(b'first').hexdigest()
+    assert cache.receipt()['whole_file_reads'] == 1
+    # Same size and restored mtime still changes ctime; the saved digest must
+    # not be returned for different bytes.
+    path.write_bytes(b'other')
+    os.utime(path, ns=(original_stat.st_atime_ns, original_stat.st_mtime_ns))
+    assert cache.digest(path) == hashlib.sha256(b'other').hexdigest()
+    assert cache.receipt()['whole_file_reads'] == 2
+    assert job.StableDigests().digest(path) == hashlib.sha256(b'other').hexdigest()
+    alias = tmp_path / 'hardlink'
+    os.link(path, alias)
+    assert cache.digest(alias) == hashlib.sha256(b'other').hexdigest()
+    assert cache.receipt()['whole_file_reads'] == 3
+
+
+def test_validator_cap_is_explicit_bounded_and_defaults_to_twenty():
+    assert job.validator_cpu_limit({}) == 20
+    assert job.validator_cpu_limit({'receiver_validator_cpu_seconds': 60}) == 60
+    for limit in (0, 61, True, 5.0):
+        with pytest.raises(ValueError, match='validator CPU limit'):
+            job.validator_cpu_limit({'receiver_validator_cpu_seconds': limit})
+
+
+def test_preflight_checks_executed_closure_not_unrelated_future_cost_code(tmp_path):
+    source = tmp_path / 'source'
+    target = tmp_path / 'future'
+    (source / 'experiments/tennis').mkdir(parents=True)
+    (target / 'experiments/tennis').mkdir(parents=True)
+    names = ['experiments/tennis/w8_receiver_preflight.py', 'experiments/tennis/w8_receiver_bootstrap.py',
+             'experiments/tennis/w8_input_job.py']
+    hashes = {}
+    for name in names:
+        (source / name).write_text(name)
+        (target / name).write_text(name)
+        hashes[name] = job.fixed.file_sha(source / name)
+    hashes['experiments/tennis/w8_receiver_job.py'] = 'old-unexecuted-code'
+    (target / 'experiments/tennis/w8_receiver_job.py').write_text('new reviewed cost implementation')
+    receipt = {'source_modules': {'module': {'path': str(source / names[2]), 'sha256': hashes[names[2]]}}}
+    bundle = {'source_tree': str(source), 'receipts': {'main': receipt, 'jcv': receipt},
+              'frozen_source_files': hashes}
+    job.check_preflight_sources(bundle, target)
+    (target / names[0]).write_text('changed preflight')
+    with pytest.raises(ValueError, match='preflight-qualified source changed'):
+        job.check_preflight_sources(bundle, target)
