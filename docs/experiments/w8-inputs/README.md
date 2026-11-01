@@ -11,6 +11,12 @@ same-configuration reproduction of both packet hashes. It resolves current
 implementation reproducibility only; it does not qualify fresh inference or
 erase limitations of the original diagnostic receipts.
 
+The `input-diagnostic-initial` and `input-diagnostic-extent` JSONs preserve the
+Mac's strict geometry failure and its measured extent. They predate the paid
+judged-bitmap helper correction; they are failure diagnostics, not results of
+the current unexecuted packed input job. The original native-equivalence check
+also failed in that local environment, so the discrepancy was not waived.
+
 The fixed candidate stopped unresolved at 46.3151 kbps: one measured anchor
 ends at 45.8233 kbps. `input-oracle-draft.json` is **not submission-ready and
 must not be submitted** under the stopped card. Its Landlock confinement and

@@ -1,0 +1,16 @@
+{
+  "status": "failed",
+  "error": "Golden mismatch: nadal_kyrgios__000_at120__person_000000000000:box",
+  "traceback": "Traceback (most recent call last):\n  File \"/private/tmp/w8-input-fixture-20261101/check.py\", line 21, in <module>\n    validate_golden(out,paths,items[keys[0]])\n  File \"/Users/manu/.codex/worktrees/3cb5/PointStream/experiments/tennis/w8_inputs.py\", line 136, in validate_golden\n    raise ValueError(f\"Golden mismatch: {name}:{key}\")\nValueError: Golden mismatch: nadal_kyrgios__000_at120__person_000000000000:box\n",
+  "cpu_s": 1.242154,
+  "wall_s": 1.3036108748055995,
+  "input_sha256": {
+    "publish/packets/nadal_kyrgios__000@120/keypoints.kps": "2e8452e4c458cf0998b6b8e004812575bdb2a638dd927b087dbc330d11d67070",
+    "publish/packets/nadal_kyrgios__000@120/nadal_kyrgios__000_at120__person_000000000000.png.ref": "63d214f5631fd5557d86a9c8c7c2936e2ef45afe539e882001d60e6115896559",
+    "publish/packets/nadal_kyrgios__000@120/nadal_kyrgios__000_at120__person_000000000001.png.ref": "c8a4d5355f06d72281751a0d936d5e28c1d80d189021b20000ccfc1dc62e7d6a",
+    "publish/units/nadal_kyrgios__000_at120__person_000000000000.npz": "ec3ca2dab1b6df5ccf36687d9c4709a4a2a4a623771f2bbe104d823ecdac5ce7",
+    "publish/units/nadal_kyrgios__000_at120__person_000000000001.npz": "6773675838ab49b97d05029b076660454f1b3bacebecdb1f262b43ad268b7d76"
+  },
+  "golden_archive_sha256": "94a5d6318fc113557fb24c8a32f2edffdf368f7a289484fddd4b19a749302bfa",
+  "code_sha256": "a1a16f0eef36a4c1a193fb1a39b51a0a2c6adab908dee4987a4c91fc4d24bde9"
+}
