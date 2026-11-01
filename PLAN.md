@@ -23,6 +23,24 @@ new dependency.
 
 ## Where PointStream stands (2026-11-01)
 
+**Paper strengthening reopened (user, 2026-11-01):** the research roadmap is
+not complete and the earlier technically prepared package is a preserved review
+checkpoint, not the final submission candidate. The user approved a stronger
+visual presentation (approximately eight main figures, supporting appendix
+ablations/negative results, replacing repetitive prose/tables), with **at most
+23 body/reference pages, at most two reference pages within those 23, and five
+additional appendix pages**. PRESLEY is a read-only format reference and must
+not be modified by this session. The retained K5b ball streak result belongs
+in the main paper: the user adopted it on 2026-10-21 despite its failed
+whole-frame PSNR rate guard. Recover and audit the saved real-payload result,
+including tracker/judge dependence, before promoting its specific task claim;
+do not substitute the earlier source-pixel oracle or call it a whole-codec win.
+Parallel work is recovering the ball evidence, implementing saved-evidence
+figures, and ranking unfinished research. New GPU runs, stopped-card retries,
+training and larger sweeps still require their own reviewed protocol/budget.
+In particular med000 DCVC was explicitly dropped by the user after decoder
+nondeterminism; do not automatically reopen it as a missing-anchor repair.
+
 **Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
 Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library
 inventory and CPU input/runtime qualification passed their recorded narrow gates.

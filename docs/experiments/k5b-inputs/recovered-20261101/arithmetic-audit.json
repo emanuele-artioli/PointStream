@@ -1,0 +1,173 @@
+{
+  "scope": "CPU-only arithmetic and archived-validator replay from recovered four-window JSON; no original media/stream/model or fresh decoder replay",
+  "original_job": "20261021T084417Z-048cc9d4",
+  "source_revision": "d4bed15b9ee6590717f9c7b8fda84acf1e85e94f",
+  "recovery_date": "2026-11-01",
+  "selected_input_files": {
+    "k5b1b.json": {
+      "bytes": 6136,
+      "sha256": "d3a785c7b1ec3035ebcbe1476299cb71f825223b8893efaa841391e1eed9a678"
+    },
+    "tracknet__game10__Clip10.json": {
+      "bytes": 74665,
+      "sha256": "935d79c77f1acdbefde0e67b630cbf180fb831f29a2170e628cbedc7c990cb5c"
+    },
+    "tracknet__game3__Clip3.json": {
+      "bytes": 73835,
+      "sha256": "b016a8642a54fd7f45152458455ef973c4dd8edee8984f4639f34bb7fcf8c914"
+    },
+    "tracknet__game3__Clip6.json": {
+      "bytes": 75168,
+      "sha256": "55a1a7e117b993197e1e5622ba4801f7e8ab5bfbf1179befeafe5f62820094dc"
+    },
+    "tracknet__game7__Clip2.json": {
+      "bytes": 74943,
+      "sha256": "0a18840a587868b591c8d483cef3cba80e0feeef9f195f170de3f5596162e397"
+    },
+    "ready.json": {
+      "bytes": 758,
+      "sha256": "9611f4156175ab37ac85c258a7217e5bfc75d91d9f07f2d79d84d25a821dea11"
+    },
+    "export-receipt.json": {
+      "bytes": 472,
+      "sha256": "b9dbf9618a833473afa237c9925833216601ec4b92ca084e5db053ae3bef636b"
+    }
+  },
+  "original_validator_checks": {
+    "every_window_published": true,
+    "converted_every_frame": true,
+    "every_point_coded": true,
+    "dcvc_decodes_deterministic": true,
+    "dcvc_decodes_are_pictures": true,
+    "models_on_cuda": true,
+    "every_variant_judged": true,
+    "judge_finds_the_source_ball": true,
+    "source_judged_against_itself": true,
+    "balltrack_gpu_path_agrees": true,
+    "ball_payload_round_trips": true,
+    "ball_bytes_billed": true,
+    "frame_error_never_rises": true,
+    "disk_is_sharp": true,
+    "side_by_side_clips_written": true
+  },
+  "ast_equivalent_historical_functions": [
+    "experiments/tennis/k5b1b.py:detection",
+    "experiments/tennis/k5b1b.py:hull",
+    "experiments/tennis/k5b1b.py:rate_to_reach",
+    "experiments/tennis/k5b1b.py:detection_verdict",
+    "experiments/tennis/k5b1b.py:curve",
+    "experiments/tennis/k5b1b.py:window_report",
+    "experiments/tennis/k5b1b.py:decide",
+    "experiments/tennis/k5b1b.py:validate_rows",
+    "experiments/tennis/k5.py:bd_rate",
+    "experiments/tennis/k5.py:verdict",
+    "experiments/background/g5.py:pareto",
+    "experiments/background/g5.py:envelope",
+    "experiments/background/g5.py:anchor_quality"
+  ],
+  "recomputed_qp0_equal_window_means": {
+    "decode": {
+      "windows": 4,
+      "mean_total_kbps": 12.952350629074246,
+      "mean_balltrack_recall": 0.009670747386662194
+    },
+    "streak@balltrack": {
+      "windows": 4,
+      "mean_total_kbps": 13.917260085186406,
+      "mean_balltrack_recall": 0.9097922926510347
+    }
+  },
+  "recomputed_streak_dcvc": {
+    "tracknet/game10/Clip10": {
+      "dists_bd_rate_pooled": {
+        "bd_rate": -0.35705277962148463,
+        "basis": "bd"
+      },
+      "frame_psnr_bd_rate_dcvc": {
+        "bd_rate": 0.017929814079033157,
+        "basis": "bd"
+      },
+      "historical_detection_verdict": {
+        "rate": 19.299759036144575,
+        "anchor_rate": 137.69178956510711,
+        "ratio": 0.14016637518549172,
+        "passes": true
+      },
+      "historical_gate_checks": {
+        "detection": true,
+        "dists": true,
+        "frame": false
+      }
+    },
+    "tracknet/game3/Clip3": {
+      "dists_bd_rate_pooled": {
+        "bd_rate": -0.4204840158310085,
+        "basis": "bd"
+      },
+      "frame_psnr_bd_rate_dcvc": {
+        "bd_rate": 0.028231036262093667,
+        "basis": "bd"
+      },
+      "historical_detection_verdict": {
+        "rate": 12.648000000000001,
+        "anchor_rate": 246.04087416494062,
+        "ratio": 0.051406092759697514,
+        "passes": true
+      },
+      "historical_gate_checks": {
+        "detection": true,
+        "dists": true,
+        "frame": false
+      }
+    },
+    "tracknet/game3/Clip6": {
+      "dists_bd_rate_pooled": {
+        "bd_rate": -0.33790294489662287,
+        "basis": "bd"
+      },
+      "frame_psnr_bd_rate_dcvc": {
+        "bd_rate": 0.022542747098753146,
+        "basis": "bd"
+      },
+      "historical_detection_verdict": {
+        "rate": 12.070588235294117,
+        "anchor_rate": 260.04209213238863,
+        "ratio": 0.046417824654129164,
+        "passes": true
+      },
+      "historical_gate_checks": {
+        "detection": true,
+        "dists": true,
+        "frame": false
+      }
+    },
+    "tracknet/game7/Clip2": {
+      "dists_bd_rate_pooled": {
+        "bd_rate": -0.2735775598439998,
+        "basis": "bd"
+      },
+      "frame_psnr_bd_rate_dcvc": {
+        "bd_rate": 0.025746412633407045,
+        "basis": "bd"
+      },
+      "historical_detection_verdict": {
+        "rate": 11.650693069306929,
+        "anchor_rate": 79.2256958580986,
+        "ratio": 0.14705699890821436,
+        "passes": true
+      },
+      "historical_gate_checks": {
+        "detection": true,
+        "dists": true,
+        "frame": false
+      }
+    }
+  },
+  "limitations": [
+    "BallTrack is both encoder position source and image judge; label/WASB position controls are not independent output judges",
+    "four development windows; original all-gate decision failed; user retained streak despite frame guard",
+    "published archive contains result JSONs and H264 contact-sheet videos, no serialized BALL/native codec streams",
+    "historical archive full digest not rechecked at this checkpoint; selected raw members independently SHA256 identified",
+    "same underlying codec settings plus billed ball bytes; not exact equal-total-rate screenshots or full PointStream codec result"
+  ]
+}

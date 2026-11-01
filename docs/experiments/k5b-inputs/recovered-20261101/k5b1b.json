@@ -1,0 +1,223 @@
+{
+ "decision": {
+  "decides_on": "balltrack",
+  "detection_share": 0.8,
+  "max_dists_bd_rate": -0.25,
+  "max_frame_bd_rate": 0.01,
+  "max_rate_ratio": 0.5,
+  "min_windows": 6,
+  "of_windows": 8,
+  "overlap": {
+   "ball_psnr": 0.5,
+   "dists": 0.01,
+   "frame_psnr": 0.5,
+   "lpips": 0.01,
+   "streak_psnr": 0.5
+  }
+ },
+ "device": "NVIDIA RTX A6000",
+ "judges": {
+  "balltrack": {
+   "meta": {
+    "epoch": 47,
+    "iter": 15228
+   },
+   "path": "/dev/shm/emanuele-pointstream/cache/b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec/balltrack_best.state_dict.pt",
+   "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+  },
+  "dists": {
+   "backbone": "/dev/shm/emanuele-pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+   "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+   "metric": "DISTS",
+   "net": "vgg16",
+   "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)",
+   "torchmetrics": "1.9.0",
+   "weights": "/dev/shm/emanuele-pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+   "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218"
+  },
+  "lpips": {
+   "backbone": "/dev/shm/emanuele-pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+   "backbone_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+   "heads": "/dev/shm/emanuele-pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/lpips_models/alex.pth",
+   "heads_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0",
+   "metric": "LPIPS",
+   "net": "alex",
+   "pooling": "spatial map at full resolution (bilinear), mean over the frame or region",
+   "torchmetrics": "1.9.0"
+  }
+ },
+ "on_cuda": {
+  "balltrack": "cuda:0",
+  "dists": "cuda:0",
+  "lpips": "cuda:0",
+  "wasb": "cuda:0"
+ },
+ "restored": [],
+ "settings": {
+  "cpu_sets": [
+   [
+    0,
+    1,
+    2
+   ],
+   [
+    3,
+    4,
+    5
+   ],
+   [
+    6,
+    7,
+    8
+   ],
+   [
+    9,
+    10,
+    11
+   ],
+   [
+    12,
+    13,
+    14
+   ]
+  ],
+  "crfs": [
+   35,
+   41,
+   48,
+   55,
+   62
+  ],
+  "crop": 64,
+  "exposures": [
+   0.0,
+   0.14285714285714285,
+   0.2857142857142857,
+   0.42857142857142855,
+   0.5714285714285714,
+   0.7142857142857143,
+   0.8571428571428571,
+   1.0
+  ],
+  "frames": 240,
+  "hit_px": [
+   10.0,
+   5.0
+  ],
+  "min_gain": 0.5,
+  "paste_px": 4.0,
+  "phases": [
+   -0.5,
+   -0.3333333333333333,
+   -0.16666666666666666,
+   0.0,
+   0.16666666666666666,
+   0.3333333333333333,
+   0.5
+  ],
+  "preset": 4,
+  "qps": [
+   0,
+   21,
+   42,
+   63
+  ],
+  "radii": [
+   1.5,
+   2.0,
+   2.5,
+   3.0,
+   3.5,
+   4.0,
+   4.5,
+   5.0,
+   5.5,
+   6.0
+  ],
+  "region_px": 8.0,
+  "rounds": 2,
+  "samples": 16,
+  "sbs_points": [
+   [
+    "dcvc-uf-htl",
+    42
+   ],
+   [
+    "svt-av1",
+    55
+   ]
+  ],
+  "sbs_source": "balltrack",
+  "shift": 4
+ },
+ "stage": "full",
+ "tools": {
+  "dcvc": {
+   "image_sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302",
+   "tree": "/dev/shm/emanuele-pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/opt/DCVC",
+   "video_sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+  },
+  "decoder": {
+   "path": "/dev/shm/emanuele-pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+   "real_path": "/dev/shm/emanuele-pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+   "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+   "version": "1.5.4"
+  },
+  "encoder": {
+   "path": "/dev/shm/emanuele-pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+   "real_path": "/dev/shm/emanuele-pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+   "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+   "version": "SVT-AV1 v4.2.0 (release)"
+  },
+  "ffmpeg": {
+   "path": "/dev/shm/emanuele-pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+   "real_path": "/dev/shm/emanuele-pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+   "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+   "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+  }
+ },
+ "torch": "2.10.0+cu128",
+ "trajectory": {
+  "absolute": 14,
+  "bits_per_frame": 7.601523213614995,
+  "frames": 1653,
+  "kbps": 0.22804569640844985,
+  "raw_bits_per_frame": 20.34845735027223,
+  "raw_kbps": 0.6104537205081669,
+  "residual_bits_per_symbol": 7.696778233518382,
+  "residuals": 1509,
+  "visibility_bits_per_symbol": 0.39738627811636396,
+  "visible": 1523,
+  "windows": [
+   "tracknet/game3/Clip3",
+   "tracknet/game7/Clip2",
+   "tracknet/game3/Clip6",
+   "tracknet/game10/Clip10",
+   "tracknet/game6/Clip3",
+   "tracknet/game2/Clip8",
+   "tracknet/game8/Clip6",
+   "tracknet/game2/Clip5"
+  ]
+ },
+ "wasb": {
+  "code": "/dev/shm/emanuele-pointstream/cache/657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55/tree",
+  "setting": {
+   "hm_weight": true,
+   "model": "wasb",
+   "step": 1,
+   "tracker": "online",
+   "weights": "wasb_tennis_best.pth.tar"
+  },
+  "weights": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb"
+ },
+ "windows": [
+  "tracknet/game3/Clip3",
+  "tracknet/game7/Clip2",
+  "tracknet/game10/Clip10",
+  "tracknet/game3/Clip6"
+ ],
+ "windows_json": {
+  "path": "/dev/shm/emanuele-pointstream/cache/d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516/windows.json",
+  "sha256": "d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516"
+ }
+}
