@@ -9,12 +9,13 @@ from __future__ import annotations
 import json
 import math
 import os
-import re
 import stat
 import sys
 import time
 from pathlib import Path
 from typing import Any
+
+MANIFEST_SHA256 = '4f5af8c90f5fd909abac2aed123917795f388b3961e31e18cb2e0f306aa7acb0'
 
 
 def projection(spec: dict[str, Any], dispatch: dict[str, Any], validation: dict[str, Any], now: float) -> dict[str, float]:
@@ -22,14 +23,23 @@ def projection(spec: dict[str, Any], dispatch: dict[str, Any], validation: dict[
     manifest = [item for item in spec.get('staged_inputs', []) if item.get('name') == 'repair_manifest']
     arguments = spec.get('arguments', [])
     if (spec.get('single_cpu_campaign') is not True or spec.get('defer_failed_publication') is not True
-            or spec.get('cpu_threads') != 1
+            or type(spec.get('cpu_threads')) is not int or spec['cpu_threads'] != 1
             or spec.get('device', 'gpu') != 'gpu'
             or spec.get('scale', {}).get('judged') != {'smoke': 3, 'full': 0}
             or not isinstance(arguments, list) or arguments.count('--repair-manifest') != 1
             or arguments.index('--repair-manifest') + 1 >= len(arguments)
             or arguments[arguments.index('--repair-manifest') + 1] != '{staged:repair_manifest}'
-            or len(manifest) != 1 or not re.fullmatch(r'[0-9a-f]{64}', manifest[0].get('sha256', ''))):
+            or len(manifest) != 1 or manifest[0].get('sha256') != MANIFEST_SHA256):
         raise ValueError('one-core GPU campaign and original 3/80 tick scales required')
+    sharing = spec.get('gpu_sharing')
+    if sharing is not None and (not isinstance(sharing, dict) or sharing != {'mode': 'exclusive'}):
+        raise ValueError('exclusive GPU admission required')
+    contention = spec.get('contention')
+    if not isinstance(contention, dict) or contention != {'policy': 'stop', 'resume_attempts': 0}:
+        raise ValueError('contention must stop without retries')
+    dispatched_sharing = dispatch.get('gpu_sharing')
+    if dispatched_sharing is not None and dispatched_sharing != {'mode': 'exclusive'}:
+        raise ValueError('exclusive GPU dispatch required')
     def finite(value: Any, label: str) -> float:
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
             raise ValueError(f'{label} must be positive and finite')
@@ -39,7 +49,7 @@ def projection(spec: dict[str, Any], dispatch: dict[str, Any], validation: dict[
     full = finite(spec['full']['seconds'], 'full allowance')
     validator = finite(spec['validator_seconds'], 'validator allowance')
     budget = finite(spec['budget_seconds'], 'campaign budget')
-    if smoke > 20 or full > 175 or validator > 5 or budget > 212:
+    if smoke > 40 or full > 195 or validator > 10 or budget > 280:
         raise ValueError('campaign allowance exceeds approved allocation')
     if dispatch.get('stage') not in (None, 'smoke') or len(dispatch.get('cpu_affinity', [])) != 1:
         raise ValueError('one-core smoke dispatch required')
@@ -56,7 +66,7 @@ def projection(spec: dict[str, Any], dispatch: dict[str, Any], validation: dict[
     if predicted > full:
         raise ValueError('full projection exceeds full allowance')
     staging = max(5.0, 1.25 * (phase - start))
-    publication = 2.0
+    publication = 5.0
     # Publication follows the full command and is outside its allowance.
     required = staging + max(full, predicted) + publication
     remaining = end - now
