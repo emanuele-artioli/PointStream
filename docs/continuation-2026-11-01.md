@@ -1,4 +1,4 @@
-# Continuation, 2026-11-01: CPU source repair passed; user amendment pending
+# Continuation, 2026-11-01: empirical review package prepared; author filing checks remain
 
 **Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
 Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library
@@ -9,46 +9,17 @@ MAIN/JCV runtime guards. Historical process-group IDs were not recorded; current
 known children/task processes were absent. This is no fresh decoder-quality,
 full cached-environment, sustained-reference or live-rate claim.
 
-**Current receiver decision:** failed pilot `20261101T135101Z-d67fe593`
-is closed; it omitted two required source helpers and produced no learned
-output. The corrected source package passed the real isolated CPU decoder,
-independent audit and root comparison:237 source files,480 tensor fingerprints,
-both NPZs and isolation checks match. Charge full40 CPU-s for this qualification.
-Original W8 closed **≤2,165/3,600 CPU-s and352/3,600 GPU-s**; at least1,435
-CPU-s /3,248 GPU-s remain. All owned processes/claims/waits are closed; no live
-reservation. One replacement cost-only1/3-step campaign, bounded580 CPU-s /500
-GPU-s inside original totals, **awaits the user** under the [source repair amendment](cards/w8-source-package-repair.md).
-There is no authority to retry or run30 steps until that answer and the
-subsequent complete source/host/budget gates. Raw receipts and the root
-acceptance are linked in [W8](experiments/w8-wire-audit.md).
+**Current receiver decision:** The approved sole replacement `20261101T151030Z-df638d2f` stopped and is closed. Its exact packet worker passed, then CUDA initialization returned `cudaGetDeviceCount` error 2/out-of-memory and CUDA was unavailable before model construction, kernel probe or sampling. The underlying cause is unknown; do not infer a physical-memory OOM, quality negative or 1/3-step cost slope. All task-owned PIDs/process groups, claims and wait are closed and events acknowledged; no live job, reservation or timer remains. No GPU retry or 30-step run is admitted.
 
-Overleaf main is `a6679181`, with the confirmed author block, ATHENA
-acknowledgment and organic PRESLEY citation beside ELVIS/GenStream. Review:
-22 body/reference pages plus 3 appendix pages; isolated small-format probe:
-23+3, within the user's 23+5 limit. Useful scientific negatives remain in the
-appendix. MoQSplat/TIGAS were reviewed and omitted as indirect. The paper is not
-submission-ready: finish the bounded witness decision and final publication
-checks. Code `b58155b4` passed CI; draft PR #325 will need exact-head checks after
-its evidence/documentation update.
+The root-accepted phase charge is ≤292 CPU-s /188 GPU-s, including 64 CPU-s preallocation, 188 s one-core campaign wall, 20 CPU-s audit and 20 CPU-s monitoring. Original W8 cumulative is **≤2,457/3,600 CPU-s and 540/3,600 GPU-s**, leaving at least 1,143 CPU-s and 3,060 GPU-s in the accounting envelope. Historical administrative-inspection CPU telemetry uncertainty remains disclosed in W8; these are not invented aggregate measurements. A CUDA-only diagnostic is a future proposal, not authorized.
 
-Submission local handle `54766` completed exit0; the canonical client record is
-`/Users/manu/.pointstream/fleet/jobs/20261101T135101Z-d67fe593.json`.
-The first exact-ID status command, handle `21660`, exited zero and found the
-request terminal failed at its correctness smoke. Its raw output is
-`/private/tmp/w8-cost-initial-status-d67fe593-20261101.json`; no wait or replay is
-needed. Read-only diagnosis and resource/lifecycle closeout are complete.
-The actual source snapshot is preserved at
-`/private/tmp/w8-cost-source-b581-frozen-20261101.tar`. The exact spec and source
-freeze are under `docs/experiments/w8-inputs/receiver-20261101/`.
+Overleaf main **`eb7e3a3f67a3af7ce3e0da20387f6f138a66648f`** is pushed. The user-selected PRESLEY anonymous-review profile is implemented: `acmart[manuscript,screen,review,anonymous,natbib=false]`, ACM BibLaTeX `acmnumeric`/`sorting=none` and matching float spacing. The master/named copy retains all four confirmed authors, AAU and ATHENA; the anonymous review PDF hides the author block, funding and self-identifying URLs while retaining AI research methods. Names in cited works remain normally visible; this is a targeted check, not a guarantee that every possible identity inference is prevented. The actual live TOMM portal requirements have not been independently certified.
 
-CPU qualification: raw receipts at
-`/private/tmp/w8-receiver-full-audit-b581-v2-20261101/receipts`; root acceptance
-`616abd67…`, partial audit `8108c849…` and current lifecycle `3fee152a…` retain
-the missing historical-PGID boundary. Actual child CPU18.236780 s; closed at51 s
-including the parent and complete audit/closeout reserves. Shared prerequisites
-are immutable under
-`Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101/`:
-bundle `ab5f1b93…`, identity `0953c528…`, original oracle `8047b676…`.
+The frozen package is `/private/tmp/pointstream-submission-20261101-eb7e3a3/`. Both the anonymous review PDF and named author copy have **22 body/reference + 3 appendix pages**. Anonymous PDF SHA256 `c40150cc7801873ca7462e9bd7ef966d263865559761051d79e8de625507d2e6`; named PDF SHA256 `fe24d4958c5fd648d37eeb621edf7216fb2aa216a3e7b8d2434e911535a73e27`; source ZIP `PointStream-source-AUTHOR-EDITOR-ONLY.zip` SHA256 `84fc7723b6deba5a335c601b04fe88d7a350e3176373fa1abfb827ca209c074b` contains identifying master source and is for authors/editors only. Manifest SHA256 `7f1d8c01b332ef79591934cd62d5702dce436dd11a0111b5823676972efa5e70`. Native Biber 2.22 fresh source builds matched both PDF texts; the source archive has 16 active files, no BBL/BST or vendored third-party styles, and declares external TeX dependencies. Checker (26 keys), five registry tests and both-variant visibility checks passed. `b910` was a valid genuine-BibTeX intermediate, now superseded by the chosen profile; the old `f68` style is historical and unsuitable.
+
+The user states the paper is under review nowhere and the coauthors have **not reviewed** it. Remaining author step: coauthor review and approval of the exact package, then an explicit instruction before filing. Source-specific tennis permissions remain unknown and disclosed; no legal clearance is inferred. No paper has been filed. The cover letter remains a draft. Code branch merged latest main `3d93d6e9` including MoQSplat PR #327, with no new paper result; the fixed `48a95400f307999ebb1ca7a80c7abf3d6940beaa` evidence pin remains valid. [PR #326](https://github.com/emanuele-artioli/PointStream/pull/326) will receive a final documentation commit; consult the live PR for checks/merge status rather than assuming a head or result.
+
+All W8-owned jobs, claims, waits and timers are closed; W8 remains ≤2,457 CPU-s /540 GPU-s with the administrative telemetry limit recorded above. No GPU retry or 30-step work is authorized. Cache lifetime and native completion wakeups remain unknown.
 
 ## Immutable scientific state
 
@@ -115,8 +86,7 @@ No scoring reservation remains. No balance transfers to other cards.
 
 PR #318 merged `538b1022`, PR #319 merged `1b282587`, PR #320 merged `02c6c10e`.
 PR #321 merged `b014067c`; exclusive-policy PR #322 merged `f5597299` after
-CI passed on exact `c0f25e4e`. Current branch is
-`codex/w8-receiver-witness-2026-11-01`, draft PR #325. CI passed for `5651`, run `41301707915`. The accepted input gate
+CI passed on exact `c0f25e4e`. PR #325 later merged as `06ce6374` after exact `044425c6` CI passed; current branch is `codex/w8-source-repair-2026-11-01`. Historical CI passed for `5651`, run `41301707915`. The accepted input gate
 is described above; fresh GPU generation remains unqualified. Frozen source
 `5651a24b` full pytest had the same 13 failing node names as the saved clean-main
 Mac run, with 1,407 passed and 32 skipped; its 42 receiver tests passed. Frozen
@@ -138,25 +108,4 @@ and all three native binaries were checked; all scientific imports came from
 clean frozen source. Source/input artifacts and diagnostics are referenced in
 [W8](experiments/w8-wire-audit.md) and its amendment input directory.
 
-The manuscript is pushed at `a6679181fcbe8104702bf3b0231140cc301d9ca1`.
-The user confirmed the author block and requested ATHENA acknowledgment and
-organic self-citations, now integrated. No authority to submit has been given.
-The current review/alternate-format page counts are 22+3 and23+3. No recurring
-model timer/cache keepalive is active; cache lifetime is unknown. Native
-completion after returning the chat remains unverified, so execution is attended.
-
-Next: record the user decision on the source-only GPU repair amendment; do
-not replay the closed pilot. CPU repair acceptance is complete. Admit final
-30-step work only after a
-complete remaining CPU/GPU forecast that includes SAM/native/RGB/composition,
-post-seal scoring, validation and publication. Worker primitives exist; a full
-fleet witness driver/validator is still needed if the cost oracle passes. Final
-paper outcome/pins/checks/PDF and venue workflow remain; the full task audit and
-negative appendix already triage the rest of PLAN. Submission needs explicit
-user authority. Do not reopen deferred training/live/racket/large-sweep work.
-
-Author questions are pending about the exact footage/source terms and any
-shared media, the complete AI-assistance disclosure and the relation to prior
-papers/concurrent review. See [author statements](paper/author-statements-2026-11-01.md).
-Author names/order/affiliation, ATHENA support and organic citations are already
-confirmed/integrated. Submission itself is not authorized.
+The current manuscript/package identities and remaining author filing checks are recorded at the top. Historical W7 evidence above remains unchanged. The cover letter is a draft and has not been sent; no paper was submitted. Do not replay either closed W8 cost request or reopen deferred training/live/racket/sweep cards without their own authority.

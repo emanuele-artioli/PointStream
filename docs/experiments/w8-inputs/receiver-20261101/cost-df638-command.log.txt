@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/local/users/emanuele/pointstream/sources/20261101T151030Z-df638d2f/experiments/tennis/w8_receiver_job.py", line 700, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/local/users/emanuele/pointstream/sources/20261101T151030Z-df638d2f/experiments/tennis/w8_receiver_job.py", line 694, in main
+    cost_run(stage, args.steps, args.parent_cpu, args.packet_cpu, args.generator_cpu, args.worker_wall,
+  File "/local/users/emanuele/pointstream/sources/20261101T151030Z-df638d2f/experiments/tennis/w8_receiver_job.py", line 425, in cost_run
+    gpu_usage = _worker(Path(policies['jcv']['python']), gpu_cfg, model_work, generator_cpu, worker_wall)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/local/users/emanuele/pointstream/sources/20261101T151030Z-df638d2f/experiments/tennis/w8_receiver_job.py", line 185, in _worker
+    raise RuntimeError(f'isolated worker failed; retained {work}')
+RuntimeError: isolated worker failed; retained /local/users/emanuele/pointstream/scratch/20261101T151030Z-df638d2f-smoke/cost-worker

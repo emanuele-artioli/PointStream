@@ -1,0 +1,16 @@
+import hashlib,json,os,pathlib,resource
+resource.setrlimit(resource.RLIMIT_CPU,(2,2));r=pathlib.Path('/local/users/emanuele/pointstream/audits/w8-driver-access-probe-v1-20261101'); names=['parent.json','metadata.json','existing.stdout','existing.stderr','existing.start.json','existing.exit.json','narrow.stdout','narrow.stderr','narrow.start.json','narrow.exit.json','probe.py']; files={}
+for n in names:
+ b=(r/n).read_bytes()
+ if len(b)>50000: raise ValueError('size')
+ files[n]={'text':b.decode(),'sha256':hashlib.sha256(b).hexdigest()}
+ids=[json.loads(files[n]['text']) for n in ('parent.json','existing.start.json','narrow.start.json')]; result={}
+for x in ids:
+ for k in ('pid','pgid'):
+  i=x[k]; exists=os.path.exists('/proc/'+str(i)) if k=='pid' else None
+  if k=='pgid':
+   try:os.killpg(i,0);exists=True
+   except ProcessLookupError:exists=False
+   except PermissionError:exists=True
+  result[k+':'+str(i)]=exists
+print(json.dumps({'files':files,'owned':result},sort_keys=True))

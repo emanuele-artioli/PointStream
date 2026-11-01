@@ -1,0 +1,28 @@
+"""Root-reviewed prospective launcher; creates one exclusive local receipt directory."""
+import base64, hashlib, json, resource, shlex, signal, subprocess, time
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+root=Path(__file__).resolve().parent
+script=(root/'driver-access-probe-v1-remote.py.txt').read_bytes()
+encoded=base64.b64encode(script).decode()
+command='/usr/bin/timeout 55 /usr/bin/python3 -I -S -B -c '+shlex.quote(script.decode())+' parent '+shlex.quote(encoded)
+if len(command)>30000: raise ValueError('command bound')
+out=Path('/private/tmp/w8-driver-access-probe-v1-20261101'); out.mkdir(mode=0o700,exist_ok=False)
+(out/'command.sha256').write_text(hashlib.sha256(command.encode()).hexdigest()+'\n')
+def cap(): resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+started=time.monotonic()
+with (out/'stdout').open('xb') as stdout,(out/'stderr').open('xb') as stderr:
+ p=subprocess.Popen(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=8','gpu6',command],stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr,preexec_fn=cap)
+ (out/'handle.json').write_text(json.dumps({'pid':p.pid,'started':time.time(),'wall_limit':60}))
+ def alarm(_a,_b): raise TimeoutError()
+ signal.signal(signal.SIGALRM,alarm);signal.alarm(60)
+ try: status=p.wait(); timed_out=False
+ except TimeoutError:
+  p.terminate()
+  try: status=p.wait(timeout=2)
+  except subprocess.TimeoutExpired: p.kill();status=p.wait()
+  timed_out=True
+ finally: signal.alarm(0)
+(out/'execution.json').write_text(json.dumps({'status':status,'timed_out':timed_out,'wall':time.monotonic()-started}))
+
+if status or timed_out: raise SystemExit(status if status > 0 else 1)

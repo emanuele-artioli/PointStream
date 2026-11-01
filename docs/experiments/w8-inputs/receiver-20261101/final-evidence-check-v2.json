@@ -1,0 +1,10 @@
+{
+  "root_checked": true,
+  "supersedes_pending_carrier_item_in": "final-evidence-check.json",
+  "ignored_raw_log_preserved": true,
+  "carrier": "cost-df638-command.log.txt",
+  "mapping": "cost-df638-carriers.json",
+  "sha256": "4f0f749fc9c10262396a47a360745d8838ae870b2b2a97c4f3ae193505759fef",
+  "original_summary_unchanged": true,
+  "scope": "Resolution of the sole durability finding. Other38hashes and links are checked in the earlier report; raw scientific evidence unchanged."
+}

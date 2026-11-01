@@ -1,0 +1,16 @@
+{
+  "root_approved": true,
+  "action": "new exclusive driver-qualified preflight publication only",
+  "CPU_upper": 6,
+  "within_preallocation64_of_phase580": true,
+  "destination": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-driver-v1-20261101",
+  "hashes": {
+    "publisher-remote-v2.py": "c7854c31b4b44aab895f3988fcf619cb23e3c376bc6988afe4e0efa4325cad84",
+    "publisher-launcher-v2.py": "f0aa015e9576557d452b3aba5ff771ba13aba5ca29a920e54b68e0d5b6e95797",
+    "bundle.json": "8ab330809c2b39a93e02aee4e74b9eb576df3969434da6675b6a0095430258f9"
+  },
+  "command_sha256": "83ea2c47bb5e6cc8242ae8155ab720cfdc5bcb22c2234ea22a998c248396e7aa",
+  "bundle_scope": "unchanged CPU receipts and source/asset identities; only11 individually permission-tested JCVpublicsystempaths added; notCUDAqualified",
+  "independent_readback": "Separate1CPUprocess exact3regular0444files,stablepath/fdidentity+sha,ownPID/session recorded; source originals untouched",
+  "no_GPU_allocation": true
+}

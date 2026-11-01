@@ -1,0 +1,30 @@
+import base64,hashlib,json,os,pathlib,resource,signal,subprocess,sys,zlib
+resource.setrlimit(resource.RLIMIT_CPU,(2,2)); old=pathlib.Path('/home/itec/emanuele/Datasets/pointstream-data/tennis/w8-receiver-prerequisites-b581-20261101');new=old.parent/'w8-receiver-prerequisites-b581-driver-v1-20261101';sha=lambda b:hashlib.sha256(b).hexdigest(); bundle=zlib.decompress(base64.b64decode(sys.argv[1],validate=True));want={'bundle.json':'8ab330809c2b39a93e02aee4e74b9eb576df3969434da6675b6a0095430258f9','identity.json':'0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe','oracle.json':'8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc'}
+if sha(bundle)!=want['bundle.json']:raise ValueError('bundle SHA')
+inputs={'bundle.json':bundle}
+for n in ('identity.json','oracle.json'):
+ p=old/n
+ if p.is_symlink() or not p.is_file() or p.stat().st_size>500000:raise ValueError('source')
+ inputs[n]=p.read_bytes()
+ if sha(inputs[n])!=want[n]:raise ValueError('source SHA')
+new.mkdir(mode=0o700,exist_ok=False)
+for n,b in inputs.items():
+ p=new/n
+ with p.open('xb') as f:f.write(b)
+ p.chmod(0o444)
+ if sha(p.read_bytes())!=want[n]:raise ValueError('readback')
+checker="import hashlib,json,os,pathlib,resource,stat,sys\nresource.setrlimit(resource.RLIMIT_CPU,(1,1));p=pathlib.Path(sys.argv[1]);want=json.loads(sys.argv[2]);out={}\nif set(x.name for x in p.iterdir())!=set(want):raise ValueError('directory membership')\nfor name,digest in want.items():\n q=p/name; s=q.lstat()\n if not stat.S_ISREG(s.st_mode) or stat.S_IMODE(s.st_mode)!=0o444:raise ValueError('mode or type')\n fd=os.open(q,os.O_RDONLY|os.O_NOFOLLOW)\n try:\n  before=os.fstat(fd); h=hashlib.sha256()\n  while True:\n   b=os.read(fd,65536)\n   if not b:break\n   h.update(b)\n  after=os.fstat(fd); end=q.lstat()\n finally:os.close(fd)\n fields=lambda x:(x.st_dev,x.st_ino,x.st_size,x.st_mtime_ns,x.st_ctime_ns,x.st_mode)\n if fields(s)!=fields(before) or fields(before)!=fields(after) or fields(after)!=fields(end) or h.hexdigest()!=digest:raise ValueError('identity or unstable file')\n out[name]={'sha256':digest,'size':end.st_size,'device':end.st_dev,'inode':end.st_ino,'mtime_ns':end.st_mtime_ns,'ctime_ns':end.st_ctime_ns}\nprint(json.dumps({'passed':True,'files':out},sort_keys=True))\n"
+child=subprocess.Popen(['/usr/bin/python3','-I','-S','-B','-c',checker,str(new),json.dumps(want)],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+print(json.dumps({'phase':'readback_started','pid':child.pid,'pgid':child.pid}),flush=True)
+try: out,err=child.communicate(timeout=10)
+except subprocess.TimeoutExpired:
+ try: os.killpg(child.pid,signal.SIGTERM)
+ except ProcessLookupError: pass
+ try: out,err=child.communicate(timeout=2)
+ except subprocess.TimeoutExpired:
+  try: os.killpg(child.pid,signal.SIGKILL)
+  except ProcessLookupError: pass
+  out,err=child.communicate()
+ raise TimeoutError('independent readback')
+if child.returncode or len(out)>10000: raise RuntimeError('independent readback failed: '+err.decode()[:1000])
+print(json.dumps({'passed':True,'path':str(new),'sha256':want,'child_pid':child.pid,'child_status':child.returncode,'independent_readback':json.loads(out),'cpu':sum(resource.getrusage(resource.RUSAGE_SELF)[:2])}))

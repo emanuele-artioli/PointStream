@@ -1,0 +1,31 @@
+import json,os,pathlib,resource,subprocess,time,xml.etree.ElementTree as ET
+resource.setrlimit(resource.RLIMIT_CPU,(1,1)); os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
+def cap():resource.setrlimit(resource.RLIMIT_CPU,(1,1))
+p=subprocess.run(['/usr/bin/nvidia-smi','-q','-x'],capture_output=True,timeout=15,preexec_fn=cap,check=True)
+if len(p.stdout)>1000000:raise ValueError('nvidia output bound')
+x=ET.fromstring(p.stdout);g=[]
+for a in x.findall('gpu'):
+ processes=[]
+ for v in a.findall('./processes/process_info'):processes.append({'pid':v.findtext('pid'),'name':v.findtext('process_name'),'memory':v.findtext('used_memory')})
+ g.append({'uuid':a.findtext('uuid'),'name':a.findtext('product_name'),'memory_free':a.findtext('./fb_memory_usage/free'),'memory_used':a.findtext('./fb_memory_usage/used'),'utilization':a.findtext('./utilization/gpu_util'),'processes':processes})
+c=pathlib.Path('/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/claims');names=sorted(c.iterdir()) if c.exists() else []
+if len(names)>64:raise ValueError('too many claims')
+claims=[]
+for q in names:
+ z={'name':q.name,'directory':q.is_dir()}
+ if q.is_file() and not q.is_symlink():
+  b=q.read_bytes()
+  if len(b)>8192:raise ValueError('claim size')
+  z['text']=b.decode('utf8','replace')
+ if q.is_dir():
+  fs=sorted(q.iterdir())
+  if len(fs)>64:raise ValueError('claim entries')
+  z['entries']=[]
+  for f in fs:
+   if f.is_file() and not f.is_symlink():
+    b=f.read_bytes()
+    if len(b)>8192:raise ValueError('claim size')
+    z['entries'].append({'name':f.name,'text':b.decode('utf8','replace')})
+   else:z['entries'].append({'name':f.name,'type':'other'})
+ claims.append(z)
+print(json.dumps({'epoch':time.time(),'gpu':g,'claims':claims,'loadavg':os.getloadavg(),'cpu_count':os.cpu_count(),'child_cpu':sum(resource.getrusage(resource.RUSAGE_CHILDREN)[:2]),'parent_cpu':sum(resource.getrusage(resource.RUSAGE_SELF)[:2])}))

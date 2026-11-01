@@ -1,0 +1,17 @@
+{
+  "accepted": true,
+  "job_id": "20261101T151030Z-df638d2f",
+  "summary_sha256": "7d238554ddbcdf098ecf6d66963e59e9f47e4eef13ce53ec917b628449ad9541",
+  "outcome": "Stopped: real packet decoder succeeded; CUDA initialization failed before model construction/profiling/sampling; underlying driver/runtime cause unknown. No fresh generated quality or generator-cost projection.",
+  "CPU_phase_accounting_upper": 292,
+  "GPU_phase_upper": 188,
+  "CPU_cumulative_accounting_upper": 2457,
+  "GPU_cumulative_upper": 540,
+  "CPU_remaining_lower_accounting": 1143,
+  "GPU_remaining_lower": 3060,
+  "CPU_scope_limitation": "Campaign one-core wall bound188+fullpreallocation64+audit20+monitor20. Historical administrative inspection telemetry missing;35CPUprovision is conservative and not a measured strictaggregate.",
+  "lifecycle": "Canonicalterminalfailed; recordedsupervisor4055982/campaignPGID4056173/packet4059486/cost4059633 absent;claims empty;onewait ended;two deliveredterminaleventsACK.",
+  "full_witness_admitted": false,
+  "GPU_retry_authorized": false,
+  "paper_scope_decision": "Retain supported empirical findings, qualified saved-quality rate screen and CPU packet-input proof. Fresh tennis reconstruction/reuse/live/codec-win claims remain unqualified. Future minimal source-hidden CUDA-init diagnosis needs a separately reviewed proposal; no automatic retry."
+}

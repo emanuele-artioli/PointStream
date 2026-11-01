@@ -1,0 +1,10 @@
+{
+  "scope": "Byte-identical text carrier for the gitignored raw .log named in the immutable summary. Original remains at its unchanged path locally and in remote job evidence.",
+  "files": {
+    "cost-df638-command.log": {
+      "carrier": "cost-df638-command.log.txt",
+      "sha256": "4f0f749fc9c10262396a47a360745d8838ae870b2b2a97c4f3ae193505759fef",
+      "bytes": 1260
+    }
+  }
+}
