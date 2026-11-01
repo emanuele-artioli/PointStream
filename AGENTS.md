@@ -160,10 +160,11 @@ command, many edit-and-test rounds), hand it to the cheapest tier that can do
 it. Keep in the main session what needs the conversation's context, takes a
 handful of tool calls, or needs the user.
 
-Not yet validated in Codex (2026-10-29): the tier table, the rule above and
-the subagent docs. The first Codex session that delegates works through the
-[Codex validation](docs/sessions.md#codex-validation) list, records the result
-there, and deletes this paragraph.
+Codex's first delegation audit is recorded under
+[Codex validation](docs/sessions.md#codex-validation). Requested overrides were
+accepted, but actual model/effort telemetry was unavailable; do not claim the
+tier identities were verified. Runner stop behavior was observed; role-specific
+hook enforcement remains unverified.
 
 ## Deciding and asking
 
