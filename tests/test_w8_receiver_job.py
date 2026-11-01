@@ -264,6 +264,8 @@ def test_cost_audit_requires_and_records_cpu_cap(tmp_path, monkeypatch):
     output = tmp_path / 'audit.json'
     captured = []
     monkeypatch.setattr(job.resource, 'setrlimit', lambda which, limits: captured.append((which, limits)))
+    monkeypatch.setattr(sys, 'platform', 'linux')
+    monkeypatch.setattr(job.os, 'sched_getaffinity', lambda _pid: {0}, raising=False)
     monkeypatch.setattr(job, 'audit_pair', lambda *_: {'passed': True})
     monkeypatch.setattr(sys, 'argv', ['w8_receiver_job', 'cost-audit', '--one', 'smoke', '--three', 'full',
                                      '--oracle', 'oracle', '--remaining-gpu', '100', '--downstream-reserve', '10',
@@ -271,6 +273,10 @@ def test_cost_audit_requires_and_records_cpu_cap(tmp_path, monkeypatch):
     assert job.main() == 0
     assert captured == [(job.resource.RLIMIT_CPU, (7, 7))]
     assert json.loads(output.read_text())['audit_cpu_limit'] == 7
+    monkeypatch.setattr(job.os, 'sched_getaffinity', lambda _pid: {0, 1})
+    with pytest.raises(ValueError, match='requires one CPU'):
+        job.main()
+    assert captured == [(job.resource.RLIMIT_CPU, (7, 7))]
     sys.argv[sys.argv.index('--cpu-seconds') + 1] = '21'
     with pytest.raises(ValueError, match='at most 20 seconds'):
         job.main()
