@@ -831,3 +831,59 @@ print(json.dumps({"selected": selected, "child": child.strip()}))
     value = json.loads(result.stdout)
     assert len(value["selected"]) == 1
     assert value["child"] == str(value["selected"])
+
+
+def test_all_status_reads_each_published_request_with_live_semantics(tmp_path):
+    base = tmp_path / "jobs" / "fleet"
+    inbox_dir = base / "inbox"
+    states = {
+        "20261003T000000Z-00000001": {"status": "attention", "error": "old attention"},
+        "20261003T000000Z-00000002": {"status": "running"},
+        "20261003T000000Z-00000003": {"status": "complete", "result": "stable"},
+        "20261003T000000Z-00000004": {},  # Missing state metadata remains visible.
+    }
+    for name, state in states.items():
+        directory = inbox_dir / name
+        monitor.write_json(directory / "ready.json", {})
+        if state:
+            monitor.write_json(directory / "state.json", state)
+    monitor.write_json(inbox_dir / "20261003T000000Z-00000002" / "run" / "status.json", {"status": "running", "stage": "full"})
+    monitor.write_json(inbox_dir / "20261003T000000Z-00000003" / "gate.json", {"accepted": True})
+    (inbox_dir / "unpublished").mkdir()
+
+    expected = [inbox.rpc(base, "status", {"job_id": name}) for name in states]
+    assert inbox.rpc(base, "status", {}) == expected
+    monitor.write_json(inbox_dir / "20261003T000000Z-00000002" / "run" / "status.json", {"status": "complete"})
+    updated = inbox.rpc(base, "status", {})
+    assert updated[1]["status"] == "complete"
+    assert updated[0]["status"] == "attention"
+    assert updated[2] == expected[2]
+    assert "status" not in updated[3]
+
+
+def test_all_status_fails_on_corrupt_published_metadata(tmp_path):
+    base = tmp_path / "jobs" / "fleet"
+    directory = base / "inbox" / "corrupt"
+    monitor.write_json(directory / "ready.json", {})
+    (directory / "state.json").write_text("{")
+    with pytest.raises(ValueError):
+        inbox.rpc(base, "status", {})
+
+
+def test_all_status_reads_requests_concurrently(tmp_path, monkeypatch):
+    from threading import Barrier
+
+    base = tmp_path / "jobs" / "fleet"
+    for name in ("first", "second"):
+        monitor.write_json(base / "inbox" / name / "ready.json", {})
+        monitor.write_json(base / "inbox" / name / "state.json", {"status": "pending"})
+    barrier = Barrier(2, timeout=5)
+    original = monitor.read_json
+
+    def synchronized_read(path, default=None):
+        if path.name == "state.json":
+            barrier.wait()
+        return original(path, default)
+
+    monkeypatch.setattr(monitor, "read_json", synchronized_read)
+    assert [result["job_id"] for result in inbox.rpc(base, "status", {})] == ["first", "second"]
