@@ -619,6 +619,7 @@ and choose `gpu_models` from it.
 
 | Model | GPU class | Device / provider / kernels verified | Job |
 |---|---|---|---|
+| MoQSplat external reproduction, gsplat 1.5.3 | RTX 6000 Ada (8.9), exclusive gpu6 | passes: full 6,131,954-Gaussian scene through CUDA gsplat with CPU fallback forbidden; Torch 2.10.0+cu128, compiler 12.4.131, explicit target headers/libs, SH3 and asymmetric camera intrinsics; received-data/source render agreement within 2/255 channel levels on 3 frames. CUDA extension exercised; individual kernel names were not profiled. Scope/identities in [record](moqsplat-reproduction-2026-11-01.md#final-correctness-result); no performance claim | `20261101T161843Z-425ac71f` |
 | SAM 3.1 multiplex | RTX 6000 Ada (8.9) | passes: CUDA, torch 2.10.0+cu128, cuDNN 9.10; bf16 flash attention (+ mem-efficient), policy `native_flash`; hand IoU 0.65; peak 11.3 GiB | `20261006T113911Z-fb135803` |
 | SAM 3.1 multiplex | RTX A6000 (8.6) | passes: as Ada; flash attention; hand IoU 0.65; peak 11.3 GiB | `20261006T114724Z-5b302ae5` |
 | SAM 3.1 multiplex | Quadro RTX 8000 (7.5) | **fails the kernel check**: runs on CUDA, but no fused attention exists for its bf16 path, so it falls back to math attention (policy `efficient_then_math_fallback`); same IoU, peak 39.5 GiB, 2.2× slower. Do not use | `20261006T114256Z-e7362cf2` |
