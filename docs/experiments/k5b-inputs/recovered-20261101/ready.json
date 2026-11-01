@@ -1,0 +1,15 @@
+{
+  "git_head": "d4bed15b9ee6590717f9c7b8fda84acf1e85e94f",
+  "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tracked_changes_included": [],
+  "tracked_changes_excluded": [],
+  "included_untracked_sha256": {},
+  "untracked_excluded_count": 0,
+  "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "untracked_excluded_sample": [],
+  "deleted_paths": [],
+  "snapshot_sha256": "a13220d181806e5c5f7a78d0bf6521686363e49cf09c1983153eb5d4a50d6fda",
+  "spec_sha256": "35819693953bdd981ed0b6b22606e3d564f332a25b7bc2ca0cd10bb35a0e6d83",
+  "source_sha256": "dcac8661680ec340415ab811503479cda9ec82c7ed3d6161b23b71d89a222018",
+  "published": 1792572261.397631
+}

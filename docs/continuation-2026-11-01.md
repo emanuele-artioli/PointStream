@@ -1,4 +1,23 @@
-# Continuation, 2026-11-01: empirical review package prepared; author filing checks remain
+# Continuation, 2026-11-01: paper strengthening and main-paper ball result
+
+**Latest user direction:** the previous `eb7e3a3` package remains preserved,
+but presentation and substantive contribution review are reopened. The user
+approved the proposed eight main figures, appendix ablations/negative results,
+and exchanging repetitive prose/tables for figures. The limit is 23 pages for
+body plus references (references at most two pages), plus five appendix pages.
+PRESLEY is strictly read-only. Main-paper restoration of the real K5b streak
+result is prioritized: the user explicitly kept it despite the failed frame
+guard; the active manuscript had omitted the substantive experiment. Audit
+saved packets, exact rates, window/source identities and the dependent
+BallTrack judge before drafting a task-specific claim. Figure generation from
+saved evidence is authorized; no new GPU experiment, stopped W8 retry or
+training is implied. med000 DCVC remains dropped by the user's 2026-10-31
+decision. Current code branch is `codex/paper-strengthening-2026-11-01` from
+`origin/main` `35ab3fd4`; the unrelated MoQSplat update is not paper evidence.
+Three delegates are working on saved-evidence figure implementation, bounded
+read-only ball artifact recovery, and a full-roadmap prioritization report.
+No new experiment has been launched. The older state below is historical
+except where explicitly retained (W8 stop, scientific limits, budgets).
 
 **Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
 Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library

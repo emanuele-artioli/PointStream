@@ -515,3 +515,68 @@ the decisions are in [experiments.md](../experiments.md).
   check (frame PSNR at the same coder point not lower, which the
   encoder's last check already ensures), which is a rule change for the
   user to make, disclosed as such.
+
+### 2026-11-01 — saved ball evidence recovered for the main paper
+
+The user requested strengthening the paper beyond presentation and restoring
+the retained ball result to the main contribution. This is a read-only recovery
+and CPU arithmetic replay of the original four-window experiment, not a new
+encoding, image score, receiver execution or confirmation sample. The original
+job `20261021T084417Z-048cc9d4` is complete. Its exported `ready.json` identifies
+source `d4bed15b9ee6590717f9c7b8fda84acf1e85e94f`, an empty selected patch,
+snapshot `a13220d181806e5c5f7a78d0bf6521686363e49cf09c1983153eb5d4a50d6fda`,
+executable source `dcac8661680ec340415ab811503479cda9ec82c7ed3d6161b23b71d89a222018`
+and spec `35819693953bdd981ed0b6b22606e3d564f332a25b7bc2ca0cd10bb35a0e6d83`.
+The run receipt records RTX A6000, torch/CUDA, native tool identities and metric
+weights; historical shared-device timing is contaminated.
+
+Bounded attended reads recovered the run receipt and all four window JSONs
+from the 105,338,880-byte archive. Their exact bytes and SHA256 values, exported
+job identity and root arithmetic replay are retained in
+[`k5b-inputs/recovered-20261101/`](k5b-inputs/recovered-20261101/).
+The full archive digest was not independently rehashed at this checkpoint;
+selected raw-member hashes were independently checked. All 15 archived
+validator checks replay successfully from the records. This replays assertions
+about saved outputs, not the underlying models or decoded pixels. The report
+functions and PCHIP/anchor-envelope helpers were AST-compared with the frozen
+source and match. Reproduction from the repository root:
+
+```bash
+PYTHONPATH=. python3.12 docs/experiments/k5b-inputs/recovered-20261101/replay_arithmetic.py.txt
+```
+
+NumPy 2.0.0 and SciPy 1.18.1 reproduce the saved evidence: equal-window mean
+DCVC QP0 rate 12.9523506291 to 13.9172600852 kbps and BallTrack recall
+0.0096707474 to 0.9097922927 with the charged streak. Per-window crop-DISTS
+BD-rate is -42.0484%, -33.7903%, -27.3578% and -35.7053%; frame-PSNR BD-rate
+is +2.8231%, +2.2543%, +2.5746% and +1.7930%, respectively for game3/Clip3,
+game3/Clip6, game7/Clip2 and game10/Clip10. The original +1% frame guard still
+fails on all four; the user's 2026-10-21 decision to keep the streak is retained,
+not rewritten as a prespecified pass.
+
+The archive inventory has window records and H.264 contact-sheet videos, but
+no serialized BALL packets or native codec streams. Reported round trips and
+native-stream hashes remain in the records; fresh independent decoding is not
+established by this recovery. BallTrack supplied both primary encoder positions
+and the image-based task score. Alternate label/WASB position sources do not
+make it an independent output judge. These are four development windows, and
+the result is a task-specific visibility/crop-quality tradeoff with additional
+charged bits, not a whole-frame or integrated-codec win.
+
+The selected 10,904,292-byte `game3/Clip3/sbs-dcvc42-follow.mp4` was separately
+recovered read-only for author review, SHA256
+`6c83fc921f18700af39b3e939d1ca9735e0ace28e014d5d13cf135395486d34c`.
+Zero-based frames 35 and 71 were visually checked: source, DCVC, disk and streak
+panels are 3x ball-following crops from an H.264 contact sheet. Their displayed
+rates are 110.2, 111.1 and 111.4 kbps (baseline, disk, streak), not equal total
+rates. They are recompressed illustrations, not native still-image metrics.
+Source-specific reuse permissions remain unverified. The images/video stay in
+the private author-review folder; no raw footage is added to the code repository.
+
+A held-out, image-based independent-judge confirmation is proposed in
+[`../paper/research-and-figure-priorities-2026-11-01.md`](../paper/research-and-figure-priorities-2026-11-01.md).
+It requires qualified judge training/exposure, actual native and BALL streams,
+all-frame labels/missingness/false positives, both conventional and neural
+anchors, and a separately reviewed resource ceiling. The original stopped
+part 2 and unused budgets are not silently reopened. No new fleet job or GPU
+work was launched for this recovery.
