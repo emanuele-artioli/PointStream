@@ -1,0 +1,22 @@
+Error in cpuinfo: failed to parse processor information from /proc/cpuinfo
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/local/users/emanuele/pointstream/sources/20261101T085408Z-6d60d6c4/experiments/tennis/w8_input_job.py", line 833, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/local/users/emanuele/pointstream/sources/20261101T085408Z-6d60d6c4/experiments/tennis/w8_input_job.py", line 804, in main
+    fixed_worker(args.bundle, args.profile, args.guider, args.out, args.deny, args.parent_net)
+  File "/local/users/emanuele/pointstream/sources/20261101T085408Z-6d60d6c4/experiments/tennis/w8_input_job.py", line 283, in fixed_worker
+    decoded_match = unpack_match(match, profile['match']['sha256'], GUIDER_SHA, base)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/local/users/emanuele/pointstream/sources/20261101T085408Z-6d60d6c4/experiments/tennis/w8_payload.py", line 321, in unpack_match
+    return decode_checkpoint(profile['tensors'], sections, guider_base, profile['rank'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/local/users/emanuele/pointstream/sources/20261101T085408Z-6d60d6c4/experiments/tennis/w8_payload.py", line 251, in decode_checkpoint
+    value = restore_tensor(entry['metadata'], sections[entry['symbols']], sections[scales_name] if scales_name else b'')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/local/users/emanuele/pointstream/sources/20261101T085408Z-6d60d6c4/experiments/tennis/w8_payload.py", line 189, in restore_tensor
+    scale = torch.from_numpy(np.frombuffer(decompress_exact(scales, expected[1]), dtype='<f2').copy()).float()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Failed to initialize cpuinfo!
