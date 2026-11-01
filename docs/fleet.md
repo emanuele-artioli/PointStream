@@ -42,7 +42,9 @@ scripts/ps-fleet cancel JOB_ID
 
 Status RPCs default to 120 seconds. An explicit `--status-timeout-seconds`
 accepts 1–600 seconds for a slow shared-filesystem status read, preserving the
-same query and results. It does not change submission, cancellation, waiting,
+same query and results. All-job status reads published requests concurrently with a
+bounded worker pool; it still reads live state and fails if a request cannot be
+read, rather than returning a partial snapshot. It does not change submission, cancellation, waiting,
 host probes or artifact-export deadlines. A timed-out status read leaves job
 state unknown; it never authorizes replay.
 

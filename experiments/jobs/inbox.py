@@ -1007,12 +1007,11 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
         return {"job_id": directory.name, "status": "pending", "source_sha256": identity, "input_check": input_check}
     if action in {"status", "events", "cancel"}:
         directories = [job_directory(base, payload["job_id"])] if payload.get("job_id") else sorted((base / "inbox").glob("*"))
-        results = []
-        for directory in directories:
+        def read_request(directory: Path) -> dict[str, Any] | None:
             if not (directory / "ready.json").exists():
                 if payload.get("job_id"):
                     raise fleet.FleetError("job is unpublished or unknown; inspect transfer before retrying")
-                continue
+                return None
             state = monitor.read_json(directory / "state.json", {})
             remote = monitor.read_json(directory / "run" / "status.json", {})
             if remote.get("status"):
@@ -1040,9 +1039,16 @@ def rpc(base: Path, action: str, payload: dict[str, Any]) -> Any:
                     if record["kind"].startswith("terminal:"):
                         record["id"] = uuid.uuid5(uuid.NAMESPACE_URL, str(directory) + record["kind"]).hex
                     unique[record["id"]] = record
-                results.append({"job_id": directory.name, "status": state.get("status"), "events": list(unique.values())})
-            else:
-                results.append({**state, "job_id": directory.name, "directory": str(directory), "gate": monitor.read_json(directory / "gate.json"), "campaign_error": monitor.read_json(directory / "campaign-error.json")})
+                return {"job_id": directory.name, "status": state.get("status"), "events": list(unique.values())}
+            return {**state, "job_id": directory.name, "directory": str(directory), "gate": monitor.read_json(directory / "gate.json"), "campaign_error": monitor.read_json(directory / "campaign-error.json")}
+
+        # Bound concurrent NFS reads; do not cache history or omit live overlays.
+        if action == "status" and not payload.get("job_id"):
+            with ThreadPoolExecutor(max_workers=16) as pool:
+                requests = list(pool.map(read_request, directories))
+        else:
+            requests = [read_request(directory) for directory in directories]
+        results = [request for request in requests if request is not None]
         return results[0] if payload.get("job_id") else results
     if action == "worker_start":
         alias = payload["alias"]
