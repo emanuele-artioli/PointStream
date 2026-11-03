@@ -1,0 +1,408 @@
+{
+  "frames": 16,
+  "gpu": "NVIDIA RTX A6000",
+  "host": "gpu2",
+  "job": "20261103T132157Z-f665bece",
+  "label_counts": {
+    "excluded": 0,
+    "negative": 0,
+    "visible": 16
+  },
+  "limitations": [
+    "Historical development footage; author-reported judge split is not independently verified training logs.",
+    "This independently checks stored predictions, labels, native stream/container bytes and arithmetic; no detector, codec, or GPU was rerun.",
+    "No negative frames; false-positive-on-negative rate is unmeasured.",
+    "Six points and 16 frames do not establish the stopped 48-frame pilot or an overall codec advantage.",
+    "Source frame and model hashes were checked against recorded identities, not re-read from inaccessible original inputs."
+  ],
+  "local_cpu_seconds": 0.061071,
+  "local_wall_seconds": 0.007722666021436453,
+  "passed": true,
+  "points": [
+    {
+      "ball_on": true,
+      "baseline_psnr": 29.486779153739143,
+      "codec": "dcvc",
+      "guard_off": false,
+      "judges": {
+        "baseline": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 0,
+            "hit_5px": 0,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 3,
+            "hit_10px": 0,
+            "hit_5px": 0,
+            "negatives": 0,
+            "positives": 16
+          }
+        },
+        "streak": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 1,
+            "hit_10px": 12,
+            "hit_5px": 7,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 16,
+            "hit_5px": 14,
+            "negatives": 0,
+            "positives": 16
+          }
+        }
+      },
+      "ledger": {
+        "ball_container_bytes": 93,
+        "ball_sha256": "3023b325f0fbc8282f8be2a0f46b8caa9c93a4be697b83d62e435ac5ea3f0b11",
+        "kbps": 89.385,
+        "native_bytes": 5866,
+        "native_sha256": "24070747d473cc193580742bc803c98d7304e783b591dd1d3861c24fe0bc9176",
+        "total_bytes": 5959
+      },
+      "native_framing": {
+        "format": "PSDC",
+        "header_bytes": 9,
+        "native_stream_bytes": 5857
+      },
+      "point": 0,
+      "streak_psnr": 29.490566142590907
+    },
+    {
+      "ball_on": true,
+      "baseline_psnr": 34.59641323139984,
+      "codec": "dcvc",
+      "guard_off": false,
+      "judges": {
+        "baseline": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 1,
+            "hit_5px": 1,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 1,
+            "hit_10px": 1,
+            "hit_5px": 1,
+            "negatives": 0,
+            "positives": 16
+          }
+        },
+        "streak": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 1,
+            "hit_10px": 14,
+            "hit_5px": 8,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 16,
+            "hit_5px": 14,
+            "negatives": 0,
+            "positives": 16
+          }
+        }
+      },
+      "ledger": {
+        "ball_container_bytes": 95,
+        "ball_sha256": "1da50b213c01c148891cb11d224305ccd5de3ae8d619d936d86ad74d08c4b0fe",
+        "kbps": 260.745,
+        "native_bytes": 17288,
+        "native_sha256": "cf7a7d7e2a84860e9cbfd96eac02173edef6e647427e580ed47902eed558b482",
+        "total_bytes": 17383
+      },
+      "native_framing": {
+        "format": "PSDC",
+        "header_bytes": 9,
+        "native_stream_bytes": 17279
+      },
+      "point": 21,
+      "streak_psnr": 34.60840415963772
+    },
+    {
+      "ball_on": true,
+      "baseline_psnr": 38.13731017404556,
+      "codec": "dcvc",
+      "guard_off": false,
+      "judges": {
+        "baseline": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 7,
+            "hit_5px": 6,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 1,
+            "hit_10px": 7,
+            "hit_5px": 7,
+            "negatives": 0,
+            "positives": 16
+          }
+        },
+        "streak": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 2,
+            "hit_10px": 12,
+            "hit_5px": 8,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 16,
+            "hit_5px": 14,
+            "negatives": 0,
+            "positives": 16
+          }
+        }
+      },
+      "ledger": {
+        "ball_container_bytes": 100,
+        "ball_sha256": "b0652d557e64221c02f4d9756e185e3ad133c3cead0f4f67647b2a1696d00aec",
+        "kbps": 654.33,
+        "native_bytes": 43522,
+        "native_sha256": "be30d20bebe95b323370be42b0e74cb37d94afe5c76e31919568f40ec7404a9f",
+        "total_bytes": 43622
+      },
+      "native_framing": {
+        "format": "PSDC",
+        "header_bytes": 9,
+        "native_stream_bytes": 43513
+      },
+      "point": 42,
+      "streak_psnr": 38.14952308872437
+    },
+    {
+      "ball_on": true,
+      "baseline_psnr": 39.10141448417833,
+      "codec": "svt",
+      "guard_off": false,
+      "judges": {
+        "baseline": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 6,
+            "hit_5px": 6,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 1,
+            "hit_10px": 8,
+            "hit_5px": 8,
+            "negatives": 0,
+            "positives": 16
+          }
+        },
+        "streak": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 1,
+            "hit_10px": 13,
+            "hit_5px": 7,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 16,
+            "hit_5px": 14,
+            "negatives": 0,
+            "positives": 16
+          }
+        }
+      },
+      "ledger": {
+        "ball_container_bytes": 95,
+        "ball_sha256": "0362b2af19c9bc5a910333b0c3cae456e3beb32a81ee13b84085ba74cdc85eb0",
+        "kbps": 749.64,
+        "native_bytes": 49881,
+        "native_sha256": "ff02c09a8322afaae3d6c58cec6d34548e42c80b1e0a0cc5665a810ef3c28d65",
+        "total_bytes": 49976
+      },
+      "native_framing": {
+        "codec_payload_bytes": 49657,
+        "format": "IVF",
+        "header_bytes": 32,
+        "per_frame_headers_bytes": 192,
+        "rate": 30,
+        "scale": 1
+      },
+      "point": 48,
+      "streak_psnr": 39.11550885104936
+    },
+    {
+      "ball_on": true,
+      "baseline_psnr": 37.31627083468174,
+      "codec": "svt",
+      "guard_off": false,
+      "judges": {
+        "baseline": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 1,
+            "hit_10px": 3,
+            "hit_5px": 2,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 1,
+            "hit_10px": 3,
+            "hit_5px": 3,
+            "negatives": 0,
+            "positives": 16
+          }
+        },
+        "streak": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 12,
+            "hit_5px": 7,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 16,
+            "hit_5px": 15,
+            "negatives": 0,
+            "positives": 16
+          }
+        }
+      },
+      "ledger": {
+        "ball_container_bytes": 96,
+        "ball_sha256": "b11e75dc0d6797493b65653faf00315ad6f8abfd04051f4005a7c2e6e8948223",
+        "kbps": 520.98,
+        "native_bytes": 34636,
+        "native_sha256": "a6c1aac8acd4a921f76f328e998d9ca08eff1b7a4790381135368c36fb80b6d9",
+        "total_bytes": 34732
+      },
+      "native_framing": {
+        "codec_payload_bytes": 34412,
+        "format": "IVF",
+        "header_bytes": 32,
+        "per_frame_headers_bytes": 192,
+        "rate": 30,
+        "scale": 1
+      },
+      "point": 55,
+      "streak_psnr": 37.334234552356236
+    },
+    {
+      "ball_on": true,
+      "baseline_psnr": 33.95323970727998,
+      "codec": "svt",
+      "guard_off": false,
+      "judges": {
+        "baseline": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 0,
+            "hit_5px": 0,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 2,
+            "hit_5px": 2,
+            "negatives": 0,
+            "positives": 16
+          }
+        },
+        "streak": {
+          "balltrack": {
+            "false_on_negative": 0,
+            "far_on_positive": 2,
+            "hit_10px": 10,
+            "hit_5px": 7,
+            "negatives": 0,
+            "positives": 16
+          },
+          "wasb": {
+            "false_on_negative": 0,
+            "far_on_positive": 0,
+            "hit_10px": 16,
+            "hit_5px": 13,
+            "negatives": 0,
+            "positives": 16
+          }
+        }
+      },
+      "ledger": {
+        "ball_container_bytes": 93,
+        "ball_sha256": "fcddcf26f40b8d3e3f0fe76f2e18d66303b28860031c110d4af0fe76063fb5f1",
+        "kbps": 256.335,
+        "native_bytes": 16996,
+        "native_sha256": "bb967f46faa2ea529116bdc1bf6968dd094f658c09530fd62e65779f634d0419",
+        "total_bytes": 17089
+      },
+      "native_framing": {
+        "codec_payload_bytes": 16772,
+        "format": "IVF",
+        "header_bytes": 32,
+        "per_frame_headers_bytes": 192,
+        "rate": 30,
+        "scale": 1
+      },
+      "point": 62,
+      "streak_psnr": 33.96306192191828
+    }
+  ],
+  "published_tar_sha256": "f160ce69f66b1272236c9c6c98ea72c65912bc500754141d419ebb15a8e3227e",
+  "source_judges": {
+    "balltrack": {
+      "false_on_negative": 0,
+      "far_on_positive": 1,
+      "hit_10px": 14,
+      "hit_5px": 8,
+      "negatives": 0,
+      "positives": 16
+    },
+    "wasb": {
+      "false_on_negative": 0,
+      "far_on_positive": 0,
+      "hit_10px": 16,
+      "hit_5px": 15,
+      "negatives": 0,
+      "positives": 16
+    }
+  },
+  "source_revision": "862d56c2a7d4499a0a0a9ed97f5a9f535b659cfb",
+  "source_wasb_qualification_passed": true,
+  "source_window": "tracknet/game8/Clip6"
+}

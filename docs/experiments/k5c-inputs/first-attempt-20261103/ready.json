@@ -1,0 +1,35 @@
+{
+  "git_head": "862d56c2a7d4499a0a0a9ed97f5a9f535b659cfb",
+  "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tracked_changes_included": [],
+  "tracked_changes_excluded": [],
+  "included_untracked_sha256": {},
+  "untracked_excluded_count": 0,
+  "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "untracked_excluded_sample": [],
+  "deleted_paths": [],
+  "snapshot_sha256": "00e487604fda13590e832ed7aaa85e85e31f26303415dfca7e2f5c541b5b2d87",
+  "spec_sha256": "52abc84a4c65e5ae0cc5da9e276ca0dc58c2a235d2dc67917847fda8441ffa77",
+  "source_sha256": "e24a6b252a79e3968f464d0eace460d05b7bac37a675229d070c571d050a2d1e",
+  "source_archive": "source.tar",
+  "input_check": {
+    "hashed": [
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/exposure-receipt.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/windows.json",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt"
+    ],
+    "deferred": [
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/tracknet-k4.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz"
+    ],
+    "deferred_bytes": 5930297219,
+    "deferred_to": "campaign"
+  },
+  "published": 1793712139.739518
+}

@@ -1,0 +1,1 @@
+{"passed": true, "checks": {"persisted_component_records": true, "accepted_16_and_48_frame_pilot": true}, "prior_16_verified": true, "points": 6, "frames": 48, "scope": "persisted component records; not independently replayed model inference"}

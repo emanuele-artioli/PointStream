@@ -1,0 +1,183 @@
+{
+  "job_id": "20261103T141758Z-f5d52fac",
+  "terminal_status": "complete",
+  "created": 1793715582.795426,
+  "settled": 1793715844.1254387,
+  "creation_to_settlement_seconds": 261.3300127983093,
+  "gpu_charge_upper_seconds": 262,
+  "prior_gpu_charge_seconds": 201,
+  "cumulative_gpu_charge_seconds": 463,
+  "gpu_budget_seconds": 900,
+  "cpu_phase_envelope_seconds": {
+    "preparation": 20,
+    "single_core_lifecycle": 262,
+    "independent_audit": 20,
+    "monitoring": 10,
+    "total": 312
+  },
+  "prior_cpu_charge_seconds": 1101,
+  "cumulative_cpu_envelope_seconds": 1413,
+  "cpu_budget_seconds": 1800,
+  "cpu_accounting_note": "Conservative envelope; aggregate administrative CPU telemetry is incomplete, not an exact measurement.",
+  "closure": "terminal state reports no GPU compute processes and no PointStream claim; read-only process query found neither supervisor PID 2767698, child PID 2767715 nor members of process group 2767715",
+  "event_acknowledged": "4c515c8fe195594f83453bd15f96a428",
+  "source_commit": "6040fe5c7da6d804ea52d3d190e6aeb04c0e20b2",
+  "source_archive_sha256": "775169b3a27a5dd42c80cf79e83540dbf6c6f5287ee9d16892616b59adbd865c",
+  "snapshot_sha256": "e715f7d15b5f7f544225dc2e443f03abc3ade93c9cf36be316c0c8d83c895d3a",
+  "normalized_spec_sha256": "161a958ffff2aba437dd1a32c56255e8dd6002be6554349108133e599dde5de1",
+  "input_identities": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/windows.json",
+      "sha256": "d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/tracknet-k4.tar",
+      "sha256": "5cde1f81c6723eb8342c52d8d5aa55cd24dd7567b3b792818337dfe368edc57d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/exposure-receipt.json",
+      "sha256": "c841040c67c37e19b656b7661b50cc6119c1034ece63b9196519fb23341f0680"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261103T132157Z-f665bece/smoke/published.tar",
+      "sha256": "f160ce69f66b1272236c9c6c98ea72c65912bc500754141d419ebb15a8e3227e"
+    }
+  ],
+  "source_conversion": {
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-nostdin",
+      "-framerate",
+      "30",
+      "-start_number",
+      "0",
+      "-i",
+      "/local/users/emanuele/pointstream/cache/5cde1f81c6723eb8342c52d8d5aa55cd24dd7567b3b792818337dfe368edc57d/tree/Dataset/game8/Clip6/%04d.jpg",
+      "-frames:v",
+      "48",
+      "-vf",
+      "scale=1280:720:flags=area:out_range=tv,format=yuv420p",
+      "-f",
+      "rawvideo",
+      "-pix_fmt",
+      "yuv420p",
+      "-y",
+      "/local/users/emanuele/pointstream/scratch/20261103T141758Z-f5d52fac-smoke/k5c-work/source.yuv"
+    ],
+    "frames": 48,
+    "sha256": "5c74a5cb679e77b7a1649868be5bc0ea23acb65c1469e9c8503969c18a536ee1",
+    "seconds": 0.28
+  },
+  "source_window": "tracknet/game8/Clip6",
+  "environment": {
+    "name": "environment",
+    "source": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "extract": true,
+    "mode": "local-hit",
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+    "seconds": 3.139181613922119,
+    "prefix": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+    "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+    "bin": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin"
+  },
+  "smoke_archive_sha256": "d40a9f7e0a7d2878d01010d4e128467bbdc174f9a899e007a555b9febe256d32",
+  "independent_audit": "pending",
+  "receipt_sha256": {
+    "ack.json": "93ceabcfea6780c6315af7f6b2429a9a194b6af8f35d9d4f8ce400c111010588",
+    "export-receipt.json": "3cec87bcfa22eb6d83235c0e38239e811bdf11c20eb50df0de32626703b4c98e",
+    "full-execution.json": "e1b8ccd123237ab1ff6afa38aec74eadda75b2c1dcd79fe602630938cadd2563",
+    "ready.json": "7da51ecca1523ba37ab8dde892db63cb94281550392bb60525c296cbd99adf48",
+    "smoke-dispatch.json": "ae42047b4bd0d82266dd46cd804a39ddaa5e403865c2c49b6b234c070c07ec4a",
+    "smoke-execution.json": "089a7205c6ec86bddca95f61ee8c29ce3448bcabaa4a80b2085a16f8c8e7ba30",
+    "smoke-staging.json": "2de4aadc46acc5a577e8a909f891583969a5d708abbcac30f2d1d3d17a90eca6",
+    "state.json": "e7df17f54d3ec12e4fc703b02294d4e0fc5c5d921da3105e4eb3aec68b046def",
+    "validation.json": "ef41dc55c3c1d84b38fc5f97075cd3bfccecbb254a42a8d8aec6a09935fae5d5"
+  },
+  "host_admission_tool_inventory": {
+    "ffmpeg": {
+      "path": "/opt/local/bin/ffmpeg",
+      "version": [
+        "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+        "built with gcc 11 (Ubuntu 11.4.0-1ubuntu1~22.04)",
+        "configuration: --prefix=/opt/local --enable-pthreads --enable-pic --enable-shared --enable-rpath --enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libvmaf --enable-nonfree --enable-ffnvcodec --enable-demuxer=dash --enable-libxml2 --enable-libvvenc"
+      ],
+      "returncode": 0
+    },
+    "vvencapp": {
+      "path": "/opt/local/bin/vvencapp",
+      "version": [
+        "vvencapp version 1.11.0"
+      ],
+      "returncode": 0
+    }
+  },
+  "manager_python_inventory": "Python 3.10.20",
+  "gpu_admission_snapshot": {
+    "index": 0,
+    "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "memory_used_mib": 1,
+    "memory_total_mib": 49140,
+    "memory_free_mib": 48645,
+    "utilization_pct": 0,
+    "compute_processes": [],
+    "pointstream_claimed": false,
+    "pointstream_shared_claims": []
+  },
+  "component_native_tools": {
+    "ffmpeg": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+      "sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+      "version": "ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "SvtAv1EncApp": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/SvtAv1EncApp",
+      "sha256": "4cec951d20d1b72c4c226b337b00521ad32893885931f34d9e74cfbed53a25b4",
+      "version": "SVT-AV1 v4.2.0 (release)"
+    },
+    "dav1d": {
+      "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "real_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/dav1d",
+      "sha256": "e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6",
+      "version": "1.5.4"
+    }
+  },
+  "component_device_metadata": {
+    "balltrack": "cuda:0",
+    "wasb": "cuda:0"
+  },
+  "metadata_scope": "Host admission inventory and manager Python are distinct from the actual packed component runtime and native tools; GPU admission snapshot is not terminal process evidence. Closure is corroborated separately by terminal status and process-group query."
+}

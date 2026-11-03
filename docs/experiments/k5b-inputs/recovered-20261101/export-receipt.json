@@ -1,0 +1,17 @@
+{
+  "job_id": "20261021T084417Z-048cc9d4",
+  "host": "gpu1",
+  "root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261021T084417Z-048cc9d4",
+  "read_only": true,
+  "seconds": 2.757782041095197,
+  "files": [
+    {
+      "path": "ready.json",
+      "status": "read",
+      "source_bytes": 758,
+      "truncated": false,
+      "sha256": "9611f4156175ab37ac85c258a7217e5bfc75d91d9f07f2d79d84d25a821dea11",
+      "seconds": 0.0448092888109386
+    }
+  ]
+}

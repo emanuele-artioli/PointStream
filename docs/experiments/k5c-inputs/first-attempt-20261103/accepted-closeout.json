@@ -1,0 +1,45 @@
+{
+  "job": "20261103T132157Z-f665bece",
+  "phase": "closed cost stop after actual 16-frame output",
+  "checks": "independent CPU audit of saved predictions/bytes/labels; no model rerun",
+  "gpu_charge_upper_seconds": 201,
+  "cpu_charge_envelope": {
+    "preparation": 600,
+    "request_lifetime_upper": 201,
+    "independent_audit_allocation": 180,
+    "monitoring_allocation": 120,
+    "total": 1101
+  },
+  "remaining_original_gpu_seconds": 699,
+  "remaining_original_cpu_seconds": 699,
+  "resource_basis": "request creation to persisted terminal worker settlement (200.7341s), which follows supervisor exit and finally release in the reviewed manager; includes queue time, not an asserted exact GPU occupancy measurement; current PIDs/own claims absent",
+  "source_16_archive_sha256": "f160ce69f66b1272236c9c6c98ea72c65912bc500754141d419ebb15a8e3227e",
+  "files": {
+    "independent-audit.json": {
+      "bytes": 11273,
+      "sha256": "b0e18a2cdfd4997d118c3dec7e984209382a6bcf62ffc4ac0b3537eeb37c06d7"
+    },
+    "resource-closeout.json": {
+      "bytes": 1811,
+      "sha256": "89c5c302823146be2f5e0be1f7d706ab604eae3ec6394eb781b38bf6e06c2512"
+    },
+    "ready.json": {
+      "bytes": 2113,
+      "sha256": "3f94e5b4b8ae38338c871eafdf71a16aba997c877d826887d037d0a6bf177138"
+    },
+    "smoke-execution.json": {
+      "bytes": 378,
+      "sha256": "4918b47efeaf54d35772f26d3a4298ae42f7557c6e01f6d704787bf7f489488a"
+    },
+    "smoke-dispatch.json": {
+      "bytes": 13602,
+      "sha256": "cebe94c32ade4e897f6ad020b81d52b96084ccbec8de7fffb4953f3b4af7c0d7"
+    },
+    "failed-cost-gate.json": {
+      "bytes": 94,
+      "sha256": "71db31e187261a76a1de502c4000afd37f8d0d97de695fba52988abd8a2857dc"
+    }
+  },
+  "administrative_cpu_limit": "conservative allocations; exact complete control-plane CPU aggregate not measured",
+  "claim": "recorded component path verified only for 16 visible positive frames, no false-positive-on-negative estimate or 48-frame measurement"
+}

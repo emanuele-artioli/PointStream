@@ -1,0 +1,134 @@
+{
+  "local_root": "/local/users/emanuele/pointstream",
+  "inputs": [
+    {
+      "name": "windows",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/windows.json",
+      "sha256": "d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516/windows.json",
+      "seconds": 0.001741170883178711
+    },
+    {
+      "name": "dcvc_image",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302/cvpr2026_image.pth.tar",
+      "seconds": 0.16008734703063965
+    },
+    {
+      "name": "dcvc_video",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3/cvpr2026_video_htl.pth.tar",
+      "seconds": 0.44912242889404297
+    },
+    {
+      "name": "tracknet",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/tracknet-k4.tar",
+      "sha256": "5cde1f81c6723eb8342c52d8d5aa55cd24dd7567b3b792818337dfe368edc57d",
+      "extract": true,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/5cde1f81c6723eb8342c52d8d5aa55cd24dd7567b3b792818337dfe368edc57d/tree",
+      "seconds": 0.2069549560546875
+    },
+    {
+      "name": "wasb_code",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55",
+      "extract": true,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55/tree",
+      "seconds": 0.001438140869140625
+    },
+    {
+      "name": "wasb_weights",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6",
+      "extract": true,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6/tree",
+      "seconds": 0.12910151481628418
+    },
+    {
+      "name": "balltrack_code",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+      "extract": true,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff/tree",
+      "seconds": 0.0006804466247558594
+    },
+    {
+      "name": "balltrack",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec/balltrack_best.state_dict.pt",
+      "seconds": 0.0465853214263916
+    },
+    {
+      "name": "wasb_config",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+      "extract": false,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d/wasb-tennis.yaml",
+      "seconds": 0.004204511642456055
+    },
+    {
+      "name": "exposure_receipt",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/exposure-receipt.json",
+      "sha256": "c841040c67c37e19b656b7661b50cc6119c1034ece63b9196519fb23341f0680",
+      "extract": false,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/c841040c67c37e19b656b7661b50cc6119c1034ece63b9196519fb23341f0680/exposure-receipt.json",
+      "seconds": 0.0017423629760742188
+    },
+    {
+      "name": "accepted16",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261103T132157Z-f665bece/smoke/published.tar",
+      "sha256": "f160ce69f66b1272236c9c6c98ea72c65912bc500754141d419ebb15a8e3227e",
+      "extract": false,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/f160ce69f66b1272236c9c6c98ea72c65912bc500754141d419ebb15a8e3227e/published.tar",
+      "seconds": 0.002193450927734375
+    }
+  ],
+  "environment": {
+    "name": "environment",
+    "source": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "extract": true,
+    "mode": "local-hit",
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+    "seconds": 3.139181613922119,
+    "prefix": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+    "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+    "bin": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin"
+  },
+  "scratch": "/local/users/emanuele/pointstream/scratch/20261103T141758Z-f5d52fac-smoke",
+  "attempt": 1,
+  "restored_checkpoint": null,
+  "temporary_environment": {
+    "TMPDIR": "/local/users/emanuele/pointstream/temporary/20261103T141758Z-f5d52fac/smoke/tmp-6cc1f03922d04906aaba030cf5335ce9",
+    "TMP": "/local/users/emanuele/pointstream/temporary/20261103T141758Z-f5d52fac/smoke/tmp-6cc1f03922d04906aaba030cf5335ce9",
+    "TEMP": "/local/users/emanuele/pointstream/temporary/20261103T141758Z-f5d52fac/smoke/tmp-6cc1f03922d04906aaba030cf5335ce9",
+    "PYTHONPYCACHEPREFIX": "/local/users/emanuele/pointstream/python-cache"
+  },
+  "published": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261103T141758Z-f5d52fac/smoke/published.tar",
+    "sha256": "d40a9f7e0a7d2878d01010d4e128467bbdc174f9a899e007a555b9febe256d32",
+    "bytes": 1259520,
+    "members": 24,
+    "partial": false
+  },
+  "publication_seconds": 0.2584797851741314,
+  "released": 1793715830.1220775
+}

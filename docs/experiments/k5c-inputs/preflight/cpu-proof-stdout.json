@@ -1,0 +1,1 @@
+{"passed": true, "selected": [0], "child": {"child": [0], "grandchild": "[0]"}, "allowed_before_count": 96, "cpu_self_seconds": 0.120445, "cpu_children_seconds": 0.041506, "scope": "cooperative inherited affinity, not adversarial containment; no CUDA/model/native command"}

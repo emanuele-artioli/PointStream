@@ -1,0 +1,45 @@
+{
+  "job_id": "20261103T141758Z-f5d52fac",
+  "created": 1793715582.795426,
+  "status": "complete",
+  "updated": 1793715844.1254387,
+  "host_alias": "gpu6",
+  "gpu": {
+    "index": 0,
+    "uuid": "GPU-dbbb295f-6156-1133-8658-841f3f5b17d0",
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "memory_used_mib": 1,
+    "memory_total_mib": 49140,
+    "memory_free_mib": 48645,
+    "utilization_pct": 0,
+    "compute_processes": [],
+    "pointstream_claimed": false,
+    "pointstream_shared_claims": []
+  },
+  "gpu_sharing": {
+    "mode": "exclusive"
+  },
+  "supervisor_pid": 2767698,
+  "remote_status": {
+    "status": "complete",
+    "started": 1793715597.810007,
+    "last_progress": 1793715839.8761594,
+    "emitted": [
+      "terminal:complete"
+    ],
+    "gpu_sharing": {
+      "mode": "exclusive"
+    },
+    "pid": 2767715,
+    "proc_start_time": 1793715597.96,
+    "process_group_id": 2767715,
+    "progress": {
+      "stage": "full",
+      "completed": 1,
+      "updated": 1793715837.098539,
+      "decision": null
+    },
+    "exit_code": 0,
+    "ended": 1793715839.8761594
+  }
+}

@@ -1,4 +1,69 @@
-# Continuation, 2026-11-01: empirical review package prepared; author filing checks remain
+# Continuation, 2026-11-01: paper strengthening and main-paper ball result
+
+**Latest state, 2026-11-03:** the original approved 48-frame independent-image-
+judge ball pilot completed as `20261103T141758Z-f5d52fac`, source `6040fe5c`, gpu6 Ada.
+Actual 48-frame component archive SHA256 `d40a9f7e0a7d2878d01010d4e128467bbdc174f9a899e007a555b9febe256d32`
+and independent CPU audit SHA256 `ae6a285b7213403328c9cd31eb77aa5bad35dfcbfdb72fad7254589d22013fe0`.
+Six native/BALL ledgers, 48-frame labels, separate image-judge counts and PSNR
+guards pass. WASB source 45/48 at 10 px; rendered 42–44/48 versus 0–8/48 native.
+All 48 are visible positive, zero negative/excluded; no negative-frame FP estimate.
+One historical development prefix, not generalization or full-codec win.
+
+The first `20261103T132157Z-f665bece` cost stop remains failed/preserved; 16 valid
+controls were independently audited and reused via the explicit allocation
+amendment for the original 48-frame target. Those prefixes are nested, not 64 frames.
+Both requests are terminal with task-owned processes/claims/waits closed and
+events acknowledged. Accepted cumulative envelopes **463/900 GPU-s and
+1,413/1,800 CPU-s** include preparation, failed and successful single-core
+lifecycles, audits and monitoring; aggregate administrative CPU telemetry remains
+uncertain. No further computation, training, W8 retry, third attempt or larger
+study is authorized by the balance. Exact identities/receipts and limits are
+in [K5c](experiments/k5c-independent-ball.md).
+
+**Manuscript checkpoint:** Overleaf `a2972799a7c70f37bdb8f72485f23beefdf55a16` is pushed.
+Eight main and two appendix figures; 23 main including references 22–23 plus
+five appendix pages. The ball contribution and separate WASB 48-frame pilot
+remain in main; full per-setting byte/PSNR ledger is appendix Table 10. The
+historical whole-frame PSNR BD-rate failure, dependent old judge and different
+framing convention remain visible. The new anonymous review supplement contains
+only saved predictions, labels and ledgers, not footage or native binaries.
+
+Frozen author-review package:
+`/private/tmp/pointstream-strengthened-review-20261103-a297279/`.
+Anonymous PDF SHA256 `775c77b590c4022a367538d0ebdb7bb191305f403fb6142e538bf3295f85cfe0`;
+author PDF `3014512b72d93fc1fdaf5e3a2ec2335dda1992dd16e8932599c152c6e3f386ab`;
+selected source ZIP `bca3019482b6877214e92d0cb6fc1f50c210b9983f81abba9508fa03bcc0d985`;
+anonymous data ZIP `0ecdcafc20afe1cc6ff97ab79599bce7f9805092cb1ae14851eb3a52bf4de886`;
+root manifest `b8b8dd3bf53866deba4fe25db2c6b0c1ecd196856e981b8be57d70303af08d58`.
+Both variants build from selected 23 active files using native Biber 2.22/external
+ACM styles; checker 29 keys and five registry tests pass. Root verified hashes,
+page spans, 26 judge sequences and labels, named/anonymous contacts/links, figures
+and table layout. No source hidden client, negative-frame behavior or untouched
+confirmation follows. The broader PLAN is not complete; see the
+[review record](paper/strengthened-author-review-2026-11-03.md).
+
+Coauthors have not approved the revision, footage permissions remain unresolved,
+and no submission occurred. PRESLEY was never modified. Prior packages and
+historical notes below are preserved, not current publication candidates.
+
+**Latest user direction:** the previous `eb7e3a3` package remains preserved,
+but presentation and substantive contribution review are reopened. The user
+approved the proposed eight main figures, appendix ablations/negative results,
+and exchanging repetitive prose/tables for figures. The limit is 23 pages for
+body plus references (references at most two pages), plus five appendix pages.
+PRESLEY is strictly read-only. Main-paper restoration of the real K5b streak
+result is prioritized: the user explicitly kept it despite the failed frame
+guard; the active manuscript had omitted the substantive experiment. Audit
+saved packets, exact rates, window/source identities and the dependent
+BallTrack judge before drafting a task-specific claim. Figure generation from
+saved evidence is authorized; no new GPU experiment, stopped W8 retry or
+training is implied. med000 DCVC remains dropped by the user's 2026-10-31
+decision. Current code branch is `codex/paper-strengthening-2026-11-01` from
+`origin/main` `35ab3fd4`; the unrelated MoQSplat update is not paper evidence.
+Three delegates are working on saved-evidence figure implementation, bounded
+read-only ball artifact recovery, and a full-roadmap prioritization report.
+No new experiment has been launched. The older state below is historical
+except where explicitly retained (W8 stop, scientific limits, budgets).
 
 **Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
 Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library

@@ -1,0 +1,66 @@
+{
+  "scope": "attended pre-admission inspection and inherited-affinity proof; no CUDA/native experimental stage yet",
+  "approved_caps": {
+    "gpu_seconds": 900,
+    "workload_cpu_seconds": 1800
+  },
+  "preparation_charge_cpu_seconds": 300,
+  "gpu_charge_so_far": 0,
+  "administrative_cpu_telemetry": "full control-plane CPU not measured; 300-s preparation allocation is conservative, not an invented exact aggregate measurement",
+  "selected_receipts": {
+    "cpu-proof-stdout.json": {
+      "bytes": 274,
+      "sha256": "cc48843c1b269d91cac5915590a1fdb0cfc9fb0855272d9df72fe01257d29166"
+    },
+    "cpu-proof-execution.json": {
+      "bytes": 53,
+      "sha256": "b9de7668939ea4064b867b3e745f49460f2b958db6ef448c75e212a19cdda72f"
+    },
+    "publish-stdout.json": {
+      "bytes": 350,
+      "sha256": "13eee5b1ad4abd0344c2370e645c6aa77e4b2d4b268c1466476128ffb62d141e"
+    },
+    "publish-execution.json": {
+      "bytes": 52,
+      "sha256": "46a593fa27ba39ede3c46e87fa71fcf34b55487ebcc960e9070204811eea97a1"
+    }
+  },
+  "checks": {
+    "host-inspect": {
+      "local_receipt": "/private/tmp/pointstream-k5c-host-inspect-20261101.json",
+      "sha256": "5f8ea057193676b65528e1e53fa352d42e47613298f32c11bde0d5312138ed9e",
+      "bytes": 14397
+    },
+    "existing-jobs-retry": {
+      "local_receipt": "/private/tmp/pointstream-k5c-existing-jobs-retry-20261101.json",
+      "sha256": "29601e4dfb1a82140e325dbc17779644655a875f71421114e2c22ea49c45c57c",
+      "bytes": 4721047
+    },
+    "doctor": {
+      "local_receipt": "/private/tmp/pointstream-k5c-doctor-20261101.json",
+      "sha256": "73d34d0a313d950cba0c5616b14689b4a17abeec978d66027aba5648270950b3",
+      "bytes": 11190
+    },
+    "doctor-eligible": {
+      "local_receipt": "/private/tmp/pointstream-k5c-doctor-eligible-20261101.json",
+      "sha256": "93c616acf1d1470d51200b6516beb9ce350f3410eb7f55296729c62813ac4d0e",
+      "bytes": 8835
+    },
+    "workers": {
+      "local_receipt": "/private/tmp/pointstream-k5c-workers-20261101.json",
+      "sha256": "c7266886fb3c0290e271c3bcee3aba904283b4e69454f109e80317a84ad3aa4c",
+      "bytes": 1415
+    }
+  },
+  "existing_jobs_records": 1560,
+  "gpu3_excluded": "doctor atomic-visibility read timed out at 60s; other required checks retained, not bypassed",
+  "eligible_pool": [
+    "gpu2",
+    "gpu5",
+    "gpu6"
+  ],
+  "doctor_eligible_passed": true,
+  "model_profiles": "WASB/BallTrack plus DCVC on previously qualified A6000/Ada; new output-image judging path still needs smoke",
+  "native_smoke_and_pilot_source_revision": "74cb91d4 (code preparation; final frozen job identity recorded at submission)",
+  "resource_basis": "reviewed sequential code, inherited one-core affinity, canonical inclusive 720s campaign timer and task-owned teardown; cooperative guard, not adversarial containment"
+}

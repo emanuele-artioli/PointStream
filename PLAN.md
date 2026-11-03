@@ -21,7 +21,62 @@ Every dataset is used for what it labels ([resources](docs/resources.md#what-eac
 The environment audit (step 0) comes before the first component that needs a
 new dependency.
 
-## Where PointStream stands (2026-11-01)
+## Where PointStream stands (2026-11-03)
+
+**Latest checkpoint:** Overleaf `a2972799a7c70f37bdb8f72485f23beefdf55a16`
+is pushed: eight main figures and two appendix figures, 23 body/reference pages
+(references on 22–23) plus five appendix pages. The historical ball result and
+new separate-judge 48-frame pilot are in the main text/figure; a per-setting
+physical-byte/PSNR table supports them in the appendix. Negative whole-frame
+guards and broader limitations remain visible. Both variants build from the
+23-file selected-source ZIP; anonymous review data contains only saved
+predictions/labels/ledgers, with no footage or native binaries. Exact package
+identities and remaining research/author steps are in the
+[review record](docs/paper/strengthened-author-review-2026-11-03.md).
+Source-specific footage permissions and coauthor approval remain unresolved;
+no paper has been submitted. The user separately approved the
+[new independent-judge pilot](docs/cards/k5c-independent-ball-pilot.md) at
+900 GPU-s /1,800 workload CPU-s. The original 48-frame development pilot is
+now complete as `20261103T141758Z-f5d52fac` on gpu6 Ada, using frozen source
+`6040fe5c`. Independent CPU audit passes all six physical native/BALL records,
+frame/label joins, detector counts and PSNR guards. Source WASB finds 45/48;
+rendered WASB finds 42–44/48 versus 0–8/48 native at 10 px. All 48 are visible
+positive frames, so negative-frame false positives remain unmeasured. This
+supports a narrow independent-model task observation, not untouched-clip
+confirmation, perceptual realism, matched-rate BD-rate or a complete codec win.
+The historical four-window whole-frame PSNR guard failure remains unchanged.
+
+The first request `20261103T132157Z-f665bece` is preserved as a cost stop:
+its valid 16-frame command forecast 577.91 s against the internal 420 s allocation.
+The explicit [allocation amendment](docs/cards/k5c-48-frame-continuation.md)
+reused independently audited controls for the original 48-frame target without changing
+scientific helpers, quality rules or user-approved totals. The 16-frame prefix is
+nested within 48, not an independent additional sample. All task-owned GPU
+processes/claims/waits are closed and terminal events acknowledged. Accepted
+cumulative envelopes: **463/900 GPU-s and 1,413/1,800 CPU-s**, including failures,
+preparation, single-core lifecycle, audit and monitoring; complete administrative
+CPU telemetry remains uncertain. No training, W8 retry, third attempt or larger
+study follows from unused authority. Exact source/spec/archive identities and
+receipts live in [K5c](docs/experiments/k5c-independent-ball.md). The wider
+research roadmap retains its open tasks and recorded stops.
+
+**Paper strengthening reopened (user, 2026-11-01):** the research roadmap is
+not complete and the earlier technically prepared package is a preserved review
+checkpoint, not the final submission candidate. The user approved a stronger
+visual presentation (approximately eight main figures, supporting appendix
+ablations/negative results, replacing repetitive prose/tables), with **at most
+23 body/reference pages, at most two reference pages within those 23, and five
+additional appendix pages**. PRESLEY is a read-only format reference and must
+not be modified by this session. The retained K5b ball streak result belongs
+in the main paper: the user adopted it on 2026-10-21 despite its failed
+whole-frame PSNR rate guard. Recover and audit the saved real-payload result,
+including tracker/judge dependence, before promoting its specific task claim;
+do not substitute the earlier source-pixel oracle or call it a whole-codec win.
+Parallel work is recovering the ball evidence, implementing saved-evidence
+figures, and ranking unfinished research. New GPU runs, stopped-card retries,
+training and larger sweeps still require their own reviewed protocol/budget.
+In particular med000 DCVC was explicitly dropped by the user after decoder
+nondeterminism; do not automatically reopen it as a missing-anchor repair.
 
 **Current W8 checkpoint, 2026-11-01:** the independent saved-quality screen,
 Linux exact-input oracle, all-80 saved-pixel reconstruction, native YUV/library
@@ -375,6 +430,7 @@ marked `card ready` is waiting for the user to start it.
 
 | item | card | branch | model / effort | status |
 |---|---|---|---|---|
+| Paper strengthening and independent ball pilot | [research priorities](docs/paper/research-and-figure-priorities-2026-11-01.md); [K5c](docs/experiments/k5c-independent-ball.md) | `codex/paper-strengthening-2026-11-01`, PR #329 | primary plus requested Terra 6.1 medium delegates; actual tier telemetry unavailable | 2026-11-03: eight main/two appendix figures implemented, ball retained in main, negative guards visible; 23 main/reference plus five appendix pages. Original four-window audit recovered. K5c original 48-frame pilot completed and independently audited as `20261103T141758Z-f5d52fac`, gpu6 Ada, code `6040fe5c`; first 16-frame cost stop preserved. WASB 42–44/48 versus 0–8/48 native, all 48 positive; no confirmation/full-codec win. Closed cumulative 463/900 GPU-s and 1,413/1,800 CPU-s; administrative telemetry uncertainty disclosed. Both requests/processes/claims/waits closed, events acknowledged; no further compute admitted. Two original SVT gaps remain after read-only audit; med000 DCVC dropped. Manuscript a297279 pushed; selected source and separate anonymous data frozen in the November3 review record. PRESLEY untouched; coauthor approval and footage permissions unresolved; no submission. |
 | W8 exclusive upper-baseline attempt | [approved exclusive amendment](docs/experiments/w8-inputs/amendment-20261101/exclusive-prospective-card.md) | `codex/w8-exclusive-results-2026-11-01` (policy PR #322 merged) | primary plus Terra 6.1 medium delegates | complete: `20261101T081828Z-d70bc44f`, gpu6 exclusive Ada, frozen source `c0f25e4e` / spec `e9d926b6`; independent full audit and raw screen pass all 8 cells at 46.3151 kbps. Initial two cost stops preserved. Combined inclusive scoring 224 GPU-s / ≤304 CPU-s of 450/450; original total after 15 CPU-s runtime preflight: 224 GPU-s / ≤1,169 CPU-s of 3,600/3,600. Processes/claims/waits closed. No training/encoding/model/payload/quality-rule change. |
 | W8 Linux exact-input oracle and fresh receiver gates | [original W8 card](docs/cards/w8-fresh-decoder-witness.md); [approved repair](docs/cards/w8-source-package-repair.md) | `codex/w8-source-repair-2026-11-01` | primary plus scoped delegates | Input/runtime/native/pixel gates passed within recorded scope. Sole replacement `20261101T151030Z-df638d2f` packet worker passed, then CUDA device count error 2/unavailable before model/kernel/sampling; cause unknown, no quality result or cost slope. All task-owned processes/claims/wait/events closed. Phase ≤292 CPU-s/188 GPU-s; original cumulative ≤2,457/540 of 3,600 each. No retry or 30-step admission. Empirical paper retains fresh-decoder limitation; CUDA-only diagnostic is an unauthorized future proposal. PR #325 merged `06ce6374`; final documentation update belongs to [PR #326](https://github.com/emanuele-artioli/PointStream/pull/326), whose live checks/merge state should be consulted. |
 | W8 approved upper-baseline amendment (historical, followed by exclusive repair) | [coverage follow-up](docs/experiments/w8-inputs/prospective-coverage-followup.md) | `codex/w8-cost-reallocation-2026-11-01` (predecessor PR #320 merged) | primary plus Terra 6.1 medium delegates | stopped 2026-11-01: first request `20261101T071706Z-afde26d5` passed correctness but failed cost projection, second `20261101T073429Z-04a50c10` hit its smoke limit on shared GPU; both terminal/claims released, no full quality point or third run. Amendment ≤87 CPU-s/67 GPU-s of 300/300; cumulative W8 ≤937 CPU-s/67 GPU-s of 3,600/3,600. Subsequent exclusive-GPU 450/450 inclusive scoring-cap amendment approved; its distinct request is tracked in the row above, original totals unchanged. Fixed packet/rate and quality/receiver gates unchanged. |
