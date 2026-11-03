@@ -224,3 +224,82 @@ Save /tmp/moqsplat-crosshost-synchronized-20261103/{result.json,smoke.log,
 smoke/summary.json}. Endpoint self-expires; no firewall/route changes attempted.
 Need a permitted UDP route/trusted reachable endpoint (possibly university VPN
 or IT firewall assistance) before claiming outside-network success. No GPU used.
+
+CPU retry20261103T152350Z-49a47c66 terminalFAILED with no external client proof;
+endpoint self-expired and children terminated. No outside session accepted.
+Stop direct external tests pending permitted UDP reachability; no recurring
+wakeups or exposed task endpoints remain. Charge another150 CPU-s conservatively
+(300/480 allocatedCPU-s total, 0 GPU). Terminal events acknowledged.
+PointStream final checks Ruff/mypy382files pass; full pytest1450passed,30skipped
+in102.64s. No unrelated root/paper changes.
+
+### 20261103T152241Z-0989d383 partial successes and GPU worker failure
+
+115 CPU tests passed. Full semantic publisher, five-level VMAF and native
+prepared-manifest delivery passed (all6,131,954Gaussians,10layers,1,447,156,104
+payloadbytes, exact attributes, cache revisit0). Direct live:420frames, all640
+layers, controls/cache/realGPUeviction passed. Constrained120Mbps,80ms one-way,
+0.1%loss:416frames,144layers, controls passed.
+
+Recovery relay accepted reconnected publisher and subscriber. Client rendered
+132frames then failed inside gsplat torch.inverse at cuSolver handle creation
+(CUSOLVER_STATUS_INTERNAL_ERROR). This is not evidence that reconnect failed.
+Default asyncio render dispatch can rotate CUDA work across pool threads;
+thread-local library handles are a plausible cause, not proved. Replace it
+with one dedicated render thread, set device/inference scope there, preserve
+fail-fast on library errors and record render thread IDs in real telemetry.
+New gate must cover changed runtime; no promotion of this failed job.
+
+Supervisor352.80s +salvage25.43s/staging; conservatively charge420GPU-s.
+Phase GPU charge720; aggregate2,160/3,600; remaining1,440. New reservation at
+most1,400 (smoke600/full650). All raw output retained as partial.tar and local
+review bundleSHA6bb4f6a686ff92b1e9cf89b67cca60d6eac09366f52ac4236fcaf13f9b95228d.
+Direct control latency samples1.53/1.81s during budget changes; constrained
+76.98/91.53ms. Shared timing is not performance evidence, but pauses are an
+observed usability limitation and must be reported. No uniformly smooth claim.
+
+### Dedicated-worker gate 20261103T153511Z-10f1d7a3
+
+Published/pending; source51aa7b66623969afd9e4ac8fcf7fd159c25243e7, archive
+75f399794df40944c6d905023c323ec0826b0e50766852c11fb82fe364c6399c.
+CPU5 independent full suite passes (115 tests); no local Torch environment
+assumed. Scope change: CUDA work has one persistent thread with explicit device
+and inference mode; errors remain fatal, failure summaries retain last metrics.
+Prospective finite-VMAF bounds implemented and checked on saved previous curve.
+1,400-second reservation within1,440 remaining; smoke600/full650, deadline
+2026-11-03T16:04:15.874155Z. Spece09213720d7bc8866c832956672962240a36711862fc2339bbf51f42be2b7871.
+Previous semantic received-vs-source RGBmax1/255, mean0.00002604/255; images
+visually inspected. These are prior-job successes, not new-runtime qualification.
+
+The dedicated-worker request remains PENDING after capacity reinspection.
+GPU6device0 nowuses45,951MiB; device1 has23,133MiBfree, below16,000+8,192
+admission. Inspect then cancel our pending request; do not replay unknown work.
+Known client Torch allocator caps are6,144MiB each; revised14500MiBgroup request
+reserves2,212MiB beyond those two caps for driver/library contexts, plus8,192MiB
+external margin (22,692MiBtotaladmission). This fits device1 with no runtime
+quality/budget changes. Supervisor still enforces group memory and errors.
+Same1,400GPU-s ceiling and same frozen source; no extraGPUspend for pending wait.
+GPU5hardware/toolchain and separate local filesystem also verified, but avoid
+moving7.7GiB unless needed. A bounded environment archive is retained as setup
+evidence, not GPU evidence.
+
+20261103T153511Z-10f1d7a3 confirmed CANCELLED without host/owner/execution;
+bounded wait ended after546s. Zero GPU charge; terminal event acknowledged.
+Replacement uses unchanged source/runtime,14500MiB request andsame8GiBmargin.
+
+### Corrected resource reservation 20261103T154539Z-3d7be786
+
+Published/pending, same source51aa7b6 and archive75f399794df40944c6d905023c323ec0826b0e50766852c11fb82fe364c6399c.
+14500MiB group request +8192MiBmargin,1400GPU-s maximum, same untouched
+client budgets and qualification. Spec470a6f4bfb56700311f6bcdefe2a7abbb591c2fa895c1410d8572a73ff9f4c51.
+Archive setup tar/gzip hit its240s CPU bound; partial archive is preserved
+and is not a valid packed environment or GPU evidence. No migration performed.
+
+Later CPU-only cache-admission correction: existing same-size cache files are
+not charged as new disk demand. Every cached payload still undergoes receiver
+SHA verification. Focused regression passes; this does not alter cold-cache
+GPU workloads or the dedicated-worker source archive under qualification.
+Final CPU suite will include the new test separately; distinguish final head
+from the frozen GPU source revision. Prepared semantic live defaults are
+documented explicitly: tested Bicycle requires512MiB native cache target
+(large background layer exceeds128MiB), finite subscriberuses4GiB.
