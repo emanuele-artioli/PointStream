@@ -371,3 +371,46 @@ last useful JPEG with explicit waiting/stale-pose metadata; raw rendering remain
 recorded as black, and complete-scene empty views are not hidden. Seven viewer
 regressions and driver-status regression pass; the final gate includes this UI.
 No observed CUDA reserved-memory frame exceeded budget in the valid smoke.
+
+### Final bounded job 20261103T162943Z-5642b945
+
+Published/pending; sourcec96339fe8fb9eaf6c887b5446fbe059e6b4d8ba6, archive
+8b6b4c31ef22705184960c66ac9081d76cea6aa87564d4ae2686254bdce94375.
+Smoke:2clients constrained90s; full:2clients recovery180s, lateGPUbudgetcycle
+afterallreceived. Corrected controller waits for nonemptycatalogs fromboth.
+Speccfe099a4e20b8e860f48983bd8be256deb3080125f10c3e4b83d4a6486af2e5c; adapter40e2f593/476f6a08 code,480GPU-smax
+(allremaining),smoke180/full270/validators5each,deadline2026-11-03T16:41:03.016234Z.
+Source includes CPU-tested viewer hold-last-useful policy and preservesrawblack
+render metrics plus explicit displayed-pose/age/holdfields. Fullindependent
+CPU suite is rerun within the native gate before GPU work.
+No additional GPU request is authorized by this protocol after budgetexhaustion.
+
+## Final result — 3 November
+
+20261103T162943Z-5642b945 COMPLETE. Actual constrained smoke used40seconds
+(the existing smoke duration), not the planned90;119CPUtests passed31.91s.
+Two constrained clients419/411frames,128/90layers bysummary (journalend128/89).
+Two180-secondrecovery clients1989/1993frames,all640layerseach,1reconnecteach,
+589/593evictions,1229/1233promotions,0/0cache-revisitrequests. OneCUDAworker
+thread perclient; no allocated/attempt/reserved/resident framebudgetviolation.
+Rawblack45/36frames wereallheldpreviousimagesinviewerwithstale-pose/ageflags;
+maxheldage2.70/3.04s. Budgetchanges producedmaxframeinterval2.37/2.39s.
+Sharedtiming isdiagnostic, neverpaperperformance. Actual constrainedpilot40s
+and recovery180s is the qualified scope;90sconstrained and4/5minute recovery
+intentions were not executed.
+
+Native smokevalidatorpassed; fullcommandself-checkspassed, andidenticalCPU
+adaptervalidator runagainst exportedfullsummary passed3,982frames. No claim
+thatfleetinvokedexternalfullvalidator. Exports/tmp/moqsplat-final-evidence-20261103/
+final-evidence-20261103-hipbq4mf; canonicalinbox archivesretainrawjournals.
+NativeFFIlibSHAaa313c69b57e287234cd2d925bdeeaa27bdb9609c3bf6c059a9d5700f4b8a36a.
+GPUAda8.9UUIDef96fc4f-134e-4c01-290e-9a6c8bbef553. CompleteMoQSplat public
+report reproduction/VALIDATION-20261103.md; sourcecode/tests remain byte-identical
+to c96339fe8fb9eaf6c887b5446fbe059e6b4d8ba6 after documentation updates.
+
+Conservativefinalcharge480GPU-s, aggregate3,600/3,600. STOP GPUwork; none
+required or authorized within this protocol. No training/paidAPIs or recurring
+LLMtimers. EndpointtestprocessesandGPUchildrenended; priorpendingrequestcancelled.
+Remainingexternalchecks: permitted UDProute/trustedreachableendpoint, separate
+CUDA-machine/browser/newOS validation and hours-longsessions. Originalcustom
+transport/TableIartifacts still require coauthor recovery. Noextendedpaperwork.
