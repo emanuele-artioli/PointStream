@@ -21,11 +21,11 @@ def main() -> None:
     args = parser.parse_args()
     stage = Path(os.environ["PS_STAGE_DIR"])
     if args.validate:
-        result = json.loads((stage / "summary.json").read_text())
-        if not result["valid"] or not result["external_client"]["source_attributes_exact"]:
+        saved = json.loads((stage / "summary.json").read_text())
+        if not saved["valid"] or not saved["external_client"]["source_attributes_exact"]:
             raise ValueError("separate-machine QUIC check did not pass")
         Path(os.environ["PS_VALIDATION_PATH"]).write_text(
-            json.dumps({"passed": True, "checks": result})
+            json.dumps({"passed": True, "checks": saved})
         )
         return
     assert args.source and args.scene and args.python and args.port
