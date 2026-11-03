@@ -1,0 +1,55 @@
+{
+  "scope": "Read-only inspection of recovered original SVT score summaries; no scoring or encoding",
+  "gaps": [
+    {
+      "window": "med000",
+      "family": "SVT half-out s2_o20",
+      "encode_job": "20261031T111927Z-2d513709",
+      "score_summary_sha256": "d1e42f8b161c7a04264a8c954b834332b76b57c66cce94a82ba3cec21d0dee79",
+      "source_code": "9db7a3df7aef69075a97a3f6f4e53d9c8cfeb806",
+      "reported_corrected_target_kbps_rounded": 42.252049,
+      "saved_search": {
+        "scale": 2,
+        "offset": -20,
+        "outside": true,
+        "status": "unbracketed_high",
+        "order": [
+          47,
+          70
+        ],
+        "rates": {
+          "47": 269.54833333333335,
+          "70": 42.366666666666674
+        },
+        "selected": null
+      },
+      "scope": "Only CRF47/70 in this recovered search; no exhaustive codec-ladder claim. No scored selected point for this family."
+    },
+    {
+      "window": "med019",
+      "family": "SVT half-out s2_o20",
+      "encode_job": "20261031T105514Z-2310cf5a",
+      "score_summary_sha256": "989e75dbcdebef7310d4fe8e8c9eeb8b74fb6565d48b7dbdce04ba4d5cd6b2e2",
+      "source_code": "615fe6afebee6726c3cb661021b1a791c78b63dd",
+      "reported_corrected_target_kbps_rounded": 42.015549,
+      "saved_search": {
+        "scale": 2,
+        "offset": -20,
+        "outside": true,
+        "status": "unbracketed_high",
+        "order": [
+          47,
+          70
+        ],
+        "rates": {
+          "47": 278.5133333333334,
+          "70": 42.08
+        },
+        "selected": null
+      },
+      "scope": "Only CRF47/70 in this recovered search; no exhaustive codec-ladder claim. No scored selected point for this family."
+    }
+  ],
+  "native_archive_listing": "Read-only attempt interrupted without a returned handle/result; execution state unknown. Do not replay automatically. No GPU or scoring request was launched by this inspection.",
+  "decision": "The inspected records cannot close the two original SVT gaps for free. Retain conditional W7 family coverage; med000 DCVC was user-dropped and is not reopened. New encode/score requires separately reviewed bounded scope."
+}

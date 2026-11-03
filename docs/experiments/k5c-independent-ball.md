@@ -1,4 +1,4 @@
-# K5c — independent image judge for the ball component
+# Experiments: K5c — independent image judge for the ball component
 
 ## Current decision, 2026-11-03
 
@@ -219,3 +219,25 @@ known baseline/environment errors outside this worker. The 48-frame phase
 retains the exact prior archive, input/model/native identity bindings, actual
 source qualification and all six native/BALL paths. The zero-frame marker is
 validated solely as completion bookkeeping, never scientific data.
+
+### Continuation submission, 2026-11-03
+
+Submitted exactly once as `20261103T141758Z-f5d52fac`, initially pending;
+absolute deadline 2026-11-03 14:45 UTC. Clean source commit
+`6040fe5c7da6d804ea52d3d190e6aeb04c0e20b2`, source archive SHA256
+`775169b3a27a5dd42c80cf79e83540dbf6c6f5287ee9d16892616b59adbd865c`.
+Submit receipt normalized spec SHA256
+`161a958ffff2aba437dd1a32c56255e8dd6002be6554349108133e599dde5de1`;
+this differs from the pre-admission expected hash and requires reconciliation.
+Receipt: `/private/tmp/pointstream-k5c-continuation-inspection-20261103/submit.json`;
+results: `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261103T141758Z-f5d52fac`.
+The phase ceiling is 660 GPU-s / 650 CPU-s including preparation, lifecycle,
+audit and monitoring; prior closed charge is 201 GPU-s / 1,101 CPU-s, with
+900 GPU-s / 1,800 CPU-s overall caps. The only real pilot is the 48-frame smoke;
+the zero-frame full marker is not evidence. No third attempt is authorized.
+
+**Spec identity resolved:** fleet hashes sorted JSON using default separators;
+the pre-admission `2be95...` used compact separators. Recomputing fleet's
+serialization for the exact frozen spec yields the receipt's
+`161a958ffff2aba437dd1a32c56255e8dd6002be6554349108133e599dde5de1`.
+There was no configuration change.

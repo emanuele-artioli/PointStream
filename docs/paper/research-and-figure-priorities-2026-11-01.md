@@ -4,6 +4,28 @@ The manuscript is a **work in progress**, with an author-approved empirical-stud
 
 The user's figure/format target is **at most 23 main pages including at most two pages of references, plus at most five additional appendix pages**. Match the chosen TOMM review profile; do not add figures merely to fill pages. This is a planning audit, not a claim that eight figures or every open experiment is mandatory. Existing records and outputs are immutable. The user authorized the figure and manuscript revision; this planning document grants no new experiment budget or permission to change PRESLEY.
 
+## 2026-11-03 checkpoint
+
+The visual revision is implemented in Overleaf `0d98328` (eight main and two
+appendix figures; 23 body/reference plus five appendix pages). A separate
+citation revision is under root review. Ball remains a main contribution with
+its historical rate framing and negative whole-frame guard exposed.
+
+The newly approved K5c independent-image-judge pilot has a valid independently
+audited 16-frame development prefix. Its first request stopped on cost
+promotion, not quality; the original 48-frame target is being completed only
+under the explicit within-budget allocation amendment in
+[the experiment entry](../experiments/k5c-independent-ball.md). No completed
+48-frame result or untouched confirmation is presumed here. The research
+roadmap is not complete.
+
+The saved original SVT summaries were inspected without encoding/scoring. Both
+half-out searches tried CRF47 and70 but remained slightly above their corrected
+rate at70; no selected/scored point closes either gap. Exact identities,
+limits and an interrupted read-only listing's unknown state are preserved in
+[the audit](svt-gap-saved-evidence-audit-2026-11-03.json). No automatic repair
+or reopening of the user-dropped med000 DCVC family follows.
+
 ## Priority and decision status
 
 | Rank | Work and current state | Cheapest next step and authorization boundary |
