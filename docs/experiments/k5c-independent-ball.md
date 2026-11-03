@@ -1,53 +1,72 @@
 # Experiments: K5c — independent image judge for the ball component
 
-## Current decision, 2026-11-03
+## Current decision, 2026-11-03: approved pilot complete
 
-The first request `20261103T132157Z-f665bece` is closed at its cost-promotion
-gate; its 16-frame records passed independent CPU audit. No 48-frame result
-exists yet. The exact initial source/spec and cost failure below are preserved.
-The recorded independent audit and allocation-to-release reconciliation support
-an explicit [operational amendment](../cards/k5c-48-frame-continuation.md) for
-the already approved 48-frame target using those accepted controls. This is
-not a claim that the initial 420-second gate passed or a new compute allocation.
+The original 48-frame development target completed under the explicit
+[operational amendment](../cards/k5c-48-frame-continuation.md), using the
+independently audited 16-frame controls. The first cost failure is preserved
+below and in `k5c-inputs/first-attempt-20261103/`; it was not retroactively
+passed. Continuation `20261103T141758Z-f5d52fac` completed on gpu6 RTX6000 Ada.
+Its actual 48-frame component output passed independent CPU audit, not a larger
+confirmation. The fleet full stage performed no additional experiment.
 
-**Accepted cumulative envelopes:** 201 GPU-s and 1,101 workload CPU-s, leaving
-699 seconds of each within the original 900/1,800 limits. The GPU envelope is
-the rounded 200.734-second persisted worker lifecycle, corroborated by absent
-supervisor/campaign processes and claims; it includes admission time, rather
-than claiming exact allocation telemetry. CPU conservatively includes 600
-preparation +201 single-core lifecycle +180 audit +120 monitoring. Independent
-audit itself used 0.061 CPU-s; control-plane aggregate telemetry remains
-incomplete. Raw and accepted receipts are preserved under
-[`k5c-inputs/first-attempt-20261103/`](k5c-inputs/first-attempt-20261103/).
+**Accepted cumulative envelopes:** **463/900 GPU-s and 1,413/1,800 workload CPU-s**.
+The continuation charge is 262 GPU-s (261.330-second creation-to-terminal worker
+settlement, corroborated by absent supervisor/child/process group and claims),
+and 312 CPU-s: 20 preparation +262 single-core lifecycle +20 audit +10 monitoring. This
+includes the first phase's 201 GPU-s and 1,101 CPU-s. These are conservative
+allocation envelopes, not invented exact allocation or aggregate administrative
+CPU telemetry. All task-owned GPU processes/claims and the single attended wait
+are closed; terminal events acknowledged. No new computation, training, W8
+retry, third attempt or larger study is admitted by the unused remainder.
+Receipts: [`k5c-inputs/continuation-20261103/`](k5c-inputs/continuation-20261103/).
 
-The audit recomputed registered frame/label joins, 5/10-pixel judge counts,
-physical native/BALL byte ledgers and hashes, framing and RGB-PSNR guards for
-all six settings. Source WASB found 16/16 visible labels within 10 pixels;
-rendered WASB found 16/16 at each setting versus baseline counts 0,1,7 (DCVC)
-and 8,3,2 (SVT). All 16 labels are positive: negative-frame false positives
-remain unmeasured. This is a development prefix, not an independent statistical
-confirmation or complete-codec win. Label/source identities were checked
-against recorded hashes, not all external original images reread in the audit.
+**Frozen decision rule result:** PASS for source qualification, complete native/
+BALL records, actual independent-image-judge path, physical byte ledger and
+feasible cost on the registered 48-frame prefix. Source WASB is 45/48 within 10 px
+(43/48 within 5 px), above the 80% source gate. All 48 labels are visible positives;
+zero negative or excluded frames, so negative-frame false positives remain
+unmeasured. All six native streams declare and contain 48 frames; packet geometry,
+hashes, label/row joins, 5/10 px counts/F1, byte rates, native decoder-hash equality
+and per-setting RGB-PSNR guards pass. No guard-off ball was present.
 
-**Before the next outcome:** retain the same one-window hypothesis, competing
-explanation, six settings, source qualification and physical-byte/PSNR checks.
-The next test is the original 48-frame development pilot, nested over the 16
-controls; do not pool them as 64 independent frames. The new phase is bounded
-at 660 GPU-s /650 CPU-s, so cumulative envelopes remain at most 861/900 GPU-s
-and 1,751/1,800 CPU-s, reserving 39/49 for uncertainty. No third attempt, training,
-W8 retry, new model or larger study is admitted. Identity, source, device,
-packet, frame or runtime failure stops it. The retained 577.91-second complete
-forecast fits the new phase ceiling; the real-work forecast 517.91 seconds fits
-the 535-second command. This explicit reallocation corrects the insufficient
-internal stage cap without changing user-approved totals or quality rules.
+| Codec setting | Native bytes | BALL container bytes | Total kbps | WASB 10 px native -> streak | WASB 5 px native -> streak |
+|---|---:|---:|---:|---:|---:|
+| DCVC-UF QP 0 | 6,689 | 237 | 34.630 | 0/48 -> 42/48 | 0/48 -> 40/48 |
+| DCVC-UF QP 21 | 20,118 | 247 | 101.825 | 1/48 -> 44/48 | 1/48 -> 40/48 |
+| DCVC-UF QP 42 | 62,374 | 245 | 313.095 | 6/48 -> 43/48 | 6/48 -> 40/48 |
+| SVT-AV1 CRF 48 | 80,787 | 254 | 405.205 | 8/48 -> 44/48 | 7/48 -> 40/48 |
+| SVT-AV1 CRF 55 | 55,833 | 248 | 280.405 | 5/48 -> 44/48 | 4/48 -> 41/48 |
+| SVT-AV1 CRF 62 | 27,856 | 244 | 140.500 | 0/48 -> 44/48 | 0/48 -> 41/48 |
 
-Frozen continuation spec:
-[`k5c-inputs/continuation-48-spec-20261103.json`](k5c-inputs/continuation-48-spec-20261103.json).
-The fleet `smoke` stage measures the actual 48-frame pilot; the `full` stage
-writes only a zero-frame non-result marker. Only the actual measured records
-may support a paper result. Controller review and source freeze precede dispatch;
-record the new exact job ID here before one bounded fleet wait. No continuation
-submission has occurred at this checkpoint.
+The 48 frames are tracknet/game8/Clip6 at 30 fps (1.6 s), historical development
+footage. These physical native+BALL containers include native IVF framing and
+are distinct from the historical four-window component rates. No common
+integrated-system envelope or installed-model charge is asserted. The first 16
+prefix is nested, not 16 additional independent observations. The WASB reported
+training split excludes game 8; checkpoint optimizer inputs were not independently
+audited. Source identity strings were bound, not all external original images
+reread during CPU audit. Native decode replay ran inside the GPU worker; CPU
+audit checked saved parity hashes and packets, not fresh native/model inference.
+
+**Narrow finding:** a separate source-qualified image model recognizes rendered
+ball marks more often in these observed settings, at the billed additional
+bytes. This cannot distinguish realistic ball appearance from a recognizable
+bright mark, establish negative-frame behavior, untouched-clip generalization,
+matched-rate BD-rate or a complete codec/source-hidden receiver advantage.
+Crop LPIPS/DISTS were not implemented here. The historical +1% PSNR BD-rate guard
+failure and original 6/8 rule are unchanged; nondecreasing PSNR at the same codec
+setting is a different contract. Next scientific test would freeze distinct
+eligible clips with positive/negative labels and the independent judge, then
+seek a separately reviewed, costed confirmation allocation. No confirmation is
+scheduled or authorized by this pilot.
+
+Independent CPU audit SHA256
+`ae6a285b7213403328c9cd31eb77aa5bad35dfcbfdb72fad7254589d22013fe0`,
+script SHA256 `dd879d32a6f7e3fc138851808fa231db227c5226feaffc4fda4c2d8d96af6fd2`;
+record [`continuation-20261103/independent-audit.json`](k5c-inputs/continuation-20261103/independent-audit.json).
+The process reported about 0.058 CPU-s; the 20 CPU-s audit envelope includes
+extraction/launch. Actual model/codec work was not rerun by the audit.
 
 ## 2026-11-01: bounded pilot approved; pre-admission gates pending
 
@@ -241,3 +260,26 @@ the pre-admission `2be95...` used compact separators. Recomputing fleet's
 serialization for the exact frozen spec yields the receipt's
 `161a958ffff2aba437dd1a32c56255e8dd6002be6554349108133e599dde5de1`.
 There was no configuration change.
+
+**Continuation terminal:** `20261103T141758Z-f5d52fac` completed on gpu6 Ada
+index 0. The 48-frame command exited 0 in 227.511 s without recorded contention;
+its validator reports six persisted component points and verified prior 16, but
+independent audit remains required. The zero-frame full marker exited 0 in
+0.121 s and is not a result. Creation to terminal settlement was 261.330 s;
+conservatively charge 262 GPU-s, including queue time. The saved terminal
+status shows no GPU process or PointStream claim; a read-only gpu6 process
+inspection found neither supervisor 2767698, child 2767715 nor process group
+2767715. New cumulative conservative GPU charge is 463/900 GPU-s. The accepted CPU phase envelope is 312 s (20 preparation + 262 single-core
+lifecycle + 20 audit + 10 monitoring); cumulative 1,413/1,800 CPU-s. Aggregate
+administrative CPU telemetry remains incomplete, so this is not an exact measurement.
+
+Read-only receipts are in `/private/tmp/pointstream-k5c-continuation-20261103-receipts/`;
+closure evidence is in `/private/tmp/pointstream-k5c-continuation-inspection-20261103/closure-archive.txt`.
+The smoke archive was copied to `/private/tmp/pointstream-k5c-continuation-20261103-published.tar`;
+remote and local SHA256 both equal
+`d40a9f7e0a7d2878d01010d4e128467bbdc174f9a899e007a555b9febe256d32`.
+The canonical small-artifact exporter rejected the tar extension; the copy used
+read-only SSH/SCP without republishing. Terminal event
+`4c515c8fe195594f83453bd15f96a428` was acknowledged after the terminal report
+was delivered. The [closure ledger](k5c-inputs/continuation-20261103/closure-ledger.json)
+records identities, native tools, resource bounds and receipt hashes.

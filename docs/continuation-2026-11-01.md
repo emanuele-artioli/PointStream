@@ -1,26 +1,25 @@
 # Continuation, 2026-11-01: paper strengthening and main-paper ball result
 
-**Latest state, 2026-11-03:** first independent-image-judge ball request
-`20261103T132157Z-f665bece` is closed, failed at the cost-promotion gate.
-Its 16-frame real-component output passed independent CPU audit; the 48-frame
-stage never ran. Source `862d56c2` and its isolated worktree are immutable.
-The sole wait (old runner exec 14017) ended; task-owned GPU processes, claims
-and events are closed/acknowledged. Accepted cumulative envelopes are
-**201 GPU-s /1,101 workload CPU-s**, leaving 699 of each within the approved
-900/1,800 totals. Exact raw/accepted closeout records are in the
-[K5c entry](experiments/k5c-independent-ball.md).
+**Latest state, 2026-11-03:** the original approved 48-frame independent-image-
+judge ball pilot completed as `20261103T141758Z-f5d52fac`, source `6040fe5c`, gpu6 Ada.
+Actual 48-frame component archive SHA256 `d40a9f7e0a7d2878d01010d4e128467bbdc174f9a899e007a555b9febe256d32`
+and independent CPU audit SHA256 `ae6a285b7213403328c9cd31eb77aa5bad35dfcbfdb72fad7254589d22013fe0`.
+Six native/BALL ledgers, 48-frame labels, separate image-judge counts and PSNR
+guards pass. WASB source 45/48 at 10 px; rendered 42–44/48 versus 0–8/48 native.
+All 48 are visible positive, zero negative/excluded; no negative-frame FP estimate.
+One historical development prefix, not generalization or full-codec win.
 
-Root explicitly amended operational allocation for the already approved
-48-frame target, reusing independently audited 16-frame controls and requiring
-identical numerical paths and bound source/model/native identities. New phase
-at most **660 GPU-s /650 CPU-s**; cumulative at most861/1,751, with39/49 reserve.
-The retained complete 577.91-second forecast fits that ceiling, unlike the
-initial420-second stage allocation. Real48data are in fleet `smoke`; `full`0
-is an explicit non-result marker. No48result exists yet; no new request
-submitted at this checkpoint. No third attempt, larger study, training or W8
-retry. Before any action re-read actual ID from experiments entry and inspect
-canonical status; never replay the first request. Source/host admission and
-new-source freeze must precede the one versioned continuation dispatch.
+The first `20261103T132157Z-f665bece` cost stop remains failed/preserved; 16 valid
+controls were independently audited and reused via the explicit allocation
+amendment for the original 48-frame target. Those prefixes are nested, not 64 frames.
+Both requests are terminal with task-owned processes/claims/waits closed and
+events acknowledged. Accepted cumulative envelopes **463/900 GPU-s and
+1,413/1,800 CPU-s** include preparation, failed and successful single-core
+lifecycles, audits and monitoring; aggregate administrative CPU telemetry remains
+uncertain. No further computation, training, W8 retry, third attempt or larger
+study is authorized by the balance. Exact identities/receipts and limits are
+in [K5c](experiments/k5c-independent-ball.md). Manuscript incorporation is in
+progress; current Overleaf checkpoint below predates this new pilot.
 
 The strengthened manuscript **`0d983288c2c7b6182fffcd8093d12bb1d307d03e`**
 is pushed to Overleaf: eight main figures and two appendix figures, **23 main

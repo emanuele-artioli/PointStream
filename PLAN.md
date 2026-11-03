@@ -31,26 +31,29 @@ historical component-rate framing omissions and the failed PSNR BD-rate guard
 retained. Source-specific footage permissions and coauthor approval remain
 unresolved; no paper has been submitted. The user separately approved the
 [new independent-judge pilot](docs/cards/k5c-independent-ball-pilot.md) at
-900 GPU-s / 1,800 workload CPU-s. The first request
-`20261103T132157Z-f665bece` (source `862d56c2`, spec
-`52abc84a4c65e5ae0cc5da9e276ca0dc58c2a235d2dc67917847fda8441ffa77`)
-is closed at its cost gate: a valid 16-frame command took 138.110 seconds but
-its conservative 577.91-second forecast exceeded the internal 420-second
-allocation. Its exact native/BALL/judge records passed independent CPU audit;
-this is no 48-frame or statistical confirmation. All task-owned GPU processes,
-claims and the attended wait are closed; events acknowledged.
+900 GPU-s /1,800 workload CPU-s. The original 48-frame development pilot is
+now complete as `20261103T141758Z-f5d52fac` on gpu6 Ada, using frozen source
+`6040fe5c`. Independent CPU audit passes all six physical native/BALL records,
+frame/label joins, detector counts and PSNR guards. Source WASB finds 45/48;
+rendered WASB finds 42–44/48 versus 0–8/48 native at 10 px. All 48 are visible
+positive frames, so negative-frame false positives remain unmeasured. This
+supports a narrow independent-model task observation, not untouched-clip
+confirmation, perceptual realism, matched-rate BD-rate or a complete codec win.
+The historical four-window whole-frame PSNR guard failure remains unchanged.
 
-The accepted cumulative envelopes are **201/900 GPU-s and 1,101/1,800 CPU-s**.
-An explicit [controller/allocation amendment](docs/cards/k5c-48-frame-continuation.md)
-reuses those accepted 16-frame controls for the original 48-frame target with
-unchanged numerical paths, within a new phase of at most 660 GPU-s /650 CPU-s.
-It changes no user-approved total or scientific quality rule. Cumulative caps
-remain at most 861 GPU-s /1,751 CPU-s with uncertainty reserve. Source/input and
-host admission checks precede one new frozen request; no submission yet. No
-training, W8 retry, third attempt or larger confirmation is admitted. Exact
-job identities, receipts and the non-result fleet completion marker are in
-[K5c](docs/experiments/k5c-independent-ball.md). The research roadmap below
-retains its other open tasks and recorded stops.
+The first request `20261103T132157Z-f665bece` is preserved as a cost stop:
+its valid 16-frame command forecast 577.91 s against the internal 420 s allocation.
+The explicit [allocation amendment](docs/cards/k5c-48-frame-continuation.md)
+reused independently audited controls for the original 48-frame target without changing
+scientific helpers, quality rules or user-approved totals. The 16-frame prefix is
+nested within 48, not an independent additional sample. All task-owned GPU
+processes/claims/waits are closed and terminal events acknowledged. Accepted
+cumulative envelopes: **463/900 GPU-s and 1,413/1,800 CPU-s**, including failures,
+preparation, single-core lifecycle, audit and monitoring; complete administrative
+CPU telemetry remains uncertain. No training, W8 retry, third attempt or larger
+study follows from unused authority. Exact source/spec/archive identities and
+receipts live in [K5c](docs/experiments/k5c-independent-ball.md). The wider
+research roadmap retains its open tasks and recorded stops.
 
 **Paper strengthening reopened (user, 2026-11-01):** the research roadmap is
 not complete and the earlier technically prepared package is a preserved review

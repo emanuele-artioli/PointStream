@@ -11,12 +11,18 @@ appendix figures; 23 body/reference plus five appendix pages). A separate
 citation revision is under root review. Ball remains a main contribution with
 its historical rate framing and negative whole-frame guard exposed.
 
-The newly approved K5c independent-image-judge pilot has a valid independently
-audited 16-frame development prefix. Its first request stopped on cost
-promotion, not quality; the original 48-frame target is being completed only
-under the explicit within-budget allocation amendment in
-[the experiment entry](../experiments/k5c-independent-ball.md). No completed
-48-frame result or untouched confirmation is presumed here. The research
+The approved K5c independent-image-judge pilot is complete on the registered
+48-frame development prefix, with independent CPU audit of all six saved
+native/BALL/judge paths. WASB detections rise from 0–8/48 native to 42–44/48 with
+the streak, adding 237–254 bytes; source qualification is 45/48. All labels are
+positive, and source/model exposure is author-reported. The original 16-frame controls
+are nested within 48. This narrows the encoder/judge dependence concern but does
+not establish perceptual realism, negative-frame behavior, untouched-clip
+confirmation or a complete codec win. The first internal cost stop remains
+preserved; explicit within-total reallocation completed the original target at
+accepted cumulative envelopes 463/900 GPU-s and 1,413/1,800 CPU-s, with administrative
+CPU telemetry uncertainty. No confirmation is authorized by the unused balance.
+See [the experiment entry](../experiments/k5c-independent-ball.md). The research
 roadmap is not complete.
 
 The saved original SVT summaries were inspected without encoding/scoring. Both

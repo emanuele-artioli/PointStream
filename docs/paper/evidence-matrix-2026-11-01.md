@@ -2,6 +2,36 @@
 
 Scope: read-only review of the working manuscript snapshot at `/private/tmp/pointstream-w7-manuscript` and its active `HOLE`/`CLAIM` markers, the linked PointStream experiment records and corrected W7 artifacts. This snapshot may move while the manuscript is edited; recheck the submitted revision. A marker or a pathname records a provenance lead, not proof that a remote artifact was independently inspected here. Historical `companion/legacy-markers.tex` is an archive, not an additional checklist of current results. No remote artifacts were accessed and no model/experiment was run for this audit.
 
+## 2026-11-03 ball addendum
+
+The visual restoration and primary ball citations are implemented; the new
+48-frame development pilot is complete, not an untouched confirmation. Job
+`20261103T141758Z-f5d52fac`, code `6040fe5c7da6d804ea52d3d190e6aeb04c0e20b2`,
+gpu6 RTX 6000 Ada, actual component archive SHA256
+`d40a9f7e0a7d2878d01010d4e128467bbdc174f9a899e007a555b9febe256d32`;
+independent saved-record audit SHA256
+`ae6a285b7213403328c9cd31eb77aa5bad35dfcbfdb72fad7254589d22013fe0`.
+WASB source qualification 45/48 at 10 px; native 0–8/48 versus streak 42–44/48
+at six settings, adding 237–254 physical BALL container bytes to actual native
+containers including IVF. All 48 labels visible-positive; no negative/excluded
+frames. Preserved native parity hashes and per-setting PSNR guards pass.
+
+The separately trained image judge's game exclusion is author-reported, not
+optimizer-log audited. The CPU audit recomputes stored prediction counts,
+frame/label joins and packet ledgers; it does not rerun inference or reread all
+external originals. Historical 16-frame controls are nested within 48, not 64 samples.
+Bright-mark recognition, perceptual realism, negative-frame behavior and
+cross-clip generalization remain open. This is no matched-rate BD/full-codec
+or source-hidden complete receiver result. Historical four-window native-rate
+framing omissions and whole-frame PSNR BD-rate failure remain visible and are
+not replaced by this different PSNR contract. See
+[the experiment entry](../experiments/k5c-independent-ball.md).
+
+The original SVT omissions also remain: the recovered half-out searches have
+no selected/scored point below their corrected targets. The saved-record audit
+is [recorded separately](svt-gap-saved-evidence-audit-2026-11-03.json); no
+encoding/scoring or dropped med000 DCVC retry was performed.
+
 ## Venue rules and the page split
 
 The [TOMM author guide](https://tomccap.hosting.acm.org/guide.html) says a regular technical paper has **23 pages including text, figures and references**, in the small ACM submission format, and may add a **five-page online appendix** in the same template, headed “Online Appendix”, in the same PDF. This agrees with the user's 23+5 instruction; there is no observed conflict. The guide explicitly exempts additional pages needed to respond to reviewers **on resubmission** from the 23 pages; do not apply that exemption to the initial paper or interpret it as an enlarged initial appendix. It also requests a letter of changes for resubmission after rejection; this is distinct from a first submission. It describes a 28-page allowance for surveys, not the regular paper. The guide appears old (legacy template links and naming); verify the live journal submission system's instructions before filing if inconsistent with the general ACM [LaTeX guidance](https://authors.acm.org/binaries/content/assets/publications/taps/latex-best_practices-06-may-2020.pdf), which describes single-column `manuscript` review output. Do not assume a page count measured in another layout satisfies TOMM's specified format. Confirm paper/appendix boundary, heading, and pages in the final PDF. The guide lists originality, previous-conference extension disclosure where applicable, third-party content and CCS indexing; it does not itself establish the actual rights status of the broadcast footage or the present manuscript's eligibility.
