@@ -21,6 +21,9 @@ def main() -> None:
     parser.add_argument("--publisher-camera", type=Path)
     parser.add_argument("--python", type=Path)
     parser.add_argument("--soak-seconds", type=int)
+    parser.add_argument("--case-set", choices=("all", "direct", "impaired"), default="all")
+    parser.add_argument("--audience", type=int, default=0)
+    parser.add_argument("--qualified-smoke", type=Path)
     parser.add_argument("--validate", action="store_true")
     args = parser.parse_args()
     stage = Path(os.environ["PS_STAGE_DIR"])
@@ -28,10 +31,14 @@ def main() -> None:
         result = json.loads((stage / "summary.json").read_text())
         if not result.get("valid") or result.get("transport") != "QUIC":
             raise ValueError("native client qualification did not pass")
-        if len(result.get("cases", [])) != 3 or (
-            result.get("stage") == "smoke" and not result["semantic"]["valid"]
-        ):
-            raise ValueError("semantic preparation and all three network cases are required")
+        selected = result.get("case_set", "all")
+        expected_cases = {"all": 3, "direct": 1, "impaired": 2}[selected]
+        if len(result.get("cases", [])) != expected_cases:
+            raise ValueError("selected network cases did not all pass")
+        if selected != "all" and not result.get("prior_gate_verified"):
+            raise ValueError("focused follow-up requires the qualified prior smoke")
+        if selected == "all" and result.get("stage") == "smoke" and not result["semantic"]["valid"]:
+            raise ValueError("semantic preparation did not pass")
         for case in result["cases"]:
             for client in case["clients"]:
                 frame = client["last_frame"]
@@ -50,6 +57,20 @@ def main() -> None:
         "9fdd44a31c504547ffb81d2c6d9e6dac3493c8eaa8b0398d3f43bae6c7003e92"
     ):
         raise ValueError("publisher weights do not match the protocol identity")
+    prior_verified = None
+    if args.case_set != "all":
+        if not args.qualified_smoke:
+            raise ValueError("focused follow-up requires qualified prior evidence")
+        prior = json.loads(args.qualified_smoke.read_text())
+        if not (
+            prior.get("valid")
+            and prior["semantic"]["valid"]
+            and len(prior["cases"]) == 3
+            and prior.get("source_archive_sha256")
+            == "75f399794df40944c6d905023c323ec0826b0e50766852c11fb82fe364c6399c"
+        ):
+            raise ValueError("prior smoke is not the qualified dedicated-worker source")
+        prior_verified = hashlib.sha256(args.qualified_smoke.read_bytes()).hexdigest()
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
     checkout = scratch / "source"
     checkout.mkdir()
@@ -114,6 +135,10 @@ def main() -> None:
         os.environ["PS_STAGE"],
         "--soak-seconds",
         str(args.soak_seconds),
+        "--case-set",
+        args.case_set,
+        "--audience",
+        str(args.audience),
     ]
     try:
         subprocess.run(command, cwd=checkout, env=environment, check=True)
@@ -121,6 +146,7 @@ def main() -> None:
         summary = output / "summary.json"
         if summary.exists():
             result = json.loads(summary.read_text())
+            result["prior_gate_verified"] = prior_verified
             result["source_archive_sha256"] = hashlib.sha256(args.source.read_bytes()).hexdigest()
             result["command"] = command
             (stage / "summary.json").write_text(json.dumps(result, indent=2))

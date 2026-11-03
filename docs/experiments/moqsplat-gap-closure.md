@@ -303,3 +303,30 @@ Final CPU suite will include the new test separately; distinguish final head
 from the frozen GPU source revision. Prepared semantic live defaults are
 documented explicitly: tested Bicycle requires512MiB native cache target
 (large background layer exceeds128MiB), finite subscriberuses4GiB.
+
+## Focused concurrent follow-up: prospective rule
+
+20261103T154539Z-3d7be786 smoke PASSED, allthreecases, semantic pipeline and
+1,893liveframes (436direct/418constrained/1,039recovery), reconnect1.
+Full stage FAILED on a timing condition, not a client exception: two clients
+rendered637/632frames, source-exact597/614of640layers by60s, steady~10layers/s
+and one render thread each. No CUDA exception. Required GPU evictions were not
+yet reached; do not claim completed concurrent qualification from that run.
+
+Supervisor634.73s +salvage14.35s/staging; conservativelycharge720GPU-s.
+Aggregate2,880/3,600,720remaining. Keep the valid single-client/semantic evidence
+from its unchanged components. New focused smoke: two clients, direct90s
+(projected completion~65–70s from measured progress), lowerGPUbudget after
+complete reception to force actual evictions. Separate earlycamera movement
+from budget changes so normal input response is observable independently.
+Full: concurrent constrained90s and relay-recovery240s. Four minutes instead
+of the original five is the explicit narrowed scope withinremainingbudget.
+Require both clients source-exact, nonblack continuousframes, renderedcontrols,
+measuredallocation withinbudget, and both reconnect in recovery.
+
+Reuse only the valid prior smoke identified by its SHA andsource75f399...;
+original publisher/render/transport inputs unchanged, liveCUDAworker unchanged.
+The later CPU-verified disk-space guard does not alter cold-cache work.
+No standalone oracle/semantic rerun in focused cases; native gate still runs
+real full-scene production clients. Bound smoke220s/full440s,validators10s,
+maximum720GPU-sremaining; stop onfailure/exhaustion, no furtherGPUreservation.
