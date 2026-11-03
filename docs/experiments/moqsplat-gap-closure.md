@@ -330,3 +330,44 @@ The later CPU-verified disk-space guard does not alter cold-cache work.
 No standalone oracle/semantic rerun in focused cases; native gate still runs
 real full-scene production clients. Bound smoke220s/full440s,validators10s,
 maximum720GPU-sremaining; stop onfailure/exhaustion, no furtherGPUreservation.
+
+### Focused last-budget job 20261103T161225Z-f5903422
+
+Published/pending; scope direct-two-client90s smoke, impaired-two-client
+90s+240s full. Source44b439cd41590fae941cc203675e2b64d18b0ef2, archive
+7b19431c305b869b3b15a4a8436e8ae623be4d943cee12247265b0fb24bb74af.
+Adapter2caeaea8, specb139d7757c46500bf34c17da56fa9e877499956176aaf67a45e78556ad21c1c8; maximum720GPU-s (allremaining),
+smoke220/full440/validators10 each,deadline2026-11-03T16:27:37.608877Z.
+Qualified prior smokeSHA40bd034989e9d980c68925b769be3b42faba5a071b9544a3db1979222adc2ae2
+is staged and verified before focused execution. Byte-identity comparison of
+publisher/render/transport components passed. Only client_player disk-space
+precheck, array_checks added size helper, and qualification harness differ
+from the qualified source. CPU regression covers the disk-space change.
+PointStream checks rerun:1450passed,30skipped in102.39s; Ruff/mypy382pass.
+
+### Concurrent direct completed; test-controller defect found
+
+20261103T161225Z-f5903422 terminalFAILED at eviction assertion; both clients
+were healthy and receivedall640layers,990/960frames. Driver treated missing
+received/total fields as equal (None==None) while the second client was starting.
+Budget therefore dropped at1.73/4.56seconds (5/47layers), before eviction was
+possible, and restored at4.37/7.38seconds (31/75layers). This is a qualification
+controller defect, not evidence of a runtime eviction failure. Fix requires
+nonempty catalogs and completion on every client; add CPU regression.
+Actual supervisor161.37s +salvage16.15s/staging; conservative240GPU-s charge.
+Aggregate3,120/3,600;480remaining. Direct complete-scene concurrent delivery is
+now evidenced, while per-client eviction is evidenced in valid single-client
+smoke323evictions. No claim of completed concurrent loss/recovery yet.
+
+Final narrowed gate: concurrent constrained90s smoke; concurrent recovery180s
+full, with a further late budget drop after full reception if it occurs.
+Scope is three minutes, not the earlier four/five-minute intention. Smoke180s,
+full270s,validators5each,maximum480GPU-s (allremaining). Existing semantic and
+direct evidence reused explicitly. No further GPU work on exhaustion/failure.
+
+Observed valid-smoke recovery had30rawblackframes after playback began,10.555
+to12.989s while partial data was missing. New CPU-only viewer policy holds the
+last useful JPEG with explicit waiting/stale-pose metadata; raw rendering remains
+recorded as black, and complete-scene empty views are not hidden. Seven viewer
+regressions and driver-status regression pass; the final gate includes this UI.
+No observed CUDA reserved-memory frame exceeded budget in the valid smoke.
