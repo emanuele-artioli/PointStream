@@ -31,11 +31,26 @@ historical component-rate framing omissions and the failed PSNR BD-rate guard
 retained. Source-specific footage permissions and coauthor approval remain
 unresolved; no paper has been submitted. The user separately approved the
 [new independent-judge pilot](docs/cards/k5c-independent-ball-pilot.md) at
-900 GPU-s / 1,800 workload CPU-s. Ten CPU tests and the substantive artifact
-and cost gates pass their fixtures; target-device/model/native execution is
-still pending admission. The approved pilot does not reopen K5b/W8 stopped
-work, train, or authorize a larger confirmation. Preflight receipts and
-the next exact job identity live in [K5c](docs/experiments/k5c-independent-ball.md).
+900 GPU-s / 1,800 workload CPU-s. The first request
+`20261103T132157Z-f665bece` (source `862d56c2`, spec
+`52abc84a4c65e5ae0cc5da9e276ca0dc58c2a235d2dc67917847fda8441ffa77`)
+is closed at its cost gate: a valid 16-frame command took 138.110 seconds but
+its conservative 577.91-second forecast exceeded the internal 420-second
+allocation. Its exact native/BALL/judge records passed independent CPU audit;
+this is no 48-frame or statistical confirmation. All task-owned GPU processes,
+claims and the attended wait are closed; events acknowledged.
+
+The accepted cumulative envelopes are **201/900 GPU-s and 1,101/1,800 CPU-s**.
+An explicit [controller/allocation amendment](docs/cards/k5c-48-frame-continuation.md)
+reuses those accepted 16-frame controls for the original 48-frame target with
+unchanged numerical paths, within a new phase of at most 660 GPU-s /650 CPU-s.
+It changes no user-approved total or scientific quality rule. Cumulative caps
+remain at most 861 GPU-s /1,751 CPU-s with uncertainty reserve. Source/input and
+host admission checks precede one new frozen request; no submission yet. No
+training, W8 retry, third attempt or larger confirmation is admitted. Exact
+job identities, receipts and the non-result fleet completion marker are in
+[K5c](docs/experiments/k5c-independent-ball.md). The research roadmap below
+retains its other open tasks and recorded stops.
 
 **Paper strengthening reopened (user, 2026-11-01):** the research roadmap is
 not complete and the earlier technically prepared package is a preserved review

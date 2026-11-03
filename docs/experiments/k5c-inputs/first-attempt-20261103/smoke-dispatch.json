@@ -1,0 +1,269 @@
+{
+  "command": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+    "-m",
+    "experiments.tennis.k5c_independent_ball",
+    "--windows",
+    "/local/users/emanuele/pointstream/cache/d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516/windows.json",
+    "--source",
+    "/local/users/emanuele/pointstream/cache/5cde1f81c6723eb8342c52d8d5aa55cd24dd7567b3b792818337dfe368edc57d/tree",
+    "--image-ckpt",
+    "/local/users/emanuele/pointstream/cache/b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302/cvpr2026_image.pth.tar",
+    "--image-sha256",
+    "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302",
+    "--video-ckpt",
+    "/local/users/emanuele/pointstream/cache/934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3/cvpr2026_video_htl.pth.tar",
+    "--video-sha256",
+    "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3",
+    "--balltrack",
+    "/local/users/emanuele/pointstream/cache/b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec/balltrack_best.state_dict.pt",
+    "--balltrack-code",
+    "/local/users/emanuele/pointstream/cache/5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff/tree",
+    "--wasb-code",
+    "/local/users/emanuele/pointstream/cache/657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55/tree",
+    "--wasb-weights",
+    "/local/users/emanuele/pointstream/cache/4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6/tree",
+    "--wasb-config",
+    "/local/users/emanuele/pointstream/cache/6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d/wasb-tennis.yaml",
+    "--exposure-receipt",
+    "/local/users/emanuele/pointstream/cache/c841040c67c37e19b656b7661b50cc6119c1034ece63b9196519fb23341f0680/exposure-receipt.json",
+    "--frames",
+    "16"
+  ],
+  "input_identity": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/windows.json",
+      "sha256": "d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/tracknet-k4.tar",
+      "sha256": "5cde1f81c6723eb8342c52d8d5aa55cd24dd7567b3b792818337dfe368edc57d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/exposure-receipt.json",
+      "sha256": "c841040c67c37e19b656b7661b50cc6119c1034ece63b9196519fb23341f0680"
+    }
+  ],
+  "staged_inputs": [
+    {
+      "name": "windows",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/windows.json",
+      "sha256": "d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516",
+      "extract": false,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/d79bb01c0d522d27d66f0a37183b87176d549a934a70301878c24e1298e1c516/windows.json",
+      "seconds": 0.005124092102050781
+    },
+    {
+      "name": "dcvc_image",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302/cvpr2026_image.pth.tar",
+      "seconds": 0.5347838401794434
+    },
+    {
+      "name": "dcvc_video",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3",
+      "extract": false,
+      "mode": "local-hit",
+      "path": "/local/users/emanuele/pointstream/cache/934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3/cvpr2026_video_htl.pth.tar",
+      "seconds": 1.2804579734802246
+    },
+    {
+      "name": "tracknet",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/tracknet-k4.tar",
+      "sha256": "5cde1f81c6723eb8342c52d8d5aa55cd24dd7567b3b792818337dfe368edc57d",
+      "extract": true,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/5cde1f81c6723eb8342c52d8d5aa55cd24dd7567b3b792818337dfe368edc57d/tree",
+      "seconds": 5.913109302520752
+    },
+    {
+      "name": "wasb_code",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55",
+      "extract": true,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55/tree",
+      "seconds": 0.04947185516357422
+    },
+    {
+      "name": "wasb_weights",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6",
+      "extract": true,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6/tree",
+      "seconds": 3.418354034423828
+    },
+    {
+      "name": "balltrack_code",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+      "extract": true,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff/tree",
+      "seconds": 0.03419828414916992
+    },
+    {
+      "name": "balltrack",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+      "extract": false,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec/balltrack_best.state_dict.pt",
+      "seconds": 0.23982667922973633
+    },
+    {
+      "name": "wasb_config",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+      "extract": false,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d/wasb-tennis.yaml",
+      "seconds": 0.005743980407714844
+    },
+    {
+      "name": "exposure_receipt",
+      "source": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/exposure-receipt.json",
+      "sha256": "c841040c67c37e19b656b7661b50cc6119c1034ece63b9196519fb23341f0680",
+      "extract": false,
+      "mode": "local-copy",
+      "path": "/local/users/emanuele/pointstream/cache/c841040c67c37e19b656b7661b50cc6119c1034ece63b9196519fb23341f0680/exposure-receipt.json",
+      "seconds": 0.0026204586029052734
+    }
+  ],
+  "staged_environment": {
+    "name": "environment",
+    "source": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "extract": true,
+    "mode": "local-hit",
+    "path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+    "seconds": 13.047190189361572,
+    "prefix": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree",
+    "python": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+    "bin": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin"
+  },
+  "code": {
+    "git_head": "862d56c2a7d4499a0a0a9ed97f5a9f535b659cfb",
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_changes_included": [],
+    "tracked_changes_excluded": [],
+    "included_untracked_sha256": {},
+    "untracked_excluded_count": 0,
+    "untracked_excluded_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_excluded_sample": [],
+    "deleted_paths": [],
+    "snapshot_sha256": "00e487604fda13590e832ed7aaa85e85e31f26303415dfca7e2f5c541b5b2d87",
+    "spec_sha256": "52abc84a4c65e5ae0cc5da9e276ca0dc58c2a235d2dc67917847fda8441ffa77",
+    "source_sha256": "e24a6b252a79e3968f464d0eace460d05b7bac37a675229d070c571d050a2d1e",
+    "source_archive": "source.tar",
+    "input_check": {
+      "hashed": [
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/exposure-receipt.json",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/windows.json",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt"
+      ],
+      "deferred": [
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k4-2026-10-13/inputs/tracknet-k4.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz"
+      ],
+      "deferred_bytes": 5930297219,
+      "deferred_to": "campaign"
+    },
+    "published": 1793712139.739518
+  },
+  "environment": {
+    "host": "gpu2.itec.aau.at",
+    "alias": "gpu2",
+    "gpu": {
+      "index": 0,
+      "uuid": "GPU-fc7e8fff-75be-4984-a185-fe8ce63edcd9",
+      "name": "NVIDIA RTX A6000",
+      "memory_used_mib": 1,
+      "memory_total_mib": 49140,
+      "memory_free_mib": 48675,
+      "utilization_pct": 0,
+      "compute_processes": [],
+      "pointstream_claimed": false,
+      "pointstream_shared_claims": []
+    },
+    "python": "Python 3.10.20",
+    "tools": {
+      "ffmpeg": {
+        "path": "/opt/local/bin/ffmpeg",
+        "version": [
+          "ffmpeg version n7.1.1-56-gc2184b65d2 Copyright (c) 2000-2025 the FFmpeg developers",
+          "built with gcc 11 (Ubuntu 11.4.0-1ubuntu1~22.04)",
+          "configuration: --prefix=/opt/local --enable-pthreads --enable-pic --enable-shared --enable-rpath --enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libvmaf --enable-nonfree --enable-ffnvcodec --enable-demuxer=dash --enable-libxml2 --enable-libvvenc"
+        ],
+        "returncode": 0
+      },
+      "vvencapp": {
+        "path": "/opt/local/bin/vvencapp",
+        "version": [
+          "vvencapp version 1.11.0"
+        ],
+        "returncode": 0
+      }
+    },
+    "started": 1793712159.672915
+  },
+  "started": 1793712185.549084,
+  "citable": false,
+  "attempt": 1,
+  "resumed_from": null,
+  "contention_policy": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "gpu_sharing": {
+    "mode": "exclusive"
+  },
+  "cpu_affinity": [
+    0
+  ],
+  "campaign_clock": {
+    "started": 2179290.469857166,
+    "phase_started": 2179315.160138708,
+    "budget_end": 2180010.0503837503
+  }
+}

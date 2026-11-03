@@ -189,3 +189,161 @@ def test_cost_projection_requires_timing_and_reserves_both_ceilings(tmp_path) ->
     dispatch.write_text(json.dumps({"campaign_clock": {"started": 100}}))
     with pytest.raises(KeyError):
         pilot.cost_projection(tmp_path, 200)
+
+
+def test_accepted_archive_must_match_exact_hash_and_validate_16(tmp_path, monkeypatch) -> None:
+    import io
+    import json
+    import tarfile
+
+    archive = tmp_path / "prior.tar"
+    data = json.dumps({"frames": 16}).encode()
+    with tarfile.open(archive, "w") as output:
+        info = tarfile.TarInfo("publish/pilot.json")
+        info.size = len(data)
+        output.addfile(info, io.BytesIO(data))
+    monkeypatch.setattr(pilot, "ACCEPTED_SMOKE_SHA", pilot.sha(archive))
+    monkeypatch.setattr(pilot, "validate", lambda _path: {"passed": True, "frames": 16})
+    assert pilot.accepted_smoke(archive)["frames"] == 16
+    archive.write_bytes(b"different")
+    with pytest.raises(ValueError, match="hash differs"):
+        pilot.accepted_smoke(archive)
+
+
+def test_prior_binding_checks_first_16_frames_and_each_tool() -> None:
+    import copy
+
+    ids: dict[str, Any] = {k: k for k in ("window_manifest_sha256", "exposure_receipt_sha256", "wasb_sha256", "balltrack_sha256",
+                           "image_sha256", "video_sha256")}
+    ids["source_frames"] = [str(i) for i in range(16)]
+    ids["tools"] = {x: {"sha256": x} for x in ("ffmpeg", "SvtAv1EncApp", "dav1d")}
+    current = copy.deepcopy(ids)
+    current["source_frames"] += ["later"] * 32
+    pilot.bind_prior({"identities": ids}, current)
+    current["source_frames"][10] = "wrong"
+    with pytest.raises(ValueError, match="source-frame"):
+        pilot.bind_prior({"identities": ids}, current)
+    current = copy.deepcopy(ids)
+    current["tools"]["dav1d"]["sha256"] = "wrong"
+    with pytest.raises(ValueError, match="native tool"):
+        pilot.bind_prior({"identities": ids}, current)
+
+
+def test_zero_stage_requires_full_and_exact_accepted_archive(tmp_path, monkeypatch) -> None:
+    import argparse
+    import json
+
+    archive = tmp_path / "prior.tar"
+    archive.write_bytes(b"accepted")
+    monkeypatch.setattr(pilot, "ACCEPTED_SMOKE_SHA", pilot.sha(archive))
+    args = argparse.Namespace(frames=0, accepted_smoke_archive=str(archive))
+    monkeypatch.setenv("PS_SCRATCH_DIR", str(tmp_path))
+    monkeypatch.setenv("PS_STAGE", "smoke")
+    with pytest.raises(ValueError):
+        pilot.empty_completion(args)
+    monkeypatch.setenv("PS_STAGE", "full")
+    args.accepted_smoke_archive = None
+    with pytest.raises(ValueError):
+        pilot.empty_completion(args)
+    args.accepted_smoke_archive = str(archive)
+    pilot.empty_completion(args)
+    marker = json.loads((tmp_path / "publish" / "no-additional-experiment.json").read_text())
+    assert marker["frames"] == 0 and marker["scientific_result"] is False
+
+
+def test_continuation_requires_48_validated_frames_and_prior_archive(tmp_path, monkeypatch) -> None:
+    import json
+
+    frames = 48
+    labels = [(1, 3.0, 4.0)] * frames
+    judge = pilot.frame_results([(True, 3.0, 4.0)] * frames, labels)
+    judges = {"wasb": judge, "balltrack": judge}
+    window = {"windows": [{"id": pilot.WINDOW, "dataset": "tracknet", "frames": frames,
+                           "labels": [[1, 3, 4]] * frames, "size": [32, 32], "fps": 30}]}
+    (tmp_path / "windows.json").write_text(json.dumps(window))
+    points = []
+    for kind, number in pilot.POINTS:
+        directory = tmp_path / f"{kind}-{number}"
+        directory.mkdir()
+        native = directory / ("stream.psdc" if kind == "dcvc" else "stream.ivf")
+        native.write_bytes(b"native")
+        packet = directory / "ball.psb"
+        pilot.packet_write(packet, [None] * frames, [None] * frames, 32, 32, Fraction(30))
+        points.append({"codec": kind, "point": number,
+                       "native_record": {"encoder_decoded_sha256": "same", "receiver_decoded_sha256": "same"},
+                       "baseline": {"sha256": pilot.sha(native), "bytes": native.stat().st_size,
+                                    "frame_psnr": 30, "judges": judges},
+                       "streak": {"ledger": pilot.ledger(native, packet, frames / 30), "ball_on": False,
+                                  "roundtrip": True, "guard_off": False, "frame_psnr": 30, "judges": judges}})
+    (tmp_path / "accepted-smoke.tar").write_bytes(b"placeholder")
+    monkeypatch.setattr(pilot, "accepted_smoke", lambda _p: {"identities": {}})
+    monkeypatch.setattr(pilot, "bind_prior", lambda _old, _new: None)
+    report: dict[str, Any] = {"window": pilot.WINDOW, "frames": frames, "fps": "30", "size": [32, 32],
+              "reference_labels": labels, "identities": {"window_manifest_sha256": pilot.sha(tmp_path / "windows.json")},
+              "quality_space": "RGB PSNR", "on_cuda": {"wasb": "cuda:0", "balltrack": "cuda:0"},
+              "prior_16": {"archive_sha256": pilot.ACCEPTED_SMOKE_SHA}, "source_judges": judges, "points": points}
+    (tmp_path / "pilot.json").write_text(json.dumps(report))
+    assert pilot.validate(tmp_path)["frames"] == 48
+    report["points"].pop()
+    (tmp_path / "pilot.json").write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="points"):
+        pilot.validate(tmp_path)
+
+
+def test_full_nonresult_marker_validation_rejects_smoke_and_tampering(tmp_path, monkeypatch) -> None:
+    import argparse
+    import json
+
+    archive = tmp_path / "prior.tar"
+    archive.write_bytes(b"accepted")
+    monkeypatch.setattr(pilot, "ACCEPTED_SMOKE_SHA", pilot.sha(archive))
+    monkeypatch.setenv("PS_SCRATCH_DIR", str(tmp_path))
+    monkeypatch.setenv("PS_STAGE", "full")
+    pilot.empty_completion(argparse.Namespace(frames=0, accepted_smoke_archive=str(archive)))
+    output = tmp_path / "publish"
+    result = pilot.validate_stage_output(output, "full")
+    assert result["passed"] and result["frames"] == 0 and "NONRESULT" in result["scope"]
+    with pytest.raises(ValueError):
+        pilot.validate_stage_output(output, "smoke")
+    (output / "pilot.json").write_text("{}")
+    with pytest.raises(ValueError):
+        pilot.validate_stage_output(output, "full")
+    (output / "pilot.json").unlink()
+    marker = output / "no-additional-experiment.json"
+    data = json.loads(marker.read_text())
+    data["scientific_result"] = True
+    marker.write_text(json.dumps(data))
+    with pytest.raises(ValueError):
+        pilot.validate_stage_output(output, "full")
+    data["scientific_result"] = False
+    marker.write_text(json.dumps(data))
+    (output / "accepted-smoke.tar").write_bytes(b"wrong")
+    with pytest.raises(ValueError):
+        pilot.validate_stage_output(output, "full")
+
+
+def test_fleet_validate_only_accepts_full_nonresult_archive(tmp_path, monkeypatch) -> None:
+    import argparse
+    import json
+    import sys
+    import tarfile
+
+    archive = tmp_path / "prior.tar"
+    archive.write_bytes(b"accepted")
+    monkeypatch.setattr(pilot, "ACCEPTED_SMOKE_SHA", pilot.sha(archive))
+    monkeypatch.setenv("PS_SCRATCH_DIR", str(tmp_path))
+    monkeypatch.setenv("PS_STAGE", "full")
+    pilot.empty_completion(argparse.Namespace(frames=0, accepted_smoke_archive=str(archive)))
+    stage = tmp_path / "stage"
+    stage.mkdir()
+    with tarfile.open(stage / "published.tar", "w") as tar:
+        tar.add(tmp_path / "publish", arcname="publish")
+    target = tmp_path / "validation.json"
+    monkeypatch.setenv("PS_STAGE_DIR", str(stage))
+    monkeypatch.setenv("PS_VALIDATION_PATH", str(target))
+    monkeypatch.setenv("TMPDIR", str(tmp_path))
+    monkeypatch.setattr(sys, "argv", ["k5c", "--validate-only"])
+    pilot.main()
+    result = json.loads(target.read_text())
+    assert result["passed"] and result["checks"]["no_additional_experiment"]
+    assert result["frames"] == 0 and "NONRESULT" in result["scope"]

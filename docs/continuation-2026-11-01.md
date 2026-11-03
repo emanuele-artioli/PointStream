@@ -1,5 +1,40 @@
 # Continuation, 2026-11-01: paper strengthening and main-paper ball result
 
+**Latest state, 2026-11-03:** first independent-image-judge ball request
+`20261103T132157Z-f665bece` is closed, failed at the cost-promotion gate.
+Its 16-frame real-component output passed independent CPU audit; the 48-frame
+stage never ran. Source `862d56c2` and its isolated worktree are immutable.
+The sole wait (old runner exec 14017) ended; task-owned GPU processes, claims
+and events are closed/acknowledged. Accepted cumulative envelopes are
+**201 GPU-s /1,101 workload CPU-s**, leaving 699 of each within the approved
+900/1,800 totals. Exact raw/accepted closeout records are in the
+[K5c entry](experiments/k5c-independent-ball.md).
+
+Root explicitly amended operational allocation for the already approved
+48-frame target, reusing independently audited 16-frame controls and requiring
+identical numerical paths and bound source/model/native identities. New phase
+at most **660 GPU-s /650 CPU-s**; cumulative at most861/1,751, with39/49 reserve.
+The retained complete 577.91-second forecast fits that ceiling, unlike the
+initial420-second stage allocation. Real48data are in fleet `smoke`; `full`0
+is an explicit non-result marker. No48result exists yet; no new request
+submitted at this checkpoint. No third attempt, larger study, training or W8
+retry. Before any action re-read actual ID from experiments entry and inspect
+canonical status; never replay the first request. Source/host admission and
+new-source freeze must precede the one versioned continuation dispatch.
+
+The strengthened manuscript **`0d983288c2c7b6182fffcd8093d12bb1d307d03e`**
+is pushed to Overleaf: eight main figures and two appendix figures, **23 main
+including references on 22–23, plus five appendix pages**. Named/anonymous
+clean-source PDFs and source ZIP are preserved in
+`/private/tmp/pointstream-strengthened-review-20261101-0d98328/`; manifest SHA256
+`fc61af9f5a1fc4152bfde0ba57eebec81b873b393f0da94df38d1b564a362a64`.
+The ball result and qualitative strip are in the main paper; its dependent
+judge, historical SVT framing/outer-envelope omissions and failed PSNR BD-rate
+guard remain visible. The W6 replay explicitly failed its per-frame control;
+no smoothing-quality claim follows. Coauthors have not yet approved the draft,
+source footage permissions are unresolved, and no paper was submitted. PRESLEY
+was not modified. Earlier packages and historical notes below are preserved.
+
 **Latest user direction:** the previous `eb7e3a3` package remains preserved,
 but presentation and substantive contribution review are reopened. The user
 approved the proposed eight main figures, appendix ablations/negative results,

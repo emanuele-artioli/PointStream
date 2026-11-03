@@ -29,6 +29,8 @@ from src.pointstream.bitstream import Container, Tag
 
 POINTS = (("dcvc", 0), ("dcvc", 21), ("dcvc", 42), ("svt", 48), ("svt", 55), ("svt", 62))
 WINDOW = "tracknet/game8/Clip6"
+ACCEPTED_SMOKE_SHA = "f160ce69f66b1272236c9c6c98ea72c65912bc500754141d419ebb15a8e3227e"
+ACCEPTED_SMOKE_JOB = "20261103T132157Z-f665bece"
 
 
 
@@ -174,14 +176,73 @@ def _native_decode(kind: str, point_dir: Path, native: Path, destination: Path, 
         subprocess.run(cmd, env={**k5.STAGE_ENV, **env}, cwd=cwd, check=True, capture_output=True, timeout=3600)
 
 
+
+def accepted_smoke(path: Path) -> dict[str, Any]:
+    """Independently revalidate the exact retained 16-frame component archive."""
+    if sha(path) != ACCEPTED_SMOKE_SHA:
+        raise ValueError("prior 16-frame archive hash differs")
+    with tempfile.TemporaryDirectory(prefix="k5c-prior-", dir=os.environ.get("TMPDIR")) as folder:
+        with tarfile.open(path, "r:") as archive:
+            members = archive.getmembers()
+            if len(members) > 100 or sum(m.size for m in members) > 16 * 1024 * 1024:
+                raise ValueError("prior archive exceeds expected bounds")
+            if any(not (m.isfile() or m.isdir()) for m in members):
+                raise ValueError("prior archive contains a link or special entry")
+            archive.extractall(folder, filter="data")
+        prior = Path(folder) / "publish"
+        verified = validate(prior)
+        if verified["frames"] != 16:
+            raise ValueError("prior archive does not contain 16 frames")
+        return json.loads((prior / "pilot.json").read_text())
+
+
+def bind_prior(prior: dict[str, Any], current: dict[str, Any]) -> None:
+    old = prior["identities"]
+    for key in ("window_manifest_sha256", "exposure_receipt_sha256", "wasb_sha256", "balltrack_sha256",
+                "image_sha256", "video_sha256"):
+        if old[key] != current[key]:
+            raise ValueError(f"prior input identity differs: {key}")
+    if len(old["source_frames"]) != 16 or current["source_frames"][:16] != old["source_frames"]:
+        raise ValueError("prior source-frame identities differ")
+    for role in ("ffmpeg", "SvtAv1EncApp", "dav1d"):
+        if old["tools"][role]["sha256"] != current["tools"][role]["sha256"]:
+            raise ValueError(f"prior native tool differs: {role}")
+
+
+def empty_completion(args: argparse.Namespace) -> None:
+    """Explicitly record that the fleet full stage ran no additional experiment."""
+    if os.environ.get("PS_STAGE") != "full" or args.frames != 0 or not args.accepted_smoke_archive:
+        raise ValueError("zero-frame completion requires full stage and accepted archive")
+    if sha(Path(args.accepted_smoke_archive)) != ACCEPTED_SMOKE_SHA:
+        raise ValueError("prior 16-frame archive hash differs")
+    scratch = os.environ.get("PS_SCRATCH_DIR")
+    if not scratch:
+        raise ValueError("zero-frame completion requires fleet scratch")
+    out = Path(scratch) / "publish"
+    out.mkdir(parents=True, exist_ok=False)
+    shutil.copyfile(args.accepted_smoke_archive, out / "accepted-smoke.tar")
+    (out / "no-additional-experiment.json").write_text(json.dumps({
+        "scope": "no additional experiment; 48-frame pilot result is in the smoke stage",
+        "prior_16_job": ACCEPTED_SMOKE_JOB, "prior_16_sha256": ACCEPTED_SMOKE_SHA,
+        "frames": 0, "scientific_result": False}) + "\n")
+
+
 def run(args: argparse.Namespace) -> None:
+    if args.frames == 0:
+        empty_completion(args)
+        return
     # This does not enforce aggregate CPU/GPU budgets; the fleet supervisor must.
     cpus = one_cpu(set(os.sched_getaffinity(0)), os.environ.get("PS_CPU_ALLOWANCE"))
     if not 1 <= args.frames <= 48:
         raise ValueError("pilot permits 1–48 frames")
     stage = os.environ.get("PS_STAGE")
-    if stage in ("smoke", "full") and args.frames != {"smoke": 16, "full": 48}[stage]:
-        raise ValueError("fleet smoke requires 16 frames and full requires 48")
+    continuation = bool(args.accepted_smoke_archive)
+    expected = {"smoke": 48, "full": 0} if continuation else {"smoke": 16, "full": 48}
+    if stage in expected and args.frames != expected[stage]:
+        raise ValueError("frame count does not match registered stage mode")
+    if continuation and stage != "smoke":
+        raise ValueError("accepted archive continuation must run as fleet smoke")
+    prior = accepted_smoke(Path(args.accepted_smoke_archive)) if continuation else None
     window = load_window(Path(args.windows), args.frames)
     exposure = admit(Path(args.exposure_receipt), Path(args.wasb_config),
                      Path(args.wasb_weights) / "wasb_tennis_best.pth.tar", Path(args.windows))
@@ -190,9 +251,6 @@ def run(args: argparse.Namespace) -> None:
     for path, expected in ((Path(args.image_ckpt), args.image_sha256), (Path(args.video_ckpt), args.video_sha256)):
         if sha(path) != expected:
             raise ValueError("native checkpoint hash differs")
-    import torch
-    if not torch.cuda.is_available():
-        raise ValueError("CUDA unavailable")
     from src.codecs.svtav1 import tool
     identities = {"window_manifest_sha256": sha(Path(args.windows)), "exposure_receipt_sha256": sha(Path(args.exposure_receipt)),
                   "wasb_sha256": WASB_SHA, "balltrack_sha256": BALLTRACK_SHA,
@@ -203,6 +261,11 @@ def run(args: argparse.Namespace) -> None:
                                        for i in range(args.frames)]
     else:
         identities["source_sha256"] = sha(Path(args.source))
+    if prior is not None:
+        bind_prior(prior, identities)
+    import torch
+    if not torch.cuda.is_available():
+        raise ValueError("CUDA unavailable")
     scratch = os.environ.get("PS_SCRATCH_DIR")
     if not scratch and (args.output is None or args.work_dir is None):
         raise ValueError("specify output and work-dir, or set PS_SCRATCH_DIR")
@@ -214,6 +277,8 @@ def run(args: argparse.Namespace) -> None:
     work.mkdir(parents=True, exist_ok=False)
     shutil.copyfile(args.windows, out / "windows.json")
     shutil.copyfile(args.exposure_receipt, out / "exposure-receipt.json")
+    if prior is not None:
+        shutil.copyfile(args.accepted_smoke_archive, out / "accepted-smoke.tar")
     w, h = window["size"]
     fps = Fraction(window["fps"]).limit_denominator(1001)
     labels = k5b1b.label_kinds(tw.labels(window, args.frames))
@@ -302,6 +367,9 @@ def run(args: argparse.Namespace) -> None:
               "receiver": "native stream and BALL packet reread; source isolation not established",
               "cpu_budget": "single affinity only; aggregate process-tree enforcement not established",
               "reference_labels": labels, "source_judges": source_judges, "points": results}
+    if prior is not None:
+        output["prior_16"] = {"job": ACCEPTED_SMOKE_JOB, "archive_sha256": ACCEPTED_SMOKE_SHA,
+                              "scope": "prior 16-frame correctness; original cost gate did not pass"}
     (out / "pilot.json").write_text(json.dumps(output, indent=2, default=str) + "\n")
 
 
@@ -346,6 +414,10 @@ def validate(output: Path) -> dict[str, Any]:
             recalculated = frame_results(preds, labels)
             if recalculated["counts"] != item["counts"] or recalculated["rates"] != item["rates"]:
                 raise ValueError("judge counts differ from rows")
+    if "prior_16" in report:
+        if report["frames"] != 48 or report["prior_16"]["archive_sha256"] != ACCEPTED_SMOKE_SHA:
+            raise ValueError("invalid continuation proof")
+        bind_prior(accepted_smoke(output / "accepted-smoke.tar"), report["identities"])
     check_judges(report["source_judges"])
     source_recall = report["source_judges"]["wasb"]["rates"]["detection_rate"]
     if source_recall is None or source_recall < 0.8:
@@ -375,7 +447,7 @@ def validate(output: Path) -> dict[str, Any]:
         for variant in ("baseline", "streak"):
             check_judges(point[variant]["judges"])
     return {"passed": True, "checks": {"persisted_component_records": True},
-            "points": len(POINTS), "frames": frames,
+            "prior_16_verified": "prior_16" in report, "points": len(POINTS), "frames": frames,
             "scope": "persisted component records; not independently replayed model inference"}
 
 
@@ -404,6 +476,25 @@ def cost_projection(stage_dir: Path, now: float) -> dict[str, float]:
             "campaign_reserve_seconds": 60.0}
 
 
+
+def validate_stage_output(output: Path, stage: str | None) -> dict[str, Any]:
+    marker_path = output / "no-additional-experiment.json"
+    if marker_path.exists():
+        if stage != "full" or {x.name for x in output.iterdir()} != {"no-additional-experiment.json", "accepted-smoke.tar"}:
+            raise ValueError("nonresult marker allowed only alone in full stage with prior archive")
+        marker = json.loads(marker_path.read_text())
+        expected = {"scope": "no additional experiment; 48-frame pilot result is in the smoke stage",
+                    "prior_16_job": ACCEPTED_SMOKE_JOB, "prior_16_sha256": ACCEPTED_SMOKE_SHA,
+                    "frames": 0, "scientific_result": False}
+        if marker != expected or type(marker.get("frames")) is not int or type(marker.get("scientific_result")) is not bool:
+            raise ValueError("invalid nonresult marker")
+        if sha(output / "accepted-smoke.tar") != ACCEPTED_SMOKE_SHA:
+            raise ValueError("prior archive hash differs in full-stage marker")
+        return {"passed": True, "checks": {"no_additional_experiment": True}, "frames": 0,
+                "scope": "NONRESULT: no additional experiment was performed"}
+    return validate(output)
+
+
 def main() -> None:
     if len(sys.argv) == 2 and sys.argv[1] == "--validate-only":
         target = Path(os.environ["PS_VALIDATION_PATH"])
@@ -413,13 +504,19 @@ def main() -> None:
             with tempfile.TemporaryDirectory(prefix="k5c-validator-", dir=os.environ["TMPDIR"]) as folder:
                 with tarfile.open(archive, "r:") as bundle:
                     bundle.extractall(folder, filter="data")
-                result = validate(Path(folder) / "publish")
+                result = validate_stage_output(Path(folder) / "publish", os.environ.get("PS_STAGE"))
+                continuation = (Path(folder) / "publish" / "accepted-smoke.tar").exists()
             if os.environ.get("PS_STAGE") == "smoke":
-                if result["frames"] != 16:
-                    raise ValueError("smoke output must contain 16 frames")
-                result["cost_projection"] = cost_projection(Path(os.environ["PS_STAGE_DIR"]), time.monotonic())
-                result["checks"]["full_stage_cost_projection"] = True
-            elif os.environ.get("PS_STAGE") == "full" and result["frames"] != 48:
+                if continuation:
+                    if result["frames"] != 48 or not result["prior_16_verified"]:
+                        raise ValueError("continued pilot must contain 48 frames and validated prior proof")
+                    result["checks"]["accepted_16_and_48_frame_pilot"] = True
+                else:
+                    if result["frames"] != 16:
+                        raise ValueError("smoke output must contain 16 frames")
+                    result["cost_projection"] = cost_projection(Path(os.environ["PS_STAGE_DIR"]), time.monotonic())
+                    result["checks"]["full_stage_cost_projection"] = True
+            elif os.environ.get("PS_STAGE") == "full" and result["frames"] not in (0, 48):
                 raise ValueError("full pilot output must contain 48 frames")
         except Exception as exc:
             target.write_text(json.dumps({"passed": False, "error": str(exc)}) + "\n")
@@ -435,6 +532,7 @@ def main() -> None:
         parser.add_argument("--" + name, required=True)
     parser.add_argument("--output")
     parser.add_argument("--work-dir")
+    parser.add_argument("--accepted-smoke-archive")
     parser.add_argument("--frames", type=int, default=48)
     parser.add_argument("--encoder", default="SvtAv1EncApp")
     parser.add_argument("--decoder", default="dav1d")
