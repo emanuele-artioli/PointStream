@@ -18,21 +18,33 @@ events acknowledged. Accepted cumulative envelopes **463/900 GPU-s and
 lifecycles, audits and monitoring; aggregate administrative CPU telemetry remains
 uncertain. No further computation, training, W8 retry, third attempt or larger
 study is authorized by the balance. Exact identities/receipts and limits are
-in [K5c](experiments/k5c-independent-ball.md). Manuscript incorporation is in
-progress; current Overleaf checkpoint below predates this new pilot.
+in [K5c](experiments/k5c-independent-ball.md).
 
-The strengthened manuscript **`0d983288c2c7b6182fffcd8093d12bb1d307d03e`**
-is pushed to Overleaf: eight main figures and two appendix figures, **23 main
-including references on 22–23, plus five appendix pages**. Named/anonymous
-clean-source PDFs and source ZIP are preserved in
-`/private/tmp/pointstream-strengthened-review-20261101-0d98328/`; manifest SHA256
-`fc61af9f5a1fc4152bfde0ba57eebec81b873b393f0da94df38d1b564a362a64`.
-The ball result and qualitative strip are in the main paper; its dependent
-judge, historical SVT framing/outer-envelope omissions and failed PSNR BD-rate
-guard remain visible. The W6 replay explicitly failed its per-frame control;
-no smoothing-quality claim follows. Coauthors have not yet approved the draft,
-source footage permissions are unresolved, and no paper was submitted. PRESLEY
-was not modified. Earlier packages and historical notes below are preserved.
+**Manuscript checkpoint:** Overleaf `a2972799a7c70f37bdb8f72485f23beefdf55a16` is pushed.
+Eight main and two appendix figures; 23 main including references 22–23 plus
+five appendix pages. The ball contribution and separate WASB 48-frame pilot
+remain in main; full per-setting byte/PSNR ledger is appendix Table 10. The
+historical whole-frame PSNR BD-rate failure, dependent old judge and different
+framing convention remain visible. The new anonymous review supplement contains
+only saved predictions, labels and ledgers, not footage or native binaries.
+
+Frozen author-review package:
+`/private/tmp/pointstream-strengthened-review-20261103-a297279/`.
+Anonymous PDF SHA256 `775c77b590c4022a367538d0ebdb7bb191305f403fb6142e538bf3295f85cfe0`;
+author PDF `3014512b72d93fc1fdaf5e3a2ec2335dda1992dd16e8932599c152c6e3f386ab`;
+selected source ZIP `bca3019482b6877214e92d0cb6fc1f50c210b9983f81abba9508fa03bcc0d985`;
+anonymous data ZIP `0ecdcafc20afe1cc6ff97ab79599bce7f9805092cb1ae14851eb3a52bf4de886`;
+root manifest `b8b8dd3bf53866deba4fe25db2c6b0c1ecd196856e981b8be57d70303af08d58`.
+Both variants build from selected 23 active files using native Biber 2.22/external
+ACM styles; checker 29 keys and five registry tests pass. Root verified hashes,
+page spans, 26 judge sequences and labels, named/anonymous contacts/links, figures
+and table layout. No source hidden client, negative-frame behavior or untouched
+confirmation follows. The broader PLAN is not complete; see the
+[review record](paper/strengthened-author-review-2026-11-03.md).
+
+Coauthors have not approved the revision, footage permissions remain unresolved,
+and no submission occurred. PRESLEY was never modified. Prior packages and
+historical notes below are preserved, not current publication candidates.
 
 **Latest user direction:** the previous `eb7e3a3` package remains preserved,
 but presentation and substantive contribution review are reopened. The user
