@@ -21,7 +21,11 @@ def main() -> None:
     parser.add_argument("--publisher-camera", type=Path)
     parser.add_argument("--python", type=Path)
     parser.add_argument("--soak-seconds", type=int)
-    parser.add_argument("--case-set", choices=("all", "direct", "impaired"), default="all")
+    parser.add_argument(
+        "--case-set",
+        choices=("all", "direct", "impaired", "constrained", "recovery"),
+        default="all",
+    )
     parser.add_argument("--audience", type=int, default=0)
     parser.add_argument("--qualified-smoke", type=Path)
     parser.add_argument("--validate", action="store_true")
@@ -32,7 +36,9 @@ def main() -> None:
         if not result.get("valid") or result.get("transport") != "QUIC":
             raise ValueError("native client qualification did not pass")
         selected = result.get("case_set", "all")
-        expected_cases = {"all": 3, "direct": 1, "impaired": 2}[selected]
+        expected_cases = {"all": 3, "direct": 1, "impaired": 2, "constrained": 1, "recovery": 1}[
+            selected
+        ]
         if len(result.get("cases", [])) != expected_cases:
             raise ValueError("selected network cases did not all pass")
         if selected != "all" and not result.get("prior_gate_verified"):
