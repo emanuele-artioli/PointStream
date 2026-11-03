@@ -176,3 +176,51 @@ If UDP is blocked, preserve failure and request a reachable trusted endpoint or
 VPN/firewall assistance; do not tunnel TCP and call it native WAN delivery.
 CPU budget 480 seconds, 2 threads; final stage preserves each client's proof.
 No human needed for this network-only test.
+
+### Cross-host CPU job 20261103T151800Z-053ccd17
+
+Published/pending, CPU only (0 GPU-seconds), 480-second CPU ceiling, ports
+24533 smoke / 24534 full. Source archive same GPU2 revision, source subset
+65,536 explicit. Adapter16090b7b, proof must be written from this Mac by native
+checker. No GPU qualification claim. Request identity e75f918a78a2216d06a0fc402d393441b1927a1250432174bbe485d65fea6d9a.
+
+### Semantic preparation passed; orbit CLI import failed
+
+20261103T151437Z-d50b3f16 terminal FAILED, supervisor 191.44s (conservative
+240s charge). Full real-scene source CUDA oracle and original semantic publisher
+completed in the independent environment. VMAF stopped at orbit generation:
+upstream helper imports missing gsplat_object_segmentation rather than the
+actual gsplat_clustering_vmaf module. Fix the import and add actual --help
+subprocess tests for all three publisher CLIs; isolated camera math tests did
+not exercise imports. Preserve all prior outputs. New CPU4 regression must pass
+before another GPU gate. Phase 300 GPU-s charged, remaining 1,860; aggregate
+1,740/3,600. Revised reservation 1,800, smoke600/full850; no promotion on failure.
+
+Cross-host 20261103T151800Z-053ccd17 FAILED with no external proof. Initial Mac
+venv lacked NumPy (setup issue, fixed using binary numpy2.5.4 for Python3.14).
+Retry began15:21:02Z, endpoint stopped15:21:12Z: only10s overlap, insufficient
+for a conclusive network-block attribution. Server ready15:19:32Z, publisher
+QUIC session confirmed. Preserve failure, charge150 CPU-s of480 ceiling.
+A fresh synchronized attempt has330 CPU-s remaining, awaits readiness before
+connecting, same source/scene subset and ports; never replay old request.
+
+### Final revised GPU gate 20261103T152241Z-0989d383
+
+Published/pending, source3ff6f9a35a88db681e89c9d5ac95962df5e80805, archive
+a4312a7aeb3adb9bef74fa8d852543302df97dbdedd1518afdfe0e2603295257.
+Independent CPU4 full suite115passed in16.52s, including three actual publisher
+CLIs. 1,800-second reservation of1,860 remaining; smoke600/full850.
+Specd45c5d7ad3cffd5b39770ab80b0367abff1d8a1ee78c610dc27b42742ad19d66; canonical external inbox path named by this ID.
+
+Synchronized CPU retry20261103T152350Z-49a47c66 published;330-second CPU ceiling, no GPU.
+Root client waits for each endpoint.json before dialing; saves proof then
+allows smoke/full progression. Native checker Python3.14.3+numpy2.5.4, MoQ
+bindings0.5.2/0.4.20 on this Mac. Spec510c9dc3bd709e58e863ac0966527fcb56b59046dfdb43cd0fc39e5e5c993dc6.
+
+Synchronized external check failed native QUIC connect with timeout despite
+waiting for endpoint readiness. Do not infer the exact firewall/VPN cause.
+Remote relay accepts its loopback publisher; no separate Mac session accepted.
+Save /tmp/moqsplat-crosshost-synchronized-20261103/{result.json,smoke.log,
+smoke/summary.json}. Endpoint self-expires; no firewall/route changes attempted.
+Need a permitted UDP route/trusted reachable endpoint (possibly university VPN
+or IT firewall assistance) before claiming outside-network success. No GPU used.
