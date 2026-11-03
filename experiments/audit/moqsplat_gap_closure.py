@@ -46,6 +46,10 @@ def main() -> None:
         return
     assert args.source and args.scene and args.trace and args.python
     assert args.weights and args.publisher_camera and args.soak_seconds
+    if hashlib.sha256(args.weights.read_bytes()).hexdigest() != (
+        "9fdd44a31c504547ffb81d2c6d9e6dac3493c8eaa8b0398d3f43bae6c7003e92"
+    ):
+        raise ValueError("publisher weights do not match the protocol identity")
     scratch = Path(os.environ["PS_SCRATCH_DIR"])
     checkout = scratch / "source"
     checkout.mkdir()

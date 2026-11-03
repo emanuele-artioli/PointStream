@@ -104,3 +104,11 @@ Protocol input manifest SHA256:
 PointStream adapter checks: Ruff passes; mypy passes (381 source files);
 full pytest 1,450 passed, 30 skipped. Global legacy MoQSplat Ruff is not clean
 (564 existing/legacy diagnostics); focused new/native files pass Ruff.
+
+### Publication attempt 20261103T150639Z-1ceedad4
+
+Submission returned UNKNOWN: inbox publication rejected staged weights outside
+the Datasets fleet root (weights correctly live in Models). Do not replay.
+Inspect this ID before preparing a corrected request; it is not GPU evidence.
+Source revision 2f371f631c8dbe83944e03c58d2f5940db8931c3; source archive
+502b09b34cb41448571cd8e01e290e0810ef57e8f22cec1745d5589dd789ed06.
