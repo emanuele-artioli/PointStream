@@ -112,3 +112,67 @@ the Datasets fleet root (weights correctly live in Models). Do not replay.
 Inspect this ID before preparing a corrected request; it is not GPU evidence.
 Source revision 2f371f631c8dbe83944e03c58d2f5940db8931c3; source archive
 502b09b34cb41448571cd8e01e290e0810ef57e8f22cec1745d5589dd789ed06.
+
+The status command rejected that ID as unpublished. Read-only inbox inspection
+found only source.tar and events, no ready/spec/owner/run: no runnable request,
+no GPU charge. Preserve it. Corrected adapter hashes weights in Models in place;
+only scene, trace, camera and source are staged under Datasets. Prepare a new
+request; this is not replay of an uncertain runnable request.
+
+### Published GPU job 20261103T150751Z-2f6bb31b
+
+Pending at publication, gpu6 Ada shared correctness class. Original protocol
+ceiling 3,600 GPU-s; prior conservative 1,440; request reserves at most 2,000
+of 2,160 remaining (600 smoke, 1,000 full, validators/staging within ceiling).
+Deadline 2026-11-03T15:49:26.945258Z. Adapter f1b5d6cbccc95b72b8f17537e4ec9176f695b627;
+MoQSplat 2f371f631c8dbe83944e03c58d2f5940db8931c3, archive
+502b09b34cb41448571cd8e01e290e0810ef57e8f22cec1745d5589dd789ed06.
+Spec cf90122079ca8062962d2f453562a32077d8af5770fe10687bf24425f3cbbb44.
+Results: fleet/inbox/20261103T150751Z-2f6bb31b under the external jobs root.
+Bounded native wait handle to be persisted below; no recurring model wakeups.
+
+Bounded wait process handle 94443; output
+/tmp/moqsplat-gap-gpu2-wait-20261103.json, maximum 2,400 seconds. The fleet
+reports completion-first monitoring; this client has not independently proved
+that a command completion resumes sampling. Remain attended and preserve the
+handle; do not add timers or repeated polling.
+
+Initial wait ended after 7 seconds on declared shared-GPU contention event
+d19565dcf0045eeda7d269a99e803e83 (already expected, acknowledged). No claim
+changed. Start a new single bounded wait after the event; retain its handle.
+
+Second bounded wait handle 97158, output
+/tmp/moqsplat-gap-gpu2-wait-after-ack-20261103.json, max 2,100 seconds.
+Independent read-only review found and fixed the semantic seg-directory mismatch
+before freezing GPU1; final read-only transport audit found no further concrete
+blockers. No remote agents were used.
+
+### First executed gate failed before rendering
+
+20261103T150751Z-2f6bb31b terminal FAILED; native wait returned terminal attention.
+111 CPU tests passed in 14.24s. Oracle CLI rejected unsupported --width/--height
+from the new qualification harness (oracle already uses fixed 320x240). No
+semantic or live qualification passed. Actual supervisor 30.44s plus staging;
+charge conservatively 60 GPU-s, phase remaining 2,100 (aggregate 1,500/3,600).
+All outputs retained. Remove those unsupported harness arguments; unchanged
+production render/transport paths, then a new bounded gate with new source hash.
+
+### Revised gate 20261103T151437Z-d50b3f16
+
+Published/pending, new source ff4f08d04062429ee8ae6022c122fb0ef8e877f7, archive
+2292a2f78eff6254ec28c0328b264799321be0548f3a28ee747e8ee79c194a1b.
+Spec 2255957db2c8094b05209e0912ce4327a3b6d67394c70ff713e68888628a16fb; 2,000-second reservation within 2,100 remaining.
+Deadline 2026-11-03T15:57:33.696115Z, same 600s smoke / 1,000s full bounds.
+Only oracle CLI argument correction; no failed gate promoted.
+
+## Prospective independent-machine network check
+
+CPU-only Mac-to-gpu6 native QUIC, 65,536 real source Gaussians explicitly
+selected for a bounded network check (not image quality or full-scene performance).
+Temporary relay binds ports 24533/24534 for at most 140 seconds each. No firewall
+changes, no public deployment, no GPU claim. External checker must verify source
+attributes, QUIC counters and cache revisits; server requires that saved proof.
+If UDP is blocked, preserve failure and request a reachable trusted endpoint or
+VPN/firewall assistance; do not tunnel TCP and call it native WAN delivery.
+CPU budget 480 seconds, 2 threads; final stage preserves each client's proof.
+No human needed for this network-only test.
