@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-03",
+  "scope": "resume before first pilot submission; no prior pilot request or GPU use exists",
+  "approved_gpu_seconds": 900,
+  "approved_workload_cpu_seconds": 1800,
+  "preparation_cpu_charge_total": 600,
+  "basis": "300 CPU-s prior conservative preparation plus 300 CPU-s resumed source/fleet verification; reallocated within existing contingency",
+  "remaining_cpu_envelope": {
+    "single_core_allocation_to_terminal": 840,
+    "independent_audit": 180,
+    "monitoring": 120,
+    "contingency": 60
+  },
+  "gpu_spent": 0,
+  "gpu_reserved_for_sole_attempt": 900,
+  "eligible_hosts": [
+    "gpu2",
+    "gpu3",
+    "gpu5",
+    "gpu6"
+  ],
+  "doctor_passed": true,
+  "job_records": 1560,
+  "current_active_requests": 0,
+  "receipt_identities": {
+    "host-inspect": {
+      "local_path": "/private/tmp/pointstream-k5c-host-inspect-20261103.json",
+      "sha256": "f4f2162fb11ef028f6a6df6917e4e1a54be9787c030dfba9ee6290533e98464d",
+      "bytes": 14873
+    },
+    "existing-jobs": {
+      "local_path": "/private/tmp/pointstream-k5c-existing-jobs-20261103.json",
+      "sha256": "29601e4dfb1a82140e325dbc17779644655a875f71421114e2c22ea49c45c57c",
+      "bytes": 4721047
+    },
+    "doctor": {
+      "local_path": "/private/tmp/pointstream-k5c-doctor-20261103.json",
+      "sha256": "bdd3531b8d22fbcd1412f591146335b6be99118d8b8c767772b79a91c496cf0d",
+      "bytes": 10891
+    }
+  },
+  "source_code_static_review": "No blocking native API or codec-setting mismatch at ea8d0058; updated decoder container-SHA telemetry fix changes no codec settings; actual target execution still requires smoke",
+  "administrative_cpu_telemetry": "conservative allocations; no exact complete control-plane aggregate measurement asserted",
+  "old_spec_preserved": "pilot-spec.json expired without submission; only deadline and now-healthy complete host pool updated"
+}

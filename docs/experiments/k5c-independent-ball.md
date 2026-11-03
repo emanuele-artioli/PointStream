@@ -88,3 +88,31 @@ no retry and deferred failed publication. Inclusive outer caps remain
 **Jobs:** none yet; record the actual submission identity before waiting.
 **New GPU use:** zero. PRESLEY is untouched; no training or automatic larger
 confirmation is authorized.
+
+## 2026-11-03: resumed before the first submission
+
+Saved state and the canonical fleet listing confirm that no K5c request was
+submitted and GPU use remains zero. The November 1 source/receipt publication
+succeeded; it is preserved and is not replayed. The expired original spec is
+retained. The new [spec](k5c-inputs/pilot-spec-20261103.json) changes only its
+deadline and the verified healthy host pool. All six hosts were inspected;
+doctor now passes for gpu2/gpu3/gpu5/gpu6 and all 1,560 requests were read, with
+no currently pending/running/launching/preparing request. Foreign GPU activity
+is untouched; at this snapshot the two gpu2 A6000 devices were idle.
+
+An independent static review found no blocking native-interface mismatch.
+The newer DCVC worker fixes a container-hash telemetry variable, while HT-L,
+QP, checkpoints, color input and native acceptance guards retain their prior
+settings. The actual target-device path remains subject to the authorized
+smoke. A small source change persists source-judge qualification even if its
+gate fails, so a failed oracle retains its measured denominator and predictions.
+All ten focused CPU tests and full Ruff pass.
+
+The resumed conservative preparation allocation is 300 CPU-s, taken from the
+existing contingency: cumulative preparation **600 CPU-s**, leaving an envelope
+of 840 single-core lifecycle +180 independent audit +120 monitoring +60
+contingency =1,200 CPU-s. The original **1,800 CPU-s /900 GPU-s** ceilings do not
+increase. These allocations are not invented exact control-plane CPU telemetry.
+The refreshed records are in
+[`k5c-inputs/preflight/resume-20261103.json`](k5c-inputs/preflight/resume-20261103.json).
+No new budget, training, retry or larger confirmation is implied by resuming.

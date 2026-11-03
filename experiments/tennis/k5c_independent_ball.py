@@ -233,6 +233,12 @@ def run(args: argparse.Namespace) -> None:
         return zoo.run("wasb-step1", pixels)
     source_judges = judge_images(source, labels, predict_wasb, predict_ball)
     source_recall = source_judges["wasb"]["rates"]["detection_rate"]
+    (out / "source-qualification.json").write_text(json.dumps({
+        "window": WINDOW, "frames": args.frames, "identities": identities,
+        "on_cuda": on_cuda, "reference_labels": labels, "source_judges": source_judges,
+        "passed": source_recall is not None and source_recall >= 0.8,
+        "scope": "source-image judge qualification only; no native or rendered outcome",
+    }, indent=2, default=str) + "\n")
     if source_recall is None or source_recall < 0.8:
         raise ValueError("WASB source-frame qualification below 0.8 or undefined")
 
