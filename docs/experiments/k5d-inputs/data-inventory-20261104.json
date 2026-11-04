@@ -1,0 +1,1271 @@
+{
+  "date": "2026-11-04",
+  "scope": "Read-only inventory of TrackNet games 8–10; 240-frame feasibility, not a sample selection or evidence of independent confirmation",
+  "method": "Attended read-only SSH gpu6, Python standard-library zip central directory and 30 Label.csv entries; no images decoded, inference, encodes, or archive extraction. Counts are whole clips, not 240-frame windows. Matching image count alone does not establish exact filename alignment.",
+  "archive": {
+    "path": "/home/itec/emanuele/Datasets/TrackNet/Dataset.zip",
+    "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+    "sha256_source": "existing immutable dataset manifest, not recomputed",
+    "manifest": "/home/itec/emanuele/Datasets/manifests/TrackNet.json",
+    "manifest_sha256": "591351e70097b811d06cd6e6d0c24a88122cc05c0e6726db72fda409238ca87b",
+    "storage": "JPEG frames only; no full source video in release; archive hash identifies full images collectively; individual JPEG hashes not verified",
+    "source": "https://nol.cs.nctu.edu.tw/ndo3je6av9/",
+    "source_access": "official host and original Drive link unreachable in 2026-10-05 manifest; mirror https://drive.google.com/drive/folders/11r0RUaQHX7I3ANkaYG4jOxXK1OYo01Ut",
+    "paper": "https://arxiv.org/abs/1907.03698",
+    "license": "No licence stated in released Readme.docx, according to existing dataset manifest; broadcast footage rights unresolved."
+  },
+  "visibility": {
+    "0": "out of frame; no-ball x/y/status fields blank in inspected rows",
+    "1": "easy visible",
+    "2": "hard visible",
+    "3": "occluded; exclude from visible recall and no-ball false positives unless separately specified"
+  },
+  "exposure": {
+    "wasb_training": "Games 1–7 train and 8–10 test per pinned author configuration, not independently audited checkpoint training logs. docs/experiments/k5c-inputs/wasb-reported-split-provenance.json",
+    "wasb_checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+    "author_configuration": "https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/src/configs/dataset/tennis.yaml",
+    "prior_tracker_selection": "All 30 games 8–10 clips scored by K5b tracker comparison, job 20261020T214833Z-bf224666; all 30 also used in CRF62 probe 20261020T220308Z-436c3db3. docs/experiments/k5b.md. No clip qualifies as previously unscored or fully selection-naive.",
+    "other_known_exposure": "game8/Clip6 first 48 frames K5c development; game10/Clip10 and game3/Clip3, game3/Clip6, game7/Clip2 K5b development. Historical exposure beyond documented records remains unknown."
+  },
+  "independence": "Manifest describes 10 broadcast videos, one game directory per video. Whether game8, game9 and game10 are distinct matches, players, venues, or broadcasts from the same match is not established. Clips within a game are not independent matches.",
+  "eligibility": "Nine clips have at least 240 label rows and 240 JPEG entries. Feasible for clip-disjoint pilot and confirmation only under disclosed prior exposure; no statistically unseen confirmation established. All nine have fewer than 480 rows except game10/Clip12. Nonoverlap between samples requires explicit frozen frame ranges; no ranges selected here. Whole-clip counts do not guarantee each 240-frame window has every class.",
+  "clips_at_least_240": [
+    {
+      "game": "game8",
+      "clip": "Clip3",
+      "label_rows": 413,
+      "jpg_entries": 413,
+      "visibility_counts": {
+        "0": 30,
+        "1": 326,
+        "2": 57,
+        "3": 0
+      },
+      "label_sha256": "d58cc7c6c5fe8bbe089f6c8b8206b44e719b5435df0e25e2b8c8cd57eca26227",
+      "archive_label_path": "Dataset/game8/Clip3/Label.csv"
+    },
+    {
+      "game": "game8",
+      "clip": "Clip7",
+      "label_rows": 422,
+      "jpg_entries": 422,
+      "visibility_counts": {
+        "0": 0,
+        "1": 378,
+        "2": 44,
+        "3": 0
+      },
+      "label_sha256": "a011ccbba5f1e3dc606e93b041740c135adf8543b2c76602352eb9c5a08c4007",
+      "archive_label_path": "Dataset/game8/Clip7/Label.csv"
+    },
+    {
+      "game": "game8",
+      "clip": "Clip8",
+      "label_rows": 319,
+      "jpg_entries": 319,
+      "visibility_counts": {
+        "0": 0,
+        "1": 259,
+        "2": 60,
+        "3": 0
+      },
+      "label_sha256": "b9befae816b4eb8ddbf6e23cfe3079f5475a6d4b846eebb5b8c61ec86088cf24",
+      "archive_label_path": "Dataset/game8/Clip8/Label.csv"
+    },
+    {
+      "game": "game9",
+      "clip": "Clip2",
+      "label_rows": 258,
+      "jpg_entries": 258,
+      "visibility_counts": {
+        "0": 0,
+        "1": 241,
+        "2": 17,
+        "3": 0
+      },
+      "label_sha256": "d03560ab232440559b4a9cac0e92704819a84266f3ab409493e96a87a122c747",
+      "archive_label_path": "Dataset/game9/Clip2/Label.csv"
+    },
+    {
+      "game": "game9",
+      "clip": "Clip3",
+      "label_rows": 359,
+      "jpg_entries": 359,
+      "visibility_counts": {
+        "0": 0,
+        "1": 336,
+        "2": 19,
+        "3": 4
+      },
+      "label_sha256": "263646618611a1bfe0d5be96a4996f7a107490a45c88ac6acdf1405ddad6b7ac",
+      "archive_label_path": "Dataset/game9/Clip3/Label.csv"
+    },
+    {
+      "game": "game9",
+      "clip": "Clip5",
+      "label_rows": 292,
+      "jpg_entries": 292,
+      "visibility_counts": {
+        "0": 30,
+        "1": 242,
+        "2": 19,
+        "3": 1
+      },
+      "label_sha256": "ba554e5aa090948a0211c98bfbbe8429e6318322328ffaebd1de0bf31d290814",
+      "archive_label_path": "Dataset/game9/Clip5/Label.csv"
+    },
+    {
+      "game": "game10",
+      "clip": "Clip1",
+      "label_rows": 316,
+      "jpg_entries": 316,
+      "visibility_counts": {
+        "0": 0,
+        "1": 298,
+        "2": 18,
+        "3": 0
+      },
+      "label_sha256": "7024bae805e8ca189c9bc0f1e7a93aaf400dba6ebb9b624af3b2d7661b12c0a6",
+      "archive_label_path": "Dataset/game10/Clip1/Label.csv"
+    },
+    {
+      "game": "game10",
+      "clip": "Clip6",
+      "label_rows": 292,
+      "jpg_entries": 292,
+      "visibility_counts": {
+        "0": 0,
+        "1": 276,
+        "2": 16,
+        "3": 0
+      },
+      "label_sha256": "80392a96ad0a26e94fe7e46b37c183ccc346fd0bac6eaa163a34d5e0f931411b",
+      "archive_label_path": "Dataset/game10/Clip6/Label.csv"
+    },
+    {
+      "game": "game10",
+      "clip": "Clip12",
+      "label_rows": 586,
+      "jpg_entries": 586,
+      "visibility_counts": {
+        "0": 5,
+        "1": 506,
+        "2": 75,
+        "3": 0
+      },
+      "label_sha256": "6bef9b5048eec4f7bfff53725d152deb43e00ee189e48fb006347b99a07d7236",
+      "archive_label_path": "Dataset/game10/Clip12/Label.csv"
+    }
+  ],
+  "external_candidates": {
+    "OpenTTGames": {
+      "source": {
+        "name": "OpenTTGames",
+        "homepage": "https://lab.osai.ai/",
+        "urls": [
+          "https://lab.osai.ai/datasets/openttgames/data/{game_1..game_5,test_1..test_7}.{mp4,zip}"
+        ],
+        "licence": "CC BY-NC-SA 4.0",
+        "access": "public direct download, no registration",
+        "citation": "Voeikov et al., TTNet: Real-time temporal and spatial video analysis of table tennis, CVPRW 2020"
+      },
+      "label_format": {
+        "ball_markup.json": "{frame: {x, y}} in 1920x1080 pixels; (-1, -1) = ball absent",
+        "events_markup.json": "{frame: bounce | net | empty_event}",
+        "segmentation_masks/<frame>.png": "RGB PNG, one binary channel each: R=table, G=human, B=scoreboard (verified visually); stored at 320x128, i.e. downscaled 6x horizontally and 8.4x vertically from 1920x1080, so edges are blocky when upsampled",
+        "mask_provenance": "model_aided (per the OpenTTGames page)"
+      },
+      "per_video": {
+        "game_1": {
+          "split": "train",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "738.325000",
+            "nb_frames": "88599"
+          },
+          "frames": 88599,
+          "ball_labelled_frames": 6799,
+          "ball_visible_frames": 6723,
+          "mask_frames": 6799,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.0767,
+          "labelled_run_length": {
+            "n": 483,
+            "min": 1,
+            "median": 17.0,
+            "max": 43
+          },
+          "events": {
+            "bounce": 227,
+            "net": 182,
+            "empty_event": 195
+          },
+          "mask_sizes_sampled": {
+            "320x128": 68
+          }
+        },
+        "game_2": {
+          "split": "train",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "1435.000000",
+            "nb_frames": "172200"
+          },
+          "frames": 172200,
+          "ball_labelled_frames": 17444,
+          "ball_visible_frames": 17277,
+          "mask_frames": 17444,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.1013,
+          "labelled_run_length": {
+            "n": 1337,
+            "min": 1,
+            "median": 17.0,
+            "max": 34
+          },
+          "events": {
+            "empty_event": 536,
+            "bounce": 591,
+            "net": 430
+          },
+          "mask_sizes_sampled": {
+            "320x128": 175
+          }
+        },
+        "game_3": {
+          "split": "train",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "618.000000",
+            "nb_frames": "74160"
+          },
+          "frames": 74160,
+          "ball_labelled_frames": 7275,
+          "ball_visible_frames": 7162,
+          "mask_frames": 7275,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.0981,
+          "labelled_run_length": {
+            "n": 531,
+            "min": 1,
+            "median": 17.0,
+            "max": 34
+          },
+          "events": {
+            "bounce": 240,
+            "empty_event": 173,
+            "net": 187
+          },
+          "mask_sizes_sampled": {
+            "320x128": 73
+          }
+        },
+        "game_4": {
+          "split": "train",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "526.000000",
+            "nb_frames": "63120"
+          },
+          "frames": 63120,
+          "ball_labelled_frames": 7073,
+          "ball_visible_frames": 6972,
+          "mask_frames": 7073,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.1121,
+          "labelled_run_length": {
+            "n": 525,
+            "min": 1,
+            "median": 17.0,
+            "max": 34
+          },
+          "events": {
+            "empty_event": 176,
+            "bounce": 231,
+            "net": 187
+          },
+          "mask_sizes_sampled": {
+            "320x128": 71
+          }
+        },
+        "game_5": {
+          "split": "train",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "1200.000000",
+            "nb_frames": "144000"
+          },
+          "frames": 144000,
+          "ball_labelled_frames": 7406,
+          "ball_visible_frames": 7061,
+          "mask_frames": 7406,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.0514,
+          "labelled_run_length": {
+            "n": 381,
+            "min": 17,
+            "median": 17.0,
+            "max": 34
+          },
+          "events": {
+            "bounce": 248,
+            "net": 184,
+            "empty_event": 19
+          },
+          "mask_sizes_sampled": {
+            "320x128": 75
+          }
+        },
+        "test_1": {
+          "split": "test",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "140.000000",
+            "nb_frames": "16800"
+          },
+          "frames": 16800,
+          "ball_labelled_frames": 887,
+          "ball_visible_frames": 881,
+          "mask_frames": 887,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.0528,
+          "labelled_run_length": {
+            "n": 39,
+            "min": 17,
+            "median": 17.0,
+            "max": 33
+          },
+          "events": {
+            "bounce": 31,
+            "net": 24,
+            "empty_event": 1
+          },
+          "mask_sizes_sampled": {
+            "320x128": 9
+          }
+        },
+        "test_2": {
+          "split": "test",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "30.000000",
+            "nb_frames": "3600"
+          },
+          "frames": 3600,
+          "ball_labelled_frames": 779,
+          "ball_visible_frames": 773,
+          "mask_frames": 779,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.2164,
+          "labelled_run_length": {
+            "n": 36,
+            "min": 17,
+            "median": 17.0,
+            "max": 34
+          },
+          "events": {
+            "net": 21,
+            "bounce": 28,
+            "empty_event": 1
+          },
+          "mask_sizes_sampled": {
+            "320x128": 8
+          }
+        },
+        "test_3": {
+          "split": "test",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "65.000000",
+            "nb_frames": "7800"
+          },
+          "frames": 7800,
+          "ball_labelled_frames": 805,
+          "ball_visible_frames": 799,
+          "mask_frames": 805,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.1032,
+          "labelled_run_length": {
+            "n": 46,
+            "min": 1,
+            "median": 17.0,
+            "max": 32
+          },
+          "events": {
+            "bounce": 31,
+            "empty_event": 6,
+            "net": 18
+          },
+          "mask_sizes_sampled": {
+            "320x128": 9
+          }
+        },
+        "test_4": {
+          "split": "test",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "300.000000",
+            "nb_frames": "36000"
+          },
+          "frames": 36000,
+          "ball_labelled_frames": 1319,
+          "ball_visible_frames": 1305,
+          "mask_frames": 1319,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.0366,
+          "labelled_run_length": {
+            "n": 95,
+            "min": 1,
+            "median": 17.0,
+            "max": 33
+          },
+          "events": {
+            "empty_event": 29,
+            "bounce": 46,
+            "net": 29
+          },
+          "mask_sizes_sampled": {
+            "320x128": 14
+          }
+        },
+        "test_5": {
+          "split": "test",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "96.000000",
+            "nb_frames": "11520"
+          },
+          "frames": 11520,
+          "ball_labelled_frames": 1018,
+          "ball_visible_frames": 1008,
+          "mask_frames": 1018,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.0884,
+          "labelled_run_length": {
+            "n": 62,
+            "min": 1,
+            "median": 17.0,
+            "max": 33
+          },
+          "events": {
+            "bounce": 34,
+            "net": 26,
+            "empty_event": 5
+          },
+          "mask_sizes_sampled": {
+            "320x128": 11
+          }
+        },
+        "test_6": {
+          "split": "test",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "90.000000",
+            "nb_frames": "10800"
+          },
+          "frames": 10800,
+          "ball_labelled_frames": 1308,
+          "ball_visible_frames": 1300,
+          "mask_frames": 1308,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.1211,
+          "labelled_run_length": {
+            "n": 66,
+            "min": 17,
+            "median": 17.0,
+            "max": 34
+          },
+          "events": {
+            "bounce": 41,
+            "net": 38,
+            "empty_event": 1
+          },
+          "mask_sizes_sampled": {
+            "320x128": 14
+          }
+        },
+        "test_7": {
+          "split": "test",
+          "video": {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "avg_frame_rate": "120/1",
+            "duration": "130.000000",
+            "nb_frames": "15600"
+          },
+          "frames": 15600,
+          "ball_labelled_frames": 874,
+          "ball_visible_frames": 770,
+          "mask_frames": 874,
+          "mask_frames_equal_ball_frames": true,
+          "labelled_fraction": 0.056,
+          "labelled_run_length": {
+            "n": 41,
+            "min": 17,
+            "median": 17.0,
+            "max": 33
+          },
+          "events": {
+            "bounce": 29,
+            "net": 24,
+            "empty_event": 2
+          },
+          "mask_sizes_sampled": {
+            "320x128": 9
+          }
+        }
+      },
+      "files": [
+        {
+          "path": "raw/game_1.mp4",
+          "bytes": 5572649632,
+          "sha256": "1297b3db91f2e3e160337643695dff07eabf9785ea2d88c2f7b59687ba511148",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/game_1.zip",
+          "bytes": 8083590,
+          "sha256": "a4109881b1e848340bced411a2da5b21de3794ebcb52454e50443fe3ce2d345c",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/game_2.mp4",
+          "bytes": 10833064677,
+          "sha256": "330ac07730bae6d899dbbbd00ad43500c583e6af6ea6dd261565bc77811eba66",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/game_2.zip",
+          "bytes": 19379792,
+          "sha256": "c716a3fc89f0084b8477b8a96a89204828e0d6d165b052962fd3ba7b244bcbe7",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/game_3.mp4",
+          "bytes": 4637044123,
+          "sha256": "e0f6a1ddbb838ac6acc67fb50f763728b589ec8f8cb7ababd9fa95f13c853e49",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/game_3.zip",
+          "bytes": 8881415,
+          "sha256": "1e2820e3b0e20b88fe30f2abe4447ed400a0eb51deed925b1335dfb655a92045",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/game_4.mp4",
+          "bytes": 3947371986,
+          "sha256": "ddb2bc49915a99db46702825ff322759faa9205c846a1ba902419e38c1e23b39",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/game_4.zip",
+          "bytes": 8046734,
+          "sha256": "cfa9b066a177f3d822460963b52bf454ca877435e5f454f0e512343f61d2c8cb",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/game_5.mp4",
+          "bytes": 4493632417,
+          "sha256": "4b90df6712356ba8184af2b9a23ba6cb00a5f048a8a5af0ff2e12cbb54cd8958",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/game_5.zip",
+          "bytes": 9421708,
+          "sha256": "7f5dfedcb2e381a4ec9809418f346260135e3ec39b56f64ca5cd1325967a3671",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/test_1.mp4",
+          "bytes": 1050070368,
+          "sha256": "373f0a6926c7edb51eb70119f020afc30beabd140dc5f9cc454f0c7848406bb2",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/test_1.zip",
+          "bytes": 1027632,
+          "sha256": "7dca7b6614d51b136209b18d3acf6f26cb06bf59ca05189e587ab7a57762bb51",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/test_2.mp4",
+          "bytes": 225118372,
+          "sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/test_2.zip",
+          "bytes": 897976,
+          "sha256": "c692014ca9074d331700385e4c0b5e0bd32968123bf001fe8b1c9b2e64ac142d",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/test_3.mp4",
+          "bytes": 487941402,
+          "sha256": "48179df05a7a816d1b44b142fbc1ff604e6094aad7a4b13cd013f0c2447a2daf",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/test_3.zip",
+          "bytes": 887364,
+          "sha256": "74d94c27ac3c6cf1c6b5ff722ffe87f734b0c11f95179720cb70ffaac1511c67",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/test_4.mp4",
+          "bytes": 2250582415,
+          "sha256": "c941fb0862daf47dbb8afc62117c21a921f649a7fdeee94fe5c16f9f2839be6d",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/test_4.zip",
+          "bytes": 1458322,
+          "sha256": "3022d7aeb14d913f8fb0a26d1e1a2cfab067e315591962b39ea15f85867a9e2a",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/test_5.mp4",
+          "bytes": 720160846,
+          "sha256": "2c4652738a07102db7428b31003784532117dc9619c5fa1cca80c60639cc233d",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/test_5.zip",
+          "bytes": 1181893,
+          "sha256": "d97d7e985ab05d46a922581106adf12a9b85d3cf91730a818fe44137561ad5ac",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/test_6.mp4",
+          "bytes": 675731698,
+          "sha256": "ae37928612d8c5652677d468a8feb2669aff0afe8cfc1b1a642cc6ba5b811c29",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/test_6.zip",
+          "bytes": 1384414,
+          "sha256": "3971e3c3c2c8ebe5c123f1a79fc7629a53950096784b24d11f5c8796ac1e0fc4",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "raw/test_7.mp4",
+          "bytes": 488378737,
+          "sha256": "f2f54e4ce0c23a50d119fa2fdae552cb277d31f7e3e5a61c8fd3c40ef064399e",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "raw/test_7.zip",
+          "bytes": 1019841,
+          "sha256": "f26f8f2475eef4646e35a4fb4049eb3a47e10759e5abb0eef0f7b837110d40d5",
+          "sha256_source": "computed_from_host_local_copy"
+        }
+      ],
+      "limitations": [
+        "Labels are event-centered; consecutive labelled runs peak at 43 frames. Complete 240-frame encoding contexts remain possible, but score only GT-labeled frames and never treat unlabeled frames as negatives.",
+        "Previously used all seven test videos for background motion measurement, G1e, not established as ball-scored or pristine. Prior exposure beyond searched records unknown.",
+        "Table-tennis domain differs from WASB tennis checkpoint. WASB table-tennis checkpoint presence and exact split provenance not established; do not assume qualification.",
+        "Individual source dates/match identities and relation to other table-tennis data unverified."
+      ],
+      "analysis_protocol": "Complete 240-frame contexts can be encoded; score only explicitly labeled ground truth and count negatives only where coordinates are (-1,-1). Unlabeled frame state unknown. Exact context frame IDs and per-context class counts must be frozen and verified before use.",
+      "wasb_table_tennis": "No table-tennis dataset or checkpoint appears in the pinned WASB author GET_STARTED; attempted src/configs/dataset/tabletennis.yaml is 404. No OpenTTGames training split/checkpoint provenance established. https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/GET_STARTED.md",
+      "test_counts": {
+        "test_1": {
+          "frames": 16800,
+          "labeled": 887,
+          "visible": 881,
+          "explicit_absent": 6,
+          "unlabeled": 15913
+        },
+        "test_2": {
+          "frames": 3600,
+          "labeled": 779,
+          "visible": 773,
+          "explicit_absent": 6,
+          "unlabeled": 2821
+        },
+        "test_3": {
+          "frames": 7800,
+          "labeled": 805,
+          "visible": 799,
+          "explicit_absent": 6,
+          "unlabeled": 6995
+        },
+        "test_4": {
+          "frames": 36000,
+          "labeled": 1319,
+          "visible": 1305,
+          "explicit_absent": 14,
+          "unlabeled": 34681
+        },
+        "test_5": {
+          "frames": 11520,
+          "labeled": 1018,
+          "visible": 1008,
+          "explicit_absent": 10,
+          "unlabeled": 10502
+        },
+        "test_6": {
+          "frames": 10800,
+          "labeled": 1308,
+          "visible": 1300,
+          "explicit_absent": 8,
+          "unlabeled": 9492
+        },
+        "test_7": {
+          "frames": 15600,
+          "labeled": 874,
+          "visible": 770,
+          "explicit_absent": 104,
+          "unlabeled": 14726
+        }
+      }
+    },
+    "RacketVision": {
+      "source": {
+        "name": "RacketVision",
+        "homepage": "https://github.com/OrcustD/RacketVision",
+        "urls": [
+          "https://huggingface.co/datasets/linfeng302/RacketVision"
+        ],
+        "licence": "MIT (Hugging Face dataset card)",
+        "access": "public Hugging Face dataset, not gated",
+        "citation": "RacketVision: A Multiple Racket Sports Benchmark for Unified Ball and Racket Analysis, AAAI 2026 (arXiv:2511.17045)"
+      },
+      "label_format": {
+        "<sport>/all/<match>/csv/<rally>_ball.csv": "Frame,Visibility,X,Y (0-indexed frame, 1920x1080 px); sparse rows",
+        "<sport>/all/<match>/racket/<rally>/<frame>.json": "list of {bbox_xywh, keypoints[5][x,y,vis]}; keypoints top,bottom,handle,left,right",
+        "info/*_det_coco.json, *_pose_coco.json": "COCO detection (3 racket categories) and pose (1 category, 5 keypoints)",
+        "<sport>/interp_ball, merged_racket": "interpolated ball trajectories and merged racket predictions (not ground truth)",
+        "data_traj/*.pkl": "pre-built trajectory-forecast sets"
+      },
+      "per_sport": {
+        "badminton": {
+          "clips": 461,
+          "frames": 114753,
+          "resolution": {
+            "1920x1080": 461
+          },
+          "fps": {
+            "25/1": 457,
+            "24000/1001": 4
+          },
+          "ball_labelled_frames": 23003,
+          "ball_visible": 19822,
+          "ball_labelled_fraction": 0.2005,
+          "racket_labelled_frames": 10598,
+          "racket_instances": 13969,
+          "racket_labelled_fraction": 0.0924,
+          "splits": {
+            "train": 374,
+            "val": 41,
+            "test": 46
+          }
+        },
+        "tabletennis": {
+          "clips": 780,
+          "frames": 170027,
+          "resolution": {
+            "1920x1080": 780
+          },
+          "fps": {
+            "60/1": 201,
+            "25/1": 209,
+            "60000/1001": 67,
+            "30/1": 112,
+            "50/1": 191
+          },
+          "ball_labelled_frames": 19495,
+          "ball_visible": 16961,
+          "ball_labelled_fraction": 0.1147,
+          "racket_labelled_frames": 6650,
+          "racket_instances": 8062,
+          "racket_labelled_fraction": 0.0391,
+          "splits": {
+            "train": 625,
+            "val": 69,
+            "test": 86
+          }
+        },
+        "tennis": {
+          "clips": 431,
+          "frames": 150399,
+          "resolution": {
+            "1920x1080": 431
+          },
+          "fps": {
+            "25/1": 279,
+            "30000/1001": 30,
+            "60/1": 119,
+            "30/1": 2,
+            "50/1": 1
+          },
+          "ball_labelled_frames": 21544,
+          "ball_visible": 20066,
+          "ball_labelled_fraction": 0.1432,
+          "racket_labelled_frames": 7395,
+          "racket_instances": 8286,
+          "racket_labelled_fraction": 0.0492,
+          "splits": {
+            "train": 350,
+            "val": 38,
+            "test": 43
+          }
+        }
+      },
+      "hf_revision": "85157ca21faa2abca96d837dd2b963738029bcc8",
+      "files": [
+        {
+          "path": ".gitattributes",
+          "bytes": 2761,
+          "sha256": "9fc66cd2b357d5bf235c9513be0c75d57ef2487fd591eababfe6509dc6f51e8a",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "README.md",
+          "bytes": 8166,
+          "sha256": "2e72cdc76e71ebd97e156a69f8c50eb7c3da917c87a02c548d64d3b1347ac32b",
+          "sha256_source": "computed_from_stored_file"
+        },
+        {
+          "path": "annotations.tar",
+          "bytes": 33290240,
+          "sha256": "e4930845160fbe7a4928437c2cc3f3bd15a6b0666f1e3af6f5d54056a9e3db1e",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "badminton.tar",
+          "bytes": 1861713920,
+          "sha256": "1442d215c8dc31787e2a60a290470f5c4072c8d5a2b594d4f853c8399da8ca30",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "data_traj.tar",
+          "bytes": 999628800,
+          "sha256": "32ba3b2f2283f933f6ccd4028b0d51629781131428b7763c19da91ebdf00cb0f",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "info.tar",
+          "bytes": 73707520,
+          "sha256": "9f81ea2f696eb50a3e9aa00ce421439ebd4172ef1956d3fff91c0d497722ea9d",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "tabletennis.tar",
+          "bytes": 2595962880,
+          "sha256": "e5f682e08799181ef5f6dc6984863ab1b137071c9f0f22e102eb85a5176e24ff",
+          "sha256_source": "computed_from_host_local_copy"
+        },
+        {
+          "path": "tennis.tar",
+          "bytes": 2009118720,
+          "sha256": "9b1ea8c4ae91ac17b60970031e30cd7b0eb33936df944837a5a924d02d6a3820",
+          "sha256_source": "computed_from_host_local_copy"
+        }
+      ],
+      "limitations": [
+        "Tennis test 43 rallies were scored in K5b tracker selection by jobs 20261020T220058Z-fc8980da, 20261020T214901Z-0d339486, 20261020T214907Z-eefaac4b; train and validation selection exposure unknown.",
+        "BallTrack checkpoint documented as trained on RacketVision; WASB tennis configuration names TrackNet games 1–7 but source broadcast overlap with RacketVision not independently excluded.",
+        "Sparse per-rally ground-truth CSV rows only; unlabeled frames unknown, never negatives. Interpolated tracks are not ground truth.",
+        "Anonymous match/rally IDs do not prove event, date, or source identity; no 240-frame clip inventory or source-level disjointness verified."
+      ]
+    }
+  },
+  "tracknet_games_8_9_10_all_clips": [
+    {
+      "label": "Dataset/game10/Clip1/Label.csv",
+      "label_rows": 316,
+      "visibility_counts": {
+        "0": 0,
+        "1": 298,
+        "2": 18,
+        "3": 0
+      },
+      "label_sha256": "7024bae805e8ca189c9bc0f1e7a93aaf400dba6ebb9b624af3b2d7661b12c0a6",
+      "jpg_entries": 316
+    },
+    {
+      "label": "Dataset/game10/Clip10/Label.csv",
+      "label_rows": 166,
+      "visibility_counts": {
+        "0": 0,
+        "1": 158,
+        "2": 8,
+        "3": 0
+      },
+      "label_sha256": "23f99b55d68c17ef2accfa933f1776519562f34aa832184c03ac8e752e4b8a2e",
+      "jpg_entries": 166
+    },
+    {
+      "label": "Dataset/game10/Clip11/Label.csv",
+      "label_rows": 80,
+      "visibility_counts": {
+        "0": 41,
+        "1": 32,
+        "2": 7,
+        "3": 0
+      },
+      "label_sha256": "1f0963a50c0522ffc5f3d05b29eed4e36cbbd03d47cc949309c82ed46cade6fc",
+      "jpg_entries": 80
+    },
+    {
+      "label": "Dataset/game10/Clip12/Label.csv",
+      "label_rows": 586,
+      "visibility_counts": {
+        "0": 5,
+        "1": 506,
+        "2": 75,
+        "3": 0
+      },
+      "label_sha256": "6bef9b5048eec4f7bfff53725d152deb43e00ee189e48fb006347b99a07d7236",
+      "jpg_entries": 586
+    },
+    {
+      "label": "Dataset/game10/Clip2/Label.csv",
+      "label_rows": 132,
+      "visibility_counts": {
+        "0": 0,
+        "1": 126,
+        "2": 6,
+        "3": 0
+      },
+      "label_sha256": "dda09f31cb40877fcc8173dcdac36577e1a954924851b360b2ada22fe4fe7fe1",
+      "jpg_entries": 132
+    },
+    {
+      "label": "Dataset/game10/Clip3/Label.csv",
+      "label_rows": 188,
+      "visibility_counts": {
+        "0": 0,
+        "1": 180,
+        "2": 8,
+        "3": 0
+      },
+      "label_sha256": "247c81967bfb05b53f2b65c0a691a7f14c98802ca93c95a68298b2244b5ba72f",
+      "jpg_entries": 188
+    },
+    {
+      "label": "Dataset/game10/Clip4/Label.csv",
+      "label_rows": 47,
+      "visibility_counts": {
+        "0": 0,
+        "1": 45,
+        "2": 2,
+        "3": 0
+      },
+      "label_sha256": "16a92bcee1d07e72ee237beac47d9b71ba41b21cad7c748abad272be84789d70",
+      "jpg_entries": 47
+    },
+    {
+      "label": "Dataset/game10/Clip5/Label.csv",
+      "label_rows": 65,
+      "visibility_counts": {
+        "0": 0,
+        "1": 64,
+        "2": 1,
+        "3": 0
+      },
+      "label_sha256": "1bcc55917cf54ab512e571e3e9b938b61d58f947a016b7cabf5a634345ba3b88",
+      "jpg_entries": 65
+    },
+    {
+      "label": "Dataset/game10/Clip6/Label.csv",
+      "label_rows": 292,
+      "visibility_counts": {
+        "0": 0,
+        "1": 276,
+        "2": 16,
+        "3": 0
+      },
+      "label_sha256": "80392a96ad0a26e94fe7e46b37c183ccc346fd0bac6eaa163a34d5e0f931411b",
+      "jpg_entries": 292
+    },
+    {
+      "label": "Dataset/game10/Clip7/Label.csv",
+      "label_rows": 142,
+      "visibility_counts": {
+        "0": 0,
+        "1": 117,
+        "2": 25,
+        "3": 0
+      },
+      "label_sha256": "f1311e9445336612fff4fcbc76a7722bdf51b13d491d49c2940afcad02d6f6ae",
+      "jpg_entries": 142
+    },
+    {
+      "label": "Dataset/game10/Clip8/Label.csv",
+      "label_rows": 81,
+      "visibility_counts": {
+        "0": 16,
+        "1": 51,
+        "2": 13,
+        "3": 1
+      },
+      "label_sha256": "f4d10e534e71e9ab6092811e92470b6b726a06a4ff244bc3eda8acf6f3844a71",
+      "jpg_entries": 81
+    },
+    {
+      "label": "Dataset/game10/Clip9/Label.csv",
+      "label_rows": 49,
+      "visibility_counts": {
+        "0": 0,
+        "1": 44,
+        "2": 5,
+        "3": 0
+      },
+      "label_sha256": "18fdff27c5f2923b4e317b6db6e05f35458169bfa8fc7b6711faef660b5161e3",
+      "jpg_entries": 49
+    },
+    {
+      "label": "Dataset/game8/Clip1/Label.csv",
+      "label_rows": 118,
+      "visibility_counts": {
+        "0": 0,
+        "1": 107,
+        "2": 11,
+        "3": 0
+      },
+      "label_sha256": "e3e0e3fb4531a9b6bab67197db57f2252e6a4a05114f08030f5081675c7a0079",
+      "jpg_entries": 118
+    },
+    {
+      "label": "Dataset/game8/Clip2/Label.csv",
+      "label_rows": 97,
+      "visibility_counts": {
+        "0": 2,
+        "1": 86,
+        "2": 9,
+        "3": 0
+      },
+      "label_sha256": "e4f8e48ba6e75c71939f47f2391d7dc57a1f7776aa98e9d4318540d7f9d8c419",
+      "jpg_entries": 97
+    },
+    {
+      "label": "Dataset/game8/Clip3/Label.csv",
+      "label_rows": 413,
+      "visibility_counts": {
+        "0": 30,
+        "1": 326,
+        "2": 57,
+        "3": 0
+      },
+      "label_sha256": "d58cc7c6c5fe8bbe089f6c8b8206b44e719b5435df0e25e2b8c8cd57eca26227",
+      "jpg_entries": 413
+    },
+    {
+      "label": "Dataset/game8/Clip4/Label.csv",
+      "label_rows": 133,
+      "visibility_counts": {
+        "0": 0,
+        "1": 124,
+        "2": 9,
+        "3": 0
+      },
+      "label_sha256": "ca64094c5800854e358382dd07e408d9276bbefae4b537d7965f00ee64edb7dd",
+      "jpg_entries": 133
+    },
+    {
+      "label": "Dataset/game8/Clip5/Label.csv",
+      "label_rows": 87,
+      "visibility_counts": {
+        "0": 8,
+        "1": 68,
+        "2": 11,
+        "3": 0
+      },
+      "label_sha256": "5c2e414b233eb8a1db59f3b41dd8242084ac8e2d4e81d60c704dd182d46eb41a",
+      "jpg_entries": 87
+    },
+    {
+      "label": "Dataset/game8/Clip6/Label.csv",
+      "label_rows": 131,
+      "visibility_counts": {
+        "0": 65,
+        "1": 54,
+        "2": 12,
+        "3": 0
+      },
+      "label_sha256": "c8ec96ec7caf5d26470d3d71faf40e7b572c579505f8114df003dc28b24b82e0",
+      "jpg_entries": 131
+    },
+    {
+      "label": "Dataset/game8/Clip7/Label.csv",
+      "label_rows": 422,
+      "visibility_counts": {
+        "0": 0,
+        "1": 378,
+        "2": 44,
+        "3": 0
+      },
+      "label_sha256": "a011ccbba5f1e3dc606e93b041740c135adf8543b2c76602352eb9c5a08c4007",
+      "jpg_entries": 422
+    },
+    {
+      "label": "Dataset/game8/Clip8/Label.csv",
+      "label_rows": 319,
+      "visibility_counts": {
+        "0": 0,
+        "1": 259,
+        "2": 60,
+        "3": 0
+      },
+      "label_sha256": "b9befae816b4eb8ddbf6e23cfe3079f5475a6d4b846eebb5b8c61ec86088cf24",
+      "jpg_entries": 319
+    },
+    {
+      "label": "Dataset/game8/Clip9/Label.csv",
+      "label_rows": 238,
+      "visibility_counts": {
+        "0": 0,
+        "1": 206,
+        "2": 32,
+        "3": 0
+      },
+      "label_sha256": "854c326df3e4eca5e44cc5b7422ae5458f0d8763127604fdb6b728f0db27c58a",
+      "jpg_entries": 238
+    },
+    {
+      "label": "Dataset/game9/Clip1/Label.csv",
+      "label_rows": 83,
+      "visibility_counts": {
+        "0": 0,
+        "1": 79,
+        "2": 4,
+        "3": 0
+      },
+      "label_sha256": "fc1fe57a38f17eeb9c16fb01c9e11ae037fa445014e038c3ffacb07f730f833a",
+      "jpg_entries": 83
+    },
+    {
+      "label": "Dataset/game9/Clip2/Label.csv",
+      "label_rows": 258,
+      "visibility_counts": {
+        "0": 0,
+        "1": 241,
+        "2": 17,
+        "3": 0
+      },
+      "label_sha256": "d03560ab232440559b4a9cac0e92704819a84266f3ab409493e96a87a122c747",
+      "jpg_entries": 258
+    },
+    {
+      "label": "Dataset/game9/Clip3/Label.csv",
+      "label_rows": 359,
+      "visibility_counts": {
+        "0": 0,
+        "1": 336,
+        "2": 19,
+        "3": 4
+      },
+      "label_sha256": "263646618611a1bfe0d5be96a4996f7a107490a45c88ac6acdf1405ddad6b7ac",
+      "jpg_entries": 359
+    },
+    {
+      "label": "Dataset/game9/Clip4/Label.csv",
+      "label_rows": 106,
+      "visibility_counts": {
+        "0": 0,
+        "1": 105,
+        "2": 1,
+        "3": 0
+      },
+      "label_sha256": "3ee66fb07bec17de0ceaa48951342599dba563c043eb330b7f9557c508e04828",
+      "jpg_entries": 106
+    },
+    {
+      "label": "Dataset/game9/Clip5/Label.csv",
+      "label_rows": 292,
+      "visibility_counts": {
+        "0": 30,
+        "1": 242,
+        "2": 19,
+        "3": 1
+      },
+      "label_sha256": "ba554e5aa090948a0211c98bfbbe8429e6318322328ffaebd1de0bf31d290814",
+      "jpg_entries": 292
+    },
+    {
+      "label": "Dataset/game9/Clip6/Label.csv",
+      "label_rows": 109,
+      "visibility_counts": {
+        "0": 0,
+        "1": 92,
+        "2": 17,
+        "3": 0
+      },
+      "label_sha256": "50b36a1da5de2b4aa693239b46c0dae30c2e395a0a628f3d39c5b7da1dddb738",
+      "jpg_entries": 109
+    },
+    {
+      "label": "Dataset/game9/Clip7/Label.csv",
+      "label_rows": 87,
+      "visibility_counts": {
+        "0": 0,
+        "1": 80,
+        "2": 7,
+        "3": 0
+      },
+      "label_sha256": "e7baec147da02086cb4a75e6161bd0a536e5e64a2c81f42bd4d75c63075c5b31",
+      "jpg_entries": 87
+    },
+    {
+      "label": "Dataset/game9/Clip8/Label.csv",
+      "label_rows": 56,
+      "visibility_counts": {
+        "0": 0,
+        "1": 52,
+        "2": 4,
+        "3": 0
+      },
+      "label_sha256": "5132b22e4b63dbc78bf299d58878aa4411496314da0aff693e8e7a36205e9745",
+      "jpg_entries": 56
+    },
+    {
+      "label": "Dataset/game9/Clip9/Label.csv",
+      "label_rows": 223,
+      "visibility_counts": {
+        "0": 0,
+        "1": 218,
+        "2": 5,
+        "3": 0
+      },
+      "label_sha256": "4a52bc5fa6b5f7dbbed6b81e9672b4f8b7e141488469ef39c92705e8d9b54b72",
+      "jpg_entries": 223
+    }
+  ]
+}

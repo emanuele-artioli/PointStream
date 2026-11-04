@@ -1,0 +1,557 @@
+{
+  "date": "2026-11-04",
+  "scope": "Read-only recovery of existing K5b records, no new inference or score computation; aggregate arithmetic on recorded counts only. Source records were used in tracker selection and are retrospective.",
+  "frozen_gates": {
+    "per_clip_visible_recall_10px_at_least": 0.8,
+    "negative_minimum_count": 100,
+    "negative_false_rate_maximum": 0.05,
+    "failure_policy": "Report source qualification failures; do not retune thresholds after outcomes."
+  },
+  "source_job": {
+    "id": "20261020T214833Z-bf224666",
+    "source_revision": "7590a774f43563c1075452307a5d01d9fed65782",
+    "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_snapshot_sha256": "b541f48c9325b8dda23a9ba8d3ac2b67475d89f431944440f1ea2bb72bf649ea",
+    "published_tar": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261020T214833Z-bf224666/full/published.tar",
+    "published_tar_sha256": "6d2aed8ebe3b6c55e0e168fecd7237a653dc67f580bcb535d6310c7affc32d38",
+    "members": "30 clip JSONs each contain original per-frame predictions, labels and recorded counts; 32 tar members including directories.",
+    "full_summary": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261020T214833Z-bf224666/full/k5b-trackers.json",
+    "staging": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261020T214833Z-bf224666/full/staging.json",
+    "input_tracknet_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+    "wasb_checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+    "wasb_source_archive_name": "WASB-SBDT-923462c.tar",
+    "wasb_source_archive_sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55",
+    "source_commit_limitation": "Archive name identifies author revision 923462c; archive contents and exact git commit not independently checked in this audit.",
+    "environment_archive_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+    "gpu": "NVIDIA RTX 6000 Ada Generation",
+    "torch": "2.10.0+cu128",
+    "device": "cuda:0",
+    "candidate": "wasb-step1",
+    "aggregate_counts": {
+      "false_on_negative": 10,
+      "far_on_positive": 41,
+      "hit_10px": 5051,
+      "hit_5px": 4984,
+      "negatives": 197,
+      "positives": 5472
+    },
+    "per_clip_gate": {
+      "passed": false,
+      "failing_clips": [
+        {
+          "clip_id": "tracknet/game10/Clip11",
+          "hits": 25,
+          "visible": 39
+        },
+        {
+          "clip_id": "tracknet/game10/Clip8",
+          "hits": 40,
+          "visible": 64
+        },
+        {
+          "clip_id": "tracknet/game9/Clip7",
+          "hits": 69,
+          "visible": 87
+        }
+      ]
+    },
+    "negative_gate": {
+      "passed": false,
+      "false_on_negative": 10,
+      "known_negative": 197,
+      "false_rate": 0.050761421319796954
+    },
+    "per_clip_recorded_counts": [
+      {
+        "id": "tracknet/game10/Clip1",
+        "frames": 316,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 2,
+          "hit_10px": 288,
+          "hit_5px": 287,
+          "negatives": 0,
+          "positives": 316
+        },
+        "detection_rate": 0.9113924050632911,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip1.json"
+      },
+      {
+        "id": "tracknet/game10/Clip10",
+        "frames": 166,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 155,
+          "hit_5px": 155,
+          "negatives": 0,
+          "positives": 166
+        },
+        "detection_rate": 0.9337349397590361,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip10.json"
+      },
+      {
+        "id": "tracknet/game10/Clip11",
+        "frames": 80,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 25,
+          "hit_5px": 25,
+          "negatives": 41,
+          "positives": 39
+        },
+        "detection_rate": 0.6410256410256411,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip11.json"
+      },
+      {
+        "id": "tracknet/game10/Clip12",
+        "frames": 586,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 6,
+          "hit_10px": 520,
+          "hit_5px": 519,
+          "negatives": 5,
+          "positives": 581
+        },
+        "detection_rate": 0.8950086058519794,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip12.json"
+      },
+      {
+        "id": "tracknet/game10/Clip2",
+        "frames": 132,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 127,
+          "hit_5px": 127,
+          "negatives": 0,
+          "positives": 132
+        },
+        "detection_rate": 0.9621212121212122,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip2.json"
+      },
+      {
+        "id": "tracknet/game10/Clip3",
+        "frames": 188,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 2,
+          "hit_10px": 174,
+          "hit_5px": 172,
+          "negatives": 0,
+          "positives": 188
+        },
+        "detection_rate": 0.925531914893617,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip3.json"
+      },
+      {
+        "id": "tracknet/game10/Clip4",
+        "frames": 47,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 46,
+          "hit_5px": 46,
+          "negatives": 0,
+          "positives": 47
+        },
+        "detection_rate": 0.9787234042553191,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip4.json"
+      },
+      {
+        "id": "tracknet/game10/Clip5",
+        "frames": 65,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 60,
+          "hit_5px": 59,
+          "negatives": 0,
+          "positives": 65
+        },
+        "detection_rate": 0.9230769230769231,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip5.json"
+      },
+      {
+        "id": "tracknet/game10/Clip6",
+        "frames": 292,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 1,
+          "hit_10px": 278,
+          "hit_5px": 277,
+          "negatives": 0,
+          "positives": 292
+        },
+        "detection_rate": 0.952054794520548,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip6.json"
+      },
+      {
+        "id": "tracknet/game10/Clip7",
+        "frames": 142,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 1,
+          "hit_10px": 118,
+          "hit_5px": 118,
+          "negatives": 0,
+          "positives": 142
+        },
+        "detection_rate": 0.8309859154929577,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip7.json"
+      },
+      {
+        "id": "tracknet/game10/Clip8",
+        "frames": 81,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 1,
+          "hit_10px": 40,
+          "hit_5px": 39,
+          "negatives": 16,
+          "positives": 64
+        },
+        "detection_rate": 0.625,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip8.json"
+      },
+      {
+        "id": "tracknet/game10/Clip9",
+        "frames": 49,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 47,
+          "hit_5px": 47,
+          "negatives": 0,
+          "positives": 49
+        },
+        "detection_rate": 0.9591836734693877,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game10__Clip9.json"
+      },
+      {
+        "id": "tracknet/game8/Clip1",
+        "frames": 118,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 105,
+          "hit_5px": 105,
+          "negatives": 0,
+          "positives": 118
+        },
+        "detection_rate": 0.8898305084745762,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game8__Clip1.json"
+      },
+      {
+        "id": "tracknet/game8/Clip2",
+        "frames": 97,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 2,
+          "hit_10px": 89,
+          "hit_5px": 86,
+          "negatives": 2,
+          "positives": 95
+        },
+        "detection_rate": 0.9368421052631579,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game8__Clip2.json"
+      },
+      {
+        "id": "tracknet/game8/Clip3",
+        "frames": 413,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 4,
+          "hit_10px": 362,
+          "hit_5px": 360,
+          "negatives": 30,
+          "positives": 383
+        },
+        "detection_rate": 0.9451697127937336,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game8__Clip3.json"
+      },
+      {
+        "id": "tracknet/game8/Clip4",
+        "frames": 133,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 133,
+          "hit_5px": 132,
+          "negatives": 0,
+          "positives": 133
+        },
+        "detection_rate": 1.0,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game8__Clip4.json"
+      },
+      {
+        "id": "tracknet/game8/Clip5",
+        "frames": 87,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 76,
+          "hit_5px": 75,
+          "negatives": 8,
+          "positives": 79
+        },
+        "detection_rate": 0.9620253164556962,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game8__Clip5.json"
+      },
+      {
+        "id": "tracknet/game8/Clip6",
+        "frames": 131,
+        "counts": {
+          "false_on_negative": 8,
+          "far_on_positive": 0,
+          "hit_10px": 62,
+          "hit_5px": 60,
+          "negatives": 65,
+          "positives": 66
+        },
+        "detection_rate": 0.9393939393939394,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game8__Clip6.json"
+      },
+      {
+        "id": "tracknet/game8/Clip7",
+        "frames": 422,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 2,
+          "hit_10px": 405,
+          "hit_5px": 400,
+          "negatives": 0,
+          "positives": 422
+        },
+        "detection_rate": 0.9597156398104265,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game8__Clip7.json"
+      },
+      {
+        "id": "tracknet/game8/Clip8",
+        "frames": 319,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 3,
+          "hit_10px": 296,
+          "hit_5px": 288,
+          "negatives": 0,
+          "positives": 319
+        },
+        "detection_rate": 0.9278996865203761,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game8__Clip8.json"
+      },
+      {
+        "id": "tracknet/game8/Clip9",
+        "frames": 238,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 5,
+          "hit_10px": 226,
+          "hit_5px": 222,
+          "negatives": 0,
+          "positives": 238
+        },
+        "detection_rate": 0.9495798319327731,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game8__Clip9.json"
+      },
+      {
+        "id": "tracknet/game9/Clip1",
+        "frames": 83,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 1,
+          "hit_10px": 77,
+          "hit_5px": 74,
+          "negatives": 0,
+          "positives": 83
+        },
+        "detection_rate": 0.927710843373494,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game9__Clip1.json"
+      },
+      {
+        "id": "tracknet/game9/Clip2",
+        "frames": 258,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 4,
+          "hit_10px": 236,
+          "hit_5px": 231,
+          "negatives": 0,
+          "positives": 258
+        },
+        "detection_rate": 0.9147286821705426,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game9__Clip2.json"
+      },
+      {
+        "id": "tracknet/game9/Clip3",
+        "frames": 359,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 327,
+          "hit_5px": 321,
+          "negatives": 0,
+          "positives": 355
+        },
+        "detection_rate": 0.9211267605633803,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game9__Clip3.json"
+      },
+      {
+        "id": "tracknet/game9/Clip4",
+        "frames": 106,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 103,
+          "hit_5px": 103,
+          "negatives": 0,
+          "positives": 106
+        },
+        "detection_rate": 0.9716981132075472,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game9__Clip4.json"
+      },
+      {
+        "id": "tracknet/game9/Clip5",
+        "frames": 292,
+        "counts": {
+          "false_on_negative": 2,
+          "far_on_positive": 0,
+          "hit_10px": 245,
+          "hit_5px": 235,
+          "negatives": 30,
+          "positives": 261
+        },
+        "detection_rate": 0.9386973180076629,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game9__Clip5.json"
+      },
+      {
+        "id": "tracknet/game9/Clip6",
+        "frames": 109,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 1,
+          "hit_10px": 99,
+          "hit_5px": 98,
+          "negatives": 0,
+          "positives": 109
+        },
+        "detection_rate": 0.908256880733945,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game9__Clip6.json"
+      },
+      {
+        "id": "tracknet/game9/Clip7",
+        "frames": 87,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 3,
+          "hit_10px": 69,
+          "hit_5px": 68,
+          "negatives": 0,
+          "positives": 87
+        },
+        "detection_rate": 0.7931034482758621,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game9__Clip7.json"
+      },
+      {
+        "id": "tracknet/game9/Clip8",
+        "frames": 56,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 0,
+          "hit_10px": 55,
+          "hit_5px": 55,
+          "negatives": 0,
+          "positives": 56
+        },
+        "detection_rate": 0.9821428571428571,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game9__Clip8.json"
+      },
+      {
+        "id": "tracknet/game9/Clip9",
+        "frames": 223,
+        "counts": {
+          "false_on_negative": 0,
+          "far_on_positive": 3,
+          "hit_10px": 208,
+          "hit_5px": 200,
+          "negatives": 0,
+          "positives": 223
+        },
+        "detection_rate": 0.9327354260089686,
+        "has_frame_predictions": true,
+        "has_frame_labels": true,
+        "member": "publish/clips/tracknet--tracknet__game9__Clip9.json"
+      }
+    ]
+  },
+  "image_path_limitation": "Historical job reads original JPEG with cv2.imdecode and converts BGR to RGB. K5c source path converts JPEGs through FFmpeg limited-range yuv420p and back to RGB. These are not established pixel-identical. Historical source counts cannot automatically qualify that later pipeline; require exact image-path parity or separately preregister and qualify a distinct source contract. Both use WASB step1 wrapper; current file differs historically, and full numerical equivalence is not independently established.",
+  "probe_job": {
+    "id": "20261020T220308Z-436c3db3",
+    "source_revision": "09f0cd39d0ee73d0b450ece844e3c968345a9603",
+    "published_tar": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261020T220308Z-436c3db3/full/published.tar",
+    "published_tar_sha256": "a4178a34841502aebcb5d3c35e6bd29829a87bafd463bf31fc3aa5be6227afe1",
+    "member_summary": "30 clip JSON records with per-frame predictions/labels; archive has no video stream files. Historical svt_roundtrip deletes codec work directory. No separate native stream search outside this archive and source code was conducted; do not claim universal absence.",
+    "settings": "SVT-AV1 preset 8 CRF 62, not a full codec rate sweep."
+  },
+  "reuse": "Useful retrospective source-model and failure evidence for the exact historical source path, subject to preserved source identities and recorded selection. Cannot claim gate pass, independent confirmation or qualification of a changed image conversion. Probe predictions are historical degraded-input observations, not retained reusable native streams."
+}
