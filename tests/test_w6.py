@@ -147,3 +147,19 @@ def test_split_bootstrap_and_control():
     assert idx.shape == (5, 50) and idx.max() < 50
     assert w6.control_max_diff(np.array([np.nan, 1.0]), np.array([np.nan, 1.0 + 1e-8])) == pytest.approx(1e-8)
     assert w6.control_max_diff(np.array([np.nan, 1.0]), np.array([0.0, 1.0])) == float("inf")
+
+
+def test_split_report_exit_uses_literal_control(tmp_path):
+    import json
+
+    result = {
+        "control": {"pass_literal": False, "pass_float32": True, "pass": True},
+        "flicker": {"mean": {}, "anchor": 0, "mask_share": 0, "content_share": 0, "decision": {}},
+        "seconds": 0,
+    }
+    assert w6.write_split_report(tmp_path, result) == 2
+    saved = json.loads((tmp_path / "w6b-flicker-split.json").read_text())
+    assert saved["control"] == {"pass_literal": False, "pass_float32": True, "pass": False}
+    result["control"]["pass_literal"] = True
+    assert w6.write_split_report(tmp_path, result) == 0
+    assert json.loads((tmp_path / "w6b-flicker-split.json").read_text())["control"]["pass"] is True

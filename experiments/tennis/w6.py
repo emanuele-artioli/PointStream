@@ -781,7 +781,7 @@ def command_flicker_split(a: argparse.Namespace) -> int:
     control["max_abs_diff"] = worst
     control["pass_literal"] = bool(worst <= 1e-6)
     control["pass_float32"] = bool(worst <= 2 * float(np.spacing(np.float32(np.nanmax(flick[0, pairs])))))
-    control["pass"] = control["pass_float32"]
+    control["pass"] = control["pass_literal"]
 
     # the anchor at the hybrid's rate, from W6's saved per-frame values (no re-encode)
     target, rate = saved_meta["target_kbps"], saved_meta["anchor_rates_kbps"]
@@ -809,8 +809,16 @@ def command_flicker_split(a: argparse.Namespace) -> int:
     np.savez_compressed(out_dir / "flicker-split.npz", variants=np.asarray(variants), flicker=flick, energy=energy, energy_src=energy_src,
                         valid=valid, anchor_flicker=anchor_flicker, anchor_energy=anchor_energy, iou_source=iou_source, iou_smooth=iou_smooth,
                         jitter_recv=jitter_recv, jitter_smooth=jitter_smooth, area_ratio=area_ratio)
+    return write_split_report(out_dir, result)
+
+
+def write_split_report(out_dir: Path, result: dict[str, Any]) -> int:
+    """Write the split report and enforce the registered literal control on exit."""
+    control = result["control"]
+    # Never allow a diagnostic float32 comparison to override the registered rule.
+    control["pass"] = bool(control["pass_literal"])
     (out_dir / "w6b-flicker-split.json").write_text(json.dumps(result, indent=1, default=str) + "\n")
-    print(json.dumps({"control": control, "flicker": {k: flicker_result[k] for k in ("mean", "anchor", "mask_share", "content_share", "decision")},
+    print(json.dumps({"control": control, "flicker": {k: result["flicker"][k] for k in ("mean", "anchor", "mask_share", "content_share", "decision")},
                       "seconds": result["seconds"]}, indent=1, default=str), flush=True)
     return 0 if control["pass"] else 2
 

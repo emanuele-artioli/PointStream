@@ -1,0 +1,715 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04",
+  "status": "TrackNet clip selection frozen; OpenTTGames context selection unresolved; no inference or scientific results",
+  "tracknet": {
+    "scope": "Retrospective benchmark; all 30 source clips previously scored for tracker selection. No pristine or statistically unseen claim.",
+    "source_archive_path": "/home/itec/emanuele/Datasets/TrackNet/Dataset.zip",
+    "source_archive_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+    "source_archive_hash_basis": "existing manifest; not recomputed",
+    "dataset_manifest_path": "/home/itec/emanuele/Datasets/manifests/TrackNet.json",
+    "dataset_manifest_sha256": "591351e70097b811d06cd6e6d0c24a88122cc05c0e6726db72fda409238ca87b",
+    "source_selection": "All full clips in game8, game9 and game10. Each original frame counted at most once, including calibration clips and previously studied prefixes.",
+    "expected_totals": {
+      "clips": 30,
+      "frames": 5675,
+      "visible_easy_hard": 5472,
+      "absent_out_of_frame": 197,
+      "occluded": 6
+    },
+    "calibration_selection": {
+      "algorithm": "Sort all clips by lowercase hex SHA256 of UTF-8 pointstream-k5d-dev-v1: concatenated with clip_id. First is lowest hash with at least 48 label rows and at least one absent label; second is lowest hash with at least 48 rows in a different game from first.",
+      "clip_ids": [
+        "tracknet/game9/Clip5",
+        "tracknet/game10/Clip3"
+      ],
+      "role": "Cost and range controls only; previously established renderer parameters remain frozen. Included once in full retrospective benchmark; do not repeat prefix as independent data."
+    },
+    "clips": [
+      {
+        "clip_id": "tracknet/game10/Clip1",
+        "dev_sha256": "86124ed1d93a68fd82af43e7e9122470d61f79315a588b6801c2fd40d6915e7d",
+        "label": "Dataset/game10/Clip1/Label.csv",
+        "label_rows": 316,
+        "visibility_counts": {
+          "0": 0,
+          "1": 298,
+          "2": 18,
+          "3": 0
+        },
+        "label_sha256": "7024bae805e8ca189c9bc0f1e7a93aaf400dba6ebb9b624af3b2d7661b12c0a6",
+        "jpg_entries": 316,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip10",
+        "dev_sha256": "f07a652a315831ac6ab2e76facb5401f91b622ee88b41ce50e92ee0481dc8d02",
+        "label": "Dataset/game10/Clip10/Label.csv",
+        "label_rows": 166,
+        "visibility_counts": {
+          "0": 0,
+          "1": 158,
+          "2": 8,
+          "3": 0
+        },
+        "label_sha256": "23f99b55d68c17ef2accfa933f1776519562f34aa832184c03ac8e752e4b8a2e",
+        "jpg_entries": 166,
+        "roles": [
+          "full_retrospective_benchmark",
+          "k5b_prior_renderer_development"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip11",
+        "dev_sha256": "6bddec067de87e78fc25192e242a2bd9710d53996589f673a5fe13b3cae11c99",
+        "label": "Dataset/game10/Clip11/Label.csv",
+        "label_rows": 80,
+        "visibility_counts": {
+          "0": 41,
+          "1": 32,
+          "2": 7,
+          "3": 0
+        },
+        "label_sha256": "1f0963a50c0522ffc5f3d05b29eed4e36cbbd03d47cc949309c82ed46cade6fc",
+        "jpg_entries": 80,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip12",
+        "dev_sha256": "7bb6e7165dcfc42031a20ba24b492a3c01529e68e27fc8f4a52b4198c77231f0",
+        "label": "Dataset/game10/Clip12/Label.csv",
+        "label_rows": 586,
+        "visibility_counts": {
+          "0": 5,
+          "1": 506,
+          "2": 75,
+          "3": 0
+        },
+        "label_sha256": "6bef9b5048eec4f7bfff53725d152deb43e00ee189e48fb006347b99a07d7236",
+        "jpg_entries": 586,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip2",
+        "dev_sha256": "5b56a75ebf4662f42f842d6b04f3fffab98e04d944d6cd84263b71097fbf982d",
+        "label": "Dataset/game10/Clip2/Label.csv",
+        "label_rows": 132,
+        "visibility_counts": {
+          "0": 0,
+          "1": 126,
+          "2": 6,
+          "3": 0
+        },
+        "label_sha256": "dda09f31cb40877fcc8173dcdac36577e1a954924851b360b2ada22fe4fe7fe1",
+        "jpg_entries": 132,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip3",
+        "dev_sha256": "07852fd2c89cd49af42ada243949175f0517be3f75c3445fafa6f61de4c267ec",
+        "label": "Dataset/game10/Clip3/Label.csv",
+        "label_rows": 188,
+        "visibility_counts": {
+          "0": 0,
+          "1": 180,
+          "2": 8,
+          "3": 0
+        },
+        "label_sha256": "247c81967bfb05b53f2b65c0a691a7f14c98802ca93c95a68298b2244b5ba72f",
+        "jpg_entries": 188,
+        "roles": [
+          "full_retrospective_benchmark",
+          "calibration_cost_and_range_control"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip4",
+        "dev_sha256": "b60bd6002c2b95aff682e0e006e05254f5322fc9a5533a621c5ca7bf262e721d",
+        "label": "Dataset/game10/Clip4/Label.csv",
+        "label_rows": 47,
+        "visibility_counts": {
+          "0": 0,
+          "1": 45,
+          "2": 2,
+          "3": 0
+        },
+        "label_sha256": "16a92bcee1d07e72ee237beac47d9b71ba41b21cad7c748abad272be84789d70",
+        "jpg_entries": 47,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip5",
+        "dev_sha256": "dae95be6eb7a319bbf45ef53f85db02d8a9175f11bb1ddd8c087897225bf5d32",
+        "label": "Dataset/game10/Clip5/Label.csv",
+        "label_rows": 65,
+        "visibility_counts": {
+          "0": 0,
+          "1": 64,
+          "2": 1,
+          "3": 0
+        },
+        "label_sha256": "1bcc55917cf54ab512e571e3e9b938b61d58f947a016b7cabf5a634345ba3b88",
+        "jpg_entries": 65,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip6",
+        "dev_sha256": "e057625a271cfb093806bead386760f13614d47df64ff243d5646b52a6b62816",
+        "label": "Dataset/game10/Clip6/Label.csv",
+        "label_rows": 292,
+        "visibility_counts": {
+          "0": 0,
+          "1": 276,
+          "2": 16,
+          "3": 0
+        },
+        "label_sha256": "80392a96ad0a26e94fe7e46b37c183ccc346fd0bac6eaa163a34d5e0f931411b",
+        "jpg_entries": 292,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip7",
+        "dev_sha256": "dc48b208a39e0e6e1fc0a998367d5ac5182f0de4188bba00df655100a2351890",
+        "label": "Dataset/game10/Clip7/Label.csv",
+        "label_rows": 142,
+        "visibility_counts": {
+          "0": 0,
+          "1": 117,
+          "2": 25,
+          "3": 0
+        },
+        "label_sha256": "f1311e9445336612fff4fcbc76a7722bdf51b13d491d49c2940afcad02d6f6ae",
+        "jpg_entries": 142,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip8",
+        "dev_sha256": "5021fd6d4da815afc3b1931066b4e681bd7c224b11657b97813585f99cb89869",
+        "label": "Dataset/game10/Clip8/Label.csv",
+        "label_rows": 81,
+        "visibility_counts": {
+          "0": 16,
+          "1": 51,
+          "2": 13,
+          "3": 1
+        },
+        "label_sha256": "f4d10e534e71e9ab6092811e92470b6b726a06a4ff244bc3eda8acf6f3844a71",
+        "jpg_entries": 81,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game10/Clip9",
+        "dev_sha256": "ee2797f4788f46648cdb363673072f01def05d7872034f923c7184d8cfee853c",
+        "label": "Dataset/game10/Clip9/Label.csv",
+        "label_rows": 49,
+        "visibility_counts": {
+          "0": 0,
+          "1": 44,
+          "2": 5,
+          "3": 0
+        },
+        "label_sha256": "18fdff27c5f2923b4e317b6db6e05f35458169bfa8fc7b6711faef660b5161e3",
+        "jpg_entries": 49,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game8/Clip1",
+        "dev_sha256": "c67321aea7fcedfb10976bef6df8d6e115b64510a05afdac8c144b7d6e24155e",
+        "label": "Dataset/game8/Clip1/Label.csv",
+        "label_rows": 118,
+        "visibility_counts": {
+          "0": 0,
+          "1": 107,
+          "2": 11,
+          "3": 0
+        },
+        "label_sha256": "e3e0e3fb4531a9b6bab67197db57f2252e6a4a05114f08030f5081675c7a0079",
+        "jpg_entries": 118,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game8/Clip2",
+        "dev_sha256": "4987f0f0fccb301358f93db1c67f99bbb7f8f1791def99b851b67664ece51629",
+        "label": "Dataset/game8/Clip2/Label.csv",
+        "label_rows": 97,
+        "visibility_counts": {
+          "0": 2,
+          "1": 86,
+          "2": 9,
+          "3": 0
+        },
+        "label_sha256": "e4f8e48ba6e75c71939f47f2391d7dc57a1f7776aa98e9d4318540d7f9d8c419",
+        "jpg_entries": 97,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game8/Clip3",
+        "dev_sha256": "90f3f74b86c4b2a4d0deea8f56afb1c549a61c0a49a8f1a174a3e61d825e63ae",
+        "label": "Dataset/game8/Clip3/Label.csv",
+        "label_rows": 413,
+        "visibility_counts": {
+          "0": 30,
+          "1": 326,
+          "2": 57,
+          "3": 0
+        },
+        "label_sha256": "d58cc7c6c5fe8bbe089f6c8b8206b44e719b5435df0e25e2b8c8cd57eca26227",
+        "jpg_entries": 413,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game8/Clip4",
+        "dev_sha256": "afac48387ab6bc54790adee7c877212ff2349a1fd3fddc19ffe9c4167020b4b0",
+        "label": "Dataset/game8/Clip4/Label.csv",
+        "label_rows": 133,
+        "visibility_counts": {
+          "0": 0,
+          "1": 124,
+          "2": 9,
+          "3": 0
+        },
+        "label_sha256": "ca64094c5800854e358382dd07e408d9276bbefae4b537d7965f00ee64edb7dd",
+        "jpg_entries": 133,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game8/Clip5",
+        "dev_sha256": "73882bb4a77e5d063f8a12eb9666c8d247e3e9b0d0e59c085a8bac5bc5471240",
+        "label": "Dataset/game8/Clip5/Label.csv",
+        "label_rows": 87,
+        "visibility_counts": {
+          "0": 8,
+          "1": 68,
+          "2": 11,
+          "3": 0
+        },
+        "label_sha256": "5c2e414b233eb8a1db59f3b41dd8242084ac8e2d4e81d60c704dd182d46eb41a",
+        "jpg_entries": 87,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game8/Clip6",
+        "dev_sha256": "eb0260037b888a3225a4fc1f8aede69078e6513deb01e9f705e1801a5a000b31",
+        "label": "Dataset/game8/Clip6/Label.csv",
+        "label_rows": 131,
+        "visibility_counts": {
+          "0": 65,
+          "1": 54,
+          "2": 12,
+          "3": 0
+        },
+        "label_sha256": "c8ec96ec7caf5d26470d3d71faf40e7b572c579505f8114df003dc28b24b82e0",
+        "jpg_entries": 131,
+        "roles": [
+          "full_retrospective_benchmark",
+          "k5c_prior_48_frame_development"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game8/Clip7",
+        "dev_sha256": "1235cde5f25a6d6c9733bffff7e56bf68d67936007470d32317c68de5b38bafa",
+        "label": "Dataset/game8/Clip7/Label.csv",
+        "label_rows": 422,
+        "visibility_counts": {
+          "0": 0,
+          "1": 378,
+          "2": 44,
+          "3": 0
+        },
+        "label_sha256": "a011ccbba5f1e3dc606e93b041740c135adf8543b2c76602352eb9c5a08c4007",
+        "jpg_entries": 422,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game8/Clip8",
+        "dev_sha256": "40f5d96826c353f0940f3385c785c90fda87ea3a6745068f824168c630bdc674",
+        "label": "Dataset/game8/Clip8/Label.csv",
+        "label_rows": 319,
+        "visibility_counts": {
+          "0": 0,
+          "1": 259,
+          "2": 60,
+          "3": 0
+        },
+        "label_sha256": "b9befae816b4eb8ddbf6e23cfe3079f5475a6d4b846eebb5b8c61ec86088cf24",
+        "jpg_entries": 319,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game8/Clip9",
+        "dev_sha256": "658f21ab0a3c372247d3c83b434d91bc4fc63d582c1ae36d685632696cedd155",
+        "label": "Dataset/game8/Clip9/Label.csv",
+        "label_rows": 238,
+        "visibility_counts": {
+          "0": 0,
+          "1": 206,
+          "2": 32,
+          "3": 0
+        },
+        "label_sha256": "854c326df3e4eca5e44cc5b7422ae5458f0d8763127604fdb6b728f0db27c58a",
+        "jpg_entries": 238,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game9/Clip1",
+        "dev_sha256": "f95350c858d8b29deb20edbfe37ed73bb9fe9846f457268d57ad071463518f46",
+        "label": "Dataset/game9/Clip1/Label.csv",
+        "label_rows": 83,
+        "visibility_counts": {
+          "0": 0,
+          "1": 79,
+          "2": 4,
+          "3": 0
+        },
+        "label_sha256": "fc1fe57a38f17eeb9c16fb01c9e11ae037fa445014e038c3ffacb07f730f833a",
+        "jpg_entries": 83,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game9/Clip2",
+        "dev_sha256": "d514cb12347e8563af6a164ff7b49f5c690e63f1c7e8ea970f86b816f6d1d748",
+        "label": "Dataset/game9/Clip2/Label.csv",
+        "label_rows": 258,
+        "visibility_counts": {
+          "0": 0,
+          "1": 241,
+          "2": 17,
+          "3": 0
+        },
+        "label_sha256": "d03560ab232440559b4a9cac0e92704819a84266f3ab409493e96a87a122c747",
+        "jpg_entries": 258,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game9/Clip3",
+        "dev_sha256": "8cffdcd05253df954dcfa2c1cb81fd7abd12917dccace9a7f4a4cf1236e909d8",
+        "label": "Dataset/game9/Clip3/Label.csv",
+        "label_rows": 359,
+        "visibility_counts": {
+          "0": 0,
+          "1": 336,
+          "2": 19,
+          "3": 4
+        },
+        "label_sha256": "263646618611a1bfe0d5be96a4996f7a107490a45c88ac6acdf1405ddad6b7ac",
+        "jpg_entries": 359,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game9/Clip4",
+        "dev_sha256": "cb04401129b6fbfd67fedf202d6bbb0a1446907277c870a107ea49379fea004e",
+        "label": "Dataset/game9/Clip4/Label.csv",
+        "label_rows": 106,
+        "visibility_counts": {
+          "0": 0,
+          "1": 105,
+          "2": 1,
+          "3": 0
+        },
+        "label_sha256": "3ee66fb07bec17de0ceaa48951342599dba563c043eb330b7f9557c508e04828",
+        "jpg_entries": 106,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game9/Clip5",
+        "dev_sha256": "17218a5574ced50e6c2f9199c87840aec36f41efb0ad45ed757b1dcb3ebbb3cb",
+        "label": "Dataset/game9/Clip5/Label.csv",
+        "label_rows": 292,
+        "visibility_counts": {
+          "0": 30,
+          "1": 242,
+          "2": 19,
+          "3": 1
+        },
+        "label_sha256": "ba554e5aa090948a0211c98bfbbe8429e6318322328ffaebd1de0bf31d290814",
+        "jpg_entries": 292,
+        "roles": [
+          "full_retrospective_benchmark",
+          "calibration_cost_and_range_control"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game9/Clip6",
+        "dev_sha256": "41f4768b8766ad654d86442ef3fe6ed4bc5e75cadc85c558043b5dede9509da6",
+        "label": "Dataset/game9/Clip6/Label.csv",
+        "label_rows": 109,
+        "visibility_counts": {
+          "0": 0,
+          "1": 92,
+          "2": 17,
+          "3": 0
+        },
+        "label_sha256": "50b36a1da5de2b4aa693239b46c0dae30c2e395a0a628f3d39c5b7da1dddb738",
+        "jpg_entries": 109,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game9/Clip7",
+        "dev_sha256": "cac83690be20cdc8bdbc4e9ab85888acb38721ad1dabd126b2d9f15f33a0ed95",
+        "label": "Dataset/game9/Clip7/Label.csv",
+        "label_rows": 87,
+        "visibility_counts": {
+          "0": 0,
+          "1": 80,
+          "2": 7,
+          "3": 0
+        },
+        "label_sha256": "e7baec147da02086cb4a75e6161bd0a536e5e64a2c81f42bd4d75c63075c5b31",
+        "jpg_entries": 87,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game9/Clip8",
+        "dev_sha256": "dfa87d1b55ef4c64e73983a79e0b35cac749681dfb8ab256f60cacc85c3f1f4c",
+        "label": "Dataset/game9/Clip8/Label.csv",
+        "label_rows": 56,
+        "visibility_counts": {
+          "0": 0,
+          "1": 52,
+          "2": 4,
+          "3": 0
+        },
+        "label_sha256": "5132b22e4b63dbc78bf299d58878aa4411496314da0aff693e8e7a36205e9745",
+        "jpg_entries": 56,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      },
+      {
+        "clip_id": "tracknet/game9/Clip9",
+        "dev_sha256": "2d80eb15b5afc7c656d664d7aec4fbf6391afe824ae2588ad538ca986f294b48",
+        "label": "Dataset/game9/Clip9/Label.csv",
+        "label_rows": 223,
+        "visibility_counts": {
+          "0": 0,
+          "1": 218,
+          "2": 5,
+          "3": 0
+        },
+        "label_sha256": "4a52bc5fa6b5f7dbbed6b81e9672b4f8b7e141488469ef39c92705e8d9b54b72",
+        "jpg_entries": 223,
+        "roles": [
+          "full_retrospective_benchmark"
+        ]
+      }
+    ],
+    "other_prior_development_clips_outside_benchmark": [
+      "tracknet/game3/Clip3",
+      "tracknet/game3/Clip6",
+      "tracknet/game7/Clip2"
+    ],
+    "frame_ground_truth_policy": "Visibility 1 or 2 are visible; 0 explicitly out of frame; 3 occluded, separate from visible and absent."
+  },
+  "judge": {
+    "model": "WASB tennis pretrained checkpoint",
+    "checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+    "checkpoint_hash_basis": "historical K5b receipt; staged bytes must be verified",
+    "author_revision": "923462cacdeb3353b84ddebdedb3f4b7a8553b0f",
+    "config_sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+    "config_url": "https://github.com/nttcom/WASB-SBDT/blob/923462cacdeb3353b84ddebdedb3f4b7a8553b0f/src/configs/dataset/tennis.yaml",
+    "reported_training_games": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "reported_test_games": [
+      8,
+      9,
+      10
+    ],
+    "training_logs_independently_verified": false,
+    "cross_sport": "Tennis checkpoint trained in tennis domain, OpenTTGames is table tennis; public split is author-reported and checkpoint optimizer inputs are not independently audited. Source-level disjointness and weight training exclusions remain unverified. No table-tennis WASB checkpoint documented; do not select a fallback based on outcome."
+  },
+  "openttgames": {
+    "scope": "Potential cross-sport transfer, conditional on source qualification, selection manifest completion and authorized budget. Prior G1e used all test videos for motion-floor evaluation; no claim of untouched footage.",
+    "context_rule": "One 240-frame context per official test_1 through test_7. Select by deterministic hash over all valid 240-frame starts without quality or model outcomes; require at least 16 explicit ground truth labels and at least one explicit absent frame. Exact hash input/tie-break must be preregistered before selection. No starts or per-context counts assigned here.",
+    "label_policy": "Score only ground-truth-labeled frames. Coordinates (-1,-1) explicitly absent. Unlabeled frames are unknown and excluded from visible and absent denominators.",
+    "qualification": "Before any cross-sport quality claim, WASB tennis source-frame recall must reach at least 80% of explicit visible labels within 10 px, with denominator, coordinate scaling, absent false detections, and per-video results recorded. The exact evaluation scale and aggregation must be fixed before inference. Failure narrows scope and precludes the cross-sport quality claim; no fallback selection after outcomes.",
+    "test_videos": [
+      {
+        "video_id": "test_1",
+        "context_selection": "UNRESOLVED",
+        "frame_start_zero_based": null,
+        "frame_count": 240,
+        "reason": "Per-frame ground truth metadata was not retrieved; eligible starts and deterministic selection cannot be established from per-video aggregates.",
+        "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_1.mp4",
+        "video_sha256": "373f0a6926c7edb51eb70119f020afc30beabd140dc5f9cc454f0c7848406bb2",
+        "labels_archive_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_1.zip",
+        "labels_archive_sha256": "7dca7b6614d51b136209b18d3acf6f26cb06bf59ca05189e587ab7a57762bb51",
+        "whole_video_counts": {
+          "frames": 16800,
+          "labeled": 887,
+          "visible": 881,
+          "explicit_absent": 6,
+          "unlabeled": 15913
+        }
+      },
+      {
+        "video_id": "test_2",
+        "context_selection": "UNRESOLVED",
+        "frame_start_zero_based": null,
+        "frame_count": 240,
+        "reason": "Per-frame ground truth metadata was not retrieved; eligible starts and deterministic selection cannot be established from per-video aggregates.",
+        "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_2.mp4",
+        "video_sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43",
+        "labels_archive_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_2.zip",
+        "labels_archive_sha256": "c692014ca9074d331700385e4c0b5e0bd32968123bf001fe8b1c9b2e64ac142d",
+        "whole_video_counts": {
+          "frames": 3600,
+          "labeled": 779,
+          "visible": 773,
+          "explicit_absent": 6,
+          "unlabeled": 2821
+        }
+      },
+      {
+        "video_id": "test_3",
+        "context_selection": "UNRESOLVED",
+        "frame_start_zero_based": null,
+        "frame_count": 240,
+        "reason": "Per-frame ground truth metadata was not retrieved; eligible starts and deterministic selection cannot be established from per-video aggregates.",
+        "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_3.mp4",
+        "video_sha256": "48179df05a7a816d1b44b142fbc1ff604e6094aad7a4b13cd013f0c2447a2daf",
+        "labels_archive_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_3.zip",
+        "labels_archive_sha256": "74d94c27ac3c6cf1c6b5ff722ffe87f734b0c11f95179720cb70ffaac1511c67",
+        "whole_video_counts": {
+          "frames": 7800,
+          "labeled": 805,
+          "visible": 799,
+          "explicit_absent": 6,
+          "unlabeled": 6995
+        }
+      },
+      {
+        "video_id": "test_4",
+        "context_selection": "UNRESOLVED",
+        "frame_start_zero_based": null,
+        "frame_count": 240,
+        "reason": "Per-frame ground truth metadata was not retrieved; eligible starts and deterministic selection cannot be established from per-video aggregates.",
+        "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_4.mp4",
+        "video_sha256": "c941fb0862daf47dbb8afc62117c21a921f649a7fdeee94fe5c16f9f2839be6d",
+        "labels_archive_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_4.zip",
+        "labels_archive_sha256": "3022d7aeb14d913f8fb0a26d1e1a2cfab067e315591962b39ea15f85867a9e2a",
+        "whole_video_counts": {
+          "frames": 36000,
+          "labeled": 1319,
+          "visible": 1305,
+          "explicit_absent": 14,
+          "unlabeled": 34681
+        }
+      },
+      {
+        "video_id": "test_5",
+        "context_selection": "UNRESOLVED",
+        "frame_start_zero_based": null,
+        "frame_count": 240,
+        "reason": "Per-frame ground truth metadata was not retrieved; eligible starts and deterministic selection cannot be established from per-video aggregates.",
+        "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_5.mp4",
+        "video_sha256": "2c4652738a07102db7428b31003784532117dc9619c5fa1cca80c60639cc233d",
+        "labels_archive_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_5.zip",
+        "labels_archive_sha256": "d97d7e985ab05d46a922581106adf12a9b85d3cf91730a818fe44137561ad5ac",
+        "whole_video_counts": {
+          "frames": 11520,
+          "labeled": 1018,
+          "visible": 1008,
+          "explicit_absent": 10,
+          "unlabeled": 10502
+        }
+      },
+      {
+        "video_id": "test_6",
+        "context_selection": "UNRESOLVED",
+        "frame_start_zero_based": null,
+        "frame_count": 240,
+        "reason": "Per-frame ground truth metadata was not retrieved; eligible starts and deterministic selection cannot be established from per-video aggregates.",
+        "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_6.mp4",
+        "video_sha256": "ae37928612d8c5652677d468a8feb2669aff0afe8cfc1b1a642cc6ba5b811c29",
+        "labels_archive_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_6.zip",
+        "labels_archive_sha256": "3971e3c3c2c8ebe5c123f1a79fc7629a53950096784b24d11f5c8796ac1e0fc4",
+        "whole_video_counts": {
+          "frames": 10800,
+          "labeled": 1308,
+          "visible": 1300,
+          "explicit_absent": 8,
+          "unlabeled": 9492
+        }
+      },
+      {
+        "video_id": "test_7",
+        "context_selection": "UNRESOLVED",
+        "frame_start_zero_based": null,
+        "frame_count": 240,
+        "reason": "Per-frame ground truth metadata was not retrieved; eligible starts and deterministic selection cannot be established from per-video aggregates.",
+        "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_7.mp4",
+        "video_sha256": "f2f54e4ce0c23a50d119fa2fdae552cb277d31f7e3e5a61c8fd3c40ef064399e",
+        "labels_archive_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_7.zip",
+        "labels_archive_sha256": "f26f8f2475eef4646e35a4fb4049eb3a47e10759e5abb0eef0f7b837110d40d5",
+        "whole_video_counts": {
+          "frames": 15600,
+          "labeled": 874,
+          "visible": 770,
+          "explicit_absent": 104,
+          "unlabeled": 14726
+        }
+      }
+    ]
+  },
+  "provenance": [
+    "docs/experiments/k5d-inputs/data-inventory-20261104.json",
+    "docs/experiments/k5b.md",
+    "docs/experiments/k5c-inputs/wasb-reported-split-provenance.json",
+    "docs/experiments/g1e.md"
+  ]
+}
