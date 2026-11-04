@@ -70,7 +70,9 @@ may be cancelled. Device/provider/kernel checks use qualified A6000/Ada paths.
    must retain actual native bytes and BALL symbols and charge every byte.
 2. Ball: source-only oracle and the real native/wire/metric path on small
    development inputs; then two calibration clips. The full 30-clip benchmark
-   proceeds only with valid independent image judging and complete forecasts.
+   requires complete forecasts. Task claims additionally require qualified
+   independent image judging; a failed judge does not qualify as a codec
+   failure or automatically stop correctly joined fidelity measurements.
    Source qualification failures remain registered exclusions, not replacement
    clips. Extra anchor points are added only for unsupported overlap. Controls
    assess placement/mark sensitivity, not prove perceptual realism.

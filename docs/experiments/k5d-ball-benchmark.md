@@ -26,7 +26,10 @@
   WASB receives output images alone, ground truth only enters the separate
   scorer. Its authors report tennis training on games 1–7 and test 8–10;
   optimizer logs were not independently audited. No documented table-tennis
-  WASB checkpoint or training split is invented.
+  WASB checkpoint or training split is invented. A source-judge failure narrows
+  the task claim; it does not invalidate correctly joined raw-image fidelity
+  measurements. The fidelity route may proceed independently only after its
+  own development correctness and complete-cost gates. No after-test judge switch.
 - Primary fidelity report: crop DISTS and LPIPS PCHIP BD-rate against the pooled
   achievable native envelope, per clip and each native family, with actual
   transported byte counts. Full-frame PSNR and perceptual metrics remain beside
@@ -42,8 +45,10 @@
   absent-frame false detections beside it. Descriptive success for this new
   task endpoint requires at least 75% of all 30 registered clips to have qualified
   source inference and supported mean recall gain at least 0.10 over the native
-  envelope across the fixed common low-rate range; lack of support is not a
-  pass. Pooled excess false detections must be no more than 0.05 per explicit
+  envelope at the two fixed low operating settings, DCVC-UF QP 0 +streak and
+  SVT-AV1 CRF 62 +streak. Both actual candidate rates must be bracketed by the
+  measured native support; their mean difference is the per-clip endpoint.
+  Lack of support is not a pass. Pooled excess false detections must be no more than 0.05 per explicit
   absent frame, with all 197 negatives retained and per-clip counts shown. This
   is a prespecified benchmark criterion, not population significance or a
   retrospective pass of the old 6/8 whole-contract rule. Unknown/occluded labels
@@ -94,3 +99,60 @@
   one bounded canonical fleet wait. Every waited stage within 45 minutes; split
   the 30-clip benchmark into independently published clip shards and stop when
   the decision is made.
+
+### 2026-11-04 — actual saved-component wire check (CPU only)
+
+- Code `85588f048b20427f32c2b67ca88e4335c343ab87`; command
+  `python -m experiments.tennis.k5d_wire_audit` with the exact preserved K5c
+  archive SHA256 `d40a9f7e0a7d2878d01010d4e128467bbdc174f9a899e007a555b9febe256d32`.
+- PASS: all six actual native containers and BALL symbol payloads roundtrip
+  exactly through PSBL v1, including declared 48-frame geometry, resource ID,
+  checksum and full physical-byte sum. The native files are opaque retained
+  bytes; no model, native decoder, source image or metric was run. This is an
+  engineering framing result, not codec-quality or source-isolation evidence.
+- Recorded process-time interval 0.020504 CPU-s, excluding import/startup. Reserve
+  a conservative 1 CPU-s inside the local 120 CPU-s engineering ceiling. GPU 0.
+  Original model/data/results remain untouched; the old 48 frames are not new
+  statistical observations. Receipt:
+  [wire-framing-audit-20261104.json](k5d-inputs/wire-framing-audit-20261104.json).
+- Software preparation: PSBL parsing/render parity, equal-rate pooled-envelope
+  analysis and all-frame denominator rules, real source-oracle CLI, and strict
+  W6 gate have focused checks. Receiver-only CLI is prepared separately but
+  has not decoded a real native stream; filesystem denial, full encoder/fit/
+  metric orchestration and fleet admission remain incomplete. W8 diagnostic
+  is per-condition preparation, not a submitted or fully admitted supervisor.
+- No new GPU allocation or submission. The staged resource question is pending;
+  inference remains blocked until explicit approval.
+
+### 2026-11-04 — historical source evidence recovered before new inference
+
+- Exact selection archive `20261020T214833Z-bf224666`, source `7590a774`, was
+  recovered read-only. It contains all 30 source frame/label/prediction records.
+  WASB-step1 records 5,051/5,472 visible hits at 10 pixels; 27/30 clips clear the 80%
+  source screen. The failures are game10/Clip11 (25/39), game10/Clip8 (40/64),
+  game9/Clip7 (69/87). All remain in registered coverage.
+- A source-negative calibration screen was fixed in the root's audit brief
+  before opening these recovered counts: at least 100 explicit negatives and
+  false rate at most 0.05. Recorded source false detections 10/197=0.0507614
+  fail that proposed screen. This is an instrument-calibration failure, not a
+  negative codec-quality result or a revised historical rule. No threshold is
+  relaxed and no alternative judge is selected after this outcome. Strong
+  negative-frame/realism claims remain blocked. Relative detector counts may
+  still be reported with this calibration and their label-based limitations.
+- The raw-JPEG OpenCV loader/label/count functions are AST-identical to `7590a774`;
+  Zoo's inference and transforms are unchanged, while its constructor added
+  explicit candidate-name selection. Archive, weight and environment identities
+  match the recorded family. This supports historical source screening and
+  possible reuse after actual input/config/runtime binding; it does not prove
+  exact current inference or parity to K5c's FFmpeg YUV420 source path. The new
+  source-oracle explicitly uses raw JPEG, so these records must not be rejected
+  solely because the different K5c contract used YUV. Actual decoded-image
+  judging and source controls must share the declared new transform.
+- The CRF 62 probe archive exists and was hashed, but retained JSON records only;
+  its code removed native stream work directories. No bitstreams are recovered
+  from the inspected archive. This search cannot prove absence elsewhere.
+- Frozen source/weight/archive identities and per-clip counts are preserved in
+  [source-evidence-reuse-20261104.json](k5d-inputs/source-evidence-reuse-20261104.json).
+  No new source/model/codec run, GPU use or closed-budget transfer. Primary
+  regional fidelity and byte-efficiency remain testable independently under
+  their development/cost gates; the detector-based interpretation is narrower.

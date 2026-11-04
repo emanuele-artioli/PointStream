@@ -79,3 +79,21 @@ def test_reject_negative_distance_and_boolean_metric() -> None:
         rows = [point("svt", "native", 100, 0.2, metric), point("svt", "ball", 100, value, metric)]
         with pytest.raises(ValueError):
             compare(rows, 240, D, metric, "ball", 0.01)
+
+
+def test_constant_anchor_support_does_not_end_at_first_point() -> None:
+    for metric, value in (("false_per_negative", 0.0), ("recall10", 0.0)):
+        rows = [point("svt", "native", r, value, metric) for r in (100, 200, 400)]
+        rows += [point("svt", "ball", r, 0.1, metric) for r in (150, 500)]
+        candidates = compare(rows, 240, D, metric, "ball", 0.01)["candidate_points"]
+        assert isinstance(candidates, list)
+        assert candidates[0]["anchor_at_rate"] == 0
+        assert candidates[1]["anchor_at_rate"] is None
+
+
+def test_constant_quality_dominance_uses_only_measured_support() -> None:
+    rows = [point("svt", "native", r, 20) for r in (100, 200, 400)]
+    rows += [point("svt", "ball", r, 25) for r in (150, 300)]
+    assert compare(rows, 240, D, "frame_psnr", "ball", 1)["status"] == "better_at_every_supported_rate"
+    outside = rows[:3] + [point("svt", "ball", r, 25) for r in (500, 600)]
+    assert compare(outside, 240, D, "frame_psnr", "ball", 1)["status"] == "unsupported_range"

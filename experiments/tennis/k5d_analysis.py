@@ -61,10 +61,16 @@ def _unique_rates(points: Sequence[tuple[float, float]]) -> list[tuple[float, fl
     return sorted(best.items())
 
 
-def quality_at(front: Sequence[tuple[float, float]], rate: float) -> float | None:
-    """Interpolate on a previously formed front, only inside its rate range."""
-    if not front or not math.isfinite(rate) or rate < front[0][0] or rate > front[-1][0]:
+def quality_at(front: Sequence[tuple[float, float]], rate: float,
+               support: tuple[float, float] | None = None) -> float | None:
+    """Interpolate within measured support; retain best quality on a supported plateau."""
+    if not front or not math.isfinite(rate):
         return None
+    low, high = support if support is not None else (front[0][0], front[-1][0])
+    if rate < low or rate > high or rate < front[0][0]:
+        return None
+    if rate >= front[-1][0]:
+        return front[-1][1]
     if len(front) == 1:
         return front[0][1] if rate == front[0][0] else None
     for (r0, q0), (r1, q1) in zip(front, front[1:]):
@@ -93,33 +99,33 @@ def compare(rows: Sequence[Point], frames: int, duration: Fraction, metric: str,
         raise ValueError("missing native or candidate points")
     anchor = envelope(_unique_rates([(r.rate, sign * r.value) for r in anchor_rows]))
     candidate = pareto(_unique_rates([(r.rate, sign * r.value) for r in test_rows]))
+    anchor_support = (min(r.rate for r in anchor_rows), max(r.rate for r in anchor_rows))
+    candidate_support = (min(r.rate for r in test_rows), max(r.rate for r in test_rows))
     observations = [{"codec": r.codec, "setting": r.setting, "rate_kbps": r.rate,
                      "value": r.value,
-                     "anchor_at_rate": None if (q := quality_at(anchor, r.rate)) is None else sign * q}
+                     "anchor_at_rate": None if (q := quality_at(anchor, r.rate, anchor_support)) is None else sign * q}
                     for r in test_rows]
-    result: dict[str, object] = {"metric": metric, "native_points": [
+    result: dict[str, object] = {"metric": metric, "native_rate_support": anchor_support,
+                                "candidate_rate_support": candidate_support, "native_points": [
         {"codec": r.codec, "setting": r.setting, "rate_kbps": r.rate, "value": r.value}
         for r in anchor_rows], "candidate_points": observations, "bd_rate": None}
     if metric in DISCRETE:
         result["status"] = "descriptive_discrete"
         return result
-    if len(candidate) < 2 or len(anchor) < 2:
-        result["status"] = "unsupported_range"
-        return result
     lo = max(candidate[0][1], anchor[0][1])
     hi = min(candidate[-1][1], anchor[-1][1])
     result["quality_overlap"] = max(0.0, hi - lo)
-    if hi > lo and hi - lo >= minimum_quality_span:
+    if len(candidate) >= 2 and len(anchor) >= 2 and hi > lo and hi - lo >= minimum_quality_span:
         result["bd_rate"] = bd_rate(candidate, anchor, minimum_quality_span)
         result["status"] = "bd_rate"
         return result
     if hi <= lo:
-        rlo, rhi = max(anchor[0][0], candidate[0][0]), min(anchor[-1][0], candidate[-1][0])
+        rlo, rhi = max(anchor_support[0], candidate_support[0]), min(anchor_support[1], candidate_support[1])
         if rlo < rhi:
             knots = sorted({rlo, rhi, *(r for r, _ in anchor + candidate if rlo < r < rhi)})
             differences = []
             for rate in knots:
-                a, c = quality_at(anchor, rate), quality_at(candidate, rate)
+                a, c = quality_at(anchor, rate, anchor_support), quality_at(candidate, rate, candidate_support)
                 assert a is not None and c is not None
                 differences.append(c - a)
             if all(d > 0 for d in differences):

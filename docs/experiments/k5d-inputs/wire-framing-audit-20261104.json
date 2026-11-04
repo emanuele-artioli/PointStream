@@ -1,0 +1,125 @@
+{
+  "passed": true,
+  "scope": "framing roundtrip on six saved real native/BALL records; no new pixels, decoding, quality or isolation result",
+  "original_job": "20261103T141758Z-f5d52fac",
+  "original_archive_sha256": "d40a9f7e0a7d2878d01010d4e128467bbdc174f9a899e007a555b9febe256d32",
+  "new_wire_version": 1,
+  "checks": [
+    "exact_native_bytes",
+    "canonical_ball_symbols",
+    "frame_geometry",
+    "full_wire_accounting"
+  ],
+  "points": [
+    {
+      "codec": "dcvc-uf",
+      "setting": 0,
+      "native_bytes": 6689,
+      "ball_payload_bytes": 215,
+      "metadata_and_integrity_bytes": 89,
+      "total_wire_bytes": 6993,
+      "kbps": 34.965,
+      "wire_sha256": "815dc030ee341629f53142ac5448bb5ae456e24a7a0f45efb01a4129927467d5",
+      "native_sha256": "65c65f6ac3ea918fbd15e0239dd432151dfe1d276a71e690fb1ad25b7f55b0ee",
+      "geometry": [
+        1280,
+        720
+      ],
+      "frames": 48,
+      "fps": "30",
+      "resource_id": "dcvc-uf-htl@main-32e68872"
+    },
+    {
+      "codec": "dcvc-uf",
+      "setting": 21,
+      "native_bytes": 20118,
+      "ball_payload_bytes": 225,
+      "metadata_and_integrity_bytes": 89,
+      "total_wire_bytes": 20432,
+      "kbps": 102.16,
+      "wire_sha256": "ce1240cb68fcb681e4c3924cf3349e27ad4cb15bfabbf233ece7fd330b550d8d",
+      "native_sha256": "82cfc0d3abc8d2429a205b3d175acfc1a6d9e278f1950ffc3d7178281bdbf425",
+      "geometry": [
+        1280,
+        720
+      ],
+      "frames": 48,
+      "fps": "30",
+      "resource_id": "dcvc-uf-htl@main-32e68872"
+    },
+    {
+      "codec": "dcvc-uf",
+      "setting": 42,
+      "native_bytes": 62374,
+      "ball_payload_bytes": 223,
+      "metadata_and_integrity_bytes": 89,
+      "total_wire_bytes": 62686,
+      "kbps": 313.43,
+      "wire_sha256": "9db95b551c17b866037eb6fc0b99c30dbf3fa5a456d4163065356baaf0be5977",
+      "native_sha256": "2005908924fccea08f3580118e565b4e48074f055e7a44e2224a01a0ab58e343",
+      "geometry": [
+        1280,
+        720
+      ],
+      "frames": 48,
+      "fps": "30",
+      "resource_id": "dcvc-uf-htl@main-32e68872"
+    },
+    {
+      "codec": "svt-av1-ivf",
+      "setting": 48,
+      "native_bytes": 80787,
+      "ball_payload_bytes": 232,
+      "metadata_and_integrity_bytes": 88,
+      "total_wire_bytes": 81107,
+      "kbps": 405.535,
+      "wire_sha256": "c428c95d25560579c033adce4a9965ea99a7c44335255a8dd30cd94cd7274e36",
+      "native_sha256": "ca3d3472ee1d3027d2eff884121604b0e4ed6fc8b6945f79b473afe5aed4c4dd",
+      "geometry": [
+        1280,
+        720
+      ],
+      "frames": 48,
+      "fps": "30",
+      "resource_id": "svt-av1@4.2.0+av1-rgb-v1"
+    },
+    {
+      "codec": "svt-av1-ivf",
+      "setting": 55,
+      "native_bytes": 55833,
+      "ball_payload_bytes": 226,
+      "metadata_and_integrity_bytes": 88,
+      "total_wire_bytes": 56147,
+      "kbps": 280.735,
+      "wire_sha256": "70bbccd5492fdcb7b0370ad176debb1886d62385c09c487cd4e222ebed1d03ac",
+      "native_sha256": "d26c933618dbc549f5e115c15450313138445afb135a412e9e9defcbde662ddb",
+      "geometry": [
+        1280,
+        720
+      ],
+      "frames": 48,
+      "fps": "30",
+      "resource_id": "svt-av1@4.2.0+av1-rgb-v1"
+    },
+    {
+      "codec": "svt-av1-ivf",
+      "setting": 62,
+      "native_bytes": 27856,
+      "ball_payload_bytes": 222,
+      "metadata_and_integrity_bytes": 88,
+      "total_wire_bytes": 28166,
+      "kbps": 140.83,
+      "wire_sha256": "78638cebf72b6e71383c34c2619d87e9afccf7b4920ccf376335c8d4cb0986a9",
+      "native_sha256": "88ed0ea9c70d208dae93fbc80ea9e6a98d45cdd2c1589b03cce6447bb52ed7fa",
+      "geometry": [
+        1280,
+        720
+      ],
+      "frames": 48,
+      "fps": "30",
+      "resource_id": "svt-av1@4.2.0+av1-rgb-v1"
+    }
+  ],
+  "cpu_seconds": 0.020503999999999994,
+  "code_revision": "85588f048b20427f32c2b67ca88e4335c343ab87"
+}
