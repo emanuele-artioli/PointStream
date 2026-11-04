@@ -23,13 +23,13 @@ request has been submitted. No timers, LLM keepalives or active fleet waits.
 - Code branch `codex/submission-research-2026-11-04`, based on fetched main
   `98d12601` (MoQSplat PR330, unrelated to paper evidence). CPU preparation
   commit `85588f048b20427f32c2b67ca88e4335c343ab87`; source-evidence/receiver
-  preparation commit `4f4ea2dc` pushed. [PR #331](https://github.com/emanuele-artioli/PointStream/pull/331)
-  draft, full Linux CI succeeds at 4f4ea2dc; later review/commits must inspect exact
+  preparation commit `4f4ea2dc` and transport/continuation preparation `edbefa5b` pushed. [PR #331](https://github.com/emanuele-artioli/PointStream/pull/331)
+  draft at this historical checkpoint; full Linux CI succeeds at edbefa5b; later review/commits must inspect exact
   head/checks. Some final documentation/remux-preparation files may remain
   uncommitted; inspect status before acting. Scoped code changes only.
 - Manuscript `/private/tmp/pointstream-w7-manuscript`: prior pushed main a297279;
   factual exposure correction `5109c83d6fc5156e390fd79fb54d72f89bee777f` is
-  committed locally, **not yet pushed** at this checkpoint. Both variants
+  fast-forward pushed to Overleaf main and independently verified. Both variants
   build 28 pages, appendix starts 24; checker and five registry tests pass. Claim binds
   inventory SHA 4ed6ea5857d0fc54a4f9a158e10da31cb3836d82b1acb43b950dfd34d4b762f0.
   That exact inventory is now committed in code 85588f04; do not edit it silently.
@@ -132,3 +132,29 @@ request has been submitted. No timers, LLM keepalives or active fleet waits.
    as evidence. Persist new ID/budget before one bounded fleet wait. Never replay.
 4. If approval is pending, continue bounded CPU preparation/evidence work; no new GPU.
    No automatic timer/wakeup is active. Original broad goal persists.
+
+## Final CPU-phase publication checkpoint
+
+- Manuscript 5109 is now pushed to Overleaf. New review package
+  `/private/tmp/pointstream-research-review-20261104-5109c83/` has selected-source
+  ZIP SHA 50ebaba74ddafdc27aa88c1584a3fb9201a729e893397b1a789bb9fd2973ecc7,
+  anonymous PDF SHA 6a2c998fe6e394884eb926fae435e86c6436b8b49353bcddf8f5d065a0539905,
+  author PDF SHA 8199c627128bed24d047496b09d30578e9a6cf1781605fcdbfb59eab85034fe3,
+  manifest SHA ef3e1de19d283ceb3ee6bcbf177fbb9f719ca702b5b5367189e3a33ccfb57f1d.
+  Root verified all listed hashes, all 23 active-source files against the exact
+  checkout, 28 pages/reference 22–23/appendix 24–28 and changed page 12 layout.
+  Existing 48-frame anonymous review data is unchanged; separate allowlisted
+  exposure-audit JSON hash 90dd72b1389b7ed1d4b501c382c651fdf477675c4fcd208dd4729c10b191fe11
+  has no direct author/homepath/identifying-projectURL strings in the scoped scan.
+- The manuscript's symbolic `.git/HEAD` was unexpectedly missing; cause unknown.
+  Source files, main ref and reflogs agreed on 5109. Root preserved complete Git
+  metadata under `/private/tmp/pointstream-manuscript-git-recovery-20261104/`,
+  restored only `ref: refs/heads/main` atomically (no active locks), and verified
+  clean tracked source plus successful fast-forward push. No object, index,
+  branch history or manuscript content was discarded; old packages remain.
+- Code full CI passed edbefa5b at run 41912628839. Final doc-only head and PR #331
+  readiness/merge state should be read live. Focused 44 tests and full Ruff pass;
+  local seven mypy baseline/environment errors persist; no personal installation altered.
+- Resource question remains PENDING. No new GPU allocation/request, no native
+  remux/decode or model/image inference, no fleet wait/timer. Author-review is
+  still not submission approval and original broad research goal persists.

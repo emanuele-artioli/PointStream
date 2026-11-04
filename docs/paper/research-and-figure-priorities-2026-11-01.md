@@ -4,6 +4,27 @@ The manuscript is a **work in progress**, with an author-approved empirical-stud
 
 The user's figure/format target is **at most 23 main pages including at most two pages of references, plus at most five additional appendix pages**. Match the chosen TOMM review profile; do not add figures merely to fill pages. This is a planning audit, not a claim that eight figures or every open experiment is mandatory. Existing records and outputs are immutable. The user authorized the figure and manuscript revision; this planning document grants no new experiment budget or permission to change PRESLEY.
 
+## 2026-11-04 execution checkpoint
+
+The user requests completion of submission-relevant research and expansion of
+the ball proof of concept. The new [execution audit](submission-completion-audit-2026-11-04.md)
+and [staged card](../cards/submission-research-2026-11-04.md) supersede the older
+planning state below. GPU approval is pending; all closed budgets remain closed.
+
+Actual metadata recovery establishes prior tracker-selection use of all 30
+TrackNet games 8–10 clips and 43 RacketVision test rallies. The full TrackNet corpus
+has 5,675 frames, including 197 explicit absences. New work is a retrospective
+benchmark, not untouched confirmation. Existing source records qualify 27/30
+clips by 80% recall but record 10/197 false detections, failing the proposed 5%
+source-negative screen; retain instrument limits separately from codec results.
+The new wire/parser, source-oracle entrypoint, matched-envelope analysis,
+receiver-only interface, W8 diagnostic building blocks and lossless-container
+oracle are CPU-tested preparation, not new quality or isolation evidence. W6's
+literal-control exit gate is corrected without changing historical artifacts.
+Manuscript 5109c83 discloses selection exposure and is pushed; no new study result
+is asserted. See [continuation](../continuation-2026-11-04.md) for exact state and
+resource decision; the original wider PLAN remains unfinished.
+
 ## 2026-11-03 checkpoint
 
 The visual revision is implemented in Overleaf `0d98328` (eight main and two
