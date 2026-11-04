@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "approval_date": "2026-11-04",
+  "authority": "User approved staged20GPUh/24workloadCPUh; initial2GPUh/3CPUh feasibility; no training",
+  "gpu_total_seconds": 72000,
+  "cpu_total_seconds": 86400,
+  "initial_gpu_limit_seconds": 7200,
+  "initial_cpu_limit_seconds": 10800,
+  "initial_gate": "active; no larger-stage release yet",
+  "workstreams": {
+    "ball": {
+      "gpu_limit_seconds": 50400,
+      "cpu_limit_seconds": 57600
+    },
+    "svt_gaps": {
+      "gpu_limit_seconds": 1800,
+      "cpu_limit_seconds": 2700
+    },
+    "w8": {
+      "gpu_limit_seconds": 7200,
+      "cpu_limit_seconds": 10800
+    },
+    "w6": {
+      "gpu_limit_seconds": 1800,
+      "cpu_limit_seconds": 4500
+    },
+    "ego_peer_oracles": {
+      "gpu_limit_seconds": 3600,
+      "cpu_limit_seconds": 5400
+    },
+    "shared": {
+      "gpu_limit_seconds": 7200,
+      "cpu_limit_seconds": 5400
+    }
+  },
+  "charges": [
+    {
+      "workstream": "shared",
+      "scope": "inclusive administrative/pre-admission CPU allocation, including earlier bounded metadata/engineering preparation; no model or new native inference",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "basis": "conservative allocation, not complete measured aggregate administrative telemetry"
+    }
+  ],
+  "reservations": [
+    {
+      "phase": "w7-remux-transport-20261104",
+      "workstream": "svt_gaps",
+      "gpu_seconds": 0,
+      "cpu_seconds": 330,
+      "status": "reserved before dispatch",
+      "spec": "docs/experiments/w7-inputs/remux-transport-oracle-20261104.json",
+      "scope": "250s oneCPU campaign plus80s external admission/audit/release; transport feasibility only"
+    }
+  ],
+  "jobs": [],
+  "old_budgets": "closed, not borrowed",
+  "notes": [
+    "Every job is recorded before one bounded fleet wait.",
+    "All-in initial and workstream limits include failed starts, staging, validations, monitoring and release.",
+    "Never replay an unknown request."
+  ]
+}

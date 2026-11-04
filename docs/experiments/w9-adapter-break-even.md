@@ -243,3 +243,17 @@ Final conservative CPU ledger: previous 541-s bound (including the 10-s remainin
 The preceding **641 CPU-s** is only the conservative standalone preparation, CPU pilot, parsing, fresh-process full audits and analysis subtotal. It does not include host CPU consumed by the six GPU scoring jobs. For each job, the saved smoke and full `execution.json` records contain `children_resource_usage` user and system seconds. In the frozen `experiments/jobs/inbox.py`, both snapshots are taken by the same campaign process using `resource.getrusage(RUSAGE_CHILDREN)` after waiting for the corresponding stage; the full snapshot follows the smoke validator. Thus the full snapshot is cumulative and includes the smoke validator's waited child CPU. Summing smoke and full snapshots deliberately double-counts the smoke and conservatively includes any earlier waited staging children. Independent post-full CPU audits are already covered by the standalone subtotal; the fleet does not automatically run a full-stage validator.
 
 Across all six scoring jobs, summing both saved snapshots gives **1,282.600081 recorded child CPU-s**, rounded up to **1,283 CPU-s** for accounting. Added to the standalone ≤641 CPU-s bound, the combined conservative **recorded workload CPU accounting is ≤1,924 / 5,400 CPU-s**; the GPU occupancy bound remains **1,043 / 5,400 GPU-s**. This accounting covers experiment and validator child processes and the separately reserved CPU work; as previously clarified, it excludes long-lived fleet manager/worker infrastructure and shared cache staging. The estimate is an overcount of the recorded child snapshots, not a measurement of untracked infrastructure CPU. The previous 641 value must be labeled standalone subtotal, never the total. The per-job user/system values, exact execution-record SHA256s, and accounting method are retained in `w9-inputs/w7-workload-cpu-accounting.json` (SHA256 `914d2ff5b90395f09bec6deedbf40afd83aa5faefc12c4009ed5d6d2cc4c95ea`). No new jobs or scientific scoring were run for this correction.
+
+### 2026-11-04 — approved transport feasibility phase
+
+Fresh program authority: `docs/cards/submission-research-2026-11-04.md`; reserve
+330 workload CPU-seconds /0GPU before dispatch (250s one-CPU fleet campaign plus
+80s external admission/audit/release). Existing med000 `20261031T111927Z-2d513709`
+and med019 `20261031T105514Z-2310cf5a` were inspected through canonical status
+before using their immutable published streams. Prospective spec at
+`w7-inputs/remux-transport-oracle-20261104.json`, smoke med000/full med019,
+100s each, independent smoke validator15s, same module and native commands.
+Missing/unknown color metadata, changed cadence or a historical raw-YUV hash
+mismatch stop the route. A smaller container would be a new transport contract,
+not a repair of the frozen IVF family; all anchors must be consistently re-rated
+before any new interval claim. No new quality result or job ID yet.

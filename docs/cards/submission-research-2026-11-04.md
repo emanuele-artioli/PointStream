@@ -1,11 +1,12 @@
 # Submission research program — 2026-11-04
 
-Status: reviewed scope and proposed resource envelope; new GPU allocation NOT
-approved. The user's instruction authorizes completing research preparation,
-code, metadata audits, reanalysis and manuscript corrections. Closed K5c/W8/
-W9 balances remain closed. This card requests one finite staged allocation,
-so ordinary implementation corrections within it need not generate repeated
-budget questions. No unknown submission may be replayed.
+Status: **APPROVED by the user, 2026-11-04**: a fresh staged ceiling of
+20 GPU-hours /24 workload CPU-hours. Initial release: at most 2 GPU-hours /
+3 workload CPU-hours across feasibility. Larger stages remain conditional on
+correctness and complete-cost forecasts fitting the approved aggregate and
+workstream ceilings. Ordinary bounded implementation corrections need no new
+permission; source/numerical rules and stops below remain binding. Closed
+K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
 ## Goal and scope
 
@@ -27,7 +28,7 @@ qualification with the existing tennis-trained WASB judge. No table-tennis WASB
 checkpoint exists in the pinned documented release. Unknown frames are not
 negatives. No claim of independent matches beyond documented source identity.
 
-## Proposed inclusive ceilings
+## Approved inclusive ceilings
 
 A fresh **20 GPU-hours and 24 workload CPU-hours**, including staging, failed
 starts, pilots, native encoding/decoding, inference, metrics, independent audits,
@@ -99,6 +100,7 @@ may be cancelled. Device/provider/kernel checks use qualified A6000/Ada paths.
    Lost connectivity never permits replay. If cost or evidence cannot fit,
    preserve the result and return for a new decision.
 
-Before approval, preparation and read-only metadata work continue; no new GPU
-request is admitted. Larger training or a full 34-window pipeline study would
-require a new dominating oracle, measured proposal and resource decision.
+The approval permits this staged program, not training or an automatic full
+34-window pipeline study. Those still need a dominating oracle, measured
+proposal and separate resource decision. All current reservations and charges
+live in `docs/experiments/submission-research-budget-20261104.json`.

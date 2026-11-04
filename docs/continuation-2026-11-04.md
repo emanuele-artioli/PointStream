@@ -1,22 +1,22 @@
 # Continuation — 2026-11-04: expanded submission research
 
-## User goal and pending decision
+## Current approved phase (supersedes historical checkpoint below)
 
-User explicitly requests expansion of the48-frame ball proof of concept into a
-full contribution and completion of remaining PLAN work toward the best paper.
-The primary owns scientific choices, with requested Terra 6.1 medium delegates
-(actual tier telemetry unverified). PRESLEY must never be modified. Existing
-23 main/reference pages (at most two reference pages) plus five appendix limit persists.
-Coauthors have not reviewed the paper and footage permissions remain unresolved;
-no submission is authorized.
+User explicitly approved the staged 20 GPU-hour /24 workload CPU-hour program,
+with initial feasibility release 2 GPU-hours /3 CPU-hours. No training or legacy
+full sweep is authorized. Old allocations remain closed. Current branch is
+`codex/submission-feasibility-2026-11-04`, based on main `404c280d` (PR331 merged).
+Authority/charges/reservations/jobs live in
+`docs/experiments/submission-research-budget-20261104.json`.
+A prospective W7 CPU remux phase reserves330 CPU-seconds /0GPU; no job ID yet.
+Three Terra6.1 medium delegates implement the ball admission wrapper, W8 CUDA
+supervisor and remux adapter. Actual model/effort telemetry remains unverified.
+No submission is authorized; PRESLEY remains read-only. Coauthors have not yet
+reviewed. Footage permissions remain unresolved. Keep23main/reference pages
+(at most2reference pages), plus5appendix pages.
 
-A single asynchronous budget question is **PENDING, NOT APPROVED**: fresh 20 GPU-h /
-24 workload CPU-h aggregate program, first 2 GPU-h /3 CPU-h for feasibility, then scale
-only under real correctness and complete-cost gates. [Card](cards/submission-research-2026-11-04.md).
-Options presented: approve full staged 20/24 (recommended), feasibility 2/3 only,
-or code/existing-evidence only. Do not infer approval from the user's broad
-research goal or elapsed time. Old K5c/W8/W9 balances are closed; no new GPU
-request has been submitted. No timers, LLM keepalives or active fleet waits.
+The remainder records the previous preparation checkpoint; its pending-budget
+wording and draft PR status are historical, superseded by this approval.
 
 ## Repositories and safe state
 
