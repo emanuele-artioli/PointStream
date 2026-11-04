@@ -8,7 +8,7 @@ full sweep is authorized. Old allocations remain closed. Current branch is
 `codex/submission-feasibility-2026-11-04`, based on main `404c280d` (PR331 merged).
 Authority/charges/reservations/jobs live in
 `docs/experiments/submission-research-budget-20261104.json`.
-A prospective W7 CPU remux phase reserves330 CPU-seconds /0GPU; no job ID yet.
+W7 CPU remux job20261104T221616Z-49f19251 is terminal failed (metadata gate: unavailable color metadata),330CPU-s/0GPU phase reservation retained pending final accounting. Ball calibration3300GPU/3600CPU, W8diagnostic180GPU/240CPU and W6control1200GPU/1500CPU are reserved before dispatch; no IDs yet at this checkpoint.
 Three Terra6.1 medium delegates implement the ball admission wrapper, W8 CUDA
 supervisor and remux adapter. Actual model/effort telemetry remains unverified.
 No submission is authorized; PRESLEY remains read-only. Coauthors have not yet

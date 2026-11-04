@@ -51,9 +51,45 @@
       "status": "reserved before dispatch",
       "spec": "docs/experiments/w7-inputs/remux-transport-oracle-20261104.json",
       "scope": "250s oneCPU campaign plus80s external admission/audit/release; transport feasibility only"
+    },
+    {
+      "phase": "k5d-calibration-20261104",
+      "workstream": "ball",
+      "gpu_seconds": 3300,
+      "cpu_seconds": 3600,
+      "status": "reserved before dispatch",
+      "spec": "docs/experiments/k5d-inputs/calibration-fleet-spec-20261104.json"
+    },
+    {
+      "phase": "w8-cuda-diagnostic-20261104",
+      "workstream": "w8",
+      "gpu_seconds": 180,
+      "cpu_seconds": 240,
+      "status": "reserved before dispatch",
+      "spec": "docs/experiments/w8-inputs/receiver-20261101/w8-cuda-diagnostic-fleet-draft-20261104.json"
+    },
+    {
+      "phase": "w6-literal-control-20261104",
+      "workstream": "w6",
+      "gpu_seconds": 1200,
+      "cpu_seconds": 1500,
+      "status": "reserved before dispatch",
+      "spec": "docs/experiments/w6-specs/control-20261104.json"
     }
   ],
-  "jobs": [],
+  "jobs": [
+    {
+      "job_id": "20261104T221616Z-49f19251",
+      "phase": "w7-remux-transport-20261104",
+      "state": "submitted; canonical status pending",
+      "spec_sha256": "2d0d2341aea4a1b4a34e6701e2d3e0a69723e7c80dbf67235967751fadb2a23d",
+      "source_sha256": "969539cffc978ef798d59ade25f98dd7e9e52b7d176de2644c8eba19d5228fbf",
+      "revision": "f14b5f2b3280945037a3e926b61c56721a2d2c44",
+      "deadline": "2026-11-04T23:30:00+00:00",
+      "inclusive_cpu_ceiling": 330,
+      "gpu_ceiling": 0
+    }
+  ],
   "old_budgets": "closed, not borrowed",
   "notes": [
     "Every job is recorded before one bounded fleet wait.",

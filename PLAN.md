@@ -32,9 +32,9 @@ A larger TrackNet study must be described as retrospective; its 5,675 frames
 include 5,472 visible, 197 explicitly absent and 6 occluded. Exact selections and
 hashes are in [K5d](docs/experiments/k5d-ball-benchmark.md). New source/model,
 wire/receiver, task/fidelity analysis and budget gates are being prepared;
-no new GPU request is authorized or submitted. Code preparation already fixes
+the user approved a fresh staged20GPU-hour/24workloadCPU-hour program, initially2GPU-hours/3CPU-hours for feasibility. Larger stages require correctness and complete forecasts; authority and charges are recorded in the approved card and budget ledger. Code preparation already fixes
 the W6 diagnostic's improper float32 override of its literal registered control.
-The old pilot/receiver budgets stay closed. A proposed finite staged program is
+The old pilot/receiver budgets stay closed. The approved finite staged program is
 in [the card](docs/cards/submission-research-2026-11-04.md); full 34-window/training
 work cannot be silently borrowed into it. The complete remaining-work audit is
 [here](docs/paper/submission-completion-audit-2026-11-04.md).

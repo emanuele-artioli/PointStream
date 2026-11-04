@@ -79,7 +79,7 @@ may be cancelled. Device/provider/kernel checks use qualified A6000/Ada paths.
    assess placement/mark sensitivity, not prove perceptual realism.
 3. W8: two fresh minimal CUDA conditions in the same authenticated JCV runtime,
    outside and after the original isolation policy, without generator weights.
-   The initial diagnostic reproduces the original policy exactly. No source,
+   The initial diagnostic uses a newly named historical-policy relocation profile: the authenticated original source is reconstructed read-only, outputs/aliases are fresh, the worker is preflight-only with no weight-body reads. The full configuration diff is retained. It is not a literal rerun of the original configuration. No source,
    label, saved-output or numerical-tolerance boundary may be relaxed, and no
    CUDA initialization occurs before isolation. If a defect concerns a missing
    generic runtime resource, any repair must use a newly versioned, authenticated
