@@ -257,3 +257,17 @@ Missing/unknown color metadata, changed cadence or a historical raw-YUV hash
 mismatch stop the route. A smaller container would be a new transport contract,
 not a repair of the frozen IVF family; all anchors must be consistently re-rated
 before any new interval claim. No new quality result or job ID yet.
+
+Submitted fresh CPU request **20261104T221616Z-49f19251**, source 969539cffc978ef798d59ade25f98dd7e9e52b7d176de2644c8eba19d5228fbf from f14b5f2b3280945037a3e926b61c56721a2d2c44, no selected patch/untracked additions; spec 2d0d2341aea4a1b4a34e6701e2d3e0a69723e7c80dbf67235967751fadb2a23d. Inspect canonical status before any action; never replay. Inclusive phase ceiling330CPU-s/0GPU.
+
+**Outcome: transport route stopped.** Job20261104T221616Z-49f19251, gpu2,
+CPU-only; command0.74555s (childCPU0.47803s), supervisor25.47s before terminal
+failure. Both probes retain range=tv but lack color_space/transfer/primaries.
+Registered metadata gate rejects this; no raw-YUV equality or scoring is
+claimed, med019 fullstage never ran, and the two original anchor gaps remain
+unresolved. Original probe SHAa23b411229057c1e70878de4cef0008befe8cfbd2c8fd61c1ac18b6547c92cd2;
+remux probe414d9de141d0f0c2a31623286b7e884bcd5ab78dd70f0df9f982a148d5e81b09.
+Full preserved receipt at w7-inputs/remux-negative-receipt-20261104.json.
+Charge the entire330CPU-s phase ceiling conservatively,0GPU; do not relax
+metadata after outcome or replay this request. This is a transportqualification
+failure, not a codecquality negative.

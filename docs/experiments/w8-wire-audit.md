@@ -398,3 +398,5 @@ Metadata/limitations retained under w8-inputs/receiver-20261101/. Runtimearchive
 is authenticated; cached extracted runtime tree is not fully rehashed.
 Spec deadline23:00UTC bounds pending admission; initial CPUheadroom0 may
 prevent admission. No job ID at freeze; do not replay unknown submissions.
+
+Submitted fresh paired diagnostic **20261104T222305Z-5d374710**, source c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233 from bf6208c5380f537429b4e49bed39e1c22cdb7b8f, spec 381758de5d3a09c3db7a4c666eefd99ddc0cc0ada07fa65dd1d92487af71da48. Phase180GPU/240CPU; inspect canonical status before action, never replay.

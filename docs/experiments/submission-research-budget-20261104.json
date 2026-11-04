@@ -40,6 +40,13 @@
       "gpu_seconds": 0,
       "cpu_seconds": 300,
       "basis": "conservative allocation, not complete measured aggregate administrative telemetry"
+    },
+    {
+      "phase": "w7-remux-transport-20261104",
+      "workstream": "svt_gaps",
+      "cpu_seconds": 330,
+      "gpu_seconds": 0,
+      "basis": "entire inclusive phase ceiling, conservative; native command0.74555s, oneCPU supervisor wall25.47s, external preparation/audit bounded80s; administrative complete aggregate unmeasured"
     }
   ],
   "reservations": [
@@ -48,7 +55,7 @@
       "workstream": "svt_gaps",
       "gpu_seconds": 0,
       "cpu_seconds": 330,
-      "status": "reserved before dispatch",
+      "status": "closed; charged entire inclusive330CPU-s ceiling conservatively",
       "spec": "docs/experiments/w7-inputs/remux-transport-oracle-20261104.json",
       "scope": "250s oneCPU campaign plus80s external admission/audit/release; transport feasibility only"
     },
@@ -75,19 +82,61 @@
       "cpu_seconds": 1500,
       "status": "reserved before dispatch",
       "spec": "docs/experiments/w6-specs/control-20261104.json"
+    },
+    {
+      "phase": "ego-mask-fixed-oracle-20261104",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "status": "reserved before local CPU analysis",
+      "scope": "120CPU-s hardlimit plus30s admission/audit; no video/model/native invocation"
     }
   ],
   "jobs": [
     {
       "job_id": "20261104T221616Z-49f19251",
       "phase": "w7-remux-transport-20261104",
-      "state": "submitted; canonical status pending",
+      "state": "terminal failed; metadata gate; no full/scoring",
       "spec_sha256": "2d0d2341aea4a1b4a34e6701e2d3e0a69723e7c80dbf67235967751fadb2a23d",
       "source_sha256": "969539cffc978ef798d59ade25f98dd7e9e52b7d176de2644c8eba19d5228fbf",
       "revision": "f14b5f2b3280945037a3e926b61c56721a2d2c44",
       "deadline": "2026-11-04T23:30:00+00:00",
       "inclusive_cpu_ceiling": 330,
-      "gpu_ceiling": 0
+      "gpu_ceiling": 0,
+      "result": "original and remux probes lack color_space/color_transfer/color_primaries"
+    },
+    {
+      "job_id": "20261104T222053Z-0061cb27",
+      "phase": "k5d-calibration-20261104",
+      "state": "pending",
+      "spec_sha256": "b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff",
+      "source_sha256": "c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233",
+      "revision": "bf6208c5380f537429b4e49bed39e1c22cdb7b8f",
+      "deadline": "2026-11-05T02:00:00+00:00",
+      "inclusive_cpu_ceiling": 3600,
+      "gpu_ceiling": 3300
+    },
+    {
+      "job_id": "20261104T222153Z-1145ce7a",
+      "phase": "w6-literal-control-20261104",
+      "state": "pending",
+      "spec_sha256": "b07c84e23cb2aa71fb34f41582b90fbe274f574d81f5ec7976350686a1f0e0fc",
+      "source_sha256": "c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233",
+      "revision": "bf6208c5380f537429b4e49bed39e1c22cdb7b8f",
+      "deadline": "2026-11-05T01:00:00+00:00",
+      "inclusive_cpu_ceiling": 1500,
+      "gpu_ceiling": 1200
+    },
+    {
+      "job_id": "20261104T222305Z-5d374710",
+      "phase": "w8-cuda-diagnostic-20261104",
+      "state": "pending",
+      "spec_sha256": "381758de5d3a09c3db7a4c666eefd99ddc0cc0ada07fa65dd1d92487af71da48",
+      "source_sha256": "c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233",
+      "revision": "bf6208c5380f537429b4e49bed39e1c22cdb7b8f",
+      "deadline": "2026-11-04T23:00:00+00:00",
+      "inclusive_cpu_ceiling": 240,
+      "gpu_ceiling": 180
     }
   ],
   "old_budgets": "closed, not borrowed",

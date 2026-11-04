@@ -181,3 +181,5 @@ is a new non-overwriting hardlink (device58,inode37089793,2564111322bytes)
 to the original TrackNet ZIP, not a copy/overwrite; staged verifier must check
 the frozen full SHA. Source revision derives from authenticated fleet dispatch.
 No inference or job ID at this freeze checkpoint.
+
+Submitted calibration job **20261104T222053Z-0061cb27**, source c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233 from bf6208c5380f537429b4e49bed39e1c22cdb7b8f, spec b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff. Phase3300GPU/3600CPU; inspect canonical status before action, never replay.
