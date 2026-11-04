@@ -1,5 +1,16 @@
 # Continuation — 2026-11-04: expanded submission research
 
+## Live job checkpoint — 22:28 UTC
+
+- Ball calibration20261104T222053Z-0061cb27: running smoke on gpu5Ada at last canonical status; immutable sourcebf6208c5/sourcec34ddd02;3300GPU/3600CPU phase.
+- W6control20261104T222153Z-1145ce7a: pending Ada admission,1200GPU/1500CPU.
+- W8diagnostic20261104T222305Z-5d374710: pending gpu6 exactprofile,180GPU/240CPU, deadline23:00UTC. gpu6 CPUheadroom0 atlastprobe; do not force otherhosts with incompatible receipt/inodes.
+- One canonical wholebatch wait is running: localexec session15697; result/private/tmp/pointstream-feasibility-batch-wait-20261104.json, max2700s, deadlineapprox23:13UTC. Preservehandle; no recurringtimer/nativecompletionresumption has been verified. Wait exits on meaningful attention or allterminal. Inspect before any replay; no uncertain request is duplicated.
+- W7remux20261104T221616Z-49f19251 terminalfailure metadata (no color-space/transfer/primaries),330CPU charged/0GPU, nofull/noquality; terminal+decision events acknowledged.
+- CPU fixedmaskoracle150CPU/0GPU reserved; agentexecuting committed237ae214 on authenticated report, no model/native decoding.
+- CodePR332 has auto-merge enabled, LinuxCI passedbf6208; local237ae214 push inprogress handle72811. Full localpytest11 unrelated existing cv2/PyYAML court/segmentation failures; mypy7existing unrelated errors.
+- Manuscriptworktreehas uncommitted source-screen/remuxqualification,28pages8main2appendixfigures, checker+5registrytestspass. Rootreviewedpage12. No manuscriptpushyet. PRESLEYuntouched.
+
 ## Current approved phase (supersedes historical checkpoint below)
 
 User explicitly approved the staged 20 GPU-hour /24 workload CPU-hour program,

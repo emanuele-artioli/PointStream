@@ -92,3 +92,27 @@ def test_baseline_wire_and_physical_rate_are_checked(tmp_path, monkeypatch):
     (tmp_path / 'dcvc-0' / 'baseline.psbl').write_bytes(b'bad')
     with pytest.raises(ValueError):
         enc.validate(tmp_path)
+
+
+def test_failed_source_is_fidelity_only_with_bound_gate(tmp_path, monkeypatch):
+    report = fixture_output(tmp_path, monkeypatch)
+    source_path = tmp_path / 'source-qualification.json'
+    source = json.loads(source_path.read_text())
+    source['qualified'] = False
+    source['identities'] = {'archive': {'sha256': 'archive'}}
+    source_path.write_text(json.dumps(source))
+    with pytest.raises(ValueError, match='source qualification failed'):
+        enc.validate(tmp_path)
+    gate_path = tmp_path / 'fidelity-gate.json'
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'archive_sha256': 'archive',
+            'calibration_job_id': 'job', 'evidence_sha256': 'a' * 64,
+            'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'full_cost']}
+    gate_path.write_text(json.dumps(gate))
+    report['fidelity_gate'] = {'sha256': enc.oracle.sha(gate_path)}
+    report['source_task_qualified'] = False
+    (tmp_path / 'pilot.json').write_text(json.dumps(report))
+    assert enc.validate(tmp_path)['frames'] == 2
+    report['source_task_qualified'] = True
+    (tmp_path / 'pilot.json').write_text(json.dumps(report))
+    with pytest.raises(ValueError, match='relabeled'):
+        enc.validate(tmp_path)

@@ -56,7 +56,9 @@ def metrics(source: np.ndarray, images: np.ndarray, labels: list[tuple[int, floa
     from experiments.visor.h3b import dists_crops, lpips_reduce
     result = []
     for i, (a, b, (kind, x, y)) in enumerate(zip(source, images, labels)):
-        row: dict[str, Any] = {"frame": i, "frame_psnr": old.psnr(a, b), "full_lpips": None,
+        diff = a.astype(np.int32) - b.astype(np.int32)
+        row: dict[str, Any] = {"frame": i, "sse": int(np.sum(diff.astype(np.int64) ** 2)), "pixels": int(diff.size),
+                               "frame_psnr": old.psnr(a, b), "full_lpips": None,
                                "full_dists": None, "crop_lpips": None, "crop_dists": None}
         if nets is not None:
             lp, di = nets
@@ -92,13 +94,35 @@ def convert_rgb(ffmpeg: str, source: np.ndarray, destination: Path, fps: Fractio
     return cmd
 
 
+def fidelity_gate(path: Path, digest: str, archive_sha: str) -> dict[str, Any]:
+    if oracle.sha(path) != digest:
+        raise ValueError("fidelity gate receipt hash mismatch")
+    receipt = json.loads(path.read_text())
+    required = {"source_transform", "native_and_wire", "receiver_parity", "perceptual_metrics", "full_cost"}
+    evidence = receipt.get("evidence_sha256")
+    if (not isinstance(evidence, str) or len(evidence) != 64 or any(c not in "0123456789abcdef" for c in evidence)
+            or receipt.get("schema_version") != 1 or receipt.get("passed") is not True
+            or receipt.get("scope") != "fidelity-only" or receipt.get("archive_sha256") != archive_sha
+            or not receipt.get("calibration_job_id") or not receipt.get("evidence_sha256")
+            or not required.issubset(set(receipt.get("checks", [])))):
+        raise ValueError("fidelity gate lacks independent calibration and cost checks")
+    return receipt
+
+
 def validate(out: Path) -> dict[str, Any]:
     report = json.loads((out / "pilot.json").read_text())
     qualification = json.loads((out / "source-qualification.json").read_text())
     oracle.validate_report(qualification)
-    if (not qualification["qualified"] or report["frames"] != qualification["frames"]
-            or report["clip"] != qualification["clip"]):
-        raise ValueError("source qualification failed or frame count mismatch")
+    if report["frames"] != qualification["frames"] or report["clip"] != qualification["clip"]:
+        raise ValueError("source qualification frame count or clip mismatch")
+    gate = report.get("fidelity_gate")
+    if gate:
+        fidelity_gate(out / "fidelity-gate.json", gate["sha256"], qualification["identities"]["archive"]["sha256"])
+    elif not qualification["qualified"]:
+        raise ValueError("source qualification failed without independent fidelity gate")
+
+    if "source_task_qualified" in report and report["source_task_qualified"] != qualification["qualified"]:
+        raise ValueError("source task qualification was relabeled")
     labels = [(r["label_kind"], r["label_x"], r["label_y"]) for r in qualification["rows"]]
     n = len(labels)
     width, height = report["size"]
@@ -150,6 +174,9 @@ def validate(out: Path) -> dict[str, Any]:
             if len(item["metrics"]) != n or [r["frame"] for r in item["metrics"]] != list(range(n)):
                 raise ValueError("metric frame coverage mismatch")
             for i, row in enumerate(item["metrics"]):
+                if "sse" in row and (type(row["sse"]) is not int or not 0 <= row["sse"] <= width * height * 3 * 255**2
+                                     or row.get("pixels") != width * height * 3):
+                    raise ValueError("invalid raw squared error")
                 for key in ("frame_psnr", "full_lpips", "full_dists", "crop_lpips", "crop_dists"):
                     value = row[key]
                     required = key == "frame_psnr" or (report["full_metrics"] and (not key.startswith("crop") or labels[i][0] == 1))
@@ -182,16 +209,18 @@ def run(args: argparse.Namespace) -> None:
     local_root = os.environ.get("PS_LOCAL_ROOT")
     if local_root and not Path(args.archive).resolve().is_relative_to(Path(local_root).resolve()):
         raise ValueError("archive is outside PS_LOCAL_ROOT")
-    if args.clip not in ("tracknet/game9/Clip5", "tracknet/game10/Clip3") or args.start_frame != 0:
-        raise ValueError("only registered calibration clips starting at zero")
+    benchmark = bool(getattr(args, "benchmark", False))
+    if args.start_frame != 0 or (not benchmark and args.clip not in ("tracknet/game9/Clip5", "tracknet/game10/Clip3")):
+        raise ValueError("only registered clips starting at zero")
     if len(os.sched_getaffinity(0)) != 1 or os.environ.get("PS_CPU_ALLOWANCE") != "1" or torch.cuda.device_count() != 1:
         raise ValueError("requires one CPU and one CUDA device")
     for name in ("ffmpeg", "encoder", "decoder"):
         if not Path(getattr(args, name)).is_absolute():
             raise ValueError("native tools must be absolute paths")
     selection = oracle.select(json.loads(Path(args.manifest).read_text()), args.clip, 0, args.frames)
-    if args.frames not in (16, selection["label_rows"]):
-        raise ValueError("only 16-frame smoke or full calibration clip is allowed")
+    if ((benchmark and args.frames != selection["label_rows"] and not (os.environ.get("PS_STAGE") == "smoke" and args.frames == 16))
+            or (not benchmark and args.frames not in (16, selection["label_rows"]))):
+        raise ValueError("benchmark requires full clip; calibration requires smoke or full clip")
     for name in ("image_ckpt", "video_ckpt", "lpips_backbone", "dists_backbone"):
         if oracle.sha(Path(getattr(args, name))) != getattr(args, name + "_sha256"):
             raise ValueError(f"{name} hash mismatch")
@@ -204,7 +233,13 @@ def run(args: argparse.Namespace) -> None:
              "elapsed_seconds": time.monotonic() - started}) + "\n")
         raise
     (args.output / "source-qualification.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
-    if not report["qualified"]:
+    gate_record = None
+    if benchmark:
+        gate_path = Path(args.fidelity_gate)
+        fidelity_gate(gate_path, args.fidelity_gate_sha256, args.archive_sha256)
+        shutil.copyfile(gate_path, args.output / "fidelity-gate.json")
+        gate_record = {"sha256": args.fidelity_gate_sha256, "scope": "fidelity-only"}
+    elif not report["qualified"]:
         raise ValueError("source qualification failed; retained before coding")
     args.image_sha256 = args.image_ckpt_sha256
     args.video_sha256 = args.video_ckpt_sha256
@@ -237,6 +272,13 @@ def run(args: argparse.Namespace) -> None:
             raise ValueError("DCVC native validation failed")
         native = path / ("stream.psdc" if kind == "dcvc" else "stream.ivf")
         decoded = tw.rgb_frames(Path(rec["decoded"]), w, h, n, path / "decoded.npy")
+        directory = args.output / f"{kind}-{point}"
+        directory.mkdir()
+        shutil.copyfile(native, directory / "native.bin")
+        if kind == "dcvc":
+            for name in ("plan.json", "encode.json", "decode.json"):
+                shutil.copyfile(path / name, directory / name)
+        (directory / "native-checkpoint.json").write_text(json.dumps(rec, indent=2, allow_nan=False) + "\n")
         coded.append((kind, point, native, rec, decoded))
     fits = old.fit_streak(start, source, [x[4] for x in coded], (h, w))
     resource_map = {"resources": {"svt": {"codec": "svt-av1-ivf", "decoder": args.decoder, "decoder_sha256": oracle.sha(Path(args.decoder))},
@@ -254,15 +296,11 @@ def run(args: argparse.Namespace) -> None:
         payload = ball.encode_frames(track, apps, w, h)
         stream = ball_stream.Stream(w, h, fps, n, "dcvc-uf" if kind == "dcvc" else "svt-av1-ivf", kind, native.read_bytes(), payload)
         directory = args.output / f"{kind}-{point}"
-        directory.mkdir()
         if kind == "dcvc":
             from src.codecs.dcvc_uf_worker import dcvc_command
-            for name in ("plan.json", "encode.json", "decode.json"):
-                shutil.copyfile(native.parent / name, directory / name)
             rec["commands"] = {action: dcvc_command(Path(sys.prefix), action, native.parent / "plan.json",
                               native.parent / f"{action}.json")[0] for action in ("encode", "decode")}
         published = directory / "native.bin"
-        shutil.copyfile(native, published)
         wire = directory / "stream.psbl"
         wire.write_bytes(ball_stream.pack(stream))
         baseline_wire = directory / "baseline.psbl"
@@ -297,7 +335,8 @@ def run(args: argparse.Namespace) -> None:
               "full_metrics": nets is not None,
               "scope": "feasibility only" if nets is None else "six-point calibration; filesystem denial not established",
               "conversion": {"command": conversion, "yuv_sha256": oracle.sha(yuv), "floor_psnr": pooled_psnr(source, converted)},
-              "resource_map_sha256": oracle.sha(map_path),
+              "resource_map_sha256": oracle.sha(map_path), "fidelity_gate": gate_record,
+              "source_task_qualified": bool(report["qualified"]),
               "metric_models": None if nets is None else {"lpips": quality.lpips_record(Path(args.lpips_backbone)),
                                                              "dists": quality.dists_record(Path(args.dists_backbone))},
               "identities": {name: {"path": getattr(args, name), "sha256": getattr(args, name + "_sha256")} for name in ("image_ckpt", "video_ckpt", "lpips_backbone", "dists_backbone")},

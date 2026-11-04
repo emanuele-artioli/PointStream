@@ -183,3 +183,20 @@ the frozen full SHA. Source revision derives from authenticated fleet dispatch.
 No inference or job ID at this freeze checkpoint.
 
 Submitted calibration job **20261104T222053Z-0061cb27**, source c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233 from bf6208c5380f537429b4e49bed39e1c22cdb7b8f, spec b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff. Phase3300GPU/3600CPU; inspect canonical status before action, never replay.
+
+Prospective judge-sensitivity controls frozen before opening calibration outcome: k5d-inputs/calibration-controls-contract-20261104.json; same188frameClip3 SVT62, exact retainednative/streak, same-track exposure0 disk withPSNRguard, diagnostic64pxhorizontalshift andwhite-streak colour. Fullimagejudges/registeredlabels only; no realismcertification, no tuning. Phase reserved600GPU/900CPU; no executionuntil realinputparity andcostfit.
+
+**Calibration interrupted, not a quality negative.** Canonical request
+20261104T222053Z-0061cb27 is terminal contended on gpu5; foreignGPU PID358756
+triggered frozen stop policy. Its16frame raw-source screen completed
+(WASB16/16 at5/10px; BallTrack14/16 at5px,15/16 at10px), but no complete
+native/wire/metric record or cost promotion exists. Parent349596 andforeignPID
+were both gone at recovery; no foreign process was signalled by this session.
+Receipt k5d-inputs/calibration-contention-receipt-20261104.json preserves
+status/staging/source identities. Charge conservative450GPU-s/650CPU-s
+(inclusive, above259.4s oneCPU supervisor lifecycle), release unused reservation.
+Rootprospectively reserves3300GPU/3600CPU for one fresh same-contract request
+after fresh host/alljobchecks; this is not a replay of the stopped request.
+Initial feasibility ceiling remains7200GPU/10800CPU, oldallocationsclosed.
+
+Submitted fresh same-contract calibration **20261104T223611Z-ed28cf8e**, source 82effb7975c304090cdd748a90e0365be5fb7e02ee24ece3c0238e034f574948 from 237ae2145ad2a3b86e20e3899b4250a559b3a42b, spec b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff. Same frozen encoder asbf6208; concurrent benchmarkencoder edits excluded. Complete1577request canonical snapshot+all6host probes found bothgpu2A6000idle; gpu5busy/gpu6CPUheadroom0. Phase3300GPU/3600CPU, initialreleasebudgetstillfits; neverreplayold0061cb27.

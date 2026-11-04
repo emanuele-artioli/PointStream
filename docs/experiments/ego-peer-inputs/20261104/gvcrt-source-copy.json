@@ -1,0 +1,9 @@
+{
+  "bytes": 48800,
+  "created_exclusively": true,
+  "original_untouched": true,
+  "output": "/home/itec/emanuele/Datasets/pointstream-data/tennis/gvcrt-20261104-inputs/source-export.tar.gz",
+  "sha256": "a7ad708cfaea7d0030cc1d78bd2cd1f1d62a1df999d8eaece292bff510c30f7e",
+  "source": "gpu5:/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf/source-export.tar.gz",
+  "verified_after_copy": true
+}

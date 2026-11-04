@@ -9,7 +9,7 @@ from typing import Sequence
 from experiments.background.g5 import envelope, pareto
 from experiments.tennis.k5 import bd_rate
 
-CONTINUOUS = {"frame_psnr": 1, "crop_lpips": -1, "crop_dists": -1}
+CONTINUOUS = {"frame_psnr": 1, "crop_lpips": -1, "crop_dists": -1, "full_lpips": -1, "full_dists": -1}
 DISCRETE = {"recall5", "recall10", "false_per_negative"}
 
 
@@ -47,7 +47,7 @@ def validate_points(rows: Sequence[Point], frames: int, duration: Fraction, metr
                 or isinstance(row.value, bool) or not math.isfinite(row.value)
                 or not math.isfinite(row.rate) or row.rate <= 0):
             raise ValueError("invalid or incomparable point")
-        if metric in {"crop_lpips", "crop_dists"} and row.value < 0:
+        if metric in {"crop_lpips", "crop_dists", "full_lpips", "full_dists"} and row.value < 0:
             raise ValueError("invalid perceptual distance")
         if metric in DISCRETE and not 0 <= row.value <= 1:
             raise ValueError("invalid task rate")

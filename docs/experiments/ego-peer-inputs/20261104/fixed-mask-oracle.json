@@ -1,0 +1,580 @@
+{
+  "git_revision": "237ae2145ad2a3b86e20e3899b4250a559b3a42b",
+  "input_archive_sha256": "383b34b10c838b883e21308e22344cdd28dba4c0eb404d3e12734a52719a0565",
+  "items": {
+    "P01_107_0000003049": {
+      "comparisons": {
+        "free": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": 0.02676962437263186,
+              "range": [
+                -0.32629738390445706,
+                -0.03676909923553467
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.13934174773120556,
+              "range": [
+                -0.4292574050726594,
+                -0.0354845876792061
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": 0.004154232876594222,
+              "range": [
+                -0.3038810659448306,
+                -0.03676909923553467
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.07653020103183317,
+              "range": [
+                -0.3940718967811858,
+                -0.0354845876792061
+              ],
+              "where": "overlap"
+            }
+          }
+        },
+        "ideal_2kbps": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": 0.09345047643641324,
+              "range": [
+                -0.32629738390445706,
+                -0.03676909923553467
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.20584484019890437,
+              "range": [
+                -0.4292574050726594,
+                -0.0354845876792061
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": 0.06328413562207058,
+              "range": [
+                -0.3038810659448306,
+                -0.03676909923553467
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.13190086881647867,
+              "range": [
+                -0.3940718967811858,
+                -0.0354845876792061
+              ],
+              "where": "overlap"
+            }
+          }
+        },
+        "shape": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": 0.48325565644712354,
+              "range": [
+                -0.32629738390445706,
+                -0.03676909923553467
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.5979775542699242,
+              "range": [
+                -0.4292574050726594,
+                -0.0354845876792061
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": 0.4094366278345569,
+              "range": [
+                -0.3038810659448306,
+                -0.03676909923553467
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.460046306610544,
+              "range": [
+                -0.3940718967811858,
+                -0.0354845876792061
+              ],
+              "where": "overlap"
+            }
+          }
+        }
+      },
+      "selected_pairs": 15,
+      "shape_bytes": 8882,
+      "shape_source_sha256": "d827ea747651af47bedbb380c628ae3996dd3de6557b4bd3d3b1566c73decffa"
+    },
+    "P02_02_0000006080": {
+      "comparisons": {
+        "free": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": -0.07267439714429613,
+              "range": [
+                -0.3200017711520195,
+                -0.040652711788813266
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.2919240766519855,
+              "range": [
+                -0.4711434751977313,
+                -0.04326973536271083
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": -0.1557005950752658,
+              "range": [
+                -0.30451792627573,
+                -0.040652711788813266
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.31148937673518784,
+              "range": [
+                -0.4064654650056004,
+                -0.04326973536271083
+              ],
+              "where": "overlap"
+            }
+          }
+        },
+        "ideal_2kbps": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": -0.0275539632173476,
+              "range": [
+                -0.3200017711520195,
+                -0.040652711788813266
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.339481293976269,
+              "range": [
+                -0.4711434751977313,
+                -0.04326973536271083
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": -0.11766756998128003,
+              "range": [
+                -0.30451792627573,
+                -0.040652711788813266
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.3444817001305023,
+              "range": [
+                -0.4064654650056004,
+                -0.04326973536271083
+              ],
+              "where": "overlap"
+            }
+          }
+        },
+        "shape": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": 0.42303761335354184,
+              "range": [
+                -0.3200017711520195,
+                -0.040652711788813266
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.8079370408341602,
+              "range": [
+                -0.4711434751977313,
+                -0.04326973536271083
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": 0.26236397645620646,
+              "range": [
+                -0.30451792627573,
+                -0.040652711788813266
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.680400553265913,
+              "range": [
+                -0.4064654650056004,
+                -0.04326973536271083
+              ],
+              "where": "overlap"
+            }
+          }
+        }
+      },
+      "selected_pairs": 13,
+      "shape_bytes": 12405,
+      "shape_source_sha256": "bc4b41eb86791962d1ebc73ff7b2efcb7b7d7343fe81079459761de13b85ae3b"
+    },
+    "P03_10_0000000616": {
+      "comparisons": {
+        "free": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": -0.1448386436948994,
+              "range": [
+                -0.32099401940902084,
+                -0.07999801576137543
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.4296812216670549,
+              "range": [
+                -0.43385070261347813,
+                -0.050295657404703584
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": -0.2144618917726765,
+              "range": [
+                -0.30745299190282827,
+                -0.07999801576137543
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.44035742467207917,
+              "range": [
+                -0.41194009608910803,
+                -0.050295657404703584
+              ],
+              "where": "overlap"
+            }
+          }
+        },
+        "ideal_2kbps": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": -0.09443639945069415,
+              "range": [
+                -0.32099401940902084,
+                -0.07999801576137543
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.489081335379115,
+              "range": [
+                -0.43385070261347813,
+                -0.050295657404703584
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": -0.1711883883402443,
+              "range": [
+                -0.30745299190282827,
+                -0.07999801576137543
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.49353608016908934,
+              "range": [
+                -0.41194009608910803,
+                -0.050295657404703584
+              ],
+              "where": "overlap"
+            }
+          }
+        },
+        "shape": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": 0.3375302808599936,
+              "range": [
+                -0.32099401940902084,
+                -0.07999801576137543
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.9932727685201603,
+              "range": [
+                -0.43385070261347813,
+                -0.050295657404703584
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": 0.199071221604755,
+              "range": [
+                -0.30745299190282827,
+                -0.07999801576137543
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": 0.9479715714945098,
+              "range": [
+                -0.41194009608910803,
+                -0.050295657404703584
+              ],
+              "where": "overlap"
+            }
+          }
+        }
+      },
+      "selected_pairs": 12,
+      "shape_bytes": 10779,
+      "shape_source_sha256": "f54f4969296ea2ab67903d89eb89e7e7259799f034b3c275484bed60e96bd2de"
+    },
+    "P09_106_0000006303": {
+      "comparisons": {
+        "free": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": -0.24254826188702905,
+              "range": [
+                -0.3783597081899643,
+                -0.07492104033629099
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": -0.19913764188694172,
+              "range": [
+                -0.4952332224509196,
+                -0.05120297085876854
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": -0.3025312030847902,
+              "range": [
+                -0.360040964782238,
+                -0.07492104033629099
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": -0.233608737521094,
+              "range": [
+                -0.45411431855775675,
+                -0.05120297085876854
+              ],
+              "where": "overlap"
+            }
+          }
+        },
+        "ideal_2kbps": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": -0.2204254975494151,
+              "range": [
+                -0.3783597081899643,
+                -0.07492104033629099
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": -0.17351975190739022,
+              "range": [
+                -0.4952332224509196,
+                -0.05120297085876854
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": -0.2838793770420406,
+              "range": [
+                -0.360040964782238,
+                -0.07492104033629099
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": -0.2118558977078001,
+              "range": [
+                -0.45411431855775675,
+                -0.05120297085876854
+              ],
+              "where": "overlap"
+            }
+          }
+        },
+        "shape": {
+          "pooled": {
+            "wdists_fill": {
+              "bd": -0.12688770910220348,
+              "range": [
+                -0.3783597081899643,
+                -0.07492104033629099
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": -0.06483434368765706,
+              "range": [
+                -0.4952332224509196,
+                -0.05120297085876854
+              ],
+              "where": "overlap"
+            }
+          },
+          "venue": {
+            "wdists_fill": {
+              "bd": -0.20493912023876582,
+              "range": [
+                -0.360040964782238,
+                -0.07492104033629099
+              ],
+              "where": "overlap"
+            },
+            "wlpips_fill": {
+              "bd": -0.11949761538698744,
+              "range": [
+                -0.45411431855775675,
+                -0.05120297085876854
+              ],
+              "where": "overlap"
+            }
+          }
+        }
+      },
+      "selected_pairs": 14,
+      "shape_bytes": 6512,
+      "shape_source_sha256": "f8300802c07fd0eaf6cf6abe14b6a23022777cd6d40e45de1a58628a1da4ce23"
+    }
+  },
+  "numpy": "2.0.0",
+  "overall_dists_rule": {
+    "free": true,
+    "ideal_2kbps": false,
+    "shape": false
+  },
+  "python": "3.12.7",
+  "schema": 1,
+  "scipy": "1.18.1",
+  "scope": "Fixed reduced masks, fixed H5p 4a composites and selected pairs; ideal costs are not actual streams.",
+  "source_sha256": {
+    "bitstream": "9bad141cb30a6ece3a1201f91c4bad46954bbd3e601737e38e6b1a648f29d590",
+    "g5": "5ffd82bb6a6c4c2fcb7235ad48dc603295dbc3360e95f1f2b63b7b5cf49241f5",
+    "h5": "a7778e04ae93a209faba846c0b5300b0b5c016ff4ee41646e9a285c2dce606a4",
+    "oracle": "b5033067fe3bb1efbaf20940863ca32b2a24a6801e5f4c059b6a765c24486c80"
+  },
+  "summary": {
+    "free|pooled|wdists_fill": {
+      "items_below_zero": 3,
+      "items_with_bd": 4,
+      "mean_bd": -0.10832291958839818,
+      "passes_dists_rule": true
+    },
+    "free|pooled|wlpips_fill": {
+      "items_below_zero": 1,
+      "items_with_bd": 4,
+      "mean_bd": 0.16545235104082606,
+      "passes_dists_rule": false
+    },
+    "free|venue|wdists_fill": {
+      "items_below_zero": 3,
+      "items_with_bd": 4,
+      "mean_bd": -0.16713486426403457,
+      "passes_dists_rule": true
+    },
+    "free|venue|wlpips_fill": {
+      "items_below_zero": 1,
+      "items_with_bd": 4,
+      "mean_bd": 0.14869206622950154,
+      "passes_dists_rule": false
+    },
+    "ideal_2kbps|pooled|wdists_fill": {
+      "items_below_zero": 3,
+      "items_with_bd": 4,
+      "mean_bd": -0.0622413459452609,
+      "passes_dists_rule": false
+    },
+    "ideal_2kbps|pooled|wlpips_fill": {
+      "items_below_zero": 1,
+      "items_with_bd": 4,
+      "mean_bd": 0.21522192941172455,
+      "passes_dists_rule": false
+    },
+    "ideal_2kbps|venue|wdists_fill": {
+      "items_below_zero": 3,
+      "items_with_bd": 4,
+      "mean_bd": -0.12736279993537358,
+      "passes_dists_rule": true
+    },
+    "ideal_2kbps|venue|wlpips_fill": {
+      "items_below_zero": 1,
+      "items_with_bd": 4,
+      "mean_bd": 0.18951568785206754,
+      "passes_dists_rule": false
+    },
+    "shape|pooled|wdists_fill": {
+      "items_below_zero": 1,
+      "items_with_bd": 4,
+      "mean_bd": 0.2792339603896139,
+      "passes_dists_rule": false
+    },
+    "shape|pooled|wlpips_fill": {
+      "items_below_zero": 1,
+      "items_with_bd": 4,
+      "mean_bd": 0.5835882549841469,
+      "passes_dists_rule": false
+    },
+    "shape|venue|wdists_fill": {
+      "items_below_zero": 1,
+      "items_with_bd": 4,
+      "mean_bd": 0.16648317641418814,
+      "passes_dists_rule": false
+    },
+    "shape|venue|wlpips_fill": {
+      "items_below_zero": 1,
+      "items_with_bd": 4,
+      "mean_bd": 0.4922302039959948,
+      "passes_dists_rule": false
+    }
+  }
+}

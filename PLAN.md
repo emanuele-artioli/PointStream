@@ -326,6 +326,7 @@ The detailed historical findings follow; they do not supersede this resume state
   bound. Every hand result also granted R, which the decoder does not
   have (H3b2: 72–170 kbps).
 
+- **Fixed-mask feasibility (2026-11-04):** H5p fixed-composite oracle at `237ae214` passes its weighted-DISTS rule with the reduced mask free (venue −16.71%, pooled −10.83%, 3/4), but ideal 2 kbps fails pooled (−6.22%) and measured shape fails (venue +16.65%, pooled +27.92%). Narrowed scope: P09_106 alone retains a paid-shape win (venue −20.49%, pooled −12.69%); test independent small-F windows before generalizing. No GPU; changed-mask or altered-stream methods are not bounded. [Evidence and GVC intake](docs/experiments/ego-peer-feasibility-20261104.md).
 - **Egocentric pipeline (H5):** runs end to end on the 4 pilot items
   (`src/pointstream/`, `experiments/visor/h5.py`). Against fairly
   configured off-the-shelf codecs, venue models unbilled, F granted:

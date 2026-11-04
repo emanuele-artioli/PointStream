@@ -47,6 +47,34 @@
       "cpu_seconds": 330,
       "gpu_seconds": 0,
       "basis": "entire inclusive phase ceiling, conservative; native command0.74555s, oneCPU supervisor wall25.47s, external preparation/audit bounded80s; administrative complete aggregate unmeasured"
+    },
+    {
+      "phase": "k5d-calibration-20261104",
+      "workstream": "ball",
+      "gpu_seconds": 450,
+      "cpu_seconds": 650,
+      "basis": "conservative inclusive envelope above259.4s oneCPU supervisor lifecycle and external admission/identity/audit; stoppedforeignPID358756; parent349596andforeignPIDgone atcheck"
+    },
+    {
+      "phase": "source-rights-metadata-20261104",
+      "workstream": "shared",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "basis": "bounded read-only metadata inventory ceiling; no video/model decode, data changes or contacts"
+    },
+    {
+      "phase": "ego-mask-fixed-oracle-20261104",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 0,
+      "cpu_seconds": 150,
+      "basis": "entire bounded ceiling covers0.725CPU oracle+0.052audit+0.153localSSH+0.519envmetadata plus<=60remoteuninstrumentedstat/read reserve; no model/native decoding"
+    },
+    {
+      "phase": "partial-and-opentt-metadata-20261104",
+      "workstream": "shared",
+      "gpu_seconds": 0,
+      "cpu_seconds": 90,
+      "basis": "conservative <=30CPU partialterminalaudit + <=60CPU OpenTTmetadata selection; no native/model/frame inference"
     }
   ],
   "reservations": [
@@ -64,7 +92,7 @@
       "workstream": "ball",
       "gpu_seconds": 3300,
       "cpu_seconds": 3600,
-      "status": "reserved before dispatch",
+      "status": "closed interrupted; conservative450GPU/650CPU charged, unused reservation released",
       "spec": "docs/experiments/k5d-inputs/calibration-fleet-spec-20261104.json"
     },
     {
@@ -88,8 +116,40 @@
       "workstream": "ego_peer_oracles",
       "gpu_seconds": 0,
       "cpu_seconds": 150,
-      "status": "reserved before local CPU analysis",
+      "status": "closed;150CPU/0GPU inclusive ceiling conservatively charged",
       "scope": "120CPU-s hardlimit plus30s admission/audit; no video/model/native invocation"
+    },
+    {
+      "phase": "k5d-calibration-controls-20261104",
+      "workstream": "ball",
+      "gpu_seconds": 1200,
+      "cpu_seconds": 1500,
+      "status": "reserved; bound increased prospectively for five-arm full metrics, no outcome opened",
+      "scope": "contract docs/experiments/k5d-inputs/calibration-controls-contract-20261104.json; 188sameclipSVT62, no newencoding"
+    },
+    {
+      "phase": "k5d-calibration-replacement-20261104",
+      "workstream": "ball",
+      "gpu_seconds": 3300,
+      "cpu_seconds": 3600,
+      "status": "reserved; wait fresh admission review",
+      "scope": "same scientificcalibration asbf6208, newrequest afterconfirmedterminalforeigncontention; no oldrequestreplay"
+    },
+    {
+      "phase": "gvcrt-entropy-interface-20261104",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 0,
+      "cpu_seconds": 210,
+      "status": "reserved; root review/admission required before compile",
+      "scope": "nativeCPU entropy build and symbols only; no model/video/GPU"
+    },
+    {
+      "phase": "opentt-frame-join-witness-20261104",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "status": "reserved; no decoding until rootadmission; optionalnotcorebenchmarkdependency",
+      "scope": "sourceidentity andmanualframe/labelindexwitness only,no judges/no qualitycodec"
     }
   ],
   "jobs": [
@@ -108,13 +168,15 @@
     {
       "job_id": "20261104T222053Z-0061cb27",
       "phase": "k5d-calibration-20261104",
-      "state": "pending",
+      "state": "terminal contended; no native/full metric quality result",
       "spec_sha256": "b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff",
       "source_sha256": "c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233",
       "revision": "bf6208c5380f537429b4e49bed39e1c22cdb7b8f",
       "deadline": "2026-11-05T02:00:00+00:00",
       "inclusive_cpu_ceiling": 3600,
-      "gpu_ceiling": 3300
+      "gpu_ceiling": 3300,
+      "result": "16frame sourceWASB16/16, nativepipeline interrupted, no promotion",
+      "foreign_gpu_pid": 358756
     },
     {
       "job_id": "20261104T222153Z-1145ce7a",
@@ -137,6 +199,17 @@
       "deadline": "2026-11-04T23:00:00+00:00",
       "inclusive_cpu_ceiling": 240,
       "gpu_ceiling": 180
+    },
+    {
+      "job_id": "20261104T223611Z-ed28cf8e",
+      "phase": "k5d-calibration-replacement-20261104",
+      "state": "pending",
+      "spec_sha256": "b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff",
+      "source_sha256": "82effb7975c304090cdd748a90e0365be5fb7e02ee24ece3c0238e034f574948",
+      "revision": "237ae2145ad2a3b86e20e3899b4250a559b3a42b",
+      "deadline": "2026-11-05T02:00:00+00:00",
+      "inclusive_cpu_ceiling": 3600,
+      "gpu_ceiling": 3300
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -144,5 +217,21 @@
     "Every job is recorded before one bounded fleet wait.",
     "All-in initial and workstream limits include failed starts, staging, validations, monitoring and release.",
     "Never replay an unknown request."
-  ]
+  ],
+  "monitoring": {
+    "mode": "one canonical wholebatch wait; exits on attention",
+    "state": "running",
+    "local_exec_session": 82059,
+    "jobs": [
+      "20261104T223611Z-ed28cf8e",
+      "20261104T222153Z-1145ce7a",
+      "20261104T222305Z-5d374710"
+    ],
+    "result": "/private/tmp/pointstream-feasibility-batch2-wait-20261104.json",
+    "max_seconds": 2700,
+    "started_utc": "2026-11-04T22:59:48.239015+00:00",
+    "deadline_utc": "2026-11-04T23:44:48.239015+00:00",
+    "native_completion_resume_verified": false,
+    "recurring_llm_polling": false
+  }
 }
