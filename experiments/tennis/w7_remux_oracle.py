@@ -79,8 +79,10 @@ def validate_probes(original: dict[str, Any], remux: dict[str, Any], *, width: i
         if any(stamps[i] - stamps[0] != Fraction(i, 1) / fps for i in range(frames)):
             raise ValueError('frame timestamps do not preserve the exact cadence')
         color_keys = ('color_range', 'color_space', 'color_transfer', 'color_primaries')
-        if any(key not in s for key in color_keys):
-            raise ValueError('missing color metadata')
+        if any(not isinstance(s.get(key), str) or not s[key].strip()
+               or s[key].strip().lower().startswith(('unknown', 'unspecified', 'reserved'))
+               for key in color_keys):
+            raise ValueError('missing or unavailable color metadata')
         metadata.append({key: s[key] for key in color_keys})
         times.append(stamps)
     if metadata[0] != metadata[1] or times[0] != times[1]:
@@ -116,6 +118,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         if name.startswith('probe_'):
             (work / f'{name}.json').write_bytes(completed.stdout)
             outputs[name] = json.loads(completed.stdout)
+        if name == 'probe_remux':
+            # Reject unsupported metadata before spending time on full decodes.
+            validate_probes(outputs['probe_original'], outputs['probe_remux'], width=args.width,
+                            height=args.height, frames=args.frames, fps=fps)
     details = validate_probes(outputs['probe_original'], outputs['probe_remux'], width=args.width,
                               height=args.height, frames=args.frames, fps=fps)
     expected_bytes = args.width * args.height * 3 // 2 * args.frames

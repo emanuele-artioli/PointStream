@@ -156,3 +156,28 @@
   No new source/model/codec run, GPU use or closed-budget transfer. Primary
   regional fidelity and byte-efficiency remain testable independently under
   their development/cost gates; the detector-based interpretation is narrower.
+
+### 2026-11-04 — staged allocation approved
+
+The user approved the [program card](../cards/submission-research-2026-11-04.md):
+20 GPU-hours /24 workload CPU-hours inclusive, first 2 GPU-hours /3 CPU-hours for
+feasibility. Old allocations remain closed. The new [budget ledger](submission-research-budget-20261104.json)
+records 300 CPU-s administrative/pre-admission allocation, 0 GPU use, no reservations
+or new jobs at this checkpoint. Root reviews actual module/validator/source/
+input/runtime/device correctness and complete forecasts before submission.
+No larger study is admitted by approval alone. No training or 200 GPU-hour full
+pipeline run is included. Uncertain submissions are inspected, never repeated.
+
+### Prospective calibration admission — approved phase
+
+Root reviewed real six-point encoder, packet receiver, full-frame/fixed64px crop
+metrics and native/zero-BALL/candidate byte ledgers. New frozen entrypoint
+`k5d_fleet`: game10/Clip3,16-frame full-metrics smoke then188-frame fullclip.
+Inclusive phase ceiling3300GPU-s/3600CPU-s within initialrelease; oneCPU,
+exclusive qualified GPU, smoke600s/full2400s/campaign3300s. Full forecast uses
+1.25 times measured smoke cost scaled188/16 plus60s and a further60s campaign
+reserve. Failure stops promotion; no filesystem-isolation claim. Source ZIP
+is a new non-overwriting hardlink (device58,inode37089793,2564111322bytes)
+to the original TrackNet ZIP, not a copy/overwrite; staged verifier must check
+the frozen full SHA. Source revision derives from authenticated fleet dispatch.
+No inference or job ID at this freeze checkpoint.

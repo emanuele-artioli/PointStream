@@ -644,7 +644,7 @@ def decode_av1(stream: Path, out: Path, threads: int) -> dict[str, str]:
 
 
 def command_flicker_split(a: argparse.Namespace) -> int:
-    """W6b (CPU): the post path's composite, flow and flicker, with the five variants of the split, from saved inputs."""
+    """W6b: replay the post path with an explicit RGB conversion device."""
     import cv2
     import torch
 
@@ -655,6 +655,9 @@ def command_flicker_split(a: argparse.Namespace) -> int:
     from experiments.visor.j import residual_energies
 
     began, cpu_began = time.monotonic(), time.process_time()
+    device = getattr(a, "device", "cpu")
+    if device == "cuda" and (not torch.cuda.is_available() or torch.cuda.device_count() != 1):
+        raise ValueError("CUDA control requires exactly one visible CUDA device")
     torch.set_num_threads(a.threads)
     cv2.setNumThreads(a.threads)
     scratch, out_dir = a.scratch, a.out
@@ -673,6 +676,8 @@ def command_flicker_split(a: argparse.Namespace) -> int:
     post = extract_all(a.post_archive, scratch / "post") / "publish"
     saved = np.load(post / "judges.npz")
     saved_meta = json.loads((post / "w6-judge.json").read_text())
+    if digest(post / "judges.npz") != saved_meta["judges_sha256"]:
+        raise ValueError("saved post judge arrays changed")
     wire = load_wire(a, scratch)
     players, order, boxes, region = wire["players"], wire["order"], wire["boxes"], wire["region"]
     unit_names = [u["name"] for u in wire["units"]]
@@ -700,7 +705,7 @@ def command_flicker_split(a: argparse.Namespace) -> int:
     gpu_saved = np.load(extract_member(a.gpu_base, "publish/al-s4-gpu.npy", scratch / "base" / "al-s4-gpu.npy"), mmap_mode="r")
 
     def base_frame(t: int) -> np.ndarray:
-        return cv2.resize(plane_rgb(raw_base, t, 480, 272, torch, "cpu"), (1920, 1080), interpolation=cv2.INTER_CUBIC)
+        return cv2.resize(plane_rgb(raw_base, t, 480, 272, torch, device), (1920, 1080), interpolation=cv2.INTER_CUBIC)
 
     base_diff = max(int(np.abs(base_frame(t).astype(np.int16) - np.asarray(gpu_saved[t // 3]).astype(np.int16)).max()) for t in range(0, FRAMES, 3))
 
@@ -731,7 +736,7 @@ def command_flicker_split(a: argparse.Namespace) -> int:
 
     smooth_cache: dict[tuple[int, int], np.ndarray] = {}
     for t in range(frames):
-        source = plane_rgb(raw_source, t, 1920, 1080, torch, "cpu")
+        source = plane_rgb(raw_source, t, 1920, 1080, torch, device)
         base = base_frame(t)
         player_crops, player_boxes = {}, {}
         recv, smooth, matte = {}, {}, {}
@@ -803,7 +808,7 @@ def command_flicker_split(a: argparse.Namespace) -> int:
              "consecutive_iou_smoothed": mean_of(jitter_smooth)}
     result = {"frames": frames, "pairs": int(valid.sum()), "variants": variants, "flicker": flicker_result, "energy": energy_result,
               "control": control, "masks": masks, "base_tick_max_abs_diff_vs_paid_rgb": base_diff, "base_decoder": decoder,
-              "anchor_rates_kbps": rate, "inputs": hashes, "post_job_judges_sha256": saved_meta["judges_sha256"], "device": "cpu",
+              "anchor_rates_kbps": rate, "inputs": hashes, "post_job_judges_sha256": saved_meta["judges_sha256"], "device": device,
               "threads": a.threads, "seconds": round(time.monotonic() - began, 1), "cpu_seconds": round(time.process_time() - cpu_began, 1),
               "tools": {"ffmpeg": tool_version(["ffmpeg", "-version"]), "torch": torch.__version__, "cv2": cv2.__version__}}
     np.savez_compressed(out_dir / "flicker-split.npz", variants=np.asarray(variants), flicker=flick, energy=energy, energy_src=energy_src,
@@ -958,6 +963,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--out", type=Path, required=True)
     s.add_argument("--frames", type=int, default=0)
     s.add_argument("--threads", type=int, default=4)
+    s.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     for name in ("validate-generate", "validate-masks", "validate-judge", "validate-post"):
         sub.add_parser(name)
     r = sub.add_parser("report")

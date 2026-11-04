@@ -44,3 +44,11 @@ def test_hash_identity_must_match(tmp_path):
         check_hash(path, '0' * 64)
     with pytest.raises(ValueError, match='lowercase hex'):
         check_hash(path, 'invalid')
+
+
+@pytest.mark.parametrize('value', ['unknown', 'unspecified', 'reserved', 'reserved0', ''])
+def test_unavailable_color_is_not_proof_of_preservation(value):
+    altered = probe()
+    altered['streams'][0]['color_space'] = value
+    with pytest.raises(ValueError, match='color metadata'):
+        validate_probes(altered, altered, width=960, height=544, frames=3, fps=Fraction(50))

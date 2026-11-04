@@ -1,11 +1,12 @@
 # Submission research program — 2026-11-04
 
-Status: reviewed scope and proposed resource envelope; new GPU allocation NOT
-approved. The user's instruction authorizes completing research preparation,
-code, metadata audits, reanalysis and manuscript corrections. Closed K5c/W8/
-W9 balances remain closed. This card requests one finite staged allocation,
-so ordinary implementation corrections within it need not generate repeated
-budget questions. No unknown submission may be replayed.
+Status: **APPROVED by the user, 2026-11-04**: a fresh staged ceiling of
+20 GPU-hours /24 workload CPU-hours. Initial release: at most 2 GPU-hours /
+3 workload CPU-hours across feasibility. Larger stages remain conditional on
+correctness and complete-cost forecasts fitting the approved aggregate and
+workstream ceilings. Ordinary bounded implementation corrections need no new
+permission; source/numerical rules and stops below remain binding. Closed
+K5c/W8/W9 balances are not transferred. Unknown submissions are never replayed.
 
 ## Goal and scope
 
@@ -27,7 +28,7 @@ qualification with the existing tennis-trained WASB judge. No table-tennis WASB
 checkpoint exists in the pinned documented release. Unknown frames are not
 negatives. No claim of independent matches beyond documented source identity.
 
-## Proposed inclusive ceilings
+## Approved inclusive ceilings
 
 A fresh **20 GPU-hours and 24 workload CPU-hours**, including staging, failed
 starts, pilots, native encoding/decoding, inference, metrics, independent audits,
@@ -78,7 +79,7 @@ may be cancelled. Device/provider/kernel checks use qualified A6000/Ada paths.
    assess placement/mark sensitivity, not prove perceptual realism.
 3. W8: two fresh minimal CUDA conditions in the same authenticated JCV runtime,
    outside and after the original isolation policy, without generator weights.
-   The initial diagnostic reproduces the original policy exactly. No source,
+   The initial diagnostic uses a newly named historical-policy relocation profile: the authenticated original source is reconstructed read-only, outputs/aliases are fresh, the worker is preflight-only with no weight-body reads. The full configuration diff is retained. It is not a literal rerun of the original configuration. No source,
    label, saved-output or numerical-tolerance boundary may be relaxed, and no
    CUDA initialization occurs before isolation. If a defect concerns a missing
    generic runtime resource, any repair must use a newly versioned, authenticated
@@ -99,6 +100,7 @@ may be cancelled. Device/provider/kernel checks use qualified A6000/Ada paths.
    Lost connectivity never permits replay. If cost or evidence cannot fit,
    preserve the result and return for a new decision.
 
-Before approval, preparation and read-only metadata work continue; no new GPU
-request is admitted. Larger training or a full 34-window pipeline study would
-require a new dominating oracle, measured proposal and resource decision.
+The approval permits this staged program, not training or an automatic full
+34-window pipeline study. Those still need a dominating oracle, measured
+proposal and separate resource decision. All current reservations and charges
+live in `docs/experiments/submission-research-budget-20261104.json`.

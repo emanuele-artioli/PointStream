@@ -377,3 +377,24 @@ The current amendment checkpoint is first; earlier records remain below. The pro
 - **Weights and model lineage.** The accounting grants installed generic generator/segmenter and common tennis-base weights; this is an explicit deployment assumption, not free universal content. The common `tennis-base@fit-100` is itself trained on footage from the Alcaraz and Medvedev matches plus other matches; those Tier 1 matches are familiar, whereas Tier 2's Nadal–Kyrgios generator base did not see that match (its match adapter was trained on the first half). Exact upstream/pretraining and replay independence remain scoped to recorded audits ([lineage receipts](k6b-players.md), [W7](w7-untouched.md)). Match-specific adapter and pose guider are charged over 7,200 s: the frozen Alcaraz and Medvedev measured terms are 1,488,252 and 1,495,592 bytes respectively ([rate code](../../experiments/tennis/w7_rates.py)); these are per-tensor charges, including quantization scales and LZMA framing, not complete serialized decoder payloads. They lack a serialized tensor directory and complete receiver bootstrap. Separately, the recorded common tennis-base checkpoint is 48,878,567 bytes; including it at installation or amortizing it is a sensitivity, not an added charge hidden in the primary rate. Any required generic decoder and SAM installation must be declared separately, not mislabeled as match payload.
 - **Minimal next witness and units.** Freeze one window and one declared decoder profile; serialize a complete self-delimiting bundle containing IVF, KPS2, the *actual* reference packets, match adapter/guider tensors with directories, scale/shape/name and quantization metadata, model identifiers, ordering, timing and any necessary initialization/corrections. From an isolated fresh process with only that bundle and explicitly identified installed models/code, decode references/keypoints/geometry, native base, generated crops, masks and composite at the same 80 judged ticks; assert hashes or a prespecified platform-tolerant numerical/quality control against saved outputs, and audit file reads to exclude source/target/prepared/saved-result access. If it passes, repeat on 240 frames separately before a full-rate claim. Count the bundle bytes exactly once, distinguish per-frame, per-window, per-reference refresh, per-match and one-time installation costs, and recalculate the rate at the actual amortization interval. A mismatch is unresolved until corrected and its bytes paid; no numerical unmeasured overhead or complete-codec win is inferred.
 - **Search limits.** This is source and checked-in-record inspection, not a fresh decoder execution or independent remeasurement of all historical byte fields. The prior receiver isolation applies to mask prediction from saved generated pixels, not an end-to-end complete bitstream. Source/quality evaluation files are distinguished from receiver inputs by their code path, not asserted absent from an untested deployment. No new files in `Datasets`/`Models` and no experiment job.
+
+### 2026-11-04 — approved paired CUDA diagnostic admission
+
+Fresh program phase reserves180GPU-s/240workloadCPU-s, no old balances.
+Profile `historical-runtime-policy-relocated-no-weight-read-v1` reconstructs
+authenticated original source archive6412af95…a713 in a new read-only path;
+original config SHAfd97361b…04ec is retained byte-for-byte, with explicit full
+normalization diff. Original model grants remain but files={} and preflight
+worker kind prevent weight-body verification/loading; no model identity claim.
+Outputs and denied aliases are fresh, actual protected paths/receipt/inodes
+unchanged, CUDA initializes only after original isolation bootstrap. Two fresh
+60s-bounded generic/isolated tiny CUDA arms use the same JCV runtime and GPU.
+The paired negative is a complete diagnostic only when both failures are
+measured and isolation denials are independently verified; generation remains
+gated separately. Exact-profile compatible pool is gpu6 among responsivehosts;
+gpu3 compatibility unknown after timeout. gpu5 lacks5 preserved allow paths,
+the fixed protected receipt, and has a different NFS device; others lack more.
+Metadata/limitations retained under w8-inputs/receiver-20261101/. Runtimearchive
+is authenticated; cached extracted runtime tree is not fully rehashed.
+Spec deadline23:00UTC bounds pending admission; initial CPUheadroom0 may
+prevent admission. No job ID at freeze; do not replay unknown submissions.

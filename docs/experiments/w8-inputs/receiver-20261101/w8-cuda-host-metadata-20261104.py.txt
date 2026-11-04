@@ -1,0 +1,11 @@
+import concurrent.futures,json,subprocess,shlex
+from pathlib import Path
+c=json.loads(Path('/private/tmp/w8-historical-config-20261104.raw.json').read_text())
+program='''import json,sys,pathlib,os\nc=json.loads(sys.stdin.read()); roots=c['allow_paths']; omit=('/local/users/emanuele/pointstream/sources/20261101T151030Z-df638d2f','/local/users/emanuele/pointstream/scratch/20261101T151030Z-df638d2f-smoke/cost-worker/output'); roots=[p for p in roots if not any(p==x or p.startswith(x+'/') for x in omit)]; missing=[p for p in roots if not pathlib.Path(p).exists()]; pr=pathlib.Path(c['protected_receipt']['path']); fixed={k:v[0] for k,v in c['denied_paths'].items() if k!='aliases'}; ids={}\nfor k,v in fixed.items():\n try:\n  s=pathlib.Path(v).stat();ids[k]={'device':s.st_dev,'inode':s.st_ino}\n except OSError as e:ids[k]={'error':str(e)}\nprint(json.dumps({'missing_allow':missing,'protected_receipt_exists':pr.is_file(),'protected_inodes':ids,'runtime_tree_exists':pathlib.Path('/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/bin/python').exists()}))'''
+def one(host):
+ try:
+  r=subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=6',host,'python3 -c '+shlex.quote(program)],input=json.dumps(c),text=True,capture_output=True,timeout=25)
+  return host,{'status':r.returncode,'stdout':r.stdout,'stderr':r.stderr}
+ except Exception as e:return host,{'error':str(e)}
+with concurrent.futures.ThreadPoolExecutor(max_workers=6) as ex:
+ print(json.dumps(dict(ex.map(one,['gpu1','gpu2','gpu3','gpu4','gpu5','gpu6'])),indent=2))
