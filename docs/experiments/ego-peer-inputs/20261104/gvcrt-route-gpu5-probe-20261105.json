@@ -1,0 +1,42 @@
+{
+  "status": "failed",
+  "host": "gpu5",
+  "source": "/private/tmp/pointstream-gvcrt-endpoints-e6e0-source.tar",
+  "source_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "source_bytes": 6133760,
+  "target_dir": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-route-c72ec701c8f34bb0a20af7145401f438",
+  "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-route-c72ec701c8f34bb0a20af7145401f438/source.tar",
+  "timeout_seconds": 15,
+  "doctor_evidence": "7488c0eaef7f4446bad9fb0558bed41a",
+  "cpu_affinity": "not available on this macOS client",
+  "error": "Command '['ssh', '-C', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8', 'gpu5', \"bash -lc 'umask 077; set -o noclobber -o pipefail; gzip -dc | dd bs=1M iflag=fullblock status=none > /home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-route-c72ec701c8f34bb0a20af7145401f438/source.tar'\"]' timed out after 14.861044917000982 seconds",
+  "error_type": "TimeoutExpired",
+  "elapsed_seconds": 15.011180333000084,
+  "usage_before": {
+    "self": {
+      "user_seconds": 0.046813999999999995,
+      "system_seconds": 0.018917
+    },
+    "children": {
+      "user_seconds": 0.014655,
+      "system_seconds": 0.007587
+    }
+  },
+  "usage_after": {
+    "self": {
+      "user_seconds": 0.183554,
+      "system_seconds": 0.023565
+    },
+    "children": {
+      "user_seconds": 0.056593,
+      "system_seconds": 0.023932
+    }
+  },
+  "partial_bytes_observed": 977721,
+  "remote_matching_processes_observed": 0,
+  "remote_aggregate_cpu": "unmeasured",
+  "full_cpu_charge_seconds": 120,
+  "checksum_verified": false,
+  "retried": false,
+  "scope": "actual _send_snapshot upload route diagnostic only; no GPU or model"
+}
