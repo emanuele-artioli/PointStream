@@ -200,16 +200,22 @@ def main() -> None:
     elif args.mode == 'oracle-outer':
         oracle_outer(args.unshare_sha, args.timeout, arguments)
     else:
+        accounting_context = None
+        if arguments and arguments[0] in ('prepare', 'score'):
+            from experiments.tennis import k5d_checkpoint as checkpoint
+            from experiments.tennis import k5d_checkpoint_fleet as fleet
+            if 'torch' in sys.modules:
+                raise ValueError('namespace init must not import Torch or initialize CUDA')
+            accounting_context = {'clip': fleet.option(arguments, '--clip'),
+                                  'frames': int(fleet.option(arguments, '--frames')),
+                                  'execution_identity': checkpoint.execution_identity()}
         receipt = supervise(arguments, args.timeout, args.outside)
         print('K5D_NAMESPACE_CANDIDATE ' + json.dumps(receipt, sort_keys=True, allow_nan=False), flush=True)
         if receipt['reason'] != 'complete' or receipt['status'] != 0:
             raise SystemExit(1)
-        if arguments[0] in ('prepare', 'score'):
-            from experiments.tennis import k5d_checkpoint as checkpoint
-            from experiments.tennis import k5d_checkpoint_fleet as fleet
+        if accounting_context is not None:
             record = {'schema': 1, 'method': 'linux-pidns-init-waited-rusage-v1', 'phase': arguments[0],
-                      'stage': os.environ['PS_STAGE'], 'clip': fleet.option(arguments, '--clip'),
-                      'frames': int(fleet.option(arguments, '--frames')), 'execution_identity': checkpoint.execution_identity(),
+                      'stage': os.environ['PS_STAGE'], **accounting_context,
                       'child_exit_code': receipt['status'], 'wrapper_pid': os.getpid(),
                       'command_pid': receipt['worker_namespace_pid'],
                       'adopted_children_waited': max(0, receipt['reaped'] - 1),
