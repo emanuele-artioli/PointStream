@@ -500,7 +500,7 @@ def _send_snapshot(
     receive = f"umask 077; set -o noclobber; cat > {shlex.quote(remote_tar)}"
     with source.open("rb") as stream:
         proc = subprocess.run(
-            ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "-lc", receive])],
+            ["ssh", "-C", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "-lc", receive])],
             stdin=stream,
             capture_output=True,
             timeout=timeout,
