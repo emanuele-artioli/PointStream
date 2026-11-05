@@ -71,9 +71,8 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
     proof.mkdir()
     outside = os.readlink('/proc/self/ns/pid')
     timeout = 20.0 if case == 'normal' else 12.0
-    command = [str(unshare), '--user', '--map-root-user', '--pid', '--fork', '--kill-child=SIGKILL',
-               sys.executable, '-m', 'experiments.tennis.k5d_scoped_namespace', 'inner',
-               '--outside', outside, '--timeout', str(timeout), '--', 'native-proof', *native_args,
+    command = [sys.executable, '-m', 'experiments.tennis.k5d_scoped_namespace', 'oracle-outer',
+               '--unshare-sha', sha(unshare), '--timeout', str(timeout), '--', 'native-proof', *native_args,
                '--output', str(Path(os.environ['PS_SCRATCH_DIR']) / ('native-' + case))]
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     log = proof / 'command.log'
@@ -90,7 +89,8 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
                 for member in descendants(proc.pid):
                     observed[(member['host_pid'], member['start_ticks'])] = member
                     binary = Path(member['executable'])
-                    if binary.name in expected_native and sha(binary) == expected_native[binary.name]:
+                    if (binary.name in expected_native
+                            and binary.resolve() == (Path(sys.prefix) / 'bin' / binary.name).resolve()):
                         active_native = member
                         break
                 if active_native is not None:
@@ -103,13 +103,19 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
                 proc.wait()
                 raise TimeoutError('native subprocess observation deadline')
             init = json.loads((proof / 'init.json').read_text())['identity']
+            launcher_exe = Path(os.readlink(f'/proc/{proc.pid}/exe')).resolve(strict=True)
+            launcher_stat = Path(f'/proc/{proc.pid}/stat').read_text()
+            launcher_start = int(launcher_stat[launcher_stat.rfind(')') + 2:].split()[19])
+            if launcher_exe != unshare or launcher_start != owner['start_ticks']:
+                raise ValueError('outer launcher executable or identity differs')
             if (not valid_identity(init) or init['namespace_pid'] != 1 or init['pid_namespace'] == outside
                     or active_native['pid_namespace'] != init['pid_namespace'] or not valid_identity(active_native)):
                 proc.kill()
                 proc.wait()
                 raise ValueError('namespace or native process identity differs')
             write(proof / 'before-interruption.json', {'case': case, 'launcher': owner, 'init': init,
-                  'native': active_native, 'observed_members': list(observed.values()), 'outside_namespace': outside})
+                  'native': active_native, 'observed_members': list(observed.values()), 'outside_namespace': outside,
+                  'launcher_executable': str(launcher_exe), 'launcher_executable_sha256': sha(launcher_exe)})
             if case != 'normal':
                 if gone(active_native):
                     raise ValueError('owned native process exited before interruption')
@@ -187,6 +193,20 @@ def execute(args: argparse.Namespace) -> None:
     if dispatch['environment']['gpu'] is not None:
         raise ValueError('GPU must be hidden')
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
+    if os.environ['PS_STAGE'] == 'full':
+        publish = scratch / 'publish'
+        publish.mkdir()
+        write(publish / 'no-op.json', {'schema': 1, 'stage': 'full', 'scope': 'no repeated oracle or production work',
+              'source_sha256': dispatch['code']['source_sha256'], 'snapshot_sha256': dispatch['code']['snapshot_sha256'],
+              'environment_sha256': dispatch['staged_environment']['sha256']})
+        return
+    archive = Path(args.archive).resolve(strict=True)
+    if sha(archive) != args.archive_sha:
+        raise ValueError('staged source hash differs')
+    st = archive.stat()
+    archive_identity = {'sha256': args.archive_sha,
+                        'stat': [st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns]}
+    os.environ['PS_K5D_ARCHIVE_IDENTITY'] = json.dumps(archive_identity, sort_keys=True)
     publish = scratch / 'publish'
     publish.mkdir()
     root = publish / 'cases'
@@ -196,6 +216,9 @@ def execute(args: argparse.Namespace) -> None:
                    '--decoder-sha', args.decoder_sha]
     expected_native = {'ffmpeg': args.ffmpeg_sha, 'SvtAv1EncApp': args.encoder_sha,
                        'dav1d': args.decoder_sha}
+    for name, digest in expected_native.items():
+        if sha(Path(sys.prefix) / 'bin' / name) != digest:
+            raise ValueError('native executable hash differs: ' + name)
     results = []
     for case in CASES:
         try:
@@ -204,7 +227,10 @@ def execute(args: argparse.Namespace) -> None:
             write(publish / f'failed-{case}.json', {'case': case, 'error': str(exc),
                   'scope': 'partial native oracle proof; do not retry automatically'})
             raise
-    write(publish / 'oracle.json', {'schema': 1, 'stage': os.environ['PS_STAGE'],
+    st = archive.stat()
+    if archive_identity['stat'] != [st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns]:
+        raise ValueError('staged archive identity changed during oracle')
+    write(publish / 'oracle.json', {'schema': 1, 'archive_stat': archive_identity['stat'], 'stage': os.environ['PS_STAGE'],
           'source_sha256': dispatch['code']['source_sha256'], 'snapshot_sha256': dispatch['code']['snapshot_sha256'],
           'environment_sha256': dispatch['staged_environment']['sha256'], 'unshare_sha256': args.unshare_sha,
           'archive_sha256': args.archive_sha, 'native_tools': expected_native, 'cases': results,

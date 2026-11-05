@@ -129,6 +129,49 @@ def outer(unshare_sha: str, timeout: float, arguments: list[str]) -> None:
     os.execv(path, cmd)
 
 
+def oracle_outer(unshare_sha: str, timeout: float, arguments: list[str]) -> None:
+    """Exec the same launcher for a CPU oracle bound to its parent fleet spec."""
+    import hashlib
+    import json
+    import shutil
+
+    from experiments.jobs.inbox import phase_command
+
+    if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or os.environ.get('PS_STAGE') != 'smoke':
+        raise ValueError('CPU smoke oracle profile required')
+    stage = Path(os.environ['PS_STAGE_DIR'])
+    spec = json.loads((stage.parent / 'spec.json').read_text())
+    staged = json.loads((stage / 'staging.json').read_text())['inputs']
+    expected = phase_command(spec, 'smoke', staged, sys.executable)
+    parent = Path(f'/proc/{os.getppid()}/cmdline').read_bytes().split(b'\0')
+    parent_args = [item.decode() for item in parent if item]
+    if (spec.get('entrypoint') != ['-m', 'experiments.tennis.k5d_native_pid_oracle']
+            or parent_args != expected or expected[3] != 'run'):
+        raise ValueError('oracle parent does not match fleet stage')
+    def option(name: str) -> str:
+        if expected.count(name) != 1:
+            raise ValueError('oracle option differs')
+        return expected[expected.index(name) + 1]
+    pairs = ('--archive', '--archive-sha', '--ffmpeg-sha', '--encoder-sha', '--decoder-sha')
+    if (unshare_sha != option('--unshare-sha') or len(arguments) != 13 or arguments[0] != 'native-proof'
+            or any(arguments[1 + 2 * i] != name or arguments[2 + 2 * i] != option(name)
+                   for i, name in enumerate(pairs)) or arguments[11] != '--output'):
+        raise ValueError('oracle workload differs from fleet spec')
+    output = Path(arguments[12]).resolve()
+    scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
+    if output.parent != scratch or not output.name.startswith('native-') or not 0 < timeout < 21:
+        raise ValueError('oracle output or timeout differs')
+    worker_command(arguments)
+    path = shutil.which('unshare')
+    if not path or Path(path).resolve() != Path(option('--unshare')).resolve() or hashlib.sha256(Path(path).read_bytes()).hexdigest() != unshare_sha:
+        raise ValueError('oracle unshare identity differs')
+    outside = os.readlink('/proc/self/ns/pid')
+    cmd = [path, '--user', '--map-root-user', '--pid', '--fork', '--kill-child=SIGKILL',
+           sys.executable, '-m', 'experiments.tennis.k5d_scoped_namespace', 'inner',
+           '--outside', outside, '--timeout', str(timeout), '--', *arguments]
+    os.execv(path, cmd)
+
+
 def main() -> None:
     import argparse
     import json
@@ -139,6 +182,10 @@ def main() -> None:
     outer_parser.add_argument('--unshare-sha', required=True)
     outer_parser.add_argument('--timeout', required=True, type=float)
     outer_parser.add_argument('arguments', nargs=argparse.REMAINDER)
+    oracle_parser = sub.add_parser('oracle-outer')
+    oracle_parser.add_argument('--unshare-sha', required=True)
+    oracle_parser.add_argument('--timeout', required=True, type=float)
+    oracle_parser.add_argument('arguments', nargs=argparse.REMAINDER)
     inner_parser = sub.add_parser('inner')
     inner_parser.add_argument('--outside', required=True)
     inner_parser.add_argument('--timeout', required=True, type=float)
@@ -147,6 +194,8 @@ def main() -> None:
     arguments = args.arguments[1:] if args.arguments[:1] == ['--'] else args.arguments
     if args.mode == 'outer':
         outer(args.unshare_sha, args.timeout, arguments)
+    elif args.mode == 'oracle-outer':
+        oracle_outer(args.unshare_sha, args.timeout, arguments)
     else:
         receipt = supervise(arguments, args.timeout, args.outside)
         print('K5D_NAMESPACE_CANDIDATE ' + json.dumps(receipt, sort_keys=True, allow_nan=False), flush=True)

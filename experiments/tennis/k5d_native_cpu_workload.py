@@ -17,12 +17,12 @@ from pathlib import Path
 def run(archive: Path, archive_sha: str, output: Path, binaries: dict[str, str]) -> dict:
     if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or len(os.sched_getaffinity(0)) != 1:
         raise ValueError('CPU-only, single-affinity workload required')
-    digest = hashlib.sha256()
-    with archive.open('rb') as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
-            digest.update(chunk)
-    if digest.hexdigest() != archive_sha:
-        raise ValueError('source archive changed')
+    expected = json.loads(os.environ['PS_K5D_ARCHIVE_IDENTITY'])
+    def stamp() -> list[int]:
+        st = archive.stat()
+        return [st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns]
+    if expected.get('sha256') != archive_sha or expected.get('stat') != stamp():
+        raise ValueError('staged source identity changed')
     tools = {name: Path(sys.prefix) / 'bin' / binary for name, binary in
              (('ffmpeg', 'ffmpeg'), ('encoder', 'SvtAv1EncApp'), ('decoder', 'dav1d'))}
     for name, path in tools.items():
@@ -47,6 +47,8 @@ def run(archive: Path, archive_sha: str, output: Path, binaries: dict[str, str])
                          crf=48, preset=k5.PRESET, threads=1, full_range=False,
                          encoder=str(tools['encoder']), decoder=str(tools['decoder']),
                          cpus=list(os.sched_getaffinity(0)))
+    if stamp() != expected['stat']:
+        raise ValueError('staged source changed during native work')
     if record['decoded_frames'] != 2 or record['temporal_units'] != 2:
         raise ValueError('native output timeline differs')
     return {'source_sha256': archive_sha, 'clip': clip['id'], 'frames': 2,
