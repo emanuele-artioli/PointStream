@@ -45,3 +45,24 @@ def test_subreaper_waits_for_orphan(tmp_path: Path, capsys: pytest.CaptureFixtur
     assert marker.read_text() == 'done'
     assert row['adopted_children_waited'] == 1
     assert parse(json.loads(capsys.readouterr().out.split('K5D_CPU_ACCOUNTING ', 1)[1])) > 0
+
+
+def test_pid_namespace_receipt_requires_matching_execution() -> None:
+    row = dict(receipt(), method='linux-pidns-init-waited-rusage-v1')
+    namespace = {'status': 0, 'reason': 'complete', 'complete_descendant_wait': True,
+                 'namespace_init': {'namespace_pid': 1}, 'worker_namespace_pid': 2, 'reaped': 1,
+                 'children_cpu_seconds': 3.0, 'init_cpu_seconds': 0.5}
+    def joined(proof: dict) -> float:
+        log = 'K5D_NAMESPACE_CANDIDATE ' + json.dumps(proof) + '\nK5D_CPU_ACCOUNTING ' + json.dumps(row)
+        return accounting.read_receipt(log, phase='prepare', stage='full', clip='clip', frames=48,
+                                       identity={'source': 'hash'})
+    assert joined(namespace) == 3.5
+    with pytest.raises(ValueError, match='namespace execution record'):
+        parse(row)
+    for key, value in [('status', 1), ('worker_namespace_pid', 3), ('children_cpu_seconds', 4.0),
+                       ('complete_descendant_wait', False), ('namespace_init', {'namespace_pid': 2})]:
+        with pytest.raises(ValueError, match='namespace execution'):
+            joined(dict(namespace, **{key: value}))
+    row['method'] = 'other'
+    with pytest.raises(ValueError, match='provenance'):
+        joined(namespace)

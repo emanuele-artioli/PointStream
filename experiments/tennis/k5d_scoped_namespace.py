@@ -207,7 +207,7 @@ def main() -> None:
         if arguments[0] in ('prepare', 'score'):
             from experiments.tennis import k5d_checkpoint as checkpoint
             from experiments.tennis import k5d_checkpoint_fleet as fleet
-            record = {'schema': 1, 'method': 'linux-subreaper-waited-rusage-v1', 'phase': arguments[0],
+            record = {'schema': 1, 'method': 'linux-pidns-init-waited-rusage-v1', 'phase': arguments[0],
                       'stage': os.environ['PS_STAGE'], 'clip': fleet.option(arguments, '--clip'),
                       'frames': int(fleet.option(arguments, '--frames')), 'execution_identity': checkpoint.execution_identity(),
                       'child_exit_code': receipt['status'], 'wrapper_pid': os.getpid(),

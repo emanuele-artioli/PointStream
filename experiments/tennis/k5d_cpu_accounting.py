@@ -95,7 +95,7 @@ def read_receipt(log: str, *, phase: str, stage: str, clip: str, frames: int,
     if len(lines) != 1:
         raise ValueError('exactly one CPU accounting record required')
     record = json.loads(lines[0])
-    if (record.get('schema') != 1 or record.get('method') != 'linux-subreaper-waited-rusage-v1'
+    if (record.get('schema') != 1 or record.get('method') not in ('linux-subreaper-waited-rusage-v1', 'linux-pidns-init-waited-rusage-v1')
             or record.get('phase') != phase or record.get('stage') != stage or record.get('clip') != clip
             or record.get('frames') != frames or record.get('execution_identity') != identity
             or record.get('child_exit_code') != 0 or record.get('complete_descendant_wait') is not True
@@ -105,6 +105,25 @@ def read_receipt(log: str, *, phase: str, stage: str, clip: str, frames: int,
             or type(record.get('adopted_children_waited')) is not int or record['adopted_children_waited'] < 0
             or record.get('scope') != 'stage command only; excludes fleet staging, publication and validation'):
         raise ValueError('CPU accounting provenance differs')
+    if record['method'] == 'linux-pidns-init-waited-rusage-v1':
+        namespace_prefix = 'K5D_NAMESPACE_CANDIDATE '
+        namespaces = [line[len(namespace_prefix):] for line in log.splitlines() if line.startswith(namespace_prefix)]
+        if len(namespaces) != 1:
+            raise ValueError('exactly one namespace execution record required')
+        namespace = json.loads(namespaces[0])
+        init = namespace.get('namespace_init')
+        if (not isinstance(init, dict) or type(init.get('namespace_pid')) is not int
+                or init['namespace_pid'] != 1 or record['wrapper_pid'] != 1
+                or type(namespace.get('status')) is not int or namespace['status'] != 0 or namespace.get('reason') != 'complete'
+                or namespace.get('complete_descendant_wait') is not True
+                or type(namespace.get('worker_namespace_pid')) is not int
+                or namespace['worker_namespace_pid'] != record['command_pid']
+                or type(namespace.get('reaped')) is not int or namespace['reaped'] < 1
+                or namespace['reaped'] - 1 != record['adopted_children_waited']
+                or isinstance(namespace.get('children_cpu_seconds'), bool) or isinstance(namespace.get('init_cpu_seconds'), bool)
+                or namespace.get('children_cpu_seconds') != record['children_cpu_seconds']
+                or namespace.get('init_cpu_seconds') != record['wrapper_cpu_seconds']):
+            raise ValueError('namespace execution and CPU accounting differ')
     values = [record.get('children_cpu_seconds'), record.get('wrapper_cpu_seconds')]
     if any(isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x) or x < 0 for x in values):
         raise ValueError('invalid CPU accounting values')
