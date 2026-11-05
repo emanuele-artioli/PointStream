@@ -1,0 +1,12 @@
+{
+  "job": "20261105T020103Z-c33fa60e",
+  "host": "gpu6",
+  "read_only_check": "After terminal status, direct existence checks reported the task-owned smoke scratch, full scratch, and source checkout absent. No deletion was performed by the auditor.",
+  "smoke_scratch_present": false,
+  "full_scratch_present": false,
+  "source_checkout_present": false,
+  "canonical_status_gpu_claimed": false,
+  "canonical_status_compute_processes": [],
+  "supervisor_pids_present": false,
+  "limitations": "Worker exit receipts contain no individual worker PIDs; no claim is made that each was independently checked."
+}
