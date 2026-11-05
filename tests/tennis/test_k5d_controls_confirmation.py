@@ -32,3 +32,20 @@ def test_rejects_forged_audit_and_forecast_respects_slowdown(tmp_path):
     fake.write_text(json.dumps(audit))
     with pytest.raises(ValueError, match='SHA'):
         confirmation.make_spec('/home/itec/emanuele/Datasets/pointstream-data/analysis/audit.json', fake, '2026-11-05T04:00:00+00:00')
+
+
+def test_generator_uses_only_committed_pilot_template_in_clean_tree(tmp_path, monkeypatch):
+    import shutil
+
+    audit = Path('docs/experiments/k5d-inputs/controls-3ec159d8-independent-audit-20261105.json').resolve()
+    template = Path('docs/experiments/k5d-inputs/calibration-controls-pilot-spec-20261105.json')
+    destination = tmp_path / template
+    destination.parent.mkdir(parents=True)
+    shutil.copyfile(template, destination)
+    monkeypatch.setattr(confirmation.fleet, 'ROOT', tmp_path)
+    spec = confirmation.make_spec('/home/itec/emanuele/Datasets/pointstream-data/analysis/audit.json', audit, '2026-11-05T04:00:00+00:00')
+    rows = {x['name']: x for x in spec['staged_inputs']}
+    assert rows['calibration_full']['sha256'] == confirmation.CALIBRATION_SHA['calibration_full']
+    assert 'cc450baf/full/published.tar' in rows['calibration_full']['path']
+    assert all('d8b5c76b/full/published.tar' not in x['path'] for x in spec['inputs'])
+    assert not (tmp_path / 'docs/experiments/k5d-inputs/calibration-controls-spec-20261105.json').exists()

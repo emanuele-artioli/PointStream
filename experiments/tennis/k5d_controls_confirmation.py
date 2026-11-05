@@ -32,8 +32,25 @@ def make_spec(audit_path: str, audit_copy: Path, deadline: str) -> dict:
             or audit['stages']['smoke']['archive_sha256'] != PILOT_SHA['pilot_smoke']
             or audit['stages']['full']['archive_sha256'] != PILOT_SHA['pilot_full']):
         raise ValueError('audit is not the accepted pilot')
-    base = fleet.ROOT / 'docs/experiments/k5d-inputs/calibration-controls-spec-20261105.json'
+    base = fleet.ROOT / 'docs/experiments/k5d-inputs/calibration-controls-pilot-spec-20261105.json'
     spec = json.loads(base.read_text())
+    wanted = {'archive', 'balltrack_code', 'balltrack_weight', 'wasb_code', 'wasb_weights', 'wasb_config',
+              'lpips_backbone', 'dists_backbone', 'calibration_smoke', 'calibration_full'}
+    declared = spec['staged_inputs']
+    if len(declared) != len(wanted) or {item['name'] for item in declared} != wanted:
+        raise ValueError('base control input set differs')
+    old_full = next(item for item in declared if item['name'] == 'calibration_full')
+    if old_full['sha256'] != controls.CALIBRATION_SHA['calibration_full']:
+        raise ValueError('base pilot calibration differs')
+    old_pair = {'path': old_full['path'], 'sha256': old_full['sha256']}
+    if spec['inputs'].count(old_pair) != 1:
+        raise ValueError('base calibration input binding differs')
+    new_pair = {'path': str(DATA / 'jobs/fleet/inbox/20261105T003756Z-cc450baf/full/published.tar'),
+                'sha256': CALIBRATION_SHA['calibration_full']}
+    spec['inputs'][spec['inputs'].index(old_pair)] = new_pair
+    old_full.update(new_pair)
+    if next(item['sha256'] for item in declared if item['name'] == 'calibration_smoke') != CALIBRATION_SHA['calibration_smoke']:
+        raise ValueError('base smoke calibration differs')
     inputs = [
         {'name': 'pilot_smoke', 'path': str(DATA / 'jobs/fleet/inbox/20261105T021434Z-3ec159d8/smoke/published.tar'), 'sha256': PILOT_SHA['pilot_smoke']},
         {'name': 'pilot_full', 'path': str(DATA / 'jobs/fleet/inbox/20261105T021434Z-3ec159d8/full/published.tar'), 'sha256': PILOT_SHA['pilot_full']},
