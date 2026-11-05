@@ -88,3 +88,23 @@ def test_cpu_sample_alone_cannot_authorize_unverified_staging(monkeypatch: pytes
     result = control.programme_projection(data)
     assert result['cpu']['incremental_seconds'] is not None
     assert result['cpu']['fits'] is False
+
+
+def test_confirmation_caps_are_separate_from_full_study() -> None:
+    data = receipt()
+    clips = ['tracknet/game9/Clip5', 'tracknet/game10/Clip12']
+    gpu = dict(zip((f'{c}:{p}' for c in clips for p in ('prepare', 'score')),
+                   (1200, 1400, 2100, 2700), strict=True))
+    cpu = {name: 2000 for name in gpu}
+    gate = {'allowed_clips': clips, 'confirmation_caps': {
+        'gpu': {'jobs': gpu, 'external': 200, 'total': 7600},
+        'cpu': {'jobs': cpu, 'external': 200, 'total': 8200}}}
+    control.confirmation_budget(gate, data)
+    assert control.programme_projection(data)['cpu']['fits'] is False
+    gpu[next(iter(gpu))] = 1
+    with pytest.raises(ValueError, match='below numerical forecast'):
+        control.confirmation_budget(gate, data)
+    gpu[next(iter(gpu))] = 1200
+    gate['allowed_clips'] = list(reversed(clips))
+    with pytest.raises(ValueError, match='registered clips'):
+        control.confirmation_budget(gate, data)

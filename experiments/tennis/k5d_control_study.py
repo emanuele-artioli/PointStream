@@ -123,6 +123,42 @@ def check_budget(ledger: dict[str, Any], attestation: dict[str, Any], ledger_sha
             raise ValueError('programme budget exceeds reconciled ledger')
 
 
+def confirmation_budget(gate: dict[str, Any], receipt: dict[str, Any]) -> None:
+    """Check only an independently reserved four-job scale confirmation.
+
+    This does not certify CPU fit, containment, or full-study admission.
+    """
+    clips = ('tracknet/game9/Clip5', 'tracknet/game10/Clip12')
+    if set(clips) != study.CONFIRMATION or gate.get('allowed_clips') != list(clips):
+        raise ValueError('confirmation release must name both registered clips in order')
+    caps = gate.get('confirmation_caps')
+    if not isinstance(caps, dict) or set(caps) != {'gpu', 'cpu'}:
+        raise ValueError('confirmation GPU and CPU caps required')
+    rows = study.selection()
+    for resource, maximum in (('gpu', 9000), ('cpu', 10800)):
+        budget = caps[resource]
+        if not isinstance(budget, dict) or set(budget) != {'jobs', 'external', 'total'}:
+            raise ValueError('four job caps and external reserve required')
+        jobs = budget['jobs']
+        names = {f'{clip}:{phase}' for clip in clips for phase in ('prepare', 'score')}
+        if not isinstance(jobs, dict) or set(jobs) != names:
+            raise ValueError('exact confirmation jobs required')
+        values = [*jobs.values(), budget['external'], budget['total']]
+        if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v <= 0 for v in values):
+            raise ValueError('invalid confirmation cap')
+        if sum(jobs.values()) + budget['external'] > budget['total'] or budget['total'] > maximum:
+            raise ValueError('confirmation cap exceeds tranche')
+        programme = receipt['programme'][resource]
+        if budget['total'] > min(programme['ball_remaining_seconds'], programme['global_remaining_seconds']):
+            raise ValueError('confirmation cap exceeds reconciled budget')
+        if resource == 'gpu':
+            for clip in clips:
+                for phase in ('prepare', 'score'):
+                    predicted = study.forecast(receipt, phase, rows[clip]['label_rows'], receipt['cost'][phase]['seconds16'])
+                    if jobs[f'{clip}:{phase}'] < predicted:
+                        raise ValueError('confirmation GPU cap below numerical forecast')
+
+
 def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bridge_path: Path, bridge_sha: str,
              old_source: Path, new_source: Path, ledger_path: Path, ledger_sha: str,
              budget_path: Path, budget_sha: str, identity: dict[str, str], clip: str, phase: str) -> tuple[dict[str, Any], int]:
