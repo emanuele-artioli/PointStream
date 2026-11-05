@@ -1,0 +1,20 @@
+{
+  "archive_sha256": "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066",
+  "author_source_archive_sha256": "a7ad708cfaea7d0030cc1d78bd2cd1f1d62a1df999d8eaece292bff510c30f7e",
+  "author_source_marker_and_28_file_closure": true,
+  "counts": [
+    4,
+    16
+  ],
+  "identical_saved_rows_self_compare": true,
+  "per_point_metric_and_judge_rows_match_count": true,
+  "points": [
+    "dcvc-0",
+    "dcvc-21",
+    "dcvc-42",
+    "svt-48",
+    "svt-55",
+    "svt-62"
+  ],
+  "scope": "CPU-only API and byte-ledger exercise; no model or GPU and no new metric evidence"
+}

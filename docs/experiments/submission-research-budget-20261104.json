@@ -6,7 +6,7 @@
   "cpu_total_seconds": 86400,
   "initial_gpu_limit_seconds": 7200,
   "initial_cpu_limit_seconds": 10800,
-  "initial_gate": "active; no larger-stage release yet",
+  "initial_gate": "Ball16/48 correctness and cost gates passed; root prospectively releases only bounded188 stage2; no full30 release. GVC and one-test2-source feasibility remain within initial7200GPU/10800CPU. Controls conditional on188 output.",
   "workstreams": {
     "ball": {
       "gpu_limit_seconds": 50400,
@@ -110,6 +110,34 @@
       "gpu_seconds": 65,
       "cpu_seconds": 360,
       "basis": "65s creation-to-terminal-update release upperbound; entire360CPU phase conservativelycharged incl inspection; tinygenericCUDApass, isolatedbootstrapandUUIDmachineryfail beforeisolationCUDA"
+    },
+    {
+      "phase": "w6-smoothing-20261104",
+      "workstream": "w6",
+      "gpu_seconds": 303,
+      "cpu_seconds": 1500,
+      "basis": "303s entire lifecycle releaseupperbound; full1500CPU ceiling conservatively charged (audit15.537CPU withinreserved180); all239pairs/80ticksaudited"
+    },
+    {
+      "phase": "k5d-16-48-costpilot-20261104",
+      "workstream": "ball",
+      "gpu_seconds": 1800,
+      "cpu_seconds": 2100,
+      "basis": "full authorized phase charged conservatively; independent receipt exact16 checks and full48 retained results; measured lifecycle594.63s, aggregate external CPU unmeasured"
+    },
+    {
+      "phase": "w8-portable-v2-repair1-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 76,
+      "cpu_seconds": 360,
+      "basis": "75.312s release-inclusive upperbound rounded76GPU; full360CPU conservativelycharged; processes/PGID independentlyabsent; originalgatefailed, offlinepairedread-isolationaudit records CUDAerror2"
+    },
+    {
+      "phase": "opentt-frame-join-witness-20261104",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "basis": "entire300CPU charged; CPUwitnesssmoke262.773s (above210target), validatorpassed butcampaignbudgetexhausted before no-workfullmarker; images retained/manualjoinreview no model"
     }
   ],
   "reservations": [
@@ -120,7 +148,8 @@
       "cpu_seconds": 330,
       "status": "closed; charged entire inclusive330CPU-s ceiling conservatively",
       "spec": "docs/experiments/w7-inputs/remux-transport-oracle-20261104.json",
-      "scope": "250s oneCPU campaign plus80s external admission/audit/release; transport feasibility only"
+      "scope": "250s oneCPU campaign plus80s external admission/audit/release; transport feasibility only",
+      "release_stage": "initial"
     },
     {
       "phase": "k5d-calibration-20261104",
@@ -128,7 +157,8 @@
       "gpu_seconds": 3300,
       "cpu_seconds": 3600,
       "status": "closed interrupted; conservative450GPU/650CPU charged, unused reservation released",
-      "spec": "docs/experiments/k5d-inputs/calibration-fleet-spec-20261104.json"
+      "spec": "docs/experiments/k5d-inputs/calibration-fleet-spec-20261104.json",
+      "release_stage": "initial"
     },
     {
       "phase": "w8-cuda-diagnostic-20261104",
@@ -136,7 +166,8 @@
       "gpu_seconds": 180,
       "cpu_seconds": 240,
       "status": "closed; conservative charge recorded; unused reservation released",
-      "spec": "docs/experiments/w8-inputs/receiver-20261101/w8-cuda-diagnostic-fleet-draft-20261104.json"
+      "spec": "docs/experiments/w8-inputs/receiver-20261101/w8-cuda-diagnostic-fleet-draft-20261104.json",
+      "release_stage": "initial"
     },
     {
       "phase": "w6-literal-control-20261104",
@@ -144,7 +175,8 @@
       "gpu_seconds": 1200,
       "cpu_seconds": 1500,
       "status": "closed; charged conservative inclusive envelope; unused reservation released",
-      "spec": "docs/experiments/w6-specs/control-20261104.json"
+      "spec": "docs/experiments/w6-specs/control-20261104.json",
+      "release_stage": "initial"
     },
     {
       "phase": "ego-mask-fixed-oracle-20261104",
@@ -152,15 +184,17 @@
       "gpu_seconds": 0,
       "cpu_seconds": 150,
       "status": "closed;150CPU/0GPU inclusive ceiling conservatively charged",
-      "scope": "120CPU-s hardlimit plus30s admission/audit; no video/model/native invocation"
+      "scope": "120CPU-s hardlimit plus30s admission/audit; no video/model/native invocation",
+      "release_stage": "initial"
     },
     {
       "phase": "k5d-calibration-controls-20261104",
       "workstream": "ball",
       "gpu_seconds": 1200,
       "cpu_seconds": 1500,
-      "status": "reserved; bound increased prospectively for five-arm full metrics, no outcome opened",
-      "scope": "contract docs/experiments/k5d-inputs/calibration-controls-contract-20261104.json; 188sameclipSVT62, no newencoding"
+      "status": "conditional reservation, unavailable until full188 archive; not part of initial active admission",
+      "scope": "contract docs/experiments/k5d-inputs/calibration-controls-contract-20261104.json; 188sameclipSVT62, no newencoding",
+      "release_stage": "post-188 conditional"
     },
     {
       "phase": "k5d-calibration-replacement-20261104",
@@ -168,7 +202,8 @@
       "gpu_seconds": 3300,
       "cpu_seconds": 3600,
       "status": "closed; charged conservative inclusive envelope; unused reservation released",
-      "scope": "same scientificcalibration asbf6208, newrequest afterconfirmedterminalforeigncontention; no oldrequestreplay"
+      "scope": "same scientificcalibration asbf6208, newrequest afterconfirmedterminalforeigncontention; no oldrequestreplay",
+      "release_stage": "initial"
     },
     {
       "phase": "gvcrt-entropy-interface-20261104",
@@ -176,50 +211,73 @@
       "gpu_seconds": 0,
       "cpu_seconds": 210,
       "status": "closed; conservative charge recorded; unused reservation released",
-      "scope": "nativeCPU entropy build and symbols only; no model/video/GPU"
+      "scope": "nativeCPU entropy build and symbols only; no model/video/GPU",
+      "release_stage": "initial"
     },
     {
       "phase": "opentt-frame-join-witness-20261104",
       "workstream": "ball",
       "gpu_seconds": 0,
       "cpu_seconds": 300,
-      "status": "reserved; no decoding until rootadmission; optionalnotcorebenchmarkdependency",
-      "scope": "sourceidentity andmanualframe/labelindexwitness only,no judges/no qualitycodec"
+      "status": "closed; conservative charge recorded; retained evidence and no replays",
+      "scope": "sourceidentity andmanualframe/labelindexwitness only,no judges/no qualitycodec",
+      "release_stage": "initial"
     },
     {
       "phase": "k5d-16-48-costpilot-20261104",
       "workstream": "ball",
       "gpu_seconds": 1800,
       "cpu_seconds": 2100,
-      "status": "root reviewed; admitted frozen prospective code/spec, pending dispatch"
+      "status": "closed; conservative charge recorded; retained evidence and no replays",
+      "release_stage": "initial"
     },
     {
       "phase": "w6-smoothing-20261104",
       "workstream": "w6",
       "gpu_seconds": 1200,
       "cpu_seconds": 1500,
-      "status": "root reviewed; admitted frozen prospective code/spec, pending dispatch"
+      "status": "closed;303GPU/full1500CPU conservativecharge recorded; independentfullauditpassed",
+      "release_stage": "initial"
     },
     {
       "phase": "gvcrt-native4-16-20261105",
       "workstream": "ego_peer_oracles",
       "gpu_seconds": 900,
       "cpu_seconds": 1200,
-      "status": "prospective reservation; root review required, no GPU/model dispatch yet"
+      "status": "prospective reservation; root review required, no GPU/model dispatch yet",
+      "release_stage": "initial"
     },
     {
       "phase": "w8-portable-v2-20261105",
       "workstream": "w8",
       "gpu_seconds": 240,
       "cpu_seconds": 360,
-      "status": "closed;65GPU/full360CPU conservativelycharged; release verified"
+      "status": "closed;65GPU/full360CPU conservativelycharged; release verified",
+      "release_stage": "initial"
     },
     {
       "phase": "w8-portable-v2-repair1-20261105",
       "workstream": "w8",
       "gpu_seconds": 240,
       "cpu_seconds": 360,
-      "status": "prospective rootreviewed repair1; original archived source unchanged, no policyrelaxation"
+      "status": "closed; conservative charge recorded; retained evidence and no replays",
+      "release_stage": "initial"
+    },
+    {
+      "phase": "k5d-confirmation188-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 2500,
+      "cpu_seconds": 2800,
+      "release_stage": "larger stage2",
+      "status": "prospective root release after16/48 correctness and complete1649.8s full188 forecast; code/specreview beforedispatch"
+    },
+    {
+      "phase": "opentt-test2-source-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 240,
+      "cpu_seconds": 360,
+      "release_stage": "initial",
+      "status": "prospective reservation; root manualjoinonly; worker/spec/costreview needed"
     }
   ],
   "jobs": [
@@ -310,7 +368,7 @@
     {
       "job_id": "20261105T000651Z-30f6379a",
       "phase": "w6-smoothing-20261104",
-      "state": "submitted; inspect canonical status",
+      "state": "complete; independentevidenceauditpassed; bothprofilesdescriptiveimprovement, originaltimegatefails",
       "revision": "cd669a2204f6d7f578a98e526285922d4e771e4b",
       "source_sha256": "36106be834aed2fe90085417ab74035ca33e3328e15bd886ce41264e6c461ee9",
       "spec_sha256": "6bee17ef882314c4e28490ff2334a7e74f238334ceaf49ab8ba32021f9b235bb",
@@ -328,6 +386,26 @@
       "deadline": "2026-11-05T00:45:21.789990+00:00",
       "inclusive_cpu_ceiling": 360,
       "gpu_ceiling": 240
+    },
+    {
+      "job_id": "20261105T001308Z-4ae20579",
+      "phase": "opentt-frame-join-witness-20261104",
+      "state": "submitted; nojoin/judgeoutcome",
+      "revision": "73e5b8c63e7cf6c6db24e09e0eb1f808aee6e352",
+      "source_sha256": "d543b220b1653b09de29ee7e356633927c2202582ad8d88368536d6d7220c7ce",
+      "spec_sha256": "221dc26a477efcebf6b99c895ae8ffe9e3d4c180ad2b9565bf136078a79e6a0d",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 300
+    },
+    {
+      "job_id": "20261105T001423Z-2a8c6880",
+      "phase": "w8-portable-v2-repair1-20261105",
+      "state": "submitted; noisolatedCUDAresultyet",
+      "source_sha256": "d543b220b1653b09de29ee7e356633927c2202582ad8d88368536d6d7220c7ce",
+      "spec_sha256": "5fce2a53928c9ee0b5402417584629e277c4b661d4eca8e1676115a314978c14",
+      "revision": "73e5b8c63e7cf6c6db24e09e0eb1f808aee6e352",
+      "gpu_ceiling": 240,
+      "inclusive_cpu_ceiling": 360
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -338,14 +416,14 @@
   ],
   "monitoring": {
     "mode": "one canonical wholebatch wait; exits on attention",
-    "state": "previousbatchattention; newboundedwait activejobs only",
+    "state": "previousattention W8repair1failed; remainingball/OpenTT boundedwait",
     "jobs": [
       "20261105T000550Z-d8b5c76b",
-      "20261105T000651Z-30f6379a"
+      "20261105T001308Z-4ae20579"
     ],
-    "result": "/private/tmp/pointstream-ball-smoothing-wait-20261105.json",
-    "max_seconds": 1800,
-    "started_utc": "2026-11-05T00:10:42.054213+00:00",
+    "result": "/private/tmp/pointstream-cost-join-wait2-20261105.json",
+    "max_seconds": 1500,
+    "started_utc": "2026-11-05T00:15:51.506888+00:00",
     "deadline_utc": "2026-11-05T00:45:21.789990+00:00",
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,

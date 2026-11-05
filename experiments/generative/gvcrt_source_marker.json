@@ -1,0 +1,33 @@
+{
+  "files": {
+    "UVG_rgb.json": "61de752f988003518b0c4ddb97317c6c66c15614a06c589a2e5f9a1cb2093b53",
+    "requirements.txt": "1fdd85da18be34ae10a3ad2797eabd1b188eb95dd9eb689a2ed60c7e7dda71ba",
+    "src/cpp/py_rans/py_rans.cpp": "fc26ffc37d296ea9ee0919b154852ce266ce012b86c16ac905190b8a2b8f0f48",
+    "src/cpp/py_rans/py_rans.h": "ef9eefd2be45f824a7ac78cc688ad79c58deb05ff4248d2f072bd81068ab2d24",
+    "src/cpp/py_rans/rans.cpp": "fd78ff143d4f62b6b7393b8468eaa6558b8e6fd5021b15f84b8c7b22ae3e9a72",
+    "src/cpp/py_rans/rans.h": "9b15dc5c77bcbf9bde1ce88c7bb357b5170bb8601ef9852960335999eafb5261",
+    "src/cpp/py_rans/rans_byte.h": "a5d057d14657c8acc4a24300f2aa9424ff0544b42e92551a17a746fd0cc70a77",
+    "src/cpp/setup.py": "44ab150f51103a33f97b4dded9eeb2ccf729d1a9d051d9d220d94b2d4f7f29e1",
+    "src/layers/cuda_inference.py": "ed75bd62f96520f6d0b7209f07caf373bccb645139675849fbf4a0c3d00ff8e0",
+    "src/layers/extensions/inference/bind.cpp": "c02e19647c57126300811560347636c8d183e95057154b07ecfb79359c925ba5",
+    "src/layers/extensions/inference/common.h": "0361520307fd91ae53de109cd93c677b157659fd71bd97269f53ce347be368d3",
+    "src/layers/extensions/inference/def.h": "36eab0444b09d5a62abc7b531da1dce2744ec9c4c73990f8fce836e5962ca8bf",
+    "src/layers/extensions/inference/impl.cpp": "8b1d6e52e991256a04448946e5e3700b000ecc0daeb152c5f0d94348b3efe32e",
+    "src/layers/extensions/inference/kernel.cu": "e71c3a59d1829ae81695e660c2fcca19c7d379c315d8d1dc72e06ac3f795f40c",
+    "src/layers/extensions/inference/setup.py": "713aa6036186fe3c5f4d30411c806971d55438b2da8dfd3d65cf572a921b6d8b",
+    "src/layers/layers.py": "cb1b620a6fdecdff087e1e59691536a8c7f6ae2447dec83bb460ace519cd0991",
+    "src/models/common_model.py": "b8671f241847223dab55ffb7051ec0343fce5b61870b8576e8ed5f74e1c13ccf",
+    "src/models/entropy_models.py": "7c8574b1e3e97b15897c2ee69575e37ba2fe0ba4ef0182b5bb6ff83bce93eba4",
+    "src/models/image_model_gvcrt.py": "2d34ef89df55955e1f57404d2df9b6345952dff38d3aa26ec5d3b5ecca6383ad",
+    "src/models/improved_model_gvcrt.py": "88a8caa6589c885e746472dcb5962cf1d2a501020e0d7b8745afde111469212c",
+    "src/models/video_model_gvcrt.py": "324cfb1c5c651ebe3929cb4478477722ddd1e73f586ec569cb824c9044af8bf0",
+    "src/utils/common.py": "c6f46e58de1a1145794c13226a7914bb1a5ef775ad9ad3fcd695d872d6f3ee8f",
+    "src/utils/metrics.py": "3c6abd33ecd244009948615977bf428e5c14dec8fd0feee11f44e335f9d85b45",
+    "src/utils/stream_helper.py": "40fb73b75fd2d96b371c5d5733928c83e1c785c40e8b89a93ea4414af5431bf1",
+    "src/utils/transforms.py": "8d07100e2e531357f4a315db33e3ae137076b2378d1835888fc6055dfb46fe55",
+    "src/utils/video_reader.py": "5381bee1c5ceca6a85949529d489a50c055f0c6bcb2de1f1818bc283f320354d",
+    "src/utils/video_writer.py": "06101f3d3c5e8fb1e33d44c775d8ebe6a17986319ba4015c47c1849c7443b8a0",
+    "test_video_gvcrt_1088.py": "60c470e578b15ae29d830f9b5b89cacf31ffade839c0bce48f735415922c80be"
+  },
+  "revision": "d0e32bfa3e8e282f9a77437c223c605858eea637"
+}

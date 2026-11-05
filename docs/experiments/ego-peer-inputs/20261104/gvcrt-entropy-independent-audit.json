@@ -1,0 +1,76 @@
+{
+  "canonical_status": "complete",
+  "compiled_extension": {
+    "bytes": 412392,
+    "independent_remote_hash_matches": true,
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261104T230325Z-e340664f/smoke/gvcrt-entropy/MLCodec_extensions_cpp.so",
+    "sha256": "f0951974be2a1168f87a67f8d3683844874aa1902b2d135cde46c2e5b915262e"
+  },
+  "compiler_sha256": "2360901d864cf10bfd6296e261cb2c14053552a80377761ab07146ec9ec9a2c0",
+  "compiler_stderr_bytes": 0,
+  "compiler_version": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0",
+  "compiler_version_independent_remote_match": true,
+  "conservative_accounting": {
+    "all_in_upper_cpu_seconds": 142,
+    "approved_cap_cpu_seconds": 210,
+    "audit_monitoring_allowance_cpu_seconds": 60,
+    "basis": "created-to-terminal wall upper bound for one-core campaign plus explicit 60s audit/monitoring allowance; not observed total process CPU",
+    "created_to_terminal_upper_cpu_seconds": 82,
+    "gpu_seconds": 0
+  },
+  "execution": {
+    "child_cpu_seconds_from_receipt": 9.061834,
+    "created_to_terminal_updated_seconds": 81.30738401412964,
+    "one_cpu_affinity": [
+      0
+    ],
+    "stage_wall_seconds": 9.490604639053345,
+    "supervisor_wall_seconds": 20.11646270751953
+  },
+  "git_head": "8e532d8038c1e4bbcbf3f7e4327b4e66668db082",
+  "gpu": null,
+  "host": "gpu5",
+  "job_id": "20261104T230325Z-e340664f",
+  "lifecycle": {
+    "both_pids_absent": true,
+    "cpu_claim_records_scanned": 6,
+    "gpu_claim": null,
+    "matching_claims": 0,
+    "owned_process_group_exists": false,
+    "process_group_id": 467515,
+    "supervisor_pid": 467501
+  },
+  "limits": "Symbol-only CPU interface, not neural encode, CUDA, persisted video decode, rate-quality, or peer qualification.",
+  "native_streams": [
+    {
+      "exact_roundtrip": true,
+      "sha256": "31c78285bcaef8cee894eea9717cf816264605e87a6d02044a5859d003d9b0f6",
+      "stream_bytes": 5,
+      "stream_hex": "da1680001d",
+      "two_entropy_coders": false
+    },
+    {
+      "exact_roundtrip": true,
+      "sha256": "59440923e6a683f636e6e9a724fd2d1affb2f2a7371903558d27983bc4492272",
+      "stream_bytes": 7,
+      "stream_hex": "02050508028a02",
+      "two_entropy_coders": true
+    }
+  ],
+  "runtime_archive_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "runtime_cache_limitation": "staged packed archive checked; full extracted tree not independently rehashed",
+  "source_archive_sha256": "a7ad708cfaea7d0030cc1d78bd2cd1f1d62a1df999d8eaece292bff510c30f7e",
+  "source_snapshot_sha256": "72d75c348d35fdc8acb5c427ec85d3e8b83ab433a6a4e856654eb13296239dd0",
+  "spec_sha256": "e75b8f4abf7fad8494b043f2ade95b6c99f8f5ed076a2c688463f781b85ff7b9",
+  "stdout_sha256": "b1459e934c31c0c86221ccd9c3cc0f065004ab6e8d094f36b47f53d41c9d40d5",
+  "validator": {
+    "checks": {
+      "compiler_identity": true,
+      "extension_hash": true,
+      "fresh_process_replay": true,
+      "single_and_dual_roundtrip_receipts": true,
+      "source_and_runtime_identity": true
+    },
+    "passed": true
+  }
+}
