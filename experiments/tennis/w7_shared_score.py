@@ -45,15 +45,21 @@ def check_hybrid_state(window: roi.Window, actual_sha: str, spec_path: Path, rea
             raise ValueError('hybrid control archive differs from frozen window')
         return
     from experiments.jobs.inbox import digest as spec_digest
-    if (window.name != 'med000'
-            or old.digest(spec_path) != '9b3d405e22326c26a88ce6f6a15c3aa8b63fb59f8eccdb6714221de7c82339fc'
-            or old.digest(ready_path) != '8a7575bf77e28c573a8c9a35e5d294d258d1413c98f4244a12056302d4b94b98'):
+    legacy = {
+        'med000': ('9b3d405e22326c26a88ce6f6a15c3aa8b63fb59f8eccdb6714221de7c82339fc',
+                   '8a7575bf77e28c573a8c9a35e5d294d258d1413c98f4244a12056302d4b94b98',
+                   '2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03'),
+        'med019': ('ef489d1009f57e47b23480ee94388461e19b64bc9a87d0d64b61df1fadecfb07',
+                   'c1a5274c365be81083eb03d3c98751b43e290370f5b465d01073220bc9572e34',
+                   '812c18a2aa7943c1d9ce28a4685529a5fcfebefabf8d30b441a238f4b9d92335')}
+    expected = legacy.get(window.name)
+    if expected is None or old.digest(spec_path) != expected[0] or old.digest(ready_path) != expected[1]:
         raise ValueError('null hybrid state requires authenticated historical spec and ready')
     spec, ready = json.loads(spec_path.read_text()), json.loads(ready_path.read_text())
     records = [x for x in spec['staged_inputs'] if x['name'] == 'hybrid']
     if (spec_digest(spec) != ready.get('spec_sha256') or len(records) != 1
             or records[0]['sha256'] != actual_sha
-            or actual_sha != '2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03'):
+            or actual_sha != expected[2]):
         raise ValueError('historical spec hybrid identity differs')
 
 
@@ -214,7 +220,8 @@ def forecast(pilot: dict[str, Any], *, source_bounds: dict[str, dict[str, float]
     return out
 
 
-def score(args: Any, rows: list[dict[str, Any]], inputs: dict[str, Path], pilot: bool) -> None:
+def score(args: Any, rows: list[dict[str, Any]], inputs: dict[str, Path], pilot: bool,
+          selection: set[tuple[str, str]] | None = None) -> None:
     """Run all points in one process; `inputs` are already SHA-verified staged assets."""
     import torch
     from experiments.tennis.k4b_features import convert_command
@@ -229,6 +236,10 @@ def score(args: Any, rows: list[dict[str, Any]], inputs: dict[str, Path], pilot:
     selected = [r for r in rows if r['window'] == 'med000' and
                 ((r['kind'] == 'control' and r['scale'] == 8) or (r['kind'] == 'new' and r['crf'] == 70))] if pilot else rows
     cohort(rows)
+    if selection is not None:
+        selected = [r for r in rows if (r['window'], r['name']) in selection]
+        if len(selected) != len(selection):
+            raise ValueError('selected scoring roles missing')
     if pilot and len(selected) != 2:
         raise ValueError('required med000 control and CRF70 absent')
     if not torch.cuda.is_available() or 'A6000' not in torch.cuda.get_device_name(0) or 'Ada' in torch.cuda.get_device_name(0):
@@ -249,7 +260,9 @@ def score(args: Any, rows: list[dict[str, Any]], inputs: dict[str, Path], pilot:
     for row in selected:
         w = row['window']
         proof = json.loads(inputs[row['proof_asset']].read_text())
-        check_hybrid_state(roi.WINDOWS[w], old.digest(inputs[w + '_hybrid']), inputs['historical_spec'], inputs['historical_ready'])
+        check_hybrid_state(roi.WINDOWS[w], old.digest(inputs[w + '_hybrid']),
+                           inputs[w + '_historical_spec'] if w + '_historical_spec' in inputs else inputs['historical_spec'],
+                           inputs[w + '_historical_ready'] if w + '_historical_ready' in inputs else inputs['historical_ready'])
         validation = json.loads(inputs[row['validation_asset']].read_text())
         check_point(row, proof, validation, inputs[row['mkv_asset']], roi.WINDOWS[w], old.digest(inputs[w + '_source']),
                     old.digest(inputs[w + '_masks']), old.digest(inputs[w + '_hybrid']), scorer_sha, bridge)
