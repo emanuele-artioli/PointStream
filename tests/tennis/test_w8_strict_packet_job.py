@@ -155,3 +155,30 @@ def test_campaign_remaining_gate_rejects_underfunded(monkeypatch):
     dispatch['campaign_clock']['budget_end'] = 300.0
     with pytest.raises(ValueError, match='insufficient'):
         job.require_remaining(dispatch, 141, 190)
+
+
+def test_fresh_host_receipt_requires_bytes_path_and_original_inode(tmp_path, monkeypatch):
+    from experiments.tennis import w8_receiver_preflight
+    protected = {}
+    for name in ('source', 'prepared', 'fit', 'golden', 'masks'):
+        path = tmp_path / name
+        path.write_bytes(name.encode())
+        protected[name] = (str(path), job.fixed.file_sha(path))
+    monkeypatch.setattr(w8_receiver_preflight, 'PROTECTED', protected)
+    monkeypatch.setattr(job, 'PROTECTED', protected)
+    original = {'denied_paths': {name: [entry[0]] for name, entry in protected.items()}}
+    historical = {'protected_inputs': {name: {'path': path, 'sha256': digest,
+                     'device': path_device - 1, 'inode': path_inode}
+                  for name, (path, digest) in protected.items()
+                  for path_device, path_inode in [(job.Path(path).stat().st_dev, job.Path(path).stat().st_ino)]}}
+    receipt = tmp_path / 'fresh.json'
+    result = job.policy.protected_identity(original, receipt)
+    assert result['sha256'] == job.fixed.file_sha(receipt)
+    fresh = json.loads(receipt.read_text())
+    job.reconcile_protected_identity(historical, fresh)
+    fresh['protected_inputs']['source']['inode'] += 1
+    with pytest.raises(ValueError, match='identity mismatch'):
+        job.reconcile_protected_identity(historical, fresh)
+    job.Path(protected['source'][0]).write_bytes(b'changed')
+    with pytest.raises(ValueError, match='identity mismatch'):
+        job.policy.protected_identity(original, tmp_path / 'bad.json')

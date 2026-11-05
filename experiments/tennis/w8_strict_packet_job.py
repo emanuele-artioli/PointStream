@@ -62,7 +62,7 @@ def bound_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str
 def evidence_names() -> list[str]:
     return ['decoded.pt', 'decoded-manifest.json', 'prepare.json', 'cpu-only.json',
             *(f'{name}.npz' for name in fixed.UNITS), 'worker-config.json',
-            'loader-identity.json', 'source-manifest.json', 'worker-exit.json', 'worker.stdout', 'worker.stderr']
+            'loader-identity.json', 'protected-identity.json', 'source-manifest.json', 'worker-exit.json', 'worker.stdout', 'worker.stderr']
 
 
 def check_isolation(config: dict[str, Any], isolation: dict[str, Any], loader: dict[str, Any],
@@ -91,6 +91,22 @@ def check_isolation(config: dict[str, Any], isolation: dict[str, Any], loader: d
                    or path not in (name.replace('.', '/') + '.py', name.replace('.', '/') + '/__init__.py')
                    for name, path in origins.items())):
         raise ValueError('packet project source origins differ from manifest')
+
+
+def reconcile_protected_identity(historical: dict[str, Any], fresh: dict[str, Any]) -> None:
+    old, current = historical['protected_inputs'], fresh['protected_inputs']
+    if set(old) != set(PROTECTED) or set(current) != set(PROTECTED):
+        raise ValueError('protected receipt categories differ')
+    for group, (name, digest) in PROTECTED.items():
+        prior, now = old[group], current[group]
+        if (set(prior) != {'path', 'sha256', 'device', 'inode'} or set(now) != set(prior)
+                or prior['path'] != name or now['path'] != name or prior['sha256'] != digest
+                or now['sha256'] != digest or prior['inode'] != now['inode']
+                or type(prior['device']) is not int or type(now['device']) is not int):
+            raise ValueError('protected historical/fresh identity mismatch: ' + group)
+        st = Path(name).stat()
+        if (now['device'], now['inode']) != (st.st_dev, st.st_ino):
+            raise ValueError('protected host identity changed: ' + group)
 
 
 def worker(python: Path, root: Path, work: Path, config: dict[str, Any], loader: Path) -> dict[str, Any]:
@@ -153,13 +169,13 @@ def run(stage: Path) -> None:
     cost.check_preflight_bundle(preflight, paths['identity'])
     cost.check_preflight_sources(preflight, snapshot)
     identity = json.loads(paths['identity'].read_text())
-    for group, (name, expected) in PROTECTED.items():
-        st = Path(name).stat()
-        if identity['protected_inputs'][group] != {'path': name, 'sha256': expected, 'device': st.st_dev, 'inode': st.st_ino}:
-            raise ValueError('protected identity changed: ' + group)
     fingerprints = cost.read_oracle(paths['oracle'])
     rate = cost.audit_public_rate(paths['packet'], paths['profile'])
     scratch = fixed.checked_scratch()
+    require_remaining(dispatch, 141, 190)
+    protected_path = scratch / 'protected-identity.json'
+    protected = policy.protected_identity({'denied_paths': {group: [name] for group, (name, _) in PROTECTED.items()}}, protected_path)
+    reconcile_protected_identity(identity, json.loads(protected_path.read_text()))
     root = scratch / 'receiver-source'
     manifest = source.stage_source(snapshot, root)
     source.verify_source(root, manifest)
@@ -189,7 +205,7 @@ def run(stage: Path) -> None:
     config = {'worker_kind': 'packet', 'unit': fixed.UNITS[0], 'cpu_seconds': 100, 'files': files, 'output': str(output),
               'allow_paths': cost.strict_roots(root, output, main, files), 'denied_paths': denied,
               'parent_user_namespace': os.readlink('/proc/self/ns/user'), 'parent_network_namespace': os.readlink('/proc/self/ns/net'),
-              'protected_receipt': {'path': str(paths['identity']), 'sha256': IDENTITY_SHA}, 'tensor_fingerprints': fingerprints,
+              'protected_receipt': protected, 'tensor_fingerprints': fingerprints,
               'environment': {'CUDA_VISIBLE_DEVICES': '', 'TMPDIR': str(output), 'TMP': str(output), 'TEMP': str(output),
                               'XDG_CACHE_HOME': str(output / '.cache'), 'TORCH_HOME': str(output / '.cache' / 'torch'),
                               'PS_GPU_MEMORY_LIMIT_MIB': '0'}}
@@ -213,6 +229,7 @@ def run(stage: Path) -> None:
     members = {'decoded.pt': output / 'decoded.pt', 'decoded-manifest.json': output / 'decoded-manifest.json',
                'prepare.json': output / 'publish/prepare.json', 'cpu-only.json': output / 'cpu-only.json',
                'worker-config.json': work / 'worker-config.json', 'loader-identity.json': loader_path,
+               'protected-identity.json': protected_path,
                'source-manifest.json': manifest_path, 'worker-exit.json': work / 'worker-exit.json',
                'worker.stdout': work / 'stdout', 'worker.stderr': work / 'stderr'}
     members.update({f'{name}.npz': output / 'publish/units' / f'{name}.npz' for name in fixed.UNITS})
@@ -323,8 +340,11 @@ def validate(stage: Path, output: Path) -> int:
             if (config['allow_paths'] != cost.strict_roots(Path(config['allow_paths'][0]), Path(config['output']), main, config['files'])
                     or {name: item['sha256'] for name, item in config['files'].items()}
                     != {'bundle': NAMES['packet'], 'profile': NAMES['profile'], 'guider': NAMES['guider']}
-                    or config['protected_receipt']['sha256'] != IDENTITY_SHA or config['cpu_seconds'] != 100):
+                    or config['protected_receipt']['sha256'] != fixed.file_sha(unpacked / 'protected-identity.json')
+                    or config['cpu_seconds'] != 100):
                 raise ValueError('packet read grants or public files differ')
+            reconcile_protected_identity(json.loads(paths['identity'].read_text()),
+                                         json.loads((unpacked / 'protected-identity.json').read_text()))
             check_isolation(config, packet['isolation'], loader, manifest, fixed.file_sha(unpacked / 'loader-identity.json'))
             if (cpu.get('cuda_visible_devices') != '' or cpu.get('cuda_initialized_after_decode') is not False
                     or cpu.get('torch_version') != preflight['receipts']['main']['torch']
