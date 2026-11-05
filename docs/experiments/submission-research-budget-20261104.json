@@ -800,6 +800,57 @@
       "cpu_seconds": 130,
       "release_stage": "research-first24/28",
       "basis": "Remaining130CPUproofceilingconservativelycharged, plus20readinesspreviouslycharged=150CPUinclusive. Actual7.170ssmoke/6.186helper/30.220campaign; aggregateadminunmetered. Rootindependentlyverifiedactual20-file29d573archiveallgitblobse6e0andrawffe1receipt/strict596I537P/tables0,3,9/allCPU/CUDAuninitialized. Appended11fleetcontractfiles explainpre-review9file7408difference; actualsourcebbbc8656truthfullyrecorded. No native/GPU inference."
+    },
+    {
+      "phase": "unpublished-transfer-20261105T224658Z-97705347",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "release_stage": "research-first24/28",
+      "basis": "Sourceuploadtimeout89.64s; canonicalunpublishedunknown andsharedinboxonlyevents+7158849Bpartialvs16076800Bexpected, noready/spec/state/dispatch. Noexecution. Entirefuture60CPUexternalchargedplusprior20metadata=80CPU; unused100CPUcampaignreleasedwithintranche. Partialpreserved/no replay."
+    },
+    {
+      "phase": "unpublished-transfer-20261105T224748Z-f0a2e092",
+      "parent_phase": "gvcrt-qp-endpoint-sensitivity-20261105",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Sourceuploadtimeout~60s; canonicalunpublishedunknown,noready/spec/state,onlyevents+1490005Bpartialvs6133760Bexpected,noobservedtransferprocess. QP9unsubmitted. Entire50CPUsnapshot/transportallowancecharged; noGPU/nativecomponent. Partialpreserved/no replay."
+    },
+    {
+      "phase": "fleet-upload-routing-qualification-20261105",
+      "workstream": "shared",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "release_stage": "research-first24/28",
+      "basis": "Entire120CPUchargedfor15.011sactualgpu5uploadprobe/local0.1997CPU+doctor/source/cleanupchecks; remoteaggregateCPUunmetered.977721Bpartialretained,checksumnotreached,noprocessobservedafter; negative transport-only result, notGPU/evidencefailure. Actualrouteoptioncodeunit-tested, performancefixnotclaimed."
+    },
+    {
+      "phase": "fleet-sha-source-cache-qualification-20261105",
+      "workstream": "shared",
+      "gpu_seconds": 0,
+      "cpu_seconds": 180,
+      "release_stage": "research-first24/28",
+      "basis": "Entire180CPUinclusivephaseconservativelycharged. Realcde904source6133760B(gzip1571902B)uploadedviagpu5in51.189swithunchangedhelperremoteSHApass; separatepoststat/SHAregularmode600/inode2250247/fullbytesmatched; noownprocessobserved. LocalCPU0.338s,remoteaggregateunmetered. Cachepreservedreadonly;actualcachecopydistinctgatepending. Earlier15snegativepreserved."
+    },
+    {
+      "phase": "fleet-sha-cache-copy-proof-20261105",
+      "workstream": "shared",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "release_stage": "research-first24/28",
+      "basis": "Entire60CPUinclusivephasecharged;actualfixedcopier3.425s,local0.034CPU,remoteaggregateunmeasured. Bothcde904source/freshcopySHA/6133760B/regularmode600/samedev58/distinctinodes2250247and2252774independentlymatched,noprocessobserved; freshdoctorf11passed. NoGPU/job/overwrite. Sourceandcopyretained."
+    },
+    {
+      "phase": "w8-paired-source-cache-preparation-20261105",
+      "parent_phase": "w8-paired-cost-800-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 50,
+      "release_stage": "research-first24/28",
+      "basis": "Entire50CPUpreparationallowancechargedWITHIN1100phase/configured100external. Sourcee66/19189760Buploaded78.317sviagpu5+separateSHA/stat/processchecks;localCPU0.993,remoteaggregateunmeasured. Sourcecacheimmutable, noGPU/model. Failedlocalfirstlauncherbeforeimports/networkrecorded,soleactualuploadsuccess."
     }
   ],
   "reservations": [
@@ -1310,16 +1361,48 @@
       "workstream": "ego_peer_oracles",
       "release_stage": "research-first24/28",
       "gpu_seconds": 1800,
-      "cpu_seconds": 2050,
-      "status": "CPUproof0d856f3baccepted150CPUinclusiveclosedwithinphase; actualsource29d573/bbbc8656all20filesverified. Remaining1800GPU2050CPUprospectiveforQP0+9(2x900GPU1000CPUplus50CPUcontingency). GPUUNRELEASEDpendingfullfrozenclosure/spec/coupledforecast/freshhostreview. Preserveallpoints/failures/noBD/corpusclaim."
+      "cpu_seconds": 2000,
+      "status": "RootRELEASESTWOfreshQP0/9exclusivebatchfromverifiedreadonlycde904cacheviaactualSHAcopier(3.425sproof). Frozene6e0311/sourcea4f3, actualCPUtableproofaccepted; future1800GPU2000CPU=2x900/1000, noextraceiling. Freshdeadline<=45m,CPU2/3gpu5,modes/mathsame4\u219216/1.5wholegate. Oldf0UNPUBLISHEDpartialpreserved/50CPUcharged. Allpoints/failures/outofrangereported,noBD/corpusclaim."
     },
     {
       "phase": "k5d-scale-first-tranche-20261105",
       "workstream": "ball",
       "release_stage": "research-first24/28firstnewtranche",
       "gpu_seconds": 9000,
-      "cpu_seconds": 10780,
-      "status": "ProspectivefirsttrancheceilingONLY; noGPUorCPUworkloadreleasedyet. CoversminimalnativeCPUoracle(realoneuserPIDpath,nofilesystemisolationclaim),16originalcalibrationparity,newcompletearchivebridge,registered292/586confirmations,allsetup/audit/failurereserves. Perjobfrozenprotocol/source/spec/inclusive1.5forecastrootreviewrequired. Full30notadmitted. Proofs/calibrationmustbeincludedonce,notdouble-reserved."
+      "cpu_seconds": 10720,
+      "status": "FrozenFINALe64a7bc6/fc890de/source199fe3/wrapper9e68reviewed; all1348oldfilesunchanged+23additions. RootreleasesONEnew180CPUinclusive0GPU nativeproof, withintranche, aftersourcecache/upload/source/deadline/currenthostchecks. First50CPUpreparation/sourceupload<=450wall authorized(16240640B,gzip4426565,1.5slowreferenceforecast216.227s+reserve<450); remaining100campaign+30audit ifpreparation50charged. Exact100campaign70smoke10validator5noop/80external(total180), sameactualnative4cases/counters/argauth. NoGPUuntilCPUproofaccepted; parity600smoke800campaign1000GPU1200CPUprovisionalrequirescompleteforecast. NoFSdenialclaim. HonestPIDNSmethod+postsetupCPUpreloaded, serializerpostlude/outerunshareCPUreservedseparately; full30stillgated."
+    },
+    {
+      "phase": "fleet-upload-routing-qualification-20261105",
+      "workstream": "shared",
+      "release_stage": "research-first24/28",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "closed;120CPU0GPUcharged;15sprobeFAILED,partialreadonly,noautomaticretry; separatelonger/cachedsourceprotocolrootreview."
+    },
+    {
+      "phase": "fleet-sha-source-cache-qualification-20261105",
+      "workstream": "shared",
+      "release_stage": "research-first24/28",
+      "gpu_seconds": 0,
+      "cpu_seconds": 180,
+      "status": "closed;180CPU0GPUcharged;exactfullcde904sourcecacheuploadSHApasses;realcopyproofpending."
+    },
+    {
+      "phase": "w8-paired-cost-800-20261105",
+      "workstream": "w8",
+      "release_stage": "research-first24/28",
+      "gpu_seconds": 900,
+      "cpu_seconds": 1050,
+      "status": "Source04c6/e66andcachedfull19189760BSHAqualified; rootreleasesONENEWpaired1\u21923afterfreshspecdeadline/alljob/doctor/cache/currenthostchecks. Phase900GPU1100CPU=50preparationcharged+1050future(950configuredremaining+100postaudit). Original15inputs/math/guard/costvalidate/auditpairunchanged. Specprofile800/260/500/60/290CPU300wall,exclusiveAda/CPU1; boundedqueue<=45mallowed. Noretry/no30automatic."
+    },
+    {
+      "phase": "fleet-sha-cache-copy-proof-20261105",
+      "workstream": "shared",
+      "release_stage": "research-first24/28",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "status": "closed;60CPUcharged;actualSHAcachecopierqualifiedforcde904copies,newsource/destnohardlink/nooverwrite."
     }
   ],
   "jobs": [
@@ -2030,6 +2113,72 @@
       "pre_review_snapshot_sha256": "7408ab0a7e88483ad5608fbc3cb90919f5881eadbb7d79a316a6dea4adebb80a",
       "pre_review_source_sha256": "ff01282baeaefa48f9f09f4c276d90f55b58df1ec080aec0526e57dda552d618",
       "source_scope_note": "Fleetautoappended11contractfiles;all20actualmembersreviewedagainstsamefrozenrevision;pre-review9filearchivewasnotactualsubmission."
+    },
+    {
+      "job_id": "20261105T224658Z-97705347",
+      "phase": "k5d-scale-first-tranche-20261105",
+      "state": "unpublishedtransferSTOP,noexecutionconfirmed;noready/spec/state;partialpreserved;no replay",
+      "revision": "279b7ff9c0ec412a3b774df4078d6352e811959c",
+      "snapshot_sha256": "c7afd4bb806dc6f2f8ce5aea48fd4ba4b469ecf5f45c1748e740292893f4ee7b",
+      "source_sha256": "277546e02ada2e4a928a4b09b63f54e67dba56f88f4f0a8cadb5106c241e14ae",
+      "spec_sha256": "8fc07d732191dc199019043628dcad58192e911079c69af142ca775f35c0abfb",
+      "deadline": "2026-11-05T23:15:00Z",
+      "inclusive_cpu_ceiling": 180,
+      "gpu_ceiling": 0
+    },
+    {
+      "job_id": "20261105T224748Z-f0a2e092",
+      "phase": "gvcrt-qp-endpoint-sensitivity-20261105",
+      "state": "unpublishedtransferSTOP,noexecutionconfirmed;noready/spec/state;partialpreserved;no replay",
+      "revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+      "snapshot_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+      "source_sha256": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+      "spec_sha256": "ef5660e0e497c5219bf839171404734527ff09bf077150711881992efe278aae",
+      "deadline": "2026-11-05T23:27:00Z",
+      "inclusive_cpu_ceiling": 1000,
+      "gpu_ceiling": 900,
+      "local_batch_record": "/private/tmp/pointstream-gvcrt-endpoint-batch-20261105.json"
+    },
+    {
+      "job_id": "20261105T231555Z-78e54aff",
+      "phase": "gvcrt-qp-endpoint-sensitivity-20261105",
+      "state": "publishedpending;ONEboundedbatchwait;inspectexactIDneverreplay",
+      "qp": 0,
+      "revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+      "snapshot_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+      "source_sha256": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+      "spec_sha256": "bdb7173235a77c7ca8166b3acf3c9a481589de228faef6d86255d0d2bdfaee76",
+      "deadline": "2026-11-05T23:55:00Z",
+      "gpu_ceiling": 900,
+      "inclusive_cpu_ceiling": 1000,
+      "snapshot_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-cache-3ce18520af3c46e0be3d9345a9f04009/source.tar"
+    },
+    {
+      "job_id": "20261105T231706Z-2f65a26e",
+      "phase": "gvcrt-qp-endpoint-sensitivity-20261105",
+      "state": "publishedpending;ONEboundedbatchwait;inspectexactIDneverreplay",
+      "qp": 9,
+      "revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+      "snapshot_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+      "source_sha256": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+      "spec_sha256": "6a1f70d5ff0d36eed5bede73881c38b0cb71f119ef2dbc35d7e2cbcc504c219a",
+      "deadline": "2026-11-05T23:55:00Z",
+      "gpu_ceiling": 900,
+      "inclusive_cpu_ceiling": 1000,
+      "snapshot_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-cache-3ce18520af3c46e0be3d9345a9f04009/source.tar"
+    },
+    {
+      "job_id": "20261105T231638Z-64ef0bb9",
+      "phase": "w8-paired-cost-800-20261105",
+      "state": "publishedpending;ONEcanonical1200swait44284;inspectexactIDneverreplay",
+      "revision": "04c6e22b85554d660b6a33d735d875f1df7530ca",
+      "snapshot_sha256": "e66ed9c7f02835a719cf8f5defbdbf67785cd08f55011dd26239c724212bef90",
+      "spec_sha256": "398db7756f2bde2a09562708cb753c919466db374edc90f7ec61721c4afedf58",
+      "deadline": "2026-11-05T23:54:28Z",
+      "gpu_ceiling": 900,
+      "inclusive_cpu_ceiling": 1100,
+      "cpu_already_charged_seconds": 50,
+      "snapshot_cache": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/w8-paired-source-20261105T231016Z-1030f9c5/source.tar"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -2046,17 +2195,30 @@
     "RootCPUproofsubcap100\u2192150withinGVC2200, noaggregate/workstreamincrease; 20readinesscharged, futureproof130inclusive. Remaining2180CPUopenGVCaggregateincludesit\u2014nodooublecount."
   ],
   "monitoring": {
-    "mode": "onecanonicalboundedwait",
-    "state": "noactiveorqueuedrecordedjob;CPUproofaudited;futureball/W8/GVCstagesnotadmitted",
+    "mode": "onecanonicalboundedwaitperindependentexperimentbatch",
+    "state": "GVCtwoendpointbatch+W8onepairedcostjobpublished;nativeCPUproofsourceuploadinprogressnojobyet",
     "jobs": [
-      "20261105T223810Z-0d856f3b"
+      "20261105T231555Z-78e54aff",
+      "20261105T231706Z-2f65a26e",
+      "20261105T231638Z-64ef0bb9"
     ],
-    "max_seconds": 100,
+    "batches": [
+      {
+        "scope": "GVC0and9",
+        "max_seconds": 2700,
+        "handle": 42113,
+        "record": "/private/tmp/pointstream-gvcrt-cache-batch-20261105.json"
+      },
+      {
+        "scope": "W8paired1\u21923",
+        "max_seconds": 1200,
+        "handle": "44284",
+        "result": "/private/tmp/w8-paired-wait-20261105.json"
+      }
+    ],
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": true,
-    "deadline_utc": "2026-11-05T22:58:00Z",
-    "handle_record": "/private/tmp/pointstream-gvcrt-qp-cpu-launch-20261105.json"
+    "completed": false
   },
   "approval_history": [
     {
