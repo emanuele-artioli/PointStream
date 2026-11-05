@@ -171,6 +171,29 @@ limit, cover earlier worker admission or a separate audit, or eliminate monitor
 polling and termination overhead. Those need their own accounting and bounds.
 Workers must run the release implementing the opt-in before it is used.
 
+An opted-in single-CPU campaign may also declare `"cpu_affinity_index": 1`
+to select the second CPU in the supervisor's sorted allowed CPU set; an
+omitted index keeps the existing first-CPU behavior. The index must be a
+nonnegative integer and is valid only with `"single_cpu_campaign": true`.
+An out-of-range index fails before a device or CPU claim. For indexed requests,
+the reviewed fleet-release supervisor pins itself first and records its
+available and selected CPUs; the campaign verifies that inherited binding, and
+the smoke, full stage, validator and their ordinary children inherit it.
+`dispatch.json` records the physical CPU and fleet-control file hashes. The
+supervisor and campaign execute from the reviewed fleet release; scientific
+commands still execute from their separately frozen workload snapshot.
+
+The index is a selection, not a core reservation or automatic collision
+detector. Coordinate indices for concurrent campaigns and check their recorded
+physical CPUs: different inherited CPU sets can map the same index to
+different cores, and different indices from different sets can still collide.
+The GPU contention checker does not detect CPU collisions. Until the indexed
+release has passed the fleet doctor and host-specific inheritance checks, run
+only one timing-sensitive single-CPU campaign per host, even on separate GPUs.
+An indexed submission requires every eligible host's fresh worker heartbeat to
+advertise `indexed_cpu_affinity_v1`; activating a new worker release must be
+reviewed separately and must preserve active supervisors and their artifacts.
+
 Children inherit `PS_STAGE` (smoke/full), `PS_STAGE_DIR` (separate output directory),
 `PS_JOB_DIR` (supervisor directory), `PS_VALIDATION_PATH`, `PS_SCRATCH_DIR`,
 `PS_CHECKPOINT_DIR` and `PS_ATTEMPT` (1 unless a declared resume started it). Write outputs to
