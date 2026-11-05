@@ -342,6 +342,7 @@ def run_isolated(config: dict[str, Any], isolation: dict[str, Any], *, materiali
         cleanup_completed(scratch / 'folders', folder_receipt)
         folder_receipt['cleanup_wall_seconds'] = time.monotonic() - cleanup_started
         folder_receipt['cleanup_cpu_seconds'] = time.process_time() - cleanup_cpu
+        folder_receipt['cleanup_complete'] = True
         (output / 'materialization.json').write_text(json.dumps(folder_receipt, sort_keys=True))
     publication_started = start_phase()
     path = output / f'{unit_name}@match5.npz'

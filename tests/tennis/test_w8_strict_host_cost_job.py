@@ -1,4 +1,5 @@
 import copy
+from pathlib import Path
 
 import pytest
 
@@ -209,3 +210,90 @@ def test_uuid_api_preflight_rejects_missing_property_and_initialized_cuda():
     torch.cuda.is_initialized = lambda: True
     with pytest.raises(ValueError, match='already initialized'):
         job.require_gpu_uuid_api(torch)
+
+
+def test_materialized_spec_is_explicit_and_default_stays_historical():
+    old = job.make_spec('2026-11-05T08:10:00Z')
+    new = job.make_materialized_spec('2026-11-05T08:10:00Z')
+    assert '--materialize-profile' not in old['arguments']
+    assert '--materialize-profile' in new['arguments']
+    assert new['materialization_profile'] == job.folder_profile.PROFILE
+    assert new['folder_reference_audit_sha256'] == job.FOLDER_AUDIT_SHA
+    root = Path(job.__file__).resolve().parents[2]
+    assert job.fixed.file_sha(root / job.FOLDER_AUDIT_PATH) == job.FOLDER_AUDIT_SHA
+    assert new['budget_seconds'] == old['budget_seconds'] == 600
+    assert new['receiver_cpu_budget_seconds'] == old['receiver_cpu_budget_seconds'] == 900
+
+
+def test_materialization_receipt_pins_source_and_cleanup(tmp_path, monkeypatch):
+    sizes = {name: 1 for name in job.folder_profile.SIZES}
+    pinned = {name: 'a' * 64 for name in sizes}
+    monkeypatch.setattr(job.folder_profile, 'SIZES', sizes)
+    monkeypatch.setattr(job.folder_profile, 'PINNED', pinned)
+    files, rows = {}, {}
+    for index, name in enumerate(sizes):
+        path = tmp_path / str(index)
+        path.write_bytes(b'x')
+        st = path.stat()
+        files['weight:' + name] = {'path': str(path), 'sha256': pinned[name]}
+        rows[name] = {'source_sha256': pinned[name], 'copy_sha256': pinned[name], 'bytes': 1,
+                      'copy_inode': index + 1, 'source_stat': [st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns]}
+    receipt = {'profile': job.folder_profile.PROFILE, 'cleanup_complete': True, 'files': rows, 'bytes': 4,
+               'wall_seconds': 2, 'cpu_seconds': 1, 'cleanup_wall_seconds': 1, 'cleanup_cpu_seconds': 1}
+    job.check_folder_receipt(receipt, files)
+    bad = copy.deepcopy(receipt)
+    bad['files'][next(iter(sizes))]['copy_sha256'] = 'b' * 64
+    with pytest.raises(ValueError, match='identity'):
+        job.check_folder_receipt(bad, files)
+    receipt['cleanup_complete'] = False
+    with pytest.raises(ValueError, match='cleanup'):
+        job.check_folder_receipt(receipt, files)
+
+
+def test_materialized_durable_archive_includes_receipt_not_weight_bodies(tmp_path):
+    retained = tmp_path / 'retained'
+    retained.mkdir()
+    names = job.durable_member_names(True)
+    assert 'materialization.json' in names
+    assert all('pytorch_model' not in name and 'safetensors' not in name for name in names)
+    for name in names:
+        (retained / name).write_text('receipt')
+    receipt = job.seal_durable_archive(retained, names, materialized=True)
+    job.verify_durable_archive(retained, receipt, materialized=True)
+    with pytest.raises(ValueError, match='identities'):
+        job.verify_durable_archive(retained, receipt)
+
+
+def test_materialized_forecast_charges_whole_stage_and_staging_margin():
+    receipt = {'wall_seconds': 2.0, 'cleanup_wall_seconds': 1.0}
+    result = job.materialized_three_step_forecast(100.0, 20.0, 60.0, 20.0, receipt)
+    expected_extra = job.FOLDER_IO_WALL_FLOOR - 3.0
+    assert result['three_step_seconds'] == pytest.approx(1.5 * (100 + 40 + expected_extra))
+    assert result['stage_reserve_seconds'] == 30
+    with pytest.raises(ValueError, match='full-stage'):
+        job.materialized_three_step_forecast(50, 20, 60, 20, receipt)
+    with pytest.raises(ValueError, match='exceeds whole worker'):
+        job.materialized_three_step_forecast(100, 20, 60, 20, {'wall_seconds': 50, 'cleanup_wall_seconds': 20})
+
+
+def test_materialization_flag_only_reaches_model_child(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    calls = []
+    def launch(command, **kwargs):
+        calls.append(command)
+        return SimpleNamespace(pid=123)
+    monkeypatch.setattr(job.subprocess, 'Popen', launch)
+    monkeypatch.setattr(job.receiver, 'wait_owned_worker', lambda proc, seconds: (0, False))
+    loader = tmp_path / 'loader.json'
+    loader.write_text('{}')
+    model_work = tmp_path / 'model'
+    model_work.mkdir()
+    job._worker(tmp_path / 'python', {'worker_kind': 'cost_probe'}, model_work, 100, 130, tmp_path, loader,
+                materialize_profile=True)
+    assert '--materialize-profile' in calls[0]
+    packet_work = tmp_path / 'packet'
+    packet_work.mkdir()
+    with pytest.raises(ValueError, match='only to model'):
+        job._worker(tmp_path / 'python', {'worker_kind': 'packet'}, packet_work, 100, 130, tmp_path, loader,
+                    materialize_profile=True)
+    assert len(calls) == 1
