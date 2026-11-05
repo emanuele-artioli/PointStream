@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 
 from experiments.tennis import w8_strict_receiver_worker as receiver
@@ -20,6 +21,42 @@ def wrapper_identity(source_root: Path, actual_file: Path) -> dict[str, str]:
     if expected.is_symlink() or actual != expected or not actual.is_file():
         raise ValueError('model wrapper entrypoint is outside authenticated source root or has wrong name')
     return {'path': WRAPPER_RELATIVE_PATH, 'sha256': receiver.digest(actual)}
+
+
+def pin_declared_aa_imports(config: dict) -> None:
+    """Give the authenticated opt source precedence without accepting other origins."""
+    files = config['files']
+    entry = files['code:animate_anyone']
+    init = Path(entry['path'])
+    if (init.is_symlink() or init.name != '__init__.py' or init.parent.name != 'animate_anyone'
+            or not init.is_file() or init.resolve(strict=True) != init
+            or receiver.digest(init) != entry['sha256']):
+        raise ValueError('declared AA package origin or hash differs')
+    for name, module in tuple(sys.modules.items()):
+        if name != 'animate_anyone' and not name.startswith('animate_anyone.'):
+            continue
+        declared = files.get(f'code:{name}')
+        actual = getattr(module, '__file__', None)
+        spec = getattr(module, '__spec__', None)
+        if not declared or not actual or not spec or not spec.origin:
+            raise ValueError(f'preloaded AA module is not declared: {name}')
+        expected = Path(declared['path'])
+        if (expected.is_symlink() or expected.resolve(strict=True) != expected
+                or Path(actual).resolve(strict=True) != expected
+                or Path(spec.origin).resolve(strict=True) != expected
+                or receiver.digest(expected) != declared['sha256']):
+            raise ValueError(f'preloaded AA module origin or hash differs: {name}')
+        search = getattr(module, '__path__', None)
+        locations = spec.submodule_search_locations
+        if ((search is None) != (locations is None)
+                or (search is not None and ([Path(p).resolve(strict=True) for p in search] != [expected.parent]
+                    or [Path(p).resolve(strict=True) for p in locations] != [expected.parent]))):
+            raise ValueError(f'preloaded AA package search path differs: {name}')
+    # Preserve the source-only project root in the first position.
+    parent = str(init.parent.parent)
+    if not sys.path or sys.path[0] == parent:
+        raise ValueError('project source path must remain first')
+    sys.path[1:] = [parent, *(entry for entry in sys.path[1:] if entry != parent)]
 
 
 def main() -> int:
@@ -39,9 +76,12 @@ def main() -> int:
         raise ValueError('host model wrapper only admits bounded cost probes')
     wrapper = wrapper_identity(args.source_root, Path(__file__))
     if args.materialize_profile:
+        pin_declared_aa_imports(config)
         receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root, materialize_profile=True)
     else:
         receiver.launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root)
+    if args.materialize_profile:
+        pin_declared_aa_imports(config)
     import torch
     if not torch.cuda.is_initialized() or torch.cuda.device_count() != 1:
         raise ValueError('exactly one initialized CUDA device required')

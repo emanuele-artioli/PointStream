@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "scope": "attended CPU asset preflight; no GPU/model execution",
+  "passed": true,
+  "host": "gpu5",
+  "cpu_affinity": [
+    2
+  ],
+  "gpu_seconds": 0,
+  "max_cpu_seconds": 120,
+  "max_wall_seconds": 150,
+  "conservative_charge_recommendation_cpu_seconds": 120,
+  "wall_seconds": 13.325398557819426,
+  "process_cpu_seconds": 9.062322,
+  "records": [
+    {
+      "name": "archive",
+      "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+      "mode": "verified-local",
+      "bytes": 2564111322,
+      "seconds": 2.8175820810720325
+    },
+    {
+      "name": "balltrack_code",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+      "mode": "verified-local",
+      "bytes": 327680,
+      "seconds": 0.001537400297820568
+    },
+    {
+      "name": "balltrack_weight",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec",
+      "mode": "verified-local",
+      "bytes": 45410554,
+      "seconds": 0.04382469318807125
+    },
+    {
+      "name": "wasb_code",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55",
+      "mode": "verified-local",
+      "bytes": 409600,
+      "seconds": 0.0006941761821508408
+    },
+    {
+      "name": "wasb_weights",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6",
+      "mode": "verified-local",
+      "bytes": 123607040,
+      "seconds": 0.13798325695097446
+    },
+    {
+      "name": "wasb_config",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+      "mode": "verified-local",
+      "bytes": 429,
+      "seconds": 0.0003077257424592972
+    },
+    {
+      "name": "lpips_backbone",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "mode": "verified-local",
+      "bytes": 244408911,
+      "seconds": 0.2625402072444558
+    },
+    {
+      "name": "dists_backbone",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "mode": "verified-local",
+      "bytes": 553433881,
+      "seconds": 0.4924701824784279
+    },
+    {
+      "name": "source",
+      "sha256": "a7ad708cfaea7d0030cc1d78bd2cd1f1d62a1df999d8eaece292bff510c30f7e",
+      "mode": "verified-local",
+      "bytes": 48800,
+      "seconds": 0.0005459673702716827
+    },
+    {
+      "name": "historic",
+      "sha256": "748591675c350fe3e0214b0a4aca4529b56199419f0c4838b167e6e52440ecba",
+      "mode": "verified-shared-read-only",
+      "bytes": 14274560,
+      "seconds": 0.07313606236129999
+    },
+    {
+      "name": "baseline",
+      "sha256": "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066",
+      "mode": "verified-shared-read-only",
+      "bytes": 983040,
+      "seconds": 0.0027096616104245186
+    },
+    {
+      "name": "i_model",
+      "sha256": "c8a840415cc028307131c66f68076b7e9f6fcc4db7fed423c62e8b202f83a22d",
+      "mode": "local-copy",
+      "bytes": 334225106,
+      "seconds": 3.511653810739517
+    },
+    {
+      "name": "p_model",
+      "sha256": "7a89bd342a1484b3da7dfc3f03834ff81e0e4180e02f8a286dec0d1025c99f4e",
+      "mode": "local-copy",
+      "bytes": 206881943,
+      "seconds": 2.3712934432551265
+    },
+    {
+      "name": "entropy",
+      "sha256": "f0951974be2a1168f87a67f8d3683844874aa1902b2d135cde46c2e5b915262e",
+      "mode": "local-copy",
+      "bytes": 412392,
+      "seconds": 0.00949123315513134
+    },
+    {
+      "name": "environment",
+      "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "mode": "verified-local",
+      "bytes": 4936811281,
+      "seconds": 3.599051014520228
+    }
+  ],
+  "available_bytes_after": 1648811405312,
+  "raw_log_sha256": "bea90de5e19fec5af6ecdccf0926381ec3cc83c7463dc0c911978bc6c7b4b1f4",
+  "script_sha256": "004789cbc74964048cd55d97edcdf50f8640f14cd0d776611846892920dac609",
+  "source_package": {
+    "git_head": "3d38e706c5ee0184ec0a4333c18bbe0f89dab851",
+    "selected_paths": [
+      "experiments/generative/gvcrt_peer_job_w8leaves.py",
+      "experiments/generative/gvcrt_receiver_worker_w8leaves.py",
+      "experiments/generative/gvcrt_peer_scorer.py",
+      "experiments/generative/gvcrt_native_bridge.py",
+      "experiments/tennis",
+      "experiments/background",
+      "experiments/visor",
+      "experiments/__init__.py",
+      "experiments/jobs",
+      "src"
+    ],
+    "source_sha256": "acbab3f38b7e2fb6fd6608e24d61d6fc1ddbafb9372aea59da0450920f0bdd06",
+    "snapshot_sha256": "d8b70bd9f271ba7d0eae4afe5dbcd73dd356f7907a4abc38f764d450c9c28ad6",
+    "bytes": 5918720,
+    "files": 295,
+    "module_sha256": {
+      "experiments/generative/gvcrt_peer_job_w8leaves.py": "4de9d5d44d3672a65837d8380b13f3a46155594d8589c67418e2e3cd046e0897",
+      "experiments/generative/gvcrt_receiver_worker_w8leaves.py": "768040b7e020c446209a85a2044271f2e1ae7d7463f060a9672767f100b59b74",
+      "experiments/generative/gvcrt_peer_scorer.py": "93ffb07e7c31d66d5c91b7d6d8be5bf6c5f777541cbec608c8150dc2659bf84f",
+      "experiments/generative/gvcrt_native_bridge.py": "cf42d1a115d905ed5faf3fdb01a8c7aa66c728091a18880c8cbf818cbcfbfd61"
+    }
+  },
+  "isolated_import_check": {
+    "project_modules_checked": 29,
+    "all_project_origins_within_extracted_package": true,
+    "torch_imported": false,
+    "numpy_imported": true,
+    "model_execution": false,
+    "note": "GPU/author model and historical scorer dynamically load only during actual future run; static package breadth and import check are not end-to-end native validation."
+  },
+  "limitations": [
+    "NFS/host I/O may be shared; timing is not model performance qualification.",
+    "Extracted tree identities and live device/provider must be rechecked by the candidate on any future job.",
+    "Exact GPU UUID/capability guard is currently incomplete; no GPU admission."
+  ]
+}

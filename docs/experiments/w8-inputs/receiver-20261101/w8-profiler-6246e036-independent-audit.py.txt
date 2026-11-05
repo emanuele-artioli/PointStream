@@ -1,0 +1,74 @@
+"""Read-only independent verification of the saved CPU profiler oracle; no models."""
+import ast, hashlib, json, os, resource, stat, tarfile
+from pathlib import Path
+resource.setrlimit(resource.RLIMIT_CPU, (30, 30))
+J='20261105T122632Z-6246e036'
+B=Path('/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox')/J
+D=lambda b: hashlib.sha256(b).hexdigest()
+def read(p): return p.read_bytes()
+def obj(p): return json.loads(read(p))
+state=obj(B/'state.json'); ready=obj(B/'ready.json'); spec=obj(B/'spec.json'); gate=obj(B/'gate.json')
+claim=obj(B/'run/claim.json'); status=obj(B/'run/status.json'); staging=obj(B/'smoke/staging.json'); execution=obj(B/'smoke/execution.json')
+assert state['status']=='complete' and status['status']=='complete' and status['exit_code']==0
+assert spec['device']=='cpu' and spec['cpu_affinity_index']==1 and spec['hosts']==['gpu6']
+assert ready['git_head']=='af0dbcbd3c9036fbdc489bdd24e633916a28bca2'
+assert ready['snapshot_sha256']==D(read(B/'source.tar'))=='c88be1167b2405c22ff41a7c74be1d7a957b85df60407070dcdf8b983ed2e2a3'
+assert ready['spec_sha256']==D(json.dumps(spec,sort_keys=True,allow_nan=False).encode())=='4ea9817ef7df3a448b95fc55a5dfde90695bc0c25214005c44d6f3cf8e56ae06'
+assert gate['passed'] and gate['validation']['passed'] and all(gate['validation']['checks'].values())
+assert spec['environment']['sha256']=='bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e'
+assert len(staging['inputs'])==1 and D(read(Path(staging['inputs'][0]['path'])))=='5452a5d6bb865152556a0e26dc99798a0ee88dff1c1c86b9a4fd1f5c904413dd'
+pub=read(B/'smoke/published.tar'); pubsha=D(pub); assert pubsha==staging['published']['sha256']
+import io
+with tarfile.open(fileobj=io.BytesIO(pub)) as t:
+ members=t.getmembers(); files=[m for m in members if m.isfile()]
+ arms=['unrestricted','strict','clock']; kinds=['trace','config','receipt','stdout','stderr']
+ expected={'publish/profiler-oracle.json'}|{f'publish/{a}.{k}' for a in arms for k in kinds}
+ assert len(files)==16 and {m.name for m in files}==expected
+ assert all(m.isfile() or (m.isdir() and m.name.rstrip('/')=='publish') for m in members)
+ assert all(m.size<=(20_000_000 if m.name.endswith('.trace') else 1_000_000) for m in files)
+ raw={m.name:t.extractfile(m).read() for m in files}
+r=json.loads(raw['publish/profiler-oracle.json']); assert r['scope']=='CPU only; no model or GPU qualification'
+with tarfile.open(B/'source.tar') as t:
+ assert len(r['code_sha256'])==8
+ for name,sha in r['code_sha256'].items(): assert D(t.extractfile(name).read())==sha
+ tree=ast.parse(t.extractfile('experiments/tennis/w8_cuda_system_leaves.py').read())
+ approved=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(x,ast.Name) and x.id=='APPROVED_LEAVES' for x in n.targets))
+assert r['code_sha256']['experiments/tennis/w8_profiler_clock_oracle.py']=='f8166c5d9db64ea41c28f18311dc6fecdc0af4f1ae77c10e2da147318dae2c39'
+assert [x['arm'] for x in r['arms']]==arms
+results=[]
+for a in r['arms']:
+ arm=a['arm']; vals={k:raw[f'publish/{arm}.{k}'] for k in kinds}
+ assert {k:D(v) for k,v in vals.items()}==a['artifacts']
+ assert a['trace_sha256']==D(vals['trace'])
+ rc=json.loads(vals['receipt']); cfg=json.loads(vals['config']); assert rc=={k:v for k,v in a.items() if k not in ('artifacts','clocksource_trace','trace_sha256')}
+ assert set(a['source_origins'].values())==set(r['code_sha256'])
+ assert a['cuda_visible_devices']=='' and not a['cuda_before'] and not a['cuda_after'] and a['bootstrap_equal']
+ assert all(a['namespaces'][n]!=a['parent_ns'][n]==cfg['parent_ns'][n] for n in ('user','net'))
+ lines=vals['trace'].decode(errors='replace').splitlines(); assert [l for l in lines if '/sys/devices/system/clocksource' in l]==a['clocksource_trace']
+ segments={}
+ for phase in ('cpu','requested_cpu_cuda'):
+  start=[i for i,l in enumerate(lines) if 'W8_PROFILE_'+phase+'_BEGIN' in l]; end=[i for i,l in enumerate(lines) if 'W8_PROFILE_'+phase+'_END' in l]
+  assert len(start)==len(end)==1 and start[0]<end[0]
+  segments[phase]=[l for l in lines[start[0]+1:end[0]] if '/sys/devices/system/clocksource' in l]
+ if arm!='unrestricted':
+  assert len(a['denials'])==10 and set(a['denials'])==set(cfg['denied']) and set(a['denials'].values())<={1,13}
+  assert set(a['mutations'])=={'write','truncate','create','remove','mkdir','rename','link'} and set(a['mutations'].values())<={1,13,18}
+  assert a['landlock_abi']>=3 and len(a['approved_leaves'])==12 and {x['name'] for x in a['approved_leaves']}==set(approved)
+ if arm=='clock':
+  grants=a['experimental_clock_grants']; parents=cfg['clock_identity']; assert len(grants)==len(parents)==3
+  assert [g['path'] for g in grants]==['/sys/devices/system/clocksource','/sys/devices/system/clocksource/clocksource0/current_clocksource','/sys/devices/system/clocksource/clocksource0/available_clocksource']
+  for i,(g,p) in enumerate(zip(grants,parents)):
+   assert all(g[k]==p[k] for k in ('path','device','inode','mode')) and p['uid']==0 and not p['mode']&stat.S_IWOTH
+   assert g['uid']==65534 and g['sha256_before']==p['sha256'] and g['rights']==('READ_DIR recursive' if i==0 else 'READ_FILE')
+   assert (stat.S_ISDIR(p['mode']) if i==0 else stat.S_ISREG(p['mode']))
+   if i: assert p['sha256']==D(read(Path(p['path'])))
+ results.append({'arm':arm,'results':a['results'],'torch_version':a['torch_version'],'clock_calls_between_markers':segments,'all_clock_lines':a['clocksource_trace'],'trace_sha256':a['trace_sha256'],'trace_bytes':len(vals['trace']),'denial_count':len(a.get('denials',{})),'mutations':a.get('mutations'),'namespace_distinct':True,'cuda_before':a['cuda_before'],'cuda_after':a['cuda_after'],'clock_grants':a.get('experimental_clock_grants'),'parent_clock_identity':cfg['clock_identity'] if arm=='clock' else None})
+assert claim['device_claim'] is None
+allocation=Path(claim['claims_dir'])/'cpu'/f"{claim['cpu_claim']['host']}.json"; allocations=obj(allocation).get('allocations',{}) if allocation.exists() else {}
+token=claim['cpu_claim']['token']; released=token not in allocations
+pids=[state['supervisor_pid'],status['pid']]; present=[pid for pid in pids if Path(f'/proc/{pid}').exists()]
+try: os.killpg(status['process_group_id'],0); group_present=True
+except ProcessLookupError: group_present=False
+assert released and not present and not group_present
+report={'job_id':J,'status':'complete, CPU-only oracle; not CUDA qualification','revision':ready['git_head'],'environment_sha256':spec['environment']['sha256'],'synthetic_input_sha256':staging['inputs'][0]['sha256'],'snapshot_sha256':ready['snapshot_sha256'],'normalized_spec_sha256':ready['spec_sha256'],'publication_sha256':pubsha,'full_source_files_verified':r['code_sha256'],'raw_artifact_sha256':{x['arm']:x['artifacts'] for x in r['arms']},'results':results,'smoke_execution':execution,'gate':gate['validation'],'lifecycle':{'created':state['created'],'started':status['started'],'ended':status['ended'],'updated':state['updated'],'creation_to_ended_seconds':status['ended']-state['created'],'creation_to_updated_seconds':state['updated']-state['created'],'proposed_conservative_cpu_seconds_including_80_external':179,'gpu_seconds':0},'release':{'supervisor_and_campaign_pids':pids,'pids_present':present,'campaign_pgid':status['process_group_id'],'process_group_present':group_present,'cpu_claim_released':released,'device_claim':None},'scope_limit':'CUDA requested with CUDA_VISIBLE_DEVICES empty; torch disabled CUDA profiling, so no evidence of CUDA profiler clocksource operations, kernel qualification, or repair sufficiency. Setup O_PATH operations are outside profiler markers.','audit_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2])}
+print(json.dumps(report,indent=2,sort_keys=True))

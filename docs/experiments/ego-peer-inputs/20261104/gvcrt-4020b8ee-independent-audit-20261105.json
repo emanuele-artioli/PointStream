@@ -1,0 +1,57 @@
+{
+  "job": "20261105T121902Z-4020b8ee",
+  "checks": {
+    "archive_sha256": true,
+    "saved_snapshot": true,
+    "source_tree": true,
+    "normalized_spec": true,
+    "smoke_gate": true,
+    "full_dispatch": true,
+    "frozen_full_validator": true
+  },
+  "cuda_visible_devices": "",
+  "cpu_affinity": [
+    2
+  ],
+  "scope": "full-stage audit; independent kernel names not profiled",
+  "teardown": "requires separate root check of task-owned processes and claims",
+  "validator": {
+    "checks": {
+      "actual_bytes": true,
+      "artifacts": true,
+      "backend": true,
+      "baseline": true,
+      "baseline_recomputed": true,
+      "checkpoint_bytes": true,
+      "child_receipts_and_probe_order": true,
+      "current_code": true,
+      "ffmpeg_identity": true,
+      "fixed_sources": true,
+      "frames_and_qp": true,
+      "gate": true,
+      "input_checkpoint_identity": true,
+      "input_transform": true,
+      "metric_checkpoint_bytes": true,
+      "metric_source_identity": true,
+      "metric_sources_recomputed": true,
+      "model_coverage": true,
+      "native_schedule_and_isolation": true,
+      "native_timing": true,
+      "paired_comparison": true,
+      "parity": true,
+      "probe": true,
+      "protected_input_coverage": true,
+      "receiver_denials": true,
+      "score_rows": true,
+      "scorer_config": true,
+      "scorer_device": true,
+      "scorer_models": true,
+      "smoke_promotion_and_prefix": true,
+      "source_denied": true,
+      "source_members_and_floor": true
+    },
+    "passed": true
+  },
+  "returncode": 0,
+  "passed": true
+}

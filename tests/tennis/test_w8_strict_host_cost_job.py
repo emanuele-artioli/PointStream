@@ -297,3 +297,63 @@ def test_materialization_flag_only_reaches_model_child(tmp_path, monkeypatch):
         job._worker(tmp_path / 'python', {'worker_kind': 'packet'}, packet_work, 100, 130, tmp_path, loader,
                     materialize_profile=True)
     assert len(calls) == 1
+
+
+def test_aa_pin_imports_declared_package_before_site_copy(tmp_path, monkeypatch):
+    import importlib
+    import sys
+    from experiments.tennis import w8_strict_host_model_worker as worker
+    opt = tmp_path / 'opt' / 'animate_anyone'
+    site = tmp_path / 'site' / 'animate_anyone'
+    opt.mkdir(parents=True)
+    site.mkdir(parents=True)
+    (opt / '__init__.py').write_text('origin = "declared"\n')
+    (site / '__init__.py').write_text('origin = "foreign"\n')
+    entry = opt / '__init__.py'
+    config = {'files': {'code:animate_anyone': {'path': str(entry), 'sha256': worker.receiver.digest(entry)}}}
+    monkeypatch.delitem(sys.modules, 'animate_anyone', raising=False)
+    monkeypatch.setattr(sys, 'path', [str(tmp_path), str(site.parent), *sys.path])
+    worker.pin_declared_aa_imports(config)
+    module = importlib.import_module('animate_anyone')
+    try:
+        assert module.origin == 'declared'
+        assert Path(module.__file__).resolve() == entry
+        worker.pin_declared_aa_imports(config)
+    finally:
+        sys.modules.pop('animate_anyone', None)
+
+
+def test_aa_pin_rejects_foreign_and_mixed_preloaded_origins(tmp_path, monkeypatch):
+    import importlib.util
+    import sys
+    from types import ModuleType
+    from experiments.tennis import w8_strict_host_model_worker as worker
+    package = tmp_path / 'animate_anyone'
+    package.mkdir()
+    init = package / '__init__.py'
+    init.write_text('')
+    config = {'files': {'code:animate_anyone': {'path': str(init), 'sha256': worker.receiver.digest(init)}}}
+    foreign = tmp_path / 'foreign.py'
+    foreign.write_text('')
+    module = ModuleType('animate_anyone')
+    module.__file__ = str(foreign)
+    module.__spec__ = importlib.util.spec_from_file_location('animate_anyone', foreign)
+    monkeypatch.setitem(sys.modules, 'animate_anyone', module)
+    with pytest.raises(ValueError, match='origin or hash'):
+        worker.pin_declared_aa_imports(config)
+    module.__file__ = str(init)
+    module.__spec__ = importlib.util.spec_from_file_location('animate_anyone', init)
+    module.__path__ = [str(package), str(tmp_path)]
+    with pytest.raises(ValueError, match='search path'):
+        worker.pin_declared_aa_imports(config)
+    module.__path__ = [str(package)]
+    module.__spec__.submodule_search_locations = [str(tmp_path)]
+    with pytest.raises(ValueError, match='search path'):
+        worker.pin_declared_aa_imports(config)
+    module.__file__ = None
+    with pytest.raises(ValueError, match='not declared'):
+        worker.pin_declared_aa_imports(config)
+    monkeypatch.delitem(sys.modules, 'animate_anyone')
+    init.write_text('mutation')
+    with pytest.raises(ValueError, match='origin or hash'):
+        worker.pin_declared_aa_imports(config)
