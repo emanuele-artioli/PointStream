@@ -28,8 +28,10 @@ def digest(path: Path) -> str:
     return h.hexdigest()
 
 
-def ivf(path: Path) -> tuple[bytes, list[tuple[int, bytes]]]:
+def ivf(path: Path, *, fps: int = 50) -> tuple[bytes, list[tuple[int, bytes]]]:
     """Parse exact IVF framing; never accept truncated or surplus records."""
+    if fps not in (25, 50):
+        raise ValueError('unsupported frozen cadence')
     data = path.read_bytes()
     if len(data) < 32:
         raise ValueError('short IVF header')
@@ -50,14 +52,14 @@ def ivf(path: Path) -> tuple[bytes, list[tuple[int, bytes]]]:
             raise ValueError('truncated or empty IVF payload')
         frames.append((timestamp, data[offset:offset + size]))
         offset += size
-    if offset != len(data) or [Fraction(x[0] * scale, rate) for x in frames] != [Fraction(i, 50) for i in range(240)]:
+    if offset != len(data) or [Fraction(x[0] * scale, rate) for x in frames] != [Fraction(i, fps) for i in range(240)]:
         raise ValueError('extra bytes or IVF frame timestamps changed')
     return data[:32], frames
 
 
-def compare_ivf(original: Path, returned: Path) -> dict[str, Any]:
-    header_a, frames_a = ivf(original)
-    header_b, frames_b = ivf(returned)
+def compare_ivf(original: Path, returned: Path, *, fps: int = 50) -> dict[str, Any]:
+    header_a, frames_a = ivf(original, fps=fps)
+    header_b, frames_b = ivf(returned, fps=fps)
     exact = original.read_bytes() == returned.read_bytes()
     return {'original_ivf_sha256': digest(original), 'reconstructed_ivf_sha256': digest(returned),
             'original_header_hex': header_a.hex(), 'reconstructed_header_hex': header_b.hex(),
@@ -66,18 +68,18 @@ def compare_ivf(original: Path, returned: Path) -> dict[str, Any]:
             'exact_ivf_bytes': exact}
 
 
-def probe(probe_data: dict[str, Any], width: int, height: int) -> dict[str, Any]:
+def probe(probe_data: dict[str, Any], width: int, height: int, *, fps: int = 50) -> dict[str, Any]:
     streams, frames = probe_data.get('streams', []), probe_data.get('frames', [])
     if len(streams) != 1 or len(frames) != 240:
         raise ValueError('stream or frame count differs')
     stream = streams[0]
     if (stream['codec_name'] != 'av1' or (stream['width'], stream['height']) != (width, height)
-            or stream['pix_fmt'] != 'yuv420p' or Fraction(stream['r_frame_rate']) != 50
+            or stream['pix_fmt'] != 'yuv420p' or Fraction(stream['r_frame_rate']) != fps
             or stream.get('color_range') != 'tv'):
         raise ValueError('native profile differs')
     base = Fraction(stream['time_base'])
     times = [int(x['best_effort_timestamp']) * base for x in frames]
-    if base <= 0 or any(x - times[0] != Fraction(i, 50) for i, x in enumerate(times)):
+    if base <= 0 or any(x - times[0] != Fraction(i, fps) for i, x in enumerate(times)):
         raise ValueError('frame PTS differ')
     colors = {name: stream.get(name) for name in profile.COLOR_FIELDS}
     for name in profile.COLOR_FIELDS[1:]:
@@ -92,10 +94,10 @@ def commands(ffmpeg: Path, ffprobe: Path, src: Path, work: Path) -> dict[str, li
 
 
 def prove(row: dict[str, Any], src: Path, work: Path, ffmpeg: Path, ffprobe: Path,
-          *, dav1d: Path | None = None, native_yuv: bool = False) -> dict[str, Any]:
+          *, dav1d: Path | None = None, native_yuv: bool = False, fps: int = 50) -> dict[str, Any]:
     if digest(src) != row['original_ivf_sha256'] or digest(ffmpeg) != old.FFMPEG_SHA or digest(ffprobe) != old.FFPROBE_SHA:
         raise ValueError('native or tool identity mismatch')
-    ivf(src)
+    ivf(src, fps=fps)
     work.mkdir(mode=0o700, parents=True, exist_ok=False)
     cmd = commands(ffmpeg, ffprobe, src, work)
     results = {}
@@ -103,13 +105,13 @@ def prove(row: dict[str, Any], src: Path, work: Path, ffmpeg: Path, ffprobe: Pat
         run = subprocess.run(cmd[name], capture_output=True, check=True, timeout=30)
         if name.startswith('probe_'):
             results[name] = json.loads(run.stdout)
-    before = probe(results['probe_original'], row['width'], row['height'])
-    after = probe(results['probe_mkv'], row['width'], row['height'])
+    before = probe(results['probe_original'], row['width'], row['height'], fps=fps)
+    after = probe(results['probe_mkv'], row['width'], row['height'], fps=fps)
     if before['timestamps'] != after['timestamps']:
         raise ValueError('delivery timestamps differ')
-    comparison = compare_ivf(src, work / 'decoder-scratch.ivf')
+    comparison = compare_ivf(src, work / 'decoder-scratch.ivf', fps=fps)
     out = {'schema': 1, **row, **comparison, 'delivered_mkv_sha256': digest(work / 'delivered.mkv'),
-           'delivered_mkv_bytes': (work / 'delivered.mkv').stat().st_size, 'fps': '50',
+           'delivered_mkv_bytes': (work / 'delivered.mkv').stat().st_size, 'fps': str(fps),
            'profile': profile.PROFILE, 'original_color_metadata': before['colors'],
            'delivered_color_metadata': after['colors'], 'commands': {k: cmd[k] for k in ('mux', 'probe_original', 'probe_mkv', 'extract_ivf')},
            'native_decoder_input_unchanged': comparison['exact_ivf_bytes'],
@@ -157,13 +159,13 @@ def representative_three(inventory: dict[str, Any]) -> list[dict[str, Any]]:
         result.append(rows[0])
     return result
 
-def validate_proof(row: dict[str, Any], original: Path, work: Path, *, native_yuv: bool = False) -> dict[str, Any]:
+def validate_proof(row: dict[str, Any], original: Path, work: Path, *, native_yuv: bool = False, fps: int = 50) -> dict[str, Any]:
     record = json.loads((work / 'proof.json').read_text())
     for key, value in row.items():
         if record.get(key) != value:
             raise ValueError('proof inventory identity differs: ' + key)
     mkv = work / 'delivered.mkv'
-    comparison = compare_ivf(original, work / 'decoder-scratch.ivf')
+    comparison = compare_ivf(original, work / 'decoder-scratch.ivf', fps=fps)
     if (digest(original) != row['original_ivf_sha256']
             or any(record.get(key) != value for key, value in comparison.items())
             or (not native_yuv and not comparison['exact_ivf_bytes']) or not comparison['ordered_payloads_equal']
