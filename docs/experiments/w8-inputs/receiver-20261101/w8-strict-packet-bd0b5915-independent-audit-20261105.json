@@ -1,0 +1,55 @@
+{
+  "job_id": "20261105T051531Z-bd0b5915",
+  "fleet_status": "failed",
+  "fleet_validator_error": "ValueError: packet read grants or public files differ",
+  "cause": "Read grants had identical members in different order after config JSON serialization sorted file keys; grant order has no Landlock policy semantics. The original fleet gate remains failed.",
+  "scope": "independent saved-artifact CPU packet audit; no repeated packet decode, generation, CUDA or GPU qualification",
+  "producer_git_revision": "5937cdd7f3320c39090ec1e1d17003421286b486",
+  "producer_source_sha256": "fe1bc8a85056d0b96781d122cf10c50adee900f6d1f11775550010ab975534a0",
+  "producer_snapshot_sha256": "ffe12d85b0d8e1ebdb8f2f60588594450a6bf2fa9d9067015740d2380d6370bc",
+  "spec_sha256": "a1cc010b46d35b8e2e1bc2594204c003bafa6f61307adc7b8ab7729315408088",
+  "outer_archive_sha256": "9dfb9d49a39e761b348191574ff318a6ded31b4b7e769ecadcd6dd146abd62d6",
+  "all_retained_member_hashes_verified": true,
+  "serialized_480_oracle_fingerprints_verified": true,
+  "source_snapshot_members_verified": 328,
+  "unit_sha256": {
+    "nadal_kyrgios__000_at120__person_000000000000": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+    "nadal_kyrgios__000_at120__person_000000000001": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7"
+  },
+  "checkpoint_sha256": "1bb95a11c25ac66774b887c93277b695779e21cc9803cc565408206934f0fdeb",
+  "staged_input_sha256_verified": {
+    "guider": "1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488",
+    "identity": "0953c5284ee8dc462d4eb95b7ce49cb9bad68e4d612fce5d167706f954668ebe",
+    "oracle": "8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc",
+    "packet": "eff1aca84a63e870a2994bd227b3dacb5583fee5c54a420235d828fa1a31bbf4",
+    "preflight": "ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5",
+    "profile": "bec98d67280e9f777a0d3cc110baa51ae2bf2c876aefe6b247d9691432f61107"
+  },
+  "protected_identity_receipt_sha256": "aedd258c6e374e55e29f2ade85ba57e29e327028846d18b5336d43e3a1aa119e",
+  "historical_vs_current_protected_paths_sha_inodes": "matched; current device and inode stat checked; fresh producer hash receipt retained",
+  "strict_policy": "corrected order-insensitive exact grant set with duplicate rejection; 10 protected denials, 7 mutation denials, namespace, source origin, 12 approved leaves, thread/fd and CPU bootstrap checks verified",
+  "worker_cpu_seconds": 6.426213000000001,
+  "worker_wall_seconds": 6.531238444149494,
+  "smoke_wall_seconds": 8.673071146011353,
+  "cpu_pre_serialization": {
+    "restored_tensors": 480,
+    "state_tensors": 480,
+    "unit_arrays": 14
+  },
+  "cuda_initialized_after_decode": false,
+  "public_packet_bytes": 2289836,
+  "conditional_kbps": 46.31506222222222,
+  "conditional_rate_assumption": "reference and match reused for 7200 seconds",
+  "lifecycle_wall_seconds": 61.56683897972107,
+  "cpu_lifecycle_ceiling_seconds": 62,
+  "external_cpu_reserve_seconds": 60,
+  "proposed_cpu_charge_seconds": 122,
+  "gpu_charge_seconds": 0,
+  "pids_absent": [
+    1058706,
+    1058725,
+    1058824
+  ],
+  "cpu_claims": "no allocation with this job ID in inspected shared CPU claim files",
+  "archival_scope": "retained published.tar and source.tar, staged inputs rehashed on gpu5 cache; no paths assumed present without inspection"
+}

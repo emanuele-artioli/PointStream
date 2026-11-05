@@ -1,0 +1,5 @@
+# CPU-only packet check with current-host protected identity
+
+Root-approved prospective300CPU/0GPU phase within the original20GPUh/24CPUh programme, W8 partition, on2026-11-05. No additional user allocation. Priorf5ee failed beforepacket: identicalprotectedinodes but historicalNFSdevice59/currentgpu5device58; that failedgate remains unchanged. Newparent hashesallfive fixed196MBprotectedbodies, verifiesstablebefore/after/pathstats andhistoricalpath/SHA/inode, thenbinds currenthostdevice/inode in a freshSHA-authenticatedreceipt consumedbychildandindependentvalidator. Historicalreceipt/preflight remainread-only. No protected-byte orpolicyexception.
+
+Frozen5937cdd7, gpu5CPUindex1, packedMAIN, exactsixpublicinputs; noGPUclaim/CUDA/modelgeneration/training. Campaign240CPUwallbound +60external=300CPU; packet100CPU/130wall, validator30CPU/40wall; phase/campaignreadinessgates mustfit beforepacketandpublication. Preserve allactualpacketbytes,480fingerprints,NPZ/checkpoint/origin/isolation/canaryreceipts. Failedhash/identity/policy/correctness/cost stops; noautomaticGPUorfull-decoderpromotion. No qualityresult follows frompacketproofalone.

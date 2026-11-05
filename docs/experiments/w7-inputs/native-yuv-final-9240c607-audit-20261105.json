@@ -1,0 +1,53 @@
+{
+  "job_id": "20261105T045259Z-9240c607",
+  "status": "failed",
+  "canonical_status_sha256": "10bfbcc7c7c794c565c3ae8a1137340ac8f6ed36e5660f42b5c554fc4eb3f9b0",
+  "host": "gpu5",
+  "cpu_affinity": [
+    0
+  ],
+  "smoke_gate": {
+    "passed": true,
+    "checks": {
+      "three_frozen_roles": true,
+      "independent_native_yuv": true,
+      "all_frame_timestamps": true,
+      "cost_forecast": true
+    },
+    "full_forecast_seconds": 574.50352001586,
+    "phase_elapsed_seconds": 21.67154049873352
+  },
+  "smoke_published_sha256": "99cc81116a1e3d68c30690b0aced9ff8f33ebff6b09db61c82036bf8810a26c0",
+  "full_partial_sha256": "e179855ac8aa6829e2e4b1d38d15797a904aa96cfd7e3ecc3c772494438b787c",
+  "full_partial_contents": [
+    "publish/"
+  ],
+  "full_completed_roles": 0,
+  "first_role": "al028/s2_o0_crf66",
+  "first_original_ivf_sha256": "bc5d543b30caf45dd0105b45af1620348d7083d0dc99db595012438a846f3023",
+  "failure": "w7_byteproof.py:54 original IVF has extra bytes or unexpected frame timestamps; exact subcondition not yet isolated",
+  "full_command_seconds": 0.06829214096069336,
+  "created_to_status_updated_seconds": 73.16566348075867,
+  "conservative_cpu_charge_seconds": 164,
+  "external_cpu_reserve_seconds": 90,
+  "supervisor_and_campaign_pids_absent": true,
+  "source_tree_removed": true,
+  "interpretation": "Full proof failed at first original IVF before transport/decode. No negative codec result; no 75-role admission. Three validated smoke proofs remain available in smoke publication.",
+  "original_ivf_parser_audit": {
+    "sha256": "bc5d543b30caf45dd0105b45af1620348d7083d0dc99db595012438a846f3023",
+    "bytes": 22645,
+    "width": 960,
+    "height": 544,
+    "timebase": "1/25",
+    "frames": 240,
+    "timestamps": "0..239 in unit steps",
+    "nonempty_payloads": 240,
+    "trailing_bytes": 0,
+    "failure": "parser assumes 1/50; actual 1/25 matches frozen 25 fps al028 manifest",
+    "manifest": "docs/experiments/w7-specs/windows.json",
+    "source_yuv_sha256": "5788a0f1b0b2ce3c8d57ea842807a43dda1f9fa3cc06cd90c3aa4b27ff31d22a",
+    "historical_native_yuv_sha256": "c5841f322e91d73e40fde05f119edc519ebb3c4506de66e8ac73f09575532cf7",
+    "other_25fps_logical_roles": "41 total across al028/al034/al043; only first IVF independently parsed",
+    "future_fix": "bind per-window fps to frozen manifest in original/returned IVF, MKV PTS and actual rate checks; retain all other gates and independent decode"
+  }
+}
