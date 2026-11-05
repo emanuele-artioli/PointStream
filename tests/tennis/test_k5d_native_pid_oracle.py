@@ -69,5 +69,57 @@ def test_missing_libc_pidfd_exports_fail_closed(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setattr(k5d_pidfd.ctypes, 'CDLL', lambda *_args, **_kw: Libc())
     monkeypatch.setattr(k5d_pidfd.os, 'pidfd_open', None, raising=False)
     monkeypatch.setattr(k5d_pidfd.signal, 'pidfd_send_signal', None, raising=False)
-    with pytest.raises(RuntimeError, match='exports unavailable'):
+    monkeypatch.setattr(k5d_pidfd.platform, 'machine', lambda: 'not-x86_64')
+    with pytest.raises(RuntimeError, match='unsupported Linux pidfd syscall ABI'):
+        k5d_pidfd.Pidfd()
+
+
+def test_x86_64_pidfd_syscall_backend_uses_typed_arguments_and_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import ctypes
+    from experiments.tennis import k5d_pidfd
+
+    calls: list[tuple] = []
+    class Function:
+        def __init__(self, fn):
+            self.fn = fn
+        def __call__(self, *args):
+            return self.fn(*args)
+    def call(*args):
+        calls.append(args)
+        return 7 if args[0].value == 434 else 0
+    class Libc:
+        gnu_get_libc_version = Function(lambda: b'2.35')
+        syscall = Function(call)
+    monkeypatch.setattr(k5d_pidfd.sys, 'platform', 'linux')
+    monkeypatch.setattr(k5d_pidfd.platform, 'machine', lambda: 'x86_64')
+    monkeypatch.setattr(k5d_pidfd.ctypes, 'CDLL', lambda *_args, **_kw: Libc())
+    monkeypatch.setattr(k5d_pidfd.os, 'pidfd_open', None, raising=False)
+    monkeypatch.setattr(k5d_pidfd.signal, 'pidfd_send_signal', None, raising=False)
+    monkeypatch.setattr(k5d_pidfd.os, 'close', lambda _fd: None)
+    adapter = k5d_pidfd.Pidfd()
+    proof = adapter.self_check()
+    assert proof['backend'] == 'linux-x86_64-syscall'
+    assert [x.value for x in calls[0]] == [434, k5d_pidfd.os.getpid(), 0]
+    assert [x.value for x in calls[1]] == [424, 7, 0, None, 0]
+    assert isinstance(calls[0][1], ctypes.c_int) and isinstance(calls[1][3], ctypes.c_void_p)
+    setattr(adapter, 'syscall_fn', Function(lambda *_args: -1))
+    with pytest.raises(OSError, match='pidfd_open failed'):
+        adapter.self_check()
+
+
+def test_x86_64_pidfd_syscall_rejects_wrong_word_size(monkeypatch: pytest.MonkeyPatch) -> None:
+    from experiments.tennis import k5d_pidfd
+
+    class Function:
+        def __call__(self):
+            return b'2.35'
+    class Libc:
+        gnu_get_libc_version = Function()
+    monkeypatch.setattr(k5d_pidfd.sys, 'platform', 'linux')
+    monkeypatch.setattr(k5d_pidfd.platform, 'machine', lambda: 'x86_64')
+    monkeypatch.setattr(k5d_pidfd.ctypes, 'CDLL', lambda *_args, **_kw: Libc())
+    monkeypatch.setattr(k5d_pidfd.ctypes, 'sizeof', lambda _: 4)
+    monkeypatch.setattr(k5d_pidfd.os, 'pidfd_open', None, raising=False)
+    monkeypatch.setattr(k5d_pidfd.signal, 'pidfd_send_signal', None, raising=False)
+    with pytest.raises(RuntimeError, match='unsupported Linux pidfd syscall ABI'):
         k5d_pidfd.Pidfd()

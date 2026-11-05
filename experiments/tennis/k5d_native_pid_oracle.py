@@ -292,10 +292,13 @@ def validate() -> None:
                 or capability.get('source_sha256') != sha(Path(__file__).with_name('k5d_pidfd.py'))
                 or capability.get('cuda_visible_devices') != '' or capability.get('torch_imported') is not False
                 or not isinstance(capability.get('cpu_affinity'), list) or len(capability['cpu_affinity']) != 1
-                or record['pidfd_capability'].get('backend') not in ('python', 'libc-exports')
+                or record['pidfd_capability'].get('backend') not in ('python', 'libc-exports', 'linux-x86_64-syscall')
                 or record['pidfd_capability'].get('own_pid_signal_zero') is not True
                 or not record['pidfd_capability'].get('libc_version')
-                or not record['pidfd_capability'].get('python_version')):
+                or not record['pidfd_capability'].get('python_version')
+                or (capability.get('backend') == 'linux-x86_64-syscall'
+                    and (capability.get('machine') != 'x86_64' or capability.get('abi_source') !=
+                         'https://raw.githubusercontent.com/torvalds/linux/v6.8/arch/x86/entry/syscalls/syscall_64.tbl'))):
             raise ValueError('oracle assets differ from actual fleet specification')
         if (record['schema'] != 1 or record['stage'] != 'smoke' or record['cases'] != cases
                 or record['source_sha256'] != dispatch['code']['source_sha256']
