@@ -67,7 +67,7 @@ def prepare(stage: Path, scratch: Path) -> tuple[dict[str, Path], list[dict[str,
     if set(inputs) != REQUIRED:
         raise ValueError('staged input coverage differs')
     spec = json.loads((stage.parent / 'spec.json').read_text())
-    if (spec.get('device') != 'gpu' or spec.get('hosts') != ['gpu2', 'gpu3']
+    if (spec.get('device') != 'gpu' or spec.get('hosts') != ['gpu2']
             or spec.get('gpu_models') != ['RTX A6000'] or spec.get('cpu_threads') != 1
             or spec.get('single_cpu_campaign') is not True or spec.get('budget_seconds') != 950
             or spec.get('smoke', {}).get('seconds') != 360 or spec.get('full', {}).get('seconds') != 500
@@ -185,7 +185,7 @@ def make_spec(assets: dict[str, dict[str, str]], deadline: str) -> dict[str, Any
                 assets[w + '_hybrid']['sha256'], shared.old.digest(Path(shared.old.__file__)), shared.source_bridge())
     files = {name: (entry['remote'], entry['sha256']) for name, entry in assets.items()}
     spec = w7_specs.common('experiments.tennis.w7_narrow_score', ['--stage', '{stage}'], files)
-    spec.update({'device': 'gpu', 'hosts': ['gpu2', 'gpu3'], 'gpu_models': ['RTX A6000'],
+    spec.update({'device': 'gpu', 'hosts': ['gpu2'], 'gpu_models': ['RTX A6000'],
                  'gpu_memory_mib': 8000, 'cpu_threads': 1, 'single_cpu_campaign': True,
                  'local_storage_gib': 30, 'deadline': deadline,
                  'scale': {'stage': {'smoke': 'smoke', 'full': 'full'}},
