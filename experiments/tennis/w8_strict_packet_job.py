@@ -34,7 +34,7 @@ def bound_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     if (spec.get('device') != 'cpu' or spec.get('gpu_models') != [] or spec.get('gpu_memory_mib') != 0
             or spec.get('single_cpu_campaign') is not True or spec.get('cpu_threads') != 1
-            or spec.get('hosts') != ['gpu5'] or spec.get('budget_seconds', 0) > 170
+            or spec.get('hosts') != ['gpu5'] or spec.get('budget_seconds', 0) != 240
             or spec.get('environment', {}).get('sha256') != cost.MAIN_ENV
             or staging['environment']['sha256'] != cost.MAIN_ENV or len(dispatch.get('cpu_affinity', [])) != 1):
         raise ValueError('CPU-only single-core MAIN environment contract differs')
@@ -127,6 +127,20 @@ def worker(python: Path, root: Path, work: Path, config: dict[str, Any], loader:
     return record
 
 
+def require_remaining(dispatch: dict[str, Any], phase_reserve: float, campaign_reserve: float) -> dict[str, float]:
+    clock = dispatch['campaign_clock']
+    now = time.monotonic()
+    started, phase, end = clock['started'], clock['phase_started'], clock['budget_end']
+    if not started <= phase <= now < end or end - started > 241:
+        raise ValueError('campaign clock identity differs')
+    phase_left = phase + 180 - now
+    campaign_left = end - now
+    if phase_left < phase_reserve or campaign_left < campaign_reserve:
+        raise ValueError('insufficient time for packet, publication and independent validator')
+    return {'phase_seconds_remaining': phase_left, 'campaign_seconds_remaining': campaign_left,
+            'phase_seconds_reserved': phase_reserve, 'campaign_seconds_reserved': campaign_reserve}
+
+
 def run(stage: Path) -> None:
     if stage.name != 'smoke' or sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise ValueError('single-core Linux CPU smoke required')
@@ -179,7 +193,9 @@ def run(stage: Path) -> None:
               'environment': {'CUDA_VISIBLE_DEVICES': '', 'TMPDIR': str(output), 'TMP': str(output), 'TEMP': str(output),
                               'XDG_CACHE_HOME': str(output / '.cache'), 'TORCH_HOME': str(output / '.cache' / 'torch'),
                               'PS_GPU_MEMORY_LIMIT_MIB': '0'}}
+    admission = require_remaining(dispatch, 141, 181)
     usage = worker(python, root, work, config, loader_path)
+    require_remaining(dispatch, 10, 51)
     decoded = json.loads((output / 'decoded-manifest.json').read_text())
     if (decoded.get('packet_sha256') != fixed.WINDOW_SHA or decoded.get('profile_sha256') != fixed.PROFILE_SHA
             or decoded.get('guider_sha256') != fixed.GUIDER_SHA or decoded.get('match_tensors') != fingerprints
@@ -213,7 +229,7 @@ def run(stage: Path) -> None:
                'archive_sha256': fixed.file_sha(archive_path), 'archive_bytes': archive_path.stat().st_size,
                'members': {name: fixed.file_sha(members[name]) for name in evidence_names()},
                'inputs': {name: fixed.file_sha(path) for name, path in paths.items()}, 'public_rate': rate,
-               'worker': usage, 'parent_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+               'worker': usage, 'admission': admission, 'parent_cpu_seconds': sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
                'code_identity': dispatch['code']['source_sha256'], 'snapshot_sha256': dispatch['code']['snapshot_sha256']}
     (pub / 'packet-summary.json').write_text(json.dumps(summary, sort_keys=True, allow_nan=False) + '\n')
 
@@ -280,6 +296,10 @@ def validate(stage: Path, output: Path) -> int:
                         shutil.copyfileobj(stream, target, 1024 * 1024)
             if any(fixed.file_sha(unpacked / name) != digest for name, digest in summary['members'].items()):
                 raise ValueError('packet evidence bytes differ')
+            admission = summary['admission']
+            if (admission.get('phase_seconds_reserved') != 141 or admission.get('campaign_seconds_reserved') != 181
+                    or admission.get('phase_seconds_remaining', 0) < 141 or admission.get('campaign_seconds_remaining', 0) < 181):
+                raise ValueError('packet campaign readiness receipt differs')
             config = json.loads((unpacked / 'worker-config.json').read_text())
             loader = json.loads((unpacked / 'loader-identity.json').read_text())
             manifest = json.loads((unpacked / 'source-manifest.json').read_text())
@@ -307,7 +327,10 @@ def validate(stage: Path, output: Path) -> int:
                 raise ValueError('packet read grants or public files differ')
             check_isolation(config, packet['isolation'], loader, manifest, fixed.file_sha(unpacked / 'loader-identity.json'))
             if (cpu.get('cuda_visible_devices') != '' or cpu.get('cuda_initialized_after_decode') is not False
-                    or cpu.get('torch_version') != preflight['receipts']['main']['torch']):
+                    or cpu.get('torch_version') != preflight['receipts']['main']['torch']
+                    or cpu.get('pre_serialization', {}).get('state_tensors') != 480
+                    or cpu.get('pre_serialization', {}).get('unit_arrays', 0) <= 0
+                    or cpu.get('pre_serialization', {}).get('restored_tensors', 0) <= 0):
                 raise ValueError('CPU-only runtime evidence differs')
             check_serialized(unpacked, packet, fingerprints)
             files = manifest.get('files')
@@ -349,12 +372,12 @@ def make_spec(deadline: str) -> dict[str, Any]:
     base['staged_inputs'] = selected
     base['inputs'] = [{'path': item['path'], 'sha256': item['sha256']} for item in selected]
     base.update(device='cpu', hosts=['gpu5'], gpu_models=[], gpu_memory_mib=0, cpu_threads=1,
-                single_cpu_campaign=True, budget_seconds=170, validator_seconds=18,
+                single_cpu_campaign=True, budget_seconds=240, validator_seconds=40,
                 entrypoint=['-m', 'experiments.tennis.w8_strict_packet_job'],
                 arguments=['packet-run', '--phase', '{phase}'], scale={'phase': {'smoke': 'smoke', 'full': 'full'}},
-                smoke={'seconds': 150, 'representative_basis': 'Fresh source-hidden strict CPU packet decode and full independent oracle proof; full stage is only a completion marker.'},
+                smoke={'seconds': 180, 'representative_basis': 'Fresh source-hidden strict CPU packet decode and full independent oracle proof; full stage is only a completion marker.'},
                 full={'seconds': 1}, validator=['{python}', '-m', 'experiments.tennis.w8_strict_packet_job', 'packet-validate'],
-                required_commands=['unshare'], deadline=deadline, stall_seconds=150)
+                required_commands=['unshare'], deadline=deadline, stall_seconds=180)
     base['environment'] = {'path': '/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz',
                            'sha256': cost.MAIN_ENV}
     base.pop('gpu_sharing', None)

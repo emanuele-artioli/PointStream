@@ -15,7 +15,7 @@ def test_real_spec_has_only_public_cpu_inputs():
     validate_spec(spec, now=1793848684)
     assert spec['device'] == 'cpu'
     assert spec['hosts'] == ['gpu5']
-    assert spec['budget_seconds'] == 170
+    assert spec['budget_seconds'] == 240
     assert {i['name']: i['sha256'] for i in spec['staged_inputs']} == job.NAMES
     assert spec['arguments'][0] == 'packet-run'
     assert spec['validator'][-1] == 'packet-validate'
@@ -36,7 +36,7 @@ def test_exact_staged_input_binding_rejects_extra_and_tamper(tmp_path, monkeypat
         staged.append({'name': name, 'path': str(path), 'sha256': digest})
     monkeypatch.setattr(job, 'NAMES', names)
     spec = {'device': 'cpu', 'gpu_models': [], 'gpu_memory_mib': 0, 'single_cpu_campaign': True,
-            'cpu_threads': 1, 'hosts': ['gpu5'], 'budget_seconds': 170,
+            'cpu_threads': 1, 'hosts': ['gpu5'], 'budget_seconds': 240,
             'environment': {'sha256': job.cost.MAIN_ENV}, 'staged_inputs': staged,
             'inputs': [{'path': x['path'], 'sha256': x['sha256']} for x in staged]}
     (tmp_path / 'spec.json').write_text(json.dumps(spec))
@@ -126,3 +126,30 @@ def test_isolation_requires_all_denials_mutations_and_exact_source(monkeypatch):
     receipt['source_origins'][module] = 'src/other.py'
     with pytest.raises(ValueError, match='origins'):
         job.check_isolation(config, receipt, {}, manifest, 'loader')
+
+
+def test_pre_serialization_rejects_fake_cuda_and_meta():
+    class Tensor:
+        def __init__(self, kind):
+            self.device = type('Device', (), {'type': kind})()
+    state = {'reference_unet': {str(i): Tensor('cpu') for i in range(160)},
+             'denoising_unet': {str(i): Tensor('cpu') for i in range(160)},
+             'pose_guider': {str(i): Tensor('cpu') for i in range(160)}}
+    assert packet_worker.assert_cpu_state(state, lambda x: isinstance(x, Tensor)) == 480
+    for kind in ('cuda', 'meta'):
+        state['pose_guider']['0'] = Tensor(kind)
+        with pytest.raises(ValueError, match='non-CPU'):
+            packet_worker.assert_cpu_state(state, lambda x: isinstance(x, Tensor))
+    with pytest.raises(ValueError, match='non-CPU'):
+        packet_worker.assert_cpu_units({'a': {'bad': Tensor('cuda')}}, ('a',), bytes)
+
+
+def test_campaign_remaining_gate_rejects_underfunded(monkeypatch):
+    monkeypatch.setattr(job.time, 'monotonic', lambda: 120.0)
+    dispatch = {'campaign_clock': {'started': 100.0, 'phase_started': 110.0, 'budget_end': 340.0}}
+    assert job.require_remaining(dispatch, 141, 181)['phase_seconds_remaining'] == 170
+    with pytest.raises(ValueError, match='insufficient'):
+        job.require_remaining(dispatch, 171, 181)
+    dispatch['campaign_clock']['budget_end'] = 300.0
+    with pytest.raises(ValueError, match='insufficient'):
+        job.require_remaining(dispatch, 141, 181)
