@@ -19,6 +19,7 @@ import shlex
 import subprocess
 import tarfile
 import tempfile
+import time
 import uuid
 from typing import Any
 
@@ -497,18 +498,25 @@ def _send_snapshot(
     if not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
         raise FleetError("snapshot transfer timeout must be positive and finite")
     remote_tar = str(Path(target).with_suffix(".tar"))
-    receive = f"umask 077; set -o noclobber; cat > {shlex.quote(remote_tar)}"
+    # Coalesce pipe reads before writing NFS; noclobber preserves partial uploads.
+    receive = f"umask 077; set -o noclobber; exec dd bs=1M iflag=fullblock status=none > {shlex.quote(remote_tar)}"
+    deadline = time.monotonic() + timeout
+    def remaining() -> float:
+        left = deadline - time.monotonic()
+        if left <= 0:
+            raise FleetError(f"{host}: snapshot transfer time budget exhausted")
+        return left
     with source.open("rb") as stream:
         proc = subprocess.run(
             ["ssh", "-C", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "-lc", receive])],
             stdin=stream,
             capture_output=True,
-            timeout=timeout,
+            timeout=remaining(),
             check=False,
         )
     if proc.returncode:
         raise FleetError(f"{host}: snapshot transfer failed: {proc.stderr.decode(errors='replace').strip()}")
-    checksum = _ssh(host, ["sha256sum", "--", remote_tar])
+    checksum = _ssh(host, ["sha256sum", "--", remote_tar], timeout=remaining())
     if checksum.returncode or checksum.stdout.split(maxsplit=1)[0] != expected_sha256:
         raise FleetError(f"{host}: transferred snapshot checksum does not match the local archive")
     if not extract:
@@ -516,11 +524,11 @@ def _send_snapshot(
     unpacked = _ssh(
         host,
         ["tar", "-xf", remote_tar, "-C", target],
-        timeout=timeout,
+        timeout=remaining(),
     )
     if unpacked.returncode:
         raise FleetError(f"{host}: snapshot extraction failed: {unpacked.stderr.strip()}")
-    remove_archive = _ssh(host, ["/usr/bin/python3", "-c", "import pathlib,sys; pathlib.Path(sys.argv[1]).unlink()", remote_tar])
+    remove_archive = _ssh(host, ["/usr/bin/python3", "-c", "import pathlib,sys; pathlib.Path(sys.argv[1]).unlink()", remote_tar], timeout=remaining())
     if remove_archive.returncode:
         raise FleetError(f"{host}: snapshot extracted but its temporary archive could not be removed")
 

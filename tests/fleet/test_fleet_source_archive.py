@@ -88,9 +88,22 @@ def test_send_snapshot_without_extraction_keeps_only_the_verified_archive(tmp_pa
     fleet._send_snapshot("gpu2", source, "/inbox/job/source", "a" * 64, timeout=90, extract=False)
     argv, sent, timeout = uploads[0]
     assert argv[:2] == ["ssh", "-C"] and argv[-2] == "gpu2"
-    assert "noclobber" in argv[-1] and "/inbox/job/source.tar" in argv[-1]
-    assert sent == b"archive" and timeout == 90
+    assert "iflag=fullblock" in argv[-1] and "noclobber" in argv[-1]
+    assert "bs=1M" in argv[-1] and "/inbox/job/source.tar" in argv[-1]
+    assert sent == b"archive" and 0 < timeout <= 90
     assert commands == [["sha256sum", "--", "/inbox/job/source.tar"]]
+
+
+def test_snapshot_transfer_stops_when_shared_deadline_expires(tmp_path, monkeypatch):
+    source = tmp_path / "source.tar"
+    source.write_bytes(b"archive")
+    moments = iter((0.0, 1.0, 91.0))
+    monkeypatch.setattr(fleet.time, "monotonic", lambda: next(moments))
+    monkeypatch.setattr(fleet.subprocess, "run", lambda *a, **kw: SimpleNamespace(returncode=0, stderr=b""))
+    monkeypatch.setattr(fleet, "_ssh", lambda *a, **kw: pytest.fail("checksum after expired deadline"))
+    with pytest.raises(fleet.FleetError, match="time budget exhausted"):
+        fleet._send_snapshot("gpu2", source, "/inbox/job/source", "a" * 64, timeout=90, extract=False)
+    assert source.read_bytes() == b"archive"
 
 
 def test_archive_publication_keeps_no_tree_on_nfs_and_the_legacy_identity(tmp_path, local_root):
