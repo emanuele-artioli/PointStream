@@ -1,0 +1,21 @@
+{
+  "approved": true,
+  "analysis_source_sha256": "e0d4716bf40ceb16a4ad43181becb618df6cf5f00b728d0f0b525cd65e780dea",
+  "new_score_audit_sha256": "a01fb9ff905918e8574e48ce6d74d4b0f44f9ce9099a46dd74f85a0d2c8726f1",
+  "max_cpu_seconds": 60,
+  "scientific_source_identity": {
+    "tracked_python_files": 545,
+    "tracked_python_manifest_sha256": "0bd91672433804cfa3b22ca840ce9d5e9196ae5947819aaab669ece168dc0e74",
+    "python_version": "3.12.7 | packaged by conda-forge | (main, Oct  4 2024, 15:57:01) [Clang 17.0.6 ]",
+    "numpy_version": "1.26.4",
+    "scipy_version": "1.17.1",
+    "numpy_binary_sha256": "a51276f3aab2d91051aa0ced3ddaa39a776ae60132ca4c07a91b82a8b7a92ea7",
+    "scipy_special_binary_sha256": "5ff965ce3b560fa7e2f6901b665e42b96554024a5b32a253c7f7f5bc95c2134f",
+    "scipy_interpolate_binary_sha256": "70886697c9ae4bf98ed1ef0fe1b7a05b8f241ab72f21b0db4d4e698d5bdf1ec4"
+  },
+  "inclusive_cpu_seconds": 120,
+  "phase": "w7-final-envelope-analysis-20261105",
+  "authority": "root within approved staged20GPUh/24CPUh; complete IVF primary and MKV sensitivity chosen before outcome",
+  "cost_basis": "Pinned project numerical runtime synthetic ten paired reports2.285wall/1.850CPU incl0.135 actual authenticated input load; 60CPU command cap plus60 external audit, 1.5 margin amply included",
+  "source_review": "8deef29a root reviewed native IVF byte authentication, alias-preserving deep copy of rate views, hull/sign/bracket/metric ordering, W9 billing and source/runtime gating; independent404a32bc framing and module-gate review addressed."
+}

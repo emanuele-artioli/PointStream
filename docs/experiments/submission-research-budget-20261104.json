@@ -506,6 +506,91 @@
       "gpu_seconds": 0,
       "cpu_seconds": 180,
       "basis": "Entire180CPUasset/provenanceoraclecharged. Cachehash0.822s/sourceconversion1.463s onlysubcomponents; sourceYUVda27...exact, control9.9666e-5<.001. Noall53reuse/RGBdigestclaim."
+    },
+    {
+      "phase": "w7-shared-score-pilot-20261105",
+      "job_id": "20261105T055056Z-aa3070f0",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 350,
+      "cpu_seconds": 450,
+      "basis": "Entire350GPU450CPUpilotceilingconservativelycharged. Complete2points/old320valuesexact,123scommand, control88.3/new18.48; noattributionofwarmup. Source/PIDs/claimsreleased. Full22currentworstpointforecastcannotfit; separateprovenance53reuseapproved."
+    },
+    {
+      "phase": "w8-strict-host-cost-20261105",
+      "job_id": "20261105T055250Z-24f354fd",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 243,
+      "cpu_seconds": 343,
+      "basis": "ceil142.133creation\u2192terminal143+100external=243GPU; plus100CPUexternal=343CPUconservativeupper. ModelconstructorstoppedbeforeVAEloadingonMAKE_SYMEACCES, no kernel/UUIDreceipt. Packet480/2unit/sourceproofpassedinscratchnotdurable; PIDs/PGID/claimsreleased."
+    },
+    {
+      "phase": "w7-historical-reuse-review-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "basis": "Whole120CPUindependentreviewcharged; 67346b60retains53oldmeasurements/48A6000+5Ada/9controlclassdiff/.001sensitivity, nofreshRGBclaim."
+    },
+    {
+      "phase": "w7-remaining-five-preflight-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "basis": "Whole120CPUpreflightcharged;52.20CPUstaging/cacheprescans+3.05sourceconversion+2.607realprepare dispatchplusunmeasuredsetup; all21assets+MAINcachehitsGPU2, bothcontrols/proofs matched.20scontextsconservativeextraponly."
+    },
+    {
+      "phase": "w8-regular-folder-oracle-20261105",
+      "job_id": "20261105T062850Z-0b9653c5",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 111,
+      "basis": "ceil60.920lateststatuslifecycle61+50external111CPUupper. Failed0.420scommandbeforeLandlockonUIDloaderguard; nofolders/method/models/GPU. UIDmappinginferrednotlogged; PIDs/claimreleased."
+    },
+    {
+      "phase": "w7-narrow-five-completion-20261105",
+      "job_id": "20261105T064410Z-40ee5e97",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 539,
+      "cpu_seconds": 639,
+      "basis": "Independent audit37a18a64 and source/controls/publications match; ceil488.424creation-to-terminal489+50GPU/150CPU external conservative upper. Exact two320-value controls, three new plus earlier aa307 point counted once; no quality outcome yet."
+    },
+    {
+      "phase": "w8-folder-parent-loader-repair-20261105",
+      "job_id": "20261105T064712Z-66226a15",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "basis": "Entire120CPU ceiling charged; independent6cf5d170 archive/source/gate audit passes266 synthetic bytes, unchanged folder helper/strict policy/cleanup. No model, real I/O or GPU result."
+    },
+    {
+      "phase": "w7-achievable-control-envelope-audit-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "basis": "Entire120CPU read-only fairness audit charged; b025c198 authenticates18 controls and four duplicate pairs. All valid native encodes eligible; old family analysis retained."
+    },
+    {
+      "phase": "w7-final-envelope-analysis-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "basis": "Entire120CPU analysis/pilot/review charged. Source8deef29a, rootgate7044db87; independent audit identified affordable endpoint exclusion and DCVC coverage handling, original e9f646 report retained not promoted."
+    },
+    {
+      "phase": "pinned-local-code-validation-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "basis": "Conservative300CPU allowance for isolated pinned dependency environment/install and full configured checks. Python3.12/NumPy1.26.4/OpenCV4.10/PyYAML6.0.2, all configured Ruff+mypy pass,1811passed31skipped pytest130.95wall. Prior defaultcv2v5/missingyaml failures retained as environment mismatch."
     }
   ],
   "reservations": [
@@ -831,7 +916,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 350,
       "cpu_seconds": 450,
-      "status": "Rootreviewc54nativeprofile/actual12assets/7930spec-ready-nullbridge/14f7publication/80tickcontrol/A6000pool2&3 accepted. 240smoke+20validator+20marker+20internal=300campaign+50GPU/100CPUexternal350/450. No full22/53reuseadmission untilactualpilot+6sourcecostjoins."
+      "status": "closed; Entire350GPU450CPUpilotceilingconservativelycharged. Complete2points/old320valuesexact,123scommand, control88.3/new18.48; noattributionofwarmup. Source/PIDs/claimsreleased. Full22currentworstpointforecastcannotfit; separateprovenance53reuseapproved."
     },
     {
       "phase": "w8-strict-host-cost-20261105",
@@ -839,7 +924,87 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 700,
       "cpu_seconds": 1000,
-      "status": "Rootreview29a82+independentreview342/629wrapperorigin andtrustedbootstrap rationale accepted. Oldreceiver/preflightclosureunchanged; freshpacketbeforemodel, actualAda8.9UUID/sealedkernels andallsource/isolationguards. 1/3only600campaign+100external<=700GPU1000CPU. No30stepadmission; projectionadvisory. JCVuuidpropertyCPUcheckedwithoutCUDA."
+      "status": "closed; ceil142.133creation\u2192terminal143+100external=243GPU; plus100CPUexternal=343CPUconservativeupper. ModelconstructorstoppedbeforeVAEloadingonMAKE_SYMEACCES, no kernel/UUIDreceipt. Packet480/2unit/sourceproofpassedinscratchnotdurable; PIDs/PGID/claimsreleased."
+    },
+    {
+      "phase": "w7-historical-reuse-review-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "closed; Whole120CPUindependentreviewcharged; 67346b60retains53oldmeasurements/48A6000+5Ada/9controlclassdiff/.001sensitivity, nofreshRGBclaim."
+    },
+    {
+      "phase": "w8-regular-folder-oracle-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "closed;111CPUcharged/9released, earlyloadernamespaceUIDcheckfailedbeforemethod/noGPU; rawfailurepreserved."
+    },
+    {
+      "phase": "w7-remaining-five-preflight-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "closed; Whole120CPUpreflightcharged;52.20CPUstaging/cacheprescans+3.05sourceconversion+2.607realprepare dispatchplusunmeasuredsetup; all21assets+MAINcachehitsGPU2, bothcontrols/proofs matched.20scontextsconservativeextraponly."
+    },
+    {
+      "phase": "w7-narrow-five-completion-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 1000,
+      "cpu_seconds": 1100,
+      "status": "closed; conservative539GPU/639CPU charged; independent audit accepted, unused reservation released."
+    },
+    {
+      "phase": "w8-folder-parent-loader-repair-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "closed; conservative0GPU/120CPU charged; independent audit accepted, unused reservation released."
+    },
+    {
+      "phase": "w7-achievable-control-envelope-audit-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "closed; conservative0GPU/120CPU charged; independent audit accepted, unused reservation released."
+    },
+    {
+      "phase": "w7-final-envelope-analysis-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "closed; full120CPU charged. First gated report e9f646 invalid for primary endpoint/coverage handling, preserved and not for paper. Independent correction required."
+    },
+    {
+      "phase": "w8-real-folder-io-oracle-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 240,
+      "status": "Prospective240CPU/0GPU:180 campaign+60 external for four pinned public files/real unchanged helper/strict isolation. Final source+spec review required before dispatch, no models."
+    },
+    {
+      "phase": "gvc-strict-worker-cpu-oracle-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 180,
+      "status": "Prospective minimal actual GVC strict-worker Linux isolation CPU oracle; code/spec/cost review before dispatch. No Torch/model/GPU, no grant expansion; original26df remains failed."
+    },
+    {
+      "phase": "w7-achievable-endpoint-analysis-repair-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "Prospective60CPU command plus60 audit, fresh source/manifest/runtime gate after affordable endpoint/per-codec coverage correction; no model/encode/GPU. Old wrong report preserved."
     }
   ],
   "jobs": [
@@ -1333,7 +1498,7 @@
       "job_id": "20261105T055056Z-aa3070f0",
       "phase": "w7-shared-score-pilot-20261105",
       "subphase": "two-point-med000-gpu-pilot",
-      "state": "submitted; frozenc54A6000poolgpu2/gpu3,350GPU450CPUinclusive, control63/new70only, no22/53reuseadmission.",
+      "state": "completepilot2points/320controlsexact; full22notfit/noautomaticnewscoring",
       "revision": "c54fad0cdf103bcf01fbb04e7b7c30638c27297b",
       "snapshot_sha256": "70742bb89455c4c96bd067d0164d6e0ae08e83790fd828f1be1404c1575a1be7",
       "source_sha256": "9c1244d370720ebc349c86658a81a4d02e19ebbc0cc99c072d6f6d7008fa0ee4",
@@ -1345,13 +1510,61 @@
       "job_id": "20261105T055250Z-24f354fd",
       "phase": "w8-strict-host-cost-20261105",
       "subphase": "one-three-step-strict-generation-cost",
-      "state": "submitted; frozen29a82gpu6Adaexclusive,700GPU1000CPUinclusive. Freshpacket/source/protectedidentitybeforemodel andactualAdaUUID/kernelwrapper; no30stepqualityadmission.",
+      "state": "failedMAKE_SYMduringmodel-foldersetupbeforeVAE/modelkernel/UUID; partialpacketproofvalidbutnodurablemodelresult; no retry.",
       "revision": "29a82e8ce0c6b672d1a47ede780e5b9b81969f77",
       "snapshot_sha256": "97b7e3557d3d0afc82b716aa6922d54be11d7e181787b397048ddaadf5fc74cf",
       "source_sha256": "9189338eda9849d82d694eefa0dcf946d55ad65d61c203670186d6bf7a85b134",
       "spec_sha256": "426757b7a5e268bb04ec1d3e08125af10ae57cafb635caa94dbd61d0eb499767",
       "gpu_ceiling": 700,
       "inclusive_cpu_ceiling": 1000
+    },
+    {
+      "job_id": "20261105T062850Z-0b9653c5",
+      "phase": "w8-regular-folder-oracle-20261105",
+      "subphase": "synthetic-strict-folder-cpu",
+      "state": "failedbeforeLandlock/foldermethod dueparent-vs-namespaceUIDguard;111CPU/noGPU, audit3a96a0c0, PIDs/claimreleased.",
+      "revision": "2650d595d5748e328c8aa152af4d76ca8f5379bf",
+      "snapshot_sha256": "2ed3ad806379ced8c28582257314361175271834e8977ae51bfbebab43457017",
+      "source_sha256": "d568084962f8ad3721690092ebbe24a66d7f6fc8c47a7b33c53d343fe7132712",
+      "spec_sha256": "2db83da86b4d76644388dcaabfcbc0e61fb1be42fc7cb003df52fc18359011bc",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 120
+    },
+    {
+      "job_id": "20261105T064410Z-40ee5e97",
+      "phase": "w7-narrow-five-completion-20261105",
+      "subphase": "two-controls-three-new",
+      "state": "complete; independent audit accepted; Independent audit37a18a64 and source/controls/publications match; ceil488.424creation-to-terminal489+50GPU/150CPU external conservative upper. Exact two320-value controls, three new plus earlier aa307 point counted once; no quality outcome yet.",
+      "revision": "eff9706a230501d6d489457ab78b7e39298fd9a8",
+      "snapshot_sha256": "86c29d4256cdec77c55e5688b50cbf26e5ccea10e788fe35a6f799f5eeb632ef",
+      "source_sha256": "a47c1d6919b108b93c181437cb77b979653f414ca4d937b2c4480a57e48fe005",
+      "spec_sha256": "b92fc3c14bead5d2c58de036db521a89fa5a2859c021a6679303b922e09649d5",
+      "gpu_ceiling": 1000,
+      "inclusive_cpu_ceiling": 1100
+    },
+    {
+      "job_id": "20261105T064712Z-66226a15",
+      "phase": "w8-folder-parent-loader-repair-20261105",
+      "subphase": "synthetic-folder-parent-auth-cpu",
+      "state": "complete; independent audit accepted; Entire120CPU ceiling charged; independent6cf5d170 archive/source/gate audit passes266 synthetic bytes, unchanged folder helper/strict policy/cleanup. No model, real I/O or GPU result.",
+      "revision": "b805e3d268f6d7881804b5d50eb31778c1abd0e0",
+      "snapshot_sha256": "451f3b99bf3283eb219631e8c567597ebb7f7df208224106bb1811b4c3a20430",
+      "source_sha256": "2850a8696c0211032ef64d55ad4e6b0acef3000f09a1a5ba2953b8c1ca741a3b",
+      "spec_sha256": "67f1f4447900a61c087b740131b8fc8a74e45fb35e507e5c0ccaf541485b54d5",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 120
+    },
+    {
+      "job_id": "20261105T071725Z-b5eb8a21",
+      "phase": "w8-real-folder-io-oracle-20261105",
+      "subphase": "strict real public folder copy CPU",
+      "state": "acknowledged pending; frozenbd55fded gpu6CPU-only, no model/GPU. One canonical bounded wait owned by root.",
+      "revision": "bd55fdedc60c7622c2ea421c97e716390c14029f",
+      "snapshot_sha256": "cc552d0b97bc84b985c3c95f8d32407fa4e049eed1252e81e3525a395e109c85",
+      "spec_sha256": "e5afc09b6dcefaa3756ba8ff0c786c474d205bab4406baa8b0e9cfd659641053",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 240,
+      "source_sha256": "732b9e2913ac99153cdf720f4d57fee0c500e1dc41759849e3994f3e24cf3003"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -1366,17 +1579,18 @@
   ],
   "monitoring": {
     "mode": "one canonical wholebatch wait; exits on attention",
-    "state": "oneboundedwholeGPUbatchwait; W7A6000two-points and W8Ada1/3cost, bothwithin20/24",
+    "state": "both terminal; independent audits accepted; no active science job",
     "jobs": [
-      "20261105T055056Z-aa3070f0",
-      "20261105T055250Z-24f354fd"
+      "20261105T064410Z-40ee5e97",
+      "20261105T064712Z-66226a15"
     ],
-    "result": "/private/tmp/pointstream-w7-w8-gpu-pilot-batch-wait-20261105.json",
+    "result": "/private/tmp/pointstream-narrow-folder-batch-wait-20261105.json",
     "max_seconds": 1200,
-    "started_utc": "2026-11-05T05:55:00.732899+00:00",
-    "deadline_utc": "2026-11-05T06:15:00.735137+00:00",
+    "started_utc": "2026-11-05T06:55:08.223552+00:00",
+    "deadline_utc": "2026-11-05T07:15:08.224100+00:00",
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "previous_result": "/private/tmp/pointstream-pilots-wholebatch-wait-20261105.json"
+    "previous_result": "/private/tmp/pointstream-pilots-wholebatch-wait-20261105.json",
+    "completed": true
   }
 }
