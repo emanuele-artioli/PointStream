@@ -1,0 +1,79 @@
+{
+  "arguments": [
+    "run",
+    "--source-archive",
+    "{staged:historical_source}",
+    "--phase",
+    "{phase}"
+  ],
+  "budget_seconds": 300,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "cpu_threads": 1,
+  "deadline": "2026-11-05T01:30:00+00:00",
+  "device": "gpu",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.w8_cuda_factorial"
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-jcv-20261022T124459Z.tar.gz",
+    "sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e"
+  },
+  "full": {
+    "seconds": 1
+  },
+  "gpu_memory_mib": 24000,
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_sharing": {
+    "mode": "exclusive"
+  },
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261101T151030Z-df638d2f/source.tar",
+      "sha256": "6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713"
+    }
+  ],
+  "local_storage_gib": 40,
+  "required_commands": [
+    "nvidia-smi",
+    "unshare"
+  ],
+  "scale": {
+    "phase": {
+      "full": "full",
+      "smoke": "smoke"
+    }
+  },
+  "schema": 1,
+  "single_cpu_campaign": true,
+  "smoke": {
+    "representative_basis": "Fresh 2x2 namespace and exact portable Landlock controls; four 45-second arms with CPU warmup and protected path checks.",
+    "seconds": 260
+  },
+  "staged_inputs": [
+    {
+      "extract": false,
+      "name": "historical_source",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261101T151030Z-df638d2f/source.tar",
+      "sha256": "6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713"
+    }
+  ],
+  "stall_seconds": 260,
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.w8_cuda_factorial",
+    "validate"
+  ],
+  "validator_seconds": 20,
+  "verify_staged_inputs": true
+}

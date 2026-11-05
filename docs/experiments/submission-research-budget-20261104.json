@@ -138,6 +138,20 @@
       "gpu_seconds": 0,
       "cpu_seconds": 300,
       "basis": "entire300CPU charged; CPUwitnesssmoke262.773s (above210target), validatorpassed butcampaignbudgetexhausted before no-workfullmarker; images retained/manualjoinreview no model"
+    },
+    {
+      "phase": "gvcrt-native4-16-20261105",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 900,
+      "cpu_seconds": 1200,
+      "basis": "full phase ceiling conservatively charged; no model/encode started; isolatedCUDAerror2 and genericcontrolpass, lifecycle60.677s; audit overhead unmeasured"
+    },
+    {
+      "phase": "opentt-test2-source-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 240,
+      "cpu_seconds": 360,
+      "basis": "Entirephase ceiling conservatively charged; actualmechanicalcompletion0/85visible0/6false149unknown; fullreport/audit andsourcewitnesschecked, externalaggregateunmeasured"
     }
   ],
   "reservations": [
@@ -244,7 +258,7 @@
       "workstream": "ego_peer_oracles",
       "gpu_seconds": 900,
       "cpu_seconds": 1200,
-      "status": "prospective reservation; root review required, no GPU/model dispatch yet",
+      "status": "closed; full900GPU/1200CPU ceiling conservatively charged; currentisolationnegative only",
       "release_stage": "initial"
     },
     {
@@ -277,7 +291,23 @@
       "gpu_seconds": 240,
       "cpu_seconds": 360,
       "release_stage": "initial",
-      "status": "prospective reservation; root manualjoinonly; worker/spec/costreview needed"
+      "status": "closed; full240GPU/360CPU charged; sourcejudgequalificationfailed, no coding"
+    },
+    {
+      "phase": "w8-factorial-cuda-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 400,
+      "cpu_seconds": 600,
+      "release_stage": "initial",
+      "status": "prospective fourcells namespacebundle\u00d7sameLandlockpolicy; no model/decoder/inference"
+    },
+    {
+      "phase": "k5d-checkpoint16-48-equivalence-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 3400,
+      "cpu_seconds": 4350,
+      "release_stage": "larger stage2",
+      "status": "prospective prepare700/900 +6score450/550 +CPUassemble150; rootreview/specfreeze beforedispatch; nofull30admission"
     }
   ],
   "jobs": [
@@ -410,12 +440,32 @@
     {
       "job_id": "20261105T003105Z-26df2a36",
       "phase": "gvcrt-native4-16-20261105",
-      "state": "submitted; probe/cost/fullgates pending",
+      "state": "failed atisolatedno-modelCUDA; genericcontrolpass; no native/GVCqualityresult; processes/claimreleased",
       "revision": "d65a4146f97bbeceb9a39b4c4e17b500236c18f5",
       "source_sha256": "189d52eefa83cdba56fbd93bd8c59f6f4b390e418996f62afaaf116ef2228c33",
       "spec_sha256": "afae8037e8af970ea872b19f52eefba215aefba480b225e7d9a4224893736cac",
       "gpu_ceiling": 900,
       "inclusive_cpu_ceiling": 1200
+    },
+    {
+      "job_id": "20261105T003756Z-cc450baf",
+      "phase": "k5d-confirmation188-20261105",
+      "state": "submitted; new16/188 gate pending",
+      "revision": "b26e5b43702a21c37bcb4357223e0e6a25e1bec5",
+      "source_sha256": "c212f85b429f3a1abbca925de25736334fd06ffe9e821fac7798aaa99703fda7",
+      "spec_sha256": "2d58571180db6b7d6e1685da78a36d7bc14a1f72ade5f7b56016ae631789bf6e",
+      "gpu_ceiling": 2500,
+      "inclusive_cpu_ceiling": 2800
+    },
+    {
+      "job_id": "20261105T003930Z-a4067c30",
+      "phase": "opentt-test2-source-20261105",
+      "state": "complete mechanical; sourcejudgequalificationnegative0/85visible0/6false149unknown; claims/processesreleased",
+      "revision": "5018210928e892e2029064615d3571544c55e37e",
+      "source_sha256": "d11fb244de97152d65f7a35f38095176f41fc560bd64c0da42aac9ccc1cf2d50",
+      "spec_sha256": "ab3fe7365fc37d57716cb053ce2a0c806d22763de7d202113b709537848228c7",
+      "gpu_ceiling": 240,
+      "inclusive_cpu_ceiling": 360
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -426,13 +476,13 @@
   ],
   "monitoring": {
     "mode": "one canonical wholebatch wait; exits on attention",
-    "state": "previousattention W8repair1failed; remainingball/OpenTT boundedwait",
+    "state": "newboundedbatch; source and188 only; GVCnegativeunderreview",
     "jobs": [
-      "20261105T000550Z-d8b5c76b",
-      "20261105T001308Z-4ae20579"
+      "20261105T003756Z-cc450baf",
+      "20261105T003930Z-a4067c30"
     ],
-    "result": "/private/tmp/pointstream-cost-join-wait2-20261105.json",
-    "max_seconds": 1500,
+    "result": "/private/tmp/pointstream-188-source-wait-20261105.json",
+    "max_seconds": 2100,
     "started_utc": "2026-11-05T00:15:51.506888+00:00",
     "deadline_utc": "2026-11-05T00:45:21.789990+00:00",
     "native_completion_resume_verified": false,

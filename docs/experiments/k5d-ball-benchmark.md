@@ -231,3 +231,17 @@ Independent cost audit `cost-d8b5-independent-audit-20261105.json` SHA66cbbd2ef1
 ### One table-tennis source-only admission —2026-11-05
 
 Root reviewed original1085–1087 PNGs from CPUjob4ae20579: visible white ball agrees with zero-based labels (189,539),(154,536),(117,534);35/37pixel displacement distinguishes an offset. Reviewed join receipt7ae07b38… and evidence7fc2cdb1… were published by exclusivecreate at`Datasets/pointstream-data/tennis/k5d-20261105-inputs/` and rehashed. The earlier CPUjob exhausted its270s campaign after valid witness/validator; command262.773s exceeded210s requested stage limit, and no fullno-workmarker ran. Preserve that coststop; no model or source-qualification conclusion follows. Before GPUadmission a real CPU-only OpenCV/FFmpeg witness check matched all3 rawRGB hashes (auditb8e762f6…,1.622CPU-s inside prospective sourcephase external140CPU). Source worker independently repeats this before Zoo/model. Root admits onlytest2 context1066..1305,16timing smoke/full240 source-judge, fixedtennisWASB andall85visible/6absent/149unknown: recall10evalpx≥.8 andfalse-per-negative≤.05, no resampling120fps or GT/crops tojudge. Entire240GPU/360CPU withininitialrelease; complete measured≤120s full forecast required; no fullcross-sportcoding or other6videojoins. Eight focusedtests andfullRuffpass.
+
+Fresh188confirmation request **20261105T003756Z-cc450baf**, revision b26e5b43702a21c37bcb4357223e0e6a25e1bec5, source c212f85b429f3a1abbca925de25736334fd06ffe9e821fac7798aaa99703fda7, spec 2d58571180db6b7d6e1685da78a36d7bc14a1f72ade5f7b56016ae631789bf6e. Entire2500GPU/2800CPU largerstage2 only; no full30release. Readcanonicalstatusbeforenextaction; neverreplay.
+
+Fresh test2 source-only request **20261105T003930Z-a4067c30**, revision 5018210928e892e2029064615d3571544c55e37e, source d11fb244de97152d65f7a35f38095176f41fc560bd64c0da42aac9ccc1cf2d50, spec ab3fe7365fc37d57716cb053ce2a0c806d22763de7d202113b709537848228c7. Entire240GPU/360CPU, measured16timing gate thenfull240 onlyifforecastfits. No cross-sportcoding claim; inspectcanonicalstatusbeforenextaction, neverreplay.
+
+Independent source audit: **20261105T003930Z-a4067c30** completed without a
+mechanical error, but the frozen tennis WASB judge did not qualify on this one
+OpenTT test_2 context: 0/85 visible hits within 10 evaluation pixels (required
+≥80%), with 0/6 false positives (required ≤5%); 149 unknown frames are excluded.
+The reviewed three-frame OpenCV/FFmpeg join agrees. This is a negative result for
+this judge and context, not proof that all cross-sport approaches fail. The next
+cheap test is a separately justified independent judge or source-correctness
+check with frozen exposure and budget; no cross-sport coding or training is
+admitted. [Independent audit](k5d-inputs/opentt-test2-source-a406-independent-audit-20261105.json).
