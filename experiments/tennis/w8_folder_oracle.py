@@ -35,7 +35,18 @@ def expected_bytes(name: str) -> bytes:
     return ('pointstream-synthetic-folder-oracle-v1:' + name).encode()
 
 
-def worker(config_path: Path) -> None:
+def parent_loader_identity(path: Path) -> dict[str, int]:
+    if str(path.resolve(strict=True)) != '/etc/ld.so.cache':
+        raise ValueError('loader cache path differs')
+    info = path.stat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & stat.S_IWOTH:
+        raise ValueError('host loader cache must be root-owned and non-world-writable')
+    return {'device': info.st_dev, 'inode': info.st_ino, 'mode': info.st_mode, 'uid': info.st_uid}
+
+
+def worker(config_path: Path, config_sha256: str) -> None:
+    if sha(config_path) != config_sha256:
+        raise ValueError('oracle config identity mismatch')
     config = json.loads(config_path.read_text())
     if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or 'torch' in sys.modules:
         raise ValueError('GPU-hidden, no-Torch process required')
@@ -51,10 +62,7 @@ def worker(config_path: Path) -> None:
     denied = [Path(p) for p in config['denied']]
     if len(denied) != 10 or any(p.resolve().is_relative_to(output) for p in denied):
         raise ValueError('synthetic denied paths invalid')
-    loader = Path('/etc/ld.so.cache').resolve(strict=True).stat()
-    loader_receipt = {'device': loader.st_dev, 'inode': loader.st_ino, 'mode': loader.st_mode, 'uid': loader.st_uid}
-    if loader.st_uid != 0 or loader.st_mode & stat.S_IWOTH:
-        raise ValueError('loader identity invalid')
+    loader_receipt = config['loader_identity']
     extra, leaves = policy.approved_leaves(denied, loader_receipt)
     paths = [output, Path(sys.prefix), *(Path(p) for p in policy.SYSTEM_GRANTS),
              *(Path(x['path']) for x in config['inputs'].values()), *extra]
@@ -119,12 +127,14 @@ def run() -> None:
         a = protected / f'alias-{i}'
         a.symlink_to(p)
         denied.extend((str(p), str(a)))
+    loader_receipt = parent_loader_identity(Path('/etc/ld.so.cache'))
     config = {'inputs': declared, 'output': str(output), 'canary': str(canary), 'denied': denied,
+              'loader_identity': loader_receipt,
               'parent_ns': {n: os.readlink('/proc/self/ns/' + n) for n in ('user', 'net')}}
     cfg = root / 'config.json'
     cfg.write_text(json.dumps(config, sort_keys=True))
     cmd = ['/usr/bin/unshare', '--user', '--map-root-user', '--net', sys.executable,
-           '-m', 'experiments.tennis.w8_folder_oracle', 'worker', '--config', str(cfg)]
+           '-m', 'experiments.tennis.w8_folder_oracle', 'worker', '--config', str(cfg), '--config-sha256', sha(cfg)]
     env = {'CUDA_VISIBLE_DEVICES': '', 'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONNOUSERSITE': '1',
            'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1',
            'PYTHONPATH': str(Path(__file__).resolve().parents[2])}
@@ -238,6 +248,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=('run', 'worker', 'validate', 'marker', 'make-spec'))
     parser.add_argument('--config', type=Path)
+    parser.add_argument('--config-sha256')
     parser.add_argument('--deadline')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
@@ -250,9 +261,9 @@ def main() -> int:
             json.dump(spec, stream, indent=2)
             stream.write('\n')
     elif args.mode == 'worker':
-        if args.config is None:
-            parser.error('worker requires --config')
-        worker(args.config)
+        if args.config is None or args.config_sha256 is None:
+            parser.error('worker requires --config and --config-sha256')
+        worker(args.config, args.config_sha256)
     elif args.mode == 'run':
         run()
     elif args.mode == 'validate':

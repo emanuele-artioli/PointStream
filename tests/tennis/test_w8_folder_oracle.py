@@ -67,3 +67,28 @@ def test_validator_rejects_unproven_symlink_denial(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match='strict policy'):
         oracle.validate()
     assert not json.loads((tmp_path / 'validation.json').read_text())['passed']
+
+
+def test_loader_receipt_uses_parent_root_identity_and_child_inode_check():
+    # Host root can be unmapped in the child user namespace; inode/mode still match.
+    loader = {'uid': 0, 'mode': 0o100644, 'device': 58, 'inode': 123}
+    leaves = []
+    for name in oracle.policy.APPROVED_LEAVES:
+        resolved = name.replace('/proc/self/', '/proc/101/')
+        leaves.append({'name': name, 'resolved': resolved, 'uid': 65534, 'mode': 0o100644,
+                       'device': 58, 'inode': 123})
+    oracle.policy.validate_leaf_receipt(leaves, loader)
+    leaves[0]['inode'] = 124
+    with pytest.raises(ValueError, match='loader cache'):
+        oracle.policy.validate_leaf_receipt(leaves, loader)
+    leaves[0]['inode'] = 123
+    loader['uid'] = 65534
+    with pytest.raises(ValueError, match='loader cache'):
+        oracle.policy.validate_leaf_receipt(leaves, loader)
+
+
+def test_worker_rejects_unbound_loader_config_before_bootstrap(tmp_path):
+    config = tmp_path / 'config.json'
+    config.write_text('{}')
+    with pytest.raises(ValueError, match='config identity'):
+        oracle.worker(config, '0' * 64)
