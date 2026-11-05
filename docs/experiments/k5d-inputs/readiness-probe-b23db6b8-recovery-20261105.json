@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "job_id": "20261105T043909Z-b23db6b8",
+  "observed_at": "2026-11-05T04:50:16.807055+00:00",
+  "scope": "read-only recovery of ambiguous submit; no replay or cleanup",
+  "client": {
+    "state": "submission_unknown",
+    "state_path": "/Users/manu/.pointstream/fleet/jobs/20261105T043909Z-b23db6b8.json",
+    "state_sha256": "bd1328f6de536df9df4b316fe2b8c82ffad3ced0c9b282b2701851b92dccbadb",
+    "snapshot_git_head": "fc8c98b18ad3424a3131ba8e51e9bd7f32dd7115",
+    "normalized_spec_sha256": "64bf84d05df9e4bcb4812ce0b99541e10e15453be873c818c5803503bc424c87",
+    "snapshot_sha256": "0b7d1a7e38359c6f3f0ad90acb951928d77e4fb5e0592fa2326c46e41f74e3e6",
+    "snapshot_bytes": 16076800,
+    "error": "source.tar upload through gpu1 timed out after 90 seconds"
+  },
+  "canonical_status": "job is unpublished or unknown; inspect transfer before retrying",
+  "remote_inbox": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T043909Z-b23db6b8",
+    "observed_entries": [
+      "events/",
+      "source.tar"
+    ],
+    "source_tar_bytes": 6619136,
+    "source_tar_sha256": "f71c97b278fbe6db5d2203ee3d7a3cf2eb382e23d62a2938daae593a0590e83b",
+    "ready_json_present": false,
+    "spec_json_present": false,
+    "state_json_present": false
+  },
+  "uploader_process_observation": "No process containing this job ID was found on gpu1 or the local client at inspection.",
+  "conclusion": "Incomplete unpublished source upload. No readiness execution or timing result was found. Partial remote archive remains untouched."
+}

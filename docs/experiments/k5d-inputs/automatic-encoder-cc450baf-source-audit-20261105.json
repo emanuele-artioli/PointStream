@@ -1,0 +1,54 @@
+{
+  "schema": "cc450-existing-automatic-encoder-audit-v1",
+  "job": "20261105T003756Z-cc450baf",
+  "git_revision": "b26e5b43702a21c37bcb4357223e0e6a25e1bec5",
+  "source_tar_sha256": "48b51fe3b3dbff6e574122ad7ea3aaf0ae5638caef2a69a7170e7e7f8a4d2857",
+  "source_tar_sha256_method": "remote sha256sum of fleet inbox source.tar; compared with pilot snapshot_identity.snapshot_sha256",
+  "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "included_untracked": {},
+  "files": {
+    "experiments/tennis/k5d_encoder.py": {
+      "git_and_archive_sha256": "74b47ebd16f64efca292e71b1f2719ec59a7b369abca673a8c5e6f7ebdf2d7bd"
+    },
+    "experiments/tennis/k5c_independent_ball.py": {
+      "git_and_archive_sha256": "ff7e16420fc26af19c4cd942cce90ec58b5313babd69ad0e6af5b1992f213629"
+    },
+    "experiments/tennis/k5b1b.py": {
+      "git_and_archive_sha256": "24f6c6d92e706299b4fce79a44a05f2746bd921530ff5f714fcbb93771c7408a"
+    },
+    "src/pointstream/ball.py": {
+      "git_and_archive_sha256": "b7d1bcd00a5ee18094436ee0bb0db9b05c05f04ca8e4d4ad0396a79a1bcd9efe"
+    }
+  },
+  "runtime_encoder_sha256": "74b47ebd16f64efca292e71b1f2719ec59a7b369abca673a8c5e6f7ebdf2d7bd",
+  "ast_assignments": {
+    "start": "measure('encoder.source_track', lambda: k5b1b.track_of(tracker.run(source), (h, w)))",
+    "fits": "measure('encoder.fit_streak', lambda: old.fit_streak(start, source, [x[4] for x in coded], (h, w)))"
+  },
+  "ast_argument_checks": {
+    "fit_streak": [
+      "start",
+      "source",
+      "decodes",
+      "shape"
+    ],
+    "track_of": [
+      "preds",
+      "shape"
+    ],
+    "FrameCrops.build": [
+      "start",
+      "source",
+      "decodes"
+    ],
+    "fit_frames": [
+      "crops",
+      "settings",
+      "shape",
+      "rounds"
+    ]
+  },
+  "logic": "track_of converts BallTrack.run(source) to the start positions; FrameCrops takes those positions, source RGB and decoded RGB; fit_frames refines positions and appearances by source-versus-decode crop error; global PSNR guard uses source and rendered native frames. No labels passed into this fitting chain. Labels are used in source qualification/eligibility, score_frames, and label-centered scoring crops.",
+  "judge_scope": "WASB is independent of encoder model conditional on reported train/test split, training logs unaudited; BallTrack judge reuses encoder model and measures self-consistency, not an independent judge.",
+  "limitations": "AST argument and manual dependency inspection, not a formal whole-program information-flow proof. Source hash and selected helper byte hashes match the archived snapshot; no GPU execution undertaken."
+}

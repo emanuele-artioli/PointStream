@@ -79,9 +79,17 @@ def test_send_snapshot_without_extraction_keeps_only_the_verified_archive(tmp_pa
     def remote(host, command, **kwargs):
         commands.append(command)
         return SimpleNamespace(returncode=0, stdout="a" * 64 + " source.tar", stderr="")
-    monkeypatch.setattr(fleet.subprocess, "run", lambda *a, **kw: SimpleNamespace(returncode=0, stderr=b""))
+    uploads = []
+    def upload(argv, **kwargs):
+        uploads.append((argv, kwargs['stdin'].read(), kwargs['timeout']))
+        return SimpleNamespace(returncode=0, stderr=b"")
+    monkeypatch.setattr(fleet.subprocess, "run", upload)
     monkeypatch.setattr(fleet, "_ssh", remote)
     fleet._send_snapshot("gpu2", source, "/inbox/job/source", "a" * 64, timeout=90, extract=False)
+    argv, sent, timeout = uploads[0]
+    assert argv[:2] == ["ssh", "-C"] and argv[-2] == "gpu2"
+    assert "noclobber" in argv[-1] and "/inbox/job/source.tar" in argv[-1]
+    assert sent == b"archive" and timeout == 90
     assert commands == [["sha256sum", "--", "/inbox/job/source.tar"]]
 
 

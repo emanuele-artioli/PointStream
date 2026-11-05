@@ -14,7 +14,7 @@
     },
     "svt_gaps": {
       "gpu_limit_seconds": 1800,
-      "cpu_limit_seconds": 2700
+      "cpu_limit_seconds": 3320
     },
     "w8": {
       "gpu_limit_seconds": 7200,
@@ -30,7 +30,7 @@
     },
     "shared": {
       "gpu_limit_seconds": 7200,
-      "cpu_limit_seconds": 5400
+      "cpu_limit_seconds": 4780
     }
   },
   "charges": [
@@ -305,6 +305,104 @@
       "cpu_seconds": 54,
       "basis": "Conservativeceil23.140creation-to-terminal24+30external=54CPU; actual3nativeYUV/validatorproofscomplete; noGPU/scoring.",
       "subphase": "3point-native-YUV-pilot"
+    },
+    {
+      "phase": "w8-strict-source-repair-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 270,
+      "cpu_seconds": 370,
+      "basis": "266.010creation-to-terminalrounded270GPU; CPU270+100external=370 conservative; likely30CPUhardlimitSIGKILL, no completedpacketproof/generator."
+    },
+    {
+      "phase": "k5d-coalesced-permission-repair-20261105",
+      "subphase": "permission-fixed-prepare",
+      "workstream": "ball",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 850,
+      "cpu_seconds": 1050,
+      "basis": "Entireprepareceilingcharged; actual168.218/234.939commands, strict16/48native/source/pixels exactd8; othercampaigncommandnonoverlap butsupervisor/stagingactivitynotisolated."
+    },
+    {
+      "phase": "w7-byteproof-75roles-20261105",
+      "subphase": "full75-coststop-gpu2",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 118,
+      "basis": "Conservativeceil57.37454wholelifecycle58+60external=118CPU. All3nativeproofsvalid, slowest4.840031 yields574.5035forecast>240/no75full; sharingcausalitynotestablished."
+    },
+    {
+      "phase": "indexed-control-linux-verification-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "basis": "Entire120CPUallocationconservativelycharged; doctor+reviewed538release2503bb20restart, actual2CPU-onlyprobespass, independentauditfb9c7d9e; no models/GPU."
+    },
+    {
+      "phase": "automatic-encoder-source-audit-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "basis": "Conservativeentire60CPUsource-onlyaudit; actualcc450source tar48b51fe3, encoder74b47e/helperhashes+AST/manualchecks. ExistingBallTrack-basedencoder, duplicateproposalsuperseded,no newGPUvariant."
+    },
+    {
+      "phase": "k5d-calibration-controls-20261104",
+      "subphase": "188-coststop-CPU-overlap",
+      "workstream": "ball",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 180,
+      "cpu_seconds": 280,
+      "basis": "Conservativeceil174.9459wholelifecycle180GPU+100externalCPU=280CPU. 16numericparitypassed,actual62.0955s/673.713forecast>400; CPU0approx59.9scocommand overlap metadata, causalitynotproven; no188controls."
+    },
+    {
+      "phase": "k5d-coalesced-permission-repair-20261105",
+      "subphase": "same-source-score16-48",
+      "workstream": "ball",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 1200,
+      "cpu_seconds": 1400,
+      "basis": "Entire1200GPU1400CPUscoreceilingconservativelycharged. Canonicalcomplete1423; allsix16/48 native/wire/pixel/metric/judge exactd8. Command110.029/201.416s, actualsource7640/H8a3."
+    },
+    {
+      "phase": "w7-final-native75-20261105",
+      "job_id": "20261105T043952Z-73feafb2",
+      "subphase": "unpublished-source-transfer",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "basis": "Conservative60CPUexternaltransfer/adminallowance; SSH90walluploadtimedout before publish. No workload or GPU ran; partialarchivepreserved. This charge mustbe deductedfromactivephaseallowance before newadmission."
+    },
+    {
+      "phase": "w8-strict-packet-cpu-20261105",
+      "job_id": "20261105T043907Z-a1145a05",
+      "subphase": "unpublished-source-transfer",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "basis": "Conservative60CPUexternaltransfer/adminallowance; SSH90walluploadtimedout before publish. No workload or GPU ran; partialarchivepreserved. This charge mustbe deductedfromactivephaseallowance before newadmission."
+    },
+    {
+      "phase": "k5d-input-readiness-cost-20261105",
+      "job_id": "20261105T043909Z-b23db6b8",
+      "subphase": "unpublished-source-transfer",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "basis": "Conservative60CPUexternaltransfer/adminallowance; SSH90walluploadtimedout before publish. No workload or GPU ran; partialarchivepreserved. This charge mustbe deductedfromactivephaseallowance before newadmission."
+    },
+    {
+      "phase": "compressed-source-transfer-probe-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "basis": "Entire120CPUsource-onlytransportprobeallocationcharged; actual17.337s transfer+SHA over samegpu1/sharedNFS, sourceexacte007c6e1 retained, no fleetpublish/models."
     }
   ],
   "reservations": [
@@ -359,7 +457,7 @@
       "workstream": "ball",
       "gpu_seconds": 600,
       "cpu_seconds": 800,
-      "status": "Actual16/48pilotcompleteandaudited; full600GPU700CPUpriorceilingcharged. Remaining600GPU800CPUconditional188 with375.105-secondrealforecast (1.5margin+40reserve), samefivearms, prospectivecode/source/costgatebeforelaunch.",
+      "status": "closed; pilot600GPU700CPUcharged, final188coststop0e180GPU280CPUchargedactualupper, no188results; unused420GPU520CPUreleased. 48negativecontrolretained; no newGPUattemptpendingbudgetdecision.",
       "scope": "contract docs/experiments/k5d-inputs/calibration-controls-contract-20261104.json; 188sameclipSVT62, no newencoding",
       "release_stage": "post-188 conditional"
     },
@@ -502,7 +600,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 408,
-      "status": "Actualnativepilotcomplete54CPUchargedinaddition138prior, remaining408CPUforindependentfull75(3repeatedsmoke+75full); spec348+60external, measured213.59forecastsubjectnewlivegate. Noqualityreuseclaim."
+      "status": "closed; actual310CPUcharges(138+54+118), unused290CPUreleased. No75fullcoverage; originalwholeIVFgateandnativecoststopremainfailed."
     },
     {
       "phase": "gvcrt-native-strict-20261105",
@@ -516,9 +614,9 @@
       "phase": "k5d-coalesced-permission-repair-20261105",
       "workstream": "ball",
       "release_stage": "larger stage2",
-      "gpu_seconds": 2050,
-      "cpu_seconds": 2450,
-      "status": "Newprogrammeallocation: prepare850/1050same220/500/780; score1200/1400new220/750/1100 preserving3x1.25+20forecast; strictwholeidentity/scientificrulesunchanged. Lastcoalescedmechanicalrepair."
+      "gpu_seconds": 1200,
+      "cpu_seconds": 1400,
+      "status": "closed; full2050GPU2450CPUcharged across fe451prepare850/1050 and1423score1200/1400; strictsame-sourceexact16/48qualified; nofull30release."
     },
     {
       "phase": "w8-strict-source-repair-20261105",
@@ -526,7 +624,47 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 700,
       "cpu_seconds": 1000,
-      "status": "Newprogrammeallocationafterfailedphaseclosed; cwd/originfixonly,260/300/600and1/3costgatesunchanged, no broaderpolicy/newmodel/training."
+      "status": "closed; actual270GPU370CPUconservativelychargedwhole266.010screation-to-statusrounded270+100externalCPU; packetSIGKILLat30CPU, partialbytesexactoldoraclebutno finalmanifest/no model; unused430GPU630CPUreleased"
+    },
+    {
+      "phase": "indexed-control-linux-verification-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "closed; full120CPUconservativelycharged incldoctor/restart/probes/external. Bothsequentialgpu5indices0/1passedactualsupervisor/child/validator/source-controlseparation; no concurrent-schedulingbenchmark claim."
+    },
+    {
+      "phase": "w8-strict-packet-cpu-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "status": "Prospectivefreshrequestafterindependentproofpriorrequestunpublished. Exactfrozensourceunchanged, localSSHcompressiononlyqualified17.337s/SHA. Wholecurrentcampaign+externalallowance300CPU; earlier60transferchargeadditionalandretained. W7shared60CPUtransferprospective; otherswithinexistingworkstreamlimits. No GPU."
+    },
+    {
+      "phase": "w7-final-native75-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 850,
+      "status": "Prospectivefreshrequestafterindependentproofpriorrequestunpublished. Exactfrozensourceunchanged, localSSHcompressiononlyqualified17.337s/SHA. Wholecurrentcampaign+externalallowance850CPU; earlier60transferchargeadditionalandretained. W7shared60CPUtransferprospective; otherswithinexistingworkstreamlimits. No GPU."
+    },
+    {
+      "phase": "k5d-input-readiness-cost-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "status": "Prospectivefreshrequestafterindependentproofpriorrequestunpublished. Exactfrozensourceunchanged, localSSHcompressiononlyqualified17.337s/SHA. Wholecurrentcampaign+externalallowance300CPU; earlier60transferchargeadditionalandretained. W7shared60CPUtransferprospective; otherswithinexistingworkstreamlimits. No GPU."
+    },
+    {
+      "phase": "compressed-source-transfer-probe-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "status": "closed; entire120CPUconservativelycharged, actualcompressedexact16.3MBarchivegpu1sharedNFStransfer+SHA17.337s, noGPU; auditpersisted."
     }
   ],
   "jobs": [
@@ -820,7 +958,7 @@
       "job_id": "20261105T023619Z-0e2a610f",
       "phase": "k5d-calibration-controls-20261104",
       "subphase": "16-188-confirmation",
-      "state": "submitted; fivearms/costgatepending",
+      "state": "terminalcostgate16fivearmparitypassed;673.713forecast>400; approximateCPU0commandco-overlap59.9s, no188full; claimsreleased",
       "revision": "2cc35643a2dc8c8d389deba171e07e62150838a1",
       "source_sha256": "c6bbb5ccd64555321997ecefe0cabc4aa32b1ef37e66740e0e944132e20d405f",
       "spec_sha256": "38aefa3a49ae8e98ea6dc087adcc40b50b92c196e0a6d5ea4b6aeace0ee2c7f7",
@@ -842,7 +980,7 @@
       "job_id": "20261105T025239Z-d60936d5",
       "phase": "w7-byteproof-75roles-20261105",
       "subphase": "independent75-nativeYUV",
-      "state": "submitted; correctness/costgatepending",
+      "state": "terminalcostgate; 3nativeproofsvalid,4.840smax/574.50forecast>240; no75full, inclusive118CPU, PIDsabsent",
       "revision": "28d659cccee8b018534435ef0d9733b5b01340a9",
       "source_sha256": "a5407245b27db721770119fc21fa4a77ba161652c6cdaa6758ecc4a8c05503d4",
       "spec_sha256": "09e93d412f175a3dbba8ab560e31bbe0318f1e9d792c98b52b891ad43dc0d246",
@@ -853,7 +991,7 @@
       "job_id": "20261105T025241Z-fe451f9e",
       "phase": "k5d-coalesced-permission-repair-20261105",
       "subphase": "prepare16-48",
-      "state": "submitted; correctness/costgatepending",
+      "state": "complete; strict16/48savedartifactnative/source/pixelparityaudited,168.218/234.939s; cleanupverified",
       "revision": "7640ed34696ec93c1a61fd3666d29828eea38e46",
       "source_sha256": "8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13",
       "spec_sha256": "fcfa508d37f0bc93c0213b868314cc925820dbea715774427dfa18a70573b47a",
@@ -864,27 +1002,106 @@
       "job_id": "20261105T025257Z-f893c63e",
       "phase": "w8-strict-source-repair-20261105",
       "subphase": "actual1-3steps",
-      "state": "submitted; correctness/costgatepending",
+      "state": "terminalpacketSIGKILLconsistentCPU30limit; NPZ/checkpointoldoracleexactbutno decodedmanifest/isolationreceipt, generatorneverstarted; released",
       "revision": "738dd5b3182d66a880d26cb3f0384e57b2abfe01",
       "source_sha256": "a41440b5f1abd24c97786704df6a4c9f60a2c909cf72f06e7284e2a6b1ad42d6",
       "spec_sha256": "21bfd22ea651db16d1e06d0aece77ec92ea2fdbc0af621cda25d0650717aa282",
       "gpu_ceiling": 700,
       "inclusive_cpu_ceiling": 1000
+    },
+    {
+      "job_id": "20261105T032433Z-1423f92a",
+      "phase": "k5d-coalesced-permission-repair-20261105",
+      "subphase": "same-source-score16-48",
+      "state": "complete; independentlyauditedactual16/48all6 native/wire/pixel/metrics/judges exactd8; source7640, no full30promotion.",
+      "revision": "7640ed34696ec93c1a61fd3666d29828eea38e46",
+      "source_sha256": "8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13",
+      "spec_sha256": "c017b76ab52a281d1444b6e6b457d9987024a6996dc2bf85fb8ca7501a387d4e",
+      "gpu_ceiling": 1200,
+      "inclusive_cpu_ceiling": 1400
+    },
+    {
+      "job_id": "20261105T032852Z-5b36881b",
+      "phase": "indexed-control-linux-verification-20261105",
+      "subphase": "index0",
+      "state": "complete; independentactualLinuxplacement/source-controlsplitpassed, sequentialGPU5logicalCPU0/1, no concurrentproof",
+      "revision": "3bc4b8736d1d50c93681e8d7d2c793b67b650f26",
+      "source_sha256": "2045fadd7d23c140ff53d9dd3cc996e7d04ce40fa569312b1d98fa3af52100e6",
+      "spec_sha256": "33aae717906516c3bcc7871eadba8652c7c6fff47e8a5b30ddce390f2236ad90",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 30
+    },
+    {
+      "job_id": "20261105T033020Z-48761453",
+      "phase": "indexed-control-linux-verification-20261105",
+      "subphase": "index1",
+      "state": "complete; independentactualLinuxplacement/source-controlsplitpassed, sequentialGPU5logicalCPU0/1, no concurrentproof",
+      "revision": "3bc4b8736d1d50c93681e8d7d2c793b67b650f26",
+      "source_sha256": "2045fadd7d23c140ff53d9dd3cc996e7d04ce40fa569312b1d98fa3af52100e6",
+      "spec_sha256": "2ccef9a2c683420efff89d93c93a8b944c4ea15ff288ae3159d53cf2b3000878",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 30
+    },
+    {
+      "job_id": "20261105T043952Z-73feafb2",
+      "phase": "w7-final-native75-20261105",
+      "subphase": "unpublished-source-transfer",
+      "state": "unpublished; canonicalunknown and independentinboxinspectiononlypartialsource.tar/events, nospec/ready/state/run, no worker/no GPU. Preservepartial/clientrecord; no replay.",
+      "revision": "80a21cc6efaf7489fcdd3fbeab9d21aaaff0c695",
+      "snapshot_sha256": "03cbe200fe50edcd268b4281be7f46f74933ee28190f2b5b4c5344945c177f46",
+      "spec_sha256": "f0e8bfca933f0732ffd708695725d3e4986071d949a15763ffbf9ba7c0825aec",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 850
+    },
+    {
+      "job_id": "20261105T043907Z-a1145a05",
+      "phase": "w8-strict-packet-cpu-20261105",
+      "subphase": "unpublished-source-transfer",
+      "state": "unpublished; canonicalunknown and independentinboxinspectiononlypartialsource.tar/events, nospec/ready/state/run, no worker/no GPU. Preservepartial/clientrecord; no replay.",
+      "revision": "46fe9f5b36e68a836c47ed3d4cf117ff6fe2e614",
+      "snapshot_sha256": "e007c6e1ddbf6230fde3b171647831f8e53babc35fff8d4f847b837d3dd56511",
+      "spec_sha256": "b70b5312f8111a275fe0963356c2aec9cc3fe0118f1a70d4fe4a68605386ea05",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 300
+    },
+    {
+      "job_id": "20261105T043909Z-b23db6b8",
+      "phase": "k5d-input-readiness-cost-20261105",
+      "subphase": "unpublished-source-transfer",
+      "state": "unpublished; canonicalunknown and independentinboxinspectiononlypartialsource.tar/events, nospec/ready/state/run, no worker/no GPU. Preservepartial/clientrecord; no replay.",
+      "revision": "fc8c98b18ad3424a3131ba8e51e9bd7f32dd7115",
+      "snapshot_sha256": "0b7d1a7e38359c6f3f0ad90acb951928d77e4fb5e0592fa2326c46e41f74e3e6",
+      "spec_sha256": "64bf84d05df9e4bcb4812ce0b99541e10e15453be873c818c5803503bc424c87",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 300
+    },
+    {
+      "job_id": "20261105T045259Z-9240c607",
+      "phase": "w7-final-native75-20261105",
+      "subphase": "fresh-compressed-transfer-final75",
+      "state": "submitted; exactfrozen80a21source, cpu5index0,760campaign850inclusiveCPU; priorunpublished73fepreserved",
+      "revision": "80a21cc6efaf7489fcdd3fbeab9d21aaaff0c695",
+      "snapshot_sha256": "03cbe200fe50edcd268b4281be7f46f74933ee28190f2b5b4c5344945c177f46",
+      "spec_sha256": "518743246fe9f3e3dcd1c90664ea8e14292dc58bee70125f0fc9d60c091a575a",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 850
     }
   ],
   "old_budgets": "closed, not borrowed",
   "notes": [
     "Every job is recorded before one bounded fleet wait.",
     "All-in initial and workstream limits include failed starts, staging, validations, monitoring and release.",
-    "Never replay an unknown request."
+    "Never replay an unknown request.",
+    "Root20261105prospectivelytransferred560CPUsharedreserve\u2192svt_gaps: workstream3260CPUand4840CPU, global86400unchanged; no newuserallocation.",
+    "CompressedtransferfreshCPUallowances20261105"
   ],
   "monitoring": {
     "mode": "one canonical wholebatch wait; exits on attention",
-    "state": "phase5 separatehosts pending CPUindex allocatorfix; no recurringmonitor",
+    "state": "no publishedjobsactive; three unpublishedsource-transferfailuresinspected/preserved; no polling/automation",
     "jobs": [
-      "20261105T025239Z-d60936d5",
-      "20261105T025241Z-fe451f9e",
-      "20261105T025257Z-f893c63e"
+      "20261105T043952Z-73feafb2",
+      "20261105T043907Z-a1145a05",
+      "20261105T043909Z-b23db6b8"
     ],
     "result": "/private/tmp/pointstream-phase5-wait-20261105.json",
     "max_seconds": 1800,

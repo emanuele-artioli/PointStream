@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "passed": true,
+  "scope": "sequential CPU-only saved probe receipts; no simultaneous scheduling or GPU behavior established",
+  "probes": [
+    {
+      "job": "20261105T032852Z-5b36881b",
+      "index": 0,
+      "selected": [
+        0
+      ],
+      "scientific_source": "/local/users/emanuele/pointstream/sources/20261105T032852Z-5b36881b",
+      "scientific_inbox_sha256": "26f51a26f97dc5e1c86ff9278eacc13b15468fa44150f55360d51d71526fd96f",
+      "control_root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20",
+      "control_files": {
+        "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+        "experiments/jobs/__init__.py": "999dfe9ae372c896e01e55010d27a97b0c6bc2fe6ff22183a1dc121ee3d56633",
+        "experiments/jobs/inbox.py": "5dbdc52879729157d2073ad717d731fb7af4563f3ca1330930be96edea97266e",
+        "experiments/jobs/monitor.py": "73671c2892127bf2510b98aee75356f50736d8613f769d5b8e5426b4a821268e",
+        "experiments/jobs/claims.py": "4ce261cc723de1ff2e4497c5f760d997bf6681f0e7ca75019a53280acbc6b1ef",
+        "experiments/jobs/fleet.py": "ecb7b7bbe4b2f8c3c79e39e77da1de1ae00a3d8a67308b33ff0aad29ff729145",
+        "experiments/jobs/staging.py": "f94156c1d5b9a6bf2ac1ec8c3437a82cd6f36a9085a7f68a6122381b7cfd0422"
+      },
+      "stages": {
+        "smoke": {
+          "archive_sha256": "511359951f0d29c8537d2201e5384fe458fab46d58ff71aed0e2455ecab7b0d8",
+          "seconds": 2.620154857635498,
+          "workload_pid": 942971,
+          "child_pid": 942990,
+          "dispatch_sha256": "16e7bbcb51a96a7a5d40c825326c2468ba3e2627fea7455a0de45a4b6c15efb9"
+        },
+        "full": {
+          "archive_sha256": "23ff32183509eeba8d76b4793e19fdb7f931b8dc4dafc237201069a637df0fee",
+          "seconds": 2.170072317123413,
+          "workload_pid": 943029,
+          "child_pid": 943030,
+          "dispatch_sha256": "46539a57acf177bacdd3ed647e4ebfc12b7a93d8ae3045ed94c1556218f058c9"
+        }
+      },
+      "validator_pid": 943027,
+      "validator_child_pid": 943028
+    },
+    {
+      "job": "20261105T033020Z-48761453",
+      "index": 1,
+      "selected": [
+        1
+      ],
+      "scientific_source": "/local/users/emanuele/pointstream/sources/20261105T033020Z-48761453",
+      "scientific_inbox_sha256": "26f51a26f97dc5e1c86ff9278eacc13b15468fa44150f55360d51d71526fd96f",
+      "control_root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20",
+      "control_files": {
+        "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+        "experiments/jobs/__init__.py": "999dfe9ae372c896e01e55010d27a97b0c6bc2fe6ff22183a1dc121ee3d56633",
+        "experiments/jobs/inbox.py": "5dbdc52879729157d2073ad717d731fb7af4563f3ca1330930be96edea97266e",
+        "experiments/jobs/monitor.py": "73671c2892127bf2510b98aee75356f50736d8613f769d5b8e5426b4a821268e",
+        "experiments/jobs/claims.py": "4ce261cc723de1ff2e4497c5f760d997bf6681f0e7ca75019a53280acbc6b1ef",
+        "experiments/jobs/fleet.py": "ecb7b7bbe4b2f8c3c79e39e77da1de1ae00a3d8a67308b33ff0aad29ff729145",
+        "experiments/jobs/staging.py": "f94156c1d5b9a6bf2ac1ec8c3437a82cd6f36a9085a7f68a6122381b7cfd0422"
+      },
+      "stages": {
+        "smoke": {
+          "archive_sha256": "a65f559bda3415f220b8f2487325deacb8356b80531c0da6829b6983d9444c3a",
+          "seconds": 2.2199385166168213,
+          "workload_pid": 945131,
+          "child_pid": 945132,
+          "dispatch_sha256": "e78d4296206a9209cf629b36ef7254b1ff8bd404d7119e2aea7f3ee9e8629c23"
+        },
+        "full": {
+          "archive_sha256": "77e3d8193bfb55c8a49565635dab06f30402550401a73731cd19a7e5a50e7c10",
+          "seconds": 2.17307448387146,
+          "workload_pid": 945179,
+          "child_pid": 945182,
+          "dispatch_sha256": "7c0c382289c60e9419379d2b61b3fc512923bb50fd6d04cc35903c462d5799ed"
+        }
+      },
+      "validator_pid": 945170,
+      "validator_child_pid": 945171
+    }
+  ]
+}
