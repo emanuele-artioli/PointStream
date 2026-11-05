@@ -1,0 +1,42 @@
+{
+  "affinity": [
+    0
+  ],
+  "comparison": {
+    "frames": [
+      {
+        "frame_index": 1085,
+        "raw_rgb_sha256": "2471ee558198e18f69eec8a284447acd854994af902f86ad83c12b596b472f08"
+      },
+      {
+        "frame_index": 1086,
+        "raw_rgb_sha256": "a85b9a2411cf734ce01c4af70792f8ab446ce6dfc78aec654e6de8f13d55d988"
+      },
+      {
+        "frame_index": 1087,
+        "raw_rgb_sha256": "bc7349df6cbdf744e010ea4c25258a20cccb3978b4886b2e14f27fb558415381"
+      }
+    ],
+    "passed": true
+  },
+  "cpu_limit_seconds": 15,
+  "cpu_seconds": 1.622452474,
+  "cuda_visible_devices": "",
+  "error": null,
+  "evidence_sha256": "7fc2cdb16ec55aaa1feaeff64dca04006cd5c9fc8afd98b6da1f62245a9f3ad9",
+  "opencv_version": "4.10.0",
+  "passed": true,
+  "python": "3.12.14 (main, Sep  2 2026, 23:27:36) [GCC 15.3.0]",
+  "video": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.mp4",
+  "video_sha256_prior_witness": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43",
+  "wall_seconds": 1.6409216998144984,
+  "host": "gpu2",
+  "runtime_path": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python",
+  "runtime_archive_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "external_script_sha256": "1538a3b4ffba7cc71fa6fb5dd23a28c216f6bbf1607203e83cdd420001c94c94",
+  "source_helper": "experiments/tennis/k5d_opentt_source.py: source_rgb and validate_decode_witness, extracted verbatim",
+  "external_raw_receipt_sha256": "b5c73d5b74c21f2d031a8b9ed94c7c95d82a202687c2ec1df9d5826754832f55",
+  "wall_limit_seconds": 30,
+  "scope": "one CPU-only OpenCV seek/RGB comparison; no model, GPU or additional source frames",
+  "video_hash_scope": "identity from earlier witness, not rehashed in this check"
+}

@@ -1,0 +1,198 @@
+"""Focused fail-closed checks without torch, CUDA or authored model files."""
+import importlib.util
+from pathlib import Path
+import subprocess
+import sys
+
+import pytest
+
+BRIDGE = Path(__file__).resolve().parents[2] / 'experiments/generative/gvcrt_native_bridge.py'
+spec = importlib.util.spec_from_file_location('gvcrt_bridge', BRIDGE)
+assert spec is not None and spec.loader is not None
+bridge = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(bridge)
+
+
+class Tensor:
+    def __init__(self, shape=(2,)):
+        self.shape = shape
+
+    def numel(self):
+        return 2
+
+
+class Model:
+    def state_dict(self):
+        return {'weight': Tensor()}
+
+    def parameters(self):
+        return [Tensor()]
+
+    def load_state_dict(self, state, strict):
+        assert strict and set(state) == {'weight'}
+
+
+def test_complete_i_state_uses_actual_student_dictionary():
+    receipt = bridge.checked_state(Model(), {'student': {'module.weight': Tensor()}, 'ema_shadow': {}}, 'I')
+    assert receipt['selected_dictionary'] == 'student'
+    assert receipt['strict_complete_coverage']
+
+
+@pytest.mark.parametrize('state', [{}, {'weight': Tensor((3,))}, {'weight': Tensor(), 'extra': Tensor()}])
+def test_missing_wrong_shape_or_extra_state_fails(state):
+    with pytest.raises(ValueError):
+        bridge.checked_state(Model(), {'student': state}, 'I')
+
+
+def test_normalized_duplicate_fails():
+    with pytest.raises(ValueError, match='Duplicate'):
+        bridge.checked_state(Model(), {'student': {'weight': Tensor(), 'module.weight': Tensor()}}, 'I')
+
+
+def test_checkpoint_hash_mismatch_fails(tmp_path):
+    payload = tmp_path / 'checkpoint'
+    payload.write_bytes(b'not a model')
+    with pytest.raises(ValueError, match='SHA256'):
+        bridge.checked_file(payload, '0' * 64)
+
+
+def test_source_denial_blocks_pathlib_and_os_open(tmp_path):
+    source = tmp_path / 'source.png'
+    source.write_bytes(b'hidden')
+    script = '''import importlib.util, pathlib, os, sys
+spec=importlib.util.spec_from_file_location('bridge',sys.argv[1]); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+attempts=m.deny_sources([sys.argv[2]])
+assert not attempts
+for operation in (lambda: pathlib.Path(sys.argv[2]).read_bytes(), lambda: os.open(sys.argv[2],os.O_RDONLY)):
+ try:operation()
+ except PermissionError:pass
+ else:raise AssertionError('source access allowed')
+assert len(attempts)==2
+'''
+    subprocess.run([sys.executable, '-c', script, str(BRIDGE), str(source)], check=True)
+
+
+class CoderStub:
+    def __init__(self, intra=False):
+        self.intra = intra
+        self.events = []
+
+    def set_use_two_entropy_coders(self, value):
+        self.events.append(('partition', value))
+
+    def compress(self, x, qp):
+        self.events.append(('compress', qp))
+        result = {'bit_stream': b'native bytes'}
+        if self.intra:
+            result['x_hat'] = 'I reconstructed pixels'
+        return result
+
+    def clear_dpb(self):
+        self.events.append(('clear',))
+
+    def add_ref_frame(self, feature, frame):
+        self.events.append(('reference', feature, frame))
+
+    def prepare_feature_adaptor_i(self, qp):
+        self.events.append(('adapt', qp))
+
+
+def test_native_p_compressor_needs_no_pixel_return():
+    i, p = CoderStub(True), CoderStub()
+    result = bridge.compress_frame(i, p, 'input', 3, False, True, 0)
+    assert result == {'bit_stream': b'native bytes'}
+    assert p.events == [('adapt', 0), ('compress', 3)]
+    assert i.events == []
+
+
+def test_i_initialization_and_both_native_partition_modes():
+    i, p = CoderStub(True), CoderStub()
+    assert bridge.configure_entropy(i, p, 1088, 1920) == 1
+    bridge.compress_frame(i, p, 'input', 1, True, False, 0)
+    assert i.events == [('partition', True), ('compress', 1)]
+    assert p.events == [('partition', True), ('clear',), ('reference', None, 'I reconstructed pixels')]
+
+
+def test_official_namespace_wins_over_later_regular_pointstream_src(tmp_path):
+    official, shadow = tmp_path / 'official', tmp_path / 'pointstream'
+    (official / 'src').mkdir(parents=True)
+    (shadow / 'src').mkdir(parents=True)
+    (official / 'src/probe.py').write_text('ORIGIN="verified GVC"\n')
+    (shadow / 'src/__init__.py').write_text('ORIGIN="foreign PointStream"\n')
+    script = '''import importlib.util,sys
+spec=importlib.util.spec_from_file_location('bridge',sys.argv[1]); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+sys.path[:0]=[sys.argv[2],sys.argv[3]]
+m.bind_source_namespace(sys.argv[2])
+import src.probe
+assert src.probe.ORIGIN=='verified GVC'
+assert list(src.__path__)==[sys.argv[2]+'/src']
+'''
+    subprocess.run([sys.executable, '-c', script, str(BRIDGE), str(official), str(shadow)], check=True)
+
+
+def test_preloaded_foreign_src_is_rejected(tmp_path):
+    official, shadow = tmp_path / 'official', tmp_path / 'pointstream'
+    (official / 'src').mkdir(parents=True)
+    (shadow / 'src').mkdir(parents=True)
+    (shadow / 'src/__init__.py').write_text('ORIGIN="foreign"\n')
+    script = '''import importlib.util,sys
+spec=importlib.util.spec_from_file_location('bridge',sys.argv[1]); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+sys.path.insert(0,sys.argv[3]); import src
+try:m.bind_source_namespace(sys.argv[2])
+except RuntimeError as error:assert 'Foreign src' in str(error)
+else:raise AssertionError('foreign package accepted')
+'''
+    subprocess.run([sys.executable, '-c', script, str(BRIDGE), str(official), str(shadow)], check=True)
+
+
+def registered_manifest(policy='released'):
+    canvas_h, canvas_w = bridge.padding_canvas(360, 640, policy)
+    return {'frames': 1, 'fps': 12, 'original_width': 640, 'original_height': 360,
+            'canvas_width': canvas_w, 'canvas_height': canvas_h, 'padding_policy': policy,
+            'ec_part': int(canvas_h * canvas_w > 1280 * 720), 'force_zero_thres': None,
+            'reset_interval': 8, 'base_qp': 1, 'stream': {'bytes': 10},
+            'placements': [{'index': 0, 'I': True, 'reset': False, 'qp': 1, 'offset': 0, 'bytes': 10}]}
+
+
+def test_registered_min64_nonmultiple_canvas_and_original_crop():
+    assert bridge.padding_canvas(360, 640, 'min64') == (384, 640)
+    assert bridge.padding_canvas(359, 641, 'min64') == (384, 704)
+    assert bridge.padding_canvas(1080, 1920, 'min64') == (1088, 1920)
+    manifest = registered_manifest('min64')
+    bridge.validate_manifest(manifest)
+    assert (manifest['original_height'], manifest['original_width']) == (360, 640)
+
+
+def test_released_canvas_unchanged_and_entropy_partition_follows_canvas():
+    released, adapted = registered_manifest(), registered_manifest('min64')
+    assert (released['canvas_height'], released['canvas_width']) == (1088, 1920)
+    for manifest in (released, adapted):
+        bridge.validate_manifest(manifest)
+        i, p = CoderStub(True), CoderStub()
+        assert bridge.configure_entropy(i, p, manifest['canvas_height'], manifest['canvas_width']) == manifest['ec_part']
+    assert released['ec_part'] == 1 and adapted['ec_part'] == 0
+    adapted['ec_part'] = 1
+    with pytest.raises(ValueError, match='entropy partition'):
+        bridge.validate_manifest(adapted)
+
+
+def test_manifest_cannot_mislabel_released_canvas_as_min64():
+    manifest = registered_manifest()
+    manifest['padding_policy'] = 'min64'
+    with pytest.raises(ValueError, match='registered padding'):
+        bridge.validate_manifest(manifest)
+
+
+@pytest.mark.parametrize('height,width', [(0, 640), (360, 0), (-1, 640), (360.5, 640)])
+def test_invalid_original_dimensions_rejected(height, width):
+    with pytest.raises(ValueError, match='positive integers'):
+        bridge.padding_canvas(height, width, 'min64')
+    with pytest.raises(ValueError, match='positive integers'):
+        bridge.validate_rgb_geometry('RGB', (width, height), width, height)
+
+
+def test_source_color_and_original_geometry_remain_registered():
+    bridge.validate_rgb_geometry('RGB', (640, 360), 640, 360)
+    for mode, size in [('RGBA', (640, 360)), ('L', (640, 360)), ('RGB', (640, 384))]:
+        with pytest.raises(ValueError, match='RGB geometry'):
+            bridge.validate_rgb_geometry(mode, size, 640, 360)

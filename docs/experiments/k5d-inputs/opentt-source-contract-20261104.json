@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "prospective metadata selection; no inference or video frame decoded",
+  "hypothesis": "The existing tennis WASB judge retains at least 0.80 visible-ball recall at 10 evaluation pixels in each qualified OpenTTGames test context.",
+  "competing_explanation": "Domain shift from tennis to table tennis, including 120 fps temporal sampling, can invalidate the judge; source failure narrows the transfer claim without judge replacement.",
+  "coverage": "All seven test videos; prior G1e background-motion use means footage is not untouched. One context each; no replacement after source results.",
+  "context_selection": "For each full 120fps video enumerate every 240-frame start s in [0, frame_count-240]. Eligible means at least 16 classifiable explicit ball-label rows (visible or explicit absent), including at least one explicit (-1,-1) absent row; unlabeled and partially missing coordinate rows are unknown. Select lexicographically smallest lowercase SHA256 of UTF-8 pointstream-k5d-opentt-v1:test_N:s, with s in ordinary unpadded decimal; ties by smaller s. The choice uses labels but no model predictions or image quality.",
+  "label_join": "Provisional zero-based video presentation index equals integer ball_markup.json key; no offset. This interpretation is supported by independent extraction code but is not yet established from the dataset author. Join and seek/frame parity require independent validation before source qualification.",
+  "image_transform": "Decode original presentation-order frames to RGB, retain all 240 contiguous native 120 fps frames for temporal model context, resize each 1920x1080 RGB frame to 1280x720 using OpenCV INTER_AREA, scale label coordinates by 2/3. WASB step1 receives full resized RGB frames, not labels or crops.",
+  "scoring": "Only explicit labels enter denominators: (-1,-1) absent; in-bounds coordinates visible; unannotated frames and rows with only one coordinate -1 are unknown. Per-video visible recall at 10 pixels in 1280x720 evaluation space must be at least 0.80, corresponding to 15 source pixels. Record 5px, absent false detections, unknown and all labeled predictions; no global false-absence claim from sparse negatives.",
+  "limits": "Source qualification is not a codec result or an independent match-level confirmation. No model or frame extraction before root admission. Proposed future source-stage budget <=180 GPU-seconds and <=300 workload CPU-seconds within already approved workstream, not separately authorized by this metadata selection; smoke and complete-cost forecast required.",
+  "references": [
+    "docs/experiments/k5d-inputs/study-selection-20261104.json",
+    "docs/experiments/k5d-inputs/data-inventory-20261104.json",
+    "https://github.com/maudzung/TTNet-Real-time-Analysis-System-for-Table-Tennis-Pytorch/blob/master/prepare_dataset/extract_smooth_labellings.py",
+    "https://doi.org/10.1038/s41598-024-51865-3"
+  ],
+  "metadata_correction": "Before contexts were selected, archive validation found seven partially missing coordinate rows across five videos; prior inventory counted them visible. They remain unknown and are retained, never negatives."
+}

@@ -1,0 +1,123 @@
+{
+  "cells": {
+    "n0l0": {
+      "cpu_seconds": 3.2721870000000006,
+      "cuda_error": null,
+      "denials": 0,
+      "exit_status": 0,
+      "landlock_abi": null,
+      "namespace": {
+        "net": "net:[4026531840]",
+        "user": "user:[4026531837]"
+      },
+      "status": "passed",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "5d7d9c2b513435c85ffbf4dff23d25202a46ee88400a2164714c1aeb50920937",
+      "wall_seconds": 3.3834659438580275
+    },
+    "n0l1": {
+      "cpu_seconds": 4.339924,
+      "cuda_error": {
+        "message": "Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 2: out of memory",
+        "type": "RuntimeError"
+      },
+      "denials": 10,
+      "exit_status": 1,
+      "landlock_abi": 4,
+      "namespace": {
+        "net": "net:[4026531840]",
+        "user": "user:[4026531837]"
+      },
+      "status": "failed",
+      "stderr_sha256": "c1e8def7c7986633c7b1f9e38e8af867407320c9d3a024ff44598c6a8f63cbe4",
+      "stdout_sha256": "30eddfb7e4f9e781bb61ffc7978019b9c172013f09c4eb1cda671b9e11c96465",
+      "wall_seconds": 4.491778452880681
+    },
+    "n1l0": {
+      "cpu_seconds": 4.639302999999999,
+      "cuda_error": null,
+      "denials": 0,
+      "exit_status": 0,
+      "landlock_abi": null,
+      "namespace": {
+        "net": "net:[4026537944]",
+        "user": "user:[4026537943]"
+      },
+      "status": "passed",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "29abf510ab9d2fb5c1448ba16d00f011c5eccf33485ed46188966a9f3fd2e2a5",
+      "wall_seconds": 4.79390709195286
+    },
+    "n1l1": {
+      "cpu_seconds": 4.215526,
+      "cuda_error": {
+        "message": "Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 2: out of memory",
+        "type": "RuntimeError"
+      },
+      "denials": 10,
+      "exit_status": 1,
+      "landlock_abi": 4,
+      "namespace": {
+        "net": "net:[4026537944]",
+        "user": "user:[4026537943]"
+      },
+      "status": "failed",
+      "stderr_sha256": "c1e8def7c7986633c7b1f9e38e8af867407320c9d3a024ff44598c6a8f63cbe4",
+      "stdout_sha256": "c7d905f1631a4518e424c78a73c2fcea97687170571e94651bd5fd9861351b7d",
+      "wall_seconds": 4.292939892038703
+    }
+  },
+  "checks": {
+    "all_warmup_thread_fd_no_preinit": true,
+    "cuda_errors_not_bootstrap_or_timeout": true,
+    "denials_by_cell": true,
+    "four_worker_argv_and_output_hashes": true,
+    "namespace_by_cell": true,
+    "normalized_portable_policy_and_full_diff": true,
+    "protected_path_hash_inode_receipt": true,
+    "source_archive_and_member_hashes_recomputed": true
+  },
+  "config_sha256": "dff7bf0a2788ce67f5cfb719ce157c9a543cba6a708561363542e1638263971c",
+  "decision": "Within this exact runtime/policy and host, the two non-Landlock arms passed and the two Landlock arms failed CUDA initialization error 2 regardless of namespace; this does not establish physical OOM, the specific denied resource, or model/inference quality. Operational fleet validator failed because extracted scratch no longer existed; independent receipt audit supports the recorded four-cell observation, not a fleet validation pass.",
+  "fleet_status": "failed: smoke validator reread extracted scratch after teardown",
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "historical_archive_sha256": "6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713",
+  "historical_members_sha256": {
+    "experiments/tennis/w8_input_job.py": "c7ceda3bbcc1ae69891032c3382b7cde7b022b6c051f3df41a116811ede2a835",
+    "experiments/tennis/w8_receiver_bootstrap.py": "3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49"
+  },
+  "host": "gpu6",
+  "job": "20261105T005409Z-372411b3",
+  "manifest_sha256": "0ae03cfaccb4cb1c5e709a7086f1a7b01245698efd63dcb455aa0dbe5e90e4ec",
+  "profile": "portable-w8-factorial-namespace-landlock-v1",
+  "protected_identity_receipt_sha256": "aa07461ea2216a633b08d49dc959280326a6d63e7b92198d6d378143d1ad3bca",
+  "resources": {
+    "children_usage_semantics": "cumulative RUSAGE_CHILDREN at command completion; do not add individual child CPU again",
+    "command_wall_seconds": 18.046342372894287,
+    "creation_to_terminal_wall_seconds": 96.3067296,
+    "external_audit_cpu": "not separately measured; bounded CPU-only audit",
+    "gpu_claim_and_compute_processes": "none at canonical status",
+    "supervisor_and_worker_pids": "absent after terminal",
+    "supervisor_start_to_terminal_seconds": 30.3291571,
+    "waited_children_cpu_seconds": 17.065368
+  },
+  "runtime_archive_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+  "runtime_cache": "local-hit, not rehashed in full",
+  "source_identity_sha256": "8d92a61eb8ca2c251ee1b0a4d19b52f874e320f11484e02666429574212e2d08",
+  "source_revision": "dc19510ff3a49409fbd089b6cb5b92f03adeae4e",
+  "source_tar_sha256": "b20d371f74503cb96f37f7fb7f13dcb335d20467d399ad3d11c30ab77ebc2cb3",
+  "spec_sha256": "3a1e57313425f1d8b9bbaa6f6fcbb7e10bdfa35e8e7aac81bcbf252415bfb76e",
+  "summary_sha256": "f1cfde799ab2885e6a3cf633022054169537f9d722ad09eb6c389e6a2ffde665",
+  "warmup_sha256": "23b2b3ca0600a2394d27dd6e9692c9aec33e2d854670975a04e7d9234cdf6a83",
+  "worker_sha256": "c6f52c0f3ccbef82d7c3bfba32d8bac29d6891c0e843344ffd4c362744180fdb",
+  "worker_validation": {
+    "generation_gate_passed": false,
+    "measurement_complete": true,
+    "outcomes": {
+      "n0l0": "passed",
+      "n0l1": "failed",
+      "n1l0": "passed",
+      "n1l1": "failed"
+    }
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "hosts": {
+    "gpu1": {
+      "status": 0,
+      "elapsed": 5.029341957997531,
+      "data": {
+        "source": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf'"
+        },
+        "script": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf/test_video_gvcrt_1088.py'"
+        },
+        "checkpoint_i": {
+          "exists": true,
+          "size": 334225106,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_I.pt"
+        },
+        "checkpoint_p": {
+          "exists": true,
+          "size": 206881943,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_P.pt"
+        },
+        "python": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/bin/python'"
+        },
+        "entropy": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/MLCodec_extensions_cpp.cpython-312-x86_64-linux-gnu.so'"
+        },
+        "frames_dir": {
+          "exists": true,
+          "size": 4,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/audits/gvcrt-smoke16-b164141-gpu3-recovery2-20261002"
+        }
+      },
+      "error": ""
+    },
+    "gpu2": {
+      "status": 0,
+      "elapsed": 4.676350582856685,
+      "data": {
+        "source": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf'"
+        },
+        "script": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf/test_video_gvcrt_1088.py'"
+        },
+        "checkpoint_i": {
+          "exists": true,
+          "size": 334225106,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_I.pt"
+        },
+        "checkpoint_p": {
+          "exists": true,
+          "size": 206881943,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_P.pt"
+        },
+        "python": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/bin/python'"
+        },
+        "entropy": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/MLCodec_extensions_cpp.cpython-312-x86_64-linux-gnu.so'"
+        },
+        "frames_dir": {
+          "exists": true,
+          "size": 4,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/audits/gvcrt-smoke16-b164141-gpu3-recovery2-20261002"
+        }
+      },
+      "error": ""
+    },
+    "gpu3": {
+      "status": 0,
+      "elapsed": 12.45565625000745,
+      "data": {
+        "source": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf'"
+        },
+        "script": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf/test_video_gvcrt_1088.py'"
+        },
+        "checkpoint_i": {
+          "exists": true,
+          "size": 334225106,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_I.pt"
+        },
+        "checkpoint_p": {
+          "exists": true,
+          "size": 206881943,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_P.pt"
+        },
+        "python": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/bin/python'"
+        },
+        "entropy": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/MLCodec_extensions_cpp.cpython-312-x86_64-linux-gnu.so'"
+        },
+        "frames_dir": {
+          "exists": true,
+          "size": 4,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/audits/gvcrt-smoke16-b164141-gpu3-recovery2-20261002"
+        }
+      },
+      "error": ""
+    },
+    "gpu4": {
+      "status": 0,
+      "elapsed": 4.723922499921173,
+      "data": {
+        "source": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf'"
+        },
+        "script": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf/test_video_gvcrt_1088.py'"
+        },
+        "checkpoint_i": {
+          "exists": true,
+          "size": 334225106,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_I.pt"
+        },
+        "checkpoint_p": {
+          "exists": true,
+          "size": 206881943,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_P.pt"
+        },
+        "python": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/bin/python'"
+        },
+        "entropy": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/MLCodec_extensions_cpp.cpython-312-x86_64-linux-gnu.so'"
+        },
+        "frames_dir": {
+          "exists": true,
+          "size": 4,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/audits/gvcrt-smoke16-b164141-gpu3-recovery2-20261002"
+        }
+      },
+      "error": ""
+    },
+    "gpu5": {
+      "status": 0,
+      "elapsed": 4.668274208903313,
+      "data": {
+        "source": {
+          "exists": true,
+          "size": 4096,
+          "resolved": "/local/users/emanuele/relocated-var-tmp-20261027/emanuele-pointstream-gvcrt-code-d0e32bf"
+        },
+        "script": {
+          "exists": true,
+          "size": 24929,
+          "resolved": "/local/users/emanuele/relocated-var-tmp-20261027/emanuele-pointstream-gvcrt-code-d0e32bf/test_video_gvcrt_1088.py",
+          "sha256": "60c470e578b15ae29d830f9b5b89cacf31ffade839c0bce48f735415922c80be"
+        },
+        "checkpoint_i": {
+          "exists": true,
+          "size": 334225106,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_I.pt"
+        },
+        "checkpoint_p": {
+          "exists": true,
+          "size": 206881943,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_P.pt"
+        },
+        "python": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/bin/python'"
+        },
+        "entropy": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/MLCodec_extensions_cpp.cpython-312-x86_64-linux-gnu.so'"
+        },
+        "frames_dir": {
+          "exists": true,
+          "size": 4,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/audits/gvcrt-smoke16-b164141-gpu3-recovery2-20261002"
+        }
+      },
+      "error": ""
+    },
+    "gpu6": {
+      "status": 0,
+      "elapsed": 4.763845375273377,
+      "data": {
+        "source": {
+          "exists": true,
+          "size": 4096,
+          "resolved": "/local/users/emanuele/relocated-var-tmp-20261027/emanuele-pointstream-gvcrt-code-d0e32bf"
+        },
+        "script": {
+          "exists": true,
+          "size": 24929,
+          "resolved": "/local/users/emanuele/relocated-var-tmp-20261027/emanuele-pointstream-gvcrt-code-d0e32bf/test_video_gvcrt_1088.py",
+          "sha256": "60c470e578b15ae29d830f9b5b89cacf31ffade839c0bce48f735415922c80be"
+        },
+        "checkpoint_i": {
+          "exists": true,
+          "size": 334225106,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_I.pt"
+        },
+        "checkpoint_p": {
+          "exists": true,
+          "size": 206881943,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_P.pt"
+        },
+        "python": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/bin/python'"
+        },
+        "entropy": {
+          "exists": false,
+          "error": "[Errno 2] No such file or directory: '/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/MLCodec_extensions_cpp.cpython-312-x86_64-linux-gnu.so'"
+        },
+        "frames_dir": {
+          "exists": true,
+          "size": 4,
+          "resolved": "/home/itec/emanuele/Datasets/pointstream-data/audits/gvcrt-smoke16-b164141-gpu3-recovery2-20261002"
+        }
+      },
+      "error": ""
+    }
+  },
+  "local_ssh_child_cpu_seconds": 0.153173
+}

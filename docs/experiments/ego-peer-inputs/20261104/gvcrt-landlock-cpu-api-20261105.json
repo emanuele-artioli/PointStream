@@ -1,0 +1,1 @@
+{"work": "/local/users/emanuele/pointstream/gvcrt-landlock-api-20261105-pvbfke95", "returncode": 0, "stdout": "{\"abi\": 4, \"mask\": 32767, \"denials\": {\"write\": 13, \"truncate\": 13, \"create\": 13, \"remove\": 13, \"mkdir\": 13, \"rename\": 13, \"link\": 18}, \"output_probe\": true}\n", "stderr": "", "canaries_preserved": true, "child_cpu": 0.063255}

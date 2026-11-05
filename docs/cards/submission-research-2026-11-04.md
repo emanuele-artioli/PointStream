@@ -104,3 +104,25 @@ The approval permits this staged program, not training or an automatic full
 34-window pipeline study. Those still need a dominating oracle, measured
 proposal and separate resource decision. All current reservations and charges
 live in `docs/experiments/submission-research-budget-20261104.json`.
+
+## Root stage2 release —2026-11-05
+
+Independent16/48 accepted-path audit (`66cbbd2e…`, job `20261105T000550Z-d8b5c76b`) verifies exact16 contract and complete48 retained results/timings; it does not independently recompute all judges or re-decode full48. New bounded Clip3 full188 confirmation is released at2500GPU/2800CPU inclusive, with500s smoke,1750s full,2400s oneCPU campaign and100GPU/400CPU external. Its new purpose-specific fidelity receipt `389f3af9…` predicts1649.78s using1.5× measured affine command cost plus200s overhead and60s reserve, adjusted upward for a slower new16 smoke. Old failed188 projection and48-onlyreceipt remain unchanged. No full30 stage is released: the586-frame clip projects2594s command alone, so checkpoint stages require separate16/48 numerical equivalence and complete-cost confirmation. Existingcontrols are a post188 conditional reservation because they require that full saved archive. Initial GVC and one verified table-tennis source-only pilot remain inside7200GPU/10800CPU feasibility bounds, separately from this larger release. Global and per-workstream ceilings remain unchanged.
+
+## Checkpoint equivalence phase — 2026-11-05
+
+Goal: establish that separating preparation from per-point scoring preserves the complete Clip3 16/48 coding and evaluation contract, then measure its cost. Preparation retains all six full native sequences and the joint fit. Each point is freshly decoded, checked against the prepared pixel hashes, and scored over its complete temporal sequence. Assembly requires all six points for each size and exact agreement with the accepted d8b5 reports.
+
+The competing explanation is that a changed CUDA state, resource path or temporal boundary changes results. Any native, packet, pixel, metric or judge mismatch stops the phase; no tolerance is enlarged after output. Failed identity, cost, deadline or resource checks also stop. This phase does not authorize the 30-clip corpus.
+
+The prospective ceiling is 3,400 GPU-seconds and 4,350 workload CPU-seconds: preparation 700/900, six scoring jobs at 450/550 each, and CPU assembly at 0/150. Preparation uses at most 650 campaign seconds, with smoke/full limits of 200/420 seconds. The SHA-bound timing decomposition predicts 393.13 seconds for full48 with a 1.5 margin and reserves, scaled upward for a slower new16 smoke. Its bounded 45 CPU-second evidence acquisition is included in preparation's external allowance. Every stage uses one frozen source checkout; later documentation commits cannot change its identity.
+
+### Checkpoint preparation repair1
+
+The first preparation command completed native/receiver work but incorrectly invoked scored validation on intentionally empty score arrays. Its original700GPU/900CPU ceiling is charged conservatively. A new700GPU/900CPU preparation attempt is reserved prospectively; the whole equivalence phase's cumulative ceiling is now4,100GPU/5,250CPU, including six original point jobs and assembly. Prepared validation retains native, packet, geometry, receiver and accounting checks and requires scores to be empty. Ordinary validation still rejects prepared reports; assembly marks metrics complete only after six complete point receipts. No numeric tolerance, encoding, fitting, guard, source or judging rule changes. Original snapshot and outputs remain intact. Root accepts focused validator/dispatch tests plus source review; the dispatch fixture stubs preparation and does not itself exercise the full encoder. Actual16 parity and cost gates remain required.
+
+## CUDA system-call trace pilot — 2026-11-05
+
+The four-cell saved observation associates failure with the portable Landlock condition; it does not identify a resource or exclude NoNewPrivs, which Landlock requires. The next three fresh, equally traced processes hold namespaces off and compare baseline, NoNewPrivs alone, and the same read policy. The competing explanation is tracing or NoNewPrivs rather than a denied system resource. Each must record its privilege state and identical CPU warmup; the Landlock arm must retain all ten protected-path denials. Trace candidates exclude intentional probes and never cause automatic permission changes. No model, encoding, body read in a control, or decoder qualification is included.
+
+The ceiling is200GPU/300CPU, including a150-second one-core campaign and50GPU/150CPU external. Arms stop at30seconds, the stage at120seconds. Existing paired controls support this small diagnostic forecast; live tracing/driver compatibility remains unverified until the bounded pilot. Failure, incomplete receipts or exhausted budget narrows the observation and stops. Both eligible hosts expose strace; no installation is authorized or needed. Initial charged-plus-active feasibility remains5,413GPU/10,341CPU, within7,200/10,800.

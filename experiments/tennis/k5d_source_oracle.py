@@ -127,22 +127,25 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
     if len(os.sched_getaffinity(0)) != 1 or not torch.cuda.is_available() or torch.cuda.device_count() != 1:
         raise ValueError("requires one visible CUDA device and single-CPU affinity")
+    timer = getattr(args, "timer", None)
+    def measure(name: str, fn: Any) -> Any:
+        return timer.measure(name, fn) if timer is not None else fn()
     identities = {}
     for name in ("manifest", "archive", "balltrack_weight", "wasb_config", "exposure"):
         path = Path(getattr(args, name))
-        digest = sha(path)
+        digest = measure(f"source.hash.{name}", lambda: sha(path))
         if digest != getattr(args, name + "_sha256"):
             raise ValueError(f"{name} SHA256 mismatch")
         identities[name] = {"path": str(path), "sha256": digest}
     for name in ("balltrack_code", "wasb_code"):
         path = Path(getattr(args, name))
-        digest = tree_sha(path)
+        digest = measure(f"source.tree_hash.{name}", lambda: tree_sha(path))
         if digest != getattr(args, name + "_sha256"):
             raise ValueError(f"{name} tree SHA256 mismatch")
         identities[name] = {"path": str(path), "tree_sha256": digest}
     bind_config(Path(args.wasb_code), identities["wasb_config"]["sha256"])
     weights = Path(args.wasb_weights) / "wasb_tennis_best.pth.tar"
-    weight_hash = sha(weights)
+    weight_hash = measure("source.hash.wasb_weights", lambda: sha(weights))
     if weight_hash != args.wasb_weights_sha256:
         raise ValueError("WASB weights SHA256 mismatch")
     identities["wasb_weights"] = {"path": str(weights), "sha256": weight_hash}
@@ -170,15 +173,16 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         if len(names) != len(set(names)):
             raise ValueError("duplicate archive members")
         selected_rows = clip["rows"][args.start_frame:args.start_frame + args.frames]
-        hashes = [hashlib.sha256(z.read(f"{clip['dir']}/{row[0]}")).hexdigest() for row in selected_rows]
+        hashes = measure("source.hash.selected_frames", lambda: [hashlib.sha256(z.read(f"{clip['dir']}/{row[0]}")).hexdigest() for row in selected_rows])
     subclip = {**clip, "rows": selected_rows}
     labels = trk.tracknet_labels(subclip)
-    images = trk.tracknet_frames(Path(args.archive), subclip)
-    zoo = trk.Zoo(Path(args.wasb_code), Path(args.wasb_weights), names=("wasb-step1",))
-    bt = trk.BallTrack(Path(args.balltrack_code), Path(args.balltrack_weight))
+    images = measure("source.image_decode", lambda: trk.tracknet_frames(Path(args.archive), subclip))
+    zoo = measure("source.wasb_init", lambda: trk.Zoo(Path(args.wasb_code), Path(args.wasb_weights), names=("wasb-step1",)))
+    bt = measure("source.balltrack_init", lambda: trk.BallTrack(Path(args.balltrack_code), Path(args.balltrack_weight)))
     if next(zoo.settings["wasb-step1"]["net"].parameters()).device.type != "cuda" or next(bt.net.parameters()).device.type != "cuda":
         raise ValueError("model is not on CUDA")
-    predictions = {"wasb": zoo.run("wasb-step1", images), "balltrack": bt.run(images)}
+    predictions = {"wasb": measure("source.wasb_judge", lambda: zoo.run("wasb-step1", images)),
+                   "balltrack": measure("source.balltrack_judge", lambda: bt.run(images))}
     scores = {name: score_frames(labels, preds) for name, preds in predictions.items()}
     rows = []
     for i, (label, digest) in enumerate(zip(labels, hashes)):

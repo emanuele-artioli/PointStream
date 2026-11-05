@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/Users/manu/miniconda3/bin/python",
+    "-m",
+    "experiments.visor.ego_mask_budget_oracle",
+    "--bundle",
+    "/private/tmp/h5p4d-20261104.tar.gz",
+    "--output",
+    "/private/tmp/ego-mask-fixed-oracle-20261104.json"
+  ],
+  "returncode": 0,
+  "elapsed_seconds": 0.9995369589887559,
+  "child_user_seconds": 0.552012,
+  "child_system_seconds": 0.172565,
+  "child_max_rss_platform_units": 112623616,
+  "platform": "macOS; native affinity unavailable; thread libraries limited to one",
+  "thread_environment": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1"
+  },
+  "output_sha256": "6857b91776435946d9ccd3ed916c8f4f4886edf3aac13ed4207f222d0918e769"
+}

@@ -181,3 +181,81 @@ is a new non-overwriting hardlink (device58,inode37089793,2564111322bytes)
 to the original TrackNet ZIP, not a copy/overwrite; staged verifier must check
 the frozen full SHA. Source revision derives from authenticated fleet dispatch.
 No inference or job ID at this freeze checkpoint.
+
+Submitted calibration job **20261104T222053Z-0061cb27**, source c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233 from bf6208c5380f537429b4e49bed39e1c22cdb7b8f, spec b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff. Phase3300GPU/3600CPU; inspect canonical status before action, never replay.
+
+Prospective judge-sensitivity controls frozen before opening calibration outcome: k5d-inputs/calibration-controls-contract-20261104.json; same188frameClip3 SVT62, exact retainednative/streak, same-track exposure0 disk withPSNRguard, diagnostic64pxhorizontalshift andwhite-streak colour. Fullimagejudges/registeredlabels only; no realismcertification, no tuning. Phase reserved600GPU/900CPU; no executionuntil realinputparity andcostfit.
+
+**Calibration interrupted, not a quality negative.** Canonical request
+20261104T222053Z-0061cb27 is terminal contended on gpu5; foreignGPU PID358756
+triggered frozen stop policy. Its16frame raw-source screen completed
+(WASB16/16 at5/10px; BallTrack14/16 at5px,15/16 at10px), but no complete
+native/wire/metric record or cost promotion exists. Parent349596 andforeignPID
+were both gone at recovery; no foreign process was signalled by this session.
+Receipt k5d-inputs/calibration-contention-receipt-20261104.json preserves
+status/staging/source identities. Charge conservative450GPU-s/650CPU-s
+(inclusive, above259.4s oneCPU supervisor lifecycle), release unused reservation.
+Rootprospectively reserves3300GPU/3600CPU for one fresh same-contract request
+after fresh host/alljobchecks; this is not a replay of the stopped request.
+Initial feasibility ceiling remains7200GPU/10800CPU, oldallocationsclosed.
+
+Submitted fresh same-contract calibration **20261104T223611Z-ed28cf8e**, source 82effb7975c304090cdd748a90e0365be5fb7e02ee24ece3c0238e034f574948 from 237ae2145ad2a3b86e20e3899b4250a559b3a42b, spec b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff. Same frozen encoder asbf6208; concurrent benchmarkencoder edits excluded. Complete1577request canonical snapshot+all6host probes found bothgpu2A6000idle; gpu5busy/gpu6CPUheadroom0. Phase3300GPU/3600CPU, initialreleasebudgetstillfits; neverreplayold0061cb27.
+
+**ed28coststop, valid16-frame fullpath.** Allsixpoints completedwithfull
+metrics/judges/native+PSBL/zeroBALL identitiesandfreshpacketparity; nativeUF
+sm80 onA6000, bothmodelsGPU, oneCPU, no contention. Pilotc4686467…fff12;
+publishedtar dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066.
+208.447644s command ledto3121.575s conservative188projection>2400stagecap.
+No fullpromotion. Independentselectedaudit at
+k5d-inputs/calibration-ed28-smoke-independent-audit-20261104.json.
+Charge450GPU/650CPU inclusive above370.388s lifecycle; totalCPUunmeasured.
+Prospective nextphase1800GPU/2100CPU is a smaller16/48 sameclip timingpilot
+onprovenbitidenticalnumericalpath; oldgate staysfailed, qualitysettingsunchanged.
+Onlyafter two correctuncontaminatedframecounts andconservativecompletecost
+fit may a fresh188confirmation be admitted; nocorpus/realismclaimfromsmokes.
+
+Root admitted prospective16/48 cost instrumentation after focused correctness tests and exact ed28 contract review. No188/full30 promotion is authorized by this cost48-only receipt. Inclusive1800GPU/2100CPU reserved; host inspection00:05UTC found gpu2 idle A6000 capacity.
+
+Fresh cost16/48 request **20261105T000550Z-d8b5c76b** submitted from cd669a22; immutable source receipt at `/private/tmp/pointstream-cost16-48-submit-20261105.json`. Spec SHA-256 acd2859c1aff5f2f118e262bf528afa90e4bea7612da68d7b6a5fead94e23a02. Inclusive1800GPU/2100CPU; deadline2026-11-05T00:45:21.789990+00:00. Re-read canonical status before acting; never replay.
+
+### OpenTTGames CPU frame-index witness admission —2026-11-05
+
+Root reviewed the pureCPU witness and six focused tests pass. Metadata links are new hardlinks matching source device/inode/size on gpu2, receipt `opentt-join-input-links-20261105.json`; originals are untouched. New bounded test2-only request uses the already reserved300CPU/0GPU (270s oneCPU fleet+30external incl preparation/audit), not seven-video or judge admission. Exact120Hz fullPTS, sequential/seek RGB parity and3labeled images required; any pass remains REVIEW_REQUIRED for independent image/coordinate verification. Full corpus contexts remain frozen.
+
+FreshCPUjoin request **20261105T001308Z-4ae20579**, revision 73e5b8c63e7cf6c6db24e09e0eb1f808aee6e352, source d543b220b1653b09de29ee7e356633927c2202582ad8d88368536d6d7220c7ce, spec 221dc26a477efcebf6b99c895ae8ffe9e3d4c180ad2b9565bf136078a79e6a0d. Entire300CPU/0GPU, test2only; inspectcanonicalstatusbeforenextaction, neverreplay.
+
+### Accepted cost review and prospective188 stage —2026-11-05
+
+Independent cost audit `cost-d8b5-independent-audit-20261105.json` SHA66cbbd2ef1480524b0327effb9c760d7ef726abe40e338c3246c434bc9640d66 checks16exactoldcontract and48completepoint/frame/metric/judge receipts and filehashes. No independent full48 pixeldecode or judgeinference was repeated. Command205.769s/339.863s imply fixed138.722s plus4.190427s/frame; childrenCPU is cumulative, not summed. All1800GPU/2100CPU phase ceiling charged conservatively. Fresh188-only receipt389f3af98638f30f4d2aad6334f37aaa66392d2e71528137108253dbf2086d32 and larger2500GPU/2800CPU reservation authorize only one stagedconfirmation after real16 exactparity/cost gate; full1750/campaign2400≤40min, post-full audit required. The longest586-frame command projects2594s beforeoverhead, so full30awaits frozencheckpointparity/cost evidence. Prototypecheckpoint helpers are unqualified code, not experimental results.
+
+### One table-tennis source-only admission —2026-11-05
+
+Root reviewed original1085–1087 PNGs from CPUjob4ae20579: visible white ball agrees with zero-based labels (189,539),(154,536),(117,534);35/37pixel displacement distinguishes an offset. Reviewed join receipt7ae07b38… and evidence7fc2cdb1… were published by exclusivecreate at`Datasets/pointstream-data/tennis/k5d-20261105-inputs/` and rehashed. The earlier CPUjob exhausted its270s campaign after valid witness/validator; command262.773s exceeded210s requested stage limit, and no fullno-workmarker ran. Preserve that coststop; no model or source-qualification conclusion follows. Before GPUadmission a real CPU-only OpenCV/FFmpeg witness check matched all3 rawRGB hashes (auditb8e762f6…,1.622CPU-s inside prospective sourcephase external140CPU). Source worker independently repeats this before Zoo/model. Root admits onlytest2 context1066..1305,16timing smoke/full240 source-judge, fixedtennisWASB andall85visible/6absent/149unknown: recall10evalpx≥.8 andfalse-per-negative≤.05, no resampling120fps or GT/crops tojudge. Entire240GPU/360CPU withininitialrelease; complete measured≤120s full forecast required; no fullcross-sportcoding or other6videojoins. Eight focusedtests andfullRuffpass.
+
+Fresh188confirmation request **20261105T003756Z-cc450baf**, revision b26e5b43702a21c37bcb4357223e0e6a25e1bec5, source c212f85b429f3a1abbca925de25736334fd06ffe9e821fac7798aaa99703fda7, spec 2d58571180db6b7d6e1685da78a36d7bc14a1f72ade5f7b56016ae631789bf6e. Entire2500GPU/2800CPU largerstage2 only; no full30release. Readcanonicalstatusbeforenextaction; neverreplay.
+
+Fresh test2 source-only request **20261105T003930Z-a4067c30**, revision 5018210928e892e2029064615d3571544c55e37e, source d11fb244de97152d65f7a35f38095176f41fc560bd64c0da42aac9ccc1cf2d50, spec ab3fe7365fc37d57716cb053ce2a0c806d22763de7d202113b709537848228c7. Entire240GPU/360CPU, measured16timing gate thenfull240 onlyifforecastfits. No cross-sportcoding claim; inspectcanonicalstatusbeforenextaction, neverreplay.
+
+Independent source audit: **20261105T003930Z-a4067c30** completed without a
+mechanical error, but the frozen tennis WASB judge did not qualify on this one
+OpenTT test_2 context: 0/85 visible hits within 10 evaluation pixels (required
+≥80%), with 0/6 false positives (required ≤5%); 149 unknown frames are excluded.
+The reviewed three-frame OpenCV/FFmpeg join agrees. This is a negative result for
+this judge and context, not proof that all cross-sport approaches fail. The next
+cheap test is a separately justified independent judge or source-correctness
+check with frozen exposure and budget; no cross-sport coding or training is
+admitted. [Independent audit](k5d-inputs/opentt-test2-source-a406-independent-audit-20261105.json).
+
+### Checkpoint equivalence admission — 2026-11-05
+
+The bounded phase and stop conditions are recorded in the research card. Preparation's complete native contexts and joint fit are unchanged; scoring replays existing packets and preserves whole-clip judge context. All results must match d8b5's full-schema 16/48 reports exactly. No corpus admission follows from code or CPU fixtures. The SHA-bound prospective prepare decomposition (`53b15df0…`) subtracts only 24 nonoverlapping outer scoring events from each accepted command: remaining times169.770/235.418s; predicted full48 with margin/reserve393.127s. Per-point startup is measured by its own smoke. Root reserves3,400GPU/4,350CPU under the approved larger-stage ceiling and will freeze an independent source checkout for every job in this phase.
+
+Fresh checkpoint prepare16/48 request **20261105T005745Z-d72ef178**, frozenrevision ae7bc1c89532d589feac4dfd2379fbea5dee3dfb, source 7d38b2bd54a7a712ac5cbf653fab6ce164373bafba5ea58394cc868aa4f11469, spec e60b534424fc2c7521527b496ef67b9bc124937bf13ce34cde82fab8e083f45c. Frozen sourcecheckout `/private/tmp/pointstream-checkpoint-frozen-20261105` remainsunchanged forscore/assembly. Inclusiveprepare700GPU/900CPU. No corpusadmission; readcanonicalstatusbeforeaction andneverreplay.
+
+### 188-frame Clip3 confirmation saved-artifact audit — 2026-11-05
+
+Job **20261105T003756Z-cc450baf** completed on exclusive RTX A6000; full `published.tar` SHA-256 `622fd68d5380b97449a09872bc15402117dd9c3e7a2576a757cd6aff8fd090d7`. Independent saved-artifact audit [`confirmation188-cc450baf-independent-audit-20261105.json`](k5d-inputs/confirmation188-cc450baf-independent-audit-20261105.json), SHA-256 `c6a1f88e1971c70bd320a83f290aae190c3f05c438005e727b3907c45bbcbb34`, checks the purpose-limited 188-frame gate `389f3af9...`, frozen validator, six native and paired PSBL ledgers, recorded producer/receiver parity, 2,256 metric rows and 4,512 judge rows; it independently recomputes each judge count and pooled RGB PSNR from saved SSE. Source qualification passes on this clip: 188 visible labels, no absent or unknown labels; source WASB has 174/188 and BallTrack 183/188 hits within 10 pixels. No false-positive rate can be estimated here. Checkpoint training logs remain unaudited.
+
+Across the six operating points, baseline versus streak 10-pixel WASB hits range 1–127 versus 160–177/188, and BallTrack 2–153 versus 182–183/188. Streak pooled RGB PSNR is 0.0076–0.0217 dB higher than its paired baseline; the four saved perceptual means also decrease at each point. These are descriptive paired operating-point results with added wire bytes, not a matched-rate or corpus result. The old 188-frame naive cost failure and historical four-window guard outcome are not converted into passes; three retrospective exclusions and the 10/197 negative-frame calibration failure remain. Nested 16/48-frame prefixes are not additional clips.
+
+The recorded smoke and full commands took 203.65 s and 897.03 s, respectively; no contention was recorded, claims were released and both task PIDs and process group were absent on inspection. Validation inspects saved bytes, rows and parity receipts; it does not independently decode, inspect source pixels, run perceptual models or rerun judges, and it does not establish OS-level source denial. No full-corpus release follows from this confirmation.

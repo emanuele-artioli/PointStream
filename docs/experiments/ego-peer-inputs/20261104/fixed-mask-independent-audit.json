@@ -1,0 +1,41 @@
+{
+  "checks": {
+    "P01_107_0000003049": {
+      "anchors": 34,
+      "exact_receipts": true,
+      "minimum_shape_bytes": 8882,
+      "rows": 15,
+      "selected_pairs": 15,
+      "venue_anchors": 9
+    },
+    "P02_02_0000006080": {
+      "anchors": 34,
+      "exact_receipts": true,
+      "minimum_shape_bytes": 12405,
+      "rows": 13,
+      "selected_pairs": 13,
+      "venue_anchors": 9
+    },
+    "P03_10_0000000616": {
+      "anchors": 34,
+      "exact_receipts": true,
+      "minimum_shape_bytes": 10779,
+      "rows": 12,
+      "selected_pairs": 12,
+      "venue_anchors": 9
+    },
+    "P09_106_0000006303": {
+      "anchors": 34,
+      "exact_receipts": true,
+      "minimum_shape_bytes": 6512,
+      "rows": 14,
+      "selected_pairs": 14,
+      "venue_anchors": 9
+    }
+  },
+  "limitation": "independent metadata and byte-count audit; no independent metric recomputation",
+  "max_rss_bytes_macos": 17432576,
+  "result_sha256": "6857b91776435946d9ccd3ed916c8f4f4886edf3aac13ed4207f222d0918e769",
+  "self_cpu_seconds": 0.051889,
+  "wall_seconds": 0.013271290808916092
+}

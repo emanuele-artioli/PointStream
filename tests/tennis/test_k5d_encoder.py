@@ -92,3 +92,190 @@ def test_baseline_wire_and_physical_rate_are_checked(tmp_path, monkeypatch):
     (tmp_path / 'dcvc-0' / 'baseline.psbl').write_bytes(b'bad')
     with pytest.raises(ValueError):
         enc.validate(tmp_path)
+
+
+def test_failed_source_is_fidelity_only_with_bound_gate(tmp_path, monkeypatch):
+    report = fixture_output(tmp_path, monkeypatch)
+    source_path = tmp_path / 'source-qualification.json'
+    source = json.loads(source_path.read_text())
+    source['qualified'] = False
+    source['identities'] = {'archive': {'sha256': 'archive'}}
+    source_path.write_text(json.dumps(source))
+    with pytest.raises(ValueError, match='source qualification failed'):
+        enc.validate(tmp_path)
+    gate_path = tmp_path / 'fidelity-gate.json'
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'purpose': 'full-retrospective-benchmark', 'archive_sha256': 'archive',
+            'calibration_job_id': 'job', 'evidence_sha256': 'a' * 64,
+            'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'full_cost']}
+    gate_path.write_text(json.dumps(gate))
+    report['fidelity_gate'] = {'sha256': enc.oracle.sha(gate_path)}
+    report['source_task_qualified'] = False
+    (tmp_path / 'pilot.json').write_text(json.dumps(report))
+    assert enc.validate(tmp_path)['frames'] == 2
+    report['source_task_qualified'] = True
+    (tmp_path / 'pilot.json').write_text(json.dumps(report))
+    with pytest.raises(ValueError, match='relabeled'):
+        enc.validate(tmp_path)
+
+
+def test_integer_sse_psnr_matches_original_float64_on_uint8_frames():
+    rng = np.random.default_rng(702)
+    inputs = [rng.integers(0, 256, size=(72, 128, 3), dtype=np.uint8) for _ in range(4)]
+    inputs += [np.zeros((72, 128, 3), dtype=np.uint8)]
+    controls = [rng.integers(0, 256, size=x.shape, dtype=np.uint8) for x in inputs[:4]]
+    identical = inputs[-1].copy()
+    controls.append(identical)
+    one_pixel = identical.copy()
+    one_pixel[0, 0, 0] = 1
+    inputs.append(identical)
+    controls.append(one_pixel)
+    labels = [(-1, 0., 0.)] * len(inputs)
+    rows = enc.metrics(np.stack(inputs), np.stack(controls), labels, None)
+    for row, a, b in zip(rows, inputs, controls):
+        assert row['frame_psnr'] == enc.old.psnr(a, b)
+
+
+def test_guard_reuse_requires_equal_pixels_and_runs_each_judge_once(monkeypatch):
+    image = np.zeros((1, 3, 3, 3), dtype=np.uint8)
+    calls = {'metrics': 0, 'judges': 0}
+
+    def fake_metrics(*_):
+        calls['metrics'] += 1
+        return [{'record': 1}]
+
+    def fake_judges(_):
+        calls['judges'] += 1
+        return {'record': 1}
+
+    monkeypatch.setattr(enc, 'metrics', fake_metrics)
+    a, b, c, d, provenance = enc.score_arms(image, image, image.copy(), [(-1, 0., 0.)], None, fake_judges, True)
+    assert a is c and b is d and provenance and calls == {'metrics': 1, 'judges': 1}
+    changed = image.copy()
+    changed[0, 0, 0, 0] = 1
+    with pytest.raises(ValueError, match='differs'):
+        enc.score_arms(image, image, changed, [(-1, 0., 0.)], None, fake_judges, True)
+
+
+def test_generic_decoder_resource_bytes_are_separate_from_wire(tmp_path):
+    image, video, decoder = (tmp_path / n for n in ('i', 'v', 'd'))
+    image.write_bytes(b'123')
+    video.write_bytes(b'12345')
+    decoder.write_bytes(b'1')
+    ledger = enc.installed_decoder_resources(image, video, decoder)
+    assert ledger['dcvc']['checkpoint_total_bytes'] == 8
+    assert ledger['dcvc']['image_checkpoint']['sha256'] == enc.oracle.sha(image)
+    assert ledger['svt']['decoder']['bytes'] == 1
+    assert 'excluded from per-clip wire' in ledger['scope']
+
+
+def test_confirmation_fidelity_gate_is_narrow_and_separate(tmp_path):
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only',
+            'purpose': '188-frame-confirmation', 'archive_sha256': 'archive',
+            'calibration_job_id': 'job', 'evidence_sha256': 'a' * 64,
+            'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'full_cost'],
+            'clip': 'tracknet/game10/Clip3', 'max_frames': 188}
+    path = tmp_path / 'gate.json'
+    path.write_text(json.dumps(gate))
+    digest = enc.oracle.sha(path)
+    for frames in (16, 188):
+        assert enc.fidelity_gate(path, digest, 'archive', purpose='188-frame-confirmation',
+                                 clip=gate['clip'], frames=frames) == gate
+    for frames in (48, 189):
+        with pytest.raises(ValueError, match='confirmation'):
+            enc.fidelity_gate(path, digest, 'archive', purpose='188-frame-confirmation',
+                              clip=gate['clip'], frames=frames)
+    with pytest.raises(ValueError, match='confirmation'):
+        enc.fidelity_gate(path, digest, 'archive', purpose='188-frame-confirmation',
+                          clip='tracknet/game9/Clip5', frames=188)
+    with pytest.raises(ValueError, match='purpose'):
+        enc.fidelity_gate(path, digest, 'archive', purpose='full-retrospective-benchmark')
+    gate['checks'].remove('full_cost')
+    path.write_text(json.dumps(gate))
+    with pytest.raises(ValueError, match='calibration'):
+        enc.fidelity_gate(path, enc.oracle.sha(path), 'archive', purpose='188-frame-confirmation',
+                          clip=gate['clip'], frames=188)
+
+
+def test_checkpoint_assembly_passes_real_report_validator(tmp_path, monkeypatch):
+    from experiments.tennis import k5d_checkpoint as cp
+
+    root = tmp_path / 'prepared'
+    root.mkdir()
+    report = fixture_output(root, monkeypatch)
+    scored_points = json.loads(json.dumps(report['points']))
+    report['checkpoint_prepare'] = True
+    report['full_metrics'] = False
+    for point in report['points']:
+        point['baseline'].update(metrics=[], judges={})
+        point['streak'].update(metrics=[], judges={}, reuse=None)
+    (root / 'pilot.json').write_text(json.dumps(report))
+    identity = {'source_sha256': 's', 'snapshot_sha256': 'p', 'environment_sha256': 'e'}
+    cp.seal(root, identity)
+    sha = enc.oracle.sha(root / 'checkpoint.json')
+    receipts = []
+    for i, point in enumerate(scored_points):
+        point['streak']['reuse'] = 'disabled'
+        path = tmp_path / f'point-{i}.json'
+        path.write_text(json.dumps({'checkpoint_sha256': sha, 'execution_identity': identity, 'point': point,
+                                    'receiver_replay': {'decoded_yuv_sha256': 'decode', 'rendered_rgb_sha256': 'render'}}))
+        receipts.append({'path': str(path), 'sha256': enc.oracle.sha(path)})
+    result = cp.assemble(root, sha, receipts, tmp_path / 'assembled', identity)
+    assert result['frames'] == 2 and result['points'] == 6 and result['full_metrics']
+
+
+def test_checkpoint_parity_compares_full_scores_and_ignores_relocated_command(tmp_path, monkeypatch):
+    import shutil
+    from experiments.tennis import k5d_checkpoint as cp
+
+    prior = tmp_path / 'prior'
+    prior.mkdir()
+    report = fixture_output(prior, monkeypatch)
+    report['conversion'] = {'yuv_sha256': 'same', 'floor_psnr': 30., 'command': ['/old/output']}
+    (prior / 'pilot.json').write_text(json.dumps(report))
+    source_path = prior / 'source-qualification.json'
+    source = json.loads(source_path.read_text())
+    source['scores'] = {'wasb': {'hits': 1}}
+    source_path.write_text(json.dumps(source))
+    current = tmp_path / 'current'
+    shutil.copytree(prior, current)
+    report['conversion']['command'] = ['/new/output']
+    (current / 'pilot.json').write_text(json.dumps(report))
+    assert cp.compare_equivalence(prior, current, enc.oracle.sha(prior / 'pilot.json'))['passed']
+    report['points'][0]['streak']['metrics'][0]['full_lpips'] = 0.2
+    (current / 'pilot.json').write_text(json.dumps(report))
+    with pytest.raises(ValueError):
+        cp.compare_equivalence(prior, current, enc.oracle.sha(prior / 'pilot.json'))
+
+
+def test_prepared_validator_rejects_scored_or_incomplete_reports(tmp_path, monkeypatch):
+    report = fixture_output(tmp_path, monkeypatch)
+    report['checkpoint_prepare'] = True
+    report['full_metrics'] = False
+    for point in report['points']:
+        point['baseline'].update(metrics=[], judges={})
+        point['streak'].update(metrics=[], judges={}, reuse=None)
+    def write():
+        (tmp_path / 'pilot.json').write_text(json.dumps(report))
+    write()
+    assert enc.validate(tmp_path, prepared=True)['points'] == 6
+    with pytest.raises(ValueError, match='prepared report'):
+        enc.validate(tmp_path)
+    report['points'][0]['baseline']['metrics'] = [{'frame': 0}]
+    write()
+    with pytest.raises(ValueError, match='partial scores'):
+        enc.validate(tmp_path, prepared=True)
+    report['points'][0]['baseline']['metrics'] = []
+    report['points'][0]['streak']['judges'] = {'wasb': {}}
+    write()
+    with pytest.raises(ValueError, match='partial scores'):
+        enc.validate(tmp_path, prepared=True)
+    report['points'][0]['streak']['judges'] = {}
+    report['points'][0]['streak']['reuse'] = 'disabled'
+    write()
+    with pytest.raises(ValueError, match='partial scores'):
+        enc.validate(tmp_path, prepared=True)
+    report['points'][0]['streak']['reuse'] = None
+    report['points'].pop()
+    write()
+    with pytest.raises(ValueError, match='six point'):
+        enc.validate(tmp_path, prepared=True)

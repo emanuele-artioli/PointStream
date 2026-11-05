@@ -1,0 +1,22 @@
+{
+  "job": "20261105T003105Z-26df2a36",
+  "status": "failed smoke; no replay",
+  "host": "gpu6",
+  "gpu": "NVIDIA RTX 6000 Ada Generation, GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "source_revision": "d65a4146f97bbeceb9a39b4c4e17b500236c18f5",
+  "source_sha256": "189d52eefa83cdba56fbd93bd8c59f6f4b390e418996f62afaaf116ef2228c33",
+  "spec_sha256": "afae8037e8af970ea872b19f52eefba215aefba480b225e7d9a4224893736cac",
+  "dispatch_sha256": "5a5d5eed48202f0dcaad58237818ff618e92b92a0066a395706573564c7986f5",
+  "dispatch_environment": {"sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661", "prefix_and_python_present": true, "mode": "local-hit"},
+  "stage": "After source preparation and namespace/Landlock bootstrap, isolated CUDA initialization failed in torch.cuda.get_device_properties before any GVC model or encoder was started. Error 2 says out of memory, but does not establish physical memory exhaustion.",
+  "command_log_sha256": "201b0bd82bc80db7637bda143a93e646bf11a2cb09ac4c16d96557779e59b885",
+  "isolation_receipt_sha256": "268ebea7fbc1f12d95df257d0c1f2bec9f923c528486f3ed3042d3024887e0ff",
+  "isolation_receipt": {"landlock_abi": 4, "denial_count": 52, "denial_errno_values": [13], "cpu_before_and_after_sha256": "1eab08ee2105ebc9c1323901ab0e45871fe6f954ae807e379755087d00027a77", "cuda_preinitialized": false},
+  "isolated_probe": {"exit_receipt_sha256": "c64384ef3bd559fa9d873e564de7d7425ccd462c9935966e4d3b005cc422c19b", "stderr_sha256": "0cc4133da658f8c752d26d21595b16d84e0d2d65be3bd04d44e5e225c7123db3", "exit_code": 1, "timed_out": false, "wall_seconds": 6.9599755, "cpu_seconds": 6.150661},
+  "generic_control": {"exit_receipt_sha256": "bd85e35a42f340975be08a8e59dff4960f72fd7153e650a0a3f91687a8c44120", "result_sha256": "eb60f3b0ce458b6d9f6537bb9275559091d3fb18e74ef1ea0821807f6d2ed680", "exit_code": 0, "torch": "2.10.0+cu128", "capability": [8, 9], "sum": 1048576.0, "wall_seconds": 4.437212, "cpu_seconds": 4.328141},
+  "prepare": {"exit_receipt_sha256": "5944015f0e341ff23cbe96474495e7e564b350bcf37db43e230642f117ddd6eb", "exit_code": 0, "wall_seconds": 11.267835, "cpu_seconds": 11.0777},
+  "execution_receipt_sha256": "01236996ae19489ab9c76ae5c05cda82857e54bb5f44050424b29e55eb5a8a71",
+  "resources": {"smoke_command_wall_seconds": 23.527007818222046, "smoke_waited_children_cpu_seconds": 22.250379, "supervisor_started_to_ended_wall_seconds": 60.6766818, "external_audit_not_included": true, "canonical_status": "GPU unclaimed and no GPU compute processes", "supervisor_and_all_three_child_pids_absent": true},
+  "decision": "Current source-denied receiver profile fails the required isolated CUDA probe. Stop this profile without inferring a model or compression result. Generic control demonstrates CUDA in the unisolated process only. Any policy change requires separate prospective review and admission.",
+  "evidence_root": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T003105Z-26df2a36/smoke/gvcrt-peer"
+}

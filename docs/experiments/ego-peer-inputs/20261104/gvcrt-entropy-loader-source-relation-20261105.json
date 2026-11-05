@@ -1,0 +1,10 @@
+{
+  "historical_cpu_api_receipt": "gvcrt-landlock-cpu-api-v2-20261105.json",
+  "historical_cpu_api_worker_sha256": "2c3c4d21a847f75b508a24b0230eba2d91166778847d38ff6a5137575bd1cd09",
+  "pre_loader_worker_sha256": "5872764cdec7e96f218b593bf83a310b2a56c6262b8d5be237d5d1490c715314",
+  "current_worker_sha256": "690a8a789bf399acb57367565f1afa02024f84b5c670af7d1fdc1976b1e3c3fd",
+  "code_change": "Explicit file loader is called after bootstrap only in decode; probe mode unchanged by this change. Landlock permissions are unchanged by this change.",
+  "restrict_ast_sha256": "6a27df824c16aba4eeb6d7aceb797b1fb16cbbf2fab01e932ab84a17352fc66c",
+  "bootstrap_ast_sha256": "5b05956732af48c79149c22fc2fda3ed531f65c2c4a15797b4e9545d4ed5d49d",
+  "qualification": "Source-level relation only; historical CPU API receipt tested an earlier worker SHA. No new OS or CUDA execution is claimed."
+}

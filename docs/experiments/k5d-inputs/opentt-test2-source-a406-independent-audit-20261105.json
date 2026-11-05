@@ -1,0 +1,109 @@
+{
+  "job_id": "20261105T003930Z-a4067c30",
+  "status": "complete exit 0",
+  "host": "gpu6",
+  "gpu": "NVIDIA RTX 6000 Ada Generation",
+  "revision": "5018210928e892e2029064615d3571544c55e37e",
+  "source_sha256": "d11fb244de97152d65f7a35f38095176f41fc560bd64c0da42aac9ccc1cf2d50",
+  "spec_sha256": "ab3fe7365fc37d57716cb053ce2a0c806d22763de7d202113b709537848228c7",
+  "stages": {
+    "smoke": {
+      "archive_sha256": "4ace384943d5d0fe9ff5a54db23a7ffc1c382d1722962f7d76aa040f9b78959b",
+      "frames": 16,
+      "scores": {
+        "frames": 16,
+        "visible": 16,
+        "absent": 0,
+        "unknown": 0,
+        "hit5": 0,
+        "hit10": 0,
+        "miss10": 16,
+        "false_on_absent": 0,
+        "recall5": 0.0,
+        "recall10": 0.0,
+        "false_per_negative": null
+      },
+      "qualified": false,
+      "command_wall_seconds": 8.78271746635437,
+      "timing": {
+        "preflight_fixed_seconds": 2.0541525101289153,
+        "source_io_seconds": 2.0313453609123826,
+        "model_init_seconds": 0.548603736795485,
+        "judge_seconds": 1.1921689454466105
+      },
+      "contention": [],
+      "timing_contaminated": false,
+      "paused_seconds": 0.0,
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "cpu_affinity": [
+        0
+      ]
+    },
+    "full": {
+      "archive_sha256": "7c9619d25f050fa9f81cfbcf8230c1d95cfcf363cb3bc53046371382a5e234ea",
+      "frames": 240,
+      "scores": {
+        "frames": 240,
+        "visible": 85,
+        "absent": 6,
+        "unknown": 149,
+        "hit5": 0,
+        "hit10": 0,
+        "miss10": 85,
+        "false_on_absent": 0,
+        "recall5": 0.0,
+        "recall10": 0.0,
+        "false_per_negative": 0.0
+      },
+      "qualified": false,
+      "command_wall_seconds": 24.274372339248657,
+      "timing": {
+        "preflight_fixed_seconds": 1.5142074609175324,
+        "source_io_seconds": 12.949658170342445,
+        "model_init_seconds": 0.47174747474491596,
+        "judge_seconds": 7.184694414027035
+      },
+      "contention": [],
+      "timing_contaminated": false,
+      "paused_seconds": 0.0,
+      "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+      "cpu_affinity": [
+        0
+      ]
+    }
+  },
+  "identities": {
+    "selection_sha256": "b104b87aefae92e3a3ea7766bc51e3b34f6c3c7a1f071bbbbca7eeb218984877",
+    "video_sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43",
+    "label_archive_sha256": "c692014ca9074d331700385e4c0b5e0bd32968123bf001fe8b1c9b2e64ac142d",
+    "join_witness_sha256": "7ae07b383514ffa0f96286dc22f900446c15d3b3376e4a50027183500f05736d",
+    "wasb_code_tree_sha256": "d456047c70e9dbd3a2f7196e2d1991a069393ab68d7466d0ee7ecfd23360cab0",
+    "wasb_config_sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+    "wasb_checkpoint_sha256": "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb"
+  },
+  "independent_checks": [
+    "240 ordered frames 1066\u20131305 and hashes; labels exactly match frozen selection",
+    "recomputed visible 85, absent 6, unknown 149, hits5 0, hits10 0, false positives 0; 1 prediction on unknown",
+    "three OpenCV raw RGB witness hashes match evidence, evidence SHA256 matches signed join witness",
+    "inspected submitted source: full uncropped resized frames reach Zoo, labels built only after inference; CUDA model device asserted",
+    "stage archive digests match publication receipts; exclusive GPU, no reported contention; reported claim absent and both recorded process IDs absent at check"
+  ],
+  "decision": "FAIL source qualification: recall10 0/85 (0%) <80%; 0/6 false positives satisfies <=5%; unknown excluded. Completed negative, not mechanical failure. No coding or training admission.",
+  "resource_accounting": {
+    "one_cpu_affinity": true,
+    "supervisor_lifecycle_wall_seconds": 50.4351414,
+    "cumulative_children_cpu_seconds_final": 32.960139,
+    "preflight_cpu_seconds": 1.622452474,
+    "phase_caps_gpu_cpu_seconds": [
+      240,
+      360
+    ],
+    "conservative_charge": "Use full phase ceilings where unmetered external preparation/audit aggregate is unavailable; limits include external preflight."
+  },
+  "limitations": [
+    "No independent model re-execution or raw image re-decoding in this audit. Predictions and image hashes are saved artifacts.",
+    "One 240-frame context; model-aided annotations, empirically reviewed frame join at three frames, author annotation origin not proven.",
+    "Source report records GPU name and model CUDA assertion, but no explicit installed OpenCV/FFmpeg version; packed environment archive SHA is recorded.",
+    "Reported evidence does not establish why judge missed the ball or generalize to other footage."
+  ]
+}

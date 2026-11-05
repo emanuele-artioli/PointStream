@@ -105,3 +105,94 @@ def test_cuda_failures_are_measurements_but_never_generation_pass(tmp_path, monk
     assert job.validate(tmp_path) == 0
     assert json.loads((tmp_path / 'validation.json').read_text()) == {
         'measurement_complete': True, 'both_cuda_passed': False, 'generation_gate_passed': False}
+
+
+def test_portable_profile_retains_only_exact_original_grant_subset():
+    import json
+
+    historical = json.loads(Path(job.__file__).with_name('w8_cuda_historical_config.json').read_text())
+    receipt = {'path': '/new/receipt', 'sha256': 'a' * 64}
+    result = job.normalize_portable(historical, Path('/new/source'), Path('/new/output'),
+                                    Path('/new/aliases'), 'GPU-new', 'user:new', 'net:new', receipt)
+    assert result['allow_paths'] == ['/new/source', '/new/output', job.RUNTIME_ROOT, *job.SYSTEM_GRANTS]
+    assert result['files'] == {} and result['protected_receipt'] == receipt
+    assert result['denied_paths']['source'] == historical['denied_paths']['source']
+    assert len(result['denied_paths']['aliases']) == 5
+    historical['allow_paths'].remove('/dev/urandom')
+    with pytest.raises(ValueError, match='subset'):
+        job.normalize_portable(historical, Path('/new/source'), Path('/new/output'),
+                               Path('/new/aliases'), 'GPU-new', 'user:new', 'net:new', receipt)
+
+
+def test_portable_identity_hashes_all_files_and_rejects_mismatch(tmp_path, monkeypatch):
+    import json
+    from experiments.tennis import w8_receiver_preflight
+
+    expected = {}
+    for name in ('source', 'prepared', 'fit', 'golden', 'masks'):
+        path = tmp_path / name
+        path.write_bytes(name.encode())
+        expected[name] = (str(path), job.digest(path))
+    monkeypatch.setattr(w8_receiver_preflight, 'PROTECTED', expected)
+    historical = {'denied_paths': {name: [item[0]] for name, item in expected.items()}}
+    receipt_path = tmp_path / 'receipt.json'
+    identity = job.protected_identity(historical, receipt_path)
+    assert identity['sha256'] == job.digest(receipt_path)
+    records = json.loads(receipt_path.read_text())['protected_inputs']
+    assert set(records) == set(expected)
+    assert all(records[k]['sha256'] == expected[k][1] and records[k]['inode'] == Path(expected[k][0]).stat().st_ino
+               for k in expected)
+    Path(expected['masks'][0]).write_bytes(b'changed')
+    with pytest.raises(ValueError, match='identity mismatch'):
+        job.protected_identity(historical, tmp_path / 'bad.json')
+
+
+def test_portable_arm_budget_preserves_sixty_second_reserve():
+    assert job.enough_budget(100, 100, job.PORTABLE_PROFILE)
+    assert not job.enough_budget(101, 100, job.PORTABLE_PROFILE)
+    assert not job.enough_budget(100, 101, job.PORTABLE_PROFILE)
+
+
+def test_gpu_uuid_canonical_comparison():
+    raw = 'ef96fc4f-134e-4c01-290e-9a6c8bbef553'
+    assert job.canonical_gpu_uuid(raw) == job.canonical_gpu_uuid('GPU-' + raw)
+    assert job.canonical_gpu_uuid(raw) != job.canonical_gpu_uuid('GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162')
+    for malformed in ('GPU-', raw.replace('-', ''), '{' + raw + '}'):
+        with pytest.raises(ValueError):
+            job.canonical_gpu_uuid(malformed)
+
+
+def test_archived_worker_cli_import_effect_is_avoided_with_hard_limit():
+    import subprocess
+    import sys
+
+    script = '''
+import importlib, resource, sys
+from experiments.tennis.w8_cuda_job import without_legacy_worker_argv
+resource.setrlimit(resource.RLIMIT_CPU, (60, 60))
+sys.argv = ['w8_cuda_job.py', 'worker', '--condition', 'isolated']
+saved = sys.argv
+try:
+    importlib.import_module('experiments.tennis.w8_input_job')
+except ValueError as exc:
+    assert 'raise maximum limit' in str(exc)
+else:
+    raise AssertionError('legacy import unexpectedly changed hard CPU limit')
+module = without_legacy_worker_argv(lambda: importlib.import_module('experiments.tennis.w8_input_job'))
+assert callable(module.synthetic_torch_bootstrap)
+assert sys.argv is saved and sys.argv[1] == 'worker'
+assert resource.getrlimit(resource.RLIMIT_CPU) == (60, 60)
+'''
+    subprocess.run([sys.executable, '-c', script], check=True, capture_output=True, text=True, timeout=30)
+
+
+def test_argv_restored_after_bootstrap_failure(monkeypatch):
+    import sys
+    original_argv = ['worker', 'worker']
+    monkeypatch.setattr(sys, 'argv', original_argv)
+    def fail():
+        assert sys.argv == ['worker']
+        raise RuntimeError('failed')
+    with pytest.raises(RuntimeError):
+        job.without_legacy_worker_argv(fail)
+    assert sys.argv is original_argv

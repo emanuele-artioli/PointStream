@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "status": "frozen prospectively before opening current calibration outcome",
+  "clip": "tracknet/game10/Clip3",
+  "native_point": {
+    "codec": "svt",
+    "crf": 62
+  },
+  "scope": "Judge sensitivity controls; no perceptual realism or additional statistical confirmation claim",
+  "inputs": "Retained exact native and candidate PSBL from admitted calibration; original JPEG source/labels and identical judge hashes",
+  "arms": {
+    "native": "Unchanged real SVT CRF62 decode",
+    "streak": "Exact retained PSBL reconstruction; require pixel parity to calibration receipt",
+    "disk": "Retained streak positions/radius/colour/phase, exposure index set to zero; retain pooled RGB PSNR nondecrease guard, otherwise off; serialize actual PSBL bytes",
+    "wrong_position": "Diagnostic only: retained streak positions shifted horizontally by64 pixels modulo image width, with same per-frame appearances; no coding/PSNR admission claim",
+    "brightness": "Diagnostic only: retained streak positions/radius/exposure/phase with RGB colour(255,255,255); no coding/PSNR admission claim"
+  },
+  "report": "Full-image WASB and BallTrack raw per-frame outputs and label-only scores; all existing frame labels/unknown policy, full and fixed64px crop LPIPS/DISTS/PSNR; native/wire/payload bytes for coding arms; actual changed-frame counts and diagnostic status",
+  "selection": "All188 fullclip frames; a nested16-frame smoke for correctness/cost only, not extra sample",
+  "stop": "Input/parity/judge/device mismatch or cost overflow stops; inactive controls are reported uninformative, never a judge validation pass; no tuning after result",
+  "cpu_inclusive_seconds": 1500,
+  "gpu_inclusive_seconds": 1200,
+  "no_training": true
+}

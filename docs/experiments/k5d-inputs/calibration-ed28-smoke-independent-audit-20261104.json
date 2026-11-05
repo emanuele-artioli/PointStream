@@ -1,0 +1,342 @@
+{
+  "job": "20261104T223611Z-ed28cf8e",
+  "scope": "read-only retained smoke audit; cost gate failed, no promotion or quality claim",
+  "archive": {
+    "bytes": 983040,
+    "sha256": "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066",
+    "members": 43
+  },
+  "source_qualification": {
+    "sha256": "da743708eecc1850e4f55b2a925601bb226b52c90e5b2fbc7386705438fa4a17",
+    "frames": 16,
+    "qualified": true,
+    "scores": {
+      "wasb": {
+        "frames": 16,
+        "visible": 16,
+        "absent": 0,
+        "unknown": 0,
+        "hit5": 16,
+        "hit10": 16,
+        "miss10": 0,
+        "false_on_absent": 0,
+        "recall5": 1.0,
+        "recall10": 1.0,
+        "false_per_negative": null
+      },
+      "balltrack": {
+        "frames": 16,
+        "visible": 16,
+        "absent": 0,
+        "unknown": 0,
+        "hit5": 14,
+        "hit10": 15,
+        "miss10": 1,
+        "false_on_absent": 0,
+        "recall5": 0.875,
+        "recall10": 0.9375,
+        "false_per_negative": null
+      }
+    },
+    "device": {
+      "name": "NVIDIA RTX A6000",
+      "visible_count": 1,
+      "affinity": [
+        0
+      ],
+      "capability": [
+        8,
+        6
+      ],
+      "uuid": "fc7e8fff-75be-4984-a185-fe8ce63edcd9",
+      "models_on_cuda": [
+        "wasb-step1",
+        "balltrack"
+      ]
+    },
+    "elapsed_seconds": 8.959007123950869
+  },
+  "pilot": {
+    "sha256": "c46864671036e7435a572b9c05793ad79639927897adce2f89bd0bb62d3fff12",
+    "clip": "tracknet/game10/Clip3",
+    "frames": 16,
+    "full_metrics": true,
+    "elapsed_seconds": 204.9848664039746,
+    "parent_cpu_seconds": 75.58713873500001,
+    "revision": "237ae2145ad2a3b86e20e3899b4250a559b3a42b",
+    "snapshot_identity": {
+      "git_head": "237ae2145ad2a3b86e20e3899b4250a559b3a42b",
+      "source_sha256": "82effb7975c304090cdd748a90e0365be5fb7e02ee24ece3c0238e034f574948",
+      "snapshot_sha256": "748591675c350fe3e0214b0a4aca4529b56199419f0c4838b167e6e52440ecba",
+      "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "included_untracked_sha256": {}
+    },
+    "metric_models": {
+      "lpips": {
+        "metric": "LPIPS",
+        "net": "alex",
+        "torchmetrics": "1.9.0",
+        "heads": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/lpips_models/alex.pth",
+        "heads_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0",
+        "backbone": "/local/users/emanuele/pointstream/cache/7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02/alexnet-owt-7be5be79.pth",
+        "backbone_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+        "pooling": "spatial map at full resolution (bilinear), mean over the frame or region"
+      },
+      "dists": {
+        "metric": "DISTS",
+        "net": "vgg16",
+        "torchmetrics": "1.9.0",
+        "weights": "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/lib/python3.12/site-packages/torchmetrics/functional/image/dists_models/weights.pt",
+        "weights_sha256": "f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218",
+        "backbone": "/local/users/emanuele/pointstream/cache/397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0/vgg16-397923af.pth",
+        "backbone_sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+        "pooling": "every layer's mean, variance and covariance weighted by the region resized to it (area)"
+      }
+    }
+  },
+  "points": [
+    {
+      "codec": "dcvc",
+      "setting": 0,
+      "native_bytes": 8244,
+      "native_sha256": "66a9a6e44d5087d2e2ed5b379196bbd995d900dcf414884c6218e4e08cbc795a",
+      "candidate_bytes": 8387,
+      "candidate_sha256": "6ea2d9c78fbfd0071be22760ff1327582d9e64e74b8af8c01cef80a89045b1c6",
+      "baseline_psbl_bytes": 8313,
+      "baseline_psbl_sha256": "e2258bcd34cd33ec97f04e97c3e9f801548712b32838d7db7b4167c3930a4801",
+      "point_json_sha256": "a72abac0be6a476fb05931b96aaaaeee1b3a6cbc7a10410a9394073ab130ce0d",
+      "point_matches": true,
+      "hashes_match": true,
+      "decode_parity": true,
+      "render_parity": true,
+      "receiver_frames": 16,
+      "guard_off": false,
+      "arms": {
+        "baseline": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        },
+        "streak": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        }
+      },
+      "device": {
+        "name": "NVIDIA RTX A6000",
+        "capability": [
+          8,
+          6
+        ],
+        "extension": "sm80"
+      },
+      "timings": {
+        "encoder_load": 7.457,
+        "encode": 1.175,
+        "decoder_load": 7.789,
+        "decode_passes": [
+          0.525,
+          0.158
+        ]
+      },
+      "deterministic": true,
+      "intra_match": true
+    },
+    {
+      "codec": "dcvc",
+      "setting": 21,
+      "native_bytes": 20876,
+      "native_sha256": "1e3f40b5016293fe4986695d70dbdad2979ebd105c27c77422ea5838f04244dd",
+      "candidate_bytes": 21025,
+      "candidate_sha256": "df04ad91475df8e30d36bdec48005a560a0fefd850854c0bd57c97ce08da0df5",
+      "baseline_psbl_bytes": 20945,
+      "baseline_psbl_sha256": "e30d0d0288f43f6824feafae5a8075d0109f6f15f19a191ea69214a05dbd5ee6",
+      "point_json_sha256": "5e4ce302d37a024de27fff98ea032d266f65241a9ed43e94e0ecd32a3ca48db2",
+      "point_matches": true,
+      "hashes_match": true,
+      "decode_parity": true,
+      "render_parity": true,
+      "receiver_frames": 16,
+      "guard_off": false,
+      "arms": {
+        "baseline": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        },
+        "streak": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        }
+      },
+      "device": {
+        "name": "NVIDIA RTX A6000",
+        "capability": [
+          8,
+          6
+        ],
+        "extension": "sm80"
+      },
+      "timings": {
+        "encoder_load": 7.462,
+        "encode": 1.171,
+        "decoder_load": 7.796,
+        "decode_passes": [
+          0.52,
+          0.156
+        ]
+      },
+      "deterministic": true,
+      "intra_match": true
+    },
+    {
+      "codec": "dcvc",
+      "setting": 42,
+      "native_bytes": 46126,
+      "native_sha256": "a6632d68cfa35adf91c71d824bf3395c11471acfec19a04f20f8fbfc130d90cf",
+      "candidate_bytes": 46273,
+      "candidate_sha256": "ecadc36fa172df83df0c99ca2bfd2c5ab700e98d8b0fa98c8862d62631cb2161",
+      "baseline_psbl_bytes": 46195,
+      "baseline_psbl_sha256": "1dee90cc5e525bc9ef9a6b455102cf452f822788989b983f12cf5caaa0374be0",
+      "point_json_sha256": "e50d51fdfcce625d56902f14c47e0fb62794b7f438d8e1ca13784088152f8fd7",
+      "point_matches": true,
+      "hashes_match": true,
+      "decode_parity": true,
+      "render_parity": true,
+      "receiver_frames": 16,
+      "guard_off": false,
+      "arms": {
+        "baseline": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        },
+        "streak": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        }
+      },
+      "device": {
+        "name": "NVIDIA RTX A6000",
+        "capability": [
+          8,
+          6
+        ],
+        "extension": "sm80"
+      },
+      "timings": {
+        "encoder_load": 7.49,
+        "encode": 1.168,
+        "decoder_load": 7.866,
+        "decode_passes": [
+          0.524,
+          0.158
+        ]
+      },
+      "deterministic": true,
+      "intra_match": true
+    },
+    {
+      "codec": "svt",
+      "setting": 48,
+      "native_bytes": 57481,
+      "native_sha256": "589bc1eda7467ff7c038c444d531327dd300f21c637caa703025ad4996fbf610",
+      "candidate_bytes": 57625,
+      "candidate_sha256": "33e6278aaa1c15769bd7c16f637922c11fcfa3c4d0fa7e4a3e6f9a19cf1660fe",
+      "baseline_psbl_bytes": 57549,
+      "baseline_psbl_sha256": "28514f7c63cf4b1d4363f3ff79fc0f422c63f595bda88b0cb3264bfa12f4bf32",
+      "point_json_sha256": "b1616bd54cb6976d064103c6650e3c41a9bc9fe85c98fe22eeeb724ae812b89a",
+      "point_matches": true,
+      "hashes_match": true,
+      "decode_parity": true,
+      "render_parity": true,
+      "receiver_frames": 16,
+      "guard_off": false,
+      "arms": {
+        "baseline": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        },
+        "streak": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        }
+      }
+    },
+    {
+      "codec": "svt",
+      "setting": 55,
+      "native_bytes": 41028,
+      "native_sha256": "cd18309ada9ea15a8fa93f09633d39d11eba4d8165364ee0622570a09c59b265",
+      "candidate_bytes": 41173,
+      "candidate_sha256": "47ce6c1a8f41ab4825f3fba7ceffd772ab7ad73bb05fd0edb7d5f48e0111b8ba",
+      "baseline_psbl_bytes": 41096,
+      "baseline_psbl_sha256": "f1a1e3251e5b4ebaf057c378a09dfc7d9da70da63ada16aa03aa767faabf47b4",
+      "point_json_sha256": "0bf5990aaed9b58c28fe81cf90e7d9a7913be72012ec42409645a2e9712924ed",
+      "point_matches": true,
+      "hashes_match": true,
+      "decode_parity": true,
+      "render_parity": true,
+      "receiver_frames": 16,
+      "guard_off": false,
+      "arms": {
+        "baseline": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        },
+        "streak": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        }
+      }
+    },
+    {
+      "codec": "svt",
+      "setting": 62,
+      "native_bytes": 21683,
+      "native_sha256": "91a304e1df95d7a7b553615d3b120ae9c1a7f0767f524eedd4bc7af621916504",
+      "candidate_bytes": 21826,
+      "candidate_sha256": "be9f6bbb3784b77355a0069852cd1eb7dc333f2e5c17c5a29ddbcf7e79135411",
+      "baseline_psbl_bytes": 21751,
+      "baseline_psbl_sha256": "34e07025ccf0b0fb1b1bedc8457d75035f646e1a169c8741646c4075e6400214",
+      "point_json_sha256": "7e49845d940430d9ac3c38d557453de16ad3f229b5815449b468b456192672a1",
+      "point_matches": true,
+      "hashes_match": true,
+      "decode_parity": true,
+      "render_parity": true,
+      "receiver_frames": 16,
+      "guard_off": false,
+      "arms": {
+        "baseline": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        },
+        "streak": {
+          "metric_rows": 16,
+          "metric_fields_finite": true,
+          "wasb_rows": 16,
+          "balltrack_rows": 16
+        }
+      }
+    }
+  ]
+}

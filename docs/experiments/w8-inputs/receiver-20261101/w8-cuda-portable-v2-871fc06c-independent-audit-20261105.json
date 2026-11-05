@@ -1,0 +1,57 @@
+{
+  "campaign_pgid": 1161315,
+  "charge": {
+    "basis": "GPU rounded above creation-to-terminal-status interval and observed claim release; CPU charges whole authorized phase because complete external aggregate CPU was not measured",
+    "cpu_seconds": 360,
+    "gpu_seconds": 65,
+    "unused_original_reservation_cpu_seconds": 0,
+    "unused_original_reservation_gpu_seconds": 175
+  },
+  "claimed_gpu_status": false,
+  "creation_to_terminal_release_status_seconds": 64.40936756134033,
+  "generation_gate_passed": false,
+  "generic": {
+    "cpu_seconds": 3.886357,
+    "status": "passed tiny CUDA probe",
+    "stdout_sha256": "068d663e763a5d83355c09b8702c4d9313ccb365b759d25114360805cd168330",
+    "sum": 1048576.0,
+    "torch": "2.7.0+cu128",
+    "torch_cuda": "12.8",
+    "uuid_returned": "ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+    "wall_seconds": 4.693210526369512
+  },
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "host": "gpu6",
+  "independent_review": "read-only canonical status and bounded existing receipts; no protected file bodies read; no job rerun",
+  "isolated": {
+    "cpu_seconds": 2.81122,
+    "error": "legacy w8_input_job worker argv import tried to raise hard CPU limit from 60 to 650",
+    "status": "incomplete before isolation and CUDA",
+    "stdout_sha256": "1eda7c37120f939801ecf0b63cc375b5a275396cfef9152b56885e1bca6e3aa6",
+    "wall_seconds": 2.8823203463107347
+  },
+  "isolation_receipt": null,
+  "job": "20261105T000744Z-871fc06c",
+  "limitations": [
+    "Generic probe had no filesystem write confinement; actual recorded work was a tiny CUDA probe.",
+    "No protected content entered workers; supervisor hashed protected opaque archives that may contain weights.",
+    "Read-access Landlock policy does not establish write confinement.",
+    "No model deserialization, construction, inference, or generation qualification."
+  ],
+  "measurement_complete": false,
+  "observed_creation_epoch": 1793837287.515239,
+  "observed_terminal_release_status_epoch": 1793837351.9246066,
+  "original_failure_diagnosed": false,
+  "protected_identity_receipt_sha256": "aa07461ea2216a633b08d49dc959280326a6d63e7b92198d6d378143d1ad3bca",
+  "recorded_pid_and_group_absent": true,
+  "revision": "39a0af696dadc00a01b493c4c951311ebb18af93",
+  "schema": 1,
+  "selected_gpu_compute_processes": [],
+  "smoke_command_seconds": 9.722461223602295,
+  "source_sha256": "de9b1cb25ed238ba7c4dca4fa738c793ec6bd1fd1816da1cb14ac94eed1bc7cf",
+  "spec_sha256": "ba951e6ac9a582147305720a80a4e181aca80482f3af7be0ac7d583fa222f1a6",
+  "state": "failed",
+  "supervisor_pid": 1161308,
+  "timing_contaminated": false,
+  "validator_error": "torch UUID omitted NVIDIA GPU- prefix; physical UUID comparison rejected the generic arm"
+}

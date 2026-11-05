@@ -1,0 +1,12 @@
+import concurrent.futures,json,shlex,subprocess,time,resource
+program='''import pathlib,json,hashlib,os\npaths={'source':'/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf','script':'/var/tmp/emanuele-pointstream-gvcrt-code-d0e32bf/test_video_gvcrt_1088.py','checkpoint_i':'/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_I.pt','checkpoint_p':'/home/itec/emanuele/pointstream-data/third_party/gvcrt-qualified-20261001/downloads/GVC-RT_P.pt','python':'/home/itec/emanuele/.conda/envs/pointstream-dcvc/bin/python','entropy':'/home/itec/emanuele/.conda/envs/pointstream-dcvc/lib/python3.12/site-packages/MLCodec_extensions_cpp.cpython-312-x86_64-linux-gnu.so','frames_dir':'/home/itec/emanuele/pointstream-data/audits/gvcrt-smoke16-b164141-gpu3-recovery2-20261002'}\nout={}\nfor k,v in paths.items():\n p=pathlib.Path(v)\n try:\n  s=p.stat(); x={'exists':True,'size':s.st_size,'resolved':str(p.resolve())}\n  if k in ('script','entropy') and s.st_size<10000000:x['sha256']=hashlib.sha256(p.read_bytes()).hexdigest()\n  out[k]=x\n except OSError as e:out[k]={'exists':False,'error':str(e)}\nprint(json.dumps(out))'''
+def check(h):
+ start=time.monotonic()
+ try:
+  p=subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=6',h,'python3 -c '+shlex.quote(program)],capture_output=True,text=True,timeout=20)
+  return h,{'status':p.returncode,'elapsed':time.monotonic()-start,'data':json.loads(p.stdout) if p.returncode==0 else None,'error':p.stderr[:500]}
+ except subprocess.TimeoutExpired:return h,{'status':'timeout','elapsed':time.monotonic()-start}
+b=resource.getrusage(resource.RUSAGE_CHILDREN)
+with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:r=dict(pool.map(check,['gpu1','gpu2','gpu3','gpu4','gpu5','gpu6']))
+a=resource.getrusage(resource.RUSAGE_CHILDREN)
+print(json.dumps({'hosts':r,'local_ssh_child_cpu_seconds':a.ru_utime+a.ru_stime-b.ru_utime-b.ru_stime},indent=2))

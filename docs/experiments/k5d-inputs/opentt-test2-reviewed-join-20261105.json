@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "clip": "test_2",
+  "video_sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43",
+  "ball_markup_sha256": "db79a74c3fc2299d84668b7bcc98e4a925ccdee839e6ca00a28c16bc91d85c74",
+  "annotation_to_zero_based_offset": 0,
+  "reviewer": "root Codex independent full-resolution visual review,2026-11-05",
+  "method": "Examined all three original full-resolution PNGs and labeled contact sheet. Visible moving white ball centers agree with zero-based labels at1085:(189,539),1086:(154,536),1087:(117,534);35/37pixel displacement distinguishes a one-frame offset. Exact120Hz PTS and sequential/seek rawRGB parity verified by retained validator.",
+  "evidence_sha256": "7fc2cdb16ec55aaa1feaeff64dca04006cd5c9fc8afd98b6da1f62245a9f3ad9",
+  "source_job_id": "20261105T001308Z-4ae20579",
+  "source_archive_sha256": "91d7027a20b2e6b95788256f0daf9f2c3054fcaec31bfbaa11e2bcd1df0df338",
+  "frame_png_sha256": {
+    "1085": "14dd4b2e14032e20c693714c5e4722f721c81ac36316479251e04d0c6ff070d5",
+    "1086": "76187029eb10aeca3006d47a1f445e808a487b104df1d1540bb73c12ef3b9007",
+    "1087": "f57d0b0841df9cd8de9aa075cc78388417dc2f72ea24abc7ae29938ed5ddf444"
+  },
+  "limitations": [
+    "Empirical join witness for test2 selected context only; not author documentation of index origin or other6videos",
+    "Fleet budget_exhausted after validatedsmoke; no full no-work marker",
+    "Smoke command262.773s exceeded210s requested stage cap; retain cost failure and raw artifacts",
+    "No judge/model/coding/negative-label accuracy qualification;149unknown and6explicitabsent remain unchanged"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "job_id": "20261105T005745Z-d72ef178",
+  "source_revision": "ae7bc1c89532d589feac4dfd2379fbea5dee3dfb",
+  "source_sha256": "7d38b2bd54a7a712ac5cbf653fab6ce164373bafba5ea58394cc868aa4f11469",
+  "host": "gpu2", "gpu": "NVIDIA RTX A6000", "status": "failed", "stage": "smoke",
+  "error": "ValueError: metric frame coverage mismatch",
+  "cause": "Unscored prepare report passed to scored-report encoder validator; fleet validator and checkpoint receipt not reached.",
+  "command_seconds": 169.26149249076843, "child_cpu_seconds": 168.375637,
+  "claim_released": true, "observed_pids_absent": [713749, 713773],
+  "sha256": {
+    "smoke/command.log": "247474be5f61061a7568fd872c89be029d92bd86dde8788755188a18e93be76f",
+    "smoke/execution.json": "89278dc949bab4017dcb90b861e7cbea2e8eae3df60144fce673d97e1eb4c65f",
+    "smoke/dispatch.json": "3717785a15418b9660325a131be7871f91b5c94beeb031321381c1b2e4295876",
+    "smoke/staging.json": "d8f459dc7c1bd98528ab240057ad36428fbf4b172d59e46fa3236d4e5c992ab4",
+    "run/claim.json": "c854a869513f1d627f5c77e7f30d1d93f51e575e4bbc2e16f683ea2f4d53e58b",
+    "run/status.json": "96da7f56fa458a96a04f7a5eb64be0b7049e7f627228b663a8dd87a15f13efd4"
+  },
+  "interpretation": "Mechanical failure; parity and cost not assessed. Full 48 frames not admitted."
+}

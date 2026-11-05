@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "status": "prospective metadata-only witness selection; no frame decoded",
+  "source_selection_sha256": "b104b87aefae92e3a3ea7766bc51e3b34f6c3c7a1f071bbbbca7eeb218984877",
+  "prior_candidate_center_ids": {"test_1":15459,"test_2":1077,"test_3":7593,"test_4":31981,"test_5":5524,"test_6":1330,"test_7":6899},
+  "prior_candidate_diagnosis": "Largest adjacent in-bounds displacement alone selected obvious jumps: test_3 1154.0 pixels and test_7 approximately 244 pixels in one 120 fps frame. These were found from metadata, not pixels or detector results; prior rule was not used to decode frames.",
+  "witness_rule_version": "visible-continuous-triplet-v2",
+  "witness_rule": "Within each previously frozen 240-frame context, take every consecutive triplet t-1,t,t+1 with three fully visible in-bounds coordinates. Both Euclidean displacements must be in [5,128] source pixels, cosine of their displacement vectors must be >=0.9, and their speed ratio must be in [0.5,2]. Select the t maximizing the smaller of the two displacements; tie break by smaller t. If no triplet qualifies, stop as ambiguous. Do not replace after inspecting any video pixels or judge outcomes.",
+  "scope": "The motion constraints select only a useful manual alignment witness, not benchmark frames or scientific exclusions. Preserve all 589 visible labels and all other labels exactly as in source selection.",
+  "review": "No source-judge qualification until independently reviewed label-to-frame origin evidence is present. Decode exact t-1,t,t+1 sequentially from the first source frame and independently fast-seek; require identical raw RGB hashes and the same expected exact rational 120 Hz presentation timestamps against the first source PTS. Export original frames, a labeled contact sheet, media hash and PTS evidence. Out-of-range, frame count, VFR, ambiguous origin, non-identical seek or unclear human review stops the source route. Do not choose offset from detection scores.",
+  "budget": "One CPU-only pilot video first. No model or GPU; total later seven-video work only if a complete staging/hash/probe/decode/publication forecast fits 300 workload CPU-s. This contract does not authorize execution by itself."
+}
