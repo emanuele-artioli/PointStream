@@ -62,6 +62,7 @@ def parent():
     os.sched_setaffinity(0, {cpus[1]})
     if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or Path.cwd().resolve() != SOURCE:
         raise ValueError('proof must use staged cwd and hidden GPU')
+    sys.path[0] = str(SOURCE)
     import torch
     from experiments.tennis import w8_clock_profile as profile
     from experiments.tennis import w8_strict_host_cost_job as job
