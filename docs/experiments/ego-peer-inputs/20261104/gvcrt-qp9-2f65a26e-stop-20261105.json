@@ -1,0 +1,108 @@
+{
+  "job": "20261105T231706Z-2f65a26e",
+  "status": "contended",
+  "qp": 9,
+  "revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+  "snapshot_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "source_identity": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+  "normalized_spec_sha256": "6a1f70d5ff0d36eed5bede73881c38b0cb71f119ef2dbc35d7e2cbcc504c219a",
+  "canonical_status": {
+    "job_id": "20261105T231706Z-2f65a26e",
+    "created": 1793920639.7146888,
+    "status": "contended",
+    "updated": 1793921567.1574695,
+    "host_alias": "gpu5",
+    "gpu": {
+      "index": 0,
+      "uuid": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "memory_used_mib": 1,
+      "memory_total_mib": 49140,
+      "memory_free_mib": 48645,
+      "utilization_pct": 0,
+      "compute_processes": [],
+      "pointstream_claimed": false,
+      "pointstream_shared_claims": []
+    },
+    "gpu_sharing": {
+      "mode": "exclusive"
+    },
+    "supervisor_pid": 3754169,
+    "admission_retry": "GPU claim failed: Device GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162 on gpu5.itec.aau.at is already claimed",
+    "remote_status": {
+      "status": "contended",
+      "started": 1793921507.1202621,
+      "last_progress": 1793921527.5877721,
+      "emitted": [
+        "terminal:contended",
+        "contention:1793921527.5877721"
+      ],
+      "gpu_sharing": {
+        "mode": "exclusive"
+      },
+      "pid": 3754185,
+      "proc_start_time": 1793921507.16,
+      "process_group_id": 3754185,
+      "contention": [
+        {
+          "detected": 1793921527.5877721,
+          "action": "stop",
+          "foreign_gpu_pids": [
+            3754420
+          ],
+          "ended": 1793921527.5877721
+        }
+      ],
+      "timing_contaminated": true,
+      "foreign_gpu_pids": [
+        3754420
+      ],
+      "error": "A process outside this job began using its claimed GPU",
+      "ended": 1793921527.5877721,
+      "progress": {
+        "stage": "smoke",
+        "completed": 0,
+        "updated": 1793921519.064529,
+        "decision": null
+      }
+    },
+    "resume_declined": "no declared resume attempts remain (0 declared)",
+    "directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T231706Z-2f65a26e",
+    "gate": null,
+    "campaign_error": null
+  },
+  "probe_child": {
+    "argv": [
+      "/usr/bin/unshare",
+      "--user",
+      "--map-root-user",
+      "--net",
+      "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/python3.12",
+      "/local/users/emanuele/pointstream/scratch/20261105T231706Z-2f65a26e-smoke/gvcrt-peer/minimal/gvcrt_receiver_worker_w8leaves.py",
+      "probe",
+      "--config",
+      "/local/users/emanuele/pointstream/scratch/20261105T231706Z-2f65a26e-smoke/gvcrt-peer/probe-config.json",
+      "--config-sha256",
+      "e6b3ddaf980f4d40cee405e4d5a2289acc79a2232529859c2813888e932e054f"
+    ],
+    "cpu_seconds": 2.027392999999999,
+    "ended_monotonic": 6601139.716293195,
+    "interrupted": true,
+    "name": "isolated-probe",
+    "pid": 3754699,
+    "started_monotonic": 6601137.477728689,
+    "status": -15,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "timed_out": false,
+    "wall_seconds": 2.238564506173134
+  },
+  "stop": "Foreign GPU process detected during isolated CUDA probe; supervisor stopped by its fixed contention policy. No completed smoke, full native encode, quality or rate result; no retry.",
+  "teardown": "After terminal, supervisor 3754169, campaign process group 3754185, isolated-probe PID 3754699 and observed children/threads absent; gpu5 CPU allocations empty; exclusive GPU claim and lock absent, shared directory empty. No foreign process was signaled.",
+  "events": [
+    "2a6b18444f9657b8a09ad383b3266879",
+    "acbdc151d2cd54b0933756acf0f09af2"
+  ],
+  "raw_bundle_sha256": "837e281cfe855f3338a08b53d7d8ac886d2a68d04dc5af6e39376e012c2a00cd",
+  "context": "QP0 175.815 kb/s and QP3 338.550 kb/s native are separate 16-frame results; no QP9 rate or complete curve. CPU/GPU costs await root accounting."
+}
