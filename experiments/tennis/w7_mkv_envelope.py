@@ -7,7 +7,11 @@ the approved W7 receipts. Missing points prevent a complete study envelope.
 from __future__ import annotations
 
 import hashlib
+import io
+import json
 import math
+import tarfile
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -16,6 +20,59 @@ from experiments.background import g5
 from experiments.tennis import w1_roi, w7_analysis
 
 METRICS = ('full_lpips', 'foreground_lpips', 'full_dists', 'foreground_dists')
+
+
+OLD_REVIEW_SHA = '581b015e88bbb5d5ce6a5900cf8e3ac8ecc32d649d7f9887ee29893b8d19a18b'
+CONTROL_REVIEW_SHA = '7a6ff1d5ce5d540b5d31825147cc5c198c66149cdf11741fb56786cfd186d7b3'
+
+
+def _file_sha(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            h.update(block)
+    return h.hexdigest()
+
+
+def load_historical(old_path: Path, control_path: Path, archives: dict[str, Path]) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
+    """Authenticate the two root-reviewed receipts and all nine old score archives."""
+    if _file_sha(old_path) != OLD_REVIEW_SHA or _file_sha(control_path) != CONTROL_REVIEW_SHA:
+        raise ValueError('historical review receipt SHA mismatch')
+    old, controls = json.loads(old_path.read_text()), json.loads(control_path.read_text())
+    if old.get('approved_historical_reuse') is not True or controls.get('approved_historical_control_reuse') is not True:
+        raise ValueError('historical reuse not approved')
+    jobs = old['historical_jobs']
+    if len(jobs) != 9 or set(archives) != set(jobs):
+        raise ValueError('exactly nine historical producer archives required')
+    loaded = {}
+    for job, path in archives.items():
+        if _file_sha(path) != jobs[job]['score_archive_sha256']:
+            raise ValueError('historical score archive SHA mismatch: ' + job)
+        with tarfile.open(path) as tar:
+            members = [m for m in tar if m.name == 'publish/scores.npz' and m.isfile()]
+            if len(members) != 1 or members[0].size > 64_000_000:
+                raise ValueError('historical scores member missing or ambiguous')
+            stream = tar.extractfile(members[0])
+            if stream is None:
+                raise ValueError('historical scores member unreadable')
+            with np.load(io.BytesIO(stream.read()), allow_pickle=False) as scores:
+                if scores['ticks'].tolist() != w1_roi.TICKS:
+                    raise ValueError('historical tick set differs')
+                loaded[job] = {name: scores[name].copy() for name in scores.files if name != 'ticks'}
+    rows = []
+    for role, receipt in (('rerate', old), ('control', controls)):
+        for record in receipt['rows']:
+            score = loaded[record['score_job']][record['name']]
+            if score_digest(score) != record['score_array_sha256']:
+                raise ValueError('historical score array SHA mismatch')
+            rows.append({'role': role, 'window': record['window'], 'name': record['name'],
+                         'original_ivf_sha256': record.get('original_ivf_sha256', record.get('stream_sha256')),
+                         'native_yuv_sha256': record.get('native_yuv_sha256', record.get('historical_native_yuv_sha256')),
+                         'mkv_sha256': record['mkv_sha256'], 'mkv_bytes': record['mkv_bytes'],
+                         'fps': record['fps'], 'values': score})
+    if len(rows) != 71:
+        raise ValueError('historical coverage differs')
+    return rows, old, controls
 
 
 def score_digest(values: Any) -> str:
