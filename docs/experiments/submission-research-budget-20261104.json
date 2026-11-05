@@ -756,6 +756,15 @@
       "gpu_seconds": 0,
       "cpu_seconds": 500,
       "basis": "Entire500CPU code-check reservation conservatively charged; frozenf33d2246 configuredRuff/mypy531files+pytest1861pass37skip all3exit0,167.939wall/243.068waitedchildren+supervisorCPU. SeparatemachineguardCPUunmetered/liveprimaryparserdiscardedsamples; finalrunnerprintfailedAFTERvalidreceiptwritten, checksunaffected. Notresearch/modelqualification."
+    },
+    {
+      "phase": "w8-clock-cost-fresh-readiness-20261105",
+      "parent_phase": "w8-clock-qualified-host-cost-requalification-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "release_stage": "research-first24/28",
+      "basis": "Entire100CPU external allowance conservatively charged for freshallhostdoctor/inspect/status twice/cache/source/spec/deadline checks. DistributedaggregateCPUunmetered; noGPU/modelsubmission yet. New100CPUpostrunauditreservation addedprospectivelywithinprogramme/W8caps."
     }
   ],
   "reservations": [
@@ -1250,8 +1259,8 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 700,
       "cpu_seconds": 940,
-      "status": "SOURCE/CPUQUALIFIED butcapacityBLOCKED:e0251a8a no qualifyingexclusiveAda, noGPUrequestqueued. ActualsourceDD/a519; 60CPUproofcharged; future940CPU700GPU cumulative1000CPU=60+930configured(710worker/validator+100external+120admin1.5margin)+10rootcontingency. Spec930bd9eaadc provisional13:58UTC mustrefreshaftercurrenthost/doctor/cache/source/spec/costreview. ONE1\u21923only, no30step/automaticretry.",
-      "authorized_cumulative_cpu_seconds": 1000
+      "status": "RootreleasesONEactual1\u21923costattemptafterfresh22:25UTC gpu5Adaexclusive/all1627canonicaljobsinactive/doctor/cache/CPU249/sourceDDa519review; updateddeadline22:51:39UTC/spec1d75740e. 60CPUpriorproof+100CPUreadinesscharged; future940=830remainingconfigured+10contingency+100newpostaudit. Phase1100CPU700GPUinclusive. Noretry,no30stepautomatic.",
+      "authorized_cumulative_cpu_seconds": 1100
     },
     {
       "phase": "final-configured-checks-f33d2246-20261105",
@@ -1260,6 +1269,14 @@
       "gpu_seconds": 0,
       "cpu_seconds": 500,
       "status": "closed500CPU0GPUcharged, all3configuredcheckcommandspass; runnerpost-summaryformattingerrorretainedinreceiptaddendum, guardterminated"
+    },
+    {
+      "phase": "gvcrt-qp-endpoint-sensitivity-20261105",
+      "workstream": "ego_peer_oracles",
+      "release_stage": "research-first24/28",
+      "gpu_seconds": 1800,
+      "cpu_seconds": 2200,
+      "status": "ProspectiveaggregateenvelopeONLY; GPUunreleased. Rootreviewedbf08575doptinQP0/9(default3unchanged)propagation; oneCPUcheckpointcoverageproofmax100CPUinclusive (20CPUmetadatareadinesspermitted, actualTorch/weightproofrequiresfrozenprotocolreview). Bothendpoints4\u219216smokes/fullonlyafterproof/source/cost/hostgates,1.5marginunchanged; noBD/corpus/absentclaim; allpoints/failuresretained."
     }
   ],
   "jobs": [
@@ -1943,6 +1960,18 @@
       "gpu_ceiling": 0,
       "inclusive_cpu_ceiling": 180,
       "deadline": "2026-11-05T13:24:37Z"
+    },
+    {
+      "job_id": "20261105T222814Z-8eeacee2",
+      "phase": "w8-clock-qualified-host-cost-requalification-20261105",
+      "state": "submitted; canonical600swait active99047; inspectexactstatusbeforerecovery",
+      "spec_sha256": "1d75740eedb36e4cb151163c5484d9fb3060ad9df3736b61994333fec889f50a",
+      "snapshot_sha256": "a519ad56ee2df01d4b7951b882bdfb20cc458874538a66defc122070dd28cfc4",
+      "revision": "dd519fd31878d85715994f62b5fa1bcaa53c8687",
+      "deadline": "2026-11-05T22:51:39Z",
+      "gpu_ceiling": 700,
+      "inclusive_cpu_ceiling": 1100,
+      "scope": "One1stepactualmodelsmoke;3stepcostonlyifunchanged1.5gatefits. No30stepgeneration/qualityautomatic."
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -1954,23 +1983,22 @@
     "CompressedtransferfreshCPUallowances20261105",
     "Rootprospective240CPUshared\u2192SVT for separatemanifest-cadenceprofileafterall75framingoraclepassed; old50fps9240failureclosed, no changedinput/quality/gate. SVT3560/shared4540CPUglobal86400unchanged, futurequality1670CPUretained.",
     "ExplicitgzipSVT60CPUtransfer20261105",
-    "Root20261105userapprovedpending24GPUh/28CPUh (+14400/+14400seconds), assigned increase toball:64800GPU72000CPU. Firstnewtranche9000GPU10800CPU requiresperjobrelease; nofull30automaticadmission. Manuscripteditspauseduntilworthwhileresearchdecisionsresolved."
+    "Root20261105userapprovedpending24GPUh/28CPUh (+14400/+14400seconds), assigned increase toball:64800GPU72000CPU. Firstnewtranche9000GPU10800CPU requiresperjobrelease; nofull30automaticadmission. Manuscripteditspauseduntilworthwhileresearchdecisionsresolved.",
+    "Root20261105prospectivelyraisesW8clockcostphaseCPU1000\u21921100insideexistingW8/programmeCPUcap, specifically100postrunauditafterfreshreadinessconsumed100external. Existingnumericcaps/source/scientificgatesunchanged; configured930includesalreadycharged100readiness, futureconfigured830. Futurephase940CPU700GPU, cumulative160chargedCPU+940=1100."
   ],
   "monitoring": {
-    "mode": "one canonical bounded wait",
-    "state": "allrecordedjobsterminalaudited; NOactive/queuedmodeljob; costpilotcapacityblocked; source/specpreservedforfreshreview",
+    "mode": "onecanonicalboundedwait",
+    "state": "oneW8costjobsubmitted",
     "jobs": [
-      "20261105T125523Z-500ccc2f"
+      "20261105T222814Z-8eeacee2"
     ],
     "max_seconds": 600,
-    "started_utc": "2026-11-05T12:57:51.508889+00:00",
-    "deadline_utc": "2026-11-05T13:07:51.508889+00:00",
+    "local_process_handle": 99047,
+    "result": "/private/tmp/w8-clock-cost-wait-20261105.json",
+    "deadline_utc": "2026-11-05T22:51:39Z",
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": true,
-    "result": "/private/tmp/pointstream-w8-shared-cuda-oracle-wait-20261105.json",
-    "local_process_handle": 6605,
-    "events_pending_ack": []
+    "completed": false
   },
   "approval_history": [
     {
