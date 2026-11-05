@@ -154,8 +154,13 @@ def fidelity_gate(path: Path, digest: str, archive_sha: str, *, purpose: str = "
     return receipt
 
 
-def validate(out: Path) -> dict[str, Any]:
+def validate(out: Path, *, prepared: bool = False) -> dict[str, Any]:
     report = json.loads((out / "pilot.json").read_text())
+    if prepared:
+        if report.get("checkpoint_prepare") is not True or report["full_metrics"] is not False:
+            raise ValueError("invalid prepared report marker or metrics status")
+    elif "checkpoint_prepare" in report:
+        raise ValueError("prepared report requires prepared validation")
     qualification = json.loads((out / "source-qualification.json").read_text())
     oracle.validate_report(qualification)
     if report["frames"] != qualification["frames"] or report["clip"] != qualification["clip"]:
@@ -215,6 +220,11 @@ def validate(out: Path) -> dict[str, Any]:
                 or baseline["zero_ball_wire_sha256"] != oracle.sha(zero_path)
                 or not math.isclose(baseline["zero_ball_wire_kbps"], zero_path.stat().st_size * 8 / (n / float(fps)) / 1000, rel_tol=1e-12)):
             raise ValueError("native or zero-ball wire accounting mismatch")
+        if prepared:
+            if (any(p[arm]["metrics"] != [] or p[arm]["judges"] != {} for arm in ("baseline", "streak"))
+                    or p["streak"].get("reuse", object()) is not None):
+                raise ValueError("prepared report contains partial scores")
+            continue
         for arm in ("baseline", "streak"):
             item = p[arm]
             if len(item["metrics"]) != n or [r["frame"] for r in item["metrics"]] != list(range(n)):
@@ -408,8 +418,8 @@ def run(args: argparse.Namespace) -> None:
         results.append(result)
         (directory / "point.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
     output = {"frames": n, "clip": args.clip, "size": [w, h], "fps": str(fps), "duration_seconds": n / float(fps),
-              "full_metrics": nets is not None,
-              "scope": ("16/48-frame bounded cost pilot; filesystem denial not established" if cost_pilot else
+              "full_metrics": nets is not None and not checkpoint_prepare,
+              "scope": ("unscored checkpoint preparation" if checkpoint_prepare else "16/48-frame bounded cost pilot; filesystem denial not established" if cost_pilot else
                         "feasibility only" if nets is None else "six-point calibration; filesystem denial not established"),
               "conversion": {"command": conversion, "yuv_sha256": measure("source.hash.yuv", lambda: oracle.sha(yuv)),
                              "floor_psnr": measure("source.conversion_floor", lambda: pooled_psnr(source, converted))},
@@ -429,7 +439,7 @@ def run(args: argparse.Namespace) -> None:
     if checkpoint_prepare:
         output["checkpoint_prepare"] = True
     (args.output / "pilot.json").write_text(json.dumps(output, indent=2, allow_nan=False) + "\n")
-    validate(args.output)
+    validate(args.output, prepared=checkpoint_prepare)
 
 
 def main() -> int:

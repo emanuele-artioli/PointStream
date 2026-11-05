@@ -39,119 +39,153 @@
       "scope": "inclusive administrative/pre-admission CPU allocation, including earlier bounded metadata/engineering preparation; no model or new native inference",
       "gpu_seconds": 0,
       "cpu_seconds": 300,
-      "basis": "conservative allocation, not complete measured aggregate administrative telemetry"
+      "basis": "conservative allocation, not complete measured aggregate administrative telemetry",
+      "release_stage": "initial"
     },
     {
       "phase": "w7-remux-transport-20261104",
       "workstream": "svt_gaps",
       "cpu_seconds": 330,
       "gpu_seconds": 0,
-      "basis": "entire inclusive phase ceiling, conservative; native command0.74555s, oneCPU supervisor wall25.47s, external preparation/audit bounded80s; administrative complete aggregate unmeasured"
+      "basis": "entire inclusive phase ceiling, conservative; native command0.74555s, oneCPU supervisor wall25.47s, external preparation/audit bounded80s; administrative complete aggregate unmeasured",
+      "release_stage": "initial"
     },
     {
       "phase": "k5d-calibration-20261104",
       "workstream": "ball",
       "gpu_seconds": 450,
       "cpu_seconds": 650,
-      "basis": "conservative inclusive envelope above259.4s oneCPU supervisor lifecycle and external admission/identity/audit; stoppedforeignPID358756; parent349596andforeignPIDgone atcheck"
+      "basis": "conservative inclusive envelope above259.4s oneCPU supervisor lifecycle and external admission/identity/audit; stoppedforeignPID358756; parent349596andforeignPIDgone atcheck",
+      "release_stage": "initial"
     },
     {
       "phase": "source-rights-metadata-20261104",
       "workstream": "shared",
       "gpu_seconds": 0,
       "cpu_seconds": 60,
-      "basis": "bounded read-only metadata inventory ceiling; no video/model decode, data changes or contacts"
+      "basis": "bounded read-only metadata inventory ceiling; no video/model decode, data changes or contacts",
+      "release_stage": "initial"
     },
     {
       "phase": "ego-mask-fixed-oracle-20261104",
       "workstream": "ego_peer_oracles",
       "gpu_seconds": 0,
       "cpu_seconds": 150,
-      "basis": "entire bounded ceiling covers0.725CPU oracle+0.052audit+0.153localSSH+0.519envmetadata plus<=60remoteuninstrumentedstat/read reserve; no model/native decoding"
+      "basis": "entire bounded ceiling covers0.725CPU oracle+0.052audit+0.153localSSH+0.519envmetadata plus<=60remoteuninstrumentedstat/read reserve; no model/native decoding",
+      "release_stage": "initial"
     },
     {
       "phase": "partial-and-opentt-metadata-20261104",
       "workstream": "shared",
       "gpu_seconds": 0,
       "cpu_seconds": 90,
-      "basis": "conservative <=30CPU partialterminalaudit + <=60CPU OpenTTmetadata selection; no native/model/frame inference"
+      "basis": "conservative <=30CPU partialterminalaudit + <=60CPU OpenTTmetadata selection; no native/model/frame inference",
+      "release_stage": "initial"
     },
     {
       "phase": "k5d-calibration-replacement-20261104",
       "workstream": "ball",
       "gpu_seconds": 450,
       "cpu_seconds": 650,
-      "basis": "uncontaminated complete16smoke;188costgatefailed;370.388s lifecycle plusexternal envelope"
+      "basis": "uncontaminated complete16smoke;188costgatefailed;370.388s lifecycle plusexternal envelope",
+      "release_stage": "initial"
     },
     {
       "phase": "w6-literal-control-20261104",
       "workstream": "w6",
       "gpu_seconds": 529,
       "cpu_seconds": 829,
-      "basis": "independentauditexact239pairs; release-inclusive528.694s upperobservation plus300CPU external; aggregateCPUunmeasured"
+      "basis": "independentauditexact239pairs; release-inclusive528.694s upperobservation plus300CPU external; aggregateCPUunmeasured",
+      "release_stage": "initial"
     },
     {
       "phase": "w8-cuda-diagnostic-20261104",
       "workstream": "w8",
       "gpu_seconds": 0,
       "cpu_seconds": 60,
-      "basis": "expired unadmitted; no CUDA/GPU/model execution; conservative preparation CPU ceiling"
+      "basis": "expired unadmitted; no CUDA/GPU/model execution; conservative preparation CPU ceiling",
+      "release_stage": "initial"
     },
     {
       "phase": "gvcrt-entropy-interface-20261104",
       "workstream": "ego_peer_oracles",
       "gpu_seconds": 0,
       "cpu_seconds": 142,
-      "basis": "complete CPU-only native roundtrip;82s lifecycle upper bound plus60s external; release verified"
+      "basis": "complete CPU-only native roundtrip;82s lifecycle upper bound plus60s external; release verified",
+      "release_stage": "initial"
     },
     {
       "phase": "w8-portable-v2-20261105",
       "workstream": "w8",
       "gpu_seconds": 65,
       "cpu_seconds": 360,
-      "basis": "65s creation-to-terminal-update release upperbound; entire360CPU phase conservativelycharged incl inspection; tinygenericCUDApass, isolatedbootstrapandUUIDmachineryfail beforeisolationCUDA"
+      "basis": "65s creation-to-terminal-update release upperbound; entire360CPU phase conservativelycharged incl inspection; tinygenericCUDApass, isolatedbootstrapandUUIDmachineryfail beforeisolationCUDA",
+      "release_stage": "initial"
     },
     {
       "phase": "w6-smoothing-20261104",
       "workstream": "w6",
       "gpu_seconds": 303,
       "cpu_seconds": 1500,
-      "basis": "303s entire lifecycle releaseupperbound; full1500CPU ceiling conservatively charged (audit15.537CPU withinreserved180); all239pairs/80ticksaudited"
+      "basis": "303s entire lifecycle releaseupperbound; full1500CPU ceiling conservatively charged (audit15.537CPU withinreserved180); all239pairs/80ticksaudited",
+      "release_stage": "initial"
     },
     {
       "phase": "k5d-16-48-costpilot-20261104",
       "workstream": "ball",
       "gpu_seconds": 1800,
       "cpu_seconds": 2100,
-      "basis": "full authorized phase charged conservatively; independent receipt exact16 checks and full48 retained results; measured lifecycle594.63s, aggregate external CPU unmeasured"
+      "basis": "full authorized phase charged conservatively; independent receipt exact16 checks and full48 retained results; measured lifecycle594.63s, aggregate external CPU unmeasured",
+      "release_stage": "initial"
     },
     {
       "phase": "w8-portable-v2-repair1-20261105",
       "workstream": "w8",
       "gpu_seconds": 76,
       "cpu_seconds": 360,
-      "basis": "75.312s release-inclusive upperbound rounded76GPU; full360CPU conservativelycharged; processes/PGID independentlyabsent; originalgatefailed, offlinepairedread-isolationaudit records CUDAerror2"
+      "basis": "75.312s release-inclusive upperbound rounded76GPU; full360CPU conservativelycharged; processes/PGID independentlyabsent; originalgatefailed, offlinepairedread-isolationaudit records CUDAerror2",
+      "release_stage": "initial"
     },
     {
       "phase": "opentt-frame-join-witness-20261104",
       "workstream": "ball",
       "gpu_seconds": 0,
       "cpu_seconds": 300,
-      "basis": "entire300CPU charged; CPUwitnesssmoke262.773s (above210target), validatorpassed butcampaignbudgetexhausted before no-workfullmarker; images retained/manualjoinreview no model"
+      "basis": "entire300CPU charged; CPUwitnesssmoke262.773s (above210target), validatorpassed butcampaignbudgetexhausted before no-workfullmarker; images retained/manualjoinreview no model",
+      "release_stage": "initial"
     },
     {
       "phase": "gvcrt-native4-16-20261105",
       "workstream": "ego_peer_oracles",
       "gpu_seconds": 900,
       "cpu_seconds": 1200,
-      "basis": "full phase ceiling conservatively charged; no model/encode started; isolatedCUDAerror2 and genericcontrolpass, lifecycle60.677s; audit overhead unmeasured"
+      "basis": "full phase ceiling conservatively charged; no model/encode started; isolatedCUDAerror2 and genericcontrolpass, lifecycle60.677s; audit overhead unmeasured",
+      "release_stage": "initial"
     },
     {
       "phase": "opentt-test2-source-20261105",
       "workstream": "ball",
       "gpu_seconds": 240,
       "cpu_seconds": 360,
-      "basis": "Entirephase ceiling conservatively charged; actualmechanicalcompletion0/85visible0/6false149unknown; fullreport/audit andsourcewitnesschecked, externalaggregateunmeasured"
+      "basis": "Entirephase ceiling conservatively charged; actualmechanicalcompletion0/85visible0/6false149unknown; fullreport/audit andsourcewitnesschecked, externalaggregateunmeasured",
+      "release_stage": "initial"
+    },
+    {
+      "phase": "w8-factorial-cuda-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 400,
+      "cpu_seconds": 600,
+      "basis": "entirephaseconservativelycharged; 4completeworkermeasurements independentlyaudited; fleetvalidatorfailedremovedscratch, no originalgatepass; lifecycle96.307s",
+      "release_stage": "initial"
+    },
+    {
+      "phase": "k5d-checkpoint16-48-equivalence-20261105",
+      "subphase": "prepare-failed1",
+      "release_stage": "larger stage2",
+      "workstream": "ball",
+      "gpu_seconds": 700,
+      "cpu_seconds": 900,
+      "basis": "entire700GPU/900CPUpreparephase conservativelycharged; source/packetwork completed butscored-validatorcalledonunscoredreport;169.2615scommand; no16controlor48promotion"
     }
   ],
   "reservations": [
@@ -299,7 +333,7 @@
       "gpu_seconds": 400,
       "cpu_seconds": 600,
       "release_stage": "initial",
-      "status": "prospective fourcells namespacebundle\u00d7sameLandlockpolicy; no model/decoder/inference"
+      "status": "closed; full400GPU600CPUcharged; independent4cellobservation only"
     },
     {
       "phase": "k5d-checkpoint16-48-equivalence-20261105",
@@ -307,7 +341,17 @@
       "gpu_seconds": 3400,
       "cpu_seconds": 4350,
       "release_stage": "larger stage2",
-      "status": "prospective prepare700/900 +6score450/550 +CPUassemble150; rootreview/specfreeze beforedispatch; nofull30admission"
+      "status": "prospectively amended: active700/900repair1 +6score450/550 +CPUassemble150; originalfailed700/900chargedseparately; maximum2repairs",
+      "authorized_cumulative_gpu_seconds": 4100,
+      "authorized_cumulative_cpu_seconds": 5250
+    },
+    {
+      "phase": "w8-cuda-systemtrace-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 200,
+      "cpu_seconds": 300,
+      "release_stage": "initial",
+      "status": "prospective3tracedcontrols; no automaticgrant/model; tool/code/pilotgates required"
     }
   ],
   "jobs": [
@@ -476,6 +520,18 @@
       "spec_sha256": "3a1e57313425f1d8b9bbaa6f6fcbb7e10bdfa35e8e7aac81bcbf252415bfb76e",
       "gpu_ceiling": 400,
       "inclusive_cpu_ceiling": 600
+    },
+    {
+      "job_id": "20261105T005745Z-d72ef178",
+      "phase": "k5d-checkpoint16-48-equivalence-20261105",
+      "subphase": "prepare",
+      "state": "terminalmechanicalfailure: ordinaryscoredvalidationonunscoredprepare; no48promotion; preservedoutputs/source",
+      "revision": "ae7bc1c89532d589feac4dfd2379fbea5dee3dfb",
+      "source_sha256": "7d38b2bd54a7a712ac5cbf653fab6ce164373bafba5ea58394cc868aa4f11469",
+      "spec_sha256": "e60b534424fc2c7521527b496ef67b9bc124937bf13ce34cde82fab8e083f45c",
+      "gpu_ceiling": 700,
+      "inclusive_cpu_ceiling": 900,
+      "frozen_checkout": "/private/tmp/pointstream-checkpoint-frozen-20261105"
     }
   ],
   "old_budgets": "closed, not borrowed",

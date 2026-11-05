@@ -182,6 +182,17 @@ def test_score_dispatch_uses_actual_fleet_staged_environment_and_phase(tmp_path,
     assert sha == '1' * 64 and actual.frames == 16
     assert identity == {'source_sha256': 'b' * 64, 'snapshot_sha256': 'c' * 64, 'environment_sha256': 'e' * 64}
     assert actual.cost_pilot and actual.manifest_sha256 == source_sha
+    prepared = []
+    monkeypatch.setattr(fleet, 'prepare_baseline', lambda: None)
+    monkeypatch.setattr(fleet.enc, 'fidelity_gate', lambda *a, **kw: None)
+    monkeypatch.setattr(fleet.cp, 'prepare', lambda data, ident: prepared.append((data, ident)))
+    args.action = 'prepare'
+    args.fidelity_gate = str(tmp_path / 'gate')
+    args.fidelity_gate_sha256 = 'f' * 64
+    fleet.run(args)
+    prep_args, prep_identity = prepared[0]
+    assert prep_args.frames == 16 and prep_args.cost_pilot
+    assert prep_args.output == scratch / 'publish' and prep_identity == identity
     args.frames = 48
     with pytest.raises(ValueError, match='stage frame'):
         fleet.run(args)

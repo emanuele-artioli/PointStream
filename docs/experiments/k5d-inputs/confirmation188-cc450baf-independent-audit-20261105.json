@@ -1,0 +1,1002 @@
+{
+  "audit_utc": "2026-11-05T01:09:44.407556+00:00",
+  "checks": {
+    "all_2256_metric_rows_frame_order_sse_psnr_and_four_perceptual_values": true,
+    "all_4512_judge_rows_recomputed": true,
+    "calibration_prefix_gate": true,
+    "frozen_job_validator": "k5d_encoder.validate passed (188 frames, 6 points, full_metrics); checkout files identical to frozen git revision",
+    "native_and_both_psbl_file_hashes_sizes_and_decoder_renderer_receipts": true,
+    "point_records_match_pilot": true,
+    "separate_cpu_row_audit_sha256": "a0d8d1166afe66c403b0570dcce62c624379ab8dd75ebdcd1f833d5d5eb70512",
+    "source_376_judge_rows_recomputed": true,
+    "source_only_reuse_not_counted_as_new_clips": true
+  },
+  "code": {
+    "deleted_paths": [],
+    "git_head": "b26e5b43702a21c37bcb4357223e0e6a25e1bec5",
+    "included_untracked_sha256": {},
+    "input_check": {
+      "deferred": [
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+        "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/tracknet-dataset.zip",
+        "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz"
+      ],
+      "deferred_bytes": 9073688773,
+      "deferred_to": "campaign",
+      "hashed": [
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261105-inputs/fidelity-confirmation188-gate-20261105.json",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261104T223611Z-ed28cf8e/smoke/published.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T000550Z-d8b5c76b/smoke/published.tar",
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt"
+      ]
+    },
+    "published": 1793839110.5138505,
+    "snapshot_sha256": "48b51fe3b3dbff6e574122ad7ea3aaf0ae5638caef2a69a7170e7e7f8a4d2857",
+    "source_archive": "source.tar",
+    "source_sha256": "c212f85b429f3a1abbca925de25736334fd06ffe9e821fac7798aaa99703fda7",
+    "spec_sha256": "2d58571180db6b7d6e1685da78a36d7bc14a1f72ade5f7b56016ae631789bf6e",
+    "tracked_changes_excluded": [
+      "experiments/tennis/k5d_opentt_source.py",
+      "tests/tennis/test_k5d_opentt_source.py"
+    ],
+    "tracked_changes_included": [],
+    "tracked_worktree_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_excluded_count": 3,
+    "untracked_excluded_paths_sha256": "ef4d9fa7463f78e8b870df9c94a594a5ab925e5b7be3df182030fb0c0c983d5d",
+    "untracked_excluded_sample": [
+      "docs/experiments/k5d-inputs/opentt-test2-opencv-witness-audit-20261105.json",
+      "docs/experiments/k5d-inputs/opentt-test2-source-spec-20261105.json",
+      "experiments/tennis/k5d_opentt_source_spec.py"
+    ]
+  },
+  "fidelity_gate": {
+    "accepted_audit_sha256": "66cbbd2ef1480524b0327effb9c760d7ef726abe40e338c3246c434bc9640d66",
+    "historical_16_smoke_sha256": "8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377",
+    "historical_48_full_sha256": "f0dd118a5d64ca148be675a097606aa6dacb8ae49ffcac639ad30911ae74a727",
+    "max_frames": 188,
+    "purpose": "188-frame-confirmation",
+    "reference_parity": {
+      "mode": "source-prefix-188",
+      "passed": true,
+      "reference_jobs": [
+        "20261104T223611Z-ed28cf8e",
+        "20261105T000550Z-d8b5c76b"
+      ],
+      "reference_sha256": [
+        "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066",
+        "8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377"
+      ]
+    },
+    "scope": "fidelity-only",
+    "scope_limitations": [
+      "New bounded188 confirmation only; no corpus admission",
+      "Old188naive cost gate remains failed; old48receipt remains48only",
+      "Two nested prefixes on one developmentclip do not establish linearity/content scaling",
+      "No filesystem-denial witness or independently recomputed judge/pixel scores in audit",
+      "Retrospective cohort; preserve3 historical task exclusions and10/197 failed source-negative calibration"
+    ],
+    "sha256": "389f3af98638f30f4d2aad6334f37aaa66392d2e71528137108253dbf2086d32"
+  },
+  "files": {
+    "pilot_sha256": "16e6ca53b8cd162d5feba96bae989f97aa0ded3c005d5f69b007a388e2a60bbd",
+    "points": {
+      "dcvc-0": {
+        "baseline.psbl": {
+          "bytes": 11893,
+          "sha256": "a39be61f02449b71926e65a156e32126927d2a18f6e4349d0216631b9e33ec54"
+        },
+        "native-checkpoint.json": {
+          "bytes": 785,
+          "sha256": "f60f1d53eeb5842db6035ed238d31a00941689a1e59f2d3d8ed2bc9a259d4758"
+        },
+        "native.bin": {
+          "bytes": 11824,
+          "sha256": "246746e7209f12a30af35482eb55d9d3bfd42638cf640beb60edb9a77d2600ea"
+        },
+        "point.json": {
+          "bytes": 199320,
+          "sha256": "41d37ccb6722cb8f73f13539fba4931dcbedce88471d9814df40d36cd6891735"
+        },
+        "stream.psbl": {
+          "bytes": 12696,
+          "sha256": "11fdccf89be9f7d8d7d39601e3af3942989ff5604dbaf5149e64d1a3c5bcab29"
+        }
+      },
+      "dcvc-21": {
+        "baseline.psbl": {
+          "bytes": 31767,
+          "sha256": "bc836e4b7eb0c706d45f814bccaaaa284cfb50dd6e6f6abefe6ffae92bce1c0a"
+        },
+        "native-checkpoint.json": {
+          "bytes": 786,
+          "sha256": "365ee1366dd86d77ad3cf1caec5b8ed345e8dcb7a8309c2bd0a383236cd0d80d"
+        },
+        "native.bin": {
+          "bytes": 31698,
+          "sha256": "fbc0b759328b246a21be368aa09fc7ba4785548d74560939547b0d4a6a91511b"
+        },
+        "point.json": {
+          "bytes": 199879,
+          "sha256": "02f98a729c5d7d7d757d801f0961eabd4dafd2863f86a6d125a2e0b20da4de6c"
+        },
+        "stream.psbl": {
+          "bytes": 32609,
+          "sha256": "41abb79affb06b9877f4af2be4f81ce6e0e1e159a44147132fdd86421fc715bd"
+        }
+      },
+      "dcvc-42": {
+        "baseline.psbl": {
+          "bytes": 91235,
+          "sha256": "f2cf469d7556bfe679536dbb926b5c996677ecb39cd987b2725d81a05aa4b1f4"
+        },
+        "native-checkpoint.json": {
+          "bytes": 786,
+          "sha256": "408e2c55daf98d44ea90f53f6e9d7d83a6a952e3572d33b3be5fea3a9adad727"
+        },
+        "native.bin": {
+          "bytes": 91166,
+          "sha256": "fb609821a48cb8d899a6c3df3f2eb06df5211d5c2a7ddcea876370a974b3e30a"
+        },
+        "point.json": {
+          "bytes": 203113,
+          "sha256": "8a9101e363a2b1b457c95853177264080fdd3a5b05969e4392fb30685eccff26"
+        },
+        "stream.psbl": {
+          "bytes": 92224,
+          "sha256": "20100021ee7b53d659b504dc852ead9a92686ca68a812f80d8cb0433c1eba8a9"
+        }
+      },
+      "svt-48": {
+        "baseline.psbl": {
+          "bytes": 214465,
+          "sha256": "dd3f83527a5df19bc7b9946049af1d2b27e15edc319e4a2229d26ff933d44da8"
+        },
+        "native-checkpoint.json": {
+          "bytes": 1595,
+          "sha256": "fda4fa064899ade917ba1dfca8bb70322cd49c07af96a2aa1021fac9cc25e63e"
+        },
+        "native.bin": {
+          "bytes": 214397,
+          "sha256": "5bc7eea83ae742b52aa6daf2946e7282e05c10ecb7a996c49b33b4b432b27b18"
+        },
+        "point.json": {
+          "bytes": 202867,
+          "sha256": "6f858d26e357c4ebe5e8e63f48527273e8903a574b1e86b1da99b779b13d7a31"
+        },
+        "stream.psbl": {
+          "bytes": 215419,
+          "sha256": "16d3af5c9d0289857630e3b92bb54dec9c496f15152455d60d6b13638a65ee53"
+        }
+      },
+      "svt-55": {
+        "baseline.psbl": {
+          "bytes": 130211,
+          "sha256": "2074308be38acc5bb2aee8e4e7b1f39ca5e6312798617488b45becd7993508a0"
+        },
+        "native-checkpoint.json": {
+          "bytes": 1594,
+          "sha256": "902247633eba3bd7fbd19e31a38e09258181e902de2477ee9b5ad031b5c25ca2"
+        },
+        "native.bin": {
+          "bytes": 130143,
+          "sha256": "d9c3735cee88c03362e7c15e3ba0fce394269795ee39b601d6dbfc6c6dcfa934"
+        },
+        "point.json": {
+          "bytes": 200878,
+          "sha256": "41c1e8b9d61f9e9cec5914ecf79b2a9141e2978299dd81f144d5f8b2e9ed6a0e"
+        },
+        "stream.psbl": {
+          "bytes": 131113,
+          "sha256": "aaef891c53e26f15beb836ecc541fb98d662e438ef9ac1977fc54d204a837556"
+        }
+      },
+      "svt-62": {
+        "baseline.psbl": {
+          "bytes": 57727,
+          "sha256": "52f051cde02ceb37d138785626da004ceb8f75ba5fbde86a04ec6d3793cb4581"
+        },
+        "native-checkpoint.json": {
+          "bytes": 1588,
+          "sha256": "75af652999efbaf786112ae3df741c2cf68867579b090cad288d4ff0f9fd8e3f"
+        },
+        "native.bin": {
+          "bytes": 57659,
+          "sha256": "2f20f05831827e37c5f88f086af6763ceb2684c800665c5dd3ea3f721531239f"
+        },
+        "point.json": {
+          "bytes": 199578,
+          "sha256": "f42018bcb850a6e15cddc51b9c45a94186a125688776aaa90da0f101f46ac071"
+        },
+        "stream.psbl": {
+          "bytes": 58574,
+          "sha256": "ba80c3f6b2e1ac488db351e49552ec64f5ee466d3fcc8497c3fe4f9ffc2c5020"
+        }
+      }
+    },
+    "reference_parity_sha256": "a18a4888b63365fc7f2fb12228d1eb9cdaf6353cf9a3cd5c4ae91102473b1571",
+    "resources_sha256": "fff91f6583c117fd3f63e001c7aa31db6fb651ffad8bf3401bdcd42defc9a346",
+    "source_qualification_sha256": "84fc54d721d00628705169e52571c6a2e6991b95ab13d97d6a711cec45898755",
+    "timing_sha256": "346a0cf2e27d8301aff2a28c9b2f7f1c22a6bc2c388470c46f3e468f5e47b576"
+  },
+  "gate_forecast": {
+    "campaign_remaining_seconds": 2031.5913590481505,
+    "fixed": 138.72209787368774,
+    "full_estimate_seconds": 1649.78349506855,
+    "margin": 1.5,
+    "observed_slowdown": 1.0,
+    "overhead_seconds": 200.0,
+    "per_frame": 4.190426766872406,
+    "reserve_seconds": 60.0,
+    "smoke_seconds": 203.64874958992004
+  },
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/tracknet-dataset.zip",
+      "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_image.pth.tar",
+      "sha256": "b3b900de23f30e4fc437010ddffe6a5413a56d6cfd97fb6235adbcd2b6973302"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/b2-2026-10-07/inputs/dcvc/cvpr2026_video_htl.pth.tar",
+      "sha256": "934bde4a12fc0b6b0c679ec6ae21d41cb7722debf8b631ee0dd750d030b1a6b3"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261104T223611Z-ed28cf8e/smoke/published.tar",
+      "sha256": "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T000550Z-d8b5c76b/smoke/published.tar",
+      "sha256": "8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261105-inputs/fidelity-confirmation188-gate-20261105.json",
+      "sha256": "389f3af98638f30f4d2aad6334f37aaa66392d2e71528137108253dbf2086d32"
+    }
+  ],
+  "job_dir": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T003756Z-cc450baf",
+  "job_id": "20261105T003756Z-cc450baf",
+  "lifecycle": {
+    "audit_cap_cpu_seconds": 120,
+    "campaign_wall_seconds": 1147.4130222797394,
+    "claim": false,
+    "compute_processes": [],
+    "contention": {
+      "full": [],
+      "smoke": []
+    },
+    "external_cpu_cap_seconds": 400,
+    "gpu": "NVIDIA RTX A6000",
+    "host": "gpu2",
+    "phase_caps_gpu_cpu_seconds": [
+      2500,
+      2800
+    ],
+    "pids": {
+      "673877": "absent",
+      "673884": "absent"
+    },
+    "process_group": "absent",
+    "process_group_id": 673884,
+    "status": "complete",
+    "supervisor_pid": 673877,
+    "uuid": "GPU-fc7e8fff-75be-4984-a185-fe8ce63edcd9",
+    "worker_pid": 673884
+  },
+  "points": [
+    {
+      "arms": {
+        "baseline": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 2,
+              "hit5": 0,
+              "miss10": 186,
+              "recall10": 0.010638297872340425,
+              "recall5": 0.0,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 1,
+              "hit5": 0,
+              "miss10": 187,
+              "recall10": 0.005319148936170213,
+              "recall5": 0.0,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.2163294106721878,
+            "crop_lpips": 0.16664944913119395,
+            "full_dists": 0.13826400168398592,
+            "full_lpips": 0.10274405346412749
+          },
+          "pooled_psnr": 29.191600873454924
+        },
+        "streak": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 182,
+              "hit5": 175,
+              "miss10": 6,
+              "recall10": 0.9680851063829787,
+              "recall5": 0.9308510638297872,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 177,
+              "hit5": 177,
+              "miss10": 11,
+              "recall10": 0.9414893617021277,
+              "recall5": 0.9414893617021277,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.1714702565619286,
+            "crop_lpips": 0.060028763616734995,
+            "full_dists": 0.1380472608069156,
+            "full_lpips": 0.10192785348734394
+          },
+          "pooled_psnr": 29.19941816080268
+        }
+      },
+      "codec": "dcvc",
+      "guard_off": false,
+      "native_bytes": 11824,
+      "point": 0,
+      "psnr_delta_db": 0.007817287347755553,
+      "streak_wire_bytes": 12696,
+      "zero_ball_wire_bytes": 11893
+    },
+    {
+      "arms": {
+        "baseline": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 32,
+              "hit5": 30,
+              "miss10": 156,
+              "recall10": 0.1702127659574468,
+              "recall5": 0.1595744680851064,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 27,
+              "hit5": 26,
+              "miss10": 161,
+              "recall10": 0.14361702127659576,
+              "recall5": 0.13829787234042554,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.17723914124864212,
+            "crop_lpips": 0.12381802064842208,
+            "full_dists": 0.06684165654030252,
+            "full_lpips": 0.04278153543494836
+          },
+          "pooled_psnr": 33.49567365508083
+        },
+        "streak": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 183,
+              "hit5": 174,
+              "miss10": 5,
+              "recall10": 0.973404255319149,
+              "recall5": 0.925531914893617,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 173,
+              "hit5": 172,
+              "miss10": 15,
+              "recall10": 0.9202127659574468,
+              "recall5": 0.9148936170212766,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.1402745823910896,
+            "crop_lpips": 0.04204629234687247,
+            "full_dists": 0.06674014761092815,
+            "full_lpips": 0.04218128330600459
+          },
+          "pooled_psnr": 33.51183828092629
+        }
+      },
+      "codec": "dcvc",
+      "guard_off": false,
+      "native_bytes": 31698,
+      "point": 21,
+      "psnr_delta_db": 0.01616462584546241,
+      "streak_wire_bytes": 32609,
+      "zero_ball_wire_bytes": 31767
+    },
+    {
+      "arms": {
+        "baseline": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 150,
+              "hit5": 146,
+              "miss10": 38,
+              "recall10": 0.7978723404255319,
+              "recall5": 0.776595744680851,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 127,
+              "hit5": 126,
+              "miss10": 61,
+              "recall10": 0.675531914893617,
+              "recall5": 0.6702127659574468,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.12137404337842414,
+            "crop_lpips": 0.04817395641944034,
+            "full_dists": 0.031141399069035305,
+            "full_lpips": 0.019002573089960336
+          },
+          "pooled_psnr": 36.05492578998954
+        },
+        "streak": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 182,
+              "hit5": 175,
+              "miss10": 6,
+              "recall10": 0.9680851063829787,
+              "recall5": 0.9308510638297872,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 169,
+              "hit5": 167,
+              "miss10": 19,
+              "recall10": 0.898936170212766,
+              "recall5": 0.8882978723404256,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.10649702491912436,
+            "crop_lpips": 0.024719243144685838,
+            "full_dists": 0.03111224130113074,
+            "full_lpips": 0.01881797920727561
+          },
+          "pooled_psnr": 36.06250663672273
+        }
+      },
+      "codec": "dcvc",
+      "guard_off": false,
+      "native_bytes": 91166,
+      "point": 42,
+      "psnr_delta_db": 0.007580846733191038,
+      "streak_wire_bytes": 92224,
+      "zero_ball_wire_bytes": 91235
+    },
+    {
+      "arms": {
+        "baseline": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 153,
+              "hit5": 145,
+              "miss10": 35,
+              "recall10": 0.8138297872340425,
+              "recall5": 0.7712765957446809,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 122,
+              "hit5": 122,
+              "miss10": 66,
+              "recall10": 0.648936170212766,
+              "recall5": 0.648936170212766,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.09845249545066914,
+            "crop_lpips": 0.03621448461459256,
+            "full_dists": 0.013469872322488339,
+            "full_lpips": 0.009359769356166217
+          },
+          "pooled_psnr": 38.02027563297975
+        },
+        "streak": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 183,
+              "hit5": 176,
+              "miss10": 5,
+              "recall10": 0.973404255319149,
+              "recall5": 0.9361702127659575,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 165,
+              "hit5": 164,
+              "miss10": 23,
+              "recall10": 0.8776595744680851,
+              "recall5": 0.8723404255319149,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.08484600833121766,
+            "crop_lpips": 0.016134959950230697,
+            "full_dists": 0.01344781258004777,
+            "full_lpips": 0.009217749912969891
+          },
+          "pooled_psnr": 38.02873124975742
+        }
+      },
+      "codec": "svt",
+      "guard_off": false,
+      "native_bytes": 214397,
+      "point": 48,
+      "psnr_delta_db": 0.008455616777673924,
+      "streak_wire_bytes": 215419,
+      "zero_ball_wire_bytes": 214465
+    },
+    {
+      "arms": {
+        "baseline": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 80,
+              "hit5": 76,
+              "miss10": 108,
+              "recall10": 0.425531914893617,
+              "recall5": 0.40425531914893614,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 62,
+              "hit5": 61,
+              "miss10": 126,
+              "recall10": 0.32978723404255317,
+              "recall5": 0.324468085106383,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.13088052862502159,
+            "crop_lpips": 0.07469341126171515,
+            "full_dists": 0.02143570970981679,
+            "full_lpips": 0.015286220095118168
+          },
+          "pooled_psnr": 36.80389826985998
+        },
+        "streak": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 183,
+              "hit5": 174,
+              "miss10": 5,
+              "recall10": 0.973404255319149,
+              "recall5": 0.925531914893617,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 160,
+              "hit5": 158,
+              "miss10": 28,
+              "recall10": 0.851063829787234,
+              "recall5": 0.8404255319148937,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.09903436582139198,
+            "crop_lpips": 0.0227846233991589,
+            "full_dists": 0.02138143999779478,
+            "full_lpips": 0.014900338165021676
+          },
+          "pooled_psnr": 36.82306955070521
+        }
+      },
+      "codec": "svt",
+      "guard_off": false,
+      "native_bytes": 130143,
+      "point": 55,
+      "psnr_delta_db": 0.019171280845235117,
+      "streak_wire_bytes": 131113,
+      "zero_ball_wire_bytes": 130211
+    },
+    {
+      "arms": {
+        "baseline": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 24,
+              "hit5": 19,
+              "miss10": 164,
+              "recall10": 0.1276595744680851,
+              "recall5": 0.10106382978723404,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 20,
+              "hit5": 17,
+              "miss10": 168,
+              "recall10": 0.10638297872340426,
+              "recall5": 0.09042553191489362,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.15984163893030046,
+            "crop_lpips": 0.11365743655899659,
+            "full_dists": 0.040633390875572856,
+            "full_lpips": 0.031098131197845963
+          },
+          "pooled_psnr": 34.32132240151213
+        },
+        "streak": {
+          "judges": {
+            "balltrack": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 183,
+              "hit5": 176,
+              "miss10": 5,
+              "recall10": 0.973404255319149,
+              "recall5": 0.9361702127659575,
+              "unknown": 0,
+              "visible": 188
+            },
+            "wasb": {
+              "absent": 0,
+              "false_on_absent": 0,
+              "false_per_negative": null,
+              "frames": 188,
+              "hit10": 173,
+              "hit5": 173,
+              "miss10": 15,
+              "recall10": 0.9202127659574468,
+              "recall5": 0.9202127659574468,
+              "unknown": 0,
+              "visible": 188
+            }
+          },
+          "means": {
+            "crop_dists": 0.11737322870721208,
+            "crop_lpips": 0.03175770952564446,
+            "full_dists": 0.04056331705539785,
+            "full_lpips": 0.030475248704283513
+          },
+          "pooled_psnr": 34.34298305489723
+        }
+      },
+      "codec": "svt",
+      "guard_off": false,
+      "native_bytes": 57659,
+      "point": 62,
+      "psnr_delta_db": 0.021660653385104922,
+      "streak_wire_bytes": 58574,
+      "zero_ball_wire_bytes": 57727
+    }
+  ],
+  "published": {
+    "full": {
+      "bytes": 4648960,
+      "members": 52,
+      "partial": false,
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T003756Z-cc450baf/full/published.tar",
+      "sha256": "622fd68d5380b97449a09872bc15402117dd9c3e7a2576a757cd6aff8fd090d7"
+    },
+    "smoke": {
+      "bytes": 1064960,
+      "members": 52,
+      "partial": false,
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T003756Z-cc450baf/smoke/published.tar",
+      "sha256": "a39643080425a1b05da7bade7a74c0a96bbf14848434c121ae7f5ab8353e6873"
+    }
+  },
+  "runtime_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "schema": "pointstream.k5d.confirmation188.independent-saved-artifact-audit.v1",
+  "scope_and_limits": "Saved-artifact and receipt validation; no independent codec re-decode, source pixel access, model inference, perceptual recomputation or fresh judge inference. Producer/receiver parity is recorded hash equality, not OS source-denial proof. This single retrospective Clip3 is descriptive; not a corpus result, matched-rate metric guard, BD-rate result, or new historical four-window decision.",
+  "source_qualification": {
+    "clip": "tracknet/game10/Clip3",
+    "exposure_scope": "primary-author documented split and model-name mapping; not independent audit of checkpoint training logs",
+    "frames": 188,
+    "historical_exclusions": "Three historical task exclusions and failed 10/197 source-negative calibration remain; no new 4-window guard pass is asserted.",
+    "label_counts": {
+      "absent": 0,
+      "unknown": 0,
+      "visible": 188
+    },
+    "original_source_transform": {
+      "command": [
+        "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+        "-v",
+        "error",
+        "-nostdin",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "rgb24",
+        "-s",
+        "1280x720",
+        "-r",
+        "30",
+        "-i",
+        "pipe:0",
+        "-frames:v",
+        "188",
+        "-vf",
+        "scale=in_range=pc:out_range=tv:out_color_matrix=bt709,format=yuv420p",
+        "-f",
+        "rawvideo",
+        "/local/users/emanuele/pointstream/scratch/20261105T003756Z-cc450baf-full/publish-work/source.yuv"
+      ],
+      "floor_psnr": 41.3566481613484,
+      "yuv_sha256": "317ed14c71b68a8453c4ce47fd9d3a26e41b240fb076ec9cd7febd384a112e57"
+    },
+    "qualified": true,
+    "source_judges": {
+      "balltrack": {
+        "absent": 0,
+        "false_on_absent": 0,
+        "false_per_negative": null,
+        "frames": 188,
+        "hit10": 183,
+        "hit5": 175,
+        "miss10": 5,
+        "recall10": 0.973404255319149,
+        "recall5": 0.9308510638297872,
+        "unknown": 0,
+        "visible": 188
+      },
+      "wasb": {
+        "absent": 0,
+        "false_on_absent": 0,
+        "false_per_negative": null,
+        "frames": 188,
+        "hit10": 174,
+        "hit5": 172,
+        "miss10": 14,
+        "recall10": 0.925531914893617,
+        "recall5": 0.9148936170212766,
+        "unknown": 0,
+        "visible": 188
+      }
+    }
+  },
+  "spec_identity": {
+    "difference": "fleet adds deadline_epoch to canonical job spec; remaining fields identical",
+    "fleet_canonical_sha256": "2d58571180db6b7d6e1685da78a36d7bc14a1f72ade5f7b56016ae631789bf6e",
+    "job_spec_file_sha256": "1b13d174e18167e51d2dd1cf1572b9f5ed73838e55afe81a29dc072a1d2ce824",
+    "local_original_file_sha256": "138e95dcf4fcddd317452957ebbcc989d79696696bc162b282019a6ffc367dbb"
+  },
+  "timing": {
+    "full": {
+      "campaign_clock": {
+        "budget_end": 2308508.159798486,
+        "phase_started": 2306497.491773175,
+        "started": 2306251.653523418
+      },
+      "execution": {
+        "children_resource_usage": [
+          920.459777,
+          175.882428,
+          7537464,
+          0,
+          0,
+          0,
+          26719329,
+          14,
+          0,
+          392,
+          21522912,
+          0,
+          0,
+          0,
+          215106,
+          210058
+        ],
+        "contention": [],
+        "exit_code": 0,
+        "gpu_sharing": {
+          "mode": "exclusive"
+        },
+        "paused_seconds": 0.0,
+        "seconds": 897.0278038978577,
+        "timing_contaminated": false
+      },
+      "sha256": "622fd68d5380b97449a09872bc15402117dd9c3e7a2576a757cd6aff8fd090d7",
+      "staging": 1793840266.9382052
+    },
+    "smoke": {
+      "campaign_clock": {
+        "budget_end": 2308508.159798486,
+        "phase_started": 2306272.366928585,
+        "started": 2306251.653523418
+      },
+      "execution": {
+        "children_resource_usage": [
+          162.94283,
+          39.742438,
+          2847116,
+          0,
+          0,
+          0,
+          8775267,
+          7,
+          0,
+          88,
+          1699768,
+          0,
+          0,
+          0,
+          22202,
+          24828
+        ],
+        "contention": [],
+        "exit_code": 0,
+        "gpu_sharing": {
+          "mode": "exclusive"
+        },
+        "paused_seconds": 0.0,
+        "seconds": 203.64874958992004,
+        "timing_contaminated": false
+      },
+      "sha256": "a39643080425a1b05da7bade7a74c0a96bbf14848434c121ae7f5ab8353e6873",
+      "staging": 1793839346.7085886
+    }
+  }
+}

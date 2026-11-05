@@ -76,6 +76,7 @@ def validate_prepared(root: Path) -> dict[str, Any]:
 
 
 def seal(root: Path, identity: dict[str, str]) -> dict[str, Any]:
+    enc.validate(root, prepared=True)
     report = validate_prepared(root)
     data = {'schema': 1, 'execution_identity': identity, 'clip': report['clip'],
             'frames': report['frames'], 'points': [list(p) for p in enc.POINTS],
@@ -94,7 +95,7 @@ def verify(root: Path, expected_sha: str, identity: dict[str, str]) -> dict[str,
         raise ValueError('checkpoint content, source or runtime mismatch')
     report = validate_prepared(root)
     if (report['clip'] != data['clip'] or report['frames'] != data['frames']
-            or not report['full_metrics']):
+            or report['full_metrics'] is not False):
         raise ValueError('checkpoint report scope mismatch')
     return data
 
@@ -213,6 +214,9 @@ def assemble(checkpoint: Path, checkpoint_sha: str, point_files: list[dict[str, 
     shutil.copytree(checkpoint, output)
     (output / 'checkpoint.json').unlink()
     report.pop('checkpoint_prepare')
+    report['full_metrics'] = True
+    report['scope'] = ('16/48-frame bounded cost pilot; filesystem denial not established'
+                       if report.get('cost_pilot') else 'six-point calibration; filesystem denial not established')
     report['points'] = [scores[k] for k in enc.POINTS]
     (output / 'pilot.json').write_text(json.dumps(report, indent=2, allow_nan=False) + '\n')
     for p in report['points']:
