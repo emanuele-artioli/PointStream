@@ -220,7 +220,7 @@ def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bri
         native = study.checked_json(qualification_paths['native_cpu'], qualification['native_cpu_receipt_sha256'])
         parity = study.checked_json(qualification_paths['gpu_parity'], qualification['gpu_parity_receipt_sha256'])
         if (native.get('schema') != 1 or native.get('audited') is not True or native.get('passed') is not True
-                or native.get('scope') != 'native CPU PID containment and accounting'
+                or native.get('scope') != 'native CPU PID containment and accounting' or native.get('gpu_used') is not False
                 or native.get('consumer_execution_identity') != identity
                 or not isinstance(native.get('job_id'), str) or not native['job_id'].startswith('2026')
                 or native.get('namespace_wrapper_sha256') != qualification['namespace_wrapper_sha256']

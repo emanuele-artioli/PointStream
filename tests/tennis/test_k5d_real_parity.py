@@ -39,7 +39,7 @@ def test_parity_spec_stays_within_smoke_limit_and_uses_actual_cpu_receipt(tmp_pa
     from experiments.jobs import inbox
 
     cpu = tmp_path / 'cpu.json'
-    cpu.write_text(json.dumps({'audited': True, 'passed': True, 'scope': 'native CPU PID containment and accounting',
+    cpu.write_text(json.dumps({'audited': True, 'passed': True, 'scope': 'native CPU PID containment and accounting', 'gpu_used': False,
                                'unshare_sha256': 'a' * 64, 'namespace_wrapper_sha256': 'b' * 64,
                                'consumer_execution_identity': {}}))
     assets = {'fidelity_gate': {'local': str(cpu), 'remote': '/fidelity', 'sha256': 'c' * 64},

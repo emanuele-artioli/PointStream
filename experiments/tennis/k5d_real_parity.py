@@ -34,7 +34,7 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
     cpu = json.loads(Path(assets['native_cpu_receipt']['local']).read_text())
     from experiments.tennis import k5d_scoped_namespace as namespace
     if (cpu.get('audited') is not True or cpu.get('passed') is not True
-            or cpu.get('scope') != 'native CPU PID containment and accounting'
+            or cpu.get('scope') != 'native CPU PID containment and accounting' or cpu.get('gpu_used') is not False
             or cpu.get('consumer_execution_identity') != identity
             or cpu.get('unshare_sha256') != unshare_sha256
             or cpu.get('namespace_wrapper_sha256') != oracle.sha(Path(namespace.__file__))):
@@ -68,7 +68,7 @@ def run(args: argparse.Namespace) -> None:
     cpu = json.loads(Path(args.native_cpu_receipt).read_text())
     if (oracle.sha(Path(args.native_cpu_receipt)) != args.native_cpu_receipt_sha256
             or cpu.get('schema') != 1 or cpu.get('audited') is not True or cpu.get('passed') is not True
-            or cpu.get('scope') != 'native CPU PID containment and accounting'
+            or cpu.get('scope') != 'native CPU PID containment and accounting' or cpu.get('gpu_used') is not False
             or cpu.get('consumer_execution_identity') != identity
             or not isinstance(cpu.get('job_id'), str) or not cpu['job_id'].startswith('2026')
             or cpu.get('all_owned_pids_absent') is not True or cpu.get('independent_cpu_match') is not True

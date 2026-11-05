@@ -139,7 +139,7 @@ def test_confirmation_requires_both_audited_receipts_without_full30_fit(
     bridge = {'approved': True, 'calibration_execution_identity': {'old': 'old'},
               'consumer_execution_identity': {'new': 'new'}, 'calibration_snapshot_sha256': 'x',
               'consumer_snapshot_sha256': 'y', 'changed_paths': [], 'unchanged_files': 1}
-    cpu = {'schema': 1, 'audited': True, 'passed': True, 'scope': 'native CPU PID containment and accounting',
+    cpu = {'schema': 1, 'audited': True, 'passed': True, 'scope': 'native CPU PID containment and accounting', 'gpu_used': False,
            'namespace_wrapper_sha256': 'w' * 64, 'unshare_sha256': 'd' * 64,
            'consumer_execution_identity': {'new': 'new'}, 'job_id': '20261105T000000Z-12345678',
            'cases': ['normal', 'timeout', 'sigterm', 'sigkill'], 'all_owned_pids_absent': True,
