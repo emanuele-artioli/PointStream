@@ -1,0 +1,112 @@
+{
+  "al028/control_s8_crf63": {
+    "proof_asset": "proof_0",
+    "validation_asset": "validation_0",
+    "mkv_asset": "mkv_0"
+  },
+  "al028/control_s4_crf63": {
+    "proof_asset": "proof_1",
+    "validation_asset": "validation_1",
+    "mkv_asset": "mkv_1"
+  },
+  "al028/control_s2_crf63": {
+    "proof_asset": "proof_2",
+    "validation_asset": "validation_2",
+    "mkv_asset": "mkv_2"
+  },
+  "al034/control_s8_crf63": {
+    "proof_asset": "proof_3",
+    "validation_asset": "validation_3",
+    "mkv_asset": "mkv_3"
+  },
+  "al034/control_s4_crf63": {
+    "proof_asset": "proof_4",
+    "validation_asset": "validation_4",
+    "mkv_asset": "mkv_4"
+  },
+  "al034/control_s2_crf63": {
+    "proof_asset": "proof_5",
+    "validation_asset": "validation_5",
+    "mkv_asset": "mkv_5"
+  },
+  "al043/control_s8_crf63": {
+    "proof_asset": "proof_6",
+    "validation_asset": "validation_6",
+    "mkv_asset": "mkv_6"
+  },
+  "al043/control_s4_crf63": {
+    "proof_asset": "proof_7",
+    "validation_asset": "validation_7",
+    "mkv_asset": "mkv_7"
+  },
+  "al043/control_s2_crf63": {
+    "proof_asset": "proof_8",
+    "validation_asset": "validation_8",
+    "mkv_asset": "mkv_8"
+  },
+  "med000/control_s8_crf63": {
+    "proof_asset": "proof_9",
+    "validation_asset": "validation_9",
+    "mkv_asset": "mkv_9"
+  },
+  "med000/control_s4_crf63": {
+    "proof_asset": "proof_10",
+    "validation_asset": "validation_10",
+    "mkv_asset": "mkv_10"
+  },
+  "med000/control_s2_crf63": {
+    "proof_asset": "proof_11",
+    "validation_asset": "validation_11",
+    "mkv_asset": "mkv_11"
+  },
+  "med024/control_s8_crf63": {
+    "proof_asset": "proof_12",
+    "validation_asset": "validation_12",
+    "mkv_asset": "mkv_12"
+  },
+  "med024/control_s4_crf63": {
+    "proof_asset": "proof_13",
+    "validation_asset": "validation_13",
+    "mkv_asset": "mkv_13"
+  },
+  "med024/control_s2_crf63": {
+    "proof_asset": "proof_14",
+    "validation_asset": "validation_14",
+    "mkv_asset": "mkv_14"
+  },
+  "med019/control_s8_crf63": {
+    "proof_asset": "proof_15",
+    "validation_asset": "validation_15",
+    "mkv_asset": "mkv_15"
+  },
+  "med019/control_s4_crf63": {
+    "proof_asset": "proof_16",
+    "validation_asset": "validation_16",
+    "mkv_asset": "mkv_16"
+  },
+  "med019/control_s2_crf63": {
+    "proof_asset": "proof_17",
+    "validation_asset": "validation_17",
+    "mkv_asset": "mkv_17"
+  },
+  "med000/s2_o20_crf47": {
+    "proof_asset": "proof_18",
+    "validation_asset": "validation_18",
+    "mkv_asset": "mkv_18"
+  },
+  "med000/s2_o20_crf70": {
+    "proof_asset": "proof_19",
+    "validation_asset": "validation_19",
+    "mkv_asset": "mkv_19"
+  },
+  "med019/s2_o20_crf47": {
+    "proof_asset": "proof_20",
+    "validation_asset": "validation_20",
+    "mkv_asset": "mkv_20"
+  },
+  "med019/s2_o20_crf70": {
+    "proof_asset": "proof_21",
+    "validation_asset": "validation_21",
+    "mkv_asset": "mkv_21"
+  }
+}
