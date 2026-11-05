@@ -74,3 +74,17 @@ def test_cpu_fit_is_never_inferred_from_wall_and_nan_margin_rejected() -> None:
     data['cost']['score']['margin'] = float('nan')
     with pytest.raises(ValueError, match='calibration bounds'):
         control.programme_projection(data)
+
+
+def test_cpu_sample_alone_cannot_authorize_unverified_staging(monkeypatch: pytest.MonkeyPatch) -> None:
+    from experiments.tennis import k5d_study_wave as wave
+
+    data = receipt()
+    data['consumer_execution_identity'] = {}
+    data['cpu_calibration'] = {'unverified': 'test'}
+    monkeypatch.setattr(wave, 'verified_cpu_calibration', lambda *_: {
+        phase: {'margin': 1.5, 'fixed_seconds': 1, 'marginal_seconds_per_frame': 0.1}
+        for phase in ('prepare', 'score')})
+    result = control.programme_projection(data)
+    assert result['cpu']['incremental_seconds'] is not None
+    assert result['cpu']['fits'] is False

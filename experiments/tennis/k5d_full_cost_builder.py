@@ -40,8 +40,17 @@ def model(s16: float, s48: float, margin: float, stage_reserve: float) -> dict[s
 
 
 def projection(costs: dict[str, dict[str, float]], allowances: dict[str, Any],
-               budgets: dict[str, Any]) -> dict[str, Any]:
-    """Account once for 60 smokes, 60 full stages, and all non-command work."""
+               budgets: dict[str, Any], *, profile: str = 'legacy') -> dict[str, Any]:
+    """Forecast the legacy GPU smoke or opt-in CPU readiness campaign."""
+    if profile not in ('legacy', 'readiness'):
+        raise ValueError('unknown study profile')
+    if profile == 'readiness':
+        readiness = number(allowances['gpu']['readiness_seconds'], 'readiness', positive=True)
+        if not 20 <= readiness <= 60:
+            raise ValueError('readiness bound must be between 20 and 60 seconds')
+    else:
+        readiness = 0.0
+    stage_limit, campaign_limit, smoke_limit = (2670, 3000, 60) if profile == 'readiness' else (2400, 2700, 240)
     rows = study.selection()
     schedule = list(CONFIRMATION) + sorted(set(rows) - set(CONFIRMATION))
     if len(schedule) != 30 or sum(rows[x]['label_rows'] for x in schedule) != 5675:
@@ -53,9 +62,9 @@ def projection(costs: dict[str, dict[str, float]], allowances: dict[str, Any],
         n = rows[clip]['label_rows']
         for phase in ('prepare', 'score'):
             c = costs[phase]
-            smoke = c['margin'] * c['seconds16']
+            smoke = readiness if profile == 'readiness' else c['margin'] * c['seconds16']
             full = c['margin'] * (c['fixed_seconds'] + c['marginal_seconds_per_frame'] * n) + c['reserve_seconds']
-            stage_caps_fit = stage_caps_fit and smoke <= 240 and full <= 2400
+            stage_caps_fit = stage_caps_fit and smoke <= smoke_limit and full <= stage_limit
             details.append({'clip': clip, 'frames': n, 'phase': phase,
                             'smoke_seconds': smoke, 'full_seconds': full})
             gpu_compute += smoke + full
@@ -67,7 +76,7 @@ def projection(costs: dict[str, dict[str, float]], allowances: dict[str, Any],
         audit = number(allowances[resource]['per_campaign_audit_seconds'], 'audit', positive=True)
         failure = number(allowances[resource]['failed_start_reserve_seconds'], 'failed starts', positive=True)
         stage_caps_fit = stage_caps_fit and all(
-            row['smoke_seconds'] + row['full_seconds'] + 2 * stage_io + validator <= 2700 for row in details)
+            row['smoke_seconds'] + row['full_seconds'] + 2 * stage_io + validator <= campaign_limit for row in details)
         extra = 120 * stage_io + 60 * validator + 60 * audit + failure
         extras[resource] = extra
         prior = number(budgets[resource]['spent_and_reserved_seconds'], 'prior spent and active reservation')
@@ -76,7 +85,9 @@ def projection(costs: dict[str, dict[str, float]], allowances: dict[str, Any],
         projected = gpu_compute if resource == 'gpu' else 0.0
         budget_fits[resource] = (resource == 'gpu' and projected + extra <= global_left
                                  and prior + projected + extra <= cap)
-    return {'clips': 30, 'unique_frames': 5675, 'full_native_frame_visits': 11350,
+    return {'profile': profile, 'gpu_smoke_inferences': 0 if profile == 'readiness' else 60,
+            'stage_limit_seconds': stage_limit, 'campaign_limit_seconds': campaign_limit,
+            'clips': 30, 'unique_frames': 5675, 'full_native_frame_visits': 11350,
             'campaigns': 60, 'smoke_stages': 60, 'full_stages': 60,
             'stage_caps_fit': stage_caps_fit, 'budget_fits': budget_fits,
             'confirmation_order': list(CONFIRMATION), 'ordered_stages': details,
@@ -174,7 +185,7 @@ def build(inputs: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
                 or attestation[resource]['ball_limit_seconds'] != ledger['workstreams']['ball'][resource + '_limit_seconds']
                 or attestation[resource]['spent_and_reserved_seconds'] < total_charged):
             raise ValueError('attested prior spending differs from actual ledger')
-    forecast = projection(costs, inputs['allowances'], attestation)
+    forecast = projection(costs, inputs['allowances'], attestation, profile=inputs.get('profile', 'legacy'))
     evidence = {'schema': 1, 'passed': False, 'status': 'draft pending root independent review',
                 'execution_identity': identity, 'gpu_model': 'RTX A6000', 'selection_sha256': fleet.SOURCE_SHA,
                 'cost': costs, 'fleet_stages': {k: v[0]['expected'] for k, v in metadata_rows.items()},

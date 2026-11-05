@@ -6,22 +6,49 @@ work. An operator must inspect the returned proposal and build each real spec.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import math
 import re
+import shutil
+import tarfile
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 from experiments.jobs import inbox
 from experiments.tennis import k5d_checkpoint_fleet as cf, k5d_full_study as study
 from experiments.tennis import k5d_source_oracle as oracle
-from experiments.tennis import k5d_checkpoint as cp, k5d_cost_pilot as cost, k5d_encoder as enc
+from experiments.tennis import k5d_checkpoint as cp, k5d_encoder as enc
+from experiments.tennis import k5d_cpu_accounting as accounting
 
 CONFIRMATIONS = ('tracknet/game9/Clip5', 'tracknet/game10/Clip12')
 STATES = {'pending', 'running', 'complete', 'failed', 'unknown'}
 
+
+
+@contextlib.contextmanager
+def unpack_publication(archive: Path, sha: str) -> Iterator[Path]:
+    """Extract an uncompressed fleet tar within a bounded local-space reserve."""
+    if oracle.sha(archive) != sha:
+        raise ValueError('archive SHA256 mismatch')
+    archive_bytes = archive.stat().st_size
+    # Native and wire archives can exceed the calibration helper's 2 GB limit.
+    if not 0 < archive_bytes <= 64 * 1024**3:
+        raise ValueError('publication exceeds audit archive bound')
+    with tempfile.TemporaryDirectory(prefix='k5d-wave-audit-') as folder:
+        if shutil.disk_usage(folder).free < 3 * archive_bytes + 1024**3:
+            raise ValueError('insufficient audit scratch space')
+        with tarfile.open(archive, 'r:') as bundle:
+            members = bundle.getmembers()
+            names = [member.name for member in members]
+            if (len(members) > 10000 or len(names) != len(set(names))
+                    or any(not (m.isfile() or m.isdir()) for m in members)
+                    or sum(m.size for m in members) > archive_bytes):
+                raise ValueError('invalid publication members or size')
+            bundle.extractall(folder, filter='data')
+        yield Path(folder) / 'publish'
 
 def read(path: Path, sha: str) -> dict[str, Any]:
     return study.checked_json(path, sha)
@@ -80,14 +107,21 @@ def verify_completed(clip: str, phase: str, entry: dict[str, Any], frames: int,
                 or cf.option(dispatch['command'], '--clip') != clip
                 or cf.option(dispatch['command'], '--frames') != str(expected_frames)
                 or spec['entrypoint'][1] not in dispatch['command']
+                or '--accounted-child' in dispatch['command']
                 or phase not in dispatch['command']):
             raise ValueError('completed fleet execution provenance differs')
         if not cf.digest_string(artifact['sha256']) or oracle.sha(Path(artifact['local_path'])) != artifact['sha256']:
             raise ValueError('completed publication SHA mismatch')
         if phase == 'prepare' and stage == 'full' and not cf.digest_string(artifact.get('checkpoint_sha256', '')):
             raise ValueError('prepared checkpoint digest missing')
+        if control:
+            log_path = job_dir / stage / 'command.log'
+            if oracle.sha(log_path) != records['command_log_sha256']:
+                raise ValueError('CPU command log SHA mismatch')
+            accounting.read_receipt(log_path.read_text(), phase=phase, stage=stage, clip=clip,
+                                    frames=frames, identity=identity)
         if control and stage == 'smoke':
-            with cost.unpack(Path(artifact['local_path']), artifact['sha256']) as output:
+            with unpack_publication(Path(artifact['local_path']), artifact['sha256']) as output:
                 readiness = json.loads((output / 'readiness.json').read_text())
                 if (readiness.get('identity') != identity or readiness.get('source', {}).get('frames') != frames
                         or readiness['source'].get('labels') != frames
@@ -101,7 +135,7 @@ def validate_full(clip: str, phase: str, frames: int, identity: dict[str, str],
                   artifact: dict[str, Any], preparation: dict[str, Any] | None,
                   dispatch: dict[str, Any]) -> None:
     """Reconstruct score from the exact producer and validate native data and metrics."""
-    with cost.unpack(Path(artifact['local_path']), artifact['sha256']) as output:
+    with unpack_publication(Path(artifact['local_path']), artifact['sha256']) as output:
         if phase == 'prepare':
             record = cp.verify(output, artifact['checkpoint_sha256'], identity)
             enc.validate(output, prepared=True)
@@ -116,7 +150,7 @@ def validate_full(clip: str, phase: str, frames: int, identity: dict[str, str],
         if (cf.option(dispatch['command'], option) != checkpoint_sha
                 or not any(x.get('sha256') == prepared['sha256'] for x in dispatch.get('staged_inputs', []))):
             raise ValueError('score dispatch is not bound to prepared publication')
-        with cost.unpack(Path(prepared['local_path']), prepared['sha256']) as root:
+        with unpack_publication(Path(prepared['local_path']), prepared['sha256']) as root:
             record = cp.verify(root, checkpoint_sha, identity)
             if record['clip'] != clip or record['frames'] != frames:
                 raise ValueError('score producer timeline differs')
@@ -137,6 +171,43 @@ def validate_full(clip: str, phase: str, frames: int, identity: dict[str, str],
                 if json.loads((rebuilt / 'pilot.json').read_text()) != json.loads((actual / 'pilot.json').read_text()):
                     raise ValueError('score assembly differs from exact producer and point receipts')
 
+
+
+def verified_cpu_calibration(samples: dict[str, Any], identity: dict[str, str]) -> dict[str, dict[str, float]]:
+    """Fit CPU only from the two independently validated full confirmation jobs per phase."""
+    if set(samples) != {'prepare', 'score'}:
+        raise ValueError('both CPU calibration phases required')
+    fitted = {}
+    selection = study.selection()
+    for phase in ('prepare', 'score'):
+        entries = samples[phase]
+        if not isinstance(entries, list) or len(entries) != 2 or {x.get('clip') for x in entries} != set(CONFIRMATIONS):
+            raise ValueError('both registered CPU confirmation clips required')
+        values = []
+        jobs = set()
+        for sample in entries:
+            clip = sample['clip']
+            frames = selection[clip]['label_rows']
+            entry = sample['entry']
+            jobs.add(entry['job_id'])
+            if phase == 'score':
+                if not sample.get('preparation'):
+                    raise ValueError('score calibration needs its actual producer job')
+                verify_completed(clip, 'prepare', sample['preparation'], frames, identity)
+            verify_completed(clip, phase, entry, frames, identity, sample.get('preparation'))
+            receipt = read(Path(entry['receipt_path']), entry['receipt_sha256'])
+            log = Path(receipt['job_directory']) / 'full' / 'command.log'
+            seconds = accounting.read_receipt(log.read_text(), phase=phase, stage='full', clip=clip,
+                                              frames=frames, identity=identity)
+            values.append((frames, seconds))
+        if len(jobs) != 2:
+            raise ValueError('distinct measured confirmation jobs required')
+        values.sort()
+        (n1, t1), (n2, t2) = values
+        slope = max(0.0, (t2 - t1) / (n2 - n1))
+        fixed = max(0.0, t1 - slope * n1, t2 - slope * n2)
+        fitted[phase] = {'fixed_seconds': fixed, 'marginal_seconds_per_frame': slope, 'margin': 1.5}
+    return fitted
 
 def inventory(ledger: dict[str, Any], identity: dict[str, str]) -> dict[str, dict[str, Any]]:
     selected = study.selection()

@@ -69,6 +69,10 @@ def programme_projection(receipt: dict[str, Any]) -> dict[str, Any]:
             max_full = max(max_full, estimate)
     if max_full > 2670:
         raise ValueError('full stage exceeds recovery bound')
+    cpu_costs = None
+    if 'cpu_calibration' in receipt:
+        from experiments.tennis import k5d_study_wave as wave
+        cpu_costs = wave.verified_cpu_calibration(receipt['cpu_calibration'], receipt['consumer_execution_identity'])
     results = {}
     for resource in ('gpu', 'cpu'):
         d = receipt['programme'][resource]
@@ -81,14 +85,21 @@ def programme_projection(receipt: dict[str, Any]) -> dict[str, Any]:
             raise ValueError('missing readiness, staging, validator or audit reserves')
         if max_full + d['readiness_seconds'] + 2 * d['stage_staging_seconds'] + d['validator_seconds'] > 3000:
             raise ValueError('longest campaign exceeds 3000-second recovery bound')
-        incremental = (full_compute + 60 * d['readiness_seconds'] + 120 * d['stage_staging_seconds']
+        command_cost = full_compute
+        if resource == 'cpu' and cpu_costs is not None:
+            command_cost = sum(cpu_costs[phase]['margin'] * (cpu_costs[phase]['fixed_seconds']
+                               + cpu_costs[phase]['marginal_seconds_per_frame'] * row['label_rows'])
+                               for row in rows.values() for phase in ('prepare', 'score'))
+        incremental = (command_cost + 60 * d['readiness_seconds'] + 120 * d['stage_staging_seconds']
                        + 60 * d['validator_seconds'] + 60 * d['audit_seconds'] + d['failed_start_reserve_seconds'])
-        results[resource] = {'incremental_seconds': incremental if resource == 'gpu' else None,
-                             'fits': resource == 'gpu' and incremental <= min(d['ball_remaining_seconds'], d['global_remaining_seconds'])}
+        qualified = resource == 'gpu'
+        results[resource] = {'incremental_seconds': incremental if resource == 'gpu' or cpu_costs is not None else None,
+                             'fits': qualified and incremental <= min(d['ball_remaining_seconds'], d['global_remaining_seconds'])}
     return {'campaigns': 60, 'full_stages': 60, 'gpu_smoke_inferences': 0,
             'full_frames_per_phase': 5675, 'max_full_seconds': max_full,
             'gpu': results['gpu'], 'cpu': results['cpu'],
-            'cpu_method': 'unqualified wall estimate; process-tree CPU upper bound not established'}
+            'cpu_method': ('unreleased estimate: verified command CPU with 1.5 margin; staging and isolation remain unproved'
+                           if cpu_costs is not None else 'process-tree CPU upper bound not established')}
 
 
 def check_budget(ledger: dict[str, Any], attestation: dict[str, Any], ledger_sha: str,
@@ -257,6 +268,14 @@ def validate() -> None:
                     or report['source']['frames'] != report['source']['labels']
                     or report['scope'] != 'CPU asset, source header and checkpoint readiness; no GPU scoring'):
                 raise ValueError('incomplete CPU readiness output')
+        from experiments.tennis import k5d_cpu_accounting as accounting
+        spec_data = json.loads((stage.parent / 'spec.json').read_text())
+        args = spec_data['arguments']
+        if '--accounted-child' in args:
+            raise ValueError('fleet command may not bypass CPU wrapper')
+        accounting.read_receipt((stage / 'command.log').read_text(), phase=args[0], stage='smoke',
+                                clip=cf.option(args, '--clip'), frames=report['source']['frames'],
+                                identity=cp.execution_identity())
         target.write_text(json.dumps({'passed': True, 'checks': {'full_timeline_and_assets': True,
                                       'strict_frozen_identity': True}}) + '\n')
     except Exception as exc:
@@ -277,6 +296,9 @@ def main() -> None:
         result = spec(json.loads(cf.BASE.read_text()), **data)
         cp.write_new(options.output, result)
         return
+    accounted_child = sys.argv[1:2] == ['--accounted-child']
+    if accounted_child:
+        del sys.argv[1]
     parser = argparse.ArgumentParser()
     parser.add_argument('action', choices=('prepare', 'score'))
     for name in ('archive', 'balltrack-code', 'balltrack-weight', 'wasb-code', 'wasb-weights', 'wasb-config',
@@ -291,7 +313,18 @@ def main() -> None:
     args = parser.parse_args()
     if args.action == 'score' and (not args.checkpoint or not args.checkpoint_sha256):
         parser.error('score requires actual checkpoint and SHA')
-    run(args)
+    if accounted_child:
+        run(args)
+    else:
+        from experiments.tennis import k5d_cpu_accounting as accounting
+        command = [sys.executable, '-m', 'experiments.tennis.k5d_control_study',
+                   '--accounted-child', *sys.argv[1:]]
+        stage_name = os.environ.get('PS_STAGE', '')
+        stage_dir = Path(os.environ['PS_STAGE_DIR'])
+        spec_data = json.loads((stage_dir.parent / 'spec.json').read_text())
+        seconds = spec_data[stage_name]['seconds']
+        accounting.measure(command, phase=args.action, clip=args.clip, frames=args.frames,
+                           stage=stage_name, identity=cp.execution_identity(), timeout_seconds=seconds - min(10, seconds / 4))
 
 
 if __name__ == '__main__':

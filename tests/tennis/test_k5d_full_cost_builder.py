@@ -31,3 +31,20 @@ def test_fit_rejects_invalid_or_unphysical_evidence() -> None:
         builder.model(100, 132, True, 20)
     with pytest.raises(ValueError):
         builder.model(100, 132, 1.49, 20)
+
+
+def test_readiness_profile_uses_control_smoke_and_longer_bounded_stage() -> None:
+    costs = {kind: builder.model(100, 132, 1.5, 20) for kind in ('prepare', 'score')}
+    allowances = {kind: {'per_stage_staging_seconds': 2, 'per_campaign_validator_seconds': 3,
+                         'per_campaign_audit_seconds': 4, 'failed_start_reserve_seconds': 50,
+                         'readiness_seconds': 40} for kind in ('gpu', 'cpu')}
+    budgets = {kind: {'spent_and_reserved_seconds': 0, 'ball_limit_seconds': 100000,
+                      'global_remaining_seconds': 100000} for kind in ('gpu', 'cpu')}
+    result = builder.projection(costs, allowances, budgets, profile='readiness')
+    assert result['gpu_smoke_inferences'] == 0
+    assert (result['stage_limit_seconds'], result['campaign_limit_seconds']) == (2670, 3000)
+    assert all(row['smoke_seconds'] == 40 for row in result['ordered_stages'])
+    assert result['cpu_incremental_seconds'] is None and result['budget_fits']['cpu'] is False
+    allowances['gpu']['readiness_seconds'] = 0
+    with pytest.raises(ValueError):
+        builder.projection(costs, allowances, budgets, profile='readiness')

@@ -122,7 +122,7 @@ def test_score_rejects_wrong_producer_binding(tmp_path: Path, monkeypatch: pytes
     def unpack(*args: Any) -> Any:
         yield tmp_path
 
-    monkeypatch.setattr(wave.cost, 'unpack', unpack)
+    monkeypatch.setattr(wave, 'unpack_publication', unpack)
     producer = {'publications': {'full': {'sha256': 'a' * 64, 'checkpoint_sha256': 'b' * 64}}}
     dispatch = {'command': ['experiments.tennis.k5d_control_study', '--checkpoint-sha256', 'c' * 64],
                 'staged_inputs': [{'sha256': 'a' * 64}]}
