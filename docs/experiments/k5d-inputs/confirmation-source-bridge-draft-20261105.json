@@ -8,12 +8,12 @@
     "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
   },
   "consumer_execution_identity": {
-    "source_sha256": "5b37c0b1bd9ccb0d529952a8c7d80964d050a71c5b02e963173f66d0c7a29a54",
-    "snapshot_sha256": "cc3f884078e43bec673bd2a646fb82db00223e8dc6d29be0148e5311a6bf4db3",
+    "source_sha256": "f45031b13550636c1b5eb812b572576628ca8d622334dd54fbd0e82ec031b9ae",
+    "snapshot_sha256": "8443228c6e94b0341f7c8f31ff80d5df97c5dba1a79e05aca776ae27cab5cdf1",
     "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
   },
   "calibration_snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
-  "consumer_snapshot_sha256": "cc3f884078e43bec673bd2a646fb82db00223e8dc6d29be0148e5311a6bf4db3",
+  "consumer_snapshot_sha256": "8443228c6e94b0341f7c8f31ff80d5df97c5dba1a79e05aca776ae27cab5cdf1",
   "changed_paths": [
     "experiments/tennis/k5d_control_bridge.py",
     "experiments/tennis/k5d_control_readiness.py",
@@ -25,6 +25,7 @@
     "experiments/tennis/k5d_pid_escalation_oracle.py",
     "experiments/tennis/k5d_pid_namespace_wrapper.py",
     "experiments/tennis/k5d_readiness_cost_probe.py",
+    "experiments/tennis/k5d_real_parity.py",
     "experiments/tennis/k5d_scoped_namespace.py",
     "experiments/tennis/k5d_study_wave.py",
     "tests/tennis/test_k5d_control_bridge.py",
@@ -34,10 +35,11 @@
     "tests/tennis/test_k5d_full_cost_builder.py",
     "tests/tennis/test_k5d_native_pid_oracle.py",
     "tests/tennis/test_k5d_readiness_cost_probe.py",
+    "tests/tennis/test_k5d_real_parity.py",
     "tests/tennis/test_k5d_scoped_namespace.py",
     "tests/tennis/test_k5d_study_wave.py"
   ],
   "unchanged_files": 1348,
   "scope": "complete archived source manifests; no checkpoint identity substitution",
-  "candidate_git_head": "9bf4cf4d3c06d0195aff65708cdae5bdae43f819"
+  "candidate_git_head": "b2b69c4587d3d0698f780c7488968ad282be367c"
 }
