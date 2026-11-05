@@ -38,3 +38,12 @@ def test_launcher_rejects_non_fleet_entrypoint(tmp_path, monkeypatch: pytest.Mon
     monkeypatch.setenv('PS_STAGE_DIR', str(stage))
     with pytest.raises(ValueError, match='fleet stage'):
         namespace.outer('0' * 64, 10, ['prepare'])
+
+
+def test_native_proof_is_fixed_cpu_only(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '')
+    cmd = namespace.worker_command(['native-proof', '--archive', '/staged/source'])
+    assert cmd[1:3] == ['-m', 'experiments.tennis.k5d_native_cpu_workload']
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '0')
+    with pytest.raises(ValueError, match='fixed prepare'):
+        namespace.worker_command(['native-proof', '--archive', '/staged/source'])

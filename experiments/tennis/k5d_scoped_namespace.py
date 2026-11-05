@@ -20,10 +20,14 @@ TARGET = 'experiments.tennis.k5d_control_study'
 
 def worker_command(arguments: list[str]) -> list[str]:
     """Construct, rather than accept, the executable and worker entrypoint."""
-    if (not arguments or arguments[0] not in ('prepare', 'score')
-            or '--accounted-child' in arguments or any(not isinstance(x, str) or not x for x in arguments)):
-        raise ValueError('only the fixed prepare/score worker is allowed')
-    return [sys.executable, '-m', TARGET, '--accounted-child', *arguments]
+    if (not arguments or any(not isinstance(x, str) or not x for x in arguments)
+            or '--accounted-child' in arguments):
+        raise ValueError('invalid fixed worker arguments')
+    if arguments[0] in ('prepare', 'score'):
+        return [sys.executable, '-m', TARGET, '--accounted-child', *arguments]
+    if arguments[0] == 'native-proof' and os.environ.get('CUDA_VISIBLE_DEVICES') == '':
+        return [sys.executable, '-m', 'experiments.tennis.k5d_native_cpu_workload', *arguments[1:]]
+    raise ValueError('only fixed prepare/score or CPU native-proof workers are allowed')
 
 
 def supervise(arguments: list[str], timeout: float, outside_namespace: str) -> dict[str, Any]:
@@ -52,6 +56,16 @@ def supervise(arguments: list[str], timeout: float, outside_namespace: str) -> d
         signal.signal(signum, stop)
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     start = time.monotonic()
+    from experiments.tennis.k5d_pid_escalation_oracle import process_identity, write
+
+    proof_root = os.environ.get('PS_K5D_PROOF_ROOT')
+    if proof_root:
+        root = Path(proof_root).resolve(strict=True)
+        scratch = Path(os.environ['PS_SCRATCH_DIR']).resolve(strict=True)
+        if root == scratch or not root.is_relative_to(scratch):
+            raise ValueError('proof root must be within scratch')
+        write(root / 'init.json', {'identity': process_identity(), 'argv': command,
+                                 'outside_namespace': outside_namespace})
     child = subprocess.Popen(command, start_new_session=True)
     status: int | None = None
     reaped = 0
@@ -79,6 +93,7 @@ def supervise(arguments: list[str], timeout: float, outside_namespace: str) -> d
     own = resource.getrusage(resource.RUSAGE_SELF)
     cpu = (after.ru_utime + after.ru_stime) - (before.ru_utime + before.ru_stime)
     return {'status': status, 'reason': reason or 'complete', 'reaped': reaped,
+            'namespace_init': process_identity(), 'worker_namespace_pid': child.pid, 'argv': command,
             'children_cpu_seconds': cpu, 'init_cpu_seconds': own.ru_utime + own.ru_stime,
             'elapsed_seconds': time.monotonic() - start, 'complete_descendant_wait': True}
 

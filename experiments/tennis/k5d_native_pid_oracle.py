@@ -1,0 +1,287 @@
+"""CPU-only, non-scientific native PID/accounting oracle; no fleet admission.
+
+The coordinator is separate from the K5d namespace init. It records owned PID
+identities and native executable observation before interruption, compares the
+normal namespace accounting to the coordinator's independent waited rusage,
+and refuses incomplete proof. Never signals an unobserved or foreign process.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import resource
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+from typing import Any
+
+from experiments.tennis.k5d_pid_escalation_oracle import gone, valid_identity, write
+
+CASES = ('normal', 'timeout', 'sigterm', 'sigkill')
+
+
+def sha(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open('rb') as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def descendants(pid: int) -> list[dict[str, Any]]:
+    """Read only descendants of the owned launcher, guarding PID reuse."""
+    result: list[dict[str, Any]] = []
+    pending = [pid]
+    visited = set(pending)
+    while pending:
+        parent = pending.pop()
+        try:
+            children = (Path('/proc') / str(parent) / 'task' / str(parent) / 'children').read_text().split()
+        except FileNotFoundError:
+            continue
+        for item in children:
+            child = int(item)
+            if child in visited:
+                continue
+            visited.add(child)
+            try:
+                base = Path('/proc') / str(child)
+                text = (base / 'stat').read_text()
+                fields = [line.split()[1:] for line in (base / 'status').read_text().splitlines()
+                          if line.startswith('NSpid:')]
+                pids = [int(n) for n in fields[0]]
+                record = {'host_pid': child, 'namespace_pid': pids[-1], 'namespace_pids': pids,
+                          'start_ticks': int(text[text.rfind(')') + 2:].split()[19]),
+                          'pid_namespace': os.readlink(base / 'ns/pid'),
+                          'executable': os.readlink(base / 'exe')}
+            except (FileNotFoundError, IndexError, ProcessLookupError):
+                continue
+            result.append(record)
+            pending.append(child)
+    return result
+
+
+def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
+             expected_native: dict[str, str]) -> dict[str, Any]:
+    proof = root / case
+    proof.mkdir()
+    outside = os.readlink('/proc/self/ns/pid')
+    timeout = 20.0 if case == 'normal' else 12.0
+    command = [str(unshare), '--user', '--map-root-user', '--pid', '--fork', '--kill-child=SIGKILL',
+               sys.executable, '-m', 'experiments.tennis.k5d_scoped_namespace', 'inner',
+               '--outside', outside, '--timeout', str(timeout), '--', 'native-proof', *native_args,
+               '--output', str(Path(os.environ['PS_SCRATCH_DIR']) / ('native-' + case))]
+    before = resource.getrusage(resource.RUSAGE_CHILDREN)
+    log = proof / 'command.log'
+    with log.open('xb') as stream:
+        proc = subprocess.Popen(command, stdout=stream, stderr=subprocess.STDOUT,
+                                env={**os.environ, 'PS_K5D_PROOF_ROOT': str(proof)}, start_new_session=True)
+        try:
+            owner = {'host_pid': proc.pid, 'start_ticks': int((Path('/proc') / str(proc.pid) / 'stat').read_text().split(') ')[1].split()[19])}
+            write(proof / 'launcher.json', owner)
+            observed: dict[tuple[int, int], dict[str, Any]] = {}
+            active_native = None
+            deadline = time.monotonic() + 12
+            while time.monotonic() < deadline:
+                for member in descendants(proc.pid):
+                    observed[(member['host_pid'], member['start_ticks'])] = member
+                    binary = Path(member['executable'])
+                    if binary.name in expected_native and sha(binary) == expected_native[binary.name]:
+                        active_native = member
+                        break
+                if active_native is not None:
+                    break
+                if proc.poll() is not None:
+                    raise RuntimeError('native subprocess was not observed while alive')
+                time.sleep(0.005)
+            if active_native is None:
+                proc.kill()
+                proc.wait()
+                raise TimeoutError('native subprocess observation deadline')
+            init = json.loads((proof / 'init.json').read_text())['identity']
+            if (not valid_identity(init) or init['namespace_pid'] != 1 or init['pid_namespace'] == outside
+                    or active_native['pid_namespace'] != init['pid_namespace'] or not valid_identity(active_native)):
+                proc.kill()
+                proc.wait()
+                raise ValueError('namespace or native process identity differs')
+            write(proof / 'before-interruption.json', {'case': case, 'launcher': owner, 'init': init,
+                  'native': active_native, 'observed_members': list(observed.values()), 'outside_namespace': outside})
+            if case != 'normal':
+                if gone(active_native):
+                    raise ValueError('owned native process exited before interruption')
+                fd = os.pidfd_open(active_native['host_pid'])
+                try:
+                    if gone(active_native):
+                        raise ValueError('owned native process identity changed')
+                    signal.pidfd_send_signal(fd, signal.SIGSTOP)
+                finally:
+                    os.close(fd)
+            if case == 'sigterm':
+                proc.terminate()
+                try:
+                    proc.wait(timeout=0.1)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+            elif case == 'sigkill':
+                proc.kill()
+            # timeout case waits for the init's own watchdog; normal completes naturally.
+            try:
+                proc.wait(timeout=20)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait()
+                raise TimeoutError('owned launcher exceeded outer deadline')
+            stream.flush()
+            os.fsync(stream.fileno())
+        finally:
+            if proc.poll() is None:
+                proc.kill()
+                proc.wait()
+    after = resource.getrusage(resource.RUSAGE_CHILDREN)
+    waited_cpu = (after.ru_utime + after.ru_stime) - (before.ru_utime + before.ru_stime)
+    deadline = time.monotonic() + 2
+    members = [init, *observed.values()]
+    while not all(gone(member) for member in members):
+        if time.monotonic() >= deadline:
+            raise TimeoutError('recorded owned namespace member remains')
+        time.sleep(0.02)
+    lines = log.read_text().splitlines()
+    records = [json.loads(line.removeprefix('K5D_NAMESPACE_CANDIDATE ')) for line in lines
+               if line.startswith('K5D_NAMESPACE_CANDIDATE ')]
+    if case == 'normal':
+        if proc.returncode != 0 or len(records) != 1 or records[0]['reason'] != 'complete':
+            raise ValueError('normal native workload failed')
+        outputs = [json.loads(line.removeprefix('K5D_NATIVE_CPU ')) for line in lines
+                   if line.startswith('K5D_NATIVE_CPU ')]
+        if (len(outputs) != 1 or outputs[0]['frames'] != 2
+                or outputs[0]['clip'] != 'tracknet/game9/Clip5'
+                or outputs[0]['native']['temporal_units'] != 2 or outputs[0]['native']['decoded_frames'] != 2
+                or any(len(outputs[0][name]) != 64 for name in ('source_rgb_sha256', 'yuv_sha256', 'decoded_sha256'))):
+            raise ValueError('normal native output is incomplete')
+        inner_cpu = records[0]['children_cpu_seconds'] + records[0]['init_cpu_seconds']
+        # The external total also includes unshare; allow a small positive overhead.
+        if not 0 <= waited_cpu - inner_cpu <= max(0.2, inner_cpu * 0.05):
+            raise ValueError('outer and namespace CPU counters disagree')
+    elif proc.returncode == 0:
+        raise ValueError('interrupted workload exited successfully')
+    result = {'case': case, 'launcher': owner, 'init': init, 'native': active_native,
+              'observed_members': list(observed.values()), 'members_absent': True,
+              'returncode': proc.returncode, 'outer_waited_cpu_seconds': waited_cpu,
+              'inner_records': records, 'native_output': outputs[0] if case == 'normal' else None, 'log_sha256': sha(log)}
+    write(proof / 'result.json', result)
+    return result
+
+
+def execute(args: argparse.Namespace) -> None:
+    if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or len(os.sched_getaffinity(0)) != 1:
+        raise ValueError('CPU-only one-core oracle required')
+    unshare = Path(args.unshare).resolve(strict=True)
+    if sha(unshare) != args.unshare_sha:
+        raise ValueError('unshare hash differs')
+    stage = Path(os.environ['PS_STAGE_DIR'])
+    dispatch = json.loads((stage / 'dispatch.json').read_text())
+    if dispatch['environment']['gpu'] is not None:
+        raise ValueError('GPU must be hidden')
+    scratch = Path(os.environ['PS_SCRATCH_DIR'])
+    publish = scratch / 'publish'
+    publish.mkdir()
+    root = publish / 'cases'
+    root.mkdir()
+    native_args = ['--archive', args.archive, '--archive-sha', args.archive_sha,
+                   '--ffmpeg-sha', args.ffmpeg_sha, '--encoder-sha', args.encoder_sha,
+                   '--decoder-sha', args.decoder_sha]
+    expected_native = {'ffmpeg': args.ffmpeg_sha, 'SvtAv1EncApp': args.encoder_sha,
+                       'dav1d': args.decoder_sha}
+    results = []
+    for case in CASES:
+        try:
+            results.append(one_case(root, case, unshare, native_args, expected_native))
+        except Exception as exc:
+            write(publish / f'failed-{case}.json', {'case': case, 'error': str(exc),
+                  'scope': 'partial native oracle proof; do not retry automatically'})
+            raise
+    write(publish / 'oracle.json', {'schema': 1, 'stage': os.environ['PS_STAGE'],
+          'source_sha256': dispatch['code']['source_sha256'], 'snapshot_sha256': dispatch['code']['snapshot_sha256'],
+          'environment_sha256': dispatch['staged_environment']['sha256'], 'unshare_sha256': args.unshare_sha,
+          'archive_sha256': args.archive_sha, 'native_tools': expected_native, 'cases': results,
+          'scope': 'CPU native process containment and accounting; no GPU, quality or file-denial claim'})
+
+
+def validate() -> None:
+    import tarfile
+
+    stage = Path(os.environ['PS_STAGE_DIR'])
+    target = Path(os.environ['PS_VALIDATION_PATH'])
+    try:
+        archive = stage / 'published.tar'
+        staging = json.loads((stage / 'staging.json').read_text())
+        if sha(archive) != staging['published']['sha256']:
+            raise ValueError('publication hash differs')
+        with tarfile.open(archive, 'r:') as bundle:
+            members = bundle.getmembers()
+            if any(not (m.isfile() or m.isdir()) or '..' in Path(m.name).parts or m.name.startswith('/')
+                   for m in members) or sum(m.size for m in members) > 2_000_000:
+                raise ValueError('invalid oracle publication')
+            def read(name: str) -> dict[str, Any]:
+                stream = bundle.extractfile(name)
+                if stream is None:
+                    raise ValueError('missing oracle artifact')
+                return json.load(stream)
+            record = read('publish/oracle.json')
+            cases = [read(f'publish/cases/{case}/result.json') for case in CASES]
+            before = [read(f'publish/cases/{case}/before-interruption.json') for case in CASES]
+        dispatch = json.loads((stage / 'dispatch.json').read_text())
+        if (record['schema'] != 1 or record['stage'] != 'smoke' or record['cases'] != cases
+                or record['source_sha256'] != dispatch['code']['source_sha256']
+                or record['snapshot_sha256'] != dispatch['code']['snapshot_sha256']
+                or record['environment_sha256'] != dispatch['staged_environment']['sha256']
+                or dispatch['environment']['gpu'] is not None or [x['case'] for x in cases] != list(CASES)):
+            raise ValueError('oracle execution identity differs')
+        for case, pre, result in zip(CASES, before, cases, strict=True):
+            if (pre['case'] != case or pre['native'] != result['native'] or pre['init'] != result['init']
+                    or result['members_absent'] is not True or not valid_identity(result['native'])
+                    or not valid_identity(result['init']) or result['init']['namespace_pid'] != 1
+                    or result['native']['pid_namespace'] != result['init']['pid_namespace']
+                    or result['init']['pid_namespace'] == pre['outside_namespace']
+                    or (result['returncode'] == 0) != (case == 'normal')
+                    or result['outer_waited_cpu_seconds'] <= 0):
+                raise ValueError('native or teardown evidence differs')
+        normal = cases[0]
+        native = normal['native_output']
+        cpu = normal['inner_records']
+        if (not isinstance(native, dict) or native['frames'] != 2 or native['clip'] != 'tracknet/game9/Clip5'
+                or native['source_sha256'] != record['archive_sha256'] or native['native']['decoded_frames'] != 2
+                or native['native']['temporal_units'] != 2 or len(cpu) != 1 or cpu[0]['reason'] != 'complete'
+                or cpu[0]['complete_descendant_wait'] is not True):
+            raise ValueError('normal CPU/native proof differs')
+        inner = cpu[0]['children_cpu_seconds'] + cpu[0]['init_cpu_seconds']
+        if not 0 <= normal['outer_waited_cpu_seconds'] - inner <= max(0.2, inner * 0.05):
+            raise ValueError('normal CPU accounting differs')
+        write(target, {'passed': True, 'checks': {'native_and_namespace': True, 'four_exit_modes': True,
+              'owned_pids_absent': True, 'normal_cpu_comparison': True}})
+    except Exception as exc:
+        write(target, {'passed': False, 'checks': {'native_oracle': False}, 'error': str(exc)})
+        raise
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action', choices=('run', 'validate'))
+    for name in ('archive', 'archive-sha', 'unshare', 'unshare-sha', 'ffmpeg-sha', 'encoder-sha', 'decoder-sha'):
+        parser.add_argument('--' + name)
+    args = parser.parse_args()
+    if args.action == 'validate':
+        validate()
+    else:
+        if any(getattr(args, name) is None for name in ('archive', 'archive_sha', 'unshare', 'unshare_sha',
+                                                        'ffmpeg_sha', 'encoder_sha', 'decoder_sha')):
+            parser.error('all pinned inputs and executable hashes are required')
+        execute(args)
+
+
+if __name__ == '__main__':
+    main()
