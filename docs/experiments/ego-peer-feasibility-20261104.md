@@ -80,3 +80,6 @@ Guarded native 4→16 request **20261105T121902Z-4020b8ee** was published, with 
 
 
 Request **20261105T121902Z-4020b8ee** completed and passed a separately executed GPU-hidden frozen full validator; the [paired six-anchor comparison and independent audit](ego-peer-inputs/20261104/gvcrt-4020b8ee-independent-report-20261105.md) records checks, identities, bytes, model/device/kernel scope and teardown. At the sole GVC QP3 point, native rate 338.55 kb/s, frame PSNR 21.106 dB versus an interpolated native-rate anchor envelope of 33.712 dB; crop LPIPS 0.1018 versus 0.1351 (lower better). This is one matched 16-frame Clip3 point with no BD-rate claim.
+
+
+A subsequent [CPU-only official-source and saved-pixel sanity review](ego-peer-inputs/20261104/gvcrt-4020b8ee-source-sanity-20261105.md) found no adapter inconsistency invalidating the fixed-point measurement. It records the matched YUV420→RGB input choice and 41.457 dB conversion floor, deliberate uint8 metric convention, decoded range, QP/refresh/checkpoint comparison, and qualified WASB author-reported game split; no independent official-entrypoint encode was run. Creation-to-terminal update was 187.418 seconds, supporting conservative 188 GPU-second charging.
