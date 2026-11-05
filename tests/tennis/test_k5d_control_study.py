@@ -108,3 +108,92 @@ def test_confirmation_caps_are_separate_from_full_study() -> None:
     gate['allowed_clips'] = list(reversed(clips))
     with pytest.raises(ValueError, match='registered clips'):
         control.confirmation_budget(gate, data)
+
+
+def test_confirmation_requires_both_audited_receipts_without_full30_fit(
+    tmp_path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from experiments.tennis import k5d_full_study as study
+
+    data = receipt()
+    data.update(schema=1, passed=True, selection_sha256=control.fleet.SOURCE_SHA,
+                calibration_execution_identity={'old': 'old'}, consumer_execution_identity={'new': 'new'},
+                bridge_sha256='b' * 64, gpu_model='RTX A6000', gpu_capability=[8, 6],
+                calibration_jobs={'prepare': '20261105T025241Z-fe451f9e', 'score': '20261105T032433Z-1423f92a'},
+                stage_caps_fit=True)
+    clips = ['tracknet/game9/Clip5', 'tracknet/game10/Clip12']
+    jobs = [f'{c}:{p}' for c in clips for p in ('prepare', 'score')]
+    qualification = {'audited': True, 'cpu_native_pid_passed': True, 'gpu_16_parity_passed': True,
+                     'consumer_execution_identity': {'new': 'new'}, 'gpu_model': 'RTX A6000',
+                     'gpu_capability': [8, 6], 'namespace_wrapper_sha256': 'w' * 64,
+                     'native_cpu_receipt_sha256': 'a' * 64, 'gpu_parity_receipt_sha256': 'c' * 64,
+                     'unshare_sha256': 'd' * 64}
+    gate = {'schema': 1, 'approved': True, 'purpose': 'full-retrospective-benchmark-cpu-readiness',
+            'selection_sha256': control.fleet.SOURCE_SHA, 'consumer_execution_identity': {'new': 'new'},
+            'cost_receipt_sha256': 'e' * 64, 'bridge_sha256': 'b' * 64, 'gpu_models': ['RTX A6000'],
+            'gpu_capability': [8, 6], 'fidelity_only_for_unqualified': True, 'allowed_clips': clips,
+            'release': 'cost-confirmation', 'confirmation_qualification': qualification,
+            'confirmation_caps': {'gpu': {'jobs': dict(zip(jobs, (1200, 1400, 2100, 2700), strict=True)),
+                                          'external': 200, 'total': 7600},
+                                  'cpu': {'jobs': dict.fromkeys(jobs, 2000), 'external': 200, 'total': 8200}}}
+    bridge = {'approved': True, 'calibration_execution_identity': {'old': 'old'},
+              'consumer_execution_identity': {'new': 'new'}, 'calibration_snapshot_sha256': 'x',
+              'consumer_snapshot_sha256': 'y', 'changed_paths': [], 'unchanged_files': 1}
+    cpu = {'schema': 1, 'audited': True, 'passed': True, 'scope': 'native CPU PID containment and accounting',
+           'namespace_wrapper_sha256': 'w' * 64, 'unshare_sha256': 'd' * 64,
+           'cases': ['normal', 'timeout', 'sigterm', 'sigkill'], 'all_owned_pids_absent': True,
+           'independent_cpu_match': True}
+    parity = {'schema': 1, 'audited': True, 'passed': True, 'scope': 'actual 16-frame GPU native and score parity',
+              'consumer_execution_identity': {'new': 'new'}, 'gpu_model': 'RTX A6000', 'gpu_capability': [8, 6],
+              'all_six_exact': True, 'namespace_wrapper_sha256': 'w' * 64}
+    objects = {'gate': gate, 'cost': data, 'bridge': bridge, 'ledger': {}, 'budget': {}, 'cpu': cpu, 'parity': parity}
+    monkeypatch.setattr(study, 'checked_json', lambda path, _: objects[path.name])
+    monkeypatch.setattr(study, 'selection', lambda: {clips[0]: {'label_rows': 292}, clips[1]: {'label_rows': 586}})
+    monkeypatch.setattr(control.bridge, 'bridge', lambda *_: bridge)
+    monkeypatch.setattr(control.evidence, 'historical', lambda *_: None)
+    monkeypatch.setattr(control, 'check_budget', lambda *_: None)
+    monkeypatch.setattr(control, 'programme_projection', lambda *_: {'gpu': {'fits': False}, 'cpu': {'fits': False}})
+    monkeypatch.setattr(control.oracle, 'sha', lambda *_: 'w' * 64)
+    args = (tmp_path / 'gate', 'g' * 64, tmp_path / 'cost', 'e' * 64, tmp_path / 'bridge', 'b' * 64,
+            tmp_path / 'old', tmp_path / 'new', tmp_path / 'ledger', 'l' * 64, tmp_path / 'budget', 't' * 64,
+            {'new': 'new'}, clips[0], 'prepare')
+    with pytest.raises(ValueError, match='qualification receipts'):
+        control.approved(*args)
+    paths = {'native_cpu': tmp_path / 'cpu', 'gpu_parity': tmp_path / 'parity'}
+    _, frames = control.approved(*args, paths)
+    assert frames == 292
+    parity['all_six_exact'] = False
+    with pytest.raises(ValueError, match='qualification receipt'):
+        control.approved(*args, paths)
+    parity['all_six_exact'] = True
+    gate['release'] = 'full-study'
+    data['budget_fits'] = {'gpu': True, 'cpu': True}
+    with pytest.raises(ValueError, match='full programme exceeds'):
+        control.approved(*args, paths)
+
+
+def test_confirmation_spec_uses_namespace_and_enforces_job_caps(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from experiments.jobs import inbox
+
+    clip = 'tracknet/game9/Clip5'
+    gate = {'release': 'cost-confirmation', 'confirmation_qualification': {'unshare_sha256': 'a' * 64},
+            'confirmation_caps': {resource: {'jobs': {f'{clip}:prepare': 500}}
+                                  for resource in ('gpu', 'cpu')}}
+    names = ('full_gate', 'cost_receipt', 'bridge', 'calibration_source', 'consumer_source', 'fidelity_gate',
+             'budget_ledger', 'budget_attestation', 'native_cpu_receipt', 'gpu_parity_receipt')
+    assets = {name: {'local': str(tmp_path / name), 'remote': '/remote/' + name, 'sha256': 'a' * 64} for name in names}
+    monkeypatch.setattr(control.study, 'checked_json', lambda *_: gate)
+    monkeypatch.setattr(control, 'approved', lambda *_: ({'cost': {'prepare': {'seconds16': 1}}}, 292))
+    monkeypatch.setattr(control.study, 'forecast', lambda *_: 1)
+    monkeypatch.setattr(control.cf, 'asset', lambda name, *_args, **_kwargs: {'name': name})
+    monkeypatch.setattr(control.cf, 'common_spec', lambda *_: {'scale': {}})
+    monkeypatch.setattr(inbox, 'validate_spec', lambda *_: None)
+    base: dict = {'arguments': []}
+    result = control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
+                          deadline='later', readiness_seconds=20, full_seconds=100, campaign_seconds=150)
+    assert result['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+    assert result['arguments'][:4] == ['--unshare-sha', 'a' * 64, '--timeout', '{namespace_timeout}']
+    assert '--native-cpu-receipt' in result['arguments'] and '--gpu-parity-receipt' in result['arguments']
+    with pytest.raises(ValueError, match='job cap'):
+        control.spec(base, phase='prepare', clip=clip, identity={}, assets=assets,
+                     deadline='later', readiness_seconds=20, full_seconds=490, campaign_seconds=550)

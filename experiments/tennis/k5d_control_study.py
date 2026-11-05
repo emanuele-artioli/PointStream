@@ -17,7 +17,7 @@ from experiments.tennis import k5d_benchmark as benchmark, k5d_checkpoint as cp
 from experiments.tennis import k5d_checkpoint_fleet as cf, k5d_coalesced as co
 from experiments.tennis import k5d_control_bridge as bridge, k5d_control_readiness as readiness
 from experiments.tennis import k5d_cost_pilot as cost, k5d_fleet as fleet, k5d_full_study as study
-from experiments.tennis import k5d_study_evidence as evidence
+from experiments.tennis import k5d_study_evidence as evidence, k5d_source_oracle as oracle
 
 # Saved fleet evidence independently audited against the d8b5 references.
 CALIBRATION_EXECUTIONS = {
@@ -161,7 +161,8 @@ def confirmation_budget(gate: dict[str, Any], receipt: dict[str, Any]) -> None:
 
 def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bridge_path: Path, bridge_sha: str,
              old_source: Path, new_source: Path, ledger_path: Path, ledger_sha: str,
-             budget_path: Path, budget_sha: str, identity: dict[str, str], clip: str, phase: str) -> tuple[dict[str, Any], int]:
+             budget_path: Path, budget_sha: str, identity: dict[str, str], clip: str, phase: str,
+             qualification_paths: dict[str, Path] | None = None) -> tuple[dict[str, Any], int]:
     gate = study.checked_json(gate_path, gate_sha)
     receipt = study.checked_json(cost_path, cost_sha)
     signed_bridge = study.checked_json(bridge_path, bridge_sha)
@@ -194,15 +195,48 @@ def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bri
             or receipt.get('bridge_sha256') != bridge_sha
             or receipt.get('gpu_model') != 'RTX A6000' or receipt.get('gpu_capability') != [8, 6]
             or receipt.get('calibration_jobs') != {'prepare': '20261105T025241Z-fe451f9e', 'score': '20261105T032433Z-1423f92a'}
-            or receipt.get('stage_caps_fit') is not True or receipt.get('budget_fits') != {'gpu': True, 'cpu': True}
+            or receipt.get('stage_caps_fit') is not True
             or any(receipt['cost'][kind]['margin'] < 1.5 for kind in ('prepare', 'score'))):
         raise ValueError('full programme cost evidence does not authorize this profile')
     ledger = study.checked_json(ledger_path, ledger_sha)
     attestation = study.checked_json(budget_path, budget_sha)
     check_budget(ledger, attestation, ledger_sha, budget_sha, receipt)
     projection = programme_projection(receipt)
-    if not projection['gpu']['fits'] or not projection['cpu']['fits']:
-        raise ValueError('recomputed full programme exceeds available budgets')
+    if gate['release'] == 'cost-confirmation':
+        qualification = gate.get('confirmation_qualification')
+        if not isinstance(qualification, dict):
+            raise ValueError('real-path confirmation qualification required')
+        from experiments.tennis import k5d_scoped_namespace as namespace
+        if (qualification.get('audited') is not True or qualification.get('cpu_native_pid_passed') is not True
+                or qualification.get('gpu_16_parity_passed') is not True
+                or qualification.get('consumer_execution_identity') != identity
+                or qualification.get('gpu_model') != 'RTX A6000' or qualification.get('gpu_capability') != [8, 6]
+                or qualification.get('namespace_wrapper_sha256') != oracle.sha(Path(namespace.__file__))
+                or any(not isinstance(qualification.get(key), str) or not cf.digest_string(qualification[key])
+                       for key in ('native_cpu_receipt_sha256', 'gpu_parity_receipt_sha256', 'unshare_sha256'))):
+            raise ValueError('real-path qualification differs')
+        if qualification_paths is None or set(qualification_paths) != {'native_cpu', 'gpu_parity'}:
+            raise ValueError('both independently audited qualification receipts are required')
+        native = study.checked_json(qualification_paths['native_cpu'], qualification['native_cpu_receipt_sha256'])
+        parity = study.checked_json(qualification_paths['gpu_parity'], qualification['gpu_parity_receipt_sha256'])
+        if (native.get('schema') != 1 or native.get('audited') is not True or native.get('passed') is not True
+                or native.get('scope') != 'native CPU PID containment and accounting'
+                or native.get('namespace_wrapper_sha256') != qualification['namespace_wrapper_sha256']
+                or native.get('unshare_sha256') != qualification['unshare_sha256']
+                or native.get('cases') != ['normal', 'timeout', 'sigterm', 'sigkill']
+                or native.get('all_owned_pids_absent') is not True or native.get('independent_cpu_match') is not True
+                or parity.get('schema') != 1 or parity.get('audited') is not True or parity.get('passed') is not True
+                or parity.get('scope') != 'actual 16-frame GPU native and score parity'
+                or parity.get('consumer_execution_identity') != identity or parity.get('gpu_model') != 'RTX A6000'
+                or parity.get('gpu_capability') != [8, 6] or parity.get('all_six_exact') is not True
+                or parity.get('namespace_wrapper_sha256') != qualification['namespace_wrapper_sha256']):
+            raise ValueError('actual native or GPU qualification receipt differs')
+        confirmation_budget(gate, receipt)
+    else:
+        if receipt.get('budget_fits') != {'gpu': True, 'cpu': True}:
+            raise ValueError('full programme budget evidence differs')
+        if not projection['gpu']['fits'] or not projection['cpu']['fits']:
+            raise ValueError('recomputed full programme exceeds available budgets')
     if phase not in ('prepare', 'score'):
         raise ValueError('invalid stage')
     return receipt, clips[clip]['label_rows']
@@ -223,13 +257,19 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
                  'budget_ledger', 'budget_attestation'):
         if name not in assets:
             raise ValueError('missing approved evidence asset: ' + name)
+    gate_data = study.checked_json(Path(assets['full_gate']['local']), assets['full_gate']['sha256'])
+    qualification_paths = None
+    if gate_data.get('release') == 'cost-confirmation':
+        if not {'native_cpu_receipt', 'gpu_parity_receipt'}.issubset(assets):
+            raise ValueError('actual CPU and GPU qualification assets required')
+        qualification_paths = {name: Path(assets[name + '_receipt']['local']) for name in ('native_cpu', 'gpu_parity')}
     receipt, frames = approved(Path(assets['full_gate']['local']), assets['full_gate']['sha256'],
                                Path(assets['cost_receipt']['local']), assets['cost_receipt']['sha256'],
                                Path(assets['bridge']['local']), assets['bridge']['sha256'],
                                Path(assets['calibration_source']['local']), Path(assets['consumer_source']['local']),
                                Path(assets['budget_ledger']['local']), assets['budget_ledger']['sha256'],
                                Path(assets['budget_attestation']['local']), assets['budget_attestation']['sha256'],
-                               identity, clip, phase)
+                               identity, clip, phase, qualification_paths)
     predicted = study.forecast(receipt, phase, frames, receipt['cost'][phase]['seconds16'])
     if predicted > full_seconds:
         raise ValueError('fixed/marginal full-stage forecast exceeds declared cap')
@@ -243,6 +283,9 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
             '--budget-ledger', '{staged:budget_ledger}', '--budget-ledger-sha256', assets['budget_ledger']['sha256'],
             '--budget-attestation', '{staged:budget_attestation}', '--budget-attestation-sha256', assets['budget_attestation']['sha256'],
             '--fidelity-gate', '{staged:fidelity_gate}', '--fidelity-gate-sha256', assets['fidelity_gate']['sha256']]
+    if qualification_paths is not None:
+        args += ['--native-cpu-receipt', '{staged:native_cpu_receipt}',
+                 '--gpu-parity-receipt', '{staged:gpu_parity_receipt}']
     if phase == 'score':
         if 'checkpoint' not in assets:
             raise ValueError('actual full-context checkpoint required')
@@ -256,6 +299,16 @@ def spec(base: dict[str, Any], *, phase: str, clip: str, identity: dict[str, str
     result['scale']['mode'] = {'smoke': 'readiness', 'full': 'full'}
     result['smoke'] = {'seconds': readiness_seconds, 'representative_basis': 'CPU validation of the complete source timeline, model identities, source bridge and prepared checkpoint.'}
     result['full'] = {'seconds': full_seconds}
+    if gate_data['release'] == 'cost-confirmation':
+        for resource in ('gpu', 'cpu'):
+            cap = gate_data['confirmation_caps'][resource]['jobs'][f'{clip}:{phase}']
+            if campaign_seconds > cap:
+                raise ValueError('campaign exceeds reserved confirmation job cap')
+        result['entrypoint'] = ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']
+        result['arguments'] = ['--unshare-sha', gate_data['confirmation_qualification']['unshare_sha256'],
+                               '--timeout', '{namespace_timeout}', '--', *args]
+        result['scale']['namespace_timeout'] = {'smoke': str(readiness_seconds - min(10, readiness_seconds / 4)),
+                                                 'full': str(full_seconds - min(10, full_seconds / 4))}
     result['validator'] = ['{python}', '-m', 'experiments.tennis.k5d_control_study', 'validate']
     from experiments.jobs.inbox import validate_spec
     validate_spec(result)
@@ -266,7 +319,9 @@ def verify_gate(args: argparse.Namespace, identity: dict[str, str]) -> int:
     _, frames = approved(Path(args.full_gate), args.full_gate_sha256, Path(args.cost_receipt), args.cost_receipt_sha256,
                          Path(args.bridge), args.bridge_sha256, Path(args.calibration_source), Path(args.consumer_source),
                          Path(args.budget_ledger), args.budget_ledger_sha256, Path(args.budget_attestation),
-                         args.budget_attestation_sha256, identity, args.clip, args.action)
+                         args.budget_attestation_sha256, identity, args.clip, args.action,
+                         {'native_cpu': Path(args.native_cpu_receipt), 'gpu_parity': Path(args.gpu_parity_receipt)}
+                         if args.native_cpu_receipt and args.gpu_parity_receipt else None)
     if args.frames != frames:
         raise ValueError('full native timeline differs')
     return frames
@@ -307,6 +362,10 @@ def validate() -> None:
         from experiments.tennis import k5d_cpu_accounting as accounting
         spec_data = json.loads((stage.parent / 'spec.json').read_text())
         args = spec_data['arguments']
+        if spec_data['entrypoint'] == ['-m', 'experiments.tennis.k5d_scoped_namespace', 'outer']:
+            if args.count('--') != 1:
+                raise ValueError('namespace worker separator differs')
+            args = args[args.index('--') + 1:]
         if '--accounted-child' in args:
             raise ValueError('fleet command may not bypass CPU wrapper')
         accounting.read_receipt((stage / 'command.log').read_text(), phase=args[0], stage='smoke',
@@ -343,6 +402,8 @@ def main() -> None:
                  'fidelity-gate', 'fidelity-gate-sha256', 'budget-ledger', 'budget-ledger-sha256',
                  'budget-attestation', 'budget-attestation-sha256', 'mode'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--native-cpu-receipt')
+    parser.add_argument('--gpu-parity-receipt')
     parser.add_argument('--checkpoint')
     parser.add_argument('--checkpoint-sha256')
     parser.add_argument('--frames', type=int, required=True)

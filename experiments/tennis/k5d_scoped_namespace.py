@@ -201,6 +201,19 @@ def main() -> None:
         print('K5D_NAMESPACE_CANDIDATE ' + json.dumps(receipt, sort_keys=True, allow_nan=False), flush=True)
         if receipt['reason'] != 'complete' or receipt['status'] != 0:
             raise SystemExit(1)
+        if arguments[0] in ('prepare', 'score'):
+            from experiments.tennis import k5d_checkpoint as checkpoint
+            from experiments.tennis import k5d_checkpoint_fleet as fleet
+            record = {'schema': 1, 'method': 'linux-subreaper-waited-rusage-v1', 'phase': arguments[0],
+                      'stage': os.environ['PS_STAGE'], 'clip': fleet.option(arguments, '--clip'),
+                      'frames': int(fleet.option(arguments, '--frames')), 'execution_identity': checkpoint.execution_identity(),
+                      'child_exit_code': receipt['status'], 'wrapper_pid': os.getpid(),
+                      'command_pid': receipt['worker_namespace_pid'],
+                      'adopted_children_waited': max(0, receipt['reaped'] - 1),
+                      'children_cpu_seconds': receipt['children_cpu_seconds'],
+                      'wrapper_cpu_seconds': receipt['init_cpu_seconds'], 'complete_descendant_wait': True,
+                      'scope': 'stage command only; excludes fleet staging, publication and validation'}
+            print('K5D_CPU_ACCOUNTING ' + json.dumps(record, sort_keys=True, allow_nan=False), flush=True)
 
 
 if __name__ == '__main__':

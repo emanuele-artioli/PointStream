@@ -27,7 +27,14 @@ CONTROL_ADDITIONS = frozenset({'experiments/tennis/k5d_control_bridge.py',
                                'experiments/tennis/k5d_cpu_accounting.py',
                                'tests/tennis/test_k5d_cpu_accounting.py',
                                'tests/tennis/test_k5d_full_cost_builder.py',
-                               'tests/tennis/test_k5d_study_wave.py'})
+                               'tests/tennis/test_k5d_study_wave.py',
+                               'experiments/tennis/k5d_scoped_namespace.py',
+                               'experiments/tennis/k5d_native_pid_oracle.py',
+                               'experiments/tennis/k5d_native_cpu_workload.py',
+                               'experiments/tennis/k5d_pid_escalation_oracle.py',
+                               'experiments/tennis/k5d_pid_namespace_wrapper.py',
+                               'tests/tennis/test_k5d_scoped_namespace.py',
+                               'tests/tennis/test_k5d_native_pid_oracle.py'})
 
 
 def manifest(archive: Path, expected_sha: str) -> tuple[str, dict[str, list[str]]]:
