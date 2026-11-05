@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "device": "cpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [],
+  "gpu_memory_mib": 0,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.k5d_opentt_join_witness"
+  ],
+  "arguments": [
+    "--clip",
+    "test_2",
+    "--video",
+    "{staged:video}",
+    "--labels",
+    "{staged:labels}",
+    "--mode",
+    "{mode}"
+  ],
+  "scale": {
+    "mode": {
+      "smoke": "inspect",
+      "full": "no-additional-work"
+    }
+  },
+  "staged_inputs": [
+    {
+      "name": "video",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.mp4",
+      "sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43"
+    },
+    {
+      "name": "labels",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.zip",
+      "sha256": "c692014ca9074d331700385e4c0b5e0bd32968123bf001fe8b1c9b2e64ac142d"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.mp4",
+      "sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.zip",
+      "sha256": "c692014ca9074d331700385e4c0b5e0bd32968123bf001fe8b1c9b2e64ac142d"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "local_storage_gib": 16,
+  "verify_staged_inputs": true,
+  "required_commands": [],
+  "smoke": {
+    "seconds": 210,
+    "representative_basis": "CPU-only one-video witness pilot, source test_2 exact video/annotation hashes and frozen adjacent triplet; inspect actual frame PTS across stream, decode from first frame and compare exact source PTS/RGB with a bounded fast seek, export three frames and labeled contact sheet for independent review. This one short-source pilot is not a seven-video cost forecast or source-judge result."
+  },
+  "full": {
+    "seconds": 5
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.k5d_opentt_join_witness",
+    "--validate-smoke"
+  ],
+  "validator_seconds": 25,
+  "budget_seconds": 270,
+  "deadline": "2026-11-05T02:00:00+00:00",
+  "stall_seconds": 240
+}

@@ -1,0 +1,20 @@
+{
+  "inputs": [
+    {
+      "source": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_2.mp4",
+      "destination": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.mp4",
+      "device": 2097343,
+      "inode": 37087257,
+      "bytes": 225118372
+    },
+    {
+      "source": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_2.zip",
+      "destination": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.zip",
+      "device": 2097343,
+      "inode": 37083351,
+      "bytes": 897976
+    }
+  ],
+  "mode": "existing source read-only; exclusive hardlinks; no body hashes in this metadata step",
+  "host": "gpu2"
+}

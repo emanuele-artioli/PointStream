@@ -281,6 +281,39 @@
       "deadline": "2026-11-04T23:20:00+00:00",
       "inclusive_cpu_ceiling": 210,
       "gpu_ceiling": 0
+    },
+    {
+      "job_id": "20261105T000550Z-d8b5c76b",
+      "phase": "k5d-16-48-costpilot-20261104",
+      "state": "submitted; inspect canonical status",
+      "revision": "cd669a2204f6d7f578a98e526285922d4e771e4b",
+      "deadline": "2026-11-05T00:45:21.789990+00:00",
+      "inclusive_cpu_ceiling": 2100,
+      "gpu_ceiling": 1800,
+      "source_sha256": "36106be834aed2fe90085417ab74035ca33e3328e15bd886ce41264e6c461ee9",
+      "spec_sha256": "cf1db81be013336627e15bebaadbc9a9f375c00c77bc3380b9dd32b7a7fd1542"
+    },
+    {
+      "job_id": "20261105T000651Z-30f6379a",
+      "phase": "w6-smoothing-20261104",
+      "state": "submitted; inspect canonical status",
+      "revision": "cd669a2204f6d7f578a98e526285922d4e771e4b",
+      "source_sha256": "36106be834aed2fe90085417ab74035ca33e3328e15bd886ce41264e6c461ee9",
+      "spec_sha256": "6bee17ef882314c4e28490ff2334a7e74f238334ceaf49ab8ba32021f9b235bb",
+      "deadline": "2026-11-05T00:45:21.789990+00:00",
+      "inclusive_cpu_ceiling": 1500,
+      "gpu_ceiling": 1200
+    },
+    {
+      "job_id": "20261105T000744Z-871fc06c",
+      "phase": "w8-portable-v2-20261105",
+      "state": "submitted; inspect canonical status",
+      "revision": "39a0af696dadc00a01b493c4c951311ebb18af93",
+      "source_sha256": "de9b1cb25ed238ba7c4dca4fa738c793ec6bd1fd1816da1cb14ac94eed1bc7cf",
+      "spec_sha256": "ba951e6ac9a582147305720a80a4e181aca80482f3af7be0ac7d583fa222f1a6",
+      "deadline": "2026-11-05T00:45:21.789990+00:00",
+      "inclusive_cpu_ceiling": 360,
+      "gpu_ceiling": 240
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -291,18 +324,17 @@
   ],
   "monitoring": {
     "mode": "one canonical wholebatch wait; exits on attention",
-    "state": "completed; attention; inspectsavedbatch2receipt",
-    "local_exec_session": 82059,
+    "state": "previousbatchattention; newboundedwait activejobs only",
     "jobs": [
-      "20261104T223611Z-ed28cf8e",
-      "20261104T222153Z-1145ce7a",
-      "20261104T222305Z-5d374710"
+      "20261105T000550Z-d8b5c76b",
+      "20261105T000651Z-30f6379a"
     ],
-    "result": "/private/tmp/pointstream-feasibility-batch2-wait-20261104.json",
-    "max_seconds": 2700,
-    "started_utc": "2026-11-04T22:59:48.239015+00:00",
-    "deadline_utc": "2026-11-04T23:44:48.239015+00:00",
+    "result": "/private/tmp/pointstream-ball-smoothing-wait-20261105.json",
+    "max_seconds": 1800,
+    "started_utc": "2026-11-05T00:10:42.054213+00:00",
+    "deadline_utc": "2026-11-05T00:45:21.789990+00:00",
     "native_completion_resume_verified": false,
-    "recurring_llm_polling": false
+    "recurring_llm_polling": false,
+    "previous_result": "/private/tmp/pointstream-pilots-wholebatch-wait-20261105.json"
   }
 }

@@ -39,13 +39,13 @@ in [the card](docs/cards/submission-research-2026-11-04.md); full 34-window/trai
 work cannot be silently borrowed into it. The complete remaining-work audit is
 [here](docs/paper/submission-completion-audit-2026-11-04.md).
 
-**Latest checkpoint:** Overleaf `5109c83d6fc5156e390fd79fb54d72f89bee777f`
+**Latest manuscript checkpoint:** Overleaf `184e2e0`
 is pushed: eight main figures and two appendix figures, 23 body/reference pages
 (references on 22–23) plus five appendix pages. The historical ball result and
 new separate-judge 48-frame pilot are in the main text/figure; a per-setting
 physical-byte/PSNR table supports them in the appendix. Negative whole-frame
-guards and broader limitations remain visible. Both variants build from the
-23-file selected-source ZIP; anonymous review data contains only saved
+guards and broader limitations remain visible. Both current variants build to the same page limits; the previous
+23-file selected-source ZIP is preserved pending a new research-final package; previous anonymous review data contains only saved
 predictions/labels/ledgers, with no footage or native binaries. Exact package
 identities and remaining research/author steps are in the
 [review record](docs/paper/strengthened-author-review-2026-11-03.md).

@@ -215,3 +215,9 @@ Onlyafter two correctuncontaminatedframecounts andconservativecompletecost
 fit may a fresh188confirmation be admitted; nocorpus/realismclaimfromsmokes.
 
 Root admitted prospective16/48 cost instrumentation after focused correctness tests and exact ed28 contract review. No188/full30 promotion is authorized by this cost48-only receipt. Inclusive1800GPU/2100CPU reserved; host inspection00:05UTC found gpu2 idle A6000 capacity.
+
+Fresh cost16/48 request **20261105T000550Z-d8b5c76b** submitted from cd669a22; immutable source receipt at `/private/tmp/pointstream-cost16-48-submit-20261105.json`. Spec SHA-256 acd2859c1aff5f2f118e262bf528afa90e4bea7612da68d7b6a5fead94e23a02. Inclusive1800GPU/2100CPU; deadline2026-11-05T00:45:21.789990+00:00. Re-read canonical status before acting; never replay.
+
+### OpenTTGames CPU frame-index witness admission —2026-11-05
+
+Root reviewed the pureCPU witness and six focused tests pass. Metadata links are new hardlinks matching source device/inode/size on gpu2, receipt `opentt-join-input-links-20261105.json`; originals are untouched. New bounded test2-only request uses the already reserved300CPU/0GPU (270s oneCPU fleet+30external incl preparation/audit), not seven-video or judge admission. Exact120Hz fullPTS, sequential/seek RGB parity and3labeled images required; any pass remains REVIEW_REQUIRED for independent image/coordinate verification. Full corpus contexts remain frozen.

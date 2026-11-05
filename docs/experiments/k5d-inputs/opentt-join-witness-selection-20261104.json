@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "rule": "visible-continuous-triplet-v2",
+  "source_selection_sha256": "b104b87aefae92e3a3ea7766bc51e3b34f6c3c7a1f071bbbbca7eeb218984877",
+  "contract_sha256": "22dc62d79499854d4fb4775e27a8aa14e1a31753994897252c10556d60992933",
+  "status": "metadata-only; review required; no pixels decoded or provenance verified",
+  "items": [
+    {
+      "id": "test_1",
+      "center_frame_label_index": 15433,
+      "frame_indices": [
+        15432,
+        15433,
+        15434
+      ],
+      "displacement_pixels": [
+        24.73863375370596,
+        25.0
+      ],
+      "coordinates": [
+        [
+          947,
+          514
+        ],
+        [
+          971,
+          520
+        ],
+        [
+          995,
+          527
+        ]
+      ],
+      "eligible_triplets": 38,
+      "video_sha256": "373f0a6926c7edb51eb70119f020afc30beabd140dc5f9cc454f0c7848406bb2",
+      "video_bytes": 1050070368,
+      "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_1.mp4",
+      "ball_markup_sha256": "f60ca733c514e5e4792ca9184331649bb6bc241f84d862d12e459397f49dc621",
+      "label_archive_sha256": "7dca7b6614d51b136209b18d3acf6f26cb06bf59ca05189e587ab7a57762bb51"
+    },
+    {
+      "id": "test_2",
+      "center_frame_label_index": 1086,
+      "frame_indices": [
+        1085,
+        1086,
+        1087
+      ],
+      "displacement_pixels": [
+        35.12833614050059,
+        37.05401462729781
+      ],
+      "coordinates": [
+        [
+          189,
+          539
+        ],
+        [
+          154,
+          536
+        ],
+        [
+          117,
+          534
+        ]
+      ],
+      "eligible_triplets": 23,
+      "video_sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43",
+      "video_bytes": 225118372,
+      "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_2.mp4",
+      "ball_markup_sha256": "db79a74c3fc2299d84668b7bcc98e4a925ccdee839e6ca00a28c16bc91d85c74",
+      "label_archive_sha256": "c692014ca9074d331700385e4c0b5e0bd32968123bf001fe8b1c9b2e64ac142d"
+    },
+    {
+      "id": "test_3",
+      "center_frame_label_index": 7581,
+      "frame_indices": [
+        7580,
+        7581,
+        7582
+      ],
+      "displacement_pixels": [
+        34.36568055487916,
+        38.47076812334269
+      ],
+      "coordinates": [
+        [
+          805,
+          514
+        ],
+        [
+          771,
+          519
+        ],
+        [
+          733,
+          525
+        ]
+      ],
+      "eligible_triplets": 60,
+      "video_sha256": "48179df05a7a816d1b44b142fbc1ff604e6094aad7a4b13cd013f0c2447a2daf",
+      "video_bytes": 487941402,
+      "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_3.mp4",
+      "ball_markup_sha256": "885afc7b9514a0745d7653dc4bcadc2698d66b0ae514532b2372cd98bfc7109c",
+      "label_archive_sha256": "74d94c27ac3c6cf1c6b5ff722ffe87f734b0c11f95179720cb70ffaac1511c67"
+    },
+    {
+      "id": "test_4",
+      "center_frame_label_index": 31981,
+      "frame_indices": [
+        31980,
+        31981,
+        31982
+      ],
+      "displacement_pixels": [
+        32.2490309931942,
+        32.38826948140329
+      ],
+      "coordinates": [
+        [
+          802,
+          641
+        ],
+        [
+          834,
+          645
+        ],
+        [
+          866,
+          650
+        ]
+      ],
+      "eligible_triplets": 31,
+      "video_sha256": "c941fb0862daf47dbb8afc62117c21a921f649a7fdeee94fe5c16f9f2839be6d",
+      "video_bytes": 2250582415,
+      "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_4.mp4",
+      "ball_markup_sha256": "a835c3535732181ab6e6535ddbdf8bdd6f001a81ee08de1c301f2d97aacdae5c",
+      "label_archive_sha256": "3022d7aeb14d913f8fb0a26d1e1a2cfab067e315591962b39ea15f85867a9e2a"
+    },
+    {
+      "id": "test_5",
+      "center_frame_label_index": 5525,
+      "frame_indices": [
+        5524,
+        5525,
+        5526
+      ],
+      "displacement_pixels": [
+        39.6232255123179,
+        34.828149534535996
+      ],
+      "coordinates": [
+        [
+          1061,
+          240
+        ],
+        [
+          1032,
+          213
+        ],
+        [
+          1005,
+          191
+        ]
+      ],
+      "eligible_triplets": 83,
+      "video_sha256": "2c4652738a07102db7428b31003784532117dc9619c5fa1cca80c60639cc233d",
+      "video_bytes": 720160846,
+      "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_5.mp4",
+      "ball_markup_sha256": "54a475f1eb2ccbd234c48e95bd839f67c070af8952acb6a27ddea4b35d832760",
+      "label_archive_sha256": "d97d7e985ab05d46a922581106adf12a9b85d3cf91730a818fe44137561ad5ac"
+    },
+    {
+      "id": "test_6",
+      "center_frame_label_index": 1331,
+      "frame_indices": [
+        1330,
+        1331,
+        1332
+      ],
+      "displacement_pixels": [
+        42.579337712087536,
+        39.45883931389772
+      ],
+      "coordinates": [
+        [
+          1571,
+          662
+        ],
+        [
+          1529,
+          655
+        ],
+        [
+          1490,
+          649
+        ]
+      ],
+      "eligible_triplets": 124,
+      "video_sha256": "ae37928612d8c5652677d468a8feb2669aff0afe8cfc1b1a642cc6ba5b811c29",
+      "video_bytes": 675731698,
+      "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_6.mp4",
+      "ball_markup_sha256": "b5be0056e78a3af145a8687ce10be0fca8866c4fde9c7390cfa8623b1cf5c17b",
+      "label_archive_sha256": "3971e3c3c2c8ebe5c123f1a79fc7629a53950096784b24d11f5c8796ac1e0fc4"
+    },
+    {
+      "id": "test_7",
+      "center_frame_label_index": 7055,
+      "frame_indices": [
+        7054,
+        7055,
+        7056
+      ],
+      "displacement_pixels": [
+        36.22154055254967,
+        37.21558813185679
+      ],
+      "coordinates": [
+        [
+          916,
+          537
+        ],
+        [
+          952,
+          541
+        ],
+        [
+          989,
+          545
+        ]
+      ],
+      "eligible_triplets": 60,
+      "video_sha256": "f2f54e4ce0c23a50d119fa2fdae552cb277d31f7e3e5a61c8fd3c40ef064399e",
+      "video_bytes": 488378737,
+      "video_path": "/home/itec/emanuele/Datasets/OpenTTGames/raw/test_7.mp4",
+      "ball_markup_sha256": "2f02252a3a315d4196098885c834ffb0a21d0f01c294b559d76bdd6ff8d2e296",
+      "label_archive_sha256": "f26f8f2475eef4646e35a4fb4049eb3a47e10759e5abb0eef0f7b837110d40d5"
+    }
+  ]
+}
