@@ -17,3 +17,9 @@ The proposed submission would use the existing draft spec after replacing its ex
 ```
 
 Before dispatch, root must approve the selected package, reserve the new phase, verify the canonical snapshot and source SHA against the eventual submission, and repeat host/job/doctor/path checks and set a fresh bounded deadline. Retain the current host-contention caveat; this is an actual-policy-helper correctness oracle, not a performance qualification. No new uploader, manager, GPU work or automatic replay is included.
+
+## Root-approved request recorded before acknowledgement
+
+One new, separate 0 GPU / 180 CPU inclusive request was generated as `20261105T074557Z-8b27625a`; it is not a replay of the unpublished `b4be8cbf` request. The local preparing record reports normalized spec SHA `70f621abcd3bb99c51e10b3a41874dc114d87caa1813a59e2d048155fecc4fc5` and expected narrow snapshot SHA `bde697a465aabc71e059b4b55524af89935b43b19b6a250632b600fc148436a8`; expected source tree SHA `520786b6402f0cb24ce66aede4383b170d458ad7e9a997e1c46602e74be9110c`, deadline `2026-11-05T08:25:46.088155+00:00`. Fleet campaign is capped at 120 seconds and the external reserve at 60 CPU seconds. This record does not assert publication or completion; inspect the existing request rather than replaying any uncertainty. Preflight found no registered active jobs, gpu6 doctor passed, and all 52 retained paths and config identity matched. Unrelated external gpu6 processes may contend on CPU; no actual contention or performance conclusion is asserted.
+
+The submit client acknowledged the request as `pending`, with actual source tree SHA `520786b6402f0cb24ce66aede4383b170d458ad7e9a997e1c46602e74be9110c` matching the reviewed narrow package. Root owns canonical status and the single bounded wait; this acknowledgement is not a smoke or policy result.

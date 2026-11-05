@@ -591,6 +591,49 @@
       "gpu_seconds": 0,
       "cpu_seconds": 300,
       "basis": "Conservative300CPU allowance for isolated pinned dependency environment/install and full configured checks. Python3.12/NumPy1.26.4/OpenCV4.10/PyYAML6.0.2, all configured Ruff+mypy pass,1811passed31skipped pytest130.95wall. Prior defaultcv2v5/missingyaml failures retained as environment mismatch."
+    },
+    {
+      "phase": "w8-real-folder-io-oracle-20261105",
+      "job_id": "20261105T071725Z-b5eb8a21",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 135,
+      "basis": "Final independent audit75174fe5 supersedes draft8014b056 with explicit producer-hashed/deleted-copy limitation. Actual1,550,638,493public bytes pinned source identities and producer copy/hash/helper/cleanup receipts verified; no copy reread after cleanup possible. Strict paths/aliases/mutations/source/claims verified. ceil74.652lifecycle75+60external135CPU; no model/GPU."
+    },
+    {
+      "phase": "w7-achievable-endpoint-analysis-repair-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 120,
+      "basis": "Entire120CPU correction/pilot/outcome/audit allocation charged. Source967f07e0, rootgate2e0af63b, reportd09b0543 independently accepted by5a435128. SixTier1 only, conditionalavailableanchors, modeledinterpolation, missing med000DCVC and strictIVFhalfout gaps retained; not fullcodec/freshdecoder/unseenmatch win."
+    },
+    {
+      "phase": "gvc-strict-worker-cpu-oracle-20261105",
+      "job_id": "20261105T073455Z-b4be8cbf",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "basis": "Entire60 external reserve charged for failed explicit-gzip17.8MB snapshot upload90s; canonical unpublished and independent inbox partial5,242,880B/events only, no ready/spec/state/worker. Preserve unknown request/partial source, never replay."
+    },
+    {
+      "phase": "gvc-strict-policy-narrow-package-cpu-20261105",
+      "job_id": "20261105T074557Z-8b27625a",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 134,
+      "basis": "Independent actual helper audit6342a269 accepts all17 frozen source members,52protected/alias paths,12leaves,ABI4,canaries/namespace/hostloader,CPU0 and noGPU/Torch/fullbootstrap. PIDs/claim absent. ceil73.475lifecycle74+60external134CPU upper; externalhostCPUprocesses mean no performancequalification."
+    },
+    {
+      "phase": "post-correction-local-verification-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "basis": "Additional conservative administrative/verification allowance for final configuredchecks and packaging; Ruff+mypy clean,1820passed31skipped fullpytest108.07wall. Local aggregate CPU telemetry not measured; not experimental runtime evidence. Earlier300CI setup/check allowance retained."
     }
   ],
   "reservations": [
@@ -988,7 +1031,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 240,
-      "status": "Prospective240CPU/0GPU:180 campaign+60 external for four pinned public files/real unchanged helper/strict isolation. Final source+spec review required before dispatch, no models."
+      "status": "closed; conservative135CPU/0GPU charged, unused105CPU released; real warm-cache copy/helper/cleanup audited, not model qualification."
     },
     {
       "phase": "gvc-strict-worker-cpu-oracle-20261105",
@@ -996,7 +1039,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 180,
-      "status": "Prospective minimal actual GVC strict-worker Linux isolation CPU oracle; code/spec/cost review before dispatch. No Torch/model/GPU, no grant expansion; original26df remains failed."
+      "status": "closed;60CPU external charged, unused120CPU campaign released; unpublished partialsource preserved, no worker/model."
     },
     {
       "phase": "w7-achievable-endpoint-analysis-repair-20261105",
@@ -1004,7 +1047,23 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 120,
-      "status": "Prospective60CPU command plus60 audit, fresh source/manifest/runtime gate after affordable endpoint/per-codec coverage correction; no model/encode/GPU. Old wrong report preserved."
+      "status": "closed; entire120CPU charged, independent actual report5a435128 accepted scopedTier1 result."
+    },
+    {
+      "phase": "w8-strict-materialized-cost-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 700,
+      "cpu_seconds": 1000,
+      "status": "Root00aff80a source/490b7ac4 host amendment reviewed; authorize ONE GPU5 exclusiveAda,CPUindex1,1/3-only costpilot,600campaign700GPU1000CPU inclusive. Preflight14cachedassets/2packedruntimes/91AAfiles/5protectedpaths SHA stable, onlymissing10.4MBAAcache canonicallypopulated.21.79CPU+staging within100external reserve. OtherGPU6foreignprocessesuntouched; actualGPU5cost notassumedfromGPU6. Mandatory whole-stage1.5 gate/source/UUID/packet/materialization checks, no30stepqualityadmission/noautomaticretry."
+    },
+    {
+      "phase": "gvc-strict-policy-narrow-package-cpu-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 180,
+      "status": "closed;134CPU/0GPU charged,46unused released; actual GVC policy helpers qualified only, model/native/GPU/fullTorchbootstrap remain unqualified."
     }
   ],
   "jobs": [
@@ -1558,13 +1617,37 @@
       "job_id": "20261105T071725Z-b5eb8a21",
       "phase": "w8-real-folder-io-oracle-20261105",
       "subphase": "strict real public folder copy CPU",
-      "state": "acknowledged pending; frozenbd55fded gpu6CPU-only, no model/GPU. One canonical bounded wait owned by root.",
+      "state": "complete; final independent75174fe5 audit accepted (draft8014b056 superseded); copy hashes from verified producer receipt, source independently rechecked;135CPU charged, no model/GPU.",
       "revision": "bd55fdedc60c7622c2ea421c97e716390c14029f",
       "snapshot_sha256": "cc552d0b97bc84b985c3c95f8d32407fa4e049eed1252e81e3525a395e109c85",
       "spec_sha256": "e5afc09b6dcefaa3756ba8ff0c786c474d205bab4406baa8b0e9cfd659641053",
       "gpu_ceiling": 0,
       "inclusive_cpu_ceiling": 240,
       "source_sha256": "732b9e2913ac99153cdf720f4d57fee0c500e1dc41759849e3994f3e24cf3003"
+    },
+    {
+      "job_id": "20261105T073455Z-b4be8cbf",
+      "phase": "gvc-strict-worker-cpu-oracle-20261105",
+      "subphase": "actual GVC policy helper CPU oracle",
+      "state": "unpublished; canonical unknown plus independent inbox only partial5,242,880Bsource/events, no ready/spec/state/worker.60CPU external charged, no replay.",
+      "revision": "3d38e706",
+      "snapshot_sha256": "6d34c8501ae6dddeba0447c2b9379acb9ac4ade1e600dabd2ab30a26fb404af7",
+      "source_sha256": "be17bb311e78565b5c2c841c3a4d58cceb8f73e68aaa4587995c3d2082006776",
+      "spec_sha256": "d967281e4f0a45b09f6da1a3530a20acb56b2c930db97623cdb29a3f9a60e4ef",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 180
+    },
+    {
+      "job_id": "20261105T074557Z-8b27625a",
+      "phase": "gvc-strict-policy-narrow-package-cpu-20261105",
+      "subphase": "narrow actual-helper CPU oracle",
+      "state": "complete; independent6342a269 all17source/52denials/12leaves/canary/namespace/loader/claims accepted,134CPUcharged; no model/GPU/fullbootstrap.",
+      "revision": "3d38e706c5ee0184ec0a4333c18bbe0f89dab851",
+      "snapshot_sha256": "bde697a465aabc71e059b4b55524af89935b43b19b6a250632b600fc148436a8",
+      "source_sha256": "520786b6402f0cb24ce66aede4383b170d458ad7e9a997e1c46602e74be9110c",
+      "spec_sha256": "70f621abcd3bb99c51e10b3a41874dc114d87caa1813a59e2d048155fecc4fc5",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 180
     }
   ],
   "old_budgets": "closed, not borrowed",
