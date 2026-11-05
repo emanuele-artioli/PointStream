@@ -284,14 +284,20 @@ def run_isolated(config: dict[str, Any], isolation: dict[str, Any], *, materiali
     model_load_cost = finish_phase(load_started)
     import sys
 
+    clock_module = 'experiments.tennis.w8_clock_profile'
+    if isolation.get('clock_profile') is not None and not getattr(sys.modules.get(clock_module), '__file__', None):
+        raise ValueError('clocksource profile module is not loaded or has no origin')
     modules = {name: Path(str(module.__file__)).resolve() for name, module in sys.modules.items()
                if (name.startswith('animate_anyone') or name in ('experiments.tennis.k6b_generate',
-                    'experiments.tennis.k6b_fit')) and getattr(module, '__file__', None)}
+                    'experiments.tennis.k6b_fit') or (isolation.get('clock_profile') is not None and name == clock_module))
+               and getattr(module, '__file__', None)}
     for name, path in modules.items():
         if paths.get(f'code:{name}') is None or path != paths[f'code:{name}'].resolve():
             raise ValueError(f'undeclared executing source module: {name}')
         if name.startswith('animate_anyone') and aa_verified.get(str(path)) != fixed.file_sha(path):
             raise ValueError(f'AA source is absent from pinned archive: {name}')
+        if name == clock_module and fixed.file_sha(path) != config['files'][f'code:{name}']['sha256']:
+            raise ValueError(f'executing source changed: {name}')
     from experiments.audit.env_smoke import profile_cuda
 
     seed = int(hashlib.sha256(unit_name.encode()).hexdigest()[:7], 16)
@@ -327,7 +333,8 @@ def run_isolated(config: dict[str, Any], isolation: dict[str, Any], *, materiali
     frames = 240
     for name, module in sys.modules.items():
         if ((name.startswith('animate_anyone') or name in ('experiments.tennis.k6b_generate',
-                'experiments.tennis.k6b_fit')) and getattr(module, '__file__', None)):
+                'experiments.tennis.k6b_fit') or (isolation.get('clock_profile') is not None and name == clock_module))
+                and getattr(module, '__file__', None)):
             path = Path(str(module.__file__)).resolve()
             if paths.get(f'code:{name}') is None or path != paths[f'code:{name}'].resolve():
                 raise ValueError(f'undeclared executing source module: {name}')
