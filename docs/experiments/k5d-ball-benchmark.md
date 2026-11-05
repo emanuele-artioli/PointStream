@@ -283,3 +283,12 @@ Same-source sixpointcoalescedscore job `20261105T023544Z-408e8453`, source `c25d
 Finalcontrol16/188job `20261105T023619Z-0e2a610f`, source `c6bbb5ccd64555321997ecefe0cabc4aa32b1ef37e66740e0e944132e20d405f`, canonicalspec `38aefa3a49ae8e98ea6dc087adcc40b50b92c196e0a6d5ea4b6aeace0ee2c7f7`, frozen2cc35643; inclusive600GPU800CPU, samef438costreceipt andfivearms, no appearancequalificationorcorpusclaim.
 
 Phase k5d-coalesced-permission-repair-20261105 job `20261105T025241Z-fe451f9e`, revision `7640ed34696ec93c1a61fd3666d29828eea38e46`, source `8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13`, canonicalspec `fcfa508d37f0bc93c0213b868314cc925820dbea715774427dfa18a70573b47a`; inclusive850GPU/1050CPU seconds. No replay or implied scientificpass.
+
+Standalone coalescedscore job `20261105T032433Z-1423f92a`, source `8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13`, spec `c017b76ab52a281d1444b6e6b457d9987024a6996dc2bf85fb8ca7501a387d4e`, frozen7640ed34,gpu2-only/nootherregisteredactivejobatadmission; inclusive1200GPU1400CPU220/750/1100. Same producer identityfe451, all6native/metrics/judges and48cost gate pending.
+
+
+### Accepted shared scoring and pending expanded release — 2026-11-05
+
+Job1423f92a is complete, with all six16/48 native/wire/receiver/metric/judge arrays matching d8b5; saved-artifact audit `k5d-inputs/coalesced-score-1423-independent-audit-20261105.json` SHA09f7d8761c95c83b8c000cae9cc1f86d648e3ad415481b880b34240baee7421d. The whole2050GPU2450CPUprepare/scorephase is charged conservatively. WASB is independent of the encoder; BallTrack is encoder-model consistency. The actualcc450source audit confirms the encoder already uses automatic BallTrack coordinates, so the duplicate automatic-input proposal is superseded.
+
+The proposedH3 CPU-readiness cost probe b23db6b8 was never published because source upload timed out. Its partial archive is preserved; no readiness timing or full30admission follows. The additional24GPUh/28CPUh proposal remains unapproved, and the original20/24programme ceiling remains authoritative. Exact actualsource bridge, readinesscost,292/586scalechecks and complete remainingforecast are still required before full30.

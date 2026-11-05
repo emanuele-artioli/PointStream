@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "kind": "cpu-affinity-command-interval-audit",
+  "jobs": {
+    "score": {
+      "job_id": "20261105T023544Z-408e8453",
+      "phase": "smoke",
+      "host": "gpu2",
+      "cpu_affinity": [
+        0
+      ],
+      "dispatch_started_epoch": 1793846205.8257017,
+      "command_elapsed_seconds": 174.02550172805786,
+      "approx_end_epoch": 1793846379.8512034,
+      "exit_code": 1,
+      "fleet_recorded_contention": [],
+      "dispatch_sha256": "3128db8e49ac3dc420d2de430d367fed2c38d1efe5f1f22b890f59426a87549f",
+      "execution_sha256": "f763ff1152fc902815965418976ef5432e02e23cc29f57c422f5964332e99957"
+    },
+    "controls": {
+      "job_id": "20261105T023619Z-0e2a610f",
+      "phase": "smoke",
+      "host": "gpu2",
+      "cpu_affinity": [
+        0
+      ],
+      "dispatch_started_epoch": 1793846319.9202125,
+      "command_elapsed_seconds": 62.095499753952026,
+      "approx_end_epoch": 1793846382.0157123,
+      "exit_code": 0,
+      "fleet_recorded_contention": [],
+      "dispatch_sha256": "90eced6c01e74498b49d344841ef57b52201e6dcdfcd4b23eb9a622f109ac68f",
+      "execution_sha256": "cd16fcbd15246f73cab08b8f84b62278a37b73c7e6ffac88545497848efcee35"
+    }
+  },
+  "estimated_command_overlap_seconds": 59.93099093437195,
+  "interpretation": "Both commands had CPU 0 affinity on gpu2 and estimated wall intervals overlap. Fleet contention arrays are empty; recorded data does not measure actual simultaneous CPU utilization or prove causation of slower execution. Dispatch timestamps precede command start slightly, so reconstructed bounds and overlap are approximate.",
+  "method": "dispatch.started + execution.seconds; run_bounded starts after dispatch receipt is written",
+  "scope": "saved metadata only; no new inference"
+}

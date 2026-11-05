@@ -1,0 +1,23 @@
+{
+  "job": "20261105T025257Z-f893c63e",
+  "fleet_status": "failed in one-step smoke; packet decoder incomplete; no generator",
+  "host": "gpu6",
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "source_revision": "738dd5b3182d66a880d26cb3f0384e57b2abfe01",
+  "source_identity_sha256": "a41440b5f1abd24c97786704df6a4c9f60a2c909cf72f06e7284e2a6b1ad42d6",
+  "source_archive_sha256": "8a85eca90c1054adb50185ff9dfeab76d5b1378dd37ab5581bc56e46b81a14a8",
+  "spec_sha256": "21bfd22ea651db16d1e06d0aece77ec92ea2fdbc0af621cda25d0650717aa282",
+  "supervisor_sha256": "b840533de639feedb3e72b3f47374debf1f714524375caeacb6eab13ec9659d8",
+  "packet_worker_sha256": "b17548932c8d29da177a688ea3c77e29559861178e2dfa1dec40fae0e4a28951",
+  "main_runtime_archive_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "jcv_runtime_archive_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+  "dispatch_sha256": "7867cf4fd1146a4fdb4dfa13d312a3d523f59423c6c6142b9ea514de09863086",
+  "execution_sha256": "ae7cf415215511d425650651cbad0e9df05c6bd0af7de683e308f54691e6afa5",
+  "command_sha256": "fc83a3db840876da3c5a612968247b9315ae35584bb87efde6907e53850cdddc",
+  "packet_worker": {"pid": 2502179, "exit_status": -9, "timed_out": false, "wall_seconds": 30.2457384057343, "cpu_seconds": 30.068316, "configured_hard_cpu_seconds": 30, "stdout_bytes": 0, "stderr_bytes": 0, "exit_receipt_sha256": "4ee70c9072d06eb0a1f03f20321a1cf26f5e9e72ceb8d145bbcde13b431aa2f3", "config_sha256": "64486fb256d03534259a7632ca9436486cc6bff02f98576fd37bd324b44b8e06", "source_origin_receipt_published": false, "isolation_receipt_published": false, "canaries_preserved": true},
+  "partial_outputs": {"unit_000_sha256": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d", "unit_001_sha256": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7", "decoded_pt_sha256": "1bb95a11c25ac66774b887c93277b695779e21cc9803cc565408206934f0fdeb", "decoded_pt_bytes": 7557439, "decoded_manifest_present": false, "oracle_note": "Both unit hashes match the independent oracle, and decoded.pt matches the previously accepted CPU packet-decoder receipt; the current worker did not complete its own manifest and validation."},
+  "prior_completed_packet_cpu": {"receipt": "cost-source-repair-cpu-v1-audit-worker.exit.json", "worker_cpu_seconds": 7.822299, "worker_wall_seconds": 8.892493105493486, "worker_cpu_limit_seconds": 12, "separate_validator_cpu_seconds": 2.103339, "scope": "previous accepted real packet decoder on MAIN runtime; no model inference or quality"},
+  "resources": {"campaign_start_to_phase_start_seconds": 40.31670389, "smoke_command_wall_seconds": 44.237637996673584, "waited_children_cpu_seconds": 42.142245, "cpu_semantics": "cumulative children; do not add packet CPU again", "supervisor_started_to_terminal_seconds": 94.6899412, "creation_to_terminal_status_seconds": 266.0102368, "cpu_affinity": [0], "phase_caps_gpu_cpu_seconds": [700, 1000], "claim_and_gpu_processes": "none at canonical status", "supervisor_and_packet_worker_pids_absent": true, "failed_scratch_retained": true, "auditor_deleted_nothing": true},
+  "interpretation": "The packet worker was SIGKILLed after approximately 30 CPU seconds, matching its hard CPU limit; the saved receipt does not by itself exclude a different SIGKILL source. Both units and the serialized checkpoint match earlier identities, but no complete current packet proof, source-origin or isolation receipt was published. No model-generation process started. The difference from the prior 7.822-second completed packet worker is not explained by these receipts.",
+  "decision": "Keep this failed attempt and partial artifacts. Any revised packet CPU limit or further diagnostic requires a prospective budget review and fresh authorization; do not infer model success, automatically replay, or widen isolation."
+}

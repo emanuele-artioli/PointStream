@@ -716,3 +716,7 @@ The [2026-10-27 storage recovery](storage-maintenance-2026-10-27.md) records
 migration journals, fresh-shell checks, protected live files and the remaining
 gpu5/gpu6 live-path approval restriction. The shared startup script is maintained
 at `env/bootstrap-hostlocal.sh`; runtime aliases must be prepared before installation.
+
+Linuxindexed-controlindex0probejob `20261105T032852Z-5b36881b` recorded2026-11-05; CPU-onlyoldscientificsource3bc4b873+released538control, no model/data. Newrelease `/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/releases/20261105T031637Z-2503bb20`; doctorpassedallhosts, freshcapabilityheartbeatsverified. ActualLinuxplacementacceptedwithindependentaudit `experiments/k5d-inputs/indexed-control-probes-independent-audit-20261105.json`; the probe uses CPU0.
+
+Indexed-controlindex1probejob `20261105T033020Z-48761453` is a CPU-onlyverification; actualsupervisor/workload/child/validatorCPU1 andsource/controlseparationacceptedinthesameaudit. The two probes ran sequentially; no concurrent-schedulingperformanceclaim.

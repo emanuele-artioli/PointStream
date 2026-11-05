@@ -1,0 +1,1908 @@
+{
+  "schema": "pointstream-balltrack-predictions-v1",
+  "clip": "tracknet/game10/Clip3",
+  "frames": 188,
+  "source_job": "20261105T003756Z-cc450baf",
+  "qualification_sha256": "84fc54d721d00628705169e52571c6a2e6991b95ab13d97d6a711cec45898755",
+  "source_transform": "OpenCV JPEG decode BGR converted to RGB; no video transform; no K5c parity claim",
+  "identities": {
+    "manifest": {
+      "path": "/local/users/emanuele/pointstream/sources/20261105T003756Z-cc450baf/docs/experiments/k5d-inputs/study-selection-20261104.json",
+      "sha256": "d572e991d89f52264f6017e0d034e93dcfbb9766c7693093a4502e8f144da343"
+    },
+    "archive": {
+      "path": "/local/users/emanuele/pointstream/cache/bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18/tracknet-dataset.zip",
+      "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18"
+    },
+    "balltrack_weight": {
+      "path": "/local/users/emanuele/pointstream/cache/b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+    },
+    "balltrack_code": {
+      "path": "/local/users/emanuele/pointstream/cache/5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff/tree",
+      "tree_sha256": "f7a5c1c6284365f84c324d62169186ef1312c4d921bc0df5dbacd16ef5361964"
+    }
+  },
+  "rows": [
+    {
+      "frame": 0,
+      "member": "Dataset/game10/Clip3/0000.jpg",
+      "source_sha256": "23c699909b21a42efb00704f25b4563809f7d1afc9bb43d20cfdf54b436fcd10",
+      "prediction": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "frame": 1,
+      "member": "Dataset/game10/Clip3/0001.jpg",
+      "source_sha256": "ff7658191ed917edeff71923006c9ba7877c5070224aa6b7b059e9019a217f3a",
+      "prediction": {
+        "detected": true,
+        "x": 671.25,
+        "y": 302.5
+      }
+    },
+    {
+      "frame": 2,
+      "member": "Dataset/game10/Clip3/0002.jpg",
+      "source_sha256": "6e5678e2e30cffc3bb06b863e4b2c0a92c3ca04d450773e5eff436500e050d1c",
+      "prediction": {
+        "detected": true,
+        "x": 680.0,
+        "y": 333.75
+      }
+    },
+    {
+      "frame": 3,
+      "member": "Dataset/game10/Clip3/0003.jpg",
+      "source_sha256": "e94a1daf4333857996c97aaefe4d481e65b69a9559f7f5de9dacaf4afc4ce37a",
+      "prediction": {
+        "detected": true,
+        "x": 690.0,
+        "y": 365.0
+      }
+    },
+    {
+      "frame": 4,
+      "member": "Dataset/game10/Clip3/0004.jpg",
+      "source_sha256": "0bcc36159a611253ea2d2be01a39b92c492453679b10b3af2e481674c7357f21",
+      "prediction": {
+        "detected": true,
+        "x": 697.5,
+        "y": 387.5
+      }
+    },
+    {
+      "frame": 5,
+      "member": "Dataset/game10/Clip3/0005.jpg",
+      "source_sha256": "f7388c93af20281bd8e2c0c2340521e06906f69832b3758f0d1f59335ad46474",
+      "prediction": {
+        "detected": true,
+        "x": 705.0,
+        "y": 390.0
+      }
+    },
+    {
+      "frame": 6,
+      "member": "Dataset/game10/Clip3/0006.jpg",
+      "source_sha256": "d6a921356747c2d94c54832d7b681cf7789326e8e338ea1329308deec1e19477",
+      "prediction": {
+        "detected": true,
+        "x": 712.5,
+        "y": 392.5
+      }
+    },
+    {
+      "frame": 7,
+      "member": "Dataset/game10/Clip3/0007.jpg",
+      "source_sha256": "e769b359af0153c6d85be7f1c1b76c44c674eee9d20fec99721b4a50c8ce597b",
+      "prediction": {
+        "detected": true,
+        "x": 717.5,
+        "y": 395.0
+      }
+    },
+    {
+      "frame": 8,
+      "member": "Dataset/game10/Clip3/0008.jpg",
+      "source_sha256": "2d30421113a80e58f57c719c00b46f8f8c9223bdda6f4c1049df2fb5d049a5eb",
+      "prediction": {
+        "detected": true,
+        "x": 725.0,
+        "y": 400.0
+      }
+    },
+    {
+      "frame": 9,
+      "member": "Dataset/game10/Clip3/0009.jpg",
+      "source_sha256": "f8215c54a1758d23cad13e9ce464303759e0d17bce67c48b8b8cd8d82a88daaa",
+      "prediction": {
+        "detected": true,
+        "x": 732.5,
+        "y": 405.0
+      }
+    },
+    {
+      "frame": 10,
+      "member": "Dataset/game10/Clip3/0010.jpg",
+      "source_sha256": "b5499403d4d15c3fe2793f50da32a83df8bdb039a69bc1a675c71cfe899266d2",
+      "prediction": {
+        "detected": true,
+        "x": 742.5,
+        "y": 412.5
+      }
+    },
+    {
+      "frame": 11,
+      "member": "Dataset/game10/Clip3/0011.jpg",
+      "source_sha256": "209a2077429d8116692e53b50fb4e639dd6b9aaffa65b7b22cccc01436bf7261",
+      "prediction": {
+        "detected": true,
+        "x": 750.0,
+        "y": 420.0
+      }
+    },
+    {
+      "frame": 12,
+      "member": "Dataset/game10/Clip3/0012.jpg",
+      "source_sha256": "1d63bc240c3d0d38c331d2986cb905dfad882217625c7bf013bd7a6540ce7c10",
+      "prediction": {
+        "detected": true,
+        "x": 760.0,
+        "y": 430.0
+      }
+    },
+    {
+      "frame": 13,
+      "member": "Dataset/game10/Clip3/0013.jpg",
+      "source_sha256": "0a32857416bffeaab5824ac7795485ffe21b5195cb6dcf9f2e33f300a1d5e52e",
+      "prediction": {
+        "detected": true,
+        "x": 770.0,
+        "y": 440.0
+      }
+    },
+    {
+      "frame": 14,
+      "member": "Dataset/game10/Clip3/0014.jpg",
+      "source_sha256": "60015763d3494414b7b4d9dcf7e054d37ad1ec58702466aba95aa8521e5932cc",
+      "prediction": {
+        "detected": true,
+        "x": 780.0,
+        "y": 451.25
+      }
+    },
+    {
+      "frame": 15,
+      "member": "Dataset/game10/Clip3/0015.jpg",
+      "source_sha256": "9f43beddda753359dc79388e73770ce4ced84b25d48d5288e156c6153b9b6986",
+      "prediction": {
+        "detected": true,
+        "x": 775.0,
+        "y": 432.5
+      }
+    },
+    {
+      "frame": 16,
+      "member": "Dataset/game10/Clip3/0016.jpg",
+      "source_sha256": "bc45361ec324a9653ade1f067d905599ea06adfd2e4000202f0994a18c7c0ed5",
+      "prediction": {
+        "detected": true,
+        "x": 765.0,
+        "y": 402.5
+      }
+    },
+    {
+      "frame": 17,
+      "member": "Dataset/game10/Clip3/0017.jpg",
+      "source_sha256": "9470658c5eb039da08e6dc3888205170cf6c4e7a960cbfc63fd1e366a0432066",
+      "prediction": {
+        "detected": true,
+        "x": 757.5,
+        "y": 375.0
+      }
+    },
+    {
+      "frame": 18,
+      "member": "Dataset/game10/Clip3/0018.jpg",
+      "source_sha256": "dbddab838f5ef04168fc195faa905045e8ffdd293f073c8a3150648562e97b04",
+      "prediction": {
+        "detected": true,
+        "x": 748.75,
+        "y": 352.5
+      }
+    },
+    {
+      "frame": 19,
+      "member": "Dataset/game10/Clip3/0019.jpg",
+      "source_sha256": "3168fdb490228e7b675c3782d327435ef37c7bdb832b39268be48af017121399",
+      "prediction": {
+        "detected": true,
+        "x": 741.25,
+        "y": 332.5
+      }
+    },
+    {
+      "frame": 20,
+      "member": "Dataset/game10/Clip3/0020.jpg",
+      "source_sha256": "cb68ed15525a2c8b2cbb5224042b5b8e1df60d25856e60865064d394b15ca81e",
+      "prediction": {
+        "detected": true,
+        "x": 735.0,
+        "y": 315.0
+      }
+    },
+    {
+      "frame": 21,
+      "member": "Dataset/game10/Clip3/0021.jpg",
+      "source_sha256": "d68d4ff6d3d0be947855ffb1ba8a7b70aa7d352e962143bfc05dd0f74c0b24e1",
+      "prediction": {
+        "detected": true,
+        "x": 730.0,
+        "y": 300.0
+      }
+    },
+    {
+      "frame": 22,
+      "member": "Dataset/game10/Clip3/0022.jpg",
+      "source_sha256": "e16268817367632747317a76b66d8f49845c3fef1facbcf45a35c71eb2f26e46",
+      "prediction": {
+        "detected": true,
+        "x": 722.5,
+        "y": 285.0
+      }
+    },
+    {
+      "frame": 23,
+      "member": "Dataset/game10/Clip3/0023.jpg",
+      "source_sha256": "e048af0ff33373ffa4efc7d40dbae8c1df1a0dd1ac2c3cbee544666883915c5a",
+      "prediction": {
+        "detected": true,
+        "x": 717.5,
+        "y": 275.0
+      }
+    },
+    {
+      "frame": 24,
+      "member": "Dataset/game10/Clip3/0024.jpg",
+      "source_sha256": "ac29f2ab3425f99c83bae4ad7180e86359d806cc6d12ba8cc7d681c981cc1b37",
+      "prediction": {
+        "detected": true,
+        "x": 712.5,
+        "y": 263.75
+      }
+    },
+    {
+      "frame": 25,
+      "member": "Dataset/game10/Clip3/0025.jpg",
+      "source_sha256": "b7c997c3d095d00a5bedd65868acb091205f83502d14c6d68c37dd524bc51c45",
+      "prediction": {
+        "detected": true,
+        "x": 707.5,
+        "y": 255.0
+      }
+    },
+    {
+      "frame": 26,
+      "member": "Dataset/game10/Clip3/0026.jpg",
+      "source_sha256": "8f822092dc0b1b0ef24580acb06598240694103915a25ae7652666f4d45c346d",
+      "prediction": {
+        "detected": true,
+        "x": 703.75,
+        "y": 246.25
+      }
+    },
+    {
+      "frame": 27,
+      "member": "Dataset/game10/Clip3/0027.jpg",
+      "source_sha256": "4567e2d234781a1700bcdadc7e1218ec2ae4d52dc1c87bce26a1a1738cf12f17",
+      "prediction": {
+        "detected": true,
+        "x": 700.0,
+        "y": 240.0
+      }
+    },
+    {
+      "frame": 28,
+      "member": "Dataset/game10/Clip3/0028.jpg",
+      "source_sha256": "896efc5966992fe492f034c77a81b2cf4a9516e0036b943d266700b55c00784b",
+      "prediction": {
+        "detected": true,
+        "x": 695.0,
+        "y": 235.0
+      }
+    },
+    {
+      "frame": 29,
+      "member": "Dataset/game10/Clip3/0029.jpg",
+      "source_sha256": "019bc52b9e4ad74e69e99592a0e00660434ca15216d0f168fb4383fbf48b4491",
+      "prediction": {
+        "detected": true,
+        "x": 692.5,
+        "y": 230.0
+      }
+    },
+    {
+      "frame": 30,
+      "member": "Dataset/game10/Clip3/0030.jpg",
+      "source_sha256": "c569b4f83ac7c5bdde0217cbb7a963c218f1da161dd0cab57e42decf3568fdfb",
+      "prediction": {
+        "detected": true,
+        "x": 687.5,
+        "y": 225.0
+      }
+    },
+    {
+      "frame": 31,
+      "member": "Dataset/game10/Clip3/0031.jpg",
+      "source_sha256": "2e9960893a3ea17db3dc97bdb3666d64c9659662b5a88f58fdb33a3902220a22",
+      "prediction": {
+        "detected": true,
+        "x": 685.0,
+        "y": 222.5
+      }
+    },
+    {
+      "frame": 32,
+      "member": "Dataset/game10/Clip3/0032.jpg",
+      "source_sha256": "762243cac74faed9345210b28971c13d92c8d28b74c3439eff7bb3549e4c041c",
+      "prediction": {
+        "detected": true,
+        "x": 683.75,
+        "y": 220.0
+      }
+    },
+    {
+      "frame": 33,
+      "member": "Dataset/game10/Clip3/0033.jpg",
+      "source_sha256": "058edb28c717faee629b2ddb675629fc29cdf985845359a981a630ab920a26f5",
+      "prediction": {
+        "detected": true,
+        "x": 680.0,
+        "y": 217.5
+      }
+    },
+    {
+      "frame": 34,
+      "member": "Dataset/game10/Clip3/0034.jpg",
+      "source_sha256": "32d088f8408359d902ce1bf520f5ae263b5e8b7fd62a4b40800be77ef696f5a8",
+      "prediction": {
+        "detected": true,
+        "x": 677.5,
+        "y": 210.0
+      }
+    },
+    {
+      "frame": 35,
+      "member": "Dataset/game10/Clip3/0035.jpg",
+      "source_sha256": "dfc4daa3d4b72a3678827315c3188e101f1f0d680bed03f1aba76e4f7029d49d",
+      "prediction": {
+        "detected": true,
+        "x": 675.0,
+        "y": 196.25
+      }
+    },
+    {
+      "frame": 36,
+      "member": "Dataset/game10/Clip3/0036.jpg",
+      "source_sha256": "7dd8aed2f7d803b8591deff286ba9a119a96e1b4467114fb24d37d48252cc1a0",
+      "prediction": {
+        "detected": true,
+        "x": 675.0,
+        "y": 185.0
+      }
+    },
+    {
+      "frame": 37,
+      "member": "Dataset/game10/Clip3/0037.jpg",
+      "source_sha256": "61723fa52575c841553fcd2cfef8361fb3d0befe461716813fd6718af2a0aec3",
+      "prediction": {
+        "detected": true,
+        "x": 672.5,
+        "y": 175.0
+      }
+    },
+    {
+      "frame": 38,
+      "member": "Dataset/game10/Clip3/0038.jpg",
+      "source_sha256": "e2d127f11109720d63b84ffb13233c14fc748b005fe498901a142b34e44d1561",
+      "prediction": {
+        "detected": true,
+        "x": 670.0,
+        "y": 167.5
+      }
+    },
+    {
+      "frame": 39,
+      "member": "Dataset/game10/Clip3/0039.jpg",
+      "source_sha256": "4c566201d41f98afeb3821af628ea23368d3aaa8bc3739b6c624552ea7eea698",
+      "prediction": {
+        "detected": true,
+        "x": 667.5,
+        "y": 160.0
+      }
+    },
+    {
+      "frame": 40,
+      "member": "Dataset/game10/Clip3/0040.jpg",
+      "source_sha256": "c7bbc461c53f22677830c1974ef0eff4b58fda2e886ca6875c79c5248ff86cdc",
+      "prediction": {
+        "detected": true,
+        "x": 666.25,
+        "y": 152.5
+      }
+    },
+    {
+      "frame": 41,
+      "member": "Dataset/game10/Clip3/0041.jpg",
+      "source_sha256": "2d5dbbb28a2d0c7cf1ac96ee3668743e50bb9eda174265dbab5b49f506bfa248",
+      "prediction": {
+        "detected": true,
+        "x": 665.0,
+        "y": 147.5
+      }
+    },
+    {
+      "frame": 42,
+      "member": "Dataset/game10/Clip3/0042.jpg",
+      "source_sha256": "19f8e0d97e63ca23fa2c0fc445b7a6e6bdb569c45a8ccc9e51b5f2adeb2c40ee",
+      "prediction": {
+        "detected": true,
+        "x": 663.75,
+        "y": 142.5
+      }
+    },
+    {
+      "frame": 43,
+      "member": "Dataset/game10/Clip3/0043.jpg",
+      "source_sha256": "bec0d77618dfb2543e0e9a1677703e8aea99862e375b4aac2545faa9b90f3811",
+      "prediction": {
+        "detected": true,
+        "x": 662.5,
+        "y": 137.5
+      }
+    },
+    {
+      "frame": 44,
+      "member": "Dataset/game10/Clip3/0044.jpg",
+      "source_sha256": "69a978d978b6fc28190106b1483f0db9dae86034bea7c9475df5489b560bf71d",
+      "prediction": {
+        "detected": true,
+        "x": 660.0,
+        "y": 137.5
+      }
+    },
+    {
+      "frame": 45,
+      "member": "Dataset/game10/Clip3/0045.jpg",
+      "source_sha256": "1555d58fa809696a8de1a07b0c4397b26453cec5f192203f884a593e5ed70cb7",
+      "prediction": {
+        "detected": true,
+        "x": 657.5,
+        "y": 137.5
+      }
+    },
+    {
+      "frame": 46,
+      "member": "Dataset/game10/Clip3/0046.jpg",
+      "source_sha256": "e4ef79bdfb6b1ea8fbf09bd8e979ff6afa0d8d8f3fe741868adc17d7a9f6afe0",
+      "prediction": {
+        "detected": true,
+        "x": 656.25,
+        "y": 138.75
+      }
+    },
+    {
+      "frame": 47,
+      "member": "Dataset/game10/Clip3/0047.jpg",
+      "source_sha256": "24486f61e882a2393dd4491b14adc17a398e6453e69195847c33531fe2a50e9c",
+      "prediction": {
+        "detected": true,
+        "x": 655.0,
+        "y": 140.0
+      }
+    },
+    {
+      "frame": 48,
+      "member": "Dataset/game10/Clip3/0048.jpg",
+      "source_sha256": "e8e26aa14f15d8f93b1a6626c0676c5576c6dca2853e8f0ef9c5317823c2041e",
+      "prediction": {
+        "detected": true,
+        "x": 653.75,
+        "y": 140.0
+      }
+    },
+    {
+      "frame": 49,
+      "member": "Dataset/game10/Clip3/0049.jpg",
+      "source_sha256": "f9c26e3badad812e911165017d4528af6644cc5b8a18e91aef5f191d3a765782",
+      "prediction": {
+        "detected": true,
+        "x": 652.5,
+        "y": 142.5
+      }
+    },
+    {
+      "frame": 50,
+      "member": "Dataset/game10/Clip3/0050.jpg",
+      "source_sha256": "23dd84c3d48702602af40f7ba3695aac84bbe97a77acb01cc902c075ac3b8edd",
+      "prediction": {
+        "detected": true,
+        "x": 652.5,
+        "y": 145.0
+      }
+    },
+    {
+      "frame": 51,
+      "member": "Dataset/game10/Clip3/0051.jpg",
+      "source_sha256": "869fb3c474adbbae538e727d9e4b27d7e7ca4fdf5b49129c3c90ba77ef67892b",
+      "prediction": {
+        "detected": true,
+        "x": 650.0,
+        "y": 146.25
+      }
+    },
+    {
+      "frame": 52,
+      "member": "Dataset/game10/Clip3/0052.jpg",
+      "source_sha256": "7a0fc636865e56ef54fca6b5192277a96a73fc93878da63af41b88586880946c",
+      "prediction": {
+        "detected": true,
+        "x": 650.0,
+        "y": 148.75
+      }
+    },
+    {
+      "frame": 53,
+      "member": "Dataset/game10/Clip3/0053.jpg",
+      "source_sha256": "5ef553ce0f757a464a04c22e8d2bbc9407fa63ec14c78e94f93c9d3d39a96df7",
+      "prediction": {
+        "detected": true,
+        "x": 647.5,
+        "y": 152.5
+      }
+    },
+    {
+      "frame": 54,
+      "member": "Dataset/game10/Clip3/0054.jpg",
+      "source_sha256": "c9a9de20997aeab1c3a4c3168b40dac0a0ca26e6189c838663a6cd1ec09c187f",
+      "prediction": {
+        "detected": true,
+        "x": 647.5,
+        "y": 155.0
+      }
+    },
+    {
+      "frame": 55,
+      "member": "Dataset/game10/Clip3/0055.jpg",
+      "source_sha256": "8b55d2809b86be3e378de7c3494f0e51c046d822eef96fbf6e4874a06020307e",
+      "prediction": {
+        "detected": true,
+        "x": 646.25,
+        "y": 161.25
+      }
+    },
+    {
+      "frame": 56,
+      "member": "Dataset/game10/Clip3/0056.jpg",
+      "source_sha256": "46f3a46c9c82e4f5bd3925a193e26db2bf1300dca37a480c19ad3d2443221ce1",
+      "prediction": {
+        "detected": true,
+        "x": 646.25,
+        "y": 165.0
+      }
+    },
+    {
+      "frame": 57,
+      "member": "Dataset/game10/Clip3/0057.jpg",
+      "source_sha256": "11443bfc988fccf984fb0979a4e7f1496a5dff8baa62301a20d26ec5d9106ddb",
+      "prediction": {
+        "detected": true,
+        "x": 645.0,
+        "y": 170.0
+      }
+    },
+    {
+      "frame": 58,
+      "member": "Dataset/game10/Clip3/0058.jpg",
+      "source_sha256": "d5e218933152cb567d18b2f5289cda2953d139b19e6035732688a552bdd3ddb6",
+      "prediction": {
+        "detected": true,
+        "x": 645.0,
+        "y": 175.0
+      }
+    },
+    {
+      "frame": 59,
+      "member": "Dataset/game10/Clip3/0059.jpg",
+      "source_sha256": "b3dcb4d26262fd6e0e0dabc220c096303796ca1ffa686880be37049c741e90b4",
+      "prediction": {
+        "detected": true,
+        "x": 645.0,
+        "y": 180.0
+      }
+    },
+    {
+      "frame": 60,
+      "member": "Dataset/game10/Clip3/0060.jpg",
+      "source_sha256": "5f19732fa4a1923c1c955566baefeec640c6d4a27639cbd5cbea0e42c7c0fc8b",
+      "prediction": {
+        "detected": true,
+        "x": 645.0,
+        "y": 187.5
+      }
+    },
+    {
+      "frame": 61,
+      "member": "Dataset/game10/Clip3/0061.jpg",
+      "source_sha256": "7d1b66abec1dd1358bcfbe971022ea7750fb2ec6a06bae4e1ab225199b80cf36",
+      "prediction": {
+        "detected": true,
+        "x": 642.5,
+        "y": 192.5
+      }
+    },
+    {
+      "frame": 62,
+      "member": "Dataset/game10/Clip3/0062.jpg",
+      "source_sha256": "f713846c028a3b8b1f6fedc1a5d67229f7a1a28854c1d65d092e054c1f6fd3fd",
+      "prediction": {
+        "detected": true,
+        "x": 642.5,
+        "y": 201.25
+      }
+    },
+    {
+      "frame": 63,
+      "member": "Dataset/game10/Clip3/0063.jpg",
+      "source_sha256": "242f2f17819cb1b0fa648e189ca8651ad47317d67a695b437642f1b6e43d0c46",
+      "prediction": {
+        "detected": true,
+        "x": 642.5,
+        "y": 208.75
+      }
+    },
+    {
+      "frame": 64,
+      "member": "Dataset/game10/Clip3/0064.jpg",
+      "source_sha256": "6d94afd711150503fefb51565e358e7fe5b9d79e25053d44861e5367e4501be1",
+      "prediction": {
+        "detected": true,
+        "x": 642.5,
+        "y": 217.5
+      }
+    },
+    {
+      "frame": 65,
+      "member": "Dataset/game10/Clip3/0065.jpg",
+      "source_sha256": "7424268a7edcf5557d30cade5da34c1187bc3827fa1cc177f20b6d0a6d98dee9",
+      "prediction": {
+        "detected": true,
+        "x": 643.75,
+        "y": 226.25
+      }
+    },
+    {
+      "frame": 66,
+      "member": "Dataset/game10/Clip3/0066.jpg",
+      "source_sha256": "70efecaba05ee7c88e1df61bf4676b43185d2c1e2ffb3dda513ee6cbfeb2d9e3",
+      "prediction": {
+        "detected": true,
+        "x": 645.0,
+        "y": 235.0
+      }
+    },
+    {
+      "frame": 67,
+      "member": "Dataset/game10/Clip3/0067.jpg",
+      "source_sha256": "e624db27e84c321a5a6f06c1532c1f48ecede27f6f75895556ce803474049f45",
+      "prediction": {
+        "detected": true,
+        "x": 645.0,
+        "y": 245.0
+      }
+    },
+    {
+      "frame": 68,
+      "member": "Dataset/game10/Clip3/0068.jpg",
+      "source_sha256": "8d3f4747289f3d9605e9b8d69860f71d0b9388ce39e7d89412c3ed5c1a923baf",
+      "prediction": {
+        "detected": true,
+        "x": 645.0,
+        "y": 257.5
+      }
+    },
+    {
+      "frame": 69,
+      "member": "Dataset/game10/Clip3/0069.jpg",
+      "source_sha256": "7ad71be4368dec6139059244c9e59cb00417333c20f18554bc383389799ff5c1",
+      "prediction": {
+        "detected": true,
+        "x": 646.25,
+        "y": 270.0
+      }
+    },
+    {
+      "frame": 70,
+      "member": "Dataset/game10/Clip3/0070.jpg",
+      "source_sha256": "61729ab2360ec5af22155f97fb5b00ca0a9b37c9df1b762181e6e142e3b46ac9",
+      "prediction": {
+        "detected": true,
+        "x": 646.25,
+        "y": 280.0
+      }
+    },
+    {
+      "frame": 71,
+      "member": "Dataset/game10/Clip3/0071.jpg",
+      "source_sha256": "7ac7fe2443963eae3342d1a46a1323bc090420bd72990260fd21d8520e1988f0",
+      "prediction": {
+        "detected": true,
+        "x": 647.5,
+        "y": 295.0
+      }
+    },
+    {
+      "frame": 72,
+      "member": "Dataset/game10/Clip3/0072.jpg",
+      "source_sha256": "122beee3aadf3c89894d1d496803f28c9c029eaf0a66432676c042604e7e03d5",
+      "prediction": {
+        "detected": true,
+        "x": 647.5,
+        "y": 307.5
+      }
+    },
+    {
+      "frame": 73,
+      "member": "Dataset/game10/Clip3/0073.jpg",
+      "source_sha256": "f8dd414bac8e84c54eb7a6fae28bd4ef302737258bdbf4434722b90f8904d6ab",
+      "prediction": {
+        "detected": true,
+        "x": 648.75,
+        "y": 322.5
+      }
+    },
+    {
+      "frame": 74,
+      "member": "Dataset/game10/Clip3/0074.jpg",
+      "source_sha256": "cae1b924591bc4e8eaa60c6034dd3fef90ea727dce851dc8b63708d1e8257020",
+      "prediction": {
+        "detected": true,
+        "x": 650.0,
+        "y": 337.5
+      }
+    },
+    {
+      "frame": 75,
+      "member": "Dataset/game10/Clip3/0075.jpg",
+      "source_sha256": "427e8d90fead3241135f0fef71e4c658ca366b75140b28f7dc7c921067a0cfb8",
+      "prediction": {
+        "detected": true,
+        "x": 652.5,
+        "y": 352.5
+      }
+    },
+    {
+      "frame": 76,
+      "member": "Dataset/game10/Clip3/0076.jpg",
+      "source_sha256": "51af383e7b1ab13a201d439800aa280fddd34c5319874289ae6c1f8cd287d20d",
+      "prediction": {
+        "detected": true,
+        "x": 652.5,
+        "y": 370.0
+      }
+    },
+    {
+      "frame": 77,
+      "member": "Dataset/game10/Clip3/0077.jpg",
+      "source_sha256": "93e6d8a3b9fb82828f6a3b50f1a32bc50817e04cb797f0f43d0d36da7bf1a7ad",
+      "prediction": {
+        "detected": true,
+        "x": 655.0,
+        "y": 386.25
+      }
+    },
+    {
+      "frame": 78,
+      "member": "Dataset/game10/Clip3/0078.jpg",
+      "source_sha256": "74e5add0817eb6452746ee8a371b820b4118c6d5b1568057c891fb86e6de1ef2",
+      "prediction": {
+        "detected": true,
+        "x": 655.0,
+        "y": 405.0
+      }
+    },
+    {
+      "frame": 79,
+      "member": "Dataset/game10/Clip3/0079.jpg",
+      "source_sha256": "3e815247833b5abc3d9e5b653bdb88b171ab6843999c768814ba5b66ac3834b6",
+      "prediction": {
+        "detected": true,
+        "x": 657.5,
+        "y": 422.5
+      }
+    },
+    {
+      "frame": 80,
+      "member": "Dataset/game10/Clip3/0080.jpg",
+      "source_sha256": "c8c06c8b6ce7e5dfbe30f6ae84fc5ffb3a54c99a1c1c569ad00e128948d07eee",
+      "prediction": {
+        "detected": true,
+        "x": 658.75,
+        "y": 442.5
+      }
+    },
+    {
+      "frame": 81,
+      "member": "Dataset/game10/Clip3/0081.jpg",
+      "source_sha256": "4c989dedb212a86ce9f8994ad7ba5ec0cdd6462b77e89a61640fa57a348eab60",
+      "prediction": {
+        "detected": true,
+        "x": 661.25,
+        "y": 462.5
+      }
+    },
+    {
+      "frame": 82,
+      "member": "Dataset/game10/Clip3/0082.jpg",
+      "source_sha256": "8616bc1046d3c3b1091c6ea0041970ad59675613364c16c308f99e7fc312718b",
+      "prediction": {
+        "detected": true,
+        "x": 662.5,
+        "y": 485.0
+      }
+    },
+    {
+      "frame": 83,
+      "member": "Dataset/game10/Clip3/0083.jpg",
+      "source_sha256": "9829d974e5db1d5a30857243321097e1dd9345a90f98461ffb3177b1380e53a0",
+      "prediction": {
+        "detected": true,
+        "x": 665.0,
+        "y": 507.5
+      }
+    },
+    {
+      "frame": 84,
+      "member": "Dataset/game10/Clip3/0084.jpg",
+      "source_sha256": "4dd7aa14d69efa8c4fa71a52e345d0e82529a2d92ab7475402b00d897a18a546",
+      "prediction": {
+        "detected": true,
+        "x": 667.5,
+        "y": 508.75
+      }
+    },
+    {
+      "frame": 85,
+      "member": "Dataset/game10/Clip3/0085.jpg",
+      "source_sha256": "2831412c38f50fce36222feefdba36cc192a4579c84e087f8cd9c5a43f08382f",
+      "prediction": {
+        "detected": true,
+        "x": 670.0,
+        "y": 507.5
+      }
+    },
+    {
+      "frame": 86,
+      "member": "Dataset/game10/Clip3/0086.jpg",
+      "source_sha256": "f8eac0e720ad9ddf03f45c1ade2fa7a79cde34d300cacbf949999d8b5a74a25b",
+      "prediction": {
+        "detected": true,
+        "x": 672.5,
+        "y": 506.25
+      }
+    },
+    {
+      "frame": 87,
+      "member": "Dataset/game10/Clip3/0087.jpg",
+      "source_sha256": "ef2726b3f2805b42b6db604ee889630144ddf0d67d0d2eff385ffe57f6b01713",
+      "prediction": {
+        "detected": true,
+        "x": 675.0,
+        "y": 506.25
+      }
+    },
+    {
+      "frame": 88,
+      "member": "Dataset/game10/Clip3/0088.jpg",
+      "source_sha256": "1549cf4f255e98d154120628b25c21dc620d8b469ac58716b7ef1696808f7bbf",
+      "prediction": {
+        "detected": true,
+        "x": 677.5,
+        "y": 507.5
+      }
+    },
+    {
+      "frame": 89,
+      "member": "Dataset/game10/Clip3/0089.jpg",
+      "source_sha256": "6d42260f2d986c0f74cb738b870f0e83ccf579091fd6410961563a4b82fab121",
+      "prediction": {
+        "detected": true,
+        "x": 682.5,
+        "y": 510.0
+      }
+    },
+    {
+      "frame": 90,
+      "member": "Dataset/game10/Clip3/0090.jpg",
+      "source_sha256": "09213ac03fd8ffeae59771b11f29253f682bc1ed4b661db661d404fff0b1a1c0",
+      "prediction": {
+        "detected": true,
+        "x": 685.0,
+        "y": 512.5
+      }
+    },
+    {
+      "frame": 91,
+      "member": "Dataset/game10/Clip3/0091.jpg",
+      "source_sha256": "c6a2387cb8b0efffacc7f2af9be2d0ee7d4078d6185d329534fd7973da3c3d43",
+      "prediction": {
+        "detected": true,
+        "x": 687.5,
+        "y": 515.0
+      }
+    },
+    {
+      "frame": 92,
+      "member": "Dataset/game10/Clip3/0092.jpg",
+      "source_sha256": "0fb63329b68fa636e000b078804628d163271f673c1b202184075a9e0d8923df",
+      "prediction": {
+        "detected": true,
+        "x": 692.5,
+        "y": 520.0
+      }
+    },
+    {
+      "frame": 93,
+      "member": "Dataset/game10/Clip3/0093.jpg",
+      "source_sha256": "dd72e0d26b7d02eb904986d378bbeefb101fe6a47e14494c2a1c79449aede59d",
+      "prediction": {
+        "detected": true,
+        "x": 695.0,
+        "y": 525.0
+      }
+    },
+    {
+      "frame": 94,
+      "member": "Dataset/game10/Clip3/0094.jpg",
+      "source_sha256": "ae79a21b192914082de039989b48c235f00972bb1559fa37b3042838fce83112",
+      "prediction": {
+        "detected": true,
+        "x": 697.5,
+        "y": 530.0
+      }
+    },
+    {
+      "frame": 95,
+      "member": "Dataset/game10/Clip3/0095.jpg",
+      "source_sha256": "b5e43471d8791191287aaa74272d9d9036ceed234bdbd9634b772163bb744db8",
+      "prediction": {
+        "detected": true,
+        "x": 702.5,
+        "y": 537.5
+      }
+    },
+    {
+      "frame": 96,
+      "member": "Dataset/game10/Clip3/0096.jpg",
+      "source_sha256": "7309962ddd199ea92f7fdb21c5b8ca772584ee19a6b3907f80f25317a4d23b04",
+      "prediction": {
+        "detected": true,
+        "x": 705.0,
+        "y": 545.0
+      }
+    },
+    {
+      "frame": 97,
+      "member": "Dataset/game10/Clip3/0097.jpg",
+      "source_sha256": "52d683e9c0b2302c44e9c7f429ccff6cf8fa19eb125d8c68fb683ecd47216b82",
+      "prediction": {
+        "detected": true,
+        "x": 708.75,
+        "y": 547.5
+      }
+    },
+    {
+      "frame": 98,
+      "member": "Dataset/game10/Clip3/0098.jpg",
+      "source_sha256": "ce69a81413bf8d2ffcf0f14b7a8117d75c450afe86dc6ef001fa7bf5db901097",
+      "prediction": {
+        "detected": true,
+        "x": 680.0,
+        "y": 496.25
+      }
+    },
+    {
+      "frame": 99,
+      "member": "Dataset/game10/Clip3/0099.jpg",
+      "source_sha256": "a7109e25b9d749e9e59eba23fec4047f0823cd2e659a5693007372d0621826a9",
+      "prediction": {
+        "detected": true,
+        "x": 666.25,
+        "y": 460.0
+      }
+    },
+    {
+      "frame": 100,
+      "member": "Dataset/game10/Clip3/0100.jpg",
+      "source_sha256": "99f7914d9813790348332d9ce77b131156d9af1fdcf0c80346d54bddb7ecad7d",
+      "prediction": {
+        "detected": true,
+        "x": 648.75,
+        "y": 425.0
+      }
+    },
+    {
+      "frame": 101,
+      "member": "Dataset/game10/Clip3/0101.jpg",
+      "source_sha256": "6181dec0606368bc47fcc438e386fbf1c0e8e1d663f987f2a0d7cdef3d7111de",
+      "prediction": {
+        "detected": true,
+        "x": 631.25,
+        "y": 392.5
+      }
+    },
+    {
+      "frame": 102,
+      "member": "Dataset/game10/Clip3/0102.jpg",
+      "source_sha256": "6b7cae34a25512bcf1494a12088e5e692f9481004c14374d3f1e03e7d4b65ad8",
+      "prediction": {
+        "detected": true,
+        "x": 617.5,
+        "y": 367.5
+      }
+    },
+    {
+      "frame": 103,
+      "member": "Dataset/game10/Clip3/0103.jpg",
+      "source_sha256": "55d53193672c95cdd07463ca5f23baa4f7d7a5e21971f2733f49b333c65c2982",
+      "prediction": {
+        "detected": true,
+        "x": 602.5,
+        "y": 342.5
+      }
+    },
+    {
+      "frame": 104,
+      "member": "Dataset/game10/Clip3/0104.jpg",
+      "source_sha256": "318e04dcb6642c953e286dbfcebe7019b703cd7a90263f82e0104ee97e5112d3",
+      "prediction": {
+        "detected": true,
+        "x": 590.0,
+        "y": 322.5
+      }
+    },
+    {
+      "frame": 105,
+      "member": "Dataset/game10/Clip3/0105.jpg",
+      "source_sha256": "80c2e77a09a1da7249721de35b3db4dd6d914649d17a782adecb5c3fdc86f9ca",
+      "prediction": {
+        "detected": true,
+        "x": 578.75,
+        "y": 302.5
+      }
+    },
+    {
+      "frame": 106,
+      "member": "Dataset/game10/Clip3/0106.jpg",
+      "source_sha256": "af42a3422496b7e2005f687de3571ccb81d458ea3f15fe5947ffbfa0f64ffba5",
+      "prediction": {
+        "detected": true,
+        "x": 567.5,
+        "y": 287.5
+      }
+    },
+    {
+      "frame": 107,
+      "member": "Dataset/game10/Clip3/0107.jpg",
+      "source_sha256": "b46967f901545246d5535f891f282da6787d5b775368dfbd6dc4606954b8fc6e",
+      "prediction": {
+        "detected": true,
+        "x": 557.5,
+        "y": 271.25
+      }
+    },
+    {
+      "frame": 108,
+      "member": "Dataset/game10/Clip3/0108.jpg",
+      "source_sha256": "43b1b02ff3b18f80e21813adfa47ad75a903bdc8a3e988c81e476d14bbcf01a3",
+      "prediction": {
+        "detected": true,
+        "x": 550.0,
+        "y": 261.25
+      }
+    },
+    {
+      "frame": 109,
+      "member": "Dataset/game10/Clip3/0109.jpg",
+      "source_sha256": "8468f97752e166cea6776569d665ade0b74e40ba8df9a0dcb444772d4fa1e866",
+      "prediction": {
+        "detected": true,
+        "x": 540.0,
+        "y": 250.0
+      }
+    },
+    {
+      "frame": 110,
+      "member": "Dataset/game10/Clip3/0110.jpg",
+      "source_sha256": "ffca216e0984e26f8318633879753f8696d718835bca1f17339f96afc7418dff",
+      "prediction": {
+        "detected": true,
+        "x": 532.5,
+        "y": 240.0
+      }
+    },
+    {
+      "frame": 111,
+      "member": "Dataset/game10/Clip3/0111.jpg",
+      "source_sha256": "44fd840f4d6a22e77ff1736ebf962abc5dcc114b10617a56008de3978ffee7f0",
+      "prediction": {
+        "detected": true,
+        "x": 523.75,
+        "y": 232.5
+      }
+    },
+    {
+      "frame": 112,
+      "member": "Dataset/game10/Clip3/0112.jpg",
+      "source_sha256": "e6187dabeffb667b71c1eac66d535a12a8e1bb66dd0b07dd4462ca4a706f44c0",
+      "prediction": {
+        "detected": true,
+        "x": 517.5,
+        "y": 225.0
+      }
+    },
+    {
+      "frame": 113,
+      "member": "Dataset/game10/Clip3/0113.jpg",
+      "source_sha256": "ef6ec8979ddff8a8bd46120b09763bc7f04c561ce7d628fedc4690f78974b91d",
+      "prediction": {
+        "detected": true,
+        "x": 510.0,
+        "y": 220.0
+      }
+    },
+    {
+      "frame": 114,
+      "member": "Dataset/game10/Clip3/0114.jpg",
+      "source_sha256": "0f36ddf3d2c728f0de086864c2f95f1f1adc2d137a37b52bfb88af8a2364313a",
+      "prediction": {
+        "detected": true,
+        "x": 502.5,
+        "y": 215.0
+      }
+    },
+    {
+      "frame": 115,
+      "member": "Dataset/game10/Clip3/0115.jpg",
+      "source_sha256": "b905e96bb2a7c3227022515abbc64b3a9746e79b7c5d40edade69a60bee7e257",
+      "prediction": {
+        "detected": true,
+        "x": 497.5,
+        "y": 212.5
+      }
+    },
+    {
+      "frame": 116,
+      "member": "Dataset/game10/Clip3/0116.jpg",
+      "source_sha256": "1f7055294e377a27b01b6a33ec06077f59d958933b91b0023a3c2a2f4cda2b85",
+      "prediction": {
+        "detected": true,
+        "x": 492.5,
+        "y": 212.5
+      }
+    },
+    {
+      "frame": 117,
+      "member": "Dataset/game10/Clip3/0117.jpg",
+      "source_sha256": "fcde27ece8d8e5ce87f30622bcff4fc52e019e134478251b7a919b8ae8cdd0ef",
+      "prediction": {
+        "detected": true,
+        "x": 486.25,
+        "y": 210.0
+      }
+    },
+    {
+      "frame": 118,
+      "member": "Dataset/game10/Clip3/0118.jpg",
+      "source_sha256": "cae1e2f93e5d6a7da87111e1102f36cec2128d6be44cdbc12d6b2298a0421fd1",
+      "prediction": {
+        "detected": true,
+        "x": 482.5,
+        "y": 207.5
+      }
+    },
+    {
+      "frame": 119,
+      "member": "Dataset/game10/Clip3/0119.jpg",
+      "source_sha256": "8da669cb93c5fafcb389a6825a0abc99b5eeab8baaba3691f271767d589e2ea3",
+      "prediction": {
+        "detected": true,
+        "x": 477.5,
+        "y": 207.5
+      }
+    },
+    {
+      "frame": 120,
+      "member": "Dataset/game10/Clip3/0120.jpg",
+      "source_sha256": "97aa788774a11f73472ade566ef4fc66b0db0a7c671deaa4e99469edd45f7c90",
+      "prediction": {
+        "detected": true,
+        "x": 472.5,
+        "y": 210.0
+      }
+    },
+    {
+      "frame": 121,
+      "member": "Dataset/game10/Clip3/0121.jpg",
+      "source_sha256": "3152b184266c3b4361940cdfe443945b6dc44b1e5b348d387afe38ee24c460d5",
+      "prediction": {
+        "detected": true,
+        "x": 467.5,
+        "y": 212.5
+      }
+    },
+    {
+      "frame": 122,
+      "member": "Dataset/game10/Clip3/0122.jpg",
+      "source_sha256": "877064f3c0f1644fbe62f8ef3cd6a1d33593a10743696ec80de75cc019c5c52a",
+      "prediction": {
+        "detected": true,
+        "x": 463.75,
+        "y": 210.0
+      }
+    },
+    {
+      "frame": 123,
+      "member": "Dataset/game10/Clip3/0123.jpg",
+      "source_sha256": "0ef669ec5f5fdf31ea8f1a61998dea340c2674d1757d526ee562a3b05d794a0c",
+      "prediction": {
+        "detected": true,
+        "x": 461.25,
+        "y": 197.5
+      }
+    },
+    {
+      "frame": 124,
+      "member": "Dataset/game10/Clip3/0124.jpg",
+      "source_sha256": "48419830f2c629a309fefa7ef17127dc764df74131ce3ba5ff81c921353b5cc6",
+      "prediction": {
+        "detected": true,
+        "x": 457.5,
+        "y": 185.0
+      }
+    },
+    {
+      "frame": 125,
+      "member": "Dataset/game10/Clip3/0125.jpg",
+      "source_sha256": "7de48618e313b1257c0bb6ed6b5c5b45928127ed4efb55c17cc8d14cf0b3592f",
+      "prediction": {
+        "detected": true,
+        "x": 455.0,
+        "y": 175.0
+      }
+    },
+    {
+      "frame": 126,
+      "member": "Dataset/game10/Clip3/0126.jpg",
+      "source_sha256": "4559223ba957729ec6fc292a6edf77dd54ae34bb57725625bdaefbe75b7e35d5",
+      "prediction": {
+        "detected": true,
+        "x": 452.5,
+        "y": 165.0
+      }
+    },
+    {
+      "frame": 127,
+      "member": "Dataset/game10/Clip3/0127.jpg",
+      "source_sha256": "c66146221be5da457e833ac6200df9ff66e28b846f4e24713d466b8e48a6635a",
+      "prediction": {
+        "detected": true,
+        "x": 448.75,
+        "y": 157.5
+      }
+    },
+    {
+      "frame": 128,
+      "member": "Dataset/game10/Clip3/0128.jpg",
+      "source_sha256": "b16728b0cd1fdd3dfb29c9ad31d7d875b876c6b5b767bde55e87a65cd3a6fd73",
+      "prediction": {
+        "detected": true,
+        "x": 445.0,
+        "y": 150.0
+      }
+    },
+    {
+      "frame": 129,
+      "member": "Dataset/game10/Clip3/0129.jpg",
+      "source_sha256": "e45360ea2a7d8f4f347f99329b59439c4ce02b7eaa5acaba84fcf135e218a054",
+      "prediction": {
+        "detected": true,
+        "x": 442.5,
+        "y": 142.5
+      }
+    },
+    {
+      "frame": 130,
+      "member": "Dataset/game10/Clip3/0130.jpg",
+      "source_sha256": "40e652a2703197fac022211f707a7b2d4b7ec0eeabdb06a275dd6d14ca4f43bd",
+      "prediction": {
+        "detected": true,
+        "x": 440.0,
+        "y": 135.0
+      }
+    },
+    {
+      "frame": 131,
+      "member": "Dataset/game10/Clip3/0131.jpg",
+      "source_sha256": "59c37c7a3647fac1d5f66b63be74f5e192944eed72a43e99e307fefd426837f2",
+      "prediction": {
+        "detected": true,
+        "x": 437.5,
+        "y": 130.0
+      }
+    },
+    {
+      "frame": 132,
+      "member": "Dataset/game10/Clip3/0132.jpg",
+      "source_sha256": "b7ca0058ac2f2a640572a7128f30e444b63980343544c28f5590bd4e723c8507",
+      "prediction": {
+        "detected": true,
+        "x": 435.0,
+        "y": 123.75
+      }
+    },
+    {
+      "frame": 133,
+      "member": "Dataset/game10/Clip3/0133.jpg",
+      "source_sha256": "5b630e4c4449e0baae01c7d78827f0121deb8d5deb29bd526f858343fe335c19",
+      "prediction": {
+        "detected": true,
+        "x": 432.5,
+        "y": 120.0
+      }
+    },
+    {
+      "frame": 134,
+      "member": "Dataset/game10/Clip3/0134.jpg",
+      "source_sha256": "f7f2523a9209f27b3e699579d9e29bfbe713c4468d6b9ab3b80908036768b054",
+      "prediction": {
+        "detected": true,
+        "x": 430.0,
+        "y": 116.25
+      }
+    },
+    {
+      "frame": 135,
+      "member": "Dataset/game10/Clip3/0135.jpg",
+      "source_sha256": "3b07688b718b3f7d415c5f958fd3ea8166bc0db4c94be0efd9f23e1e4900d8f5",
+      "prediction": {
+        "detected": true,
+        "x": 427.5,
+        "y": 113.75
+      }
+    },
+    {
+      "frame": 136,
+      "member": "Dataset/game10/Clip3/0136.jpg",
+      "source_sha256": "41ff0e16ac96fc87be1e44db534dc704307ce681fb8aca3a147d6d184766e25e",
+      "prediction": {
+        "detected": true,
+        "x": 426.25,
+        "y": 112.5
+      }
+    },
+    {
+      "frame": 137,
+      "member": "Dataset/game10/Clip3/0137.jpg",
+      "source_sha256": "849308a8d9b2fe33f3d3f788d62ee23b97f7f465e751f146793a64fd2f285727",
+      "prediction": {
+        "detected": true,
+        "x": 423.75,
+        "y": 110.0
+      }
+    },
+    {
+      "frame": 138,
+      "member": "Dataset/game10/Clip3/0138.jpg",
+      "source_sha256": "6fb5275dc36f60b78afd66cc031c44456b1a9a188146d9d4c5811e93b729e9b1",
+      "prediction": {
+        "detected": true,
+        "x": 421.25,
+        "y": 107.5
+      }
+    },
+    {
+      "frame": 139,
+      "member": "Dataset/game10/Clip3/0139.jpg",
+      "source_sha256": "fc0531bebbe2bb05fa8137ce59d5bb17aad38c2009c05af8061fc7f539693810",
+      "prediction": {
+        "detected": true,
+        "x": 418.75,
+        "y": 106.25
+      }
+    },
+    {
+      "frame": 140,
+      "member": "Dataset/game10/Clip3/0140.jpg",
+      "source_sha256": "05ff0af4ef2f7f8dad2814bb0d517dab7b783f7f276fb15bb036f9ce3e8c8e97",
+      "prediction": {
+        "detected": true,
+        "x": 427.5,
+        "y": 111.25
+      }
+    },
+    {
+      "frame": 141,
+      "member": "Dataset/game10/Clip3/0141.jpg",
+      "source_sha256": "f05471b5050f0eb8a52dd979e3b900e6a197cc088beef3839029c81a323b9114",
+      "prediction": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "frame": 142,
+      "member": "Dataset/game10/Clip3/0142.jpg",
+      "source_sha256": "9138b584533afdd633be31351bb8689ec3963ce0ca2255dc5d5c65c91c36826a",
+      "prediction": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "frame": 143,
+      "member": "Dataset/game10/Clip3/0143.jpg",
+      "source_sha256": "ac2affd96c7d165bcfb120d519a550aec78697ccbd43e8d16fcdabdc4058a6e1",
+      "prediction": {
+        "detected": false,
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    {
+      "frame": 144,
+      "member": "Dataset/game10/Clip3/0144.jpg",
+      "source_sha256": "8b6da5d24de42164d70637df2989b7219df00efa15398f50df1959c962716d58",
+      "prediction": {
+        "detected": true,
+        "x": 480.0,
+        "y": 138.75
+      }
+    },
+    {
+      "frame": 145,
+      "member": "Dataset/game10/Clip3/0145.jpg",
+      "source_sha256": "719c9bf83d035b668e5cd58cf4946aaf03cc92a9960bb1e1a8061942f90532e9",
+      "prediction": {
+        "detected": true,
+        "x": 495.0,
+        "y": 147.5
+      }
+    },
+    {
+      "frame": 146,
+      "member": "Dataset/game10/Clip3/0146.jpg",
+      "source_sha256": "ac197fd86460ca6bbb5b52f8dc496fd384c00e0d3d461974a0e53855a4bfe1c4",
+      "prediction": {
+        "detected": true,
+        "x": 508.75,
+        "y": 156.25
+      }
+    },
+    {
+      "frame": 147,
+      "member": "Dataset/game10/Clip3/0147.jpg",
+      "source_sha256": "8ca6b2562bb7cc3dbf46a92e7ab551e0c22dc56e85c5e3616f08b02c9dd8cb1c",
+      "prediction": {
+        "detected": true,
+        "x": 523.75,
+        "y": 167.5
+      }
+    },
+    {
+      "frame": 148,
+      "member": "Dataset/game10/Clip3/0148.jpg",
+      "source_sha256": "ee008f96c3a1f58947b5ad11318667f6b4e04eedb608d1f73e137d3daa1a582a",
+      "prediction": {
+        "detected": true,
+        "x": 537.5,
+        "y": 177.5
+      }
+    },
+    {
+      "frame": 149,
+      "member": "Dataset/game10/Clip3/0149.jpg",
+      "source_sha256": "b3e11e2a92b9c154c2e1a1c19a79736fa8dc85d87f068d109e247f1e9826931a",
+      "prediction": {
+        "detected": true,
+        "x": 552.5,
+        "y": 190.0
+      }
+    },
+    {
+      "frame": 150,
+      "member": "Dataset/game10/Clip3/0150.jpg",
+      "source_sha256": "73eaf256bf557d60c04294eed3aeb11ae3d94c7ffef666e05c4f3f182e1d500a",
+      "prediction": {
+        "detected": true,
+        "x": 566.25,
+        "y": 202.5
+      }
+    },
+    {
+      "frame": 151,
+      "member": "Dataset/game10/Clip3/0151.jpg",
+      "source_sha256": "dde4202b1b3a51e84791779bef5637c027c2b9ad06678d022a1eb9c286d941ed",
+      "prediction": {
+        "detected": true,
+        "x": 582.5,
+        "y": 216.25
+      }
+    },
+    {
+      "frame": 152,
+      "member": "Dataset/game10/Clip3/0152.jpg",
+      "source_sha256": "4e5fc5eadc6dd24485c01b8feef6da7060bdc884aa29b01b47fa25cec0421a1b",
+      "prediction": {
+        "detected": true,
+        "x": 597.5,
+        "y": 230.0
+      }
+    },
+    {
+      "frame": 153,
+      "member": "Dataset/game10/Clip3/0153.jpg",
+      "source_sha256": "437a621cc5d553c1cd2907d77121b644530dcd827a32ba72a9b288482c316d1d",
+      "prediction": {
+        "detected": true,
+        "x": 613.75,
+        "y": 245.0
+      }
+    },
+    {
+      "frame": 154,
+      "member": "Dataset/game10/Clip3/0154.jpg",
+      "source_sha256": "abdf83d298f5760fb8d61aebe55218172ad4e1f559b553c00a87d34507100c3a",
+      "prediction": {
+        "detected": true,
+        "x": 628.75,
+        "y": 258.75
+      }
+    },
+    {
+      "frame": 155,
+      "member": "Dataset/game10/Clip3/0155.jpg",
+      "source_sha256": "791e575a130c90917c5f4a2c4d02186cb7e40288e06922500a9e03883d2fea9d",
+      "prediction": {
+        "detected": true,
+        "x": 647.5,
+        "y": 278.75
+      }
+    },
+    {
+      "frame": 156,
+      "member": "Dataset/game10/Clip3/0156.jpg",
+      "source_sha256": "c911a5e449ddd71ce47ab5e5f4cb0a1c40d931cb2fcd8a6564a04a64ea840d0b",
+      "prediction": {
+        "detected": true,
+        "x": 656.25,
+        "y": 285.0
+      }
+    },
+    {
+      "frame": 157,
+      "member": "Dataset/game10/Clip3/0157.jpg",
+      "source_sha256": "f02cdb7f80ddafd38338fdc5c3c81df944911951589bcb241df3d379821705ba",
+      "prediction": {
+        "detected": true,
+        "x": 661.25,
+        "y": 282.5
+      }
+    },
+    {
+      "frame": 158,
+      "member": "Dataset/game10/Clip3/0158.jpg",
+      "source_sha256": "b439f7462aef0da3322e314761ba7e3ecc31c5104c9747b4102b4685be0dbfa4",
+      "prediction": {
+        "detected": true,
+        "x": 665.0,
+        "y": 282.5
+      }
+    },
+    {
+      "frame": 159,
+      "member": "Dataset/game10/Clip3/0159.jpg",
+      "source_sha256": "aacf7de42e8e2cc9e0df7217586b7a11931baae7d9f1a206a2f70f31a624d23d",
+      "prediction": {
+        "detected": true,
+        "x": 670.0,
+        "y": 280.0
+      }
+    },
+    {
+      "frame": 160,
+      "member": "Dataset/game10/Clip3/0160.jpg",
+      "source_sha256": "7e67f21ff959d938619f92f415b3081b9474e986540099b37724ad214f6e2cff",
+      "prediction": {
+        "detected": true,
+        "x": 675.0,
+        "y": 277.5
+      }
+    },
+    {
+      "frame": 161,
+      "member": "Dataset/game10/Clip3/0161.jpg",
+      "source_sha256": "bd696d443a905f1a4aeca3d4c5c8dfa277a085e09ea316f0f8ebc9a60545c687",
+      "prediction": {
+        "detected": true,
+        "x": 678.75,
+        "y": 277.5
+      }
+    },
+    {
+      "frame": 162,
+      "member": "Dataset/game10/Clip3/0162.jpg",
+      "source_sha256": "630ce5041d3640781b6e5acd0649cf7c8f8520b65b759bc7528be7cb8f74750a",
+      "prediction": {
+        "detected": true,
+        "x": 682.5,
+        "y": 278.75
+      }
+    },
+    {
+      "frame": 163,
+      "member": "Dataset/game10/Clip3/0163.jpg",
+      "source_sha256": "473e22bb267e946ad69257cbf521eecde591ec1a6b0a894d59254391cc6286ad",
+      "prediction": {
+        "detected": true,
+        "x": 687.5,
+        "y": 280.0
+      }
+    },
+    {
+      "frame": 164,
+      "member": "Dataset/game10/Clip3/0164.jpg",
+      "source_sha256": "5278582b4103b6171d970e35142803251cd6e66baae55bc7e41ce4fe655b8287",
+      "prediction": {
+        "detected": true,
+        "x": 692.5,
+        "y": 282.5
+      }
+    },
+    {
+      "frame": 165,
+      "member": "Dataset/game10/Clip3/0165.jpg",
+      "source_sha256": "525786528f1d41745d5767c44cbd9c87d28bfd776805b399e24f5ea24162a142",
+      "prediction": {
+        "detected": true,
+        "x": 697.5,
+        "y": 282.5
+      }
+    },
+    {
+      "frame": 166,
+      "member": "Dataset/game10/Clip3/0166.jpg",
+      "source_sha256": "3aed595f8a1ccc9810c831730e00ca1e9891553d1adb67dc3f0a230e6e5617a9",
+      "prediction": {
+        "detected": true,
+        "x": 701.25,
+        "y": 285.0
+      }
+    },
+    {
+      "frame": 167,
+      "member": "Dataset/game10/Clip3/0167.jpg",
+      "source_sha256": "7638eb0b36d32e90bb997f338ce6f6731b82ea8061773b8bee3ea2d634644e7a",
+      "prediction": {
+        "detected": true,
+        "x": 705.0,
+        "y": 290.0
+      }
+    },
+    {
+      "frame": 168,
+      "member": "Dataset/game10/Clip3/0168.jpg",
+      "source_sha256": "057668416cfe85b7f699959b4d6fb3f9cfb3015cba05e50bde858ce6d0584907",
+      "prediction": {
+        "detected": true,
+        "x": 708.75,
+        "y": 285.0
+      }
+    },
+    {
+      "frame": 169,
+      "member": "Dataset/game10/Clip3/0169.jpg",
+      "source_sha256": "ac4a08baa3f447e6530e04dbb51edd539b103ba828fb6962324687317b46570b",
+      "prediction": {
+        "detected": true,
+        "x": 711.25,
+        "y": 282.5
+      }
+    },
+    {
+      "frame": 170,
+      "member": "Dataset/game10/Clip3/0170.jpg",
+      "source_sha256": "7418730788373bd8b29a221172b25c3d3c8c5de090c26b21612a15b3fcfb7b8c",
+      "prediction": {
+        "detected": true,
+        "x": 715.0,
+        "y": 277.5
+      }
+    },
+    {
+      "frame": 171,
+      "member": "Dataset/game10/Clip3/0171.jpg",
+      "source_sha256": "7ec9bd35f825eedf5d190d00df8a69acb8ed0612e0842fe62624280beee1d46b",
+      "prediction": {
+        "detected": true,
+        "x": 716.25,
+        "y": 275.0
+      }
+    },
+    {
+      "frame": 172,
+      "member": "Dataset/game10/Clip3/0172.jpg",
+      "source_sha256": "5a0acdb6817138022b8bfdd5c8ee537dba0020e26ec3121088cad011bc32f37b",
+      "prediction": {
+        "detected": true,
+        "x": 717.5,
+        "y": 272.5
+      }
+    },
+    {
+      "frame": 173,
+      "member": "Dataset/game10/Clip3/0173.jpg",
+      "source_sha256": "db2778e8569fc2147f25a47f975c13f2f4aaa5a04624dc52a61e2a570405aafb",
+      "prediction": {
+        "detected": true,
+        "x": 720.0,
+        "y": 270.0
+      }
+    },
+    {
+      "frame": 174,
+      "member": "Dataset/game10/Clip3/0174.jpg",
+      "source_sha256": "b8016de4498a1fff83edfe9d84f428ba525f6eb5c6facf4e22439658d68f89c9",
+      "prediction": {
+        "detected": true,
+        "x": 723.75,
+        "y": 267.5
+      }
+    },
+    {
+      "frame": 175,
+      "member": "Dataset/game10/Clip3/0175.jpg",
+      "source_sha256": "c4af82e135dd371b1770dfff716f6efd7089be9ed50dec4fb2f989a63c50d481",
+      "prediction": {
+        "detected": true,
+        "x": 725.0,
+        "y": 267.5
+      }
+    },
+    {
+      "frame": 176,
+      "member": "Dataset/game10/Clip3/0176.jpg",
+      "source_sha256": "8dd6069a38dc7f523fe76ca4a4f62128ea89bce6eac93f7215e19537c5bd92c2",
+      "prediction": {
+        "detected": true,
+        "x": 727.5,
+        "y": 267.5
+      }
+    },
+    {
+      "frame": 177,
+      "member": "Dataset/game10/Clip3/0177.jpg",
+      "source_sha256": "78c2954c3a908973a809c6ec8d8de34634fe61fb4ca4c3652609261e6d41890c",
+      "prediction": {
+        "detected": true,
+        "x": 731.25,
+        "y": 267.5
+      }
+    },
+    {
+      "frame": 178,
+      "member": "Dataset/game10/Clip3/0178.jpg",
+      "source_sha256": "5b45f978a9c241b47a227bfc63144d6053ccd6aed02102237ce93a934f270d48",
+      "prediction": {
+        "detected": true,
+        "x": 733.75,
+        "y": 267.5
+      }
+    },
+    {
+      "frame": 179,
+      "member": "Dataset/game10/Clip3/0179.jpg",
+      "source_sha256": "4909f4a9a91a665753acc62fd15be2a3bc77f101cb736d34c99f4d8e2cd00e44",
+      "prediction": {
+        "detected": true,
+        "x": 736.25,
+        "y": 270.0
+      }
+    },
+    {
+      "frame": 180,
+      "member": "Dataset/game10/Clip3/0180.jpg",
+      "source_sha256": "cd2413e66b443554a65e654d24f95be2ddaddb15a5183e846276484622ce33b7",
+      "prediction": {
+        "detected": true,
+        "x": 737.5,
+        "y": 271.25
+      }
+    },
+    {
+      "frame": 181,
+      "member": "Dataset/game10/Clip3/0181.jpg",
+      "source_sha256": "3c47837e433012a0788dc3e6ce6332ca91efd2edaf6b7048e540b1c3844b479f",
+      "prediction": {
+        "detected": true,
+        "x": 740.0,
+        "y": 272.5
+      }
+    },
+    {
+      "frame": 182,
+      "member": "Dataset/game10/Clip3/0182.jpg",
+      "source_sha256": "1a79b85dd0c5da50e648f8dbfb08d0ec1342dcec6a80e7f961633452dca5b4b5",
+      "prediction": {
+        "detected": true,
+        "x": 742.5,
+        "y": 275.0
+      }
+    },
+    {
+      "frame": 183,
+      "member": "Dataset/game10/Clip3/0183.jpg",
+      "source_sha256": "b70ef2f14efa62a223a97f78c0f4e64f3e617b99f9ea0dbed36b33deffdf82a3",
+      "prediction": {
+        "detected": true,
+        "x": 745.0,
+        "y": 277.5
+      }
+    },
+    {
+      "frame": 184,
+      "member": "Dataset/game10/Clip3/0184.jpg",
+      "source_sha256": "fd29678bb73b37cd75ca7f47b00969673d9d44c8d5e59a231e91d346c23d4e21",
+      "prediction": {
+        "detected": true,
+        "x": 747.5,
+        "y": 275.0
+      }
+    },
+    {
+      "frame": 185,
+      "member": "Dataset/game10/Clip3/0185.jpg",
+      "source_sha256": "3dd9f5a5561b8e2c14cb7394f0676a3e195a784affc4ca5ab4258c91c9109ac9",
+      "prediction": {
+        "detected": true,
+        "x": 750.0,
+        "y": 272.5
+      }
+    },
+    {
+      "frame": 186,
+      "member": "Dataset/game10/Clip3/0186.jpg",
+      "source_sha256": "d83db830f75c2fb46d1ec453049578e2e2ad6377b8da65138757c5cd7718ec06",
+      "prediction": {
+        "detected": true,
+        "x": 753.75,
+        "y": 267.5
+      }
+    },
+    {
+      "frame": 187,
+      "member": "Dataset/game10/Clip3/0187.jpg",
+      "source_sha256": "47a8db72f477054c5b9f98ee335abb19bb8fefc00aa9a057ccc110c1355eb227",
+      "prediction": {
+        "detected": true,
+        "x": 755.0,
+        "y": 265.0
+      }
+    }
+  ]
+}
