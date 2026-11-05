@@ -9,7 +9,7 @@ from experiments.tennis import k5d_checkpoint as cp
 def make_preparation(root, monkeypatch):
     root.mkdir()
     monkeypatch.setattr(cp.oracle, 'validate_report', lambda _: {})
-    (root / 'source-qualification.json').write_text('{}')
+    (root / 'source-qualification.json').write_text('{"qualified": true}')
     points = []
     for codec, setting in cp.enc.POINTS:
         folder = root / f'{codec}-{setting}'
@@ -22,7 +22,7 @@ def make_preparation(root, monkeypatch):
                        'decode_parity': True, 'render_parity': True,
                        'baseline': {'metrics': [], 'judges': {}, 'zero_ball_wire_sha256': cp.oracle.sha(folder / 'baseline.psbl')},
                        'streak': {'guard_off': False, 'metrics': [], 'judges': {}, 'reuse': None}})
-    (root / 'pilot.json').write_text(json.dumps({'frames': 2, 'clip': 'sample', 'checkpoint_prepare': True, 'points': points}))
+    (root / 'pilot.json').write_text(json.dumps({'frames': 2, 'clip': 'sample', 'checkpoint_prepare': True, 'full_metrics': True, 'points': points}))
     identity = {'source_sha256': 'source', 'snapshot_sha256': 'snapshot', 'environment_sha256': 'runtime'}
     cp.seal(root, identity)
     return identity, points, cp.oracle.sha(root / 'checkpoint.json')

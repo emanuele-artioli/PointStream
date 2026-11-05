@@ -245,3 +245,7 @@ this judge and context, not proof that all cross-sport approaches fail. The next
 cheap test is a separately justified independent judge or source-correctness
 check with frozen exposure and budget; no cross-sport coding or training is
 admitted. [Independent audit](k5d-inputs/opentt-test2-source-a406-independent-audit-20261105.json).
+
+### Checkpoint equivalence admission — 2026-11-05
+
+The bounded phase and stop conditions are recorded in the research card. Preparation's complete native contexts and joint fit are unchanged; scoring replays existing packets and preserves whole-clip judge context. All results must match d8b5's full-schema 16/48 reports exactly. No corpus admission follows from code or CPU fixtures. The SHA-bound prospective prepare decomposition (`53b15df0…`) subtracts only 24 nonoverlapping outer scoring events from each accepted command: remaining times169.770/235.418s; predicted full48 with margin/reserve393.127s. Per-point startup is measured by its own smoke. Root reserves3,400GPU/4,350CPU under the approved larger-stage ceiling and will freeze an independent source checkout for every job in this phase.

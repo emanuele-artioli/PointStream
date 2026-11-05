@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "scope": "prospective fixed/marginal decomposition from one nested 16/48 clip; not proof of linearity or a scientific result",
+  "job": "20261105T000550Z-d8b5c76b",
+  "source_cost_audit_sha256": "66cbbd2ef1480524b0327effb9c760d7ef726abe40e338c3246c434bc9640d66",
+  "method": "Subtract only nonoverlapping metrics.<codec>.<point>.<arm> and judges.<codec>.<point>.<arm> outer wall intervals from whole command wall. Do not subtract nested judge, startup, native, source oracle or model initialization. Fit remaining 16/48; scale predicted48 upward for new16 slowdown; apply 1.5 margin and 40 seconds seal/staging/validation reserve plus 20 seconds remaining-campaign reserve.",
+  "input_read_cpu_allocation_seconds": 45,
+  "stages": {
+    "16": {
+      "archive_sha256": "8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377",
+      "timing_sha256": "77c0ff99c668c8c46e512b0bd732a4bbbf271d74f348b0d0202fddb8cf20c850",
+      "command_wall_seconds": 205.76892614364624,
+      "scoring_events": [
+        {
+          "name": "metrics.dcvc.0.baseline",
+          "wall_seconds": 3.767336219083518
+        },
+        {
+          "name": "judges.dcvc.0.baseline",
+          "wall_seconds": 1.344024470075965
+        },
+        {
+          "name": "metrics.dcvc.0.streak",
+          "wall_seconds": 1.562620598822832
+        },
+        {
+          "name": "judges.dcvc.0.streak",
+          "wall_seconds": 1.3635622668080032
+        },
+        {
+          "name": "metrics.dcvc.21.baseline",
+          "wall_seconds": 1.6425455962307751
+        },
+        {
+          "name": "judges.dcvc.21.baseline",
+          "wall_seconds": 1.27217554487288
+        },
+        {
+          "name": "metrics.dcvc.21.streak",
+          "wall_seconds": 1.5839885771274567
+        },
+        {
+          "name": "judges.dcvc.21.streak",
+          "wall_seconds": 1.1935631330125034
+        },
+        {
+          "name": "metrics.dcvc.42.baseline",
+          "wall_seconds": 1.6170649328269064
+        },
+        {
+          "name": "judges.dcvc.42.baseline",
+          "wall_seconds": 1.274900249671191
+        },
+        {
+          "name": "metrics.dcvc.42.streak",
+          "wall_seconds": 1.5742962220683694
+        },
+        {
+          "name": "judges.dcvc.42.streak",
+          "wall_seconds": 1.2955174259841442
+        },
+        {
+          "name": "metrics.svt.48.baseline",
+          "wall_seconds": 1.635717157740146
+        },
+        {
+          "name": "judges.svt.48.baseline",
+          "wall_seconds": 1.160783994011581
+        },
+        {
+          "name": "metrics.svt.48.streak",
+          "wall_seconds": 1.5870923059992492
+        },
+        {
+          "name": "judges.svt.48.streak",
+          "wall_seconds": 1.186468203086406
+        },
+        {
+          "name": "metrics.svt.55.baseline",
+          "wall_seconds": 1.6131286979652941
+        },
+        {
+          "name": "judges.svt.55.baseline",
+          "wall_seconds": 1.1450498648919165
+        },
+        {
+          "name": "metrics.svt.55.streak",
+          "wall_seconds": 1.5736773358657956
+        },
+        {
+          "name": "judges.svt.55.streak",
+          "wall_seconds": 1.158568532206118
+        },
+        {
+          "name": "metrics.svt.62.baseline",
+          "wall_seconds": 1.6430041030980647
+        },
+        {
+          "name": "judges.svt.62.baseline",
+          "wall_seconds": 1.1452336492948234
+        },
+        {
+          "name": "metrics.svt.62.streak",
+          "wall_seconds": 1.5878635277040303
+        },
+        {
+          "name": "judges.svt.62.streak",
+          "wall_seconds": 1.0709199677221477
+        }
+      ],
+      "scoring_wall_seconds": 35.99910257617012,
+      "remaining_wall_seconds": 169.76982356747612
+    },
+    "48": {
+      "archive_sha256": "f0dd118a5d64ca148be675a097606aa6dacb8ae49ffcac639ad30911ae74a727",
+      "timing_sha256": "f413eb28cded1a10d229c3965b2d3701ef30b86410c89a7e5673fabfcc87faae",
+      "command_wall_seconds": 339.86258268356323,
+      "scoring_events": [
+        {
+          "name": "metrics.dcvc.0.baseline",
+          "wall_seconds": 7.075250115711242
+        },
+        {
+          "name": "judges.dcvc.0.baseline",
+          "wall_seconds": 3.916201062966138
+        },
+        {
+          "name": "metrics.dcvc.0.streak",
+          "wall_seconds": 4.795855794567615
+        },
+        {
+          "name": "judges.dcvc.0.streak",
+          "wall_seconds": 3.9024039381183684
+        },
+        {
+          "name": "metrics.dcvc.21.baseline",
+          "wall_seconds": 4.94547572825104
+        },
+        {
+          "name": "judges.dcvc.21.baseline",
+          "wall_seconds": 3.8923136270605028
+        },
+        {
+          "name": "metrics.dcvc.21.streak",
+          "wall_seconds": 4.77813989110291
+        },
+        {
+          "name": "judges.dcvc.21.streak",
+          "wall_seconds": 3.8582277088426054
+        },
+        {
+          "name": "metrics.dcvc.42.baseline",
+          "wall_seconds": 4.90813787188381
+        },
+        {
+          "name": "judges.dcvc.42.baseline",
+          "wall_seconds": 3.826081191189587
+        },
+        {
+          "name": "metrics.dcvc.42.streak",
+          "wall_seconds": 4.744677240028977
+        },
+        {
+          "name": "judges.dcvc.42.streak",
+          "wall_seconds": 3.9207825609482825
+        },
+        {
+          "name": "metrics.svt.48.baseline",
+          "wall_seconds": 4.934225351084024
+        },
+        {
+          "name": "judges.svt.48.baseline",
+          "wall_seconds": 3.5595722342841327
+        },
+        {
+          "name": "metrics.svt.48.streak",
+          "wall_seconds": 4.802755332086235
+        },
+        {
+          "name": "judges.svt.48.streak",
+          "wall_seconds": 3.3102619308046997
+        },
+        {
+          "name": "metrics.svt.55.baseline",
+          "wall_seconds": 4.91253345599398
+        },
+        {
+          "name": "judges.svt.55.baseline",
+          "wall_seconds": 3.524374856147915
+        },
+        {
+          "name": "metrics.svt.55.streak",
+          "wall_seconds": 4.788953416980803
+        },
+        {
+          "name": "judges.svt.55.streak",
+          "wall_seconds": 3.457794171757996
+        },
+        {
+          "name": "metrics.svt.62.baseline",
+          "wall_seconds": 4.906403372064233
+        },
+        {
+          "name": "judges.svt.62.baseline",
+          "wall_seconds": 3.441543811932206
+        },
+        {
+          "name": "metrics.svt.62.streak",
+          "wall_seconds": 4.767770597245544
+        },
+        {
+          "name": "judges.svt.62.streak",
+          "wall_seconds": 3.475158761255443
+        }
+      ],
+      "scoring_wall_seconds": 104.44489402230829,
+      "remaining_wall_seconds": 235.41768866125494
+    }
+  },
+  "fixed_seconds": 136.9458910205867,
+  "marginal_seconds_per_frame": 2.051495784180588,
+  "baseline_prepare16_seconds": 169.76982356747612,
+  "baseline_prepare48_seconds": 235.41768866125494,
+  "forecast_at_baseline_seconds": 393.1265329918824,
+  "fresh_process_score_caution": "Point timers exclude checkpoint hashing, decoder startup, model loading, staging and fresh process costs; per-point 16 smoke must measure these. The threefold gate may stop safely; no cost-fit is implied."
+}

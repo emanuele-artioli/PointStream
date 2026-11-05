@@ -51,9 +51,16 @@ def execution_identity() -> dict[str, str]:
             'environment_sha256': dispatch['staged_environment']['sha256']}
 
 
-def seal(root: Path, identity: dict[str, str]) -> dict[str, Any]:
+def validate_prepared(root: Path) -> dict[str, Any]:
     report = json.loads((root / 'pilot.json').read_text())
-    oracle.validate_report(json.loads((root / 'source-qualification.json').read_text()))
+    qualification = json.loads((root / 'source-qualification.json').read_text())
+    oracle.validate_report(qualification)
+    gate = report.get('fidelity_gate')
+    if gate:
+        enc.fidelity_gate(root / 'fidelity-gate.json', gate['sha256'], qualification['identities']['archive']['sha256'],
+                          purpose=gate.get('purpose', 'full-retrospective-benchmark'), clip=report['clip'], frames=report['frames'])
+    elif not qualification.get('qualified'):
+        raise ValueError('unqualified source lacks fidelity gate')
     if not report.get('checkpoint_prepare') or [(p['codec'], p['point']) for p in report['points']] != list(enc.POINTS):
         raise ValueError('prepare is not the complete six-point joint-fit path')
     if any(p[a]['metrics'] or p[a]['judges'] for p in report['points'] for a in ('baseline', 'streak')):
@@ -65,6 +72,11 @@ def seal(root: Path, identity: dict[str, str]) -> dict[str, Any]:
                 or oracle.sha(folder / 'baseline.psbl') != point['baseline']['zero_ball_wire_sha256']
                 or not point['decode_parity'] or not point['render_parity']):
             raise ValueError('prepare packet or fresh receiver parity failed')
+    return report
+
+
+def seal(root: Path, identity: dict[str, str]) -> dict[str, Any]:
+    report = validate_prepared(root)
     data = {'schema': 1, 'execution_identity': identity, 'clip': report['clip'],
             'frames': report['frames'], 'points': [list(p) for p in enc.POINTS],
             'files': manifest_files(root), 'scope': 'full native contexts and joint fit; no scored output'}
@@ -80,6 +92,10 @@ def verify(root: Path, expected_sha: str, identity: dict[str, str]) -> dict[str,
             or data.get('points') != [list(p) for p in enc.POINTS]
             or data.get('files') != manifest_files(root)):
         raise ValueError('checkpoint content, source or runtime mismatch')
+    report = validate_prepared(root)
+    if (report['clip'] != data['clip'] or report['frames'] != data['frames']
+            or not report['full_metrics']):
+        raise ValueError('checkpoint report scope mismatch')
     return data
 
 
@@ -244,9 +260,23 @@ def prepare(args: argparse.Namespace, identity: dict[str, str]) -> None:
         raise ValueError('output must be inside task scratch')
     if getattr(args, 'feasibility_no_metrics', False):
         raise ValueError('checkpoint study requires full scoring contract')
+    if getattr(args, 'cost_pilot', False):
+        enc.fidelity_gate(Path(args.fidelity_gate), args.fidelity_gate_sha256, args.archive_sha256,
+                          purpose='48-frame-cost-pilot', clip=args.clip, frames=args.frames)
     args.checkpoint_prepare = True
     args.timer = Timer(scratch / 'checkpoint-prepare-timing.json')
     enc.run(args)
+    if getattr(args, 'cost_pilot', False):
+        gate_path = out / 'fidelity-gate.json'
+        if not gate_path.exists():
+            shutil.copyfile(args.fidelity_gate, gate_path)
+        if oracle.sha(gate_path) != args.fidelity_gate_sha256:
+            raise ValueError('prepared fidelity gate identity changed')
+        report_path = out / 'pilot.json'
+        report = json.loads(report_path.read_text())
+        report['fidelity_gate'] = {'sha256': args.fidelity_gate_sha256, 'scope': 'fidelity-only',
+                                   'purpose': '48-frame-cost-pilot'}
+        report_path.write_text(json.dumps(report, indent=2, allow_nan=False) + '\n')
     seal(out, identity)
 
 

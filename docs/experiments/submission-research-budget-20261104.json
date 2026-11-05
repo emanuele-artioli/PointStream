@@ -466,6 +466,16 @@
       "spec_sha256": "ab3fe7365fc37d57716cb053ce2a0c806d22763de7d202113b709537848228c7",
       "gpu_ceiling": 240,
       "inclusive_cpu_ceiling": 360
+    },
+    {
+      "job_id": "20261105T005409Z-372411b3",
+      "phase": "w8-factorial-cuda-20261105",
+      "state": "submitted; fourcellpilotnotyetqualified",
+      "revision": "dc19510ff3a49409fbd089b6cb5b92f03adeae4e",
+      "source_sha256": "8d92a61eb8ca2c251ee1b0a4d19b52f874e320f11484e02666429574212e2d08",
+      "spec_sha256": "3a1e57313425f1d8b9bbaa6f6fcbb7e10bdfa35e8e7aac81bcbf252415bfb76e",
+      "gpu_ceiling": 400,
+      "inclusive_cpu_ceiling": 600
     }
   ],
   "old_budgets": "closed, not borrowed",
