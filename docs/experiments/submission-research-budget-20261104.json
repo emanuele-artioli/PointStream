@@ -748,6 +748,14 @@
       "cpu_seconds": 60,
       "parent_phase": "w8-clock-qualified-host-cost-requalification-20261105",
       "basis": "Entire35+15CPUproofallowance +8+2separatemetadatacap60 charged; actualparent9.584/child0.291/metadata2.639CPU, otherpacking/transferoverheadunmetered. Independent78abc20f fulla519source353manifest/helper/retainedconfig/AAguard/canary/mutation/JCVlauncher metadataaccepted, noModel/Torchinchild/GPUqualification."
+    },
+    {
+      "phase": "final-configured-checks-f33d2246-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 500,
+      "basis": "Entire500CPU code-check reservation conservatively charged; frozenf33d2246 configuredRuff/mypy531files+pytest1861pass37skip all3exit0,167.939wall/243.068waitedchildren+supervisorCPU. SeparatemachineguardCPUunmetered/liveprimaryparserdiscardedsamples; finalrunnerprintfailedAFTERvalidreceiptwritten, checksunaffected. Notresearch/modelqualification."
     }
   ],
   "reservations": [
@@ -1244,6 +1252,14 @@
       "cpu_seconds": 940,
       "status": "SOURCE/CPUQUALIFIED butcapacityBLOCKED:e0251a8a no qualifyingexclusiveAda, noGPUrequestqueued. ActualsourceDD/a519; 60CPUproofcharged; future940CPU700GPU cumulative1000CPU=60+930configured(710worker/validator+100external+120admin1.5margin)+10rootcontingency. Spec930bd9eaadc provisional13:58UTC mustrefreshaftercurrenthost/doctor/cache/source/spec/costreview. ONE1\u21923only, no30step/automaticretry.",
       "authorized_cumulative_cpu_seconds": 1000
+    },
+    {
+      "phase": "final-configured-checks-f33d2246-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 500,
+      "status": "closed500CPU0GPUcharged, all3configuredcheckcommandspass; runnerpost-summaryformattingerrorretainedinreceiptaddendum, guardterminated"
     }
   ],
   "jobs": [
