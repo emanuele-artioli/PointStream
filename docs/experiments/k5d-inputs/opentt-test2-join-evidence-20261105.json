@@ -1,0 +1,141 @@
+{
+  "frames": [
+    {
+      "frame_index": 1085,
+      "pts": 138880,
+      "time_base": "1/15360",
+      "raw_rgb_sha256": "2471ee558198e18f69eec8a284447acd854994af902f86ad83c12b596b472f08",
+      "png_sha256": "14dd4b2e14032e20c693714c5e4722f721c81ac36316479251e04d0c6ff070d5",
+      "png_bytes": 1726247,
+      "label_xy_source": [
+        189,
+        539
+      ]
+    },
+    {
+      "frame_index": 1086,
+      "pts": 139008,
+      "time_base": "1/15360",
+      "raw_rgb_sha256": "a85b9a2411cf734ce01c4af70792f8ab446ce6dfc78aec654e6de8f13d55d988",
+      "png_sha256": "76187029eb10aeca3006d47a1f445e808a487b104df1d1540bb73c12ef3b9007",
+      "png_bytes": 1734502,
+      "label_xy_source": [
+        154,
+        536
+      ]
+    },
+    {
+      "frame_index": 1087,
+      "pts": 139136,
+      "time_base": "1/15360",
+      "raw_rgb_sha256": "bc7349df6cbdf744e010ea4c25258a20cccb3978b4886b2e14f27fb558415381",
+      "png_sha256": "f57d0b0841df9cd8de9aa075cc78388417dc2f72ea24abc7ae29938ed5ddf444",
+      "png_bytes": 1731430,
+      "label_xy_source": [
+        117,
+        534
+      ]
+    }
+  ],
+  "contact_sheet": {
+    "file": "contact-sheet.png",
+    "sha256": "3328952211b512430b61210aba4c8cb1b8783ce8fc058da7ca6c66b5098fbc13",
+    "bytes": 1500167
+  },
+  "schema_version": 1,
+  "clip": "test_2",
+  "status": "REVIEW_REQUIRED; no label-origin conclusion",
+  "video_sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43",
+  "video_bytes": 225118372,
+  "ball_markup_sha256": "db79a74c3fc2299d84668b7bcc98e4a925ccdee839e6ca00a28c16bc91d85c74",
+  "selection_sha256": "b104b87aefae92e3a3ea7766bc51e3b34f6c3c7a1f071bbbbca7eeb218984877",
+  "witness_selection_sha256": "bcd51345c39965f70f0d4c051238de54b87670720002c5ea488fa8d93c7661d7",
+  "ffmpeg_sha256": "7556f7249282a43dfaa02b776d4d6ad8b01a8865bfbca790a018a9c5d98103d2",
+  "ffprobe_sha256": "f4e72e0094397518602881be95f16a1d60ec41b03ecfb0aaa6f8e45ffa14583a",
+  "source_pts_first": 0,
+  "source_frame_count": 3600,
+  "fps": "120/1",
+  "time_base": "1/15360",
+  "sequential_pts": [
+    138880,
+    139008,
+    139136
+  ],
+  "seek_pts": [
+    138880,
+    139008,
+    139136
+  ],
+  "sequential_command": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "-hide_banner",
+    "-loglevel",
+    "info",
+    "-nostdin",
+    "-threads",
+    "1",
+    "-filter_threads",
+    "1",
+    "-copyts",
+    "-i",
+    "/local/users/emanuele/pointstream/cache/91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43/test_2.mp4",
+    "-an",
+    "-vf",
+    "select=between(n\\,1085\\,1087),showinfo",
+    "-frames:v",
+    "3",
+    "-vsync",
+    "0",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "rgb24",
+    "pipe:1"
+  ],
+  "seek_command": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffmpeg",
+    "-hide_banner",
+    "-loglevel",
+    "info",
+    "-nostdin",
+    "-threads",
+    "1",
+    "-filter_threads",
+    "1",
+    "-copyts",
+    "-ss",
+    "8",
+    "-i",
+    "/local/users/emanuele/pointstream/cache/91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43/test_2.mp4",
+    "-an",
+    "-vf",
+    "select=between(n\\,125\\,127),showinfo",
+    "-frames:v",
+    "3",
+    "-vsync",
+    "0",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "rgb24",
+    "pipe:1"
+  ],
+  "probe_command": [
+    "/local/users/emanuele/pointstream/cache/32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661/tree/bin/ffprobe",
+    "-v",
+    "error",
+    "-select_streams",
+    "v:0",
+    "-threads",
+    "1",
+    "-show_streams",
+    "-show_frames",
+    "-show_entries",
+    "stream=width,height,nb_frames,time_base,avg_frame_rate,r_frame_rate:frame=best_effort_timestamp",
+    "-of",
+    "json",
+    "/local/users/emanuele/pointstream/cache/91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43/test_2.mp4"
+  ],
+  "fast_seek_raw_parity": true,
+  "claim": "decoder index consistency only; author annotation origin needs independent review"
+}

@@ -1,0 +1,47 @@
+{
+  "job": "20261105T000550Z-d8b5c76b",
+  "status": "complete exit 0",
+  "host": "gpu2 RTX A6000",
+  "source_git_head": "cd669a2204f6d7f578a98e526285922d4e771e4b",
+  "source_snapshot_sha256": "36106be834aed2fe90085417ab74035ca33e3328e15bd886ce41264e6c461ee9",
+  "canonical_spec_sha256": "cf1db81be013336627e15bebaadbc9a9f375c00c77bc3380b9dd32b7a7fd1542",
+  "reference_archive_sha256": "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066",
+  "smoke_archive_sha256": "8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377",
+  "full_archive_sha256": "f0dd118a5d64ca148be675a097606aa6dacb8ae49ffcac639ad30911ae74a727",
+  "checks": {
+    "16_exact_reference": "six points: native, wire, baseline wire, decoded and rendered hashes, guard, per-frame metrics and judge outputs; source rows and scores",
+    "48": "six points, frame coverage for both arms and both judges, file hashes, recorded receiver decode/render hash parity, point checkpoints, timing coverage, source prefix and identities",
+    "limits": "Read-only receipt and archive audit; no native/model execution, pixel re-decode, or independent judge score recomputation. Timing events overlap and are not summed."
+  },
+  "resources": {
+    "source_affinity": [
+      0
+    ],
+    "execution_contention": [],
+    "paused_seconds": 0,
+    "claim_and_processes": "canonical status reports no active PointStream claim or GPU compute processes; recorded supervisor and worker PIDs absent at subsequent ps",
+    "lifecycle_wall_seconds": 594.6262414,
+    "child_cpu_cumulative_16": 204.863972,
+    "child_cpu_cumulative_48": 543.490441,
+    "cpu_caveat": "RUSAGE_CHILDREN is cumulative across stages; difference includes validator; no phase total derived from summing these values",
+    "encoder_root_cpu_16": 202.760497,
+    "encoder_root_cpu_48": 336.429242,
+    "phase_caps_gpu_cpu_seconds": [
+      1800,
+      2100
+    ]
+  },
+  "forecast": {
+    "method": "illustrative two-point command-wall fit; same clip and cached staging only; not admission or evidence of general scaling",
+    "fixed_seconds_per_start": 138.72209787368774,
+    "marginal_seconds_per_frame": 4.190426766872406,
+    "command_188_seconds": 926.5223300457001,
+    "command_586_seconds": 2594.3121832609177,
+    "command_30_clips_5675_frames_seconds": 27942.334838211536,
+    "assumptions_for_margin_example": "1.25 x command plus 21.9 seconds warm staging/publication/validator and 60 seconds reserve per clip; external audit and cold staging excluded",
+    "margin_example_188_seconds": 1240.052912557125,
+    "margin_example_586_seconds": 3324.790229076147,
+    "margin_example_30_clips_seconds": 37384.91854776442,
+    "conclusion": "586 projected over 2400 seconds even without overhead or margin; bounded full-context checkpoint DAG required unless new representative evidence changes this. Old 188 gate remains failed; this 48 cost receipt does not authorize 188 or corpus."
+  }
+}

@@ -166,3 +166,81 @@ def test_generic_decoder_resource_bytes_are_separate_from_wire(tmp_path):
     assert ledger['dcvc']['image_checkpoint']['sha256'] == enc.oracle.sha(image)
     assert ledger['svt']['decoder']['bytes'] == 1
     assert 'excluded from per-clip wire' in ledger['scope']
+
+
+def test_confirmation_fidelity_gate_is_narrow_and_separate(tmp_path):
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only',
+            'purpose': '188-frame-confirmation', 'archive_sha256': 'archive',
+            'calibration_job_id': 'job', 'evidence_sha256': 'a' * 64,
+            'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'full_cost'],
+            'clip': 'tracknet/game10/Clip3', 'max_frames': 188}
+    path = tmp_path / 'gate.json'
+    path.write_text(json.dumps(gate))
+    digest = enc.oracle.sha(path)
+    for frames in (16, 188):
+        assert enc.fidelity_gate(path, digest, 'archive', purpose='188-frame-confirmation',
+                                 clip=gate['clip'], frames=frames) == gate
+    for frames in (48, 189):
+        with pytest.raises(ValueError, match='confirmation'):
+            enc.fidelity_gate(path, digest, 'archive', purpose='188-frame-confirmation',
+                              clip=gate['clip'], frames=frames)
+    with pytest.raises(ValueError, match='confirmation'):
+        enc.fidelity_gate(path, digest, 'archive', purpose='188-frame-confirmation',
+                          clip='tracknet/game9/Clip5', frames=188)
+    with pytest.raises(ValueError, match='purpose'):
+        enc.fidelity_gate(path, digest, 'archive', purpose='full-retrospective-benchmark')
+    gate['checks'].remove('full_cost')
+    path.write_text(json.dumps(gate))
+    with pytest.raises(ValueError, match='calibration'):
+        enc.fidelity_gate(path, enc.oracle.sha(path), 'archive', purpose='188-frame-confirmation',
+                          clip=gate['clip'], frames=188)
+
+
+def test_checkpoint_assembly_passes_real_report_validator(tmp_path, monkeypatch):
+    from experiments.tennis import k5d_checkpoint as cp
+
+    root = tmp_path / 'prepared'
+    root.mkdir()
+    report = fixture_output(root, monkeypatch)
+    scored_points = json.loads(json.dumps(report['points']))
+    report['checkpoint_prepare'] = True
+    for point in report['points']:
+        point['baseline'].update(metrics=[], judges={})
+        point['streak'].update(metrics=[], judges={}, reuse=None)
+    (root / 'pilot.json').write_text(json.dumps(report))
+    identity = {'source_sha256': 's', 'snapshot_sha256': 'p', 'environment_sha256': 'e'}
+    cp.seal(root, identity)
+    sha = enc.oracle.sha(root / 'checkpoint.json')
+    receipts = []
+    for i, point in enumerate(scored_points):
+        point['streak']['reuse'] = 'disabled'
+        path = tmp_path / f'point-{i}.json'
+        path.write_text(json.dumps({'checkpoint_sha256': sha, 'execution_identity': identity, 'point': point,
+                                    'receiver_replay': {'decoded_yuv_sha256': 'decode', 'rendered_rgb_sha256': 'render'}}))
+        receipts.append({'path': str(path), 'sha256': enc.oracle.sha(path)})
+    result = cp.assemble(root, sha, receipts, tmp_path / 'assembled', identity)
+    assert result['frames'] == 2 and result['points'] == 6 and result['full_metrics']
+
+
+def test_checkpoint_parity_compares_full_scores_and_ignores_relocated_command(tmp_path, monkeypatch):
+    import shutil
+    from experiments.tennis import k5d_checkpoint as cp
+
+    prior = tmp_path / 'prior'
+    prior.mkdir()
+    report = fixture_output(prior, monkeypatch)
+    report['conversion'] = {'yuv_sha256': 'same', 'floor_psnr': 30., 'command': ['/old/output']}
+    (prior / 'pilot.json').write_text(json.dumps(report))
+    source_path = prior / 'source-qualification.json'
+    source = json.loads(source_path.read_text())
+    source['scores'] = {'wasb': {'hits': 1}}
+    source_path.write_text(json.dumps(source))
+    current = tmp_path / 'current'
+    shutil.copytree(prior, current)
+    report['conversion']['command'] = ['/new/output']
+    (current / 'pilot.json').write_text(json.dumps(report))
+    assert cp.compare_equivalence(prior, current, enc.oracle.sha(prior / 'pilot.json'))['passed']
+    report['points'][0]['streak']['metrics'][0]['full_lpips'] = 0.2
+    (current / 'pilot.json').write_text(json.dumps(report))
+    with pytest.raises(ValueError):
+        cp.compare_equivalence(prior, current, enc.oracle.sha(prior / 'pilot.json'))

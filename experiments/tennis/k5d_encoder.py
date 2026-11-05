@@ -145,6 +145,10 @@ def fidelity_gate(path: Path, digest: str, archive_sha: str, *, purpose: str = "
                 or receipt.get("calibration_job_id") != "20261104T223611Z-ed28cf8e"
                 or receipt.get("accepted_smoke_sha256") != "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066"):
             raise ValueError("cost-pilot fidelity gate clip or frame limit mismatch")
+    elif purpose == "188-frame-confirmation":
+        if (receipt.get("clip") != "tracknet/game10/Clip3" or clip != receipt["clip"]
+                or receipt.get("max_frames") != 188 or frames not in (16, 188)):
+            raise ValueError("confirmation fidelity gate clip or frame limit mismatch")
     elif purpose != "full-retrospective-benchmark":
         raise ValueError("unrecognized fidelity gate purpose")
     return receipt
@@ -253,6 +257,7 @@ def run(args: argparse.Namespace) -> None:
         raise ValueError("archive is outside PS_LOCAL_ROOT")
     benchmark = bool(getattr(args, "benchmark", False))
     cost_pilot = bool(getattr(args, "cost_pilot", False))
+    checkpoint_prepare = bool(getattr(args, "checkpoint_prepare", False))
     if cost_pilot and (benchmark or args.clip != "tracknet/game10/Clip3" or args.frames not in (16, 48)):
         raise ValueError("cost pilot is restricted to game10/Clip3 at 16 or 48 frames")
     if args.start_frame != 0 or (not benchmark and args.clip not in ("tracknet/game9/Clip5", "tracknet/game10/Clip3")):
@@ -288,9 +293,12 @@ def run(args: argparse.Namespace) -> None:
         raise
     (args.output / "source-qualification.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
     gate_record = None
-    if benchmark or (cost_pilot and not report["qualified"]):
+    gate_purpose = getattr(args, "gate_purpose", None)
+    if gate_purpose not in (None, "188-frame-confirmation") or (gate_purpose and (benchmark or cost_pilot)):
+        raise ValueError("invalid or conflicting explicit gate purpose")
+    if benchmark or gate_purpose or (cost_pilot and not report["qualified"]):
         gate_path = Path(args.fidelity_gate)
-        purpose = "48-frame-cost-pilot" if cost_pilot else "full-retrospective-benchmark"
+        purpose = "48-frame-cost-pilot" if cost_pilot else gate_purpose or "full-retrospective-benchmark"
         fidelity_gate(gate_path, args.fidelity_gate_sha256, args.archive_sha256, purpose=purpose, clip=args.clip, frames=args.frames)
         shutil.copyfile(gate_path, args.output / "fidelity-gate.json")
         gate_record = {"sha256": args.fidelity_gate_sha256, "scope": "fidelity-only", "purpose": purpose}
@@ -376,8 +384,15 @@ def run(args: argparse.Namespace) -> None:
         if not parity or not render_parity:
             raise ValueError("receiver parity failed")
         encoder_decoded_sha256 = oracle.sha(Path(rec.pop("decoded")))
-        baseline_metrics, baseline_judges, streak_metrics, streak_judges, reuse = score_arms(
-            source, decoded, composite, labels, nets, judges, guard, timer, f"{kind}.{point}")
+        if checkpoint_prepare:
+            baseline_metrics: list[dict[str, Any]] = []
+            baseline_judges: dict[str, Any] = {}
+            streak_metrics: list[dict[str, Any]] = []
+            streak_judges: dict[str, Any] = {}
+            reuse: str | None = None
+        else:
+            baseline_metrics, baseline_judges, streak_metrics, streak_judges, reuse = score_arms(
+                source, decoded, composite, labels, nets, judges, guard, timer, f"{kind}.{point}")
         result = {"codec": kind, "point": point, "native_record": rec, "native_bytes": published.stat().st_size,
                   "native_sha256": oracle.sha(published), "wire_bytes": wire.stat().st_size, "wire_sha256": oracle.sha(wire),
                   "receiver": receipt, "decode_parity": parity, "render_parity": render_parity,
@@ -411,6 +426,8 @@ def run(args: argparse.Namespace) -> None:
               "cpu_accounting": "parent process only; fleet must meter whole process tree", "python": sys.version, "torch": torch.__version__,
               "revision": args.code_revision, "snapshot_identity": getattr(args, "snapshot_identity", None),
               "encoder_source_sha256": oracle.sha(Path(__file__)), "points": results}
+    if checkpoint_prepare:
+        output["checkpoint_prepare"] = True
     (args.output / "pilot.json").write_text(json.dumps(output, indent=2, allow_nan=False) + "\n")
     validate(args.output)
 

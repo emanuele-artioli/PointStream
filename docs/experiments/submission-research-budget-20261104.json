@@ -406,6 +406,16 @@
       "revision": "73e5b8c63e7cf6c6db24e09e0eb1f808aee6e352",
       "gpu_ceiling": 240,
       "inclusive_cpu_ceiling": 360
+    },
+    {
+      "job_id": "20261105T003105Z-26df2a36",
+      "phase": "gvcrt-native4-16-20261105",
+      "state": "submitted; probe/cost/fullgates pending",
+      "revision": "d65a4146f97bbeceb9a39b4c4e17b500236c18f5",
+      "source_sha256": "189d52eefa83cdba56fbd93bd8c59f6f4b390e418996f62afaaf116ef2228c33",
+      "spec_sha256": "afae8037e8af970ea872b19f52eefba215aefba480b225e7d9a4224893736cac",
+      "gpu_ceiling": 900,
+      "inclusive_cpu_ceiling": 1200
     }
   ],
   "old_budgets": "closed, not borrowed",

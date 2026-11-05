@@ -104,3 +104,7 @@ The approval permits this staged program, not training or an automatic full
 34-window pipeline study. Those still need a dominating oracle, measured
 proposal and separate resource decision. All current reservations and charges
 live in `docs/experiments/submission-research-budget-20261104.json`.
+
+## Root stage2 release —2026-11-05
+
+Independent16/48 accepted-path audit (`66cbbd2e…`, job `20261105T000550Z-d8b5c76b`) verifies exact16 contract and complete48 retained results/timings; it does not independently recompute all judges or re-decode full48. New bounded Clip3 full188 confirmation is released at2500GPU/2800CPU inclusive, with500s smoke,1750s full,2400s oneCPU campaign and100GPU/400CPU external. Its new purpose-specific fidelity receipt `389f3af9…` predicts1649.78s using1.5× measured affine command cost plus200s overhead and60s reserve, adjusted upward for a slower new16 smoke. Old failed188 projection and48-onlyreceipt remain unchanged. No full30 stage is released: the586-frame clip projects2594s command alone, so checkpoint stages require separate16/48 numerical equivalence and complete-cost confirmation. Existingcontrols are a post188 conditional reservation because they require that full saved archive. Initial GVC and one verified table-tennis source-only pilot remain inside7200GPU/10800CPU feasibility bounds, separately from this larger release. Global and per-workstream ceilings remain unchanged.

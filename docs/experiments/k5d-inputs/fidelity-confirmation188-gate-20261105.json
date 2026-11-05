@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "scope": "fidelity-only",
+  "purpose": "188-frame-confirmation",
+  "passed": true,
+  "clip": "tracknet/game10/Clip3",
+  "max_frames": 188,
+  "archive_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+  "calibration_job_id": "20261105T000550Z-d8b5c76b",
+  "accepted_smoke_sha256": "8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377",
+  "accepted_full48_sha256": "f0dd118a5d64ca148be675a097606aa6dacb8ae49ffcac639ad30911ae74a727",
+  "evidence_sha256": "66cbbd2ef1480524b0327effb9c760d7ef726abe40e338c3246c434bc9640d66",
+  "checks": [
+    "source_transform",
+    "native_and_wire",
+    "receiver_parity",
+    "perceptual_metrics",
+    "full_cost"
+  ],
+  "cost": {
+    "fixed_seconds": 138.72209787368774,
+    "marginal_seconds": 4.190426766872406,
+    "formula": "1.5*(fixed+188*marginal)*max(1,current16/reference16)+200+60",
+    "prediction_188_seconds": 1649.78349506855,
+    "smoke_limit_seconds": 500,
+    "full_limit_seconds": 1750,
+    "campaign_seconds": 2400,
+    "phase_gpu_seconds": 2500,
+    "phase_cpu_seconds": 2800,
+    "external_cpu_seconds": 400
+  },
+  "limitations": [
+    "New bounded188 confirmation only; no corpus admission",
+    "Old188naive cost gate remains failed; old48receipt remains48only",
+    "Two nested prefixes on one developmentclip do not establish linearity/content scaling",
+    "No filesystem-denial witness or independently recomputed judge/pixel scores in audit",
+    "Retrospective cohort; preserve3 historical task exclusions and10/197 failed source-negative calibration"
+  ],
+  "authority": "Root stage2 release within user-approved20GPUh/24CPUh after independently checked16/48 correctness and complete bounded188 forecast; no training"
+}

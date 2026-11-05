@@ -1,0 +1,236 @@
+{
+  "arms": [
+    {
+      "admitted": true,
+      "condition": "generic",
+      "cpu_seconds": 4.187681,
+      "status": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "cbd080c2ab5a688e8a771bc44e9b57d57b877d0df8fb2b5d5a195d7907d37219",
+      "timed_out": false,
+      "wall_seconds": 4.254292782396078
+    },
+    {
+      "admitted": true,
+      "condition": "isolated",
+      "cpu_seconds": 3.938863000000001,
+      "status": 1,
+      "stderr_sha256": "a58378e6cb9586ef6aaaf4a0859ce363a9a92e879f817c4040a7cea7aae7ed6d",
+      "stdout_sha256": "cbd129662d34a2111d2ae926b5c7bdd60ef5ea402dc8f2cec2ea4cc749d0f9f1",
+      "timed_out": false,
+      "wall_seconds": 3.9898352241143584
+    }
+  ],
+  "artifact_capture_utc": "2026-11-05T00:20:11.447346+00:00",
+  "artifact_directory": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T001423Z-2a8c6880/smoke/w8-cuda-diagnostic",
+  "artifact_sha256": {
+    "generic.exit.json": "b1b73496e5b4594440714d57673ca2b9045d98cfee551c415ed27ebd34e3b3fe",
+    "generic.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "generic.stdout": "cbd080c2ab5a688e8a771bc44e9b57d57b877d0df8fb2b5d5a195d7907d37219",
+    "isolated.exit.json": "7a0e97bc12aa7bed061771d9130ab20f63a3b45abaaf7e05afb7483ca40d4161",
+    "isolated.stderr": "a58378e6cb9586ef6aaaf4a0859ce363a9a92e879f817c4040a7cea7aae7ed6d",
+    "isolated.stdout": "cbd129662d34a2111d2ae926b5c7bdd60ef5ea402dc8f2cec2ea4cc749d0f9f1",
+    "manifest.json": "1f06f30e0232d86863e6856eb83d6f11d10d024492194e401bd965d6761af041",
+    "summary.json": "649a4fbbfce18b08f4ad3e34ffa19c86f478ac550c75c144d942fc0f002bf3e6",
+    "worker-config.json": "6e68a3606a1b10fda95ddb97429bba6ac83e0793e751ba1d12eb359abe5c903e"
+  },
+  "generic": {
+    "condition": "generic",
+    "cuda": {
+      "capability": [
+        8,
+        9
+      ],
+      "device_count": 1,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "sum": 1048576.0,
+      "tensor_bytes": 8192,
+      "torch": "2.7.0+cu128",
+      "torch_cuda": "12.8",
+      "total_memory": 51010207744,
+      "uuid": "ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+      "visible_devices": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
+    },
+    "phase": "cuda_probe",
+    "status": "passed",
+    "usage": {
+      "system_seconds": 0.404846,
+      "user_seconds": 3.304747
+    }
+  },
+  "gpu_memory_reconciliation": {
+    "cuda_total_bytes": 51010207744,
+    "cuda_total_mib": 48647.125,
+    "difference_total_minus_reserved_to_cuda_mib": 0.875,
+    "limitation": "NVML reading occurred after job and is reported in rounded MiB; corroboration, not proof of the run-time reservation.",
+    "nvml_reserved_mib": 492,
+    "nvml_total_mib": 49140,
+    "post_job_query": "nvidia-smi --query-gpu=uuid,memory.total,memory.reserved --format=csv,noheader,nounits",
+    "query_timestamp": "before artifact_capture_utc, after terminal status; exact query timestamp not retained",
+    "sources": [
+      "https://docs.nvidia.com/deploy/nvml-api/api/structnvmlMemory__v2__t.html",
+      "https://docs.nvidia.com/cuda/cuda-runtime-api/cuda_runtime_api/structcudaDeviceProp.html"
+    ],
+    "uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
+  },
+  "isolated": {
+    "condition": "isolated",
+    "error": {
+      "message": "Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 2: out of memory",
+      "type": "RuntimeError"
+    },
+    "phase": "cuda_probe",
+    "status": "failed"
+  },
+  "isolation": {
+    "parent_network_namespace": "net:[4026531840]",
+    "parent_user_namespace": "user:[4026531837]",
+    "receipt": {
+      "cpu_bootstrap": {
+        "after_landlock_sha256": "23b2b3ca0600a2394d27dd6e9692c9aec33e2d854670975a04e7d9234cdf6a83",
+        "before_landlock_sha256": "23b2b3ca0600a2394d27dd6e9692c9aec33e2d854670975a04e7d9234cdf6a83",
+        "cuda_initialized_before_isolation": false
+      },
+      "denials": {
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T150848Z-a582ecc0/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T162058Z-c9b2c47b/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T163512Z-1d0712ad/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173108Z-0782499a/full/published.tar": 13,
+        "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4": 13,
+        "/local/users/emanuele/pointstream/scratch/20261105T001423Z-2a8c6880-smoke/w8-cuda-diagnostic/aliases/fit": 13,
+        "/local/users/emanuele/pointstream/scratch/20261105T001423Z-2a8c6880-smoke/w8-cuda-diagnostic/aliases/golden": 13,
+        "/local/users/emanuele/pointstream/scratch/20261105T001423Z-2a8c6880-smoke/w8-cuda-diagnostic/aliases/masks": 13,
+        "/local/users/emanuele/pointstream/scratch/20261105T001423Z-2a8c6880-smoke/w8-cuda-diagnostic/aliases/prepared": 13,
+        "/local/users/emanuele/pointstream/scratch/20261105T001423Z-2a8c6880-smoke/w8-cuda-diagnostic/aliases/source": 13
+      },
+      "extra_fds": false,
+      "landlock_abi": 4,
+      "namespaces": {
+        "net": "net:[4026537944]",
+        "user": "user:[4026537943]"
+      },
+      "network_interfaces": [
+        "lo"
+      ],
+      "pre_sandbox_threads": 1,
+      "process_limit": "audit hook operational control, not a hostile-code boundary"
+    },
+    "receipt_check_isolation_passed": true
+  },
+  "job_id": "20261105T001423Z-2a8c6880",
+  "lifecycle": {
+    "accounting": "Conservatively charge the entire original 360 CPU-second ceiling; GPU lifecycle accounting remains root-owned.",
+    "compute_processes": [],
+    "execution_seconds": 9.300846338272095,
+    "gpu_claimed": false,
+    "host": "gpu6",
+    "process_group_id": 1221885,
+    "supervisor_pid": 1221807,
+    "terminal_status": "failed"
+  },
+  "manifest_identity": {
+    "config_sha256": "6e68a3606a1b10fda95ddb97429bba6ac83e0793e751ba1d12eb359abe5c903e",
+    "gpu_before": {
+      "compute_processes": [],
+      "memory_mib": 49140,
+      "name": "NVIDIA RTX 6000 Ada Generation",
+      "uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
+    },
+    "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+    "historical_config_sha256": "fd97361b467896222f02b1e9e07510a0a445cb7140fe9c6f7ad749b2178904ec",
+    "profile": "historical-runtime-subset-portable-no-weight-read-v2",
+    "runtime_archive_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+    "script_sha256": "be728ac0d64f07b053f074b9860c13ae65049c3bd7dfe43329e95278888971a9",
+    "source_sha256": "6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713"
+  },
+  "normalized_diff": {
+    "allowed_paths_after": [
+      "/local/users/emanuele/pointstream/scratch/20261105T001423Z-2a8c6880-smoke/w8-cuda-diagnostic/historical-source",
+      "/local/users/emanuele/pointstream/scratch/20261105T001423Z-2a8c6880-smoke/w8-cuda-diagnostic/isolated-output",
+      "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree",
+      "/usr/lib",
+      "/lib",
+      "/lib64",
+      "/dev/nvidia-modeset",
+      "/dev/nvidia-uvm",
+      "/dev/nvidia-uvm-tools",
+      "/dev/nvidia0",
+      "/dev/nvidia1",
+      "/dev/nvidiactl",
+      "/dev/nvidia-caps/nvidia-cap1",
+      "/dev/nvidia-caps/nvidia-cap2",
+      "/dev/null",
+      "/dev/urandom",
+      "/proc/driver/nvidia/version"
+    ],
+    "changed_fields": [
+      "allow_paths",
+      "cpu_seconds",
+      "denied_paths",
+      "environment",
+      "files",
+      "output",
+      "probe_steps",
+      "protected_receipt",
+      "worker_kind"
+    ],
+    "historical_config_sha256": "fd97361b467896222f02b1e9e07510a0a445cb7140fe9c6f7ad749b2178904ec",
+    "recomputed_portable_normalization_equal": true,
+    "validated_equal_to_historical_config_diff": true,
+    "worker_config_sha256": "6e68a3606a1b10fda95ddb97429bba6ac83e0793e751ba1d12eb359abe5c903e"
+  },
+  "offline_audit": {
+    "both_cuda_passed": false,
+    "generation_gate_passed": false,
+    "paired_measurement_complete": true,
+    "scope": "Independently checked retained receipts, no GPU rerun; result is generic CUDA pass and isolated CUDA initialization error 2. Error cause unknown; no claim about historical failure. Landlock check covers read/execute access, not mutation confinement. No model or generation qualification."
+  },
+  "original_outcome": {
+    "command_log_tail": "validate: ValueError: worker physical GPU or runtime identity mismatch (line 443)",
+    "fleet_status": "failed",
+    "original_failure_preserved": true,
+    "original_validation_replaced": false,
+    "validator_memory_tolerance_mib": 16
+  },
+  "protected_receipt": {
+    "protected": {
+      "protected_inputs": {
+        "fit": {
+          "device": 59,
+          "inode": 5567094,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T150848Z-a582ecc0/full/published.tar",
+          "sha256": "cceb49b3d593c770e5b0d8dcd5d69b5b358bf88d76030cef8034674417907584"
+        },
+        "golden": {
+          "device": 59,
+          "inode": 5554733,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T163512Z-1d0712ad/full/published.tar",
+          "sha256": "cce89567a57bd202db8dbd6a39599688bce8a52e048d53f2b38fd7fda7da4985"
+        },
+        "masks": {
+          "device": 59,
+          "inode": 20090395,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T173108Z-0782499a/full/published.tar",
+          "sha256": "4eb91e79c287a49accc17fcd115819e7345bc078d49e1477ce43ccdf87cd549b"
+        },
+        "prepared": {
+          "device": 59,
+          "inode": 20088721,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T162058Z-c9b2c47b/full/published.tar",
+          "sha256": "94a5d6318fc113557fb24c8a32f2edffdf368f7a289484fddd4b19a749302bfa"
+        },
+        "source": {
+          "device": 59,
+          "inode": 5567065,
+          "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/w7-tier2-codex-20261031/eval/sources/nadal_kyrgios__000.mp4",
+          "sha256": "b7d887c0e2ba15ecc4f6e831d23942b2eb0857e40385c840ea4249d037433f1d"
+        }
+      }
+    },
+    "sha256": "aa07461ea2216a633b08d49dc959280326a6d63e7b92198d6d378143d1ad3bca"
+  },
+  "reviewed_utc": "2026-11-05T00:21:22.751159+00:00",
+  "revision": "73e5b8c63e7cf6c6db24e09e0eb1f808aee6e352",
+  "submitted_source_sha256": "d543b220b1653b09de29ee7e356633927c2202582ad8d88368536d6d7220c7ce",
+  "submitted_spec_sha256": "5fce2a53928c9ee0b5402417584629e277c4b661d4eca8e1676115a314978c14"
+}
