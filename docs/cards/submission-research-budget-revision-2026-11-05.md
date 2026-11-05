@@ -27,3 +27,9 @@ Increase the total programme ceiling to24 GPUh/28 workloadCPUh (+4/+4h). Do not 
 Other eligible work remains the two SVT gaps with correctly billed delivery/native-YUV proof and gated metrics, small fixed GVC feasibility only if admitted, full-clip detector sensitivity and source-hidden decoder qualification. Negative and inconclusive results are retained. Training, the legacy34-window full-pipeline study, new codec parameter searches and source-footage redistribution remain outside this allocation. Author review/footage rights and final submission remain separate human steps.
 
 If the increase is declined, prioritize the ball evidence and anchor repair within20/24; do not promise full30 plus all other follow-ups. Record incomplete comparisons and cost-stopped work as limitations.
+
+## Updated accounting checkpoint — 12:27 UTC
+
+Original 20 GPU-hour /24 CPU-hour authority remains unchanged; the 24/28 proposal is still pending. Current conservative charges are 16522 GPU-seconds and 29081 CPU-seconds. GVC has a separate future900 GPU /1000CPU envelope; the CPU-only profiler and synthetic-accounting oracles each reserve180CPU. These are prospective caps, not measurements.
+
+The illustrative full30 readiness/staging forecast of55,619GPU-seconds, plus currentGPUcharges and the900-second GVC envelope, exceeds72,000 seconds before a fresh decoder release or further failure reserve. The51,022.734-second numerical-stage forecast alone excludes those operational costs. Source compatibility and292/586 scale confirmations remain required, and CPU fit cannot be certified from wall time: new instrumentation still needs actual Linux/native qualification, measured confirmation and noncommand reserves. The proposed first2.5GPUh/3CPUh tranche therefore remains only for those predeclared confirmations and accounting; it is not full30 admission or a promised positive result.

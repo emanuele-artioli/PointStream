@@ -675,6 +675,46 @@
       "gpu_seconds": 0,
       "cpu_seconds": 40,
       "basis": "whole40CPUcap charged for boundedgpu6CPU2 real15asset+runtime/extractedtree warmcache verification, measured7.75CPU/8.56wall; consumedforecast40contingency, noGPU/model"
+    },
+    {
+      "phase": "k5d-linux-cpu-accounting-oracle-20261105",
+      "workstream": "ball",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 180,
+      "basis": "Entire100campaign80external ceiling charged; exactindependenttwo-stageLinuxsubreaperCPUcounter/provenance/releaseaudit0231a157accepted; notnative/CUDA/interruptionqualification."
+    },
+    {
+      "phase": "gvcrt-native-strict-20261105",
+      "workstream": "ego_peer_oracles",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 200,
+      "cpu_seconds": 400,
+      "basis": "Conservative200lifecycleGPU bound above~138creation-to-ended plusrelease;400CPU=200lifecycleupper+200externalforecast allocation fullycharged, notaggregateCPUmeter. Independentfullsource/native/parity/score audit6eb736ff accepted, sourceAPIqualitysanityreviewseparate; no kernel-nametrace or curve qualification."
+    },
+    {
+      "phase": "w8-profiler-public-clocksource-cpu-oracle-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 179,
+      "basis": "ceil98.616creation-to-terminalupdated99+80external fullycharged; independentlyaudited58d1135d source/rawtraces/canary/UID/claims. CUDAhiddenprofilesneveraccessclocksource, inconclusiveforactualCUDApath; nopolicypromotion."
+    },
+    {
+      "phase": "gvcrt-native-source-sanity-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "basis": "Conservative20CPU inclusiveabove8.82recordedCPUscan+boundedcheckpoint/sourcepreprocessingjoins; noGPU/model/decode; actualadaptedpointnotinvalidated, officialentrypointreplication/kernelnamesnotestablished."
+    },
+    {
+      "phase": "k5d-pid-namespace-teardown-oracle-20261105",
+      "workstream": "ball",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 180,
+      "basis": "Entire100campaign80external ceiling charged; failedSIGTERMimmediate-exitproof, source/spec/own9PIDs+claimsabsence auditc11056db accepted. Earliernormal/timeouthardkillcase markers retained, no productionteardownqualification."
     }
   ],
   "reservations": [
@@ -880,7 +920,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 900,
       "cpu_seconds": 1000,
-      "status": "RootwarmforecastapprovedONEnew4\u219216request9d56 source4dd3 snapshot, gpu6fallbackaftergpu5bothforeignbusy/W8oracledeferred;120+40+40CPUpreflightscharged200CPU, future1000CPU=800campaign+200external100audit20monitor30release50submit;900GPU800+100overhead. Noautomaticretry,coldcacheortraining.",
+      "status": "closed;200GPU400CPU charged; independentauditsacceptedforscopedcomponentproof, noautomaticretry orfullstudyrelease",
       "authorized_cumulative_cpu_seconds": 1200
     },
     {
@@ -1121,7 +1161,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 180,
-      "status": "prospectiveCPUonlyoracle\u2264180inclusive; authenticpinnedJCV strict-isolationprofiler noCUDA/model/privateinput, exactsyscall/denialproof before anypolicymodification; noGPUretry"
+      "status": "closed;0GPU179CPUcharged, unusedreleased, acceptednarrowscopeonly"
     },
     {
       "phase": "k5d-linux-cpu-accounting-oracle-20261105",
@@ -1129,7 +1169,39 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 0,
       "cpu_seconds": 180,
-      "status": "CPU-only prospectiveLinuxsubreaper/accounting+teardownoracle, syntheticcommandsonly/noTorch/model/GPU;100campaign80external, exactsource/validator/noorphans proofs. No292/586/full30admission or budgetincrease."
+      "status": "closed;0GPU180CPU charged; independentauditsacceptedforscopedcomponentproof, noautomaticretry orfullstudyrelease"
+    },
+    {
+      "phase": "gvcrt-native-source-sanity-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "status": "closed;0GPU20CPUcharged, unusedreleased, acceptednarrowscopeonly"
+    },
+    {
+      "phase": "w8-cuda-profiler-public-synthetic-oracle-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 250,
+      "cpu_seconds": 350,
+      "status": "Root971ca reviewed sharedsyntheticonly:4096MiBallocatorcap(realJCVget/setAPIhiddenproof),8192MiBmargin/continue/alwayscontaminatedtimingusedonlybudgetgates.250GPU350CPUinclusive/180campaign plus70GPU170CPUexternal; ONErequestafterfreshwarmhost/sharedCPU/memory/spec/archivechecks; noactualreceiverpolicymodelpromotion."
+    },
+    {
+      "phase": "k5d-pid-namespace-teardown-oracle-20261105",
+      "workstream": "ball",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 180,
+      "status": "closed180CPU0GPUcharged; failedSIGTERMwait3seconds, allown9PIDsandclaimsgone; no retry orproductionadmission"
+    },
+    {
+      "phase": "k5d-pid-escalation-wrapper-cpu-oracle-20261105",
+      "workstream": "ball",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 180,
+      "status": "ProspectiveCPUonlydirectexecPIDnamespacelauncher+boundedSIGTERM\u2192SIGKILL escalationproof, originalimmediateSIGTERMfailurepreserved. Rootsource/spec review requiredbeforeexecution; noGPU/actualnative/productionbridgeapproval."
     }
   ],
   "jobs": [
@@ -1744,7 +1816,7 @@
       "job_id": "20261105T121902Z-4020b8ee",
       "phase": "gvcrt-native-strict-20261105",
       "subphase": "guardedwarmAda4to16",
-      "state": "canonicalrunning gpu6GPU0CPU2 smoke; oneboundedrootwait900sec, noautomaticretry",
+      "state": "complete; independentfrozenfullvalidator/source/nativeparity/device/scoringauditaccepted;200GPU400CPUcharged/remainderreleased; one16frameQP3point, kernelsnotprofiled/sourceAPIqualitysanitypending",
       "revision": "9d56c5e181ef1e38dd3977af71453cf6506781cf",
       "snapshot_sha256": "4dd3d3f1210ccdc3e31e27d53888670e75f1df2e265214c82ec3962998afd36e",
       "source_sha256": "22aba7ddd69734099194bc756272ee0c1836f96b9de7e27e7aede1d53b8662df",
@@ -1752,6 +1824,42 @@
       "gpu_ceiling": 900,
       "inclusive_cpu_ceiling": 1000,
       "deadline": "2026-11-05T12:53:35.273517+00:00"
+    },
+    {
+      "job_id": "20261105T122208Z-a62ad658",
+      "phase": "k5d-linux-cpu-accounting-oracle-20261105",
+      "state": "complete; independent0231a157exactsource/spec/pub/syntheticCPUcounter/adoption/PIDclaimreleaseauditaccepted;180CPUcharged0GPU, notnative/interruptionqualification",
+      "revision": "b96e81bd021e2bb36fe78c4f461b4a8a4512830c",
+      "source_sha256": "8df50d964f7af8283c0d7d05695af6885e77f1dd667d09f9b7261577bca97060",
+      "snapshot_sha256": "7cca0cdd84cf2b145718ccfbeb451e55106d6ec8348a7800bf806772b3809108",
+      "spec_sha256": "311e078b159bc6bce04ab0b908e2ac3dd9e49e4558934ce043c13c157a605170",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 180,
+      "deadline": "2026-11-05T12:56:18Z"
+    },
+    {
+      "job_id": "20261105T122632Z-6246e036",
+      "phase": "w8-profiler-public-clocksource-cpu-oracle-20261105",
+      "state": "complete; independent58d1135d source/pub/rawtraces/denial/releaseauditaccepted;179CPU0GPUcharged. CUDAprofilingdisabled/zeroactualclockcalls meansinconclusiveforGPU; no policyfixadmitted.",
+      "revision": "af0dbcbd3c9036fbdc489bdd24e633916a28bca2",
+      "source_module_sha256": "f8166c5d9db64ea41c28f18311dc6fecdc0af4f1ae77c10e2da147318dae2c39",
+      "snapshot_sha256": "c88be1167b2405c22ff41a7c74be1d7a957b85df60407070dcdf8b983ed2e2a3",
+      "spec_sha256": "4ea9817ef7df3a448b95fc55a5dfde90695bc0c25214005c44d6f3cf8e56ae06",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 180,
+      "deadline": "2026-11-05T12:59:00Z"
+    },
+    {
+      "job_id": "20261105T124406Z-a6149bf3",
+      "phase": "k5d-pid-namespace-teardown-oracle-20261105",
+      "state": "failedsmokeSIGTERMlauncherwait3sectimeout; independentauditc11056db source/spec/9PIDs/claimsreleasedaccepted,180CPU0GPUcharged; no replay",
+      "revision": "7bdb05ee436815f757926ff84c0a413f89098503",
+      "source_sha256": "1d29c0f3af8c33ce20ac6a7862aa7465cbbb4ee52568497687834c79ac77177d",
+      "snapshot_sha256": "d23d0620962a745036751d63372740648a1603f29257eefa37229e1f4aaf3c34",
+      "spec_sha256": "c34f6e31ce28628084652f8fb5367aaab196cc94cc94defc19cf9d9966101a70",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 180,
+      "deadline": "2026-11-05T13:18:02Z"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -1765,18 +1873,19 @@
     "ExplicitgzipSVT60CPUtransfer20261105"
   ],
   "monitoring": {
-    "mode": "one canonical bounded wait for recorded batch afterstatus",
-    "state": "canonicalstatusrunning smoke; onebounded900secondwaitstarting",
+    "mode": "one canonical bounded wait",
+    "state": "allrecordedsciencejobsterminalandindependentlyaudited; CUDA-syntheticoraclepreparationonly",
     "jobs": [
-      "20261105T121902Z-4020b8ee"
+      "20261105T122632Z-6246e036"
     ],
-    "max_seconds": 900,
+    "max_seconds": 300,
+    "started_utc": "2026-11-05T12:28:50.485349+00:00",
+    "deadline_utc": "2026-11-05T12:33:50.485349+00:00",
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": false,
-    "result": "/private/tmp/pointstream-gvc-guarded-batch-wait-20261105.json",
-    "started_utc": "2026-11-05T12:21:08.903670+00:00",
-    "deadline_utc": "2026-11-05T12:36:08.903670+00:00",
-    "local_process_handle": 18082
+    "completed": true,
+    "result": "/private/tmp/pointstream-w8-profiler-oracle-wait-20261105.json",
+    "local_process_handle": 70250,
+    "events_pending_ack": []
   }
 }

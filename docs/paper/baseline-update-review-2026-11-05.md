@@ -26,3 +26,15 @@ Both variants still have 28 pages, body and references through page23 and append
 - Live clone: `/private/tmp/pointstream-paper-20261105`; earlier `/private/tmp` clones/PDFs were unavailable on resumed execution, so live Overleaf was freshly cloned rather than reconstructed from missing files.
 
 This is still an intermediate research checkpoint. GVC native execution and the CPU profiler oracle have separate gated work; no kernel/quality conclusion was imported from them. PRESLEY is untouched. Coauthor review, source permissions and explicit filing authority remain unresolved.
+
+## Native GVC point incorporated — 12:55 UTC
+
+Overleaf main **5cf2823** is pushed after root reviewed candidate46bc44f/06ac021. A single exploratory16-frame QP3 native GVC point now has exact sender/fresh source-hidden receiver parity and matched saved anchor context. At338.6kb/s native, cropLPIPS improves0.1018vs0.1351 while full-framePSNR worsens21.11vs33.71dB against interpolated anchors. The paragraph explicitly retains input YUV conversion, unfused/unprofiled kernels, cold deployment weight bytes and the lack of a curve, corpus result or complete common-contract comparison. The older contended intake proof remains historical. Future work and the appendix engagement row are reconciled.
+
+Root independently joined every companion peer/anchor/context object to the actual detailed result, verified audit/source-sanity SHA, ran the manuscript checker and five tests, and inspected rendered authorpage4. Both variants remain28pages, refs22–23 and appendix24–28,8main+2appendixfigures; unchanged native formatting, no overfull boxes or unresolved citations. Candidate changed-page layouts were reviewed in both variants.
+
+- Author `/private/tmp/gvcrt-paper-author.pdf`, SHA256 `246bb5fe2085935a7ef591ef96715d94ec78c64dfdf964d969d5d626dd7dc69e`.
+- Anonymous `/private/tmp/gvcrt-paper-anonymous.pdf`, SHA256 `7c4f26579b2d233d4718dcc362f2c058aaf97938f15d019a17b5fad4690a76db`.
+- Reviewed independent worktree `/private/tmp/pointstream-paper-gvcrt-20261105`; liveclone `/private/tmp/pointstream-paper-20261105`.
+
+PRESLEY is untouched. This remains a research checkpoint, with full30ball, fresh model reconstruction and author/source-rights decisions unresolved; no final package or submission certification is inferred.
