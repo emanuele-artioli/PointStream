@@ -39,3 +39,51 @@ def test_disk_preserves_parameters_when_psnr_guard_passes():
     arms, disabled = variants(stream, source, native)
     assert not disabled
     assert arms['disk'] == disk
+
+
+def test_cost_forecast_requires_success_and_current_campaign_budget():
+    import pytest
+    from experiments.tennis.k5d_controls import cost_forecast
+
+    execution = {'exit_code': 0, 'seconds': 40., 'timing_contaminated': False}
+    clock = {'started': 100., 'phase_started': 110., 'budget_end': 1000.}
+    projected = cost_forecast(execution, clock, 200., 850.)
+    assert projected == 40 * 3 * 1.5 + 20
+    with pytest.raises(ValueError, match='forecast'):
+        cost_forecast(execution, clock, 850., 270.)
+    with pytest.raises(ValueError, match='invalid'):
+        cost_forecast({**execution, 'timing_contaminated': True}, clock, 200., 850.)
+    with pytest.raises(ValueError, match='invalid'):
+        cost_forecast({**execution, 'exit_code': 1}, clock, 200., 850.)
+
+
+def test_bound_calibration_spec_has_frozen_publications_and_budget():
+    import json
+    from pathlib import Path
+    from experiments.jobs.inbox import validate_spec
+    from experiments.tennis.k5d_controls import CALIBRATION_SHA
+
+    path = Path('docs/experiments/k5d-inputs/calibration-controls-pilot-spec-20261105.json')
+    spec = json.loads(path.read_text())
+    validate_spec(spec)
+    inputs = {x['name']: x for x in spec['staged_inputs']}
+    for name, digest in CALIBRATION_SHA.items():
+        item = inputs[name]
+        assert item['sha256'] == digest
+        assert {'path': item['path'], 'sha256': digest} in spec['inputs']
+        assert ('20261105T003756Z-cc450baf' if name.endswith('smoke') else '20261105T000550Z-d8b5c76b') in item['path']
+    assert spec['gpu_models'] == ['RTX A6000']
+    assert spec['budget_seconds'] == 550 and spec['full']['seconds'] == 400
+    assert spec['smoke']['seconds'] == 130 and spec['validator_seconds'] == 15
+    assert spec['scale']['frames'] == {'smoke': 16, 'full': 48}
+
+
+def test_future_full_forecast_fits_fixed_and_marginal_with_slowdown():
+    import pytest
+    from experiments.tennis.k5d_controls import full188_forecast
+
+    assert full188_forecast(50, 82, 60, reserve=100) == pytest.approx(1.5 * (34 + 188) * 1.2 + 100)
+    with pytest.raises(ValueError, match='negative fixed'):
+        full188_forecast(10, 50, 10, reserve=100)
+    with pytest.raises(ValueError, match='invalid'):
+        full188_forecast(50, 49, 50, reserve=100)

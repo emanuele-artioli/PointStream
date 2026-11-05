@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "hosts": [
+    "gpu2",
+    "gpu3",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX A6000"
+  ],
+  "gpu_memory_mib": 16000,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "defer_failed_publication": true,
+  "gpu_sharing": {
+    "mode": "exclusive"
+  },
+  "device": "gpu",
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.k5d_controls"
+  ],
+  "arguments": [
+    "--frames",
+    "{frames}"
+  ],
+  "scale": {
+    "frames": {
+      "smoke": 16,
+      "full": 48
+    }
+  },
+  "staged_inputs": [
+    {
+      "name": "archive",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/tracknet-dataset.zip",
+      "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18"
+    },
+    {
+      "name": "balltrack_code",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff",
+      "extract": true
+    },
+    {
+      "name": "balltrack_weight",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+    },
+    {
+      "name": "wasb_code",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55",
+      "extract": true
+    },
+    {
+      "name": "wasb_weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6",
+      "extract": true
+    },
+    {
+      "name": "wasb_config",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+      "extract": false
+    },
+    {
+      "name": "lpips_backbone",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+    },
+    {
+      "name": "dists_backbone",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "name": "calibration_smoke",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T003756Z-cc450baf/smoke/published.tar",
+      "sha256": "a39643080425a1b05da7bade7a74c0a96bbf14848434c121ae7f5ab8353e6873",
+      "extract": false
+    },
+    {
+      "name": "calibration_full",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T000550Z-d8b5c76b/full/published.tar",
+      "sha256": "f0dd118a5d64ca148be675a097606aa6dacb8ae49ffcac639ad30911ae74a727",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261104-inputs/tracknet-dataset.zip",
+      "sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/RacketVision-c44af2a.tar",
+      "sha256": "5bec7ca535d2562ce0252a45f3dded0cfd5897571a6e29a10247a87884d961ff"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/balltrack_best.state_dict.pt",
+      "sha256": "b052479e6229d840a1a7f42dbc83a6b752a53ef8bc5841a4b957acd519563fec"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T003756Z-cc450baf/smoke/published.tar",
+      "sha256": "a39643080425a1b05da7bade7a74c0a96bbf14848434c121ae7f5ab8353e6873"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T000550Z-d8b5c76b/full/published.tar",
+      "sha256": "f0dd118a5d64ca148be675a097606aa6dacb8ae49ffcac639ad30911ae74a727"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [
+    "ffmpeg"
+  ],
+  "verify_staged_inputs": true,
+  "local_storage_gib": 32,
+  "smoke": {
+    "seconds": 130,
+    "representative_basis": "16 frames, all five complete control arms and whole-frame judges; gate bounds 48-frame pilot."
+  },
+  "full": {
+    "seconds": 400
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.k5d_controls",
+    "--validate-smoke"
+  ],
+  "validator_seconds": 15,
+  "budget_seconds": 550,
+  "deadline": "2026-11-05T02:53:08.839665+00:00",
+  "stall_seconds": 500,
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  }
+}
