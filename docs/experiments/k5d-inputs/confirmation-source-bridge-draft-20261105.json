@@ -8,12 +8,12 @@
     "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
   },
   "consumer_execution_identity": {
-    "source_sha256": "a8f53f84b1136f4536d58b29143337ed2be28805c386f2bbda70a4d210625830",
-    "snapshot_sha256": "5de2d916fef69ea21e32056640ebbf01f1d8459d71765fd4af721178bf43a049",
+    "source_sha256": "6986e1aa626b94425d534251a2fc8a3b27ef437533f6bcebfac75d28e386c1cd",
+    "snapshot_sha256": "2ff568810ba07be749fac5eae10065342ad1595a30e1f61a1918f90dabed2133",
     "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
   },
   "calibration_snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
-  "consumer_snapshot_sha256": "5de2d916fef69ea21e32056640ebbf01f1d8459d71765fd4af721178bf43a049",
+  "consumer_snapshot_sha256": "2ff568810ba07be749fac5eae10065342ad1595a30e1f61a1918f90dabed2133",
   "changed_paths": [
     "experiments/tennis/k5d_control_bridge.py",
     "experiments/tennis/k5d_control_readiness.py",
@@ -41,5 +41,5 @@
   ],
   "unchanged_files": 1348,
   "scope": "complete archived source manifests; no checkpoint identity substitution",
-  "candidate_git_head": "40f43a9072aba6870cb5942505ffff7089ddcb39"
+  "candidate_git_head": "086da0d3e7130101bc0f0a7c76e481891ac3c551"
 }
