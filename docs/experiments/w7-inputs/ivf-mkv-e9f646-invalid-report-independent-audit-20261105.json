@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "status": "invalid for promotion; retained raw output",
+  "report_path": "/private/tmp/w7-ivf-mkv-final-20261105.json",
+  "report_sha256": "e9f64656663266646c4acc1f97e82e2d76be1aefb73527c5bf376b0e2051f56c",
+  "root_gate_sha256": "7044db87740d03c314002e865522c6d201b52d51f7190cc8beba40a34ca9bfc4",
+  "analysis_source_sha256": "e0d4716bf40ceb16a4ad43181becb618df6cf5f00b728d0f0b525cd65e780dea",
+  "source_revision": "8deef29a8f86288da65ee0fe651dfdf0bcef0cea",
+  "findings": [
+    {
+      "issue": "Primary achievable-anchor helper rejects a target above highest sampled SVT rate although the cheaper endpoint remains achievable; W7 DCVC helper also drops the best affordable endpoint beyond its sampled bracket. The 3600-second al034 and al043 targets exceed available DCVC brackets, so the chosen baseline changes from DCVC to SVT; larger reported gaps are not evidence of improved short-horizon performance.",
+      "al034_target_kbps": 21.40244666666667,
+      "al034_dcvc_highest_sample_kbps": 19.36916666666667,
+      "al043_target_kbps": 21.529413333333338,
+      "al043_dcvc_highest_sample_kbps": 20.02583333333333,
+      "location": "experiments/tennis/w7_mkv_envelope.py:_in_bracket_hull and decision_report"
+    },
+    {
+      "issue": "dcvc_missing records an absent table, not a present but unbracketed codec. The 3600-second sensitivity_without_missing_dcvc includes al034 and al043 although neither has DCVC interpolation at that target; distinguish missing-table, unbracketed, and endpoint-achievable explicitly."
+    },
+    {
+      "issue": "At 7200 seconds the strict original-IVF historical-family s2_o20 remains unbracketed for med000 and med019: their CRF70 complete IVF rates still exceed the respective corrected targets. MKV sensitivity has different actual framing bytes and may change brackets. Do not call both IVF families repaired."
+    },
+    {
+      "issue": "holds means the t interval for each metric excludes zero on available anchors for six windows. It is conditional, not a complete-anchor, complete-codec, fresh-receiver, or short-match superiority gate. The old remux metadata failure, original IVF family result and separate Tier2 remain unchanged."
+    }
+  ],
+  "independent_arithmetic": {
+    "rate_interval_holds_uniform_stress_checks_passed": 746,
+    "complete_three_window_ci_checks_passed": 96,
+    "scope": "recomputed role byte-rate arithmetic, target bank rates, pooled means and t intervals, cluster intervals, holds flags, uniform \u00b10.001 shifts. Passing arithmetic does not repair the anchor-coverage defect."
+  },
+  "disposition": "No outcome promotion. Preserve this report and its spent 120-CPU reservation. Correct source, obtain fresh gate and independently review revised report under separate allocation."
+}

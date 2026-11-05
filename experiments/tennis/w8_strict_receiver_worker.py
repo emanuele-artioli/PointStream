@@ -66,7 +66,7 @@ def clean_process() -> None:
 
 
 def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: str,
-           canary: Path, source_root: Path) -> None:
+           canary: Path, source_root: Path, *, materialize_profile: bool = False) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
     policy, fixed, bootstrap, receiver = preload()
@@ -136,7 +136,11 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
                  'loader_identity_sha256': loader_sha, 'source_origins': source_origins,
                  'policy': 'w8-approved-system-leaves-mutation-v1'}
     if config['worker_kind'] == 'packet':
+        if materialize_profile:
+            raise ValueError('materialization profile is not valid for packet workers')
         receiver.run_packet_isolated(config, isolation)
+    elif materialize_profile:
+        receiver.run_isolated(config, isolation, materialize_profile=True)
     else:
         receiver.run_isolated(config, isolation)
 

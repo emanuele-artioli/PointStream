@@ -1,0 +1,391 @@
+{
+ "schema": 1,
+ "review": "accepted for scoped conditional Tier 1 reporting; not a full-codec, source-hidden or Tier 2 result",
+ "report_sha256": "d09b054369e2c435d2347e0455a0b244af52f2af03d599becdb48110cbb1156b",
+ "root_gate_sha256": "2e0af63bb1c6e815386941e06834a36d668e5bc5ed1ea07a666d890767a5f1fe",
+ "source_revision": "967f07e0d782650c0940d1b2408e3a8b914e4fe8",
+ "source_module_sha256": "91f82e456624cae0b2b33cd57200c413114002a57154305b9ba03e624a6f26fc",
+ "scientific_source_identity": {
+  "tracked_python_files": 545,
+  "tracked_python_manifest_sha256": "e9a2090de661e612eb2d77500186f5bac9f22d0c0c9b1be6cb51cf2db231466d",
+  "python_version": "3.12.7 | packaged by conda-forge | (main, Oct  4 2024, 15:57:01) [Clang 17.0.6 ]",
+  "numpy_version": "1.26.4",
+  "scipy_version": "1.17.1",
+  "numpy_binary_sha256": "a51276f3aab2d91051aa0ced3ddaa39a776ae60132ca4c07a91b82a8b7a92ea7",
+  "scipy_special_binary_sha256": "5ff965ce3b560fa7e2f6901b665e42b96554024a5b32a253c7f7f5bc95c2134f",
+  "scipy_interpolate_binary_sha256": "70886697c9ae4bf98ed1ef0fe1b7a05b8f241ab72f21b0db4d4e698d5bdf1ec4"
+ },
+ "independent_checks": {
+  "role_byte_and_score_joins": 150,
+  "anchor_metric_sign_and_coverage": 864,
+  "pooled_ci": 48,
+  "cluster_ci": 108,
+  "scenarios": 36,
+  "dcvc_available_subset_cis": 60,
+  "holds_checks": 36,
+  "uniform_anchor_stress_shifts": 248
+ },
+ "retained_historical_classes": {
+  "A6000": 48,
+  "Ada": 5
+ },
+ "limitations": [
+  "Six Tier 1 windows are correlated within matches; three-window clusters are separately reported.",
+  "Med000 DCVC is absent. At shorter horizons other DCVC endpoints can be affordable without a bracketing pair; foreground coverage describes the status.",
+  "Original IVF strict-family half-out at two hours remains unresolved for med000 and med019; complete-MKV framing sensitivity resolves those two.",
+  "Historical RGB hashes were not retained; native-YUV matched quality attachment uses the reviewed fixed conversion assumption.",
+  "G5 linear-rate hull followed by log-rate interpolation is a model; sampled affordable endpoints are observed.",
+  "The \u00b10.001 uniform-anchor stress is not a statistical or per-row uncertainty bound.",
+  "Tier 2 and the old failed metadata remux remain separate and unchanged."
+ ],
+ "nominal": [
+  {
+   "framing": "primary_ivf",
+   "seconds": 7200,
+   "pooled_gap_95ci": {
+    "lpips": [
+     0.09649898351845199,
+     0.034902916484640625,
+     0.15809505055226336
+    ],
+    "dists": [
+     0.0809910627686669,
+     0.05288965410932045,
+     0.10909247142801334
+    ]
+   },
+   "dcvc_eligible_windows": [
+    "al028",
+    "al034",
+    "al043",
+    "med024",
+    "med019"
+   ],
+   "dcvc_subset_gap_95ci": {
+    "lpips": [
+     0.07277820312698004,
+     0.06124775581420395,
+     0.08430865043975613
+    ],
+    "dists": [
+     0.07067389865553822,
+     0.05838372241708084,
+     0.0829640748939956
+    ]
+   },
+   "dcvc_foreground_coverage": {
+    "al028": "interpolated_bracket",
+    "al034": "interpolated_bracket",
+    "al043": "interpolated_bracket",
+    "med000": "absent",
+    "med024": "interpolated_bracket",
+    "med019": "interpolated_bracket"
+   },
+   "whole_frame_all_differences_negative": true,
+   "historical_halfout": {
+    "med000": "unresolved",
+    "med019": "unresolved"
+   },
+   "primary_holds_001_stress": [
+    true,
+    true,
+    true
+   ],
+   "historical_holds_001_stress": [
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "framing": "primary_ivf",
+   "seconds": 3600,
+   "pooled_gap_95ci": {
+    "lpips": [
+     0.08186777105964137,
+     0.023251422025751402,
+     0.14048412009353134
+    ],
+    "dists": [
+     0.07368686955024191,
+     0.044351246007349535,
+     0.10302249309313428
+    ]
+   },
+   "dcvc_eligible_windows": [
+    "al028",
+    "al034",
+    "al043",
+    "med024",
+    "med019"
+   ],
+   "dcvc_subset_gap_95ci": {
+    "lpips": [
+     0.05943755465401914,
+     0.045478751067892294,
+     0.073396358240146
+    ],
+    "dists": [
+     0.06320407379139334,
+     0.04786587461147028,
+     0.0785422729713164
+    ]
+   },
+   "dcvc_foreground_coverage": {
+    "al028": "interpolated_bracket",
+    "al034": "affordable_endpoint",
+    "al043": "affordable_endpoint",
+    "med000": "absent",
+    "med024": "interpolated_bracket",
+    "med019": "interpolated_bracket"
+   },
+   "whole_frame_all_differences_negative": true,
+   "historical_halfout": {
+    "med000": "resolved",
+    "med019": "resolved"
+   },
+   "primary_holds_001_stress": [
+    true,
+    true,
+    true
+   ],
+   "historical_holds_001_stress": [
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "framing": "primary_ivf",
+   "seconds": 1800,
+   "pooled_gap_95ci": {
+    "lpips": [
+     0.06805621541532862,
+     0.015571295018473735,
+     0.12054113581218351
+    ],
+    "dists": [
+     0.06615631240029061,
+     0.037786523899733374,
+     0.09452610090084786
+    ]
+   },
+   "dcvc_eligible_windows": [
+    "al028",
+    "al034",
+    "al043",
+    "med024",
+    "med019"
+   ],
+   "dcvc_subset_gap_95ci": {
+    "lpips": [
+     0.04912566995546395,
+     0.02311515047293218,
+     0.07513618943799572
+    ],
+    "dists": [
+     0.05752074288077548,
+     0.03415216684504511,
+     0.08088931891650586
+    ]
+   },
+   "dcvc_foreground_coverage": {
+    "al028": "interpolated_bracket",
+    "al034": "affordable_endpoint",
+    "al043": "affordable_endpoint",
+    "med000": "absent",
+    "med024": "affordable_endpoint",
+    "med019": "affordable_endpoint"
+   },
+   "whole_frame_all_differences_negative": true,
+   "historical_halfout": {
+    "med000": "resolved",
+    "med019": "resolved"
+   },
+   "primary_holds_001_stress": [
+    true,
+    true,
+    true
+   ],
+   "historical_holds_001_stress": [
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "framing": "mkv_transport_sensitivity",
+   "seconds": 7200,
+   "pooled_gap_95ci": {
+    "lpips": [
+     0.09376964487244606,
+     0.03910994446885948,
+     0.14842934527603263
+    ],
+    "dists": [
+     0.08015554505232818,
+     0.0540714552982625,
+     0.10623963480639385
+    ]
+   },
+   "dcvc_eligible_windows": [
+    "al028",
+    "al034",
+    "al043",
+    "med024",
+    "med019"
+   ],
+   "dcvc_subset_gap_95ci": {
+    "lpips": [
+     0.07277820312698004,
+     0.06124775581420395,
+     0.08430865043975613
+    ],
+    "dists": [
+     0.07067389865553822,
+     0.05838372241708084,
+     0.0829640748939956
+    ]
+   },
+   "dcvc_foreground_coverage": {
+    "al028": "interpolated_bracket",
+    "al034": "interpolated_bracket",
+    "al043": "interpolated_bracket",
+    "med000": "absent",
+    "med024": "interpolated_bracket",
+    "med019": "interpolated_bracket"
+   },
+   "whole_frame_all_differences_negative": true,
+   "historical_halfout": {
+    "med000": "resolved",
+    "med019": "resolved"
+   },
+   "primary_holds_001_stress": [
+    true,
+    true,
+    true
+   ],
+   "historical_holds_001_stress": [
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "framing": "mkv_transport_sensitivity",
+   "seconds": 3600,
+   "pooled_gap_95ci": {
+    "lpips": [
+     0.07982833054577189,
+     0.02636055025372947,
+     0.1332961108378143
+    ],
+    "dists": [
+     0.07256109667963125,
+     0.045859210839278124,
+     0.09926298251998436
+    ]
+   },
+   "dcvc_eligible_windows": [
+    "al028",
+    "al034",
+    "al043",
+    "med024",
+    "med019"
+   ],
+   "dcvc_subset_gap_95ci": {
+    "lpips": [
+     0.05943755465401914,
+     0.045478751067892294,
+     0.073396358240146
+    ],
+    "dists": [
+     0.06320407379139334,
+     0.04786587461147028,
+     0.0785422729713164
+    ]
+   },
+   "dcvc_foreground_coverage": {
+    "al028": "interpolated_bracket",
+    "al034": "affordable_endpoint",
+    "al043": "affordable_endpoint",
+    "med000": "absent",
+    "med024": "interpolated_bracket",
+    "med019": "interpolated_bracket"
+   },
+   "whole_frame_all_differences_negative": true,
+   "historical_halfout": {
+    "med000": "resolved",
+    "med019": "resolved"
+   },
+   "primary_holds_001_stress": [
+    true,
+    true,
+    true
+   ],
+   "historical_holds_001_stress": [
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "framing": "mkv_transport_sensitivity",
+   "seconds": 1800,
+   "pooled_gap_95ci": {
+    "lpips": [
+     0.06611637681452771,
+     0.0182183646992913,
+     0.11401438892976412
+    ],
+    "dists": [
+     0.06513673293791994,
+     0.03876717177407289,
+     0.09150629410176699
+    ]
+   },
+   "dcvc_eligible_windows": [
+    "al028",
+    "al034",
+    "al043",
+    "med024",
+    "med019"
+   ],
+   "dcvc_subset_gap_95ci": {
+    "lpips": [
+     0.04912566995546395,
+     0.02311515047293218,
+     0.07513618943799572
+    ],
+    "dists": [
+     0.05752074288077548,
+     0.03415216684504511,
+     0.08088931891650586
+    ]
+   },
+   "dcvc_foreground_coverage": {
+    "al028": "interpolated_bracket",
+    "al034": "affordable_endpoint",
+    "al043": "affordable_endpoint",
+    "med000": "absent",
+    "med024": "affordable_endpoint",
+    "med019": "affordable_endpoint"
+   },
+   "whole_frame_all_differences_negative": true,
+   "historical_halfout": {
+    "med000": "resolved",
+    "med019": "resolved"
+   },
+   "primary_holds_001_stress": [
+    true,
+    true,
+    true
+   ],
+   "historical_holds_001_stress": [
+    null,
+    null,
+    null
+   ]
+  }
+ ]
+}

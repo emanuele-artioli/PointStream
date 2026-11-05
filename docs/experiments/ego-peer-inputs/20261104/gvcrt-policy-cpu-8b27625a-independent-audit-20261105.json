@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "job_id": "20261105T074557Z-8b27625a",
+  "status": "complete",
+  "scope": "GVC actual policy helpers only; no torch, CUDA, model or receiver bootstrap",
+  "source_snapshot_sha256": "bde697a465aabc71e059b4b55524af89935b43b19b6a250632b600fc148436a8",
+  "source_tree_sha256": "520786b6402f0cb24ce66aede4383b170d458ad7e9a997e1c46602e74be9110c",
+  "spec_sha256": "70f621abcd3bb99c51e10b3a41874dc114d87caa1813a59e2d048155fecc4fc5",
+  "input_config_sha256": "cda68dac4dea488195093c1580b00360f80e61712ce4e9e8f6f06a27c9191442",
+  "published_sha256": "f5eee7b32f6259ca42687d739d538e58695b61fb679d2037d363763ddb6e4db2",
+  "archive_members": 17,
+  "source_manifest_sha256": "c8b603e876756b230a6545265331403e0fde87a0c9581a9e193dac9f38066ade",
+  "records_sha256": {
+    "ready.json": "dd32da387a5d867a58a42a3152ddf48722fe932bd7519567ac03bff33e7d7128",
+    "state.json": "c2cbd87b31a5dff568516f374679bd6ee01c8d251e1990efd00c4ea81166ceae",
+    "gate.json": "e6fe4068785537c45c2f1424d39a62c558f3de5ed86d5ba50f11f39e02d60654",
+    "validation.json": "818cb35d1381b6d5daeabdeb3aa2469f5b85e647ba6136a07ba347fa66cc286f",
+    "spec.json": "f53ba24abcbc73a0a5fcf391048eae4e61c5ec94c440046f868387f1097f04b0",
+    "smoke/dispatch.json": "34a03fc5abc20db5e4df57bbbe421f7a3cd0a889c3dfb266b9b44086a1d5b8e7",
+    "smoke/execution.json": "50a1fba308328e52a85c0da65c90621843d42a763b82a97c575079e564ed03bf",
+    "smoke/staging.json": "482123c578f142954d19a5d33c8cec2489f3b572399617307ca19c6bea0c573c",
+    "run/claim.json": "4c35533fe70218797cdcf747b1b06de767d62e4c0a0aff733a3b1fe576a45d9a",
+    "run/cpu-affinity.json": "96321e276f1b23ec8be4e450d2093e7ba0220deeafc22377df595ce0565b633f"
+  },
+  "cpu_affinity": [
+    0
+  ],
+  "device": null,
+  "denials": 52,
+  "aliases": 26,
+  "denial_errno": [
+    13
+  ],
+  "landlock_abi": 4,
+  "mutation_denials": {
+    "create": 13,
+    "link": 18,
+    "mkdir": 13,
+    "remove": 13,
+    "rename": 13,
+    "truncate": 13,
+    "write": 13
+  },
+  "parent_host_loader": {
+    "device": 64513,
+    "inode": 4198695,
+    "mode": 33188,
+    "uid": 0
+  },
+  "namespace_loader_uid": 65534,
+  "host_loader_same_inode_mode": true,
+  "parent_canaries_intact": true,
+  "parent_and_child_pids_absent": true,
+  "matching_cpu_claim_absent": true,
+  "lifecycle_wall_seconds": 73.47458267211914,
+  "conservative_cpu_charge_upper_seconds": 134,
+  "external_allowance_seconds": 60,
+  "cost_basis": "ceil creation-to-terminal-state-update wall plus 60 external CPU allowance; not measured CPU usage",
+  "qualification": "actual policy helpers only; no full Torch bootstrap, CUDA, model, decode or quality qualification",
+  "caveat": "unrelated gpu6 processes present at submission; no contention asserted"
+}

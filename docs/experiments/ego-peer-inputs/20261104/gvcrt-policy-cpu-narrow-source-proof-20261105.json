@@ -1,0 +1,64 @@
+{
+  "selected_paths": [
+    "experiments/generative/gvcrt_policy_cpu_oracle.py",
+    "experiments/generative/gvcrt_receiver_worker_w8leaves.py",
+    "experiments/generative/gvcrt_peer_job_w8leaves.py",
+    "experiments/visor/__init__.py",
+    "experiments/visor/gvcrt_entropy_pilot.py",
+    "experiments/__init__.py",
+    "experiments/jobs",
+    "src/__init__.py"
+  ],
+  "files": {
+    "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+    "experiments/generative/gvcrt_peer_job_w8leaves.py": "4de9d5d44d3672a65837d8380b13f3a46155594d8589c67418e2e3cd046e0897",
+    "experiments/generative/gvcrt_policy_cpu_oracle.py": "13e86e6d7f5650eab140a2a8c5e2cd8b40580923407487fe4e38ecb7e139daa8",
+    "experiments/generative/gvcrt_receiver_worker_w8leaves.py": "768040b7e020c446209a85a2044271f2e1ae7d7463f060a9672767f100b59b74",
+    "experiments/jobs/__init__.py": "999dfe9ae372c896e01e55010d27a97b0c6bc2fe6ff22183a1dc121ee3d56633",
+    "experiments/jobs/artifacts.py": "e43caff476b148de076d161ecae1e8bd728d0085b71b131ab019ce118f9f95c3",
+    "experiments/jobs/claims.py": "4ce261cc723de1ff2e4497c5f760d997bf6681f0e7ca75019a53280acbc6b1ef",
+    "experiments/jobs/environment.py": "11a7eb114e04dedd3721bb57db3e5b1fe9e44c515adcfc6baafc9b7169964992",
+    "experiments/jobs/fleet.py": "e2a3da5f591be682f8fc0643f1ab72845d46cd1c75fcc4ca3ebb333595f65b3b",
+    "experiments/jobs/fleet_smoke.py": "c386740f9d7c8fe1f66506767c9482eb01c6b99d714a96f9674fc87b78796d0a",
+    "experiments/jobs/inbox.py": "5dbdc52879729157d2073ad717d731fb7af4563f3ca1330930be96edea97266e",
+    "experiments/jobs/indexed_control_probe.py": "99809638ad7b28daab34cfa78b02ebfcd5cc1ba9bd9302337d1169f53e5ebcbb",
+    "experiments/jobs/monitor.py": "73671c2892127bf2510b98aee75356f50736d8613f769d5b8e5426b4a821268e",
+    "experiments/jobs/staging.py": "f94156c1d5b9a6bf2ac1ec8c3437a82cd6f36a9085a7f68a6122381b7cfd0422",
+    "experiments/visor/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/visor/gvcrt_entropy_pilot.py": "af7e02639547cf35edf43c792615d5d9c8f784de2079efb890310c4137b0fb3a",
+    "src/__init__.py": "ae44788819d1253995e05ac454621d9c9b5ee2139f8a411cd8b786349e932078"
+  },
+  "snapshot_sha256": "bde697a465aabc71e059b4b55524af89935b43b19b6a250632b600fc148436a8",
+  "source_sha256": "520786b6402f0cb24ce66aede4383b170d458ad7e9a997e1c46602e74be9110c",
+  "bytes": 399360,
+  "git_head": "3d38e706c5ee0184ec0a4333c18bbe0f89dab851",
+  "scope": "narrowed source archive proposal; no submission or GPU authority",
+  "approved": false,
+  "import_probe": {
+    "python_isolated_mode": true,
+    "cwd": "/private/tmp/gvcrt-cpu-narrow-unpacked-20261105",
+    "project_modules_checked": 11,
+    "all_project_paths_within_extracted_archive": true,
+    "torch_imported": false,
+    "numpy_imported": false,
+    "cli_parser_help_passed": true,
+    "validator_function_loaded": true,
+    "validator_rejects_missing_publication": true,
+    "draft_spec_validate_passed": true,
+    "python_version": "3.12.7 | packaged by conda-forge | (main, Oct  4 2024, 15:57:01) [Clang 17.0.6 ]"
+  },
+  "notes": [
+    "experiments.generative is a namespace package; no __init__.py exists at frozen revision.",
+    "experiments/jobs, experiments/__init__.py and src/__init__.py are automatically appended by the existing submission CLI.",
+    "This import-only test does not exercise Landlock, the full Torch bootstrap or any model."
+  ],
+  "prior_request": "20261105T073455Z-b4be8cbf",
+  "prior_request_state": "unpublished; partial source preserved; root charges 60 external CPU",
+  "proposed_new_phase": {
+    "cpu_seconds_inclusive": 180,
+    "gpu_seconds": 0,
+    "campaign_seconds": 120,
+    "external_cpu_seconds": 60,
+    "approved": false
+  }
+}

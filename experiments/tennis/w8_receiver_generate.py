@@ -187,7 +187,7 @@ def render_full_unit(renderer: Any, unit: dict[str, np.ndarray], seed: int,
     return ticks, crops
 
 
-def run_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
+def run_isolated(config: dict[str, Any], isolation: dict[str, Any], *, materialize_profile: bool = False) -> None:
     """Render one complete packet-derived unit after the stdlib isolation bootstrap."""
     import resource
     import time
@@ -236,6 +236,10 @@ def run_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
         raise ValueError('fresh empty output directory required')
     scratch = output / 'scratch'
     scratch.mkdir()
+    folder_receipt = None
+    if materialize_profile:
+        from experiments.tennis.w8_public_folder_materialize import materialize_public
+        folder_receipt = materialize_public(config['files'], scratch / 'folders', PINNED_WEIGHTS)
     with np.load(paths['unit'], allow_pickle=False) as loaded:
         unit = {key: loaded[key] for key in loaded.files}
     if (not np.array_equal(unit['t'], np.arange(240))
@@ -332,6 +336,14 @@ def run_isolated(config: dict[str, Any], isolation: dict[str, Any]) -> None:
             if fixed.file_sha(path) != config['files'][f'code:{name}']['sha256']:
                 raise ValueError(f'executing source changed: {name}')
             modules[name] = path
+    if folder_receipt is not None:
+        from experiments.tennis.w8_public_folder_materialize import cleanup_completed
+        cleanup_started, cleanup_cpu = time.monotonic(), time.process_time()
+        cleanup_completed(scratch / 'folders', folder_receipt)
+        folder_receipt['cleanup_wall_seconds'] = time.monotonic() - cleanup_started
+        folder_receipt['cleanup_cpu_seconds'] = time.process_time() - cleanup_cpu
+        folder_receipt['cleanup_complete'] = True
+        (output / 'materialization.json').write_text(json.dumps(folder_receipt, sort_keys=True))
     publication_started = start_phase()
     path = output / f'{unit_name}@match5.npz'
     np.savez_compressed(path, t=np.asarray(ticks, dtype=np.int64), crops=np.stack(crops))

@@ -1,0 +1,164 @@
+{
+  "scope": "CPU-only gpu2 standard staging prewarm; no GPU",
+  "host": "gpu2",
+  "core": 0,
+  "first_raw_sha256": "f3b08bd5eca1d29850e46671705933beb7a5547f3b1a1a3a313c577f8452a3c1",
+  "repeat_raw_sha256": "a51eab1e6a01379cb698c1663c35efbb9b1d0ead866647cc42beb587089f2734",
+  "first_wall_seconds": 12.903616582974792,
+  "first_cpu_seconds_including_cache_prescan": 26.263689999999997,
+  "repeat_wall_seconds": 12.757060488220304,
+  "repeat_cpu_seconds_including_cache_prescan": 25.933929,
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "environment_mode": "local-hit",
+  "environment_seconds": 10.769793033599854,
+  "inputs": [
+    {
+      "name": "med000_source",
+      "sha256": "3bf7ddaae0db5c48b1072fccb15f9f162e41fa5999886b9a5bde58dc0495c630",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.035558462142944336
+    },
+    {
+      "name": "med000_masks",
+      "sha256": "d0c038098fcd159d4713400456ed84ebcc0998251d0b5a14ef826ec167824efd",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.0030777454376220703
+    },
+    {
+      "name": "med000_hybrid",
+      "sha256": "2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.004572391510009766
+    },
+    {
+      "name": "state_med000",
+      "sha256": "96f8eee7bec42558fc1711a6f0ae03a85bffd0c1fd89235e291325455c5b9afb",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.008991479873657227
+    },
+    {
+      "name": "med000_historical_spec",
+      "sha256": "9b3d405e22326c26a88ce6f6a15c3aa8b63fb59f8eccdb6714221de7c82339fc",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 6.818771362304688e-05
+    },
+    {
+      "name": "med000_historical_ready",
+      "sha256": "8a7575bf77e28c573a8c9a35e5d294d258d1413c98f4244a12056302d4b94b98",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 4.696846008300781e-05
+    },
+    {
+      "name": "windows",
+      "sha256": "18d184cd39f6a4029a98e6fd9852d1e38f5cfde5c2ee19e5bc67bd69299c5e15",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 5.054473876953125e-05
+    },
+    {
+      "name": "lpips",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.5757851600646973
+    },
+    {
+      "name": "dists",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 1.2828681468963623
+    },
+    {
+      "name": "med019_source",
+      "sha256": "1c13479eb3b6f8d175eb6f5020c629896e6b01f719014ec995a06b4c6c5a3e9c",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.007136344909667969
+    },
+    {
+      "name": "med019_masks",
+      "sha256": "4ed9c80adb7528c36ace0b1777c53402e92796894839967f9cc1264e754fd9d7",
+      "first_mode": "local-copy",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.008559226989746094
+    },
+    {
+      "name": "med019_hybrid",
+      "sha256": "812c18a2aa7943c1d9ce28a4685529a5fcfebefabf8d30b441a238f4b9d92335",
+      "first_mode": "local-copy",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.002885103225708008
+    },
+    {
+      "name": "state_med019",
+      "sha256": "a335f1ccfdec65fc63002533f5c37c21222e3d087f4cdd126bae9f31167dda0d",
+      "first_mode": "local-copy",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.0066623687744140625
+    },
+    {
+      "name": "med019_historical_spec",
+      "sha256": "ef489d1009f57e47b23480ee94388461e19b64bc9a87d0d64b61df1fadecfb07",
+      "first_mode": "local-copy",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.00011086463928222656
+    },
+    {
+      "name": "med019_historical_ready",
+      "sha256": "c1a5274c365be81083eb03d3c98751b43e290370f5b465d01073220bc9572e34",
+      "first_mode": "local-copy",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 4.410743713378906e-05
+    },
+    {
+      "name": "inventory",
+      "sha256": "867d9fff8974f4ec5320c9b830138d4aac2ee22c285d7de45aebb04dff3bab11",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.0019800662994384766
+    },
+    {
+      "name": "bindings",
+      "sha256": "2ee1dd1a03e898c63e64a8080cd8bc31f02328f8e4b1083b6dc2f34f09297b61",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 5.459785461425781e-05
+    },
+    {
+      "name": "historical_review",
+      "sha256": "581b015e88bbb5d5ce6a5900cf8e3ac8ecc32d649d7f9887ee29893b8d19a18b",
+      "first_mode": "local-copy",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.0002589225769042969
+    },
+    {
+      "name": "pilot_audit",
+      "sha256": "55fd444a5e56122e9744c100df0062b1408a1dfedff8e103ef16c21bc9aabafa",
+      "first_mode": "local-copy",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 4.410743713378906e-05
+    },
+    {
+      "name": "byte_publication",
+      "sha256": "55739efe3cbf6937b6251e26c2ed1322663f8d1d2d1ee5f36bfb1ace593cdb59",
+      "first_mode": "local-hit",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.026188135147094727
+    },
+    {
+      "name": "pilot_archive",
+      "sha256": "588e8ccae59e99ad6667ba30cb277c3fbcd90d47fca060b8a6a5f844b57dffd4",
+      "first_mode": "local-copy",
+      "repeat_mode": "local-hit",
+      "repeat_seconds": 0.005615711212158203
+    }
+  ],
+  "limits": "Cache state can change. Smoke validator uses actual elapsed overhead and refuses promotion if the 1.5-margin forecast exceeds the inclusive limits."
+}

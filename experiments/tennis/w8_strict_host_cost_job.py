@@ -24,9 +24,13 @@ from experiments.tennis import w8_input_job as fixed
 from experiments.tennis import w8_receiver_generate as receiver
 from experiments.tennis import w8_strict_source as strict_source
 from experiments.tennis import w8_strict_packet_job as packet_audit
+from experiments.tennis import w8_public_folder_materialize as folder_profile
 from experiments.tennis import w8_cuda_system_leaves as strict_policy
 from experiments.tennis.w8_receiver_preflight import ENV_SHAS, PROTECTED
 
+FOLDER_AUDIT_SHA = '75174fe559f3ecb4d73dbd1950eb74bc0eec2b47a470885c3b914f9f09ee600c'
+FOLDER_AUDIT_PATH = 'docs/experiments/w8-inputs/receiver-20261101/w8-folder-real-io-b5eb8a21-independent-audit-20261105.json'
+FOLDER_IO_WALL_FLOOR = 5.554623505100608
 PACKET_AUDIT_SHA = 'c1923844722a088bbcc948c3d3d43535c31cf0440db98abbc152669287c8fc3a'
 PACKET_AUDIT_PATH = 'docs/experiments/w8-inputs/receiver-20261101/w8-strict-packet-bd0b5915-independent-audit-20261105.json'
 ORACLE_SHA = '8047b67694dd64171d2c0d13a9eaff53b18cd833b8fdc45ba054185c382848cc'
@@ -161,7 +165,7 @@ def _item(path: Path, digest_file: Callable[[Path], str] | None = None) -> dict[
     return {'path': str(path), 'sha256': (digest_file or fixed.file_sha)(path)}
 
 
-def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path) -> dict[str, Any]:
+def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, wall_seconds: int, code_root: Path, loader: Path, *, materialize_profile: bool = False) -> dict[str, Any]:
     config_path = work / 'worker-config.json'
     config_path.write_text(json.dumps(config, sort_keys=True))
     source = code_root
@@ -179,6 +183,10 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
                '--config-sha256', fixed.file_sha(config_path), '--loader', str(loader),
                '--loader-sha256', fixed.file_sha(loader), '--canary', str(canary),
                '--source-root', str(code_root)]
+    if materialize_profile:
+        if config['worker_kind'] != 'cost_probe':
+            raise ValueError('materialization applies only to model cost probes')
+        command.append('--materialize-profile')
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     started = time.monotonic()
     def limit() -> None:
@@ -205,7 +213,7 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
 
 
 def projection(one: dict[str, Any], three: dict[str, Any], remaining_gpu: float,
-               downstream_reserve: float, extra_generation_overhead: float) -> dict[str, Any]:
+               downstream_reserve: float, extra_generation_overhead: float, *, safety_factor: float = 1.35) -> dict[str, Any]:
     """Project two original 30-step units from measured 1/3-step sampling times."""
     if (one.get('scope') != 'qualification_only' or three.get('scope') != 'qualification_only'
             or one.get('steps') != 1 or three.get('steps') != 3 or one.get('unit') != three.get('unit')):
@@ -214,13 +222,13 @@ def projection(one: dict[str, Any], three: dict[str, Any], remaining_gpu: float,
     one_time, three_time = a['sampling']['gpu_reserved_wall_seconds'], b['sampling']['gpu_reserved_wall_seconds']
     if (not all(math.isfinite(v) for v in (one_time, three_time, remaining_gpu, downstream_reserve, extra_generation_overhead))
             or not 0 < one_time < three_time or remaining_gpu <= 0 or downstream_reserve <= 0
-            or extra_generation_overhead < 0):
+            or extra_generation_overhead < 0 or not math.isfinite(safety_factor) or safety_factor < 1.35):
         raise ValueError('nonpositive, nonmonotonic or invalid cost evidence')
     per_step = (three_time - one_time) / 2
     sampling_30 = one_time + 29 * per_step
     overhead = sum(max(a[k]['gpu_reserved_wall_seconds'], b[k]['gpu_reserved_wall_seconds'])
                    for k in ('model_load', 'original_probe', 'context_probe', 'publication'))
-    predicted = 1.35 * 2 * (sampling_30 + overhead + extra_generation_overhead)
+    predicted = safety_factor * 2 * (sampling_30 + overhead + extra_generation_overhead)
     return {'admission_authorized': False, 'per_step_gpu_wall_seconds': per_step, 'two_unit_30_step_seconds_upper_projection': predicted,
             'downstream_reserve_seconds': downstream_reserve,
             'extra_generation_overhead_seconds_per_unit': extra_generation_overhead,
@@ -248,15 +256,16 @@ def copy_new(source: Path, target: Path) -> None:
     target.chmod(0o444)
 
 
-def durable_member_names() -> list[str]:
-    return ['source-manifest.json', 'loader-identity.json', 'packet-config.json', 'generator-config.json',
+def durable_member_names(materialized: bool = False) -> list[str]:
+    names = ['source-manifest.json', 'loader-identity.json', 'packet-config.json', 'generator-config.json',
             f'{fixed.UNITS[0]}@match5.npz', f'{fixed.UNITS[0]}@match5.json', 'sealed.json',
             'decoded.pt', 'decoded-manifest.json', 'packet-unit.npz', 'packet-unit-other.npz', 'packet-cpu-only.json', 'protected-identity.json', 'gpu-identity.json']
+    return names + (['materialization.json'] if materialized else [])
 
 
-def seal_durable_archive(retained: Path, names: list[str]) -> dict[str, Any]:
+def seal_durable_archive(retained: Path, names: list[str], *, materialized: bool = False) -> dict[str, Any]:
     """Preserve an explicit fixed set of immutable files, with an exclusive archive."""
-    if names != durable_member_names() or len(names) != len(set(names)) or any(Path(n).name != n for n in names):
+    if names != durable_member_names(materialized) or len(names) != len(set(names)) or any(Path(n).name != n for n in names):
         raise ValueError('invalid durable archive member list')
     if sum((retained / name).stat().st_size for name in names) > 512 * 1024 * 1024:
         raise ValueError('durable artifact payload exceeds 512 MiB')
@@ -275,13 +284,13 @@ def seal_durable_archive(retained: Path, names: list[str]) -> dict[str, Any]:
             'members': {name: fixed.file_sha(retained / name) for name in names}}
 
 
-def verify_durable_archive(retained: Path, receipt: dict[str, Any]) -> None:
+def verify_durable_archive(retained: Path, receipt: dict[str, Any], *, materialized: bool = False) -> None:
     archive = retained / 'receiver-artifacts.tar'
     if (receipt.get('path') != str(archive) or archive.is_symlink() or not archive.is_file()
             or archive.stat().st_size != receipt.get('bytes') or fixed.file_sha(archive) != receipt.get('sha256')):
         raise ValueError('durable archive identity mismatch')
     expected = receipt.get('members')
-    if not isinstance(expected, dict) or set(expected) != set(durable_member_names()):
+    if not isinstance(expected, dict) or set(expected) != set(durable_member_names(materialized)):
         raise ValueError('durable archive member identities missing')
     with tarfile.open(archive) as tar:
         entries = tar.getmembers()
@@ -428,6 +437,41 @@ def require_gpu_uuid_api(torch: Any) -> dict[str, Any]:
             'uuid_attribute_type': 'property', 'cuda_initialized': False}
 
 
+def check_folder_receipt(receipt: dict[str, Any], files: dict[str, dict[str, str]]) -> None:
+    rows = receipt.get('files')
+    if (receipt.get('profile') != folder_profile.PROFILE or receipt.get('cleanup_complete') is not True
+            or not isinstance(rows, dict) or set(rows) != set(folder_profile.SIZES)
+            or receipt.get('bytes') != sum(folder_profile.SIZES.values())):
+        raise ValueError('materialization receipt scope or cleanup differs')
+    for name, size in folder_profile.SIZES.items():
+        row, item = rows[name], files.get('weight:' + name, {})
+        if (item.get('sha256') != folder_profile.PINNED[name] or row.get('source_sha256') != folder_profile.PINNED[name]
+                or row.get('copy_sha256') != folder_profile.PINNED[name] or row.get('bytes') != size
+                or type(row.get('copy_inode')) is not int or row['copy_inode'] <= 0):
+            raise ValueError('materialized file identity differs: ' + name)
+        st = Path(item['path']).stat()
+        if row.get('source_stat') != [st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns]:
+            raise ValueError('materialization source changed: ' + name)
+    for key in ('wall_seconds', 'cpu_seconds', 'cleanup_wall_seconds', 'cleanup_cpu_seconds'):
+        value = receipt.get(key)
+        if not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+            raise ValueError('materialization timing missing: ' + key)
+
+
+def materialized_three_step_forecast(measured_stage: float, sample_wall: float, worker_wall: float,
+                                     setup_wall: float, folder_receipt: dict[str, Any]) -> dict[str, float]:
+    """Conservatively project the entire measured stage plus three-step sampling."""
+    values = (measured_stage, sample_wall, worker_wall, setup_wall)
+    if (any(not math.isfinite(v) or v < 0 for v in values) or not 0 < sample_wall <= worker_wall <= measured_stage):
+        raise ValueError('materialized full-stage timing differs')
+    copied = folder_receipt['wall_seconds'] + folder_receipt['cleanup_wall_seconds']
+    if not math.isfinite(copied) or not 0 <= copied <= worker_wall:
+        raise ValueError('materialized I/O time exceeds whole worker')
+    extra = max(0.0, FOLDER_IO_WALL_FLOOR - copied)
+    return {'three_step_seconds': 1.5 * (measured_stage + 2 * sample_wall + extra),
+            'stage_reserve_seconds': max(15.0, 1.5 * setup_wall), 'io_floor_extra_seconds': extra}
+
+
 def check_gpu_binding(receipt: dict[str, Any], sealed: dict[str, Any], claimed: str, dispatch: dict[str, Any],
                       source_files: dict[str, str]) -> None:
     """Bind this stage's model/kernels to the fleet-selected physical Ada device."""
@@ -448,7 +492,7 @@ def check_gpu_binding(receipt: dict[str, Any], sealed: dict[str, Any], claimed: 
 
 
 def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generator_cpu: int,
-             worker_wall: int, preflight_path: Path, preflight_sha: str) -> None:
+             worker_wall: int, preflight_path: Path, preflight_sha: str, *, materialize_profile: bool = False) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux one-core fleet admission required')
     if steps not in (1, 3) or type(steps) is not int:
@@ -464,6 +508,9 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
     uuid_api = require_gpu_uuid_api(torch)
     digests = StableDigests()
     paths, spec = stage_inputs(stage, digests.digest)
+    profile = spec.get('materialization_profile')
+    if profile not in (None, folder_profile.PROFILE) or (profile == folder_profile.PROFILE) != materialize_profile:
+        raise ValueError('declared materialization profile and command differ')
     if preflight_path.resolve(strict=True) != paths['preflight'] or fixed.file_sha(preflight_path) != preflight_sha:
         raise ValueError('CLI preflight path or SHA differs from staged input')
     external = spec['receiver_external_cpu_reserve_seconds']
@@ -480,6 +527,9 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
     snapshot_root = Path(__file__).resolve().parents[2]
     if spec.get('packet_reference_audit_sha256') != PACKET_AUDIT_SHA or fixed.file_sha(snapshot_root / PACKET_AUDIT_PATH) != PACKET_AUDIT_SHA:
         raise ValueError('accepted CPU packet reference evidence differs')
+    if materialize_profile and (spec.get('folder_reference_audit_sha256') != FOLDER_AUDIT_SHA
+            or fixed.file_sha(snapshot_root / FOLDER_AUDIT_PATH) != FOLDER_AUDIT_SHA):
+        raise ValueError('real folder I/O audit reference differs')
     check_preflight_sources(preflight, snapshot_root)
     scratch = fixed.checked_scratch()
     protected_path = scratch / 'protected-identity.json'
@@ -591,7 +641,7 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
         raise ValueError('dispatch and claimed GPU differ')
     gpu_cfg = config('cost_probe', generated, model_out, policies['jcv'], generator_cpu, visible)
     gpu_cfg['probe_steps'] = steps
-    gpu_usage = _worker(Path(policies['jcv']['python']), gpu_cfg, model_work, generator_cpu, worker_wall, root, loader_receipt)
+    gpu_usage = _worker(Path(policies['jcv']['python']), gpu_cfg, model_work, generator_cpu, worker_wall, root, loader_receipt, materialize_profile=materialize_profile)
     expected = {'unit': fixed.UNITS[0], 'packet_sha256': fixed.WINDOW_SHA, 'profile_sha256': fixed.PROFILE_SHA,
                 'tensor_fingerprints': fingerprints, 'files': {k: v['sha256'] for k, v in generated.items()}}
     validation = receiver.validate_cost_probe(model_out, expected, steps)
@@ -601,6 +651,16 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
             or device_receipt.get('config_sha256') != fixed.file_sha(model_work / 'worker-config.json')):
         raise ValueError('GPU identity is not bound to model receipt and configuration')
     check_gpu_binding(device_receipt, sealed_device, visible, dispatch, code_manifest['files'])
+    if materialize_profile:
+        folder_receipt = json.loads((model_out / 'materialization.json').read_text())
+        check_folder_receipt(folder_receipt, gpu_cfg['files'])
+        if folder_receipt['wall_seconds'] + folder_receipt['cleanup_wall_seconds'] > gpu_usage['wall_seconds']:
+            raise ValueError('materialization timings exceed whole model worker')
+        if (device_receipt.get('materialization_profile') != folder_profile.PROFILE
+                or device_receipt.get('materialization_sha256') != fixed.file_sha(model_out / 'materialization.json')):
+            raise ValueError('materialization receipt is not GPU-worker-bound')
+    elif device_receipt.get('materialization_profile') is not None:
+        raise ValueError('unexpected materialization profile')
     seal = json.loads((model_out / 'sealed.json').read_text())
     retained = retained_path(stage)
     retained.parent.mkdir(parents=True, exist_ok=True)
@@ -626,12 +686,15 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
         if source.is_symlink() or not source.is_file():
             raise ValueError('invalid packet-derived retained input')
         copy_new(source, retained / filename)
-    durable_archive = seal_durable_archive(retained, durable_member_names())
+    if materialize_profile:
+        copy_new(model_out / 'materialization.json', retained / 'materialization.json')
+    durable_archive = seal_durable_archive(retained, durable_member_names(materialize_profile), materialized=materialize_profile)
     publication = scratch / 'publish'
     publication.mkdir(exist_ok=False)
     summary = {'scope': 'qualification_only', 'steps': steps, 'unit': fixed.UNITS[0],
                'validation': validation, 'generation_seal': seal, 'packet_usage': packet_usage, 'public_rate': rate,
-               'durable_archive': durable_archive,
+               'durable_archive': durable_archive, 'materialization_profile': folder_profile.PROFILE if materialize_profile else None,
+               'folder_reference_audit_sha256': FOLDER_AUDIT_SHA if materialize_profile else None,
                'source_manifest_sha256': fixed.file_sha(retained / 'source-manifest.json'),
                'loader_identity_sha256': fixed.file_sha(retained / 'loader-identity.json'),
                'protected_identity_sha256': fixed.file_sha(retained / 'protected-identity.json'),
@@ -709,7 +772,8 @@ def audit_retained_inputs(retained: Path, seal: dict[str, Any], fingerprints: di
 
 def audit_strict_policy(stage: Path, retained: Path, summary: dict[str, Any]) -> None:
     """Recheck preserved isolation and the complete code-only package against the fleet archive."""
-    verify_durable_archive(retained, summary['durable_archive'])
+    materialized = summary.get('materialization_profile') == folder_profile.PROFILE
+    verify_durable_archive(retained, summary['durable_archive'], materialized=materialized)
     for file, key in (('source-manifest.json', 'source_manifest_sha256'), ('loader-identity.json', 'loader_identity_sha256'),
                       ('packet-config.json', 'packet_config_sha256'), ('generator-config.json', 'generator_config_sha256'),
                       ('protected-identity.json', 'protected_identity_sha256'), ('packet-cpu-only.json', 'packet_cpu_only_sha256'),
@@ -735,6 +799,11 @@ def audit_strict_policy(stage: Path, retained: Path, summary: dict[str, Any]) ->
             stream = bundle.extractfile(member)
             if stream is None or hashlib.sha256(stream.read()).hexdigest() != expected:
                 raise ValueError('source member hash mismatch: ' + name)
+        if materialized:
+            member = bundle.getmember(FOLDER_AUDIT_PATH)
+            stream = bundle.extractfile(member) if member.isfile() else None
+            if stream is None or hashlib.sha256(stream.read()).hexdigest() != FOLDER_AUDIT_SHA:
+                raise ValueError('frozen real folder I/O audit differs')
     loader = json.loads((retained / 'loader-identity.json').read_text())
     staged = {item['name']: item for item in json.loads((stage / 'staging.json').read_text())['inputs']}
     preflight_path = Path(staged['preflight']['source'])
@@ -759,6 +828,15 @@ def audit_strict_policy(stage: Path, retained: Path, summary: dict[str, Any]) ->
             or gpu_receipt.get('config_sha256') != summary['generator_config_sha256']):
         raise ValueError('saved GPU identity binding differs')
     check_gpu_binding(gpu_receipt, sealed_gpu, generator_config['environment']['CUDA_VISIBLE_DEVICES'], dispatch, files)
+    if materialized:
+        folder_receipt = json.loads((retained / 'materialization.json').read_text())
+        check_folder_receipt(folder_receipt, generator_config['files'])
+        if (summary.get('folder_reference_audit_sha256') != FOLDER_AUDIT_SHA
+                or gpu_receipt.get('materialization_profile') != folder_profile.PROFILE
+                or gpu_receipt.get('materialization_sha256') != fixed.file_sha(retained / 'materialization.json')):
+            raise ValueError('retained materialization binding differs')
+    elif gpu_receipt.get('materialization_profile') is not None:
+        raise ValueError('unexpected retained materialization profile')
     records = (('packet-config.json', json.loads((retained / 'decoded-manifest.json').read_text())['isolation']),
                ('generator-config.json', json.loads((retained / 'sealed.json').read_text())['isolation']))
     for filename, isolation in records:
@@ -842,8 +920,24 @@ def cost_validate(stage: Path, output: Path) -> int:
         sample_wall = validation['phase_costs']['sampling']['gpu_reserved_wall_seconds']
         if not 0 < sample_wall <= measured:
             raise ValueError('smoke sampling duration is invalid')
-        projected = 1.35 * (measured - sample_wall + 3 * sample_wall)
-        stage_reserve = max(10.0, 1.25 * (phase - started))
+        profile = spec.get('materialization_profile')
+        materialized = profile == folder_profile.PROFILE
+        if profile not in (None, folder_profile.PROFILE) or summary.get('materialization_profile') != profile:
+            raise ValueError('materialization stage profile differs')
+        if materialized:
+            audit = Path(__file__).resolve().parents[2] / FOLDER_AUDIT_PATH
+            if spec.get('folder_reference_audit_sha256') != FOLDER_AUDIT_SHA or fixed.file_sha(audit) != FOLDER_AUDIT_SHA:
+                raise ValueError('real folder I/O audit reference differs')
+            io = json.loads((retained / 'materialization.json').read_text())
+            forecast = materialized_three_step_forecast(measured, sample_wall, summary['generation_usage']['wall_seconds'],
+                                                        phase - started, io)
+            io_extra = forecast['io_floor_extra_seconds']
+            projected = forecast['three_step_seconds']
+            stage_reserve = forecast['stage_reserve_seconds']
+        else:
+            io_extra = 0.0
+            projected = 1.35 * (measured - sample_wall + 3 * sample_wall)
+            stage_reserve = max(10.0, 1.25 * (phase - started))
         if (not started <= phase <= now < end or end - started > spec['budget_seconds'] + 1
                 or projected > full_limit or end - now < projected + stage_reserve + 10):
             raise ValueError('remaining campaign cannot conservatively admit 3-step cost stage')
@@ -861,7 +955,7 @@ def cost_validate(stage: Path, output: Path) -> int:
                   'independent_crop_validation': True, 'remaining_budget': True, 'cpu_reservation': True},
                   'scope': '1-step cost probe only, no quality claim', 'validation': validation,
                   'hash_accounting': digests.receipt(),
-                  'projection': {'measured_smoke_wall_seconds': measured, 'three_step_allowance': projected,
+                  'projection': {'measured_smoke_wall_seconds': measured, 'three_step_allowance': projected, 'io_floor_extra_seconds': io_extra,
                                  'stage_reserve_seconds': stage_reserve, 'remaining_seconds': end - now,
                                  'cpu_reservation_seconds': total_cap,
                                  'validator_cpu_limit_seconds': validator_cap}}
@@ -936,14 +1030,44 @@ def audit_pair(one_path: Path, three_path: Path, oracle_path: Path, remaining_gp
         raise ValueError('cost stages used different installed inputs or GPU class')
     measured_overhead = max(_measured_stage_overhead(one_path, validations[0]),
                             _measured_stage_overhead(three_path, validations[1]))
-    if extra_generation_overhead < measured_overhead:
-        raise ValueError('per-unit setup reserve is below measured stage overhead')
+    profile = summaries[0].get('materialization_profile')
+    materialized = profile == folder_profile.PROFILE
+    if profile not in (None, folder_profile.PROFILE) or summaries[1].get('materialization_profile') != profile:
+        raise ValueError('cost stages used different materialization profiles')
+    staging_reserve = 0.0
+    validator_reserve = 0.0
+    if materialized:
+        for path in (one_path, three_path):
+            staged = json.loads((path / 'staging.json').read_text())
+            value = sum(float(x['seconds']) for x in staged['inputs']) + float(staged['environment']['seconds'])
+            if not math.isfinite(value) or value < 0:
+                raise ValueError('measured staging receipt invalid')
+            staging_reserve = max(staging_reserve, value)
+        gate = json.loads((one_path.parent / 'gate.json').read_text())
+        validator_reserve = float(gate['validator_seconds'])
+        if gate.get('passed') is not True or not math.isfinite(validator_reserve) or validator_reserve < 0:
+            raise ValueError('passed validator timing required')
+    required_overhead = measured_overhead + staging_reserve + validator_reserve
+    if extra_generation_overhead < required_overhead:
+        raise ValueError('per-unit setup reserve is below measured stage, staging and validation overhead')
     decision = projection(validations[0], validations[1], remaining_gpu, downstream_reserve,
-                          extra_generation_overhead)
+                          extra_generation_overhead, safety_factor=1.5 if materialized else 1.35)
     decision['measured_stage_overhead_seconds_per_unit'] = measured_overhead
+    decision['measured_staging_seconds_per_unit'] = staging_reserve
+    decision['measured_validator_seconds_per_unit'] = validator_reserve
     return {'passed': True, 'admission_authorized': False, 'provenance_scope': 'stage-artifact calculation; terminal job and authoritative ledger require independent review',
             'scope': 'advisory cost projection only, no quality or promotion authority',
             'one_step': validations[0], 'three_step': validations[1], 'projection': decision}
+
+
+def make_materialized_spec(deadline: str) -> dict[str, Any]:
+    spec = make_spec(deadline)
+    spec['arguments'].append('--materialize-profile')
+    spec['materialization_profile'] = folder_profile.PROFILE
+    spec['folder_reference_audit_sha256'] = FOLDER_AUDIT_SHA
+    spec['smoke']['representative_basis'] = ('One complete 240-frame unit with one actual generation step, '
+        'strict source-denied receiver and SHA-bound regular-file materialization; whole-stage measured 1.5-margin admission precedes the three-step cost pilot.')
+    return spec
 
 
 def make_spec(deadline: str) -> dict[str, Any]:
@@ -974,6 +1098,7 @@ def main() -> int:
     make = sub.add_parser('make-spec')
     make.add_argument('--deadline', required=True)
     make.add_argument('--output', type=Path, required=True)
+    make.add_argument('--materialize-profile', action='store_true')
     run = sub.add_parser('cost-run')
     run.add_argument('--steps', type=int, required=True)
     run.add_argument('--parent-cpu', type=int, required=True)
@@ -982,6 +1107,7 @@ def main() -> int:
     run.add_argument('--worker-wall', type=int, required=True)
     run.add_argument('--preflight', type=Path, required=True)
     run.add_argument('--preflight-sha256', required=True)
+    run.add_argument('--materialize-profile', action='store_true')
     sub.add_parser('cost-validate')
     audit = sub.add_parser('cost-audit')
     audit.add_argument('--one', type=Path, required=True)
@@ -994,7 +1120,7 @@ def main() -> int:
     audit.add_argument('--cpu-seconds', type=int, required=True)
     args = parser.parse_args()
     if args.command == 'make-spec':
-        spec = make_spec(args.deadline)
+        spec = make_materialized_spec(args.deadline) if args.materialize_profile else make_spec(args.deadline)
         from experiments.jobs.inbox import validate_spec
         validate_spec(spec)
         with args.output.open('x') as stream:
@@ -1018,7 +1144,7 @@ def main() -> int:
     if args.command == 'cost-validate':
         return cost_validate(stage, Path(os.environ['PS_VALIDATION_PATH']))
     cost_run(stage, args.steps, args.parent_cpu, args.packet_cpu, args.generator_cpu, args.worker_wall,
-             args.preflight, args.preflight_sha256)
+             args.preflight, args.preflight_sha256, materialize_profile=args.materialize_profile)
     return 0
 
 

@@ -1,0 +1,19 @@
+{
+  "approved": true,
+  "analysis_source_sha256": "91f82e456624cae0b2b33cd57200c413114002a57154305b9ba03e624a6f26fc",
+  "new_score_audit_sha256": "a01fb9ff905918e8574e48ce6d74d4b0f44f9ce9099a46dd74f85a0d2c8726f1",
+  "max_cpu_seconds": 60,
+  "scientific_source_identity": {
+    "tracked_python_files": 550,
+    "tracked_python_manifest_sha256": "efec8728d771bd100a78973d3513fafd88d1450ee92e50f56590217d5f7e4a3d",
+    "python_version": "3.12.7 | packaged by conda-forge | (main, Oct  4 2024, 15:57:01) [Clang 17.0.6 ]",
+    "numpy_version": "1.26.4",
+    "scipy_version": "1.17.1",
+    "numpy_binary_sha256": "a51276f3aab2d91051aa0ced3ddaa39a776ae60132ca4c07a91b82a8b7a92ea7",
+    "scipy_special_binary_sha256": "5ff965ce3b560fa7e2f6901b665e42b96554024a5b32a253c7f7f5bc95c2134f",
+    "scipy_interpolate_binary_sha256": "70886697c9ae4bf98ed1ef0fe1b7a05b8f241ab72f21b0db4d4e698d5bdf1ec4"
+  },
+  "authority": "root reproducibility replay within already charged120CPU corrected-analysis envelope; no models/new data",
+  "code_revision": "00aff80adac40c5cc5db4ea598d6ebbb9330be8d",
+  "scope": "all committed source; exact same scientific module and numerical runtime, validate stable results despite unrelated project files"
+}

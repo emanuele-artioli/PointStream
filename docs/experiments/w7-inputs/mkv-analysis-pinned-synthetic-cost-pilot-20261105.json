@@ -1,0 +1,34 @@
+{
+  "scope": "CPU cost only; synthetic scores, no outcome or admission",
+  "historical_roles": 71,
+  "new_roles": 4,
+  "primary_streams": 71,
+  "authenticated_load_wall_seconds": 0.13488487480208278,
+  "synthetic_runs": 10,
+  "synthetic_run_wall_seconds": [
+    1.1704704160802066,
+    0.09053412498906255,
+    0.09909254172816873,
+    0.13361850008368492,
+    0.10596100008115172,
+    0.09236070793122053,
+    0.09821920888498425,
+    0.12896337499842048,
+    0.1168059166520834,
+    0.11307520791888237
+  ],
+  "total_wall_seconds": 2.2846252908930182,
+  "process_cpu_seconds": 1.849562,
+  "full_analysis_basis": "one complete W7 t-interval report, no bootstrap; external work and reserves require root",
+  "source_sha256": "e0d4716bf40ceb16a4ad43181becb618df6cf5f00b728d0f0b525cd65e780dea",
+  "scientific_source_identity": {
+    "tracked_python_files": 545,
+    "tracked_python_manifest_sha256": "0bd91672433804cfa3b22ca840ce9d5e9196ae5947819aaab669ece168dc0e74",
+    "python_version": "3.12.7 | packaged by conda-forge | (main, Oct  4 2024, 15:57:01) [Clang 17.0.6 ]",
+    "numpy_version": "1.26.4",
+    "scipy_version": "1.17.1",
+    "numpy_binary_sha256": "a51276f3aab2d91051aa0ced3ddaa39a776ae60132ca4c07a91b82a8b7a92ea7",
+    "scipy_special_binary_sha256": "5ff965ce3b560fa7e2f6901b665e42b96554024a5b32a253c7f7f5bc95c2134f",
+    "scipy_interpolate_binary_sha256": "70886697c9ae4bf98ed1ef0fe1b7a05b8f241ab72f21b0db4d4e698d5bdf1ec4"
+  }
+}
