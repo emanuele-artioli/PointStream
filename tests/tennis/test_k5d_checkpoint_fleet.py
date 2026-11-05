@@ -253,14 +253,25 @@ def test_prepare_forecast_uses_pinned_outer_intervals_and_actual_slowdown(tmp_pa
     baseline16, baseline48 = fleet.prepare_baseline()
     assert baseline16 == pytest.approx(169.76982356747612)
     assert baseline48 == pytest.approx(235.41768866125494)
-    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': baseline16}))
-    (tmp_path / 'dispatch.json').write_text(json.dumps({'campaign_clock': {'started': 1., 'phase_started': 2., 'budget_end': 650.}}))
-    forecast = fleet.prepare_forecast(tmp_path, 180.)
+    stage = tmp_path / 'smoke'
+    stage.mkdir()
+    (tmp_path / 'spec.json').write_text(json.dumps({'full': {'seconds': 420}}))
+    (stage / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': baseline16}))
+    (stage / 'dispatch.json').write_text(json.dumps({'campaign_clock': {'started': 1., 'phase_started': 2., 'budget_end': 650.}}))
+    forecast = fleet.prepare_forecast(stage, 180.)
     assert forecast['estimate_seconds'] == pytest.approx(393.1265329918824)
     assert forecast['observed_slowdown'] == 1.0
-    (tmp_path / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': baseline16 * 1.10}))
+    (stage / 'execution.json').write_text(json.dumps({'exit_code': 0, 'seconds': baseline16 * 1.10}))
     with pytest.raises(ValueError, match='forecast'):
-        fleet.prepare_forecast(tmp_path, 180.)
+        fleet.prepare_forecast(stage, 180.)
+    (tmp_path / 'spec.json').write_text(json.dumps({'full': {'seconds': 500}}))
+    assert fleet.prepare_forecast(stage, 180.)['estimate_seconds'] == pytest.approx(428.4391862910707)
+    with pytest.raises(ValueError, match='forecast'):
+        fleet.prepare_forecast(stage, 230.)
+    for bad in (True, 0, 501):
+        (tmp_path / 'spec.json').write_text(json.dumps({'full': {'seconds': bad}}))
+        with pytest.raises(ValueError, match='stage cap'):
+            fleet.prepare_forecast(stage, 180.)
     tampered = tmp_path / 'tampered.json'
     data = json.loads(fleet.PREPARE_RECEIPT.read_text())
     data['stages']['16']['scoring_events'][0]['wall_seconds'] += 1
