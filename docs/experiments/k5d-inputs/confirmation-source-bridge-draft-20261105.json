@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "status": "draft; no actual dispatch, scientific approval, or CPU/GPU qualification",
+  "approved": false,
+  "calibration_execution_identity": {
+    "source_sha256": "8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13",
+    "snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "consumer_execution_identity": {
+    "source_sha256": "5b37c0b1bd9ccb0d529952a8c7d80964d050a71c5b02e963173f66d0c7a29a54",
+    "snapshot_sha256": "cc3f884078e43bec673bd2a646fb82db00223e8dc6d29be0148e5311a6bf4db3",
+    "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "calibration_snapshot_sha256": "c3ff5419167504afcd84d25931791eddfe8bae16b5e492ed124df31e43f66f67",
+  "consumer_snapshot_sha256": "cc3f884078e43bec673bd2a646fb82db00223e8dc6d29be0148e5311a6bf4db3",
+  "changed_paths": [
+    "experiments/tennis/k5d_control_bridge.py",
+    "experiments/tennis/k5d_control_readiness.py",
+    "experiments/tennis/k5d_control_study.py",
+    "experiments/tennis/k5d_cpu_accounting.py",
+    "experiments/tennis/k5d_full_cost_builder.py",
+    "experiments/tennis/k5d_native_cpu_workload.py",
+    "experiments/tennis/k5d_native_pid_oracle.py",
+    "experiments/tennis/k5d_pid_escalation_oracle.py",
+    "experiments/tennis/k5d_pid_namespace_wrapper.py",
+    "experiments/tennis/k5d_readiness_cost_probe.py",
+    "experiments/tennis/k5d_scoped_namespace.py",
+    "experiments/tennis/k5d_study_wave.py",
+    "tests/tennis/test_k5d_control_bridge.py",
+    "tests/tennis/test_k5d_control_readiness.py",
+    "tests/tennis/test_k5d_control_study.py",
+    "tests/tennis/test_k5d_cpu_accounting.py",
+    "tests/tennis/test_k5d_full_cost_builder.py",
+    "tests/tennis/test_k5d_native_pid_oracle.py",
+    "tests/tennis/test_k5d_readiness_cost_probe.py",
+    "tests/tennis/test_k5d_scoped_namespace.py",
+    "tests/tennis/test_k5d_study_wave.py"
+  ],
+  "unchanged_files": 1348,
+  "scope": "complete archived source manifests; no checkpoint identity substitution",
+  "candidate_git_head": "9bf4cf4d3c06d0195aff65708cdae5bdae43f819"
+}
