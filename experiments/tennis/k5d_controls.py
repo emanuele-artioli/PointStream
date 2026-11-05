@@ -68,22 +68,29 @@ def members(path: Path) -> dict[str, bytes]:
     return result
 
 
-def bound_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str, Any]]:
+def bound_inputs(stage: Path, *, full_frames: int = 48, calibration_sha: dict[str, str] | None = None,
+                 extra_sha: dict[str, str] | None = None) -> tuple[dict[str, Path], dict[str, Any], dict[str, Any]]:
+    if full_frames not in (48, 188):
+        raise ValueError('unregistered controls scope')
+    calibration_sha = CALIBRATION_SHA if calibration_sha is None else calibration_sha
+    extra_sha = {} if extra_sha is None else extra_sha
     spec = json.loads((stage.parent / 'spec.json').read_text())
     stage_data = json.loads((stage / 'staging.json').read_text())
     dispatch = json.loads((stage / 'dispatch.json').read_text())
     if (spec.get('single_cpu_campaign') is not True or spec.get('cpu_threads') != 1
+            or spec.get('gpu_sharing') != {'mode': 'exclusive'} or dispatch.get('gpu_sharing') != {'mode': 'exclusive'}
+            or spec.get('gpu_models') != ['RTX A6000']
             or spec.get('device') != 'gpu' or not 0 < spec.get('budget_seconds', 0) <= 1200
             or spec.get('environment', {}).get('sha256') != ENV_SHA
             or stage_data['environment']['sha256'] != ENV_SHA or len(dispatch.get('cpu_affinity', [])) != 1
             or spec.get('budget_seconds', 0) > 550
-            or spec.get('scale', {}).get('frames') != {'smoke': 16, 'full': 48}
-            or spec.get('smoke', {}).get('seconds', 0) > 130 or spec.get('full', {}).get('seconds', 0) > 400):
+            or spec.get('scale', {}).get('frames') != {'smoke': 16, 'full': full_frames}
+            or spec.get('smoke', {}).get('seconds', 0) > (100 if full_frames == 188 else 130) or spec.get('full', {}).get('seconds', 0) > 400):
         raise ValueError('wrong environment or bounded single-CPU campaign')
     declared = {x['name']: x for x in spec['staged_inputs']}
     actual = {x['name']: x for x in stage_data['inputs']}
     names = {'archive', 'balltrack_code', 'balltrack_weight', 'wasb_code', 'wasb_weights', 'wasb_config',
-             'lpips_backbone', 'dists_backbone', 'calibration_smoke', 'calibration_full'}
+             'lpips_backbone', 'dists_backbone', 'calibration_smoke', 'calibration_full'} | set(extra_sha)
     if set(declared) != names or set(actual) != names or len(actual) != len(stage_data['inputs']):
         raise ValueError('wrong input set')
     root = Path(stage_data['local_root']).resolve(strict=True)
@@ -94,14 +101,22 @@ def bound_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str
         if (len(digest) != 64 or set(digest) == {'0'} or staged['sha256'] != digest
                 or staged.get('extract', False) != item.get('extract', False)):
             raise ValueError('unbound staged identity: ' + name)
-        if name in CALIBRATION_SHA and digest != CALIBRATION_SHA[name]:
+        if name in calibration_sha and digest != calibration_sha[name]:
             raise ValueError('calibration publication changed: ' + name)
+        if name in extra_sha and digest != extra_sha[name]:
+            raise ValueError('pilot receipt identity changed: ' + name)
         if name in fleet.EXPECTED and name not in ('wasb_code', 'wasb_weights', 'balltrack_code') and digest != fleet.EXPECTED[name]:
             raise ValueError('changed immutable input: ' + name)
         path = Path(staged['path']).resolve(strict=True)
         if not path.is_relative_to(root):
             raise ValueError('staged input is not host local')
         paths[name] = path
+    for name, digest in calibration_sha.items():
+        if oracle.sha(paths[name]) != digest:
+            raise ValueError('calibration bytes differ: ' + name)
+    for name, digest in extra_sha.items():
+        if oracle.sha(paths[name]) != digest:
+            raise ValueError('pilot bytes differ: ' + name)
     for name in ('wasb_code', 'balltrack_code'):
         entry = actual[name]
         archive = paths[name].parent / Path(entry['source']).name
@@ -136,13 +151,14 @@ def check_calibration(data: dict[str, bytes], frames: int) -> tuple[dict[str, An
     return source, point, stream
 
 
-def run(stage: Path, scratch: Path, frames: int) -> None:
+def run(stage: Path, scratch: Path, frames: int, *, full_frames: int = 48,
+        calibration_sha: dict[str, str] | None = None, extra_sha: dict[str, str] | None = None) -> None:
     import torch
     from src.codecs import quality
     from experiments.tennis import k5d_worker
     started = time.monotonic()
-    paths, _, dispatch = bound_inputs(stage)
-    if frames != {'smoke': 16, 'full': 48}.get(stage.name):
+    paths, _, dispatch = bound_inputs(stage, full_frames=full_frames, calibration_sha=calibration_sha, extra_sha=extra_sha)
+    if frames != {'smoke': 16, 'full': full_frames}.get(stage.name):
         raise ValueError('stage frame mismatch')
     if len(os.sched_getaffinity(0)) != 1 or not torch.cuda.is_available() or torch.cuda.device_count() != 1:
         raise ValueError('single CPU and one CUDA GPU required')
@@ -318,9 +334,10 @@ def full188_forecast(seconds16: float, seconds48: float, current16: float, *, re
     return 1.5 * (fixed + 188 * marginal) * max(1., current16 / seconds16) + reserve
 
 
-def validate_smoke(stage: Path, output: Path) -> None:
+def validate_smoke(stage: Path, output: Path, *, full_frames: int = 48,
+                   calibration_sha: dict[str, str] | None = None, extra_sha: dict[str, str] | None = None) -> None:
     try:
-        paths, spec, dispatch = bound_inputs(stage)
+        paths, spec, dispatch = bound_inputs(stage, full_frames=full_frames, calibration_sha=calibration_sha, extra_sha=extra_sha)
         with tarfile.open(stage / 'published.tar') as tar:
             f = tar.extractfile('publish/controls.json')
             if f is None:
@@ -379,7 +396,40 @@ def validate_smoke(stage: Path, output: Path) -> None:
         clock = dispatch['campaign_clock']
         now = time.monotonic()
         elapsed = execution['seconds']
-        projected = cost_forecast(execution, clock, now, spec['full']['seconds'])
+        if full_frames == 188:
+            if extra_sha is None:
+                raise ValueError('pilot identities required')
+            if (execution.get('exit_code') != 0 or execution.get('timing_contaminated') is not False
+                    or isinstance(elapsed, bool) or not isinstance(elapsed, (int, float)) or not math.isfinite(elapsed)
+                    or elapsed <= 0 or execution.get('gpu_sharing') != {'mode': 'exclusive'}
+                    or not 0 < clock['started'] <= clock['phase_started'] <= now < clock['budget_end']
+                    or clock['budget_end'] - clock['started'] > spec['budget_seconds'] + 1):
+                raise ValueError('invalid smoke execution or campaign clock')
+            audit = json.loads(paths['cost_audit'].read_text())
+            if (audit['job_id'] != '20261105T021434Z-3ec159d8'
+                    or audit['stages']['smoke']['archive_sha256'] != extra_sha['pilot_smoke']
+                    or audit['stages']['full']['archive_sha256'] != extra_sha['pilot_full']):
+                raise ValueError('pilot provenance differs')
+            with tarfile.open(paths['pilot_smoke']) as pilot:
+                pilot_file = pilot.extractfile('publish/controls.json')
+                if pilot_file is None:
+                    raise ValueError('missing pilot smoke controls')
+                prior = json.load(pilot_file)
+            validate_result(prior, 16)
+            for key in ('labels', 'results', 'disk_guard_off', 'calibration_archive_sha256', 'calibration_wire_sha256', 'metric_models'):
+                if report[key] != prior[key]:
+                    raise ValueError('16-frame control parity differs: ' + key)
+            with tarfile.open(paths['pilot_full']) as pilot:
+                pilot_file = pilot.extractfile('publish/controls.json')
+                if pilot_file is None:
+                    raise ValueError('missing pilot full controls')
+                prior_full = json.load(pilot_file)
+            validate_result(prior_full, 48)
+            projected = full188_forecast(audit['stages']['smoke']['command_seconds'], audit['stages']['full']['command_seconds'], elapsed, reserve=40)
+            if projected > spec['full']['seconds'] or projected + 10 > clock['budget_end'] - now:
+                raise ValueError('188-frame control cost exceeds stage or campaign')
+        else:
+            projected = cost_forecast(execution, clock, now, spec['full']['seconds'])
         remaining = clock['budget_end'] - now
         result = {'passed': True, 'checks': {'five_arms': True, 'native_streak_parity': True,
                   'metrics_judges_coverage': True, 'cost_projection': True},
