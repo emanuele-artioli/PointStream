@@ -21,7 +21,11 @@ CONTROL_ADDITIONS = frozenset({'experiments/tennis/k5d_control_bridge.py',
                                'tests/tennis/test_k5d_control_bridge.py',
                                'tests/tennis/test_k5d_control_readiness.py',
                                'tests/tennis/test_k5d_control_study.py',
-                               'tests/tennis/test_k5d_readiness_cost_probe.py'})
+                               'tests/tennis/test_k5d_readiness_cost_probe.py',
+                               'experiments/tennis/k5d_full_cost_builder.py',
+                               'experiments/tennis/k5d_study_wave.py',
+                               'tests/tennis/test_k5d_full_cost_builder.py',
+                               'tests/tennis/test_k5d_study_wave.py'})
 
 
 def manifest(archive: Path, expected_sha: str) -> tuple[str, dict[str, list[str]]]:

@@ -54,7 +54,10 @@ def programme_projection(receipt: dict[str, Any]) -> dict[str, Any]:
         if receipt['calibration_execution_sha256'].get(key) != sha or costs[phase]['seconds' + frame] < measured:
             raise ValueError('calibration execution differs or understates measured cost')
     for phase in ('prepare', 'score'):
-        if (costs[phase]['margin'] < 1.5 or costs[phase]['reserve_seconds'] <= 0
+        if (any(isinstance(costs[phase][key], bool) or not isinstance(costs[phase][key], (int, float))
+                or not math.isfinite(costs[phase][key])
+                for key in ('margin', 'reserve_seconds', 'seconds16', 'seconds48'))
+                or costs[phase]['margin'] < 1.5 or costs[phase]['reserve_seconds'] <= 0
                 or costs[phase]['seconds16'] <= 0 or costs[phase]['seconds48'] < costs[phase]['seconds16']):
             raise ValueError('invalid calibration bounds')
     full_compute = 0.0
@@ -80,12 +83,12 @@ def programme_projection(receipt: dict[str, Any]) -> dict[str, Any]:
             raise ValueError('longest campaign exceeds 3000-second recovery bound')
         incremental = (full_compute + 60 * d['readiness_seconds'] + 120 * d['stage_staging_seconds']
                        + 60 * d['validator_seconds'] + 60 * d['audit_seconds'] + d['failed_start_reserve_seconds'])
-        results[resource] = {'incremental_seconds': incremental,
-                             'fits': incremental <= min(d['ball_remaining_seconds'], d['global_remaining_seconds'])}
+        results[resource] = {'incremental_seconds': incremental if resource == 'gpu' else None,
+                             'fits': resource == 'gpu' and incremental <= min(d['ball_remaining_seconds'], d['global_remaining_seconds'])}
     return {'campaigns': 60, 'full_stages': 60, 'gpu_smoke_inferences': 0,
             'full_frames_per_phase': 5675, 'max_full_seconds': max_full,
             'gpu': results['gpu'], 'cpu': results['cpu'],
-            'cpu_method': 'one-core elapsed wall upper bound; no cumulative RUSAGE summation'}
+            'cpu_method': 'unqualified wall estimate; process-tree CPU upper bound not established'}
 
 
 def check_budget(ledger: dict[str, Any], attestation: dict[str, Any], ledger_sha: str,

@@ -62,3 +62,15 @@ def test_budget_cannot_overstate_remaining_or_ignore_active_reservations() -> No
     result['programme']['gpu']['ball_remaining_seconds'] = 651
     with pytest.raises(ValueError, match='reconciled ledger'):
         control.check_budget(ledger, attestation, 'a' * 64, 'b' * 64, result)
+
+
+def test_cpu_fit_is_never_inferred_from_wall_and_nan_margin_rejected() -> None:
+    data = receipt()
+    data['programme']['cpu']['ball_remaining_seconds'] = 1e9
+    data['programme']['cpu']['global_remaining_seconds'] = 1e9
+    result = control.programme_projection(data)
+    assert result['cpu']['fits'] is False
+    assert result['cpu']['incremental_seconds'] is None
+    data['cost']['score']['margin'] = float('nan')
+    with pytest.raises(ValueError, match='calibration bounds'):
+        control.programme_projection(data)
