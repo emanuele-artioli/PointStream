@@ -1,0 +1,47 @@
+{
+  "status": "passed",
+  "source": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-cache-3ce18520af3c46e0be3d9345a9f04009/source.tar",
+  "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-copy-28657bbb172d4033830cea075146ec80/source.tar",
+  "expected_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "helper_source": "/Users/manu/.codex/worktrees/3cb5/PointStream/experiments/jobs/fleet.py",
+  "helper_source_sha256": "fadf9f81644f7aea51e44831cf20e1ea3adaa71e42803b37d8583312dec31c1f",
+  "timeout_seconds": 20,
+  "doctor_evidence": "f11c95820568459cb9eb01b3ab5261cf",
+  "cpu_affinity": "not available on this macOS client",
+  "elapsed_seconds": 3.4246511250021285,
+  "usage_before": {
+    "self": {
+      "user_seconds": 0.056664,
+      "system_seconds": 0.021887999999999998
+    },
+    "children": {
+      "user_seconds": 0.012053,
+      "system_seconds": 0.007809
+    }
+  },
+  "usage_after": {
+    "self": {
+      "user_seconds": 0.057831,
+      "system_seconds": 0.024546
+    },
+    "children": {
+      "user_seconds": 0.029993,
+      "system_seconds": 0.020257999999999998
+    }
+  },
+  "source_bytes": 6133760,
+  "destination_bytes": 6133760,
+  "source_inode": 2250247,
+  "destination_inode": 2252774,
+  "device": 58,
+  "source_mode": "0600",
+  "destination_mode": "0600",
+  "source_regular": true,
+  "destination_regular": true,
+  "source_postcheck_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "destination_postcheck_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "remote_matching_processes_observed": 0,
+  "remote_aggregate_cpu": "unmeasured",
+  "full_cpu_charge_seconds": 60,
+  "scope": "actual fixed cache copier only; no GPU, model or endpoint execution"
+}
