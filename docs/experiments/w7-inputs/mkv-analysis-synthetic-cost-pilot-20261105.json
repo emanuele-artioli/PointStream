@@ -1,0 +1,24 @@
+{
+  "scope": "CPU cost only; synthetic scores, no outcome or admission",
+  "historical_roles": 71,
+  "new_roles": 4,
+  "primary_streams": 71,
+  "authenticated_load_wall_seconds": 0.02525912504643202,
+  "synthetic_runs": 10,
+  "synthetic_run_wall_seconds": [
+    0.9358817921020091,
+    0.03317783307284117,
+    0.03362208278849721,
+    0.03318945784121752,
+    0.03309662500396371,
+    0.032943458296358585,
+    0.033003666903823614,
+    0.033014667220413685,
+    0.03297337517142296,
+    0.03296145796775818
+  ],
+  "total_wall_seconds": 1.2597031658515334,
+  "process_cpu_seconds": 1.080475,
+  "full_analysis_basis": "one complete W7 t-interval report, no bootstrap; external work and reserves require root",
+  "source_sha256": "59ffbcfbceec1073372420d19f1595669b2b63c667efa700afec2c8b805fa33f"
+}

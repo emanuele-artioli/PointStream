@@ -22,9 +22,10 @@ def fixture():
                 ident = f'rerate{i}'
                 duplicates.append({'window': window, 'control': name, 'roi': f'rerate{i}'})
             base = {'window': window, 'name': name, 'original_ivf_sha256': ident,
-                    'native_yuv_sha256': ident, 'mkv_sha256': name, 'mkv_bytes': 100, 'fps': 25}
+                    'native_yuv_sha256': ident, 'mkv_sha256': name, 'mkv_bytes': 100, 'fps': 25,
+                    'gpu_class': 'A6000', 'score_job': 'synthetic'}
             inventory[group].append({'window': window, 'name': name, 'original_ivf_sha256': ident,
-                                     'historical_native_yuv_sha256': ident})
+                                     'historical_native_yuv_sha256': ident, 'policy': 's2_o0', 'crf': 63})
             reviews[role].append({**base, 'score_array_sha256': digest})
             rows.append({**base, 'role': role, 'values': values.copy()})
     return (inventory, rows, {'approved_historical_reuse': True, 'rows': reviews['rerate']},
@@ -55,3 +56,35 @@ def test_unapproved_or_incomplete_new_scores_cannot_form_hull():
 def test_nonoverlap_never_invents_bd_rate():
     value = subject.compare_curves([(1.0, 0.0), (2.0, 0.1)], [(1.0, 0.5), (2.0, 0.6)])
     assert value == {'bd_rate': None, 'basis': 'no overlapping quality range'}
+
+
+def test_bank_horizons_and_no_extrapolation():
+    row = {'rate_kbps': 20.0, 'billing_correction': {'intended_bank_bytes': 1_000_000}}
+    assert subject.bank_rate(row, 'al028', 7200) == 20.0
+    assert subject.bank_rate(row, 'al028', 3600) > 20.0
+    assert subject.bank_rate(row, 'al028', 1800) > subject.bank_rate(row, 'al028', 3600)
+    points = [(10.0, -0.4), (20.0, -0.2)]
+    assert subject._in_bracket_hull(points, 5.0) is None
+    assert subject._in_bracket_hull(points, 25.0) is None
+    assert subject._in_bracket_hull(points, 15.0) is not None
+
+
+def test_review_sha_must_match_before_loading_archives(tmp_path):
+    old = tmp_path / 'old.json'
+    old.write_text('{}')
+    control = tmp_path / 'control.json'
+    control.write_text('{}')
+    with pytest.raises(ValueError, match='SHA mismatch'):
+        subject.load_historical(old, control, {})
+
+
+def test_decision_preserves_missing_brackets_and_18_scenarios():
+    views = subject.verified_views(*fixture())
+    billing = {name: {'rate_kbps': 20.0, 'billing_correction': {'intended_bank_bytes': 1_000_000},
+                      'dcvc_points': [], 'hybrid': {m: {'whole': .5, 'foreground': .5}
+                                                   for m in ('lpips', 'dists')}}
+               for name in subject.w7_analysis.WINDOWS}
+    report = subject.decision_report(views, billing)
+    assert len(report['scenarios']) == 18
+    assert all(case['holds'] is None for case in report['scenarios'].values())
+    assert len(report['roles']) == 75
