@@ -204,6 +204,7 @@ def test_checkpoint_assembly_passes_real_report_validator(tmp_path, monkeypatch)
     report = fixture_output(root, monkeypatch)
     scored_points = json.loads(json.dumps(report['points']))
     report['checkpoint_prepare'] = True
+    report['full_metrics'] = False
     for point in report['points']:
         point['baseline'].update(metrics=[], judges={})
         point['streak'].update(metrics=[], judges={}, reuse=None)
@@ -244,3 +245,37 @@ def test_checkpoint_parity_compares_full_scores_and_ignores_relocated_command(tm
     (current / 'pilot.json').write_text(json.dumps(report))
     with pytest.raises(ValueError):
         cp.compare_equivalence(prior, current, enc.oracle.sha(prior / 'pilot.json'))
+
+
+def test_prepared_validator_rejects_scored_or_incomplete_reports(tmp_path, monkeypatch):
+    report = fixture_output(tmp_path, monkeypatch)
+    report['checkpoint_prepare'] = True
+    report['full_metrics'] = False
+    for point in report['points']:
+        point['baseline'].update(metrics=[], judges={})
+        point['streak'].update(metrics=[], judges={}, reuse=None)
+    def write():
+        (tmp_path / 'pilot.json').write_text(json.dumps(report))
+    write()
+    assert enc.validate(tmp_path, prepared=True)['points'] == 6
+    with pytest.raises(ValueError, match='prepared report'):
+        enc.validate(tmp_path)
+    report['points'][0]['baseline']['metrics'] = [{'frame': 0}]
+    write()
+    with pytest.raises(ValueError, match='partial scores'):
+        enc.validate(tmp_path, prepared=True)
+    report['points'][0]['baseline']['metrics'] = []
+    report['points'][0]['streak']['judges'] = {'wasb': {}}
+    write()
+    with pytest.raises(ValueError, match='partial scores'):
+        enc.validate(tmp_path, prepared=True)
+    report['points'][0]['streak']['judges'] = {}
+    report['points'][0]['streak']['reuse'] = 'disabled'
+    write()
+    with pytest.raises(ValueError, match='partial scores'):
+        enc.validate(tmp_path, prepared=True)
+    report['points'][0]['streak']['reuse'] = None
+    report['points'].pop()
+    write()
+    with pytest.raises(ValueError, match='six point'):
+        enc.validate(tmp_path, prepared=True)
