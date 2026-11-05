@@ -297,12 +297,15 @@ def validate() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('action', choices=('run', 'validate'))
+    parser.add_argument('--phase', choices=('smoke', 'full'))
     for name in ('archive', 'archive-sha', 'unshare', 'unshare-sha', 'ffmpeg-sha', 'encoder-sha', 'decoder-sha'):
         parser.add_argument('--' + name)
     args = parser.parse_args()
     if args.action == 'validate':
         validate()
     else:
+        if args.phase != os.environ.get('PS_STAGE'):
+            parser.error('phase must match fleet stage')
         if any(getattr(args, name) is None for name in ('archive', 'archive_sha', 'unshare', 'unshare_sha',
                                                         'ffmpeg_sha', 'encoder_sha', 'decoder_sha')):
             parser.error('all pinned inputs and executable hashes are required')
