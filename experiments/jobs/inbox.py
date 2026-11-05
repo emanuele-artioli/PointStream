@@ -1331,15 +1331,22 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         if transfer_seconds > 90:
             raise fleet.FleetError("bounded snapshot transfer seconds must be <=90")
     config = load_config(args.state_dir)
+    upload_host = getattr(args, "snapshot_upload_host", None)
+    if upload_host is not None:
+        if upload_host not in config["hosts"]:
+            raise fleet.FleetError("snapshot upload host must be in the verified fleet configuration")
+        report = doctor(config["hosts"])
+        if not report.get("passed") or report.get("base") != config.get("base"):
+            raise fleet.FleetError("snapshot upload host requires a passing shared-visibility fleet doctor")
     spec = validate_spec(json.loads(args.spec.read_text()), now=time.time())
     if not set(spec["hosts"]).issubset(config["hosts"]):
         raise fleet.FleetError("job hosts must have verified workers")
     health = remote_rpc(config, "health", {"hosts": config["hosts"]})
-    for alias in spec["hosts"]:
+    for alias in dict.fromkeys([*spec["hosts"], *([upload_host] if upload_host is not None else [])]):
         heartbeat = health["workers"].get(alias)
         if not heartbeat or time.time() - heartbeat["updated"] > 3 * POLL_SECONDS:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
-        if "cpu_affinity_index" in spec and "indexed_cpu_affinity_v1" not in (heartbeat.get("capabilities") or []):
+        if alias in spec["hosts"] and "cpu_affinity_index" in spec and "indexed_cpu_affinity_v1" not in (heartbeat.get("capabilities") or []):
             raise fleet.FleetError(f"worker {alias} does not advertise indexed CPU affinity; activate the reviewed fleet release first")
     # Keep the archive on NFS and unpack host-locally only when every eligible worker can.
     archive_mode = all("source_archive" in (health["workers"][alias].get("capabilities") or []) for alias in spec["hosts"])
@@ -1356,6 +1363,8 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     archive_options = {"include_paths": archive_paths} if archive_paths else {}
     snapshot, sha, metadata = fleet._build_snapshot(source_root, include_changes=tuple(args.include_change), include_untracked=tuple(args.include_untracked), **archive_options)
     record = {"job_id": job_id, "status": "preparing", "config": config, "spec_sha256": digest(spec), "snapshot": metadata, "chat_id": args.chat_id}
+    if upload_host is not None:
+        record["snapshot_upload_host"] = upload_host
     monitor.write_json(args.state_dir / f"{job_id}.json", record)
     try:
         prepare: dict[str, Any] = {"job_id": job_id}
@@ -1368,7 +1377,7 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         transfer_options: dict[str, Any] = {"timeout": transfer_seconds} if transfer_seconds is not None else {}
         if archive_mode:
             transfer_options["extract"] = False
-        fleet._send_snapshot(config["hosts"][0], snapshot, str(Path(prepared["directory"]) / "source"), sha, **transfer_options)
+        fleet._send_snapshot(upload_host or config["hosts"][0], snapshot, str(Path(prepared["directory"]) / "source"), sha, **transfer_options)
         publish: dict[str, Any] = {"job_id": job_id, "spec": spec, "snapshot": metadata}
         if archive_mode:
             publish["source_archive"] = True
@@ -1534,6 +1543,7 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     submission = actions.add_parser("submit")
     submission.add_argument("spec", type=Path)
     submission.add_argument("--source-worktree", type=Path, help="snapshot an explicit checkout of this same repository; default is the canonical checkout")
+    submission.add_argument("--snapshot-upload-host", help="route archive upload through a verified fleet host after a fresh shared-visibility doctor")
     submission.add_argument("--snapshot-transfer-seconds", type=float, help="bound each archive transfer/extraction to at most 90 seconds; default preserves the fleet timeout")
     submission.add_argument("--snapshot-path", action="append", default=[], help="archive only this reviewed tracked file/directory from HEAD; repeat for a complete workload dependency set")
     submission.add_argument("--chat-id", default=os.environ.get("CODEX_THREAD_ID"), help="submitting Codex chat; register its five-minute heartbeat")

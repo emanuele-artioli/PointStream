@@ -256,3 +256,74 @@ def test_selftest_spec_is_valid_and_allows_a_cold_nfs_torch_import(tmp_path, mon
     spec = inbox.validate_spec(inbox.selftest_submit(Namespace(state_dir=tmp_path / "state", hosts=["gpu6"]), tmp_path))
     assert spec["smoke"]["seconds"] >= 3 * 61 - 3 and spec["full"]["seconds"] >= spec["smoke"]["seconds"]
     assert spec["deadline_epoch"] - time.time() > spec["budget_seconds"]
+
+
+@pytest.mark.parametrize('chosen, expected', [(None, 'gpu1'), ('gpu2', 'gpu2')])
+def test_submit_routes_only_snapshot_through_verified_host(tmp_path, monkeypatch, chosen, expected):
+    from argparse import Namespace
+
+    spec_path = tmp_path / 'spec.json'
+    spec_path.write_text(json.dumps(specification(tmp_path)))
+    snapshot = tmp_path / 'snapshot.tar'
+    snapshot.write_bytes(b'fixed archive')
+    config = {'hosts': ['gpu1', 'gpu2'], 'base': '/data/jobs/fleet'}
+    sent = []
+    payloads = {}
+    monkeypatch.setattr(inbox, 'load_config', lambda _: config)
+    monkeypatch.setattr(inbox, 'doctor', lambda _: {'passed': True, 'base': config['base']})
+    monkeypatch.setattr(fleet, '_build_snapshot', lambda *a, **kw: (snapshot, 'fixed-sha', {}))
+    monkeypatch.setattr(fleet, '_send_snapshot', lambda *a, **kw: sent.append((a, kw)))
+    def remote(_config, action, payload):
+        payloads[action] = payload
+        if action == 'health':
+            return {'workers': {h: {'updated': time.time(), 'capabilities': ['source_archive']} for h in config['hosts']}}
+        if action == 'prepare':
+            return {'directory': '/data/jobs/fleet/inbox/' + payload['job_id'], 'source_archive': True}
+        return {'status': 'pending'}
+    monkeypatch.setattr(inbox, 'remote_rpc', remote)
+    args = Namespace(state_dir=tmp_path / 'state', spec=spec_path, include_change=[], include_untracked=[],
+                     chat_id='chat', snapshot_upload_host=chosen, snapshot_transfer_seconds=90)
+    result = inbox.submit(args, tmp_path)
+    assert sent[0][0][0] == expected
+    assert sent[0][0][1:] == (snapshot, '/data/jobs/fleet/inbox/' + result['job_id'] + '/source', 'fixed-sha')
+    assert sent[0][1]['extract'] is False and sent[0][1]['timeout'] == 90
+    assert payloads['publish']['spec']['hosts'] == ['gpu1']
+    assert result.get('snapshot_upload_host') == chosen
+
+
+def test_upload_host_rejects_unconfigured_or_failed_visibility_before_prepare(tmp_path, monkeypatch):
+    from argparse import Namespace
+
+    spec_path = tmp_path / 'spec.json'
+    spec_path.write_text(json.dumps(specification(tmp_path)))
+    config = {'hosts': ['gpu1', 'gpu2'], 'base': '/data/jobs/fleet'}
+    monkeypatch.setattr(inbox, 'load_config', lambda _: config)
+    monkeypatch.setattr(inbox, 'remote_rpc', lambda *a: pytest.fail('must not prepare or publish'))
+    args = Namespace(state_dir=tmp_path / 'state', spec=spec_path, include_change=[], include_untracked=[],
+                     chat_id='chat', snapshot_upload_host='gpu6')
+    with pytest.raises(fleet.FleetError, match='verified fleet configuration'):
+        inbox.submit(args, tmp_path)
+    args.snapshot_upload_host = 'gpu2'
+    for report in ({'passed': False, 'base': config['base']}, {'passed': True, 'base': '/other'}):
+        monkeypatch.setattr(inbox, 'doctor', lambda _, r=report: r)
+        with pytest.raises(fleet.FleetError, match='shared-visibility'):
+            inbox.submit(args, tmp_path)
+
+
+def test_upload_host_requires_fresh_heartbeat_before_prepare(tmp_path, monkeypatch):
+    from argparse import Namespace
+
+    spec_path = tmp_path / 'spec.json'
+    spec_path.write_text(json.dumps(specification(tmp_path)))
+    config = {'hosts': ['gpu1', 'gpu2'], 'base': '/data/jobs/fleet'}
+    monkeypatch.setattr(inbox, 'load_config', lambda _: config)
+    monkeypatch.setattr(inbox, 'doctor', lambda _: {'passed': True, 'base': config['base']})
+    def remote(_config, action, _payload):
+        if action != 'health':
+            pytest.fail('must not prepare or publish')
+        return {'workers': {'gpu1': {'updated': time.time()}, 'gpu2': {'updated': 0}}}
+    monkeypatch.setattr(inbox, 'remote_rpc', remote)
+    args = Namespace(state_dir=tmp_path / 'state', spec=spec_path, include_change=[], include_untracked=[],
+                     chat_id='chat', snapshot_upload_host='gpu2')
+    with pytest.raises(fleet.FleetError, match='gpu2 has no fresh heartbeat'):
+        inbox.submit(args, tmp_path)
