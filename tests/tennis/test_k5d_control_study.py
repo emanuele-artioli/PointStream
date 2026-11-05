@@ -141,11 +141,12 @@ def test_confirmation_requires_both_audited_receipts_without_full30_fit(
               'consumer_snapshot_sha256': 'y', 'changed_paths': [], 'unchanged_files': 1}
     cpu = {'schema': 1, 'audited': True, 'passed': True, 'scope': 'native CPU PID containment and accounting',
            'namespace_wrapper_sha256': 'w' * 64, 'unshare_sha256': 'd' * 64,
+           'consumer_execution_identity': {'new': 'new'}, 'job_id': '20261105T000000Z-12345678',
            'cases': ['normal', 'timeout', 'sigterm', 'sigkill'], 'all_owned_pids_absent': True,
            'independent_cpu_match': True}
     parity = {'schema': 1, 'audited': True, 'passed': True, 'scope': 'actual 16-frame GPU native and score parity',
-              'consumer_execution_identity': {'new': 'new'}, 'gpu_model': 'RTX A6000', 'gpu_capability': [8, 6],
-              'all_six_exact': True, 'namespace_wrapper_sha256': 'w' * 64}
+              'consumer_execution_identity': {'new': 'new'}, 'job_id': '20261105T000000Z-abcdef12',
+              'gpu_model': 'RTX A6000', 'gpu_capability': [8, 6], 'all_six_exact': True, 'namespace_wrapper_sha256': 'w' * 64}
     objects = {'gate': gate, 'cost': data, 'bridge': bridge, 'ledger': {}, 'budget': {}, 'cpu': cpu, 'parity': parity}
     monkeypatch.setattr(study, 'checked_json', lambda path, _: objects[path.name])
     monkeypatch.setattr(study, 'selection', lambda: {clips[0]: {'label_rows': 292}, clips[1]: {'label_rows': 586}})

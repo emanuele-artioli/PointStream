@@ -221,12 +221,15 @@ def approved(gate_path: Path, gate_sha: str, cost_path: Path, cost_sha: str, bri
         parity = study.checked_json(qualification_paths['gpu_parity'], qualification['gpu_parity_receipt_sha256'])
         if (native.get('schema') != 1 or native.get('audited') is not True or native.get('passed') is not True
                 or native.get('scope') != 'native CPU PID containment and accounting'
+                or native.get('consumer_execution_identity') != identity
+                or not isinstance(native.get('job_id'), str) or not native['job_id'].startswith('2026')
                 or native.get('namespace_wrapper_sha256') != qualification['namespace_wrapper_sha256']
                 or native.get('unshare_sha256') != qualification['unshare_sha256']
                 or native.get('cases') != ['normal', 'timeout', 'sigterm', 'sigkill']
                 or native.get('all_owned_pids_absent') is not True or native.get('independent_cpu_match') is not True
                 or parity.get('schema') != 1 or parity.get('audited') is not True or parity.get('passed') is not True
                 or parity.get('scope') != 'actual 16-frame GPU native and score parity'
+                or not isinstance(parity.get('job_id'), str) or not parity['job_id'].startswith('2026')
                 or parity.get('consumer_execution_identity') != identity or parity.get('gpu_model') != 'RTX A6000'
                 or parity.get('gpu_capability') != [8, 6] or parity.get('all_six_exact') is not True
                 or parity.get('namespace_wrapper_sha256') != qualification['namespace_wrapper_sha256']):

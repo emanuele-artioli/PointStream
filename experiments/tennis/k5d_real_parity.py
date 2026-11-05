@@ -19,7 +19,8 @@ from experiments.tennis import k5d_coalesced as co, k5d_cost_pilot as cost
 from experiments.tennis import k5d_encoder as enc, k5d_fleet as fleet, k5d_source_oracle as oracle
 
 
-def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshare_sha256: str) -> dict:
+def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshare_sha256: str,
+         identity: dict[str, str]) -> dict:
     """Build a bounded candidate only after actual assets are available.
 
     This does not reserve resources or approve a fleet submission.
@@ -34,6 +35,7 @@ def spec(base: dict, *, assets: dict[str, dict[str, str]], deadline: str, unshar
     from experiments.tennis import k5d_scoped_namespace as namespace
     if (cpu.get('audited') is not True or cpu.get('passed') is not True
             or cpu.get('scope') != 'native CPU PID containment and accounting'
+            or cpu.get('consumer_execution_identity') != identity
             or cpu.get('unshare_sha256') != unshare_sha256
             or cpu.get('namespace_wrapper_sha256') != oracle.sha(Path(namespace.__file__))):
         raise ValueError('audited actual CPU proof does not match namespace')
@@ -62,10 +64,13 @@ def run(args: argparse.Namespace) -> None:
     scratch = Path(os.environ['PS_SCRATCH_DIR'])
     if os.environ['PS_STAGE'] != 'smoke' or args.frames != 16:
         raise ValueError('only the 16-frame calibration clip is admitted')
+    identity = cp.execution_identity()
     cpu = json.loads(Path(args.native_cpu_receipt).read_text())
     if (oracle.sha(Path(args.native_cpu_receipt)) != args.native_cpu_receipt_sha256
             or cpu.get('schema') != 1 or cpu.get('audited') is not True or cpu.get('passed') is not True
             or cpu.get('scope') != 'native CPU PID containment and accounting'
+            or cpu.get('consumer_execution_identity') != identity
+            or not isinstance(cpu.get('job_id'), str) or not cpu['job_id'].startswith('2026')
             or cpu.get('all_owned_pids_absent') is not True or cpu.get('independent_cpu_match') is not True
             or cpu.get('cases') != ['normal', 'timeout', 'sigterm', 'sigkill']):
         raise ValueError('audited native CPU proof required')
@@ -77,7 +82,6 @@ def run(args: argparse.Namespace) -> None:
     if (torch.cuda.device_count() != 1 or torch.cuda.get_device_name(0) != 'NVIDIA RTX A6000'
             or tuple(torch.cuda.get_device_capability(0)) != (8, 6)):
         raise ValueError('exclusive A6000 CUDA device required')
-    identity = cp.execution_identity()
     if oracle.sha(cf.AUDIT_PATH) != cf.AUDIT_SHA or oracle.sha(fleet.SOURCE) != fleet.SOURCE_SHA or oracle.sha(fleet.EXPOSURE) != fleet.EXPOSURE_SHA:
         raise ValueError('historical audit, source manifest or exposure differs')
     data = vars(args).copy()
