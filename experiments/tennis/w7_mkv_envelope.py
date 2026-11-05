@@ -371,18 +371,23 @@ def bank_rate(row: dict[str, Any], window: str, horizon: int) -> float:
     return rate
 
 
-def _in_bracket_hull(points: list[tuple[float, float]], rate: float) -> float | None:
+def achievable_at_rate(points: list[tuple[float, float]], rate: float) -> tuple[float | None, str]:
+    """Best achievable quality; carrying an affordable endpoint is not extrapolation."""
+    if not points:
+        return None, 'absent'
     front = g5.envelope(points)
-    if len(front) < 2 or rate < front[0][0] or rate > front[-1][0]:
-        return None
-    return g5.anchor_quality(points, rate)
+    if rate < front[0][0]:
+        return None, 'below_minimum_rate'
+    if rate >= front[-1][0]:
+        return front[-1][1], 'affordable_endpoint'
+    return g5.anchor_quality(points, rate), 'interpolated_bracket'
 
 
 def decision_report(views: dict[str, Any], billing: dict[str, dict[str, Any]]) -> dict[str, Any]:
     """W7 gaps and t intervals at corrected bank rates, across fixed stress cases.
 
-    A missing bracket leaves the corresponding window unresolved. The selected
-    families are preserved as a historical sensitivity, with DCVC as before.
+    The primary carries any affordable codec endpoint. Selected historical
+    families retain the original strict bracket requirement.
     """
     output: dict[str, Any] = {'scope': 'W7 anchor comparison, not fresh historical neural scoring',
                               'deduplicated': views['deduplicated'], 'scenarios': {},
@@ -402,14 +407,22 @@ def decision_report(views: dict[str, Any], billing: dict[str, dict[str, Any]]) -
                     rate = bank_rate(base, name, horizon)
                     subset = [r for r in views[view_name] if r['window'] == name]
                     metrics: dict[str, Any] = {}
+                    coverage: dict[str, Any] = {}
+                    dcvc = w7_analysis.dcvc_value([tuple(x) for x in base['dcvc_points']], rate) if base['dcvc_points'] else None
                     for metric in ('lpips', 'dists'):
                         index = METRICS.index('foreground_' + metric)
                         candidates = []
                         if view_name == 'primary':
                             points = [(r['wire_kbps'], -float(np.mean(r['values'][index]) + stress)) for r in subset]
-                            quality = _in_bracket_hull(points, rate)
+                            quality, svt_status = achievable_at_rate(points, rate)
                             if quality is not None:
                                 candidates.append(('svt_achievable_hull', -quality))
+                            d_index = 4 if metric == 'lpips' else 5
+                            dpoints = [(float(x[1]), -float(x[d_index]) - stress) for x in base['dcvc_points']]
+                            dquality, dcvc_status = achievable_at_rate(dpoints, rate)
+                            coverage[metric] = {'svt': svt_status, 'dcvc': dcvc_status}
+                            if dquality is not None:
+                                candidates.append(('dcvc', -dquality))
                         else:
                             for family in w7_analysis.SVT:
                                 family_rows = [{'rate_kbps': r['wire_kbps'], 'crf': r['crf'],
@@ -421,8 +434,7 @@ def decision_report(views: dict[str, Any], billing: dict[str, dict[str, Any]]) -
                                 value = w1_roi.policy_at_target(family_rows, rate) if family_rows else None
                                 if value is not None:
                                     candidates.append((family, value['foreground_' + metric]))
-                        dcvc = w7_analysis.dcvc_value([tuple(x) for x in base['dcvc_points']], rate) if base['dcvc_points'] else None
-                        if dcvc is not None:
+                        if view_name != 'primary' and dcvc is not None:
                             candidates.append(('dcvc', dcvc['foreground_' + metric] + stress))
                         if candidates:
                             family, score = min(candidates, key=lambda x: x[1])
@@ -435,9 +447,14 @@ def decision_report(views: dict[str, Any], billing: dict[str, dict[str, Any]]) -
                         candidates_whole = []
                         if view_name == 'primary':
                             points = [(r['wire_kbps'], -float(np.mean(r['values'][index]) + stress)) for r in subset]
-                            quality = _in_bracket_hull(points, rate)
+                            quality, _ = achievable_at_rate(points, rate)
                             if quality is not None:
                                 candidates_whole.append(('svt_achievable_hull', -quality))
+                            d_index = 2 if metric == 'lpips' else 3
+                            dpoints = [(float(x[1]), -float(x[d_index]) - stress) for x in base['dcvc_points']]
+                            dquality, _ = achievable_at_rate(dpoints, rate)
+                            if dquality is not None:
+                                candidates_whole.append(('dcvc', -dquality))
                         else:
                             for family in w7_analysis.SVT:
                                 family_rows = [{'rate_kbps': r['wire_kbps'], 'crf': r['crf'],
@@ -449,7 +466,7 @@ def decision_report(views: dict[str, Any], billing: dict[str, dict[str, Any]]) -
                                 value = w1_roi.policy_at_target(family_rows, rate) if family_rows else None
                                 if value is not None:
                                     candidates_whole.append((family, value['whole_' + metric]))
-                        if dcvc is not None:
+                        if view_name != 'primary' and dcvc is not None:
                             candidates_whole.append(('dcvc', dcvc['whole_' + metric] + stress))
                         if candidates_whole:
                             family, score = min(candidates_whole, key=lambda x: x[1])
@@ -473,11 +490,14 @@ def decision_report(views: dict[str, Any], billing: dict[str, dict[str, Any]]) -
                                                 for k, v in dcvc.items()}
                         family_status = {family: 'resolved' if value is not None else 'unresolved'
                                          for family, value in policies.items()}
-                        if not base['dcvc_points']:
-                            family_status['dcvc'] = 'missing'
+                        family_status['dcvc'] = ('absent' if not base['dcvc_points'] else
+                                                 'interpolated_bracket' if dcvc is not None else 'unbracketed')
                         dominance = w1_roi.decide(policies, base['hybrid']) if any(v is not None for v in policies.values()) else None
                     by_window[name] = {'rate_kbps': rate, 'metrics': metrics, 'whole_frame': whole,
-                                       'dcvc_missing': not bool(base['dcvc_points']),
+                                       'dcvc_table_absent': not bool(base['dcvc_points']),
+                                       'dcvc_available_at_rate': (coverage['lpips']['dcvc'] in ('interpolated_bracket', 'affordable_endpoint')
+                                                                  if view_name == 'primary' else dcvc is not None),
+                                       'codec_coverage_by_metric': coverage if view_name == 'primary' else None,
                                        'family_status': family_status, 'w1_dominance': dominance}
                 groups: dict[str, Any] = {}
                 for metric in ('lpips', 'dists'):
@@ -491,12 +511,14 @@ def decision_report(views: dict[str, Any], billing: dict[str, dict[str, Any]]) -
                     clusters[prefix] = {m: w7_analysis.t_interval([r['metrics'][m]['delta'] for r in cluster])
                                         if all(r['metrics'][m] is not None for r in cluster) else None
                                         for m in ('lpips', 'dists')}
-                eligible = [r for r in by_window.values() if not r['dcvc_missing']]
+                eligible = [r for r in by_window.values() if r['dcvc_available_at_rate']]
                 without_missing = {m: w7_analysis.t_interval([r['metrics'][m]['delta'] for r in eligible])
                                    if all(r['metrics'][m] is not None for r in eligible) else None
                                    for m in ('lpips', 'dists')}
                 output['scenarios'][key] = {'windows': by_window, 'pooled': groups, 'clusters': clusters,
-                                             'sensitivity_without_missing_dcvc': without_missing,
+                                             'sensitivity_only_dcvc_available_at_rate': {'intervals': without_missing,
+                                                                                         'windows': [n for n, r in by_window.items() if r['dcvc_available_at_rate']]},
+                                             'holds_scope': 'conditional on available anchors; not a codec win',
                                              'holds': all(groups[m]['complete'] and groups[m]['interval']['excludes_zero_above']
                                                           for m in ('lpips', 'dists')) if all(groups[m]['complete'] for m in groups) else None}
     return output

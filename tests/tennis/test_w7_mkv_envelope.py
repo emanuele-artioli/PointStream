@@ -64,9 +64,11 @@ def test_bank_horizons_and_no_extrapolation():
     assert subject.bank_rate(row, 'al028', 3600) > 20.0
     assert subject.bank_rate(row, 'al028', 1800) > subject.bank_rate(row, 'al028', 3600)
     points = [(10.0, -0.4), (20.0, -0.2)]
-    assert subject._in_bracket_hull(points, 5.0) is None
-    assert subject._in_bracket_hull(points, 25.0) is None
-    assert subject._in_bracket_hull(points, 15.0) is not None
+    assert subject.achievable_at_rate([], 5.0) == (None, 'absent')
+    assert subject.achievable_at_rate(points, 5.0) == (None, 'below_minimum_rate')
+    assert subject.achievable_at_rate(points, 25.0) == (-0.2, 'affordable_endpoint')
+    assert subject.achievable_at_rate(points, 15.0)[1] == 'interpolated_bracket'
+    assert subject.achievable_at_rate(points, 15.0)[0] <= subject.achievable_at_rate(points, 25.0)[0]
 
 
 def test_review_sha_must_match_before_loading_archives(tmp_path):
@@ -87,7 +89,12 @@ def test_decision_preserves_missing_brackets_and_18_scenarios():
     sizes = {(r['role'], r['window'], r['name']): 100 for r in views['all_roles']}
     report = subject.framing_reports(views, billing, sizes)['primary_ivf']
     assert len(report['scenarios']) == 18
-    assert all(case['holds'] is None for case in report['scenarios'].values())
+    historical = [case for key, case in report['scenarios'].items() if key.endswith('historical_family_sensitivity')]
+    assert all(case['holds'] is None for case in historical)
+    primary = [case for key, case in report['scenarios'].items() if key.endswith('primary')]
+    assert all(all(w['codec_coverage_by_metric']['lpips']['svt'] == 'affordable_endpoint'
+                       and w['codec_coverage_by_metric']['lpips']['dcvc'] == 'absent'
+                       for w in case['windows'].values()) for case in primary)
     assert len(report['roles']) == 75
 
 
@@ -110,3 +117,24 @@ def test_gate_rejects_changed_scientific_dependency_identity(tmp_path, monkeypat
     monkeypatch.setattr(subject, 'source_identity', lambda root: {'tracked_python_manifest_sha256': 'changed'})
     with pytest.raises(ValueError, match='source identity'):
         subject.check_final_gate(gate, subject._file_sha(gate), tmp_path)
+
+
+def test_strict_historical_family_keeps_original_no_bracket_rule():
+    points = [{'crf': 1, 'rate_kbps': 10, 'whole_lpips': .3, 'foreground_lpips': .4,
+               'whole_dists': .3, 'foreground_dists': .4},
+              {'crf': 2, 'rate_kbps': 20, 'whole_lpips': .2, 'foreground_lpips': .3,
+               'whole_dists': .2, 'foreground_dists': .3}]
+    assert subject.policy_at_target(points, 25) is None
+    assert subject.achievable_at_rate([(10, -.4), (20, -.3)], 25) == (-.3, 'affordable_endpoint')
+
+
+def test_primary_best_achievable_error_never_rises_with_target_rate():
+    svt = [(10.0, -.6), (20.0, -.4)]
+    dcvc = [(12.0, -.5), (18.0, -.3)]
+    targets = (12.0, 16.0, 21.0, 30.0)
+    best = []
+    for target in targets:
+        values = [v for points in (svt, dcvc) if (v := subject.achievable_at_rate(points, target)[0]) is not None]
+        best.append(-max(values))
+    assert best == sorted(best, reverse=True)
+    assert best[-1] == best[-2]
