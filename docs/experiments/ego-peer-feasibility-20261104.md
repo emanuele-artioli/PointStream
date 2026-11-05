@@ -1,4 +1,4 @@
-# Egocentric mask and generative-peer feasibility, 2026-11-04
+# Experiments: Egocentric mask and generative-peer feasibility, 2026-11-04
 
 ## Decision before any new run
 
