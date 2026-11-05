@@ -1,0 +1,341 @@
+{
+  "cells": {
+    "leaves": {
+      "approved_leaves": [
+        {
+          "device": 64513,
+          "inode": 4198695,
+          "mode": 33188,
+          "name": "/etc/ld.so.cache",
+          "resolved": "/etc/ld.so.cache",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026532133,
+          "mode": 33060,
+          "name": "/proc/cpuinfo",
+          "resolved": "/proc/cpuinfo",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026532134,
+          "mode": 33060,
+          "name": "/proc/devices",
+          "resolved": "/proc/devices",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026534815,
+          "mode": 33060,
+          "name": "/proc/driver/nvidia/capabilities/mig/config",
+          "resolved": "/proc/driver/nvidia/capabilities/mig/config",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026534816,
+          "mode": 33060,
+          "name": "/proc/driver/nvidia/capabilities/mig/monitor",
+          "resolved": "/proc/driver/nvidia/capabilities/mig/monitor",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026534792,
+          "mode": 33060,
+          "name": "/proc/driver/nvidia/params",
+          "resolved": "/proc/driver/nvidia/params",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 745782486,
+          "mode": 33060,
+          "name": "/proc/self/maps",
+          "resolved": "/proc/2146140/maps",
+          "uid": 0
+        },
+        {
+          "device": 24,
+          "inode": 745774270,
+          "mode": 33060,
+          "name": "/proc/self/status",
+          "resolved": "/proc/2146140/status",
+          "uid": 0
+        },
+        {
+          "device": 24,
+          "inode": 4026532138,
+          "mode": 33060,
+          "name": "/proc/stat",
+          "resolved": "/proc/stat",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 82401,
+          "mode": 33188,
+          "name": "/proc/sys/vm/mmap_min_addr",
+          "resolved": "/proc/sys/vm/mmap_min_addr",
+          "uid": 65534
+        },
+        {
+          "device": 23,
+          "inode": 5781,
+          "mode": 33060,
+          "name": "/sys/devices/system/cpu/online",
+          "resolved": "/sys/devices/system/cpu/online",
+          "uid": 65534
+        },
+        {
+          "device": 23,
+          "inode": 48,
+          "mode": 33060,
+          "name": "/sys/devices/system/memory/block_size_bytes",
+          "resolved": "/sys/devices/system/memory/block_size_bytes",
+          "uid": 65534
+        }
+      ],
+      "cpu_seconds": 4.365671999999999,
+      "cuda": {
+        "capability": [
+          8,
+          9
+        ],
+        "device_count": 1,
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "sum": 1048576.0,
+        "torch": "2.7.0+cu128",
+        "torch_cuda": "12.8",
+        "total_memory_bytes": 51010207744,
+        "uuid": "ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+        "visible_devices": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
+      },
+      "error": null,
+      "handled_mask": 13,
+      "landlock_abi": 4,
+      "mutation_denials": {},
+      "namespace": {
+        "net": "net:[4026537944]",
+        "user": "user:[4026537943]"
+      },
+      "output_write_ok": null,
+      "protected_denials": 10,
+      "status": "passed",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "53b845be6d558de69f629e17b5a62901e99cd2dd21e5e6615082fa31e17ccc82",
+      "wall_seconds": 4.4430066710338
+    },
+    "portable": {
+      "approved_leaves": [],
+      "cpu_seconds": 4.368297,
+      "cuda": null,
+      "error": {
+        "message": "Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 2: out of memory",
+        "type": "RuntimeError"
+      },
+      "handled_mask": 13,
+      "landlock_abi": 4,
+      "mutation_denials": {},
+      "namespace": {
+        "net": "net:[4026537944]",
+        "user": "user:[4026537943]"
+      },
+      "output_write_ok": null,
+      "protected_denials": 10,
+      "status": "failed",
+      "stderr_sha256": "032bfea91848a6726326f07c4a349f0075e77dd2ad60d9b6433d0589fffe30d8",
+      "stdout_sha256": "f8afee734f4f6fe728236999d985bc96605ddc32a71442d91559f06869a161f3",
+      "wall_seconds": 4.4349383022636175
+    },
+    "strict": {
+      "approved_leaves": [
+        {
+          "device": 64513,
+          "inode": 4198695,
+          "mode": 33188,
+          "name": "/etc/ld.so.cache",
+          "resolved": "/etc/ld.so.cache",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026532133,
+          "mode": 33060,
+          "name": "/proc/cpuinfo",
+          "resolved": "/proc/cpuinfo",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026532134,
+          "mode": 33060,
+          "name": "/proc/devices",
+          "resolved": "/proc/devices",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026534815,
+          "mode": 33060,
+          "name": "/proc/driver/nvidia/capabilities/mig/config",
+          "resolved": "/proc/driver/nvidia/capabilities/mig/config",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026534816,
+          "mode": 33060,
+          "name": "/proc/driver/nvidia/capabilities/mig/monitor",
+          "resolved": "/proc/driver/nvidia/capabilities/mig/monitor",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 4026534792,
+          "mode": 33060,
+          "name": "/proc/driver/nvidia/params",
+          "resolved": "/proc/driver/nvidia/params",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 745782588,
+          "mode": 33060,
+          "name": "/proc/self/maps",
+          "resolved": "/proc/2147020/maps",
+          "uid": 0
+        },
+        {
+          "device": 24,
+          "inode": 745783384,
+          "mode": 33060,
+          "name": "/proc/self/status",
+          "resolved": "/proc/2147020/status",
+          "uid": 0
+        },
+        {
+          "device": 24,
+          "inode": 4026532138,
+          "mode": 33060,
+          "name": "/proc/stat",
+          "resolved": "/proc/stat",
+          "uid": 65534
+        },
+        {
+          "device": 24,
+          "inode": 82401,
+          "mode": 33188,
+          "name": "/proc/sys/vm/mmap_min_addr",
+          "resolved": "/proc/sys/vm/mmap_min_addr",
+          "uid": 65534
+        },
+        {
+          "device": 23,
+          "inode": 5781,
+          "mode": 33060,
+          "name": "/sys/devices/system/cpu/online",
+          "resolved": "/sys/devices/system/cpu/online",
+          "uid": 65534
+        },
+        {
+          "device": 23,
+          "inode": 48,
+          "mode": 33060,
+          "name": "/sys/devices/system/memory/block_size_bytes",
+          "resolved": "/sys/devices/system/memory/block_size_bytes",
+          "uid": 65534
+        }
+      ],
+      "cpu_seconds": 3.657165000000001,
+      "cuda": {
+        "capability": [
+          8,
+          9
+        ],
+        "device_count": 1,
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "sum": 1048576.0,
+        "torch": "2.7.0+cu128",
+        "torch_cuda": "12.8",
+        "total_memory_bytes": 51010207744,
+        "uuid": "ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+        "visible_devices": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553"
+      },
+      "error": null,
+      "handled_mask": 32767,
+      "landlock_abi": 4,
+      "mutation_denials": {
+        "create": 13,
+        "link": 18,
+        "mkdir": 13,
+        "remove": 13,
+        "rename": 13,
+        "truncate": 13,
+        "write": 13
+      },
+      "namespace": {
+        "net": "net:[4026537944]",
+        "user": "user:[4026537943]"
+      },
+      "output_write_ok": true,
+      "protected_denials": 10,
+      "status": "passed",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "0ddc223a707bf94d69ff54f0cbd52bf29c35b9b5f0afcafd6799fd2646fac633",
+      "wall_seconds": 3.941979927010834
+    }
+  },
+  "checks": {
+    "fixed_twelve_leaves_child_self_paths": true,
+    "loader_host_root_inode": true,
+    "namespace_warmup_thread_fd_no_preinit": true,
+    "normalized_portable_policy_and_diff": true,
+    "protected_identity_receipt": true,
+    "source_archive_and_members_recomputed": true,
+    "strict_mutation_canaries_and_output_write": true,
+    "ten_protected_denials_each": true,
+    "three_argv_and_output_hashes": true
+  },
+  "config_sha256": "3b30fe865b75c6d24d1289fd01e127d7b47b9567c215b38915dc8041e3977eef",
+  "decision": "On this Ada host with this JCV runtime, namespace-on CUDA fails under the old portable read policy and passes under the fixed 12-leaf read policy and under that policy plus tested mutation confinement. This is tiny CUDA availability and these measured boundaries only; it does not identify an individually necessary leaf, qualify model inference/decoding, prove prior OOM, or pass the generation gate.",
+  "fleet_status": "complete; diagnostic measurement only",
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "historical_archive_sha256": "6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713",
+  "historical_members_sha256": {
+    "experiments/tennis/w8_input_job.py": "c7ceda3bbcc1ae69891032c3382b7cde7b022b6c051f3df41a116811ede2a835",
+    "experiments/tennis/w8_receiver_bootstrap.py": "3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49"
+  },
+  "host": "gpu6",
+  "job": "20261105T020103Z-c33fa60e",
+  "loader_identity_sha256": "8c2d901888f253fb7337686efcd1627f6814d270e4c14f89c1190bf9e3dfd7a5",
+  "manifest_sha256": "9a9d61173f33a6e9fd0dccb6770ab645ca13e5880a740c32aabd7b77fc209c09",
+  "profile": "w8-approved-system-leaves-mutation-v1",
+  "protected_identity_receipt_sha256": "aa07461ea2216a633b08d49dc959280326a6d63e7b92198d6d378143d1ad3bca",
+  "resources": {
+    "children_usage_semantics": "cumulative RUSAGE_CHILDREN; do not add arm CPU",
+    "creation_to_terminal_wall_seconds": 120.8577338,
+    "external_audit_cpu": "not separately measured; read-only bounded audit",
+    "gpu_claim_and_compute_processes": "none at canonical status",
+    "phase_reservation_gpu_cpu_seconds": [
+      150,
+      200
+    ],
+    "smoke_command_wall_seconds": 13.726482391357422,
+    "smoke_waited_children_cpu_seconds": 12.963969,
+    "supervisor_pids": "absent after terminal",
+    "supervisor_start_to_terminal_seconds": 30.3670654
+  },
+  "runtime_archive_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+  "runtime_cache": "local-hit, not fully rehashed",
+  "source_revision": "54780ff11db5db19daf9d8188b259bfb2e2720ee",
+  "source_sha256": "ae587697eae4742bc6e317837147acd0eac27ea0189b900af3746b9f422d76c8",
+  "source_tar_sha256": "cf2103d833a775d599eb97bb687648053f41d9b3007474140978147291fb5b66",
+  "spec_sha256": "b4609bc29503f43dfa51985510ca5a2dcfadd26244a5cc83c8da26bcb8698627",
+  "summary_sha256": "1bd0e0923525aa2488f058dea2f2267285c52310f3d2ec0087b04321d0f03848",
+  "warmup_sha256": "23b2b3ca0600a2394d27dd6e9692c9aec33e2d854670975a04e7d9234cdf6a83",
+  "worker_sha256": "4cbca949843da0254644e666b6c6d86400fe37e22b316f921da3fc8715e0f970"
+}

@@ -186,6 +186,55 @@
       "gpu_seconds": 700,
       "cpu_seconds": 900,
       "basis": "entire700GPU/900CPUpreparephase conservativelycharged; source/packetwork completed butscored-validatorcalledonunscoredreport;169.2615scommand; no16controlor48promotion"
+    },
+    {
+      "phase": "hardware-existing-evidence-audit-20261105",
+      "workstream": "shared",
+      "release_stage": "initial",
+      "gpu_seconds": 0,
+      "cpu_seconds": 45,
+      "basis": "bounded localmetadata/savednumericrecords andfleettable audit; noGPU/newmodel; conservativefull45CPUallocation"
+    },
+    {
+      "phase": "w8-cuda-systemtrace-20261105",
+      "workstream": "w8",
+      "release_stage": "initial",
+      "gpu_seconds": 200,
+      "cpu_seconds": 300,
+      "basis": "full200GPU300CPUconservativelycharged; baseline/NNPpassed,LLerror2; trace51denials12systemleaves, no causalindividualpathproof"
+    },
+    {
+      "phase": "k5d-confirmation188-20261105",
+      "workstream": "ball",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 2500,
+      "cpu_seconds": 2800,
+      "basis": "Conservatively charge entire approved ceiling; audited complete16/188sixpoints, no contention, release verified; c6a1f88e audit."
+    },
+    {
+      "phase": "k5d-checkpoint16-48-equivalence-20261105",
+      "workstream": "ball",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 700,
+      "cpu_seconds": 900,
+      "basis": "Conservatively charge entire repair1prepare ceiling; audited complete16/48native and receiver parity; archived measured commands168.562/235.071 seconds.",
+      "subphase": "prepare-repair1"
+    },
+    {
+      "phase": "w8-approved-system-leaves-20261105",
+      "workstream": "w8",
+      "release_stage": "initial",
+      "gpu_seconds": 150,
+      "cpu_seconds": 200,
+      "basis": "Entirephaseceilingconservativelycharged; oldpolicyCUDAerror2,12leaves+strictmutationtinyCUDApassed; audit5db207d1; command13.726s; supervisor30.367s"
+    },
+    {
+      "phase": "verification-cpu-20261105",
+      "workstream": "shared",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 300,
+      "basis": "Conservative CPU allocation for full100.16s localpytest, configuredmypy/Ruff/docs focusedverification and source review; localmissingcv2/PyYAML failures plus transientdochead correctedfocused; not GPU evidence."
     }
   ],
   "reservations": [
@@ -240,7 +289,7 @@
       "workstream": "ball",
       "gpu_seconds": 1200,
       "cpu_seconds": 1500,
-      "status": "conditional reservation, unavailable until full188 archive; not part of initial active admission",
+      "status": "prospectiverelease: separate16/48costpilot600GPU700CPU inclusive; remaining600GPU800CPU conditional188onlyafterSHA-boundrealcostgate. Aggregate1200GPU1500CPU unchanged; no qualityselection.",
       "scope": "contract docs/experiments/k5d-inputs/calibration-controls-contract-20261104.json; 188sameclipSVT62, no newencoding",
       "release_stage": "post-188 conditional"
     },
@@ -317,7 +366,7 @@
       "gpu_seconds": 2500,
       "cpu_seconds": 2800,
       "release_stage": "larger stage2",
-      "status": "prospective root release after16/48 correctness and complete1649.8s full188 forecast; code/specreview beforedispatch"
+      "status": "closed; full2500GPU2800CPU charged; independentlyaudited complete188"
     },
     {
       "phase": "opentt-test2-source-20261105",
@@ -338,10 +387,10 @@
     {
       "phase": "k5d-checkpoint16-48-equivalence-20261105",
       "workstream": "ball",
-      "gpu_seconds": 3400,
-      "cpu_seconds": 4350,
+      "gpu_seconds": 1400,
+      "cpu_seconds": 1800,
       "release_stage": "larger stage2",
-      "status": "prospectively amended: active700/900repair1 +6score450/550 +CPUassemble150; originalfailed700/900chargedseparately; maximum2repairs",
+      "status": "Prospective replacement of six UNLAUNCHED perpoint score jobs: new frozen-source prepare700GPU900CPU plus coalescedall6score700GPU900CPU, assemblyincluded. Failedfirst700900 and successfulrepair700900 charged separately. Strict whole-source identity requires fresh prepare under complete coalesced revision. Cumulative2800GPU3600CPU remains below prior4100/5250 authorization.",
       "authorized_cumulative_gpu_seconds": 4100,
       "authorized_cumulative_cpu_seconds": 5250
     },
@@ -351,7 +400,31 @@
       "gpu_seconds": 200,
       "cpu_seconds": 300,
       "release_stage": "initial",
-      "status": "prospective3tracedcontrols; no automaticgrant/model; tool/code/pilotgates required"
+      "status": "closed; full200GPU300CPUcharged; independentlyauditedtrace/currentpolicyonly"
+    },
+    {
+      "phase": "w8-approved-system-leaves-20261105",
+      "workstream": "w8",
+      "release_stage": "initial",
+      "gpu_seconds": 150,
+      "cpu_seconds": 200,
+      "status": "closed; full150GPU200CPU conservativelycharged; independenttinyCUDA/mutationauditpassed, generationnotqualified"
+    },
+    {
+      "phase": "w7-mkv-profile-byte-oracle-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "initial",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "status": "submitted; newprofile fullwire/nativeYUV oracle, oldstrictremuxFAILpreserved"
+    },
+    {
+      "phase": "w8-strict-decoder-cost-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 700,
+      "cpu_seconds": 1000,
+      "status": "Prospective ceiling; source/CPU correctness, independent policy/input review and rootapprovalbefore dispatch. Actual1/3stepsonly, no training; complete forecast required for futurefullreplay."
     }
   ],
   "jobs": [
@@ -494,7 +567,7 @@
     {
       "job_id": "20261105T003756Z-cc450baf",
       "phase": "k5d-confirmation188-20261105",
-      "state": "submitted; new16/188 gate pending",
+      "state": "complete; independentlyaudited188sixpoints; same-settingdescriptiveonly; released",
       "revision": "b26e5b43702a21c37bcb4357223e0e6a25e1bec5",
       "source_sha256": "c212f85b429f3a1abbca925de25736334fd06ffe9e821fac7798aaa99703fda7",
       "spec_sha256": "2d58571180db6b7d6e1685da78a36d7bc14a1f72ade5f7b56016ae631789bf6e",
@@ -514,7 +587,7 @@
     {
       "job_id": "20261105T005409Z-372411b3",
       "phase": "w8-factorial-cuda-20261105",
-      "state": "submitted; fourcellpilotnotyetqualified",
+      "state": "terminalfleetvalidatorfailure removedscratch; independent fourcell measurementvalid; LLconditionfailedCUDA",
       "revision": "dc19510ff3a49409fbd089b6cb5b92f03adeae4e",
       "source_sha256": "8d92a61eb8ca2c251ee1b0a4d19b52f874e320f11484e02666429574212e2d08",
       "spec_sha256": "3a1e57313425f1d8b9bbaa6f6fcbb7e10bdfa35e8e7aac81bcbf252415bfb76e",
@@ -532,6 +605,60 @@
       "gpu_ceiling": 700,
       "inclusive_cpu_ceiling": 900,
       "frozen_checkout": "/private/tmp/pointstream-checkpoint-frozen-20261105"
+    },
+    {
+      "job_id": "20261105T012016Z-7f12c20a",
+      "phase": "k5d-checkpoint16-48-equivalence-20261105",
+      "subphase": "prepare-repair1",
+      "state": "complete; independentlyaudited16/48nativepreparation exactd8b5, unscoredhonestly; released",
+      "revision": "550e85898acfada12dace83a81ac1e48ae6266cb",
+      "source_sha256": "2d8ce3c31460a745628910d22c20e2af158b5e89533f346f3a4a34c1c7fcffd9",
+      "spec_sha256": "da0d6e81c853e0164143ef5855b2cc42439c5765c186178cfed878f8fb567a1d",
+      "gpu_ceiling": 700,
+      "inclusive_cpu_ceiling": 900,
+      "frozen_checkout": "/private/tmp/pointstream-checkpoint-repair1-frozen-20261105"
+    },
+    {
+      "job_id": "20261105T012119Z-fe074da8",
+      "phase": "w8-cuda-systemtrace-20261105",
+      "state": "complete; independentlyauditedbaseline/NNPpassLLfail trace; released",
+      "revision": "827000fbd7eba7dcbc955a4b4f5a4d209986a534",
+      "source_sha256": "c24896c60fed749494fa7f59bbcb14db115ef16de445ea10c8dcd49a99ec3ec7",
+      "spec_sha256": "3404cfa596ab8707f25315bdd4a93310b1c9fa614e770e56f68a2304e717b751",
+      "gpu_ceiling": 200,
+      "inclusive_cpu_ceiling": 300
+    },
+    {
+      "job_id": "20261105T020103Z-c33fa60e",
+      "phase": "w8-approved-system-leaves-20261105",
+      "state": "complete; independentaudittinyCUDApassedwith12leavesandstrictmutation, generationgatefalse, released",
+      "revision": "54780ff11db5db19daf9d8188b259bfb2e2720ee",
+      "source_sha256": "ae587697eae4742bc6e317837147acd0eac27ea0189b900af3746b9f422d76c8",
+      "spec_sha256": "b4609bc29503f43dfa51985510ca5a2dcfadd26244a5cc83c8da26bcb8698627",
+      "gpu_ceiling": 150,
+      "inclusive_cpu_ceiling": 200
+    },
+    {
+      "job_id": "20261105T020925Z-97a4cf02",
+      "phase": "k5d-checkpoint16-48-equivalence-20261105",
+      "subphase": "coalesced-source-prepare",
+      "state": "submitted; fresh16/48pending",
+      "revision": "f7695b70957c14e87dbf07426afdb7f0492dff36",
+      "source_sha256": "59844fa9daa863ff64f09e16e02a564454fa3c4598288cbdcd3dbc65aed24423",
+      "spec_sha256": "93a9923c782869e5cfc73cbe58cc8831c422f5fe2b1527d66ed72af1e4f73c85",
+      "gpu_ceiling": 700,
+      "inclusive_cpu_ceiling": 900,
+      "frozen_checkout": "/private/tmp/pointstream-coalesced-frozen-20261105"
+    },
+    {
+      "job_id": "20261105T021035Z-04e27283",
+      "phase": "w7-mkv-profile-byte-oracle-20261105",
+      "state": "submitted; transportonly",
+      "revision": "977aa6273a9064d4d86f3104362d7eb323567050",
+      "source_sha256": "02720720ea4149becefc4dc11ce9aac08aaa5cc6af4bdc310eeb25f8c408424c",
+      "spec_sha256": "0d758463bbdfef579daff52fd472445a69c76ea22fb92a6666460627f63c8d8b",
+      "gpu_ceiling": 0,
+      "inclusive_cpu_ceiling": 100
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -542,13 +669,13 @@
   ],
   "monitoring": {
     "mode": "one canonical wholebatch wait; exits on attention",
-    "state": "newboundedbatch; source and188 only; GVCnegativeunderreview",
+    "state": "newboundedbatch coalescedprepare+Matroskaoracle",
     "jobs": [
-      "20261105T003756Z-cc450baf",
-      "20261105T003930Z-a4067c30"
+      "20261105T020925Z-97a4cf02",
+      "20261105T021035Z-04e27283"
     ],
-    "result": "/private/tmp/pointstream-188-source-wait-20261105.json",
-    "max_seconds": 2100,
+    "result": "/private/tmp/pointstream-coalesced-mkv-wait-20261105.json",
+    "max_seconds": 1800,
     "started_utc": "2026-11-05T00:15:51.506888+00:00",
     "deadline_utc": "2026-11-05T00:45:21.789990+00:00",
     "native_completion_resume_verified": false,

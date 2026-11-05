@@ -29,6 +29,8 @@ ARMS = ('native', 'streak', 'disk', 'wrong_position', 'brightness')
 DECODER_SHA = 'e7e2fb1818ed790606a50ed33d9a0c5bf44f57528cb673a86ec37e33fc96c7e6'
 CONTRACT_SHA = '18c88bf2a70ede9a11b793d278924490ff5aa621feb7a703347a8d417e133ac5'
 ENV_SHA = '32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661'
+CALIBRATION_SHA = {'calibration_smoke': 'a39643080425a1b05da7bade7a74c0a96bbf14848434c121ae7f5ab8353e6873',
+                   'calibration_full': 'f0dd118a5d64ca148be675a097606aa6dacb8ae49ffcac639ad30911ae74a727'}
 
 
 def variants(stream: ball_stream.Stream, source: np.ndarray, native: np.ndarray) -> tuple[dict[str, ball_stream.Stream], bool]:
@@ -74,7 +76,9 @@ def bound_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str
             or spec.get('device') != 'gpu' or not 0 < spec.get('budget_seconds', 0) <= 1200
             or spec.get('environment', {}).get('sha256') != ENV_SHA
             or stage_data['environment']['sha256'] != ENV_SHA or len(dispatch.get('cpu_affinity', [])) != 1
-            or spec.get('smoke', {}).get('seconds', 0) > 200 or spec.get('full', {}).get('seconds', 0) > 850):
+            or spec.get('budget_seconds', 0) > 550
+            or spec.get('scale', {}).get('frames') != {'smoke': 16, 'full': 48}
+            or spec.get('smoke', {}).get('seconds', 0) > 130 or spec.get('full', {}).get('seconds', 0) > 400):
         raise ValueError('wrong environment or bounded single-CPU campaign')
     declared = {x['name']: x for x in spec['staged_inputs']}
     actual = {x['name']: x for x in stage_data['inputs']}
@@ -90,6 +94,8 @@ def bound_inputs(stage: Path) -> tuple[dict[str, Path], dict[str, Any], dict[str
         if (len(digest) != 64 or set(digest) == {'0'} or staged['sha256'] != digest
                 or staged.get('extract', False) != item.get('extract', False)):
             raise ValueError('unbound staged identity: ' + name)
+        if name in CALIBRATION_SHA and digest != CALIBRATION_SHA[name]:
+            raise ValueError('calibration publication changed: ' + name)
         if name in fleet.EXPECTED and name not in ('wasb_code', 'wasb_weights', 'balltrack_code') and digest != fleet.EXPECTED[name]:
             raise ValueError('changed immutable input: ' + name)
         path = Path(staged['path']).resolve(strict=True)
@@ -115,11 +121,14 @@ def check_calibration(data: dict[str, bytes], frames: int) -> tuple[dict[str, An
     stream = ball_stream.unpack(wire)
     baseline = ball_stream.unpack(data['svt-62/baseline.psbl'])
     if (len(matching) != 1 or matching[0] != point or pilot['clip'] != 'tracknet/game10/Clip3'
-            or pilot['frames'] != frames or source['frames'] != frames or stream.frames != frames
+            or source['clip'] != pilot['clip'] or pilot['frames'] != frames or source['frames'] != frames or stream.frames != frames
             or stream.codec != 'svt-av1-ivf' or stream.native != data['svt-62/native.bin']
             or baseline.native != stream.native or any(ball.decode_frames(baseline.ball_payload, frames, stream.width, stream.height)[0])
             or hashlib.sha256(wire).hexdigest() != point['wire_sha256']
             or hashlib.sha256(stream.native).hexdigest() != point['native_sha256']
+            or point['receiver']['wire_sha256'] != point['wire_sha256']
+            or point['receiver']['native_sha256'] != point['native_sha256']
+            or point['receiver']['frames'] != frames
             or point['receiver']['decoded_yuv_sha256'] != point['encoder_decoded_sha256']
             or point['receiver']['rendered_rgb_sha256'] != point['encoder_rendered_sha256']
             or not point['decode_parity'] or not point['render_parity']):
@@ -133,7 +142,7 @@ def run(stage: Path, scratch: Path, frames: int) -> None:
     from experiments.tennis import k5d_worker
     started = time.monotonic()
     paths, _, dispatch = bound_inputs(stage)
-    if frames != {'smoke': 16, 'full': 188}.get(stage.name):
+    if frames != {'smoke': 16, 'full': 48}.get(stage.name):
         raise ValueError('stage frame mismatch')
     if len(os.sched_getaffinity(0)) != 1 or not torch.cuda.is_available() or torch.cuda.device_count() != 1:
         raise ValueError('single CPU and one CUDA GPU required')
@@ -145,6 +154,8 @@ def run(stage: Path, scratch: Path, frames: int) -> None:
     cal = paths['calibration_smoke' if frames == 16 else 'calibration_full']
     cal_data = members(cal)
     source_report, point, stream = check_calibration(cal_data, frames)
+    if list(torch.cuda.get_device_capability(0)) != source_report['device']['capability']:
+        raise ValueError('GPU class differs from retained calibration')
     identities = source_report['identities']
     for name in ('archive', 'balltrack_weight', 'wasb_config'):
         if identities[name]['sha256'] != fleet.EXPECTED[name]:
@@ -280,6 +291,33 @@ def validate_result(report: dict[str, Any], frames: int) -> None:
         raise ValueError('disk violates pooled RGB PSNR nondecrease guard')
 
 
+
+def cost_forecast(execution: dict[str, Any], clock: dict[str, Any], now: float, full_limit: float) -> float:
+    elapsed = execution['seconds']
+    if (execution.get('exit_code') != 0 or execution.get('timing_contaminated') is not False
+            or isinstance(elapsed, bool) or not isinstance(elapsed, (int, float))
+            or not math.isfinite(elapsed) or elapsed <= 0
+            or not 0 < clock['started'] <= clock['phase_started'] <= now < clock['budget_end']):
+        raise ValueError('invalid smoke execution or campaign clock')
+    projected = elapsed * 3 * 1.5 + 20
+    if projected > full_limit or projected + 20 > clock['budget_end'] - now:
+        raise ValueError('full control cost forecast exceeds budget')
+    return projected
+
+
+def full188_forecast(seconds16: float, seconds48: float, current16: float, *, reserve: float) -> float:
+    """Prospective bound; admission still requires SHA-bound pilot receipts and review."""
+    values = (seconds16, seconds48, current16, reserve)
+    if (any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) for v in values)
+            or not 0 < seconds16 <= seconds48 or current16 <= 0 or reserve <= 0):
+        raise ValueError('invalid pilot cost evidence')
+    marginal = (seconds48 - seconds16) / 32
+    fixed = seconds16 - 16 * marginal
+    if fixed < 0:
+        raise ValueError('negative fixed pilot cost')
+    return 1.5 * (fixed + 188 * marginal) * max(1., current16 / seconds16) + reserve
+
+
 def validate_smoke(stage: Path, output: Path) -> None:
     try:
         paths, spec, dispatch = bound_inputs(stage)
@@ -341,10 +379,8 @@ def validate_smoke(stage: Path, output: Path) -> None:
         clock = dispatch['campaign_clock']
         now = time.monotonic()
         elapsed = execution['seconds']
-        projected = elapsed * 188 / 16 * 1.25 + 60
+        projected = cost_forecast(execution, clock, now, spec['full']['seconds'])
         remaining = clock['budget_end'] - now
-        if not 0 < elapsed or projected > spec['full']['seconds'] or projected + 60 > remaining:
-            raise ValueError('full control cost forecast exceeds budget')
         result = {'passed': True, 'checks': {'five_arms': True, 'native_streak_parity': True,
                   'metrics_judges_coverage': True, 'cost_projection': True},
                   'projection': {'smoke_seconds': elapsed, 'full_seconds': projected, 'remaining_seconds': remaining}}
@@ -362,10 +398,10 @@ def main() -> None:
     stage = Path(os.environ['PS_STAGE_DIR'])
     if args.validate_smoke:
         validate_smoke(stage, Path(os.environ['PS_VALIDATION_PATH']))
-    elif args.frames in (16, 188):
+    elif args.frames in (16, 48):
         run(stage, Path(os.environ['PS_SCRATCH_DIR']), args.frames)
     else:
-        parser.error('16 or 188 frames required')
+        parser.error('16 or 48 frames required for cost pilot')
 
 
 if __name__ == '__main__':
