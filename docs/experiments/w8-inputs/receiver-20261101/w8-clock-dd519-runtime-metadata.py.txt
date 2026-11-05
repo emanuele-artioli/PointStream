@@ -1,0 +1,21 @@
+"""Separate read-only JCV runtime metadata check; not a replay of the proof."""
+import hashlib, json, os, resource, subprocess
+from pathlib import Path
+ROOT=Path('/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105')
+PYTHON='/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/bin/python'
+code='''import os,sys,torch,json,resource; from pathlib import Path
+p=Path(sys.executable);s=p.stat()
+print(json.dumps({"sys_executable":sys.executable,"resolved_executable":str(p.resolve()),"device":s.st_dev,"inode":s.st_ino,"mode":s.st_mode,"mtime_ns":s.st_mtime_ns,"size":s.st_size,"torch":str(torch.__version__),"torch_cuda":torch.version.cuda,"cuda_initialized":torch.cuda.is_initialized(),"visible":os.environ.get("CUDA_VISIBLE_DEVICES"),"pid":os.getpid(),"pgid":os.getpgrp(),"cpu_seconds":sum(resource.getrusage(resource.RUSAGE_SELF)[:2])}))'''
+env={**os.environ,'CUDA_VISIBLE_DEVICES':'','PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','OMP_NUM_THREADS':'1','OPENBLAS_NUM_THREADS':'1','MKL_NUM_THREADS':'1',**{k:str(ROOT/'temp') for k in ('TMPDIR','TMP','TEMP','XDG_CACHE_HOME','TORCH_HOME')}}
+def limit():resource.setrlimit(resource.RLIMIT_CPU,(8,8))
+p=subprocess.Popen([PYTHON,'-c',code],env=env,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True,preexec_fn=limit)
+out,err=p.communicate(timeout=30)
+if p.returncode:raise RuntimeError(err.decode(errors='replace')[-3000:])
+child=json.loads(out);assert child['pid']==p.pid and child['pgid']==p.pid and child['visible']=='' and not child['cuda_initialized'] and child['torch']=='2.7.0+cu128' and child['torch_cuda']=='12.8'
+try:os.killpg(p.pid,0);group_present=True
+except ProcessLookupError:group_present=False
+pattern='/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105/[p]roof.py'
+scan=subprocess.run(['/usr/bin/pgrep','-f',pattern],capture_output=True,text=True,check=False)
+if scan.returncode not in (0,1):raise RuntimeError('targeted proof process check failed')
+pids=[int(x) for x in scan.stdout.split()];assert not pids and not group_present
+print(json.dumps({'scope':'separate read-only runtime metadata; no proof replay or GPU','metadata':child,'metadata_process_exit':p.returncode,'metadata_process_group_present':group_present,'matching_current_proof_processes':pids,'result_sha256':hashlib.sha256((ROOT/'result.json').read_bytes()).hexdigest()},sort_keys=True))
