@@ -1328,10 +1328,13 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     transfer_seconds = getattr(args, "snapshot_transfer_seconds", None)
     if transfer_seconds is not None:
         number(transfer_seconds, "snapshot transfer seconds")
-        if transfer_seconds > 90:
-            raise fleet.FleetError("bounded snapshot transfer seconds must be <=90")
+        if transfer_seconds > 450:
+            raise fleet.FleetError("bounded snapshot transfer seconds must be <=450")
     config = load_config(args.state_dir)
     upload_host = getattr(args, "snapshot_upload_host", None)
+    cache_archive = getattr(args, "snapshot_cache_archive", None)
+    if cache_archive is not None and upload_host is None:
+        raise fleet.FleetError("snapshot cache archive requires an explicitly verified upload host")
     if upload_host is not None:
         if upload_host not in config["hosts"]:
             raise fleet.FleetError("snapshot upload host must be in the verified fleet configuration")
@@ -1365,6 +1368,8 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
     record = {"job_id": job_id, "status": "preparing", "config": config, "spec_sha256": digest(spec), "snapshot": metadata, "chat_id": args.chat_id}
     if upload_host is not None:
         record["snapshot_upload_host"] = upload_host
+    if cache_archive is not None:
+        record["snapshot_cache_archive"] = cache_archive
     monitor.write_json(args.state_dir / f"{job_id}.json", record)
     try:
         prepare: dict[str, Any] = {"job_id": job_id}
@@ -1377,7 +1382,14 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         transfer_options: dict[str, Any] = {"timeout": transfer_seconds} if transfer_seconds is not None else {}
         if archive_mode:
             transfer_options["extract"] = False
-        fleet._send_snapshot(upload_host or config["hosts"][0], snapshot, str(Path(prepared["directory"]) / "source"), sha, **transfer_options)
+        target = str(Path(prepared["directory"]) / "source")
+        if cache_archive is not None:
+            if not archive_mode or upload_host is None:
+                raise fleet.FleetError("snapshot cache reuse requires verified source-archive mode")
+            fleet._copy_snapshot_from_cache(upload_host, config["pythons"][upload_host], config["base"],
+                                            cache_archive, target, sha, timeout=transfer_seconds)
+        else:
+            fleet._send_snapshot(upload_host or config["hosts"][0], snapshot, target, sha, **transfer_options)
         publish: dict[str, Any] = {"job_id": job_id, "spec": spec, "snapshot": metadata}
         if archive_mode:
             publish["source_archive"] = True
@@ -1543,8 +1555,9 @@ def main(argv_values: list[str] | None = None, *, public_only: bool = False) -> 
     submission = actions.add_parser("submit")
     submission.add_argument("spec", type=Path)
     submission.add_argument("--source-worktree", type=Path, help="snapshot an explicit checkout of this same repository; default is the canonical checkout")
+    submission.add_argument("--snapshot-cache-archive", help="copy a verified matching .tar from shared fleet storage into a fresh job archive")
     submission.add_argument("--snapshot-upload-host", help="route archive upload through a verified fleet host after a fresh shared-visibility doctor")
-    submission.add_argument("--snapshot-transfer-seconds", type=float, help="bound each archive transfer/extraction to at most 90 seconds; default preserves the fleet timeout")
+    submission.add_argument("--snapshot-transfer-seconds", type=float, help="bound each archive transfer/extraction to at most 450 seconds; default preserves the fleet timeout")
     submission.add_argument("--snapshot-path", action="append", default=[], help="archive only this reviewed tracked file/directory from HEAD; repeat for a complete workload dependency set")
     submission.add_argument("--chat-id", default=os.environ.get("CODEX_THREAD_ID"), help="submitting Codex chat; register its five-minute heartbeat")
     for command in (workers, submission):

@@ -327,3 +327,80 @@ def test_upload_host_requires_fresh_heartbeat_before_prepare(tmp_path, monkeypat
                      chat_id='chat', snapshot_upload_host='gpu2')
     with pytest.raises(fleet.FleetError, match='gpu2 has no fresh heartbeat'):
         inbox.submit(args, tmp_path)
+
+
+def test_cache_copy_verifies_sha_and_never_overwrites(tmp_path, monkeypatch):
+    import hashlib
+    import subprocess
+    import sys
+
+    base = tmp_path / 'fleet'
+    base.mkdir()
+    archive = base / 'cached.tar'
+    archive.write_bytes(b'original snapshot bytes')
+    sha = hashlib.sha256(archive.read_bytes()).hexdigest()
+    def local_ssh(_host, argv, *, timeout):
+        return subprocess.run(argv, capture_output=True, text=True, timeout=timeout, check=False)
+    monkeypatch.setattr(fleet, '_ssh', local_ssh)
+    target = base / 'new' / 'source'
+    target.parent.mkdir()
+    fleet._copy_snapshot_from_cache('gpu5', sys.executable, str(base), str(archive), str(target), sha, timeout=30)
+    saved = target.with_suffix('.tar')
+    assert saved.read_bytes() == archive.read_bytes()
+    assert saved.stat().st_ino != archive.stat().st_ino
+    with pytest.raises(fleet.FleetError, match='cache copy failed'):
+        fleet._copy_snapshot_from_cache('gpu5', sys.executable, str(base), str(archive), str(target), sha, timeout=30)
+    assert saved.read_bytes() == b'original snapshot bytes'
+    archive.write_bytes(b'truncated')
+    with pytest.raises(fleet.FleetError, match='cache copy failed'):
+        fleet._copy_snapshot_from_cache('gpu5', sys.executable, str(base), str(archive), str(base / 'other'), sha, timeout=30)
+    assert not (base / 'other.tar').exists()
+    foreign = tmp_path / 'outside.tar'
+    foreign.write_bytes(b'original snapshot bytes')
+    with pytest.raises(fleet.FleetError, match='within shared fleet'):
+        fleet._copy_snapshot_from_cache('gpu5', sys.executable, str(base), str(foreign), str(base / 'other'), sha, timeout=30)
+    link = base / 'link.tar'
+    link.symlink_to(foreign)
+    with pytest.raises(fleet.FleetError, match='cache copy failed'):
+        fleet._copy_snapshot_from_cache('gpu5', sys.executable, str(base), str(link), str(base / 'other'), sha, timeout=30)
+
+
+def test_cache_reuse_requires_explicit_verified_host(tmp_path, monkeypatch):
+    from argparse import Namespace
+
+    monkeypatch.setattr(inbox, 'load_config', lambda _: {'hosts': ['gpu1'], 'base': '/data/jobs/fleet'})
+    args = Namespace(state_dir=tmp_path, snapshot_transfer_seconds=450,
+                     snapshot_cache_archive='/data/jobs/fleet/cache.tar')
+    with pytest.raises(fleet.FleetError, match='explicitly verified upload host'):
+        inbox.submit(args, tmp_path)
+
+
+def test_submit_cache_reuse_keeps_job_spec_and_passes_exact_snapshot_sha(tmp_path, monkeypatch):
+    from argparse import Namespace
+
+    spec_path = tmp_path / 'spec.json'
+    spec_path.write_text(json.dumps(specification(tmp_path)))
+    snapshot = tmp_path / 'snapshot.tar'
+    snapshot.write_bytes(b'fixed snapshot')
+    config = {'hosts': ['gpu1', 'gpu2'], 'base': '/data/jobs/fleet', 'pythons': {'gpu2': '/usr/bin/python3'}}
+    copies = []
+    monkeypatch.setattr(inbox, 'load_config', lambda _: config)
+    monkeypatch.setattr(inbox, 'doctor', lambda _: {'passed': True, 'base': config['base']})
+    monkeypatch.setattr(fleet, '_build_snapshot', lambda *a, **kw: (snapshot, 'fixed-sha', {}))
+    monkeypatch.setattr(fleet, '_send_snapshot', lambda *a, **kw: pytest.fail('unexpected stream upload'))
+    monkeypatch.setattr(fleet, '_copy_snapshot_from_cache', lambda *a, **kw: copies.append((a, kw)))
+    def remote(_config, action, payload):
+        if action == 'health':
+            return {'workers': {h: {'updated': time.time(), 'capabilities': ['source_archive']} for h in config['hosts']}}
+        if action == 'prepare':
+            return {'directory': '/data/jobs/fleet/inbox/' + payload['job_id'], 'source_archive': True}
+        assert payload['spec']['hosts'] == ['gpu1']
+        return {'status': 'pending'}
+    monkeypatch.setattr(inbox, 'remote_rpc', remote)
+    args = Namespace(state_dir=tmp_path / 'state', spec=spec_path, include_change=[], include_untracked=[],
+                     chat_id='chat', snapshot_upload_host='gpu2', snapshot_transfer_seconds=450,
+                     snapshot_cache_archive='/data/jobs/fleet/checks/cache.tar')
+    result = inbox.submit(args, tmp_path)
+    assert copies == [(('gpu2', '/usr/bin/python3', config['base'], args.snapshot_cache_archive,
+                        '/data/jobs/fleet/inbox/' + result['job_id'] + '/source', 'fixed-sha'), {'timeout': 450})]
+    assert result['snapshot_cache_archive'] == args.snapshot_cache_archive

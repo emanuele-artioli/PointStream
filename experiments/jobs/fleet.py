@@ -485,6 +485,57 @@ def _remote_path(host: dict[str, Any], *parts: str) -> str:
     return str(Path(host["data_root"]).joinpath("jobs", "fleet", *parts))
 
 
+_CACHE_COPY_PROGRAM = r'''import hashlib, os, pathlib, stat, sys
+base, source, target, expected = sys.argv[1:]
+base = pathlib.Path(base).resolve(strict=True)
+source = pathlib.Path(source)
+target = pathlib.Path(target)
+if not source.is_absolute() or not target.is_absolute() or ".." in source.parts or ".." in target.parts:
+    raise ValueError("absolute normalized paths required")
+if not source.resolve(strict=True).is_relative_to(base) or not target.parent.resolve(strict=True).is_relative_to(base):
+    raise ValueError("cache and target must be within shared fleet storage")
+def digest(stream):
+    h = hashlib.sha256()
+    while block := stream.read(1024 * 1024): h.update(block)
+    return h.hexdigest()
+fd = os.open(source, os.O_RDONLY | os.O_NOFOLLOW)
+with os.fdopen(fd, "rb") as src:
+    before = os.fstat(src.fileno())
+    if not stat.S_ISREG(before.st_mode) or digest(src) != expected:
+        raise ValueError("cache is not a regular file with the expected SHA256")
+    src.seek(0)
+    dest_fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(dest_fd, "wb") as dest:
+        h = hashlib.sha256()
+        while block := src.read(1024 * 1024):
+            dest.write(block)
+            h.update(block)
+        dest.flush()
+        os.fsync(dest.fileno())
+    after = os.fstat(src.fileno())
+    if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns) or h.hexdigest() != expected:
+        raise ValueError("cache changed during copy")
+with target.open("rb") as dest:
+    if digest(dest) != expected: raise ValueError("destination SHA256 mismatch")
+print(expected)
+'''
+
+
+def _copy_snapshot_from_cache(host: str, python: str, base: str, source: str, target: str,
+                              expected_sha256: str, *, timeout: float | None = None) -> None:
+    """Copy verified shared storage to a fresh archive; retain failed partials."""
+    limit = SNAPSHOT_TRANSFER_TIMEOUT_SECONDS if timeout is None else timeout
+    if not isinstance(limit, (int, float)) or not math.isfinite(limit) or limit <= 0:
+        raise FleetError("snapshot transfer timeout must be positive and finite")
+    cache, root = PurePosixPath(source), PurePosixPath(base)
+    if not cache.is_absolute() or ".." in cache.parts or not cache.is_relative_to(root) or cache.suffix != ".tar":
+        raise FleetError("snapshot cache archive must be a .tar within shared fleet storage")
+    destination = str(PurePosixPath(target).with_suffix(".tar"))
+    result = _ssh(host, [python, "-c", _CACHE_COPY_PROGRAM, base, source, destination, expected_sha256], timeout=limit)
+    if result.returncode or result.stdout.strip() != expected_sha256:
+        raise FleetError(f"{host}: snapshot cache copy failed: {(result.stderr or result.stdout)[-4000:]}")
+
+
 def _send_snapshot(
     host: str, source: Path, target: str, expected_sha256: str, *, timeout: float | None = None, extract: bool = True,
 ) -> None:
