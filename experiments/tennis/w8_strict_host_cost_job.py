@@ -171,7 +171,7 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
         (canary / name).write_bytes(b'canary')
     env = {'PYTHONPATH': str(source), 'PYTHONNOUSERSITE': '1', 'PYTHONDONTWRITEBYTECODE': '1',
            'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1'}
-    module = 'experiments.tennis.w8_strict_packet_worker' if config['worker_kind'] == 'packet' else 'experiments.tennis.w8_strict_receiver_worker'
+    module = 'experiments.tennis.w8_strict_packet_worker' if config['worker_kind'] == 'packet' else 'experiments.tennis.w8_strict_host_model_worker'
     if config['worker_kind'] == 'packet':
         env['CUDA_VISIBLE_DEVICES'] = ''
     command = ['/usr/bin/unshare', '--user', '--map-root-user', '--net', str(python), '-m',
@@ -221,7 +221,7 @@ def projection(one: dict[str, Any], three: dict[str, Any], remaining_gpu: float,
     overhead = sum(max(a[k]['gpu_reserved_wall_seconds'], b[k]['gpu_reserved_wall_seconds'])
                    for k in ('model_load', 'original_probe', 'context_probe', 'publication'))
     predicted = 1.35 * 2 * (sampling_30 + overhead + extra_generation_overhead)
-    return {'per_step_gpu_wall_seconds': per_step, 'two_unit_30_step_seconds_upper_projection': predicted,
+    return {'admission_authorized': False, 'per_step_gpu_wall_seconds': per_step, 'two_unit_30_step_seconds_upper_projection': predicted,
             'downstream_reserve_seconds': downstream_reserve,
             'extra_generation_overhead_seconds_per_unit': extra_generation_overhead,
             'remaining_gpu_seconds': remaining_gpu,
@@ -251,7 +251,7 @@ def copy_new(source: Path, target: Path) -> None:
 def durable_member_names() -> list[str]:
     return ['source-manifest.json', 'loader-identity.json', 'packet-config.json', 'generator-config.json',
             f'{fixed.UNITS[0]}@match5.npz', f'{fixed.UNITS[0]}@match5.json', 'sealed.json',
-            'decoded.pt', 'decoded-manifest.json', 'packet-unit.npz', 'packet-unit-other.npz', 'packet-cpu-only.json', 'protected-identity.json']
+            'decoded.pt', 'decoded-manifest.json', 'packet-unit.npz', 'packet-unit-other.npz', 'packet-cpu-only.json', 'protected-identity.json', 'gpu-identity.json']
 
 
 def seal_durable_archive(retained: Path, names: list[str]) -> dict[str, Any]:
@@ -417,6 +417,20 @@ def strict_roots(root: Path, output: Path, runtime: dict[str, Any], files: dict[
     return list(dict.fromkeys(roots))
 
 
+def check_gpu_binding(receipt: dict[str, Any], sealed: dict[str, Any], claimed: str, dispatch: dict[str, Any]) -> None:
+    """Bind this stage's model/kernels to the fleet-selected physical Ada device."""
+    gpu = dispatch.get('environment', {}).get('gpu') or {}
+    expected = strict_policy.canonical_gpu_uuid(claimed)
+    if (strict_policy.canonical_gpu_uuid(gpu.get('uuid', '')) != expected
+            or strict_policy.canonical_gpu_uuid(receipt.get('device_uuid', '')) != expected
+            or strict_policy.canonical_gpu_uuid(receipt.get('visible_devices', '')) != expected
+            or receipt.get('cuda_device_count') != 1 or (receipt.get('major'), receipt.get('minor')) != (8, 9)
+            or 'RTX 6000 Ada' not in receipt.get('name', '')
+            or sealed.get('device') != {'name': receipt['name'], 'major': 8, 'minor': 9}):
+        raise ValueError('model receipt is not bound to dispatched RTX 6000 Ada')
+    receiver.check_execution_receipt(sealed)
+
+
 def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generator_cpu: int,
              worker_wall: int, preflight_path: Path, preflight_sha: str) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
@@ -552,14 +566,23 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
             raise ValueError(f'current generator source differs from frozen identity: {name}')
         generated[f'code:{name}'] = {'path': str(current), 'sha256': digest}
     visible = os.environ.get('CUDA_VISIBLE_DEVICES')
-    if not visible:
-        raise ValueError('fleet must supply an explicit GPU device')
+    dispatch = json.loads((stage / 'dispatch.json').read_text())
+    if not visible or visible != os.environ.get('PS_CLAIMED_GPU_UUID'):
+        raise ValueError('fleet must supply its explicitly claimed GPU device')
+    if strict_policy.canonical_gpu_uuid(visible) != strict_policy.canonical_gpu_uuid((dispatch['environment'].get('gpu') or {}).get('uuid', '')):
+        raise ValueError('dispatch and claimed GPU differ')
     gpu_cfg = config('cost_probe', generated, model_out, policies['jcv'], generator_cpu, visible)
     gpu_cfg['probe_steps'] = steps
     gpu_usage = _worker(Path(policies['jcv']['python']), gpu_cfg, model_work, generator_cpu, worker_wall, root, loader_receipt)
     expected = {'unit': fixed.UNITS[0], 'packet_sha256': fixed.WINDOW_SHA, 'profile_sha256': fixed.PROFILE_SHA,
                 'tensor_fingerprints': fingerprints, 'files': {k: v['sha256'] for k, v in generated.items()}}
     validation = receiver.validate_cost_probe(model_out, expected, steps)
+    device_receipt = json.loads((model_out / 'gpu-identity.json').read_text())
+    sealed_device = json.loads((model_out / 'sealed.json').read_text())
+    if (device_receipt.get('sealed_sha256') != fixed.file_sha(model_out / 'sealed.json')
+            or device_receipt.get('config_sha256') != fixed.file_sha(model_work / 'worker-config.json')):
+        raise ValueError('GPU identity is not bound to model receipt and configuration')
+    check_gpu_binding(device_receipt, sealed_device, visible, dispatch)
     seal = json.loads((model_out / 'sealed.json').read_text())
     retained = retained_path(stage)
     retained.parent.mkdir(parents=True, exist_ok=True)
@@ -569,6 +592,7 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
     for src, name in ((source_manifest, 'source-manifest.json'), (loader_receipt, 'loader-identity.json'),
                       (protected_path, 'protected-identity.json'),
                       (decoder_out / 'cpu-only.json', 'packet-cpu-only.json'),
+                      (model_out / 'gpu-identity.json', 'gpu-identity.json'),
                       (decoder_work / 'worker-config.json', 'packet-config.json'),
                       (model_work / 'worker-config.json', 'generator-config.json')):
         copy_new(src, retained / name)
@@ -594,6 +618,7 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
                'loader_identity_sha256': fixed.file_sha(retained / 'loader-identity.json'),
                'protected_identity_sha256': fixed.file_sha(retained / 'protected-identity.json'),
                'packet_cpu_only_sha256': fixed.file_sha(retained / 'packet-cpu-only.json'),
+               'gpu_identity_sha256': fixed.file_sha(retained / 'gpu-identity.json'),
                'packet_config_sha256': fixed.file_sha(retained / 'packet-config.json'),
                'generator_config_sha256': fixed.file_sha(retained / 'generator-config.json'),
                'generation_usage': gpu_usage, 'inputs': {k: digests.digest(v) for k, v in paths.items()},
@@ -666,7 +691,8 @@ def audit_strict_policy(stage: Path, retained: Path, summary: dict[str, Any]) ->
     verify_durable_archive(retained, summary['durable_archive'])
     for file, key in (('source-manifest.json', 'source_manifest_sha256'), ('loader-identity.json', 'loader_identity_sha256'),
                       ('packet-config.json', 'packet_config_sha256'), ('generator-config.json', 'generator_config_sha256'),
-                      ('protected-identity.json', 'protected_identity_sha256'), ('packet-cpu-only.json', 'packet_cpu_only_sha256')):
+                      ('protected-identity.json', 'protected_identity_sha256'), ('packet-cpu-only.json', 'packet_cpu_only_sha256'),
+                      ('gpu-identity.json', 'gpu_identity_sha256')):
         if fixed.file_sha(retained / file) != summary[key]:
             raise ValueError('retained policy identity mismatch: ' + file)
     manifest = json.loads((retained / 'source-manifest.json').read_text())
@@ -705,6 +731,13 @@ def audit_strict_policy(stage: Path, retained: Path, summary: dict[str, Any]) ->
             or cpu_only.get('pre_serialization', {}).get('restored_tensors') != 480
             or cpu_only.get('pre_serialization', {}).get('unit_arrays', 0) <= 0):
         raise ValueError('packet CPU-only receipt incomplete')
+    gpu_receipt = json.loads((retained / 'gpu-identity.json').read_text())
+    sealed_gpu = json.loads((retained / 'sealed.json').read_text())
+    generator_config = json.loads((retained / 'generator-config.json').read_text())
+    if (gpu_receipt.get('sealed_sha256') != fixed.file_sha(retained / 'sealed.json')
+            or gpu_receipt.get('config_sha256') != summary['generator_config_sha256']):
+        raise ValueError('saved GPU identity binding differs')
+    check_gpu_binding(gpu_receipt, sealed_gpu, generator_config['environment']['CUDA_VISIBLE_DEVICES'], dispatch)
     records = (('packet-config.json', json.loads((retained / 'decoded-manifest.json').read_text())['isolation']),
                ('generator-config.json', json.loads((retained / 'sealed.json').read_text())['isolation']))
     for filename, isolation in records:
@@ -887,7 +920,8 @@ def audit_pair(one_path: Path, three_path: Path, oracle_path: Path, remaining_gp
     decision = projection(validations[0], validations[1], remaining_gpu, downstream_reserve,
                           extra_generation_overhead)
     decision['measured_stage_overhead_seconds_per_unit'] = measured_overhead
-    return {'passed': True, 'scope': 'cost projection only, not quality or promotion authority',
+    return {'passed': True, 'admission_authorized': False, 'provenance_scope': 'stage-artifact calculation; terminal job and authoritative ledger require independent review',
+            'scope': 'advisory cost projection only, no quality or promotion authority',
             'one_step': validations[0], 'three_step': validations[1], 'projection': decision}
 
 

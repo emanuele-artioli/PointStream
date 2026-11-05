@@ -104,7 +104,7 @@ def test_fresh_packet_worker_is_cpu_instrumented_and_model_worker_is_separate(tm
         job._worker(tmp_path / 'python', {'worker_kind': kind}, work, 100, 130, tmp_path, loader)
     assert 'experiments.tennis.w8_strict_packet_worker' in calls[0][0]
     assert calls[0][1]['CUDA_VISIBLE_DEVICES'] == ''
-    assert 'experiments.tennis.w8_strict_receiver_worker' in calls[1][0]
+    assert 'experiments.tennis.w8_strict_host_model_worker' in calls[1][0]
     assert 'CUDA_VISIBLE_DEVICES' not in calls[1][1]
 
 
@@ -112,3 +112,53 @@ def test_new_retained_receipts_are_required():
     names = job.durable_member_names()
     assert 'packet-cpu-only.json' in names
     assert 'protected-identity.json' in names
+
+
+def test_model_receipt_must_bind_claimed_physical_ada(monkeypatch):
+    checked = []
+    monkeypatch.setattr(job.receiver, 'check_execution_receipt', lambda receipt: checked.append(receipt))
+    uuid = 'GPU-12345678-1234-4234-8234-123456789abc'
+    r = {'device_uuid': uuid.removeprefix('GPU-'), 'visible_devices': uuid, 'cuda_device_count': 1,
+         'name': 'NVIDIA RTX 6000 Ada Generation', 'major': 8, 'minor': 9}
+    sealed = {'device': {'name': r['name'], 'major': 8, 'minor': 9}, 'kernels': {'kernel_launches': 42}}
+    dispatch = {'environment': {'gpu': {'uuid': uuid}}}
+    job.check_gpu_binding(r, sealed, uuid, dispatch)
+    assert checked == [sealed]
+    bad = copy.deepcopy(r)
+    bad['device_uuid'] = '00000000-0000-4000-8000-000000000000'
+    with pytest.raises(ValueError, match='dispatched'):
+        job.check_gpu_binding(bad, sealed, uuid, dispatch)
+    bad = copy.deepcopy(r)
+    bad['minor'] = 6
+    with pytest.raises(ValueError, match='dispatched'):
+        job.check_gpu_binding(bad, sealed, uuid, dispatch)
+    bad = copy.deepcopy(dispatch)
+    bad['environment']['gpu']['uuid'] = 'GPU-00000000-0000-4000-8000-000000000000'
+    with pytest.raises(ValueError, match='dispatched'):
+        job.check_gpu_binding(r, sealed, uuid, bad)
+
+
+def test_host_cost_projection_is_advisory_and_never_admits():
+    one = {'scope': 'qualification_only', 'steps': 1, 'unit': 'u', 'phase_costs': {}}
+    three = {'scope': 'qualification_only', 'steps': 3, 'unit': 'u', 'phase_costs': {}}
+    for key in ('model_load', 'original_probe', 'context_probe', 'sampling', 'publication'):
+        one['phase_costs'][key] = {'gpu_reserved_wall_seconds': 1}
+        three['phase_costs'][key] = {'gpu_reserved_wall_seconds': 3 if key == 'sampling' else 1}
+    decision = job.projection(one, three, 10000, 100, 1)
+    assert decision['fits'] is True
+    assert decision['admission_authorized'] is False
+    assert 'no quality evidence' in decision['scope']
+
+
+def test_model_wrapper_rejects_packet_before_isolation_or_cuda(tmp_path, monkeypatch):
+    import json
+    import sys
+    from experiments.tennis import w8_strict_host_model_worker as worker
+    config = tmp_path / 'config.json'
+    config.write_text(json.dumps({'worker_kind': 'packet'}))
+    monkeypatch.setattr(sys, 'argv', ['worker', '--config', str(config), '--config-sha256', worker.receiver.digest(config),
+                                     '--loader', str(config), '--loader-sha256', worker.receiver.digest(config),
+                                     '--canary', str(tmp_path), '--source-root', str(tmp_path)])
+    monkeypatch.setattr(worker.receiver, 'launch', lambda *a, **k: pytest.fail('incorrect model launch'))
+    with pytest.raises(ValueError, match='only admits'):
+        worker.main()
