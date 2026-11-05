@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "approval_date": "2026-11-04",
-  "authority": "User approved staged20GPUh/24workloadCPUh; initial2GPUh/3CPUh feasibility; no training",
-  "gpu_total_seconds": 72000,
-  "cpu_total_seconds": 86400,
+  "authority": "User approved staged20GPUh/24workloadCPUh on20261104; explicitly approved pending ceilingincrease to24GPUh/28workloadCPUh on20261105 and research-first completion of worthwhile PLAN work. No training, legacy200GPUh study, paid API fallback, or submission.",
+  "gpu_total_seconds": 86400,
+  "cpu_total_seconds": 100800,
   "initial_gpu_limit_seconds": 7200,
   "initial_cpu_limit_seconds": 10800,
   "initial_gate": "Ball16/48 correctness and cost gates passed; root prospectively releases only bounded188 stage2; no full30 release. GVC and one-test2-source feasibility remain within initial7200GPU/10800CPU. Controls conditional on188 output.",
   "workstreams": {
     "ball": {
-      "gpu_limit_seconds": 50400,
-      "cpu_limit_seconds": 57600
+      "gpu_limit_seconds": 64800,
+      "cpu_limit_seconds": 72000
     },
     "svt_gaps": {
       "gpu_limit_seconds": 1800,
@@ -1953,7 +1953,8 @@
     "Root20261105prospectivelytransferred560CPUsharedreserve\u2192svt_gaps: workstream3260CPUand4840CPU, global86400unchanged; no newuserallocation.",
     "CompressedtransferfreshCPUallowances20261105",
     "Rootprospective240CPUshared\u2192SVT for separatemanifest-cadenceprofileafterall75framingoraclepassed; old50fps9240failureclosed, no changedinput/quality/gate. SVT3560/shared4540CPUglobal86400unchanged, futurequality1670CPUretained.",
-    "ExplicitgzipSVT60CPUtransfer20261105"
+    "ExplicitgzipSVT60CPUtransfer20261105",
+    "Root20261105userapprovedpending24GPUh/28CPUh (+14400/+14400seconds), assigned increase toball:64800GPU72000CPU. Firstnewtranche9000GPU10800CPU requiresperjobrelease; nofull30automaticadmission. Manuscripteditspauseduntilworthwhileresearchdecisionsresolved."
   ],
   "monitoring": {
     "mode": "one canonical bounded wait",
@@ -1970,5 +1971,22 @@
     "result": "/private/tmp/pointstream-w8-shared-cuda-oracle-wait-20261105.json",
     "local_process_handle": 6605,
     "events_pending_ack": []
-  }
+  },
+  "approval_history": [
+    {
+      "date": "2026-11-04",
+      "authority": "User approved staged20GPUh/24workloadCPUh; initial2GPUh/3CPUh feasibility; no training",
+      "gpu_total_seconds": 72000,
+      "cpu_total_seconds": 86400
+    },
+    {
+      "date": "2026-11-05",
+      "gpu_total_seconds": 86400,
+      "cpu_total_seconds": 100800,
+      "authority": "User: If you agree, increase the cap for this time, and continue until everything that is worth doing from the plan is done. Interpreted as explicit approval of the pending24/28proposal, not unbounded authority.",
+      "initial_new_tranche_gpu_seconds": 9000,
+      "initial_new_tranche_cpu_seconds": 10800,
+      "gate": "Prospective per-job releases only: actual native/CPU/PID/nestednamespace and source-bridge qualification,292/586scale confirmations and complete remaining forecast with1.5margin/reserves. Full30notyetreleased."
+    }
+  ]
 }

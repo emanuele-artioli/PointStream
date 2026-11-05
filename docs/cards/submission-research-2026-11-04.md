@@ -1,7 +1,7 @@
 # Submission research program — 2026-11-04
 
-Status: **APPROVED by the user, 2026-11-04**: a fresh staged ceiling of
-20 GPU-hours /24 workload CPU-hours. Initial release: at most 2 GPU-hours /
+Status: **APPROVED by the user, 2026-11-04; ceiling increased 2026-11-05**:
+24 GPU-hours /28 workload CPU-hours total, including all earlier programme charges. Initial release: at most 2 GPU-hours /
 3 workload CPU-hours across feasibility. Larger stages remain conditional on
 correctness and complete-cost forecasts fitting the approved aggregate and
 workstream ceilings. Ordinary bounded implementation corrections need no new
@@ -30,7 +30,7 @@ negatives. No claim of independent matches beyond documented source identity.
 
 ## Approved inclusive ceilings
 
-A fresh **20 GPU-hours and 24 workload CPU-hours**, including staging, failed
+A total **24 GPU-hours and 28 workload CPU-hours**, including staging, failed
 starts, pilots, native encoding/decoding, inference, metrics, independent audits,
 monitoring and cleanup. All jobs inherit one-CPU bounds unless a separately
 reviewed measured process-tree bound is demonstrably cheaper. Aggregate
@@ -40,13 +40,13 @@ No training, paid API fallback or remote agent session is included.
 
 | Work | GPU ceiling | Workload CPU ceiling |
 |---|---:|---:|
-| Ball source oracles, controls, matched native ladders, 30-clip benchmark and qualified cross-sport subset |14h|16h|
+| Ball source oracles, controls, matched native ladders, 30-clip benchmark and qualified cross-sport subset |18h|20h|
 | Two original SVT half-out gaps, original scoring controls and updated intervals |0.5h|0.75h|
 | New W8 CUDA diagnosis, then cost pilot and one complete fresh witness only on gates |2h|3h|
 | W6 literal control reproduction and bounded smoothing study |0.5h|1.25h|
 | Paid-mask / generative-peer feasibility oracles, no full 34-window sweep |1h|1.5h|
 | Shared admission, audit and uncertainty reserve |2h|1.5h|
-| **Total** |**20h**|**24h**|
+| **Total** |**24h**|**28h**|
 
 The initial release is at most **2 GPU-hours /3 workload CPU-hours** across
 feasibility stages. The rest is usable only after representative smoke and
@@ -140,3 +140,7 @@ The ceiling is150GPU/200CPU, including a120-second one-core campaign and30GPU/80
 The four new SVT scores and 75 complete-byte/native-YUV roles are independently audited. Corrected report `d09b0543` and audit `5a435128` cover six familiar-match windows only, using every valid control (71 distinct streams), complete native IVF as primary and complete MKV separately. Conditional player gaps remain positive, whole-frame anchors are better, med000 DCVC is missing and the Medvedev subgroup is inconclusive. The original-IVF strict half-out brackets remain unresolved; MKV resolves them. Tier 2 remains unchanged. The first report is preserved as invalid after independent endpoint/coverage review; both 120 CPU-second analysis allocations are charged. This is a fairer, more complete conditional comparison, not full-codec certification.
 
 The real public-folder I/O oracle `20261105T071725Z-b5eb8a21` independently passes the unchanged strict policy and all four real file hashes/cleanup; conservative charge 135 CPU-seconds, zero GPU. It qualifies warm-cache mechanics only. An opt-in one-/three-step generation cost candidate remains prospective until its full source/spec/forecast is reviewed. The original 20/24 ceiling is unchanged; proposed 24/28 and larger ball release are pending. No training, paper submission or source-footage redistribution follows.
+
+## Research-first ceiling revision —2026-11-05
+
+User approved the pending24GPUh/28CPUh proposal in `submission-research-budget-revision-2026-11-05.md`, with the first additional9,000GPU/10,800CPU-second tranche conditional on per-job correctness, source-compatibility, real native/namespace/CPU-accounting qualification and292/586 scale confirmations. The aggregate increase is assigned to ball; the full30 study remains gated by a complete forecast and reserves. Pause manuscript edits until worthwhile research endpoints are resolved. Preserve completed negatives, historical ceilings and failed attempts. No training, legacy200GPUh study, or submission.
