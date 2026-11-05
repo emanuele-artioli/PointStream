@@ -103,6 +103,13 @@
       "gpu_seconds": 0,
       "cpu_seconds": 142,
       "basis": "complete CPU-only native roundtrip;82s lifecycle upper bound plus60s external; release verified"
+    },
+    {
+      "phase": "w8-portable-v2-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 65,
+      "cpu_seconds": 360,
+      "basis": "65s creation-to-terminal-update release upperbound; entire360CPU phase conservativelycharged incl inspection; tinygenericCUDApass, isolatedbootstrapandUUIDmachineryfail beforeisolationCUDA"
     }
   ],
   "reservations": [
@@ -205,7 +212,14 @@
       "workstream": "w8",
       "gpu_seconds": 240,
       "cpu_seconds": 360,
-      "status": "prospective reservation; narrower runtime subset; supervisor hashes opaque archives; worker never reads/deserializes weights"
+      "status": "closed;65GPU/full360CPU conservativelycharged; release verified"
+    },
+    {
+      "phase": "w8-portable-v2-repair1-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 240,
+      "cpu_seconds": 360,
+      "status": "prospective rootreviewed repair1; original archived source unchanged, no policyrelaxation"
     }
   ],
   "jobs": [
@@ -307,7 +321,7 @@
     {
       "job_id": "20261105T000744Z-871fc06c",
       "phase": "w8-portable-v2-20261105",
-      "state": "submitted; inspect canonical status",
+      "state": "failed diagnostic machinery; incomplete isolatedmeasurement; processes/claimreleased",
       "revision": "39a0af696dadc00a01b493c4c951311ebb18af93",
       "source_sha256": "de9b1cb25ed238ba7c4dca4fa738c793ec6bd1fd1816da1cb14ac94eed1bc7cf",
       "spec_sha256": "ba951e6ac9a582147305720a80a4e181aca80482f3af7be0ac7d583fa222f1a6",

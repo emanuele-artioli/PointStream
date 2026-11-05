@@ -16,8 +16,9 @@ import sys
 import tarfile
 import time
 import traceback
+import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, TypeVar
 
 PROFILE = 'historical-runtime-policy-relocated-no-weight-read-v1'
 PORTABLE_PROFILE = 'historical-runtime-subset-portable-no-weight-read-v2'
@@ -159,6 +160,29 @@ def check_isolation(receipt: dict[str, Any], config: dict[str, Any]) -> None:
         raise ValueError('invalid historical isolation receipt')
 
 
+T = TypeVar('T')
+
+
+def without_legacy_worker_argv(call: Callable[[], T]) -> T:
+    """Prevent archived import-time CLI limits from treating this worker as its own."""
+    saved = sys.argv
+    try:
+        sys.argv = [saved[0]]
+        return call()
+    finally:
+        sys.argv = saved
+
+
+def canonical_gpu_uuid(value: str) -> uuid.UUID:
+    """Compare only canonical UUID spellings, with NVIDIA's optional GPU- prefix."""
+    if value.startswith('GPU-'):
+        value = value[4:]
+    parsed = uuid.UUID(value)
+    if str(parsed) != value.lower():
+        raise ValueError('noncanonical GPU UUID')
+    return parsed
+
+
 def run_worker(args: argparse.Namespace) -> int:
     # The supervisor is a directly executed script; importing the archived
     # package here must precede any import from the current checkout.
@@ -172,7 +196,7 @@ def run_worker(args: argparse.Namespace) -> int:
     result: dict[str, Any] = {'condition': args.condition, 'status': 'failed'}
     try:
         if args.condition == 'isolated':
-            isolation = bootstrap.bootstrap(config)
+            isolation = without_legacy_worker_argv(lambda: bootstrap.bootstrap(config))
             result['isolation'] = isolation
             check_isolation(isolation, config)
         import torch
@@ -414,7 +438,8 @@ def validate(stage: Path) -> int:
                 or not isinstance(cuda.get('capability'), list) or len(cuda['capability']) != 2
                 or not cuda.get('torch') or not cuda.get('torch_cuda')
                 or abs(cuda.get('total_memory', 0) - manifest['gpu_before']['memory_mib'] * 1048576) > 16 * 1048576
-                or (cuda.get('uuid') and cuda['uuid'].lower() != manifest['gpu_uuid'].lower())):
+                or not isinstance(cuda.get('uuid'), str) or not cuda['uuid']
+                or canonical_gpu_uuid(cuda['uuid']) != canonical_gpu_uuid(manifest['gpu_uuid'])):
             raise ValueError('worker physical GPU or runtime identity mismatch')
         if name == 'isolated':
             check_isolation(result.get('isolation', {}), json.loads((stage / 'worker-config.json').read_text()))

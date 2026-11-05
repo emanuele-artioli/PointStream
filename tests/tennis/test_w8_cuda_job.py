@@ -151,3 +151,48 @@ def test_portable_arm_budget_preserves_sixty_second_reserve():
     assert job.enough_budget(100, 100, job.PORTABLE_PROFILE)
     assert not job.enough_budget(101, 100, job.PORTABLE_PROFILE)
     assert not job.enough_budget(100, 101, job.PORTABLE_PROFILE)
+
+
+def test_gpu_uuid_canonical_comparison():
+    raw = 'ef96fc4f-134e-4c01-290e-9a6c8bbef553'
+    assert job.canonical_gpu_uuid(raw) == job.canonical_gpu_uuid('GPU-' + raw)
+    assert job.canonical_gpu_uuid(raw) != job.canonical_gpu_uuid('GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162')
+    for malformed in ('GPU-', raw.replace('-', ''), '{' + raw + '}'):
+        with pytest.raises(ValueError):
+            job.canonical_gpu_uuid(malformed)
+
+
+def test_archived_worker_cli_import_effect_is_avoided_with_hard_limit():
+    import subprocess
+    import sys
+
+    script = '''
+import importlib, resource, sys
+from experiments.tennis.w8_cuda_job import without_legacy_worker_argv
+resource.setrlimit(resource.RLIMIT_CPU, (60, 60))
+sys.argv = ['w8_cuda_job.py', 'worker', '--condition', 'isolated']
+saved = sys.argv
+try:
+    importlib.import_module('experiments.tennis.w8_input_job')
+except ValueError as exc:
+    assert 'raise maximum limit' in str(exc)
+else:
+    raise AssertionError('legacy import unexpectedly changed hard CPU limit')
+module = without_legacy_worker_argv(lambda: importlib.import_module('experiments.tennis.w8_input_job'))
+assert callable(module.synthetic_torch_bootstrap)
+assert sys.argv is saved and sys.argv[1] == 'worker'
+assert resource.getrlimit(resource.RLIMIT_CPU) == (60, 60)
+'''
+    subprocess.run([sys.executable, '-c', script], check=True, capture_output=True, text=True, timeout=30)
+
+
+def test_argv_restored_after_bootstrap_failure(monkeypatch):
+    import sys
+    original_argv = ['worker', 'worker']
+    monkeypatch.setattr(sys, 'argv', original_argv)
+    def fail():
+        assert sys.argv == ['worker']
+        raise RuntimeError('failed')
+    with pytest.raises(RuntimeError):
+        job.without_legacy_worker_argv(fail)
+    assert sys.argv is original_argv
