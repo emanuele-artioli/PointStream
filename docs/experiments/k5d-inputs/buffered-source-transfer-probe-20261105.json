@@ -1,0 +1,10 @@
+{
+  "status": "complete",
+  "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/buffered-source-20261105T045815Z/source",
+  "sha256": "e007c6e1ddbf6230fde3b171647831f8e53babc35fff8d4f847b837d3dd56511",
+  "size": 16322560,
+  "timeout_seconds": 90,
+  "receiver": "dd bs=1M iflag=fullblock",
+  "revision": "08ee097f",
+  "transfer_and_sha_seconds": 20.743263124953955
+}
