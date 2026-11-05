@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import resource
 import signal
@@ -89,7 +90,7 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
                 for member in descendants(proc.pid):
                     observed[(member['host_pid'], member['start_ticks'])] = member
                     binary = Path(member['executable'])
-                    if (binary.name in expected_native
+                    if (binary.name in expected_native and (case == 'normal' or binary.name == 'SvtAv1EncApp')
                             and binary.resolve() == (Path(sys.prefix) / 'bin' / binary.name).resolve()):
                         active_native = member
                         break
@@ -177,7 +178,11 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
     result = {'case': case, 'launcher': owner, 'init': init, 'native': active_native,
               'observed_members': list(observed.values()), 'members_absent': True,
               'returncode': proc.returncode, 'outer_waited_cpu_seconds': waited_cpu,
-              'inner_records': records, 'native_output': outputs[0] if case == 'normal' else None, 'log_sha256': sha(log)}
+              'inner_records': records, 'native_output': outputs[0] if case == 'normal' else None,
+              'native_commands_sha256': hashlib.sha256(json.dumps(
+                  [outputs[0]['conversion_command'], outputs[0]['native']['encode_command'],
+                   outputs[0]['native']['decode_command']], separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+                  if case == 'normal' else None, 'log_sha256': sha(log)}
     write(proof / 'result.json', result)
     return result
 
@@ -261,6 +266,19 @@ def validate() -> None:
             cases = [read(f'publish/cases/{case}/result.json') for case in CASES]
             before = [read(f'publish/cases/{case}/before-interruption.json') for case in CASES]
         dispatch = json.loads((stage / 'dispatch.json').read_text())
+        spec = json.loads((stage.parent / 'spec.json').read_text())
+        arguments = spec['arguments']
+        def option(name: str) -> str:
+            if arguments.count(name) != 1:
+                raise ValueError('spec option missing or ambiguous: ' + name)
+            return arguments[arguments.index(name) + 1]
+        tools = {'ffmpeg': option('--ffmpeg-sha'), 'SvtAv1EncApp': option('--encoder-sha'),
+                 'dav1d': option('--decoder-sha')}
+        inputs = [entry for entry in staging['inputs'] if entry['name'] == 'archive']
+        if (len(inputs) != 1 or inputs[0]['sha256'] != option('--archive-sha')
+                or record['archive_sha256'] != option('--archive-sha')
+                or record['unshare_sha256'] != option('--unshare-sha') or record['native_tools'] != tools):
+            raise ValueError('oracle assets differ from actual fleet specification')
         if (record['schema'] != 1 or record['stage'] != 'smoke' or record['cases'] != cases
                 or record['source_sha256'] != dispatch['code']['source_sha256']
                 or record['snapshot_sha256'] != dispatch['code']['snapshot_sha256']
@@ -274,7 +292,11 @@ def validate() -> None:
                     or result['native']['pid_namespace'] != result['init']['pid_namespace']
                     or result['init']['pid_namespace'] == pre['outside_namespace']
                     or (result['returncode'] == 0) != (case == 'normal')
-                    or result['outer_waited_cpu_seconds'] <= 0):
+                    or isinstance(result['outer_waited_cpu_seconds'], bool)
+                    or not isinstance(result['outer_waited_cpu_seconds'], (int, float))
+                    or not math.isfinite(result['outer_waited_cpu_seconds']) or result['outer_waited_cpu_seconds'] <= 0
+                    or pre['launcher_executable_sha256'] != option('--unshare-sha')
+                    or (case != 'normal' and Path(result['native']['executable']).name != 'SvtAv1EncApp')):
                 raise ValueError('native or teardown evidence differs')
         normal = cases[0]
         native = normal['native_output']
@@ -284,7 +306,16 @@ def validate() -> None:
                 or native['native']['temporal_units'] != 2 or len(cpu) != 1 or cpu[0]['reason'] != 'complete'
                 or cpu[0]['complete_descendant_wait'] is not True):
             raise ValueError('normal CPU/native proof differs')
-        inner = cpu[0]['children_cpu_seconds'] + cpu[0]['init_cpu_seconds']
+        values = [cpu[0]['children_cpu_seconds'], cpu[0]['init_cpu_seconds']]
+        if any(isinstance(v, bool) or not isinstance(v, (float, int)) or not math.isfinite(v) or v < 0 for v in values):
+            raise ValueError('invalid namespace CPU counter')
+        commands = [native['conversion_command'], native['native']['encode_command'], native['native']['decode_command']]
+        if (normal['native_commands_sha256'] != hashlib.sha256(json.dumps(commands, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+                or native['tools'] != {'ffmpeg': tools['ffmpeg'], 'encoder': tools['SvtAv1EncApp'], 'decoder': tools['dav1d']}
+                or [Path(c[0]).name for c in commands] != ['ffmpeg', 'SvtAv1EncApp', 'dav1d']
+                or native['native']['temporal_units'] != 2):
+            raise ValueError('native command or executable binding differs')
+        inner = sum(values)
         if not 0 <= normal['outer_waited_cpu_seconds'] - inner <= max(0.2, inner * 0.05):
             raise ValueError('normal CPU accounting differs')
         write(target, {'passed': True, 'checks': {'native_and_namespace': True, 'four_exit_modes': True,
