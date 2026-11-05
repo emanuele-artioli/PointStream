@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from experiments.tennis.k5d_pid_escalation_oracle import gone, valid_identity, write
+from experiments.tennis.k5d_pidfd import Pidfd
 
 CASES = ('normal', 'timeout', 'sigterm', 'sigkill')
 
@@ -67,7 +68,7 @@ def descendants(pid: int) -> list[dict[str, Any]]:
 
 
 def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
-             expected_native: dict[str, str]) -> dict[str, Any]:
+             expected_native: dict[str, str], pidfd: Pidfd) -> dict[str, Any]:
     proof = root / case
     proof.mkdir()
     outside = os.readlink('/proc/self/ns/pid')
@@ -120,11 +121,11 @@ def one_case(root: Path, case: str, unshare: Path, native_args: list[str],
             if case != 'normal':
                 if gone(active_native):
                     raise ValueError('owned native process exited before interruption')
-                fd = os.pidfd_open(active_native['host_pid'])
+                fd = pidfd.open(active_native['host_pid'])
                 try:
                     if gone(active_native):
                         raise ValueError('owned native process identity changed')
-                    signal.pidfd_send_signal(fd, signal.SIGSTOP)
+                    pidfd.send(fd, int(signal.SIGSTOP))
                 finally:
                     os.close(fd)
             if case == 'sigterm':
@@ -224,10 +225,18 @@ def execute(args: argparse.Namespace) -> None:
     for name, digest in expected_native.items():
         if sha(Path(sys.prefix) / 'bin' / name) != digest:
             raise ValueError('native executable hash differs: ' + name)
+    pidfd = Pidfd()
+    capability = pidfd.self_check()
+    if 'torch' in sys.modules:
+        raise ValueError('CPU oracle coordinator must not import Torch')
+    from experiments.tennis import k5d_pidfd as pidfd_module
+    capability.update(source_sha256=sha(Path(pidfd_module.__file__)), cuda_visible_devices='',
+                      cpu_affinity=sorted(os.sched_getaffinity(0)), torch_imported=False)
+    write(publish / 'pidfd-capability.json', capability)
     results = []
     for case in CASES:
         try:
-            results.append(one_case(root, case, unshare, native_args, expected_native))
+            results.append(one_case(root, case, unshare, native_args, expected_native, pidfd))
         except Exception as exc:
             write(publish / f'failed-{case}.json', {'case': case, 'error': str(exc),
                   'scope': 'partial native oracle proof; do not retry automatically'})
@@ -238,7 +247,7 @@ def execute(args: argparse.Namespace) -> None:
     write(publish / 'oracle.json', {'schema': 1, 'archive_stat': archive_identity['stat'], 'stage': os.environ['PS_STAGE'],
           'source_sha256': dispatch['code']['source_sha256'], 'snapshot_sha256': dispatch['code']['snapshot_sha256'],
           'environment_sha256': dispatch['staged_environment']['sha256'], 'unshare_sha256': args.unshare_sha,
-          'archive_sha256': args.archive_sha, 'native_tools': expected_native, 'cases': results,
+          'archive_sha256': args.archive_sha, 'native_tools': expected_native, 'pidfd_capability': capability, 'cases': results,
           'scope': 'CPU native process containment and accounting; no GPU, quality or file-denial claim'})
 
 
@@ -265,6 +274,7 @@ def validate() -> None:
             record = read('publish/oracle.json')
             cases = [read(f'publish/cases/{case}/result.json') for case in CASES]
             before = [read(f'publish/cases/{case}/before-interruption.json') for case in CASES]
+            capability = read('publish/pidfd-capability.json')
         dispatch = json.loads((stage / 'dispatch.json').read_text())
         spec = json.loads((stage.parent / 'spec.json').read_text())
         arguments = spec['arguments']
@@ -277,7 +287,15 @@ def validate() -> None:
         inputs = [entry for entry in staging['inputs'] if entry['name'] == 'archive']
         if (len(inputs) != 1 or inputs[0]['sha256'] != option('--archive-sha')
                 or record['archive_sha256'] != option('--archive-sha')
-                or record['unshare_sha256'] != option('--unshare-sha') or record['native_tools'] != tools):
+                or record['unshare_sha256'] != option('--unshare-sha') or record['native_tools'] != tools
+                or record['pidfd_capability'] != capability
+                or capability.get('source_sha256') != sha(Path(__file__).with_name('k5d_pidfd.py'))
+                or capability.get('cuda_visible_devices') != '' or capability.get('torch_imported') is not False
+                or not isinstance(capability.get('cpu_affinity'), list) or len(capability['cpu_affinity']) != 1
+                or record['pidfd_capability'].get('backend') not in ('python', 'libc-exports')
+                or record['pidfd_capability'].get('own_pid_signal_zero') is not True
+                or not record['pidfd_capability'].get('libc_version')
+                or not record['pidfd_capability'].get('python_version')):
             raise ValueError('oracle assets differ from actual fleet specification')
         if (record['schema'] != 1 or record['stage'] != 'smoke' or record['cases'] != cases
                 or record['source_sha256'] != dispatch['code']['source_sha256']
