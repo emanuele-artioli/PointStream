@@ -1,0 +1,75 @@
+{
+  "status": "prospective; no GPU jobs submitted; currently no eligible exclusive host",
+  "source_revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+  "source_archive_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "source_identity": "a4f3b2d25a7d9c9d38b30761d1cb187fc9b63d60ccf33ba7972b106b95ba1558",
+  "regular_files": 311,
+  "archive_local": "/private/tmp/pointstream-gvcrt-endpoints-e6e0-source.tar",
+  "source_diff_base": "9d56c5e181ef1e38dd3977af71453cf6506781cf",
+  "source_diff": [
+    "M\texperiments/generative/gvcrt_peer_job_w8leaves.py",
+    "M\texperiments/tennis/k5d_control_bridge.py",
+    "M\texperiments/tennis/k5d_control_study.py",
+    "A\texperiments/tennis/k5d_cpu_accounting.py",
+    "A\texperiments/tennis/k5d_cpu_accounting_oracle.py",
+    "M\texperiments/tennis/k5d_full_cost_builder.py",
+    "A\texperiments/tennis/k5d_native_cpu_workload.py",
+    "A\texperiments/tennis/k5d_native_pid_oracle.py",
+    "A\texperiments/tennis/k5d_pid_escalation_oracle.py",
+    "A\texperiments/tennis/k5d_pid_namespace_wrapper.py",
+    "A\texperiments/tennis/k5d_pid_teardown_oracle.py",
+    "A\texperiments/tennis/k5d_scoped_namespace.py",
+    "M\texperiments/tennis/k5d_study_wave.py",
+    "A\texperiments/tennis/w8_clock_profile.py",
+    "A\texperiments/tennis/w8_cuda_profiler_synthetic.py",
+    "A\texperiments/tennis/w8_profiler_clock_oracle.py",
+    "M\texperiments/tennis/w8_receiver_generate.py",
+    "M\texperiments/tennis/w8_strict_host_cost_job.py",
+    "M\texperiments/tennis/w8_strict_host_model_worker.py",
+    "M\texperiments/tennis/w8_strict_receiver_worker.py"
+  ],
+  "comparison_scope": "Only peer supervisor changed among directly named native bridge, receiver, scorer, guarded scorer, k5b_trackers, k5d_encoder, k5d_analysis, windows and background g5. No dynamic transitive import claim.",
+  "specs": [
+    {
+      "qp": 0,
+      "spec_path": "/private/tmp/pointstream-gvcrt-endpoint-qp0-spec-20261105.json",
+      "file_sha256": "999d7037242b6b5b3fd8e28aa199e849606bae06e99168e9628b01d0a3b10459",
+      "normalized_sha256": "a185d08bb965ceb91129938ee882b8ce1ddb5b4db13ef59514b513fd19d9585c"
+    },
+    {
+      "qp": 9,
+      "spec_path": "/private/tmp/pointstream-gvcrt-endpoint-qp9-spec-20261105.json",
+      "file_sha256": "515adcaed158f14cd27fc775904840c1503a672b668588065adb79d71a020ae7",
+      "normalized_sha256": "149d7a07cacfa3259cf48a1f3e037eed18936f94566996589ca554cb779d2c3d"
+    }
+  ],
+  "deadline": "2026-11-05T23:08:00Z",
+  "spec_expiry_note": "Refresh deadline and all admission checks if stale; no release implied.",
+  "per_endpoint_cap": {
+    "gpu_seconds": 900,
+    "cpu_seconds": 1000,
+    "campaign_seconds": 800,
+    "cpu_external_seconds": 200
+  },
+  "combined_endpoint_caps": {
+    "gpu_seconds": 1800,
+    "cpu_seconds": 2000
+  },
+  "remaining_cpu_contingency_seconds": 50,
+  "external_cpu_each": {
+    "audit": 100,
+    "transport_and_snapshot": 50,
+    "admission_monitor": 20,
+    "release_teardown": 30
+  },
+  "campaign_each": {
+    "smoke": 200,
+    "smoke_validator": 30,
+    "full": 500,
+    "staging_publication_reserve": 70
+  },
+  "prior_qp3_four_frame_forecast_seconds": 265.70472234813496,
+  "stop": "Both endpoint smokes require their own 1.5x whole-cost projection; promote full only when both endpoint programme and remaining budget fit. Stop on missing/changed identity, contention, timeout, cost or gate failure; no automatic retry.",
+  "readiness": "At 2026-11-05 ~22:44 UTC gpu5 both Adas had foreign compute; gpu6 CPU headroom 0. gpu5 13/15 cache hash-key directories exist, two smaller prior baseline/source tar paths total 15,257,600 bytes; metadata only, no fresh hash proof. No current exclusive host. Refresh immediately before possible submission.",
+  "claims": "Only fixed 16-frame same-source descriptive peer comparison, including both endpoints and failures; no BD-rate, broad ranking or corpus claim."
+}
