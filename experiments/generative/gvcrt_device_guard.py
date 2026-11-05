@@ -24,7 +24,7 @@ def check_device(record: dict[str, Any], claimed: str, *, scorer: bool = False) 
             or canonical_uuid(record.get('uuid')) != expected
             or record.get('visible') != claimed):
         raise ValueError('observed CUDA device differs from claimed Ada')
-    if scorer and (record.get('provider') != 'torch_cuda' or record.get('model_parameters_on_cuda') is not True):
+    if scorer and (record.get('provider') != 'torch_cuda' or record.get('model_first_parameters_on_cuda') is not True):
         raise ValueError('scorer CUDA model provider evidence missing')
 
 

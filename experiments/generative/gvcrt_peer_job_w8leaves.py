@@ -190,6 +190,23 @@ def inspect_gpu(visible: str) -> dict[str, str]:
     return {'uuid': found[0][0], 'name': found[0][1]}
 
 
+def check_saved_device_proof(dispatch: dict[str, Any], result: dict[str, Any], score: dict[str, Any]) -> None:
+    """Rebind saved CUDA observations to the fleet dispatch, not only the saved claim."""
+    claimed = result['gpu_uuid']
+    expected = device_guard.canonical_uuid(claimed)
+    if not claimed.startswith('GPU-'):
+        raise ValueError('full claimed physical GPU UUID required')
+    dispatched = dispatch['environment']['gpu']['uuid']
+    identity = result['gpu_identity']
+    if (device_guard.canonical_uuid(dispatched) != expected or identity['uuid'] != claimed):
+        raise ValueError('dispatch or physical identity differs from saved claim')
+    device_guard.check_device(result['probe_cuda'], claimed)
+    device_guard.check_device(score['device'], claimed, scorer=True)
+    if (score['device']['name'] != identity['name']
+            or result['probe_cuda']['name'] != identity['name']):
+        raise ValueError('observed GPU names differ from physical identity')
+
+
 def tree_identity(tree: Path) -> str:
     files = sorted(p for p in tree.rglob('*') if p.is_file() and p.suffix in ('.py', '.yaml', '.yml'))
     if not files:
@@ -934,11 +951,9 @@ def validate_phase(stage: Path, validation: Path) -> int:
         'f5e65c96230b7f6ca995691647d482237e4cab8a50c5c4a5784f219ef0748218'
         and metric_record.get('dists', {}).get('backbone_sha256') == METRIC_INPUTS['dists_backbone'])
     try:
-        device_guard.check_device(result['probe_cuda'], result['gpu_uuid'])
-        device_guard.check_device(score['device'], result['gpu_uuid'], scorer=True)
-        checks['scorer_device'] = (score['device']['name'] == result['gpu_identity']['name']
-                                   and result['probe_cuda']['name'] == result['gpu_identity']['name'])
-    except (ValueError, TypeError, KeyError):
+        check_saved_device_proof(read_json(stage / 'dispatch.json'), result, score)
+        checks['scorer_device'] = True
+    except (OSError, ValueError, TypeError, KeyError):
         checks['scorer_device'] = False
     if frames == 4:
         try:

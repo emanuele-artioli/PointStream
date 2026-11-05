@@ -37,8 +37,8 @@ def main() -> None:
     if before != after:
         raise ValueError('scorer CUDA device changed')
     # original.score returns only after explicitly checking every metric/judge
-    # model parameter is on CUDA and after completing all metric operations.
-    device = {**after, 'provider': 'torch_cuda', 'model_parameters_on_cuda': True}
+    # model's first parameter is on CUDA and after completing all metric operations.
+    device = {**after, 'provider': 'torch_cuda', 'model_first_parameters_on_cuda': True}
     guard.check_device(device, args.expected_uuid, scorer=True)
     result['device'] = device
     with final.open('x') as f:
