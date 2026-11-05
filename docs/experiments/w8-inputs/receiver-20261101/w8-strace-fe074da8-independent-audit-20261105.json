@@ -1,0 +1,313 @@
+{
+  "baseline_and_nnp_shared_denial": "access(/dev/nvidia-caps/nvidia-cap1,R_OK) returned EACCES in both successful controls",
+  "cells": {
+    "baseline": {
+      "cpu_seconds": 4.803780000000001,
+      "denials": 0,
+      "error": null,
+      "landlock_abi": null,
+      "nnp_after": 0,
+      "nnp_before": 0,
+      "nonprotected_errno_count": 1,
+      "status": "passed",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "85168ac57e391cd9dedc86ae9575cf8f892a0ab0ff9c6001a7ec4ff1588772b6",
+      "trace_sha256": "c63ac9b0852e412cc36c203215ed0fbb8024710c2ebbe51cf9a852c695eb474c",
+      "wall_seconds": 5.099439924582839
+    },
+    "landlock": {
+      "cpu_seconds": 3.679934,
+      "denials": 10,
+      "error": {
+        "message": "Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 2: out of memory",
+        "type": "RuntimeError"
+      },
+      "landlock_abi": 4,
+      "nnp_after": 1,
+      "nnp_before": 0,
+      "nonprotected_errno_count": 51,
+      "status": "failed",
+      "stderr_sha256": "a0b0e8eea9273a4f44058c8f13af4e93e5a304a2924b962c9a30d7f8fa4e4402",
+      "stdout_sha256": "f4992c9a7f3f2f36397b1712f8e71fe4fceb02cac942c765cd3d030e91ef15aa",
+      "trace_sha256": "5b289a70cddb1a0814618d8349b8b8f8477e581ebdb1b24bac835150bab8061b",
+      "wall_seconds": 3.756729293614626
+    },
+    "nnp": {
+      "cpu_seconds": 3.4679409999999997,
+      "denials": 0,
+      "error": null,
+      "landlock_abi": null,
+      "nnp_after": 1,
+      "nnp_before": 0,
+      "nonprotected_errno_count": 1,
+      "status": "passed",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "3e0b986437095adecb2c1919eeb41b803543b4d0342de7f3e6cd9fb0d1d82e13",
+      "trace_sha256": "921ee085ff86f81e2532c1dbf1fca35dc8b543c3da52ba62fd52dfdeee59df85",
+      "wall_seconds": 3.5650857714936137
+    }
+  },
+  "checks": {
+    "nnp_conditions": true,
+    "normalized_portable_policy_and_diff": true,
+    "protected_denials_and_trace_summaries": true,
+    "protected_identity_receipt": true,
+    "same_namespace_warmup_thread_fd_no_preinit": true,
+    "source_archive_and_members_recomputed": true,
+    "three_argv_and_raw_trace_hashes": true
+  },
+  "comparison_limit": "Counts cover the complete traced process. Identical path/flags do not prove equivalent call site or timing; some successful Landlock calls occurred before restrictions. No denial is established as necessary or sufficient.",
+  "config_sha256": "53b6682b2940b21bf83257e9c71c7f7e6d5d08fb970180224d7c82b04a6264a9",
+  "decision": "NNP alone did not reproduce CUDA failure; exact portable Landlock did. Trace identifies 12 denied system path/flag candidates, not a proven causal resource. No grant or model qualification follows.",
+  "denied_openat_comparison": [
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 4
+      },
+      "flags": "O_RDONLY|O_CLOEXEC",
+      "landlock": {
+        "failed_opens": 1,
+        "successful_opens": 3
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 4
+      },
+      "path": "/etc/ld.so.cache",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 4
+      },
+      "flags": "O_RDONLY",
+      "landlock": {
+        "failed_opens": 2,
+        "successful_opens": 2
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 4
+      },
+      "path": "/proc/cpuinfo",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 4
+      },
+      "flags": "O_RDONLY",
+      "landlock": {
+        "failed_opens": 6,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 4
+      },
+      "path": "/proc/devices",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "flags": "O_RDONLY",
+      "landlock": {
+        "failed_opens": 1,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "path": "/proc/driver/nvidia/capabilities/mig/config",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "flags": "O_RDONLY",
+      "landlock": {
+        "failed_opens": 1,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "path": "/proc/driver/nvidia/capabilities/mig/monitor",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 15
+      },
+      "flags": "O_RDONLY",
+      "landlock": {
+        "failed_opens": 15,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 15
+      },
+      "path": "/proc/driver/nvidia/params",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "flags": "O_RDONLY",
+      "landlock": {
+        "failed_opens": 4,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "path": "/proc/self/maps",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "flags": "O_RDONLY",
+      "landlock": {
+        "failed_opens": 2,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "path": "/proc/self/status",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 0
+      },
+      "flags": "O_RDONLY|O_CLOEXEC",
+      "landlock": {
+        "failed_opens": 7,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 0
+      },
+      "path": "/proc/stat",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "flags": "O_RDONLY",
+      "landlock": {
+        "failed_opens": 2,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 2
+      },
+      "path": "/proc/sys/vm/mmap_min_addr",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 7
+      },
+      "flags": "O_RDONLY|O_CLOEXEC",
+      "landlock": {
+        "failed_opens": 7,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 7
+      },
+      "path": "/sys/devices/system/cpu/online",
+      "syscall": "openat"
+    },
+    {
+      "baseline": {
+        "failed_opens": 0,
+        "successful_opens": 3
+      },
+      "flags": "O_RDONLY",
+      "landlock": {
+        "failed_opens": 3,
+        "successful_opens": 0
+      },
+      "landlock_errno": "EACCES",
+      "nnp": {
+        "failed_opens": 0,
+        "successful_opens": 3
+      },
+      "path": "/sys/devices/system/memory/block_size_bytes",
+      "syscall": "openat"
+    }
+  ],
+  "fleet_status": "complete, measurement_complete true, generation gate false",
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "historical_archive_sha256": "6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713",
+  "historical_members_sha256": {
+    "experiments/tennis/w8_input_job.py": "c7ceda3bbcc1ae69891032c3382b7cde7b022b6c051f3df41a116811ede2a835",
+    "experiments/tennis/w8_receiver_bootstrap.py": "3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49"
+  },
+  "host": "gpu6",
+  "job": "20261105T012119Z-fe074da8",
+  "manifest_sha256": "73f20500dfdd21f5ab9914511cadfffa1216f29b84227414e8d65d33a18ce74e",
+  "profile": "portable-w8-nnp-landlock-strace-v1",
+  "protected_identity_receipt_sha256": "aa07461ea2216a633b08d49dc959280326a6d63e7b92198d6d378143d1ad3bca",
+  "resources": {
+    "children_usage_semantics": "cumulative RUSAGE_CHILDREN; do not add arm CPU",
+    "command_wall_seconds": 13.275723934173584,
+    "creation_to_terminal_wall_seconds": 65.1528621,
+    "external_audit_cpu": "not separately measured; bounded CPU-only audit",
+    "gpu_claim_and_compute_processes": "none at canonical status",
+    "supervisor_pids": "absent after terminal",
+    "supervisor_start_to_terminal_seconds": 30.327315,
+    "waited_children_cpu_seconds": 12.578647
+  },
+  "runtime_archive_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+  "runtime_cache": "local-hit, not fully rehashed",
+  "source_revision": "827000fbd7eba7dcbc955a4b4f5a4d209986a534",
+  "source_sha256": "c24896c60fed749494fa7f59bbcb14db115ef16de445ea10c8dcd49a99ec3ec7",
+  "source_tar_sha256": "413fed2d072508df179beeddc80c4efc589586b37f13c03ed3ba7e73ad99335d",
+  "spec_sha256": "3404cfa596ab8707f25315bdd4a93310b1c9fa614e770e56f68a2304e717b751",
+  "strace_sha256": "38a5c75cb29dd85ddd7780d54f5bf595554d7a1b5c42524b23065f5dc4c4b01d",
+  "strace_version": "strace -- version 5.16",
+  "summary_sha256": "a4995115885237da8d2751a9398f8d6e9d8324a46aef5a490082f4f24b8eb35a",
+  "warmup_sha256": "23b2b3ca0600a2394d27dd6e9692c9aec33e2d854670975a04e7d9234cdf6a83",
+  "worker_sha256": "1dbe86fd8a2003507661062e7511fc2b2990bf268e29a51d99f3dbc89a7320e9"
+}

@@ -186,6 +186,22 @@
       "gpu_seconds": 700,
       "cpu_seconds": 900,
       "basis": "entire700GPU/900CPUpreparephase conservativelycharged; source/packetwork completed butscored-validatorcalledonunscoredreport;169.2615scommand; no16controlor48promotion"
+    },
+    {
+      "phase": "hardware-existing-evidence-audit-20261105",
+      "workstream": "shared",
+      "release_stage": "initial",
+      "gpu_seconds": 0,
+      "cpu_seconds": 45,
+      "basis": "bounded localmetadata/savednumericrecords andfleettable audit; noGPU/newmodel; conservativefull45CPUallocation"
+    },
+    {
+      "phase": "w8-cuda-systemtrace-20261105",
+      "workstream": "w8",
+      "release_stage": "initial",
+      "gpu_seconds": 200,
+      "cpu_seconds": 300,
+      "basis": "full200GPU300CPUconservativelycharged; baseline/NNPpassed,LLerror2; trace51denials12systemleaves, no causalindividualpathproof"
     }
   ],
   "reservations": [
@@ -351,7 +367,23 @@
       "gpu_seconds": 200,
       "cpu_seconds": 300,
       "release_stage": "initial",
-      "status": "prospective3tracedcontrols; no automaticgrant/model; tool/code/pilotgates required"
+      "status": "closed; full200GPU300CPUcharged; independentlyauditedtrace/currentpolicyonly"
+    },
+    {
+      "phase": "w8-approved-system-leaves-20261105",
+      "workstream": "w8",
+      "release_stage": "initial",
+      "gpu_seconds": 150,
+      "cpu_seconds": 200,
+      "status": "prospective reservation; rootcode/spec/correctnessreviewbeforeadmission"
+    },
+    {
+      "phase": "w7-mkv-profile-byte-oracle-20261105",
+      "workstream": "svt_gaps",
+      "release_stage": "initial",
+      "gpu_seconds": 0,
+      "cpu_seconds": 100,
+      "status": "prospective reservation; rootcode/spec/correctnessreviewbeforeadmission"
     }
   ],
   "jobs": [
@@ -532,6 +564,28 @@
       "gpu_ceiling": 700,
       "inclusive_cpu_ceiling": 900,
       "frozen_checkout": "/private/tmp/pointstream-checkpoint-frozen-20261105"
+    },
+    {
+      "job_id": "20261105T012016Z-7f12c20a",
+      "phase": "k5d-checkpoint16-48-equivalence-20261105",
+      "subphase": "prepare-repair1",
+      "state": "submitted; no16/48qualificationyet",
+      "revision": "550e85898acfada12dace83a81ac1e48ae6266cb",
+      "source_sha256": "2d8ce3c31460a745628910d22c20e2af158b5e89533f346f3a4a34c1c7fcffd9",
+      "spec_sha256": "da0d6e81c853e0164143ef5855b2cc42439c5765c186178cfed878f8fb567a1d",
+      "gpu_ceiling": 700,
+      "inclusive_cpu_ceiling": 900,
+      "frozen_checkout": "/private/tmp/pointstream-checkpoint-repair1-frozen-20261105"
+    },
+    {
+      "job_id": "20261105T012119Z-fe074da8",
+      "phase": "w8-cuda-systemtrace-20261105",
+      "state": "submitted; controls/tracespending",
+      "revision": "827000fbd7eba7dcbc955a4b4f5a4d209986a534",
+      "source_sha256": "c24896c60fed749494fa7f59bbcb14db115ef16de445ea10c8dcd49a99ec3ec7",
+      "spec_sha256": "3404cfa596ab8707f25315bdd4a93310b1c9fa614e770e56f68a2304e717b751",
+      "gpu_ceiling": 200,
+      "inclusive_cpu_ceiling": 300
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -542,13 +596,13 @@
   ],
   "monitoring": {
     "mode": "one canonical wholebatch wait; exits on attention",
-    "state": "newboundedbatch; source and188 only; GVCnegativeunderreview",
+    "state": "newboundedbatch repair1prepare andsystemtrace",
     "jobs": [
-      "20261105T003756Z-cc450baf",
-      "20261105T003930Z-a4067c30"
+      "20261105T012016Z-7f12c20a",
+      "20261105T012119Z-fe074da8"
     ],
-    "result": "/private/tmp/pointstream-188-source-wait-20261105.json",
-    "max_seconds": 2100,
+    "result": "/private/tmp/pointstream-repair1-trace-wait-20261105.json",
+    "max_seconds": 1800,
     "started_utc": "2026-11-05T00:15:51.506888+00:00",
     "deadline_utc": "2026-11-05T00:45:21.789990+00:00",
     "native_completion_resume_verified": false,

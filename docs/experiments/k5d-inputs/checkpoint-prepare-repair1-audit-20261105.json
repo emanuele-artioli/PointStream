@@ -1,0 +1,16 @@
+{
+  "job_id": "20261105T012016Z-7f12c20a",
+  "status": "complete", "host": "gpu2", "gpu": "NVIDIA RTX A6000",
+  "revision": "550e85898acfada12dace83a81ac1e48ae6266cb",
+  "source_sha256": "2d8ce3c31460a745628910d22c20e2af158b5e89533f346f3a4a34c1c7fcffd9",
+  "spec_sha256": "da0d6e81c853e0164143ef5855b2cc42439c5765c186178cfed878f8fb567a1d",
+  "snapshot_sha256": "d32fca1739f3a667942859bb2f801b3c9371f7c829ee0ca7eb360c895202589a",
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "smoke": {"frames": 16, "archive_sha256": "11c85d45d7d6f0819dfed874276c9c53f52ec06f302e83c545bc91cc63633f5f", "checkpoint_sha256": "a644dbd251c09b567d911bcdf949a331aa3959cd374dc036355b09f923b86a2c", "command_seconds": 168.56175303459167, "execution_sha256": "579228bfb702da4f1e8fb7d8dbdf3dd6196b66625056c6e75ce6ccac996c7b7a", "dispatch_sha256": "7b43fe835d9be16b9cc643ba2e94be140b134731068029cebb6aa2e16236a35e"},
+  "full": {"frames": 48, "archive_sha256": "329dbe6e7987da9a6dbe4b1686e987304177c7bd6c107d1b6b8abb7edfbbafdd", "checkpoint_sha256": "f81a970415da82b9634d48cecf228c22ea350a6c6634ae90d6a1705a13b1e193", "command_seconds": 235.07100248336792, "execution_sha256": "d92895ba0e392712ccd9b83db510eba519eed9a12e137ab353b88e0f904fe262", "dispatch_sha256": "3c09c7d8ae2e278e8143b1732d802979af3e635c8099d3c9545e33ae3374cef5"},
+  "cpu_seconds_cumulative_children_at_full": 401.741013,
+  "supervisor_seconds": 453.213656,
+  "claims_released": true, "observed_pids_absent": [752804, 752814],
+  "checks": ["both checkpoint manifests and frozen native-only validators pass on extracted local archives", "both have six points, false full_metrics and empty scores", "16 parity helper passes against d8b5 smoke 8758597ba524cafc017e25cbd20c15ecbeaeed534d5622dfe67d66eb16521377", "48 source rows, source scores, converted YUV and all six native, wire, zero-ball, decoded and rendered hashes and guard flags match d8b5 full f0dd118a5d64ca148be675a097606aa6dacb8ae49ffcac639ad30911ae74a727"],
+  "scope": "unscored checkpoint preparation and reference comparison; no scorer inference or corpus admission"
+}
