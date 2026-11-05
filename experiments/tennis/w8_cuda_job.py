@@ -281,7 +281,7 @@ def run(args: argparse.Namespace) -> int:
         'normalized_diff': diff(original, config), 'gpu_uuid': visible,
         'dispatch_sha256': digest(Path(os.environ['PS_STAGE_DIR']) / 'dispatch.json'),
         'gpu_before': gpu_info, 'staged_environment': packed,
-        'limitations': ('Stricter subset: pass establishes only runtime/policy CUDA availability; failure may be subset-specific. '
+        'limitations': ('Supervisor hashes opaque protected archives, which may contain weights; worker arms never read or deserialize weights, construct a model or perform inference. Stricter subset: pass establishes only runtime/policy CUDA availability; failure may be subset-specific. '
                         'Neither outcome diagnoses the past failure or qualifies model generation.' if args.profile == PORTABLE_PROFILE
                         else 'CUDA diagnostic only; no model qualification')})
     runtime = Path(sys.executable).resolve(strict=True)
