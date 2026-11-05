@@ -80,9 +80,12 @@ def code_svt(args: argparse.Namespace, yuv: Path, work: Path, window: dict[str, 
                       threads=len(cpus), full_range=False, encoder=args.encoder, decoder=args.decoder, cpus=cpus)
     if rec["decoded_frames"] != frames:
         raise RuntimeError(f"SVT-AV1 CRF {crf}: decoded {rec['decoded_frames']} of {frames} frames")
-    return {"codec": "svt-av1", "param": crf, "kbps": rec["payload_bytes"] * 8 / (frames / float(window["fps"])) / 1000.0,
-            "bytes": rec["payload_bytes"], "stream_sha256": rec["stream_sha256"], "decoded": rec["decoded"],
-            "command": rec["encode_command"], "decode_command": rec["decode_command"]}
+    result = {"codec": "svt-av1", "param": crf, "kbps": rec["payload_bytes"] * 8 / (frames / float(window["fps"])) / 1000.0,
+              "bytes": rec["payload_bytes"], "stream_sha256": rec["stream_sha256"], "decoded": rec["decoded"],
+              "command": rec["encode_command"], "decode_command": rec["decode_command"]}
+    if getattr(args, "timer", None) is not None:
+        result["native_timing"] = {key: rec[key] for key in ("encode_seconds", "encode_cpu_seconds", "decode_seconds", "decode_cpu_seconds")}
+    return result
 
 
 def luma_psnr(decoded: Path, source: Path, width: int, height: int, frames: int) -> float:
@@ -107,7 +110,10 @@ def dcvc_attempt(args: argparse.Namespace, yuv: Path, work: Path, window: dict[s
     reports = {}
     for action in ("encode", "decode"):
         command, env, cwd = dcvc_command(Path(sys.prefix), action, work / "plan.json", work / f"{action}.json")
-        done = subprocess.run(command, env={**STAGE_ENV, **env}, cwd=cwd, capture_output=True, text=True, timeout=3600)
+        def invoke() -> subprocess.CompletedProcess[str]:
+            return subprocess.run(command, env={**STAGE_ENV, **env}, cwd=cwd, capture_output=True, text=True, timeout=3600)
+        timer = getattr(args, "timer", None)
+        done = timer.measure(f"native.dcvc.{qp}.{action}", invoke) if timer is not None else invoke()
         if done.returncode:
             raise RuntimeError(f"DCVC-UF {action} failed ({done.returncode}):\n{done.stderr[-4000:]}")
         reports[action] = json.loads((work / f"{action}.json").read_text())

@@ -200,3 +200,18 @@ after fresh host/alljobchecks; this is not a replay of the stopped request.
 Initial feasibility ceiling remains7200GPU/10800CPU, oldallocationsclosed.
 
 Submitted fresh same-contract calibration **20261104T223611Z-ed28cf8e**, source 82effb7975c304090cdd748a90e0365be5fb7e02ee24ece3c0238e034f574948 from 237ae2145ad2a3b86e20e3899b4250a559b3a42b, spec b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff. Same frozen encoder asbf6208; concurrent benchmarkencoder edits excluded. Complete1577request canonical snapshot+all6host probes found bothgpu2A6000idle; gpu5busy/gpu6CPUheadroom0. Phase3300GPU/3600CPU, initialreleasebudgetstillfits; neverreplayold0061cb27.
+
+**ed28coststop, valid16-frame fullpath.** Allsixpoints completedwithfull
+metrics/judges/native+PSBL/zeroBALL identitiesandfreshpacketparity; nativeUF
+sm80 onA6000, bothmodelsGPU, oneCPU, no contention. Pilotc4686467…fff12;
+publishedtar dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066.
+208.447644s command ledto3121.575s conservative188projection>2400stagecap.
+No fullpromotion. Independentselectedaudit at
+k5d-inputs/calibration-ed28-smoke-independent-audit-20261104.json.
+Charge450GPU/650CPU inclusive above370.388s lifecycle; totalCPUunmeasured.
+Prospective nextphase1800GPU/2100CPU is a smaller16/48 sameclip timingpilot
+onprovenbitidenticalnumericalpath; oldgate staysfailed, qualitysettingsunchanged.
+Onlyafter two correctuncontaminatedframecounts andconservativecompletecost
+fit may a fresh188confirmation be admitted; nocorpus/realismclaimfromsmokes.
+
+Root admitted prospective16/48 cost instrumentation after focused correctness tests and exact ed28 contract review. No188/full30 promotion is authorized by this cost48-only receipt. Inclusive1800GPU/2100CPU reserved; host inspection00:05UTC found gpu2 idle A6000 capacity.

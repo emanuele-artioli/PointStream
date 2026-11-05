@@ -20,6 +20,12 @@ from pathlib import Path
 from typing import Any
 
 PROFILE = 'historical-runtime-policy-relocated-no-weight-read-v1'
+PORTABLE_PROFILE = 'historical-runtime-subset-portable-no-weight-read-v2'
+RUNTIME_ROOT = '/local/users/emanuele/pointstream/cache/' + 'bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree'
+SYSTEM_GRANTS = ('/usr/lib', '/lib', '/lib64', '/dev/nvidia-modeset', '/dev/nvidia-uvm',
+                 '/dev/nvidia-uvm-tools', '/dev/nvidia0', '/dev/nvidia1', '/dev/nvidiactl',
+                 '/dev/nvidia-caps/nvidia-cap1', '/dev/nvidia-caps/nvidia-cap2',
+                 '/dev/null', '/dev/urandom', '/proc/driver/nvidia/version')
 OLD_CONFIG_SHA = 'fd97361b467896222f02b1e9e07510a0a445cb7140fe9c6f7ad749b2178904ec'
 SOURCE_SHA = '6412af951f9b48a47fc189390e03609627425e401e5ccaf1b158e73108f1a713'
 RUNTIME_SHA = 'bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e'
@@ -78,14 +84,53 @@ def normalize(original: dict[str, Any], source: Path, output: Path, aliases: Pat
     return config
 
 
+def normalize_portable(original: dict[str, Any], source: Path, output: Path, aliases: Path,
+                       visible: str, parent_user: str, parent_net: str, receipt: dict[str, str]) -> dict[str, Any]:
+    config = normalize(original, source, output, aliases, visible, parent_user, parent_net)
+    retained = [OLD_SOURCE, OLD_OUTPUT, RUNTIME_ROOT, *SYSTEM_GRANTS]
+    if len(set(retained)) != len(retained) or any(original['allow_paths'].count(p) != 1 for p in retained):
+        raise ValueError('historical grants do not contain the exact portable subset')
+    config['allow_paths'] = [str(source), str(output), RUNTIME_ROOT, *SYSTEM_GRANTS]
+    config['protected_receipt'] = receipt
+    return config
+
+
+def protected_identity(original: dict[str, Any], receipt_path: Path) -> dict[str, str]:
+    # Supervisor only: stream each protected file once, recording stable file identity.
+    from experiments.tennis.w8_receiver_preflight import PROTECTED
+
+    protected = {}
+    for group, (name, expected) in PROTECTED.items():
+        if original['denied_paths'][group] != [name]:
+            raise ValueError('historical protected path mismatch')
+        path = Path(name)
+        if str(path.resolve(strict=True)) != name:
+            raise ValueError('protected path is not canonical')
+        with path.open('rb') as f:
+            before = os.fstat(f.fileno())
+            h = hashlib.sha256()
+            for chunk in iter(lambda: f.read(1024 * 1024), b''):
+                h.update(chunk)
+            after = os.fstat(f.fileno())
+        current = path.stat()
+        def identity(st: os.stat_result) -> tuple[int, int, int, int, int]:
+            return st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns
+        if identity(before) != identity(after) or identity(before) != identity(current) or h.hexdigest() != expected:
+            raise ValueError('protected input changed or identity mismatch: ' + group)
+        protected[group] = {'path': name, 'sha256': expected, 'device': before.st_dev, 'inode': before.st_ino}
+    write_json(receipt_path, {'protected_inputs': protected})
+    return {'path': str(receipt_path), 'sha256': digest(receipt_path)}
+
+
 def diff(original: dict[str, Any], normalized: dict[str, Any]) -> dict[str, Any]:
     return {k: {'before': original.get(k), 'after': normalized.get(k)}
             for k in sorted(original.keys() | normalized.keys()) if original.get(k) != normalized.get(k)}
 
 
-def enough_budget(elapsed: float, cpu: float) -> bool:
-    return (elapsed + ARM_SECONDS + RESERVE_SECONDS <= GPU_SECONDS
-            and cpu + ARM_SECONDS + RESERVE_SECONDS <= CPU_SECONDS)
+def enough_budget(elapsed: float, cpu: float, profile: str = PROFILE) -> bool:
+    limit, reserve, cpu_limit = (220, 60, 220) if profile == PORTABLE_PROFILE else (GPU_SECONDS, RESERVE_SECONDS, CPU_SECONDS)
+    return (elapsed + ARM_SECONDS + reserve <= limit
+            and cpu + ARM_SECONDS + reserve <= cpu_limit)
 
 
 def worker_command(python: str, script: str, condition: str, config: Path, sha: str,
@@ -221,18 +266,24 @@ def run(args: argparse.Namespace) -> int:
     if not isinstance(clock, dict) or not isinstance(clock.get('budget_end'), (int, float)):
         raise ValueError('single-CPU fleet campaign clock required')
     gpu_info = check_gpu(visible)
-    config = normalize(original, source, output, aliases, visible,
-                       os.readlink('/proc/self/ns/user'), os.readlink('/proc/self/ns/net'))
+    parent_user, parent_net = os.readlink('/proc/self/ns/user'), os.readlink('/proc/self/ns/net')
+    if args.profile == PORTABLE_PROFILE:
+        receipt = protected_identity(original, stage / 'protected-identity.json')
+        config = normalize_portable(original, source, output, aliases, visible, parent_user, parent_net, receipt)
+    else:
+        config = normalize(original, source, output, aliases, visible, parent_user, parent_net)
     config_path = stage / 'worker-config.json'
     write_json(config_path, config)
     config_sha = digest(config_path)
-    write_json(stage / 'manifest.json', {'profile': PROFILE, 'historical_config_sha256': OLD_CONFIG_SHA,
+    write_json(stage / 'manifest.json', {'profile': args.profile, 'historical_config_sha256': OLD_CONFIG_SHA,
         'source_sha256': SOURCE_SHA, 'runtime_archive_sha256': RUNTIME_SHA,
         'script_sha256': digest(Path(__file__)), 'config_sha256': config_sha,
         'normalized_diff': diff(original, config), 'gpu_uuid': visible,
         'dispatch_sha256': digest(Path(os.environ['PS_STAGE_DIR']) / 'dispatch.json'),
         'gpu_before': gpu_info, 'staged_environment': packed,
-        'limitations': 'CUDA diagnostic only; no model qualification'})
+        'limitations': ('Stricter subset: pass establishes only runtime/policy CUDA availability; failure may be subset-specific. '
+                        'Neither outcome diagnoses the past failure or qualifies model generation.' if args.profile == PORTABLE_PROFILE
+                        else 'CUDA diagnostic only; no model qualification')})
     runtime = Path(sys.executable).resolve(strict=True)
     expected_root = Path('/local/users/emanuele/pointstream/cache') / RUNTIME_SHA / 'tree'
     if not runtime.is_relative_to(expected_root.resolve(strict=True)):
@@ -245,8 +296,9 @@ def run(args: argparse.Namespace) -> int:
         own = resource.getrusage(resource.RUSAGE_SELF)
         children = resource.getrusage(resource.RUSAGE_CHILDREN)
         cpu = own.ru_utime + own.ru_stime - cpu_start.ru_utime - cpu_start.ru_stime + children.ru_utime + children.ru_stime
-        if (not enough_budget(time.monotonic() - started, cpu)
-                or time.monotonic() + ARM_SECONDS + RESERVE_SECONDS > clock['budget_end']):
+        reserve = 60 if args.profile == PORTABLE_PROFILE else RESERVE_SECONDS
+        if (not enough_budget(time.monotonic() - started, cpu, args.profile)
+                or time.monotonic() + ARM_SECONDS + reserve > clock['budget_end']):
             results.append({'condition': condition, 'admitted': False, 'reason': 'budget'})
             break
         check_gpu(visible)
@@ -283,7 +335,7 @@ def run(args: argparse.Namespace) -> int:
         except (OSError, ValueError, subprocess.SubprocessError) as exc:
             results.append({'condition': 'gpu_exclusivity', 'admitted': False, 'reason': str(exc)})
             break
-    write_json(stage / 'summary.json', {'profile': PROFILE, 'arms': results,
+    write_json(stage / 'summary.json', {'profile': args.profile, 'arms': results,
                'elapsed_seconds': time.monotonic() - started})
     return validate(stage)
 
@@ -291,7 +343,7 @@ def run(args: argparse.Namespace) -> int:
 def validate(stage: Path) -> int:
     manifest = json.loads((stage / 'manifest.json').read_text())
     summary = json.loads((stage / 'summary.json').read_text())
-    if (manifest['profile'] != PROFILE or manifest['historical_config_sha256'] != OLD_CONFIG_SHA
+    if (manifest['profile'] not in (PROFILE, PORTABLE_PROFILE) or manifest['historical_config_sha256'] != OLD_CONFIG_SHA
             or manifest['source_sha256'] != SOURCE_SHA or manifest['runtime_archive_sha256'] != RUNTIME_SHA
             or digest(stage / 'historical-config.json') != OLD_CONFIG_SHA
             or digest(stage / 'worker-config.json') != manifest['config_sha256']):
@@ -303,8 +355,22 @@ def validate(stage: Path) -> int:
     source = Path(config['allow_paths'][0])
     output = Path(config['output'])
     aliases = Path(config['denied_paths']['aliases'][0]).parent
-    expected = normalize(original, source, output, aliases, manifest['gpu_uuid'],
-                         config['parent_user_namespace'], config['parent_network_namespace'])
+    if manifest['profile'] == PORTABLE_PROFILE:
+        receipt_path = stage / 'protected-identity.json'
+        receipt = {'path': str(receipt_path), 'sha256': digest(receipt_path)}
+        from experiments.tennis.w8_receiver_preflight import PROTECTED
+        identities = json.loads(receipt_path.read_text())['protected_inputs']
+        if set(identities) != set(PROTECTED) or any(
+            identities[k].get('path') != v[0] or identities[k].get('sha256') != v[1]
+            or type(identities[k].get('device')) is not int or type(identities[k].get('inode')) is not int
+            for k, v in PROTECTED.items()
+        ):
+            raise ValueError('portable protected identity receipt mismatch')
+        expected = normalize_portable(original, source, output, aliases, manifest['gpu_uuid'],
+                                      config['parent_user_namespace'], config['parent_network_namespace'], receipt)
+    else:
+        expected = normalize(original, source, output, aliases, manifest['gpu_uuid'],
+                             config['parent_user_namespace'], config['parent_network_namespace'])
     if expected != config:
         raise ValueError('configuration differs from the approved normalized profile')
     arms = summary['arms']
@@ -369,6 +435,7 @@ def main() -> int:
     p = sub.add_parser('run')
     p.add_argument('--stage')
     p.add_argument('--phase', choices=('smoke', 'full'), required=True)
+    p.add_argument('--profile', choices=(PROFILE, PORTABLE_PROFILE), default=PROFILE)
     p.add_argument('--original-config', default=str(Path(__file__).with_name('w8_cuda_historical_config.json')))
     p.add_argument('--source-archive', required=True)
     p = sub.add_parser('worker')

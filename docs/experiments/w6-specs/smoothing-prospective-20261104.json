@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "device": "gpu",
+  "single_cpu_campaign": true,
+  "hosts": [
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 16000,
+  "cpu_threads": 1,
+  "local_storage_gib": 45,
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "required_commands": [],
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.w6_smoothing_job"
+  ],
+  "arguments": [
+    "--frames",
+    "{frames}"
+  ],
+  "scale": {
+    "frames": {
+      "smoke": 16,
+      "full": 240
+    }
+  },
+  "staged_inputs": [
+    {
+      "name": "al",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76",
+      "extract": false
+    },
+    {
+      "name": "transport",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261025T082944Z-29f021a5/full/published.tar",
+      "sha256": "6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7",
+      "extract": false
+    },
+    {
+      "name": "anchor",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261024T201059Z-29586984/full/published.tar",
+      "sha256": "67444a2a8f56c8700fb073a1184ce207ec3ad38cc003dbafa6710bb33836dff9",
+      "extract": false
+    },
+    {
+      "name": "base",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T072713Z-2888cefe/full/published.tar",
+      "sha256": "00b13e89077a27a3e6ff23bf476e9795c2120c5b1f5252ddfdd6f533a8119a39",
+      "extract": false
+    },
+    {
+      "name": "gpu_base",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T074823Z-135421ee/full/published.tar",
+      "sha256": "5c4a0cfced5501e085f67d394f3a50ca7f92d2cb592f73fbd3ad661461cb691b",
+      "extract": false
+    },
+    {
+      "name": "generated",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T120630Z-9190e75a/full/published.tar",
+      "sha256": "031ea5d7b744a0c52f9ee769fb38d5b9d30340f567ca042c6079d4f9240f354c",
+      "extract": false
+    },
+    {
+      "name": "post_archive",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T132449Z-75957f16/full/published.tar",
+      "sha256": "48c352ae1b008cbb6cba82fa6a79d5b3b46e63c0b1123516ec25750ebf150eaf",
+      "extract": false
+    },
+    {
+      "name": "masks",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261029T092537Z-88270f98/full/published.tar",
+      "sha256": "fbb39eec8b9d823b8d57acd0efc0d8b6f051739886ce94592dfffbfc3494142d",
+      "extract": false
+    },
+    {
+      "name": "lpips",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "extract": false
+    },
+    {
+      "name": "dists",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0",
+      "extract": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k6b-confirm-20261024-execution/sources/alcaraz_hurkacz__031.mp4",
+      "sha256": "054e4535638d8dfa3dee69258f45c231aaeab2241b91309d449be7b0934cef76"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261025T082944Z-29f021a5/full/published.tar",
+      "sha256": "6865035e3132b6e07600fdaabc8c9d7152b8b6e3c3260d9f3df21cab33ca33c7"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261024T201059Z-29586984/full/published.tar",
+      "sha256": "67444a2a8f56c8700fb073a1184ce207ec3ad38cc003dbafa6710bb33836dff9"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T072713Z-2888cefe/full/published.tar",
+      "sha256": "00b13e89077a27a3e6ff23bf476e9795c2120c5b1f5252ddfdd6f533a8119a39"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261027T074823Z-135421ee/full/published.tar",
+      "sha256": "5c4a0cfced5501e085f67d394f3a50ca7f92d2cb592f73fbd3ad661461cb691b"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T120630Z-9190e75a/full/published.tar",
+      "sha256": "031ea5d7b744a0c52f9ee769fb38d5b9d30340f567ca042c6079d4f9240f354c"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T132449Z-75957f16/full/published.tar",
+      "sha256": "48c352ae1b008cbb6cba82fa6a79d5b3b46e63c0b1123516ec25750ebf150eaf"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261029T092537Z-88270f98/full/published.tar",
+      "sha256": "fbb39eec8b9d823b8d57acd0efc0d8b6f051739886ce94592dfffbfc3494142d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3-2026-10-10/inputs/lpips/alexnet-owt-7be5be79.pth",
+      "sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/visor/h3b-2026-10-11/inputs/dists/vgg16-397923af.pth",
+      "sha256": "397923af8e79cdbb6a7127f12361acd7a2f83e06b05044ddf496e83de57a5bf0"
+    }
+  ],
+  "smoke": {
+    "seconds": 200,
+    "representative_basis": "16 consecutive frames and six judged ticks through original CUDA source/base conversion, exact W1 masks, both players, all three fixed crop profiles with one raw-predecessor flow, all pair residuals and masked LPIPS/DISTS; two fixed base ticks cross-check independent production W1 score_point."
+  },
+  "full": {
+    "seconds": 800
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.w6_smoothing_job",
+    "--validate"
+  ],
+  "validator_seconds": 30,
+  "budget_seconds": 1100,
+  "stall_seconds": 600,
+  "deadline": "2026-11-05T00:45:21.789990+00:00",
+  "contention": {
+    "policy": "stop",
+    "resume_attempts": 0
+  },
+  "verify_staged_inputs": true,
+  "external_cpu_reserve_seconds": 400,
+  "external_gpu_reserve_seconds": 100,
+  "post_full_audit_cpu_limit_seconds": 180,
+  "phase_cpu_limit_seconds": 1500,
+  "phase_gpu_limit_seconds": 1200,
+  "new_phase_preparation_consumed_cpu_seconds": 0,
+  "new_phase_post_audit_consumed_cpu_seconds": 0
+}

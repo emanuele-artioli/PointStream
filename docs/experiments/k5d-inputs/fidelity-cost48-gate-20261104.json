@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "scope": "fidelity-only",
+  "purpose": "48-frame-cost-pilot",
+  "passed": true,
+  "clip": "tracknet/game10/Clip3",
+  "max_frames": 48,
+  "archive_sha256": "bb45372d011ef4092d78173169c8ad6280d7dbdb9998efaf2b1c72a63ca1dd18",
+  "calibration_job_id": "20261104T223611Z-ed28cf8e",
+  "accepted_smoke_sha256": "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066",
+  "evidence_sha256": "9e146d7487cd76d5c2acd41889f68fc6a7ead4f44f29d0e3e19671e45d395cfc",
+  "checks": [
+    "source_transform",
+    "native_and_wire",
+    "receiver_parity",
+    "perceptual_metrics",
+    "full_cost"
+  ],
+  "cost": {
+    "reference_complete_16_seconds": 208.447644,
+    "prediction_48_seconds": 841.678665,
+    "formula": "1.25 * reference16 * (48/16) +60",
+    "smoke_limit_seconds": 600,
+    "full_48_limit_seconds": 900,
+    "campaign_one_cpu_limit_seconds": 1700,
+    "phase_gpu_inclusive_seconds": 1800,
+    "phase_cpu_inclusive_seconds": 2100,
+    "campaign_reserve_seconds": 60
+  },
+  "source_transform": "Original OpenCV JPEG RGB; explicit BT709 limited-range YUV420 conversion for native encoders; declared30fps",
+  "limitations": [
+    "48-frame resource pilot only; no188 or corpus admission",
+    "No filesystem-denial witness",
+    "No codec-quality win or original6of8 guard pass",
+    "Prior source-negative calibration10/197 failed; preserve historical3 task exclusions"
+  ],
+  "authority": "Root admission within user-approved staged20GPUh/24CPUh, initial2GPUh/3CPUh; newphase1800GPU/2100CPU reserved before dispatch"
+}

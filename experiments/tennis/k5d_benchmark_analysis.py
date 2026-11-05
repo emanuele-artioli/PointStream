@@ -17,6 +17,9 @@ from experiments.tennis import k5d_analysis as analysis, k5d_encoder as encoder
 from experiments.tennis.k5d_fleet import EXPECTED, EXPOSURE_SHA, SOURCE, SOURCE_SHA
 
 LOW = (("dcvc", 0), ("svt", 62))
+HISTORICAL_EVIDENCE = SOURCE.parent / "source-evidence-reuse-20261104.json"
+HISTORICAL_SHA = "d840b8f1daaf59150a4475967957d70ce1226e1fd647e7d142790cf685f0804f"
+HISTORICAL_FAILURES = frozenset({"tracknet/game10/Clip11", "tracknet/game10/Clip8", "tracknet/game9/Clip7"})
 SPANS = {"frame_psnr": .1, "crop_lpips": .005, "crop_dists": .005, "full_lpips": .005, "full_dists": .005}
 
 
@@ -85,6 +88,14 @@ def historical_psnr_guard(fidelity: dict[str, Any], exact_sse: bool, has_cap: bo
     return bool(value <= .01)
 
 
+def task_source_eligibility(clip: str, current: bool) -> tuple[bool, bool, bool]:
+    """Prior registered source failures remain excluded even after a later pass."""
+    if not isinstance(current, bool):
+        raise ValueError("invalid current source qualification")
+    historical = clip not in HISTORICAL_FAILURES
+    return current, historical, current and historical
+
+
 def summarize_clip(directory: Path, expected: dict[str, Any]) -> dict[str, Any]:
     encoder.validate(directory)
     report = json.loads((directory / "pilot.json").read_text())
@@ -149,10 +160,11 @@ def summarize_clip(directory: Path, expected: dict[str, Any]) -> dict[str, Any]:
                     "candidate_false": scores["false_on_absent"], "native_false_at_rate": baseline_false})
     supported = all(x["recall_gain"] is not None for x in low)
     mean_gain = sum(x["recall_gain"] for x in low) / 2 if supported else None
-    qualified = source["qualified"]
+    current_qualified, historical_qualified, qualified = task_source_eligibility(report["clip"], source["qualified"])
     return {"clip_id": report["clip"], "game": report["clip"].split("/")[1], "frames": len(labels),
             "visible": counts["1"], "absent": counts["0"], "unknown": counts["-1"],
-            "source_qualified": qualified, "source_scores": source["scores"]["wasb"],
+            "source_qualified": qualified, "current_source_qualified": current_qualified,
+            "historical_source_qualified": historical_qualified, "source_scores": source["scores"]["wasb"],
             "task_status": "source_failed" if not qualified else "unsupported" if not supported else "evaluated",
             "low_points": low, "mean_recall_gain": mean_gain,
             "task_pass": bool(qualified and mean_gain is not None and mean_gain >= .10),
@@ -163,6 +175,11 @@ def summarize_clip(directory: Path, expected: dict[str, Any]) -> dict[str, Any]:
 
 
 def summarize(selection: dict[str, Any], directories: list[Path]) -> dict[str, Any]:
+    if encoder.oracle.sha(HISTORICAL_EVIDENCE) != HISTORICAL_SHA:
+        raise ValueError("historical source evidence hash mismatch")
+    historical = json.loads(HISTORICAL_EVIDENCE.read_text())["source_job"]["per_clip_gate"]["failing_clips"]
+    if {row["clip_id"] for row in historical} != HISTORICAL_FAILURES:
+        raise ValueError("historical source exclusion list differs")
     clips = selection["tracknet"]["clips"]
     ids = [c["clip_id"] for c in clips]
     if len(ids) != 30 or len(set(ids)) != 30 or len(directories) != 30:
@@ -209,7 +226,9 @@ def summarize(selection: dict[str, Any], directories: list[Path]) -> dict[str, A
             "coverage": totals, "source_false": source_false, "source_false_per_negative": source_false_rate,
             "strong_absence_claim_allowed": False,
             "strong_absence_claim_reason": "prior frozen source negative calibration failed: 10/197 > 0.05",
-            "qualified_clips": sum(c["source_qualified"] for c in result), "passing_clips": passes,
+            "qualified_clips": sum(c["source_qualified"] for c in result),
+            "current_source_qualified_clips": sum(c["current_source_qualified"] for c in result),
+            "historical_source_evidence_sha256": HISTORICAL_SHA, "passing_clips": passes,
             "required_passing_clips": 23, "unmatched_absence_rates": unmatched,
             "pooled_mean_excess_false_per_absent": excess, "false_excess_by_setting": setting_excess,
             "false_limit_pass": absence_pass,

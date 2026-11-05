@@ -105,3 +105,49 @@ def test_cuda_failures_are_measurements_but_never_generation_pass(tmp_path, monk
     assert job.validate(tmp_path) == 0
     assert json.loads((tmp_path / 'validation.json').read_text()) == {
         'measurement_complete': True, 'both_cuda_passed': False, 'generation_gate_passed': False}
+
+
+def test_portable_profile_retains_only_exact_original_grant_subset():
+    import json
+
+    historical = json.loads(Path(job.__file__).with_name('w8_cuda_historical_config.json').read_text())
+    receipt = {'path': '/new/receipt', 'sha256': 'a' * 64}
+    result = job.normalize_portable(historical, Path('/new/source'), Path('/new/output'),
+                                    Path('/new/aliases'), 'GPU-new', 'user:new', 'net:new', receipt)
+    assert result['allow_paths'] == ['/new/source', '/new/output', job.RUNTIME_ROOT, *job.SYSTEM_GRANTS]
+    assert result['files'] == {} and result['protected_receipt'] == receipt
+    assert result['denied_paths']['source'] == historical['denied_paths']['source']
+    assert len(result['denied_paths']['aliases']) == 5
+    historical['allow_paths'].remove('/dev/urandom')
+    with pytest.raises(ValueError, match='subset'):
+        job.normalize_portable(historical, Path('/new/source'), Path('/new/output'),
+                               Path('/new/aliases'), 'GPU-new', 'user:new', 'net:new', receipt)
+
+
+def test_portable_identity_hashes_all_files_and_rejects_mismatch(tmp_path, monkeypatch):
+    import json
+    from experiments.tennis import w8_receiver_preflight
+
+    expected = {}
+    for name in ('source', 'prepared', 'fit', 'golden', 'masks'):
+        path = tmp_path / name
+        path.write_bytes(name.encode())
+        expected[name] = (str(path), job.digest(path))
+    monkeypatch.setattr(w8_receiver_preflight, 'PROTECTED', expected)
+    historical = {'denied_paths': {name: [item[0]] for name, item in expected.items()}}
+    receipt_path = tmp_path / 'receipt.json'
+    identity = job.protected_identity(historical, receipt_path)
+    assert identity['sha256'] == job.digest(receipt_path)
+    records = json.loads(receipt_path.read_text())['protected_inputs']
+    assert set(records) == set(expected)
+    assert all(records[k]['sha256'] == expected[k][1] and records[k]['inode'] == Path(expected[k][0]).stat().st_ino
+               for k in expected)
+    Path(expected['masks'][0]).write_bytes(b'changed')
+    with pytest.raises(ValueError, match='identity mismatch'):
+        job.protected_identity(historical, tmp_path / 'bad.json')
+
+
+def test_portable_arm_budget_preserves_sixty_second_reserve():
+    assert job.enough_budget(100, 100, job.PORTABLE_PROFILE)
+    assert not job.enough_budget(101, 100, job.PORTABLE_PROFILE)
+    assert not job.enough_budget(100, 101, job.PORTABLE_PROFILE)

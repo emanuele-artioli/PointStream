@@ -7,7 +7,7 @@ from experiments.tennis import k5d_benchmark_analysis as analysis, k5d_encoder a
 
 def test_independent_gate_must_be_valid_and_hash_bound(tmp_path):
     path = tmp_path / 'gate.json'
-    receipt = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'archive_sha256': 'archive',
+    receipt = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'purpose': 'full-retrospective-benchmark', 'archive_sha256': 'archive',
                'calibration_job_id': 'job', 'evidence_sha256': 'a' * 64,
                'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'full_cost']}
     path.write_text(json.dumps(receipt))
@@ -52,7 +52,7 @@ def test_population_gate_counts_all_30_and_unmatched_negative_never_passes(tmp_p
         absent = visibility['0']
         return {'clip_id': clip['clip_id'], 'game': clip['clip_id'].split('/')[1], 'frames': clip['label_rows'],
                 'visible': visibility['1'] + visibility['2'], 'absent': absent, 'unknown': visibility['3'],
-                'source_qualified': i >= 3, 'task_pass': 3 <= i < 26,
+                'source_qualified': i >= 3, 'current_source_qualified': i >= 3, 'task_pass': 3 <= i < 26,
                 'source_scores': {'false_on_absent': 10 if clip['clip_id'] == 'tracknet/game9/Clip5' else 0},
                 'low_points': [{'codec': codec, 'setting': point, 'candidate_false': 0,
                                 'native_false_at_rate': None if absent and i == first_absent else 0.}
@@ -98,3 +98,11 @@ def test_historical_psnr_guard_uses_dcvc_against_dcvc_only():
     fidelity['frame_psnr']['dcvc']['dcvc']['bd_rate'] = .005
     assert analysis.historical_psnr_guard(fidelity, exact_sse=True, has_cap=False) is True
     assert analysis.historical_psnr_guard(fidelity, exact_sse=False, has_cap=True) is None
+
+
+def test_historical_source_failure_cannot_be_readmitted_by_rerun():
+    assert analysis.task_source_eligibility('tracknet/game10/Clip11', True) == (True, False, False)
+    assert analysis.task_source_eligibility('tracknet/game10/Clip8', True) == (True, False, False)
+    assert analysis.task_source_eligibility('tracknet/game9/Clip7', True) == (True, False, False)
+    assert analysis.task_source_eligibility('tracknet/game9/Clip5', True) == (True, True, True)
+    assert analysis.task_source_eligibility('tracknet/game9/Clip5', False) == (False, True, False)

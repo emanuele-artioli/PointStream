@@ -1,0 +1,69 @@
+{
+  "scope": "read-only independent saved-array arithmetic and artifact identity audit; no model, flow, decoder or smoothing executed",
+  "job": "20261104T222153Z-1145ce7a",
+  "git_head": "bf6208c5380f537429b4e49bed39e1c22cdb7b8f",
+  "source_sha256": "c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233",
+  "snapshot_sha256": "d0eadebdc92938079e8b757cf687f50ff3747970b5fb2aa95eabbaa6792a5e13",
+  "gpu": "NVIDIA RTX 6000 Ada Generation",
+  "device_uuid": "GPU-7754164a-33cd-265c-3696-c20966d228fe",
+  "historical_judges_sha256": "4d71f6cc6ef5307a491099116e55f62bbe30266d9c2f50b2c3088f16d2c353f1",
+  "stages": {
+    "smoke": {
+      "archive_sha256": "24bd1ef8acfdb3a9b576512941774ba7263f960df6d35eb389f02a8b9ef6feb5",
+      "report_sha256": "934d44f8163b100f941207a3b80e00624e688d76086f4bbdadc4c1ce2a18ba0f",
+      "arrays_sha256": "1e72ee227889529adfe84965f2902181a82b86468a57995f019959123e047939",
+      "frames": 8,
+      "checks": {
+        "flicker": {
+          "pairs": 7,
+          "max_abs_diff": 0.0,
+          "over_tolerance": 0
+        },
+        "energy": {
+          "pairs": 7,
+          "max_abs_diff": 0.0,
+          "over_tolerance": 0
+        },
+        "source_energy": {
+          "pairs": 7,
+          "max_abs_diff": 0.0,
+          "over_tolerance": 0
+        }
+      },
+      "base_max_abs_diff": 1,
+      "timing_contaminated": false,
+      "execution_seconds": 15.708956003189087
+    },
+    "full": {
+      "archive_sha256": "e2d2ca789b705c9bdfa4ddf8074ce13a0ddff507867ef0a592d3d7b5cb9a4ee6",
+      "report_sha256": "baed1b13ed64b6e4b665ddc174b38d88d8c501942e5ee52c3aabe3dcf5b8bc6c",
+      "arrays_sha256": "9c8dd6c986cd5cdf5b96b65f1acf927e08609fce35bef2867735098dae1e327c",
+      "frames": 240,
+      "checks": {
+        "flicker": {
+          "pairs": 239,
+          "max_abs_diff": 0.0,
+          "over_tolerance": 0
+        },
+        "energy": {
+          "pairs": 239,
+          "max_abs_diff": 0.0,
+          "over_tolerance": 0
+        },
+        "source_energy": {
+          "pairs": 239,
+          "max_abs_diff": 0.0,
+          "over_tolerance": 0
+        }
+      },
+      "base_max_abs_diff": 1,
+      "timing_contaminated": false,
+      "execution_seconds": 72.57413291931152
+    }
+  },
+  "supervisor_elapsed_seconds": 481.9160575866699,
+  "environment_start_to_terminal_state_update_seconds": 528.6940095424652,
+  "cpu_telemetry": "stage child rusage cumulative; total workload and external admission/audit CPU not fully instrumented",
+  "claim_check": "2026-11-04 read-only GPU/CPU token absent; supervisor and child process absent",
+  "prior_cpu_replay": "remains failed; this new production-path control does not change historical outcome"
+}

@@ -104,7 +104,7 @@ def test_failed_source_is_fidelity_only_with_bound_gate(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match='source qualification failed'):
         enc.validate(tmp_path)
     gate_path = tmp_path / 'fidelity-gate.json'
-    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'archive_sha256': 'archive',
+    gate = {'schema_version': 1, 'passed': True, 'scope': 'fidelity-only', 'purpose': 'full-retrospective-benchmark', 'archive_sha256': 'archive',
             'calibration_job_id': 'job', 'evidence_sha256': 'a' * 64,
             'checks': ['source_transform', 'native_and_wire', 'receiver_parity', 'perceptual_metrics', 'full_cost']}
     gate_path.write_text(json.dumps(gate))
@@ -116,3 +116,53 @@ def test_failed_source_is_fidelity_only_with_bound_gate(tmp_path, monkeypatch):
     (tmp_path / 'pilot.json').write_text(json.dumps(report))
     with pytest.raises(ValueError, match='relabeled'):
         enc.validate(tmp_path)
+
+
+def test_integer_sse_psnr_matches_original_float64_on_uint8_frames():
+    rng = np.random.default_rng(702)
+    inputs = [rng.integers(0, 256, size=(72, 128, 3), dtype=np.uint8) for _ in range(4)]
+    inputs += [np.zeros((72, 128, 3), dtype=np.uint8)]
+    controls = [rng.integers(0, 256, size=x.shape, dtype=np.uint8) for x in inputs[:4]]
+    identical = inputs[-1].copy()
+    controls.append(identical)
+    one_pixel = identical.copy()
+    one_pixel[0, 0, 0] = 1
+    inputs.append(identical)
+    controls.append(one_pixel)
+    labels = [(-1, 0., 0.)] * len(inputs)
+    rows = enc.metrics(np.stack(inputs), np.stack(controls), labels, None)
+    for row, a, b in zip(rows, inputs, controls):
+        assert row['frame_psnr'] == enc.old.psnr(a, b)
+
+
+def test_guard_reuse_requires_equal_pixels_and_runs_each_judge_once(monkeypatch):
+    image = np.zeros((1, 3, 3, 3), dtype=np.uint8)
+    calls = {'metrics': 0, 'judges': 0}
+
+    def fake_metrics(*_):
+        calls['metrics'] += 1
+        return [{'record': 1}]
+
+    def fake_judges(_):
+        calls['judges'] += 1
+        return {'record': 1}
+
+    monkeypatch.setattr(enc, 'metrics', fake_metrics)
+    a, b, c, d, provenance = enc.score_arms(image, image, image.copy(), [(-1, 0., 0.)], None, fake_judges, True)
+    assert a is c and b is d and provenance and calls == {'metrics': 1, 'judges': 1}
+    changed = image.copy()
+    changed[0, 0, 0, 0] = 1
+    with pytest.raises(ValueError, match='differs'):
+        enc.score_arms(image, image, changed, [(-1, 0., 0.)], None, fake_judges, True)
+
+
+def test_generic_decoder_resource_bytes_are_separate_from_wire(tmp_path):
+    image, video, decoder = (tmp_path / n for n in ('i', 'v', 'd'))
+    image.write_bytes(b'123')
+    video.write_bytes(b'12345')
+    decoder.write_bytes(b'1')
+    ledger = enc.installed_decoder_resources(image, video, decoder)
+    assert ledger['dcvc']['checkpoint_total_bytes'] == 8
+    assert ledger['dcvc']['image_checkpoint']['sha256'] == enc.oracle.sha(image)
+    assert ledger['svt']['decoder']['bytes'] == 1
+    assert 'excluded from per-clip wire' in ledger['scope']

@@ -75,6 +75,34 @@
       "gpu_seconds": 0,
       "cpu_seconds": 90,
       "basis": "conservative <=30CPU partialterminalaudit + <=60CPU OpenTTmetadata selection; no native/model/frame inference"
+    },
+    {
+      "phase": "k5d-calibration-replacement-20261104",
+      "workstream": "ball",
+      "gpu_seconds": 450,
+      "cpu_seconds": 650,
+      "basis": "uncontaminated complete16smoke;188costgatefailed;370.388s lifecycle plusexternal envelope"
+    },
+    {
+      "phase": "w6-literal-control-20261104",
+      "workstream": "w6",
+      "gpu_seconds": 529,
+      "cpu_seconds": 829,
+      "basis": "independentauditexact239pairs; release-inclusive528.694s upperobservation plus300CPU external; aggregateCPUunmeasured"
+    },
+    {
+      "phase": "w8-cuda-diagnostic-20261104",
+      "workstream": "w8",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "basis": "expired unadmitted; no CUDA/GPU/model execution; conservative preparation CPU ceiling"
+    },
+    {
+      "phase": "gvcrt-entropy-interface-20261104",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 0,
+      "cpu_seconds": 142,
+      "basis": "complete CPU-only native roundtrip;82s lifecycle upper bound plus60s external; release verified"
     }
   ],
   "reservations": [
@@ -100,7 +128,7 @@
       "workstream": "w8",
       "gpu_seconds": 180,
       "cpu_seconds": 240,
-      "status": "reserved before dispatch",
+      "status": "closed; conservative charge recorded; unused reservation released",
       "spec": "docs/experiments/w8-inputs/receiver-20261101/w8-cuda-diagnostic-fleet-draft-20261104.json"
     },
     {
@@ -108,7 +136,7 @@
       "workstream": "w6",
       "gpu_seconds": 1200,
       "cpu_seconds": 1500,
-      "status": "reserved before dispatch",
+      "status": "closed; charged conservative inclusive envelope; unused reservation released",
       "spec": "docs/experiments/w6-specs/control-20261104.json"
     },
     {
@@ -132,7 +160,7 @@
       "workstream": "ball",
       "gpu_seconds": 3300,
       "cpu_seconds": 3600,
-      "status": "reserved; wait fresh admission review",
+      "status": "closed; charged conservative inclusive envelope; unused reservation released",
       "scope": "same scientificcalibration asbf6208, newrequest afterconfirmedterminalforeigncontention; no oldrequestreplay"
     },
     {
@@ -140,7 +168,7 @@
       "workstream": "ego_peer_oracles",
       "gpu_seconds": 0,
       "cpu_seconds": 210,
-      "status": "reserved; root review/admission required before compile",
+      "status": "closed; conservative charge recorded; unused reservation released",
       "scope": "nativeCPU entropy build and symbols only; no model/video/GPU"
     },
     {
@@ -150,6 +178,34 @@
       "cpu_seconds": 300,
       "status": "reserved; no decoding until rootadmission; optionalnotcorebenchmarkdependency",
       "scope": "sourceidentity andmanualframe/labelindexwitness only,no judges/no qualitycodec"
+    },
+    {
+      "phase": "k5d-16-48-costpilot-20261104",
+      "workstream": "ball",
+      "gpu_seconds": 1800,
+      "cpu_seconds": 2100,
+      "status": "root reviewed; admitted frozen prospective code/spec, pending dispatch"
+    },
+    {
+      "phase": "w6-smoothing-20261104",
+      "workstream": "w6",
+      "gpu_seconds": 1200,
+      "cpu_seconds": 1500,
+      "status": "root reviewed; admitted frozen prospective code/spec, pending dispatch"
+    },
+    {
+      "phase": "gvcrt-native4-16-20261105",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 900,
+      "cpu_seconds": 1200,
+      "status": "prospective reservation; root review required, no GPU/model dispatch yet"
+    },
+    {
+      "phase": "w8-portable-v2-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 240,
+      "cpu_seconds": 360,
+      "status": "prospective reservation; narrower runtime subset; supervisor hashes opaque archives; worker never reads/deserializes weights"
     }
   ],
   "jobs": [
@@ -181,18 +237,20 @@
     {
       "job_id": "20261104T222153Z-1145ce7a",
       "phase": "w6-literal-control-20261104",
-      "state": "pending",
+      "state": "complete; independentcontrolauditpassed; claimsreleased",
       "spec_sha256": "b07c84e23cb2aa71fb34f41582b90fbe274f574d81f5ec7976350686a1f0e0fc",
       "source_sha256": "c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233",
       "revision": "bf6208c5380f537429b4e49bed39e1c22cdb7b8f",
       "deadline": "2026-11-05T01:00:00+00:00",
       "inclusive_cpu_ceiling": 1500,
-      "gpu_ceiling": 1200
+      "gpu_ceiling": 1200,
+      "result": "all239pairs all3arrays maxabs0 matchingNaNs",
+      "published_tar_sha256": "e2d2ca789b705c9bdfa4ddf8074ce13a0ddff507867ef0a592d3d7b5cb9a4ee6"
     },
     {
       "job_id": "20261104T222305Z-5d374710",
       "phase": "w8-cuda-diagnostic-20261104",
-      "state": "pending",
+      "state": "expired unadmitted; no CUDA/GPU/model execution; conservative preparation CPU ceiling",
       "spec_sha256": "381758de5d3a09c3db7a4c666eefd99ddc0cc0ada07fa65dd1d92487af71da48",
       "source_sha256": "c34ddd0290327a203d5bab38492fc1eeef42c7e11bcbfce3efccfd923f132233",
       "revision": "bf6208c5380f537429b4e49bed39e1c22cdb7b8f",
@@ -203,13 +261,26 @@
     {
       "job_id": "20261104T223611Z-ed28cf8e",
       "phase": "k5d-calibration-replacement-20261104",
-      "state": "pending",
+      "state": "terminal coststop; complete16sixpointsmoke correctnesspassed, no188promotion",
       "spec_sha256": "b54c6986a0b343695709fa3b631d89859a162c3e0211c8bef08cfe6c79d370ff",
       "source_sha256": "82effb7975c304090cdd748a90e0365be5fb7e02ee24ece3c0238e034f574948",
       "revision": "237ae2145ad2a3b86e20e3899b4250a559b3a42b",
       "deadline": "2026-11-05T02:00:00+00:00",
       "inclusive_cpu_ceiling": 3600,
-      "gpu_ceiling": 3300
+      "gpu_ceiling": 3300,
+      "result": "208.447644s smoke =>3121.575s forecast >2400s cap",
+      "published_tar_sha256": "dc1bc14133cf210589f2452785fbaf6d4905e91aae05fdc6d7ac0f25da8ec066"
+    },
+    {
+      "job_id": "20261104T230325Z-e340664f",
+      "phase": "gvcrt-entropy-interface-20261104",
+      "state": "complete CPU-only native roundtrip;82s lifecycle upper bound plus60s external; release verified",
+      "spec_sha256": "e75b8f4abf7fad8494b043f2ade95b6c99f8f5ed076a2c688463f781b85ff7b9",
+      "source_sha256": "72d75c348d35fdc8acb5c427ec85d3e8b83ab433a6a4e856654eb13296239dd0",
+      "revision": "8e532d8038c1e4bbcbf3f7e4327b4e66668db082",
+      "deadline": "2026-11-04T23:20:00+00:00",
+      "inclusive_cpu_ceiling": 210,
+      "gpu_ceiling": 0
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -220,7 +291,7 @@
   ],
   "monitoring": {
     "mode": "one canonical wholebatch wait; exits on attention",
-    "state": "running",
+    "state": "completed; attention; inspectsavedbatch2receipt",
     "local_exec_session": 82059,
     "jobs": [
       "20261104T223611Z-ed28cf8e",
