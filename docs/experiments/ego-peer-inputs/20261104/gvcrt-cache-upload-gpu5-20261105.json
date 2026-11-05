@@ -1,0 +1,45 @@
+{
+  "status": "passed",
+  "host": "gpu5",
+  "source": "/private/tmp/pointstream-gvcrt-endpoints-e6e0-source.tar",
+  "source_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "source_bytes": 6133760,
+  "target_dir": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-cache-3ce18520af3c46e0be3d9345a9f04009",
+  "target": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/checks/gvcrt-cache-3ce18520af3c46e0be3d9345a9f04009/source.tar",
+  "timeout_seconds": 180,
+  "doctor_evidence": "24b9f11527c449198031a0750d83232f",
+  "cpu_affinity": "not available on this macOS client",
+  "error": null,
+  "elapsed_seconds": 51.18905541700224,
+  "usage_before": {
+    "self": {
+      "user_seconds": 0.044782999999999996,
+      "system_seconds": 0.019108
+    },
+    "children": {
+      "user_seconds": 0.011986,
+      "system_seconds": 0.009112
+    }
+  },
+  "usage_after": {
+    "self": {
+      "user_seconds": 0.20049499999999998,
+      "system_seconds": 0.027642999999999997
+    },
+    "children": {
+      "user_seconds": 0.140183,
+      "system_seconds": 0.054759999999999996
+    }
+  },
+  "remote_file_bytes": 6133760,
+  "remote_inode": 2250247,
+  "remote_mode": "0600",
+  "remote_regular_file": true,
+  "independent_remote_sha256": "cde9046414f4412a92652b11c0c75ac7a4965e7843badb65a1f449b3368ae7ff",
+  "remote_matching_processes_observed": 0,
+  "remote_aggregate_cpu": "unmeasured",
+  "full_cpu_charge_seconds": 180,
+  "cache_copy_proof": false,
+  "gpu_job_submitted": false,
+  "scope": "full actual _send_snapshot upload verified; no receiver cache copy or model qualification"
+}
