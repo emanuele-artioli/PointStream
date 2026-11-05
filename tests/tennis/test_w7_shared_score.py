@@ -177,7 +177,7 @@ def test_materialize_checks_full_coverage_and_selected_bytes(tmp_path: Path) -> 
 
 def test_null_hybrid_requires_actual_7930_spec_and_ready(tmp_path: Path, monkeypatch) -> None:
     import json
-    from types import SimpleNamespace
+    from dataclasses import replace
     from experiments.jobs.inbox import digest
     value = '2f01e4df611c1b6c3c08890ec88cc1c6881517c288cbec722eb20699e741cf03'
     spec = {'staged_inputs': [{'name': 'hybrid', 'sha256': value}]}
@@ -186,10 +186,10 @@ def test_null_hybrid_requires_actual_7930_spec_and_ready(tmp_path: Path, monkeyp
     ready.write_text(json.dumps({'spec_sha256': digest(spec)}))
     monkeypatch.setattr(worker.old, 'digest', lambda p: {'spec': '9b3d405e22326c26a88ce6f6a15c3aa8b63fb59f8eccdb6714221de7c82339fc',
                        'ready': '8a7575bf77e28c573a8c9a35e5d294d258d1413c98f4244a12056302d4b94b98'}[p.name])
-    w = SimpleNamespace(name='med000', hybrid_archive_sha=None)
+    w = replace(roi.AL, name='med000', hybrid_archive_sha=None)
     worker.check_hybrid_state(w, value, sp, ready)
     with pytest.raises(ValueError, match='identity'):
         worker.check_hybrid_state(w, 'other', sp, ready)
-    w.hybrid_archive_sha = 'non-null-different'
+    w = replace(w, hybrid_archive_sha='non-null-different')
     with pytest.raises(ValueError, match='hybrid control'):
         worker.check_hybrid_state(w, value, sp, ready)
