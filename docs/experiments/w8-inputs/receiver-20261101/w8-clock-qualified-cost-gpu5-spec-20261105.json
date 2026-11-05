@@ -25,7 +25,7 @@
   },
   "cpu_affinity_index": 1,
   "cpu_threads": 1,
-  "deadline": "2026-11-05T13:45:00Z",
+  "deadline": "2026-11-05T13:58:00Z",
   "defer_failed_publication": true,
   "device": "gpu",
   "entrypoint": [
@@ -115,7 +115,7 @@
   "local_storage_gib": 40,
   "materialization_profile": "public-model-folders-copy-v1",
   "packet_reference_audit_sha256": "c1923844722a088bbcc948c3d3d43535c31cf0440db98abbc152669287c8fc3a",
-  "receiver_cpu_budget_seconds": 900,
+  "receiver_cpu_budget_seconds": 930,
   "receiver_external_cpu_reserve_seconds": 100,
   "receiver_validator_cpu_seconds": 30,
   "required_commands": [
@@ -236,5 +236,5 @@
   "verify_staged_inputs": true,
   "clock_policy_profile": "w8-public-clocksource-two-leaf-v1",
   "clock_reference_audit_sha256": "9cf6eff76f0c0e40228d658bb439d92a261f1e87bb3ce9c546567f829759ae07",
-  "deadline_epoch": 1793886300.0
+  "deadline_epoch": 1793887080.0
 }

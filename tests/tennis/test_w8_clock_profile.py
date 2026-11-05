@@ -211,7 +211,7 @@ def test_actual_post_constructor_guard_binds_opt_in_helper_path_and_hash(tmp_pat
         exec(guard, env)
 
 
-def test_candidate_spec_changes_only_clock_opt_in_and_deadline():
+def test_candidate_spec_changes_clock_opt_in_cpu_cap_and_deadline():
     from experiments.tennis import w8_strict_host_cost_job as job
 
     root = Path(__file__).resolve().parents[2] / "docs/experiments/w8-inputs/receiver-20261101"
@@ -225,6 +225,9 @@ def test_candidate_spec_changes_only_clock_opt_in_and_deadline():
         value.pop("deadline_epoch", None)
     new.pop("clock_policy_profile")
     new.pop("clock_reference_audit_sha256")
+    assert old["receiver_cpu_budget_seconds"] == 900
+    assert new["receiver_cpu_budget_seconds"] == 930
+    new["receiver_cpu_budget_seconds"] = old["receiver_cpu_budget_seconds"]
     new["arguments"].remove("--clock-profile")
     assert new == old
 
