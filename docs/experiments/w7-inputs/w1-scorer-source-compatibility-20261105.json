@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "scope": "source provenance and AST comparison only; not score or pixel equivalence evidence",
+  "method": "For all nine producer jobs, independently SHA256-hashed source.tar and checked against ready and dispatch snapshot_sha256; read ready and dispatch hashes and selected patch; hashed listed source members. source_tree_sha256 is fleet tree identity, distinct from archive SHA256.",
+  "original_score_jobs": [
+    {
+      "job": "20261030T201626Z-e32a981b",
+      "source_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261030T201626Z-e32a981b/source.tar",
+      "source_archive_sha256": "3d7029753ea378bf86a62fcf3d6c078bc8c1abe8c8cd85bfc5db07b4b923479a",
+      "source_tree_sha256": "02223a8227072ca54b2448379f05fda29099c5ac8f352909ce1ad9e7f9461842",
+      "git_head": "8ecd68a7e345729be3b221143561d3fcd56a139a",
+      "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ready_sha256": "f656a239115f37a2ae4da9b8757d1f0f4a0da4dc04f6ed9ab106911338a94f80",
+      "dispatch_sha256": "9ee743e22154508996370afb8436549deb2fd852eccb51594072acd169e708b8",
+      "dispatch_source_matches": true,
+      "files": {
+        "experiments/tennis/w1_score.py": "5a6108fb596f20204a51628775f4bc6db5bdf6962dd9acf9f5d2012ae4a456ae",
+        "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+        "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+        "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+        "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+        "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+        "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+      }
+    },
+    {
+      "job": "20261031T113142Z-4be48588",
+      "source_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T113142Z-4be48588/source.tar",
+      "source_archive_sha256": "bf86ce21637732e65754d8f4de8f4ecd2d3b32981e93452fa2f7b6a079d1b2f2",
+      "source_tree_sha256": "79a3ea215c06610deccc73c610989252ca4d983f4a6fc41ba84fe8795f8ace94",
+      "git_head": "9db7a3df7aef69075a97a3f6f4e53d9c8cfeb806",
+      "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ready_sha256": "78d451fad4fbfe8d54fb1178dab573d775f4a79ad295a05e1c06c6281088c4cd",
+      "dispatch_sha256": "b22b29dfd355a174bc0ae03a67fbec0c291ef8cf816c393e50266a3cfc47828a",
+      "dispatch_source_matches": true,
+      "files": {
+        "experiments/tennis/w1_score.py": "5a6108fb596f20204a51628775f4bc6db5bdf6962dd9acf9f5d2012ae4a456ae",
+        "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+        "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+        "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+        "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+        "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+        "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+      }
+    },
+    {
+      "job": "20261031T112231Z-b3a5d0d6",
+      "source_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T112231Z-b3a5d0d6/source.tar",
+      "source_archive_sha256": "35a6c3f106df626f1cc1999a5ee514e2dfb261ba177cec6193eda884aee7113e",
+      "source_tree_sha256": "8858c52ca63d24c253ac7c15e7a4ec085870304d1eac6f9b312c030ba0585fd0",
+      "git_head": "35c90c86876643b194621f1cd252e4eca6f68d65",
+      "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ready_sha256": "42ddf0ed8296f5c838469e93300b08287a3b97f22428ec4dfa002d0d336efe70",
+      "dispatch_sha256": "c1575e95885fe5a320ec2b21aa1b8cb1bd8c61c6824108622e51bf9d43947d92",
+      "dispatch_source_matches": true,
+      "files": {
+        "experiments/tennis/w1_score.py": "5a6108fb596f20204a51628775f4bc6db5bdf6962dd9acf9f5d2012ae4a456ae",
+        "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+        "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+        "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+        "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+        "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+        "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+      }
+    },
+    {
+      "job": "20261031T112710Z-7930b798",
+      "source_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T112710Z-7930b798/source.tar",
+      "source_archive_sha256": "bf86ce21637732e65754d8f4de8f4ecd2d3b32981e93452fa2f7b6a079d1b2f2",
+      "source_tree_sha256": "79a3ea215c06610deccc73c610989252ca4d983f4a6fc41ba84fe8795f8ace94",
+      "git_head": "9db7a3df7aef69075a97a3f6f4e53d9c8cfeb806",
+      "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ready_sha256": "8a7575bf77e28c573a8c9a35e5d294d258d1413c98f4244a12056302d4b94b98",
+      "dispatch_sha256": "352b817729e11aa300365a4bddccb1541886c972e84030c18a5e5da1749b0e25",
+      "dispatch_source_matches": true,
+      "files": {
+        "experiments/tennis/w1_score.py": "5a6108fb596f20204a51628775f4bc6db5bdf6962dd9acf9f5d2012ae4a456ae",
+        "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+        "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+        "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+        "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+        "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+        "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+      }
+    },
+    {
+      "job": "20261031T113152Z-f858b1c5",
+      "source_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T113152Z-f858b1c5/source.tar",
+      "source_archive_sha256": "bf86ce21637732e65754d8f4de8f4ecd2d3b32981e93452fa2f7b6a079d1b2f2",
+      "source_tree_sha256": "79a3ea215c06610deccc73c610989252ca4d983f4a6fc41ba84fe8795f8ace94",
+      "git_head": "9db7a3df7aef69075a97a3f6f4e53d9c8cfeb806",
+      "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ready_sha256": "2319c573cb383d2dbd1e76ef74094620a1b664478d280490415b70f66fb8df88",
+      "dispatch_sha256": "1d0e0f3ed069d18d09fd3fd64b23a8e28bbfc8ae6d23ffdb943343b68fc38bb1",
+      "dispatch_source_matches": true,
+      "files": {
+        "experiments/tennis/w1_score.py": "5a6108fb596f20204a51628775f4bc6db5bdf6962dd9acf9f5d2012ae4a456ae",
+        "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+        "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+        "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+        "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+        "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+        "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+      }
+    },
+    {
+      "job": "20261031T105818Z-014c1510",
+      "source_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T105818Z-014c1510/source.tar",
+      "source_archive_sha256": "7e164089d6baae6b2f89280893ea38bb249b188965b5a39b1d03c15813743e74",
+      "source_tree_sha256": "7ef27d7706374c87628bdd7f3444d24eaa3f449872160541e340bc63c21bc3cd",
+      "git_head": "615fe6afebee6726c3cb661021b1a791c78b63dd",
+      "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ready_sha256": "c1a5274c365be81083eb03d3c98751b43e290370f5b465d01073220bc9572e34",
+      "dispatch_sha256": "26fe45ed820762d11170e24325f06edda85cc042eafadc3cd651dd40ce288842",
+      "dispatch_source_matches": true,
+      "files": {
+        "experiments/tennis/w1_score.py": "5a6108fb596f20204a51628775f4bc6db5bdf6962dd9acf9f5d2012ae4a456ae",
+        "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+        "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+        "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+        "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+        "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+        "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+      }
+    }
+  ],
+  "repair_score_jobs": [
+    {
+      "job": "20261031T215039Z-d1695e8d",
+      "source_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T215039Z-d1695e8d/source.tar",
+      "source_archive_sha256": "2ca2f023624e90830e5ff8ed4e490a0ddf4b6a4ed2f76005247b7529ebf0d609",
+      "source_tree_sha256": "fd4b55343c73f990ac31af2cd8424312f9fd57a7d56412bfd73314e2a5243649",
+      "git_head": "9a74db8744690c5998b97c38a989fb042f6f81f5",
+      "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ready_sha256": "a9be145a52fd3375101b199f926542247d7b61dc7a043dd10b048c49195a53f0",
+      "dispatch_sha256": "0b10f0e0598346a9fe4b3e116fd9a052d1d8c3ee63ba14ed2dcdd76af27ad332",
+      "files": {
+        "experiments/tennis/w1_score.py": "26f056f05fba7a8132f57c7b3c4fd9a0e67555f7985d617255916499e9df7743",
+        "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+        "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+        "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+        "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+        "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+        "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+      }
+    },
+    {
+      "job": "20261031T215041Z-2f1dee96",
+      "source_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T215041Z-2f1dee96/source.tar",
+      "source_archive_sha256": "2ca2f023624e90830e5ff8ed4e490a0ddf4b6a4ed2f76005247b7529ebf0d609",
+      "source_tree_sha256": "fd4b55343c73f990ac31af2cd8424312f9fd57a7d56412bfd73314e2a5243649",
+      "git_head": "9a74db8744690c5998b97c38a989fb042f6f81f5",
+      "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ready_sha256": "fe20bfd0f57b1484de4abe2ea5fa253962716ba0f4f04c6a69b61eb0be8696ed",
+      "dispatch_sha256": "7b5faa963586fb64708c9515e5b9ded139e2c0ea62d8f7c7b9f1e478736d1c79",
+      "files": {
+        "experiments/tennis/w1_score.py": "26f056f05fba7a8132f57c7b3c4fd9a0e67555f7985d617255916499e9df7743",
+        "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+        "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+        "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+        "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+        "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+        "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+      }
+    },
+    {
+      "job": "20261031T215041Z-3ab89852",
+      "source_archive_path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T215041Z-3ab89852/source.tar",
+      "source_archive_sha256": "2ca2f023624e90830e5ff8ed4e490a0ddf4b6a4ed2f76005247b7529ebf0d609",
+      "source_tree_sha256": "fd4b55343c73f990ac31af2cd8424312f9fd57a7d56412bfd73314e2a5243649",
+      "git_head": "9a74db8744690c5998b97c38a989fb042f6f81f5",
+      "tracked_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ready_sha256": "4754916ace79328f7a5c8a9a644342b34ecd90238e43c1ed94b4065855fb897e",
+      "dispatch_sha256": "7dbc24c43c08ba9fc032f5435027c4d57d969cc8250c9207e24a89054a2b6232",
+      "files": {
+        "experiments/tennis/w1_score.py": "26f056f05fba7a8132f57c7b3c4fd9a0e67555f7985d617255916499e9df7743",
+        "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+        "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+        "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+        "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+        "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+        "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+      }
+    }
+  ],
+  "historical_w1_score_sha256": "5a6108fb596f20204a51628775f4bc6db5bdf6962dd9acf9f5d2012ae4a456ae",
+  "repair_w1_score_sha256": "26f056f05fba7a8132f57c7b3c4fd9a0e67555f7985d617255916499e9df7743",
+  "common_helpers_sha256": {
+    "experiments/tennis/w1_roi.py": "e98b1965b3b45e665217fbc95f79cdaa81ccaefb86f534137013217659f155ef",
+    "experiments/tennis/k4b_features.py": "067ffcdab6f4a7d32aed2c39331961e34b84484826cbcb879204e2d82511c453",
+    "experiments/tennis/k6.py": "a8da4febac96249983713e74144e1deec1953a644c25a3ce111a2decec985dd7",
+    "experiments/visor/h3b.py": "a5b51f9586e17e1e86b33e34fd6bc296e9e0ede8203e0cbf3829f1af88acc6e2",
+    "src/codecs/svtav1.py": "d57ada7fb94f4788447b0175c980cbe5e64042b9751a1643783fbb26e369ae1c",
+    "src/codecs/quality.py": "bb330efdcf49694e86edca8311fcfdb4e08eb1db3316d81a112f6b808e9b8b46"
+  },
+  "same_function_ast": [
+    "assemble",
+    "control_errors",
+    "extract",
+    "hybrid_point",
+    "scales_of",
+    "score_point",
+    "selected_points"
+  ],
+  "changed_function_ast": [
+    "main",
+    "run",
+    "validate"
+  ],
+  "identical_run_statement_ast": [
+    "source YUV path",
+    "convert_command subprocess",
+    "source YUV hash guard",
+    "source YUV memmap",
+    "80-tick truth conversion loop",
+    "LPIPS and DISTS construction",
+    "CUDA model device guard",
+    "score_point/control_errors loop"
+  ],
+  "run_changes": "GPU class admission, explicit repair-point and mask input selection, and repair-specific analysis/output metadata. No claim that whole run functions are equivalent.",
+  "limits": "This bridges code provenance only. Actual source-video conversion, tick masks, model weights, GPU controls, delivered MKV/IVF and per-point native/RGB evidence remain separately required. Frozen running byte pilot inventory remains unchanged."
+}

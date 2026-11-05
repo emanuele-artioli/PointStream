@@ -269,3 +269,17 @@ Independent implementation review accepted commit f7695b70 for a new bounded pre
 Fresh coalesced-source prepare submitted as `20261105T020925Z-97a4cf02`; source SHA256 `59844fa9daa863ff64f09e16e02a564454fa3c4598288cbdcd3dbc65aed24423`, canonical spec SHA256 `93a9923c782869e5cfc73cbe58cc8831c422f5fe2b1527d66ed72af1e4f73c85`; pending16/48 qualification.
 
 Sensitivity controls: the previous 188-frame `calibration-controls-spec-20261105.json` is **SUPERSEDED** and rejected by the pilot worker. The unsubmitted [16/48-frame cost pilot](k5d-inputs/calibration-controls-pilot-20261105.md) uses the fixed five arms and whole-frame judges, with a 550-second campaign inside a 600 GPU-second / 700 CPU-second inclusive pilot allocation. A separate 188-frame run remains contingent on SHA-bound pilot cost evidence, full forecast and remaining budget; no new outcome-based selection is allowed.
+
+Control16/48costpilot submitted as `20261105T021434Z-3ec159d8`; source `6840271ba7b4179a044184e7db5dea357c1702dd093f335d812f3f5fb077b15a`, spec `9f83edb1ec4db02ce7d9125c0b96fea4d1b4eefada8eacafddb3ac5d4f61efc5`, frozen48046314; inclusive600GPU700CPU, original188goal remainsconditional.
+
+### 2026-11-05 — Measured prepare cost-cap revision
+
+Job97a4cf02 completed196.731-second16frame preparation with exactnative/source/reconstruction parity and zero recordedcontention. Its449.206-second conservative fullforecast exceeded420, so48correctlydidnotrun. Revised frozenff60bb3d uses220/500-second stages and780campaign,850GPU1050CPUinclusive, retaining1.5slowdownmargin+40reserve+20remainingreserve. Three previous700/900prepareceilings charged separately; newprepare+futurecoalescedscore yields3650GPU4650CPU cumulative≤prior4100/5250cap. No replay or replacement of the oldfailedgate. Rootreviewedstrictspec500max and31focusedtestspassed beforedispatch.
+
+Sized-source prepare job `20261105T021805Z-f518beaa`, source `c25d77329c6fe85be4396e51abb794ee6805736a8486b5061c9f8ebcaba7c4d6`, spec `b9726296d634425eed0467a716acbaac6708fcc59ccba616cfa829ecf674507c`; frozen `/private/tmp/pointstream-coalesced-sized-frozen-20261105`.
+
+Same-source sixpointcoalescedscore job `20261105T023544Z-408e8453`, source `c25d77329c6fe85be4396e51abb794ee6805736a8486b5061c9f8ebcaba7c4d6`, spec `213c2248f72c660914edbb9a4051f4a835062d2511cee2a4959546ad346fb8f9`; frames16/48all6, budget700GPU900CPU, exactd8metrics/judgesandcurrentforecastrequired.
+
+Finalcontrol16/188job `20261105T023619Z-0e2a610f`, source `c6bbb5ccd64555321997ecefe0cabc4aa32b1ef37e66740e0e944132e20d405f`, canonicalspec `38aefa3a49ae8e98ea6dc087adcc40b50b92c196e0a6d5ea4b6aeace0ee2c7f7`, frozen2cc35643; inclusive600GPU800CPU, samef438costreceipt andfivearms, no appearancequalificationorcorpusclaim.
+
+Phase k5d-coalesced-permission-repair-20261105 job `20261105T025241Z-fe451f9e`, revision `7640ed34696ec93c1a61fd3666d29828eea38e46`, source `8a3b51c487cf9b456e304fdf24300f230ece3f3c7b2c8569ab6681fbd8166f13`, canonicalspec `fcfa508d37f0bc93c0213b868314cc925820dbea715774427dfa18a70573b47a`; inclusive850GPU/1050CPU seconds. No replay or implied scientificpass.

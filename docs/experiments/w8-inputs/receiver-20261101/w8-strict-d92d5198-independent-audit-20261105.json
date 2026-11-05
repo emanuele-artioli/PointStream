@@ -1,0 +1,22 @@
+{
+  "job": "20261105T023057Z-d92d5198",
+  "fleet_status": "failed in one-step smoke before packet decode and generation",
+  "host": "gpu6",
+  "gpu_uuid": "GPU-ef96fc4f-134e-4c01-290e-9a6c8bbef553",
+  "revision": "ffe54457ba51b4eed62fc5a47c0081b881718f8c",
+  "source_identity_sha256": "d144f3657544ebb090e4a92dbee9b119f77baf1ea52ae380e3ae22d31a7f3ed1",
+  "source_archive_sha256": "11b57116e2c6fec121f0a5905536aef2fdddcb0b05d12f5e935a5b2e32f77d20",
+  "spec_sha256": "285fd7d98bbcff0fbdf6c4e25e341883fac5449c741be9e1c9e3e137670f0792",
+  "runtime_archive_sha256": "bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e",
+  "source_members_sha256": {"w8_payload.py": "9629bc596923540cf9eb3e17ebcc6b1c2b3000de15cf5019c33e083153a69a64", "w8_strict_cost_job.py": "d00771bf4d219bc82323e36c40966aa6a9de459037887f7fb059fde56da7607b", "w8_strict_receiver_worker.py": "e756d0e8e9d1a8826ed2029c03356f829d70d7e34d5666cdb5d8aa3e4068ca7f", "w8_strict_source.py": "90a030ef648011b917a8839c8e20ad31cb3f182127461c2901f15546961c56fe"},
+  "command_log_sha256": "0888709e211ec3ebb333d33e53aa4e694f05566bb6dd88054600e79879a292ee",
+  "execution_sha256": "33ea7dfc93657e2ce4d302c0b6c664ae4f17de6b961f00f48e11a061fa6513a8",
+  "packet_worker_config_sha256": "eebe8d5eaf73c333314b369f1216bb62e689fbac9e57a4ba5a6421bc464e7980",
+  "packet_worker_stderr_sha256": "26c9decc8ceca86eeeafd594eeed60ab76296557a71b87cb30f60e3eb3ea2d7b",
+  "packet_worker": {"pid": 2308926, "status": 1, "timed_out": false, "wall_seconds": 2.7771667698398232, "cpu_seconds": 2.734131, "stdout_bytes": 0, "output_members": [], "mutation_canaries_unchanged": true},
+  "failure": "After strict bootstrap returned and packet worker entered prepare_packet, Python attempted to import w8_payload.py from the fleet source checkout. Landlock denied that path; the separately staged source-only copy was the granted root and had the same authenticated member hash. The frozen launcher used PYTHONPATH for that source-only copy but did not set subprocess cwd, allowing the fleet checkout to precede it on sys.path.",
+  "isolation_evidence_limit": "The call stack establishes that the bootstrap returned, but this failed worker did not publish the isolation receipt because its packet manifest is only written after preparation; no independent denial or mutation qualification is claimed for this failed attempt.",
+  "generation_status": "The model output directory was empty, no generation worker started, and no one-step crop or cost/quality evidence was produced. The supervisor had extracted the approved common base before the packet worker.",
+  "resources": {"campaign_start_to_phase_start_seconds": 121.750536732, "smoke_command_wall_seconds": 11.724729537963867, "waited_children_cpu_seconds": 11.637839, "cpu_semantics": "cumulative RUSAGE_CHILDREN, not additive with packet worker CPU", "supervisor_start_to_terminal_seconds": 143.3964991, "creation_to_terminal_status_seconds": 196.6174643, "phase_caps_gpu_cpu_seconds": [700, 1000], "claim_and_gpu_processes": "none at canonical status", "supervisor_and_packet_worker_pids_absent": true, "failed_smoke_scratch_retained": true, "fleet_source_checkout_removed": true, "auditor_deleted_nothing": true},
+  "recommendation": "Review a new source-origin repair that launches with cwd equal to the authenticated source-only tree and verifies executing package origins, with CPU import/order tests. Preserve the existing source-denial and write policy. The original failed job must not be replayed; any new job requires a fresh cost forecast and explicit reservation within the remaining phase budget, including the observed staging overhead."
+}

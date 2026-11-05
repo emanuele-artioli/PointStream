@@ -36,8 +36,11 @@ POLL_SECONDS = 60
 # worker unpacks it under its host-local root. Workers advertise the capability
 # in their heartbeat so a client never uses it against an older worker.
 SOURCE_ARCHIVE = "source.tar"
-WORKER_CAPABILITIES = ("source_archive",)
+WORKER_CAPABILITIES = ("source_archive", "indexed_cpu_affinity_v1")
 SOURCE_EXTRACT_SECONDS = 300
+INDEXED_CONTROL_FILES = ("experiments/__init__.py", "experiments/jobs/__init__.py",
+                         "experiments/jobs/inbox.py", "experiments/jobs/monitor.py",
+                         "experiments/jobs/claims.py", "experiments/jobs/fleet.py", "experiments/jobs/staging.py")
 # Publication runs under the client's 120 s SSH limit and admission inside the
 # worker scan that also refreshes the heartbeat, so neither may stream large
 # inputs over NFS (8 MB/s on 2026-10-30: 429 s for one 3.4 GB UNet). They hash
@@ -82,6 +85,11 @@ def validate_spec(spec: Any, *, now: float | None = None) -> dict[str, Any]:
             raise fleet.FleetError('single_cpu_campaign must be boolean')
         if spec['single_cpu_campaign'] and (type(spec.get('cpu_threads')) is not int or spec['cpu_threads'] != 1):
             raise fleet.FleetError('single_cpu_campaign requires cpu_threads: 1')
+    if 'cpu_affinity_index' in spec:
+        if type(spec['cpu_affinity_index']) is not int or spec['cpu_affinity_index'] < 0:
+            raise fleet.FleetError('cpu_affinity_index must be a nonnegative integer')
+        if spec.get('single_cpu_campaign') is not True:
+            raise fleet.FleetError('cpu_affinity_index requires single_cpu_campaign: true')
     if 'defer_failed_publication' in spec:
         if not isinstance(spec['defer_failed_publication'], bool):
             raise fleet.FleetError('defer_failed_publication must be boolean')
@@ -550,28 +558,44 @@ def start_request(directory: Path, spec: dict[str, Any], gpu: dict[str, Any] | N
     run = directory / "run"
     run.mkdir()
     (run / "events").mkdir()
+    indexed = "cpu_affinity_index" in spec
+    # An indexed request must execute the reviewed fleet release, even when
+    # its scientific source snapshot embeds an older fleet implementation.
+    control_root = Path(__file__).resolve().parents[2]
+    if indexed:
+        control_identity = {name: file_digest(control_root / name) for name in INDEXED_CONTROL_FILES}
+        campaign_command = [sys.executable, str(control_root / "experiments/jobs/inbox.py"), "campaign", str(directory)]
+        supervisor_command = [sys.executable, str(control_root / "experiments/jobs/monitor.py"), "serve", str(run)]
+        salvage_command = [sys.executable, str(control_root / "experiments/jobs/inbox.py"), "salvage", str(directory)]
+    else:
+        control_identity = None
+        campaign_command = [sys.executable, "-m", "experiments.jobs.inbox", "campaign", str(directory)]
+        supervisor_command = [sys.executable, "-m", "experiments.jobs.monitor", "serve", str(run)]
+        salvage_command = [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)]
     claims: dict[str, Any] = {"gpu": gpu["uuid"] if gpu else None, "cpu_threads": spec["cpu_threads"], "claims_dir": str(base.parent / "claims"), "min_free_memory_mb": spec["gpu_memory_mib"] + fleet.DEFAULT_MEMORY_MARGIN_MIB}
     sharing = gpu_sharing(spec) if gpu else None
     if sharing and sharing["mode"] == "shared":
         claims.update(sharing="shared", memory_mib=spec["gpu_memory_mib"], margin_mib=sharing["margin_mib"], min_free_memory_mb=spec["gpu_memory_mib"] + sharing["margin_mib"])
     monitor.write_json(run / "request.json", {
-        "command": [sys.executable, "-m", "experiments.jobs.inbox", "campaign", str(directory)],
+        "command": campaign_command,
         "cwd": str(source), "budget_seconds": remaining, "deadline_epoch": spec["deadline_epoch"],
         "thread": None, "codex": "codex", "cancel_path": str(directory / "cancel.json"),
         "contention": spec.get("contention") or {"policy": "stop"}, "attempt": state.get("attempt", 1),
         # Preserve host-local failed scratch for a separately budgeted manual
         # salvage when explicitly requested; automatic salvage is otherwise unchanged.
         **({} if spec.get("defer_failed_publication") else
-           {"salvage": [sys.executable, "-m", "experiments.jobs.inbox", "salvage", str(directory)]}),
+           {"salvage": salvage_command}),
+        **({"cpu_affinity_index": spec["cpu_affinity_index"]} if "cpu_affinity_index" in spec else {}),
+        **({"fleet_control": {"root": str(control_root), "files": control_identity}} if indexed else {}),
         # Without a GPU claim the supervisor claims only CPU threads and hides every GPU.
         "claims": claims, "gpu_sharing": sharing,
     })
     monitor.write_json(run / "policy.json", {"stall_seconds": spec["stall_seconds"], "report_at": None, "quiet_until": 0})
     monitor.write_json(directory / "environment.json", {"host": host["host"], "alias": host["alias"], "gpu": gpu, "python": host.get("python_version"), "tools": host.get("tool_versions"), "started": time.time()})
     transition(directory, "launching", host_alias=host["alias"], gpu=gpu, gpu_sharing=sharing)
-    env = {**os.environ, "PYTHONPATH": str(source), "PS_DATA_ROOT": str(base.parent.parent)}
+    env = {**os.environ, "PYTHONPATH": str(control_root if indexed else source), "PS_DATA_ROOT": str(base.parent.parent)}
     with (run / "supervisor.log").open("a") as output:
-        child = subprocess.Popen([sys.executable, "-m", "experiments.jobs.monitor", "serve", str(run)], cwd=source, env=env, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
+        child = subprocess.Popen(supervisor_command, cwd=source, env=env, stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
     monitor.write_json(run / "supervisor.json", {"pid": child.pid, "proc_start_time": get_process_start_time(child.pid), "host": host["host"]})
     transition(directory, "running", supervisor_pid=child.pid)
 
@@ -726,12 +750,17 @@ def contention_during(run: Path, started: float, ended: float) -> dict[str, Any]
     return {"timing_contaminated": bool(episodes), "contention": episodes, "paused_seconds": monitor.paused_seconds(status, started, ended)}
 
 
-def campaign_cpu_affinity(spec: dict[str, Any]) -> list[int] | None:
+def campaign_cpu_affinity(spec: dict[str, Any], supervisor_binding: dict[str, Any] | None = None) -> list[int] | None:
     """Restrict CPU campaigns, or an explicitly opted-in GPU campaign.
 
     Affinity is inherited by ordinary children, but is not a security boundary:
     reviewed workload code and native tools must not widen it or escape teardown.
     """
+    index = spec.get("cpu_affinity_index", 0)
+    if type(index) is not int or index < 0:
+        raise fleet.FleetError("cpu_affinity_index must be a nonnegative integer")
+    if "cpu_affinity_index" in spec and spec.get("single_cpu_campaign") is not True:
+        raise fleet.FleetError("cpu_affinity_index requires single_cpu_campaign: true")
     if spec.get("device", "gpu") != "cpu" and not spec.get("single_cpu_campaign", False):
         return None
     count = spec.get("cpu_threads")
@@ -745,9 +774,18 @@ def campaign_cpu_affinity(spec: dict[str, Any]) -> list[int] | None:
         raise fleet.FleetError("CPU campaign requires process affinity support")
     try:
         available = sorted(get_affinity(0))
-        if len(available) < count:
-            raise fleet.FleetError(f"CPU campaign needs {count} allowed CPUs; only {len(available)} available")
-        selected = available[:count]
+        if supervisor_binding is not None:
+            original = supervisor_binding.get("available")
+            selected = supervisor_binding.get("selected")
+            if (type(original) is not list or any(type(cpu) is not int for cpu in original)
+                    or original != sorted(set(original)) or index >= len(original)
+                    or supervisor_binding.get("index") != index or selected != [original[index]]
+                    or count != 1 or available != selected):
+                raise fleet.FleetError("CPU campaign supervisor affinity binding differs")
+            return selected
+        if index + count > len(available):
+            raise fleet.FleetError(f"CPU campaign affinity index {index} needs {count} allowed CPUs; only {len(available)} available")
+        selected = available[index:index + count]
         set_affinity(0, selected)
         if set(get_affinity(0)) != set(selected):
             raise fleet.FleetError("CPU campaign affinity did not take effect")
@@ -771,7 +809,10 @@ def campaign(directory: Path) -> int:
         return 1
     spec = monitor.read_json(directory / "spec.json")
     try:
-        cpu_affinity = campaign_cpu_affinity(spec)
+        binding = monitor.read_json(directory / "run" / "cpu-affinity.json") if "cpu_affinity_index" in spec else None
+        if "cpu_affinity_index" in spec and binding is None:
+            raise fleet.FleetError("indexed CPU campaign requires supervisor affinity binding")
+        cpu_affinity = campaign_cpu_affinity(spec, binding)
         manifest = monitor.read_json(directory / "ready.json")
         # Archive-mode jobs link source/ to host-local disk: read it there, not through NFS.
         source = (directory / "source").resolve()
@@ -779,6 +820,12 @@ def campaign(directory: Path) -> int:
         started = time.time()
         supervisor_state = monitor.read_json(run / "status.json", {})
         supervisor_request = monitor.read_json(run / "request.json", {})
+        if "cpu_affinity_index" in spec:
+            control = supervisor_request.get("fleet_control", {})
+            control_root = Path(__file__).resolve().parents[2]
+            if (control.get("root") != str(control_root) or set(control.get("files", {})) != set(INDEXED_CONTROL_FILES)
+                    or any(file_digest(control_root / name) != control["files"][name] for name in INDEXED_CONTROL_FILES)):
+                raise fleet.FleetError("indexed fleet control release identity differs")
         budget_end = min(supervisor_state.get("started", started) + supervisor_request.get("budget_seconds", spec["budget_seconds"]), spec["deadline_epoch"])
         budget_end_monotonic = time.monotonic() + max(0.0, budget_end - time.time())
         if digest(spec) != manifest["spec_sha256"]:
@@ -829,6 +876,10 @@ def campaign(directory: Path) -> int:
                 "PS_VALIDATION_PATH": str(directory / "validation.json"),
                 **temporary_env,
             }
+            if "cpu_affinity_index" in spec:
+                # Scientific modules and validators must import the frozen
+                # workload, even though the supervisor runs from the release.
+                env["PYTHONPATH"] = str(source)
             if packed:
                 env.update(PATH=os.pathsep.join([packed["bin"], env.get("PATH", "")]), CONDA_PREFIX=packed["prefix"])
             monitor.write_json(output / "dispatch.json", {
@@ -837,6 +888,7 @@ def campaign(directory: Path) -> int:
                 "citable": False if stage == "smoke" else None, "attempt": attempt, "resumed_from": resumed_from,
                 "contention_policy": spec.get("contention"), "gpu_sharing": gpu_sharing(spec),
                 **({"cpu_affinity": cpu_affinity} if cpu_affinity is not None else {}),
+                **({"fleet_control": supervisor_request["fleet_control"]} if "cpu_affinity_index" in spec else {}),
                 **({"campaign_clock": {"started": campaign_started_monotonic,
                                         "phase_started": time.monotonic(),
                                         "budget_end": budget_end_monotonic}}
@@ -1287,6 +1339,8 @@ def submit(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         heartbeat = health["workers"].get(alias)
         if not heartbeat or time.time() - heartbeat["updated"] > 3 * POLL_SECONDS:
             raise fleet.FleetError(f"worker {alias} has no fresh heartbeat; run doctor and inspect before submission")
+        if "cpu_affinity_index" in spec and "indexed_cpu_affinity_v1" not in (heartbeat.get("capabilities") or []):
+            raise fleet.FleetError(f"worker {alias} does not advertise indexed CPU affinity; activate the reviewed fleet release first")
     # Keep the archive on NFS and unpack host-locally only when every eligible worker can.
     archive_mode = all("source_archive" in (health["workers"][alias].get("capabilities") or []) for alias in spec["hosts"])
     job_id =datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8]

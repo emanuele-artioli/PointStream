@@ -234,14 +234,20 @@ def prepare_forecast(stage: Path, now: float) -> dict[str, float]:
             or not math.isfinite(seconds) or seconds <= 0
             or not 0 < clock['started'] <= clock['phase_started'] <= now < clock['budget_end']):
         raise ValueError('invalid prepare campaign timing')
+    spec = json.loads((stage.parent / 'spec.json').read_text())
+    full_cap = spec['full']['seconds']
+    if (isinstance(full_cap, bool) or not isinstance(full_cap, (int, float))
+            or not math.isfinite(full_cap) or not 0 < full_cap <= 500):
+        raise ValueError('prepare full stage cap must be positive and at most 500 seconds')
     slowdown = max(1., seconds / base16)
     estimate = 1.5 * base48 * slowdown + 40
     remaining = clock['budget_end'] - now
-    if estimate > 420 or estimate + 20 > remaining:
+    if estimate > full_cap or estimate + 20 > remaining:
         raise ValueError('prepare 48-frame forecast exceeds stage or remaining campaign')
     return {'smoke_seconds': seconds, 'baseline16': base16, 'baseline48': base48,
             'observed_slowdown': slowdown, 'margin': 1.5, 'seal_staging_validation_reserve_seconds': 40.,
-            'estimate_seconds': estimate, 'remaining_seconds': remaining, 'campaign_reserve_seconds': 20.}
+            'estimate_seconds': estimate, 'full_stage_cap_seconds': full_cap,
+            'remaining_seconds': remaining, 'campaign_reserve_seconds': 20.}
 
 
 def option(arguments: list[str], name: str) -> str:

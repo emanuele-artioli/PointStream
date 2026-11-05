@@ -18,7 +18,13 @@ FULL_PATH = str(cf.DATA_ROOT / 'jobs/fleet/inbox/20261105T000550Z-d8b5c76b/full/
 
 
 def score_spec(base: dict[str, Any], *, small: dict[str, str], full: dict[str, str],
-               reference16_local: Path, reference48_local: Path, deadline: str) -> dict[str, Any]:
+               reference16_local: Path, reference48_local: Path, deadline: str,
+               smoke_seconds: int = 200, full_seconds: int = 420, budget_seconds: int = 650) -> dict[str, Any]:
+    if (type(smoke_seconds) is not int or not 0 < smoke_seconds <= 220
+            or type(full_seconds) is not int or not 0 < full_seconds <= 750
+            or type(budget_seconds) is not int or budget_seconds > 1100
+            or budget_seconds < smoke_seconds + full_seconds + 20):
+        raise ValueError('invalid bounded scoring campaign')
     a = cf.checkpoint_archive('prepare16', small['remote'], small['archive_sha256'], Path(small['local']), small['checkpoint_sha256'], 16)
     b = cf.checkpoint_archive('prepare48', full['remote'], full['archive_sha256'], Path(full['local']), full['checkpoint_sha256'], 48)
     r16 = cf.asset('reference16', cf.D8_SMOKE_PATH, cf.D8_SMOKE_SHA, reference16_local, extract=False)
@@ -28,9 +34,9 @@ def score_spec(base: dict[str, Any], *, small: dict[str, str], full: dict[str, s
     spec['arguments'] = ['score', *base['arguments'], '--prepare16', '{staged:prepare16}', '--prepare48', '{staged:prepare48}',
                          '--checkpoint16-sha256', small['checkpoint_sha256'], '--checkpoint48-sha256', full['checkpoint_sha256'],
                          '--reference16', '{staged:reference16}', '--reference48', '{staged:reference48}']
-    spec['smoke'] = {'seconds': 200, 'representative_basis': 'All six complete 16-frame receiver replays, shared judges and exact accepted-output comparison.'}
-    spec['full'] = {'seconds': 420}
-    spec['budget_seconds'] = 650
+    spec['smoke'] = {'seconds': smoke_seconds, 'representative_basis': 'All six complete 16-frame receiver replays, shared judges and exact accepted-output comparison.'}
+    spec['full'] = {'seconds': full_seconds}
+    spec['budget_seconds'] = budget_seconds
     spec['validator'] = ['{python}', '-m', 'experiments.tennis.k5d_coalesced_fleet', 'validate']
     return spec
 
@@ -59,6 +65,14 @@ def run(args: argparse.Namespace) -> None:
     cp.write_new(scratch / 'publish' / 'comparison.json', comparison)
 
 
+def score_forecast(stage: Path, now: float) -> dict[str, float]:
+    spec = json.loads((stage.parent / 'spec.json').read_text())
+    full_cap = spec['full']['seconds']
+    if type(full_cap) is not int or not 0 < full_cap <= 750:
+        raise ValueError('score full stage cap must be positive and at most 750 seconds')
+    return cf.forecast(stage, full_cap, 3, now)
+
+
 def validate() -> None:
     target = Path(os.environ['PS_VALIDATION_PATH'])
     try:
@@ -69,7 +83,7 @@ def validate() -> None:
             result = cp.compare_equivalence(prior, output / 'assembled', oracle.sha(prior / 'pilot.json'))
             if result != json.loads((output / 'comparison.json').read_text()) or result['frames'] != 16:
                 raise ValueError('coalesced smoke comparison differs')
-        projection = cf.forecast(stage, 420, 3, time.monotonic())
+        projection = score_forecast(stage, time.monotonic())
         target.write_text(json.dumps({'passed': True, 'checks': {'all_six_exact': True, 'forecast': True}, 'forecast': projection}) + '\n')
     except Exception as exc:
         target.write_text(json.dumps({'passed': False, 'checks': {'coalesced': False}, 'error': str(exc)}) + '\n')

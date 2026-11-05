@@ -1,0 +1,59 @@
+{
+  "job_id": "20261105T024114Z-9b0e94ee",
+  "status": "complete",
+  "host": "gpu5",
+  "created": 1793846504.8947713,
+  "ended": 1793846528.034913,
+  "inclusive_charge_seconds": 54,
+  "external_audit_reserve_seconds": 30,
+  "source_sha256": "3152b1bf3154c46377a42f46767d052cada4ff3e55224fd1908e512c8f2027bb",
+  "spec_sha256": "327f456032f05f3a9ed011358e433082839693fc9b65f85b0c4be0a8e9261ed2",
+  "gate": {
+    "passed": true,
+    "spec_sha256": "327f456032f05f3a9ed011358e433082839693fc9b65f85b0c4be0a8e9261ed2",
+    "source_sha256": "3152b1bf3154c46377a42f46767d052cada4ff3e55224fd1908e512c8f2027bb",
+    "inputs": [
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T111906Z-fe5c2c88/full/published.tar",
+        "sha256": "84ad27fab909d5c18a3f991da0ec85d2acab603baf6353cbbc11e9be8a812e78"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T105451Z-8b753ab5/full/published.tar",
+        "sha256": "63da25623b76d4394e8d714ffeb3aa2ea3b2c96e006427ede0cf46285b667a72"
+      },
+      {
+        "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261031T111927Z-2d513709/full/published.tar",
+        "sha256": "172fea604e4ea1464dc22917b0737e315515ed38629723a7d5dcde7c2c2e84db"
+      }
+    ],
+    "validation": {
+      "passed": true,
+      "checks": {
+        "three_frozen_roles": true,
+        "independent_mkv_extract": true,
+        "native_yuv": true,
+        "timestamps": true,
+        "cost_forecast": true
+      },
+      "projection_seconds": 207.68447804963216,
+      "remaining_phase_seconds": 421.73325514793396,
+      "max_worker_and_validator_point_seconds": 1.3127509159967303,
+      "current_charge_elapsed_seconds": 10.26674485206604,
+      "scope": "pilot only; separately review remaining budget before full run"
+    },
+    "validator_seconds": 1.5222806930541992,
+    "smoke_seconds": 7.146704196929932,
+    "remaining_seconds": 112.7381317615509,
+    "attempt": 1
+  },
+  "artifact_hashes": {
+    "smoke/published.tar": "856d4bc669ef8491c4f8b6b033131ac1e35c7e4256b07d5dc56728653bc5bb7a",
+    "smoke/execution.json": "f4c2a9b4cae3f8dc06968991dd78d36130f405254183116067b344203173e8ef",
+    "smoke/staging.json": "be44f3923bbb8eba824e2cc062af5ee41995eee5c957d9617f36ba065a9b4a34",
+    "smoke/dispatch.json": "b5a46f5af822cafeaf16ca833931981abf43afede2be647706dac8346c295bf6",
+    "gate.json": "0d7040fbc27c09f8b42829ebcdc0b419e337c0c6a3df26349572224ba92e805f",
+    "full/published.tar": "b896823ce4e2da4d2381c9479c1ee9d6cb2b3b75b7a91a84ff0cea851582b5a2",
+    "full/execution.json": "31cf1c27e2db7f82ebdb2d377d71e90c7e0a21b4db8a69f0eb34778aede44835"
+  },
+  "scope": "Independent saved artifact and receipt audit; no independent native model or re-decode repeated; validator separately redecoded three actual streams."
+}

@@ -366,6 +366,24 @@ def salvage(directory: Path, request: dict[str, Any], reason: str) -> dict[str, 
         return {"error": str(exc), "reason": reason, "started": started, "seconds": time.time() - started}
 
 
+def apply_indexed_cpu_affinity(index: int) -> dict[str, Any]:
+    """Pin an opted-in supervisor before it launches the campaign."""
+    if type(index) is not int or index < 0:
+        raise ValueError("cpu_affinity_index must be a nonnegative integer")
+    get_affinity = getattr(os, "sched_getaffinity", None)
+    set_affinity = getattr(os, "sched_setaffinity", None)
+    if get_affinity is None or set_affinity is None:
+        raise ValueError("indexed supervisor requires process affinity support")
+    available = sorted(get_affinity(0))
+    if index >= len(available):
+        raise ValueError(f"cpu_affinity_index {index} exceeds {len(available)} allowed CPUs")
+    selected = [available[index]]
+    set_affinity(0, selected)
+    if sorted(get_affinity(0)) != selected:
+        raise ValueError("indexed supervisor affinity did not take effect")
+    return {"index": index, "available": available, "selected": selected}
+
+
 def supervise(directory: Path) -> int:
     def interrupted(signum: int, frame: Any) -> None:
         raise InterruptedError("supervisor interrupted")
@@ -417,6 +435,16 @@ def supervise(directory: Path) -> int:
                 )
                 write_json(directory / "status.json", state)
                 return 1
+            if "cpu_affinity_index" in request:
+                try:
+                    if cpu_req != 1:
+                        raise ValueError("indexed supervisor requires one CPU")
+                    binding = apply_indexed_cpu_affinity(request["cpu_affinity_index"])
+                    write_json(directory / "cpu-affinity.json", binding)
+                except (OSError, ValueError) as exc:
+                    state.update(status="failed", admission_rejected=True, error=f"CPU affinity failed: {exc}")
+                    write_json(directory / "status.json", state)
+                    return 1
             if claims_cfg:
                 from experiments.jobs.claims import (
                     acquire_device_claim,
