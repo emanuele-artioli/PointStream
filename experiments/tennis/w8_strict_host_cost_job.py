@@ -417,8 +417,13 @@ def strict_roots(root: Path, output: Path, runtime: dict[str, Any], files: dict[
     return list(dict.fromkeys(roots))
 
 
-def check_gpu_binding(receipt: dict[str, Any], sealed: dict[str, Any], claimed: str, dispatch: dict[str, Any]) -> None:
+def check_gpu_binding(receipt: dict[str, Any], sealed: dict[str, Any], claimed: str, dispatch: dict[str, Any],
+                      source_files: dict[str, str]) -> None:
     """Bind this stage's model/kernels to the fleet-selected physical Ada device."""
+    wrapper_path = 'experiments/tennis/w8_strict_host_model_worker.py'
+    if (wrapper_path not in source_files or receipt.get('wrapper') !=
+            {'path': wrapper_path, 'sha256': source_files[wrapper_path]}):
+        raise ValueError('model wrapper origin differs from authenticated source')
     gpu = dispatch.get('environment', {}).get('gpu') or {}
     expected = strict_policy.canonical_gpu_uuid(claimed)
     if (strict_policy.canonical_gpu_uuid(gpu.get('uuid', '')) != expected
@@ -582,7 +587,7 @@ def cost_run(stage: Path, steps: int, parent_cpu: int, packet_cpu: int, generato
     if (device_receipt.get('sealed_sha256') != fixed.file_sha(model_out / 'sealed.json')
             or device_receipt.get('config_sha256') != fixed.file_sha(model_work / 'worker-config.json')):
         raise ValueError('GPU identity is not bound to model receipt and configuration')
-    check_gpu_binding(device_receipt, sealed_device, visible, dispatch)
+    check_gpu_binding(device_receipt, sealed_device, visible, dispatch, code_manifest['files'])
     seal = json.loads((model_out / 'sealed.json').read_text())
     retained = retained_path(stage)
     retained.parent.mkdir(parents=True, exist_ok=True)
@@ -737,7 +742,7 @@ def audit_strict_policy(stage: Path, retained: Path, summary: dict[str, Any]) ->
     if (gpu_receipt.get('sealed_sha256') != fixed.file_sha(retained / 'sealed.json')
             or gpu_receipt.get('config_sha256') != summary['generator_config_sha256']):
         raise ValueError('saved GPU identity binding differs')
-    check_gpu_binding(gpu_receipt, sealed_gpu, generator_config['environment']['CUDA_VISIBLE_DEVICES'], dispatch)
+    check_gpu_binding(gpu_receipt, sealed_gpu, generator_config['environment']['CUDA_VISIBLE_DEVICES'], dispatch, files)
     records = (('packet-config.json', json.loads((retained / 'decoded-manifest.json').read_text())['isolation']),
                ('generator-config.json', json.loads((retained / 'sealed.json').read_text())['isolation']))
     for filename, isolation in records:

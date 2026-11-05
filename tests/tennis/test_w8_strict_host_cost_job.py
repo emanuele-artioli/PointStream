@@ -121,21 +121,24 @@ def test_model_receipt_must_bind_claimed_physical_ada(monkeypatch):
     r = {'device_uuid': uuid.removeprefix('GPU-'), 'visible_devices': uuid, 'cuda_device_count': 1,
          'name': 'NVIDIA RTX 6000 Ada Generation', 'major': 8, 'minor': 9}
     sealed = {'device': {'name': r['name'], 'major': 8, 'minor': 9}, 'kernels': {'kernel_launches': 42}}
+    path = 'experiments/tennis/w8_strict_host_model_worker.py'
+    files = {path: 'a' * 64}
+    r['wrapper'] = {'path': path, 'sha256': 'a' * 64}
     dispatch = {'environment': {'gpu': {'uuid': uuid}}}
-    job.check_gpu_binding(r, sealed, uuid, dispatch)
+    job.check_gpu_binding(r, sealed, uuid, dispatch, files)
     assert checked == [sealed]
     bad = copy.deepcopy(r)
     bad['device_uuid'] = '00000000-0000-4000-8000-000000000000'
     with pytest.raises(ValueError, match='dispatched'):
-        job.check_gpu_binding(bad, sealed, uuid, dispatch)
+        job.check_gpu_binding(bad, sealed, uuid, dispatch, files)
     bad = copy.deepcopy(r)
     bad['minor'] = 6
     with pytest.raises(ValueError, match='dispatched'):
-        job.check_gpu_binding(bad, sealed, uuid, dispatch)
+        job.check_gpu_binding(bad, sealed, uuid, dispatch, files)
     bad = copy.deepcopy(dispatch)
     bad['environment']['gpu']['uuid'] = 'GPU-00000000-0000-4000-8000-000000000000'
     with pytest.raises(ValueError, match='dispatched'):
-        job.check_gpu_binding(r, sealed, uuid, bad)
+        job.check_gpu_binding(r, sealed, uuid, bad, files)
 
 
 def test_host_cost_projection_is_advisory_and_never_admits():
@@ -162,3 +165,31 @@ def test_model_wrapper_rejects_packet_before_isolation_or_cuda(tmp_path, monkeyp
     monkeypatch.setattr(worker.receiver, 'launch', lambda *a, **k: pytest.fail('incorrect model launch'))
     with pytest.raises(ValueError, match='only admits'):
         worker.main()
+
+
+def test_model_wrapper_actual_entrypoint_identity_and_mutation(tmp_path):
+    from experiments.tennis import w8_strict_host_model_worker as worker
+    expected = tmp_path / worker.WRAPPER_RELATIVE_PATH
+    expected.parent.mkdir(parents=True)
+    expected.write_text('original')
+    observed = worker.wrapper_identity(tmp_path, expected)
+    assert observed['path'] == worker.WRAPPER_RELATIVE_PATH
+    assert observed['sha256'] == worker.receiver.digest(expected)
+    outsider = tmp_path / 'other.py'
+    outsider.write_text('original')
+    with pytest.raises(ValueError, match='outside'):
+        worker.wrapper_identity(tmp_path, outsider)
+    expected.write_text('mutated')
+    assert worker.wrapper_identity(tmp_path, expected)['sha256'] != observed['sha256']
+
+
+def test_gpu_binding_rejects_mutated_wrapper_hash(monkeypatch):
+    monkeypatch.setattr(job.receiver, 'check_execution_receipt', lambda receipt: None)
+    uuid = 'GPU-12345678-1234-4234-8234-123456789abc'
+    path = 'experiments/tennis/w8_strict_host_model_worker.py'
+    receipt = {'device_uuid': uuid, 'visible_devices': uuid, 'cuda_device_count': 1,
+               'name': 'RTX 6000 Ada', 'major': 8, 'minor': 9,
+               'wrapper': {'path': path, 'sha256': 'b' * 64}}
+    sealed = {'device': {'name': 'RTX 6000 Ada', 'major': 8, 'minor': 9}}
+    with pytest.raises(ValueError, match='wrapper origin'):
+        job.check_gpu_binding(receipt, sealed, uuid, {'environment': {'gpu': {'uuid': uuid}}}, {path: 'a' * 64})
