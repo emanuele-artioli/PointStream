@@ -41,15 +41,17 @@ No training, paid API fallback or remote agent session is included.
 | Work | GPU ceiling | Workload CPU ceiling |
 |---|---:|---:|
 | Ball source oracles, controls, matched native ladders, 30-clip benchmark and qualified cross-sport subset |18h|20h|
-| Two original SVT half-out gaps, original scoring controls and updated intervals |0.5h|0.75h|
+| Two original SVT half-out gaps, original scoring controls and updated intervals |0.5h|3,620 s|
 | New W8 CUDA diagnosis, then cost pilot and one complete fresh witness only on gates |2h|3h|
 | W6 literal control reproduction and bounded smoothing study |0.5h|1.25h|
 | Paid-mask / generative-peer feasibility oracles, no full 34-window sweep |1h|1.5h|
-| Shared admission, audit and uncertainty reserve |2h|1.5h|
+| Shared admission, audit and uncertainty reserve |2h|4,480 s|
 | **Total** |**24h**|**28h**|
 
-The initial release is at most **2 GPU-hours /3 workload CPU-hours** across
-feasibility stages. The rest is usable only after representative smoke and
+The original initial release was at most **2 GPU-hours /3 workload CPU-hours** across
+feasibility stages. The November5 revision adds a separately gated first tranche
+of at most **2.5 GPU-hours /3 workload CPU-hours** for ball qualification and scale.
+The CPU allocation table includes the recorded transfers from shared reserve to SVT. The rest is usable only after representative smoke and
 measured complete-cost forecasts fit both remaining ceilings and the relevant
 workstream cap. Root may move the shared reserve to a named workstream with a
 prospective written justification, never exceeding aggregate ceilings or

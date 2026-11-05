@@ -765,6 +765,32 @@
       "cpu_seconds": 100,
       "release_stage": "research-first24/28",
       "basis": "Entire100CPU external allowance conservatively charged for freshallhostdoctor/inspect/status twice/cache/source/spec/deadline checks. DistributedaggregateCPUunmetered; noGPU/modelsubmission yet. New100CPUpostrunauditreservation addedprospectivelywithinprogramme/W8caps."
+    },
+    {
+      "phase": "gvcrt-qp-cpu-readiness-20261105",
+      "parent_phase": "gvcrt-qp-endpoint-sensitivity-20261105",
+      "workstream": "ego_peer_oracles",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "release_stage": "research-first24/28",
+      "basis": "Conservative20CPUreadinesscapforworker/CPU/alljob/cachekey/filesystem/sourcepackagechecks; noactualcheckpointprooforGPUyet. Includedin150CPUproofsubcap, notadditional."
+    },
+    {
+      "phase": "w8-clock-qualified-host-cost-requalification-20261105",
+      "workstream": "w8",
+      "gpu_seconds": 250,
+      "cpu_seconds": 600,
+      "release_stage": "research-first24/28",
+      "basis": "Conservative250GPUabove224.407screated\u2192terminalupdatedwhole-requestspan(includesqueue) and171.299ssupervisorlifetime. CPU600=remaining940minusunused340full3stepworkerallowance; retainsallone-stepworker340+validator30+admin120+postaudit100+contingency10 caps. Prior60proof+100freshreadinesschargedseparately: cumulative760CPU/250GPUphase. Actualone-stepcommand130.837s, gen109.494/packet6.460/parent13.253CPU; administrativeaggregateunmetered. OldcombinedcostgateFAILED,no3step. Rootindependentcanonicalstatus/rawseal/source/KERNEL/denialreview acceptedqualification-onlyscope."
+    },
+    {
+      "phase": "k5d-native-cpu-oracle-readiness-20261105",
+      "parent_phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "gpu_seconds": 0,
+      "cpu_seconds": 20,
+      "release_stage": "research-first24/28",
+      "basis": "Entireapproved20CPUmetadataallowancecharged; gpu2warmruntime/unshare+ffmpeg/SVT/dav1dactualSHA/headroomchecks, noencodingyet. Includedin180CPUproofsubcapoftranche."
     }
   ],
   "reservations": [
@@ -1259,7 +1285,7 @@
       "release_stage": "larger stage2",
       "gpu_seconds": 700,
       "cpu_seconds": 940,
-      "status": "RootreleasesONEactual1\u21923costattemptafterfresh22:25UTC gpu5Adaexclusive/all1627canonicaljobsinactive/doctor/cache/CPU249/sourceDDa519review; updateddeadline22:51:39UTC/spec1d75740e. 60CPUpriorproof+100CPUreadinesscharged; future940=830remainingconfigured+10contingency+100newpostaudit. Phase1100CPU700GPUinclusive. Noretry,no30stepautomatic.",
+      "status": "closed;250GPU600futureCPUchargedplus160priorCPU=760phaseCPU. OriginalcombinedgateFAILEDaftervalid1step;450GPU340CPUunusedreleased. Exact8eeacee2terminal/sourcea519/spec1d757/480tensors/real109kernels/10read+7mutationdenialsaccepted. Noretry/noquality/30stepautomatic.",
       "authorized_cumulative_cpu_seconds": 1100
     },
     {
@@ -1275,8 +1301,16 @@
       "workstream": "ego_peer_oracles",
       "release_stage": "research-first24/28",
       "gpu_seconds": 1800,
-      "cpu_seconds": 2200,
-      "status": "ProspectiveaggregateenvelopeONLY; GPUunreleased. Rootreviewedbf08575doptinQP0/9(default3unchanged)propagation; oneCPUcheckpointcoverageproofmax100CPUinclusive (20CPUmetadatareadinesspermitted, actualTorch/weightproofrequiresfrozenprotocolreview). Bothendpoints4\u219216smokes/fullonlyafterproof/source/cost/hostgates,1.5marginunchanged; noBD/corpus/absentclaim; allpoints/failuresretained."
+      "cpu_seconds": 2180,
+      "status": "RootreleasedONECPUcheckpointproofselected9archive7408/sourceff012/revisione6e0/spec8e25/gpu5CPU2deadline22:58; exactIDpending. Proofsubcap150CPUinclusive=55campaign+75external(includes20alreadychargedmetadata)+20contingency, WITHIN2200aggregate. BothendpointGPUUNRELEASED untilproof/source/freshcostreview; noBD/corpusclaim."
+    },
+    {
+      "phase": "k5d-scale-first-tranche-20261105",
+      "workstream": "ball",
+      "release_stage": "research-first24/28firstnewtranche",
+      "gpu_seconds": 9000,
+      "cpu_seconds": 10780,
+      "status": "ProspectivefirsttrancheceilingONLY; noGPUorCPUworkloadreleasedyet. CoversminimalnativeCPUoracle(realoneuserPIDpath,nofilesystemisolationclaim),16originalcalibrationparity,newcompletearchivebridge,registered292/586confirmations,allsetup/audit/failurereserves. Perjobfrozenprotocol/source/spec/inclusive1.5forecastrootreviewrequired. Full30notadmitted. Proofs/calibrationmustbeincludedonce,notdouble-reserved."
     }
   ],
   "jobs": [
@@ -1964,7 +1998,7 @@
     {
       "job_id": "20261105T222814Z-8eeacee2",
       "phase": "w8-clock-qualified-host-cost-requalification-20261105",
-      "state": "submitted; canonical600swait active99047; inspectexactstatusbeforerecovery",
+      "state": "terminalFAILEDcombinedcostgate;actual1stepqualificationaccepted;nothreestep;ownPID/claimsreleased;eventsACK",
       "spec_sha256": "1d75740eedb36e4cb151163c5484d9fb3060ad9df3736b61994333fec889f50a",
       "snapshot_sha256": "a519ad56ee2df01d4b7951b882bdfb20cc458874538a66defc122070dd28cfc4",
       "revision": "dd519fd31878d85715994f62b5fa1bcaa53c8687",
@@ -1972,6 +2006,18 @@
       "gpu_ceiling": 700,
       "inclusive_cpu_ceiling": 1100,
       "scope": "One1stepactualmodelsmoke;3stepcostonlyifunchanged1.5gatefits. No30stepgeneration/qualityautomatic."
+    },
+    {
+      "job_id": "20261105T223810Z-0d856f3b",
+      "phase": "gvcrt-qp-endpoint-sensitivity-20261105",
+      "state": "CPUproofsubmitted;singleboundedwait;noendpointGPU",
+      "revision": "e6e0b530aebc84b1a73ef6200b7fc24db7f28c21",
+      "snapshot_sha256": "7408ab0a7e88483ad5608fbc3cb90919f5881eadbb7d79a316a6dea4adebb80a",
+      "source_sha256": "ff01282baeaefa48f9f09f4c276d90f55b58df1ec080aec0526e57dda552d618",
+      "spec_sha256": "8e25fcf2865713c6a1aa05ad4901c58da9ec556cbaac2f5fc957b6f232d486c8",
+      "inclusive_cpu_ceiling": 150,
+      "gpu_ceiling": 0,
+      "deadline": "2026-11-05T22:58:00Z"
     }
   ],
   "old_budgets": "closed, not borrowed",
@@ -1984,21 +2030,21 @@
     "Rootprospective240CPUshared\u2192SVT for separatemanifest-cadenceprofileafterall75framingoraclepassed; old50fps9240failureclosed, no changedinput/quality/gate. SVT3560/shared4540CPUglobal86400unchanged, futurequality1670CPUretained.",
     "ExplicitgzipSVT60CPUtransfer20261105",
     "Root20261105userapprovedpending24GPUh/28CPUh (+14400/+14400seconds), assigned increase toball:64800GPU72000CPU. Firstnewtranche9000GPU10800CPU requiresperjobrelease; nofull30automaticadmission. Manuscripteditspauseduntilworthwhileresearchdecisionsresolved.",
-    "Root20261105prospectivelyraisesW8clockcostphaseCPU1000\u21921100insideexistingW8/programmeCPUcap, specifically100postrunauditafterfreshreadinessconsumed100external. Existingnumericcaps/source/scientificgatesunchanged; configured930includesalreadycharged100readiness, futureconfigured830. Futurephase940CPU700GPU, cumulative160chargedCPU+940=1100."
+    "Root20261105prospectivelyraisesW8clockcostphaseCPU1000\u21921100insideexistingW8/programmeCPUcap, specifically100postrunauditafterfreshreadinessconsumed100external. Existingnumericcaps/source/scientificgatesunchanged; configured930includesalreadycharged100readiness, futureconfigured830. Futurephase940CPU700GPU, cumulative160chargedCPU+940=1100.",
+    "RootCPUproofsubcap100\u2192150withinGVC2200, noaggregate/workstreamincrease; 20readinesscharged, futureproof130inclusive. Remaining2180CPUopenGVCaggregateincludesit\u2014nodooublecount."
   ],
   "monitoring": {
     "mode": "onecanonicalboundedwait",
-    "state": "oneW8costjobsubmitted",
+    "state": "GVConeCPUproofonly",
     "jobs": [
-      "20261105T222814Z-8eeacee2"
+      "20261105T223810Z-0d856f3b"
     ],
-    "max_seconds": 600,
-    "local_process_handle": 99047,
-    "result": "/private/tmp/w8-clock-cost-wait-20261105.json",
-    "deadline_utc": "2026-11-05T22:51:39Z",
+    "max_seconds": 100,
     "native_completion_resume_verified": false,
     "recurring_llm_polling": false,
-    "completed": false
+    "completed": false,
+    "deadline_utc": "2026-11-05T22:58:00Z",
+    "handle_record": "/private/tmp/pointstream-gvcrt-qp-cpu-launch-20261105.json"
   },
   "approval_history": [
     {

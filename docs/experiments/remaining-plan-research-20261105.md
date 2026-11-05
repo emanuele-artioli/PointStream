@@ -39,3 +39,7 @@ A negative or incomplete gate narrows only the tested configuration. No
 research point above is marked complete because its code exists, its smoke
 passed, or a related pilot succeeded. Source-footage permissions, author
 review and filing authority are human prerequisites, not experiments.
+
+## Root disposition — W7 strict-family sensitivity, November5
+
+Root re-inspected the accepted `ivf-mkv-corrected-tier1-report-20261105.json` at the two-hour primary scenario: every six-window SVT LPIPS/DISTS comparison is an interpolated bracket; five DCVC comparisons are bracketed and med000 DCVC remains the explicit user-dropped absence. Only the historical-family sensitivity has unresolved `s2_o20` cells for med000 and med019. Thus the remaining two strict-family cells do not prevent the retained pooled achievable-envelope primary decision. No further encoding is worth spending solely to erase those sensitivity omissions. Retain them beside the MKV sensitivity and the missing DCVC case, without claiming all original families are complete. This closes the *current research decision* to pursue additional SVT points, not the missing measurements themselves. No new scoring, rates, thresholds or claim promotion.
