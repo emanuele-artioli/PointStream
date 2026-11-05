@@ -16,6 +16,8 @@ def test_real_spec_has_only_public_cpu_inputs():
     assert spec['device'] == 'cpu'
     assert spec['hosts'] == ['gpu5']
     assert spec['budget_seconds'] == 240
+    assert spec['full']['seconds'] == 10
+    assert spec['validator_seconds'] == 40
     assert {i['name']: i['sha256'] for i in spec['staged_inputs']} == job.NAMES
     assert spec['arguments'][0] == 'packet-run'
     assert spec['validator'][-1] == 'packet-validate'
@@ -147,9 +149,9 @@ def test_pre_serialization_rejects_fake_cuda_and_meta():
 def test_campaign_remaining_gate_rejects_underfunded(monkeypatch):
     monkeypatch.setattr(job.time, 'monotonic', lambda: 120.0)
     dispatch = {'campaign_clock': {'started': 100.0, 'phase_started': 110.0, 'budget_end': 340.0}}
-    assert job.require_remaining(dispatch, 141, 181)['phase_seconds_remaining'] == 170
+    assert job.require_remaining(dispatch, 141, 190)['phase_seconds_remaining'] == 170
     with pytest.raises(ValueError, match='insufficient'):
-        job.require_remaining(dispatch, 171, 181)
+        job.require_remaining(dispatch, 171, 190)
     dispatch['campaign_clock']['budget_end'] = 300.0
     with pytest.raises(ValueError, match='insufficient'):
-        job.require_remaining(dispatch, 141, 181)
+        job.require_remaining(dispatch, 141, 190)

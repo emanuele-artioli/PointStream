@@ -193,9 +193,9 @@ def run(stage: Path) -> None:
               'environment': {'CUDA_VISIBLE_DEVICES': '', 'TMPDIR': str(output), 'TMP': str(output), 'TEMP': str(output),
                               'XDG_CACHE_HOME': str(output / '.cache'), 'TORCH_HOME': str(output / '.cache' / 'torch'),
                               'PS_GPU_MEMORY_LIMIT_MIB': '0'}}
-    admission = require_remaining(dispatch, 141, 181)
+    admission = require_remaining(dispatch, 141, 190)
     usage = worker(python, root, work, config, loader_path)
-    require_remaining(dispatch, 10, 51)
+    require_remaining(dispatch, 10, 60)
     decoded = json.loads((output / 'decoded-manifest.json').read_text())
     if (decoded.get('packet_sha256') != fixed.WINDOW_SHA or decoded.get('profile_sha256') != fixed.PROFILE_SHA
             or decoded.get('guider_sha256') != fixed.GUIDER_SHA or decoded.get('match_tensors') != fingerprints
@@ -297,8 +297,8 @@ def validate(stage: Path, output: Path) -> int:
             if any(fixed.file_sha(unpacked / name) != digest for name, digest in summary['members'].items()):
                 raise ValueError('packet evidence bytes differ')
             admission = summary['admission']
-            if (admission.get('phase_seconds_reserved') != 141 or admission.get('campaign_seconds_reserved') != 181
-                    or admission.get('phase_seconds_remaining', 0) < 141 or admission.get('campaign_seconds_remaining', 0) < 181):
+            if (admission.get('phase_seconds_reserved') != 141 or admission.get('campaign_seconds_reserved') != 190
+                    or admission.get('phase_seconds_remaining', 0) < 141 or admission.get('campaign_seconds_remaining', 0) < 190):
                 raise ValueError('packet campaign readiness receipt differs')
             config = json.loads((unpacked / 'worker-config.json').read_text())
             loader = json.loads((unpacked / 'loader-identity.json').read_text())
@@ -376,7 +376,7 @@ def make_spec(deadline: str) -> dict[str, Any]:
                 entrypoint=['-m', 'experiments.tennis.w8_strict_packet_job'],
                 arguments=['packet-run', '--phase', '{phase}'], scale={'phase': {'smoke': 'smoke', 'full': 'full'}},
                 smoke={'seconds': 180, 'representative_basis': 'Fresh source-hidden strict CPU packet decode and full independent oracle proof; full stage is only a completion marker.'},
-                full={'seconds': 1}, validator=['{python}', '-m', 'experiments.tennis.w8_strict_packet_job', 'packet-validate'],
+                full={'seconds': 10}, validator=['{python}', '-m', 'experiments.tennis.w8_strict_packet_job', 'packet-validate'],
                 required_commands=['unshare'], deadline=deadline, stall_seconds=180)
     base['environment'] = {'path': '/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz',
                            'sha256': cost.MAIN_ENV}
