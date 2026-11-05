@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "device": "gpu",
+  "hosts": [
+    "gpu1",
+    "gpu2",
+    "gpu3",
+    "gpu4",
+    "gpu5",
+    "gpu6"
+  ],
+  "gpu_models": [
+    "RTX A6000",
+    "RTX 6000 Ada"
+  ],
+  "gpu_memory_mib": 8000,
+  "cpu_threads": 1,
+  "single_cpu_campaign": true,
+  "entrypoint": [
+    "-m",
+    "experiments.tennis.k5d_opentt_source"
+  ],
+  "arguments": [
+    "--clip",
+    "test_2",
+    "--frames",
+    "{frames}",
+    "--selection",
+    "{staged:selection}",
+    "--video",
+    "{staged:video}",
+    "--labels",
+    "{staged:labels}",
+    "--join-witness",
+    "{staged:join_witness}",
+    "--join-evidence",
+    "{staged:join_evidence}",
+    "--wasb-code",
+    "{staged:wasb_code}",
+    "--wasb-weights",
+    "{staged:wasb_weights}",
+    "--wasb-config",
+    "{staged:wasb_config}",
+    "--selection-sha256",
+    "b104b87aefae92e3a3ea7766bc51e3b34f6c3c7a1f071bbbbca7eeb218984877",
+    "--join-witness-sha256",
+    "7ae07b383514ffa0f96286dc22f900446c15d3b3376e4a50027183500f05736d",
+    "--wasb-code-sha256",
+    "d456047c70e9dbd3a2f7196e2d1991a069393ab68d7466d0ee7ecfd23360cab0",
+    "--wasb-weights-sha256",
+    "9d391239ab10c733f8e5bfadf16ab72838e7a8ebc88e8ae2038501c03d42b4bb",
+    "--wasb-config-sha256",
+    "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d"
+  ],
+  "scale": {
+    "frames": {
+      "smoke": 16,
+      "full": 240
+    }
+  },
+  "staged_inputs": [
+    {
+      "name": "video",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.mp4",
+      "sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43"
+    },
+    {
+      "name": "labels",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.zip",
+      "sha256": "c692014ca9074d331700385e4c0b5e0bd32968123bf001fe8b1c9b2e64ac142d"
+    },
+    {
+      "name": "wasb_code",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55",
+      "extract": true
+    },
+    {
+      "name": "wasb_weights",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6",
+      "extract": true
+    },
+    {
+      "name": "wasb_config",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d",
+      "extract": false
+    },
+    {
+      "name": "selection",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261105-inputs/opentt-source-selection-20261104.json",
+      "sha256": "b104b87aefae92e3a3ea7766bc51e3b34f6c3c7a1f071bbbbca7eeb218984877"
+    },
+    {
+      "name": "join_witness",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261105-inputs/opentt-test2-reviewed-join-20261105.json",
+      "sha256": "7ae07b383514ffa0f96286dc22f900446c15d3b3376e4a50027183500f05736d"
+    },
+    {
+      "name": "join_evidence",
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261105-inputs/opentt-test2-join-evidence-20261105.json",
+      "sha256": "7fc2cdb16ec55aaa1feaeff64dca04006cd5c9fc8afd98b6da1f62245a9f3ad9"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.mp4",
+      "sha256": "91df783ab4d26bf350faffaefabe9fb6c172584dfd053a866729b11cc3261c43"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-opentt-join-witness-20261104/inputs/test_2.zip",
+      "sha256": "c692014ca9074d331700385e4c0b5e0bd32968123bf001fe8b1c9b2e64ac142d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/WASB-SBDT-923462c.tar",
+      "sha256": "657fb5e0c06bbe621f10bdf6d8937f5cb7f8cbef1c4a369e30d9d87f54e87a55"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5b-2026-10-20/inputs/wasb-tennis-weights.tar",
+      "sha256": "4129d4210145dd029e393028deef717a10b59a603f93e5081c1058b8f178f5e6"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5c-independent-judge-20261101-2031/wasb-tennis.yaml",
+      "sha256": "6dbcad60e207bf684d0094f59aa922b107be1c1ce83998dc5b167ed59b0d1e0d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261105-inputs/opentt-source-selection-20261104.json",
+      "sha256": "b104b87aefae92e3a3ea7766bc51e3b34f6c3c7a1f071bbbbca7eeb218984877"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261105-inputs/opentt-test2-reviewed-join-20261105.json",
+      "sha256": "7ae07b383514ffa0f96286dc22f900446c15d3b3376e4a50027183500f05736d"
+    },
+    {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/tennis/k5d-20261105-inputs/opentt-test2-join-evidence-20261105.json",
+      "sha256": "7fc2cdb16ec55aaa1feaeff64dca04006cd5c9fc8afd98b6da1f62245a9f3ad9"
+    }
+  ],
+  "environment": {
+    "path": "/home/itec/emanuele/Datasets/pointstream-data/environments/pointstream-20261009T214002Z.tar.gz",
+    "sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661"
+  },
+  "local_storage_gib": 16,
+  "verify_staged_inputs": true,
+  "required_commands": [],
+  "smoke": {
+    "seconds": 80,
+    "representative_basis": "16 consecutive full source images and the frozen tennis WASB judge; source I/O, initialization and inference are timed separately; smoke is not a qualification result."
+  },
+  "full": {
+    "seconds": 120
+  },
+  "validator": [
+    "{python}",
+    "-m",
+    "experiments.tennis.k5d_opentt_source",
+    "--validate-smoke"
+  ],
+  "validator_seconds": 10,
+  "budget_seconds": 220,
+  "deadline": "2026-11-05T01:19:17.273186+00:00",
+  "stall_seconds": 120
+}
