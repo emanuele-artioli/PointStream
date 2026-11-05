@@ -34,7 +34,10 @@ except Exception:
     record['traceback'] = traceback.format_exc()
 finally:
     record['torch_after'] = 'torch' in sys.modules
-    record['affinity'] = sorted(os.sched_getaffinity(0))
+    try:
+        record['affinity'] = sorted(os.sched_getaffinity(0))
+    except Exception:
+        record['affinity'] = None
     record['cpu_seconds'] = time.process_time() - cpu_start
     record['wall_seconds'] = time.monotonic() - start
     record['exit_code'] = exit_code
