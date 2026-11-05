@@ -72,3 +72,35 @@ comparison needs independently verified same-frame native-plus-BALL source,
 settings, judge and complete-byte joins. Scorer exposure, 16 visible frames,
 released 1920×1088 padded canvas, eager backend and adapter interoperability
 limits remain as in the [QP3 audit](gvcrt-4020b8ee-independent-report-20261105.md).
+
+## CPU proof concrete draft
+
+`gvcrt-qp-cpu-proof-draft-20261105.json` is intentionally expired and is not
+an admission. Its CPU-only single-core campaign has a 40-second smoke, 5-second
+validator, 3-second full no-op and 55-second total campaign ceiling. The smoke
+rehashes the four declared author export/checkpoint/entropy inputs, unpacks
+only the source in fleet scratch, then runs the CUDA-hidden qualification with
+a 35-second child timeout. The validator checks device and CUDA status, strict
+I/P coverage, finite table shapes, shifts, process/usage receipt and helper,
+bridge, export marker, interpreter and weights/extension identities. The full
+stage is a no-op; it performs no additional evidence work. The five-second
+validator and staging must fit inside the 55-second campaign. Missing warm
+cache or a timeout means stop, not retry. The child exits on timeout and fleet
+owns campaign process-group teardown; independently verify PID/PGID and claim
+release. The new receipt is published atomically without replacing any existing
+file. This is a checkpoint qualification only; it says nothing about native
+encode, output quality or GPU timing.
+
+Allocate at most 45 CPU-s outside campaign (including the already reserved
+20 for metadata) for snapshot/transport, admission, bounded independent receipt
+review, monitoring and teardown; 55 + 45 = 100 CPU-s inclusive. Record actual
+bounded costs and stop before the next operation if its remaining allowance is
+insufficient; the 55-second one-CPU campaign bound does not bound external
+processes. Fresh exact snapshot SHA, source/marker/weights/runtime/extension
+hashes, host and affinity, cache identity, independently reviewed draft,
+deadline, source allowlist, teardown and complete accounting are required
+before root releases even this proof. The gpu5 cache metadata check found all
+five corresponding hash-key directories and separate `/local` storage; it did
+not hash their contents. gpu6 had no CPU headroom at that check. Capacity and
+checks are transient and must be repeated at admission. No CPU proof, GPU
+endpoint or shared-budget release is implied by this draft.

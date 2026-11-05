@@ -3,6 +3,10 @@
 import argparse
 import json
 import os
+import resource
+import sys
+import tempfile
+import time
 from pathlib import Path
 
 from experiments.generative import gvcrt_native_bridge as bridge
@@ -30,6 +34,44 @@ def check_tables(i_model, p_model, torch):
     return {'shapes': sizes, 'p_shift_indices': placements}
 
 
+def device_inventory(i_model, p_model):
+    result = {}
+    for role, model in (('I', i_model), ('P', p_model)):
+        for kind, values in (('parameters', model.named_parameters()), ('buffers', model.named_buffers())):
+            seen = list(values)
+            devices = sorted({str(value.device) for _, value in seen})
+            if any(value.device.type != 'cpu' for _, value in seen):
+                raise ValueError(f'{role} {kind} contain non-CPU tensors')
+            result[f'{role}.{kind}'] = {'count': len(seen), 'devices': devices}
+    if not result['I.parameters']['count'] or not result['P.parameters']['count']:
+        raise ValueError('missing model parameters')
+    return result
+
+
+def usage():
+    return {name: {'user_seconds': value.ru_utime, 'system_seconds': value.ru_stime,
+                   'max_rss': value.ru_maxrss} for name, value in (
+        ('self', resource.getrusage(resource.RUSAGE_SELF)),
+        ('children', resource.getrusage(resource.RUSAGE_CHILDREN)))}
+
+
+def publish_once(output, receipt):
+    # Hard-link publication cannot overwrite an existing result; remove only our temp.
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', dir=output.parent, prefix='.qp-proof-',
+                                         delete=False) as out:
+            temporary = Path(out.name)
+            json.dump(receipt, out, sort_keys=True, indent=2, allow_nan=False)
+            out.write('\n')
+            out.flush()
+            os.fsync(out.fileno())
+        os.link(temporary, output)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument('--official-repo', type=Path, required=True)
@@ -41,15 +83,36 @@ def main():
     args = parser.parse_args()
     if os.environ.get('CUDA_VISIBLE_DEVICES') not in ('', '-1'):
         raise RuntimeError('CUDA must be explicitly hidden')
+    started = time.monotonic()
+    usage_before = usage()
+    import torch
+    if torch.cuda.is_initialized():
+        raise RuntimeError('CUDA was initialized before model loading')
     args.disable_fused = True
     torch, i_model, p_model, receipt = bridge.models(args, 'cpu')
     if not all(x['strict_complete_coverage'] for x in receipt['coverage']):
         raise ValueError('incomplete checkpoint coverage')
     receipt['tables'] = check_tables(i_model, p_model, torch)
-    receipt['cuda_visible_devices'] = os.environ['CUDA_VISIBLE_DEVICES']
-    with args.output.open('x') as out:
-        json.dump(receipt, out, sort_keys=True, indent=2, allow_nan=False)
-        out.write('\n')
+    receipt['devices'] = device_inventory(i_model, p_model)
+    if torch.cuda.is_initialized():
+        raise RuntimeError('CUDA initialized during CPU qualification')
+    source_manifest = args.official_repo / '.gvcrt-source.json'
+    if not source_manifest.is_file():
+        raise ValueError('hashed source export manifest required')
+    receipt['cpu_proof'] = {
+        'cuda_visible_devices': os.environ['CUDA_VISIBLE_DEVICES'],
+        'cuda_initialized_before': False, 'cuda_initialized_after': False,
+        'interpreter': str(Path(sys.executable).resolve(strict=True)),
+        'interpreter_sha256': bridge.sha256(Path(sys.executable).resolve(strict=True)),
+        'pid': os.getpid(), 'pgid': os.getpgid(0), 'affinity': sorted(os.sched_getaffinity(0)),
+        'source_manifest_sha256': bridge.sha256(source_manifest),
+        'helper_sha256': bridge.sha256(Path(__file__).resolve(strict=True)),
+        'elapsed_seconds': time.monotonic() - started,
+        'usage_before': usage_before, 'usage_after': usage(),
+    }
+    if len(receipt['cpu_proof']['affinity']) != 1:
+        raise ValueError('qualification requires one CPU affinity')
+    publish_once(args.output, receipt)
 
 
 if __name__ == '__main__':

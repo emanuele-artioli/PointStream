@@ -81,3 +81,22 @@ def test_cpu_table_gate_checks_all_tables_and_shifts():
     p.shift_qp = lambda q, index: q + index
     with pytest.raises(ValueError):
         check_tables(i, p, torch)
+
+
+def test_cpu_device_guard_and_exclusive_receipt(tmp_path):
+    from types import SimpleNamespace
+
+    from experiments.generative.gvcrt_qp_coverage import device_inventory, publish_once
+
+    tensor = SimpleNamespace(device=SimpleNamespace(type='cpu', __str__=lambda _: 'cpu'))
+    model = SimpleNamespace(named_parameters=lambda: [('p', tensor)], named_buffers=lambda: [])
+    assert device_inventory(model, model)['I.parameters']['count'] == 1
+    tensor.device.type = 'cuda'
+    with pytest.raises(ValueError):
+        device_inventory(model, model)
+    output = tmp_path / 'receipt.json'
+    publish_once(output, {'valid': True})
+    with pytest.raises(FileExistsError):
+        publish_once(output, {'valid': False})
+    assert 'true' in output.read_text()
+    assert list(tmp_path.iterdir()) == [output]
