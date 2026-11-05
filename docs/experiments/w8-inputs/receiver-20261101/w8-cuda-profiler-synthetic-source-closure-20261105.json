@@ -1,0 +1,23 @@
+{
+  "files": {
+    "experiments/__init__.py": "06f003a15341e1a630da290bb9f66f11bd79de593e85aff33fdd1b548db2cba9",
+    "experiments/tennis/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/tennis/k6b_generate.py": "00248aa4fdd47e634f82b37a7a33c99f1794440d65cbfe9395255a4225735542",
+    "experiments/tennis/w8_cuda_profiler_synthetic.py": "c78cfea985d05e70d6ec59a745290f035c9d5b7e2258da7e7218f2344f171435",
+    "experiments/tennis/w8_cuda_system_leaves.py": "4cbca949843da0254644e666b6c6d86400fe37e22b316f921da3fc8715e0f970",
+    "experiments/tennis/w8_folder_oracle.py": "1db0c096065f4e5c710de02a99679cf81ad15738312b6d37572a7b0b91f378ee",
+    "experiments/tennis/w8_profiler_clock_oracle.py": "f8166c5d9db64ea41c28f18311dc6fecdc0af4f1ae77c10e2da147318dae2c39",
+    "experiments/tennis/w8_public_folder_materialize.py": "e127da6bffbf055b40a163b0026b50f9bb56e083c75ad017007d4145453b1fcc",
+    "experiments/tennis/w8_receiver_bootstrap.py": "3fb7f0b2ab33fdfa185f38c3bfe8f977540dc13cc10b8f0ccce0625c1de03e49"
+  },
+  "fleet_automatically_adds": [
+    "experiments/jobs",
+    "src/__init__.py"
+  ],
+  "normalized_spec_sha256": "4a53cfe86304c0d7e5e38efc50d1b209af3d7cac9f159a22574bfe672762159f",
+  "note": "Review-only candidate; archive hash is established by actual fleet publication. Refresh deadline, fleet status and host preflight before any request.",
+  "source_closure_test": "Nine-file tree imported under Python -I from separate local directory with checkout excluded; Linux/CUDA execution not yet tested.",
+  "source_revision": "cdf3f471c1811ea82581ba99d81125baeac4f8dc",
+  "spec_deadline_utc": "2026-11-05T13:15:00Z",
+  "spec_file_sha256": "c997a34c6c67443a2bde7d2e50bb107bc83c5c9e14b2b2c0dd5bb4217afeed0a"
+}
