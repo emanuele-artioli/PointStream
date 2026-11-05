@@ -7,7 +7,9 @@ import json
 import os
 from pathlib import Path
 import resource
+import shutil
 import socket
+import stat
 import subprocess
 import sys
 import tarfile
@@ -38,6 +40,17 @@ def worker(cfg: Path, expected: str, arm: str) -> None:
     if sha(cfg) != expected or os.environ.get("CUDA_VISIBLE_DEVICES") != "":
         raise ValueError("config or device mismatch")
     c = json.loads(cfg.read_text())
+    source_root = Path(__file__).resolve(strict=True).parents[2]
+    if Path.cwd().resolve(strict=True) != source_root:
+        raise ValueError("worker source root differs")
+    origins = {"__main__": str(Path(__file__).resolve(strict=True).relative_to(source_root))}
+    for name, module in sys.modules.items():
+        if name == "experiments" or name.startswith("experiments."):
+            filename = getattr(module, "__file__", None)
+            if filename:
+                origins[name] = str(Path(filename).resolve(strict=True).relative_to(source_root))
+    if set(origins.values()) != set(SOURCE):
+        raise ValueError("project source closure differs")
     output, canary = Path(c["output"]), Path(c["canary"])
     denied = [Path(p) for p in c["denied"]]
     ns = {n: os.readlink("/proc/self/ns/" + n) for n in ("user", "net")}
@@ -62,6 +75,7 @@ def worker(cfg: Path, expected: str, arm: str) -> None:
         raise ValueError("threads before restriction")
     receipt = {
         "arm": arm,
+        "source_origins": origins,
         "cuda_visible_devices": "",
         "cuda_before": torch.cuda.is_initialized(),
         "namespaces": ns,
@@ -100,6 +114,9 @@ def worker(cfg: Path, expected: str, arm: str) -> None:
                     "mode": p.stat().st_mode,
                     "uid": p.stat().st_uid,
                     "rights": "READ_DIR recursive" if p == CLOCK else "READ_FILE",
+                    "sha256_before": next(
+                        x["sha256"] for x in c["clock_identity"] if x["path"] == str(p)
+                    ),
                 }
                 for p in (CLOCK, *LEAVES)
             ]
@@ -124,6 +141,7 @@ def worker(cfg: Path, expected: str, arm: str) -> None:
             [torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA],
         ),
     ]:
+        os.write(2, f"W8_PROFILE_{label}_BEGIN\n".encode())
         try:
             with warnings.catch_warnings(record=True) as caught:
                 warnings.simplefilter("always")
@@ -132,6 +150,8 @@ def worker(cfg: Path, expected: str, arm: str) -> None:
             results[label] = {"success": True, "warnings": [str(w.message) for w in caught]}
         except Exception as exc:
             results[label] = {"success": False, "error": f"{type(exc).__name__}: {exc}"}
+        finally:
+            os.write(2, f"W8_PROFILE_{label}_END\n".encode())
     receipt["results"] = results
     receipt["cuda_after"] = torch.cuda.is_initialized()
     receipt["cpu_seconds"] = sum(resource.getrusage(resource.RUSAGE_SELF)[:2])
@@ -142,6 +162,7 @@ def run() -> None:
     if os.environ.get("CUDA_VISIBLE_DEVICES") != "" or len(os.sched_getaffinity(0)) != 1:
         raise ValueError("requires GPU-hidden one-core fleet")
     resource.setrlimit(resource.RLIMIT_CPU, (10, 10))
+    resource.setrlimit(resource.RLIMIT_FSIZE, (20_000_000, 20_000_000))
     root = Path(os.environ["PS_SCRATCH_DIR"]) / "profiler-oracle"
     root.mkdir()
     canary = root / "canary"
@@ -166,6 +187,8 @@ def run() -> None:
         "MKL_NUM_THREADS": "1",
         "PYTHONPATH": str(Path(__file__).resolve().parents[2]),
     }
+    pub = Path(os.environ["PS_SCRATCH_DIR"]) / "publish"
+    pub.mkdir()
     rows = []
     for arm in ("unrestricted", "strict", "clock"):
         output = root / arm
@@ -184,6 +207,7 @@ def run() -> None:
                     "inode": p.stat().st_ino,
                     "mode": p.stat().st_mode,
                     "uid": p.stat().st_uid,
+                    "sha256": None if p == CLOCK else sha(p),
                 }
                 for p in (CLOCK, *LEAVES)
             ],
@@ -199,7 +223,7 @@ def run() -> None:
             "-o",
             str(trace),
             "-e",
-            "trace=openat,openat2,newfstatat,readlink,readlinkat,getdents64",
+            "trace=openat,openat2,newfstatat,readlink,readlinkat,getdents64,write",
             "/usr/bin/unshare",
             "--user",
             "--map-root-user",
@@ -241,11 +265,26 @@ def run() -> None:
             for line in trace.read_text(errors="replace").splitlines()
             if "/sys/devices/system/clocksource" in line
         ]
+        if (
+            trace.stat().st_size > 20_000_000
+            or len(proc.stdout) > 1_000_000
+            or len(proc.stderr) > 1_000_000
+        ):
+            raise ValueError("trace or stream exceeds publication cap")
+        artifacts = {"trace": trace, "config": cfg, "receipt": output / "receipt.json"}
+        for name, data in (("stdout", proc.stdout), ("stderr", proc.stderr)):
+            path = root / f"{arm}.{name}"
+            path.write_bytes(data)
+            artifacts[name] = path
+        artifact_hashes = {}
+        for name, path in artifacts.items():
+            destination = pub / f"{arm}.{name}"
+            shutil.copyfile(path, destination)
+            artifact_hashes[name] = sha(destination)
         receipt["clocksource_trace"] = trace_lines
         receipt["trace_sha256"] = sha(trace)
+        receipt["artifacts"] = artifact_hashes
         rows.append(receipt)
-    pub = Path(os.environ["PS_SCRATCH_DIR"]) / "publish"
-    pub.mkdir()
     result = {
         "scope": "CPU only; no model or GPU qualification",
         "arms": rows,
@@ -276,13 +315,32 @@ def validate() -> None:
             raise ValueError("synthetic input identity")
         if sha(stage / "published.tar") != staging["published"]["sha256"]:
             raise ValueError("publication digest")
+        arms = ("unrestricted", "strict", "clock")
+        kinds = ("trace", "config", "receipt", "stdout", "stderr")
+        expected = {"publish/profiler-oracle.json"} | {
+            f"publish/{arm}.{kind}" for arm in arms for kind in kinds
+        }
+        raw: dict[str, bytes] = {}
         with tarfile.open(stage / "published.tar") as t:
-            files = [m for m in t.getmembers() if m.isfile()]
-            if len(files) != 1 or files[0].name != "publish/profiler-oracle.json":
+            members = t.getmembers()
+            files = [m for m in members if m.isfile()]
+            if len(files) != len(expected) or {m.name for m in files} != expected:
                 raise ValueError("publication membership")
-            stream = t.extractfile(files[0])
-            assert stream is not None
-            r = json.load(stream)
+            if any(
+                not m.isfile() and not (m.isdir() and m.name.rstrip("/") == "publish")
+                for m in members
+            ):
+                raise ValueError("unexpected archive entry")
+            if any(
+                m.size > (20_000_000 if m.name.endswith(".trace") else 1_000_000) for m in files
+            ):
+                raise ValueError("publication size cap")
+            for member in files:
+                stream = t.extractfile(member)
+                if stream is None:
+                    raise ValueError("missing archive content")
+                raw[member.name] = stream.read()
+        r = json.loads(raw["publish/profiler-oracle.json"])
         if r["scope"] != "CPU only; no model or GPU qualification" or [
             x["arm"] for x in r["arms"]
         ] != ["unrestricted", "strict", "clock"]:
@@ -293,6 +351,39 @@ def validate() -> None:
         ):
             raise ValueError("tracer identity or CPU budget")
         for x in r["arms"]:
+            arm = x["arm"]
+            saved = {kind: raw[f"publish/{arm}.{kind}"] for kind in kinds}
+            if x["artifacts"] != {
+                kind: hashlib.sha256(data).hexdigest() for kind, data in saved.items()
+            }:
+                raise ValueError("raw artifact digest")
+            receipt = json.loads(saved["receipt"])
+            if receipt != {
+                key: value
+                for key, value in x.items()
+                if key not in ("artifacts", "clocksource_trace", "trace_sha256")
+            }:
+                raise ValueError("worker receipt mismatch")
+            config = json.loads(saved["config"])
+            if config["parent_ns"] != x["parent_ns"]:
+                raise ValueError("config namespace mismatch")
+            filtered = [
+                line
+                for line in saved["trace"].decode(errors="replace").splitlines()
+                if "/sys/devices/system/clocksource" in line
+            ]
+            markers = [
+                f"W8_PROFILE_{label}_{phase}".encode()
+                for label in ("cpu", "requested_cpu_cuda")
+                for phase in ("BEGIN", "END")
+            ]
+            positions = [saved["trace"].find(marker) for marker in markers]
+            if any(p < 0 for p in positions) or positions != sorted(positions):
+                raise ValueError("profile trace markers")
+            if filtered != x["clocksource_trace"] or x["trace_sha256"] != x["artifacts"]["trace"]:
+                raise ValueError("trace filter mismatch")
+            if set(x["source_origins"].values()) != set(SOURCE):
+                raise ValueError("project source origins")
             if (
                 x["cuda_visible_devices"] != ""
                 or x["cuda_before"]
@@ -306,12 +397,24 @@ def validate() -> None:
                 raise ValueError("trace absent")
             if set(x["results"]) != {"cpu", "requested_cpu_cuda"}:
                 raise ValueError("missing profiles")
+            for result in x["results"].values():
+                if (
+                    type(result.get("success")) is not bool
+                    or (result["success"] and not isinstance(result.get("warnings"), list))
+                    or (not result["success"] and not result.get("error"))
+                ):
+                    raise ValueError("invalid profiler outcome")
             if x["arm"] != "unrestricted":
                 if x["landlock_abi"] < 3 or x["handled_mask"] != policy.handled_rights(
                     x["landlock_abi"]
                 ):
                     raise ValueError("landlock")
-                if len(x["denials"]) != 10 or any(v not in (1, 13) for v in x["denials"].values()):
+                policy.validate_leaf_receipt(x["approved_leaves"], config["loader"])
+                if (
+                    set(x["denials"]) != set(config["denied"])
+                    or len(x["denials"]) != 10
+                    or any(v not in (1, 13) for v in x["denials"].values())
+                ):
                     raise ValueError("denials")
                 if any(v not in (1, 13, 18) for v in x["mutations"].values()):
                     raise ValueError("mutation denial errno")
@@ -330,6 +433,26 @@ def validate() -> None:
             raise ValueError("experimental grants differ")
         if [x["rights"] for x in clock] != ["READ_DIR recursive", "READ_FILE", "READ_FILE"]:
             raise ValueError("experimental rights differ")
+        config_clock = json.loads(raw["publish/clock.config"])["clock_identity"]
+        if [x["path"] for x in config_clock] != [str(CLOCK), *(str(p) for p in LEAVES)]:
+            raise ValueError("parent clock paths differ")
+        for i, (parent, child) in enumerate(zip(config_clock, clock, strict=True)):
+            if parent["uid"] != 0 or parent["mode"] & stat.S_IWOTH:
+                raise ValueError("clock identity ownership")
+            if not (stat.S_ISDIR(parent["mode"]) if i == 0 else stat.S_ISREG(parent["mode"])):
+                raise ValueError("clock identity type")
+            if (
+                any(parent[key] != child[key] for key in ("path", "device", "inode", "mode"))
+                or child["sha256_before"] != parent["sha256"]
+            ):
+                raise ValueError("clock identity differs")
+            if (
+                i == 0
+                and parent["sha256"] is not None
+                or i > 0
+                and (not isinstance(parent["sha256"], str) or len(parent["sha256"]) != 64)
+            ):
+                raise ValueError("clock leaf SHA")
         dispatch = json.loads((stage / "dispatch.json").read_text())
         source = stage.parent / "source.tar"
         if sha(source) != dispatch["code"]["snapshot_sha256"] or set(r["code_sha256"]) != set(
@@ -343,6 +466,15 @@ def validate() -> None:
                     raise ValueError("source closure")
         result = {
             "passed": True,
+            "checks": {
+                "source_identity": True,
+                "publication_identity_and_raw_traces": True,
+                "synthetic_input": True,
+                "namespaces": True,
+                "strict_denials_and_mutations": True,
+                "cpu_profile_arms": True,
+                "experimental_clock_grants": True,
+            },
             "scope": r["scope"],
             "arms_complete": True,
             "policy_denials": True,
