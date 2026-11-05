@@ -1,0 +1,182 @@
+"""Attended CPU-only proof of frozen clock bridge using retained config and source."""
+import ast
+import copy
+import hashlib
+import importlib
+import inspect
+import json
+import os
+from pathlib import Path
+import resource
+import socket
+import subprocess
+import sys
+import tarfile
+
+ROOT = Path('/local/users/emanuele/pointstream/audits/w8-clock-dd519-cpu-20261105')
+SOURCE = ROOT / 'receiver-source'
+OLD = Path('/local/users/emanuele/pointstream/scratch/20261105T082120Z-df001de2-smoke/cost-worker/worker-config.json')
+OLD_SHA = '4dc8a3bd11ba5a191790a00cb65d1780eb3d1a4fdc9496127c06c5e5cac1c8f5'
+OLD_ARCHIVE = Path('/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T082120Z-df001de2/source.tar')
+OLD_ARCHIVE_SHA = 'ef9b1324fe2eff914ac54931eb1416c2e8a984f7f5c5118350b3766267738393'
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def guard_tree(source):
+    tree = ast.parse(source)
+    fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'run_isolated')
+    return next(n for n in fn.body if isinstance(n, ast.For) and ast.unparse(n.target) == '(name, path)' and ast.unparse(n.iter) == 'modules.items()')
+
+
+def child():
+    from experiments.tennis import w8_clock_profile as profile
+    from experiments.tennis import w8_cuda_system_leaves as policy
+    from experiments.tennis import w8_receiver_bootstrap as bootstrap
+    if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or 'torch' in sys.modules:
+        raise ValueError('child must have hidden GPU and no Torch')
+    objects, proof = profile.prepare_child(ROOT / 'clock-identity.json', sys.argv[2],
+                                            [Path(p) for p in json.loads((ROOT / 'denied.json').read_text())])
+    profile.validate_receipt(proof)
+    loader = json.loads((ROOT / 'loader.json').read_text())
+    denied = [Path(p) for p in json.loads((ROOT / 'denied.json').read_text())]
+    extra, leaves = policy.approved_leaves(denied, loader)
+    output, canary = ROOT / 'child-output', ROOT / 'canary'
+    paths = [output, Path(sys.prefix), *(Path(p) for p in policy.SYSTEM_GRANTS), *extra, *objects]
+    ns = {n: os.readlink('/proc/self/ns/' + n) for n in ('user', 'net')}
+    if sorted(name for _, name in socket.if_nameindex()) != ['lo']:
+        raise ValueError('child network namespace differs')
+    abi, mask = profile.restrict(policy, paths, output)
+    denials = bootstrap._check_denials(denied)
+    mutations = policy.mutation_probes(canary, output)
+    print(json.dumps({'profile': proof, 'abi': abi, 'mask': mask, 'denials': denials,
+                      'mutations': mutations, 'approved_leaves': leaves, 'namespaces': ns,
+                      'cuda_visible_devices': '', 'torch_imported': False}, sort_keys=True))
+
+
+def parent():
+    resource.setrlimit(resource.RLIMIT_CPU, (27, 27))
+    cpus = sorted(os.sched_getaffinity(0))
+    os.sched_setaffinity(0, {cpus[1]})
+    if os.environ.get('CUDA_VISIBLE_DEVICES') != '' or Path.cwd().resolve() != SOURCE:
+        raise ValueError('proof must use staged cwd and hidden GPU')
+    import torch
+    from experiments.tennis import w8_clock_profile as profile
+    from experiments.tennis import w8_strict_host_cost_job as job
+    from experiments.tennis import w8_strict_host_model_worker as wrapper
+    from experiments.tennis import w8_strict_receiver_worker as strict_worker
+    from experiments.tennis import w8_receiver_generate as receiver
+    from experiments.tennis import w8_receiver_preflight as preflight
+    from experiments.tennis import w8_input_job as fixed
+    torch.set_num_threads(1)
+    torch.set_num_interop_threads(1)
+    if torch.cuda.is_initialized() or sha(OLD) != OLD_SHA or sha(OLD_ARCHIVE) != OLD_ARCHIVE_SHA:
+        raise ValueError('retained config/source identity or CUDA state differs')
+    manifest = json.loads((ROOT / 'source-manifest.json').read_text())
+    config = json.loads(OLD.read_text())
+    config['allow_paths'][0] = str(SOURCE)
+    for name in ('experiments.tennis.k6b_generate', 'experiments.tennis.k6b_fit'):
+        rel = name.replace('.', '/') + '.py'
+        config['files']['code:' + name] = {'path': str(SOURCE / rel), 'sha256': manifest['files'][rel]}
+    job.add_clock_source(config['files'], SOURCE, manifest)
+    wrapper.pin_declared_aa_imports(config)
+    for name in ('animate_anyone.models.pose_guider', 'animate_anyone.models.unet_2d_condition',
+                 'animate_anyone.models.unet_3d', 'animate_anyone.pipelines.pipeline_pose2vid_long'):
+        importlib.import_module(name)
+    from diffusers import AutoencoderKL, DDIMScheduler
+    from transformers import CLIPVisionModelWithProjection
+    assert all((AutoencoderKL, DDIMScheduler, CLIPVisionModelWithProjection))
+    origins = strict_worker.validate_source_origins(SOURCE)
+    job.check_clock_source_binding(config, origins, manifest['files'])
+    bundle_path = Path('/local/users/emanuele/pointstream/cache/ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5/bundle.json')
+    assert sha(bundle_path) == 'ab5f1b932918ae9956f6ef648e36e59c6a1fd9ef6c36a1722a1916b0da63a4c5'
+    job.check_preflight_sources(json.loads(bundle_path.read_text()), SOURCE)
+    aa_archive = Path(config['files']['aa_archive']['path'])
+    aa_root = Path(config['files']['code:animate_anyone']['path']).parent.parent
+    verified = preflight.verify_aa_tree(aa_archive, aa_root)['files']
+    with tarfile.open(OLD_ARCHIVE) as archive:
+        old_guard = guard_tree(archive.extractfile('experiments/tennis/w8_receiver_generate.py').read())
+    new_guard = guard_tree(inspect.getsource(receiver))
+    aa_old = copy.deepcopy(old_guard)
+    aa_new = copy.deepcopy(new_guard)
+    aa_new.body = aa_new.body[:2]
+    if ast.dump(aa_old, include_attributes=False) != ast.dump(aa_new, include_attributes=False):
+        raise ValueError('original AA/k6b guard body changed')
+    tree = ast.parse(inspect.getsource(receiver.run_isolated))
+    statements = tree.body[0].body
+    first = next(i for i, n in enumerate(statements) if isinstance(n, ast.Assign)
+                 and any(isinstance(t, ast.Name) and t.id == 'clock_module' for t in n.targets))
+    guard = compile(ast.fix_missing_locations(ast.Module(body=statements[first:first + 4], type_ignores=[])), '<exact-guard>', 'exec')
+    paths = {key: Path(value['path']) for key, value in config['files'].items() if key.startswith('code:')}
+    env = {'Path': Path, 'sys': sys, 'paths': paths, 'isolation': {'clock_profile': {'profile': profile.PROFILE}},
+           'config': config, 'aa_verified': verified, 'fixed': fixed}
+    exec(guard, env)
+    module = sys.modules['experiments.tennis.w8_clock_profile']
+    original_file = module.__file__
+    try:
+        module.__file__ = str(SOURCE / 'experiments/tennis/k6b_fit.py')
+        try:
+            exec(guard, env)
+        except ValueError as exc:
+            assert 'undeclared executing source module' in str(exc)
+        else:
+            raise ValueError('wrong helper origin accepted')
+    finally:
+        module.__file__ = original_file
+    item = config['files']['code:experiments.tennis.w8_clock_profile']
+    original_sha = item['sha256']
+    item['sha256'] = '0' * 64
+    try:
+        exec(guard, env)
+    except ValueError as exc:
+        assert 'executing source changed' in str(exc)
+    else:
+        raise ValueError('wrong helper hash accepted')
+    item['sha256'] = original_sha
+    exec(guard, env)
+    clock_sha = profile.write_parent_receipt(ROOT / 'clock-identity.json')
+    output, canary, protected = ROOT / 'child-output', ROOT / 'canary', ROOT / 'protected'
+    output.mkdir(); canary.mkdir(); protected.mkdir()
+    for name in ('write', 'truncate', 'remove', 'rename', 'link'):
+        (canary / name).write_bytes(b'canary')
+    denied = []
+    for i in range(5):
+        p = protected / str(i); p.write_bytes(b'synthetic protected'); alias = protected / f'alias-{i}'; alias.symlink_to(p)
+        denied.extend((str(p), str(alias)))
+    (ROOT / 'denied.json').write_text(json.dumps(denied))
+    st = Path('/etc/ld.so.cache').stat()
+    assert st.st_uid == 0 and not st.st_mode & 2
+    (ROOT / 'loader.json').write_text(json.dumps({'uid':st.st_uid,'mode':st.st_mode,'device':st.st_dev,'inode':st.st_ino}))
+    def limit(): resource.setrlimit(resource.RLIMIT_CPU, (4, 4))
+    before = resource.getrusage(resource.RUSAGE_CHILDREN)
+    proc = subprocess.run(['/usr/bin/unshare','--user','--map-root-user','--net',sys.executable,
+                           str(ROOT / 'proof.py'),'child',clock_sha], cwd=SOURCE, env=os.environ,
+                          capture_output=True, timeout=20, preexec_fn=limit, check=False)
+    if proc.returncode:
+        raise RuntimeError('isolated clock helper failed: '+proc.stderr.decode(errors='replace')[-3000:])
+    after = resource.getrusage(resource.RUSAGE_CHILDREN)
+    child_result = json.loads(proc.stdout)
+    parent_ns = {n:os.readlink('/proc/self/ns/'+n) for n in ('user','net')}
+    assert all(child_result['namespaces'][n] != parent_ns[n] for n in parent_ns)
+    assert len(child_result['denials'])==10 and len(child_result['mutations'])==7 and len(child_result['approved_leaves'])==12
+    assert not torch.cuda.is_initialized()
+    result={'scope':'CPU-only source/config/guard and synthetic clock policy qualification; no model instance, weights, protected body or GPU',
+            'source_archive_sha256':sha(ROOT/'source.tar'),'retained_config_sha256':OLD_SHA,'prior_source_archive_sha256':OLD_ARCHIVE_SHA,
+            'source_manifest_sha256':manifest['manifest_sha256'],'source_file_count':len(manifest['files']),
+            'helper':config['files']['code:experiments.tennis.w8_clock_profile'],'helper_origin':origins['experiments.tennis.w8_clock_profile'],
+            'aa_guard_original_comparison_body_unchanged':True,'aa_guard_passed_with_retained_config':True,
+            'wrong_helper_path_rejected':True,'wrong_helper_hash_rejected':True,'aa_pin_passed':True,
+            'historical_preflight_source_closure_passed':True,'parent_cuda_initialized':False,
+            'parent_cpu_seconds':sum(resource.getrusage(resource.RUSAGE_SELF)[:2]),
+            'child_cpu_seconds':after.ru_utime+after.ru_stime-before.ru_utime-before.ru_stime,
+            'parent_ns':parent_ns,'child':child_result}
+    (ROOT/'result.json').write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
+    print(json.dumps({'passed':True,'parent_cpu_seconds':result['parent_cpu_seconds'],
+                      'child_cpu_seconds':result['child_cpu_seconds'],'source_files':result['source_file_count'],
+                      'result':str(ROOT/'result.json'),'sha256':sha(ROOT/'result.json')}))
+
+if __name__ == '__main__':
+    if len(sys.argv)>1 and sys.argv[1]=='child': child()
+    else: parent()
