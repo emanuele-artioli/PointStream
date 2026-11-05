@@ -142,7 +142,7 @@ def test_pilot_spec_uses_actual_whole_argument_stage_placeholder(tmp_path, monke
     monkeypatch.setattr(worker, 'source_bridge', lambda: {})
     monkeypatch.setattr(worker, 'check_hybrid_state', lambda *args: None)
     monkeypatch.setattr(worker.old, 'digest', lambda path: roi.WEIGHTS[path.name] if path.name in roi.WEIGHTS else 'f' * 64)
-    result = fleet.pilot_spec(assets=assets, deadline='2099-01-01T00:00:00Z', smoke_seconds=100,
+    result = fleet.pilot_spec(assets=assets, deadline='2099-01-01T00:00:00Z', smoke_seconds=90,
                               campaign_seconds=150, gpu_budget_seconds=200, cpu_budget_seconds=250)
     assert result['scale']['items'] == {'smoke': 2, 'full': 0}
     assert result['arguments'][result['arguments'].index('--items') + 1] == '{items}'

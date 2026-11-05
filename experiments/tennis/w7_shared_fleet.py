@@ -20,7 +20,7 @@ from experiments.tennis import w1_roi as roi, w7_shared_score as worker, w7_spec
 def pilot_spec(*, assets: dict[str, dict[str, str]], deadline: str, smoke_seconds: int,
                campaign_seconds: int, gpu_budget_seconds: int, cpu_budget_seconds: int) -> dict[str, Any]:
     if (type(smoke_seconds) is not int or not 0 < smoke_seconds <= 600
-            or type(campaign_seconds) is not int or campaign_seconds < smoke_seconds + 40
+            or type(campaign_seconds) is not int or campaign_seconds < smoke_seconds + 60
             or type(gpu_budget_seconds) is not int or type(cpu_budget_seconds) is not int
             or gpu_budget_seconds > 350 or cpu_budget_seconds > 450
             or campaign_seconds + 50 > gpu_budget_seconds or campaign_seconds + 100 > cpu_budget_seconds):
