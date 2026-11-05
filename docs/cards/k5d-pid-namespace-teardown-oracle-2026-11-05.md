@@ -1,0 +1,11 @@
+# K5d synthetic Linux PID namespace teardown oracle — 2026-11-05
+
+Goal: test whether a util-linux PID namespace keeps a synthetic double-forked, new-session child contained through normal namespace-init exit, an outer timeout kill, SIGTERM, and SIGKILL of the launcher. This is CPU-only synthetic evidence, not a native, CUDA, production or source-bridge qualification.
+
+Hypothesis: `unshare --user --map-root-user --pid --fork --kill-child=SIGKILL` gives the child a distinct PID namespace; kernel namespace teardown removes its task-owned init and escaped-session grandchild after each exit mode. Competing explanation: namespaces are unsupported, launcher parent-death handling fails, a member outlives init, or the observation confuses a reused PID with a live member. Every case verifies host PID plus namespace PID, namespace inode, process start ticks, different process session, intermediate child reaping and later absence of its own original init and escaped member. Only the task-owned launcher is signalled. Synthetic descendants have four-second self-expiry. No GPU, model, user data, global fleet changes or external process signals.
+
+Decision: all four cases must pass on both stages; any missing namespace support, malformed proof, unreaped member, unexpected exit, or other failure stops the oracle. The smoke validator checks publication and case evidence before full. A pass does not establish real native/CUDA execution or timeouts, namespace compatibility with nested user/network namespaces, or CPU budget fit for the real study; those remain separate tests. Do not infer exact CPU from wall time.
+
+Budget: CPU-only, at most100 workload CPU-seconds plus80 external CPU-seconds within the reserved original programme ceiling; no GPU work. Smoke/full each at most35 seconds and validator10 seconds, campaign100 seconds and deadline at most40 minutes. Proposed gpu2 one-core job only after root reviews source/spec and fresh all-host, jobs and doctor checks. No submission has been made. No automatic retry.
+
+GPU2 reports util-linux `unshare` 2.37.2 and its help lists the required user, map-root-user, PID, fork and kill-child options; actual kernel permission and behavior have not been tested. Draft spec: `/private/tmp/pointstream-k5d-pid-namespace-spec-20261105.json`.
