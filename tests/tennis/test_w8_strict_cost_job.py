@@ -59,3 +59,27 @@ def test_exact_preflight_runtime_gets_only_qualified_device_grants(tmp_path):
     altered['allow_paths'].append('/home')
     with pytest.raises(ValueError, match='fixed profile'):
         job.strict_roots(tmp_path / 'source', tmp_path / 'output', altered, files)
+
+
+def test_worker_launch_uses_authenticated_source_as_cwd(tmp_path, monkeypatch):
+    source = tmp_path / 'source'
+    source.mkdir()
+    work = tmp_path / 'work'
+    work.mkdir()
+    loader = tmp_path / 'loader.json'
+    loader.write_text('{}')
+    captured = {}
+    class FakeProcess:
+        pid = 123
+    def popen(command, **kwargs):
+        captured['command'] = command
+        captured['cwd'] = kwargs['cwd']
+        captured['env'] = kwargs['env']
+        return FakeProcess()
+    monkeypatch.setattr(job.subprocess, 'Popen', popen)
+    monkeypatch.setattr(job.receiver, 'wait_owned_worker', lambda proc, timeout: (0, False))
+    result = job._worker(tmp_path / 'python', {'worker_kind': 'packet'}, work, 10, 20, source, loader)
+    assert result['canaries_preserved'] is True
+    assert captured['cwd'] == source and captured['env']['PYTHONPATH'] == str(source)
+    command = captured['command']
+    assert command[command.index('--source-root') + 1] == str(source)

@@ -34,6 +34,30 @@ def preload() -> tuple[Any, Any, Any, Any]:
         sys.argv = prior
 
 
+def validate_source_origins(source_root: Path) -> dict[str, str]:
+    """Reject checkout or site-package shadowing before source-hidden isolation."""
+    root = source_root.resolve(strict=True)
+    if Path.cwd().resolve(strict=True) != root or not Path(__file__).resolve(strict=True).is_relative_to(root):
+        raise ValueError('worker is not executing from authenticated source root')
+    origins: dict[str, str] = {}
+    for name, module in sorted(sys.modules.items()):
+        if not (name == 'experiments' or name.startswith('experiments.') or name == 'src'
+                or name.startswith('src.') or name == 'tools' or name.startswith('tools.')):
+            continue
+        filename = getattr(module, '__file__', None)
+        if filename:
+            path = Path(filename).resolve(strict=True)
+            if not path.is_relative_to(root):
+                raise ValueError('project module outside authenticated source root: ' + name)
+            origins[name] = str(path.relative_to(root))
+        for package_path in getattr(module, '__path__', ()):
+            if not Path(package_path).resolve(strict=True).is_relative_to(root):
+                raise ValueError('project package outside authenticated source root: ' + name)
+    if not origins or 'experiments.tennis.w8_receiver_generate' not in origins:
+        raise ValueError('required receiver source closure not loaded')
+    return origins
+
+
 def clean_process() -> None:
     if len(os.listdir('/proc/self/task')) != 1:
         raise RuntimeError('pre-isolation process is not single-threaded')
@@ -42,11 +66,14 @@ def clean_process() -> None:
 
 
 def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: str,
-           canary: Path) -> None:
+           canary: Path, source_root: Path) -> None:
     if sys.platform != 'linux' or len(os.sched_getaffinity(0)) != 1:
         raise RuntimeError('Linux and one CPU required')
     policy, fixed, bootstrap, receiver = preload()
+    source_origins = validate_source_origins(source_root)
     config = bootstrap.load_config(config_path, config_sha)
+    if Path(config['allow_paths'][0]).resolve(strict=True) != source_root.resolve(strict=True):
+        raise ValueError('config source grant differs from authenticated source root')
     if config['worker_kind'] not in ('packet', 'cost_probe'):
         raise ValueError('only packet decode and bounded cost probe are admitted')
     if config['worker_kind'] == 'cost_probe' and config.get('probe_steps') not in (1, 3):
@@ -106,7 +133,7 @@ def launch(config_path: Path, config_sha: str, loader_path: Path, loader_sha: st
                  'cpu_bootstrap': {'before_landlock_sha256': before, 'after_landlock_sha256': after,
                                    'cuda_initialized_before_isolation': False},
                  'approved_leaves': leaves, 'mutation_denials': mutation, 'output_write_ok': True,
-                 'loader_identity_sha256': loader_sha,
+                 'loader_identity_sha256': loader_sha, 'source_origins': source_origins,
                  'policy': 'w8-approved-system-leaves-mutation-v1'}
     if config['worker_kind'] == 'packet':
         receiver.run_packet_isolated(config, isolation)
@@ -121,8 +148,9 @@ def main() -> int:
     p.add_argument('--loader', type=Path, required=True)
     p.add_argument('--loader-sha256', required=True)
     p.add_argument('--canary', type=Path, required=True)
+    p.add_argument('--source-root', type=Path, required=True)
     args = p.parse_args()
-    launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary)
+    launch(args.config, args.config_sha256, args.loader, args.loader_sha256, args.canary, args.source_root)
     return 0
 
 

@@ -171,14 +171,15 @@ def _worker(python: Path, config: dict[str, Any], work: Path, cpu_seconds: int, 
     command = ['/usr/bin/unshare', '--user', '--map-root-user', '--net', str(python), '-m',
                'experiments.tennis.w8_strict_receiver_worker', '--config', str(config_path),
                '--config-sha256', fixed.file_sha(config_path), '--loader', str(loader),
-               '--loader-sha256', fixed.file_sha(loader), '--canary', str(canary)]
+               '--loader-sha256', fixed.file_sha(loader), '--canary', str(canary),
+               '--source-root', str(code_root)]
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     started = time.monotonic()
     def limit() -> None:
         resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, 3600))
     with (work / 'stdout').open('xb') as stdout, (work / 'stderr').open('xb') as stderr:
         proc = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
-                                close_fds=True, env=env, preexec_fn=limit)
+                                close_fds=True, env=env, cwd=code_root, preexec_fn=limit)
         (work / 'start.json').write_text(json.dumps({'pid': proc.pid, 'pgid': os.getpgrp(),
                                                      'started_monotonic': started}, sort_keys=True))
         status, timed_out = receiver.wait_owned_worker(proc, wall_seconds)
@@ -682,6 +683,11 @@ def audit_strict_policy(stage: Path, retained: Path, summary: dict[str, Any]) ->
                 or isolation['namespaces']['user'] == config['parent_user_namespace']
                 or isolation['namespaces']['net'] == config['parent_network_namespace']):
             raise ValueError('strict source-hidden isolation incomplete')
+        origins = isolation.get('source_origins')
+        if (not isinstance(origins, dict) or not origins
+                or 'experiments.tennis.w8_receiver_generate' not in origins
+                or any(not isinstance(value, str) or value not in files for value in origins.values())):
+            raise ValueError('pre-isolation project source origins differ from pinned source manifest')
         strict_policy.validate_leaf_receipt(isolation['approved_leaves'], loader)
         mutation = isolation['mutation_denials']
         if (set(mutation) != {'write', 'truncate', 'create', 'remove', 'mkdir', 'rename', 'link'}
