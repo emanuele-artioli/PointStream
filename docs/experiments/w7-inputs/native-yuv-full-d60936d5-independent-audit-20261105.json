@@ -1,0 +1,43 @@
+{
+  "job_id": "20261105T025239Z-d60936d5",
+  "status": "failed",
+  "host": "gpu2",
+  "source_revision": "28d659cc",
+  "created": 1793847195.29133,
+  "ended": 1793847252.6658733,
+  "lifecycle_seconds": 57.37454319000244,
+  "external_reserve_seconds": 60,
+  "inclusive_charge_seconds": 118,
+  "phase_prior_charges": [
+    138,
+    54
+  ],
+  "phase_ceiling_seconds": 600,
+  "phase_remaining_after_charge_seconds": 290,
+  "smoke_exit_code": 0,
+  "smoke_seconds": 10.870972394943237,
+  "point_seconds": [
+    1.0421390696428716,
+    4.767558088060468,
+    4.8400312890298665
+  ],
+  "forecast_seconds": 574.50352001586,
+  "full_stage_cap_seconds": 240,
+  "gate_result": "failed cost forecast; no full stage",
+  "proof_scope": "Saved smoke artifacts checked, producer and independent validator completed three native-YUV proofs; no re-decode in this audit.",
+  "cpu_affinity": [
+    0
+  ],
+  "contention": "fe451 GPU command did not overlap d609 command; its staging may overlap CPU0, no causal attribution without telemetry.",
+  "pids_absent": [
+    926795,
+    926807
+  ],
+  "sha256": {
+    "validation.json": "e2e0534803498bb0c6435f4a2b45f284e4f1f349e958d01dee7363d3e6ee11e8",
+    "smoke/execution.json": "6c93a105d797ac43f6d32f76fd0e83579826c08c71d323e3191d36051609f66d",
+    "smoke/dispatch.json": "0bbfbf0e75d4ead802f5ce3ce51150db3eff0c256f7b3201fc69515747ec346a",
+    "smoke/staging.json": "f94d1a9674a79cb4eae931850776395f3afe7e9ae15bfb94f4ff866595c51a61",
+    "smoke/published.tar": "a5e21a2184bbe18ae5d61507ee0bafcab9f1d2932f9f31cf3e5a99061b2a9bad"
+  }
+}
