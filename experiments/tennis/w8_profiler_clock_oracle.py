@@ -47,6 +47,10 @@ def worker(cfg: Path, expected: str, arm: str) -> None:
         raise ValueError("namespace mismatch")
     if len(os.sched_getaffinity(0)) != 1 or len(os.listdir("/proc/self/task")) != 1:
         raise ValueError("must start with one thread and core")
+    if any(
+        int(fd) > 2 and Path("/proc/self/fd", fd).exists() for fd in os.listdir("/proc/self/fd")
+    ):
+        raise ValueError("unexpected inherited file descriptor")
     import torch
 
     torch.set_num_threads(1)
@@ -212,9 +216,16 @@ def run() -> None:
             arm,
         ]
 
+        arm_env = {
+            **env,
+            **{
+                key: str(output)
+                for key in ("TMPDIR", "TMP", "TEMP", "XDG_CACHE_HOME", "TORCH_HOME")
+            },
+        }
         proc = subprocess.run(
             cmd,
-            env=env,
+            env=arm_env,
             cwd=env["PYTHONPATH"],
             stdin=subprocess.DEVNULL,
             capture_output=True,
