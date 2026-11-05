@@ -739,6 +739,15 @@
       "gpu_seconds": 0,
       "cpu_seconds": 250,
       "basis": "Conservative250CPUabove238.512waitedchildCPU+wrapper/recording; frozen90f77dd6 configuredRuff+mypy526files+pytest1848passed37skips,173.077wall; codechecksnotresearchmodelqualification."
+    },
+    {
+      "phase": "w8-clock-profile-cpu-prequalification-20261105",
+      "workstream": "w8",
+      "release_stage": "larger stage2",
+      "gpu_seconds": 0,
+      "cpu_seconds": 60,
+      "parent_phase": "w8-clock-qualified-host-cost-requalification-20261105",
+      "basis": "Entire35+15CPUproofallowance +8+2separatemetadatacap60 charged; actualparent9.584/child0.291/metadata2.639CPU, otherpacking/transferoverheadunmetered. Independent78abc20f fulla519source353manifest/helper/retainedconfig/AAguard/canary/mutation/JCVlauncher metadataaccepted, noModel/Torchinchild/GPUqualification."
     }
   ],
   "reservations": [
@@ -1232,8 +1241,9 @@
       "workstream": "w8",
       "release_stage": "larger stage2",
       "gpu_seconds": 700,
-      "cpu_seconds": 1000,
-      "status": "ProspectiveONE1/3step actualmodelcostrequalification afteroptinEXACTsynthetic-testedclockREAD_DIR+2readonlyleaves/rootauthentication/sourceguardCPUoracle. Commonpolicy/modelmath/qualityunchanged; available_clocksourceunusedintraceandnotclaimednecessary.700GPU1000CPU/600campaign,260/300stage30validator,1.5wholecostgate; freshactualsource/spec/host/completecostreview requiredbeforedispatch; no30stepadmission/automaticretry."
+      "cpu_seconds": 940,
+      "status": "SOURCE/CPUQUALIFIED butcapacityBLOCKED:e0251a8a no qualifyingexclusiveAda, noGPUrequestqueued. ActualsourceDD/a519; 60CPUproofcharged; future940CPU700GPU cumulative1000CPU=60+930configured(710worker/validator+100external+120admin1.5margin)+10rootcontingency. Spec930bd9eaadc provisional13:58UTC mustrefreshaftercurrenthost/doctor/cache/source/spec/costreview. ONE1\u21923only, no30step/automaticretry.",
+      "authorized_cumulative_cpu_seconds": 1000
     }
   ],
   "jobs": [
@@ -1931,7 +1941,7 @@
   ],
   "monitoring": {
     "mode": "one canonical bounded wait",
-    "state": "allrecordedjobsterminal/independentlyaudited; freshclockqualifiedmodelcostsourceunderreview, noactualnewmodeljob",
+    "state": "allrecordedjobsterminalaudited; NOactive/queuedmodeljob; costpilotcapacityblocked; source/specpreservedforfreshreview",
     "jobs": [
       "20261105T125523Z-500ccc2f"
     ],
