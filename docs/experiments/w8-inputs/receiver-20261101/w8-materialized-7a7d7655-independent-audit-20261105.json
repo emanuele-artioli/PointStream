@@ -1,0 +1,224 @@
+{
+  "copies_retained_bytes": 1550638493,
+  "copy_note": "Four files exist in failed output; no complete model-worker materialization receipt or independent post-copy SHA audit was produced.",
+  "cost": {
+    "creation_to_terminal_upper_wall_seconds": 208.31141233444214,
+    "external_cpu_reserve_seconds": 100,
+    "includes_previous_preflight_and_cpu_audit": true,
+    "proposed_cpu_charge_seconds": 309,
+    "proposed_gpu_charge_seconds": 209,
+    "reservation_cpu_seconds": 1000,
+    "reservation_gpu_seconds": 700
+  },
+  "cpu_import_requalification": {
+    "candidate_wrapper_sha256": "4f7bd565731829f23de223041d2cf2c57bffa59e72c902f89c1df7f47f65e40f",
+    "cpu_seconds": 7.749296999999999,
+    "cuda_initialized": false,
+    "exact_guard_passed": true,
+    "guarded_modules": {
+      "aa_archive": "/local/users/emanuele/pointstream/cache/bfca6cf1129a0154bf2c3431c0e01b34f5e815eda5ba504f54e001c8ceeb99ee/moore-animateanyone-67c4229.tar",
+      "base": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/tennis-base.pt",
+      "checkpoint": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/packet-worker/output/decoded.pt",
+      "code:animate_anyone": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/__init__.py",
+      "code:animate_anyone.configs": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/configs/__init__.py",
+      "code:animate_anyone.configs.prompts": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/configs/prompts/__init__.py",
+      "code:animate_anyone.configs.prompts.test_cases": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/configs/prompts/test_cases.py",
+      "code:animate_anyone.dataset": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/dataset/__init__.py",
+      "code:animate_anyone.dataset.dance_image": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/dataset/dance_image.py",
+      "code:animate_anyone.dataset.dance_video": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/dataset/dance_video.py",
+      "code:animate_anyone.dataset.image_sequence": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/dataset/image_sequence.py",
+      "code:animate_anyone.dwpose": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/dwpose/__init__.py",
+      "code:animate_anyone.dwpose.onnxdet": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/dwpose/onnxdet.py",
+      "code:animate_anyone.dwpose.onnxpose": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/dwpose/onnxpose.py",
+      "code:animate_anyone.dwpose.util": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/dwpose/util.py",
+      "code:animate_anyone.dwpose.wholebody": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/dwpose/wholebody.py",
+      "code:animate_anyone.models": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/__init__.py",
+      "code:animate_anyone.models.attention": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/attention.py",
+      "code:animate_anyone.models.motion_module": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/motion_module.py",
+      "code:animate_anyone.models.mutual_self_attention": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/mutual_self_attention.py",
+      "code:animate_anyone.models.pose_guider": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/pose_guider.py",
+      "code:animate_anyone.models.resnet": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/resnet.py",
+      "code:animate_anyone.models.transformer_2d": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/transformer_2d.py",
+      "code:animate_anyone.models.transformer_3d": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/transformer_3d.py",
+      "code:animate_anyone.models.unet_2d_blocks": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/unet_2d_blocks.py",
+      "code:animate_anyone.models.unet_2d_condition": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/unet_2d_condition.py",
+      "code:animate_anyone.models.unet_3d": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/unet_3d.py",
+      "code:animate_anyone.models.unet_3d_blocks": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/models/unet_3d_blocks.py",
+      "code:animate_anyone.pipelines": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/pipelines/__init__.py",
+      "code:animate_anyone.pipelines.context": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/pipelines/context.py",
+      "code:animate_anyone.pipelines.pipeline_lmks2vid_long": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/pipelines/pipeline_lmks2vid_long.py",
+      "code:animate_anyone.pipelines.pipeline_pose2img": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/pipelines/pipeline_pose2img.py",
+      "code:animate_anyone.pipelines.pipeline_pose2vid": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/pipelines/pipeline_pose2vid.py",
+      "code:animate_anyone.pipelines.pipeline_pose2vid_long": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/pipelines/pipeline_pose2vid_long.py",
+      "code:animate_anyone.pipelines.utils": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/pipelines/utils.py",
+      "code:animate_anyone.scripts": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/scripts/__init__.py",
+      "code:animate_anyone.scripts.lmks2vid": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/scripts/lmks2vid.py",
+      "code:animate_anyone.scripts.pose2vid": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/scripts/pose2vid.py",
+      "code:animate_anyone.scripts.train_stage_1": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/scripts/train_stage_1.py",
+      "code:animate_anyone.scripts.train_stage_2": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/scripts/train_stage_2.py",
+      "code:animate_anyone.utils": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/utils/__init__.py",
+      "code:animate_anyone.utils.util": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/utils/util.py",
+      "code:experiments.tennis.k6b_fit": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/receiver-source/experiments/tennis/k6b_fit.py",
+      "code:experiments.tennis.k6b_generate": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/receiver-source/experiments/tennis/k6b_generate.py",
+      "decoder_manifest": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/packet-worker/output/decoded-manifest.json",
+      "unit": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/packet-worker/output/publish/units/nadal_kyrgios__000_at120__person_000000000000.npz",
+      "weight:image_encoder/config.json": "/local/users/emanuele/pointstream/cache/ba41139cc9dad159163a53e2aa847356b627f53fef988ad461659bd2d587d886/config.json",
+      "weight:image_encoder/pytorch_model.bin": "/local/users/emanuele/pointstream/cache/89d2aa29b5fdf64f3ad4f45fb4227ea98bc45156bbae673b85be1af7783dbabb/pytorch_model.bin",
+      "weight:original/denoising_unet.pth": "/local/users/emanuele/pointstream/cache/b9e5a2c34fac369e8a922972ca2210916c6af175a0dad907deccf6235816ad52/denoising_unet.pth",
+      "weight:original/motion_module.pth": "/local/users/emanuele/pointstream/cache/0d11e01a281b39880da2efeea892215c1313e5713fca3d100a7fbb72ee312ef9/motion_module.pth",
+      "weight:original/pose_guider.pth": "/local/users/emanuele/pointstream/cache/1a8b7c1b4db92980fd977b4fd003c1396bbae9a9cdea00c35d452136d5e4f488/pose_guider.pth",
+      "weight:original/reference_unet.pth": "/local/users/emanuele/pointstream/cache/beddccb08d49a8b29b0f4d6d456c6521d4382a8d8d48884fa60ba8802509c214/reference_unet.pth",
+      "weight:vae/config.json": "/local/users/emanuele/pointstream/cache/92d3dfb746fca211a2c9e019e285f8597412211728dce3c5bcf4eda0f2d62e7e/config.json",
+      "weight:vae/diffusion_pytorch_model.safetensors": "/local/users/emanuele/pointstream/cache/a1d993488569e928462932c8c38a0760b874d166399b14414135bd9c42df5815/diffusion_pytorch_model.safetensors"
+    },
+    "module_count": 54,
+    "prior_reporting_failure": "An earlier exact-guard run passed its guard but failed serializing Path objects; corrected reporting run passed.",
+    "probe_script_sha256": "ca2a739c63b369f9b4b1633be7309a4ae6021fb5e0966679049cc0d1c03162e7",
+    "scope": "All four actual Renderer imports, actual retained declared config and original archive SHA check; no model construction.",
+    "wall_seconds": 7.6684859553352
+  },
+  "cpu_packet_independent_recheck": {
+    "checkpoint_sha256": "1bb95a11c25ac66774b887c93277b695779e21cc9803cc565408206934f0fdeb",
+    "cpu_seconds": 1.508084,
+    "denials": 10,
+    "fingerprints": 480,
+    "landlock_abi": 4,
+    "mask": 32767,
+    "packet_input_rechecked": true,
+    "source_files": 340,
+    "source_manifest_sha256": "320ad44392e07d805546d146f564a32e5a173dac3cb4f821d218e4c38e4b8dbb",
+    "unit_sha256": {
+      "nadal_kyrgios__000_at120__person_000000000000": "387544a3fc344685f7c07632879affbdafcfd54fd6e1c00e0d9d6c06ca98995d",
+      "nadal_kyrgios__000_at120__person_000000000001": "74be8c9e2f8eb65ca67e6339ef9a2a2f8238df36c60a4b5a07a45fc68d3712a7"
+    },
+    "wall_seconds": 1.3892296515405178
+  },
+  "device_claimed": "GPU-07aa7586-7116-8c7b-1e9c-e5dbdc74b162",
+  "failure": "ValueError: undeclared executing source module: animate_anyone",
+  "failure_scope": "Renderer constructor returned; source-origin guard failed before probe, CUDA kernel qualification, sampling, GPU identity receipt, or quality.",
+  "git_head": "00aff80adac40c5cc5db4ea598d6ebbb9330be8d",
+  "job_id": "20261105T075639Z-7a7d7655",
+  "model_worker_exit": {
+    "config_sha256": "d1697171014b35687f9df70ac72d9c77e7f449d6adf7ec144ec69fc322f1ecc5",
+    "cpu_seconds": 55.956644,
+    "pgid": 1242060,
+    "pid": 1244115,
+    "status": 1,
+    "timed_out": false,
+    "wall_seconds": 57.63070146739483
+  },
+  "no_generation_quality_or_kernel_claim": true,
+  "origin_inference": {
+    "caveat": "Failed worker did not log actual module origin; fresh same-runtime/cwd import is a reproduction, not direct observation.",
+    "declared": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/opt/Moore-AnimateAnyone/animate_anyone/__init__.py",
+    "different_content": 0,
+    "regular_python_files_compared": 39,
+    "reproduced_import": "/local/users/emanuele/pointstream/cache/bf738ce596552875e81d067de933ba1ae610c970dba915570efdb2784add8a7e/tree/lib/python3.12/site-packages/animate_anyone/__init__.py"
+  },
+  "packet_worker_exit": {
+    "config_sha256": "71f09b232a1f56bae12e6c48fb0fe5d69bd45d52c7f6b6b7c74a046aa2565616",
+    "cpu_seconds": 6.899152,
+    "pgid": 1242060,
+    "pid": 1243995,
+    "status": 0,
+    "timed_out": false,
+    "wall_seconds": 7.053939118050039
+  },
+  "raw_evidence": {
+    "affinity": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/run/cpu-affinity.json",
+      "sha256": "5effc6df5962b1bdae87f895aa4457a79de14b1e6240f6beb7b4128ac7ba0a5d"
+    },
+    "claim": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/run/claim.json",
+      "sha256": "01f588defbde68cfd5153d989f2d276729a51e5f7f29b667ac65ea58ebd5882a"
+    },
+    "command": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/smoke/command.log",
+      "sha256": "72fd10f7e555a5a287d7942cf548ea9e1c19b0cd8facd86847f3efc065e8787e"
+    },
+    "dispatch": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/smoke/dispatch.json",
+      "sha256": "e51d62959b7886fb51553005176ade517a5652d827f5e0c55ada50bdd7124902"
+    },
+    "environment": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/environment.json",
+      "sha256": "0c85df8ec76572b358bacf5c7c7602a0d0a3cf07fa02692d98bcb13a18dd5136"
+    },
+    "execution": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/smoke/execution.json",
+      "sha256": "77f24fb09fbcb60fb378a9de05d7516f54ba92b659cc8a22f0cb6fdcb0a19afa"
+    },
+    "loader": {
+      "path": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/loader-identity.json",
+      "sha256": "6de83856556070aab7f079730347637e9e078889d4cce6a9f16f944bc25152eb"
+    },
+    "model_config": {
+      "path": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/cost-worker/worker-config.json",
+      "sha256": "d1697171014b35687f9df70ac72d9c77e7f449d6adf7ec144ec69fc322f1ecc5"
+    },
+    "model_exit": {
+      "path": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/cost-worker/exit.json",
+      "sha256": "d231aba9ab7e2b505879b3d3f27cf0d7dff1caf626b92168061b9bd8313b21b8"
+    },
+    "model_stderr": {
+      "path": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/cost-worker/stderr",
+      "sha256": "eb5025cddc91e991484b55b7c97d275c92cec3d16876139a00e584a71c1c29ac"
+    },
+    "packet_config": {
+      "path": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/packet-worker/worker-config.json",
+      "sha256": "71f09b232a1f56bae12e6c48fb0fe5d69bd45d52c7f6b6b7c74a046aa2565616"
+    },
+    "packet_cpu": {
+      "path": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/packet-worker/output/cpu-only.json",
+      "sha256": "5baf1a324de733e2c93507c83d2563cf121365a6632ae6821eaff025db0fc985"
+    },
+    "packet_exit": {
+      "path": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/packet-worker/exit.json",
+      "sha256": "739b044b7b0dc59dde59c278a8cdb74955d83e18cedd3a0602cb84ae2c113a71"
+    },
+    "packet_manifest": {
+      "path": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/packet-worker/output/decoded-manifest.json",
+      "sha256": "6dec8d5234b6788ba642abeafa59ca9775b8ca82711943a2f30f0eab12f6bb6f"
+    },
+    "protected": {
+      "path": "/local/users/emanuele/pointstream/scratch/20261105T075639Z-7a7d7655-smoke/protected-identity.json",
+      "sha256": "aedd258c6e374e55e29f2ade85ba57e29e327028846d18b5336d43e3a1aa119e"
+    },
+    "ready": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/ready.json",
+      "sha256": "18a699d31c4bd0e72b34a96758fd04834e9332b02dd8e58fea564ea581031566"
+    },
+    "run_status": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/run/status.json",
+      "sha256": "76a9177bf8822d847b37c800ff1682473e33d69e47c96e09b72c7afa86cb2c8f"
+    },
+    "spec": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/spec.json",
+      "sha256": "283cbcabc748074d749370cc0e59cfe658b0064127a7caefde951926f813013f"
+    },
+    "staging": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/smoke/staging.json",
+      "sha256": "cc730596643f872c08ca69e3fd7ec94e988cd5e99b22cb64efff37374e23f3aa"
+    },
+    "state": {
+      "path": "/home/itec/emanuele/Datasets/pointstream-data/jobs/fleet/inbox/20261105T075639Z-7a7d7655/state.json",
+      "sha256": "39a92548c12de403adb8e957a048ddc01194a4462107f58e4eeba264f6366976"
+    }
+  },
+  "release": {
+    "campaign_pid_and_pgid": 1242060,
+    "campaign_process_group_empty": true,
+    "gpu_claim_released": true,
+    "gpu_compute_processes": [],
+    "model_pid": 1244115,
+    "packet_pid": 1243995,
+    "pids_present": false,
+    "source_archive_and_scratch_preserved": true,
+    "supervisor_pid": 1242053,
+    "temporary_source_removed": true
+  },
+  "snapshot_sha256": "abfeeae250582e664a68a374f570b9bac18cff42912c79de206b6f7092777c09",
+  "status": "failed",
+  "submitted_spec_sha256": "81232218d16dec7dfca91d5d8ad7ebd73b60e40119f09f20fc175d06bc3b4f7c"
+}
