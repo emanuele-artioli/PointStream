@@ -1,0 +1,49 @@
+{
+  "job_id": "20261105T064410Z-40ee5e97",
+  "status": "complete",
+  "source_commit": "eff9706a230501d6d489457ab78b7e39298fd9a8",
+  "source_tree_sha256": "a47c1d6919b108b93c181437cb77b979653f414ca4d937b2c4480a57e48fe005",
+  "snapshot_sha256": "86c29d4256cdec77c55e5688b50cbf26e5ccea10e788fe35a6f799f5eeb632ef",
+  "spec_sha256": "b92fc3c14bead5d2c58de036db521a89fa5a2859c021a6679303b922e09649d5",
+  "host": "gpu2",
+  "gpu": "NVIDIA RTX A6000",
+  "exclusive": true,
+  "cpu_affinity": [
+    0
+  ],
+  "gpu_claimed_at_terminal": false,
+  "matching_cpu_gpu_claims": false,
+  "supervisor_and_campaign_pids_absent": true,
+  "source_tree_removed": true,
+  "environment_sha256": "32e68872700e4c3ffbee38425740f5f57ecf6d827a6a05329942c2ac10534661",
+  "smoke_publication_sha256": "bdf2fb93c8e57dcd8e1a29d7d6941c63833510f68395ee0667711b4cb7533599",
+  "full_publication_sha256": "4d74743448b543ec8ce331a796a50a2386a127b3198cef66c23101a48faac546",
+  "score_receipt_sha256": "a01fb9ff905918e8574e48ce6d74d4b0f44f9ce9099a46dd74f85a0d2c8726f1",
+  "smoke_execution_seconds": 203.9017472267151,
+  "full_execution_seconds": 221.31183505058289,
+  "both_timing_contaminated": false,
+  "gate": {
+    "passed": true,
+    "checks": {
+      "two_controls": true,
+      "cost_forecast": true
+    },
+    "forecast": {
+      "smoke": 353.08328689914197,
+      "full": 489.38163772341795,
+      "science": 842.4649246225599,
+      "gpu_inclusive": 952.4649246225599,
+      "cpu_inclusive": 1052.46492462256,
+      "staging": 40.0
+    },
+    "scope": "three predeclared remaining scores only"
+  },
+  "controls_exact_historical_320_values_each": true,
+  "new_score_count": 4,
+  "prior_aa307_med000_crf70_included_once": true,
+  "created_to_terminal_status_update_seconds": 488.42384910583496,
+  "recommended_gpu_seconds": 539,
+  "recommended_cpu_seconds": 639,
+  "accounting": "Conservative one-core / exclusive GPU whole creation-to-status-update elapsed ceiling plus the reserved external audit. Elapsed is not measured CPU occupation.",
+  "scope": "five actual scores plus prior aa307 score, no curve or envelope analysis"
+}
