@@ -10,6 +10,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 import hashlib
+import gzip
 import json
 import math
 import os
@@ -499,17 +500,25 @@ def _send_snapshot(
         raise FleetError("snapshot transfer timeout must be positive and finite")
     remote_tar = str(Path(target).with_suffix(".tar"))
     # Coalesce pipe reads before writing NFS; noclobber preserves partial uploads.
-    receive = f"umask 077; set -o noclobber; exec dd bs=1M iflag=fullblock status=none > {shlex.quote(remote_tar)}"
+    receive = f"umask 077; set -o noclobber -o pipefail; gzip -dc | dd bs=1M iflag=fullblock status=none > {shlex.quote(remote_tar)}"
     deadline = time.monotonic() + timeout
     def remaining() -> float:
         left = deadline - time.monotonic()
         if left <= 0:
             raise FleetError(f"{host}: snapshot transfer time budget exhausted")
         return left
-    with source.open("rb") as stream:
+    # Compress on the client, independent of any existing SSH ControlMaster.
+    # TemporaryFile uses the client's configured TMPDIR and is never on the GPU host.
+    with tempfile.TemporaryFile() as compressed, source.open("rb") as stream:
+        with gzip.GzipFile(fileobj=compressed, mode="wb", compresslevel=6, mtime=0) as encoder:
+            while block := stream.read(1024 * 1024):
+                remaining()
+                encoder.write(block)
+        remaining()
+        compressed.seek(0)
         proc = subprocess.run(
             ["ssh", "-C", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8", host, shlex.join(["bash", "-lc", receive])],
-            stdin=stream,
+            stdin=compressed,
             capture_output=True,
             timeout=remaining(),
             check=False,
